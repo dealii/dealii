@@ -1215,12 +1215,18 @@ void DoFHandler<1>::do_renumbering (const vector<int> &new_numbers) {
 				   // renumber the dofs on the interface of
 				   // two cells more than once. Anyway, this
 				   // way it's not only more correct but also
-				   // faster
+				   // faster; note, however, that dof numbers
+				   // may be -1, namely when the appropriate
+				   // vertex/line/etc is unused
   for (vector<int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
-    {
-      Assert (*i != -1, ExcInternalError());
+    if (*i != -1)
       *i = new_numbers[*i];
-    };
+    else
+				       // if index is -1: check if this one
+				       // really is unused
+      Assert (tria->vertices_used[(i-vertex_dofs.begin()) /
+				 selected_fe->dofs_per_vertex] == false,
+	      ExcInternalError ());
   
   for (unsigned int level=0; level<levels.size(); ++level) 
     for (vector<int>::iterator i=levels[level]->line_dofs.begin();
@@ -1238,11 +1244,23 @@ template <>
 void DoFHandler<2>::do_renumbering (const vector<int> &new_numbers) {
   Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
+				   // note that we can not use cell iterators
+				   // in this function since then we would
+				   // renumber the dofs on the interface of
+				   // two cells more than once. Anyway, this
+				   // way it's not only more correct but also
+				   // faster; note, however, that dof numbers
+				   // may be -1, namely when the appropriate
+				   // vertex/line/etc is unused
   for (vector<int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
-    {
-      Assert (*i != -1, ExcInternalError());
+    if (*i != -1)
       *i = new_numbers[*i];
-    };
+    else
+				       // if index is -1: check if this one
+				       // really is unused
+      Assert (tria->vertices_used[(i-vertex_dofs.begin()) /
+				 selected_fe->dofs_per_vertex] == false,
+	      ExcInternalError ());
   
   for (unsigned int level=0; level<levels.size(); ++level) 
     {
