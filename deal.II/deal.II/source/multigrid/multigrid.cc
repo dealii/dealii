@@ -83,7 +83,9 @@ void MGTransferPrebuilt::build_matrices (const MGDoFHandler<dim> &mg_dof)
 						 // this child
 		const FullMatrix<double> &prolongation
 		  = mg_dof.get_fe().prolongate(child);
-	    
+
+		Assert (prolongation.n() != 0, ExcNoProlongation());
+		
 		cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
 						 // now tag the entries in the

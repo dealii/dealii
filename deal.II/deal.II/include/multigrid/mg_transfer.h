@@ -136,6 +136,12 @@ class MGTransferPrebuilt : public Subscriptor // MGTransferBase<Vector<double> >
 		      OutVector &dst,
 		      const MGLevelObject<Vector<double> > &src) const;
 
+				     /**
+				      * Finite element does not
+				      * provide prolongation matrices.
+				      */
+    DeclException0(ExcNoProlongation);
+    
   private:
 
 				   /**
