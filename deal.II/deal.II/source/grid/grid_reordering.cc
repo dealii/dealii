@@ -1213,19 +1213,23 @@ GridReordering<dim>::presort_cells (typename std::vector<Cell>       &cells,
   
 				   // now we still have to convert all
 				   // old cell numbers to new cells
-				   // numbers
+				   // numbers. non-existent neighbors
+				   // (with index -1) are mapped to
+				   // non-existent neighbors, so we
+				   // need not touch these indices
   for (unsigned int c=0; c<cells.size(); ++c)
     {
       cells[c].cell_no = new_cell_numbers[cells[c].cell_no];
       Assert (cells[c].cell_no == c, ExcInternalError());
 
       for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-	{
-	  Assert (cells[c].neighbors[n] < new_cell_numbers.size(),
-		  ExcIndexRange(cells[c].neighbors[n], 0, 
-				new_cell_numbers.size()));
-	  cells[c].neighbors[n] = new_cell_numbers[cells[c].neighbors[n]];
-	};
+	if (cells[c].neighbors[n] != Cell::invalid_neighbor)
+	  {
+	    Assert (cells[c].neighbors[n] < new_cell_numbers.size(),
+		    ExcIndexRange(cells[c].neighbors[n], 0, 
+				  new_cell_numbers.size()));
+	    cells[c].neighbors[n] = new_cell_numbers[cells[c].neighbors[n]];
+	  };
     };
 
   for (typename std::map<Face,FaceData>::iterator i=faces.begin(); i!=faces.end(); ++i)
