@@ -190,7 +190,7 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >
 template <class MATRIX, class VECTOR>
 MGMatrix<MATRIX, VECTOR>::MGMatrix (MGLevelObject<MATRIX>* p)
 		:
-		matrix (p)
+		matrix (p, typeid(*this).name())
 {}
 
 
@@ -269,7 +269,7 @@ MGMatrixSelect (const unsigned int row,
 		const unsigned int col,
 		MGLevelObject<MATRIX>* p)
   :
-  matrix (p),
+  matrix (p, typeid(*this).name()),
   row(row),
   col(col)
 {}

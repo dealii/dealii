@@ -170,9 +170,9 @@ template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
 MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
 ::MGCoarseGridLACIteration()
 		:
-		solver(0),
-		matrix(0),
-		precondition(0)
+		solver(0, typeid(*this).name()),
+		matrix(0, typeid(*this).name()),
+		precondition(0, typeid(*this).name())
 {}
 
 
@@ -182,9 +182,9 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
 			   const MATRIX  &m,
 			   const PRECOND &p)
 		:
-		solver(&s),
-		matrix(&m),
-		precondition(&p)
+		solver(&s, typeid(*this).name()),
+		matrix(&m, typeid(*this).name()),
+		precondition(&p, typeid(*this).name())
 {}
 
 
@@ -240,7 +240,7 @@ template<typename number, class VECTOR>
 MGCoarseGridHouseholder<number, VECTOR>::MGCoarseGridHouseholder(
   const FullMatrix<number>* A)
 		:
-		matrix(A)
+		matrix(A, typeid(*this).name())
 {}
 
 
