@@ -13,6 +13,7 @@
 
 
 #include <base/function.h>
+#include <base/multithread_info.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
@@ -40,14 +41,46 @@ using namespace std;
 
 
 
-// TODO:[RH, WB] extend this function to use vector valued coefficient functions for system elements.
-// TODO:[WB] implement multithreading for this function.
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const Mapping<dim>       &mapping,
 					     const DoFHandler<dim>    &dof,
 					     const Quadrature<dim>    &q,
 					     SparseMatrix<double>     &matrix,
 					     const Function<dim> * const coefficient)
+{
+  const unsigned int n_threads = multithread_info.n_default_threads;
+  Threads::ThreadManager thread_manager;
+
+				   // define starting and end point
+				   // for each thread
+  std::vector<IteratorRange> thread_ranges
+    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
+						  dof.end(), n_threads);
+
+				   // mutex to synchronise access to
+				   // the matrix
+  Threads::ThreadMutex mutex;
+  
+				   // then assemble in parallel
+  for (unsigned int thread=0; thread<n_threads; ++thread)
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate(&MatrixCreator<dim>::create_mass_matrix_1)
+		    .collect_args (mapping, dof, q, matrix, coefficient,
+				   thread_ranges[thread], mutex));
+  thread_manager.wait ();  
+};
+
+
+
+// TODO:[RH] extend this function to use vector valued coefficient functions for system elements.
+template <int dim>
+void MatrixCreator<dim>::create_mass_matrix_1 (const Mapping<dim>       &mapping,
+					       const DoFHandler<dim>    &dof,
+					       const Quadrature<dim>    &q,
+					       SparseMatrix<double>     &matrix,
+					       const Function<dim> * const coefficient,
+					       const IteratorRange      &range,
+					       Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_values | update_JxW_values);
   if (coefficient != 0)
@@ -65,8 +98,8 @@ void MatrixCreator<dim>::create_mass_matrix (const Mapping<dim>       &mapping,
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  for (; cell!=dof.end(); ++cell)
+  typename DoFHandler<dim>::active_cell_iterator cell = range.first;
+  for (; cell!=range.second; ++cell)
     {
       fe_values.reinit (cell);
       
@@ -104,10 +137,15 @@ void MatrixCreator<dim>::create_mass_matrix (const Mapping<dim>       &mapping,
 
 				       // transfer everything into the
 				       // global object
+      mutex.acquire ();
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  matrix.add (dof_indices[i], dof_indices[j],
-		      cell_matrix(i,j));
+	  if ((n_components==1) ||
+	      (fe.system_to_component_index(i).first ==
+	       fe.system_to_component_index(j).first))
+	    matrix.add (dof_indices[i], dof_indices[j],
+			cell_matrix(i,j));
+      mutex.release ();
     };
 };
 
@@ -123,8 +161,6 @@ void MatrixCreator<dim>::create_mass_matrix (const DoFHandler<dim>    &dof,
 }
 
 
-// TODO:[RH, WB] extend this function to use vector valued coefficient functions for system elements.
-// TODO:[WB] implement multithreading for this function.
 template <int dim>
 void MatrixCreator<dim>::create_mass_matrix (const Mapping<dim>       &mapping,
 					     const DoFHandler<dim>    &dof,
@@ -133,6 +169,45 @@ void MatrixCreator<dim>::create_mass_matrix (const Mapping<dim>       &mapping,
 					     const Function<dim>      &rhs,
 					     Vector<double>           &rhs_vector,
 					     const Function<dim> * const coefficient)
+{
+  const unsigned int n_threads = multithread_info.n_default_threads;
+  Threads::ThreadManager thread_manager;
+
+				   // define starting and end point
+				   // for each thread
+  std::vector<IteratorRange> thread_ranges
+    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
+						  dof.end(), n_threads);
+
+				   // mutex to synchronise access to
+				   // the matrix
+  Threads::ThreadMutex mutex;
+  
+				   // then assemble in parallel
+  for (unsigned int thread=0; thread<n_threads; ++thread)
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate(&MatrixCreator<dim>::
+					 create_mass_matrix_2)
+		    .collect_args (mapping, dof, q, matrix, rhs,
+				   rhs_vector, coefficient,
+				   thread_ranges[thread], mutex));
+  thread_manager.wait ();  
+};
+
+
+
+// TODO:[RH] extend this function to use vector valued coefficient functions for system elements.
+template <int dim>
+void
+MatrixCreator<dim>::create_mass_matrix_2 (const Mapping<dim>       &mapping,
+					  const DoFHandler<dim>    &dof,
+					  const Quadrature<dim>    &q,
+					  SparseMatrix<double>     &matrix,
+					  const Function<dim>      &rhs,
+					  Vector<double>           &rhs_vector,
+					  const Function<dim> * const coefficient,
+					  const IteratorRange      &range,
+					  Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_values |
 					 update_q_points |
@@ -154,8 +229,8 @@ void MatrixCreator<dim>::create_mass_matrix (const Mapping<dim>       &mapping,
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  for (; cell!=dof.end(); ++cell)
+  typename DoFHandler<dim>::active_cell_iterator cell = range.first;
+  for (; cell!=range.second; ++cell)
     {
       fe_values.reinit (cell);
       
@@ -205,12 +280,17 @@ void MatrixCreator<dim>::create_mass_matrix (const Mapping<dim>       &mapping,
 
 				       // transfer everything into the
 				       // global object
+      mutex.acquire ();
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  matrix.add (dof_indices[i], dof_indices[j],
-		      cell_matrix(i,j));
+	  if ((n_components==1) ||
+	      (fe.system_to_component_index(i).first ==
+	       fe.system_to_component_index(j).first))
+	    matrix.add (dof_indices[i], dof_indices[j],
+			cell_matrix(i,j));
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	rhs_vector(dof_indices[i]) += local_rhs(i);
+      mutex.release ();
     };
 };
 
@@ -260,17 +340,79 @@ void MatrixCreator<1>::create_boundary_mass_matrix (const Mapping<1>          &,
 #endif
 
 
-// TODO:[RH, WB] extend this function to use vector valued coefficient functions for system elements.
-// TODO:[WB] implement multithreading for this function.
+// TODO:[RH] extend this function to use vector valued coefficient functions for system elements.
 template <int dim>
-void MatrixCreator<dim>::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
-						      const DoFHandler<dim>     &dof,
-						      const Quadrature<dim-1>   &q,
-						      SparseMatrix<double>      &matrix,
-						      const FunctionMap         &boundary_functions,
-						      Vector<double>            &rhs_vector,
-						      std::vector<unsigned int> &dof_to_boundary_mapping,
-						      const Function<dim>       *a)
+void
+MatrixCreator<dim>::create_boundary_mass_matrix (const Mapping<dim>        &mapping,
+						 const DoFHandler<dim>     &dof,
+						 const Quadrature<dim-1>   &q,
+						 SparseMatrix<double>      &matrix,
+						 const FunctionMap         &boundary_functions,
+						 Vector<double>            &rhs_vector,
+						 std::vector<unsigned int> &dof_to_boundary_mapping,
+						 const Function<dim>       *a)
+{
+  const unsigned int n_threads = multithread_info.n_default_threads;
+  Threads::ThreadManager thread_manager;
+
+				   // define starting and end point
+				   // for each thread
+  std::vector<IteratorRange> thread_ranges
+    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
+						  dof.end(), n_threads);
+
+				   // mutex to synchronise access to
+				   // the matrix
+  Threads::ThreadMutex mutex;
+  
+				   // then assemble in parallel
+  for (unsigned int thread=0; thread<n_threads; ++thread)
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate(&MatrixCreator<dim>::
+					 create_boundary_mass_matrix_1)
+		    .collect_args (mapping, dof, q, matrix,
+				   boundary_functions, rhs_vector,
+				   dof_to_boundary_mapping, a,
+				   thread_ranges[thread], mutex));
+  thread_manager.wait ();  
+};
+
+
+#if deal_II_dimension == 1
+
+template <>
+void
+MatrixCreator<1>::
+create_boundary_mass_matrix_1 (const Mapping<1>          &,
+			       const DoFHandler<1>       &,
+			       const Quadrature<0>       &,
+			       SparseMatrix<double>      &,
+			       const FunctionMap         &,
+			       Vector<double>            &,
+			       std::vector<unsigned int> &,
+			       const Function<1> * const ,
+			       const IteratorRange       &,
+			       Threads::ThreadMutex      &)
+{
+  Assert (false, ExcNotImplemented());
+};
+
+#endif
+
+
+template <int dim>
+void
+MatrixCreator<dim>::
+create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
+			       const DoFHandler<dim>     &dof,
+			       const Quadrature<dim-1>   &q,
+			       SparseMatrix<double>      &matrix,
+			       const FunctionMap         &boundary_functions,
+			       Vector<double>            &rhs_vector,
+			       std::vector<unsigned int> &dof_to_boundary_mapping,
+			       const Function<dim> * const a,
+			       const IteratorRange       &range,
+			       Threads::ThreadMutex      &mutex)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
@@ -325,9 +467,8 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const Mapping<dim>        
   std::vector<unsigned int> dofs_on_face_vector (dofs_per_face);
   std::set<int> dofs_on_face;
 
-  DoFHandler<dim>::active_cell_iterator cell = dof.begin_active (),
-					endc = dof.end ();
-  for (; cell!=endc; ++cell)
+  DoFHandler<dim>::active_cell_iterator cell = range.first;
+  for (; cell!=range.second; ++cell)
     for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 				       // check if this face is on that part of
 				       // the boundary we are interested in
@@ -516,7 +657,8 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const Mapping<dim>        
 //in the innermost loop, we traverse a set twice in "find", but
 //this could be made much faster, e.g. by first building a vector<bool>
 //that already stores the result of find beforehand
-// (then remove dofs_on_face altogether)	  
+// (then remove dofs_on_face altogether)
+	  mutex.acquire ();
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      if ((dofs_on_face.find(dofs[i]) != dofs_on_face.end()) &&
@@ -526,6 +668,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const Mapping<dim>        
 			   cell_matrix(i,j));
 	      else
 		{
+//TODO:[?] We assume here that shape functions that have support also on the boundary also have their support point on the boundary (by having their indices in dofs_on_face). This is not true, however, e.g. for discontinuous elements.
 						   // compare here for relative
 						   // smallness
 		  Assert (fabs(cell_matrix(i,j)) <= 1e-10 * max_diag_entry,
@@ -542,6 +685,7 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const Mapping<dim>        
 		Assert (fabs(cell_vector(j)) <= 1e-10 * max_diag_entry,
 			ExcInternalError());
 	      };
+	  mutex.release ();
 	};
 };
 
@@ -561,14 +705,47 @@ void MatrixCreator<dim>::create_boundary_mass_matrix (const DoFHandler<dim>     
 }
 
 
-// TODO:[RH, WB] extend this function to use vector valued coefficient functions for system elements.
-// TODO:[WB] implement multithreading for this function.
+
 template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const Mapping<dim>       &mapping,
 						const DoFHandler<dim>    &dof,
 						const Quadrature<dim>    &q,
 						SparseMatrix<double>     &matrix,
 						const Function<dim> * const coefficient)
+{
+  const unsigned int n_threads = multithread_info.n_default_threads;
+  Threads::ThreadManager thread_manager;
+
+				   // define starting and end point
+				   // for each thread
+  std::vector<IteratorRange> thread_ranges
+    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
+						  dof.end(), n_threads);
+
+				   // mutex to synchronise access to
+				   // the matrix
+  Threads::ThreadMutex mutex;
+  
+				   // then assemble in parallel
+  for (unsigned int thread=0; thread<n_threads; ++thread)
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate(&MatrixCreator<dim>::create_laplace_matrix_1)
+		    .collect_args (mapping, dof, q, matrix, coefficient,
+				   thread_ranges[thread], mutex));
+  thread_manager.wait ();  
+};
+
+
+
+// TODO:[RH] extend this function to use vector valued coefficient functions for system elements.
+template <int dim>
+void MatrixCreator<dim>::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
+						  const DoFHandler<dim>    &dof,
+						  const Quadrature<dim>    &q,
+						  SparseMatrix<double>     &matrix,
+						  const Function<dim> * const coefficient,
+						  const IteratorRange      &range,
+						  Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_JxW_values |
 					 update_gradients);
@@ -587,8 +764,8 @@ void MatrixCreator<dim>::create_laplace_matrix (const Mapping<dim>       &mappin
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  for (; cell!=dof.end(); ++cell)
+  typename DoFHandler<dim>::active_cell_iterator cell = range.first;
+  for (; cell!=range.second; ++cell)
     {
       fe_values.reinit (cell);
       
@@ -627,10 +804,15 @@ void MatrixCreator<dim>::create_laplace_matrix (const Mapping<dim>       &mappin
 
 				       // transfer everything into the
 				       // global object
+      mutex.acquire ();
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  matrix.add (dof_indices[i], dof_indices[j],
-		      cell_matrix(i,j));
+	  if ((n_components==1) ||
+	      (fe.system_to_component_index(i).first ==
+	       fe.system_to_component_index(j).first))
+	    matrix.add (dof_indices[i], dof_indices[j],
+			cell_matrix(i,j));
+      mutex.release ();
     };
 };
 
@@ -684,8 +866,6 @@ void MatrixCreator<dim>::create_level_laplace_matrix (unsigned int level,
 
 
 
-// TODO:[RH, WB] extend this function to use vector valued coefficient functions for system elements.
-// TODO:[WB] implement multithreading for this function.
 template <int dim>
 void MatrixCreator<dim>::create_laplace_matrix (const Mapping<dim>       &mapping,
 						const DoFHandler<dim>    &dof,
@@ -694,6 +874,45 @@ void MatrixCreator<dim>::create_laplace_matrix (const Mapping<dim>       &mappin
 						const Function<dim>      &rhs,
 						Vector<double>           &rhs_vector,
 						const Function<dim> * const coefficient)
+{
+  const unsigned int n_threads = multithread_info.n_default_threads;
+  Threads::ThreadManager thread_manager;
+
+				   // define starting and end point
+				   // for each thread
+  std::vector<IteratorRange> thread_ranges
+    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
+						  dof.end(), n_threads);
+
+				   // mutex to synchronise access to
+				   // the matrix
+  Threads::ThreadMutex mutex;
+  
+				   // then assemble in parallel
+  for (unsigned int thread=0; thread<n_threads; ++thread)
+    Threads::spawn (thread_manager,
+		    Threads::encapsulate(&MatrixCreator<dim>::
+					 create_laplace_matrix_2)
+		    .collect_args (mapping, dof, q, matrix, rhs,
+				   rhs_vector, coefficient,
+				   thread_ranges[thread], mutex));
+  thread_manager.wait ();  
+};
+
+
+
+// TODO:[RH] extend this function to use vector valued coefficient functions for system elements.
+template <int dim>
+void
+MatrixCreator<dim>::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
+					     const DoFHandler<dim>    &dof,
+					     const Quadrature<dim>    &q,
+					     SparseMatrix<double>     &matrix,
+					     const Function<dim>      &rhs,
+					     Vector<double>           &rhs_vector,
+					     const Function<dim> * const coefficient,
+					     const IteratorRange      &range,
+					     Threads::ThreadMutex     &mutex)
 {
   UpdateFlags update_flags = UpdateFlags(update_values    |
 					 update_gradients |
@@ -716,8 +935,8 @@ void MatrixCreator<dim>::create_laplace_matrix (const Mapping<dim>       &mappin
   
   std::vector<unsigned int> dof_indices (dofs_per_cell);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  for (; cell!=dof.end(); ++cell)
+  typename DoFHandler<dim>::active_cell_iterator cell = range.first;
+  for (; cell!=range.second; ++cell)
     {
       fe_values.reinit (cell);
       
@@ -769,12 +988,17 @@ void MatrixCreator<dim>::create_laplace_matrix (const Mapping<dim>       &mappin
 
 				       // transfer everything into the
 				       // global object
+      mutex.acquire ();
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  matrix.add (dof_indices[i], dof_indices[j],
-		      cell_matrix(i,j));
+	  if ((n_components==1) ||
+	      (fe.system_to_component_index(i).first ==
+	       fe.system_to_component_index(j).first))
+	    matrix.add (dof_indices[i], dof_indices[j],
+			cell_matrix(i,j));
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	rhs_vector(dof_indices[i]) += local_rhs(i);
+      mutex.release ();
     };
 };
 
@@ -791,6 +1015,7 @@ void MatrixCreator<dim>::create_laplace_matrix (const DoFHandler<dim>    &dof,
   static const MappingQ1<dim> mapping;  
   create_laplace_matrix(mapping, dof, q, matrix, rhs, rhs_vector, coefficient);
 }
+
 
 
 template <int dim>

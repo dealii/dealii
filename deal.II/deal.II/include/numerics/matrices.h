@@ -11,6 +11,7 @@
 
 
 #include <base/exceptions.h>
+#include <base/thread_management.h>
 #include <map>
 
 
@@ -205,7 +206,11 @@ class MatrixCreator
 				      * Assemble the mass matrix. If no 
 				      * coefficient is given, it is assumed
 				      * to be unity.
-				      * 
+				      *
+				      * If the library is configured
+				      * to use multithreading, this
+				      * function works in parallel.
+				      *
 				      * See the general doc of this class
 				      * for more information.
 				      */
@@ -213,7 +218,7 @@ class MatrixCreator
 				    const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
 				    SparseMatrix<double>     &matrix,
-				    const Function<dim>      *a = 0);
+				    const Function<dim> * const a = 0);
 
 				     /**
 				      * Calls the @p{create_mass_matrix}
@@ -223,16 +228,20 @@ class MatrixCreator
     static void create_mass_matrix (const DoFHandler<dim>    &dof,
 				    const Quadrature<dim>    &q,
 				    SparseMatrix<double>     &matrix,
-				    const Function<dim>      *a = 0);
+				    const Function<dim> * const a = 0);
 
     				     /**
-				      * Assemble the mass matrix and a right
-				      * hand side vector. If no 
-				      * coefficient is given, it is assumed
-				      * to be unity.
+				      * Assemble the mass matrix and a
+				      * right hand side vector. If no
+				      * coefficient is given, it is
+				      * assumed to be unity.
 				      *
-				      * See the general doc of this class
-				      * for more information.
+				      * If the library is configured
+				      * to use multithreading, this
+				      * function works in parallel.
+				      *
+				      * See the general doc of this
+				      * class for more information.
 				      */
     static void create_mass_matrix (const Mapping<dim>       &mapping,
 				    const DoFHandler<dim>    &dof,
@@ -240,7 +249,7 @@ class MatrixCreator
 				    SparseMatrix<double>     &matrix,
 				    const Function<dim>      &rhs,
 				    Vector<double>           &rhs_vector,
-				    const Function<dim>      *a = 0);
+				    const Function<dim> * const a = 0);
 
 				     /**
 				      * Calls the @p{create_mass_matrix}
@@ -252,52 +261,65 @@ class MatrixCreator
 				    SparseMatrix<double>     &matrix,
 				    const Function<dim>      &rhs,
 				    Vector<double>           &rhs_vector,
-				    const Function<dim>      *a = 0);
+				    const Function<dim> * const a = 0);
     
 				     /**
-				      * Assemble the mass matrix and a right
-				      * hand side vector along the boundary.
-				      * If no 
-				      * coefficient is given, it is assumed
-				      * to be constant one.
+				      * Assemble the mass matrix and a
+				      * right hand side vector along
+				      * the boundary.  If no
+				      * coefficient is given, it is
+				      * assumed to be constant one.
 				      *
-				      * The matrix is assumed to already be
-				      * initialized with a suiting sparsity
-				      * pattern (the @ref{DoFHandler} provides an
+				      * The matrix is assumed to
+				      * already be initialized with a
+				      * suiting sparsity pattern (the
+				      * @ref{DoFHandler} provides an
 				      * appropriate function).
 				      *
-				      * See the general doc of this class
-				      * for more information.
+				      * If the library is configured
+				      * to use multithreading, this
+				      * function works in parallel.
+				      *
+				      * See the general doc of this
+				      * class for more information.
 				      */
-    static void create_boundary_mass_matrix (const Mapping<dim>       &mapping,
-					     const DoFHandler<dim>    &dof,
-					     const Quadrature<dim-1>  &q,
-					     SparseMatrix<double>     &matrix,
-					     const FunctionMap        &boundary_functions,
-					     Vector<double>           &rhs_vector,
-					     std::vector<unsigned int>&dof_to_boundary_mapping,
-					     const Function<dim>      *a = 0);
+    static
+    void create_boundary_mass_matrix (const Mapping<dim>       &mapping,
+				      const DoFHandler<dim>    &dof,
+				      const Quadrature<dim-1>  &q,
+				      SparseMatrix<double>     &matrix,
+				      const FunctionMap        &boundary_functions,
+				      Vector<double>           &rhs_vector,
+				      std::vector<unsigned int>&dof_to_boundary_mapping,
+				      const Function<dim>      *a = 0);
 
 				     /**
-				      * Calls the @p{create_boundary_mass_matrix}
+				      * Calls the
+				      * @p{create_boundary_mass_matrix}
 				      * function, see above, with
 				      * @p{mapping=MappingQ1<dim>()}.
 				      */
-    static void create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
-					     const Quadrature<dim-1>  &q,
-					     SparseMatrix<double>     &matrix,
-					     const FunctionMap        &boundary_functions,
-					     Vector<double>           &rhs_vector,
-					     std::vector<unsigned int>&dof_to_boundary_mapping,
-					     const Function<dim>      *a = 0);
+    static
+    void create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
+				      const Quadrature<dim-1>  &q,
+				      SparseMatrix<double>     &matrix,
+				      const FunctionMap        &boundary_functions,
+				      Vector<double>           &rhs_vector,
+				      std::vector<unsigned int>&dof_to_boundary_mapping,
+				      const Function<dim>      *a = 0);
 
 				     /**
-				      * Assemble the Laplace matrix. If no 
-				      * coefficient is given, it is assumed
-				      * to be constant one.
+				      * Assemble the Laplace
+				      * matrix. If no coefficient is
+				      * given, it is assumed to be
+				      * constant one.
 				      * 
-				      * See the general doc of this class
-				      * for more information.
+				      * If the library is configured
+				      * to use multithreading, this
+				      * function works in parallel.
+				      *
+				      * See the general doc of this
+				      * class for more information.
 				      */
     static void create_laplace_matrix (const Mapping<dim>       &mapping,
 				       const DoFHandler<dim>    &dof,
@@ -316,10 +338,11 @@ class MatrixCreator
 				       const Function<dim>      *a = 0);
 
 				     /**
-				      * Generate Laplace matrix for a given level.
+				      * Generate Laplace matrix for a
+				      * given level.
 				      * 
-				      * See the general doc of this class
-				      * for more information.
+				      * See the general doc of this
+				      * class for more information.
 				      */
     static void create_level_laplace_matrix (unsigned int             level,
 					     const MGDoFHandler<dim>& dof,
@@ -328,13 +351,18 @@ class MatrixCreator
 					     const Function<dim>*     a = 0);
 
 				     /**
-				      * Assemble the Laplace matrix and a right
-				      * hand side vector. If no 
-				      * coefficient is given, it is assumed
-				      * to be constant one.
+				      * Assemble the Laplace matrix
+				      * and a right hand side
+				      * vector. If no coefficient is
+				      * given, it is assumed to be
+				      * constant one.
 				      * 
-				      * See the general doc of this class
-				      * for more information.
+				      * If the library is configured
+				      * to use multithreading, this
+				      * function works in parallel.
+				      *
+				      * See the general doc of this
+				      * class for more information.
 				      */
     static void create_laplace_matrix (const Mapping<dim>       &mapping,
 				       const DoFHandler<dim>    &dof,
@@ -342,7 +370,7 @@ class MatrixCreator
 				       SparseMatrix<double>     &matrix,
 				       const Function<dim>      &rhs,
 				       Vector<double>           &rhs_vector,
-				       const Function<dim>      *a = 0);
+				       const Function<dim> * const a = 0);
 
 				     /**
 				      * Calls the @p{create_laplace_matrix}
@@ -360,6 +388,122 @@ class MatrixCreator
 				      * Exception
 				      */
     DeclException0 (ExcComponentMismatch);
+
+  private:
+				     /**
+				      * Convenience abbreviation for
+				      * DoF handler cell iterators.
+				      */
+    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+
+				     /**
+				      * Pair of iterators denoting a
+				      * half-open range.
+				      */
+    typedef std::pair<active_cell_iterator,active_cell_iterator> IteratorRange;
+    
+
+				     /**
+				      * Version of the same function
+				      * (without suffix @p{_1}) with
+				      * the same argument list that
+				      * operates only on an interval
+				      * of iterators. Used for
+				      * parallelization. The mutex is
+				      * used to synchronise access to
+				      * the matrix.
+				      */
+    static
+    void create_mass_matrix_1 (const Mapping<dim>       &mapping,
+			       const DoFHandler<dim>    &dof,
+			       const Quadrature<dim>    &q,
+			       SparseMatrix<double>     &matrix,
+			       const Function<dim> * const a,
+			       const IteratorRange      &range,
+			       Threads::ThreadMutex     &mutex);
+
+				     /**
+				      * Version of the same function
+				      * (without suffix @p{_2}) with
+				      * the same argument list that
+				      * operates only on an interval
+				      * of iterators. Used for
+				      * parallelization. The mutex is
+				      * used to synchronise access to
+				      * the matrix.
+				      */
+    static
+    void create_mass_matrix_2 (const Mapping<dim>       &mapping,
+			       const DoFHandler<dim>    &dof,
+			       const Quadrature<dim>    &q,
+			       SparseMatrix<double>     &matrix,
+			       const Function<dim>      &rhs,
+			       Vector<double>           &rhs_vector,
+			       const Function<dim> * const a,
+			       const IteratorRange      &range,
+			       Threads::ThreadMutex     &mutex);
+
+				     /**
+				      * Version of the same function
+				      * (without suffix @p{_1}) with
+				      * the same argument list that
+				      * operates only on an interval
+				      * of iterators. Used for
+				      * parallelization. The mutex is
+				      * used to synchronise access to
+				      * the matrix.
+				      */
+    static
+    void create_laplace_matrix_1 (const Mapping<dim>       &mapping,
+				  const DoFHandler<dim>    &dof,
+				  const Quadrature<dim>    &q,
+				  SparseMatrix<double>     &matrix,
+				  const Function<dim> * const a,
+				  const IteratorRange      &range,
+				  Threads::ThreadMutex     &mutex);
+
+				     /**
+				      * Version of the same function
+				      * (without suffix @p{_2}) with
+				      * the same argument list that
+				      * operates only on an interval
+				      * of iterators. Used for
+				      * parallelization. The mutex is
+				      * used to synchronise access to
+				      * the matrix.
+				      */
+    static
+    void create_laplace_matrix_2 (const Mapping<dim>       &mapping,
+				  const DoFHandler<dim>    &dof,
+				  const Quadrature<dim>    &q,
+				  SparseMatrix<double>     &matrix,
+				  const Function<dim>      &rhs,
+				  Vector<double>           &rhs_vector,
+				  const Function<dim> * const a,
+				  const IteratorRange      &range,
+				  Threads::ThreadMutex     &mutex);
+
+				     /**
+				      * Version of the same function
+				      * (without suffix @p{_1}) with
+				      * the same argument list that
+				      * operates only on an interval
+				      * of iterators. Used for
+				      * parallelization. The mutex is
+				      * used to synchronise access to
+				      * the matrix.
+				      */
+    static
+    void create_boundary_mass_matrix_1 (const Mapping<dim>       &mapping,
+					const DoFHandler<dim>    &dof,
+					const Quadrature<dim-1>  &q,
+					SparseMatrix<double>     &matrix,
+					const FunctionMap        &boundary_functions,
+					Vector<double>           &rhs_vector,
+					std::vector<unsigned int>&dof_to_boundary_mapping,
+					const Function<dim> * const a,
+					const IteratorRange      &range,
+					Threads::ThreadMutex     &mutex);
 };
 
 
