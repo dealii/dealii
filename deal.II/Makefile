@@ -137,9 +137,9 @@ TODO:
 	@egrep -i '// *todo' $D/base/include/*/*.h $D/base/source/*.cc \
                      $D/lac/include/*/*.h $D/lac/source/*.cc   \
                      $D/deal.II/include/*/*.h $D/deal.II/source/*/*.cc \
-	| perl -pi -e 's#$D/?#\n#g;' \
-	| perl -pi -e 's#(.*)(TODO:?)(\[.+\])#\3 \1\2\3#gi;' \
-	| perl -pi -e 's#\s*//\s*TODO:\s*(\[.+\])\s*#\n\1     #gi;' \
+	| perl -pi -e 's#$D/?#\n#;' \
+	| perl -pi -e 's#(.*)(TODO:?)(\[.+\])#\3 \1\2\3#i;' \
+	| perl -pi -e 's#\s*//\s*TODO:\s*(\[.+\])\s*#\n\1     #i;' \
              > $@
 
 
