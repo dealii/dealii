@@ -13,10 +13,10 @@ include $D/common/Make.global_options
 
 %.g.o : %.cc
 	@echo =====debug========= $<
-	@$(CXX) $(flags) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.g) $(CXXFLAGS) -c $< -o $@
 %.o : %.cc
 	@echo =====optimized===== $<
-	@$(CXX) $(flags) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) $(CXXFLAGS) -c $< -o $@
 
 ############################################################
 # Automatic generation of dependencies
