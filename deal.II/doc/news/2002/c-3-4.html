@@ -105,6 +105,58 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> New: There are now <code
+       class="member">Triangulation::save/load_user_pointers(vector&lt;void
+       *&gt; &)</code> functions similar to the respective <code
+       class="member">Triangulation::save/load_user_flags(vector&lt;bool&gt;
+       &)</code> functions.
+       <br>
+       (RH 2002/06/14)
+       </p>
+
+  <li> <p> Fix: Bug in <code
+       class="member">Triangulation<3>::load_user_pointers(vector&lt;void
+       *&gt; &)</code> is now fixed.
+       <br>
+       (RH 2002/06/14)
+       </p>
+
+  <li> <p> Fixed: <code
+       class="member">Triangulation::load_user_pointers(vector&lt;void
+       *&gt; &)</code> erroneously threw an assertion for
+       <code>dim==1</code>. This is now fixed.
+       <br>
+       (RH 2002/06/14)
+       </p>
+
+  <li> <p> Change: <code
+       class="member">Triangulation<1>::n_quads</code> now returns 0,
+       instead of throwing an assertion, as before. The same holds for
+       similar functions like <code
+       class="member">Triangulation<dim>::n_hexs</code> that now
+       returns 0 for <code>dim<3</code>.
+       <br>
+       (RH 2002/06/14)
+       </p>
+
+  <li> <p> Improved: Several functions like the <code
+       class="member">DoFHandler::distribute</code> and <code
+       class="member">DoFTools::make_flux_sparsity_pattern</code>
+       functions altered the <code
+       class="member">user_flags</code>. This was stated in the
+       documentation of these functions. Nevertheless, it might have
+       led to unexpected behaviour of the <code
+       class="member">user_flags</code> for users who weren't aware of
+       this <em>side-effect</em>. Now, these functions do not alter
+       the <code class="member">user_flags</code>, any
+       more. Consequently, the users do not need to worry any more
+       about the reliability of the <code
+       class="member">user_flags</code> when calling any function of
+       the library.
+       <br>
+       (RH 2002/06/14)
+       </p>  
+
   <li> <p> Fixed: <code
        class="member">FE_Q::has_support_on_face</code> always returned
        true in 1d, partly because faces are not really an issue in
@@ -121,13 +173,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        class="member">FETools::back_interpolate</code> and <code
        class="member">FETools::interpolate_difference</code> functions
        do not take into account hanging node constraints. Therefore,
-       they have been working for continuous elements on globally
-       refined grids and on discontinuous elements, only. Now, there
-       are new functions with the same names but additional <code
+       they work for continuous elements on globally refined grids and
+       on discontinuous elements, only. Now, there are new functions
+       with the same names but additional <code
        class="class">ConstraintMatrix</code> arguments for the hanging
-       node constraints. These new functions now work for continuous
-       as well as for discontinuous elements. But, the old functions
-       are still supported.
+       node constraints. These new functions work for continuous as
+       well as for discontinuous elements. But, the old functions are
+       still supported.
        <br>
        (RH 2002/06/13)
        </p>
@@ -144,14 +196,6 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        class="class">TriaAccessor</code> and <code
        class="class">TriaIterator</code> classes now take pointers to
        <tt>const</tt> <code class="class">Triangulation</code>s.
-       <br>
-       (RH 2002/06/12)
-       </p>
-
-  <li> <p> Changed: <code
-       class="member">Triangulation::clear_user_flags</code> and <code
-       class="member">Triangulation::clear_user_pointers</code> are
-       now <tt>const</tt> functions.
        <br>
        (RH 2002/06/12)
        </p>
