@@ -219,6 +219,8 @@ dnl Adjust compiler parameters if multithreading is desired:
 dnl - Use the right -threads/-pthread/-mthread option
 dnl - Set preprocessor directives if necessary
 dnl - __USE_MALLOC tells gcc to use thread safe STL allocators
+dnl - _REENTRANT is a flag that is used in the standard UNIX
+dnl   headers to make reentrant functions (with suffix _r) declared
 dnl - remove -ansi from compiler flags again, since ACE yields hundreds of
 dnl   error messages with this flag
 if test $enablemultithreading = yes ; then
@@ -226,6 +228,7 @@ if test $enablemultithreading = yes ; then
   DEAL_II_THREAD_CPPFLAGS
 
   AC_DEFINE(__USE_MALLOC)
+  AC_DEFINE(_REENTRANT)
 
   CXXFLAGSG="`echo $CXXFLAGSG | perl -pi -e 's/-ansi//g;'`"
 fi
