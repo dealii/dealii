@@ -43,7 +43,8 @@
  * the size of the orthogonalized residual computed during the
  * iteration may be larger by orders of magnitude than the true
  * residual. This is due to numerical instabilities related to badly
- * conditioned matrices.
+ * conditioned matrices. Since this instability results in a bad
+ * stopping criterion, the default for this parameter is @p{true}.
  *
  * The second parameter is the size of a breakdown criterion. It is
  * difficult to find a general good criterion, so if things do not
@@ -69,11 +70,11 @@ class SolverBicgstab : public Solver<VECTOR>
 					 /**
 					  * Constructor.
 					  *
-					  * The default is no exact residual
+					  * The default is exact residual
 					  * computation and breakdown
 					  * parameter 1e-16.
 					  */
-	AdditionalData(bool exact_residual = false,
+	AdditionalData(bool exact_residual = true,
 		       double breakdown=1.e-10) :
 			exact_residual(exact_residual),
 			breakdown(breakdown)
