@@ -50,7 +50,7 @@ void FESystem<dim>::initialize_matrices () {
 template <>
 FiniteElementData<1>
 FESystem<1>::multiply_dof_numbers (const FiniteElementData<1> &fe_data,
-				   const unsigned int         &N) {
+				   const unsigned int          N) {
   return FiniteElementData<1> (fe_data.dofs_per_vertex * N,
 			       fe_data.dofs_per_line * N,
 			       fe_data.n_transform_functions);
@@ -64,7 +64,7 @@ FESystem<1>::multiply_dof_numbers (const FiniteElementData<1> &fe_data,
 template <>
 FiniteElementData<2>
 FESystem<2>::multiply_dof_numbers (const FiniteElementData<2> &fe_data,
-				   const unsigned int         N) {
+				   const unsigned int          N) {
   return FiniteElementData<2> (fe_data.dofs_per_vertex * N,
 			       fe_data.dofs_per_line * N,
 			       fe_data.dofs_per_quad * N,

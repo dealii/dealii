@@ -29,7 +29,7 @@ FECubicSub<1>::FECubicSub () :
 
 template <>
 FECubicSub<1>::FECubicSub (const int) :
-		FELinearMapping<2> (0, 0, 4)
+		FELinearMapping<1> (0, 4)
 {
   initialize_matrices ();
 };

@@ -455,7 +455,7 @@ DoFCellAccessor<1>::get_dof_values (const dVector &values,
   vector<double>::iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next_lcoal_value++ = values(vertex_dof_index(vertex,d));
+      *next_local_value++ = values(vertex_dof_index(vertex,d));
   for (unsigned int d=0; d<dofs_per_line; ++d)
     *next_local_value++ = values(dof_index(d));
 };

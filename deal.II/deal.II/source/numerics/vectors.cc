@@ -94,6 +94,7 @@ VectorTools<dim>::interpolate(const DoFHandler<dim>    &high_dof,
 #if deal_II_dimension == 1
 
 
+template <>
 void VectorTools<1>::project (const DoFHandler<1>    &,
 			      const ConstraintMatrix &,
 			      const FiniteElement<1> &,
