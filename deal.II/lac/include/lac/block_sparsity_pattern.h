@@ -50,8 +50,8 @@ class CompressedBlockSparsityPattern;
  * one of its subobjects' size is changed. After you initialize the
  * sizes of the subobjects, you will therefore have to call the
  * @p{collect_sizes()} function of this class! Note that, of course, all
- * sub-matrices in a row have to have the same number of rows, and
- * that all sub-matrices in a column have to have the same number of
+ * sub-matrices in a (block-)row have to have the same number of rows, and
+ * that all sub-matrices in a (block-)column have to have the same number of
  * columns.
  *
  * You will in general not want to use this class, but one of the
@@ -269,7 +269,8 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * matrix, which equals the
 				      * dimension of the image
 				      * space. It is the sum of rows
-				      * of the rows of sub-matrices.
+				      * of the (block-)rows of
+				      * sub-matrices.
 				      */
     unsigned int n_rows () const;
 
@@ -278,8 +279,8 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * this matrix, which equals the
 				      * dimension of the range
 				      * space. It is the sum of
-				      * columns of the columns of
-				      * sub-matrices.
+				      * columns of the (block-)columns
+				      * of sub-matrices.
 				      */
     unsigned int n_cols () const;
 
