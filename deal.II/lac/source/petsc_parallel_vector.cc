@@ -113,6 +113,9 @@ namespace PETScWrappers
     Vector &
     Vector::operator = (const PETScWrappers::Vector &v)
     {
+      // first flush buffers
+      compress ();
+
       int ierr;
 
                             // get a pointer to the local memory of this vector
