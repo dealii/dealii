@@ -20,13 +20,17 @@ AC_SUBST(DEAL2_DIR)
 
 
 dnl    Find a C compiler, which is used when building
-dnl    shared libaries. This modifies the variable CC
+dnl    shared libaries. This modifies the variable CC.
+dnl    In order to get the absolute path of the compiler, use the
+dnl    second line
 AC_PROG_CC
+CC=`which $CC`
 
 
 dnl    Find the right C++ compiler. This modifies the following
 dnl    variables: CXX, GXX, CXXFLAGS
 AC_PROG_CXX
+CXX=`which $CXX`
 if test $GXX = yes ; then
   # find out the right version
   GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`

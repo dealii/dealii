@@ -1,80 +1,16 @@
 # $Id$
 
-
 ###############################################################################
-# This file exports several make variables to other Makefiles which
-# include it. You will want to include this file into the Makefiles of
-# your project to use the same compiler flags and to access the pathes
-# to libraries. The following symbols defined in this file may be of
-# interest:
-#
-#
-# General
-# -------
-#   CXX                -- executable name of the C++ compiler
-#   CC                 -- executable name of the C compiler, which
-#                         is used to generate shared libraries
-#   PERL               -- executable name of the 'perl' program
-#
-#
-# Paths to libraries
-# -------------------
-#   lib-path-base      -- path to the library files of the /base library
-#   lib-path-lac       -- same for the /lac library
-#   lib-path-deal2     -- same for the /deal.II library
-#   LIBPATH            -- all the library pathes prefixed by -L, i.e. the
-#                         flags needed by the compiler to find the libraries
-#                         when they are linked in using -lbase -llac -ldeal_II_2d
-#                         (for example). These -L paths are appended to what
-#                         was in $(LIBPATH) before
-#
-#
-# Paths and filenames of libraries
-# --------------------------------
-#   lib-base.o         -- path and filename of the base library in optimized
-#                         mode. depending on whether shared libraries were
-#                         or were not enabled, the suffix of the value of this
-#                         variable is either .so or .a
-#   lib-base.g         -- same, for the library in debug mode
-#
-#   lib-lac.o          -- same for the lac libraries
-#   lib-lac.g 
-#
-#   lib-deal2-1d.o lib-deal2-1d.g  -- same for the deal.II libraries in the various
-#   lib-deal2-2d.o lib-deal2-2d.g     dimensions
-#   lib-deal2-3d.o lib-deal2-3d.g
-#
-#
-#
-# Pathes to include files
-# -----------------------
-#   include-path-base  -- same as for lib-path-base, but contains the paths
-#                         to the include files of the /base library
-#   include-path-lac   -- same for the /lac library
-#   include-path-deal2 -- same for the /deal.II library
-#   INCLUDE            -- all the include pathes prefixed by -I
-#
-#
-# Compiler flags
-# --------------
-#   CXXFLAGS.g         -- compiler flags for debug mode
-#   CXXFLAGS.o         -- compiler flags for optimized mode
-#
-#
-#
-# If --with-multithreading was given to ./configure, $(INCLUDE) and
-# $(LIBPATH) are augmented by the ACE include and library paths, and
-# the following symbols are meaningful:
-#
-# ACE_ROOT           -- path to the ACE library as given to ./configure
-# with-multithreading-- this symbol is 'no' if the flag was not given
-#                       to ./configure and not 'no' (it actually equals
-#                       $(ACE_ROOT)) if -with-multithreading=... was
-#                       given
+## Please note:
+##   The ./configure script generates Make.global_options from 
+##   Make.global_options.in, so if you want to change something,
+##   then do it in the latter file and re-run ./configure in the
+##   top level directory
+##
+##
+##   This file exports several variables. They are documented in 
+##   the file  doc/development/makefiles.html.
 ###############################################################################
-
-
-
 
 
 
@@ -193,6 +129,9 @@ ifneq ($(with-multithreading),no)
   ACE_ROOT    = $(with-multithreading)
   INCLUDE    += -I$(ACE_ROOT)
   LIBPATH    += -L$(ACE_ROOT)/ace
+
+  lib-ACE     = $(ACE_ROOT)/ace/libACE.so
+
   CXXFLAGS.g += -DDEAL_II_USE_MT
   CXXFLAGS.o += -DDEAL_II_USE_MT
 
