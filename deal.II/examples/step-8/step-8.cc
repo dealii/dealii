@@ -541,7 +541,8 @@ void ElasticProblem<dim>::assemble_system ()
 		    (
 		      (shape_grads[i][q_point][component_i] *
 		       shape_grads[j][q_point][component_j] *
-		       lambda_values[q_point])
+		       (lambda_values[q_point] +
+			mu_values[q_point]))
 		      +                             // (mu d_i u_j, d_i v_j)
 		      (shape_grads[i][q_point][component_j] *
 		       shape_grads[j][q_point][component_i] *
