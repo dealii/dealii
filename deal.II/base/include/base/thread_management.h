@@ -136,7 +136,7 @@ namespace Threads
 				    * objects or start new threads.
 				    */
   typedef DummyThreadMutex   ThreadMutex;
-  typedef ThreadManager      ThreadManager;
+  typedef DummyThreadManager ThreadManager;
 #endif
 
   
