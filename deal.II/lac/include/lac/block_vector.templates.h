@@ -601,7 +601,7 @@ namespace BlockVectorIterators
 	next_break_backward = global_index;
 	next_break_forward  = static_cast<unsigned int>(-1);
       };
-  };
+  }
 
   
 
@@ -635,7 +635,7 @@ namespace BlockVectorIterators
       };
   
     ++global_index;
-  };
+  }
 
 
 
@@ -672,7 +672,7 @@ namespace BlockVectorIterators
 	};
   
     --global_index;
-  }; 
+  }
 };
 
 

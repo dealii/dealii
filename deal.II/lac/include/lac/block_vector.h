@@ -563,7 +563,13 @@ namespace BlockVectorIterators
 					*/
       void move_backward ();
 
-      friend class InverseConstnessIterator;
+				       /**
+					* Make all other iterators
+					* friend, i.e. including the
+					* one with opposite constness.
+					*/
+      template <class N, bool B>
+      friend class Iterator<N,B>;
   };
 };
 
@@ -1126,11 +1132,11 @@ class BlockVector
     unsigned int num_blocks;
 
 				     /**
-				      * Make the iterator class a
-				      * friend.
+				      * Make the iterator classes
+				      * friends.
 				      */
-    friend class iterator;
-    friend class const_iterator;
+    template <typename T1, bool B>
+    friend class BlockVectorIterators::Iterator<T1,B>;
 
     template <typename Number2> friend class BlockVector;
 };
@@ -1259,7 +1265,7 @@ namespace BlockVectorIterators
 		  index_within_block (c.index_within_block),
 		  next_break_forward (c.next_break_forward),
 		  next_break_backward (c.next_break_backward)
-  {};
+  {}
 
 
 
@@ -1281,7 +1287,7 @@ namespace BlockVectorIterators
 				     // to cast away the
 				     // constness. disallow this
     Assert (constness==true, ExcCastingAwayConstness());
-  };
+  }
   
 
 
@@ -1302,7 +1308,7 @@ namespace BlockVectorIterators
 		  next_break_forward (next_break_forward),
 		  next_break_backward (next_break_backward)
   {
-  };
+  }
   
 
 
@@ -1320,7 +1326,7 @@ namespace BlockVectorIterators
     next_break_backward = c.next_break_backward;
 
     return *this;
-  };
+  }
 
 
 
@@ -1336,7 +1342,7 @@ namespace BlockVectorIterators
 				     // reference to a temporary
     reference p = parent->block(current_block)(index_within_block);
     return p;
-  };
+  }
 
 
 
@@ -1352,7 +1358,7 @@ namespace BlockVectorIterators
 				     // reference to a temporary
     reference p = parent->block(current_block)(index_within_block);
     return &p;
-  };
+  }
   
 
 
@@ -1383,7 +1389,7 @@ namespace BlockVectorIterators
 				     // class as well.
     reference p = (*parent)(global_index+d);
     return p;
-  };
+  }
 
 
 
@@ -1394,7 +1400,7 @@ namespace BlockVectorIterators
   {
     move_forward ();
     return *this;
-  };
+  }
 
 
 
@@ -1406,7 +1412,7 @@ namespace BlockVectorIterators
     const Iterator old_value = *this;
     move_forward ();
     return old_value;
-  };
+  }
 
 
 
@@ -1417,7 +1423,7 @@ namespace BlockVectorIterators
   {
     move_backward ();
     return *this;
-  };
+  }
 
 
 
@@ -1429,7 +1435,7 @@ namespace BlockVectorIterators
     const Iterator old_value = *this;
     move_backward ();
     return old_value;
-  };
+  }
 
 
 
@@ -1441,7 +1447,7 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index == i.global_index);
-  };
+  }
 
 
 
@@ -1453,7 +1459,7 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index == i.global_index);
-  };
+  }
   
 
 
@@ -1465,7 +1471,7 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index != i.global_index);
-  };
+  }
 
 
 
@@ -1477,7 +1483,7 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index != i.global_index);
-  };
+  }
   
 
 
@@ -1489,7 +1495,7 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index < i.global_index);
-  };
+  }
 
 
 
@@ -1501,7 +1507,7 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index < i.global_index);
-  };
+  }
 
 
 
@@ -1513,7 +1519,7 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index <= i.global_index);
-  };
+  }
 
 
 
@@ -1525,7 +1531,7 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index <= i.global_index);
-  };
+  }
 
 
 
@@ -1537,7 +1543,7 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index > i.global_index);
-  };
+  }
 
 
 
@@ -1549,7 +1555,7 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index > i.global_index);
-  };
+  }
 
 
 
@@ -1561,8 +1567,8 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index >= i.global_index);
-  };  
-
+  }
+  
 
 
   template <typename number, bool constness>
@@ -1573,7 +1579,7 @@ namespace BlockVectorIterators
     Assert (parent == i.parent, ExcPointerToDifferentVectors());
 
     return (global_index >= i.global_index);
-  };  
+  }
 
 
 
@@ -1586,7 +1592,7 @@ namespace BlockVectorIterators
 
     return (static_cast<signed int>(global_index) -
 	    static_cast<signed int>(i.global_index));
-  };  
+  }
 
 
 
@@ -1599,7 +1605,7 @@ namespace BlockVectorIterators
 
     return (static_cast<signed int>(global_index) -
 	    static_cast<signed int>(i.global_index));
-  };
+  }
 
 
 
@@ -1623,7 +1629,7 @@ namespace BlockVectorIterators
 				       // have to seek new block
 				       // anyway
       return Iterator (*parent, global_index+d);
-  };
+  }
 
 
 
@@ -1647,7 +1653,7 @@ namespace BlockVectorIterators
 				       // have to seek new block
 				       // anyway
       return Iterator (*parent, global_index-d);
-  };
+  }
 
 
 
@@ -1674,7 +1680,7 @@ namespace BlockVectorIterators
       *this = Iterator (*parent, global_index+d);
 
     return *this;
-  };
+  }
 
 
 
@@ -1701,7 +1707,7 @@ namespace BlockVectorIterators
       *this = Iterator (*parent, global_index-d);
 
     return *this;
-  };
+  }
   
 };
 
