@@ -116,6 +116,8 @@ GridGenerator::hyper_rectangle (Triangulation<dim> &tria,
 
 
 
+#if deal_II_dimension == 1
+
 void
 GridGenerator::colorize_hyper_rectangle (Triangulation<1> &)
 {
@@ -123,7 +125,7 @@ GridGenerator::colorize_hyper_rectangle (Triangulation<1> &)
 };
 
 
-#if deal_II_dimension != 1
+#else
 
 template <int dim>
 void
@@ -815,6 +817,13 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
 
 #endif
 
+
+// make the following function inline. this is so that it becomes marked
+// internal/weak for the linker and we don't get multiply defined errors
+// when linking with more than one dimension at a time. Usually we used
+// the trick of putting these functions in a .all_dimensions.cc file, but
+// this is not necessary here as this is an internal only function.
+inline
 void GridGenerator::laplace_solve (const SparseMatrix<double> &S,
 				   const std::map<unsigned int,double> &m,
 				   Vector<double> &u)
