@@ -270,6 +270,13 @@ class ThreadManager : public ACE_Thread_Manager
 				      * points for a new thread; that function
 				      * in turn calls the member function
 				      * with its object and argument.
+				      *
+				      * By the way, the strange naming
+				      * of this class with capital
+				      * latters and underscores tries
+				      * to mimic the corresponding
+				      * classes of the STL for
+				      * non-member functions.
 				      */
     template <typename Class, typename Arg>
     struct Mem_Fun_Data1
@@ -305,6 +312,17 @@ class ThreadManager : public ACE_Thread_Manager
 			mem_fun (mem_fun) {};
     };
 
+				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * specific binary member
+				      * function of an object. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
     template <typename Class, typename Arg1, typename Arg2>
     struct Mem_Fun_Data2
     {
@@ -325,6 +343,17 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
 
+				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * specific ternary member
+				      * function of an object. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
     template <typename Class, typename Arg1, typename Arg2, typename Arg3>
     struct Mem_Fun_Data3
     {
@@ -348,6 +377,17 @@ class ThreadManager : public ACE_Thread_Manager
     };
     
 
+				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * specific quaternary member
+				      * function of an object. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
     template <typename Class,
               typename Arg1, typename Arg2,
               typename Arg3, typename Arg4>
@@ -375,6 +415,17 @@ class ThreadManager : public ACE_Thread_Manager
 			mem_fun (mem_fun) {};
     };
 
+				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * specific quintary member
+				      * function of an object. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
     template <typename Class,
               typename Arg1, typename Arg2,
               typename Arg3, typename Arg4,
@@ -407,6 +458,17 @@ class ThreadManager : public ACE_Thread_Manager
     };
 
     
+				     /**
+				      * This class is used to package
+				      * all data needed to call a
+				      * specific hexary member
+				      * function of an object. See the
+				      * general documentation of the
+				      * #ThreadManager# class or of
+				      * the class
+				      * #ThreadManager::Mem_Fun_Data1#
+				      * for more information.
+				      */
     template <typename Class,
               typename Arg1, typename Arg2,
               typename Arg3, typename Arg4,
