@@ -18,6 +18,7 @@
 #include <fe/fe_lib.lagrange.h>
 #include <fe/fe_lib.dg.h>
 #include <fe/fe_system.h>
+#include <fe/fe_tools.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
@@ -25,7 +26,6 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
-#include <numerics/matrices.h>
 #include <iomanip>
 #include <fstream>
 
@@ -97,7 +97,7 @@ print_fe_matrices(const FiniteElement<dim>& high,
 		      const FiniteElement<dim>& low)
 {
   FullMatrix<double> interpolation(low.dofs_per_cell, high.dofs_per_cell);
-  MatrixCreator<dim>::create_interpolation_matrix(high, low, interpolation);
+  FETools::get_interpolation_matrix(high, low, interpolation);
   deallog << "Interpolation" << endl;
   interpolation.print(logfile);
 }
