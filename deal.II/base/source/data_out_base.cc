@@ -22,19 +22,23 @@
 #include <set>
 
 
-template <int dim>
-DataOutBase::Patch<dim>::Patch () :
+template <int dim, int spacedim>
+DataOutBase::Patch<dim,spacedim>::Patch () :
 		n_subdivisions (1)
 				 // all the other data has a
 				 // constructor of its own
-{};
+{
+  Assert (dim<=spacedim, ExcInvalidCombinationOfDimensions(dim,spacedim));
+  Assert (spacedim<=3, ExcNotImplemented());
+};
 
 
-template <int dim>
-void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
-			     const vector<string>      &data_names,
-			     const UcdFlags            &flags,
-			     ostream                   &out) 
+
+template <int dim, int spacedim>
+void DataOutBase::write_ucd (const vector<Patch<dim,spacedim> > &patches,
+			     const vector<string>               &data_names,
+			     const UcdFlags                     &flags,
+			     ostream                            &out) 
 {
   AssertThrow (out, ExcIO());
 
@@ -46,7 +50,7 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
 				   // and cells for later use
   unsigned int n_cells = 0,
 	       n_nodes = 0;
-  for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+  for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
        patch!=patches.end(); ++patch)
     switch (dim)
       {
@@ -113,7 +117,7 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
     {
       unsigned int present_node = 1;
       
-      for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+      for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
 	   patch!=patches.end(); ++patch)
 	{
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -125,11 +129,23 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
 	      case 1:
 	      {
 		for (unsigned int i=0; i<n_subdivisions+1; ++i, ++present_node)
-		  out << present_node
-		      << "   "
-		      << ((patch->vertices[1](0) * i / n_subdivisions) +
-			  (patch->vertices[0](0) * (n_subdivisions-i) / n_subdivisions))
-		      << " 0 0\n";                        // fill with zeroes
+		  {
+		    out << present_node
+			<< "   ";
+
+		    const Point<spacedim>
+		      node = ((patch->vertices[1] * i / n_subdivisions) +
+			      (patch->vertices[0] * (n_subdivisions-i) / n_subdivisions));
+
+						     // write out coordinates
+		    for (unsigned int i=0; i<spacedim; ++i)
+		      out << node(i) << ' ';
+						     // fill with zeroes
+		    for (unsigned int i=spacedim; i<3; ++i)
+		      out << "0 ";
+		    out << endl;
+		  };
+		
 		break;
 	      };
 	       
@@ -141,15 +157,24 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
 		      const double x_frac = i * 1./n_subdivisions,
 				   y_frac = j * 1./n_subdivisions;
 		      
+		      out << present_node
+			  << "   ";
+		      
 						       // compute coordinates for
 						       // this patch point
-		      out << present_node
-			  << "  "
-			  << (((patch->vertices[1] * x_frac) +
-			       (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-			      ((patch->vertices[2] * x_frac) +
-			       (patch->vertices[3] * (1-x_frac))) * y_frac)
-			  << " 0\n";                   // fill with zeroes
+		      const Point<spacedim>
+			node = (((patch->vertices[1] * x_frac) +
+				 (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
+				((patch->vertices[2] * x_frac) +
+				 (patch->vertices[3] * (1-x_frac))) * y_frac);
+		      
+						       // write out coordinates
+		      for (unsigned int i=0; i<spacedim; ++i)
+			out << node(i) << ' ';
+						       // fill with zeroes
+		      for (unsigned int i=spacedim; i<3; ++i)
+			out << "0 ";
+		      out << endl;
 
 		      ++present_node;
 		    };
@@ -177,16 +202,27 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
 							 // compute coordinates for
 							 // this patch point
 			out << present_node
-			    << "  "
-			    << ((((patch->vertices[1] * x_frac) +
-				  (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-				 ((patch->vertices[2] * x_frac) +
-				  (patch->vertices[3] * (1-x_frac))) * y_frac)   * (1-z_frac) +
-				(((patch->vertices[5] * x_frac) +
-				  (patch->vertices[4] * (1-x_frac))) * (1-y_frac) +
-				 ((patch->vertices[6] * x_frac) +
-				  (patch->vertices[7] * (1-x_frac))) * y_frac)   * z_frac)
-			    << endl;
+			    << "   ";
+			
+							 // compute coordinates for
+							 // this patch point
+			const Point<spacedim>
+			  node = ((((patch->vertices[1] * x_frac) +
+				    (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
+				   ((patch->vertices[2] * x_frac) +
+				    (patch->vertices[3] * (1-x_frac))) * y_frac)   * (1-z_frac) +
+				  (((patch->vertices[5] * x_frac) +
+				    (patch->vertices[4] * (1-x_frac))) * (1-y_frac) +
+				   ((patch->vertices[6] * x_frac) +
+				    (patch->vertices[7] * (1-x_frac))) * y_frac)   * z_frac);
+			
+							 // write out coordinates
+			for (unsigned int i=0; i<spacedim; ++i)
+			  out << node(i) << ' ';
+							 // fill with zeroes unnecessary here
+			for (unsigned int i=spacedim; i<3; ++i)
+			  out << "0 ";
+			out << endl;
 			
 			++present_node;
 		      };
@@ -212,7 +248,7 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
       unsigned int present_cell = 1;      
       unsigned int first_vertex_of_patch = 0;
       
-      for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+      for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
 	   patch!=patches.end(); ++patch)
 	{
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -276,7 +312,7 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
 	    };
 
 
-// finally update the number
+					   // finally update the number
 					   // of the first vertex of this patch
 	  switch (dim)
 	    {
@@ -304,7 +340,7 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
     };
 
 
-/////////////////////////////
+				   /////////////////////////////
 				   // now write data
   if (n_data_sets != 0)
     {      
@@ -320,9 +356,9 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
 	    << endl;
 
 
-// loop over all patches
+				       // loop over all patches
       unsigned int present_node = 1;
-      for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+      for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
 	   patch != patches.end(); ++patch)
 	{
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -407,11 +443,12 @@ void DataOutBase::write_ucd (const vector<Patch<dim> > &patches,
 };
 
 
-template <int dim>
-void DataOutBase::write_gnuplot (const vector<Patch<dim> > &patches,
-				 const vector<string>      &data_names,
-				 const GnuplotFlags        &/*flags*/,
-				 ostream                   &out) 
+
+template <int dim, int spacedim>
+void DataOutBase::write_gnuplot (const vector<Patch<dim,spacedim> > &patches,
+				 const vector<string>               &data_names,
+				 const GnuplotFlags                 &/*flags*/,
+				 ostream                            &out) 
 {
   AssertThrow (out, ExcIO());
   
@@ -442,7 +479,7 @@ void DataOutBase::write_gnuplot (const vector<Patch<dim> > &patches,
 	  << "#" << endl
 	  << "# ";
       
-      switch (dim) 
+      switch (spacedim)
 	{
 	  case 1:
 		out << "<x> ";
@@ -466,8 +503,8 @@ void DataOutBase::write_gnuplot (const vector<Patch<dim> > &patches,
     };
 
 
-// loop over all patches
-  for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+				   // loop over all patches
+  for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
        patch != patches.end(); ++patch)
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -565,7 +602,7 @@ void DataOutBase::write_gnuplot (const vector<Patch<dim> > &patches,
 
 						     // compute coordinates for
 						     // this patch point
-		    const Point<dim> this_point
+		    const Point<spacedim> this_point
 		      = ((((patch->vertices[1] * x_frac) +
 			   (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
 			  ((patch->vertices[2] * x_frac) +
@@ -694,16 +731,18 @@ void DataOutBase::write_gnuplot (const vector<Patch<dim> > &patches,
 };
 
 
-template <int dim>
-void DataOutBase::write_povray (const vector<Patch<dim> > &patches,
-				const vector<string>      &data_names,
-				const PovrayFlags         &flags,
-				ostream                   &out) 
+
+template <int dim, int spacedim>
+void DataOutBase::write_povray (const vector<Patch<dim,spacedim> > &patches,
+				const vector<string>               &data_names,
+				const PovrayFlags                  &flags,
+				ostream                            &out) 
 {
   AssertThrow (out, ExcIO());
   
   Assert (patches.size() > 0, ExcNoPatches());
-  Assert (dim==2, ExcNotImplemented());        // only for 2-D  
+  Assert (dim==2, ExcNotImplemented());        // only for 2-D surfaces on a 2-D plane
+  Assert (spacedim==2, ExcNotImplemented());
 
   const unsigned int n_data_sets = data_names.size();
   
@@ -728,26 +767,26 @@ void DataOutBase::write_povray (const vector<Patch<dim> > &patches,
 	  << endl
 	  << "*/ " << endl;
       
-                                    // include files
+				       // include files
       out << "#include \"colors.inc\" " << endl
 	  << "#include \"textures.inc\" " << endl;
 
-
-// use external include file for textures,
-                                    // camera and light
+      
+				       // use external include file for textures,
+				       // camera and light
       if (flags.external_data)
 	out << "#include \"data.inc\" " << endl;
       else                          // all definitions in data file
 	{  
-                                    // camera
+					   // camera
 	  out << endl << endl
 	      << "camera {"            << endl
 	      << "  location <1,4,-7>" << endl
 	      << "  look_at <0,0,0>"   << endl
 	      << "  angle 30"          << endl
 	      << "}"                   << endl;
-      
-                                    // light
+	  
+					   // light
 	  out << endl 
 	      << "light_source {"      << endl
 	      << "  <1,4,-7>"	   << endl
@@ -760,11 +799,11 @@ void DataOutBase::write_povray (const vector<Patch<dim> > &patches,
 	      << "}"                   << endl;
 	}
     };
-
+  
 				   // max. and min. heigth of solution 
   double hmin=0, hmax=0;
 
-  for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+  for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
        patch != patches.end(); ++patch)
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -814,7 +853,7 @@ void DataOutBase::write_povray (const vector<Patch<dim> > &patches,
     }
 
 	                              // loop over all patches
-  for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+  for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
        patch != patches.end(); ++patch)
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -831,7 +870,7 @@ void DataOutBase::write_povray (const vector<Patch<dim> > &patches,
 	      ExcInvalidDatasetSize (patch->data.n(), n_subdivisions+1));
 
 
-      Point<dim> ver[16];			    // value for all points in this patch
+      Point<spacedim> ver[16];			    // value for all points in this patch
       
       for (unsigned int i=0; i<n_subdivisions+1; ++i)
 	{
@@ -994,15 +1033,17 @@ void DataOutBase::write_povray (const vector<Patch<dim> > &patches,
 };
 
 
-template <int dim>
-void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
-			     const vector<string>      &/*data_names*/,
-			     const EpsFlags            &flags,
-			     ostream                   &out) 
+
+template <int dim, int spacedim>
+void DataOutBase::write_eps (const vector<Patch<dim,spacedim> > &patches,
+			     const vector<string>               &/*data_names*/,
+			     const EpsFlags                     &flags,
+			     ostream                            &out) 
 {
   Assert (out, ExcIO());
   
   Assert (patches.size() > 0, ExcNoPatches());
+  Assert (spacedim==dim, ExcNotImplemented());
   
   switch (dim) 
     {
@@ -1035,7 +1076,7 @@ void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 					 // note that since dim==2, we
 					 // have exactly four vertices per
 					 // patch and per cell
-	for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+	for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
 	     patch!=patches.end(); ++patch)
 	  {
 	    const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -1048,7 +1089,7 @@ void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 			      x_frac1 = (i+1) * 1./n_subdivisions,
 			      y_frac1 = (j+1) * 1./n_subdivisions;
 		  
-		  const Point<dim> points[4]
+		  const Point<spacedim> points[4]
 		    = { (((patch->vertices[1] * x_frac) +
 			  (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
 			 ((patch->vertices[2] * x_frac) +
@@ -1141,7 +1182,7 @@ void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 
 						   // compute coordinates of
 						   // center of cell
-		  const Point<dim> center_point
+		  const Point<spacedim> center_point
 		    = (points[0] + points[1] + points[2] + points[3]) / 4;
 		  const double center_height
 		    = -(heights[0] + heights[1] + heights[2] + heights[3]) / 4;
@@ -1331,11 +1372,12 @@ void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 };
 
 
-template <int dim>
-void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
-			     const vector<string>      &data_names,
-			     const GmvFlags            &/*flags*/,
-			     ostream                   &out) 
+
+template <int dim, int spacedim>
+void DataOutBase::write_gmv (const vector<Patch<dim,spacedim> > &patches,
+			     const vector<string>               &data_names,
+			     const GmvFlags                     &/*flags*/,
+			     ostream                            &out) 
 {
   AssertThrow (out, ExcIO());
 
@@ -1360,7 +1402,7 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 				   // and cells for later use
   unsigned int n_cells = 0,
 	       n_nodes = 0;
-  for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+  for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
        patch!=patches.end(); ++patch)
     switch (dim)
       {
@@ -1413,7 +1455,7 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
   Threads::ThreadManager thread_manager;
   Threads::spawn (thread_manager,
 		  Threads::encapsulate (&DataOutBase::template
-					write_gmv_reorder_data_vectors<dim>)
+					write_gmv_reorder_data_vectors<dim,spacedim>)
 		  .collect_args(patches, data_vectors));
 
 				   ///////////////////////////////
@@ -1426,14 +1468,14 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
   out << "nodes " << n_nodes << endl;
   for (unsigned int d=1; d<=3; ++d)
     {
-      for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+      for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
 	   patch!=patches.end(); ++patch)
 	{
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
 	  
 					   // if we have nonzero values for
 					   // this coordinate
-	  if (d<=dim)
+	  if (d<=spacedim)
 	    {
 	      switch (dim)
 		{
@@ -1503,7 +1545,7 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 		};
 	    }
 	  else
-					     // d>dim. write zeros instead
+					     // d>spacedim. write zeros instead
 	    {
 	      const unsigned int n_points
 		= static_cast<unsigned int>(pow (n_subdivisions+1, dim));
@@ -1526,7 +1568,7 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 
       unsigned int first_vertex_of_patch = 0;
       
-      for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+      for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
 	   patch!=patches.end(); ++patch)
 	{
 	  const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -1644,9 +1686,10 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 
 
 
-template <int dim>
-void DataOutBase::write_gmv_reorder_data_vectors (const vector<Patch<dim> > &patches,
-						  vector<vector<double> >   &data_vectors)
+template <int dim, int spacedim>
+void
+DataOutBase::write_gmv_reorder_data_vectors (const vector<Patch<dim,spacedim> > &patches,
+					     vector<vector<double> >            &data_vectors)
 {
 				   // unlike in the main function, we
 				   // don't have here the data_names
@@ -1662,7 +1705,7 @@ void DataOutBase::write_gmv_reorder_data_vectors (const vector<Patch<dim> > &pat
   
 				   // loop over all patches
   unsigned int next_value = 0;
-  for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
+  for (typename vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
        patch != patches.end(); ++patch)
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -1735,48 +1778,53 @@ void DataOutBase::write_gmv_reorder_data_vectors (const vector<Patch<dim> > &pat
 /* --------------------------- class DataOutInterface ---------------------- */
 
 
-template <int dim>
-void DataOutInterface<dim>::write_ucd (ostream &out) const 
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::write_ucd (ostream &out) const 
 {
   DataOutBase::write_ucd (get_patches(), get_dataset_names(),
 			  ucd_flags, out);
 };
 
 
-template <int dim>
-void DataOutInterface<dim>::write_gnuplot (ostream &out) const 
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::write_gnuplot (ostream &out) const 
 {
   DataOutBase::write_gnuplot (get_patches(), get_dataset_names(),
 			      gnuplot_flags, out);
 };
 
 
-template <int dim>
-void DataOutInterface<dim>::write_povray (ostream &out) const 
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::write_povray (ostream &out) const 
 {
   DataOutBase::write_povray (get_patches(), get_dataset_names(),
 			     povray_flags, out);
 };
 
 
-template <int dim>
-void DataOutInterface<dim>::write_eps (ostream &out) const 
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::write_eps (ostream &out) const 
 {
   DataOutBase::write_eps (get_patches(), get_dataset_names(),
 			  eps_flags, out);
 };
 
 
-template <int dim>
-void DataOutInterface<dim>::write_gmv (ostream &out) const 
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::write_gmv (ostream &out) const 
 {
   DataOutBase::write_gmv (get_patches(), get_dataset_names(),
 			  gmv_flags, out);
 };
 
 
-template <int dim>
-void DataOutInterface<dim>::write (ostream &out,
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::write (ostream &out,
 				   OutputFormat output_format) const
 {
   if (output_format == default_format)
@@ -1810,51 +1858,58 @@ void DataOutInterface<dim>::write (ostream &out,
 };
 
 
-template <int dim>
-void DataOutInterface<dim>::set_default_format(OutputFormat fmt)
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::set_default_format(OutputFormat fmt)
 {
   Assert(fmt != default_format, ExcNotImplemented());
   default_fmt = fmt;
 }
 
 
-template <int dim>
-void DataOutInterface<dim>::set_flags (const UcdFlags &flags) 
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::set_flags (const UcdFlags &flags) 
 {
   ucd_flags = flags;
 };
 
 
-template <int dim>
-void DataOutInterface<dim>::set_flags (const GnuplotFlags &flags) 
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::set_flags (const GnuplotFlags &flags) 
 {
   gnuplot_flags = flags;
 };
 
 
-template <int dim>
-void DataOutInterface<dim>::set_flags (const PovrayFlags &flags) 
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::set_flags (const PovrayFlags &flags) 
 {
   povray_flags = flags;
 };
 
 
-template <int dim>
-void DataOutInterface<dim>::set_flags (const EpsFlags &flags) 
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::set_flags (const EpsFlags &flags) 
 {
   eps_flags = flags;
 };
 
 
-template <int dim>
-void DataOutInterface<dim>::set_flags (const GmvFlags &flags) 
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::set_flags (const GmvFlags &flags) 
 {
   gmv_flags = flags;
 };
 
 
-template <int dim>
-string DataOutInterface<dim>::default_suffix (OutputFormat output_format) const
+
+template <int dim, int spacedim>
+string DataOutInterface<dim,spacedim>::default_suffix (OutputFormat output_format) const
 {
   if (output_format == default_format)
     output_format = default_fmt;
@@ -1883,9 +1938,10 @@ string DataOutInterface<dim>::default_suffix (OutputFormat output_format) const
 };
 
 
-template <int dim>
-DataOutInterface<dim>::OutputFormat
-DataOutInterface<dim>::parse_output_format (const string &format_name)
+
+template <int dim, int spacedim>
+DataOutInterface<dim,spacedim>::OutputFormat
+DataOutInterface<dim,spacedim>::parse_output_format (const string &format_name)
 {
   if (format_name == "ucd")
     return ucd;
@@ -1909,15 +1965,17 @@ DataOutInterface<dim>::parse_output_format (const string &format_name)
 };
 
 
-template <int dim>
-string DataOutInterface<dim>::get_output_format_names ()
+
+template <int dim, int spacedim>
+string DataOutInterface<dim,spacedim>::get_output_format_names ()
 {
   return "ucd|gnuplot|povray|eps|gmv";
 }
 
 
-template <int dim>
-void DataOutInterface<dim>::declare_parameters (ParameterHandler &prm) 
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::declare_parameters (ParameterHandler &prm) 
 {
   prm.declare_entry ("Output format", "gnuplot",
 		     Patterns::Selection (get_output_format_names ()));
@@ -1944,8 +2002,9 @@ void DataOutInterface<dim>::declare_parameters (ParameterHandler &prm)
 }
 
 
-template <int dim>
-void DataOutInterface<dim>::parse_parameters (ParameterHandler &prm) 
+
+template <int dim, int spacedim>
+void DataOutInterface<dim,spacedim>::parse_parameters (ParameterHandler &prm) 
 {
   const string& output_name = prm.get ("Output format");
   default_fmt = parse_output_format (output_name);
@@ -1974,5 +2033,11 @@ void DataOutInterface<dim>::parse_parameters (ParameterHandler &prm)
 
 // explicit instantiations. functions in DataOutBase are instantiated by
 // the respective functions in DataOut_Interface
-template class DataOutInterface<data_out_dimension>;
-template class DataOutBase::Patch<data_out_dimension>;
+template class DataOutInterface<data_out_dimension,data_out_dimension>;
+template class DataOutBase::Patch<data_out_dimension, data_out_dimension>;
+
+// also enable plotting surfaces of 3d objects
+#if data_out_dimension == 3
+template class DataOutInterface<data_out_dimension,data_out_dimension-1>;
+template class DataOutBase::Patch<data_out_dimension, data_out_dimension-1>;
+#endif

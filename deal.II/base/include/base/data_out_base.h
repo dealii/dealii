@@ -80,8 +80,24 @@ class ParameterHandler;
  * i.e. the z-coordinate runs fastest, then the y-coordinate, then x (if there
  * are that many space directions).
  *
- * The @p{Patch} class takes a template parameter denoting the space dimension
- * in which this patch operates.
+ *
+ * @sect3{Generalized patches}
+ *
+ * In general, the patches as explained above might be too
+ * restricted. For example, one might want to draw only the outer
+ * faces of a domain in a three-dimensional computation, if one is not
+ * interested in what happens inside. Then, the objects that should be
+ * drawn are two-dimensional in a three-dimensional world. The
+ * @p{Patch} class and associated output functions handle these
+ * cases. The @p{Patch} class therefore takes two template parameters,
+ * the first, named @p{dim} denoting the dimension of the object (in
+ * the above example, this would be two), while the second, named
+ * @p{spacedim}, denotes the dimension of the embedding space (this
+ * would be three). The corner points of a patch have the dimension of
+ * the space, while their number is determined by the dimension of the
+ * patch. By default, the second template parameter has the same value
+ * as the first, which would correspond to outputting a cell, rather
+ * than a face or something else.
  *
  *
  * @sect2{Supported output formats}
@@ -155,9 +171,8 @@ class ParameterHandler;
  * with values in the third direction taken from a data vector.
  *
  * The output uses two different povray-objects:
-
- * @begin{itemize}
  *
+ * @begin{itemize}
  * @item @p{BICUBIC_PATCH}
  * A @p{bicubic_patch} is a 3-dimensional Bezier patch. It consists of 16 Points
  * describing the surface. The 4 corner points are touched by the object,
@@ -191,6 +206,7 @@ class ParameterHandler;
  * @end{verbatim}
  * If the external file "data.inc" is used, the path to this file has to be
  * included in the povray options.
+ *
  *
  * @sect3{EPS format}
  *
@@ -267,7 +283,7 @@ class ParameterHandler;
  * details of the viewpoint, light source, etc.
  *
  *
- * @author Wolfgang Bangerth 1999; EPS output based on an earlier implementation by Stefan Nauber for the old DataOut class; Povray output by Thomas Richter 1999
+ * @author Wolfgang Bangerth 1999, 2000; EPS output based on an earlier implementation by Stefan Nauber for the old DataOut class; Povray output by Thomas Richter 1999
  */
 class DataOutBase 
 {
@@ -298,7 +314,7 @@ class DataOutBase
 				      * @end{verbatim}
 				      * @author Wolfgang Bangerth
 				      */
-    template <int dim>
+    template <int dim, int spacedim=dim>
     struct Patch
     {
 					 /**
@@ -311,7 +327,7 @@ class DataOutBase
 					  * is the same as for cells
 					  * in the triangulation.
 					  */
-	Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
+	Point<spacedim> vertices[GeometryInfo<dim>::vertices_per_cell];
 	
 					 /**
 					  * Number of subdivisions with
@@ -401,6 +417,15 @@ class DataOutBase
 					  * @p{n_subdivisions} to one.
 					  */
 	Patch ();
+
+					 /**
+					  * Exception
+					  */
+	DeclException2 (ExcInvalidCombinationOfDimensions,
+			int, int,
+			<< "It is not possible to have a structural dimension of " << arg1
+			<< " to be larger than the space dimension of the surrounding"
+			<< " space " << arg2);
     };
 
 
@@ -869,11 +894,11 @@ class DataOutBase
 				      * documentation for more information
 				      * on the parameters.
 				      */
-    template <int dim>
-    static void write_ucd (const vector<Patch<dim> > &patches,
-			   const vector<string>      &data_names,
-			   const UcdFlags            &flags,
-			   ostream                   &out);
+    template <int dim, int spacedim>
+    static void write_ucd (const vector<Patch<dim,spacedim> > &patches,
+			   const vector<string>               &data_names,
+			   const UcdFlags                     &flags,
+			   ostream                            &out);
 
     				     /**
 				      * Write the given list of patches
@@ -882,11 +907,11 @@ class DataOutBase
 				      * documentation for more information
 				      * on the parameters.
 				      */
-    template <int dim>
-    static void write_gnuplot (const vector<Patch<dim> > &patches,
-			       const vector<string>      &data_names,
-			       const GnuplotFlags        &flags,
-			       ostream                   &out);
+    template <int dim, int spacedim>
+    static void write_gnuplot (const vector<Patch<dim,spacedim> > &patches,
+			       const vector<string>               &data_names,
+			       const GnuplotFlags                 &flags,
+			       ostream                            &out);
 
     				     /**
 				      * Write the given list of patches
@@ -895,11 +920,11 @@ class DataOutBase
 				      * documentation for more information
 				      * on the parameters.
 				      */
-    template <int dim>
-    static void write_povray (const vector<Patch<dim> > &patches,
-			      const vector<string>      &data_names,
-			      const PovrayFlags         &flags,
-			      ostream                   &out);
+    template <int dim, int spacedim>
+    static void write_povray (const vector<Patch<dim,spacedim> > &patches,
+			      const vector<string>               &data_names,
+			      const PovrayFlags                  &flags,
+			      ostream                            &out);
 
     				     /**
 				      * Write the given list of patches
@@ -908,11 +933,11 @@ class DataOutBase
 				      * documentation for more information
 				      * on the parameters.
 				      */
-    template <int dim>
-    static void write_eps (const vector<Patch<dim> > &patches,
-			   const vector<string>      &data_names,
-			   const EpsFlags            &flags,
-			   ostream                   &out);
+    template <int dim, int spacedim>
+    static void write_eps (const vector<Patch<dim,spacedim> > &patches,
+			   const vector<string>               &data_names,
+			   const EpsFlags                     &flags,
+			   ostream                            &out);
 
     				     /**
 				      * Write the given list of patches
@@ -921,11 +946,11 @@ class DataOutBase
 				      * documentation for more information
 				      * on the parameters.
 				      */
-    template <int dim>
-    static void write_gmv (const vector<Patch<dim> > &patches,
-			   const vector<string>      &data_names,
-			   const GmvFlags            &flags,
-			   ostream                   &out);
+    template <int dim, int spacedim>
+    static void write_gmv (const vector<Patch<dim,spacedim> > &patches,
+			   const vector<string>               &data_names,
+			   const GmvFlags                     &flags,
+			   ostream                            &out);
 
 
 				     /**
@@ -1023,10 +1048,13 @@ class DataOutBase
 				      * thus moved into this separate
 				      * function.
 				      */
-    template <int dim>
-    static void write_gmv_reorder_data_vectors (const vector<Patch<dim> > &patches,
-						vector<vector<double> >   &data_vectors);
+    template <int dim, int spacedim>
+    static void
+    write_gmv_reorder_data_vectors (const vector<Patch<dim,spacedim> > &patches,
+				    vector<vector<double> >            &data_vectors);
 };
+
+
 
 
 /**
@@ -1141,7 +1169,7 @@ class DataOutBase
  *
  * @author Wolfgang Bangerth, 1999
  */
-template <int dim>
+template <int dim, int spacedim=dim>
 class DataOutInterface : private DataOutBase
 {
   public:
@@ -1342,7 +1370,8 @@ class DataOutInterface : private DataOutBase
 				      * allow the output functions to
 				      * know what they shall print.
 				      */
-    virtual const vector<DataOutBase::Patch<dim> > & get_patches () const = 0;
+    virtual const vector<DataOutBase::Patch<dim,spacedim> > &
+    get_patches () const = 0;
 
 				     /**
 				      * Abstract virtual function through

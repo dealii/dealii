@@ -21,6 +21,7 @@ DataOutBase::UcdFlags::UcdFlags (const bool write_preamble) :
 {};
 
 
+
 DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
 				       const bool bicubic_patch,
 				       const bool external_data) :
@@ -30,10 +31,12 @@ DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
 {};
 
 
+
 void DataOutBase::UcdFlags::declare_parameters (ParameterHandler &prm)
 {
   prm.declare_entry ("Write preamble", "true", Patterns::Bool());
 };
+
 
 
 void DataOutBase::UcdFlags::parse_parameters (ParameterHandler &prm)
@@ -42,14 +45,15 @@ void DataOutBase::UcdFlags::parse_parameters (ParameterHandler &prm)
 };
 
 
+
 void DataOutBase::GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
-{
-};
+{};
+
 
 
 void DataOutBase::GnuplotFlags::parse_parameters (ParameterHandler &/*prm*/)
-{
-};
+{};
+
 
 
 void DataOutBase::PovrayFlags::declare_parameters (ParameterHandler &prm)
@@ -63,12 +67,14 @@ void DataOutBase::PovrayFlags::declare_parameters (ParameterHandler &prm)
 };
 
 
+
 void DataOutBase::PovrayFlags::parse_parameters (ParameterHandler &prm)
 {
   smooth        = prm.get_bool ("Use smooth triangles");
   bicubic_patch = prm.get_bool ("Use bicubic patches");
   external_data = prm.get_bool ("Include external file");
 };
+
 
 
 DataOutBase::EpsFlags::EpsFlags (const unsigned int  height_vector,
@@ -96,6 +102,7 @@ DataOutBase::EpsFlags::EpsFlags (const unsigned int  height_vector,
 		shade_cells(shade_cells),
 		color_function(color_function)
 {};
+
 
 
 DataOutBase::EpsFlags::RgbValues
@@ -196,12 +203,14 @@ DataOutBase::EpsFlags::grey_scale_color_function (const double x,
 };
 
 
+
 bool DataOutBase::EpsCell2d::operator < (const EpsCell2d &e) const
 {
 				   // note the "wrong" order in
 				   // which we sort the elements
   return depth > e.depth;
 };
+
 
 
 void DataOutBase::EpsFlags::declare_parameters (ParameterHandler &prm)
@@ -233,6 +242,7 @@ void DataOutBase::EpsFlags::declare_parameters (ParameterHandler &prm)
 };
 
 
+
 void DataOutBase::EpsFlags::parse_parameters (ParameterHandler &prm)
 {
   height_vector = prm.get_integer ("Index of vector for height");
@@ -256,11 +266,11 @@ void DataOutBase::EpsFlags::parse_parameters (ParameterHandler &prm)
 };
 
 
+
 void DataOutBase::GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
-{
-};
+{};
+
 
 
 void DataOutBase::GmvFlags::parse_parameters (ParameterHandler &/*prm*/)
-{
-};
+{};

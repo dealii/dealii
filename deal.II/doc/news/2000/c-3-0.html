@@ -9,8 +9,22 @@
     <meta name="keywords" content="deal.II"></head>
 
 <body>
+
+
 <h2>Changes after Version 3.0</h2>
+
+This is a quite extensive list of changes made after the release of 
+<acronym>deal.II</acronym> version 3.0. It is subdivided into changes
+made to the three sub-libraries <a href="#base">base</a>, 
+<a href="#lac">lac</a>, and <a href="#deal.II">deal.II</a>, as well as
+changes to the <a href="#general">general infrastructure,
+documentation, etc</a>.
+
+
+
+<a name="general"></a>
 <h3>General</h3>
+
 <ol>
   <li> <p>
        New: the <code class="program">step-9</code> example program is
@@ -100,12 +114,25 @@
        <br>
        (GK 2000/04/05)
        </p>
-
 </ol>
 
+
+
+<a name="base"></a>
 <h3>base</h3>
 
 <ol>
+  <li> <p>
+       New: The <code class="class">DataOutBase</code> and
+       <code class="class">DataOutBase::Patch</code> classes have been
+       changed so as to allow output of objects that have an other
+       dimension than the surrounding space, for example writing faces
+       instead of cells (this might be useful to write only external
+       faces in 3d computations).
+       <br>
+       (WB 2000/09/07)
+       </p>       
+
   <li> <p> 
        New: <code class="class">Timer</code> now uses the system
        function <code class="member">getrusage (RUSAGE_CHILDREN,
@@ -170,6 +197,7 @@
 
 
 
+<a name="lac"></a>
 <h3>lac</h3>
 
 <ol>
@@ -407,6 +435,7 @@
 
 
 
+<a name="deal.II"></a>
 <h3>deal.II</h3>
 
 <ol>
