@@ -3072,6 +3072,11 @@ echo "$as_me: error: Unrecognized compiler -- sorry" >&2;}
         LDFLAGS="$LDFLAGS -lpthread"
 	;;
 
+      *cygwin* )
+        CXXFLAGSPIC=
+        LDFLAGSPIC=
+        ;;
+
       *)
 	CXXFLAGSPIC="-fPIC"
 	LDFLAGSPIC="-fPIC"
@@ -3842,6 +3847,10 @@ echo "$as_me: error: Unrecognized compiler -- sorry" >&2;}
       *dec-osf* )
 	CFLAGSPIC="-fPIC"
 	;;
+
+      *cygwin*)
+        CFLAGSPIC=
+        ;;
 
       *)
 	CFLAGSPIC="-fPIC"
@@ -8126,7 +8135,6 @@ fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
-
 for ac_func in gethostname
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
@@ -8229,8 +8237,8 @@ fi
 done
 
 
-  echo "$as_me:$LINENO: checking for bad gethostname/FPU interaction" >&5
-echo $ECHO_N "checking for bad gethostname/FPU interaction... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for bad socket functions/FPU interaction" >&5
+echo $ECHO_N "checking for bad socket functions/FPU interaction... $ECHO_C" >&6
   ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -8293,11 +8301,11 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
 ( exit $ac_status )
 
-      echo "$as_me:$LINENO: result: yes. disabling gethostname()" >&5
-echo "${ECHO_T}yes. disabling gethostname()" >&6
+      echo "$as_me:$LINENO: result: yes. disabling socket functions" >&5
+echo "${ECHO_T}yes. disabling socket functions" >&6
 
 cat >>confdefs.h <<\_ACEOF
-#define DEAL_II_BROKEN_GETHOSTNAME 1
+#define DEAL_II_BROKEN_SOCKETS 1
 _ACEOF
 
 
@@ -8498,7 +8506,15 @@ echo "${ECHO_T}F77 compiler is unkown. no flags set!" >&6
           F77FLAGSO="$F77FLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
         fi
 
-	F77FLAGSPIC="-fPIC"
+        case "$target" in
+           *cygwin* )
+                F77FLAGSPIC=
+                ;;
+           * )
+	        F77FLAGSPIC="-fPIC"
+                ;;
+        esac
+
         F77LIBS="$F77LIBS -lg2c"
 
 	;;
@@ -8593,6 +8609,7 @@ esac
 case "$target" in
    *cygwin )
            shared_lib_suffix=".dll"
+           cygwin_shared_lib="yes"
            ;;
 esac
 
@@ -9762,7 +9779,17 @@ echo "${ECHO_T}PowerPC64" >&6
               ;;
         esac
 	;;
+    athlon* | pentium* | i386 | i486 | i586 | i686 | k6* | winchip*)
+        echo "$as_me:$LINENO: result: x86 derivate ($withcpu)" >&5
+echo "${ECHO_T}x86 derivate ($withcpu)" >&6
+	case "$GXX_VERSION" in
+	  gcc*)
+	                                  	      CXXFLAGSO="$CXXFLAGSO -march=$withcpu"
 
+	      	      F77FLAGSO="$F77FLAGSO -march=$withcpu"
+          ;;
+        esac
+        ;;
     *)
         echo "$as_me:$LINENO: result: none given or not recognized" >&5
 echo "${ECHO_T}none given or not recognized" >&6
@@ -11398,6 +11425,14 @@ echo "     For more information, see the doc/readme.html file."
 echo
 echo -------------------------------------------------------------
 echo
+
+if test "x$cygwin_shared_lib" = "xyes" ; then
+  echo "     Please add the line"
+  echo "        export PATH=\$PATH:$DEAL2_DIR/lib"
+  echo "     to your .bash_profile file so that windows will be"
+  echo "     able to find the deal.II shared libraries when"
+  echo "     executing your programs."
+fi
 
 if test "x$doxygen_not_found" = "xyes" ; then
   echo "     WARNING: During configuration, no version of the doxygen"

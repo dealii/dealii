@@ -206,7 +206,8 @@ DEAL_II_CHECK_ISNAN
 DEAL_II_CHECK_RAND_R
 DEAL_II_CHECK_QUAD_DEFINE
 DEAL_II_CHECK_ERROR_CODES_DEFINITION
-DEAL_II_CHECK_GETHOSTNAME
+AC_CHECK_FUNCS(gethostname)
+DEAL_II_CHECK_BROKEN_SOCKETS
 
 
 
@@ -281,6 +282,7 @@ esac
 case "$target" in
    *cygwin )
            shared_lib_suffix=".dll"
+           cygwin_shared_lib="yes"
            ;;
 esac  
 
@@ -615,6 +617,14 @@ echo "     For more information, see the doc/readme.html file."
 echo
 echo -------------------------------------------------------------
 echo
+
+if test "x$cygwin_shared_lib" = "xyes" ; then
+  echo "     Please add the line"
+  echo "        export PATH=\$PATH:$DEAL2_DIR/lib"
+  echo "     to your .bash_profile file so that windows will be"
+  echo "     able to find the deal.II shared libraries when"
+  echo "     executing your programs."
+fi
 
 if test "x$doxygen_not_found" = "xyes" ; then
   echo "     WARNING: During configuration, no version of the doxygen"

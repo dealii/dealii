@@ -53,9 +53,9 @@
    */
 #undef DEAL_II_ARRAY_CONDITIONAL_DECAY_BUG
 
-/* Define if the use of gethostname() leads to strange results with floating
-   point computations on cygwin systems. */
-#undef DEAL_II_BROKEN_GETHOSTNAME
+/* Define if the use of socket functionality leads to strange results with
+   floating point computations on cygwin systems. */
+#undef DEAL_II_BROKEN_SOCKETS
 
 /* Backward compatibility support for functions and classes that do not take
    an explicit mapping variable, but rather use a default Q1 mapping instead

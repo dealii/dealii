@@ -296,6 +296,11 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
         LDFLAGS="$LDFLAGS -lpthread"
 	;;
 
+      *cygwin* )
+        CXXFLAGSPIC=
+        LDFLAGSPIC=
+        ;;
+
       *)
 	CXXFLAGSPIC="-fPIC"
 	LDFLAGSPIC="-fPIC"
@@ -987,6 +992,10 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 	CFLAGSPIC="-fPIC"
 	;;
 
+      *cygwin*)
+        CFLAGSPIC=
+        ;;
+
       *)
 	CFLAGSPIC="-fPIC"
 	;;
@@ -1206,7 +1215,15 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
           F77FLAGSO="$F77FLAGSO -funroll-loops -funroll-all-loops -fstrict-aliasing"
         fi
   
-	F77FLAGSPIC="-fPIC"
+        case "$target" in
+           *cygwin* )
+                F77FLAGSPIC=
+                ;;
+           * )
+	        F77FLAGSPIC="-fPIC"
+                ;;
+        esac
+
         F77LIBS="$F77LIBS -lg2c"
   
 	;;
@@ -1315,7 +1332,20 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
               ;;
         esac
 	;;
+    athlon* | pentium* | i386 | i486 | i586 | i686 | k6* | winchip*)
+        AC_MSG_RESULT(x86 derivate ($withcpu))
+	case "$GXX_VERSION" in
+	  gcc*)
+	      dnl Tune for this processor, but only in optimized mode
+              dnl (to prevent the effects of possible compiler bugs to affect
+              dnl both debug as well as optimized versions)
+	      CXXFLAGSO="$CXXFLAGSO -march=$withcpu"
 
+	      dnl Also set the mode for f77 compiler
+	      F77FLAGSO="$F77FLAGSO -march=$withcpu"
+          ;;
+        esac
+        ;;
     *)
         AC_MSG_RESULT(none given or not recognized)
 	;;
@@ -3957,22 +3987,24 @@ using namespace std;
 
 
 dnl -------------------------------------------------------------
-dnl Check whether the gethostname() function is available. To
-dnl spice up things, some versions of cygwin have a problem in
-dnl that when you call that function on an AMD system, the FPU
-dnl is set into 64bit mode, rather than 80bit mode, and doesn't
-dnl do any long double computations any more, even though the
-dnl compiler still announces that it does through the std::limits
-dnl class. We have to check for this.
+dnl Check whether socket functions (i.e. functions using the
+dnl network) affect the numerical accuracy. To spice up things,
+dnl on some versions of cygwin (<=1.5.13), calling the windows
+dnl socket function (e.g. the functions defined in unistd.h)
+dnl will set the internal accuracy of the FPU to 64 bits (double)
+dnl instead of 80 bits. Consequently, all long double operations
+dnl are performed with double accuracy only. The compiler will
+dnl not notice this fact and still report long double limits in
+dnl the linits<>-class. We have to check for this, otherwise
+dnl some functions like the QGauss constructor will go into an
+dnl infinite loop.
 dnl
-dnl Usage: DEAL_II_CHECK_GETHOSTNAME
+dnl Usage: DEAL_II_CHECK_BROKEN_SOCKETS
 dnl
 dnl -------------------------------------------------------------
-AC_DEFUN(DEAL_II_CHECK_GETHOSTNAME, dnl
+AC_DEFUN(DEAL_II_CHECK_BROKEN_SOCKETS, dnl
 [
-  AC_CHECK_FUNCS(gethostname)
-
-  AC_MSG_CHECKING(for bad gethostname/FPU interaction)
+  AC_MSG_CHECKING(for bad socket functions/FPU interaction)
   AC_LANG(C++)
   CXXFLAGS="$CXXFLAGSG"
   AC_TRY_RUN(
@@ -3999,9 +4031,9 @@ int main()
       AC_MSG_RESULT(no)
     ],
     [
-      AC_MSG_RESULT([yes. disabling gethostname()])
-      AC_DEFINE(DEAL_II_BROKEN_GETHOSTNAME, 1, 
-                [Define if the use of gethostname() leads to strange
+      AC_MSG_RESULT([yes. disabling socket functions])
+      AC_DEFINE(DEAL_II_BROKEN_SOCKETS, 1, 
+                [Define if the use of socket functionality leads to strange
                  results with floating point computations on cygwin 
                  systems.])
     ])

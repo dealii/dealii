@@ -57,7 +57,10 @@
           the use of shared libraries; courtesy of 
           <a href="http://testdrive.hp.com">testdrive.hp.com</a>);
       <li>Mac OS X 10.2 with gcc 3.x (with some restrictions on
-          the use of shared libraries).
+          the use of shared libraries);
+      <li><a href="http://www.cygwin.com">Cygwin/Windows</a> with
+          cygwin1.dll versions 1.5.xx and gcc 3.3 under Windows XP
+          and NT.
     </ul>
     Furthermore, for the following list of systems, we have collected
     our experiences on separate pages:
@@ -82,7 +85,7 @@
            PGCC 3.x and 4.x on x86 Linux</a>.
 
       <li> <a href="platforms/windows.html" target="body">Microsoft
-           Windows 95/98/2000/NT</a>.
+           Windows 95/98/2000/NT/XP</a>.
 
       <li> <a href="platforms/bcc.html" target="body">Borland C++/Kylix</a>.
     </ul>
@@ -407,7 +410,8 @@
       </p>
     </ul>
     If shared libraries were built instead of static ones, then the
-    suffix <code>.a</code> is replaced by <code>.so</code>
+    suffix <code>.a</code> is replaced by <code>.so</code> or
+    <code>.dll</code> (for Cygwin/Windows).
     </p>
 
     <p>
@@ -478,7 +482,7 @@
       <code>--disable-shared</code>. (They are disabled by default on
       those systems for which we could not make them work. This
       applies to AIX, DEC Alpha stations running Linux and OSF1,
-      CygWin Windows systems, and some other systems as
+      and some other systems as
       well. Probably, there are simple solutions, but since we can't
       regularly test on these systems, we did not try very hard. If
       anyone would like to look into this, we would be pleased to
@@ -550,6 +554,32 @@
       number of threads to start in some situations. We presently
       support this detection only on Linux, Solaris, OSF, and SGI
       systems.
+      </p>
+
+    <li>
+      <p>
+      <code>--with-cpu=...</code>: this enables specific optimization
+      flags for your processor. Programs compiled with these options
+      might not execute on an other system, even if that system has a very
+      similar CPU (e.g. AMD and Intel processors). However, execution time
+      can be increased by up to 30 percent if this optimization is enabled.
+      </p>
+
+      <p>
+      Currently supported CPUs are <code>PowerPC64</code>, <code>i386</code>,
+      <code>i486</code>, <code>i586</code>, <code>i686</code>,
+      <code>pentium</code>, <code>pentium-mmx</code>, <code>pentiumpro</code>, 
+      <code>pentium2</code>, <code>pentium3</code>, <code>pentium4</code>, 
+      <code>k6</code>, <code>k6-2</code>, <code>k6-3</code>, <code>athlon</code>,
+      <code>athlon-tbird</code>, <code>athlon-4</code>, <code>athlon-xp</code>, 
+      <code>athlon-mp</code>, <code>winchip-c6</code>, and <code>winchip2</code>.
+      </p>
+
+      <p>
+      Optimizations currently only work in conjunction with gcc. Without the
+      option <code>--with-cpu=xxx</code>, no cpu specific optimization is applied.
+      Furthermore, CPU specific optimization is switched on only for the compilation
+      of the optimized library versions.
       </p>
 
     <li>
