@@ -760,8 +760,8 @@ void DataOutBase::write_povray (const vector<Patch<dim> > &patches,
 	}
     };
 
-
-double hmin=0,hmax=0;                             // max. and min. heigth of solution 
+				   // max. and min. heigth of solution 
+  double hmin=0, hmax=0;
 
   for (typename vector<Patch<dim> >::const_iterator patch=patches.begin();
        patch != patches.end(); ++patch)
@@ -830,7 +830,7 @@ double hmin=0,hmax=0;                             // max. and min. heigth of sol
 	      ExcInvalidDatasetSize (patch->data.n(), n_subdivisions+1));
 
 
-Point<dim> ver[16];			    // value for all points in this patch
+      Point<dim> ver[16];			    // value for all points in this patch
       
       for (unsigned int i=0; i<n_subdivisions+1; ++i)
 	{
@@ -1087,7 +1087,7 @@ void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 			patch->data(flags.height_vector,i*(n_subdivisions+1) + j+1)     * flags.z_scaling : 0};
 
 
-// now compute the projection of
+						   // now compute the projection of
 						   // the bilinear cell given by the
 						   // four vertices and their heights
 						   // and write them to a proper
@@ -1226,7 +1226,7 @@ void DataOutBase::write_eps (const vector<Patch<dim> > &patches,
 	const Point<2> offset(x_min, y_min);
 
 
-// now write preamble
+					 // now write preamble
 	if (true) 
 	  {
 					     // block this to have local
@@ -1546,7 +1546,7 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
 	    };
 
 
-// finally update the number
+					   // finally update the number
 					   // of the first vertex of this patch
 	  switch (dim)
 	    {
@@ -1668,7 +1668,8 @@ void DataOutBase::write_gmv (const vector<Patch<dim> > &patches,
     };
 
 
-// end of variable section
+  
+				   // end of variable section
   out << "endvars" << endl;
   
 				   // end of output
