@@ -26,7 +26,7 @@
  * should be derived from @p{Subscriptor} to allow for the use of a
  * smart pointer to it.
  *
- * @author Guido Kanschat, 1999
+ * @author Guido Kanschat, 1999, Ralf Hartmann, 2002.
  */
 template<class SOLVER, class MATRIX, class PRECOND, class VECTOR = Vector<double> >
 class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
@@ -52,6 +52,21 @@ class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
     void operator() (const unsigned int   level,
 		     VECTOR       &dst,
 		     const VECTOR &src) const;
+
+				     /**
+				      * Sets the matrix. This gives
+				      * the possibility to replace the
+				      * matrix that was given to the
+				      * constructor by a new matrix.
+				      */
+    void set_matrix (const MATRIX &);
+
+				     /**
+				      * Exception.
+				      */
+    DeclException0 (ExcNoMatrixGiven);
+
+    
   private:
 				     /**
 				      * Reference to the solver.
@@ -61,7 +76,7 @@ class MGCoarseGridLACIteration :  public MGCoarseGrid<VECTOR>
 				     /**
 				      * Reference to the matrix.
 				      */
-    const SmartPointer<const MATRIX> matrix;
+    SmartPointer<const MATRIX> matrix;
     
 				     /**
 				      * Reference to the preconditioner.
@@ -92,9 +107,18 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
 	      VECTOR       &dst,
 	      const VECTOR &src) const
 {
+  Assert(matrix!=0, ExcNoMatrixGiven());
   solver.solve(*matrix, dst, src, precondition);
 }
 
+
+template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
+void
+MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
+::set_matrix(const MATRIX &m)
+{
+  matrix=&m;
+}
 
 
 #endif
