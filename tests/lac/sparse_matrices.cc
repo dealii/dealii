@@ -75,7 +75,7 @@ int main()
 				   // Switch between regression test
 				   // and benchmark
 #ifdef DEBUG  
-  deallog.depth_console(3);
+  deallog.depth_console(0);
   const unsigned int size = 5;
   const unsigned int row_length = 3;
 #else
