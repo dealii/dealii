@@ -671,6 +671,13 @@ template<> void MappingQ1<3>::compute_shapes_virtual (
   const std::vector<Point<3> > &unit_points,
   InternalData &data) const;
 
+template <>
+void
+MappingQ1<1>::compute_face_data (const UpdateFlags,
+                                 const Quadrature<1> &,
+                                 const unsigned int,
+                                 InternalData &) const;
+
 template <> void MappingQ1<1>::compute_fill_face (
   const DoFHandler<1>::cell_iterator &,
   const unsigned int,
