@@ -39,7 +39,7 @@ DEAL::Mapping2d-2-Q4.output
 DEAL::  area=6.82
 DEAL::MappingFace2d-2-Q4.output
 DEAL::MappingSubface2d-2-Q4.output
-DEAL::p_unit=0.86 0.57,  p_real=3.71 2.38,  p_re_unit=0.86 0.57
+DEAL::p_unit=0.86 0.57,  p_real=3.70 2.38,  p_re_unit=0.86 0.57
 DEAL::Triangulation3:
 DEAL::exact_area=1.50
 DEAL::Mapping2d-3-Cartesian.output
