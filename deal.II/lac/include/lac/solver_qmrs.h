@@ -46,8 +46,40 @@ class SolverQMRS : public Solver<Matrix,Vector>
 				      * pipe additional data to the
 				      * solver. This solver does not
 				      * need additional data.
+				      *
+				      * There are two possibilities to compute
+				      * the residual: one is an estimate using
+				      * the computed value #tau#. The other
+				      * is exact computation using another matrix
+				      * vector multiplication.
+				      *
+				      * QMRS, is susceptible to breakdowns, so
+				      * we need a parameter telling us, which
+				      * numbers are considered zero.
 				      */
-    struct AdditionalData {};
+    struct AdditionalData
+    {
+					 /**
+					  * Constructor.
+					  *
+					  * The default is no exact residual
+					  * computation and breakdown
+					  * parameter 1e-16.
+					  */
+	AdditionalData(bool exact_residual = false,
+		       double breakdown=1.e-16) :
+			exact_residual(exact_residual),
+			breakdown(breakdown)
+	  {}
+					 /**
+					  * Flag for exact computation of residual.
+					  */
+	bool exact_residual;
+					 /**
+					  * Breakdown threshold.
+					  */
+	double breakdown;
+    };
 
 				     /**
 				      * Constructor.
@@ -96,6 +128,10 @@ class SolverQMRS : public Solver<Matrix,Vector>
 				      * the square root of the #res2# value.
 				      */
     long double res2;
+				     /**
+				      * Breakdown threshold.
+				      */
+    AdditionalData additional_data;
 };
 
 
@@ -107,8 +143,10 @@ class SolverQMRS : public Solver<Matrix,Vector>
 template<class Matrix, class Vector>
 SolverQMRS<Matrix,Vector>::SolverQMRS(SolverControl &cn,
 				  VectorMemory<Vector> &mem,
-				  const AdditionalData &) :
-		Solver<Matrix,Vector>(cn,mem) {};
+				  const AdditionalData &data) :
+		Solver<Matrix,Vector>(cn,mem),
+		additional_data(data)
+{};
 
 
 template<class Matrix, class Vector>
@@ -185,9 +223,8 @@ SolverQMRS<Matrix,Vector>::solve (const Matrix &A,
       A.vmult(t,p);
 				       // Step 2
       sigma = q*t;
-//      if (fabs(sigma) < ??)
-//TODO: Breakdown criteria here and below
-
+      if (fabs(sigma) < additional_data.breakdown)
+	return ReturnState(breakdown);
 				       // Step 3
       alpha = rho/sigma;
       v.add(-alpha,t);
@@ -200,11 +237,16 @@ SolverQMRS<Matrix,Vector>::solve (const Matrix &A,
       d.sadd(psi*theta_old, psi*alpha, p);
       x.add(d);
 				       // Step 5
-      res = sqrt((it+1)*tau);
+      if (additional_data.exact_residual)
+	res = A.residual(q,x,b);
+      else
+	res = sqrt((it+1)*tau);
       conv = control().check(it,res);
       if (conv) break;
+
 				       // Step 6
-//      if (fabs(rho) < ??)
+      if (fabs(rho) < additional_data.breakdown)
+	return ReturnState(breakdown);
 				       // Step 7
       rho_old = rho;
       precondition(q,v);
