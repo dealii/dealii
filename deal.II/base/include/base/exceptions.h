@@ -202,7 +202,7 @@
  *  is
  *  \begin{verbatim}
  *    AssertThrow (cond, ExcSomething(additional information));
- *  \end{verabtim}
+ *  \end{verbatim}
  *  The condition to be checked is incorporated into the macro in order to
  *  allow passing the violated condition as a string. The expansion of the
  *  #AssertThrow# macro is not affected by the #DEBUG# preprocessor variable.
