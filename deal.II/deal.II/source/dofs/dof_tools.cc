@@ -1391,8 +1391,6 @@ compute_intergrid_transfer_representation (const DoFHandler<dim>              &c
 					   const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
 					   std::vector<std::map<unsigned int, float> > &transfer_representation)
 {
-  
-
 				   // store the weights with which a dof
 				   // on the parameter grid contributes
 				   // to a dof on the fine grid. see the
@@ -1446,9 +1444,6 @@ compute_intergrid_transfer_representation (const DoFHandler<dim>              &c
   
 				   // now compute the requested
 				   // representation
-  transfer_representation.clear ();
-  transfer_representation.resize (weights.size());
-  
   const unsigned int n_global_parm_dofs
     = std::count_if (weight_mapping.begin(), weight_mapping.end(),
 		     std::bind2nd (std::not_equal_to<int> (), -1));
@@ -1475,12 +1470,22 @@ compute_intergrid_transfer_representation (const DoFHandler<dim>              &c
 				   // next copy over weights array
 				   // and replace respective
 				   // numbers
+  const unsigned int n_rows = weight_mapping.size();
+  
+  transfer_representation.clear ();
+  transfer_representation.resize (n_rows);
+  
   const unsigned int n_coarse_dofs = coarse_grid.n_dofs();
   for (unsigned int i=0; i<n_coarse_dofs; ++i)
-    {
+    {      
       std::map<unsigned int, float>::const_iterator j = weights[i].begin();
       for (; j!=weights[i].end(); ++j)
-	transfer_representation[i][inverse_weight_mapping[j->first]] = j->second;
+	{
+	  const unsigned int p = inverse_weight_mapping[j->first];
+	  Assert (p<n_rows, ExcInternalError());
+	  
+	  transfer_representation[p][i] = j->second;
+	};
     };
 };
 
