@@ -116,10 +116,19 @@ class BoundaryValues:  public Function<dim>
 				 // ``Tensor'', simplifying terms like
 				 // $\beta\cdot n$ and
 				 // $\beta\cdot\nabla v$.
+                                 //
+                                 // An unnecessary empty constructor
+                                 // is added to the class to work
+                                 // around a bug in Compaq's cxx
+                                 // compiler which otherwise reports
+                                 // an error about an omitted
+                                 // initializer for an object of
+                                 // this class further down.
 template <int dim>
 class Beta
 {
   public:
+    Beta () {};
     void value_list (const std::vector<Point<dim> > &points,
 		     std::vector<Point<dim> > &values) const;
 };
@@ -161,9 +170,9 @@ void Beta<dim>::value_list(const std::vector<Point<dim> > &points,
       const Point<dim> &p=points[i];
       Point<dim> &beta=values[i];
 
-      beta(0)=-p(1);
-      beta(1)=p(0);
-      beta/=sqrt(beta.square());
+      beta(0) = -p(1);
+      beta(1) = p(0);
+      beta /= std::sqrt(beta.square());
     }
 }
 
