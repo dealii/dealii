@@ -203,8 +203,8 @@ void DGAssembler<dim>::assemble_cell_term(const FEValuesBase<dim>& fe_v,
     for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i) 
       {
 	for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-	  cell_matrix(i,j) += beta[point]*grad_v[j][point]*
-			      v(i,point) *
+	  cell_matrix(i,j) -= beta[point]*grad_v[i][point]*
+			      v(j,point) *
 			      JxW[point];
 	
 	cell_vector(i) += rhs[point] *v(i,point) * JxW[point];
@@ -237,28 +237,28 @@ void DGAssembler<dim>::assemble_face_term(const FEFaceValuesBase<dim>& fe_v,
   for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
     {
       double beta_n=beta[point] * normals[point];
-      if (beta_n<0)
+      if (beta_n>0)
+	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
+	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
+	    cell_matrix(i,j) += beta_n *
+				v(j,point) *
+				v(i,point) *
+				JxW[point];
+      else
 	{
-	  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-	    {
-	      for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-		cell_matrix(i,j) -= beta_n *
-				    v(j,point) *
-				    v(i,point) *
-				    JxW[point];
-
-	      if (!face->at_boundary())
-		for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
-		  cell_inflow_matrix(i,k) += beta_n *
-					     v_neighbor(k,point) *
-					     v(i,point) *
-					     JxW[point];
-	      else
-		cell_vector(i) -= beta_n *
-				  g[point] *
-				  v(i,point) *
-				  JxW[point];
-	    }
+	  if (face->at_boundary())
+	    for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
+	      cell_vector(i) -= beta_n *
+				g[point] *
+				v(i,point) *
+				JxW[point];
+	  else
+	    for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
+	      for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
+		cell_inflow_matrix(i,k) += beta_n *
+					   v_neighbor(k,point) *
+					   v(i,point) *
+					   JxW[point];
 	}
     }
 }
