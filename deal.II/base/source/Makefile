@@ -3,8 +3,8 @@
 D=../..
 
 cc-files = $(wildcard *.cc)
-o-files  = $(cc-files:.cc=.o)
-go-files = $(cc-files:.cc=.go)
+o-files  = $(addprefix ../lib/o/, $(cc-files:.cc=.o))
+go-files = $(addprefix ../lib/o/, $(cc-files:.cc=.go))
 h-files  = $(wildcard ../include/*/*.h)
 
 forward-declarations = $D/base/include/base/forward-declarations.h
@@ -13,23 +13,25 @@ include $D/deal.II/Make.global_options
 
 
 
-%.go : %.cc Makefile
-	@echo ======== DEBUG =================== $<
+../lib/o/%.go :
+	@echo ============================ Compiling with debugging information:   $<
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
-%.o : %.cc Makefile
-	@echo ======== OPTIMIZE ================ $<
+../lib/o/%.o :
+	@echo ============================ Compiling with optimization:   $<
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
-lib: lib.g.a lib.a
+lib: ../lib/libbase.g.a ../lib/libbase.a
 
 
-lib.a: $(forward-declarations) ../lib/libbase.a($(o-files))
+../lib/libbase.a: $(forward-declarations) $(o-files)
+	@ar ruv $@ $(o-files)
 
-lib.g.a: $(forward-declarations) ../lib/libbase.g.a($(go-files))
+../lib/libbase.g.a: $(forward-declarations) $(go-files)
+	@ar ruv $@ $(go-files)
 
 clean:
-	rm -f *.o *.go *~ Makefile.dep ../lib/lib*
+	rm -f ../lib/o/*.o ../lib/o/*.go *~ ../lib/Makefile.dep ../lib/lib*
 
 
 
@@ -48,6 +50,7 @@ clean:
 ifneq (1,${recursive-make-fwd-decl})
 	@echo ============================ Remaking Makefile
 	@perl ../Make_dep.pl ../lib/libbase $(INCLUDE) $(cc-files) \
+		| perl -p -e 's!^.*\((.*)\):!../lib/o/$$1:!g;' \
 		> ../lib/Makefile.dep
 else
 	@echo ============================ Not remaking Makefile since in nested mode
