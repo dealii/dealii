@@ -14,7 +14,7 @@
 #define __deal2__parameter_handler_h
 
 
-//TODO:[WB] Use numeric_limits to designate the default values of bounds parameters
+//TODO:[WB] (compiler) Use numeric_limits to designate the default values of bounds parameters
 // of Patterns::Integer and Patterns::Double. This would then allow to use half-open
 // intervals as well, among other advantages.
 

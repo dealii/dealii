@@ -13,7 +13,7 @@
 /*----------------------------   tria-iterator.h     ---------------------------*/
 
 
-//TODO:[WB] Change <iostream> to <ostream> when that becomes available
+//TODO:[WB] (compiler) Change <iostream> to <ostream> when that becomes available
 #include <iterator>
 #include <iostream>
 #include <base/exceptions.h>

@@ -324,7 +324,7 @@ class TriaDimensionInfo<3>
 
 /*------------------------------------------------------------------------*/
 
-//TODO:[WB] Move the TriaNumberCache into the Triangulation class
+//TODO:[WB] (compiler) Move the TriaNumberCache into the Triangulation class
 //  once the compiler supports this (gcc2.95 does not allow this at present)
 
 

@@ -182,7 +182,7 @@ class FiniteElementData
 				      * me (WB) why we have to declare and implement
 				      * this one explicitely.
 				      */
-//TODO:[WB] remove operator and let the compiler generate it as soon as it is willing to do so    
+//TODO:[WB] (compiler) remove operator and let the compiler generate it as soon as it is willing to do so    
     bool operator == (const FiniteElementData<dim> &) const;
 
 				     /**

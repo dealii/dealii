@@ -20,7 +20,7 @@
 // everytime we use a point.
 
 
-//TODO:[WB] Change <iostream> to <ostream> when that becomes available
+//TODO:[WB] (compiler) Change <iostream> to <ostream> when that becomes available
 
 #include <base/exceptions.h>
 #include <iostream>
@@ -244,7 +244,7 @@ class Tensor<1,dim>
 				 /**
 				  * Exception
 				  */
-//TODO:[WB] move the exceptions back into the Tensor class, if the compiler allows to do so. Also rename them back (i.e. drop the initial Tensor* from the name)
+//TODO:[WB] (compiler) move the exceptions back into the Tensor class, if the compiler allows to do so. Also rename them back (i.e. drop the initial Tensor* from the name)
 DeclException2(ExcWrongVectorSize, int, int, << "Tensor has " << arg1
 	       << " entries, but vector has size " << arg2);
 DeclException1 (ExcDimTooSmall,
