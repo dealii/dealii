@@ -12,6 +12,10 @@
 //----------------------------  grid_in_3d.cc  ---------------------------
 
 
+// check that we can read in and edge orient meshes in 3d with a
+// significant number of cells. this tests Mike's reorienting
+// algorithm
+
 #include <dofs/dof_handler.h>
 #include <grid/tria.h>
 #include <grid/tria_boundary.h>
