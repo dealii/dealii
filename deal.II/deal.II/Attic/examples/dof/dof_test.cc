@@ -79,7 +79,7 @@ template <int dim>
 class TestCases : public MultipleParameterLoop::UserClass{
   public:
     TestCases ();
-    ~TestCases ();
+    virtual ~TestCases ();
     
     virtual void create_new (const unsigned int run_no);
     virtual void declare_parameters (ParameterHandler &prm);
