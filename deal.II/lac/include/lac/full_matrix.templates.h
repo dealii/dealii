@@ -72,8 +72,8 @@ template <typename number>
 FullMatrix<number> &
 FullMatrix<number>::operator *= (const double factor)
 {
-  number       *p = data();
-  const number *e = data() + n()*m();
+  number       *p = &el(0,0);
+  const number *e = &el(0,0) + n()*m();
   while (p != e)
     *p++ *= factor;
 
