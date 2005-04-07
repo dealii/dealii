@@ -31,6 +31,12 @@ template<typename number> class Vector;
 /**
  * QR-decomposition of a full matrix.
  *
+ * Whenever an object of this class is created, it copies the matrix
+ * given and computes its QR-decomposition by Householder
+ * algorithm. Then, the function least_squares() can be used to
+ * compute the vector <i>x</i> minimizing <i>||Ax-b||</i> for a given
+ * vector <i>b</i>.
+ *
  * @ref Instantiations: some (<tt>@<float@> @<double@></tt>)
  *
  * @author Guido Kanschat, 2005
@@ -49,9 +55,19 @@ class Householder : private FullMatrix<number>
 				     /**
 				      * Solve the least-squares
 				      * problem for the right hand
-				      * side <tt>src</tt>.  The return
+				      * side <tt>src</tt>. The return
 				      * value is the Euclidean norm of
 				      * the approximation error.
+				      *
+				      * @arg @c dst contains the
+				      * solution of the least squares
+				      * problem on return.
+				      *
+				      * @arg @c src contains the right
+				      * hand side <i>b</i> of the
+				      * least squares problem. It will
+				      * be changed uring the algorithm
+				      * and is unusable on return.
 				      */
     template<typename number2>
     double least_squares (Vector<number2> &dst,
