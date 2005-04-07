@@ -25,6 +25,7 @@ D                    = @DEAL2_DIR@
 CC                   = @CC@
 CXX                  = @CXX@
 GXX-VERSION          = @GXX_VERSION@
+GXX-VERSION-DETAILED = @GXX_VERSION_DETAILED@
 CC                   = @CC@
 CC-VERSION           = @CC_VERSION@
 SHLIBLD              = @SHLIBLD@
