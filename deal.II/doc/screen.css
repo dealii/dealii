@@ -46,9 +46,16 @@ hr {
     margin: 0.2em 0 0.2em 0;
 }
 
+div.head {
+        text-align:center;
+        position: fixed;
+        bottom:1ex;
+        width: 100%;
+}
 
 h1.head {
-	text-align:center;
+	position:relative;
+        text-align:center;
 	font-weight: bold;
 	color:black;
 	padding-top: 0;
