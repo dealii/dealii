@@ -49,8 +49,8 @@ hr {
 div.head {
         text-align:center;
         position: fixed;
-        bottom:1ex;
-        width: 100%;
+        bottom:3ex;
+        width: 98%;
 }
 
 h1.head {
