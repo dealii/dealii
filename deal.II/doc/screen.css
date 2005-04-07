@@ -2,36 +2,29 @@
 body {
 	background-image: none;
 	background-color: white; 
-    color: Black;
-    margin: 0;
-    padding: 0;
+	color: Black;
+	margin: 0;
+	padding: 0;
 }
-
-body {
-    font: normal sans-serif;
-    color: Black;
-    margin: 0;
-    padding: 0;
-}
-
 
 body.title {
 	background-image: url(pictures/title-background.jpg);
-    margin: 0;
-    padding: 2px;
+	margin: 0;
+	padding: 2px;
 }
 
 body.navbar {
 	background-image: url(pictures/deal.II-text.jpg);
-    margin: 2px;
-    padding: 2px;
+	margin: 2px;
+	padding: 2px;
 }
 
-frameset { background-color: white;
-	   border-color: white;
-	   border: 0;
-	   frameborder: 0;
-         }
+frameset {
+	background-color: white;
+	border-color: white;
+	border: 0;
+	frameborder: 0;
+}
 
 a:hover { text-decoration: underline; }
 
