@@ -3,8 +3,9 @@ body {
 	background-image: none;
 	background-color: white; 
 	color: Black;
-	margin: 0;
+	margin: 10px;
 	padding: 0;
+	font-family: sans-serif;
 }
 
 body.title {
@@ -17,12 +18,14 @@ body.navbar {
 	background-image: url(pictures/deal.II-text.jpg);
 	margin: 2px;
 	padding: 2px;
+	font-family: sans-serif;
+	font-size: 12px;
 }
 
 frameset {
 	background-color: white;
-	border-color: white;
-	border: 0;
+	border-color: black;
+	border: 2px;
 }
 
 a:hover { text-decoration: underline; }
