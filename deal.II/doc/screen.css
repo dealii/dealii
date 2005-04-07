@@ -63,8 +63,17 @@ h1, h2, h3, h4, h5, h6 {
     padding-bottom: 0.17em;
     border-bottom: 1px solid #aaaaaa;
 }
-h1 { font-size: 175%; }
-h2 { font-size: 140%; }
+
+h1 {
+	font-size: 175%;
+	font-variant: small-caps;
+}
+
+h2 {
+	font-size: 140%;
+	font-variant: small-caps;
+}
+
 h3 { font-size: 125%;
      padding-bottom: 0.17em;
      border-bottom: 1px dashed #aaaaaa; }
