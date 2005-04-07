@@ -75,7 +75,7 @@ A.qindexHL:hover {
 	padding: 2px 6px;
 }
 A.qindexHL:visited { text-decoration: none; background-color: #6666cc; color: #ffffff }
-A.el { text-decoration: none; }
+A.el { text-decoration: none; font-weight: normal; }
 A.elRef { font-weight: bold }
 A.code { text-decoration: none; font-weight: normal; color: #1A419D}
 A.codeRef { font-weight: normal; color: #1A419D}
@@ -233,10 +233,4 @@ INPUT.search { font-size: 75%;
                background-color: #eeeeff;
 }
 TD.tiny      { font-size: 75%;
-}
-a {
-	color: #900000;
-}
-a:visited {
-	color: #a06000;
 }
