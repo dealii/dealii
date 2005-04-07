@@ -23,7 +23,6 @@ frameset {
 	background-color: white;
 	border-color: white;
 	border: 0;
-	frameborder: 0;
 }
 
 a:hover { text-decoration: underline; }
@@ -66,12 +65,10 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
 	font-size: 175%;
-	font-variant: small-caps;
 }
 
 h2 {
 	font-size: 140%;
-	font-variant: small-caps;
 }
 
 h3 { font-size: 125%;
