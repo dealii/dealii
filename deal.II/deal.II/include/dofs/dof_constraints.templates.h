@@ -797,6 +797,44 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                                    // same order of magnitude
                                                    // as the other elements of
                                                    // the matrix
+						   //
+						   // note that this
+						   // also captures
+						   // the special case
+						   // that a dof is
+						   // both constrained
+						   // and fixed (this
+						   // can happen for
+						   // hanging nodes in
+						   // 3d that also
+						   // happen to be on
+						   // the
+						   // boundary). in
+						   // that case,
+						   // following the
+						   // above program
+						   // flow, it is
+						   // realized that
+						   // when
+						   // distributing the
+						   // row and column
+						   // no elements of
+						   // the matrix are
+						   // actually touched
+						   // if all the
+						   // degrees of
+						   // freedom to which
+						   // this dof is
+						   // constrained are
+						   // also constrained
+						   // (the usual case
+						   // with hanging
+						   // nodes in
+						   // 3d). however, in
+						   // the line below,
+						   // we do actually
+						   // do something
+						   // with this dof
                   if (i == j)
                     global_matrix.add (local_dof_indices[i],
                                        local_dof_indices[i],
