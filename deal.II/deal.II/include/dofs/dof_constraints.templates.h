@@ -35,7 +35,7 @@ namespace
   inline
   bool
   is_fixed (const std::map<unsigned int, double> &fixed_dofs,
-	    const unsigned int                   &i)
+	    const unsigned int                    i)
   {
     return (fixed_dofs.find(i) != fixed_dofs.end());
   }
