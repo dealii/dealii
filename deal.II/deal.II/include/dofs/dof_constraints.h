@@ -698,6 +698,46 @@ class ConstraintMatrix : public Subscriptor
 				      * advisable to have the list of
 				      * fixed nodes available when
 				      * calling the present function.
+				      *
+				      * However, it is worth noting
+				      * that even though the the
+				      * function obtains the list of
+				      * boundary nodes, this does not
+				      * guarantee that the boundary
+				      * values will be correct after
+				      * solving the linear system. The
+				      * reason is that the for fixed
+				      * (boundary) nodes, the matrix
+				      * has an empty row and column
+				      * except for the diagonal entry,
+				      * and the value of the solution
+				      * vector for this dof is the
+				      * right hand side value divided
+				      * by the diagonal entry. In
+				      * order to guarantee that the
+				      * resulting value is correct, we
+				      * need to have knowledge of both
+				      * the matrix and the right hand
+				      * side vector, something that
+				      * the
+				      * MatrixTools::apply_boundary_values
+				      * function does but this one
+				      * does not. Therefore, unless
+				      * you want to handle boundary
+				      * values yourself after
+				      * assembling the matrix by
+				      * adjusting the diagonal entries
+				      * of the matrix and the rows of
+				      * the right hand side vector of
+				      * the fixed nodes, it is advised
+				      * to not call this function here
+				      * directly, but rather to call
+				      * the
+				      * distribute_local_to_global()
+				      * function that does the work
+				      * for the matrix and right hand
+				      * side vector at the same time,
+				      * as demonstrated in step-17.
                                       */
     template <typename VectorType>
     void
@@ -788,6 +828,46 @@ class ConstraintMatrix : public Subscriptor
 				      * advisable to have the list of
 				      * fixed nodes available when
 				      * calling the present function.
+				      *
+				      * However, it is worth noting
+				      * that even though the the
+				      * function obtains the list of
+				      * boundary nodes, this does not
+				      * guarantee that the boundary
+				      * values will be correct after
+				      * solving the linear system. The
+				      * reason is that the for fixed
+				      * (boundary) nodes, the matrix
+				      * has an empty row and column
+				      * except for the diagonal entry,
+				      * and the value of the solution
+				      * vector for this dof is the
+				      * right hand side value divided
+				      * by the diagonal entry. In
+				      * order to guarantee that the
+				      * resulting value is correct, we
+				      * need to have knowledge of both
+				      * the matrix and the right hand
+				      * side vector, something that
+				      * the
+				      * MatrixTools::apply_boundary_values
+				      * function does but this one
+				      * does not. Therefore, unless
+				      * you want to handle boundary
+				      * values yourself after
+				      * assembling the matrix by
+				      * adjusting the diagonal entries
+				      * of the matrix and the rows of
+				      * the right hand side vector of
+				      * the fixed nodes, it is advised
+				      * to not call this function here
+				      * directly, but rather to call
+				      * the
+				      * distribute_local_to_global()
+				      * function that does the work
+				      * for the matrix and right hand
+				      * side vector at the same time,
+				      * as demonstrated in step-17.
                                       */
     template <typename MatrixType>
     void
