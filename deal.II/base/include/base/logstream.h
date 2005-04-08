@@ -190,6 +190,39 @@ class LogStream
 				      * double values. All numbers
 				      * with a smaller absolute value
 				      * will be printed as zero.
+				      *
+				      * The default value for this
+				      * threshold is zero,
+				      * i.e. numbers are printed
+				      * according to their real value.
+				      *
+				      * This feature is mostly useful
+				      * for automated tests: there,
+				      * one would like to reproduce
+				      * the exact same solution in
+				      * each run of a
+				      * testsuite. However, subtle
+				      * difference in processor,
+				      * operating system, or compiler
+				      * version can lead to
+				      * differences in the last few
+				      * digits of numbers, due to
+				      * different rounding. While one
+				      * can avoid trouble for most
+				      * numbers when comparing with
+				      * stored results by simply
+				      * limiting the accuracy of
+				      * output, this does not hold for
+				      * numbers very close to zero,
+				      * i.e. zero plus accumulated
+				      * round-off. For these numbers,
+				      * already the first digit is
+				      * tainted by round-off. Using
+				      * the present function, it is
+				      * possible to eliminate this
+				      * source of problems, by simply
+				      * writing zero to the output in
+				      * this case.
 				      */
     void threshold_double(const double t);
     
