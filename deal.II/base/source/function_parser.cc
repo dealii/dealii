@@ -16,6 +16,7 @@
 #include <lac/vector.h>
 
 // Utility to split a string given a delimiter.
+
 unsigned int SplitString(const std::string& input, 
 			 const std::string& delimiter, 
 			 std::vector<std::string>& results)
@@ -81,6 +82,8 @@ template <int dim>
 FunctionParser<dim>::~FunctionParser() {
   delete[] fp;
 }
+
+#ifndef DEAL_II_DISABLE_PARSER
 
 template <int dim>
 void FunctionParser<dim>::initialize(const std::string variables,
@@ -158,7 +161,6 @@ void FunctionParser<dim>::initialize(const std::string variables,
 }
 
 template <int dim>
-inline
 double FunctionParser<dim>::value (const Point<dim> &p,
 				   unsigned int component) const 
 {
@@ -186,7 +188,6 @@ double FunctionParser<dim>::value (const Point<dim> &p,
 
 
 template <int dim>
-inline
 void FunctionParser<dim>::vector_value (const Point<dim> &p,
 					Vector<double>   &values) const 
 {
@@ -212,6 +213,46 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
 	     ExcMessage(fp[component].ErrorMsg()));
     } 
 }
+
+#else
+
+
+template <int dim>
+void FunctionParser<dim>::initialize(
+  const std::string, const std::vector<std::string>,
+  std::map<std::string, double>, bool, bool)
+{
+  Assert(false, ExcDisabled("parser"));
+}
+
+
+template <int dim>
+void FunctionParser<dim>::initialize(
+  const std::string, const std::string,
+  std::map<std::string, double>, bool, bool)
+{
+  Assert(false, ExcDisabled("parser"));
+}
+
+
+template <int dim>
+double FunctionParser<dim>::value (
+  const Point<dim> &, unsigned int) const 
+{
+  Assert(false, ExcDisabled("parser"));
+  return 0.;
+}
+
+
+template <int dim>
+void FunctionParser<dim>::vector_value (
+  const Point<dim>&, Vector<double>&) const 
+{
+  Assert(false, ExcDisabled("parser"));
+}
+
+
+#endif
 
 // Explicit Instantiations.
 

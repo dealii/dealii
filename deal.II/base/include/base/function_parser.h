@@ -20,7 +20,21 @@
 #include <base/function.h>
 #include <vector>
 #include <map>
+
+#ifndef DEAL_II_DISABLE_PARSER
 #include <functionparser/fparser.h>
+#else
+namespace fparser
+{
+				   /**
+				    * Dummy definition if
+				    * FunctionParser is not used.
+				    */
+  class FunctionParser {};
+  
+};
+
+#endif
 
 template <int dim> class Point;
 template <int rank_, int dim> class Tensor;
@@ -94,24 +108,44 @@ template <int dim>
 class FunctionParser : public Function<dim>
 {
   public:
-  /** Constructor for Parsed functions. Its arguments are the same of
-      the base class Function. The only difference is that this object
-      needs to be initialized with initialize() method before you can
-      use it. If an attempt to use this function is made before the
-      initialize() method has been called, then an exception is
-      thrown. */
-  FunctionParser (const unsigned int n_components = 1,
-		  const double       initial_time = 0.0); 
+				     /**
+				      * Constructor for Parsed
+				      * functions. Its arguments are
+				      * the same of the base class
+				      * Function. The only difference
+				      * is that this object needs to
+				      * be initialized with
+				      * initialize() method before you
+				      * can use it. If an attempt to
+				      * use this function is made
+				      * before the initialize() method
+				      * has been called, then an
+				      * exception is thrown.
+				      */
+    FunctionParser (const unsigned int n_components = 1,
+		    const double       initial_time = 0.0); 
   
-  /** Destructor. Explicitly delete the FunctionParser objects (there
-      is one for each component of the function). */
-  ~FunctionParser();
-  
-  /** Type for the constant map. Used by the initialize() method. */
-  typedef std::map<std::string, double> ConstMap;
-  
-  /** Iterator for the constants map. Used by the initialize() method. */
-  typedef ConstMap::iterator ConstMapIterator;
+				     /**
+				      * Destructor. Explicitly delete
+				      * the FunctionParser objects
+				      * (there is one for each
+				      * component of the function).
+				      */
+    ~FunctionParser();
+    
+				     /**
+				      * Type for the constant
+				      * map. Used by the initialize()
+				      * method.
+				      */
+    typedef std::map<std::string, double> ConstMap;
+    
+				     /**
+				      * Iterator for the constants
+				      * map. Used by the initialize()
+				      * method.
+				      */
+    typedef ConstMap::iterator ConstMapIterator;
 
   /** Initialize the function. From the fparser.txt file:
       @verbatim
@@ -248,11 +282,11 @@ class FunctionParser : public Function<dim>
     
     
   */
-  void initialize(const std::string vars,
-		  const std::vector<std::string> expressions,
-		  const ConstMap constants,
-		  bool time_dependent = false,
-		  bool use_degrees = false);
+    void initialize(const std::string vars,
+		    const std::vector<std::string> expressions,
+		    const ConstMap constants,
+		    bool time_dependent = false,
+		    bool use_degrees = false);
   
   /** Initialize the function. Same as above, but accepts a string
       rather than a vector of strings. If this is a vector valued
@@ -311,29 +345,36 @@ class FunctionParser : public Function<dim>
      @endverbatim
       
   */
-  void initialize(const std::string vars,
-		  const std::string expression,
-		  const ConstMap constants,
-		  bool time_dependent = false,
-		  bool use_degrees = false);
+    void initialize(const std::string vars,
+		    const std::string expression,
+		    const ConstMap constants,
+		    bool time_dependent = false,
+		    bool use_degrees = false);
   
 
-  /**
-   * Return the value of the function at the given point. Unless there
-   * is only one component (i.e. the function is scalar), you should
-   * state the component you want to have evaluated; it defaults to
-   * zero, i.e. the first component. */
+				     /**
+				      * Return the value of the
+				      * function at the given
+				      * point. Unless there is only
+				      * one component (i.e. the
+				      * function is scalar), you
+				      * should state the component you
+				      * want to have evaluated; it
+				      * defaults to zero, i.e. the
+				      * first component.
+				      */
   virtual double value (const Point<dim>   &p,
 			const unsigned int  component = 0) const;
 
-  /**
-   * Return all components of a vector-valued function at a given
-   * point.
-   *
-   * <tt>values</tt> shall have the
-   * right size beforehand,
-   * i.e. #n_components.
-   */
+				     /**
+				      * Return all components of a
+				      * vector-valued function at a
+				      * given point.
+				      *
+				      * <tt>values</tt> shall have the
+				      * right size beforehand,
+				      * i.e. #n_components.
+				      */
   virtual void vector_value (const Point<dim>   &p,
 			     Vector<double>     &values) const;
 
@@ -351,23 +392,37 @@ class FunctionParser : public Function<dim>
 		  << arg2 << ").");
     
   //@}
- private: 
-  /** A pointer to the actual function parsers. */
- fparser::FunctionParser * fp;
+  private: 
+				     /**
+				      * A pointer to the actual
+				      * function parsers.
+				      */
+    fparser::FunctionParser * fp;
     
- /** State of usability. This variable is checked every time the
-     function is called for evaluation. It's set to true in the
-     initialize() methods.*/
- bool initialized;
+				     /**
+				      * State of usability. This
+				      * variable is checked every time
+				      * the function is called for
+				      * evaluation. It's set to true
+				      * in the initialize() methods.
+				      */
+    bool initialized;
     
- /** Number of variables. If this is also a function of time, then the
-     number of variables is dim+1, otherwhise it is dim. In the case
-     that this is a time dependent function, the time is supposed to
-     be the last variable. If #n_vars is not identical to the number
-     of the variables parsed by the initialize() method, then an
-     exception is thrown.   
- */
- unsigned int n_vars;
+				     /**
+				      * Number of variables. If this
+				      * is also a function of time,
+				      * then the number of variables
+				      * is dim+1, otherwhise it is
+				      * dim. In the case that this is
+				      * a time dependent function, the
+				      * time is supposed to be the
+				      * last variable. If #n_vars is
+				      * not identical to the number of
+				      * the variables parsed by the
+				      * initialize() method, then an
+				      * exception is thrown.
+				     */
+    unsigned int n_vars;
 };
 
 
