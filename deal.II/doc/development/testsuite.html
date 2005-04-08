@@ -1,15 +1,20 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
                  "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-  <head>
-    <link href="../screen.css" rel="StyleSheet" media="screen">
-    <title>The deal.II Testsuite</title>
-    <meta name="author" content="the deal.II authors <authors@dealii.org>">
-    <meta name="keywords" content="deal.II"></head>
-  <body>
+<head>
+  <link href="../screen.css" rel="StyleSheet">
+  <title>The deal.II Testsuite</title>
+  <meta name="author" content="the deal.II authors <authors@dealii.org>">
+  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005 by the deal.II authors">
+  <meta name="date" content="$Date$">
+  <meta name="CVS_ID" content="$Id$">
+  <meta name="keywords" content="deal dealii finite elements fem triangulation">
+  <meta http-equiv="content-language" content="en">
+</head>
+<body>
 
 
-    <h2>The deal.II Testsuite</h2>
+    <h1>The deal.II Testsuite</h1>
 
     <p>
     deal.II has a testsuite that, at the time this article is written,
@@ -34,7 +39,7 @@
     </p>
 
 
-    <h3>Running it</h3>
+    <h2>Running it</h2>
 
     <p>
     To run the testsuite, you first need CVS access to our source
@@ -202,7 +207,7 @@
 
 
 
-    <h3>Adding new tests</h3>
+    <h2>Adding new tests</h2>
 
     <p>
     As mentioned above, we usually add a new test these days every
@@ -213,7 +218,7 @@
     .
     </p>
 
-    <h4>The testcase</h4>
+    <h3>The testcase</h3>
     <p>
     For the testcase, we usually start from a template like this:
     <pre>
@@ -283,7 +288,7 @@ int main ()
     </p>
 
     
-    <h4>An entry in the Makefile</h4>
+    <h3>An entry in the Makefile</h3>
 
     <p>
     In order for the Makefiles to pick up your new test, you have to
@@ -310,7 +315,7 @@ int main ()
 
 
 
-    <h4>An expected output</h4>
+    <h3>An expected output</h3>
 
     <p>
     If you run your new test executable, you will get an output file
@@ -363,7 +368,7 @@ int main ()
 
 
 
-    <h4>Checking everything in</h4>
+    <h3>Checking in</h3>
     
     <p>
     Tests are a way to make sure everything keeps working. If they
@@ -384,7 +389,7 @@ int main ()
     </p>
 
 
-    <h3>Adding a new system</h3>
+    <h2>Adding a new system</h2>
 
     <p>
     If you are working on a system or with a compiler for which test
