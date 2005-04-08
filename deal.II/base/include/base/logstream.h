@@ -19,6 +19,7 @@
 
 #include <string>
 #include <stack>
+#include <cmath>
 
 // we only need output streams, but older compilers did not provide
 // them in a separate include file
