@@ -31,7 +31,7 @@ template <int dim> const unsigned int GeometryInfo<dim>::hexes_per_cell;
 // these variables
 namespace internal
 {
-  void foo (const unsigned int *) {};
+  void foo (const unsigned int *) {}
 
   template <int dim>
   void define_variables () 
