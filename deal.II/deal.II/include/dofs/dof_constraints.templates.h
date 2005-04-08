@@ -612,13 +612,48 @@ distribute_local_to_global (const Vector<double>            &local_vector,
                                            // distribute it, but make
                                            // sure we don't touch the
                                            // entries of fixed dofs
+					   //
+					   // there is one critical
+					   // point: sometimes a dof
+					   // may be both constrained
+					   // and fixed, for example
+					   // hanging nodes in 3d at
+					   // the boundary. in that
+					   // case, we don't quite
+					   // know what to do --
+					   // handle the constraint or
+					   // the fixed
+					   // value. however, this
+					   // isn't so hard if all the
+					   // nodes that this node is
+					   // constrained to are also
+					   // fixed nodes, in which
+					   // case we could do both
+					   // but opt to copy the
+					   // element. however, we
+					   // have to check that all
+					   // the nodes to which it is
+					   // constrained are also
+					   // fixed
           if (position->line != local_dof_indices[i])
             global_vector(local_dof_indices[i]) += local_vector(i);
           else
-            for (unsigned int j=0; j<position->entries.size(); ++j)
-	      if (!is_fixed(fixed_dofs, position->entries[j].first))
-		global_vector(position->entries[j].first)
-		  += local_vector(i) * position->entries[j].second;
+	    {
+	      if (!is_fixed(fixed_dofs, local_dof_indices[i]))
+		{
+		  for (unsigned int j=0; j<position->entries.size(); ++j)
+		    if (!is_fixed(fixed_dofs, position->entries[j].first))
+		      global_vector(position->entries[j].first)
+			+= local_vector(i) * position->entries[j].second;
+		}
+	      else
+		{
+		  global_vector(local_dof_indices[i]) += local_vector(i);
+		  for (unsigned int j=0; j<position->entries.size(); ++j)
+		    Assert (is_fixed(fixed_dofs, position->entries[j].first),
+			    ExcInternalError());
+		}
+	    }
         }
     }
 }
