@@ -1077,6 +1077,16 @@ namespace StandardExceptions
 				    * if it is actually included.
 				    */
   DeclException0 (ExcNeedsPETSC);
+				   /**
+				    * A configuration option disabled
+				    * this feature. In order to use
+				    * it, you must reconfigure and
+				    * recompile the libraries.
+				    */
+  DeclException1 (ExcDisabled, char*,
+		  << "This feature was disabled by the "
+		  "configuration option --disable-"
+		  << arg1 << ". Reconfigure to use it!");
   
 //@}
 }
