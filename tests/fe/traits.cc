@@ -2,7 +2,7 @@
 //    traits.cc,v 1.2 2004/01/23 16:34:24 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -121,6 +121,7 @@ int main ()
   std::ofstream logfile("traits.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
   check<1> ();
   check<2> ();

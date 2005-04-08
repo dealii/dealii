@@ -118,6 +118,7 @@ main()
   std::ofstream logfile("internals.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
   CHECK_M(DGQ,0,2);
   CHECK_M(DGQ,1,2);

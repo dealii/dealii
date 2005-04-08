@@ -1,5 +1,5 @@
 // mapping_q1_eulerian.cc,v 1.3 2002/06/26 12:28:54 guido Exp
-// Copyright (C) 2001, 2002 Michael Stadler, Wolfgang Bangerth
+// Copyright (C) 2001, 2002, 2005 Michael Stadler, Wolfgang Bangerth
 //
 
 #include "../tests.h"
@@ -94,6 +94,7 @@ main()
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
 
 

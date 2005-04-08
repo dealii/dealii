@@ -2,7 +2,7 @@
 //    q_3.cc,v 1.1 2003/05/05 13:49:41 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,6 +61,7 @@ main()
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
                                    // we had the matrices precomputed
                                    // up to Q4 for 1d, 2d and 3d

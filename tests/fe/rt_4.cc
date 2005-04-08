@@ -2,7 +2,7 @@
 //    rt_4.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,7 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 5
+#define PRECISION 2
 
 
 
@@ -41,7 +41,7 @@ test(const unsigned int degree)
       for (unsigned int i=0; i<m.m(); ++i)
 	{
 	  for (unsigned int j=0; j<m.n(); ++j)
-	    deallog << m(i,j) << ' ';
+	    deallog << 100*m(i,j) << ' ';
 	  deallog << std::endl;
 	}
       
@@ -58,6 +58,7 @@ main()
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
   for (unsigned int degree=0; degree<4; ++degree)
     test<2>(degree);

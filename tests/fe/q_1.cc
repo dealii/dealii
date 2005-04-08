@@ -2,7 +2,7 @@
 //    q_1.cc,v 1.1 2003/05/05 13:49:41 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,7 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 5
+#define PRECISION 2
 
 
 
@@ -41,7 +41,7 @@ test(const unsigned int degree)
   for (unsigned int i=0; i<constraints.m(); ++i)
     {
       for (unsigned int j=0; j<constraints.n(); ++j)
-	deallog << constraints(i,j) << ' ';
+	deallog << 100*constraints(i,j) << ' ';
       deallog << std::endl;
     }
   
@@ -57,6 +57,7 @@ main()
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
                                    // no constraints in 1d, but we had
                                    // the matrices precomputed up to

@@ -183,6 +183,7 @@ int main()
   std::ofstream logfile("fe_tools.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
   
   test_projection<1>(logfile);
   test_projection<2>(logfile);

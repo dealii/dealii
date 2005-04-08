@@ -2,7 +2,7 @@
 //    system_1.cc,v 1.3 2003/06/09 21:55:00 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -79,6 +79,7 @@ main()
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
   CHECK_SYS1(FE_Q<1>(1),  3,
              FE_Q<1>(2),  3,

@@ -2,7 +2,7 @@
 //    non_primitive_2.cc,v 1.5 2003/04/21 07:31:15 guido Exp
 //    Version: 
 //
-//    Copyright (C) 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -255,6 +255,7 @@ int main ()
   std::ofstream logfile("non_primitive_2.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
   test<2> ();
   test<3> ();

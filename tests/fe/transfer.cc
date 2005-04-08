@@ -38,13 +38,12 @@
 char fname[50];
 
 #define TEST(dim, l, el, deg) { el<dim> fe(deg); \
-  of << # el << '<' << dim << ">(" << deg << ')' << std::endl; \
-  print_matrix(of, tr ## dim, l, fe, #el); }
+  deallog << # el << '<' << dim << ">(" << deg << ')' << std::endl; \
+  print_matrix(tr ## dim, l, fe, #el); }
 
 template<int dim>
 inline void
-print_matrix(LogStream& of,
-	     Triangulation<dim>& tr,
+print_matrix(Triangulation<dim>& tr,
 	     unsigned int level,
 	     const FiniteElement<dim>& finel,
 	     const char* /*name*/)
@@ -66,17 +65,20 @@ print_matrix(LogStream& of,
       out = 0.;
       in(i) = 1.;
       transfer.restrict_and_add(level,out,in);
-      out.print(of, 3, false);
+      for (unsigned int k=0;k<out.size();++k)
+	deallog << '\t' << out(k);
+      deallog << std::endl;
     }
-  of << std::endl;
+  deallog << std::endl;
 }
 
 
 int
 main()
 {
-  std::ofstream of("transfer.output");
+  std::ofstream logfile("transfer.output");
   deallog.attach(logfile);
+  logfile.precision(3);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   

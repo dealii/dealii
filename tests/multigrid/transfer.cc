@@ -227,6 +227,7 @@ int main()
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
   
 //  check_simple (FE_DGP<2>(0));
 //  check_simple (FE_DGP<2>(1));
