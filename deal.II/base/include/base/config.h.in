@@ -5,7 +5,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,6 +61,9 @@
    an explicit mapping variable, but rather use a default Q1 mapping instead
    */
 #undef DEAL_II_COMPAT_MAPPING
+
+/* disable the function parser in contrib */
+#undef DEAL_II_DISABLE_PARSER
 
 /* Defined if the compiler does not honor the explicit keyword on template
    constructors. */
