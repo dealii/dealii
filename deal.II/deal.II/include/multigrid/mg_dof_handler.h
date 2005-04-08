@@ -1061,10 +1061,6 @@ class MGDoFHandler : public DoFHandler<dim>
 			int,
 			<< "The given level number " << arg1 << " is outside "
 			<< "the range of levels this vertex lives on.");
-					 /**
-					  * Exception.
-					  */
-	DeclException0 (ExcInternalError);
 	
       private:
 					 /**
