@@ -13,10 +13,16 @@
 
 
 #include <lac/full_matrix.templates.h>
+#include <base/logstream.h>
 
 #define TYPEMAT float
 
 template class FullMatrix<TYPEMAT>;
+
+template void FullMatrix<TYPEMAT>::print(
+  LogStream&, const unsigned int, const unsigned int) const;
+template void FullMatrix<TYPEMAT>::print(
+  std::ostream&, const unsigned int, const unsigned int) const;
 
 template FullMatrix<TYPEMAT>& FullMatrix<TYPEMAT>::operator =(
   const FullMatrix<double>&);

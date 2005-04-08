@@ -142,6 +142,7 @@ int main(int,char)
   deallog.attach(logfile);
   deallog.depth_console(0);
 //  deallog.log_execution_time(true);
+//  deallog.log_time_differences(true);
   
   test_fe_datas<1>();
   test_fe_datas<2>();

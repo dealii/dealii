@@ -2,7 +2,7 @@
 //    transfer.cc,v 1.4 2003/04/09 15:49:55 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 //----------------------------  show_transfer.cc  ---------------------------
 
 #include "../tests.h"
+#include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
@@ -42,7 +43,7 @@ char fname[50];
 
 template<int dim>
 inline void
-print_matrix(std::ostream& of,
+print_matrix(LogStream& of,
 	     Triangulation<dim>& tr,
 	     unsigned int level,
 	     const FiniteElement<dim>& finel,
@@ -74,6 +75,11 @@ print_matrix(std::ostream& of,
 int
 main()
 {
+  std::ofstream of("transfer.output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
+  
   Triangulation<2> tr2;
 
   GridGenerator::hyper_cube(tr2, -1., 1.);
@@ -84,8 +90,6 @@ main()
   GridGenerator::hyper_cube(tr3, -1., 1.);
   tr3.refine_global(3);
 
-  std::ofstream of("transfer.output");
-  
   TEST(2, 1, FE_Q, 1);
   TEST(2, 1, FE_Q, 2);
   TEST(2, 1, FE_Q, 3);

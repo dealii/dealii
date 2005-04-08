@@ -19,6 +19,11 @@
 
 template class FullMatrix<TYPEMAT>;
 
+template void FullMatrix<TYPEMAT>::print(
+  LogStream&, const unsigned int, const unsigned int) const;
+template void FullMatrix<TYPEMAT>::print(
+  std::ostream&, const unsigned int, const unsigned int) const;
+
 template FullMatrix<TYPEMAT>& FullMatrix<TYPEMAT>::operator =(
   const FullMatrix<float>&);
 

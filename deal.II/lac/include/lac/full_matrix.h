@@ -480,55 +480,59 @@ class FullMatrix : public Table<2,number>
 				      * Output of the matrix in
 				      * user-defined format.
 				      */
-    void print (std::ostream       &s,
+    template <class STREAM>
+    void print (STREAM             &s,
 		const unsigned int  width=5,
 		const unsigned int  precision=2) const;
 
 				     /**
-				      * Print the matrix in the usual
-				      * format, i.e. as a matrix and
-				      * not as a list of nonzero
-				      * elements. For better
-				      * readability, elements not in
-				      * the matrix are displayed as
-				      * empty space, while matrix
-				      * elements which are explicitly
-				      * set to zero are displayed as
-				      * such.
-				      *
+				      * Print the matrix and allow
+				      * formatting of entries.
+				     *
 				      * The parameters allow for a
 				      * flexible setting of the output
-				      * format: <tt>precision</tt> and
-				      * <tt>scientific</tt> are used to
-				      * determine the number format,
-				      * where <tt>scientific</tt> = <tt>false</tt>
-				      * means fixed point notation.  A
-				      * zero entry for <tt>width</tt> makes
-				      * the function compute a width,
-				      * but it may be changed to a
-				      * positive value, if output is
-				      * crude.
+				      * format:
 				      *
-				      * Additionally, a character for
-				      * an empty value may be
-				      * specified.
+				      * @arg <tt>precision</tt>
+				      * denotes the number of trailing
+				      * digits.
 				      *
-				      * Finally, the whole matrix can
-				      * be multiplied with a common
-				      * denominator to produce more
-				      * readable output, even
-				      * integers.
+				      * @arg <tt>scientific</tt> is
+				      * used to determine the number
+				      * format, where
+				      * <tt>scientific</tt> =
+				      * <tt>false</tt> means fixed
+				      * point notation.
 				      *
-				      * @attention This function
-				      * may produce <b>large</b> amounts of
-				      * output if applied to a large matrix!
-				      */
+				      * @arg <tt>width</tt> denotes
+				      * the with of each column. A
+				      * zero entry for <tt>width</tt>
+				      * makes the function compute a
+				      * width, but it may be changed
+				      * to a positive value, if output
+				      * is crude.
+				      *
+				      * @arg <tt>zero_string</tt>
+				      * specifies a string printed for
+				      * zero entries.
+				      *
+				      * @arg <tt>denominator</tt>
+				      * Multiply the whole matrix by
+				      * this common denominator to get
+				      * nicer numbers.
+				      *
+				      * @arg <tt>threshold</tt>: all
+				      * entries with absolute value
+				      * smaller than this are
+				      * considered zero.
+				     */
     void print_formatted (std::ostream       &out,
 			  const unsigned int  presicion=3,
 			  const bool          scientific  = true,
 			  const unsigned int  width       = 0,
 			  const char         *zero_string = " ",
-			  const double        denominator = 1.) const;
+			  const double        denominator = 1.,
+			  const double        threshold   = 0.) const;
     
 				     /**
 				      * Determine an estimate for the

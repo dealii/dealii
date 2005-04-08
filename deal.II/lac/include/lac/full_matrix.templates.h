@@ -730,8 +730,9 @@ number FullMatrix<number>::linfty_norm () const
 
 
 template <typename number>
+template <class STREAM>
 void
-FullMatrix<number>::print (std::ostream       &s,
+FullMatrix<number>::print (STREAM             &s,
 			   const unsigned int  w,
 			   const unsigned int  p) const
 {
@@ -1466,12 +1467,14 @@ FullMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
 
 template <typename number>
 void
-FullMatrix<number>::print_formatted (std::ostream       &out,
-				     const unsigned int  precision,
-				     const bool          scientific,
-				     const unsigned int  width_,
-				     const char         *zero_string,
-				     const double        denominator) const
+FullMatrix<number>::print_formatted (
+  std::ostream       &out,
+  const unsigned int  precision,
+  const bool          scientific,
+  const unsigned int  width_,
+  const char         *zero_string,
+  const double        denominator,
+  const double        threshold) const
 {
   unsigned int width = width_;
   
@@ -1497,7 +1500,7 @@ FullMatrix<number>::print_formatted (std::ostream       &out,
   for (unsigned int i=0; i<m(); ++i) 
     {
       for (unsigned int j=0; j<n(); ++j)
-	if (this->el(i,j) != 0)
+	if (std::fabs(this->el(i,j)) > threshold)
 	  out << std::setw(width)
 	      << this->el(i,j) * denominator << ' ';
 	else
