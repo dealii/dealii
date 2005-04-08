@@ -963,6 +963,10 @@ void ElasticProblem<dim>::assemble_system ()
 	  = (boundary_value->second /
 	     system_matrix.diag_element (boundary_value->first));
       }
+
+				   // At the end, compress the
+				   // so-modified vector again:
+  system_rhs.compress ();
 }
 
 
