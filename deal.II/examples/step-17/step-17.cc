@@ -799,11 +799,13 @@ void ElasticProblem<dim>::assemble_system ()
         hanging_node_constraints
           .distribute_local_to_global (cell_matrix,
                                        local_dof_indices,
+				       boundary_values,
                                        system_matrix);
 
         hanging_node_constraints
           .distribute_local_to_global (cell_rhs,
                                        local_dof_indices,
+				       boundary_values,
                                        system_rhs);
       }
 
