@@ -182,6 +182,15 @@ class LogStream
 				      * parameter is returned.
 				      */
     bool log_time_differences (const bool flag);
+
+				     /**
+				      * Set a threshold for the
+				      * minimal absolute value of
+				      * double values. All numbers
+				      * with a smaller absolute value
+				      * will be printed as zero.
+				      */
+    void threshold_double(const double t);
     
 				     /**
 				      * Output a constant something
@@ -189,6 +198,18 @@ class LogStream
 				      */
     template <typename T>
     LogStream & operator << (const T &t);
+
+				     /**
+				      * Output double precision
+				      * numbers through this
+				      * stream. This function
+				      * eliminates floating point
+				      * numbers smaller than
+				      * #double_threshold, which can
+				      * be changed using
+				      * threshold_double().
+				      */
+    LogStream & operator << (const double t);
 
 				     /**
 				      * Treat ostream
@@ -315,6 +336,12 @@ class LogStream
     double last_time;
 
 				     /**
+				      * Threshold for printing double
+				      * values.
+				      */
+    double double_threshold;
+    
+				     /**
 				      * Original buffer of
 				      * <tt>std::cerr</tt>. We store
 				      * the address of that buffer
@@ -356,6 +383,22 @@ LogStream::operator<< (const T& t)
 				   // do the work that is common to
 				   // the two operator<< functions
   print (t);
+  return *this;
+}
+
+
+
+inline
+LogStream &
+LogStream::operator<< (const double t)
+{
+				   // do the work that is common to
+				   // the two operator<< functions
+  if (std::fabs(t) > double_threshold)
+    print (t);
+  else
+    print('0');
+  
   return *this;
 }
 

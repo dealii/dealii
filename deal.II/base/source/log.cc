@@ -50,7 +50,7 @@ LogStream::LogStream()
 		std_out(&std::cerr), file(0), was_endl(true),
 		std_depth(10000), file_depth(10000),
 		print_utime(false), diff_utime(false),
-		last_time (0.), old_cerr(0)
+		last_time (0.), double_threshold(0.), old_cerr(0)
 {
   prefixes.push("DEAL:");
   std_out->setf(std::ios::showpoint | std::ios::left);
@@ -145,6 +145,13 @@ LogStream::depth_file (const unsigned n)
   const unsigned int h = file_depth;
   file_depth = n;
   return h;
+}
+
+
+void
+LogStream::threshold_double (const double t)
+{
+  double_threshold = t;
 }
 
 
