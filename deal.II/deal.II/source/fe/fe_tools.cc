@@ -571,19 +571,24 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 					   // solve the least squares
 					   // problem.
 	  const double result = H.least_squares(v_fine, v_coarse);
-	  Assert (result < 1.e-10, ExcLeastSquaresError(result));
+	  Assert (result < 1.e-12, ExcLeastSquaresError(result));
 	    
-					   // Finally copy into the
-					   // result matrix. Since the
-					   // matrix maps a coarse
-					   // grid function to a fine
-					   // grid function, the
-					   // columns are fine grid.
+					   // Copy into the result
+					   // matrix. Since the matrix
+					   // maps a coarse grid
+					   // function to a fine grid
+					   // function, the columns
+					   // are fine grid.
 	  for (unsigned int j=0;j<n;++j)
 	    matrix(j,i) = v_fine(j);
 	}
+				       // Remove small entries from
+				       // the matrix
+      for (unsigned int i=0; i<matrix.m(); ++i)
+	for (unsigned int j=0; j<matrix.n(); ++j)
+	  if (std::fabs(matrix(i,j)) < 1e-12)
+	    matrix(i,j) = 0.;
     }
-  
 }
 
 
