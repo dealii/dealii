@@ -24,8 +24,6 @@
 #include <lac/block_sparse_matrix.h>
 
 
-//TODO[WB]: Some things could be accelerated on globally refined meshes if we didn't even enter the main loops of the condense functions when the 'lines' array is empty
-
 
 namespace
 {
