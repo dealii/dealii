@@ -26,6 +26,24 @@
 
 //TODO[WB]: Some things could be accelerated on globally refined meshes if we didn't even enter the main loops of the condense functions when the 'lines' array is empty
 
+
+namespace
+{
+				   // an abbreviation to see if a
+				   // certain index is contained in a
+				   // map
+  inline
+  bool
+  is_fixed (const std::map<unsigned int, double> &fixed_dofs,
+	    const unsigned int                   &i)
+  {
+    return (fixed_dofs.find(i) != fixed_dofs.end());
+  }
+}
+
+
+
+
 template<typename number>
 void
 ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
@@ -554,9 +572,6 @@ ConstraintMatrix::set_zero (VectorType &vec) const
 
 
 
-#define is_fixed(i) (fixed_dofs.find(i) != fixed_dofs.end())
-//#define is_fixed(i) false
-
 template <typename VectorType>
 void
 ConstraintMatrix::
@@ -603,7 +618,7 @@ distribute_local_to_global (const Vector<double>            &local_vector,
             global_vector(local_dof_indices[i]) += local_vector(i);
           else
             for (unsigned int j=0; j<position->entries.size(); ++j)
-	      if (!is_fixed(position->entries[j].first))
+	      if (!is_fixed(fixed_dofs, position->entries[j].first))
 		global_vector(position->entries[j].first)
 		  += local_vector(i) * position->entries[j].second;
         }
@@ -702,7 +717,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                                    // ok, row is constrained,
                                                    // but column is not
                   for (unsigned int q=0; q<position_i->entries.size(); ++q)
-		    if (!is_fixed(position_i->entries[q].first))
+		    if (!is_fixed(fixed_dofs, position_i->entries[q].first))
 		      global_matrix.add (position_i->entries[q].first,
 					 local_dof_indices[j],
 					 local_matrix(i,j) *
@@ -715,7 +730,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                                    // round: row ok, column is
                                                    // constrained
                   for (unsigned int q=0; q<position_j->entries.size(); ++q)
-		    if (!is_fixed(position_j->entries[q].first))
+		    if (!is_fixed(fixed_dofs, position_j->entries[q].first))
 		      global_matrix.add (local_dof_indices[i],
 					 position_j->entries[q].first,
 					 local_matrix(i,j) *
@@ -727,9 +742,9 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                                    // last case: both row and
                                                    // column are constrained
                   for (unsigned int p=0; p<position_i->entries.size(); ++p)
-		    if (!is_fixed(position_i->entries[p].first))
+		    if (!is_fixed(fixed_dofs, position_i->entries[p].first))
 		      for (unsigned int q=0; q<position_j->entries.size(); ++q)
-			if (!is_fixed(position_j->entries[q].first))
+			if (!is_fixed(fixed_dofs, position_j->entries[q].first))
 			  global_matrix.add (position_i->entries[p].first,
 					     position_j->entries[q].first,
 					     local_matrix(i,j) *
