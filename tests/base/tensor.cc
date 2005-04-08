@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,7 +12,6 @@
 //----------------------------  tensor.cc  ---------------------------
 
 
-#include "../tests.h"
 #include <base/tensor.h>
 #include <base/logstream.h>
 #include <lac/vector.h>
@@ -25,6 +24,7 @@ int main ()
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
   
   double a[3][3] = {{1, 2, 3}, {3, 4, 5}, {6, 7, 8}};
   double b[3][3] = {{25,31,37}, {45,57,69}, {75,96,117}};

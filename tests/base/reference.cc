@@ -41,6 +41,7 @@ int main()
   std::ofstream logfile("reference.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
                                    // we do something rather weird in
                                    // this file: bind the buffer of

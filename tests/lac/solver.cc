@@ -26,6 +26,7 @@
 #include <lac/solver_control.h>
 #include <lac/solver_cg.h>
 #include <lac/solver_gmres.h>
+#include <lac/solver_minres.h>
 #include <lac/solver_bicgstab.h>
 #include <lac/solver_richardson.h>
 #include <lac/solver_qmrs.h>
@@ -72,6 +73,7 @@ int main()
   logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
   
   GrowingVectorMemory<> mem;
   SolverControl control(100, 1.e-3);
@@ -80,6 +82,7 @@ int main()
   SolverGMRES<> gmres(control, mem, 8);
   SolverGMRES<>::AdditionalData(8, true);
   SolverGMRES<> gmresright(control, mem, 8);  
+  SolverMinRes<> minres(control, mem);
   SolverBicgstab<> bicgstab(control, mem);
   SolverRichardson<> rich(control, mem);
   SolverQMRS<> qmrs(control, mem);
@@ -153,6 +156,7 @@ int main()
 	  check_solve(bicgstab,A,u,f,prec_no);
 	  check_solve(gmres,A,u,f,prec_no);
 	  check_solve(gmresright,A,u,f,prec_no);
+//	  check_solve(minres,A,u,f,prec_no);
 	  check_solve(qmrs,A,u,f,prec_no);
 	  control.set_max_steps(100);
 	  

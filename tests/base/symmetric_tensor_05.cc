@@ -14,7 +14,6 @@
 // make sure the tensor t_ijkl=delta_ik delta_jl + delta_il delta_jk
 // actually maps a rank-2 tensor onto twice itself
 
-#include "../tests.h"
 #include <base/symmetric_tensor.h>
 #include <base/logstream.h>
 #include <fstream>
@@ -80,7 +79,8 @@ int main ()
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
-
+  deallog.threshold_double(1.e-10);
+  
   test<2> ();
   test<3> ();
   

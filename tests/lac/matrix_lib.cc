@@ -70,6 +70,7 @@ int main()
   logfile.precision(0);
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
   
   SparsityPattern sparsity1(2,3,3);
   SparsityPattern sparsity2(3,4,4);

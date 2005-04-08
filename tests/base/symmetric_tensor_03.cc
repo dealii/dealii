@@ -1,4 +1,4 @@
-//----------------------------  symmetric_tensor_03.cc  ---------------------------
+//---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,11 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  symmetric_tensor_03.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 // test symmetric 2x2x2x2 tensors
 
-#include "../tests.h"
 #include <base/symmetric_tensor.h>
 #include <base/logstream.h>
 #include <fstream>
@@ -25,6 +24,7 @@ int main ()
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
   
   SymmetricTensor<4,2> t;
   t[0][0][0][0] = 1;
