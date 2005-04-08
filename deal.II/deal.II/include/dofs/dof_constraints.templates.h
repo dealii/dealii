@@ -554,11 +554,15 @@ ConstraintMatrix::set_zero (VectorType &vec) const
 
 
 
+#define is_fixed(i) (fixed_dofs.find(i) != fixed_dofs.end())
+//#define is_fixed(i) false
+
 template <typename VectorType>
 void
 ConstraintMatrix::
 distribute_local_to_global (const Vector<double>            &local_vector,
                             const std::vector<unsigned int> &local_dof_indices,
+			    const std::map<unsigned int, double> &fixed_dofs,
                             VectorType                      &global_vector) const
 {
   Assert (local_vector.size() == local_dof_indices.size(),
@@ -589,15 +593,19 @@ distribute_local_to_global (const Vector<double>            &local_vector,
                                          lines.end(),
                                          index_comparison);
 
-                                           // if the line is not constrained,
-                                           // then simply copy the
-                                           // data. otherwise distribute it
+                                           // if the line is not
+                                           // constrained, then simply
+                                           // copy the data. otherwise
+                                           // distribute it, but make
+                                           // sure we don't touch the
+                                           // entries of fixed dofs
           if (position->line != local_dof_indices[i])
             global_vector(local_dof_indices[i]) += local_vector(i);
           else
             for (unsigned int j=0; j<position->entries.size(); ++j)
-              global_vector(position->entries[j].first)
-                += local_vector(i) * position->entries[j].second;
+	      if (!is_fixed(position->entries[j].first))
+		global_vector(position->entries[j].first)
+		  += local_vector(i) * position->entries[j].second;
         }
     }
 }
@@ -609,6 +617,7 @@ void
 ConstraintMatrix::
 distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                             const std::vector<unsigned int> &local_dof_indices,
+			    const std::map<unsigned int, double> &fixed_dofs,
                             MatrixType                      &global_matrix) const
 {
   Assert (local_matrix.n() == local_dof_indices.size(),
@@ -693,10 +702,11 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                                    // ok, row is constrained,
                                                    // but column is not
                   for (unsigned int q=0; q<position_i->entries.size(); ++q)
-                    global_matrix.add (position_i->entries[q].first,
-                                       local_dof_indices[j],
-                                       local_matrix(i,j) *
-                                       position_i->entries[q].second);
+		    if (!is_fixed(position_i->entries[q].first))
+		      global_matrix.add (position_i->entries[q].first,
+					 local_dof_indices[j],
+					 local_matrix(i,j) *
+					 position_i->entries[q].second);
                 }
               else if ((is_constrained_i == false) &&
                        (is_constrained_j == true))
@@ -705,10 +715,11 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                                    // round: row ok, column is
                                                    // constrained
                   for (unsigned int q=0; q<position_j->entries.size(); ++q)
-                    global_matrix.add (local_dof_indices[i],
-                                       position_j->entries[q].first,
-                                       local_matrix(i,j) *
-                                       position_j->entries[q].second);
+		    if (!is_fixed(position_j->entries[q].first))
+		      global_matrix.add (local_dof_indices[i],
+					 position_j->entries[q].first,
+					 local_matrix(i,j) *
+					 position_j->entries[q].second);
                 }
               else if ((is_constrained_i == true) &&
                        (is_constrained_j == true))
@@ -716,12 +727,14 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                                    // last case: both row and
                                                    // column are constrained
                   for (unsigned int p=0; p<position_i->entries.size(); ++p)
-                    for (unsigned int q=0; q<position_j->entries.size(); ++q)
-                      global_matrix.add (position_i->entries[p].first,
-                                         position_j->entries[q].first,
-                                         local_matrix(i,j) *
-                                         position_i->entries[p].second *
-                                         position_j->entries[q].second);
+		    if (!is_fixed(position_i->entries[p].first))
+		      for (unsigned int q=0; q<position_j->entries.size(); ++q)
+			if (!is_fixed(position_j->entries[q].first))
+			  global_matrix.add (position_i->entries[p].first,
+					     position_j->entries[q].first,
+					     local_matrix(i,j) *
+					     position_i->entries[p].second *
+					     position_j->entries[q].second);
 
                                                    // to make sure that the
                                                    // global matrix remains

@@ -99,7 +99,8 @@ void test ()
           A.add (local_dofs[i], local_dofs[j], local_matrix(i,j));
 
                                        // or let other functions do that
-      constraints.distribute_local_to_global (local_matrix, local_dofs, B);
+      constraints.distribute_local_to_global (local_matrix, local_dofs,
+					      std::map<unsigned int,double>(), B);
     }
 
                                    // now condense away constraints from A

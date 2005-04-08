@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <vector>
+#include <map>
 #include <utility>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
@@ -656,7 +657,7 @@ class ConstraintMatrix : public Subscriptor
                                       * In contrast to the similar function in
                                       * the DoFAccessor class, this function
                                       * also takes care of constraints,
-                                      * i.e. of one of the elements of @p
+                                      * i.e. if one of the elements of @p
                                       * local_dof_indices belongs to a
                                       * constrained node, then rather than
                                       * writing the corresponding element of
@@ -672,11 +673,37 @@ class ConstraintMatrix : public Subscriptor
                                       * the condense function after the
                                       * vectors and matrices are fully
                                       * assembled.
+				      *
+				      * In order to do its work
+				      * properly, this function has to
+				      * know which degrees of freedom
+				      * are fixed, for example
+				      * boundary values. For this, the
+				      * third argument is a map
+				      * between the numbers of the
+				      * DoFs that are fixed and the
+				      * values they are fixed to. One
+				      * can pass an empty map in for
+				      * this argument, but note that
+				      * you will then have to fix
+				      * these nodes later on again,
+				      * for example by using
+				      * MatrixTools::apply_boundary_values
+				      * to the resulting
+				      * matrix. However, since the
+				      * present function was written
+				      * for the express purpose of not
+				      * having to use tools that later
+				      * modify the matrix, it is
+				      * advisable to have the list of
+				      * fixed nodes available when
+				      * calling the present function.
                                       */
     template <typename VectorType>
     void
     distribute_local_to_global (const Vector<double>            &local_vector,
                                 const std::vector<unsigned int> &local_dof_indices,
+				const std::map<unsigned int, double> &fixed_dofs,
                                 VectorType                      &global_vector) const;
 
                                      /**
@@ -697,7 +724,7 @@ class ConstraintMatrix : public Subscriptor
                                       * In contrast to the similar function in
                                       * the DoFAccessor class, this function
                                       * also takes care of constraints,
-                                      * i.e. of one of the elements of @p
+                                      * i.e. if one of the elements of @p
                                       * local_dof_indices belongs to a
                                       * constrained node, then rather than
                                       * writing the corresponding element of
@@ -736,11 +763,37 @@ class ConstraintMatrix : public Subscriptor
                                       * the condense function after the
                                       * vectors and matrices are fully
                                       * assembled.
+				      *
+				      * In order to do its work
+				      * properly, this function has to
+				      * know which degrees of freedom
+				      * are fixed, for example
+				      * boundary values. For this, the
+				      * third argument is a map
+				      * between the numbers of the
+				      * DoFs that are fixed and the
+				      * values they are fixed to. One
+				      * can pass an empty map in for
+				      * this argument, but note that
+				      * you will then have to fix
+				      * these nodes later on again,
+				      * for example by using
+				      * MatrixTools::apply_boundary_values
+				      * to the resulting
+				      * matrix. However, since the
+				      * present function was written
+				      * for the express purpose of not
+				      * having to use tools that later
+				      * modify the matrix, it is
+				      * advisable to have the list of
+				      * fixed nodes available when
+				      * calling the present function.
                                       */
     template <typename MatrixType>
     void
     distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                 const std::vector<unsigned int> &local_dof_indices,
+				const std::map<unsigned int, double> &fixed_dofs,
                                 MatrixType                      &global_matrix) const;
     
 				     /**
