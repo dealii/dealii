@@ -12,7 +12,11 @@
 //----------------------------  dof_constraints_01x.cc  ---------------------------
 
 
-// check DoFConstraints::distribute_local_to_global for matrices
+// check DoFConstraints::distribute_local_to_global for matrices and
+// vectors in the presence of both constraints and boundary
+// values. this proved to be a really tricky can of worms. this test
+// checks things on a rather small domain, the sister test
+// dof_constraints_01y does it on complicated meshes
 
 #include "../tests.h"
 #include <base/function_lib.h>
@@ -144,13 +148,10 @@ void test ()
 				   // boundary nodes are computed in
 				   // different ways, so make sure
 				   // that the boundary values will be
-				   // correct and then set to the same
-				   // thing
+				   // correct
   for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
     if (boundary_values.find(i) != boundary_values.end())
       {
-	Assert (b(i)/B.diag_element(i) == boundary_values[i], ExcInternalError());
-	Assert (a(i)/A.diag_element(i) == boundary_values[i], ExcInternalError());
 	B.diag_element(i) = A.diag_element(i);
 	b(i) = a(i);
       }
