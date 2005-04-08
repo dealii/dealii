@@ -27,6 +27,24 @@ template <int dim> const unsigned int GeometryInfo<dim>::lines_per_cell;
 template <int dim> const unsigned int GeometryInfo<dim>::quads_per_cell;
 template <int dim> const unsigned int GeometryInfo<dim>::hexes_per_cell;
 
+// make sure that also the icc compiler defines (and not only declares) 
+// these variables
+namespace internal
+{
+  void foo (const unsigned int *) {};
+
+  template <int dim>
+  void define_variables () 
+  { 
+    foo(&GeometryInfo<dim>::vertices_per_cell);
+  }
+
+  template void define_variables<2> ();
+  template void define_variables<3> ();
+}
+
+
+
 
 template <>
 const unsigned int GeometryInfo<1>::opposite_face[GeometryInfo<1>::faces_per_cell]
