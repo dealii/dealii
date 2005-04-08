@@ -1,7 +1,7 @@
 
 body {
 	background-image: none;
-	background-color: #FFFFFF; 
+	background-color: #ECF0F4; 
 	color: Black;
 	margin: 10px;
 	padding: 0;
@@ -9,21 +9,19 @@ body {
 }
 
 body.title {
-	background-color: #D0D8E0; 
-	background-image: url(pictures/title-background.jpg);
+	background-color: #CCD8E8; 
 	margin: 0;
 	padding: 2px;
 }
 
 body.gallery {
-	background-color: #D0D8E0; 
-	background-image: url(pictures/title-background.jpg);
+	background-color: #CCD8E8; 
 	margin: 0;
 	padding: 2px;
 }
 
 body.navbar {
-	background-color: #D0D8E0; 
+	background-color: #CCD8E8; 
 	background-image: url(pictures/deal.II-text.jpg);
 	margin: 2px;
 	padding: 2px;
