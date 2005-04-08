@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -95,6 +95,7 @@ int main ()
   logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
   test<1> ();
   test<2> ();

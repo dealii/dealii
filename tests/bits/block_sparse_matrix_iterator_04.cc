@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004 by the deal.II authors
+//    Copyright (C) 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,6 +55,7 @@ int main ()
   std::ofstream logfile("block_sparse_matrix_iterator_04.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
   try
     {

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004 by the deal.II authors and Brian Carnes
+//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors and Brian Carnes
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -54,6 +54,7 @@ int main()
   std::ofstream logfile("block_sparse_matrix_1.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
   Triangulation<2> tria;  
   GridGenerator::hyper_cube (tria,0,1);

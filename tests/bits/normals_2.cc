@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -47,6 +47,7 @@ void check (const Triangulation<dim> &tria,
   FE_Q<dim> fe(1);
   DoFHandler<dim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
+  deallog.threshold_double(1.e-10);
 
   QGauss3<dim-1> q_face;
   
@@ -100,6 +101,7 @@ int main ()
   std::ofstream logfile("normals_2.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
   {  
     Triangulation<2> coarse_grid;
