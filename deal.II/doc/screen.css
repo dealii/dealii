@@ -58,7 +58,7 @@ hr {
 div.head {
         text-align:center;
         position: fixed;
-        bottom:3ex;
+        bottom:10px;
         width: 98%;
 }
 
