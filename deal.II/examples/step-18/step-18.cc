@@ -1490,17 +1490,17 @@ namespace QuasiStaticElasticity
   template <int dim>
   void TopLevel<dim>::solve_timestep ()
   {
-    pcout << "      Assembling system..." << std::flush;
+    pcout << "    Assembling system..." << std::flush;
     assemble_system ();
     pcout << " norm of rhs is " << system_rhs.l2_norm()
           << std::endl;
       
     const unsigned int n_iterations = solve_linear_problem ();
   
-    pcout << "      Solver converged in " << n_iterations
+    pcout << "    Solver converged in " << n_iterations
           << " iterations." << std::endl;
 
-    pcout << "      Updating quadrature point data..." << std::flush;
+    pcout << "    Updating quadrature point data..." << std::flush;
     update_quadrature_point_history ();
     pcout << std::endl;
   }
