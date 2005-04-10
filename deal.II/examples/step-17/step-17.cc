@@ -171,7 +171,7 @@ class ElasticProblem
                                      // classes from the
                                      // ``PETScWrappers::MPI'' namespace;
                                      // sequential versions of these classes
-                                     // are in the ````PETScWrappers''
+                                     // are in the ``PETScWrappers''
                                      // namespace, i.e. without the ``MPI''
                                      // part). Note also that we do not use a
                                      // separate sparsity pattern, since PETSc
