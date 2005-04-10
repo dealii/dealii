@@ -113,7 +113,20 @@ namespace QuasiStaticElasticity
   };
 
 
-                                   //
+                                   // @sect3{The stress-strain tensor}
+
+                                   // Next, we define the linear relationship
+                                   // between the stress and the strain in
+                                   // elasticity. It is given by a tensor of
+                                   // rank 4 that is usually written in the
+                                   // form ``C_{ijkl} = \mu (\delta_{ik}
+                                   // \delta_{jl} + \delta_{il} \delta_{jk}) +
+                                   // \lambda \delta_{ij} \delta_{kl}''. This
+                                   // tensor maps symmetric tensor of rank 2
+                                   // to symmetric tensors of rank 2. A
+                                   // function implementing its creation for
+                                   // given values of the Lame constants
+                                   // lambda and my is straightforward:
   template <int dim>
   SymmetricTensor<4,dim>
   get_stress_strain_tensor (const double lambda, const double mu)
@@ -129,10 +142,36 @@ namespace QuasiStaticElasticity
     return tmp;
   }
 
+                                   // With this function, we can define a
+                                   // variable that will be used throughout
+                                   // the program as the stress-strain tensor,
+                                   // with values for the Lame constants that
+                                   // are appropriate for steel:
   const SymmetricTensor<4,deal_II_dimension> stress_strain_tensor
   = get_stress_strain_tensor<deal_II_dimension> (/*lambda = */ 9.695e10,
                                                  /*mu     = */ 7.617e10);
+                                   // In more elaborate programs, this will
+                                   // probably be a member variable of some
+                                   // class instead, or a function that
+                                   // returns the stress-strain relationship
+                                   // depending on other input. For example in
+                                   // damage theory models, the Lame constants
+                                   // are considered a function of the prior
+                                   // stress/strain history of a
+                                   // point. Conversely, in plasticity the
+                                   // form of the stress-strain tensor is
+                                   // modified if the material has reached the
+                                   // yield stress in a certain point, and
+                                   // possibly also depending on its prior
+                                   // history.
+                                   //
+                                   // In the present program, however, we
+                                   // assume that the material is completely
+                                   // elastic and linear, and a constant
+                                   // stress-strain tensor is sufficient for
+                                   // our present purposes.
 
+  
 
 				   // @sect3{Auxiliary functions}
 
