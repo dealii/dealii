@@ -1490,28 +1490,19 @@ namespace QuasiStaticElasticity
   template <int dim>
   void TopLevel<dim>::solve_timestep ()
   {
-//TODO:    
-    for (unsigned int nonlinear_iteration=1; true; ++nonlinear_iteration)
-      {
-	pcout << "    Nonlinear iteration " << nonlinear_iteration
-	      << std::endl;
-
-	pcout << "      Assembling system..." << std::flush;
-	assemble_system ();
-	pcout << " norm of rhs is " << system_rhs.l2_norm()
-	      << std::endl;
+    pcout << "      Assembling system..." << std::flush;
+    assemble_system ();
+    pcout << " norm of rhs is " << system_rhs.l2_norm()
+          << std::endl;
       
-	const unsigned int n_iterations = solve_linear_problem ();
+    const unsigned int n_iterations = solve_linear_problem ();
   
-	pcout << "      Solver converged in " << n_iterations
-	      << " iterations." << std::endl;
+    pcout << "      Solver converged in " << n_iterations
+          << " iterations." << std::endl;
 
-	pcout << "      Updating quadrature point data..." << std::flush;
-	update_quadrature_point_history ();
-	pcout << std::endl;
-      
-	break;
-      }
+    pcout << "      Updating quadrature point data..." << std::flush;
+    update_quadrature_point_history ();
+    pcout << std::endl;
   }
 
 
