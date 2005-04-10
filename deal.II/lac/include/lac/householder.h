@@ -167,10 +167,11 @@ Householder<number>::least_squares (Vector<number2>& dst,
 	src(i) -= sum*this->el(i,j);
     }
   
-  backward(dst, src);
+  this->backward(dst, src);
   
   number2 sum = 0.;
-  for (unsigned int i=this->n() ; i<this->m() ; ++i) sum += src(i) * src(i);
+  for (unsigned int i=this->n() ; i<this->m() ; ++i)
+    sum += src(i) * src(i);
   return std::sqrt(sum);
 }
 
