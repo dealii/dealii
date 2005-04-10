@@ -11,6 +11,8 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+//TODO:
+#define deal_II_dimension 2
 
                                  // First the usual list of header files that
                                  // have already been used in previous example
@@ -109,100 +111,27 @@ namespace QuasiStaticElasticity
   {
       SymmetricTensor<2,dim> old_stress;
   };
-    
 
-//TODO:  
-  namespace MaterialModel
+
+                                   //
+  template <int dim>
+  SymmetricTensor<4,dim>
+  get_stress_strain_tensor (const double lambda, const double mu)
   {
-    template <int dim>
-    class Base
-    {
-      public:
-	virtual
-	~Base ();
-      
-	virtual
-	SymmetricTensor<4,dim>
-	stress_strain_tensor (const PointHistory<dim> &point_history) const = 0;
-    };
-
-
-    template <int dim>
-    Base<dim>::~Base ()
-    {}
-
-
-
-    template <int dim>
-    class LinearElasticity : public Base<dim>
-    {
-      public:
-	LinearElasticity (const double lambda,
-			  const double mu);
-      
-	virtual
-	SymmetricTensor<4,dim>
-	stress_strain_tensor (const PointHistory<dim> &point_history) const;
-
-      protected:
-	const SymmetricTensor<4,dim> linear_stress_strain_tensor;
-
-      private:
-	static
-	SymmetricTensor<4,dim>
-	get_linear_tensor (const double lambda,
-			   const double mu);
-    };
-  
-
-    template <int dim>
-    LinearElasticity<dim>::LinearElasticity (const double lambda,
-					     const double mu)
-		    :
-		    linear_stress_strain_tensor (get_linear_tensor (lambda,
-								    mu))
-    {}
-
-
-    template <int dim>
-    inline
-    SymmetricTensor<4,dim>
-    LinearElasticity<dim>::
-    stress_strain_tensor (const PointHistory<dim> &/*point_history*/) const
-    {
-				       // note that this model is independent of
-				       // the point's history, i.e. prior
-				       // deformation does not play a role
-      return linear_stress_strain_tensor;
-    }
-
-
-  
-    template <int dim>
-    SymmetricTensor<4,dim>
-    LinearElasticity<dim>::
-    get_linear_tensor (const double lambda,
-		       const double mu)
-    {
-      SymmetricTensor<4,dim> tmp;
-      for (unsigned int i=0; i<dim; ++i)
-	for (unsigned int j=0; j<dim; ++j)
-	  for (unsigned int k=0; k<dim; ++k)
-	    for (unsigned int l=0; l<dim; ++l)
-	      tmp[i][j][k][l] = (((i==k) && (j==l) ? mu : 0) +
-				 ((i==l) && (j==k) ? mu : 0) +
-				 ((i==j) && (k==l) ? lambda : 0));
-      return tmp;
-    }
-  
+    SymmetricTensor<4,dim> tmp;
+    for (unsigned int i=0; i<dim; ++i)
+      for (unsigned int j=0; j<dim; ++j)
+        for (unsigned int k=0; k<dim; ++k)
+          for (unsigned int l=0; l<dim; ++l)
+            tmp[i][j][k][l] = (((i==k) && (j==l) ? mu : 0) +
+                               ((i==l) && (j==k) ? mu : 0) +
+                               ((i==j) && (k==l) ? lambda : 0));
+    return tmp;
   }
 
-                                   // from
-                                   // http://www.mstrtech.com/WebPages/matexam.htm
-                                   // for steel
-  MaterialModel::LinearElasticity<deal_II_dimension>
-  material_model (/*lambda=*/9.695e10,
-                  /*mu    =*/7.617e10);
+  const SymmetricTensor<4,deal_II_dimension> stress_strain_tensor
+  = get_stress_strain_tensor<deal_II_dimension> (/*lambda = */ 9.695e10,
+                                                 /*mu     = */ 7.617e10);
 
 
 				   // @sect3{Auxiliary functions}
@@ -1406,17 +1335,10 @@ namespace QuasiStaticElasticity
 		    eps_phi_i = get_strain (fe_values, i, q_point),
 		    eps_phi_j = get_strain (fe_values, j, q_point);
 
-		  const PointHistory<dim> &point_history
-		    = reinterpret_cast<PointHistory<dim>*>
-		    (cell->user_pointer())[q_point];
-                
 		  cell_matrix(i,j) 
-		    +=
-		    (eps_phi_i *
-		     material_model.stress_strain_tensor(point_history) *
-		     eps_phi_j)
-		    *
-		    fe_values.JxW(q_point);
+		    += (eps_phi_i * stress_strain_tensor * eps_phi_j
+                        *
+                        fe_values.JxW(q_point));
 		}
 
 
@@ -2505,11 +2427,6 @@ namespace QuasiStaticElasticity
 					   // points of this cell:
 	  for (unsigned int q=0; q<quadrature_formula.n_quadrature_points; ++q)
 	    {
-//TODO: Replace by proper plasticity model             
-	      const PointHistory<dim> &point_history
-		= reinterpret_cast<PointHistory<dim>*>
-		(cell->user_pointer())[q];
-
                                                // On each quadrature point,
                                                // compute the strain increment
                                                // from the gradients, and
@@ -2522,7 +2439,7 @@ namespace QuasiStaticElasticity
               const SymmetricTensor<2,dim> new_stress
                 = (local_quadrature_points_history[q].old_stress
                    +
-                   (material_model.stress_strain_tensor(point_history) *
+                   (stress_strain_tensor *
                     get_strain (displacement_increment_grads[q])));
 
                                                // Finally, we have to rotate
