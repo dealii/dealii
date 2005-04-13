@@ -23,6 +23,7 @@
 
 namespace 
 {
+  inline
   std::vector<unsigned int>
   invert_numbering (const std::vector<unsigned int> &in)
   {

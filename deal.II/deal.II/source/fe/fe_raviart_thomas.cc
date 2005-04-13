@@ -72,6 +72,7 @@ namespace
 				   // highest. we use this to select
 				   // interpolation points primarily
 				   // in this direction then
+  inline
   Point<2> generate_unit_point (const unsigned int j,
 				const unsigned int N,
 				const unsigned int d,
@@ -103,6 +104,7 @@ namespace
 				   //
 				   // the same applies as above for
 				   // the meaning of the parameter "d"
+  inline
   Point<3> generate_unit_point (const unsigned int /*j*/,
 				const unsigned int N,
 				const unsigned int d,
