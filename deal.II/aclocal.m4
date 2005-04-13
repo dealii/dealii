@@ -396,8 +396,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
   
     case "$GXX_VERSION" in
       egcs1.1 | gcc2.95)
-          CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs"
-          CXXFLAGSO="$CXXFLAGSO -fnonnull-objects"
+          CXXFLAGSG="$CXXFLAGSG -Wmissing-declarations -Wbad-function-cast -Wtraditional -Wnested-externs -Wno-non-template-friend"
+          CXXFLAGSO="$CXXFLAGSO -fnonnull-objects -Wno-non-template-friend"
           ;;
   
       *)
