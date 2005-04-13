@@ -20,7 +20,21 @@
 #include <fstream>
 #include <iostream>
 
-  
+
+inline
+double value(unsigned int i,
+	     unsigned int j,
+	     unsigned int k,
+	     unsigned int l,
+	     double lambda,
+	     double mu)
+{
+  return ((i==k) && (j==l) ? mu : 0) +
+	 ((i==l) && (j==k) ? mu : 0) +
+	 ((i==j) && (k==l) ? lambda : 0);
+}
+
+
 
 template <int dim>
 void test ()
@@ -32,11 +46,9 @@ void test ()
     for (unsigned int j=0; j<dim; ++j)
       for (unsigned int k=0; k<dim; ++k)
 	for (unsigned int l=0; l<dim; ++l)
-	  t[i][j][k][l] = (((i==k) && (j==l) ? mu : 0) +
-			   ((i==l) && (j==k) ? mu : 0) +
-			   ((i==j) && (k==l) ? lambda : 0));
-	  
-  SymmetricTensor<2,dim> a, b;
+	  t[i][j][k][l] = value(i,j,k,l,lambda,mu);
+  
+  SymmetricTensor<2,dim> a;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       a[i][j] = (1. + (i+1)*(j+1));
