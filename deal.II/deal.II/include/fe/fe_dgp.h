@@ -30,6 +30,20 @@ template <int dim> class MappingQ;
  * polynomials form a Legendre basis on the unit square. Thus, the
  * mass matrix is diagonal, if the grid cells are parallelograms.
  *
+ * The shape functions of this element are composed of the Lagrange
+ * polynomials <tt>L<sub>i</sub>(x)</tt>. In 2d, they form the basis
+ * <tt>L<sub>i</sub>(x) L<sub>j</sub>(y)</tt> where
+ * <tt>i<p,j<p,i+j<p</tt>, with <tt>p</tt> the order of the finite
+ * element as given to the constructor. For example, for p=1, there
+ * are the finite element space on each cell is spanned by the three
+ * functions <tt>1,x,y</tt>, although the actual shape functions may
+ * be linear combinations of these. Note that unlike the FE_DGQ
+ * element, the function <tt>xy</tt> is not part of the basis. 
+ *
+ * Similarly, in 3d, the shape functions are <tt>L<sub>i</sub>(x)
+ * L<sub>j</sub>(y) L<sub>k</sub>(z)</tt> where
+ * <tt>i<p,j<p,k<p,i+j+k<p</tt>.
+ *
  * @author Guido Kanschat, 2001, 2002, Ralf Hartmann 2004
  */
 template <int dim>
