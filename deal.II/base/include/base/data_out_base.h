@@ -2300,7 +2300,7 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
 				      * the last time a stream was
 				      * given to the read() function.
 				      */
-    virtual const std::vector<typename DataOutBase::Patch<dim,spacedim> > &
+    virtual const std::vector<typename ::DataOutBase::Patch<dim,spacedim> > &
     get_patches () const;
 
 				     /**
@@ -2317,7 +2317,7 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
     virtual std::vector<std::string> get_dataset_names () const;
     
   private:
-    std::vector<typename DataOutBase::Patch<dim,spacedim> > patches;
+    std::vector<typename ::DataOutBase::Patch<dim,spacedim> > patches;
     std::vector<std::string> dataset_names;
 };
 

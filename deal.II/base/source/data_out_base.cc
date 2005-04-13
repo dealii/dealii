@@ -4526,7 +4526,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
 
 				   // first empty previous content
   {
-    std::vector<typename DataOutBase::Patch<dim,spacedim> >
+    std::vector<typename ::DataOutBase::Patch<dim,spacedim> >
       tmp;
     tmp.swap (patches);
   }
@@ -4596,7 +4596,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
 
 
 template <int dim, int spacedim>
-const std::vector<typename DataOutBase::Patch<dim,spacedim> > &
+const std::vector<typename ::DataOutBase::Patch<dim,spacedim> > &
 DataOutReader<dim,spacedim>::get_patches () const
 {
   return patches;
