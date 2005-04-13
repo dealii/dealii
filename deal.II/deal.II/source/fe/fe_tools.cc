@@ -50,6 +50,7 @@
 namespace 
 {
   template <int dim>
+  inline
   unsigned int
   max_dofs_per_cell (const DoFHandler<dim> &dh) 
   {
@@ -58,6 +59,7 @@ namespace
 
 
   template <int dim>
+  inline
   unsigned int
   max_dofs_per_face (const DoFHandler<dim> &dh) 
   {
@@ -66,6 +68,7 @@ namespace
 
 
   template <int dim>
+  inline
   unsigned int
   n_components (const DoFHandler<dim> &dh) 
   {
@@ -86,6 +89,7 @@ namespace
                                    // T==double, and otherwise uses a
                                    // temporary
   template <int dim>
+  inline
   void gim_forwarder (const FiniteElement<dim> &fe1,
                       const FiniteElement<dim> &fe2,
                       FullMatrix<double> &interpolation_matrix)
@@ -95,6 +99,7 @@ namespace
 
   
   template <int dim, typename number>
+  inline
   void gim_forwarder (const FiniteElement<dim> &fe1,
                       const FiniteElement<dim> &fe2,
                       FullMatrix<number> &interpolation_matrix)
@@ -108,6 +113,7 @@ namespace
 				   // return true if the given pattern
 				   // string matches the given name at
 				   // the first position of the string
+  inline
   bool
   match_at_string_start (const std::string &name,
 			 const std::string &pattern)
@@ -134,6 +140,7 @@ namespace
 				   // if no integer can be read at the
 				   // indicated position, return
 				   // (-1,-1)
+  inline
   std::pair<int, unsigned int>
   get_integer (const std::string &name,
 	       const unsigned int position)
@@ -186,6 +193,7 @@ namespace
 				   // replaced with the numeric value
 				   // of the template argument
   template <int dim>
+  inline
   unsigned int match_dimension (const std::string &name,
 				const unsigned int position)
   {
@@ -222,6 +230,8 @@ namespace
     return 0;
   }
 }
+
+
 
 template<int dim>
 void FETools::compute_component_wise(
