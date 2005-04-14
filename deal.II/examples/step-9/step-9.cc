@@ -1389,8 +1389,8 @@ void AdvectionProblem<dim>::output_results (const unsigned int cycle) const
 }
 
 
-				 // ... as is the main loop (setup -
-				 // solve - refine)
+				 // ... as is the main loop (setup --
+				 // solve -- refine)
 template <int dim>
 void AdvectionProblem<dim>::run () 
 {

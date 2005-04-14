@@ -39,7 +39,7 @@
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
 
-                                 // This is probably the only new one - it
+                                 // This is probably the only new one -- it
                                  // declares the class that we use to transfer
                                  // a solution on one grid to the one we
                                  // obtain after refining/coarsening it:

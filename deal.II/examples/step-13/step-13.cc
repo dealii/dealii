@@ -16,8 +16,8 @@
 				 // a list of include files from the
 				 // library, and as usual they are in
 				 // the standard order which is
-				 // ``base'' - ``lac'' - ``grid'' -
-				 // ``dofs'' - ``fe'' - ``numerics''
+				 // ``base'' -- ``lac'' -- ``grid'' --
+				 // ``dofs'' -- ``fe'' -- ``numerics''
 				 // (as each of these categories
 				 // roughly builds upon previous
 				 // ones), then C++ standard headers:
