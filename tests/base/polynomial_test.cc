@@ -115,6 +115,7 @@ check_poly (const std::vector<Polynomial<double> >& v,
 {
   deallog.push("Polyno");
   PolynomialSpace<dim> p(v);
+  p.output_indices(deallog);
   check_poly (x, p);
   deallog.pop();
 }
