@@ -30,19 +30,10 @@ template <int dim> class MappingQ;
  * polynomials form a Legendre basis on the unit square. Thus, the
  * mass matrix is diagonal, if the grid cells are parallelograms.
  *
- * The shape functions of this element are composed of the Lagrange
- * polynomials <tt>L<sub>i</sub>(x)</tt>. In 2d, they form the basis
- * <tt>L<sub>i</sub>(x) L<sub>j</sub>(y)</tt> where
- * <tt>i<p,j<p,i+j<p</tt>, with <tt>p</tt> the order of the finite
- * element as given to the constructor. For example, for p=1, there
- * are the finite element space on each cell is spanned by the three
- * functions <tt>1,x,y</tt>, although the actual shape functions may
- * be linear combinations of these. Note that unlike the FE_DGQ
- * element, the function <tt>xy</tt> is not part of the basis. 
- *
- * Similarly, in 3d, the shape functions are <tt>L<sub>i</sub>(x)
- * L<sub>j</sub>(y) L<sub>k</sub>(z)</tt> where
- * <tt>i<p,j<p,k<p,i+j+k<p</tt>.
+ * The shape functions are defined in the class PolynomialSpace. The
+ * polynomials used inside PolynomialSpace are Polynomials::Legendre
+ * up to degree <tt>p</tt> given in FE_DGP. For the ordering of the
+ * basis functions, refer to PolynomialSpace.
  *
  * @author Guido Kanschat, 2001, 2002, Ralf Hartmann 2004
  */
@@ -110,25 +101,6 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
     struct Matrices
     {
 					 /**
-					  * Pointers to the embedding
-					  * matrices, one for each
-					  * polynomial degree starting
-					  * from constant elements
-					  */
-	static const double * const embedding[][GeometryInfo<dim>::children_per_cell];
-
-					 /**
-					  * Number of elements (first
-					  * index) the above field
-					  * has. Equals the highest
-					  * polynomial degree plus one
-					  * for which the embedding
-					  * matrices have been
-					  * computed.
-					  */
-	static const unsigned int n_embedding_matrices;
-
-					 /**
 					  * As @p embedding but for
 					  * projection matrices.
 					  */
@@ -188,35 +160,17 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)
 #ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-template <> 
-const double * const FE_DGP<1>::Matrices::embedding[][GeometryInfo<1>::children_per_cell];
-
-template <>
-const unsigned int FE_DGP<1>::Matrices::n_embedding_matrices;
-
 template <>
 const double * const FE_DGP<1>::Matrices::projection_matrices[][GeometryInfo<1>::children_per_cell];
 
 template <>
 const unsigned int FE_DGP<1>::Matrices::n_projection_matrices;
 
-template <> 
-const double * const FE_DGP<2>::Matrices::embedding[][GeometryInfo<2>::children_per_cell];
-
-template <>
-const unsigned int FE_DGP<2>::Matrices::n_embedding_matrices;
-
 template <>
 const double * const FE_DGP<2>::Matrices::projection_matrices[][GeometryInfo<2>::children_per_cell];
 
 template <>
 const unsigned int FE_DGP<2>::Matrices::n_projection_matrices;
-
-template <> 
-const double * const FE_DGP<3>::Matrices::embedding[][GeometryInfo<3>::children_per_cell];
-
-template <>
-const unsigned int FE_DGP<3>::Matrices::n_embedding_matrices;
 
 template <>
 const double * const FE_DGP<3>::Matrices::projection_matrices[][GeometryInfo<3>::children_per_cell];
