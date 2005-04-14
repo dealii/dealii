@@ -33,7 +33,8 @@ template <int dim> class MappingQ;
  * The shape functions are defined in the class PolynomialSpace. The
  * polynomials used inside PolynomialSpace are Polynomials::Legendre
  * up to degree <tt>p</tt> given in FE_DGP. For the ordering of the
- * basis functions, refer to PolynomialSpace.
+ * basis functions, refer to PolynomialSpace, remebering that the
+ * Legendre polynomials are ordered by ascending degree.
  *
  * @author Guido Kanschat, 2001, 2002, Ralf Hartmann 2004
  */
