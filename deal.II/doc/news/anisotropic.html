@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
+   "http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+  <head>
+    <link href="../screen.css" rel="StyleSheet">
+    <title>The deal.II news page</title>
+    <meta name="author" content="the deal.II authors <authors@dealii.org>">
+    <meta name="keywords" content="deal.II"></head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<body>
+
+
+<h2>Changes between the main branch and the anisotropic branch</h2>
+
+<p>
+This is the list of changes between the main cvs branch and the
+anisotropic branch of <acronym>deal.II</acronym> library. It is
+subdivided into changes made to the three sub-libraries <a
+href="#base">base</a>, <a href="#lac">lac</a>, and <a
+href="#deal.II">deal.II</a>, as well as changes to the <a
+href="#general">general infrastructure, documentation, etc</a>.
+</p>
+
+<p>
+All entries are signed with the names of the author. Regular
+contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
+(Guido Kanschat), RH (Ralf Hartmann).
+</p>
+
+
+<a name="incompatible"></a>
+<h3 style="color:red">Incompatibilities</h3>
+
+<p style="color:red">
+Following are a few modifications to the library that unfortunately
+are incompatible with previous versions of the library, but which we
+deem necessary for the extension of the library to anisotropic
+refinement.
+</p>
+
+
+<ol>
+  <li> <p>
+       Changed: <code class="class">GeometryInfo</code>::<code
+       class="member">children_per_cell</code> has been replaced by
+       <code class="class">GeometryInfo</code>::<code
+       class="member">max_children_per_cell</code>, which represents
+       the maximum number of children a cell might have, i.e. the
+       number of children in the case of isotropic refinement. But
+       note, that this number will rarely be needed in user codes. In
+       general, the number of children of a cell varies from cell to
+       cell and can be obtained by <code>cell->n_children()</code>,
+       which gives the number of children of a specific
+       <code>cell</code> which is refined iso- or anisotropically.
+       <br>
+       (RH 2005/02/26)
+       </p>
+
+  <li> <p>
+       Changed: The analogous change applies to the number of children
+       of a face. <code class="class">GeometryInfo</code>::<code
+       class="member">subfaces_per_face</code> has been replaced by
+       <code class="class">GeometryInfo</code>::<code
+       class="member">max_children_per_face</code>, which represents
+       the maximum number of children a face might have, i.e. the
+       number of children in the case of an isotropic refined face.
+       But note, that this number will rarely be needed in user
+       codes. In general, the number of children of a face varies from
+       face to face and can be obtained by
+       <code>face->n_children()</code>, which gives the number of
+       children of a specific <code>face</code> which is refined iso-
+       or anisotropically.
+       <br>
+       (RH 2005/02/26)
+       </p>
+
+  <li> <p>
+       Changed: The <code class="class">GeometryInfo</code>::<code
+       class="member">child_cell_on_face</code> is generalized to
+       anisotropic refinement and has now an additional
+       <code>RefineCase::Type</code> argument. This function will
+       rarely be used in user codes, as e.g. the neighbor's child at a
+       specific face and subface should be accessed through
+       <code>cell->neighbor_child_on_subface</code> rather than
+       through the <code class="class">GeometryInfo</code>::<code
+       class="member">child_cell_on_face</code> function.
+       <br>
+       (RH 2005/02/27)
+       </p>
+</ol>
+
+
+<a name="general"></a>
+<h3>General</h3>
+
+<ol>
+  <li> <p>
+       New but temporarily: A global
+       <code>anisotropic_refinement</code> flag has been introduced
+       (defined in <code>geometry_info.h</code>, initialized in
+       <code>data_out_base.cc</code>) indicating whether an
+       anisotropic refinement has been performed or not. This flag is
+       checked throughout the code and throws an exception in all
+       parts of the library which are not yet generalized to
+       anisotropic refinement. This flag can be removed once
+       anisotropic refinement is fully incorporated into deal.II.
+       <br>
+       (RH 2005/02/26)
+       </p>
+</ol>
+
+
+
+<a name="base"></a>
+<h3>base</h3>
+
+<ol>
+</ol>
+
+
+
+<a name="lac"></a>
+<h3>lac</h3>
+
+<ol>
+</ol>
+
+
+
+<a name="deal.II"></a>
+<h3>deal.II</h3>
+
+<ol>
+  <li> <p>
+       Changed: When allowing anisotropic refinement it cannot be
+       garantueed that all children of a cell are stored in
+       consecutive components of the <code>quads.quads</code> or the
+       <code>hexes.hexes</code> vector, respectively. It is only known
+       that children are stored at least in pairs. Therefore, it is
+       not sufficient any more to store the index of the first child
+       of a cell, only. Now the indices of every second child, i.e. of
+       the even numbered children, must be stored.  For this, the
+       <code>cell-></code><code class="member">set_children</code>
+       function now has a new argument representing the number of the
+       child for which the index shall be set. This function can only
+       be called for even numbered children. The same applies to the
+       <code>face-></code><code class="member">set_children</code>
+       function.
+       <br> 
+       Finally, we note that these functions are for internal use,
+       only.
+       <br> 
+       (RH 2005/03/03)
+       </p>
+
+  <li> <p>
+       Changed: The <code>cell-></code><code
+       class="member">refine_flag_set</code> function now returns a
+       <code>RefineCase::Type</code> argument instead of a boolean. Be
+       aware, that you now still can ask
+       <code>if(!cell->refine_flag_set())</code> ,
+       <code>if(cell->refine_flag_set()==false)</code> and
+       <code>if(cell->refine_flag_set())</code> , but you cannot ask
+       <code>if(cell->refine_flag_set()==true)</code> any more.  <br>
+       (RH 2005/03/03)
+       </p>
+
+  <li> <p>
+       Extended: The <code>cell-></code><code
+       class="member">set_refine_flag</code> function now has a new
+       <code>RefineCase::Type</code> argument which defaults to <code
+       class="class">GeometryInfo&lt;dim&gt;</code>::<code
+       class="member">isotropic_refinement</code>.  <br> (RH
+       2005/03/03)
+       </p>
+
+  <li> <p>
+       New: There is now a new <code
+       class="class">GeometryInfo&lt;dim&gt;</code>::<code
+       class="member">isotropic_refinement</code> variable of type
+       <code>RefineCase::Type</code> representing the isotropic
+       refinement case in <code>dim</code> dimensions,
+       i.e. <code>GeometryInfo&lt;1&gt;::isotropic_refinement=RefineCase::cut_x</code>,
+       <code>GeometryInfo&lt;2&gt;::isotropic_refinement=RefineCase::cut_xy</code>
+       and
+       <code>GeometryInfo&lt;3&gt;::isotropic_refinement=RefineCase::cut_xyz</code>.
+       <br> 
+       (RH 2005/03/03)
+       </p>
+
+  <li> <p>
+       New: There is now a new enum <code>RefineCase::Type</code>
+       defined in <code>geometry_info.h</code>, which allows to
+       describe all possible (anisotropic and isotropic) refinement
+       cases in (1,) 2 and 3 dimensions.
+       <br> 
+       (RH 2005/02/26)
+       </p>
+
+  <li> <p>
+       New: There is now a new <code
+       class="class">TriaObjectAccessor</code>::<code
+       class="member">n_children</code> function which returns the
+       number of children of the cell or face it was invoked for.
+       <br> 
+       (RH 2005/02/26)
+       </p>
+
+  <li> <p>
+       New: There is now a new <code
+       class="class">TriaObjectAccessor</code>::<code
+       class="member">refine_case</code> function which returns the
+       <code>RefineCase::Type</code> a cell or face is refined with.
+       <br> 
+       (RH 2005/02/26)
+       </p>
+
+  <li> <p>
+       New: There is now a new <code
+       class="class">TriaObjectAccessor</code>::<code
+       class="member">set_refine_case</code> function. This function
+       is mainly for internal use (required by <code
+       class="class">Triangulation</code>::<code
+       class="member">execute_coarsening_and_refinement</code>). It is
+       not provided for <code>dim=1</code> as there the refinement
+       case defaults to isotropic refinement.
+       <br> 
+       (RH 2005/02/26)
+       </p>
+
+  <li> <p>
+       New: New <code>vector&lt;RefineCase::Type&gt;
+       refine_cases</code> vectors have been introduced in <code
+       class="class">TriangulationLevel&lt;2&gt;::QuadsData</code> and
+       <code
+       class="class">TriangulationLevel&lt;3&gt;::HexesData</code>. For
+       memory efficiency (but with a penalty on run-time) they might
+       be replaced by <code>vector&lt;vector&lt;bool&gt; &gt; (dim,
+       vector&lt;bool&gt; (n_quads/n_hexes))</code>, later.
+       <br> 
+       (RH 2005/02/26)
+       </p>
+</ol>
+
+<hr>
+Last update $Date$
+
+</body>
+</html>
