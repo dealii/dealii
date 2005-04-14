@@ -43,7 +43,40 @@
  * dim-dimensional polynomials can be changed by using the
  * set_numbering() function.
  *
- * @author Guido Kanschat, 2002, Wolfgang Bangerth, 2003, Ralf Hartmann 2004
+ * The standard ordering of polynomials is that indices for the first
+ * space dimension vasry fastest and the last space dimension is
+ * slowest. In particular, if we take for simplicity the vector of
+ * monomials <i>x<sup>0</sup>, x<sup>1</sup>, x<sup>2</sup>,...,
+ * x<sup>n</sup></i>, we get
+ *
+ * <dl>
+ * <dt> 1D <dd> <i> x<sup>0</sup>, x<sup>1</sup>,...,x<sup>n</sup></i>
+ * <dt> 2D: <dd> <i> x<sup>0</sup>y<sup>0</sup>,
+ *    x<sup>1</sup>y<sup>0</sup>,...,
+ *    x<sup>n</sup>y<sup>0</sup>,<br>
+ *    x<sup>0</sup>y<sup>1</sup>,
+ *    x<sup>1</sup>y<sup>1</sup>,...,
+ *    x<sup>n-1</sup>y<sup>1</sup>,<br>
+ *    x<sup>0</sup>y<sup>2</sup>,...
+ *    x<sup>n-2</sup>y<sup>2</sup>,<br>...<br>
+ *    x<sup>0</sup>y<sup>n-1</sup>,
+ *    x<sup>1</sup>y<sup>n-1</sup>,<br>
+ *    x<sup>0</sup>y<sup>n</sup>
+ *    </i>
+ * <dt> 3D: <dd> <i> x<sup>0</sup>y<sup>0</sup>z<sup>0</sup>,...,
+ *    x<sup>n</sup>y<sup>0</sup>z<sup>0</sup>,<br>
+ *    x<sup>0</sup>y<sup>1</sup>z<sup>0</sup>,...,
+ *    x<sup>n-1</sup>y<sup>1</sup>z<sup>0</sup>,<br>...<br>
+ *    x<sup>0</sup>y<sup>n</sup>z<sup>0</sup>,<br>
+ *    x<sup>0</sup>y<sup>0</sup>z<sup>1</sup>,...
+ *    x<sup>n-1</sup>y<sup>0</sup>z<sup>1</sup>,<br>...<br>
+ *    x<sup>0</sup>y<sup>n-1</sup>z<sup>1</sup>,<br>
+ *    x<sup>0</sup>y<sup>0</sup>z<sup>2</sup>,...
+ *    x<sup>n-2</sup>y<sup>0</sup>z<sup>2</sup>,<br>...<br>
+ *    x<sup>0</sup>y<sup>0</sup>z<sup>n</sup>
+ *    </i>
+ * </dl>
+ * @author Guido Kanschat, Wolfgang Bangerth, Ralf Hartmann 2002, 2003, 2004, 2005
  */
 template <int dim>
 class PolynomialSpace
@@ -70,7 +103,8 @@ class PolynomialSpace
 				      * Prints the list of the indices
 				      * to <tt>out</tt>.
 				      */
-    void output_indices(std::ostream &out) const;
+    template <class STREAM>
+    void output_indices(STREAM &out) const;
 
 				     /**
 				      * Sets the ordering of the
@@ -273,6 +307,25 @@ PolynomialSpace<dim>::degree() const
 {
   return polynomials.size();
 }
+
+
+template <int dim>
+template <class STREAM>
+void
+PolynomialSpace<dim>::output_indices(STREAM &out) const
+{
+  unsigned int ix[dim];
+  for (unsigned int i=0; i<n_pols; ++i)
+    {
+      compute_index(i,ix);
+      out << i << "\t";
+      for (unsigned int d=0; d<dim; ++d)
+	out << ix[d] << " ";
+      out << std::endl;
+    }
+}
+
+
 
 /// @endif  
 

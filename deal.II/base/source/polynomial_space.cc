@@ -108,23 +108,6 @@ compute_index (const unsigned int i,
 
 template <int dim>
 void
-PolynomialSpace<dim>::output_indices(std::ostream &out) const
-{
-  unsigned int ix[dim];
-  for (unsigned int i=0; i<n_pols; ++i)
-    {
-      compute_index(i,ix);
-      out << i << "\t";
-      for (unsigned int d=0; d<dim; ++d)
-	out << ix[d] << " ";
-      out << std::endl;
-    }
-}
-
-
-
-template <int dim>
-void
 PolynomialSpace<dim>::set_numbering(
   const std::vector<unsigned int> &renumber)
 {
