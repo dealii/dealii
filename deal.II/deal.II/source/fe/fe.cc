@@ -280,6 +280,27 @@ FiniteElementBase<dim>::prolongation_is_implemented () const
 
 template <int dim>
 bool
+FiniteElementBase<dim>::restriction_is_implemented () const
+{
+  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+    {
+      Assert ((restriction[c].m() == this->dofs_per_cell) ||
+              (restriction[c].m() == 0),
+              ExcInternalError());
+      Assert ((restriction[c].n() == this->dofs_per_cell) ||
+              (restriction[c].n() == 0),
+              ExcInternalError());
+      if ((restriction[c].m() == 0) ||
+          (restriction[c].n() == 0))
+        return false;
+    }
+  return true;
+}
+
+
+
+template <int dim>
+bool
 FiniteElementBase<dim>::constraints_are_implemented () const
 {
   return (this->dofs_per_face  == 0) || (interface_constraints.m() != 0);

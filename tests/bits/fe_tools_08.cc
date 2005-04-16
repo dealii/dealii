@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,7 +43,7 @@ check_this (const FiniteElement<dim> &fe1,
     return;
                                    // we need prolongation matrices in
                                    // fe2
-  if (!fe2.prolongation_is_implemented())
+  if (!fe2.restriction_is_implemented())
     return;
   
   std::auto_ptr<Triangulation<dim> > tria(make_tria<dim>());

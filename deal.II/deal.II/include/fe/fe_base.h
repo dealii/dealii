@@ -771,6 +771,34 @@ class FiniteElementBase : public Subscriptor,
                                       */
     bool prolongation_is_implemented () const;
 
+                                     /**
+                                      * Return whether this element implements
+                                      * its restriction matrices. The return
+                                      * value also indicates whether a call to
+                                      * the @p get_restriction_matrix
+                                      * function will generate an error or
+                                      * not.
+                                      *
+                                      * This function is mostly here in order
+                                      * to allow us to write more efficient
+                                      * test programs which we run on all
+                                      * kinds of weird elements, and for which
+                                      * we simply need to exclude certain
+                                      * tests in case something is not
+                                      * implemented. It will in general
+                                      * probably not be a great help in
+                                      * applications, since there is not much
+                                      * one can do if one needs these features
+                                      * and they are not implemented. This
+                                      * function could be used to check
+                                      * whether a call to
+                                      * <tt>get_restriction_matrix()</tt> will
+                                      * succeed; however, one then still needs
+                                      * to cope with the lack of information
+                                      * this just expresses.
+                                      */
+    bool restriction_is_implemented () const;
+
     				     /**
 				      * Return a readonly reference to
 				      * the matrix which describes the
