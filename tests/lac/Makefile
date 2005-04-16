@@ -21,7 +21,7 @@ default: run-tests
 ############################################################
 
 tests_x = vector-vector \
-	full_matrix tridiagonal_matrix \
+	full_matrix householder tridiagonal_matrix \
 	sparsity_pattern sparse_matrices \
 	block_vector block_vector_iterator block_matrices \
 	matrix_lib matrix_out \
