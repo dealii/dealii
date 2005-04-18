@@ -30,13 +30,19 @@
 #endif
 
 
-DeclException2(ExcUnexpectedInput,
-	       std::string, std::string,
-	       << "Unexpected input: expected line\n  <"
-	       << arg1
-	       << ">\nbut got\n  <"
-	       << arg2 << ">");
+DeclException2 (ExcUnexpectedInput,
+                std::string, std::string,
+                << "Unexpected input: expected line\n  <"
+                << arg1
+                << ">\nbut got\n  <"
+                << arg2 << ">");
 
+DeclException4 (ExcIncompatibleDimensions,
+                int, int, int, int,
+                << "Either the dimensions <" << arg1 << "> and <"
+                << arg2 << "> or the space dimensions <"
+                << arg3 << "> and <" << arg4
+                << "> do not match!");
 
 
 template <int dim, int spacedim>
@@ -4559,10 +4565,25 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     tmp.swap (dataset_names);
   }
 
-				   // then check that we have the
-				   // correct header of this
-				   // file. both the first and second
-				   // lines have to match
+				   // then check that we have the correct
+				   // header of this file. both the first and
+				   // second real lines have to match, as well
+				   // as the dimension information written
+				   // before that
+  {
+    std::pair<unsigned int, unsigned int>
+      dimension_info
+      = ::DataOutBase::determine_intermediate_format_dimensions (in);
+    AssertThrow ((dimension_info.first  == dim) &&
+                 (dimension_info.second == spacedim),
+                 ExcIncompatibleDimensions (dimension_info.first, dim,
+                                            dimension_info.second, spacedim));
+
+                                     // read to the end of the line
+    std::string tmp;
+    getline (in, tmp);
+  }
+  
   {
     std::string header;
     getline (in, header);
