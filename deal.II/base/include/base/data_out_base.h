@@ -2292,6 +2292,17 @@ class DataOutInterface : private DataOutBase
  * This second use scenario is explained in some detail in the step-18
  * example program.
  *
+ * Both these applications are implemented in the step-19 example program.
+ * There, a slight complication is also explained: in order to read data back
+ * into this object, you have to know the template parameters for the space
+ * dimension which were used when writing the data. If this knowledge is
+ * available at compile time, then this is no problem. However, if it is not
+ * (such as in a simple format converted), then it needs to be figured out at
+ * run time, even though the compiler already needs it at compile time. A way
+ * around using the DataOutBase::determine_intermediate_format_dimensions()
+ * function is explained in step-19.
+ * 
+ *
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, int spacedim=dim>
