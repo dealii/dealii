@@ -229,6 +229,55 @@ class LAPACKFullMatrix : public TransposeTable<number>
     std::complex<number>
     eigenvalue (unsigned int i) const;
     
+				     /**
+				      * Print the matrix and allow
+				      * formatting of entries.
+				     *
+				      * The parameters allow for a
+				      * flexible setting of the output
+				      * format:
+				      *
+				      * @arg <tt>precision</tt>
+				      * denotes the number of trailing
+				      * digits.
+				      *
+				      * @arg <tt>scientific</tt> is
+				      * used to determine the number
+				      * format, where
+				      * <tt>scientific</tt> =
+				      * <tt>false</tt> means fixed
+				      * point notation.
+				      *
+				      * @arg <tt>width</tt> denotes
+				      * the with of each column. A
+				      * zero entry for <tt>width</tt>
+				      * makes the function compute a
+				      * width, but it may be changed
+				      * to a positive value, if output
+				      * is crude.
+				      *
+				      * @arg <tt>zero_string</tt>
+				      * specifies a string printed for
+				      * zero entries.
+				      *
+				      * @arg <tt>denominator</tt>
+				      * Multiply the whole matrix by
+				      * this common denominator to get
+				      * nicer numbers.
+				      *
+				      * @arg <tt>threshold</tt>: all
+				      * entries with absolute value
+				      * smaller than this are
+				      * considered zero.
+				     */
+    void print_formatted (std::ostream       &out,
+			  const unsigned int  presicion=3,
+			  const bool          scientific  = true,
+			  const unsigned int  width       = 0,
+			  const char         *zero_string = " ",
+			  const double        denominator = 1.,
+			  const double        threshold   = 0.) const;
+    
   private:
 				     /**
 				      * Since LAPACK operations
@@ -294,18 +343,21 @@ LAPACKFullMatrix<number>::fill (
   const unsigned int src_offset_i,
   const unsigned int src_offset_j)
 {
-  const unsigned int endrow = src_offset_i + this->m();
-  const unsigned int endcol = src_offset_j + this->n();
-
-  for (unsigned int i=0;i<this->m();++i)
+  const unsigned int endrow = this->n_rows() - dst_offset_i;
+  const unsigned int endcol = src_offset_j + this->n_cols();
+  
+  const typename MATRIX::const_iterator
+    end = M.end(src_offset_i+n_rows()-dst_offset_i-1);
+  for (typename MATRIX::const_iterator entry = M.begin(src_offset_i);
+       entry != end; ++entry)
     {
-      const typename MATRIX::const_iterator end = M.end(src_offset_i+i);
-      for (typename MATRIX::const_iterator entry = M.begin(src_offset_i+i);
-	   entry != end; ++entry)
-	if (entry->column() < endcol)
-	  this->el(dst_offset_i+i,
-		   dst_offset_j+entry->column()-src_offset_j)
-	    = entry->value();
+      const unsigned int i = entry->row();
+      const unsigned int j = entry->column();
+      
+      if (j >= src_offset_j && j < endcol)
+	this->operator()(dst_offset_i-src_offset_i+i,
+			 dst_offset_j-src_offset_j+j)
+	  = entry->value();
     }
   
   state = LAPACKSupport::matrix;

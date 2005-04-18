@@ -18,6 +18,7 @@
 #include <lac/vector.h>
 
 #include <iostream>
+#include <iomanip>
 
 using namespace LAPACKSupport;
 
@@ -223,6 +224,55 @@ LAPACKFullMatrix<number>::Tvmult_add (
   const Vector<number> &v) const
 {
   Tvmult(w, v, true);
+}
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::print_formatted (
+  std::ostream       &out,
+  const unsigned int  precision,
+  const bool          scientific,
+  const unsigned int  width_,
+  const char         *zero_string,
+  const double        denominator,
+  const double        threshold) const
+{
+  unsigned int width = width_;
+  
+  Assert ((!this->empty()) || (this->n_cols()+this->n_rows()==0),
+	  ExcInternalError());
+  
+				   // set output format, but store old
+				   // state
+  std::ios::fmtflags old_flags = out.flags();
+  unsigned int old_precision = out.precision (precision);
+
+  if (scientific)
+    {
+      out.setf (std::ios::scientific, std::ios::floatfield);
+      if (!width)
+	width = precision+7;
+    } else {
+      out.setf (std::ios::fixed, std::ios::floatfield);
+      if (!width)
+	width = precision+2;
+    }
+  
+  for (unsigned int i=0; i<n_rows(); ++i) 
+    {
+      for (unsigned int j=0; j<n_cols(); ++j)
+	if (std::fabs(this->el(i,j)) > threshold)
+	  out << std::setw(width)
+	      << this->el(i,j) * denominator << ' ';
+	else
+	  out << std::setw(width) << zero_string << ' ';
+      out << std::endl;
+    };
+
+  AssertThrow (out, ExcIO());
+				   // reset output format
+  out.flags (old_flags);
+  out.precision(old_precision);
 }
 
 
