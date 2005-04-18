@@ -4389,7 +4389,9 @@ parse_output_format (const std::string &format_name)
   if (format_name == "deal.II intermediate")
     return deal_II_intermediate;
   
-  AssertThrow (false, ExcInvalidState ());
+  AssertThrow (false,
+               ExcMessage ((std::string("The format <") + format_name +
+                            std::string("> is not recognized")).c_str()));
 
 				   // return something invalid
   return OutputFormat(-1);
