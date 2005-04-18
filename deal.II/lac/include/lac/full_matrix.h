@@ -794,6 +794,10 @@ class FullMatrix : public Table<2,number>
 
 
 				     /**
+				      * @deprecated Use the class Householder
+				      * to compute a QR-factorization which
+				      * can be applied to several vectors.
+				      *
 				      * QR-factorization of a matrix.
 				      * The orthogonal transformation
 				      * Q is applied to the vector y
@@ -1010,6 +1014,10 @@ class FullMatrix : public Table<2,number>
 		   const Vector<number2> &src) const;
 
 				     /**
+				      * @deprecated Use the class
+				      * Householder to solve least
+				      * squares problems.
+				      *
 				      * Least-Squares-Approximation by
 				      * QR-factorization. The return
 				      * value is the Euclidean norm of
