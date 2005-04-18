@@ -1872,8 +1872,7 @@ namespace QuasiStaticElasticity
 				     // format. To determine it, we
 				     // use the same function that has
 				     // already been used in step-13:
-//TODO
-    filename << data_out.default_suffix(DataOut<dim>::gmv);
+    filename << data_out.default_suffix(DataOut<dim>::deal_II_intermediate);
 
 				     // With the so-completed
 				     // filename, let us open a file
@@ -1881,8 +1880,7 @@ namespace QuasiStaticElasticity
 				     // generated into it, using the
 				     // intermediate format:
     std::ofstream output (filename.str().c_str());
-//TODO    
-    data_out.write_gmv (output);
+    data_out.write_deal_II_intermediate (output);
   }
 
   
