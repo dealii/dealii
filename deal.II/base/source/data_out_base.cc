@@ -3950,6 +3950,14 @@ write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
 			    const Deal_II_IntermediateFlags         &/*flags*/,
 			    std::ostream                            &out) 
 {
+                                   // first write tokens indicating the
+                                   // template parameters. we need this in
+                                   // here because we may want to read in data
+                                   // again even if we don't know in advance
+                                   // the template parameters, see step-19
+  out << dim << ' ' << spacedim << std::endl;
+
+                                   // then write a header
   out << "[deal.II intermediate format graphics data]" << std::endl
       << "[written by deal.II version "
       << DEAL_II_MAJOR << '.' << DEAL_II_MINOR << "]" << std::endl;
@@ -3964,6 +3972,20 @@ write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
 
   out << std::endl;
 } 
+
+
+
+std::pair<unsigned int, unsigned int>
+DataOutBase::
+determine_intermediate_format_dimensions (std::istream &input)
+{
+  Assert (input, ExcIO());
+          
+  int dim, spacedim;
+  input >> dim >> spacedim;
+
+  return std::make_pair (dim, spacedim);
+}
 
 
 

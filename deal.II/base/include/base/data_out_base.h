@@ -1534,6 +1534,29 @@ class DataOutBase
 					    const Deal_II_IntermediateFlags         &flags,
 					    std::ostream                            &out);
 
+
+                                     /**
+                                      * Given an input stream that contains
+                                      * data written by
+                                      * write_deal_II_intermediate, determine
+                                      * the <tt>dim</tt> and <tt>spacedim</tt>
+                                      * template parameters with which that
+                                      * function was called, and return them
+                                      * as a pair of values.
+                                      *
+                                      * Note that this function eats a number
+                                      * of elements at the present position of
+                                      * the stream, and therefore alters
+                                      * it. In order to read from it using,
+                                      * for example, the DataOutReader class,
+                                      * you may wish to either reset the
+                                      * stream to its previous position, or
+                                      * close and reopen it.
+                                      */
+    static
+    std::pair<unsigned int, unsigned int>
+    determine_intermediate_format_dimensions (std::istream &input);
+    
 				     /**
 				      * Determine an estimate for
 				      * the memory consumption (in
