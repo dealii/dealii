@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <fe/fe_dgp_monomial.h>
+#include <fe/fe_tools.h>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
@@ -126,7 +127,10 @@ FE_DGPMonomial<dim>::FE_DGPMonomial (const unsigned int degree)
 
 				   // initialize the interpolation
 				   // matrices
-  initialize_embedding ();
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+    this->prolongation[i].reinit (this->dofs_per_cell,
+				  this->dofs_per_cell);
+  FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
 //  initialize_restriction ();
 
                                    // note, that these elements have
@@ -221,51 +225,6 @@ get_interpolation_matrix (const FiniteElementBase<dim> &source_fe,
     }
 }
 
-
-
-template <int dim>
-void
-FE_DGPMonomial<dim>::initialize_embedding ()
-{
-  std::vector<Point<dim> > unit_points(this->dofs_per_cell);
-  generate_unit_points(this->degree, unit_points);
-  
-  FullMatrix<double> cell_interpolation (this->dofs_per_cell,
-					 this->dofs_per_cell);
-  FullMatrix<double> subcell_interpolation (this->dofs_per_cell,
-					    this->dofs_per_cell);
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
-    this->prolongation[child].reinit (this->dofs_per_cell,
-				      this->dofs_per_cell);
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
-    {
-      for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	{
-	  const Point<dim> &p_subcell=unit_points[j];
-	  
-	  const Point<dim> p_cell =
-	    GeometryInfo<dim>::child_to_cell_coordinates (p_subcell, child);
-	  
-	  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-	    {
-	      cell_interpolation(j,i) = this->poly_space.compute_value (i, p_cell);
-	      subcell_interpolation(j,i) = this->poly_space.compute_value (i, p_subcell);
-	    }
-	}
-      
-				       // then compute the embedding
-				       // matrix for this child and
-				       // this coordinate direction
-      subcell_interpolation.gauss_jordan ();
-      subcell_interpolation.mmult (this->prolongation[child], cell_interpolation);
-      
-				       // cut off very small values
-      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-	for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	  if (std::fabs(this->prolongation[child](i,j)) < 2e-14*this->degree*dim)
-	    this->prolongation[child](i,j) = 0.;      
-    }
-}
 
 
 template <int dim>

@@ -20,6 +20,7 @@
 #include <fe/mapping.h>
 #include <fe/fe_raviart_thomas.h>
 #include <fe/fe_values.h>
+#include <fe/fe_tools.h>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
@@ -155,7 +156,12 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int degree)
 
 				   // initialize the various matrices
   initialize_constraints ();
-  initialize_embedding ();
+
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+    this->prolongation[i].reinit (this->dofs_per_cell,
+				  this->dofs_per_cell);
+  FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
+  
   initialize_restriction ();
 
 				   // finally fill in support points
@@ -603,133 +609,6 @@ FE_RaviartThomas<3>::initialize_constraints ()
 }
 
 #endif
-
-
-#if deal_II_dimension == 1
-
-template <>
-void
-FE_RaviartThomas<1>::initialize_embedding ()
-{
-  Assert (false, ExcNotUsefulInThisDimension());
-}
-
-#endif
-
-
-template <int dim>
-void
-FE_RaviartThomas<dim>::initialize_embedding ()
-{
-				   // compute the interpolation
-				   // matrices in much the same way as
-				   // we do for the constraints. it's
-				   // actually simpler here, since we
-				   // don't have this weird
-				   // renumbering stuff going on
-				   //
-				   // it is, however, slightly
-				   // complicated by the fact that we
-				   // have vector-valued elements
-				   // here, so we do all the stuff for
-				   // the degrees of freedom
-				   // corresponding to each coordinate
-				   // direction separately
-  const unsigned int dofs_per_coordinate = this->dofs_per_cell/dim;
-  Assert (dofs_per_coordinate*dim == this->dofs_per_cell,
-	  ExcInternalError());
-  for (unsigned int d=0; d<dim; ++d)
-    Assert (polynomials[d].n() == dofs_per_coordinate, ExcInternalError());
-  
-  FullMatrix<double> cell_interpolation (dofs_per_coordinate,
-					 dofs_per_coordinate);
-  FullMatrix<double> subcell_interpolation (dofs_per_coordinate,
-					    dofs_per_coordinate);
-  FullMatrix<double> tmp (dofs_per_coordinate,
-			  dofs_per_coordinate);
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
-    this->prolongation[child].reinit (this->dofs_per_cell,
-				      this->dofs_per_cell);
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
-    for (unsigned int d=0; d<dim; ++d)
-      {
-	for (unsigned int j=0; j<dofs_per_coordinate; ++j)
-	  {
-					     // generate a point on
-					     // the child cell and
-					     // evaluate the shape
-					     // functions there
-					     //
-					     // see the comment for
-					     // that function to see
-					     // why the third
-					     // parameter is necessary
-	    const Point<dim> p_subcell = generate_unit_point (j, dofs_per_coordinate,
-							      d, int2type<dim>());
-	    const Point<dim> p_cell =
-	      GeometryInfo<dim>::child_to_cell_coordinates (p_subcell, child);
-
-	    for (unsigned int i=0; i<dofs_per_coordinate; ++i)
-	      {
-		cell_interpolation(j,i) = polynomials[d].compute_value (i, p_cell);
-		subcell_interpolation(j,i) = polynomials[d].compute_value (i, p_subcell);
-	      }
-	  }
-
-					 // then compute the embedding
-					 // matrix for this child and
-					 // this coordinate direction
-	subcell_interpolation.gauss_jordan ();
-	subcell_interpolation.mmult (tmp, cell_interpolation);
-
-					 // finally transfer the
-					 // results for this
-					 // coordinate into the matrix
-					 // corresponding to the
-					 // entire space on this
-					 // cell. cut off very small
-					 // values here
-	for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-	  if (renumber[i].first == d)
-	    for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	      if (renumber[j].first == d)
-		if (std::fabs(tmp(renumber[i].second,renumber[j].second)) > 1e-15)
-		  this->prolongation[child](i,j) = tmp(renumber[i].second,
-						       renumber[j].second);
-      }
-
-				   // if this were a Lagrange
-				   // interpolation element, we could
-				   // make sure that the row sum of
-				   // each of the matrices is 1 at
-				   // this point. note that this won't
-				   // work here, since we are working
-				   // with hierarchical elements for
-				   // which the shape functions don't
-				   // sum up to 1
-				   //
-				   // however, we can make sure that
-				   // only components couple that have
-				   // the same vector component
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
-    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-      for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-	Assert ((this->prolongation[child](i,j) == 0.) ||
-		(renumber[i].first == renumber[j].first),
-		ExcInternalError());
-      
-  
-				   // there is one additional thing to
-				   // be considered: since the shape
-				   // functions on the real cell
-				   // contain the Jacobian (actually,
-				   // the determinant of the inverse),
-				   // there is an additional factor of
-				   // 2 when going from the big to the
-				   // small cell:
-  for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
-    this->prolongation[child] *= 1./2;
-}
 
 
 #if deal_II_dimension == 1
