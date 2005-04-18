@@ -42,7 +42,6 @@ inconvenience this causes.
 
 
 <ol>
-
   <li> <p>Changed: The template argument of <code
   class="class">BlockMatrixArray</code> was changed to
   <tt>number</tt>, equal to the same argument of the used <code
@@ -101,6 +100,16 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+  <li> <p>
+       Fixed: The step-17 example program had a stupid mistake in that it
+       initializes the <code>pcout</code> variable with an uninitialized value
+       of <code>mpi_communicator</code>. While this seems to have worked for
+       some older MPI implementations, this is no longer the case on some
+       other systems. It is now fixed.
+       <br>
+       (WB, 2005/04/18)
+       </p>
+
   <li> <p>
        New: If there are references to other example programs in any of the
        step-XX programs, then they will now show up as crosslinks in the HTML
