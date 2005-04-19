@@ -258,9 +258,9 @@ LAPACKFullMatrix<number>::print_formatted (
 	width = precision+2;
     }
   
-  for (unsigned int i=0; i<n_rows(); ++i) 
+  for (unsigned int i=0; i<this->n_rows(); ++i) 
     {
-      for (unsigned int j=0; j<n_cols(); ++j)
+      for (unsigned int j=0; j<this->n_cols(); ++j)
 	if (std::fabs(this->el(i,j)) > threshold)
 	  out << std::setw(width)
 	      << this->el(i,j) * denominator << ' ';
