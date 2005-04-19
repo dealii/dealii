@@ -9,13 +9,13 @@ steps = $(shell echo step-? step-??)
 
 # default is: build all examples. for each example, there is a target
 # build-step-N, where N in [1...]
-default: $(addprefix build-,$(steps))
+default: $(addprefix build-,$(steps)) doxygen
 
 # run example programs; make a target run-step-N for each N
-run: $(addprefix run-,$(steps))
+run: $(addprefix run-,$(steps)) run-doxygen
 
 # clean subdirs; make a target clean-step-N for each N
-clean: $(addprefix clean-,$(steps))
+clean: $(addprefix clean-,$(steps)) clean-doxygen
 
 
 
@@ -27,10 +27,16 @@ run-step-%:
 	cd $(@:run-%=%) ; $(MAKE) run
 clean-step-%:
 	cd $(@:clean-%=%) ; $(MAKE) clean
-
+doxygen:
+	cd doxygen ; $(MAKE)
+run-doxygen:
+	cd doxygen ; $(MAKE) run
+clean-doxygen:
+	cd doxygen ; $(MAKE) clean
 
 # all targets in this directory do not produce files, so they are
 # .PHONY:
 .PHONY: $(addprefix build-step-,$(steps)) \
         $(addprefix run-step-,$(steps))   \
-        $(addprefix clean-step-,$(steps))
+        $(addprefix clean-step-,$(steps)) \
+	doxygen doxygen-run doxygen-clean
