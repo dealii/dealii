@@ -347,7 +347,7 @@ LAPACKFullMatrix<number>::fill (
   const unsigned int endcol = src_offset_j + this->n_cols();
   
   const typename MATRIX::const_iterator
-    end = M.end(src_offset_i+n_rows()-dst_offset_i-1);
+    end = M.end(src_offset_i+this->n_rows()-dst_offset_i-1);
   for (typename MATRIX::const_iterator entry = M.begin(src_offset_i);
        entry != end; ++entry)
     {
