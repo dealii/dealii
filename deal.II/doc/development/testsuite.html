@@ -15,6 +15,65 @@
 
 
     <h1>The deal.II Testsuite</h1>
+    
+    <p>The deal.II testsuite consists of two parts, the build tests and
+    the regression tests. While the build tests just check if the
+    library can be compiled on different systems, the regression tests
+    actually are actually run and compare the output of the testy
+    programs with precomputed values. These two testsuites are
+    described below.</p>
+
+    <h2>The build tests</h2>
+
+    <p>With our build tests, we check if deal.II can be compiled on
+    different systems and with different compilers as well as
+    different configuration options. Results are collected in a
+    database and can be accessed <a
+    href="http://www.dealii.org/build.php">online</a>.<p>
+
+    <p>Running the build test suite is simple and we encourage deal.II
+    users with configurations not found on the <a
+    href="http://www.dealii.org/build.php">build test page</a> to
+    participate. Assuming you checked out deal.II into the directory
+    <code>dealtest</code>, running it is as simple as:</p>
+
+    <pre>
+
+    cd dealtest
+    make clean
+    cvs update -d -P
+    make build-test BUILDTESTFLAGS='-with-umfpack -with-lapack'
+    mail build-tests@dealii.org < build-test-log
+
+    </pre>
+
+    <p>After cleaning up the directory and updating the library to the
+    most recent version, the <code>make</code> command configures the
+    library (here for use of UMFPack and LAPACK libraries) and
+    compiles everything. The result is in the file
+    <code>build-test-log</code>, Which is sent to the build test demon
+    in the end.</p>
+    
+    <h3>Configuring for a special compiler</h3>
+    
+    <p>If your compiler is not in the standard path or has a strange
+    name (like <code>mycc</code> for C and <code>myCC</code> for C++),
+    your template would be something like this:</p>
+
+    <pre>
+
+    export PATH=/my/compiler/path:$PATH
+    
+    cd dealtest
+    make clean
+    cvs update -d -P
+    make build-test BUILDTESTFLAGS='CC=mycc CXX=myCC'
+    mail build-tests@dealii.org < build-test-log
+
+    </pre>
+
+
+    <h2>The regression tests</h2>
 
     <p>
     deal.II has a testsuite that, at the time this article is written,
@@ -39,7 +98,7 @@
     </p>
 
 
-    <h2>Running it</h2>
+    <h3>Running it</h3>
 
     <p>
     To run the testsuite, you first need CVS access to our source
@@ -207,7 +266,7 @@
 
 
 
-    <h2>Adding new tests</h2>
+    <h3>Adding new tests</h3>
 
     <p>
     As mentioned above, we usually add a new test these days every
@@ -218,7 +277,7 @@
     .
     </p>
 
-    <h3>The testcase</h3>
+    <h4>The testcase</h4>
     <p>
     For the testcase, we usually start from a template like this:
     <pre>
@@ -288,7 +347,7 @@ int main ()
     </p>
 
     
-    <h3>An entry in the Makefile</h3>
+    <h4>An entry in the Makefile</h4>
 
     <p>
     In order for the Makefiles to pick up your new test, you have to
@@ -315,7 +374,7 @@ int main ()
 
 
 
-    <h3>An expected output</h3>
+    <h4>An expected output</h4>
 
     <p>
     If you run your new test executable, you will get an output file
@@ -368,7 +427,7 @@ int main ()
 
 
 
-    <h3>Checking in</h3>
+    <h4>Checking in</h4>
     
     <p>
     Tests are a way to make sure everything keeps working. If they
@@ -389,7 +448,7 @@ int main ()
     </p>
 
 
-    <h2>Adding a new system</h2>
+    <h3>Adding a new system</h3>
 
     <p>
     If you are working on a system or with a compiler for which test
