@@ -1557,7 +1557,7 @@ namespace QuasiStaticElasticity
     PETScWrappers::SolverCG cg (solver_control,
 				mpi_communicator);
 
-    PETScWrappers::PreconditionSSOR preconditioner(system_matrix);
+    PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
 
 				     // Then solve the system:
     cg.solve (system_matrix, distributed_incremental_displacement, system_rhs,
