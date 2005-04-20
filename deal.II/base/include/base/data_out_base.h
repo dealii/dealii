@@ -2364,6 +2364,19 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
                                       */
     void merge (const DataOutReader<dim,spacedim> &other);
     
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcNoPatches);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcIncompatibleDatasetNames);
+                                     /**
+                                      * Exception
+                                      */
+    DeclException0 (ExcIncompatiblePatchLists);
+
   protected:
 				     /**
 				      * This is the function
