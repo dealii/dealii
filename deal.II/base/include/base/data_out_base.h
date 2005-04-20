@@ -2361,6 +2361,9 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
                                       * either this or the other
                                       * object did not yet set up any
                                       * patches.
+				      *
+				      * The use of this function is
+				      * demonstrated in step-19.
                                       */
     void merge (const DataOutReader<dim,spacedim> &other);
     
