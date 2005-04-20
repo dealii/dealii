@@ -405,6 +405,7 @@ AC_SUBST(DEAL_II_DEFINE_DEAL_II_USE_PETSC)
 DEAL_II_CONFIGURE_METIS
 AC_SUBST(USE_CONTRIB_METIS)
 AC_SUBST(DEAL_II_METIS_DIR)
+AC_SUBST(DEAL_II_METIS_VERSION)
 
 dnl Check for UMFPack. This is more an enable for the contributed version,
 dnl but it should become a real --with-umfpack later
