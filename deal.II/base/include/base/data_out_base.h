@@ -2319,6 +2319,51 @@ class DataOutReader : public DataOutInterface<dim,spacedim>
 				      */
     void read (std::istream &in);
 
+                                     /**
+                                      * This function can be used to
+                                      * merge the patches read by the
+                                      * other object into the patches
+                                      * that this present object
+                                      * stores. This is sometimes
+                                      * handy if one has, for example,
+                                      * a domain decomposition
+                                      * algorithm where each block is
+                                      * represented by a DoFHandler of
+                                      * its own, but one wants to
+                                      * output the solution on all the
+                                      * blocks at the same
+                                      * time. Alternatively, it may
+                                      * also be used for parallel
+                                      * programs, where each process
+                                      * only generates output for its
+                                      * share of the cells, even if
+                                      * all processes can see all
+                                      * cells.
+                                      *
+                                      * For this to work, the input
+                                      * files for the present object
+                                      * and the given argument need to
+                                      * have the same number of output
+                                      * vectors, and they need to use
+                                      * the same number of
+                                      * subdivisions per patch. The
+                                      * output will probably look
+                                      * rather funny if patches in
+                                      * both objects overlap in space.
+                                      *
+                                      * If you call read() for this
+                                      * object after merging in
+                                      * patches, the previous state is
+                                      * overwritten, and the merged-in
+                                      * patches are lost.
+				      *
+                                      * This function will fail if
+                                      * either this or the other
+                                      * object did not yet set up any
+                                      * patches.
+                                      */
+    void merge (const DataOutReader<dim,spacedim> &other);
+    
   protected:
 				     /**
 				      * This is the function
