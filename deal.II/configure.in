@@ -312,7 +312,7 @@ dnl                       Optional features
 dnl --------------------------------------------------------------
 
 AC_ARG_ENABLE(parser,
-              AS_HELP_STRING([--enable-parser],
+              AC_HELP_STRING([--enable-parser],
                              [While switched on by default, this option allows
                               to switch off support for the function parser
 			      in the contrib directory.]),
