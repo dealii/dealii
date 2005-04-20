@@ -4569,6 +4569,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
     AC_DEFINE(DEAL_II_USE_METIS, 1,
               [Defined if a Metis installation was found and is going
                to be used])
+
+    AC_MSG_CHECKING(for Metis version)
+    DEAL_II_METIS_VERSION=`cat $DEAL_II_METIS_DIR/Version`
+    AC_MSG_RESULT($DEAL_II_METIS_VERSION)
   fi
 ])
 
