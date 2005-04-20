@@ -213,13 +213,13 @@ build-test:
 	echo BUILDTESTNOTE=$(BUILDTESTNOTE)        | tee -a build-test-log
 	(./configure $(BUILDTESTFLAGS) 2>&1) > build-test-config
 	if test -f common/Make.global_options ; then \
-	   grep '^enable-shared' common/Make.global_options ; \
-	   grep enable-multithreading common/Make.global_options ; \
-	   grep with-multithreading common/Make.global_options ; \
-	   grep USE_CONTRIB_PETSC common/Make.global_options ; \
-	   grep USE_CONTRIB_METIS common/Make.global_options ; \
-	   grep USE_CONTRIB_HSL common/Make.global_options ; \
-	   grep USE_CONTRIB_UMFPACK common/Make.global_options ; \
+	   grep '^enable-shared' common/Make.global_options | grep = ; \
+	   grep enable-multithreading common/Make.global_options | grep = ; \
+	   grep with-multithreading common/Make.global_options | grep = ; \
+	   grep USE_CONTRIB_PETSC common/Make.global_options | grep = ; \
+	   grep USE_CONTRIB_METIS common/Make.global_options | grep = ; \
+	   grep USE_CONTRIB_HSL common/Make.global_options | grep = ; \
+	   grep USE_CONTRIB_UMFPACK common/Make.global_options | grep = ; \
 	 fi    | tee -a build-test-log
 	echo END HEADER `date -u '+%Y-%m-%d %T'`             | tee -a build-test-log
 	echo                                  | tee -a build-test-log
