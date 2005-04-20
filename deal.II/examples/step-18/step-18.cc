@@ -136,9 +136,9 @@ namespace QuasiStaticElasticity
       for (unsigned int j=0; j<dim; ++j)
         for (unsigned int k=0; k<dim; ++k)
           for (unsigned int l=0; l<dim; ++l)
-            tmp[i][j][k][l] = (((i==k) && (j==l) ? mu : 0) +
-                               ((i==l) && (j==k) ? mu : 0) +
-                               ((i==j) && (k==l) ? lambda : 0));
+            tmp[i][j][k][l] = (((i==k) && (j==l) ? mu : 0.0) +
+                               ((i==l) && (j==k) ? mu : 0.0) +
+                               ((i==j) && (k==l) ? lambda : 0.0));
     return tmp;
   }
 
