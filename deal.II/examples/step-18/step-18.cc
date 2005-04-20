@@ -1121,12 +1121,18 @@ namespace QuasiStaticElasticity
 				   triangulation.refine_global (1);
 */
 
-				     // As the final step, we need to set up a
-				     // clean state of the data that we store
-				     // in the quadrature points on all cells
-				     // that are treated on the present
-				     // processor. This is done in this
-				     // function:
+				     // As the final step, we need to
+				     // set up a clean state of the
+				     // data that we store in the
+				     // quadrature points on all cells
+				     // that are treated on the
+				     // present processor. To do so,
+				     // we also have to know which
+				     // processors are ours in the
+				     // first place. This is done in
+				     // the following two function
+				     // calls:
+    GridTools::partition_triangulation (n_mpi_processes, triangulation);
     setup_quadrature_point_history ();  
   }
   
@@ -1135,20 +1141,32 @@ namespace QuasiStaticElasticity
 
                                    // @sect4{TopLevel::setup_system}
 
-				   // The next function is the one that sets
-				   // up the data structures for a given
-				   // mesh. This is done in most the same way
-				   // as in step-17: first, subdivide the
-				   // domain into blocks that each processor
-				   // alone will handle, then distribute the
-				   // degrees of freedom, the sort these
-				   // degrees of freedom in such a way that
-				   // each processor gets a contiguous chunk
-				   // of them:
+				   // The next function is the one
+				   // that sets up the data structures
+				   // for a given mesh. This is done
+				   // in most the same way as in
+				   // step-17: distribute the degrees
+				   // of freedom, then sort these
+				   // degrees of freedom in such a way
+				   // that each processor gets a
+				   // contiguous chunk of them. Note
+				   // that subdivions into chunks for
+				   // each processor is handled in the
+				   // functions that create or refine
+				   // grids, unlike in the previous
+				   // example program (the point where
+				   // this happens is mostly a matter
+				   // of taste; here, we chose to do
+				   // it when grids are created since
+				   // in the ``do_initial_timestep''
+				   // and ``do_timestep'' functions we
+				   // want to output the number of
+				   // cells on each processor at a
+				   // point where we haven't called
+				   // the present function yet).
   template <int dim>
   void TopLevel<dim>::setup_system ()
   {
-    GridTools::partition_triangulation (n_mpi_processes, triangulation);
     dof_handler.distribute_dofs (fe);
     DoFRenumbering::subdomain_wise (dof_handler);
 
@@ -2041,8 +2059,12 @@ namespace QuasiStaticElasticity
 						     0.35, 0.03);
     triangulation.execute_coarsening_and_refinement ();
 
-                                     // Finally, set up quadrature point data
-                                     // again on the new mesh:
+                                     // Finally, set up quadrature
+                                     // point data again on the new
+                                     // mesh, and only on those cells
+                                     // that we have determined to be
+                                     // ours:
+    GridTools::partition_triangulation (n_mpi_processes, triangulation);
     setup_quadrature_point_history ();
   }
   
