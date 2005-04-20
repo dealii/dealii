@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2000, 2004, 2005 by the deal.II authors */
+/*    Copyright (C) 2005 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -33,6 +33,17 @@ void do_convert (const std::vector<std::string> &input_files,
   DataOutReader<dim,spacedim> intermediate_data;  
   intermediate_data.read (intermediate_stream);
 
+				   // for all following input files
+  for (unsigned int i=1; i<input_files.size(); ++i)
+    {
+      std::ifstream additional_stream (input_files[i].c_str());
+      AssertThrow (additional_stream, ExcIO());
+
+      DataOutReader<dim,spacedim> additional_data;  
+      additional_data.read (additional_stream);
+      intermediate_data.merge (additional_data);
+    } 
+  
   std::ofstream output_stream (output_file.c_str());
   AssertThrow (output_stream, ExcIO());
 
