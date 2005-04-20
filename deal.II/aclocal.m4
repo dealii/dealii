@@ -4571,7 +4571,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
                to be used])
 
     AC_MSG_CHECKING(for Metis version)
-    DEAL_II_METIS_VERSION=`cat $DEAL_II_METIS_DIR/Version`
+    DEAL_II_METIS_VERSION=`cat $DEAL_II_METIS_DIR/VERSION`
     AC_MSG_RESULT($DEAL_II_METIS_VERSION)
   fi
 ])
