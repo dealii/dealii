@@ -774,7 +774,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * By default, this class produces patches for all active cells. Sometimes,
  * this is not what you want, maybe because they are simply too many (and too
  * small to be seen individually) or because you only want to see a certain
- * region of the domain, or for some other reason.
+ * region of the domain (for example in parallel programs such as the step-18
+ * example program), or for some other reason.
  *
  * For this, internally the @p build_patches function does not generate
  * the sequence of cells to be converted into patches itself, but relies
@@ -789,6 +790,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * information of the last cell which was accessed is not sufficient to
  * determine the next one.
  *
+ * There is one caveat, however: if you have cell data (in contrast to nodal,
+ * or dof, data) such as error indicators, then you must make sure that the @p
+ * first_cell and @p next_cell only walk over active cells, since cell data
+ * cannot be interpolated to a coarser cell. If you do have cell data and use
+ * this pair of functions and they return a non-active cell, then an exception
+ * will be thrown.
+ * 
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
