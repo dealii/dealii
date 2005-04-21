@@ -401,7 +401,7 @@ void DataOut<dim>::build_some_patches (Data data)
   
   unsigned int cell_number = 0;
   typename std::vector< ::DataOutBase::Patch<dim> >::iterator patch = this->patches.begin();
-  typename DoFHandler<dim>::cell_iterator cell = this->dof->begin();
+  typename DoFHandler<dim>::cell_iterator cell = this->dofs->begin();
 
                                    // count how many cells were skipped at the
                                    // beginning
