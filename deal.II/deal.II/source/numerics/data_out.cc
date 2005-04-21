@@ -407,8 +407,16 @@ void DataOut<dim>::build_some_patches (Data data)
   for (unsigned int i=0; (i<data.this_thread)&&(cell != this->dofs->end()); ++i)
     {
       ++patch;
-      ++cell_number;
-      cell=next_cell(cell);
+
+                                       // move to next cell and update
+                                       // cell_number making sure that we also
+                                       // count those cells that next_cell may
+                                       // have skipped
+      const typename DoFHandler<dim>::cell_iterator
+        new_cell = next_cell(cell);
+      if (new_cell != this->dofs->end())
+        cell_number += std::distance (cell, new_cell);
+      cell = new_cell;
     }
 
   				   // now loop over all cells and
@@ -556,10 +564,18 @@ void DataOut<dim>::build_some_patches (Data data)
 	   (i<data.n_threads)&&(cell != this->dofs->end()); ++i)
 	{
 	  ++patch;
-	  ++cell_number;
-	  cell=next_cell(cell);
+
+                                           // move to next cell and update
+                                           // cell_number making sure that we also
+                                           // count those cells that next_cell may
+                                           // have skipped
+          const typename DoFHandler<dim>::cell_iterator
+            new_cell = next_cell(cell);
+          if (new_cell != this->dofs->end())
+            cell_number += std::distance (cell, new_cell);
+          cell = new_cell;
 	}
-    };
+    }
 }
 
 
