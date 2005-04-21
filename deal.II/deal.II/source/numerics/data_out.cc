@@ -456,6 +456,7 @@ void DataOut<dim>::build_some_patches (Data data)
           if (this->cell_data.size() != 0)
             {
               Assert (!cell->has_children(), ExcNotImplemented());
+//TODO: This introduces a quadratic component into the algorithm. We may be doing better if we always kept track of the cell_number when 'cell' is increased, but we have to make sure that we only do this if cell_number is actually used, since we don't want to enforce the activeness constraints otherwise
               const unsigned int cell_number
                 = std::distance (this->dofs->begin_active(),
                                  typename DoFHandler<dim>::active_cell_iterator(cell));
