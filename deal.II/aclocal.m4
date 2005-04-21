@@ -202,19 +202,19 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 	  version7="`echo $is_intel_icc | grep 'Version 7'`"
 	  version8="`echo $is_intel_icc | grep 'Version 8'`"
           if test "x$version5" != "x" ; then
-            AC_MSG_RESULT(C++ compiler is Intel ICC 5)
+            AC_MSG_RESULT(C++ compiler is icc-5)
             GXX_VERSION=intel_icc5
           else if test "x$version6" != "x" ; then
-            AC_MSG_RESULT(C++ compiler is Intel ICC 6)
+            AC_MSG_RESULT(C++ compiler is icc-6)
             GXX_VERSION=intel_icc6
           else if test "x$version7" != "x" ; then
-            AC_MSG_RESULT(C++ compiler is Intel ICC 7)
+            AC_MSG_RESULT(C++ compiler is icc-7)
             GXX_VERSION=intel_icc7
           else if test "x$version8" != "x" ; then
-            AC_MSG_RESULT(C++ compiler is Intel ICC 8)
+            AC_MSG_RESULT(C++ compiler is icc-8)
             GXX_VERSION=intel_icc8
           else
-            AC_MSG_RESULT(C++ compiler is Intel ICC)
+            AC_MSG_RESULT(C++ compiler is icc)
             GXX_VERSION=intel_icc
           fi fi fi fi
           GXX_VERSION_DETAILED=$GXX_VERSION
@@ -223,7 +223,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
           dnl Or DEC's cxx compiler?
           is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
           if test "x$is_dec_cxx" != "x" ; then
-            AC_MSG_RESULT(C++ compiler is Compaq cxx)
+            AC_MSG_RESULT(C++ compiler is Compaq-cxx)
             GXX_VERSION=compaq_cxx
             GXX_VERSION_DETAILED=$GXX_VERSION
           else
