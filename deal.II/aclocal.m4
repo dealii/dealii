@@ -920,19 +920,19 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
 	  version7="`echo $is_intel_icc | grep 'Version 7'`"
 	  version8="`echo $is_intel_icc | grep 'Version 8'`"
           if test "x$version5" != "x" ; then
-            AC_MSG_RESULT(C compiler is Intel ICC 5)
+            AC_MSG_RESULT(C compiler is icc-5)
             CC_VERSION=intel_icc5
           else if test "x$version6" != "x" ; then
-            AC_MSG_RESULT(C compiler is Intel ICC 6)
+            AC_MSG_RESULT(C compiler is icc-6)
             CC_VERSION=intel_icc6
           else if test "x$version7" != "x" ; then
-            AC_MSG_RESULT(C compiler is Intel ICC 7)
+            AC_MSG_RESULT(C compiler is icc-7)
             CC_VERSION=intel_icc7
           else if test "x$version8" != "x" ; then
-            AC_MSG_RESULT(C compiler is Intel ICC 8)
+            AC_MSG_RESULT(C compiler is icc-8)
             CC_VERSION=intel_icc8
           else
-            AC_MSG_RESULT(C compiler is Intel ICC)
+            AC_MSG_RESULT(C compiler is icc)
             CC_VERSION=intel_icc
           fi fi fi fi
         else
