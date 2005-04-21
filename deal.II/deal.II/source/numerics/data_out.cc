@@ -401,8 +401,19 @@ void DataOut<dim>::build_some_patches (Data data)
   
   unsigned int cell_number = 0;
   typename std::vector< ::DataOutBase::Patch<dim> >::iterator patch = this->patches.begin();
-  typename DoFHandler<dim>::cell_iterator cell=first_cell();
+  typename DoFHandler<dim>::cell_iterator cell = this->dof->begin();
 
+                                   // count how many cells were skipped at the
+                                   // beginning
+  {
+    const typename DoFHandler<dim>::cell_iterator first_cell = this->first_cell();
+    while (cell != first_cell)
+      {
+        ++cell;
+        ++cell_number;
+      }
+  }
+  
 				   // get first cell in this thread
   for (unsigned int i=0; (i<data.this_thread)&&(cell != this->dofs->end()); ++i)
     {
