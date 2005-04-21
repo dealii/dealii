@@ -399,37 +399,14 @@ void DataOut<dim>::build_some_patches (Data data)
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
-  unsigned int cell_number = 0;
   typename std::vector< ::DataOutBase::Patch<dim> >::iterator patch = this->patches.begin();
-  typename DoFHandler<dim>::cell_iterator cell = this->dofs->begin();
-
-                                   // count how many cells were skipped at the
-                                   // beginning
-  {
-    const typename DoFHandler<dim>::cell_iterator first_cell = this->first_cell();
-    while (cell != first_cell)
-      {
-        ++cell;
-        ++cell_number;
-      }
-  }
+  typename DoFHandler<dim>::cell_iterator cell = first_cell();
   
 				   // get first cell in this thread
   for (unsigned int i=0; (i<data.this_thread)&&(cell != this->dofs->end()); ++i)
     {
       ++patch;
-
-                                       // move to next cell and update
-                                       // cell_number making sure that we also
-                                       // count those cells that next_cell may
-                                       // have skipped
-      const typename DoFHandler<dim>::cell_iterator
-        new_cell = next_cell(cell);
-      while (cell != new_cell)
-        {
-          ++cell;
-          ++cell_number;
-        }
+      ++cell;
     }
 
   				   // now loop over all cells and
@@ -470,15 +447,28 @@ void DataOut<dim>::build_some_patches (Data data)
 		};
 	    };
 
-					   // then do the cell data
-	  for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
-	    {
-              const double value
-               = this->cell_data[dataset]->get_cell_data_value (cell_number);
-              for (unsigned int q=0; q<n_q_points; ++q)
-                patch->data(dataset+this->dof_data.size()*data.n_components,q) =
-                  value;
-	    }
+					   // then do the cell data. only
+					   // compute the number of a cell if
+					   // needed; also make sure that we
+					   // only access cell data if the
+					   // first_cell/next_cell functions
+					   // only return active cells
+          if (this->cell_data.size() != 0)
+            {
+              Assert (!cell->has_children(), ExcNotImplemented());
+              const unsigned int cell_number
+                = std::distance (this->dofs->begin_active(),
+                                 typename DoFHandler<dim>::active_cell_iterator(cell));
+              
+              for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
+                {
+                  const double value
+                    = this->cell_data[dataset]->get_cell_data_value (cell_number);
+                  for (unsigned int q=0; q<n_q_points; ++q)
+                    patch->data(dataset+this->dof_data.size()*data.n_components,q) =
+                      value;
+                }
+            }
 	}
 
                                        // now fill the neighbors fields
@@ -577,18 +567,7 @@ void DataOut<dim>::build_some_patches (Data data)
 	   (i<data.n_threads)&&(cell != this->dofs->end()); ++i)
 	{
 	  ++patch;
-
-                                           // move to next cell and update
-                                           // cell_number making sure that we also
-                                           // count those cells that next_cell may
-                                           // have skipped
-          const typename DoFHandler<dim>::cell_iterator
-            new_cell = next_cell(cell);
-          while (cell != new_cell)
-            {
-              ++cell;
-              ++cell_number;
-            }
+          cell = next_cell(cell);
 	}
     }
 }
