@@ -127,6 +127,14 @@ class BlockMatrixArray : public Subscriptor
 {
   public:
 				     /**
+				      * Default constructor creating a
+				      * useless object. initialize()
+				      * must be called before using
+				      * it.
+				      */
+    BlockMatrixArray ();
+    
+				     /**
 				      * Constructor fixing the
 				      * dimensions.
 				      */
@@ -134,6 +142,17 @@ class BlockMatrixArray : public Subscriptor
 		      const unsigned int n_block_cols,
 		      VectorMemory<Vector<number> >& mem);
 
+				     /**
+				      * Initialize object
+				      * completely. This is the
+				      * function to call for an object
+				      * created by the default
+				      * constructor.
+				      */
+    void initialize (const unsigned int n_block_rows,
+		     const unsigned int n_block_cols,
+		     VectorMemory<Vector<number> >& mem);
+    
 				     /**
 				      * Adjust the matrix to a new
 				      * size and delete all blocks.
@@ -416,14 +435,41 @@ class BlockTrianglePrecondition
 {
   public:
 				     /**
+				      * Default constructor creating a
+				      * useless object. initialize()
+				      * must be called before using
+				      * it.
+				      */
+    BlockTrianglePrecondition ();
+    
+				     /**
 				      * Constructor. This matrix must be
 				      * block-quadratic. The additional
 				      * parameter allows for backward
 				      * insertion instead of forward.
 				      */
-    BlockTrianglePrecondition(unsigned int block_rows,
-			      VectorMemory<Vector<number> >& mem,
-			      bool backward = false);
+    BlockTrianglePrecondition (unsigned int n_block_rows,
+			       VectorMemory<Vector<number> >& mem,
+			       bool backward = false);
+    
+				     /**
+				      * Initialize object
+				      * completely. This is the
+				      * function to call for an object
+				      * created by the default
+				      * constructor.
+				      */
+    void initialize (const unsigned int n_block_rows,
+		     VectorMemory<Vector<number> >& mem,
+		     bool backward = false);
+    
+				     /**
+				      * Resize preconditioner to a new
+				      * size and clear all blocks.
+				      */
+    void reinit(const unsigned int n_block_rows);
+    
+    
 				     /**
 				      * Enter a block. This calls
 				      * BlockMatrixArray::enter(). Remember
@@ -437,12 +483,6 @@ class BlockTrianglePrecondition
 		const unsigned int col,
 		const double       prefix = 1.,
 		const bool         transpose = false);
-    
-				     /**
-				      * Resize preconditioner to a new
-				      * size and clear all blocks.
-				      */
-    void reinit(const unsigned int n_block_rows);
 
                                      /**
 				      * Preconditioning.
@@ -544,6 +584,7 @@ BlockMatrixArray<number>::enter (const MATRIX& matrix,
 				 unsigned row, unsigned int col,
 				 double prefix, bool transpose)
 {
+  Assert (mem != 0, ExcNotInitialized());
   Assert(row<n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
   Assert(col<n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
   entries.push_back(Entry(matrix, row, col, prefix, transpose));
@@ -567,6 +608,7 @@ inline
 void
 BlockMatrixArray<number>::print_latex (STREAM& out) const
 {
+  Assert (mem != 0, ExcNotInitialized());
   out << "\\begin{array}{"
       << std::string(n_block_cols(), 'c')
       << "}" << std::endl;

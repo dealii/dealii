@@ -41,6 +41,15 @@ BlockMatrixArray<number>::Entry::~Entry ()
 
 
 template <typename number>
+BlockMatrixArray<number>::BlockMatrixArray ()
+		: block_rows (0),
+		  block_cols (0),
+		  mem(0, typeid(*this).name())
+{}
+
+
+
+template <typename number>
 BlockMatrixArray<number>::BlockMatrixArray (
   const unsigned int n_block_rows,
   const unsigned int n_block_cols,
@@ -51,6 +60,20 @@ BlockMatrixArray<number>::BlockMatrixArray (
 {}
 
 
+template <typename number>
+void
+BlockMatrixArray<number>::initialize (
+  const unsigned int n_block_rows,
+  const unsigned int n_block_cols,
+  VectorMemory<Vector<number> >& memory)
+{
+  block_rows = n_block_rows;
+  block_cols = n_block_cols;
+  mem = &memory;
+}
+
+
+
 
 template <typename number>
 void
@@ -58,6 +81,7 @@ BlockMatrixArray<number>::reinit (
   const unsigned int n_block_rows,
   const unsigned int n_block_cols)
 {
+  Assert (mem != 0, ExcNotInitialized());
   clear();
   block_rows = n_block_rows;
   block_cols = n_block_cols;
@@ -78,6 +102,8 @@ void
 BlockMatrixArray<number>::vmult_add (BlockVector<number>& dst,
 				     const BlockVector<number>& src) const
 {
+  Assert (mem != 0, ExcNotInitialized());
+  
   Assert (dst.n_blocks() == block_rows,
 	  ExcDimensionMismatch(dst.n_blocks(), block_rows));
   Assert (src.n_blocks() == block_cols,
@@ -121,6 +147,7 @@ void
 BlockMatrixArray<number>::Tvmult_add (BlockVector<number>& dst,
 				      const BlockVector<number>& src) const
 {
+  Assert (mem != 0, ExcNotInitialized());
   Assert (dst.n_blocks() == block_cols,
 	  ExcDimensionMismatch(dst.n_blocks(), block_cols));
   Assert (src.n_blocks() == block_rows,
@@ -164,6 +191,7 @@ BlockMatrixArray<number>::matrix_scalar_product (
   const BlockVector<number>& u,
   const BlockVector<number>& v) const
 {
+  Assert (mem != 0, ExcNotInitialized());
   Assert (u.n_blocks() == block_rows,
 	  ExcDimensionMismatch(u.n_blocks(), block_rows));
   Assert (v.n_blocks() == block_cols,
@@ -229,6 +257,13 @@ BlockMatrixArray<number>::n_block_cols () const
 //---------------------------------------------------------------------------
 
 template <typename number>
+BlockTrianglePrecondition<number>::BlockTrianglePrecondition()
+		: BlockMatrixArray<number> (),
+		  backward(false)
+{}
+
+
+template <typename number>
 BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
   unsigned int block_rows,
   VectorMemory<Vector<number> >& mem,
@@ -241,11 +276,24 @@ BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
 
 template <typename number>
 void
+BlockTrianglePrecondition<number>::initialize(
+  unsigned int n_block_rows,
+  VectorMemory<Vector<number> >& memory,
+  bool backward)
+{
+  BlockMatrixArray<number>::initialize(n_block_rows, n_block_rows, memory);
+  backward = backward;
+}
+
+
+template <typename number>
+void
 BlockTrianglePrecondition<number>::reinit (
   const unsigned int n)
 {
   BlockMatrixArray<number>::reinit(n,n);
 }
+
 
 template <typename number>
 void
