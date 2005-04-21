@@ -414,9 +414,11 @@ void DataOut<dim>::build_some_patches (Data data)
                                        // have skipped
       const typename DoFHandler<dim>::cell_iterator
         new_cell = next_cell(cell);
-      if (new_cell != this->dofs->end())
-        cell_number += std::distance (cell, new_cell);
-      cell = new_cell;
+      while (cell != new_cell)
+        {
+          ++cell;
+          ++cell_number;
+        }
     }
 
   				   // now loop over all cells and
@@ -571,9 +573,11 @@ void DataOut<dim>::build_some_patches (Data data)
                                            // have skipped
           const typename DoFHandler<dim>::cell_iterator
             new_cell = next_cell(cell);
-          if (new_cell != this->dofs->end())
-            cell_number += std::distance (cell, new_cell);
-          cell = new_cell;
+          while (cell != new_cell)
+            {
+              ++cell;
+              ++cell_number;
+            }
 	}
     }
 }
