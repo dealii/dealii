@@ -342,6 +342,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: The <code class="class">DataOut</code> class did not work
+       properly if the <code class="member">DataOut::first_cell</code> and
+       <code class="member">DataOut::next_cell</code> functions were
+       overloaded and cell data was to be output; in that case, data from the
+       wrong cells was written out. This is now fixed. In contrast to this,
+       nodal data was never affected.
+       <br> 
+       (WB, 2005/04/20)
+       </p>
+
+  <li> <p>
        Improved: By employing the new <code
        class="class">GeometryInfo</code>::<code
        class="member">line_to_cell_vertices</code>, <code
