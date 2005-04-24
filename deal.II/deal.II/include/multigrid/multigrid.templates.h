@@ -345,7 +345,20 @@ Multigrid<VECTOR>::vcycle()
   level_v_step (maxlevel);
 }
 
+template <class VECTOR>
+void
+Multigrid<VECTOR>::vmult(VECTOR& dst, const VECTOR& src) const
+{
+  Assert(false, ExcNotImplemented());
+}
 
+
+template <class VECTOR>
+void
+Multigrid<VECTOR>::Tvmult(VECTOR& dst, const VECTOR& src) const
+{
+  Assert(false, ExcNotImplemented());
+}
 
 
 #endif
