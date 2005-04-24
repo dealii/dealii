@@ -43,6 +43,12 @@
  * level_v_step() or level_step(), where the latter one can do
  * different types of cycles.
  *
+ * Using this class, it is expected that the right hand side has been
+ * converted from a vector living on the locally finest level to a
+ * multilevel vector. This is a nontrivial operation, usually
+ * initiated automatically by the class PreconditionMG and performed
+ * by the classes derived from MGTransferBase.
+ *
  * @note The interface of this class is still very clumsy. In
  * particular, you will have to set up quite a few auxiliary objects
  * before you can use it. Unfortunately, it seems that this can be
@@ -62,9 +68,9 @@ class Multigrid : public Subscriptor
     {
 					   /// The V-cycle
 	  v_cycle,
-					   /// The W-cycle (not working yet)
+					   /// The W-cycle
 	  w_cycle,
-					   /// The F-cycle (not working yet)
+					   /// The F-cycle
 	  f_cycle
     };
     
@@ -150,6 +156,34 @@ class Multigrid : public Subscriptor
 				      */
     void vcycle ();
 
+				     /**
+				      * @deprecated This function is
+				      * purely experimental and will
+				      * probably never be implemented
+				      * in a way that it can be
+				      * released.
+				      *
+				      * Perform a multigrid cycle with
+				      * a vector which is already a
+				      * level vector. Use of this
+				      * function assumes that there is
+				      * NO local refinement and that
+				      * both vectors are on the finest
+				      * level of this Multigrid
+				      * object.
+				      */
+    void vmult(VECTOR& dst, const VECTOR& src) const;
+    
+				     /**
+				      * @deprecated Even worse than
+				      * vmult(), this function is not
+				      * even implemented, but just
+				      * declared such that certain
+				      * objects relying on it can be
+				      * constructed.
+				      */
+    void Tvmult(VECTOR& dst, const VECTOR& src) const;
+    
 				     /**
 				      * Set additional matrices to
 				      * correct residual computation
