@@ -108,7 +108,6 @@ AC_PROG_CXX
 CXXFLAGS="$OLDCXXFLAGS"
 AC_PATH_PROG(CXX,$CXX) 
 
-
 dnl Next determine which C++ compiler we have here and set compilation
 dnl flags accordingly. Note that for historical reasons the name and
 dnl version of the compiler is written to the variable GXX_VERSION.
@@ -450,10 +449,6 @@ dnl -------------------------------------------------------------
 
 AC_MSG_RESULT()
 AC_MSG_RESULT(---------------- configuring other programs -----------------)
-
-dnl DEAL_II_CHECK_KDOC
-dnl AC_SUBST(kdocdir)
-dnl AC_SUBST(kdocversion)
 
 DEAL_II_CHECK_DOXYGEN
 AC_SUBST(DOXYGEN)
