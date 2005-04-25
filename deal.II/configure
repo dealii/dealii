@@ -8655,6 +8655,14 @@ case "$target" in
            ;;
 esac
 
+if test "x$enableshared" = "xyes" ; then
+  CFLAGS="$CFLAGS $CFLAGSPIC"
+  CXXFLAGSG="$CXXFLAGSG $CXXFLAGSPIC"
+  CXXFLAGSO="$CXXFLAGSO $CXXFLAGSPIC"
+  F77FLAGSG="$F77FLAGSG $F77FLAGSPIC"
+  F77FLAGSO="$F77FLAGSO $F77FLAGSPIC"
+fi
+
 
 
 

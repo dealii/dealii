@@ -172,18 +172,6 @@ F77FLAGS.o   = @DEFS@ @F77FLAGSO@  $(INCLUDE)
 # compile flags for C compiler
 CFLAGS = @CFLAGS@
 
-ifeq ($(enable-shared),yes)
-  CXXFLAGS.g += @CXXFLAGSPIC@
-  CXXFLAGS.o += @CXXFLAGSPIC@
-
-  F77FLAGS.g += @F77FLAGSPIC@
-  F77FLAGS.o += @F77FLAGSPIC@
-
-  CFLAGS     += @CFLAGSPIC@
-  LDFLAGS    += @LDFLAGSPIC@
-endif
-
-
 # PETSc wants to see a whole lot of other flags being passed. ...
 ifeq ($(USE_CONTRIB_PETSC),yes)
   include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/variables
