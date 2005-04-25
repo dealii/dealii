@@ -513,7 +513,9 @@ MGTools::count_dofs_per_component (
 			     true);
 	  
 					   // finally sanity check
-	  Assert (std::accumulate (result[l].begin(),
+	  Assert (!dof_handler.get_fe().is_primitive()
+		  ||
+		  std::accumulate (result[l].begin(),
 				   result[l].end(), 0U)
 		  ==
 		  dof_handler.n_dofs(l),
