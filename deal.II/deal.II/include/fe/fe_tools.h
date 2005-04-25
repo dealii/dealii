@@ -163,7 +163,14 @@ class FETools
 				     /**
 				      * Compute the embedding matrices
 				      * from a coarse cell to
-				      * 2<sup>dim</sup> child cells.
+				      * 2<sup>dim</sup> child
+				      * cells. Each column of the
+				      * resulting matrices contains
+				      * the representation of a coarse
+				      * grid basis functon by the fine
+				      * grid basis; the matrices are
+				      * split such that there is one
+				      * matrix for every child.
 				      *
 				      * This function computes the
 				      * coarse grid function in a
@@ -191,6 +198,30 @@ class FETools
     static void compute_embedding_matrices(const FiniteElement<dim> &fe,
 					   FullMatrix<number>* matrices);
     
+				     /**
+				      * Compute the
+				      * <i>L<sup>2</sup></i>-projection
+				      * matrices from the children to
+				      * a coarse cell.
+				      *
+				      * @arg fe The finite element
+				      * class for which we compute the
+				      * projection matrices.
+				      * @arg matrices A pointer to
+				      * 2<sup>dim</sup> FullMatrix
+				      * objects. This is the format
+				      * used in FiniteElementBase,
+				      * where we want to use ths
+				      * function mostly.
+				      */
+    template <int dim, typename number>
+    static void compute_projection_matrices(const FiniteElement<dim> &fe,
+					    FullMatrix<number>* matrices);
+				     //@}
+				     /**
+				      * @name DoF: Functions which should be in DoFTools
+				      */
+				     //@{
 				     /**
 				      * Gives the interpolation of a the
 				      * @p dof1-function @p u1 to a
@@ -498,7 +529,7 @@ class FETools
 			     const DoFHandler<dim>&  dof2,
 			     const ConstraintMatrix& constraints,
 			     OutVector&              z2);    
-
+				     //@}
 				     /**
 				      * The numbering of the degrees
 				      * of freedom in continous finite
