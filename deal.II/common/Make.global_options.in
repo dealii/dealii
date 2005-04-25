@@ -169,6 +169,9 @@ CXXFLAGS.o   = @DEFS@ @CXXFLAGSO@  $(INCLUDE)
 F77FLAGS.g   = @DEFS@ @F77FLAGSG@  $(INCLUDE)
 F77FLAGS.o   = @DEFS@ @F77FLAGSO@  $(INCLUDE)
 
+# compile flags for C compiler
+CFLAGS = @CFLAGS@
+
 ifeq ($(enable-shared),yes)
   CXXFLAGS.g += @CXXFLAGSPIC@
   CXXFLAGS.o += @CXXFLAGSPIC@
@@ -189,5 +192,3 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
 endif
 
 
-# compile flags for C compiler
-CFLAGS = @CFLAGS@
