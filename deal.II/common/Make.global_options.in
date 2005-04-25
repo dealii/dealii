@@ -176,6 +176,7 @@ ifeq ($(enable-shared),yes)
   F77FLAGS.g += @F77FLAGSPIC@
   F77FLAGS.o += @F77FLAGSPIC@
 
+  CFLAGS     += @CFLAGSPIC@
   LDFLAGS    += @LDFLAGSPIC@
 endif
 
