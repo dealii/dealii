@@ -195,6 +195,16 @@ LAPACKFullMatrix<number>::compute_eigenvalues()
   state = LAPACKSupport::State(eigenvalues | unusable);
 }
 
+#else
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::compute_eigenvalues()
+{
+  Assert(false, ExcNeedsLAPACK());
+}
+
+
 #endif
 
 // template <typename number>
