@@ -12,10 +12,10 @@ default: hsl umfpack
 
 ifeq ($(USE_CONTRIB_HSL),yes)
 hsl:
-	cd hsl ; $(MAKE)
+	@cd hsl ; $(MAKE)
 
 hsl-clean:
-	cd hsl ; $(MAKE) clean
+	@cd hsl ; $(MAKE) clean
 else
 hsl:
 hsl-clean:
@@ -24,17 +24,22 @@ endif
 
 ifeq ($(USE_CONTRIB_UMFPACK),yes)
 umfpack:
-	cd umfpack ; $(MAKE)
+	@cd umfpack ; $(MAKE)
 else
 umfpack:
 endif
 
 
+ifeq ($(enable-parser),yes)
 functionparser:
 	@cd functionparser ; $(MAKE)
+else
+functionparser:
+endif
 
 
 # generic targets
 clean: hsl-clean
+	rm ../lib/contrib/*/*.o	
 
 .PHONY: default hsl clean umfpack functionparser
