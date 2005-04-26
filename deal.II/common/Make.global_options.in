@@ -41,6 +41,7 @@ PERL                 = @PERL@
 enable-multithreading= @enablemultithreading@
 with-multithreading  = @withmultithreading@
 enable-shared        = @enableshared@
+enable-parser        = @enableparser@
 DEAL_II_MAJOR        = @DEAL_II_MAJOR@
 DEAL_II_MINOR        = @DEAL_II_MINOR@
 
