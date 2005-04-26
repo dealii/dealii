@@ -850,10 +850,10 @@
       exception specifications that are given in the system headers. With some
       compilers, you will then get compilation errors on one or two deal.II
       files. It is easy to work around this by first compiling METIS, then
-      trying to compile deal.II, and then simply remove each function
+      trying to compile deal.II, and then simply removing each function
       signature which the compiler complains about. The ones most likely
       affected are <code>srand48()</code>, <code>drand48()</code>, and
-      <code>log2</code>. Since you have already compile METIS and deal.II does
+      <code>log2</code>. Since you have already compiled METIS and deal.II does
       not need these function declarations itself, just removing their
       declarations should not be a problem.
       </p>
