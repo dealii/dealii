@@ -40,6 +40,6 @@ endif
 
 # generic targets
 clean: hsl-clean
-	rm ../lib/contrib/*/*.o	
+	@-rm ../lib/contrib/*/*.o	
 
 .PHONY: default hsl clean umfpack functionparser
