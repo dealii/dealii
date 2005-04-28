@@ -98,6 +98,12 @@ SolverControl::State
 SolverControl::check (const unsigned int step,
 		      const double check_value)
 {
+				   // if this is the first time we
+				   // come here, then store the
+				   // residual for later comparisons
+  if (step==0)
+    initial_val = check_value;
+
   if (m_log_history && ((step % m_log_frequency) == 0))
     deallog << "Check " << step << "\t" << check_value << std::endl;
   
@@ -152,6 +158,13 @@ SolverControl::State
 SolverControl::last_check() const
 {
   return lcheck;
+}
+
+
+double
+SolverControl::initial_value() const
+{
+  return initial_val;
 }
 
 
@@ -216,12 +229,6 @@ ReductionControl::ReductionControl(const unsigned int n,
 
 ReductionControl::~ReductionControl()
 {}
-
-
-double
-ReductionControl::initial_value() const {
-  return initial_val;
-}
 
 
 SolverControl::State

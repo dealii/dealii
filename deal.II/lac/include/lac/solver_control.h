@@ -210,6 +210,12 @@ class SolverControl : public Subscriptor
     State last_check() const;
     
 				     /**
+				      * Return the initial convergence
+				      * criterion.
+				      */
+    double initial_value() const;
+
+				     /**
 				      * Return the convergence value of last
 				      * iteration step for which @p check was
 				      * called by the solver.
@@ -301,6 +307,11 @@ class SolverControl : public Subscriptor
 				      * Result of last check operation.
 				      */
     State        lcheck;
+    
+				     /**
+				      * Initial value.
+				      */
+    double initial_val;
     
 				     /**
 				      * Last value of the convergence criterion.
@@ -415,12 +426,6 @@ class ReductionControl : public SolverControl
 			 const double   check_value);
 
 				     /**
-				      * Return the initial convergence
-				      * criterion.
-				      */
-    double initial_value() const;
-
-				     /**
 				      * Reduction factor.
 				      */
     double reduction () const;
@@ -435,11 +440,6 @@ class ReductionControl : public SolverControl
 				      * Desired reduction factor.
 				      */
     double reduce;
-    
-				     /**
-				      * Initial value.
-				      */
-    double initial_val;
     
 				     /**
 				      * Reduced tolerance. Stop iterations
