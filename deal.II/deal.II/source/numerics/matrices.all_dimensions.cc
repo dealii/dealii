@@ -184,12 +184,12 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 	      
 					       // set matrix entry to zero
 	      matrix.global_entry(global_entry) = 0.;
-	    };
-	};
+	    }
+	}
 
 				       // preset solution vector
       solution(dof_number) = dof->second;
-    };
+    }
 }
 
 
@@ -504,13 +504,13 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 		  
 						   // set matrix entry to zero
 		  matrix.block(block_row,block_index.first).global_entry(global_entry) = 0.;
-		};
-	    };
-	};
+		}
+	    }
+	}
 
 				       // preset solution vector
       solution.block(block_index.first)(block_index.second) = dof->second;
-    };
+    }
 }
 
 
@@ -638,7 +638,7 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 
 				       // preset solution vector
       solution(dof_number) = dof->second;
-    };
+    }
 }
 
 #endif
