@@ -19,7 +19,9 @@ include $D/common/Make.global_options
 
 # there's an extra .o file for the function parser that we need to link into
 # libbase
+ifeq ($(enable-parser),yes)
 extra-o-files = $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
+endif
 
 
 # production rules
