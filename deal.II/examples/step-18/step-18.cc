@@ -1453,68 +1453,27 @@ namespace QuasiStaticElasticity
 					   // into the global objects. This is
 					   // done exactly as in step-17:
 	  cell->get_dof_indices (local_dof_indices);
-	  MatrixTools::local_apply_boundary_values (boundary_values,
-						    local_dof_indices,
-						    cell_matrix,
-						    cell_rhs,
-						    true);
 
           hanging_node_constraints
 	    .distribute_local_to_global (cell_matrix,
 					 local_dof_indices,
-					 boundary_values,
 					 system_matrix);
 
 	  hanging_node_constraints
 	    .distribute_local_to_global (cell_rhs,
 					 local_dof_indices,
-					 boundary_values,
 					 system_rhs);
 	}
-
-				     // Finally, make sure that PETSc
-				     // distributes all necessary information
-				     // to all processors:
-    system_matrix.compress ();
-    system_rhs.compress ();
 
 				     // The last step is to again fix
 				     // up boundary values, just as we
 				     // already did in step-17:
-//TODO (compare against what we do in step-17)    
-    double       sum_of_diagonal     = 0;
-    unsigned int n_diagonal_elements = 0;
-    
-    for (unsigned int i=system_matrix.local_range().first;
-         i<system_matrix.local_range().second; ++i)
-      if (boundary_values.find(i) == boundary_values.end())
-        {
-          ++n_diagonal_elements;
-          sum_of_diagonal += std::fabs(system_matrix.diag_element(i));
-        }
-    const double average_diagonal
-      = sum_of_diagonal / n_diagonal_elements;
-
-    for (std::map<unsigned int, double>::const_iterator
-	   boundary_value = boundary_values.begin();
-	 boundary_value != boundary_values.end(); ++boundary_value)
-      if ((boundary_value->first >= system_matrix.local_range().first)
-	  &&
-	  (boundary_value->first < system_matrix.local_range().second))
-	{
-          system_matrix.set (boundary_value->first,
-                             boundary_value->first,
-                             average_diagonal);
-	  system_rhs(boundary_value->first)
-	    = (boundary_value->second * average_diagonal);
-//TODO document          
-          incremental_displacement(boundary_value->first)
-            = boundary_value->second;
-	}
-
 //TODO document    
-    system_matrix.compress ();
-    system_rhs.compress ();    
+    PETScWrappers::MPI::Vector tmp (system_rhs);
+    MatrixTools::apply_boundary_values (boundary_values,
+                                        system_matrix, tmp,
+                                        system_rhs);
+    incremental_displacement = tmp;
   }
 
 
@@ -2575,54 +2534,46 @@ namespace QuasiStaticElasticity
 					       // exactly symmetric.
 
 					       // As another defensive
-					       // measure, we should
-					       // make sure that we
-					       // have actually
-					       // computed the
-					       // rotation matrices
-					       // correctly. One
-					       // possible way is to
-					       // ensure that the
-					       // invariants of the
-					       // stress before and
-					       // after rotation
-					       // coincide. For this,
-					       // remember that the
-					       // invariants are named
-					       // this way because
-					       // they do not change
-					       // under orthogonal
-					       // transformations like
-					       // rotations. For our
-					       // present purposes, we
-					       // only test that the
-					       // first and third
-					       // invariants, i.e. the
-					       // trace and
-					       // determinant, of the
-					       // stress are the same
-					       // up to a small
-					       // difference
-					       // proportional to the
-					       // size of the stress
-					       // tensor. Adding such
-					       // checks has proven to
-					       // be an invaluable
-					       // means to find subtle
-					       // bugs, and in
-					       // particular to guard
-					       // against involuntary
-					       // changes in other
-					       // parts of the program
-					       // (or the library, for
-					       // that matter). Note that in order
- 					       // to make these checks work
- 					       // even on cells where the
- 					       // stress happens to be zero,
- 					       // we need to compare
- 					       // less-than-or-equal, not just
- 					       // less-than some small
- 					       // tolerance:
+					       // measure, we should make sure
+					       // that we have actually
+					       // computed the rotation
+					       // matrices correctly. One
+					       // possible way is to ensure
+					       // that the invariants of the
+					       // stress before and after
+					       // rotation coincide. For this,
+					       // remember that the invariants
+					       // are named this way because
+					       // they do not change under
+					       // orthogonal transformations
+					       // like rotations. For our
+					       // present purposes, we only
+					       // test that the first and
+					       // third invariants, i.e. the
+					       // trace and determinant, of
+					       // the stress are the same up
+					       // to a small difference
+					       // proportional to the size of
+					       // the stress tensor (since the
+					       // determinant is a nonlinear
+					       // function, unlike the trace,
+					       // we allow for a slightly
+					       // larger tolerance). Adding
+					       // such checks has proven to be
+					       // an invaluable means to find
+					       // subtle bugs, and in
+					       // particular to guard against
+					       // involuntary changes in other
+					       // parts of the program (or the
+					       // library, for that
+					       // matter). Note that in order
+					       // to make these checks work
+					       // even on cells where the
+					       // stress happens to be zero,
+					       // we need to compare
+					       // less-than-or-equal, not just
+					       // less-than some small
+					       // tolerance:
 	      Assert (std::fabs(trace(new_stress) - trace(rotated_new_stress))
 		      <=
 		      1e-12 * std::fabs(trace(new_stress)),
@@ -2630,7 +2581,7 @@ namespace QuasiStaticElasticity
 
 	      Assert (std::fabs(determinant(new_stress) - determinant(rotated_new_stress))
 		      <=
-		      1e-12 * std::fabs(determinant(new_stress)),
+		      1e-10 * std::fabs(determinant(new_stress)),
 		      ExcInternalError());
 
                                                // The result of all these
