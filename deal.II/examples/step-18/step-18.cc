@@ -2615,14 +2615,21 @@ namespace QuasiStaticElasticity
 					       // changes in other
 					       // parts of the program
 					       // (or the library, for
-					       // that matter):
+					       // that matter). Note that in order
+ 					       // to make these checks work
+ 					       // even on cells where the
+ 					       // stress happens to be zero,
+ 					       // we need to compare
+ 					       // less-than-or-equal, not just
+ 					       // less-than some small
+ 					       // tolerance:
 	      Assert (std::fabs(trace(new_stress) - trace(rotated_new_stress))
-		      <
+		      <=
 		      1e-12 * std::fabs(trace(new_stress)),
 		      ExcInternalError());
 
 	      Assert (std::fabs(determinant(new_stress) - determinant(rotated_new_stress))
-		      <
+		      <=
 		      1e-12 * std::fabs(determinant(new_stress)),
 		      ExcInternalError());
 
