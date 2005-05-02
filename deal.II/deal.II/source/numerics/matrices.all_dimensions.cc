@@ -541,8 +541,11 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                                    // we have to read and write from this
                                    // matrix (in this order). this will only
                                    // work if we compress the matrix first,
-                                   // done here:
+                                   // done here. do the same with the other
+                                   // objects just to be on the safe side:
   matrix.compress ();
+  solution.compress ();
+  right_hand_side.compress ();
   
   const unsigned int n_dofs = matrix.m();
 
@@ -666,8 +669,11 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                                    // we have to read and write from this
                                    // matrix (in this order). this will only
                                    // work if we compress the matrix first,
-                                   // done here:
+                                   // done here. do the same with the other
+                                   // objects just to be on the safe side:
   matrix.compress ();
+  solution.compress ();
+  right_hand_side.compress ();
   
   const unsigned int n_dofs = matrix.m();
 
