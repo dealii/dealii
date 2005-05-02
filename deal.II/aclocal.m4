@@ -4406,14 +4406,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
     dnl defining the string "DEAL_II_USE_PETSC" for the preprocessor. If
     dnl we don't have no PETSc, then it does not define this string.
     DEAL_II_DEFINE_DEAL_II_USE_PETSC=DEAL_II_USE_PETSC
-
-    dnl If we are linking with static libraries, then we will have to add
-    dnl BLAS to the linker line for PETSc. Note that this is not necessary
-    dnl for shared libs, since they should already come with this reference
-    dnl built in.
-    if test "x$enableshared" = "xno" ; then
-      LDFLAGS="$LDFLAGS -lblas"
-    fi
   fi
 
 
