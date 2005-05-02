@@ -973,7 +973,6 @@ class SparsityPattern : public Subscriptor
 				      * position may be non-zero.
 				      */
     bool exists (const unsigned int i, const unsigned int j) const;
-    
 
 				     /**
 				      * Number of entries in a specific row.
