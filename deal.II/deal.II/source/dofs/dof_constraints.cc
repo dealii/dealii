@@ -1195,7 +1195,6 @@ ConstraintMatrix::memory_consumption () const
   template void ConstraintMatrix:: \
     distribute_local_to_global<VectorType > (const Vector<double>            &, \
                                              const std::vector<unsigned int> &, \
-                                             const std::map<unsigned int, double> &, \
                                              VectorType                      &) const; \
   template void ConstraintMatrix::distribute<VectorType >(const VectorType &condensed,\
 					                 VectorType       &uncondensed) const;\
@@ -1248,7 +1247,6 @@ ConstraintMatrix::condense<float>(BlockSparseMatrix<float> &uncondensed) const;
 template void ConstraintMatrix:: \
 distribute_local_to_global<MatrixType > (const FullMatrix<double>        &, \
                                          const std::vector<unsigned int> &, \
-                                         const std::map<unsigned int, double> &, \
                                          MatrixType                      &) const
 
 MATRIX_FUNCTIONS(SparseMatrix<double>);
