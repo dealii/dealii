@@ -675,8 +675,6 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
   solution.compress ();
   right_hand_side.compress ();
   
-  const unsigned int n_dofs = matrix.m();
-
 				   // determine the first nonzero diagonal
 				   // entry from within the part of the matrix
 				   // that we can see. if we can't find such
