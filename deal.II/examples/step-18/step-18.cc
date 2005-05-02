@@ -1296,6 +1296,9 @@ namespace QuasiStaticElasticity
                                      // only to reset the right hand side
                                      // vector to its correct size:
     system_rhs.reinit (mpi_communicator, dof_handler.n_dofs(), n_local_dofs);
+
+//TODO: document what we do here and why
+    incremental_displacement.reinit (dof_handler.n_dofs());
   }
 
 
@@ -1478,6 +1481,20 @@ namespace QuasiStaticElasticity
 				     // The last step is to again fix
 				     // up boundary values, just as we
 				     // already did in step-17:
+//TODO (compare against what we do in step-17)    
+    double       sum_of_diagonal     = 0;
+    unsigned int n_diagonal_elements = 0;
+    
+    for (unsigned int i=system_matrix.local_range().first;
+         i<system_matrix.local_range().second; ++i)
+      if (boundary_values.find(i) == boundary_values.end())
+        {
+          ++n_diagonal_elements;
+          sum_of_diagonal += std::fabs(system_matrix.diag_element(i));
+        }
+    const double average_diagonal
+      = sum_of_diagonal / n_diagonal_elements;
+
     for (std::map<unsigned int, double>::const_iterator
 	   boundary_value = boundary_values.begin();
 	 boundary_value != boundary_values.end(); ++boundary_value)
@@ -1485,14 +1502,18 @@ namespace QuasiStaticElasticity
 	  &&
 	  (boundary_value->first < system_matrix.local_range().second))
 	{
-	  Assert (system_matrix.diag_element (boundary_value->first) != 0,
-		  ExcInternalError());
-	
+          system_matrix.set (boundary_value->first,
+                             boundary_value->first,
+                             average_diagonal);
 	  system_rhs(boundary_value->first)
-	    = (boundary_value->second /
-	       system_matrix.diag_element (boundary_value->first));
+	    = (boundary_value->second * average_diagonal);
+//TODO document          
+          incremental_displacement(boundary_value->first)
+            = boundary_value->second;
 	}
 
+//TODO document    
+    system_matrix.compress ();
     system_rhs.compress ();    
   }
 
@@ -1550,7 +1571,9 @@ namespace QuasiStaticElasticity
       distributed_incremental_displacement (mpi_communicator,
 					    dof_handler.n_dofs(),
 					    n_local_dofs);
-
+//TODO document    
+    distributed_incremental_displacement = incremental_displacement;
+    
 //TODO: make more robust against changes in the size of the domain!    
     SolverControl           solver_control (dof_handler.n_dofs(),
 					    1e-16*system_rhs.l2_norm());
@@ -1566,7 +1589,7 @@ namespace QuasiStaticElasticity
     incremental_displacement = distributed_incremental_displacement;
 
     hanging_node_constraints.distribute (incremental_displacement);
-
+    
     return solver_control.last_step();
   }
 
