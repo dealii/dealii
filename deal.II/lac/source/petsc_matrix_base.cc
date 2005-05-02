@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004 by the deal.II authors
+//    Copyright (C) 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -62,11 +62,20 @@ namespace PETScWrappers
       ierr = MatGetRow(*matrix, this->a_row, &ncols, &colnums, &values);
       AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
-                                       // copy it into our caches
-      colnum_cache.reset (new std::vector<unsigned int> (colnums,
-                                                         colnums+ncols));
-      value_cache.reset (new std::vector<PetscScalar> (values, values+ncols));
-
+                                       // copy it into our caches if the line
+                                       // isn't empty
+      if (ncols != 0)
+        {
+          colnum_cache.reset (new std::vector<unsigned int> (colnums,
+                                                             colnums+ncols));
+          value_cache.reset (new std::vector<PetscScalar> (values, values+ncols));
+        }
+      else
+        {
+          colnum_cache.reset ();
+          value_cache.reset ();
+        }
+      
                                        // and finally restore the matrix
       ierr = MatRestoreRow(*matrix, this->a_row, &ncols, &colnums, &values);
       AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
