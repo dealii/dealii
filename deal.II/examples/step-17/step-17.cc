@@ -962,7 +962,7 @@ void ElasticProblem<dim>::assemble_system ()
 		ExcInternalError());
 	
 	system_rhs(boundary_value->first)
-	  = (boundary_value->second /
+	  = (boundary_value->second *
 	     system_matrix.diag_element (boundary_value->first));
       }
 
