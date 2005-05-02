@@ -41,6 +41,11 @@ namespace PETScWrappers
 {
   class SparseMatrix;
   class Vector;
+  namespace MPI
+  {
+    class SparseMatrix;
+    class Vector;
+  }
 }
 #endif
 
@@ -833,6 +838,13 @@ class MatrixTools : public MatrixCreator
 			   PETScWrappers::SparseMatrix  &matrix,
 			   PETScWrappers::Vector  &solution,
 			   PETScWrappers::Vector  &right_hand_side,
+			   const bool             eliminate_columns = true);
+
+    static void
+    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			   PETScWrappers::MPI::SparseMatrix  &matrix,
+			   PETScWrappers::MPI::Vector  &solution,
+			   PETScWrappers::MPI::Vector  &right_hand_side,
 			   const bool             eliminate_columns = true);
 #endif
 
