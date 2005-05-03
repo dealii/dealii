@@ -1118,6 +1118,10 @@ class SparseDirectUMFPACK : public virtual Subscriptor
                                       * Exception
                                       */
     DeclException0 (ExcUMFPACKError);
+				     /**
+				      * Exception
+				      */
+    DeclException0 (ExcNeedsUMFPack);
     
   private:
                                      /**
