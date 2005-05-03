@@ -971,7 +971,7 @@ namespace QuasiStaticElasticity
   template <int dim>
   void
   IncrementalBoundaryValues<dim>::
-  vector_value (const Point<dim> &p,
+  vector_value (const Point<dim> &/*p*/,
                 Vector<double>   &values) const 
   {
     Assert (values.size() == dim, 
