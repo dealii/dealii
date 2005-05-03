@@ -11,8 +11,6 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
-//TODO:
-#define deal_II_dimension 2
 
                                  // First the usual list of header files that
                                  // have already been used in previous example
@@ -142,15 +140,13 @@ namespace QuasiStaticElasticity
     return tmp;
   }
 
-                                   // With this function, we can define a
-                                   // variable that will be used throughout
-                                   // the program as the stress-strain tensor,
-                                   // with values for the Lame constants that
-                                   // are appropriate for steel:
-  const SymmetricTensor<4,deal_II_dimension> stress_strain_tensor
-  = get_stress_strain_tensor<deal_II_dimension> (/*lambda = */ 9.695e10,
-                                                 /*mu     = */ 7.617e10);
-                                   // In more elaborate programs, this will
+                                   // With this function, we will
+                                   // define a static member variable
+                                   // of the main class below that
+                                   // will be used throughout the
+                                   // program as the stress-strain
+                                   // tensor. Note that
+                                   // in more elaborate programs, this will
                                    // probably be a member variable of some
                                    // class instead, or a function that
                                    // returns the stress-strain relationship
@@ -690,7 +686,7 @@ namespace QuasiStaticElasticity
 
       PETScWrappers::MPI::Vector       system_rhs;
 
-      PETScWrappers::Vector       incremental_displacement;
+      PETScWrappers::Vector            incremental_displacement;
 
                                        // The next block of variables is then
                                        // related to the time dependent nature
@@ -737,12 +733,14 @@ namespace QuasiStaticElasticity
 				       // ``local_dofs_per_process[this_mpi_process]''.
       unsigned int         n_local_dofs;
 
-				       // Finally, also cache how many cells
-				       // the present processor owns. Note
-				       // that the cells that belong to a
-				       // processor are not necessarily
-				       // contiguously numbered (when
-				       // iterating over them using
+				       // In the same direction, also
+				       // cache how many cells the
+				       // present processor owns. Note
+				       // that the cells that belong
+				       // to a processor are not
+				       // necessarily contiguously
+				       // numbered (when iterating
+				       // over them using
 				       // ``active_cell_iterator'').
       unsigned int         n_local_cells;
 
@@ -757,6 +755,21 @@ namespace QuasiStaticElasticity
       static
       unsigned int
       get_this_mpi_process (const MPI_Comm &mpi_communicator);
+
+				       // In addition, we have a
+				       // static variable that denotes
+				       // the linear relationship
+				       // between the stress and
+				       // strain. Since it is a
+				       // constant object that does
+				       // not depend on any input (at
+				       // least not in this program),
+				       // we make it a static variable
+				       // and will initialize it in
+				       // the same place where we
+				       // define the constructor of
+				       // this class:
+      static const SymmetricTensor<4,dim> stress_strain_tensor;
   };
 
 
@@ -1018,6 +1031,20 @@ namespace QuasiStaticElasticity
     return rank;
   }
 
+
+      
+				   // Then initialize the
+				   // stress-strain tensor, which we
+				   // have declared as a static const
+				   // variable. We chose Lame
+				   // constants that are appropriate
+				   // for steel:
+  template <int dim>
+  const SymmetricTensor<4,dim>
+  TopLevel<dim>::stress_strain_tensor
+  = get_stress_strain_tensor<dim> (/*lambda = */ 9.695e10,
+				   /*mu     = */ 7.617e10);      
+  
 
 
                                    // @sect4{The public interface}
@@ -2668,7 +2695,7 @@ int main (int argc, char **argv)
       {
         deallog.depth_console (0);
 
-        QuasiStaticElasticity::TopLevel<deal_II_dimension> elastic_problem;
+        QuasiStaticElasticity::TopLevel<2> elastic_problem;
         elastic_problem.run ();
       }
 
