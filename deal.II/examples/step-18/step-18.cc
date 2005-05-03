@@ -1185,7 +1185,69 @@ namespace QuasiStaticElasticity
                                      // and 3:
     triangulation.set_boundary (2, inner_cylinder);
     triangulation.set_boundary (3, outer_cylinder);
-    
+
+                                     // There's one more thing we have to take
+                                     // care of (we should have done so above
+                                     // already, but for didactic reasons it
+                                     // was more appropriate to handle it
+                                     // after discussing boundary
+                                     // objects). Boundary indicators in
+                                     // deal.II, for mostly historic reasons,
+                                     // serve a dual purpose: they describe
+                                     // the type of a boundary for other
+                                     // places in a program where different
+                                     // boundary conditions are implemented;
+                                     // and they describe which boundary
+                                     // object (as the ones associated above)
+                                     // should be queried when new boundary
+                                     // points need to be placed upon mesh
+                                     // refinement. In the prefix to this
+                                     // function, we have discussed the
+                                     // boundary condition issue, and the
+                                     // boundary geometry issue was mentioned
+                                     // just above. But there is a case where
+                                     // we have to be careful with geometry:
+                                     // what happens if a cell is refined that
+                                     // has two faces with different boundary
+                                     // indicators? For example one at the
+                                     // edges of the cylinder? In that case,
+                                     // the library wouldn't know where to put
+                                     // new points in the middle of edges (one
+                                     // of the twelve lines of a
+                                     // hexahedron). In fact, the library
+                                     // doesn't even care about the boundary
+                                     // indicator of adjacent faces when
+                                     // refining edges: it considers the
+                                     // boundary indicators associated with
+                                     // the edges themselves. So what do we
+                                     // want to happen with the edges of the
+                                     // cylinder shell: they sit on both faces
+                                     // with boundary indicators 2 or 3 (inner
+                                     // or outer shell) and 0 or 1 (for which
+                                     // no boundary objects have been
+                                     // specified, and for which the library
+                                     // therefore assumes straight
+                                     // lines). Obviously, we want these lines
+                                     // to follow the curved shells, so we
+                                     // have to assign all edges along faces
+                                     // with boundary indicators 2 or 3 these
+                                     // same boundary indicators to make sure
+                                     // they are refined using the appropriate
+                                     // geometry objects. This is easily done:
+    for (typename Triangulation<dim>::active_face_iterator
+	   face=triangulation.begin_active_face();
+	 face!=triangulation.end_face(); ++face)
+      if (face->at_boundary())
+        if ((face->boundary_indicator() == 2)
+            ||
+            (face->boundary_indicator() == 3))
+          for (unsigned int edge = 0; edge<GeometryInfo<dim>::lines_per_face;
+               ++edge)
+            face->line(edge)
+              ->set_boundary_indicator (face->boundary_indicator());
+
+                                     // Once all this is done, we can refine
+                                     // the mesh once globally:
     triangulation.refine_global (1);
     
 
