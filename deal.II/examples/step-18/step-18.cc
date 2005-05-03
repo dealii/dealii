@@ -1292,12 +1292,19 @@ namespace QuasiStaticElasticity
                                      // ``sparsity_pattern'' variable go out
                                      // of scope without any problem.
                                      
-                                     // The last task in this function is then
-                                     // only to reset the right hand side
-                                     // vector to its correct size:
+                                     // The last task in this function
+                                     // is then only to reset the
+                                     // right hand side vector as well
+                                     // as the solution vector to its
+                                     // correct size; remember that
+                                     // the solution vector is a local
+                                     // one, unlike the right hand
+                                     // side that is a distributed
+                                     // parallel one and therefore
+                                     // needs to know the MPI
+                                     // communicator over which it is
+                                     // supposed to transmit messages:
     system_rhs.reinit (mpi_communicator, dof_handler.n_dofs(), n_local_dofs);
-
-//TODO: document what we do here and why
     incremental_displacement.reinit (dof_handler.n_dofs());
   }
 
@@ -1467,9 +1474,26 @@ namespace QuasiStaticElasticity
 
 				     // The last step is to again fix
 				     // up boundary values, just as we
-				     // already did in step-17:
-//TODO document    
-    PETScWrappers::MPI::Vector tmp (system_rhs);
+				     // already did in previous
+				     // programs. A slight
+				     // complication is that the
+				     // ``apply_boundary_values''
+				     // function wants to have a
+				     // solution vector compatible
+				     // with the matrix and right hand
+				     // side (i.e. here a distributed
+				     // parallel vector, rather than
+				     // the sequential vector we use
+				     // in this program) in order to
+				     // preset the entries of the
+				     // solution vector with the
+				     // correct boundary values. We
+				     // provide such a compatible
+				     // vector in the form of a
+				     // temporary vector which we then
+				     // copy into the sequential one:
+    PETScWrappers::MPI::Vector tmp (mpi_communicator, dof_handler.n_dofs(),
+				    n_local_dofs);
     MatrixTools::apply_boundary_values (boundary_values,
                                         system_matrix, tmp,
                                         system_rhs, false);
