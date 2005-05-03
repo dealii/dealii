@@ -11,6 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include <base/path_search.h>
 
 #include <grid/grid_in.h>
 #include <grid/tria.h>
@@ -994,20 +995,9 @@ template <int dim>
 void GridIn<dim>::read (const std::string& filename,
 			Format format)
 {
-  std::ifstream in(filename.c_str());
-  
-  Assert (in.is_open(), ExcFileNotOpen(filename.c_str()));
-
-//TODO:[GK] Do we really need the following, which does not compile with gcc 2.95?  
-//   if (!in)
-//     {
-//       std::ios_base::iostate state = in.rdstate();
-//       std::cerr << "File open, but error " << state << std::endl;
-//       exit(1);
-//     }
-  
+  PathSearch search("MESH");
+  std::istream& in = search.open(filename.c_str());
   read(in, format);
-  in.close();
 }
 
 

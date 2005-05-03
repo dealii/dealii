@@ -68,7 +68,7 @@ class SubCellData;
  * further details.
  *
  *
- * @sect3{Supported input formats}
+ * <h3>Supported input formats</h3>
  *
  * At present, the following input formats are supported:
  * <ul>
@@ -100,7 +100,7 @@ class SubCellData;
  * </ul>
  *
  *
- * @sect3{Structure of input grid data. The GridReordering class}
+ * <h3>Structure of input grid data. The GridReordering class</h3>
  * 
  * It is your duty to use a correct numbering of vertices in the cell
  * list, i.e. for lines in 1d, you have to first give the vertex with
@@ -203,7 +203,10 @@ class GridIn
 				     /**
 				      * Open the file given by the
 				      * string and call the previous
-				      * function read().
+				      * function read(). This function
+				      * uses the PathSearch mechanism
+				      * to find files. The file class
+				      * used is <code>MESH</code>.
 				      */
     void read (const std::string&, Format format=Default);
     
