@@ -15,6 +15,7 @@
 
 
 #include <lac/full_matrix.h>
+#include <lac/matrix_lib.h>
 #include <multigrid/mg_base.h>
 
 /*!@addtogroup mg */
@@ -31,7 +32,7 @@
  *
  * @author Guido Kanschat, 1999, Ralf Hartmann, 2002.
  */
-template<class SOLVER, class MATRIX, class PRECOND, class VECTOR = Vector<double> >
+template<class SOLVER, class VECTOR = Vector<double> >
 class MGCoarseGridLACIteration :  public MGCoarseGridBase<VECTOR>
 {
   public:
@@ -46,13 +47,20 @@ class MGCoarseGridLACIteration :  public MGCoarseGridBase<VECTOR>
 				      * preconditioning method for later
 				      * use.
 				      */
+    template<class MATRIX, class PRECOND>
     MGCoarseGridLACIteration (SOLVER        &,
 			      const MATRIX  &,
 			      const PRECOND &);
-
+    
+				     /**
+				      * Destructor freeing the pointers.
+				      */
+    ~MGCoarseGridLACIteration ();
+    
 				     /**
 				      * Initialize new data.
 				      */
+    template<class MATRIX, class PRECOND>
     void initialize (SOLVER        &,
 		     const MATRIX  &,
 		     const PRECOND &);
@@ -79,6 +87,7 @@ class MGCoarseGridLACIteration :  public MGCoarseGridBase<VECTOR>
 				      * matrix that was given to the
 				      * constructor by a new matrix.
 				      */
+    template <class MATRIX>
     void set_matrix (const MATRIX &);
     
   private:
@@ -90,13 +99,15 @@ class MGCoarseGridLACIteration :  public MGCoarseGridBase<VECTOR>
 				     /**
 				      * Reference to the matrix.
 				      */
-    SmartPointer<const MATRIX> matrix;
+    PointerMatrixBase<VECTOR>* matrix;
     
 				     /**
 				      * Reference to the preconditioner.
 				      */
-    SmartPointer<const PRECOND> precondition;
+    PointerMatrixBase<VECTOR>* precondition;
 };
+
+
 
 //TODO: Improve QR-factorization to make this more efficient.
 
@@ -166,55 +177,74 @@ class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
 /* ------------------ Functions for MGCoarseGridLACIteration ------------ */
 
 
-template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
-MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
+template<class SOLVER, class VECTOR>
+MGCoarseGridLACIteration<SOLVER, VECTOR>
 ::MGCoarseGridLACIteration()
 		:
 		solver(0, typeid(*this).name()),
-		matrix(0, typeid(*this).name()),
-		precondition(0, typeid(*this).name())
+		matrix(0),
+		precondition(0)
 {}
 
 
-template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
-MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
+template<class SOLVER, class VECTOR>
+template<class MATRIX, class PRECOND>
+MGCoarseGridLACIteration<SOLVER, VECTOR>
 ::MGCoarseGridLACIteration(SOLVER& s,
 			   const MATRIX  &m,
 			   const PRECOND &p)
 		:
-		solver(&s, typeid(*this).name()),
-		matrix(&m, typeid(*this).name()),
-		precondition(&p, typeid(*this).name())
-{}
+		solver(&s, typeid(*this).name())
+{
+  matrix = new PointerMatrix<MATRIX, VECTOR>(&m);
+  precondition = new PointerMatrix<PRECOND, VECTOR>(&p);
+}
 
 
-template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
+template<class SOLVER, class VECTOR>
+MGCoarseGridLACIteration<SOLVER, VECTOR>
+::~MGCoarseGridLACIteration()
+{
+  clear();
+}
+
+
+template<class SOLVER, class VECTOR>
+template<class MATRIX, class PRECOND>
 void
-MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
+MGCoarseGridLACIteration<SOLVER, VECTOR>
 ::initialize(SOLVER& s,
 	     const MATRIX  &m,
 	     const PRECOND &p)
 {
   solver = &s;
-  matrix = &m;
-  precondition = &p;
+  if (matrix)
+    delete matrix;
+  matrix = new PointerMatrix<MATRIX, VECTOR>(&m);
+  if (precondition)
+    delete precondition;
+  precondition = new PointerMatrix<PRECOND, VECTOR>(&p);
 }
 
 
-template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
+template<class SOLVER, class VECTOR>
 void
-MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
+MGCoarseGridLACIteration<SOLVER, VECTOR>
 ::clear()
 {
   solver = 0;
+  if (matrix)
+    delete matrix;
   matrix = 0;
+  if (precondition)
+    delete precondition;
   precondition = 0;
 }
 
 
-template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
+template<class SOLVER, class VECTOR>
 void
-MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
+MGCoarseGridLACIteration<SOLVER, VECTOR>
 ::operator() (const unsigned int    /* level */,
 	      VECTOR       &dst,
 	      const VECTOR &src) const
@@ -226,12 +256,15 @@ MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
 }
 
 
-template<class SOLVER, class MATRIX, class PRECOND, class VECTOR>
+template<class SOLVER, class VECTOR>
+template<class MATRIX>
 void
-MGCoarseGridLACIteration<SOLVER, MATRIX, PRECOND, VECTOR>
+MGCoarseGridLACIteration<SOLVER, VECTOR>
 ::set_matrix(const MATRIX &m)
 {
-  matrix=&m;
+  if (matrix)
+    delete matrix;
+  matrix = new PointerMatrix<MATRIX, VECTOR>(&m);
 }
 
 //---------------------------------------------------------------------------

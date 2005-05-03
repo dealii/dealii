@@ -42,6 +42,15 @@ inconvenience this causes.
 
 
 <ol>
+  <li> <p>Changed: The class <code
+  class="class">MGCoarseGridLACIteration</code> lost two template
+  arguments. Since the matrix and preconditioner are now stored in
+  form of <code class="class">PointerMatrix</code> objects, handling
+  of the class is much simpler, in particular when exchanging
+  preconditioners.
+  <br> (GK 2005/05/03)
+  </p>
+
   <li> <p>Changed: The template argument of <code
   class="class">BlockMatrixArray</code> was changed to
   <tt>number</tt>, equal to the same argument of the used <code
