@@ -1472,7 +1472,7 @@ namespace QuasiStaticElasticity
     PETScWrappers::MPI::Vector tmp (system_rhs);
     MatrixTools::apply_boundary_values (boundary_values,
                                         system_matrix, tmp,
-                                        system_rhs);
+                                        system_rhs, false);
     incremental_displacement = tmp;
   }
 
