@@ -842,8 +842,29 @@ class MatrixTools : public MatrixCreator
 			   const bool             eliminate_columns = true);
 
                                      /**
-                                      * Same function, but for parallel PETSc
-                                      * matrices.
+                                      * Same function, but for
+                                      * parallel PETSc matrices. Note
+                                      * that this function only
+                                      * operates on the local range of
+                                      * the parallel matrix, i.e. it
+                                      * only eliminates rows
+                                      * corresponding to degrees of
+                                      * freedom for which the row is
+                                      * stored on the present
+                                      * processor. All other boundary
+                                      * nodes are ignored, and it
+                                      * doesn't matter whether they
+                                      * are present in the first
+                                      * argument to this function or
+                                      * not. A consequence of this,
+                                      * however, is that this function
+                                      * has to be called from all
+                                      * processors that participate in
+                                      * sharing the contents of the
+                                      * given matrices and vectors. It
+                                      * is also implied that the local
+                                      * range for all objects passed
+                                      * to this function is the same.
                                       */
     static void
     apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
