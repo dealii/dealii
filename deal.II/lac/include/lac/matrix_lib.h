@@ -52,7 +52,13 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
     ProductMatrix(const MATRIX1& m1,
 		  const MATRIX2& m2,
 		  VectorMemory<VECTOR>& mem);
-
+    
+				     /**
+				      * Change the matrices.
+				      */
+    template <class MATRIX1, class MATRIX2>
+    void reinit(const MATRIX1& m1, const MATRIX2& m2);
+    
 				     /**
 				      * Destructor.
 				      */
@@ -299,6 +305,20 @@ ProductMatrix<VECTOR>::ProductMatrix (
 {
   m1 = new PointerMatrix<MATRIX1, VECTOR>(&mat1);
   m2 = new PointerMatrix<MATRIX2, VECTOR>(&mat2);
+}
+
+
+template<class VECTOR>
+template<class MATRIX1, class MATRIX2>
+void
+ProductMatrix<VECTOR>::reinit (
+  const MATRIX1& mat1,
+  const MATRIX2& mat2)
+{
+  delete m1;
+  delete m2;
+  m1 = new PointerMatrix<MATRIX1, VECTOR>(&mat1);
+  m2 = new PointerMatrix<MATRIX2, VECTOR>(&mat2);  
 }
 
 
