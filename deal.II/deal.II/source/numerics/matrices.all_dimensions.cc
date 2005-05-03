@@ -694,6 +694,9 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                                    // used for both petsc matrix types
   PETScWrappers::apply_boundary_values (boundary_values, matrix, solution,
                                         right_hand_side, preserve_symmetry);
+
+				   // compress the matrix once we're done
+  matrix.compress ();  
 }
 
 
