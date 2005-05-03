@@ -851,15 +851,10 @@ namespace PETScWrappers
           accessor.a_index = 0;
           ++accessor.a_row;
       
-          while (accessor.a_index >= accessor.matrix->row_length(accessor.a_row))
-            {
-              ++accessor.a_row;
-
-                                           // if we happened to find the end
-                                           // of the matrix, then stop here
-              if (accessor.a_row == accessor.matrix->m())
-                break;
-            }
+          while ((accessor.a_row < accessor.matrix->m())
+                 &&
+                 (accessor.matrix->row_length(accessor.a_row) == 0))
+            ++accessor.a_row;
 
           accessor.visit_present_row();
         }
