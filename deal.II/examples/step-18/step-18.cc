@@ -1531,22 +1531,32 @@ namespace QuasiStaticElasticity
 
                                    // @sect4{TopLevel::solve_linear_problem}
 
-                                   // Solving the linear system again works
-                                   // mostly as before. The only difference is
-                                   // that we want to only keep a complete
-                                   // local copy of the solution vector
-                                   // instead of the distributed one that we
-                                   // get as output from PETSc's solver
-                                   // routines. To this end, we declare a
-                                   // local temporary variable for the
-                                   // distributed vector, solve with it, and
-                                   // at the end of the function copy it again
-                                   // into the complete local vector that we
-                                   // declared as a member variable. Hanging
-                                   // node constraints are then distributed
+                                   // Solving the linear system again
+                                   // works mostly as before. The only
+                                   // difference is that we want to
+                                   // only keep a complete local copy
+                                   // of the solution vector instead
+                                   // of the distributed one that we
+                                   // get as output from PETSc's
+                                   // solver routines. To this end, we
+                                   // declare a local temporary
+                                   // variable for the distributed
+                                   // vector and initialize it with
+                                   // the contents of the local
+                                   // variable (remember that the
+                                   // ``apply_boundary_values''
+                                   // function called in
+                                   // ``assemble_system'' preset the
+                                   // values of boundary nodes in this
+                                   // vector), solve with it, and at
+                                   // the end of the function copy it
+                                   // again into the complete local
+                                   // vector that we declared as a
+                                   // member variable. Hanging node
+                                   // constraints are then distributed
                                    // only on the local copy,
-                                   // i.e. independently of each other on each
-                                   // of the processors:
+                                   // i.e. independently of each other
+                                   // on each of the processors:
   template <int dim>
   unsigned int TopLevel<dim>::solve_linear_problem () 
   {
@@ -1554,7 +1564,6 @@ namespace QuasiStaticElasticity
       distributed_incremental_displacement (mpi_communicator,
 					    dof_handler.n_dofs(),
 					    n_local_dofs);
-//TODO document    
     distributed_incremental_displacement = incremental_displacement;
     
 //TODO: make more robust against changes in the size of the domain!    
