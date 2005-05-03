@@ -2337,47 +2337,67 @@ namespace QuasiStaticElasticity
 
                                    // @sect4{TopLevel::update_quadrature_point_history}
 
-                                   // At the end of each time step, we should
-                                   // have computed an incremental
-                                   // displacement update so that the material
-                                   // in its new configuration accomodates for
-                                   // the difference between the external body
-                                   // and boundary forces applied during this
-                                   // time step minus the forces exerted
+                                   // At the end of each time step, we
+                                   // should have computed an
+                                   // incremental displacement update
+                                   // so that the material in its new
+                                   // configuration accomodates for
+                                   // the difference between the
+                                   // external body and boundary
+                                   // forces applied during this time
+                                   // step minus the forces exerted
                                    // through pre-existing internal
                                    // stresses. In order to have the
-                                   // pre-existing stresses available at the
-                                   // next time step, we therefore have to
-                                   // update the pre-existing stresses with
-                                   // the stresses due to the incremental
-                                   // displacement computed during the present
-                                   // time step. Ideally, the resulting sum of
-                                   // internal stresses would exactly counter
-                                   // all external forces. Indeed, a simple
-                                   // experiment can make sure that this is
-                                   // so: if we choose boundary conditions and
-                                   // body forces to be time independent, then
-                                   // the forcing terms (the sum of external
-                                   // forces and internal stresses) should be
-                                   // exactly zero. If you make this
-                                   // experiment, you will realize from the
-                                   // output of the norm of the right hand
-                                   // side in each time step that this is
-                                   // almost the case: it is not exactly zero,
+                                   // pre-existing stresses available
+                                   // at the next time step, we
+                                   // therefore have to update the
+                                   // pre-existing stresses with the
+                                   // stresses due to the incremental
+                                   // displacement computed during the
+                                   // present time step. Ideally, the
+                                   // resulting sum of internal
+                                   // stresses would exactly counter
+                                   // all external forces. Indeed, a
+                                   // simple experiment can make sure
+                                   // that this is so: if we choose
+                                   // boundary conditions and body
+                                   // forces to be time independent,
+                                   // then the forcing terms (the sum
+                                   // of external forces and internal
+                                   // stresses) should be exactly
+                                   // zero. If you make this
+                                   // experiment, you will realize
+                                   // from the output of the norm of
+                                   // the right hand side in each time
+                                   // step that this is almost the
+                                   // case: it is not exactly zero,
                                    // since in the first time step the
-                                   // incremental displacement and stress
-                                   // updates were computed relative to the
-                                   // undeformed mesh, which was then
-                                   // deformed. In the second time step, we
-                                   // again compute displacement and stress
-                                   // updates, but this time in the deformed
-                                   // mesh -- there, the resulting updates are
-                                   // very small but not quite zero. This can
-                                   // be iterated, and in each such iteration
-                                   // the residual, i.e. the norm of the right
-                                   // hand side vector, is reduced by
-
-//TODO: compute amount  
+                                   // incremental displacement and
+                                   // stress updates were computed
+                                   // relative to the undeformed mesh,
+                                   // which was then deformed. In the
+                                   // second time step, we again
+                                   // compute displacement and stress
+                                   // updates, but this time in the
+                                   // deformed mesh -- there, the
+                                   // resulting updates are very small
+                                   // but not quite zero. This can be
+                                   // iterated, and in each such
+                                   // iteration the residual, i.e. the
+                                   // norm of the right hand side
+                                   // vector, is reduced; if one makes
+                                   // this little experiment, one
+                                   // realizes that the norm of this
+                                   // residual decays exponentially
+                                   // with the number of iterations,
+                                   // and after an initial very rapid
+                                   // decline is reduced by roughly a
+                                   // factor of about 3.5 in each
+                                   // iteration (for one testcase I
+                                   // looked at, other testcases, and
+                                   // other numbers of unknowns change
+                                   // the factor, but not the
+                                   // exponential decay).
 
                                    // In a sense, this can then be considered
                                    // as a quasi-timestepping scheme to
