@@ -519,6 +519,153 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 
 #ifdef DEAL_II_USE_PETSC
 
+namespace PETScWrappers
+{
+  template <typename PETScMatrix, typename PETScVector>
+  void
+  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+                         PETScMatrix      &matrix,
+                         PETScVector      &solution,
+                         PETScVector      &right_hand_side,
+                         const bool        preserve_symmetry)
+  {
+    Assert (preserve_symmetry == false, ExcNotImplemented());
+
+    Assert (matrix.n() == right_hand_side.size(),
+            ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
+    Assert (matrix.n() == solution.size(),
+            ExcDimensionMismatch(matrix.n(), solution.size()));
+
+                                     // if no boundary values are to be applied
+                                     // simply return
+    if (boundary_values.size() == 0)
+      return;
+
+
+                                     // we have to read and write from this
+                                     // matrix (in this order). this will only
+                                     // work if we compress the matrix first,
+                                     // done here. do the same with the other
+                                     // objects just to be on the safe side:
+    matrix.compress ();
+    solution.compress ();
+    right_hand_side.compress ();
+
+    const std::pair<unsigned int, unsigned int> local_range
+      = matrix.local_range();
+    
+                                     // determine the first nonzero diagonal
+                                     // entry from within the part of the matrix
+                                     // that we can see. if we can't find such
+                                     // an entry, take one
+    PetscScalar average_nonzero_diagonal_entry = 1;
+    for (unsigned int i=local_range.first;
+         i<local_range.second; ++i)
+      if (matrix.diag_element(i) != 0)
+        {
+          average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
+          break;
+        }
+
+                                     // iterate over all fixed degrees of
+                                     // freedom that are within the local
+                                     // range of this matrix. the function is
+                                     // pretty awkward to implement, since we
+                                     // can't freely mix reading and writing
+                                     // from the matrix without global
+                                     // synchronisation, so we first determine
+                                     // which are the entries we have to work
+                                     // on in a first step, and then come back
+                                     // and do that all at once
+    {
+      matrix.compress ();
+      
+      std::map<unsigned int,double>::const_iterator
+        dof  = boundary_values.begin(),
+        endd = boundary_values.end();
+      std::vector<std::pair<unsigned int, unsigned int> >
+        set_to_zero_entries;
+      
+      for (; dof != endd; ++dof)
+        if ((dof->first >= local_range.first) &&
+            (dof->first < local_range.second))
+          {
+            const unsigned int dof_number = dof->first;
+      
+                                             // for each constrained dof:
+      
+                                             // store which entries of this line
+                                             // to set to zero except for the
+                                             // diagonal entry.
+            PETScWrappers::MatrixBase::const_iterator
+              p = matrix.begin(dof_number),
+              e = matrix.end(dof_number);
+
+            for (; p!=e; ++p)
+              {
+                Assert (p->row() == dof_number, ExcInternalError());
+                
+                if (p->column() != dof_number)
+                  set_to_zero_entries.push_back (std::make_pair (dof_number,
+                                                                 p->column()));
+              }
+          }
+
+                                       // now set all these entries to zero in
+                                       // one bulk operation that requires
+                                       // only a single synchronisation:
+      matrix.compress ();
+      for (std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
+             i = set_to_zero_entries.begin();
+           i != set_to_zero_entries.end(); ++i)
+        matrix.set (i->first, i->second, 0.);
+    }
+      
+
+                                           // the next thing is to set right
+                                           // hand side to wanted value. note
+                                           // that for petsc matrices
+                                           // interleaving read with write
+                                           // operations is very
+                                           // expensive. thus, we here always
+                                           // replace the diagonal element,
+                                           // rather than first checking
+                                           // whether it is nonzero and in
+                                           // that case preserving it. this is
+                                           // different from the case of
+                                           // deal.II sparse matrices treated
+                                           // in the other functions.
+    {
+      matrix.compress ();
+
+      std::map<unsigned int,double>::const_iterator
+        dof  = boundary_values.begin(),
+        endd = boundary_values.end();
+
+      for (; dof != endd; ++dof)
+        if ((dof->first >= local_range.first) &&
+            (dof->first < local_range.second))
+          {  
+            const unsigned int dof_number = dof->first;
+
+            matrix.set (dof_number, dof_number,
+                        average_nonzero_diagonal_entry);
+            right_hand_side(dof_number)
+              = dof->second * average_nonzero_diagonal_entry;
+
+                                             // preset solution vector
+            solution(dof_number) = dof->second;
+          }
+    }
+    
+    matrix.compress ();
+    solution.compress ();
+    right_hand_side.compress ();
+  }
+}
+
+
+
 void
 MatrixTools::
 apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
@@ -527,117 +674,10 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                        PETScWrappers::Vector   &right_hand_side,
                        const bool        preserve_symmetry)
 {
-  Assert (matrix.n() == right_hand_side.size(),
-	  ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-  Assert (matrix.n() == solution.size(),
-	  ExcDimensionMismatch(matrix.n(), solution.size()));
-
-                                   // if no boundary values are to be applied
-				   // simply return
-  if (boundary_values.size() == 0)
-    return;
-
-
-                                   // we have to read and write from this
-                                   // matrix (in this order). this will only
-                                   // work if we compress the matrix first,
-                                   // done here. do the same with the other
-                                   // objects just to be on the safe side:
-  matrix.compress ();
-  solution.compress ();
-  right_hand_side.compress ();
-  
-  const unsigned int n_dofs = matrix.m();
-
-				   // if a diagonal entry is zero
-				   // later, then we use another
-				   // number instead. take it to be
-				   // the first nonzero diagonal
-				   // element of the matrix, or 1 if
-				   // there is no such thing
-  PetscScalar first_nonzero_diagonal_entry = 1;
-  for (unsigned int i=0; i<n_dofs; ++i)
-    if (matrix.diag_element(i) != 0)
-      {
-	first_nonzero_diagonal_entry = matrix.diag_element(i);
-	break;
-      }
-
-  
-  std::map<unsigned int,double>::const_iterator
-    dof  = boundary_values.begin(),
-    endd = boundary_values.end();
-  for (; dof != endd; ++dof)
-    {
-      Assert (dof->first < n_dofs, ExcInternalError());
-      
-      const unsigned int dof_number = dof->first;
-      
-				       // for each constrained dof:
-      
-				       // set entries of this line
-				       // to zero except for the diagonal
-				       // entry.
-      {
-        PETScWrappers::MatrixBase::const_iterator
-          p = matrix.begin(dof_number),
-          e = matrix.end(dof_number);
-
-                                         // iterate over all elements of this
-                                         // row and set elements to zero
-                                         // except for the diagonal
-                                         // element. note that this is not
-                                         // exactly clean programming, since
-                                         // we change the matrix underneath,
-                                         // while we still keep working with
-                                         // the iterators into it
-        for (; p!=e; ++p)
-          if (p->column() != dof_number)
-            matrix.set (dof_number, p->column(), 0.);
-      }
-      
-
-				       // set right hand side to wanted value;
-				       // also store the new rhs entry to make
-				       // the gauss step (when preserving the
-				       // symmetry of the matrix) more
-				       // efficient
-                                       //
-                                       // note that for petsc matrices
-                                       // interleaving read with write
-                                       // operations is very expensive. thus,
-                                       // we here always replace the diagonal
-                                       // element, rather than first checking
-                                       // whether it is nonzero and in that
-                                       // case preserving it. this is
-                                       // different from the case of deal.II
-                                       // sparse matrices treated in the other
-                                       // functions.
-      PetscScalar new_rhs;
-      matrix.set (dof_number, dof_number,
-                  first_nonzero_diagonal_entry);
-      new_rhs = dof->second * first_nonzero_diagonal_entry;
-      right_hand_side(dof_number) = new_rhs;
-
-				       // if the user wants to have
-				       // the symmetry of the matrix
-				       // preserved, and if the
-				       // sparsity pattern is
-				       // symmetric, then do a Gauss
-				       // elimination step with the
-				       // present row
-      if (preserve_symmetry)
-	{
-          Assert (false, ExcNotImplemented());
-	}
-
-				       // preset solution vector
-      solution(dof_number) = dof->second;
-    }
-
-  matrix.compress ();
-  solution.compress ();
-  right_hand_side.compress ();
+                                   // simply redirect to the generic function
+                                   // used for both petsc matrix types
+  PETScWrappers::apply_boundary_values (boundary_values, matrix, solution,
+                                        right_hand_side, preserve_symmetry);
 }
 
 
@@ -650,121 +690,10 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                        PETScWrappers::MPI::Vector   &right_hand_side,
                        const bool        preserve_symmetry)
 {
-                                   // this function works almost exactly as
-                                   // the one above, with the only exception
-                                   // that we have to make sure that we only
-                                   // access elements that belong to the slice
-                                   // of the matrix that is available locally
-  Assert (matrix.n() == right_hand_side.size(),
-	  ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
-  Assert (matrix.n() == solution.size(),
-	  ExcDimensionMismatch(matrix.n(), solution.size()));
-
-                                   // if no boundary values are to be applied
-				   // simply return
-  if (boundary_values.size() == 0)
-    return;
-
-
-                                   // we have to read and write from this
-                                   // matrix (in this order). this will only
-                                   // work if we compress the matrix first,
-                                   // done here. do the same with the other
-                                   // objects just to be on the safe side:
-  matrix.compress ();
-  solution.compress ();
-  right_hand_side.compress ();
-  
-				   // determine the first nonzero diagonal
-				   // entry from within the part of the matrix
-				   // that we can see. if we can't find such
-				   // an entry, take one
-  PetscScalar first_nonzero_diagonal_entry = 1;
-  for (unsigned int i=matrix.local_range().first;
-       i<matrix.local_range().second; ++i)
-    if (matrix.diag_element(i) != 0)
-      {
-	first_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
-	break;
-      }
-
-                                   // iterate over all fixed degrees of
-                                   // freedom that are within the local range
-                                   // of this matrix
-  std::map<unsigned int,double>::const_iterator
-    dof  = boundary_values.begin(),
-    endd = boundary_values.end();
-  for (; dof != endd; ++dof)
-    if ((dof->first >= matrix.local_range().first) &&
-        (dof->first < matrix.local_range().second))
-      {
-        const unsigned int dof_number = dof->first;
-      
-                                         // for each constrained dof:
-      
-                                         // set entries of this line
-                                         // to zero except for the diagonal
-                                         // entry.
-        {
-          PETScWrappers::MatrixBase::const_iterator
-            p = matrix.begin(dof_number),
-            e = matrix.end(dof_number);
-
-                                           // iterate over all elements of this
-                                           // row and set elements to zero
-                                           // except for the diagonal
-                                           // element. note that this is not
-                                           // exactly clean programming, since
-                                           // we change the matrix underneath,
-                                           // while we still keep working with
-                                           // the iterators into it
-          for (; p!=e; ++p)
-            if (p->column() != dof_number)
-              matrix.set (dof_number, p->column(), 0.);
-        }
-      
-
-				       // set right hand side to wanted value;
-				       // also store the new rhs entry to make
-				       // the gauss step (when preserving the
-				       // symmetry of the matrix) more
-				       // efficient
-                                       //
-                                       // note that for petsc matrices
-                                       // interleaving read with write
-                                       // operations is very expensive. thus,
-                                       // we here always replace the diagonal
-                                       // element, rather than first checking
-                                       // whether it is nonzero and in that
-                                       // case preserving it. this is
-                                       // different from the case of deal.II
-                                       // sparse matrices treated in the other
-                                       // functions.
-      PetscScalar new_rhs;
-      matrix.set (dof_number, dof_number,
-                  first_nonzero_diagonal_entry);
-      new_rhs = dof->second * first_nonzero_diagonal_entry;
-      right_hand_side(dof_number) = new_rhs;
-
-				       // if the user wants to have
-				       // the symmetry of the matrix
-				       // preserved, and if the
-				       // sparsity pattern is
-				       // symmetric, then do a Gauss
-				       // elimination step with the
-				       // present row
-      if (preserve_symmetry)
-	{
-          Assert (false, ExcNotImplemented());
-	}
-
-				       // preset solution vector
-      solution(dof_number) = dof->second;
-    }
-
-  matrix.compress ();
-  solution.compress ();
-  right_hand_side.compress ();
+                                   // simply redirect to the generic function
+                                   // used for both petsc matrix types
+  PETScWrappers::apply_boundary_values (boundary_values, matrix, solution,
+                                        right_hand_side, preserve_symmetry);
 }
 
 
