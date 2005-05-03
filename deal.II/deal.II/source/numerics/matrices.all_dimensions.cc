@@ -66,7 +66,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
       {
 	first_nonzero_diagonal_entry = matrix.diag_element(i);
 	break;
-      };
+      }
 
   
   std::map<unsigned int,double>::const_iterator dof  = boundary_values.begin(),
@@ -324,7 +324,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 	  
 	  for (unsigned int j=first; j<last; ++j)
 	    matrix.block(block_index.first,block_col).global_entry(j) = 0.;
-	};
+	}
       
 
 				       // set right hand side to
@@ -352,7 +352,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 	    .diag_element(block_index.second)
 	    = first_nonzero_diagonal_entry;
 	  new_rhs = dof->second * first_nonzero_diagonal_entry;
-	};
+	}
       right_hand_side.block(block_index.first)(block_index.second)
 	= new_rhs;
 
