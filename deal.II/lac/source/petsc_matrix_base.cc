@@ -336,7 +336,7 @@ namespace PETScWrappers
 //query this information from PETSc
     int ierr;
     ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
-    Assert (ierr == 0, MatrixBase::ExcPETScError(ierr));
+    AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
                                      // then restore the matrix and return the
                                      // number of columns in this row as
