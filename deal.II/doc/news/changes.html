@@ -273,6 +273,13 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: The PETSc matrix iterators had trouble when some rows of a
+       matrix were empty. This has now been mostly fixed.
+       <br> 
+       (WB, 2005/05/02)
+       </p>
+
+  <li> <p>
        Fixed: The <code class="class">PETScWrappers::MPI::SparseMatrix</code>
        class had functions that allow to take a pre-existing sparsity pattern
        as the basis for entry allocation. These function had an option to
