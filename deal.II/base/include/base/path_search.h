@@ -119,6 +119,14 @@ class PathSearch
 		       const std::string& suffix);
     
 				     /**
+				      * Return the actual name of the
+				      * file opened by the previous
+				      * call to one of the open()
+				      * functions.
+				      */
+    const std::string& name() const;
+
+				     /**
 				      * Show the paths and suffixes
 				      * used for this object.
 				      */
@@ -189,7 +197,7 @@ class PathSearch
     static std::vector<std::string>& get_suffix_list(const std::string& cls);
     
 				     /**
-				      * The flie class handled by this object.
+				      * The file class handled by this object.
 				      */
     const std::string cls;
     
@@ -221,6 +229,12 @@ class PathSearch
     std::auto_ptr<std::ifstream> stream;
 
 				     /**
+				      * The actual name of the file
+				      * that was opened previously.
+				      */
+    std::string real_name;
+    
+				     /**
 				      * Debug flag. No output if zero.
 				      */
     const unsigned int debug;
@@ -232,7 +246,17 @@ class PathSearch
 };
 
 
+inline
+const std::string&
+PathSearch::name () const
+{
+  return real_name;
+}
+
+
+
 template <class STREAM>
+inline
 void
 PathSearch::show(STREAM& out) const
 {

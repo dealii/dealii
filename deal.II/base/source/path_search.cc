@@ -81,7 +81,6 @@ std::istream&
 PathSearch::open (const std::string& filename,
 		  const std::string& suffix)
 {
-  std::string name;
   std::vector<std::string>::const_iterator path;
   const std::vector<std::string>::const_iterator endp = my_path_list.end();
 
@@ -93,16 +92,16 @@ PathSearch::open (const std::string& filename,
 				   // Try without suffix first
   for (path = my_path_list.begin(); path != endp; ++path)
     {
-      name = *path + filename;
+      real_name = *path + filename;
       if (debug > 1)
 	deallog << "PathSearch[" << cls << "] trying "
-		<< name << std::endl;
-      stream.reset(new std::ifstream(name.c_str()));
+		<< real_name << std::endl;
+      stream.reset(new std::ifstream(real_name.c_str()));
       if (stream->is_open())
 	{
 	  if (debug > 0)
 	    deallog << "PathSearch[" << cls << "] opened "
-		    << name << std::endl;
+		    << real_name << std::endl;
 	  return *stream;
 	}
     }
@@ -110,16 +109,16 @@ PathSearch::open (const std::string& filename,
 				   // Now try with given suffix
   for (path = my_path_list.begin(); path != endp; ++path)
     {
-      name = *path + filename + suffix;
+      real_name = *path + filename + suffix;
       if (debug > 1)
 	deallog << "PathSearch[" << cls << "] trying "
-		<< name << std::endl;
-      stream.reset(new std::ifstream(name.c_str()));
+		<< real_name << std::endl;
+      stream.reset(new std::ifstream(real_name.c_str()));
       if (stream->is_open())
 	{
 	  if (debug > 0)
 	    deallog << "PathSearch[" << cls << "] opened "
-		    << name << std::endl;
+		    << real_name << std::endl;
 	  return *stream;
 	}
     }
@@ -131,7 +130,6 @@ PathSearch::open (const std::string& filename,
 std::istream&
 PathSearch::open (const std::string& filename)
 {
-  std::string name;
   std::vector<std::string>::const_iterator suffix;
   std::vector<std::string>::const_iterator path;
   const std::vector<std::string>::const_iterator ends = my_suffix_list.end();
@@ -147,16 +145,16 @@ PathSearch::open (const std::string& filename)
     {
       for (path = my_path_list.begin(); path != endp; ++path)
 	{
-	  name = *path + filename + *suffix;
+	  real_name = *path + filename + *suffix;
 	  if (debug > 1)
 	    deallog << "PathSearch[" << cls << "] trying "
-		    << name << std::endl;
-	  stream.reset(new std::ifstream(name.c_str()));
+		    << real_name << std::endl;
+	  stream.reset(new std::ifstream(real_name.c_str()));
 	  if (stream->is_open())
 	    {
 	      if (debug > 0)
 		deallog << "PathSearch[" << cls << "] opened "
-			<< name << std::endl;
+			<< real_name << std::endl;
 	      return *stream;
 	    }
 	}
