@@ -126,7 +126,7 @@ namespace QuasiStaticElasticity
                                    // to symmetric tensors of rank 2. A
                                    // function implementing its creation for
                                    // given values of the Lame constants
-                                   // lambda and my is straightforward:
+                                   // lambda and mu is straightforward:
   template <int dim>
   SymmetricTensor<4,dim>
   get_stress_strain_tensor (const double lambda, const double mu)
