@@ -70,7 +70,7 @@ else
 # libraries which we want to link to the object file, and there need
 # to be two sets of libraries: one for the debug mode version of the
 # application and one for the optimized mode. Here we have selected
-# the versions for 2d. Note that the order in which the libraries are
+# the versions for 3d. Note that the order in which the libraries are
 # given here is important and that your applications won't link
 # properly if they are given in another order.
 #
