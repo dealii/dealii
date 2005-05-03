@@ -995,8 +995,23 @@ template <int dim>
 void GridIn<dim>::read (const std::string& filename,
 			Format format)
 {
+				   // Search file class for meshes
   PathSearch search("MESH");
+				   // Open the file and remember its name
   std::istream& in = search.open(filename.c_str());
+  const std::string& name = search.name();  
+  
+  if (format == Default)
+    {
+      const unsigned int slashpos = name.find_last_of('/');
+      const unsigned int dotpos = name.find_last_of('.');
+      if (dotpos < name.length()
+	  && (dotpos > slashpos || slashpos == name.length()))
+	{
+	  std::string ext = name.substr(dotpos+1);
+	  format = parse_format(ext);
+	}
+    }
   read(in, format);
 }
 
@@ -1066,6 +1081,9 @@ GridIn<dim>::parse_format (const std::string &format_name)
   if (format_name == "msh")
     return msh;
   
+  if (format_name == "inp")
+    return ucd;
+
   if (format_name == "ucd")
     return ucd;
 
