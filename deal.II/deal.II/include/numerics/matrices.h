@@ -679,34 +679,43 @@ class MatrixCreator
  *
  * @sect3{Local elimination}
  *
- * The second way of handling boundary values is to modify the local matrix
- * and vector contributions appropriately before transferring them into the
- * global sparse matrix and vector. This is what local_apply_boundary_values()
- * does. The advantage is that we save the call to the apply_boundary_values
- * function (which is expensive because it has to work on sparse data
- * structures). On the other hand, the local_apply_boundary_values() function
- * is called many times, even if we only have a very small number of fixed
- * boundary nodes.
+ * The second way of handling boundary values is to modify the local
+ * matrix and vector contributions appropriately before transferring
+ * them into the global sparse matrix and vector. This is what
+ * local_apply_boundary_values() does. The advantage is that we save
+ * the call to the apply_boundary_values function (which is expensive
+ * because it has to work on sparse data structures). On the other
+ * hand, the local_apply_boundary_values() function is called many
+ * times, even if we only have a very small number of fixed boundary
+ * nodes, and the main drawback is that this function doesn't work as
+ * expected if there are hanging nodes that also need to be
+ * treated. The reason that this function doesn't work is that it is
+ * meant to be run before distribution into the global matrix,
+ * i.e. before hanging nodes are distributed; since hanging nodes can
+ * be constrained to a boundary node, the treatment of hanging nodes
+ * can add entries again to rows and columns corresponding to boundary
+ * values and that we have already vacated in the local elimination
+ * step. To make things worse, in 3d constrained nodes can even lie on
+ * the boundary. Thus, it is imperative that boundary node elimination
+ * happens @em after hanging node elimination, but this can't be
+ * achieved with local elimination of boundary nodes unless there are
+ * no hanging node constraints at all.
  *
- * However, since we do not have access to the data structures of some sparse
- * matrix formats (e.g. the PETSc matrix classes), this may be the only way to
- * get rid of boundary nodes for these matrix formats. In general, this
- * function should not be a loss in efficiency over the global one.
- *
- * Local elimination has one drawback: we don't have access to the solution
- * vector, only to the local contributions to the matrix and right hand
- * side. The problem with this is subtle, but can lead to very hard to find
- * difficulties: when we eliminate a degree of freedom, we delete the row and
- * column of this unknown, and set the diagonal entry to some positive
- * value. To make the problem more or less well-conditioned, we set this
- * diagonal entry to the absolute value of its prior value if that was
- * non-zero, or to the average magnitude of all other nonzero diagonal
- * elements. Then we set the right hand side value such that the resulting
- * solution entry has the right value as given by the boundary values. Since
- * we add these contributions up over all local contributions, the diagonal
- * entry and the respective value in the right hand side are added up
- * correspondingly, so that the entry in the solution of the linear system is
- * still valid.
+ * Local elimination has one additional drawback: we don't have access
+ * to the solution vector, only to the local contributions to the
+ * matrix and right hand side. The problem with this is subtle, but
+ * can lead to very hard to find difficulties: when we eliminate a
+ * degree of freedom, we delete the row and column of this unknown,
+ * and set the diagonal entry to some positive value. To make the
+ * problem more or less well-conditioned, we set this diagonal entry
+ * to the absolute value of its prior value if that was non-zero, or
+ * to the average magnitude of all other nonzero diagonal
+ * elements. Then we set the right hand side value such that the
+ * resulting solution entry has the right value as given by the
+ * boundary values. Since we add these contributions up over all local
+ * contributions, the diagonal entry and the respective value in the
+ * right hand side are added up correspondingly, so that the entry in
+ * the solution of the linear system is still valid.
  *
  * A problem arises, however, if the diagonal entries so chosen are not
  * appropriate for the linear system. Consider, for example, a mixed Laplace
@@ -743,8 +752,12 @@ class MatrixCreator
  * need to either increase the diagonal entries in @p X to a size that matches
  * those in the other part of the Schur complement, or, simpler, prime the
  * solution vector before you start the solver.
+ *
+ * In conclusion, local elimination of boundary nodes only works if
+ * there are no hanging nodes and even then doesn't always work fully
+ * satisfactorily.
  * 
- * @author Wolfgang Bangerth, 1998, 2000, 2004
+ * @author Wolfgang Bangerth, 1998, 2000, 2004, 2005
  */
 class MatrixTools : public MatrixCreator
 {
@@ -827,30 +840,53 @@ class MatrixTools : public MatrixCreator
 			   PETScWrappers::MPI::Vector  &solution,
 			   PETScWrappers::MPI::Vector  &right_hand_side,
 			   const bool             eliminate_columns = true);
+
+                                     /**
+                                      * Same function, but for parallel PETSc
+                                      * matrices.
+                                      */
+    static void
+    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			   PETScWrappers::MPI::SparseMatrix  &matrix,
+			   PETScWrappers::Vector       &solution,
+			   PETScWrappers::MPI::Vector  &right_hand_side,
+			   const bool             eliminate_columns = true);
 #endif
 
                                      /**
-                                      * Rather than applying boundary values
-                                      * to the global matrix and vector after
-                                      * assembly, this function does so @em
-                                      * before assembling, by modifying the
-                                      * local matrix and vector
-                                      * contributions. If you call this
-                                      * function on all local contributions,
-                                      * the resulting matrix will have the
-                                      * same entries, and the final call to
-                                      * apply_boundary_values() on the global
-                                      * system will not be necessary.
+                                      * Rather than applying boundary
+                                      * values to the global matrix
+                                      * and vector after creating the
+                                      * global matrix, this function
+                                      * does so during assembly, by
+                                      * modifying the local matrix and
+                                      * vector contributions. If you
+                                      * call this function on all
+                                      * local contributions, the
+                                      * resulting matrix will have the
+                                      * same entries, and the final
+                                      * call to
+                                      * apply_boundary_values() on the
+                                      * global system will not be
+                                      * necessary.
                                       *
-                                      * Since this function does not have to
-                                      * work on the complicated data
-                                      * structures of sparse matrices, it is
-                                      * relatively cheap. It may therefore be
-                                      * a win if you have many fixed degrees
-                                      * of freedom (e.g. boundary nodes), or
-                                      * if access to the sparse matrix is
-                                      * expensive (e.g. for block sparse
-                                      * matrices, or for PETSc matrices).
+                                      * Since this function does not
+                                      * have to work on the
+                                      * complicated data structures of
+                                      * sparse matrices, it is
+                                      * relatively cheap. It may
+                                      * therefore be a win if you have
+                                      * many fixed degrees of freedom
+                                      * (e.g. boundary nodes), or if
+                                      * access to the sparse matrix is
+                                      * expensive (e.g. for block
+                                      * sparse matrices, or for PETSc
+                                      * matrices). However, it doesn't
+                                      * work as expected if there are
+                                      * also hanging nodes to be
+                                      * considered. More caveats are
+                                      * listed in the general
+                                      * documentation of this class.
                                       */
     static void
     local_apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
