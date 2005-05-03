@@ -551,44 +551,48 @@ void ElasticProblem<dim>::setup_system ()
                                  // functions on the matrix and vector at the
                                  // end of this function.
                                  //
-                                 // The second point is that once we have
-                                 // handed over matrix and vector
-                                 // contributions to PETSc, it is a) hard, and
-                                 // b) very inefficient to get them back for
-                                 // modifications. This is not only the fault
-                                 // of PETSc, it is also a consequence of the
-                                 // distributed nature of this program: if an
-                                 // entry resides on another processor, then
-                                 // it is necessarily expensive to get it. The
-                                 // consequence of this is that where we
-                                 // previously first assembled the matrix and
-                                 // right hand side as if there were not
-                                 // hanging node constraints and boundary
-                                 // values, and then eliminated these in a
-                                 // second step, we now have to do that while
-                                 // still assembling the local systems, and
-                                 // before handing these entries over to
-                                 // PETSc. Fortunately, deal.II provides
-                                 // functions to do so, so that we do not have
-                                 // to touch any entries of the linear system
-                                 // later on any more.
+                                 // The second point is that once we
+                                 // have handed over matrix and vector
+                                 // contributions to PETSc, it is a)
+                                 // hard, and b) very inefficient to
+                                 // get them back for
+                                 // modifications. This is not only
+                                 // the fault of PETSc, it is also a
+                                 // consequence of the distributed
+                                 // nature of this program: if an
+                                 // entry resides on another
+                                 // processor, then it is necessarily
+                                 // expensive to get it. The
+                                 // consequence of this is that where
+                                 // we previously first assembled the
+                                 // matrix and right hand side as if
+                                 // there were no hanging node
+                                 // constraints and boundary values,
+                                 // and then eliminated these in a
+                                 // second step, we should now try to
+                                 // do that while still assembling the
+                                 // local systems, and before handing
+                                 // these entries over to PETSc. At
+                                 // least as far as eliminating
+                                 // hanging nodes is concerned, this
+                                 // is actually possible, though
+                                 // removing boundary nodes isn't that
+                                 // simple. deal.II provides functions
+                                 // to do this first part: instead of
+                                 // copying elements by hand into the
+                                 // global matrix, we use the
+                                 // `distribute_local_to_global''
+                                 // functions below to take care of
+                                 // hanging nodes at the same
+                                 // time. The second step, elimination
+                                 // of boundary nodes, is then done in
+                                 // exactly the same way as in all
+                                 // previous example programs.
                                  //
                                  // So, here is the actual implementation:
 template <int dim>
 void ElasticProblem<dim>::assemble_system () 
 {
-                                   // As mentioned we have to treat boundary
-                                   // values while still assembling local
-                                   // systems. Therefore, we have to have
-                                   // their values available at the beginning
-                                   // of the assembly function, not only after
-                                   // looping over all cells:
-  std::map<unsigned int,double> boundary_values;
-  VectorTools::interpolate_boundary_values (dof_handler,
-					    0,
-					    ZeroFunction<dim>(dim),
-					    boundary_values);
-
                                    // The infrastructure to assemble linear
                                    // systems is the same as in all the other
                                    // programs, and in particular unchanged
@@ -764,6 +768,11 @@ void ElasticProblem<dim>::assemble_system ()
                                    //
                                    // However, we still have to apply boundary
                                    // values, in the same way as we always do:
+  std::map<unsigned int,double> boundary_values;
+  VectorTools::interpolate_boundary_values (dof_handler,
+					    0,
+					    ZeroFunction<dim>(dim),
+					    boundary_values);
   MatrixTools::apply_boundary_values (boundary_values,
                                       system_matrix, solution,
                                       system_rhs, false);
