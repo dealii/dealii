@@ -1117,38 +1117,74 @@ namespace QuasiStaticElasticity
                                    // is a library function for such a
                                    // mesh.
 				   //
-				   // In a second step, we have to
-				   // associated boundary conditions
-				   // with the upper and lower faces
-				   // of the cylinder. We choose a
-				   // boundary indicator of 0 for the
-				   // boundary faces that are
-				   // characterized by their midpoints
-				   // having z-coordinates of either 0
-				   // (bottom face), an indicator of 2
-				   // for z=3 (top face), and a
-				   // boundary indicator of 2 for all
-				   // other boundary faces (i.e. the
-				   // inner and outer cylinder
-				   // surfaces).
+				   // In a second step, we have to associated
+				   // boundary conditions with the upper and
+				   // lower faces of the cylinder. We choose a
+				   // boundary indicator of 0 for the boundary
+				   // faces that are characterized by their
+				   // midpoints having z-coordinates of either
+				   // 0 (bottom face), an indicator of 2 for
+				   // z=3 (top face); finally, we use boundary
+				   // indicator 2 for all faces on the inside
+				   // of the cylinder shell, and 3 for the
+				   // outside.
   template <int dim>
   void TopLevel<dim>::create_coarse_grid ()
   {
+    const double inner_radius = 0.8,
+                 outer_radius = 1;
     GridGenerator::cylinder_shell (triangulation,
-				   3, .8, 1);
+				   3, inner_radius, outer_radius);
     for (typename Triangulation<dim>::active_cell_iterator
 	   cell=triangulation.begin_active();
 	 cell!=triangulation.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	if (cell->face(f)->at_boundary())
 	  {
-	    if (cell->face(f)->center()(2) == 0)
+            const Point<dim> face_center = cell->face(f)->center();
+            
+	    if (face_center[2] == 0)
 	      cell->face(f)->set_boundary_indicator (0);
-	    else if (cell->face(f)->center()(2) == 3)
+	    else if (face_center[2] == 3)
 	      cell->face(f)->set_boundary_indicator (1);
-	    else
+	    else if (std::sqrt(face_center[0]*face_center[0] +
+                               face_center[1]*face_center[1])
+                     <
+                     (inner_radius + outer_radius) / 2)
 	      cell->face(f)->set_boundary_indicator (2);
+            else
+              cell->face(f)->set_boundary_indicator (3);
 	  }
+
+                                     // In order to make sure that new
+                                     // vertices are placed correctly on mesh
+                                     // refinement, we have to associate
+                                     // objects describing those parts of the
+                                     // boundary that do not consist of
+                                     // straight parts. Corresponding to the
+                                     // cylinder shell generator function used
+                                     // above, there are classes that can be
+                                     // used to describe the geometry of
+                                     // cylinders. We need to use different
+                                     // objects for the inner and outer parts
+                                     // of the cylinder, with different radii;
+                                     // the second argument to the constructor
+                                     // indicates the axis around which the
+                                     // cylinder revolves -- in this case the
+                                     // z-axis. Note that the boundary objects
+                                     // need to live as long as the
+                                     // triangulation does; we can achieve
+                                     // this by making the objects static,
+                                     // which means that they live as long as
+                                     // the program runs:
+    static const CylinderBoundary<dim> inner_cylinder (inner_radius, 2);
+    static const CylinderBoundary<dim> outer_cylinder (outer_radius, 2);
+                                     // We then attach these two objects to
+                                     // the triangulation, and make them
+                                     // correspond to boundary indicators 2
+                                     // and 3:
+    triangulation.set_boundary (2, inner_cylinder);
+    triangulation.set_boundary (3, outer_cylinder);
     
     triangulation.refine_global (1);
     
