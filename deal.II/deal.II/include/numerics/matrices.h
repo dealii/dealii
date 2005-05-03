@@ -754,13 +754,6 @@ class MatrixTools : public MatrixCreator
 				      * to the system matrix and vectors
 				      * as described in the general
 				      * documentation.
-				      *
-				      * For a replacement function,
-				      * see the documentation of the
-				      * FilteredMatrix class in
-				      * the @p LAC sublibrary, or use the
-				      * local_apply_boundary_values()
-				      * function..
 				      */
     template <typename number>
     static void
@@ -778,13 +771,6 @@ class MatrixTools : public MatrixCreator
 				      * documentation. This function
 				      * works for block sparse
 				      * matrices and block vectors
-				      *
-				      * For a replacement function, see the
-				      * documentation of the
-				      * FilteredMatrix class in the
-				      * @p LAC sublibrary, or use the
-				      * local_apply_boundary_values()
-				      * function.
 				      */
     template <typename number>
     static void
@@ -794,6 +780,7 @@ class MatrixTools : public MatrixCreator
 			   BlockVector<number>                 &right_hand_side,
 			   const bool           eliminate_columns = true);
 
+#ifdef DEAL_II_USE_PETSC
 				     /**
 				      * Apply dirichlet boundary conditions to
 				      * the system matrix and vectors as
@@ -801,38 +788,28 @@ class MatrixTools : public MatrixCreator
 				      * documentation. This function works on
 				      * the classes that are used to wrap
 				      * PETSc objects.
-				      *
-				      * Note that this function is not very
-				      * efficient: it needs to alternatingly
-				      * read and write into the matrix, a
-				      * situation that PETSc does not handle
-				      * too well. In addition, we only get rid
-				      * of rows corresponding to boundary
-				      * nodes, but the corresponding case of
-				      * deleting the respective columns
-				      * (i.e. if @p eliminate_columns is @p
-				      * true) is not presently implemented,
-				      * and probably will never because it is
-				      * too expensive without direct access to
-				      * the PETSc data structures. A third
-				      * reason against this function is that
-				      * it doesn't handle the case where the
-				      * matrix is distributed across an MPI
-				      * system.
-				      *
-				      * In order to still be able to eliminate
-				      * boundary values, it is better to get
-				      * rid of them before the local matrices
-				      * and vectors are distributed to the
-				      * global ones, because then we don't
-				      * have to mess with the sparse data
-				      * structures. The
-				      * local_apply_boundary_values() function
-				      * does that, and is recommended for use
-				      * instead of the global one for PETSc
-				      * matrices and vectors.
-				      */
-#ifdef DEAL_II_USE_PETSC
+				      * 
+ 				      * Note that this function is not very
+ 				      * efficient: it needs to alternatingly
+ 				      * read and write into the matrix, a
+ 				      * situation that PETSc does not handle
+ 				      * too well. In addition, we only get rid
+ 				      * of rows corresponding to boundary
+ 				      * nodes, but the corresponding case of
+ 				      * deleting the respective columns
+ 				      * (i.e. if @p eliminate_columns is @p
+ 				      * true) is not presently implemented,
+ 				      * and probably will never because it is
+ 				      * too expensive without direct access to
+ 				      * the PETSc data structures. A third
+ 				      * reason against this function is that
+ 				      * it doesn't handle the case where the
+ 				      * matrix is distributed across an MPI
+ 				      * system.
+ 				      *
+ 				      * However, it is probably necessary in
+ 				      * most cases.
+ 				      */
     static void
     apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 			   PETScWrappers::SparseMatrix  &matrix,
@@ -840,6 +817,10 @@ class MatrixTools : public MatrixCreator
 			   PETScWrappers::Vector  &right_hand_side,
 			   const bool             eliminate_columns = true);
 
+                                     /**
+                                      * Same function, but for parallel PETSc
+                                      * matrices.
+                                      */
     static void
     apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 			   PETScWrappers::MPI::SparseMatrix  &matrix,
