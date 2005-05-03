@@ -1573,7 +1573,6 @@ namespace QuasiStaticElasticity
 
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
 
-				     // Then solve the system:
     cg.solve (system_matrix, distributed_incremental_displacement, system_rhs,
 	      preconditioner);
 
