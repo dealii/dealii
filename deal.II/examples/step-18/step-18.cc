@@ -915,14 +915,23 @@ namespace QuasiStaticElasticity
                                    // displacement as the present velocity
                                    // times the present timestep.
                                    //
-                                   // For the purposes of this program, we
-                                   // choose a simple form of boundary
-                                   // displacement: we displace the top
-                                   // boundary with constant velocity
-                                   // downwards. The implementation of this
-                                   // class should then be obvious using the
-                                   // knowledge we gained through all the
-                                   // previous example programs:
+                                   // For the purposes of this
+                                   // program, we choose a simple form
+                                   // of boundary displacement: we
+                                   // displace the top boundary with
+                                   // constant velocity downwards. The
+                                   // rest of the boundary is either
+                                   // going to be fixed (and is then
+                                   // described using an object of
+                                   // type ``ZeroFunction'') or free
+                                   // (Neumann-type, in which case
+                                   // nothing special has to be done).
+                                   // // The implementation of the
+                                   // class describing the constant
+                                   // downward motion should then be
+                                   // obvious using the knowledge we
+                                   // gained through all the previous
+                                   // example programs:
   template <int dim>
   class IncrementalBoundaryValues :  public Function<dim> 
   {
@@ -969,10 +978,7 @@ namespace QuasiStaticElasticity
 	    ExcDimensionMismatch (values.size(), dim));
 
     values = 0;
-    if (p[2] > 0)
-      values(2) = -present_timestep * velocity;
-    else
-      values(2) = 0;
+    values(2) = -present_timestep * velocity;
   }
 
 
