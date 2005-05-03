@@ -716,260 +716,94 @@ void ElasticProblem<dim>::assemble_system ()
                                          // need to transfer it into the
                                          // global objects. However, as
                                          // described in the introduction to
-                                         // this function, we will not be able
-                                         // to do any operations to matrix and
-                                         // vector entries any more after
-                                         // handing them off to PETSc
-                                         // (i.e. after distributing to the
-                                         // global objects), and we will have
-                                         // to take care of boundary value and
-                                         // hanging node constraints already
-                                         // here. This is done as follows:
-                                         // first, we take care of boundary
-                                         // values. This is relatively simple,
-                                         // since it only involves deleting
-                                         // rows and columns from the global
-                                         // matrix, and setting the value of
-                                         // the right hand side entry
-                                         // correctly. This, however, can
-                                         // already be done on the local
-                                         // level, for which this is the
-                                         // correct way:
+                                         // this function, we want to avoid
+                                         // any operations to matrix and
+                                         // vector entries after handing them
+                                         // off to PETSc (i.e. after
+                                         // distributing to the global
+                                         // objects). Therefore, we will take
+                                         // care of hanging node constraints
+                                         // already here. This is not quite
+                                         // trivial since the rows and columns
+                                         // of constrained nodes have to be
+                                         // distributed to the rows and
+                                         // columns of those nodes to which
+                                         // they are constrained. This can't
+                                         // be done on a purely local basis
+                                         // (because the degrees of freedom to
+                                         // which hanging nodes are
+                                         // constrained may not be associated
+                                         // with the cell we are presently
+                                         // treating, and are therefore not
+                                         // represented in the local matrix
+                                         // and vector), but it can be done
+                                         // while distributing the local
+                                         // system to the global one. This is
+                                         // what the following two calls do,
+                                         // i.e. they distribute to the global
+                                         // objects and at the same time make
+                                         // sure that hanging node constraints
+                                         // are taken care of:
         cell->get_dof_indices (local_dof_indices);
-        MatrixTools::local_apply_boundary_values (boundary_values,
-                                                  local_dof_indices,
-                                                  cell_matrix,
-                                                  cell_rhs,
-                                                  true);
-                                         // The last argument to the call just
-                                         // performed allows for some
-                                         // optimizations that are more
-                                         // important for the case where we
-                                         // eliminate boundary values from
-                                         // global objects. It controls
-                                         // whether we should also delete the
-                                         // column corresponding to a boundary
-                                         // node, or keep it (and passing
-                                         // ``true'' as above means: yes, do
-                                         // eliminate the column). If we do,
-                                         // then the resulting matrix will be
-                                         // symmetric again if it was before;
-                                         // if we don't, then it won't. The
-                                         // solution of the resulting system
-                                         // should be the same, though. The
-                                         // only reason why we may want to
-                                         // make the system symmetric again is
-                                         // that we would like to use the CG
-                                         // method, which only works with
-                                         // symmetric matrices.  Experience
-                                         // tells that CG also works (and
-                                         // works almost as well) if we don't
-                                         // remove the columns associated with
-                                         // boundary nodes, which can be
-                                         // easily explained by the special
-                                         // structure of the
-                                         // non-symmetry. Since eliminating
-                                         // columns from dense matrices is not
-                                         // expensive, though, we let the
-                                         // function do it; not doing so is
-                                         // more important if the linear
-                                         // system is either non-symmetric
-                                         // anyway, or we are using the
-                                         // non-local version of this function
-                                         // (as in all the other example
-                                         // programs before) and want to save
-                                         // a few cycles during this
-                                         // operation.
-
-                                         // The second task is to take
-                                         // care of hanging node
-                                         // constraints. This is a
-                                         // little more complicated,
-                                         // since the rows and columns
-                                         // of constrained nodes have
-                                         // to be distributed to the
-                                         // rows and columns of those
-                                         // nodes to which they are
-                                         // constrained. This can't be
-                                         // done on a purely local
-                                         // basis, but it can be done
-                                         // while distributing the
-                                         // local system to the global
-                                         // one. This is what the
-                                         // following two calls do,
-                                         // i.e. they distribute to
-                                         // the global objects and at
-                                         // the same time make sure
-                                         // that hanging node
-                                         // constraints are taken care
-                                         // of. It turns out,
-                                         // unfortunately, that these
-                                         // functions again interfere
-                                         // with boundary values, and
-                                         // that there are a few nasty
-                                         // cases where a node may
-                                         // even be both constrained
-                                         // to other nodes as well as
-                                         // fixed to certain boundary
-                                         // values: these cases happen
-                                         // in 3d when one cell on the
-                                         // boundary is refined, but a
-                                         // neighboring boundary cell
-                                         // isn't. In this case, the
-                                         // functions we will be
-                                         // calling here need
-                                         // knowledge about which of
-                                         // the degrees of freedom are
-                                         // actually fixed, for which
-                                         // we have to pass the third
-                                         // argument. To make things
-                                         // worse, however, this is
-                                         // still not enough: we now
-                                         // have all constrained nodes
-                                         // right, and we also have
-                                         // (above already) eliminated
-                                         // the lines and columns of
-                                         // boundary nodes, but the
-                                         // values of boundary nodes
-                                         // that also carry
-                                         // constraints will come out
-                                         // wrong. An explanation and
-                                         // solution to this problem
-                                         // is that we have to fix
-                                         // them up again after the
-                                         // matrix is complete, which
-                                         // we will do at the end of
-                                         // this function. First, let
-                                         // us just transfer
-                                         // everything into the global
-                                         // matrix:
         hanging_node_constraints
           .distribute_local_to_global (cell_matrix,
                                        local_dof_indices,
-				       boundary_values,
                                        system_matrix);
 
         hanging_node_constraints
           .distribute_local_to_global (cell_rhs,
                                        local_dof_indices,
-				       boundary_values,
                                        system_rhs);
       }
 
                                    // The global matrix and right hand side
                                    // vectors have now been formed. Note that
-                                   // since we took care of these operations
-                                   // already above, we do not have to apply
-                                   // boundary values or condense away hanging
-                                   // node constraints any more.
+                                   // since we took care of this already
+                                   // above, we do not have to condense away
+                                   // hanging node constraints any more.
                                    //
-                                   // However, we have to make sure that those
-                                   // entries we wrote into matrix and vector
-                                   // objects but which are stored on other
-                                   // processes, reach their destination. For
-                                   // this, the ``compress'' functions of
-                                   // these objects are used, which compress
-                                   // the object by flushing the caches that
-                                   // PETSc holds for them:
-  system_matrix.compress ();
-  system_rhs.compress ();
-
-				   // As mentioned above, this is not
-				   // yet all: The matrix and right
-				   // hand side entries of boundary
-				   // nodes may still be wrong. The
-				   // reason for this is that the
-				   // ``MatrixTools::local_apply_boundary_values''
-				   // function removes the rows and
-				   // columns of nodes that are fixed
-				   // to their boundary values, except
-				   // for the diagonal element of the
-				   // matrix, and the
-				   // ``ConstraintMatrix::distribute_local_to_global''
-				   // functions handle hanging
-				   // nodes. However, here is the
-				   // problem: Since the row of a
-				   // fixed node is empty except for
-				   // the diagonal entry, its solution
-				   // value equals the corresponding
-				   // value in the right hand side
-				   // vector divided by the diagonal
-				   // element of the matrix. In other
-				   // words, when we treat boundary
-				   // nodes in the matrix, we not only
-				   // have to make sure that we zero
-				   // out the rows and columns of
-				   // these degrees of freedom, but we
-				   // also have to make sure that the
-				   // diagonal entry of the matrix and
-				   // the corresponding value of the
-				   // right hand side are in
-				   // synch. But the two calls to
-				   // ``ConstraintMatrix::distribute_local_to_global''
-				   // can't do that because they each
-				   // only know about either the righ
-				   // hand side vector or the matrix,
-				   // but not both. And even if we
-				   // merged them into a single
-				   // function that knows about both,
-				   // that would not help much:
-				   // PETSc's model of parallel
-				   // computations is very much
-				   // tailored to the concept of doing
-				   // things in batches -- doing lots
-				   // of additions to matrix or vector
-				   // entries, doing lots of sets to
-				   // matrix or vector entries, then
-				   // calling ``compress'' and
-				   // possibly reading some. Switching
-				   // from one kind of operation to
-				   // another usually triggers global
-				   // communication between the
-				   // parallel processes, making the
-				   // program very slow. If we tried
-				   // to keep matrix diagonal and
-				   // right hand side vector elements
-				   // in synch at all times, we can't
-				   // do this in batch mode: we would
-				   // add to the diagonal entry of the
-				   // matrix, but then we would have
-				   // to read its new value and set
-				   // the corresponding value of the
-				   // right hand side vector. That's
-				   // inefficient. What we should
-				   // rather do is add up all the
-				   // time, and at the end of
-				   // everything fix up the few
-				   // entries there are. This is how
-				   // this is done (note that we only
-				   // have to consider those entries
-				   // of the matrix/right hand side
-				   // vector that are handled on the
-				   // present processor, since the
-				   // other processors will take care
-				   // of the rest; we add a test for a
-				   // nonzero matrix entry just to be
-				   // really sure that everything is
-				   // ok):
-  for (std::map<unsigned int, double>::const_iterator
-	 boundary_value = boundary_values.begin();
-       boundary_value != boundary_values.end(); ++boundary_value)
-    if ((boundary_value->first >= system_matrix.local_range().first)
-	&&
-	(boundary_value->first < system_matrix.local_range().second))
-      {
-	Assert (system_matrix.diag_element (boundary_value->first) != 0,
-		ExcInternalError());
-	
-	system_rhs(boundary_value->first)
-	  = (boundary_value->second *
-	     system_matrix.diag_element (boundary_value->first));
-      }
-
-				   // At the end, compress the
-				   // so-modified vector again:
-  system_rhs.compress ();
-}
+                                   // However, we still have to apply boundary
+                                   // values, in the same way as we always do:
+  MatrixTools::apply_boundary_values (boundary_values,
+                                      system_matrix, solution,
+                                      system_rhs, false);
+                                   // The last argument to the call just
+                                   // performed allows for some
+                                   // optimizations. It controls
+                                   // whether we should also delete the
+                                   // column corresponding to a boundary
+                                   // node, or keep it (and passing
+                                   // ``true'' as above means: yes, do
+                                   // eliminate the column). If we do,
+                                   // then the resulting matrix will be
+                                   // symmetric again if it was before;
+                                   // if we don't, then it won't. The
+                                   // solution of the resulting system
+                                   // should be the same, though. The
+                                   // only reason why we may want to
+                                   // make the system symmetric again is
+                                   // that we would like to use the CG
+                                   // method, which only works with
+                                   // symmetric matrices.  Experience
+                                   // tells that CG also works (and
+                                   // works almost as well) if we don't
+                                   // remove the columns associated with
+                                   // boundary nodes, which can be
+                                   // easily explained by the special
+                                   // structure of the
+                                   // non-symmetry. Since eliminating
+                                   // columns from dense matrices is not
+                                   // expensive, though, we let the
+                                   // function do it; not doing so is
+                                   // more important if the linear
+                                   // system is either non-symmetric
+                                   // anyway, or we are using the
+                                   // non-local version of this function
+                                   // (as in all the other example
+                                   // programs before) and want to save
+                                   // a few cycles during this
+                                   // operation.
+  }
 
 
 
