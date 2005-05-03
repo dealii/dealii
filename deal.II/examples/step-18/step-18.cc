@@ -1566,7 +1566,6 @@ namespace QuasiStaticElasticity
 					    n_local_dofs);
     distributed_incremental_displacement = incremental_displacement;
     
-//TODO: make more robust against changes in the size of the domain!    
     SolverControl           solver_control (dof_handler.n_dofs(),
 					    1e-16*system_rhs.l2_norm());
     PETScWrappers::SolverCG cg (solver_control,
