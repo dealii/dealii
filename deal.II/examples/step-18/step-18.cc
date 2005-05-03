@@ -893,7 +893,7 @@ namespace QuasiStaticElasticity
                                    //
                                    // For quasistatic displacement, typical
                                    // boundary forces would be pressure on a
-                                   // body, tangential friction against
+                                   // body, or tangential friction against
                                    // another body. We chose a somewhat
                                    // simpler case here: we prescribe a
                                    // certain movement of (parts of) the
@@ -968,20 +968,11 @@ namespace QuasiStaticElasticity
     Assert (values.size() == dim, 
 	    ExcDimensionMismatch (values.size(), dim));
 
-//TODO    
-/*  
-				 // cylinder boundary values
-				 values = 0;
-				 if (p[2] > 0)
-				 values(2) = -timestep * velocity;
-				 else
-				 values(2) = 0;
-*/
     values = 0;
-    if (p[0] > 0)
-      values(0) = present_timestep * velocity;
+    if (p[2] > 0)
+      values(2) = -present_timestep * velocity;
     else
-      values(0) = -present_timestep * velocity;    
+      values(2) = 0;
   }
 
 
@@ -1112,6 +1103,7 @@ namespace QuasiStaticElasticity
   template <int dim>
   void TopLevel<dim>::create_coarse_grid ()
   {
+/*    
     GridGenerator::hyper_cube (triangulation, -1, 1);
 
 				     // assign left and right boundary as the
@@ -1126,27 +1118,27 @@ namespace QuasiStaticElasticity
   
     triangulation.refine_global (2);
 
-/*
-  GridGenerator::cylinder_shell (triangulation,
-  3, .8, 1);
-                                   // associate left boundary with
-                                   // boundary indicator 0, right
-                                   // boundary with 0. all other
-                                   // boundaries remain at zero
-				   for (typename Triangulation<dim>::active_cell_iterator
-				   cell=triangulation.begin_active();
-				   cell!=triangulation.end(); ++cell)
-				   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-				   if (cell->face(f)->center()(2) == 0)
-				   cell->face(f)->set_boundary_indicator (0);
-				   else
-				   if (cell->face(f)->center()(2) == 3)
-				   cell->face(f)->set_boundary_indicator (0);
-				   else
-				   cell->face(f)->set_boundary_indicator (1);
-  
-				   triangulation.refine_global (1);
 */
+    GridGenerator::cylinder_shell (triangulation,
+				   3, .8, 1);
+				     // associate left boundary with
+				     // boundary indicator 0, right
+				     // boundary with 0. all other
+				     // boundaries remain at zero
+    for (typename Triangulation<dim>::active_cell_iterator
+	   cell=triangulation.begin_active();
+	 cell!=triangulation.end(); ++cell)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	if (cell->face(f)->center()(2) == 0)
+	  cell->face(f)->set_boundary_indicator (0);
+	else
+	  if (cell->face(f)->center()(2) == 3)
+	    cell->face(f)->set_boundary_indicator (0);
+	  else
+	    cell->face(f)->set_boundary_indicator (1);
+  
+//    triangulation.refine_global (1);
+
 
 				     // As the final step, we need to
 				     // set up a clean state of the
@@ -1339,21 +1331,27 @@ namespace QuasiStaticElasticity
 
                                    // @sect4{TopLevel::assemble_system}
 
-                                   // Again, assembling the system matrix and
-                                   // right hand side follows the same
-                                   // structure as in many example programs
-                                   // before. In particular, it is mostly
-                                   // equivalent to step-17, except for the
-                                   // different right hand side that now only
-                                   // has to take into account internal
-                                   // stresses. In addition, assembling the
-                                   // matrix is made significantly more
-                                   // transparent by using the
-                                   // ``SymmetricTensor'' class; in addition,
-                                   // it is also more general since it is
-                                   // independent of the fact that we may or
-                                   // may not be using an isotropic elasticity
-                                   // tensor.
+                                   // Again, assembling the system
+                                   // matrix and right hand side
+                                   // follows the same structure as in
+                                   // many example programs before. In
+                                   // particular, it is mostly
+                                   // equivalent to step-17, except
+                                   // for the different right hand
+                                   // side that now only has to take
+                                   // into account internal
+                                   // stresses. In addition,
+                                   // assembling the matrix is made
+                                   // significantly more transparent
+                                   // by using the ``SymmetricTensor''
+                                   // class: note the elegance of
+                                   // forming the scalar products of
+                                   // symmetric tensors of rank 2 and
+                                   // 4. The implementation is also
+                                   // more general since it is
+                                   // independent of the fact that we
+                                   // may or may not be using an
+                                   // isotropic elasticity tensor.
                                    //
                                    // The first part of the assembly routine
                                    // is as always:
@@ -1363,14 +1361,6 @@ namespace QuasiStaticElasticity
     system_rhs = 0;
     system_matrix = 0;
 
-    std::map<unsigned int,double> boundary_values;
-    VectorTools::
-      interpolate_boundary_values (dof_handler,
-                                   0,
-                                   IncrementalBoundaryValues<dim>(present_time,
-                                                                  present_timestep),
-                                   boundary_values);
-    
     FEValues<dim> fe_values (fe, quadrature_formula, 
 			     UpdateFlags(update_values    |
 					 update_gradients |
@@ -1519,6 +1509,18 @@ namespace QuasiStaticElasticity
 				     // vector in the form of a
 				     // temporary vector which we then
 				     // copy into the sequential one:
+    std::vector<bool> z_component (dim, false);
+    z_component[0] =
+    z_component[dim-1] = true;
+    std::map<unsigned int,double> boundary_values;
+    VectorTools::
+      interpolate_boundary_values (dof_handler,
+                                   0,
+                                   IncrementalBoundaryValues<dim>(present_time,
+                                                                  present_timestep),
+                                   boundary_values,
+				   z_component);
+    
     PETScWrappers::MPI::Vector tmp (mpi_communicator, dof_handler.n_dofs(),
 				    n_local_dofs);
     MatrixTools::apply_boundary_values (boundary_values,
@@ -1980,7 +1982,7 @@ namespace QuasiStaticElasticity
     pcout << "Timestep " << timestep_no << " at time " << present_time
 	  << std::endl;
   
-    for (unsigned int cycle=0; cycle<4; ++cycle)
+    for (unsigned int cycle=0; cycle<2; ++cycle)
       {
 	pcout << "  Cycle " << cycle << ':' << std::endl;
 
@@ -2611,57 +2613,6 @@ namespace QuasiStaticElasticity
 					       // result to make it
 					       // exactly symmetric.
 
-					       // As another defensive
-					       // measure, we should make sure
-					       // that we have actually
-					       // computed the rotation
-					       // matrices correctly. One
-					       // possible way is to ensure
-					       // that the invariants of the
-					       // stress before and after
-					       // rotation coincide. For this,
-					       // remember that the invariants
-					       // are named this way because
-					       // they do not change under
-					       // orthogonal transformations
-					       // like rotations. For our
-					       // present purposes, we only
-					       // test that the first and
-					       // third invariants, i.e. the
-					       // trace and determinant, of
-					       // the stress are the same up
-					       // to a small difference
-					       // proportional to the size of
-					       // the stress tensor (since the
-					       // determinant is a nonlinear
-					       // function, unlike the trace,
-					       // we allow for a slightly
-					       // larger tolerance). Adding
-					       // such checks has proven to be
-					       // an invaluable means to find
-					       // subtle bugs, and in
-					       // particular to guard against
-					       // involuntary changes in other
-					       // parts of the program (or the
-					       // library, for that
-					       // matter). Note that in order
-					       // to make these checks work
-					       // even on cells where the
-					       // stress happens to be zero,
-					       // we need to compare
-					       // less-than-or-equal, not just
-					       // less-than some small
-					       // tolerance:
-	      Assert (std::fabs(trace(new_stress) - trace(rotated_new_stress))
-		      <=
-		      1e-12 * std::fabs(trace(new_stress)),
-		      ExcInternalError());
-
-	      Assert (std::fabs(determinant(new_stress) - determinant(rotated_new_stress))
-		      <=
-		      1e-10 * std::fabs(determinant(new_stress)),
-		      ExcInternalError());
-
                                                // The result of all these
                                                // operations is then written
                                                // back into the original
@@ -2695,7 +2646,7 @@ int main (int argc, char **argv)
       {
         deallog.depth_console (0);
 
-        QuasiStaticElasticity::TopLevel<2> elastic_problem;
+        QuasiStaticElasticity::TopLevel<3> elastic_problem;
         elastic_problem.run ();
       }
 
