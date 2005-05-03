@@ -1095,50 +1095,57 @@ namespace QuasiStaticElasticity
 
                                    // @sect4{TopLevel::create_coarse_grid}
 
-                                   // The next function in the order in which
-                                   // they were declared in the class
-                                   // declaration is the one that creates the
-                                   // coarse grid from which we start.
-//TODO  
+                                   // The next function in the order
+                                   // in which they were declared
+                                   // above is the one that creates
+                                   // the coarse grid from which we
+                                   // start. For this example program,
+                                   // we want to compute the
+                                   // deformation of a cylinder under
+                                   // axial compression. The first
+                                   // step therefore is to generate a
+                                   // mesh for a cylinder of length 3
+                                   // and with inner and outer radii
+                                   // of 0.8 and 1,
+                                   // respectively. Fortunately, there
+                                   // is a library function for such a
+                                   // mesh.
+				   //
+				   // In a second step, we have to
+				   // associated boundary conditions
+				   // with the upper and lower faces
+				   // of the cylinder. We choose a
+				   // boundary indicator of 0 for the
+				   // boundary faces that are
+				   // characterized by their midpoints
+				   // having z-coordinates of either 0
+				   // (bottom face), an indicator of 2
+				   // for z=3 (top face), and a
+				   // boundary indicator of 2 for all
+				   // other boundary faces (i.e. the
+				   // inner and outer cylinder
+				   // surfaces).
   template <int dim>
   void TopLevel<dim>::create_coarse_grid ()
   {
-/*    
-    GridGenerator::hyper_cube (triangulation, -1, 1);
-
-				     // assign left and right boundary as the
-				     // ones to be stretched
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if ((triangulation.begin_active()->face(f)->center()[0] == 1.)
-	  ||
-	  (triangulation.begin_active()->face(f)->center()[0] == -1.))
-	triangulation.begin_active()->face(f)->set_boundary_indicator (0);
-      else
-	triangulation.begin_active()->face(f)->set_boundary_indicator (1);
-  
-    triangulation.refine_global (2);
-
-*/
     GridGenerator::cylinder_shell (triangulation,
 				   3, .8, 1);
-				     // associate left boundary with
-				     // boundary indicator 0, right
-				     // boundary with 0. all other
-				     // boundaries remain at zero
     for (typename Triangulation<dim>::active_cell_iterator
 	   cell=triangulation.begin_active();
 	 cell!=triangulation.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	if (cell->face(f)->center()(2) == 0)
-	  cell->face(f)->set_boundary_indicator (0);
-	else
-	  if (cell->face(f)->center()(2) == 3)
-	    cell->face(f)->set_boundary_indicator (0);
-	  else
-	    cell->face(f)->set_boundary_indicator (1);
-  
-//    triangulation.refine_global (1);
-
+	if (cell->face(f)->at_boundary())
+	  {
+	    if (cell->face(f)->center()(2) == 0)
+	      cell->face(f)->set_boundary_indicator (0);
+	    else if (cell->face(f)->center()(2) == 3)
+	      cell->face(f)->set_boundary_indicator (1);
+	    else
+	      cell->face(f)->set_boundary_indicator (2);
+	  }
+    
+    triangulation.refine_global (1);
+    
 
 				     // As the final step, we need to
 				     // set up a clean state of the
@@ -1508,14 +1515,81 @@ namespace QuasiStaticElasticity
 				     // provide such a compatible
 				     // vector in the form of a
 				     // temporary vector which we then
-				     // copy into the sequential one:
+				     // copy into the sequential one.
+    
+				     // We make up for this
+				     // complication by showing how
+				     // boundary values can be used
+				     // flexibly: following the way we
+				     // create the triangulation,
+				     // there are three distinct
+				     // boundary indicators used to
+				     // describe the domain,
+				     // corresponding to the bottom
+				     // and top faces, as well as the
+				     // inner/outer surfaces. We would
+				     // like to impose boundary
+				     // conditions of the following
+				     // type: The inner and outer
+				     // cylinder surfaces are free of
+				     // external forces, a fact that
+				     // corresponds to natural
+				     // (Neumann-type) boundary
+				     // conditions for which we don't
+				     // have to do anything. At the
+				     // bottom, we want no movement at
+				     // all, corresponding to the
+				     // cylinder being clamped or
+				     // cemented in at this part of
+				     // the boundary. At the top,
+				     // however, we want a prescribed
+				     // vertical downward motion
+				     // compressing the cylinder; in
+				     // addition, we only want to
+				     // restrict the vertical
+				     // movement, but not the
+				     // horizontal ones -- one can
+				     // think of this situation as a
+				     // well-greased plate sitting on
+				     // top of the cylinder pushing it
+				     // downwards: the atoms of the
+				     // cylinder are forced to move
+				     // downward, but they are free to
+				     // slide horizontally along the
+				     // plate.
+
+				     // The way to describe this is as
+				     // follows: for boundary
+				     // indicator zero (bottom face)
+				     // we use a dim-dimensional zero
+				     // function representing no
+				     // motion in any coordinate
+				     // direction. For the boundary
+				     // with indicator 1 (top
+				     // surface), we use the
+				     // ``IncrementalBoundaryValues''
+				     // class, but we specify an
+				     // additional argument to the
+				     // ``VectorTools::interpolate_boundary_values''
+				     // function denoting which vector
+				     // components it should apply to;
+				     // this is a vector of bools for
+				     // each vector component and
+				     // because we only want to
+				     // restrict vertical motion, it
+				     // has only its last component
+				     // set:
     std::vector<bool> z_component (dim, false);
-    z_component[0] =
     z_component[dim-1] = true;
     std::map<unsigned int,double> boundary_values;
     VectorTools::
       interpolate_boundary_values (dof_handler,
                                    0,
+                                   ZeroFunction<dim> (dim),
+                                   boundary_values);
+    VectorTools::
+      interpolate_boundary_values (dof_handler,
+                                   1,
                                    IncrementalBoundaryValues<dim>(present_time,
                                                                   present_timestep),
                                    boundary_values,
