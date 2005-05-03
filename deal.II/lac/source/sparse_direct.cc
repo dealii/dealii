@@ -1853,27 +1853,27 @@ SparseDirectUMFPACK::SparseDirectUMFPACK ()
                 numeric_decomposition (0),
                 control (0)
 {
-  Assert(false, ExcNeedsUMFPack());
+  Assert(false, ExcNeedsUMFPACK());
 }
 
 
 void
 SparseDirectUMFPACK::clear ()
 {
-  Assert(false, ExcNeedsUMFPack());
+  Assert(false, ExcNeedsUMFPACK());
 }
 
 
 void SparseDirectUMFPACK::factorize (const SparseMatrix<double> &)
 {
-  Assert(false, ExcNeedsUMFPack());
+  Assert(false, ExcNeedsUMFPACK());
 }
 
 
 void
 SparseDirectUMFPACK::solve (Vector<double> &) const
 {
-  Assert(false, ExcNeedsUMFPack());
+  Assert(false, ExcNeedsUMFPACK());
 }
 
 
@@ -1881,7 +1881,7 @@ void
 SparseDirectUMFPACK::solve (const SparseMatrix<double> &,
                             Vector<double>             &)
 {
-  Assert(false, ExcNeedsUMFPack());
+  Assert(false, ExcNeedsUMFPACK());
 }
 
 
