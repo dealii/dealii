@@ -63,18 +63,15 @@ namespace PETScWrappers
       AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
 
                                        // copy it into our caches if the line
-                                       // isn't empty
-      if (ncols != 0)
-        {
-          colnum_cache.reset (new std::vector<unsigned int> (colnums,
-                                                             colnums+ncols));
-          value_cache.reset (new std::vector<PetscScalar> (values, values+ncols));
-        }
-      else
-        {
-          colnum_cache.reset ();
-          value_cache.reset ();
-        }
+                                       // isn't empty. if it is, then we've
+                                       // done something wrong, since we
+                                       // shouldn't have initialized an
+                                       // iterator for an empty line (what
+                                       // would it point to?)
+      Assert (ncols != 0, ExcInternalError());
+      colnum_cache.reset (new std::vector<unsigned int> (colnums,
+                                                         colnums+ncols));
+      value_cache.reset (new std::vector<PetscScalar> (values, values+ncols));
       
                                        // and finally restore the matrix
       ierr = MatRestoreRow(*matrix, this->a_row, &ncols, &colnums, &values);
@@ -309,6 +306,48 @@ namespace PETScWrappers
 
 
   
+  unsigned int
+  MatrixBase::
+  row_length (const unsigned int row) const
+  {
+//TODO: this function will probably only work if compress() was called on the
+//matrix previously. however, we can't do this here, since it would impose
+//global communication and one would have to make sure that this function is
+//called the same number of times from all processors, something that is
+//unreasonable. there should simply be a way in PETSc to query the number of
+//entries in a row bypassing the call to compress(), but I can't find one
+    Assert (row < m(), ExcInternalError());
+
+                                     // get a representation of the present
+                                     // row
+    int ncols;
+
+#if (PETSC_VERSION_MAJOR <= 2) && \
+    ((PETSC_VERSION_MINOR < 2) ||  \
+     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+    int         *colnums;
+    PetscScalar *values;
+#else
+    const int         *colnums;
+    const PetscScalar *values;
+#endif
+
+//TODO: this is probably horribly inefficient; we should lobby for a way to
+//query this information from PETSc
+    int ierr;
+    ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
+    Assert (ierr == 0, MatrixBase::ExcPETScError(ierr));
+
+                                     // then restore the matrix and return the
+                                     // number of columns in this row as
+                                     // queried previously
+    ierr = MatRestoreRow(*this, row, &ncols, &colnums, &values);
+    AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
+
+    return ncols;
+  }
+
+
   PetscReal
   MatrixBase::l1_norm () const
   {

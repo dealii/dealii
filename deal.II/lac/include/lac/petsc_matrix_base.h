@@ -491,6 +491,12 @@ namespace PETScWrappers
                                         */
       unsigned int n_nonzero_elements () const;
       
+
+                                       /**
+                                        * Number of entries in a specific row.
+                                        */
+      unsigned int row_length (const unsigned int row) const;
+      
                                        /**
                                         * Return the l1-norm of the matrix, that is
                                         * $|M|_1=max_{all columns j}\sum_{all 
@@ -669,12 +675,27 @@ namespace PETScWrappers
                                        /**
                                         * STL-like iterator with the
                                         * first entry of row @p r.
+                                        *
+                                        * Note that if the given row is empty,
+                                        * i.e. does not contain any nonzero
+                                        * entries, then the iterator returned by
+                                        * this function equals
+                                        * <tt>end(r)</tt>. Note also that the
+                                        * iterator may not be dereferencable in
+                                        * that case.
                                         */
       const_iterator begin (const unsigned int r) const;
 
                                        /**
-                                        * Final iterator of row
-                                        * @p r.
+                                        * Final iterator of row <tt>r</tt>. It
+                                        * points to the first element past the
+                                        * end of line @p r, or past the end of
+                                        * the entire sparsity pattern.
+                                        *
+                                        * Note that the end iterator is not
+                                        * necessarily dereferencable. This is in
+                                        * particular the case if it is the end
+                                        * iterator for the last row of a matrix.
                                         */
       const_iterator end (const unsigned int r) const;
       
@@ -764,9 +785,6 @@ namespace PETScWrappers
                     a_index(index)
     {
       visit_present_row ();
-      Assert ((row == matrix->m()) ||
-              (index < colnum_cache->size()),
-              ExcInvalidIndexWithinRow (index, row));
     }
 
 
@@ -824,10 +842,25 @@ namespace PETScWrappers
       Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
 
       ++accessor.a_index;
+
+                                       // if at end of line: do one step, then
+                                       // cycle until we find a row with a
+                                       // nonzero number of entries
       if (accessor.a_index >= accessor.colnum_cache->size())
         {
           accessor.a_index = 0;
-          accessor.a_row++;
+          ++accessor.a_row;
+      
+          while (accessor.a_index >= accessor.matrix->row_length(accessor.a_row))
+            {
+              ++accessor.a_row;
+
+                                           // if we happened to find the end
+                                           // of the matrix, then stop here
+              if (accessor.a_row == accessor.matrix->m())
+                break;
+            }
+
           accessor.visit_present_row();
         }
       return *this;
@@ -839,16 +872,7 @@ namespace PETScWrappers
     const_iterator::operator++ (int)
     {
       const const_iterator old_state = *this;
-    
-      Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
-
-      ++accessor.a_index;
-      if (accessor.a_index >= accessor.colnum_cache->size())
-        {
-          accessor.a_index = 0;
-          accessor.a_row++;
-          accessor.visit_present_row();
-        }
+      ++(*this);
       return old_state;
     }
 
@@ -932,7 +956,10 @@ namespace PETScWrappers
   MatrixBase::begin(const unsigned int r) const
   {
     Assert (r < m(), ExcIndexRange(r, 0, m()));
-    return const_iterator(this, r, 0);
+    if (row_length(r) > 0)
+      return const_iterator(this, r, 0);
+    else
+      return end (r);
   }
 
 
@@ -941,7 +968,17 @@ namespace PETScWrappers
   MatrixBase::end(const unsigned int r) const
   {
     Assert (r < m(), ExcIndexRange(r, 0, m()));
-    return const_iterator(this, r+1, 0);
+
+                                     // place the iterator on the first entry
+                                     // past this line, or at the end of the
+                                     // matrix
+    for (unsigned int i=r+1; i<m(); ++i)
+      if (row_length(i) > 0)
+        return const_iterator(this, i, 0);
+    
+                                     // if there is no such line, then take the
+                                     // end iterator of the matrix
+    return end();
   }
 
 
