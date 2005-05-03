@@ -1020,10 +1020,8 @@ class SparseDirectMA47 : public Subscriptor
  *
  * @author Wolfgang Bangerth, 2004
  */
-class SparseDirectUMFPACK : public Subscriptor
+class SparseDirectUMFPACK : public virtual Subscriptor
 {
-#ifdef HAVE_UMFPACK
-    
   public:
 				     /**
 				      * Constructor. See the
@@ -1152,11 +1150,66 @@ class SparseDirectUMFPACK : public Subscriptor
                                       * routines.
                                       */
     std::vector<double> control;
-
-#endif
 };
 
+
+/**
+ * Wrapper for SparseDirectUMFPACK, implementing the usual
+ * preconditioner interface with functions initialize() and vmult().
+ */
+class PreconditionUMFPACK : public virtual Subscriptor,
+			    private SparseDirectUMFPACK
+{
+  public:
+				     /**
+				      * Dummy class needed for the
+				      * usual initalization interface
+				      * of preconditioners.
+				      */
+    class AdditionalData
+    {};
+    
+    
+				     /**
+				      * Initialize memory and call
+				      * SparseDirectUMFPACK::factorize.
+				      */
+    void initialize(const SparseMatrix<double> &matrix,
+		    const AdditionalData = AdditionalData());
+    
+				     /**
+				      * Preconditioner interface
+				      * function. Given the source
+				      * vector, returns the
+				      * approximated solution of <i>Ax
+				      * = b</i>.
+				      */
+    void vmult (Vector<double>&, const Vector<double>&) const;
+
+				     /**
+				      * Not implemented but necessary
+				      * for compiling.
+				      */
+    void Tvmult (Vector<double>&, const Vector<double>&) const;
+    
+				     /**
+				      * Same as vmult(), but adding to
+				      * the previous solution. Not
+				      * implemented yet.
+				      */
+    void vmult_add (Vector<double>&, const Vector<double>&) const;
+
+				     /**
+				      * Not implemented but necessary
+				      * for compiling.
+				      */
+    void Tvmult_add (Vector<double>&, const Vector<double>&) const;
+};
+
+
+
 /*@}*/
+
 
 
 #endif

@@ -1617,6 +1617,18 @@ call_ma47cd (const unsigned int *n_rows,           //scalar
 
 
 
+SparseDirectUMFPACK::~SparseDirectUMFPACK ()
+{
+  clear ();
+}
+
+
+void
+SparseDirectUMFPACK::
+initialize (const SparsityPattern &)
+{}
+
+
 #ifdef HAVE_UMFPACK
 
 SparseDirectUMFPACK::SparseDirectUMFPACK ()
@@ -1628,12 +1640,6 @@ SparseDirectUMFPACK::SparseDirectUMFPACK ()
   umfpack_di_defaults (&control[0]);
 }
 
-
-
-SparseDirectUMFPACK::~SparseDirectUMFPACK ()
-{
-  clear ();
-}
 
 
 void
@@ -1670,13 +1676,6 @@ SparseDirectUMFPACK::clear ()
 
   umfpack_di_defaults (&control[0]);
 }
-
-
-
-void
-SparseDirectUMFPACK::
-initialize (const SparsityPattern &)
-{}
 
 
 
@@ -1844,7 +1843,91 @@ SparseDirectUMFPACK::solve (const SparseMatrix<double> &matrix,
   solve (rhs_and_solution);
 }
 
+
+#else
+
+
+SparseDirectUMFPACK::SparseDirectUMFPACK ()
+                :
+                symbolic_decomposition (0),
+                numeric_decomposition (0),
+                control (UMFPACK_CONTROL)
+{
+  Assert(false, ExcNeedsUMFPack());
+}
+
+
+void
+SparseDirectUMFPACK::clear ()
+{
+  Assert(false, ExcNeedsUMFPack());
+}
+
+void SparseDirectUMFPACK::factorize (const SparseMatrix<double> &)
+{
+  Assert(false, ExcNeedsUMFPack());
+}
+
+void
+SparseDirectUMFPACK::solve (Vector<double> &) const
+{
+  Assert(false, ExcNeedsUMFPack());
+}
+
+void
+SparseDirectUMFPACK::solve (const SparseMatrix<double> &,
+                            Vector<double>             &)
+{
+  Assert(false, ExcNeedsUMFPack());
+}
+
+
 #endif
+
+
+void
+PreconditionUMFPACK::initialize (const SparseMatrix<double>& M,
+				 const AdditionalData)
+{
+  this->factorize(M);
+}
+
+
+void
+PreconditionUMFPACK::vmult (
+  Vector<double>&       dst,
+  const Vector<double>& src) const
+{
+  dst = src;
+  this->solve(dst);
+}
+
+
+void
+PreconditionUMFPACK::Tvmult (
+  Vector<double>&,
+  const Vector<double>&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+void
+PreconditionUMFPACK::vmult_add (
+  Vector<double>&,
+  const Vector<double>&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+void
+PreconditionUMFPACK::Tvmult_add (
+  Vector<double>&,
+  const Vector<double>&) const
+{
+  Assert(false, ExcNotImplemented());
+}
 
 
 // explicit instantiations
