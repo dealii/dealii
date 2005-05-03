@@ -1851,7 +1851,7 @@ SparseDirectUMFPACK::SparseDirectUMFPACK ()
                 :
                 symbolic_decomposition (0),
                 numeric_decomposition (0),
-                control (UMFPACK_CONTROL)
+                control (0)
 {
   Assert(false, ExcNeedsUMFPack());
 }
@@ -1863,16 +1863,19 @@ SparseDirectUMFPACK::clear ()
   Assert(false, ExcNeedsUMFPack());
 }
 
+
 void SparseDirectUMFPACK::factorize (const SparseMatrix<double> &)
 {
   Assert(false, ExcNeedsUMFPack());
 }
+
 
 void
 SparseDirectUMFPACK::solve (Vector<double> &) const
 {
   Assert(false, ExcNeedsUMFPack());
 }
+
 
 void
 SparseDirectUMFPACK::solve (const SparseMatrix<double> &,
