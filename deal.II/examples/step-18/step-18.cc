@@ -308,7 +308,16 @@ namespace QuasiStaticElasticity
 				   // have to reconstruct the
 				   // (symmetric) strain tensor by
 				   // transforming the data storage
-				   // format and symmetrization.
+				   // format and symmetrization. We do
+				   // this in the same way as above,
+				   // i.e. we avoid a few computations
+				   // by filling first the diagonal
+				   // and then only one half of the
+				   // symmetric tensor (the
+				   // ``SymmetricTensor'' class makes
+				   // sure that it is sufficient to
+				   // write only one of the two
+				   // symmetric components).
 				   //
 				   // Before we do this, though, we
 				   // make sure that the input has the
@@ -328,10 +337,14 @@ namespace QuasiStaticElasticity
   {
     Assert (grad.size() == dim, ExcInternalError());
 
-    Tensor<2,dim> strain;
+    SymmetricTensor<2,dim> strain;
     for (unsigned int i=0; i<dim; ++i)
-      for (unsigned int j=0; j<dim; ++j)
+      strain[i][i] = grad[i][i];
+    
+    for (unsigned int i=0; i<dim; ++i)
+      for (unsigned int j=i+1; j<dim; ++j)
 	strain[i][j] = (grad[i][j] + grad[j][i]) / 2;
+    
     return strain;
   }
 
@@ -1040,7 +1053,7 @@ namespace QuasiStaticElasticity
   const SymmetricTensor<4,dim>
   TopLevel<dim>::stress_strain_tensor
   = get_stress_strain_tensor<dim> (/*lambda = */ 9.695e10,
-				   /*mu     = */ 7.617e10);      
+				   /*mu     = */ 7.617e10);
   
 
 
@@ -1533,7 +1546,7 @@ namespace QuasiStaticElasticity
 		  cell_matrix(i,j) 
 		    += (eps_phi_i * stress_strain_tensor * eps_phi_j
                         *
-                        fe_values.JxW(q_point));
+                        fe_values.JxW (q_point));
 		}
 
 
@@ -1573,12 +1586,12 @@ namespace QuasiStaticElasticity
 		  const SymmetricTensor<2,dim> &old_stress
 		    = local_quadrature_points_data[q_point].old_stress;
 		
-		  cell_rhs(i) += (fe_values.shape_value(i,q_point) *
+		  cell_rhs(i) += (fe_values.shape_value (i,q_point) *
 				  body_force_values[q_point](component_i)
 				  -
-				  get_strain(fe_values,i,q_point) *
+				  get_strain (fe_values,i,q_point) *
 				  old_stress) *
-				 fe_values.JxW(q_point);
+				 fe_values.JxW (q_point);
 		}
 	    }
 
