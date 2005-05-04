@@ -1792,7 +1792,7 @@ namespace QuasiStaticElasticity
 
 
 
-				   // @sect4{TopLevel::output_resuls}
+				   // @sect4{TopLevel::output_results}
 
 				   // This function generate the
 				   // graphical output in intermediate
