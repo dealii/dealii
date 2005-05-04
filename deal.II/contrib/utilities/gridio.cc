@@ -16,54 +16,48 @@
 
 using namespace std;
 
+template <int dim>
+void convert(const char* infile,
+	     const char* outfile,
+	     GridOut::OutputFormat oformat)
+{
+  Triangulation<dim> tr;
+  GridIn<dim> gin;
+  gin.attach_triangulation(tr);
+  gin.read(infile);
+
+  GridOut gout;
+  ofstream out(outfile);
+  gout.write(tr, out, oformat);
+}
+
+
 int main(int argc, char** argv)
 {
-  if (argc<2)
+  if (argc<4)
     {
       cerr << "Usage: " << argv[0]
-	   << " -i informat -o outformat <filename>" << endl;
+	   << " dim infile outfile" << endl;
       exit(1);
     }
 
-  GridOut::OutputFormat oformat;
-  int c;
-  const char* optstring="i:o:";
-  while((c=getopt(argc, argv, optstring)) != -1)
-  {
-      switch (c)
-      {
-	  case 'i':
-	      break;
-	  case 'o':
-	      oformat = GridOut::parse_output_format(optarg);
-	      break;
-      }
-  }
-  string iname =argv[optind];
-//  if (iname.find_last_of('.') <= 0)
-//    iname.append(".inp");
+  const unsigned int d = atoi(argv[1]);
   
-  GridOutFlags::XFig xfig_flags;
-  xfig_flags.level_depth = false;
+  std::string outstring(argv[3]);
+  GridOut::OutputFormat oformat = GridOut::eps;
+  
+  const unsigned int dotpos = outstring.find_last_of('.');
+  if (dotpos < outstring.length())
+    {
+      std::string ext = outstring.substr(dotpos+1);
+      if (ext == "inp")
+	ext = "ucd";
+      
+      oformat = GridOut::parse_output_format(ext);
+    }
 
-  Triangulation<2> tr;
-
-   ifstream in (iname.c_str());
-   AssertThrow(in, ExcFileNotOpen(argv[1]));
-
-   GridIn<2> gin;
-   gin.attach_triangulation(tr);
-   gin.read_ucd(in);
-
-   GridOut gout;
-   gout.set_flags(xfig_flags);
-   
-   string oname(iname, 0, iname.find_last_of('.'));  
-   oname.append(GridOut::default_suffix(oformat));
-   cout << iname << " -> " << oname << endl;
-   ofstream out(oname.c_str());
-
-   gout.write(tr, out, oformat);
-   
-//  GridOut
+  if (d == 2)
+    convert<2>(argv[2], argv[3], oformat);
+  else if (d == 3)
+    convert<3>(argv[2], argv[3], oformat);
 }
