@@ -1852,16 +1852,12 @@ SparseDirectUMFPACK::SparseDirectUMFPACK ()
                 symbolic_decomposition (0),
                 numeric_decomposition (0),
                 control (0)
-{
-  Assert(false, ExcNeedsUMFPACK());
-}
+{}
 
 
 void
 SparseDirectUMFPACK::clear ()
-{
-  Assert(false, ExcNeedsUMFPACK());
-}
+{}
 
 
 void SparseDirectUMFPACK::factorize (const SparseMatrix<double> &)
