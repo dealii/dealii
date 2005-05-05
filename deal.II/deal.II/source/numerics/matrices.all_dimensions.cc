@@ -637,6 +637,8 @@ namespace PETScWrappers
                                            // in the other functions.
     {
       matrix.compress ();
+      right_hand_side.compress ();
+      solution.compress ();
 
       std::map<unsigned int,double>::const_iterator
         dof  = boundary_values.begin(),
