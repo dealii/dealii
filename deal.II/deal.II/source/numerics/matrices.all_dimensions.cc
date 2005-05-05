@@ -553,14 +553,29 @@ namespace PETScWrappers
 
     const std::pair<unsigned int, unsigned int> local_range
       = matrix.local_range();
+
+				     // make sure that there is at
+				     // least one boundary node on
+				     // each processor, or we get into
+				     // trouble with synchronisation
+    {
+      bool found = false;
+      for (unsigned int i=local_range.first; i<local_range.second; ++i)
+	if (boundary_values.find (i) != boundary_values.end())
+	  {
+	    found = true;
+	    break;
+	  }
+      Assert (found == true, ExcNotImplemented());
+    }
+    
     
                                      // determine the first nonzero diagonal
                                      // entry from within the part of the matrix
                                      // that we can see. if we can't find such
                                      // an entry, take one
     PetscScalar average_nonzero_diagonal_entry = 1;
-    for (unsigned int i=local_range.first;
-         i<local_range.second; ++i)
+    for (unsigned int i=local_range.first; i<local_range.second; ++i)
       if (matrix.diag_element(i) != 0)
         {
           average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
