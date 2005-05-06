@@ -73,7 +73,7 @@ class SmartPointer
 				      *
 				      * The <tt>id</tt> is used in the
 				      * call to
-				      * Subscriptor::subscribe(). The #id of
+				      * Subscriptor::subscribe(typeid(*this).name()). The #id of
 				      * the object copied is used here.
 				      */
     SmartPointer (const SmartPointer<T> &tt);
@@ -90,7 +90,7 @@ class SmartPointer
 				      *
 				      * The <tt>id</tt> is used in the
 				      * call to
-				      * Subscriptor::subscribe() and
+				      * Subscriptor::subscribe(typeid(*this).name()) and
 				      * by ~SmartPointer() in the call
 				      * to Subscriptor::unsubscribe().
 				      */
@@ -331,12 +331,12 @@ inline
 void SmartPointer<T>::swap (T *&tt)
 {
   if (t != 0)
-    t->unsubscribe ();
+    t->unsubscribe (id);
   
   std::swap (t, tt);
 
   if (t != 0)
-    t->subscribe ();
+    t->subscribe (id);
 }
 
 
