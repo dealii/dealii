@@ -490,7 +490,6 @@ namespace PETScWrappers
                                         * be zero, it is counted anyway.
                                         */
       unsigned int n_nonzero_elements () const;
-      
 
                                        /**
                                         * Number of entries in a specific row.
