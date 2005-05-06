@@ -42,6 +42,25 @@ inconvenience this causes.
 
 
 <ol>
+  <li> <p>Changed: The way boundary constraints were handled in the step-17
+  tutorial program was conceptually flawed. We tried to eliminate boundary
+  nodes locally on the cell level, and hanging node constraints subsequently
+  when transferring into the global matrix. However, this doesn't work in
+  general: the elimination of hanging node constraints could re-populate rows
+  and columns that had already been vacated during boundary node
+  elimination. At the end of a long though process, we came to the conclusion
+  that it is impossible to revert the traditional order of operations: first
+  eliminate all hanging node constraints, then eliminate all boundary
+  nodes. This leads to a situation where the <code
+  class="member">MatrixTools::local_apply_boundary_values</code> function is
+  not very useful any more, except for the special case where there are no
+  hanging nodes. The step-17 example program has therefore been changed to use
+  the <code class="member">MatrixTools::apply_boundary_values</code> function
+  again, though hanging node elimination still happens during transfer into
+  the global matrix.
+  <br> (WB 2005/05/05)
+  </p>
+
   <li> <p>Changed: The class <code
   class="class">MGCoarseGridLACIteration</code> lost two template
   arguments. Since the matrix and preconditioner are now stored in
