@@ -377,10 +377,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: The <code class="member">MatrixTools::apply_boundary_values</code>
+       function now also works for PETSc sequential and parallel matrices.
+       <br> 
+       (WB, 2005/05/05)
+       </p>
+
+  <li> <p>
        Improved: The function<code class="class">GridIn</code>::<code
        class="member">read</code> now searches for files using the
        mechanism provided by the class <code
-       class="class">PathSearch</code>. Furthermore, library of input
+       class="class">PathSearch</code>. Furthermore, a library of input
        meshes has been started in <code>lib/meshes</code>.
        <br> 
        (GK, 2005/05/03)
