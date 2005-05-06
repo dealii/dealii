@@ -571,7 +571,7 @@ BlockMatrixArray<number>::Entry::Entry (const MATRIX& matrix,
 		col (col),
 		prefix (prefix),
 		transpose (transpose),
-		matrix (new PointerMatrix<MATRIX, Vector<number> >(&matrix))
+		matrix (new PointerMatrix<MATRIX, Vector<number> >(&matrix, typeid(*this).name()))
 {}
 
 

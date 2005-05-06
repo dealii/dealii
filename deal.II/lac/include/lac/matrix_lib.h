@@ -303,8 +303,8 @@ ProductMatrix<VECTOR>::ProductMatrix (
   VectorMemory<VECTOR>& m)
   : mem(&m, typeid(*this).name())
 {
-  m1 = new PointerMatrix<MATRIX1, VECTOR>(&mat1);
-  m2 = new PointerMatrix<MATRIX2, VECTOR>(&mat2);
+  m1 = new PointerMatrix<MATRIX1, VECTOR>(&mat1, typeid(*this).name());
+  m2 = new PointerMatrix<MATRIX2, VECTOR>(&mat2, typeid(*this).name());
 }
 
 
@@ -317,8 +317,8 @@ ProductMatrix<VECTOR>::reinit (
 {
   delete m1;
   delete m2;
-  m1 = new PointerMatrix<MATRIX1, VECTOR>(&mat1);
-  m2 = new PointerMatrix<MATRIX2, VECTOR>(&mat2);  
+  m1 = new PointerMatrix<MATRIX1, VECTOR>(&mat1, typeid(*this).name());
+  m2 = new PointerMatrix<MATRIX2, VECTOR>(&mat2, typeid(*this).name());
 }
 
 

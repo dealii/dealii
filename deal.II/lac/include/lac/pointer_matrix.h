@@ -107,14 +107,14 @@ class PointerMatrixBase : public Subscriptor
     
 				     /**
 				      * Matrix-vector product, adding to
-				      * @p dst.
+				      * <tt>dst</tt>.
 				      */
     virtual void vmult_add (VECTOR& dst,
 			    const VECTOR& src) const = 0;
     
 				     /**
 				      * Tranposed matrix-vector product,
-				      * adding to @p dst.
+				      * adding to <tt>dst</tt>.
 				      */
     virtual void Tvmult_add (VECTOR& dst,
 			     const VECTOR& src) const = 0;
@@ -144,11 +144,31 @@ class PointerMatrix : public PointerMatrixBase<VECTOR>
 				      * argument is stored in this
 				      * class. As usual, the lifetime of
 				      * <tt>*M</tt> must be longer than the
-				      * one of the @p PointerMatrix.
+				      * one of the PointerMatrix.
 				      *
-				      * If @p M is zero, no matrix is stored.
+				      * If <tt>M</tt> is zero, no
+				      * matrix is stored.
 				      */
     PointerMatrix (const MATRIX* M=0);
+
+				     /**
+				      * Constructor. The name argument
+				      * is used to identify the
+				      * SmartPointer for this object.
+				      */
+    PointerMatrix(const char* name);
+    
+				     /**
+				      * Constructor. <tt>M</tt> points
+				      * to a matrix which must live
+				      * longer than the
+				      * PointerMatrix. The name
+				      * argument is used to identify
+				      * the SmartPointer for this
+				      * object.
+				      */
+    PointerMatrix(const MATRIX* M,
+		  const char* name);
     
 				     /**
 				      * Return whether the object is
@@ -178,14 +198,14 @@ class PointerMatrix : public PointerMatrixBase<VECTOR>
     
 				     /**
 				      * Matrix-vector product, adding to
-				      * @p dst.
+				      * <tt>dst</tt>.
 				      */
     virtual void vmult_add (VECTOR& dst,
 			    const VECTOR& src) const;
     
 				     /**
 				      * Tranposed matrix-vector product,
-				      * adding to @p dst.
+				      * adding to <tt>dst</tt>.
 				      */
     virtual void Tvmult_add (VECTOR& dst,
 			     const VECTOR& src) const;
@@ -292,12 +312,28 @@ PointerMatrixBase<VECTOR>::operator >= (const PointerMatrixBase<VECTOR>& other) 
 }
 
 
+//----------------------------------------------------------------------//
+
 
 template<class MATRIX, class VECTOR>
 PointerMatrix<MATRIX, VECTOR>::PointerMatrix (const MATRIX* M)
-  :
-  m(M, typeid(*this).name())
+  : m(M, typeid(*this).name())
 {}
+
+
+template<class MATRIX, class VECTOR>
+PointerMatrix<MATRIX, VECTOR>::PointerMatrix (const char* name)
+  : m(0, name)
+{}
+
+
+template<class MATRIX, class VECTOR>
+PointerMatrix<MATRIX, VECTOR>::PointerMatrix (
+  const MATRIX* M,
+  const char* name)
+  : m(M, name)
+{}
+
 
 template<class MATRIX, class VECTOR>
 inline const PointerMatrix<MATRIX, VECTOR>&
