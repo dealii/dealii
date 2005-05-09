@@ -131,7 +131,7 @@ DataEntry<VectorType>::clear ()
 template <int dof_handler_dim, int patch_dim, int patch_space_dim>
 DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataOut_DoFData ()
 		:
-		dofs(0)
+		dofs(0,typeid(*this).name())
 {}
 
 
@@ -152,12 +152,7 @@ attach_dof_handler (const DoFHandler<dof_handler_dim> &d)
   Assert (dof_data.size() == 0, ExcOldDataStillPresent());
   Assert (cell_data.size() == 0, ExcOldDataStillPresent());
   
-  if (dofs != 0)
-    dofs->unsubscribe ();
-  
   dofs = &d;
-  if (dofs != 0)
-    dofs->subscribe ();
 }
 
 
@@ -303,10 +298,7 @@ clear_input_data_references ()
     cell_data[i]->clear ();
 
   if (dofs != 0)
-    {
-      dofs->unsubscribe ();
-      dofs = 0;
-    };
+    dofs = 0;
 }
 
 
@@ -319,10 +311,7 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear ()
   cell_data.erase (cell_data.begin(), cell_data.end());
 
   if (dofs != 0)
-    {
-      dofs->unsubscribe ();
-      dofs = 0;
-    };
+    dofs = 0;
 
 				   // delete patches
   std::vector<Patch> dummy;
