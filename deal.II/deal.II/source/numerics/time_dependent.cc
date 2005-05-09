@@ -60,7 +60,7 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
 	  ExcInvalidPosition());
 
 				   // lock this timestep from deletion
-  new_timestep->subscribe();
+  new_timestep->subscribe(typeid(*this).name());
 
 				   // first insert the new time step
 				   // into the doubly linked list
@@ -123,7 +123,7 @@ void TimeDependent::delete_timestep (const unsigned int position)
   Assert (position<timesteps.size(),
 	  ExcInvalidPosition());
 
-  timesteps[position]->unsubscribe();
+  timesteps[position]->unsubscribe(typeid(*this).name());
   delete timesteps[position];
   timesteps.erase (timesteps.begin() + position);
 
@@ -437,7 +437,7 @@ TimeStepBase_Tria<dim>::~TimeStepBase_Tria ()
 {
   if (!flags.delete_and_rebuild_tria)
     {
-      tria->unsubscribe ();
+      tria->unsubscribe(typeid(*this).name());
       delete tria;
     }
   else
@@ -471,7 +471,7 @@ TimeStepBase_Tria<dim>::sleep (const unsigned sleep_level)
       
       if (flags.delete_and_rebuild_tria)
 	{
-	  tria->unsubscribe();
+	  tria->unsubscribe(typeid(*this).name());
 	  delete tria;
 	  tria = 0;
 	};
@@ -505,7 +505,7 @@ void TimeStepBase_Tria<dim>::restore_grid ()
 				   // create a virgin triangulation and
 				   // set it to a copy of the coarse grid
   tria = new Triangulation<dim> ();
-  tria->subscribe();
+  tria->subscribe(typeid(*this).name());
   tria->copy_triangulation (*coarse_grid);
 
 				   // for each of the previous refinement

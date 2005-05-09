@@ -54,7 +54,7 @@ Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
   for (unsigned int i=0;i<255;++i)
     {
       boundary[i] = straight_boundary;
-      boundary[i]->subscribe();
+      boundary[i]->subscribe(typeid(*this).name());
     }
 }
 
@@ -79,7 +79,7 @@ Triangulation<dim>::~Triangulation ()
   levels.clear ();
 
   for (unsigned int i=0;i<255;++i)
-    boundary[i]->unsubscribe ();
+    boundary[i]->unsubscribe(typeid(*this).name());
 }
 
 
@@ -100,9 +100,9 @@ void Triangulation<dim>::clear ()
   
   for (unsigned int i=0; i<255; ++i)
     {
-      boundary[i]->unsubscribe ();
+      boundary[i]->unsubscribe(typeid(*this).name());
       boundary[i] = straight_boundary;
-      boundary[i]->subscribe ();
+      boundary[i]->subscribe(typeid(*this).name());
     };
 
   number_cache = TriaNumberCache<dim>();
@@ -116,9 +116,9 @@ Triangulation<dim>::set_boundary (const unsigned int number,
 {
   Assert(number<255, ExcIndexRange(number,0,255));
   
-  boundary[number]->unsubscribe ();
+  boundary[number]->unsubscribe(typeid(*this).name());
   boundary[number] = &boundary_object;
-  boundary_object.subscribe();
+  boundary_object.subscribe(typeid(*this).name());
 }
 
 
@@ -217,9 +217,9 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
 
   for (unsigned i=0;i<255;++i)
     {
-      boundary[i]->unsubscribe ();
+      boundary[i]->unsubscribe(typeid(*this).name());
       boundary[i]      = old_tria.boundary[i];
-      boundary[i]->subscribe ();
+      boundary[i]->subscribe(typeid(*this).name());
     }
 
   levels.reserve (old_tria.levels.size());
@@ -4163,10 +4163,10 @@ Triangulation<dim>::clear_despite_subscriptions()
 				   // and then set them again
   const unsigned int n=n_subscriptions();
   for (unsigned int i=0; i<n; ++i)
-    unsubscribe();
+    unsubscribe(typeid(*this).name());
   clear ();
   for (unsigned int i=0; i<n; ++i)
-    subscribe();
+    subscribe(typeid(*this).name());
 }
 
 
