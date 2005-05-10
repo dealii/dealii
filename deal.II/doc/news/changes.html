@@ -301,6 +301,15 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: <code class="class">SparseDirectUMFPACK</code> now
+       has the complete interface of a preconditioner
+       class. Therefore, it can be used in iterative solvers and in
+       multigrid smoothers.
+       <br> 
+       (GK, 2005/05/10)
+       </p>
+
+  <li> <p>
        Fixed: The PETSc matrix iterators had trouble when some rows of a
        matrix were empty. This has now been mostly fixed.
        <br> 
