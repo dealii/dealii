@@ -1885,7 +1885,7 @@ SparseDirectUMFPACK::solve (const SparseMatrix<double> &,
 
 
 void
-PreconditionUMFPACK::initialize (const SparseMatrix<double>& M,
+SparseDirectUMFPACK::initialize (const SparseMatrix<double>& M,
 				 const AdditionalData)
 {
   this->factorize(M);
@@ -1893,7 +1893,7 @@ PreconditionUMFPACK::initialize (const SparseMatrix<double>& M,
 
 
 void
-PreconditionUMFPACK::vmult (
+SparseDirectUMFPACK::vmult (
   Vector<double>&       dst,
   const Vector<double>& src) const
 {
@@ -1903,7 +1903,7 @@ PreconditionUMFPACK::vmult (
 
 
 void
-PreconditionUMFPACK::Tvmult (
+SparseDirectUMFPACK::Tvmult (
   Vector<double>&,
   const Vector<double>&) const
 {
@@ -1912,7 +1912,7 @@ PreconditionUMFPACK::Tvmult (
 
 
 void
-PreconditionUMFPACK::vmult_add (
+SparseDirectUMFPACK::vmult_add (
   Vector<double>&,
   const Vector<double>&) const
 {
@@ -1921,7 +1921,7 @@ PreconditionUMFPACK::vmult_add (
 
 
 void
-PreconditionUMFPACK::Tvmult_add (
+SparseDirectUMFPACK::Tvmult_add (
   Vector<double>&,
   const Vector<double>&) const
 {

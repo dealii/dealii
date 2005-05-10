@@ -1005,6 +1005,15 @@ class SparseDirectMA47 : public Subscriptor
  * direct sparse LU factorization. Matrices may have symmetric or unsymmetrix
  * sparsity patterns, and may have unsymmetric entries.
  *
+ * This matrix class implements the usual interface of
+ * preconditioners, that is a function initialize(const
+ * SparseMatrix<double>&matrix,const AdditionalData) for initalizing
+ * and the whole set of vmult() functions common to all
+ * matrices. Implemented here are only vmult() and vmult_add(), which
+ * perform multiplication with the inverse matrix. Furthermore, this
+ * class provides an older interface, consisting of the functions
+ * factorize() and solve(). Both interfaces are interchangeable.
+ *
  * @note This class only exists if support for <a
  * href="http://www.cise.ufl.edu/research/sparse/umfpack">UMFPACK</a> was
  * enabled during configure and if the <a
@@ -1020,9 +1029,18 @@ class SparseDirectMA47 : public Subscriptor
  *
  * @author Wolfgang Bangerth, 2004
  */
-class SparseDirectUMFPACK : public virtual Subscriptor
+class SparseDirectUMFPACK : public Subscriptor
 {
   public:
+				     /**
+				      * Dummy class needed for the
+				      * usual initalization interface
+				      * of preconditioners.
+				      */
+    class AdditionalData
+    {};
+    
+    
 				     /**
 				      * Constructor. See the
 				      * documentation of this class
@@ -1072,6 +1090,41 @@ class SparseDirectUMFPACK : public virtual Subscriptor
 				      * solves are required.
 				      */
     void factorize (const SparseMatrix<double> &matrix);
+
+				     /**
+				      * Initialize memory and call
+				      * SparseDirectUMFPACK::factorize.
+				      */
+    void initialize(const SparseMatrix<double> &matrix,
+		    const AdditionalData = AdditionalData());
+    
+				     /**
+				      * Preconditioner interface
+				      * function. Given the source
+				      * vector, returns the
+				      * approximated solution of <i>Ax
+				      * = b</i>.
+				      */
+    void vmult (Vector<double>&, const Vector<double>&) const;
+
+				     /**
+				      * Not implemented but necessary
+				      * for compiling.
+				      */
+    void Tvmult (Vector<double>&, const Vector<double>&) const;
+    
+				     /**
+				      * Same as vmult(), but adding to
+				      * the previous solution. Not
+				      * implemented yet.
+				      */
+    void vmult_add (Vector<double>&, const Vector<double>&) const;
+
+				     /**
+				      * Not implemented but necessary
+				      * for compiling.
+				      */
+    void Tvmult_add (Vector<double>&, const Vector<double>&) const;
 
 				     /**
 				      * Solve for a certain right hand
@@ -1155,61 +1208,6 @@ class SparseDirectUMFPACK : public virtual Subscriptor
                                       */
     std::vector<double> control;
 };
-
-
-/**
- * Wrapper for SparseDirectUMFPACK, implementing the usual
- * preconditioner interface with functions initialize() and vmult().
- */
-class PreconditionUMFPACK : public virtual Subscriptor,
-			    private SparseDirectUMFPACK
-{
-  public:
-				     /**
-				      * Dummy class needed for the
-				      * usual initalization interface
-				      * of preconditioners.
-				      */
-    class AdditionalData
-    {};
-    
-    
-				     /**
-				      * Initialize memory and call
-				      * SparseDirectUMFPACK::factorize.
-				      */
-    void initialize(const SparseMatrix<double> &matrix,
-		    const AdditionalData = AdditionalData());
-    
-				     /**
-				      * Preconditioner interface
-				      * function. Given the source
-				      * vector, returns the
-				      * approximated solution of <i>Ax
-				      * = b</i>.
-				      */
-    void vmult (Vector<double>&, const Vector<double>&) const;
-
-				     /**
-				      * Not implemented but necessary
-				      * for compiling.
-				      */
-    void Tvmult (Vector<double>&, const Vector<double>&) const;
-    
-				     /**
-				      * Same as vmult(), but adding to
-				      * the previous solution. Not
-				      * implemented yet.
-				      */
-    void vmult_add (Vector<double>&, const Vector<double>&) const;
-
-				     /**
-				      * Not implemented but necessary
-				      * for compiling.
-				      */
-    void Tvmult_add (Vector<double>&, const Vector<double>&) const;
-};
-
 
 
 /*@}*/
