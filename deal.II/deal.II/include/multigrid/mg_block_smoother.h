@@ -284,6 +284,8 @@ MGSmootherBlock<MATRIX, RELAX, number>::smooth(
   BlockVector<number>& u,
   const BlockVector<number>& rhs) const
 {
+  deallog.push("Smooth");
+  
   unsigned int maxlevel = matrices.get_maxlevel();
   unsigned int steps2 = steps;
 
@@ -323,6 +325,7 @@ MGSmootherBlock<MATRIX, RELAX, number>::smooth(
 
   mem.free(r);
   mem.free(d);
+  deallog.pop();
 }
 
 
