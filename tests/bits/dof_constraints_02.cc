@@ -90,8 +90,7 @@ void test ()
         A(local_dofs[i]) += local_vector(i);
 
                                        // or let other functions do that
-      constraints.distribute_local_to_global (local_vector, local_dofs,
-					      std::map<unsigned int,double>(), B);
+      constraints.distribute_local_to_global (local_vector, local_dofs, B);
     }
 
                                    // now condense away constraints from A
