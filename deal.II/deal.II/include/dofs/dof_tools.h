@@ -157,11 +157,20 @@ class DoFTools
 				      */
     enum Coupling
     {
-					   /// The two components do not couple
+					   /**
+                                            * The two components do not
+                                            * couple.
+                                            */
 	  none,
-					   /// The two components do couple
+					   /**
+                                            * The two components do couple.
+                                            */
 	  always,
-/// The two components couple only if their shape functions can be nonzero on this face
+                                           /**
+                                            * The two components couple only
+                                            * if their shape functions can be
+                                            * nonzero on this face.
+                                            */
 	  nonzero
     };
     
