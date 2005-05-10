@@ -128,9 +128,14 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
 {
   if (debug>0)
     deallog << "V-cycle entering level " << level << std::endl;
+  if (debug>2)
+    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm()
+	    << std::endl;
   
   if (level == minlevel)
     {
+      if (debug>0)
+	deallog << "Coarse level           " << level << std::endl;
       (*coarse)(level, solution[level], defect[level]);
       return;
     }
@@ -139,12 +144,16 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
 				   // smoothing of the residual by
 				   // modifying s
   pre_smooth->smooth(level, solution[level], defect[level]);
-
+  
+  if (debug>2)
+    deallog << "Solution norm          " << solution[level].l2_norm()
+	    << std::endl;
+  
   if (debug>1)
     deallog << "Residual on      level " << level << std::endl;
 				   // t = A*solution[level]
   matrix->vmult(level, t[level], solution[level]);
-
+  
 				   // make t rhs of lower level The
 				   // non-refined parts of the
 				   // coarse-level defect already
@@ -160,33 +169,41 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
       transfer->restrict_and_add (l, t[l-1], t[l]);
       defect[l-1] -= t[l-1];
     }
-
+  
 				   // do recursion
   solution[level-1] = 0.;
   level_v_step(level-1);
-
+  
 				   // reset size of the auxiliary
 				   // vector, since it has been
 				   // resized in the recursive call to
 				   // level_v_step directly above
   t[level] = 0.;
-
+  
 				   // do coarse grid correction
   transfer->prolongate(level, t[level], solution[level-1]);
   
   solution[level] += t[level];
-
+  
   if (edge_up != 0)
     {
       edge_up->Tvmult(level, t[level], solution[level-1]);
       defect[level] -= t[level];
     }
   
+  if (debug>2)
+    deallog << "V-cycle  Defect norm   " << defect[level].l2_norm()
+	    << std::endl;
+  
   if (debug>1)
     deallog << "Smoothing on     level " << level << std::endl;
 				   // post-smoothing
   post_smooth->smooth(level, solution[level], defect[level]);
-
+  
+  if (debug>2)
+    deallog << "Solution norm          " << solution[level].l2_norm()
+	    << std::endl;
+  
   if (debug>1)
     deallog << "V-cycle leaving  level " << level << std::endl;
 }
@@ -205,7 +222,10 @@ Multigrid<VECTOR>::level_step(const unsigned int level,
       case f_cycle: cychar = 'F'; break;
       case w_cycle: cychar = 'W'; break;
     }
-  
+
+  if (debug>0)
+    deallog << cychar << "-cycle entering level " << level << std::endl;
+
 				   // Not actually the defect yet, but
 				   // we do not want to spend yet
 				   // another vector.
@@ -221,26 +241,31 @@ Multigrid<VECTOR>::level_step(const unsigned int level,
 				   // defect2. This is subtracted from
 				   // the original defect.
   t[level].equ(-1.,defect2[level],1.,defect[level]);
-  
+
+  if (debug>2)
+    deallog << cychar << "-cycle defect norm    " << t[level].l2_norm()
+	    << std::endl;
+
   if (level == minlevel)
     {
       if (debug>0)
-	deallog << cychar << "-cycle solving  level " << level << std::endl;
+	deallog << cychar << "-cycle coarse level   " << level << std::endl;
   
       (*coarse)(level, solution[level], t[level]);
       return;
     }
-  if (debug>0)
-    deallog << cychar << "-cycle entering level " << level << std::endl;
-  
   if (debug>1)
-    deallog << "Smoothing on     level " << level << std::endl;
+    deallog << cychar << "-cycle smoothing level " << level << std::endl;
 				   // smoothing of the residual by
 				   // modifying s
   pre_smooth->smooth(level, solution[level], t[level]);
-
+  
+  if (debug>2)
+    deallog << cychar << "-cycle solution norm    "
+	    << solution[level].l2_norm() << std::endl;
+  
   if (debug>1)
-    deallog << "Residual on      level " << level << std::endl;
+    deallog << cychar << "-cycle residual level   " << level << std::endl;
 				   // t = A*solution[level]
   matrix->vmult(level, t[level], solution[level]);
 				   // make t rhs of lower level The
@@ -290,13 +315,17 @@ Multigrid<VECTOR>::level_step(const unsigned int level,
 
   t[level].sadd(-1.,-1.,defect2[level],1.,defect[level]);
 
+  if (debug>2)
+    deallog << cychar << "-cycle  Defect norm    " << t[level].l2_norm()
+	    << std::endl;
+
   if (debug>1)
-    deallog << "Smoothing on     level " << level << std::endl;
+    deallog << cychar << "-cycle smoothing level " << level << std::endl;
 				   // post-smoothing
   post_smooth->smooth(level, solution[level], t[level]);
 
   if (debug>1)
-    deallog << cychar << "-cycle leaving  level " << level << std::endl;
+    deallog << cychar << "-cycle leaving level   " << level << std::endl;
 }
 
 
@@ -352,6 +381,14 @@ Multigrid<VECTOR>::vmult(VECTOR& dst, const VECTOR& src) const
 {
   Multigrid<VECTOR>& mg = const_cast<Multigrid<VECTOR>&>(*this);
   mg.defect[maxlevel] = src;
+  for (unsigned int level=maxlevel;level>minlevel;--level)
+    {
+      mg.defect[level-1] = 0.;
+      mg.transfer->restrict_and_add (level,
+				     mg.defect[level-1],
+				     mg.defect[level]);
+    }
+  
   mg.cycle();
   dst = mg.solution[maxlevel];
 }
