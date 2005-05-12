@@ -849,19 +849,6 @@ void FEValuesBase<dim>::get_function_grads (
       for (unsigned int point=0; point<n_quadrature_points; ++point)
 	for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
 	  if (fe->is_primitive(shape_func))
-	    values[point][fe->system_to_component_index(shape_func).first
-			  +mc * n_components]
-	      += fe_function(indices[shape_func+mc*dofs_per_cell])
-	      * shape_grad(shape_func, point);
-	  else
-	    for (unsigned int c=0; c<n_components; ++c)
-	      values[point][c] += (fe_function(indices[shape_func]) *
-				   shape_grad_component(shape_func, point, c));
-  else
-    for (unsigned int mc = 0; mc < component_multiple; ++mc)
-      for (unsigned int point=0; point<n_quadrature_points; ++point)
-	for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
-	  if (fe->is_primitive(shape_func))
 	    values[fe->system_to_component_index(shape_func).first
 		   +mc * n_components][point]
 	      += fe_function(indices[shape_func+mc*dofs_per_cell])
@@ -869,6 +856,19 @@ void FEValuesBase<dim>::get_function_grads (
 	  else
 	    for (unsigned int c=0; c<n_components; ++c)
 	      values[c][point] += (fe_function(indices[shape_func]) *
+				   shape_grad_component(shape_func, point, c));
+  else
+    for (unsigned int mc = 0; mc < component_multiple; ++mc)
+      for (unsigned int point=0; point<n_quadrature_points; ++point)
+	for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
+	  if (fe->is_primitive(shape_func))
+	    values[point][fe->system_to_component_index(shape_func).first
+			  +mc * n_components]
+	      += fe_function(indices[shape_func+mc*dofs_per_cell])
+	      * shape_grad(shape_func, point);
+	  else
+	    for (unsigned int c=0; c<n_components; ++c)
+	      values[point][c] += (fe_function(indices[shape_func]) *
 				   shape_grad_component(shape_func, point, c));
 }
 
@@ -952,23 +952,6 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
 	  {
 	    Tensor<2,dim> tmp(shape_2nd_derivative(shape_func,point));
 	    tmp *= dof_values(shape_func);
-	    second_derivs[point][fe->system_to_component_index(shape_func).first]
-	      += tmp;
-	  }
-	else
-	  for (unsigned int c=0; c<n_components; ++c)
-	    {
-	      Tensor<2,dim> tmp = this->shape_2nd_derivative_component(shape_func,point,c);
-	      tmp *= dof_values(shape_func);
-	      second_derivs[point][c] += tmp;
-	    }
-  else
-    for (unsigned int point=0; point<n_quadrature_points; ++point)
-      for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
-	if (fe->is_primitive(shape_func))
-	  {
-	    Tensor<2,dim> tmp(shape_2nd_derivative(shape_func,point));
-	    tmp *= dof_values(shape_func);
 	    second_derivs[fe->system_to_component_index(shape_func).first][point]
 	      += tmp;
 	  }
@@ -978,6 +961,23 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
 	      Tensor<2,dim> tmp = this->shape_2nd_derivative_component(shape_func,point,c);
 	      tmp *= dof_values(shape_func);
 	      second_derivs[c][point] += tmp;
+	    }
+  else
+    for (unsigned int point=0; point<n_quadrature_points; ++point)
+      for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
+	if (fe->is_primitive(shape_func))
+	  {
+	    Tensor<2,dim> tmp(shape_2nd_derivative(shape_func,point));
+	    tmp *= dof_values(shape_func);
+	    second_derivs[point][fe->system_to_component_index(shape_func).first]
+	      += tmp;
+	  }
+	else
+	  for (unsigned int c=0; c<n_components; ++c)
+	    {
+	      Tensor<2,dim> tmp = this->shape_2nd_derivative_component(shape_func,point,c);
+	      tmp *= dof_values(shape_func);
+	      second_derivs[point][c] += tmp;
 	    }
 }
 
