@@ -15,8 +15,10 @@ default: $(addprefix build-,$(steps)) doxygen
 run: $(addprefix run-,$(steps)) run-doxygen
 
 # clean subdirs; make a target clean-step-N for each N
-clean: $(addprefix clean-,$(steps)) clean-doxygen
-
+clean:
+	-rm -f *~ */*~ */*.$(OBJEXT) */*gmv */*gnuplot */*gpl */*eps */*pov */*tex \
+	$(addsuffix $(EXEEXT),$(basename $(shell echo step-*/step-*.cc))) \
+	doxygen/*.exe */Makefile.dep
 
 
 # for each build/run/clean target: strip the build- prefix of the
