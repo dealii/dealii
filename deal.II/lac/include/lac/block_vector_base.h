@@ -1007,6 +1007,7 @@ class BlockVectorBase
 /*----------------------- Inline functions ----------------------------------*/
 
 
+///@if NoDoc
 namespace internal
 {
   namespace BlockVectorIterators
@@ -2115,5 +2116,6 @@ BlockVectorBase<VectorType>::operator() (const unsigned int i)
   return components[local_index.first](local_index.second);
 }
 
+///@endif
 
 #endif

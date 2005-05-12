@@ -855,6 +855,8 @@ class SymmetricTensor
 
 // ------------------------- inline functions ------------------------
 
+///@if NoDoc
+
 namespace internal
 {
   namespace SymmetricTensorAccessors
@@ -1738,6 +1740,7 @@ SymmetricTensor<4,3>::norm () const
   return std::sqrt(t);
 }
 
+///@endif
 
 /* ----------------- Non-member functions operating on tensors. ------------ */
 
