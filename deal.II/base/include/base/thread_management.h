@@ -5081,10 +5081,11 @@ namespace Threads
 				    * @internal
                                     * Overload of the non-const spawn
                                     * function for member functions
-                                    * with no arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * with no arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C>
   inline
@@ -5097,10 +5098,11 @@ namespace Threads
 				    * @internal
                                     * Overload of the spawn function
                                     * for const member functions with
-                                    * no arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * no arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C>
   inline
@@ -5149,10 +5151,11 @@ namespace Threads
 				    * @internal
                                     * Overload of the non-const spawn
                                     * function for member functions with
-                                    * 1 argument. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * 1 argument. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C, typename Arg1>
   inline
@@ -5165,10 +5168,11 @@ namespace Threads
 				    * @internal
                                     * Overload of the spawn function for
                                     * const member functions with 1
-                                    * argument. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * argument. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C, typename Arg1>
   inline
@@ -5220,10 +5224,11 @@ namespace Threads
 				    * @internal
                                     * Overload of the non-const spawn
                                     * function for member functions
-                                    * with 2 arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * with 2 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C, typename Arg1, typename Arg2>
   inline
@@ -5236,10 +5241,11 @@ namespace Threads
 				    * @internal
                                     * Overload of the spawn function
                                     * for const member functions with
-                                    * 2 arguments. This is the version
-                                    * of the <tt>spawn</tt> function for
-                                    * the case that threading is not
-                                    * enabled.
+                                    * 2 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C, typename Arg1, typename Arg2>
   inline
@@ -5291,10 +5297,11 @@ namespace Threads
                                    /**
                                     * Overload of the non-const spawn
                                     * function for member functions
-                                    * with 3 arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * with 3 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3>
@@ -5308,10 +5315,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for const member functions with
-                                    * 3 arguments. This is the version
-                                    * of the <tt>spawn</tt> function for
-                                    * the case that threading is not
-                                    * enabled.
+                                    * 3 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3>
@@ -5366,10 +5374,11 @@ namespace Threads
                                    /**
                                     * Overload of the non-const spawn
                                     * function for member functions
-                                    * with 4 arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * with 4 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -5383,10 +5392,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for const member functions with
-                                    * 4 arguments. This is the version
-                                    * of the <tt>spawn</tt> function for
-                                    * the case that threading is not
-                                    * enabled.
+                                    * 4 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -5443,10 +5453,11 @@ namespace Threads
                                    /**
                                     * Overload of the non-const spawn
                                     * function for member functions
-                                    * with 5 arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * with 5 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5462,10 +5473,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for const member functions with
-                                    * 5 arguments. This is the version
-                                    * of the <tt>spawn</tt> function for
-                                    * the case that threading is not
-                                    * enabled.
+                                    * 5 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5523,10 +5535,11 @@ namespace Threads
                                    /**
                                     * Overload of the non-const spawn
                                     * function for member functions
-                                    * with 6 arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * with 6 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5542,10 +5555,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for const member functions with
-                                    * 6 arguments. This is the version
-                                    * of the <tt>spawn</tt> function for
-                                    * the case that threading is not
-                                    * enabled.
+                                    * 6 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5606,10 +5620,11 @@ namespace Threads
                                    /**
                                     * Overload of the non-const spawn
                                     * function for member functions
-                                    * with 7 arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * with 7 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5628,10 +5643,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for const member functions with
-                                    * 7 arguments. This is the version
-                                    * of the <tt>spawn</tt> function for
-                                    * the case that threading is not
-                                    * enabled.
+                                    * 7 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5696,10 +5712,11 @@ namespace Threads
                                    /**
                                     * Overload of the non-const spawn
                                     * function for member functions
-                                    * with 8 arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * with 8 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5720,10 +5737,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for const member functions with
-                                    * 8 arguments. This is the version
-                                    * of the <tt>spawn</tt> function for
-                                    * the case that threading is not
-                                    * enabled.
+                                    * 8 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5792,10 +5810,11 @@ namespace Threads
                                    /**
                                     * Overload of the non-const spawn
                                     * function for member functions
-                                    * with 9 arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * with 9 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5816,10 +5835,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for const member functions with
-                                    * 9 arguments. This is the version
-                                    * of the <tt>spawn</tt> function for
-                                    * the case that threading is not
-                                    * enabled.
+                                    * 9 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5889,10 +5909,11 @@ namespace Threads
                                    /**
                                     * Overload of the non-const spawn
                                     * function for member functions
-                                    * with 10 arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * with 10 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5915,10 +5936,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for const member functions with
-                                    * 10 arguments. This is the
-                                    * version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * 10 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename C,
             typename Arg1, typename Arg2, typename Arg3,
@@ -5977,10 +5999,11 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with no
-                                    * arguments. This is the version
-                                    * of the <tt>spawn</tt> function for
-                                    * the case that threading is not
-                                    * enabled.
+                                    * arguments. This version of the fun
+				    * ction is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT>
   inline
@@ -6027,10 +6050,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for non-member or static member
-                                    * functions with 1 argument. This
-                                    * is the version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * functions with 1 argument. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename Arg1>
   inline
@@ -6079,10 +6103,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for non-member or static member
-                                    * functions with 2 arguments. This
-                                    * is the version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * functions with 2 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT, typename Arg1, typename Arg2>
   inline
@@ -6132,10 +6157,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for non-member or static member
-                                    * functions with 3 arguments. This
-                                    * is the version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * functions with 3 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3>
@@ -6188,10 +6214,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for non-member or static member
-                                    * functions with 4 arguments. This
-                                    * is the version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * functions with 4 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3, typename Arg4>
@@ -6246,10 +6273,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for non-member or static member
-                                    * functions with 5 arguments. This
-                                    * is the version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * functions with 5 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3,
@@ -6305,10 +6333,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for non-member or static member
-                                    * functions with 6 arguments. This
-                                    * is the version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * functions with 6 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3,
@@ -6366,10 +6395,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for non-member or static member
-                                    * functions with 7 arguments. This
-                                    * is the version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * functions with 7 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3,
@@ -6431,10 +6461,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for non-member or static member
-                                    * functions with 8 arguments. This
-                                    * is the version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * functions with 8 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3,
@@ -6500,10 +6531,11 @@ namespace Threads
                                    /**
                                     * Overload of the spawn function
                                     * for non-member or static member
-                                    * functions with 9 arguments. This
-                                    * is the version of the <tt>spawn</tt>
-                                    * function for the case that
-                                    * threading is not enabled.
+                                    * functions with 9 arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3,
@@ -6571,10 +6603,11 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with 10
-                                    * arguments. This is the version
-                                    * of the <tt>spawn</tt> function for
-                                    * the case that threading is not
-                                    * enabled.
+                                    * arguments. This version of the
+				    * function is only visible if
+				    * multithreading is not enabled, but
+				    * it has the exact same interface as
+				    * if multithreading was enabled.
                                     */
   template <typename RT,
             typename Arg1, typename Arg2, typename Arg3,
