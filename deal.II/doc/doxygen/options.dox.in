@@ -916,7 +916,9 @@ INCLUDE_FILE_PATTERNS  =
 # or name=definition (no spaces). If the definition and the = are 
 # omitted =1 is assumed.
 
-PREDEFINED             = DEBUG=1 @DEAL_II_DEFINE_DEAL_II_USE_PETSC@
+# [WB] Set MT flags so that the corresponding documentation will always be visible,
+# [WB] irrespective of whether MT is actually switched on or not.
+PREDEFINED             = DEBUG=1 @DEAL_II_DEFINE_DEAL_II_USE_PETSC@ DEAL_II_USE_MT=1 DEAL_II_USE_MT_POSIX=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
