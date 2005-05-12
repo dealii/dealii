@@ -5081,7 +5081,6 @@ namespace Threads
 
  
                                    /**
-				    * @internal
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with no arguments. This version of the
@@ -5098,7 +5097,6 @@ namespace Threads
   }
 
                                    /**
-				    * @internal
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * no arguments. This version of the
@@ -5151,7 +5149,6 @@ namespace Threads
 
  
                                    /**
-				    * @internal
                                     * Overload of the non-const spawn
                                     * function for member functions with
                                     * 1 argument. This version of the
@@ -5168,7 +5165,6 @@ namespace Threads
   }
 
                                    /**
-				    * @internal
                                     * Overload of the spawn function for
                                     * const member functions with 1
                                     * argument. This version of the
@@ -5224,7 +5220,6 @@ namespace Threads
 
 
                                    /**
-				    * @internal
                                     * Overload of the non-const spawn
                                     * function for member functions
                                     * with 2 arguments. This version of the
@@ -5241,7 +5236,6 @@ namespace Threads
   }
 
                                    /**
-				    * @internal
                                     * Overload of the spawn function
                                     * for const member functions with
                                     * 2 arguments. This version of the
