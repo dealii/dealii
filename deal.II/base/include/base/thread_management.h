@@ -6651,7 +6651,6 @@ namespace Threads
   
 }   // end of implementation of namespace Threads
 
-/// @endif
 
 
 //---------------------------------------------------------------------------
