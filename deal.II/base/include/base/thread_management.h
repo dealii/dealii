@@ -721,9 +721,9 @@ namespace Threads
 }   // end declarations of namespace Threads
 
 /* ----------- implementation of functions in namespace Threads ---------- */
+/// @if NoDoc
 namespace Threads 
 {  
-/// @if NoDoc
   template <typename ForwardIterator>
   std::vector<std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin,
@@ -781,9 +781,12 @@ namespace Threads
       }
     return return_values;
   }  
+}
 
 ///@endif
-  
+
+namespace Threads
+{
   namespace internal 
   {
                                      /**
@@ -5999,11 +6002,12 @@ namespace Threads
                                     * Overload of the spawn function
                                     * for non-member or static member
                                     * functions with no
-                                    * arguments. This version of the fun
-				    * ction is only visible if
-				    * multithreading is not enabled, but
-				    * it has the exact same interface as
-				    * if multithreading was enabled.
+                                    * arguments. This version of the
+                                    * function is only visible if *
+                                    * multithreading is not enabled,
+                                    * but * it has the exact same
+                                    * interface as * if multithreading
+                                    * was enabled.
                                     */
   template <typename RT>
   inline
