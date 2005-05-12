@@ -720,10 +720,10 @@ namespace Threads
   
 }   // end declarations of namespace Threads
 
-/// @if NoDoc
 /* ----------- implementation of functions in namespace Threads ---------- */
 namespace Threads 
 {  
+/// @if NoDoc
   template <typename ForwardIterator>
   std::vector<std::pair<ForwardIterator,ForwardIterator> >
   split_range (const ForwardIterator &begin,
@@ -782,7 +782,8 @@ namespace Threads
     return return_values;
   }  
 
-
+///@endif
+  
   namespace internal 
   {
                                      /**
