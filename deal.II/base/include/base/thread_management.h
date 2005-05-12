@@ -35,7 +35,10 @@
 
 
 /**
- * A namespace for the implementation of thread management in deal.II.
+ * A namespace for the implementation of thread management in
+ * deal.II. Most of the content of this namespace is discussed in
+ * detail in one of the reports linked to from the documentation page
+ * of deal.II.
  */
 namespace Threads 
 {
