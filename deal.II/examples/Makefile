@@ -1,6 +1,8 @@
 # $Id$
 #
 # This Makefile only recurses into the subdirs
+include ../common/Make.global_options
+
 all: default
 
 # existing examples. take dirnames and strip 'step'
