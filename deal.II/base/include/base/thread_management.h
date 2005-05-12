@@ -517,7 +517,21 @@ namespace Threads
                                     * the library.
                                     */
   typedef PosixThreadMutex     ThreadMutex;
+
+                                   /**
+                                    * If using POSIX functions, then
+                                    * alias the POSIX wrapper classes
+                                    * to the names we use throughout
+                                    * the library.
+                                    */
   typedef PosixThreadCondition ThreadCondition;  
+
+                                   /**
+                                    * If using POSIX functions, then
+                                    * alias the POSIX wrapper classes
+                                    * to the names we use throughout
+                                    * the library.
+                                    */
   typedef PosixThreadBarrier   Barrier;
 
 #  else
@@ -534,7 +548,27 @@ namespace Threads
 				    * barrier class.
 				    */
   typedef DummyThreadMutex     ThreadMutex;
+
+				   /**
+				    * In non-multithread mode, the
+				    * mutex and thread management
+				    * classes are aliased to dummy
+				    * classes that actually do
+				    * nothing, in particular not lock
+				    * objects. Likewise for the
+				    * barrier class.
+				    */
   typedef DummyThreadCondition ThreadCondition;  
+
+				   /**
+				    * In non-multithread mode, the
+				    * mutex and thread management
+				    * classes are aliased to dummy
+				    * classes that actually do
+				    * nothing, in particular not lock
+				    * objects. Likewise for the
+				    * barrier class.
+				    */
   typedef DummyBarrier         Barrier;
 #endif
   
