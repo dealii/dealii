@@ -25,8 +25,11 @@ void convert(const char* infile,
   GridIn<dim> gin;
   gin.attach_triangulation(tr);
   gin.read(infile);
-
+  
   GridOut gout;
+  GridOutFlags::DX dx_flags(true, true, true, false, true);
+  gout.set_flags(dx_flags);
+  
   ofstream out(outfile);
   gout.write(tr, out, oformat);
 }
