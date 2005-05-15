@@ -736,7 +736,7 @@ FEValuesBase<dim>::
 get_function_grads (const InputVector                         &fe_function,
 		    std::vector<std::vector<Tensor<1,dim> > > &gradients) const
 {
-  Assert (n_quadrature_points == gradients.size(),
+  Assert (gradients.size() == n_quadrature_points,
 	  ExcDimensionMismatch(gradients.size(), n_quadrature_points));
 
   const unsigned int n_components = fe->n_components();
@@ -769,7 +769,7 @@ get_function_grads (const InputVector                         &fe_function,
 	{
 	  Tensor<1,dim> tmp = this->shape_grad(shape_func,point);
 	  tmp *= dof_values(shape_func);
-	  gradients[fe->system_to_component_index(shape_func).first][point]
+	  gradients[point][fe->system_to_component_index(shape_func).first]
 	    += tmp;
 	}
       else
@@ -777,7 +777,7 @@ get_function_grads (const InputVector                         &fe_function,
 	  {
 	    Tensor<1,dim> tmp = this->shape_grad_component(shape_func,point,c);
 	    tmp *= dof_values(shape_func);
-	    gradients[c][point] += tmp;
+	    gradients[point][c] += tmp;
 	  }
 }
 
