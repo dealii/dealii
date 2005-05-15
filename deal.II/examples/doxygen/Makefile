@@ -39,4 +39,4 @@ product_matrix.exe: product_matrix.o $(lib-lac.g) $(lib-base.g)
 ######################################################################
 
 clean:
-	-rm *~ *.o *.exe
+	-rm -f *~ *.o *.exe
