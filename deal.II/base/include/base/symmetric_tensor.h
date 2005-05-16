@@ -856,7 +856,11 @@ class SymmetricTensor
     
     friend double determinant (const SymmetricTensor<2,2> &t);
 
-    friend double determinant (const SymmetricTensor<2,3> &t);    
+    friend double determinant (const SymmetricTensor<2,3> &t);
+
+    template <int dim2>
+    friend SymmetricTensor<2,dim2>
+    deviator (const SymmetricTensor<2,dim2> &t);
 };
 
 
@@ -1765,7 +1769,7 @@ SymmetricTensor<4,3>::norm () const
 inline
 double determinant (const SymmetricTensor<2,1> &t)
 {
-  return t[0][0];
+  return t.data[0];
 }
 
 
@@ -1842,6 +1846,32 @@ SymmetricTensor<rank,dim>
 transpose (const SymmetricTensor<rank,dim> &t)
 {
   return t;
+}
+
+
+
+/**
+ * Compute the deviator of a symmetric tensor, which is defined as <tt>dev[s]
+ * = s - 1/dim*tr[s]*I</tt>, where <tt>I</tt> is the identity operator. This
+ * quantity equals the original tensor minus its contractive or dilative
+ * component and refers to the shear in, for example, elasticity.
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline
+SymmetricTensor<2,dim>
+deviator (const SymmetricTensor<2,dim> &t)
+{
+  SymmetricTensor<2,dim> tmp = t;
+
+                                   // subtract scaled trace from the diagonal
+  const double tr = trace(t) / dim;
+  for (unsigned int i=0; i<dim; ++i)
+    tmp.data[i] -= tr;
+  
+  return tmp;
 }
 
 
