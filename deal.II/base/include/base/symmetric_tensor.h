@@ -794,7 +794,15 @@ class SymmetricTensor
                                       * i.e. the square root of the sum of
                                       * squares of all entries. This norm is
                                       * induced by the scalar product defined
-                                      * above for two symmetric tensors.
+                                      * above for two symmetric tensors. Note
+                                      * that it includes <i>all</i> entries of
+                                      * the tensor, counting symmetry, not
+                                      * only the unique ones (for example, for
+                                      * rank-2 tensors, this norm includes
+                                      * adding up the squares of upper right
+                                      * as well as lower left entries, not
+                                      * just one of them, although they are
+                                      * equal for symmetric tensors).
                                       */
     double norm () const;
     
