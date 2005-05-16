@@ -21,49 +21,34 @@ unsigned int SplitString(const std::string& input,
 			 const std::string& delimiter, 
 			 std::vector<std::string>& results)
 {
-  int iPos = 0;
-  int newPos = -1;
-  int sizeS2 = delimiter.size();
-  int isize = input.size();
-
-  std::vector<int> positions;
-
-  newPos = input.find (delimiter, 0);
-
-  if( newPos < 0 ) { return 0; }
-
+  // Size of the delimiter. Use it to calculate the offsets between
+  // different pieces of the string
+  unsigned int sizeS2 = delimiter.size();
+  // Counter for Current Position
+  unsigned int iPos = 0;
+  // Counter for Position of next delimiter
+  unsigned int newPos = 0;  
+  // Counter for Number of strings
   unsigned int numFound = 0;
-
-  while( newPos > iPos )
-  {
-    numFound++;
-    positions.push_back(newPos);
-    iPos = newPos;
-    newPos = input.find (delimiter, iPos+sizeS2+1);
-  }
-
-  for(unsigned int i=0; i <= positions.size(); ++i)
-  {
-    std::string s;
-    if( i == 0 ) { s = input.substr( i, positions[i] ); }
-    int offset = positions[i-1] + sizeS2;
-    if( offset < isize )
-    {
-      if( i == positions.size() )
-      {
-        s = input.substr(offset);
-      }
-      else if( i > 0 )
-      {
-        s = input.substr( positions[i-1] + sizeS2, 
-          positions[i] - positions[i-1] - sizeS2 );
-      }
+  
+  while( newPos != std::string::npos )
+    { 
+      // Look for a delimiter starting with the correct offset. Note
+      // that if it is the beginning of the cycle the offset is zero.
+      newPos = input.find (delimiter, iPos);
+      // We either found a delimiter inside the string or the
+      // delimiter was not found. Increment the found counter anyway,
+      // as if there are no delimiters, we return one vector
+      // containing exacly one string anyway
+      numFound++;
+      // Add the string we just found to the output vector
+      Assert(iPos <= input.size(), ExcInternalError());
+      results.push_back(input.substr(iPos, newPos-iPos));
+      // Update the current position with the correct offset.
+      iPos = newPos+sizeS2+1;
     }
-    if( s.size() > 0 )
-    {
-      results.push_back(s);
-    }
-  }
+  // At least we found one string and no delimiters.
+  Assert(numFound > 0, ExcInternalError());
   return numFound;
 }
 
@@ -154,7 +139,6 @@ void FunctionParser<dim>::initialize(const std::string variables,
   // In this case a vector function is built with the number of
   // components found between the separators ';' 
   SplitString(expression, ";", expressions);
-  if (expressions.size() == 0) expressions.push_back(expression);
   // Now initialize with the things we got.
   initialize
     (variables, expressions, constants, time_dependent, use_degrees);  
