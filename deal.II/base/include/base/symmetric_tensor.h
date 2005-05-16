@@ -41,6 +41,7 @@ namespace internal
 				      * remaining indices remain in
 				      * invalid state.
 				      */
+    inline
     TableIndices<2> merge (const TableIndices<2> &previous_indices,
 			   const unsigned int     new_index,
 			   const unsigned int     position)
@@ -66,6 +67,7 @@ namespace internal
 				      * remaining indices remain in
 				      * invalid state.
 				      */
+    inline
     TableIndices<4> merge (const TableIndices<4> &previous_indices,
 			   const unsigned int     new_index,
 			   const unsigned int     position)
@@ -1124,6 +1126,7 @@ SymmetricTensor<rank,dim>::memory_consumption ()
 
 
 template <>
+inline
 internal::SymmetricTensorAccessors::double_contraction_result<2,2,1>::type
 SymmetricTensor<2,1>::operator * (const SymmetricTensor<2,1> &s) const
 {
@@ -1133,6 +1136,7 @@ SymmetricTensor<2,1>::operator * (const SymmetricTensor<2,1> &s) const
 
 
 template <>
+inline
 internal::SymmetricTensorAccessors::double_contraction_result<2,2,2>::type
 SymmetricTensor<2,2>::operator * (const SymmetricTensor<2,2> &s) const
 {
@@ -1144,6 +1148,7 @@ SymmetricTensor<2,2>::operator * (const SymmetricTensor<2,2> &s) const
 
 
 template <>
+inline
 internal::SymmetricTensorAccessors::double_contraction_result<2,2,3>::type
 SymmetricTensor<2,3>::operator * (const SymmetricTensor<2,3> &s) const
 {
@@ -1158,6 +1163,7 @@ SymmetricTensor<2,3>::operator * (const SymmetricTensor<2,3> &s) const
 
 
 template <>
+inline
 internal::SymmetricTensorAccessors::double_contraction_result<4,2,1>::type
 SymmetricTensor<4,1>::
 operator * (const SymmetricTensor<2,1> &s) const
@@ -1171,6 +1177,7 @@ operator * (const SymmetricTensor<2,1> &s) const
 
 
 template <>
+inline
 internal::SymmetricTensorAccessors::double_contraction_result<2,4,1>::type
 SymmetricTensor<2,1>::
 operator * (const SymmetricTensor<4,1> &s) const
@@ -1184,6 +1191,7 @@ operator * (const SymmetricTensor<4,1> &s) const
 
 
 template <>
+inline
 internal::SymmetricTensorAccessors::double_contraction_result<4,2,2>::type
 SymmetricTensor<4,2>::
 operator * (const SymmetricTensor<2,2> &s) const
@@ -1202,6 +1210,7 @@ operator * (const SymmetricTensor<2,2> &s) const
 
 
 template <>
+inline
 internal::SymmetricTensorAccessors::double_contraction_result<2,4,2>::type
 SymmetricTensor<2,2>::
 operator * (const SymmetricTensor<4,2> &s) const
@@ -1220,6 +1229,7 @@ operator * (const SymmetricTensor<4,2> &s) const
 
 
 template <>
+inline
 internal::SymmetricTensorAccessors::double_contraction_result<4,2,3>::type
 SymmetricTensor<4,3>::
 operator * (const SymmetricTensor<2,3> &s) const
@@ -1241,6 +1251,7 @@ operator * (const SymmetricTensor<2,3> &s) const
 
 
 template <>
+inline
 internal::SymmetricTensorAccessors::double_contraction_result<2,4,3>::type
 SymmetricTensor<2,3>::
 operator * (const SymmetricTensor<4,3> &s) const
@@ -1262,6 +1273,7 @@ operator * (const SymmetricTensor<4,3> &s) const
 
 
 template <>
+inline
 double &
 SymmetricTensor<2,1>::operator () (const TableIndices<2> &indices)
 {
@@ -1276,6 +1288,7 @@ SymmetricTensor<2,1>::operator () (const TableIndices<2> &indices)
 
 
 template <>
+inline
 double
 SymmetricTensor<2,1>::operator () (const TableIndices<2> &indices) const
 {
@@ -1290,6 +1303,7 @@ SymmetricTensor<2,1>::operator () (const TableIndices<2> &indices) const
 
 
 template <>
+inline
 double &
 SymmetricTensor<2,2>::operator () (const TableIndices<2> &indices)
 {
@@ -1316,6 +1330,7 @@ SymmetricTensor<2,2>::operator () (const TableIndices<2> &indices)
 
 
 template <>
+inline
 double
 SymmetricTensor<2,2>::operator () (const TableIndices<2> &indices) const
 {
@@ -1342,6 +1357,7 @@ SymmetricTensor<2,2>::operator () (const TableIndices<2> &indices) const
 
 
 template <>
+inline
 double &
 SymmetricTensor<2,3>::operator () (const TableIndices<2> &indices)
 {
@@ -1378,6 +1394,7 @@ SymmetricTensor<2,3>::operator () (const TableIndices<2> &indices)
 
 
 template <>
+inline
 double
 SymmetricTensor<2,3>::operator () (const TableIndices<2> &indices) const
 {
@@ -1414,6 +1431,7 @@ SymmetricTensor<2,3>::operator () (const TableIndices<2> &indices) const
 
 
 template <>
+inline
 double &
 SymmetricTensor<4,1>::operator () (const TableIndices<4> &indices)
 {
@@ -1428,6 +1446,7 @@ SymmetricTensor<4,1>::operator () (const TableIndices<4> &indices)
 
 
 template <>
+inline
 double
 SymmetricTensor<4,1>::operator () (const TableIndices<4> &indices) const
 {
@@ -1442,6 +1461,7 @@ SymmetricTensor<4,1>::operator () (const TableIndices<4> &indices) const
 
 
 template <>
+inline
 double &
 SymmetricTensor<4,2>::operator () (const TableIndices<4> &indices)
 {
@@ -1480,6 +1500,7 @@ SymmetricTensor<4,2>::operator () (const TableIndices<4> &indices)
 
 
 template <>
+inline
 double
 SymmetricTensor<4,2>::operator () (const TableIndices<4> &indices) const
 {
@@ -1518,6 +1539,7 @@ SymmetricTensor<4,2>::operator () (const TableIndices<4> &indices) const
 
 
 template <>
+inline
 double &
 SymmetricTensor<4,3>::operator () (const TableIndices<4> &indices)
 {
@@ -1582,6 +1604,7 @@ SymmetricTensor<4,3>::operator () (const TableIndices<4> &indices)
 
 
 template <>
+inline
 double
 SymmetricTensor<4,3>::operator () (const TableIndices<4> &indices) const
 {
@@ -1668,6 +1691,7 @@ SymmetricTensor<rank,dim>::operator [] (const unsigned int row)
 
 
 template <>
+inline
 double
 SymmetricTensor<2,1>::norm () const
 {
@@ -1677,6 +1701,7 @@ SymmetricTensor<2,1>::norm () const
 
 
 template <>
+inline
 double
 SymmetricTensor<2,2>::norm () const
 {
@@ -1686,6 +1711,7 @@ SymmetricTensor<2,2>::norm () const
 
 
 template <>
+inline
 double
 SymmetricTensor<2,3>::norm () const
 {
@@ -1696,6 +1722,7 @@ SymmetricTensor<2,3>::norm () const
 
 
 template <>
+inline
 double
 SymmetricTensor<4,1>::norm () const
 {
@@ -1705,6 +1732,7 @@ SymmetricTensor<4,1>::norm () const
 
 
 template <>
+inline
 double
 SymmetricTensor<4,2>::norm () const
 {
@@ -1730,6 +1758,7 @@ SymmetricTensor<4,2>::norm () const
 
 
 template <>
+inline
 double
 SymmetricTensor<4,3>::norm () const
 {
@@ -1973,6 +2002,7 @@ operator / (const SymmetricTensor<rank,dim> &t,
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
+inline
 void
 double_contract (SymmetricTensor<2,1> &tmp,
 		 const SymmetricTensor<4,1> &t,
@@ -1998,6 +2028,7 @@ double_contract (SymmetricTensor<2,1> &tmp,
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
+inline
 void
 double_contract (SymmetricTensor<2,1> &tmp,
 		 const SymmetricTensor<2,1> &s,
@@ -2022,6 +2053,7 @@ double_contract (SymmetricTensor<2,1> &tmp,
  *
  * @related SymmetricTensor @author Wolfgang Bangerth, 2005
  */
+inline
 void
 double_contract (SymmetricTensor<2,2> &tmp,
 		 const SymmetricTensor<4,2> &t,
@@ -2053,6 +2085,7 @@ double_contract (SymmetricTensor<2,2> &tmp,
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
+inline
 void
 double_contract (SymmetricTensor<2,2> &tmp,
 		 const SymmetricTensor<2,2> &s,
@@ -2084,6 +2117,7 @@ double_contract (SymmetricTensor<2,2> &tmp,
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
+inline
 void
 double_contract (SymmetricTensor<2,3> &tmp,
 		 const SymmetricTensor<4,3> &t,
@@ -2118,6 +2152,7 @@ double_contract (SymmetricTensor<2,3> &tmp,
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
+inline
 void
 double_contract (SymmetricTensor<2,3> &tmp,
 		 const SymmetricTensor<2,3> &s,
