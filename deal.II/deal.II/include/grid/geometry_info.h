@@ -531,7 +531,7 @@ GeometryInfo<1>::unit_cell_vertex (const unsigned int vertex)
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, vertices_per_cell));
 
-  const Point<1> vertices[vertices_per_cell] =
+  static const Point<1> vertices[vertices_per_cell] =
     { Point<1>(0.), Point<1>(1.) };
   return vertices[vertex];
 }
@@ -546,7 +546,7 @@ GeometryInfo<2>::unit_cell_vertex (const unsigned int vertex)
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, vertices_per_cell));
 
-  const Point<2> vertices[vertices_per_cell] =
+  static const Point<2> vertices[vertices_per_cell] =
     { Point<2>(0., 0.), Point<2>(1., 0.),
       Point<2>(1.,1.), Point<2>(0.,1.) };
   return vertices[vertex];
@@ -562,7 +562,7 @@ GeometryInfo<3>::unit_cell_vertex (const unsigned int vertex)
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, vertices_per_cell));
 
-  const Point<3> vertices[vertices_per_cell] =
+  static const Point<3> vertices[vertices_per_cell] =
     { Point<3>(0., 0., 0.), Point<3>(1., 0., 0.),
       Point<3>(1., 0., 1.), Point<3>(0., 0., 1.),
       Point<3>(0., 1., 0.), Point<3>(1., 1., 0.),
