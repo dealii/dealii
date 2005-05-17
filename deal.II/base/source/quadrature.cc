@@ -832,39 +832,12 @@ QProjector<dim>::project_to_child (const Quadrature<dim>    &quadrature,
   Assert (child_no < GeometryInfo<dim>::children_per_cell,
 	  ExcIndexRange (child_no, 0, GeometryInfo<dim>::children_per_cell));
   
-  const unsigned int n_q_points = quadrature.n_quadrature_points;  
-    
-				   // projection is simple: copy over
-				   // old points, scale them, and if
-				   // necessary shift them
-  std::vector<Point<dim> > q_points = quadrature.get_points ();
+  const unsigned int n_q_points = quadrature.n_quadrature_points;
+
+  std::vector<Point<dim> > q_points(n_q_points);
   for (unsigned int i=0; i<n_q_points; ++i)
-    q_points[i] /= 2;
-
-  switch (dim)
-    {
-      case 1:
-      {
-	if (child_no == 1)
-	  for (unsigned int i=0; i<n_q_points; ++i)
-	    q_points[i][0] += 0.5;
-	break;
-      };
-
-      case 2:
-      {
-	if ((child_no == 1) || (child_no == 2))
-	  for (unsigned int i=0; i<n_q_points; ++i)
-	    q_points[i][0] += 0.5;
-	if ((child_no == 2) || (child_no == 3))
-	  for (unsigned int i=0; i<n_q_points; ++i)
-	    q_points[i][1] += 0.5;
-	break;
-      };
-
-      default:
-	    Assert (false, ExcNotImplemented());
-    };
+    q_points[i]=GeometryInfo<dim>::child_to_cell_coordinates(
+      quadrature.point(i), child_no);
 
 				   // for the weights, things are
 				   // equally simple: copy them and
