@@ -124,6 +124,7 @@ PolynomialsBDM<dim>::compute (const Point<dim>            &unit_point,
 }
 
 
+/*
 template <int dim>
 void
 PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
@@ -189,15 +190,24 @@ PolynomialsBDM<dim>::compute_node_matrix (Table<2,double>& A) const
   Assert (polynomial_space.degree() <= 2,
 	  ExcNotImplemented());
 }
-
+*/
 
 template <int dim>
 unsigned int
 PolynomialsBDM<dim>::compute_n_pols(unsigned int k)
 {
-  return dim*PolynomialSpace<dim>::compute_n_pols(k)+2;
+  if (dim == 1)
+    return PolynomialSpace<dim>::compute_n_pols(k)+1;
+  if (dim == 2)
+    return 2*PolynomialSpace<dim>::compute_n_pols(k)+2;
+  if (dim == 3)
+    return 3*PolynomialSpace<dim>::compute_n_pols(k)+3*(k+1);
+  Assert(false, ExcNotImplemented());
+  return 0;
 }
 
 
+template class PolynomialsBDM<1>;
 template class PolynomialsBDM<2>;
+template class PolynomialsBDM<3>;
 

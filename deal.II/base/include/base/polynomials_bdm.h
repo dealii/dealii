@@ -28,15 +28,30 @@
 /**
  * @brief The set of BDM polynomials on tensor product cells
  *
- * This class implements the <I>H<SUB>div</SUB></I>-conforming,
+ * This class implements the <i>H<sup>div</sup></i>-conforming,
  * vector-valued Brezzi-Douglas-Marini polynomials as described in the
  * book by Brezzi and Fortin.
  *
- * Right now, they are implemented in two dimensions only. There, they
- * consist of the complete polynomial space of degree $p$ plus two
- * additional vectors.
+ * These polynomial spaces are based on the space
+ * <i>P<sub>k</sub></i>, realized by a PolynomialSpace constructed
+ * with Legendre polynomials. Since these shape functions are not
+ * sufficient, additional functions are added. These are the following
+ * vector valued polynomials:
  *
- * @author Guido Kanschat, 2003
+ * <dl>
+ * <dt>In 2D:
+ * <dd> The 2D-curl of the functions <i>x<sup>k+1</sup>y</i>
+ * and <i>xy<sup>k+1</sup></i>.
+ * <dt>In 3D:
+ * <dd> For any <i>i=0,...,k</i> the curls of
+ * <i>(0,0,xy<sup>i+1</sup>z<sup>k-i</sup>)</i>,
+ * <i>(0,x<sup>k-i</sup>yz<sup>i+1</sup>,0)</i> and
+ * <i>(x<sup>i+1</sup>y<sup>k-i</sup>z,0,0)</i>
+ * </dl>
+ *
+ * Right now, they are implemented in two dimensions only.
+ *
+ * @author Guido Kanschat, 2003, 2005
  */
 template <int dim>
 class PolynomialsBDM
@@ -47,15 +62,14 @@ class PolynomialsBDM
 				      * functions for BDM polynomials
 				      * of given degree.
 				      *
-				      * Remark that the degree of a
-				      * BDM space is the degree of the
-				      * largest complete polynomial
-				      * space embedded.
-				      *
-				      * @arg p: the degree of the
-				      * BDM-space
+				      * @arg k: the degree of the
+				      * BDM-space, which is the degree
+				      * of the largest complete
+				      * polynomial space
+				      * <i>P<sub>k</sub></i> contained
+				      * in the BDM-space.
 				      */
-    PolynomialsBDM (const unsigned int p);
+    PolynomialsBDM (const unsigned int k);
 
 				     /**
 				      * Computes the value and the
@@ -84,103 +98,7 @@ class PolynomialsBDM
     void compute (const Point<dim>            &unit_point,
                   std::vector<Tensor<1,dim> > &values,
                   std::vector<Tensor<2,dim> > &grads,
-                  std::vector<Tensor<3,dim> > &grad_grads) const;
-    
-				     /**
-				      * Computes the value of the
-				      * <tt>i</tt>th BDM
-				      * polynomial at
-				      * <tt>unit_point</tt>.
-				      *
-				      * Note, that using this function
-				      * within a loop over all tensor
-				      * product polynomials is not
-				      * efficient, because then each
-				      * point value of the underlying
-				      * (one-dimensional) polynomials
-				      * is (unnecessarily) computed
-				      * several times.  Instead use
-				      * the <tt>compute</tt> function, see
-				      * above, with
-				      * <tt>values.size()==n_tensor_pols</tt>
-				      * to get the point values of all
-				      * tensor polynomials all at once
-				      * and in a much more efficient
-				      * way.
-				      */
-    Tensor<1,dim> compute_value (const unsigned int i,
-				 const Point<dim> &p) const;
-
-				     /**
-				      * Computes the grad of the
-				      * <tt>i</tt>th tensor product
-				      * polynomial at
-				      * <tt>unit_point</tt>. Here <tt>i</tt> is
-				      * given in tensor product
-				      * numbering.
-				      *
-				      * Note, that using this function
-				      * within a loop over all tensor
-				      * product polynomials is not
-				      * efficient, because then each
-				      * derivative value of the
-				      * underlying (one-dimensional)
-				      * polynomials is (unnecessarily)
-				      * computed several times.
-				      * Instead use the <tt>compute</tt>
-				      * function, see above, with
-				      * <tt>grads.size()==n_tensor_pols</tt>
-				      * to get the point value of all
-				      * tensor polynomials all at once
-				      * and in a much more efficient
-				      * way.
-				      */
-    Tensor<2,dim> compute_grad (const unsigned int i,
-				const Point<dim> &p) const;
-
-				     /**
-				      * Computes the second
-				      * derivative (grad_grad) of the
-				      * <tt>i</tt>th tensor product
-				      * polynomial at
-				      * <tt>unit_point</tt>. Here <tt>i</tt> is
-				      * given in tensor product
-				      * numbering.
-				      *
-				      * Note, that using this function
-				      * within a loop over all tensor
-				      * product polynomials is not
-				      * efficient, because then each
-				      * derivative value of the
-				      * underlying (one-dimensional)
-				      * polynomials is (unnecessarily)
-				      * computed several times.
-				      * Instead use the <tt>compute</tt>
-				      * function, see above, with
-				      * <tt>grad_grads.size()==n_tensor_pols</tt>
-				      * to get the point value of all
-				      * tensor polynomials all at once
-				      * and in a much more efficient
-				      * way.
-				      */
-    Tensor<3,dim> compute_grad_grad (const unsigned int i,
-                                     const Point<dim> &p) const;
-
-				     /**
-				      * Compute the matrix that has as
-				      * its entry
-				      * <i>a<sub>ij</sub></i> the node
-				      * functional <i>i</i> evaluated
-				      * for basis function
-				      * <i>j</i>. The node functionals
-				      * are the standard BDM
-				      * interpolation operators.
-				      *
-				      * The inverse of this matrix can
-				      * be used to interpolate node
-				      * values to BDM polynomials.
-				      */
-    void compute_node_matrix (Table<2,double>&) const;
+                  std::vector<Tensor<3,dim> > &grad_grads) const;    
     
 				     /**
 				      * Returns the number of BDM polynomials.
@@ -229,10 +147,12 @@ class PolynomialsBDM
 				      * Auxiliary memory.
 				      */
     mutable std::vector<double> p_values;
+    
 				     /**
 				      * Auxiliary memory.
 				      */
     mutable std::vector<Tensor<1,dim> > p_grads;
+    
 				     /**
 				      * Auxiliary memory.
 				      */
@@ -252,7 +172,7 @@ template <int dim>
 inline unsigned int
 PolynomialsBDM<dim>::degree() const
 {
-  return polynomial_space.degree() - 1;
+  return polynomial_space.degree();
 }
 
 #endif
