@@ -45,7 +45,7 @@ unsigned int SplitString(const std::string& input,
       Assert(iPos <= input.size(), ExcInternalError());
       results.push_back(input.substr(iPos, newPos-iPos));
       // Update the current position with the correct offset.
-      iPos = newPos+sizeS2+1;
+      iPos = newPos+sizeS2;
     }
   // At least we found one string and no delimiters.
   Assert(numFound > 0, ExcInternalError());
