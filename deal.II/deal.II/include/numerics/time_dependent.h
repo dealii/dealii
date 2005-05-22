@@ -697,7 +697,7 @@ class TimeDependent
 				      * objects pointed to by the pointers
 				      * in this collection.
 				      */
-    std::vector<TimeStepBase*> timesteps;
+    std::vector<SmartPointer<TimeStepBase> > timesteps;
 
 				     /**
 				      * Number of the present sweep. This is
@@ -1797,7 +1797,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * such a behaviour is specified
 				      * in the @p flags structure.
 				      */
-    Triangulation<dim>       *tria;
+    SmartPointer<Triangulation<dim> > tria;
 
 				     /**
 				      * Pointer to a grid which is to
@@ -1882,11 +1882,11 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
       {
 	case forward:
 	      init_function (static_cast<typename InitFunctionObject::argument_type>
-			     (timesteps[step]));
+			     (&*timesteps[step]));
 	      break;
 	case backward:
 	      init_function (static_cast<typename InitFunctionObject::argument_type>
-			     (timesteps[n_timesteps-step-1]));
+			     (&*timesteps[n_timesteps-step-1]));
 	      break;
       };
 
@@ -1932,11 +1932,11 @@ void TimeDependent::do_loop (InitFunctionObject      init_function,
 	{
 	  case forward:
 		loop_function (static_cast<typename LoopFunctionObject::argument_type>
-			       (timesteps[step]));
+			       (&*timesteps[step]));
 		break;
 	  case backward:
 		loop_function (static_cast<typename LoopFunctionObject::argument_type>
-			       (timesteps[n_timesteps-step-1]));
+			       (&*timesteps[n_timesteps-step-1]));
 		break;
 	};
       

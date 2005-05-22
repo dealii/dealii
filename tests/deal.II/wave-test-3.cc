@@ -2858,11 +2858,12 @@ void TimestepManager<dim>::run_sweep (const unsigned int sweep_no)
   
   start_sweep (sweep_no);
 
-  for (std::vector<TimeStepBase*>::iterator timestep=timesteps.begin();
+  for (std::vector<SmartPointer<TimeStepBase> >::iterator timestep=timesteps.begin();
        timestep!=timesteps.end(); ++timestep)
     {
-      dynamic_cast<TimeStepBase_Wave<dim>*>(*timestep)->attach_sweep_info (sweep_info);
-      dynamic_cast<TimeStepBase_Wave<dim>*>(*timestep)->attach_sweep_data (sweep_data);
+      TimeStepBase* t = *timestep;
+      dynamic_cast<TimeStepBase_Wave<dim>*>(t)->attach_sweep_info (sweep_info);
+      dynamic_cast<TimeStepBase_Wave<dim>*>(t)->attach_sweep_data (sweep_data);
     };
   
   solve_primal_problem ();
@@ -2905,9 +2906,11 @@ const unsigned int n_timesteps = timesteps.size();
   std::vector<Vector<float> > indicators (n_timesteps);
       
   for (unsigned int i=0; i<n_timesteps; ++i)
-    static_cast<TimeStepBase_Wave<dim>*>(timesteps[i])
-      ->get_timestep_postprocess().get_tria_refinement_criteria (indicators[i]);
-
+    {
+      TimeStepBase* t = timesteps[i];
+      static_cast<TimeStepBase_Wave<dim>*>(t)
+	->get_timestep_postprocess().get_tria_refinement_criteria (indicators[i]);
+    }
 
   unsigned int total_number_of_cells = 0;
   for (unsigned int i=0; i<timesteps.size(); ++i)
@@ -3003,14 +3006,18 @@ if (parameters.compare_indicators_globally)
       deallog << "    Refining each time step separately." << std::endl;
       
       for (unsigned int timestep=0; timestep<timesteps.size(); ++timestep)
-	static_cast<TimeStepBase_Tria<dim>*>(timesteps[timestep])->init_for_refinement();
-
+	{
+	  TimeStepBase* t = timesteps[timestep];
+	  static_cast<TimeStepBase_Tria<dim>*>(t)->init_for_refinement();
+	}
+      
       unsigned int total_expected_cells = 0;
       
       for (unsigned int timestep=0; timestep<timesteps.size(); ++timestep)
 	{
+	  TimeStepBase* t = timesteps[timestep];
 	  TimeStepBase_Wave<dim> *this_timestep
-	    = static_cast<TimeStepBase_Wave<dim>*>(timesteps[timestep]);
+	    = static_cast<TimeStepBase_Wave<dim>*>(t);
 	    
 	  this_timestep->wake_up (0);
 
@@ -3051,11 +3058,11 @@ if (parameters.compare_indicators_globally)
 
 	  this_timestep->sleep (0);
 	  if (timestep!=0)
-	    static_cast<TimeStepBase_Tria<dim>*>(timesteps[timestep-1])->sleep(1);
+	    static_cast<TimeStepBase_Tria<dim>&>(*timesteps[timestep-1]).sleep(1);
 	};
       
       if (timesteps.size() != 0)
-	static_cast<TimeStepBase_Tria<dim>*>(timesteps.back())->sleep(1);
+	static_cast<TimeStepBase_Tria<dim>&>(*timesteps.back()).sleep(1);
 
 
 deallog << "    Got " << total_number_of_cells << " presently, expecting "
@@ -3083,9 +3090,9 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
 	{
 	  deallog << timesteps[timestep]->get_time()
 	       << "   ";
-	  dynamic_cast<TimeStep<dim>*>
-	    (static_cast<TimeStepBase_Wave<dim>*>
-	     (timesteps[timestep]))->write_statistics (logfile);
+	  dynamic_cast<TimeStep<dim>&>
+	    (static_cast<TimeStepBase_Wave<dim>&>
+	     (*timesteps[timestep])).write_statistics (logfile);
 	  deallog << std::endl;
 	};
 

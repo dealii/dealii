@@ -58,10 +58,6 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
   Assert ((std::find(timesteps.begin(), timesteps.end(), position) != timesteps.end()) ||
 	  (position == 0),
 	  ExcInvalidPosition());
-
-				   // lock this timestep from deletion
-  new_timestep->subscribe(typeid(*this).name());
-
 				   // first insert the new time step
 				   // into the doubly linked list
 				   // of timesteps
@@ -93,7 +89,7 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
     else
       {
 					 // inner time step
-	std::vector<TimeStepBase*>::iterator insert_position
+	std::vector<SmartPointer<TimeStepBase> >::iterator insert_position
 	  = std::find(timesteps.begin(), timesteps.end(), position);
 	
 	(*(insert_position-1))->set_next_timestep (new_timestep);
@@ -122,9 +118,15 @@ void TimeDependent::delete_timestep (const unsigned int position)
 {
   Assert (position<timesteps.size(),
 	  ExcInvalidPosition());
-
-  timesteps[position]->unsubscribe(typeid(*this).name());
-  delete timesteps[position];
+  
+				   // Remember time step object for
+				   // later deletion and unlock
+				   // SmartPointer
+  TimeStepBase* t = timesteps[position];
+  timesteps[position] = 0;
+				   // Now delete unsubscribed object
+  delete t;
+  
   timesteps.erase (timesteps.begin() + position);
 
 				   // reset "next" pointer of previous
@@ -424,7 +426,7 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria (const double              time,
 					   const Flags              &flags,
 					   const RefinementFlags    &refinement_flags) :
 		TimeStepBase (time),
-		tria(0),
+		tria(0, typeid(*this).name()),
 		coarse_grid (&coarse_grid),
 		flags (flags),
 		refinement_flags (refinement_flags)
@@ -437,8 +439,9 @@ TimeStepBase_Tria<dim>::~TimeStepBase_Tria ()
 {
   if (!flags.delete_and_rebuild_tria)
     {
-      tria->unsubscribe(typeid(*this).name());
-      delete tria;
+      Triangulation<dim>* t = tria;
+      tria = 0;
+      delete t;
     }
   else
     Assert (tria==0, ExcInternalError());
@@ -471,11 +474,11 @@ TimeStepBase_Tria<dim>::sleep (const unsigned sleep_level)
       
       if (flags.delete_and_rebuild_tria)
 	{
-	  tria->unsubscribe(typeid(*this).name());
-	  delete tria;
+	  Triangulation<dim>* t = tria;
 	  tria = 0;
-	};
-    };
+	  delete t;
+	}
+    }
 
   TimeStepBase::sleep (sleep_level);
 }
@@ -505,7 +508,6 @@ void TimeStepBase_Tria<dim>::restore_grid ()
 				   // create a virgin triangulation and
 				   // set it to a copy of the coarse grid
   tria = new Triangulation<dim> ();
-  tria->subscribe(typeid(*this).name());
   tria->copy_triangulation (*coarse_grid);
 
 				   // for each of the previous refinement
