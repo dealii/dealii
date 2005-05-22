@@ -20,6 +20,7 @@
 #include <base/point.h>
 #include <base/polynomial.h>
 #include <base/polynomial_space.h>
+#include <base/tensor_product_polynomials.h>
 #include <base/table.h>
 
 #include <vector>
@@ -57,6 +58,11 @@ class PolynomialsRaviartThomas
 				      */
     PolynomialsRaviartThomas (const unsigned int k);
 
+				     /**
+				      * Destructor deleting the polynomials.
+				      */
+    ~PolynomialsRaviartThomas ();
+    
 				     /**
 				      * Computes the value and the
 				      * first and second derivatives
@@ -111,11 +117,19 @@ class PolynomialsRaviartThomas
     
   private:
 				     /**
-				      * An object representing the
-				      * onedimensional polynomial
-				      * space used here.
+				      * The degree of this object as
+				      * given to the constructor.
 				      */
-    const PolynomialSpace<1> polynomial_space;
+    const unsigned int my_degree;
+    
+				     /**
+				      * An object representing the
+				      * polynomial space for a single
+				      * component. We can re-use it by
+				      * rotating the coordinates of
+				      * the evaluation point.
+				      */
+    AnisotropicPolynomials<dim>* polynomial_space;
 
 				     /**
 				      * Number of Raviart-Thomas
@@ -127,6 +141,16 @@ class PolynomialsRaviartThomas
 				      * Auxiliary memory.
 				      */
     mutable std::vector<double> p_values;    
+    
+				     /**
+				      * Auxiliary memory.
+				      */
+    mutable std::vector<Tensor<1,dim> > p_grads;
+    
+				     /**
+				      * Auxiliary memory.
+				      */
+    mutable std::vector<Tensor<2,dim> > p_grad_grads;
 };
 
 
@@ -142,7 +166,7 @@ template <int dim>
 inline unsigned int
 PolynomialsRaviartThomas<dim>::degree() const
 {
-  return polynomial_space.degree() -  1;
+  return my_degree;
 }
 
 #endif
