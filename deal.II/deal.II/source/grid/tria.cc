@@ -52,10 +52,7 @@ Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 				   // set default boundary for all
 				   // possible components
   for (unsigned int i=0;i<255;++i)
-    {
-      boundary[i] = straight_boundary;
-      boundary[i]->subscribe(typeid(*this).name());
-    }
+    boundary[i] = straight_boundary;
 }
 
 
@@ -77,9 +74,6 @@ Triangulation<dim>::~Triangulation ()
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
   levels.clear ();
-
-  for (unsigned int i=0;i<255;++i)
-    boundary[i]->unsubscribe(typeid(*this).name());
 }
 
 
@@ -91,21 +85,7 @@ void Triangulation<dim>::clear ()
 				   // more
   Assert (n_subscriptions() == 0, ExcInternalError());
   
-  for (unsigned int i=0; i<levels.size(); ++i)
-    delete levels[i];
-  levels.clear ();
-
-  vertices.clear ();
-  vertices_used.clear ();
-  
-  for (unsigned int i=0; i<255; ++i)
-    {
-      boundary[i]->unsubscribe(typeid(*this).name());
-      boundary[i] = straight_boundary;
-      boundary[i]->subscribe(typeid(*this).name());
-    };
-
-  number_cache = TriaNumberCache<dim>();
+  clear_despite_subscriptions();
 }
 
 
@@ -116,9 +96,7 @@ Triangulation<dim>::set_boundary (const unsigned int number,
 {
   Assert(number<255, ExcIndexRange(number,0,255));
   
-  boundary[number]->unsubscribe(typeid(*this).name());
   boundary[number] = &boundary_object;
-  boundary_object.subscribe(typeid(*this).name());
 }
 
 
@@ -216,11 +194,7 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
   smooth_grid   = old_tria.smooth_grid;
 
   for (unsigned i=0;i<255;++i)
-    {
-      boundary[i]->unsubscribe(typeid(*this).name());
-      boundary[i]      = old_tria.boundary[i];
-      boundary[i]->subscribe(typeid(*this).name());
-    }
+    boundary[i] = old_tria.boundary[i];
 
   levels.reserve (old_tria.levels.size());
   for (unsigned int level=0; level<old_tria.levels.size(); ++level)
@@ -4158,15 +4132,21 @@ Triangulation<dim>::execute_coarsening_and_refinement ()
 template<int dim>
 void
 Triangulation<dim>::clear_despite_subscriptions()
-{  
-				   // disable subscriptions, clear,
-				   // and then set them again
-  const unsigned int n=n_subscriptions();
-  for (unsigned int i=0; i<n; ++i)
-    unsubscribe(typeid(*this).name());
-  clear ();
-  for (unsigned int i=0; i<n; ++i)
-    subscribe(typeid(*this).name());
+{
+				   // This is the former function
+				   // clear without the assertion in
+				   // the beginning.
+  for (unsigned int i=0; i<levels.size(); ++i)
+    delete levels[i];
+  levels.clear ();
+  
+  vertices.clear ();
+  vertices_used.clear ();
+  
+  for (unsigned int i=0; i<255; ++i)
+    boundary[i] = straight_boundary;
+  
+  number_cache = TriaNumberCache<dim>();
 }
 
 

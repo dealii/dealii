@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/point.h>
 #include <base/subscriptor.h>
+#include <base/smartpointer.h>
 #include <grid/geometry_info.h>
 #include <grid/tria_iterator_selector.h>
 
@@ -294,6 +295,7 @@ struct TriaNumberCache<2> : public TriaNumberCache<1>
     unsigned int memory_consumption () const;
 };
 
+//TODO: Replace boundary[255] by a std::vector so we can use constructor of SmartPointer
 
 /**
  * Cache class used to store the number of used and active elements
@@ -3291,7 +3293,7 @@ class Triangulation : public Subscriptor
 				      *  and can thus never be
 				      *  associated with a boundary.
 				      */
-    const Boundary<dim>* boundary[255];
+    SmartPointer<const Boundary<dim> > boundary[255];
 
 				     /**
 				      *  Do some smoothing in the process
