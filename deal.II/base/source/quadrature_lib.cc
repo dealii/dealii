@@ -100,6 +100,17 @@ QGauss<1>::QGauss (const unsigned int n)
 }
 
 
+template <>
+QGaussLobatto<1>::QGaussLobatto (unsigned int n)
+		:
+		Quadrature<1> (n)
+{
+  for (unsigned int k=0;k<n;++k)
+    {
+      this->quadrature_points[k] = Point<1>(std::sin(2.*M_PI*k/(n-1)));
+    }
+}
+
 
 template <>
 QGauss2<1>::QGauss2 ()
@@ -500,6 +511,7 @@ QWeddle<dim>::QWeddle ()
 // explicit specialization
 // note that 1d formulae are specialized by implementation above
 template class QGauss<2>;
+template class QGaussLobatto<2>;
 template class QGauss2<2>;
 template class QGauss3<2>;
 template class QGauss4<2>;
@@ -513,6 +525,7 @@ template class QMilne<2>;
 template class QWeddle<2>;
 
 template class QGauss<3>;
+template class QGaussLobatto<3>;
 template class QGauss2<3>;
 template class QGauss3<3>;
 template class QGauss4<3>;

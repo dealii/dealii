@@ -18,15 +18,14 @@
 #include <base/quadrature.h>
 
 
+/*!@addtogroup Quadrature */
+/*@{*/
+
 /**
  * Gauss-Legendre quadrature of arbitrary order.
  *
  * The coefficients of these quadrature rules are computed by the
- * function found in <tt>Numerical Recipies</tt>. For lower order
- * quadrature rules, the use of this class is thus equivalent to the
- * use of the QGauss1 through QGauss7 classes, for which
- * the coefficients are hardcoded, but this class can provide higher
- * order formulae as well.
+ * function found in <tt>Numerical Recipies</tt>.
  *
  * @author Guido Kanschat, 2001
  */
@@ -35,15 +34,36 @@ class QGauss : public Quadrature<dim>
 {
   public:
 				   /**
-				    * Generate a formula with <tt>p</tt>
-				    * quadrature points, exact for
-				    * polynomials of degree <tt>2p-1</tt>.
+				    * Generate a formula with
+				    * <tt>n</tt> quadrature points (in
+				    * each space direction), exact for
+				    * polynomials of degree
+				    * <tt>2n-1</tt>.
 				    */
-    QGauss (const unsigned int p);
+    QGauss (const unsigned int n);
 };
 
 
+/**
+ * Gauss quadrature rule using the Gauss-Lobatto points.
+ *
+ * @note The quadrature weights are not implemented yet.
+ *
+ * @author Guido Kanschat, 2005
+ */
+template<int dim>
+class QGaussLobatto : public Quadrature<dim>
+{
+  public:
+				     /**
+				      * Generate a formula with
+				      * <tt>n</tt> quadrature points
+				      * (in each space direction).
+				      */
+    QGaussLobatto(const unsigned int n);
+};
 
+  
 
 /**
  * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
@@ -212,11 +232,12 @@ class QWeddle : public Quadrature<dim>
     QWeddle ();
 };
 
-
+/*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
 
 template <> QGauss<1>::QGauss (const unsigned int n);
+template <> QGaussLobatto<1>::QGaussLobatto (const unsigned int n);
 template <> QGauss2<1>::QGauss2 ();
 template <> QGauss3<1>::QGauss3 ();
 template <> QGauss4<1>::QGauss4 ();
