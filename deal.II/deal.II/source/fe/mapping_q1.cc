@@ -783,10 +783,11 @@ MappingQ1<1>::fill_fe_subface_values (const Triangulation<1>::cell_iterator &,
 
 template <int dim>
 void
-MappingQ1<dim>::transform_covariant (const std::vector<Tensor<1,dim> > &input,
-                                     const unsigned int                 offset,
-                                     std::vector<Tensor<1,dim> >       &output,
-                                     const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ1<dim>::transform_covariant (
+  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<1,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
@@ -805,10 +806,11 @@ MappingQ1<dim>::transform_covariant (const std::vector<Tensor<1,dim> > &input,
 
 template <int dim>
 void
-MappingQ1<dim>::transform_covariant (const std::vector<Tensor<2,dim> > &input,
-                                     const unsigned int                 offset,
-                                     std::vector<Tensor<2,dim> >       &output,
-                                     const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ1<dim>::transform_covariant (
+  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<2,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData *data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
@@ -828,10 +830,11 @@ MappingQ1<dim>::transform_covariant (const std::vector<Tensor<2,dim> > &input,
 template <int dim>
 void
 MappingQ1<dim>::
-transform_contravariant (const std::vector<Tensor<1,dim> > &input,
-                         const unsigned int                 offset,
-                         std::vector<Tensor<1,dim> >       &output,
-                         const typename Mapping<dim>::InternalDataBase &mapping_data) const
+transform_contravariant (
+  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<1,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
@@ -850,11 +853,11 @@ transform_contravariant (const std::vector<Tensor<1,dim> > &input,
 
 template <int dim>
 void
-MappingQ1<dim>::
-transform_contravariant (const std::vector<Tensor<2,dim> > &input,
-                         const unsigned int                 offset,
-                         std::vector<Tensor<2,dim> >       &output,
-                         const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ1<dim>::transform_contravariant (
+  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<2,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData* data_ptr = dynamic_cast<const InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());

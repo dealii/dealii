@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <base/vector_slice.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <fe/fe_update_flags.h>
@@ -27,6 +28,7 @@ template <int dim> class FEValues;
 template <int dim> class FEFaceValues;
 template <int dim> class FESubfaceValues;
 
+//TODO: Offset in transform functions should be replaced by initializing VectorSlice correctly
 
 /*!@addtogroup febase */
 /*@{*/
@@ -250,9 +252,9 @@ class Mapping : public Subscriptor
 				      */
     virtual
     void
-    transform_covariant (const std::vector<Tensor<1,dim> > &input,
-                         const unsigned int                 offset,
-                         std::vector<Tensor<1,dim> >       &output,
+    transform_covariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+                         const unsigned int                                    offset,
+                         VectorSlice<std::vector<Tensor<1,dim> > >             output,
 			 const InternalDataBase &internal) const = 0;
 
                                      /**
@@ -269,9 +271,9 @@ class Mapping : public Subscriptor
                                       */
     virtual
     void
-    transform_covariant (const std::vector<Tensor<2,dim> > &input,
+    transform_covariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
                          const unsigned int                 offset,
-			 std::vector<Tensor<2,dim> >       &output,
+			 VectorSlice<std::vector<Tensor<2,dim> > >      output,
 			 const InternalDataBase &internal) const = 0;
     
 				     /**
@@ -297,9 +299,9 @@ class Mapping : public Subscriptor
 				      */
     virtual
     void
-    transform_contravariant (const std::vector<Tensor<1,dim> > &input,
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                              const unsigned int                 offset,
-			     std::vector<Tensor<1,dim> >       &output,
+			     VectorSlice<std::vector<Tensor<1,dim> > >      output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const = 0;
 
                                      /**
@@ -323,9 +325,9 @@ class Mapping : public Subscriptor
                                       */
     
     virtual void
-    transform_contravariant (const std::vector<Tensor<2,dim> > &intput,
+    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > intput,
                              const unsigned int                 offset,
-			     std::vector<Tensor<2,dim> > &output,
+			     const VectorSlice<std::vector<Tensor<2,dim> > > output,
 			     const typename Mapping<dim>::InternalDataBase &internal) const = 0;
     
 				     /**

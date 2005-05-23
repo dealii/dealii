@@ -1118,11 +1118,11 @@ add_quad_support_points(const typename Triangulation<dim>::cell_iterator &,
 
 template <int dim>
 void
-MappingQ<dim>::
-transform_covariant (const std::vector<Tensor<1,dim> > &input,
-                     const unsigned int                 offset,
-                     std::vector<Tensor<1,dim> >       &output,
-                     const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ<dim>::transform_covariant (
+  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<1,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
@@ -1153,10 +1153,11 @@ transform_covariant (const std::vector<Tensor<1,dim> > &input,
 
 template <int dim>
 void
-MappingQ<dim>::transform_covariant (const std::vector<Tensor<2,dim> > &input,
-                                    const unsigned int                 offset,
-                                    std::vector<Tensor<2,dim> >       &output,
-                                    const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ<dim>::transform_covariant (
+  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<2,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
@@ -1187,11 +1188,11 @@ MappingQ<dim>::transform_covariant (const std::vector<Tensor<2,dim> > &input,
 
 template <int dim>
 void
-MappingQ<dim>::
-transform_contravariant (const std::vector<Tensor<1,dim> > &input,
-                         const unsigned int                 offset,
-                         std::vector<Tensor<1,dim> >       &output,
-                         const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ<dim>::transform_contravariant (
+  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<1,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);
@@ -1222,10 +1223,11 @@ transform_contravariant (const std::vector<Tensor<1,dim> > &input,
 
 template <int dim>
 void
-MappingQ<dim>::transform_contravariant (const std::vector<Tensor<2,dim> > &input,
-                                        const unsigned int                 offset,
-                                        std::vector<Tensor<2,dim> >       &output,
-                                        const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingQ<dim>::transform_contravariant (
+  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<2,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const typename MappingQ1<dim>::InternalData *q1_data =
     dynamic_cast<const typename MappingQ1<dim>::InternalData *> (&mapping_data);

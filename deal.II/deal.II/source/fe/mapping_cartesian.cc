@@ -432,11 +432,11 @@ MappingCartesian<1>::fill_fe_subface_values (const Triangulation<1>::cell_iterat
 
 template <int dim>
 void
-MappingCartesian<dim>::
-transform_covariant (const std::vector<Tensor<1,dim> > &input,
-                     const unsigned int                 offset,
-                     std::vector<Tensor<1,dim> >       &output,
-                     const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingCartesian<dim>::transform_covariant (
+  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<1,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
@@ -456,10 +456,11 @@ transform_covariant (const std::vector<Tensor<1,dim> > &input,
 
 template <int dim>
 void
-MappingCartesian<dim>::transform_covariant (const std::vector<Tensor<2,dim> > &input,
-                                            const unsigned int                 offset,
-					    std::vector<Tensor<2,dim> >       &output,
-					    const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingCartesian<dim>::transform_covariant (
+  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<2,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
   const InternalData &data = dynamic_cast<const InternalData&> (mapping_data);
 
@@ -480,10 +481,11 @@ MappingCartesian<dim>::transform_covariant (const std::vector<Tensor<2,dim> > &i
 
 template <int dim>
 void
-MappingCartesian<dim>::transform_contravariant (const std::vector<Tensor<1,dim> > &input,
-                                                const unsigned int                 offset,
-                                                std::vector<Tensor<1,dim> >       &output,
-                                                const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingCartesian<dim>::transform_contravariant (
+  const VectorSlice<const std::vector<Tensor<1,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<1,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -507,10 +509,11 @@ MappingCartesian<dim>::transform_contravariant (const std::vector<Tensor<1,dim> 
 
 template <int dim>
 void
-MappingCartesian<dim>::transform_contravariant (const std::vector<Tensor<2,dim> > &input,
-                                                const unsigned int                 offset,
-                                                std::vector<Tensor<2,dim> >       &output,
-                                                const typename Mapping<dim>::InternalDataBase &mapping_data) const
+MappingCartesian<dim>::transform_contravariant (
+  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+  const unsigned int                 offset,
+  VectorSlice<std::vector<Tensor<2,dim> > > output,
+  const typename Mapping<dim>::InternalDataBase &mapping_data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
