@@ -1787,7 +1787,7 @@ SymmetricTensor<4,3>::norm () const
 
 /**
  * Compute the determinant of a tensor or rank 2. The determinant is
- * also commonly referred to as the second invariant of rank-2 tensors.
+ * also commonly referred to as the third invariant of rank-2 tensors.
  *
  * For the present case of one-dimensional tensors, the determinant
  * equals the only element and is therefore equivalent to the trace.
@@ -1805,7 +1805,7 @@ double determinant (const SymmetricTensor<2,1> &t)
 
 /**
  * Compute the determinant of a tensor or rank 2. The determinant is
- * also commonly referred to as the second invariant of rank-2 tensors.
+ * also commonly referred to as the third invariant of rank-2 tensors.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1821,7 +1821,7 @@ double determinant (const SymmetricTensor<2,2> &t)
 
 /**
  * Compute the determinant of a tensor or rank 2. The determinant is
- * also commonly referred to as the second invariant of rank-2 tensors.
+ * also commonly referred to as the third invariant of rank-2 tensors.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
