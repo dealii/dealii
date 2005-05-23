@@ -20,7 +20,6 @@
 
 template <int rank, int dim> class SymmetricTensor;
 
-
 namespace internal
 {
                                    /**
@@ -859,10 +858,13 @@ class SymmetricTensor
     friend double determinant (const SymmetricTensor<2,2> &t);
 
     friend double determinant (const SymmetricTensor<2,3> &t);
-
+    
     template <int dim2>
     friend SymmetricTensor<2,dim2>
     deviator (const SymmetricTensor<2,dim2> &t);
+    
+    template <int dim2>
+    friend SymmetricTensor<2,dim2> unit_symmetric_tensor ();
 };
 
 
@@ -1959,6 +1961,60 @@ deviator (const SymmetricTensor<2,dim> &t)
   for (unsigned int i=0; i<dim; ++i)
     tmp.data[i] -= tr;
   
+  return tmp;
+}
+
+
+
+/**
+ * Return a unit symmetric tensor of rank 2 and dimension 1.
+ * 
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <>
+inline
+SymmetricTensor<2,1>
+unit_symmetric_tensor<1> () 
+{
+  SymmetricTensor<2,1> tmp;
+  tmp.data[0] = 1;
+  return tmp;
+}
+
+
+
+/**
+ * Return a unit symmetric tensor of rank 2 and dimension 2.
+ * 
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <>
+inline
+SymmetricTensor<2,2>
+unit_symmetric_tensor<2> () 
+{
+  SymmetricTensor<2,2> tmp;
+  tmp.data[0] = tmp.data[1] = 1;
+  return tmp;
+}
+
+
+
+/**
+ * Return a unit symmetric tensor of rank 2 and dimension 3.
+ * 
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <>
+inline
+SymmetricTensor<2,3>
+unit_symmetric_tensor<3> () 
+{
+  SymmetricTensor<2,3> tmp;
+  tmp.data[0] = tmp.data[1] = tmp.data[2] = 1;
   return tmp;
 }
 
