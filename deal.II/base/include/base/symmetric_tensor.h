@@ -1792,6 +1792,9 @@ SymmetricTensor<4,3>::norm () const
  * For the present case of one-dimensional tensors, the determinant
  * equals the only element and is therefore equivalent to the trace.
  *
+ * For greater notational simplicity, there is also a <tt>third_invariant</tt>
+ * function that returns the determinant of a tensor.
+ *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
@@ -1806,6 +1809,9 @@ double determinant (const SymmetricTensor<2,1> &t)
 /**
  * Compute the determinant of a tensor or rank 2. The determinant is
  * also commonly referred to as the third invariant of rank-2 tensors.
+ *
+ * For greater notational simplicity, there is also a <tt>third_invariant</tt>
+ * function that returns the determinant of a tensor.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1822,6 +1828,9 @@ double determinant (const SymmetricTensor<2,2> &t)
 /**
  * Compute the determinant of a tensor or rank 2. The determinant is
  * also commonly referred to as the third invariant of rank-2 tensors.
+ *
+ * For greater notational simplicity, there is also a <tt>third_invariant</tt>
+ * function that returns the determinant of a tensor.
  *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -1842,6 +1851,24 @@ double determinant (const SymmetricTensor<2,3> &t)
 
 
 /**
+ * Compute the determinant of a tensor or rank 2. This function therefore
+ * computes the same value as the <tt>determinant()</tt> functions and is only
+ * provided for greater notational simplicity (since there are also functions
+ * <tt>first_invariant</tt> and <tt>second_invariant</tt>).
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline
+double third_invariant (const SymmetricTensor<2,dim> &t)
+{
+  return determinant (t);
+}
+
+
+
+/**
  * Compute and return the trace of a tensor of rank 2, i.e. the sum of
  * its diagonal entries. The trace is the first invariant of a rank-2
  * tensor.
@@ -1856,6 +1883,38 @@ double trace (const SymmetricTensor<2,dim> &d)
   for (unsigned int i=0; i<dim; ++i)
     t += d.data[i];
   return t;
+}
+
+
+/**
+ * Compute the trace of a tensor or rank 2. This function therefore
+ * computes the same value as the <tt>trace()</tt> functions and is only
+ * provided for greater notational simplicity (since there are also functions
+ * <tt>second_invariant</tt> and <tt>third_invariant</tt>).
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline
+double first_invariant (const SymmetricTensor<2,dim> &t)
+{
+  return trace (t);
+}
+
+
+/**
+ * Compute the second invariant a tensor or rank 2. The second invariant is
+ * defined as <tt>I2 = 1/2[ (trace sigma)^2 - trace (sigma^2) ]</tt>.
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline
+double second_invariant (const SymmetricTensor<2,dim> &t)
+{
+  return (trace(t)*trace(t) - t*t) / 2;
 }
 
 
