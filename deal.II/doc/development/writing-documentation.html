@@ -117,7 +117,16 @@
     target="_top">doxygen webpage</a> to get an overview. However,
     here is a brief summary of the most often used features:
     </p>
-    <ul> <li> <em>Itemized lists:</em>
+    <ul>
+    <li> <em>Virtual functions:</em>
+        Do not document virtual functions in derived classes, if there
+        is nothing different from the base class. If a virtual
+        function is documented in a base class, doxygen will
+        automatically copy this documentation to the derived
+        classes. This mechanism is interrupted, if a documentation
+        block is found in the derived class.
+
+    <li> <em>Itemized lists:</em>
 	 By writing comments like the following,
 	 <pre>
 	   /**
