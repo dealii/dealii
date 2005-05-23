@@ -18,7 +18,7 @@
 
 /**
  * Filter a range out of any object having a random access operator
- * <tt>[] (unsigned int)</tt>.
+ * <tt>[] (unsigned int)</tt> and a function <tt>size() const</tt>.
  *
  * The use of this object is straight forward. It reduplicates the
  * random access operator of the <tt>VECTOR</tt> and adds an offset to
@@ -42,19 +42,62 @@ template <class VECTOR>
 class VectorSlice
 {
   public:
+				     /**
+				      * Construct a vector slice
+				      * containing the whole
+				      * vector. Comes handy, if you
+				      * did not want to have a slice
+				      * at all, but the function you
+				      * call wants it: just put in the
+				      * vector itself as argument and
+				      * let this constructor make a
+				      * slice for you.
+				      */
     VectorSlice(VECTOR& v);
+				     /**
+				      * The real constructor for a
+				      * vector slice, allowing you to
+				      * specify the start index and
+				      * the length of the slice.
+				      */
     VectorSlice(VECTOR& v,
 		unsigned int start,
 		unsigned int length);
 
+				     /**
+				      * Return the length of the slice
+				      * using the same interface as
+				      * <tt>std::vector</tt>.
+				      */
     unsigned int size() const;
 
+				     /**
+				      * Access an element of the slice
+				      * using the same interface as
+				      * <tt>std::vector</tt>.
+				      */
     typename VECTOR::reference operator[] (unsigned int);
+    
+				     /**
+				      * Access an element of a
+				      * constant slice using the same
+				      * interface as
+				      * <tt>std::vector</tt>.
+				      */
     typename VECTOR::const_reference operator[] (unsigned int) const;
   private:
+				     /**
+				      * The vector we extract from.
+				      */
     VECTOR& v;
-    unsigned int start;
-    unsigned int length;
+				     /**
+				      * The start index of the slice.
+				      */
+    const unsigned int start;
+				     /**
+				      * The length of the slice.
+				      */
+    const unsigned int length;
 };
 
 
