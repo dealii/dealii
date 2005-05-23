@@ -204,6 +204,13 @@ inconvenience this causes.
 
 <ol>  
   <li> <p>
+       New: The <code class="class">QAnisotropic</code> class allows
+       generation of quadrature rules of different order in each
+       space dimension.
+       <br>
+       (GK, 2005/05/24)
+       </p>
+
        New: The <code class="class">Tensor</code> classes now
        have member functions that compute the Frobenius norm and its
        square. There are also global <code>operator*</code> functions
@@ -392,6 +399,14 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Improved: The <code class="member">Mapping::transform_*</code>
+       functions accept <code class="class">VectorSlice</code> instead
+       of <code class="class">Vector</code>, thus allowing more flexibility.
+       <br> 
+       (GK, 2005/05/24)
+       </p>
+
   <li> <p>
        New: The <code class="member">MatrixTools::apply_boundary_values</code>
        function now also works for PETSc sequential and parallel matrices.
