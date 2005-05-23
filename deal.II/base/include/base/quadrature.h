@@ -20,6 +20,9 @@
 #include <vector>
 
 
+/*!@addtogroup Quadrature */
+/*@{*/
+
 /**
  * Base class for quadrature formulae in arbitrary dimensions. This class
  * stores quadrature points and weights on the unit line [0,1], unit
@@ -201,6 +204,44 @@ class Quadrature : public Subscriptor
     std::vector<double>      weights;
 };
 
+
+/**
+ * Quadrature formula implementing anisotropic distributions of
+ * quadrature points on the reference cell. To this end, the tensor
+ * product of <tt>dim</tt> onedimensional quadrature formulas is
+ * generated.
+ *
+ * @note Each constructor can only be used in the dimension matching
+ * the number of arguments.
+ *
+ * @author Guido Kanschat, 2005
+ */
+template <int dim>
+class QAnisotropic : public Quadrature<dim>
+{
+  public:
+				     /**
+				      * Constructor for a
+				      * onedimensional formula. This
+				      * one just copies the given
+				      * quadrature rule.
+				      */
+    QAnisotropic(const Quadrature<1>& qx);
+    
+				     /**
+				      * Constructor for a twodimensional formula.
+				      */
+    QAnisotropic(const Quadrature<1>& qx,
+		 const Quadrature<1>& qy);
+    
+				     /**
+				      * Constructor for a threedimensional formula.
+				      */
+    QAnisotropic(const Quadrature<1>& qx,
+		 const Quadrature<1>& qy,
+		 const Quadrature<1>& qz);
+    
+};
 
 
 /**
@@ -566,6 +607,8 @@ class QProjector
                                       */
     static Quadrature<2> reflect (const Quadrature<2> &q);
 };
+
+/*@}*/
 
 /// @if NoDoc
 

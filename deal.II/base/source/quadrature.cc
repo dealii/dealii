@@ -235,6 +235,67 @@ Quadrature<dim>::memory_consumption () const
 
 
 //---------------------------------------------------------------------------
+template<int dim>
+QAnisotropic<dim>::QAnisotropic(const Quadrature<1>& qx)
+		: Quadrature<dim>(qx.n_quadrature_points)
+{
+  Assert (dim==1, ExcImpossibleInDim(dim));
+  unsigned int k=0;
+  for (unsigned int k1=0;k1<qx.n_quadrature_points;++k1)
+    {
+      this->quadrature_points[k](0) = qx.point(k1)(0);
+      this->weights[k++] = qx.weight(k1);
+    }
+  Assert (k==this->n_quadrature_points, ExcInternalError());
+}
+
+
+
+template<int dim>
+QAnisotropic<dim>::QAnisotropic(const Quadrature<1>& qx,
+				const Quadrature<1>& qy)
+		: Quadrature<dim>(qx.n_quadrature_points
+				  *qy.n_quadrature_points)
+{
+  Assert (dim==2, ExcImpossibleInDim(dim));
+  unsigned int k=0;
+  for (unsigned int k2=0;k2<qy.n_quadrature_points;++k2)
+    for (unsigned int k1=0;k1<qx.n_quadrature_points;++k1)
+    {
+      this->quadrature_points[k](0) = qx.point(k1)(0);
+      this->quadrature_points[k](1) = qy.point(k2)(0);
+      this->weights[k++] = qx.weight(k1) * qy.weight(k2);
+    }
+  Assert (k==this->n_quadrature_points, ExcInternalError());
+}
+
+
+
+template<int dim>
+QAnisotropic<dim>::QAnisotropic(const Quadrature<1>& qx,
+				const Quadrature<1>& qy,
+				const Quadrature<1>& qz)
+		: Quadrature<dim>(qx.n_quadrature_points
+				  *qy.n_quadrature_points
+				  *qz.n_quadrature_points)
+{
+  Assert (dim==2, ExcImpossibleInDim(dim));
+  unsigned int k=0;
+  for (unsigned int k3=0;k3<qz.n_quadrature_points;++k3)
+    for (unsigned int k2=0;k2<qy.n_quadrature_points;++k2)
+      for (unsigned int k1=0;k1<qx.n_quadrature_points;++k1)
+	{
+	  this->quadrature_points[k](0) = qx.point(k1)(0);
+	  this->quadrature_points[k](1) = qy.point(k2)(0);
+	  this->quadrature_points[k](2) = qz.point(k3)(0);
+	  this->weights[k++] = qx.weight(k1) * qy.weight(k2) * qz.weight(k3);
+	}
+  Assert (k==this->n_quadrature_points, ExcInternalError());
+}
+
+
+
+//---------------------------------------------------------------------------
 
 
 
@@ -1105,6 +1166,9 @@ QIterated<dim>::QIterated (const Quadrature<1> &base_quadrature,
 template class Quadrature<1>;
 template class Quadrature<2>;
 template class Quadrature<3>;
+template class QAnisotropic<1>;
+template class QAnisotropic<2>;
+template class QAnisotropic<3>;
 template class QIterated<1>;
 template class QIterated<2>;
 template class QIterated<3>;
