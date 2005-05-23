@@ -16,6 +16,8 @@
 
 #include <fe/fe.h>
 
+/*!@addtogroup fe */
+/*@{*/
 
 /**
  * This class gives a unified framework for the implementation of
@@ -208,21 +210,12 @@ class FE_Poly : public FiniteElement<dim>
     
   protected:
       
-				     /**
-				      * Prepare internal data
-				      * structures and fill in values
-				      * independent of the cell.
-				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_data (const UpdateFlags,
 	      const Mapping<dim>& mapping,
 	      const Quadrature<dim>& quadrature) const ;
 
-				     /**
-				      * Implementation of the same
-				      * function in FiniteElement.
-				      */
     virtual void
     fill_fe_values (const Mapping<dim> &mapping,
 		    const typename Triangulation<dim>::cell_iterator &cell,
@@ -231,10 +224,6 @@ class FE_Poly : public FiniteElement<dim>
 		    typename Mapping<dim>::InternalDataBase      &fe_internal,
 		    FEValuesData<dim>& data) const;
     
-				     /**
-				      * Implementation of the same
-				      * function in FiniteElement.
-				      */
     virtual void
     fill_fe_face_values (const Mapping<dim> &mapping,
 			 const typename Triangulation<dim>::cell_iterator &cell,
@@ -244,10 +233,6 @@ class FE_Poly : public FiniteElement<dim>
 			 typename Mapping<dim>::InternalDataBase      &fe_internal,
 			 FEValuesData<dim>& data) const ;
     
-				     /**
-				      * Implementation of the same
-				      * function in FiniteElement.
-				      */
     virtual void
     fill_fe_subface_values (const Mapping<dim> &mapping,
 			    const typename Triangulation<dim>::cell_iterator &cell,
@@ -411,6 +396,6 @@ class FE_Poly : public FiniteElement<dim>
     POLY poly_space;
 };
 
-
+/*@}*/
 
 #endif
