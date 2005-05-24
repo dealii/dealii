@@ -196,12 +196,9 @@ template <int dim>
 unsigned int
 PolynomialsBDM<dim>::compute_n_pols(unsigned int k)
 {
-  if (dim == 1)
-    return PolynomialSpace<dim>::compute_n_pols(k)+1;
-  if (dim == 2)
-    return 2*PolynomialSpace<dim>::compute_n_pols(k)+2;
-  if (dim == 3)
-    return 3*PolynomialSpace<dim>::compute_n_pols(k)+3*(k+1);
+  if (dim == 1) return k+1;
+  if (dim == 2) return (k+1)*(k+2)+2;
+  if (dim == 3) return ((k+1)*(k+2)*(k+3))/2+3*(k+1);
   Assert(false, ExcNotImplemented());
   return 0;
 }
