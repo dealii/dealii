@@ -44,7 +44,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   
-  this->mapping_type = independent_on_cartesian;
+  this->mapping_type = this->independent_on_cartesian;
   
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     this->prolongation[i].reinit (this->dofs_per_cell,
@@ -75,7 +75,7 @@ FE_RaviartThomasNodal<dim>::get_name () const
   std::ostrstream namebuf;
 #endif
   
-  namebuf << "FE_RaviartThomasNodal<" << dim << ">(" << degree-1 << ")";
+  namebuf << "FE_RaviartThomasNodal<" << dim << ">(" << this->degree-1 << ")";
 
 #ifndef HAVE_STD_STRINGSTREAM
   namebuf << std::ends;
@@ -98,7 +98,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_RaviartThomasNodal<dim>::clone() const
 {
-  return new FE_RaviartThomasNodal<dim>(degree-1);
+  return new FE_RaviartThomasNodal<dim>(this->degree-1);
 }
 
 
@@ -269,7 +269,7 @@ FE_RaviartThomasNodal<dim>::initialize_node_matrix ()
       {
 	for (unsigned int i=0;i<n_dofs;++i)
 	  N(current,i) = this->shape_value_component(
-	    i, unit_support_point(current),
+	    i, this->unit_support_points[current],
 	    GeometryInfo< dim >::unit_normal_direction[face])
 			 * GeometryInfo< dim >::unit_normal_orientation[face];
 	++current;
@@ -281,14 +281,14 @@ FE_RaviartThomasNodal<dim>::initialize_node_matrix ()
     for (unsigned int k=0;k<n_cell;++k)
       {
 	for (unsigned int i=0;i<n_dofs;++i)
-	  N(current,i) = this->shape_value_component(i, unit_support_point(current), d);
+	  N(current,i) = this->shape_value_component(i, this->unit_support_points[current], d);
 	++current;
       }
   Assert (current == n_dofs, ExcInternalError());
-
-  inverse_node_matrix.invert(N);
+  this->inverse_node_matrix.reinit(n_dofs, n_dofs);
+  this->inverse_node_matrix.invert(N);
 }
 
 
 
-template FE_RaviartThomasNodal<deal_II_dimension>;
+template class FE_RaviartThomasNodal<deal_II_dimension>;
