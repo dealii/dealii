@@ -1096,7 +1096,12 @@ namespace QuasiStaticElasticity
                                    // ``run()''. It initializes the variables
                                    // that describe where in time we presently
                                    // are, then runs the first time step, then
-                                   // loops over all the other time steps:
+                                   // loops over all the other time
+                                   // steps. Note that for simplicity we use a
+                                   // fixed time step, whereas a more
+                                   // sophisticated program would of course
+                                   // have to chose it in some more reasonable
+                                   // way adaptively:
   template <int dim>
   void TopLevel<dim>::run () 
   {
