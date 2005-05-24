@@ -14,9 +14,11 @@
 #define __deal2__fe_raviart_thomas_h
 
 #include <base/config.h>
+#include <base/polynomials_raviart_thomas.h>
 #include <base/tensor_product_polynomials.h>
 #include <grid/geometry_info.h>
 #include <fe/fe.h>
+#include <fe/fe_poly_tensor.h>
 
 template <int dim> class MappingQ;
 
@@ -258,16 +260,12 @@ class FE_RaviartThomas : public FiniteElement<dim>
     
 				     /**
 				      * Check whether a shape function
-				      * is non-zero on a face.
+				      * may be non-zero on a face.
 				      *
 				      * Right now, this is only
 				      * implemented for RT0 in
 				      * 1D. Otherwise, returns always
 				      * @p true.
-				      *
-				      * Implementation of the
-				      * interface in
-				      * FiniteElement
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
@@ -291,31 +289,15 @@ class FE_RaviartThomas : public FiniteElement<dim>
     DeclException0 (ExcNotUsefulInThisDimension);
     
   protected:    
-				     /**
-				      * @p clone function instead of
-				      * a copy constructor.
-				      *
-				      * This function is needed by the
-				      * constructors of @p FESystem.
-				      */
+    
     virtual FiniteElement<dim> * clone() const;
   
-				     /**
-				      * Prepare internal data
-				      * structures and fill in values
-				      * independent of the cell.
-				      */
     virtual
     typename Mapping<dim>::InternalDataBase *
     get_data (const UpdateFlags,
 	      const Mapping<dim>& mapping,
 	      const Quadrature<dim>& quadrature) const ;
 
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * FiniteElement.
-				      */
     virtual void
     fill_fe_values (const Mapping<dim> &mapping,
 		    const typename Triangulation<dim>::cell_iterator &cell,
@@ -324,11 +306,6 @@ class FE_RaviartThomas : public FiniteElement<dim>
 		    typename Mapping<dim>::InternalDataBase      &fe_internal,
 		    FEValuesData<dim>& data) const;
     
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * FiniteElement.
-				      */
     virtual void
     fill_fe_face_values (const Mapping<dim> &mapping,
 			 const typename Triangulation<dim>::cell_iterator &cell,
@@ -338,11 +315,6 @@ class FE_RaviartThomas : public FiniteElement<dim>
 			 typename Mapping<dim>::InternalDataBase      &fe_internal,
 			 FEValuesData<dim>& data) const;
     
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * FiniteElement.
-				      */
     virtual void
     fill_fe_subface_values (const Mapping<dim> &mapping,
 			    const typename Triangulation<dim>::cell_iterator &cell,
@@ -569,6 +541,112 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      */
     template <int dim1> friend class FE_RaviartThomas;
 };
+
+
+
+/**
+ * The Raviart-Thomas elements with node functionals defined as point
+ * values in Gauss points.
+ *
+ * <h3>Description of node values</h3>
+ *
+ * For this Raviart-Thomas element, the node values are not cell and
+ * face moments with respect to certain polynomials, but the values in
+ * quadrature points.
+ *
+ * For an RT-element of degree <i>k</i>, we choose
+ * <i>k+1<sup>d-1</sup></i> Gauss points on each face. This way, the
+ * normal component which is in <i>Q<sub>k</sub></i> is uniquely
+ * determined. Furthermore, since this Gauss-formula is exact on
+ * <i>Q<sub>2k+1</sub></i>, these node values correspond to the exact
+ * integration of the moments of the RT-space.
+ *
+ * In the interior of the cells, the moments are with respect to an
+ * anisotropic <i>Q<sub>k</sub></i> space, where the test functions
+ * are one degree lower in the direction corresponding to the vector
+ * component under consideration. This can be emulated by using an
+ * anisotropic Gauss formula for integration.
+ *
+ * @warning The degree stored in the member variable
+ * FiniteElementData<dim>::degree is higher by one than the
+ * constructor argument!
+ * 
+ * @author Guido Kanschat, 2005
+ */
+template <int dim>
+class FE_RaviartThomasNodal
+  :
+  public FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>
+{
+				     /**
+				      * Constructor for the Raviart-Thomas
+				      * element of degree @p p.
+				      */
+    FE_RaviartThomasNodal (const unsigned int p);
+    
+				     /**
+				      * Return a string that uniquely
+				      * identifies a finite
+				      * element. This class returns
+				      * <tt>FE_RaviartThomasNodal<dim>(degree)</tt>, with
+				      * @p dim and @p degree
+				      * replaced by appropriate
+				      * values.
+				      */
+    virtual std::string get_name () const;
+
+    virtual FiniteElement<dim>* clone () const;
+
+    				     /**
+				      * Check whether a shape function
+				      * may be non-zero on a face.
+				      *
+				      * Right now, always returns
+				      * @p true.
+				      */
+    virtual bool has_support_on_face (const unsigned int shape_index,
+				      const unsigned int face_index) const;    
+  private:
+    				     /**
+				      * Only for internal use. Its
+				      * full name is
+				      * @p get_dofs_per_object_vector
+				      * function and it creates the
+				      * @p dofs_per_object vector that is
+				      * needed within the constructor to
+				      * be passed to the constructor of
+				      * @p FiniteElementData.
+				      */
+    static std::vector<unsigned int>
+    get_dpo_vector (const unsigned int degree);
+
+				     /**
+				      * Compute the vector used for
+				      * the
+				      * @p restriction_is_additive
+				      * field passed to the base
+				      * class's constructor.
+				      */
+    static std::vector<bool>
+    get_ria_vector (const unsigned int degree);
+    				     /**
+				      * Initialize the
+				      * FiniteElementBase<dim>::unit_support_points
+				      * and FiniteElementBase<dim>::unit_face_support_points
+				      * fields. Called from the
+				      * constructor.
+				      */
+    void initialize_unit_support_points (const unsigned int degree);
+
+				     /**
+				      * Initialize the
+				      * #inverse_node_matrix
+				      * field. Called from the
+				      * constructor.
+				      */
+    void initialize_node_matrix ();
+};
+
 
 /*@}*/
 

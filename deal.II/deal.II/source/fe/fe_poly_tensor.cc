@@ -26,7 +26,6 @@ FE_PolyTensor<POLY,dim>::FE_PolyTensor (
 		FiniteElement<dim> (fe_data,
 				    restriction_is_additive_flags,
 				    nonzero_components),
-                degree(degree),
                 poly_space(POLY(degree))
 {
   cached_point(0) = -1;
@@ -252,12 +251,13 @@ FE_PolyTensor<POLY,dim>::get_data (const UpdateFlags      update_flags,
 
 template <class POLY, int dim>
 void
-FE_PolyTensor<POLY,dim>::fill_fe_values (const Mapping<dim>                   &mapping,
-				   const typename Triangulation<dim>::cell_iterator &cell,
-				   const Quadrature<dim>                &quadrature,
-				   typename Mapping<dim>::InternalDataBase &mapping_data,
-				   typename Mapping<dim>::InternalDataBase &fedata,
-				   FEValuesData<dim>                    &data) const
+FE_PolyTensor<POLY,dim>::fill_fe_values (
+  const Mapping<dim>                   &mapping,
+  const typename Triangulation<dim>::cell_iterator &cell,
+  const Quadrature<dim>                &quadrature,
+  typename Mapping<dim>::InternalDataBase &mapping_data,
+  typename Mapping<dim>::InternalDataBase &fedata,
+  FEValuesData<dim>                    &data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -269,7 +269,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (const Mapping<dim>                   &m
   const unsigned int n_quad = quadrature.n_quadrature_points;
   const UpdateFlags flags(fe_data.current_update_flags());
   
-  Assert(mapping_type == independent, ExcNotImplemented());
+  Assert(mapping_type == independent || mapping_type == independent_on_cartesian,
+	 ExcNotImplemented());
   
   Assert(!(flags & update_values) || fe_data.shape_values.size() == n_dofs,
 	 ExcDimensionMismatch(fe_data.shape_values.size(), n_dofs));
@@ -307,13 +308,14 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (const Mapping<dim>                   &m
 
 template <class POLY, int dim>
 void
-FE_PolyTensor<POLY,dim>::fill_fe_face_values (const Mapping<dim>                   &mapping,
-				const typename Triangulation<dim>::cell_iterator &cell,
-				const unsigned int                    face,
-				const Quadrature<dim-1>              &quadrature,
-				typename Mapping<dim>::InternalDataBase       &mapping_data,
-				typename Mapping<dim>::InternalDataBase       &fedata,
-				FEValuesData<dim>                    &data) const
+FE_PolyTensor<POLY,dim>::fill_fe_face_values (
+  const Mapping<dim>                   &mapping,
+  const typename Triangulation<dim>::cell_iterator &cell,
+  const unsigned int                    face,
+  const Quadrature<dim-1>              &quadrature,
+  typename Mapping<dim>::InternalDataBase       &mapping_data,
+  typename Mapping<dim>::InternalDataBase       &fedata,
+  FEValuesData<dim>                    &data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -334,7 +336,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (const Mapping<dim>                
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  Assert(mapping_type == independent, ExcNotImplemented());
+  Assert(mapping_type == independent || mapping_type == independent_on_cartesian,
+	 ExcNotImplemented());
 //TODO: Size assertions
   
   for (unsigned int i=0; i<n_dofs; ++i)
@@ -365,14 +368,15 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (const Mapping<dim>                
 
 template <class POLY, int dim>
 void
-FE_PolyTensor<POLY,dim>::fill_fe_subface_values (const Mapping<dim>                   &mapping,
-				   const typename Triangulation<dim>::cell_iterator &cell,
-				   const unsigned int                    face,
-				   const unsigned int                    subface,
-				   const Quadrature<dim-1>              &quadrature,
-				   typename Mapping<dim>::InternalDataBase       &mapping_data,
-				   typename Mapping<dim>::InternalDataBase       &fedata,
-				   FEValuesData<dim>                    &data) const
+FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
+  const Mapping<dim>                   &mapping,
+  const typename Triangulation<dim>::cell_iterator &cell,
+  const unsigned int                    face,
+  const unsigned int                    subface,
+  const Quadrature<dim-1>              &quadrature,
+  typename Mapping<dim>::InternalDataBase       &mapping_data,
+  typename Mapping<dim>::InternalDataBase       &fedata,
+  FEValuesData<dim>                    &data) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -393,7 +397,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (const Mapping<dim>             
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  Assert(mapping_type == independent, ExcNotImplemented());
+  Assert(mapping_type == independent || mapping_type == independent_on_cartesian,
+	 ExcNotImplemented());
 //TODO: Size assertions
   
   for (unsigned int i=0; i<n_dofs; ++i)
@@ -449,6 +454,41 @@ FE_PolyTensor<POLY,dim>::element_multiplicity (const unsigned int index) const
   return 1;
 }
 
+
+template <class POLY, int dim>
+UpdateFlags
+FE_PolyTensor<POLY,dim>::update_once (const UpdateFlags flags) const
+{
+  Assert (mapping_type != no_mapping, ExcNotInitialized());
+  const bool values_once = (mapping_type == independent);
+  
+  UpdateFlags out = update_default;
+
+  if (values_once && (flags & update_values))
+    out |= update_values;
+
+  return out;
+}
+
+
+template <class POLY, int dim>
+UpdateFlags
+FE_PolyTensor<POLY,dim>::update_each (const UpdateFlags flags) const
+{
+  Assert (mapping_type != no_mapping, ExcNotInitialized());
+  const bool values_once = (mapping_type == independent);
+  
+  UpdateFlags out = update_default;
+
+  if (!values_once && (flags & update_values))
+    out |= update_values             | update_covariant_transformation;
+  if (flags & update_gradients)
+    out |= update_gradients          | update_covariant_transformation;
+  if (flags & update_second_derivatives)
+    out |= update_second_derivatives | update_covariant_transformation;
+
+  return out;
+}
 
 
 template class FE_PolyTensor<PolynomialsRaviartThomas<deal_II_dimension>,deal_II_dimension>;

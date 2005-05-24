@@ -63,6 +63,11 @@ class FE_PolyTensor : public FiniteElement<dim>
   public:
 				     /**
 				      * Constructor.
+				      *
+				      * @arg @c degree: constructor
+				      * argument for poly. May be
+				      * different from @p
+				      * fe_data.degree.
 				      */
     FE_PolyTensor (unsigned int degree,
 		   const FiniteElementData<dim> &fe_data,
@@ -134,6 +139,28 @@ class FE_PolyTensor : public FiniteElement<dim>
                                       */
     virtual unsigned int element_multiplicity (const unsigned int index) const;
 
+				     /**
+				      * Given <tt>flags</tt>,
+				      * determines the values which
+				      * must be computed only for the
+				      * reference cell. Make sure,
+				      * that #mapping_type is set by
+				      * the derived class, such that
+				      * this function can operate
+				      * correctly.
+				      */
+    virtual UpdateFlags update_once (const UpdateFlags flags) const;
+				     /**
+				      * Given <tt>flags</tt>,
+				      * determines the values which
+				      * must be computed in each cell
+				      * cell. Make sure, that
+				      * #mapping_type is set by the
+				      * derived class, such that this
+				      * function can operate
+				      * correctly.
+				      */
+    virtual UpdateFlags update_each (const UpdateFlags flags) const;
     
   protected:
 				     /**
@@ -150,11 +177,36 @@ class FE_PolyTensor : public FiniteElement<dim>
 				      * possible to avoid the mapping.
 				      */
     enum MappingType {
-					   /// Shape functions do not depend on actual mesh cell
+					   /**
+					    * No mapping has been
+					    * selected, throw an error
+					    * if needed.
+					    */
+	  no_mapping,
+					   /**
+					    * Shape functions do not
+					    * depend on actual mesh
+					    * cell
+					    */
 	  independent,
-					   /// Shape functions are transformed covariant.
+					   /**
+					    * Shape functions do not
+					    * depend on actual mesh
+					    * cell. The mapping class
+					    * must be
+					    * MappingCartesian.
+					    */
+	  independent_on_cartesian,
+					   /**
+					    * Shape functions are
+					    * transformed covariant.
+					    */ 
 	  covariant,
-					   /// Shape functions are transformed contravariant.
+					   /**
+					    * Shape functions are
+					    * transformed
+					    * contravariant.
+					    */
 	  contravariant
     };
 
@@ -240,17 +292,13 @@ class FE_PolyTensor : public FiniteElement<dim>
 	std::vector<std::vector<Tensor<2,dim> > > shape_grads;
     };
     
-				     /**
-				      * Degree of the polynomials.
-				      */  
-    unsigned int degree;
-
                                      /**
                                       * The polynomial space. Its type
                                       * is given by the template
                                       * parameter POLY.
                                       */    
     POLY poly_space;
+    
 				     /**
 				      * The inverse of the matrix
 				      * <i>a<sub>ij</sub></i> of node
