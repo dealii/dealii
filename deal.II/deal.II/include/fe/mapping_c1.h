@@ -18,7 +18,7 @@
 #include <fe/mapping_q.h>
 
 
-/*!@addtogroup fe */
+/*!@addtogroup mapping */
 /*@{*/
 
 /**

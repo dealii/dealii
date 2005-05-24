@@ -44,7 +44,7 @@ template <int dim> class Quadrature;
 //TODO: Add access to mapping values to FEValuesBase
 //TODO: Several FEValuesBase of a system should share Mapping
 
-/*!@addtogroup febase */
+/*!@addtogroup feaccess */
 /*@{*/
 
 /**
@@ -232,8 +232,6 @@ class FEValuesData
 
 
 /**
- * @brief Common features of <tt>FEValues*</tt> classes.
- *
  * FEValues, FEFaceValues and FESubfaceValues objects are programming
  * interfaces to finite element and mapping classes on the one hand
  * side, to cells and quadrature rules on the other side. The reason

@@ -24,10 +24,7 @@
 #include <cmath>
 
 
-
-
-
-/*!@addtogroup fe */
+/*!@addtogroup mapping */
 /*@{*/
 
 

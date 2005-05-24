@@ -17,7 +17,7 @@
 #include <lac/full_matrix.h>
 #include <fe/fe.h>
 
-/*!@addtogroup fe */
+/*!@addtogroup febase */
 /*@{*/
 
 /**

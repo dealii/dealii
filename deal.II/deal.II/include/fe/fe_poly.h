@@ -16,7 +16,7 @@
 
 #include <fe/fe.h>
 
-/*!@addtogroup fe */
+/*!@addtogroup febase */
 /*@{*/
 
 /**

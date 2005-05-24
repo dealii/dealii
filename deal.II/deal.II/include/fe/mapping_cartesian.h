@@ -20,7 +20,7 @@
 #include <fe/mapping.h>
 
 
-/*!@addtogroup fe */
+/*!@addtogroup mapping */
 /*@{*/
 
 /**

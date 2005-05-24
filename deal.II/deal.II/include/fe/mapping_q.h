@@ -21,7 +21,7 @@
 template <int dim> class TensorProductPolynomials;
 
 
-/*!@addtogroup fe */
+/*!@addtogroup mapping */
 /*@{*/
 
 /**

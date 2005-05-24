@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,20 +12,34 @@
 //-------------------------------------------------------------------------
 
 /**
- * @defgroup grid Grid Handling
+ * @defgroup grid Grids
  */
 
 /**
- * @defgroup dofs Handling of degrees of freedom
+ * @defgroup dofs Degrees of Freedom
  */
 
 /**
- * @defgroup febase Finite element access classes
+ * @defgroup feall Finite Elements
+ * @{
+ */
+/**
+ * @defgroup febase Base classes
+ */
+
+/**
+ * @defgroup feaccess Finite element access classes (FEValues etc.)
  */
 
 /**
  * @defgroup fe Finite element shape functions
  */
+
+/**
+ * @defgroup mapping Mappings to the reference cell
+ */
+
+/*@}*/
 
 /**
  * @defgroup mg Multilevel support
