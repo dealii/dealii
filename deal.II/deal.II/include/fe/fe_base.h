@@ -43,7 +43,7 @@ template<int dim> class FESystem;
  * version, FiniteElementData and FiniteElementBase should be private
  * base classes of FiniteElement.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003, 2005
  */
 template<int dim>
 class FiniteElementData
@@ -56,17 +56,27 @@ class FiniteElementData
     const unsigned int dofs_per_vertex;
 
 				     /** Number of degrees of freedom
-				      *  on a line.
+				      *  in a line; not including the
+				      *  degrees of freedom on the
+				      *  vertices of the line.
 				      */
     const unsigned int dofs_per_line;
 
 				     /** Number of degrees of freedom
-				      *  on a quadrilateral.
+				      *  in a quadrilateral; not
+				      *  including the degrees of
+				      *  freedom on the lines and
+				      *  vertices of the
+				      *  quadrilateral.
 				      */
     const unsigned int dofs_per_quad;
 
 				     /** Number of degrees of freedom
-				      *  on a hexahedron.
+				      *  in a hexahedron; not
+				      *  including the degrees of
+				      *  freedom on the
+				      *  quadrilaterals, lines and
+				      *  vertices of the hecahedron.
 				      */
     const unsigned int dofs_per_hex;
 
@@ -96,22 +106,24 @@ class FiniteElementData
     const unsigned int first_face_quad_index;
 
 				     /**
-				      * Number of degrees of freedom on a
-				      * face. This information is
-				      * redundant to some fields in the
-				      * derived classes but makes
-				      * writing dimension independent
-				      * programs easier.
+				      * Number of degrees of freedom
+				      * on a face. This is the
+				      * accumulated number of degrees
+				      * of freedom on all the objects
+				      * of dimension up to
+				      * <tt>dim-1</tt> constituting a
+				      * face.
 				      */
     const unsigned int dofs_per_face;
     
 				     /**
 				      * Total number of degrees of freedom
-				      * on a cell. This information is
-				      * redundant to some fields in the
-				      * derived classes but makes
-				      * writing dimension independent
-				      * programs easier.
+				      * on a cell. This is the
+				      * accumulated number of degrees
+				      * of freedom on all the objects
+				      * of dimension up to
+				      * <tt>dim</tt> constituting a
+				      * cell.
 				      */
     const unsigned int dofs_per_cell;
 
@@ -182,31 +194,39 @@ class FiniteElementData
     unsigned int n_dofs_per_vertex () const;
 
 				     /**
-				      * Number of dofs per line.
+				      * Number of dofs per line. Not
+				      * including dofs on lower
+				      * dimensional objects.
 				      */
     unsigned int n_dofs_per_line () const;
 
     				     /**
-				      * Number of dofs per quad.
+				      * Number of dofs per quad. Not
+				      * including dofs on lower
+				      * dimensional objects.
 				      */
     unsigned int n_dofs_per_quad () const;
 
     				     /**
-				      * Number of dofs per hex.
+				      * Number of dofs per hex. Not
+				      * including dofs on lower
+				      * dimensional objects.
 				      */
     unsigned int n_dofs_per_hex () const;
 
     				     /**
 				      * Number of dofs per face,
-				      * which is one of the above
-				      * depending on the dimension.
+				      * accumulating degrees of
+				      * freedom of all lower
+				      * dimensional objects.
 				      */
     unsigned int n_dofs_per_face () const;
 
     				     /**
-				      * Number of dofs per cell, again
-				      * one of the above depending on
-				      * the dimension.
+				      * Number of dofs per cell,
+				      * accumulating degrees of
+				      * freedom of all lower
+				      * dimensional objects.
 				      */
     unsigned int n_dofs_per_cell () const;
 
