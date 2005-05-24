@@ -20,6 +20,8 @@
 
 template <int rank, int dim> class SymmetricTensor;
 
+template <int dim> SymmetricTensor<2,dim> unit_symmetric_tensor ();
+
 namespace internal
 {
                                    /**
