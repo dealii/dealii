@@ -578,6 +578,7 @@ class FE_RaviartThomasNodal
   :
   public FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>
 {
+  public:
 				     /**
 				      * Constructor for the Raviart-Thomas
 				      * element of degree @p p.
