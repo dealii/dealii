@@ -37,20 +37,13 @@ FE_DGPNonparametric<dim>::FE_DGPNonparametric (const unsigned int degree)
                 degree(degree),
                 polynomial_space (Polynomials::Legendre::generate_complete_basis(degree))
 {
-				   // if defined, copy over matrices
-				   // from precomputed arrays
-//    if ((degree < Matrices::n_embedding_matrices) &&
-//        (Matrices::embedding[degree][0] != 0))
-//      for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-//        this->prolongation[c].fill (Matrices::embedding[degree][c]);
-//    else
-//      for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell;++i)
-//        this->prolongation[i].reinit(0,0);
-                                   // since not implemented, set to
-                                   // "empty"
+  const unsigned int n_dofs = this->dofs_per_cell;
   for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-    this->prolongation[i].reinit(0, 0);
-
+    {
+      this->prolongation[i].reinit(n_dofs, n_dofs);
+      for (unsigned int j=0;j<n_dofs;++j)
+	this->prolongation[i](j,j) = 1.;
+    }
                                    // restriction can be defined
                                    // through projection for
                                    // discontinuous elements, but is
