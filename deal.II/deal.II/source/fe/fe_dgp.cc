@@ -25,7 +25,6 @@ template <int dim>
 FE_DGP<dim>::FE_DGP (const unsigned int degree)
 		:
 		FE_Poly<PolynomialSpace<dim>, dim> (
-		  degree,
 		  PolynomialSpace<dim>(Polynomials::Legendre::generate_complete_basis(degree)),
 		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree),
 		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),

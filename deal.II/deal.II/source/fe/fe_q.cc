@@ -423,7 +423,6 @@ template <int dim>
 FE_Q<dim>::FE_Q (const unsigned int degree)
 		:
 		FE_Poly<TensorProductPolynomials<dim>, dim> (
-		  degree,
 		  TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
 		  FiniteElementData<dim>(get_dpo_vector(degree),1, degree),
 		  std::vector<bool> (FiniteElementData<dim>(

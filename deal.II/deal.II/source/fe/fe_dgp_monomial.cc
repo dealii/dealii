@@ -112,7 +112,6 @@ template <int dim>
 FE_DGPMonomial<dim>::FE_DGPMonomial (const unsigned int degree)
 		:
 		FE_Poly<PolynomialsP<dim>, dim> (
-		  degree,
 		  PolynomialsP<dim>(degree),
 		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree),
 		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),

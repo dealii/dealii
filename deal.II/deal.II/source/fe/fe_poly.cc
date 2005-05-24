@@ -18,15 +18,13 @@
 
 
 template <class POLY, int dim>
-FE_Poly<POLY,dim>::FE_Poly (unsigned int degree,
-			    const POLY& poly_space,
+FE_Poly<POLY,dim>::FE_Poly (const POLY& poly_space,
 			    const FiniteElementData<dim> &fe_data,
 			    const std::vector<bool> &restriction_is_additive_flags,
 			    const std::vector<std::vector<bool> > &nonzero_components):
 		FiniteElement<dim> (fe_data,
 				    restriction_is_additive_flags,
 				    nonzero_components),
-                degree(degree),
                 poly_space(poly_space)
 {}
 
@@ -35,7 +33,7 @@ template <class POLY, int dim>
 unsigned int
 FE_Poly<POLY,dim>::get_degree () const
 {
-  return degree;
+  return this->degree;
 }
 
 

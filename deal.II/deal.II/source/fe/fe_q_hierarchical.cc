@@ -40,7 +40,6 @@ template <int dim>
 FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 		:
 		FE_Poly<TensorProductPolynomials<dim>, dim> (
-		  degree,
 		  Polynomials::Hierarchical::generate_complete_basis(degree),
 		  FiniteElementData<dim>(get_dpo_vector(degree),1, degree),
 		  std::vector<bool> (FiniteElementData<dim>(
