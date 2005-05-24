@@ -294,7 +294,7 @@ namespace PETScWrappers
                                         * Exception
                                         */
       DeclException0 (ExcIteratorRangeDoesNotMatchVectorSize);
-				       //@}
+				       ///@}
   };
 
 /*@}*/

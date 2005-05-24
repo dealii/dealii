@@ -267,7 +267,8 @@ namespace PETScWrappers
       using BlockMatrixBase<SparseMatrix>::clear;
       
 				       /** @addtogroup Exceptions
-					* @{ */
+					* @{
+					*/
       
                                        /**
                                         * Exception
@@ -283,7 +284,7 @@ namespace PETScWrappers
                       int, int, int, int,
                       << "The blocks [" << arg1 << ',' << arg2 << "] and ["
                       << arg3 << ',' << arg4 << "] have differing column numbers.");
-				       //@}
+				       ///@}
   };
 
 
