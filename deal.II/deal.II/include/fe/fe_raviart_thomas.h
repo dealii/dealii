@@ -555,7 +555,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
  * quadrature points.
  *
  * For an RT-element of degree <i>k</i>, we choose
- * <i>k+1<sup>d-1</sup></i> Gauss points on each face. This way, the
+ * <i>(k+1)<sup>d-1</sup></i> Gauss points on each face. This way, the
  * normal component which is in <i>Q<sub>k</sub></i> is uniquely
  * determined. Furthermore, since this Gauss-formula is exact on
  * <i>Q<sub>2k+1</sub></i>, these node values correspond to the exact
