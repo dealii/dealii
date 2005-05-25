@@ -228,10 +228,10 @@ FE_PolyTensor<POLY,dim>::get_data (const UpdateFlags      update_flags,
 	  if (inverse_node_matrix.n_cols() == 0)
 	    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	      data->shape_values[i][k] = values[i];
-	  else
-	    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-	      for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-		data->shape_values[i][k] = inverse_node_matrix(j,i) * values[j];
+ 	  else
+ 	    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+ 	      for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+ 		data->shape_values[i][k] += inverse_node_matrix(j,i) * values[j];
 	
 	if (flags & update_gradients)
 	  if (inverse_node_matrix.n_cols() == 0)
@@ -240,7 +240,7 @@ FE_PolyTensor<POLY,dim>::get_data (const UpdateFlags      update_flags,
 	  else
 	    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	      for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-		data->shape_grads[i][k] = inverse_node_matrix(j,i) * grads[j];
+		data->shape_grads[i][k] += inverse_node_matrix(j,i) * grads[j];
       }
   return data;
 }
@@ -282,7 +282,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
   
   for (unsigned int i=0; i<n_dofs; ++i)
     {
-      const unsigned int first = i*dim;//data.shape_function_to_row_table[i];
+      const unsigned int first = data.shape_function_to_row_table[i];
       
       if (flags & update_values)
 	for (unsigned int k=0; k<n_quad; ++k)
