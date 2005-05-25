@@ -652,7 +652,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
   coarse.reinit(dof_coarse);
   FullMatrix<number> A(n, n);
   for (unsigned int k=0;k<nq;++k)
-    for (unsigned int i=0;i<n;++j)
+    for (unsigned int i=0;i<n;++i)
       for (unsigned int j=0;j<n;++j)
 	A(i,j) = coarse.JxW(k)
 		 * coarse.shape_value(i,k)
@@ -676,10 +676,10 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
       
 				       // Remove small entries from
 				       // the matrix
-      for (unsigned int i=0; i<matrix.m(); ++i)
-	for (unsigned int j=0; j<matrix.n(); ++j)
-	  if (std::fabs(matrix(i,j)) < 1e-12)
-	    matrix(i,j) = 0.;
+//       for (unsigned int i=0; i<matrix.m(); ++i)
+// 	for (unsigned int j=0; j<matrix.n(); ++j)
+// 	  if (std::fabs(matrix(i,j)) < 1e-12)
+// 	    matrix(i,j) = 0.;
     }
 }
 
