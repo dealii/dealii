@@ -128,15 +128,17 @@ int main (int argc, char ** argv)
 {
   try
     {
-      if (argc == 0)
+      if (argc == 1)
         {
-          std::cout << "Converter from deal.II intermediate format to "
+          std::cout << std::endl
+		    << "Converter from deal.II intermediate format to "
                     << "other graphics formats."
                     << std::endl << std::endl
                     << "Usage: ./step-19 [-p parameter_file] "
                     << "list_of_input_files -x output_format "
                     << "output_file"
-                    << std::endl;
+                    << std::endl
+		    << std::endl;
           exit (1);
         }
       
