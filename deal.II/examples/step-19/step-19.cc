@@ -135,7 +135,7 @@ int main (int argc, char ** argv)
                     << "other graphics formats."
                     << std::endl << std::endl
                     << "Usage: ./step-19 [-p parameter_file] "
-                    << "list_of_input_files -x output_format "
+                    << "list_of_input_files [-x output_format] "
                     << "output_file"
                     << std::endl
 		    << std::endl;
