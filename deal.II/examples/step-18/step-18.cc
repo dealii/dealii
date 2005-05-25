@@ -2075,7 +2075,7 @@ namespace QuasiStaticElasticity
     filename << "solution-";
     filename << std::setfill('0');
     filename.setf(std::ios_base::fixed, std::ios_base::floatfield);
-    filename << std::setw(12) << std::setprecision(4) << present_time;
+    filename << std::setw(9) << std::setprecision(4) << present_time;
 
 				     // Next, in case there are
 				     // multiple processes working
