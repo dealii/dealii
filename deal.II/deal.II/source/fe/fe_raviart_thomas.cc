@@ -128,16 +128,16 @@ namespace
 
 
 template <int dim>
-FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int degree)
+FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int rt_order)
 		:
-		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),
-							   dim, degree+1),
-				    get_ria_vector (degree),
-				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),dim,degree+1).dofs_per_cell,
+		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(rt_order),
+							   dim, rt_order+1),
+				    get_ria_vector (rt_order),
+				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(rt_order),dim,rt_order+1).dofs_per_cell,
 								    std::vector<bool>(dim,true))),
-		degree(degree),
-                polynomials (create_polynomials(degree)),
-                renumber (compute_renumber(degree))
+		rt_order(rt_order),
+                polynomials (create_polynomials(rt_order)),
+                renumber (compute_renumber(rt_order))
 {
   Assert (dim >= 2, ExcNotUsefulInThisDimension());
 
@@ -146,10 +146,10 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int degree)
                                    // the number of degrees of freedom
                                    // per cell
   Assert (((dim==2) &&
-           (this->dofs_per_cell == 2*(degree+1)*(degree+2)))
+           (this->dofs_per_cell == 2*(rt_order+1)*(rt_order+2)))
           ||
           ((dim==3) &&
-           (this->dofs_per_cell == 3*(degree+1)*(degree+1)*(degree+2))),
+           (this->dofs_per_cell == 3*(rt_order+1)*(rt_order+1)*(rt_order+2))),
           ExcInternalError());
   Assert (renumber.size() == this->dofs_per_cell,
           ExcInternalError());
@@ -197,7 +197,7 @@ FE_RaviartThomas<dim>::get_name () const
   std::ostrstream namebuf;
 #endif
   
-  namebuf << "FE_RaviartThomas<" << dim << ">(" << degree << ")";
+  namebuf << "FE_RaviartThomas<" << dim << ">(" << rt_order << ")";
 
 #ifndef HAVE_STD_STRINGSTREAM
   namebuf << std::ends;
@@ -211,7 +211,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_RaviartThomas<dim>::clone() const
 {
-  return new FE_RaviartThomas<dim>(degree);
+  return new FE_RaviartThomas<dim>(rt_order);
 }
 
 
@@ -445,7 +445,7 @@ FE_RaviartThomas<2>::initialize_constraints ()
 
 				   // this case is too easy, so
 				   // special case it
-  if (degree == 0)
+  if (rt_order == 0)
     {
       this->interface_constraints(0,0) = this->interface_constraints(1,0) = .5;
       return;
@@ -523,7 +523,7 @@ FE_RaviartThomas<2>::initialize_constraints ()
 				   // need inside deal.II
   const std::vector<Polynomials::Polynomial<double> >
     face_polynomials (Polynomials::Hierarchical::
-		      generate_complete_basis (degree));
+		      generate_complete_basis (rt_order));
   Assert (face_polynomials.size() == this->dofs_per_face, ExcInternalError());
   
   FullMatrix<double> face_interpolation (2*this->dofs_per_face, this->dofs_per_face);
@@ -555,8 +555,8 @@ FE_RaviartThomas<2>::initialize_constraints ()
   for (unsigned int subface=0; subface<GeometryInfo<dim>::subfaces_per_face; ++subface)
     for (unsigned int i=0; i<this->dofs_per_face; ++i)
       {
-	const double p_face (1.*i/degree/2 + (subface == 0 ? 0. : .5));
-	const double p_subface (1.*i/degree);
+	const double p_face (1.*i/rt_order/2 + (subface == 0 ? 0. : .5));
+	const double p_subface (1.*i/rt_order);
 
 	for (unsigned int j=0; j<this->dofs_per_face; ++j)
 	  {
@@ -628,7 +628,7 @@ void
 FE_RaviartThomas<2>::initialize_restriction ()
 {
   const unsigned int dim = 2;
-  switch (degree)
+  switch (rt_order)
     {
       case 0:
       {
@@ -817,7 +817,7 @@ FE_RaviartThomas<dim>::initialize_unit_support_points ()
     {
       case 2:
       {
-        Assert (degree+1 == this->dofs_per_face, ExcInternalError());
+        Assert (rt_order+1 == this->dofs_per_face, ExcInternalError());
         
                                          // associate support points
                                          // with mid-face points if a
@@ -858,7 +858,7 @@ FE_RaviartThomas<dim>::initialize_unit_support_points ()
       case 3:
       {
                                          // same as in 2d
-        Assert ((degree+1)*(degree+1) == this->dofs_per_face, ExcInternalError());
+        Assert ((rt_order+1)*(rt_order+1) == this->dofs_per_face, ExcInternalError());
         
                                          // start with the face shape
                                          // functions
@@ -933,20 +933,20 @@ FE_RaviartThomas<1>::get_dpo_vector (const unsigned int)
 
 template <int dim>
 std::vector<unsigned int>
-FE_RaviartThomas<dim>::get_dpo_vector (const unsigned int degree)
+FE_RaviartThomas<dim>::get_dpo_vector (const unsigned int rt_order)
 {
                                    // the element is face-based (not
                                    // to be confused with George
                                    // W. Bush's Faith Based
                                    // Initiative...), and we have
-                                   // (degree+1)^(dim-1) DoFs per face
+                                   // (rt_order+1)^(dim-1) DoFs per face
   unsigned int dofs_per_face = 1;
   for (unsigned int d=0; d<dim-1; ++d)
-    dofs_per_face *= degree+1;
+    dofs_per_face *= rt_order+1;
 
                                    // and then there are interior dofs
   const unsigned int
-    interior_dofs = dim*degree*dofs_per_face;
+    interior_dofs = dim*rt_order*dofs_per_face;
   
   std::vector<unsigned int> dpo(dim+1);
   dpo[dim-1] = dofs_per_face;
@@ -972,26 +972,26 @@ FE_RaviartThomas<1>::get_ria_vector (const unsigned int)
 
 template <int dim>
 std::vector<bool>
-FE_RaviartThomas<dim>::get_ria_vector (const unsigned int degree)
+FE_RaviartThomas<dim>::get_ria_vector (const unsigned int rt_order)
 {
   unsigned int dofs_per_cell, dofs_per_face;
   switch (dim)
     {
       case 2:
-	    dofs_per_face = degree+1;
-	    dofs_per_cell = 2*(degree+1)*(degree+2);
+	    dofs_per_face = rt_order+1;
+	    dofs_per_cell = 2*(rt_order+1)*(rt_order+2);
 	    break;
       case 3:
-	    dofs_per_face = (degree+1)*(degree+1);
-	    dofs_per_cell = 3*(degree+1)*(degree+1)*(degree+2);
+	    dofs_per_face = (rt_order+1)*(rt_order+1);
+	    dofs_per_cell = 3*(rt_order+1)*(rt_order+1)*(rt_order+2);
 	    break;
       default:
 	    Assert (false, ExcNotImplemented());
     }
-  Assert (FiniteElementData<dim>(get_dpo_vector(degree),dim).dofs_per_cell ==
+  Assert (FiniteElementData<dim>(get_dpo_vector(rt_order),dim).dofs_per_cell ==
 	  dofs_per_cell,
 	  ExcInternalError());
-  Assert (FiniteElementData<dim>(get_dpo_vector(degree),dim).dofs_per_face ==
+  Assert (FiniteElementData<dim>(get_dpo_vector(rt_order),dim).dofs_per_face ==
 	  dofs_per_face,
 	  ExcInternalError());
   
@@ -1026,7 +1026,7 @@ FE_RaviartThomas<1>::create_polynomials (const unsigned int)
 
 template <>
 std::vector<AnisotropicPolynomials<2> >
-FE_RaviartThomas<2>::create_polynomials (const unsigned int degree)
+FE_RaviartThomas<2>::create_polynomials (const unsigned int rt_order)
 {
   const unsigned int dim = 2;
   
@@ -1037,8 +1037,8 @@ FE_RaviartThomas<2>::create_polynomials (const unsigned int degree)
                                    // see the book by Brezzi and
                                    // Fortin
   const std::vector<Polynomials::Polynomial<double> > pols[2]
-    = { Polynomials::Hierarchical::generate_complete_basis (degree+1),
-        Polynomials::Hierarchical::generate_complete_basis (degree)};
+    = { Polynomials::Hierarchical::generate_complete_basis (rt_order+1),
+        Polynomials::Hierarchical::generate_complete_basis (rt_order)};
 
                                    // create spaces (k+1,k) and (k,k+1)
   std::vector<std::vector<Polynomials::Polynomial<double> > >
@@ -1073,7 +1073,7 @@ FE_RaviartThomas<2>::create_polynomials (const unsigned int degree)
 
 template <>
 std::vector<AnisotropicPolynomials<3> >
-FE_RaviartThomas<3>::create_polynomials (const unsigned int degree)
+FE_RaviartThomas<3>::create_polynomials (const unsigned int rt_order)
 {
   const unsigned int dim = 3;
   
@@ -1085,8 +1085,8 @@ FE_RaviartThomas<3>::create_polynomials (const unsigned int degree)
                                    // see the book by Brezzi and
                                    // Fortin
   const std::vector<Polynomials::Polynomial<double> > pols[2]
-    = { Polynomials::Hierarchical::generate_complete_basis (degree+1),
-        Polynomials::Hierarchical::generate_complete_basis (degree)};
+    = { Polynomials::Hierarchical::generate_complete_basis (rt_order+1),
+        Polynomials::Hierarchical::generate_complete_basis (rt_order)};
 
                                    // create spaces (k+1,k,k),
                                    // (k,k+1,k) and (k,k,k+1)
@@ -1143,27 +1143,27 @@ FE_RaviartThomas<1>::compute_renumber (const unsigned int)
 
 template <>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_RaviartThomas<2>::compute_renumber (const unsigned int degree)
+FE_RaviartThomas<2>::compute_renumber (const unsigned int rt_order)
 {
   const unsigned int dim = 2;
   
   std::vector<std::pair<unsigned int, unsigned int> > ret_val;
   
                                    // to explain the following: the
-                                   // first (degree+1) shape functions
+                                   // first (rt_order+1) shape functions
                                    // are on face 0, and point in
                                    // y-direction, so are for the
                                    // second vector component. then
-                                   // there are (degree+1) shape
+                                   // there are (rt_order+1) shape
                                    // functions on face 1, which is
                                    // for the x vector component, and
                                    // so on. since the order of face
-                                   // degrees of freedom is arbitrary,
+                                   // rt_orders of freedom is arbitrary,
                                    // we simply use the same order as
                                    // that provided by the 1d
                                    // polynomial class on which this
                                    // element is based. after
-                                   // 4*(degree+1), the remaining
+                                   // 4*(rt_order+1), the remaining
                                    // shape functions are all bubbles,
                                    // so we can number them in any way
                                    // we want. we do so by first
@@ -1187,38 +1187,38 @@ FE_RaviartThomas<2>::compute_renumber (const unsigned int degree)
                                    // comments below
 
                                    // face 0
-  for (unsigned int i=0; i<degree+1; ++i)
+  for (unsigned int i=0; i<rt_order+1; ++i)
     ret_val.push_back (std::make_pair (1U, i));
   
                                    // face 1
-  for (unsigned int i=0; i<degree+1; ++i)
-    ret_val.push_back (std::make_pair (0U, (degree+2)*i+1));
+  for (unsigned int i=0; i<rt_order+1; ++i)
+    ret_val.push_back (std::make_pair (0U, (rt_order+2)*i+1));
   
                                    // face 2
-  for (unsigned int i=0; i<degree+1; ++i)
-    ret_val.push_back (std::make_pair (1U, (degree+1)+i));
+  for (unsigned int i=0; i<rt_order+1; ++i)
+    ret_val.push_back (std::make_pair (1U, (rt_order+1)+i));
   
                                    // face 3
-  for (unsigned int i=0; i<degree+1; ++i)
-    ret_val.push_back (std::make_pair (0U, (degree+2)*i));
+  for (unsigned int i=0; i<rt_order+1; ++i)
+    ret_val.push_back (std::make_pair (0U, (rt_order+2)*i));
 
                                    // then go on with interior bubble
                                    // functions, first for the
                                    // x-direction, then for the
                                    // y-direction
-  for (unsigned int x=0; x<degree; ++x)
-    for (unsigned int y=0; y<degree+1; ++y)
+  for (unsigned int x=0; x<rt_order; ++x)
+    for (unsigned int y=0; y<rt_order+1; ++y)
       {
-        const unsigned int index_in_component = (x+2) + y*(degree+2);
-        Assert (index_in_component < (degree+1)*(degree+2),
+        const unsigned int index_in_component = (x+2) + y*(rt_order+2);
+        Assert (index_in_component < (rt_order+1)*(rt_order+2),
                 ExcInternalError());
         ret_val.push_back (std::make_pair(0U, index_in_component));
       }
-  for (unsigned int x=0; x<degree+1; ++x)
-    for (unsigned int y=0; y<degree; ++y)
+  for (unsigned int x=0; x<rt_order+1; ++x)
+    for (unsigned int y=0; y<rt_order; ++y)
       {
-        const unsigned int index_in_component = 2*(degree+1) + y + x*degree;
-        Assert (index_in_component < (degree+1)*(degree+2),
+        const unsigned int index_in_component = 2*(rt_order+1) + y + x*rt_order;
+        Assert (index_in_component < (rt_order+1)*(rt_order+2),
                 ExcInternalError());
         ret_val.push_back (std::make_pair(1U, index_in_component));
       }
@@ -1227,7 +1227,7 @@ FE_RaviartThomas<2>::compute_renumber (const unsigned int degree)
                                    // make sure we have actually used
                                    // up all elements of the tensor
                                    // product polynomial
-  Assert (ret_val.size() == 2*(degree+1)*(degree+2),
+  Assert (ret_val.size() == 2*(rt_order+1)*(rt_order+2),
           ExcInternalError());
   std::vector<bool> test[dim] = { std::vector<bool>(ret_val.size()/dim, false),
                                   std::vector<bool>(ret_val.size()/dim, false) };
@@ -1256,7 +1256,7 @@ FE_RaviartThomas<2>::compute_renumber (const unsigned int degree)
 
 template <>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_RaviartThomas<3>::compute_renumber (const unsigned int /*degree*/)
+FE_RaviartThomas<3>::compute_renumber (const unsigned int /*rt_order*/)
 {
   Assert (false, ExcNotImplemented());
   return std::vector<std::pair<unsigned int, unsigned int> > ();  
@@ -1823,7 +1823,7 @@ FE_RaviartThomas<dim>::has_support_on_face (const unsigned int shape_index,
 				   // Return computed values if we
 				   // know them easily. Otherwise, it
 				   // is always safe to return true.
-  switch (degree)
+  switch (rt_order)
     {
       case 0:
       {
@@ -1848,7 +1848,7 @@ FE_RaviartThomas<dim>::has_support_on_face (const unsigned int shape_index,
           };
       };
       
-      default:  // other degree
+      default:  // other rt_order
 	return true;
     };
   
@@ -1871,7 +1871,7 @@ template <int dim>
 unsigned int
 FE_RaviartThomas<dim>::get_degree () const
 {
-  return degree;
+  return rt_order;
 }
 
 

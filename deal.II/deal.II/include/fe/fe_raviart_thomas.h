@@ -327,9 +327,15 @@ class FE_RaviartThomas : public FiniteElement<dim>
 
   private:
 				     /**
-				      * Degree of the polynomials.
+				      * The order of the
+				      * Raviart-Thomas element. The
+				      * lowest order elements are
+				      * usually referred to as RT0,
+				      * even though their shape
+				      * functions are piecewise
+				      * linears.
 				      */  
-    const unsigned int degree;
+    const unsigned int rt_order;
 
                                      /**
                                       * Spaces describing the
