@@ -539,10 +539,21 @@ namespace internal
  * example for the 3x3x3x3 tensors of rank 4, only 36 instead of the full 81
  * entries have to be stored.
  *
- * Tensors of rank 4 are considered symmetric if they are operators mapping
- * symmetric rank-2 tensors onto symmetric rank-2 tensors. This entails
- * certain symmetry properties on the elements in their 4-dimensional index
- * space.
+ * While the definition of a symmetric rank-2 tensor is obvious,
+ * tensors of rank 4 are considered symmetric if they are operators
+ * mapping symmetric rank-2 tensors onto symmetric rank-2
+ * tensors. This entails certain symmetry properties on the elements
+ * in their 4-dimensional index space, in particular that
+ * <tt>C<sub>ijkl</sub>=C<sub>jikl</sub>=C<sub>ijlk</sub></tt>. However,
+ * it does not imply the relation
+ * <tt>C<sub>ijkl</sub>=C<sub>klij</sub></tt>. Consequently, symmetric
+ * tensors of rank 4 as understood here are only tensors that map
+ * symmetric tensors onto symmetric tensors, but they do not
+ * necessarily induce a symmetric scalar product <tt>a:C:b=b:C:a</tt>
+ * or even a positive (semi-)definite form <tt>a:C:a</tt>, where
+ * <tt>a,b</tt> are symmetric rank-2 tensors and the colon indicates
+ * the common double-index contraction that acts as a product for
+ * symmetric tensors.
  *
  * Symmetric tensors are most often used in structural and fluid mechanics,
  * where strains and stresses are usually symmetric tensors, and the
