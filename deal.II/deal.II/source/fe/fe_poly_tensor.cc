@@ -305,14 +305,6 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
   if (flags & update_second_derivatives)
     this->compute_2nd (mapping, cell, dsd.cell(),
 		       mapping_data, fe_data, data);
-  deallog << "Shape data " << get_name() << std::endl;
-  
-  for (unsigned int i=0;i<data.shape_values.n_rows();++i)
-    {
-      for (unsigned int j=0;j<n_quad;++j)
-	deallog << ' ' << data.shape_values(i,j);
-      deallog << std::endl; 
-    }
 }
 
 
