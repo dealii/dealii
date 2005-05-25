@@ -1,7 +1,6 @@
-# Generated automatically from Makefile.in by configure.
 ############################################################
 # Makefile,v 1.15 2002/06/13 12:51:13 hartmann Exp
-# Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -49,6 +48,7 @@ rt_3.exe                : rt_3.g.$(OBJEXT)                $(libraries)
 rt_4.exe                : rt_4.g.$(OBJEXT)                $(libraries)
 rt_5.exe                : rt_5.g.$(OBJEXT)                $(libraries)
 rt_6.exe                : rt_6.g.$(OBJEXT)                $(libraries)
+rtn_1.exe               : rtn_1.g.$(OBJEXT)               $(libraries)
 dgp_monomial_1.exe	: dgp_monomial_1.g.$(OBJEXT)      $(libraries)
 dgp_monomial_2.exe	: dgp_monomial_2.g.$(OBJEXT)      $(libraries)
 system_1.exe            : system_1.g.$(OBJEXT)            $(libraries)

@@ -602,6 +602,88 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 }
 
 
+template<int dim, typename number>
+void
+FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
+				     FullMatrix<number>* matrices)
+{
+  const unsigned int nc = GeometryInfo<dim>::children_per_cell;
+  const unsigned int n  = fe.dofs_per_cell;
+  const unsigned int nd = fe.n_components();
+  const unsigned int degree = fe.degree;
+  
+  for (unsigned int i=0;i<nc;++i)
+    {
+      Assert(matrices[i].n() == n, ExcDimensionMismatch(matrices[i].n(),n));
+      Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(),n));
+    }
+  
+				   /*
+				    * Set up two meshes, one with a
+				    * single reference cell and the
+				    * other refined, together with
+				    * DoFHandler and finite elements.
+				    */
+  Triangulation<dim> tr_coarse;
+  Triangulation<dim> tr_fine;
+  GridGenerator::hyper_cube (tr_coarse, 0, 1);
+  GridGenerator::hyper_cube (tr_fine, 0, 1);
+  tr_fine.refine_global(1);
+  DoFHandler<dim> dof_coarse(tr_coarse);
+  dof_coarse.distribute_dofs(fe);
+  DoFHandler<dim> dof_fine(tr_fine);
+  dof_fine.distribute_dofs(fe);
+
+  MappingCartesian<dim> mapping;
+  QGauss<dim> q_fine(degree+1);
+  const unsigned int nq = q_fine.n_quadrature_points;
+  
+  FEValues<dim> coarse (mapping, fe, q_fine,
+			update_q_points | update_JxW_values | update_values);
+  FEValues<dim> fine (mapping, fe, q_fine,
+		      update_q_points | update_JxW_values | update_values);
+  
+  typename DoFHandler<dim>::active_cell_iterator coarse_cell
+    = dof_coarse.begin_active();
+  typename DoFHandler<dim>::active_cell_iterator fine_cell;
+
+				   // Compute the coarse level mass
+				   // matrix
+  coarse.reinit(dof_coarse);
+  FullMatrix<number> A(n, n);
+  for (unsigned int k=0;k<nq;++k)
+    for (unsigned int i=0;i<n;++j)
+      for (unsigned int j=0;j<n;++j)
+	A(i,j) = coarse.JxW(k)
+		 * coarse.shape_value(i,k)
+		 * coarse.shape_value(j,k);
+  
+  Householder<double> H(A);
+  
+  Vector<number> v_coarse(n);
+  Vector<number> v_fine(n);
+  
+  unsigned int cell_number = 0;
+  for (fine_cell = dof_fine.begin_active();
+       fine_cell != dof_fine.end();
+       ++fine_cell, ++cell_number)
+    {
+				       // Compute right hand side,
+				       // which is a fine level basis
+				       // function tested with the
+				       // coarse level functions.
+      Assert(false, ExcNotImplemented());
+      
+				       // Remove small entries from
+				       // the matrix
+      for (unsigned int i=0; i<matrix.m(); ++i)
+	for (unsigned int j=0; j<matrix.n(); ++j)
+	  if (std::fabs(matrix(i,j)) < 1e-12)
+	    matrix(i,j) = 0.;
+    }
+}
+
+
 template <int dim,
           class InVector, class OutVector>
 void

@@ -16,6 +16,7 @@
 #include <fe/fe_poly_tensor.h>
 #include <fe/fe_values.h>
 
+#include <base/logstream.h>
 
 template <class POLY, int dim>
 FE_PolyTensor<POLY,dim>::FE_PolyTensor (
@@ -64,7 +65,7 @@ FE_PolyTensor<POLY,dim>::shape_value_component (
     return cached_values[i][component];
   else
     for (unsigned int j=0;j<inverse_node_matrix.n_cols();++j)
-      s += inverse_node_matrix(i,j) * cached_values[j][component];
+      s += inverse_node_matrix(j,i) * cached_values[j][component];
   return s;
 }
 
@@ -103,7 +104,7 @@ FE_PolyTensor<POLY,dim>::shape_grad_component (
     return cached_grads[i][component];
   else
     for (unsigned int j=0;j<inverse_node_matrix.n_cols();++j)
-      s += inverse_node_matrix(i,j) * cached_grads[j][component];
+      s += inverse_node_matrix(j,i) * cached_grads[j][component];
   
   return s;
 }
@@ -174,7 +175,9 @@ FE_PolyTensor<POLY,dim>::get_data (const UpdateFlags      update_flags,
 
   const UpdateFlags flags(data->update_flags);
   const unsigned int n_q_points = quadrature.n_quadrature_points;
-
+  double d;
+  d = floor (1.3);
+  
 				   // some scratch arrays
   std::vector<Tensor<1,dim> > values(0);
   std::vector<Tensor<2,dim> > grads(0);
@@ -228,7 +231,7 @@ FE_PolyTensor<POLY,dim>::get_data (const UpdateFlags      update_flags,
 	  else
 	    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	      for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-		data->shape_values[i][k] = inverse_node_matrix(i,j) * values[j];
+		data->shape_values[i][k] = inverse_node_matrix(j,i) * values[j];
 	
 	if (flags & update_gradients)
 	  if (inverse_node_matrix.n_cols() == 0)
@@ -237,7 +240,7 @@ FE_PolyTensor<POLY,dim>::get_data (const UpdateFlags      update_flags,
 	  else
 	    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
 	      for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-		data->shape_grads[i][k] = inverse_node_matrix(i,j) * grads[j];
+		data->shape_grads[i][k] = inverse_node_matrix(j,i) * grads[j];
       }
   return data;
 }
@@ -279,7 +282,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
   
   for (unsigned int i=0; i<n_dofs; ++i)
     {
-      const unsigned int first = data.shape_function_to_row_table[i];
+      const unsigned int first = i*dim;//data.shape_function_to_row_table[i];
       
       if (flags & update_values)
 	for (unsigned int k=0; k<n_quad; ++k)
@@ -302,6 +305,14 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
   if (flags & update_second_derivatives)
     this->compute_2nd (mapping, cell, dsd.cell(),
 		       mapping_data, fe_data, data);
+  deallog << "Shape data " << get_name() << std::endl;
+  
+  for (unsigned int i=0;i<data.shape_values.n_rows();++i)
+    {
+      for (unsigned int j=0;j<n_quad;++j)
+	deallog << ' ' << data.shape_values(i,j);
+      deallog << std::endl; 
+    }
 }
 
 

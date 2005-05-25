@@ -45,15 +45,16 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   
   this->mapping_type = this->independent_on_cartesian;
-  
+				   // These must be done first, since
+				   // they change the evaluation of
+				   // basis functions
+  initialize_unit_support_points (deg);
+  initialize_node_matrix();
+
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     this->prolongation[i].reinit (this->dofs_per_cell,
 				  this->dofs_per_cell);
   FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
-				   // finally fill in support points
-				   // on cell and face
-  initialize_unit_support_points (deg);
-  initialize_node_matrix();
 }
 
 
