@@ -1591,11 +1591,12 @@ namespace QuasiStaticElasticity
 		  const SymmetricTensor<2,dim> &old_stress
 		    = local_quadrature_points_data[q_point].old_stress;
 		
-		  cell_rhs(i) += (fe_values.shape_value (i,q_point) *
-				  body_force_values[q_point](component_i)
+		  cell_rhs(i) += (body_force_values[q_point](component_i) *
+				  fe_values.shape_value (i,q_point)
 				  -
-				  get_strain (fe_values,i,q_point) *
-				  old_stress) *
+                                  old_stress *
+				  get_strain (fe_values,i,q_point))
+                                 *
 				 fe_values.JxW (q_point);
 		}
 	    }
