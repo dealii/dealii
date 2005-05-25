@@ -85,6 +85,9 @@ ifeq ($(USE_CONTRIB_HSL),yes)
   tests_x += hsl_*
 endif
 
+ifeq ($(USE_CONTRIB_UMFPACK),yes)
+  tests_x += umfpack_*
+endif
 
 
 # from above list of regular expressions, generate the real set of
