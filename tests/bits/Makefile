@@ -64,7 +64,6 @@ tests_x = geometry_info_1 \
 	  cylinder_shell_* \
 	  compressed_sparsity_pattern_* \
 	  point_difference_* \
-	  umfpack_* \
 	  fe_q_3d* \
           rt_* \
 	  nedelec_* \
