@@ -3,6 +3,14 @@
 #
 # Copyright (c) the deal.II authors 2003
 
+###############################
+# Configured variables
+
+D     = @DEAL2_DIR@
+include $D/common/Make.global_options
+
+
+
 html: deal.tag
 
 private:
@@ -20,4 +28,25 @@ base:    base.tag
 lac:     lac.tag
 deal.II: deal.tag
 
-.PHONY: html private base lac deal.II
+# validate cross references. there are so many html files in these
+# directories that we can just call
+#    $(PERL) $D/common/scripts/validate-xrefs.pl deal.II/*.html
+# as this leads to error messages of the kind "/usr/bin/perl: Argument 
+# list too long". Instead, use a loop over all html files
+validate-xrefs-%:
+	@echo --- Validating xrefs in $(@:validate-xrefs-%=%)/ ---
+	cd $(@:validate-xrefs-%=%) ; \
+		for i in *.html ; do \
+			$(PERL) $D/common/scripts/validate-xrefs.pl $i ; \
+		done
+
+validate-xrefs: validate-xrefs-base \
+                validate-xrefs-lac  \
+                validate-xrefs-deal.II
+
+
+.PHONY: html private base lac deal.II \
+	validate-xrefs \
+	validate-xrefs-base \
+        validate-xrefs-lac  \
+        validate-xrefs-deal.II

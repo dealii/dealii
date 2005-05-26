@@ -3,9 +3,7 @@
 ###############################
 # Configured variables
 
-D        = @DEAL2_DIR@
-
-
+D     = @DEAL2_DIR@
 include $D/common/Make.global_options
 
 
@@ -32,9 +30,7 @@ glossary:
 validate-xrefs:
 	@echo "Validating cross-references in HTML files."
 	$(PERL) $D/common/scripts/validate-xrefs.pl *html
-	$(PERL) $D/common/scripts/validate-xrefs.pl doxygen/base/*.html
-	$(PERL) $D/common/scripts/validate-xrefs.pl doxygen/lac/*.html
-	$(PERL) $D/common/scripts/validate-xrefs.pl doxygen/deal.II/*.html
+	cd doxygen ; $(MAKE) validate-xrefs
 	cd tutorial ; $(MAKE) validate-xrefs
 	cd development ; $(MAKE) validate-xrefs
 	cd publications ; $(MAKE) validate-xrefs
