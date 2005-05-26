@@ -359,7 +359,22 @@ dnl -------------------------------------------------------------
 AC_MSG_RESULT()
 AC_MSG_RESULT(---------------- configuring additional libs ----------------)
 
-dnl Make sure we configure for libraries used by other libraries
+
+dnl First check for PETSc
+
+DEAL_II_CONFIGURE_PETSC
+AC_SUBST(USE_CONTRIB_PETSC)
+AC_SUBST(DEAL_II_PETSC_DIR)
+AC_SUBST(DEAL_II_PETSC_ARCH)
+AC_SUBST(DEAL_II_PETSC_VERSION_MAJOR)
+AC_SUBST(DEAL_II_PETSC_VERSION_MINOR)
+AC_SUBST(DEAL_II_PETSC_VERSION_SUBMINOR)
+AC_SUBST(DEAL_II_DEFINE_DEAL_II_USE_PETSC)
+
+
+
+dnl Make sure we configure for libraries used by other libraries. For
+dnl example, UMFPACK needs blas, and so does LAPACK
 
 if test "x$with_umfpack" != "x" ; then
   if test "x$with_blas" = "x" ; then
@@ -372,6 +387,18 @@ if test "x$with_lapack" != "x" ; then
     with_blas="yes"
   fi
 fi
+
+
+dnl Likewise, if we use PETSc and link statically, we have to add blas to the
+dnl linker line (if we use shared libs, then the PETSc libs already carry this
+dnl dependence, but static archives do not have a method to list dependencies)
+if test "x$with-petsc" != "x" ; then
+  if "x$enableshared" != "no" ; then
+   abort
+    with_blas="yes"
+  fi
+fi
+
 
 dnl -------------------------------------------------------------
 dnl Actually include libraries here. Check for the libraries
@@ -405,15 +432,6 @@ dnl -------------------------------------------------------------
 
 DEAL_II_CONFIGURE_TECPLOT
 AC_SUBST(TECPLOT_INCLUDE_DIR)
-
-DEAL_II_CONFIGURE_PETSC
-AC_SUBST(USE_CONTRIB_PETSC)
-AC_SUBST(DEAL_II_PETSC_DIR)
-AC_SUBST(DEAL_II_PETSC_ARCH)
-AC_SUBST(DEAL_II_PETSC_VERSION_MAJOR)
-AC_SUBST(DEAL_II_PETSC_VERSION_MINOR)
-AC_SUBST(DEAL_II_PETSC_VERSION_SUBMINOR)
-AC_SUBST(DEAL_II_DEFINE_DEAL_II_USE_PETSC)
 
 DEAL_II_CONFIGURE_METIS
 AC_SUBST(USE_CONTRIB_METIS)
