@@ -191,14 +191,16 @@ class Quadrature : public Subscriptor
 
   protected:
 				     /**
-				      * List of quadrature points. To be filled
-				      * by the constructors of derived classes.
+				      * List of quadrature points. To
+				      * be filled by the constructors
+				      * of derived classes.
 				      */
     std::vector<Point<dim> > quadrature_points;
 
 				     /**
-				      * List of weights of the quadrature points.
-				      * To be filled by the constructors of
+				      * List of weights of the
+				      * quadrature points.  To be
+				      * filled by the constructors of
 				      * derived classes.
 				      */
     std::vector<double>      weights;
