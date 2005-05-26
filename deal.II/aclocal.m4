@@ -4414,9 +4414,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
     DEAL_II_CONFIGURE_PETSC_ARCH
     DEAL_II_CONFIGURE_PETSC_VERSION
 
-    dnl Finally set with-petsc if this hasn't happened yet
-    if test "x$with-petsc" = "x" ; then
-      with-petsc="yes"
+    dnl Finally set with_petsc if this hasn't happened yet
+    if test "x$with_petsc" = "x" ; then
+      with_petsc="yes"
     fi
   fi
 ])
