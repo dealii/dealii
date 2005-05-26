@@ -208,7 +208,7 @@ class Quadrature : public Subscriptor
 /**
  * Quadrature formula implementing anisotropic distributions of
  * quadrature points on the reference cell. To this end, the tensor
- * product of <tt>dim</tt> onedimensional quadrature formulas is
+ * product of <tt>dim</tt> one-dimensional quadrature formulas is
  * generated.
  *
  * @note Each constructor can only be used in the dimension matching
@@ -222,25 +222,26 @@ class QAnisotropic : public Quadrature<dim>
   public:
 				     /**
 				      * Constructor for a
-				      * onedimensional formula. This
+				      * one-dimensional formula. This
 				      * one just copies the given
 				      * quadrature rule.
 				      */
     QAnisotropic(const Quadrature<1>& qx);
     
 				     /**
-				      * Constructor for a twodimensional formula.
+				      * Constructor for a
+				      * two-dimensional formula.
 				      */
     QAnisotropic(const Quadrature<1>& qx,
 		 const Quadrature<1>& qy);
     
 				     /**
-				      * Constructor for a threedimensional formula.
+				      * Constructor for a
+				      * three-dimensional formula.
 				      */
     QAnisotropic(const Quadrature<1>& qx,
 		 const Quadrature<1>& qy,
 		 const Quadrature<1>& qz);
-    
 };
 
 
