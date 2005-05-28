@@ -28,6 +28,7 @@
 #  include <strstream>
 #endif
 
+#include <iostream>
 
 template <int dim>
 FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
@@ -125,7 +126,7 @@ FE_RaviartThomasNodal<dim>::get_dpo_vector (const unsigned int deg)
                                    // the element is face-based and we have
                                    // (deg+1)^(dim-1) DoFs per face
   unsigned int dofs_per_face = 1;
-  for (unsigned int d=0; d<dim-1; ++d)
+  for (unsigned int d=1; d<dim; ++d)
     dofs_per_face *= deg+1;
 
                                    // and then there are interior dofs
@@ -216,11 +217,14 @@ FE_RaviartThomasNodal<dim>::initialize_unit_support_points (const unsigned int d
       for (unsigned int k=0;k<this->dofs_per_face;++k)
 	this->unit_face_support_points[k] = face_points.point(k);
       Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(face_points);
-      for (unsigned int k=0;k<faces.n_quadrature_points;++k)
+      for (unsigned int k=0;k<//faces.n_quadrature_points
+			  this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;++k)
 	this->unit_support_points[k] = faces.point(k);
 
-      current = faces.n_quadrature_points;
+      current = this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
     }
+  
+  if (deg==0) return;
 				   // In the interior, we need
 				   // anisotropic Gauss quadratures,
 				   // different for each direction.
@@ -271,8 +275,8 @@ FE_RaviartThomasNodal<dim>::initialize_node_matrix ()
 	for (unsigned int i=0;i<n_dofs;++i)
 	  N(current,i) = this->shape_value_component(
 	    i, this->unit_support_points[current],
-	    GeometryInfo< dim >::unit_normal_direction[face])
-			 * GeometryInfo< dim >::unit_normal_orientation[face];
+	    GeometryInfo< dim >::unit_normal_direction[face]);
+//			 * GeometryInfo< dim >::unit_normal_orientation[face];
 	++current;
       }
 				   // Interior degrees of freedom in each direction
