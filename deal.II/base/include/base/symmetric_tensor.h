@@ -2050,12 +2050,22 @@ SymmetricTensor<4,dim>
 deviator_tensor () 
 {
   SymmetricTensor<4,dim> tmp;
+  
+                                   // fill the elements treating the diagonal
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       tmp.data[i][j] = (i==j ? 1 : 0) - 1./dim;
+
+                                   // then fill the ones that copy over the
+                                   // non-diagonal elements. note that during
+                                   // the double-contraction, we handle the
+                                   // off-diagonal elements twice, so simply
+                                   // copying requires a weight of 1/2
   for (unsigned int i=dim;
-       i<internal::SymmetricTensorAccessors::StorageType<4,dim>::n_rank2_components; ++i)
-    tmp.data[i][i] = 1;
+       i<internal::SymmetricTensorAccessors::StorageType<4,dim>
+                      ::n_rank2_components;
+       ++i)
+    tmp.data[i][i] = 0.5;
   
   return tmp;
 }
