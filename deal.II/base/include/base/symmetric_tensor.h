@@ -21,6 +21,7 @@
 template <int rank, int dim> class SymmetricTensor;
 
 template <int dim> SymmetricTensor<2,dim> unit_symmetric_tensor ();
+template <int dim> SymmetricTensor<4,dim> deviator_tensor ();
 
 namespace internal
 {
@@ -878,6 +879,9 @@ class SymmetricTensor
     
     template <int dim2>
     friend SymmetricTensor<2,dim2> unit_symmetric_tensor ();
+
+    template <int dim2>
+    friend SymmetricTensor<4,dim2> deviator_tensor ();
 };
 
 
@@ -2028,6 +2032,31 @@ unit_symmetric_tensor<3> ()
 {
   SymmetricTensor<2,3> tmp;
   tmp.data[0] = tmp.data[1] = tmp.data[2] = 1;
+  return tmp;
+}
+
+
+
+
+/**
+ * Return a unit symmetric tensor of rank 2 and dimension 2.
+ * 
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline
+SymmetricTensor<4,dim>
+deviator_tensor () 
+{
+  SymmetricTensor<4,dim> tmp;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      tmp.data[i][j] = (i==j ? 1 : 0) - 1./dim;
+  for (unsigned int i=dim;
+       i<internal::SymmetricTensorAccessors::StorageType<4,dim>::n_rank2_components; ++i)
+    tmp.data[i][i] = 1;
+  
   return tmp;
 }
 
