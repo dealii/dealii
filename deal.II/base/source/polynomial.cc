@@ -628,7 +628,7 @@ namespace Polynomials
       {
 					 // Construct interpolation formula
 	p[i] = Polynomial<double>(one);
-	for (unsigned int k=0;k<p.size();++k)
+	for (unsigned int k=0;k<points.size();++k)
 	  if (k != i)
 	    {
 	      linear[0] = -points[k](0);
@@ -637,6 +637,30 @@ namespace Polynomials
 	      p[i] *= factor;
 	    }
       }
+
+				     // Since the previous operation
+				     // is subject to round-off error
+				     // amplification, we correct the
+				     // polynomials here.
+    for (unsigned int i=0;i<p.size();++i)
+      {
+	for (unsigned int k=0;k<points.size();++k)
+	  {
+	    const double value = p[i].value(points[k](0));
+	    Polynomial<double> q = p[k];
+	    if (i==k)
+	      {
+		q *= 1.-value;
+		p[i] += q;
+	      }
+	    else
+	      {
+		q *= -value;
+		p[i] += q;
+	      }
+	  }
+      }
+    
     return p;
   }
   

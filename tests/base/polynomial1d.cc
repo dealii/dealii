@@ -127,7 +127,7 @@ int main ()
       q.push_back(LagrangeEquidistant(6, i));
     }
 
-				   // We add 1.0001 bacuse of bugs in
+				   // We add 1.0001 because of bugs in
 				   // the ostream classes
   for (unsigned int i=0;i<p.size();++i)
     for (unsigned int j=0;j<p.size();++j)
