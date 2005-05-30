@@ -29,12 +29,6 @@ template <int dim>
 void
 fill_vector (std::vector<Quadrature<dim> *>& quadratures)
 {
-  quadratures.push_back (new QGauss2<dim>());
-  quadratures.push_back (new QGauss3<dim>());
-  quadratures.push_back (new QGauss4<dim>());
-  quadratures.push_back (new QGauss5<dim>());
-  quadratures.push_back (new QGauss6<dim>());
-  quadratures.push_back (new QGauss7<dim>());
   quadratures.push_back (new QMidpoint<dim>());
   quadratures.push_back (new QTrapez<dim>());
   quadratures.push_back (new QSimpson<dim>());
