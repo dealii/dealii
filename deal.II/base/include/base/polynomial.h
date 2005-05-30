@@ -21,6 +21,7 @@
 
 #include <vector>
 
+template <int dim> class Point;
 
 /**
  * A namespace in which classes relating to the description of
@@ -162,6 +163,11 @@ namespace Polynomials
 					* Multiply with a scalar.
 					*/
       Polynomial<number>& operator *= (const double s);
+
+				       /**
+					* Multiply with another polynomial.
+					*/
+      Polynomial<number>& operator *= (const Polynomial<number>& p);
 
 				       /**
 					* Add a second polynomial.
@@ -333,7 +339,31 @@ namespace Polynomials
                             const unsigned int support_point);
   };
 
-
+/**
+ * Lagrange polynomials for an arbistrary set of interpolation points.
+ *
+ * @author Guido Kanschat, 2005
+ */
+  class Lagrange
+  {
+    public:
+				       /**
+					* Given a set of points, this
+					* function returns all
+					* Lagrange polynomials for
+					* interpolation of these
+					* points. The number of
+					* polynomials is equal to the
+					* number of points and the
+					* maximum degree is one less.
+					*/
+      static
+      std::vector<Polynomial<double> >
+      generate_complete_basis (const std::vector<Point<1> >& points);
+  };
+  
+  
+  
 /**
  * Legendre polynomials of arbitrary degree on <tt>[0,1]</tt>.
  *

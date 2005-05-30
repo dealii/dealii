@@ -13,6 +13,7 @@
 
 
 #include <base/polynomial.h>
+#include <base/point.h>
 #include <base/exceptions.h>
 #include <base/thread_management.h>
 
@@ -163,6 +164,24 @@ namespace Polynomials
     for (typename std::vector<number>::iterator c = coefficients.begin();
          c != coefficients.end(); ++c)
       *c *= s;
+    return *this;
+  }
+
+  
+  template <typename number>
+  Polynomial<number>&
+  Polynomial<number>::operator *= (const Polynomial<number>& p)
+  {
+				     // Degree of the product
+    unsigned int new_degree = this->degree() + p.degree();
+
+    std::vector<number> new_coefficients(new_degree+1, 0.);
+    
+    for (unsigned int i=0; i<p.coefficients.size(); ++i)
+      for (unsigned int j=0; j<this->coefficients.size(); ++j)
+      new_coefficients[i+j] += this->coefficients[j]*p.coefficients[i];
+    this->coefficients = new_coefficients;
+    
     return *this;
   }
 
@@ -589,6 +608,38 @@ namespace Polynomials
   }
 
 
+//----------------------------------------------------------------------//
+
+  
+  std::vector<Polynomial<double> >
+  Lagrange::generate_complete_basis (const std::vector<Point<1> >& points)
+  {
+    std::vector<Polynomial<double> > p(points.size());
+				     // polynomials are built as
+				     // products of linear
+				     // factors. The coefficient in
+				     // front of the linear term is
+				     // always 1.
+    std::vector<double> linear(2, 1.);
+				     // We start with a constant polynomial
+    std::vector<double> one(1, 1.);
+    
+    for (unsigned int i=0;i<p.size();++i)
+      {
+					 // Construct interpolation formula
+	p[i] = Polynomial<double>(one);
+	for (unsigned int k=0;k<p.size();++k)
+	  if (k != i)
+	    {
+	      linear[0] = -points[k](0);
+	      Polynomial<double> factor(linear);
+	      factor *= 1./(points[i](0)-points[k](0));
+	      p[i] *= factor;
+	    }
+      }
+    return p;
+  }
+  
 
 // ------------------ class Legendre --------------- //
 

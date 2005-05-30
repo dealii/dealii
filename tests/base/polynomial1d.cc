@@ -77,6 +77,9 @@ void polynomial_arithmetic ()
   p1 *= 2.;
   std::cerr << "*2" << std::endl;
   p1.print(std::cerr);
+  std::cerr << "*P2" << std::endl;
+  p2 *= p1;
+  p2.print(std::cerr);
   
   for (unsigned int i=0;i<7;++i)
     {
