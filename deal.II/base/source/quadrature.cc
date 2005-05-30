@@ -279,7 +279,7 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1>& qx,
 				  *qy.n_quadrature_points
 				  *qz.n_quadrature_points)
 {
-  Assert (dim==2, ExcImpossibleInDim(dim));
+  Assert (dim==3, ExcImpossibleInDim(dim));
   unsigned int k=0;
   for (unsigned int k3=0;k3<qz.n_quadrature_points;++k3)
     for (unsigned int k2=0;k2<qy.n_quadrature_points;++k2)
