@@ -121,7 +121,7 @@ QGaussLobatto<1>::QGaussLobatto (unsigned int n)
 {
   for (unsigned int k=0;k<n;++k)
     {
-      this->quadrature_points[k] = Point<1>(std::sin(2.*M_PI*k/(n-1)));
+      this->quadrature_points[k] = Point<1>(.5-.5*std::cos(M_PI*k/(n-1)));
     }
 }
 
