@@ -63,13 +63,19 @@ PolynomialsRaviartThomas<dim>::compute (const Point<dim>            &unit_point,
   p_grads.resize((grads.size() == 0) ? 0 : n_sub);
   p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
   
-				   // Compute values of complete space
-				   // and insert into tensors.  Result
-				   // will have first all polynomials
-				   // in the x-component, then y and
-				   // z.
   for (unsigned int d=0;d<dim;++d)
     {
+				       // First we copy the point. The
+				       // polynomial space for
+				       // component d consists of
+				       // polynomials of degree k+1 in
+				       // x_d and degree k in the
+				       // other variables. in order to
+				       // simplify this, we use the
+				       // same AnisotropicPolynomial
+				       // space and simply rotate the
+				       // coordinates through all
+				       // directions.
       Point<dim> p;
       for (unsigned int c=0;c<dim;++c)
 	p(c) = unit_point((c+d)%dim);
@@ -81,11 +87,14 @@ PolynomialsRaviartThomas<dim>::compute (const Point<dim>            &unit_point,
       
 				       // Let's hope this is not the transpose
       for (unsigned int i=0;i<p_grads.size();++i)
-	grads[i+d*n_sub][d] = p_grads[i];
+	for (unsigned int d1=0;d1<dim;++d1)
+	  grads[i+d*n_sub][d][d1] = p_grads[i][(d1+d)%dim];
       
 				       // Let's hope this is not the transpose
       for (unsigned int i=0;i<p_grad_grads.size();++i)
-	grad_grads[i+d*n_sub][d] = p_grad_grads[i];
+	for (unsigned int d1=0;d1<dim;++d1)
+	  for (unsigned int d2=0;d2<dim;++d2)
+	    grad_grads[i+d*n_sub][d][d1][d2] = p_grad_grads[i][(d1+d)%dim][(d2+d)%dim];
     }
 }
 
