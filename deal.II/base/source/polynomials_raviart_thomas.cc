@@ -85,16 +85,15 @@ PolynomialsRaviartThomas<dim>::compute (const Point<dim>            &unit_point,
       for (unsigned int i=0;i<p_values.size();++i)
 	  values[i+d*n_sub][d] = p_values[i];
       
-				       // Let's hope this is not the transpose
       for (unsigned int i=0;i<p_grads.size();++i)
 	for (unsigned int d1=0;d1<dim;++d1)
-	  grads[i+d*n_sub][d][d1] = p_grads[i][(d1+d)%dim];
+	  grads[i+d*n_sub][d][(d1+d)%dim] = p_grads[i][d1];
       
-				       // Let's hope this is not the transpose
       for (unsigned int i=0;i<p_grad_grads.size();++i)
 	for (unsigned int d1=0;d1<dim;++d1)
 	  for (unsigned int d2=0;d2<dim;++d2)
-	    grad_grads[i+d*n_sub][d][d1][d2] = p_grad_grads[i][(d1+d)%dim][(d2+d)%dim];
+	    grad_grads[i+d*n_sub][d][(d1+d)%dim][(d2+d)%dim]
+	      = p_grad_grads[i][d1][d2];
     }
 }
 
