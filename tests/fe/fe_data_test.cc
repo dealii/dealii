@@ -59,11 +59,28 @@ void test_fe_datas()
 				   // Check Raviart-Thomas in 2d only
   if (dim==2)
     {
-      fe_datas.push_back(new FE_RaviartThomas<dim>(0));
+      FE_RaviartThomas<dim>* rt0 = new FE_RaviartThomas<dim>(0);
+      FE_RaviartThomas<dim>* rt1 = new FE_RaviartThomas<dim>(1);
+      fe_datas.push_back(rt0);
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-      fe_datas.push_back(new FE_RaviartThomas<dim>(1));
+      fe_datas.push_back(rt1);
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(new FE_RaviartThomas<dim>(2));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(new FESystem<dim>(*rt1, 1,
+					   FE_DGQ<dim> (1), 1));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+    }
+  if (dim>1)
+    {
+      FE_RaviartThomasNodal<dim>* rt0 = new FE_RaviartThomasNodal<dim>(0);
+      FE_RaviartThomasNodal<dim>* rt1 = new FE_RaviartThomasNodal<dim>(1);
+      fe_datas.push_back(rt0);
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(rt1);
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(new FESystem<dim>(*rt1, 1,
+					   FE_DGQ<dim> (1), 1));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
     }
   
