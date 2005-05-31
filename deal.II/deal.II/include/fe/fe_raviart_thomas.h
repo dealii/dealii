@@ -558,22 +558,30 @@ class FE_RaviartThomas : public FiniteElement<dim>
  *
  * For this Raviart-Thomas element, the node values are not cell and
  * face moments with respect to certain polynomials, but the values in
- * quadrature points.
+ * quadrature points. Following the general scheme for numbering
+ * degrees of freedom, the node values on edges are first, edge by
+ * edge, according to the natural ordering of the edges of a cell. The
+ * interior degrees of freedom are last.
  *
  * For an RT-element of degree <i>k</i>, we choose
- * <i>(k+1)<sup>d-1</sup></i> Gauss points on each face. This way, the
- * normal component which is in <i>Q<sub>k</sub></i> is uniquely
- * determined. Furthermore, since this Gauss-formula is exact on
- * <i>Q<sub>2k+1</sub></i>, these node values correspond to the exact
- * integration of the moments of the RT-space.
+ * <i>(k+1)<sup>d-1</sup></i> Gauss points on each face. These points
+ * are ordered lexicographically with respect to the orientation of
+ * the face. This way, the normal component which is in
+ * <i>Q<sub>k</sub></i> is uniquely determined. Furthermore, since
+ * this Gauss-formula is exact on <i>Q<sub>2k+1</sub></i>, these node
+ * values correspond to the exact integration of the moments of the
+ * RT-space.
  *
  * In the interior of the cells, the moments are with respect to an
  * anisotropic <i>Q<sub>k</sub></i> space, where the test functions
  * are one degree lower in the direction corresponding to the vector
- * component under consideration. This can be emulated by using an
+ * component under consideration. This is emulated by using an
  * anisotropic Gauss formula for integration.
  *
- * @warning The degree stored in the member variable
+ * @warning The current implementation is for Cartesian meshes
+ * only. You must use MappingCartesian.
+ * 
+ * @note The degree stored in the member variable
  * FiniteElementData<dim>::degree is higher by one than the
  * constructor argument!
  * 
