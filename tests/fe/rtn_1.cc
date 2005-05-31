@@ -16,6 +16,7 @@
 
 #include "../tests.h"
 #include <base/logstream.h>
+#include <base/qprojector.h>
 #include <grid/grid_generator.h>
 #include <fe/fe_raviart_thomas.h>
 #include <fe/mapping_cartesian.h>

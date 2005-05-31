@@ -5,6 +5,7 @@
 
 #include "../tests.h"
 #include <base/quadrature_lib.h>
+#include <base/qprojector.h>
 #include <base/logstream.h>
 #include <lac/vector.h>
 #include <grid/tria.h>

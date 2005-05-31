@@ -11,6 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include <base/qprojector.h>
 #include <base/tensor_product_polynomials.h>
 #include <base/polynomials_p.h>
 #include <fe/fe_poly.h>

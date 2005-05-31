@@ -17,6 +17,7 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <base/quadrature.h>
+#include <base/qprojector.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>

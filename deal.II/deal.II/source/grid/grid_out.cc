@@ -14,6 +14,7 @@
 
 #include <base/point.h>
 #include <base/quadrature.h>
+#include <base/qprojector.h>
 #include <grid/grid_out.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>

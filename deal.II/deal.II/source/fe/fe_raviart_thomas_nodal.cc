@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <base/quadrature_lib.h>
+#include <base/qprojector.h>
 #include <base/table.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>

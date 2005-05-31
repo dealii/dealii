@@ -11,6 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include <base/qprojector.h>
 #include <base/polynomials_bdm.h>
 #include <base/polynomials_raviart_thomas.h>
 #include <fe/fe_poly_tensor.h>

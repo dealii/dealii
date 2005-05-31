@@ -14,6 +14,7 @@
 
 #include <grid/geometry_info.h>
 #include <base/quadrature.h>
+#include <base/qprojector.h>
 #include <base/memory_consumption.h>
 
 #include <cmath>
@@ -910,6 +911,29 @@ QProjector<dim>::project_to_child (const Quadrature<dim>    &quadrature,
   return Quadrature<dim> (q_points, weights);
 }
 
+
+
+template <int dim>
+Quadrature<dim>
+QProjector<dim>::project_to_line(
+  const Quadrature<1>& quadrature,
+  const Point<dim>& p1,
+  const Point<dim>& p2)
+{
+  const unsigned int n = quadrature.n_quadrature_points;
+  std::vector<Point<dim> > points(n);
+  std::vector<double> weights(n);
+  const double length = p1.distance(p2);
+  
+  for (unsigned int k=0;k<n;++k)
+    {
+      const double alpha = quadrature.point(k)(0);
+      points[k] = alpha * p2;
+      points[k] += (1.-alpha) * p1;
+      weights[k] = length * quadrature.weight(k);
+    }
+  return Quadrature<dim> (points, weights);
+}
 
 
 template <int dim>

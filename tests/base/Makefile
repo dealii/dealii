@@ -24,7 +24,7 @@ threads.cc : threads.pl
 
 tests_x =  logtest \
 	   reference \
-	   quadrature_* \
+	   quadrature_* qprojector \
 	   path_search \
 	   slice_vector \
 	   table \

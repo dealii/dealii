@@ -23,6 +23,7 @@
 
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
+#include <base/qprojector.h>
 #include <cmath>
 
 template <int dim>
