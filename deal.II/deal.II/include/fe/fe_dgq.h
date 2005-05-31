@@ -18,6 +18,7 @@
 #include <fe/fe_poly.h>
 
 template <int dim> class MappingQ;
+template <int dim> class Quadrature;
 
 /*!@addtogroup fe */
 /*@{*/
@@ -77,6 +78,18 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * polynomials of degree <tt>p</tt>.
 				      */
     FE_DGQ (const unsigned int p);
+
+				     /**
+				      * Constructor for tensor product
+				      * polynomials based on
+				      * Polynomials::Lagrange
+				      * interpolation of the support
+				      * points in the quadrature rule
+				      * <tt>points</tt>. The degree of
+				      * these polynomials is
+				      * <tt>points.size()-1</tt>.
+				      */
+    FE_DGQ (const Quadrature<1>& points);
     
 				     /**
 				      * Return a string that uniquely
@@ -143,7 +156,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * Declare a nested class which
 				      * will hold static definitions
 				      * of various matrices such as
-				      * embedding matrices. The
+				      * projection matrices. The
 				      * definition of the various
 				      * static fields are in the files
 				      * <tt>fe_dgq_[123]d.cc</tt> in
@@ -151,25 +164,6 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     struct Matrices
     {
-					 /**
-					  * Pointers to the embedding
-					  * matrices, one for each
-					  * polynomial degree starting
-					  * from constant elements
-					  */
-	static const double * const embedding[];
-
-					 /**
-					  * Number of elements (first
-					  * index) the above field
-					  * has. Equals the highest
-					  * polynomial degree plus one
-					  * for which the embedding
-					  * matrices have been
-					  * computed.
-					  */
-	static const unsigned int n_embedding_matrices;
-
 					 /**
 					  * As @p embedding but for
 					  * projection matrices.
@@ -257,35 +251,17 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)
 #ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-template <> 
-const double * const FE_DGQ<1>::Matrices::embedding[];
-
-template <>
-const unsigned int FE_DGQ<1>::Matrices::n_embedding_matrices;
-
 template <>
 const double * const FE_DGQ<1>::Matrices::projection_matrices[];
 
 template <>
 const unsigned int FE_DGQ<1>::Matrices::n_projection_matrices;
 
-template <> 
-const double * const FE_DGQ<2>::Matrices::embedding[];
-
-template <>
-const unsigned int FE_DGQ<2>::Matrices::n_embedding_matrices;
-
 template <>
 const double * const FE_DGQ<2>::Matrices::projection_matrices[];
 
 template <>
 const unsigned int FE_DGQ<2>::Matrices::n_projection_matrices;
-
-template <> 
-const double * const FE_DGQ<3>::Matrices::embedding[];
-
-template <>
-const unsigned int FE_DGQ<3>::Matrices::n_embedding_matrices;
 
 template <>
 const double * const FE_DGQ<3>::Matrices::projection_matrices[];
