@@ -16,6 +16,7 @@
 #include <base/polynomials_raviart_thomas.h>
 #include <fe/fe_poly_tensor.h>
 #include <fe/fe_values.h>
+#include <fe/mapping_cartesian.h>
 
 #include <base/logstream.h>
 
@@ -269,12 +270,14 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 				   // possible
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
 
+  Assert(mapping_type == independent
+	 || ( mapping_type == independent_on_cartesian
+	      && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
+	 ExcNotImplemented());
+
   const unsigned int n_dofs = this->dofs_per_cell;
   const unsigned int n_quad = quadrature.n_quadrature_points;
   const UpdateFlags flags(fe_data.current_update_flags());
-  
-  Assert(mapping_type == independent || mapping_type == independent_on_cartesian,
-	 ExcNotImplemented());
   
   Assert(!(flags & update_values) || fe_data.shape_values.size() == n_dofs,
 	 ExcDimensionMismatch(fe_data.shape_values.size(), n_dofs));
@@ -340,7 +343,9 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  Assert(mapping_type == independent || mapping_type == independent_on_cartesian,
+  Assert(mapping_type == independent
+	 || ( mapping_type == independent_on_cartesian
+	      && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
 	 ExcNotImplemented());
 //TODO: Size assertions
   
@@ -401,7 +406,9 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  Assert(mapping_type == independent || mapping_type == independent_on_cartesian,
+  Assert(mapping_type == independent
+	 || ( mapping_type == independent_on_cartesian
+	      && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
 	 ExcNotImplemented());
 //TODO: Size assertions
   
