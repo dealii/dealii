@@ -14,6 +14,7 @@
 
 #include <fe/mapping_q1_eulerian.h>
 #include <lac/vector.h>
+#include <lac/petsc_vector.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
@@ -21,9 +22,10 @@
 
 
 
-template <int dim>
-MappingQ1Eulerian<dim>::MappingQ1Eulerian (const Vector<double>  &euler_transform_vectors,
-					   const DoFHandler<dim> &shiftmap_dof_handler)
+template <int dim, class EulerVectorType>
+MappingQ1Eulerian<dim, EulerVectorType>::
+MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
+		   const DoFHandler<dim> &shiftmap_dof_handler)
                      :
 		     euler_transform_vectors(euler_transform_vectors),
 		     shiftmap_dof_handler(&shiftmap_dof_handler)
@@ -31,11 +33,11 @@ MappingQ1Eulerian<dim>::MappingQ1Eulerian (const Vector<double>  &euler_transfor
 
 
 
-template <int dim>
+template <int dim, class EulerVectorType>
 void
-MappingQ1Eulerian<dim>::compute_mapping_support_points(
-  const typename Triangulation<dim>::cell_iterator &cell,
-  std::vector<Point<dim> > &a) const
+MappingQ1Eulerian<dim, EulerVectorType>::
+compute_mapping_support_points(const typename Triangulation<dim>::cell_iterator &cell,
+			       std::vector<Point<dim> > &a) const
 {
 
 				   // The assertions can not be in the
@@ -103,4 +105,5 @@ MappingQ1Eulerian<dim>::compute_mapping_support_points(
 
 
 // explicit instantiation
-template class MappingQ1Eulerian<deal_II_dimension>;
+template class MappingQ1Eulerian<deal_II_dimension, Vector<double> >;
+template class MappingQ1Eulerian<deal_II_dimension, PETScWrappers::Vector>;
