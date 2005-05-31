@@ -22,6 +22,7 @@ template <int rank, int dim> class SymmetricTensor;
 
 template <int dim> SymmetricTensor<2,dim> unit_symmetric_tensor ();
 template <int dim> SymmetricTensor<4,dim> deviator_tensor ();
+template <int dim> SymmetricTensor<4,dim> identity_tensor ();
 
 namespace internal
 {
@@ -882,6 +883,9 @@ class SymmetricTensor
 
     template <int dim2>
     friend SymmetricTensor<4,dim2> deviator_tensor ();
+
+    template <int dim2>
+    friend SymmetricTensor<4,dim2> identity_tensor ();
 };
 
 
@@ -2039,7 +2043,15 @@ unit_symmetric_tensor<3> ()
 
 
 /**
- * Return a unit symmetric tensor of rank 2 and dimension 2.
+ * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
+ * tensor <tt>t</tt> returns the deviator <tt>dev t</tt>. It is the operator
+ * representation of the linear deviator operator.
+ *
+ * For every tensor <tt>t</tt>, there holds the identity
+ * <tt>deviator(t)==deviator_tensor<dim>()*t</tt>, up to numerical
+ * round-off. The reason this operator representation is provided since one
+ * sometimes needs to invert operators like <tt>identity_tensor<dim>() +
+ * delta_t*deviator_tensor<dim>()</tt> or similar.
  * 
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -2055,6 +2067,47 @@ deviator_tensor ()
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       tmp.data[i][j] = (i==j ? 1 : 0) - 1./dim;
+
+                                   // then fill the ones that copy over the
+                                   // non-diagonal elements. note that during
+                                   // the double-contraction, we handle the
+                                   // off-diagonal elements twice, so simply
+                                   // copying requires a weight of 1/2
+  for (unsigned int i=dim;
+       i<internal::SymmetricTensorAccessors::StorageType<4,dim>
+                      ::n_rank2_components;
+       ++i)
+    tmp.data[i][i] = 0.5;
+  
+  return tmp;
+}
+
+
+
+/**
+ * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
+ * tensor <tt>t</tt> returns the deviator <tt>dev t</tt>. It is the operator
+ * representation of the linear deviator operator.
+ *
+ * For every tensor <tt>t</tt>, there holds the identity
+ * <tt>deviator(t)==deviator_tensor<dim>()*t</tt>, up to numerical
+ * round-off. The reason this operator representation is provided since one
+ * sometimes needs to invert operators like <tt>identity_tensor<dim>() +
+ * delta_t*deviator_tensor<dim>()</tt> or similar.
+ * 
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline
+SymmetricTensor<4,dim>
+identity_tensor () 
+{
+  SymmetricTensor<4,dim> tmp;
+  
+                                   // fill the elements treating the diagonal
+  for (unsigned int i=0; i<dim; ++i)
+    tmp.data[i][i] = 1;
 
                                    // then fill the ones that copy over the
                                    // non-diagonal elements. note that during
