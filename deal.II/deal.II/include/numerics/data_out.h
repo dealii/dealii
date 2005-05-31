@@ -20,6 +20,7 @@
 #include <base/multithread_info.h>
 #include <base/data_out_base.h>
 #include <dofs/dof_handler.h>
+#include <fe/mapping.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -820,7 +821,20 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      * threads to be used to build
 				      * the patches is set to
 				      * <tt>multithread_info.n_default_threads</tt>.
+				      *
+				      * The optional parameter
+				      * defining a mapping is especially
+				      * intended for the Eulerian mapping.
+				      * It offers an opportunity to
+				      * watch the solution on the
+				      * deformed triangulational on which
+				      * the computation was actually carried
+				      * out.
 				      */
+    virtual void build_patches (const Mapping<dim> &mapping,
+				const unsigned int n_subdivisions = 1,
+				const unsigned int n_threads      = multithread_info.n_default_threads);
+
     virtual void build_patches (const unsigned int n_subdivisions = 1,
 				const unsigned int n_threads      = multithread_info.n_default_threads);
 
@@ -893,6 +907,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
 	unsigned int n_components;
 	unsigned int n_datasets;
 	unsigned int n_subdivisions;
+        SmartPointer<const Mapping<dim> > mapping;
 	std::vector<double>          patch_values;
 	std::vector<Vector<double> > patch_values_system;
 
