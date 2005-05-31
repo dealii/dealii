@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors and
+//    Copyright (C) 2005 by the deal.II authors and Oliver Kayser-Herold
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
