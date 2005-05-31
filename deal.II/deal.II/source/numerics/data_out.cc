@@ -405,7 +405,8 @@ void DataOut<dim>::build_some_patches (Data data)
       Assert (patch != this->patches.end(), ExcInternalError());
 
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-	patch->vertices[vertex] = cell->vertex(vertex);
+	  patch->vertices[vertex] = data.mapping->transform_unit_to_real_cell
+	      (cell, GeometryInfo<dim>::unit_cell_vertex (vertex));
       
       if (data.n_datasets > 0)
 	{
@@ -567,6 +568,16 @@ template <int dim>
 void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
 				  const unsigned int n_threads_) 
 {
+  static const MappingQ1<dim> mapping;
+  build_patches (mapping, n_subdivisions, n_threads_);
+}
+
+
+template <int dim>
+void DataOut<dim>::build_patches (const Mapping<dim> &mapping,
+				  const unsigned int n_subdivisions,
+				  const unsigned int n_threads_) 
+{
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
@@ -663,6 +674,7 @@ void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
       thread_data[i].n_subdivisions = n_subdivisions;
       thread_data[i].patch_values.resize (n_q_points);
       thread_data[i].patch_values_system.resize (n_q_points);
+      thread_data[i].mapping        = &mapping;
 
       thread_data[i].cell_to_patch_index_map = &cell_to_patch_index_map;
       
