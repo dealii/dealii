@@ -821,23 +821,49 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      * threads to be used to build
 				      * the patches is set to
 				      * <tt>multithread_info.n_default_threads</tt>.
-				      *
-				      * The optional parameter
-				      * defining a mapping is especially
-				      * intended for the Eulerian mapping.
-				      * It offers an opportunity to
-				      * watch the solution on the
-				      * deformed triangulational on which
-				      * the computation was actually carried
-				      * out.
+				      */
+    virtual void build_patches (const unsigned int n_subdivisions = 1,
+				const unsigned int n_threads      = multithread_info.n_default_threads);
+
+				     /**
+				      * Same as above, except that the
+				      * additional first parameter
+				      * defines a mapping that is to
+				      * be used in the generation of
+				      * output. For internal reasons,
+				      * even if
+				      * <tt>n_subdivisions>1</tt>, the
+				      * points interior of subdivided
+				      * patches are still computed
+				      * from the vertices of the cell,
+				      * i.e. even a higher order
+				      * mapping does not lead to a
+				      * representation of a curved
+				      * boundary by using more
+				      * subdivisions. However, the
+				      * mapping argument can be used
+				      * for the Eulerian mappings (see
+				      * class MappingQ1Eulerian) where
+				      * a mapping is used not only to
+				      * determine the position of
+				      * points interior to a cell, but
+				      * also of the vertices.  It
+				      * offers an opportunity to watch
+				      * the solution on a deformed
+				      * triangulation on which the
+				      * computation was actually
+				      * carried out, even if the mesh
+				      * is internally stored in its
+				      * undeformed configuration and
+				      * the deformation is only
+				      * tracked by an additional
+				      * vector that holds the
+				      * deformation of each vertex.
 				      */
     virtual void build_patches (const Mapping<dim> &mapping,
 				const unsigned int n_subdivisions = 1,
 				const unsigned int n_threads      = multithread_info.n_default_threads);
-
-    virtual void build_patches (const unsigned int n_subdivisions = 1,
-				const unsigned int n_threads      = multithread_info.n_default_threads);
-
+    
 				     /**
 				      * Return the first cell which we
 				      * want output for. The default
