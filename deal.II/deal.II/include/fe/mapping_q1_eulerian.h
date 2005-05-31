@@ -70,9 +70,16 @@
  * make sure that whenever you use this object, the given objects
  * still represent valid data.
  *
+ * To enable the use of the MappingQ1Eulerian class also in the context
+ * of parallel codes using the PETSc wrapper classes, the type of
+ * the vector can be specified as template parameter <tt>EulerVectorType</tt>
+ * Not specifying this template argument in applications using the PETSc
+ * vector classes leads to the construction of a copy of the vector
+ * which is not acccessible afterwards!
+ *
  * @author Michael Stadler, 2001
  */
-template <int dim>
+template <int dim, class EulerVectorType = Vector<double> >
 class MappingQ1Eulerian : public MappingQ1<dim>
 {
   public:
@@ -98,7 +105,7 @@ class MappingQ1Eulerian : public MappingQ1<dim>
 				      * can be initialized by
 				      * <tt>DoFObjectAccessor::set_dof_values()</tt>.
 				      */
-    MappingQ1Eulerian (const Vector<double>  &euler_transform_vectors,
+    MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
                        const DoFHandler<dim> &shiftmap_dof_handler);
 
 
@@ -128,7 +135,7 @@ class MappingQ1Eulerian : public MappingQ1<dim>
 				      * Reference to the vector of
 				      * shifts.
 				      */
-    const Vector<double> &euler_transform_vectors;
+    const EulerVectorType &euler_transform_vectors;
     
                                      /**
 				      * Pointer to the DoFHandler to
