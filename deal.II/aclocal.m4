@@ -1070,7 +1070,7 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
           ;;
   
       MIPSpro*)
-          CFLAGSO="$CFLAGS -O2"
+          CFLAGS="$CFLAGS -O2"
           CFLAGSPIC="-KPIC"
           ;;
   
@@ -1090,10 +1090,14 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 	  dnl flags
 	  case "$target" in
 	    *86*)
-		CFLAGSO="$CFLAGS -tpp6"
+		CFLAGS="$CFLAGS -tpp6"
 		;;
 	  esac
           ;;
+
+	  dnl Check whether we can switch off the annoying 1572 warning
+	  dnl message about unreliable floating point comparisons
+	  DEAL_II_ICC_C_WD_1572
 
       *)
           AC_MSG_RESULT(Unknown C compiler - using generic options)
@@ -3597,6 +3601,28 @@ AC_DEFUN(DEAL_II_ICC_WD_1572, dnl
       [
         AC_MSG_RESULT(yes)
 	CXXFLAGSG="$CXXFLAGSG -wd1572"
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ])
+])
+
+
+dnl -------------------------------------------------------------
+dnl Some test, but for the icc C compiler.
+dnl
+dnl Usage: DEAL_II_ICC_C_WD_1572
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_ICC_C_WD_1572, dnl
+[
+  AC_MSG_CHECKING(whether -wd1572 is allowed for the C compiler)
+  AC_LANG(C)
+  CFLAGS="$CFLAGS -wd1572"
+  AC_TRY_COMPILE( [], [],
+      [
+        AC_MSG_RESULT(yes)
+	CFLAGS="$CFLAGS -wd1572"
       ],
       [
         AC_MSG_RESULT(no)
