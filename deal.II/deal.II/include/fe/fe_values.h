@@ -1845,8 +1845,10 @@ class FEFaceValuesBase : public FEValuesBase<dim>
     const std::vector<Point<dim> > & get_normal_vectors () const;
 
 				     /**
-				      * Return the list of outward normal
-				      * vectors times quadrature weights.
+				      * Return the list of outward
+				      * normal vectors times the
+				      * Jacobian of the surface
+				      * mapping.
 				      */
     const std::vector<Tensor<1,dim> > & get_boundary_forms () const;
 
