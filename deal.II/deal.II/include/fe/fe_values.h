@@ -165,6 +165,20 @@ class FEValuesData
 				      * class, see the general
 				      * documentation of this class
 				      * for more information.
+				      *
+				      * However, if this object refers
+				      * to an FEFaceValues of
+				      * FESubfaceValues object, then
+				      * the JxW_values correspond to
+				      * the Jacobian of the
+				      * transformation of the face,
+				      * not the cell, i.e. the
+				      * dimensionality is that of a
+				      * surface measure, not of a
+				      * volume measure. In this case,
+				      * it is computed from the
+				      * boundary forms, rather than
+				      * the Jacobian matrix.
 				      */
     std::vector<double>       JxW_values;
 
@@ -964,21 +978,27 @@ class FEValuesBase : protected FEValuesData<dim>
     const std::vector<Point<dim> > & get_quadrature_points () const;
 
 				     /**
-				      * Mapped quadrature weight. This
-				      * is the Jacobi determinant
-				      * times the weight of the
-				      *<tt>i</tt>th unit quadrature point.
+				      * Mapped quadrature weight. If
+				      * this object refers to a volume
+				      * evaluation (i.e. the derived
+				      * class is of type FEValues),
+				      * then this is the Jacobi
+				      * determinant times the weight
+				      * of the *<tt>i</tt>th unit
+				      * quadrature point.
 				      *
-				      * On faces, this is the mapped
-				      * surface element.
+				      * For surface evaluations
+				      * (i.e. classes FEFaceValues or
+				      * FESubfaceValues), is the
+				      * mapped surface element times
+				      * the weight of the quadrature
+				      * point.
 				      */
     double JxW (const unsigned int quadrature_point) const;
 
 				     /**
 				      * Pointer to the array holding
-				      * the Jacobi determinant times the
-				      * quadrature weight at the different
-				      * quadrature points.
+				      * the values returned by JxW().
 				      */
     const std::vector<double> & get_JxW_values () const;
     
@@ -1742,12 +1762,20 @@ class FEValues : public FEValuesBase<dim>
 
 
 /**
- * Extend the interface of FEValuesBase by surface values.
+ * Extend the interface of FEValuesBase to values that only make sense
+ * when evaluating something on the surface of a cell. All the data
+ * that is available in the interior of cells is also available here.
  *
  * On surfaces of mesh cells, normal vectors and boundary forms are
  * additional values that can be computed. This class provides the
  * interface to access those. Implementations are in derived classes
  * FEFaceValues and FESubfaceValues.
+ *
+ * The boundary form is the cross product of the images of the unit
+ * tangential vectors. Therefore, it is the unit normal vector
+ * multiplied with the surface element. Since it may be cheaper to
+ * compute the boundary form immediately, use this value to integrate
+ * <tt>n.ds</tt>.
  *
  * See FEValuesBase
  *
