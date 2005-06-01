@@ -106,4 +106,6 @@ compute_mapping_support_points(const typename Triangulation<dim>::cell_iterator 
 
 // explicit instantiation
 template class MappingQ1Eulerian<deal_II_dimension, Vector<double> >;
+#ifdef DEAL_II_USE_PETSC
 template class MappingQ1Eulerian<deal_II_dimension, PETScWrappers::Vector>;
+#endif
