@@ -2126,6 +2126,34 @@ identity_tensor ()
 
 
 /**
+ * Return the tensor of rank 4 that is the outer product of the two tensors
+ * given as arguments, i.e. the result <tt>T=t1 \otimes t2</tt> satisfies
+ * <tt>T phi = t1 (t2 : phi)</tt> for all symmetric tensors <tt>phi</tt>.
+ * 
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <int dim>
+inline
+SymmetricTensor<4,dim>
+outer_product (const SymmetricTensor<2,dim> &t1,
+               const SymmetricTensor<2,dim> &t2) 
+{
+  SymmetricTensor<4,dim> tmp;
+
+                                   // fill only the elements really needed
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+        for (unsigned int l=k; l<dim; ++l)
+          tmp[i][j][k][l] = t1[i][j] * t2[k][l];
+
+  return tmp;
+}
+
+
+
+/**
  * Return the symmetrized version of the full rank-2 tensor,
  * i.e. (t+transpose(t))/2, as a symmetric rank-2 tensor.
  *
