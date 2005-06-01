@@ -788,7 +788,7 @@ AC_DEFUN(DEAL_II_SET_CXX_DEBUG_FLAG, dnl
 dnl -------------------------------------------------------------
 dnl Determine the C compiler in use. Return the name and possibly
 dnl version of this compiler in CC_VERSION. This function is almost
-dnl identifical to DEAL_II_DETERMINE_CXX_BRAND and tehrefore lacks
+dnl identifical to DEAL_II_DETERMINE_CXX_BRAND and therefore lacks
 dnl a lot of the comments found there to keep it short
 dnl
 dnl Usage: DEAL_II_DETERMINE_CC_BRAND
@@ -799,7 +799,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
   if test "$GCC" = "yes" ; then
     CC_VERSION_STRING=`($CC -v 2>&1) | grep "gcc version"`
     if test "x$CC_VERSION_STRING" = "x" ; then
-      GC=no
+      GCC=no
     fi
   fi
 
