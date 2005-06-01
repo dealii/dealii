@@ -167,7 +167,7 @@ class FEValuesData
 				      * for more information.
 				      *
 				      * However, if this object refers
-				      * to an FEFaceValues of
+				      * to an FEFaceValues or
 				      * FESubfaceValues object, then
 				      * the JxW_values correspond to
 				      * the Jacobian of the
