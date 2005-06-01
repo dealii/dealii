@@ -2129,6 +2129,12 @@ identity_tensor ()
  * Return the tensor of rank 4 that is the outer product of the two tensors
  * given as arguments, i.e. the result <tt>T=t1 \otimes t2</tt> satisfies
  * <tt>T phi = t1 (t2 : phi)</tt> for all symmetric tensors <tt>phi</tt>.
+ *
+ * For example, the deviator tensor can be computed as
+ * <tt>identity_tensor<dim>() -
+ * 1/d*outer_product(unit_symmetric_tensor<dim>(),
+ * unit_symmetric_tensor<dim>())</tt>, since the (double) contraction with the
+ * unit tensor yields the trace of a symmetric tensor.
  * 
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
