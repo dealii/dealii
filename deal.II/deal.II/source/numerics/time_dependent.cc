@@ -137,14 +137,14 @@ void TimeDependent::delete_timestep (const unsigned int position)
   if (position != 0)
     timesteps[position-1]->set_next_timestep ((position<timesteps.size()) ?
 					      timesteps[position] :
-					      0);
+					      /*null*/SmartPointer<TimeStepBase>());
 
 				   // same for "previous" pointer of next
 				   // time step
   if (position<timesteps.size())
     timesteps[position]->set_previous_timestep ((position!=0) ?
 						timesteps[position-1] :
-						0);
+						/*null*/SmartPointer<TimeStepBase>());
 }
 
 
