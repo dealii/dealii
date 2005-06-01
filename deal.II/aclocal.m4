@@ -1093,11 +1093,12 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 		CFLAGS="$CFLAGS -tpp6"
 		;;
 	  esac
-          ;;
 
 	  dnl Check whether we can switch off the annoying 1572 warning
 	  dnl message about unreliable floating point comparisons
 	  DEAL_II_ICC_C_WD_1572
+
+          ;;
 
       *)
           AC_MSG_RESULT(Unknown C compiler - using generic options)

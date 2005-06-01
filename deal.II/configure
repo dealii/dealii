@@ -3626,7 +3626,6 @@ echo "${ECHO_T}Unrecognized compiler -- still trying" >&6
 		CFLAGS="$CFLAGS -tpp6"
 		;;
 	  esac
-          ;;
 
 
   echo "$as_me:$LINENO: checking whether -wd1572 is allowed for the C compiler" >&5
@@ -3677,6 +3676,8 @@ echo "${ECHO_T}no" >&6
 fi
 rm -f conftest.$ac_objext conftest.$ac_ext
 
+
+          ;;
 
       *)
           echo "$as_me:$LINENO: result: Unknown C compiler - using generic options" >&5
