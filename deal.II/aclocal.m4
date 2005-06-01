@@ -97,6 +97,8 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 	  *version\ 3.3.3*) GXX_VERSION_DETAILED=gcc3.3.3 ;;
 	  *version\ 3.3.4*) GXX_VERSION_DETAILED=gcc3.3.4 ;;
 	  *version\ 3.3.5*) GXX_VERSION_DETAILED=gcc3.3.5 ;;
+	  *version\ 3.3.6*) GXX_VERSION_DETAILED=gcc3.3.6 ;;
+	  *version\ 3.3.7*) GXX_VERSION_DETAILED=gcc3.3.7 ;;
 	  *)                GXX_VERSION_DETAILED=gcc3.3.x ;;
         esac
   	;;
