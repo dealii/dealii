@@ -27,7 +27,7 @@ unsigned int SplitString(const std::string& input,
   // Counter for Current Position
   unsigned int iPos = 0;
   // Counter for Position of next delimiter
-  unsigned int newPos = 0;  
+  std::string::size_type newPos = 0;  
   // Counter for Number of strings
   unsigned int numFound = 0;
   
