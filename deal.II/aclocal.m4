@@ -3619,6 +3619,7 @@ AC_DEFUN(DEAL_II_ICC_C_WD_1572, dnl
 [
   AC_MSG_CHECKING(whether -wd1572 is allowed for the C compiler)
   AC_LANG(C)
+  OLDCFLAGS="$CFLAGS"
   CFLAGS="$CFLAGS -wd1572"
   AC_TRY_COMPILE( [], [],
       [
@@ -3627,6 +3628,7 @@ AC_DEFUN(DEAL_II_ICC_C_WD_1572, dnl
       ],
       [
         AC_MSG_RESULT(no)
+	CFLAGS="$OLDCFLAGS"
       ])
 ])
 
