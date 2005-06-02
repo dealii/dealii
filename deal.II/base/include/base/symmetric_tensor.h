@@ -23,6 +23,11 @@ template <int rank, int dim> class SymmetricTensor;
 template <int dim> SymmetricTensor<2,dim> unit_symmetric_tensor ();
 template <int dim> SymmetricTensor<4,dim> deviator_tensor ();
 template <int dim> SymmetricTensor<4,dim> identity_tensor ();
+template <int dim2> double trace (const SymmetricTensor<2,dim2> &);
+
+template <int dim> SymmetricTensor<2,dim>
+deviator (const SymmetricTensor<2,dim> &);
+
 
 namespace internal
 {
