@@ -35,13 +35,6 @@
  *               std::vector<Tensor<3,dim> > &grad_grads) const;
  * @endcode
  *
- * The polynomial spaces are usually described as direct sum of
- * simpler spaces. In such a case, the usual basis of node functionals
- * is not dual to the basis of the polynomial space. Therefore, the
- * matrix #inverse_node_matrix can be filled by the constructor of a
- * derived class such that the usual interpolation condition
- * <i>N<sub>i</sub>(v<sub>j</sub>)</i> holds on the reference cell.
- *
  * In many cases, the node functionals depend on the shape of the mesh
  * cell, since they evaluate normal or tangential components on the
  * faces. In order to allow for a set of transformations, the variable
@@ -53,7 +46,66 @@
  * vector valued polynomial classes. What's missing here in particular
  * is information on the topological location of the node values.
  *
- * @see PolynomialsBDM, PolynomialsRaviartThomas
+ * <h3>Deriving classes</h3>
+ *
+ * Any derived class must decide on the polynomial space to use.  This
+ * polynomial space should be implemented simply as a set of vector
+ * valued polynomials like PolynomialsBDM and
+ * PolynomialsRaviartThomas.  In order to facilitate this
+ * implementation, the basis of this space may be arbitrary.
+ *
+ * <h4>Determining the correct basis</h4>
+ *
+ * In most cases, the set of desired node values <i>N<sub>i</sub></i>
+ * and the basis functions <i>v<sub>j</sub></i> will not fulfil the
+ * interpolation condition <i>N<sub>i</sub>(v<sub>j</sub>) =
+ * &delta;<sub>ij</sub></i>.
+ *
+ * The use of the membaer data #inverse_node_matrix allows to compute
+ * the basis <i>v<sub>j</sub></i> automatically, after the node values
+ * for ech original basis function of the polynomial space have been
+ * computed.
+ *
+ * Therefore, the constructor of a derived class should have a
+ * structure like this (example for interpolation in support points):
+ *
+ * @verbatim
+ *  fill_support_points();
+ *
+ *  const unsigned int n_dofs = this->dofs_per_cell;
+ *  FullMatrix<double> N(n_dofs, n_dofs);
+ *
+ *  for (unsigned int i=0;i<n_dofs;++i)
+ *    {
+ *      const Point<dim>& p = this->unit_support_point[i];
+ *
+ *      for (unsigned int j=0;j<n_dofs;++j)		
+ *  	  for (unsigned int d=0;d<dim;++d)		
+ *	    N(i,j) += node_vector[i][d]
+ *                  * this->shape_value_component(j, p, d);
+ *    }
+ *
+ *  this->inverse_node_matrix.reinit(n_dofs, n_dofs);
+ *  this->inverse_node_matrix.invert(N);
+ * @endverbatim
+ *
+ * @note The matrix #inverse_node_matrix should have dimensions zero
+ * before this piece of code is executed. Only then,
+ * shape_value_component() will return the raw bolynomial <i>j</i> as
+ * defined in the polynomial space POLY.
+ *
+ * <h4>Setting the transformation</h4>
+ *
+ * In most cases, vector valued basis functions must be transformed
+ * when mapped from the reference cell to the actual grid cell. These
+ * transformations can be selected from the set MappingType and stored
+ * in #mapping_type. Therefore, each constructor should contain a line
+ * like:
+ * @verbatim
+ * this->mapping_type = this->independent_on_cartesian;
+ * @endverbatim
+ *
+ *@see PolynomialsBDM, PolynomialsRaviartThomas
  *
  * @author Guido Kanschat, 2005
  **/
