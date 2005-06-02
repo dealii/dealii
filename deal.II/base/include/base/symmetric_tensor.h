@@ -857,10 +857,25 @@ class SymmetricTensor
 
     
   private:
+				     /**
+				      * A structure that describes
+				      * properties of the base tensor.
+				      */
+    typedef 
+    internal::SymmetricTensorAccessors::StorageType<rank,dim>
+    base_tensor_descriptor;
+    
                                      /**
-                                      * Data storage for a symmetric tensor.
+                                      * Data storage type for a
+                                      * symmetric tensor.
                                       */
-    typename internal::SymmetricTensorAccessors::StorageType<rank,dim>::base_tensor_type data;
+    typedef typename base_tensor_descriptor::base_tensor_type base_tensor_type;
+    
+				     /**
+				      * The place where we store the
+				      * data of the tensor.
+				      */
+    base_tensor_type data;
 
 				     /**
 				      * Make all other symmetric tensors friends.
@@ -1295,6 +1310,60 @@ operator * (const SymmetricTensor<4,3> &s) const
 		  2 * data[4] * s.data[4][i] +
 		  2 * data[5] * s.data[5][i];
 
+  return tmp;
+}
+
+
+
+
+template <>
+inline
+internal::SymmetricTensorAccessors::double_contraction_result<4,4,1>::type
+SymmetricTensor<4,1>::
+operator * (const SymmetricTensor<4,1> &s) const
+{
+  const unsigned int dim = 1;
+  SymmetricTensor<4,dim> tmp;
+  tmp.data[0][0] = data[0][0] * s.data[0][0];
+  return tmp;
+}
+
+
+
+template <>
+inline
+internal::SymmetricTensorAccessors::double_contraction_result<4,4,2>::type
+SymmetricTensor<4,2>::
+operator * (const SymmetricTensor<4,2> &s) const
+{
+  const unsigned int dim = 2;
+  SymmetricTensor<4,dim> tmp;
+  for (unsigned int i=0; i<base_tensor_descriptor::n_rank2_components; ++i)
+    for (unsigned int j=0; j<base_tensor_descriptor::n_rank2_components; ++j)
+      tmp.data[i][j] = data[i][0] * s.data[0][j] +
+		       data[i][1] * s.data[1][j] +
+		       2*data[i][2] * s.data[2][j];
+  return tmp;
+}
+
+
+
+template <>
+inline
+internal::SymmetricTensorAccessors::double_contraction_result<4,4,3>::type
+SymmetricTensor<4,3>::
+operator * (const SymmetricTensor<4,3> &s) const
+{
+  const unsigned int dim = 3;
+  SymmetricTensor<4,dim> tmp;
+  for (unsigned int i=0; i<base_tensor_descriptor::n_rank2_components; ++i)
+    for (unsigned int j=0; j<base_tensor_descriptor::n_rank2_components; ++j)
+      tmp.data[i][j] = data[i][0] * s.data[0][j] +
+		       data[i][1] * s.data[1][j] +
+		       data[i][2] * s.data[2][j] +
+		       2*data[i][3] * s.data[3][j] +
+  		       2*data[i][4] * s.data[4][j] +
+		       2*data[i][5] * s.data[5][j];
   return tmp;
 }
 
@@ -2079,8 +2148,7 @@ deviator_tensor ()
                                    // off-diagonal elements twice, so simply
                                    // copying requires a weight of 1/2
   for (unsigned int i=dim;
-       i<internal::SymmetricTensorAccessors::StorageType<4,dim>
-                      ::n_rank2_components;
+       i<SymmetricTensor<4,dim>::base_tensor_descriptor::n_rank2_components;
        ++i)
     tmp.data[i][i] = 0.5;
   
@@ -2120,8 +2188,7 @@ identity_tensor ()
                                    // off-diagonal elements twice, so simply
                                    // copying requires a weight of 1/2
   for (unsigned int i=dim;
-       i<internal::SymmetricTensorAccessors::StorageType<4,dim>
-                      ::n_rank2_components;
+       i<SymmetricTensor<4,dim>::base_tensor_descriptor::n_rank2_components;
        ++i)
     tmp.data[i][i] = 0.5;
   
