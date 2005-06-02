@@ -4652,10 +4652,14 @@ dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_BLAS, dnl
 [
   if test "x$1" != "xyes" ; then
-    AC_CHECK_LIB($1, daxpy_,
-    [ LIBS="-l$1 $LIBS"
-      AC_DEFINE(HAVE_LIBBLAS)]
-    ,,$F77LIBS)
+    AC_CHECK_LIB($1, 
+                 daxpy_,
+                 [ 
+                   LIBS="-l$1 $LIBS"
+                   AC_DEFINE(HAVE_LIBBLAS)
+                 ],
+                 ,
+                 $F77LIBS)
   else
     AC_CHECK_LIB(blas, daxpy_,,,$F77LIBS)
   fi
