@@ -3624,10 +3624,12 @@ AC_DEFUN(DEAL_II_ICC_C_WD_1572, dnl
   AC_TRY_COMPILE( [], [],
       [
         AC_MSG_RESULT(yes)
-	CFLAGS="$CFLAGS -wd1572"
+	dnl Keep -wd1572 in CFLAGS
       ],
       [
         AC_MSG_RESULT(no)
+
+	dnl Remove -wd1572 again from flags
 	CFLAGS="$OLDCFLAGS"
       ])
 ])
