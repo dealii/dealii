@@ -131,6 +131,13 @@ class QProjector
 				      * selecting the data of one
 				      * particular face only happens
 				      * later.
+				      *
+				      * @note In 3D, this function
+				      * produces two sets of
+				      * quadrature points for each
+				      * face, in order to cope
+				      * possibly different
+				      * orientations of the mesh. 
 				      */
     static Quadrature<dim>
     project_to_all_faces (const SubQuadrature &quadrature);
