@@ -2148,7 +2148,7 @@ deviator_tensor ()
                                    // off-diagonal elements twice, so simply
                                    // copying requires a weight of 1/2
   for (unsigned int i=dim;
-       i<SymmetricTensor<4,dim>::base_tensor_descriptor::n_rank2_components;
+       i<internal::SymmetricTensorAccessors::StorageType<4,dim>::n_rank2_components;
        ++i)
     tmp.data[i][i] = 0.5;
   
@@ -2188,7 +2188,7 @@ identity_tensor ()
                                    // off-diagonal elements twice, so simply
                                    // copying requires a weight of 1/2
   for (unsigned int i=dim;
-       i<SymmetricTensor<4,dim>::base_tensor_descriptor::n_rank2_components;
+       i<internal::SymmetricTensorAccessors::StorageType<4,dim>::n_rank2_components;
        ++i)
     tmp.data[i][i] = 0.5;
   
