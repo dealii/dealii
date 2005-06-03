@@ -16,7 +16,7 @@
 // associated lack of accessibility of the Subscriptor functions to
 // the SmartPointer
 //
-// it was fixed around 203-05-22
+// it was fixed around 2003-05-22
 
 
 #include "../tests.h"
