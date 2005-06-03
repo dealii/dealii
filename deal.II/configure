@@ -3104,7 +3104,7 @@ echo "${ECHO_T}Unrecognized C++ compiler -- Try to go ahead and get help from de
 
     if test "$GXX" = yes ; then
     CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-128"
-    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Winline -Woverloaded-virtual -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-128"
+    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Winline -Woverloaded-virtual -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-128 -ftrapv"
 
         CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
@@ -3986,7 +3986,6 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
 
         echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	CFLAGS="$CFLAGS -wd1572"
 
 else
   echo "$as_me: failed program was:" >&5
@@ -3995,7 +3994,8 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
         echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
-	CFLAGS="$OLDCFLAGS"
+
+		CFLAGS="$OLDCFLAGS"
 
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
