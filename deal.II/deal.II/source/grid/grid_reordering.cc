@@ -20,7 +20,7 @@
 #include <fstream>
 
 
-
+//TODO[WB]: this file uses signed integers in weird ways, for edge and face orientations. these uses should be fixed by proper use of an enum
 
 
 #if deal_II_dimension == 1
