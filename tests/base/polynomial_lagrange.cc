@@ -42,7 +42,7 @@ void check_interpolation (const std::vector<Polynomial<double> >& p,
 	    }
 	  else
 	    {
-	      if (std::fabs(y) > 2.e-10)
+	      if (std::fabs(y) > 3.e-10)
 		deallog << "Error0  lg y=" << std::log10(std::fabs(y))
 			<< std::endl;
 	    }
