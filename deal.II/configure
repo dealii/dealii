@@ -3104,7 +3104,7 @@ echo "${ECHO_T}Unrecognized C++ compiler -- Try to go ahead and get help from de
 
     if test "$GXX" = yes ; then
     CXXFLAGSO="$CXXFLAGS -O2 -Wuninitialized -felide-constructors -ftemplate-depth-128"
-    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Winline -Woverloaded-virtual -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-128 -ftrapv"
+    CXXFLAGSG="$CXXFLAGS -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Winline -Woverloaded-virtual -Wsynth -Wsign-compare -Wconversion -Wswitch -ftemplate-depth-128"
 
         CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
