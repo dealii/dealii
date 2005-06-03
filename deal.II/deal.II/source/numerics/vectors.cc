@@ -493,29 +493,60 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
     {
       std::vector<Vector<double> > rhs_values(n_q_points, Vector<double>(n_components));
       
-      for (; cell!=endc; ++cell) 
+      // Use the faster code if the FiniteElement is primitive
+      if (fe.is_primitive ())
 	{
-	  fe_values.reinit(cell);
-	  
-	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
-	  rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
-	  
-	  cell_vector = 0;
-	  for (unsigned int point=0; point<n_q_points; ++point)
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      {
-		const unsigned int component
-		  = fe.system_to_component_index(i).first;
-		
-		cell_vector(i) += rhs_values[point](component) *
-				  fe_values.shape_value(i,point) *
-				  weights[point];
-	      }
-	  
-	  cell->get_dof_indices (dofs);
-	  
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    rhs_vector(dofs[i]) += cell_vector(i);
+	  for (; cell!=endc; ++cell) 
+	    {
+	      fe_values.reinit(cell);
+	      
+	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
+	      rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
+	      
+	      cell_vector = 0;
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  {
+		    const unsigned int component
+		      = fe.system_to_component_index(i).first;
+		    
+		    cell_vector(i) += rhs_values[point](component) *
+		                      fe_values.shape_value(i,point) *
+		                      weights[point];
+		  }
+	      
+	      cell->get_dof_indices (dofs);
+	      
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		rhs_vector(dofs[i]) += cell_vector(i);
+	    }
+	}
+      else
+	// Otherwise do it the way proposed for vector valued elements
+	{
+	  for (; cell!=endc; ++cell) 
+	    {
+	      fe_values.reinit(cell);
+	      
+	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
+	      rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
+	      
+	      cell_vector = 0;
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
+		    if (fe.get_nonzero_components(i)[comp_i])
+		      {
+			cell_vector(i) += rhs_values[point](comp_i) *
+			                  fe_values.shape_value_component(i,point,comp_i) *
+			                  weights[point];
+		      }
+	      
+	      cell->get_dof_indices (dofs);
+	      
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		rhs_vector(dofs[i]) += cell_vector(i);
+	    }
 	}
     }
 }
@@ -610,22 +641,40 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 	       boundary_indicators.end()))
 	    {
 	      fe_values.reinit(cell, face);
-	  
+	      
 	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
 	      rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
-	  
-	      cell_vector = 0;
-	      for (unsigned int point=0; point<n_q_points; ++point)
-		for (unsigned int i=0; i<dofs_per_cell; ++i)
-		  {
-		    const unsigned int component
-		      = fe.system_to_component_index(i).first;
-		    
-		    cell_vector(i) += rhs_values[point](component) *
-				      fe_values.shape_value(i,point) *
-				      weights[point];
-		  }
 	      
+	      cell_vector = 0;
+	      
+	      // Use the faster code if the FiniteElement is primitive
+	      if (fe.is_primitive ())
+		{		  
+		  for (unsigned int point=0; point<n_q_points; ++point)
+		    for (unsigned int i=0; i<dofs_per_cell; ++i)
+		      {
+			const unsigned int component
+			  = fe.system_to_component_index(i).first;
+			
+			cell_vector(i) += rhs_values[point](component) *
+				          fe_values.shape_value(i,point) *
+				          weights[point];
+		      }
+		}
+	      else
+		{
+		  // And the full featured code, if vector valued FEs are used
+		  for (unsigned int point=0; point<n_q_points; ++point)
+		    for (unsigned int i=0; i<dofs_per_cell; ++i)
+		      for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
+			if (fe.get_nonzero_components(i)[comp_i])
+			  {
+			    cell_vector(i) += rhs_values[point](comp_i) *
+			                      fe_values.shape_value_component(i,point,comp_i) *
+			                      weights[point];
+			  }
+		}
+		  
 	      cell->get_dof_indices (dofs);
 	      
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
