@@ -1046,24 +1046,24 @@ namespace internal
 					   // edges
 	  for (unsigned int i=4*group; i<4*(group+1); ++i)
 	    {
-					       // The local edge
-					       // orientation within
-					       // the cell
-	      const signed int LOR
-                = (c.local_orientation_flags[i] *
-                   mesh.edge_list[c.edges[i]].orientation_flag);
-	      
 					       // If the edge has
 					       // orientation
-	      if (LOR != 0)
+	      if ((c.local_orientation_flags[i] != 0)
+		  &&
+		  (mesh.edge_list[c.edges[i]].orientation_flag != 0))
 		{
-						   // And we haven't
+		  const signed int this_edge_direction
+		    = (c.local_orientation_flags[i] 
+		       == mesh.edge_list[c.edges[i]].orientation_flag  ?
+		       +1 : -1);
+
+						   // If we haven't
 						   // seen an oriented
-						   // edge before
+						   // edge before,
+						   // then store its
+						   // value:
 		  if (value == 0) 
-						     // Store it's
-						     // value
-		    value = LOR;
+		    value = this_edge_direction;
 		  else
 						     // If we have
 						     // seen an
@@ -1072,7 +1072,7 @@ namespace internal
 						     // we'd better
 						     // have the same
 						     // orientation.
-		    if (value != LOR)
+		    if (value != this_edge_direction)
 		      return false;
 		}
 	    }
@@ -1152,12 +1152,17 @@ namespace internal
       unsigned int cur_flag   = 1;
       for (unsigned int i = 4*n; i<4*(n+1); ++i, cur_flag<<=1)
 	{
-	  const signed int orient
-            = (mesh.edge_list[c.edges[i]].orientation_flag *
-               c.local_orientation_flags[i]);
-	  if (orient != 0)
+	  if ((mesh.edge_list[c.edges[i]].orientation_flag != 0)
+	      &&
+               (c.local_orientation_flags[i] != 0))
 	    {
 	      ++n_oriented;
+
+	      const signed int orient
+		= (mesh.edge_list[c.edges[i]].orientation_flag ==
+		   c.local_orientation_flags[i] ?
+		   +1 : -1);
+
 	      if (glorient == 0)
 		glorient = orient;
 	      else
