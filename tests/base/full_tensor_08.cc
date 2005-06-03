@@ -31,7 +31,7 @@ void test ()
     for (unsigned int j=0; j<dim; ++j)
       t[i][j] = (1. + (i+lambda)*(mu+13));
 	  
-  Tensor<2,dim> a, b;
+  Tensor<2,dim> a;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       a[i][j] = (1. + (i+1)*(j+1));
