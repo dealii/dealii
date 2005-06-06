@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"
+   "http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+  <head>
+    <link href="../../screen.css" rel="StyleSheet" media="screen">
+    <link href="../../print.css" rel="StyleSheet" media="print">
+  <body>
+
+
+<h3>Abstract:</h3>
+<dir>
+In this thesis we introduce a discontinuous Galerkin method for the
+numerical solution of hyperbolic conversation laws, as for example the
+compressible Euler equations of gas dynamics. Based on this finite
+element method, we develop an adaptive algorithm for the efficient
+computation of physically relevant quantities of the solution.  This
+includes <em>a posteriori</em> error estimation of the error in the
+computed quantity as well as adaptive mesh design specifically
+tailored to the efficient computation of this quantity. We illustrate
+this approach by several different hyperbolic problems in combination
+with various different target quantities, including the efficient
+computation of drag and lift coefficients of airfoils immersed in
+inviscid compressible gas flows.
+<br>
+<br>
+In particular, this work includes following issues
+<ul>
+    <li> <p>
+    Discretisation:
+    <ul>
+        <li> Streamline diffusion and discontinuous Galerkin method
+	for a scalar hyperbolic problem: <br> comparison with respect to
+	accuracy and conservation properties
+	<li> Discontinuous Galerkin method for the compressible Euler equations
+	<li> Use of shock-capturing
+	<li> Higher order boundary approximation at reflective boundaries
+	<li> Solution of the nonlinear and the linear problems
+	<li> Mesh generation for airfoil computations
+    </ul>
+    </p>
+
+    <li> <p>
+    A posteriori error estimation and adaptivity:
+    <ul>
+        <li> Derivation (by duality argument) of error estimates with
+        respect to arbitrary target functionals
+
+	<li> Question of well-posedness of the dual problem
+
+	<li> Approximation of the error representation by numerical
+	approximation of the dual solution
+
+	<li> Adaptive algorithm tailored to the efficient computation
+	of the quantity of interest
+    </ul>
+    </p>
+    
+    <li> <p> Numerical Examples illustrating the performance of the
+    error estimation and the adaptive grid refinement for a wide range
+    of hyperbolic problems including
+    <ul>
+    	<li> the linear advection equation
+	<li> the 1D inviscid Burgers equation
+	<li> the Buckley-Leverett equation
+	<li> the 1D compressible Euler equations
+	<li> and several examples for the 2D compressible Euler equations.
+    </ul>
+    and for a variety of target functionals (quantities) including
+    <ul>
+    	<li> drag and lift coefficients of airfoils
+	<li> pressure point values
+	<li> weighted boundary integrals
+	</ul>
+    </p>
+
+    <li> <p>
+    Appendices
+    <ul>
+    	<li> Full description of exact solutions to hyperbolic
+    	problems treated in numerical examples
+
+	<li> Implementational details of finite elements with curved
+    	boundaries
+
+    </ul>
+</dir>
+</body>
+</html>
+
+    
+
