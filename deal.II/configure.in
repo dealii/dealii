@@ -392,9 +392,6 @@ fi
 dnl Likewise, if we use PETSc and link statically, we have to add blas to the
 dnl linker line (if we use shared libs, then the PETSc libs already carry this
 dnl dependence, but static archives do not have a method to list dependencies)
-echo $with_petsc
-echo $enableshared
-
 if test "x$with_petsc" != "x" ; then
   if test "x$enableshared" = "xno" ; then
     with_blas="yes"
