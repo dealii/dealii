@@ -203,10 +203,24 @@ class FE_RaviartThomas : public FiniteElement<dim>
 						     const unsigned int component) const;
 
 				     /**
-				      * Return the polynomial degree
+				      * Return the order
 				      * of this finite element,
 				      * i.e. the value passed to the
 				      * constructor.
+				      *
+				      * Note that for this element,
+				      * the order is actually one
+				      * lower than the maximal
+				      * polynomial degree, unlike for
+				      * most of the other
+				      * elements. For example, the RT0
+				      * element as piecewise linear
+				      * shape functions, even though
+				      * the normal component of them
+				      * is piecewise constant on each
+				      * face (the latter being the
+				      * property that defines the
+				      * order of the element).
 				      */
     unsigned int get_degree () const;
     
