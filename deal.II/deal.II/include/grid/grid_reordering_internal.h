@@ -395,6 +395,74 @@ namespace internal
  */
   namespace GridReordering3d
   {
+				     /**
+				      * A structure indicating the
+				      * direction of an edge. In the
+				      * implementation file, we define
+				      * three objects,
+				      * <tt>unoriented_edge</tt>,
+				      * <tt>forward_edge</tt>, and
+				      * <tt>backward_edge</tt>, that
+				      * denote whether an edge has
+				      * already been oriented, whether
+				      * it is in standard orientation,
+				      * or whether it has reverse
+				      * direction. The state that each
+				      * of these objects encode is
+				      * stored in the
+				      * <tt>orientation</tt> member
+				      * variable -- we would really
+				      * need only three such values,
+				      * which we pick in the
+				      * implementation file, and make
+				      * sure when we compare such
+				      * objects that only these three
+				      * special values are actually
+				      * used.
+				      *
+				      * The reason for this way of
+				      * implementing things is as
+				      * follows. Usually, such a
+				      * property would be implemented
+				      * as an enum. However, in the
+				      * previous implementation, a
+				      * signed integer was used with
+				      * unoriented=0, forward=+1, and
+				      * backward=-1. A number of
+				      * operations, such as equality
+				      * of ordered edges were mapped
+				      * to checking whether the
+				      * product of two edge
+				      * orientations equals +1. Such
+				      * arithmetic isn't always
+				      * portable and sometimes flagged
+				      * when using -ftrapv with
+				      * gcc. Using this class instead
+				      * makes sure that there isn't
+				      * going to be any arithmetic
+				      * going on on edge orientations,
+				      * just comparisons for equality
+				      * or inequality.
+				      *
+				      * @author Wolfgang Bangerth, 2005
+				      */
+    struct EdgeOrientation 
+    {
+					 /**
+					  * A value indicating the orientation.
+					  */
+	char orientation;
+
+					 /**
+					  * Comparison operator.
+					  */
+	bool operator == (const EdgeOrientation &edge_orientation) const;
+	
+					 /**
+					  * Comparison operator.
+					  */
+	bool operator != (const EdgeOrientation &edge_orientation) const;
+    };
 
                                      /**
                                       * During building the
@@ -460,13 +528,13 @@ namespace internal
 
                                          /** 
                                           * Whether the edge has not
-                                          * already been oriented (0),
+                                          * already been oriented,
                                           * points from node 0 to node
-                                          * 1 (1), or the reverse
-                                          * (-1). The initial state of
-                                          * this flag is zero.
+                                          * 1, or the reverse.
+                                          * The initial state of
+                                          * this flag is unoriented.
                                           */
-        signed short int orientation_flag;
+        EdgeOrientation orientation_flag;
 
                                          /** 
                                           * Used to determine which
@@ -536,7 +604,7 @@ namespace internal
                                           * (1) or node 1 is the base
                                           * (-1).
                                           */
-        signed int local_orientation_flags[GeometryInfo<3>::lines_per_cell];
+        EdgeOrientation local_orientation_flags[GeometryInfo<3>::lines_per_cell];
         
                                          /**
                                           * An internal flag used to

@@ -20,9 +20,6 @@
 #include <fstream>
 
 
-//TODO[WB]: this file uses signed integers in weird ways, for edge and face orientations. these uses should be fixed by proper use of an enum
-
-
 #if deal_II_dimension == 1
 
 void GridReordering<1>::reorder_cells (const std::vector<CellData<1> > &)
@@ -586,6 +583,31 @@ namespace internal
 		    char *,
 		    <<  "Grid Orientation Error: " << arg1);
 
+    const EdgeOrientation unoriented_edge = {'u'};
+    const EdgeOrientation forward_edge    = {'f'};
+    const EdgeOrientation backward_edge   = {'b'};
+
+    inline
+    bool
+    EdgeOrientation::
+    operator == (const EdgeOrientation &edge_orientation) const
+    {
+      Assert ((orientation == 'u') || (orientation == 'f') || (orientation == 'b'),
+	      ExcInternalError());
+      return orientation == edge_orientation.orientation;
+    }
+
+
+
+    inline
+    bool
+    EdgeOrientation::
+    operator != (const EdgeOrientation &edge_orientation) const
+    {
+      return ! (*this == edge_orientation);
+    }
+
+    
 
     namespace ElementInfo
     {
@@ -619,16 +641,16 @@ namespace internal
 					* the edge -1 means the end
 					* of the edge.
 					*/
-      static const int edge_to_node_orient[8][3] = 
+      static const EdgeOrientation edge_to_node_orient[8][3] = 
       {
-	    { 1, 1, 1},
-	    {-1, 1, 1},
-	    {-1,-1, 1},
-	    { 1,-1, 1},
-	    { 1, 1,-1},
-	    {-1, 1,-1},
-	    {-1,-1,-1}, 
-	    { 1,-1,-1}
+	    {forward_edge,forward_edge,forward_edge},
+	    {backward_edge,forward_edge,forward_edge},
+	    {backward_edge,backward_edge,forward_edge},
+	    {forward_edge,backward_edge,forward_edge},
+	    {forward_edge,forward_edge,backward_edge},
+	    {backward_edge,forward_edge,backward_edge},
+	    {backward_edge,backward_edge,backward_edge}, 
+	    {forward_edge,backward_edge,backward_edge}
       };	    
     
 				       /**
@@ -680,7 +702,7 @@ namespace internal
     Edge::Edge (const unsigned int n0,
 		const unsigned int n1)
 		    :
-		    orientation_flag (0),
+		    orientation_flag (unoriented_edge),
 		    group (deal_II_numbers::invalid_unsigned_int)
     {
       nodes[0] = n0;
@@ -694,7 +716,7 @@ namespace internal
       for (unsigned int i=0; i<GeometryInfo<3>::lines_per_cell; ++i)
 	{
 	  edges[i] = deal_II_numbers::invalid_unsigned_int;
-	  local_orientation_flags[i] = 1;
+	  local_orientation_flags[i] = forward_edge;
 	}
       
       for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
@@ -756,21 +778,24 @@ namespace internal
       const unsigned int ge1 = c.edges[e1];
       const unsigned int ge2 = c.edges[e2];
 
-      const int or0 = ElementInfo::edge_to_node_orient[local_node_num][0] *
-		      c.local_orientation_flags[e0];
-      const int or1 = ElementInfo::edge_to_node_orient[local_node_num][1] *
-		      c.local_orientation_flags[e1];
-      const int or2 = ElementInfo::edge_to_node_orient[local_node_num][2] *
-		      c.local_orientation_flags[e2];
+      const EdgeOrientation or0 = ElementInfo::edge_to_node_orient[local_node_num][0] ==
+				  c.local_orientation_flags[e0] ?
+				  forward_edge : backward_edge;
+      const EdgeOrientation or1 = ElementInfo::edge_to_node_orient[local_node_num][1] ==
+				  c.local_orientation_flags[e1] ?
+				  forward_edge : backward_edge;
+      const EdgeOrientation or2 = ElementInfo::edge_to_node_orient[local_node_num][2] ==
+		      c.local_orientation_flags[e2] ?
+		      forward_edge : backward_edge;
 
 				       // Make sure that edges agree
 				       // what the current node should
 				       // be.
-      Assert ((edge_list[ge0].nodes[or0 == 1 ? 0 : 1] ==
-	       edge_list[ge1].nodes[or1 == 1 ? 0 : 1])
+      Assert ((edge_list[ge0].nodes[or0 == forward_edge ? 0 : 1] ==
+	       edge_list[ge1].nodes[or1 == forward_edge ? 0 : 1])
 	      &&
-	      (edge_list[ge1].nodes[or1 == 1 ? 0 : 1] ==
-	       edge_list[ge2].nodes[or2 == 1 ? 0 : 1]),
+	      (edge_list[ge1].nodes[or1 == forward_edge ? 0 : 1] ==
+	       edge_list[ge2].nodes[or2 == forward_edge ? 0 : 1]),
 	      ExcMessage ("This message does not satisfy the internal "
 			  "consistency check"));
     }    
@@ -805,7 +830,8 @@ namespace internal
 		 ++edge_num)
 	      {
 		unsigned int gl_edge_num = 0;
-		signed int l_edge_orient = 1;
+		EdgeOrientation l_edge_orient = forward_edge;
+		
 						 // Construct the
 						 // CheapEdge
 		const unsigned int
@@ -835,7 +861,7 @@ namespace internal
 						     // from hash_map
 		    gl_edge_num = edge_map[cur_edge]; 
 		    if (edge_list[gl_edge_num].nodes[0] != node0)
-		      l_edge_orient = -1;
+		      l_edge_orient = backward_edge;
 		  }
 						 // set edge number to
 						 // edgenum
@@ -1019,7 +1045,7 @@ namespace internal
     {
       for (unsigned int i=0; i<12; ++i)
 	if (mesh.edge_list[mesh.cell_list[cell_num].edges[i]].orientation_flag
-            == 0)
+            == unoriented_edge)
 	  return false;
       return true;
     }
@@ -1041,28 +1067,30 @@ namespace internal
 					   // orientation is first
 					   // encountered in the group
 					   // it is stored in this
-	  signed int value = 0;
+	  EdgeOrientation value = unoriented_edge;
 					   // Loop over all parallel
 					   // edges
 	  for (unsigned int i=4*group; i<4*(group+1); ++i)
 	    {
 					       // If the edge has
 					       // orientation
-	      if ((c.local_orientation_flags[i] != 0)
+	      if ((c.local_orientation_flags[i] !=
+		   unoriented_edge)
 		  &&
-		  (mesh.edge_list[c.edges[i]].orientation_flag != 0))
+		  (mesh.edge_list[c.edges[i]].orientation_flag !=
+		   unoriented_edge))
 		{
-		  const signed int this_edge_direction
+		  const EdgeOrientation this_edge_direction
 		    = (c.local_orientation_flags[i] 
 		       == mesh.edge_list[c.edges[i]].orientation_flag  ?
-		       +1 : -1);
+		       forward_edge : backward_edge);
 
 						   // If we haven't
 						   // seen an oriented
 						   // edge before,
 						   // then store its
 						   // value:
-		  if (value == 0) 
+		  if (value == unoriented_edge) 
 		    value = this_edge_direction;
 		  else
 						     // If we have
@@ -1091,7 +1119,8 @@ namespace internal
 				       // search for the unoriented
 				       // side
       while ((edge<12) &&
-	     (mesh.edge_list[c.edges[edge]].orientation_flag != 0))
+	     (mesh.edge_list[c.edges[edge]].orientation_flag !=
+	     unoriented_edge))
 	++edge;
   
 				       // if we found none then return
@@ -1108,7 +1137,8 @@ namespace internal
 				       // of the edges in the group
 				       // should be un-oriented
       for (unsigned int j = edge_group*4; j<edge_group*4+4; ++j)
-	Assert (mesh.edge_list[c.edges[j]].orientation_flag == 0,
+	Assert (mesh.edge_list[c.edges[j]].orientation_flag ==
+		unoriented_edge,
 		ExcGridOrientError("Tried to orient edge when other edges "
                                    "in group are already oriented!"));
 
@@ -1147,23 +1177,25 @@ namespace internal
 				       // Check if any edge is
 				       // oriented
       unsigned int n_oriented = 0;
-      signed int   glorient   = 0;
+      EdgeOrientation glorient   = unoriented_edge;
       unsigned int edge_flags = 0;
       unsigned int cur_flag   = 1;
       for (unsigned int i = 4*n; i<4*(n+1); ++i, cur_flag<<=1)
 	{
-	  if ((mesh.edge_list[c.edges[i]].orientation_flag != 0)
+	  if ((mesh.edge_list[c.edges[i]].orientation_flag !=
+	      unoriented_edge)
 	      &&
-               (c.local_orientation_flags[i] != 0))
+	      (c.local_orientation_flags[i] !=
+	       unoriented_edge))
 	    {
 	      ++n_oriented;
 
-	      const signed int orient
+	      const EdgeOrientation orient
 		= (mesh.edge_list[c.edges[i]].orientation_flag ==
 		   c.local_orientation_flags[i] ?
-		   +1 : -1);
+		   forward_edge : backward_edge);
 
-	      if (glorient == 0)
+	      if (glorient == unoriented_edge)
 		glorient = orient;
 	      else
 		AssertThrow(orient == glorient,
@@ -1176,7 +1208,7 @@ namespace internal
 				       // were any of the sides
 				       // oriented?  were they all
 				       // already oriented?
-      if ((glorient == 0) || (n_oriented == 4))
+      if ((glorient == unoriented_edge) || (n_oriented == 4))
 	return false;
 
 				       // If so orient all edges
@@ -1186,7 +1218,9 @@ namespace internal
 	if ((edge_flags & cur_flag) != 0)
 	  {
 	    mesh.edge_list[c.edges[i]].orientation_flag 
-	      = c.local_orientation_flags[i]*glorient;
+	      = (c.local_orientation_flags[i] == glorient ?
+		 forward_edge : backward_edge);
+	    
 	    mesh.edge_list[c.edges[i]].group = cur_edge_group;
                                        // Remember that we have oriented 
                                        // this edge in the current cell.
@@ -1293,7 +1327,7 @@ namespace internal
 					   // edge on the current
 					   // cube. (for each edge on
 					   // the curent cube)
-	  int local_edge_orientation[12];
+	  EdgeOrientation local_edge_orientation[12];
 	  for (unsigned int j = 0; j<12; ++j)
 	    {
 					       // get the global edge
@@ -1301,13 +1335,14 @@ namespace internal
 					       // All edges should be
 					       // oriented at this
 					       // stage..
-	      Assert (the_edge.orientation_flag != 0,
+	      Assert (the_edge.orientation_flag != unoriented_edge,
 		      ExcGridOrientError ("Unoriented edge encountered"));
 					       // calculate whether it
 					       // points the right way
-					       // (1) or not (-1)
-	      local_edge_orientation[j] = (the_cell.local_orientation_flags[j] *
-					   the_edge.orientation_flag);
+					       // or not
+	      local_edge_orientation[j] = (the_cell.local_orientation_flags[j] ==
+					   the_edge.orientation_flag ?
+					   forward_edge : backward_edge);
 	    }
 
 					   // Here the number of
@@ -1327,17 +1362,24 @@ namespace internal
 					       // orientation of the
 					       // edge coming into the
 					       // node.
-	      const int sign0 = ElementInfo::edge_to_node_orient[node_num][0];
-	      const int sign1 = ElementInfo::edge_to_node_orient[node_num][1];
-	      const int sign2 = ElementInfo::edge_to_node_orient[node_num][2];
+	      const EdgeOrientation sign0 = ElementInfo::edge_to_node_orient[node_num][0];
+	      const EdgeOrientation sign1 = ElementInfo::edge_to_node_orient[node_num][1];
+	      const EdgeOrientation sign2 = ElementInfo::edge_to_node_orient[node_num][2];
 
 					       // Add one to the total
 					       // for each edge
 					       // pointing in
+	      Assert (local_edge_orientation[e0] != unoriented_edge,
+		      ExcInternalError());
+	      Assert (local_edge_orientation[e1] != unoriented_edge,
+		      ExcInternalError());
+	      Assert (local_edge_orientation[e2] != unoriented_edge,
+		      ExcInternalError());
+	      
 	      const unsigned int
-		total  = (((local_edge_orientation[e0]*sign0 == 1) ? 1 : 0)
-			  +((local_edge_orientation[e1]*sign1 == 1) ? 1 : 0)
-			  +((local_edge_orientation[e2]*sign2 == 1) ? 1 : 0));
+		total  = (((local_edge_orientation[e0] == sign0) ? 1 : 0)
+			  +((local_edge_orientation[e1] == sign1) ? 1 : 0)
+			  +((local_edge_orientation[e2] == sign2) ? 1 : 0));
       
 	      if (total == 3) 
 		{
