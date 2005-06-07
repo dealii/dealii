@@ -110,8 +110,15 @@ lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
 # -Wl,-rpath in our linker flags, we create one convenience library
 # for all PETSc libraries in our own lib directory, and have this one
 # twiddle with whatever is necessary to link in PETSc.
-lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
-lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
+#
+# to make things more fun, the whole scheme was changed in petsc 2.3.0
+ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
+  lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/libg_c++/$(DEAL_II_PETSC_ARCH)
+  lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/libO_c++/$(DEAL_II_PETSC_ARCH)
+else
+  lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
+  lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
+endif
 lib-contrib-petsc.g = $(LIBDIR)/libpetsc.g$(lib-suffix)
 lib-contrib-petsc.o = $(LIBDIR)/libpetsc$(lib-suffix)
 
@@ -153,8 +160,12 @@ INCLUDE = -I$D/base/include -I$D/lac/include -I$D/deal.II/include \
 # be replaced by something where we do not blindly include PETSc make files
 # (and thus import all of its variables), but rather set up a scheme to
 # extract these values upon configuration
+#
+# note also that this only works for PETSc before 2.3 :-]
 ifeq ($(USE_CONTRIB_PETSC),yes)
-  include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/packages
+  ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
+    include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/packages
+  endif
   INCLUDE += -I$(include-path-petsc) -I$(include-path-petsc-bmake)\
              $(MPI_INCLUDE)
 endif
@@ -175,7 +186,11 @@ CFLAGS = @CFLAGS@
 
 # PETSc wants to see a whole lot of other flags being passed. ...
 ifeq ($(USE_CONTRIB_PETSC),yes)
-  include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/variables
+  ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
+    include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/variables
+  else
+    include $(DEAL_II_PETSC_DIR)/bmake/common/variables
+  endif
   CXXFLAGS.g += $(GCXX_PETSCFLAGS)
   CXXFLAGS.o += $(OCXX_PETSCFLAGS)
 endif

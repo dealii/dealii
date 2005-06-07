@@ -127,7 +127,12 @@ namespace PETScWrappers
                                      // (see test bits/petsc_65)
     compress ();
     
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
     const int ierr = VecSet (&s, vector);
+#else
+    const int ierr = VecSet (vector, s);
+#endif
+    
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -438,8 +443,12 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator *= (const PetscScalar a)
   {
-    const int ierr
-      = VecScale (&a, vector);
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const int ierr = VecScale (&a, vector);
+#else
+    const int ierr = VecScale (vector, a);
+#endif
+    
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -452,8 +461,12 @@ namespace PETScWrappers
   {
     const PetscScalar factor = 1./a;
     
-    const int ierr
-      = VecScale (&factor, vector);
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const int ierr = VecScale (&factor, vector);
+#else
+    const int ierr = VecScale (vector, factor);
+#endif
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -464,10 +477,13 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator += (const VectorBase &v)
   {
-    const PetscScalar one = 1.0;
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const PetscScalar one = 1.0;    
+    const int ierr = VecAXPY (&one, v, vector);
+#else
+    const int ierr = VecAXPY (vector, 1, v);
+#endif
     
-    const int ierr
-      = VecAXPY (&one, v, vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -478,10 +494,13 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator -= (const VectorBase &v)
   {
-    const PetscScalar minus_one = -1.0;
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const PetscScalar minus_one = -1.0;    
+    const int ierr = VecAXPY (&minus_one, v, vector);
+#else
+    const int ierr = VecAXPY (vector, -1, v);
+#endif
     
-    const int ierr
-      = VecAXPY (&minus_one, v, vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -492,8 +511,12 @@ namespace PETScWrappers
   void
   VectorBase::add (const PetscScalar s)
   {
-    const int ierr
-      = VecShift (&s, vector);
+ #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const int ierr = VecShift (&s, vector);
+#else
+    const int ierr = VecShift (vector, s);
+#endif
+    
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
@@ -511,8 +534,12 @@ namespace PETScWrappers
   VectorBase::add (const PetscScalar a,
                    const VectorBase     &v)
   {
-    const int ierr
-      = VecAXPY (&a, v, vector);
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const int ierr = VecAXPY (&a, v, vector);
+#else
+    const int ierr = VecAXPY (vector, a, v);
+#endif
+    
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
@@ -520,15 +547,19 @@ namespace PETScWrappers
 
   void
   VectorBase::add (const PetscScalar a,
-                   const VectorBase     &v,
+                   const VectorBase &v,
                    const PetscScalar b,
-                   const VectorBase     &w)
+                   const VectorBase &w)
   {
     const PetscScalar weights[2] = {a,b};
     Vec               addends[2] = {v.vector, w.vector};
     
-    const int ierr
-      = VecMAXPY (2, weights, vector, addends);
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const int ierr = VecMAXPY (2, weights, vector, addends);
+#else
+    const int ierr = VecMAXPY (vector, 2, weights, addends);
+#endif
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
@@ -536,10 +567,14 @@ namespace PETScWrappers
 
   void
   VectorBase::sadd (const PetscScalar s,
-                    const VectorBase     &v)
+                    const VectorBase &v)
   {
-    const int ierr
-      = VecAYPX (&s, v, vector);
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const int ierr = VecAYPX (&s, v, vector);
+#else
+    const int ierr = VecAYPX (vector, s, v);
+#endif
+    
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
@@ -573,8 +608,12 @@ namespace PETScWrappers
     const PetscScalar weights[2] = {a,b};
     Vec               addends[2] = {v.vector,w.vector};
     
-    const int ierr
-      = VecMAXPY (2, weights, vector, addends);
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const int ierr = VecMAXPY (2, weights, vector, addends);
+#else
+    const int ierr = VecMAXPY (vector, 2, weights, addends);
+#endif
+    
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -596,8 +635,12 @@ namespace PETScWrappers
     const PetscScalar weights[3] = {a,b,c};
     Vec               addends[3] = {v.vector, w.vector, x.vector};
     
-    const int ierr
-      = VecMAXPY (3, weights, vector, addends);
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const int ierr = VecMAXPY (3, weights, vector, addends);
+#else
+    const int ierr = VecMAXPY (vector, 3, weights, addends);
+#endif
+    
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -615,7 +658,7 @@ namespace PETScWrappers
 
   void
   VectorBase::equ (const PetscScalar a,
-                   const VectorBase     &v)
+                   const VectorBase &v)
   {
     Assert (size() == v.size(),
             ExcDimensionMismatch (size(), v.size()));
@@ -633,9 +676,9 @@ namespace PETScWrappers
 
   void
   VectorBase::equ (const PetscScalar a,
-                   const VectorBase     &v,
+                   const VectorBase &v,
                    const PetscScalar b,
-                   const VectorBase     &w)
+                   const VectorBase &w)
   {
     Assert (size() == v.size(),
             ExcDimensionMismatch (size(), v.size()));
@@ -655,8 +698,12 @@ namespace PETScWrappers
   VectorBase::ratio (const VectorBase &a,
                      const VectorBase &b)
   {
-    const int ierr
-      = VecPointwiseDivide (a, b, vector);
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const int ierr = VecPointwiseDivide (a, b, vector);
+#else
+    const int ierr = VecPointwiseDivide (vector, a, b);
+#endif
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -699,6 +746,7 @@ namespace PETScWrappers
   }
 
 
+  
   void
   VectorBase::swap (VectorBase &v)
   {

@@ -393,8 +393,11 @@ namespace PETScWrappers
   MatrixBase &
   MatrixBase::operator *= (const PetscScalar a)
   {
-    const int ierr
-      = MatScale (&a, matrix);
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const int ierr = MatScale (&a, matrix);
+#else
+    const int ierr = MatScale (matrix, a);
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;
@@ -407,8 +410,12 @@ namespace PETScWrappers
   {
     const PetscScalar factor = 1./a;
     
-    const int ierr
-      = MatScale (&factor, matrix);
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
+    const int ierr = MatScale (&factor, matrix);
+#else
+    const int ierr = MatScale (matrix, factor);
+#endif
+
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return *this;

@@ -291,10 +291,19 @@ namespace PETScWrappers
     ierr = PCLUSetPivoting (pc, additional_data.pivoting);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
     ierr = PCLUSetZeroPivot (pc, additional_data.zero_pivot);
+#else
+    ierr = PCFactorSetZeroPivot (pc, additional_data.zero_pivot);
+#endif
+    
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
     ierr = PCLUSetDamping (pc, additional_data.damping);
+#else
+    ierr = PCFactorSetShiftNonzero (pc, additional_data.damping);
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
