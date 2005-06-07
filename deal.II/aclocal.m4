@@ -4477,48 +4477,36 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
      [
         DEAL_II_PETSC_ARCH=$withval
 	AC_MSG_RESULT($DEAL_II_PETSC_ARCH)
-
-        dnl Make sure that what was specified is actually correct
-        if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
-             ; then
-          dnl Check whether PETSc is installed but someone has simply
-	  dnl forgotten to also compile for C++
-          if test -d $DEAL_II_PETSC_DIR/lib/libg/$DEAL_II_PETSC_ARCH \
-             ; then
-            AC_MSG_ERROR([PETSc has not been compiled for C++, but
-                          deal.II needs this])
-          else
-            AC_MSG_ERROR([PETSc has not been compiled for the architecture
-                          specified with --with-petsc-arch])
-          fi
-	fi
      ],
      [
         dnl Take something from the environment variables, if it is there
         if test "x$PETSC_ARCH" != "x" ; then
           DEAL_II_PETSC_ARCH="$PETSC_ARCH"
 	  AC_MSG_RESULT($DEAL_II_PETSC_ARCH)
-
-          dnl Make sure that what this is actually correct
-          if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
-             ; then
-            dnl Check whether PETSc is installed but someone has simply
-	    dnl forgotten to also compile for C++
-            if test -d $DEAL_II_PETSC_DIR/lib/libg/$DEAL_II_PETSC_ARCH \
-               ; then
-              AC_MSG_ERROR([PETSc has not been compiled for C++, but
-                            deal.II needs this])
-            else
-              AC_MSG_ERROR([PETSc has not been compiled for the architecture
-                            specified with --with-petsc-arch])
-            fi
-          fi
         else
     	  AC_MSG_ERROR([If PETSc is used, you must specify the architecture
                         either through the PETSC_ARCH environment variable,
                         or through the --with-petsc-arch flag])
         fi
      ])
+
+
+  if test "x$PETSC_ARCH" != "x" ; then
+    dnl Make sure that what was specified is actually correct
+    if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
+         ; then
+      dnl Check whether PETSc is installed but someone has simply
+      dnl forgotten to also compile for C++
+      if test -d $DEAL_II_PETSC_DIR/lib/libg/$DEAL_II_PETSC_ARCH \
+         ; then
+        AC_MSG_ERROR([PETSc has not been compiled for C++, but
+                      deal.II needs this])
+      else
+        AC_MSG_ERROR([PETSc has not been compiled for the architecture
+                      specified with --with-petsc-arch])
+      fi
+    fi
+  fi
 ])
 
 
