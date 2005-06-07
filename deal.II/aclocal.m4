@@ -4446,8 +4446,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
 
   dnl If we have found PETSc, determine additional pieces of data
   if test "$USE_CONTRIB_PETSC" = "yes" ; then
-    DEAL_II_CONFIGURE_PETSC_ARCH
     DEAL_II_CONFIGURE_PETSC_VERSION
+    DEAL_II_CONFIGURE_PETSC_ARCH
 
     dnl Finally set with_petsc if this hasn't happened yet
     if test "x$with_petsc" = "x" ; then
@@ -4492,20 +4492,38 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
 
 
   if test "x$PETSC_ARCH" != "x" ; then
-    dnl Make sure that what was specified is actually correct
-    if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
-         ; then
-      dnl Check whether PETSc is installed but someone has simply
-      dnl forgotten to also compile for C++
-      if test -d $DEAL_II_PETSC_DIR/lib/libg/$DEAL_II_PETSC_ARCH \
-         ; then
-        AC_MSG_ERROR([PETSc has not been compiled for C++, but
-                      deal.II needs this])
-      else
-        AC_MSG_ERROR([PETSc has not been compiled for the architecture
-                      specified with --with-petsc-arch])
-      fi
-    fi
+    dnl Make sure that what was specified is actually correct. to be sure,
+    dnl petsc changed the locations where they store their libraries
+    dnl sometime in the middle...
+    case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
+      2.2*)
+        if test ! -d $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH \
+             ; then
+          dnl Check whether PETSc is installed but someone has simply
+          dnl forgotten to also compile for C++
+          if test -d $DEAL_II_PETSC_DIR/lib/libg/$DEAL_II_PETSC_ARCH \
+             ; then
+            AC_MSG_ERROR([PETSc has not been compiled for C++, but
+                          deal.II needs this])
+          else
+            AC_MSG_ERROR([PETSc has not been compiled for the architecture
+                          specified with --with-petsc-arch])
+          fi
+        fi
+        ;;
+  
+      2.3*)
+        if test ! -d $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH \
+             ; then
+          AC_MSG_ERROR([PETSc has not been compiled for the architecture
+                        specified with --with-petsc-arch])
+        fi
+        ;;
+
+      *)
+        AC_MSG_ERROR([Unknown PETSc version])
+	;;
+    esac
   fi
 ])
 
