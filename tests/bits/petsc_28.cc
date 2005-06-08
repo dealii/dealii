@@ -38,7 +38,8 @@ void test (PETScWrappers::Vector &v)
                                    // make sure they're equal
   deallog << v*w << ' ' << v.l2_norm() * w.l2_norm()
           << ' ' << v*w - v.l2_norm() * w.l2_norm() << std::endl;
-  Assert (std::fabs(v*w - v.l2_norm() * w.l2_norm()) < 1e-14*(v*w),
+  const double eps=sizeof(PetscScalar)==8 ? 1e-14 : 1e-5;
+  Assert (std::fabs(v*w - v.l2_norm() * w.l2_norm()) < eps*(v*w),
           ExcInternalError());
 
   deallog << "OK" << std::endl;

@@ -41,7 +41,7 @@ void test (PETScWrappers::Vector &v,
   w.compress ();
 
                                    // <w,Mv>
-  const double s = m.matrix_scalar_product (w,v);
+  const PetscScalar s = m.matrix_scalar_product (w,v);
 
                                    // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
@@ -50,7 +50,7 @@ void test (PETScWrappers::Vector &v,
       Assert (w(i) == i+1, ExcInternalError());
     }
 
-  double result = 0;
+  PetscScalar result = 0;
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
       result += (i+2*j)*j*(i+1);

@@ -24,7 +24,7 @@
 void test (PETScWrappers::Vector &v)
 {
                                    // set some elements of the vector
-  double norm = 0;
+  PetscScalar norm = 0;
   for (unsigned int i=0; i<v.size(); i+=1+i)
     {
       v(i) = i;
@@ -32,8 +32,9 @@ void test (PETScWrappers::Vector &v)
     }
   v.compress ();
 
-                                   // then check the norm  
-  Assert (fabs(v.l2_norm()-std::sqrt(norm))<1e-14, ExcInternalError());
+                                   // then check the norm
+  const double eps=sizeof(PetscScalar)==8 ? 1e-14 : 1e-5;
+  Assert (fabs(v.l2_norm()-std::sqrt(norm))<eps, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

@@ -36,13 +36,13 @@ void test (PETScWrappers::Vector &v)
   v.compress ();
 
                                    // <w,Mv>
-  const double s = m.matrix_norm_square (v);
+  const PetscScalar s = m.matrix_norm_square (v);
 
                                    // make sure we get the expected result
   for (unsigned int i=0; i<v.size(); ++i)
     Assert (v(i) == i, ExcInternalError());
 
-  double result = 0;
+  PetscScalar result = 0;
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.m(); ++j)
       result += (i+2*j)*j*i;
@@ -65,7 +65,7 @@ int main (int argc, char **argv)
     {
       PetscInitialize(&argc,&argv,0,0);
       {
-        PETScWrappers::Vector v (100);
+        PETScWrappers::Vector v (30);
         test (v);
       }
       PetscFinalize ();
