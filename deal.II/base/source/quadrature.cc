@@ -21,6 +21,17 @@
 #include <iterator>
 
 
+// Integer to the power of dim
+template <int dim>
+inline unsigned int dimpow (unsigned int n)
+{
+  unsigned int result = n;
+  for (unsigned int i=1;i<dim;++i)
+    result *= n;
+  return result;
+}
+
+
 template <>
 Quadrature<0>::Quadrature (const unsigned int)
               : n_quadrature_points(0)
@@ -137,6 +148,39 @@ Quadrature<dim>::Quadrature (const SubQuadrature &q1,
 				   // near that. 
   Assert ((sum>0.999999) && (sum<1.000001), ExcInternalError());
 #endif
+}
+
+
+
+template <int dim>
+Quadrature<dim>::Quadrature (const Quadrature<1> &q)
+		:
+		Subscriptor(),
+		n_quadrature_points (dimpow<dim>(q.n_quadrature_points)),
+		quadrature_points (n_quadrature_points),
+		weights (n_quadrature_points, 0.)
+{
+  const unsigned int n0 = q.n_quadrature_points;
+  const unsigned int n1 = (dim>1) ? n0 : 1;
+  const unsigned int n2 = (dim>2) ? n0 : 1;
+
+  unsigned int k=0;
+  for (unsigned int i2=0;i2<n2;++i2)
+    for (unsigned int i1=0;i1<n1;++i1)
+      for (unsigned int i0=0;i0<n0;++i0)
+	{
+	  quadrature_points[k](0) = q.point(i0)(0);
+	  if (dim>1)
+	    quadrature_points[k](1) = q.point(i1)(0);
+	  if (dim>2)
+	    quadrature_points[k](2) = q.point(i2)(0);
+	  weights[k] = q.weight(i0);
+	  if (dim>1)
+	    weights[k] *= q.weight(i1);
+	  if (dim>2)
+	    weights[k] *= q.weight(i2);
+	  ++k;
+	}
 }
 
 

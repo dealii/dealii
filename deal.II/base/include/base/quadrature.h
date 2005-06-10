@@ -75,7 +75,7 @@
  *
  * @ref Instantiations: few
  *
- * @author Wolfgang Bangerth, 1998, 1999, 2000
+ * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2005
  */
 template <int dim>
 class Quadrature : public Subscriptor
@@ -113,6 +113,21 @@ class Quadrature : public Subscriptor
 				      */
     Quadrature (const SubQuadrature &,
 		const Quadrature<1> &);
+    
+				     /**
+				      * Build this quadrature formula
+				      * as the <tt>dim</tt>-fold
+				      * tensor product of a formula in
+				      * one dimension.
+				      *
+				      * Assuming that the points in
+				      * the on-dimensional rule are in
+				      * ascending order, the points of
+				      * the resulting rule are ordered
+				      * lexicographically with
+				      * <i>x</i> running fastest.
+				      */
+    Quadrature (const Quadrature<1> &);
     
 				     /**
 				      * Construct a quadrature formula
