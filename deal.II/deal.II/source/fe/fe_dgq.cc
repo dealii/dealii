@@ -11,6 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include <base/quadrature.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_tools.h>
 
@@ -256,6 +257,29 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 }
 
 
+
+template <int dim>
+FE_DGQ<dim>::FE_DGQ (const Quadrature<1>& points)
+		:
+		FE_Poly<TensorProductPolynomials<dim>, dim> (
+		  TensorProductPolynomials<dim>(Polynomials::Lagrange::generate_complete_basis(points.get_points())),
+		  FiniteElementData<dim>(get_dpo_vector(points.n_quadrature_points-1), 1, points.n_quadrature_points-1),
+		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(points.n_quadrature_points-1),1, points.n_quadrature_points-1).dofs_per_cell, true),
+		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
+		    get_dpo_vector(points.n_quadrature_points-1),1, points.n_quadrature_points-1).dofs_per_cell, std::vector<bool>(1,true)))
+{
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+    this->prolongation[i].reinit (this->dofs_per_cell,
+				  this->dofs_per_cell);
+  FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
+  
+				   // Compute support points, whivh
+				   // are the tensor product of the
+				   // Lagrange interpolation points in
+				   // the constructor.
+  Quadrature<dim> support_quadrature(points);
+  this->unit_support_points = support_quadrature.get_points();
+}
 
 template <int dim>
 std::string
