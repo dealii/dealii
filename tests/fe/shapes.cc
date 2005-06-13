@@ -470,7 +470,19 @@ void plot_FE_DGQ_shape_functions()
   plot_shape_functions(m, q3, "DGQ3");
   plot_face_shape_functions(m, q3, "DGQ3");
   test_compute_functions(m, q3, "DGQ3");
-
+  
+  QGaussLobatto<1> quadrature_gl(5);
+  FE_DGQ<dim> qgl(quadrature_gl);
+  plot_shape_functions(m, qgl, "DGQGL");
+  plot_face_shape_functions(m, qgl, "DGQGL");
+  test_compute_functions(m, qgl, "DGQGL");
+  
+  QGauss<1> quadrature_g(5);
+  FE_DGQ<dim> qg(quadrature_g);
+  plot_shape_functions(m, qg, "DGQG");
+  plot_face_shape_functions(m, qg, "DGQG");
+  test_compute_functions(m, qg, "DGQG");
+  
 //    FE_DGQ<dim> q4(4);
 //    plot_shape_functions(m, q4, "DGQ4");
 //    plot_face_shape_functions(m, q4, "DGQ4");
@@ -666,6 +678,10 @@ main()
   plot_FE_Q_Hierarchical_shape_functions<2>();
   plot_FE_Q_Hierarchical_shape_functions<3>();
 
+  plot_FE_DGQ_shape_functions<1>();
+  plot_FE_DGQ_shape_functions<2>();
+  plot_FE_DGQ_shape_functions<3>();
+  
   plot_FE_DGP_shape_functions<1>();
   plot_FE_DGP_shape_functions<2>();
   plot_FE_DGP_shape_functions<3>();
