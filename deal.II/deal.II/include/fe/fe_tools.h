@@ -25,7 +25,7 @@ template <typename number> class Vector;
 template <int dim> class FiniteElement;
 template <int dim> class DoFHandler;
 template <int dim> class hpDoFHandler;
-template <int dim> class FE_Q;
+template <int dim> class FiniteElementData;
 class ConstraintMatrix;
 
 
@@ -566,8 +566,13 @@ class FETools
 				      * Note that since this function
 				      * uses specifics of the
 				      * continuous finite elements, it
-				      * can only operate on objects of
-				      * type FE_Q().
+				      * can only operate on
+				      * FiniteElementData<dim> objects
+				      * inherent in FE_Q(). However,
+				      * this function does not take a
+				      * FE_Q object as it is also
+				      * invoked by the FE_Q()
+				      * constructor.
 				      *
 				      * It is assumed that the size of
 				      * the output argument already
@@ -578,8 +583,8 @@ class FETools
 				      */
     template <int dim>
     static void
-    hierarchic_to_lexicographic_numbering (const FE_Q<dim>           &fe,
-					   std::vector<unsigned int> &h2l);
+    hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe_data,
+					   std::vector<unsigned int>    &h2l);
 
 				     /**
 				      * This is the reverse function
@@ -592,8 +597,8 @@ class FETools
 				      */
     template <int dim>
     static void
-    lexicographic_to_hierarchic_numbering (const FE_Q<dim>           &fe,
-					   std::vector<unsigned int> &l2h);
+    lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
+					   std::vector<unsigned int>    &l2h);
 
 				     /**
 				      * Given a name in the form which

@@ -1073,7 +1073,7 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
 
 template <int dim>
 void
-FETools::hierarchic_to_lexicographic_numbering (const FE_Q<dim>           &fe,
+FETools::hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe,
 						std::vector<unsigned int> &h2l)
 {
   Assert (fe.n_components() == 1, ExcInvalidFE());
@@ -1233,8 +1233,8 @@ FETools::hierarchic_to_lexicographic_numbering (const FE_Q<dim>           &fe,
 
 template <int dim>
 void
-FETools::lexicographic_to_hierarchic_numbering (const FE_Q<dim>           &fe,
-						std::vector<unsigned int> &l2h)
+FETools::lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe,
+						std::vector<unsigned int>    &l2h)
 {
 				   // note: this function does the
 				   // reverse operation of the
@@ -2078,13 +2078,13 @@ void FETools::extrapolate<deal_II_dimension>
 template
 void
 FETools::hierarchic_to_lexicographic_numbering<deal_II_dimension>
-(const FE_Q<deal_II_dimension> &fe,
- std::vector<unsigned int>     &h2l);
+(const FiniteElementData<deal_II_dimension> &fe,
+ std::vector<unsigned int>                  &h2l);
 template
 void
 FETools::lexicographic_to_hierarchic_numbering<deal_II_dimension>
-(const FE_Q<deal_II_dimension> &fe,
- std::vector<unsigned int>     &h2l);
+(const FiniteElementData<deal_II_dimension> &fe,
+ std::vector<unsigned int>                  &h2l);
 
 template
 FiniteElement<deal_II_dimension> *
