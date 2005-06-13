@@ -429,6 +429,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: The method <code class="class">FETools</code>::<code
+       class="member">lexicographic_to_hierarchic_numbering</code> now
+       takes a <code class="class">FiniteElementData</code> instead of
+       a <code class="class">FE_Q</code> object. Now this function can
+       also be called by the <code class="class">FE_Q</code>
+       constructor avoiding duplication of code.
+       <br> 
+       (RH, 2005/06/13)
+       </p>
+
+  <li> <p>
        New: The method <code class="member">create_mass_matrix</code>
        in class <code class="class">MatrixCreator</code> can now handle 
        vector valued finite elements. A similar change was applied
