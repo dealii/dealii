@@ -328,85 +328,12 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * @p FiniteElementData.
 				      */
     static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
-    
-				     /**
-				      * Map tensor product data to
-				      * shape function numbering. This
-				      * function is actually an alike
-				      * replica of the respective
-				      * function in the FETools
-				      * class, but is kept for three
-				      * reasons:
-				      *
-				      * 1. It only operates on a
-				      * FiniteElementData
-				      * structure. This is ok in the
-				      * present context, since we can
-				      * control which types of
-				      * arguments it is called with
-				      * because this is a private
-				      * function. However, the
-				      * publicly visible function in
-				      * the FETools class needs
-				      * to make sure that the
-				      * FiniteElementData object
-				      * it works on actually
-				      * represents a continuous finite
-				      * element, which we found too
-				      * difficult if we do not pass an
-				      * object of type FE_Q()
-				      * directly.
-				      *
-				      * 2. If we would call the
-				      * publicly available version of
-				      * this function instead of this
-				      * one, we would have to pass a
-				      * finite element
-				      * object. However, since the
-				      * construction of an entire
-				      * finite element object can be
-				      * costly, we rather chose to
-				      * retain this function.
-				      *
-				      * 3. Third reason is that we
-				      * want to call this function for
-				      * faces as well, by just calling
-				      * this function for the finite
-				      * element of one dimension
-				      * less. If we would call the
-				      * global function instead, this
-				      * would require us to construct
-				      * a second finite element object
-				      * of one dimension less, just to
-				      * call this function. Since that
-				      * function does not make use of
-				      * hanging nodes constraints,
-				      * interpolation and restriction
-				      * matrices, etc, this would have
-				      * been a waste. Furthermore, it
-				      * would have posed problems with
-				      * template instantiations.
-				      *
-				      * To sum up, the existence of
-				      * this function is a compromise
-				      * between simplicity and proper
-				      * library design, where we have
-				      * chosen to weigh the simplicity
-				      * aspect a little more than
-				      * proper design.
-				      *
-				      * This function is called from
-				      * the constructor.
-				      */
-    static
-    std::vector<unsigned int>
-    lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
-					   const unsigned int            degree);
 
 				     /**
 				      * This is an analogon to the
-				      * previous function, but working
-				      * on faces. Called from the
+				      * FETools::lexicographic_to_hierarchic_numbering
+				      * function, but working on
+				      * faces. Called from the
 				      * constructor.
 				      */
     static
