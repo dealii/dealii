@@ -186,6 +186,9 @@ CFLAGS = @CFLAGS@
 
 # PETSc wants to see a whole lot of other flags being passed. ...
 ifeq ($(USE_CONTRIB_PETSC),yes)
+  # set PETSC_DIR and PETSC_ARCH to be used in variables file
+  PETSC_DIR  = $(DEAL_II_PETSC_DIR)
+  PETSC_ARCH = $(DEAL_II_PETSC_ARCH)
   ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
     include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/variables
   else
