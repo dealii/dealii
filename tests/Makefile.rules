@@ -134,7 +134,7 @@ run-tests: $(tests:%=%.OK)
 
 output: $(tests:%=%.output)
 
-exe: $(tests:%=%.exe)
+build: $(tests:%=%.exe)
 
 ############################################################
 # Link and copy files in ./results/* to generate checked

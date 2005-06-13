@@ -46,22 +46,22 @@ report+mail:
 build: build-base build-lac build-fe build-deal.II build-multigrid build-bits
 
 build-base: abort.o
-	cd base ; $(MAKE) exe
+	cd base ; $(MAKE) build
 
 build-lac: abort.o
-	cd lac ; $(MAKE) exe
+	cd lac ; $(MAKE) build
 
 build-fe: abort.o
-	cd fe ; $(MAKE) exe
+	cd fe ; $(MAKE) build
 
 build-bits: abort.o
-	cd bits ; $(MAKE) exe
+	cd bits ; $(MAKE) build
 
 build-deal.II: abort.o
-	cd deal.II ; $(MAKE) exe
+	cd deal.II ; $(MAKE) build
 
 build-multigrid: abort.o
-	cd multigrid ; $(MAKE) exe
+	cd multigrid ; $(MAKE) build
 
 
 # compilation and execution of tests only, no comparison with
