@@ -55,7 +55,7 @@ FETools::hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe
 	  h2l[i] = i-1;
 
 	break;
-      };
+      }
 
       case 2:
       {
@@ -87,7 +87,7 @@ FETools::hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe
 	Assert (next_index == fe.dofs_per_cell, ExcInternalError());
 
 	break;
-      };
+      }
 
       case 3:
       {
@@ -168,11 +168,11 @@ FETools::hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe
 	Assert (next_index == fe.dofs_per_cell, ExcInternalError());
 	
 	break;
-      };       
+      }       
 
       default:
 	    Assert (false, ExcNotImplemented());
-    };
+    }
 }
 
 
