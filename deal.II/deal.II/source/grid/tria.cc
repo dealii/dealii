@@ -260,7 +260,7 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 				       // adjacent to these vertices
       lines_at_vertex[cells[cell].vertices[0]].push_back (cell);
       lines_at_vertex[cells[cell].vertices[1]].push_back (cell);
-    };
+    }
 
 
 				   // some security tests
@@ -282,7 +282,7 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 	      clear_despite_subscriptions ();
 
 	      AssertThrow (false, ExcInternalError());
-      };
+      }
 
 				   // assert there are no more than
 				   // two boundary nodes
@@ -291,7 +291,7 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
       clear_despite_subscriptions();
       
       AssertThrow (false, ExcInternalError());
-    };
+    }
   
 
 
@@ -328,7 +328,7 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 					0,              // level
 					lines_at_vertex[line->vertex_index(vertex)][0]);
 	  line->set_neighbor (vertex, neighbor);
-	};
+	}
 
 
 				   // re-compute numbers of lines, etc
@@ -446,7 +446,7 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	      
 	      AssertThrow (false,
 			   ExcGridHasInvalidCell(cell));
-	    };
+	    }
 		  
 					   // insert line, with
 					   // invalid iterator if line
@@ -680,7 +680,7 @@ struct QuadComparator
 	  return true;
 	else
 	  return false;
-      };
+      }
 };
 
 
@@ -1457,7 +1457,7 @@ void Triangulation<1>::distort_random (const double factor,
 	{
 	  at_boundary[line->vertex_index(0)] = true;
 	  at_boundary[line->vertex_index(1)] = true;
-	};
+	}
       
       minimal_length[line->vertex_index(0)]
 	= std::min(line->diameter(),
@@ -1465,7 +1465,7 @@ void Triangulation<1>::distort_random (const double factor,
       minimal_length[line->vertex_index(1)]
 	= std::min(line->diameter(),
 		   minimal_length[line->vertex_index(1)]);
-    };
+    }
 
 
   const unsigned int n_vertices = vertices.size();
@@ -1490,7 +1490,7 @@ void Triangulation<1>::distort_random (const double factor,
 
 				       // finally move the vertex
       vertices[vertex] += shift_vector;
-    };
+    }
 }
 
 #endif
@@ -1544,7 +1544,7 @@ void Triangulation<dim>::distort_random (const double factor,
 	{
 	  at_boundary[line->vertex_index(0)] = true;
 	  at_boundary[line->vertex_index(1)] = true;
-	};
+	}
       
       minimal_length[line->vertex_index(0)]
 	= std::min(line->diameter(),
@@ -1552,7 +1552,7 @@ void Triangulation<dim>::distort_random (const double factor,
       minimal_length[line->vertex_index(1)]
 	= std::min(line->diameter(),
 		   minimal_length[line->vertex_index(1)]);
-    };
+    }
 
 
   const unsigned int n_vertices = vertices.size();
@@ -1577,7 +1577,7 @@ void Triangulation<dim>::distort_random (const double factor,
 
 				       // finally move the vertex
       vertices[vertex] += shift_vector;
-    };
+    }
 
 
 				   // finally correct hanging nodes
@@ -1620,7 +1620,7 @@ void Triangulation<dim>::set_all_refine_flags ()
     {
       cell->clear_coarsen_flag();
       cell->set_refine_flag ();
-    };
+    }
 }
 
 
@@ -1632,7 +1632,7 @@ void Triangulation<dim>::refine_global (const unsigned int times)
     {
       set_all_refine_flags();
       execute_coarsening_and_refinement ();
-    };
+    }
 }
 
 
@@ -1880,13 +1880,13 @@ void Triangulation<dim>::save_user_flags (std::vector<bool> &v) const
     {
       save_user_flags_quad (tmp);
       v.insert (v.end(), tmp.begin(), tmp.end());
-    };
+    }
   
   if (dim >= 3)
     {
       save_user_flags_hex (tmp);
       v.insert (v.end(), tmp.begin(), tmp.end());
-    };      
+    }      
 
   if (dim >= 4)
     Assert (false, ExcNotImplemented());
@@ -1930,7 +1930,7 @@ void Triangulation<dim>::load_user_flags (const std::vector<bool> &v)
       tmp.insert (tmp.end(),
 		  v.begin()+n_lines(), v.begin()+n_lines()+n_quads());
       load_user_flags_quad (tmp);
-    };
+    }
   
   if (dim >= 3)
     {
@@ -1938,7 +1938,7 @@ void Triangulation<dim>::load_user_flags (const std::vector<bool> &v)
       tmp.insert (tmp.end(),
 		  v.begin()+n_lines()+n_quads(), v.begin()+n_lines()+n_quads()+n_hexs());
       load_user_flags_hex (tmp);
-    };      
+    }      
 
   if (dim >= 4)
     Assert (false, ExcNotImplemented());
@@ -2219,13 +2219,13 @@ void Triangulation<dim>::save_user_pointers (std::vector<void *> &v) const
     {
       save_user_pointers_quad (tmp);
       v.insert (v.end(), tmp.begin(), tmp.end());
-    };
+    }
   
   if (dim >= 3)
     {
       save_user_pointers_hex (tmp);
       v.insert (v.end(), tmp.begin(), tmp.end());
-    };      
+    }      
 
   if (dim >= 4)
     Assert (false, ExcNotImplemented());
@@ -2252,7 +2252,7 @@ void Triangulation<dim>::load_user_pointers (const std::vector<void *> &v)
       tmp.insert (tmp.end(),
 		  v.begin()+n_lines(), v.begin()+n_lines()+n_quads());
       load_user_pointers_quad (tmp);
-    };
+    }
   
   if (dim >= 3)
     {
@@ -2260,7 +2260,7 @@ void Triangulation<dim>::load_user_pointers (const std::vector<void *> &v)
       tmp.insert (tmp.end(),
 		  v.begin()+n_lines()+n_quads(), v.begin()+n_lines()+n_quads()+n_hexs());
       load_user_pointers_hex (tmp);
-    };      
+    }      
 
   if (dim >= 4)
     Assert (false, ExcNotImplemented());
@@ -4174,8 +4174,8 @@ Triangulation<1>::execute_refinement ()
 	    {
 	      levels.push_back (new TriangulationLevel<dim>);
 	      break;
-	    };
-    };
+	    }
+    }
 
 
 				   // check how much space is needed
@@ -4222,7 +4222,7 @@ Triangulation<1>::execute_refinement ()
 	TriangulationLevel<1>::reserve_space (GeometryInfo<1>::children_per_cell*flagged_cells);
       
       needed_vertices += flagged_cells;
-    };
+    }
 
 				   // add to needed vertices how many
 				   // vertices are already in use
@@ -4238,7 +4238,7 @@ Triangulation<1>::execute_refinement ()
     {
       vertices.resize (needed_vertices, Point<1>());
       vertices_used.resize (needed_vertices, false);
-    };
+    }
 
 
 				   // Do REFINEMENT
@@ -4345,8 +4345,8 @@ Triangulation<1>::execute_refinement ()
 		    {
 		      left_neighbor = left_neighbor->child(1);
 		      left_neighbor->set_neighbor (1, first_child);
-		    };
-		};
+		    }
+		}
 	    
 					     // insert second child
 	    second_child->clear_children ();
@@ -4375,10 +4375,10 @@ Triangulation<1>::execute_refinement ()
 		    {
 		      right_neighbor = right_neighbor->child(0);
 		      right_neighbor->set_neighbor (0, second_child);
-		    };
-		};
-	  };      
-    };
+		    }
+		}
+	  }      
+    }
 
 
 				   // re-compute number of lines
@@ -4431,8 +4431,8 @@ Triangulation<2>::execute_refinement ()
 	    {
 	      levels.push_back (new TriangulationLevel<dim>);
 	      break;
-	    };
-    };
+	    }
+    }
 
 
 				   // first clear user flags for
@@ -4503,7 +4503,7 @@ Triangulation<2>::execute_refinement ()
 	    Assert (line->has_children() == false, ExcInternalError());
 	    needed_lines    += 2;
 	    needed_vertices += 1;
-	  };
+	  }
       
       
       				       // count number of used cells
@@ -4532,7 +4532,7 @@ Triangulation<2>::execute_refinement ()
 				       // level
       levels[level+1]->
 	TriangulationLevel<2>::reserve_space (4*flagged_cells);
-    };
+    }
 
 				   // add to needed vertices how many
 				   // vertices are already in use
@@ -4548,7 +4548,7 @@ Triangulation<2>::execute_refinement ()
     {
       vertices.resize (needed_vertices, Point<dim>());
       vertices_used.resize (needed_vertices, false);
-    };
+    }
 
 
 				   // Do REFINEMENT  
@@ -4641,8 +4641,8 @@ Triangulation<2>::execute_refinement ()
 					     // indicating the need
 					     // for refinement
 	    line->clear_user_flag ();
-	  };
-    };
+	  }
+    }
 
 				   // Now set up the new cells
   for (int level=0; level<static_cast<int>(levels.size())-1; ++level) 
@@ -4797,7 +4797,7 @@ Triangulation<2>::execute_refinement ()
 
 		Assert (new_lines[l]->used() == false,
                         ExcCellShouldBeUnused());
-	      };
+	      }
 
 	    new_lines[8] ->set (Line(new_vertices[1], new_vertices[8]));
 	    new_lines[9] ->set (Line(new_vertices[8], new_vertices[5]));
@@ -4812,7 +4812,7 @@ Triangulation<2>::execute_refinement ()
 		new_lines[l]->clear_children();
 						 // interior line
 		new_lines[l]->set_boundary_indicator(255);
-	      };
+	      }
 
 					     // Now add the four new
 					     // cells!
@@ -4833,7 +4833,7 @@ Triangulation<2>::execute_refinement ()
 			ExcCellShouldBeUnused());
 		subcells[i] = next_unused_cell;
 		++next_unused_cell;
-	      };
+	      }
 
 
 	    cell->set_children (subcells[0]->index());
@@ -5110,8 +5110,8 @@ Triangulation<3>::execute_refinement ()
 	    {
 	      levels.push_back (new TriangulationLevel<dim>);
 	      break;
-	    };
-    };
+	    }
+    }
 
 
 				   // first clear user flags for quads
@@ -5185,9 +5185,9 @@ Triangulation<3>::execute_refinement ()
 		    for (unsigned int line=0; line<4; ++line)
 		      if (aface->line(line)->has_children() == false)
 			aface->line(line)->set_user_flag ();
-		  };
-	      };
-	  };
+		  }
+	      }
+	  }
 
 				       // now count the quads and
 				       // lines which were flagged for
@@ -5199,7 +5199,7 @@ Triangulation<3>::execute_refinement ()
 	    needed_quads    += 4;
 	    needed_lines    += 4;
 	    needed_vertices += 1;
-	  };
+	  }
 
       for (line_iterator line=begin_line(level); line!=end_line(level); ++line)
 	if (line->user_flag_set())
@@ -5207,7 +5207,7 @@ Triangulation<3>::execute_refinement ()
 	    Assert (line->has_children() == false, ExcInternalError());
 	    needed_lines += 2;
 	    needed_vertices += 1;
-	  };
+	  }
 
 
 				       // count number of used cells on
@@ -5240,7 +5240,7 @@ Triangulation<3>::execute_refinement ()
 				       // level
       levels[level+1]->
 	TriangulationLevel<3>::reserve_space (8*flagged_cells);
-    };
+    }
 
 				   // add to needed vertices how many
 				   // vertices are already in use
@@ -5256,7 +5256,7 @@ Triangulation<3>::execute_refinement ()
     {
       vertices.resize (needed_vertices, Point<dim>());
       vertices_used.resize (needed_vertices, false);
-    };
+    }
 
 
 				   ///////////////////////////////////////////
@@ -5381,8 +5381,8 @@ Triangulation<3>::execute_refinement ()
 					     // indicating the need
 					     // for refinement
 	    line->clear_user_flag ();
-	  };
-    };
+	  }
+    }
 
 
 				   ///////////////////////////////////////
@@ -5489,7 +5489,7 @@ Triangulation<3>::execute_refinement ()
 
 		Assert (new_lines[i]->used() == false,
                         ExcCellShouldBeUnused());
-	      };
+	      }
 
 					     // set the data of the
 					     // four lines.
@@ -5528,7 +5528,7 @@ Triangulation<3>::execute_refinement ()
 		new_lines[i]->clear_user_pointer();
 		new_lines[i]->clear_children();
 		new_lines[i]->set_boundary_indicator(quad->boundary_indicator());
-	      };
+	      }
 
 
 					     // now for the
@@ -5612,14 +5612,14 @@ Triangulation<3>::execute_refinement ()
 		new_quads[i]->clear_user_pointer();
 		new_quads[i]->clear_children();
 		new_quads[i]->set_boundary_indicator (quad->boundary_indicator());
-	      };  
+	      }  
 	    
 					     // finally clear flag
 					     // indicating the need
 					     // for refinement
 	    quad->clear_user_flag ();
-	  };
-    };
+	  }
+    }
 
 				   ///////////////////////////////////
 				   // Now, finally, set up the new
@@ -5728,7 +5728,7 @@ Triangulation<3>::execute_refinement ()
 
 		Assert (new_lines[i]->used() == false,
                         ExcCellShouldBeUnused());
-	      };
+	      }
 
 					     // set the data of the
 					     // six lines.  first
@@ -5785,7 +5785,7 @@ Triangulation<3>::execute_refinement ()
 		new_lines[i]->clear_children();
 						 // interior line
 		new_lines[i]->set_boundary_indicator(255);
-	      };
+	      }
 
 
 					     // now for the
@@ -5953,7 +5953,7 @@ Triangulation<3>::execute_refinement ()
 
 		Assert (new_quads[i]->used() == false,
                         ExcCellShouldBeUnused());
-	      };
+	      }
 
 					     // set up the 12 quads,
 					     // numbered as follows
@@ -6047,7 +6047,7 @@ Triangulation<3>::execute_refinement ()
 		new_quads[i]->clear_children();
 						 // interior quad
 		new_quads[i]->set_boundary_indicator (255);
-	      };  
+	      }  
 
 
 					     /////////////////////////////////
@@ -6181,7 +6181,7 @@ Triangulation<3>::execute_refinement ()
 		Assert (new_hexes[i]->used() == false,
                         ExcCellShouldBeUnused());
 		++next_unused_hex;
-	      };
+	      }
 
 					     // note these hexes as
 					     // children to the
@@ -6450,10 +6450,10 @@ Triangulation<3>::execute_refinement ()
 				    ExcInternalError());
 			    Assert (!neighbor_cells[face][c]->has_children(),
 				    ExcInternalError());
-			  };
-		      };
-		  };
-	      };
+			  }
+		      }
+		  }
+	      }
 
 					     // now we've got all
 					     // neighbors, so set them
@@ -6586,15 +6586,15 @@ Triangulation<3>::execute_refinement ()
 
                     found:
                     ;
-		  };
+		  }
 
 
 					     // note that the
 					     // refinement flag was
 					     // already cleared at the
 					     // beginning of this loop
-	  };
-    };
+	  }
+    }
 
 				   // re-compute number of lines and
 				   // quads
@@ -6669,8 +6669,8 @@ void Triangulation<dim>::execute_coarsening ()
 	      Assert (cell->child(child)->coarsen_flag_set(),
 		      ExcInternalError());
 	      cell->child(child)->clear_coarsen_flag();
-	    };
-	};
+	    }
+	}
 
 
 				   // now do the actual coarsening
@@ -6813,15 +6813,15 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 			    cell->line(line)->set_user_flag();
 			
 			break;
-		      };
-		  };
+		      }
+		  }
 
 		if (offending_line_found)
 		  {
 		    mesh_changed = true;
 		    break;
-		  };
-	      };
+		  }
+	      }
 
 					     // there is another thing
 					     // here: if any of the
@@ -6852,8 +6852,8 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 		  mesh_changed = true;
 		  
 		  break;
-		};
-	  };
+		}
+	  }
     }
   while (mesh_changed == true);
 }
@@ -6909,7 +6909,7 @@ void Triangulation<dim>::fix_coarsen_flags () {
 	  if (cell->level() == 0)
 	    cell->clear_coarsen_flag();
 	  continue;
-	};
+	}
 	  
       flagged_children = 0;
       for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
@@ -6920,14 +6920,14 @@ void Triangulation<dim>::fix_coarsen_flags () {
 					     // clear flag since we
 					     // don't need it anymore
 	    cell->child(child)->clear_coarsen_flag();
-	  };
+	  }
 	  
 				       // flag this cell for
 				       // coarsening if all children
 				       // were flagged
       if (flagged_children == GeometryInfo<dim>::children_per_cell)
 	cell->set_user_flag();
-    };
+    }
       
 				   // in principle no coarsen flags
 				   // should be set any more at this
@@ -6968,7 +6968,7 @@ void Triangulation<dim>::fix_coarsen_flags () {
 						     // some time
 		    child_neighbor->refine_flag_set())
 		  coarsening_allowed = false;
-	    };
+	    }
 	
 					 // if allowed: tag the
 					 // children for coarsening
@@ -6979,8 +6979,8 @@ void Triangulation<dim>::fix_coarsen_flags () {
 		      ExcInternalError());
 	      
 	      cell->child(c)->set_coarsen_flag();
-	    };
-      };
+	    }
+      }
 }
 
 
@@ -7006,7 +7006,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 
       return ((flags_before[0] != flags_after[0]) ||
 	      (flags_before[1] != flags_after[1]));
-    };
+    }
 
 				   // for all other dimensions
 
@@ -7283,7 +7283,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 		      {
 			all_children_active = false;
 			break;
-		      };
+		      }
 
 		if (all_children_active) 
 		  {
@@ -7332,8 +7332,8 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 				if (tagged_children ==
 				    GeometryInfo<dim>::children_per_cell)
 				  ++unrefined_neighbors;
-			      };
-		      };
+			      }
+		      }
 		
 						     // if all
 						     // neighbors
@@ -7384,9 +7384,9 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 			  }
 		      else 
 			cell->clear_refine_flag();
-		  };
-	      };
-	};
+		  }
+	      }
+	}
 
 				       //////////////////////////////////////
 				       // STEP 2:
@@ -7445,8 +7445,8 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 						     // this inner
 						     // loop.
 		    break;
-		  };	  
-	};
+		  }	  
+	}
 
 				       /////////////////////////////////////
 				       // STEP 3:      
@@ -7493,16 +7493,16 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 		      ++refined_neighbors;
 		    else
 		      ++unrefined_neighbors;
-		  };
+		  }
 
 	      if (unrefined_neighbors < refined_neighbors)
 		{
 		  if (cell->coarsen_flag_set())
 		    cell->clear_coarsen_flag();
 		  cell->set_refine_flag ();
-		};
-	    };
-	};
+		}
+	    }
+	}
 
 
 				       /////////////////////////////////
@@ -7716,8 +7716,8 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 						       // namely our present
 						       // neighbor
 		      cell->neighbor(i)->clear_coarsen_flag ();
-		};
-	  };
+		}
+	  }
 
 				       //////////////////////////////////////
 				       // STEP 6:
@@ -7804,8 +7804,8 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
 	      neighbor = neighbor->child(1);
 	    else
 	      break;
-	  };
-      };
+	  }
+      }
 
   				   // now do it for the cells to the
 				   // left
@@ -7831,8 +7831,8 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
 	      neighbor = neighbor->child(0);
 	    else
 	      break;
-	  };
-      };
+	  }
+      }
 
 
 				   // delete the vertex which will not
@@ -7850,7 +7850,7 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
       cell->child(child)->clear_user_pointer();
       cell->child(child)->clear_user_flag();
       cell->child(child)->clear_used_flag();
-    };
+    }
 
 
 				   // delete pointer to children
@@ -7923,7 +7923,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
 	       ++neighbor_neighbor)
 	    if (neighbor->neighbor(neighbor_neighbor) == cell->child(child))
 	      neighbor->set_neighbor(neighbor_neighbor, cell);
-      };
+      }
 
 				   // delete the vertex which will not
 				   // be needed anymore. This vertex
@@ -7972,10 +7972,10 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
 	    cell->face(face)->child(subface)->clear_user_pointer ();
 	    cell->face(face)->child(subface)->clear_user_flag ();
 	    cell->face(face)->child(subface)->clear_used_flag ();
-	  };
+	  }
 	
 	cell->face(face)->clear_children();
-      };
+      }
   
 				   // invalidate children
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
@@ -7983,7 +7983,7 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
       cell->child(child)->clear_user_pointer();
       cell->child(child)->clear_user_flag();
       cell->child(child)->clear_used_flag();
-    };
+    }
 
 
 				   // delete pointer to children
@@ -8056,7 +8056,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	       ++neighbor_neighbor)
 	    if (neighbor->neighbor(neighbor_neighbor) == cell->child(child))
 	      neighbor->set_neighbor(neighbor_neighbor, cell);
-      };
+      }
 
 				   // delete the vertex which will not
 				   // be needed anymore. This vertex
@@ -8108,14 +8108,14 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
       interior_quads[q]->clear_user_pointer();
       interior_quads[q]->clear_user_flag();
       interior_quads[q]->clear_used_flag();
-    };
+    }
 
   for (unsigned int l=0; l<6; ++l)
     {
       interior_lines[l]->clear_user_pointer();
       interior_lines[l]->clear_user_flag();
       interior_lines[l]->clear_used_flag();
-    };
+    }
 
 				   // for the six faces: if the
 				   // neighbor does not itself need
@@ -8147,7 +8147,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	    interior_lines[l]->clear_user_pointer ();
 	    interior_lines[l]->clear_user_flag ();
 	    interior_lines[l]->clear_used_flag ();
-	  };
+	  }
 	
 					 // delete the four subfaces
 	for (unsigned int subface=0;
@@ -8156,10 +8156,10 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	    quad->child(subface)->clear_user_pointer ();
 	    quad->child(subface)->clear_user_flag ();
 	    quad->child(subface)->clear_used_flag ();
-	  };
+	  }
 	
 	quad->clear_children();
-      };
+      }
 
 				   // invalidate children
   for (unsigned int child=0; child<GeometryInfo<dim>::children_per_cell; ++child)
@@ -8171,7 +8171,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
         cell->child(child)->set_face_orientation (f, false);
       
       cell->child(child)->clear_used_flag();
-    };
+    }
 
 
 				   // delete pointer to children
@@ -8273,10 +8273,10 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 		      ExcInternalError());
 	      
 	      line_is_needed[cell->face(nb)->line(i)] = true;
-	    };
+	    }
 					   // ok for this neighbor
 	  continue;
-	};
+	}
 
 				       // if the neighbor is not
 				       // refined, then it may still
@@ -8308,7 +8308,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	      Assert (!neighbor_neighbor->has_children(),
 		      ExcInternalError());
 	      continue;
-	    };
+	    }
 
 					   // neighbor's neighbor is
 					   // on same level. if it has
@@ -8325,9 +8325,9 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 
 		if (line_is_needed.find(line) != line_is_needed.end())
 		  line_is_needed[line] = true;
-	      };
-	};
-    };
+	      }
+	}
+    }
 
 
 				   // now, if the lines are not marked
@@ -8347,10 +8347,10 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	    line->child(child)->clear_user_pointer();
 	    line->child(child)->clear_user_flag();
 	    line->child(child)->clear_used_flag();
-	  };
+	  }
 
 	line->clear_children();
-      };
+      }
 }
 
 #endif
@@ -8409,7 +8409,7 @@ void Triangulation<dim>::read_bool_vector (const unsigned int  magic_number1,
     {
       in >> tmp;
       flags[i] = tmp;
-    };
+    }
 
   for (unsigned int position=0; position!=N; ++position)
     v[position] = (flags[position/8] & (1<<(position%8)));
@@ -8465,11 +8465,11 @@ void Triangulation<dim>::update_number_cache_lines ()
 				begin_line (level+1));
 	  for (; line!=endc; ++line)
 	    ++number_cache.n_lines_level[level];
-	};
+	}
       
 				       // update total number of lines
       number_cache.n_lines += number_cache.n_lines_level[level];
-    };
+    }
 
 				   // do the update for the number of
 				   // active lines as well
@@ -8485,11 +8485,11 @@ void Triangulation<dim>::update_number_cache_lines ()
 			       endc = end_active_line (level);
 	  for (; line!=endc; ++line)
 	    ++number_cache.n_active_lines_level[level];
-	};
+	}
       
 				       // update total number of lines
       number_cache.n_active_lines += number_cache.n_active_lines_level[level];
-    };
+    }
 }
 
 
@@ -8526,11 +8526,11 @@ void Triangulation<dim>::update_number_cache_quads ()
 				begin_quad (level+1));
 	  for (; quad!=endc; ++quad)
 	    ++number_cache.n_quads_level[level];
-	};
+	}
       
 				       // update total number of quads
       number_cache.n_quads += number_cache.n_quads_level[level];
-    };
+    }
 
 				   // do the update for the number
 				   // of active quads as well
@@ -8546,11 +8546,11 @@ void Triangulation<dim>::update_number_cache_quads ()
 			       endc = end_active_quad (level);
 	  for (; quad!=endc; ++quad)
 	    ++number_cache.n_active_quads_level[level];
-	};
+	}
       
 				       // update total number of quads
       number_cache.n_active_quads += number_cache.n_active_quads_level[level];
-    };
+    }
 }
 
 #endif
@@ -8600,11 +8600,11 @@ void Triangulation<dim>::update_number_cache_hexes ()
 			      begin_hex (level+1));
 	  for (; hex!=endc; ++hex)
 	    ++number_cache.n_hexes_level[level];
-	};
+	}
       
 				       // update total number of hexes
       number_cache.n_hexes += number_cache.n_hexes_level[level];
-    };
+    }
 
 				   // do the update for the number
 				   // of active hexes as well
@@ -8620,11 +8620,11 @@ void Triangulation<dim>::update_number_cache_hexes ()
 			     endc = end_active_hex (level);
 	  for (; hex!=endc; ++hex)
 	    ++number_cache.n_active_hexes_level[level];
-	};
+	}
       
 				       // update total number of hexes
       number_cache.n_active_hexes += number_cache.n_active_hexes_level[level];
-    };
+    }
 }
 
 #endif
@@ -8647,7 +8647,7 @@ void Triangulation<dim>::update_number_cache ()
 	    
       default:
 	    Assert (false, ExcInternalError());
-    };
+    }
 }
 
 
