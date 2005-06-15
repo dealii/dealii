@@ -63,7 +63,7 @@ int main (int argc,char **argv)
       PetscInitialize(&argc,&argv,0,0);
       {
         std::vector<unsigned int> row_lengths (5, 3U);
-        row_lengths.back() == 2;
+        row_lengths.back() = 2;
         PETScWrappers::SparseMatrix m (5,5,row_lengths);
         test (m);
       }
