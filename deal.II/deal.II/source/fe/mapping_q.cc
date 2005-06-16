@@ -954,21 +954,6 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 		     lines_per_face    = GeometryInfo<3>::lines_per_face,
 		     vertices_per_cell = GeometryInfo<3>::vertices_per_cell;
 
-                                   // mapping of faces to vertex
-                                   // indices for properly oriented
-                                   // faces is given by
-                                   // GeometryInfo<3>::face_to_cell_vertices
-				   //
-                                   // same if the face is in opposite
-                                   // orientation
-  static const unsigned int face_to_cell_vertices2
-    [faces_per_cell][vertices_per_face]={{0,3,2,1},
-					 {4,7,6,5},
-					 {0,4,5,1},
-					 {1,2,6,5},
-					 {3,7,6,2},
-					 {0,3,7,4}};
-
   static const StraightBoundary<3> straight_boundary;
 				   // used if face quad at boundary or
 				   // entirely in the interior of the
@@ -991,29 +976,17 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 
                                        // some sanity checks up front
       for (unsigned int i=0; i<vertices_per_face; ++i)
-        Assert(face->vertex_index(i)==
-               cell->vertex_index(face_orientation ?
-				  GeometryInfo<3>::face_to_cell_vertices(face_no, i) :
-				  face_to_cell_vertices2[face_no][i]),
-               ExcInternalError());
-      
+        Assert(face->vertex_index(i)==cell->vertex_index(
+	  GeometryInfo<3>::face_to_cell_vertices(face_no, i, face_orientation)),
+	  ExcInternalError());
 
 				       // indices of the lines that
-				       // bound a properly oriented
-				       // face are given by
+				       // bound a face are given by
 				       // GeometryInfo<3>::
-				       // face_to_cell_lines(face_no, line_no)
-				       //
-				       // same for faces in wrong
-				       // orientation is given by
-				       // GeometryInfo<3>::
-				       // face_to_cell_lines(face_no, 3-line_no)
+				       // face_to_cell_lines
       for (unsigned int i=0; i<lines_per_face; ++i)
-        Assert(face->line(i)==
-               cell->line(face_orientation ?
-			  GeometryInfo<3>::face_to_cell_lines(face_no, i) :
-			  GeometryInfo<3>::face_to_cell_lines(face_no, 3-i)),
-               ExcInternalError());
+        Assert(face->line(i)==cell->line(GeometryInfo<3>::face_to_cell_lines(
+	  face_no, i, face_orientation)), ExcInternalError());
       
 				       // if face at boundary, then
 				       // ask boundary object to
@@ -1064,17 +1037,13 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
 	      
 					       // sort the points into b
               for (unsigned int i=0; i<vertices_per_face; ++i)
-                b[i]=a[face_orientation ?
-		      GeometryInfo<3>::face_to_cell_vertices(face_no, i) :
-		      face_to_cell_vertices2[face_no][i]];
+                b[i]=a[GeometryInfo<3>::face_to_cell_vertices(face_no, i, face_orientation)];
 		      
               for (unsigned int i=0; i<lines_per_face; ++i)
                 for (unsigned int j=0; j<degree-1; ++j)
                   b[vertices_per_face+i*(degree-1)+j]=
-                    a[vertices_per_cell+
-		     (face_orientation ?
-		      GeometryInfo<3>::face_to_cell_lines(face_no, i) :
-		      GeometryInfo<3>::face_to_cell_lines(face_no, 3-i))*(degree-1)+j];
+                    a[vertices_per_cell + GeometryInfo<3>::face_to_cell_lines(
+		      face_no, i, face_orientation)*(degree-1)+j];
 
 					       // Now b includes the
 					       // right order of

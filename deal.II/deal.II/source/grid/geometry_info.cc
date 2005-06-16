@@ -109,7 +109,8 @@ GeometryInfo<3>::unit_normal_orientation[GeometryInfo<3>::faces_per_cell]
 template <>
 unsigned int
 GeometryInfo<1>::child_cell_on_face (const unsigned int face,
-                                     const unsigned int subface)
+                                     const unsigned int subface,
+				     const bool)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (subface==subfaces_per_face, ExcIndexRange(subface, 0, 1));
@@ -122,7 +123,8 @@ GeometryInfo<1>::child_cell_on_face (const unsigned int face,
 template <>
 unsigned int
 GeometryInfo<2>::child_cell_on_face (const unsigned int face,
-                                     const unsigned int subface)
+                                     const unsigned int subface,
+				     const bool)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
@@ -140,11 +142,13 @@ GeometryInfo<2>::child_cell_on_face (const unsigned int face,
 template <>
 unsigned int
 GeometryInfo<3>::child_cell_on_face (const unsigned int face,
-				     const unsigned int subface)
+				     const unsigned int subface,
+				     const bool face_orientation)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
-  
+  static const unsigned int
+    flip[GeometryInfo<3>::subfaces_per_face] = { 0, 3, 2, 1 };
   static const unsigned
     subcells[faces_per_cell][subfaces_per_face] = {{0, 1, 2, 3},
                                                    {4, 5, 6, 7},
@@ -152,7 +156,7 @@ GeometryInfo<3>::child_cell_on_face (const unsigned int face,
                                                    {1, 5, 6, 2},
                                                    {3, 2, 6, 7},
                                                    {0, 4, 7, 3}};
-  return subcells[face][subface];
+  return face_orientation ? subcells[face][subface] : subcells[face][flip[subface]];
 }
 
 
@@ -208,7 +212,8 @@ GeometryInfo<3>::line_to_cell_vertices (const unsigned int line,
 template <>
 unsigned int
 GeometryInfo<3>::face_to_cell_lines (const unsigned int face,
-				     const unsigned int line)
+				     const unsigned int line,
+				     const bool face_orientation)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (line<lines_per_face, ExcIndexRange(line, 0, lines_per_face));
@@ -221,7 +226,7 @@ GeometryInfo<3>::face_to_cell_lines (const unsigned int face,
 					     {2,10, 6,11},
 					     {8, 7,11, 3}};
 
-  return lines[face][line];
+  return face_orientation ? lines[face][line] : lines[face][3-line];
 }
 
 
@@ -230,9 +235,10 @@ template <int dim>
 inline
 unsigned int
 GeometryInfo<dim>::face_to_cell_vertices (const unsigned int face,
-					  const unsigned int vertex)
+					  const unsigned int vertex,
+					  const bool face_orientation)
 {
-  return child_cell_on_face(face, vertex);
+  return child_cell_on_face(face, vertex, face_orientation);
 }
 
 

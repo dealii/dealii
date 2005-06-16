@@ -2195,11 +2195,8 @@ neighbor_child_on_subface (const unsigned int face,
     = (this->neighbor(face)->face_orientation(neighbor_neighbor) ==
        this->face_orientation(face));
   const unsigned int neighbor_child_index
-    = (GeometryInfo<3>::
-       child_cell_on_face(neighbor_neighbor,
-                          (face_orientations_match ?
-                           subface :
-                           subface_translation[subface])));
+    = GeometryInfo<3>::child_cell_on_face(neighbor_neighbor, subface,
+					  face_orientations_match);
   const TriaIterator<3,CellAccessor<3> > neighbor_child=
     this->neighbor(face)->child(neighbor_child_index);
 

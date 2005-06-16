@@ -6280,6 +6280,16 @@ Triangulation<3>::execute_refinement ()
                 new_hexes[GeometryInfo<dim>::child_cell_on_face(f,s)]
                   ->set_face_orientation(f, hex->face_orientation(f));
             
+#ifdef DEBUG
+					     // check consistency
+					     // against
+					     // GeometryInfo<3>::child_cell_on_face
+	    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	      for (unsigned int s=0; s<GeometryInfo<dim>::subfaces_per_face; ++s) 
+		Assert(hex->face(f)->child(s)==hex->child(
+		  GeometryInfo<dim>::child_cell_on_face(
+		    f, s, hex->face_orientation(f)))->face(f), ExcInternalError());
+#endif
 
 					     /////////////////////////////////
 					     // now the only thing still
@@ -6431,19 +6441,12 @@ Triangulation<3>::execute_refinement ()
                              &&
                              hex->face_orientation(face));
                         
-                        static const unsigned int
-                          child_switch_table[GeometryInfo<dim>::subfaces_per_face]
-                          = { 0, 3, 2, 1 };
-                        
 			for (unsigned int c=0;
 			     c<GeometryInfo<dim>::subfaces_per_face; ++c)
 			  {
 			    neighbor_cells[face][c]
 			      = neighbor->child(GeometryInfo<dim>::
-                                                child_cell_on_face(nb_nb,
-                                                                   orient ?
-                                                                   c :
-                                                                   child_switch_table[c]));
+						child_cell_on_face(nb_nb, c, orient));
 			    
 			    Assert (neighbor_cells[face][c].state() ==
 				    IteratorState::valid,

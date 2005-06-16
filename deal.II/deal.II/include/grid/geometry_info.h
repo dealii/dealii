@@ -353,34 +353,20 @@ struct GeometryInfo
 				      * the exact order of the
 				      * children is laid down in the
 				      * documentation of the
-				      * Triangulation class.
-				      * However, it must be noted that
-				      * this class and function only
-				      * deals with faces in standard
-				      * orientation. In 3d, faces can
-				      * exist in two orientations,
-				      * though, and if a face is in
-				      * the wrong orientation, then
-				      * this function may not give you
-				      * what you want. You can inquire
-				      * about the face orientation
-				      * using the
-				      * <tt>cell->face_orientation</tt>
-				      * function, and the function to
-				      * ask for a neighbor's cell
-				      * behind a given face and
-				      * subface is
-				      * <tt>cell->neighbor_child_on_subface</tt>.
-				      * The latter function, in
-				      * contrast to the present one,
-				      * also takes into account the
-				      * actual orientation of the
-				      * faces of a cell and will
-				      * return the correct result in
-				      * all cases.
+				      * Triangulation class. Through
+				      * the <tt>face_orientation</tt>
+				      * argument this function handles
+				      * faces oriented in both, the
+				      * standard and non-standard
+				      * orientation.
+				      * <tt>face_orientation</tt>
+				      * defaults to <tt>true</tt>
+				      * (standard orientation) and has
+				      * no effect in 2d.
 				      */
     static unsigned int child_cell_on_face (const unsigned int face,
-					    const unsigned int subface);
+					    const unsigned int subface,
+					    const bool face_orientation = true);
     
 				     /**
 				      * Map line vertex number to cell
@@ -416,6 +402,17 @@ struct GeometryInfo
 				      * face <tt>face</tt>, e.g.
 				      * <tt>GeometryInfo<2>::face_to_cell_vertices(2,0)=3</tt>.
 				      *
+				      * Through the
+				      * <tt>face_orientation</tt>
+				      * argument this function handles
+				      * faces oriented in both, the
+				      * standard or non-standard
+				      * orientation.
+				      * <tt>face_orientation</tt>
+				      * defaults to <tt>true</tt>
+				      * (standard orientation) and has
+				      * no effect in 2d.
+				      *
 				      * As the children of a cell are
 				      * ordered according to the
 				      * vertices of the cell, this
@@ -427,7 +424,8 @@ struct GeometryInfo
 				      * a suggestive name.
 				      */
     static unsigned int face_to_cell_vertices (const unsigned int face,
-					       const unsigned int vertex);
+					       const unsigned int vertex,
+					       const bool face_orientation = true);
 
 				     /**
 				      * Map face line number to cell
@@ -437,12 +435,23 @@ struct GeometryInfo
 				      * <tt>face</tt>, e.g.
 				      * <tt>GeometryInfo<3>::face_to_cell_lines(3,1)=5</tt>.
 				      *
+				      * Through the
+				      * <tt>face_orientation</tt>
+				      * argument this function handles
+				      * faces oriented in both, the
+				      * standard and non-standard
+				      * orientation.
+				      * <tt>face_orientation</tt>
+				      * defaults to <tt>true</tt>
+				      * (standard orientation).
+				      *
 				      * This function is useful and
 				      * implemented for
 				      * <tt>dim=3</tt>, only.
 				      */
     static unsigned int face_to_cell_lines (const unsigned int face,
-					    const unsigned int line);
+					    const unsigned int line,
+					    const bool face_orientation = true);
     
 				     /**
 				      * Return the position of the
