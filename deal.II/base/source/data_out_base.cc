@@ -2394,9 +2394,9 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 					       // lower left corner
 		<< "0 0 "
 					       // upper right corner
-		<< static_cast<unsigned int>( (x_max-x_min) * scale )
+		<< static_cast<unsigned int>( rint((x_max-x_min) * scale ))
 		<< ' '
-		<< static_cast<unsigned int>( (y_max-y_min) * scale )
+		<< static_cast<unsigned int>( rint((y_max-y_min) * scale ))
 		<< std::endl;
 	    
 					     // define some abbreviations to keep
