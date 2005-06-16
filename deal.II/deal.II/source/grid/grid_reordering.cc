@@ -641,16 +641,17 @@ namespace internal
 					* the edge -1 means the end
 					* of the edge.
 					*/
+//TODO: we should really initialize these entries as forward_edge or backward_edge, but gcc2.95 has a bug where it zero-initializes these data elements instead, leading to aborts later on.
       static const EdgeOrientation edge_to_node_orient[8][3] = 
       {
-	    {forward_edge,forward_edge,forward_edge},
-	    {backward_edge,forward_edge,forward_edge},
-	    {backward_edge,backward_edge,forward_edge},
-	    {forward_edge,backward_edge,forward_edge},
-	    {forward_edge,forward_edge,backward_edge},
-	    {backward_edge,forward_edge,backward_edge},
-	    {backward_edge,backward_edge,backward_edge}, 
-	    {forward_edge,backward_edge,backward_edge}
+	    {{'f'},{'f'},{'f'}},
+	    {{'b'},{'f'},{'f'}},
+	    {{'b'},{'b'},{'f'}},
+	    {{'f'},{'b'},{'f'}},
+	    {{'f'},{'f'},{'b'}},
+	    {{'b'},{'f'},{'b'}},
+	    {{'b'},{'b'},{'b'}}, 
+	    {{'f'},{'b'},{'b'}}
       };	    
     
 				       /**
