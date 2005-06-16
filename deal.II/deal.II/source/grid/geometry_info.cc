@@ -147,8 +147,9 @@ GeometryInfo<3>::child_cell_on_face (const unsigned int face,
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
-  static const unsigned int
-    flip[GeometryInfo<3>::subfaces_per_face] = { 0, 3, 2, 1 };
+
+  static const unsigned int flip[subfaces_per_face] = { 0, 3, 2, 1 };
+
   static const unsigned
     subcells[faces_per_cell][subfaces_per_face] = {{0, 1, 2, 3},
                                                    {4, 5, 6, 7},
