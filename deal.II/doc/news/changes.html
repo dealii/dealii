@@ -429,12 +429,27 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: The <code class="class">GeometryInfo</code>::<code
+       class="member">child_cell_on_face</code>, <code
+       class="member">face_to_cell_vertices</code> and <code
+       class="member">face_to_cell_lines</code> now have an additional
+       <code>face_orientation</code> argument, which has no effect in
+       2d and which defaults to <code>true</code> (standard
+       orientation) in 3d. Now these functions return the right values
+       also for the case of non-standard oriented faces in 3d. This
+       avoids several aweful pieces of code including questioning
+       face_orientation and using child_switch_tables.
+       <br> 
+       (RH, 2005/06/16)
+       </p>
+
+  <li> <p>
        Changed: The method <code class="class">FETools</code>::<code
        class="member">lexicographic_to_hierarchic_numbering</code> now
        takes a <code class="class">FiniteElementData</code> instead of
        a <code class="class">FE_Q</code> object. Now this function can
        also be called by the <code class="class">FE_Q</code>
-       constructor avoiding duplication of code.
+       constructor which avoids code duplication.
        <br> 
        (RH, 2005/06/13)
        </p>
