@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -87,9 +87,9 @@ check ()
     }
   else
     GridGenerator::hyper_cube(tr, -1./std::sqrt(static_cast<double>(dim)),1./std::sqrt(static_cast<double>(dim)));
+  static const HyperBallBoundary<dim> boundary;
   if (dim != 1)
     {
-      static const HyperBallBoundary<dim> boundary;
       tr.set_boundary (0, boundary);
     };
   tr.refine_global (1);

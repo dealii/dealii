@@ -31,9 +31,9 @@ template <int dim>
 void test ()
 {  
   Triangulation<dim> tria;
+  static const HyperBallBoundary<dim> x;
   if (dim == 2)
     {
-      static const HyperBallBoundary<dim> x;
       tria.set_boundary (0, x);
       GridGenerator::hyper_ball (tria);
     }
