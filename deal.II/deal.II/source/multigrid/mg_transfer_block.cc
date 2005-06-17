@@ -113,7 +113,7 @@ void MGTransferBlockBase::build_matrices (
   component_start.resize(target_component.size());
   DoFTools::
     count_dofs_per_component (static_cast<const DoFHandler<dim>&>(mg_dof),
-                              component_start, target_component);
+                              component_start, true, target_component);
 
   unsigned int k=0;
   for (unsigned int i=0;i<component_start.size();++i)

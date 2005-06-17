@@ -26,6 +26,7 @@
 #include <fe/fe_dgq.h>
 #include <fe/fe_dgp.h>
 #include <fe/fe_nedelec.h>
+#include <fe/fe_raviart_thomas.h>
 #include <fe/fe_system.h>
 
 #include <fstream>
@@ -158,8 +159,18 @@ main()
 
       CHECK(Nedelec, 1, 2);
       CHECK(Nedelec, 1, 3);
-  
 
+      CHECK(RaviartThomas, 0, 2);
+      CHECK(RaviartThomas, 1, 2);
+      CHECK(RaviartThomas, 2, 2);
+
+      CHECK(RaviartThomasNodal, 0, 2);
+      CHECK(RaviartThomasNodal, 1, 2);
+      CHECK(RaviartThomasNodal, 2, 2);
+      CHECK(RaviartThomasNodal, 0, 3);
+      CHECK(RaviartThomasNodal, 1, 3);
+      CHECK(RaviartThomasNodal, 2, 3);
+      
       CHECK_SYS1(FE_Q<1>(1),  3,1);
       CHECK_SYS1(FE_DGQ<1>(2),2,1);
       CHECK_SYS1(FE_DGP<1>(3),1,1);

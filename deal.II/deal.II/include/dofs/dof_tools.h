@@ -906,6 +906,17 @@ class DoFTools
 				      * than the total number of
 				      * degrees of freedom.
 				      *
+				      * This behavior can be switched
+				      * off by the optional parameter
+				      * <tt>vector_valued_once</tt>. If
+				      * this is <tt>true</tt>, the
+				      * number of components of a
+				      * nonprimitive vector valued
+				      * element is collected only in
+				      * the first component. All other
+				      * components will have a count
+				      * of zero.
+				      *
 				      * The additional optional
 				      * argument @p target_component
 				      * allows for a re-sorting and
@@ -934,6 +945,7 @@ class DoFTools
     static void
     count_dofs_per_component (const DoFHandler<dim>&     dof_handler,
 			      std::vector<unsigned int>& dofs_per_component,
+			      const bool vector_valued_once = false,
 			      std::vector<unsigned int>  target_component
 			      =std::vector<unsigned int>());
     

@@ -90,7 +90,7 @@ void check_select(const FiniteElement<dim>& fe,
   mgdof.distribute_dofs(fe);
   DoFRenumbering::component_wise(mgdof, target_component);
   vector<unsigned int> ndofs(fe.n_components());
-  DoFTools::count_dofs_per_component(mgdof, ndofs, target_component);
+  DoFTools::count_dofs_per_component(mgdof, ndofs, true, target_component);
   
   for (unsigned int l=0;l<tr.n_levels();++l)
     DoFRenumbering::component_wise(mgdof, l, mg_target_component);

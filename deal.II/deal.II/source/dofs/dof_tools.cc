@@ -1723,9 +1723,11 @@ void
 DoFTools::count_dofs_per_component (
   const DoFHandler<dim>&     dof_handler,
   std::vector<unsigned int>& dofs_per_component,
+  bool only_once,
   std::vector<unsigned int>  target_component)
 {
-  const unsigned int n_components = dof_handler.get_fe().n_components();
+  const FiniteElement<dim>& fe = dof_handler.get_fe();
+  const unsigned int n_components = fe.n_components();
   dofs_per_component.resize (n_components);
   std::fill (dofs_per_component.begin(), dofs_per_component.end(), 0U);
   
@@ -1750,8 +1752,9 @@ DoFTools::count_dofs_per_component (
     {
       dofs_per_component[0] = dof_handler.n_dofs();
       return;
-    };
-  
+    }
+
+      
 				   // otherwise determine the number
 				   // of dofs in each component
 				   // separately. do so in parallel
@@ -1775,12 +1778,27 @@ DoFTools::count_dofs_per_component (
   threads.join_all ();
 
 				   // next count what we got
-  for (unsigned int i=0; i<n_components; ++i)
-    dofs_per_component[target_component[i]]
-      += std::count(dofs_in_component[i].begin(),
-		    dofs_in_component[i].end(),
-		    true);
-
+  unsigned int component = 0;
+  for (unsigned int b=0;b<fe.n_base_elements();++b)
+    {
+      const FiniteElement<dim>& base = fe.base_element(b);
+				       // Dimension of base element
+      unsigned int d = base.n_components();
+      
+      for (unsigned int m=0;m<fe.element_multiplicity(b);++m)
+	{
+	  for (unsigned int dd=0;dd<d;++dd)
+	    {
+	      if (base.is_primitive() || (!only_once || dd==0))
+	      dofs_per_component[target_component[component]]
+		+= std::count(dofs_in_component[component].begin(),
+			      dofs_in_component[component].end(),
+			      true);
+	      ++component;
+	    }
+	}
+    }
+  
 				   // finally sanity check. this is
 				   // only valid if the finite element
 				   // is actually primitive, so
@@ -3118,7 +3136,7 @@ template
 void
 DoFTools::count_dofs_per_component<deal_II_dimension> (
   const DoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
+  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
 
 template
 void

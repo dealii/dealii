@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,12 +38,28 @@ check_this (const DoFHandler<dim> &dof_handler)
     deallog << ' ' << dofs_per_component[i];
   deallog << std::endl;
 
+  DoFTools::count_dofs_per_component (dof_handler,
+				      dofs_per_component, true);
+
+  for (unsigned int i=0;i<n_components;++i)
+    deallog << ' ' << dofs_per_component[i];
+  deallog << std::endl;
+
   if (n_components>1)
     {
       std::vector<unsigned int> target_component(n_components,0U);
 
       DoFTools::count_dofs_per_component (dof_handler,
 					  dofs_per_component,
+					  false,
+					  target_component);
+      for (unsigned int i=0;i<n_components;++i)
+	deallog << ' ' << dofs_per_component[i];
+      deallog << std::endl;
+
+      DoFTools::count_dofs_per_component (dof_handler,
+					  dofs_per_component,
+					  true,
 					  target_component);
       for (unsigned int i=0;i<n_components;++i)
 	deallog << ' ' << dofs_per_component[i];
@@ -54,6 +70,14 @@ check_this (const DoFHandler<dim> &dof_handler)
       
       DoFTools::count_dofs_per_component (dof_handler,
 					  dofs_per_component,
+					  false,
+					  target_component);
+      for (unsigned int i=0;i<n_components;++i)
+	deallog << ' ' << dofs_per_component[i];
+      deallog << std::endl;
+      DoFTools::count_dofs_per_component (dof_handler,
+					  dofs_per_component,
+					  true,
 					  target_component);
       for (unsigned int i=0;i<n_components;++i)
 	deallog << ' ' << dofs_per_component[i];
