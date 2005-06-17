@@ -948,6 +948,20 @@ class DoFTools
 			      const bool vector_valued_once = false,
 			      std::vector<unsigned int>  target_component
 			      =std::vector<unsigned int>());
+
+				     /**
+				      * @deprecated See the previous
+				      * function with the same name
+				      * for a description. This
+				      * function exists for
+				      * compatibility with older
+				      * versions only.
+				      */
+    template <int dim>
+    static void
+    count_dofs_per_component (const DoFHandler<dim>&     dof_handler,
+			      std::vector<unsigned int>& dofs_per_component,
+			      std::vector<unsigned int>  target_component);
     
 				     /**
 				      * This function can be used when

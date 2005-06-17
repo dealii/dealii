@@ -1816,6 +1816,17 @@ DoFTools::count_dofs_per_component (
 
 template <int dim>
 void
+DoFTools::count_dofs_per_component (
+  const DoFHandler<dim>&     dof_handler,
+  std::vector<unsigned int>& dofs_per_component,
+  std::vector<unsigned int>  target_component)
+{
+  count_dofs_per_component (dof_handler, dofs_per_component, false, target_component);
+}
+
+
+template <int dim>
+void
 DoFTools::compute_intergrid_constraints (
   const DoFHandler<dim>              &coarse_grid,
   const unsigned int                  coarse_component,
@@ -3137,6 +3148,12 @@ void
 DoFTools::count_dofs_per_component<deal_II_dimension> (
   const DoFHandler<deal_II_dimension>&,
   std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+
+template
+void
+DoFTools::count_dofs_per_component<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension>&,
+  std::vector<unsigned int>&, std::vector<unsigned int>);
 
 template
 void
