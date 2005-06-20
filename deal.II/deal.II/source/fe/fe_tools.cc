@@ -1416,6 +1416,66 @@ FETools::get_fe_from_name_aux (const std::string &name)
 
 
 
+template <int dim>
+void
+FETools::
+compute_projection_from_quadrature_points_matrix (const FiniteElement<dim> &fe,
+                                                  const Quadrature<dim>    &lhs_quadrature,
+                                                  const Quadrature<dim>    &rhs_quadrature,
+                                                  FullMatrix<double>       &X)
+{
+  Assert (fe.n_components() == 1, ExcNotImplemented());
+
+                                   // first build the matrices M and Q
+                                   // described in the documentation
+  FullMatrix<double> M (fe.dofs_per_cell, fe.dofs_per_cell);
+  FullMatrix<double> Q (fe.dofs_per_cell, rhs_quadrature.n_quadrature_points);
+
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+    for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+      for (unsigned int q=0; q<lhs_quadrature.n_quadrature_points; ++q)
+        M(i,j) += fe.shape_value (i, lhs_quadrature.point(q)) *
+                  fe.shape_value (j, lhs_quadrature.point(q)) *
+                  lhs_quadrature.weight(q);
+
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+    for (unsigned int q=0; q<rhs_quadrature.n_quadrature_points; ++q)
+      Q(i,q) += fe.shape_value (i, rhs_quadrature.point(q)) *
+                rhs_quadrature.weight(q);
+
+                                   // then invert M
+  FullMatrix<double> M_inverse (fe.dofs_per_cell, fe.dofs_per_cell);
+  M_inverse.invert (M);
+
+                                   // finally compute the result
+  X.reinit (fe.dofs_per_cell, rhs_quadrature.n_quadrature_points);
+  M_inverse.mmult (X, Q);
+
+  Assert (X.m() == fe.dofs_per_cell, ExcInternalError());
+  Assert (X.n() == rhs_quadrature.n_quadrature_points, ExcInternalError());
+}
+
+
+
+template <int dim>
+void
+FETools::
+compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim> &fe,
+                                                   const Quadrature<dim>    &quadrature,
+                                                   FullMatrix<double>       &I_q)
+{
+  Assert (fe.n_components() == 1, ExcNotImplemented());
+  Assert (I_q.m() == quadrature.n_quadrature_points,
+          ExcMessage ("Wrong matrix size"));
+  Assert (I_q.n() == fe.dofs_per_cell, ExcMessage ("Wrong matrix size"));
+
+  for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+      I_q(q,i) = fe.shape_value (i, quadrature.point(q));
+}
+
+
+
 
 /*-------------- Explicit Instantiations -------------------------------*/
 
@@ -1661,6 +1721,21 @@ void FETools::extrapolate<deal_II_dimension>
 template
 FiniteElement<deal_II_dimension> *
 FETools::get_fe_from_name<deal_II_dimension> (const std::string &);
+
+template
+void
+FETools::
+compute_projection_from_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &fe,
+                                                  const Quadrature<deal_II_dimension>    &lhs_quadrature,
+                                                  const Quadrature<deal_II_dimension>    &rhs_quadrature,
+                                                  FullMatrix<double>       &X);
+
+template
+void
+FETools::
+compute_interpolation_to_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &fe,
+                                                   const Quadrature<deal_II_dimension>    &quadrature,
+                                                   FullMatrix<double>       &I_q);
 
 
 /*----------------------------   fe_tools.cc     ---------------------------*/

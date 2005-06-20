@@ -48,7 +48,7 @@ class ConstraintMatrix;
  * $id-I_h$ that is needed for evaluating $(id-I_h)z$ for e.g. the
  * dual solution $z$.
  *
- * @author Ralf Hartmann, 2000; Wolfgang Bangerth, 2003, Guido Kanschat, 2000, 2004
+ * @author Ralf Hartmann, 2000; Wolfgang Bangerth, 2003, 2005, Guido Kanschat, 2000, 2004
  */
 class FETools
 {
@@ -666,6 +666,121 @@ class FETools
     FiniteElement<dim> *
     get_fe_from_name (const std::string &name);
 
+
+                                     /**
+                                      * Projects scalar data defined in
+                                      * quadrature points to a finite element
+                                      * space on a single cell.
+                                      *
+                                      * What this function does is the
+                                      * following: assume that there is scalar
+                                      * data <tt>u<sub>q</sub>, 0 <= q <
+                                      * Q:=quadrature.n_quadrature_points</tt>
+                                      * defined at the quadrature points of a
+                                      * cell, with the points defined by the
+                                      * given <tt>rhs_quadrature</tt>
+                                      * object. We may then want to ask for
+                                      * that finite element function (on a
+                                      * single cell) <tt>v<sub>h</sub></tt> in
+                                      * the finite-dimensional space defined
+                                      * by the given FE object that is the
+                                      * projection of <tt>u</tt> in the
+                                      * following sense:
+                                      *
+                                      * Usually, the projection
+                                      * <tt>v<sub>h</sub></tt> is that
+                                      * function that satisfies
+                                      * <tt>(v<sub>h</sub>,w)=(u,w)</tt> for
+                                      * all discrete test functions
+                                      * <tt>w</tt>. In the present case, we
+                                      * can't evaluate the right hand side,
+                                      * since <tt>u</tt> is only defined in
+                                      * the quadrature points given by
+                                      * <tt>rhs_quadrature</tt>, so we replace
+                                      * it by a quadrature
+                                      * approximation. Likewise, the left hand
+                                      * side is approximated using the
+                                      * <tt>lhs_quadrature</tt> object; if
+                                      * this quadrature object is chosen
+                                      * appropriately, then the integration of
+                                      * the left hand side can be done
+                                      * exactly, without any
+                                      * approximation. The use of different
+                                      * quadrature objects is necessary if the
+                                      * quadrature object for the right hand
+                                      * side has too few quadrature points --
+                                      * for example, if data <tt>q</tt> is
+                                      * only defined at the cell center, then
+                                      * the corresponding one-point quadrature
+                                      * formula is obviously insufficient to
+                                      * approximate the scalar product on the
+                                      * left hand side by a definite form.
+                                      *
+                                      * After these quadrature approximations,
+                                      * we end up with a nodal representation
+                                      * <tt>V<sub>h</sub></tt> of
+                                      * <tt>v<sub>h</sub></tt> that satisfies
+                                      * the following system of linear
+                                      * equations: <tt>M V<sub>h</sub> = Q
+                                      * U</tt>, where
+                                      * <tt>M<sub>ij</sub>=(phi_i,phi_j)</tt>
+                                      * is the mass matrix approximated by
+                                      * <tt>lhs_quadrature</tt>, and
+                                      * <tt>Q</tt> is the matrix
+                                      * <tt>Q<sub>iq</sub>=phi<sub>i</sub>(x<sub>q</sub>)
+                                      * w<sub>q</sub></tt> where
+                                      * <tt>w<sub>q</sub></tt> are quadrature
+                                      * weights; <tt>U</tt> is the vector of
+                                      * quadrature point data
+                                      * <tt>u<sub>q</sub></tt>.
+                                      *
+                                      * In order to then get the nodal
+                                      * representation <tt>V<sub>h</sub></tt>
+                                      * of the projection of <tt>U</tt>, one
+                                      * computes <tt>V<sub>h</sub> = X U,
+                                      * X=M<sup>-1</sup> Q</tt>. The purpose
+                                      * of this function is to compute the
+                                      * matrix <tt>X</tt> and return it
+                                      * through the last argument of this
+                                      * function.
+                                      *
+                                      * Note that this function presently only
+                                      * supports scalar data. An extension of
+                                      * the mass matrix is of course trivial,
+                                      * but one has to define the order of
+                                      * data in the vector <tt>U</tt> if it
+                                      * contains vector valued data in all
+                                      * quadrature points.
+                                      *
+                                      * A use for this function is described
+                                      * in the introduction to the step-18
+                                      * example program.
+                                      *
+                                      * The opposite of this function,
+                                      * interpolation of a finite element
+                                      * function onto quadrature points is
+                                      * essentially what the
+                                      * <tt>FEValues::get_function_values</tt>
+                                      * functions do; to make things a little
+                                      * simpler, the
+                                      * <tt>FETools::compute_interpolation_to_quadrature_points_matrix</tt>
+                                      * provides the matrix form of this.
+                                      */
+    template <int dim>
+    static
+    void
+    compute_projection_from_quadrature_points_matrix (const FiniteElement<dim> &fe,
+                                                      const Quadrature<dim>    &lhs_quadrature,
+                                                      const Quadrature<dim>    &rhs_quadrature,
+                                                      FullMatrix<double>       &X);
+
+    template <int dim>
+    static
+    void
+    compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim> &fe,
+                                                       const Quadrature<dim>    &quadrature,
+                                                       FullMatrix<double>       &I_q);
+    
 				     /**
 				      * Exception
 				      */
