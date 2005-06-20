@@ -204,15 +204,13 @@ class FETools
 				      * matrices from the children to
 				      * a coarse cell.
 				      *
-				      * @arg fe The finite element
-				      * class for which we compute the
-				      * projection matrices.
-				      * @arg matrices A pointer to
-				      * 2<sup>dim</sup> FullMatrix
-				      * objects. This is the format
-				      * used in FiniteElementBase,
-				      * where we want to use ths
-				      * function mostly.
+				      * @arg fe The finite element class for
+				      * which we compute the projection
+				      * matrices.  @arg matrices A pointer to
+				      * <tt>GeometryInfo::children_per_cell</tt>=2<sup>dim</sup>
+				      * FullMatrix objects. This is the format
+				      * used in FiniteElementBase, where we
+				      * want to use this function mostly.
 				      */
     template <int dim, typename number>
     static void compute_projection_matrices(const FiniteElement<dim> &fe,
