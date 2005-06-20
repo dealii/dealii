@@ -457,15 +457,14 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
     {
       b = 0.;
       for (unsigned int i=0;i<n2;++i)
-	{
-	  for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
-	    {
-	      const double w = val2.JxW(k);
-	      const double u = val1.shape_value(j,k);
-	      const double v = val2.shape_value(i,k);
-	      b(i) += u*v*w;
-	    }
-	}
+        for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+          {
+            const double w = val2.JxW(k);
+            const double u = val1.shape_value(j,k);
+            const double v = val2.shape_value(i,k);
+            b(i) += u*v*w;
+          }
+      
 				       // Multiply by the inverse
       mass.vmult(x,b);
       for (unsigned int i=0;i<n2;++i)
@@ -490,32 +489,18 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
       Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(),n));
     }
   
-				   /*
-				    * Set up two meshes, one with a
-				    * single reference cell and the
-				    * other refined, together with
-				    * DoFHandler and finite elements.
-				    */
-  Triangulation<dim> tr_coarse;
-  Triangulation<dim> tr_fine;
-  GridGenerator::hyper_cube (tr_coarse, 0, 1);
-  GridGenerator::hyper_cube (tr_fine, 0, 1);
-  tr_fine.refine_global(1);
-  DoFHandler<dim> dof_coarse(tr_coarse);
-  dof_coarse.distribute_dofs(fe);
-  DoFHandler<dim> dof_fine(tr_fine);
-  dof_fine.distribute_dofs(fe);
+                                   // Set up a meshes, one with a single
+                                   // reference cell and refine it once
+  Triangulation<dim> tria;
+  GridGenerator::hyper_cube (tria, 0, 1);
+  tria.refine_global(1);
 
   MappingCartesian<dim> mapping;
   QGauss<dim> q_fine(degree+1);
   const unsigned int nq = q_fine.n_quadrature_points;
   
   FEValues<dim> fine (mapping, fe, q_fine,
-		      update_q_points | update_JxW_values | update_values);
-  
-  typename DoFHandler<dim>::active_cell_iterator coarse_cell
-    = dof_coarse.begin_active();
-  typename DoFHandler<dim>::active_cell_iterator fine_cell;
+		      update_q_points | update_JxW_values | update_values);  
 
 				   /**
 				    * We search for the polynomial on
@@ -532,7 +517,7 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 				    * This matrix is the same for all
 				    * children.
 				    */
-  fine.reinit(dof_fine.begin_active());
+  fine.reinit(tria.begin_active());
   FullMatrix<number> A(nq*nd, n);
   for (unsigned int d=0;d<nd;++d)
     for (unsigned int k=0;k<nq;++k)
@@ -545,17 +530,23 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
   Vector<number> v_fine(n);
   
   unsigned int cell_number = 0;
-  for (fine_cell = dof_fine.begin_active();
-       fine_cell != dof_fine.end();
-       ++fine_cell, ++cell_number)
+  for (typename Triangulation<dim>::active_cell_iterator fine_cell
+         = tria.begin_active();
+       fine_cell != tria.end(); ++fine_cell, ++cell_number)
     {
-      FullMatrix<number>& matrix = matrices[cell_number];
       fine.reinit(fine_cell);
-      Quadrature<dim> q_coarse (fine.get_quadrature_points(),
-				fine.get_JxW_values());
-      FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
-      coarse.reinit(coarse_cell);
 
+                                       // evaluate on the coarse cell (which
+                                       // is the first -- inactive -- cell on
+                                       // the lowest level of the
+                                       // triangulation we have created)
+      const Quadrature<dim> q_coarse (fine.get_quadrature_points(),
+                                      fine.get_JxW_values());
+      FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
+      coarse.reinit(tria.begin(0));
+
+      FullMatrix<double> &this_matrix = matrices[cell_number];
+      
 				       // Compute this once for each
 				       // coarse grid basis function
       for (unsigned int i=0;i<n;++i)
@@ -582,16 +573,17 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 					   // function, the columns
 					   // are fine grid.
 	  for (unsigned int j=0;j<n;++j)
-	    matrix(j,i) = v_fine(j);
+	    this_matrix(j,i) = v_fine(j);
 	}
 				       // Remove small entries from
 				       // the matrix
-      for (unsigned int i=0; i<matrix.m(); ++i)
-	for (unsigned int j=0; j<matrix.n(); ++j)
-	  if (std::fabs(matrix(i,j)) < 1e-12)
-	    matrix(i,j) = 0.;
+      for (unsigned int i=0; i<this_matrix.m(); ++i)
+	for (unsigned int j=0; j<this_matrix.n(); ++j)
+	  if (std::fabs(this_matrix(i,j)) < 1e-12)
+	    this_matrix(i,j) = 0.;
     }
 }
+
 
 
 template<int dim, typename number>
