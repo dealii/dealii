@@ -588,6 +588,7 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 
 
 
+//TODO[GK]: this function is presently not instantiated, and probably doesn't even compile.
 template<int dim, typename number>
 void
 FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
