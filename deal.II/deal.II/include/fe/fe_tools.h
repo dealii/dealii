@@ -774,6 +774,17 @@ class FETools
                                                       const Quadrature<dim>    &rhs_quadrature,
                                                       FullMatrix<double>       &X);
 
+                                     /**
+                                      * Given a (scalar) local finite element
+                                      * function, compute the matrix that maps
+                                      * the vector of nodal values onto the
+                                      * vector of values of this function at
+                                      * quadrature points as given by the
+                                      * second argument. In a sense, this
+                                      * function does the opposite of the @p
+                                      * compute_projection_from_quadrature_points_matrix
+                                      * function.
+                                      */
     template <int dim>
     static
     void
