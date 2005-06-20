@@ -33,6 +33,7 @@ tests_x = geometry_info_1 \
 	  data_out_stack_0* \
 	  dof_tools_[0-9]* \
 	  fe_tools_[0-9]* \
+	  fe_tools_cpfqpm* \
           anna_? \
 	  gerold_1 \
 	  roy_1 \
