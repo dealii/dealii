@@ -12,7 +12,7 @@
 //----------------------------  fe_tools_01b.cc  ---------------------------
 
 
-// common framework for the various dof_tools_*.cc tests
+// common framework for the various fe_tools_*.cc tests
 
 #include "../tests.h"
 #include <base/logstream.h>
