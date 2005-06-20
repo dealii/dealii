@@ -406,19 +406,11 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
   
   unsigned int n1 = fe1.dofs_per_cell;
   unsigned int n2 = fe2.dofs_per_cell;
-				   // First, create a mass matrix. We
-				   // cannot use MatrixTools, since we
-				   // want to have a FullMatrix.
-				   //
+
+  				   // First, create a local mass matrix for
+  				   // the unit cell
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
-  
-  DoFHandler<dim> dof1(tr);
-  dof1.distribute_dofs(fe1);
-  typename DoFHandler<dim>::active_cell_iterator cell1 = dof1.begin();
-  DoFHandler<dim> dof2(tr);
-  dof2.distribute_dofs(fe2);
-  typename DoFHandler<dim>::active_cell_iterator cell2 = dof2.begin();
   
 				   // Choose a quadrature rule
 				   // Gauss is exact up to degree 2n-1
@@ -430,9 +422,9 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
 				   // Set up FEValues.
   const UpdateFlags flags = update_values | update_q_points | update_JxW_values;
   FEValues<dim> val1 (fe1, quadrature, update_values);
-  val1.reinit (cell1);
+  val1.reinit (tr.begin_active());
   FEValues<dim> val2 (fe2, quadrature, flags);
-  val2.reinit (cell2);
+  val2.reinit (tr.begin_active());
 
 				   // Integrate and invert mass matrix
 				   // This happens in the target space
