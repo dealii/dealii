@@ -593,6 +593,9 @@ void
 FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
 				     FullMatrix<number>* matrices)
 {
+//TODO[GK]: clean up this function and make it work  
+  Assert (false, ExcNotImplemented());
+  
   const unsigned int nc = GeometryInfo<dim>::children_per_cell;
   const unsigned int n  = fe.dofs_per_cell;
   const unsigned int nd = fe.n_components();
@@ -610,6 +613,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
 				    * other refined, together with
 				    * DoFHandler and finite elements.
 				    */
+//TODO[GK]: This should be changed just like the function above, i.e. not use a DoFHandler at all (and use the Triangulation alone), and to use only a single triangulation. this would make it significantly more efficient
   Triangulation<dim> tr_coarse;
   Triangulation<dim> tr_fine;
   GridGenerator::hyper_cube (tr_coarse, 0, 1);
