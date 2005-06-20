@@ -582,6 +582,8 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 	  if (std::fabs(this_matrix(i,j)) < 1e-12)
 	    this_matrix(i,j) = 0.;
     }
+  Assert (cell_number == GeometryInfo<dim>::children_per_cell,
+          ExcInternalError());
 }
 
 
