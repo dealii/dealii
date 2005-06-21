@@ -317,23 +317,24 @@ class FiniteElementData
  * In addition to the fields already present in 1D, a constraint
  * matrix is needed, if the finite element has node values located on
  * edges or vertices. These constraints are represented by an $m\times
- * n$-matrix #interface_constraints, where <i>n</i> is the number of
+ * n$-matrix #interface_constraints, where <i>m</i> is the number of
  * degrees of freedom on the refined side without the corner vertices
  * (those dofs on the middle vertex plus those on the two lines), and
- * <i>m</i> is that of the unrefined side (those dofs on the two
+ * <i>n</i> is that of the unrefined side (those dofs on the two
  * vertices plus those on the line). The matrix is thus a rectangular
- * one.
+ * one. The $m\times n$ size of the #interface_constraints matrix can
+ * also be accessed through the interface_constraints_size() function.
  *
  * The mapping of the dofs onto the indices of the matrix on the
  * unrefined side is as follows: let $d_v$ be the number of dofs on a
- * vertex, $d_l$ that on a line, then $m=0...d_v-1$ refers to the dofs
- * on vertex zero of the unrefined line, $m=d_v...2d_v-1$ to those on
- * vertex one, $m=2d_v...2d_v+d_l-1$ to those on the line.
+ * vertex, $d_l$ that on a line, then $n=0...d_v-1$ refers to the dofs
+ * on vertex zero of the unrefined line, $n=d_v...2d_v-1$ to those on
+ * vertex one, $n=2d_v...2d_v+d_l-1$ to those on the line.
  *
- * Similarly, $n=0...d_v-1$ refers to the dofs on the middle vertex of
+ * Similarly, $m=0...d_v-1$ refers to the dofs on the middle vertex of
  * the refined side (vertex one of child line zero, vertex zero of
- * child line one), $n=d_v...d_v+d_l-1$ refers to the dofs on child
- * line zero, $n=d_v+d_l...d_v+2d_l-1$ refers to the dofs on child
+ * child line one), $m=d_v...d_v+d_l-1$ refers to the dofs on child
+ * line zero, $m=d_v+d_l...d_v+2d_l-1$ refers to the dofs on child
  * line one.  Please note that we do not need to reserve space for the
  * dofs on the end vertices of the refined lines, since these must be
  * mapped one-to-one to the appropriate dofs of the vertices of the
@@ -348,20 +349,20 @@ class FiniteElementData
  * @sect3{Finite elements in three dimensions}
  *
  * For the interface constraints, almost the same holds as for the 2D case.
- * The numbering for the indices $m$ on the mother face is obvious and keeps
+ * The numbering for the indices $n$ on the mother face is obvious and keeps
  * to the usual numbering of degrees of freedom on quadrilaterals.
  *
  * The numbering of the degrees of freedom on the interior of the refined
- * faces for the index $n$ is as follows: let $d_v$ and $d_l$ be as above,
+ * faces for the index $m$ is as follows: let $d_v$ and $d_l$ be as above,
  * and $d_q$ be the number of degrees of freedom per quadrilateral (and
- * therefore per face), then $n=0...d_v-1$ denote the dofs on the vertex at
- * the center, $n=d_v...5d_v-1$ for the dofs on the vertices at the center
+ * therefore per face), then $m=0...d_v-1$ denote the dofs on the vertex at
+ * the center, $m=d_v...5d_v-1$ for the dofs on the vertices at the center
  * of the bounding lines of the quadrilateral,
- * $n=5d_v..5d_v+4*d_l-1$ are for the degrees of freedom on
+ * $m=5d_v..5d_v+4*d_l-1$ are for the degrees of freedom on
  * the four lines connecting the center vertex to the outer boundary of the
- * mother face, $n=5d_v+4*d_l...5d_v+4*d_l+8*d_l-1$ for the degrees of freedom
+ * mother face, $m=5d_v+4*d_l...5d_v+4*d_l+8*d_l-1$ for the degrees of freedom
  * on the small lines surrounding the quad,
- * and $n=5d_v+12*d_l...5d_v+12*d_l+4*d_q-1$ for the dofs on the
+ * and $m=5d_v+12*d_l...5d_v+12*d_l+4*d_q-1$ for the dofs on the
  * four child faces. Note the direction of the lines at the boundary of the
  * quads, as shown below.
  *
