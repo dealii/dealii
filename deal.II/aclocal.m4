@@ -1280,7 +1280,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 [
   case "$F77_VERSION" in
-    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc[34].*)
+    egcs-1.1 | gcc2.95 | gcc2.96 | gcc2.97 | gcc[[34]].*)
         F77FLAGSG="$FFLAGS -ggdb -DDEBUG -pedantic -W -Wall"
         F77FLAGSO="$FFLAGS -O2"
   
