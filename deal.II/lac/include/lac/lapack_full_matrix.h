@@ -343,7 +343,6 @@ LAPACKFullMatrix<number>::fill (
   const unsigned int src_offset_i,
   const unsigned int src_offset_j)
 {
-  const unsigned int endrow = this->n_rows() - dst_offset_i;
   const unsigned int endcol = src_offset_j + this->n_cols();
   
   const typename MATRIX::const_iterator
