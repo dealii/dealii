@@ -523,10 +523,10 @@ class BlockTrianglePrecondition
 				     /**
 				      * Make function of base class available.
 				      */
-    BlockMatrixArray<number>::n_block_cols;
-    BlockMatrixArray<number>::clear;
-    BlockMatrixArray<number>::Subscriptor::subscribe;
-    BlockMatrixArray<number>::Subscriptor::unsubscribe;
+    using BlockMatrixArray<number>::n_block_cols;
+    using BlockMatrixArray<number>::clear;
+    using BlockMatrixArray<number>::Subscriptor::subscribe;
+    using BlockMatrixArray<number>::Subscriptor::unsubscribe;
 
       				     /** @addtogroup Exceptions
 				      * @{ */
