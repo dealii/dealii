@@ -22,6 +22,7 @@
 
 template <typename number> class FullMatrix;
 template <typename number> class Vector;
+template <int dim> class Quadrature;
 template <int dim> class FiniteElement;
 template <int dim> class DoFHandler;
 template <int dim> class hpDoFHandler;
