@@ -262,6 +262,7 @@ END
 }
 print "  tg.join_all();\n";
 print "  tgr.join_all();\n";
+print "  tgcr.join_all();\n";
 print "}\n";
 
 #############
