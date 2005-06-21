@@ -62,6 +62,10 @@ check_this (const FiniteElement<dim> &fe,
                                    // quadrature points
   if (fe.dofs_per_cell < q_rhs.n_quadrature_points)
     return;
+
+  deallog << "dofs_per_cell=" << fe.dofs_per_cell
+          << ", n_q_points=" << q_rhs.n_quadrature_points
+          << std::endl;
   
   FullMatrix<double> X (fe.dofs_per_cell,
                         q_rhs.n_quadrature_points);
