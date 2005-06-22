@@ -1587,31 +1587,12 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
           const unsigned int vertex_no = shape_index;
           Assert (vertex_no < GeometryInfo<dim>::vertices_per_cell,
                   ExcInternalError());
-          switch (dim)
-            {
-              case 2:
-              {
-                static const unsigned int face_vertices[4][2] =
-                  { {0,1},{1,2},{2,3},{0,3} };
-                return ((face_vertices[face_index][0] == vertex_no)
-                        ||
-                        (face_vertices[face_index][1] == vertex_no));
-              };
 
-              case 3:
-              {
-                static const unsigned int face_vertices[6][4] =
-                  { {0,1,2,3},{4,5,6,7},{0,1,5,4},
-                    {1,5,6,2},{3,2,6,7},{0,4,7,3} };
-                return ((face_vertices[face_index][0] == vertex_no)||
-                        (face_vertices[face_index][1] == vertex_no)||
-                        (face_vertices[face_index][2] == vertex_no)||
-                        (face_vertices[face_index][3] == vertex_no));
-              };
+	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+	    if (GeometryInfo<dim>::face_to_cell_vertices(face_index, v) == vertex_no)
+	      return true;
 
-              default:
-                    Assert (false, ExcNotImplemented());
-            };
+	  return false;
         }
       else if (shape_index < this->first_quad_index)
                                          // ok, dof is on a line
@@ -1630,16 +1611,12 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
             {
                                                // see whether the
                                                // given line is on the
-                                               // given face. use
-                                               // table technique
-                                               // again
-              static const unsigned int face_lines[6][4] =
-                { {0,1,2,3},{4,5,6,7},{0,8,9,4},
-                  {1,9,5,10},{2,10,6,11},{3,8,7,11} };
-              return ((face_lines[face_index][0] == line_index)||
-                      (face_lines[face_index][1] == line_index)||
-                      (face_lines[face_index][2] == line_index)||
-                      (face_lines[face_index][3] == line_index));
+                                               // given face.
+	      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
+		if (GeometryInfo<3>::face_to_cell_lines(face_index, l) == line_index)
+		  return true;
+
+	      return false;
             }
           else
             Assert (false, ExcNotImplemented());
@@ -1675,8 +1652,8 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
                                            // above
           Assert (false, ExcNotImplemented());
           return false;
-        };
-    };
+        }
+    }
 
                                    // we should not have gotten here
   Assert (false, ExcInternalError());
