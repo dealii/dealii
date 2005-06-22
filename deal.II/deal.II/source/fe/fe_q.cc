@@ -606,7 +606,7 @@ void FE_Q<dim>::initialize_unit_support_points ()
 	    p(2) = iz * step;
 	  
 	  this->unit_support_points[index_map_inverse[k++]] = p;
-	};
+	}
 }
 
 
@@ -651,7 +651,7 @@ void FE_Q<dim>::initialize_unit_face_support_points ()
 	    p(2) = iz * step;
 	  
 	  this->unit_face_support_points[face_index_map_inverse[k++]] = p;
-	};
+	}
 }
 
 
@@ -1400,7 +1400,7 @@ FE_Q<dim>::initialize_embedding ()
 	    sum += this->prolongation[child](row,col);
 	  Assert (std::fabs(sum-1.) < 2e-14*this->degree*dim,
 		  ExcInternalError());
-	};
+	}
     }
 }
 
