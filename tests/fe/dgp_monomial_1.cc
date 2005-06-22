@@ -1,5 +1,5 @@
 //----------------------------  dgp_monomial_1.cc  ---------------------------
-//    $Id: dgp_monomial_1.cc,v 1.1 2003/05/05 13:49:41 wolf Exp
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2003, 2004, 2005 by the deal.II authors
