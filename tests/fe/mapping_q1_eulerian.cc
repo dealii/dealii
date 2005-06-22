@@ -60,13 +60,13 @@ show_values(FiniteElement<dim>& fe,
   for (unsigned int k=0; k<quadrature_formula.n_quadrature_points; ++k)
     {
       deallog << quadrature_formula.point(k) << std::endl;
-      deallog << "\tJxW " << fe_values.JxW(k);
+      deallog << "JxW: " << fe_values.JxW(k) << std::endl;
 	  
       for (unsigned int i=0;i<fe.dofs_per_cell;++i)
 	{
-	  deallog << "\tValues " << fe_values.shape_value(i,k);
-	  deallog << "\tGrad " << fe_values.shape_grad(i,k);
-	  deallog << "\t2nd " << fe_values.shape_2nd_derivative(i,k);
+	  deallog << "Values: " << fe_values.shape_value(i,k);
+	  deallog << ",  Grad: " << fe_values.shape_grad(i,k);
+	  deallog << ",  2nd: " << fe_values.shape_2nd_derivative(i,k);
 	  deallog << std::endl;
 	}
     }
@@ -79,10 +79,10 @@ template<int dim>
 void show_values()
 {
   FE_Q<dim> q1(1);
-  show_values(q1, "DGQ1");
+  show_values(q1, "Q1");
 
   FE_Q<dim> q2(2);
-  show_values(q2, "DGQ2");
+  show_values(q2, "Q2");
 }
 
 
