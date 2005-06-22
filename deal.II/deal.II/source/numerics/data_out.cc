@@ -518,8 +518,6 @@ void DataOut<dim>::build_some_patches (Data data)
             = this->patches[(*data.cell_to_patch_index_map)
                             [neighbor->level()][neighbor->index()]].patch_index;
           
-//TODO:[GK] Shouldn't we use the deal.II (i.e. the unnatural) numbering of the neighbors here as well rather than some new numbering scheme?
-
 	  switch (dim)
 	    {
 	      case 1:
