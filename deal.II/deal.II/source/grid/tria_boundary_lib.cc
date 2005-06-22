@@ -145,22 +145,27 @@ CylinderBoundary<3>::get_intermediate_points_on_quad (
   const Triangulation<3>::quad_iterator &quad,
   std::vector<Point<3> > &points) const
 {
-  unsigned int m=static_cast<unsigned int> (std::sqrt(static_cast<double>(points.size())));
-  Assert(points.size()==m*m, ExcInternalError());
-
-  std::vector<Point<3> > lp3(m);
-  std::vector<Point<3> > lp1(m);
-  
-  get_intermediate_points_on_line(quad->line(3), lp3);
-  get_intermediate_points_on_line(quad->line(1), lp1);
-  
-  std::vector<Point<3> > lps(m);
-  for (unsigned int i=0; i<m; ++i)
+  if (points.size()==1)
+    points[0]=get_new_point_on_quad(quad);
+  else
     {
-      get_intermediate_points_between_points(lp3[i], lp1[i], lps);
+      unsigned int m=static_cast<unsigned int> (std::sqrt(static_cast<double>(points.size())));
+      Assert(points.size()==m*m, ExcInternalError());
       
-      for (unsigned int j=0; j<m; ++j)
-	points[i*m+j]=lps[j];
+      std::vector<Point<3> > lp3(m);
+      std::vector<Point<3> > lp1(m);
+
+      get_intermediate_points_on_line(quad->line(3), lp3);
+      get_intermediate_points_on_line(quad->line(1), lp1);
+      
+      std::vector<Point<3> > lps(m);
+      for (unsigned int i=0; i<m; ++i)
+	{
+	  get_intermediate_points_between_points(lp3[i], lp1[i], lps);
+	  
+	  for (unsigned int j=0; j<m; ++j)
+	    points[i*m+j]=lps[j];
+	}
     }
 }
 
@@ -407,22 +412,27 @@ HyperBallBoundary<3>::get_intermediate_points_on_quad (
   const Triangulation<3>::quad_iterator &quad,
   std::vector<Point<3> > &points) const
 {
-  unsigned int m=static_cast<unsigned int> (std::sqrt(static_cast<double>(points.size())));
-  Assert(points.size()==m*m, ExcInternalError());
-
-  std::vector<Point<3> > lp3(m);
-  std::vector<Point<3> > lp1(m);
-  
-  get_intermediate_points_on_line(quad->line(3), lp3);
-  get_intermediate_points_on_line(quad->line(1), lp1);
-  
-  std::vector<Point<3> > lps(m);
-  for (unsigned int i=0; i<m; ++i)
+  if (points.size()==1)
+    points[0]=get_new_point_on_quad(quad);
+  else
     {
-      get_intermediate_points_between_points(lp3[i], lp1[i], lps);
+      unsigned int m=static_cast<unsigned int> (std::sqrt(static_cast<double>(points.size())));
+      Assert(points.size()==m*m, ExcInternalError());
       
-      for (unsigned int j=0; j<m; ++j)
-	points[i*m+j]=lps[j];
+      std::vector<Point<3> > lp3(m);
+      std::vector<Point<3> > lp1(m);
+      
+      get_intermediate_points_on_line(quad->line(3), lp3);
+      get_intermediate_points_on_line(quad->line(1), lp1);
+      
+      std::vector<Point<3> > lps(m);
+      for (unsigned int i=0; i<m; ++i)
+	{
+	  get_intermediate_points_between_points(lp3[i], lp1[i], lps);
+	  
+	  for (unsigned int j=0; j<m; ++j)
+	    points[i*m+j]=lps[j];
+	}
     }
 }
 
@@ -567,17 +577,21 @@ HalfHyperBallBoundary<dim>::
 get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
 				 std::vector<Point<dim> > &points) const
 {
-				   // check whether center of object is
-				   // at x==0, since then it belongs
-				   // to the plane part of the
-				   // boundary
-  const Point<dim> quad_center = quad->center();
-  if (quad_center(0) == this->center(0))
-    StraightBoundary<dim>::get_intermediate_points_on_quad (quad, points);
+  if (points.size()==1)
+    points[0]=get_new_point_on_quad(quad);
   else
-    HyperBallBoundary<dim>::get_intermediate_points_on_quad (quad, points);
+    {
+				       // check whether center of
+				       // object is at x==0, since
+				       // then it belongs to the plane
+				       // part of the boundary
+      const Point<dim> quad_center = quad->center();
+      if (quad_center(0) == this->center(0))
+	StraightBoundary<dim>::get_intermediate_points_on_quad (quad, points);
+      else
+	HyperBallBoundary<dim>::get_intermediate_points_on_quad (quad, points);
+    }
 }
-
 
 
 #if deal_II_dimension == 1
