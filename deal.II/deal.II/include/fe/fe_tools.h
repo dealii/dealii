@@ -317,6 +317,14 @@ class FETools
                                       * simpler, the
                                       * <tt>FETools::compute_interpolation_to_quadrature_points_matrix</tt>
                                       * provides the matrix form of this.
+				      *
+				      * Note that this function works
+				      * on a single cell, rather than
+				      * an entire triangulation. In
+				      * effect, it therefore doesn't
+				      * matter if you use a continuous
+				      * or discontinuous version of
+				      * the finite element.
                                       */
     template <int dim>
     static
