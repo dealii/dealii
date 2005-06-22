@@ -1,6 +1,6 @@
-//----------------------------  q_4.cc  ---------------------------
-//    q_4.cc,v 1.1 2003/05/08 14:54:41 wolf Exp
-//    Version: 
+//----------------------------  dgp_monomial_2.cc  ---------------------------
+//    $Id: dgp_monomial_2.cc,v 1.1 2003/05/08 14:54:41 wolf Exp
+//    Version: $Name$
 //
 //    Copyright (C) 2003, 2005 by the deal.II authors
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    fuqher information on this license.
 //
-//----------------------------  q_4.cc  ---------------------------
+//----------------------------  dgp_monomial_2.cc  ---------------------------
 
 
 // previously, the FETools::get_interpolation_matrix function would

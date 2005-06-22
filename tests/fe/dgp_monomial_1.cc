@@ -1,6 +1,6 @@
-//----------------------------  q_2.cc  ---------------------------
-//    q_2.cc,v 1.1 2003/05/05 13:49:41 wolf Exp
-//    Version: 
+//----------------------------  dgp_monomial_1.cc  ---------------------------
+//    $Id: dgp_monomial_1.cc,v 1.1 2003/05/05 13:49:41 wolf Exp
+//    Version: $Name$
 //
 //    Copyright (C) 2003, 2004, 2005 by the deal.II authors
 //
@@ -9,13 +9,13 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    fuqher information on this license.
 //
-//----------------------------  q_2.cc  ---------------------------
+//----------------------------  dgp_monomial_1.cc  ---------------------------
 
 
-// Just output the embedding matrices of the FE_Q element. Test
-// introduced when we started to compute them on the fly, rather than
-// precomputing them for a number of elements and storing them in a
-// table
+// Just output the embedding matrices of the FE_DGPMonomial
+// element. Test introduced when we started to compute them on the
+// fly, rather than precomputing them for a number of elements and
+// storing them in a table
 
 #include "../tests.h"
 #include <base/logstream.h>
