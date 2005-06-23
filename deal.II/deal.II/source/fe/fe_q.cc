@@ -182,8 +182,7 @@ namespace FE_Q_Helper
     inline
     Point<1>
     generate_face_unit_point (const unsigned int i,
-			      const unsigned int N,
-			      const int2type<1>  )
+			      const unsigned int N)
     {
       Assert (i<N, ExcInternalError());
       const double h = 1./(N+1);
@@ -706,8 +705,7 @@ FE_Q<2>::initialize_constraints ()
 				       // face. the function we call
 				       // takes care of all this
       const Point<dim-1> p_face
-	= FE_Q_Helper::generate_face_unit_point (i, n_small_functions,
-						 FE_Q_Helper::int2type<dim-1>());
+	= FE_Q_Helper::generate_face_unit_point (i, n_small_functions);
 
 				       // evaluate the big face
 				       // shape function at this
