@@ -188,57 +188,7 @@ namespace FE_Q_Helper
       Assert (i<N, ExcInternalError());
       const double h = 1./(N+1);
       return Point<1>((1+i)*h);
-    }
-  
-    
-				     // given N, generate i=0...N-1
-				     // equidistant points in the domain
-				     // [0,1]^2, but excluding the four
-				     // vertices (since we don't have to
-				     // consider shape functions on
-				     // child cells that are located on
-				     // existing vertices)
-#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-    static
-#endif
-    inline
-    Point<2>
-    generate_face_unit_point (const unsigned int i,
-			      const unsigned int N,
-			      const int2type<2>  )
-    {
-      Assert (i<N, ExcInternalError());
-    
-      const unsigned int N1d = int_sqrt(N+4);    
-      const double h = 1./(N1d+1);
-    
-				       // i gives the index in the list
-				       // of points excluding the four
-				       // vertices. convert this into an
-				       // index for all N1d**2 points
-				       //
-				       // we do so by
-				       // - adding one if the point is
-				       // beyond the lower left vertex
-				       // (actually, all points are)
-
-				       // - adding one if the point is
-				       // beyond the lower right one
-				       // - adding one if it is beyond
-				       // the upper left one
-				       // - not adding one for the upper
-				       // right vertex, since no point
-				       // can be beyond that one anyway
-				       // :-)
-      const unsigned int true_i = (1
-				   +
-				   (i >= N1d-2 ? 1 : 0)
-				   +
-				   (i >= N1d*(N1d-1)-2 ? 1 : 0));
-      return Point<2> ((true_i%N1d)*h,
-		       (true_i/N1d)*h);
-    }
-  
+    }  
 
 
 				     // return whether shape function j,
@@ -267,73 +217,6 @@ namespace FE_Q_Helper
       return !(((j>=1) && (j<1+fe_data.dofs_per_line) && (subface == 1)) ||
 	       ((j>=1+fe_data.dofs_per_line) && (subface == 0)));
     }
-
-
-
-#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-    static
-#endif
-    inline
-    bool
-    constraint_function_is_active_on_child (const unsigned int          j,
-					    const unsigned int          subface,
-					    const FiniteElementData<3> &fe_data)
-    {
-				       // in 3d: in our weird numbering,
-				       // the zeroth function is the one
-				       // associated with the center
-				       // node, then come the four edge
-				       // midpoints, then the ones on
-				       // the 12 edges then those on
-				       // subfaces. some are active on
-				       // more than one child
-
-      if (j < 5)
-					 // one one of the five vertices
-	{
-	  switch (j)
-	    {
-	      case 0: return true;
-	      case 1: return (subface == 0) || (subface == 1);
-	      case 2: return (subface == 1) || (subface == 2);
-	      case 3: return (subface == 2) || (subface == 3);
-	      case 4: return (subface == 3) || (subface == 0);
-	    }
-	}
-      else if (j < 5 + 12*fe_data.dofs_per_line)
-					 // one one of the 12 lines
-	{
-	  const unsigned int line = (j-5)/fe_data.dofs_per_line;
-	  Assert (line<12, ExcInternalError());
-
-	  switch (line)
-	    {
-	      case 0: return (subface == 0) || (subface == 1);
-	      case 1: return (subface == 1) || (subface == 2);
-	      case 2: return (subface == 2) || (subface == 3);
-	      case 3: return (subface == 3) || (subface == 0);
-	      case 4: return (subface == 0);
-	      case 5: return (subface == 1);
-	      case 6: return (subface == 1);
-	      case 7: return (subface == 2);
-	      case 8: return (subface == 3);
-	      case 9: return (subface == 2);
-	      case 10: return (subface == 0);
-	      case 11: return (subface == 2);
-	    }
-	}
-      else
-					 // interior
-	{
-	  const unsigned int quad = (j-5-12*fe_data.dofs_per_line)/fe_data.dofs_per_quad;
-	  Assert (quad<4, ExcInternalError());
-	  return quad == subface;
-	}
-    
-      Assert (false, ExcInternalError());
-      return deal_II_numbers::invalid_unsigned_int;
-    }
-
 
 				     // given index j in the weird
 				     // constraint numbering, compute
