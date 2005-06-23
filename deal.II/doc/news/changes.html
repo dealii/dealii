@@ -42,16 +42,6 @@ inconvenience this causes.
 
 
 <ol>
-  <li> <p>Improved: The function <code class="class">DoFTools</code>::<code
-  class="member">count_dofs_per_component</code> got an additional
-  argument. This argument allows to count the degrees of freedom of
-  nonprimitive vector valued elements only once, instead of in every component.
-  Although this argument defaults to the previous behavior, it had to be put
-  into the argument list ahead of <tt>target_component</tt> in order to make
-  use of default arguments more efficiently.
-  <br> (GK 2005/06/17)
-  </p>
-
   <li> <p>Changed: The way boundary constraints were handled in the step-17
   tutorial program was conceptually flawed. We tried to eliminate boundary
   nodes locally on the cell level, and hanging node constraints subsequently
@@ -438,6 +428,18 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>Improved: The function <code class="class">DoFTools</code>::<code
+  class="member">count_dofs_per_component</code> and its counterpart
+  in <code class="class">MGTools</code> got an additional
+  argument. This argument allows to count the degrees of freedom of
+  nonprimitive vector valued elements only once, instead of in every component.
+  Although this argument defaults to the previous behavior, it had to be put
+  into the argument list ahead of <tt>target_component</tt> in order to make
+  use of default arguments more efficiently. The old order of
+  arguments can still be used through a wrapper function.
+  <br> (GK 2005/06/22)
+  </p>
+
   <li> <p>
        Improved: The <code class="class">GeometryInfo</code>::<code
        class="member">child_cell_on_face</code>, <code

@@ -85,7 +85,7 @@ void MGTransferBlockBase::build_matrices (
 				   // vector don't have holes.
   const unsigned int n_components  =
     *std::max_element(mg_target_component.begin(), mg_target_component.end()) + 1;
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;  
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   
   Assert (mg_selected.size() == fe.n_components(),
@@ -93,7 +93,7 @@ void MGTransferBlockBase::build_matrices (
   
 				   // Compute the lengths of all blocks
   sizes.resize(n_levels);
-  MGTools::count_dofs_per_component(mg_dof, sizes, mg_target_component);
+  MGTools::count_dofs_per_component(mg_dof, sizes, true, mg_target_component);
 
 				   // Fill some index vectors
 				   // for later use.
@@ -597,6 +597,3 @@ MGTransferSelect<double>::copy_from_mg_add (
   const MGDoFHandler<deal_II_dimension>&,
   BlockVector<double>&,
   const MGLevelObject<Vector<double> >&) const;
-
-
-

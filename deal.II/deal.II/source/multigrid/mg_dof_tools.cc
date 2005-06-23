@@ -449,15 +449,16 @@ void
 MGTools::count_dofs_per_component (
   const MGDoFHandler<dim> &dof_handler,
   std::vector<std::vector<unsigned int> > &result,
+  bool only_once,
   std::vector<unsigned int> target_component)
 {
+  const FiniteElement<dim>& fe = dof_handler.get_fe();
+  const unsigned int n_components = fe.n_components();
   const unsigned int nlevels = dof_handler.get_tria().n_levels();
   
   Assert (result.size() == nlevels,
 	  ExcDimensionMismatch(result.size(), nlevels));
-
-  const unsigned int n_components = dof_handler.get_fe().n_components();
-
+  
   if (target_component.size() == 0)
     {
       target_component.resize(n_components);
@@ -502,16 +503,30 @@ MGTools::count_dofs_per_component (
 	      component_select[i][i] = true;
 	      threads += Threads::spawn (fun_ptr)(l, dof_handler, component_select[i],
                                                   dofs_in_component[i]);
-	    };
+	    }
 	  threads.join_all();
 
 					   // next count what we got
-	  for (unsigned int i=0; i<n_components; ++i)
-	      result[l][target_component[i]]
-		+= std::count(dofs_in_component[i].begin(),
-			     dofs_in_component[i].end(),
-			     true);
-	  
+	  unsigned int component = 0;
+	  for (unsigned int b=0;b<fe.n_base_elements();++b)
+	    {
+	      const FiniteElement<dim>& base = fe.base_element(b);
+					       // Dimension of base element
+	      unsigned int d = base.n_components();
+	      
+	      for (unsigned int m=0;m<fe.element_multiplicity(b);++m)
+		{
+		  for (unsigned int dd=0;dd<d;++dd)
+		    {
+		      if (base.is_primitive() || (!only_once || dd==0))
+			result[l][target_component[component]]
+			  += std::count(dofs_in_component[component].begin(),
+					dofs_in_component[component].end(),
+					true);
+		      ++component;
+		    }
+		}
+	    }
 					   // finally sanity check
 	  Assert (!dof_handler.get_fe().is_primitive()
 		  ||
@@ -591,7 +606,7 @@ MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
     ndofs(mg_dof.get_tria().n_levels(),
 	  std::vector<unsigned int>(target_component.size()));
 
-  count_dofs_per_component (mg_dof, ndofs, target_component);
+  count_dofs_per_component (mg_dof, ndofs, true, target_component);
   
   for (unsigned int level=v.get_minlevel();
        level<=v.get_maxlevel();++level)
@@ -640,7 +655,7 @@ MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
 	new_dofs(mg_dof.get_tria().n_levels(),
 		 std::vector<unsigned int>(target_component.size()));
       std::swap(ndofs, new_dofs);
-      count_dofs_per_component (mg_dof, ndofs, target_component);
+      count_dofs_per_component (mg_dof, ndofs, true, target_component);
     }
   
   for (unsigned int level=v.get_minlevel();
@@ -710,4 +725,5 @@ template void MGTools::reinit_vector<deal_II_dimension> (
 template void MGTools::count_dofs_per_component<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
   std::vector<std::vector<unsigned int> >&,
+  bool,
   std::vector<unsigned int>);

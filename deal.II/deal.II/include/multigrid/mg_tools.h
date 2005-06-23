@@ -149,10 +149,11 @@ class MGTools
 				      * <tt>result[level][component]</tt>).
 				      */
     template <int dim>
-      static void count_dofs_per_component (const MGDoFHandler<dim> &mg_dof,
-					    std::vector<std::vector<unsigned int> > &result,
-					    std::vector<unsigned int> target_component
-					    = std::vector<unsigned int>());
+      static void count_dofs_per_component (
+	const MGDoFHandler<dim> &mg_dof,
+	std::vector<std::vector<unsigned int> > &result,
+	const bool only_once = false,
+	std::vector<unsigned int> target_component = std::vector<unsigned int>());
     
     
 				     /**
