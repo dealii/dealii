@@ -344,6 +344,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: <code class="class">SparsityPattern</code>::<code
+       class="member">block_write</code> neither wrote the number of
+       columns of the pattern, nor the flag for optimizing the
+       diagonal, and <code class="class">SparsityPattern</code>::<code
+       class="member">block_read</code> did not attempt to read this
+       data. Both is fixed now.
+       <br>
+       (GK, 2005/06/24)
+       </p>
+
+  <li> <p>
        Improved: <code class="class">SparseDirectUMFPACK</code> now
        has the complete interface of a preconditioner
        class. Therefore, it can be used in iterative solvers and in
