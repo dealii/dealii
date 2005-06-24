@@ -875,9 +875,11 @@ SparsityPattern::block_write (std::ostream &out) const
                                    // bracketed in [...]
   out << '[' << max_dim << ' '
       << rows << ' '
+      << cols << ' '
       << max_vec_len << ' '
       << max_row_length << ' '
-      << compressed << "][";
+      << compressed << ' '
+      << diagonal_optimized << "][";
                                    // then write out real data
   out.write (reinterpret_cast<const char*>(&rowstart[0]),
 	     reinterpret_cast<const char*>(&rowstart[max_dim])
@@ -903,7 +905,13 @@ SparsityPattern::block_read (std::istream &in)
                                    // first read in simple data
   in >> c;
   AssertThrow (c == '[', ExcIO());
-  in >> max_dim >> rows >> max_vec_len >> max_row_length >> compressed;
+  in >> max_dim
+     >> rows
+     >> cols
+     >> max_vec_len
+     >> max_row_length
+     >> compressed
+     >> diagonal_optimized;
 
   in >> c;
   AssertThrow (c == ']', ExcIO());
