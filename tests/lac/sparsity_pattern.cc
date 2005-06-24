@@ -137,25 +137,33 @@ main ()
   std::ofstream tmp_write("sparsity_pattern.tmp");
   sp3.block_write (tmp_write);
   tmp_write.close ();
+
+  SparsityPattern sp5;
   
   std::ifstream tmp_read("sparsity_pattern.tmp");
-  sp4.block_read (tmp_read);
+  sp5.block_read (tmp_read);
   tmp_read.close ();
 
                                    // delete temporary file
   std::remove ("sparsity_pattern.tmp");
   
-				   // now check for equivalence of sp3 and sp4
+				   // now check for equivalence of sp3 and sp5
+  deallog << sp3.n_rows() - sp5.n_rows() << ' '
+	  << sp3.n_cols() - sp5.n_cols() << ' '
+	  << (sp3.is_compressed() ^ sp5.is_compressed()) << ' '
+	  << (sp3.is_compressed() ^ sp5.is_compressed()) << ' '
+	  << std::endl;
+  
   for (unsigned int row=0; row<sp3.n_rows(); ++row)
     {
       const unsigned int
         *sp3_p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
       const unsigned int
-        *sp4_p=sp4.get_column_numbers()+sp4.get_rowstart_indices()[row];
+        *sp5_p=sp5.get_column_numbers()+sp5.get_rowstart_indices()[row];
       for (; sp3_p != (sp3.get_column_numbers() +
                        sp3.get_rowstart_indices()[row+1]);
-           ++sp3_p, ++sp4_p)
-	Assert (*sp3_p == *sp4_p, ExcInternalError());
+           ++sp3_p, ++sp5_p)
+	Assert (*sp3_p == *sp5_p, ExcInternalError());
     };
 }
 
