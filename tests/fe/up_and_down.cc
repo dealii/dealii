@@ -86,7 +86,7 @@ void check_element (const Triangulation<dim> &tr,
         for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
           Assert (cell->child(c)->active(), ExcInternalError());
 
-                                         // then restrict and prolong
+                                         // then restrict and prolongate
         cell->get_interpolated_dof_values (tmp, v);
         cell->set_dof_values_by_interpolation (v, x);
       };
@@ -115,8 +115,9 @@ void check_element (const Triangulation<dim> &tr,
           << "; relative residual: "
           << (relative_residual<threshold ? "ok" : "botched up!")
           << std::endl;
-  
-  Assert (relative_residual < threshold*x.l2_norm(), ExcInternalError());
+
+//TODO:[WB] Why this exception with a value different from above. Output of the error should be sufficient!  
+//  Assert (relative_residual < threshold*x.l2_norm(), ExcInternalError());
 }
 
 
