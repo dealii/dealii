@@ -155,6 +155,17 @@ class MGTools
 	const bool only_once = false,
 	std::vector<unsigned int> target_component = std::vector<unsigned int>());
     
+				     /**
+				      * @deprecated Wrapper for the
+				      * other function with same name,
+				      * introduced for compatibility.
+				      */
+    template <int dim>
+      static void count_dofs_per_component (
+	const MGDoFHandler<dim> &mg_dof,
+	std::vector<std::vector<unsigned int> > &result,
+	std::vector<unsigned int> target_component);
+    
     
 				     /**
 				      * Ajust vectors on all levels to

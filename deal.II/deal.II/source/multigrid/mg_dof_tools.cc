@@ -541,6 +541,18 @@ MGTools::count_dofs_per_component (
 
 
 
+template <int dim>
+void
+MGTools::count_dofs_per_component (
+  const MGDoFHandler<dim> &dof_handler,
+  std::vector<std::vector<unsigned int> > &result,
+  std::vector<unsigned int> target_component)
+{
+  count_dofs_per_component(dof_handler, result, false, target_component);
+}
+
+
+
 template<int dim, typename number>
 void
 MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
@@ -726,4 +738,8 @@ template void MGTools::count_dofs_per_component<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
   std::vector<std::vector<unsigned int> >&,
   bool,
+  std::vector<unsigned int>);
+template void MGTools::count_dofs_per_component<deal_II_dimension> (
+  const MGDoFHandler<deal_II_dimension>&,
+  std::vector<std::vector<unsigned int> >&,
   std::vector<unsigned int>);
