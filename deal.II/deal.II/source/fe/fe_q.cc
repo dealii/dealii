@@ -1081,6 +1081,32 @@ FE_Q<dim>::initialize_restriction ()
 // Data field initialization
 //---------------------------------------------------------------------------
 
+#if deal_II_dimension == 1
+
+template <>
+bool
+FE_Q<1>::has_support_on_face (const unsigned int shape_index,
+                              const unsigned int face_index) const
+{
+  Assert (shape_index < this->dofs_per_cell,
+	  ExcIndexRange (shape_index, 0, this->dofs_per_cell));
+  Assert (face_index < GeometryInfo<1>::faces_per_cell,
+	  ExcIndexRange (face_index, 0, GeometryInfo<1>::faces_per_cell));
+
+
+				   // in 1d, things are simple. since
+				   // there is only one degree of
+				   // freedom per vertex in this
+				   // class, the first is on vertex 0
+				   // (==face 0 in some sense), the
+				   // second on face 1:
+  return (((shape_index == 0) && (face_index == 0)) ||
+          ((shape_index == 1) && (face_index == 1)));
+}
+
+
+#else
+
 
 template <int dim>
 bool
@@ -1093,107 +1119,94 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
 	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
 
-				   // in 1d, things are simple. since
-				   // there is only one degree of
-				   // freedom per vertex in this
-				   // class, the first is on vertex 0
-				   // (==face 0 in some sense), the
-				   // second on face 1:
-  if (dim==1)
-    return (((shape_index == 0) && (face_index == 0)) ||
-	    ((shape_index == 1) && (face_index == 1)));
-  else
-				     // more dimensions
-    {
-                                       // first, special-case interior
-                                       // shape functions, since they
-                                       // have no support no-where on
-                                       // the boundary
-      if (((dim==2) && (shape_index>=this->first_quad_index))
-          ||
-          ((dim==3) && (shape_index>=this->first_hex_index)))
-        return false;
+                                   // first, special-case interior
+                                   // shape functions, since they
+                                   // have no support no-where on
+                                   // the boundary
+  if (((dim==2) && (shape_index>=this->first_quad_index))
+      ||
+      ((dim==3) && (shape_index>=this->first_hex_index)))
+    return false;
                                        
-                                       // let's see whether this is a
-                                       // vertex
-      if (shape_index < this->first_line_index) 
+                                   // let's see whether this is a
+                                   // vertex
+  if (shape_index < this->first_line_index) 
+    {
+                                       // for Q elements, there is
+                                       // one dof per vertex, so
+                                       // shape_index==vertex_number. check
+                                       // whether this vertex is
+                                       // on the given face. thus,
+                                       // for each face, give a
+                                       // list of vertices
+      const unsigned int vertex_no = shape_index;
+      Assert (vertex_no < GeometryInfo<dim>::vertices_per_cell,
+              ExcInternalError());
+
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+        if (GeometryInfo<dim>::face_to_cell_vertices(face_index, v) == vertex_no)
+          return true;
+
+      return false;
+    }
+  else if (shape_index < this->first_quad_index)
+                                     // ok, dof is on a line
+    {
+      const unsigned int line_index
+        = (shape_index - this->first_line_index) / this->dofs_per_line;
+      Assert (line_index < GeometryInfo<dim>::lines_per_cell,
+              ExcInternalError());
+
+                                       // in 2d, the line is the
+                                       // face, so get the line
+                                       // index
+      if (dim == 2)
+        return (line_index == face_index);
+      else if (dim == 3)
         {
-                                           // for Q elements, there is
-                                           // one dof per vertex, so
-                                           // shape_index==vertex_number. check
-                                           // whether this vertex is
-                                           // on the given face. thus,
-                                           // for each face, give a
-                                           // list of vertices
-          const unsigned int vertex_no = shape_index;
-          Assert (vertex_no < GeometryInfo<dim>::vertices_per_cell,
-                  ExcInternalError());
+                                           // see whether the
+                                           // given line is on the
+                                           // given face.
+          for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
+            if (GeometryInfo<3>::face_to_cell_lines(face_index, l) == line_index)
+              return true;
 
-	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-	    if (GeometryInfo<dim>::face_to_cell_vertices(face_index, v) == vertex_no)
-	      return true;
-
-	  return false;
-        }
-      else if (shape_index < this->first_quad_index)
-                                         // ok, dof is on a line
-        {
-          const unsigned int line_index
-            = (shape_index - this->first_line_index) / this->dofs_per_line;
-          Assert (line_index < GeometryInfo<dim>::lines_per_cell,
-                  ExcInternalError());
-
-                                           // in 2d, the line is the
-                                           // face, so get the line
-                                           // index
-          if (dim == 2)
-            return (line_index == face_index);
-          else if (dim == 3)
-            {
-                                               // see whether the
-                                               // given line is on the
-                                               // given face.
-	      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
-		if (GeometryInfo<3>::face_to_cell_lines(face_index, l) == line_index)
-		  return true;
-
-	      return false;
-            }
-          else
-            Assert (false, ExcNotImplemented());
-        }
-      else if (shape_index < this->first_hex_index)
-                                         // dof is on a quad
-        {
-          const unsigned int quad_index 
-            = (shape_index - this->first_quad_index) / this->dofs_per_quad;
-          Assert (static_cast<signed int>(quad_index) <
-                  static_cast<signed int>(GeometryInfo<dim>::quads_per_cell),
-                  ExcInternalError());
-          
-                                           // in 2d, cell bubble are
-                                           // zero on all faces. but
-                                           // we have treated this
-                                           // case above already
-          Assert (dim != 2, ExcInternalError());
-
-                                           // in 3d,
-                                           // quad_index=face_index
-          if (dim == 3)
-            return (quad_index == face_index);
-          else
-            Assert (false, ExcNotImplemented());
-        }
-      else
-                                         // dof on hex
-        {
-                                           // can only happen in 3d,
-                                           // but this case has
-                                           // already been covered
-                                           // above
-          Assert (false, ExcNotImplemented());
           return false;
         }
+      else
+        Assert (false, ExcNotImplemented());
+    }
+  else if (shape_index < this->first_hex_index)
+                                     // dof is on a quad
+    {
+      const unsigned int quad_index 
+        = (shape_index - this->first_quad_index) / this->dofs_per_quad;
+      Assert (static_cast<signed int>(quad_index) <
+              static_cast<signed int>(GeometryInfo<dim>::quads_per_cell),
+              ExcInternalError());
+          
+                                       // in 2d, cell bubble are
+                                       // zero on all faces. but
+                                       // we have treated this
+                                       // case above already
+      Assert (dim != 2, ExcInternalError());
+
+                                       // in 3d,
+                                       // quad_index=face_index
+      if (dim == 3)
+        return (quad_index == face_index);
+      else
+        Assert (false, ExcNotImplemented());
+    }
+  else
+                                     // dof on hex
+    {
+                                       // can only happen in 3d,
+                                       // but this case has
+                                       // already been covered
+                                       // above
+      Assert (false, ExcNotImplemented());
+      return false;
     }
 
                                    // we should not have gotten here
@@ -1201,6 +1214,7 @@ FE_Q<dim>::has_support_on_face (const unsigned int shape_index,
   return false;
 }
 
+#endif
 
 
 template <int dim>
