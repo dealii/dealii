@@ -689,11 +689,10 @@ FE_Q<3>::initialize_constraints ()
                                    // destination (child) and source (mother)
                                    // dofs.
   const unsigned int pnts=(this->degree+1)*(this->degree+1);  
-  std::vector<Polynomials::LagrangeEquidistant> v;
-  for (unsigned int i=0;i<=this->degree;++i)
-    v.push_back(Polynomials::LagrangeEquidistant(this->degree,i));
-
-  const TensorProductPolynomials<dim-1> face_polynomials(v);
+  const std::vector<Polynomials::Polynomial<double> > polynomial_basis=
+    Polynomials::LagrangeEquidistant::generate_complete_basis(this->degree);
+ 
+  const TensorProductPolynomials<dim-1> face_polynomials(polynomial_basis);
 
   this->interface_constraints
     .TableBase<2,double>::reinit (this->interface_constraints_size());
