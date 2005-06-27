@@ -596,44 +596,23 @@ FE_Q<2>::initialize_constraints ()
 				   // traces of the shape functions is
 				   // an element of P_{k} (in 2d), or
 				   // Q_{k} (in 3d), where k is the
-				   // degree of the element
-				   //
-				   // from this, we interpolate
-				   // between mother and cell
-				   // face. for the general case, this
-				   // may be a little complicated if
-				   // we don't use Lagrange
-				   // interpolation polynomials, since
-				   // then we can't just use point
-				   // interpolation. what we do
-				   // instead is to evaluate at a
-				   // number of points and then invert
-				   // the interpolation matrix. here,
-				   // for the FE_Q elements, we
-				   // actually do have Lagrange
-				   // polynomials, but we still follow
-				   // the general scheme since this
-				   // code here is the master copy for
-				   // what we use in other elements as
-				   // well. however, there are places
-				   // where we make use of the fact
-				   // that we have Lagrange
-				   // interpolation polynomials.
+				   // degree of the element.  from
+				   // this, we interpolate between
+				   // mother and cell face.
 
-				   // mathematically speaking, the
-				   // interpolation process works in
-				   // the following way: on each
-				   // subface, we want that finite
-				   // element solututions from both
-				   // sides coincide. i.e. if a and b
-				   // are expansion coefficients for
-				   // the shape functions from both
-				   // sides, we seek a relation
-				   // between x and y such that
-				   //   sum_i a_i phi^c_i(x)
-				   //   == sum_j b_j phi_j(x)
+				   // the interpolation process works
+				   // as followings: on each subface,
+				   // we want that finite element
+				   // solutions from both sides
+				   // coincide. i.e. if a and b are
+				   // expansion coefficients for the
+				   // shape functions from both sides,
+				   // we seek a relation between x and
+				   // y such that
+				   //   sum_j a_j phi^c_j(x)
+				   //   == sum_j b_j phi_j(x)  
 				   // for all points x on the
-				   // interface. here, phi^c_i are the
+				   // interface. here, phi^c_j are the
 				   // shape functions on the small
 				   // cell on one side of the face,
 				   // and phi_j those on the big cell
@@ -645,229 +624,94 @@ FE_Q<2>::initialize_constraints ()
 				   // need n evaluation points, and we
 				   // choose them equidistantly.
 				   //
-				   // what one then gets is a matrix
-				   // system
-				   //    a A  ==  b B
+				   // we obtain the matrix system
+				   //    A a  ==  B b
 				   // where
-				   //    A_ij = phi^c_i(x_j)
-  				   //    B_ij = phi_i(x_j)
-				   // and the relation we are looking for
-				   // is
-				   //    a = (A^T)^-1 B^T b
+				   //    A_ij = phi^c_j(x_i)
+  				   //    B_ij = phi_j(x_i)
+				   // and the relation we are looking
+				   // for is
+				   //    a = A^-1 B b
 				   //
-				   // below, we build up these
-				   // matrices, but rather than
-				   // transposing them after the
-				   // fact, we do so while building
-				   // them. A will be
-				   // subface_interpolation, B will be
-				   // face_interpolation. note that we
-				   // build up these matrices for all
-				   // faces at once, rather than
-				   // considering them separately. the
-				   // reason is that we finally will
-				   // want to have them in this order
-				   // anyway, as this is the format we
-				   // need inside deal.II
-  TensorProductPolynomials<dim-1>
-    face_polynomials (Polynomials::LagrangeEquidistant::
-		      generate_complete_basis (this->degree));
-  Assert (face_polynomials.n() == this->dofs_per_face, ExcInternalError());
-  
-  const unsigned int n_small_functions = this->interface_constraints_size()[0];
-  
-  FullMatrix<double> face_interpolation (n_small_functions, this->dofs_per_face);
-  FullMatrix<double> subface_interpolation (n_small_functions, n_small_functions);
-  
-  for (unsigned int i=0; i<n_small_functions; ++i)
+				   // for the special case of Lagrange
+				   // interpolation polynomials, A_ij
+				   // reduces to delta_ij, and
+				   //    a_i = B_ij b_j
+				   // Hence,
+				   // interface_constraints(i,j)=B_ij.
+				   //
+				   // for the general case, where we
+				   // don't have Lagrange
+				   // interpolation polynomials, this
+				   // is a little more
+				   // complicated. Then we would
+				   // evaluate at a number of points
+				   // and invert the interpolation
+				   // matrix A.
+				   //
+				   // Note, that we build up these
+				   // matrices for all subfaces at
+				   // once, rather than considering
+				   // them separately. the reason is
+				   // that we finally will want to
+				   // have them in this order anyway,
+				   // as this is the format we need
+				   // inside deal.II
+
+				   // In the following the points x_i
+				   // are constructed in following
+				   // order (n=degree-1)
+				   // *----------*---------*
+				   //     1..n   0  n+1..2n
+				   // i.e. first the midpoint of the
+				   // line, then the support points on
+				   // subface 0 and on subface 1
+  std::vector<Point<dim-1> > constraint_points;
+                                   // Add midpoint
+  constraint_points.push_back (Point<dim-1> (0.5));
+
+  if (this->degree>1)
     {
-				       // generate a quadrature point
-				       // xi. it is actually not so
-				       // important where this point
-				       // lies, as long as we make
-				       // sure that they are not
-				       // equal. however, we will want
-				       // them to be the (equidistant)
-				       // Lagrange points, since then
-				       // the subface_interpolation
-				       // matrix has a most positive
-				       // property: it is a
-				       // permutation of the identity
-				       // matrix. so create an
-				       // equidistant mesh of points
-				       // in the interior of the face
-				       // (in 2d). for 3d, things are
-				       // somewhat more convoluted as
-				       // usual, since the new (child)
-				       // shape functions are not only
-				       // located in the interior of
-				       // the face, but also on the
-				       // edges, with the exception of
-				       // the four vertices of the
-				       // face. the function we call
-				       // takes care of all this
-      const Point<dim-1> p_face
-	= FE_Q_Helper::generate_face_unit_point (i, n_small_functions);
-
-				       // evaluate the big face
-				       // shape function at this
-				       // point. note that the
-				       // numbering of our shape
-				       // functions is different
-				       // from that of the
-				       // polynomial, which orders
-				       // them in the order of
-				       // interpolation points.
-				       //
-				       // face_index_map_inverse will
-				       // get us over this little
-				       // conversion
-      for (unsigned int j=0; j<this->dofs_per_face; ++j)
-	{
-	  face_interpolation(i,j)
-	    = face_polynomials.compute_value(face_index_map[j], p_face);
-					   // if the value is small up
-					   // to round-off, then
-					   // simply set it to zero to
-					   // avoid unwanted fill-in
-					   // of the constraint
-					   // matrices (which would
-					   // then increase the number
-					   // of other DoFs a
-					   // constrained DoF would
-					   // couple to)
-	  if (std::fabs(face_interpolation(i,j)) < 1e-14)
-	    face_interpolation(i,j) = 0;
-	}
-	
-				       // then evaluate all the
-				       // small shape functions at
-				       // this point.
-      for (unsigned int j=0; j<n_small_functions; ++j)
-	{
-					   // first thing is to check
-					   // which face the present
-					   // point is on,
-					   // i.e. whether it is left
-					   // or right of the middle
-					   // vertex in 2d, or
-					   // something more complex
-					   // in 3d (note that we
-					   // might actually be
-					   // sitting on top of the
-					   // center vertex, or on on
-					   // interface between
-					   // children, but that
-					   // doesn't really bother
-					   // us: the shape functions
-					   // associated with that
-					   // have the same value
-					   // whether we consider the
-					   // left or the right
-					   // subface, and all other
-					   // shape functions should
-					   // be zero there as well,
-					   // so it doesn't really
-					   // matter whether we
-					   // account for this fact or
-					   // not...)
-	  const unsigned int subface
-	    = GeometryInfo<dim-1>::child_cell_from_point (p_face);
-
-					   // then check whether small
-					   // shape function number j
-					   // is nonzero on this
-					   // face. as usual with our
-					   // numbering of shape
-					   // functions in constraint
-					   // matrices, this is messy,
-					   // so have a function that
-					   // does this for us
-					   //
-					   // if not active, then the
-					   // entry in the matrix will
-					   // remain zero, and we
-					   // simply go on with the
-					   // next entry
-	  if (!
-	      FE_Q_Helper::
-	      constraint_function_is_active_on_child (j, subface, *this))
-	    continue;
-	    
-					   // otherwise: compute the
-					   // coordinates of this
-					   // evaluation point on
-					   // the small face
-	  const Point<dim-1> p_subface
-	    = GeometryInfo<dim-1>::cell_to_child_coordinates (p_face, subface);
-	
-					   // then get the index of
-					   // small shape function j
-					   // on this subface. again,
-					   // divert to a function
-					   // that is specialized for
-					   // this
-	  const unsigned int local_j
-	    = FE_Q_Helper::constraint_get_local_j (j, subface, *this);
-
-					   // so evaluate this shape
-					   // function there. now,
-					   // since we have been
-					   // careful with our choice
-					   // of evaluation points,
-					   // this is not actually
-					   // necessary: the values of
-					   // the small shape
-					   // functions at these
-					   // points should be either
-					   // zero, and we can
-					   // precompute which they
-					   // are. However, we double
-					   // check just to be sure we
-					   // didn't do something
-					   // stupid...
-					   //
-					   // (we could just set the
-					   // evaluated value, but
-					   // we'd end up with a lot
-					   // of almost-zero entries,
-					   // which will then carry
-					   // over to the final
-					   // result. this clutters up
-					   // the constraint matrices,
-					   // which we want to keep as
-					   // small as possible.)
-	  if (FE_Q_Helper::constraint_is_support_point (i, j, subface, *this))
-	    subface_interpolation(i, j) = 1.;
-	  else
-	    subface_interpolation(i, j) = 0.;
-	  Assert (std::fabs (subface_interpolation(i, j) -
-			     face_polynomials.compute_value(local_j, p_subface))
-		  < 1e-12,
-		  ExcInternalError());
-	}
+      const unsigned int n=this->degree-1;
+      const double step=1./this->degree;
+				       // subface 0
+      for (unsigned int i=1; i<=n; ++i)
+	constraint_points.push_back (
+	  GeometryInfo<dim-1>::child_to_cell_coordinates(Point<dim-1>(i*step),0));
+				       // subface 1
+      for (unsigned int i=1; i<=n; ++i)
+	constraint_points.push_back (
+	  GeometryInfo<dim-1>::child_to_cell_coordinates(Point<dim-1>(i*step),1));
     }
 
-				   // what we now want to do is to
-				   // compute
-				   //   (subface_intp)^-1 face_intp
-				   // which should give us the
-				   // desired hanging node constraints.
-				   // rather than actually doing this,
-				   // we note that we have constructed
-				   // subface_interpolation to be a
-				   // permutation of the unit matrix.
-				   // rather than doing a gauss jordan
-				   // inversion, we note that the
-				   // inverse is actually given by the
-				   // transpose of the matrix. This has
-				   // the additional benefit of being
-				   // more stable and in particular of
-				   // not adding almost-zeros
+                                   // Now construct relation between
+                                   // destination (child) and source (mother)
+                                   // dofs.
+  const std::vector<Polynomials::Polynomial<double> > polynomials=
+    Polynomials::LagrangeEquidistant::generate_complete_basis(this->degree);
+
   this->interface_constraints
     .TableBase<2,double>::reinit (this->interface_constraints_size());
-  subface_interpolation.Tmmult (this->interface_constraints,
-				face_interpolation);
+
+  for (unsigned int i=0; i<constraint_points.size(); ++i)
+    for (unsigned j=0; j<this->degree+1; ++j)
+      {
+	this->interface_constraints(i,j) = 
+	  polynomials[face_index_map[j]].value (constraint_points[i](0));
+		    
+                                           // if the value is small up
+                                           // to round-off, then
+                                           // simply set it to zero to
+                                           // avoid unwanted fill-in
+                                           // of the constraint
+                                           // matrices (which would
+                                           // then increase the number
+                                           // of other DoFs a
+                                           // constrained DoF would
+                                           // couple to)
+          if (std::fabs(this->interface_constraints(i,j)) < 1e-14)
+            this->interface_constraints(i,j) = 0;
+      }
 }
 
 #endif
@@ -879,78 +723,25 @@ FE_Q<3>::initialize_constraints ()
 {
   const unsigned int dim = 3;
 
-                                   // This algorithm for the automatic
-                                   // generation of the constraint matrices is
-                                   // different from the one implemented for
-                                   // the 2D elements. Hence it is only suited
-                                   // for standard Finite Elements with a
-                                   // Lagrangian basis.  This algorithm
-                                   // consists of two parts. In the first
-                                   // part, the coordinates of the hanging
-                                   // nodes on the master element will be
-                                   // determined. These points are constructed
-                                   // in a special order (as described in the
-                                   // fe_base.h file for the class
-                                   // FiniteElementBase). First the hanging
-                                   // node in the mid of the coarser element
-                                   // is considered:
-                                   // 
-                                   // Coarse      Fine
-                                   // +-----+     +--+--+ 
-                                   // |     |     |  |  |
-                                   // |  *  |     +--+--+
-                                   // |     |     |  |  |
-                                   // +-----+     +--+--+
-                                   // 
-                                   // Then the coordinates of the hanging
-                                   // nodes at the midpoint of the outline of
-                                   // the coarse element follow:
-                                   // 
-                                   // Coarse      Fine
-                                   // +--*--+     +--+--+ 
-                                   // |     |     |  |  |
-                                   // *     *     +--+--+
-                                   // |     |     |  |  |
-                                   // +--*--+     +--+--+
-                                   // 
-                                   // For Q1 that was it. But for higher order
-                                   // elements some more constraints are
-                                   // required.  Hanging nodes on the lines
-                                   // which are inside the coarse element:
-                                   // 
-                                   // Coarse      Fine
-                                   // +-----+     +--+--+ 
-                                   // |  *  |     |  |  |
-                                   // | * * |     +--+--+
-                                   // |  *  |     |  |  |
-                                   // +-----+     +--+--+
-                                   // 
-                                   // Hanging nodes on the outside lines:
-                                   // 
-                                   // Coarse      Fine
-                                   // +-*-*-+     +--+--+ 
-                                   // *     *     |  |  |
-                                   // |     |     +--+--+
-                                   // *     *     |  |  |
-                                   // +-*-*-+     +--+--+
-                                   // 
-                                   // And finally the interior nodes:
-                                   // 
-                                   // Coarse      Fine
-                                   // +-----+     +--+--+ 
-                                   // | * * |     |  |  |
-                                   // |     |     +--+--+
-                                   // | * * |     |  |  |
-                                   // +-----+     +--+--+
-                                   // 
-                                   // Once these points are known, it is
-                                   // pretty easy to get the contribution of
-                                   // each node on the coarse face to the
-                                   // value at the hanging nodes.  This task
-                                   // is accomplished in the second part of
-                                   // the algorithm
+				   // For a detailed documentation of
+				   // the interpolation see the
+				   // FE_Q<2>::initialize_constraints
+				   // function.
 
-                                   // Generate destination points.
+				   // In the following the points x_i
+				   // are constructed in the order as
+				   // described in the documentation
+				   // of the FiniteElementBase class
+				   // (fe_base.h), i.e.
+				   //   *--13--3--14--*
+				   //   |      |      |
+				   //   16 20  7  19  12
+				   //   |      |      |
+				   //   4--8---0--6---2
+				   //   |      |      |
+				   //   15 17  5  18  11
+				   //   |      |      |
+				   //   *--9---1--10--*
   std::vector<Point<dim-1> > constraint_points;
 
                                    // Add midpoint
