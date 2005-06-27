@@ -16,6 +16,8 @@
 #include <fe/fe_q.h>
 #include <fe/fe_tools.h>
 
+#include <vector>
+
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
 #else
