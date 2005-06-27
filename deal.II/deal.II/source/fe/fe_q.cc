@@ -632,13 +632,13 @@ FE_Q<3>::initialize_constraints ()
     {
       const unsigned int n=this->degree-1;
       const double step=1./this->degree;
-      vector<Point<dim-2> > line_support_points(n);
+      std::vector<Point<dim-2> > line_support_points(n);
       for (unsigned int i=0; i<n; ++i)
 	line_support_points[i](0)=(i+1)*step;
       Quadrature<dim-2> qline(line_support_points);
 
 				       // auxiliary points in 2d
-      vector<Point<dim-1> > p_line(n);
+      std::vector<Point<dim-1> > p_line(n);
   
 				       // Add nodes of lines interior
 				       // in the "mother-face"
@@ -673,7 +673,7 @@ FE_Q<3>::initialize_constraints ()
       
 				       // Create constraints for
 				       // interior nodes
-      vector<Point<dim-1> > inner_points(n*n);
+      std::vector<Point<dim-1> > inner_points(n*n);
       for (unsigned int i=0, iy=1; iy<=n; ++iy)
 	for (unsigned int ix=1; ix<=n; ++ix)
 	  inner_points[i++] = Point<dim-1> (ix*step, iy*step);
