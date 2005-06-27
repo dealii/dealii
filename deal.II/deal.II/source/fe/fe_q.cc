@@ -191,8 +191,8 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 						    face_index_map(FE_Q_Helper::invert_numbering(face_lexicographic_to_hierarchic_numbering (degree)))
 {
   std::vector<unsigned int> renumber (this->dofs_per_cell);
-  FETools::lexicographic_to_hierarchic_numbering (*this, renumber);
-  this->poly_space.set_numbering(FE_Q_Helper::invert_numbering(renumber));
+  FETools::hierarchic_to_lexicographic_numbering (*this, renumber);
+  this->poly_space.set_numbering(renumber);
   
 				   // finally fill in support points
 				   // on cell and face
