@@ -11,6 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
+#include <base/quadrature.h>
+#include <base/qprojector.h>
 #include <fe/fe_q.h>
 #include <fe/fe_tools.h>
 
@@ -950,86 +952,78 @@ FE_Q<3>::initialize_constraints ()
 
                                    // Generate destination points.
   std::vector<Point<dim-1> > constraint_points;
-  const std::vector<Point<dim-1> > &un_supp
-    = this->get_unit_face_support_points ();
-  const unsigned int pnts = un_supp.size ();
 
                                    // Add midpoint
   constraint_points.push_back (Point<dim-1> (0.5, 0.5));
 
-                                   // Add midpoints of lines of "mother-face"
-  for (unsigned int face = 0; 
-       face < GeometryInfo<dim>::subfaces_per_face; ++face)
-    {
-      Point<dim-1> pnt_temp = un_supp[(face + 1) % 4];
-      pnt_temp *= 0.5;
-      pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
-      constraint_points.push_back (pnt_temp);
-    }
-
-                                   // Add nodes of lines interior in the
+                                   // Add midpoints of lines of
                                    // "mother-face"
-  for (unsigned int face = 0; 
-       face < GeometryInfo<dim>::subfaces_per_face; ++face)
+  constraint_points.push_back (Point<dim-1> (0.5, 0));
+  constraint_points.push_back (Point<dim-1> (1, 0.5));
+  constraint_points.push_back (Point<dim-1> (0.5, 1));
+  constraint_points.push_back (Point<dim-1> (0, 0.5));
+
+  if (this->degree>1)
     {
-      const unsigned int line_offset
-        = 4 + ((face + 1) % 4) * (this->degree-1);
-      for (unsigned int line_dof = 0; line_dof < this->degree-1; ++line_dof)
-        {
-          Point<dim-1> pnt_temp = un_supp[line_offset + line_dof];
-          pnt_temp *= 0.5;
-          pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
-          constraint_points.push_back (pnt_temp);
-        }
-    }
+      const unsigned int n=this->degree-1;
+      const double step=1./this->degree;
+      vector<Point<dim-2> > line_support_points(n);
+      for (unsigned int i=0; i<n; ++i)
+	line_support_points[i](0)=(i+1)*step;
+      Quadrature<dim-2> qline(line_support_points);
 
-                                   // DoFs on bordering lines
-  for (unsigned int line = 0; 
-       line < GeometryInfo<dim>::lines_per_face; ++line)
-    {
-                                       // This face index runs through the two
-                                       // faces, which share the line "line"
-                                       // with the coarse element.
-      for (unsigned int face = 0; face < 2; ++face)
-        {
-          const unsigned int line_offset = 4 + (line * (this->degree-1));
+				       // auxiliary points in 2d
+      vector<Point<dim-1> > p_line(n);
+  
+				       // Add nodes of lines interior
+				       // in the "mother-face"
 
-                                           // Line 2 and 3 have a different
-                                           // ordering
-          const unsigned int offset
-            = ((line < 2) ?
-               ((line + face) % 4) :
-               ((line + 1 - face) % 4));
-
-          for (unsigned int line_dof = 0;
-               line_dof < this->degree-1; ++line_dof)
-            {
-              Point<dim-1> pnt_temp = un_supp[line_offset + line_dof];
-              pnt_temp *= 0.5;
-              pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (offset) * 0.5);
-              constraint_points.push_back (pnt_temp);
-            }
-        }
-    }
-
-                                   // Create constraints for interior nodes
-  const unsigned int dofs_per_face = (this->degree-1) * (this->degree-1);
-  for (unsigned int face = 0; 
-       face < GeometryInfo<dim>::subfaces_per_face; ++face)
-    {
-      const unsigned int face_offset = 4 + (4 * (this->degree-1));
-      for (unsigned int face_dof = 0; face_dof < dofs_per_face; ++face_dof)
-        {
-          Point<dim-1> pnt_temp = un_supp[face_offset + face_dof];
-          pnt_temp *= 0.5;
-          pnt_temp += (GeometryInfo<dim-1>::unit_cell_vertex (face) * 0.5);
-          constraint_points.push_back (pnt_temp);
-        }
+				       // line 5: use line 15
+      QProjector<dim-1>::project_to_subface(qline, 3, 0, p_line);
+      for (unsigned int i=0; i<n; ++i)
+	constraint_points.push_back (p_line[i] + Point<dim-1> (0.5, 0));
+				       // line 6: use line 10
+      QProjector<dim-1>::project_to_subface(qline, 0, 1, p_line);
+      for (unsigned int i=0; i<n; ++i)
+	constraint_points.push_back (p_line[i] + Point<dim-1> (0, 0.5));
+				       // line 7: use line 16
+      QProjector<dim-1>::project_to_subface(qline, 3, 1, p_line);
+      for (unsigned int i=0; i<n; ++i)
+	constraint_points.push_back (p_line[i] + Point<dim-1> (0.5, 0));
+				       // line 8: use line 9
+      QProjector<dim-1>::project_to_subface(qline, 0, 0, p_line);
+      for (unsigned int i=0; i<n; ++i)
+	constraint_points.push_back (p_line[i] + Point<dim-1> (0, 0.5));      
+      
+				       // DoFs on bordering lines
+				       // lines 9-16
+      for (unsigned int face=0; face<GeometryInfo<dim-1>::faces_per_cell; ++face)
+	for (unsigned int subface=0;
+	     subface<GeometryInfo<dim-1>::subfaces_per_face; ++subface)
+	  {
+	    QProjector<dim-1>::project_to_subface(qline, face, subface, p_line);
+	    constraint_points.insert(constraint_points.end(),
+				     p_line.begin(), p_line.end());
+	  }
+      
+				       // Create constraints for
+				       // interior nodes
+      vector<Point<dim-1> > inner_points(n*n);
+      for (unsigned int i=0, iy=1; iy<=n; ++iy)
+	for (unsigned int ix=1; ix<=n; ++ix)
+	  inner_points[i++] = Point<dim-1> (ix*step, iy*step);
+      
+      for (unsigned int child=0; 
+	   child<GeometryInfo<dim-1>::children_per_cell; ++child)
+	for (unsigned int i=0; i<inner_points.size(); ++i)
+	  constraint_points.push_back (
+	    GeometryInfo<dim-1>::child_to_cell_coordinates(inner_points[i], child));
     }
 
                                    // Now construct relation between
                                    // destination (child) and source (mother)
                                    // dofs.
+  const unsigned int pnts=(this->degree+1)*(this->degree+1);  
   std::vector<Polynomials::LagrangeEquidistant> v;
   for (unsigned int i=0;i<=this->degree;++i)
     v.push_back(Polynomials::LagrangeEquidistant(this->degree,i));
@@ -1039,7 +1033,7 @@ FE_Q<3>::initialize_constraints ()
   this->interface_constraints
     .TableBase<2,double>::reinit (this->interface_constraints_size());
 
-  for (unsigned int j = 0; j < constraint_points.size(); ++j)
+  for (unsigned int i=0; i<constraint_points.size(); ++i)
     {
       const double interval = (double) (this->degree * 2);
       bool mirror[dim - 1];
@@ -1062,10 +1056,10 @@ FE_Q<3>::initialize_constraints ()
                                        // will be scaled back. The equal
                                        // treatment of all coordinates should
                                        // eliminate any FP errors.
-      for (unsigned int k = 0; k < dim - 1; ++k)
+      for (unsigned int k=0; k<dim-1; ++k)
         {
           const int coord_int =
-            static_cast<int> (constraint_points[j](k) * interval + 0.25);
+            static_cast<int> (constraint_points[i](k) * interval + 0.25);
           constraint_point(k) = 1.*coord_int / interval;
 
                                            // The following lines of code
@@ -1112,11 +1106,11 @@ FE_Q<3>::initialize_constraints ()
             constraint_point(k) = 1.0 - constraint_point(k);
         }
 
-      for (unsigned i = 0; i < pnts; ++i)
+      for (unsigned j=0; j<pnts; ++j)
         {
           unsigned int indices[2]
-            = { face_index_map[i] % (this->degree + 1),
-                face_index_map[i] / (this->degree + 1) };
+            = { face_index_map[j] % (this->degree + 1),
+                face_index_map[j] / (this->degree + 1) };
           
           for (unsigned int k = 0; k<2; ++k)
             if (mirror[k])
@@ -1125,7 +1119,7 @@ FE_Q<3>::initialize_constraints ()
           const unsigned int
             new_index = indices[1] * (this->degree + 1) + indices[0];
 
-          this->interface_constraints(j,i) = 
+          this->interface_constraints(i,j) = 
             face_polynomials.compute_value (new_index, constraint_point);
 	    
                                            // if the value is small up
@@ -1138,8 +1132,8 @@ FE_Q<3>::initialize_constraints ()
                                            // of other DoFs a
                                            // constrained DoF would
                                            // couple to)
-          if (std::fabs(this->interface_constraints(j,i)) < 1e-14)
-            this->interface_constraints(j,i) = 0;
+          if (std::fabs(this->interface_constraints(i,j)) < 1e-14)
+            this->interface_constraints(i,j) = 0;
         }
     }
 }
