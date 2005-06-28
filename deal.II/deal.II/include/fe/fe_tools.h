@@ -325,6 +325,47 @@ class FETools
 				      * matter if you use a continuous
 				      * or discontinuous version of
 				      * the finite element.
+				      *
+				      * It is worth noting that there
+				      * are a few confusing cases of
+				      * this function. The first one
+				      * is that it really only makes
+				      * sense to project onto a finite
+				      * element that has at most as
+				      * many degrees of freedom per
+				      * cell as there are quadrature
+				      * points; the projection of N
+				      * quadrature point data into a
+				      * space with M>N unknowns is
+				      * well-defined, but often yields
+				      * funny and non-intuitive
+				      * results. Secondly, one would
+				      * think that if the quadrature
+				      * point data is defined in the
+				      * support points of the finite
+				      * element, i.e. the quadrature
+				      * points of
+				      * <tt>ths_quadrature</tt> equal
+				      * <tt>fe.get_unit_support_points()</tt>,
+				      * then the projection should be
+				      * the identity, i.e. each degree
+				      * of freedom of the finite
+				      * element equals the value of
+				      * the given data in the support
+				      * point of the corresponding
+				      * shape function. However, this
+				      * is not generally the case:
+				      * while the matrix <tt>Q</tt> in
+				      * that case is the identity
+				      * matrix, the mass matrix
+				      * <tt>M</tt> is not equal to the
+				      * identity matrix, except for
+				      * the special case that the
+				      * quadrature formula
+				      * <tt>lhs_quadrature</tt> also
+				      * has its quadrature points in
+				      * the support points of the
+				      * finite element.
                                       */
     template <int dim>
     static
