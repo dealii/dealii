@@ -500,23 +500,21 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
   const unsigned int nq = q_fine.n_quadrature_points;
   
   FEValues<dim> fine (mapping, fe, q_fine,
-		      update_q_points | update_JxW_values | update_values);  
-
-				   /**
-				    * We search for the polynomial on
-				    * the small cell, being equal to
-				    * the coarse polynomial in all
-				    * quadrature points.
-				    *
-				    * First build the matrix for this
-				    * least squares problem. This
-				    * contains the values of the fine
-				    * cell polynomials in the fine
-				    * cell grid points.
-				    *
-				    * This matrix is the same for all
-				    * children.
-				    */
+		      update_q_points | update_JxW_values | update_values);
+  
+				   // We search for the polynomial on
+				   // the small cell, being equal to
+				   // the coarse polynomial in all
+				   // quadrature points.
+				    
+				   // First build the matrix for this
+				   // least squares problem. This
+				   // contains the values of the fine
+				   // cell polynomials in the fine
+				   // cell grid points.
+				    
+				   // This matrix is the same for all
+				   // children.
   fine.reinit(tria.begin_active());
   FullMatrix<number> A(nq*nd, n);
   for (unsigned int d=0;d<nd;++d)
@@ -588,15 +586,13 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 
 
 
-//TODO[GK]: this function is presently not instantiated, and probably doesn't even compile.
+//TODO[GK]: this function does not work yet.
 template<int dim, typename number>
 void
 FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
 				     FullMatrix<number>* matrices)
 {
-//TODO[GK]: clean up this function and make it work  
-  Assert (false, ExcNotImplemented());
-  
+  Assert(false, ExcNotImplemented());
   const unsigned int nc = GeometryInfo<dim>::children_per_cell;
   const unsigned int n  = fe.dofs_per_cell;
   const unsigned int nd = fe.n_components();
@@ -608,23 +604,10 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
       Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(),n));
     }
   
-				   /*
-				    * Set up two meshes, one with a
-				    * single reference cell and the
-				    * other refined, together with
-				    * DoFHandler and finite elements.
-				    */
-//TODO[GK]: This should be changed just like the function above, i.e. not use a DoFHandler at all (and use the Triangulation alone), and to use only a single triangulation. this would make it significantly more efficient
-  Triangulation<dim> tr_coarse;
-  Triangulation<dim> tr_fine;
-  GridGenerator::hyper_cube (tr_coarse, 0, 1);
-  GridGenerator::hyper_cube (tr_fine, 0, 1);
-  tr_fine.refine_global(1);
-  DoFHandler<dim> dof_coarse(tr_coarse);
-  dof_coarse.distribute_dofs(fe);
-  DoFHandler<dim> dof_fine(tr_fine);
-  dof_fine.distribute_dofs(fe);
-
+  Triangulation<dim> tr;
+  GridGenerator::hyper_cube (tr, 0, 1);
+  tr.refine_global(1);
+  
   MappingCartesian<dim> mapping;
   QGauss<dim> q_fine(degree+1);
   const unsigned int nq = q_fine.n_quadrature_points;
@@ -634,43 +617,88 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
   FEValues<dim> fine (mapping, fe, q_fine,
 		      update_q_points | update_JxW_values | update_values);
   
-  typename DoFHandler<dim>::active_cell_iterator coarse_cell
-    = dof_coarse.begin_active();
-  typename DoFHandler<dim>::active_cell_iterator fine_cell;
+  typename Triangulation<dim>::cell_iterator coarse_cell
+    = tr.begin(0);
+  typename Triangulation<dim>::cell_iterator fine_cell;
 
 				   // Compute the coarse level mass
 				   // matrix
-  coarse.reinit(dof_coarse);
+  coarse.reinit(coarse_cell);
   FullMatrix<number> A(n, n);
   for (unsigned int k=0;k<nq;++k)
     for (unsigned int i=0;i<n;++i)
       for (unsigned int j=0;j<n;++j)
-	A(i,j) = coarse.JxW(k)
-		 * coarse.shape_value(i,k)
-		 * coarse.shape_value(j,k);
+	if (fe.is_primitive())
+	  A(i,j) = coarse.JxW(k)
+		   * coarse.shape_value(i,k)
+		   * coarse.shape_value(j,k);
+	else
+	  for (unsigned int d=0;d<nd;++d)
+	    A(i,j) = coarse.JxW(k)
+		     * coarse.shape_value_component(i,k,d)
+		     * coarse.shape_value_component(j,k,d);
   
   Householder<double> H(A);
   
   Vector<number> v_coarse(n);
   Vector<number> v_fine(n);
   
-  unsigned int cell_number = 0;
-  for (fine_cell = dof_fine.begin_active();
-       fine_cell != dof_fine.end();
-       ++fine_cell, ++cell_number)
+  for (unsigned int cell_number=0;cell_number<GeometryInfo<dim>::children_per_cell;++cell_number)
     {
+      FullMatrix<double> &this_matrix = matrices[cell_number];
+      
 				       // Compute right hand side,
 				       // which is a fine level basis
 				       // function tested with the
 				       // coarse level functions.
-      Assert(false, ExcNotImplemented());
+      fine.reinit(coarse_cell->child(cell_number));
+      Quadrature<dim> q_coarse (fine.get_quadrature_points(),
+				fine.get_JxW_values());
+      FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
+      coarse.reinit(coarse_cell);
+      
+				       // Build RHS
+
+				       // Outer loop over all fine
+				       // grid shape functions phi_j
+      for (unsigned int j=0;j<fe.dofs_per_cell;++j)
+	{
+					   // Loop over all quadrature points
+	  for (unsigned int k=0;k<fine.n_quadrature_points;++k)
+	    {
+					       // integrate the scalar
+					       // product
+					       // (phi_i,phi_j) for
+					       // all coarse shape
+					       // functions to get the
+					       // right hand side
+	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		{
+		  if (fe.is_primitive())
+		    v_fine(i) += fine.JxW(k)
+				 * coarse.shape_value(i,k)
+				 * fine.shape_value(j,k);
+		  else
+		    for (unsigned int d=0;d<nd;++d)
+		      v_fine(i) += fine.JxW(k)
+				   * coarse.shape_value_component(i,k,d)
+				   * fine.shape_value_component(j,k,d);
+		}
+	    }
+					   // RHS ready. Solve system
+					   // and enter row into
+					   // matrix
+	  H.least_squares(v_coarse, v_fine);
+	  for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+	    this_matrix(j,i) = v_coarse(i);
+	}
       
 				       // Remove small entries from
 				       // the matrix
-//       for (unsigned int i=0; i<matrix.m(); ++i)
-// 	for (unsigned int j=0; j<matrix.n(); ++j)
-// 	  if (std::fabs(matrix(i,j)) < 1e-12)
-// 	    matrix(i,j) = 0.;
+      for (unsigned int i=0; i<this_matrix.m(); ++i)
+ 	for (unsigned int j=0; j<this_matrix.n(); ++j)
+ 	  if (std::fabs(this_matrix(i,j)) < 1e-12)
+ 	    this_matrix(i,j) = 0.;
     }
 }
 
@@ -1523,6 +1551,10 @@ void FETools::get_projection_matrix<deal_II_dimension>
 
 template
 void FETools::compute_embedding_matrices<deal_II_dimension>
+(const FiniteElement<deal_II_dimension> &, FullMatrix<double>*);
+
+template
+void FETools::compute_projection_matrices<deal_II_dimension>
 (const FiniteElement<deal_II_dimension> &, FullMatrix<double>*);
 
 template
