@@ -71,6 +71,6 @@ check_this (const FiniteElement<dim> &fe,
   for (unsigned int i=0; i<X.m(); ++i)
     X(i,i) -= 1;
 
-  Assert (X.frobenius_norm() < 1e-12, ExcInternalError());
+  Assert (X.frobenius_norm() < 1e-10, ExcInternalError());
 }
 
