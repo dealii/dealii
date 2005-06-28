@@ -128,6 +128,20 @@ FiniteElementBase (const FiniteElementData<dim> &fe_data,
                                     ==
                                     n_nonzero_components_table.end())
 {
+				   // Special handling of vectors of
+				   // length one: in this case, we
+				   // assume that all entries were
+				   // supposed to be equal.
+   unsigned int ndofs = this->dofs_per_cell;
+   if (restriction_is_additive_flags.size() == 1 && this->dofs_per_cell > 1)
+     {
+       std::vector<bool>& riaf = const_cast<std::vector<bool>&>(restriction_is_additive_flags);
+       riaf.resize(ndofs, restriction_is_additive_flags[0]);
+     }
+   
+//   if (nonzero_components.size() == 1 && this->dofs_per_cell > 1)
+//     nonzero_components.resize(ndofs, nonzero_components[0]);
+  
   Assert (restriction_is_additive_flags.size() == this->dofs_per_cell,
 	  ExcDimensionMismatch(restriction_is_additive_flags.size(),
 			       this->dofs_per_cell));
