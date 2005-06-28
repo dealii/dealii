@@ -45,10 +45,78 @@ template<int dim> class FESystem;
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003, 2005
  */
-template<int dim>
+template <int dim>
 class FiniteElementData
 {
   public:
+				     /**
+				      * Enumerator for the different
+				      * types of continuity a finite
+				      * element may have. Continuity
+				      * is measured by the Sobolev
+				      * space containing the
+				      * constructed finite element
+				      * space and also called this way.
+				      *
+				      * Note that certain continuities
+				      * may imply others. For
+				      * instance, a function in
+				      * <i>H<sup>1</sup></i> is in
+				      * <i>H<sup>curl</sup></i> and
+				      * <i>H<sup>div</sup></i> as
+				      * well.
+				      *
+				      * If you are interested in
+				      * continuity in the classical
+				      * sense, then the following
+				      * relations hold:
+				      *
+				      * <ol>
+				      *
+				      * <li> <i>H<sup>1</sup></i>
+				      * implies that the function is
+				      * continuous over cell
+				      * boundaries.
+				      *
+				      * <li> <i>H<sup>2</sup></i>
+				      * implies that the function is
+				      * continuously differentiable
+				      * over cell boundaries.
+				      *
+				      * The value <i>L<sup>2</sup></i>
+				      * indicates that the element is
+				      * discontinuous. Since
+				      * discontinuous elements have no
+				      * topological couplings between
+				      * grid cells and code may
+				      * actually depend on this
+				      * property, <i>L<sup>2</sup></i>
+				      * conformity is handled in a
+				      * special way in the sense that
+				      * it is <b>not</b> implied by
+				      * any higher conformity.
+				      *
+				      * In order to test if a finite
+				      * element conforms to a certain
+				      * space, use
+				      * FiniteElementData<dim>::conforms().
+				      */
+    enum Conformity
+    {
+/// Indicates incompatible continuities of a system.
+	  unknown = 0x00,
+/// Discontinuous elements. See above!
+	  L2 = 0x01,
+/// Conformity with the space <i>H<sup>curl</sup></i> (continuous tangential component of a vector field)
+	  Hcurl = 0x02,
+/// Conformity with the space <i>H<sup>div</sup></i> (continuous normal component of a vector field)
+	  Hdiv = 0x04,
+/// Conformity with the space <i>H<sup>1</sup></i> (continuous)
+	  H1 = 0x06,
+/// Conformity with the space <i>H<sup>2</sup></i> (continuously differentiable)
+	  H2 = 0x0e
+    };
+    
 				     /**
 				      * Number of degrees of freedom on
 				      * a vertex.
@@ -153,6 +221,11 @@ class FiniteElementData
 				      * coordinate direction.
 				      */
     const unsigned int degree;
+
+				     /**
+				      * Indicate the space this element conforms to.
+				      */
+    const Conformity conforming_space;
     
     				     /**
 				      * Default
@@ -186,7 +259,8 @@ class FiniteElementData
 				      */
     FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
 		       const unsigned int n_components,
-		       const unsigned int degree = deal_II_numbers::invalid_unsigned_int);
+		       const unsigned int degree = deal_II_numbers::invalid_unsigned_int,
+		       const Conformity conformity = unknown);
 
 				     /**
 				      * Number of dofs per vertex.
@@ -245,11 +319,24 @@ class FiniteElementData
 				      * quadrature rule.
 				      */
     unsigned int tensor_degree () const;
+
+				     /**
+				      * Test whether a finite element
+				      * space conforms to a certain
+				      * Sobolev space.
+				      *
+				      * @note This function will
+				      * return a true value even if
+				      * the finite element space has
+				      * higher regularity than asked
+				      * for.
+				      */
+    bool conforms (const Conformity) const;
     
 				     /**
 				      * Comparison operator.
 				      */
-    bool operator == (const FiniteElementData<dim> &) const;
+    bool operator == (const FiniteElementData &) const;
 };
 
 
@@ -1869,6 +1956,15 @@ FiniteElementData<dim>::tensor_degree () const
 }
 
 
+template <int dim>
+inline
+bool
+FiniteElementData<dim>::conforms (Conformity space) const
+{
+  return ((space & conforming_space) != 0);
+}
+
+//----------------------------------------------------------------------//
 
 template <int dim>  
 inline

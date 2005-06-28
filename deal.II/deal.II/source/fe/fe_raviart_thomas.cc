@@ -132,7 +132,7 @@ template <int dim>
 FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int rt_order)
 		:
 		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(rt_order),
-							   dim, rt_order+1),
+							   dim, rt_order+1, FiniteElementData<dim>::Hdiv),
 				    get_ria_vector (rt_order),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(rt_order),dim,rt_order+1).dofs_per_cell,
 								    std::vector<bool>(dim,true))),

@@ -16,7 +16,7 @@
 #include <fe/fe.h>
 
 
-template <int dim>
+template<int dim>
 FiniteElementData<dim>::FiniteElementData ()
                 :
 		dofs_per_vertex(0),
@@ -31,7 +31,8 @@ FiniteElementData<dim>::FiniteElementData ()
 		dofs_per_face(0),
 		dofs_per_cell (0),
 		components(0),
-		degree(0)
+		degree(0),
+		conforming_space(unknown)
 {}
 
 
@@ -40,7 +41,8 @@ template <int dim>
 FiniteElementData<dim>::
 FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
                    const unsigned int n_components,
-                   const unsigned int degree)
+                   const unsigned int degree,
+		   const Conformity conformity)
                 :
 		dofs_per_vertex(dofs_per_object[0]),
 		dofs_per_line(dofs_per_object[1]),
@@ -71,7 +73,8 @@ FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
 			       GeometryInfo<dim>::quads_per_cell * dofs_per_quad +
 			       GeometryInfo<dim>::hexes_per_cell * dofs_per_hex),
 		components(n_components),
-		degree(degree)
+		degree(degree),
+		conforming_space(conformity)
 {
   Assert(dofs_per_object.size()==dim+1, ExcDimensionMismatch(dofs_per_object.size()-1,dim));
 }
@@ -85,7 +88,9 @@ bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 	  (dofs_per_line == f.dofs_per_line) &&
 	  (dofs_per_quad == f.dofs_per_quad) &&
 	  (dofs_per_hex == f.dofs_per_hex) &&
-	  (components == f.components));
+	  (components == f.components) &&
+	  (degree == f.degree) &&
+	  (conforming_space == f.conforming_space));
 }
 
 

@@ -1730,7 +1730,8 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
   if (dim>1) dpo.push_back(fe_data.dofs_per_quad * N);
   if (dim>2) dpo.push_back(fe_data.dofs_per_hex * N);
   
-  return FiniteElementData<dim> (dpo, fe_data.n_components() * N, fe_data.tensor_degree());
+  return FiniteElementData<dim> (dpo, fe_data.n_components() * N, fe_data.tensor_degree(),
+				 fe_data.conforming_space);
 }
 
 
@@ -1851,7 +1852,9 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
   return FiniteElementData<dim> (dpo,
 				 fe1.n_components() * N1 +
 				 fe2.n_components() * N2,
-				 degree);
+				 degree,
+				 FiniteElementData<dim>::Conformity(fe1.conforming_space
+								    & fe2.conforming_space));
 }
 
 
@@ -1884,7 +1887,10 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
   return FiniteElementData<dim> (dpo,
 				 fe1.n_components() * N1 +
 				 fe2.n_components() * N2 +
-				 fe3.n_components() * N3, degree);
+				 fe3.n_components() * N3, degree,
+				 FiniteElementData<dim>::Conformity(fe1.conforming_space
+								    & fe2.conforming_space
+								    & fe3.conforming_space));
 }
 
 

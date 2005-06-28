@@ -26,7 +26,7 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
 		:
 		FE_Poly<PolynomialSpace<dim>, dim> (
 		  PolynomialSpace<dim>(Polynomials::Legendre::generate_complete_basis(degree)),
-		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree),
+		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
 		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
 		    get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true)))

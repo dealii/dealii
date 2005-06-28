@@ -37,7 +37,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 		FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim> (
 		  deg,
 		  FiniteElementData<dim>(get_dpo_vector(deg),
-					 dim, deg+1),
+					 dim, deg+1, FiniteElementData<dim>::Hdiv),
 		  get_ria_vector (deg),
 		  std::vector<std::vector<bool> >(
 		    FiniteElementData<dim>(get_dpo_vector(deg),
@@ -277,7 +277,6 @@ FE_RaviartThomasNodal<dim>::initialize_node_matrix ()
 	  N(current,i) = this->shape_value_component(
 	    i, this->unit_support_points[current],
 	    GeometryInfo< dim >::unit_normal_direction[face]);
-//			 * GeometryInfo< dim >::unit_normal_orientation[face];
 	++current;
       }
 				   // Interior degrees of freedom in each direction

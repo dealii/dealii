@@ -29,11 +29,12 @@
 #endif
 
 
+
+//TODO: Remove doubled degrees
 template <int dim>
 FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 		:
-		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),
-							   dim),
+		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree), dim, degree+1, FiniteElementData<dim>::Hcurl),
 				    std::vector<bool> (FiniteElementData<dim>(get_dpo_vector(degree),dim).dofs_per_cell,false),
 				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),dim).dofs_per_cell,
 								    std::vector<bool>(dim,true))),

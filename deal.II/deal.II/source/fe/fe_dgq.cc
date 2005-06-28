@@ -139,7 +139,7 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 		:
 		FE_Poly<TensorProductPolynomials<dim>, dim> (
 		  TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
-		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree),
+		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
 		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
 		    get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
