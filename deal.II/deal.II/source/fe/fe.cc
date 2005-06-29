@@ -119,7 +119,8 @@ FiniteElementBase<dim>::FiniteElementBase (
                 component_to_base_table (this->components,
                                          std::make_pair(0U, 0U)),
                 restriction_is_additive_flags(r_i_a_f),
-		nonzero_components (nonzero_c)
+		nonzero_components (nonzero_c),
+		cached_primitivity(false)
 {
 				   // Special handling of vectors of
 				   // length one: in this case, we
