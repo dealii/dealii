@@ -24,6 +24,8 @@
 #endif
 
 
+//TODO[WB]: rename functions in Exception to match out usual_spelling_convention
+
 
 ExceptionBase::ExceptionBase ()
                 :
