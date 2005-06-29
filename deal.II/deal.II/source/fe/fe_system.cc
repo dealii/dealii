@@ -1853,6 +1853,7 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 				 fe1.n_components() * N1 +
 				 fe2.n_components() * N2,
 				 degree,
+				 typename
 				 FiniteElementData<dim>::Conformity(fe1.conforming_space
 								    & fe2.conforming_space));
 }
@@ -1888,6 +1889,7 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 				 fe1.n_components() * N1 +
 				 fe2.n_components() * N2 +
 				 fe3.n_components() * N3, degree,
+				 typename
 				 FiniteElementData<dim>::Conformity(fe1.conforming_space
 								    & fe2.conforming_space
 								    & fe3.conforming_space));
