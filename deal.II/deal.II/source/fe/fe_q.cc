@@ -185,12 +185,12 @@ FE_Q<dim>::FE_Q (const unsigned int degree)
 		:
 		FE_Poly<TensorProductPolynomials<dim>, dim> (
 		  TensorProductPolynomials<dim>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
-		  FiniteElementData<dim>(get_dpo_vector(degree),1, degree, FiniteElementData<dim>::H1),
-		  std::vector<bool> (FiniteElementData<dim>(
-		    get_dpo_vector(degree),1, degree).dofs_per_cell, false),
-		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
-		    get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true))),
-						    face_index_map(FE_Q_Helper::invert_numbering(face_lexicographic_to_hierarchic_numbering (degree)))
+		  FiniteElementData<dim>(get_dpo_vector(degree),
+					 1, degree,
+					 FiniteElementData<dim>::H1),
+		  std::vector<bool> (1, false),
+		  std::vector<std::vector<bool> >(1, std::vector<bool>(1,true))),
+		face_index_map(FE_Q_Helper::invert_numbering(face_lexicographic_to_hierarchic_numbering (degree)))
 {
   std::vector<unsigned int> renumber (this->dofs_per_cell);
   FETools::hierarchic_to_lexicographic_numbering (*this, renumber);

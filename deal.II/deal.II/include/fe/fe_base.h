@@ -362,7 +362,7 @@ class FiniteElementData
  * transfer, respectively.
  *
  *
- * @sect3{Support points}
+ * <h3>Support points</h3>
  *
  * Since a FiniteElement does not have information on the actual
  * grid cell, it can only provide support points on the unit
@@ -391,7 +391,7 @@ class FiniteElementData
  * If the mapping of all support points is needed, the first variant should
  * be preferred for efficiency.
  *
- * @sect3{Finite elements in one dimension}
+ * <h3>Finite elements in one dimension</h3>
  *
  * Finite elements in one dimension need only set the #restriction
  * and #prolongation matrices. The constructor of this class in one
@@ -399,7 +399,7 @@ class FiniteElementData
  * dimension zero. Changing this behaviour in derived classes is
  * generally not a reasonable idea and you risk getting into trouble.
  * 
- * @sect3{Finite elements in two dimensions}
+ * <h3>Finite elements in two dimensions</h3>
  * 
  * In addition to the fields already present in 1D, a constraint
  * matrix is needed, if the finite element has node values located on
@@ -433,7 +433,7 @@ class FiniteElementData
  * at the time of this writing whether this is a constraint itself.
  *
  * 
- * @sect3{Finite elements in three dimensions}
+ * <h3>Finite elements in three dimensions</h3>
  *
  * For the interface constraints, almost the same holds as for the 2D case.
  * The numbering for the indices $n$ on the mother face is obvious and keeps
@@ -580,9 +580,18 @@ class FiniteElementBase : public Subscriptor,
 				      * existing finite element
 				      * classes. For the second and
 				      * third parameter of this
-				      * constructor, see the document
+				      * constructor, see the documentation
 				      * of the respective member
 				      * variables.
+				      *
+				      * @note Both vector parameters
+				      * should have length
+				      * <tt>dofs_per_cell</tt>. Nevertheless,
+				      * it is allowed to use vectors
+				      * of length one. In this case,
+				      * the vector is resized to the
+				      * correct length and filled with
+				      * the entry value.
 				      */
     FiniteElementBase (const FiniteElementData<dim> &fe_data,
 		       const std::vector<bool> &restriction_is_additive_flags,
