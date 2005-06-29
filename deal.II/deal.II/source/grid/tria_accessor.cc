@@ -906,6 +906,13 @@ Point<3> TriaObjectAccessor<3, 3>::barycenter () const
   \vec x_s = 1/|K| \int_K \vec x dx dy dz
   = 1/|K| \int_{\hat K} \vec x(xi,eta,zeta) |det J| d(xi) d(eta) d(zeta)
 
+  Note, that in the ordering of the shape functions tphi[0]-tphi[7]
+  below, eta and zeta have been exchanged (zeta belongs to the y, and
+  eta to the z direction). However, the resulting Jacobian determinant
+  detJ should be the same, as a matrix and the matrix created from it
+  by exchanging two consecutive lines and two neighboring columns have
+  the same determinant.
+  
   # x, y and z are arrays holding the x-, y- and z-values of the four vertices
   # of this cell in real space. 
   x := array(0..7):
