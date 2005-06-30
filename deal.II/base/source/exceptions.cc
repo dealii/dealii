@@ -85,10 +85,10 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
    out << "Stacktrace:" << std::endl;
 
    void * array[25];
-   int nSize = backtrace(array, 25);
-   char ** symbols = backtrace_symbols(array, nSize);
+   const int n_frames = backtrace(array, 25);
+   char ** symbols = backtrace_symbols(array, n_frames);
 
-   for (int i = 0; i < nSize; i++)
+   for (int i = 0; i < n_frames; i++)
       out << symbols[i] << std::endl;
 
    free(symbols);
