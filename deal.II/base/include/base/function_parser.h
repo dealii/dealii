@@ -31,57 +31,57 @@ namespace fparser
 				    * FunctionParser is not used.
 				    */
   class FunctionParser {};
-  
 };
 
 #endif
 
-template <int dim> class Point;
-template <int rank_, int dim> class Tensor;
-template <int dim> class Tensor<1,dim>;
-template <typename number> class Vector;
+template <int> class Point;
+template <int, int> class Tensor;
+template <int> class Tensor<1,dim>;
+template <typename> class Vector;
+
 
 /**
- * Function Parser. Wrapper class for the fparser library (see
- * http://www.students.tut.fi/~warp/FunctionParser/). This class lets
- * you evaluate strings such as "sqrt(1-x^2+y^2)" with given values of
- * 'x' and 'y'. Some of the informations contained here are copied
- * verbatim from the fparser.txt file that comes with the fparser
- * library. Please refer also to that file both for clarifications on
- * how this wrapper works, as well as for any issue regarding the
- * licence that applies to this class.
+ * This class implements a function object that gets its value by parsing a
+ * string describing this function. It is a wrapper class for the fparser
+ * library (see http://www.students.tut.fi/~warp/FunctionParser/). This class
+ * lets you evaluate strings such as "sqrt(1-x^2+y^2)" for given values of
+ * 'x' and 'y'. Some of the information contained here is copied verbatim
+ * from the fparser.txt file that comes with the fparser library. Please refer
+ * also to that file both for clarifications on how this wrapper works, as
+ * well as for any issue regarding the licence that applies to this class.
  *
- * By using this class you indicate that you accept the terms of the
- * licence that comes with the fparser library.
+ * By using this class you indicate that you accept the terms of the licence
+ * that comes with the fparser library. If you do not agree with them, you
+ * should not use this class or configure the deal.II library without the
+ * function parser (see the ReadMe file of deal.II on instructions for this).
  *
  * The following example shows how to use this class:
- @verbatim
-
+ * @verbatim
+  // Define some constants that will be used by the function parser
+  std::map<std::string> constants;
+  constants["pi"] = deal_II_numbers::PI;
+  
+  // Define the variables that will be used inside the expressions
+  std::string variables = "x,y,z";
  
- // Define some constants that will be used by the function parser
- std::map<std::string> constants;
- constants["pi"] = M_PI;
+  // Define the expressions of the individual components of a
+  // vector valued function with two components:
+  std::vector<std::string> expressions(2);
+  expressions[0] = "sin(2*pi*x)+sinh(pi*z)";
+  expressions[1] = "sin(2*pi*y)*exp(x^2)";
+  
+  // Generate an empty function for these two components.
+  ParsedFunction<3> vector_function(2);
  
- // Define the variables that will be used inside the expressions
- std::string variables = "x,y,z";
- 
- // Define the expressions of the vector_valued function.
- std::vector<std::string> expressions(2);
- expressions[0] = "sin(2*pi*x)+sinh(pi*z)";
- expressions[1] = "sin(2*pi*y)*exp(x^2)";
- 
- // Generate an empty function with two components
- ParsedFunction<3> vector_function(2);
- 
- // And populate it with the newly created objects.
- vector_function.initialize(variables,
-			    expressions,
-			    constants);
- 
- @endverbatim
+  // And populate it with the newly created objects.
+  vector_function.initialize(variables,
+ 			    expressions,
+ 			    constants); 
+  @endverbatim
  * 
  * See http://www.students.tut.fi/~warp/FunctionParser/ for an
- * explanation on how the underlining library works. 
+ * explanation on how the underlying library works. 
  *
  
  From the fparser.txt file:
@@ -94,60 +94,19 @@ template <typename number> class Vector;
  is very fast (specially compared to libraries which evaluate functions
  by just interpreting the raw function string).
 
- The library is made in ISO C++ and requires a standard-conforming C++
- compiler.
-
  @endverbatim
- * This object overloads for you the virtual methods value() and
- * vector_value() of the Function base class with the byte compiled
- * versions of the expressions given to the initialize() methods.
  *
- * @author Luca Heltai, 2005
- */
-template <int dim>
-class FunctionParser : public Function<dim>
-{
-  public:
-				     /**
-				      * Constructor for Parsed
-				      * functions. Its arguments are
-				      * the same of the base class
-				      * Function. The only difference
-				      * is that this object needs to
-				      * be initialized with
-				      * initialize() method before you
-				      * can use it. If an attempt to
-				      * use this function is made
-				      * before the initialize() method
-				      * has been called, then an
-				      * exception is thrown.
-				      */
-    FunctionParser (const unsigned int n_components = 1,
-		    const double       initial_time = 0.0); 
-  
-				     /**
-				      * Destructor. Explicitly delete
-				      * the FunctionParser objects
-				      * (there is one for each
-				      * component of the function).
-				      */
-    ~FunctionParser();
-    
-				     /**
-				      * Type for the constant
-				      * map. Used by the initialize()
-				      * method.
-				      */
-    typedef std::map<std::string, double> ConstMap;
-    
-				     /**
-				      * Iterator for the constants
-				      * map. Used by the initialize()
-				      * method.
-				      */
-    typedef ConstMap::iterator ConstMapIterator;
-
-  /** Initialize the function. From the fparser.txt file:
+ * This class overloads for you the virtual methods value() and
+ * vector_value() of the Function base class with the byte compiled versions
+ * of the expressions given to the initialize() methods. Note that the class
+ * will not work unless you call the initialize() method first, that accepts
+ * the text description of the function as an argument (among other
+ * things). The reason for this is that this text description may be read from
+ * an input file, and may therefore not be available at object construction
+ * time yet.
+ *
+ * The syntax to describe a function follows usual programming practice,
+ * and is explained in this snippet from the fparser.txt file:
       @verbatim
       The function string understood by the class is very similar to the C-syntax.
       Arithmetic float expressions can be created from float literals, variables
@@ -240,48 +199,118 @@ class FunctionParser : public Function<dim>
   call is safe. In any other place it will cause an infinite recursion (which
   will make the program eventually run out of memory).
   @endverbatim
+ *
+ * @author Luca Heltai, 2005
+ */
+template <int dim>
+class FunctionParser : public Function<dim>
+{
+  public:
+				     /**
+				      * Constructor for Parsed
+				      * functions. Its arguments are
+				      * the same of the base class
+				      * Function. The only difference
+				      * is that this object needs to
+				      * be initialized with
+				      * initialize() method before you
+				      * can use it. If an attempt to
+				      * use this function is made
+				      * before the initialize() method
+				      * has been called, then an
+				      * exception is thrown.
+				      */
+    FunctionParser (const unsigned int n_components = 1,
+		    const double       initial_time = 0.0); 
   
-  This methods accepts the following parameters: 
-  
-  - <b>vars</b>. It contains a string with the variables that will be
-    used by the expressions to be evaluated. Note that the variables
-    can have any name (of course different from the function names
-    defined above!), but the order IS important. The first variable
-    will correspond to the first component of the point in which the
-    function is evaluated, the second variable to the second component
-    and so forth. If this function is also time dependent, then it is
-    necessary to specify it by setting the #time_dependent parameter
-    to true.     
-    An Exception is thrown if the number of variables specified here
-    is different from dim (if this function is not time-dependent) or
-    from dim+1 (if it is time-dependent).
+				     /**
+				      * Destructor. Explicitly delete
+				      * the FunctionParser objects
+				      * (there is one for each
+				      * component of the function).
+				      */
+    ~FunctionParser();
     
-  - <b>expressions</b>. This is a list of strings containing the
-    expressions that will be byte compiled by the internal parser
-    (FunctionParser). Note that the size of this vector must match
-    exactly the number of components of the FunctionParser. If this is
-    not the case, an exception is thrown.
+				     /**
+				      * Type for the constant
+				      * map. Used by the initialize()
+				      * method.
+				      */
+    typedef std::map<std::string, double> ConstMap;
     
-  - <b>constants</b>. The map of constants is used to pass any
-    necessary constant that we want to specify in our expressions (in
-    the example above the number pi). An expression is valid if and
-    only if it contains only defined variables and defined constants
-    (other than the functions specified above). If a constant is given
-    whose name is not valid (eg: <tt>constants["sin"] = 1.5;</tt>) an
-    exception is thrown.
-    
-  - <b>time_dependent</b>. If this is a time dependent function, then
-    the last variable is assumed to be the time variable, and
-    this->get_time() is passed to the function. Naturally the number
-    of variables parsed by the initialize() method in this case is
-    dim+1. It defaults to false, i.e.. do not consider time.
+				     /**
+				      * Iterator for the constants
+				      * map. Used by the initialize()
+				      * method.
+				      */
+    typedef ConstMap::iterator ConstMapIterator;
 
-  - <b>use_degrees</b>. Parameter to decide if the trigonometric
-    functions work in radians or degrees. The default for this
-    parameter is false, i.e. use radians and not degrees.
-    
-    
-  */
+                                     /**
+                                      * Initialize the function.  This methods
+                                      * accepts the following parameters:
+                                      *
+                                      * <b>vars</b>: a string with
+                                      * the variables that will be used by the
+                                      * expressions to be evaluated. Note that
+                                      * the variables can have any name (of
+                                      * course different from the function
+                                      * names defined above!), but the order
+                                      * IS important. The first variable will
+                                      * correspond to the first component of
+                                      * the point in which the function is
+                                      * evaluated, the second variable to the
+                                      * second component and so forth. If this
+                                      * function is also time dependent, then
+                                      * it is necessary to specify it by
+                                      * setting the #time_dependent parameter
+                                      * to true.  An exception is thrown if
+                                      * the number of variables specified here
+                                      * is different from dim (if this
+                                      * function is not time-dependent) or
+                                      * from dim+1 (if it is time-dependent).
+                                      * 
+                                      * <b>expressions</b>: a list of strings
+                                      * containing the expressions that will
+                                      * be byte compiled by the internal
+                                      * parser (FunctionParser). Note that the
+                                      * size of this vector must match exactly
+                                      * the number of components of the
+                                      * FunctionParser, as declared in the
+                                      * constructor. If this is not the case,
+                                      * an exception is thrown.
+                                      *
+                                      *
+                                      * <b>constants</b>: a map of constants
+                                      * used to pass any necessary constant
+                                      * that we want to specify in our
+                                      * expressions (in the example above the
+                                      * number pi). An expression is valid if
+                                      * and only if it contains only defined
+                                      * variables and defined constants (other
+                                      * than the functions specified
+                                      * above). If a constant is given whose
+                                      * name is not valid (eg:
+                                      * <tt>constants["sin"] = 1.5;</tt>) an
+                                      * exception is thrown.
+                                      * 
+                                      * <b>time_dependent</b>. If this is a
+                                      * time dependent function, then the last
+                                      * variable declared in <b>vars</b> is
+                                      * assumed to be the time variable, and
+                                      * this->get_time() is used to initialize
+                                      * it when evaluating the
+                                      * function. Naturally the number of
+                                      * variables parsed by the initialize()
+                                      * method in this case is dim+1. The
+                                      * value of this parameter defaults to
+                                      * false, i.e. do not consider time.
+                                      *
+                                      * <b>use_degrees</b>. Parameter to
+                                      * decide if the trigonometric functions
+                                      * work in radians or degrees. The
+                                      * default for this parameter is false,
+                                      * i.e. use radians and not degrees.
+                                      */
     void initialize(const std::string vars,
 		    const std::vector<std::string> expressions,
 		    const ConstMap constants,
@@ -363,8 +392,8 @@ class FunctionParser : public Function<dim>
 				      * defaults to zero, i.e. the
 				      * first component.
 				      */
-  virtual double value (const Point<dim>   &p,
-			const unsigned int  component = 0) const;
+    virtual double value (const Point<dim>   &p,
+                          const unsigned int  component = 0) const;
 
 				     /**
 				      * Return all components of a
@@ -375,23 +404,23 @@ class FunctionParser : public Function<dim>
 				      * right size beforehand,
 				      * i.e. #n_components.
 				      */
-  virtual void vector_value (const Point<dim>   &p,
-			     Vector<double>     &values) const;
+    virtual void vector_value (const Point<dim>   &p,
+                               Vector<double>     &values) const;
 
-  /** @addtogroup Exceptions
-   * @{ */    
-  DeclException2 (ExcParseError,
-		  int, char*, 
-		  << "Parsing Error at Column " << arg1
-		  << ". The parser said: " << arg2);
+                                     /** @addtogroup Exceptions
+                                      * @{ */
+    DeclException2 (ExcParseError,
+                    int, char*, 
+                    << "Parsing Error at Column " << arg1
+                    << ". The parser said: " << arg2);
     
-  DeclException2 (ExcInvalidExpressionSize,
-		  int, int, 
-		  << "The number of components (" << arg1
-		  << ") is not equal to the number of expressions (" 
-		  << arg2 << ").");
+    DeclException2 (ExcInvalidExpressionSize,
+                    int, int, 
+                    << "The number of components (" << arg1
+                    << ") is not equal to the number of expressions (" 
+                    << arg2 << ").");
     
-  //@}
+                                     //@}
   private: 
 				     /**
 				      * A pointer to the actual
@@ -421,7 +450,7 @@ class FunctionParser : public Function<dim>
 				      * the variables parsed by the
 				      * initialize() method, then an
 				      * exception is thrown.
-				     */
+                                      */
     unsigned int n_vars;
 };
 
