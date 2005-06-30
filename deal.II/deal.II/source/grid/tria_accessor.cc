@@ -1813,7 +1813,8 @@ bool CellAccessor<2>::point_inside (const Point<2> &p) const
     {
 				       // vector from the first vertex
 				       // of the line to the point
-      const Point<2> to_p = p-this->vertex(f);
+      const Point<2> to_p = p-this->vertex(
+	GeometryInfo<2>::face_to_cell_vertices(f,0));
 				       // vector describing the line
       const Point<2> face = direction[f]*(
 	this->vertex(GeometryInfo<2>::face_to_cell_vertices(f,1)) -
