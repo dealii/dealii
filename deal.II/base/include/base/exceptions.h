@@ -366,12 +366,6 @@ class ExceptionBase : public std::exception
     void print_exc_data (std::ostream &out) const;
 
 				     /**
-				      *  Print out the stacktrace (if available)
-                                      *  at the time the exception is created
-				      */
-    void print_stack_trace (std::ostream &out) const;
-
-				     /**
 				      *  Print more specific information about the
 				      *  exception which occured. Overload this
 				      *  function in your own exception classes.
@@ -386,12 +380,23 @@ class ExceptionBase : public std::exception
 				      *  exception occured as well as user
 				      *  information.
 				      *
-				      *  This function is mainly used when using
-				      *  exceptions declared by the
-				      *  <tt>DeclException*</tt> macros with the <tt>throw</tt>
-				      *  mechanism or the <tt>AssertThrow</tt> macro.
+				      *  This function is mainly used
+				      *  when using exceptions
+				      *  declared by the
+				      *  <tt>DeclException*</tt>
+				      *  macros with the
+				      *  <tt>throw</tt> mechanism or
+				      *  the <tt>AssertThrow</tt>
+				      *  macro.
 				      */
     virtual const char * what () const throw ();
+
+				     /**
+				      * Print a stacktrace, if one has
+				      * been recorded previously, to
+				      * the given stream.
+				      */
+    void print_stack_trace (std::ostream &out) const;
 
   protected:
 				     /**
@@ -418,6 +423,22 @@ class ExceptionBase : public std::exception
 				      * Name of the exception and call sequence.
 				      */
     const char  *exc;
+
+				     /**
+				      * A backtrace to the position
+				      * where the problem happened, if
+				      * the system supports this.
+				      */
+    char ** stacktrace;
+
+				     /**
+				      * The number of stacktrace
+				      * frames that are stored in the
+				      * previous variable. Zero if the
+				      * system does not support stack
+				      * traces.
+				      */
+    int n_stacktrace_frames;
 };
 
 

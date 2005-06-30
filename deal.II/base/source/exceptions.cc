@@ -31,7 +31,9 @@
 
 ExceptionBase::ExceptionBase ()
                 :
-		file(""), line(0), function(""), cond(""), exc("")
+		file(""), line(0), function(""), cond(""), exc(""),
+		stacktrace (0),
+		n_stacktrace_frames (0)
 {}
 
 
@@ -39,13 +41,18 @@ ExceptionBase::ExceptionBase ()
 ExceptionBase::ExceptionBase (const char* f, const int l, const char *func,
 			      const char* c, const char *e)
                 :
-		file(f), line(l), function(func), cond(c), exc(e)
+		file(f), line(l), function(func), cond(c), exc(e),
+		stacktrace (0),
+		n_stacktrace_frames (0)
 {}
 
 
 
 ExceptionBase::~ExceptionBase () throw ()
-{}
+{
+  if (backtrace != 0)
+    free (stacktrace);
+}
 
 
 
@@ -60,6 +67,41 @@ void ExceptionBase::set_fields (const char* f,
   function = func;
   cond = c;
   exc  = e;
+
+				   // if the system supports this, get
+				   // a stacktrace how we got here
+#ifdef HAVE_GLIBC_STACKTRACE
+   void * array[25];
+   n_stacktrace_frames = backtrace(array, 25);
+   stacktrace = backtrace_symbols(array, n_stacktrace_frames);
+#endif  
+}
+
+
+
+void ExceptionBase::print_stack_trace (std::ostream &out) const
+{
+				    // print the stacktrace. first
+				    // omit all those frames that have
+				    // ExceptionBase or
+				    // deal_II_exceptions in their
+				    // names, as these correspond to
+				    // the exception raising mechanism
+				    // themselves, rather than the
+				    // place where the exception was
+				    // triggered
+   int frame = 0;
+   while ((frame < n_stacktrace_frames)
+	  &&
+	  ((std::string(stacktrace[frame]).find ("ExceptionBase") != std::string::npos)
+	   ||
+	   (std::string(stacktrace[frame]).find ("deal_II_exceptions") != std::string::npos)))
+     ++frame;
+
+				    // output the rest
+   for (; frame < n_stacktrace_frames; ++frame)
+      out << stacktrace[frame]
+	  << std::endl;
 }
 
 
@@ -75,43 +117,6 @@ void ExceptionBase::print_exc_data (std::ostream &out) const
       << "The name and call sequence of the exception was:" << std::endl
       << "    " << exc  << std::endl
       << "Additional Information: " << std::endl;
-}
-
-
-
-void ExceptionBase::print_stack_trace (std::ostream &out) const
-{
-#ifdef HAVE_GLIBC_STACKTRACE
-   out << "Stacktrace:" << std::endl;
-
-   void * array[25];
-   const int n_frames = backtrace(array, 25);
-   char ** symbols = backtrace_symbols(array, n_frames);
-
-				    // print the stacktraces. first
-				    // omit all those frames that have
-				    // ExceptionBase or
-				    // deal_II_exceptions in their
-				    // names, as these correspond to
-				    // the exception raising mechanism
-				    // themselves, rather than the
-				    // place where the exception was
-				    // triggered
-   int frame = 0;
-   while ((frame < n_frames)
-	  &&
-	  ((std::string(symbols[frame]).find ("ExceptionBase") != std::string::npos)
-	   ||
-	   (std::string(symbols[frame]).find ("deal_II_exceptions") != std::string::npos)))
-     ++frame;
-
-				    // output the rest
-   for (; frame < n_frames; ++frame)
-      out << symbols[frame]
-	  << std::endl;
-
-   free(symbols);
-#endif
 }
 
 
@@ -160,6 +165,8 @@ const char * ExceptionBase::what () const throw ()
       print_exc_data (converter);
                                        // put in exception specific data
       print_info (converter);
+
+      print_stack_trace (converter);
 
       converter << "--------------------------------------------------------"
                 << std::endl;
