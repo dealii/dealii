@@ -148,7 +148,7 @@
  *
  *  In <tt>__IssueError</tt> the given data
  *  is transferred into the <tt>exc</tt> object by calling the
- *  SetFields() function; after that, the general error info
+ *  set_fields() function; after that, the general error info
  *  is printed onto <tt>std::cerr</tt> using the PrintError() function of
  *  <tt>exc</tt> and finally the exception specific data is printed
  *  using the user defined function PrintError() (which is
@@ -237,9 +237,9 @@
  *    if (!(cond))
  *      {
  *        ExcSomething e(additional information);
- *        e.SetFields (__FILE__, __LINE__, __PRETTY_FUNCTION__,
- *                     "condition as a string",
- *                     "name of condition as a string");
+ *        e.set_fields (__FILE__, __LINE__, __PRETTY_FUNCTION__,
+ *                      "condition as a string",
+ *                      "name of condition as a string");
  *        throw e;
  *      };
  *  @endcode
@@ -282,7 +282,7 @@
  *    public:
  *      name (const type1 a1, const type2 a2) :
  *                     arg1 (a1), arg2(a2) {};
- *      virtual void PrintInfo (std::ostream &out) const {
+ *      virtual void print_info (std::ostream &out) const {
  *        out outsequence << std::endl;
  *      };
  *    private:
@@ -353,30 +353,30 @@ class ExceptionBase : public std::exception
 				      *  condition and the name of the exception as
 				      *  a char pointer.
 				      */
-    void SetFields (const char *f,
-		    const int   l,
-		    const char *func,
-		    const char *c,
-		    const char *e);
+    void set_fields (const char *f,
+		     const int   l,
+		     const char *func,
+		     const char *c,
+		     const char *e);
     
 				     /**
 				      *  Print out the general part of the error
 				      *  information.
 				      */
-    void PrintExcData (std::ostream &out) const;
+    void print_exc_data (std::ostream &out) const;
 
 				     /**
 				      *  Print out the stacktrace (if available)
                                       *  at the time the exception is created
 				      */
-    void PrintStackTrace (std::ostream &out) const;
+    void print_stack_trace (std::ostream &out) const;
 
 				     /**
 				      *  Print more specific information about the
 				      *  exception which occured. Overload this
 				      *  function in your own exception classes.
 				      */
-    virtual void PrintInfo (std::ostream &out) const;
+    virtual void print_info (std::ostream &out) const;
 
 
 				     /**
@@ -505,7 +505,7 @@ namespace deal_II_exceptions
     {
 				       // Fill the fields of the
 				       // exception object
-      e.SetFields (file, line, function, cond, exc_name);
+      e.set_fields (file, line, function, cond, exc_name);
       throw e;
     }
     
@@ -646,7 +646,7 @@ class Exception1 : public ExceptionBase {                             \
   public:                                                             \
       Exception1 (const type1 a1) : arg1 (a1) {};                     \
       virtual ~Exception1 () throw () {};                             \
-      virtual void PrintInfo (std::ostream &out) const {              \
+      virtual void print_info (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
       };                                                              \
   private:                                                            \
@@ -665,7 +665,7 @@ class Exception2 : public ExceptionBase {                             \
       Exception2 (const type1 a1, const type2 a2) :          \
 	      arg1 (a1), arg2(a2) {};                                 \
       virtual ~Exception2 () throw () {};                             \
-      virtual void PrintInfo (std::ostream &out) const {              \
+      virtual void print_info (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
       };                                                              \
   private:                                                            \
@@ -685,7 +685,7 @@ class Exception3 : public ExceptionBase {                             \
       Exception3 (const type1 a1, const type2 a2, const type3 a3) : \
 	      arg1 (a1), arg2(a2), arg3(a3) {};                       \
       virtual ~Exception3 () throw () {};                             \
-      virtual void PrintInfo (std::ostream &out) const {              \
+      virtual void print_info (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
       };                                                              \
   private:                                                            \
@@ -707,7 +707,7 @@ class Exception4 : public ExceptionBase {                             \
 	    const type3 a3, const type4 a4) :                \
 	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4) {};             \
       virtual ~Exception4 () throw () {};                             \
-      virtual void PrintInfo (std::ostream &out) const {              \
+      virtual void print_info (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
       };                                                              \
   private:                                                            \
@@ -730,7 +730,7 @@ class Exception5 : public ExceptionBase {                             \
 	    const type4 a4, const type5 a5) :                \
 	      arg1 (a1), arg2(a2), arg3(a3), arg4(a4), arg5(a5) {};   \
       virtual ~Exception5 () throw () {};                             \
-      virtual void PrintInfo (std::ostream &out) const {              \
+      virtual void print_info (std::ostream &out) const {              \
         out outsequence << std::endl;                                 \
       };                                                              \
   private:                                                            \

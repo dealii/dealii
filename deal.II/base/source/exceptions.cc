@@ -27,7 +27,6 @@
 #  include <execinfo.h>
 #endif
 
-//TODO[WB]: rename functions in Exception to match out usual_spelling_convention
 
 
 ExceptionBase::ExceptionBase ()
@@ -50,11 +49,11 @@ ExceptionBase::~ExceptionBase () throw ()
 
 
 
-void ExceptionBase::SetFields (const char* f,
-			       const int l,
-			       const char *func,
-			       const char *c,
-			       const char *e)
+void ExceptionBase::set_fields (const char* f,
+				const int l,
+				const char *func,
+				const char *c,
+				const char *e)
 {
   file = f;
   line = l;
@@ -65,7 +64,7 @@ void ExceptionBase::SetFields (const char* f,
 
 
 
-void ExceptionBase::PrintExcData (std::ostream &out) const
+void ExceptionBase::print_exc_data (std::ostream &out) const
 {
   out << "An error occurred in line <" << line
       << "> of file <" << file
@@ -78,7 +77,9 @@ void ExceptionBase::PrintExcData (std::ostream &out) const
       << "Additional Information: " << std::endl;
 }
 
-void ExceptionBase::PrintStackTrace (std::ostream &out) const
+
+
+void ExceptionBase::print_stack_trace (std::ostream &out) const
 {
 #ifdef HAVE_GLIBC_STACKTRACE
    out << "Stacktrace:" << std::endl;
@@ -94,7 +95,9 @@ void ExceptionBase::PrintStackTrace (std::ostream &out) const
 #endif
 }
 
-void ExceptionBase::PrintInfo (std::ostream &out) const
+
+
+void ExceptionBase::print_info (std::ostream &out) const
 {
   out << "(none)" << std::endl;
 }
@@ -135,11 +138,11 @@ const char * ExceptionBase::what () const throw ()
       converter << "--------------------------------------------------------"
                 << std::endl;
                                        // put general info into the std::string
-      PrintExcData (converter);
+      print_exc_data (converter);
                                        // put in exception specific data
-      PrintInfo (converter);
+      print_info (converter);
 
-      PrintStackTrace (converter);      // put in stacktrace (if available)
+      print_stack_trace (converter);      // put in stacktrace (if available)
   
       converter << "--------------------------------------------------------"
                 << std::endl;
@@ -207,7 +210,7 @@ namespace deal_II_exceptions
     {
 				       // fill the fields of the
 				       // exception object
-      e.SetFields (file, line, function, cond, exc_name);
+      e.set_fields (file, line, function, cond, exc_name);
       
 				       // if no other exception has
 				       // been displayed before, show
@@ -217,10 +220,10 @@ namespace deal_II_exceptions
 	  std::cerr << "--------------------------------------------------------"
 		    << std::endl;
 					   // print out general data
-	  e.PrintExcData (std::cerr);
+	  e.print_exc_data (std::cerr);
 					   // print out exception
 					   // specific data
-	  e.PrintInfo (std::cerr);
+	  e.print_info (std::cerr);
 	  std::cerr << "--------------------------------------------------------"
 		    << std::endl;
 
