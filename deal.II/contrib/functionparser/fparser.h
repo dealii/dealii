@@ -16,6 +16,9 @@
 #include <iostream>
 #endif
 
+namespace fparser
+{
+  
 class FunctionParser
 {
 public:
@@ -62,6 +65,11 @@ public:
 #endif
 
 
+    // Added by Luca Heltai. For consistency checking.
+    unsigned int NVars() {
+      return data->varAmount;
+    };
+    
 
 //========================================================================
 private:
@@ -151,5 +159,8 @@ private:
 
     void MakeTree(void*) const;
 };
+ 
+}
 
+  
 #endif
