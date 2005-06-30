@@ -134,8 +134,12 @@ private:
     bool checkRecursiveLinking(const FunctionParser*) const;
 
     bool isValidName(const std::string&) const;
+
+    inline
     Data::VarMap_t::const_iterator FindVariable(const char*,
                                                 const Data::VarMap_t&) const;
+
+    inline
     Data::ConstMap_t::const_iterator FindConstant(const char*) const;
     int CheckSyntax(const char*);
     bool Compile(const char*);
