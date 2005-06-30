@@ -480,6 +480,12 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>Improved: The class <code
+  class="class">FiniteElementData</code> now stores information on the
+  Sobolev space a finite element space conforms with.
+  <br> (GK 2005/06/29)
+  </p>
+  
   <li> <p>
        New: Added function <code
        class="class">FiniteElementBase::component_to_system_index</code>
@@ -487,6 +493,7 @@ inconvenience this causes.
        <br>
        (Ralf B. Schulz, 2005/06/30)
        </p>
+
   <li> <p>Improved: The function <code class="class">DoFTools</code>::<code
   class="member">count_dofs_per_component</code> and its counterpart
   in <code class="class">MGTools</code> got an additional
