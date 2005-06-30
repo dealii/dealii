@@ -88,8 +88,27 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
    const int n_frames = backtrace(array, 25);
    char ** symbols = backtrace_symbols(array, n_frames);
 
-   for (int i = 0; i < n_frames; i++)
-      out << symbols[i] << std::endl;
+				    // print the stacktraces. first
+				    // omit all those frames that have
+				    // ExceptionBase or
+				    // deal_II_exceptions in their
+				    // names, as these correspond to
+				    // the exception raising mechanism
+				    // themselves, rather than the
+				    // place where the exception was
+				    // triggered
+   int frame = 0;
+   while ((frame < n_frames)
+	  &&
+	  ((std::string(symbols[frame]).find ("ExceptionBase") != std::string::npos)
+	   ||
+	   (std::string(symbols[frame]).find ("deal_II_exceptions") != std::string::npos)))
+     ++frame;
+
+				    // output the rest
+   for (; frame < n_frames; ++frame)
+      out << symbols[frame]
+	  << std::endl;
 
    free(symbols);
 #endif
