@@ -45,33 +45,9 @@ void check ()
   
 				   // Now get the cell
   Triangulation<3>::cell_iterator cell = triangulation.begin();
-    
-  std::vector<CellData<3> > cells (1, CellData<3>());
-				   // get the indices
-  for (unsigned int j=0; j<8; ++j) {       
-    cells[0].vertices[j] = j;
-  }
-    
-				   // get the vertex coordinates
-  Point<3> vertices[8];
-  for (unsigned int j=0; j<8; ++j) {       
-    vertices[j] = cell->vertex(j);
-  }
-				   // modify one vertex.
-  vertices[0] = Point<3>(-1,0,0);
-    
-  SubCellData boundary_info;
-  Triangulation<3> triangulation2;
-  
-				   // create a new triangulation.
-  triangulation2.create_triangulation (
-    std::vector<Point<3> >(&vertices[0],&vertices[8]),
-    cells , boundary_info
-  );
-
-  Triangulation<3>::cell_iterator cell2 = triangulation2.begin();
+  cell->vertex(0)(0)=-1.;
                                       
-				   // and test it.                                   
+				   // and test it.
   double testcoord[14][3] = {{0.5,0.5,0.5},
 			     {2,0.5,0.5},
 			     {0.5,2,0.5},
@@ -94,7 +70,7 @@ void check ()
         const Point<3> testpoint(testcoord[i][0],
 				 testcoord[i][1],
 				 testcoord[i][2]);
-        bool res = cell2->point_inside(testpoint);
+        bool res = cell->point_inside(testpoint);
         deallog << testpoint << " \t inside " << res 
                 << " expected " << expected[i] << std::endl;
         Assert (res == expected[i], ExcInternalError());
