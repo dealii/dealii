@@ -129,6 +129,12 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: The latest version of UMFPACK, version 4.4, has been imported.
+       <br>
+       (WB, 2005/06/30)
+       </p>
+
+  <li> <p>
        Fixed: The documentation pages did not contain information
        about the <code>Threads::spawn</code> functions. This is now fixed.
        <br>
@@ -203,6 +209,19 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>  
+  <li> <p>
+       Changed: The functions in class <code
+       class="class">ExceptionBase</code> have been renamed to conform
+       to our coding conventions that function names be all lower-case
+       with words separated by underscores. This is technically an
+       incompatible change, since these functions were publicly
+       visible, but were usually hidden behind macros and not used
+       anywhere explicitly in the library; we hope that this also
+       holds for external code.
+       <br>
+       (WB, 2005/06/30)
+       </p>
+
   <li> <p>
        Improved: The class <code class="class">Quadrature</code> has a new
        constructor generating the <tt>dim</tt>-dimensional tensor product of a
