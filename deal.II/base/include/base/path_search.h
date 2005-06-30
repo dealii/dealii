@@ -28,7 +28,7 @@
  * suffixes.
  *
  * A list of search paths is maintained for each file class supported.
- * A file class is defined by s unique string. The classes provided are
+ * A file class is defined by a unique string. The classes provided are
  * <dl>
  * <dt> MESH <dd> mesh input files in various formats (see GridIn)
  * <dt> PARAMETER <dd> Parameter files (<tt>.prm</tt>)
@@ -61,10 +61,10 @@
  * @endverbatim
  *
  * Path lists are by default starting with the current directory
- * (<tt>""</tt>), followed optionally by a standard directory of
+ * (<tt>"./"</tt>), followed optionally by a standard directory of
  * deal.II. Use show() to find out the path list
  * for a given class. Paths and suffixes can be added using the
- * functions add_path() and add_suffix(), repectively.
+ * functions add_path() and add_suffix(), respectively.
  *
  * @note Directories in the path list should always end with a
  * trailing <tt>"/"</tt>, while suffixes should always start with a
@@ -75,7 +75,6 @@
  *
  * @author Guido Kanschat, 2005
  */
-
 class PathSearch
 {
   public:
@@ -100,13 +99,14 @@ class PathSearch
 				      * The debug argument determines
 				      * the verbosity of this class.
 				      */
-    PathSearch(const std::string& cls, const unsigned int debug=0);
+    PathSearch (const std::string& cls,
+		const unsigned int debug=0);
 
 				     /**
 				      * Open a file in the class
 				      * specified by the constructor.
 				      */
-    std::istream& open(const std::string& filename);
+    std::istream& open (const std::string& filename);
 
 				     /**
 				      * Open a file in the class
@@ -115,8 +115,8 @@ class PathSearch
 				      * standard suffix list, but only
 				      * try to apply the suffix given.
 				      */
-    std::istream& open(const std::string& filename,
-		       const std::string& suffix);
+    std::istream& open (const std::string& filename,
+			const std::string& suffix);
     
 				     /**
 				      * Return the actual name of the
@@ -173,19 +173,21 @@ class PathSearch
     
   private:
 				     /**
-				      * Type of values in the class maps.
+				      * Type of values in the class
+				      * maps.
 				      */
     typedef std::map<std::string, std::vector<std::string> >::value_type map_type;
     
 				     /**
-				      * Initialize the static list objects for further use.
+				      * Initialize the static list
+				      * objects for further use.
 				      */
     static void initialize_classes();
     
 				     /**
 				      * Get path list for a certain
 				      * class. Used to set up
-				      * #my_path_list in constructor.
+				      * @p my_path_list in constructor.
 				      */
     static std::vector<std::string>& get_path_list(const std::string& cls);
     
@@ -209,17 +211,20 @@ class PathSearch
     static std::map<std::string, std::vector<std::string> > path_lists;
     
 				     /**
-				      * List of suffixes for each class.
+				      * List of suffixes for each
+				      * class.
 				      */
     static std::map<std::string, std::vector<std::string> > suffix_lists;
     
 				     /**
-				      * Path list for the class this object belongs to.
+				      * Path list for the class this
+				      * object belongs to.
 				      */
     std::vector<std::string>& my_path_list;
     
 				     /**
-				      * Suffix list for the class this object belongs to.
+				      * Suffix list for the class this
+				      * object belongs to.
 				      */
     std::vector<std::string>& my_suffix_list;
     
@@ -244,6 +249,9 @@ class PathSearch
 				      */
     static std::string empty;
 };
+
+
+/* ----------------------------- inline functions ------------------------- */
 
 
 inline
