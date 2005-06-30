@@ -49,7 +49,7 @@ void check ()
   std::vector<CellData<3> > cells (1, CellData<3>());
 				   // get the indices
   for (unsigned int j=0; j<8; ++j) {       
-    cells[0].vertices[j] = cell->vertex_index(j);
+    cells[0].vertices[j] = j;
   }
     
 				   // get the vertex coordinates
