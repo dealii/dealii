@@ -66,7 +66,7 @@ int main ()
   Boundary<3>::FaceVertexNormals normals;
   for (unsigned int case_no=0; case_no<1; ++case_no)
     {
-      deallog << "Case" << case_no << endl;
+      deallog << "Case" << case_no << std::endl;
       create_triangulation(case_no, tria);
       const Triangulation<3>::active_cell_iterator cell=tria.begin_active();
       Triangulation<3>::face_iterator face;
