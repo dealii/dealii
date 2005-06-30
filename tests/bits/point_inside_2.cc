@@ -27,6 +27,7 @@
 #include <fstream>
 
 
+template <int dim>
 void check ()
 {
 				   // use a rather complicated way to
@@ -37,14 +38,14 @@ void check ()
 				   // the original testcase came in,
 				   // and it tests some more stuff, so
 				   // why change things
-  Triangulation<3> triangulation;
+  Triangulation<dim> triangulation;
   
 				   // we generate a hyper_cube and
 				   // modify one vertex.
   GridGenerator::hyper_cube (triangulation);
   
 				   // Now get the cell
-  Triangulation<3>::cell_iterator cell = triangulation.begin();
+  Triangulation<dim>::cell_iterator cell = triangulation.begin();
   cell->vertex(0)(0)=-1.;
                                       
 				   // and test it.
@@ -64,17 +65,22 @@ void check ()
                             {-0.26,0.5,0.5}
                             };
     
-    int expected[] = {1,0,0,0,0,0,0,1,1,1,0,1,1,0};
-    for (int i=0; i<14; i++)
-      {
-        const Point<3> testpoint(testcoord[i][0],
-				 testcoord[i][1],
-				 testcoord[i][2]);
-        bool res = cell->point_inside(testpoint);
-        deallog << testpoint << " \t inside " << res 
-                << " expected " << expected[i] << std::endl;
-        Assert (res == expected[i], ExcInternalError());
-      }    
+  const bool expected2d[] = {1,0,0,1,0,0,1,1,1,1,0,1,1,1};
+  const bool expected3d[] = {1,0,0,0,0,0,0,1,1,1,0,1,1,0};
+  const bool *expected=dim==2 ? expected2d : expected3d;
+  for (int i=0; i<14; i++)
+    {
+      Point<dim> testpoint;
+      testpoint(0)=testcoord[i][0];
+      testpoint(1)=testcoord[i][1];
+      if (dim==3)
+	testpoint(2)=testcoord[i][2];
+
+      bool res = cell->point_inside(testpoint);
+      deallog << testpoint << "  \t inside " << res 
+	      << " expected " << expected[i] << std::endl;
+      Assert (res == expected[i], ExcInternalError());
+    }    
 }
 
 
@@ -85,5 +91,6 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  check ();
+  check<2> ();
+  check<3> ();
 }
