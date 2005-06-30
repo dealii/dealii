@@ -14,9 +14,6 @@
 #define __deal2__dof_accessor_h
 
 
-/*-------------------------   dof_iterator.h     ------------------------*/
-
-
 #include <base/config.h>
 #include <grid/tria_accessor.h>
 #include <vector>
@@ -46,8 +43,8 @@ template <int dim>              class DoFObjectAccessor<3, dim>;
 /**
  * Define the basis for accessors to the degrees of freedom.
  *
- * Note that it is allowed to construct an object of which the
- * @p dof_handler pointer is a Null pointer. Such an object would
+ * Note that it is allowed to construct an object of which
+ * #dof_handler is a Null pointer. Such an object would
  * result in a strange kind of behaviour, though every reasonable
  * operating system should disallow access through that pointer.
  * The reason we do not check for the null pointer in the
@@ -63,8 +60,9 @@ template <int dim>              class DoFObjectAccessor<3, dim>;
  * which has an invalid dof handler pointer. This is to guarantee
  * that every iterator which is once assigned to is a valid
  * object. However, this assertion only holds in debug mode, when
- * the @p Assert macro is switched on.
+ * the #Assert macro is switched on.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -78,7 +76,7 @@ class DoFAccessor
 
 				     /**
 				      * This should be the default constructor.
-				      * We cast away the @p constness of the
+				      * We cast away the constness of the
 				      * pointer which clearly is EVIL but
 				      * we can't help without making all
 				      * functions which could somehow use
@@ -117,22 +115,34 @@ class DoFAccessor
     
 				     /**
 				      * Exception for child classes
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcInvalidObject);
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcVectorNotEmpty);
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcVectorDoesNotMatch);
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcMatrixDoesNotMatch);
 				     /**
-				      * Exception
+				      * A function has been called for
+				      * a cell which should be active,
+				      * but is refined. @ref GlossActive
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcNotActive);
 
@@ -158,6 +168,7 @@ class DoFAccessor
  * the inheritance is automatically chosen to be from CellAccessor if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1999
  */
 template <int celldim, int dim>
@@ -184,6 +195,7 @@ class DoFObjectAccessor_Inheritance
  * the inheritance is automatically chosen to be from CellAccessor if the
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
@@ -219,7 +231,7 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * lines in 1D-, 2D-, etc dimensions).
  *
  *
- * @sect3{Usage}
+ * <h3>Usage</h3>
  *
  * The DoFDimensionInfo classes inherited by the DoFHandler classes
  * declare typedefs to iterators using the accessors declared in this class
@@ -228,12 +240,12 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * as they provide easier typing (much less complicated names!).
  * 
  * 
- * @sect3{Notes about the class hierarchy structure}
+ * <h3>Notes about the class hierarchy structure</h3>
  *
  * See the report on this subject, which is available from the general
  * documentation directory.
  *
- *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998; Guido Kanschat, 1999
  * 
  * (Internal: inheritance is necessary for the general template due to
@@ -272,27 +284,27 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 		       const AccessorData       *local_data);
     
 				     /**
-				      * Index of the @p ith degree
+				      * Index of the <i>i</i>th degree
 				      * of freedom of this object.
 				      */
     unsigned int dof_index (const unsigned int i) const;
 
     				     /**
-				      * Set the index of the @p ith degree
+				      * Set the index of the <i>i</i>th degree
 				      * of freedom of this object to @p index.
 				      */
     void set_dof_index (const unsigned int i,
 			const int index) const;
 
 				     /**
-				      * Index of the @p ith degree
+				      * Index of the <i>i</i> degree
 				      * on the @p vertexth vertex.
 				      */
     unsigned int vertex_dof_index (const unsigned int vertex,
 				   const unsigned int i) const;
 
 				     /**
-				      * Set the index of the @p ith degree
+				      * Set the index of the <i>i</i> degree
 				      * on the @p vertexth vertex to @p index.
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
@@ -343,7 +355,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 
 				     /**
 				      * This function is the counterpart to
-				      * @p get_dof_values: it takes a vector
+				      * get_dof_values(): it takes a vector
 				      * of values for the degrees of freedom
 				      * of the cell pointed to by this iterator
 				      * and writes these values into the global
@@ -380,21 +392,21 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 			 OutputVector         &values) const;
 
     				     /**
-				      *  Pointer to the @p ith line
+				      *  Pointer to the <i>i</i>th line
 				      *  bounding this Object.
 				      */
     TriaIterator<dim,DoFObjectAccessor<1, dim> >
     line (const unsigned int i) const;
 
     				     /**
-				      *  Pointer to the @p ith quad
+				      *  Pointer to the <i>i</i>th quad
 				      *  bounding this Object.
 				      */
     TriaIterator<dim,DoFObjectAccessor<2, dim> >
     quad (const unsigned int i) const;
     
 				     /**
-				      * @p ith child as a DoFObjectAccessor
+				      * <i>i</i>th child as a DoFObjectAccessor
 				      * iterator. This function is needed since
 				      * the child function of the base
 				      * class returns a hex accessor without
@@ -479,7 +491,7 @@ class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
  * lines in 1D-, 2D-, etc dimensions).
  *
  *
- * @sect3{Usage}
+ * <h3>Usage</h3>
  *
  * The DoFDimensionInfo classes inherited by the DoFHandler classes
  * declare typedefs to iterators using the accessors declared in this class
@@ -488,7 +500,7 @@ class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
  * as they provide easier typing (much less complicated names!).
  * 
  * 
- * @sect3{Notes about the class hierarchy structure}
+ * <h3>Notes about the class hierarchy structure</h3>
  *
  * Inheritance from <tt>DoFObjectAccessor_Inheritance<1,dim>::BaseClass</tt> yields
  * inheritance from <tt>CellAccessor<1></tt> if <tt>dim==1</tt> and from
@@ -496,6 +508,7 @@ class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
  * of this class shares all features of cells in one dimension, but behaves
  * like an ordinary line in all other cases.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -601,7 +614,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function is the counterpart to
-				      * @p get_dof_values: it takes a vector
+				      * get_dof_values(): it takes a vector
 				      * of values for the degrees of freedom
 				      * of the cell pointed to by this iterator
 				      * and writes these values into the global
@@ -689,7 +702,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 /**
  * Grant access to the degrees of freedom located on quads.
  *
- * @ref DoFObjectAccessor
+ * @ingroup dofs
  */
 template <int dim>
 class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
@@ -795,7 +808,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function is the counterpart to
-				      * @p get_dof_values: it takes a vector
+				      * get_dof_values(): it takes a vector
 				      * of values for the degrees of freedom
 				      * of the cell pointed to by this iterator
 				      * and writes these values into the global
@@ -891,7 +904,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 /**
  * Grant access to the degrees of freedom located on hexes.
  *
- * @ref DoFObjectAccessor
+ * @ingroup dofs
  */
 template <int dim>
 class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
@@ -997,7 +1010,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 
 				     /**
 				      * This function is the counterpart to
-				      * @p get_dof_values: it takes a vector
+				      * get_dof_values(): it takes a vector
 				      * of values for the degrees of freedom
 				      * of the cell pointed to by this iterator
 				      * and writes these values into the global
@@ -1115,6 +1128,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
  * CellAccessor, which makes the functions of this class available to the
  * DoFCellAccessor class as well.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -1237,7 +1251,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * decided what the this function
 				      * does in these cases.
 				      *
-				      * Unlike the @p get_dof_values
+				      * Unlike the get_dof_values()
 				      * function, this function is
 				      * associated to cells rather
 				      * than to lines, quads, and
@@ -1253,7 +1267,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				     /**
 				      * This, again, is the
 				      * counterpart to
-				      * @p get_interpolated_dof_values:
+				      * get_interpolated_dof_values():
 				      * you specify the dof values on
 				      * a cell and these are
 				      * interpolated to the children
@@ -1265,7 +1279,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * to by this object is terminal,
 				      * then the dof values are set in
 				      * the global data vector by
-				      * calling the @p set_dof_values
+				      * calling the set_dof_values()
 				      * function; otherwise, the
 				      * values are prolonged to each
 				      * of the children and this
@@ -1273,7 +1287,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * them.
 				      *
 				      * Using the
-				      * @p get_interpolated_dof_values
+				      * get_interpolated_dof_values()
 				      * and this function, you can
 				      * compute the interpolation of a
 				      * finite element function to a
@@ -1319,7 +1333,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * what the prolongation matrices
 				      * represent in this case.
 				      *
-				      * Unlike the @p set_dof_values
+				      * Unlike the set_dof_values()
 				      * function, this function is
 				      * associated to cells rather
 				      * than to lines, quads, and

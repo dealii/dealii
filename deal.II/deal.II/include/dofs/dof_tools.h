@@ -46,7 +46,7 @@ template <int dim> class Mapping;
  * object of class DoFTools.
  *
  *
- * @sect3{Setting up sparsity patterns}
+ * <h3>Setting up sparsity patterns</h3>
  *
  * When assembling system matrices, the entries are usually of the form
  * $a_{ij} = a(\phi_i, \phi_j)$, where $a$ is a bilinear functional, often an
@@ -70,18 +70,18 @@ template <int dim> class Mapping;
  *
  *
  *
- * @sect3{DoF numberings on boundaries}
+ * <h3>DoF numberings on boundaries</h3>
  *
  * When projecting the traces of functions to the boundary or parts
  * thereof, one needs to build matrices and vectors with the degrees
  * of freedom on the boundary. What is needed in this case is a
  * numbering of the boundary degrees of freedom, starting from zero on
  * and not considering the degrees of freedom in the interior. The
- * @p map_dof_to_boundary_indices function does exactly this, by
+ * map_dof_to_boundary_indices() function does exactly this, by
  * providing a vector with as many entries as there are degrees of
  * freedom on the whole domain, with each entry being the number in
  * the numbering of the boundary or
- * DoFHandler@p ::invalid_dof_index if the dof is not on the
+ * DoFHandler::invalid_dof_index if the dof is not on the
  * boundary. You should always use this function to get the mapping
  * between local (boundary) and the global numbers, for example to
  * build the mass matrix on the boundary, or to get the global index
@@ -99,7 +99,7 @@ template <int dim> class Mapping;
  * algorithm, you are better off if you just accept the mapping `as
  * is'.
  *
- * Actually, there are two @p map_dof_to_boundary_indices functions,
+ * Actually, there are two map_dof_to_boundary_indices() functions,
  * one producing a numbering for all boundary degrees of freedom and
  * one producing a numbering for only parts of the boundary, namely
  * those parts for which the boundary indicator is listed in a set of
@@ -114,11 +114,11 @@ template <int dim> class Mapping;
  * indices of degrees of freedom on different parts may be intermixed.
  *
  * Degrees of freedom on the boundary but not on one of the specified
- * boundary parts are given the index @p invalid_dof_index, as if
+ * boundary parts are given the index #invalid_dof_index, as if
  * they were in the interior. If no boundary indicator was given or if
  * no face of a cell has a boundary indicator contained in the given
  * list, the vector of new indices consists solely of
- * @p invalid_dof_indexs.
+ * #invalid_dof_index.
  *
  * The question what a degree of freedom on the boundary is, is not so
  * easy.  It should really be a degree of freedom of which the
@@ -126,7 +126,7 @@ template <int dim> class Mapping;
  * least for Lagrange elements this definition is equal to the
  * statement that the off-point of the shape function, i.e. the point
  * where the function assumes its nominal value (for Lagrange elements
- * this is the point where it has the function value @p 1), is
+ * this is the point where it has the function value 1), is
  * located on the boundary. We do not check this directly, the
  * criterion is rather defined through the information the finite
  * element class gives: the FiniteElementBase class defines the
@@ -141,7 +141,7 @@ template <int dim> class Mapping;
  * is, is a secret of the finite element (well, you can ask it, but we
  * don't do it here) and not relevant in this context.
  *
- *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, Guido Kanschat and others, 1998 - 2005
  */
 class DoFTools
@@ -173,7 +173,57 @@ class DoFTools
                                             */
 	  nonzero
     };
+				     /**
+				      * @name Sparsity Pattern Generation
+				      * @{
+				      */
     
+				     /**
+				      * On initializing a
+				      * SparsityPattern, the number of
+				      * entries required for each row
+				      * must be known. This function
+				      * estimates the maximum number
+				      * of coupling degrees of freedom
+				      * for each row of the sparsity
+				      * pattern.
+				      *
+				      * In systems of equations,
+				      * couplings between components
+				      * <b>not</b> coupling in the
+				      * differential equation can be
+				      * eliminated by the two optional
+				      * tables.
+				      *
+				      * @param dofs The DoFHandler
+				      * @param row_lengths The vector
+				      * containing the resulting row
+				      * lengths. It must have the
+				      * length DoFHandler::n_dofs().
+				      *
+				      * @param couplings
+				      * Optional argument for
+				      * optimizing out non-coupled
+				      * components of a system. If the
+				      * entry at position <i>(i,j)</i>
+				      * is #none, then couplings
+				      * between the related dofs are
+				      * neglected. See Coupling.
+				      *
+				      * @param flux_couplings:
+				      * similar to the previous
+				      * argument allows neglecting
+				      * couplings. Here, couplings due
+				      * to flux operators on faces are
+				      * considered. See #Coupling.
+				     */
+    template<int dim>
+    static
+    void compute_row_length_vector(
+      const DoFHandler<dim>& dofs,
+      std::vector<unsigned int>& row_lengths,
+      Table<2,Coupling> couplings /*= typename Table<2,Coupling>()*/,
+      Table<2,Coupling> flux_couplings /*= Table<2,Coupling>()*/);
     
 				     /**
 				      * Locate non-zero entries of the
@@ -502,6 +552,12 @@ class DoFTools
 				SparsityPattern       &sparsity,
 				const Table<2,Coupling>& int_mask,
 				const Table<2,Coupling>& flux_mask);
+
+				     //@}
+				     /**
+				      * @name Hanging Nodes
+				      * @{
+				      */
     
 				     /**
 				      * Make up the constraints which
@@ -550,6 +606,7 @@ class DoFTools
     static void
     make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 				   ConstraintMatrix    &constraints);
+				     //@}
     
 				     /**
 				      * Take a vector of values which live on
@@ -561,7 +618,7 @@ class DoFTools
 				      * note that the resulting field will not
 				      * be continuous at hanging nodes. This
 				      * can, however, easily be arranged by
-				      * calling the appropraite @p distribute
+				      * calling the appropriate @p distribute
 				      * function of a ConstraintMatrix
 				      * object created for this
 				      * DoFHandler object, after the
@@ -600,7 +657,7 @@ class DoFTools
 				      * It is assumed that the output
 				      * vector @p dof_data already
 				      * has the right size,
-				      * i.e. <tt>n_dofs()</tt> elements.
+				      * i.e. n_dofs() elements.
 				      *
 				      * This function cannot be used
 				      * if the finite element in use
@@ -746,7 +803,11 @@ class DoFTools
 			   const std::vector<bool>    &component_select,
 			   std::vector<bool>          &selected_dofs,
 			   const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
-
+				     /**
+				      * @name Hanging Nodes
+				      * @{
+				      */
+    
 				     /**
 				      * Select all dofs that will be
 				      * constrained by interface
@@ -778,7 +839,8 @@ class DoFTools
     static void
     extract_hanging_node_dofs (const DoFHandler<3> &dof_handler,
 			       std::vector<bool>   &selected_dofs);
-
+				     //@}
+    
 				     /**
 				      * Flag all those degrees of
 				      * freedom which are on cells

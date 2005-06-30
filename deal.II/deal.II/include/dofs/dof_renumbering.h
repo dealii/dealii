@@ -27,100 +27,107 @@
  * Implementation of a number of renumbering algorithms for the degrees of
  * freedom on a triangulation.
  *
- * @sect2{Cuthill-McKee like algorithms}
+ * <h3>Cuthill-McKee like algorithms</h3>
  *
- * Within this class, the Cuthill-McKee algorithm is implemented. It starts
- * at a degree of freedom, searches the other DoFs for those which are couple
- * with the one we started with and numbers these in a certain way. It then
- * finds the second level of DoFs, namely those that couple with those of
- * the previous level (which were those that coupled with the initial DoF)
- * and numbers these. And so on. For the details of the algorithm, especially
- * the numbering within each level, we refer the reader to the book of
- * Schwarz (H.R.Schwarz: Methode der finiten Elemente). The reverse Cuthill-McKee
- * algorithm does the same job, but numbers all elements in the reverse order.
+ * Within this class, the Cuthill-McKee algorithm is implemented. It
+ * starts at a degree of freedom, searches the other DoFs for those
+ * which are couple with the one we started with and numbers these in
+ * a certain way. It then finds the second level of DoFs, namely those
+ * that couple with those of the previous level (which were those that
+ * coupled with the initial DoF) and numbers these. And so on. For the
+ * details of the algorithm, especially the numbering within each
+ * level, we refer the reader to the book of Schwarz (H.R.Schwarz:
+ * Methode der finiten Elemente). The reverse Cuthill-McKee algorithm
+ * does the same job, but numbers all elements in the reverse order.
  *
- * These algorithms
- * have one major drawback: they require a good starting point, i.e. the degree
- * of freedom index afterwards to be numbered zero. This can thus be given by
- * the user, e.g. by exploiting knowledge of the actual topology of the
- * domain. It is also possible to give several starting indices, which may
- * be used to simulate a simple upstream numbering (by giving the inflow
- * dofs as starting values) or to make preconditioning faster (by letting
+ * These algorithms have one major drawback: they require a good
+ * starting point, i.e. the degree of freedom index afterwards to be
+ * numbered zero. This can thus be given by the user, e.g. by
+ * exploiting knowledge of the actual topology of the domain. It is
+ * also possible to give several starting indices, which may be used
+ * to simulate a simple upstream numbering (by giving the inflow dofs
+ * as starting values) or to make preconditioning faster (by letting
  * the dirichlet boundary indices be starting points).
  *
- * If no starting index is given, one is chosen by the program, namely one
- * with the smallest coordination number (the coordination number is the
- * number of other dofs this dof couples with). This dof is usually located
- * on the boundary of the domain. There is, however, large ambiguity in this
- * when using the hierarchical meshes used in this library, since in most
- * cases the computational domain is not approximated by tilting and deforming
- * elements and by plugging together variable numbers of elements at vertices,
- * but rather by hierarchical refinement. There is therefore a large number
- * of dofs with equal coordination numbers. The renumbering algorithms will
+ * If no starting index is given, one is chosen by the program, namely
+ * one with the smallest coordination number (the coordination number
+ * is the number of other dofs this dof couples with). This dof is
+ * usually located on the boundary of the domain. There is, however,
+ * large ambiguity in this when using the hierarchical meshes used in
+ * this library, since in most cases the computational domain is not
+ * approximated by tilting and deforming elements and by plugging
+ * together variable numbers of elements at vertices, but rather by
+ * hierarchical refinement. There is therefore a large number of dofs
+ * with equal coordination numbers. The renumbering algorithms will
  * therefore not give optimal results.
  *
- * In the book of Schwarz (H.R.Schwarz: Methode der finiten Elemente), it is
- * advised to test many starting points, if possible all with the smallest
- * coordination number and also those with slightly higher numbers. However,
- * this seems only possible for meshes with at most several dozen or a few
- * hundred elements found in small engineering problems of the early 1980s
- * (the second edition was published in 1984), but certainly not with those
- * used in this library, featuring several 10,000 to a few 100,000 elements.
+ * In the book of Schwarz (H.R.Schwarz: Methode der finiten Elemente),
+ * it is advised to test many starting points, if possible all with
+ * the smallest coordination number and also those with slightly
+ * higher numbers. However, this seems only possible for meshes with
+ * at most several dozen or a few hundred elements found in small
+ * engineering problems of the early 1980s (the second edition was
+ * published in 1984), but certainly not with those used in this
+ * library, featuring several 10,000 to a few 100,000 elements.
  *
- * On the other hand, the need to reduce the bandwidth has decreased since
- * with the mentioned number of cells, only iterative solution methods are
- * able to solve the resulting matrix systems. These, however, are not so
- * demanding with respect to the bandwidth as direct solvers used for
- * smaller problems. Things like upstream numbering become much more important
- * in recent times, so the suboptimality of the renumbering algorithms is
- * not that important any more.
- *
- * 
- * @sect3{Implementation of renumbering schemes}
- *
- * The renumbering algorithms need quite a lot of memory, since they have
- * to store for each dof with which other dofs it couples. This is done
- * using a SparsityPattern object used to store the sparsity pattern of
- * matrices. It
- * is not useful for the user to do anything between distributing the dofs
- * and renumbering, i.e. the calls to DoFHandler@p ::distribute_dofs and
- * DoFHandler@p ::renumber_dofs should follow each other immediately. If
- * you try to create a sparsity pattern or anything else in between, these
- * will be invalid afterwards.
- *
- * The renumbering may take care of dof-to-dof couplings only induced by
- * eliminating constraints. In addition to the memory consumption mentioned
- * above, this also takes quite some computational time, but it may be
- * switched off upon calling the @p renumber_dofs function. This will then
- * give inferior results, since knots in the graph (representing dofs)
- * are not found to be neighbors even if they would be after condensation.
- * 
- * The renumbering algorithms work on a purely algebraic basis, due to the
- * isomorphism between the graph theoretical groundwork underlying the
- * algorithms and binary matrices (matrices of which the entries are binary
- * values) represented by the sparsity patterns. In special, the algorithms
- * do not try to exploit topological knowledge (e.g. corner detection) to
- * find appropriate starting points. This way, however, they work in
- * arbitrary space dimension.
- *
- * If you want to give starting points, you may give a list of dof indices
- * which will form the first step of the renumbering. The dofs of the list
- * will be consecutively numbered starting with zero, i.e. this list is not
- * renumbered according to the coordination number of the nodes. Indices not
- * in the allowed range are deleted. If no index is allowed, the algorithm
- * will search for its own starting point.
+ * On the other hand, the need to reduce the bandwidth has decreased
+ * since with the mentioned number of cells, only iterative solution
+ * methods are able to solve the resulting matrix systems. These,
+ * however, are not so demanding with respect to the bandwidth as
+ * direct solvers used for smaller problems. Things like upstream
+ * numbering become much more important in recent times, so the
+ * suboptimality of the renumbering algorithms is not that important
+ * any more.
  *
  * 
- * @sect3{Results of renumbering}
+ * <h4>Implementation of renumbering schemes</h4>
  *
- * The renumbering schemes mentioned above do not lead to optimal results.
- * However, after all there is no algorithm that accomplishes this within
- * reasonable time. There are situations where the lack of optimality even
- * leads to worse results than with the original, crude, levelwise numering
- * scheme; one of these examples is a mesh of four cells of which always
- * those cells are refined which are neighbors to the center (you may call
- * this mesh a `zoom in' mesh). In one such example the bandwidth was
- * increased by about 50 per cent.
+ * The renumbering algorithms need quite a lot of memory, since they
+ * have to store for each dof with which other dofs it couples. This
+ * is done using a SparsityPattern object used to store the sparsity
+ * pattern of matrices. It is not useful for the user to do anything
+ * between distributing the dofs and renumbering, i.e. the calls to
+ * DoFHandler::distribute_dofs and DoFHandler::renumber_dofs should
+ * follow each other immediately. If you try to create a sparsity
+ * pattern or anything else in between, these will be invalid
+ * afterwards.
+ *
+ * The renumbering may take care of dof-to-dof couplings only induced
+ * by eliminating constraints. In addition to the memory consumption
+ * mentioned above, this also takes quite some computational time, but
+ * it may be switched off upon calling the @p renumber_dofs
+ * function. This will then give inferior results, since knots in the
+ * graph (representing dofs) are not found to be neighbors even if
+ * they would be after condensation.
+ * 
+ * The renumbering algorithms work on a purely algebraic basis, due to
+ * the isomorphism between the graph theoretical groundwork underlying
+ * the algorithms and binary matrices (matrices of which the entries
+ * are binary values) represented by the sparsity patterns. In
+ * special, the algorithms do not try to exploit topological knowledge
+ * (e.g. corner detection) to find appropriate starting points. This
+ * way, however, they work in arbitrary space dimension.
+ *
+ * If you want to give starting points, you may give a list of dof
+ * indices which will form the first step of the renumbering. The dofs
+ * of the list will be consecutively numbered starting with zero,
+ * i.e. this list is not renumbered according to the coordination
+ * number of the nodes. Indices not in the allowed range are
+ * deleted. If no index is allowed, the algorithm will search for its
+ * own starting point.
+ *
+ * 
+ * <h4>Results of renumbering</h4>
+ *
+ * The renumbering schemes mentioned above do not lead to optimal
+ * results.  However, after all there is no algorithm that
+ * accomplishes this within reasonable time. There are situations
+ * where the lack of optimality even leads to worse results than with
+ * the original, crude, levelwise numering scheme; one of these
+ * examples is a mesh of four cells of which always those cells are
+ * refined which are neighbors to the center (you may call this mesh a
+ * `zoom in' mesh). In one such example the bandwidth was increased by
+ * about 50 per cent.
  *
  * In most other cases, the bandwith is reduced significantly. The reduction
  * is the better the less structured the grid is. With one grid where the
@@ -145,7 +152,7 @@
  * may be difficult, however, and in many cases will not justify the effort.
  *
  *
- * @sect2{Component-wise numbering}
+ * <h3>Component-wise numbering</h3>
  *
  * For finite elements composed of several base elements using the FESystem
  * class, or for elements which provide several components themselves, it
@@ -155,7 +162,7 @@
  * different components.
  *
  * This kind of numbering may be obtained by calling the
- * @p component_wise function of this class. Since it does not touch
+ * component_wise() function of this class. Since it does not touch
  * the order of indices within each, it may be worthwhile to first
  * renumber using the Cuthill-McKee or a similar algorithm and
  * afterwards renumbering component-wise. This will bring out the
@@ -163,7 +170,7 @@
  * block.
  *
  *
- * @sect2{Cell-wise numbering for Discontinuous Galerkin FEM}
+ * <h3>Cell-wise numbering for Discontinuous Galerkin FEM</h3>
  *
  * One advantage of DGFEM is the fact, that it yields invertible
  * blocks on the diagonal of the global matrix. these blocks are in
@@ -179,42 +186,37 @@
  * preserved, so it may be useful to apply component_wise() first.
  *
  *
- * @sect2{Random renumbering}
+ * <h3>Random renumbering</h3>
  *
- * The @p random function renumbers degrees of freedom randomly. This
+ * The random() function renumbers degrees of freedom randomly. This
  * function is probably seldom of use, except to check the dependence of
  * solvers (iterative or direct ones) on the numbering of the degrees
  * of freedom. It uses the @p random_shuffle function from the C++
  * standard library to do its work.
  *
  *
- * @sect2{Other renumberings}
+ * <h3>Multigrid DoF numbering</h3>
  *
- * Apart from the ones discussed above, there are a number of other
- * renumbering schemes implemented in this class. Refer to the detailed
- * function listings for each of the functions of this class.
- * 
+ * Most algorithms also work on multigrid degree of freedom
+ * numberings. Refer to the actual function declarations to get more
+ * information on this.
  *
- * @sect2{Multigrid DoF numbering}
- *
- * Most algorithms also work on multigrid degree of freedom numberings. Refer
- * to the actual function declarations to get more information on this.
- *
- *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2004
  */
 class DoFRenumbering 
 {
   public:
 				     /**
-				      * Renumber the degrees of freedom
-				      * according to the Cuthill-McKee method,
-				      * eventually using the reverse numbering
-				      * scheme.
+				      * Renumber the degrees of
+				      * freedom according to the
+				      * Cuthill-McKee method,
+				      * eventually using the reverse
+				      * numbering scheme.
 				      *
-				      * See the general documentation of
-				      * this class for details on the
-				      * different methods.
+				      * See the general documentation
+				      * of this class for details on
+				      * the different methods.
 				      */
     template <int dim>
     static void 
@@ -226,10 +228,9 @@ class DoFRenumbering
 				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p Cuthill_McKee
-				      * function. Does not perform the
-				      * renumbering on the
-				      * @p DoFHandler dofs but
+				      * Cuthill_McKee() function. Does
+				      * not perform the renumbering on
+				      * the DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
 				      */    
@@ -242,23 +243,27 @@ class DoFRenumbering
 			   const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int>());
 
 				     /**
-				      * Renumber the degrees of freedom
-				      * according to the Cuthill-McKee method,
-				      * eventually using the reverse numbering
-				      * scheme, in this case for a multigrid
-				      * numbering of degrees of freedom.
+				      * Renumber the degrees of
+				      * freedom according to the
+				      * Cuthill-McKee method,
+				      * eventually using the reverse
+				      * numbering scheme, in this case
+				      * for a multigrid numbering of
+				      * degrees of freedom.
 				      *
-				      * You can give a triangulation level to
-				      * which this function is to be applied.
-				      * Since with a level-wise numbering there
-				      * are no hanging nodes, no constraints
-				      * can be used, so the respective
-				      * parameter of the previous function is
+				      * You can give a triangulation
+				      * level to which this function
+				      * is to be applied.  Since with
+				      * a level-wise numbering there
+				      * are no hanging nodes, no
+				      * constraints can be used, so
+				      * the respective parameter of
+				      * the previous function is
 				      * ommitted.
 				      *
-				      * See the general documentation of
-				      * this class for details on the
-				      * different methods.
+				      * See the general documentation
+				      * of this class for details on
+				      * the different methods.
 				      */
     template <int dim>
     static void 
@@ -269,12 +274,14 @@ class DoFRenumbering
 
 				     /**
 				      * Sort the degrees of freedom by
-				      * vector component. The numbering within
-				      * each component is not touched,
-				      * so a degree of freedom with index
-				      * $i$, belonging to some component,
-				      * and another degree of freedom
-				      * with index $j$ belonging to the same
+				      * vector component. The
+				      * numbering within each
+				      * component is not touched, so a
+				      * degree of freedom with index
+				      * $i$, belonging to some
+				      * component, and another degree
+				      * of freedom with index $j$
+				      * belonging to the same
 				      * component will be assigned new
 				      * indices $n(i)$ and $n(j)$ with
 				      * $n(i)<n(j)$ if $i<j$ and
@@ -283,21 +290,21 @@ class DoFRenumbering
 				      * You can specify that the
 				      * components are ordered in a
 				      * different way than suggested
-				      * by the @p FESystem object you
+				      * by the FESystem object you
 				      * use. To this end, set up the
 				      * vector @p target_component
 				      * such that the entry at index
-				      * @p i denotes the number of
-				      * the target component for dofs
-				      * with component @p i in the
-				      * @p FESystem. Naming the same
+				      * @p i denotes the number of the
+				      * target component for dofs with
+				      * component @p i in the
+				      * FESystem. Naming the same
 				      * component more than once is
 				      * possible and results in a
 				      * blocking of several components
-				      * into one.
-				      * If you omit this argument, the
-				      * same order as given by the
-				      * finite element is used.
+				      * into one.  If you omit this
+				      * argument, the same order as
+				      * given by the finite element is
+				      * used.
 				      *
 				      * If one of the base finite
 				      * elements from which the global
@@ -343,12 +350,11 @@ class DoFRenumbering
 				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p component_wise
-				      * functions. Does not perform the
-				      * renumbering on the
-				      * @p DoFHandler dofs but
-				      * returns the renumbering
-				      * vector.
+				      * component_wise()
+				      * functions. Does not perform
+				      * the renumbering on the
+				      * DoFHandler dofs but returns
+				      * the renumbering vector.
 				      */    
     template <int dim, class ITERATOR, class ENDITERATOR>
     static unsigned int
@@ -361,14 +367,14 @@ class DoFRenumbering
 				      * Cell-wise renumbering for DG
 				      * elements.  This function takes
 				      * the ordered set of cells in
-				      * @p cell_order, and makes sure
-				      * that all degrees of freedom in
-				      * a cell with higher index are
-				      * behind all degrees of freedom
-				      * of a cell with lower
-				      * index. The order inside a cell
-				      * bloock will be the same as
-				      * before this renumbering.
+				      * <tt>cell_order</tt>, and makes
+				      * sure that all degrees of
+				      * freedom in a cell with higher
+				      * index are behind all degrees
+				      * of freedom of a cell with
+				      * lower index. The order inside
+				      * a cell bloock will be the same
+				      * as before this renumbering.
 				      *
 				      * This function only works with
 				      * Discontinuous Galerkin Finite
@@ -384,10 +390,9 @@ class DoFRenumbering
 				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p cell_wise_dg
-				      * function. Does not perform the
-				      * renumbering on the
-				      * @p DoFHandler dofs but
+				      * cell_wise_dg() function. Does
+				      * not perform the renumbering on
+				      * the DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
 				      */
@@ -430,12 +435,12 @@ class DoFRenumbering
 				      * This function produces a
 				      * downstream ordering of the
 				      * mesh cells and calls
-				      * cell_wise_dg().
-				      * Therefore, it only works with
-				      * Discontinuous Galerkin Finite
-				      * Elements, i.e. all degrees of
-				      * freedom have to be associated
-				      * with the interior of the cell.
+				      * cell_wise_dg().  Therefore, it
+				      * only works with Discontinuous
+				      * Galerkin Finite Elements,
+				      * i.e. all degrees of freedom
+				      * have to be associated with the
+				      * interior of the cell.
 				      */
     template <int dim>
     static void
@@ -458,10 +463,9 @@ class DoFRenumbering
     				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p downstream_dg
-				      * function. Does not perform the
-				      * renumbering on the
-				      * @p DoFHandler dofs but
+				      * downstream_dg() function. Does
+				      * not perform the renumbering on
+				      * the DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
 				      */
@@ -479,12 +483,12 @@ class DoFRenumbering
 				      * (counter)clockwise ordering of
 				      * the mesh cells with respect to
 				      * the hub @p center and calls
-				      * cell_wise_dg().
-				      * Therefore, it only works with
-				      * Discontinuous Galerkin Finite
-				      * Elements, i.e. all degrees of
-				      * freedom have to be associated
-				      * with the interior of the cell.
+				      * cell_wise_dg().  Therefore, it
+				      * only works with Discontinuous
+				      * Galerkin Finite Elements,
+				      * i.e. all degrees of freedom
+				      * have to be associated with the
+				      * interior of the cell.
 				      */
     template <int dim>
     static void
@@ -507,10 +511,9 @@ class DoFRenumbering
     				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p clockwise_dg
-				      * functions. Does not perform the
-				      * renumbering on the
-				      * @p DoFHandler dofs but
+				      * clockwise_dg() functions. Does
+				      * not perform the renumbering on
+				      * the DoFHandler dofs but
 				      * returns the renumbering
 				      * vector.
 				      */
@@ -542,12 +545,11 @@ class DoFRenumbering
     				     /**
 				      * Computes the renumbering
 				      * vector needed by the
-				      * @p sort_selected_dofs_back
+				      * sort_selected_dofs_back()
 				      * function. Does not perform the
-				      * renumbering on the
-				      * @p DoFHandler dofs but
-				      * returns the renumbering
-				      * vector.
+				      * renumbering on the DoFHandler
+				      * dofs but returns the
+				      * renumbering vector.
 				      */
     template <int dim>
     static void
@@ -565,12 +567,11 @@ class DoFRenumbering
 
     				     /**
 				      * Computes the renumbering
-				      * vector needed by the
-				      * @p random function. Does not
-				      * perform the renumbering on the
-				      * @p DoFHandler dofs but
-				      * returns the renumbering
-				      * vector.
+				      * vector needed by the random()
+				      * function. Does not perform the
+				      * renumbering on the DoFHandler
+				      * dofs but returns the
+				      * renumbering vector.
 				      */   
     template <int dim>
     static void
@@ -578,29 +579,32 @@ class DoFRenumbering
 		    const DoFHandler<dim> &dof_handler);
 
 				     /**
-				      * Renumber the degrees of freedom such
-				      * that they are associated with the
-				      * subdomain id of the cells they are
-				      * living on, i.e. first all degrees of
-				      * freedom that belong to cells with
-				      * subdomain zero, then all with
-				      * subdomain one, etc. This is useful
-				      * when doing parallel computations after
-				      * assigning subdomain ids using a
-				      * partitioner (see the
-				      * @p GridTools::partition_triangulation
+				      * Renumber the degrees of
+				      * freedom such that they are
+				      * associated with the subdomain
+				      * id of the cells they are
+				      * living on, i.e. first all
+				      * degrees of freedom that belong
+				      * to cells with subdomain zero,
+				      * then all with subdomain one,
+				      * etc. This is useful when doing
+				      * parallel computations after
+				      * assigning subdomain ids using
+				      * a partitioner (see the
+				      * GridTools::partition_triangulation
 				      * function for this).
 				      *
 				      * Note that degrees of freedom
-				      * associated with faces, edges, and
-				      * vertices may be associated with
-				      * multiple subdomains if they are
-				      * sitting on partition boundaries. It
-				      * would therefore be undefined with
-				      * which subdomain they have to be
-				      * associated. For this, we use what we
-				      * get from the
-				      * @p DoFTools::get_subdomain_association
+				      * associated with faces, edges,
+				      * and vertices may be associated
+				      * with multiple subdomains if
+				      * they are sitting on partition
+				      * boundaries. It would therefore
+				      * be undefined with which
+				      * subdomain they have to be
+				      * associated. For this, we use
+				      * what we get from the
+				      * DoFTools::get_subdomain_association
 				      * function.
 				      *
 				      * The algorithm is stable, i.e. if
@@ -614,11 +618,13 @@ class DoFRenumbering
     subdomain_wise (DoFHandler<dim> &dof_handler);
 
     				     /**
-				      * Computes the renumbering vector needed
-				      * by the @p subdomain_wise
+				      * Computes the renumbering
+				      * vector needed by the
+				      * subdomain_wise()
 				      * function. Does not perform the
-				      * renumbering on the @p DoFHandler dofs
-				      * but returns the renumbering vector.
+				      * renumbering on the @p
+				      * DoFHandler dofs but returns
+				      * the renumbering vector.
 				      */   
     template <int dim>
     static void
@@ -627,17 +633,22 @@ class DoFRenumbering
     
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcRenumberingIncomplete);
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcInvalidComponentOrder);
 				     /**
-				      * Exception. The function is
-				      * only implemented for
-				      * Discontinuous Galerkin Finite
-				      * elements.
+				      * The function is only
+				      * implemented for Discontinuous
+				      * Galerkin Finite elements.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcNotDGFEM);
 };

@@ -37,6 +37,112 @@
 #include <numeric>
 
 
+//TODO:[GK] Traverse faces only once using flags
+
+//TODO:[GK] This function is not finished yet!!!
+template <int dim>
+void
+DoFTools::compute_row_length_vector(
+  const DoFHandler<dim>& dofs,
+  std::vector<unsigned int>& row_lengths,
+  Table<2,Coupling> couplings,
+  Table<2,Coupling> flux_couplings)
+{
+  const FiniteElement<dim>& fe = dofs.get_fe();
+  const unsigned int ncomp = fe.n_components;
+  
+  Assert (row_lengths.size() == dofs.n_dofs(),
+	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+
+  Assert (couplings.n_rows() == couplings.n_cols(),
+	  ExcDimensionMismatch(couplings.n_rows(), couplings.n_cols()));
+  Assert (flux_couplings.n_rows() == flux_couplings.n_cols(),
+	  ExcDimensionMismatch(flux_couplings.n_rows(), flux_couplings.n_cols()));
+  
+  if (couplings.n_rows() > 1)
+    Assert (couplings.n_rows() == ncomp,
+	    ExcDimensionMismatch(couplings.n_rows(), ncomp));
+  if (flux_couplings.n_rows() > 1)
+    Assert (flux_couplings.n_rows() == ncomp,
+	    ExcDimensionMismatch(flux_couplings.n_rows(), ncomp));
+
+				   // Function starts here by
+				   // resetting the counters.
+  std::fill(row_lengths.begin(), row_lengths.end(), 0);
+
+  const typename DoFHandler<dim>::cell_iterator end = dofs.end();
+  typename DoFHandler<dim>::active_cell_iterator cell;
+  std::vector<unsigned int> indices(fe.dofs_per_cell);
+  
+  for (cell = dofs.begin(); cell != end; ++cell)
+    {
+      indices.resize(fe.dofs_per_cell);
+      cell->get_dof_indices(indices);
+				       // First the simple case where
+				       // all degrees of freedom on a
+				       // cell couple.
+      if (couplings.n_rows() <= 1)
+	{
+	  unsigned int i = 0;
+					   // First, dofs on
+					   // vertices. We assume that
+					   // each vertex dof couples
+					   // with all dofs on
+					   // adjacent grid cells.
+
+					   // Since two cells share a
+					   // facein 2d, we can subtract
+					   // the dofs per face,
+					   // unless we have hanging
+					   // nodes.
+
+					   // In 3d, 8 cells share 12
+					   // faces.
+	  unsigned int increment = fe.dofs_per_cell - fe.dofs_per_face;
+	  while (i < fe.first_line_index)
+	    row_lengths[indices[i++]] += increment;
+					   // Lines are already cells
+					   // in 1D
+	  increment = (dim>1)
+		      ? fe.dofs_per_cell - fe.dofs_per_face
+		      : fe.dofs_per_cell;
+	  while (i < fe.first_quad_index)
+	    row_lengths[indices[i++]] += increment;
+					   // Now quads in 2D and 3D
+	  increment = (dim>2)
+		      ? fe.dofs_per_cell - fe.dofs_per_face
+		      : fe.dofs_per_cell;
+	  while (i < fe.first_hex_index)
+	    row_lengths[indices[i++]] += increment;
+					   // Finally, cells in 3D
+	  increment = fe.dofs_per_cell;
+	  while (i < fe.ofs_per_cell)
+	    row_lengths[indices[i++]] += increment;
+	}
+				       // At this point, we have
+				       // counted all dofs
+				       // contributiong from cells
+				       // coupled topologically to the
+				       // adjacent cells, but we
+				       // subtracted some faces.
+
+				       // Now, let's go by the faces
+				       // and add the missing
+				       // contribution as well as the
+				       // flux contributions.
+      for (unsigned int iface=0;iface<GeometryInfo<dim>::faces_per_cell;++iface)
+	{
+	  typename DoFHandler<dim>::face_iterator face = cell->face(iface);
+	  
+	  indices.resize(fe.dofs_per_face);
+	  face->get_dof_indices(indices);
+	  for (i=0;i<fe.dofs_per_face;++i)
+	    row_lengths[indices[i]] += fe.dofs_per_face;
+	}
+    }
+}
+
+
 template <int dim, class SparsityPattern>
 void
 DoFTools::make_sparsity_pattern (

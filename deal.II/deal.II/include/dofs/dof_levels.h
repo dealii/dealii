@@ -24,6 +24,7 @@
  * class, but do not actually use it. Rather, only specializations of
  * this class are used.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <int N>
@@ -43,7 +44,7 @@ class DoFLevel
  * Store the indices of the degrees of freedom which are located on
  * the lines.
  *
- * @sect3{Information for all DoFLevel classes}
+ * <h3>Information for all DoFLevel classes</h3>
  *
  * The <tt>DoFLevel<N></tt> classes 
  * store the global indices of the degrees of freedom for each cell on a
@@ -86,6 +87,7 @@ class DoFLevel
  * is used, the indices are stored in the @p vertex_dofs array of the
  * DoFHandler class.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <>
@@ -114,6 +116,7 @@ class DoFLevel<1>
  * Store the indices of the degrees of freedom which are located on
  * quads.  See DoFLevel<1> for more information.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <>
@@ -142,6 +145,7 @@ class DoFLevel<2> : public DoFLevel<1>
  * Store the indices of the degrees of freedom which are located on
  * hexhedra.  See DoFLevel<1> for more information.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <>

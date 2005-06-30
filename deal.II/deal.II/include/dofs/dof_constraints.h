@@ -75,11 +75,11 @@ class BlockIndices;
  * which has to applied to the solution vector.
  *
  *
- * @sect3{Condensing matrices and sparsity patterns}
+ * <h3>Condensing matrices and sparsity patterns</h3>
  * 
  * Condensation of a matrix is done in four steps: first one builds the
  * sparsity pattern (e.g. using
- * DoFHandler@p ::create_sparsity_pattern); then the sparsity pattern
+ * DoFHandler::create_sparsity_pattern); then the sparsity pattern
  * of the condensed matrix is made out of the original sparsity pattern and
  * the constraints; third, the global matrix is assembled; and fourth, the
  * matrix is finally condensed. To do these steps, you have (at least) two
@@ -147,7 +147,7 @@ class BlockIndices;
  * in the already condensed form.
  * 
  * 
- * @sect3{Condensing vectors}
+ * <h3>Condensing vectors</h3>
  * 
  * Condensing vectors works exactly as described above for matrices. Note that
  * condensation is an idempotent operation, i.e. doing it more than once on a
@@ -161,7 +161,7 @@ class BlockIndices;
  * techniques as mentioned above to avoid their use.
  *
  * 
- * @sect3{Avoiding explicit condensation}
+ * <h3>Avoiding explicit condensation</h3>
  *
  * Sometimes, one wants to avoid condensation at all. This may be the case
  * since condensation is an expensive operation, or because no condense()
@@ -181,7 +181,7 @@ class BlockIndices;
  * system.
  * 
  * 
- * @sect3{Distributing constraints}
+ * <h3>Distributing constraints</h3>
  * 
  * After solving the condensed system of equations, the solution vector has to
  * be redistributed. This is done by the two @p distribute function, one
@@ -194,6 +194,7 @@ class BlockIndices;
  * for unconstrained nodes, and constrained nodes need to get their values in
  * a second step.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998, 2004
  */
 class ConstraintMatrix : public Subscriptor
@@ -793,14 +794,20 @@ class ConstraintMatrix : public Subscriptor
 
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcMatrixIsClosed);
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcMatrixNotClosed);
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcLineInexistant,
 		    unsigned int,
@@ -808,10 +815,14 @@ class ConstraintMatrix : public Subscriptor
 		    << " does not exist.");
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcWrongDimension);
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException4 (ExcEntryAlreadyExists,
 		    int, int, double, double,
@@ -821,6 +832,8 @@ class ConstraintMatrix : public Subscriptor
                     << "by " << (arg4-arg3) << ".");
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException2 (ExcDoFConstrainedToConstrainedDoF,
 		    int, int,
@@ -829,6 +842,8 @@ class ConstraintMatrix : public Subscriptor
 		    << ", but that one is also constrained. This is not allowed!");
 				     /**
 				      * Exception.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcDoFIsConstrainedFromBothObjects,
 		    int,
@@ -836,6 +851,8 @@ class ConstraintMatrix : public Subscriptor
 		    << " is constrained from both object in a merge operation.");
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcDoFIsConstrainedToConstrainedDoF,
 		    int,

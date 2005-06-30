@@ -84,7 +84,7 @@ class FiniteElementData
 				      * continuously differentiable
 				      * over cell boundaries.
 				      *
-				      * The value <i>L<sup>2</sup></i>
+				      * <li> <i>L<sup>2</sup></i>
 				      * indicates that the element is
 				      * discontinuous. Since
 				      * discontinuous elements have no
@@ -96,6 +96,7 @@ class FiniteElementData
 				      * special way in the sense that
 				      * it is <b>not</b> implied by
 				      * any higher conformity.
+				      * </ol>
 				      *
 				      * In order to test if a finite
 				      * element conforms to a certain
@@ -294,6 +295,9 @@ class FiniteElementData
 				      * @param degree
 				      * Maximal polynomial degree in a
 				      * single direction.
+				      * @param conformity The finite
+				      * element space has continuity
+				      * of this Sobolev space.
 				      */
     FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
 		       const unsigned int n_components,

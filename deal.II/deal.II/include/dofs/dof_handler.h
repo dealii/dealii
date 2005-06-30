@@ -45,11 +45,111 @@ template <int dim> class Triangulation;
  * @ref DoFDimensionInfo<1>
  * @ref DoFDimensionInfo<2>
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
 class DoFDimensionInfo
 {
+  public:
+				     /**
+				      * For internal use only
+				      */
+    typedef void * raw_line_iterator;
+				     /**
+				      * Iterator for lines in the
+				      * DoFHandler
+				      */
+    typedef void * line_iterator;
+				     /**
+				      * Iterator skipping all refined
+				      * lines
+				      */
+    typedef void * active_line_iterator;
+
+				     /**
+				      * For internal use only
+				      */
+    typedef void * raw_quad_iterator;
+				     /**
+				      * Iterator for quadrilaterals in
+				      * the DoFHandler
+				      */
+    typedef void * quad_iterator;
+				     /**
+				      * Iterator skipping all refined
+				      * quadrilaterals
+				      */
+    typedef void * active_quad_iterator;
+
+				     /**
+				      * For internal use only
+				      */
+    typedef void * raw_hex_iterator;
+				     /**
+				      * Iterator for hexahedra in the
+				      * DoFHandler
+				      */
+    typedef void * hex_iterator;
+				     /**
+				      * Iterator skipping all refined
+				      * hexahedra
+				      */
+    typedef void * active_hex_iterator;
+
+				     /**
+				      * For internal use only
+				      */
+    typedef void * raw_cell_iterator;
+				     /**
+				      * All cells of the DoFHandler;
+				      * depending on the dimension
+				      * this is typedefed to
+				      * <ol>
+				      * <li> #line_iterator
+				      * <li> #quad_iterator
+				      * <li> #hex_iterator
+				      * </ol>
+				      */
+    typedef void * cell_iterator;
+				     /**
+				      * All active cells of the DoFHandler
+				      * Depending on the dimension
+				      * this is typedefed to
+				      * <ol>
+				      * <li> #active_line_iterator
+				      * <li> #active_quad_iterator
+				      * <li> #active_hex_iterator
+				      * </ol>
+				      */
+    typedef void * active_cell_iterator;
+
+				     /**
+				      * For internal use only
+				      */
+    typedef void * raw_face_iterator;
+				     /**
+				      * All faces of the DoFHandler
+				      * Depending on the dimension
+				      * this is typedefed to
+				      * <ol>
+				      * <li> <tt>void*</tt>
+				      * <li> #line_iterator
+				      * <li> #quad_iterator
+				      * </ol>
+				      */
+    typedef void * face_iterator;
+				     /**
+				      * All active faces of the DoFHandler
+				      * Depending on the dimension
+				      * this is typedefed to
+				      * <ol>
+				      * <li> <tt>void*</tt>
+				      * <li> #active_line_iterator
+				      * <li> #active_quad_iterator
+				      * </ol>
+				      */
+    typedef void * active_face_iterator;
 };
 
 
@@ -59,6 +159,7 @@ class DoFDimensionInfo
  *
  * The types have the same meaning as those declared in TriaDimensionInfo<2>.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <>
@@ -93,6 +194,7 @@ class DoFDimensionInfo<1>
  *
  * The types have the same meaning as those declared in TriaDimensionInfo<2>.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <>
@@ -127,6 +229,7 @@ class DoFDimensionInfo<2>
  *
  * The types have the same meaning as those declared in TriaDimensionInfo<3>.
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <>
@@ -184,10 +287,10 @@ class DoFDimensionInfo<3>
  * global matrices as well as matrices living on (parts of) the boundary.
  * 
  * 
- * @sect3{Distribution of indices for degrees of freedom}
+ * <h3>Distribution of indices for degrees of freedom</h3>
  *
  * The degrees of freedom (`dofs') are distributed on the given triangulation
- * by the function <tt>distribute_dofs()</tt>. It gets passed a finite element object
+ * by the function distribute_dofs(). It gets passed a finite element object
  * describing how many degrees of freedom are located on vertices, lines, etc.
  * It traverses the triangulation cell by cell and numbers the dofs of that
  * cell if not yet numbered. For non-multigrid algorithms, only active cells
@@ -206,13 +309,13 @@ class DoFDimensionInfo<3>
  * the implemented algorithms.
  *
  *
- * @sect3{User defined renumbering schemes}
+ * <h3>User defined renumbering schemes</h3>
  *
  * The DoFRenumbering class offers a number of renumbering
  * schemes like the Cuthill-McKey scheme. Basically, the function sets
  * up an array in which for each degree of freedom the index is stored
  * which is to be assigned by the renumbering. Using this array, the
- * <tt>renumber_dofs(vector<unsigned int>)</tt> function is called, which actually
+ * renumber_dofs() function is called, which actually
  * does the change from old DoF indices to the ones given in the
  * array. In some cases, however, a user may want to compute her own
  * renumbering order; in this case, allocate an array with one element
@@ -223,8 +326,7 @@ class DoFDimensionInfo<3>
  * <tt>renumber_dofs(vector<unsigned int>)</tt> with the array, which converts old
  * into new degree of freedom indices.
  *
- *
- *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -1170,12 +1272,12 @@ class DoFHandler  :  public Subscriptor,
 				      */
     std::vector<unsigned int>      vertex_dofs;
 
-				     /**
+				     /*
 				      * Make accessor objects friends.
 				      */
     template <int dim1> friend class DoFAccessor;
 
-				     /**
+				     /*
 				      * Make accessor objects friends.
 				      */
     template <int dim1, int dim2> friend class DoFObjectAccessor;

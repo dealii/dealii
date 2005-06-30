@@ -39,7 +39,7 @@ struct FunctionMap
 				     /**
 				      * Declare the type as discussed
 				      * above. Since we can't name it
-				      * @p FunctionMap (as that would
+				      * FunctionMap (as that would
 				      * ambiguate a possible
 				      * constructor of this class),
 				      * name it in the fashion of the
