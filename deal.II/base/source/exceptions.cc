@@ -23,6 +23,9 @@
 #  include <strstream>
 #endif
 
+#ifdef HAVE_GLIBC_STACKTRACE
+#  include <execinfo.h>
+#endif
 
 //TODO[WB]: rename functions in Exception to match out usual_spelling_convention
 
@@ -75,7 +78,21 @@ void ExceptionBase::PrintExcData (std::ostream &out) const
       << "Additional Information: " << std::endl;
 }
 
+void ExceptionBase::PrintStackTrace (std::ostream &out) const
+{
+#ifdef HAVE_GLIBC_STACKTRACE
+   out << "Stacktrace:" << std::endl;
 
+   void * array[25];
+   int nSize = backtrace(array, 25);
+   char ** symbols = backtrace_symbols(array, nSize);
+
+   for (int i = 0; i < nSize; i++)
+      out << symbols[i] << std::endl;
+
+   free(symbols);
+#endif
+}
 
 void ExceptionBase::PrintInfo (std::ostream &out) const
 {
@@ -121,6 +138,8 @@ const char * ExceptionBase::what () const throw ()
       PrintExcData (converter);
                                        // put in exception specific data
       PrintInfo (converter);
+
+      PrintStackTrace (converter);      // put in stacktrace (if available)
   
       converter << "--------------------------------------------------------"
                 << std::endl;

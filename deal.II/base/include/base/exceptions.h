@@ -366,6 +366,12 @@ class ExceptionBase : public std::exception
     void PrintExcData (std::ostream &out) const;
 
 				     /**
+				      *  Print out the stacktrace (if available)
+                                      *  at the time the exception is created
+				      */
+    void PrintStackTrace (std::ostream &out) const;
+
+				     /**
 				      *  Print more specific information about the
 				      *  exception which occured. Overload this
 				      *  function in your own exception classes.

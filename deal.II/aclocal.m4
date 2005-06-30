@@ -1408,7 +1408,7 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
               ;;
         esac
 	;;
-    athlon* | pentium* | i386 | i486 | i586 | i686 | k6* | winchip*)
+    athlon* | pentium* | i386 | i486 | i586 | i686 | k6* | winchip* | opteron)
         AC_MSG_RESULT(x86 derivate ($withcpu))
 	case "$GXX_VERSION" in
 	  gcc*)
@@ -3999,6 +3999,40 @@ void f (const std::ostream &out);
     ])
 ])
 
+
+dnl -------------------------------------------------------------
+dnl Check whether glibc-like stacktrace information is available
+dnl for the Exception class
+dnl
+dnl Usage: DEAL_II_HAVE_GLIBC_STACKTRACE
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_HAVE_GLIBC_STACKTRACE, dnl
+[
+  AC_MSG_CHECKING(for glibc-like stacktrace information)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#include <execinfo.h>
+    ],
+    [
+        void * array[25];
+        int nSize = backtrace(array, 25);
+        char ** symbols = backtrace_symbols(array, nSize);
+        free(symbols);
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_GLIBC_STACKTRACE, 1, 
+                [Define if deal.II is linked against the GNU C library,
+                 which provides stacktrace debug information that can be
+                 printed out in the exception class])
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+])
 
 
 dnl -------------------------------------------------------------

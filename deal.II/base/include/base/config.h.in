@@ -204,6 +204,11 @@
 /* Define to 1 if you have the `gethostname' function. */
 #undef HAVE_GETHOSTNAME
 
+/* Define if deal.II is linked against the GNU C library, which provides
+   stacktrace debug information that can be printed out in the exception class
+   */
+#undef HAVE_GLIBC_STACKTRACE
+
 /* Availability of the MA27 algorithm from HSL */
 #undef HAVE_HSL_MA27
 

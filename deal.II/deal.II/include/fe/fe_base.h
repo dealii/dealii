@@ -1111,7 +1111,25 @@ class FiniteElementBase : public Subscriptor,
 				      * function.
 				      */
     std::pair<unsigned int, unsigned int>
-    system_to_component_index (const unsigned int index) const;    
+    system_to_component_index (const unsigned int index) const;
+
+				     /**
+				      * Compute the shape function for
+				      * the given vector component and
+				      * index.
+				      *
+				      * If the element is scalar, then
+				      * the component must be zero,
+				      * and the index within this
+				      * component is equal to the
+				      * overall index.
+				      *
+				      * This is the opposite operation
+				      * from the @p system_to_component_index
+				      * function.
+				      */
+   unsigned int component_to_system_index(const unsigned int component,
+                                          const unsigned int index) const;
   
 				     /**
 				      * Same as above, but do it for
@@ -1542,6 +1560,13 @@ class FiniteElementBase : public Subscriptor,
 		    << "The interface matrix has a size of " << arg1
 		    << "x" << arg2
 		    << ", which is not reasonable in the present dimension.");
+				     /**
+				      * Exception
+				      */
+    DeclException2 (ExcComponentIndexInvalid,
+		    int, int,
+		    << "The component-index pair (" << arg1 << ", " << arg2
+		    << ") is invalid, i.e. non-existent");
                                      /**
                                       * Exception
                                       */
@@ -1625,7 +1650,7 @@ class FiniteElementBase : public Subscriptor,
 				      */
     std::vector< std::pair<unsigned int, unsigned int> > system_to_component_table;
 
-				     /**
+                                     /**
   				      * Map between linear dofs and
  				      * component dofs on face. This
  				      * is filled with default values
@@ -2025,6 +2050,19 @@ FiniteElementBase<dim>::system_to_component_index (const unsigned int index) con
   return system_to_component_table[index];
 }
 
+template <int dim>  
+inline
+unsigned int
+FiniteElementBase<dim>::component_to_system_index (const unsigned int component,
+                                                   const unsigned int index) const
+{
+   std::vector< std::pair<unsigned int, unsigned int> >::const_iterator
+      it = std::find(system_to_component_table.begin(), system_to_component_table.end(),
+                     std::pair<unsigned int, unsigned int>(component, index));
+
+   Assert(it != system_to_component_table.end(), ExcComponentIndexInvalid(component, index));
+   return std::distance(system_to_component_table.begin(), it);
+}
 
 
 
