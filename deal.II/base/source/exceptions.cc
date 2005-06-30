@@ -224,6 +224,7 @@ namespace deal_II_exceptions
 					   // print out exception
 					   // specific data
 	  e.print_info (std::cerr);
+	  e.print_stack_trace (std::cerr);
 	  std::cerr << "--------------------------------------------------------"
 		    << std::endl;
 
