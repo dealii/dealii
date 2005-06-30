@@ -1805,13 +1805,19 @@ bool CellAccessor<2>::point_inside (const Point<2> &p) const
 				   // the point is on the `cell-side'
 				   // for all four faces, it must be
 				   // inside the cell.
+
+				   // we want the faces in counter
+				   // clockwise orientation
+  static const int direction[4]={1,1,-1,-1};
   for (unsigned int f=0; f<4; ++f)
     {
 				       // vector from the first vertex
 				       // of the line to the point
       const Point<2> to_p = p-this->vertex(f);
 				       // vector describing the line
-      const Point<2> face = this->vertex((f+1)%4)-this->vertex(f);
+      const Point<2> face = direction[f]*(
+	this->vertex(GeometryInfo<2>::face_to_cell_vertices(f,1)) -
+	this->vertex(GeometryInfo<2>::face_to_cell_vertices(f,0)));
 
 				       // if we rotate the face vector
 				       // by 90 degrees to the left
