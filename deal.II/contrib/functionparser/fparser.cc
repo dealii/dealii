@@ -1,6 +1,6 @@
-//==============================
-// Function parser v2.7 by Warp
-//==============================
+//===============================
+// Function parser v2.71 by Warp
+//===============================
 
 // Comment out the following line if your compiler supports the (non-standard)
 // asinh, acosh and atanh functions and you want them to be supported. If
@@ -18,7 +18,9 @@
 // but it will not do anything.
 // If you are unsure, just leave it. It won't slow down the other parts of
 // the library.
+#ifndef NO_SUPPORT_OPTIMIZER
 #define SUPPORT_OPTIMIZER
+#endif
 
 
 //============================================================================
@@ -31,7 +33,6 @@
 #include <cmath>
 
 using namespace std;
-using namespace fparser;
 
 #ifndef M_PI
 #define M_PI 3.1415926535897932384626433832795
@@ -1398,6 +1399,10 @@ public:
     compres(char v) : state(v) {}
     // is it?
     operator bool() const { return state != 0; }
+    // is it not?
+    bool operator! () const { return state != 1; }
+    bool operator==(bool b) const { return state != !b; }
+    bool operator!=(bool b) const { return state != b; }
 private:
     char state;
 };
@@ -1502,8 +1507,10 @@ public:
         UpdateValue();
     }
 
+    bool IsOriginal() const { return !(IsInverted() || IsNegated()); }
     bool IsInverted() const { return inverted; }
     bool IsNegated() const { return negated; }
+    bool IsInvertedOriginal() const { return IsInverted() && !IsNegated(); }
     bool IsNegatedOriginal() const { return !IsInverted() && IsNegated(); }
 
 private:
@@ -1559,7 +1566,9 @@ public:
         return *this;
     }
     const CodeTreeData *operator-> () const { return &p->first; }
+    const CodeTreeData &operator*  () const { return p->first; }
     CodeTreeData *operator-> () { PrepareForWrite(); return &p->first; }
+    CodeTreeData &operator*  () { PrepareForWrite(); return p->first; }
 
     void Shock();
 };
@@ -1597,6 +1606,7 @@ public:
 
     SubTree& getp0() { /*chk<1>();*/pit tmp=GetBegin();               return *tmp; }
     SubTree& getp1() { /*chk<2>();*/pit tmp=GetBegin(); ++tmp;        return *tmp; }
+    SubTree& getp2() { /*chk<3>();*/pit tmp=GetBegin(); ++tmp; ++tmp; return *tmp; }
 
     // set
     void SetImmed(double v) { data->SetImmed(v); }
@@ -1616,6 +1626,8 @@ public:
 
     compres NonZero() const { if(!IsImmed()) return maybe;
                               return GetImmed() != 0.0; }
+    compres IsPositive() const { if(!IsImmed()) return maybe;
+                                 return GetImmed() > 0.0; }
 
 private:
     struct ConstList
@@ -3161,7 +3173,7 @@ void FunctionParser::Optimize()
 #else /* !SUPPORT_OPTIMIZER */
 
 /* keep the linker happy */
-void FunctionParser::MakeTree(CodeTree *) const {}
+void FunctionParser::MakeTree(void *) const {}
 void FunctionParser::Optimize()
 {
     // Do nothing if no optimizations are supported.

@@ -1,5 +1,5 @@
-  Function parser for C++  v2.7 by Warp.
-  =====================================
+  Function parser for C++  v2.71 by Warp.
+  ======================================
 
   Optimization code contributed by Bisqwit (http://iki.fi/bisqwit/)
 
@@ -7,6 +7,14 @@
   The usage license of this library is located at the end of this text file.
 
 
+
+  What's new in v2.71
+  -------------------
+  - Fixed a couple of syntax errors which slipped through in the v2.7
+    distribution version:
+    * non-standard semicolons at the end of namespace blocks
+    * a compilation error which happens if SUPPORT_OPTIMIZER is disabled
+  - Included a simple example program.
 
   What's new in v2.7
   ------------------
