@@ -35,6 +35,7 @@ grid_out.exe                 : grid_out.g.$(OBJEXT)          $(lib-1d) $(lib-2d)
 grid_test.exe                : grid_test.g.$(OBJEXT)                   $(lib-2d) $(lib-3d) $(libraries)
 grid_transform.exe           : grid_transform.g.$(OBJEXT)              $(lib-2d) $(lib-3d) $(libraries)
 measure_et_al.exe            : measure_et_al.g.$(OBJEXT)               $(lib-2d) $(lib-3d) $(libraries)
+normals_at_vertices.exe	     : normals_at_vertices.g.$(OBJEXT)                   $(lib-3d) $(libraries)
 intergrid_constraints.exe    : intergrid_constraints.g.$(OBJEXT)    $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 intergrid_map.exe            : intergrid_map.g.$(OBJEXT)     $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
 matrices.exe                 : matrices.g.$(OBJEXT)          $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
@@ -60,6 +61,7 @@ tests = $(sort \
 	  constraints block_matrices second_derivatives derivative_approximation \
           matrices error_estimator intergrid_constraints intergrid_map \
           wave-test-3 dof_renumbering support_point_map filtered_matrix \
+          measure_et_al normals_at_vertices \
 	  boundaries sparsity_pattern grid_tools subdomain_ids \
 	  filtered_iterator grid_out grid_in grid_in_3d face_orientations_3d \
           mg_dof_handler)
