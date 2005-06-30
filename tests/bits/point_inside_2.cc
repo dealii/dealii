@@ -45,7 +45,8 @@ void check ()
   GridGenerator::hyper_cube (triangulation);
   
 				   // Now get the cell
-  Triangulation<dim>::cell_iterator cell = triangulation.begin();
+  const typename Triangulation<dim>::cell_iterator
+    cell = triangulation.begin();
   cell->vertex(0)(0)=-1.;
                                       
 				   // and test it.

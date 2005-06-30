@@ -35,7 +35,8 @@ void check ()
   GridGenerator::hyper_cube (triangulation);
   
 				   // Now get the cell
-  const Triangulation<dim>::cell_iterator cell = triangulation.begin();
+  const typename Triangulation<dim>::cell_iterator
+    cell = triangulation.begin();
     
   double testcoord[11][3] = {{0.5,0.5,0.5},
 			     {2,0.5,0.5},
