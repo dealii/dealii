@@ -363,8 +363,10 @@ void ConstantFunction<dim>::vector_value (const Point<dim> &,
 template <int dim>
 void ConstantFunction<dim>::value_list (const std::vector<Point<dim> > &points,
 					std::vector<double>            &values,
-					const unsigned int              /*component*/) const
+					const unsigned int              component) const
 {
+  Assert (component < this->n_components,
+	  ExcIndexRange (component, 0, this->n_components));
   Assert (values.size() == points.size(),
 	  ExcDimensionMismatch(values.size(), points.size()));
 
