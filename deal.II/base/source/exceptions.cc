@@ -99,12 +99,12 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 				    // place where the exception was
 				    // triggered
    int frame = 0;
-//    while ((frame < n_stacktrace_frames)
-// 	  &&
-// 	  ((std::string(stacktrace[frame]).find ("ExceptionBase") != std::string::npos)
-// 	   ||
-// 	   (std::string(stacktrace[frame]).find ("deal_II_exceptions") != std::string::npos)))
-//      ++frame;
+   while ((frame < n_stacktrace_frames)
+	  &&
+	  ((std::string(stacktrace[frame]).find ("ExceptionBase") != std::string::npos)
+	   ||
+	   (std::string(stacktrace[frame]).find ("deal_II_exceptions") != std::string::npos)))
+     ++frame;
 
 				    // output the rest
    for (; frame < n_stacktrace_frames; ++frame)
