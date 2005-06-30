@@ -339,8 +339,10 @@ ConstantFunction<dim>::~ConstantFunction () {}
 
 template <int dim>
 double ConstantFunction<dim>::value (const Point<dim> &,
-				     const unsigned int) const
+				     const unsigned int component) const
 {
+  Assert (component < this->n_components,
+	  ExcIndexRange (component, 0, this->n_components));
   return function_value;
 }
 
