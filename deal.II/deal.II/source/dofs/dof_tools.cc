@@ -136,7 +136,7 @@ DoFTools::compute_row_length_vector(
 	  
 	  indices.resize(fe.dofs_per_face);
 	  face->get_dof_indices(indices);
-	  for (i=0;i<fe.dofs_per_face;++i)
+	  for (unsigned int i=0;i<fe.dofs_per_face;++i)
 	    row_lengths[indices[i]] += fe.dofs_per_face;
 	}
     }
