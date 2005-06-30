@@ -327,7 +327,7 @@ ConstantFunction<dim>::ConstantFunction (const double value,
 					 const unsigned int n_components)
                 :
 		ZeroFunction<dim> (n_components),
-  function_value    (value)
+		function_value    (value)
 {}
 
 
