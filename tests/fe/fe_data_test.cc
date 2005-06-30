@@ -135,7 +135,8 @@ void test_fe_datas()
       deallog << "dofs_per_face=" << fe_data->dofs_per_face << std::endl;
       deallog << "dofs_per_cell=" << fe_data->dofs_per_cell << std::endl;
       deallog << "components=" << fe_data->components << std::endl
-	      << "degree=" << fe_data->tensor_degree() << std::endl;
+	      << "degree=" << fe_data->tensor_degree() << std::endl
+	      << "conformity=" << fe_data->conforming_space << std::endl;
 
       for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
 	{
