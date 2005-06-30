@@ -56,7 +56,8 @@ class FiniteElementData
 				      * is measured by the Sobolev
 				      * space containing the
 				      * constructed finite element
-				      * space and also called this way.
+				      * space and is also called this
+				      * way.
 				      *
 				      * Note that certain continuities
 				      * may imply others. For
@@ -103,17 +104,54 @@ class FiniteElementData
 				      */
     enum Conformity
     {
-/// Indicates incompatible continuities of a system.
+					   /**
+					    * Indicates incompatible
+					    * continuities of a
+					    * system.
+					    */
 	  unknown = 0x00,
-/// Discontinuous elements. See above!
+	  
+					   /**
+					    * Discontinuous
+					    * elements. See above!
+					    */
 	  L2 = 0x01,
-/// Conformity with the space <i>H<sup>curl</sup></i> (continuous tangential component of a vector field)
+	  
+					   /**
+					    * Conformity with the
+					    * space
+					    * <i>H<sup>curl</sup></i>
+					    * (continuous tangential
+					    * component of a vector
+					    * field)
+					    */
 	  Hcurl = 0x02,
-/// Conformity with the space <i>H<sup>div</sup></i> (continuous normal component of a vector field)
+	  
+					   /**
+					    * Conformity with the
+					    * space
+					    * <i>H<sup>div</sup></i>
+					    * (continuous normal
+					    * component of a vector
+					    * field)
+					    */
 	  Hdiv = 0x04,
-/// Conformity with the space <i>H<sup>1</sup></i> (continuous)
-	  H1 = 0x06,
-/// Conformity with the space <i>H<sup>2</sup></i> (continuously differentiable)
+	  
+					   /**
+					    * Conformity with the
+					    * space
+					    * <i>H<sup>1</sup></i>
+					    * (continuous)
+					    */
+	  H1 = Hcurl | Hdiv,
+	  
+					   /**
+					    * Conformity with the
+					    * space
+					    * <i>H<sup>2</sup></i>
+					    * (continuously
+					    * differentiable)
+					    */
 	  H2 = 0x0e
     };
     
