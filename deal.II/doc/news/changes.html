@@ -223,6 +223,17 @@ inconvenience this causes.
        </p>
 
   <li> <p>
+       New: The GNU C library supports access to the call stack. For
+       systems using this library, the <code
+       class="class">ExceptionBase</code> class now uses these
+       functions to outputs the callstack when the exception is
+       created. Output is created via the new <code
+       class="class">ExceptionBase::print_stack_trace</code> function.
+       <br>
+       (Ralf B. Schulz, 2005/06/30)
+       </p>
+
+  <li> <p>
        Improved: The class <code class="class">Quadrature</code> has a new
        constructor generating the <tt>dim</tt>-dimensional tensor product of a
        one-dimensonal formula directly.
@@ -458,6 +469,13 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       New: Added function <code
+       class="class">FiniteElementBase::component_to_system_index</code>
+       which was referred to in the documentation, but was missing.
+       <br>
+       (Ralf B. Schulz, 2005/06/30)
+       </p>
   <li> <p>Improved: The function <code class="class">DoFTools</code>::<code
   class="member">count_dofs_per_component</code> and its counterpart
   in <code class="class">MGTools</code> got an additional
