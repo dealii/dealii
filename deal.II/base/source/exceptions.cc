@@ -81,6 +81,14 @@ void ExceptionBase::set_fields (const char* f,
 
 void ExceptionBase::print_stack_trace (std::ostream &out) const
 {
+  if (n_stacktrace_frames == 0)
+    return;
+  
+				   // if there is a stackframe stored, print it
+  out << std::endl;
+  out << "Stacktrace:" << std::endl
+      << "-----------" << std::endl;
+  
 				    // print the stacktrace. first
 				    // omit all those frames that have
 				    // ExceptionBase or
@@ -91,12 +99,12 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 				    // place where the exception was
 				    // triggered
    int frame = 0;
-   while ((frame < n_stacktrace_frames)
-	  &&
-	  ((std::string(stacktrace[frame]).find ("ExceptionBase") != std::string::npos)
-	   ||
-	   (std::string(stacktrace[frame]).find ("deal_II_exceptions") != std::string::npos)))
-     ++frame;
+//    while ((frame < n_stacktrace_frames)
+// 	  &&
+// 	  ((std::string(stacktrace[frame]).find ("ExceptionBase") != std::string::npos)
+// 	   ||
+// 	   (std::string(stacktrace[frame]).find ("deal_II_exceptions") != std::string::npos)))
+//      ++frame;
 
 				    // output the rest
    for (; frame < n_stacktrace_frames; ++frame)
