@@ -161,8 +161,6 @@ const char * ExceptionBase::what () const throw ()
                                        // put in exception specific data
       print_info (converter);
 
-      print_stack_trace (converter);      // put in stacktrace (if available)
-  
       converter << "--------------------------------------------------------"
                 << std::endl;
 #ifndef HAVE_STD_STRINGSTREAM
