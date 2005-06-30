@@ -37,7 +37,8 @@ PathSearch::initialize_classes()
   v.push_back(empty);
   v.push_back(std::string(".prm"));
   suffix_lists.insert(map_type(std::string("PARAMETER"), v));
-  
+
+//TODO[GK]: instead of listing by hand here, query the GridIn class which formats it can presently read
   v.clear();
   v.push_back(empty);
   v.push_back(std::string(".inp"));
