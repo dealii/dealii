@@ -50,7 +50,7 @@ ExceptionBase::ExceptionBase (const char* f, const int l, const char *func,
 
 ExceptionBase::~ExceptionBase () throw ()
 {
-  if (backtrace != 0)
+  if (stacktrace != 0)
     free (stacktrace);
 }
 
