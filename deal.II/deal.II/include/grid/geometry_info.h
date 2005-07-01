@@ -406,7 +406,7 @@ struct GeometryInfo
 				      * <tt>face_orientation</tt>
 				      * argument this function handles
 				      * faces oriented in both, the
-				      * standard or non-standard
+				      * standard and non-standard
 				      * orientation.
 				      * <tt>face_orientation</tt>
 				      * defaults to <tt>true</tt>
