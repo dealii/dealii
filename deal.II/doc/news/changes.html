@@ -210,6 +210,16 @@ inconvenience this causes.
 
 <ol>  
   <li> <p>
+       Changed: Some of the dimension independent functions in the <code
+       class="class">DataOutInterface</code> class have been moved into the
+       <code class="class">DataOutBase</code> class that does not depend on any
+       dimension template parameters. Since the latter is a base class of the
+       former, there should be no problems for application programs.
+       <br>
+       (WB, 2005/07/01)
+       </p>
+
+  <li> <p>
        Fixed: Several of the functions in class <code
        class="class">ConstantFunction</code> did not check whether the
        component handed to them was valid. In essence, even a scalar
