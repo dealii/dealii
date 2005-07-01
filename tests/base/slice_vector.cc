@@ -77,6 +77,7 @@ int main()
 
   f(v);
 
+  make_slice(v, 3, 5);
   int n = s[4];
   n += 3;
 
