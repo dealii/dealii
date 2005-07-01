@@ -1396,6 +1396,63 @@ class DataOutBase
     };
     
 				     /**
+				      * Provide a data type specifying
+				      * the presently supported output
+				      * formats.
+				      */
+    enum OutputFormat {
+	  default_format,
+					   /**
+					    * Output for IBM OpenDX.
+					    */
+	  dx,
+					   /**
+					    * Output in AVS UCD format.
+					    */
+	  ucd,
+					   /**
+					    * Output for the gnuplot tool.
+					    */
+	  gnuplot,
+					   /**
+					    * Output for the povray raytracer.
+					    */
+	  povray,
+					   /**
+					    * Output in encapsulated
+					    * PostScript.
+					    */
+	  eps,
+					   /**
+					    * Output for GMV.
+					    */
+	  gmv,
+					   /**
+					    * Output for tecplot in
+					    * text format.
+					    */
+	  
+	  tecplot,
+					   /**
+					    * Output for tecplot in
+					    * binaryformat. Faster and
+					    * smaller than text
+					    * format.
+					    */
+	  tecplot_binary,
+					   /**
+					    * Output in VTK format.
+					    */
+	  vtk,
+					   /**
+					    * Output in deal.II
+					    * intermediate format.
+					    */
+	  deal_II_intermediate
+    };
+
+
+    				     /**
 				      * Write the given list of patches
 				      * to the output stream in OpenDX
 				      * format. See the general
@@ -1557,6 +1614,45 @@ class DataOutBase
     std::pair<unsigned int, unsigned int>
     determine_intermediate_format_dimensions (std::istream &input);
     
+				     /**
+				      * Return the <tt>OutputFormat</tt>
+				      * value corresponding to the
+				      * given string. If the string
+				      * does not match any known
+				      * format, an exception is
+				      * thrown.
+				      *
+				      * Since this function does not
+				      * need data from this object, it
+				      * is static and can thus be
+				      * called without creating an
+				      * object of this class. Its main
+				      * purpose is to allow a program
+				      * to use any implemented output
+				      * format without the need to
+				      * extend the program's parser
+				      * each time a new format is
+				      * implemented.
+				      *
+				      * To get a list of presently
+				      * available format names,
+				      * e.g. to give it to the
+				      * ParameterHandler class,
+				      * use the function
+				      * get_output_format_names().
+				      */
+    static OutputFormat parse_output_format (const std::string &format_name);
+
+				     /**
+				      * Return a list of implemented
+				      * output formats. The different
+				      * names are separated by
+				      * vertical bar signs (<tt>`|'</tt>)
+				      * as used by the
+				      * ParameterHandler classes.
+				      */
+    static std::string get_output_format_names ();
+
 				     /**
 				      * Determine an estimate for
 				      * the memory consumption (in
@@ -1793,62 +1889,6 @@ template <int dim, int spacedim=dim>
 class DataOutInterface : private DataOutBase
 {
   public:
-				     /**
-				      * Provide a data type specifying
-				      * the presently supported output
-				      * formats.
-				      */
-    enum OutputFormat {
-	  default_format,
-					   /**
-					    * Output for IBM OpenDX.
-					    */
-	  dx,
-					   /**
-					    * Output in AVS UCD format.
-					    */
-	  ucd,
-					   /**
-					    * Output for the gnuplot tool.
-					    */
-	  gnuplot,
-					   /**
-					    * Output for the povray raytracer.
-					    */
-	  povray,
-					   /**
-					    * Output in encapsulated
-					    * PostScript.
-					    */
-	  eps,
-					   /**
-					    * Output for GMV.
-					    */
-	  gmv,
-					   /**
-					    * Output for tecplot in
-					    * text format.
-					    */
-	  
-	  tecplot,
-					   /**
-					    * Output for tecplot in
-					    * binaryformat. Faster and
-					    * smaller than text
-					    * format.
-					    */
-	  tecplot_binary,
-					   /**
-					    * Output in VTK format.
-					    */
-	  vtk,
-					   /**
-					    * Output in deal.II
-					    * intermediate format.
-					    */
-	  deal_II_intermediate
-    };
-
                                      /**
                                       * Destructor. Does nothing, but is
                                       * declared virtual since this class has
@@ -2044,45 +2084,6 @@ class DataOutInterface : private DataOutBase
 				      * returned.
 				      */
     std::string default_suffix (const OutputFormat output_format = default_format) const;
-
-				     /**
-				      * Return the <tt>OutputFormat</tt>
-				      * value corresponding to the
-				      * given string. If the string
-				      * does not match any known
-				      * format, an exception is
-				      * thrown.
-				      *
-				      * Since this function does not
-				      * need data from this object, it
-				      * is static and can thus be
-				      * called without creating an
-				      * object of this class. Its main
-				      * purpose is to allow a program
-				      * to use any implemented output
-				      * format without the need to
-				      * extend the program's parser
-				      * each time a new format is
-				      * implemented.
-				      *
-				      * To get a list of presently
-				      * available format names,
-				      * e.g. to give it to the
-				      * ParameterHandler class,
-				      * use the function
-				      * get_output_format_names().
-				      */
-    static OutputFormat parse_output_format (const std::string &format_name);
-
-				     /**
-				      * Return a list of implemented
-				      * output formats. The different
-				      * names are separated by
-				      * vertical bar signs (<tt>`|'</tt>)
-				      * as used by the
-				      * ParameterHandler classes.
-				      */
-    static std::string get_output_format_names ();
 
 				     /**
 				      * Declare parameters for all

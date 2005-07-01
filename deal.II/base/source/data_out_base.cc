@@ -557,6 +557,59 @@ unsigned int DataOutBase::memory_consumption ()
 
 
 
+
+DataOutBase::OutputFormat
+DataOutBase::
+parse_output_format (const std::string &format_name)
+{
+  if (format_name == "dx")
+    return dx;
+
+  if (format_name == "ucd")
+    return ucd;
+
+  if (format_name == "gnuplot")
+    return gnuplot;
+
+  if (format_name == "povray")
+    return povray;
+
+  if (format_name == "eps")
+    return eps;
+
+  if (format_name == "gmv")
+    return gmv;
+
+  if (format_name == "tecplot")
+    return tecplot;
+  
+  if (format_name == "tecplot_binary")
+    return tecplot_binary;
+  
+  if (format_name == "vtk")
+    return vtk;
+  
+  if (format_name == "deal.II intermediate")
+    return deal_II_intermediate;
+  
+  AssertThrow (false,
+               ExcMessage ((std::string("The format <") + format_name +
+                            std::string("> is not recognized")).c_str()));
+
+				   // return something invalid
+  return OutputFormat(-1);
+}
+
+
+
+std::string
+DataOutBase::get_output_format_names ()
+{
+  return "dx|ucd|gnuplot|povray|eps|gmv|tecplot|vtk|deal.II intermediate";
+}
+
+
+
 template <int dim, int spacedim>
 void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &data_names,
@@ -4378,60 +4431,6 @@ default_suffix (const OutputFormat output_format_) const
 	    Assert (false, ExcNotImplemented()); 
 	    return "";
     };
-}
-
-
-
-template <int dim, int spacedim>
-typename DataOutInterface<dim,spacedim>::OutputFormat
-DataOutInterface<dim,spacedim>::
-parse_output_format (const std::string &format_name)
-{
-  if (format_name == "dx")
-    return dx;
-
-  if (format_name == "ucd")
-    return ucd;
-
-  if (format_name == "gnuplot")
-    return gnuplot;
-
-  if (format_name == "povray")
-    return povray;
-
-  if (format_name == "eps")
-    return eps;
-
-  if (format_name == "gmv")
-    return gmv;
-
-  if (format_name == "tecplot")
-    return tecplot;
-  
-  if (format_name == "tecplot_binary")
-    return tecplot_binary;
-  
-  if (format_name == "vtk")
-    return vtk;
-  
-  if (format_name == "deal.II intermediate")
-    return deal_II_intermediate;
-  
-  AssertThrow (false,
-               ExcMessage ((std::string("The format <") + format_name +
-                            std::string("> is not recognized")).c_str()));
-
-				   // return something invalid
-  return OutputFormat(-1);
-}
-
-
-
-template <int dim, int spacedim>
-std::string
-DataOutInterface<dim,spacedim>::get_output_format_names ()
-{
-  return "dx|ucd|gnuplot|povray|eps|gmv|tecplot|vtk|deal.II intermediate";
 }
 
 
