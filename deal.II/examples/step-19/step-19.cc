@@ -112,7 +112,7 @@ parse_command_line (const int                 argc,
   if (argc < 2)
     {
       print_usage_message ();
-      exit (1);
+      exit (0);
     }
 
   std::list<std::string> args;
