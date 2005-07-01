@@ -1596,7 +1596,7 @@ void Triangulation<dim>::distort_random (const double factor,
 					   // not implemented at
 					   // present for dim=3 or
 					   // higher
-	  Assert (dim<=2, ExcInternalError());
+	  Assert (dim<=2, ExcNotImplemented());
 
 					   // compute where the common
 					   // point of the two child
