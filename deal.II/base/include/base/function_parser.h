@@ -21,19 +21,11 @@
 #include <vector>
 #include <map>
 
-#ifndef DEAL_II_DISABLE_PARSER
-#include <functionparser/fparser.h>
-#else
 namespace fparser
 {
-				   /**
-				    * Dummy definition if
-				    * FunctionParser is not used.
-				    */
-  class FunctionParser {};
-};
+  class FunctionParser;
+}
 
-#endif
 
 template <int> class Point;
 template <int, int> class Tensor;
@@ -107,7 +99,7 @@ template <typename> class Vector;
  *
  * The syntax to describe a function follows usual programming practice,
  * and is explained in this snippet from the fparser.txt file:
-      @verbatim
+   @verbatim
       The function string understood by the class is very similar to the C-syntax.
       Arithmetic float expressions can be created from float literals, variables
       or functions using the following operators in this order of precedence:
@@ -199,6 +191,60 @@ template <typename> class Vector;
   call is safe. In any other place it will cause an infinite recursion (which
   will make the program eventually run out of memory).
   @endverbatim
+ *
+ * Vector-valued functions can either be declared using strings where the
+ * function components are separated by semicolons, or using a vector of
+ * strings each defining one vector component.
+ *
+ * An example of time dependent scalar function is the following:
+      @verbatim
+     
+      // Empty constants object
+      std::map<std::string> constants;
+      
+      // Variables that will be used inside the expressions
+      std::string variables = "x,y,t";
+      
+      // Define the expression of the scalar time dependent function.
+      std::string expression = "exp(y*x)*exp(-t)";
+      
+      // Generate an empty scalar function
+      FunctionParser<2> function;
+      
+      // And populate it with the newly created objects.
+      function.initialize(variables,
+			  expression,
+			  constants,
+			  true);	// This tells the parser that 
+				 	// it is a time-dependent function
+					// and there is another variable
+					// to be taken into account (t).
+ 
+     @endverbatim
+     
+ * The following is another example of how to instantiate a
+ * vector valued function by using a single string:
+     @verbatim
+     
+      // Empty constants object
+      std::map<std::string> constants;
+      
+      // Variables that will be used inside the expressions
+      std::string variables = "x,y";
+      
+      // Define the expression of the vector valued  function.
+      std::string expression = "cos(2*pi*x)*y^2; sin(2*pi*x)*exp(y)";
+      
+      // Generate an empty vector valued function
+      FunctionParser<2> function(2);
+      
+      // And populate it with the newly created objects.
+      function.initialize(variables,
+			  expression,
+			  constants);	
+ 
+     @endverbatim
+ *    
  *
  * @author Luca Heltai, 2005
  */
@@ -311,74 +357,29 @@ class FunctionParser : public Function<dim>
                                       * default for this parameter is false,
                                       * i.e. use radians and not degrees.
                                       */
-    void initialize(const std::string vars,
-		    const std::vector<std::string> expressions,
-		    const ConstMap constants,
-		    bool time_dependent = false,
-		    bool use_degrees = false);
+    void initialize (const std::string vars,
+                     const std::vector<std::string> expressions,
+                     const ConstMap constants,
+                     const bool time_dependent = false,
+                     const bool use_degrees = false);
   
-  /** Initialize the function. Same as above, but accepts a string
-      rather than a vector of strings. If this is a vector valued
-      function, its componenents are expected to be separated by a
-      semicolon. An exception is thrown if this method is called and
-      the number of components successfully parsed does not match the
-      number of components of the base function.
-      
-      An example of time dependent scalar function is the following:
-      @verbatim
-     
-      // Empty constants object
-      std::map<std::string> constants;
-      
-      // Variables that will be used inside the expressions
-      std::string variables = "x,y,t";
-      
-      // Define the expression of the scalar time dependent function.
-      std::string expression = "exp(y*x)*exp(-t)";
-      
-      // Generate an empty scalar function
-      FunctionParser<2> function;
-      
-      // And populate it with the newly created objects.
-      function.initialize(variables,
-			  expression,
-			  constants,
-			  true);	// This tells the parser that 
-				 	// it is a time-dependent function
-					// and there is another variable
-					// to be taken into account (t).
- 
-     @endverbatim
-     
-     The following is yet another example of how to instantiate a
-     vector valued function by using a single string:
-      @verbatim
-     
-      // Empty constants object
-      std::map<std::string> constants;
-      
-      // Variables that will be used inside the expressions
-      std::string variables = "x,y";
-      
-      // Define the expression of the vector valued  function.
-      std::string expression = "cos(2*pi*x)*y^2; sin(2*pi*x)*exp(y)";
-      
-      // Generate an empty vector valued function
-      FunctionParser<2> function(2);
-      
-      // And populate it with the newly created objects.
-      function.initialize(variables,
-			  expression,
-			  constants);	
- 
-     @endverbatim
-      
-  */
-    void initialize(const std::string vars,
-		    const std::string expression,
-		    const ConstMap constants,
-		    bool time_dependent = false,
-		    bool use_degrees = false);
+                                     /**
+                                      * Initialize the function. Same as
+                                      * above, but accepts a string rather
+                                      * than a vector of strings. If this is a
+                                      * vector valued function, its
+                                      * componenents are expected to be
+                                      * separated by a semicolon. An exception
+                                      * is thrown if this method is called and
+                                      * the number of components successfully
+                                      * parsed does not match the number of
+                                      * components of the base function.
+                                      */
+    void initialize (const std::string vars,
+                     const std::string expression,
+                     const ConstMap constants,
+                     const bool time_dependent = false,
+                     const bool use_degrees = false);
   
 
 				     /**

@@ -15,6 +15,12 @@
 #include <base/point.h>
 #include <lac/vector.h>
 
+#ifndef DEAL_II_DISABLE_PARSER
+#include <functionparser/fparser.h>
+#endif
+
+
+
 // Utility to split a string given a delimiter.
 
 unsigned int SplitString(const std::string& input, 
