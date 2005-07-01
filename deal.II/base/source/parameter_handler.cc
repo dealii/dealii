@@ -981,6 +981,12 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
     }
 
 
+                                   // if there are sections to come, put two
+                                   // newlines between the last entry and the
+                                   // first subsection
+  if (pd->subsections.size() != 0)
+    out << std::endl << std::endl;
+
 				   // now transverse subsections tree
   std::map<std::string, Section*>::const_iterator ptrss;
   for (ptrss = pd->subsections.begin(); ptrss != pd->subsections.end(); ++ptrss)
