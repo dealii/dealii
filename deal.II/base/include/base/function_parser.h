@@ -37,7 +37,7 @@ namespace fparser
 
 template <int> class Point;
 template <int, int> class Tensor;
-template <int> class Tensor<1,dim>;
+template <int dim> class Tensor<1,dim>;
 template <typename> class Vector;
 
 
