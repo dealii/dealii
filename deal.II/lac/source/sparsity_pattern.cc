@@ -882,7 +882,7 @@ SparsityPattern::block_write (std::ostream &out) const
       << diagonal_optimized << "][";
                                    // then write out real data
   out.write (reinterpret_cast<const char*>(&rowstart[0]),
-	     reinterpret_cast<const char*>(&rowstart[max_dim])
+	     reinterpret_cast<const char*>(&rowstart[max_dim+1])
 	     - reinterpret_cast<const char*>(&rowstart[0]));
   out << "][";
   out.write (reinterpret_cast<const char*>(&colnums[0]),
@@ -919,15 +919,17 @@ SparsityPattern::block_read (std::istream &in)
   AssertThrow (c == '[', ExcIO());
 
                                    // reallocate space
-  delete[] rowstart;
+  if (rowstart)
+    delete[] rowstart;
+  if (colnums)
   delete[] colnums;
 
-  rowstart = new unsigned int[max_dim];
+  rowstart = new unsigned int[max_dim+1];
   colnums  = new unsigned int[max_vec_len];
   
                                    // then read data
   in.read (reinterpret_cast<char*>(&rowstart[0]),
-           reinterpret_cast<char*>(&rowstart[max_dim])
+           reinterpret_cast<char*>(&rowstart[max_dim+1])
            - reinterpret_cast<char*>(&rowstart[0]));
   in >> c;
   AssertThrow (c == ']', ExcIO());
