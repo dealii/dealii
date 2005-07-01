@@ -85,9 +85,6 @@ void create_triangulation(const unsigned int case_no,
 template<int dim>
 void test()
 {
-//    std::string dim_string("dim");
-//    dim_string+='0'+dim;
-//    deallog.push(dim_string);
   Triangulation<dim> tria;
   for (unsigned int case_no=0; case_no<2; ++case_no)
     {
