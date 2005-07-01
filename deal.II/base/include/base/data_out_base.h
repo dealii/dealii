@@ -1922,6 +1922,20 @@ class DataOutInterface : private DataOutBase
 {
   public:
                                      /**
+                                      * Import a few names that were
+                                      * previously in this class and have then
+                                      * moved to the base class. Since the
+                                      * base class is inherited from
+                                      * privately, we need to re-import these
+                                      * symbols to make sure that references
+                                      * to DataOutInterface<dim,spacedim>::XXX
+                                      * remain valid.
+                                      */
+    using DataOutBase::OutputFormat;
+    using DataOutBase::parse_output_format;
+    using DataOutBase::get_output_format_names;
+    
+                                     /**
                                       * Destructor. Does nothing, but is
                                       * declared virtual since this class has
                                       * virtual functions.
