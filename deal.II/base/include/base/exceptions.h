@@ -334,6 +334,11 @@ class ExceptionBase : public std::exception
     ExceptionBase (const char* f, const int l, const char *func,
 		   const char* c, const char *e);
 
+                                     /**
+                                      * Copy constructor.
+                                      */
+    ExceptionBase (const ExceptionBase &exc);
+    
 				     /**
 				      * Destructor. Empty, but needed
 				      * for the sake of exception
