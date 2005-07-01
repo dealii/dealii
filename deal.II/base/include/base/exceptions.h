@@ -68,7 +68,7 @@
  *  this.
  *
  *  Both modes use exception classes, which need to have special features
- *  additionally to the <tt>C++</tt> standard's <tt>exception</tt> class. Such a class
+ *  in additional to the <tt>C++</tt> standard's <tt>exception</tt> class. Such a class
  *  is declared by the following lines of code:
  *   @code
  *     DeclException2 (ExcDomain, int, int,
@@ -146,14 +146,14 @@
  *  try to set this function to something reasonable, if the compiler
  *  provides us with that, and <tt>"(not available)"</tt> otherwise.
  *
- *  In <tt>__IssueError</tt> the given data
- *  is transferred into the <tt>exc</tt> object by calling the
- *  set_fields() function; after that, the general error info
- *  is printed onto <tt>std::cerr</tt> using the PrintError() function of
- *  <tt>exc</tt> and finally the exception specific data is printed
- *  using the user defined function PrintError() (which is
- *  normally created using the <tt>DeclException (...)</tt> macro
- *  family.
+ *  In <tt>__IssueError</tt> the given data is transferred into the
+ *  <tt>exc</tt> object by calling the set_fields() function; after that, the
+ *  general error info is printed onto <tt>std::cerr</tt> using the
+ *  PrintError() function of <tt>exc</tt> and finally the exception specific
+ *  data is printed using the user defined function PrintError() (which is
+ *  normally created using the <tt>DeclException (...)</tt> macro family. If
+ *  it can be obtained from the operating system, the output may also contain
+ *  a stacktrace to show where the error happened.
  *
  *  After printing all this information,
  *  deal_II_exceptions::internals::abort() is called (with one
@@ -244,16 +244,18 @@
  *      };
  *  @endcode
  *
- *  For this purpose, the macro <tt>AssertThrow</tt> was invented. It does mainly
- *  the same job as does the <tt>Assert</tt> macro, but it does not kill the
- *  program, it rather throws an exception as shown above. The mode of usage
- *  is
+ *  For this purpose, the macro <tt>AssertThrow</tt> was invented. It does
+ *  mainly the same job as does the <tt>Assert</tt> macro, but it does not
+ *  kill the program, it rather throws an exception as shown above. The mode
+ *  of usage is
  *  @code
  *    AssertThrow (cond, ExcSomething(additional information));
  *  @endcode
+ *
  *  The condition to be checked is incorporated into the macro in order to
  *  allow passing the violated condition as a string. The expansion of the
- *  <tt>AssertThrow</tt> macro is not affected by the <tt>DEBUG</tt> preprocessor variable.
+ *  <tt>AssertThrow</tt> macro is not affected by the <tt>DEBUG</tt>
+ *  preprocessor variable.
  *
  *
  *  @section ExceptionNMacros Description of the DeclExceptionN macro family
