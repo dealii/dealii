@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -69,14 +69,13 @@ void create_L_shape (Triangulation<3> &coarse_grid)
   std::vector<Point<3> >    vertices;
   std::vector<CellData<3> > cells;
   
-  const Point<3> outer_points[8] = { Point<3>(-1,0,0),
+  const Point<3> outer_points[7] = { Point<3>(-1,0,0),
                                      Point<3>(-1,-1,0),
                                      Point<3>(0,-1,0),
                                      Point<3>(+1,-1,0),
                                      Point<3>(+1,0,0),
                                      Point<3>(+1,+1,0),
-                                     Point<3>(0,+1,0),
-                                     Point<3>(-1,+1,0) };
+                                     Point<3>(0,+1,0) };
 
                                    // first the point in the middle
                                    // and the rest of those on the
