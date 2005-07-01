@@ -48,10 +48,27 @@ ExceptionBase::ExceptionBase (const char* f, const int l, const char *func,
 
 
 
+ExceptionBase::ExceptionBase (const ExceptionBase &exc)
+                :
+                std::exception (exc),
+		file(exc.file), line(exc.line),
+                function(exc.function), cond(exc.cond), exc(exc.exc),
+                                                 // don't copy stacktrace to
+                                                 // avoid double de-allocation
+                                                 // problem
+		stacktrace (0),
+		n_stacktrace_frames (0)
+{}
+
+
+
 ExceptionBase::~ExceptionBase () throw ()
 {
   if (stacktrace != 0)
-    free (stacktrace);
+    {
+      free (stacktrace);
+      stacktrace = 0;
+    }
 }
 
 
