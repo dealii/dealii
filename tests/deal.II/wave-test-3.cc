@@ -3118,8 +3118,8 @@ void TimestepManager<dim>::write_statistics (const SweepInfo &sweep_info) const
 template <int dim>
 void TimestepManager<dim>::write_stacked_data (DataOutStack<dim> &data_out_stack) const 
 {
-  typename DataOutInterface<dim+1>::OutputFormat output_format
-    = DataOutInterface<dim+1>::parse_output_format (parameters.output_format);
+  DataOutBase::OutputFormat output_format
+    = DataOutBase::parse_output_format (parameters.output_format);
   
   deallog << "    Writing stacked time steps";
   DataOutBase::EpsFlags eps_flags;
@@ -4207,7 +4207,7 @@ void WaveParameters<dim>::declare_parameters (ParameterHandler &prm)
 
   prm.enter_subsection ("Output");
   prm.declare_entry ("Format", "gnuplot",
-		     Patterns::Selection(DataOutInterface<dim>::get_output_format_names()));
+		     Patterns::Selection(DataOutBase::get_output_format_names()));
   prm.declare_entry ("Directory", "data");
   prm.declare_entry ("Directory for temporaries", "data/tmp");
   prm.declare_entry ("Write solutions", "all sweeps",
@@ -6556,8 +6556,8 @@ void TimeStep_Postprocess<dim>::postprocess_timestep ()
       deallog << "[o]";
 
       DataOut<dim> out;
-      typename DataOut<dim>::OutputFormat output_format
-	= DataOut<dim>::parse_output_format (this->parameters.output_format);
+      DataOutBase::OutputFormat output_format
+	= DataOutBase::parse_output_format (this->parameters.output_format);
       
       out.attach_dof_handler (*this->get_timestep_primal().dof_handler);
       out.add_data_vector (this->get_timestep_primal().u, "u");
