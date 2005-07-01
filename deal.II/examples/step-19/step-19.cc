@@ -11,32 +11,188 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
-// Base libraries
-#include <base/data_out_base.h>
 
-// C++ libraries
+                                 // As usual, we start with include
+                                 // files. This program is content with really
+                                 // few of these -- we only need two files
+                                 // from the library (one for input and output
+                                 // of graphical data, one for parameter
+                                 // handling), and a few C++ standard headers:
+#include <base/data_out_base.h>
+#include <base/parameter_handler.h>
+
+#include <list>
 #include <iostream>
 #include <fstream>
 
 
+                                 // Before we start with the actual program,
+                                 // let us declare a few global variables that
+                                 // will be used to hold the parameters this
+                                 // program is going to use. Usually, global
+                                 // variables are frowned upon for a good
+                                 // reason, but since we have such a short
+                                 // program here that does only a single
+                                 // thing, we may stray from our usual line
+                                 // and make these variables global, rather
+                                 // than passing them around to all functions
+                                 // or encapsulating them into a class.
+                                 //
+                                 // The variables we have are: first, an
+                                 // object that will hold parameters of
+                                 // operation, such as output format (unless
+                                 // given on the command line); second, the
+                                 // names of input and output files; third,
+                                 // the format in which the output is to be
+                                 // written; and fourth the name of a
+                                 // parameter file:
+ParameterHandler         prm;
+std::vector<std::string> input_file_names;
+std::string              output_file; 
+std::string              output_format;
+std::string              parameter_file;
+
+
+                                 // All the stuff this program does can be
+                                 // done from here on. As described in the
+                                 // introduction, what we have to do is
+                                 // declare what values the parameter file can
+                                 // have, parse the command line, read the
+                                 // input files, then write the output. We
+                                 // will do this in this order of operation,
+                                 // but before that let us declare a function
+                                 // that prints a message about how this
+                                 // program is to be used; the function first
+                                 // prints a general message, and then goes on
+                                 // to list the parameters that are allowed in
+                                 // the parameter file (the
+                                 // ``ParameterHandler'' class has a function
+                                 // to do exactly this):
+void
+print_usage_message ()
+{
+  static const char* message
+    =
+    "\n"
+    "Converter from deal.II intermediate format to other graphics formats.\n"
+    "\n"
+    "Usage:\n"
+    "    ./step-19 [-p parameter_file] list_of_input_files \n"
+    "              [-x output_format] [-o output_file]\n"
+    "\n"
+    "Parameter sequences in brackets can be omitted a parameter file is\n"
+    "specified on the command line and if it provides values for these\n"
+    "missing parameters.\n"
+    "\n"
+    "The parameter file has the following format and allows the following\n"
+    "values (you can cut and paste this and use it for your own parameter\n"
+    "file):\n"
+    "\n";
+  std::cout << message;
+
+  prm.print_parameters (std::cout, ParameterHandler::Text);
+}
+
+
+void declare_parameters ()
+{
+  prm.declare_entry ("Output file", "",
+                     Patterns::Anything(),
+                     "The name of the output file to be generated");
+
+  DataOutInterface<1,1>::declare_parameters (prm);
+}
+
+  
+
+void
+parse_command_line (const int                 argc,
+                    char             *const* argv)
+{
+  if (argc < 2)
+    {
+      print_usage_message ();
+      exit (1);
+    }
+
+  std::list<std::string> args;
+  for (int i=1; i<argc; ++i)
+    args.push_back (argv[i]);
+  
+  while (args.size())
+    {
+      if (args.front() == std::string("-p"))
+        {
+          if (args.size() == 1)
+            {
+              std::cerr << "Error: flag '-p' must be followed by the "
+                        << "name of a parameter file."
+                        << std::endl;
+              print_usage_message ();
+              exit (1);
+            }
+          args.pop_front ();
+          parameter_file = args.front ();
+          args.pop_front ();
+        }
+      else if (args.front() == std::string("-x"))
+        {
+          if (args.size() == 1)
+            {
+              std::cerr << "Error: flag '-x' must be followed by the "
+                        << "name of an output format."
+                        << std::endl;
+              print_usage_message ();
+              exit (1);
+            }
+          args.pop_front ();
+          output_format = args.front();
+          args.pop_front ();
+        }
+      else if (args.front() == std::string("-o"))
+        {
+          if (args.size() == 1)
+            {
+              std::cerr << "Error: flag '-o' must be followed by the "
+                        << "name of an output file."
+                        << std::endl;
+              print_usage_message ();
+              exit (1);
+            }
+          args.pop_front ();
+          output_file = args.front();
+          args.pop_front ();
+        }
+      else
+        {
+          input_file_names.push_back (args.front());
+          args.pop_front ();
+        }
+    }
+
+  if (input_file_names.size() == 0)
+    {
+      std::cerr << "Error: No input file specified." << std::endl;
+      print_usage_message ();
+      exit (1);
+    }
+}
+
 
 
 template <int dim, int spacedim>
-void do_convert (const std::vector<std::string> &input_files,
-                 const std::string              &output_file,
-                 const std::string              &/*parameter_file*/,
-                 const std::string              &output_format_extension)
+void do_convert ()
 {
-  std::ifstream intermediate_stream (input_files[0].c_str());
+  std::ifstream intermediate_stream (input_file_names[0].c_str());
   AssertThrow (intermediate_stream, ExcIO());
   
   DataOutReader<dim,spacedim> intermediate_data;  
   intermediate_data.read (intermediate_stream);
 
 				   // for all following input files
-  for (unsigned int i=1; i<input_files.size(); ++i)
+  for (unsigned int i=1; i<input_file_names.size(); ++i)
     {
-      std::ifstream additional_stream (input_files[i].c_str());
+      std::ifstream additional_stream (input_file_names[i].c_str());
       AssertThrow (additional_stream, ExcIO());
 
       DataOutReader<dim,spacedim> additional_data;  
@@ -47,20 +203,20 @@ void do_convert (const std::vector<std::string> &input_files,
   std::ofstream output_stream (output_file.c_str());
   AssertThrow (output_stream, ExcIO());
 
-  const typename DataOutInterface<dim,spacedim>::OutputFormat
-    output_format
-    = intermediate_data.parse_output_format (output_format_extension);
+  const DataOutBase::OutputFormat format
+    = intermediate_data.parse_output_format (output_format);
   
-  intermediate_data.write(output_stream, output_format); 
+  intermediate_data.write(output_stream, format); 
 }
 
 
-void convert (const std::vector<std::string> &input_files,
-              const std::string              &output_file,
-              const std::string              &parameter_file,
-              const std::string              &output_format_extension)
+
+void convert ()
 {
-  std::ifstream input(input_files[0].c_str());
+  AssertThrow (input_file_names.size() > 0,
+               ExcMessage ("No input files specified."));
+  
+  std::ifstream input(input_file_names[0].c_str());
   AssertThrow (input, ExcIO());
   
   const std::pair<unsigned int, unsigned int>
@@ -72,17 +228,11 @@ void convert (const std::vector<std::string> &input_files,
             switch (dimensions.second)
               {
                 case 1:
-                      do_convert <1,1> (input_files,
-                                        output_file,
-                                        parameter_file,
-                                        output_format_extension);
+                      do_convert <1,1> ();
                       return;
                       
                 case 2:
-                      do_convert <1,2> (input_files,
-                                        output_file,
-                                        parameter_file,
-                                        output_format_extension);
+                      do_convert <1,2> ();
                       return;
               }
             AssertThrow (false, ExcNotImplemented());
@@ -91,17 +241,11 @@ void convert (const std::vector<std::string> &input_files,
             switch (dimensions.second)
               {
                 case 2:
-                      do_convert <2,2> (input_files,
-                                        output_file,
-                                        parameter_file,
-                                        output_format_extension);
+                      do_convert <2,2> ();
                       return;
 
                 case 3:
-                      do_convert <2,3> (input_files,
-                                        output_file,
-                                        parameter_file,
-                                        output_format_extension);
+                      do_convert <2,3> ();
                       return;
               }
             AssertThrow (false, ExcNotImplemented());
@@ -110,10 +254,7 @@ void convert (const std::vector<std::string> &input_files,
             switch (dimensions.second)
               {
                 case 3:
-                      do_convert <3,3> (input_files,
-                                        output_file,
-                                        parameter_file,
-                                        output_format_extension);
+                      do_convert <3,3> ();
                       return;
               }
             AssertThrow (false, ExcNotImplemented());
@@ -128,84 +269,10 @@ int main (int argc, char ** argv)
 {
   try
     {
-      if (argc == 1)
-        {
-          std::cout << std::endl
-		    << "Converter from deal.II intermediate format to "
-                    << "other graphics formats."
-                    << std::endl << std::endl
-                    << "Usage: ./step-19 [-p parameter_file] "
-                    << "list_of_input_files [-x output_format] "
-                    << "output_file"
-                    << std::endl
-		    << std::endl;
-          exit (1);
-        }
-      
-      std::string              parameter_file;
-      std::string              output_format_extension;
-      std::vector<std::string> file_names;
-      
-      for (int i=1; i<argc; ++i)
-        {
-          if (std::string(argv[i]) == std::string("-p"))
-            {
-              if (i+1 == argc)
-                {
-                  std::cerr << "Error: flag '-p' must be followed by the "
-                            << "name of a parameter file."
-                            << std::endl;
-                  exit (1);
-                }
-              parameter_file = argv[i+1];
-              ++i;
-            }
-          else if (std::string(argv[i]) == std::string("-x"))
-            {
-              if (i+1 == argc)
-                {
-                  std::cerr << "Error: flag '-x' must be followed by the "
-                            << "name of an output format."
-                            << std::endl;
-                  exit (1);
-                }
-              output_format_extension = argv[i+1];
-              ++i;
-            }
-          else
-            file_names.push_back (argv[i]);
-        }
+      declare_parameters ();
+      parse_command_line (argc, argv);
 
-      if (file_names.size() < 2)
-        {
-          std::cerr << "Error: No input and/or output files specified."
-                    << std::endl;
-          exit (1);
-        }
-
-      const std::vector<std::string> input_files (file_names.begin(),
-                                                  file_names.end()-1);
-      const std::string              output_file (file_names.back());
-
-      if (output_format_extension.size() == 0)
-        {
-          output_format_extension
-            = std::string(output_file.begin() + output_file.rfind ('.') + 1,
-                          output_file.end());
-
-          if (output_format_extension.size() == 0)
-            {
-              std::cerr << "Error: could not determine output file format "
-                        << "from name of last file name."
-                        << std::endl;
-              exit (1);
-            }
-        }
-
-      convert (input_files,
-               output_file,
-               parameter_file,
-               output_format_extension);
+      convert ();
     }
   catch (std::exception &exc)
     {
