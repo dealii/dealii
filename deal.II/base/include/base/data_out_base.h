@@ -66,6 +66,19 @@ class ParameterHandler;
  * In addition to the list of patches, a name for each data set may be given.
  *
  *
+ * @section QueryingP Querying interface
+ *
+ * This class also provides a few functions (parse_output_format(),
+ * get_output_format_names(), default_suffix()) that can be used to query
+ * which output formats this class supports. The provide a list of names for
+ * all the formats we can output, parse a string and return an enum indicating
+ * each format, and provide a way to convert a value of this enum into the
+ * usual suffix used for files of that name. Using these functions, one can
+ * entirely free applications from knowledge which formats the library
+ * presently allows to output; several of the example programs show how to do
+ * this.
+ * 
+ *
  * @subsection DataOutBasePatches Patches
  * Grids can be thought of as a collection of cells; if you want to write out
  * data on such a grid, you can do so by writing them one cell at a time.
@@ -1654,6 +1667,24 @@ class DataOutBase
     static std::string get_output_format_names ();
 
 				     /**
+				      * Provide a function which tells us which
+				      * suffix a file with a given output format
+				      * usually has. At present the following
+				      * formats are defined:
+				      * <ul>
+				      * <li> <tt>dx</tt>: <tt>.dx</tt>
+				      * <li> <tt>ucd</tt>: <tt>.inp</tt>
+				      * <li> <tt>gnuplot</tt>: <tt>.gnuplot</tt>
+				      * <li> <tt>povray</tt>: <tt>.pov</tt>
+				      * <li> <tt>eps</tt>: <tt>.eps</tt>
+				      * <li> <tt>gmv</tt>: <tt>.gmv</tt>
+				      * <li> <tt>vtk</tt>: <tt>.vtk</tt>.
+				      * <li> <tt>deal_II_intermediate</tt>: <tt>.d2</tt>.
+				      * </ul>
+				      */
+    static std::string default_suffix (const OutputFormat output_format);
+    
+				     /**
 				      * Determine an estimate for
 				      * the memory consumption (in
 				      * bytes) of this
@@ -1802,7 +1833,7 @@ class DataOutBase
  * as well as an example of programming, we refer to the documentation
  * of that class.
  *
- * In basics, this class stores a set of flags for each output format
+ * Basically, this class stores a set of flags for each output format
  * supported by the underlying <tt>DataOutBase</tt> class. These are used
  * whenever one of the <tt>write_*</tt> functions is used. By default, the
  * values of these flags are set to reasonable start-ups, but in case
@@ -1825,7 +1856,7 @@ class DataOutBase
  * handler and to read them back from an actual input file. In order
  * to avoid that in user programs these functions have to be called
  * for each available output format and the respective flag class, the
- * present <tt>DataOut_Interface</tt> class offers a function
+ * present <tt>DataOutInterface</tt> class offers a function
  * <tt>declare_parameters</tt> which calls the respective function of all
  * known output format flags classes. The flags of each such format
  * are packed together in a subsection in the input file.
@@ -1855,18 +1886,19 @@ class DataOutBase
  *   ...
  * @endcode
  * Note that in the present example, the class <tt>DataOut</tt> was used. However, any
- * other class derived from <tt>DataOut_Interface</tt> would work alike.
+ * other class derived from <tt>DataOutInterface</tt> would work alike.
  *
  *
  * @section DataOutInterfaceSelectF Run time selection of formats
  *
  * This class, much like the <tt>GridOut</tt> class, has a set of functions
- * providing a list of supported output formats, an <tt>enum</tt> denoting
- * all these and a function to parse a string and return the respective
- * <tt>enum</tt> value if it is a valid output format's name. Finally, there
- * is a function <tt>write</tt>, which takes a value of this <tt>enum</tt> and
- * dispatches to one of the actual <tt>write_*</tt> functions depending on
- * the output format selected by this value. 
+ * providing a list of supported output formats, an <tt>enum</tt> denoting all
+ * these and a function to parse a string and return the respective
+ * <tt>enum</tt> value if it is a valid output format's name (actually, these
+ * functions are inherited from the base class). Finally, there is a function
+ * <tt>write</tt>, which takes a value of this <tt>enum</tt> and dispatches to
+ * one of the actual <tt>write_*</tt> functions depending on the output format
+ * selected by this value.
  *
  * The functions offering the different output format names are,
  * respectively, <tt>default_suffix</tt>, <tt>parse_output_format</tt>, and
@@ -2058,32 +2090,18 @@ class DataOutInterface : private DataOutBase
 				      * Set the flags to be used for
 				      * output in VTK format.
 				      */
-    void set_flags (const Deal_II_IntermediateFlags &deal_II_intermediate_flags);
-    
+    void set_flags (const Deal_II_IntermediateFlags &deal_II_intermediate_flags);    
 
 				     /**
-				      * Provide a function which tells us which
-				      * suffix with a given output format
-				      * usually has. At present the following
-				      * formats are defined:
-				      * <ul>
-				      * <li> <tt>dx</tt>: <tt>.dx</tt>
-				      * <li> <tt>ucd</tt>: <tt>.inp</tt>
-				      * <li> <tt>gnuplot</tt>: <tt>.gnuplot</tt>
-				      * <li> <tt>povray</tt>: <tt>.pov</tt>
-				      * <li> <tt>eps</tt>: <tt>.eps</tt>
-				      * <li> <tt>gmv</tt>: <tt>.gmv</tt>
-				      * <li> <tt>vtk</tt>: <tt>.vtk</tt>.
-				      * <li> <tt>deal_II_intermediate</tt>: <tt>.d2</tt>.
-				      * </ul>
-				      *
-				      * If this function is called
-				      * with no argument or
-				      * <tt>default_format</tt>, the suffix
-				      * for the <tt>default_format</tt> is
-				      * returned.
+				      * A function that returns the same
+				      * string as the respective function in
+				      * the base class does; the only
+				      * exception being that if the parameter
+				      * is omitted, then the value for the
+				      * present default format is returned.
 				      */
-    std::string default_suffix (const OutputFormat output_format = default_format) const;
+    std::string
+    default_suffix (const OutputFormat output_format = default_format) const;
 
 				     /**
 				      * Declare parameters for all
