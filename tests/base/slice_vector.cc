@@ -77,8 +77,6 @@ int main()
 
   f(v);
 
-  const VectorSlice<const std::vector<int> >
-    s2 = make_slice(v, 3, 5);
   int n = s[4];
   n += 3;
 
