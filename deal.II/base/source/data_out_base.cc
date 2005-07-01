@@ -610,6 +610,50 @@ DataOutBase::get_output_format_names ()
 
 
 
+std::string
+DataOutBase::
+default_suffix (const OutputFormat output_format)
+{
+  switch (output_format) 
+    {
+      case dx:
+	    return ".dx";
+	    
+      case ucd:
+	    return ".inp";
+	    
+      case gnuplot: 
+	    return ".gnuplot";
+	    
+      case povray: 
+	    return ".pov";
+	    
+      case eps: 
+	    return ".eps";
+
+      case gmv:
+	    return ".gmv";
+
+      case tecplot:
+	    return ".dat";
+	    
+      case tecplot_binary:
+	    return ".plt";
+	    
+      case vtk:
+	    return ".vtk";
+	    
+      case deal_II_intermediate:
+	    return ".d2";
+	    
+      default: 
+	    Assert (false, ExcNotImplemented()); 
+	    return "";
+    };
+}
+
+
+
 template <int dim, int spacedim>
 void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &data_names,
@@ -4389,48 +4433,12 @@ DataOutInterface<dim,spacedim>::set_flags (const Deal_II_IntermediateFlags &flag
 template <int dim, int spacedim>
 std::string
 DataOutInterface<dim,spacedim>::
-default_suffix (const OutputFormat output_format_) const
+default_suffix (const OutputFormat output_format) const
 {
-  OutputFormat output_format = output_format_;
   if (output_format == default_format)
-    output_format = default_fmt;
-  
-  switch (output_format) 
-    {
-      case dx:
-	    return ".dx";
-	    
-      case ucd:
-	    return ".inp";
-	    
-      case gnuplot: 
-	    return ".gnuplot";
-	    
-      case povray: 
-	    return ".pov";
-	    
-      case eps: 
-	    return ".eps";
-
-      case gmv:
-	    return ".gmv";
-
-      case tecplot:
-	    return ".dat";
-	    
-      case tecplot_binary:
-	    return ".plt";
-	    
-      case vtk:
-	    return ".vtk";
-	    
-      case deal_II_intermediate:
-	    return ".d2";
-	    
-      default: 
-	    Assert (false, ExcNotImplemented()); 
-	    return "";
-    };
+    return DataOutBase::default_suffix (default_fmt);
+  else
+    return DataOutBase::default_suffix (output_format);
 }
 
 
