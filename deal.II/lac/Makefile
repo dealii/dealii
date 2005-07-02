@@ -37,25 +37,37 @@ lib: $(LIBDIR)/liblac.g$(lib-suffix) $(LIBDIR)/liblac$(lib-suffix)
 libg: $(LIBDIR)/liblac.g$(lib-suffix)
 libo: $(LIBDIR)/liblac$(lib-suffix)
 
-# if we use HSL, then we need to link against libhsl.so. if we don't, then
-# don't set this variable
-ifeq ($(USE_CONTRIB_HSL),yes)
-  LIBHSL=$(lib-contrib-hsl)
-else
-  LIBHSL=
-endif
-
 # in general, when linking shared libraries, we will want to link with
 # the underlying libs as well. AIX even requires this. on the other
 # hand, on DEC OSF with CXX this will fail with duplicate symbols, so
 # make sure that it doesn't happen on that system and that compiler
 ifneq ($(GXX-VERSION),compaq_cxx)
-  deplibs.g = $(lib-base.g) $(LIBHSL)
-  deplibs.o = $(lib-base.o) $(LIBHSL)
+  deplibs.g = $(lib-base.g)
+  deplibs.o = $(lib-base.o)
 
+  # if we use HSL, then we need to link against libhsl.so.
+  ifeq ($(USE_CONTRIB_HSL),yes)
+    deplibs.g += $(lib-contrib-hsl)
+    deplibs.o += $(lib-contrib-hsl)
+  endif
+
+  # same with PETSC
   ifeq ($(USE_CONTRIB_PETSC),yes)
     deplibs.g += $(lib-contrib-petsc.g)
     deplibs.o += $(lib-contrib-petsc.o)
+  endif
+
+  # and UMFPACK
+  ifeq ($(USE_CONTRIB_UMFPACK),yes)
+    deplibs.g += $(LIBDIR)/liblac_umfpack$(lib-suffix)
+    deplibs.o += $(LIBDIR)/liblac_umfpack$(lib-suffix)
+  endif
+
+  # for cygwin, also llapack and such are necessary
+  # we better link all libraries mentioned in $(libs)
+  ifeq ($(findstring cygwin,$(TARGET)),cygwin)
+    deplibs.g += $(LIBS)
+    deplibs.o += $(LIBS)
   endif
 
 else
