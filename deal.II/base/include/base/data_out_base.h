@@ -1932,6 +1932,7 @@ class DataOutInterface : private DataOutBase
                                       * remain valid.
                                       */
     using DataOutBase::OutputFormat;
+    using DataOutBase::gnuplot;
     using DataOutBase::parse_output_format;
     using DataOutBase::get_output_format_names;
     
