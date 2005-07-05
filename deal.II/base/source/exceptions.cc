@@ -28,6 +28,27 @@
 #endif
 
 
+namespace deal_II_exceptions
+{
+
+  std::string additional_assert_output;
+
+  void set_additional_assert_output (const char * const p)
+  {
+    additional_assert_output = p;
+  }
+
+
+
+  bool show_stacktrace = true;
+
+  void suppress_stacktrace_in_exceptions ()
+  {
+    show_stacktrace = false;
+  }  
+}
+
+
 
 ExceptionBase::ExceptionBase ()
                 :
@@ -100,6 +121,10 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 {
   if (n_stacktrace_frames == 0)
     return;
+
+  if (deal_II_exceptions::show_stacktrace == false)
+    return;
+  
   
 				   // if there is a stackframe stored, print it
   out << std::endl;
@@ -227,16 +252,6 @@ const char * ExceptionBase::what () const throw ()
 
 namespace deal_II_exceptions
 {
-
-  std::string additional_assert_output;
-
-  void set_additional_assert_output (const char * const p)
-  {
-    additional_assert_output = p;
-  }
-
-  
-  
   namespace internals 
   {
     

@@ -490,7 +490,24 @@ namespace deal_II_exceptions
 				    * given to this function.
 				    */
   void set_additional_assert_output (const char * const p);
-  
+
+				   /**
+				    * Calling this function disables
+				    * printing a stacktrace along with
+				    * the other output printed when an
+				    * exception occurs. Most of the
+				    * time, you will want to see such
+				    * a stacktrace; suppressing it,
+				    * however, is useful if one wants
+				    * to compare the output of a
+				    * program across different
+				    * machines and systems, since the
+				    * stacktrace shows memory
+				    * addresses and library
+				    * names/paths that depend on the
+				    * exact setup of a machine.
+				    */
+  void suppress_stacktrace_in_exceptions ();
   
 /**
  * The functions in this namespace are in connection with the Assert
