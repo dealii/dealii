@@ -16,7 +16,15 @@
 #include <lac/vector.h>
 
 #ifndef DEAL_II_DISABLE_PARSER
-#include <functionparser/fparser.h>
+#  include <functionparser/fparser.h>
+#else
+
+namespace fparser
+{
+  class FunctionParser
+  {};
+}
+
 #endif
 
 
