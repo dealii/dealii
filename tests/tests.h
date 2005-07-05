@@ -18,6 +18,7 @@
 
 #include <base/config.h>
 #include <base/logstream.h>
+#include <base/exceptions.h>
 #include <cmath>
 
 // overload floating point output operators for LogStream so that small
@@ -42,6 +43,15 @@ LogStream & operator << (LogStream &logstream,
       operator << <float> (d);
   return logstream;
 }
+
+
+struct SwitchOffStacktrace
+{
+    SwitchOffStacktrace ()
+      {
+	deal_II_exceptions::suppress_stacktrace_in_exceptions ();
+      }
+} deal_II_stacktrace_dummy;
 
 
 #endif // __tests_tests_h
