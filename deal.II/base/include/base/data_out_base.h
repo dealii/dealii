@@ -1932,7 +1932,15 @@ class DataOutInterface : private DataOutBase
                                       * remain valid.
                                       */
     using DataOutBase::OutputFormat;
+    using DataOutBase::default_format;
+    using DataOutBase::dx;
     using DataOutBase::gnuplot;
+    using DataOutBase::povray;
+    using DataOutBase::eps;
+    using DataOutBase::tecplot;
+    using DataOutBase::tecplot_binary;
+    using DataOutBase::vtk;
+    using DataOutBase::deal_II_intermediate;
     using DataOutBase::parse_output_format;
     using DataOutBase::get_output_format_names;
     
