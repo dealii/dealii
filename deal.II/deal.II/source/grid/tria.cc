@@ -1183,7 +1183,13 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
     if (quad->at_boundary())
       for (unsigned int l=0; l<4; ++l)
 	quad->line(l)->set_boundary_indicator (0);
-
+  
+				   // Check that all cells have
+				   // positive volume
+  Triangulation<dim>::active_cell_iterator cell=tria->begin_active(),
+					   endc=tria->end();
+  for (unsigned int c=0; cell!=endc; ++cell, ++c)
+    AssertThrow(cell->measure()>0, ExcCellNegativeMeasure(c));
 
 				   ///////////////////////////////////////
 				   // now set boundary indicators
@@ -1248,7 +1254,6 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	}
       line->set_boundary_indicator (boundary_line->material_id);
     }
-
 
 				   // now go on with boundary faces
   std::vector<CellData<2> >::const_iterator boundary_quad
