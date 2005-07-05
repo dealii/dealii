@@ -1189,7 +1189,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
   Triangulation<dim>::active_cell_iterator cell=begin_active(),
 					   endc=end();
   for (unsigned int c=0; cell!=endc; ++cell, ++c)
-    AssertThrow(cell->measure()>0, ExcCellNegativeMeasure(c));
+    AssertThrow(cell->measure()>0, ExcCellHasNegativeMeasure(c));
 
 				   ///////////////////////////////////////
 				   // now set boundary indicators
