@@ -275,6 +275,22 @@ class TriaAccessor
 				      * Exception
 				      */
     DeclException0 (ExcNeighborIsNotCoarser);
+				     /**
+				      * If this exception is thrown,
+				      * the cell has negative
+				      * volume. Make sure the grid
+				      * (which most likely has been
+				      * read in by GridIn) has no
+				      * negative volumes. For the case
+				      * all cells of the mesh are
+				      * (consistently) negative, and
+				      * one really wants to compute on
+				      * it (which in fact could work),
+				      * one can comment out this
+				      * exception in tria_accessor.cc.
+				      */
+    DeclException0 (ExcNegativeMeasure);
+    
 				     /*@}*/
 	
   protected:
