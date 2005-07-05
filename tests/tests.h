@@ -45,6 +45,14 @@ LogStream & operator << (LogStream &logstream,
 }
 
 
+
+#ifndef DEAL_II_STACKTACE_SWITCH
+#define DEAL_II_STACKTACE_SWITCH
+
+// A structure and a variable that are used to make sure that we do
+// not show a stacktrace in out testcases, since this would lead to
+// trouble with automatic comparison of output against a fixed
+// baseline
 struct SwitchOffStacktrace
 {
     SwitchOffStacktrace ()
@@ -53,5 +61,6 @@ struct SwitchOffStacktrace
       }
 } deal_II_stacktrace_dummy;
 
+#endif
 
 #endif // __tests_tests_h
