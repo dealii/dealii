@@ -81,10 +81,10 @@ int main ()
   test ("grid_in_3d_3.in");
   test ("grid_in_3d_4.in");
 
-  test ("grid_in_3d_evil_0.in");
-  test ("grid_in_3d_evil_1.in");
-  test ("grid_in_3d_evil_2.in");
-  test ("grid_in_3d_evil_3.in");
-  test ("grid_in_3d_evil_4.in");
+//    test ("grid_in_3d_evil_0.in");
+//    test ("grid_in_3d_evil_1.in");
+//    test ("grid_in_3d_evil_2.in");
+//    test ("grid_in_3d_evil_3.in");
+//    test ("grid_in_3d_evil_4.in");
 }
 
