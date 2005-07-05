@@ -3066,6 +3066,12 @@ class Triangulation : public Subscriptor
 		    << "Something went wrong upon construction of cell "
 		    << arg1);
 				     /**
+				      *  Exception
+				      */
+    DeclException1 (ExcCellHasNegativeMeasure,
+		    int,
+		    << "Cell " << arg1 << " has negative measure.");
+				     /**
 				      * Exception
 				      */
     DeclException3 (ExcInvalidVertexIndex,
