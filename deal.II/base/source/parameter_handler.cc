@@ -981,10 +981,13 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
     }
 
 
-                                   // if there are sections to come, put two
-                                   // newlines between the last entry and the
-                                   // first subsection
-  if (pd->subsections.size() != 0)
+                                   // if there was text before and
+                                   // there are sections to come, put
+                                   // two newlines between the last
+                                   // entry and the first subsection
+  if ((pd->entries.size() != 0)
+      &&
+      (pd->subsections.size() != 0))
     out << std::endl << std::endl;
 
 				   // now transverse subsections tree
