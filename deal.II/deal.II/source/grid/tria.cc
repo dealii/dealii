@@ -1186,8 +1186,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
   
 				   // Check that all cells have
 				   // positive volume
-  Triangulation<dim>::active_cell_iterator cell=tria->begin_active(),
-					   endc=tria->end();
+  Triangulation<dim>::active_cell_iterator cell=begin_active(),
+					   endc=end();
   for (unsigned int c=0; cell!=endc; ++cell, ++c)
     AssertThrow(cell->measure()>0, ExcCellNegativeMeasure(c));
 
