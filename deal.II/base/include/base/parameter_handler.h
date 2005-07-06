@@ -1509,8 +1509,24 @@ class ParameterHandler
 				      */
     struct Section 
     {
+                                         /**
+                                          * Destructor
+                                          */
 	~Section ();
 
+                                         /**
+                                          * Number of entries that this
+                                          * section has plus all the
+                                          * non-subsection entries of all its
+                                          * decendents.
+                                          */
+        unsigned int accumulated_no_of_entries () const;
+
+                                         /**
+                                          * Value of an entry in this section,
+                                          * including documentation and the
+                                          * pattern it conforms to.
+                                          */
         struct EntryContent
         {
             std::string            value;
