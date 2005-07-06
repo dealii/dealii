@@ -56,6 +56,18 @@ class GridTools
     double diameter (const Triangulation<1> &tria);
 
 				     /**
+				      * Return the measure of a cell
+				      * represented by a subset of
+				      * vertices in @p all_vertices
+				      * which is specified by @p
+				      * vertex_indices.
+				      */
+    template <int dim>
+    static
+    double cell_measure(const std::vector<Point<dim> > &all_vertices,
+			const int vertex_indices[GeometryInfo<dim>::vertices_per_cell]);
+
+				     /**
 				      * Transform the vertices of the
 				      * given triangulation by
 				      * applying the predicate to all
