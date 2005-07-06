@@ -60,6 +60,7 @@ int main ()
       gmsh_grid<2> ("grid_in_msh_01.2da.msh");
       gmsh_grid<3> ("grid_in_msh_01.3d.msh");
       gmsh_grid<3> ("grid_in_msh_01.3da.msh");
+      gmsh_grid<3> ("grid_in_msh_01.3d_neg.msh");
     }
   catch (std::exception &exc)
     {
