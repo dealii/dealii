@@ -530,6 +530,62 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: All <code class="class">GridIn</code>::<code
+       class="member">read_*</code> functions now call <code
+       class="class">GridReordering</code>::<code
+       class="member">invert_all_cells_of_negative_grid</code>. This
+       way, also misoriented grids are represented in the right
+       orientation within <acronym>deal.II</acronym>.
+       <br>
+       (RH 2005/07/06)
+       </p>
+
+  <li> <p>
+       Improved: <code
+       class="class">Triangulation&lt;3&gt;</code>::<code
+       class="member">create_triangulation</code> now checks that all
+       cell have positive volume. If not, an exception is thrown. In
+       that case use the <code
+       class="class">GridReordering</code>::<code
+       class="member">invert_all_cells_of_negative_grid</code>
+       function, see below, to fix this.
+       <br>
+       (RH 2005/07/06)
+       </p>
+
+  <li> <p>
+       New: There is now a <code
+       class="class">GridReordering</code>::<code
+       class="member">invert_all_cells_of_negative_grid</code>
+       function implemented in 3d which checks if some/all cells have
+       negative volumes. If all cell have negative volume then the
+       whole grid is reoriented. An assertion is thrown if only a
+       subset of cells have negative volumes, as then the grid might
+       be broken.
+       <br>
+       (RH 2005/07/06)
+       </p>
+
+  <li> <p>
+       New: There is now a new <code
+       class="class">GridTools</code>::<code
+       class="member">cell_measure</code> function. However, it is
+       mostly for internal use. Use <code>cell->measure()</code>
+       instead.
+       <br>
+       (RH 2005/07/06)
+       </p>
+
+  <li> <p>
+       Improved: <code>cell->measure()</code> used to give the
+       absolute value of the cell measure. It now gives the measure
+       with the correct sign. This is useful to find wrongly oriented
+       cells in 3d with negative volumes.
+       <br>
+       (RH 2005/07/05)
+       </p>
+
+  <li> <p>
        Improved: The class <code
        class="class">FiniteElementData</code> now stores information
        on the Sobolev space a finite element space conforms with.
