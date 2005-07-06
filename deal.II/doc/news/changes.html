@@ -42,86 +42,100 @@ inconvenience this causes.
 
 
 <ol>
-  <li> <p>Changed: The way boundary constraints were handled in the step-17
-  tutorial program was conceptually flawed. We tried to eliminate boundary
-  nodes locally on the cell level, and hanging node constraints subsequently
-  when transferring into the global matrix. However, this doesn't work in
-  general: the elimination of hanging node constraints could re-populate rows
-  and columns that had already been vacated during boundary node
-  elimination. At the end of a long though process, we came to the conclusion
-  that it is impossible to revert the traditional order of operations: first
-  eliminate all hanging node constraints, then eliminate all boundary
-  nodes. This leads to a situation where the <code
-  class="member">MatrixTools::local_apply_boundary_values</code> function is
-  not very useful any more, except for the special case where there are no
-  hanging nodes. The step-17 example program has therefore been changed to use
-  the <code class="member">MatrixTools::apply_boundary_values</code> function
-  again, though hanging node elimination still happens during transfer into
-  the global matrix.
-  <br> (WB 2005/05/05)
-  </p>
+  <li> <p>
+       Changed: The way boundary constraints were handled in the
+       step-17 tutorial program was conceptually flawed. We tried to
+       eliminate boundary nodes locally on the cell level, and hanging
+       node constraints subsequently when transferring into the global
+       matrix. However, this doesn't work in general: the elimination
+       of hanging node constraints could re-populate rows and columns
+       that had already been vacated during boundary node
+       elimination. At the end of a long though process, we came to
+       the conclusion that it is impossible to revert the traditional
+       order of operations: first eliminate all hanging node
+       constraints, then eliminate all boundary nodes. This leads to a
+       situation where the <code
+       class="member">MatrixTools::local_apply_boundary_values</code>
+       function is not very useful any more, except for the special
+       case where there are no hanging nodes. The step-17 example
+       program has therefore been changed to use the <code
+       class="member">MatrixTools::apply_boundary_values</code>
+       function again, though hanging node elimination still happens
+       during transfer into the global matrix.
+       <br>
+       (WB 2005/05/05)
+       </p>
 
-  <li> <p>Changed: The class <code
-  class="class">MGCoarseGridLACIteration</code> lost two template
-  arguments. Since the matrix and preconditioner are now stored in
-  form of <code class="class">PointerMatrix</code> objects, handling
-  of the class is much simpler, in particular when exchanging
-  preconditioners.
-  <br> (GK 2005/05/03)
-  </p>
+  <li> <p>
+       Changed: The class <code
+       class="class">MGCoarseGridLACIteration</code> lost two template
+       arguments. Since the matrix and preconditioner are now stored
+       in form of <code class="class">PointerMatrix</code> objects,
+       handling of the class is much simpler, in particular when
+       exchanging preconditioners.
+       <br>
+       (GK 2005/05/03)
+       </p>
 
-  <li> <p>Changed: The template argument of <code
-  class="class">BlockMatrixArray</code> was changed to
-  <tt>number</tt>, equal to the same argument of the used <code
-  class="class">BlockVector</code>. Furthermore, its constructor
-  requires an additional argument of type <code
-  class="class">VectorMemory&lt;Vector&lt;number&gt; &gt;</code>
-  providing space for auxiliary vectors. Since the entries are now of
-  type <code class="class">PointerMatrixBase</code>, even matrices
-  with blocks of different types can be constructed.
-  <br> (GK 2005/03/21)
-  </p>
+  <li> <p>
+       Changed: The template argument of <code
+       class="class">BlockMatrixArray</code> was changed to
+       <tt>number</tt>, equal to the same argument of the used <code
+       class="class">BlockVector</code>. Furthermore, its constructor
+       requires an additional argument of type <code
+       class="class">VectorMemory&lt;Vector&lt;number&gt; &gt;</code>
+       providing space for auxiliary vectors. Since the entries are
+       now of type <code class="class">PointerMatrixBase</code>, even
+       matrices with blocks of different types can be constructed.
+       <br>
+       (GK 2005/03/21)
+       </p>
 
-  <li> <p>Changed: The <code class="class">GeometryInfo</code>::<code
-  class="member">vertices_adjacent_to_line</code> function has been
-  renamed to <code class="class">GeometryInfo</code>::<code
-  class="member">line_to_cell_vertices</code> to be named analogous to
-  the <code class="member">face_to_cell_vertices</code>, <code
-  class="member">face_to_cell_lines</code> and <code
-  class="member">child_to_cell_coordinates</code> functions.
-  <br>
-  (RH 2005/03/14)
-  </p>
+  <li> <p>
+       Changed: The <code class="class">GeometryInfo</code>::<code
+       class="member">vertices_adjacent_to_line</code> function has
+       been renamed to <code class="class">GeometryInfo</code>::<code
+       class="member">line_to_cell_vertices</code> to be named
+       analogous to the <code
+       class="member">face_to_cell_vertices</code>, <code
+       class="member">face_to_cell_lines</code> and <code
+       class="member">child_to_cell_coordinates</code> functions.
+       <br>
+       (RH 2005/03/14)
+       </p>
 
-  <li> <p>Changed: the file <tt>multigrid/mg_dof_tools.h</tt> was
-  renamed to <tt>multigrid/mg_tools.h</tt> in order to match the name
-  of the class contained.
-  <br>
-  (GK 2005/03/09)
-  </p>
+  <li> <p>
+       Changed: the file <tt>multigrid/mg_dof_tools.h</tt> was renamed
+       to <tt>multigrid/mg_tools.h</tt> in order to match the name of
+       the class contained.
+       <br>
+       (GK 2005/03/09)
+       </p>
 
-  <li> <p>Changed: <code class="class">DoFTools</code>::<code
-  class="member">make_flux_sparsity_pattern</code>, <code
-  class="class">MGTools</code>::<code
-  class="member">make_flux_sparsity_pattern</code> and similar
-  functions in these classes do not receive arguments of type <code
-  class="class">FullMatrix&lt;double&gt;</code> anymore. Instead, they
-  get a <code class="class">Table&lt;2,DoFTools::Coupling&gt;</code>,
-  which contains more meaningful enums.
-  <br>
-  (GK 2005/03/09)
-  </p>
+  <li> <p>
+       Changed: <code class="class">DoFTools</code>::<code
+       class="member">make_flux_sparsity_pattern</code>, <code
+       class="class">MGTools</code>::<code
+       class="member">make_flux_sparsity_pattern</code> and similar
+       functions in these classes do not receive arguments of type
+       <code class="class">FullMatrix&lt;double&gt;</code>
+       anymore. Instead, they get a <code
+       class="class">Table&lt;2,DoFTools::Coupling&gt;</code>, which
+       contains more meaningful enums.
+       <br>
+       (GK 2005/03/09)
+       </p>
 
-  <li> <p>Changed: <code class="class">Multigrid</code>::<code
-  class="member">Multigrid</code> receives an argument determining the
-  type of multigrid cycle istead of the minimum and maximum
-  levels. The latter were rarely used anyway and can be modified by
-  <code class="member">set_minlevel()</code> and <code
-  class="member">set_maxlevel()</code>
-  <br>
-  (GK 2005/03/09)
-  </p>
-
+  <li> <p>
+       Changed: <code class="class">Multigrid</code>::<code
+       class="member">Multigrid</code> receives an argument
+       determining the type of multigrid cycle istead of the minimum
+       and maximum levels. The latter were rarely used anyway and can
+       be modified by <code class="member">set_minlevel()</code> and
+       <code class="member">set_maxlevel()</code>
+       <br>
+       (GK 2005/03/09)
+       </p>
 </ol>
 
 <a name="general"></a>
@@ -515,11 +529,13 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
-  <li> <p>Improved: The class <code
-  class="class">FiniteElementData</code> now stores information on the
-  Sobolev space a finite element space conforms with.
-  <br> (GK 2005/06/29)
-  </p>
+  <li> <p>
+       Improved: The class <code
+       class="class">FiniteElementData</code> now stores information
+       on the Sobolev space a finite element space conforms with.
+       <br>
+       (GK 2005/06/29)
+       </p>
   
   <li> <p>
        New: Added function <code
@@ -529,17 +545,21 @@ inconvenience this causes.
        (Ralf B. Schulz, 2005/06/30)
        </p>
 
-  <li> <p>Improved: The function <code class="class">DoFTools</code>::<code
-  class="member">count_dofs_per_component</code> and its counterpart
-  in <code class="class">MGTools</code> got an additional
-  argument. This argument allows to count the degrees of freedom of
-  nonprimitive vector valued elements only once, instead of in every component.
-  Although this argument defaults to the previous behavior, it had to be put
-  into the argument list ahead of <tt>target_component</tt> in order to make
-  use of default arguments more efficiently. The old order of
-  arguments can still be used through a wrapper function.
-  <br> (GK 2005/06/22)
-  </p>
+  <li> <p>
+       Improved: The function <code
+       class="class">DoFTools</code>::<code
+       class="member">count_dofs_per_component</code> and its
+       counterpart in <code class="class">MGTools</code> got an
+       additional argument. This argument allows to count the degrees
+       of freedom of nonprimitive vector valued elements only once,
+       instead of in every component.  Although this argument defaults
+       to the previous behavior, it had to be put into the argument
+       list ahead of <tt>target_component</tt> in order to make use of
+       default arguments more efficiently. The old order of arguments
+       can still be used through a wrapper function.
+       <br>
+       (GK 2005/06/22)
+       </p>
 
   <li> <p>
        Improved: The <code class="class">GeometryInfo</code>::<code
