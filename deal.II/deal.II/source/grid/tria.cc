@@ -19,6 +19,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/geometry_info.h>
+#include <grid/grid_tools.h>
 #include <grid/magic_numbers.h>
 #include <lac/vector.h>
 
@@ -697,6 +698,20 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
   vertices = v;
   vertices_used = std::vector<bool> (v.size(), true);
 
+				   // check that all cells have
+				   // positive volume. if not call the
+				   // invert_all_cells_of_negative_grid
+				   // and reorder_cells function of
+				   // GridReordering before creating
+				   // the triangulation
+  for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
+    if (GridTools::cell_measure(vertices, cells[cell_no].vertices) < 0)
+      {
+	clear_despite_subscriptions();
+	
+	AssertThrow (false, ExcGridHasInvalidCell(cell_no));
+      }
+
 				   ///////////////////////////////////////
 				   // first set up some collections of data
 				   //
@@ -1176,11 +1191,12 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	quad->line(l)->set_boundary_indicator (0);
   
 				   // Check that all cells have
-				   // positive volume
-  Triangulation<dim>::active_cell_iterator cell=begin_active(),
-					   endc=end();
-  for (unsigned int c=0; cell!=endc; ++cell, ++c)
-    AssertThrow(cell->measure()>0, ExcCellHasNegativeMeasure(c));
+				   // positive volume. As the input
+				   // CellData already passed this
+				   // test we don't really expect
+				   // negative measures here
+  for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
+    Assert(cell->measure()>0, ExcInternalError());
 
 				   ///////////////////////////////////////
 				   // now set boundary indicators
