@@ -1457,7 +1457,7 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
       {
 	++n_negative_cells;
 	for (unsigned int i=0; i<4; ++i)
-	  swap(cells[cell_no].vertices[i], cells[cell_no].vertices[i+4]);
+	  std::swap(cells[cell_no].vertices[i], cells[cell_no].vertices[i+4]);
 	
 					 // check whether the
 					 // resulting cell is now ok.
