@@ -342,7 +342,7 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 
 template <>
 void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
-					     const std::vector<CellData<2> > &c,
+					     const std::vector<CellData<2> > &cells,
 					     const SubCellData               &subcelldata)
 {
   const unsigned int dim=2;
@@ -356,11 +356,6 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 				   // copy vertices
   vertices = v;
   vertices_used = std::vector<bool> (v.size(), true);
-
-				   // copy cells. This is needed since
-				   // we may need to change entries
-  std::vector<CellData<2> > cells(c);
-
 
 				   // make up a list of the needed
 				   // lines each line is a pair of
@@ -687,7 +682,7 @@ struct QuadComparator
 template <>
 void
 Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
-                                        const std::vector<CellData<3> > &c,
+                                        const std::vector<CellData<3> > &cells,
                                         const SubCellData               &subcelldata)
 {
   const unsigned int dim=3;
@@ -701,10 +696,6 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // copy vertices
   vertices = v;
   vertices_used = std::vector<bool> (v.size(), true);
-
-				   // copy cells. This is needed since
-				   // we may need to change entries
-  std::vector<CellData<3> > cells(c);
 
 				   ///////////////////////////////////////
 				   // first set up some collections of data
