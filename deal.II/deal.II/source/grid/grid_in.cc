@@ -194,6 +194,7 @@ void GridIn<dim>::read_ucd (std::istream &in)
 				   // do some clean-up on vertices...
   delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
+  GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);
 }
@@ -358,6 +359,7 @@ void GridIn<dim>::read_dbmesh (std::istream &in)
 				   // do some clean-up on vertices...
   delete_unused_vertices (vertices, cells, subcelldata);
 				   // ...and cells
+  GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);
 }
@@ -439,6 +441,7 @@ void GridIn<2>::read_xda (std::istream &in)
 				   // do some clean-up on vertices...
   delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
+  GridReordering<2>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<2>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);
 }
@@ -521,6 +524,7 @@ void GridIn<3>::read_xda (std::istream &in)
 				   // do some clean-up on vertices...
   delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
+  GridReordering<3>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<3>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);
 }
@@ -724,6 +728,7 @@ void GridIn<dim>::read_msh (std::istream &in)
 				   // do some clean-up on vertices...
   delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
+  GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);
 }
