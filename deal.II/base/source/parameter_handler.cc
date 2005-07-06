@@ -981,65 +981,73 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
     }
 
 
-                                   // if there was text before and
-                                   // there are sections to come, put
-                                   // two newlines between the last
-                                   // entry and the first subsection
+                                   // if there was text before and there are
+                                   // sections to come, put two newlines
+                                   // between the last entry and the first
+                                   // subsection; also make sure that the
+                                   // subsections will be printed at all
+                                   // (i.e. at least one of them is non-empty)
   if ((pd->entries.size() != 0)
       &&
-      (pd->subsections.size() != 0))
+      (pd->subsections.size() != 0)
+      &&
+      (pd->accumulated_no_of_entries() != pd->entries.size()))
     out << std::endl << std::endl;
 
-				   // now transverse subsections tree
+				   // now transverse subsections tree; only
+				   // plot a subsection, if it has at least
+				   // one entry somewhere in it
   std::map<std::string, Section*>::const_iterator ptrss;
-  for (ptrss = pd->subsections.begin(); ptrss != pd->subsections.end(); ++ptrss)
-    {
-      switch (style) 
-	{
-	  case Text:
-		out << std::setw(indent_level*2) << ""
-		    << "subsection " << ptrss->first << std::endl;
-		break;
-	  case LaTeX:
-		out << std::endl
-		    << "\\item {\\bf "
-		    << "Subsection " << ptrss->first
-		    << "}" << std::endl
-		    << "\\begin{itemize}"
-		    << std::endl;
-		break;
-	  default:
-		Assert (false, ExcNotImplemented());
-	};
-      enter_subsection (ptrss->first);
-      print_parameters_section (out, style, indent_level+1);
-      leave_subsection ();
-      switch (style) 
-	{
-	  case Text:
-						 // write end of
-						 // subsection. one
-						 // blank line after
-						 // each subsection
-		out << std::setw(indent_level*2) << ""
-		    << "end" << std::endl
-		    << std::endl;
+  for (ptrss = pd->subsections.begin();
+       ptrss != pd->subsections.end(); ++ptrss)
+    if (ptrss->second->accumulated_no_of_entries() != 0)
+      {
+        switch (style) 
+          {
+            case Text:
+                  out << std::setw(indent_level*2) << ""
+                      << "subsection " << ptrss->first << std::endl;
+                  break;
+            case LaTeX:
+                  out << std::endl
+                      << "\\item {\\bf "
+                      << "Subsection " << ptrss->first
+                      << "}" << std::endl
+                      << "\\begin{itemize}"
+                      << std::endl;
+                  break;
+            default:
+                  Assert (false, ExcNotImplemented());
+          };
+        enter_subsection (ptrss->first);
+        print_parameters_section (out, style, indent_level+1);
+        leave_subsection ();
+        switch (style) 
+          {
+            case Text:
+                                                   // write end of
+                                                   // subsection. one
+                                                   // blank line after
+                                                   // each subsection
+                  out << std::setw(indent_level*2) << ""
+                      << "end" << std::endl
+                      << std::endl;
 
-						 // if this is a toplevel
-						 // subsection, then have two
-						 // newlines
-		if (indent_level == 0)
-		  out << std::endl;
+                                                   // if this is a toplevel
+                                                   // subsection, then have two
+                                                   // newlines
+                  if (indent_level == 0)
+                    out << std::endl;
 		
-		break;
-	  case LaTeX:
-		out << "\\end{itemize}"
-		    << std::endl;
-		break;
-	  default:
-		Assert (false, ExcNotImplemented());
-	};
-    };
+                  break;
+            case LaTeX:
+                  out << "\\end{itemize}"
+                      << std::endl;
+                  break;
+            default:
+                  Assert (false, ExcNotImplemented());
+          }
+      }
 }
 
 
@@ -1327,6 +1335,24 @@ ParameterHandler::Section::~Section ()
     delete p->second;
 
   subsections.clear ();
+}
+
+
+
+unsigned int
+ParameterHandler::Section::
+accumulated_no_of_entries () const
+{
+                                   // number of entries in this section
+  unsigned int n = entries.size();
+
+                                   //  then accumulate over all children
+  for (std::map<std::string, Section*>::const_iterator
+         s = subsections.begin();
+       s != subsections.end(); ++s)
+    n += s->second->accumulated_no_of_entries();
+
+  return n;
 }
 
 
