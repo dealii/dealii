@@ -13,6 +13,7 @@
 
 #include <grid/grid_reordering.h>
 #include <grid/grid_reordering_internal.h>
+#include <grid/grid_tools.h>
 
 #include <algorithm>
 #include <set>
@@ -22,10 +23,21 @@
 
 #if deal_II_dimension == 1
 
-void GridReordering<1>::reorder_cells (const std::vector<CellData<1> > &)
+template<>
+void
+GridReordering<1>::reorder_cells (std::vector<CellData<1> > &)
 {
 				   // there should not be much to do
 				   // in 1d...
+}
+
+
+template<>
+void
+GridReordering<1>::invert_all_cells_of_negative_grid(const std::vector<Point<1> > &,
+						     std::vector<CellData<1> > &)
+{
+				   // nothing to be done in 1d
 }
 
 #endif
@@ -557,7 +569,9 @@ namespace internal
 } // namespace internal
 
 
-void GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells)
+template<>
+void
+GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells)
 {
                                    // check if grids are already
                                    // consistent. if so, do
@@ -567,6 +581,15 @@ void GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells
     return;
   
   internal::GridReordering2d::GridReordering().reorient(original_cells);
+}
+
+
+template<>
+void
+GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &,
+						     std::vector<CellData<2> > &)
+{
+				   // nothing to be done in 2d
 }
 
 #endif
@@ -1409,7 +1432,7 @@ namespace internal
 }
 
 
-
+template<>
 void
 GridReordering<3>::reorder_cells (std::vector<CellData<3> > &incubes)
 {
@@ -1420,6 +1443,43 @@ GridReordering<3>::reorder_cells (std::vector<CellData<3> > &incubes)
 				   // This does the real work
   internal::GridReordering3d::Orienter::orient_mesh (incubes);
 }
+
+
+template<>
+void
+GridReordering<3>::invert_all_cells_of_negative_grid(
+  const std::vector<Point<3> > &all_vertices,
+  std::vector<CellData<3> > &cells)
+{
+  unsigned int n_negative_cells=0;
+  for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
+    if (GridTools::cell_measure(all_vertices, cells[cell_no].vertices) < 0)
+      {
+	++n_negative_cells;
+	for (unsigned int i=0; i<4; ++i)
+	  swap(cells[cell_no].vertices[i], cells[cell_no].vertices[i+4]);
+	
+					 // check whether the
+					 // resulting cell is now ok.
+					 // if not, then the grid is
+					 // seriously broken and
+					 // should be sticked into the
+					 // bin
+	AssertThrow(GridTools::cell_measure(all_vertices, cells[cell_no].vertices) > 0,
+		    ExcInternalError());
+      }
+
+				   // We assuming that all cells of a
+				   // grid have either positive or
+				   // negative volumes but not both
+				   // mixed. Although above reordering
+				   // might work also on single cells,
+				   // grids with both kind of cells
+				   // are very likely to be
+				   // broken. Check for this here.
+  AssertThrow(n_negative_cells==0 || n_negative_cells==cells.size(), ExcInternalError());
+}
+
 
 
 	
