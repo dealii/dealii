@@ -144,7 +144,11 @@ DataOutBase::DXFlags::DXFlags (const bool write_multigrid,
 void DataOutBase::DXFlags::declare_parameters (ParameterHandler &prm)
 {
   prm.declare_entry ("Write multigrid", "true", Patterns::Bool());
-  prm.declare_entry ("Write neighbors", "true", Patterns::Bool());
+  prm.declare_entry ("Write neighbors", "true",
+                     Patterns::Bool(),
+                     "A boolean field indicating whether neighborship "
+                     "information between cells is to be written to the "
+                     "OpenDX output file");
 }
 
 
@@ -170,7 +174,12 @@ DataOutBase::DXFlags::memory_consumption () const
 
 void DataOutBase::UcdFlags::declare_parameters (ParameterHandler &prm)
 {
-  prm.declare_entry ("Write preamble", "true", Patterns::Bool());
+  prm.declare_entry ("Write preamble", "true",
+                     Patterns::Bool(),
+                     "A flag indicating whether a comment should be "
+                     "written to the beginning of the output file "
+                     "indicating date and time of creation as well "
+                     "as the creating program");
 }
 
 
@@ -215,11 +224,17 @@ DataOutBase::GnuplotFlags::memory_consumption () const
 void DataOutBase::PovrayFlags::declare_parameters (ParameterHandler &prm)
 {
   prm.declare_entry ("Use smooth triangles", "false",
-		     Patterns::Bool());
+		     Patterns::Bool(),
+                     "A flag indicating whether POVRAY should use smoothed "
+                     "triangles instead of the usual ones");
   prm.declare_entry ("Use bicubic patches", "false",
-		     Patterns::Bool());
+		     Patterns::Bool(),
+                     "Whether POVRAY should use bicubic patches");
   prm.declare_entry ("Include external file", "true",
-		     Patterns::Bool ());
+		     Patterns::Bool (),
+                     "Whether camera and lightling information should "
+                     "be put into an external file \"data.inc\" or into "
+                     "the POVRAY input file");
 }
 
 
@@ -397,29 +412,52 @@ bool DataOutBase::EpsCell2d::operator < (const EpsCell2d &e) const
 void DataOutBase::EpsFlags::declare_parameters (ParameterHandler &prm)
 {
   prm.declare_entry ("Index of vector for height", "0",
-		     Patterns::Integer());
+		     Patterns::Integer(),
+                     "Number of the input vector that is to be used to "
+                     "generate height information");
   prm.declare_entry ("Index of vector for color", "0",
-		     Patterns::Integer());
+		     Patterns::Integer(),
+                     "Number of the input vector that is to be used to "
+                     "generate color information");
   prm.declare_entry ("Scale to width or height", "width",
-		     Patterns::Selection ("width|height"));
+		     Patterns::Selection ("width|height"),
+                     "Whether width or height should be scaled to match "
+                     "the given size");
   prm.declare_entry ("Size (width or height) in eps units", "300",
-		     Patterns::Integer());
+		     Patterns::Integer(),
+                     "The size (width or height) to which the eps output "
+                     "file is to be scaled");
   prm.declare_entry ("Line widths in eps units", "0.5",
-		     Patterns::Double());
+		     Patterns::Double(),
+                     "The width in which the postscript renderer is to "
+                     "plot lines");
   prm.declare_entry ("Azimut angle", "60",
-		     Patterns::Double(0,180));
+		     Patterns::Double(0,180),
+                     "Angle of the viewing position against the vertical "
+                     "axis");
   prm.declare_entry ("Turn angle", "30",
-		     Patterns::Double(0,360));
+		     Patterns::Double(0,360),
+                     "Angle of the viewing direction against the y-axis");
   prm.declare_entry ("Scaling for z-axis", "1",
-		     Patterns::Double ());
+		     Patterns::Double (),
+                     "Scaling for the z-direction relative to the scaling "
+                     "used in x- and y-directions");
   prm.declare_entry ("Draw mesh lines", "true",
-		     Patterns::Bool());
+		     Patterns::Bool(),
+                     "Whether the mesh lines, or only the surface should be "
+                     "drawn");
   prm.declare_entry ("Fill interior of cells", "true",
-		     Patterns::Bool());
+		     Patterns::Bool(),
+                     "Whether only the mesh lines, or also the interior of "
+                     "cells should be plotted. If this flag is false, then "
+                     "one can see through the mesh");
   prm.declare_entry ("Color shading of interior of cells", "true",
-		     Patterns::Bool());
+		     Patterns::Bool(),
+                     "Whether the interior of cells shall be shaded");
   prm.declare_entry ("Color function", "default",
-		     Patterns::Selection ("default|grey scale|reverse grey scale"));
+		     Patterns::Selection ("default|grey scale|reverse grey scale"),
+                     "Name of a color function used to colorize mesh lines "
+                     "and/or cell interiors");
 }
 
 
@@ -4448,7 +4486,8 @@ void
 DataOutInterface<dim,spacedim>::declare_parameters (ParameterHandler &prm) 
 {
   prm.declare_entry ("Output format", "gnuplot",
-		     Patterns::Selection (get_output_format_names ()));
+		     Patterns::Selection (get_output_format_names ()),
+                     "A name for the output format to be used");
 
   prm.enter_subsection ("DX output parameters");
   DXFlags::declare_parameters (prm);
