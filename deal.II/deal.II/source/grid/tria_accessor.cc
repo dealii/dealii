@@ -1558,7 +1558,7 @@ double TriaObjectAccessor<3, 3>::measure () const
   for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
     vertex_indices[i]=vertex_index(i);
 
-  return GridTools::cell_measure(tria->vertices, vertex_indices);
+  return GridTools::cell_measure(this->tria->vertices, vertex_indices);
 }
 
 #endif
