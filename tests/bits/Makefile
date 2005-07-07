@@ -21,7 +21,7 @@ default: run-tests
 
 ############################################################
 
-tests_x = geometry_info_1 \
+tests_x = geometry_info_* \
 	  grid_generator_?? \
 	  grid_in_* \
 	  point_inside_? \
