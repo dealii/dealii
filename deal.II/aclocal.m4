@@ -36,6 +36,15 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
     fi
   fi
 
+  dnl And because it is so convenient, the PathScale compiler also identifies
+  dnl itself as GCC...
+  if test "$GXX" = "yes" ; then
+    GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "PathScale"`
+    if test "x$GXX_VERSION_STRING" != "x" ; then
+      GXX=no
+    fi
+  fi
+
   if test "$GXX" = yes ; then
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
@@ -297,10 +306,18 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
    	                GXX_VERSION_DETAILED=$GXX_VERSION
                       else
   
-                        dnl  Aw, nothing suitable found...
-                        AC_MSG_RESULT(Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org)
-                        GXX_VERSION=unknown_cc
-                        GXX_VERSION_DETAILED=$GXX_VERSION
+                        dnl Maybe PathScale's compiler?
+                        is_pathscale="`($CXX -v 2>&1) | grep PathScale`"
+                        if test "x$is_pathscale" != "x" ; then
+                          AC_MSG_RESULT(C++ compiler is PathScale C++)
+  	                  GXX_VERSION=pathscale_cc
+   	                  GXX_VERSION_DETAILED=$GXX_VERSION
+                        else
+                          dnl  Aw, nothing suitable found...
+                          AC_MSG_RESULT(Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org)
+                          GXX_VERSION=unknown_cc
+                          GXX_VERSION_DETAILED=$GXX_VERSION
+                        fi
                       fi
                     fi
                   fi
@@ -685,15 +702,20 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSPIC=""
           LDFLAGSPIC=""
           AC_MSG_ERROR(Attention! deal.II is not known to work with Borland C++!
-	If you intend to port it to Borland C++, please remove this message
-	from aclocal.m4 and call autoconf and configure. If you do not understand
-	this, you will NOT want to do it!)
+		If you intend to port it to Borland C++, please remove this message
+		from aclocal.m4 and call autoconf and configure. If you do not
+		understand this, you will NOT want to do it!)
+          ;;
+
+      pathscale_cc)
+	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g"
+	  CXXFLAGSO="$CXXFLAGS -O3"
           ;;
 
       *)
-	CXXFLAGSG="$CXXFLAGS -DDEBUG"
-	CXXFLAGSO="$CXXFLAGS -O2"
-        AC_MSG_RESULT(Unknown C++ compiler - using generic options)
+	  CXXFLAGSG="$CXXFLAGS -DDEBUG"
+	  CXXFLAGSO="$CXXFLAGS -O2"
+          AC_MSG_RESULT(Unknown C++ compiler - using generic options)
           ;;
     esac
   fi
