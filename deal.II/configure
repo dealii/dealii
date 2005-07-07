@@ -2837,6 +2837,13 @@ fi
     fi
   fi
 
+      if test "$GXX" = "yes" ; then
+    GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "PathScale"`
+    if test "x$GXX_VERSION_STRING" != "x" ; then
+      GXX=no
+    fi
+  fi
+
   if test "$GXX" = yes ; then
         GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
@@ -3092,10 +3099,18 @@ echo "${ECHO_T}C++ compiler is KAI C++" >&6
    	                GXX_VERSION_DETAILED=$GXX_VERSION
                       else
 
-                                                echo "$as_me:$LINENO: result: Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org" >&5
+                                                is_pathscale="`($CXX -v 2>&1) | grep PathScale`"
+                        if test "x$is_pathscale" != "x" ; then
+                          echo "$as_me:$LINENO: result: C++ compiler is PathScale C++" >&5
+echo "${ECHO_T}C++ compiler is PathScale C++" >&6
+  	                  GXX_VERSION=pathscale_cc
+   	                  GXX_VERSION_DETAILED=$GXX_VERSION
+                        else
+                                                    echo "$as_me:$LINENO: result: Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org" >&5
 echo "${ECHO_T}Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org" >&6
-                        GXX_VERSION=unknown_cc
-                        GXX_VERSION_DETAILED=$GXX_VERSION
+                          GXX_VERSION=unknown_cc
+                          GXX_VERSION_DETAILED=$GXX_VERSION
+                        fi
                       fi
                     fi
                   fi
@@ -3488,20 +3503,25 @@ echo "$as_me: error: Attention! deal.II is not known to work with SUN Compilers!
           CXXFLAGSPIC=""
           LDFLAGSPIC=""
           { { echo "$as_me:$LINENO: error: Attention! deal.II is not known to work with Borland C++!
-	If you intend to port it to Borland C++" >&5
+		If you intend to port it to Borland C++" >&5
 echo "$as_me: error: Attention! deal.II is not known to work with Borland C++!
-	If you intend to port it to Borland C++" >&2;}
+		If you intend to port it to Borland C++" >&2;}
    { (exit please remove this message
-	from aclocal.m4 and call autoconf and configure. If you do not understand
-	this); exit please remove this message
-	from aclocal.m4 and call autoconf and configure. If you do not understand
-	this; }; }
+		from aclocal.m4 and call autoconf and configure. If you do not
+		understand this); exit please remove this message
+		from aclocal.m4 and call autoconf and configure. If you do not
+		understand this; }; }
+          ;;
+
+      pathscale_cc)
+	  CXXFLAGSG="$CXXFLAGS -DDEBUG -g"
+	  CXXFLAGSO="$CXXFLAGS -O3"
           ;;
 
       *)
-	CXXFLAGSG="$CXXFLAGS -DDEBUG"
-	CXXFLAGSO="$CXXFLAGS -O2"
-        echo "$as_me:$LINENO: result: Unknown C++ compiler - using generic options" >&5
+	  CXXFLAGSG="$CXXFLAGS -DDEBUG"
+	  CXXFLAGSO="$CXXFLAGS -O2"
+          echo "$as_me:$LINENO: result: Unknown C++ compiler - using generic options" >&5
 echo "${ECHO_T}Unknown C++ compiler - using generic options" >&6
           ;;
     esac
