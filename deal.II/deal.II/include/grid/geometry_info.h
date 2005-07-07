@@ -228,29 +228,52 @@ struct GeometryInfo
 				     /**
 				      * Number of lines on each face.
 				      */
-    static const unsigned int lines_per_face = GeometryInfo<dim-1>::lines_per_cell;
+    static const unsigned int lines_per_face
+    = GeometryInfo<dim-1>::lines_per_cell;
     
 				     /**
 				      * Number of quads on each face.
 				      */
-    static const unsigned int quads_per_face = (dim == 3) ? 1 : 0;
+    static const unsigned int quads_per_face
+    = GeometryInfo<dim-1>::quads_per_cell;
 
 				     /**
 				      * Number of lines of a cell.
+				      *
+				      * The formula to compute this makes use
+				      * of the fact that when going from one
+				      * dimension to the next, the object of
+				      * the lower dimension is copied once
+				      * (thus twice the old number of lines)
+				      * and then a new line is inserted
+				      * between each vertex of the old object
+				      * and the corresponding one in the copy.
 				      */
-    static const unsigned int lines_per_cell = (dim == 3) ? 12 : ((dim == 2) ? 4 : 1);
+    static const unsigned int lines_per_cell
+    = (2*GeometryInfo<dim-1>::lines_per_cell +
+       GeometryInfo<dim-1>::vertices_per_cell);
 
 				     /**
 				      * Number of quadrilaterals of a
 				      * cell.
+				      *
+				      * This number is computed recursively
+				      * just as the previous one, with the
+				      * exception that new quads result from
+				      * connecting an original line and its
+				      * copy.
 				      */
-    static const unsigned int quads_per_cell = (dim == 3) ? 6 : ((dim == 2) ? 1 : 0);
+    static const unsigned int quads_per_cell
+    = (2*GeometryInfo<dim-1>::quads_per_cell +
+       GeometryInfo<dim-1>::lines_per_cell);
 
 				     /**
 				      * Number of hexahedra of a
 				      * cell.
 				      */
-    static const unsigned int hexes_per_cell = (dim == 3) ? 1 : 0;
+    static const unsigned int hexes_per_cell
+    = (2*GeometryInfo<dim-1>::hexes_per_cell +
+       GeometryInfo<dim-1>::quads_per_cell);
 
 				     /**
 				      * List of numbers which
