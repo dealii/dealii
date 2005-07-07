@@ -4002,7 +4002,10 @@ void f (const std::ostream &out);
 
 dnl -------------------------------------------------------------
 dnl Check whether glibc-like stacktrace information is available
-dnl for the Exception class
+dnl for the Exception class. If it is, then try to also determine
+dnl whether the compiler accepts the -rdynamic flag, since that is
+dnl recommended for linking if one wants to have meaningful
+dnl backtraces.
 dnl
 dnl Usage: DEAL_II_HAVE_GLIBC_STACKTRACE
 dnl
@@ -4028,6 +4031,20 @@ AC_DEFUN(DEAL_II_HAVE_GLIBC_STACKTRACE, dnl
                 [Define if deal.II is linked against the GNU C library,
                  which provides stacktrace debug information that can be
                  printed out in the exception class])
+
+      AC_MSG_CHECKING(whether compiler accepts -rdynamic)
+
+      CXXFLAGS="$CXXFLAGSG -rdynamic"
+      AC_TRY_LINK(
+        [],
+        [;],
+        [
+          AC_MSG_RESULT(yes)
+          LDFLAGS="$LDFLAGS -rdynamic"
+        ],
+        [
+          AC_MSG_RESULT(no)
+        ])
     ],
     [
       AC_MSG_RESULT(no)
