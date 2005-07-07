@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------
 
 
+#include "../tests.h"
 #include <base/vector_slice.h>
 #include <base/logstream.h>
 
