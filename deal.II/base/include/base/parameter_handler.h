@@ -1532,6 +1532,12 @@ class ParameterHandler
             std::string            value;
             std::string            documentation;
             Patterns::PatternBase *pattern;
+
+                                             /**
+                                              * Return whether this entry has
+                                              * some form of documentation.
+                                              */
+            bool has_documentation () const;
         };
         
                                          /**

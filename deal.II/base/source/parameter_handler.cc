@@ -1002,6 +1002,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
        ptrss != pd->subsections.end(); ++ptrss)
     if (ptrss->second->accumulated_no_of_entries() != 0)
       {
+                                         // first print the subsection header
         switch (style) 
           {
             case Text:
@@ -1019,6 +1020,9 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
             default:
                   Assert (false, ExcNotImplemented());
           };
+
+                                         // then the contents of the
+                                         // subsection
         enter_subsection (ptrss->first);
         print_parameters_section (out, style, indent_level+1);
         leave_subsection ();
@@ -1371,6 +1375,15 @@ ParameterHandler::Section::memory_consumption () const
     mem += (MemoryConsumption::memory_consumption (i->first) +
 	    MemoryConsumption::memory_consumption (*(i->second)));
   return mem;
+}
+
+
+
+bool
+ParameterHandler::Section::EntryContent::
+has_documentation () const
+{
+  return documentation != "";
 }
 
 
