@@ -67,7 +67,8 @@ std::string              parameter_file;
                                  // to list the parameters that are allowed in
                                  // the parameter file (the
                                  // ``ParameterHandler'' class has a function
-                                 // to do exactly this):
+                                 // to do exactly this; see the results
+                                 // section for what it prints):
 void
 print_usage_message ()
 {
@@ -94,19 +95,26 @@ print_usage_message ()
 }
 
 
+                                 // The second function is used to declare the
+                                 // parameters this program accepts from the
+                                 // input file. While we don't actually take
+                                 // many parameters from the input file except
+                                 // for, possibly, the output file name and
+                                 // format, we nevertheless want to show how
+                                 // to work with parameter files.
 void declare_parameters ()
 {
   prm.declare_entry ("Output file", "",
                      Patterns::Anything(),
                      "The name of the output file to be generated");
 
-  DataOutInterface<1,1>::declare_parameters (prm);
+  DataOutInterface<1>::declare_parameters (prm);
 }
 
   
 
 void
-parse_command_line (const int                 argc,
+parse_command_line (const int                argc,
                     char             *const* argv)
 {
   if (argc < 2)
