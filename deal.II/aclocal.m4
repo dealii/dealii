@@ -4018,6 +4018,7 @@ AC_DEFUN(DEAL_II_HAVE_GLIBC_STACKTRACE, dnl
   AC_TRY_COMPILE(
     [
 #include <execinfo.h>
+#include <stdlib.h>
     ],
     [
         void * array[25];
