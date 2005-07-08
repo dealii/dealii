@@ -12,7 +12,7 @@
 ###########################################################################
 include ../../common/Make.global_options
 
-all: product_matrix.exe block_matrix_array.exe
+all: product_matrix$(EXEEXT) block_matrix_array$(EXEEXT)
 
 ######################################################################
 # Compilation of source code
@@ -26,11 +26,11 @@ all: product_matrix.exe block_matrix_array.exe
 # Specific targets
 ######################################################################
 
-block_matrix_array.exe: block_matrix_array.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
+block_matrix_array$(EXEEXT): block_matrix_array.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
 	@echo =====linking====$(MT)== $<
 	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-product_matrix.exe: product_matrix.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
+product_matrix$(EXEEXT): product_matrix.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
 	@echo =====linking====$(MT)== $<
 	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
 
@@ -39,4 +39,4 @@ product_matrix.exe: product_matrix.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
 ######################################################################
 
 clean:
-	-rm -f *~ *.$(OBJEXT) *.exe
+	-rm -f *~ *.$(OBJEXT) $(all)
