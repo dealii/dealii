@@ -18,7 +18,7 @@ all: product_matrix.exe block_matrix_array.exe
 # Compilation of source code
 ######################################################################
 
-%.o : %.cc
+%.$(OBJEXT) : %.cc
 	@echo =====debug======$(MT)== $<
 	@$(CXX) $(CXXFLAGS.g) $(CXXFLAGS) -c $< -o $@
 
@@ -26,11 +26,11 @@ all: product_matrix.exe block_matrix_array.exe
 # Specific targets
 ######################################################################
 
-block_matrix_array.exe: block_matrix_array.o $(lib-lac.g) $(lib-base.g)
+block_matrix_array.exe: block_matrix_array.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
 	@echo =====linking====$(MT)== $<
 	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-product_matrix.exe: product_matrix.o $(lib-lac.g) $(lib-base.g)
+product_matrix.exe: product_matrix.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
 	@echo =====linking====$(MT)== $<
 	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
 
@@ -39,4 +39,4 @@ product_matrix.exe: product_matrix.o $(lib-lac.g) $(lib-base.g)
 ######################################################################
 
 clean:
-	-rm -f *~ *.o *.exe
+	-rm -f *~ *.$(OBJEXT) *.exe
