@@ -473,6 +473,7 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
 }
 
 
+// This function is tested by tests/fe/internals, since it produces the matrices printed there
 template<int dim, typename number>
 void
 FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
@@ -585,14 +586,12 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 }
 
 
-
-//TODO[GK]: this function does not work yet.
+// This function is tested by tests/fe/internals, since it produces the matrices printed there
 template<int dim, typename number>
 void
 FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
 				     FullMatrix<number>* matrices)
 {
-  Assert(false, ExcNotImplemented());
   const unsigned int nc = GeometryInfo<dim>::children_per_cell;
   const unsigned int n  = fe.dofs_per_cell;
   const unsigned int nd = fe.n_components();
@@ -629,7 +628,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
     for (unsigned int i=0;i<n;++i)
       for (unsigned int j=0;j<n;++j)
 	if (fe.is_primitive())
-	  A(i,j) = coarse.JxW(k)
+	  A(i,j) += coarse.JxW(k)
 		   * coarse.shape_value(i,k)
 		   * coarse.shape_value(j,k);
 	else
@@ -639,7 +638,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
 		     * coarse.shape_value_component(j,k,d);
   
   Householder<double> H(A);
-  
+
   Vector<number> v_coarse(n);
   Vector<number> v_fine(n);
   
@@ -663,6 +662,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
 				       // grid shape functions phi_j
       for (unsigned int j=0;j<fe.dofs_per_cell;++j)
 	{
+	  v_fine = 0.;
 					   // Loop over all quadrature points
 	  for (unsigned int k=0;k<fine.n_quadrature_points;++k)
 	    {
@@ -690,7 +690,7 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
 					   // matrix
 	  H.least_squares(v_coarse, v_fine);
 	  for (unsigned int i=0;i<fe.dofs_per_cell;++i)
-	    this_matrix(j,i) = v_coarse(i);
+	    this_matrix(i,j) = v_coarse(i);
 	}
       
 				       // Remove small entries from

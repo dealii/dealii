@@ -152,34 +152,6 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
     virtual unsigned int memory_consumption () const;
 
 
-				     /**
-				      * Declare a nested class which
-				      * will hold static definitions
-				      * of various matrices such as
-				      * projection matrices. The
-				      * definition of the various
-				      * static fields are in the files
-				      * <tt>fe_dgq_[123]d.cc</tt> in
-				      * the source directory.
-				      */
-    struct Matrices
-    {
-					 /**
-					  * As @p embedding but for
-					  * projection matrices.
-					  */
-	static const double * const projection_matrices[];
-
-					 /**
-					  * As
-					  * @p n_embedding_matrices
-					  * but for projection
-					  * matrices.
-					  */
-	static const unsigned int n_projection_matrices;
-    };
-
-    
   protected:
 
 				     /**
@@ -247,27 +219,5 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 };
 
 /*@}*/
-
-// declaration of explicit specializations of member variables, if the
-// compiler allows us to do that (the standard says we must)
-#ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-template <>
-const double * const FE_DGQ<1>::Matrices::projection_matrices[];
-
-template <>
-const unsigned int FE_DGQ<1>::Matrices::n_projection_matrices;
-
-template <>
-const double * const FE_DGQ<2>::Matrices::projection_matrices[];
-
-template <>
-const unsigned int FE_DGQ<2>::Matrices::n_projection_matrices;
-
-template <>
-const double * const FE_DGQ<3>::Matrices::projection_matrices[];
-
-template <>
-const unsigned int FE_DGQ<3>::Matrices::n_projection_matrices;
-#endif
 
 #endif

@@ -15,6 +15,8 @@
 #include <fe/fe_dgq.h>
 #include <fe/fe_tools.h>
 
+
+#include <iostream>
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
 #else
@@ -144,77 +146,17 @@ FE_DGQ<dim>::FE_DGQ (const unsigned int degree)
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
 		    get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
-				   // generate permutation/rotation
-				   // index sets to generate some
-				   // matrices from others
-  std::vector<unsigned int> right;
-  std::vector<unsigned int> top;
-  rotate_indices (right, 'Z');
-  if (dim>2)
-    rotate_indices (top, 'X');
-  
+				   // Fill prolongation matrices with embedding operators
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     this->prolongation[i].reinit (this->dofs_per_cell,
 				  this->dofs_per_cell);
   FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
+				   // Fill restriction matrices with L2-projection
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+    this->restriction[i].reinit (this->dofs_per_cell,
+				  this->dofs_per_cell);
+  FETools::compute_projection_matrices (*this, &this->restriction[0]);
   
-				   // same as above: copy over matrix
-				   // from predefined values and
-				   // generate all others by rotation
-  if ((degree < Matrices::n_projection_matrices) &&
-      (Matrices::projection_matrices[degree] != 0))
-    {
-      for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-        this->restriction[i].reinit (this->dofs_per_cell,
-                                     this->dofs_per_cell);
-      this->restriction[0].fill (Matrices::projection_matrices[degree]);
-      switch (dim)
-	{
-	  case 1:
-          {
-	    this->restriction[1].fill_permutation (this->restriction[0],
-						   right, right);
-	    break;
-          };
-          
-	  case 2:
-          {
-	    this->restriction[1].fill_permutation (this->restriction[0],
-						   right, right);
-	    this->restriction[2].fill_permutation (this->restriction[1],
-						   right, right);
-	    this->restriction[3].fill_permutation (this->restriction[2],
-						   right, right);
-	    break;
-          };
-          
-	  case 3:
-          {
-	    this->restriction[1].fill_permutation (this->restriction[0],
-						   right, right);
-	    this->restriction[5].fill_permutation (this->restriction[1],
-						   right, right);
-	    this->restriction[4].fill_permutation (this->restriction[5],
-						   right, right);
-	    this->restriction[7].fill_permutation (this->restriction[4],
-						   top, top);
-	    this->restriction[3].fill_permutation (this->restriction[7],
-						   top, top);
-	    this->restriction[6].fill_permutation (this->restriction[5],
-						   top, top);
-	    this->restriction[2].fill_permutation (this->restriction[6],
-						   top, top);
-	    break;
-          };
-          
-	  default:
-	    Assert (false, ExcNotImplemented());
-	}
-    }
-  else
-				     // matrix undefined, leave matrix
-				     // at size zero
-    ;
   
 				   // finally fill in support points
   if (degree == 0)
