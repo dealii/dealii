@@ -1094,6 +1094,29 @@ DataSetDescriptor ()
 
 
 
+template <int dim>
+Quadrature<dim>
+QProjector<dim>::project_to_face(const SubQuadrature &quadrature,
+				 const unsigned int face_no)
+{
+  std::vector<Point<dim> > points(quadrature.n_quadrature_points);
+  project_to_face(quadrature, face_no, points);
+  return Quadrature<dim>(points, quadrature.get_weights());
+}
+
+
+template <int dim>
+Quadrature<dim>
+QProjector<dim>::project_to_subface(const SubQuadrature &quadrature,
+				    const unsigned int face_no,
+				    const unsigned int subface_no)
+{
+  std::vector<Point<dim> > points(quadrature.n_quadrature_points);
+  project_to_subface(quadrature, face_no, subface_no, points);
+  return Quadrature<dim>(points, quadrature.get_weights());
+}
+
+
 // ------------------------------------------------------------ //
 
 

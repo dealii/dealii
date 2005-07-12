@@ -90,19 +90,51 @@ class QProjector
 				 const unsigned int      face_no,
 				 std::vector<Point<dim> > &q_points);
 
+				     /**
+				      * Compute the cell quadrature
+				      * formula corresponding to using
+				      * <tt>quadrature</tt> on face
+				      * <tt>face_no</tt>. For further
+				      * details, see the general doc
+				      * for this class.
+				      */
+    static Quadrature<dim>
+    project_to_face (const SubQuadrature &quadrature,
+		     const unsigned int      face_no);
+
     				     /**
 				      * Compute the quadrature points
 				      * on the cell if the given
 				      * quadrature formula is used on
 				      * face <tt>face_no</tt>, subface
-				      * number <tt>subface_no</tt>. For
-				      * further details, see the
-				      * general doc for this class.
+				      * number <tt>subface_no</tt>.
+				      *
+				      * @note Only the points are
+				      * transformed. The quadrature
+				      * weights are the same as those
+				      * of the original rule.
 				      */
     static void project_to_subface (const SubQuadrature &quadrature,
 				    const unsigned int   face_no,
 				    const unsigned int   subface_no,
 				    std::vector<Point<dim> > &q_points);
+
+				     /**
+				      * Compute the cell quadrature
+				      * formula corresponding to using
+				      * <tt>quadrature</tt> on subface
+				      * <tt>subface_no</tt> of face
+				      * <tt>face_no</tt>.
+				      *
+				      * @note Only the points are
+				      * transformed. The quadrature
+				      * weights are the same as those
+				      * of the original rule.
+				      */
+    static Quadrature<dim>
+    project_to_subface (const SubQuadrature &quadrature,
+			const unsigned int      face_no,
+			const unsigned int   subface_no);
 
 				     /**
 				      * Take a face quadrature formula
