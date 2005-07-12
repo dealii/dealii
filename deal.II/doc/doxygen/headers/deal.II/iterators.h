@@ -1,5 +1,5 @@
 /**
-@page Iterators Iterators on mesh like containers
+ @defgroup Iterators Iterators on mesh like containers
 
 deal.II has several classes which are understood conceptionally as
 meshes. Apart from the obvious Triangulation, these are DoFHandler and
@@ -58,10 +58,10 @@ distinction is only in the Accessor.
 
 The standard loops are
 <dl>
-<dt>TriaIterator</tt>
+<dt>TriaIterator</dt>
 <dd>Traverse all cells on all levels</dd>
 
-<dt>TriaActiveIterator</tt>
+<dt>TriaActiveIterator</dt>
 <dd>Loop over @ref GlossActive "active cells" only</dd> 
 </dl>
 
@@ -73,7 +73,6 @@ is determined by the Accessor. The magic is, that for any iterator
 <tt>i</tt>, the term <tt>i-&gt;</tt> grants access to <b>all</b>
 attributes of this Accessor.
 
-
 @section IteratorsTypedefs Iterators defined in the containers
 
 The standard iterators are typedefed inside the classes. These are
@@ -82,4 +81,20 @@ The standard iterators are typedefed inside the classes. These are
 <tr><th></th>
 <th>cell_iterator</th>
 <th>face_iterator</th>
+</tr>
+<tr>
+<th>Triangulation</th>
+<td>TriaIterator&lt;dim, CellAccessor&lt;dim&gt; &gt;</td>
+<td>TriaIterator&lt;dim, TriaObjectAccessor&lt;dim-1, dim&gt; &gt;</td>
+</tr>
+<tr>
+<th>DoFHandler</th>
+<td>TriaIterator&lt;dim, DoFCellAccessor&lt;dim&gt; &gt;</td>
+<td>TriaIterator&lt;dim, DoFObjectAccessor&lt;dim-1, dim&gt; &gt;</td>
+</tr>
 </table>
+
+@section IteratorsFiltered Filtered iterators
+...
+*/
+

@@ -12,7 +12,7 @@
 //-------------------------------------------------------------------------
 
 /**
- * @defgroup grid Grids
+ * @defgroup grid Grid Classes
  */
 
 /**
@@ -21,6 +21,11 @@
 
 /**
  * @defgroup feall Finite Elements
+ *
+ * All classes related to shape functions and to access to shape
+ * functions.  This concerns the actual values of finite elements. For
+ * the numbering of degrees of freedom refer to @ref dofs.
+ *
  * @{
  */
 /**
