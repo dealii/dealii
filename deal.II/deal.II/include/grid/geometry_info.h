@@ -39,6 +39,7 @@ template <int dim> class GeometryInfo;
  * vertices, neighbors and so on, since it can be used dimension
  * independently.
  *
+ * @ingroup grid
  * @author Wolfgang Bangerth, 1998
  */
 template <>
@@ -108,10 +109,92 @@ struct GeometryInfo<0>
 
 
 /**
+ * Topological description of four dimensional cells. This class is
+ * required in some exotic cases where we compute information in a
+ * one-larger dimension than the present, and do so also in 3d (for
+ * example, stacking the solutions of a d-dimensional time dependent
+ * equation timestep after timestep in a (d+1)-dimensional space).
+ *
+ * This class contains as static members information on vertices and
+ * faces of a @p dim-dimensional grid cell. The interface is the same
+ * for all dimensions. If a value is of no use in a low dimensional
+ * cell, it is (correctly) set to zero, e.g. @p subfaces_per_cell in
+ * 1d.
+ *
+ * This information should always replace hard-coded numbers of
+ * vertices, neighbors and so on, since it can be used dimension
+ * independently.
+ *
+ * @ingroup grid
+ * @author Wolfgang Bangerth, 1998
+ */
+template <>
+struct GeometryInfo<4>
+{
+
+				     /**
+				      * Number of children a cell has.
+				      */
+    static const unsigned int children_per_cell = 16;
+
+				     /**
+				      * Number of faces a cell has.
+				      */
+    static const unsigned int faces_per_cell    = 8;
+
+				     /**
+				      * Number of children each face has
+				      * when the adjacent cell is refined.
+				      */
+    static const unsigned int subfaces_per_face = 8;
+
+				     /**
+				      * Number of vertices a cell has.
+				      */
+    static const unsigned int vertices_per_cell = 16;
+
+				     /**
+				      * Number of vertices each face
+				      * has.
+				      */
+    static const unsigned int vertices_per_face = 8;
+
+				     /**
+				      * Number of lines each face has.
+				      */
+    static const unsigned int lines_per_face    = 12;
+    
+				     /**
+				      * Number of quads on each face.
+				      */
+    static const unsigned int quads_per_face    = 6;
+
+				     /**
+				      * Number of lines of a cell.
+				      */
+    static const unsigned int lines_per_cell    = 32;
+
+				     /**
+				      * Number of quadrilaterals of a
+				      * cell.
+				      */
+    static const unsigned int quads_per_cell    = 24;
+
+				     /**
+				      * Number of hexahedra of a
+				      * cell.
+				      */
+    static const unsigned int hexes_per_cell    = 8;
+};
+
+
+
+/**
  * This template specifies the interface to all topological structure
  * of the mesh cells. This template class can be instantiated for
  * dim=1,2 and 3.
  *
+ * @ingroup grid
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005
  */
 template <int dim>
