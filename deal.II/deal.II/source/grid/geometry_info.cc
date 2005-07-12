@@ -210,6 +210,35 @@ GeometryInfo<3>::line_to_cell_vertices (const unsigned int line,
 
 
 
+//TODO:[GK] Is this the correct notion in 1D?
+template <>
+unsigned int
+GeometryInfo<1>::face_to_cell_lines (const unsigned int face,
+				     const unsigned int line,
+				     const bool)
+{
+  Assert (face+1<faces_per_cell+1, ExcIndexRange(face, 0, faces_per_cell));
+  Assert (line+1<lines_per_face+1, ExcIndexRange(line, 0, lines_per_face));
+
+  return face;
+}
+
+
+
+template <>
+unsigned int
+GeometryInfo<2>::face_to_cell_lines (const unsigned int face,
+				     const unsigned int line,
+				     const bool)
+{
+  Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
+  Assert (line<lines_per_face, ExcIndexRange(line, 0, lines_per_face));
+
+  return face;
+}
+
+
+
 template <>
 unsigned int
 GeometryInfo<3>::face_to_cell_lines (const unsigned int face,
