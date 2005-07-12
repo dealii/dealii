@@ -2122,10 +2122,10 @@ unit_symmetric_tensor<3> ()
  * representation of the linear deviator operator.
  *
  * For every tensor <tt>t</tt>, there holds the identity
- * <tt>deviator(t)==deviator_tensor<dim>()*t</tt>, up to numerical
+ * <tt>deviator(t)==deviator_tensor&lt;dim&gt;()*t</tt>, up to numerical
  * round-off. The reason this operator representation is provided since one
- * sometimes needs to invert operators like <tt>identity_tensor<dim>() +
- * delta_t*deviator_tensor<dim>()</tt> or similar.
+ * sometimes needs to invert operators like <tt>identity_tensor&lt;dim&gt;() +
+ * delta_t*deviator_tensor&lt;dim&gt;()</tt> or similar.
  * 
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -2163,10 +2163,10 @@ deviator_tensor ()
  * representation of the linear deviator operator.
  *
  * For every tensor <tt>t</tt>, there holds the identity
- * <tt>deviator(t)==deviator_tensor<dim>()*t</tt>, up to numerical
+ * <tt>deviator(t)==deviator_tensor&lt;dim&gt;()*t</tt>, up to numerical
  * round-off. The reason this operator representation is provided since one
- * sometimes needs to invert operators like <tt>identity_tensor<dim>() +
- * delta_t*deviator_tensor<dim>()</tt> or similar.
+ * sometimes needs to invert operators like <tt>identity_tensor&lt;dim&gt;() +
+ * delta_t*deviator_tensor&lt;dim&gt;()</tt> or similar.
  * 
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
@@ -2199,7 +2199,7 @@ identity_tensor ()
 
 /**
  * Return the tensor of rank 4 that is the outer product of the two tensors
- * given as arguments, i.e. the result <tt>T=t1 \otimes t2</tt> satisfies
+ * given as arguments, i.e. the result $T=t1 \otimes t2$ satisfies
  * <tt>T phi = t1 (t2 : phi)</tt> for all symmetric tensors <tt>phi</tt>.
  *
  * For example, the deviator tensor can be computed as
