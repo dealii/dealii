@@ -13,6 +13,7 @@
 
 
 #include <base/quadrature_lib.h>
+#include <base/qprojector.h>
 #include <base/logstream.h>
 #include <lac/full_matrix.h>
 #include <lac/householder.h>
@@ -583,6 +584,175 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
     }
   Assert (cell_number == GeometryInfo<dim>::children_per_cell,
           ExcInternalError());
+}
+
+
+// This function is tested by tests/fe/internals, since it produces the matrices printed there
+
+//TODO:[GK] Is this correct for vector valued?
+template<int dim, typename number>
+void
+FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
+					 FullMatrix<number>* matrices,
+					 unsigned int face_coarse,
+					 unsigned int face_fine)
+{
+  const unsigned int nc = GeometryInfo<dim>::subfaces_per_face;
+  const unsigned int n  = fe.dofs_per_face;
+  const unsigned int nd = fe.n_components();
+  const unsigned int degree = fe.degree;
+  
+  for (unsigned int i=0;i<nc;++i)
+    {
+      Assert(matrices[i].n() == n, ExcDimensionMismatch(matrices[i].n(),n));
+      Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(),n));
+    }
+  
+                                   // Set up a meshes, one with a single
+                                   // reference cell and refine it once
+  Triangulation<dim> tria;
+  GridGenerator::hyper_cube (tria, 0, 1);
+  tria.refine_global(1);
+
+  MappingCartesian<dim> mapping;
+  QGauss<dim-1> q_gauss(degree+1);
+  const Quadrature<dim> q_fine = QProjector<dim>::project_to_face(q_gauss, face_fine);
+  
+  const unsigned int nq = q_fine.n_quadrature_points;
+
+				   // In order to make the loops below
+				   // simpler, we introduce vectors
+				   // containing for indices 0-n the
+				   // number of the corresponding
+				   // shape value on the cell.
+  std::vector<unsigned int> face_c_dofs(n);
+  std::vector<unsigned int> face_f_dofs(n);
+  unsigned int k=0;
+  for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_face;++i)
+    {
+      const unsigned int offset_c = GeometryInfo<dim>::face_to_cell_vertices(face_coarse, i)
+				    *fe.dofs_per_vertex;
+      const unsigned int offset_f = GeometryInfo<dim>::face_to_cell_vertices(face_fine, i)
+				    *fe.dofs_per_vertex;
+      for (unsigned int j=0;j<fe.dofs_per_vertex;++j)
+	{
+	  face_c_dofs[k] = offset_c + j;
+	  face_f_dofs[k] = offset_f + j;
+	  ++k;
+	}
+    }
+  for (unsigned int i=1;i<=GeometryInfo<dim>::lines_per_face;++i)
+    {
+      const unsigned int offset_c = fe.first_line_index
+				    + GeometryInfo<dim>::face_to_cell_lines(face_coarse, i-1)
+				    *fe.dofs_per_line;
+      const unsigned int offset_f = fe.first_line_index
+				    + GeometryInfo<dim>::face_to_cell_lines(face_fine, i-1)
+				    *fe.dofs_per_line;
+      for (unsigned int j=0;j<fe.dofs_per_line;++j)
+	{
+	  face_c_dofs[k] = offset_c + j;
+	  face_f_dofs[k] = offset_f + j;
+	  ++k;
+	}
+    }
+  for (unsigned int i=1;i<=GeometryInfo<dim>::quads_per_face;++i)
+    {
+      const unsigned int offset_c = fe.first_quad_index
+				    + face_coarse
+				    *fe.dofs_per_quad;
+      const unsigned int offset_f = fe.first_quad_index
+				    + face_fine
+				    *fe.dofs_per_quad;
+      for (unsigned int j=0;j<fe.dofs_per_quad;++j)
+	{
+	  face_c_dofs[k] = offset_c + j;
+	  face_f_dofs[k] = offset_f + j;
+	  ++k;
+	}
+    }
+  Assert (k == fe.dofs_per_face, ExcInternalError());
+  
+  FEValues<dim> fine (mapping, fe, q_fine,
+		      update_q_points | update_JxW_values | update_values);
+  
+				   // We search for the polynomial on
+				   // the small cell, being equal to
+				   // the coarse polynomial in all
+				   // quadrature points.
+				    
+				   // First build the matrix for this
+				   // least squares problem. This
+				   // contains the values of the fine
+				   // cell polynomials in the fine
+				   // cell grid points.
+				    
+				   // This matrix is the same for all
+				   // children.
+  fine.reinit(tria.begin_active());
+  FullMatrix<number> A(nq*nd, n);
+  for (unsigned int d=0;d<nd;++d)
+    for (unsigned int k=0;k<nq;++k)
+      for (unsigned int j=0;j<n;++j)
+	A(k*nd+d,j) = fine.shape_value_component(face_f_dofs[j],k,d);
+
+  Householder<double> H(A);
+  
+  Vector<number> v_coarse(nq*nd);
+  Vector<number> v_fine(n);
+  
+  
+  
+  for (unsigned int cell_number = 0; cell_number < GeometryInfo<dim>::subfaces_per_face;
+       ++cell_number)
+    {
+      const Quadrature<dim> q_coarse
+	= QProjector<dim>::project_to_subface(q_gauss, face_coarse, cell_number);
+      FEValues<dim> coarse (mapping, fe, q_coarse, update_values);
+      
+      typename Triangulation<dim>::active_cell_iterator fine_cell
+	= tria.begin(0)->child(GeometryInfo<dim>::child_cell_on_face(face_coarse,
+								    cell_number));
+      fine.reinit(fine_cell);
+      coarse.reinit(tria.begin(0));
+      
+      FullMatrix<double> &this_matrix = matrices[cell_number];
+      
+				       // Compute this once for each
+				       // coarse grid basis function
+      for (unsigned int i=0;i<n;++i)
+	{
+					   // The right hand side of
+					   // the least squares
+					   // problem consists of the
+					   // function values of the
+					   // coarse grid function in
+					   // each quadrature point.
+	  for (unsigned int d=0;d<nd;++d)
+	    for (unsigned int k=0;k<nq;++k)
+	      v_coarse(k*nd+d) = coarse.shape_value_component(face_c_dofs[i],k,d);
+
+					   // solve the least squares
+					   // problem.
+	  const double result = H.least_squares(v_fine, v_coarse);
+	  Assert (result < 1.e-12, ExcLeastSquaresError(result));
+	    
+					   // Copy into the result
+					   // matrix. Since the matrix
+					   // maps a coarse grid
+					   // function to a fine grid
+					   // function, the columns
+					   // are fine grid.
+	  for (unsigned int j=0;j<n;++j)
+	    this_matrix(j,i) = v_fine(j);
+	}
+				       // Remove small entries from
+				       // the matrix
+      for (unsigned int i=0; i<this_matrix.m(); ++i)
+	for (unsigned int j=0; j<this_matrix.n(); ++j)
+	  if (std::fabs(this_matrix(i,j)) < 1e-12)
+	    this_matrix(i,j) = 0.;
+    }
 }
 
 
@@ -1552,6 +1722,11 @@ void FETools::get_projection_matrix<deal_II_dimension>
 template
 void FETools::compute_embedding_matrices<deal_II_dimension>
 (const FiniteElement<deal_II_dimension> &, FullMatrix<double>*);
+
+template
+void FETools::compute_face_embedding_matrices<deal_II_dimension>
+(const FiniteElement<deal_II_dimension> &, FullMatrix<double>*,
+ unsigned int, unsigned int);
 
 template
 void FETools::compute_projection_matrices<deal_II_dimension>

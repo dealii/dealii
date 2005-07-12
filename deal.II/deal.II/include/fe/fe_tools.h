@@ -185,11 +185,11 @@ class FETools
 				      * the finite element spaces are
 				      * actually nested.
 				      *
-				      * @arg fe The finite element
+				      * @param fe The finite element
 				      * class for which we compute the
 				      * embedding matrices.
-				      * @arg matrices A pointer to
-				      * 2<sup>dim</sup> FullMatrix
+				      * @param matrices A pointer to
+				      * <i>2<sup>dim</sup></i> FullMatrix
 				      * objects. This is the format
 				      * used in FiniteElementBase,
 				      * where we want to use ths
@@ -198,7 +198,34 @@ class FETools
     template <int dim, typename number>
     static void compute_embedding_matrices(const FiniteElement<dim> &fe,
 					   FullMatrix<number>* matrices);
-    
+
+				     /**
+				      * Compute the embedding matrices
+				      * on faces needed for constraint
+				      * matrices.
+				      *
+				      * @param fe The finite element
+				      * for which to compute these
+				      * matrices.
+				      * @param matrices An array of
+				      * <i>2<sup>dim-1</sup></i> FullMatrix
+				      * objects,holding the embedding
+				      * matrix for each subface.
+				      * @param face_coarse The number
+				      * of the face on the coarse side
+				      * of the face for which this is
+				      * computed.
+				      * @param face_fine The number
+				      * of the face on the refined side
+				      * of the face for which this is
+				      * computed.
+				      */
+    template<int dim, typename number>
+    static void compute_face_embedding_matrices(const FiniteElement<dim>& fe,
+						FullMatrix<number>* matrices,
+						unsigned int face_coarse,
+						unsigned int face_fine);
+
 				     /**
 				      * Compute the
 				      * <i>L<sup>2</sup></i>-projection
