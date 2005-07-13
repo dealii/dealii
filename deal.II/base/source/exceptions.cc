@@ -45,7 +45,15 @@ namespace deal_II_exceptions
   void suppress_stacktrace_in_exceptions ()
   {
     show_stacktrace = false;
-  }  
+  }
+
+
+  bool abort_on_exception = true;
+
+  void disable_abort_on_exception ()
+  {
+    abort_on_exception = false;
+  }
 }
 
 
@@ -155,7 +163,6 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 }
 
 
-
 void ExceptionBase::print_exc_data (std::ostream &out) const
 {
   out << "An error occurred in line <" << line
@@ -170,12 +177,10 @@ void ExceptionBase::print_exc_data (std::ostream &out) const
 }
 
 
-
 void ExceptionBase::print_info (std::ostream &out) const
 {
   out << "(none)" << std::endl;
 }
-
 
 
 const char * ExceptionBase::what () const throw ()
@@ -235,16 +240,16 @@ const char * ExceptionBase::what () const throw ()
                 << "*** Message is "   << std::endl
                 << exc.what ()         << std::endl
                 << "*** Aborting! ***" << std::endl;
+
       std::abort ();
-      return 0;
     }
   catch (...)
     {
       std::cerr << "*** Exception encountered in exception handling routines ***"
                 << std::endl
                 << "*** Aborting! ***" << std::endl;
+
       std::abort ();
-      return 0;
     }
 }
 
@@ -263,6 +268,7 @@ namespace deal_II_exceptions
 				      * zero.
 				      */
     unsigned int n_treated_exceptions;
+     ExceptionBase *last_exception;
   
 
     void issue_error_assert (const char *file,
@@ -272,16 +278,16 @@ namespace deal_II_exceptions
 			     const char *exc_name,
 			     ExceptionBase &e)
     {
-				       // fill the fields of the
+                                       // fill the fields of the
 				       // exception object
-      e.set_fields (file, line, function, cond, exc_name);
+       e.set_fields (file, line, function, cond, exc_name);
       
 				       // if no other exception has
 				       // been displayed before, show
 				       // this one
       if (n_treated_exceptions == 0)
 	{
-	  std::cerr << "--------------------------------------------------------"
+          std::cerr << "--------------------------------------------------------"
 		    << std::endl;
 					   // print out general data
 	  e.print_exc_data (std::cerr);
@@ -312,6 +318,7 @@ namespace deal_II_exceptions
 				       // increase number of treated
 				       // exceptions by one
       n_treated_exceptions++;
+      last_exception = &e;
     
     
 				       // abort the program now since
@@ -334,15 +341,16 @@ namespace deal_II_exceptions
 	    std::cerr << "******** Program is not aborted since another exception is active! ********"
 		      << std::endl;
 	}
-      else
-	std::abort ();
+      else if(deal_II_exceptions::abort_on_exception == true)
+         std::abort ();
     }
 
 
 
     void abort ()
     {
-      std::abort ();
+      if (deal_II_exceptions::abort_on_exception == true)
+         std::abort ();
     }
     
   }
@@ -370,8 +378,8 @@ namespace
 {
   struct preload_terminate_dummy
   {
-      preload_terminate_dummy()
-        { std::set_terminate (__gnu_cxx::__verbose_terminate_handler); }
+     preload_terminate_dummy()
+       { std::set_terminate(__gnu_cxx::__verbose_terminate_handler); }
   };
 
   static preload_terminate_dummy dummy;

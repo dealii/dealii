@@ -240,7 +240,16 @@ inconvenience this causes.
 <a name="base"></a>
 <h3>base</h3>
 
-<ol>  
+<ol>
+  <li> <p>
+       New: A function <code class="member">
+       deal_II_exceptions::disable_abort_on_exception</code> now allows
+       to disable program abortion when an assertion fails. This is used
+       in regression tests.
+       <br>
+       (Ralf B. Schulz, 2005/07/13)
+       </p>
+       
   <li> <p>
        Improved: The <code class="class">QProjector</code> has functions
        <code class="class">project_to_face</code> and

@@ -509,6 +509,26 @@ namespace deal_II_exceptions
 				    */
   void suppress_stacktrace_in_exceptions ();
   
+				   /**
+				    * Calling this function switches off
+				    * the use of std::abort() when an
+				    * exception is created using the
+				    * Assert() macro. Generally, you
+				    * want to abort the execution of a
+				    * program when Assert() is called,
+                                    * but it needs to be switched off
+				    * if you want to log all exceptions
+				    * created, or if you want to test
+				    * if an assertion is working
+				    * correctly. This is done for example
+                                    * in regression tests.
+                                    * Please note that some fatal
+				    * errors will still call abort(), e.g.
+                                    * when an exception is caught
+				    * during exception handling
+				    */
+  void disable_abort_on_exception ();
+
 /**
  * The functions in this namespace are in connection with the Assert
  * and AssertThrow mechanism but are solely for internal purposes and
