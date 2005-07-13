@@ -14,6 +14,7 @@
 #define __deal2__householder_h
 
 
+#include <cmath>
 #include <base/config.h>
 #include <lac/full_matrix.h>
 
