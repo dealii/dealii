@@ -143,6 +143,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: Cygwin has problems linking against deal.II DLLs if you
+       link against more than one dimension dependent library. The linker
+       might issue error messages about multiple defined symbols. This is now
+       detected, and the linker is forced to ignore these errors. However, if
+       you accidentally defined symbols twice you might have a hard time
+       debugging now... In this case remove the <code>-Xlinker 
+       --allow-multiple-definition</code> flag from Make.global_options.
+       <br>
+       (Ralf B. Schulz, 2005/07/13)
+       </p>
+  <li> <p>
        Changed: Under Cygwin, linking against LAPACK and UMFPACK did
        not work. This is now fixed in the Makefiles. Changes only
        affect Cygwin.

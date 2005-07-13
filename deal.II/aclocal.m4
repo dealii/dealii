@@ -378,8 +378,15 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	;;
 
       *cygwin* )
+        dnl On Cygwin, when using shared libraries, there might occur 
+        dnl difficulties when linking libraries for several dimensions,
+        dnl as some symbols are defined in all of them. This leads to a
+        dnl linker error. We force the linker to ignore multiple symbols,
+        dnl but of course this might lead to strange program behaviour if
+        dnl you accidentally defined one symbol multiple times...
+        dnl (added 2005/07/13, Ralf B. Schulz)
         CXXFLAGSPIC=
-        LDFLAGSPIC=
+        LDFLAGSPIC=-Xlinker --allow-multiple-definition
         ;;
 
       *)
@@ -1980,7 +1987,7 @@ AC_DEFUN(DEAL_II_CHECK_ABORT, dnl
   AC_TRY_COMPILE(
     [
 #include <cstdlib>
-extern "C" void abort () {}
+extern "C" void abort () { for(;;) ; }
     ],
     [
     ],
