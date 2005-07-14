@@ -558,6 +558,20 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: Function <code class="class">FETools</code>::<code
+       class="member">compute_face_embedding_matrices</code> allows for
+       automatic computation of embedding matrices on faces under the sole
+       assumption that the coarse grid space is embedded into the fine
+       grid space. In particular, no interpolation points are
+       required.<p>
+       
+       <p>Using this function, constraint matrices can be computed in
+       a general way.
+       <br> 
+       (GK, 2005/07/14)
+       </p>
+
+  <li> <p>
        Improved: All <code class="class">GridIn</code>::<code
        class="member">read_*</code> functions now call <code
        class="class">GridReordering</code>::<code
