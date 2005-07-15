@@ -210,13 +210,17 @@ namespace IteratorFilters
  *
  * The object that represent the condition an iterator has to satisfy
  * only have to provide an interface that allows to call the
- * evaluation operator, i.e. <tt>operator()</tt>. This includes function
- * pointers as well as classes that implement an <tt>operator ()</tt>.
+ * evaluation operator, i.e. <tt>bool operator() (const
+ * BaseIterator&)</tt>. This includes function pointers as well as
+ * classes that implement an <tt>bool operator ()(const
+ * BaseIterator&)</tt>. Then, the FilteredIterator will skip all
+ * objects where the return value of this function is <tt>false</tt>.
+ *
  *
  * An example of a simple valid predicate is the following: given the function
  * @code
- *   template <typename Iterator>
- *   bool level_equal_to_3 (const Iterator c)
+ *   template <typename BIterator>
+ *   bool level_equal_to_3 (const BIterator& c)
  *   {
  *     return (static_cast<unsigned int>(c->level()) == 3);
  *   };
@@ -229,8 +233,8 @@ namespace IteratorFilters
  *
  * Likewise, given the following binary function
  * @code
- *   template <typename Iterator>
- *   bool level_equal_to (const Iterator     c,
+ *   template <typename BIterator>
+ *   bool level_equal_to (const BIterator&     c,
  *                        const unsigned int level)
  *   {
  *     return (static_cast<unsigned int>(c->level()) == level);
@@ -372,6 +376,7 @@ namespace IteratorFilters
  * and its value does not depend on the filter.
  *
  * @ingroup grid
+ * @ingroup Iterators
  * @author Wolfgang Bangerth, 2002
  */
 template <typename BaseIterator>

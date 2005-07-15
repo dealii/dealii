@@ -99,6 +99,8 @@ namespace std
  * "invalid" which increases the chance that somehwen earlier than for
  * past-the-end iterators an exception is raised.
  *
+ * @ingroup grid
+ * @ingroup Accessors
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -225,22 +227,22 @@ class TriaAccessor
 				      */
 				     /*@{*/
 				     /**
-				      *  Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcCellNotUsed);
 				     /**
-				      *  Exception
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcInvalidNeighbor,
 		    int,
 		    << "Neighbor indices must be between 0 and 2^dim-1, but "
 		    << "yours was " << arg1);
 				     /**
-				      *  Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcUnusedCellAsChild);
 				     /**
-				      *  Exception
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcCantSetChildren,
 		    int,
@@ -248,31 +250,31 @@ class TriaAccessor
 		    << "children, or clear it. The given "
 		    << "index was " << arg1 << " (-1 means: clear children)");
 				     /**
-				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcUnusedCellAsNeighbor);
 				     /**
-				      *  Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcUncaughtCase);
 				     /**
-				      *  Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcDereferenceInvalidObject);
 				     /**
-				      *  Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcNotUsefulForThisDimension);
 				     /**
-				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcCantCompareIterators);
 				     /**
-				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcNeighborIsCoarser);
 				     /**
-				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcNeighborIsNotCoarser);
 				     /*@}*/
@@ -313,6 +315,8 @@ class TriaAccessor
  * access, we nevertheless document all functions of the specialized
  * classes here as well. However, they are not implemented.
  *
+ * @ingroup grid
+ * @ingroup Accessors
  * @author Wolfgang Bangerth, Guido Kanschat, 1999
  */
 template <int celldim, int dim>
@@ -812,6 +816,8 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 /**
  * Closure class to stop induction of classes. Should never be called
  * and thus produces an error when created.
+ *
+ * @ingroup grid
  */
 template<int dim>
 class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
@@ -848,6 +854,7 @@ class TriaObjectAccessor<0, dim> : public TriaAccessor<dim>
  *   also a cell and thus has much more functionality than in other
  *   dimensions.
  *
+ * @ingroup grid
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -1300,6 +1307,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
  *   two space dimension, in which case a quad is also a cell and thus
  *   has much more functionality than in other dimensions.
  *
+ * @ingroup grid
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -1805,6 +1813,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
  *   hexs in three space dimension, in which case a hex is also a cell
  *   and thus has much more functionality than in other dimensions.
  *
+ * @ingroup grid
  *   @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -2335,6 +2344,8 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
  * have neighbors, they have the possibility to check whether they are
  * at the boundary etc. This class offers access to all this data.
  *
+ * @ingroup grid
+ * @ingroup Accessors
  * @author Wolfgang Bangerth, 1998, 1999, 2000
  */
 template <int dim>
@@ -2573,29 +2584,36 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
                                       * figure out which cell we want
                                       * to have.
                                       *
-                                      * This can lead to surprising results:
-                                      * if we are sitting on a cell and are
-                                      * asking for a cell behind subface @sf,
-                                      * then this means that we are
-                                      * considering the subface for the face
-                                      * in the natural direction for the
-                                      * present cell. However, if the face as
-                                      * seen from this cell has
+                                      * This can lead to surprising
+                                      * results: if we are sitting on
+                                      * a cell and are asking for a
+                                      * cell behind subface
+                                      * <tt>sf</tt>, then this means
+                                      * that we are considering the
+                                      * subface for the face in the
+                                      * natural direction for the
+                                      * present cell. However, if the
+                                      * face as seen from this cell
+                                      * has
                                       * <tt>face_orientation()==false</tt>,
-                                      * then the child of the face that
-                                      * separates the present cell from the
-                                      * neighboring cell's child is not
-                                      * necessarily the @p sf-th child of the
-                                      * face of this cell. This is so because
-                                      * the @p subface_no parameter to this
-                                      * function corresponds to the subface
-                                      * with respect to the intrinsic ordering
-                                      * of the present cell, whereas children
-                                      * of face iterators are computed with
-                                      * respect to the intrinsic ordering of
-                                      * faces; these two orderings are only
-                                      * identical if the face orientation is
-                                      * @p true, and reversed otherwise.
+                                      * then the child of the face
+                                      * that separates the present
+                                      * cell from the neighboring
+                                      * cell's child is not
+                                      * necessarily the @p sf-th child
+                                      * of the face of this cell. This
+                                      * is so because the @p
+                                      * subface_no parameter to this
+                                      * function corresponds to the
+                                      * subface with respect to the
+                                      * intrinsic ordering of the
+                                      * present cell, whereas children
+                                      * of face iterators are computed
+                                      * with respect to the intrinsic
+                                      * ordering of faces; these two
+                                      * orderings are only identical
+                                      * if the face orientation is @p
+                                      * true, and reversed otherwise.
                                       *
                                       * Fortunately, this is only very rarely
                                       * of concern, since one is usually only
@@ -2669,15 +2687,15 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     
     
 				     /**
-				      *  Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcRefineCellNotActive);
 				     /**
-				      *  Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcCellFlaggedForRefinement);
 				     /**
-				      *  Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcCellFlaggedForCoarsening);
     

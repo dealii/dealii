@@ -63,6 +63,7 @@ template <int dim>              class DoFObjectAccessor<3, dim>;
  * the #Assert macro is switched on.
  *
  * @ingroup dofs
+ * @ingroup Accessors 
  * @author Wolfgang Bangerth, 1998
  */
 template <int dim>
@@ -169,6 +170,7 @@ class DoFAccessor
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
  * @ingroup dofs
+ * @ingroup Accessors 
  * @author Wolfgang Bangerth, 1999
  */
 template <int celldim, int dim>
@@ -196,6 +198,7 @@ class DoFObjectAccessor_Inheritance
  * object under consideration has full dimension, i.e. constitutes a cell.
  *
  * @ingroup dofs
+ * @ingroup Accessors 
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
@@ -250,6 +253,9 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * 
  * (Internal: inheritance is necessary for the general template due to
  * a compiler error.)
+ *
+ * @ingroup dofs 
+ * @ingroup Accessors 
  */
 template<int celldim, int dim>
 class DoFObjectAccessor : public DoFAccessor<dim>,
@@ -459,6 +465,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 
 /**
  * Closure class.
+ * @ingroup dofs
  */
 template<int dim>
 class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,

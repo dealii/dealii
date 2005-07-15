@@ -219,6 +219,7 @@ template <int dim> class Triangulation;
  * @ref TriaDimensionInfo<1>
  * @ref TriaDimensionInfo<2>
  * @ref TriaDimensionInfo<3>
+ * @ingroup Iterators
  * @author Wolfgang Bangerth, 1998
  * @author documentation update Guido Kanschat, 2004
  */
@@ -546,6 +547,8 @@ class TriaRawIterator :
 /**
  *   This specialization of TriaRawIterator provides access only to
  *   the <em>used</em> lines, quads, cells, etc.
+ *
+ * @ingroup Iterators
  */
 template <int dim, typename Accessor>
 class TriaIterator : public TriaRawIterator<dim,Accessor> 
@@ -694,6 +697,8 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
  *   <em>active</em> lines, quads, cells, etc. An active cell is a
  *   cell which is not refined and thus a cell on which calculations
  *   on the finest level are done.
+ *
+ * @ingroup Iterators
  */
 template <int dim, typename Accessor>
 class TriaActiveIterator : public TriaIterator<dim,Accessor> 
