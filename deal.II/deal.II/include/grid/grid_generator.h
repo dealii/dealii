@@ -341,21 +341,6 @@ class GridGenerator
 				      * throws an error if called in
 				      * 1d.
 				      *
-				      * This function is presently not
-				      * implemented in 3d, since we
-				      * fear that it might not be
-				      * possible to represent a simple
-				      * grid making up a ball with the
-				      * requirements on the direction
-				      * of lines and faces imposed by
-				      * the triangulation classes. We
-				      * hope that more complicated
-				      * arrangements than the obvious
-				      * one made up of 7 cells can
-				      * cope with this situation, but
-				      * this has not been implemented
-				      * yet.
-				      *
 				      * @note The triangulation needs to be
 				      * void upon calling this
 				      * function.
