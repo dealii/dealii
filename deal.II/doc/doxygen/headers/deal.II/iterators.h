@@ -1,5 +1,6 @@
 /**
  @defgroup Iterators Iterators on mesh like containers
+ @{
 
 deal.II has several classes which are understood conceptionally as
 meshes. Apart from the obvious Triangulation, these are DoFHandler and
@@ -95,6 +96,25 @@ The standard iterators are typedefed inside the classes. These are
 </table>
 
 @section IteratorsFiltered Filtered iterators
-...
+
+Filtered iterators restrict the scope of existing iterators even
+more. For instance, you could imagine to iterate over the the subset
+of those @ref GlossActive "active cells" having their user flag set or
+belonging to a certain subdomain.
+
+This is achieved by using an object of type FilteredIterator
+&lt;BaseIterator&gt;, where BaseIterator usually is one of the
+standard iterators discussed above.
+
+The FilteredIterator gets an additional Predicate in its constructor
+and will skip all objects where this Predicate evaluates to
+<tt>false</tt>. A collection of already implemented predicates can be
+found in the namespace IteratorFilters.
+
 */
+/**
+@defgroup Accessors Accessor classes of the mesh iterators
+*/
+
+//@}
 

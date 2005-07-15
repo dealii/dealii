@@ -22,7 +22,6 @@
  *
  * @note If a finite element is Lagrangian, generalized support points
  * and support points coincide.
- *
  * </dd>
  *
  * <dt>@anchor GlossLagrange Lagrange elements</dt>
@@ -32,6 +31,9 @@
  * <dt>@anchor GlossReferenceCell Reference cell</dt>
  * <dd>The hypercube [0,1]<sup>dim</sup>, on which all parametric finite
  * element shape functions are defined.</dd>
+ *
+ * <dt>@anchor GlossShape Shape functions</dt> <dd>The restriction of
+ * the finite element basis functions to a single grid cell.</dd>
  *
  * <dt>@anchor GlossSupport Support points</dt>
  * <dd>Support points are by definition those points <i>p<sub>i</sub></i>,
