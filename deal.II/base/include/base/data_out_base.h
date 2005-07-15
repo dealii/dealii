@@ -601,14 +601,6 @@ class DataOutBase
     struct DXFlags 
     {
 					 /**
-					  * Write in multigrid format.
-					  * This will be necessary to
-					  * get streamlines right on
-					  * locally refined grids.
-					  */
-	bool write_multigrid;
-
-					 /**
 					  * Write neighbor information.
 					  */
 	bool write_neighbors;
@@ -616,8 +608,7 @@ class DataOutBase
 					 /**
 					  * Constructor.
 					  */
-	DXFlags (const bool write_multigrid = false,
-		 const bool write_neighbors = false);
+	DXFlags (const bool write_neighbors = false);
         
 					 /**
 					  * Declare all flags with name
