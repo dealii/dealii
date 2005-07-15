@@ -246,31 +246,42 @@ class FEValuesData
 
 
 /**
- * FEValues, FEFaceValues and FESubfaceValues objects are programming
- * interfaces to finite element and mapping classes on the one hand
- * side, to cells and quadrature rules on the other side. The reason
- * for their existence is possible optimization. Depending on the type
- * of finite element and mapping, some values can be computed once on
- * the unit cell. Others must be computed on each cell, but maybe
- * computation of several values at the same time offers ways for
- * optimization. Since this interlay may be complex and depends on the
- * actual finite element, it cannot be left to the applications
- * programmer.
+ * FEValues, FEFaceValues and FESubfaceValues objects are interfaces to finite
+ * element and mapping classes on the one hand side, to cells and quadrature
+ * rules on the other side. They allow to evaluate values or derivatives of
+ * shape functions at the quadrature points of a quadrature formula when
+ * projected by a mapping from the unit cell onto a cell in real space. The
+ * reason for this abstraction is possible optimization: Depending on the type
+ * of finite element and mapping, some values can be computed once on the unit
+ * cell. Others must be computed on each cell, but maybe computation of
+ * several values at the same time offers ways for optimization. Since this
+ * interlay may be complex and depends on the actual finite element, it cannot
+ * be left to the applications programmer.
  *
- * FEValues, FEFaceValues and FESubfaceValues provide only data
- * handling: computations are left to objects of type Mapping and
- * FiniteElement. These provide functions <tt>get_*_data</tt> and
- * <tt>fill_*_values</tt> which are called by the constructor and
- * <tt>reinit</tt> functions of <tt>FEValues*</tt>, respectively.
+ * FEValues, FEFaceValues and FESubfaceValues provide only data handling:
+ * computations are left to objects of type Mapping and FiniteElement. These
+ * provide functions <tt>get_*_data</tt> and <tt>fill_*_values</tt> which are
+ * called by the constructor and <tt>reinit</tt> functions of
+ * <tt>FEValues*</tt>, respectively.
  *
  * <h3>General usage</h3>
  *
- * Usually, an object of <tt>FEValues*</tt> is used in integration loops
- * over all cells of a triangulation. To take full advantage of the
- * optimization features, it should be constructed before the
- * loop. Then, it must be re-initialized for each grid cell. This is
- * like a magnifying glass being used to look at one item after the
- * other. A typical piece of code looks like this:
+ * Usually, an object of <tt>FEValues*</tt> is used in integration loops over
+ * all cells of a triangulation (or faces of cells). To take full advantage of
+ * the optimization features, it should be constructed before the loop so that
+ * information that does not depend on the location and shape of cells can be
+ * computed once and for all (this includes, for example, the values of shape
+ * functions at quadrature points for the most common elements: we can
+ * evaluate them on the unit cell and they will be the same when mapped to the
+ * real cell). Then, in the loop over all cells, it must be re-initialized for
+ * each grid cell to compute that part of the information that changes
+ * depending on the actual cell (for example, the gradient of shape functions
+ * equals the gradient on the unit cell -- which can be computed once and for
+ * all -- times the Jacobian matrix of the mapping between unit and real cell,
+ * which needs to be recomputed for each cell).
+ *
+ * A typical piece of code, adding up local contributions to the Laplace
+ * matrix looks like this:
  *
  * @code
  * FEValues values (mapping, finite_element, quadrature, flags);
@@ -279,10 +290,20 @@ class FEValuesData
  *      ++cell)
  *   {
  *     values.reinit(cell);
+ *     for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+ *       for (unsigned int i=0; i<finite_element.dofs_per_cell; ++i)
+ *         for (unsigned int j=0; j<finite_element.dofs_per_cell; ++j)
+ *         A(i,j) += fe_values.shape_value(i,q) *
+ *                   fe_values.shape_value(j,q) *
+ *                   fe_values.JxW(q);
  *     ...
  *   }
  * @endcode
  *
+ * The individual functions used here are described below. Note that by
+ * design, the order of quadrature points used inside the FEValues object is
+ * the same as defined by the quadrature formula passed to the constructor of
+ * the FEValues object above.
  *
  *  <h3>Member functions</h3>
  *

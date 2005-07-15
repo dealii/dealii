@@ -263,29 +263,27 @@ class DoFDimensionInfo<3>
  * Manage the distribution and numbering of the degrees of freedom for
  * non-multigrid algorithms.
  *
- * We store a list of numbers for each vertex, line, quad, etc
- * denoting the mapping between the degrees of freedom on this object
- * and the global number of this degree of freedom. The numbers refer
- * to the unconstrained degrees of freedom, i.e. constrained degrees
- * of freedom are numbered in the same way as unconstrained ones.
- * This leads to the fact that indices in global vectors and matrices
- * also refer to all degrees of freedom and some kind of condensation
- * is needed to restrict the systems of equations to the unconstrained
- * degrees of freedom only. The actual layout of storage of the indices
- * is described in the DoFLevel class documentation.
+ * For each vertex, line, quad, etc, we store a list of the indices of degrees
+ * of freedom living on this object. These indices refer to the unconstrained
+ * degrees of freedom, i.e. constrained degrees of freedom are numbered in the
+ * same way as unconstrained ones, and are only later eliminated.  This leads
+ * to the fact that indices in global vectors and matrices also refer to all
+ * degrees of freedom and some kind of condensation is needed to restrict the
+ * systems of equations to the unconstrained degrees of freedom only. The
+ * actual layout of storage of the indices is described in the DoFLevel class
+ * documentation.
  *
- * Finally it offers a starting point for the assemblage of the matrices
- * by offering <tt>begin()</tt> and <tt>end()</tt> functions which return iterators
- * to walk on the DoF structures as well as the triangulation data.
- * These iterators work much like those described in the documentation
- * of the Triangulation class and of the iterator classes themselved,
- * but offer more functionality than pure triangulation iterators. The
- * order in which dof iterators are presented by the <tt>++</tt> and @p -- operators
- * is the same as that for the alike triangulation iterators.
+ * The class offers iterators to traverse all cells, in much the same way as
+ * the Triangulation class does. Using the begin() and end() functions (and
+ * all their companions, like begin_active(), begin_line(), etc, just as for
+ * the Triangulation class), one can obtain iterators to walk over cells, and
+ * query the degree of freedom structures as well as the triangulation data.
+ * These iterators are built on top of those of the Triangulation class, but
+ * offer the additional information on degrees of freedom functionality than
+ * pure triangulation iterators. The order in which dof iterators are
+ * presented by the <tt>++</tt> and <tt>--</tt> operators is the same as that
+ * for the corresponding triangulation iterators.
  *
- * This class also provides functions to create the sparsity patterns of
- * global matrices as well as matrices living on (parts of) the boundary.
- * 
  * 
  * <h3>Distribution of indices for degrees of freedom</h3>
  *
@@ -304,27 +302,26 @@ class DoFDimensionInfo<3>
  *
  * This numbering implies very large bandwiths of the resulting matrices and
  * is thus vastly suboptimal for some solution algorithms. For this reason,
- * the DoFRenumbering class offers the function @p renumber_dofs which reorders
- * the dof numbering according to some scheme. See there for a discussion of
- * the implemented algorithms.
+ * the DoFRenumbering class offers several algorithms to reorder the dof
+ * numbering according. See there for a discussion of the implemented
+ * algorithms.
  *
  *
  * <h3>User defined renumbering schemes</h3>
  *
- * The DoFRenumbering class offers a number of renumbering
- * schemes like the Cuthill-McKey scheme. Basically, the function sets
- * up an array in which for each degree of freedom the index is stored
- * which is to be assigned by the renumbering. Using this array, the
- * renumber_dofs() function is called, which actually
- * does the change from old DoF indices to the ones given in the
- * array. In some cases, however, a user may want to compute her own
- * renumbering order; in this case, allocate an array with one element
- * per degree of freedom and fill it with the number that the
- * respective degree of freedom shall be assigned. This number may,
- * for example, be obtained by sorting the support points of the
- * degrees of freedom in downwind direction.  Then call the
- * <tt>renumber_dofs(vector<unsigned int>)</tt> with the array, which converts old
- * into new degree of freedom indices.
+ * The DoFRenumbering class offers a number of renumbering schemes like the
+ * Cuthill-McKey scheme. Basically, the function sets up an array in which for
+ * each degree of freedom we store the new index this DoF should have after
+ * renumbering. Using this array, the renumber_dofs() function of the present
+ * class is called, which actually performs the change from old DoF indices to
+ * the ones given in the array. In some cases, however, a user may want to
+ * compute her own renumbering order; in this case, one can allocate an array
+ * with one element per degree of freedom and fill it with the number that the
+ * respective degree of freedom shall be assigned. This number may, for
+ * example, be obtained by sorting the support points of the degrees of
+ * freedom in downwind direction.  Then call the
+ * <tt>renumber_dofs(vector<unsigned int>)</tt> function with the array, which
+ * converts old into new degree of freedom indices.
  *
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
