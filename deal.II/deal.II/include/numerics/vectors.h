@@ -59,7 +59,7 @@ class ConstraintMatrix;
  * exchanging MappingQ1 by, for example, a MappingQ or another Mapping
  * object of interest.
  *
- * @section VectorTools1 Description of operations
+ * <h3>Description of operations</h3>
  *
  * This collection of methods offers the following operations:
  * <ul>
