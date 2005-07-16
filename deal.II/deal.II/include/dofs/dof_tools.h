@@ -188,6 +188,38 @@ class DoFTools
 				      * for each row of the sparsity
 				      * pattern.
 				      *
+				      * @param dofs The DoFHandler
+				      * @param row_lengths The vector
+				      * containing the resulting row
+				      * lengths. It must have the
+				      * length DoFHandler::n_dofs().
+				      *
+				      * @param flux_couplings
+				      * Additional couplings between
+				      * shape functions due to flux
+				      * operators on faces are
+				      * considered. If <tt>false</tt>,
+				      * the default, only topological
+				      * couplings between cells are
+				      * counted.
+				      */
+    template<int dim>
+    static
+    void compute_row_length_vector(
+      const DoFHandler<dim>& dofs,
+      std::vector<unsigned int>& row_lengths,
+      const Coupling flux_couplings = none);
+    
+				     /**
+				      * On initializing a
+				      * SparsityPattern, the number of
+				      * entries required for each row
+				      * must be known. This function
+				      * estimates the maximum number
+				      * of coupling degrees of freedom
+				      * for each row of the sparsity
+				      * pattern.
+				      *
 				      * In systems of equations,
 				      * couplings between components
 				      * <b>not</b> coupling in the

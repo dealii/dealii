@@ -37,7 +37,213 @@
 #include <numeric>
 
 
-//TODO:[GK] Traverse faces only once using flags
+
+#if  deal_II_dimension == 1
+
+
+template <int dim>
+void
+DoFTools::compute_row_length_vector(
+  const DoFHandler<dim>& dofs,
+  std::vector<unsigned int>& row_lengths,
+  const Coupling)
+{
+  const FiniteElement<dim>& fe = dofs.get_fe();
+  Assert (row_lengths.size() == dofs.n_dofs(),
+	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+
+				   // Function starts here by
+				   // resetting the counters.
+  std::fill(row_lengths.begin(), row_lengths.end(), 0);
+  
+  const typename DoFHandler<dim>::cell_iterator end = dofs.end();
+  typename DoFHandler<dim>::active_cell_iterator cell;
+  std::vector<unsigned int> cell_indices(fe.dofs_per_cell);
+  
+  for (cell = dofs.begin_active(); cell != end; ++cell)
+    {
+      cell->get_dof_indices(cell_indices);
+      unsigned int i = 0;
+      unsigned int increment = fe.dofs_per_cell;
+      while (i < fe.dofs_per_cell)
+	row_lengths[cell_indices[i++]] += increment;
+    }
+}
+
+
+#else
+
+template <int dim>
+void
+DoFTools::compute_row_length_vector(
+  const DoFHandler<dim>& dofs,
+  std::vector<unsigned int>& row_lengths,
+  const Coupling flux_coupling)
+{
+  const FiniteElement<dim>& fe = dofs.get_fe();
+  Assert (row_lengths.size() == dofs.n_dofs(),
+	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+
+				   // Function starts here by
+				   // resetting the counters.
+  std::fill(row_lengths.begin(), row_lengths.end(), 0);
+				   // We need the user flags, so we
+				   // save them for later restoration
+  std::vector<bool> old_flags;
+				   // We need a non-constant
+				   // triangulation for the user
+				   // flags. Since we restore them in
+				   // the end, this cast is safe.
+  Triangulation<dim>& user_flags_triangulation =
+    const_cast<Triangulation<dim>&> (dofs.get_tria());
+  user_flags_triangulation.save_user_flags(old_flags);
+  user_flags_triangulation.clear_user_flags();
+  
+  const typename DoFHandler<dim>::cell_iterator end = dofs.end();
+  typename DoFHandler<dim>::active_cell_iterator cell;
+  std::vector<unsigned int> cell_indices(fe.dofs_per_cell);
+  std::vector<unsigned int> neighbor_indices(fe.dofs_per_cell);
+
+				   // We loop over cells and go from
+				   // cells to lower dimensional
+				   // objects. This is the only way to
+				   // cope withthe fact, that an
+				   // unknown number of cells may
+				   // share an object of dimension
+				   // smaller than dim-1.
+  for (cell = dofs.begin_active(); cell != end; ++cell)
+    {
+      cell->get_dof_indices(cell_indices);
+      unsigned int i = 0;
+				       // First, dofs on
+				       // vertices. We assume that
+				       // each vertex dof couples
+				       // with all dofs on
+				       // adjacent grid cells.
+
+				       // Adding all dofs of the cells
+				       // will add dofs of the faces
+				       // of the cell adjacent to the
+				       // vertex twice. Therefore, we
+				       // subtract these here and add
+				       // them in a loop over the
+				       // faces below.
+
+				       // in 1d, faces and vertices
+				       // are identical. Nevertheless,
+				       // this will only work if
+				       // dofs_per_face is zero and
+				       // dofs_per_vertex is
+				       // arbitrary, not the other way
+				       // round.
+      unsigned int increment = fe.dofs_per_cell - dim * fe.dofs_per_face;
+      while (i < fe.first_line_index)
+	row_lengths[cell_indices[i++]] += increment;
+				       // From now on, if an object is
+				       // a cell, its dofs only couple
+				       // inside the cell. Since the
+				       // faces are handled below, we
+				       // have to subtract ALL faces
+				       // in this case.
+      
+				       // In all other cases we
+				       // subtract adjacent faces to be
+				       // added in the loop below.
+      increment = (dim>1)
+		  ? fe.dofs_per_cell - (dim-1) * fe.dofs_per_face
+		  : fe.dofs_per_cell - GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
+      while (i < fe.first_quad_index)
+	row_lengths[cell_indices[i++]] += increment;
+      
+				       // Now quads in 2D and 3D
+      increment = (dim>2)
+		  ? fe.dofs_per_cell - (dim-2) * fe.dofs_per_face
+		  : fe.dofs_per_cell - GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
+      while (i < fe.first_hex_index)
+	row_lengths[cell_indices[i++]] += increment;
+				       // Finally, cells in 3D
+      increment = fe.dofs_per_cell - GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
+      while (i < fe.dofs_per_cell)
+	row_lengths[cell_indices[i++]] += increment;
+
+				   // At this point, we have
+				   // counted all dofs
+				   // contributiong from cells
+				   // coupled topologically to the
+				   // adjacent cells, but we
+				   // subtracted some faces.
+  
+				   // Now, let's go by the faces
+				   // and add the missing
+				   // contribution as well as the
+				   // flux contributions.
+      for (unsigned int iface=0;iface<GeometryInfo<dim>::faces_per_cell;++iface)
+	{
+	  if (cell->at_boundary(iface))
+	    {
+	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		row_lengths[cell_indices[i]] += fe.dofs_per_face;
+	      continue;
+	    }
+	  
+	  const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(iface);
+//	  const bool neighbor_same_level = (neighbor->level() == cell->level());
+// 	  const unsigned int
+// 	    nface = neighbor_same_level
+// 	    ? cell->neighbor_of_neighbor(iface)
+// 	    : cell->neighbor_of_coarser_neighbor(iface).first;
+	  typename DoFHandler<dim>::face_iterator face = cell->face(iface);
+	  
+					   // Flux couplings are
+					   // computed from both sides
+					   // for simplicity.
+	  
+					   // The dofs on the common face
+					   // will be handled below,
+					   // therefore, we subtract them
+					   // here.
+	  if (flux_coupling != none)
+	    {
+	      unsigned int increment = fe.dofs_per_cell - fe.dofs_per_face;
+	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		row_lengths[cell_indices[i]] += increment;
+	    }
+	  
+					   // Do this only once per
+					   // face and not on the
+					   // hanging faces.
+	  if (face->user_flag_set() || neighbor->has_children())
+	    continue;
+	  face->set_user_flag();
+					   // At this point, we assume
+					   // that each cell added its
+					   // dofs minus the face to
+					   // the couplings of the
+					   // face dofs. Since we
+					   // subtracted two faces, we
+					   // have to re-add one.
+	  
+					   // If one side of the face
+					   // is refined, all the fine
+					   // face dofs couple with
+					   // the coarse one.
+	  
+					   // Wolfgang, do they couple
+					   // with each other by
+					   // constraints?
+	  neighbor->get_dof_indices(neighbor_indices);
+	  for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+	    {
+	      row_lengths[cell_indices[i]] += fe.dofs_per_face;
+	      row_lengths[neighbor_indices[i]] += fe.dofs_per_face;
+	    }
+	}
+    }
+  user_flags_triangulation.load_user_flags(old_flags);
+}
+
+#endif
+
 
 //TODO:[GK] This function is not finished yet!!!
 template <int dim>
@@ -48,6 +254,8 @@ DoFTools::compute_row_length_vector(
   Table<2,Coupling> couplings,
   Table<2,Coupling> flux_couplings)
 {
+  Assert(false, ExcNotImplemented());
+  
   const FiniteElement<dim>& fe = dofs.get_fe();
   const unsigned int ncomp = fe.n_components;
   
@@ -69,56 +277,20 @@ DoFTools::compute_row_length_vector(
 				   // Function starts here by
 				   // resetting the counters.
   std::fill(row_lengths.begin(), row_lengths.end(), 0);
-
+				   // We need the user flags, so we
+				   // save them for later restoration
+  std::vector<bool> old_flags;
+  user_flags_triangulation.save_user_flags(old_flags);
+  user_flags_triangulation.clear_user_flags();
+  
   const typename DoFHandler<dim>::cell_iterator end = dofs.end();
   typename DoFHandler<dim>::active_cell_iterator cell;
-  std::vector<unsigned int> indices(fe.dofs_per_cell);
+  std::vector<unsigned int> cell_indices(fe.dofs_per_cell);
+  std::vector<unsigned int> face_indices(fe.dofs_per_face);
   
   for (cell = dofs.begin(); cell != end; ++cell)
     {
-      indices.resize(fe.dofs_per_cell);
-      cell->get_dof_indices(indices);
-				       // First the simple case where
-				       // all degrees of freedom on a
-				       // cell couple.
-      if (couplings.n_rows() <= 1)
-	{
-	  unsigned int i = 0;
-					   // First, dofs on
-					   // vertices. We assume that
-					   // each vertex dof couples
-					   // with all dofs on
-					   // adjacent grid cells.
-
-					   // Since two cells share a
-					   // facein 2d, we can subtract
-					   // the dofs per face,
-					   // unless we have hanging
-					   // nodes.
-
-					   // In 3d, 8 cells share 12
-					   // faces.
-	  unsigned int increment = fe.dofs_per_cell - fe.dofs_per_face;
-	  while (i < fe.first_line_index)
-	    row_lengths[indices[i++]] += increment;
-					   // Lines are already cells
-					   // in 1D
-	  increment = (dim>1)
-		      ? fe.dofs_per_cell - fe.dofs_per_face
-		      : fe.dofs_per_cell;
-	  while (i < fe.first_quad_index)
-	    row_lengths[indices[i++]] += increment;
-					   // Now quads in 2D and 3D
-	  increment = (dim>2)
-		      ? fe.dofs_per_cell - fe.dofs_per_face
-		      : fe.dofs_per_cell;
-	  while (i < fe.first_hex_index)
-	    row_lengths[indices[i++]] += increment;
-					   // Finally, cells in 3D
-	  increment = fe.dofs_per_cell;
-	  while (i < fe.ofs_per_cell)
-	    row_lengths[indices[i++]] += increment;
-	}
+      cell->get_dof_indices(cell_indices);
 				       // At this point, we have
 				       // counted all dofs
 				       // contributiong from cells
@@ -132,14 +304,32 @@ DoFTools::compute_row_length_vector(
 				       // flux contributions.
       for (unsigned int iface=0;iface<GeometryInfo<dim>::faces_per_cell;++iface)
 	{
+	  if (cell->at_boundary(iface))
+	    continue;
+	  const bool neighbor_same_level = (cell->neighbor(iface)->level()
+					    == cell->level());
+	  const unsigned int
+	    nface = (neighbor_same_level)
+	    ? cell->neighbor_of_neighbor(iface)
+	    : cell->neighbor_of_coarser_neighbor(iface);
 	  typename DoFHandler<dim>::face_iterator face = cell->face(iface);
 	  
-	  indices.resize(fe.dofs_per_face);
-	  face->get_dof_indices(indices);
+					   // Flux couplings are
+					   // computed from both sides
+					   // for simplicity.
 	  for (unsigned int i=0;i<fe.dofs_per_face;++i)
-	    row_lengths[indices[i]] += fe.dofs_per_face;
+	    for (unsigned int j=0;j<fe.dofs_per_face;++j)
+	      if (flux_couplings(fe.system_to_component_index(i).first,
+				 fe.system_to_component_index(j).first) == always
+		  ||
+		  flux_couplings(fe.system_to_component_index(i).first,
+				 fe.system_to_component_index(j).first) == nonzero
+		  && fe.has_support_on_face(i, iface)
+		  && fe.has_support_on_face(j, nface))
+		;// ???
 	}
     }
+  user_flags_triangulation.load_user_flags(old_flags);
 }
 
 
@@ -2984,6 +3174,12 @@ DoFTools::compute_dof_couplings(
 
 
 // explicit instantiations
+template void
+DoFTools::compute_row_length_vector(
+  const DoFHandler<deal_II_dimension>& dofs, std::vector<unsigned int>& row_lengths,
+  const Coupling flux_coupling);
+
+
 template void
 DoFTools::make_sparsity_pattern<deal_II_dimension,SparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
