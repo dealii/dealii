@@ -1,24 +1,29 @@
-//----------------------------  dof_tools_1a.cc  ---------------------------
+//----------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  dof_tools_1a.cc  ---------------------------
+//----------------------------------------------------------------------
 
 #include "../tests.h"
 #include "dof_tools_common.cc"
 #include <lac/sparsity_pattern.h>
 
 // check
-//   DoFTools::
-//   make_sparsity_pattern (const DoFHandler<dim> &,
-//	                    SparsityPattern       &);
+//   DoFTools::make_sparsity_pattern (
+//     const DoFHandler<dim> &,
+//     SparsityPattern       &);
+// and
+//   DoFTools::compute_row_length_vector
+//    const DoFHandler<dim>&,
+//    std::vector<unsigned int>&,
+//    const Coupling)
 
 
 std::string output_file_name = "dof_tools_01a.output";
@@ -29,8 +34,13 @@ void
 check_this (const DoFHandler<dim> &dof_handler)
 {
                                    // create sparsity pattern
-  SparsityPattern sp (dof_handler.n_dofs(),
-                      dof_handler.max_couplings_between_dofs());
+  std::vector<unsigned int> row_lengths(dof_handler.n_dofs());
+  DoFTools::compute_row_length_vector(dof_handler, row_lengths);
+  unsigned int total_length=0;
+  for (unsigned int i=0;i<row_lengths.size();++i)
+    total_length += row_lengths[i];
+  
+  SparsityPattern sp (dof_handler.n_dofs(), row_lengths);
   DoFTools::make_sparsity_pattern (dof_handler, sp);
   sp.compress ();
   
@@ -47,9 +57,10 @@ check_this (const DoFHandler<dim> &dof_handler)
     }
 
                                    // write out some other indicators
-  deallog << sp.bandwidth () << std::endl
-          << sp.max_entries_per_row () << std::endl
-          << sp.n_nonzero_elements () << std::endl;
+  deallog << "Bandwidth " << sp.bandwidth ()
+          << "  Max per row " << sp.max_entries_per_row ()
+          << " Nonzero " << sp.n_nonzero_elements ()
+	  << " of "  << total_length << std::endl;
 
   unsigned int hash = 0;
   for (unsigned int l=0; l<sp.n_rows(); ++l)
