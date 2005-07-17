@@ -69,9 +69,9 @@ void test ()
 
                                    // then set up a sparsity pattern and two
                                    // matrices on top of it
-  SparsityPattern sparsity (dof_handler.n_dofs(),
-                            dof_handler.n_dofs(),
-                            dof_handler.max_couplings_between_dofs());
+  std::vector<unsigned int> row_lengths(dof_handler.n_dofs());
+  DoFTools::compute_row_length_vector(dof_handler, row_lengths);
+  SparsityPattern sparsity (dof_handler.n_dofs(), dof_handler.n_dofs(), row_lengths);
   DoFTools::make_sparsity_pattern (dof_handler, sparsity);
   constraints.condense (sparsity);
   SparseMatrix<double> A(sparsity), B(sparsity);
