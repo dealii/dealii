@@ -118,6 +118,52 @@ and will skip all objects where this Predicate evaluates to
 <tt>false</tt>. A collection of already implemented predicates can be
 found in the namespace IteratorFilters.
 
+
+@section IteratorsAndSets Iterators as pointers into sets of objects
+
+As mentioned above, iterators in deal.II can be considered as iterating over
+all the cells (or faces, lines, etc) that constitute a mesh. This suggests to
+view a triangulation as a collection of cells and other objects that are held
+together by a certain data structure that links all these objects, in the same
+was as a linked list is the data structure that connects objects in a linear
+fashion.
+
+Triangulations in deal.II can indeed be considered in this way. In particular,
+they use the computational notion of a forrest of regular trees to store their
+data. This can be understood as follows: Consider the cells of the coarse mesh
+as roots; then, if one of these coarse mesh cells is refined, it will have
+2<sup>dim</sup> children, which in turn can, but do not have to have
+2<sup>dim</sup> children of their own, and so on. This means, that each cell
+of the coarse mesh can be considered the root of a binary tree (in qd), a
+quadtree (in 2d), or an octree (in 3d). The collection of these trees
+emanating from the cells of the coarse mesh then constitutes the forrest that
+completely describes the triangulation, including all of its active and
+inactive cells. In particular, the active cells are those terminal nodes in
+the tree that have no decendants, i.e. cells which are not further
+refined. Correspondingly, inactive cells correspond to nodes in the tree with
+descendents, i.e. cells that are further refined.
+
+A triangulation contains forrests for lines (each of which may have 2
+children), quads (each with possibly four children), and hexes (each with no
+or 8 children). Depending on the dimension, these objects are also termed
+cells or faces.
+
+Iterators loop over the elements of such forrests. While the usual iterators
+loop over all nodes of a forrest, active iterators skip iterate over the
+elements in the same order, but skip all non-active entries and therefore only
+visit terminal nodes (i.e. active cells, faces, etc). There are many ways to
+traverse the elements of a forrest, for example breadth first or depth
+first. Depending on the type of data structure used to store the forrest, some
+ways are more efficient than others. At present, the way iterators traverse
+forrests in deal.II is breadth first. I.e., iterators first visit all the
+elements (cells, faces, etc) of the coarse mesh before moving on to all the
+elements of the immediate level, i.e. the immediate children of the coarse
+mesh objects; after this come the grandchildren of the coarse mesh, and so on.
+However, it must be noted that programs should not rely on this particular
+order of traversing a tree: this is considered an implementation detail that
+can change between versions, even if we consider this an unlikely option at
+the present time.
+
 */
 /**
 @defgroup Accessors Accessor classes of the mesh iterators
