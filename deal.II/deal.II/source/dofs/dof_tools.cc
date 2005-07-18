@@ -43,10 +43,10 @@
 
 template <int dim>
 void
-DoFTools::compute_row_length_vector(
-  const DoFHandler<dim>& dofs,
-  std::vector<unsigned int>& row_lengths,
-  const Coupling)
+DoFTools::
+compute_row_length_vector(const DoFHandler<dim>     &dofs,
+                          std::vector<unsigned int> &row_lengths,
+                          const Coupling)
 {
   const FiniteElement<dim>& fe = dofs.get_fe();
   Assert (row_lengths.size() == dofs.n_dofs(),
@@ -63,10 +63,11 @@ DoFTools::compute_row_length_vector(
   for (cell = dofs.begin_active(); cell != end; ++cell)
     {
       cell->get_dof_indices(cell_indices);
-      unsigned int i = 0;
-      unsigned int increment = fe.dofs_per_cell;
-      while (i < fe.dofs_per_cell)
-	row_lengths[cell_indices[i++]] += increment;
+
+                                       // each dof can couple with each other
+                                       // dof on this cell
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	row_lengths[cell_indices[i]] += fe.dofs_per_cell;
     }
 }
 
