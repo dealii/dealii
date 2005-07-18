@@ -23,6 +23,7 @@ template <int rank, int dim> class SymmetricTensor;
 template <int dim> SymmetricTensor<2,dim> unit_symmetric_tensor ();
 template <int dim> SymmetricTensor<4,dim> deviator_tensor ();
 template <int dim> SymmetricTensor<4,dim> identity_tensor ();
+template <int dim> SymmetricTensor<4,dim> invert (const SymmetricTensor<4,dim> &);
 template <int dim2> double trace (const SymmetricTensor<2,dim2> &);
 
 template <int dim> SymmetricTensor<2,dim>
@@ -906,6 +907,9 @@ class SymmetricTensor
 
     template <int dim2>
     friend SymmetricTensor<4,dim2> identity_tensor ();
+
+    template <int dim2>
+    friend SymmetricTensor<4,dim2> invert (const SymmetricTensor<4,dim2> &);
 };
 
 
@@ -2195,6 +2199,133 @@ identity_tensor ()
   return tmp;
 }
 
+
+
+/**
+ * Invert a symmetric rank-4 tensor. Since symmetric rank-4 tensors are
+ * mappings from and to symmetric rank-2 tensors, they can have an
+ * inverse. This function computes it, if it exists, for the case that the
+ * dimension equals 1.
+ *
+ * If a tensor is not invertible, then the result is unspecified, but will
+ * likely contain the results of a division by zero or a very small number at
+ * the very least.
+ * 
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <>
+inline
+SymmetricTensor<4,1>
+invert (const SymmetricTensor<4,1> &t)
+{
+  SymmetricTensor<4,1> tmp;
+  tmp.data[0][0] = 1./t.data[0][0];
+  return tmp;
+}
+
+
+
+/**
+ * Invert a symmetric rank-4 tensor. Since symmetric rank-4 tensors are
+ * mappings from and to symmetric rank-2 tensors, they can have an
+ * inverse. This function computes it, if it exists, for the case that the
+ * dimension equals 2.
+ *
+ * If a tensor is not invertible, then the result is unspecified, but will
+ * likely contain the results of a division by zero or a very small number at
+ * the very least.
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <>
+inline
+SymmetricTensor<4,2>
+invert (const SymmetricTensor<4,2> &t)
+{
+  SymmetricTensor<4,2> tmp;
+
+                                   // inverting this tensor is a little more
+                                   // complicated than necessary, since we
+                                   // store the data of 't' as a 3x3 matrix
+                                   // t.data, but the product between a rank-4
+                                   // and a rank-2 tensor is really not the
+                                   // product between this matrix and the
+                                   // 3-vector of a rhs, but rather
+                                   //
+                                   // B.vec = t.data * mult * A.vec
+                                   //
+                                   // where mult is a 3x3 matrix with
+                                   // entries [[1,0,0],[0,1,0],[0,0,2]] to
+                                   // capture the fact that we need to add up
+                                   // both the c_ij12*a_12 and the c_ij21*a_21
+                                   // terms
+                                   //
+                                   // in addition, in this scheme, the
+                                   // identity tensor has the matrix
+                                   // representation mult^-1.
+                                   //
+                                   // the inverse of 't' therefore has the
+                                   // matrix representation
+                                   //
+                                   // inv.data = mult^-1 * t.data^-1 * mult^-1
+                                   //
+                                   // in order to compute it, let's first
+                                   // compute the inverse of t.data and put it
+                                   // into tmp.data; at the end of the
+                                   // function we then scale the last row and
+                                   // column of the inverse by 1/2,
+                                   // corresponding to the left and right
+                                   // multiplication with mult^-1
+  const double t4 = t.data[0][0]*t.data[1][1],
+               t6 = t.data[0][0]*t.data[1][2],
+               t8 = t.data[0][1]*t.data[1][0],
+              t00 = t.data[0][2]*t.data[1][0],
+              t01 = t.data[0][1]*t.data[2][0],
+              t04 = t.data[0][2]*t.data[2][0],
+              t07 = 1.0/(t4*t.data[2][2]-t6*t.data[2][1]-t8*t.data[2][2]+
+                         t00*t.data[2][1]+t01*t.data[1][2]-t04*t.data[1][1]);
+  tmp.data[0][0] = (t.data[1][1]*t.data[2][2]-t.data[1][2]*t.data[2][1])*t07;
+  tmp.data[0][1] = -(t.data[0][1]*t.data[2][2]-t.data[0][2]*t.data[2][1])*t07;
+  tmp.data[0][2] = -(-t.data[0][1]*t.data[1][2]+t.data[0][2]*t.data[1][1])*t07;
+  tmp.data[1][0] = -(t.data[1][0]*t.data[2][2]-t.data[1][2]*t.data[2][0])*t07;
+  tmp.data[1][1] = (t.data[0][0]*t.data[2][2]-t04)*t07;
+  tmp.data[1][2] = -(t6-t00)*t07;
+  tmp.data[2][0] = -(-t.data[1][0]*t.data[2][1]+t.data[1][1]*t.data[2][0])*t07;
+  tmp.data[2][1] = -(t.data[0][0]*t.data[2][1]-t01)*t07;
+  tmp.data[2][2] = (t4-t8)*t07;
+
+                                   // scale last row and column as mentioned
+                                   // above
+  tmp.data[2][0] /= 2;
+  tmp.data[2][1] /= 2;
+  tmp.data[0][2] /= 2;
+  tmp.data[1][2] /= 2;
+  tmp.data[2][2] /= 4;
+  
+  return tmp;
+}
+
+
+
+/**
+ * Invert a symmetric rank-4 tensor. Since symmetric rank-4 tensors are
+ * mappings from and to symmetric rank-2 tensors, they can have an
+ * inverse. This function computes it, if it exists, for the case that the
+ * dimension equals 3.
+ *
+ * If a tensor is not invertible, then the result is unspecified, but will
+ * likely contain the results of a division by zero or a very small number at
+ * the very least.
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005
+ */
+template <>
+SymmetricTensor<4,2>
+invert (const SymmetricTensor<4,2> &t);
+// this function is implemented in the .cc file
 
 
 /**
