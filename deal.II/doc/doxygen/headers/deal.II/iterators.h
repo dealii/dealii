@@ -1,5 +1,5 @@
 /**
- @defgroup Iterators Iterators on mesh like containers
+ @defgroup Iterators Iterators on mesh-like containers
  @{
 
 deal.II has several classes which are understood conceptionally as
