@@ -647,6 +647,8 @@ class PreconditionLACSolver : public Subscriptor
 
 
 /**
+ * @deprecated Use ProductMatrix instead.
+ *
  * Matrix with preconditioner.
  * Given a matrix $A$ and a preconditioner $P$, this class implements a new matrix
  * with the matrix-vector product $PA$. It needs an auxiliary vector for that.
