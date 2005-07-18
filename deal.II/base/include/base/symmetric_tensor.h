@@ -2166,6 +2166,19 @@ deviator_tensor ()
  * tensor <tt>t</tt> returns the deviator <tt>dev t</tt>. It is the operator
  * representation of the linear deviator operator.
  *
+ * Note that this tensor, even though it is the identity, has a somewhat funny
+ * form, and in particular does not only consist of zeros and ones. For
+ * example, for <tt>dim=2</tt>, the identity tensor has all zero entries
+ * except for <tt>id[0][0][0][0]=id[1][1][1][1]=1</tt> and
+ * <tt>id[0][1][0][1]=id[0][1][1][0]=id[1][0][0][1]=id[1][0][1][0]=1/2</tt>. To
+ * see why this factor of 1/2 is necessary, consider computing <tt>A=Id
+ * . B</tt>. For the element <tt>a_01</tt> we have <tt>a_01=id_0100 b_00 +
+ * id_0111 b_11 + id_0101 b_01 + id_0110 b_10</tt>. On the other hand, we need
+ * to have <tt>a_01=b_01</tt>, and symmetry implies <tt>b_01=b_10</tt>,
+ * leading to <tt>a_01=(id_0101+id_0110) b_01</tt>, or, again by symmetry,
+ * <tt>id_0101=id_0110=1/2</tt>. Similar considerations hold for the
+ * three-dimensional case.
+ * 
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
