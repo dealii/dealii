@@ -2127,7 +2127,7 @@ unit_symmetric_tensor<3> ()
  *
  * For every tensor <tt>t</tt>, there holds the identity
  * <tt>deviator(t)==deviator_tensor&lt;dim&gt;()*t</tt>, up to numerical
- * round-off. The reason this operator representation is provided since one
+ * round-off. The reason this operator representation is provided is that one
  * sometimes needs to invert operators like <tt>identity_tensor&lt;dim&gt;() +
  * delta_t*deviator_tensor&lt;dim&gt;()</tt> or similar.
  * 
@@ -2166,12 +2166,6 @@ deviator_tensor ()
  * tensor <tt>t</tt> returns the deviator <tt>dev t</tt>. It is the operator
  * representation of the linear deviator operator.
  *
- * For every tensor <tt>t</tt>, there holds the identity
- * <tt>deviator(t)==deviator_tensor&lt;dim&gt;()*t</tt>, up to numerical
- * round-off. The reason this operator representation is provided since one
- * sometimes needs to invert operators like <tt>identity_tensor&lt;dim&gt;() +
- * delta_t*deviator_tensor&lt;dim&gt;()</tt> or similar.
- * 
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
