@@ -130,12 +130,11 @@ FE_DGPMonomial<dim>::FE_DGPMonomial (const unsigned int degree)
     this->prolongation[i].reinit (this->dofs_per_cell,
 				  this->dofs_per_cell);
   FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
-//  initialize_restriction ();
-
-                                   // note, that these elements have
-                                   // neither support nor face-support
-                                   // points, so leave these fields
-                                   // empty
+				   // Fill restriction matrices with L2-projection
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+    this->restriction[i].reinit (this->dofs_per_cell,
+				  this->dofs_per_cell);
+  FETools::compute_projection_matrices (*this, &this->restriction[0]);
 }
 
 
@@ -176,6 +175,7 @@ FE_DGPMonomial<dim>::clone() const
 
 
 
+//TODO: Remove this function and use the one in FETools, if needed
 template <int dim>
 void
 FE_DGPMonomial<dim>::

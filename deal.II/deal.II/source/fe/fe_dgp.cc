@@ -35,20 +35,11 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
     this->prolongation[i].reinit (this->dofs_per_cell,
 				  this->dofs_per_cell);
   FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
-
-                                   // restriction can be defined
-                                   // through projection for
-                                   // discontinuous elements, but is
-                                   // presently not implemented for DGP
-                                   // elements.
-
-//TODO: Do the restriction  
-                                   // if it were, then the following
-                                   // snippet would be the right code
-                                   // note further, that these
-                                   // elements have neither support
-                                   // nor face-support points, so
-                                   // leave these fields empty
+				   // Fill restriction matrices with L2-projection
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+    this->restriction[i].reinit (this->dofs_per_cell,
+				  this->dofs_per_cell);
+  FETools::compute_projection_matrices (*this, &this->restriction[0]);
 }
 
 
