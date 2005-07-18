@@ -4,11 +4,12 @@
 
 deal.II has several classes which are understood conceptionally as
 meshes. Apart from the obvious Triangulation, these are DoFHandler and
-MGDoFHandler. All of those define a set of iterators, allowing the
-user to traverse the whole mesh or portions of it. Therefore, they
-have somethings in common. In fact, these iterators are instantiations
-or subclasses of the same class TriaIterator (we do not include
-TriaRawIterator here, since it is only for internal use).
+MGDoFHandler. All of those define a set of iterators, allowing the user to
+traverse the whole mesh, i.e. the set of cells, faces, edges, etc that
+comprise the mesh, or portions of it. Therefore, they have somethings in
+common. In fact, these iterators are instantiations or subclasses of the same
+class TriaIterator (we do not include TriaRawIterator here, since it is only
+for internal use).
 
 The template signature of TriaIterator is
 @code
@@ -54,8 +55,7 @@ order. Take this code example:
 @endcode
 
 Here, all iterators will always point to the same mesh cell, even if
-the DoFHandlers are handling different finite elements. This
-distinction is only in the Accessor.
+the DoFHandlers are handling different finite elements: they all access cells in the same order, the difference is only in the Accessor.
 
 The standard loops are
 <dl>
@@ -66,13 +66,20 @@ The standard loops are
 <dd>Loop over @ref GlossActive "active cells" only</dd> 
 </dl>
 
+In addition, there are "raw iterators" that also traverse objects that are
+unused in the triangulation, but allocated anyway for efficiency reasons. User
+code should never use raw iterators, they are only for internal purposes of
+the library.
+
+
 @subsection IteratorsAccessors Accessors
 
-We just saw that iterators are not very clever and just know how to
-march through a mesh. Whatever you actually can do with this iterator
-is determined by the Accessor. The magic is, that for any iterator
-<tt>i</tt>, the term <tt>i-&gt;</tt> grants access to <b>all</b>
-attributes of this Accessor.
+Iterators are like pointers: they can be incremented and decremented, but they
+are really rather dumb. Their magic only lies in the fact that they point to
+some useful object, in this case the Accessor. Accessing data that
+characterizes a cell is always done through the Accessor, i.e. the expression
+<tt>i-&gt;</tt> grants access to <b>all</b> attributes of this Accessor.
+
 
 @section IteratorsTypedefs Iterators defined in the containers
 
