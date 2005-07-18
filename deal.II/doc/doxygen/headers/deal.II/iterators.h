@@ -8,7 +8,7 @@ MGDoFHandler. All of those define a set of iterators, allowing the
 user to traverse the whole mesh or portions of it. Therefore, they
 have somethings in common. In fact, these iterators are instantiations
 or subclasses of the same class TriaIterator (we do not include
-TriaRawIterator here, since it is only for internal use),
+TriaRawIterator here, since it is only for internal use).
 
 The template signature of TriaIterator is
 @code
