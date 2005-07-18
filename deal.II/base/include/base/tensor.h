@@ -1277,7 +1277,8 @@ invert (const Tensor<2,dim> &t)
     {
       case 1:
 	    return_tensor[0][0] = 1.0/t[0][0];
-	    return return_tensor;
+	    break;
+
       case 2:
 					     // this is Maple output,
 					     // thus a bit unstructured
@@ -1287,8 +1288,8 @@ invert (const Tensor<2,dim> &t)
 	return_tensor[0][1] = -t[0][1]*t4;
 	return_tensor[1][0] = -t[1][0]*t4;
 	return_tensor[1][1] = t[0][0]*t4;
-	return return_tensor;
-      };
+	break;
+      }
       
       case 3:
       {
@@ -1309,8 +1310,9 @@ invert (const Tensor<2,dim> &t)
 	return_tensor[2][0] = -(-t[1][0]*t[2][1]+t[1][1]*t[2][0])*t07;
 	return_tensor[2][1] = -(t[0][0]*t[2][1]-t01)*t07;
 	return_tensor[2][2] = (t4-t8)*t07;
-	return return_tensor;
-      };
+        
+	break;
+      }
 
 					// if desired, take over the
 					// inversion of a 4x4 tensor
@@ -1318,7 +1320,7 @@ invert (const Tensor<2,dim> &t)
        
       default:
 	    AssertThrow (false, ExcNotImplemented());
-    };    
+    }    
   return return_tensor;
 }
 
