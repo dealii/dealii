@@ -143,6 +143,16 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: The files
+       <tt>deal.II/include/grid/geometry_info.h</tt> and
+       <tt>deal.II/source/grid/geometry_info.cc</tt> have been moved
+       to <tt>base/include/base</tt> and <tt>base/source</tt>,
+       respectively. A redirection header file has been left in the
+       old location for compatibility.
+       <br>
+       (GK, 2005/07/19)
+       </p>
+  <li> <p>
        Changed: Cygwin has problems linking against deal.II DLLs if you
        link against more than one dimension dependent library. The linker
        might issue error messages about multiple defined symbols. This is now
