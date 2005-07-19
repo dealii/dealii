@@ -16,6 +16,7 @@
 #include <base/subscriptor.h>
 #include <lac/vector_memory.h>
 #include <lac/pointer_matrix.h>
+#include <lac/solver_richardson.h>
 
 template<typename number> class Vector;
 template<typename number> class BlockVector;
@@ -292,6 +293,97 @@ class MeanValueFilter : public Subscriptor
     unsigned int component;
 };
 
+
+
+/**
+ * Inverse matrix computed approximately by using the SolverRichardson
+ * iterative solver. In particular, the function
+ * SolverRichardson::Tsolve() allows for the implementation of
+ * transpose matrix vector products.
+ *
+ * The functions vmult() and Tvmult() appoximate the inverse
+ * iteratively starting with the vector <tt>dst</tt>. Functions
+ * vmult_add() and Tvmult_add() start the iteration with a zero
+ * vector.
+ *
+ * @ref Instantiations: some (Vector<float>, Vector<double>, BlockVector<float>, BlockVector<double>)
+ * @author Guido Kanschat, 2005
+ */
+template<class VECTOR>
+class InverseMatrixRichardson
+{
+  public:
+				     /**
+				      * Constructor, initializing the
+				      * solver with a control and
+				      * memory object. The inverted
+				      * matrix and the preconditioner
+				      * are added in initialize().
+				      */
+    InverseMatrixRichardson (SolverControl& control,
+			     VectorMemory<VECTOR>& mem);
+    
+				     /**
+				      * Initialization
+				      * function. Provide a solver
+				      * object, a matrix, and another
+				      * preconditioner for this.
+				      */
+    template <class MATRIX, class PRECONDITION>
+    void initialize (const MATRIX&,
+		     const PRECONDITION&);
+
+				     /**
+				      * Access to the SolverControl
+				      * object used by the solver.
+				      */
+    SolverControl& control() const;
+				     /**
+				      * Execute solver.
+				      */
+    void vmult (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Execute solver.
+				      */
+    void vmult_add (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Execute transpose solver.
+				      */
+    void Tvmult (VECTOR&, const VECTOR&) const;
+
+				     /**
+				      * Execute transpose solver.
+				      */
+    void Tvmult_add (VECTOR&, const VECTOR&) const;
+
+  private:
+				     /**
+				      * Access to the provided
+				      * VectorMemory object.
+				      */
+    mutable VectorMemory<VECTOR>& mem;
+    
+				     /**
+				      * The solver object.
+				      */
+    mutable SolverRichardson<VECTOR> solver;
+    
+				     /**
+				      * The matrix in use.
+				      */
+    PointerMatrixBase<VECTOR>* matrix;
+    
+				     /**
+				      * The preconditioner to use.
+				      */
+    PointerMatrixBase<VECTOR>* precondition;
+};
+
+
+
+
 /*@}*/
 //---------------------------------------------------------------------------
 
@@ -401,6 +493,17 @@ inline void
 MeanValueFilter::Tvmult_add(VECTOR&, const VECTOR&) const
 {
   Assert(false, ExcNotImplemented());
+}
+
+//-----------------------------------------------------------------------//
+
+template <class VECTOR>
+template <class MATRIX, class PRECONDITION>
+inline void
+InverseMatrixRichardson<VECTOR>::initialize (const MATRIX& m, const PRECONDITION& p)
+{
+  matrix = &m;
+  precondition = &p;
 }
 
 

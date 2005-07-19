@@ -116,4 +116,75 @@ MeanValueFilter::vmult_add(BlockVector<number>& dst,
       dst.block(i).add(src.block(i));
 }
 
+
+//----------------------------------------------------------------------//
+
+
+template <class VECTOR>
+InverseMatrixRichardson<VECTOR>::InverseMatrixRichardson(
+  SolverControl& c,
+  VectorMemory<VECTOR>& m)
+		:
+		mem(m),
+		solver(c,m),
+		matrix(0),
+		precondition(0)
+{}
+
+
+
+
+template <class VECTOR>
+void
+InverseMatrixRichardson<VECTOR>::vmult(VECTOR& dst, const VECTOR& src) const
+{
+  Assert (matrix != 0, ExcNotInitialized());
+  Assert (precondition != 0, ExcNotInitialized());
+  solver.solve(*matrix, dst, src, *precondition);
+}
+
+
+
+template <class VECTOR>
+void
+InverseMatrixRichardson<VECTOR>::vmult_add(VECTOR& dst, const VECTOR& src) const
+{
+  Assert (matrix != 0, ExcNotInitialized());
+  Assert (precondition != 0, ExcNotInitialized());
+  VECTOR* aux = mem.alloc();
+  aux->reinit(dst);
+  solver.solve(*matrix, *aux, src, *precondition);
+  dst += *aux;
+  mem.free(aux);
+}
+
+
+
+template <class VECTOR>
+void
+InverseMatrixRichardson<VECTOR>::Tvmult(VECTOR& dst, const VECTOR& src) const
+{
+  Assert (matrix != 0, ExcNotInitialized());
+  Assert (precondition != 0, ExcNotInitialized());
+  solver.Tsolve(*matrix, dst, src, *precondition);
+}
+
+
+
+template <class VECTOR>
+void
+InverseMatrixRichardson<VECTOR>::Tvmult_add(VECTOR& dst, const VECTOR& src) const
+{
+  Assert (matrix != 0, ExcNotInitialized());
+  Assert (precondition != 0, ExcNotInitialized());
+  VECTOR* aux = mem.alloc();
+  aux->reinit(dst);
+  solver.Tsolve(*matrix, *aux, src, *precondition);
+  dst += *aux;
+  mem.free(aux);
+}
+
+
+
+
 #endif
