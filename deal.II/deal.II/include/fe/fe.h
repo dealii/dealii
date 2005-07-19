@@ -163,14 +163,20 @@ class FiniteElement : public FiniteElementBase<dim>
 
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcBoundaryFaceUsed);
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcJacobiDeterminantHasWrongSign);
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcComputationNotUseful,
 		    int,
