@@ -17,7 +17,7 @@
 #include <base/config.h>
 #include <base/point.h>
 #include <base/table.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 
 #include <vector>
 #include <string>

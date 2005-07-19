@@ -20,7 +20,7 @@
 #include <lac/petsc_vector.h>
 #include <lac/petsc_block_vector.h>
 #include <grid/tria_iterator.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <fe/fe.h>

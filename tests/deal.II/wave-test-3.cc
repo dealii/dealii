@@ -2287,7 +2287,7 @@ template class HuyghensWave<2>;
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_constraints.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <base/quadrature.h>
@@ -2807,7 +2807,7 @@ template class EvaluateHuyghensWave<2>;
 #include <lac/vector.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_handler.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 
 #include <cmath>
 #include <algorithm>
@@ -4463,7 +4463,7 @@ void SweepInfo::write_summary (const std::list<EvaluationBase<2>*> &eval_list,
 #include <lac/solver_cg.h>
 #include <lac/vector_memory.h>
 #include <lac/precondition.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
@@ -6516,7 +6516,7 @@ template class TimeStep<2>;
 #include <dofs/dof_accessor.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 #include <numerics/data_out_stack.h>
 
 #include <fstream>

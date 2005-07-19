@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 #include <base/quadrature.h>
 #include <base/qprojector.h>
 #include <base/memory_consumption.h>

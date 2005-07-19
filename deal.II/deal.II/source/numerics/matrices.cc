@@ -18,7 +18,7 @@
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 #include <base/quadrature.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>

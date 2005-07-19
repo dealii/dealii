@@ -16,7 +16,7 @@
 #include <base/config.h>
 #include <base/polynomials_raviart_thomas.h>
 #include <base/tensor_product_polynomials.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 #include <fe/fe.h>
 #include <fe/fe_poly_tensor.h>
 

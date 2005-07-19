@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 
 
 
@@ -26,6 +26,9 @@ template <int dim> const unsigned int GeometryInfo<dim>::quads_per_face;
 template <int dim> const unsigned int GeometryInfo<dim>::lines_per_cell;
 template <int dim> const unsigned int GeometryInfo<dim>::quads_per_cell;
 template <int dim> const unsigned int GeometryInfo<dim>::hexes_per_cell;
+
+
+using namespace deal_II_numbers;
 
 // make sure that also the icc compiler defines (and not only declares) 
 // these variables
@@ -41,6 +44,7 @@ namespace internal
 
   template void define_variables<2> ();
   template void define_variables<3> ();
+  template void define_variables<4> ();
 }
 
 
@@ -50,15 +54,24 @@ template <>
 const unsigned int GeometryInfo<1>::opposite_face[GeometryInfo<1>::faces_per_cell]
 = { 0, 1 };
 
-
 template <>
 const unsigned int GeometryInfo<2>::opposite_face[GeometryInfo<2>::faces_per_cell]
 = { 2, 3, 0, 1 };
 
-
 template <>
 const unsigned int GeometryInfo<3>::opposite_face[GeometryInfo<3>::faces_per_cell]
 = { 1, 0, 4, 5, 2, 3 };
+
+template <>
+const unsigned int GeometryInfo<4>::opposite_face[GeometryInfo<4>::faces_per_cell]
+= { invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int };
 
 
 
@@ -66,15 +79,33 @@ template <>
 const unsigned int GeometryInfo<1>::dx_to_deal[GeometryInfo<1>::vertices_per_cell]
 = { 0, 1};
 
-
 template <>
 const unsigned int GeometryInfo<2>::dx_to_deal[GeometryInfo<2>::vertices_per_cell]
 = { 0, 3, 1, 2};
 
-
 template <>
 const unsigned int GeometryInfo<3>::dx_to_deal[GeometryInfo<3>::vertices_per_cell]
 = { 0, 3, 4, 7, 1, 2, 5, 6};
+
+template <>
+const unsigned int GeometryInfo<4>::dx_to_deal[GeometryInfo<4>::vertices_per_cell]
+= { invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int,
+    invalid_unsigned_int };
+
 
 //TODO: Use these values in mappings.
 template <>
@@ -103,6 +134,16 @@ template <>
 const int
 GeometryInfo<3>::unit_normal_orientation[GeometryInfo<3>::faces_per_cell]
 = { -1, 1, -1, 1, 1, -1 };
+
+// These are already for the new, regular numbering
+template <>
+const unsigned int
+GeometryInfo<4>::unit_normal_direction[GeometryInfo<4>::faces_per_cell]
+= { 0, 0, 1, 1, 2, 2, 3, 3 };
+template <>
+const int
+GeometryInfo<4>::unit_normal_orientation[GeometryInfo<4>::faces_per_cell]
+= { -1, 1, -1, 1, -1, 1, -1, 1 };
 
 
 
@@ -164,6 +205,18 @@ GeometryInfo<3>::child_cell_on_face (const unsigned int face,
 
 template <>
 unsigned int
+GeometryInfo<4>::child_cell_on_face (const unsigned int,
+				     const unsigned int,
+				     const bool)
+{
+  Assert(false, ExcNotImplemented());
+  return invalid_unsigned_int;
+}
+
+
+
+template <>
+unsigned int
 GeometryInfo<1>::line_to_cell_vertices (const unsigned int line,
 					const unsigned int vertex)
 {
@@ -209,8 +262,16 @@ GeometryInfo<3>::line_to_cell_vertices (const unsigned int line,
 }
 
 
+template <>
+unsigned int
+GeometryInfo<4>::line_to_cell_vertices (const unsigned int,
+					const unsigned int)
+{
+  Assert(false, ExcNotImplemented());
+  return invalid_unsigned_int;
+}
 
-//TODO:[GK] Is this the correct notion in 1D?
+
 template <>
 unsigned int
 GeometryInfo<1>::face_to_cell_lines (const unsigned int face,
@@ -219,8 +280,10 @@ GeometryInfo<1>::face_to_cell_lines (const unsigned int face,
 {
   Assert (face+1<faces_per_cell+1, ExcIndexRange(face, 0, faces_per_cell));
   Assert (line+1<lines_per_face+1, ExcIndexRange(line, 0, lines_per_face));
-
-  return face;
+  
+				   // There is only a single line, so
+				   // it must be this.
+  return 0;
 }
 
 
@@ -234,6 +297,7 @@ GeometryInfo<2>::face_to_cell_lines (const unsigned int face,
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (line<lines_per_face, ExcIndexRange(line, 0, lines_per_face));
 
+				   // The face is a line itself.
   return face;
 }
 
@@ -261,6 +325,18 @@ GeometryInfo<3>::face_to_cell_lines (const unsigned int face,
 
 
 
+template <>
+unsigned int
+GeometryInfo<4>::face_to_cell_lines (const unsigned int,
+				     const unsigned int,
+				     const bool)
+{
+  Assert(false, ExcNotImplemented());
+  return invalid_unsigned_int;
+}
+
+
+
 template <int dim>
 inline
 unsigned int
@@ -277,4 +353,4 @@ GeometryInfo<dim>::face_to_cell_vertices (const unsigned int face,
 template class GeometryInfo<1>;
 template class GeometryInfo<2>;
 template class GeometryInfo<3>;
-
+template class GeometryInfo<4>;

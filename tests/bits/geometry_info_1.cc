@@ -16,7 +16,7 @@
 
 #include "../tests.h"
 #include <base/logstream.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 
 #include <fstream>
 #include <cstdlib>

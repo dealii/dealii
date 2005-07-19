@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 #include <fe/fe.h>
 
 

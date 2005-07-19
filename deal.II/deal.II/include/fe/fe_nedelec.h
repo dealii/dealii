@@ -14,7 +14,7 @@
 #define __deal2__fe_nedelec_h
 
 #include <base/config.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 #include <fe/fe.h>
 
 template <int dim> class MappingQ;

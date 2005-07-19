@@ -20,7 +20,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_levels.h>
 #include <grid/tria.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 #include <fe/fe.h>
 
 #include <set>

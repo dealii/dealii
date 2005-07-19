@@ -438,6 +438,31 @@ FiniteElementBase<dim>::has_support_points () const
 
 
 template <int dim>
+const std::vector<Point<dim> > &
+FiniteElementBase<dim>::get_generalized_support_points () const
+{
+				   // a finite element may define
+				   // support points, but only if
+				   // there are as many as there are
+				   // degrees of freedom
+  Assert ((generalized_support_points.size() == 0) ||
+	  (generalized_support_points.size() == this->dofs_per_cell),
+	  ExcInternalError());
+  return generalized_support_points;
+}
+
+
+
+template <int dim>
+bool
+FiniteElementBase<dim>::has_generalized_support_points () const
+{
+  return (generalized_support_points.size() != 0);
+}
+
+
+
+template <int dim>
 Point<dim>
 FiniteElementBase<dim>::unit_support_point (const unsigned index) const
 {
@@ -476,6 +501,31 @@ FiniteElementBase<dim>::has_face_support_points () const
 
 
 template <int dim>
+const std::vector<Point<dim-1> > &
+FiniteElementBase<dim>::get_generalized_face_support_points () const
+{
+				   // a finite element may define
+				   // support points, but only if
+				   // there are as many as there are
+				   // degrees of freedom on a face
+  Assert ((generalized_face_support_points.size() == 0) ||
+	  (generalized_face_support_points.size() == this->dofs_per_face),
+	  ExcInternalError());
+  return generalized_face_support_points;
+}
+
+
+
+template <int dim>
+bool
+FiniteElementBase<dim>::has_generalized_face_support_points () const
+{
+  return (generalized_face_support_points.size() != 0);
+}
+
+
+
+template <int dim>
 Point<dim-1>
 FiniteElementBase<dim>::unit_face_support_point (const unsigned index) const
 {
@@ -485,6 +535,79 @@ FiniteElementBase<dim>::unit_face_support_point (const unsigned index) const
           ExcFEHasNoSupportPoints ());
   return unit_face_support_points[index];
 }
+
+
+
+template <int dim>
+void
+FiniteElementBase<dim>::interpolate(
+  std::vector<double>&       local_dofs,
+  const std::vector<double>& values) const
+{
+  Assert (has_support_points(), ExcFEHasNoSupportPoints());
+  Assert (values.size() == unit_support_points.size(),
+	  ExcDimensionMismatch(values.size(), unit_support_points.size()));
+  Assert (local_dofs.size() == this->dofs_per_cell,
+	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
+  Assert (this->n_components() == 1,
+	  ExcDimensionMismatch(this->n_components(), 1));
+
+  Assert(false, ExcNotImplemented());
+  
+//  std::fill(values.begin(), values.end(), local_dofs.begin());
+}
+
+
+
+
+template <int dim>
+void
+FiniteElementBase<dim>::interpolate(
+  std::vector<double>&    local_dofs,
+  const std::vector<Vector<double> >& values,
+  unsigned int offset) const
+{
+  Assert (has_support_points(), ExcFEHasNoSupportPoints());
+  Assert (values.size() == unit_support_points.size(),
+	  ExcDimensionMismatch(values.size(), unit_support_points.size()));
+  Assert (local_dofs.size() == this->dofs_per_cell,
+	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
+  Assert (values[0].size() >= offset+this->n_components(),
+	  ExcDimensionMismatch(values[0].size(),offset+this->n_components()));
+  
+  for (unsigned int i=0;i<this->dofs_per_cell;++i)
+    {
+      const std::pair<unsigned int, unsigned int> index
+	= this->system_to_component_index(i);
+      local_dofs[i] = values[index.second](offset+index.first);
+    }
+}
+
+
+
+
+template <int dim>
+void
+FiniteElementBase<dim>::interpolate(
+  std::vector<double>& local_dofs,
+  const VectorSlice<const std::vector<std::vector<double> > >& values) const
+{
+  Assert (has_support_points(), ExcFEHasNoSupportPoints());
+  Assert (values[0].size() == unit_support_points.size(),
+	  ExcDimensionMismatch(values.size(), unit_support_points.size()));
+  Assert (local_dofs.size() == this->dofs_per_cell,
+	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
+  Assert (values.size() == this->n_components(),
+	  ExcDimensionMismatch(values.size(), this->n_components()));
+  
+  for (unsigned int i=0;i<this->dofs_per_cell;++i)
+    {
+      const std::pair<unsigned int, unsigned int> index
+	= this->system_to_component_index(i);
+      local_dofs[i] = values[index.first][index.second];
+    }
+}
+
 
 
 

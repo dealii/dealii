@@ -19,12 +19,14 @@
 #include <base/point.h>
 #include <base/tensor.h>
 #include <base/table.h>
-#include <grid/geometry_info.h>
+#include <base/vector_slice.h>
+#include <base/geometry_info.h>
 #include <lac/full_matrix.h>
 #include <fe/fe_update_flags.h>
 #include <fe/mapping.h>
 
 #include <string>
+#include <vector>
 
 template<int dim> class FESystem;
 
@@ -1232,6 +1234,11 @@ class FiniteElementBase : public Subscriptor,
     bool restriction_is_additive (const unsigned int index) const;
 
 				     /**
+				      * @name Support points and interpolation
+				      * @{
+				      */
+    
+				     /**
 				      * Return the support points of
 				      * the trial functions on the
 				      * unit cell, if the derived
@@ -1398,13 +1405,93 @@ class FiniteElementBase : public Subscriptor,
 
                                      /**
                                       * The function corresponding to
-                                      * the @p unit_support_point
+                                      * the unit_support_point()
                                       * function, but for faces. See
                                       * there for more information.
                                       */
     virtual
     Point<dim-1>
     unit_face_support_point (const unsigned int index) const;
+    
+				     /**
+				      * Return a support point vector
+				      * for generalized interpolation.
+				      */
+    const std::vector<Point<dim> > &
+    get_generalized_support_points () const;    
+
+				     /**
+				      *
+				      */
+    bool has_generalized_support_points () const;
+
+				     /**
+				      *
+				      */
+    const std::vector<Point<dim-1> > &
+    get_generalized_face_support_points () const;
+
+				     /**
+				      * Return whether a finite
+				      * element has defined support
+				      * points on faces. If the result
+				      * is true, then a call to the
+				      * @p get_unit_support_points
+				      * yields a non-empty array.
+				      *
+				      * For more information, see the
+				      * documentation for the
+				      * has_support_points()
+				      * function.
+				      */
+    bool has_generalized_face_support_points () const;
+
+				     /**
+				      * Interpolate a set of scalar
+				      * values, computed in the
+				      * generalized support points.
+				      *
+				      * @note This function is
+				      * implemented in
+				      * FiniteElementBase for the case
+				      * that the element has support
+				      * points. In this case, the
+				      * resulting coefficients are
+				      * just the values in the suport
+				      * points. All other elements
+				      * must reimplement it.
+				      */
+    virtual void interpolate(std::vector<double>&       local_dofs,
+			     const std::vector<double>& values) const;
+      
+				     /**
+				      * Interpolate a set of vector
+				      * values, computed in the
+				      * generalized support points.
+				      *
+				      * Since a finite element often
+				      * only interpolates part of a
+				      * vector, <tt>offset</tt> is
+				      * used to determine the first
+				      * component of the vector to be
+				      * interpolated. Maybe consider
+				      * changing your data structures
+				      * to use the next function.
+				      */
+    virtual void interpolate(std::vector<double>&                local_dofs,
+			     const std::vector<Vector<double> >& values,
+			     unsigned int offset = 0) const;
+      
+				     /**
+				      * Interpolate a set of vector
+				      * values, computed in the
+				      * generalized support points.
+				      */
+    virtual void interpolate(
+      std::vector<double>& local_dofs,
+      const VectorSlice<const std::vector<std::vector<double> > >& values) const;
+      
+				     //@}
     
 				     /**
 				      * Return in which of the vector
@@ -1518,6 +1605,8 @@ class FiniteElementBase : public Subscriptor,
 
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcShapeFunctionNotPrimitive,
 		    int,
@@ -1529,35 +1618,61 @@ class FiniteElementBase : public Subscriptor,
 		    << "_component suffix?");
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcFENotPrimitive);
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcUnitShapeValuesDoNotExist);
 
 				     /**
-				      * Exception
+				      * Attempt to access support
+				      * points of a finite element
+				      * which is not Lagrangian.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcFEHasNoSupportPoints);
 
 				     /**
-				      * Exception
+				      * Attempt to access embedding
+				      * matrices of a finite element
+				      * which did not implement these
+				      * matrices.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcEmbeddingVoid);
     
 				     /**
+				      * Attempt to access restriction
+				      * matrices of a finite element
+				      * which did not implement these
+				      * matrices.
+				      *
 				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcProjectionVoid);
     
 				     /**
+				      * Attempt to access constraint
+				      * matrices of a finite element
+				      * which did not implement these
+				      * matrices.
+				      *
 				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcConstraintsVoid);
     
 				     /**
 				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException2 (ExcWrongInterfaceMatrixSize,
 		    int, int,
@@ -1566,6 +1681,7 @@ class FiniteElementBase : public Subscriptor,
 		    << ", which is not reasonable in the present dimension.");
 				     /**
 				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException2 (ExcComponentIndexInvalid,
 		    int, int,
@@ -1573,13 +1689,14 @@ class FiniteElementBase : public Subscriptor,
 		    << ") is invalid, i.e. non-existent");
                                      /**
                                       * Exception
+				      * @ingroup Exceptions
                                       */
     DeclException0 (ExcInterpolationNotImplemented);
     
   protected:  
  				     /**
 				      * Array of projection matrices. See
-				      * @p get_restriction_matrix above.
+				      * get_restriction_matrix() above.
 				      *
 				      * Matrices in this array are
 				      * automatically initialized to
@@ -1847,7 +1964,21 @@ class FiniteElementBase : public Subscriptor,
 				      * support point.
 				      */
     std::vector<Point<dim-1> > unit_face_support_points;
-
+    
+				     /**
+				      * Support points used for
+				      * interpolation functions of
+				      * non-Lagrangian elements.
+				      */
+    std::vector<Point<dim> > generalized_support_points;
+    
+				     /**
+				      * Face support points used for
+				      * interpolation functions of
+				      * non-Lagrangian elements.
+				      */    
+    std::vector<Point<dim-1> > generalized_face_support_points;
+    
 				     /**
 				      * For each shape function, give
 				      * a vector of bools (with size

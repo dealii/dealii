@@ -18,7 +18,7 @@
 #include <grid/tria_boundary.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/geometry_info.h>
+#include <base/geometry_info.h>
 #include <grid/grid_tools.h>
 #include <grid/magic_numbers.h>
 #include <lac/vector.h>
