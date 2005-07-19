@@ -80,7 +80,11 @@ class FETools
       const FiniteElement<dim>&                fe,
       std::vector<unsigned int>&               renumbering,
       std::vector<std::vector<unsigned int> >& start_indices);
-    
+
+				     /**
+				      * @name Generation of local matrices
+				      * @{
+				      */
 				     /**
 				      * Gives the interpolation matrix
 				      * that interpolates a @p fe1-
@@ -423,7 +427,7 @@ class FETools
 
 				     //@}
 				     /**
-				      * @name DoF: Functions which should be in DoFTools
+				      * @name Functions which should be in DoFTools
 				      */
 				     //@{
 				     /**
