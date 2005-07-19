@@ -93,9 +93,11 @@ check_matrices (FiniteElement<dim>& fe, const char* name)
   for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
     {
       deallog << name << '<' << dim << '>' << " restriction " << i << std::endl;
-      print_formatted (fe.get_restriction_matrix(i), 3, 6);
+      if (fe.restriction_is_implemented())
+	print_formatted (fe.get_restriction_matrix(i), 3, 6);
       deallog << name << '<' << dim << '>' << " embedding " << i << std::endl;
-      print_formatted (fe.get_prolongation_matrix(i), 3, 6);
+      if (fe.prolongation_is_implemented())
+	print_formatted (fe.get_prolongation_matrix(i), 3, 6);
     }
 }
 
@@ -130,11 +132,11 @@ main()
                                    // DGP elements presently have no
                                    // restriction matrices, so cannot
                                    // be tested
-//   CHECK_M(DGP,0,2);
-//   CHECK_M(DGP,1,2);
-//   CHECK_M(DGP,2,2);
-//   CHECK_M(DGP,3,2);
-//   CHECK_M(DGP,4,2);
+  CHECK_M(DGP,0,2);
+  CHECK_M(DGP,1,2);
+  CHECK_M(DGP,2,2);
+  CHECK_M(DGP,3,2);
+  CHECK_M(DGP,4,2);
 
   CHECK_ALL(Q,1,2);
   CHECK_ALL(Q,2,2);
@@ -149,9 +151,9 @@ main()
   CHECK_M(DGQ,2,3);
 
                                    // see above
-//   CHECK_M(DGP,0,3);
-//   CHECK_M(DGP,1,3);
-//   CHECK_M(DGP,2,3);
+  CHECK_M(DGP,0,3);
+  CHECK_M(DGP,1,3);
+  CHECK_M(DGP,2,3);
 
   CHECK_ALL(Q,1,3);
   CHECK_ALL(Q,2,3);
