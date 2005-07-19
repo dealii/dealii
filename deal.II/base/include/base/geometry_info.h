@@ -110,10 +110,10 @@ struct GeometryInfo<0>
 
 /**
  * This template specifies the interface to all topological structure
- * of the mesh cells. This template class can be instantiated for
- * dim=1,2 and 3.
+ * of the mesh cells.
  *
  * @ingroup grid
+ * @ref Instantiations: few (dim = 1,2,3,4 and a specialization for dim=0)
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005
  */
 template <int dim>
