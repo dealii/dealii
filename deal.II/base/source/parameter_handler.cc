@@ -786,8 +786,8 @@ bool ParameterHandler::get_bool (const std::string &entry_string) const
 {
   std::string s = get(entry_string);
 
-  AssertThrow ((s=="true") || (s=="false"), ExcConversionError(s));
-  if (s=="true")
+  AssertThrow ((s=="true") || (s=="false") || (s=="yes") || (s=="no"), ExcConversionError(s));
+  if (s=="true" || s=="yes")
     return true;
   else
     return false;

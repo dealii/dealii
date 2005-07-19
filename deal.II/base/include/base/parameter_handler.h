@@ -1371,7 +1371,10 @@ class ParameterHandler
 				     /**
 				      * Return value of entry
 				      * <tt>entry_string</tt> as <tt>bool</tt>.
-				      */
+                                      * The entry may be "true" or "yes" 
+                                      * for <tt>true</tt>, "false" or
+                                      * "no" for <tt>false</tt> respectively.
+                                      */
     bool           get_bool (const std::string &entry_string) const;
 
 				     /**

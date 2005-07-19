@@ -252,6 +252,14 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: <code>ParameterHandler::get_bool()</code> only accepted
+       "true" or "false" as boolean values, now it also considers "yes"
+       and "no" as "true" and "false" respectively.
+       <br>
+       (Ralf B. Schulz, 2005/07/19)
+       </p>
+       
+  <li> <p>
        Removed: The <code>write_multigrid</code> flag in <code
        class="member">DataOutBase::DXFlags</code> 
        has been removed, since it wasn't used anywhere.
