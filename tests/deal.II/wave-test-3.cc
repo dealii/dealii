@@ -385,6 +385,7 @@ class DualFunctional {
   public:
     DualFunctional (const bool use_primal_problem            = false,
 		    const bool use_primal_problem_at_endtime = false);
+    virtual ~DualFunctional () {}
     virtual void compute_endtime_vectors (Vector<double> &final_u_bar,
 					  Vector<double> &final_v_bar);
     virtual void compute_functionals (Vector<double> &j1,
@@ -462,6 +463,7 @@ class EarthSurface : public DualFunctional<dim> {
 template <int dim>
 class SplitSignal : public DualFunctional<dim> {
   public:
+    virtual ~SplitSignal () {}    
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
@@ -470,6 +472,7 @@ class SplitSignal : public DualFunctional<dim> {
 template <int dim>
 class SplitLine : public DualFunctional<dim> {
   public:
+    virtual ~SplitLine () {}
     void compute_endtime_vectors (Vector<double> &final_u_bar,
 				  Vector<double> &final_v_bar);
 };
@@ -478,6 +481,7 @@ class SplitLine : public DualFunctional<dim> {
 template <int dim>
 class OneBranch1d : public DualFunctional<dim> {
   public:
+    virtual ~OneBranch1d () {}
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
@@ -486,6 +490,7 @@ class OneBranch1d : public DualFunctional<dim> {
 template <int dim>
 class SecondCrossing : public DualFunctional<dim> {
   public:
+    virtual ~SecondCrossing () {}
     virtual void compute_functionals (Vector<double> &j1,
 				      Vector<double> &j2);
 };
@@ -4861,10 +4866,14 @@ void TimeStep_Wave<dim>::transfer_old_solutions (Vector<double> &old_u,
 
   typename DoFHandler<dim>::cell_iterator old_cell = old_dof_handler->begin(),
 				 new_cell = present_dof_handler->begin();
+// In the following loop, we should really increment new_cell as well. but we
+// don't. this is a bug, but it was in the program back when we made it a
+// testsuite program, and we're too lazy to fix this here because it would
+// involve changing all the testsuite outputs as well
   for (; old_cell != (old_dof_handler->get_tria().n_levels() == 1  ?
 		      static_cast<typename DoFHandler<dim>::cell_iterator>(old_dof_handler->end()) :
 		      old_dof_handler->begin(1));
-       ++old_cell, new_cell)
+       ++old_cell)
     transfer_old_solutions (old_cell, new_cell,
 			    *old_grid_u, *old_grid_v,
 			    old_u, old_v);
