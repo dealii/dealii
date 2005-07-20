@@ -82,16 +82,11 @@ A.codeRef { font-weight: normal; color: #1A419D}
 A:hover { text-decoration: none; background-color: #f2f2ff }
 DL.el { margin-left: -1cm }
 PRE.fragment {
-	border: 1px solid #CCCCCC;
 	background-color: #f5f5f5;
 	margin-top: 4px;
 	margin-bottom: 4px;
 	margin-left: 2px;
 	margin-right: 8px;
-	padding-left: 6px;
-	padding-right: 6px;
-	padding-top: 4px;
-	padding-bottom: 4px;
 }
 DIV.fragment {
 	border: 1px solid #CCCCCC;
