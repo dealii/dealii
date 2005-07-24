@@ -47,7 +47,7 @@
  * the configure script is looking for and how to provide it.
  *
  *
- * @section SPDMA1 Interface and Method
+ * <h3>Interface and Method</h3>
  *
  * For the meaning of the three functions initialize(), factorize(),
  * and solve(), as well as for the method used in MA27, please see the
@@ -62,7 +62,7 @@
  * which is significantly less costly than the decomposition process.
  *
  *
- * @section SPDMA2 Parameters to the constructor
+ * <h3>Parameters to the constructor</h3>
  *
  * The constructor of this class takes several arguments. The meaning
  * is the following: the MA27 functions require the user to allocate
@@ -101,9 +101,9 @@
  * indicated value is far too small and can not be relied upon.
  *
  *
- * @section SPDMA3 Note on parallelization
+ * <h3>Note on parallelization</h3>
  *
- * @subsection SPDMA4 Synchronisation
+ * <h4>Synchronisation</h4>
  * 
  * Due to the use of global variables through COMMON blocks, the calls
  * to the sparse direct solver routines are not multithreading-safe,
@@ -125,7 +125,7 @@
  * Since such cross-function synchronisation can only be performed
  * from outside, it is left to the user of this class to do so.
  *
- * @subsection SPDMA5 Detached mode
+ * <h4>Detached mode</h4>
  *
  * As an alternative, you can call the function set_detached_mode()
  * right after calling the constructor. This lets the program fork, so
@@ -160,7 +160,7 @@
  * you probably wanted.
  *
  * 
- * @subsection SPDMA6 Internals of the detached mode
+ * <h5>Internals of the detached mode</h5>
  *
  * The program that actually runs the detached solver is called
  * <tt>detached_ma27</tt>, and will show up under this name in the process
@@ -619,7 +619,7 @@ class SparseDirectMA27 : public Subscriptor
  * the configure script is looking for and how to provide it.
  *
  * 
- * @section SPDMA47a Interface and Method
+ * <h3>Interface and Method</h3>
  *
  * For the meaning of the three functions initialize(), factorize(),
  * and solve(), as well as for the method used in MA47, please see the
@@ -634,14 +634,14 @@ class SparseDirectMA27 : public Subscriptor
  * which is significantly less costly than the decomposition process.
  *
  *
- * @section SPDMA47b Parameters to the constructor
+ * <h3>Parameters to the constructor</h3>
  *
  * The constructor of this class takes several arguments. Their
  * meaning is equivalent to those of the constructor of the
  * SparseDirectMA27 class; see there for more information.
  *
  *
- * @section SPDMA47c Note on parallelization
+ * <h3>Note on parallelization</h3>
  *
  * Due to the use of global variables through COMMON blocks, the calls
  * to the sparse direct solver routines is not multithreading-capable,

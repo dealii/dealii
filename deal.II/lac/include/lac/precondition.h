@@ -185,8 +185,6 @@ class PreconditionRichardson : public Subscriptor
  * It seems that all builtin preconditioners have a relaxation
  * parameter, so please use PreconditionRelaxation for these.
  *
- * @section PrecUMU Usage
- *
  * You will usually not want to create a named object of this type,
  * although possible. The most common use is like this:
  * @code
@@ -322,8 +320,6 @@ class PreconditionRelaxation : public Subscriptor
  * <tt>MATRIX</tt> class used is required to have a function
  * <tt>precondition_Jacobi(VECTOR&, const VECTOR&, double</tt>)
  *
- * @section PrecJU Usage
- *
  * @code
  *     // Declare related objects
  *
@@ -372,8 +368,6 @@ class PreconditionJacobi : public PreconditionRelaxation<MATRIX>
  * <tt>precondition_SOR(VECTOR&, const VECTOR&, double)</tt> and
  * <tt>precondition_TSOR(VECTOR&, const VECTOR&, double)</tt>.
  *
- *
- * @section PrexSORU Usage
  * @code
  *     // Declare related objects
  *
@@ -419,8 +413,6 @@ class PreconditionSOR : public PreconditionRelaxation<MATRIX>
  * <tt>MATRIX</tt> class used is required to have a function
  * <tt>precondition_SSOR(VECTOR&, const VECTOR&, double)</tt>
  *
- *
- * @section PrexSSORU Usage
  * @code
  *     // Declare related objects
  *
@@ -469,8 +461,6 @@ class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
  * <tt>PSOR(VECTOR&, const VECTOR&, double)</tt> and
  * <tt>TPSOR(VECTOR&, const VECTOR&, double)</tt>.
  *
- *
- * @section PrecPSORU Usage
  * @code
  *     // Declare related objects
  *
@@ -559,8 +549,6 @@ class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
  *
  * Usually, the use of ReductionControl is preferred over the use of
  * the basic SolverControl in defining this solver.
- *
- * @section PrecItU Usage
  *
  * Krylov space methods like SolverCG or SolverBicgstab
  * become inefficient if soution down to machine accuracy is

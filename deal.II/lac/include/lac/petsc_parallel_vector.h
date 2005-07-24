@@ -53,7 +53,7 @@ namespace PETScWrappers
  * functions). Only the functions creating a vector of specific type differ,
  * and are implemented in this particular class.
  *
- * @section PETScParVec1 Parallel communication model
+ * <h3>Parallel communication model</h3>
  *
  * The parallel functionality of PETSc is built on top of the Message Passing
  * Interface (MPI). MPI's communication model is built on collective
@@ -79,7 +79,7 @@ namespace PETScWrappers
  * discussed below.
  *
  *
- * @section PETScParVec2 Accessing individual elements of a vector
+ * <h3>Accessing individual elements of a vector</h3>
  *
  * PETSc does allow read access to individual elements of a vector, but in the
  * distributed case only to elements that are stored locally. We implement

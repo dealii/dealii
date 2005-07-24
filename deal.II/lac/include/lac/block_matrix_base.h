@@ -248,7 +248,7 @@ namespace internal
  * individual blocks.
  *
  * 
- * @section Inheritance Inheriting from this class
+ * <h3>Inheriting from this class</h3>
  *
  * Since this class simply forwards its calls to the subobjects (if necessary
  * after adjusting indices denoting which subobject is meant), this class is

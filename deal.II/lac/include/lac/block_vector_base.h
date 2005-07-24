@@ -634,7 +634,7 @@ namespace internal
  * type the block vector is built on.
  * 
  *
- * @section BlockVectorAccess Accessing individual blocks, and resizing vectors
+ * <h3>Accessing individual blocks, and resizing vectors</h3>
  *
  * Apart from using this object as a whole, you can use each block
  * separately as a vector, using the block() function.  There

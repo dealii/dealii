@@ -46,7 +46,7 @@ namespace PETScWrappers
  * class. These comments apply here as well.
  *
  *
- * @section Partitioning Partitioning of matrices
+ * <h3>Partitioning of matrices</h3>
  *
  * PETSc partitions parallel matrices so that each MPI process "owns" a
  * certain number of rows (i.e. only this process stores the respective
