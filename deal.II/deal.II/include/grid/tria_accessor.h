@@ -57,7 +57,7 @@ namespace std
  * operators and the like), but has no functionality to actually
  * dereference data. This is done in the derived classes.
  *
- * @section TAInternals Internals
+ * <h3>Internals</h3>
  *   
  * There is a representation of past-the-end-pointers, denoted by
  * special values of the member variables #present_level and

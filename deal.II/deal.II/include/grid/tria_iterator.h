@@ -79,7 +79,7 @@ template <int dim> class Triangulation;
  * these accessors, the structure of these classes is hidden from the
  * application program.
  *
- * @section TIDiff Which iterator to use when
+ * <h3>Which iterator to use when</h3>
  *
  * @attention Application programs will rarely use TriaRawIterator,
  * but rather one of the derived classes TriaIterator or
@@ -98,7 +98,7 @@ template <int dim> class Triangulation;
  * <li> TriaActiveIterator objects which only loop over active cells.
  * </ul>
  *
- * @section TIPurpose Purpose
+ * <h3>Purpose</h3>
  *
  * Iterators are not much slower than operating directly on the data
  * structures, since they perform the loops that you had to handcode
@@ -123,7 +123,7 @@ template <int dim> class Triangulation;
  * e.g. <em>count_if</em> (see the documentation for Triangulation for
  * an example) and several others.
  *   
- * @section TIImplementation Implementation
+ * <h3>Implementation</h3>
  *
  * The iterator class itself does not have much functionality. It only
  * becomes useful when assigned an Accessor (the second template
@@ -176,7 +176,7 @@ template <int dim> class Triangulation;
  * checked and implemented.
  *
  * 
- * @section Past-the-end iterators
+ * <h3>Past-the-end iterators</h3>
  *   
  * There is a representation of past-the-end-pointers, denoted by special
  * values of the member variables @p present_level and @p present_index:
