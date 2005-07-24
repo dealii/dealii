@@ -43,43 +43,41 @@ class ParameterHandler;
 
 /**
  * This is a base class for output of data on meshes of very general
- * form. It basically only provides a set of functions for several output
- * formats which take a list of patches and write them to an output
- * stream.
+ * form. Output data is expected as a set of <tt>patches</tt> and
+ * written to the output stream in the format expected by the
+ * visualization tool. For a list of output formats, check the
+ * enumeration #OutputFormat. For each format listed there, this class
+ * contains a function <tt>write_format</tt>, writing the
+ * output. Refer to the documentation of those functions for details
+ * on a certain format.
  *
+ * <h3>Structure of the output data</h3>
+ *
+ * Data is not written with the deal.II mesh structure. Instead, it
+ * relies on a set of <tt>patches</tt> created by a derived class.
+ * Each Patch itself consists of a <tt>dim</tt>-dimensional regular
+ * grid with the same number of grid points in each direction. In the
+ * simplest case it may consist of the corner points of a mesh cell.
+ * For each point of this local grid, the Patch contains an arbitrary
+ * (but the same for each point) number of data values.
+ *
+ * Normally, each Patch is written to the output file as what the
+ * visualization program should consider a grid. Therefore, the output
+ * is in most cases a <b>collection</b> of grids with data, <b>not</b>
+ * a single grid. This became necessary, since many programs cannot
+ * handle hanging nodes. On the other hand, it means that data once
+ * written is stripped of its mesh structure and cannot be used for
+ * further simulation with deal.II.
+ * 
  * By offering this interface to the different output formats, it is simple
  * to extend this class to new formats without depending on such things
  * as actual triangulations and handling of data vectors. These things shall
  * be provided by derived class which have a user callable interface then.
  *
+ * In order to enhance intellegibility of this concept, the following
+ * two sections are kept from a previous version of this documentation.
+ * <h4>Patches</h4>
  *
- * @section DataOutBaseInterface Interface
- * This class has an interface that is not usually called by a user directly;
- * also, it consists of <tt>static</tt> functions only. Usually, derived classes will
- * inherit this class <tt>protected</tt> to hide this interface to the users of thes
- * classes.
- *
- * The interface of this class basically consists of the declaration of a data
- * type describing a patch and a bunch of functions taking a list of patches
- * and writing them in one format or other to the stream. It is in the
- * responsibility of the derived classes to provide this list of patches.
- * In addition to the list of patches, a name for each data set may be given.
- *
- *
- * @section QueryingP Querying interface
- *
- * This class also provides a few functions (parse_output_format(),
- * get_output_format_names(), default_suffix()) that can be used to query
- * which output formats this class supports. The provide a list of names for
- * all the formats we can output, parse a string and return an enum indicating
- * each format, and provide a way to convert a value of this enum into the
- * usual suffix used for files of that name. Using these functions, one can
- * entirely free applications from knowledge which formats the library
- * presently allows to output; several of the example programs show how to do
- * this.
- * 
- *
- * @subsection DataOutBasePatches Patches
  * Grids can be thought of as a collection of cells; if you want to write out
  * data on such a grid, you can do so by writing them one cell at a time.
  * The functions in this class therefore take a list of objects describing the
@@ -111,7 +109,7 @@ class ParameterHandler;
  * are that many space directions).
  *
  *
- * @subsection DataOutBaseGP Generalized patches
+ * <h4>Generalized patches</h4>
  *
  * In general, the patches as explained above might be too
  * restricted. For example, one might want to draw only the outer
@@ -129,253 +127,39 @@ class ParameterHandler;
  * as the first, which would correspond to outputting a cell, rather
  * than a face or something else.
  *
+ * <h3>DataOutBaseInterface</h3>
  *
- * @section DataOutBaseFormats Supported output formats
+ * This class has an interface that is not usually called by a user
+ * directly; also, it consists of <tt>static</tt> functions
+ * only. Usually, derived classes will inherit this class
+ * <tt>protected</tt> to hide this interface to the users of thes
+ * classes.
  *
- * @subsection DataOutBaseOpenDX OpenDX (IBM Open Visualization Data Explorer}
+ * The interface of this class basically consists of the declaration of a data
+ * type describing a patch and a bunch of functions taking a list of patches
+ * and writing them in one format or other to the stream. It is in the
+ * responsibility of the derived classes to provide this list of patches.
+ * In addition to the list of patches, a name for each data set may be given.
  *
- * Since Data Explorer (DX) is distributed as OpenSource, there is a
- * well-accessible visualization tool for all (at least Unix-based)
- * platforms. Therefore, output in its natural file format is
- * included.
  *
+ * <h3>Querying interface</h3>
+ *
+ * This class also provides a few functions (parse_output_format(),
+ * get_output_format_names(), default_suffix()) that can be used to query
+ * which output formats this class supports. The provide a list of names for
+ * all the formats we can output, parse a string and return an enum indicating
+ * each format, and provide a way to convert a value of this enum into the
+ * usual suffix used for files of that name. Using these functions, one can
+ * entirely free applications from knowledge which formats the library
+ * presently allows to output; several of the example programs show how to do
+ * this.
  * 
- * @subsection DataOutBaseUCD AVS UCD format
+ * <h3>Output parameters</h3>
  *
- * The UCD format is described in the AVS developer's guide. Due to
- * limitations in the present format, only node based data can be output,
- * which in one reason why we invented the patch concept. In order to
- * write higher order elements, you may split them up into several subdivisions
- * of each cell. These subcells will then, however, also appear as different
- * cells by programs which understand the UCD format.
- * 
- * No use is made of the possibility to give model data since these
- * are not supported by all UCD aware programs. You may give cell data
- * in derived classes by setting all values of a given data set on a
- * patch to the same value.
- *
- *
- * @subsection DataOutBaseGNUPLOT GNUPLOT format
- *
- * The GNUPLOT format is not able to handle data on unstructured grids
- * directly. Directly would mean that you only give the vertices and
- * the solution values thereon and the program constructs its own grid
- * to represent the data. This is only possible for a structured tensor
- * product grid in two dimensions. However, it is possible to give several
- * such patches within one file, which is exactly what the respective
- * function of this class does: writing each cell's data as a patch of
- * data, at least if the patches as passed from derived classes
- * represent cells. Note that the functions on patches need not be
- * continuous at interfaces between patches, so this method also works
- * for discontinuous elements. Note also, that GNUPLOT can do hidden
- * line removal for patched data.
- *
- * While this discussion applies to two spatial dimensions, it is more
- * complicated in 3d. The reason is that we could still use patches, but
- * it is difficult when trying to visualize them, since if we use a cut
- * through the data (by, for example, using x- and z-coordinates, a fixed
- * y-value and plot function values in z-direction, then the patched data
- * is not a patch in the sense GNUPLOT wants it any more. Therefore, we use
- * another approach, namely writing the data on the 3d grid as a sequence
- * of lines, i.e. two points each associated with one or more data sets.
- * There are therefore 12 lines for each subcells of a patch.
- *
- * Given the lines as described above, a cut through this data in Gnuplot
- * can then be achieved like this:
- * @verbatim
- *   set data style lines
- *   splot [:][:][0:] "T" using 1:2:($3==.5 ? $4 : -1)
- * @endverbatim
- * This command plots data in x- and y-direction unbounded, but in z-direction
- * only those data points which are above the x-y-plane (we assume here a
- * positive solution, if it has negative values, you might want to decrease the
- * lower bound). Furthermore, it only takes the data points with z-values (<tt>$3</tt>)
- * equal to 0.5, i.e. a cut through the domain at <tt>z=0.5</tt>. For the data points
- * on this plane, the data values of the first data set (<tt>$4</tt>) are raised in
- * z-direction above the x-y-plane; all other points are denoted the value
- * <tt>-1</tt> instead of the value of the data vector and are not plotted due to
- * the lower bound in z plotting direction, given in the third pair of brackets.
- *
- * Of course, more complex cuts are possible, including nonlinear
- * ones. Note however, that only those points which are actually on the
- * cut-surface are plotted.
- *
- *
- * @subsection DataOutBasePOVRAY POVRAY format
- *
- * Output in this format creates a povray source file, include standard
- * camera and light source definition for rendering with povray 3.1
- * At present, this format only supports output for two-dimensional data,
- * with values in the third direction taken from a data vector.
- *
- * The output uses two different povray-objects:
- *
- * <ul>
- * <li> <tt>BICUBIC_PATCH</tt>
- * A <tt>bicubic_patch</tt> is a 3-dimensional Bezier patch. It consists of 16 Points
- * describing the surface. The 4 corner points are touched by the object,
- * while the other 12 points pull and stretch the patch into shape.
- * One <tt>bicubic_patch</tt> is generated on each patch. Therefor the number of 
- * subdivisions has to be 3 to provide the patch with 16 points.
- * A bicubic patch is not exact but generates very smooth images.
- *
- * <li> <tt>MESH</tt>
- * The mesh object is used to store large number of triangles.
- * Every square of the patch data is split into one upper-left and one 
- * lower-right triangle. If the number of subdivisions is three, 32 triangle
- * are generated for every patch.
- * 
- * Using the smooth flag povray interpolates the normals on the triangles,
- * imitating a curved surface
- * </ul>
- *
- * All objects get one texture definition called Tex. This texture has to be
- * declared somewhere before the object data. This may be in an external 
- * data file or at the beginning of the output file.
- * Setting the <tt>external_data</tt> flag to false, an standard camera, light and
- * texture (scaled to fit the scene) is added to the outputfile. Set to true
- * an include file "data.inc" is included. This file is not generated by deal
- * and has to include camera, light and the texture definition Tex.
- *
- * You need povray (>=3.0) to render the scene. The minimum options for povray
- * are:
- * @verbatim
- *   povray +I<inputfile> +W<horiz. size> +H<ver. size> +L<include path>
- * @endverbatim
- * If the external file "data.inc" is used, the path to this file has to be
- * included in the povray options.
- *
- *
- * @subsection DataOutBaseEPS EPS (encapsulated Postscript<sup>TM</sup> format
- *
- * Output in this format circumvents the use of auxiliary graphic programs
- * converting some output format into a graphics format. This has the advantage
- * that output is easy and fast, and the disadvantage that you have to give a
- * whole bunch of parameters which determine the direction of sight, the mode of
- * colorization, the scaling of the height axis, etc. (Of course, all these
- * parameters have reasonable default values, which you may want to change from
- * time to time.) At present, this format only supports output for two-dimensional
- * data, with values in the third direction taken from a data vector.
- *
- * Basically, output consists of the mesh and the cells in between them. You can
- * draw either of these, or both, or none if you are really interested in an empty
- * picture. If written, the mesh uses black lines. The cells in between the mesh
- * are either not printed (this will result in a loss of hidden line removal, i.e.
- * you can "see through" the cells to lines behind), printed in white (which does
- * nothing apart from the hidden line removal), or colorized using one of the
- * data vectors (which need not be the same as the one used for computing the
- * height information) and a customizable color function. The default color
- * functions chooses the color between black, blue, green, red and white, with
- * growing values of the data field chosen for colorization. At present, cells
- * are displayed with one color per cell only, which is taken from the value of
- * the data field at the center of the cell; bilinear interpolation of the color
- * on a cell is not used.
- *
- * By default, the viewpoint is chosen like the default viewpoint in GNUPLOT, i.e.
- * with an angle of 60 degrees with respect to the positive z-axis and rotated
- * 30 degrees in positive sense (as seen from above) away from the negative y-axis.
- * Of course you can change these settings.
- *
- * EPS output is written without a border around the picture, i.e. the bounding box
- * is close to the output on all four sides. Coordinates are written using at most
- * five digits, to keep picture size at a reasonable size.
- *
- * All parameters along with their default values are listed in the documentation
- * of the <tt>EpsFlags</tt> member class of this class. See there for more and detailed
- * information.
- *
- * Please note that due to the various transformations each patch has to undergo
- * before actual outut, memory requirements may be rather large for large numbers
- * of patches.
- *
- *
- * @subsection DataOutBaseGMV GMV format
- *
- * The write_gmv() function writes the data in a format understood by
- * the GMV (general mesh viewer) program. This program is able to
- * generate 2d and 3d plots of almost arbitrarily many data sets,
- * along with shading, cuts through data sets and many other nifty
- * features.
- *
- * Data is written in the following format: nodes are considered the points
- * of the patches. In spatial dimensions less than three, zeroes are
- * inserted for the missing coordinates. The data vectors are written as
- * node or cell data, where for the first the data space is interpolated to
- * (bi-,tri-)linear elements.
- *
- *
- * @subsection DataOutBaseTecplot Tecplot format
- *
- * The write_tecplot() function writes the data in <a
- * href="http://www.amtec.com">Tecplot</a> FEBLOCK format. The program
- * supports 1, 2, and 3D data and has features such as contouring,
- * slicing, drawing streamlines, and animation. Patches are written as
- * a collection of quadrilaterals in 2D or bricks in 3D, with the
- * nodal values interpolated to (bi-,tri-) linear elements. These
- * functions will write Tecplot ASCII formatted files.
- * 
- * Additionally, Tecplot binary output is supported through
- * write_tecplot_binary().  For this to work properly
- * <tt>./configure</tt> checks for the Tecplot API at build time. To
- * write Tecplot binary files directly make sure that the TECHOME
- * environment variable points to the Tecplot installation directory,
- * and that the files @$TECHOME/include/TECIO.h and
- * @$TECHOME/lib/tecio.a are readable.  If these files are not
- * availabe (or in the case of 1D) <tt>write_tecplot_binary</tt> will
- * simply call <tt>write_tecplot</tt> and thus larger ASCII data files
- * will be produced rather than more efficient Tecplot binary files.
- * For more information consult the Tecplot Users and Reference
- * manuals.
- *
- *
- *
- * @subsection DataOutBaseVTK VTK format
- *
- * This is the file format used by the Visualization Toolkit <a
- * href="http://www.kitware.com/vtk.html">VTK</a>, as described in
- * their manual, section 14.3. It is similar to the GMV format, see
- * there for more information.
- *
- *
- * @subsection DataOutBaseD2 deal.II intermediate format
- *
- * In addition to all the other formats, this class can also write
- * data in the deal.II format. This is not a format that read by any
- * other graphics program, but is rather a direct dump of the
- * intermediate internal format used by deal.II. This internal format
- * is generated by the various classes that can generate output using
- * the DataOutBase class, for example from a finite element solution,
- * and is then converted in the present class to the final graphics
- * format. The reason why we offer to write out this intermediate
- * format is that it can be read back into a deal.II program using the
- * DataOutReader class, which is helpful in at least two contexts:
- * First, this can be used to later generate graphical output in any
- * other graphics format presently understood; this way, it is not
- * necessary to know at run-time which output format is requested, or
- * if multiple output files in different formats are needed. Secondly,
- * in contrast to almost all other graphics formats, it is possible to
- * merge several files that contain intermediate format data, and
- * generate a single output file from it, which may be again in
- * intermediate format or any of the final formats. This latter option
- * is most helpful for parallel programs: as demonstrated in the
- * step-17 example program, it is possible to let only one processor
- * generate the graphical output for the entire parallel program, but
- * this can become vastly inefficient if many processors are involved,
- * because the load is no longer balanced. The way out is to let each
- * processor generate intermediate graphical output for its chunk of
- * the domain, and the later merge the different files into one, which
- * is an operation that is much cheaper than the generation of the
- * intermediate data.
- *
- * Intermediate format deal.II data is usually stored in files with
- * the ending <tt>.d2</tt>.
- *
- *
- * @section DataOutBaseOP Output parameters
- *
- * All functions take a parameter which is a structure of type <tt>XFlags</tt>, where
- * <tt>X</tt> is the name of the output format. To find out what flags are presently
- * supported, read the documentation of the different structures.
+ * All functions take a parameter which is a structure of type
+ * <tt>XFlags</tt>, where <tt>X</tt> is the name of the output
+ * format. To find out what flags are presently supported, read the
+ * documentation of the different structures.
  *
  * Note that usually the output formats used for scientific visualization
  * programs have no or very few parameters (apart from some compatibility flags)
@@ -387,8 +171,19 @@ class ParameterHandler;
  * more parameters, though, since there the output file has to contain all
  * details of the viewpoint, light source, etc.
  *
+ * <h3>Credits</h3>
+ * <ul>
  *
- * @author Wolfgang Bangerth 1999, 2000, 2001; EPS output based on an earlier implementation by Stefan Nauber for the old DataOut class; Povray output by Thomas Richter 1999; OpenDX output by Guido Kanschat, 2001; Tecplot output by Benjamin Shelton Kirk, 2002.
+ * <li>EPS output based on an earlier implementation by Stefan Nauber
+ * for the old DataOut class
+ *
+ * <li>Povray output by Thomas Richter
+ *
+ * <li>Tecplot output by Benjamin Shelton Kirk
+ *
+ * </ul>
+ *
+ * @author Wolfgang Bangerth, Guido Kanschat 1999, 2000, 2001, 2002, 2005.
  */
 class DataOutBase 
 {
@@ -1455,145 +1250,329 @@ class DataOutBase
 	  deal_II_intermediate
     };
 
-
-    				     /**
-				      * Write the given list of patches
-				      * to the output stream in OpenDX
-				      * format. See the general
-				      * documentation for more information
-				      * on the parameters.
-				      */
+/**
+ * Write the given list of patches to the output stream in <a
+ * href="www.opendx.org">OpenDX</a> format.
+ *
+ * Since OpenDX uses some kind of visual data flow oriented
+ * programming language, some of these programs are provided in
+ * <tt>contrib/dx</tt>.
+ */
     template <int dim, int spacedim>
     static void write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 			  const std::vector<std::string>          &data_names,
 			  const DXFlags                          &flags,
 			  std::ostream                            &out);
-    
-				     /**
-				      * Write the given list of patches
-				      * to the output stream in ucd
-				      * format. See the general
-				      * documentation for more information
-				      * on the parameters.
-				      */
-    template <int dim, int spacedim>
-    static void write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
-			   const std::vector<std::string>          &data_names,
-			   const UcdFlags                          &flags,
-			   std::ostream                            &out);
 
-    				     /**
-				      * Write the given list of patches
-				      * to the output stream in gnuplot
-				      * format. See the general
-				      * documentation for more information
-				      * on the parameters.
-				      */
-    template <int dim, int spacedim>
-    static void write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
-			       const std::vector<std::string>          &data_names,
-			       const GnuplotFlags                      &flags,
-			       std::ostream                            &out);
-
-    				     /**
-				      * Write the given list of patches
-				      * to the output stream in povray
-				      * format. See the general
-				      * documentation for more information
-				      * on the parameters.
-				      */
-    template <int dim, int spacedim>
-    static void write_povray (const std::vector<Patch<dim,spacedim> > &patches,
-			      const std::vector<std::string>          &data_names,
-			      const PovrayFlags                       &flags,
-			      std::ostream                            &out);
-
-    				     /**
-				      * Write the given list of patches
-				      * to the output stream in eps
-				      * format. See the general
-				      * documentation for more information
-				      * on the parameters.
-				      */
+/**
+ * Write the given list of patches to the output stream in eps format.
+ *
+ * Output in this format circumvents the use of auxiliary graphic
+ * programs converting some output format into a graphics format. This
+ * has the advantage that output is easy and fast, and the
+ * disadvantage that you have to give a whole bunch of parameters
+ * which determine the direction of sight, the mode of colorization,
+ * the scaling of the height axis, etc. (Of course, all these
+ * parameters have reasonable default values, which you may want to
+ * change from time to time.) At present, this format only supports
+ * output for two-dimensional data, with values in the third direction
+ * taken from a data vector.
+ *
+ * Basically, output consists of the mesh and the cells in between
+ * them. You can draw either of these, or both, or none if you are
+ * really interested in an empty picture. If written, the mesh uses
+ * black lines. The cells in between the mesh are either not printed
+ * (this will result in a loss of hidden line removal, i.e.  you can
+ * "see through" the cells to lines behind), printed in white (which
+ * does nothing apart from the hidden line removal), or colorized
+ * using one of the data vectors (which need not be the same as the
+ * one used for computing the height information) and a customizable
+ * color function. The default color functions chooses the color
+ * between black, blue, green, red and white, with growing values of
+ * the data field chosen for colorization. At present, cells are
+ * displayed with one color per cell only, which is taken from the
+ * value of the data field at the center of the cell; bilinear
+ * interpolation of the color on a cell is not used.
+ *
+ * By default, the viewpoint is chosen like the default viewpoint in
+ * GNUPLOT, i.e.  with an angle of 60 degrees with respect to the
+ * positive z-axis and rotated 30 degrees in positive sense (as seen
+ * from above) away from the negative y-axis.  Of course you can
+ * change these settings.
+ *
+ * EPS output is written without a border around the picture, i.e. the
+ * bounding box is close to the output on all four sides. Coordinates
+ * are written using at most five digits, to keep picture size at a
+ * reasonable size.
+ *
+ * All parameters along with their default values are listed in the
+ * documentation of the <tt>EpsFlags</tt> member class of this
+ * class. See there for more and detailed information.
+ *
+ * Please note that due to the various transformations each patch has
+ * to undergo before actual outut, memory requirements may be rather
+ * large for large numbers of patches.
+ */
     template <int dim, int spacedim>
     static void write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
 			   const EpsFlags                          &flags,
 			   std::ostream                            &out);
 
-    				     /**
-				      * Write the given list of patches
-				      * to the output stream in gmv
-				      * format. See the general
-				      * documentation for more information
-				      * on the parameters.
-				      */
+/**
+ * Write the given list of patches to the output stream in gmv format.
+ *
+ * The write_gmv() function writes the data in a format understood by
+ * the GMV (general mesh viewer) program. This program is able to
+ * generate 2d and 3d plots of almost arbitrarily many data sets,
+ * along with shading, cuts through data sets and many other nifty
+ * features.
+ *
+ * Data is written in the following format: nodes are considered the
+ * points of the patches. In spatial dimensions less than three,
+ * zeroes are inserted for the missing coordinates. The data vectors
+ * are written as node or cell data, where for the first the data
+ * space is interpolated to (bi-,tri-)linear elements.
+ */
     template <int dim, int spacedim>
     static void write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
 			   const GmvFlags                          &flags,
 			   std::ostream                            &out);
 
-    				     /**
-				      * Write the given list of patches
-				      * to the output stream in Tecplot
-				      * ASCII format. See the general
-				      * documentation for more information
-				      * on the parameters.
-				      */
+/**
+ * Write the given list of patches to the output stream in gnuplot
+ * format. Visualization of two-dimensional data can then be achieved by
+ * starting <tt>gnuplot</tt> and endtering the commands
+ *
+ * @verbatim
+ * set data style lines
+ * splot "filename" using 1:2:n
+ * @endverbatim
+ * This example assumes that the number of the data vector displayed
+ * is <b>n-2</b>.
+ *
+ * The GNUPLOT format is not able to handle data on unstructured grids
+ * directly. Directly would mean that you only give the vertices and
+ * the solution values thereon and the program constructs its own grid
+ * to represent the data. This is only possible for a structured
+ * tensor product grid in two dimensions. However, it is possible to
+ * give several such patches within one file, which is exactly what
+ * the respective function of this class does: writing each cell's
+ * data as a patch of data, at least if the patches as passed from
+ * derived classes represent cells. Note that the functions on patches
+ * need not be continuous at interfaces between patches, so this
+ * method also works for discontinuous elements. Note also, that
+ * GNUPLOT can do hidden line removal for patched data.
+ *
+ * While this discussion applies to two spatial dimensions, it is more
+ * complicated in 3d. The reason is that we could still use patches,
+ * but it is difficult when trying to visualize them, since if we use
+ * a cut through the data (by, for example, using x- and
+ * z-coordinates, a fixed y-value and plot function values in
+ * z-direction, then the patched data is not a patch in the sense
+ * GNUPLOT wants it any more. Therefore, we use another approach,
+ * namely writing the data on the 3d grid as a sequence of lines,
+ * i.e. two points each associated with one or more data sets.  There
+ * are therefore 12 lines for each subcells of a patch.
+ *
+ * Given the lines as described above, a cut through this data in Gnuplot
+ * can then be achieved like this:
+ * @verbatim
+ *   set data style lines
+ *   splot [:][:][0:] "T" using 1:2:($3==.5 ? $4 : -1)
+ * @endverbatim
+ *
+ * This command plots data in x- and y-direction unbounded, but in
+ * z-direction only those data points which are above the x-y-plane
+ * (we assume here a positive solution, if it has negative values, you
+ * might want to decrease the lower bound). Furthermore, it only takes
+ * the data points with z-values (<tt>$3</tt>) equal to 0.5, i.e. a
+ * cut through the domain at <tt>z=0.5</tt>. For the data points on
+ * this plane, the data values of the first data set (<tt>$4</tt>) are
+ * raised in z-direction above the x-y-plane; all other points are
+ * denoted the value <tt>-1</tt> instead of the value of the data
+ * vector and are not plotted due to the lower bound in z plotting
+ * direction, given in the third pair of brackets.
+ *
+ * More complex cuts are possible, including nonlinear ones. Note
+ * however, that only those points which are actually on the
+ * cut-surface are plotted.
+ */
+    template <int dim, int spacedim>
+    static void write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
+			       const std::vector<std::string>          &data_names,
+			       const GnuplotFlags                      &flags,
+			       std::ostream                            &out);
+
+/**
+ * Write the given list of patches to the output stream for the <a
+ * href="www.povray.org">povray</a> raytracer.
+ *
+ * Output in this format creates a povray source file, include
+ * standard camera and light source definition for rendering with
+ * povray 3.1 At present, this format only supports output for
+ * two-dimensional data, with values in the third direction taken from
+ * a data vector.
+ *
+ * The output uses two different povray-objects:
+ *
+ * <ul>
+ * <li> <tt>BICUBIC_PATCH</tt>
+ * A <tt>bicubic_patch</tt> is a 3-dimensional Bezier patch. It consists of 16 Points
+ * describing the surface. The 4 corner points are touched by the object,
+ * while the other 12 points pull and stretch the patch into shape.
+ * One <tt>bicubic_patch</tt> is generated on each patch. Therefor the number of 
+ * subdivisions has to be 3 to provide the patch with 16 points.
+ * A bicubic patch is not exact but generates very smooth images.
+ *
+ * <li> <tt>MESH</tt>
+ * The mesh object is used to store large number of triangles.
+ * Every square of the patch data is split into one upper-left and one 
+ * lower-right triangle. If the number of subdivisions is three, 32 triangle
+ * are generated for every patch.
+ * 
+ * Using the smooth flag povray interpolates the normals on the triangles,
+ * imitating a curved surface
+ * </ul>
+ *
+ * All objects get one texture definition called Tex. This texture has to be
+ * declared somewhere before the object data. This may be in an external 
+ * data file or at the beginning of the output file.
+ * Setting the <tt>external_data</tt> flag to false, an standard camera, light and
+ * texture (scaled to fit the scene) is added to the outputfile. Set to true
+ * an include file "data.inc" is included. This file is not generated by deal
+ * and has to include camera, light and the texture definition Tex.
+ *
+ * You need povray (>=3.0) to render the scene. The minimum options for povray
+ * are:
+ * @verbatim
+ *   povray +I<inputfile> +W<horiz. size> +H<ver. size> +L<include path>
+ * @endverbatim
+ * If the external file "data.inc" is used, the path to this file has to be
+ * included in the povray options.
+ */
+    template <int dim, int spacedim>
+    static void write_povray (const std::vector<Patch<dim,spacedim> > &patches,
+			      const std::vector<std::string>          &data_names,
+			      const PovrayFlags                       &flags,
+			      std::ostream                            &out);
+
+/**
+ * Write the given list of patches to the output stream in <a
+ * href="http://www.amtec.com">Tecplot</a>
+ * ASCII format (FEBLOCK).
+ *
+ * For more information consult the Tecplot Users and Reference
+ * manuals.
+ */
     template <int dim, int spacedim>
     static void write_tecplot (const std::vector<Patch<dim,spacedim> > &patches,
 			       const std::vector<std::string>          &data_names,
 			       const TecplotFlags                      &flags,
 			       std::ostream                            &out);
 
-    				     /**
-				      * Write the given list of patches
-				      * to the output stream in Tecplot
-				      * binary format. See the general
-				      * documentation for more information
-				      * on the parameters. <tt>tecplot_binary_file_name</tt>
-				      * (specified through the TecplotFlags
-				      * struct) indicates the name of the file
-				      * to be written.  If the file name is not
-				      * set ASCII output is produced.
-				      *
-				      * If the Tecplot API is not present this simply
-				      * calls the standard write_tecplot file so that
-				      * ASCII output is still produced.
-				      */
+/**
+ * Write the given list of patches to the output stream in Tecplot
+ * binary format.
+ *
+ * For this to work properly <tt>./configure</tt> checks for the
+ * Tecplot API at build time. To write Tecplot binary files directly
+ * make sure that the TECHOME environment variable points to the
+ * Tecplot installation directory, and that the files
+ * @$TECHOME/include/TECIO.h and @$TECHOME/lib/tecio.a are readable.
+ * If these files are not availabe (or in the case of 1D) this
+ * function will simply call write_tecplot() and thus larger ASCII
+ * data files will be produced rather than more efficient Tecplot
+ * binary files.
+ *
+ * @warning TecplotFlags::tecplot_binary_file_name indicates the name
+ * of the file to be written.  If the file name is not set ASCII
+ * output is produced.
+ *
+ * For more information consult the Tecplot Users and Reference
+ * manuals.
+ */
     template <int dim, int spacedim>
-    static void write_tecplot_binary (const std::vector<Patch<dim,spacedim> > &patches,
-				      const std::vector<std::string>          &data_names,
-				      const TecplotFlags                      &flags,
-				      std::ostream                            &out);
+    static void write_tecplot_binary (
+      const std::vector<Patch<dim,spacedim> > &patches,
+      const std::vector<std::string>          &data_names,
+      const TecplotFlags                      &flags,
+      std::ostream                            &out);
 
-    				     /**
-				      * Write the given list of
-				      * patches to the output stream
-				      * in vtk format. See the general
-				      * documentation for more
-				      * information on the parameters.
-				      */
+/**
+ * Write the given list of patches to the output stream in UCD format
+ * described in the AVS developer's guide. Due to limitations in the
+ * present format, only node based data can be output, which in one
+ * reason why we invented the patch concept. In order to write higher
+ * order elements, you may split them up into several subdivisions of
+ * each cell. These subcells will then, however, also appear as
+ * different cells by programs which understand the UCD format.
+ * 
+ * No use is made of the possibility to give model data since these
+ * are not supported by all UCD aware programs. You may give cell data
+ * in derived classes by setting all values of a given data set on a
+ * patch to the same value.
+ */
+    template <int dim, int spacedim>
+    static void write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
+			   const std::vector<std::string>          &data_names,
+			   const UcdFlags                          &flags,
+			   std::ostream                            &out);
+
+/**
+ * Write the given list of patches to the output stream in vtk format.
+ *
+ * This is the file format used by the Visualization Toolkit <a
+ * href="http://www.kitware.com/vtk.html">VTK</a>, as described in
+ * their manual, section 14.3. It is similar to write_gmv().
+ */
     template <int dim, int spacedim>
     static void write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 			   const std::vector<std::string>          &data_names,
 			   const VtkFlags                          &flags,
 			   std::ostream                            &out);
 
-    				     /**
-				      * Write the given list of
-				      * patches to the output stream
-				      * in deal.II intermediate
-				      * format. See the general
-				      * documentation for more
-				      * information on the parameters.
-				      */
+/**
+ * Write the given list of patches to the output stream in deal.II
+ * intermediate format. This is not a format that read by any other
+ * graphics program, but is rather a direct dump of the intermediate
+ * internal format used by deal.II. This internal format is generated
+ * by the various classes that can generate output using the
+ * DataOutBase class, for example from a finite element solution, and
+ * is then converted in the present class to the final graphics
+ * format.
+ *
+ * The reason why we offer to write out this intermediate format is
+ * that it can be read back into a deal.II program using the
+ * DataOutReader class, which is helpful in at least two contexts:
+ * First, this can be used to later generate graphical output in any
+ * other graphics format presently understood; this way, it is not
+ * necessary to know at run-time which output format is requested, or
+ * if multiple output files in different formats are needed. Secondly,
+ * in contrast to almost all other graphics formats, it is possible to
+ * merge several files that contain intermediate format data, and
+ * generate a single output file from it, which may be again in
+ * intermediate format or any of the final formats. This latter option
+ * is most helpful for parallel programs: as demonstrated in the
+ * step-17 example program, it is possible to let only one processor
+ * generate the graphical output for the entire parallel program, but
+ * this can become vastly inefficient if many processors are involved,
+ * because the load is no longer balanced. The way out is to let each
+ * processor generate intermediate graphical output for its chunk of
+ * the domain, and the later merge the different files into one, which
+ * is an operation that is much cheaper than the generation of the
+ * intermediate data.
+ *
+ * Intermediate format deal.II data is usually stored in files with
+ * the ending <tt>.d2</tt>.
+ */
     template <int dim, int spacedim>
-    static void write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
-					    const std::vector<std::string>          &data_names,
-					    const Deal_II_IntermediateFlags         &flags,
-					    std::ostream                            &out);
+    static void write_deal_II_intermediate (
+      const std::vector<Patch<dim,spacedim> > &patches,
+      const std::vector<std::string>          &data_names,
+      const Deal_II_IntermediateFlags         &flags,
+      std::ostream                            &out);
 
 
                                      /**
@@ -1817,7 +1796,7 @@ class DataOutBase
  * the abstract interface to derived classes briefly discussed above.
  *
  *
- * @section DataOutInterfaceOF Output flags
+ * <h3>Output flags</h3>
  *
  * The way we treat flags in this class is very similar to that used in
  * the <tt>GridOut</tt> class. For detailed information on the why's and how's,
@@ -1838,7 +1817,7 @@ class DataOutBase
  * its member classes.
  *
  *
- * @section DataOutInterfaceSelectP Run time selection of output parameters
+ * <h3>Run time selection of output parameters</h3>
  *
  * In the output flags classes, described above, many flags are
  * defined for output in the different formats. In order to make them
@@ -1880,7 +1859,7 @@ class DataOutBase
  * other class derived from <tt>DataOutInterface</tt> would work alike.
  *
  *
- * @section DataOutInterfaceSelectF Run time selection of formats
+ * <h3>Run time selection of formats</h3>
  *
  * This class, much like the <tt>GridOut</tt> class, has a set of functions
  * providing a list of supported output formats, an <tt>enum</tt> denoting all
@@ -1912,7 +1891,7 @@ template <int dim, int spacedim=dim>
 class DataOutInterface : private DataOutBase
 {
   public:
-                                     /**
+                                     /*
                                       * Import a few names that were
                                       * previously in this class and have then
                                       * moved to the base class. Since the
@@ -1943,86 +1922,87 @@ class DataOutInterface : private DataOutBase
     virtual ~DataOutInterface ();
 
 				     /**
-				      * Obtain data through the
-				      * <tt>get_patches</tt> function and
-				      * write it to <tt>out</tt> in OpenDX
-				      * format.
+				      * Obtain data through get_patches()
+				      * and write it to <tt>out</tt>
+				      * in OpenDX format. See
+				      * DataOut::write_dx.
 				      */
     void write_dx (std::ostream &out) const;
 
 				     /**
-				      * Obtain data through the
-				      * <tt>get_patches</tt> function and
-				      * write it to <tt>out</tt> in UCD
-				      * format.
-				      */
-    void write_ucd (std::ostream &out) const;
-
-				     /**
-				      * Obtain data through the
-				      * <tt>get_patches</tt> function and
-				      * write it to <tt>out</tt> in GNUPLOT
-				      * format.
-				      */
-    void write_gnuplot (std::ostream &out) const;
-
-    				     /**
-				      * Obtain data through the
-				      * <tt>get_patches</tt> function and
-				      * write it to <tt>out</tt> in POVRAY
-				      * format.
-				      */
-    void write_povray (std::ostream &out) const;
-
-				     /**
-				      * Obtain data through the
-				      * <tt>get_patches</tt> function and
-				      * write it to <tt>out</tt> in EPS
-				      * format.
+				      * Obtain data through get_patches()
+				      * and write it to <tt>out</tt>
+				      * in EPS format. See
+				      * DataOut::write_eps.
 				      */
     void write_eps (std::ostream &out) const;
 
     				     /**
-				      * Obtain data through the
-				      * <tt>get_patches</tt> function and
-				      * write it to <tt>out</tt> in GMV
-				      * format.
+				      * Obtain data through get_patches()
+				      * and write it to <tt>out</tt>
+				      * in GMV format. See
+				      * DataOut::write_gmv.
 				      */
     void write_gmv (std::ostream &out) const;
 
+				     /**
+				      * Obtain data through get_patches()
+				      * and write it to <tt>out</tt>
+				      * in GNUPLOT format. See
+				      * DataOut::write_gnuplot.
+				      */
+    void write_gnuplot (std::ostream &out) const;
 
     				     /**
-				      * Obtain data through the
-				      * <tt>get_patches</tt> function and
-				      * write it to <tt>out</tt> in Tecplot
-				      * format.
+				      * Obtain data through get_patches()
+				      * and write it to <tt>out</tt>
+				      * in POVRAY format. See
+				      * DataOut::write_povray.
+				      */
+    void write_povray (std::ostream &out) const;
+    
+    				     /**
+				      * Obtain data through get_patches()
+				      * and write it to <tt>out</tt>
+				      * in Tecplot format. See
+				      * DataOut::write_tecplot.
 				      */
     void write_tecplot (std::ostream &out) const;
 
     				     /**
-				      * Obtain data through the
-				      * <tt>get_patches</tt> function and
-				      * write it in the Tecplot binary
-				      * output format. Note that the name
-				      * of the output file must be specified
-				      * through the TecplotFlags interface.
+				      * Obtain data through get_patches()
+				      * and write it in the Tecplot
+				      * binary output format. Note
+				      * that the name of the output
+				      * file must be specified through
+				      * the TecplotFlags
+				      * interface. See
+				      * DataOut::write_tecplot_binary.
 				      */
     void write_tecplot_binary (std::ostream &out) const;
 
+				     /**
+				      * Obtain data through get_patches()
+				      * and write it to <tt>out</tt>
+				      * in UCD format. See
+				      * DataOut::write_ucd.
+				      */
+    void write_ucd (std::ostream &out) const;
+
     				     /**
-				      * Obtain data through the
-				      * <tt>get_patches</tt> function and
-				      * write it to <tt>out</tt> in Vtk
-				      * format.
+				      * Obtain data through get_patches()
+				      * and write it to <tt>out</tt>
+				      * in Vtk format. See
+				      * DataOut::write_vtk.
 				      */
     void write_vtk (std::ostream &out) const;
 
     				     /**
-				      * Obtain data through the
-				      * <tt>get_patches</tt> function
+				      * Obtain data through get_patches()
 				      * and write it to <tt>out</tt>
 				      * in deal.II intermediate
-				      * format.
+				      * format. See
+				      * DataOut::write_deal_II_intermediate.
 				      */
     void write_deal_II_intermediate (std::ostream &out) const;
     
