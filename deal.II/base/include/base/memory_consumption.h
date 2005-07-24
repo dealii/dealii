@@ -65,7 +65,7 @@
  * <tt>v[i].memory_consumption()</tt>.
  *
  *
- * @section MeMoryConsumptionExt Extending this namespace
+ * <h3>Extending this namespace</h3>
  *
  * The functions in this namespace and the functionality provided by
  * it live on the assumption that there is either a function

@@ -24,7 +24,7 @@
  * microsecond. 
  *
  *
- * @section TimerUsage Usage
+ * <h3>Usage</h3>
  *
  * Use of this class is as you might expect by looking at the member
  * functions:

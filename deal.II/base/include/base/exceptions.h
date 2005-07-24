@@ -32,15 +32,14 @@
 
 
 /**
- *  This class should be used as a base class for
- *  all exception classes. Do not use its methods
- *  and variables directly since the interface
- *  and mechanism may be subject to change. Rather
- *  create new exception classes using the
- *  <tt>DeclException</tt> macro family.
+ *  This class should be used as a base class for all exception
+ *  classes. Do not use its methods and variables directly since the
+ *  interface and mechanism may be subject to change. Rather create
+ *  new exception classes using the <tt>DeclException</tt> macro
+ *  family.
  *
  *
- *  @section ExceptionBase General General overview of the exception handling mechanism in deal.II
+ *  <h3>General overview of the exception handling mechanism in deal.II</h3>
  *
  *  The error handling mechanism in <tt>deal.II</tt> is generally used in two ways.
  *  The first uses error checking in debug mode only and is useful for programs
@@ -91,7 +90,7 @@
  *  declare different classes for each of these.
  *
  *
- *  @section ExceptionBaseUse Use of the debug mode exceptions
+ *  <h3>Use of the debug mode exceptions</h3>
  *
  *  To use the exception mechanism for debug mode error checking, write lines
  *  like the following in your source code:
@@ -116,7 +115,7 @@
  *  nonetheless to be given with parentheses:
  *  <tt>Assert (i>m, ExcSomewhat());</tt>
  *
- *  @subsection ExceptionBaseInternal How it works internally
+ *  <h4>How it works internally</h4>
  *
  *  If the <tt>DEBUG</tt> preprocessor directive is set, the call <tt>Assert
  *  (cond, exc);</tt> is basically converted by the preprocessor into the
@@ -199,7 +198,7 @@
  *  message about suppressed follow-up messages is shown.
  *
  *
- *  @section ExceptionBaseUse2 Use of run-time exceptions
+ *  <h3>Use of run-time exceptions</h3>
  *
  *  For this mode, the standard <tt>C++</tt> <tt>throw</tt> and <tt>catch</tt> concept exists. We
  *  want to keep to this, but want to extend it a bit. In general, the
@@ -258,7 +257,7 @@
  *  preprocessor variable.
  *
  *
- *  @section ExceptionNMacros Description of the DeclExceptionN macro family
+ *  <h3>Description of the DeclExceptionN macro family</h3>
  *
  *  Declare an exception class without any additional parameters.
  *  There is a whole family of <tt>DeclException?</tt> macros

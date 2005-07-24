@@ -24,19 +24,19 @@
 /*@{*/
 
 /**
- * Base class for quadrature formulae in arbitrary dimensions. This class
+ * Base class for quadrature formulæ in arbitrary dimensions. This class
  * stores quadrature points and weights on the unit line [0,1], unit
  * square [0,1]x[0,1], etc.
  *
  * There are a number of derived classes, denoting concrete
- * integration formulae. Their names names prefixed by
+ * integration formulæ. Their names names prefixed by
  * <tt>Q</tt>. Refer to the list of derived classes for more details.
  *
  * The schemes for higher dimensions are tensor products of the
- * one-dimansional formulae. Therefore, a three-dimensional 5-point
+ * one-dimansional formulæ. Therefore, a three-dimensional 5-point
  * Gauss formula has 125 quadrature points.
  *
- * @section QuadratureBlaBla Mathematical background
+ * <h3>Mathematical background</h3>
  *
  * For each quadrature formula we denote by <tt>m</tt>, the maximal
  * degree of polynomials integrated exactly. This number is given in
@@ -44,20 +44,20 @@
  * error is <tt>m+1</tt>, that is, the error is the size of the cell
  * two the <tt>m+1</tt> by the Bramble-Hilbert Lemma. The number
  * <tt>m</tt> is to be found in the documentation of each concrete
- * formula. For the optimal formulae QGauss we have $m = 2N-1$, where
+ * formula. For the optimal formulæ QGauss we have $m = 2N-1$, where
  * N is the constructor parameter to QGauss. The tensor product
- * formulae are exact on tensor product polynomials of degree
+ * formulæ are exact on tensor product polynomials of degree
  * <tt>m</tt> in each space direction, but they are still only of
  * <tt>m+1</tt>st order.
  *
- * @section QuadratureImpl Implementation details
+ * <h3>Implementation details</h3>
  *
- * Most integration formulae in more than one space dimension are
- * tensor products of quadrature formulae in one space dimension, or
+ * Most integration formulæ in more than one space dimension are
+ * tensor products of quadrature formulæ in one space dimension, or
  * more generally the tensor product of a formula in <tt>(dim-1)</tt>
  * dimensions and one in one dimension. There is a special constructor
  * to generate a quadrature formula from two others.  For example, the
- * QGauss@<dim@> formulae include <i>N<sup>dim</sup></i> quadrature
+ * QGauss@<dim@> formulæ include <i>N<sup>dim</sup></i> quadrature
  * points in <tt>dim</tt> dimensions, where N is the constructor
  * parameter of QGauss.
  *
@@ -276,7 +276,7 @@ class QAnisotropic : public Quadrature<dim>
  * of the weights of the left- and the rightmost quadrature point.
  *
  * Since all dimensions higher than one are built up by tensor products of
- * one dimensional and <tt>dim-1</tt> dimensional quadrature formulae, the
+ * one dimensional and <tt>dim-1</tt> dimensional quadrature formulæ, the
  * argument given to the constructor needs to be a quadrature formula in
  * one space dimension, rather than in <tt>dim</tt> dimensions.
  *
