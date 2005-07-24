@@ -119,7 +119,7 @@ class TableEntry : public TableEntryBase
  * stream. The value type actually may vary from column to column and
  * from row to row.
  *
- * @section TableHandlerUsage Usage
+ * <h3>Usage</h3>
  *
  * The most important function is the templatized function
  * add_value(const std::string &key, const value_type value), that
@@ -137,7 +137,7 @@ class TableEntry : public TableEntryBase
  * to prescribe the format and the captions the columns are written
  * with in tex mode.
  *
- * @section TableHandlerExample Example
+ * <h3>Example</h3>
  * 
  * This is a simple example demonstrating the usage of this class. The
  * first column includes the numbers <tt>i=1..n</tt>, the second
