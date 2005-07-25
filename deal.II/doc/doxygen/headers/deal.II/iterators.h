@@ -324,7 +324,12 @@ Likewise, active iterators are as follows:
   </tr>
 </table>
 
-
+In addition to these types and calls that act on cells and faces (logical
+concepts that depend on the dimension: a cell is a quadrilateral in 2d, but
+a hexehedron in 3d), there are corresponding types and calls like
+<code>begin_active_quad()</code> or <code>end_quad()</code> that act on the
+dimension independent geometric objects line, quad, and hex. These calls,
+just as the ones above, exist in active and non-active forms.
 
 */
 /**
