@@ -68,7 +68,8 @@ tests_x = geometry_info_* \
 	  fe_q_3d* \
           rt_* \
 	  nedelec_* \
-	  get_fe_from_name
+	  get_fe_from_name \
+	  christian_*
 
 # tests for the hp branch:
 #	  fe_collection_*
