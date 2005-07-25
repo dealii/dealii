@@ -1334,10 +1334,6 @@ class DataOutBase
  * All parameters along with their default values are listed in the
  * documentation of the <tt>EpsFlags</tt> member class of this
  * class. See there for more and detailed information.
- *
- * Please note that due to the various transformations each patch has
- * to undergo before actual outut, memory requirements may be rather
- * large for large numbers of patches.
  */
     template <int dim, int spacedim>
     static void write_eps (const std::vector<Patch<dim,spacedim> > &patches,
