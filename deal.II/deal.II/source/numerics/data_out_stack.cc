@@ -246,7 +246,11 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
   std::vector<Vector<double> > patch_values_system (n_q_points,
 						    Vector<double>(n_components));
 
-				   // add the required number of patches
+				   // add the required number of
+				   // patches. first initialize a template
+				   // patch with n_q_points (in the the plane
+				   // of the cells) times n_subdivisions+1 (in
+				   // the time direction) points
   ::DataOutBase::Patch<dim+1,dim+1>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points*(n_subdivisions+1));
@@ -277,24 +281,67 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 		break;
 		
           case 2:
+                                                 // below, when we fill the
+                                                 // data, we want to make sure
+                                                 // that the parameter
+                                                 // direction is in the
+                                                 // z-direction in the local
+                                                 // coordinate direction of
+                                                 // cells.
+                                                 //
+                                                 // we do so by some index
+                                                 // juggling: for the 3d unit
+                                                 // cell
+                                                 //
+                                                 //         7-------6        7-------6
+                                                 //        /|       |       /       /|
+                                                 //       / |       |      /       / |
+                                                 //      /  |       |     /       /  |
+                                                 //     3   |       |    3-------2   |
+                                                 //     |   4-------5    |       |   5
+                                                 //     |  /       /     |       |  /
+                                                 //     | /       /      |       | /
+                                                 //     |/       /       |       |/
+                                                 //     0-------1        0-------1
+                                                 //
+                                                 //
+                                                 // with the z-direction
+                                                 // running in direction from
+                                                 // vertex 0 to 3, we have to
+                                                 // map to this the 2d unit
+                                                 // cell to both the bottom
+                                                 // and top surfaces:
+                                                 //
+                                                 //         3-------2
+                                                 //        /       / 
+                                                 //       /       /  
+                                                 //      /       /   
+                                                 //     0-------1    
+                                                 //
+                                                 // i.e. the 3d vertex indices
+                                                 // 0, 1, ..., 7 are mapped to
+                                                 // the 2d indices 0, 1, 1, 0,
+                                                 // 3, 2, 2, 3, but with
+                                                 // different z-coordinates
 		patch->vertices[0] = Point<dim+1>(cell->vertex(0)(0),
 		    				  cell->vertex(0)(1),
 						  parameter-parameter_step);
 		patch->vertices[1] = Point<dim+1>(cell->vertex(1)(0),
 		    				  cell->vertex(1)(1),
 						  parameter-parameter_step);
-		patch->vertices[2] = Point<dim+1>(cell->vertex(2)(0),
-		    				  cell->vertex(2)(1),
-						  parameter-parameter_step);
-		patch->vertices[3] = Point<dim+1>(cell->vertex(3)(0),
-		    				  cell->vertex(3)(1),
-						  parameter-parameter_step);
-		patch->vertices[4] = Point<dim+1>(cell->vertex(0)(0),
-		    				  cell->vertex(0)(1),
-						  parameter);
-		patch->vertices[5] = Point<dim+1>(cell->vertex(1)(0),
+		patch->vertices[2] = Point<dim+1>(cell->vertex(1)(0),
 		    				  cell->vertex(1)(1),
 						  parameter);
+		patch->vertices[3] = Point<dim+1>(cell->vertex(0)(0),
+		    				  cell->vertex(0)(1),
+						  parameter);
+
+                patch->vertices[4] = Point<dim+1>(cell->vertex(3)(0),
+		    				  cell->vertex(3)(1),
+						  parameter-parameter_step);
+		patch->vertices[5] = Point<dim+1>(cell->vertex(2)(0),
+		    				  cell->vertex(2)(1),
+						  parameter-parameter_step);
 		patch->vertices[6] = Point<dim+1>(cell->vertex(2)(0),
 		    				  cell->vertex(2)(1),
 						  parameter);
