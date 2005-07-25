@@ -183,6 +183,7 @@ class ParameterHandler;
  *
  * </ul>
  *
+ * @ingroup IO
  * @author Wolfgang Bangerth, Guido Kanschat 1999, 2000, 2001, 2002, 2005.
  */
 class DataOutBase 
@@ -212,6 +213,7 @@ class DataOutBase
 				      * |  |  |  |  |
 				      * |__|__|__|__|
 				      * @endverbatim
+				      * @ingroup IO
 				      * @author Wolfgang Bangerth
 				      */
     template <int dim, int spacedim=dim>
@@ -389,14 +391,23 @@ class DataOutBase
     };
 
     				     /**
-				      * Flags describing the details of
-				      * output in OpenDX format. At
-				      * present no flags are implemented.
+				      * Flags controlling the details of
+				      * output in OpenDX format.
+				      *
+				      * @ingroup IO
 				      */
     struct DXFlags 
     {
 					 /**
-					  * Write neighbor information.
+					  * Write neighbor
+					  * information. This
+					  * information is necessary
+					  * for instance, if OpenDX is
+					  * supposed to compute
+					  * integral curves
+					  * (streamlines). If it is
+					  * not present, streamlines
+					  * end at cell boundaries.
 					  */
 	bool write_neighbors;
 
@@ -433,8 +444,10 @@ class DataOutBase
     };
 
 				     /**
-				      * Flags describing the details of
+				      * Flags controlling the details of
 				      * output in UCD format.
+				      *
+				      * @ingroup IO
 				      */
     struct UcdFlags 
     {
@@ -495,9 +508,11 @@ class DataOutBase
     };
 
 				     /**
-				      * Flags describing the details of
+				      * Flags controlling the details of
 				      * output in Gnuplot format. At
 				      * present no flags are implemented.
+				      *
+				      * @ingroup IO
 				      */
     struct GnuplotFlags 
     {
@@ -551,11 +566,13 @@ class DataOutBase
     };
 
     				     /**
-				      * Flags describing the details
+				      * Flags controlling the details
 				      * of output in Povray
 				      * format. Several flags are
 				      * implemented, see their
 				      * respective documentation.
+				      *
+				      * @ingroup IO
 				      */
     struct PovrayFlags 
     {
@@ -631,9 +648,11 @@ class DataOutBase
 
 
 				     /**
-				      * Flags describing the details of
+				      * Flags controlling the details of
 				      * output in encapsulated postscript
 				      * format.
+				      *
+				      * @ingroup IO
 				      */
     struct EpsFlags 
     {
@@ -959,9 +978,11 @@ class DataOutBase
     };
 
     				     /**
-				      * Flags describing the details of
+				      * Flags controlling the details of
 				      * output in gmv format. At
 				      * present no flags are implemented.
+				      *
+				      * @ingroup IO
 				      */
     struct GmvFlags 
     {
@@ -1015,9 +1036,10 @@ class DataOutBase
     };
 
     				     /**
-				      * Flags describing the details of
-				      * output in Tecplot format. At
-				      * present no flags are implemented.
+				      * Flags controlling the details of
+				      * output in Tecplot format.
+				      *
+				      * @ingroup IO
 				      */
     struct TecplotFlags 
     {
@@ -1078,10 +1100,12 @@ class DataOutBase
     };
 
     				     /**
-				      * Flags describing the details
+				      * Flags controlling the details
 				      * of output in VTK format. At
 				      * present no flags are
 				      * implemented.
+				      *
+				      * @ingroup IO
 				      */
     struct VtkFlags 
     {
@@ -1137,11 +1161,13 @@ class DataOutBase
 
 
     				     /**
-				      * Flags describing the details
+				      * Flags controlling the details
 				      * of output in deal.II
 				      * intermediate format. At
 				      * present no flags are
 				      * implemented.
+				      *
+				      * @ingroup IO
 				      */
     struct Deal_II_IntermediateFlags
     {
@@ -1885,6 +1911,7 @@ class DataOutBase
  * suffix for the output file name can be obtained by <tt>default_suffix</tt>
  * without arguments.
  *
+ * @ingroup IO
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim, int spacedim=dim>
@@ -2316,6 +2343,7 @@ class DataOutInterface : private DataOutBase
  * function is explained in step-19.
  * 
  *
+ * @ingroup IO
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, int spacedim=dim>

@@ -30,11 +30,15 @@ template <int dim> class Mapping;
  * modify the default outfit of the grids written into a file. See the
  * different subclasses and the documentation of the GridOut
  * class for more details.
+ *
+ * @ingroup IO
  */
 namespace GridOutFlags
 {
 				   /**
 				    * Flags for grid output in OpenDX format.
+				    *
+				    * @ingroup IO
 				    */
   struct DX
   {
@@ -77,6 +81,8 @@ namespace GridOutFlags
 				   /**
 				    * Flags describing the details of
 				    * output in UCD format.
+				    *
+				    * @ingroup IO
 				    */
   struct Ucd 
   {
@@ -124,6 +130,8 @@ namespace GridOutFlags
 				   /**
 				    * Flags describing the details of
 				    * output in GNUPLOT format.
+				    *
+				    * @ingroup IO
 				    */
   struct Gnuplot
   {
@@ -175,6 +183,8 @@ namespace GridOutFlags
 				    * By default, the size of the picture
 				    * is scaled such that the width equals
 				    * 300 units.
+				    *
+				    * @ingroup IO
 				    */
   struct EpsFlagsBase
   {
@@ -271,7 +281,9 @@ namespace GridOutFlags
 				    * exist, we only here declare the
 				    * general template and declare
 				    * explicit specializations below.
-				    */
+				    *
+				    * @ingroup IO
+				   */
   template <int dim>
   struct Eps
   {};
@@ -279,6 +291,8 @@ namespace GridOutFlags
 				   /**
 				    * Flags specific to the output of
 				    * grids in one space dimensions.
+				    *
+				    * @ingroup IO
 				    */
   template <>
   struct Eps<1> : public EpsFlagsBase 
@@ -297,6 +311,8 @@ namespace GridOutFlags
 				   /**
 				    * Flags specific to the output of
 				    * grids in two space dimensions.
+				    *
+				    * @ingroup IO
 				    */
   template <>
   struct Eps<2> : public EpsFlagsBase 
@@ -359,6 +375,8 @@ namespace GridOutFlags
 				   /**
 				    * Flags specific to the output of
 				    * grids in three space dimensions.
+				    *
+				    * @ingroup IO
 				    */
   template <>
   struct Eps<3> : public EpsFlagsBase
@@ -400,6 +418,8 @@ namespace GridOutFlags
   };
 				   /**
 				    * Flags for XFig output.
+				    *
+				    * @ingroup IO
 				    */
   struct XFig
   {
@@ -496,7 +516,6 @@ namespace GridOutFlags
  * different formats. See the enum GridOut::OutputFormat for a list of formats
  * and the corresponding output function names.
  *
- * @sect3{Usage}
  * Usage is simple: either you use the direct form
  * @verbatim
  *   ofstream output_file("some_filename");
@@ -561,7 +580,8 @@ namespace GridOutFlags
  * dimensions supported by this class; they then have a template parameter,
  * as usual.
  *
- *
+ * @ingroup grid
+ * @ingroup IO
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2003; postscript format based on an implementation by Stefan Nauber, 1999
  */
 class GridOut 

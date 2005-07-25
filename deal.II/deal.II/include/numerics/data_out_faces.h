@@ -34,7 +34,7 @@ template <int dim> class DoFHandler;
  * be generated. These patches can then be written in several
  * graphical data formats by the functions of the underlying classes.
  *
- * @sect3{Interface}
+ * <h3>Interface</h3>
  *
  * The interface of this class is copied from the DataOut
  * class. Furthermore, they share the common parent class
@@ -42,7 +42,7 @@ template <int dim> class DoFHandler;
  * discussion of the interface.
  *
  *
- * @sect3{Extending this class}
+ * <h3>Extending this class</h3>
  *
  * The sequence of faces to generate patches from is generated in the
  * same way as in the DataOut class, see there for a description
@@ -75,6 +75,7 @@ template <int dim> class DoFHandler;
  * applications certainly exist, for which the author is not
  * imaginative enough.
  *
+ * @ingroup IO
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim>

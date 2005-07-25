@@ -29,6 +29,7 @@
  *   in the <tt>quads.quads</tt> list attached to the information of each level
  *   of the triangulation.
  *
+ * @ingroup grid
  *   @author Wolfgang Bangerth, 1998
  */
 class Quad

@@ -26,6 +26,8 @@
  *  General template for information belonging to one level of a multilevel
  *  hierarchy of a triangulation. This template is only declared to allow
  *  specializations for different dimensions.
+ *
+ * @ingroup grid
  */
 template <int dim>
 class TriangulationLevel
@@ -50,6 +52,7 @@ class TriangulationLevel
  *  for the lines. Since we only store one byte per line, quad or hex,
  *  this is a minor loss and we can live with that.
  *
+ * @ingroup grid
  *  @author Wolfgang Bangerth, 1998
  */
 template <>
@@ -201,6 +204,7 @@ class TriangulationLevel<0>
  *  The TriangulationsLevel objects of higher dimensions are derived from
  *  this one.
  *
+ * @ingroup grid
  *  @author Wolfgang Bangerth, 1998
  */
 template <>
@@ -357,6 +361,7 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
  *  The vector of lines and their children is derived from
  *  TriangulationLevel<1>.
  *
+ * @ingroup grid
  *  @author Wolfgang Bangerth, 1998
  */
 template <>
@@ -479,6 +484,7 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
  *  The vectors of lines and quads and their children are derived from
  *  TriangulationLevel<2>.
  *
+ * @ingroup grid
  *  @author Wolfgang Bangerth, 1998, 2003
  */
 template <>

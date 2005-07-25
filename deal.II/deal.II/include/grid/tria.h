@@ -39,6 +39,8 @@ template <int dim> class MGDoFHandler;
  *  <tt>Triangulation<dim>::create_triangulation</tt> function. It
  *  contains all data needed to construct a cell, namely the indices
  *  of the vertices and the material indicator.
+ *
+ * @ingroup grid
  */
 template <int dim>
 struct CellData
@@ -118,6 +120,8 @@ struct CellData
  *  (if in the interior). Explicitely giving a line the indicator 255
  *  will result in an error, as well as giving an interior line a boundary
  *  indicator.
+ *
+ * @ingroup grid
  */
 struct SubCellData
 {
@@ -171,6 +175,7 @@ struct SubCellData
  * Note: these class should be made local to the triangulation class
  * once the compiler supports that (gcc2.95 does not at present).
  *
+ * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
@@ -192,6 +197,7 @@ struct TriaNumberCache
  * Note: these class should be made local to the triangulation class
  * once the compiler supports that (gcc2.95 does not at present).
  *
+ * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
 template <>
@@ -252,6 +258,7 @@ struct TriaNumberCache<1>
  * Note: these class should be made local to the triangulation class
  * once the compiler supports that (gcc2.95 does not at present).
  *
+ * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
 template <>
@@ -313,6 +320,7 @@ struct TriaNumberCache<2> : public TriaNumberCache<1>
  * Note: these class should be made local to the triangulation class
  * once the compiler supports that (gcc2.95 does not at present).
  *
+ * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
 template <>

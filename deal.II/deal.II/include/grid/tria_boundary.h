@@ -71,6 +71,7 @@ template <int dim> class Triangulation;
  *   HyperBallBoundary creating a hyperball with given radius
  *   around a given center point.
  *
+ * @ingroup grid
  *   @author Wolfgang Bangerth, 1999, 2001, Ralf Hartmann, 2001
  */
 template <int dim>

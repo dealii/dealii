@@ -27,6 +27,7 @@
  *   it belongs to. The level index is implicitly given by the position
  *   in the <tt>lines.lines</tt> list attached to the information of each level.
  *
+ * @ingroup grid
  *   @author Wolfgang Bangerth, 1998
  */
 class Line

@@ -33,3 +33,10 @@
  * All other classes in this module actually implement quadrature
  * rules of different order and other characteristics.
  */
+
+/**
+ * @defgroup IO Input/Output
+ *
+ * This module collects the classes used for reading and writing
+ * meshes and data.
+ */

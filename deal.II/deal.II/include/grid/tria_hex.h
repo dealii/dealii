@@ -32,6 +32,7 @@
  *   within a hexahedron, refer to the documentation of the
  *   Triangulation class.
  *
+ * @ingroup grid
  *   @author Wolfgang Bangerth, 1998
  */
 class Hexahedron

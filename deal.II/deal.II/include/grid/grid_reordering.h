@@ -585,6 +585,7 @@
  * the triangulation from this data using the
  * Triangulation::create_triangulation() function.
  *
+ * @ingroup grid
  * @author Wolfgang Bangerth, 2000, Michael Anderson 2003, Ralf Hartmann 2005
  */
 template <int dim>

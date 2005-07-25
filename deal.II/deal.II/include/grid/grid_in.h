@@ -153,6 +153,8 @@ class SubCellData;
  * that class if you experience unexpected problems when reading grids
  * through this class.
  *
+ * @ingroup grid
+ * @ingroup IO
  * @author Wolfgang Bangerth, 1998, 2000, Luca Heltai, 2004
  */
 template <int dim>

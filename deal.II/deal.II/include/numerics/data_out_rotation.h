@@ -42,7 +42,7 @@ template <int dim> class DoFHandler;
  * produces <em>very</em> large output files.
  *
  *
- * @sect3{Interface}
+ * <h3>Interface</h3>
  *
  * The interface of this class is copied from the DataOut
  * class. Furthermore, they share the common parent class
@@ -51,7 +51,7 @@ template <int dim> class DoFHandler;
  * further classes from this class.
  *
  *
- * @sect3{Details for 1d computations}
+ * <h3>Details for 1d computations</h3>
  *
  * The one coordinate in the triangulation used by the
  * DoFHandler object passed to this class is taken as the radial
@@ -60,7 +60,7 @@ template <int dim> class DoFHandler;
  * radial coordinate only attains non-negative values.
  *
  *
- * @sect3{Details for 2d computations}
+ * <h3>Details for 2d computations</h3>
  *
  * We consider the computation (represented by the DoFHandler
  * object that is attached to this class) to have happened in the
@@ -77,6 +77,7 @@ template <int dim> class DoFHandler;
  * It is in the responsibility of the user to make sure that the
  * radial variable attains only non-negative values.
  *
+ * @ingroup IO
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim>

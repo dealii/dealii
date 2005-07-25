@@ -28,6 +28,7 @@
  * cell that contains a given point. See the descriptions of the
  * individual functions for more information.
  *
+ * @ingroup grid
  * @author Wolfgang Bangerth, 2001, 2003, 2004
  */
 class GridTools

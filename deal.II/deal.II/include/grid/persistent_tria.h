@@ -96,6 +96,7 @@
  * later reconstruction and does also not touch the coarse grid which is
  * used within restore().
  *
+ * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>

@@ -48,6 +48,7 @@
  * written as a finite element field using the DataOut class.
  * Please note that this class may produce enormous amounts of data!
  *
+ * @ingroup IO
  * @author Guido Kanschat, 2000
  */
 template<int dim, class SOLVER, class VECTOR = Vector<double> >

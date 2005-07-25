@@ -219,6 +219,7 @@ template <int dim> class Triangulation;
  * @ref TriaDimensionInfo<1>
  * @ref TriaDimensionInfo<2>
  * @ref TriaDimensionInfo<3>
+ * @ingroup grid
  * @ingroup Iterators
  * @author Wolfgang Bangerth, 1998
  * @author documentation update Guido Kanschat, 2004
@@ -548,6 +549,7 @@ class TriaRawIterator :
  *   This specialization of TriaRawIterator provides access only to
  *   the <em>used</em> lines, quads, cells, etc.
  *
+ * @ingroup grid
  * @ingroup Iterators
  */
 template <int dim, typename Accessor>
@@ -698,6 +700,7 @@ class TriaIterator : public TriaRawIterator<dim,Accessor>
  *   cell which is not refined and thus a cell on which calculations
  *   on the finest level are done.
  *
+ * @ingroup grid
  * @ingroup Iterators
  */
 template <int dim, typename Accessor>

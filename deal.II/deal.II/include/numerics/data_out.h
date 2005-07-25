@@ -36,7 +36,7 @@ template <int>      class FEValuesBase;
  * be written in any of the implemented data formats.
  *
  *
- * @sect3{User visible interface}
+ * <h3>User visible interface</h3>
  *
  * The user visible interface of this class consists of functions which allow
  * a user to make a DoFHandler object known to this class and to add data
@@ -154,6 +154,7 @@ template <int>      class FEValuesBase;
  * triangulation, so that the last template parameter has the same
  * value as the second one.
  *
+ * @ingroup IO
  * @author Wolfgang Bangerth, 1999
  */
 template <int dof_handler_dim, int patch_dim, int patch_space_dim=patch_dim>
@@ -757,7 +758,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * the patches.
  *
  *
- * @sect3{User interface information}
+ * <h3>User interface information</h3>
  *
  * The base classes of this class, DataOutBase, DataOutInterface and
  * DataOut_DoFData() offer several interfaces of their own. Refer to the
@@ -770,7 +771,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * output.
  *
  *
- * @sect3{Extensions}
+ * <h3>Extensions</h3>
  *
  * By default, this class produces patches for all active cells. Sometimes,
  * this is not what you want, maybe because they are simply too many (and too
@@ -798,6 +799,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * this pair of functions and they return a non-active cell, then an exception
  * will be thrown.
  * 
+ * @ingroup IO
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>

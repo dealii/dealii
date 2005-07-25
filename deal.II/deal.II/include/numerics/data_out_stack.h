@@ -52,7 +52,7 @@ template <int dim> class DoFHandler;
  * interpolations in time may be added in the future.
  *
  *
- * @sect2{Example of Use}
+ * <h3>Example of Use</h3>
  *
  * The following little example shall illustrate the different steps
  * of use of this class. It is assumed that the finite element used is
@@ -98,6 +98,7 @@ template <int dim> class DoFHandler;
  *     };
  * @endverbatim
  *
+ * @ingroup IO
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
