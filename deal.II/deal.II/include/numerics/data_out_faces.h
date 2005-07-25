@@ -38,7 +38,7 @@ template <int dim> class DoFHandler;
  *
  * The interface of this class is copied from the DataOut
  * class. Furthermore, they share the common parent class
- * DataOut_DoFData(). See the reference of these two classes for a
+ * DataOut_DoFData. See the reference of these two classes for a
  * discussion of the interface.
  *
  *

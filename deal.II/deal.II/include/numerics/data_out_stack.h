@@ -32,7 +32,7 @@ template <int dim> class DoFHandler;
  * space-time output file, or for example to connect the results of
  * solutions of a parameter dependent equation for several parameter
  * value together into one. The interface is mostly modelled after the
- * DataOut class.
+ * DataOut class, see there for some more documentation.
  *
  * We will explain the concept for a time dependent problem, but
  * instead of the time any parameter can be substituted. In our

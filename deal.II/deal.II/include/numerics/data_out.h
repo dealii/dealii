@@ -742,15 +742,22 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * stored in the base class. Most of the interface and an example of its
  * use is described in the documentation of the base class.
  *
- * The only thing this class offers is the function @p build_patches which
- * loops over all cells of the triangulation stored by the @p attach_dof_handler
- * function of the base class and convert the data on these to actual patches
- * which are the objects that are later output by the functions of the
- * base classes. You can give a parameter to the function which determines
- * how many subdivisions in each coordinate direction are to be performed,
- * i.e. of how many subcells each patch shall consist. Default is one, but
- * for quadratic elements you may want to choose two, for cubic elements three,
- * and so on.
+ * The only thing this class offers is the function build_patches() which
+ * loops over all cells of the triangulation stored by the
+ * attach_dof_handler() function of the base class and convert the data on
+ * these to actual patches which are the objects that are later output by the
+ * functions of the base classes. You can give a parameter to the function
+ * which determines how many subdivisions in each coordinate direction are to
+ * be performed, i.e. of how many subcells each patch shall consist. Default
+ * is one, but you may want to choose a higher number for higher order
+ * elements, so as two for quadratic elements, three for cubic elements three,
+ * and so on. The purpose of this parameter is because most graphics programs
+ * do not allow to specify higher order shape functions in the file formats:
+ * only data at vertices can be plotted and is then shown as a bilinear
+ * interpolation within the interior of cells. This may be insufficient if you
+ * have higher order finite elements, and the only way to achieve better
+ * output is to subdivide each cell of the mesh into several cells for
+ * graphical output.
  *
  * Note that after having called @p build_patches once, you can call one or
  * more of the <tt>write_*</tt> functions of the base classes. You can therefore
