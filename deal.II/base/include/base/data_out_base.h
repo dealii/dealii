@@ -76,6 +76,8 @@ class ParameterHandler;
  *
  * In order to enhance intellegibility of this concept, the following
  * two sections are kept from a previous version of this documentation.
+ *
+ * 
  * <h4>Patches</h4>
  *
  * Grids can be thought of as a collection of cells; if you want to write out
