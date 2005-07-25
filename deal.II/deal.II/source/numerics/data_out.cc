@@ -237,7 +237,7 @@ add_data_vector (const VECTOR         &vec,
 		 const std::string    &name,
 		 const DataVectorType  type)
 {
-  unsigned int n_components = dofs->get_fe().n_components ();
+  const unsigned int n_components = dofs->get_fe().n_components ();
 
   std::vector<std::string> names;
 				   // if only one component or vector
