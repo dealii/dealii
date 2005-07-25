@@ -340,8 +340,8 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 			patch->data(dataset*n_components+component,
 				    q*(n_subdivisions+1)+i)
 			  = patch_values_system[q](component);
-		};
-	    };
+		}
+	    }
 
 					   // then do the cell data
 	  for (unsigned int dataset=0; dataset<cell_data.size(); ++dataset)
@@ -351,9 +351,9 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 		for (unsigned int i=0; i<n_subdivisions+1; ++i)
 		  patch->data(dataset+dof_data.size()*n_components,
 			      q*(n_subdivisions+1)+i) = value;
-	    };
-	};
-    };
+	    }
+	}
+    }
 }
 
 
