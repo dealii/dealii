@@ -57,7 +57,7 @@ namespace PETScWrappers
  * necessary to create an object of this type, though you may do so.
  *
  *
- * @sect3{Conventions for all functions}
+ * <h3>Conventions for all functions</h3>
  *
  * There exist two versions of each function. One with a Mapping
  * argument and one without. If a code uses a mapping different from
@@ -104,7 +104,7 @@ namespace PETScWrappers
  * side.
  *
  *
- * @sect3{Supported matrices}
+ * <h3>Supported matrices</h3>
  *
  * At present there are functions to create the following matrices:
  * <ul>
@@ -144,7 +144,7 @@ namespace PETScWrappers
  * finite element.
  *
  *
- * @sect3{Matrices on the boundary}
+ * <h3>Matrices on the boundary</h3>
  *
  * The @p create_boundary_mass_matrix creates the matrix with entries
  * $m_{ij} = \int_{\Gamma} \phi_i \phi_j dx$, where $\Gamma$ is the
@@ -173,7 +173,7 @@ namespace PETScWrappers
  * triangulation object.
  *
  *
- * @sect3{Right hand sides}
+ * <h3>Right hand sides</h3>
  *
  * In many cases, you will not only want to build the matrix, but also
  * a right hand side, which will give a vector with
@@ -565,7 +565,7 @@ class MatrixCreator
  * and others.
  *
  *
- * @sect3{Boundary conditions}
+ * <h3>Boundary conditions</h3>
  *
  * The apply_boundary_values() function inserts boundary conditions
  * into a system of equations.  To actually do this you have to
@@ -578,7 +578,7 @@ class MatrixCreator
  * nodes into a linear system, as discussed below.
  * 
  *
- * @sect3{Global elimination}
+ * <h3>Global elimination</h3>
  *
  * In the first method, we first assemble the global linear system without
  * respect for fixed degrees of freedom, and in a second step eliminate them
@@ -677,7 +677,7 @@ class MatrixCreator
  * values.
  *
  *
- * @sect3{Local elimination}
+ * <h3>Local elimination</h3>
  *
  * The second way of handling boundary values is to modify the local
  * matrix and vector contributions appropriately before transferring

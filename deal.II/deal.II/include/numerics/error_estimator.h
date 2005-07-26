@@ -55,7 +55,7 @@ template <int dim> class FESubfaceValues;
  *  a lot of memory, when using many cells.
  *
  *  
- *  @sect3{Implementation}
+ *  <h3>Implementation</h3>
  *
  *  In principle, the implementation of the error estimation is simple: let
  *  \f[
@@ -97,7 +97,7 @@ template <int dim> class FESubfaceValues;
  *  the diameter of the cell.
  *  
  *
- *  @sect3{Vector-valued functions}
+ *  <h3>Vector-valued functions</h3>
  *
  *  If the finite element field for which the error is to be estimated
  *  is vector-valued, i.e. the finite element has more than one
@@ -119,7 +119,7 @@ template <int dim> class FESubfaceValues;
  *  a scalar coefficient which will then be used for all components.
  *
  *
- *  @sect3{Boundary values}
+ *  <h3>Boundary values</h3>
  *  
  *  If the face is at the boundary, i.e. there is no neighboring cell to which
  *  the jump in the gradiend could be computed, there are two possibilities:
@@ -157,7 +157,7 @@ template <int dim> class FESubfaceValues;
  *  conditions.
  *
  *  
- *  @sect3{Handling of hanging nodes}
+ *  <h3>Handling of hanging nodes</h3>
  *  
  *  The integration along faces with hanging nodes is quite tricky, since one
  *  of the elements has to be shifted one level up or down. See the
@@ -182,7 +182,7 @@ template <int dim> class FESubfaceValues;
  *  above.
  *
  *
- *  @sect3{Multiple solution vectors}
+ *  <h3>Multiple solution vectors</h3>
  *
  *  In some cases, for example in time-dependent problems, one would
  *  like to compute the error estimates for several solution vectors

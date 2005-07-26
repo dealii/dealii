@@ -33,7 +33,7 @@
  * intervals are used for each of them anyway, to make comparison easier.
  *
  *
- * @sect3{Ways to generate the intervals}
+ * <h3>Ways to generate the intervals</h3>
  *
  * At present, the following schemes for interval spacing are implemented:
  * <ul>
@@ -54,7 +54,7 @@
  * code.
  *
  *
- * @sect3{Output formats}
+ * <h3>Output formats</h3>
  *
  * At present, only GNUPLOT output is supported.
  *

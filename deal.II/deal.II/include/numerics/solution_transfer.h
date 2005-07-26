@@ -32,7 +32,7 @@
  * vector is reinitialized to the new size and filled with the interpolated
  * values.
  * 
- * @sect3{Usage}
+ * <h3>Usage</h3>
  *
  * As the interpolation while
  * coarsening is much more complicated to organize 
@@ -131,7 +131,7 @@
  * to transfer.
  *
  *
- * @sect3{Implementation}
+ * <h3>Implementation</h3>
  *
  * <ul>
  * <li> Solution transfer while pure refinement. Assume that we have got a

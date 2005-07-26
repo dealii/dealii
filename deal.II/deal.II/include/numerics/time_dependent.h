@@ -52,7 +52,7 @@ template <int dim> class Triangulation;
  * use the same setup and therefore this class.
  *
  *
- * @sect3{Overview}
+ * <h3>Overview</h3>
  *
  * The general structure of a time dependent problem solver using a timestepping
  * scheme is about the following: we have a collection of time step objects
@@ -180,7 +180,7 @@ template <int dim> class Triangulation;
  * problem, this order is reversed.
  *
  *
- * @sect3{Implementation}
+ * <h3>Implementation</h3>
  *
  * The main loop of a program using this class will usually look like
  * the following one, taken modified from an application program that
@@ -1245,7 +1245,7 @@ namespace TimeStepBase_Tria_Flags
  * </ul>
  *
  *
- * @sect3{Description of flags}
+ * <h3>Description of flags</h3>
  *
  * <ul>
  * <li> @p max_refinement_level: Cut the refinement of cells at a given level.

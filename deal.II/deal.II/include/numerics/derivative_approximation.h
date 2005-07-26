@@ -79,7 +79,7 @@
  * gradients themselves.
  *
  *
- * @sect2{Approximation of higher derivatives}
+ * <h3>Approximation of higher derivatives</h3>
  *
  * Similar to the reasoning above, approximations to higher
  * derivatives can be computed in a similar fashion. For example, the
@@ -114,7 +114,7 @@
  * same lines as exposed above.
  *
  *
- * @sect2{Refinement indicators based on the derivatives}
+ * <h3>Refinement indicators based on the derivatives</h3>
  *
  * If you would like to base a refinement criterion upon these
  * approximation of the derivatives, you will have to scale the results
@@ -129,7 +129,7 @@
  * the mesh size $h$ one higher than for the gradient.
  *
  *
- * @sect2{Implementation}
+ * <h3>Implementation</h3>
  *
  * The formulae for the computation of approximations to the gradient
  * and to the tensor of second derivatives shown above are very much
