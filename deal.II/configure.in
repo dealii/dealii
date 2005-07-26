@@ -656,7 +656,8 @@ AC_OUTPUT([common/Make.global_options
            common/scripts/make_dependencies.pl
            doc/Makefile 
 	   doc/doxygen/Makefile
-           doc/doxygen/options.dox])
+           doc/doxygen/options.dox
+	   doc/doxygen/header.html])
 
 
 echo

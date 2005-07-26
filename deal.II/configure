@@ -3145,8 +3145,8 @@ echo "${ECHO_T}Unrecognized C++ compiler -- Try to go ahead and get help from de
 	;;
 
       *cygwin* )
-        CXXFLAGSPIC=
-        LDFLAGSPIC=
+                                                                CXXFLAGSPIC="-Xlinker --allow-multiple-definition"
+        LDFLAGSPIC="--allow-multiple-definition"
         ;;
 
       *)
@@ -7576,7 +7576,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
 #include <cstdlib>
-extern "C" void abort () {}
+extern "C" void abort () { for(;;) ; }
 
 int
 main ()
@@ -10454,7 +10454,7 @@ echo "${ECHO_T}--------------------- generating output ---------------------" >&
 
 
 
-                                                            ac_config_files="$ac_config_files common/Make.global_options common/Makefile.template common/scripts/make_dependencies.pl doc/Makefile doc/doxygen/Makefile doc/doxygen/options.dox"
+                                                                      ac_config_files="$ac_config_files common/Make.global_options common/Makefile.template common/scripts/make_dependencies.pl doc/Makefile doc/doxygen/Makefile doc/doxygen/options.dox doc/doxygen/header.html"
 
 
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
@@ -10932,6 +10932,7 @@ do
   "doc/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
   "doc/doxygen/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/doxygen/Makefile" ;;
   "doc/doxygen/options.dox" ) CONFIG_FILES="$CONFIG_FILES doc/doxygen/options.dox" ;;
+  "doc/doxygen/header.html" ) CONFIG_FILES="$CONFIG_FILES doc/doxygen/header.html" ;;
   "base/include/base/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS base/include/base/config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
