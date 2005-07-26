@@ -39,4 +39,18 @@
  *
  * This module collects the classes used for reading and writing
  * meshes and data.
+ *
+ * The list of supported formats can be found in the
+ * description of the classes
+ * <ul>
+ * <li> GridIn for reading meshes,
+ * <li> GridOut for writing meshes,
+ * <li> DataOutBase for writing simulation results.
+ * </ul>
+ *
+ * For writing data, you would normally use objects of the class
+ * DataOut (DataOutBase only provides the low level output
+ * functions). Still, there are some other options for more
+ * specialized needs, like DataOutFaces, DataOutRotation and
+ * DataOutStack.
  */
