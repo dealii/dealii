@@ -23,7 +23,6 @@
  * employing numerical difference quotients. This only, if the user
  * function does not provide the gradient function himself.
  *
- * @section Usage Usage
  * The following example of an user defined function overloads and
  * implements only the value() function but not the gradient()
  * function. If the gradient() function is invoked then the gradient
