@@ -192,18 +192,18 @@ class DataOutBase
 {
   public:
 				     /**
-				      * Data structure describing a
-				      * patch of data in <tt>dim</tt> space
+				      * Data structure describing a patch of
+				      * data in <tt>dim</tt> space
 				      * dimensions. See the general
 				      * documentation of the
 				      * <tt>DataOutBase</tt> class for more
-				      * information on its contents
-				      * and purposes.  In the case of
-				      * two dimensions, the next
-				      * picture ist an example of
-				      * <tt>n_subdivision</tt> = 4 because
-				      * the number of cells is
-				      * equal to <tt>2^dim</tt>.
+				      * information on its contents and
+				      * purposes.  In the case of two
+				      * dimensions, the next picture ist an
+				      * example of <tt>n_subdivision</tt> = 4
+				      * because the number of (sub)cells
+				      * within each patch is equal to
+				      * <tt>2^dim</tt>.
 				      * @verbatim
 				      *  __ __ __ __
 				      * |  |  |  |  |
