@@ -92,7 +92,7 @@ class ConstraintMatrix;
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. The solution vector $v$ then is
  *   the projection.
  *
- *   In order to get proper results, it may necessary to treat
+ *   In order to get proper results, it be may necessary to treat
  *   boundary conditions right. Below are listed some cases where this
  *   may be needed.  If needed, this is done by <i>L<sup>2</sup></i>-projection of
  *   the trace of the given function onto the finite element space
