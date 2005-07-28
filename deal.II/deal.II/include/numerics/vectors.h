@@ -85,12 +85,15 @@ class ConstraintMatrix;
  *   given function may be, taking into account that a virtual function has
  *   to be called.
  *
- * <li> Projection: compute the <i>L<sup>2</sup></i>-projection of the given function onto
- *   the finite element space. This is done through the solution of the
+ * <li> Projection: compute the <i>L<sup>2</sup></i>-projection of the given
+ *   function onto the finite element space, i.e. if <i>f</i> is the function
+ *   to be projected, compute <i>f<sub>h</sub></i> in <i>L<sup>2</sup></i> such
+ *   that <i>(f<sub>h</sub>,v<sub>h</sub>)=(f,v<sub>h</sub>)</i> for all discrete
+ *   test functions <i>v<sub>h</sub></i>. This is done through the solution of the
  *   linear system of equations $M v = f$ where $M$ is the mass matrix
  *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$ and
  *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. The solution vector $v$ then is
- *   the projection.
+ *   the nodal representation of the projection <i>f<sub>h</sub></i>.
  *
  *   In order to get proper results, it be may necessary to treat
  *   boundary conditions right. Below are listed some cases where this
@@ -223,19 +226,19 @@ class ConstraintMatrix;
  *   function in different norms. The integration is performed using a given
  *   quadrature formulae and assumes that the given finite element objects equals
  *   that used for the computation of the solution.
- * 
+ *
  *   The result is stored in a vector (named @p difference), where each entry
  *   equals the given norm of the difference on a cell. The order of entries
  *   is the same as a @p cell_iterator takes when started with @p begin_active and
  *   promoted with the <tt>++</tt> operator.
- * 
+ *
  *   You can use the @p distribute_cell_to_dof_vector function of the
  *   DoFHandler class to convert cell based data to a data
  *   vector with values on the degrees of freedom, which can then be
  *   added to a DataOut object to be printed. But also you can
  *   add a cell based data vector itself to a DataOut object,
  *   see the @p DataOut::add_data_vector functions.
- * 
+ *
  *   Presently, there is the possibility to compute the following values from the
  *   difference, on each cell: @p mean, @p L1_norm, @p L2_norm, @p Linfty_norm,
  *   @p H1_seminorm and @p H1_norm, see @p VectorTools::NormType.
@@ -265,7 +268,7 @@ class ConstraintMatrix;
  *   norm of the gradient of the difference. The square of the full
  *   <i>H<sup>1</sup></i> norm is the sum of the square of seminorm
  *   and the square of the <i>L<sup>2</sup></i> norm.
- * 
+ *
  *   To get the global <i>L<sup>1</sup></i> error, you have to sum up the
  *   entries in @p difference, e.g. using
  *   <tt>Vector<double>::l1_norm</tt> function.  For the global <i>L<sup>2</sup></i>
@@ -275,7 +278,7 @@ class ConstraintMatrix;
  *   represent the $l_1$ and $l_2$ norms of the vectors, but you need
  *   not take the absolute value of each entry, since the cellwise
  *   norms are already positive.
- *  
+ *
  *   To get the global mean difference, simply sum up the elements as above.
  *   To get the $L_\infty$ norm, take the maximum of the vector elements, e.g.
  *   using the <tt>Vector<double>::linfty_norm</tt> function.
@@ -370,9 +373,9 @@ class VectorTools
 					    * <i>L<sup>infty</sup></i>.
 					    */
 	  W1infty_norm
-	  
+
     };
-    
+
 				     /**
 				      * Compute the interpolation of
 				      * @p function at the support
@@ -399,7 +402,7 @@ class VectorTools
 			     const DoFHandler<dim> &dof,
 			     const Function<dim>   &function,
 			     VECTOR                &vec);
-    
+
 				     /**
 				      * Calls the @p interpolate
 				      * function above with
@@ -436,7 +439,7 @@ class VectorTools
 			     const FullMatrix<double> &transfer,
 			     const InVector           &data_1,
 			     OutVector                &data_2);
-			  
+
 				     /**
 				      * Compute the projection of
 				      * @function to the finite element space.
@@ -500,7 +503,7 @@ class VectorTools
 			 const bool                enforce_zero_boundary = false,
 			 const Quadrature<0>      &q_boundary = *invalid_face_quadrature,
 			 const bool                project_to_boundary_first = false);
-    
+
 				     /**
 				      * Calls the @p project
 				      * function, see above, with
@@ -524,14 +527,14 @@ class VectorTools
 				      *
 				      * See the general documentation of this
 				      * class for further information.
-				      */				      
+				      */
     template <int dim>
     static void create_right_hand_side (const Mapping<dim>    &mapping,
 					const DoFHandler<dim> &dof,
 					const Quadrature<dim> &q,
 					const Function<dim>   &rhs,
 					Vector<double>        &rhs_vector);
-    
+
 				     /**
 				      * Calls the @p create_right_hand_side
 				      * function, see above, with
@@ -574,7 +577,7 @@ class VectorTools
 						 const Function<1>   &rhs,
 						 Vector<double>      &rhs_vector,
 						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
-    
+
 				     /**
 				      * Calls the
 				      * @p create_boundary_right_hand_side
@@ -587,7 +590,7 @@ class VectorTools
 						 const Function<dim>     &rhs,
 						 Vector<double>          &rhs_vector,
 						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
-    
+
 				     /**
 				      * Prepare Dirichlet boundary
 				      * conditions.  Make up the list
@@ -705,7 +708,7 @@ class VectorTools
 					     const Function<1>             &boundary_function,
 					     std::map<unsigned int,double> &boundary_values,
 					     const std::vector<bool>       &component_mask = std::vector<bool>());
-    
+
 				     /**
 				      * Calls the other
 				      * @p interpolate_boundary_values
@@ -731,7 +734,7 @@ class VectorTools
 					     std::map<unsigned int,double> &boundary_values,
 					     const std::vector<bool>       &component_mask = std::vector<bool>());
 
-    
+
 				     /**
 				      * Project @p function to the boundary
 				      * of the domain, using the given quadrature
@@ -771,7 +774,7 @@ class VectorTools
 					 const FunctionMap<1>::type &boundary_functions,
 					 const Quadrature<0>        &q,
 					 std::map<unsigned int,double> &boundary_values);
-    
+
 				     /**
 				      * Calls the @p project_boundary_values
 				      * function, see above, with
@@ -782,7 +785,7 @@ class VectorTools
 					 const typename FunctionMap<dim>::type &boundary_function,
 					 const Quadrature<dim-1>  &q,
 					 std::map<unsigned int,double> &boundary_values);
-    
+
     				     /**
 				      * Compute the error of the finite element solution.
 				      * Integrate the difference between
@@ -877,7 +880,7 @@ class VectorTools
 				  const Function<dim>&   exact_solution,
 				  Vector<double>&        difference,
 				  const Point<dim>&      point);
-    
+
 				     /**
 				      * Subtract the (algebraic) mean value
 				      * from a vector. This function is most
@@ -913,7 +916,7 @@ class VectorTools
 				      */
     static void subtract_mean_value(Vector<double>          &v,
 				    const std::vector<bool> &p_select);
-    
+
 				     /**
 				      * Compute the mean value of one
 				      * component of the solution.
@@ -946,7 +949,7 @@ class VectorTools
 				      const Quadrature<dim> &quadrature,
 				      const InVector        &v,
 				      const unsigned int     component);
-    
+
 				     /**
 				      * Calls the @p compute_mean_value
 				      * function, see above, with
@@ -986,11 +989,11 @@ class VectorTools
                                       * Exception
                                       */
     DeclException0 (ExcNoComponentSelected);
-    
+
   private:
 				     /**
-				      * Null pointer used to 
-				      * denote invalid face 
+				      * Null pointer used to
+				      * denote invalid face
 				      * quadrature formulas in 1d.
  				      */
     static const Quadrature<0> * const invalid_face_quadrature;
