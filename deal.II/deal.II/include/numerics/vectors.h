@@ -439,7 +439,7 @@ class VectorTools
 			  
 				     /**
 				      * Compute the projection of
-				      * @p function to the finite element space.
+				      * @function to the finite element space.
 				      *
 				      * By default, projection to the boundary
 				      * and enforcement of zero boundary values
