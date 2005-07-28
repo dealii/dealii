@@ -487,9 +487,9 @@ class VectorTools
 				      * 1d. At present, it is not
 				      * implemented.
 				      *
-				      * The default value of the
-				      * quadrature formula is an
-				      * invalid object.
+				      * The default value of the boundary
+				      * quadrature formula is an invalid
+				      * object since it makes no sense in 1d.
 				      */
     static void project (const Mapping<1>         &mapping,
 			 const DoFHandler<1>      &dof,
