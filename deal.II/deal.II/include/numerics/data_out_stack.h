@@ -191,6 +191,14 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * and therefore only one name needs to
 				      * be given.
 				      *
+				      * If @p vec is a vector with
+				      * multiple components this
+				      * function will generate
+				      * distinct names for all
+				      * components by appending an
+				      * underscore and the number of
+				      * each component to @p name
+				      * 
 				      * The data vector must have been
 				      * registered using the @p declare_data_vector
 				      * function before actually using it the

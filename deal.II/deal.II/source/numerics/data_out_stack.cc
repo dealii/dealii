@@ -24,7 +24,11 @@
 #include <fe/fe_values.h>
 #include <fe/mapping_q1.h>
 
-
+#ifdef HAVE_STD_STRINGSTREAM
+#  include <sstream>
+#else
+#  include <strstream>
+#endif
 
 
 template <int dim>
@@ -128,8 +132,37 @@ template <typename number>
 void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
 					 const std::string    &name)
 {
+  const unsigned int n_components = dof_handler->get_fe().n_components ();
+
   std::vector<std::string> names;
-  names.push_back (name);
+				   // if only one component or vector
+				   // is cell vector: we only need one
+				   // name
+  if ((n_components == 1) ||
+      (vec.size() == dof_handler->get_tria().n_active_cells()))
+    {
+      names.resize (1, name);
+    }
+  else
+				     // otherwise append _i to the
+				     // given name
+    {
+      names.resize (n_components);
+      for (unsigned int i=0; i<n_components; ++i)
+	{
+#ifdef HAVE_STD_STRINGSTREAM
+	  std::ostringstream namebuf;
+#else
+	  std::ostrstream namebuf;
+#endif
+	  namebuf << '_' << i;
+#ifndef HAVE_STD_STRINGSTREAM
+	  namebuf << std::ends;
+#endif
+  	  names[i] = name + namebuf.str();
+  	}
+    }
+
   add_data_vector (vec, names);
 }
 

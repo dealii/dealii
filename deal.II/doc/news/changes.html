@@ -584,6 +584,16 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: The <code class="member">DataOutStack::add_data_vector</code>
+       function now also allows to give only a single name even if the data is
+       vector-valued. It then makes up names for the individual components by
+       adding numbers to the name, just like the <code
+       class="class">DataOut</code> class already does for a long time.
+       <br> 
+       (WB, 2005/07/29)
+       </p>
+
+  <li> <p>
        New: The <code class="class">DataOutStack</code> class can now also be
        used to stack two-dimensional time or parameter dependent data into a 3d
        output.
