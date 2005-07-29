@@ -252,6 +252,15 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed:  <code>PathSearch</code> needed any new "search class" to
+       be added before use. Now this can be done at construction time.
+       Added <code>PathSearch::close()</code> to explicitly close the
+       last opened stream.
+       <br>
+       (Luca Heltai, 2005/07/29)
+       </p>
+
+  <li> <p>
        Changed: <code>ParameterHandler::get_bool()</code> only accepted
        "true" or "false" as boolean values, now it also considers "yes"
        and "no" as "true" and "false" respectively.
