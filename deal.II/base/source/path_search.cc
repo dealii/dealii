@@ -52,8 +52,12 @@ PathSearch::get_path_list(const std::string& cls)
 {
   if (path_lists.empty())
     initialize_classes();
-
-  Assert(path_lists.count(cls) != 0, ExcNoClass(cls));
+  
+  // Modified by Luca Heltai. If a class is not there, add it
+  if(path_lists.count(cls) == 0) add_class(cls);
+  
+  // Assert(path_lists.count(cls) != 0, ExcNoClass(cls));
+  Assert(path_lists.count(cls) != 0, ExcInternalError());
   
   return path_lists.find(cls)->second;
 }
@@ -61,8 +65,15 @@ PathSearch::get_path_list(const std::string& cls)
 
 std::vector<std::string>&
 PathSearch::get_suffix_list(const std::string& cls)
-{
-  Assert(suffix_lists.count(cls) != 0, ExcNoClass(cls));
+{  
+  // This is redundant. The constructor should have already called the
+  // add_path function with the path_list bit...
+
+  // Modified by Luca Heltai. If a class is not there, add it
+  if(suffix_lists.count(cls) == 0) add_class(cls);
+  
+  // Assert(suffix_lists.count(cls) != 0, ExcNoClass(cls));
+  Assert(suffix_lists.count(cls) != 0, ExcInternalError());
   
   return suffix_lists.find(cls)->second;
 }
@@ -127,6 +138,20 @@ PathSearch::open (const std::string& filename,
   return *stream;
 }
 
+void 
+PathSearch::close()
+{
+  if(stream->is_open()) {
+    stream->close();
+    if (debug > 0)
+      deallog << "PathSearch[" << cls << "] closed "
+	      << real_name << std::endl;
+  } else {
+    if (debug > 0)
+      deallog << "PathSearch[" << cls 
+	      << "] nothing opened" << std::endl;
+  }
+}
 
 std::istream&
 PathSearch::open (const std::string& filename)

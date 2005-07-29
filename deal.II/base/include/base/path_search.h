@@ -70,10 +70,14 @@
  * trailing <tt>"/"</tt>, while suffixes should always start with a
  * dot. These characters are not added automatically (allowing you to
  * do some real file name editing).
+ * 
+ * If you want to open another file with the same object, the previous
+ * one is automatically closed for you. The close() method is needed
+ * only if you need to open the same file externally.
  *
  * @todo Add support for environment variables like in kpathsea.
  *
- * @author Guido Kanschat, 2005
+ * @author Guido Kanschat, Luca Heltai 2005
  */
 class PathSearch
 {
@@ -117,6 +121,18 @@ class PathSearch
 				      */
     std::istream& open (const std::string& filename,
 			const std::string& suffix);
+
+				     /** Explicitly close the file
+					 opened by the previous call
+					 to one of the open()
+					 functions. This is needed
+					 only if you need to open the
+					 same file externally. Opening
+					 another file with the same
+					 PathSearch object
+					 automatically closes the old
+					 one. */
+    void close();
     
 				     /**
 				      * Return the actual name of the
