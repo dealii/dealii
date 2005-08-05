@@ -20,6 +20,7 @@
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <fe/fe_q.h>
+#include <fe/fe_q_hierarchical.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_dgp.h>
 #include <fe/fe_raviart_thomas.h>
@@ -37,6 +38,12 @@ void test_fe_datas()
   fe_datas.push_back(new FE_Q<dim> (2));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_Q<dim> (4));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_Q_Hierarchical<dim> (1));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_Q_Hierarchical<dim> (2));
+  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+  fe_datas.push_back(new FE_Q_Hierarchical<dim> (4));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGQ<dim> (1));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
