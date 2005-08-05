@@ -810,37 +810,14 @@ FE_Q_Hierarchical<dim>::has_support_on_face (const unsigned int shape_index,
                                            // one dof per vertex, so
                                            // shape_index==vertex_number. check
                                            // whether this vertex is
-                                           // on the given face. thus,
-                                           // for each face, give a
-                                           // list of vertices
+                                           // on the given face
           const unsigned int vertex_no = shape_index;
           Assert (vertex_no < GeometryInfo<dim>::vertices_per_cell,
                   ExcInternalError());
-          switch (dim)
-            {
-              case 2:
-              {
-                static const unsigned int face_vertices[4][2] =
-		{ {0,1},{1,2},{2,3},{0,3} };
-                return ((face_vertices[face_index][0] == vertex_no)
-                        ||
-                        (face_vertices[face_index][1] == vertex_no));
-              };
-
-              case 3:
-              {
-                static const unsigned int face_vertices[6][4] =
-		{ {0,1,2,3},{4,5,6,7},{0,1,5,4},
-		  {1,5,6,2},{3,2,6,7},{0,4,7,3} };
-                return ((face_vertices[face_index][0] == vertex_no)||
-                        (face_vertices[face_index][1] == vertex_no)||
-                        (face_vertices[face_index][2] == vertex_no)||
-                        (face_vertices[face_index][3] == vertex_no));
-              };
-
-              default:
-                    Assert (false, ExcNotImplemented());
-            };
+	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
+	    if (GeometryInfo<dim>::face_to_cell_vertices(face_index,i) == vertex_no)
+	      return true;
+	  return false;
         }
       else if (shape_index < this->first_quad_index)
                                          // ok, dof is on a line
@@ -850,28 +827,10 @@ FE_Q_Hierarchical<dim>::has_support_on_face (const unsigned int shape_index,
           Assert (line_index < GeometryInfo<dim>::lines_per_cell,
                   ExcInternalError());
 
-                                           // in 2d, the line is the
-                                           // face, so get the line
-                                           // index
-          if (dim == 2)
-            return (line_index == face_index);
-          else if (dim == 3)
-            {
-                                               // see whether the
-                                               // given line is on the
-                                               // given face. use
-                                               // table technique
-                                               // again
-              static const unsigned int face_lines[6][4] =
-	      { {0,1,2,3},{4,5,6,7},{0,8,9,4},
-		{1,9,5,10},{2,10,6,11},{3,8,7,11} };
-              return ((face_lines[face_index][0] == line_index)||
-                      (face_lines[face_index][1] == line_index)||
-                      (face_lines[face_index][2] == line_index)||
-                      (face_lines[face_index][3] == line_index));
-            }
-          else
-            Assert (false, ExcNotImplemented());
+	  for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_face; ++i)
+	    if (GeometryInfo<dim>::face_to_cell_lines(face_index,i) == line_index)
+	      return true;
+	  return false;
         }
       else if (shape_index < this->first_hex_index)
                                          // dof is on a quad
