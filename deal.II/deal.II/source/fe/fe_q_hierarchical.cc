@@ -46,10 +46,10 @@ FE_Q_Hierarchical<dim>::FE_Q_Hierarchical (const unsigned int degree)
 		    get_dpo_vector(degree),1, degree).dofs_per_cell, false),
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
 		    get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true))),
-						    face_renumber(face_lexicographic_to_hierarchic_numbering (degree))
+						    face_renumber(face_fe_q_hierarchical_to_hierarchic_numbering (degree))
 {
-  this->poly_space.set_numbering(invert_numbering(
-    lexicographic_to_hierarchic_numbering (*this, degree)));
+  this->poly_space.set_numbering(
+    hierarchic_to_fe_q_hierarchical_numbering(*this));
   
 				   // The matrix @p{dofs_cell} contains the 
 				   // values of the linear functionals of 
@@ -339,7 +339,6 @@ initialize_embedding_and_restriction (const std::vector<FullMatrix<double> > &do
   const std::vector<unsigned int> &renumber=
     this->poly_space.get_numbering();
   
-
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
     {
       this->prolongation[c].reinit (this->dofs_per_cell, this->dofs_per_cell);
@@ -575,251 +574,186 @@ FE_Q_Hierarchical<dim>::get_dpo_vector(const unsigned int deg)
 template <int dim>
 std::vector<unsigned int>
 FE_Q_Hierarchical<dim>::
-lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
-				       const unsigned int            degree)
+hierarchic_to_fe_q_hierarchical_numbering (const FiniteElementData<dim> &fe)
 {
-  std::vector<unsigned int> renumber (fe_data.dofs_per_cell, 0);
-  
+  Assert (fe.n_components() == 1, ExcInternalError());
+  std::vector<unsigned int> h2l(fe.dofs_per_cell);
+
+				   // polynomial degree
+  const unsigned int degree = fe.dofs_per_line+1;
+				   // number of grid points in each
+				   // direction
   const unsigned int n = degree+1;
 
-
-  if (degree == 0)
+				   // the following lines of code are
+				   // somewhat odd, due to the way the
+				   // hierarchic numbering is
+				   // organized. if someone would
+				   // really want to understand these
+				   // lines, you better draw some
+				   // pictures where you indicate the
+				   // indices and orders of vertices,
+				   // lines, etc, along with the
+				   // numbers of the degrees of
+				   // freedom in hierarchical and
+				   // lexicographical order
+  switch (dim)
     {
-      Assert ( (fe_data.dofs_per_vertex == 0) &&
-	       ((fe_data.dofs_per_line == 0) || (dim == 1)) &&
-	       ((fe_data.dofs_per_quad == 0) || (dim == 2)) &&
-	       ((fe_data.dofs_per_hex == 0)  || (dim == 3)),
-	       ExcInternalError() );
-      renumber[0] = 0;
-    };
+      case 1:
+      {
+	for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	  h2l[i] = i;
 
-  if (degree > 0)
-    {
-      Assert (fe_data.dofs_per_vertex == 1, ExcInternalError());
-      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	{
-	  unsigned int index = 0;
-					   // Find indices of vertices.
-					   // Unfortunately, somebody
-					   // switched the upper corner
-					   // points of a quad. The same
-					   // person decided to find a very
-					   // creative numbering of the
-					   // vertices of a hexahedron.
-					   // Therefore, this looks quite
-					   // sophisticated.
-					   //
-					   // NB: This same person
-					   // claims to have had good
-					   // reasons then, but seems to
-					   // have forgotten about
-					   // them. At least, the
-					   // numbering was discussed
-					   // with the complaining
-					   // person back then when all
-					   // began :-)
-	  switch (dim)
-	    {
-	      case 1:
-	      {
-		const unsigned int values[GeometryInfo<1>::vertices_per_cell]
-		  = { 0, 1 };
-		index = values[i];
-		break;
-	      };
-	     
-	      case 2:
-	      {
-		const unsigned int values[GeometryInfo<2>::vertices_per_cell]
-		  = { 0, 1, n + 1, n };
-		index = values[i];
-		break;
-	      };
-	     
-	      case 3:
-	      {
-		const unsigned int values[GeometryInfo<3>::vertices_per_cell]
-		  = { 0,             1,
-		      n * n + 1,     n * n,
-		      n,             n + 1,
-		      n * n + n + 1, n * n + n};
-		index = values[i];
-		break;
-	      };
+	break;
+      }
+
+      case 2:
+      {
+					 // Example: degree=3
+					 //
+					 // hierarchical numbering:
+					 //  3  8  9  2
+					 // 11 14 15  7
+					 // 10 12 13  6
+					 //  0  4  5  1
+					 //
+					 // fe_q_hierarchical numbering:
+					 //  4  6  7  5
+					 // 12 14 15 13
+					 //  8 10 11  9
+					 //  0  2  3  1
+	unsigned int next_index = 0;
+					 // first the four vertices
+	h2l[next_index++] = 0;
+	h2l[next_index++] = 1;
+	h2l[next_index++] = n+1;
+	h2l[next_index++] = n;
+					 // bottom line
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = 2+i;
+					 // right line
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = (2+i)*n+1;
+					 // top line
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = n+2+i;
+					 // left line
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = (2+i)*n;
+					 // inside quad
+	Assert (fe.dofs_per_quad == fe.dofs_per_line*fe.dofs_per_line,
+		ExcInternalError());
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	    h2l[next_index++] = (2+i)*n+2+j;
+
+	Assert (next_index == fe.dofs_per_cell, ExcInternalError());
+
+	break;
+      }
+
+      case 3:
+      {
+	unsigned int next_index = 0;
+	const unsigned int n2=n*n;
+					 // first the eight vertices
+					 // front face, counterclock wise
+	h2l[next_index++] = 0;
+	h2l[next_index++] = 1;
+	h2l[next_index++] = n2+1;
+	h2l[next_index++] = n2;
+					 // back face, counterclock wise
+	h2l[next_index++] = n;
+	h2l[next_index++] = n+1;
+	h2l[next_index++] = n2+n+1;
+	h2l[next_index++] = n2+n;
+
+					 // now the lines
+					 // front face, counterclock wise
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = 2+i;
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = (2+i)*n2+1;
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = n2+2+i;
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = (2+i)*n2;
+					 // back face, counterclock wise
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = n+2+i;
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = (2+i)*n2+n+1;
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = n2+n+2+i;
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = (2+i)*n2+n;
+					 // lines in y-direction,
+					 // counterclock wise
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = (2+i)*n;
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = (2+i)*n+1;
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = n2+(2+i)*n+1;
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  h2l[next_index++] = n2+(2+i)*n;
+
+					 // inside quads
+	Assert (fe.dofs_per_quad == fe.dofs_per_line*fe.dofs_per_line,
+		ExcInternalError());
+					 // front face
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	    h2l[next_index++] = (2+i)*n2+2+j;
+					 // back face
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	    h2l[next_index++] = (2+i)*n2+n+2+j;
+					 // bottom face
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	    h2l[next_index++] = (2+i)*n+2+j;
+					 // right face
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	    h2l[next_index++] = (2+i)*n2+(2+j)*n+1;
+					 // top face
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	    h2l[next_index++] = n2+(2+i)*n+2+j;
+					 // left face
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	    h2l[next_index++] = (2+i)*n2+(2+j)*n;
+
+					 // inside hex
+	Assert (fe.dofs_per_hex == fe.dofs_per_quad*fe.dofs_per_line,
+		ExcInternalError());
+	for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	  for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	    for (unsigned int k=0; k<fe.dofs_per_line; ++k)
+	      h2l[next_index++]	= (2+i)*n2+(2+j)*n+2+k;
+
+	Assert (next_index == fe.dofs_per_cell, ExcInternalError());
 	
-	      default:
-		    Assert(false, ExcNotImplemented());
-	    }
+	break;
+      }       
 
-	  Assert (index < renumber.size(), ExcInternalError());
-	  renumber[index] = i;
-	}
-    };
-				   // for degree 2 and higher: Lines,
-				   // quads, hexes etc also carry
-				   // degrees of freedom
-  if (degree > 1)
-    {
-      Assert (fe_data.dofs_per_line == degree-1, ExcInternalError());
-      Assert ((fe_data.dofs_per_quad == (degree-1)*(degree-1)) ||
-	      (dim < 2), ExcInternalError());
-      Assert ((fe_data.dofs_per_hex == (degree-1)*(degree-1)*(degree-1)) ||
-	      (dim < 3), ExcInternalError());
-    
-      for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i)
-	{
-	  unsigned int index = fe_data.first_line_index
-			       + i*fe_data.dofs_per_line;
-	  unsigned int incr = 0;
-	  unsigned int tensorstart = 0;
-					   // This again looks quite
-					   // strange because of the odd
-					   // numbering scheme.
-	  switch (i+100*dim)
-	    {
-					       // lines in x-direction
-	      case 100:
-	      case 200: case 202:
-	      case 300: case 302: case 304: case 306:
-		    incr = 1;
-		    break;
-						     // lines in y-direction
-	      case 201: case 203:
-	      case 308: case 309: case 310: case 311:
-		    incr = n;
-		    break;
-						     // lines in z-direction
-	      case 301: case 303: case 305: case 307:
-		    incr = n * n;
-		    break;
-	      default:
-		    Assert(false, ExcNotImplemented());
-	    }
-	  switch (i+100*dim)
-	    {
-					       // x=y=z=0
-	      case 100:
-	      case 200: case 203:
-	      case 300: case 303: case 308:
-		    tensorstart = 0;
-		    break;
-						     // x=1 y=z=0
-	      case 201:
-	      case 301: case 309:
-		    tensorstart = 1;
-		    break;
-						     // y=1 x=z=0
-	      case 202:
-	      case 304: case 307:
-		    tensorstart = n;
-		    break;
-						     // x=z=1 y=0
-	      case 310:
-		    tensorstart = n * n + 1;
-		    break;
-						     // z=1 x=y=0
-	      case 302: case 311:
-		    tensorstart = n * n;
-		    break;
-						     // x=y=1 z=0
-	      case 305:
-		    tensorstart = n + 1;
-		    break;
-						     // y=z=1 x=0
-	      case 306:
-		    tensorstart = n * n + n;
-		    break;
-	      default:
-		    Assert(false, ExcNotImplemented());	      
-	    }
-	  
-	  for (unsigned int jx = 2; jx<=degree ;++jx)
-	    {
-	      unsigned int tensorindex = tensorstart + jx * incr;
-	      Assert (tensorindex < renumber.size(), ExcInternalError());
-	      renumber[tensorindex] = index++;
-	    }
-	}
-    
-      for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::quads_per_cell); ++i)
-	{
-	  unsigned int index = fe_data.first_quad_index+i*fe_data.dofs_per_quad;
-	  unsigned int tensorstart = 0;
-	  unsigned int incx = 0;
-	  unsigned int incy = 0;
-	  switch (i)
-	    {
-					       // z=0 (dim==2), y=0 (dim==3)
-	      case 0:
-		    tensorstart = 0; incx = 1;
-		    if (dim==2)
-		      incy = n;
-		    else
-		      incy = n * n;
-		    break;
-						     // y=1
-	      case 1:
-		    tensorstart = n; incx = 1; incy = n * n;
-		    break;
-						     // z=0
-	      case 2:
-		    tensorstart = 0; incx = 1; incy = n;
-		    break;
-						     // x=1
-	      case 3:
-		    tensorstart = 1; incx = n; incy = n * n;
-		    break;
-						     // z=1
-	      case 4:
-		    tensorstart = n * n; incx = 1; incy = n;
-		    break;
-						     // x=0
-	      case 5:
-		    tensorstart = 0; incx = n; incy = n * n;
-		    break;
-	      default:
-		    Assert(false, ExcNotImplemented());	      
-	    }
-	  
-	  for (unsigned int jy = 2; jy<=degree; jy++)
-	    for (unsigned int jx = 2; jx<=degree ;++jx)
-	      {
-		unsigned int tensorindex = tensorstart
-					   + jx * incx + jy * incy;
-		Assert (tensorindex < renumber.size(), ExcInternalError());
-		renumber[tensorindex] = index++;
-	      }
-	}
-    
-      if (GeometryInfo<dim>::hexes_per_cell > 0)
-	for (int i=0; i<static_cast<signed int>(GeometryInfo<dim>::hexes_per_cell); ++i)
-	  {
-	    unsigned int index = fe_data.first_hex_index;
-	    
-	    for (unsigned int jz = 2; jz<=degree; jz++)
-	      for (unsigned int jy = 2; jy<=degree; jy++)
-		for (unsigned int jx = 2; jx<=degree; jx++)
-		  {
-		    const unsigned int tensorindex = jx + jy * n + jz * n * n;
-		    Assert (tensorindex < renumber.size(), ExcInternalError());
-		    renumber[tensorindex]=index++;
-		  }  
-	  } 
+      default:
+	    Assert (false, ExcNotImplemented());
     }
-
-  return renumber;
+  return h2l;
 }
-
 
 
 template <int dim>
 std::vector<unsigned int>
 FE_Q_Hierarchical<dim>::
-face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
+face_fe_q_hierarchical_to_hierarchic_numbering (const unsigned int degree)
 {
   FiniteElementData<dim-1> fe_data(FE_Q_Hierarchical<dim-1>::get_dpo_vector(degree),1);
-  return FE_Q_Hierarchical<dim-1>::lexicographic_to_hierarchic_numbering (fe_data,
-									  degree); 
+  return invert_numbering(FE_Q_Hierarchical<dim-1>::
+			  hierarchic_to_fe_q_hierarchical_numbering (fe_data));
 }
 
 
@@ -827,7 +761,7 @@ face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
 
 template <>
 std::vector<unsigned int>
-FE_Q_Hierarchical<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int)
+FE_Q_Hierarchical<1>::face_fe_q_hierarchical_to_hierarchic_numbering (const unsigned int)
 {
   return std::vector<unsigned int> ();
 }

@@ -228,7 +228,7 @@ template <int dim> class MappingQ;
  * Note the reverse ordering of degrees of freedom on the left and upper
  * line.
  *
- * @author Brian Carnes, 2002, Ralf Hartmann 2004
+ * @author Brian Carnes, 2002, Ralf Hartmann 2004, 2005
  */
 template <int dim>
 class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
@@ -315,75 +315,63 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
     static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
     
 				     /**
-				      * Map tensor product data to
-				      * shape function numbering. This
-				      * function is actually an alike
-				      * replica of the respective
-				      * function in the FETools
-				      * class, but is kept for three
-				      * reasons:
+				      * The numbering of the degrees
+				      * of freedom in continous finite
+				      * elements is hierarchic,
+				      * i.e. in such a way that we
+				      * first number the vertex dofs,
+				      * in the order of the vertices
+				      * as defined by the
+				      * triangulation, then the line
+				      * dofs in the order and
+				      * respecting the direction of
+				      * the lines, then the dofs on
+				      * quads, etc.
 				      *
-				      * 1. It only operates on a
-				      * FiniteElementData
-				      * structure. This is ok in the
-				      * present context, since we can
-				      * control which types of
-				      * arguments it is called with
-				      * because this is a private
-				      * function. However, the
-				      * publicly visible function in
-				      * the FETools class needs
-				      * to make sure that the
-				      * FiniteElementData object
-				      * it works on actually
-				      * represents a continuous finite
-				      * element, which we found too
-				      * difficult if we do not pass an
-				      * object of type FE_Q()
-				      * directly.
+				      * The dofs associated with 1d
+				      * hierarchical polynomials are
+				      * ordered with the vertices
+				      * first ($phi_0(x)=1-x$ and
+				      * $phi_1(x)=x$) and then the
+				      * line dofs (the higher degree
+				      * polynomials).  The 2d and 3d
+				      * hierarchical polynomials
+				      * originate from the 1d
+				      * hierarchical polynomials by
+				      * tensor product. In the
+				      * following, the resulting
+				      * numbering of dofs will be
+				      * denoted by `fe_q_hierarchical
+				      * numbering`.
 				      *
-				      * 2. If we would call the
-				      * publicly available version of
-				      * this function instead of this
-				      * one, we would have to pass a
-				      * finite element
-				      * object. However, since the
-				      * construction of an entire
-				      * finite element object can be
-				      * costly, we rather chose to
-				      * retain this function.
+				      * This function constructs a
+				      * table which fe_q_hierarchical
+				      * index each degree of freedom
+				      * in the hierarchic numbering
+				      * would have.
 				      *
-				      * 3. Third reason is that we
-				      * want to call this function for
-				      * faces as well, by just calling
-				      * this function for the finite
-				      * element of one dimension
-				      * less. If we would call the
-				      * global function instead, this
-				      * would require us to construct
-				      * a second finite element object
-				      * of one dimension less, just to
-				      * call this function. Since that
-				      * function does not make use of
-				      * hanging nodes constraints,
-				      * interpolation and restriction
-				      * matrices, etc, this would have
-				      * been a waste. Furthermore, it
-				      * would have posed problems with
-				      * template instantiations.
+				      * This function is anologous to
+				      * the
+				      * FETools::hierarchical_to_lexicographic_numbering()
+				      * function. However, in contrast
+				      * to the fe_q_hierarchical
+				      * numbering defined above, the
+				      * lexicographic numbering
+				      * originates from the tensor
+				      * products of consecutive
+				      * numbered dofs (like for
+				      * LagrangeEquidistant).
 				      *
-				      * To sum up, the existence of
-				      * this function is a compromise
-				      * between simplicity and proper
-				      * library design, where we have
-				      * chosen to weigh the simplicity
-				      * aspect a little more than
-				      * proper design.
+				      * It is assumed that the size of
+				      * the output argument already
+				      * matches the correct size,
+				      * which is equal to the number
+				      * of degrees of freedom in the
+				      * finite element.
 				      */
     static
-    std::vector<unsigned int>
-    lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data,
-					   const unsigned int            degree);
+    std::vector<unsigned int> hierarchic_to_fe_q_hierarchical_numbering (
+      const FiniteElementData<dim> &fe);
 
 				     /**
 				      * This is an analogon to the
@@ -392,7 +380,7 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     static
     std::vector<unsigned int>
-    face_lexicographic_to_hierarchic_numbering (const unsigned int degree);
+    face_fe_q_hierarchical_to_hierarchic_numbering (const unsigned int degree);
 
 				     /**
 				      * Initialize two auxiliary
@@ -463,6 +451,6 @@ void FE_Q_Hierarchical<1>::initialize_unit_face_support_points ();
 
 template <>
 std::vector<unsigned int>
-FE_Q_Hierarchical<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
+FE_Q_Hierarchical<1>::face_fe_q_hierarchical_to_hierarchic_numbering (const unsigned int);
 
 #endif
