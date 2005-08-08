@@ -60,7 +60,7 @@
 				 // combination with a block SSOR
 				 // preconditioner (defined in
 				 // precondition_block.h), that uses
-				 // the special block matrix structur
+				 // the special block matrix structure
 				 // of system matrices arising from DG
 				 // discretizations.
 #include <lac/solver_richardson.h>
