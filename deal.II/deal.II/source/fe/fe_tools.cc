@@ -788,8 +788,6 @@ FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
   
   typename Triangulation<dim>::cell_iterator coarse_cell
     = tr.begin(0);
-  typename Triangulation<dim>::cell_iterator fine_cell;
-
 				   // Compute the coarse level mass
 				   // matrix
   coarse.reinit(coarse_cell);
