@@ -756,7 +756,6 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
 }
 
 
-// This function is tested by tests/fe/internals, since it produces the matrices printed there
 template<int dim, typename number>
 void
 FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
