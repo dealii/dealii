@@ -593,6 +593,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: It was possible to compare iterators into different
+       <code>DoFHandler</code> objects for equality and inequality as long as
+       the underlying triangulation object was the same. This doesn't make much
+       sense, however, and even sometimes declared to iterators equal if only
+       they had the same triangulation, refinement level, and index. Comparing
+       iterators into different containers is now completely disallowed.
+       <br> 
+       (WB, 2005/08/08)
+       </p>
+
+  <li> <p>
        New: The <code class="member">DataOutStack::add_data_vector</code>
        function now also allows to give only a single name even if the data is
        vector-valued. It then makes up names for the individual components by
