@@ -31,6 +31,7 @@ template <int dim>              class DoFObjectAccessor<1, dim>;
 template <int dim>              class DoFObjectAccessor<2, dim>;
 template <int dim>              class DoFObjectAccessor<3, dim>;
 
+template <int dim, typename Accessor> class TriaRawIterator;
 
 
 
@@ -146,13 +147,30 @@ class DoFAccessor
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcNotActive);
+				     /**
+				      * Exception
+				      * 
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcCantCompareIterators);
+
+  protected:    
+				     /**
+				      *  Compare for equality.            
+				      */
+    bool operator == (const DoFAccessor &) const;
+	
+				     /**
+				      * Compare for inequality.
+				      */
+    bool operator != (const DoFAccessor &) const;
 
   protected:
 				     /**
 				      * Store the address of the DoFHandler object
 				      * to be accessed.
 				      */
-    DoFHandler<dim> *dof_handler;  
+    DoFHandler<dim> *dof_handler;
 };
 
 
@@ -460,6 +478,25 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * for the iterator classes.
 				      */
     void copy_from (const DoFObjectAccessor<celldim, dim> &a);
+
+  protected:    
+				     /**
+				      *  Compare for equality.            
+				      */
+    bool operator == (const DoFObjectAccessor &) const;
+	
+				     /**
+				      * Compare for inequality.
+				      */
+    bool operator != (const DoFObjectAccessor &) const;
+
+
+                                     /**
+                                      * Iterator classes need to be friends
+                                      * because they need to access operator==
+                                      * and operator!=.
+                                      */
+    template <int, typename> friend class TriaRawIterator;
 };
 
 
@@ -703,6 +740,25 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * for the iterator classes.
 				      */
     void copy_from (const DoFObjectAccessor<1,dim> &a);
+
+  protected:    
+				     /**
+				      *  Compare for equality.            
+				      */
+    bool operator == (const DoFObjectAccessor<1,dim> &) const;
+	
+				     /**
+				      * Compare for inequality.
+				      */
+    bool operator != (const DoFObjectAccessor<1,dim> &) const;
+
+
+                                     /**
+                                      * Iterator classes need to be friends
+                                      * because they need to access operator==
+                                      * and operator!=.
+                                      */
+    template <int, typename> friend class TriaRawIterator;
 };
 
 
@@ -905,6 +961,25 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * for the iterator classes.
 				      */
     void copy_from (const DoFObjectAccessor<2, dim> &a);
+
+  protected:    
+				     /**
+				      *  Compare for equality.            
+				      */
+    bool operator == (const DoFObjectAccessor<2,dim> &) const;
+	
+				     /**
+				      * Compare for inequality.
+				      */
+    bool operator != (const DoFObjectAccessor<2,dim> &) const;
+
+
+                                     /**
+                                      * Iterator classes need to be friends
+                                      * because they need to access operator==
+                                      * and operator!=.
+                                      */
+    template <int, typename> friend class TriaRawIterator;
 };
 
 
@@ -1115,6 +1190,25 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * for the iterator classes.
 				      */
     void copy_from (const DoFObjectAccessor<3, dim> &a);
+
+  protected:    
+				     /**
+				      *  Compare for equality.            
+				      */
+    bool operator == (const DoFObjectAccessor<3,dim> &) const;
+	
+				     /**
+				      * Compare for inequality.
+				      */
+    bool operator != (const DoFObjectAccessor<3,dim> &) const;
+
+
+                                     /**
+                                      * Iterator classes need to be friends
+                                      * because they need to access operator==
+                                      * and operator!=.
+                                      */
+    template <int, typename> friend class TriaRawIterator;
 };
 
 

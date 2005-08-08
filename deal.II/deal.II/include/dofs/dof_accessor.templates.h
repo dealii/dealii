@@ -86,6 +86,39 @@ DoFAccessor<dim>::operator = (const DoFAccessor<dim> &da)
 
 
 
+template <int dim>
+inline
+bool
+DoFAccessor<dim>::operator == (const DoFAccessor<dim> &a) const
+{
+  Assert (dof_handler == a.dof_handler, ExcCantCompareIterators());
+
+                                   // there is no real data to compare, except
+                                   // to make sure that the dof_handler
+                                   // objects in use are the same
+  return true;
+}
+
+
+
+template <int dim>
+inline
+bool
+DoFAccessor<dim>::operator != (const DoFAccessor<dim> &a) const
+{
+  Assert (dof_handler == a.dof_handler, ExcCantCompareIterators());
+
+                                   // there is no real data to compare, except
+                                   // to make sure that the dof_handler
+                                   // objects in use are the same. this is
+                                   // checked above, and apart from this there
+                                   // is no reason for us to believe that the
+                                   // two accessors are different
+  return false;
+}
+
+
+
 
 /*------------------------- Functions: DoFObjectAccessor<1,dim> -----------------------*/
 
@@ -336,6 +369,29 @@ DoFObjectAccessor<1,dim>::copy_from (const DoFObjectAccessor<1,dim> &a)
 }
 
 
+
+template <int dim>
+inline
+bool
+DoFObjectAccessor<1,dim>::operator == (const DoFObjectAccessor<1,dim> &a) const
+{
+  return (TriaObjectAccessor<1,dim>::operator == (a)
+          &&
+          DoFAccessor<dim>::operator == (a));
+}
+
+
+template <int dim>
+inline
+bool
+DoFObjectAccessor<1,dim>::operator != (const DoFObjectAccessor<1,dim> &a) const
+{
+  return (TriaObjectAccessor<1,dim>::operator != (a)
+          ||
+          DoFAccessor<dim>::operator != (a));
+}
+
+
 /*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
 
 template <int dim>
@@ -578,6 +634,30 @@ DoFObjectAccessor<2,dim>::copy_from (const DoFObjectAccessor<2,dim> &a)
   BaseClass::copy_from (a);
   this->set_dof_handler (a.dof_handler);
 }
+
+
+
+template <int dim>
+inline
+bool
+DoFObjectAccessor<2,dim>::operator == (const DoFObjectAccessor<2,dim> &a) const
+{
+  return (TriaObjectAccessor<2,dim>::operator == (a)
+          &&
+          DoFAccessor<dim>::operator == (a));
+}
+
+
+template <int dim>
+inline
+bool
+DoFObjectAccessor<2,dim>::operator != (const DoFObjectAccessor<2,dim> &a) const
+{
+  return (TriaObjectAccessor<2,dim>::operator != (a)
+          ||
+          DoFAccessor<dim>::operator != (a));
+}
+
 
 
 /*------------------------- Functions: DoFObjectAccessor<3,dim> -----------------------*/
@@ -845,6 +925,29 @@ void DoFObjectAccessor<3,dim>::copy_from (const DoFObjectAccessor<3,dim> &a)
 {
   BaseClass::copy_from (a);
   this->set_dof_handler (a.dof_handler);
+}
+
+
+
+template <int dim>
+inline
+bool
+DoFObjectAccessor<3,dim>::operator == (const DoFObjectAccessor<3,dim> &a) const
+{
+  return (TriaObjectAccessor<3,dim>::operator == (a)
+          &&
+          DoFAccessor<dim>::operator == (a));
+}
+
+
+template <int dim>
+inline
+bool
+DoFObjectAccessor<3,dim>::operator != (const DoFObjectAccessor<3,dim> &a) const
+{
+  return (TriaObjectAccessor<3,dim>::operator != (a)
+          ||
+          DoFAccessor<dim>::operator != (a));
 }
 
 
