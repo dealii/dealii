@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -43,9 +43,15 @@
 				 // due to the pre-knowledge of the
 				 // actual polynomial degree 1.
 #include <fe/mapping_q1.h>
-				 // Here the discontinuous finite
-				 // elements are defined. They are
-				 // used as all other finite elements.
+				 // Here the discontinuous finite elements are
+				 // defined. They are used in the same way as
+				 // all other finite elements, though -- as
+				 // you have seen in previous tutorial
+				 // programs -- there isn't much user
+				 // interaction with finite element classes at
+				 // all: the are passed to ``DoFHandler'' and
+				 // ``FEValues'' objects, and that is about
+				 // it.
 #include <fe/fe_dgq.h>
 				 // We are going to use the simplest
 				 // possible solver, called Richardson
