@@ -152,6 +152,7 @@ inconvenience this causes.
        <br>
        (GK, 2005/07/19)
        </p>
+
   <li> <p>
        Changed: Cygwin has problems linking against deal.II DLLs if you
        link against more than one dimension dependent library. The linker
@@ -163,6 +164,7 @@ inconvenience this causes.
        <br>
        (Ralf B. Schulz, 2005/07/13)
        </p>
+
   <li> <p>
        Changed: Under Cygwin, linking against LAPACK and UMFPACK did
        not work. This is now fixed in the Makefiles. Changes only
@@ -170,6 +172,7 @@ inconvenience this causes.
        <br>
        (Ralf B. Schulz, 2005/07/02)
        </p>
+
   <li> <p>
        New: The latest version of UMFPACK, version 4.4, has been imported.
        <br>
@@ -592,6 +595,16 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Remove: Due to the reimplementation of the 3d reordering
+       algorithm in <code class="class">GridReordering</code> two
+       years ago, the <code class="member">CellData::rotate</code>
+       function got obsolete. <code
+       class="member">CellData::rotate</code> is now removed.
+       <br>
+       (RH, 2005/08/09)
+       </p>
+
   <li> <p>
        Fixed: It was possible to compare iterators into different
        <code>DoFHandler</code> objects for equality and inequality as long as
