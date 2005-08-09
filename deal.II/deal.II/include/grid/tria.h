@@ -57,43 +57,6 @@ struct CellData
 				      * different coefficients, etc.
 				      */
     unsigned char material_id;
-
-				     /**
-				      * Rotate the cell as many times
-				      * as is given by the
-				      * argument. Rotation is done by
-				      * rotating the vertices. Note
-				      * that rotation is not possible
-				      * in 1d, and that there are four
-				      * possible orientations of a
-				      * cell in 2d, which are numbered
-				      * counter-clockwise. In 3d, a
-				      * cell can be rotated in 24
-				      * ways.
-				      *
-				      * Note that in general the
-				      * result will be different if
-				      * you rotate a cell twice or
-				      * once with the number of times
-				      * added. While this is not true
-				      * in 2d, in 3d rotations are
-				      * neither cumulative nor
-				      * exchangable.
-				      */
-    void rotate (const unsigned int times);
-
-				     /**
-				      * Rotations are not possible in
-				      * 1d.
-				      */
-    DeclException0 (ExcNotPossible);
-				     /**
-				      * Exception
-				      */
-    DeclException1 (ExcInvalidRotation,
-		    int,
-		    << "The requested number of rotations, " << arg1
-		    << " is not possible in the present space dimension.");
 };
 
 
@@ -3513,10 +3476,6 @@ template <> void Triangulation<3>::delete_children (cell_iterator &cell);
 template <> void Triangulation<1>::update_number_cache_quads ();
 template <> void Triangulation<1>::update_number_cache_hexes ();
 template <> void Triangulation<2>::update_number_cache_hexes ();
-
-template <> void CellData<1>::rotate (const unsigned int);
-template <> void CellData<2>::rotate (const unsigned int times);
-template <> void CellData<3>::rotate (const unsigned int times);
 
 /// @endif
 
