@@ -54,10 +54,11 @@ grid_in.exe                  : grid_in.g.$(OBJEXT)                     $(lib-2d)
 grid_in_3d.exe               : grid_in_3d.g.$(OBJEXT)                            $(lib-3d) $(libraries)
 face_orientations_3d.exe     : face_orientations_3d.g.$(OBJEXT)                  $(lib-3d) $(libraries)
 mg_dof_handler.exe           : mg_dof_handler.g.$(OBJEXT)              $(lib-2d)           $(libraries)
+subcelldata.exe		     : subcelldata.g.$(OBJEXT)                 $(lib-2d) $(lib-3d) $(libraries)
 
 
 tests = $(sort \
-          grid_test grid_transform dof_test data_out derivatives gradients \
+          grid_test subcelldata grid_transform dof_test data_out derivatives gradients \
 	  constraints block_matrices second_derivatives derivative_approximation \
           matrices error_estimator intergrid_constraints intergrid_map \
           wave-test-3 dof_renumbering support_point_map filtered_matrix \
