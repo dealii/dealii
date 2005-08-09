@@ -277,6 +277,15 @@ namespace PETScWrappers
       void reinit (const CompressedSparsityPattern &sparsity_pattern,
                    const bool                       preset_nonzero_locations = false);
 
+                                       /**
+                                        * Return a reference to the MPI
+                                        * communicator object in use with this
+                                        * matrix. Since this is a sequential
+                                        * matrix, it returns the MPI_COMM_SELF
+                                        * communicator.
+                                        */
+      virtual const MPI_Comm & get_mpi_communicator () const;
+
     private:
 
                                        /**

@@ -48,6 +48,15 @@ namespace PETScWrappers
                                         */
       FullMatrix (const unsigned int m,
                   const unsigned int n);
+
+                                       /**
+                                        * Return a reference to the MPI
+                                        * communicator object in use with this
+                                        * matrix. Since this is a sequential
+                                        * matrix, it returns the MPI_COMM_SELF
+                                        * communicator.
+                                        */
+      virtual const MPI_Comm & get_mpi_communicator () const;
   };
   
 /*@}*/

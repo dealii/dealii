@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004 by the deal.II authors
+//    Copyright (C) 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -115,6 +115,15 @@ namespace PETScWrappers
 
 
   
+  const MPI_Comm &
+  SparseMatrix::get_mpi_communicator () const
+  {
+    static const MPI_Comm communicator = MPI_COMM_SELF;
+    return communicator;
+  }
+
+
+
   void
   SparseMatrix::do_reinit (const unsigned int m,
                            const unsigned int n,

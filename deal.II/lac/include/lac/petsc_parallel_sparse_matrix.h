@@ -365,7 +365,7 @@ namespace PETScWrappers
                                           * communicator object in use with
                                           * this matrix.
                                           */
-        const MPI_Comm & get_mpi_communicator () const;
+        virtual const MPI_Comm & get_mpi_communicator () const;
         
 				     /** @addtogroup Exceptions
 				      * @{ */

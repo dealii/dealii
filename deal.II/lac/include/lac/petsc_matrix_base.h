@@ -363,6 +363,36 @@ namespace PETScWrappers
                 const PetscScalar value);
 
                                        /**
+                                        * Remove all elements from this #row
+                                        * by setting them to zero. The
+                                        * function does not modify the number
+                                        * of allocated nonzero entries, it
+                                        * only sets some entries to zero. It
+                                        * may drop them from the sparsity
+                                        * pattern, though (but retains the
+                                        * allocated memory in case new entries
+                                        * are again added later).
+                                        *
+                                        * This operation is used in
+                                        * eliminating constraints (e.g. due to
+                                        * hanging nodes) and makes sure that
+                                        * we can write this modification to
+                                        * the matrix without having to read
+                                        * entries (such as the locations of
+                                        * non-zero elements) from it --
+                                        * without this operation, removing
+                                        * constraints on parallel matrices is
+                                        * a rather complicated procedure.
+                                        */
+      void clear_row (const unsigned int row);
+
+                                       /**
+                                        * Same as clear_row(), except that it
+                                        * works on a number of rows at once.
+                                        */
+      void clear_rows (const std::vector<unsigned int> &rows);
+      
+                                       /**
                                         * PETSc matrices store their own
                                         * sparsity patterns. So, in analogy to
                                         * our own SparsityPattern class,
@@ -479,6 +509,14 @@ namespace PETScWrappers
 					* see also local_range().
 					*/
       bool in_local_range (const unsigned int index) const;
+
+                                       /**
+                                        * Return a reference to the MPI
+                                        * communicator object in use with this
+                                        * matrix. This function has to be
+                                        * implemented in derived classes.
+                                        */
+      virtual const MPI_Comm & get_mpi_communicator () const = 0;
 
                                        /**
                                         * Return the number of nonzero

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004 by the deal.II authors
+//    Copyright (C) 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,6 +28,14 @@ namespace PETScWrappers
                           &matrix);
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+
+
+  const MPI_Comm &
+  FullMatrix::get_mpi_communicator () const
+  {
+    static const MPI_Comm communicator = MPI_COMM_SELF;
+    return communicator;
   }
 }
 

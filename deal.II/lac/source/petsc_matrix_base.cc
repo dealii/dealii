@@ -196,6 +196,56 @@ namespace PETScWrappers
   }
 
 
+
+  void
+  MatrixBase::clear_row (const unsigned int row)
+  {
+    compress ();
+
+                                     // now set all the entries of this row to
+                                     // zero
+    IS index_set;
+    const PetscInt petsc_row = row;
+    ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, &index_set);
+    
+    static const PetscScalar zero = 0;
+    const int ierr
+      = MatZeroRows(matrix, index_set, &zero);
+    
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    compress ();
+  }
+
+
+
+  void
+  MatrixBase::clear_rows (const std::vector<unsigned int> &rows)
+  {
+    compress ();
+
+                                     // now set all the entries of these rows
+                                     // to zero
+    IS index_set;
+    const std::vector<PetscInt> petsc_rows (rows.begin(), rows.end());
+
+                                     // call the functions. note that we have
+                                     // to call them even if #rows is empty,
+                                     // since this is a collective operation
+    ISCreateGeneral (get_mpi_communicator(), rows.size(),
+                     &petsc_rows[0], &index_set);
+    
+    static const PetscScalar zero = 0;
+    const int ierr
+      = MatZeroRows(matrix, index_set, &zero);
+    
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    compress ();
+  }
+  
+  
+
   PetscScalar
   MatrixBase::el (const unsigned int i,
                   const unsigned int j) const

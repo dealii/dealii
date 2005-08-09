@@ -264,7 +264,7 @@ namespace PETScWrappers
                                          /**
                                           * Return a reference to the MPI
                                           * communicator object in use with
-                                          * this vector.
+                                          * this matrix.
                                           */
         const MPI_Comm & get_mpi_communicator () const;
 
