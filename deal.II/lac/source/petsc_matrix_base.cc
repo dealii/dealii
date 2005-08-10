@@ -215,8 +215,13 @@ namespace PETScWrappers
     ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, &index_set);
     
     static const PetscScalar zero = 0;
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR <= 2)
     const int ierr
       = MatZeroRows(matrix, index_set, &zero);
+#else
+    const int ierr
+      = MatZeroRowsIS(matrix, index_set, &zero);
+#endif
     
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -248,8 +253,13 @@ namespace PETScWrappers
                      &petsc_rows[0], &index_set);
     
     static const PetscScalar zero = 0;
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR <= 2)
     const int ierr
       = MatZeroRows(matrix, index_set, &zero);
+#else
+    const int ierr
+      = MatZeroRowsIS(matrix, index_set, &zero);
+#endif
     
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
