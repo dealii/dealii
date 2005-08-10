@@ -383,14 +383,30 @@ namespace PETScWrappers
                                         * without this operation, removing
                                         * constraints on parallel matrices is
                                         * a rather complicated procedure.
+                                        *
+                                        * The second parameter can be used to
+                                        * set the diagonal entry of this row
+                                        * to a value different from zero. The
+                                        * default is to set it to zero.
                                         */
-      void clear_row (const unsigned int row);
+      void clear_row (const unsigned int row,
+                      const PetscScalar  new_diag_value = 0);
 
                                        /**
                                         * Same as clear_row(), except that it
                                         * works on a number of rows at once.
+                                        *
+                                        * The second parameter can be used to
+                                        * set the diagonal entries of all
+                                        * cleared rows to something different
+                                        * from zero. Note that all of these
+                                        * diagonal entries get the same value
+                                        * -- if you want different values for
+                                        * the diagonal entries, you have to
+                                        * set them by hand.
                                         */
-      void clear_rows (const std::vector<unsigned int> &rows);
+      void clear_rows (const std::vector<unsigned int> &rows,
+                       const PetscScalar                new_diag_value = 0);
       
                                        /**
                                         * PETSc matrices store their own

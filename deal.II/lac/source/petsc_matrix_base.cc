@@ -198,7 +198,8 @@ namespace PETScWrappers
 
 
   void
-  MatrixBase::clear_row (const unsigned int row)
+  MatrixBase::clear_row (const unsigned int row,
+                         const PetscScalar  new_diag_value)
   {
     compress ();
 
@@ -215,12 +216,11 @@ namespace PETScWrappers
     ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, &index_set);
     
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR <= 2)
-    static const PetscScalar zero = 0;
     const int ierr
-      = MatZeroRows(matrix, index_set, &zero);
+      = MatZeroRows(matrix, index_set, &new_diag_value);
 #else
     const int ierr
-      = MatZeroRowsIS(matrix, index_set, 0);
+      = MatZeroRowsIS(matrix, index_set, new_diag_value);
 #endif
     
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -231,7 +231,8 @@ namespace PETScWrappers
 
 
   void
-  MatrixBase::clear_rows (const std::vector<unsigned int> &rows)
+  MatrixBase::clear_rows (const std::vector<unsigned int> &rows,
+                          const PetscScalar                new_diag_value)
   {
     compress ();
 
@@ -253,12 +254,11 @@ namespace PETScWrappers
                      &petsc_rows[0], &index_set);
     
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR <= 2)
-    static const PetscScalar zero = 0;
     const int ierr
-      = MatZeroRows(matrix, index_set, &zero);
+      = MatZeroRows(matrix, index_set, &new_diag_value);
 #else
     const int ierr
-      = MatZeroRowsIS(matrix, index_set, 0.);
+      = MatZeroRowsIS(matrix, index_set, new_diag_value);
 #endif
     
     AssertThrow (ierr == 0, ExcPETScError(ierr));
