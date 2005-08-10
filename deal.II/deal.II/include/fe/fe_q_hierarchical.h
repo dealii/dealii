@@ -450,6 +450,11 @@ template <>
 void FE_Q_Hierarchical<1>::initialize_unit_face_support_points ();
 
 template <>
+bool
+FE_Q_Hierarchical<1>::has_support_on_face (const unsigned int,
+					   const unsigned int) const;
+
+template <>
 std::vector<unsigned int>
 FE_Q_Hierarchical<1>::face_fe_q_hierarchical_to_hierarchic_numbering (const unsigned int);
 
