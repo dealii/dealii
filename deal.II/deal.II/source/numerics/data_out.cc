@@ -237,6 +237,7 @@ add_data_vector (const VECTOR         &vec,
 		 const std::string    &name,
 		 const DataVectorType  type)
 {
+  Assert (dofs != 0, ExcNoDoFHandlerSelected ());
   const unsigned int n_components = dofs->get_fe().n_components ();
 
   std::vector<std::string> names;
