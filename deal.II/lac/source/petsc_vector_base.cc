@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004 by the deal.II authors
+//    Copyright (C) 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -207,6 +207,45 @@ namespace PETScWrappers
     return std::make_pair (begin, end);
   }
 
+
+
+  void
+  VectorBase::set (const std::vector<unsigned int> &indices,
+                   const std::vector<PetscScalar>  &values)
+  {
+    Assert (indices.size() == values.size(),
+            ExcMessage ("Function called with arguments of different sizes"));
+
+    if (last_action != VectorBase::LastAction::insert)
+      {
+        int ierr;
+        ierr = VecAssemblyBegin (vector);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+        ierr = VecAssemblyEnd (vector);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
+
+#if (PETSC_VERSION_MAJOR <= 2) && \
+    ((PETSC_VERSION_MINOR < 2) ||  \
+     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+    const std::vector<int> petsc_indices (indices.begin(),
+                                          indices.end());
+#else
+    const std::vector<PetscInt> petsc_indices (indices.begin(),
+                                               indices.end());
+#endif
+    
+    const int ierr
+      = VecSetValues (vector, indices.size(),
+                      &petsc_indices[0], &values[0],
+                      INSERT_VALUES);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+
+    last_action = LastAction::insert;
+  }
+  
 
 
   PetscScalar

@@ -22,6 +22,7 @@
 
 #include <petscvec.h>
 
+#include <vector>
 #include <utility>
 
 
@@ -350,6 +351,19 @@ namespace PETScWrappers
                                         */
       PetscScalar
       operator () (const unsigned int index) const;
+
+                                       /**
+                                        * A collective set operation: instead
+                                        * of setting individual elements of a
+                                        * vector, this function allows to set
+                                        * a whole set of elements at once. The
+                                        * indices of the elements to be set
+                                        * are stated in the first argument,
+                                        * the corresponding values in the
+                                        * second.
+                                        */
+      void set (const std::vector<unsigned int> &indices,
+                const std::vector<PetscScalar>  &values);
       
                                        /**
                                         * Return the scalar product of two
