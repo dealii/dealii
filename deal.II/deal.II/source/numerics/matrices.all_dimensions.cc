@@ -541,18 +541,19 @@ namespace PETScWrappers
     if (boundary_values.size() == 0)
       return;
 
+    const std::pair<unsigned int, unsigned int> local_range
+      = matrix.local_range();
+    Assert (local_range == right_hand_side.local_range(),
+            ExcInternalError());
+    Assert (local_range == solution.local_range(),
+            ExcInternalError());
+    
 
                                      // we have to read and write from this
                                      // matrix (in this order). this will only
                                      // work if we compress the matrix first,
-                                     // done here. do the same with the other
-                                     // objects just to be on the safe side:
+                                     // done here
     matrix.compress ();
-    solution.compress ();
-    right_hand_side.compress ();
-
-    const std::pair<unsigned int, unsigned int> local_range
-      = matrix.local_range();
 
                                      // determine the first nonzero diagonal
                                      // entry from within the part of the
@@ -579,39 +580,56 @@ namespace PETScWrappers
 
                                      // then eliminate these rows and set
                                      // their diagonal entry to what we have
-                                     // determined above
+                                     // determined above. note that for petsc
+                                     // matrices interleaving read with write
+                                     // operations is very expensive. thus, we
+                                     // here always replace the diagonal
+                                     // element, rather than first checking
+                                     // whether it is nonzero and in that case
+                                     // preserving it. this is different from
+                                     // the case of deal.II sparse matrices
+                                     // treated in the other functions.
     matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
                                      // the next thing is to set right hand
-                                     // side to the wanted value. note that
-                                     // for petsc matrices interleaving read
-                                     // with write operations is very
-                                     // expensive. thus, we here always
-                                     // replace the diagonal element, rather
-                                     // than first checking whether it is
-                                     // nonzero and in that case preserving
-                                     // it. this is different from the case of
-                                     // deal.II sparse matrices treated in the
-                                     // other functions.
+                                     // side to the wanted value. there's one
+                                     // drawback: if we write to individual
+                                     // vector elements, then we have to do
+                                     // that on all processors. however, some
+                                     // processors may not need to set
+                                     // anything because their chunk of
+                                     // matrix/rhs do not contain any boundary
+                                     // nodes. therefore, rather than using
+                                     // individual calls, we use one call for
+                                     // all elements, thereby making sure that
+                                     // all processors call this function,
+                                     // even if some only have an empty set of
+                                     // elements to set
     right_hand_side.compress ();
     solution.compress ();
 
-    std::map<unsigned int,double>::const_iterator
-      dof  = boundary_values.begin(),
-      endd = boundary_values.end();
-
-    for (; dof != endd; ++dof)
+    std::vector<unsigned int> indices;
+    std::vector<PetscScalar>  solution_values;
+    for (std::map<unsigned int,double>::const_iterator
+           dof  = boundary_values.begin();
+         dof != boundary_values.end();
+         ++dof)
       if ((dof->first >= local_range.first) &&
           (dof->first < local_range.second))
-        {  
-          const unsigned int dof_number = dof->first;
-          right_hand_side(dof_number)
-            = dof->second * average_nonzero_diagonal_entry;
-
-                                           // preset solution vector
-          solution(dof_number) = dof->second;
+        {
+          indices.push_back (dof->first);
+          solution_values.push_back (dof->second);
         }
-    
+    solution.set (indices, solution_values);
+
+                                     // now also set appropriate values for
+                                     // the rhs
+    for (unsigned int i=0; i<solution_values.size(); ++i)
+      solution_values[i] *= average_nonzero_diagonal_entry;
+
+    right_hand_side.set (indices, solution_values);
+
+                                     // clean up
     matrix.compress ();
     solution.compress ();
     right_hand_side.compress ();
