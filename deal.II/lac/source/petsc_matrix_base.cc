@@ -205,7 +205,9 @@ namespace PETScWrappers
                                      // now set all the entries of this row to
                                      // zero
     IS index_set;
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR <= 2)
+#if (PETSC_VERSION_MAJOR <= 2) && \
+    ((PETSC_VERSION_MINOR < 2) ||  \
+     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
     const int petsc_row      = row;
 #else
     const PetscInt petsc_row = row;
@@ -231,7 +233,9 @@ namespace PETScWrappers
                                      // now set all the entries of these rows
                                      // to zero
     IS index_set;
-#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR <= 2)
+#if (PETSC_VERSION_MAJOR <= 2) && \
+    ((PETSC_VERSION_MINOR < 2) ||  \
+     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
     const std::vector<int>      petsc_rows (rows.begin(), rows.end());
 #else
     const std::vector<PetscInt> petsc_rows (rows.begin(), rows.end());
