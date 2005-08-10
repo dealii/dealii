@@ -205,7 +205,11 @@ namespace PETScWrappers
                                      // now set all the entries of this row to
                                      // zero
     IS index_set;
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR <= 2)
+    const int petsc_row      = row;
+#else
     const PetscInt petsc_row = row;
+#endif
     ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, &index_set);
     
     static const PetscScalar zero = 0;
@@ -227,7 +231,11 @@ namespace PETScWrappers
                                      // now set all the entries of these rows
                                      // to zero
     IS index_set;
+#if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR <= 2)
+    const std::vector<int>      petsc_rows (rows.begin(), rows.end());
+#else
     const std::vector<PetscInt> petsc_rows (rows.begin(), rows.end());
+#endif
 
                                      // call the functions. note that we have
                                      // to call them even if #rows is empty,
