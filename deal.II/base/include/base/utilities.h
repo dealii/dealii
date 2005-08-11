@@ -66,12 +66,17 @@ namespace Utilities
 
                                    /**
                                     * Given a string that contains text
-                                    * separated by commas, split it into its
-                                    * components; for each component, remove
-                                    * leading and trailing spaces.
+                                    * separated by a #delimiter, split it into
+                                    * its components; for each component,
+                                    * remove leading and trailing spaces.
+                                    *
+                                    * The default value of the delimiter is a
+                                    * comma, so that the function splits comma
+                                    * separated lists of strings.
                                     */
   std::vector<std::string>
-  split_comma_separated_list (const std::string &s);
+  split_string_list (const std::string &s,
+                     const char         delimiter = ',');
 
                                    /**
                                     * Generate a random number from a

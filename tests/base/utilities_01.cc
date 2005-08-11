@@ -37,15 +37,29 @@ void test ()
   deallog << Utilities::string_to_int (v)[1] << std::endl;
   deallog << Utilities::string_to_int (v)[2] << std::endl;
 
-  const char *p = "alpha, beta, gamma ";
-  Assert (Utilities::split_comma_separated_list (p).size() == 3,
-          ExcInternalError());
-  Assert (Utilities::split_comma_separated_list (p)[0] == "alpha",
-          ExcInternalError());  
-  Assert (Utilities::split_comma_separated_list (p)[1] == "beta",
-          ExcInternalError());
-  Assert (Utilities::split_comma_separated_list (p)[2] == "gamma",
-          ExcInternalError());
+  {
+    const char *p = "alpha, beta, gamma ";
+    Assert (Utilities::split_string_list (p).size() == 3,
+            ExcInternalError());
+    Assert (Utilities::split_string_list (p)[0] == "alpha",
+            ExcInternalError());  
+    Assert (Utilities::split_string_list (p)[1] == "beta",
+            ExcInternalError());
+    Assert (Utilities::split_string_list (p)[2] == "gamma",
+            ExcInternalError());
+  }
+  
+  {
+    const char *p = "alpha; beta; gamma ";
+    Assert (Utilities::split_string_list (p, ';').size() == 3,
+            ExcInternalError());
+    Assert (Utilities::split_string_list (p, ';')[0] == "alpha",
+            ExcInternalError());  
+    Assert (Utilities::split_string_list (p, ';')[1] == "beta",
+            ExcInternalError());
+    Assert (Utilities::split_string_list (p, ';')[2] == "gamma",
+            ExcInternalError());
+  }
 
   deallog << Utilities::generate_normal_random_number (13, 44) << ' ';
   deallog << Utilities::generate_normal_random_number (13, 44) << ' ';

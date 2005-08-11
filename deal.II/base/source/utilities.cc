@@ -134,11 +134,12 @@ namespace Utilities
 
 
   std::vector<std::string>
-  split_comma_separated_list (const std::string &s)
+  split_string_list (const std::string &s,
+                     const char         delimiter)
   {
     std::string tmp = s;
     std::vector<std::string> split_list;
-    split_list.reserve (std::count (tmp.begin(), tmp.end(), ',')+1);
+    split_list.reserve (std::count (tmp.begin(), tmp.end(), delimiter)+1);
 
 				     // split the input list
     while (tmp.length() != 0)
@@ -146,10 +147,10 @@ namespace Utilities
         std::string name;
 	name = tmp;
 
-	if (name.find(",") != std::string::npos)
+	if (name.find(delimiter) != std::string::npos)
 	  {
-	    name.erase (name.find(","), std::string::npos);
-	    tmp.erase (0, tmp.find(",")+1);
+	    name.erase (name.find(delimiter), std::string::npos);
+	    tmp.erase (0, tmp.find(delimiter)+1);
 	  }
 	else
 	  tmp = "";
