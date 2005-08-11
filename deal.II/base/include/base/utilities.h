@@ -84,6 +84,10 @@ namespace Utilities
 				 const double sigma);
 
 
+                                   /**
+                                    * A namespace for utility functions that
+                                    * probe system properties.
+                                    */
   namespace System
   {
     
