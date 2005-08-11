@@ -500,6 +500,24 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: The new function <code
+       class="member">PetscWrappers::VectorBase::set</code> allows to set
+       several vector elements at once.
+       <br> 
+       (WB, 2005/08/10)
+       </p>
+
+  <li> <p>
+       New: There are now functions <code
+       class="member">PetscWrappers::MatrixBase::clear_row</code> and <code
+       class="member">clear_rows</code> that allow to set the elements of a row
+       of a matrix to zero, without having to traverse the individual
+       elements.
+       <br> 
+       (WB, 2005/08/10)
+       </p>
+
+  <li> <p>
        Fixed: <code class="class">SparsityPattern</code>::<code
        class="member">block_write</code> neither wrote the number of
        columns of the pattern, nor the flag for optimizing the
