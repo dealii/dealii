@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <base/function_parser.h>
+#include <base/utilities.h>
 #include <base/point.h>
 #include <lac/vector.h>
 
@@ -26,45 +27,6 @@ namespace fparser
 }
 
 #endif
-
-
-
-// Utility to split a string given a delimiter.
-
-unsigned int SplitString(const std::string& input, 
-			 const std::string& delimiter, 
-			 std::vector<std::string>& results)
-{
-  // Size of the delimiter. Use it to calculate the offsets between
-  // different pieces of the string
-  unsigned int sizeS2 = delimiter.size();
-  // Counter for Current Position
-  unsigned int iPos = 0;
-  // Counter for Position of next delimiter
-  std::string::size_type newPos = 0;  
-  // Counter for Number of strings
-  unsigned int numFound = 0;
-  
-  while( newPos != std::string::npos )
-    { 
-      // Look for a delimiter starting with the correct offset. Note
-      // that if it is the beginning of the cycle the offset is zero.
-      newPos = input.find (delimiter, iPos);
-      // We either found a delimiter inside the string or the
-      // delimiter was not found. Increment the found counter anyway,
-      // as if there are no delimiters, we return one vector
-      // containing exacly one string anyway
-      numFound++;
-      // Add the string we just found to the output vector
-      Assert(iPos <= input.size(), ExcInternalError());
-      results.push_back(input.substr(iPos, newPos-iPos));
-      // Update the current position with the correct offset.
-      iPos = newPos+sizeS2;
-    }
-  // At least we found one string and no delimiters.
-  Assert(numFound > 0, ExcInternalError());
-  return numFound;
-}
 
 
 
@@ -167,19 +129,13 @@ void FunctionParser<dim>::initialize (const std::string variables,
 				      const bool time_dependent,
 				      const bool use_degrees)
 {
-				   // Start up with an empty vector of
-				   // expressions.
-  std::vector<std::string> expressions;
-  
-				   // In this case a vector function
-				   // is built with the number of
-				   // components found between the
-				   // separators ';'
-  SplitString (expression, ";", expressions);
-				   // Now initialize with the things
+				   // initialize with the things
 				   // we got.
-  initialize (variables, expressions, constants,
-	      time_dependent, use_degrees);  
+  initialize (variables,
+              Utilities::split_string_list (expression, ';'),
+              constants,
+	      time_dependent,
+              use_degrees);  
 }
 
 
