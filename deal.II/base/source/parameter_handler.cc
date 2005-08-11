@@ -32,6 +32,8 @@
 #endif
 
 
+//TODO[WB]: various functions here could be simplified by using namespace Utilities
+
 namespace Patterns
 {  
 
