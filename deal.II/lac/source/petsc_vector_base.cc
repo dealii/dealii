@@ -226,22 +226,30 @@ namespace PETScWrappers
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 
+				     // VecSetValues complains if we
+				     // come with an empty
+				     // vector. however, it is not a
+				     // collective operation, so we
+				     // can skip the call if necessary
+				     // (unlike the above calls)
+    if (indices.size() != 0)
+      {
 #if (PETSC_VERSION_MAJOR <= 2) && \
     ((PETSC_VERSION_MINOR < 2) ||  \
      ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
-    const std::vector<int> petsc_indices (indices.begin(),
-                                          indices.end());
+	const std::vector<int> petsc_indices (indices.begin(),
+					      indices.end());
 #else
-    const std::vector<PetscInt> petsc_indices (indices.begin(),
-                                               indices.end());
+	const std::vector<PetscInt> petsc_indices (indices.begin(),
+						   indices.end());
 #endif
     
-    const int ierr
-      = VecSetValues (vector, indices.size(),
-                      &petsc_indices[0], &values[0],
-                      INSERT_VALUES);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-    
+	const int ierr
+	  = VecSetValues (vector, indices.size(),
+			  &petsc_indices[0], &values[0],
+			  INSERT_VALUES);
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
 
     last_action = LastAction::insert;
   }
