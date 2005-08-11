@@ -157,9 +157,12 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
      ++frame;
 
 				    // output the rest
+   const unsigned int first_significant_frame = frame;
    for (; frame < n_stacktrace_frames; ++frame)
-      out << stacktrace[frame]
-	  << std::endl;
+     out << '#' << frame - first_significant_frame
+         << "  "
+         << stacktrace[frame]
+         << std::endl;
 }
 
 
