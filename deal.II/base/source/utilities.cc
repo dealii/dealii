@@ -16,6 +16,7 @@
 
 #include <fstream>
 #include <iomanip>
+#include <algorithm>
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
