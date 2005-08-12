@@ -30,7 +30,9 @@
 #  include <strstream>
 #endif
 #ifdef HAVE_STD_NUMERIC_LIMITS
-# include <limits>
+#  include <limits>
+#else
+#  include <limits.h>
 #endif
 
 
@@ -112,12 +114,17 @@ namespace Utilities
     std::ostrstream ss(s.c_str());
 #endif
 
-    int i = std::numeric_limits<int>::max();
+#ifdef HAVE_STD_NUMERIC_LIMITS
+    static const int max_int = std::numeric_limits<int>::max();
+#else
+    static const int max_int = INT_MAX;
+#endif
+    
+    int i = max_int;
     ss >> i;
 
                                      // check for errors
-    AssertThrow (i != std::numeric_limits<int>::max(),
-                 ExcCantConvertString (s));
+    AssertThrow (i != max_int, ExcCantConvertString (s));
     
     return i;
   }
