@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <ctime>
 #include <cerrno>
+#include <cmath>
 #include <unistd.h>
 #include <sys/types.h>
 #ifdef HAVE_STD_STRINGSTREAM
