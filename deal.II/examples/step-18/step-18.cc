@@ -1813,7 +1813,7 @@ namespace QuasiStaticElasticity
 
 				   // @sect4{TopLevel::output_results}
 
-				   // This function generate the
+				   // This function generates the
 				   // graphical output in intermediate
 				   // format as explained in the
 				   // introduction. Each process will
@@ -2768,7 +2768,7 @@ namespace QuasiStaticElasticity
                                                // Note that the result, a
                                                // rotation matrix, is in
                                                // general an antisymmetric
-                                               // tensor or rank 2, so we must
+                                               // tensor of rank 2, so we must
                                                // store it as a full tensor.
 
                                                // With this rotation matrix,
@@ -2806,7 +2806,7 @@ namespace QuasiStaticElasticity
 					       // symmetric; it will
 					       // then raise an
 					       // exception. To avoid
-					       // that, we explicityly
+					       // that, we explicitly
 					       // symmetrize the
 					       // result to make it
 					       // exactly symmetric.
