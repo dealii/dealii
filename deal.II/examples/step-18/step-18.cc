@@ -486,7 +486,7 @@ namespace QuasiStaticElasticity
 				   // is the toplevel driver.
                                    //
                                    // The member variables of this class are
-                                   // eseentially as before, i.e. it has to
+                                   // essentially as before, i.e. it has to
                                    // have a triangulation, a DoF handler and
                                    // associated objects such as constraints,
                                    // variables that describe the linear
@@ -615,8 +615,8 @@ namespace QuasiStaticElasticity
 				       // the matrix and the righ hand side,
 				       // for example. However, in the present
 				       // case it does: we store information
-				       // in the quadratus points, so we have
-				       // to make sure all parts of the
+				       // in the quadrature points, so we
+				       // have to make sure all parts of the
 				       // program agree on where they are and
 				       // how many there are on each
 				       // cell. Thus, let us first declare the
@@ -791,7 +791,7 @@ namespace QuasiStaticElasticity
 				   // Before we go on to the main
 				   // functionality of this program, we have
 				   // to define what forces will act on the
-				   // body whose deformation we wnat to
+				   // body whose deformation we want to
 				   // study. These may either be body forces
 				   // or boundary forces. Body forces are
 				   // generally mediated by one of the four
@@ -939,7 +939,7 @@ namespace QuasiStaticElasticity
                                    // type ``ZeroFunction'') or free
                                    // (Neumann-type, in which case
                                    // nothing special has to be done).
-                                   // // The implementation of the
+                                   // The implementation of the
                                    // class describing the constant
                                    // downward motion should then be
                                    // obvious using the knowledge we
@@ -1100,8 +1100,8 @@ namespace QuasiStaticElasticity
                                    // steps. Note that for simplicity we use a
                                    // fixed time step, whereas a more
                                    // sophisticated program would of course
-                                   // have to chose it in some more reasonable
-                                   // way adaptively:
+                                   // have to choose it in some more
+				   // reasonable way adaptively:
   template <int dim>
   void TopLevel<dim>::run () 
   {
@@ -1141,7 +1141,7 @@ namespace QuasiStaticElasticity
 				   // boundary indicator of 0 for the boundary
 				   // faces that are characterized by their
 				   // midpoints having z-coordinates of either
-				   // 0 (bottom face), an indicator of 2 for
+				   // 0 (bottom face), an indicator of 1 for
 				   // z=3 (top face); finally, we use boundary
 				   // indicator 2 for all faces on the inside
 				   // of the cylinder shell, and 3 for the
@@ -1880,7 +1880,7 @@ namespace QuasiStaticElasticity
                                    // elegant way -- and then, these example
                                    // programs also serve the purpose of
                                    // introducing what is available in
-                                   // deal.II.
+                                   // deal.II.  
   template <int dim>
   void TopLevel<dim>::output_results () const
   {
@@ -1936,7 +1936,7 @@ namespace QuasiStaticElasticity
                                      // Then, just as in step-17, define the
                                      // names of solution variables (which
                                      // here are the displacement increments)
-                                     // and queu the solution vector for
+                                     // and queue the solution vector for
                                      // output. Note in the following switch
                                      // how we make sure that if the space
                                      // dimension should be unhandled that we
@@ -2417,7 +2417,7 @@ namespace QuasiStaticElasticity
                                    // vertices there are in the
                                    // triangulation. Not all of them are
                                    // actually in use all the time -- some are
-                                   // left-overs from cells taht have been
+                                   // left-overs from cells that have been
                                    // coarsened previously and remain in
                                    // existence since deal.II never changes
                                    // the number of a vertex once it has come
