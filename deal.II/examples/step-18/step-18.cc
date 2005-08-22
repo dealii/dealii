@@ -1880,57 +1880,58 @@ namespace QuasiStaticElasticity
                                    // elegant way -- and then, these example
                                    // programs also serve the purpose of
                                    // introducing what is available in
-                                   // deal.II.  
+                                   // deal.II.
+  template<int dim>
+  class FilteredDataOut : public DataOut<dim>
+  {
+    public:
+      FilteredDataOut (const unsigned int subdomain_id)
+		      :
+		      subdomain_id (subdomain_id)
+	{}
+      
+      virtual typename DoFHandler<dim>::cell_iterator
+      first_cell ()
+	{
+	  typename DoFHandler<dim>::active_cell_iterator
+	    cell = this->dofs->begin_active();
+	  while ((cell != this->dofs->end()) &&
+		 (cell->subdomain_id() != subdomain_id))
+	    ++cell;
+	  
+	  return cell;
+	}
+      
+      virtual typename DoFHandler<dim>::cell_iterator
+      next_cell (const typename DoFHandler<dim>::cell_iterator &old_cell)
+	{
+	  if (old_cell != this->dofs->end())
+	    {
+	      const IteratorFilters::SubdomainEqualTo
+		predicate(subdomain_id);
+	      
+	      return
+		++(FilteredIterator
+		   <typename DoFHandler<dim>::active_cell_iterator>
+		   (predicate,old_cell));
+	    }
+	  else
+	    return old_cell;
+	}
+      
+      private:
+      const unsigned int subdomain_id;
+  };
+  
   template <int dim>
   void TopLevel<dim>::output_results () const
   {
-    class FilteredDataOut : public DataOut<dim>
-    {
-      public:
-        FilteredDataOut (const unsigned int subdomain_id)
-                        :
-                        subdomain_id (subdomain_id)
-          {}
-
-        virtual typename DoFHandler<dim>::cell_iterator
-        first_cell ()
-          {
-            typename DoFHandler<dim>::active_cell_iterator
-              cell = this->dofs->begin_active();
-            while ((cell != this->dofs->end()) &&
-                   (cell->subdomain_id() != subdomain_id))
-              ++cell;
-
-            return cell;
-          }
-
-        virtual typename DoFHandler<dim>::cell_iterator
-        next_cell (const typename DoFHandler<dim>::cell_iterator &old_cell)
-          {
-            if (old_cell != this->dofs->end())
-              {
-                const IteratorFilters::SubdomainEqualTo
-                  predicate(subdomain_id);
-                
-                return
-                  ++(FilteredIterator
-                     <typename DoFHandler<dim>::active_cell_iterator>
-                     (predicate,old_cell));
-              }
-            else
-              return old_cell;
-          }
-        
-      private:
-        const unsigned int subdomain_id;
-    };
-
                                      // With this newly defined class, declare
                                      // an object that is going to generate
                                      // the graphical output and attach the
                                      // dof handler with it from which to get
                                      // the solution vector:
-    FilteredDataOut data_out(this_mpi_process);
+    FilteredDataOut<dim> data_out(this_mpi_process);
     data_out.attach_dof_handler (dof_handler);
 
                                      // Then, just as in step-17, define the
@@ -2074,7 +2075,7 @@ namespace QuasiStaticElasticity
     std::ostringstream filename;
     filename << "solution-";
     filename << std::setfill('0');
-    filename.setf(std::ios_base::fixed, std::ios_base::floatfield);
+    filename.setf(std::ios::fixed, std::ios::floatfield);
     filename << std::setw(9) << std::setprecision(4) << present_time;
 
 				     // Next, in case there are
