@@ -39,7 +39,7 @@ void test (PETScWrappers::Vector &v,
   v.ratio (w, x);
 
                                    // make sure we get the expected result
-  const double eps=sizeof(PetscScalar)==8 ? 1e-14 : 1e-5;
+  const double eps=typeid(PetscScalar)==typeid(double) ? 1e-14 : 1e-5;
   for (unsigned int i=0; i<v.size(); ++i)
     {
       Assert (w(i) == i+1., ExcInternalError());

@@ -33,7 +33,7 @@ void test (PETScWrappers::Vector &v)
   v.compress ();
 
                                    // then check the norm
-  const double eps=sizeof(PetscScalar)==8 ? 1e-14 : 1e-5;
+  const double eps=typeid(PetscScalar)==typeid(double) ? 1e-14 : 1e-5;
   Assert (fabs(v.l2_norm()-std::sqrt(norm))<eps, ExcInternalError());
 
   deallog << "OK" << std::endl;
