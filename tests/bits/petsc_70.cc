@@ -20,7 +20,7 @@
 
 #include <fstream>
 
-int main (int argc,char **argv) 
+int main () 
 {
   std::ofstream logfile("petsc_70.output");
   deallog.attach(logfile);
