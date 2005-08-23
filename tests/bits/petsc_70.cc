@@ -28,9 +28,9 @@ int main (int argc,char **argv)
   deallog.threshold_double(1.e-10);
 
   if (typeid(PetscScalar)==typeid(double))
-    deallog << "double" << endl;
+    deallog << "double" << std::endl;
   else if (typeid(PetscScalar)==typeid(float))
-    deallog << "float" << endl;
+    deallog << "float" << std::endl;
   else
     Assert(false, ExcNotImplemented());
 }
