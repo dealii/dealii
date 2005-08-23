@@ -178,10 +178,10 @@ clean-tests:
 clean-common-scripts:
 	cd $D/common/scripts && $(MAKE) clean
 
-distclean: clean \
-           clean-common-scripts
+distclean: clean
 	cd lib && $(MAKE) distclean
 	-cd tests && $(MAKE) distclean
+	$(MAKE)	clean-common-scripts
 
 
 
