@@ -297,11 +297,6 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      */
     virtual unsigned int memory_consumption () const;
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotUsefulInThisDimension);
-    
   protected:    
     
     virtual FiniteElement<dim> * clone() const;

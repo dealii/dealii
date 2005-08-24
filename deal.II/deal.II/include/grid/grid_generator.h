@@ -113,6 +113,7 @@ template <typename number> class SparseMatrix;
  * transform (simple-shaped) grids to a more complicated ones, like a
  * shell onto a grid of an airfoil, for example.
  *
+ * @ingroup grid
  * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, Stefan Nauber, Joerg Weimar, 1998, 1999, 2000, 2001, 2002, 2003.
  */
 class GridGenerator

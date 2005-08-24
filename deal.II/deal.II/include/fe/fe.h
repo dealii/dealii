@@ -173,16 +173,6 @@ class FiniteElement : public FiniteElementBase<dim>
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcJacobiDeterminantHasWrongSign);
-				     /**
-				      * Exception
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException1 (ExcComputationNotUseful,
-		    int,
-		    << "The computation you required from this function is not "
-		    << "feasible or not probable in the present dimension ("
-		    << arg1 << ") because it would be prohibitively expensive.");
 
   protected:
 

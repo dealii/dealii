@@ -80,7 +80,7 @@ Point<dim>
 CylinderBoundary<dim>::
 get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const
 {
-  Assert (false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
+  Assert (false, ExcImpossibleInDim(dim));
   return Point<dim>();
 }
 
@@ -178,7 +178,7 @@ CylinderBoundary<dim>::get_intermediate_points_on_quad (
   const typename Triangulation<dim>::quad_iterator &,
   std::vector<Point<dim> > &) const
 {
-  Assert (false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
+  Assert (false, ExcImpossibleInDim(dim));
 }
 
 
@@ -191,7 +191,7 @@ CylinderBoundary<1>::
 get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 			 Boundary<1>::FaceVertexNormals &) const
 {
-  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 #endif
@@ -303,7 +303,7 @@ HyperBallBoundary<1>::get_intermediate_points_on_line (
   const Triangulation<1>::line_iterator &,
   std::vector<Point<1> > &) const
 {
-  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 #else
@@ -445,7 +445,7 @@ HyperBallBoundary<dim>::get_intermediate_points_on_quad (
   const typename Triangulation<dim>::quad_iterator &,
   std::vector<Point<dim> > &) const
 {
-  Assert(false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
+  Assert(false, ExcImpossibleInDim(dim));
 }
 
 
@@ -458,7 +458,7 @@ HyperBallBoundary<1>::
 get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 			 Boundary<1>::FaceVertexNormals &) const
 {
-  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 #endif
@@ -616,7 +616,7 @@ HalfHyperBallBoundary<1>::
 get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 			 Boundary<1>::FaceVertexNormals &) const
 {
-  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 #endif
@@ -785,7 +785,7 @@ HalfHyperShellBoundary<1>::
 get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 			 Boundary<1>::FaceVertexNormals &) const
 {
-  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 #endif

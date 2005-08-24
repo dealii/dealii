@@ -964,10 +964,6 @@ class VectorTools
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcNotUseful);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcInvalidFE);
 				     /**
 				      * Exception

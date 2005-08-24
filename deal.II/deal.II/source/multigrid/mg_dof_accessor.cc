@@ -656,7 +656,7 @@ template <>
 MGDoFCellAccessor<1>::face_iterator
 MGDoFCellAccessor<1>::face (const unsigned int) const
 {
-  Assert (false, ExcNotUsefulForThisDimension());
+  Assert (false, ExcImpossibleInDim(1));
   return face_iterator();
 }
 

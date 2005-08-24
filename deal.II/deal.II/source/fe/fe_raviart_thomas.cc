@@ -140,7 +140,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int rt_order)
                 polynomials (create_polynomials(rt_order)),
                 renumber (compute_renumber(rt_order))
 {
-  Assert (dim >= 2, ExcNotUsefulInThisDimension());
+  Assert (dim >= 2, ExcImpossibleInDim(dim));
 
                                    // check formula (III.3.22) in the
                                    // book by Brezzi & Fortin about
@@ -290,7 +290,7 @@ FE_RaviartThomas<1>::
 get_interpolation_matrix (const FiniteElementBase<1> &,
 			  FullMatrix<double>         &) const
 {
-  Assert (false, ExcNotUsefulInThisDimension());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 #endif
@@ -428,7 +428,7 @@ template <>
 void
 FE_RaviartThomas<1>::initialize_constraints ()
 {
-  Assert (false, ExcNotUsefulInThisDimension());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 #endif
@@ -925,7 +925,7 @@ template <>
 std::vector<unsigned int>
 FE_RaviartThomas<1>::get_dpo_vector (const unsigned int)
 {
-  Assert (false, ExcNotUsefulInThisDimension());
+  Assert (false, ExcImpossibleInDim(1));
   return std::vector<unsigned int>();
 }
 
@@ -964,7 +964,7 @@ template <>
 std::vector<bool>
 FE_RaviartThomas<1>::get_ria_vector (const unsigned int)
 {
-  Assert (false, ExcNotUsefulInThisDimension());
+  Assert (false, ExcImpossibleInDim(1));
   return std::vector<bool>();
 }
 
@@ -1016,7 +1016,7 @@ template <>
 std::vector<AnisotropicPolynomials<1> >
 FE_RaviartThomas<1>::create_polynomials (const unsigned int)
 {
-  Assert (false, ExcNotUsefulInThisDimension());
+  Assert (false, ExcImpossibleInDim(1));
   return std::vector<AnisotropicPolynomials<1> > ();
 }
 
@@ -1133,7 +1133,7 @@ template <>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_RaviartThomas<1>::compute_renumber (const unsigned int)
 {
-  Assert (false, ExcNotUsefulInThisDimension());
+  Assert (false, ExcImpossibleInDim(1));
   return std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 

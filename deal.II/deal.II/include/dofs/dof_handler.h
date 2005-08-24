@@ -1159,10 +1159,6 @@ class DoFHandler  :  public Subscriptor,
 		    int,
 		    << "The matrix has the wrong dimension " << arg1);
 				     /**
-				      *  Exception
-				      */
-    DeclException0 (ExcFunctionNotUseful);
-				     /**
 				      * Exception
 				      */
     DeclException1 (ExcNewNumbersNotConsecutive,

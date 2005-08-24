@@ -123,7 +123,7 @@ PersistentTriangulation<dim>::create_triangulation (const std::vector<Point<dim>
 						    const std::vector<CellData<dim> > &,
 						    const SubCellData                 &)
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(dim));
 }
 
 

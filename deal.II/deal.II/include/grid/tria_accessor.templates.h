@@ -840,7 +840,7 @@ inline
 TriaIterator<1,TriaObjectAccessor<0, 1> >
 CellAccessor<1>::face (const unsigned int) const 
 {
-  Assert (false, TriaAccessor<1>::ExcNotUsefulForThisDimension());
+  Assert (false, ExcImpossibleInDim(1));
   return TriaIterator<1,TriaObjectAccessor<0, 1> >();
 }
 

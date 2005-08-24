@@ -317,7 +317,7 @@ TimeStepBase::init_for_postprocessing ()
 void
 TimeStepBase::solve_dual_problem () 
 {
-  Assert (false, ExcPureVirtualFunctionCalled());
+  Assert (false, ExcPureFunctionCalled());
 }
 
 
@@ -325,7 +325,7 @@ TimeStepBase::solve_dual_problem ()
 void
 TimeStepBase::postprocess_timestep () 
 {
-  Assert (false, ExcPureVirtualFunctionCalled());
+  Assert (false, ExcPureFunctionCalled());
 }
 
 
@@ -415,7 +415,7 @@ TimeStepBase_Tria<dim>::TimeStepBase_Tria() :
                 flags (),
 		refinement_flags(0)
 {
-  Assert (false, ExcPureVirtualFunctionCalled());
+  Assert (false, ExcPureFunctionCalled());
 }
 
 

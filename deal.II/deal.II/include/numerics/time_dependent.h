@@ -1004,10 +1004,6 @@ class TimeStepBase : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException0 (ExcPureVirtualFunctionCalled);
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcCantComputeTimestep);
     
   protected:

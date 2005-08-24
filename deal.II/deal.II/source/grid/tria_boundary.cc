@@ -34,7 +34,7 @@ template <int dim>
 Point<dim>
 Boundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const 
 {
-  Assert (false, ExcPureVirtualFunctionCalled());
+  Assert (false, ExcPureFunctionCalled());
   return Point<dim>();
 }
 
@@ -46,7 +46,7 @@ Boundary<dim>::
 get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &,
 				 std::vector<Point<dim> > &) const
 {
-  Assert (false, ExcPureVirtualFunctionCalled());
+  Assert (false, ExcPureFunctionCalled());
 }
 
 
@@ -57,7 +57,7 @@ Boundary<dim>::
 get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &,
 				 std::vector<Point<dim> > &) const
 {
-  Assert (false, ExcPureVirtualFunctionCalled());
+  Assert (false, ExcPureFunctionCalled());
 }
 
 
@@ -68,7 +68,7 @@ Boundary<dim>::
 get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &,
 			 FaceVertexNormals                                &) const
 {
-  Assert (false, ExcPureVirtualFunctionCalled());
+  Assert (false, ExcPureFunctionCalled());
 }
 
 
@@ -96,7 +96,7 @@ template <int dim>
 Point<dim>
 StraightBoundary<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const 
 {
-  Assert (false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
+  Assert (false, ExcImpossibleInDim(dim));
   return Point<dim>();
 }
 
@@ -167,7 +167,7 @@ StraightBoundary<1>::
 get_intermediate_points_on_line (const Triangulation<1>::line_iterator &,
 				 std::vector<Point<1> > &) const
 {
-  Assert(false, Boundary<1>::ExcFunctionNotUseful(1));
+  Assert(false, ExcImpossibleInDim(1));
 }
 
 
@@ -205,7 +205,7 @@ StraightBoundary<dim>::
 get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &,
 				 std::vector<Point<dim> > &) const
 {
-  Assert(false, typename Boundary<dim>::ExcFunctionNotUseful(dim));
+  Assert(false, ExcImpossibleInDim(dim));
 }
 
 #else
@@ -254,7 +254,7 @@ StraightBoundary<1>::
 get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 			 Boundary<1>::FaceVertexNormals &) const
 {
-  Assert (false, Boundary<1>::ExcFunctionNotUseful(1));
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 #endif

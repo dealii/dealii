@@ -676,11 +676,6 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim> {
     TriaIterator<dim,MGDoFCellAccessor<dim> >
     neighbor_child_on_subface (const unsigned int face_no,
                                const unsigned int subface_no) const;
-
-    				     /**
-				      *  Exception
-				      */
-    DeclException0 (ExcNotUsefulForThisDimension);
 };
 
 /*@}*/

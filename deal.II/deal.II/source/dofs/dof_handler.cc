@@ -135,7 +135,7 @@ template <>
 DoFDimensionInfo<1>::raw_face_iterator
 DoFHandler<1>::begin_raw_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -144,7 +144,7 @@ template <>
 DoFDimensionInfo<1>::face_iterator
 DoFHandler<1>::begin_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -153,7 +153,7 @@ template <>
 DoFDimensionInfo<1>::active_face_iterator
 DoFHandler<1>::begin_active_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -162,7 +162,7 @@ template <>
 DoFDimensionInfo<1>::raw_face_iterator
 DoFHandler<1>::end_face () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -171,7 +171,7 @@ template <>
 DoFDimensionInfo<1>::raw_face_iterator
 DoFHandler<1>::last_raw_face () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -180,7 +180,7 @@ template <>
 DoFDimensionInfo<1>::raw_face_iterator
 DoFHandler<1>::last_raw_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -189,7 +189,7 @@ template <>
 DoFDimensionInfo<1>::face_iterator
 DoFHandler<1>::last_face () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -198,7 +198,7 @@ template <>
 DoFDimensionInfo<1>::face_iterator
 DoFHandler<1>::last_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -207,7 +207,7 @@ template <>
 DoFDimensionInfo<1>::active_face_iterator
 DoFHandler<1>::last_active_face () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -216,7 +216,6 @@ template <>
 DoFDimensionInfo<1>::active_face_iterator
 DoFHandler<1>::last_active_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
   return 0;
 }
 
@@ -225,7 +224,7 @@ template <>
 DoFHandler<1>::raw_quad_iterator
 DoFHandler<1>::begin_raw_quad (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -234,7 +233,7 @@ template <>
 DoFHandler<1>::quad_iterator
 DoFHandler<1>::begin_quad (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -243,7 +242,7 @@ template <>
 DoFHandler<1>::active_quad_iterator
 DoFHandler<1>::begin_active_quad (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -252,7 +251,7 @@ template <>
 DoFHandler<1>::raw_quad_iterator
 DoFHandler<1>::end_quad () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -261,7 +260,7 @@ template <>
 DoFHandler<1>::raw_quad_iterator
 DoFHandler<1>::last_raw_quad (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -270,7 +269,7 @@ template <>
 DoFHandler<1>::quad_iterator
 DoFHandler<1>::last_quad (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -279,7 +278,7 @@ template <>
 DoFHandler<1>::active_quad_iterator
 DoFHandler<1>::last_active_quad (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -288,7 +287,7 @@ template <>
 DoFHandler<1>::raw_quad_iterator
 DoFHandler<1>::last_raw_quad () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -297,7 +296,7 @@ template <>
 DoFHandler<1>::quad_iterator
 DoFHandler<1>::last_quad () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -306,7 +305,7 @@ template <>
 DoFHandler<1>::active_quad_iterator
 DoFHandler<1>::last_active_quad () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -315,7 +314,7 @@ template <>
 DoFHandler<1>::raw_hex_iterator
 DoFHandler<1>::begin_raw_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -324,7 +323,7 @@ template <>
 DoFHandler<1>::hex_iterator
 DoFHandler<1>::begin_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -333,7 +332,7 @@ template <>
 DoFHandler<1>::active_hex_iterator
 DoFHandler<1>::begin_active_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -342,7 +341,7 @@ template <>
 DoFHandler<1>::raw_hex_iterator
 DoFHandler<1>::end_hex () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -351,7 +350,7 @@ template <>
 DoFHandler<1>::raw_hex_iterator
 DoFHandler<1>::last_raw_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -360,7 +359,7 @@ template <>
 DoFHandler<1>::raw_hex_iterator
 DoFHandler<1>::last_raw_hex () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -369,7 +368,7 @@ template <>
 DoFHandler<1>::hex_iterator
 DoFHandler<1>::last_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -378,7 +377,7 @@ template <>
 DoFHandler<1>::hex_iterator
 DoFHandler<1>::last_hex () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -387,7 +386,7 @@ template <>
 DoFHandler<1>::active_hex_iterator
 DoFHandler<1>::last_active_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -396,7 +395,7 @@ template <>
 DoFHandler<1>::active_hex_iterator
 DoFHandler<1>::last_active_hex () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -569,7 +568,7 @@ template <>
 DoFHandler<2>::raw_hex_iterator
 DoFHandler<2>::begin_raw_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -578,7 +577,7 @@ template <>
 DoFHandler<2>::hex_iterator
 DoFHandler<2>::begin_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -587,7 +586,7 @@ template <>
 DoFHandler<2>::active_hex_iterator
 DoFHandler<2>::begin_active_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -596,7 +595,7 @@ template <>
 DoFHandler<2>::raw_hex_iterator
 DoFHandler<2>::end_hex () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -605,7 +604,7 @@ template <>
 DoFHandler<2>::raw_hex_iterator
 DoFHandler<2>::last_raw_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -614,7 +613,7 @@ template <>
 DoFHandler<2>::raw_hex_iterator
 DoFHandler<2>::last_raw_hex () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -623,7 +622,7 @@ template <>
 DoFHandler<2>::hex_iterator
 DoFHandler<2>::last_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -632,7 +631,7 @@ template <>
 DoFHandler<2>::hex_iterator
 DoFHandler<2>::last_hex () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -641,7 +640,7 @@ template <>
 DoFHandler<2>::active_hex_iterator
 DoFHandler<2>::last_active_hex (const unsigned int) const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -650,7 +649,7 @@ template <>
 DoFHandler<2>::active_hex_iterator
 DoFHandler<2>::last_active_hex () const
 {
-  Assert (false, ExcNotImplemented());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 

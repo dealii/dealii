@@ -1458,10 +1458,6 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
     void set_dof_values_by_interpolation (const Vector<number> &local_values,
 					  OutputVector         &values) const;
     
-    				     /**
-				      *  Exception
-				      */
-    DeclException0 (ExcNotUsefulForThisDimension);
 };
 
 

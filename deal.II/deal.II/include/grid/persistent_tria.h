@@ -251,10 +251,6 @@ class PersistentTriangulation : public Triangulation<dim>
 				     /**
 				      * Exception.
 				      */
-    DeclException0 (ExcFunctionNotUseful);
-				     /**
-				      * Exception.
-				      */
     DeclException0 (ExcTriaNotEmpty);
 				     /**
 				      * Exception.

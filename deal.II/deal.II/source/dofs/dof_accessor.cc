@@ -399,7 +399,7 @@ template <>
 TriaIterator<1, DoFObjectAccessor<0,1> >
 DoFCellAccessor<1>::face (const unsigned int) const
 {
-  Assert (false, ExcNotUsefulForThisDimension());
+  Assert (false, ExcImpossibleInDim(1));
   return TriaIterator<1, DoFObjectAccessor<0,1> >();
 }
 

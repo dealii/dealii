@@ -247,19 +247,6 @@ class Boundary : public Subscriptor
     virtual void
     get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 			     FaceVertexNormals &face_vertex_normals) const;
-      
-			     
-				     /**
-				      * Exception.
-				      */
-    DeclException0 (ExcPureVirtualFunctionCalled);
-
-				     /**
-				      * Exception.
-				      */
-    DeclException1 (ExcFunctionNotUseful,
-		    int,
-		    << "The function called is not useful for dim=" << arg1 << ".");
 };
 
 

@@ -2981,6 +2981,7 @@ class Triangulation : public Subscriptor
 				     /*@{*/
 				     /**
 				      *  Exception
+	* @ingroup Exceptions
 				      */
     DeclException1 (ExcInvalidLevel,
 		    int,
@@ -2988,37 +2989,46 @@ class Triangulation : public Subscriptor
 		    << " is not in the valid range!");
 				     /**
 				      *  Exception
+	* @ingroup Exceptions
 				      */
     DeclException0 (ExcCellShouldBeUnused);
 				     /**
 				      *  Exception
+	* @ingroup Exceptions
 				      */
     DeclException0 (ExcTooFewVerticesAllocated);
 				     /**
 				      *  Exception
+	* @ingroup Exceptions
 				      */
     DeclException0 (ExcUncaughtState);
 				     /**
-				      *  Exception
-				      */
-    DeclException0 (ExcFunctionNotUseful);
-				     /**
-				      *  Exception
+				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException2 (ExcGridsDoNotMatch,
 		    int, int,
 		    << "The present grid has " << arg1 << " active cells, "
 		    << "but the one in the file had " << arg2);
 				     /**
-				      *  Exception
+				      * Trying to re-read a grid, an error occured.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcGridReadError);
 				     /**
-				      *  Exception
+				      * The function raising this
+				      * exception can only operate on
+				      * an empty Triangulation, i.e.,
+				      * a Triangulation without grid
+				      * cells.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcTriangulationNotEmpty);
 				     /**
-				      *  Exception
+				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcGridHasInvalidCell,
 		    int,
@@ -3026,24 +3036,36 @@ class Triangulation : public Subscriptor
 		    << ". Read the docs and the source code "
 		    << "for more information.");
 				     /**
-				      *  Exception
+				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcGridHasInvalidVertices);
 				     /**
-				      *  Exception
+				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcInternalErrorOnCell,
 		    int,
 		    << "Something went wrong upon construction of cell "
 		    << arg1);
 				     /**
-				      *  Exception
+				      * A cell was entered which has
+				      * negative measure. In most
+				      * cases, this is due to a wrong
+				      * order of the vertices of the
+				      * cell.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcCellHasNegativeMeasure,
 		    int,
 		    << "Cell " << arg1 << " has negative measure.");
 				     /**
-				      * Exception
+				      * A cell is created with a
+				      * vertex number exceeding the
+				      * vertex array.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException3 (ExcInvalidVertexIndex,
 		    int, int, int,
@@ -3052,6 +3074,7 @@ class Triangulation : public Subscriptor
 		    << arg3 << ".");
 				     /**
 				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException2 (ExcLineInexistant,
 		    int, int,
@@ -3060,6 +3083,7 @@ class Triangulation : public Subscriptor
 		    << arg2 << " does not exist.");
 				     /**
 				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException4 (ExcQuadInexistant,
                     int, int, int, int,
@@ -3068,21 +3092,27 @@ class Triangulation : public Subscriptor
 		    << ", " << arg3 << ", " << arg4 << " does not exist.");
 		                     /**
 				      * Exception
+				      * @ingroup Exceptions
 				      */				      
     DeclException0 (ExcInteriorLineCantBeBoundary);
 				     /**
 				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcInteriorQuadCantBeBoundary);
     				     /**
 				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException2 (ExcMultiplySetLineInfoOfLine,
 		    int, int,
 		    << "In SubCellData the line info of the line with vertex indices "
 		    << arg1 << " and " << arg2 << " is multiply set.");
 				     /**
-				      * Exception
+				      * The triangulation level you
+				      * accessed is empty.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcEmptyLevel,
 		    int,

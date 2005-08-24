@@ -264,10 +264,6 @@ class TriaAccessor
 				     /**
 				      * @ingroup Exceptions
 				      */
-    DeclException0 (ExcNotUsefulForThisDimension);
-				     /**
-				      * @ingroup Exceptions
-				      */
     DeclException0 (ExcCantCompareIterators);
 				     /**
 				      * @ingroup Exceptions

@@ -40,7 +40,7 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 								    std::vector<bool>(dim,true))),
 		degree(degree)
 {
-  Assert (dim >= 2, ExcNotUsefulInThisDimension());
+  Assert (dim >= 2, ExcImpossibleInDim(dim));
   
 				   // copy constraint and embedding
 				   // matrices if they are

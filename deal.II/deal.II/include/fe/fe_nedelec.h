@@ -380,11 +380,6 @@ class FE_Nedelec : public FiniteElement<dim>
 					  */
 	static const unsigned int n_constraint_matrices;
     };
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcNotUsefulInThisDimension);
-    
   protected:    
 				     /**
 				      * @p clone function instead of

@@ -174,7 +174,7 @@ void TriaObjectAccessor<1, dim>::clear_children () const
 template <int dim>
 unsigned char TriaObjectAccessor<1, dim>::boundary_indicator () const
 {
-  Assert (dim>=2, typename TriaAccessor<dim>::ExcNotUsefulForThisDimension());
+  Assert (dim>=2, ExcImpossibleInDim(dim));
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   return this->tria->levels[this->present_level]->lines.material_id[this->present_index];
@@ -185,7 +185,7 @@ unsigned char TriaObjectAccessor<1, dim>::boundary_indicator () const
 template <int dim>
 void TriaObjectAccessor<1, dim>::set_boundary_indicator (const unsigned char boundary_ind) const
 {
-  Assert (dim>=2, typename TriaAccessor<dim>::ExcNotUsefulForThisDimension());
+  Assert (dim>=2, ExcImpossibleInDim(dim));
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   this->tria->levels[this->present_level]->lines.material_id[this->present_index] = boundary_ind;
@@ -404,7 +404,7 @@ void TriaObjectAccessor<2, dim>::clear_children () const
 template <int dim>
 unsigned char TriaObjectAccessor<2, dim>::boundary_indicator () const
 {
-  Assert (dim>=3, typename TriaAccessor<dim>::ExcNotUsefulForThisDimension());
+  Assert (dim>=3, ExcImpossibleInDim(dim));
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   return this->tria->levels[this->present_level]->quads.material_id[this->present_index];
@@ -415,7 +415,7 @@ unsigned char TriaObjectAccessor<2, dim>::boundary_indicator () const
 template <int dim>
 void TriaObjectAccessor<2, dim>::set_boundary_indicator (const unsigned char boundary_ind) const
 {
-  Assert (dim>=3, typename TriaAccessor<dim>::ExcNotUsefulForThisDimension());
+  Assert (dim>=3, ExcImpossibleInDim(dim));
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   this->tria->levels[this->present_level]->quads.material_id[this->present_index] = boundary_ind;
@@ -844,7 +844,7 @@ void TriaObjectAccessor<3, dim>::clear_children () const
 template <int dim>
 unsigned char TriaObjectAccessor<3, dim>::boundary_indicator () const
 {
-  Assert (dim<4, typename TriaAccessor<dim>::ExcNotUsefulForThisDimension());
+  Assert (dim<4, ExcImpossibleInDim(dim));
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   return this->tria->levels[this->present_level]->hexes.material_id[this->present_index];
@@ -855,7 +855,7 @@ unsigned char TriaObjectAccessor<3, dim>::boundary_indicator () const
 template <int dim>
 void TriaObjectAccessor<3, dim>::set_boundary_indicator (const unsigned char boundary_ind) const
 {
-  Assert (dim<4, typename TriaAccessor<dim>::ExcNotUsefulForThisDimension());
+  Assert (dim<4, ExcImpossibleInDim(dim));
   Assert (used(), typename TriaAccessor<dim>::ExcCellNotUsed());
 
   this->tria->levels[this->present_level]->hexes.material_id[this->present_index] = boundary_ind;

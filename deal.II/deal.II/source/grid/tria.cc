@@ -2014,7 +2014,7 @@ void Triangulation<dim>::load_user_flags_line (const std::vector<bool> &v)
 template <>
 void Triangulation<1>::save_user_flags_quad (std::ostream &) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
@@ -2022,7 +2022,7 @@ void Triangulation<1>::save_user_flags_quad (std::ostream &) const
 template <>
 void Triangulation<1>::save_user_flags_quad (std::vector<bool> &) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
@@ -2030,7 +2030,7 @@ void Triangulation<1>::save_user_flags_quad (std::vector<bool> &) const
 template <>
 void Triangulation<1>::load_user_flags_quad (std::istream &)
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
@@ -2038,7 +2038,7 @@ void Triangulation<1>::load_user_flags_quad (std::istream &)
 template <>
 void Triangulation<1>::load_user_flags_quad (const std::vector<bool> &)
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
@@ -2046,7 +2046,7 @@ void Triangulation<1>::load_user_flags_quad (const std::vector<bool> &)
 template <>
 void Triangulation<1>::save_user_flags_hex (std::ostream &) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
@@ -2054,7 +2054,7 @@ void Triangulation<1>::save_user_flags_hex (std::ostream &) const
 template <>
 void Triangulation<1>::save_user_flags_hex (std::vector<bool> &) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
@@ -2062,7 +2062,7 @@ void Triangulation<1>::save_user_flags_hex (std::vector<bool> &) const
 template <>
 void Triangulation<1>::load_user_flags_hex (std::istream &)
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
@@ -2070,7 +2070,7 @@ void Triangulation<1>::load_user_flags_hex (std::istream &)
 template <>
 void Triangulation<1>::load_user_flags_hex (const std::vector<bool> &)
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 #endif
@@ -2132,7 +2132,7 @@ void Triangulation<dim>::load_user_flags_quad (const std::vector<bool> &v)
 template <>
 void Triangulation<2>::save_user_flags_hex (std::ostream &) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
 }
 
 
@@ -2140,7 +2140,7 @@ void Triangulation<2>::save_user_flags_hex (std::ostream &) const
 template <>
 void Triangulation<2>::save_user_flags_hex (std::vector<bool> &) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
 }
 
 
@@ -2148,7 +2148,7 @@ void Triangulation<2>::save_user_flags_hex (std::vector<bool> &) const
 template <>
 void Triangulation<2>::load_user_flags_hex (std::istream &)
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
 }
 
 
@@ -2156,7 +2156,7 @@ void Triangulation<2>::load_user_flags_hex (std::istream &)
 template <>
 void Triangulation<2>::load_user_flags_hex (const std::vector<bool> &)
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
 }
 
 
@@ -2312,7 +2312,7 @@ void Triangulation<dim>::load_user_pointers_line (const std::vector<void *> &v)
 template <>
 void Triangulation<1>::save_user_pointers_quad (std::vector<void *> &) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
@@ -2320,7 +2320,7 @@ void Triangulation<1>::save_user_pointers_quad (std::vector<void *> &) const
 template <>
 void Triangulation<1>::load_user_pointers_quad (const std::vector<void *> &)
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
@@ -2328,7 +2328,7 @@ void Triangulation<1>::load_user_pointers_quad (const std::vector<void *> &)
 template <>
 void Triangulation<1>::save_user_pointers_hex (std::vector<void *> &) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
@@ -2336,7 +2336,7 @@ void Triangulation<1>::save_user_pointers_hex (std::vector<void *> &) const
 template <>
 void Triangulation<1>::load_user_pointers_hex (const std::vector<void *> &)
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 #endif
@@ -2375,7 +2375,7 @@ void Triangulation<dim>::load_user_pointers_quad (const std::vector<void *> &v)
 template <>
 void Triangulation<2>::save_user_pointers_hex (std::vector<void *> &) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
 }
 
 
@@ -2383,7 +2383,7 @@ void Triangulation<2>::save_user_pointers_hex (std::vector<void *> &) const
 template <>
 void Triangulation<2>::load_user_pointers_hex (const std::vector<void *> &)
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
 }
 
 
@@ -2498,7 +2498,7 @@ template <>
 Triangulation<1>::raw_face_iterator
 Triangulation<1>::begin_raw_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2508,7 +2508,7 @@ template <>
 Triangulation<1>::face_iterator
 Triangulation<1>::begin_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2518,7 +2518,7 @@ template <>
 Triangulation<1>::active_face_iterator
 Triangulation<1>::begin_active_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2528,7 +2528,7 @@ template <>
 Triangulation<1>::raw_face_iterator
 Triangulation<1>::end_face () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2538,7 +2538,7 @@ template <>
 Triangulation<1>::raw_face_iterator
 Triangulation<1>::last_raw_face () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2548,7 +2548,7 @@ template <>
 Triangulation<1>::raw_face_iterator
 Triangulation<1>::last_raw_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2558,7 +2558,7 @@ template <>
 Triangulation<1>::face_iterator
 Triangulation<1>::last_face () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2568,7 +2568,7 @@ template <>
 Triangulation<1>::face_iterator
 Triangulation<1>::last_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2578,7 +2578,7 @@ template <>
 Triangulation<1>::active_face_iterator
 Triangulation<1>::last_active_face () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2588,7 +2588,7 @@ template <>
 Triangulation<1>::active_face_iterator
 Triangulation<1>::last_active_face (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2598,7 +2598,7 @@ template <>
 Triangulation<1>::raw_quad_iterator
 Triangulation<1>::begin_raw_quad (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2608,7 +2608,7 @@ template <>
 Triangulation<1>::quad_iterator
 Triangulation<1>::begin_quad (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2618,7 +2618,7 @@ template <>
 Triangulation<1>::active_quad_iterator
 Triangulation<1>::begin_active_quad (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2628,7 +2628,7 @@ template <>
 Triangulation<1>::raw_quad_iterator
 Triangulation<1>::end_quad () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2638,7 +2638,7 @@ template <>
 Triangulation<1>::raw_quad_iterator
 Triangulation<1>::last_raw_quad (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2648,7 +2648,7 @@ template <>
 Triangulation<1>::raw_quad_iterator
 Triangulation<1>::last_raw_quad () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2658,7 +2658,7 @@ template <>
 Triangulation<1>::quad_iterator
 Triangulation<1>::last_quad (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2668,7 +2668,7 @@ template <>
 Triangulation<1>::quad_iterator
 Triangulation<1>::last_quad () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2678,7 +2678,7 @@ template <>
 Triangulation<1>::active_quad_iterator
 Triangulation<1>::last_active_quad (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2688,7 +2688,7 @@ template <>
 Triangulation<1>::active_quad_iterator
 Triangulation<1>::last_active_quad () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2698,7 +2698,7 @@ template <>
 Triangulation<1>::raw_hex_iterator
 Triangulation<1>::begin_raw_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2708,7 +2708,7 @@ template <>
 Triangulation<1>::hex_iterator
 Triangulation<1>::begin_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2718,7 +2718,7 @@ template <>
 Triangulation<1>::active_hex_iterator
 Triangulation<1>::begin_active_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2728,7 +2728,7 @@ template <>
 Triangulation<1>::raw_hex_iterator
 Triangulation<1>::end_hex () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2738,7 +2738,7 @@ template <>
 Triangulation<1>::raw_hex_iterator
 Triangulation<1>::last_raw_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2748,7 +2748,7 @@ template <>
 Triangulation<1>::raw_hex_iterator
 Triangulation<1>::last_raw_hex () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2758,7 +2758,7 @@ template <>
 Triangulation<1>::hex_iterator
 Triangulation<1>::last_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2768,7 +2768,7 @@ template <>
 Triangulation<1>::hex_iterator
 Triangulation<1>::last_hex () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2778,7 +2778,7 @@ template <>
 Triangulation<1>::active_hex_iterator
 Triangulation<1>::last_active_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2788,7 +2788,7 @@ template <>
 Triangulation<1>::active_hex_iterator
 Triangulation<1>::last_active_hex () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
 
@@ -2963,7 +2963,7 @@ template <>
 Triangulation<2>::raw_hex_iterator
 Triangulation<2>::begin_raw_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -2973,7 +2973,7 @@ template <>
 Triangulation<2>::hex_iterator
 Triangulation<2>::begin_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -2983,7 +2983,7 @@ template <>
 Triangulation<2>::active_hex_iterator
 Triangulation<2>::begin_active_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -2993,7 +2993,7 @@ template <>
 Triangulation<2>::raw_hex_iterator
 Triangulation<2>::end_hex () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -3003,7 +3003,7 @@ template <>
 Triangulation<2>::raw_hex_iterator
 Triangulation<2>::last_raw_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -3013,7 +3013,7 @@ template <>
 Triangulation<2>::raw_hex_iterator
 Triangulation<2>::last_raw_hex () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -3023,7 +3023,7 @@ template <>
 Triangulation<2>::hex_iterator
 Triangulation<2>::last_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -3033,7 +3033,7 @@ template <>
 Triangulation<2>::hex_iterator
 Triangulation<2>::last_hex () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -3043,7 +3043,7 @@ template <>
 Triangulation<2>::active_hex_iterator
 Triangulation<2>::last_active_hex (const unsigned int) const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
@@ -3053,7 +3053,7 @@ template <>
 Triangulation<2>::active_hex_iterator
 Triangulation<2>::last_active_hex () const
 {
-  Assert (false, ExcFunctionNotUseful());
+  Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
 
