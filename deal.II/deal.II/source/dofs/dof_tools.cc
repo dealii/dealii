@@ -40,13 +40,13 @@
 
 #if  deal_II_dimension == 1
 
-
+// Specialization for 1D
 template <int dim>
 void
 DoFTools::
 compute_row_length_vector(const DoFHandler<dim>     &dofs,
                           std::vector<unsigned int> &row_lengths,
-                          const Coupling)
+                          const Coupling flux_coupling)
 {
   const FiniteElement<dim>& fe = dofs.get_fe();
   Assert (row_lengths.size() == dofs.n_dofs(),
@@ -68,12 +68,87 @@ compute_row_length_vector(const DoFHandler<dim>     &dofs,
                                        // dof on this cell
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	row_lengths[cell_indices[i]] += fe.dofs_per_cell;
+      
+				       // If fluxes couple, add
+				       // coupling to neighbor cells
+      if (flux_coupling != none)
+	for (unsigned int face=0;face<GeometryInfo<dim>::faces_per_cell;++face)
+	  {
+	    if (cell->at_boundary(face)) continue;
+	    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	      row_lengths[cell_indices[i]] += fe.dofs_per_cell;
+	}
+    }
+}
+
+
+// Specialization for 1D
+//TODO:[GK] Implement this.
+template <int dim>
+void
+DoFTools::compute_row_length_vector(
+  const DoFHandler<dim>& dofs,
+  std::vector<unsigned int>& row_lengths,
+  const Table<2,Coupling>& couplings,
+  const Table<2,Coupling>& flux_couplings)
+{
+  const FiniteElement<dim>& fe = dofs.get_fe();
+  Assert (fe.is_primitive(), FiniteElementBase<dim>::ExcFENotPrimitive());
+  Assert (row_lengths.size() == dofs.n_dofs(),
+	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+  Assert (couplings.n_rows()==fe.n_components(),
+	  ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
+  Assert (couplings.n_cols()==fe.n_components(),
+	  ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
+  Assert (flux_couplings.n_rows()==fe.n_components(),
+	  ExcDimensionMismatch(flux_couplings.n_rows(), fe.n_components()));
+  Assert (flux_couplings.n_cols()==fe.n_components(),
+	  ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
+  
+  				   // Function starts here by
+				   // resetting the counters.
+  std::fill(row_lengths.begin(), row_lengths.end(), 0);
+  
+  				   // Two vectors containing the
+				   // number of dofs of a cell, split
+				   // by components.
+  std::vector<unsigned int> dofs_cell(fe.n_components());
+  
+  for (unsigned int comp=0;comp<fe.n_components();++comp)
+      dofs_cell[comp] = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell;
+  
+  const typename DoFHandler<dim>::cell_iterator end = dofs.end();
+  typename DoFHandler<dim>::active_cell_iterator cell;
+  std::vector<unsigned int> cell_indices(fe.dofs_per_cell);
+  
+  for (cell = dofs.begin_active(); cell != end; ++cell)
+    {
+      cell->get_dof_indices(cell_indices);
+      
+                                       // each dof can couple with each other
+                                       // dof on this cell
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	for (unsigned int comp=0;comp<fe.n_components();++comp)
+	  if (couplings(fe.system_to_component_index(i).first,comp) != none)
+	    row_lengths[cell_indices[i]] += dofs_cell[comp];
+      
+				       // If fluxes couple, add
+				       // coupling to neighbor cells
+      for (unsigned int face=0;face<GeometryInfo<dim>::faces_per_cell;++face)
+	{
+	  if (cell->at_boundary(face)) continue;
+	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	    for (unsigned int comp=0;comp<fe.n_components();++comp)
+	      if (flux_couplings(fe.system_to_component_index(i).first,comp) != none)
+		row_lengths[cell_indices[i]] += dofs_cell[comp];
+	}
     }
 }
 
 
 #else
 
+// Template for 2D and 3D. For 1D see specialization above
 template <int dim>
 void
 DoFTools::compute_row_length_vector(
@@ -243,20 +318,235 @@ DoFTools::compute_row_length_vector(
   user_flags_triangulation.load_user_flags(old_flags);
 }
 
-#endif
 
-
-//TODO:[GK] This function is not finished yet!!!
+//TODO:[GK] Extend this to non-primitive elements
+// This is the template for 2D and 3D. See version for 1D above
 template <int dim>
 void
 DoFTools::compute_row_length_vector(
   const DoFHandler<dim>& dofs,
   std::vector<unsigned int>& row_lengths,
-  Table<2,Coupling> couplings,
-  Table<2,Coupling> flux_couplings)
+  const Table<2,Coupling>& couplings,
+  const Table<2,Coupling>& flux_couplings)
 {
-  Assert(false, ExcNotImplemented());
+  const FiniteElement<dim>& fe = dofs.get_fe();
+  Assert (fe.is_primitive(), FiniteElementBase<dim>::ExcFENotPrimitive());
+  Assert (row_lengths.size() == dofs.n_dofs(),
+	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+  Assert (couplings.n_rows()==fe.n_components(),
+	  ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
+  Assert (couplings.n_cols()==fe.n_components(),
+	  ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
+  Assert (flux_couplings.n_rows()==fe.n_components(),
+	  ExcDimensionMismatch(flux_couplings.n_rows(), fe.n_components()));
+  Assert (flux_couplings.n_cols()==fe.n_components(),
+	  ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
+  
+				   // Function starts here by
+				   // resetting the counters.
+  std::fill(row_lengths.begin(), row_lengths.end(), 0);
+				   // We need the user flags, so we
+				   // save them for later restoration
+  std::vector<bool> old_flags;
+				   // We need a non-constant
+				   // triangulation for the user
+				   // flags. Since we restore them in
+				   // the end, this cast is safe.
+  Triangulation<dim>& user_flags_triangulation =
+    const_cast<Triangulation<dim>&> (dofs.get_tria());
+  user_flags_triangulation.save_user_flags(old_flags);
+  user_flags_triangulation.clear_user_flags();
+  
+  const typename DoFHandler<dim>::cell_iterator end = dofs.end();
+  typename DoFHandler<dim>::active_cell_iterator cell;
+  std::vector<unsigned int> cell_indices(fe.dofs_per_cell);
+  std::vector<unsigned int> neighbor_indices(fe.dofs_per_cell);
+
+				   // Two vectors containing the
+				   // number of dofs of a cell and of
+				   // a face, split by components.
+  std::vector<unsigned int> dofs_cell(fe.n_components());
+  std::vector<unsigned int> dofs_face(fe.n_components());
+
+  for (unsigned int comp=0;comp<fe.n_components();++comp)
+    {
+      dofs_cell[comp] = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell;
+      dofs_face[comp] = fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
+    }
+  
+				   // We loop over cells and go from
+				   // cells to lower dimensional
+				   // objects. This is the only way to
+				   // cope withthe fact, that an
+				   // unknown number of cells may
+				   // share an object of dimension
+				   // smaller than dim-1.
+  for (cell = dofs.begin_active(); cell != end; ++cell)
+    {
+      cell->get_dof_indices(cell_indices);
+      unsigned int i = 0;
+				       // First, dofs on
+				       // vertices. We assume that
+				       // each vertex dof couples
+				       // with all dofs on
+				       // adjacent grid cells.
+
+				       // Adding all dofs of the cells
+				       // will add dofs of the faces
+				       // of the cell adjacent to the
+				       // vertex twice. Therefore, we
+				       // subtract these here and add
+				       // them in a loop over the
+				       // faces below.
+
+				       // in 1d, faces and vertices
+				       // are identical. Nevertheless,
+				       // this will only work if
+				       // dofs_per_face is zero and
+				       // dofs_per_vertex is
+				       // arbitrary, not the other way
+				       // round.
+      unsigned int increment;
+      while (i < fe.first_line_index)
+	{
+	  for (unsigned int comp=0;comp<fe.n_components();++comp)
+	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
+	      {
+		increment = dofs_cell[comp] - dim * dofs_face[comp];
+		row_lengths[cell_indices[i]] += increment;
+	      }
+	  ++i;
+	}
+				       // From now on, if an object is
+				       // a cell, its dofs only couple
+				       // inside the cell. Since the
+				       // faces are handled below, we
+				       // have to subtract ALL faces
+				       // in this case.
+      
+				       // In all other cases we
+				       // subtract adjacent faces to be
+				       // added in the loop below.
+      while (i < fe.first_quad_index)
+	{
+	  for (unsigned int comp=0;comp<fe.n_components();++comp)
+	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
+	      {
+		increment = (dim>1)
+			    ? dofs_cell[comp] - (dim-1) * dofs_face[comp]
+			    : dofs_cell[comp] - GeometryInfo<dim>::faces_per_cell * dofs_face[comp];
+		row_lengths[cell_indices[i]] += increment;
+	      }
+	  ++i;
+	}
+      
+				       // Now quads in 2D and 3D
+      while (i < fe.first_hex_index)
+	{
+	  for (unsigned int comp=0;comp<fe.n_components();++comp)
+	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
+	      {
+		increment = (dim>2)
+			    ? dofs_cell[comp] - (dim-2) * dofs_face[comp]
+			    : dofs_cell[comp] - GeometryInfo<dim>::faces_per_cell * dofs_face[comp];
+		row_lengths[cell_indices[i]] += increment;
+	      }
+	  ++i;
+	}
+      
+				       // Finally, cells in 3D
+      while (i < fe.dofs_per_cell)
+	{
+	  for (unsigned int comp=0;comp<fe.n_components();++comp)
+	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
+	      {
+		increment = dofs_cell[comp] - GeometryInfo<dim>::faces_per_cell * dofs_face[comp];
+		row_lengths[cell_indices[i]] += increment;
+	      }
+	  ++i;
+	}
+      
+				   // At this point, we have
+				   // counted all dofs
+				   // contributiong from cells
+				   // coupled topologically to the
+				   // adjacent cells, but we
+				   // subtracted some faces.
+  
+				   // Now, let's go by the faces
+				   // and add the missing
+				   // contribution as well as the
+				   // flux contributions.
+      for (unsigned int iface=0;iface<GeometryInfo<dim>::faces_per_cell;++iface)
+	{
+	  if (cell->at_boundary(iface))
+	    {
+	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		row_lengths[cell_indices[i]] += fe.dofs_per_face;
+	      continue;
+	    }
+	  
+	  const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(iface);
+//	  const bool neighbor_same_level = (neighbor->level() == cell->level());
+// 	  const unsigned int
+// 	    nface = neighbor_same_level
+// 	    ? cell->neighbor_of_neighbor(iface)
+// 	    : cell->neighbor_of_coarser_neighbor(iface).first;
+	  typename DoFHandler<dim>::face_iterator face = cell->face(iface);
+	  
+					   // Flux couplings are
+					   // computed from both sides
+					   // for simplicity.
+	  
+					   // The dofs on the common face
+					   // will be handled below,
+					   // therefore, we subtract them
+					   // here.
+	  for (unsigned int comp=0;comp<fe.n_components();++comp)
+	    for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+	      if (flux_couplings(fe.system_to_component_index(i).first,comp) != none)
+		{
+		  unsigned int increment = dofs_cell[comp] - dofs_face[comp];
+		  row_lengths[cell_indices[i]] += increment;
+		}
+	  
+					   // Do this only once per
+					   // face and not on the
+					   // hanging faces.
+	  if (face->user_flag_set() || neighbor->has_children())
+	    continue;
+	  face->set_user_flag();
+					   // At this point, we assume
+					   // that each cell added its
+					   // dofs minus the face to
+					   // the couplings of the
+					   // face dofs. Since we
+					   // subtracted two faces, we
+					   // have to re-add one.
+	  
+					   // If one side of the face
+					   // is refined, all the fine
+					   // face dofs couple with
+					   // the coarse one.
+	  
+					   // Wolfgang, do they couple
+					   // with each other by
+					   // constraints?
+	  neighbor->get_dof_indices(neighbor_indices);
+	  for (unsigned int comp=0;comp<fe.n_components();++comp)
+	    for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+	      if (couplings(fe.system_to_component_index(i).first,comp) != none)
+		{
+		  row_lengths[cell_indices[i]] += dofs_face[comp];
+		  row_lengths[neighbor_indices[i]] += dofs_face[comp];
+		}
+	}
+    }  
+  user_flags_triangulation.load_user_flags(old_flags);
 }
+
+#endif
+
 
 
 template <int dim, class SparsityPattern>
@@ -292,9 +582,9 @@ DoFTools::make_sparsity_pattern (
 template <int dim, class SparsityPattern>
 void
 DoFTools::make_sparsity_pattern (
-  const DoFHandler<dim>                 &dof,
-  const std::vector<std::vector<bool> > &mask,
-  SparsityPattern                       &sparsity)
+  const DoFHandler<dim>&   dof,
+  const Table<2,Coupling>& couplings,
+  SparsityPattern&         sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
@@ -303,11 +593,10 @@ DoFTools::make_sparsity_pattern (
 	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
   Assert (sparsity.n_cols() == n_dofs,
 	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
-  Assert (mask.size() == dof.get_fe().n_components(),
-	  ExcDimensionMismatch(mask.size(), dof.get_fe().n_components()));
-  for (unsigned int i=0; i<mask.size(); ++i)
-    Assert (mask[i].size() == dof.get_fe().n_components(),
-	    ExcDimensionMismatch(mask[i].size(), dof.get_fe().n_components()));
+  Assert (couplings.n_rows() == dof.get_fe().n_components(),
+	  ExcDimensionMismatch(couplings.n_rows(), dof.get_fe().n_components()));
+  Assert (couplings.n_cols() == dof.get_fe().n_components(),
+	  ExcDimensionMismatch(couplings.n_cols(), dof.get_fe().n_components()));
 
 				   // first build a mask for each dof,
 				   // not like the one given which
@@ -322,9 +611,8 @@ DoFTools::make_sparsity_pattern (
     for (unsigned int j=0; j<dofs_per_cell; ++j)
       if (dof.get_fe().is_primitive(i) &&
           dof.get_fe().is_primitive(j))
-        dof_mask[i][j] = mask
-                         [dof.get_fe().system_to_component_index(i).first]
-                         [dof.get_fe().system_to_component_index(j).first];
+        dof_mask[i][j] = (couplings(dof.get_fe().system_to_component_index(i).first,
+				    dof.get_fe().system_to_component_index(j).first) != none);
       else
         {
           const unsigned int first_nonzero_comp_i
@@ -344,7 +632,7 @@ DoFTools::make_sparsity_pattern (
           Assert (first_nonzero_comp_j < dof.get_fe().n_components(),
                   ExcInternalError());          
           
-          dof_mask[i][j] = mask[first_nonzero_comp_i][first_nonzero_comp_j];
+          dof_mask[i][j] = (couplings(first_nonzero_comp_i,first_nonzero_comp_j) != none);
         }
   
 
@@ -3105,6 +3393,10 @@ DoFTools::compute_row_length_vector(
   const DoFHandler<deal_II_dimension>& dofs, std::vector<unsigned int>& row_lengths,
   const Coupling flux_coupling);
 
+template void
+DoFTools::compute_row_length_vector(
+  const DoFHandler<deal_II_dimension>& dofs, std::vector<unsigned int>& row_lengths,
+  const Table<2,Coupling>& couplings, const Table<2,Coupling>& flux_couplings);
 
 template void
 DoFTools::make_sparsity_pattern<deal_II_dimension,SparsityPattern>
@@ -3128,27 +3420,19 @@ DoFTools::make_sparsity_pattern<deal_II_dimension,CompressedBlockSparsityPattern
 
 template void 
 DoFTools::make_sparsity_pattern<deal_II_dimension,SparsityPattern>
-(const DoFHandler<deal_II_dimension> &dof,
- const std::vector<std::vector<bool> > &mask,
- SparsityPattern             &sparsity);
+(const DoFHandler<deal_II_dimension>&, const Table<2,Coupling>&, SparsityPattern&);
 
 template void 
 DoFTools::make_sparsity_pattern<deal_II_dimension,CompressedSparsityPattern>
-(const DoFHandler<deal_II_dimension> &dof,
- const std::vector<std::vector<bool> > &mask,
- CompressedSparsityPattern             &sparsity);
+(const DoFHandler<deal_II_dimension>&, const Table<2,Coupling>&, CompressedSparsityPattern&);
 
 template void 
 DoFTools::make_sparsity_pattern<deal_II_dimension,BlockSparsityPattern>
-(const DoFHandler<deal_II_dimension> &dof,
- const std::vector<std::vector<bool> > &mask,
- BlockSparsityPattern        &sparsity);
+(const DoFHandler<deal_II_dimension>&, const Table<2,Coupling>&, BlockSparsityPattern&);
 
 template void 
 DoFTools::make_sparsity_pattern<deal_II_dimension,CompressedBlockSparsityPattern>
-(const DoFHandler<deal_II_dimension> &dof,
- const std::vector<std::vector<bool> > &mask,
- CompressedBlockSparsityPattern        &sparsity);
+(const DoFHandler<deal_II_dimension>&, const Table<2,Coupling>&, CompressedBlockSparsityPattern&);
 
 #if deal_II_dimension > 1
 template void

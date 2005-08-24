@@ -225,8 +225,15 @@ class DoFTools
 				      * <b>not</b> coupling in the
 				      * differential equation can be
 				      * eliminated by the two optional
-				      * tables.
+				      * tables, which may reduce the
+				      * amount of pre-allocated
+				      * memory dramatically.
 				      *
+				      * @todo This function is only
+				      * implemented for primitive
+				      * elements. Implementation in 1D
+				      * is missing completely.
+				      * 
 				      * @param dofs The DoFHandler
 				      * @param row_lengths The vector
 				      * containing the resulting row
@@ -254,8 +261,8 @@ class DoFTools
     void compute_row_length_vector(
       const DoFHandler<dim>& dofs,
       std::vector<unsigned int>& row_lengths,
-      Table<2,Coupling> couplings /*= typename Table<2,Coupling>()*/,
-      Table<2,Coupling> flux_couplings /*= Table<2,Coupling>()*/);
+      const Table<2,Coupling>& couplings /*= typename Table<2,Coupling>()*/,
+      const Table<2,Coupling>& flux_couplings /*= Table<2,Coupling>()*/);
     
 				     /**
 				      * Locate non-zero entries of the
@@ -330,7 +337,7 @@ class DoFTools
 
 				     /**
 				      * Locate non-zero entries for
-				      * ector valued finite elements.
+				      * vector valued finite elements.
 				      * This function does mostly the
 				      * same as the previous
 				      * @p make_sparsity_pattern, but
@@ -372,16 +379,16 @@ class DoFTools
 				      * contained in there.
 				      *
 				      * This function is designed to
-				      * accept a mask, like the one
+				      * accept a coupling pattern, like the one
 				      * shown above, through the
-				      * @p mask parameter, which
-				      * contains boolean values. It
+				      * @p couplings parameter, which
+				      * contains values of type #Coupling. It
 				      * builds the matrix structure
 				      * just like the previous
 				      * function, but does not create
 				      * matrix elements if not
-				      * specified by the mask. If the
-				      * mask is symmetric, then so
+				      * specified by the coupling pattern. If the
+				      * couplings are symmetric, then so
 				      * will be the resulting sparsity
 				      * pattern.
 				      *
@@ -402,11 +409,24 @@ class DoFTools
 				      * more than one component (in
 				      * deal.II speak: they are
 				      * non-primitive). In this case,
-				      * the mask element correspoding
-				      * to the first non-zero
-				      * component is taken, and the
-				      * mask elements of all following
-				      * components are ignored.
+				      * the coupling element
+				      * correspoding to the first
+				      * non-zero component is taken
+				      * and additional ones for this
+				      * component are ignored.
+				      */
+    template <int dim, class SparsityPattern>
+    static
+    void
+    make_sparsity_pattern (const DoFHandler<dim>&    dof,
+			   const Table<2, Coupling>& coupling,
+			   SparsityPattern&          sparsity_pattern);
+				     /**
+				      * @deprecated This is the old
+				      * form of the previous
+				      * function. It generates a table
+				      * of #Coupling values and calls
+				      * it.
 				      */
     template <int dim, class SparsityPattern>
     static
@@ -1554,12 +1574,39 @@ class DoFTools
 
 // ---------------------- inline and template functions --------------------
 
-template <int dim, class Comp>
+template <int dim, class SparsityPattern>
+inline
 void
-DoFTools::
-map_support_points_to_dofs (const Mapping<dim>       &mapping,
-			    const DoFHandler<dim>    &dof_handler,
-			    std::map<Point<dim>, unsigned int, Comp> &point_to_index_map)
+DoFTools::make_sparsity_pattern (
+  const DoFHandler<dim>                 &dof,
+  const std::vector<std::vector<bool> > &mask,
+  SparsityPattern                       &sparsity_pattern)
+{
+  const unsigned int ncomp = dof.get_fe().n_components();
+  
+  Assert (mask.size() == ncomp,
+	  ExcDimensionMismatch(mask.size(), ncomp));
+  for (unsigned int i=0; i<mask.size(); ++i)
+    Assert (mask[i].size() == ncomp,
+	    ExcDimensionMismatch(mask[i].size(), ncomp));
+				   // Create a coupling table out of the mask
+  Table<2, Coupling> couplings(ncomp, ncomp);
+  for (unsigned int i=0;i<ncomp;++i)
+    for (unsigned int j=0;j<ncomp;++j)
+      if (mask[i][j])
+	couplings(i,j) = always;
+				   // Call the new function
+  make_sparsity_pattern(dof, couplings, sparsity_pattern);
+}
+
+
+template <int dim, class Comp>
+inline
+void
+DoFTools::map_support_points_to_dofs (
+  const Mapping<dim>       &mapping,
+  const DoFHandler<dim>    &dof_handler,
+  std::map<Point<dim>, unsigned int, Comp> &point_to_index_map)
 {
 				   // let the checking of arguments be
 				   // done by the function first
