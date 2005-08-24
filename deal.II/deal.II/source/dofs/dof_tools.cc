@@ -93,7 +93,7 @@ DoFTools::compute_row_length_vector(
   const Table<2,Coupling>& flux_couplings)
 {
   const FiniteElement<dim>& fe = dofs.get_fe();
-  Assert (fe.is_primitive(), FiniteElementBase<dim>::ExcFENotPrimitive());
+  Assert (fe.is_primitive(), typename FiniteElementBase<dim>::ExcFENotPrimitive());
   Assert (row_lengths.size() == dofs.n_dofs(),
 	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
   Assert (couplings.n_rows()==fe.n_components(),
@@ -330,7 +330,7 @@ DoFTools::compute_row_length_vector(
   const Table<2,Coupling>& flux_couplings)
 {
   const FiniteElement<dim>& fe = dofs.get_fe();
-  Assert (fe.is_primitive(), FiniteElementBase<dim>::ExcFENotPrimitive());
+  Assert (fe.is_primitive(), typename FiniteElementBase<dim>::ExcFENotPrimitive());
   Assert (row_lengths.size() == dofs.n_dofs(),
 	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
   Assert (couplings.n_rows()==fe.n_components(),
