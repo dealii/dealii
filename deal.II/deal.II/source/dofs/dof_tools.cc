@@ -83,7 +83,6 @@ compute_row_length_vector(const DoFHandler<dim>     &dofs,
 
 
 // Specialization for 1D
-//TODO:[GK] Implement this.
 template <int dim>
 void
 DoFTools::compute_row_length_vector(
