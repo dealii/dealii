@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/table.h>
 #include <dofs/function_map.h>
 
 #include <vector>
@@ -1590,7 +1591,7 @@ DoFTools::make_sparsity_pattern (
     Assert (mask[i].size() == ncomp,
 	    ExcDimensionMismatch(mask[i].size(), ncomp));
 				   // Create a coupling table out of the mask
-  Table<2, Coupling> couplings(ncomp, ncomp);
+  Table<2,DoFTools::Coupling> couplings(ncomp, ncomp);  
   for (unsigned int i=0;i<ncomp;++i)
     for (unsigned int j=0;j<ncomp;++j)
       if (mask[i][j])
@@ -1601,7 +1602,6 @@ DoFTools::make_sparsity_pattern (
 
 
 template <int dim, class Comp>
-inline
 void
 DoFTools::map_support_points_to_dofs (
   const Mapping<dim>       &mapping,
