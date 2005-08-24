@@ -660,6 +660,11 @@ class FiniteElementBase : public Subscriptor,
 				      * FESystem class.
 				      */
     virtual std::string get_name () const = 0;
+
+				     /**
+				      * @name Shape function access
+				      * @{
+				      */
     
 				     /**
 				      * Return the value of the
@@ -814,7 +819,12 @@ class FiniteElementBase : public Subscriptor,
     virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
 						     const Point<dim>   &p,
 						     const unsigned int component) const;
-
+				     //@}
+				     /**
+				      * @name Transfer and constraint matrices
+				      * @{
+				      */
+    
 				     /**
 				      * Projection from a fine grid
 				      * space onto a coarse grid
@@ -960,6 +970,18 @@ class FiniteElementBase : public Subscriptor,
                                       */
     bool restriction_is_implemented () const;
 
+				     /**
+				      * Access the
+				      * @p restriction_is_additive_flag
+				      * field. See there for more
+				      * information on its contents.
+				      *
+				      * The index must be between zero
+				      * and the number of shape
+				      * functions of this element.
+				      */
+    bool restriction_is_additive (const unsigned int index) const;
+
     				     /**
 				      * Return a readonly reference to
 				      * the matrix which describes the
@@ -1045,7 +1067,8 @@ class FiniteElementBase : public Subscriptor,
     virtual void
     get_interpolation_matrix (const FiniteElementBase<dim> &source,
 			      FullMatrix<double>           &matrix) const;
-      
+				     //@}
+    
 				     /**
 				      * Comparison operator. We also
 				      * check for equality of the
@@ -1065,7 +1088,10 @@ class FiniteElementBase : public Subscriptor,
 				      */
     bool operator == (const FiniteElementBase<dim> &) const;
 
-
+				     /**
+				      * @name Index computations
+				      * @{
+				      */
 				     /**
 				      * Compute vector component and
 				      * index of this shape function
@@ -1220,19 +1246,8 @@ class FiniteElementBase : public Subscriptor,
 				      */
     std::pair<unsigned int,unsigned int>
     component_to_base (const unsigned int component) const;
-
-				     /**
-				      * Access the
-				      * @p restriction_is_additive_flag
-				      * field. See there for more
-				      * information on its contents.
-				      *
-				      * The index must be between zero
-				      * and the number of shape
-				      * functions of this element.
-				      */
-    bool restriction_is_additive (const unsigned int index) const;
-
+				     //@}
+    
 				     /**
 				      * @name Support points and interpolation
 				      * @{
