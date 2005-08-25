@@ -177,8 +177,6 @@ FE_PolyTensor<POLY,dim>::get_data (const UpdateFlags      update_flags,
 
   const UpdateFlags flags(data->update_flags);
   const unsigned int n_q_points = quadrature.n_quadrature_points;
-  double d;
-  d = floor (1.3);
   
 				   // some scratch arrays
   std::vector<Tensor<1,dim> > values(0);
