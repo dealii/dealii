@@ -254,6 +254,7 @@ const char * ExceptionBase::what () const throw ()
 
       std::abort ();
     }
+  return 0;
 }
 
 
