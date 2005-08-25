@@ -203,7 +203,8 @@ template <int dim>
 FiniteElement<dim>::FiniteElement (const FiniteElement<dim> &)
 		:
 		Subscriptor(),
-		FiniteElementData<dim>()
+		FiniteElementData<dim>(),
+                cached_primitivity (false)
 {
   Assert (false,
           ExcMessage ("Finite element objects don't support copying "
