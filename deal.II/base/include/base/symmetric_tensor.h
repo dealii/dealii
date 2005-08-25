@@ -28,6 +28,8 @@ template <int dim2> double trace (const SymmetricTensor<2,dim2> &);
 
 template <int dim> SymmetricTensor<2,dim>
 deviator (const SymmetricTensor<2,dim> &);
+template <int dim> double
+determinant (const SymmetricTensor<2,dim> &);
 
 
 namespace internal
@@ -889,11 +891,8 @@ class SymmetricTensor
     template <int dim2>
     friend double trace (const SymmetricTensor<2,dim2> &d);
 
-    friend double determinant (const SymmetricTensor<2,1> &t);
-    
-    friend double determinant (const SymmetricTensor<2,2> &t);
-
-    friend double determinant (const SymmetricTensor<2,3> &t);
+    template <int dim2>
+    friend double determinant (const SymmetricTensor<2,dim2> &t);
     
     template <int dim2>
     friend SymmetricTensor<2,dim2>
@@ -1899,6 +1898,7 @@ SymmetricTensor<4,3>::norm () const
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
+template <>
 inline
 double determinant (const SymmetricTensor<2,1> &t)
 {
@@ -1917,6 +1917,7 @@ double determinant (const SymmetricTensor<2,1> &t)
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
+template <>
 inline
 double determinant (const SymmetricTensor<2,2> &t)
 {
@@ -1936,6 +1937,7 @@ double determinant (const SymmetricTensor<2,2> &t)
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
+template <>
 inline
 double determinant (const SymmetricTensor<2,3> &t)
 {
