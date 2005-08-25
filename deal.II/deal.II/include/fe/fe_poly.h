@@ -42,7 +42,7 @@
  *
  * This class is not a fully implemented FiniteElement class. Instead
  * there are several pure virtual functions declared in the
- * FiniteElement and FiniteElementBase classes which cannot
+ * FiniteElement and FiniteElement classes which cannot
  * implemented by this class but are left for implementation in
  * derived classes.
  *
@@ -83,7 +83,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * Return the value of the
 				      * <tt>i</tt>th shape function at
 				      * the point <tt>p</tt>. See the
-				      * FiniteElementBase base class
+				      * FiniteElement base class
 				      * for more information about the
 				      * semantics of this function.
 				      */
@@ -96,7 +96,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * component of the <tt>i</tt>th
 				      * shape function at the point
 				      * <tt>p</tt>. See the
-				      * FiniteElementBase base class
+				      * FiniteElement base class
 				      * for more information about the
 				      * semantics of this function.
 				      *
@@ -115,7 +115,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * Return the gradient of the
 				      * <tt>i</tt>th shape function at
 				      * the point <tt>p</tt>. See the
-				      * FiniteElementBase base class
+				      * FiniteElement base class
 				      * for more information about the
 				      * semantics of this function.
 				      */
@@ -128,7 +128,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * component of the <tt>i</tt>th
 				      * shape function at the point
 				      * <tt>p</tt>. See the
-				      * FiniteElementBase base class
+				      * FiniteElement base class
 				      * for more information about the
 				      * semantics of this function.
 				      *
@@ -149,7 +149,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * <tt>i</tt>th shape function at
 				      * point <tt>p</tt> on the unit
 				      * cell. See the
-				      * FiniteElementBase base class
+				      * FiniteElement base class
 				      * for more information about the
 				      * semantics of this function.
 				      */
@@ -162,7 +162,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * vector component of the
 				      * <tt>i</tt>th shape function at
 				      * the point <tt>p</tt>. See the
-				      * FiniteElementBase base class
+				      * FiniteElement base class
 				      * for more information about the
 				      * semantics of this function.
 				      *
@@ -336,7 +336,7 @@ class FE_Poly : public FiniteElement<dim>
 				      * see the documentation of the
 				      * base class.
 				      */
-    class InternalData : public FiniteElementBase<dim>::InternalDataBase
+    class InternalData : public FiniteElement<dim>::InternalDataBase
     {
       public:
 					 /**

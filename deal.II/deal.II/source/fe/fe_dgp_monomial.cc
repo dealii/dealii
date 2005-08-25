@@ -179,7 +179,7 @@ FE_DGPMonomial<dim>::clone() const
 template <int dim>
 void
 FE_DGPMonomial<dim>::
-get_interpolation_matrix (const FiniteElementBase<dim> &source_fe,
+get_interpolation_matrix (const FiniteElement<dim> &source_fe,
 			  FullMatrix<double>           &interpolation_matrix) const
 {  
   const FE_DGPMonomial<dim> *source_dgp_monomial

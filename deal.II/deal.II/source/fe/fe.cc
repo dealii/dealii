@@ -29,16 +29,16 @@
 
 
 
-/*------------------------------- FiniteElementBase ----------------------*/
+/*------------------------------- FiniteElement ----------------------*/
 
 
 template <int dim>
-const double FiniteElementBase<dim>::fd_step_length = 1.0e-6;
+const double FiniteElement<dim>::fd_step_length = 1.0e-6;
 
 
 template <int dim>
 void
-FiniteElementBase<dim>::
+FiniteElement<dim>::
 InternalDataBase::initialize_2nd (const FiniteElement<dim> *element,
 				  const Mapping<dim>       &mapping,
 				  const Quadrature<dim>    &quadrature)
@@ -89,7 +89,7 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim> *element,
 
 
 template <int dim>
-FiniteElementBase<dim>::InternalDataBase::~InternalDataBase ()
+FiniteElement<dim>::InternalDataBase::~InternalDataBase ()
 {
   for (unsigned int i=0; i<differences.size (); ++i)
     if (differences[i] != 0)
@@ -106,7 +106,7 @@ FiniteElementBase<dim>::InternalDataBase::~InternalDataBase ()
 
 
 template <int dim>
-FiniteElementBase<dim>::FiniteElementBase (
+FiniteElement<dim>::FiniteElement (
   const FiniteElementData<dim> &fe_data,
   const std::vector<bool> &r_i_a_f,
   const std::vector<std::vector<bool> > &nonzero_c)
@@ -200,8 +200,30 @@ FiniteElementBase<dim>::FiniteElementBase (
 
 
 template <int dim>
+FiniteElement<dim>::FiniteElement (const FiniteElement<dim> &)
+		:
+		Subscriptor(),
+		FiniteElementData<dim>()
+{
+  Assert (false,
+          ExcMessage ("Finite element objects don't support copying "
+                      "semantics through the copy constructor. If "
+                      "you want to copy a finite element, use the "
+                      "clone() function."));
+}
+
+
+
+template <int dim>
+FiniteElement<dim>::~FiniteElement ()
+{}
+
+
+
+
+template <int dim>
 double
-FiniteElementBase<dim>::shape_value (const unsigned int,
+FiniteElement<dim>::shape_value (const unsigned int,
 				     const Point<dim> &) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
@@ -212,7 +234,7 @@ FiniteElementBase<dim>::shape_value (const unsigned int,
 
 template <int dim>
 double
-FiniteElementBase<dim>::shape_value_component (const unsigned int,
+FiniteElement<dim>::shape_value_component (const unsigned int,
 					       const Point<dim> &,
 					       const unsigned int) const
 {
@@ -224,7 +246,7 @@ FiniteElementBase<dim>::shape_value_component (const unsigned int,
 
 template <int dim>
 Tensor<1,dim>
-FiniteElementBase<dim>::shape_grad (const unsigned int,
+FiniteElement<dim>::shape_grad (const unsigned int,
 				    const Point<dim> &) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
@@ -235,7 +257,7 @@ FiniteElementBase<dim>::shape_grad (const unsigned int,
 
 template <int dim>
 Tensor<1,dim>
-FiniteElementBase<dim>::shape_grad_component (const unsigned int,
+FiniteElement<dim>::shape_grad_component (const unsigned int,
 					      const Point<dim> &,
 					      const unsigned int) const
 {
@@ -247,7 +269,7 @@ FiniteElementBase<dim>::shape_grad_component (const unsigned int,
 
 template <int dim>
 Tensor<2,dim>
-FiniteElementBase<dim>::shape_grad_grad (const unsigned int,
+FiniteElement<dim>::shape_grad_grad (const unsigned int,
 					 const Point<dim> &) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
@@ -258,7 +280,7 @@ FiniteElementBase<dim>::shape_grad_grad (const unsigned int,
 
 template <int dim>
 Tensor<2,dim>
-FiniteElementBase<dim>::shape_grad_grad_component (const unsigned int,
+FiniteElement<dim>::shape_grad_grad_component (const unsigned int,
 						   const Point<dim> &,
 						   const unsigned int) const
 {
@@ -269,7 +291,7 @@ FiniteElementBase<dim>::shape_grad_grad_component (const unsigned int,
 
 template <int dim>
 const FullMatrix<double> &
-FiniteElementBase<dim>::get_restriction_matrix (const unsigned int child) const
+FiniteElement<dim>::get_restriction_matrix (const unsigned int child) const
 {
   Assert (child<GeometryInfo<dim>::children_per_cell,
 	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
@@ -281,7 +303,7 @@ FiniteElementBase<dim>::get_restriction_matrix (const unsigned int child) const
 
 template <int dim>
 const FullMatrix<double> &
-FiniteElementBase<dim>::get_prolongation_matrix (const unsigned int child) const
+FiniteElement<dim>::get_prolongation_matrix (const unsigned int child) const
 {
   Assert (child<GeometryInfo<dim>::children_per_cell,
 	  ExcIndexRange(child, 0, GeometryInfo<dim>::children_per_cell));
@@ -292,7 +314,7 @@ FiniteElementBase<dim>::get_prolongation_matrix (const unsigned int child) const
 
 template <int dim>
 bool
-FiniteElementBase<dim>::prolongation_is_implemented () const
+FiniteElement<dim>::prolongation_is_implemented () const
 {
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
     {
@@ -313,7 +335,7 @@ FiniteElementBase<dim>::prolongation_is_implemented () const
 
 template <int dim>
 bool
-FiniteElementBase<dim>::restriction_is_implemented () const
+FiniteElement<dim>::restriction_is_implemented () const
 {
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
     {
@@ -334,7 +356,7 @@ FiniteElementBase<dim>::restriction_is_implemented () const
 
 template <int dim>
 bool
-FiniteElementBase<dim>::constraints_are_implemented () const
+FiniteElement<dim>::constraints_are_implemented () const
 {
   return (this->dofs_per_face  == 0) || (interface_constraints.m() != 0);
 }
@@ -343,7 +365,7 @@ FiniteElementBase<dim>::constraints_are_implemented () const
 
 template <int dim>
 const FullMatrix<double> &
-FiniteElementBase<dim>::constraints () const
+FiniteElement<dim>::constraints () const
 {
   Assert ((this->dofs_per_face  == 0) || (interface_constraints.m() != 0),
           ExcConstraintsVoid());
@@ -360,7 +382,7 @@ FiniteElementBase<dim>::constraints () const
 
 template <int dim>
 TableIndices<2>
-FiniteElementBase<dim>::interface_constraints_size () const 
+FiniteElement<dim>::interface_constraints_size () const 
 {
   switch (dim)
     {
@@ -386,15 +408,15 @@ FiniteElementBase<dim>::interface_constraints_size () const
 
 template <int dim>
 void
-FiniteElementBase<dim>::
-get_interpolation_matrix (const FiniteElementBase<dim> &,
+FiniteElement<dim>::
+get_interpolation_matrix (const FiniteElement<dim> &,
 			  FullMatrix<double>           &) const
 {
 				   // by default, no interpolation
 				   // implemented. so throw exception,
 				   // as documentation says
   AssertThrow (false,
-               typename FiniteElementBase<dim>::
+               typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
 }
 
@@ -403,7 +425,7 @@ get_interpolation_matrix (const FiniteElementBase<dim> &,
 
 template <int dim>
 bool
-FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
+FiniteElement<dim>::operator == (const FiniteElement<dim> &f) const
 {
   return ((static_cast<const FiniteElementData<dim>&>(*this) ==
 	   static_cast<const FiniteElementData<dim>&>(f)) &&
@@ -414,7 +436,7 @@ FiniteElementBase<dim>::operator == (const FiniteElementBase<dim> &f) const
 
 template <int dim>
 const std::vector<Point<dim> > &
-FiniteElementBase<dim>::get_unit_support_points () const
+FiniteElement<dim>::get_unit_support_points () const
 {
 				   // a finite element may define
 				   // support points, but only if
@@ -430,7 +452,7 @@ FiniteElementBase<dim>::get_unit_support_points () const
 
 template <int dim>
 bool
-FiniteElementBase<dim>::has_support_points () const
+FiniteElement<dim>::has_support_points () const
 {
   return (unit_support_points.size() != 0);
 }
@@ -439,7 +461,7 @@ FiniteElementBase<dim>::has_support_points () const
 
 template <int dim>
 const std::vector<Point<dim> > &
-FiniteElementBase<dim>::get_generalized_support_points () const
+FiniteElement<dim>::get_generalized_support_points () const
 {
 				   // a finite element may define
 				   // support points, but only if
@@ -455,7 +477,7 @@ FiniteElementBase<dim>::get_generalized_support_points () const
 
 template <int dim>
 bool
-FiniteElementBase<dim>::has_generalized_support_points () const
+FiniteElement<dim>::has_generalized_support_points () const
 {
   return (generalized_support_points.size() != 0);
 }
@@ -464,7 +486,7 @@ FiniteElementBase<dim>::has_generalized_support_points () const
 
 template <int dim>
 Point<dim>
-FiniteElementBase<dim>::unit_support_point (const unsigned index) const
+FiniteElement<dim>::unit_support_point (const unsigned index) const
 {
   Assert (index < this->dofs_per_cell,
           ExcIndexRange (index, 0, this->dofs_per_cell));
@@ -477,7 +499,7 @@ FiniteElementBase<dim>::unit_support_point (const unsigned index) const
 
 template <int dim>
 const std::vector<Point<dim-1> > &
-FiniteElementBase<dim>::get_unit_face_support_points () const
+FiniteElement<dim>::get_unit_face_support_points () const
 {
 				   // a finite element may define
 				   // support points, but only if
@@ -493,7 +515,7 @@ FiniteElementBase<dim>::get_unit_face_support_points () const
 
 template <int dim>
 bool
-FiniteElementBase<dim>::has_face_support_points () const
+FiniteElement<dim>::has_face_support_points () const
 {
   return (unit_face_support_points.size() != 0);
 }
@@ -502,7 +524,7 @@ FiniteElementBase<dim>::has_face_support_points () const
 
 template <int dim>
 const std::vector<Point<dim-1> > &
-FiniteElementBase<dim>::get_generalized_face_support_points () const
+FiniteElement<dim>::get_generalized_face_support_points () const
 {
 				   // a finite element may define
 				   // support points, but only if
@@ -518,7 +540,7 @@ FiniteElementBase<dim>::get_generalized_face_support_points () const
 
 template <int dim>
 bool
-FiniteElementBase<dim>::has_generalized_face_support_points () const
+FiniteElement<dim>::has_generalized_face_support_points () const
 {
   return (generalized_face_support_points.size() != 0);
 }
@@ -527,7 +549,7 @@ FiniteElementBase<dim>::has_generalized_face_support_points () const
 
 template <int dim>
 Point<dim-1>
-FiniteElementBase<dim>::unit_face_support_point (const unsigned index) const
+FiniteElement<dim>::unit_face_support_point (const unsigned index) const
 {
   Assert (index < this->dofs_per_face,
           ExcIndexRange (index, 0, this->dofs_per_face));
@@ -540,7 +562,7 @@ FiniteElementBase<dim>::unit_face_support_point (const unsigned index) const
 
 template <int dim>
 void
-FiniteElementBase<dim>::interpolate(
+FiniteElement<dim>::interpolate(
   std::vector<double>&       local_dofs,
   const std::vector<double>& values) const
 {
@@ -562,7 +584,7 @@ FiniteElementBase<dim>::interpolate(
 
 template <int dim>
 void
-FiniteElementBase<dim>::interpolate(
+FiniteElement<dim>::interpolate(
   std::vector<double>&    local_dofs,
   const std::vector<Vector<double> >& values,
   unsigned int offset) const
@@ -588,7 +610,7 @@ FiniteElementBase<dim>::interpolate(
 
 template <int dim>
 void
-FiniteElementBase<dim>::interpolate(
+FiniteElement<dim>::interpolate(
   std::vector<double>& local_dofs,
   const VectorSlice<const std::vector<std::vector<double> > >& values) const
 {
@@ -613,7 +635,7 @@ FiniteElementBase<dim>::interpolate(
 
 template <int dim>
 unsigned int
-FiniteElementBase<dim>::memory_consumption () const
+FiniteElement<dim>::memory_consumption () const
 {
   return (sizeof(FiniteElementData<dim>) +
 	  MemoryConsumption::
@@ -637,7 +659,7 @@ FiniteElementBase<dim>::memory_consumption () const
 
 template <int dim>
 void
-FiniteElementBase<dim>::
+FiniteElement<dim>::
 compute_2nd (const Mapping<dim>                   &mapping,
 	     const typename Triangulation<dim>::cell_iterator &cell,
 	     const unsigned int,
@@ -780,7 +802,7 @@ compute_2nd (const Mapping<dim>                   &mapping,
 
 template <int dim>
 std::vector<unsigned int>
-FiniteElementBase<dim>::compute_n_nonzero_components (
+FiniteElement<dim>::compute_n_nonzero_components (
   const std::vector<std::vector<bool> > &nonzero_components)
 {
   std::vector<unsigned int> retval (nonzero_components.size());
@@ -794,40 +816,6 @@ FiniteElementBase<dim>::compute_n_nonzero_components (
 
 
 /*------------------------------- FiniteElement ----------------------*/
-
-template <int dim>
-FiniteElement<dim>::FiniteElement (const FiniteElementData<dim> &fe_data,
-				   const std::vector<bool> &restriction_is_additive_flags,
-				   const std::vector<std::vector<bool> > &nonzero_components)
-                :
-		FiniteElementBase<dim> (fe_data,
-					restriction_is_additive_flags,
-					nonzero_components)
-{}
-
-
-
-template <int dim>
-FiniteElement<dim>::FiniteElement (const FiniteElement<dim> &)
-                :
-                FiniteElementBase<dim> (FiniteElementData<dim>(),
-                                        std::vector<bool> (),
-                                        std::vector<std::vector<bool> >())
-{
-  Assert (false,
-          ExcMessage ("Finite element objects don't support copying "
-                      "semantics through the copy constructor. If "
-                      "you want to copy a finite element, use the "
-                      "clone() function."));
-}
-
-
-
-template <int dim>
-FiniteElement<dim>::~FiniteElement ()
-{}
-
-
 
 template <int dim>
 typename Mapping<dim>::InternalDataBase *
@@ -854,16 +842,6 @@ FiniteElement<dim>::get_subface_data (const UpdateFlags        flags,
 
 
 template <int dim>
-unsigned int
-FiniteElement<dim>::memory_consumption () const
-{
-  return FiniteElementBase<dim>::memory_consumption ();
-}
-
-
-
-
-template <int dim>
 const FiniteElement<dim>&
 FiniteElement<dim>::base_element(const unsigned index) const
 {
@@ -873,5 +851,4 @@ FiniteElement<dim>::base_element(const unsigned index) const
 
 /*------------------------------- Explicit Instantiations -------------*/
 
-template class FiniteElementBase<deal_II_dimension>;
 template class FiniteElement<deal_II_dimension>;

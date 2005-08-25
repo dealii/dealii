@@ -269,11 +269,11 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * element is also a @p FE_Q
 				      * element. Otherwise, an
 				      * exception of type
-				      * FiniteElementBase<dim>::ExcInterpolationNotImplemented
+				      * FiniteElement<dim>::ExcInterpolationNotImplemented
 				      * is thrown.
 				      */
     virtual void
-    get_interpolation_matrix (const FiniteElementBase<dim> &source,
+    get_interpolation_matrix (const FiniteElement<dim> &source,
 			      FullMatrix<double>           &matrix) const;
     
 				     /**
@@ -364,7 +364,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				     /**
 				      * Initialize the
 				      * @p unit_support_points field
-				      * of the FiniteElementBase
+				      * of the FiniteElement
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -373,7 +373,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				     /**
 				      * Initialize the
 				      * @p unit_face_support_points field
-				      * of the FiniteElementBase
+				      * of the FiniteElement
 				      * class. Called from the
 				      * constructor.
 				      */

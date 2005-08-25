@@ -287,7 +287,7 @@ FE_RaviartThomas<dim>::shape_grad_grad_component (const unsigned int i,
 template <>
 void
 FE_RaviartThomas<1>::
-get_interpolation_matrix (const FiniteElementBase<1> &,
+get_interpolation_matrix (const FiniteElement<1> &,
 			  FullMatrix<double>         &) const
 {
   Assert (false, ExcImpossibleInDim(1));
@@ -299,7 +299,7 @@ get_interpolation_matrix (const FiniteElementBase<1> &,
 template <int dim>
 void
 FE_RaviartThomas<dim>::
-get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
+get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 			  FullMatrix<double>           &interpolation_matrix) const
 {
 				   // this is only implemented, if the
@@ -310,7 +310,7 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
   AssertThrow ((x_source_fe.get_name().find ("FE_RaviartThomas<") == 0)
                ||
                (dynamic_cast<const FE_RaviartThomas<dim>*>(&x_source_fe) != 0),
-               typename FiniteElementBase<dim>::
+               typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
   
 				   // ok, source is a RT element, so

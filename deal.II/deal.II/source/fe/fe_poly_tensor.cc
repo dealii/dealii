@@ -40,7 +40,7 @@ double
 FE_PolyTensor<POLY,dim>::shape_value (
   const unsigned int, const Point<dim> &) const
 {
-  Assert(false, typename FiniteElementBase<dim>::ExcFENotPrimitive());
+  Assert(false, typename FiniteElement<dim>::ExcFENotPrimitive());
   return 0.;
 }
 
@@ -78,7 +78,7 @@ Tensor<1,dim>
 FE_PolyTensor<POLY,dim>::shape_grad (
   const unsigned int, const Point<dim> &) const
 {
-  Assert(false, typename FiniteElementBase<dim>::ExcFENotPrimitive());
+  Assert(false, typename FiniteElement<dim>::ExcFENotPrimitive());
   return Tensor<1,dim>();
 }
 
@@ -118,7 +118,7 @@ Tensor<2,dim>
 FE_PolyTensor<POLY,dim>::shape_grad_grad (
   const unsigned int, const Point<dim> &) const
 {
-  Assert(false, typename FiniteElementBase<dim>::ExcFENotPrimitive());
+  Assert(false, typename FiniteElement<dim>::ExcFENotPrimitive());
   return Tensor<2,dim>();
 }
 

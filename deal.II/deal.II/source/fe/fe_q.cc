@@ -249,7 +249,7 @@ FE_Q<dim>::clone() const
 template <int dim>
 void
 FE_Q<dim>::
-get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
+get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 			  FullMatrix<double>           &interpolation_matrix) const
 {
 				   // this is only implemented, if the
@@ -258,7 +258,7 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
   AssertThrow ((x_source_fe.get_name().find ("FE_Q<") == 0)
                ||
                (dynamic_cast<const FE_Q<dim>*>(&x_source_fe) != 0),
-               typename FiniteElementBase<dim>::
+               typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
   
 				   // ok, source is a Q element, so
@@ -607,7 +607,7 @@ FE_Q<3>::initialize_constraints ()
 				   // In the following the points x_i
 				   // are constructed in the order as
 				   // described in the documentation
-				   // of the FiniteElementBase class
+				   // of the FiniteElement class
 				   // (fe_base.h), i.e.
 				   //   *--13--3--14--*
 				   //   |      |      |
@@ -765,7 +765,7 @@ FE_Q<3>::initialize_constraints ()
                                            //
                                            // For a different explanation of
                                            // the problem, see the discussion
-                                           // in the FiniteElementBase class
+                                           // in the FiniteElement class
                                            // for constraint matrices in 3d.
           mirror[k] = (constraint_point(k) > 0.5);
           if (mirror[k])

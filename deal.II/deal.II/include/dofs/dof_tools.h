@@ -130,7 +130,7 @@ template <int dim> class Mapping;
  * this is the point where it has the function value 1), is
  * located on the boundary. We do not check this directly, the
  * criterion is rather defined through the information the finite
- * element class gives: the FiniteElementBase class defines the
+ * element class gives: the FiniteElement class defines the
  * numbers of basis functions per vertex, per line, and so on and the
  * basis functions are numbered after this information; a basis
  * function is to be considered to be on the face of a cell (and thus

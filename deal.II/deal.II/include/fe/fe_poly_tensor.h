@@ -318,7 +318,7 @@ class FE_PolyTensor : public FiniteElement<dim>
 				      * accessed by indices
 				      * <i>(i,k)</i>.
 				      */
-    class InternalData : public FiniteElementBase<dim>::InternalDataBase
+    class InternalData : public FiniteElement<dim>::InternalDataBase
     {
       public:
 					 /**

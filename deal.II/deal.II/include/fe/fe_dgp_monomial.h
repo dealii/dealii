@@ -68,11 +68,11 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
 				      * element is also a @p FE_Q
 				      * element. Otherwise, an
 				      * exception of type
-				      * FiniteElementBase<dim>::ExcInterpolationNotImplemented
+				      * FiniteElement<dim>::ExcInterpolationNotImplemented
 				      * is thrown.
 				      */
     virtual void
-    get_interpolation_matrix (const FiniteElementBase<dim> &source,
+    get_interpolation_matrix (const FiniteElement<dim> &source,
 			      FullMatrix<double>           &matrix) const;
     
 				     /**

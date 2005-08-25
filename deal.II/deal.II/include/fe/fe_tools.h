@@ -195,7 +195,7 @@ class FETools
 				      * @param matrices A pointer to
 				      * <i>2<sup>dim</sup></i> FullMatrix
 				      * objects. This is the format
-				      * used in FiniteElementBase,
+				      * used in FiniteElement,
 				      * where we want to use ths
 				      * function mostly.
 				      */
@@ -241,7 +241,7 @@ class FETools
 				      * matrices.  @arg matrices A pointer to
 				      * <tt>GeometryInfo::children_per_cell</tt>=2<sup>dim</sup>
 				      * FullMatrix objects. This is the format
-				      * used in FiniteElementBase, where we
+				      * used in FiniteElement, where we
 				      * want to use this function mostly.
 				      */
     template <int dim, typename number>

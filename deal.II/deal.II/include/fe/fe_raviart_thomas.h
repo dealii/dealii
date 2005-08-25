@@ -163,7 +163,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      * component of the @p ith shape
 				      * function at the point
 				      * @p p. See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -178,7 +178,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      * component of the @p ith shape
 				      * function at the point
 				      * @p p. See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -193,7 +193,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      * component of the @p ith shape
 				      * function at the point
 				      * @p p. See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -237,11 +237,11 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      * element is also a Raviart
 				      * Thomas element. Otherwise, an
 				      * exception of type
-				      * FiniteElementBase<dim>::ExcInterpolationNotImplemented
+				      * FiniteElement<dim>::ExcInterpolationNotImplemented
 				      * is thrown.
 				      */
     virtual void
-    get_interpolation_matrix (const FiniteElementBase<dim> &source,
+    get_interpolation_matrix (const FiniteElement<dim> &source,
 			      FullMatrix<double>           &matrix) const;
 
 				     /**
@@ -439,7 +439,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				     /**
 				      * Initialize the
 				      * @p unit_support_points field
-				      * of the FiniteElementBase
+				      * of the FiniteElement
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -448,7 +448,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				     /**
 				      * Initialize the
 				      * @p unit_face_support_points field
-				      * of the FiniteElementBase
+				      * of the FiniteElement
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -501,7 +501,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      * see the documentation of the
 				      * base class.
 				      */
-    class InternalData : public FiniteElementBase<dim>::InternalDataBase
+    class InternalData : public FiniteElement<dim>::InternalDataBase
     {
       public:
 					 /**
@@ -655,8 +655,8 @@ class FE_RaviartThomasNodal
     get_ria_vector (const unsigned int degree);
     				     /**
 				      * Initialize the
-				      * FiniteElementBase<dim>::unit_support_points
-				      * and FiniteElementBase<dim>::unit_face_support_points
+				      * FiniteElement<dim>::unit_support_points
+				      * and FiniteElement<dim>::unit_face_support_points
 				      * fields. Called from the
 				      * constructor.
 				      */
@@ -739,7 +739,7 @@ FE_RaviartThomas<3>::initialize_restriction ();
 template <>
 void
 FE_RaviartThomas<1>::
-get_interpolation_matrix (const FiniteElementBase<1> &,
+get_interpolation_matrix (const FiniteElement<1> &,
 			  FullMatrix<double>         &) const;
 
 /// @endif

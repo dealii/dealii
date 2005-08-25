@@ -70,7 +70,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * Return the value of the
 				      * @p ith shape function at the
 				      * point @p p. See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -84,7 +84,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * component of the @p ith shape
 				      * function at the point
 				      * @p p. See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -104,7 +104,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * Return the gradient of the
 				      * @p ith shape function at the
 				      * point @p p. See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -118,7 +118,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * component of the @p ith shape
 				      * function at the point
 				      * @p p. See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -139,7 +139,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * derivatives of the @p ith
 				      * shape function at point @p p
 				      * on the unit cell.  See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -153,7 +153,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * component of the @p ith shape
 				      * function at the point
 				      * @p p. See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -418,7 +418,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * see the documentation of the
 				      * base class.
 				      */
-    class InternalData : public FiniteElementBase<dim>::InternalDataBase
+    class InternalData : public FiniteElement<dim>::InternalDataBase
     {
       public:
 				       // have some scratch arrays

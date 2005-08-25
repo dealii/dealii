@@ -298,7 +298,7 @@ void FETools::get_interpolation_matrix (const FiniteElement<dim> &fe1,
     {
       gim_forwarder (fe1, fe2, interpolation_matrix);
     }
-  catch (typename FiniteElementBase<dim>::ExcInterpolationNotImplemented &)
+  catch (typename FiniteElement<dim>::ExcInterpolationNotImplemented &)
     {
                                        // too bad....
       fe_implements_interpolation = false;
@@ -321,7 +321,7 @@ void FETools::get_interpolation_matrix (const FiniteElement<dim> &fe1,
     fe2_support_points = fe2.get_unit_support_points ();
 
   Assert(fe2_support_points.size()==fe2.dofs_per_cell,
-	 typename FiniteElementBase<dim>::ExcFEHasNoSupportPoints());
+	 typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
 
   for (unsigned int i=0; i<fe2.dofs_per_cell; ++i)	
     {

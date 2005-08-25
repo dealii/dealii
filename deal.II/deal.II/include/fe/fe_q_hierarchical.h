@@ -409,7 +409,7 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				     /**
 				      * Initialize the
 				      * @p unit_support_points field
-				      * of the FiniteElementBase
+				      * of the FiniteElement
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -418,7 +418,7 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				     /**
 				      * Initialize the
 				      * @p unit_face_support_points field
-				      * of the FiniteElementBase
+				      * of the FiniteElement
 				      * class. Called from the
 				      * constructor.
 				      */

@@ -62,7 +62,7 @@ FESystem<dim>::InternalData::~InternalData()
 
 
 template <int dim>
-typename FiniteElementBase<dim>::InternalDataBase &
+typename FiniteElement<dim>::InternalDataBase &
 FESystem<dim>::
 InternalData::get_fe_data (const unsigned int base_no) const
 {
@@ -77,7 +77,7 @@ template <int dim>
 void
 FESystem<dim>::
 InternalData::set_fe_data (const unsigned int base_no,
-			   typename FiniteElementBase<dim>::InternalDataBase *ptr)
+			   typename FiniteElement<dim>::InternalDataBase *ptr)
 {
   Assert(base_no<base_fe_datas.size(),
 	 ExcIndexRange(base_no,0,base_fe_datas.size()));
@@ -132,7 +132,7 @@ FESystem<dim>::InternalData::clear_first_cell ()
 {
                                    // call respective function of base
                                    // class
-  FiniteElementBase<dim>::InternalDataBase::clear_first_cell ();
+  FiniteElement<dim>::InternalDataBase::clear_first_cell ();
                                    // then the functions of all the
                                    // sub-objects
   for (unsigned int i=0; i<base_fe_datas.size(); ++i)
@@ -299,7 +299,7 @@ FESystem<dim>::shape_value (const unsigned int i,
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (this->is_primitive(i), 
-	  typename FiniteElementBase<dim>::ExcShapeFunctionNotPrimitive(i));
+	  typename FiniteElement<dim>::ExcShapeFunctionNotPrimitive(i));
 
   return (base_element(this->system_to_base_table[i].first.first)
 	  .shape_value(this->system_to_base_table[i].second, p));
@@ -351,7 +351,7 @@ FESystem<dim>::shape_grad (const unsigned int i,
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (this->is_primitive(i),
-	  typename FiniteElementBase<dim>::ExcShapeFunctionNotPrimitive(i));
+	  typename FiniteElement<dim>::ExcShapeFunctionNotPrimitive(i));
 
   return (base_element(this->system_to_base_table[i].first.first)
 	  .shape_grad(this->system_to_base_table[i].second, p));
@@ -403,7 +403,7 @@ FESystem<dim>::shape_grad_grad (const unsigned int i,
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
   Assert (this->is_primitive(i), 
-	  typename FiniteElementBase<dim>::ExcShapeFunctionNotPrimitive(i));
+	  typename FiniteElement<dim>::ExcShapeFunctionNotPrimitive(i));
 
   return (base_element(this->system_to_base_table[i].first.first)
 	  .shape_grad_grad(this->system_to_base_table[i].second, p));
@@ -451,7 +451,7 @@ FESystem<dim>::shape_grad_grad_component (const unsigned int i,
 template <int dim>
 void
 FESystem<dim>::
-get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
+get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 			  FullMatrix<double>           &interpolation_matrix) const
 {
   Assert (interpolation_matrix.m() == this->dofs_per_cell,
@@ -470,7 +470,7 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
   AssertThrow ((x_source_fe.get_name().find ("FESystem<") == 0)
                ||
                (dynamic_cast<const FESystem<dim>*>(&x_source_fe) != 0),
-               typename FiniteElementBase<dim>::
+               typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
   
 				   // ok, source is a system element,
@@ -481,7 +481,7 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
                                    // condition 2: same number of
                                    // basis elements
   AssertThrow (n_base_elements() == source_fe.n_base_elements(),
-               typename FiniteElementBase<dim>::
+               typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
 
                                    // condition 3: same number of
@@ -489,7 +489,7 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
   for (unsigned int i=0; i<n_base_elements(); ++i)
     AssertThrow (element_multiplicity(i) ==
                  source_fe.element_multiplicity(i),
-                 typename FiniteElementBase<dim>::
+                 typename FiniteElement<dim>::
                  ExcInterpolationNotImplemented());
 
                                    // ok, so let's try whether it
@@ -617,8 +617,8 @@ FESystem<dim>::get_data (const UpdateFlags      flags_,
       typename Mapping<dim>::InternalDataBase *base_fe_data_base =
 	base_element(base_no).get_data(sub_flags, mapping, quadrature);
 
-      typename FiniteElementBase<dim>::InternalDataBase *base_fe_data =
-	dynamic_cast<typename FiniteElementBase<dim>::InternalDataBase *>
+      typename FiniteElement<dim>::InternalDataBase *base_fe_data =
+	dynamic_cast<typename FiniteElement<dim>::InternalDataBase *>
 	(base_fe_data_base);
       
       data->set_fe_data(base_no, base_fe_data);
@@ -823,7 +823,7 @@ compute_fill (const Mapping<dim>                   &mapping,
 	{
 	  const FiniteElement<dim> &
             base_fe      = base_element(base_no);
-	  typename FiniteElementBase<dim>::InternalDataBase &
+	  typename FiniteElement<dim>::InternalDataBase &
 	    base_fe_data = fe_data.get_fe_data(base_no);
 	  FEValuesData<dim> &
             base_data    = fe_data.get_fe_values_data(base_no);
@@ -2389,7 +2389,7 @@ FESystem<dim>::unit_support_point (const unsigned index) const
           ExcIndexRange (index, 0, this->dofs_per_cell));
   Assert ((this->unit_support_points.size() == this->dofs_per_cell) ||
           (this->unit_support_points.size() == 0),
-          typename FiniteElementBase<dim>::ExcFEHasNoSupportPoints ());
+          typename FiniteElement<dim>::ExcFEHasNoSupportPoints ());
 
                                    // let's see whether we have the
                                    // information pre-computed
@@ -2413,7 +2413,7 @@ FESystem<dim>::unit_face_support_point (const unsigned index) const
           ExcIndexRange (index, 0, this->dofs_per_face));
   Assert ((this->unit_face_support_points.size() == this->dofs_per_face) ||
           (this->unit_face_support_points.size() == 0),
-          typename FiniteElementBase<dim>::ExcFEHasNoSupportPoints ());
+          typename FiniteElement<dim>::ExcFEHasNoSupportPoints ());
 
                                    // let's see whether we have the
                                    // information pre-computed

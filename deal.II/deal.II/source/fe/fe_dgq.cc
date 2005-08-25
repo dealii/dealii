@@ -361,7 +361,7 @@ FE_DGQ<dim>::rotate_indices (std::vector<unsigned int> &numbers,
 template <int dim>
 void
 FE_DGQ<dim>::
-get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
+get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 			  FullMatrix<double>           &interpolation_matrix) const
 {
 				   // this is only implemented, if the
@@ -370,7 +370,7 @@ get_interpolation_matrix (const FiniteElementBase<dim> &x_source_fe,
   AssertThrow ((x_source_fe.get_name().find ("FE_DGQ<") == 0)
                ||
                (dynamic_cast<const FE_DGQ<dim>*>(&x_source_fe) != 0),
-               typename FiniteElementBase<dim>::
+               typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
   
 				   // ok, source is a Q element, so

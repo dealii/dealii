@@ -115,11 +115,11 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * element is also a @p FE_DGQ
 				      * element. Otherwise, an
 				      * exception of type
-				      * FiniteElementBase<dim>::ExcInterpolationNotImplemented
+				      * FiniteElement<dim>::ExcInterpolationNotImplemented
 				      * is thrown.
 				      */
     virtual void
-    get_interpolation_matrix (const FiniteElementBase<dim> &source,
+    get_interpolation_matrix (const FiniteElement<dim> &source,
 			      FullMatrix<double>           &matrix) const;
     
 				     /**

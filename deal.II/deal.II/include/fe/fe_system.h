@@ -174,7 +174,7 @@ class FESystem : public FiniteElement<dim>
 				      * component of the @p ith shape
 				      * function at the point
 				      * @p p. See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -227,7 +227,7 @@ class FESystem : public FiniteElement<dim>
 				      * component of the @p ith shape
 				      * function at the point
 				      * @p p. See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -279,7 +279,7 @@ class FESystem : public FiniteElement<dim>
 				      * component of the @p ith shape
 				      * function at the point
 				      * @p p. See the
-				      * FiniteElementBase base
+				      * FiniteElement base
 				      * class for more information
 				      * about the semantics of this
 				      * function.
@@ -314,11 +314,11 @@ class FESystem : public FiniteElement<dim>
 				      * @p get_interpolation_matrix
 				      * functions. Otherwise, an
 				      * exception of type
-				      * FiniteElementBase<dim>::ExcInterpolationNotImplemented
+				      * FiniteElement<dim>::ExcInterpolationNotImplemented
 				      * is thrown.
 				      */
     virtual void
-    get_interpolation_matrix (const FiniteElementBase<dim> &source,
+    get_interpolation_matrix (const FiniteElement<dim> &source,
 			      FullMatrix<double>           &matrix) const;
 
                                      /** 
@@ -558,7 +558,7 @@ class FESystem : public FiniteElement<dim>
 				     /**
 				      * Initialize the
 				      * @p unit_support_points field
-				      * of the FiniteElementBase
+				      * of the FiniteElement
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -567,7 +567,7 @@ class FESystem : public FiniteElement<dim>
 				     /**
 				      * Initialize the
 				      * @p unit_face_support_points field
-				      * of the FiniteElementBase
+				      * of the FiniteElement
 				      * class. Called from the
 				      * constructor.
 				      */
@@ -743,7 +743,7 @@ class FESystem : public FiniteElement<dim>
 				      * @p InternalData objects for
 				      * each of the base elements.
 				      */
-    class InternalData : public FiniteElementBase<dim>::InternalDataBase
+    class InternalData : public FiniteElement<dim>::InternalDataBase
     {
       public:
 					 /**
@@ -780,7 +780,7 @@ class FESystem : public FiniteElement<dim>
 					  * element.
 					  */
 	void set_fe_data(const unsigned int                        base_no,
-			 typename FiniteElementBase<dim>::InternalDataBase *);
+			 typename FiniteElement<dim>::InternalDataBase *);
 
 					 /**
 					  * Gives read-access to the
@@ -788,7 +788,7 @@ class FESystem : public FiniteElement<dim>
 					  * @p InternalData of the
 					  * @p base_noth base element.
 					  */	
-	typename FiniteElementBase<dim>::InternalDataBase &
+	typename FiniteElement<dim>::InternalDataBase &
 	get_fe_data (const unsigned int base_no) const;
 
 
@@ -872,7 +872,7 @@ class FESystem : public FiniteElement<dim>
 					  * elements, irrespective of
 					  * their multiplicity.
 					  */
-	typename std::vector<typename FiniteElementBase<dim>::InternalDataBase *> base_fe_datas;
+	typename std::vector<typename FiniteElement<dim>::InternalDataBase *> base_fe_datas;
 
 					 /**
 					  * Pointers to the
