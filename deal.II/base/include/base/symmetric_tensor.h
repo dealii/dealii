@@ -2332,8 +2332,8 @@ invert (const SymmetricTensor<4,2> &t)
  * @author Wolfgang Bangerth, 2005
  */
 template <>
-SymmetricTensor<4,2>
-invert (const SymmetricTensor<4,2> &t);
+SymmetricTensor<4,3>
+invert (const SymmetricTensor<4,3> &t);
 // this function is implemented in the .cc file
 
 
