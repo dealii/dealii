@@ -8904,6 +8904,8 @@ if test "x$enableshared" = "xyes" ; then
   CXXFLAGSO="$CXXFLAGSO $CXXFLAGSPIC"
   F77FLAGSG="$F77FLAGSG $F77FLAGSPIC"
   F77FLAGSO="$F77FLAGSO $F77FLAGSPIC"
+else
+  LDFLAGS="$LDFLAGS -static"
 fi
 
 

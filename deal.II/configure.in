@@ -294,6 +294,11 @@ if test "x$enableshared" = "xyes" ; then
   CXXFLAGSO="$CXXFLAGSO $CXXFLAGSPIC"
   F77FLAGSG="$F77FLAGSG $F77FLAGSPIC"
   F77FLAGSO="$F77FLAGSO $F77FLAGSPIC"
+else
+dnl The gcc compiler needs -static for static linking. For the case
+dnl other compilers do not like this flag we should introduce a
+dnl LDFLAGSSTATIC variable and check -static through AC_TRY_LINK.
+  LDFLAGS="$LDFLAGS -static"
 fi
 
 AC_SUBST(enableshared)
