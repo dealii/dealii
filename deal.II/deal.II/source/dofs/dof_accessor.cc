@@ -22,6 +22,7 @@
 #include <dofs/dof_accessor.templates.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_levels.h>
+#include <grid/tria_boundary.h>
 #include <grid/tria_iterator.h>
 #include <grid/tria_iterator.templates.h>
 #include <fe/fe.h>
