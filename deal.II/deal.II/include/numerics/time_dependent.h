@@ -619,7 +619,7 @@ class TimeDependent
 				      * deleted) and transmit the number of
 				      * the present sweep to these objects.
 				      *
-				      * It also calls the @p init_for_sweep
+				      * It also calls the @p start_sweep
 				      * function of each time step object,
 				      * after the numbers above are set.
 				      *
