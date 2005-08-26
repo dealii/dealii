@@ -338,7 +338,6 @@ GeometryInfo<4>::face_to_cell_lines (const unsigned int,
 
 
 template <int dim>
-inline
 unsigned int
 GeometryInfo<dim>::face_to_cell_vertices (const unsigned int face,
 					  const unsigned int vertex,
