@@ -524,8 +524,12 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSO="$CXXFLAGS -D__sgi__ -O2 -no_auto_include -woff 1174,1552"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-KPIC"
-          dnl Avoid output of prelinker
-          LDFLAGS="$LDFLAGS -quiet_prelink"
+          dnl Avoid output of prelinker (-quiet_prelink)
+          dnl Disable compiler warning:
+          dnl ld32: WARNING 131: Multiply defined weak symbol:
+          dnl   (_M_acquire_lock__Q2_3std15_STL_mutex_lockGv) in auto_derivative_function.g.o
+          dnl   and convergence_table.g.o (2nd definition ignored)
+          LDFLAGS="$LDFLAGS -quiet_prelink -woff 131"
           dnl
           dnl Always link with math library: The -lm option must be at the end of the
           dnl linker command, therefore it cannot be included into LDFLAGS
