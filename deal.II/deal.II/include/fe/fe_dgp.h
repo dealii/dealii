@@ -155,7 +155,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 };
 
 /* @} */
-/// @if NoDoc
+#ifndef DOXYGEN
 
 
 // declaration of explicit specializations of member variables, if the
@@ -180,5 +180,5 @@ template <>
 const unsigned int FE_DGP<3>::Matrices::n_projection_matrices;
 #endif
 
-/// @endif
+#endif // DOXYGEN
 #endif

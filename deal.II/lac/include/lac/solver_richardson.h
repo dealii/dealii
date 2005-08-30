@@ -176,7 +176,7 @@ class SolverRichardson : public Solver<VECTOR>
 /*@}*/
 /*----------------- Implementation of the Richardson Method ------------------*/
 
-
+#ifndef DOXYGEN
 
 template <class VECTOR>
 inline
@@ -350,5 +350,6 @@ SolverRichardson<VECTOR>::set_omega (const double om)
   additional_data.omega=om;
 }
 
+#endif // DOXYGEN
 
 #endif

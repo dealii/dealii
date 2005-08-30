@@ -458,6 +458,7 @@ class ReductionControl : public SolverControl
 /*@}*/
 //---------------------------------------------------------------------------
 
+#ifndef DOXYGEN
 
 inline unsigned int
 SolverControl::max_steps () const
@@ -560,5 +561,7 @@ ReductionControl::set_reduction (const double t)
   reduce = t;
   return old;
 }
+
+#endif // DOXYGEN
 
 #endif

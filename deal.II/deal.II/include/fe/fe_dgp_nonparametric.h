@@ -442,7 +442,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 
 /*@}*/
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)
@@ -484,6 +484,6 @@ template <>
 const unsigned int FE_DGPNonparametric<3>::Matrices::n_projection_matrices;
 #endif
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

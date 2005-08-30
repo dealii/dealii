@@ -667,7 +667,7 @@ MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
 
 /* -------------- declaration of explicit specializations ------------- */
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 // declaration of explicit specializations of member variables, if the
 // compiler allows us to do that (the standard says we must)
@@ -727,6 +727,6 @@ template <> void MappingQ1<1>::fill_fe_subface_values (
   std::vector<Tensor<1,1> >&,
   std::vector<Point<1> >&) const;
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

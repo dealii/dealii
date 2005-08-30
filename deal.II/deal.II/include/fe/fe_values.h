@@ -2202,7 +2202,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 
 /*@}*/
 
-///@if NoDoc
+#ifndef DOXYGEN
 /*------------------------ Inline functions: FEValuesBase ------------------------*/
 
 
@@ -2651,7 +2651,7 @@ FEFaceValuesBase<dim>::boundary_form (const unsigned int i) const
   return this->boundary_forms[i];
 }
 
-///@endif
+#endif // DOXYGEN
 
 
 #endif

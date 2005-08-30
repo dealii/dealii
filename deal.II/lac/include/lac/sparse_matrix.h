@@ -1653,7 +1653,7 @@ class SparseMatrix : public virtual Subscriptor
 
 /*@}*/
 
-/// @if NoDoc
+#ifndef DOXYGEN
 /*---------------------- Inline functions -----------------------------------*/
 
 
@@ -2318,7 +2318,7 @@ SparseMatrix<number>::end (const unsigned int r)
   return end();
 }
 
-/// @endif
+#endif // DOXYGEN
 
 
 /*----------------------------   sparse_matrix.h     ---------------------------*/

@@ -194,7 +194,7 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 
 /*@}*/
 
-/// @if NoDoc
+#ifndef DOXYGEN
 /* --------------------- inline functions ---------------------- */
 
 
@@ -304,6 +304,6 @@ GrowingVectorMemory<VECTOR>::memory_consumption () const
   return result;
 }
 
-///@endif
+#endif // DOXYGEN
 
 #endif

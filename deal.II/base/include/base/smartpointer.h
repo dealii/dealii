@@ -58,7 +58,7 @@ class SmartPointer
 				      * Standard constructor for null
 				      * pointer.  @deprecated Since
 				      * this constructor will leave
-				      * #id empty, it should be
+				      * SmartPointer::id empty, it should be
 				      * avoided wherever possible and
 				      * replaced by SmartPointer(0,id).
 				      */

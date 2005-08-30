@@ -358,7 +358,7 @@ class StraightBoundary : public Boundary<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 template <>
 void
@@ -393,6 +393,6 @@ StraightBoundary<3>::
 get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
 				 std::vector<Point<3> > &points) const;
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

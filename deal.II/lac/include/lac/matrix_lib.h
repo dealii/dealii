@@ -306,7 +306,7 @@ class MeanValueFilter : public Subscriptor
  * vmult_add() and Tvmult_add() start the iteration with a zero
  * vector.
  *
- * @ref Instantiations: some (Vector<float>, Vector<double>, BlockVector<float>, BlockVector<double>)
+ * @ref Instantiations : some (Vector<float>, Vector<double>, BlockVector<float>, BlockVector<double>)
  * @author Guido Kanschat, 2005
  */
 template<class VECTOR>

@@ -507,7 +507,7 @@ class PreconditionMG : public Subscriptor
 
 /*@}*/
 
-/// @if NoDoc
+#ifndef DOXYGEN
 /* --------------------------- inline functions --------------------- */
 
 
@@ -635,6 +635,6 @@ PreconditionMG<dim, VECTOR, TRANSFER>::Tvmult_add (
   Assert(false, ExcNotImplemented());
 }
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

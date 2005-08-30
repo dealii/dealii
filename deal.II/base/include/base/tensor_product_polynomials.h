@@ -262,7 +262,7 @@ class TensorProductPolynomials
     unsigned int x_to_the_dim (const unsigned int x);
 };
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 template <int dim>
 inline
@@ -282,7 +282,7 @@ TensorProductPolynomials<dim>::get_numbering_inverse() const
 }
 
 
-/// @endif
+#endif // DOXYGEN
 
 
 /**
@@ -485,7 +485,7 @@ class AnisotropicPolynomials
 };
 
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 /* -------------- declaration of explicit specializations --- */
 
@@ -555,6 +555,6 @@ void
 AnisotropicPolynomials<3>::compute_index(const unsigned int n,
                                          unsigned int      (&index)[3]) const;
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

@@ -36,7 +36,7 @@
  * allocation of vectors and provides functions that are specific to the
  * underlying vector type.
  *
- * @ref Instantiations: some (<tt>@<float@> @<double@></tt>)
+ * @ref Instantiations : some (<tt>@<float@> @<double@></tt>)
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
@@ -376,7 +376,7 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
 
 /*@}*/
 
-/// @if NoDoc
+#ifndef DOXYGEN
 /*----------------------- Inline functions ----------------------------------*/
 
 
@@ -452,7 +452,7 @@ void BlockVector<Number>::scale (const BlockVector2 &v)
   BaseClass::scale (v);
 }
 
-///@endif
+#endif // DOXYGEN
 
 
 /*! @addtogroup Vectors

@@ -496,7 +496,7 @@ class HalfHyperShellBoundary : public HyperShellBoundary<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 template <>
 Point<1>
@@ -546,6 +546,6 @@ HalfHyperShellBoundary<1>::
 get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 			 Boundary<1>::FaceVertexNormals &) const;
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

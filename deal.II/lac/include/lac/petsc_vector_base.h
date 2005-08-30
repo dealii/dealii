@@ -685,7 +685,7 @@ namespace PETScWrappers
     u.swap (v);
   }
 
-///@if NoDoc
+#ifndef DOXYGEN
   namespace internal
   {
     inline
@@ -928,7 +928,7 @@ namespace PETScWrappers
   }
   
 
-///@endif
+#endif // DOXYGEN
 }
 
 #endif // DEAL_II_USE_PETSC

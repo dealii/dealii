@@ -373,6 +373,8 @@ class MGSmootherRelaxation : public MGSmootherBase<VECTOR>
 
 /* ------------------------------- Inline functions -------------------------- */
 
+#ifndef DOXYGEN
+
 template <class VECTOR>
 inline void
 MGSmootherIdentity<VECTOR>::smooth (
@@ -582,5 +584,6 @@ memory_consumption () const
 }
 
 
+#endif // DOXYGEN
 
 #endif

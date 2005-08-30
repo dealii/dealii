@@ -213,7 +213,7 @@ class MappingCartesian : public Mapping<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 template <> void MappingCartesian<1>::fill_fe_face_values (
   const Triangulation<1>::cell_iterator &,
@@ -236,6 +236,6 @@ template <> void MappingCartesian<1>::fill_fe_subface_values (
   std::vector<Tensor<1,1> >&,
   std::vector<Point<1> >&) const;
 
-/// @endif  
+#endif // DOXYGEN  
 
 #endif

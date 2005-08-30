@@ -387,8 +387,6 @@ namespace MemoryConsumption
 
 // now comes the implementation of these functions
 
-/// @if NoDoc
-
 namespace MemoryConsumption
 {
   inline
@@ -598,6 +596,5 @@ namespace MemoryConsumption
   }
 }
 
-/// @endif
 
 #endif

@@ -1371,6 +1371,9 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
   const unsigned int end = r.start + r.length;
 
   unsigned int i = r.start;
+				   // If diagonal exists and this
+				   // column is higher, start only
+				   // after diagonal.
   if (r.diagonal != RowInfo::invalid_diagonal && col >= row)
     i += r.diagonal;
 				   // Find position of entry
@@ -1387,6 +1390,7 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
 				   // If no more space is available
 				   // for this row, insert new
 				   // elements into the vector.
+//TODO:[GK] We should not extend this row if i<end
   if (row != row_info.size()-1)
     {
       if (end >= row_info[row+1].start)

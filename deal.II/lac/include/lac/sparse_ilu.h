@@ -51,7 +51,7 @@
  * Refer to SparseLUDecomposition documentation for suggested
  * usage and state management.
  *
- * @ref Instantiations: some (float, double)
+ * @ref Instantiations : some (float, double)
  * @author Wolfgang Bangerth, 1999, based on a similar implementation
  * by Malte Braack; unified interface: Ralf Hartmann
  */

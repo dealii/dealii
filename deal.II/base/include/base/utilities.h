@@ -31,7 +31,7 @@ namespace Utilities
 {
 
                                    /**
-                                    * Convert a number #i to a string, with
+                                    * Convert a number @p i to a string, with
                                     * as many digits as given to fill with
                                     * leading zeros.
                                     */
@@ -66,7 +66,7 @@ namespace Utilities
 
                                    /**
                                     * Given a string that contains text
-                                    * separated by a #delimiter, split it into
+                                    * separated by a @p delimiter, split it into
                                     * its components; for each component,
                                     * remove leading and trailing spaces.
                                     *
@@ -81,8 +81,8 @@ namespace Utilities
                                    /**
                                     * Generate a random number from a
                                     * normalized Gaussian probability
-                                    * distribution centered around #a and
-                                    * with standard deviation #sigma.
+                                    * distribution centered around @p a and
+                                    * with standard deviation @p sigma.
                                     */
   double
   generate_normal_random_number (const double a,

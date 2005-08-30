@@ -381,9 +381,10 @@ class QProjector
 
 /*@}*/
 
-/// @if NoDoc
 
 /* -------------- declaration of explicit specializations ------------- */
+
+#ifndef DOXYGEN
 
 template <>
 void
@@ -439,6 +440,6 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 			 const unsigned int   n_copies);
 
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

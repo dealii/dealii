@@ -308,7 +308,7 @@ class FunctionParser : public Function<dim>
                                       * second component and so forth. If this
                                       * function is also time dependent, then
                                       * it is necessary to specify it by
-                                      * setting the #time_dependent parameter
+                                      * setting the <tt>time_dependent</tt> parameter
                                       * to true.  An exception is thrown if
                                       * the number of variables specified here
                                       * is different from dim (if this

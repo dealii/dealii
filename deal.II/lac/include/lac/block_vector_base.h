@@ -1007,7 +1007,7 @@ class BlockVectorBase
 /*----------------------- Inline functions ----------------------------------*/
 
 
-///@if NoDoc
+#ifndef DOXYGEN
 namespace internal
 {
   namespace BlockVectorIterators
@@ -2116,6 +2116,6 @@ BlockVectorBase<VectorType>::operator() (const unsigned int i)
   return components[local_index.first](local_index.second);
 }
 
-///@endif
+#endif // DOXYGEN
 
 #endif

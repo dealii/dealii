@@ -146,6 +146,7 @@ class SolverMinRes : public Solver<VECTOR>
 /*@}*/
 /*------------------------- Implementation ----------------------------*/
 
+#ifndef DOXYGEN
 
 template<class VECTOR>
 SolverMinRes<VECTOR>::SolverMinRes (SolverControl &cn,
@@ -369,5 +370,6 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
 				   // otherwise exit as normal
 }
 
+#endif // DOXYGEN
 
 #endif

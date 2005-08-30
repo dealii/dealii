@@ -59,7 +59,7 @@ class MultithreadInfo
 				      * machine, please refer to the
 				      * documentation in
 				      * <tt>multithread_info.cc</tt>
-				      * near to the #error directive.
+				      * near to the <tt>error</tt> directive.
 				      */
     const unsigned int n_cpus;
 

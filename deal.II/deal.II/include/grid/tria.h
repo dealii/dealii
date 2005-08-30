@@ -33,6 +33,7 @@ template <int dim> class MGDoFHandler;
 
 /*------------------------------------------------------------------------*/
 
+//TODO:[WB] remove reference to non-existing TriaDimensionInfo
 
 /**
  *  Structure which is passed to the
@@ -3364,7 +3365,7 @@ class Triangulation : public Subscriptor
 
 /* -------------- declaration of explicit specializations ------------- */
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 template <> Triangulation<1>::cell_iterator Triangulation<1>::begin (const unsigned int level) const;
 template <> Triangulation<1>::raw_cell_iterator Triangulation<1>::end () const;
@@ -3507,6 +3508,6 @@ template <> void Triangulation<1>::update_number_cache_quads ();
 template <> void Triangulation<1>::update_number_cache_hexes ();
 template <> void Triangulation<2>::update_number_cache_hexes ();
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

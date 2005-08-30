@@ -338,7 +338,7 @@ class TridiagonalMatrix
 };
 
 //---------------------------------------------------------------------------
-///@if NoDoc
+#ifndef DOXYGEN
 
 template<typename number>
 unsigned int
@@ -399,7 +399,7 @@ TridiagonalMatrix<number>::operator()(unsigned int i, unsigned int j)
 }
 
 
-///@endif
+#endif // DOXYGEN
 
 #endif
 

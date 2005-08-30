@@ -406,7 +406,7 @@ class PreconditionBlock : public virtual Subscriptor
  * Block Jacobi preconditioning.
  * See PreconditionBlock for requirements on the matrix.
  *
- * @ref Instantiations: some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
+ * @ref Instantiations : some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -690,7 +690,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
  * arbitrarily.
  *
  * See PreconditionBlock for requirements on the matrix.
- * @ref Instantiations: some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
+ * @ref Instantiations : some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2001, 2002, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -846,7 +846,7 @@ class PreconditionBlockSOR : public virtual Subscriptor,
  * class requires storage of the diagonal blocks and their inverses.
  *
  * See PreconditionBlock for requirements on the matrix.
- * @ref Instantiations: some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
+ * @ref Instantiations : some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>

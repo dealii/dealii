@@ -915,7 +915,7 @@ class SymmetricTensor
 
 // ------------------------- inline functions ------------------------
 
-///@if NoDoc
+#ifndef DOXYGEN
 
 namespace internal
 {
@@ -1881,7 +1881,7 @@ SymmetricTensor<4,3>::norm () const
   return std::sqrt(t);
 }
 
-///@endif
+#endif // DOXYGEN
 
 /* ----------------- Non-member functions operating on tensors. ------------ */
 

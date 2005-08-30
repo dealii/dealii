@@ -1563,7 +1563,7 @@ class SparsityPattern : public Subscriptor
 /*@}*/
 /*---------------------- Inline functions -----------------------------------*/
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 
 namespace internals
@@ -2091,6 +2091,6 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
 }
 
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

@@ -557,7 +557,7 @@ class BlockTrianglePrecondition
 
 /*@}*/
 
-///@if NoDoc
+#ifndef DOXYGEN
 //---------------------------------------------------------------------------
 
 template <typename number>
@@ -689,6 +689,6 @@ BlockTrianglePrecondition<number>::enter (const MATRIX& matrix,
 
 
 
-///@endif
+#endif // DOXYGEN
 
 #endif

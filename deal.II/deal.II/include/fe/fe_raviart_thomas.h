@@ -676,7 +676,7 @@ class FE_RaviartThomasNodal
 
 /* -------------- declaration of explicit specializations ------------- */
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 template <>
 void FE_RaviartThomas<1>::initialize_unit_face_support_points ();
@@ -742,6 +742,6 @@ FE_RaviartThomas<1>::
 get_interpolation_matrix (const FiniteElement<1> &,
 			  FullMatrix<double>         &) const;
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

@@ -115,11 +115,11 @@ template <int dim> class Mapping;
  * indices of degrees of freedom on different parts may be intermixed.
  *
  * Degrees of freedom on the boundary but not on one of the specified
- * boundary parts are given the index #invalid_dof_index, as if
+ * boundary parts are given the index DoFHandler::invalid_dof_index, as if
  * they were in the interior. If no boundary indicator was given or if
  * no face of a cell has a boundary indicator contained in the given
  * list, the vector of new indices consists solely of
- * #invalid_dof_index.
+ * DoFHandler::invalid_dof_index.
  *
  * The question what a degree of freedom on the boundary is, is not so
  * easy.  It should really be a degree of freedom of which the
@@ -426,7 +426,7 @@ class DoFTools
 				      * @deprecated This is the old
 				      * form of the previous
 				      * function. It generates a table
-				      * of #Coupling values and calls
+				      * of DoFTools::Coupling values and calls
 				      * it.
 				      */
     template <int dim, class SparsityPattern>

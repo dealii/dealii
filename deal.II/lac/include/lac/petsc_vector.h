@@ -191,7 +191,7 @@ namespace PETScWrappers
   };
 
 
-/// @if NoDoc
+#ifndef DOXYGEN
 // ------------------ template and inline functions -------------
 
 
@@ -350,7 +350,7 @@ namespace PETScWrappers
 
     return *this;
   }
-/// @endif
+#endif // DOXYGEN
 
 }
 

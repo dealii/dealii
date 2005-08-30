@@ -46,7 +46,7 @@ template<typename number> class Vector;
  * vector argument to functions. If there is no argument with a number
  * type, the matrix number type is used.
  *
- * @ref Instantiations: some (<tt>@<float@> @<double@></tt>)
+ * @ref Instantiations : some (<tt>@<float@> @<double@></tt>)
  *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2004
  */
@@ -445,7 +445,7 @@ class FullMatrix : public Table<2,number>
 
 				     /**
 				      * @deprecated Old name for
-				      * frobenius_norm().
+				      * FullMatrix::frobenius_norm().
 				      */
     number norm2 () const;
 
@@ -1062,7 +1062,7 @@ class FullMatrix : public Table<2,number>
 
 /*@}*/
 
-/// @if NoDoc
+#ifndef DOXYGEN
 /*-------------------------Inline functions -------------------------------*/
 
 
@@ -1315,7 +1315,7 @@ FullMatrix<number>::end (const unsigned int r) const
   return const_iterator(this, r+1, 0);
 }
 
-///@endif
+#endif // DOXYGEN
 
 #endif
 

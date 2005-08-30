@@ -255,7 +255,7 @@ class Tensor
 
 /*--------------------------- Inline functions -----------------------------*/
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 template <int rank_, int dim>
 inline
@@ -456,7 +456,7 @@ Tensor<rank_,dim>::memory_consumption ()
   return sizeof(Tensor<rank_,dim>);
 }
 
-/// @endif
+#endif // DOXYGEN
 /* ----------------- Non-member functions operating on tensors. ------------ */
 
 
@@ -477,6 +477,7 @@ std::ostream & operator << (std::ostream &out, const Tensor<rank_,dim> &p)
   return out;
 }
 
+#ifndef DOXYGEN
 
 /**
  * Specialization for 1D.
@@ -490,6 +491,7 @@ std::ostream & operator << (std::ostream &out, const Tensor<rank_,1> &p)
   return out;
 }
 
+#endif // DOXYGEN
 
 
 /**
@@ -1352,7 +1354,7 @@ transpose (const Tensor<2,dim> &t)
   return tt;
 }
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 /**
  * Return the transpose of the given tensor. This is the
@@ -1406,7 +1408,7 @@ transpose (const Tensor<2,3> &t)
   return Tensor<2,3>(x);
 }
 
-/// @endif
+#endif // DOXYGEN
 
 
 /**

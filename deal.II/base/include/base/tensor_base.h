@@ -359,7 +359,7 @@ class Tensor<1,dim>
 template <int dim>
 std::ostream & operator << (std::ostream &out, const Tensor<1,dim> &p);
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 /*------------------------------- Inline functions: Tensor ---------------------------*/
 
@@ -788,7 +788,7 @@ operator / (const Tensor<1,dim> &t,
   return tt;
 }
 
-/// @endif
+#endif // DOXYGEN
 
 #endif
 

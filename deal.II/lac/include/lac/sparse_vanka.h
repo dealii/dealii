@@ -118,7 +118,7 @@ template <typename number> class SparseBlockVanka;
  * whether this might pose some problems in the inversion of the local matrices.
  * Maybe someone would like to check this.
  *
- * @ref Instantiations: some (float, double)
+ * @ref Instantiations : some (float, double)
  * @author Guido Kanschat, Wolfgang Bangerth; 1999, 2000
  */
 template<typename number>

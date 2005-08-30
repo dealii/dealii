@@ -205,7 +205,7 @@ template <int dim> class Triangulation;
  * and the state of the element pointed to.
  *
  * Past-the-end iterators may also be used to compare an iterator with the
- * @em{before-the-start} value, when running backwards. There is no
+ * <i>before-the-start</i> value, when running backwards. There is no
  * distiction between the iterators pointing past the two ends of a vector.
  *   
  * By defining only one value to be past-the-end and making all other values
@@ -216,9 +216,6 @@ template <int dim> class Triangulation;
  * earlier than for past-the-end iterators an exception is raised.
  *
  * @ref Triangulation
- * @ref TriaDimensionInfo<1>
- * @ref TriaDimensionInfo<2>
- * @ref TriaDimensionInfo<3>
  * @ingroup grid
  * @ingroup Iterators
  * @author Wolfgang Bangerth, 1998

@@ -173,7 +173,7 @@ class MGCoarseGridHouseholder : public MGCoarseGridBase<VECTOR>
 
 /*@}*/
   
-/// @if NoDoc
+#ifndef DOXYGEN
 /* ------------------ Functions for MGCoarseGridLACIteration ------------ */
 
 
@@ -309,6 +309,6 @@ MGCoarseGridHouseholder<number, VECTOR>::operator() (
   work.least_squares(dst, aux);
 }
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

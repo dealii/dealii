@@ -32,7 +32,7 @@ template <int dim> class GeometryInfo;
  * This class contains as static members information on vertices and
  * faces of a @p dim-dimensional grid cell. The interface is the same
  * for all dimensions. If a value is of no use in a low dimensional
- * cell, it is (correctly) set to zero, e.g. #subfaces_per_cell in
+ * cell, it is (correctly) set to zero, e.g. #subfaces_per_face in
  * 1d.
  *
  * This information should always replace hard-coded numbers of
@@ -113,7 +113,7 @@ struct GeometryInfo<0>
  * of the mesh cells.
  *
  * @ingroup grid
- * @ref Instantiations: few (dim = 1,2,3,4 and a specialization for dim=0)
+ * @ref Instantiations few (dim = 1,2,3,4 and a specialization for dim=0)
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005
  */
 template <int dim>
@@ -474,7 +474,7 @@ struct GeometryInfo
 /* -------------- declaration of explicit specializations ------------- */
 
 
-
+#ifndef DOXYGEN
 
 template <>
 inline
@@ -652,6 +652,6 @@ GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p)
 	 (p[2] >= 0.) && (p[2] <= 1.);
 }
 
-
+#endif // DOXYGEN
 
 #endif

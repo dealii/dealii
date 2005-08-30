@@ -73,7 +73,7 @@
  * necessary to provide a class Point@<0@> to make the compiler
  * happy. This class also does nothing.
  *
- * @ref Instantiations: few
+ * @ref Instantiations few
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2005
  */
@@ -320,7 +320,7 @@ class QIterated : public Quadrature<dim>
 
 /*@}*/
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 /* -------------- declaration of explicit specializations ------------- */
 
@@ -343,6 +343,6 @@ double Quadrature<0>::weight (const unsigned int) const;
 template <>
 const std::vector<double> & Quadrature<0>::get_weights () const;
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

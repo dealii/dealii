@@ -76,7 +76,7 @@ class VectorSlice
 				      * using the same interface as
 				      * <tt>std::vector</tt>.
 				      */
-    typename VECTOR::reference operator[] (unsigned int);
+    typename VECTOR::reference operator[] (unsigned int i);
     
 				     /**
 				      * Access an element of a
@@ -84,7 +84,7 @@ class VectorSlice
 				      * interface as
 				      * <tt>std::vector</tt>.
 				      */
-    typename VECTOR::const_reference operator[] (unsigned int) const;
+    typename VECTOR::const_reference operator[] (unsigned int i) const;
   private:
 				     /**
 				      * The vector we extract from.

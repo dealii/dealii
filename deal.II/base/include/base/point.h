@@ -195,6 +195,7 @@ class Point : public Tensor<1,dim>
 
 /*------------------------------- Inline functions: Point ---------------------------*/
 
+#ifndef DOXYGEN
 
 template <int dim>
 inline
@@ -355,6 +356,7 @@ Point<dim> Point<dim>::operator / (const double factor) const
   return (Point<dim>(*this) /= factor);
 }
 
+#endif // DOXYGEN
 
 
 /*------------------------------- Global functions: Point ---------------------------*/
@@ -362,6 +364,7 @@ Point<dim> Point<dim>::operator / (const double factor) const
 
 /**
  * Global operator scaling a point vector by a scalar.
+ * @relates Point
  */
 template <int dim>
 inline
@@ -374,6 +377,7 @@ Point<dim> operator * (const double factor, const Point<dim> &p)
 /**
  * Output operator for points. Print the elements consecutively,
  * with a space in between.
+ * @relates Point
  */
 template <int dim>
 inline
@@ -392,6 +396,7 @@ std::ostream & operator << (std::ostream     &out,
 /**
  * Output operator for points. Print the elements consecutively,
  * with a space in between.
+ * @relates Point
  */
 template <int dim>
 inline
@@ -405,6 +410,7 @@ std::istream & operator >> (std::istream &in,
 }
 
 
+#ifndef DOXYGEN
 
 /** 
  * Output operator for points of dimension 1. This is implemented
@@ -418,5 +424,7 @@ std::ostream & operator << (std::ostream &out, const Point<1> &p)
 
   return out;
 }
+
+#endif // DOXYGEN
 
 #endif

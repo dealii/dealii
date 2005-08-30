@@ -251,7 +251,6 @@ class PolynomialSpace
     std::vector<unsigned int> index_map_inverse;
 };
 
-/// @if NoDoc
 
 /* -------------- declaration of explicit specializations --- */
 
@@ -326,7 +325,5 @@ PolynomialSpace<dim>::output_indices(STREAM &out) const
 }
 
 
-
-/// @endif  
 
 #endif

@@ -434,6 +434,8 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 /*@}*/
 //---------------------------------------------------------------------------
 
+#ifndef DOXYGEN
+
 template <typename number>
 inline number
 SparseLUDecomposition<number>::
@@ -478,5 +480,7 @@ SparseLUDecomposition<number>::AdditionalData::AdditionalData (
 		use_this_sparsity(use_this_spars)
 {}
 
+
+#endif // DOXYGEN
 
 #endif // __deal2__sparse_decomposition_h

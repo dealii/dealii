@@ -39,11 +39,11 @@ template <int dim> class Triangulation;
 
 
 /**
- * Define some types which differ between the dimensions. This class
- * is analogous to the TriaDimensionInfo class hierarchy.
+ * Define some types which differ between the dimensions.
  * 
  * @ref DoFDimensionInfo<1>
  * @ref DoFDimensionInfo<2>
+ * @ref DoFDimensionInfo<3>
  *
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
@@ -157,8 +157,6 @@ class DoFDimensionInfo
 /**
  * Define some types for the DoF handling in one dimension.
  *
- * The types have the same meaning as those declared in TriaDimensionInfo<2>.
- *
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
@@ -192,8 +190,6 @@ class DoFDimensionInfo<1>
 /**
  * Define some types for the DoF handling in two dimensions.
  *
- * The types have the same meaning as those declared in TriaDimensionInfo<2>.
- *
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
@@ -226,8 +222,6 @@ class DoFDimensionInfo<2>
 
 /**
  * Define some types for the DoF handling in two dimensions.
- *
- * The types have the same meaning as those declared in TriaDimensionInfo<3>.
  *
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998

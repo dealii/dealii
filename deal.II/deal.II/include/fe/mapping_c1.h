@@ -108,7 +108,7 @@ class MappingC1 : public MappingQ<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 template <> void MappingC1<1>::add_line_support_points (
   const Triangulation<1>::cell_iterator &,
@@ -125,6 +125,6 @@ template <> void MappingC1<2>::add_quad_support_points (
   std::vector<Point<2> > &) const;
 
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

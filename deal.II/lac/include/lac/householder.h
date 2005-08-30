@@ -38,7 +38,7 @@ template<typename number> class Vector;
  * compute the vector <i>x</i> minimizing <i>||Ax-b||</i> for a given
  * vector <i>b</i>.
  *
- * @ref Instantiations: some (<tt>@<float@> @<double@></tt>)
+ * @ref Instantiations : some (<tt>@<float@> @<double@></tt>)
  *
  * @author Guido Kanschat, 2005
  */
@@ -85,7 +85,7 @@ class Householder : private FullMatrix<number>
 
 /*@}*/
 
-/// @if NoDoc
+#ifndef DOXYGEN
 /*-------------------------Inline functions -------------------------------*/
 
 // QR-transformation cf. Stoer 1 4.8.2 (p. 191)
@@ -178,7 +178,7 @@ Householder<number>::least_squares (Vector<number2>& dst,
 
 
 
-///@endif
+#endif // DOXYGEN
 
 #endif
 

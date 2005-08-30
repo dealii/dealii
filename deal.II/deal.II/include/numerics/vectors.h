@@ -292,7 +292,7 @@ class ConstraintMatrix;
  * if access to an object describing the exact form of the boundary is needed, the
  * pointer stored within the triangulation object is accessed.
  *
- * @ref Instantiations: some (Vector<float>, Vector<double>, BlockVector<float>, BlockVector<double>, see also individual functions)
+ * @ref Instantiations : some (Vector<float>, Vector<double>, BlockVector<float>, BlockVector<double>, see also individual functions)
  * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, 1998, 1999, 2000, 2001
  */
 class VectorTools
@@ -434,7 +434,7 @@ class VectorTools
 				      * make the result continuous
 				      * again.
 				      *
-				      * @ref Instantiations: some (the
+				      * @ref Instantiations : some (the
 				      * standard vector types
 				      * mentioned in the class
 				      * documentation are
@@ -452,7 +452,7 @@ class VectorTools
 
 				     /**
 				      * Compute the projection of
-				      * @function to the finite element space.
+				      * @p function to the finite element space.
 				      *
 				      * By default, projection to the boundary
 				      * and enforcement of zero boundary values
@@ -467,18 +467,16 @@ class VectorTools
 				      * matrix of the finite element
 				      * space on the present grid. To
 				      * this end, the mass matrix is
-				      * assembled exactly using the
-				      * @p create_mass_matrix
-				      * function in the
-				      * MatrixTools
-				      * collection. This function
-				      * performs numerical quadrature
-				      * using the given quadrature
-				      * rule; you should therefore
-				      * make sure that the given
-				      * quadrature formula is also
-				      * sufficient for the integration
-				      * of the mass matrix.
+				      * assembled exactly using
+				      * MatrixTools::create_mass_matrix. This
+				      * function performs numerical
+				      * quadrature using the given
+				      * quadrature rule; you should
+				      * therefore make sure that the
+				      * given quadrature formula is
+				      * also sufficient for the
+				      * integration of the mass
+				      * matrix.
 				      *
 				      * See the general documentation of this
 				      * class for further information.
@@ -841,7 +839,7 @@ class VectorTools
 				      * See the general documentation of this
 				      * class for more information.
 				      *
-				      * @ref Instantiations: some
+				      * @ref Instantiations : some
 				      * (InVectors as in the
 				      * documentation of the class,
 				      * OutVector only Vector<double>

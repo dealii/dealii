@@ -197,6 +197,7 @@ class SolverQMRS : public Solver<VECTOR>
 /*@}*/
 /*------------------------- Implementation ----------------------------*/
 
+#ifndef DOXYGEN
 
 template<class VECTOR>
 SolverQMRS<VECTOR>::SolverQMRS(SolverControl &cn,
@@ -385,5 +386,6 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
   return false;
 }
 
+#endif // DOXYGEN
 
 #endif

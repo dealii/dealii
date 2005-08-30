@@ -173,7 +173,7 @@ class SolverCG : public Solver<VECTOR>
 
 /*------------------------- Implementation ----------------------------*/
 
-
+#ifndef DOXYGEN
 
 template <class VECTOR>
 inline
@@ -339,5 +339,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 					this->control().last_value());
 				   // otherwise exit as normal
 }
+
+#endif // DOXYGEN
 
 #endif

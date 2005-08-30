@@ -934,7 +934,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      * globally to avoid allocation
 				      * of memory in the threads.
 				      *
-				      * The #index_to_patch_map is
+				      * The #cell_to_patch_index_map is
 				      * an array that stores for index
 				      * <tt>[i][j]</tt> the number of the
 				      * patch that associated with the

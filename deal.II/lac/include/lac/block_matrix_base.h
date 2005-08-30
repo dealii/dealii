@@ -269,7 +269,7 @@ namespace internal
  * you attempt anyway, you will likely get a number of compiler
  * errors.
  *
- * @ref Instantiations: some (<tt>@<float@> @<double@></tt>).
+ * @ref Instantiations : some (<tt>@<float@> @<double@></tt>).
  * @author Wolfgang Bangerth, 2000, 2004
  */
 template <typename MatrixType>

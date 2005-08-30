@@ -75,7 +75,7 @@ class PreconditionIdentity : public Subscriptor
 /**
  * Preconditioning with Richardson's method. This preconditioner just
  * scales the vector with a constant relaxation factor provided by the
- * #AdditionalData object.
+ * AdditionalData object.
  *
  * In Krylov-space methods, this preconditioner should not have any
  * effect. Using SolverRichardson, the two relaxation parameters will

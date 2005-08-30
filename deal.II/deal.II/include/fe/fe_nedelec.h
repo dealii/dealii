@@ -607,7 +607,7 @@ class FE_Nedelec : public FiniteElement<dim>
 
 /*@}*/
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 
 /* -------------- declaration of explicit specializations ------------- */
@@ -714,5 +714,5 @@ template <>
 const unsigned int FE_Nedelec<3>::Matrices::n_constraint_matrices;
 
 #endif
-/// @endif
+#endif // DOXYGEN
 #endif

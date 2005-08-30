@@ -435,7 +435,7 @@ class GridIn
 
 /* -------------- declaration of explicit specializations ------------- */
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 template <>
 void
@@ -448,6 +448,6 @@ GridIn<3>::debug_output_grid (const std::vector<CellData<3> > &cells,
 			      const std::vector<Point<3> >    &vertices,
 			      std::ostream                    &out);
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

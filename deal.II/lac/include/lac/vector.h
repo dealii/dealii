@@ -48,7 +48,7 @@ template<typename number> class LAPACKFullMatrix;
  * @p vector (with a lowercase "v"), this class implements an element
  * of a vector space suitable for numerical computations.
  *
- * @ref Instantiations: some (<tt>@<float@> @<double@></tt>)
+ * @ref Instantiations : some (<tt>@<float@> @<double@></tt>)
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template <typename Number>

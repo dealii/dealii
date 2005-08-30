@@ -179,6 +179,8 @@ class MGSmootherBlock
 
 //---------------------------------------------------------------------------
 
+#ifndef DOXYGEN
+
 template <class MATRIX, class RELAX, typename number>
 inline
 MGSmootherBlock<MATRIX, RELAX, number>::MGSmootherBlock(
@@ -328,6 +330,6 @@ MGSmootherBlock<MATRIX, RELAX, number>::smooth(
   deallog.pop();
 }
 
-
+#endif // DOXYGEN
 
 #endif

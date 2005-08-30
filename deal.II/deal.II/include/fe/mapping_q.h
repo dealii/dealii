@@ -518,7 +518,7 @@ class MappingQ : public MappingQ1<dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
-/// @if NoDoc
+#ifndef DOXYGEN
 
 template<> MappingQ<1>::MappingQ (const unsigned int);
 template<> MappingQ<1>::~MappingQ ();
@@ -538,6 +538,6 @@ template<> void MappingQ<3>::add_quad_support_points(
   const Triangulation<3>::cell_iterator &cell,
   std::vector<Point<3> >                &a) const;
 
-/// @endif
+#endif // DOXYGEN
 
 #endif

@@ -41,7 +41,7 @@
  * @p reload is called. If it is not available, @p reload waits until
  * the detached thread has loaded the data.
  *
- * @ref Instantiations: some (<tt>@<float@> @<double@></tt>)
+ * @ref Instantiations : some (<tt>@<float@> @<double@></tt>)
  * @author Wolfgang Bangerth, 1999, 2000
  */
 template <typename number>

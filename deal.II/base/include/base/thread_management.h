@@ -758,7 +758,7 @@ namespace Threads
 }   // end declarations of namespace Threads
 
 /* ----------- implementation of functions in namespace Threads ---------- */
-/// @if NoDoc
+#ifndef DOXYGEN
 namespace Threads 
 {  
   template <typename ForwardIterator>
@@ -820,7 +820,7 @@ namespace Threads
   }  
 }
 
-///@endif
+#endif // DOXYGEN
 
 namespace Threads
 {

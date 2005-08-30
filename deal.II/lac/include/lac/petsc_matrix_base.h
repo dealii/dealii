@@ -820,7 +820,7 @@ namespace PETScWrappers
 
 
 
-/// @if NoDoc
+#ifndef DOXYGEN
 // -------------------------- inline and template functions ----------------------
 
 
@@ -1044,7 +1044,7 @@ namespace PETScWrappers
             (index < static_cast<unsigned int>(end)));
   }
 
-/// @endif      
+#endif // DOXYGEN      
 }
 
 

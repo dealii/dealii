@@ -234,6 +234,8 @@ class SolverBicgstab : public Solver<VECTOR>
 /*@}*/
 /*-------------------------Inline functions -------------------------------*/
 
+#ifndef DOXYGEN
+
 template<class VECTOR>
 SolverBicgstab<VECTOR>::SolverBicgstab (SolverControl &cn,
 					VectorMemory<VECTOR> &mem,
@@ -405,5 +407,6 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
 				   // otherwise exit as normal
 }
 
+#endif // DOXYGEN
 
 #endif
