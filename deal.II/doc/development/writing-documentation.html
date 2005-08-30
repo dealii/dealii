@@ -224,6 +224,23 @@
 	 to do this, please make sure the name does not interfere with
 	 <acronym>doxygen</acronym> generated anchors.
 	 </p>
+
+    <li> <em>Exclusion from documentation:</em>
+         <p> <acronym>doxygen</acronym> sometimes has problems with inlined
+	 functions of template classes. For these cases (and other cases of
+	 parts of the code to be excluded from documentation), we define a
+	 preprocessor symbol <tt>DOXYGEN</tt> when running
+	 <acronym>doxygen</acronym>. Therefore, the following template can be
+	 used to avoid documentation:</p>
+	 <pre>
+	 documented code here
+
+	 #ifndef DOXYGEN
+
+	 code here is compiled, but ignored by doxygen
+
+	 #endif // DOXYGEN
+	 </pre>
     </ul>
 
 
