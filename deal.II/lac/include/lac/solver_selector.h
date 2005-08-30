@@ -37,7 +37,7 @@
  * the @p solve function of that @p Solver that was specified in the constructor
  * of this class.
  *
- * @sect3{Usage}
+ * <h3>Usage</h3>
  * The simplest use of this class is the following:
  * @verbatim
  *                                  // generate a @p SolverControl and

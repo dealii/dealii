@@ -32,7 +32,7 @@
  * using the <tt>|</tt> (bitwise <tt>or</tt>) operator.
  *
  *
- * @sect2{Description of Flags}
+ * <h3>Description of Flags</h3>
  *
  * The following flags are declared:
  * <ul>

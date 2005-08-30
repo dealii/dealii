@@ -84,7 +84,7 @@ template <typename number> class SparseBlockVanka;
  * Remark: the Vanka method is a non-symmetric preconditioning method.
  *
  *
- * @sect3{Example of Use}
+ * <h3>Example of Use</h3>
  * This little example is taken from a program doing parameter optimization.
  * The Lagrange multiplier is the third component of the finite element
  * used. The system is solved by the GMRES method.
@@ -111,7 +111,7 @@ template <typename number> class SparseBlockVanka;
  * @endverbatim
  *
  *
- * @sect4{Implementor's remark}
+ * <h4>Implementor's remark</h4>
  * At present, the local matrices are built up such that the degree of freedom
  * associated with the local Lagrange multiplier is the first one. Thus, usually
  * the upper left entry in the local matrix is zero. It is not clear to me (W.B.)
@@ -390,7 +390,7 @@ class SparseVanka
  * mentioned, this reduces the preconditioning properties.
  *
  *
- * @sect3{Splitting the matrix into blocks}
+ * <h3>Splitting the matrix into blocks</h3>
  *
  * Splitting the matrix into blocks is always done in a way such that
  * the blocks are not necessarily of equal size, but such that the
@@ -465,7 +465,7 @@ class SparseVanka
  * </ul>
  *
  *
- * @sect3{Typical results}
+ * <h3>Typical results</h3>
  *
  * As a prototypical test case, we use a nonlinear problem from
  * optimization, which leads to a series of saddle point problems,

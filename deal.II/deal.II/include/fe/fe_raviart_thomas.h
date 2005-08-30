@@ -41,7 +41,7 @@ template <int dim> class MappingQ;
  * each face.
  * 
  * 
- * @sect3{Interpolation to finer and coarser meshes}
+ * <h3>Interpolation to finer and coarser meshes</h3>
  *
  * Each finite element class in deal.II provides matrices that are
  * used to interpolate from coarser to finer meshes and the other way
@@ -84,7 +84,7 @@ template <int dim> class MappingQ;
  * side), and it also preserves the order of the interpolation.
  * 
  *
- * @sect3{Numbering of the degrees of freedom (DoFs)}
+ * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
  * Raviart-Thomas elements have their degrees of freedom on edges, with shape
  * functions being vector valued and pointing in normal

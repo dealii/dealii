@@ -40,7 +40,7 @@ template <class number> class SparseMatrix;
  * of other preconditioners, like BlockSOR or ILU should be handled in
  * derived classes by the user.
  *
- * @sect3{Usage}
+ * <h3>Usage</h3>
  * The simplest use of this class is the following:
  * @verbatim
  *                                  // generate a @p SolverControl and

@@ -46,7 +46,7 @@ template <typename number> class SparseMatrix;
  * allocation of a certain amount of memory, but grows as necessary.
  *
  *
- * @sect3{Rationale}
+ * <h3>Rationale</h3>
  *
  * When constructing the sparsity pattern of a matrix, you usually
  * first have to provide an empty sparsity pattern object with a fixed
@@ -80,7 +80,7 @@ template <typename number> class SparseMatrix;
  * then final set of necessary indices.
  *
  *
- * @sect3{Interface}
+ * <h3>Interface</h3>
  *
  * Since this class is intended as an intermediate replacement of the
  * SparsityPattern class, it has mostly the same interface, with
@@ -89,7 +89,7 @@ template <typename number> class SparseMatrix;
  * pattern are the same.
  *
  *
- * @sect3{Usage}
+ * <h3>Usage</h3>
  *
  * Use this class as follows:
  * @verbatim

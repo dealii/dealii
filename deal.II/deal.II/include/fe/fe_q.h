@@ -30,7 +30,7 @@
  * The constructor of this class takes the degree @p p of this finite
  * element.
  *
- * @sect3{Implementation}
+ * <h3>Implementation</h3>
  *
  * The constructor creates a TensorProductPolynomials object
  * that includes the tensor product of @p LagrangeEquidistant
@@ -63,7 +63,7 @@
  *   </ul>
  * </ul>
  *
- * @sect3{Numbering of the degrees of freedom (DoFs)}
+ * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
  * The original ordering of the shape functions represented by the
  * TensorProductPolynomials is a tensor product
@@ -73,7 +73,7 @@
  * the hexes. To be explicit, these numberings are listed in the
  * following:
  *
- * @sect4{Q1 elements}
+ * <h4>Q1 elements</h4>
  * <ul>
  * <li> 1D case:
  *   @verbatim

@@ -343,7 +343,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  specialized versions for distinct dimensions.
  *
  *
- *  @sect3{Structure and iterators}
+ *  <h3>Structure and iterators</h3>
  *
  *  The actual data structure of a Triangulation object is rather complex
  *  and quite inconvenient if one attempted to operate on it directly, since
@@ -453,7 +453,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  </ul>
  *
  *
- *  @sect3{Usage}
+ *  <h3>Usage</h3>
  *
  *  Usage of a Triangulation is mainly done through the use of iterators.
  *  An example probably shows best how to use it:
@@ -497,7 +497,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  @endverbatim
  *
  *  
- *  @sect3{Creating a triangulation}
+ *  <h3>Creating a triangulation</h3>
  *
  *  There are several possibilities to create a triangulation:
  *  <ul>
@@ -629,7 +629,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *
  *
- *   @sect3{Refinement and coarsening of a triangulation}
+ *   <h3>Refinement and coarsening of a triangulation</h3>
  *
  *   Refinement of a triangulation may be done through several ways. The most
  *   low-level way is directly through iterators: let @p i be an iterator to
@@ -673,7 +673,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   elements. These functions can be found in the GridRefinement class.
  *
  *
- *   @sect3{Smoothing of a triangulation}
+ *   <h3>Smoothing of a triangulation</h3>
  *
  *   Some degradation of approximation properties has been observed
  *   for grids which are too unstructured. Therefore, the
@@ -830,7 +830,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   </ul>
  *
  *
- *   @sect3{Material and boundary information}
+ *   <h3>Material and boundary information</h3>
  *
  *   Each line, quad, etc stores one byte of information denoting the
  *   material of a cell or the part of the boundary, a lower
@@ -869,7 +869,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   the different handling of vertices from lines and quads.
  *
  *
- *   @sect3{History of a triangulation}
+ *   <h3>History of a triangulation</h3>
  *
  *   It is possible to reconstruct a grid from its refinement history, which
  *   can be stored and loaded through the @p save_refine_flags and
@@ -917,7 +917,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   afterwards.
  *
  *
- *   @sect3{User flags and data}
+ *   <h3>User flags and data</h3>
  *
  *   A triangulation offers one bit per line, quad, etc for user data.
  *   This field can be
@@ -976,7 +976,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   unlike the structured objects lines and quads. 
  *
  *
- *   @sect3{Boundary approximation}
+ *   <h3>Boundary approximation</h3>
  *
  *   You can specify a boundary function for each boundary
  *   component. If a new vertex is created on a side or face at the
@@ -1027,9 +1027,9 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   coarse grid.
  *
  *
- *   @sect3{Technical details}
+ *   <h3>Technical details</h3>
  *
- *   @sect4{Algorithms for mesh regularization and smoothing upon refinement}
+ *   <h4>Algorithms for mesh regularization and smoothing upon refinement</h4>
  *
  *   We chose an inductive point of view: since upon creation of the
  *   triangulation all cells are on the same level, all regularity assumptions
@@ -1112,7 +1112,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   upon later.
  *
  *
- *   @sect4{Implementation conventions for two spatial dimensions}
+ *   <h4>Implementation conventions for two spatial dimensions</h4>
  *
  *   There is a convention about the direction of the bounding lines of quads in
  *   2D. The direction of a line is the direction of point 0 towards point 1. We
@@ -1144,7 +1144,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   variables of the GeometryInfo classes.
  *
  *
- *   @sect4{Coordinate systems}
+ *   <h4>Coordinate systems</h4>
  *
  *   When explicit coordinates are required for points in a cell (e.g for
  *   quadrature formulae or the point of definition of trial functions), we
@@ -1161,7 +1161,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   coordinates <tt>(1,0)</tt>, vertex 2 at <tt>(1,1)</tt> and vertex 3 at <tt>(0,1)</tt>.
  *
  *
- *   @sect3{Implementation conventions for three spatial dimensions}
+ *   <h3>Implementation conventions for three spatial dimensions</h3>
  *
  *   By convention, we will use the following numbering conventions
  *   for vertices, lines and faces of hexahedra in three space
@@ -1189,7 +1189,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   member functions and variables of the GeometryInfo classes.
  *
  *
- *   @sect4{Vertices}
+ *   <h4>Vertices</h4>
  *
  *   The vertices on the front face are numbered exactly the same way as are
  *   the vertices on a quadrilateral. The vertices on the back face are numbered
@@ -1208,7 +1208,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *     0-------1        0-------1
  *   @endverbatim
  *
- *   @sect4{Lines}
+ *   <h4>Lines</h4>
  *
  *   Here, the same holds as for the vertices: the lines of the front face are
  *   numbered as for the quadrilateral, for the back face they are just shifted.
@@ -1254,7 +1254,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   for you, by reorienting cells and edges of an arbitrary list of
  *   input cells that need not be already sorted.
  *   
- *   @sect4{Faces}
+ *   <h4>Faces</h4>
  *
  *   The faces are numbered in the same order as the lines were numbered: front
  *   face, back face, then the four side faces:
@@ -1366,7 +1366,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   where you need this information actually, but a few places in the
  *   library make use of this.
  *
- *   @sect4{Children}
+ *   <h4>Children</h4>
  *
  *   The eight children of a cell are numbered as follows:
  *   @verbatim
@@ -1417,7 +1417,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   <tt>GeometryInfo<3>::child_cell_on_face</tt> is best avoided due to
  *   these problems.
  *
- *   @sect4{Coordinate systems}
+ *   <h4>Coordinate systems</h4>
  *
  *   We define the following coordinate system for the explicit coordinates of
  *   the vertices of the unit cell:
@@ -1453,7 +1453,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   </ul>
  *
  *
- *   @sect3{Warning}
+ *   <h3>Warning</h3>
  *
  *   It seems impossible to preserve @p constness of a triangulation through
  *   iterator usage. Thus, if you declare pointers to a @p const triangulation

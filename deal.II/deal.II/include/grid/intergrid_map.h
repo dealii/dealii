@@ -75,7 +75,7 @@
  * consumpion.
  *
  *
- * @sect2{Usage}
+ * <h3>Usage</h3>
  *
  * In practice, use of this class is as follows:
  * @verbatim

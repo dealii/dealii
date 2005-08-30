@@ -35,7 +35,7 @@ template <int dim> class MappingQ;
  * is linked from the general documentation page of the library.
  *
  *
- * @sect3{Restriction on transformations}
+ * <h3>Restriction on transformations</h3>
  *
  * In some sense, the implementation of this element is not complete,
  * but you will rarely notice. Here is the fact: since the element is
@@ -83,7 +83,7 @@ template <int dim> class MappingQ;
  * and the curl will be computed correctly as well.
  * 
  * 
- * @sect3{Interpolation to finer and coarser meshes}
+ * <h3>Interpolation to finer and coarser meshes</h3>
  *
  * Each finite element class in deal.II provides matrices that are
  * used to interpolate from coarser to finer meshes and the other way
@@ -126,7 +126,7 @@ template <int dim> class MappingQ;
  * side), and it also preserves the order of the interpolation.
  * 
  *
- * @sect3{Numbering of the degrees of freedom (DoFs)}
+ * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
  * Nedelec elements have their degrees of freedom on edges, with shape
  * functions being vector valued and pointing in tangential

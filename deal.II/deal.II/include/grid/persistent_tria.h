@@ -47,7 +47,7 @@
  * vectors computed on the original grid on the reconstructed grid as well.
  *
  *
- * @sect3{Usage}
+ * <h3>Usage</h3>
  * You can use objects of this class almost in the same way as objects of the
  * Triangulation class. One of the few differences is that you can only
  * construct such an object by giving a coarse grid to the constructor. The

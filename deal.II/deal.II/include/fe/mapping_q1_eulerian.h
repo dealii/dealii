@@ -26,7 +26,7 @@
  * functions. Each cell is thus shifted in space by values given to
  * the mapping through a finite element field.
  *
- * @sect3{Usage} 
+ * <h3>Usage</h3> 
  *
  * The constructor of this class takes two arguments: a reference to
  * the vector that defines the mapping from the reference

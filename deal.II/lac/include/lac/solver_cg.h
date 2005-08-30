@@ -38,7 +38,7 @@
  * temporary vectors. For this class, there is a switch allowing for
  * additional output for the computation of eigenvalues of the matrix.
  *
- * @sect3{Eigenvalue computation}
+ * <h3>Eigenvalue computation</h3>
  *
  * See Y. Saad: "Iterative methods for Sparse Linear Systems", section
  * 6.7.3 for details.

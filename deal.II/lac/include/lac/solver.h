@@ -28,7 +28,7 @@ class SolverControl;
  * This class defines possible return states of linear solvers and
  * provides interfaces to a memory pool and the control object.
  *
- * @sect3{Requirements for template classes}
+ * <h3>Requirements for template classes</h3>
  *
  * Since iterative solvers do not rely on any special structure of
  * matrices or the format of storage, but only require that matrices
@@ -106,7 +106,7 @@ class SolverControl;
  * which denotes the application of the preconditioner.
  *
  *
- * @sect3{AdditionalData}
+ * <h3>AdditionalData</h3>
  *
  * Several solvers need additional data, like the damping parameter @p omega
  * of the @p SolverRichardson class or the maximum number of temporary

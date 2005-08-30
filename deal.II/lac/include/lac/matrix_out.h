@@ -54,7 +54,7 @@
  * description of these flags.
  *
  *
- * @sect3{Internals}
+ * <h3>Internals</h3>
  *
  * To avoid a compiler error in Sun's Forte compiler, we derive
  * privately from DataOutBase. Since the base class

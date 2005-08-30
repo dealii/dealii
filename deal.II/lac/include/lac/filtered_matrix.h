@@ -99,7 +99,7 @@ template <typename number> class Vector;
  * hand side, through the apply_constraints() function.
  *
  *
- * @sect3{Connection to other classes}
+ * <h3>Connection to other classes</h3>
  *
  * The function @p MatrixTools::apply_boundary_values does exactly
  * the same that this class does, except for the fact that that
@@ -120,7 +120,7 @@ template <typename number> class Vector;
  * one then can work. For these cases, this class is meant.
  *
  *
- * @sect3{Usage}
+ * <h3>Usage</h3>
  *
  * Usage is simple: create an object of this type, point it to a
  * matrix that shall be used for $A$ above (either through the
@@ -166,7 +166,7 @@ template <typename number> class Vector;
  * @endverbatim
  *
  *
- * @sect3{Template arguments}
+ * <h3>Template arguments</h3>
  *
  * This class takes as template arguments a matrix and a vector
  * class. The former must provide @p vmult, @p Tvmult, and
@@ -176,7 +176,7 @@ template <typename number> class Vector;
  * assignment through <tt>operator=</tt>.
  *
  *
- * @sect3{Thread-safety}
+ * <h3>Thread-safety</h3>
  *
  * The functions that operate as a matrix and do not change the
  * internal state of this object are synchronised and thus

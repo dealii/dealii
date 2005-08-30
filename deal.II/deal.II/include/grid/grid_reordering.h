@@ -29,7 +29,7 @@
  * and converting them to deal.II triangulations.
  *
  *
- * @sect3{Statement of problems}
+ * <h3>Statement of problems</h3>
  *
  * Triangulations in deal.II have a special structure, in that there
  * are not only cells, but also faces, and in 3d also edges, that are
@@ -124,7 +124,7 @@
  * unfortunately.
  *
  *
- * @sect3{Examples of problems}
+ * <h3>Examples of problems</h3>
  *
  * As noted, reordering the vertex lists of cells such that the
  * resulting grid is not a trivial problem. In particular, it is often
@@ -238,7 +238,7 @@
  * entered long ago.
  *
  *
- * @sect3{Solution}
+ * <h3>Solution</h3>
  *
  * From the examples above, it is obvious that if we encounter a cell
  * that cannot be added to the cells which have already been entered,
@@ -304,7 +304,7 @@
  * and memory. We will describe these algorithms in the following.
  *
  *
- * @sect3{The 2d linear complexity algorithm}
+ * <h3>The 2d linear complexity algorithm</h3>
  *
  * The algorithm uses the fact that opposite faces of a cell need to
  * have the same orientation. So you start with one arbitrary line,
@@ -432,7 +432,7 @@
  * library.
  *
  *
- * @sect3{For the curious}
+ * <h3>For the curious</h3>
  *
  * Prior to the implementation of the algorithms developed by Michael Anderson
  * and described above, we used a branch-and-cut algorithm initially

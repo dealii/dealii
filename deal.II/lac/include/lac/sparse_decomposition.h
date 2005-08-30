@@ -30,8 +30,8 @@
  * The decomposition is stored as a sparse matrix which is why this
  * class is derived from the SparseMatrix. Since it is not a matrix in
  * the usual sense, the derivation is <tt>protected</tt> rather than <tt>public</tt>.
-
- * @sect3{Fill-in}
+ *
+ * <h3>Fill-in</h3>
  *
  * The sparse LU decompositions are frequently used with additional
  * fill-in, i.e. the sparsity structure of the decomposition is denser
@@ -45,7 +45,7 @@
  * copy-constructor of the SparsityPattern class which allows the addition
  * of side-diagonals to a given sparsity structure.
  *
- * @sect3{Unified use of preconditioners}
+ * <h3>Unified use of preconditioners</h3>
  *
  * An object of this class can be used in the same form as all
  * PreconditionBlock preconditioners:

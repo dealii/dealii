@@ -210,7 +210,7 @@ class MGDoFObjectAccessor<0, dim>
  * lines in 1D-, 2D-, etc dimensions).
  *
  *
- * @sect3{Usage}
+ * <h3>Usage</h3>
  *
  * The DoFDimensionInfo classes inherited by the DoFHandler classes
  * declare typedefs to iterators using the accessors declared in this class
@@ -219,7 +219,7 @@ class MGDoFObjectAccessor<0, dim>
  * as they provide easier typing (much less complicated names!).
  * 
  * 
- * @sect3{Notes about the class hierarchy structure}
+ * <h3>Notes about the class hierarchy structure</h3>
  *
  * Inheritance from <tt>MGDoFObjectAccessor_Inheritance<1,dim>::BaseClass</tt> yields
  * inheritance from <tt>DoFCellAccessor<1></tt> if <tt>dim==1</tt> and from

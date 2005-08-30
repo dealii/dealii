@@ -52,14 +52,14 @@ template <int dim> class MappingQ;
  * The constructor of this class takes the degree @p p of this finite
  * element.
  *
- * @sect3{Implementation}
+ * <h3>Implementation</h3>
  *
  * The constructor creates a TensorProductPolynomials object
  * that includes the tensor product of @p Hierarchical
  * polynomials of degree @p p. This @p TensorProductPolynomials
  * object provides all values and derivatives of the shape functions.
  *
- * @sect3{Numbering of the degrees of freedom (DoFs)}
+ * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
  * The original ordering of the shape functions represented by the
  * TensorProductPolynomials is a tensor product
@@ -69,7 +69,7 @@ template <int dim> class MappingQ;
  * the hexes. To be explicit, these numberings are listed in the
  * following:
  *
- * @sect4{Q1 elements}
+ * <h4>Q1 elements</h4>
  * <ul>
  * <li> 1D case:
  *   @verbatim
@@ -111,7 +111,7 @@ template <int dim> class MappingQ;
  *   <li> Index 7: <tt>[0, 1, 1]</tt>;
  *   </ul>
  * </ul>
- * @sect4{Q2 elements}
+ * <h4>Q2 elements</h4>
  * <ul>
  * <li> 1D case:
  *   @verbatim
@@ -185,7 +185,7 @@ template <int dim> class MappingQ;
  *   <li> Index 26: <tt>[1/2, 1/2, 1/2]</tt>; 
  *   </ul>
  * </ul>
- * @sect4{Q3 elements}
+ * <h4>Q3 elements</h4>
  * <ul>
  * <li> 1D case:
  *   @verbatim
@@ -205,7 +205,7 @@ template <int dim> class MappingQ;
  *   Note the reverse ordering of degrees of freedom on the left and
  *   upper line.
  * </ul>
- * @sect4{Q4 elements}
+ * <h4>Q4 elements</h4>
  * <ul>
  * <li> 1D case:
  *   @verbatim
