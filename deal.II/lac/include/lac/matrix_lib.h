@@ -211,9 +211,9 @@ class ProductSparseMatrix : public PointerMatrixBase<Vector<vector_number> >
 
 
 /**
- * Mean value filter.  The @p vmult functions of this matrix filter
+ * Mean value filter.  The vmult() functions of this matrix filter
  * out mean values of the vector.  If the vector is of type
- * @p BlockVector, then an additional parameter selects a single
+ * BlockVector, then an additional parameter selects a single
  * component for this operation.
  *
  * @author Guido Kanschat, 2002, 2003

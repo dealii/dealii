@@ -150,7 +150,7 @@ namespace PETScWrappers
                                           * that by calling the @p reinit
                                           * functions of the blocks
                                           * themselves. Do not forget to
-                                          * call @p collect_sizes after
+                                          * call collect_sizes() after
                                           * that on this object.
                                           *
                                           * The reason that you have to
@@ -160,7 +160,7 @@ namespace PETScWrappers
                                           * of elements per row may be
                                           * varying, etc. It is simpler
                                           * not to reproduce the interface
-                                          * of the @p SparsityPattern
+                                          * of the SparsityPattern
                                           * class here but rather let the
                                           * user call whatever function
                                           * she desires.

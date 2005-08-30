@@ -148,7 +148,7 @@ namespace PETScWrappers
                                         * that by calling the @p reinit
                                         * functions of the blocks
                                         * themselves. Do not forget to
-                                        * call @p collect_sizes after
+                                        * call collect_sizes() after
                                         * that on this object.
                                         *
                                         * The reason that you have to

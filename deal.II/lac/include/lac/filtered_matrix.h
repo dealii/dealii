@@ -101,11 +101,11 @@ template <typename number> class Vector;
  *
  * <h3>Connection to other classes</h3>
  *
- * The function @p MatrixTools::apply_boundary_values does exactly
+ * The function MatrixTools::apply_boundary_values() does exactly
  * the same that this class does, except for the fact that that
  * function actually modifies the matrix. Due to this, it is only
  * possible to solve with a matrix onto which
- * @p MatrixTools::apply_boundary_values was applied for one right
+ * MatrixTools::apply_boundary_values() was applied for one right
  * hand side and one set of boundary values since the modification of
  * the right hand side depends on the original matrix.
  *
@@ -214,9 +214,8 @@ class FilteredMatrix : public Subscriptor
 				     /**
 				      * Default constructor. You will
 				      * have to set the matrix to be
-				      * used later using the
-				      * @p set_referenced_matrix
-				      * function.
+				      * used later using
+				      * set_referenced_matrix().
 				      */
     FilteredMatrix ();
 
@@ -348,7 +347,7 @@ class FilteredMatrix : public Subscriptor
 				      * let $dst = M^T*src$ with $M$
 				      * being this matrix. This
 				      * function does the same as
-				      * @p vmult but takes the
+				      * vmult() but takes the
 				      * transposed matrix. (This
 				      * matrix is the filtered one to
 				      * which we store a reference.)
@@ -483,7 +482,7 @@ class FilteredMatrix : public Subscriptor
 				      * matrix. In order to guarantee
 				      * that it is not deleted while
 				      * still in use, we subscribe to
-				      * it using the @p SmartPointer
+				      * it using the SmartPointer
 				      * class.
 				      */
     SmartPointer<const MATRIX> matrix;

@@ -48,7 +48,7 @@
  * FullMatrix, as long as it satisfies a number of requirements,
  * stated with the member functions of this class.
  *
- * The generation of patches through the @p build_patches function
+ * The generation of patches through the build_patches() function
  * can be modified by giving it an object holding certain flags. See
  * the documentation of the members of the Options class for a
  * description of these flags.
@@ -81,7 +81,7 @@
  *    D d;
  * @endverbatim 
  *
- *
+ * @ingroup IO
  * @author Wolfgang Bangerth, 2001
  */
 class MatrixOut : public DataOutInterface<2,2>
@@ -171,7 +171,7 @@ class MatrixOut : public DataOutInterface<2,2>
 				      * requires that we can extract
 				      * elements of the matrix, which
 				      * is done using the
-				      * @p get_element function
+				      * get_element() function
 				      * declared below. By adding
 				      * specializations, you can
 				      * extend this class to other
@@ -195,21 +195,21 @@ class MatrixOut : public DataOutInterface<2,2>
     
 				     /**
 				      * Abbreviate the somewhat
-				      * lengthy name for the @p Patch
+				      * lengthy name for the ::DataOutBase::Patch
 				      * class.
 				      *
 				      * Note that we have to indicate
 				      * the global scope using the
 				      * @p :: in front of
-				      * @p DataOutBase, since
+				      * DataOutBase, since
 				      * otherwise the C++ rules
 				      * specify that this here
-				      * indicates the @p DataOutBase
+				      * indicates the DataOutBase
 				      * base class of this
 				      * class. Since that is a private
 				      * base class, we cannot access
 				      * its members, and so access to
-				      * the local @p Patch type would
+				      * the local Patch type would
 				      * be forbidden.
 				      */
     typedef ::DataOutBase::Patch<2,2> Patch;
@@ -217,7 +217,7 @@ class MatrixOut : public DataOutInterface<2,2>
 				     /**
 				      * This is a list of patches that
 				      * is created each time
-				      * @p build_patches is
+				      * build_patches() is
 				      * called. These patches are used
 				      * in the output routines of the
 				      * base classes.

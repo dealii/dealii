@@ -203,7 +203,7 @@ class PathSearch
 				     /**
 				      * Get path list for a certain
 				      * class. Used to set up
-				      * @p my_path_list in constructor.
+				      * #my_path_list in constructor.
 				      */
     static std::vector<std::string>& get_path_list(const std::string& cls);
     

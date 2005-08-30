@@ -52,18 +52,19 @@ template <typename number> class SparseMatrix;
  * first have to provide an empty sparsity pattern object with a fixed
  * maximal number of entries per row. To find out about this maximal
  * row length, one usually calls the function
- * DoFHandler@p ::max_couplings_per_dof which returns an
- * estimate for that quantity. While this estimate is usually quite
- * good in 2d and exact in 1d, it is often significantly too large in
- * 3d and especially for higher order elements. Furthermore, normally
- * only a small fraction of the rows of a matrix will end up having
- * the maximal number of nonzero entries per row (usually those nodes
- * adjacent to hanging nodes), most have much less. In effect, the
- * empty SparsityPattern object has allocated much too much
+ * DoFHandler::max_couplings_between_dofs() which returns an estimate for
+ * that quantity or DoFTools::compute_row_length_vector(), which gives
+ * a better estimate for each row. While this estimate is usually
+ * quite good in 2d and exact in 1d, it is often significantly too
+ * large in 3d and especially for higher order elements. Furthermore,
+ * normally only a small fraction of the rows of a matrix will end up
+ * having the maximal number of nonzero entries per row (usually those
+ * nodes adjacent to hanging nodes), most have much less. In effect,
+ * the empty SparsityPattern object has allocated much too much
  * memory. Although this unnecessarily allocated memory is later freed
- * when SparsityPattern@p ::compress is called, this
- * overallocation has, with higher order elements and in 3d, sometimes
- * been so large that the program aborted due to lack of memory.
+ * when SparsityPattern::compress() is called, this overallocation
+ * has, with higher order elements and in 3d, sometimes been so large
+ * that the program aborted due to lack of memory.
  *
  * This class therefore provides an alternative representation of a
  * sparsity pattern: we don't specify a maximal row length initially,
@@ -116,7 +117,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * member variables in other
 				      * classes. You can make the
 				      * structure usable by calling
-				      * the @p reinit function.
+				      * the reinit() function.
 				      */
     CompressedSparsityPattern ();
     
@@ -179,7 +180,7 @@ class CompressedSparsityPattern : public Subscriptor
 				      * data structures for a new
 				      * matrix with @p m rows and
 				      * @p n columns, with at most
-				      * @p max_per_row nonzero
+				      * max_entries_per_row() nonzero
 				      * entries per row.
 				      */
     void reinit (const unsigned int m,
@@ -336,7 +337,7 @@ class CompressedSparsityPattern : public Subscriptor
                                       * describing which entries of this row
                                       * are nonzero. Data is organized as
                                       * follows: if an entry is added to a
-                                      * row, it is first added to the @p cache
+                                      * row, it is first added to the #cache
                                       * variable, irrespective of whether an
                                       * entry with same column number has
                                       * already been added. Only if the cache
@@ -363,7 +364,7 @@ class CompressedSparsityPattern : public Subscriptor
                                       * Since some functions that are @p const
                                       * need to access the data of this
                                       * object, but need to flush caches
-                                      * before, the @p flush_cache function is
+                                      * before, the flush_cache() function is
                                       * marked const, and the data members are
                                       * marked @p mutable.
                                       *
@@ -399,7 +400,7 @@ class CompressedSparsityPattern : public Subscriptor
         
                                          /**
                                           * Cache of entries that have not yet
-                                          * been written to @p entries;
+                                          * been written to #entries;
                                           */
         mutable unsigned int cache[cache_size];
 
@@ -421,7 +422,7 @@ class CompressedSparsityPattern : public Subscriptor
 
                                          /**
                                           * Flush the cache my merging it with
-                                          * the @p entries array.
+                                          * the #entries array.
                                           */
         void flush_cache () const;
     };

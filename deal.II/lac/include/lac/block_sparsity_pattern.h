@@ -77,7 +77,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      *
 				      * This value is only an alias to
 				      * the respective value of the
-				      * @p SparsityPattern class.
+				      * SparsityPattern class.
 				      */
     static const unsigned int invalid_entry = SparsityPattern::invalid_entry;
     
@@ -89,7 +89,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * member variables in other
 				      * classes. You can make the
 				      * structure usable by calling
-				      * the @p reinit function.
+				      * the reinit() function.
 				      */
     BlockSparsityPatternBase ();
 
@@ -98,7 +98,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * given number of block rows and
 				      * columns. The blocks themselves
 				      * are still empty, and you have
-				      * to call @p collect_sizes after
+				      * to call collect_sizes() after
 				      * you assign them sizes.
 				      */
     BlockSparsityPatternBase (const unsigned int n_block_rows,
@@ -112,7 +112,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * are no block allocated at
 				      * present. This is for the same
 				      * reason as for the
-				      * @p SparsityPattern, see there
+				      * SparsityPattern, see there
 				      * for the details.
 				      */
     BlockSparsityPatternBase (const BlockSparsityPatternBase &bsp);
@@ -130,10 +130,10 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * unitialized ones, i.e. ones
 				      * for which also the sizes are
 				      * not yet set. You have to do
-				      * that by calling the @p reinit
+				      * that by calling the reinit()
 				      * functions of the blocks
 				      * themselves. Do not forget to
-				      * call @p collect_sizes after
+				      * call collect_sizes() after
 				      * that on this object.
 				      *
 				      * The reason that you have to
@@ -143,7 +143,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * of elements per row may be
 				      * varying, etc. It is simpler
 				      * not to reproduce the interface
-				      * of the @p SparsityPattern
+				      * of the SparsityPattern
 				      * class here but rather let the
 				      * user call whatever function
 				      * she desires.
@@ -393,8 +393,8 @@ class BlockSparsityPatternBase : public Subscriptor
 				     /**
 				      * Make the block sparse matrix a
 				      * friend, so that it can use our
-				      * @p row_indices and
-				      * @p column_indices objects.
+				      * #row_indices and
+				      * #column_indices objects.
 				      */
     template <typename number>
     friend class BlockSparseMatrix;
@@ -422,7 +422,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 				      * member variables in other
 				      * classes. You can make the
 				      * structure usable by calling
-				      * the @p reinit function.
+				      * the reinit() function.
 				      */
     BlockSparsityPattern ();
 
@@ -431,7 +431,7 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 				      * given number of block rows and
 				      * columns. The blocks themselves
 				      * are still empty, and you have
-				      * to call @p collect_sizes after
+				      * to call collect_sizes() after
 				      * you assign them sizes.
 				      */
     BlockSparsityPattern (const unsigned int n_rows,
@@ -491,7 +491,7 @@ class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      * member variables in other
 				      * classes. You can make the
 				      * structure usable by calling
-				      * the @p reinit function.
+				      * the reinit() function.
 				      */
     CompressedBlockSparsityPattern ();
 
@@ -500,7 +500,7 @@ class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<Compresse
 				      * given number of block rows and
 				      * columns. The blocks themselves
 				      * are still empty, and you have
-				      * to call @p collect_sizes after
+				      * to call collect_sizes() after
 				      * you assign them sizes.
 				      */
     CompressedBlockSparsityPattern (const unsigned int n_rows,

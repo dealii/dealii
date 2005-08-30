@@ -417,7 +417,7 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 				      * matrix. In order to guarantee
 				      * that it is not deleted while
 				      * still in use, we subscribe to
-				      * it using the @p SmartPointer
+				      * it using the SmartPointer
 				      * class.
 				      */
     SmartPointer<const BlockSparsityPattern> sparsity_pattern;

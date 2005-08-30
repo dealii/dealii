@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,11 +30,11 @@ template <typename Number> class BlockVector;
 
 
 /**
- * A block matrix consisting of blocks of type @p SparseMatrixEZ.
+ * A block matrix consisting of blocks of type SparseMatrixEZ.
  *
  * Like the other Block-objects, this matrix can be used like a
- * @p SparseMatrixEZ, when it comes to access to entries. Then, there
- * are functions for the multiplication with @p BlockVector and
+ * SparseMatrixEZ, when it comes to access to entries. Then, there
+ * are functions for the multiplication with BlockVector and
  * access to the individual blocks.
  *
  * @author Guido Kanschat, 2002, 2003
@@ -251,7 +251,7 @@ class BlockSparseMatrixEZ : public Subscriptor
 				      * let $dst = M^T*src$ with $M$
 				      * being this matrix. This
 				      * function does the same as
-				      * @p vmult but takes the
+				      * vmult() but takes the
 				      * transposed matrix.
 				      */
     template <typename somenumber>
@@ -273,7 +273,7 @@ class BlockSparseMatrixEZ : public Subscriptor
 				      * multiplication. Add $M^T*src$
 				      * to $dst$ with $M$ being this
 				      * matrix. This function does the
-				      * same as @p vmult_add but takes
+				      * same as vmult_add() but takes
 				      * the transposed matrix.
 				      */
     template <typename somenumber>

@@ -259,16 +259,17 @@ namespace internal
  * this class.
  *
  * 
- * @ref Instantiations: some (<tt>@<float@> @<double@></tt>). Most of the
- * functions take a vector or block vector argument. These functions can, in
- * general, only successfully be compiled if the individual blocks of this
- * matrix implement the respective functions operating on the vector type in
- * question. For example, if you have a block sparse matrix over deal.II
- * SparseMatrix objects, then you will likely not be able to form the
- * matrix-vector multiplication with a block vector over
- * PETScWrappers::SparseMatrix objects. If you attempt anyway, you will likely
- * get a number of compiler errors.
+ * Most of the functions take a vector or block vector argument. These
+ * functions can, in general, only successfully be compiled if the
+ * individual blocks of this matrix implement the respective functions
+ * operating on the vector type in question. For example, if you have
+ * a block sparse matrix over deal.II SparseMatrix objects, then you
+ * will likely not be able to form the matrix-vector multiplication
+ * with a block vector over PETScWrappers::SparseMatrix objects. If
+ * you attempt anyway, you will likely get a number of compiler
+ * errors.
  *
+ * @ref Instantiations: some (<tt>@<float@> @<double@></tt>).
  * @author Wolfgang Bangerth, 2000, 2004
  */
 template <typename MatrixType>

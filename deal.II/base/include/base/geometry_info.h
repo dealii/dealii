@@ -32,7 +32,7 @@ template <int dim> class GeometryInfo;
  * This class contains as static members information on vertices and
  * faces of a @p dim-dimensional grid cell. The interface is the same
  * for all dimensions. If a value is of no use in a low dimensional
- * cell, it is (correctly) set to zero, e.g. @p subfaces_per_cell in
+ * cell, it is (correctly) set to zero, e.g. #subfaces_per_cell in
  * 1d.
  *
  * This information should always replace hard-coded numbers of
@@ -418,7 +418,7 @@ struct GeometryInfo
 				      * children, return any one of
 				      * their indices. The result is
 				      * always less than
-				      * <tt>GeometryInfo<dimension>::children_per_cell</tt>.
+				      * GeometryInfo<dimension>::children_per_cell.
 				      *
 				      * The order of child cells is
 				      * described the documentation of

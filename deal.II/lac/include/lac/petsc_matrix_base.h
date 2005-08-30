@@ -258,7 +258,7 @@ namespace PETScWrappers
  * functions, and is often exchangable. However, since PETSc only supports a
  * single scalar type (either double, float, or a complex data type), it is
  * not templated, and only works with whatever your PETSc installation has
- * defined the data type @p PetscScalar to.
+ * defined the data type PetscScalar to.
  *
  * Note that PETSc only guarantees that operations do what you expect if the
  * functions @p MatAssemblyBegin and @p MatAssemblyEnd have been called
