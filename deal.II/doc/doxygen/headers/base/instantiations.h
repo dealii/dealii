@@ -1,6 +1,10 @@
 /**
  * @page Instantiations Template instantiations
  *
+ * @subpage Inst1 "Few"
+ * @subpage Inst2 "Some"
+ * @subpage Inst3 "Many"
+ * 
  * The instantiation of complex function templates costs a lot of
  * compile time and blows up the size of the resulting object
  * files. Therefore, declaration and implementation of these functions
