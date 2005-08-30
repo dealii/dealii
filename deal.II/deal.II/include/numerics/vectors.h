@@ -292,6 +292,7 @@ class ConstraintMatrix;
  * if access to an object describing the exact form of the boundary is needed, the
  * pointer stored within the triangulation object is accessed.
  *
+ * @ref Instantiations: some (Vector<float>, Vector<double>, BlockVector<float>, BlockVector<double>, see also individual functions)
  * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, 1998, 1999, 2000, 2001
  */
 class VectorTools
@@ -432,6 +433,15 @@ class VectorTools
 				      * space @p dof_2 afterwards, to
 				      * make the result continuous
 				      * again.
+				      *
+				      * @ref Instantiations: some (the
+				      * standard vector types
+				      * mentioned in the class
+				      * documentation are
+				      * instantiated, but only the
+				      * same vector for InVector and
+				      * OutVector. Other combinations
+				      * must be instantiated by hand.)
 				      */
     template <int dim, class InVector, class OutVector>
     static void interpolate (const DoFHandler<dim>    &dof_1,
@@ -830,6 +840,12 @@ class VectorTools
 				      *
 				      * See the general documentation of this
 				      * class for more information.
+				      *
+				      * @ref Instantiations: some
+				      * (InVectors as in the
+				      * documentation of the class,
+				      * OutVector only Vector<double>
+				      * and Vector<float>)
 				      */
     template <int dim, class InVector, class OutVector>
     static void integrate_difference (const Mapping<dim>    &mapping,
