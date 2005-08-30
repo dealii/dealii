@@ -69,18 +69,6 @@ class PreconditionBlockJacobi;
  * example, <tt>number==double, inverse_type=float</tt> might be a viable
  * choice.
  *
- *
- * @sect2{On template instantiations}
- *
- * Member functions of this class are either implemented in this file
- * or in a file of the same name with suffix ``.templates.h''. For the
- * most common combinations of the template parameters, instantiations
- * of this class are provided in a file with suffix ``.cc'' in the
- * ``source'' directory. If you need an instantiation that is not
- * listed there, you have to include this file along with the
- * corresponding ``.templates.h'' file and instantiate the respective
- * class yourself.
- *
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -417,6 +405,8 @@ class PreconditionBlock : public virtual Subscriptor
 /**
  * Block Jacobi preconditioning.
  * See PreconditionBlock for requirements on the matrix.
+ *
+ * @ref Instantiations: some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -700,6 +690,7 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
  * arbitrarily.
  *
  * See PreconditionBlock for requirements on the matrix.
+ * @ref Instantiations: some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2001, 2002, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -855,6 +846,7 @@ class PreconditionBlockSOR : public virtual Subscriptor,
  * class requires storage of the diagonal blocks and their inverses.
  *
  * See PreconditionBlock for requirements on the matrix.
+ * @ref Instantiations: some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>

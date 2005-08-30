@@ -46,23 +46,12 @@
  * @endverbatim
  *
  * 
- * @sect2{Usage and state management}
+ * <h3>Usage and state management</h3>
  *
  * Refer to SparseLUDecomposition documentation for suggested
  * usage and state management.
  *
- * 
- * @sect2{On template instantiations}
- *
- * Member functions of this class are either implemented in this file
- * or in a file of the same name with suffix ``.templates.h''. For the
- * most common combinations of the template parameters, instantiations
- * of this class are provided in a file with suffix ``.cc'' in the
- * ``source'' directory. If you need an instantiation that is not
- * listed there, you have to include this file along with the
- * corresponding ``.templates.h'' file and instantiate the respective
- * class yourself.
- *
+ * @ref Instantiations: some (float, double)
  * @author Wolfgang Bangerth, 1999, based on a similar implementation
  * by Malte Braack; unified interface: Ralf Hartmann
  */

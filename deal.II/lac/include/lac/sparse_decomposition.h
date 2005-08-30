@@ -82,7 +82,7 @@
  * restrictions on the sparsity see section `Fill-in' above).
  *
  *
- * @sect2{State management}
+ * <h3>State management</h3>
  *
  * The state management simply requires the initialize() function to
  * be called before the object is used as preconditioner.
@@ -106,7 +106,7 @@
  * method. It is legal to apply this decomposition (vmult() method) in
  * decomposed state.
  *
- * @sect2{Particular implementations}
+ * <h3>Particular implementations</h3>
  *
  * It is enough to override the initialize() and vmult() methods to
  * implement particular LU decompositions, like the true LU, or the

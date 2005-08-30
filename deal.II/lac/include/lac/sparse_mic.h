@@ -25,7 +25,7 @@
  * SparseLUDecomposition.
  *
  * 
- * @sect2{The decomposition}
+ * <h3>The decomposition</h3>
  * 
  * Let a sparse matrix A is in the form A = - L - U + D, where -L and
  * -U are strictly lower and upper triangular matrices. The MIC(0)

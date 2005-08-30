@@ -39,8 +39,8 @@ class ParameterHandler;
  * sophisticated tests.
  *
  *
- * @sect2{State}
- * The return states of the check function are of type @p State,
+ * <h3>State</h3>
+ * The return states of the check function are of type #State,
  * which is an enum local to this class. It indicates the state the
  * solver is in.
  *
@@ -59,14 +59,19 @@ class SolverControl : public Subscriptor
   public:
 
 				     /**
-				      * @p Enum denoting the different
+				      * Enum denoting the different
 				      * states a solver can be in. See
 				      * the general documentation of
 				      * this class for more
 				      * information.
 				      */
     enum State {
-      iterate = 0, success, failure
+					   /// Continue iteration
+      iterate = 0,
+				       /// Stop iteration, goal reached
+      success,
+				       /// Stop iteration, goal not reached
+      failure
     };
 
 				     /**
