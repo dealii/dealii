@@ -136,12 +136,12 @@ TODO:
 
 
 TAGS:
-	@cd $D/common ; etags $D/base/source/*.cc \
-	$D/lac/source/*.cc $D/deal.II/source/*/*.cc $D/deal.II/source/*/*.h \
-	$D/tests/*/*.cc $D/examples/*/*.cc \
-	--language=c++ \
-	$D/base/include/*/*.h $D/lac/include/*/*.h \
-	$D/deal.II/include/*/*.h $D/tests/*/*.h; \
+	@cd $D/common ; etags --language=c++ \
+	$D/base/include/*/*.h $D/lac/include/*/*.h $D/deal.II/include/*/*.h \
+	$D/base/source/*.cc $D/lac/source/*.cc \
+	$D/deal.II/source/*/*.cc $D/deal.II/source/*/*.h \
+	$D/examples/*/*.cc \
+	$D/tests/*/*.h $D/tests/*/*.cc ; \
 	perl -pi -e 's/ \* .*//g; s&[\t]*/\*.*&&g; s&[\t]*\*/.*&&g;' TAGS
 
 
