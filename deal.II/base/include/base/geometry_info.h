@@ -473,7 +473,6 @@ struct GeometryInfo
 
 /* -------------- declaration of explicit specializations ------------- */
 
-/// @if NoDoc
 
 
 
@@ -654,6 +653,5 @@ GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p)
 }
 
 
-/// @endif
 
 #endif
