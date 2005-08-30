@@ -116,7 +116,7 @@
  *   <li> Index 7: <tt>[0, 1, 1]</tt>;
  *   </ul>
  * </ul>
- * @sect4{Q2 elements}
+ * <h4>Q2 elements</h4>
  * <ul>
  * <li> 1D case:
  *   @verbatim
@@ -190,7 +190,7 @@
  *   <li> Index 26: <tt>[1/2, 1/2, 1/2]</tt>; 
  *   </ul>
  * </ul>
- * @sect4{Q3 elements}
+ * <h4>Q3 elements</h4>
  * <ul>
  * <li> 1D case:
  *   @verbatim
@@ -210,7 +210,7 @@
  *   Note the reverse ordering of degrees of freedom on the left and
  *   upper line.
  * </ul>
- * @sect4{Q4 elements}
+ * <h4>Q4 elements</h4>
  * <ul>
  * <li> 1D case:
  *   @verbatim
