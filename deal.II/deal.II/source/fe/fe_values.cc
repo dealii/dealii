@@ -159,7 +159,6 @@ FEValuesBase<dim>::TriaCellIterator::message_string
 
 
 template <int dim>
-inline
 FEValuesBase<dim>::TriaCellIterator::
 TriaCellIterator (const typename Triangulation<dim>::cell_iterator &cell)
                 :

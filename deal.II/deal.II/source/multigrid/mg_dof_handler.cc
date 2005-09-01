@@ -89,14 +89,12 @@ MGDoFHandler<dim>::MGVertexDoFs::operator = (const MGVertexDoFs &)
 
 
 template <int dim>
-inline
 unsigned int MGDoFHandler<dim>::MGVertexDoFs::get_coarsest_level () const {
   return coarsest_level;
 }
 
 
 template <int dim>
-inline
 unsigned int MGDoFHandler<dim>::MGVertexDoFs::get_finest_level () const {
   return finest_level;
 }

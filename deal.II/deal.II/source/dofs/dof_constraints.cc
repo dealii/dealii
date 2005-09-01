@@ -44,7 +44,6 @@
 #endif
 
 
-inline
 bool
 ConstraintMatrix::check_zero_weight (const std::pair<unsigned int, double> &p)
 {
@@ -53,7 +52,6 @@ ConstraintMatrix::check_zero_weight (const std::pair<unsigned int, double> &p)
 
 
 
-inline
 bool
 ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
 {
@@ -62,7 +60,6 @@ ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
 
 
 
-inline
 bool
 ConstraintMatrix::ConstraintLine::operator == (const ConstraintLine &a) const
 {
