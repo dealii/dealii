@@ -33,8 +33,6 @@ template <int dim> class MGDoFHandler;
 
 /*------------------------------------------------------------------------*/
 
-//TODO:[WB] remove reference to non-existing TriaDimensionInfo
-
 /**
  *  Structure which is passed to the
  *  <tt>Triangulation<dim>::create_triangulation</tt> function. It
@@ -355,15 +353,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  In order to make things as easy and dimension independent as possible,
  *  use of class local typedefs is made, see below.
  *  
- *  In the base class TriaDimensionInfo, a @p Cell is typedef'd to be whatever
- *  is reasonable for a cell in the respective dimension, i.e. a @p Line in
- *  one dimension, a @p Quad in two dimensions, and so on.
- *
  *  The Triangulation class provides iterator which enable looping over all
- *  lines, cells,
- *  etc without knowing the exact representation used to describe them. Their
- *  names are typedefs in the TriaDimensionInfo base class (thus making them
- *  local types to this class) and are as follows:
+ *  lines, cells, etc without knowing the exact representation used to
+ *  describe them. Their names are typedefs imported from the IteratorSelector
+ *  class (thus making them local types to this class) and are as follows:
  *
  *  <ul>
  *  <li> @p raw_line_iterator: loop over all lines, used or not (declared for
