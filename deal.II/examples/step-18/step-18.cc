@@ -1423,6 +1423,32 @@ namespace QuasiStaticElasticity
                                      // and we can build it even for large 3d
                                      // problems.
                                      //
+                                     // It is also worth noting that the
+                                     // sparsity pattern we construct is
+                                     // global, i.e. comprises all degrees of
+                                     // freedom whether they will be owned by
+                                     // the processor we are on or another one
+                                     // (in case this program is run in
+                                     // parallel via MPI). This of course is
+                                     // not optimal -- it limits the size of
+                                     // the problems we can solve, since
+                                     // storing the entire sparsity pattern
+                                     // (even if only for a short time) on
+                                     // each processor does not scale
+                                     // well. However, there are several more
+                                     // places in the program in which we do
+                                     // this, for example we always keep the
+                                     // global triangulation and DoF handler
+                                     // objects around, even if we only work
+                                     // on part of them. At present, deal.II
+                                     // does not have the necessary facilities
+                                     // to completely distribute these objects
+                                     // (a task that, indeed, is very hard to
+                                     // achieve with adaptive meshes, since
+                                     // well-balanced subdivisions of a domain
+                                     // tend to become unbalanced as the mesh
+                                     // is adaptively refined).
+                                     //
                                      // With this data structure, we can then
                                      // go to the PETSc sparse matrix and tell
                                      // it to pre-allocate all the entries we
