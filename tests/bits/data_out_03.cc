@@ -30,7 +30,7 @@ template <int dim>
 class XDataOut : public DataOut<dim>
 {
   public:
-    const std::vector<typename DataOutBase::Patch<dim,dim> > &
+    const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
     get_patches() const
       { return DataOut<dim>::get_patches(); }
 
@@ -45,7 +45,7 @@ template <int dim>
 class XDataOutReader : public DataOutReader<dim>
 {
   public:
-    const std::vector<typename DataOutBase::Patch<dim,dim> > &
+    const std::vector<typename ::DataOutBase::Patch<dim,dim> > &
     get_patches() const
       { return DataOutReader<dim>::get_patches(); }
 
