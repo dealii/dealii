@@ -509,20 +509,18 @@ namespace QuasiStaticElasticity
     
     private:
 				       // The private interface is more
-				       // extensive than in step-17. enerate a
-				       // coarse grid and assign appropriate
-				       // boundary condition
-				       // indicators. First, we obviously need
-				       // functions that create the initial
-				       // mesh, set up the variables that
-				       // describe the linear system on the
-				       // present mesh (i.e. matrices and
-				       // vectors), and then functions that
-				       // actually assemble the system, direct
-				       // what has to be solved in each time
-				       // step, a function that solves the
-				       // linear system that arises in each
-				       // timestep (and returns the number of
+				       // extensive than in step-17. First, we
+				       // obviously need functions that create
+				       // the initial mesh, set up the
+				       // variables that describe the linear
+				       // system on the present mesh
+				       // (i.e. matrices and vectors), and
+				       // then functions that actually
+				       // assemble the system, direct what has
+				       // to be solved in each time step, a
+				       // function that solves the linear
+				       // system that arises in each timestep
+				       // (and returns the number of
 				       // iterations it took), and finally
 				       // output the solution vector on the
 				       // currect mesh:
