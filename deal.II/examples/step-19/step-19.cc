@@ -102,6 +102,55 @@ print_usage_message ()
                                  // for, possibly, the output file name and
                                  // format, we nevertheless want to show how
                                  // to work with parameter files.
+                                 //
+                                 // In short, the ``ParameterHandler'' class
+                                 // works as follows: one declares the entries
+                                 // of parameters that can be given in input
+                                 // files together, and later on one can read
+                                 // an input file in which these parameters
+                                 // are set to their values. If a parameter is
+                                 // not listed in the input file, the default
+                                 // value specified in the declaration of that
+                                 // parameter is used. After that, the program
+                                 // can query the values assigned to certain
+                                 // parameters from the ``ParameterHandler''
+                                 // object.
+                                 //
+                                 // Declaring parameters can be done using the
+                                 // ``ParameterHandler::declare_entry''
+                                 // function. It's arguments are the name of a
+                                 // parameter, a default value (given as a
+                                 // string, even if the parameter is numeric
+                                 // in nature, and thirdly an object that
+                                 // describes constraints on values that may
+                                 // be passed to this parameter. In the
+                                 // example below, we use an object of type
+                                 // ``Patterns::Anything'' to denote that
+                                 // there are no constraints on file names
+                                 // (this is, of course, not true -- the
+                                 // operating system does have constraints,
+                                 // but from an application standpoint, almost
+                                 // all names are valid). In other cases, one
+                                 // may, for example, use
+                                 // ``Patterns::Integer'' to make sure that
+                                 // only parameters are accepted that can be
+                                 // interpreted as integer values (it is also
+                                 // possible to specify bounds for integer
+                                 // values, and all values outside this range
+                                 // are rejected), ``Patterns::Double'' for
+                                 // floating point values, classes that make
+                                 // sure that the given parameter value is a
+                                 // comma separated list of things, etc. Take
+                                 // a look at the ``Patterns'' namespace to
+                                 // see what is possible.
+                                 //
+                                 // The fourth argument to ``declare_entry''
+                                 // is a help string that can be printed to
+                                 // document what this parameter is meant to
+                                 // be used for and other information you may
+                                 // consider important when declaring this
+                                 // parameter. The default value of this
+                                 // fourth argument is the empty string.
 void declare_parameters ()
 {
   prm.declare_entry ("Output file", "",
