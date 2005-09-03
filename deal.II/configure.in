@@ -298,7 +298,13 @@ else
 dnl The gcc compiler needs -static for static linking. For the case
 dnl other compilers do not like this flag we should introduce a
 dnl LDFLAGSSTATIC variable and check -static through AC_TRY_LINK.
-  LDFLAGS="$LDFLAGS -static"
+  LDFLAGSSTATIC="-static"
+  case "$target" in
+    powerpc-apple-darwin* )
+       LDFLAGSSTATIC=""
+	   ;;
+  esac
+  LDFLAGS="$LDFLAGS $LDFLAGSSTATIC"
 fi
 
 AC_SUBST(enableshared)
