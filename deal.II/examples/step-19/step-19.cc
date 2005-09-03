@@ -151,6 +151,67 @@ print_usage_message ()
                                  // consider important when declaring this
                                  // parameter. The default value of this
                                  // fourth argument is the empty string.
+                                 //
+                                 // I always wanted to have an example program
+                                 // describing the ``ParameterHandler'' class,
+                                 // because it is so particularly useful. It
+                                 // would have been useful in a number of
+                                 // previous example programs (for example, in
+                                 // order to let the tolerance for linear
+                                 // solvers, or the number of refinement steps
+                                 // be determined by a run-time parameter,
+                                 // rather than hard-coding them into the
+                                 // program), but it turned out that trying to
+                                 // explain this class there would have
+                                 // overloaded them with things that would
+                                 // have distracted from the main
+                                 // purpose. However, while writing this
+                                 // program, I realized that there aren't all
+                                 // that many parameters this program can
+                                 // usefully ask for, or better, it turned
+                                 // out: declaring and querying these
+                                 // parameters was already done centralized in
+                                 // one place of the libray, namely the
+                                 // ``DataOutInterface'' class that handles
+                                 // exactly this -- managing parameters for
+                                 // input and output.
+                                 //
+                                 // So the second function call in this
+                                 // function is to let the
+                                 // ``DataOutInterface'' declare a good number
+                                 // of parameters that control everything from
+                                 // the output format to what kind of output
+                                 // should be generated if output is written
+                                 // in a specific graphical format. For
+                                 // example, when writing data in encapsulated
+                                 // postscript (EPS) format, the result is
+                                 // just a 2d projection, not data that can be
+                                 // viewed and rotated with a
+                                 // viewer. Therefore, one has to choose the
+                                 // viewing angle and a number of other
+                                 // options up front, when output is
+                                 // generated, rather than playing around with
+                                 // them later on. The call to
+                                 // ``DataOutInterface::declare_parameters''
+                                 // declares entries that allow to specify
+                                 // them in the parameter input file during
+                                 // run-time. If the parameter file does not
+                                 // contain entries for them, defaults are
+                                 // taken.
+                                 //
+                                 // As a final note: ``DataOutInterface'' is a
+                                 // template, because it is usually used to
+                                 // write output for a specific space
+                                 // dimension. However, this program is
+                                 // supposed to be used for all dimensions at
+                                 // the same time, so we don't know at compile
+                                 // time what the right dimension is when
+                                 // specifying the template
+                                 // parameter. Fortunately, declaring
+                                 // parameters is something that is space
+                                 // dimension independent, so we can just pick
+                                 // one arbitrarily. We pick ``1'', but it
+                                 // could have been any other number as well.
 void declare_parameters ()
 {
   prm.declare_entry ("Output file", "",
@@ -233,6 +294,9 @@ parse_command_line (const int                argc,
       print_usage_message ();
       exit (1);
     }
+
+  if (output_file == "")
+    output_file.get ("Output file");
 }
 
 
