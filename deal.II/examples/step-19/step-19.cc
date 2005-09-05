@@ -295,8 +295,8 @@ parse_command_line (const int                argc,
       exit (1);
     }
 
-  if (output_file == "")
-    output_file.get ("Output file");
+//    if (output_file == "")
+//      output_file.get ("Output file");
 }
 
 
