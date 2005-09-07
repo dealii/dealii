@@ -128,6 +128,8 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
         case "$GXX_VERSION_STRING" in
 	  *version\ 4.0.0*) GXX_VERSION_DETAILED=gcc4.0.0 ;;
 	  *version\ 4.0.1*) GXX_VERSION_DETAILED=gcc4.0.1 ;;
+	  *version\ 4.0.2*) GXX_VERSION_DETAILED=gcc4.0.2 ;;
+	  *version\ 4.0.3*) GXX_VERSION_DETAILED=gcc4.0.3 ;;
 	  *)                GXX_VERSION_DETAILED=gcc4.0.x ;;
         esac
   	;;
