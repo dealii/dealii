@@ -12,6 +12,8 @@
 /*    further information on this license.                        */
 
 
+                                 // @sect4{Preliminaries}
+
                                  // As usual, we start with include
                                  // files. This program is content with really
                                  // few of these -- we only need two files
@@ -81,7 +83,7 @@ print_usage_message ()
     "    ./step-19 [-p parameter_file] list_of_input_files \n"
     "              [-x output_format] [-o output_file]\n"
     "\n"
-    "Parameter sequences in brackets can be omitted a parameter file is\n"
+    "Parameter sequences in brackets can be omitted if a parameter file is\n"
     "specified on the command line and if it provides values for these\n"
     "missing parameters.\n"
     "\n"
@@ -94,6 +96,8 @@ print_usage_message ()
   prm.print_parameters (std::cout, ParameterHandler::Text);
 }
 
+
+                                 // @sect4{Declaring parameters for the input file}
 
                                  // The second function is used to declare the
                                  // parameters this program accepts from the
@@ -219,24 +223,116 @@ void declare_parameters ()
                      "The name of the output file to be generated");
 
   DataOutInterface<1>::declare_parameters (prm);
+
+                                   // Since everything that this program can
+                                   // usefully request in terms of input
+                                   // parameters is already handled by now,
+                                   // let us nevertheless show how to use
+                                   // input parameters in other
+                                   // circumstances. First, parameters are
+                                   // like files in a directory tree: they can
+                                   // be in the top-level directory, but you
+                                   // can also group them into subdirectories
+                                   // to make it easier to find them or to be
+                                   // able to use the same parameter name in
+                                   // different contexts.
+                                   //
+                                   // Let us first declare a dummy parameter
+                                   // in the top-level section; we assume that
+                                   // it will denote the number of iterations,
+                                   // and that useful numbers of iterations
+                                   // that a user should be able to specify
+                                   // are in the range 1...1000, with a
+                                   // default value of 42:
+  prm.declare_entry ("Dummy iterations", "42",
+                     Patterns::Integer (1,1000),
+                     "A dummy parameter asking for an integer");
+
+                                   // Next, let us declare a sub-section (the
+                                   // equivalent to a subdirectory). When
+                                   // entered, all following parameter
+                                   // declarations will be within this
+                                   // subsection. To also visually group these
+                                   // declarations with the subsection name, I
+                                   // like to use curly braces to force my
+                                   // editor to indent everything that goes
+                                   // into this sub-section by one level of
+                                   // indentation. In this sub-section, we
+                                   // shall have two entries, one that takes a
+                                   // boolean parameter and one that takes a
+                                   // selection list of values, separated by
+                                   // the '|' character:
+  prm.enter_subsection ("Dummy subsection");
+  {
+    prm.declare_entry ("Dummy generate output", "true",
+                       Patterns::Bool(),
+                       "A dummy parameter that can be fed with either "
+                       "'true' or 'false'");
+    prm.declare_entry ("Dummy color of output", "red",
+                       Patterns::Selection("red|black|blue"),
+                       "A dummy parameter that shows how one can define a "
+                       "parameter that can be assigned values from a finite "
+                       "set of values");
+  }
+  prm.leave_subsection ();
+                                   // After this, we have left the subsection
+                                   // again. You should have gotten the idea
+                                   // by now how one can nest subsections to
+                                   // separate parameters. There are a number
+                                   // of other possible patterns describing
+                                   // possible values of parameters; in all
+                                   // cases, if you try to pass a parameter to
+                                   // the program that does not match the
+                                   // expectations of the pattern, it will
+                                   // reject the parameter file and ask you to
+                                   // fix it. After all, it does not make much
+                                   // sense if you had an entry that contained
+                                   // the entry "red" for the parameter
+                                   // "Generate output".
 }
 
   
+                                 // @sect4{Parsing the command line}
 
+                                 // Our next task is to see what information
+                                 // has been provided on the command
+                                 // line. First, we need to be sure that there
+                                 // is at least one parameter: an input
+                                 // file. The format and the output file can
+                                 // be specified in the parameter file, but
+                                 // the list of input files can't, so at least
+                                 // one parameter needs to be there. Together
+                                 // with the name of the program (the zeroth
+                                 // parameter), ``argc'' must therefore be at
+                                 // least 2. If this is not the case, we print
+                                 // an error message and exit:
 void
-parse_command_line (const int                argc,
-                    char             *const* argv)
+parse_command_line (const int     argc,
+                    char *const * argv)
 {
   if (argc < 2)
     {
       print_usage_message ();
-      exit (0);
+      exit (1);
     }
 
+                                   // Next, collect all parameters in a list
+                                   // that will be somewhat simpler to handle
+                                   // than the ``argc''/``argv'' mechanism. We
+                                   // omit the name of the executable at the
+                                   // zeroth index:
   std::list<std::string> args;
   for (int i=1; i<argc; ++i)
     args.push_back (argv[i]);
-  
+
+                                   // Then process all these parameters. If
+                                   // the parameter is ``-p'', then the must
+                                   // be a parameter file following, in case
+                                   // of ``-x'' it is the name of an output
+                                   // format. Finally, for ``-o'' it is the
+                                   // name of the output file. In all cases,
+                                   // once we've treated a parameter, we
+                                   // remove it from the list of parameters:
   while (args.size())
     {
       if (args.front() == std::string("-p"))
@@ -281,6 +377,13 @@ parse_command_line (const int                argc,
           output_file = args.front();
           args.pop_front ();
         }
+
+                                       // Otherwise, this is not a parameter
+                                       // that starts with a known minus
+                                       // sequence, and we should consider it
+                                       // to be the name of an input file. Let
+                                       // us therefore add this file to the
+                                       // list of input files:
       else
         {
           input_file_names.push_back (args.front());
@@ -288,6 +391,9 @@ parse_command_line (const int                argc,
         }
     }
 
+                                   // Next check a few things and create
+                                   // errors if the checks fail. Firstly,
+                                   // there must be at least one input file
   if (input_file_names.size() == 0)
     {
       std::cerr << "Error: No input file specified." << std::endl;
@@ -295,43 +401,125 @@ parse_command_line (const int                argc,
       exit (1);
     }
 
-//    if (output_file == "")
-//      output_file.get ("Output file");
+                                   // If either the output file name or the
+                                   // output format has not been specified on
+                                   // the command line, get it from the
+                                   // parameter file:
+  if (output_file == "")
+    prm.get ("Output file");
+
+  if (output_format == "")
+    prm.get ("Output format");
 }
 
 
+                                 // @sect4{Generating output}
 
+                                 // Now that we have all the information, we
+                                 // need to read all the input files, merge
+                                 // them, and generate a single output
+                                 // file. This, after all, was the motivation,
+                                 // borne from the necessity encountered in
+                                 // the step-18 tutorial program, to write
+                                 // this program in the first place.
+                                 //
+                                 // So what we do first is to declare an
+                                 // object into which we will merge the data
+                                 // from all the input file, and read in the
+                                 // first file through a stream. Note that
+                                 // every time we open a file, we use the
+                                 // ``AssertThrow'' macro to check whether the
+                                 // file is really readable -- if it isn't
+                                 // then this will trigger an exception and
+                                 // corresponding output will be generated
+                                 // from the exception handler in ``main()'':
 template <int dim, int spacedim>
 void do_convert ()
 {
-  std::ifstream intermediate_stream (input_file_names[0].c_str());
-  AssertThrow (intermediate_stream, ExcIO());
-  
-  DataOutReader<dim,spacedim> intermediate_data;  
-  intermediate_data.read (intermediate_stream);
+  DataOutReader<dim,spacedim> merged_data;
 
-				   // for all following input files
+  {  
+    std::ifstream input (input_file_names[0].c_str());
+    AssertThrow (input, ExcIO());
+  
+    merged_data.read (input);
+  }
+
+				   // For all the other input files, we read
+				   // their data into an intermediate object,
+				   // and then merge that into the first
+				   // object declared above:
   for (unsigned int i=1; i<input_file_names.size(); ++i)
     {
-      std::ifstream additional_stream (input_file_names[i].c_str());
-      AssertThrow (additional_stream, ExcIO());
+      std::ifstream input (input_file_names[i].c_str());
+      AssertThrow (input, ExcIO());
 
       DataOutReader<dim,spacedim> additional_data;  
-      additional_data.read (additional_stream);
-      intermediate_data.merge (additional_data);
+      additional_data.read (input);
+      merged_data.merge (additional_data);
     } 
-  
+
+                                   // Once we have this, let us open an output
+                                   // stream, and parse what we got as the
+                                   // name of the output format into an
+                                   // identifier. Fortunately, the
+                                   // ``DataOutBase'' class has a function
+                                   // that does this parsing for us, i.e. it
+                                   // knows about all the presently supported
+                                   // output formats and makes sure that they
+                                   // can be specified in the parameter file
+                                   // or on the command line. Note that this
+                                   // ensures that if the library acquires the
+                                   // ability to output in other output
+                                   // formats, this program will be able to
+                                   // make use of this ability without having
+                                   // to be changed!
   std::ofstream output_stream (output_file.c_str());
   AssertThrow (output_stream, ExcIO());
 
   const DataOutBase::OutputFormat format
-    = intermediate_data.parse_output_format (output_format);
-  
-  intermediate_data.write(output_stream, format); 
+    = DataOutBase::parse_output_format (output_format);
+
+                                   // Finally, write the merged data to the
+                                   // output:
+  merged_data.write(output_stream, format); 
 }
 
 
+                                 // @sect4{Dispatching output generation}
 
+                                 // The function above takes template
+                                 // parameters relating to the space dimension
+                                 // of the output, and the dimension of the
+                                 // objects to be output. (For example, when
+                                 // outputting whole cells, these two
+                                 // dimensions are the same, but the
+                                 // intermediate files may contain only data
+                                 // pertaining to the faces of cells, in which
+                                 // case the first parameter will be one less
+                                 // than the space dimension.)
+                                 //
+                                 // The problem is: at compile time, we of
+                                 // course don't know the dimensions used in
+                                 // the input files. We have to plan for all
+                                 // cases, therefore. This is a little clumsy,
+                                 // since we need to specify the dimensions
+                                 // statically at compile time, even though we
+                                 // will only know about them at run time.
+                                 //
+                                 // So here is what we do: from the first
+                                 // input file, we determine (using a function
+                                 // in ``DataOutBase'' that exists for this
+                                 // purpose) these dimensions. We then have a
+                                 // series of switches that dispatch,
+                                 // statically, to the ``do_convert''
+                                 // functions with different template
+                                 // arguments. Not pretty, but works. Apart
+                                 // from this, the function does nothing --
+                                 // except making sure that it covered the
+                                 // dimensions for which it was called, using
+                                 // the ``AssertThrow'' macro at places in the
+                                 // code that shouldn't be reached:
 void convert ()
 {
   AssertThrow (input_file_names.size() > 0,
