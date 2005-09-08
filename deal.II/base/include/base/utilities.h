@@ -79,6 +79,20 @@ namespace Utilities
                      const char         delimiter = ',');
 
                                    /**
+                                    * Take a text, usually a documentation or
+                                    * something, and try to break it into
+                                    * individual lines of text at most @p
+                                    * width characters wide, by breaking at
+                                    * spaces in the text. If this is not
+                                    * possible, return the shortest lines than
+                                    * are longer than @p width.
+                                    */
+  std::vector<std::string>
+  break_text_into_lines (const std::string &original_text,
+                         const unsigned int width);
+
+  
+                                   /**
                                     * Generate a random number from a
                                     * normalized Gaussian probability
                                     * distribution centered around @p a and
