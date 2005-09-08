@@ -14,6 +14,7 @@
 #include <base/parameter_handler.h>
 #include <base/logstream.h>
 #include <base/memory_consumption.h>
+#include <base/utilities.h>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -30,6 +31,7 @@
 #ifdef HAVE_STD_NUMERIC_LIMITS
 # include <limits>
 #endif
+
 
 
 //TODO[WB]: various functions here could be simplified by using namespace Utilities
@@ -903,6 +905,35 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                  :
                  pd->entries[ptr->first].value);
 
+                                             // if there is documentation,
+                                             // then add an empty line (unless
+                                             // this is the first entry in a
+                                             // subsection), print the
+                                             // documentation, and then the
+                                             // actual entry; break the
+                                             // documentation into readable
+                                             // chunks such that the whole
+                                             // thing is at most 78 characters
+                                             // wide
+            if (pd->entries[ptr->first].has_documentation())
+              {
+                if (ptr != pd->entries.begin())
+                  out << std::endl;
+                
+                const std::vector<std::string> doc_lines
+                  = Utilities::
+                  break_text_into_lines (pd->entries[ptr->first].documentation,
+                                         78 - indent_level*2 - 2);
+                
+                for (unsigned int i=0; i<doc_lines.size(); ++i)
+                  out << std::setw(indent_level*2) << ""
+                      << "# "
+                      << doc_lines[i]
+                      << std::endl;
+              }
+            
+            
+            
                                              // print name and value
                                              // of this entry
             out << std::setw(indent_level*2) << ""
@@ -911,34 +942,14 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 << std::setw(longest_name-ptr->first.length()+1) << " "
                 << "= " << value;
 
-                                             // if we are going to write some
-                                             // text after this, then add a
-                                             // comment marker and align it
-                                             // properly
-            if ((pd->entries[ptr->first].has_documentation())
-                ||
-                (value != pd->entries[ptr->first].value))
-              out << std::setw(longest_value-value.length()+1) << " "
-                  << "# ";
-
-                                             // if there is
-                                             // documentation, then
-                                             // print that, too. the
-                                             // documentation is
-                                             // always looked up in
-                                             // the Defaults tree
-            if (pd->entries[ptr->first].documentation.length() != 0)
-              out << pd->entries[ptr->first].documentation;
-            
                                              // finally print the
                                              // default value, but
                                              // only if it differs
                                              // from the actual value
             if (value != pd->entries[ptr->first].value)
               {
-                if (pd->entries[ptr->first].documentation.length() != 0)
-                  out << ", ";
-                
+                out << std::setw(longest_value-value.length()+1) << " "
+                    << "# ";
                 out << "default: " << pd->entries[ptr->first].value;
               }
             
