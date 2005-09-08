@@ -3494,7 +3494,7 @@ namespace Threads
                                       * specify it.
                                       */
     template <typename RT, typename ArgList,
-              int length/* = boost::tuples::length<ArgList>::value*/>
+              int length>
     class fun_encapsulator;
 
 
@@ -3522,7 +3522,7 @@ namespace Threads
                                       * specify it.
                                       */
     template <typename RT, typename C, typename ArgList,
-              int length/* = boost::tuples::length<ArgList>::value*/>
+              int length>
     class mem_fun_encapsulator;
   }
 
@@ -3569,7 +3569,7 @@ namespace Threads
   inline
   internal::mem_fun_encapsulator<RT,C,boost::tuple<>,0>
   spawn (C &c, RT (C::*fun_ptr)()) {
-    return internal::mem_fun_encapsulator<RT, C, boost::tuple<> > (c,fun_ptr);
+    return internal::mem_fun_encapsulator<RT, C, boost::tuple<>,0> (c,fun_ptr);
   }
 
                                    /**
@@ -3581,7 +3581,7 @@ namespace Threads
   inline
   internal::mem_fun_encapsulator<RT,const C,boost::tuple<>,0>
   spawn (const C &c, RT (C::*fun_ptr)() const) {
-    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<> > (c,fun_ptr);
+    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<>,0> (c,fun_ptr);
   }
 
 
@@ -3629,7 +3629,7 @@ namespace Threads
   inline
   internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1>,1>
   spawn (C &c, RT (C::*fun_ptr)(Arg1)) {
-    return internal::mem_fun_encapsulator<RT, C, boost::tuple<Arg1> > (c,fun_ptr);
+    return internal::mem_fun_encapsulator<RT, C, boost::tuple<Arg1>,1> (c,fun_ptr);
   }
 
                                    /**
@@ -3641,7 +3641,7 @@ namespace Threads
   inline
   internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1>,1>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1) const) {
-    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<Arg1> > (c,fun_ptr);
+    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<Arg1>,1> (c,fun_ptr);
   }
 
 
@@ -3691,7 +3691,7 @@ namespace Threads
   inline
   internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2>,2>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2)) {
-    return internal::mem_fun_encapsulator<RT, C, boost::tuple<Arg1, Arg2> > (c,fun_ptr);
+    return internal::mem_fun_encapsulator<RT, C, boost::tuple<Arg1, Arg2>,2> (c,fun_ptr);
   }
 
                                    /**
@@ -3703,7 +3703,7 @@ namespace Threads
   inline
   internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1, Arg2>,2>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2) const) {
-    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<Arg1, Arg2> > (c,fun_ptr);
+    return internal::mem_fun_encapsulator<RT, const C, boost::tuple<Arg1, Arg2>,2> (c,fun_ptr);
   }
 
 
@@ -3756,7 +3756,7 @@ namespace Threads
   internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3>,3>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3)) {
     return internal::mem_fun_encapsulator<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3> > (c,fun_ptr);
+      boost::tuple<Arg1, Arg2, Arg3>,3> (c,fun_ptr);
   }
 
                                    /**
@@ -3770,7 +3770,7 @@ namespace Threads
   internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1, Arg2, Arg3>,3>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const) {
     return internal::mem_fun_encapsulator<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3> > (c,fun_ptr);
+      boost::tuple<Arg1, Arg2, Arg3>,3> (c,fun_ptr);
   }
 
 
@@ -3824,7 +3824,7 @@ namespace Threads
   internal::mem_fun_encapsulator<RT,C,boost::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) {
     return internal::mem_fun_encapsulator<RT, C,
-      boost::tuple<Arg1, Arg2, Arg3, Arg4> > (c,fun_ptr);
+      boost::tuple<Arg1, Arg2, Arg3, Arg4>,4> (c,fun_ptr);
   }
 
                                    /**
@@ -3838,7 +3838,7 @@ namespace Threads
   internal::mem_fun_encapsulator<RT,const C,boost::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const) {
     return internal::mem_fun_encapsulator<RT, const C,
-      boost::tuple<Arg1, Arg2, Arg3, Arg4> > (c,fun_ptr);
+      boost::tuple<Arg1, Arg2, Arg3, Arg4>,4> (c,fun_ptr);
   }
 
 
@@ -3896,7 +3896,7 @@ namespace Threads
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) {
     return internal::mem_fun_encapsulator<RT, C,
       boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5> > (c,fun_ptr);
+      Arg4, Arg5>,5> (c,fun_ptr);
   }
 
                                    /**
@@ -3912,7 +3912,7 @@ namespace Threads
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const) {
     return internal::mem_fun_encapsulator<RT, const C,
       boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5> > (c,fun_ptr);
+      Arg4, Arg5>,5> (c,fun_ptr);
   }
 
 
@@ -3969,7 +3969,7 @@ namespace Threads
   spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) {
     return internal::mem_fun_encapsulator<RT, C,
       boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6> > (c,fun_ptr);
+      Arg4, Arg5, Arg6>,6> (c,fun_ptr);
   }
 
                                    /**
@@ -3986,7 +3986,7 @@ namespace Threads
   spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const) {
     return internal::mem_fun_encapsulator<RT, const C,
       boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6> > (c,fun_ptr);
+      Arg4, Arg5, Arg6>,6> (c,fun_ptr);
   }
 
 
@@ -4048,7 +4048,7 @@ namespace Threads
     return internal::mem_fun_encapsulator<RT, C,
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
-      Arg7> > (c,fun_ptr);
+      Arg7>,7> (c,fun_ptr);
   }
 
                                    /**
@@ -4068,7 +4068,7 @@ namespace Threads
     return internal::mem_fun_encapsulator<RT, const C,
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
-      Arg7> > (c,fun_ptr);
+      Arg7>,7> (c,fun_ptr);
   }
 
 
@@ -4133,7 +4133,7 @@ namespace Threads
     return internal::mem_fun_encapsulator<RT, C,
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
-      Arg7, Arg8> > (c,fun_ptr);
+      Arg7, Arg8>,8> (c,fun_ptr);
   }
 
                                    /**
@@ -4155,7 +4155,7 @@ namespace Threads
     return internal::mem_fun_encapsulator<RT, const C,
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
-      Arg7, Arg8> > (c,fun_ptr);
+      Arg7, Arg8>,8> (c,fun_ptr);
   }
 
 
@@ -4222,7 +4222,7 @@ namespace Threads
     return internal::mem_fun_encapsulator<RT, C,
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9> > (c,fun_ptr);
+      Arg7, Arg8, Arg9>,9> (c,fun_ptr);
   }
 
                                    /**
@@ -4244,7 +4244,7 @@ namespace Threads
     return internal::mem_fun_encapsulator<RT, const C,
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9> > (c,fun_ptr);
+      Arg7, Arg8, Arg9>,9> (c,fun_ptr);
   }
 
 
@@ -4314,7 +4314,7 @@ namespace Threads
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
       Arg7, Arg8, Arg9,
-      Arg10> > (c,fun_ptr);
+      Arg10>,10> (c,fun_ptr);
   }
 
                                    /**
@@ -4338,7 +4338,7 @@ namespace Threads
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
       Arg7, Arg8, Arg9,
-      Arg10> > (c,fun_ptr);
+      Arg10>,10> (c,fun_ptr);
   }
 
 
@@ -4384,7 +4384,7 @@ namespace Threads
   inline
   internal::fun_encapsulator<RT,boost::tuple<>,0>
   spawn (RT (*fun_ptr)()) {
-    return internal::fun_encapsulator<RT, boost::tuple<> > (fun_ptr);
+    return internal::fun_encapsulator<RT, boost::tuple<>,0> (fun_ptr);
   }
 
 
@@ -4431,7 +4431,7 @@ namespace Threads
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1>,1>
   spawn (RT (*fun_ptr)(Arg1)) {
-    return internal::fun_encapsulator<RT, boost::tuple<Arg1> > (fun_ptr);
+    return internal::fun_encapsulator<RT, boost::tuple<Arg1>,1> (fun_ptr);
   }
 
 
@@ -4479,7 +4479,7 @@ namespace Threads
   inline
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2>,2>
   spawn (RT (*fun_ptr)(Arg1,Arg2)) {
-    return internal::fun_encapsulator<RT, boost::tuple<Arg1, Arg2> > (fun_ptr);
+    return internal::fun_encapsulator<RT, boost::tuple<Arg1, Arg2>,2> (fun_ptr);
   }
 
 
@@ -4530,7 +4530,7 @@ namespace Threads
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3>,3>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3)) {
     return internal::fun_encapsulator<RT,
-      boost::tuple<Arg1, Arg2, Arg3> > (fun_ptr);
+      boost::tuple<Arg1, Arg2, Arg3>,3> (fun_ptr);
   }
 
 
@@ -4582,7 +4582,7 @@ namespace Threads
   internal::fun_encapsulator<RT,boost::tuple<Arg1, Arg2, Arg3, Arg4>,4>
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) {
     return internal::fun_encapsulator<RT,
-      boost::tuple<Arg1, Arg2, Arg3, Arg4> > (fun_ptr);
+      boost::tuple<Arg1, Arg2, Arg3, Arg4>,4> (fun_ptr);
   }
 
 
@@ -4638,7 +4638,7 @@ namespace Threads
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) {
     return internal::fun_encapsulator<RT,
       boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5> > (fun_ptr);
+      Arg4, Arg5>,5> (fun_ptr);
   }
 
 
@@ -4693,7 +4693,7 @@ namespace Threads
   spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) {
     return internal::fun_encapsulator<RT,
       boost::tuple<Arg1, Arg2, Arg3,
-      Arg4, Arg5, Arg6> > (fun_ptr);
+      Arg4, Arg5, Arg6>,6> (fun_ptr);
   }
 
 
@@ -4753,7 +4753,7 @@ namespace Threads
     return internal::fun_encapsulator<RT,
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
-      Arg7> > (fun_ptr);
+      Arg7>,7> (fun_ptr);
   }
 
 
@@ -4816,7 +4816,7 @@ namespace Threads
     return internal::fun_encapsulator<RT,
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
-      Arg7, Arg8> > (fun_ptr);
+      Arg7, Arg8>,8> (fun_ptr);
   }
 
 
@@ -4881,7 +4881,7 @@ namespace Threads
     return internal::fun_encapsulator<RT,
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
-      Arg7, Arg8, Arg9> > (fun_ptr);
+      Arg7, Arg8, Arg9>,9> (fun_ptr);
   }
 
 
@@ -4949,7 +4949,7 @@ namespace Threads
       boost::tuple<Arg1, Arg2, Arg3,
       Arg4, Arg5, Arg6,
       Arg7, Arg8, Arg9,
-      Arg10> > (fun_ptr);
+      Arg10>,10> (fun_ptr);
   }
 
 #else  // #if (DEAL_II_USE_MT == 1)
@@ -5057,7 +5057,7 @@ namespace Threads
                                       * specify it.
                                       */
     template <typename RT, typename ArgList,
-              int length/* = boost::tuples::length<ArgList>::value*/>
+              int length>
     class fun_forwarder;
 
                                      /**
@@ -5081,7 +5081,7 @@ namespace Threads
                                       * specify it.
                                       */
     template <typename RT, typename C, typename ArgList,
-              int length/* = boost::tuples::length<ArgList>::value*/>
+              int length>
     class mem_fun_forwarder;    
   }
 
