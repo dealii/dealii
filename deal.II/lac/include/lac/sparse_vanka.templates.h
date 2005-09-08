@@ -596,7 +596,7 @@ void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
             = &SparseVanka<number>::template apply_preconditioner<number2>;
           Threads::ThreadGroup<> threads;
           for (unsigned int block=0; block<n_blocks; ++block)
-            threads += Threads::spawn(*static_cast<const SparseVanka<number>*>(this), comp)
+            threads += Threads::spawn<void,SparseVanka<number> >(*static_cast<const SparseVanka<number>*>(this), comp)
                        (dst, src,&dof_masks[block]);
           threads.join_all ();
         }

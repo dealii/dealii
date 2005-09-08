@@ -335,7 +335,7 @@ SparseMatrix<number>::vmult (OutVector& dst,
            template threaded_vmult<OutVector,InVector>);
       Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
-	threads += Threads::spawn (*this, comp) (dst, src,
+	threads += Threads::spawn<void, SparseMatrix<number> > (*this, comp) (dst, src,
                                                  n_rows * i / n_threads,
                                                  n_rows * (i+1) / n_threads);
       threads.join_all();
@@ -509,7 +509,7 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
            template threaded_matrix_norm_square<somenumber>);
       Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
-	threads += Threads::spawn (*this, comp)(v,
+	threads += Threads::spawn<void, SparseMatrix<number> > (*this, comp)(v,
                                                 n_rows * i / n_threads,
                                                 n_rows * (i+1) / n_threads,
                                                 &partial_sums[i]);
@@ -622,7 +622,7 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
            template threaded_matrix_scalar_product<somenumber>);
       Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
-	threads += Threads::spawn (*this, comp)(u, v,
+	threads += Threads::spawn<void, SparseMatrix<number> > (*this, comp)(u, v,
                                                 n_rows * i / n_threads,
                                                 n_rows * (i+1) / n_threads,
                                                 &partial_sums[i]);
@@ -800,7 +800,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
 				     template threaded_residual<somenumber>;
       Threads::ThreadGroup<> threads;
       for (unsigned int i=0; i<n_threads; ++i)
-	threads += Threads::spawn (*this, comp_residual)(dst, u, b,
+	threads += Threads::spawn<void, SparseMatrix<number> > (*this, comp_residual)(dst, u, b,
                                                          std::pair<unsigned int,unsigned int>
                                                          (n_rows * i / n_threads,
                                                           n_rows * (i+1) / n_threads),
