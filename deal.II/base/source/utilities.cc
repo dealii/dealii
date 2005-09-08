@@ -176,6 +176,65 @@ namespace Utilities
 
     return split_list;
   }
+
+
+
+  std::vector<std::string>
+  break_text_into_lines (const std::string &original_text,
+                         const unsigned int width)
+  {
+    std::string              text = original_text;
+    std::vector<std::string> lines;
+
+                                     // remove trailing spaces
+    while ((text.length() != 0) && (text[text.length()-1] == ' '))
+      text.erase(text.length()-1,1);
+  
+                                     // then split the text into lines
+    while (text.length() != 0)
+      {
+                                         // in each iteration, first remove
+                                         // leading spaces
+        while ((text.length() != 0) && (text[0] == ' '))
+          text.erase(0, 1);
+
+                                         // if we can fit everything into one
+                                         // line, then do so. otherwise, we have
+                                         // to keep breaking
+        if (text.length() < width)
+          {
+            lines.push_back (text);
+            text = "";
+          }
+        else
+          {
+                                             // starting at position width, find the
+                                             // location of the previous space, so
+                                             // that we can break around there
+            int location = std::min(width,text.length()-1);
+            for (; location>=0; --location)
+              if (text[location] == ' ')
+                break;
+          
+                                             // if there are no spaces, then try if
+                                             // there are spaces coming up
+            if (location == 0)
+              for (location = std::min(width,text.length()-1);
+                   location<static_cast<int>(text.length());
+                   ++location)
+                if (text[location] == ' ')
+                  break;
+          
+                                             // now take the text up to the found
+                                             // location and put it into a single
+                                             // line, and remove it from 'text'
+            lines.push_back (std::string (text, 0, location));
+            text.erase (0, location);
+          }
+      }
+  
+    return lines;
+  }
   
   
 
