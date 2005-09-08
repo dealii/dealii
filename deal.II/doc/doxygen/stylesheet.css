@@ -34,6 +34,25 @@ h6 { font-size: 80%;
      font-weight: bold;
 }
 
+h1.head {
+	position:relative;
+        text-align:center;
+	font-weight: bold;
+	color:black;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border-bottom: 0;
+}
+
+div.head {
+	background-color: #CCD8E8; 
+	border: 1px solid #B0B0B0;
+	width: 100%;
+	margin: 2px;
+	padding: 2px;
+        text-align:center;
+}
+
 CAPTION { font-weight: bold }
 DIV.qindex {
 	width: 100%;
