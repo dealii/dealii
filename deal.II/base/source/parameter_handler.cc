@@ -915,7 +915,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                                              // text after this, then add a
                                              // comment marker and align it
                                              // properly
-            if ((pd->entries[ptr->first].documentation.length() != 0)
+            if ((pd->entries[ptr->first].has_documentation())
                 ||
                 (value != pd->entries[ptr->first].value))
               out << std::setw(longest_value-value.length()+1) << " "
