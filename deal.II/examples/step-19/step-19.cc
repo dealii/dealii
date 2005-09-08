@@ -574,6 +574,18 @@ void convert ()
 
 
 
+                                 // @sect4{main()}
+
+                                 // Finally, the main program. There is not
+                                 // much more to do than to make sure
+                                 // parameters are declared, the command line
+                                 // is parsed (which includes reading
+                                 // parameter files), and finally making sure
+                                 // the input files are read and output is
+                                 // generated. Everything else just has to do
+                                 // with handling exceptions and making sure
+                                 // that appropriate output is generated if
+                                 // one is thrown.
 int main (int argc, char ** argv)
 {
   try
