@@ -46,7 +46,7 @@ void
 DoFTools::
 compute_row_length_vector(const DoFHandler<dim>     &dofs,
                           std::vector<unsigned int> &row_lengths,
-                          const Coupling flux_coupling)
+                          const Coupling             flux_coupling)
 {
   const FiniteElement<dim>& fe = dofs.get_fe();
   Assert (row_lengths.size() == dofs.n_dofs(),
@@ -74,7 +74,9 @@ compute_row_length_vector(const DoFHandler<dim>     &dofs,
       if (flux_coupling != none)
 	for (unsigned int face=0;face<GeometryInfo<dim>::faces_per_cell;++face)
 	  {
-	    if (cell->at_boundary(face)) continue;
+	    if (cell->at_boundary(face))
+              continue;
+            
 	    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	      row_lengths[cell_indices[i]] += fe.dofs_per_cell;
 	}
@@ -150,10 +152,9 @@ DoFTools::compute_row_length_vector(
 // Template for 2D and 3D. For 1D see specialization above
 template <int dim>
 void
-DoFTools::compute_row_length_vector(
-  const DoFHandler<dim>& dofs,
-  std::vector<unsigned int>& row_lengths,
-  const Coupling flux_coupling)
+DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
+                                    std::vector<unsigned int> &row_lengths,
+                                    const Coupling             flux_coupling)
 {
   const FiniteElement<dim>& fe = dofs.get_fe();
   Assert (row_lengths.size() == dofs.n_dofs(),
