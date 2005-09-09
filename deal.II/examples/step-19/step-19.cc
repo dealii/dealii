@@ -44,15 +44,13 @@
                                  // object that will hold parameters of
                                  // operation, such as output format (unless
                                  // given on the command line); second, the
-                                 // names of input and output files; third,
+                                 // names of input and output files; and third,
                                  // the format in which the output is to be
-                                 // written; and fourth the name of a
-                                 // parameter file:
+                                 // written:
 ParameterHandler         prm;
 std::vector<std::string> input_file_names;
 std::string              output_file; 
 std::string              output_format;
-std::string              parameter_file;
 
 
                                  // All the stuff this program does can be
@@ -325,14 +323,18 @@ parse_command_line (const int     argc,
   for (int i=1; i<argc; ++i)
     args.push_back (argv[i]);
 
-                                   // Then process all these parameters. If
-                                   // the parameter is ``-p'', then the must
-                                   // be a parameter file following, in case
-                                   // of ``-x'' it is the name of an output
-                                   // format. Finally, for ``-o'' it is the
-                                   // name of the output file. In all cases,
-                                   // once we've treated a parameter, we
-                                   // remove it from the list of parameters:
+                                   // Then process all these
+                                   // parameters. If the parameter is
+                                   // ``-p'', then there must be a
+                                   // parameter file following (which
+                                   // we should then read), in case of
+                                   // ``-x'' it is the name of an
+                                   // output format. Finally, for
+                                   // ``-o'' it is the name of the
+                                   // output file. In all cases, once
+                                   // we've treated a parameter, we
+                                   // remove it from the list of
+                                   // parameters:
   while (args.size())
     {
       if (args.front() == std::string("-p"))
@@ -346,9 +348,24 @@ parse_command_line (const int     argc,
               exit (1);
             }
           args.pop_front ();
-          parameter_file = args.front ();
+          const std::string parameter_file = args.front ();
           args.pop_front ();
-        }
+
+	  // Now read the input file:
+	  prm.read_input (parameter_file);
+
+	  // Both the output file name as well as the format can be
+	  // specified on the command line. We have therefore given
+	  // them global variables that hold their values, but they
+	  // can also be set in the parameter file. We therefore need
+	  // to extract them from the parameter file here, because
+	  // they may be overridden by later command line parameters:
+	  if (output_file == "")
+	    output_file = prm.get ("Output file");
+
+	  if (output_format == "")
+	    output_format = prm.get ("Output format");
+	}
       else if (args.front() == std::string("-x"))
         {
           if (args.size() == 1)
@@ -400,16 +417,6 @@ parse_command_line (const int     argc,
       print_usage_message ();
       exit (1);
     }
-
-                                   // If either the output file name or the
-                                   // output format has not been specified on
-                                   // the command line, get it from the
-                                   // parameter file:
-  if (output_file == "")
-    prm.get ("Output file");
-
-  if (output_format == "")
-    prm.get ("Output format");
 }
 
 
