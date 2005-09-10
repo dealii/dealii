@@ -10,3 +10,6 @@
   <meta name="deal.II version" content="@DEAL_II_VERSION@">
 </head>
 <body>
+<div class="head">
+  <h1 class="head">deal.II Reference Manual</h1>
+</div>
