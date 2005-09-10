@@ -23,8 +23,14 @@
 
 
 
+// Warning: the following function is for debugging purposes only. It
+// will be compiled only, if the additional and undocumented compiler
+// flag MG_DEBUG is set. Furthermore, as soon as this function is
+// compiled, libraries for different dimensions may NOT be linked
+// anymore at the same time.
 
-
+// If this function is to be used, its declaration must be added to
+// the class Multigrid again.
 #ifdef MG_DEBUG
 template <>
 void
@@ -36,7 +42,6 @@ Multigrid<Vector<double> >::print_vector (const unsigned int level,
      return;
    const unsigned int dim=deal_II_dimension;
 
-//TODO[GK]: How is this supposed to work? the .all_dimension.cc files are supposed to be exactly the same for all space dimensions -- if they aren't you get strange and inconsistent results if you link a program with the 1d, 2d, and 3d libraries at the same time, because you have multiple instances of the exact same function (same name, same template arguments), but they do different things. the linker can't know this, so it may call one or the other, and possible results certainly include crashes
    const DoFHandler<dim> *dof = mg_dof_handler;
   
    Vector<double> out_vector(dof->n_dofs());
