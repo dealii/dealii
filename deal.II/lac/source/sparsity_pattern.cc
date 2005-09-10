@@ -865,7 +865,6 @@ SparsityPattern::bandwidth () const
 }
 
 
-//TODO[GK]: Write and read flag diagonal_optimized?
 void
 SparsityPattern::block_write (std::ostream &out) const 
 {
