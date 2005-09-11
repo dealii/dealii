@@ -754,16 +754,18 @@ namespace Patterns
 
 /**
  *   The ParameterHandler class provides a standard interface to an input file
- *   which provides at run-time for program parameters such as time step sizes,
- *   geometries, right hand sides etc. The input for the program is given in files,
- *   streams or strings in memory using text like
+ *   which provides at run-time for program parameters such as time step
+ *   sizes, geometries, right hand sides etc. The input for the program is
+ *   given in files, streams or strings in memory using text like
  *   @verbatim
  *     set Time step size = 0.3
  *     set Geometry       = [0,1]x[0,3]
  *   @endverbatim
- *   Input may be sorted into subsection trees in order to give the input a logical
- *   structure.
+ *   Input may be sorted into subsection trees in order to give the input a
+ *   logical structure.
  *
+ *   The ParameterHandler class is discussed in detail in the step-19 example
+ *   program.
  *   
  *   <h3>Declaring entries</h3>
  *   
