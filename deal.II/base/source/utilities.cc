@@ -211,7 +211,7 @@ namespace Utilities
                                              // starting at position width, find the
                                              // location of the previous space, so
                                              // that we can break around there
-            int location = std::min(width,text.length()-1);
+            int location = std::min<int>(width,text.length()-1);
             for (; location>=0; --location)
               if (text[location] == ' ')
                 break;
@@ -219,7 +219,7 @@ namespace Utilities
                                              // if there are no spaces, then try if
                                              // there are spaces coming up
             if (location == 0)
-              for (location = std::min(width,text.length()-1);
+              for (location = std::min<int>(width,text.length()-1);
                    location<static_cast<int>(text.length());
                    ++location)
                 if (text[location] == ' ')
