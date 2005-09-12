@@ -123,7 +123,11 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 					   // columns are sorted within each
 					   // row correctly, but excluding
 					   // the main diagonal entry
-	  const int global_index_ki = sparsity(*col_ptr,row);
+                                           //
+                                           // the explicit use of operator()
+                                           // works around a bug in some gcc
+                                           // versions (see PR 18803)
+	  const int global_index_ki = sparsity.operator()(*col_ptr,row);
 
 	  if (global_index_ki != -1)
 	    this->diag_element(row) -= this->global_entry(global_index_ik) *
@@ -144,8 +148,13 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
 					       // row linearly. I just didn't
 					       // have the time to figure out
 					       // the details.
+                                               //
+                                               // the explicit use of
+                                               // operator() works around a
+                                               // bug in some gcc versions
+                                               // (see PR 18803)
        	      const int global_index_ij = j - &column_numbers[0],
-			global_index_kj = sparsity(*col_ptr,*j);
+			global_index_kj = sparsity.operator()(*col_ptr,*j);
 	      if ((global_index_ij != -1) &&
 		  (global_index_kj != -1))
 		this->global_entry(global_index_ij) -= this->global_entry(global_index_ik) *

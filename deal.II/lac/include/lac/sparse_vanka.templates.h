@@ -177,8 +177,12 @@ SparseVanka<number>::compute_inverse (const unsigned int         row,
 					 // matrix. if not, then leave
 					 // the value in the small
 					 // matrix at zero
+                                         //
+                                         // the explicit use of operator()
+                                         // works around a bug in some gcc
+                                         // versions (see PR 18803)
 	const unsigned int global_entry =
-	  structure(local_indices[i], local_indices[j]);
+	  structure.operator()(local_indices[i], local_indices[j]);
 	if (global_entry != SparsityPattern::invalid_entry)
 	  this_inverse(i,j) = matrix->global_entry(global_entry);
       };
