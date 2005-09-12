@@ -1359,7 +1359,10 @@ class ParameterHandler
     
 				     /**
 				      * Return value of entry
-				      * <tt>entry_string</tt> as <tt>long int</tt>.
+				      * <tt>entry_string</tt> as <tt>long
+				      * int</tt>. (A long int is chosen so
+				      * that even very large unsigned values
+				      * can be returned by this function.)
 				      */
     long int       get_integer (const std::string &entry_string) const;
     
