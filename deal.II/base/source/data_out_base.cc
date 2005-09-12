@@ -1294,7 +1294,6 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		      for (unsigned int j=0; j<n_subdivisions; ++j)
 			for (unsigned int k=0; k<n_subdivisions; ++k)
 			  {
-//TODO:[GK] Put in correct order
 			    out
 			      << first_vertex_of_patch+((i  )*nvt+j  )*nvt+k   << '\t'
 			      << first_vertex_of_patch+((i  )*nvt+j  )*nvt+k+1 << '\t'
@@ -1305,15 +1304,6 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 			      << first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k   << '\t'
 			      << first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k+1 << '\t'
 			      ;
-			
-//  			  << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k   << '\t'
-//  			  << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k   << '\t'
-//  			  << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k   << '\t'
-//  			  << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k   << '\t'
-//  			  << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1 << '\t'
-//  			  << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1 << '\t'
-//   			  << first_vertex_of_patch+((i  )*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1 << '\t'
-//  			  << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1 << '\t'
 			    out << std::endl;
 			  }
 		  }
