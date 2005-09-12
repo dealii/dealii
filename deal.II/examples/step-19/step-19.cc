@@ -351,20 +351,52 @@ parse_command_line (const int     argc,
           const std::string parameter_file = args.front ();
           args.pop_front ();
 
-	  // Now read the input file:
+                                           // Now read the input file:
 	  prm.read_input (parameter_file);
 
-	  // Both the output file name as well as the format can be
-	  // specified on the command line. We have therefore given
-	  // them global variables that hold their values, but they
-	  // can also be set in the parameter file. We therefore need
-	  // to extract them from the parameter file here, because
-	  // they may be overridden by later command line parameters:
+                                           // Both the output file name as
+                                           // well as the format can be
+                                           // specified on the command
+                                           // line. We have therefore given
+                                           // them global variables that hold
+                                           // their values, but they can also
+                                           // be set in the parameter file. We
+                                           // therefore need to extract them
+                                           // from the parameter file here,
+                                           // because they may be overridden
+                                           // by later command line
+                                           // parameters:
 	  if (output_file == "")
 	    output_file = prm.get ("Output file");
 
 	  if (output_format == "")
 	    output_format = prm.get ("Output format");
+
+                                           // Finally, let us note that if we
+                                           // were interested in the values of
+                                           // the parameters declared above in
+                                           // the dummy subsection, we would
+                                           // write something like this to
+                                           // extract the value of the boolean
+                                           // flag (the ``prm.get'' function
+                                           // returns the value of a parameter
+                                           // as a string, whereas the
+                                           // ``prm.get_X'' functions return a
+                                           // value already converted to a
+                                           // different type):
+          prm.enter_subsection ("Dummy subsection");
+          {
+            prm.get_bool ("Dummy generate output");
+          }
+          prm.leave_subsection ();
+                                           // We would assign the result to a
+                                           // variable, or course, but don't
+                                           // here in order not to generate an
+                                           // unused variable that the
+                                           // compiler might warn about.
+                                           //
+                                           // Alas, let's move on to handling
+                                           // of output formats:
 	}
       else if (args.front() == std::string("-x"))
         {
