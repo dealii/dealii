@@ -303,10 +303,6 @@ DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
 					   // is refined, all the fine
 					   // face dofs couple with
 					   // the coarse one.
-	  
-					   // Wolfgang, do they couple
-					   // with each other by
-					   // constraints?
 	  neighbor->get_dof_indices(neighbor_indices);
 	  for (unsigned int i=0;i<fe.dofs_per_cell;++i)
 	    {
