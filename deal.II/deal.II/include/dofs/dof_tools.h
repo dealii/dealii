@@ -229,11 +229,6 @@ class DoFTools
 				      * tables, which may reduce the
 				      * amount of pre-allocated
 				      * memory dramatically.
-				      *
-				      * @todo This function is only
-				      * implemented for primitive
-				      * elements. Implementation in 1D
-				      * is missing completely.
 				      * 
 				      * @param dofs The DoFHandler
 				      * @param row_lengths The vector
@@ -256,6 +251,11 @@ class DoFTools
 				      * couplings. Here, couplings due
 				      * to flux operators on faces are
 				      * considered. See #Coupling.
+				      *
+				      * @todo This function is only
+				      * implemented for primitive
+				      * elements. Implementation in 1D
+				      * is missing completely.
 				     */
     template<int dim>
     static
