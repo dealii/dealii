@@ -129,9 +129,7 @@ PathSearch::find (const std::string& filename,
 		  const char* open_mode)
 {
   std::vector<std::string>::const_iterator suffix;
-  std::vector<std::string>::const_iterator path;
   const std::vector<std::string>::const_iterator ends = my_suffix_list.end();
-  const std::vector<std::string>::const_iterator endp = my_path_list.end();
 
   if (debug > 2)
     deallog << "PathSearch[" << cls << "] "
