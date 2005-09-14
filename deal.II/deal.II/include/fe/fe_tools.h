@@ -223,7 +223,12 @@ class FETools
 				      * of the face on the refined side
 				      * of the face for which this is
 				      * computed.
-				      */
+				      *
+				      * @warning This function will be
+				      * used in computing constraint
+				      * matrices. It is not
+				      * sufficiently tested yet.
+				     */
     template<int dim, typename number>
     static void compute_face_embedding_matrices(const FiniteElement<dim>& fe,
 						FullMatrix<number>* matrices,
