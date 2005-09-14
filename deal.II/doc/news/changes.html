@@ -969,8 +969,8 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Fixed: The class <code>MGDoFHandler</code> had trouble when it
-       encountered a triangulation that had unused vertices, something
+       Fixed: The class <code class="class">MGDoFHandler</code> had trouble
+       when it encountered a triangulation that had unused vertices, something
        that happens when one coarsens an existing triangulation. In
        that case, it would throw unjustified exceptions. This is now
        fixed.
@@ -979,7 +979,7 @@ inconvenience this causes.
        </p>
 
   <li> <p>
-       Fixed: The class <code>Triangulation::RefinementListener</code> had only
+       Fixed: The class <code class="class">Triangulation::RefinementListener</code> had only
        virtual abstract functions but no virtual destructor. This caused
        warnings with some compilers, and is generally bad practice
        anyway. This is now fixed.
