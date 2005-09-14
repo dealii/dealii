@@ -18,8 +18,6 @@
 #include <cstdio>
 #include <algorithm>
 
-//TODO:[GK] Clean up open functions, reuse code!
-
 std::map<std::string, std::vector<std::string> > PathSearch::path_lists;
 std::map<std::string, std::vector<std::string> > PathSearch::suffix_lists;
 std::string PathSearch::empty("");
