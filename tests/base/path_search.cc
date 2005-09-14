@@ -31,20 +31,16 @@ int main()
   cc.add_suffix(".c");
   cc.add_suffix(".cc");
 
-  cc.open("block_vector.cc");
-  deallog << cc.name() << std::endl;
-  cc.open("block_vector");
-  deallog << cc.name() << std::endl;
+  deallog << cc.find("block_vector.cc") << std::endl;
+  deallog << cc.find("block_vector") << std::endl;
   cc.add_suffix(".h", PathSearch::after_none);
-  cc.open("block_vector");
-  deallog << cc.name() << std::endl;
-
+  deallog << cc.find("block_vector") << std::endl;
   cc.show(deallog);
   
   PathSearch mesh("MESH", 3);
   mesh.show(deallog);
-  std::istream& in = mesh.open("backstep");
-  deallog << mesh.name() << std::endl;
+  std::ifstream in(mesh.find("backstep").c_str());
+  deallog << mesh.find("backstep") << std::endl;
   std::string line;
   for (unsigned int i=0;i<4;++i)
     {

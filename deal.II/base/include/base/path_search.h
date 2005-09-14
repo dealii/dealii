@@ -37,15 +37,16 @@
  * Additional file classes can be added easily by using add_class().
  *
  * Usage: First, you construct a PathSearch object for a certain file class,
- * e.g. meshes. Then, you use the open() method to obtain a reference
- * to an <tt>istream</tt> object.
- * @verbatim
+ * e.g. meshes. Then, you use the find() method to obtain a full path
+ * name and you can open the file.
+ * @code
  * #include <base/path_search.h>
  *
  * PathSearch search("MESH");
- * istream& in = search.open("grid");
+ * std::string full_name = search.find("grid");
+ * std::ifstream in(full_name.c_str());
  * ...
- * @endverbatim
+ * @endcode
  *
  * This piece of code will first traverse all paths in the list set up
  * for file class <TT>MESH</tt>. If it manages to open a file, it
@@ -55,10 +56,11 @@
  *
  * If you want to restrict your search to a certain mesh format,
  * <tt>.inp</tt> for instance, then either use <tt>"grid.inp"</tt> in
- * the code above or use the alternative open function
- * @verbatim
- * istream& in = search.open("grid", ".inp");
- * @endverbatim
+ * the code above or use the alternative find(const std::string&,const
+ * std::string&,const char*) function
+ * @code
+ * std::string full_name = search.find("grid", ".inp");
+ * @endcode
  *
  * Path lists are by default starting with the current directory
  * (<tt>"./"</tt>), followed optionally by a standard directory of
@@ -71,10 +73,6 @@
  * dot. These characters are not added automatically (allowing you to
  * do some real file name editing).
  * 
- * If you want to open another file with the same object, the previous
- * one is automatically closed for you. The close() method is needed
- * only if you need to open the same file externally.
- *
  * @todo Add support for environment variables like in kpathsea.
  *
  * @author Guido Kanschat, Luca Heltai 2005
@@ -83,7 +81,8 @@ class PathSearch
 {
   public:
 				     /**
-				      * Position for adding a new item to a list.
+				      * Position for adding a new item
+				      * to a list.
 				      */
     enum Position
     {
@@ -107,40 +106,76 @@ class PathSearch
 		const unsigned int debug=0);
 
 				     /**
-				      * Open a file in the class
-				      * specified by the constructor.
+				      * Find a file in the class
+				      * specified by the constructor
+				      * and return its complete path
+				      * name (including a possible
+				      * suffix).
+				      *
+				      * File search works by actually
+				      * trying to open the file. If @p
+				      * fopen is successful with the
+				      * provided @p open_mode, then
+				      * the file is found, otherwise
+				      * the search continues.
+				      *
+				      * @warning Be careful with @p
+				      * open_mode! In particular, use
+				      * <tt>"w"</tt> with great care!
+				      * If the file does not exist, it
+				      * cannot be found. If it does
+				      * exist, the @p fopen function
+				      * will truncate it to zero
+				      * length.
+				      *
+				      * @param filename The base
+				      * name of the file to be found,
+				      * without path components and
+				      * suffix.
+				      * @param open_mode The mode
+				      * handed over to the @p fopen
+				      * function.
 				      */
-    std::istream& open (const std::string& filename);
+    std::string find (const std::string& filename,
+		      const char* open_mode = "r");
 
 				     /**
-				      * Open a file in the class
-				      * specified by the
-				      * constructor. Do not use the
-				      * standard suffix list, but only
-				      * try to apply the suffix given.
+				      * Find a file in the class
+				      * specified by the constructor
+				      * and return its complete path
+				      * name. Do not use the standard
+				      * suffix list, but only try to
+				      * apply the suffix given.
+				      *
+				      * File search works by actually
+				      * trying to open the file. If @p
+				      * fopen is successful with the
+				      * provided @p open_mode, then
+				      * the file is found, otherwise
+				      * the search continues.
+				      *
+				      * @warning Be careful with @p
+				      * open_mode! In particular, use
+				      * <tt>"w"</tt> with great care!
+				      * If the file does not exist, it
+				      * cannot be found. If it does
+				      * exist, the @p fopen function
+				      * will truncate it to zero
+				      * length.
+				      *
+				      * @param filename The base
+				      * name of the file to be found,
+				      * without path components and
+				      * suffix.
+				      * @param suffix The suffix to be
+				      * used for opening.
+				      * @param open_mode The mode
+				      * handed over to the @p fopen
+				      * function.
 				      */
-    std::istream& open (const std::string& filename,
-			const std::string& suffix);
-
-				     /** Explicitly close the file
-					 opened by the previous call
-					 to one of the open()
-					 functions. This is needed
-					 only if you need to open the
-					 same file externally. Opening
-					 another file with the same
-					 PathSearch object
-					 automatically closes the old
-					 one. */
-    void close();
-    
-				     /**
-				      * Return the actual name of the
-				      * file opened by the previous
-				      * call to one of the open()
-				      * functions.
-				      */
-    const std::string& name() const;
+    std::string find (const std::string& filename,
+		      const std::string& suffix,
+		      const char* open_mode = "r");
 
 				     /**
 				      * Show the paths and suffixes
@@ -174,13 +209,19 @@ class PathSearch
 				      * This class was not
 				      * registered in the path
 				      * search mechanism.
+				      * @ingroup Exceptions
 				      */
     DeclException1(ExcNoClass,
 		   std::string,
 		   << "The class "
 		   << arg1
 		   << " must be registered before referring it in PathSearch");
-    
+				     /**
+				      * The PathSearch class could not
+				      * find a file with this name in
+				      * its path list.
+				      * @ingroup Exceptions
+				      */
     DeclException2(ExcFileNotFound,
 		   std::string, std::string,
 		   << "The file \"" << arg1
@@ -245,17 +286,6 @@ class PathSearch
     std::vector<std::string>& my_suffix_list;
     
 				     /**
-				      * The file stream after open was called.
-				      */
-    std::auto_ptr<std::ifstream> stream;
-
-				     /**
-				      * The actual name of the file
-				      * that was opened previously.
-				      */
-    std::string real_name;
-    
-				     /**
 				      * Debug flag. No output if zero.
 				      */
     const unsigned int debug;
@@ -268,15 +298,6 @@ class PathSearch
 
 
 /* ----------------------------- inline functions ------------------------- */
-
-
-inline
-const std::string&
-PathSearch::name () const
-{
-  return real_name;
-}
-
 
 
 template <class STREAM>

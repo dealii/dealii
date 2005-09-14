@@ -15,6 +15,7 @@
 #include <base/logstream.h>
 
 #include <iostream>
+#include <cstdio>
 #include <algorithm>
 
 //TODO:[GK] Clean up open functions, reuse code!
@@ -89,72 +90,45 @@ PathSearch::PathSearch(const std::string& cls,
 {}
 
 
-std::istream&
-PathSearch::open (const std::string& filename,
-		  const std::string& suffix)
+std::string
+PathSearch::find (const std::string& filename,
+		  const std::string& suffix,
+		  const char* open_mode)
 {
   std::vector<std::string>::const_iterator path;
   const std::vector<std::string>::const_iterator endp = my_path_list.end();
 
+  std::string real_name;
+  
   if (debug > 2)
     deallog << "PathSearch[" << cls << "] "
 	    << my_path_list.size() << " directories "
 	    << std::endl;
   
-				   // Try without suffix first
-  for (path = my_path_list.begin(); path != endp; ++path)
-    {
-      real_name = *path + filename;
-      if (debug > 1)
-	deallog << "PathSearch[" << cls << "] trying "
-		<< real_name << std::endl;
-      stream.reset(new std::ifstream(real_name.c_str()));
-      if (stream->is_open())
-	{
-	  if (debug > 0)
-	    deallog << "PathSearch[" << cls << "] opened "
-		    << real_name << std::endl;
-	  return *stream;
-	}
-    }
-
-				   // Now try with given suffix
+				   // Try to open file
   for (path = my_path_list.begin(); path != endp; ++path)
     {
       real_name = *path + filename + suffix;
       if (debug > 1)
 	deallog << "PathSearch[" << cls << "] trying "
 		<< real_name << std::endl;
-      stream.reset(new std::ifstream(real_name.c_str()));
-      if (stream->is_open())
+      FILE* fp = fopen(real_name.c_str(), open_mode);
+      if (fp != 0)
 	{
 	  if (debug > 0)
 	    deallog << "PathSearch[" << cls << "] opened "
 		    << real_name << std::endl;
-	  return *stream;
+	  fclose(fp);
+	  return real_name;
 	}
     }
   AssertThrow(false, ExcFileNotFound(filename, cls));
-  return *stream;
+  return std::string("");
 }
 
-void 
-PathSearch::close()
-{
-  if(stream->is_open()) {
-    stream->close();
-    if (debug > 0)
-      deallog << "PathSearch[" << cls << "] closed "
-	      << real_name << std::endl;
-  } else {
-    if (debug > 0)
-      deallog << "PathSearch[" << cls 
-	      << "] nothing opened" << std::endl;
-  }
-}
-
-std::istream&
-PathSearch::open (const std::string& filename)
+std::string
+PathSearch::find (const std::string& filename,
+		  const char* open_mode)
 {
   std::vector<std::string>::const_iterator suffix;
   std::vector<std::string>::const_iterator path;
@@ -169,24 +143,18 @@ PathSearch::open (const std::string& filename)
   
   for (suffix = my_suffix_list.begin(); suffix != ends; ++suffix)
     {
-      for (path = my_path_list.begin(); path != endp; ++path)
+      try
 	{
-	  real_name = *path + filename + *suffix;
-	  if (debug > 1)
-	    deallog << "PathSearch[" << cls << "] trying "
-		    << real_name << std::endl;
-	  stream.reset(new std::ifstream(real_name.c_str()));
-	  if (stream->is_open())
-	    {
-	      if (debug > 0)
-		deallog << "PathSearch[" << cls << "] opened "
-			<< real_name << std::endl;
-	      return *stream;
-	    }
+	  return find(filename, *suffix, open_mode);
 	}
+      catch (ExcFileNotFound)
+	{
+	  continue;
+	}
+      
     }
   AssertThrow(false, ExcFileNotFound(filename, cls));
-  return *stream;
+  return std::string("");
 }
 
 

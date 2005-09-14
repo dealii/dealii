@@ -1002,9 +1002,14 @@ void GridIn<dim>::read (const std::string& filename,
 {
 				   // Search file class for meshes
   PathSearch search("MESH");
+  std::string name;
 				   // Open the file and remember its name
-  std::istream& in = search.open(filename.c_str());
-  const std::string& name = search.name();  
+  if (format == Default)
+   name = search.find(filename);
+  else
+    name = search.find(filename, default_suffix(format));
+
+  std::ifstream in(name.c_str());
   
   if (format == Default)
     {
