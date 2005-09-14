@@ -86,8 +86,8 @@ void check_file (const std::string name,
 
 void filename_resolution()
 {
-  check_file<2> (std::string("grid_in_2d.inp"), GridIn<2>::ucd);
-  check_file<2> (std::string("grid_in_2d.xda"), GridIn<2>::xda);
+  check_file<2> (std::string("grid_in_2d"), GridIn<2>::ucd);
+  check_file<2> (std::string("grid_in_2d"), GridIn<2>::xda);
 }
 
 
