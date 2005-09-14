@@ -184,8 +184,11 @@ SparseVanka<number>::compute_inverse (const unsigned int         row,
 	const unsigned int global_entry =
 	  structure.operator()(local_indices[i], local_indices[j]);
 	if (global_entry != SparsityPattern::invalid_entry)
-	  this_inverse(i,j) = matrix->global_entry(global_entry);
-      };
+                                           // the explicit use of operator()
+                                           // works around a bug in some gcc
+                                           // versions (see PR 18803)
+	  this_inverse.operator()(i,j) = matrix->global_entry(global_entry);
+      }
   
 				   // Compute inverse
   this_inverse.gauss_jordan();
