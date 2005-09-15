@@ -191,3 +191,9 @@ td.build {
 	text-align: center;
 	vertical-align: middle;
 }
+
+.cry {
+	color: #e000ff;
+	text-decoration: blink;
+	font-weight: bold;
+}
