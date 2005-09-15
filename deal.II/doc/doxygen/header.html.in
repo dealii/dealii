@@ -11,5 +11,5 @@
 </head>
 <body>
 <div class="head">
-  <h1 class="head">deal.II Reference Manual @PACKAGE_VRESION@</h1>
+  <h1 class="head">deal.II Reference Manual @PACKAGE_VERSION@</h1>
 </div>
