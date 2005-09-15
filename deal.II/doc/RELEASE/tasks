@@ -3,6 +3,7 @@ when a new release shall be issued:
 
 0/
 	cvs update -d -P
+	perl common/scripts/status.pl -c
 	make all
 	cd tests ; make all ; cd ..
 	cd examples ; make all ; cd ..
