@@ -220,8 +220,8 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
 				   // done.
 				   //
 				   // note that we need to scale now,
-				   // since the diagonal is not zero
-				   // now
+				   // since the diagonal is not equal to
+                                   // one now
   for (int row=N-1; row>=0; --row)
     {
 				       // get end of this row
@@ -240,6 +240,75 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
     };
 }
 
+
+template <typename number>
+template <typename somenumber>
+void SparseILU<number>::Tvmult (Vector<somenumber>       &dst,
+				const Vector<somenumber> &src) const 
+{
+  SparseLUDecomposition<number>::Tvmult (dst, src);
+
+  Assert (dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
+  Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
+  
+  const unsigned int N=dst.size();
+  const unsigned int * const rowstart_indices
+    = this->get_sparsity_pattern().get_rowstart_indices();
+  const unsigned int * const column_numbers
+    = this->get_sparsity_pattern().get_column_numbers();
+				   // solve (LU)'x=b in two steps:
+				   // first U'y = b, then
+				   //       L'x = y
+				   //
+				   // first a forward solve. Due to the
+                                   // fact that the transpose of U'
+                                   // is not easily accessible, a
+                                   // temporary vector is required.
+  Vector<somenumber> tmp (N);
+
+  dst = src;
+  for (unsigned int row=0; row<N; ++row)
+    {
+      dst(row) -= tmp (row);
+				       // scale by the diagonal element.
+				       // note that the diagonal element
+				       // was stored inverted
+      dst(row) *= this->diag_element(row);
+
+				       // get end of this row
+      const unsigned int * const rowend = &column_numbers[rowstart_indices[row+1]];
+				       // find the position where the part
+				       // right of the diagonal starts
+      const unsigned int * const first_after_diagonal = this->prebuilt_lower_bound[row];
+      
+      for (const unsigned int * col=first_after_diagonal; col!=rowend; ++col)
+	tmp(*col) += this->global_entry (col-column_numbers) * dst(row);
+    };
+
+				   // now the backward solve. same
+				   // procedure, but we need not set
+				   // dst before, since this is already
+				   // done.
+				   //
+				   // note that we no scaling is required
+                                   // now, since the diagonal is one
+				   // now
+  tmp = 0;
+  for (int row=N-1; row>=0; --row)
+    {
+      dst(row) -= tmp (row);
+
+				       // get start of this row. skip the
+				       // diagonal element
+      const unsigned int * const rowstart = &column_numbers[rowstart_indices[row]+1];
+				       // find the position where the part
+				       // right of the diagonal starts
+      const unsigned int * const first_after_diagonal = this->prebuilt_lower_bound[row];
+      
+      for (const unsigned int * col=rowstart; col!=first_after_diagonal; ++col)
+	tmp(*col) += this->global_entry (col-column_numbers) * dst(row);
+    };
+}
 
 
 template <typename number>
