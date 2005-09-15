@@ -23,14 +23,13 @@ when a new release shall be issued:
 4/ if a x.y.0 release, create a branch:
 	call common/scripts/cvs-create-branch <x> <y>
 
-5/  cvs update -P -r Branch-<x>-<y>
-	or
-    cvs checkout -P -r Branch-<x>-<y> deal.II
+5/  cvs checkout -P -r Branch-<x>-<y> deal.II
+    mv deal.II checkout
+    cd checkout
+    cvs checkout -r Branch-<x>-<y> tests
 
-    cd deal.II
-    cvs checkout tests
-
-6/ change the content of the `Version' file on both HEAD and branch
+6/ change the content of the `Version' file on both HEAD and branch; version
+   on branch should have THREE digits.
 
 7/ test the branch thoroughly:
 	make distclean (if applicable)
@@ -49,11 +48,9 @@ when a new release shall be issued:
 
 10/ tell your friends to tag their programs
 
-11a/ cvs export -r Version-x-y-z and form a tarball of that.
+11/ call common/scripts/make_tarfile.sh in the directory containing 'checkout'
 
-11b/ Produce the online documentation and form a tarball of the doxygen output
-
-12/ put it on the web server.
+12/ put both tar files on the web server.
 
 13/ Add links to download.html, navbar.html and toc.html on homepage.
 
