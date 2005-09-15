@@ -28,7 +28,7 @@ when a new release shall be issued:
     cd checkout
     cvs checkout -r Branch-<x>-<y> tests
 
-6/ change the content of the `Version' file on both HEAD and branch; version
+6/ change the version in configure.in on both HEAD and branch; version
    on branch should have THREE digits.
 
 7/ test the branch thoroughly:

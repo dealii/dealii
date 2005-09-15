@@ -9,7 +9,7 @@ dnl    is stored.
 dnl
 dnl
 dnl authors: Wolfgang Bangerth, Guido Kanschat, and others 
-dnl          1999, 2000, 2001, 2002, 2003, 2004
+dnl          1999, 2000, 2001, 2002, 2003, 2004, 2005
 dnl
 
 
@@ -23,7 +23,7 @@ dnl clearing the cache
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 
-AC_INIT([deal.II], [], [dealii@dealii.org])
+AC_INIT(deal.II, 5.3.pre, dealii@dealii.org, deal.II)
 
 AC_REVISION($Revision$)
 AC_PREREQ(2.50)
@@ -45,21 +45,16 @@ dnl -------------------------------------------------------------
 dnl    Set the path to the deal.II libraries to `pwd`
 DEAL_II_PATH=`pwd`
 
-dnl Version numbers
-DEAL_II_VERSION="`cat Version`"
-
-dnl    Set major and minor version numbers of the deal.II library,
-dnl    both as preprocessor variables and in Makefiles
-DEAL_II_MAJOR=`cat Version | perl -pi -e 's/^(\d+)\..*/$1/;'`
-DEAL_II_MINOR=`cat Version | perl -pi -e 's/^\d+\.(\d+).*/$1/;'`
+dnl    Split version number in major and minor
+DEAL_II_MAJOR=`echo $PACKAGE_VERSION | perl -pi -e 's/^(\d+)\..*/$1/;'`
+DEAL_II_MINOR=`echo $PACKAGE_VERSION | perl -pi -e 's/^\d+\.(\d+).*/$1/;'`
 AC_DEFINE_UNQUOTED(DEAL_II_MAJOR, $DEAL_II_MAJOR, 
                    [Major version number of deal.II])
 AC_DEFINE_UNQUOTED(DEAL_II_MINOR, $DEAL_II_MINOR, 
                    [Minor version number of deal.II])
 AC_DEFINE_UNQUOTED(DEAL_II_PATH, "$DEAL_II_PATH",
                    [Path to the deal.II directory])
-AC_MSG_RESULT(Configuring deal.II version $DEAL_II_VERSION)
-AC_SUBST(DEAL_II_VERSION)
+AC_MSG_RESULT(Configuring deal.II version $PACKAGE_VERSION)
 AC_SUBST(DEAL_II_MAJOR)
 AC_SUBST(DEAL_II_MINOR)
 AC_SUBST(DEAL_II_PATH)
@@ -665,6 +660,7 @@ dnl that need some information
 AC_OUTPUT([common/Make.global_options 
            common/Makefile.template 
            common/scripts/make_dependencies.pl
+	   Version
            doc/Makefile 
 	   doc/doxygen/Makefile
            doc/doxygen/options.dox

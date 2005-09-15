@@ -4086,8 +4086,7 @@ write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
 
                                    // then write a header
   out << "[deal.II intermediate format graphics data]" << std::endl
-      << "[written by deal.II version "
-      << DEAL_II_MAJOR << '.' << DEAL_II_MINOR << "]" << std::endl;
+      << "[written by " << PACKAGE_STRING << "]" << std::endl;
 
   out << data_names.size() << std::endl;
   for (unsigned int i=0; i<data_names.size(); ++i)
@@ -4644,8 +4643,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     std::ostrstream s;
 #endif
 
-    s << "[written by deal.II version "
-      << DEAL_II_MAJOR << '.' << DEAL_II_MINOR << "]";
+    s << "[written by " << PACKAGE_STRING << "]";
 
 #ifndef HAVE_STD_STRINGSTREAM
     s << std::ends;
