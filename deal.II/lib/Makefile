@@ -55,22 +55,28 @@ endif
            $(lib-contrib-petsc-path.o)/libpetscvec$(lib-suffix) \
            $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
 
-  ifeq ($(enable-shared),yes)
-    external-links-petsc:
-	@echo Setting up libraries for PETSc
+ifeq ($(enable-shared),yes)
+
+  external-links-petsc: libpetsc.g$(shared-lib-suffix) libpetsc$(shared-lib-suffix)
+
+  libpetsc.g$(shared-lib-suffix): $(xlib.g)
 	@echo "======================debug============= Linking library:   libpetsc.g$(shared-lib-suffix)"
 	@$(CXX) -shared -o libpetsc.g$(shared-lib-suffix) \
 		-Wl,-rpath,$(lib-contrib-petsc-path.g) $(xlib.g)
+
+  libpetsc$(shared-lib-suffix): $(xlib.o)
 	@echo "======================optimized========= Linking library:   libpetsc$(shared-lib-suffix)"
 	@$(CXX) -shared -o libpetsc$(shared-lib-suffix) \
 		-Wl,-rpath,$(lib-contrib-petsc-path.o) $(xlib.o)
+
 else
+
+  external-links-petsc: libpetsc.g$(static-lib-suffix) libpetsc$(static-lib-suffix)
 
   # As I don't know how to merge archives, here's a workaround: Extract each of
   # the archives and append the object files to the libpetsc archive. Do the
   # same for debug and optimized mode.
-  external-links-petsc:
-	@echo Setting up libraries for PETSc
+  libpetsc.g$(static-lib-suffix): $(xlib.g)
 	@echo "======================debug============= Linking library:   libpetsc.g$(static-lib-suffix)"
 	@rm -f libpetsc.g$(static-lib-suffix)
 	@mkdir ar_tmp; cd ar_tmp; \
@@ -82,6 +88,8 @@ else
 	@cd ..
 	@rm -r ar_tmp
 	@$(RANLIB) libpetsc.g$(static-lib-suffix)
+
+  libpetsc$(static-lib-suffix): $(xlib.o)
 	@echo "======================optimized========= Linking library:   libpetsc$(static-lib-suffix)"
 	@rm -f libpetsc$(static-lib-suffix)
 	@mkdir ar_tmp; cd ar_tmp; \
