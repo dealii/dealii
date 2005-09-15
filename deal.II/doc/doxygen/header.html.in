@@ -7,9 +7,9 @@
   <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
   <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors">
-  <meta name="deal.II version" content="@DEAL_II_VERSION@">
+  <meta name="deal.II version" content="@PACKAGE_VERSION@">
 </head>
 <body>
 <div class="head">
-  <h1 class="head">deal.II Reference Manual</h1>
+  <h1 class="head">deal.II Reference Manual @PACKAGE_VRESION@</h1>
 </div>
