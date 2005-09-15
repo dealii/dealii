@@ -78,28 +78,28 @@ else
   # same for debug and optimized mode.
   libpetsc.g$(static-lib-suffix): $(xlib.g)
 	@echo "======================debug============= Linking library:   libpetsc.g$(static-lib-suffix)"
-	@rm -f libpetsc.g$(static-lib-suffix)
-	@mkdir ar_tmp; cd ar_tmp; \
+	@rm -rf .ar_tmp
+	@mkdir .ar_tmp; cd .ar_tmp; \
 	 for arfile in $(xlib.g) ; do \
 	   $(AR) x $$arfile; \
            $(AR) q ../libpetsc.g$(static-lib-suffix) *; \
            rm *; \
 	 done
 	@cd ..
-	@rm -r ar_tmp
+	@rm -r .ar_tmp
 	@$(RANLIB) libpetsc.g$(static-lib-suffix)
 
   libpetsc$(static-lib-suffix): $(xlib.o)
 	@echo "======================optimized========= Linking library:   libpetsc$(static-lib-suffix)"
-	@rm -f libpetsc$(static-lib-suffix)
-	@mkdir ar_tmp; cd ar_tmp; \
+	@rm -rf .ar_tmp
+	@mkdir .ar_tmp; cd .ar_tmp; \
 	 for arfile in $(xlib.o) ; do \
 	   $(AR) x $$arfile; \
            $(AR) q ../libpetsc$(static-lib-suffix) *; \
            rm *; \
 	 done
 	@cd ..
-	@rm -r ar_tmp
+	@rm -r .ar_tmp
 	@$(RANLIB) libpetsc$(static-lib-suffix)
 endif
 
