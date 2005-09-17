@@ -574,10 +574,8 @@ FiniteElement<dim>::interpolate(
 	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
   Assert (this->n_components() == 1,
 	  ExcDimensionMismatch(this->n_components(), 1));
-
-  Assert(false, ExcNotImplemented());
   
-//  std::fill(values.begin(), values.end(), local_dofs.begin());
+  std::copy(values.begin(), values.end(), local_dofs.begin());
 }
 
 
@@ -602,7 +600,7 @@ FiniteElement<dim>::interpolate(
     {
       const std::pair<unsigned int, unsigned int> index
 	= this->system_to_component_index(i);
-      local_dofs[i] = values[index.second](offset+index.first);
+      local_dofs[i] = values[i](offset+index.first);
     }
 }
 
@@ -627,7 +625,7 @@ FiniteElement<dim>::interpolate(
     {
       const std::pair<unsigned int, unsigned int> index
 	= this->system_to_component_index(i);
-      local_dofs[i] = values[index.first][index.second];
+      local_dofs[i] = values[index.first][i];
     }
 }
 

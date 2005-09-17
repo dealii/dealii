@@ -1128,12 +1128,6 @@ class FiniteElement : public Subscriptor,
 				      * just the values in the suport
 				      * points. All other elements
 				      * must reimplement it.
-				      *
-				      * @warning This function will
-				      * only be available in future
-				      * versions. Right now, is
-				      * implemented for a few elements
-				      * and not tested.
 				      */
     virtual void interpolate(std::vector<double>&       local_dofs,
 			     const std::vector<double>& values) const;
@@ -1151,12 +1145,6 @@ class FiniteElement : public Subscriptor,
 				      * interpolated. Maybe consider
 				      * changing your data structures
 				      * to use the next function.
-				      *
-				      * @warning This function will
-				      * only be available in future
-				      * versions. Right now, is
-				      * implemented for a few elements
-				      * and not tested.
 				      */
     virtual void interpolate(std::vector<double>&                local_dofs,
 			     const std::vector<Vector<double> >& values,
@@ -1166,12 +1154,6 @@ class FiniteElement : public Subscriptor,
 				      * Interpolate a set of vector
 				      * values, computed in the
 				      * generalized support points.
-				      *
-				      * @warning This function will
-				      * only be available in future
-				      * versions. Right now, is
-				      * implemented for a few elements
-				      * and not tested.
 				      */
     virtual void interpolate(
       std::vector<double>& local_dofs,
