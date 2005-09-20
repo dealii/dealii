@@ -1060,7 +1060,7 @@ class FullMatrix : public Table<2,number>
     friend class Accessor;
 };
 
-/*@}*/
+/**@}*/
 
 #ifndef DOXYGEN
 /*-------------------------Inline functions -------------------------------*/
