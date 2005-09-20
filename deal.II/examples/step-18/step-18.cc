@@ -19,6 +19,7 @@
 #include <base/function.h>
 #include <base/logstream.h>
 #include <base/conditional_ostream.h>
+#include <base/utilities.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/petsc_vector.h>
@@ -755,19 +756,7 @@ namespace QuasiStaticElasticity
 				       // ``active_cell_iterator'').
       unsigned int         n_local_cells;
 
-				       // Finally, here are the same two
-				       // helper functions that we already had
-				       // in step-17 to extract some
-				       // information from the MPI subsystem:
-      static
-      unsigned int
-      get_n_mpi_processes (const MPI_Comm &mpi_communicator);
-
-      static
-      unsigned int
-      get_this_mpi_process (const MPI_Comm &mpi_communicator);
-
-				       // In addition, we have a
+				       // Finally, we have a
 				       // static variable that denotes
 				       // the linear relationship
 				       // between the stress and
@@ -1015,33 +1004,7 @@ namespace QuasiStaticElasticity
                                    // @sect3{Implementation of the ``TopLevel'' class}
 
                                    // Now for the implementation of the main
-                                   // class. The first two functions are
-                                   // verbatim copies from step-17:
-  template <int dim>
-  unsigned int
-  TopLevel<dim>::get_n_mpi_processes (const MPI_Comm &mpi_communicator)
-  {
-    int n_jobs;
-    (void)MPI_Comm_size (mpi_communicator, &n_jobs);
-
-    return n_jobs;
-  }
-
-
-
-  template <int dim>
-  unsigned int
-  TopLevel<dim>::get_this_mpi_process (const MPI_Comm &mpi_communicator)
-  {
-    int rank;
-    (void)MPI_Comm_rank (mpi_communicator, &rank);
-
-    return rank;
-  }
-
-
-      
-				   // Then initialize the
+                                   // class. First, we initialize the
 				   // stress-strain tensor, which we
 				   // have declared as a static const
 				   // variable. We chose Lame
@@ -1073,10 +1036,9 @@ namespace QuasiStaticElasticity
 		  dof_handler (triangulation),
 		  quadrature_formula (2),
 		  mpi_communicator (MPI_COMM_WORLD),
-		  n_mpi_processes (get_n_mpi_processes(mpi_communicator)),
-		  this_mpi_process (get_this_mpi_process(mpi_communicator)),
-		  pcout (std::cout,
-			 get_this_mpi_process(mpi_communicator) == 0)
+		  n_mpi_processes (Utilities::System::get_n_mpi_processes(mpi_communicator)),
+		  this_mpi_process (Utilities::System::get_this_mpi_process(mpi_communicator)),
+		  pcout (std::cout, this_mpi_process == 0)
   {}
 
 

@@ -46,8 +46,14 @@
                                  // new stream ``pcout'' which is used
                                  // in parallel computations for
                                  // generating output only on one of
-                                 // the processes.
+                                 // the MPI processes.
 #include <base/conditional_ostream.h>
+				 // We are going to query the number
+				 // of processes and the number of the
+				 // present process by calling the
+				 // respective functions in the
+				 // Utilities::System namespace.
+#include <base/utilities.h>
 				 // Then, we are
                                  // going to replace all linear algebra
                                  // components that involve the (global)
@@ -212,34 +218,6 @@ class ElasticProblem
                                      // and ``0'', respectively.
     const unsigned int n_mpi_processes;
     const unsigned int this_mpi_process;
-
-                                     // In order to obtain values for the
-                                     // above two variables, we need to query
-                                     // the MPI subsystem (in case there is no
-                                     // MPI running at all, these functions
-                                     // automatically query some wrappers that
-                                     // PETSc provides and that return default
-                                     // values for a single process). We could
-                                     // initialize above variables in the
-                                     // constructor of this class, but since
-                                     // they never change we chose to mark
-                                     // them as ``const'', and so they can
-                                     // only be initialized if we package all
-                                     // the querying functions into auxiliary,
-                                     // static functions that return the
-                                     // requested values as their return
-                                     // value. The argument they take denotes
-                                     // the MPI communicator object from which
-                                     // they shall query the total number of
-                                     // processes, and the rank within this
-                                     // communicator:
-    static
-    unsigned int
-    get_n_mpi_processes (const MPI_Comm &mpi_communicator);
-
-    static
-    unsigned int
-    get_this_mpi_process (const MPI_Comm &mpi_communicator);
 };
 
 
@@ -307,76 +285,6 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 }
 
 
-
-                                 // So here first come the two functions that
-                                 // query the number of processes associated
-                                 // with an MPI communicator object, as well
-                                 // as the rank of the present process within
-                                 // it. Note again that PETSc provides dummy
-                                 // implementations of these functions if no
-                                 // MPI support is requested. These dummy
-                                 // functions return ``1'' and ``0'' for the
-                                 // total number of processes and the rank of
-                                 // the present process within the
-                                 // communicator, respectively.
-				 //
-				 // Unfortunately, we have to work
-				 // around an oddity in the way PETSc
-				 // and some gcc versions interact. If
-				 // we use PETSc's MPI dummy
-				 // implementation, it expands the
-				 // calls to the two MPI functions
-				 // basically as ``(n_jobs=1, 0)'',
-				 // i.e. it assigns the number one to
-				 // the variable holding the number of
-				 // jobs, and then uses the comma
-				 // operator to let the entire
-				 // expression have the value
-				 // zero. The latter is important,
-				 // since ``MPI_Comm_size'' returns an
-				 // error code that we may want to
-				 // check (we don't here, but one
-				 // could in principle), and the trick
-				 // with the comma operator makes sure
-				 // that both the number of jobs is
-				 // correctly assigned, and the return
-				 // value is zero. Unfortunately, if
-				 // some recent versions of gcc detect
-				 // that the comma expression just
-				 // stands by itself, i.e. the result
-				 // is not assigned to another
-				 // variable, then they warn
-				 // ``right-hand operand of comma has
-				 // no effect''. This unwanted side
-				 // effect can be suppressed by
-				 // casting the result of the entire
-				 // expression to type ``void'' -- not
-				 // beautiful, but helps calming down
-				 // unwarranted compiler warnings...
-template <int dim>
-unsigned int
-ElasticProblem<dim>::get_n_mpi_processes (const MPI_Comm &mpi_communicator)
-{
-  int n_jobs;
-  (void)MPI_Comm_size (mpi_communicator, &n_jobs);
-
-  return n_jobs;
-}
-
-
-
-template <int dim>
-unsigned int
-ElasticProblem<dim>::get_this_mpi_process (const MPI_Comm &mpi_communicator)
-{
-  int rank;
-  (void)MPI_Comm_rank (mpi_communicator, &rank);
-
-  return rank;
-}
-
-
-
                                  // The first step in the actual
                                  // implementation of things is the
                                  // constructor of the main class. Apart from
@@ -388,23 +296,29 @@ ElasticProblem<dim>::get_this_mpi_process (const MPI_Comm &mpi_communicator)
                                  // together (in more complex applications,
                                  // one could here use a communicator object
                                  // that only links a subset of all
-                                 // processes), and call above helper
+                                 // processes), and call the Utilities helper
                                  // functions to determine the number of
                                  // processes and where the present one fits
                                  // into this picture. In addition, we make
                                  // sure that output is only generated by the
-                                 // (globally) first process:
+                                 // (globally) first process. As,
+				 // this_mpi_process is determined after
+				 // creation of pcout, we cannot set the
+				 // condition through the constructor, i.e. by
+				 // pcout(std::cout, this_mpi_process==0), but
+				 // set the condition separately.
 template <int dim>
 ElasticProblem<dim>::ElasticProblem ()
                 :
-                pcout (std::cout,
-                       get_this_mpi_process(MPI_COMM_WORLD) == 0),
+                pcout (std::cout),
 		dof_handler (triangulation),
 		fe (FE_Q<dim>(1), dim),
                 mpi_communicator (MPI_COMM_WORLD),
-                n_mpi_processes (get_n_mpi_processes(mpi_communicator)),
-                this_mpi_process (get_this_mpi_process(mpi_communicator))
-{}
+                n_mpi_processes (Utilities::System::get_n_mpi_processes(mpi_communicator)),
+                this_mpi_process (Utilities::System::get_this_mpi_process(mpi_communicator))
+{
+  pcout.set_condition(this_mpi_process == 0);
+}
 
 
 
