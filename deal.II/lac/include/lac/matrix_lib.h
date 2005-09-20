@@ -311,6 +311,8 @@ class MeanValueFilter : public Subscriptor
  */
 template<class VECTOR>
 class InverseMatrixRichardson
+  :
+  public Subscriptor
 {
   public:
 				     /**
@@ -502,8 +504,12 @@ template <class MATRIX, class PRECONDITION>
 inline void
 InverseMatrixRichardson<VECTOR>::initialize (const MATRIX& m, const PRECONDITION& p)
 {
-  matrix = &m;
-  precondition = &p;
+  if (matrix != 0)
+    delete matrix;
+  matrix = new PointerMatrix<MATRIX, VECTOR>(&m);
+  if (precondition != 0)
+    delete precondition;
+  precondition = new PointerMatrix<PRECONDITION, VECTOR>(&p);;
 }
 
 

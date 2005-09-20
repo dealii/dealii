@@ -140,7 +140,13 @@ InverseMatrixRichardson<VECTOR>::vmult(VECTOR& dst, const VECTOR& src) const
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
-  solver.solve(*matrix, dst, src, *precondition);
+  dst = 0.;
+  try
+    {
+      solver.solve(*matrix, dst, src, *precondition);
+    }
+  catch(...)
+    {}  
 }
 
 
@@ -153,7 +159,12 @@ InverseMatrixRichardson<VECTOR>::vmult_add(VECTOR& dst, const VECTOR& src) const
   Assert (precondition != 0, ExcNotInitialized());
   VECTOR* aux = mem.alloc();
   aux->reinit(dst);
-  solver.solve(*matrix, *aux, src, *precondition);
+  try
+    {
+      solver.solve(*matrix, *aux, src, *precondition);
+    }
+  catch(...)
+    {}  
   dst += *aux;
   mem.free(aux);
 }
@@ -166,7 +177,13 @@ InverseMatrixRichardson<VECTOR>::Tvmult(VECTOR& dst, const VECTOR& src) const
 {
   Assert (matrix != 0, ExcNotInitialized());
   Assert (precondition != 0, ExcNotInitialized());
-  solver.Tsolve(*matrix, dst, src, *precondition);
+  dst = 0.;
+  try
+    {
+      solver.Tsolve(*matrix, dst, src, *precondition);
+    }
+  catch(...)
+    {}  
 }
 
 
@@ -179,7 +196,12 @@ InverseMatrixRichardson<VECTOR>::Tvmult_add(VECTOR& dst, const VECTOR& src) cons
   Assert (precondition != 0, ExcNotInitialized());
   VECTOR* aux = mem.alloc();
   aux->reinit(dst);
-  solver.Tsolve(*matrix, *aux, src, *precondition);
+  try
+    {
+      solver.Tsolve(*matrix, *aux, src, *precondition);
+    }
+  catch(...)
+    {}  
   dst += *aux;
   mem.free(aux);
 }
