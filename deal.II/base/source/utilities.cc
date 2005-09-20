@@ -335,11 +335,44 @@ namespace Utilities
     }
     
 #ifdef DEAL_II_USE_PETSC
+                                // Unfortunately, we have to work
+                                // around an oddity in the way PETSc
+                                // and some gcc versions interact. If
+                                // we use PETSc's MPI dummy
+                                // implementation, it expands the
+                                // calls to the two MPI functions
+                                // basically as ``(n_jobs=1, 0)'',
+                                // i.e. it assigns the number one to
+                                // the variable holding the number of
+                                // jobs, and then uses the comma
+                                // operator to let the entire
+                                // expression have the value zero. The
+                                // latter is important, since
+                                // ``MPI_Comm_size'' returns an error
+                                // code that we may want to check (we
+                                // don't here, but one could in
+                                // principle), and the trick with the
+                                // comma operator makes sure that both
+                                // the number of jobs is correctly
+                                // assigned, and the return value is
+                                // zero. Unfortunately, if some recent
+                                // versions of gcc detect that the
+                                // comma expression just stands by
+                                // itself, i.e. the result is not
+                                // assigned to another variable, then
+                                // they warn ``right-hand operand of
+                                // comma has no effect''. This
+                                // unwanted side effect can be
+                                // suppressed by casting the result of
+                                // the entire expression to type
+                                // ``void'' -- not beautiful, but
+                                // helps calming down unwarranted
+                                // compiler warnings...
     unsigned int get_n_mpi_processes (
       const MPI_Comm &mpi_communicator)
     {
       int n_jobs=1;
-      MPI_Comm_size (mpi_communicator, &n_jobs);
+      (void) MPI_Comm_size (mpi_communicator, &n_jobs);
       
       return n_jobs;
     }
@@ -348,7 +381,7 @@ namespace Utilities
       const MPI_Comm &mpi_communicator)
     {
       int rank=0;
-      MPI_Comm_rank (mpi_communicator, &rank);
+      (void) MPI_Comm_rank (mpi_communicator, &rank);
       
       return rank;
     }
