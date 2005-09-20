@@ -18,7 +18,9 @@
 #include <vector>
 #include <string>
 
-
+#ifdef DEAL_II_USE_PETSC
+#include <petscvec.h>
+#endif    
 
 /**
  * A namespace for utility functions that are not particularly specific to
@@ -134,6 +136,26 @@ namespace Utilities
                                       * Return the present time as HH:MM:SS.
                                       */
     std::string get_time ();
+
+#ifdef DEAL_II_USE_PETSC
+				     /**
+				      * Return the number of MPI
+				      * processes there exist.
+				      */
+    unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator);
+
+				     /**
+				      * Return the number of the
+				      * present MPI process in the
+				      * space of processes. This will
+				      * be a unique value for each
+				      * process between zero and (less
+				      * than) the number of all
+				      * processes (given by
+				      * get_n_mpi_processes()).
+				      */
+    unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
+#endif // DEAL_II_USE_PETSC    
   }
 }
 

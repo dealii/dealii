@@ -334,6 +334,25 @@ namespace Utilities
       return o.str();
     }
     
+#ifdef DEAL_II_USE_PETSC
+    unsigned int get_n_mpi_processes (
+      const MPI_Comm &mpi_communicator)
+    {
+      int n_jobs=1;
+      MPI_Comm_size (mpi_communicator, &n_jobs);
+      
+      return n_jobs;
+    }
+
+    unsigned int get_this_mpi_process (
+      const MPI_Comm &mpi_communicator)
+    {
+      int rank=0;
+      MPI_Comm_rank (mpi_communicator, &rank);
+      
+      return rank;
+    }
+#endif    
   }
   
 }
