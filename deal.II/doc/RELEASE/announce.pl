@@ -68,7 +68,7 @@ if ($test)
 		   'scicomp@uni-erlangen.de',
 		   'im-net-digest@iwr.uni-heidelberg.de',
 		   'na.digest@na-net.ornl.gov',
-		   'num.info@hermes.iwr.uni-heidelberg.de');
+		   'num.info@ganymed.iwr.uni-heidelberg.de');
 }
 my $r;
 
