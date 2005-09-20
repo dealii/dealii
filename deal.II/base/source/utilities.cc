@@ -333,6 +333,7 @@ namespace Utilities
 #endif
       return o.str();
     }
+
     
 #ifdef DEAL_II_USE_PETSC
                                 // Unfortunately, we have to work
@@ -385,7 +386,17 @@ namespace Utilities
       
       return rank;
     }
-#endif    
+#else
+    unsigned int get_n_mpi_processes (const MPI_Comm &)
+    {
+      return 1;
+    }
+
+    unsigned int get_this_mpi_process (const MPI_Comm &)
+    {
+      return 0;
+    }
+#endif
   }
   
 }

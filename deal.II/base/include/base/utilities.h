@@ -20,7 +20,9 @@
 
 #ifdef DEAL_II_USE_PETSC
 #include <petscvec.h>
-#endif    
+#else
+typedef int MPI_Comm;
+#endif
 
 /**
  * A namespace for utility functions that are not particularly specific to
@@ -137,7 +139,6 @@ namespace Utilities
                                       */
     std::string get_time ();
 
-#ifdef DEAL_II_USE_PETSC
 				     /**
 				      * Return the number of MPI
 				      * processes there exist.
@@ -155,7 +156,6 @@ namespace Utilities
 				      * get_n_mpi_processes()).
 				      */
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
-#endif // DEAL_II_USE_PETSC    
   }
 }
 
