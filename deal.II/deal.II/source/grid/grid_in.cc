@@ -1016,7 +1016,7 @@ void GridIn<dim>::read (const std::string& filename,
       const unsigned int slashpos = name.find_last_of('/');
       const unsigned int dotpos = name.find_last_of('.');
       if (dotpos < name.length()
-	  && (dotpos > slashpos || slashpos == name.length()))
+	  && (dotpos > slashpos || slashpos == name.npos))
 	{
 	  std::string ext = name.substr(dotpos+1);
 	  format = parse_format(ext);
