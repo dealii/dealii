@@ -67,6 +67,7 @@ namespace
   void generate_unit_points (const unsigned int,
 			     std::vector<Point<dim> > &);
 
+#if deal_II_dimension == 1
   template <>
   void generate_unit_points (const unsigned int k,
 			     std::vector<Point<1> > &p)
@@ -76,8 +77,9 @@ namespace
     for (unsigned int i=0; i<p.size(); ++i)
       p[i](0)=i*h;
   }
+#endif
   
-  
+#if deal_II_dimension == 2
   template <>
   void generate_unit_points (const unsigned int k,
 			     std::vector<Point<2> > &p)
@@ -90,7 +92,9 @@ namespace
 	p[i](1)=points2d[start_index2d[k]+i][1];
       }
   }
+#endif
   
+#if deal_II_dimension == 3
   template <>
   void generate_unit_points (const unsigned int k,
 			     std::vector<Point<3> > &p)
@@ -104,6 +108,7 @@ namespace
 	p[i](2)=points3d[start_index3d[k]+i][2];
       }
   }
+#endif
 }
 
 

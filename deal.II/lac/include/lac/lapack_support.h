@@ -59,23 +59,23 @@ namespace LAPACKSupport
 				   /**
 				    * Character constant.
 				    */
-  extern const char V = 'V';
+  static const char V = 'V';
 				   /**
 				    * Character constant.
 				    */
-  extern const char T = 'T';
+  static const char T = 'T';
 				   /**
 				    * Character constant.
 				    */
-  extern const char N = 'N';
+  static const char N = 'N';
 				   /**
 				    * Integer constant.
 				    */
-  extern const int zero = 0;
+  static const int zero = 0;
 				   /**
 				    * Integer constant.
 				    */
-  extern const int one = 1;
+  static const int one = 1;
 }
 
 
