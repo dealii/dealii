@@ -140,8 +140,15 @@ namespace Utilities
     std::string get_time ();
 
 				     /**
-				      * Return the number of MPI
-				      * processes there exist.
+				      * Return the number of MPI processes
+				      * there exist. If this is a sequential
+				      * job, it returns 1.
+				      *
+				      * This function will only work if you
+				      * also configured the library to use
+				      * PETSc. If your program uses MPI but
+				      * not PETSc, then this function is
+				      * likely not going to work.
 				      */
     unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator);
 
@@ -154,6 +161,12 @@ namespace Utilities
 				      * than) the number of all
 				      * processes (given by
 				      * get_n_mpi_processes()).
+				      *
+				      * This function will only work if you
+				      * also configured the library to use
+				      * PETSc. If your program uses MPI but
+				      * not PETSc, then this function is
+				      * likely not going to work.
 				      */
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
   }
