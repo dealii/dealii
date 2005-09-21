@@ -86,6 +86,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Fixed: The <code
+       class="member">GridIn&lt;dim&gt;::read(filename, format)</code>
+       function ran into an exception when called with
+       <tt>Default</tt> format and a filename which does not include
+       <tt>/</tt>. This is now fixed.
+       <br> 
+       (RH 2005/09/21)
+       </p>
 </ol>
 
 <hr>
