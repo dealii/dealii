@@ -43,7 +43,8 @@ FunctionParser<dim>::FunctionParser(const unsigned int n_components,
 
 
 template <int dim>
-FunctionParser<dim>::~FunctionParser() {
+FunctionParser<dim>::~FunctionParser()
+{
   delete[] fp;
 }
 
