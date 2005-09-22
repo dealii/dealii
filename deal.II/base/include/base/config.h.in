@@ -78,6 +78,10 @@
    interface */
 #undef DEAL_II_HAVE_TECPLOT
 
+/* Flag indicating whether the library shall be compiled to use the NetCDF
+   interface */
+#undef DEAL_II_HAVE_NETCDF
+
 /* Defined if the compiler refuses to compile the definition of a function
    that was previously declared abstract. */
 #undef DEAL_II_IMPLEMENTED_PURE_FUNCTION_BUG

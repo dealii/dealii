@@ -4484,6 +4484,44 @@ AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
 
 
 
+dnl -------------------------------------------------------------
+dnl Check for the NetCDF API. If it is found we will be able read
+dnl from and write to NetCDF binary or ascii files.
+dnl
+dnl We assume that $NETCDF_DIR points to the NetCDF installation
+dnl directory, which includes the lib and include directory. I.e.
+dnl   cd $NETCDF_DIR; ls
+dnl would result in something like
+dnl   bin  include  lib  man  src
+dnl   netcdf-3.6.0-p1>
+dnl
+dnl Usage: DEAL_II_CONFIGURE_NETCDF
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
+[
+  AC_CHECK_FILE($NETCDF_DIR/lib/libnetcdf.a,
+		NETCDF_LIB=$NETCDF_DIR/lib/libnetcdf.a)
+  AC_CHECK_FILE($NETCDF_DIR/lib/libnetcdf_c++.a,
+		NETCDF_LIB="$NETCDF_DIR/lib/libnetcdf_c++.a $NETCDF_LIB",
+                NETCDF_LIB="")
+  AC_CHECK_FILE($NETCDF_DIR/include/netcdfcpp.h,
+		NETCDF_INCLUDE_DIR=-I$NETCDF_DIR/include,
+		NETCDF_LIB="")
+
+  if (test "x$NETCDF_LIB" != "x") ; then
+    AC_DEFINE(DEAL_II_HAVE_NETCDF, 1,
+	      [Flag indicating whether the library shall be compiled to use the NetCDF interface])
+
+    AC_MSG_CHECKING(for NetCDF version)
+    DEAL_II_NETCDF_VERSION=`cat $NETCDF_DIR/src/VERSION`
+    AC_MSG_RESULT($DEAL_II_NETCDF_VERSION)
+
+    LIBS="$NETCDF_LIB $LIBS"
+  fi
+])
+
+
 
 dnl ------------------------------------------------------------
 dnl Check whether PETSc is installed, and if so store the 
