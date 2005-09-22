@@ -180,7 +180,9 @@ class GridIn
 					   /// Use read_xda()
 	  xda,
 					   /// Use read_msh()
-	  msh
+	  msh,
+					   /// Use read_netcdf()
+	  netcdf
     };
     
 				     /**
@@ -236,6 +238,14 @@ class GridIn
 				      * Read grid data from an msh file.
 				      */
     void read_msh (std::istream &);
+    
+    				     /**
+				      * Read grid data from a netcdf
+				      * file.  This requires the
+				      * library to be linked with the
+				      * netcdf library.
+				      */
+    void read_netcdf (const std::string &);
     
 				     /**
 				      * Returns the standard suffix
