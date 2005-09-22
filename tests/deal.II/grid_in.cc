@@ -79,7 +79,7 @@ void test3 ()
   gi.read ("grid_in_2d.nc");
 
   GridOut grid_out;
-  ofstream gnufile("grid_in_2d.gnuplot");  
+  std::ofstream gnufile("grid_in_2d.gnuplot");  
   grid_out.write_gnuplot (tria, gnufile);
 }
 

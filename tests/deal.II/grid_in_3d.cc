@@ -76,7 +76,7 @@ void test1()
   gi.read ("grid_in_3d_1.nc");
   
   GridOut grid_out;
-  ofstream gnufile("square.gnuplot");
+  std::ofstream gnufile("square.gnuplot");
   grid_out.write_gnuplot (tria, gnufile);
 }
 
