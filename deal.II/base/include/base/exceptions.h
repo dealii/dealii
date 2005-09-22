@@ -1147,6 +1147,15 @@ namespace StandardExceptions
 				    * if it is actually included.
 				    */
   DeclException0 (ExcNeedsPETSC);
+  
+				   /**
+				    * This function requires the
+				    * NetCDF library. Please set the
+				    * environment variable NETCDF_DIR,
+				    * reconfigure and check if it is
+				    * actually included.
+				    */
+  DeclException0 (ExcNeedsNetCDF);
 				   /**
 				    * A configuration option disabled
 				    * this feature. In order to use
