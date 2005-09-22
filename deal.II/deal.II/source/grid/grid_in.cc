@@ -741,7 +741,7 @@ void GridIn<dim>::read_msh (std::istream &in)
 #if deal_II_dimension == 1
 
 template <>
-void GridIn<1>::read_netcdf (const std::string &filename)
+void GridIn<1>::read_netcdf (const std::string &)
 {
   AssertThrow(false, ExcImpossibleInDim(1));
 }
@@ -756,6 +756,9 @@ template <>
 void GridIn<2>::read_netcdf (const std::string &filename)
 {
 #ifndef DEAL_II_HAVE_NETCDF
+				   // do something with unused
+				   // filename
+  filename.c_str();
   AssertThrow(false, ExcNeedsNetCDF());
 #else
   const unsigned int dim=2;
