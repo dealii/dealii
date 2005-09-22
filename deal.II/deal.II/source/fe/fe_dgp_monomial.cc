@@ -27,6 +27,7 @@ namespace
 				   // storage of hand-chosen support
 				   // points
 				   //
+#if deal_II_dimension == 2
 				   // For dim=2, dofs_per_cell of
 				   // FE_DGPMonomial(k) is given by
 				   // 0.5(k+1)(k+2), i.e.
@@ -47,8 +48,9 @@ namespace
    {0,0},{1,0},{0,1},{1,1},{1./3.,0},{2./3.,0},{0,1./3.},{0,2./3.},{0.5,1},{1,0.5},
    {0,0},{1,0},{0,1},{1,1},{0.25,0},{0.5,0},{0.75,0},{0,0.25},{0,0.5},{0,0.75},{1./3.,1},{2./3.,1},{1,1./3.},{1,2./3.},{0.5,0.5}
   };
+#endif
 
-				   //
+#if deal_II_dimension == 3
 				   // For dim=3, dofs_per_cell of
 				   // FE_DGPMonomial(k) is given by
 				   // 1./6.(k+1)(k+2)(k+3), i.e.
@@ -61,6 +63,7 @@ namespace
    {0,0,0},{1,0,0},{0,1,0},{0,0,1},
    {0,0,0},{1,0,0},{0,1,0},{0,0,1},{0.5,0,0},{0,0.5,0},{0,0,0.5},{1,1,0},{1,0,1},{0,1,1}
   };
+#endif
 
   
   template<int dim>
