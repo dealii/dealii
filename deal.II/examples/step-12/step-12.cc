@@ -286,7 +286,6 @@ void DGTransportEquation<dim>::assemble_cell_term(
   Vector<double> &cell_vector) const
 {
 				   // First we ask ``fe_v'' for the
-				   // shape gradients, shape values and
 				   // quadrature weights,
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
 
@@ -333,9 +332,9 @@ void DGTransportEquation<dim>::assemble_boundary_term(
   Vector<double> &cell_vector) const
 {
 				   // Again, as in the previous
-				   // function, we ask the ``FEValues''
-				   // object for the shape values and
-				   // the quadrature weights
+				   // function, we ask the
+				   // ``FEValues'' object for the
+				   // quadrature weights
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
 				   // but here also for the normals.
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
@@ -399,17 +398,16 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 				 // on the face.
 				 //
 				 // In addition to the cell matrix
-				 // ``u_v_matrix'' this function has
-				 // got a new argument
-				 // ``un_v_matrix'', that stores
-				 // contributions to the system matrix
-				 // that are based on outer values of
-				 // u, see $\hat u_h$ in the
-				 // introduction, and inner values of
-				 // v, see $v_h$. Here we note that
-				 // ``un'' is the short notation for
-				 // ``u_neighbor'' and represents
-				 // $\hat u_h$.
+				 // ``u_v_matrix'' this function gets
+				 // a new argument ``un_v_matrix'',
+				 // that stores contributions to the
+				 // system matrix that are based on
+				 // outer values of u, see $\hat u_h$
+				 // in the introduction, and inner
+				 // values of v, see $v_h$. Here we
+				 // note that ``un'' is the short
+				 // notation for ``u_neighbor'' and
+				 // represents $\hat u_h$.
 template <int dim>
 void DGTransportEquation<dim>::assemble_face_term1(
   const FEFaceValuesBase<dim>& fe_v,
@@ -419,9 +417,8 @@ void DGTransportEquation<dim>::assemble_face_term1(
 {
 				   // Again, as in the previous
 				   // function, we ask the FEValues
-				   // objects for the shape values,
-				   // the quadrature weights and the
-				   // normals
+				   // objects for the quadrature
+				   // weights and the normals
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
   const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
 
