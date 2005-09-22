@@ -29,27 +29,191 @@ template <int dim> class FECollection;
 /*@{*/
 
 /**
- * Common interface of all finite elements. Here, the functions to
- * fill the data fields of FEValues are declared.
+ * Base class for finite elements in arbitrary dimensions. This class
+ * provides several fields which describe a specific finite element
+ * and which are filled by derived classes. It more or less only
+ * offers the fields and access functions which makes it possible to
+ * copy finite elements without knowledge of the actual type (linear,
+ * quadratic, etc). In particular, the functions to fill the data
+ * fields of FEValues and its derived classes are declared.
  *
  * The interface of this class is very restrictive. The reason is that
- * finite element values should be accessed only by use of
- * FEValues objects. These, together with @p FiniteElement are
- * responsible to provide an optimized implementation.
+ * finite element values should be accessed only by use of FEValues
+ * objects. These, together with FiniteElement are responsible to
+ * provide an optimized implementation.
  *
- * This even holds for evaluating finite elements at their support
- * points (provided the element is based on Lagrangian interpolation):
- * first, it is necessary to construct a quadrature rule from the
- * support points. This is then fed into an object of class
- * FEValues. Even for evaluation on the unit cell, you will need
- * a triangulation containing that single cell.
+ * This class declares the shape functions and their derivatives on
+ * the unit cell $[0,1]^d$. The means to transform them onto a given
+ * cell in physical space is provided by the FEValues class with a
+ * Mapping object.
  *
- * Basically, this class just declares the shape function and their
- * derivatives on the unit cell $[0,1]^d$, and the means to transform
- * them onto a given cell in physical space if provided by the
- * FEValues class with a Mapping object.
+ * The different matrices are initialized with the correct size, such
+ * that in the derived (concrete) finite element classes, their
+ * entries only have to be filled in; no resizing is needed. If the
+ * matrices are not defined by a concrete finite element, they should
+ * be resized to zero. This way functions using them can find out,
+ * that they are missing. On the other hand, it is possible to use
+ * finite element classes without implementation of the full
+ * functionality, if only part of it is needed. The functionality
+ * under consideration here is hanging nodes constraints and grid
+ * transfer, respectively.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001
+ *
+ * <h3>Support points</h3>
+ *
+ * Since a FiniteElement does not have information on the actual grid
+ * cell, it can only provide @ref GlossSupport "support points" on the
+ * unit cell. Support points on the actual grid cell must be computed
+ * by mapping these points. The class used for this kind of operation
+ * is FEValues. In most cases, code of the following type will serve
+ * to provide the mapped support points.
+ *
+ * @code
+ * Quadrature<dim> dummy_quadrature (fe.get_unit_support_points());
+ * FEValues<dim>   fe_values (mapping, fe, dummy_quadrature,
+ *                            update_q_points);
+ * fe_values.reinit (cell);
+ * Point<dim>& mapped_point = fe_values.quadrature_point (i);
+ * @endcode
+ *
+ * Alternatively, the points can be transformed one-by-one:
+ * @code
+ * const vector<Point<dim> >& unit_points =
+ *    fe.get_unit_support_points();
+ *
+ * Point<dim> mapped_point =
+ *    mapping.transform_unit_to_real_cell (cell, unit_points[i]);
+ * @endcode
+ * This is a shortcut, and as all shortcuts should be used cautiously.
+ * If the mapping of all support points is needed, the first variant should
+ * be preferred for efficiency.
+ *
+ * <h3>Notes on the implementation of derived classes</h3>
+ *
+ * <h4>Finite elements in one dimension</h4>
+ *
+ * Finite elements in one dimension need only set the #restriction
+ * and #prolongation matrices. The constructor of this class in one
+ * dimension presets the #interface_constraints matrix to have
+ * dimension zero. Changing this behaviour in derived classes is
+ * generally not a reasonable idea and you risk getting into trouble.
+ * 
+ * <h4>Finite elements in two dimensions</h4>
+ * 
+ * In addition to the fields already present in 1D, a constraint
+ * matrix is needed, if the finite element has node values located on
+ * edges or vertices. These constraints are represented by an $m\times
+ * n$-matrix #interface_constraints, where <i>m</i> is the number of
+ * degrees of freedom on the refined side without the corner vertices
+ * (those dofs on the middle vertex plus those on the two lines), and
+ * <i>n</i> is that of the unrefined side (those dofs on the two
+ * vertices plus those on the line). The matrix is thus a rectangular
+ * one. The $m\times n$ size of the #interface_constraints matrix can
+ * also be accessed through the interface_constraints_size() function.
+ *
+ * The mapping of the dofs onto the indices of the matrix on the
+ * unrefined side is as follows: let $d_v$ be the number of dofs on a
+ * vertex, $d_l$ that on a line, then $n=0...d_v-1$ refers to the dofs
+ * on vertex zero of the unrefined line, $n=d_v...2d_v-1$ to those on
+ * vertex one, $n=2d_v...2d_v+d_l-1$ to those on the line.
+ *
+ * Similarly, $m=0...d_v-1$ refers to the dofs on the middle vertex of
+ * the refined side (vertex one of child line zero, vertex zero of
+ * child line one), $m=d_v...d_v+d_l-1$ refers to the dofs on child
+ * line zero, $m=d_v+d_l...d_v+2d_l-1$ refers to the dofs on child
+ * line one.  Please note that we do not need to reserve space for the
+ * dofs on the end vertices of the refined lines, since these must be
+ * mapped one-to-one to the appropriate dofs of the vertices of the
+ * unrefined line.
+ *
+ * It should be noted that it is not possible to distribute a constrained
+ * degree of freedom to other degrees of freedom which are themselves
+ * constrained. Only one level of indirection is allowed. It is not known
+ * at the time of this writing whether this is a constraint itself.
+ *
+ * 
+ * <h4>Finite elements in three dimensions</h4>
+ *
+ * For the interface constraints, almost the same holds as for the 2D case.
+ * The numbering for the indices $n$ on the mother face is obvious and keeps
+ * to the usual numbering of degrees of freedom on quadrilaterals.
+ *
+ * The numbering of the degrees of freedom on the interior of the refined
+ * faces for the index $m$ is as follows: let $d_v$ and $d_l$ be as above,
+ * and $d_q$ be the number of degrees of freedom per quadrilateral (and
+ * therefore per face), then $m=0...d_v-1$ denote the dofs on the vertex at
+ * the center, $m=d_v...5d_v-1$ for the dofs on the vertices at the center
+ * of the bounding lines of the quadrilateral,
+ * $m=5d_v..5d_v+4*d_l-1$ are for the degrees of freedom on
+ * the four lines connecting the center vertex to the outer boundary of the
+ * mother face, $m=5d_v+4*d_l...5d_v+4*d_l+8*d_l-1$ for the degrees of freedom
+ * on the small lines surrounding the quad,
+ * and $m=5d_v+12*d_l...5d_v+12*d_l+4*d_q-1$ for the dofs on the
+ * four child faces. Note the direction of the lines at the boundary of the
+ * quads, as shown below.
+ *
+ * The order of the twelve lines and the four child faces can be extracted
+ * from the following sketch, where the overall order of the different
+ * dof groups is depicted:
+ * @verbatim
+ *    *--13--3--14--*
+ *    |      |      |
+ *    16 20  7  19  12
+ *    |      |      |
+ *    4--8---0--6---2
+ *    |      |      |
+ *    15 17  5  18  11
+ *    |      |      |
+ *    *--9---1--10--*
+ * @endverbatim
+ * The numbering of vertices and lines, as well as the numbering of
+ * children within a line is consistent with the one described in
+ * Triangulation. Therefore, this numbering is seen from the
+ * outside and inside, respectively, depending on the face.
+ *
+ * The three-dimensional case has a few pitfalls available for derived classes
+ * that want to implement constraint matrices. Consider the following case:
+ * @verbatim
+ *          *-------*
+ *         /       /|
+ *        /       / |
+ *       /       /  |
+ *      *-------*   |
+ *      |       |   *-------*
+ *      |       |  /       /|
+ *      |   1   | /       / |
+ *      |       |/       /  |
+ *      *-------*-------*   |
+ *      |       |       |   *
+ *      |       |       |  /
+ *      |   2   |   3   | /
+ *      |       |       |/
+ *      *-------*-------*
+ * @endverbatim
+ * Now assume that we want to refine cell 2. We will end up with two faces
+ * with hanging nodes, namely the faces between cells 1 and 2, as well as
+ * between cells 2 and 3. Constraints have to be applied to the degrees of
+ * freedom on both these faces. The problem is that there is now an edge
+ * (the top right one of cell 2) which is part of both faces. The hanging
+ * node(s) on this edge are therefore constrained twice, once from both
+ * faces. To be meaningful, these constraints of course have to be
+ * consistent: both faces have to constrain the hanging nodes on the edge to
+ * the same nodes on the coarse edge (and only on the edge, as there can
+ * then be no constraints to nodes on the rest of the face), and they have
+ * to do so with the same weights. This is sometimes tricky since the nodes
+ * on the edge may have different local numbers.
+ *
+ * For the constraint matrix this means the following: if a degree of freedom
+ * on one edge of a face is constrained by some other nodes on the same edge
+ * with some weights, then the weights have to be exactly the same as those
+ * for constrained nodes on the three other edges with respect to the
+ * corresponding nodes on these edges. If this isn't the case, you will get
+ * into trouble with the ConstraintMatrix class that is the primary consumer
+ * of the constraint information: while that class is able to handle
+ * constraints that are entered more than once (as is necessary for the case
+ * above), it insists that the weights are exactly the same.
+ *
+ * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001, 2005
  */
 template <int dim>
 class FiniteElement : public Subscriptor,
