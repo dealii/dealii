@@ -412,10 +412,11 @@ dnl -------------------------------------------------------------
 
 dnl Check for blas.
 AC_ARG_WITH(blas,
-  [  --with-blas=blaslib use the blas library blaslib. Make sure
-   the path to the libary is searched by ld, since it is included
-   by the argument -lblaslib. If no argument is given, use -lblas.
-   Default is to use -lblas only if required by other libraries.],
+  [  --with-blas=blaslib     use the blas library blaslib. Make sure
+                          the path to the libary is searched by ld, since
+                          it is included by the argument -lblaslib. If no
+                          argument is given, use -lblas. Default is to use
+                          -lblas only if required by other libraries.],
   DEAL_II_WITH_BLAS($withval))
 
 DEAL_II_CONFIGURE_HSL
@@ -448,11 +449,11 @@ AC_SUBST(DEAL_II_METIS_DIR)
 dnl Check for UMFPack. This is more an enable for the contributed version,
 dnl but it should become a real --with-umfpack later
 AC_ARG_WITH(umfpack,
-  [  --with-umfpack=umfpack-root-directory,
-      Use installed UMFPack version. 'umfpack-root-directory' should
-      be the directory containing directories AMD and UMFPACK.
-      The contributed UMFPack library is used if no argument is given.
-      Default is not to use UMFPack],
+  [  --with-umfpack=umfpack-root-directory  Use installed UMFPack version.
+                          'umfpack-root-directory' should be the directory
+                          containing directories AMD and UMFPACK. The
+                          contributed UMFPack library is used if no argument
+                          is given. Default is not to use UMFPack.],
   DEAL_II_WITH_UMFPACK($withval))
 AC_SUBST(UMFPACK_LIB)
 AC_SUBST(UMFPACK_INCLUDE_DIR)
@@ -460,10 +461,11 @@ AC_SUBST(USE_CONTRIB_UMFPACK)
 
 dnl Check for LAPACK
 AC_ARG_WITH(lapack,
-  [  --with-lapack=lapacklib use the lapack library lapacklib. Make sure
-   the path to the libary is searched by ld, since it is included
-   by the argument -llapacklib. If no argument is given, use -llapack.
-   Default is not to use -llapack.],
+  [  --with-lapack=lapacklib  use the lapack library lapacklib. Make sure
+                          the path to the libary is searched by ld, since it
+                          is included by the argument -llapacklib. If no
+                          argument is given, use -llapack. Default is not to
+                          use -llapack.],
   DEAL_II_WITH_LAPACK($withval))
 
 dnl -------------------------------------------------------------

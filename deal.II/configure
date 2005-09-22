@@ -817,53 +817,54 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-multithreading set compiler flags to allow for
+  --enable-multithreading  set compiler flags to allow for
                           multithreaded programs
   --enable-shared         set compiler flags to generate shared libraries
   --enable-parser         While switched on by default, this option allows to
                           switch off support for the function parser in the
                           contrib directory.
-  --enable-compat-blocker=mapping block functions that implicitely
+  --enable-compat-blocker=mapping  block functions that implicitely
                           assume a Q1 mapping
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-multithreading=name If name==posix, or no name given, then use
-                          POSIX threads
-  --with-petsc=/path/to/petsc   Specify the path to the PETSc installation,
-                                   of which the include and library directories
-                                   are subdirs; use this if you want to
-                                   override the PETSC_DIR environment variable
+  --with-multithreading=name  If name==posix, or no name given, then use
+                          POSIX threads.
+  --with-petsc=/path/to/petsc  Specify the path to the PETSc installation,
+                          of which the include and library directories
+                          are subdirs; use this if you want to override
+                          the PETSC_DIR environment variable.
   --with-petsc-arch=architecture  Specify the architecture for your PETSc
-                                     installation; use this if you want to
-                                     override the PETSC_ARCH environment
-                                     variable
-  --with-blas=blaslib use the blas library blaslib. Make sure
-   the path to the libary is searched by ld, since it is included
-   by the argument -lblaslib. If no argument is given, use -lblas.
-   Default is to use -lblas only if required by other libraries.
+                          installation; use this if you want to override
+                          the PETSC_ARCH environment variable.
+  --with-blas=blaslib     use the blas library blaslib. Make sure
+                          the path to the libary is searched by ld, since
+                          it is included by the argument -lblaslib. If no
+                          argument is given, use -lblas. Default is to use
+                          -lblas only if required by other libraries.
   --with-netcdf=/path/to/netcdf  Specify the path to the NetCDF installation,
-                                    of which the include and library directories
-                                    are subdirs; use this if you want to
-                                    override the NETCDF_DIR environment variable
-  --with-metis=/path/to/metis   Specify the path to the Metis installation,
-                                   of which the include and library directories
-                                   are subdirs; use this if you want to
-                                   override the METIS_DIR environment variable
-  --with-umfpack=umfpack-root-directory,
-      Use installed UMFPack version. 'umfpack-root-directory' should
-      be the directory containing directories AMD and UMFPACK.
-      The contributed UMFPack library is used if no argument is given.
-      Default is not to use UMFPack
-  --with-lapack=lapacklib use the lapack library lapacklib. Make sure
-   the path to the libary is searched by ld, since it is included
-   by the argument -llapacklib. If no argument is given, use -llapack.
-   Default is not to use -llapack.
+                          of which the include and library directories are
+                          subdirs; use this if you want to override the
+                          NETCDF_DIR environment variable.
+  --with-metis=/path/to/metis  Specify the path to the Metis installation,
+                          of which the include and library directories
+                          are subdirs; use this if you want to override
+                          the METIS_DIR environment variable.
+  --with-umfpack=umfpack-root-directory  Use installed UMFPack version.
+                          'umfpack-root-directory' should be the directory
+                          containing directories AMD and UMFPACK. The
+                          contributed UMFPack library is used if no argument
+                          is given. Default is not to use UMFPack.
+  --with-lapack=lapacklib  use the lapack library lapacklib. Make sure
+                          the path to the libary is searched by ld, since it
+                          is included by the argument -llapacklib. If no
+                          argument is given, use -llapack. Default is not to
+                          use -llapack.
   --with-cpu=cpu          Optimize specifically for the given CPU type,
                           rather than just generating code for this
-		          processor family
-  --with-doxygen=filename     use 'filename' for doxygen
+		          processor family.
+  --with-doxygen=filename  use 'filename' for doxygen
 
 Some influential environment variables:
   CC          C compiler command

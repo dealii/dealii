@@ -1411,7 +1411,7 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
   AC_ARG_WITH(cpu,
   [  --with-cpu=cpu          Optimize specifically for the given CPU type,
                           rather than just generating code for this
-		          processor family],
+		          processor family.],
       withcpu=$withval,
       withcpu="")
   AC_MSG_CHECKING(for CPU to optimize for)
@@ -1564,7 +1564,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
 [
   AC_ARG_ENABLE(multithreading,
-  [  --enable-multithreading set compiler flags to allow for
+  [  --enable-multithreading  set compiler flags to allow for
                           multithreaded programs],
     enablemultithreading=$enableval,
     enablemultithreading=no)
@@ -1698,8 +1698,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_USE_MT, dnl
 [
   AC_ARG_WITH(multithreading,
-  [  --with-multithreading=name If name==posix, or no name given, then use
-                          POSIX threads],
+  [  --with-multithreading=name  If name==posix, or no name given, then use
+                          POSIX threads.],
       withmultithreading=$withval,
       withmultithreading=no)
 
@@ -1842,7 +1842,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_COMPAT_BLOCKER, dnl
 [
   AC_ARG_ENABLE(compat-blocker,
-  [  --enable-compat-blocker=mapping block functions that implicitely
+  [  --enable-compat-blocker=mapping  block functions that implicitely
                           assume a Q1 mapping],
       enable_compat_blocker=$enableval,
       enable_compat_blocker="")
@@ -4364,7 +4364,7 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_DOXYGEN, dnl
 [
   AC_ARG_WITH(doxygen,
-  [  --with-doxygen=filename     use 'filename' for doxygen],
+  [  --with-doxygen=filename  use 'filename' for doxygen],
       DOXYGEN=$withval,
       DOXYGEN=)
 
@@ -4501,9 +4501,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
 
   AC_ARG_WITH(netcdf,
   [  --with-netcdf=/path/to/netcdf  Specify the path to the NetCDF installation,
-                                    of which the include and library directories
-                                    are subdirs; use this if you want to
-                                    override the NETCDF_DIR environment variable],
+                          of which the include and library directories are
+                          subdirs; use this if you want to override the
+                          NETCDF_DIR environment variable.],
      [
         DEAL_II_NETCDF_DIR=$withval
      ],
@@ -4556,10 +4556,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
   AC_MSG_CHECKING(for PETSc library directory)
 
   AC_ARG_WITH(petsc,
-  [  --with-petsc=/path/to/petsc   Specify the path to the PETSc installation,
-                                   of which the include and library directories
-                                   are subdirs; use this if you want to
-                                   override the PETSC_DIR environment variable],
+  [  --with-petsc=/path/to/petsc  Specify the path to the PETSc installation,
+                          of which the include and library directories
+                          are subdirs; use this if you want to override
+                          the PETSC_DIR environment variable.],
      [
 	USE_CONTRIB_PETSC=yes
         DEAL_II_PETSC_DIR=$withval
@@ -4632,9 +4632,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_ARCH, dnl
 
   AC_ARG_WITH(petsc-arch,
   [  --with-petsc-arch=architecture  Specify the architecture for your PETSc
-                                     installation; use this if you want to
-                                     override the PETSC_ARCH environment
-                                     variable],
+                          installation; use this if you want to override
+                          the PETSC_ARCH environment variable.],
      [
         DEAL_II_PETSC_ARCH=$withval
 	AC_MSG_RESULT($DEAL_II_PETSC_ARCH)
@@ -4730,10 +4729,10 @@ AC_DEFUN(DEAL_II_CONFIGURE_METIS, dnl
   AC_MSG_CHECKING(for Metis library directory)
 
   AC_ARG_WITH(metis,
-  [  --with-metis=/path/to/metis   Specify the path to the Metis installation,
-                                   of which the include and library directories
-                                   are subdirs; use this if you want to
-                                   override the METIS_DIR environment variable],
+  [  --with-metis=/path/to/metis  Specify the path to the Metis installation,
+                          of which the include and library directories
+                          are subdirs; use this if you want to override
+                          the METIS_DIR environment variable.],
      [
 	USE_CONTRIB_METIS=yes
         DEAL_II_METIS_DIR=$withval
