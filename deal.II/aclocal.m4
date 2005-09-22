@@ -4485,39 +4485,59 @@ AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
 
 
 dnl -------------------------------------------------------------
-dnl Check for the NetCDF API. If it is found we will be able read
+dnl Check whether NetCDF is installed. If so we will be able to read
 dnl from and write to NetCDF binary or ascii files.
 dnl
-dnl We assume that $NETCDF_DIR points to the NetCDF installation
-dnl directory, which includes the lib and include directory. I.e.
-dnl   cd $NETCDF_DIR; ls
-dnl would result in something like
-dnl   bin  include  lib  man  src
-dnl   netcdf-3.6.0-p1>
+dnl The NetCDF installation directory (including the lib and include
+dnl directory) is given to the --with-netcdf configure option or to
+dnl the NETCDF_DIR environment variable
 dnl
 dnl Usage: DEAL_II_CONFIGURE_NETCDF
 dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
 [
-  AC_CHECK_FILE($NETCDF_DIR/lib/libnetcdf.a,
-		NETCDF_LIB=$NETCDF_DIR/lib/libnetcdf.a)
-  AC_CHECK_FILE($NETCDF_DIR/lib/libnetcdf_c++.a,
-		NETCDF_LIB="$NETCDF_DIR/lib/libnetcdf_c++.a $NETCDF_LIB",
-                NETCDF_LIB="")
-  AC_CHECK_FILE($NETCDF_DIR/include/netcdfcpp.h,
-		NETCDF_INCLUDE_DIR=-I$NETCDF_DIR/include,
-		NETCDF_LIB="")
+  AC_MSG_CHECKING(for NetCDF library directory)
 
-  if (test "x$NETCDF_LIB" != "x") ; then
-    AC_DEFINE(DEAL_II_HAVE_NETCDF, 1,
-	      [Flag indicating whether the library shall be compiled to use the NetCDF interface])
+  AC_ARG_WITH(netcdf,
+  [  --with-netcdf=/path/to/netcdf  Specify the path to the NetCDF installation,
+                                    of which the include and library directories
+                                    are subdirs; use this if you want to
+                                    override the NETCDF_DIR environment variable],
+     [
+        DEAL_II_NETCDF_DIR=$withval
+     ],
+     [
+        dnl Take something from the environment variables, if it is there
+        if test "x$NETCDF_DIR" != "x" ; then
+  	  DEAL_II_NETCDF_DIR="$NETCDF_DIR"
+        else
+	  DEAL_II_NETCDF_DIR=""
+          AC_MSG_RESULT(not found)
+        fi
+     ])
 
-    AC_MSG_CHECKING(for NetCDF version)
-    DEAL_II_NETCDF_VERSION=`cat $NETCDF_DIR/src/VERSION`
-    AC_MSG_RESULT($DEAL_II_NETCDF_VERSION)
+  if test "x$DEAL_II_NETCDF_DIR" != "x" ; then
+    AC_MSG_RESULT($DEAL_II_NETCDF_DIR)
+    AC_CHECK_FILE($DEAL_II_NETCDF_DIR/lib/libnetcdf.a,
+		  NETCDF_LIB=$DEAL_II_NETCDF_DIR/lib/libnetcdf.a)
+    AC_CHECK_FILE($DEAL_II_NETCDF_DIR/lib/libnetcdf_c++.a,
+		  NETCDF_LIB="$DEAL_II_NETCDF_DIR/lib/libnetcdf_c++.a $NETCDF_LIB",
+                  NETCDF_LIB="")
+    AC_CHECK_FILE($DEAL_II_NETCDF_DIR/include/netcdfcpp.h,
+		  NETCDF_INCLUDE_DIR=-I$DEAL_II_NETCDF_DIR/include,
+		  NETCDF_LIB="")
 
-    LIBS="$NETCDF_LIB $LIBS"
+    if (test "x$NETCDF_LIB" != "x") ; then
+      AC_DEFINE(DEAL_II_HAVE_NETCDF, 1,
+	        [Flag indicating whether the library shall be compiled to use the NetCDF interface])
+
+      AC_MSG_CHECKING(for NetCDF version)
+      DEAL_II_NETCDF_VERSION=`cat $DEAL_II_NETCDF_DIR/src/VERSION`
+      AC_MSG_RESULT($DEAL_II_NETCDF_VERSION)
+
+      LIBS="$NETCDF_LIB $LIBS"
+    fi
   fi
 ])
 
