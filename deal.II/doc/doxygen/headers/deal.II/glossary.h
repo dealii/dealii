@@ -24,9 +24,54 @@
  * and support points coincide.
  * </dd>
  *
+ * <dt>@anchor GlossInterpolation Interpolation with finite elements</dt>
+ * <dd>The purpose of interpolation with finite elements is computing
+ * a vector of coefficients representing a finite element function,
+ * such that the @ref GlossNodes "node values" of the original
+ * function and the finite element function coincide. Therefore, the
+ * interpolation process consists of evaluating all @ref GlossNodes
+ * "node functionals" <i>N<sub>i</sub></i> for the given function
+ * <i>f</i> and store the result as entry <i>i</i> in the coefficient
+ * vector.
+ *
  * <dt>@anchor GlossLagrange Lagrange elements</dt>
  * <dd>Finite elements based on Lagrangian interpolation at
  * @ref GlossSupport "support points".</dd>
+ *
+ * <dt>@anchor GlossNodes Node values or node functionals</dt>
+ *
+ * <dd>It is customary to define a FiniteElement as a pair consisting
+ * of a local function space and a set of node values
+ * <i>(N<sub>i</sub>)</i> on the mesh cells (usually defined on the
+ * @GlossReferenceCell "reference cell"). Then, the basis of the local
+ * function space is chosen such that <i>N<sub>i</sub>(v<sub>j</sub>)
+ * = &delta;<sub>ij</sub></i>, the Kronecker delta.
+ *
+ * This splitting has several advantages, concerning analysis as well
+ * as implementation. For the analysis, it means that conformity with
+ * certain spaces (FiniteElementData::Conformity), e.g. continuity, is
+ * up to the node values. In deal.II, it helps simplifying the
+ * implementation of more complex elements like FE_RaviartThomas
+ * considerably.
+ *
+ * Examples for node functionals are values in @ref GlossSupport
+ * "support points" and moments with respect to Legendre
+ * polynomials. Let us give some examples:
+ *
+ * <table><tr>
+ * <th>Element</th>
+ * <th>Function space</th>
+ * <th>Node values</th></tr>
+ * <tr><th>FE_Q, FE_DGQ</th>
+ * <td><i>Q<sub>k</sub></i></td>
+ * <td>values in support points</td></tr>
+ * <tr><th>FE_DGP</th>
+ * <td><i>P<sub>k</sub></i></td>
+ * <td>moments with respect to Legendre polynomials</td></tr>
+ * <tr><th>FE_RaviartThomas (2d)</th>
+ * <td><i>Q<sub>k+1,k</sub> x Q<sub>k,k+1</sub></i></td>
+ * <td>moments on edges and in the interior</td></tr>
+ * </table>
  *
  * <dt>@anchor GlossReferenceCell Reference cell</dt>
  * <dd>The hypercube [0,1]<sup>dim</sup>, on which all parametric finite
