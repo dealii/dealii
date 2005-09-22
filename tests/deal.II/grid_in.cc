@@ -70,6 +70,20 @@ void test2 ()
 }
 
 
+template <int dim>
+void test3 ()
+{
+  Triangulation<dim> tria;
+  GridIn<dim> gi;
+  gi.attach_triangulation (tria);
+  gi.read ("grid_in_2d.nc");
+
+  GridOut grid_out;
+  ofstream gnufile("grid_in_2d.gnuplot");  
+  grid_out.write_gnuplot (tria, gnufile);
+}
+
+
 template<int dim>
 void check_file (const std::string name,
 		 typename GridIn<dim>::Format format)
@@ -100,7 +114,9 @@ int main ()
 
   test1<2> ();
   test2<2> ();
-  
+				   // test3 needs NetCDF
+//    test3<2> ();
+
   filename_resolution();
 }
 

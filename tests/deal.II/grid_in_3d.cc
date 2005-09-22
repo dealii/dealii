@@ -68,6 +68,20 @@ void test (const char *filename)
   deallog << "  hash=" << hash << std::endl;
 }
 
+void test1()
+{
+  Triangulation<3> tria;
+  GridIn<3> gi;
+  gi.attach_triangulation (tria);
+  gi.read ("grid_in_3d_1.nc");
+  
+  GridOut grid_out;
+  ofstream gnufile("square.gnuplot");
+  grid_out.write_gnuplot (tria, gnufile);
+}
+
+
+
 
 int main ()
 {
@@ -86,5 +100,8 @@ int main ()
   test ("grid_in_3d_evil_2.in");
   test ("grid_in_3d_evil_3.in");
   test ("grid_in_3d_evil_4.in");
+  
+				   // test1 needs NetCDF
+//    test1 ();
 }
 
