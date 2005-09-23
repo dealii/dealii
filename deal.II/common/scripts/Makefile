@@ -26,5 +26,6 @@ make_dependencies : make_dependencies.cc $D/common/Make.global_options
 
 clean:
 	-rm -f make_dependencies
+	-rm -f make_dependencies.o
 
 .PHONY: clean
