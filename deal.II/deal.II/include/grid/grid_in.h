@@ -202,7 +202,7 @@ class GridIn
 				      * #default_format variable is
 				      * used.
 				      */
-    void read (std::istream &, Format format=Default);
+    void read (std::istream &in, Format format=Default);
     
 				     /**
 				      * Open the file given by the
@@ -212,40 +212,44 @@ class GridIn
 				      * to find files. The file class
 				      * used is <code>MESH</code>.
 				      */
-    void read (const std::string&, Format format=Default);
+    void read (const std::string &in, Format format=Default);
     
 				     /**
 				      * Read grid data from an ucd file.
 				      * Numerical data is ignored.
 				      */
-    void read_ucd (std::istream &);
+    void read_ucd (std::istream &in);
 
 				     /**
 				      * Read grid data from a file
 				      * containing data in the DB mesh
 				      * format.
 				      */
-    void read_dbmesh (std::istream &);
+    void read_dbmesh (std::istream &in);
     
 				     /**
 				      * Read grid data from a file
 				      * containing data in the XDA
 				      * format.
 				      */
-    void read_xda (std::istream &);
+    void read_xda (std::istream &in);
     
     				     /**
 				      * Read grid data from an msh file.
 				      */
-    void read_msh (std::istream &);
+    void read_msh (std::istream &in);
     
     				     /**
-				      * Read grid data from a netcdf
-				      * file.  This requires the
+				      * Read grid data from a NetCDF
+				      * file. The only data format
+				      * currently supported is the
+				      * <tt>TAU grid format</tt>.
+				      *
+				      * This function requires the
 				      * library to be linked with the
-				      * netcdf library.
+				      * NetCDF library.
 				      */
-    void read_netcdf (const std::string &);
+    void read_netcdf (const std::string &filename);
     
 				     /**
 				      * Returns the standard suffix
