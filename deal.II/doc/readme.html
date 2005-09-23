@@ -701,6 +701,17 @@
     library and required FORTRAN libraries to the linker calls. BLAS
     subroutines are not used within <acronym>deal.II</acronym>.
      </dd>
+
+    <dt>NetCDF</dt>
+    <dd>Autodetected if the <tt>NETCDF_DIR</tt> environment variable
+    points to a valid installation of the <a
+    href="http://www.unidata.ucar.edu/software/netcdf/">NetCDF</a>
+    library. Can also be enabled by
+    <tt>--with-netcdf=/path/to/netcdf</tt> which overrides the path in
+    <tt>$NETCDF_DIR</tt>. If enabled, allows grid input in NetCDF
+    format (GridIn::read_netcdf).
+    </dd>
+
     </dl>
 
     <a name="compiler-flags">
