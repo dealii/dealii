@@ -24,12 +24,12 @@
 #ifdef DEAL_II_USE_PETSC
 
 
-/*! @addtogroup PETScWrappers
- *@{
- */
 
 namespace PETScWrappers
 {
+/*! @addtogroup PETScWrappers
+ *@{
+ */
 
 /**
  * An implementation of block vectors based on the vector class implemented in
@@ -461,16 +461,13 @@ namespace PETScWrappers
 
   
 
-/*! @addtogroup PETScWrappers
- *@{
- */
-
 /**
  * Global function which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *
- * @relates BlockVector
+ * @ingroup PETScWrappers
+ * @relates PETScWrappers::BlockVector
  * @author Wolfgang Bangerth, 2000
  */
   inline
@@ -479,9 +476,6 @@ namespace PETScWrappers
   {
     u.swap (v);
   }
-
-
-/*@}*/
   
 }
 

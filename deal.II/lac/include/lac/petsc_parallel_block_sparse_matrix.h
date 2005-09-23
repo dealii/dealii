@@ -25,15 +25,15 @@
 #ifdef DEAL_II_USE_PETSC
 
 
-/*! @addtogroup PETSc
- *@{
- */
 
 namespace PETScWrappers
 {
   namespace MPI
   {
-    
+
+/*! @addtogroup PETScWrappers
+ *@{
+ */   
 
 /**
  * Blocked sparse matrix based on the PETScWrappers::SparseMatrix class. This

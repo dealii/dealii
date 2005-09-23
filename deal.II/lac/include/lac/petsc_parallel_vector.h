@@ -371,7 +371,6 @@ namespace PETScWrappers
     };
 
 
-#ifndef DOXYGEN
 // ------------------ template and inline functions -------------
 
 
@@ -380,6 +379,8 @@ namespace PETScWrappers
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *
+ * @ingroup PETScWrappers
+ * @relates PETScWrappers::MPI::Vector
  * @author Wolfgang Bangerth, 2004
  */
     inline
@@ -389,6 +390,7 @@ namespace PETScWrappers
     }
 
 
+#ifndef DOXYGEN
 
     template <typename number>
     Vector::Vector (const MPI_Comm         &communicator,

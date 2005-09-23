@@ -23,10 +23,6 @@
 #ifdef DEAL_II_USE_PETSC
 
 
-/*! @addtogroup PETScWrappers
- *@{
- */
-
 namespace PETScWrappers
 {
                                    // forward declaration
@@ -34,6 +30,10 @@ namespace PETScWrappers
   
   namespace MPI
   {
+
+/*! @addtogroup PETScWrappers
+ *@{
+ */
     
 /**
  * An implementation of block vectors based on the parallel vector class
@@ -448,19 +448,16 @@ namespace PETScWrappers
         this->components[i].swap (v.components[i]);
       ::swap (this->block_indices, v.block_indices);
     }
-
   
 
-/*! @addtogroup PETScWrappers
- *@{
- */
 
 /**
  * Global function which overloads the default implementation
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *
- * @relates BlockVector
+ * @ingroup PETScWrappers
+ * @relates PETScWrappers::MPI::BlockVector
  * @author Wolfgang Bangerth, 2000
  */
     inline
@@ -469,10 +466,7 @@ namespace PETScWrappers
     {
       u.swap (v);
     }
-
-
-/*@}*/
-  
+    
   }
   
 }

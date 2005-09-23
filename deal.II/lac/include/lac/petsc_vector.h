@@ -27,6 +27,10 @@
 
 namespace PETScWrappers
 {
+/*! @addtogroup PETScWrappers
+ *@{
+ */
+
 /**
  * Implementation of a sequential vector class based on PETSC. All the
  * functionality is actually in the base class, except for the calls to
@@ -36,7 +40,6 @@ namespace PETScWrappers
  * functions). Only the functions creating a vector of specific type differ,
  * and are implemented in this particular class.
  *
- * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
  */
   class Vector : public VectorBase
@@ -190,8 +193,8 @@ namespace PETScWrappers
       void create_vector (const unsigned int n);
   };
 
+/*@}*/
 
-#ifndef DOXYGEN
 // ------------------ template and inline functions -------------
 
 
@@ -200,6 +203,8 @@ namespace PETScWrappers
  * of the C++ standard library which uses a temporary object. The
  * function simply exchanges the data of the two vectors.
  *
+ * @ingroup PETScWrappers
+ * @relates PETScWrappers::Vector
  * @author Wolfgang Bangerth, 2004
  */
   inline
@@ -209,6 +214,7 @@ namespace PETScWrappers
   }
 
 
+#ifndef DOXYGEN
 
   template <typename number>
   Vector::Vector (const ::Vector<number> &v)

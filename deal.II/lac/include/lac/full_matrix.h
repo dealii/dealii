@@ -420,9 +420,8 @@ class FullMatrix : public Table<2,number>
     number l1_norm () const;
 
     				     /**
-				      * Return the
-				      * <i>l<sub>&infin;</sub></i>-norm
-				      * of the matrix, where
+				      * Return the $l_\infty$-norm of
+				      * the matrix, where
 				      * $||M||_\infty = \max_i \sum_j
 				      * |M_{ij}|$ (maximum of the sums
 				      * over rows).

@@ -677,6 +677,7 @@ namespace PETScWrappers
  * function simply exchanges the data of the two vectors.
  *
  * @ingroup PETScWrappers
+ * @relates PETScWrappers::VectorBase
  * @author Wolfgang Bangerth, 2004
  */
   inline
