@@ -1995,14 +1995,13 @@ class DataOutInterface : private DataOutBase
     void write_tecplot (std::ostream &out) const;
 
     				     /**
-				      * Obtain data through get_patches()
-				      * and write it in the Tecplot
-				      * binary output format. Note
-				      * that the name of the output
-				      * file must be specified through
-				      * the TecplotFlags
-				      * interface. See
-				      * DataOut::write_tecplot_binary.
+				      * Obtain data through
+				      * get_patches() and write it in
+				      * the Tecplot binary output
+				      * format. Note that the name of
+				      * the output file must be
+				      * specified through the
+				      * TecplotFlags interface.
 				      */
     void write_tecplot_binary (std::ostream &out) const;
 
