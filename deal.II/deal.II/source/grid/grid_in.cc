@@ -822,16 +822,18 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   AssertThrow(static_cast<unsigned int>(
     marker_var->get_dim(0)->size())==n_markers, ExcIO());
 
-  vector<int> marker(n_markers);
-  marker_var->get(marker.begin(), n_markers);
+  std::vector<int> marker(n_markers);
+				   // use &* to convert
+				   // vector<int>::iterator to int *
+  marker_var->get(&*marker.begin(), n_markers);
   
   if (output)
     {
-      cout << "n_cell=" << n_cells << endl;
-      cout << "marker: ";
+      std::cout << "n_cell=" << n_cells << std::endl;
+      std::cout << "marker: ";
       for (unsigned int i=0; i<n_markers; ++i)
-	cout << marker[i] << " ";
-      cout << endl;
+	std::cout << marker[i] << " ";
+      std::cout << std::endl;
     }
 
 				   // next we read
@@ -847,13 +849,13 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   AssertThrow(static_cast<unsigned int>(
     bmarker_var->get_dim(0)->size())==n_bquads, ExcIO());
 
-  vector<int> bmarker(n_bquads);
-  bmarker_var->get(bmarker.begin(), n_bquads);
+  std::vector<int> bmarker(n_bquads);
+  bmarker_var->get(&*bmarker.begin(), n_bquads);
 
 				       // for each marker count the
 				       // number of boundary quads
 				       // which carry this marker
-  map<int, unsigned int> n_bquads_per_bmarker;
+  std::map<int, unsigned int> n_bquads_per_bmarker;
   for (unsigned int i=0; i<n_markers; ++i)
     {
 				       // the markers should all be
@@ -878,12 +880,12 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 				   // with e.g. constant=1 or -1
   if (output)
     {
-      cout << "n_bquads_per_bmarker: " << endl;
-      map<int, unsigned int>::const_iterator
+      std::cout << "n_bquads_per_bmarker: " << std::endl;
+      std::map<int, unsigned int>::const_iterator
 	iter=n_bquads_per_bmarker.begin();
       for (; iter!=n_bquads_per_bmarker.end(); ++iter)
-	cout << "  n_bquads_per_bmarker[" << iter->first
-	     << "]=" << iter->second << endl;
+	std::cout << "  n_bquads_per_bmarker[" << iter->first
+		  << "]=" << iter->second << std::endl;
     }
 
 				   // next we read
@@ -903,20 +905,20 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   AssertThrow(static_cast<unsigned int>(
     vertex_indices_var->get_dim(1)->size())==vertices_per_quad, ExcIO());
 
-  vector<int> vertex_indices(n_bquads*vertices_per_quad);
-  vertex_indices_var->get(vertex_indices.begin(), n_bquads, vertices_per_quad);
+  std::vector<int> vertex_indices(n_bquads*vertices_per_quad);
+  vertex_indices_var->get(&*vertex_indices.begin(), n_bquads, vertices_per_quad);
 
   for (unsigned int i=0; i<vertex_indices.size(); ++i)
     AssertThrow(vertex_indices[i]>=0, ExcInternalError());
 
   if (output)
     {
-      cout << "vertex_indices:" << endl;
+      std::cout << "vertex_indices:" << std::endl;
       for (unsigned int i=0, v=0; i<n_bquads; ++i)
 	{
 	  for (unsigned int j=0; j<vertices_per_quad; ++j)
-	    cout << vertex_indices[v++] << " ";
-	  cout << endl;
+	    std::cout << vertex_indices[v++] << " ";
+	  std::cout << std::endl;
 	}
     }
 
@@ -928,7 +930,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   AssertThrow(vertices_dim->is_valid(), ExcIO());
   const unsigned int n_vertices=vertices_dim->size();
   if (output)
-    cout << "n_vertices=" << n_vertices << endl;
+    std::cout << "n_vertices=" << n_vertices << std::endl;
 
   NcVar *points_xc=nc.get_var("points_xc");
   NcVar *points_yc=nc.get_var("points_yc");
@@ -945,10 +947,11 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 	      static_cast<int>(n_vertices), ExcIO());
   AssertThrow(points_xc->get_dim(0)->size()==
 	      static_cast<int>(n_vertices), ExcIO());
-  vector<vector<double> > point_values(3, vector<double> (n_vertices));
-  points_xc->get(point_values[0].begin(), n_vertices);
-  points_yc->get(point_values[1].begin(), n_vertices);
-  points_zc->get(point_values[2].begin(), n_vertices);
+  std::vector<std::vector<double> > point_values(
+    3, std::vector<double> (n_vertices));
+  points_xc->get(&*point_values[0].begin(), n_vertices);
+  points_yc->get(&*point_values[1].begin(), n_vertices);
+  points_zc->get(&*point_values[2].begin(), n_vertices);
 
 				   // and fill the vertices
   std::vector<Point<dim> > vertices (n_vertices);
@@ -977,7 +980,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
     }
   const int bmarker0=bmarker[quad0];
   if (output)
-    cout << "bmarker0=" << bmarker0 << endl;
+    std::cout << "bmarker0=" << bmarker0 << std::endl;
   AssertThrow(n_bquads_per_bmarker[bmarker0]==n_cells, ExcIO());
 
 				   // fill cells with all quad
@@ -1027,7 +1030,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   AssertThrow(elements_dim->is_valid(), ExcIO());
   const unsigned int n_cells=elements_dim->size();  
   if (output)
-    cout << "n_cell=" << n_cells << endl;
+    std::cout << "n_cell=" << n_cells << std::endl;
 				   // and n_hexes
   NcDim *hexes_dim=nc.get_dim("no_of_hexaeders");
   AssertThrow(hexes_dim->is_valid(), ExcIO());
@@ -1052,20 +1055,22 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   AssertThrow(static_cast<unsigned int>(
     vertex_indices_var->get_dim(1)->size())==vertices_per_hex, ExcIO());
 
-  vector<int> vertex_indices(n_cells*vertices_per_hex);
-  vertex_indices_var->get(vertex_indices.begin(), n_cells, vertices_per_hex);
+  std::vector<int> vertex_indices(n_cells*vertices_per_hex);
+  				   // use &* to convert
+				   // vector<int>::iterator to int *
+  vertex_indices_var->get(&*vertex_indices.begin(), n_cells, vertices_per_hex);
 
   for (unsigned int i=0; i<vertex_indices.size(); ++i)
     AssertThrow(vertex_indices[i]>=0, ExcInternalError());
 
   if (output)
     {
-      cout << "vertex_indices:" << endl;
+      std::cout << "vertex_indices:" << std::endl;
       for (unsigned int cell=0, v=0; cell<n_cells; ++cell)
 	{
 	  for (unsigned int i=0; i<vertices_per_hex; ++i)
-	    cout << vertex_indices[v++] << " ";
-	  cout << endl;
+	    std::cout << vertex_indices[v++] << " ";
+	  std::cout << std::endl;
 	}
     }
 
@@ -1077,7 +1082,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   AssertThrow(vertices_dim->is_valid(), ExcIO());
   const unsigned int n_vertices=vertices_dim->size();
   if (output)
-    cout << "n_vertices=" << n_vertices << endl;
+    std::cout << "n_vertices=" << n_vertices << std::endl;
 
   NcVar *points_xc=nc.get_var("points_xc");
   NcVar *points_yc=nc.get_var("points_yc");
@@ -1094,10 +1099,11 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 	      static_cast<int>(n_vertices), ExcIO());
   AssertThrow(points_xc->get_dim(0)->size()==
 	      static_cast<int>(n_vertices), ExcIO());
-  vector<vector<double> > point_values(3, vector<double> (n_vertices));
-  points_xc->get(point_values[0].begin(), n_vertices);
-  points_yc->get(point_values[1].begin(), n_vertices);
-  points_zc->get(point_values[2].begin(), n_vertices);
+  std::vector<std::vector<double> > point_values(
+    3, std::vector<double> (n_vertices));
+  points_xc->get(&*point_values[0].begin(), n_vertices);
+  points_yc->get(&*point_values[1].begin(), n_vertices);
+  points_zc->get(&*point_values[2].begin(), n_vertices);
 
 				   // and fill the vertices
   std::vector<Point<dim> > vertices (n_vertices);
