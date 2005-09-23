@@ -36,6 +36,13 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: The <tt>Tecplot</tt> library (<tt>tecio.a</tt>) was
+       detected but not added to <tt>LIBS</tt>. This is now fixed.
+       <br> 
+       (RH 2005/09/23)
+       </p>
+
+  <li> <p>
        New: <tt>configure</tt> will automatically detect a
        <tt>NetCDF</tt> installation, when its path is given by the
        <tt>NETCDF_DIR</tt> environment variable. The path of the
@@ -97,6 +104,18 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Fixed: The <tt>tecplot_binary</tt> <code
+       class="class">OutputFormat</code> has been added to <code
+       class="member">DataOutBase::get_output_format_names</code>. Now
+       an exception will be raised if <code
+       class="member">write_tecplot_binary</code> is envoked without
+       specifying the filename through the <code
+       class="class">DataOutBase::TecplotFlags</code> interface.
+       <br> 
+       (RH 2005/09/23)
+       </p>
+
   <li> <p>
        New: The <code
        class="member">GridIn&lt;dim&gt;::read_netcdf(string
