@@ -1444,13 +1444,9 @@ void GridIn<dim>::read (std::istream& in,
 	return;
 
       case netcdf:
-					     // there is no
-					     // read_netcdf(istream &)
-					     // function. Use the
-					     // read_netcdf(const
-					     // string &filename
-					     // function instead
-	Assert(false, ExcNotImplemented());
+	Assert(false, ExcMessage("There is no read_netcdf(istream &) function. "
+				 "Use the read(_netcdf)(string &filename) "
+				 "functions, instead."));
 	return;
 
       case Default:
