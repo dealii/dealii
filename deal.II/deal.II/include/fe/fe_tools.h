@@ -164,7 +164,54 @@ class FETools
     static void get_projection_matrix(const FiniteElement<dim> &fe1,
 				      const FiniteElement<dim> &fe2,
 				      FullMatrix<number> &matrix);
-
+    
+				     /**
+				      * Compute the matrix of nodal
+				      * values of a finite element
+				      * applied to all its shape
+				      * functions.
+				      *
+				      * This function is supposed to
+				      * help building finite elements
+				      * from polynomial spaces and
+				      * should be called inside the
+				      * constructor of an
+				      * element. Applied to a
+				      * completely initialized finite
+				      * element, the result should be
+				      * the unit matrix by definition
+				      * of the node values.
+				      *
+				      * Using this matrix allows the
+				      * construction of the basis of
+				      * shape functions in two steps.
+				      * <ol>
+				      *
+				      * <li>Define the space of shape
+				      * functions using an arbitrary
+				      * basis <i>w<sub>j</sub></i> and
+				      * compute the matrix <i>M</i> of
+				      * node functionals
+				      * <i>N<sub>i</sub></i> applied
+				      * to these basis functions.
+				      *
+				      * <li>Compute the basis
+				      * <i>v<sub>j</sub></i> of the
+				      * finite element shape function
+				      * space by applying
+				      * <i>M<sup>-1</sup></i> to the
+				      * basis <i>w<sub>j</sub></i>.
+				      * </ol>
+				      *
+				      * @note The FiniteElement must
+				      * provide generalized support
+				      * points and and interpolation
+				      * functions.
+				      */
+    template <int dim>
+    static void compute_node_matrix(FullMatrix<double>& M,
+				    const FiniteElement<dim>& fe);
+    
 				     /**
 				      * Compute the embedding matrices
 				      * from a coarse cell to

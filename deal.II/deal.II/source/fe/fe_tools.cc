@@ -474,6 +474,49 @@ void FETools::get_projection_matrix (const FiniteElement<dim> &fe1,
 }
 
 
+template<int dim>
+void
+FETools::compute_node_matrix(
+  FullMatrix<double>& N,
+  const FiniteElement<dim>& fe)
+{
+  const unsigned int n_dofs = fe.dofs_per_cell;
+  Assert (fe.has_generalized_support_points(), ExcNotInitialized());
+  Assert (N.n()==n_dofs, ExcDimensionMismatch(N.n(), n_dofs));
+  Assert (N.m()==n_dofs, ExcDimensionMismatch(N.m(), n_dofs));
+
+  const std::vector<Point<dim> >& points = fe.get_generalized_support_points();
+  
+				   // We need the values of the
+				   // polynomials in all generalized
+				   // support points.
+  std::vector<std::vector<double> >
+    values (dim, std::vector<double>(points.size()));
+  
+				   // In this vector, we store the
+				   // result of the interpolation
+  std::vector<double> local_dofs(n_dofs);
+  
+				   // One row per shape
+				   // function. Remember that these
+				   // are the 'raw' shape functions
+				   // where the inverse node matrix is
+				   // empty. Otherwise, this would
+				   // yield identity.
+  for (unsigned int i=0;i<n_dofs;++i)
+    {
+       for (unsigned int k=0;k<values[0].size();++k)
+ 	for (unsigned int d=0;d<dim;++d)
+ 	  values[d][k] = fe.shape_value_component(i,points[k],d);
+       fe.interpolate(local_dofs, values);
+ 				       // Enter the interpolated dofs
+ 				       // into the matrix
+       for (unsigned int j=0;j<n_dofs;++j)
+ 	N(j,i) = local_dofs[j];
+    }
+}
+
+
 // This function is tested by tests/fe/internals, since it produces the matrices printed there
 template<int dim, typename number>
 void
@@ -1674,6 +1717,11 @@ compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim> &fe,
 
 /*-------------- Explicit Instantiations -------------------------------*/
 
+
+template
+void FETools::compute_node_matrix(
+  FullMatrix<double>&,
+  const FiniteElement<deal_II_dimension>&);
 
 template
 void FETools::compute_component_wise(
