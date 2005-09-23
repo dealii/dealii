@@ -16,4 +16,4 @@ cd deal.II
 ./configure --with-umfpack
 make online-doc
 cd ..
-tar czf deal.doc-$MAJOR.$MINOR.$PATCH.tar.gz deal.II/doc/doxygen
+tar czf deal.doc-$MAJOR.$MINOR.$PATCH.tar.gz deal.II/doc
