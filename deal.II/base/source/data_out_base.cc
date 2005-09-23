@@ -639,7 +639,7 @@ parse_output_format (const std::string &format_name)
 std::string
 DataOutBase::get_output_format_names ()
 {
-  return "dx|ucd|gnuplot|povray|eps|gmv|tecplot|vtk|deal.II intermediate";
+  return "dx|ucd|gnuplot|povray|eps|gmv|tecplot|tecplot_binary|vtk|deal.II intermediate";
 }
 
 
@@ -3386,6 +3386,12 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 
   if (file_name == NULL)
     {
+				       // At least in debug mode we
+				       // should tell users why they
+				       // don't get tecplot binary
+				       // output
+      Assert(false, ExcMessage("Specify the name of the tecplot_binary"
+			       " file through the TecplotFlags interface."));
       write_tecplot (patches, data_names, flags, out);
       return;      
     };
