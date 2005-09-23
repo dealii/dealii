@@ -4531,10 +4531,6 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
       AC_DEFINE(DEAL_II_HAVE_NETCDF, 1,
 	        [Flag indicating whether the library shall be compiled to use the NetCDF interface])
 
-      AC_MSG_CHECKING(for NetCDF version)
-      DEAL_II_NETCDF_VERSION=`cat $DEAL_II_NETCDF_DIR/src/VERSION`
-      AC_MSG_RESULT($DEAL_II_NETCDF_VERSION)
-
       LIBS="$NETCDF_LIB $LIBS"
     fi
   fi
