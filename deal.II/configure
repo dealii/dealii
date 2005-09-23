@@ -9616,7 +9616,7 @@ fi
 
 
 
-  for i  in $TECHOME $TEC80HOME $TEC90HOME  ; do
+  for i  in $TECHOME $TEC100HOME $TEC90HOME $TEC80HOME  ; do
     as_ac_File=`echo "ac_cv_file_$i/lib/tecio.a" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $i/lib/tecio.a" >&5
 echo $ECHO_N "checking for $i/lib/tecio.a... $ECHO_C" >&6

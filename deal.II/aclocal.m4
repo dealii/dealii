@@ -4463,7 +4463,7 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
 [
-  for i [ in $TECHOME $TEC80HOME $TEC90HOME ] ; do
+  for i [ in $TECHOME $TEC100HOME $TEC90HOME $TEC80HOME ] ; do
     AC_CHECK_FILE($i/lib/tecio.a,
 		  TECPLOT_LIB=$i/lib/tecio.a)
     AC_CHECK_FILE($i/include/TECIO.h,
