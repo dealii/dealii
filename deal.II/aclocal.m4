@@ -4474,8 +4474,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TECPLOT, dnl
     fi
   done
 
-  if (test -r "$TECPLOT_LIB" && \
-      test -r "$TECPLOT_INCLUDE_DIR/TECIO.h") ; then
+  if (test -r "$TECPLOT_LIB") ; then
     AC_DEFINE(DEAL_II_HAVE_TECPLOT, 1,
 	      [Flag indicating whether the library shall be compiled to use the Tecplot interface])
     LIBS="$TECPLOT_LIB $LIBS"
