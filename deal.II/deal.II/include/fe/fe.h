@@ -90,6 +90,10 @@ template <int dim> class FECollection;
  *
  * <h3>Notes on the implementation of derived classes</h3>
  *
+ * The following sections list the information to be provided by
+ * derived classes, depending on the space dimension. They are
+ * followed by a list of functions helping to generate these values.
+ *
  * <h4>Finite elements in one dimension</h4>
  *
  * Finite elements in one dimension need only set the #restriction
@@ -212,6 +216,43 @@ template <int dim> class FECollection;
  * of the constraint information: while that class is able to handle
  * constraints that are entered more than once (as is necessary for the case
  * above), it insists that the weights are exactly the same.
+ *
+ * <h4>Helper functions</h4>
+ *
+ * Construction of a finite element and computation of the matrices
+ * described above may be a tedious task, in particular if it has to
+ * be performed for several space dimensions. Therefore, some
+ * functions in FETools have been provided to help with these tasks.
+ *
+ * First, aready the basis of the shape function space may be
+ * difficult to implement for arbitrary order and dimension. On the
+ * other hand, if the @ref GlossNodes "node values" are given, then
+ * the duality relation between node functionals and basis functions
+ * defines the basis. As a result, the shape function space may be
+ * defined with arbitrary "raw" basis functions, such that the actual
+ * finite element basis is computed from linear combinations of
+ * them. The coefficients of these combinations are determined by the
+ * duality of node values.
+ *
+ * Using this matrix allows the construction of the basis of shape
+ * functions in two steps.
+ * <ol>
+ *
+ * <li>Define the space of shape functions using an arbitrary basis
+ * <i>w<sub>j</sub></i> and compute the matrix <i>M</i> of node
+ * functionals <i>N<sub>i</sub></i> applied to these basis functions,
+ * such that its entries are <i>m<sub>ij</sub> =
+ * N<sub>i</sub>(w<sub>j</sub>)</i>.
+ *
+ * <li>Compute the basis <i>v<sub>j</sub></i> of the finite element
+ * shape function space by applying <i>M<sup>-1</sup></i> to the basis
+ * <i>w<sub>j</sub></i>.
+ * </ol>
+ *
+ * The function computing the matrix <i>M</i> for you is
+ * FETools::compute_node_matrix(). It relies on the existence of
+ * #generalized_support_points and implementation of interpolate()
+ * with VectorSlice argument.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001, 2005
  */

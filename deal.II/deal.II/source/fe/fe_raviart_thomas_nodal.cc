@@ -52,7 +52,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 				   // basis functions
   initialize_unit_support_points (deg);
   initialize_node_matrix();
-
+  
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     this->prolongation[i].reinit (this->dofs_per_cell,
 				  this->dofs_per_cell);
@@ -94,6 +94,111 @@ FE_RaviartThomasNodal<dim>::has_support_on_face (unsigned int, unsigned int) con
 {
   return true;
 }
+
+
+template <int dim>
+void
+FE_RaviartThomasNodal<dim>::interpolate(
+  std::vector<double>&,
+  const std::vector<double>&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template <int dim>
+void
+FE_RaviartThomasNodal<dim>::interpolate(
+  std::vector<double>&    local_dofs,
+  const std::vector<Vector<double> >& values,
+  unsigned int offset) const
+{
+  Assert (values.size() == generalized_support_points.size(),
+	  ExcDimensionMismatch(values.size(), generalized_support_points.size()));
+  Assert (local_dofs.size() == this->dofs_per_cell,
+	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
+  Assert (values[0].size() >= offset+this->n_components(),
+	  ExcDimensionMismatch(values[0].size(),offset+this->n_components()));
+
+				   // First do interpolation on
+				   // faces. There, the component
+				   // evaluated depends on the face
+				   // direction and orientation.
+  unsigned int fbase = 0;
+  unsigned int f=0;
+  for (;f<GeometryInfo<dim>::faces_per_cell;
+       ++f, fbase+=this->dofs_per_face)
+    {
+      for (unsigned int i=0;i<this->dofs_per_face;++i)
+	{
+	  local_dofs[fbase+i] = values[fbase+i](offset+GeometryInfo<dim>::unit_normal_direction[f]);
+	}
+    }
+
+				   // The remaining points form dim
+				   // chunks, one for each component.
+  const unsigned int istep = (this->dofs_per_cell - fbase) / dim;
+  Assert ((this->dofs_per_cell - fbase) % dim == 0, ExcInternalError());
+
+  f = 0;
+  while (fbase < this->dofs_per_cell)
+    {
+      for (unsigned int i=0;i<istep;++i)
+	{
+	  local_dofs[fbase+i] = values[fbase+i](offset+f);
+	}
+      fbase+=istep;
+      ++f;
+    }
+  Assert (fbase == this->dofs_per_cell, ExcInternalError());
+}
+
+
+
+template <int dim>
+void
+FE_RaviartThomasNodal<dim>::interpolate(
+  std::vector<double>& local_dofs,
+  const VectorSlice<const std::vector<std::vector<double> > >& values) const
+{
+  Assert (values.size() == this->n_components(),
+	  ExcDimensionMismatch(values.size(), this->n_components()));
+  Assert (values[0].size() == generalized_support_points.size(),
+	  ExcDimensionMismatch(values.size(), generalized_support_points.size()));
+  Assert (local_dofs.size() == this->dofs_per_cell,
+	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
+				   // First do interpolation on
+				   // faces. There, the component
+				   // evaluated depends on the face
+				   // direction and orientation.
+  unsigned int fbase = 0;
+  unsigned int f=0;
+  for (;f<GeometryInfo<dim>::faces_per_cell;
+       ++f, fbase+=this->dofs_per_face)
+    {
+      for (unsigned int i=0;i<this->dofs_per_face;++i)
+	{
+	  local_dofs[fbase+i] = values[GeometryInfo<dim>::unit_normal_direction[f]][fbase+i];
+	}
+    }
+				   // The remaining points form dim
+				   // chunks, one for each component.
+  const unsigned int istep = (this->dofs_per_cell - fbase) / dim;
+  Assert ((this->dofs_per_cell - fbase) % dim == 0, ExcInternalError());
+
+  f = 0;
+  while (fbase < this->dofs_per_cell)
+    {
+      for (unsigned int i=0;i<istep;++i)
+	{
+	  local_dofs[fbase+i] = values[f][fbase+i];
+	}
+      fbase+=istep;
+      ++f;
+    }
+  Assert (fbase == this->dofs_per_cell, ExcInternalError());
+}
+
 
 
 
@@ -199,8 +304,8 @@ template <int dim>
 void
 FE_RaviartThomasNodal<dim>::initialize_unit_support_points (const unsigned int deg)
 {
-  this->unit_support_points.resize (this->dofs_per_cell);
-  this->unit_face_support_points.resize (this->dofs_per_face);
+  this->generalized_support_points.resize (this->dofs_per_cell);
+  this->generalized_face_support_points.resize (this->dofs_per_face);
   
   unsigned int current = 0;
 
@@ -216,11 +321,11 @@ FE_RaviartThomasNodal<dim>::initialize_unit_support_points (const unsigned int d
       Assert (face_points.n_quadrature_points == this->dofs_per_face,
 	      ExcInternalError());
       for (unsigned int k=0;k<this->dofs_per_face;++k)
-	this->unit_face_support_points[k] = face_points.point(k);
+	this->generalized_face_support_points[k] = face_points.point(k);
       Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(face_points);
       for (unsigned int k=0;k<//faces.n_quadrature_points
 			  this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;++k)
-	this->unit_support_points[k] = faces.point(k);
+	this->generalized_support_points[k] = faces.point(k);
 
       current = this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
     }
@@ -242,7 +347,7 @@ FE_RaviartThomasNodal<dim>::initialize_unit_support_points (const unsigned int d
 						       ((d==1) ? low : high),
 						       ((d==2) ? low : high));
       for (unsigned int k=0;k<quadrature->n_quadrature_points;++k)
-	this->unit_support_points[current++] = quadrature->point(k);
+	this->generalized_support_points[current++] = quadrature->point(k);
       delete quadrature;
     }
   Assert (current == this->dofs_per_cell, ExcInternalError());
@@ -254,44 +359,15 @@ void
 FE_RaviartThomasNodal<dim>::initialize_node_matrix ()
 {
   const unsigned int n_dofs = this->dofs_per_cell;
-
 				   // We use an auxiliary matrix in
 				   // this function. Therefore,
 				   // inverse_node_matrix is still
 				   // empty and shape_value_component
 				   // returns the 'raw' shape values.
-  FullMatrix<double> N(n_dofs, n_dofs);
-
-				   // The curent node functional index
-  unsigned int current = 0;
-
-				   // For each face and all quadrature
-				   // points on it, the node value is
-				   // the normal component of the
-				   // shape function, possibly
-				   // pointing in negative direction.
-  for (unsigned int face = 0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-    for (unsigned int k=0;k<this->dofs_per_face;++k)
-      {
-	for (unsigned int i=0;i<n_dofs;++i)
-	  N(current,i) = this->shape_value_component(
-	    i, this->unit_support_points[current],
-	    GeometryInfo< dim >::unit_normal_direction[face]);
-	++current;
-      }
-				   // Interior degrees of freedom in each direction
-  const unsigned int n_cell = (n_dofs - current) / dim;
-  
-  for (unsigned int d=0;d<dim;++d)
-    for (unsigned int k=0;k<n_cell;++k)
-      {
-	for (unsigned int i=0;i<n_dofs;++i)
-	  N(current,i) = this->shape_value_component(i, this->unit_support_points[current], d);
-	++current;
-      }
-  Assert (current == n_dofs, ExcInternalError());
+  FullMatrix<double> M(n_dofs, n_dofs);
+  FETools::compute_node_matrix(M, *this);
   this->inverse_node_matrix.reinit(n_dofs, n_dofs);
-  this->inverse_node_matrix.invert(N);
+  this->inverse_node_matrix.invert(M);
 }
 
 

@@ -334,6 +334,15 @@ class FE_RaviartThomas : public FiniteElement<dim>
 			    typename Mapping<dim>::InternalDataBase      &fe_internal,
 			    FEValuesData<dim>& data) const;
 
+//     virtual void interpolate(std::vector<double>&                local_dofs,
+// 			     const std::vector<double>& values) const;
+//     virtual void interpolate(std::vector<double>&                local_dofs,
+// 			     const std::vector<Vector<double> >& values,
+// 			     unsigned int offset = 0) const;
+    
+//     virtual void interpolate(
+//       std::vector<double>& local_dofs,
+//       const VectorSlice<const std::vector<std::vector<double> > >& values) const;
   private:
 				     /**
 				      * The order of the
@@ -630,6 +639,14 @@ class FE_RaviartThomasNodal
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;    
+    virtual void interpolate(std::vector<double>&                local_dofs,
+			     const std::vector<double>& values) const;
+    virtual void interpolate(std::vector<double>&                local_dofs,
+			     const std::vector<Vector<double> >& values,
+			     unsigned int offset = 0) const;    
+    virtual void interpolate(
+      std::vector<double>& local_dofs,
+      const VectorSlice<const std::vector<std::vector<double> > >& values) const;
   private:
     				     /**
 				      * Only for internal use. Its
