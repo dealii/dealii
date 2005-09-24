@@ -35,7 +35,7 @@ check_support_points (const FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
   
-  const std::vector< Point<dim > > & points = fe.get_unit_support_points();
+  const std::vector< Point<dim > > & points = fe.get_generalized_support_points();
   std::vector<double> weights(points.size());
 
   Triangulation<dim> tr;
@@ -83,7 +83,7 @@ check_face_support_points (const FiniteElement<dim>& fe)
 {
   deallog << "Face " << fe.get_name() << std::endl;
   
-  const std::vector< Point<dim-1> > & sub_points = fe.get_unit_face_support_points();
+  const std::vector< Point<dim-1> > & sub_points = fe.get_generalized_face_support_points();
   std::vector<double> weights(sub_points.size());
   Quadrature<dim-1> sub_quadrature(sub_points, weights);
   std::vector< Point<dim> > points(sub_points.size());

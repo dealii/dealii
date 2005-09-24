@@ -46,7 +46,7 @@ initialize_node_matrix (const FiniteElement<dim>& other,
   
   N.reinit(n_dofs, n_dofs);
 
-  const std::vector<Point<dim> >& unit_support_points = nodes.get_unit_support_points();
+  const std::vector<Point<dim> >& unit_support_points = nodes.get_generalized_support_points();
   
 				   // The curent node functional index
   unsigned int current = 0;
