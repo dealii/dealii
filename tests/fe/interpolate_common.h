@@ -117,8 +117,8 @@ Q1WedgeFunction : public Function<dim>
       {
 	Assert (values.size() == points.size(),
 		ExcDimensionMismatch(values.size(), points.size()));
-	Assert (values[0].size() == n_components,
-		ExcDimensionMismatch(values.size(), n_components));
+	Assert (values[0].size() == this->n_components,
+		ExcDimensionMismatch(values.size(), this->n_components));
 	
 	for (unsigned int i=0;i<points.size();++i)
 	  {
