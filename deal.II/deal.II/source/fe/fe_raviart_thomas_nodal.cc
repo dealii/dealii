@@ -113,8 +113,8 @@ FE_RaviartThomasNodal<dim>::interpolate(
   const std::vector<Vector<double> >& values,
   unsigned int offset) const
 {
-  Assert (values.size() == generalized_support_points.size(),
-	  ExcDimensionMismatch(values.size(), generalized_support_points.size()));
+  Assert (values.size() == this->generalized_support_points.size(),
+	  ExcDimensionMismatch(values.size(), this->generalized_support_points.size()));
   Assert (local_dofs.size() == this->dofs_per_cell,
 	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
   Assert (values[0].size() >= offset+this->n_components(),
@@ -163,8 +163,8 @@ FE_RaviartThomasNodal<dim>::interpolate(
 {
   Assert (values.size() == this->n_components(),
 	  ExcDimensionMismatch(values.size(), this->n_components()));
-  Assert (values[0].size() == generalized_support_points.size(),
-	  ExcDimensionMismatch(values.size(), generalized_support_points.size()));
+  Assert (values[0].size() == this->generalized_support_points.size(),
+	  ExcDimensionMismatch(values.size(), this->generalized_support_points.size()));
   Assert (local_dofs.size() == this->dofs_per_cell,
 	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
 				   // First do interpolation on
