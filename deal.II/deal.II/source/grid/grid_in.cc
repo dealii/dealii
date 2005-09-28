@@ -1102,9 +1102,19 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 	      static_cast<int>(n_vertices), ExcIO());
   std::vector<std::vector<double> > point_values(
     3, std::vector<double> (n_vertices));
+				   // we switch y and z
+  const bool switch_y_z=true;
   points_xc->get(&*point_values[0].begin(), n_vertices);
-  points_yc->get(&*point_values[1].begin(), n_vertices);
-  points_zc->get(&*point_values[2].begin(), n_vertices);
+  if (switch_y_z)
+    {
+      points_yc->get(&*point_values[2].begin(), n_vertices);
+      points_zc->get(&*point_values[1].begin(), n_vertices);
+    }
+  else
+    {
+      points_yc->get(&*point_values[1].begin(), n_vertices);
+      points_zc->get(&*point_values[2].begin(), n_vertices);
+    }
 
 				   // and fill the vertices
   std::vector<Point<dim> > vertices (n_vertices);
@@ -1123,6 +1133,8 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 
   SubCellData subcelldata;
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
+  if (switch_y_z)
+    GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);  
 #endif
