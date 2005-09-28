@@ -70,6 +70,15 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: <code
+       class="member">DataOutBase&lt;2,3&gt;::write_tecplot_binary</code>
+       did not write the <code>z</code> coordinates. This is now
+       fixed.
+       <br>
+       (RH 2005/09/28)
+       </p>
+
+  <li> <p>
        Fixed: The <tt>tecplot_binary</tt> <code
        class="class">OutputFormat</code> has been added to <code
        class="member">DataOutBase::get_output_format_names</code>. Now
