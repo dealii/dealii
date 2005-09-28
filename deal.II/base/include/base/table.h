@@ -66,7 +66,7 @@ namespace internal
  * be generated in this namespace.
  */
     template <int N, typename T, bool Constness>
-    class Types
+    struct Types
     {};
 
 /**
