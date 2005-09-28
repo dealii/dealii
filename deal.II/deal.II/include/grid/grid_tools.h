@@ -29,7 +29,7 @@
  * individual functions for more information.
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, 2001, 2003, 2004
+ * @author Wolfgang Bangerth, 2001, 2003, 2004, Ralf Hartmann, 2005
  */
 class GridTools
 {
@@ -68,6 +68,41 @@ class GridTools
     double cell_measure(const std::vector<Point<dim> > &all_vertices,
 			const int vertex_indices[GeometryInfo<dim>::vertices_per_cell]);
 
+				     /**
+				      * Remove vertices that are not
+				      * referenced by any of the
+				      * cells. This function is called
+				      * by all <tt>GridIn::read_*</tt>
+				      * functions to eliminate
+				      * vertices that are listed in
+				      * the input files but are not
+				      * used by the cells in the input
+				      * file. While these vertices
+				      * should not be in the input
+				      * from the beginning, they
+				      * sometimes are, most often when
+				      * some cells have been removed
+				      * by hand without wanting to
+				      * update the vertex lists, as
+				      * they might be lengthy.
+				      *
+				      * This function is called by all
+				      * <tt>GridIn::read_*</tt>
+				      * functions as the triangulation
+				      * class requires them to be
+				      * called with used vertices
+				      * only. This is so, since the
+				      * vertices are copied verbatim
+				      * by that class, so we have to
+				      * eliminate unused vertices
+				      * beforehand.
+				      */
+    template <int dim>
+    static
+    void delete_unused_vertices (std::vector<Point<dim> >    &vertices,
+				 std::vector<CellData<dim> > &cells,
+				 SubCellData                 &subcelldata);
+    
 				     /**
 				      * Transform the vertices of the
 				      * given triangulation by

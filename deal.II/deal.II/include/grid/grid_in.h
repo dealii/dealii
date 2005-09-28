@@ -359,37 +359,6 @@ class GridIn
 				    const char  comment_start);
 
 				     /**
-				      * Remove vertices that are not
-				      * referenced by any of the
-				      * cells. This function is called
-				      * by all <tt>read_*</tt> functions to
-				      * eliminate vertices that are
-				      * listed in the input files but
-				      * are not used by the cells in
-				      * the input file. While these
-				      * vertices should not be in the
-				      * input from the beginning, they
-				      * sometimes are, most often when
-				      * some cells have been removed
-				      * by hand without wanting to
-				      * update the vertex lists, as
-				      * they might be lengthy.
-				      *
-				      * This function is called by all
-				      * <tt>read_*</tt> functions as the
-				      * triangulation class requires
-				      * them to be called with used
-				      * vertices only. This is so,
-				      * since the vertices are copied
-				      * verbatim by that class, so we
-				      * have to eliminate unused
-				      * vertices beforehand.
-				      */
-    static void delete_unused_vertices (std::vector<Point<dim> >    &vertices,
-					std::vector<CellData<dim> > &cells,
-					SubCellData                          &subcelldata);
-
-				     /**
 				      * This function can write the
 				      * raw cell data objects created
 				      * by the <tt>read_*</tt> functions in

@@ -16,6 +16,7 @@
 #include <grid/grid_in.h>
 #include <grid/tria.h>
 #include <grid/grid_reordering.h>
+#include <grid/grid_tools.h>
 
 #include <map>
 #include <algorithm>
@@ -196,7 +197,7 @@ void GridIn<dim>::read_ucd (std::istream &in)
   AssertThrow (in, ExcIO());
 
 				   // do some clean-up on vertices...
-  delete_unused_vertices (vertices, cells, subcelldata);
+  GridTools::delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
   GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
@@ -361,7 +362,7 @@ void GridIn<dim>::read_dbmesh (std::istream &in)
   AssertThrow (in, ExcIO());
 
 				   // do some clean-up on vertices...
-  delete_unused_vertices (vertices, cells, subcelldata);
+  GridTools::delete_unused_vertices (vertices, cells, subcelldata);
 				   // ...and cells
   GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
@@ -443,7 +444,7 @@ void GridIn<2>::read_xda (std::istream &in)
   AssertThrow (in, ExcIO());
 
 				   // do some clean-up on vertices...
-  delete_unused_vertices (vertices, cells, subcelldata);
+  GridTools::delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
   GridReordering<2>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<2>::reorder_cells (cells);
@@ -526,7 +527,7 @@ void GridIn<3>::read_xda (std::istream &in)
   AssertThrow (in, ExcIO());
 
 				   // do some clean-up on vertices...
-  delete_unused_vertices (vertices, cells, subcelldata);
+  GridTools::delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
   GridReordering<3>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<3>::reorder_cells (cells);
@@ -730,7 +731,7 @@ void GridIn<dim>::read_msh (std::istream &in)
   AssertThrow (in, ExcIO());
 
 				   // do some clean-up on vertices...
-  delete_unused_vertices (vertices, cells, subcelldata);
+  GridTools::delete_unused_vertices (vertices, cells, subcelldata);
 				   // ... and cells
   GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
@@ -999,7 +1000,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
       }
 
   SubCellData subcelldata;
-  delete_unused_vertices(vertices, cells, subcelldata);
+  GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   GridReordering<dim>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);  
 #endif
@@ -1121,7 +1122,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
       cells[cell].vertices[i]=vertex_indices[cell*vertices_per_hex+i];
 
   SubCellData subcelldata;
-  delete_unused_vertices(vertices, cells, subcelldata);
+  GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   GridReordering<dim>::reorder_cells (cells);
   tria->create_triangulation (vertices, cells, subcelldata);  
 #endif
@@ -1174,62 +1175,6 @@ void GridIn<dim>::skip_comment_lines (std::istream &in,
 				   // put back first character of
 				   // first non-comment line
   in.putback (c);
-}
-
-
-
-template <int dim>
-void
-GridIn<dim>::delete_unused_vertices (std::vector<Point<dim> >    &vertices,
-				     std::vector<CellData<dim> > &cells,
-				     SubCellData                          &subcelldata)
-{
-				   // first check which vertices are
-				   // actually used
-  std::vector<bool> vertex_used (vertices.size(), false);
-  for (unsigned int c=0; c<cells.size(); ++c)
-    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-      vertex_used[cells[c].vertices[v]] = true;
-
-				   // then renumber the vertices that
-				   // are actually used in the same
-				   // order as they were beforehand
-  const unsigned int invalid_vertex = deal_II_numbers::invalid_unsigned_int;
-  std::vector<unsigned int> new_vertex_numbers (vertices.size(), invalid_vertex);
-  unsigned int next_free_number = 0;
-  for (unsigned int i=0; i<vertices.size(); ++i)
-    if (vertex_used[i] == true)
-      {
-	new_vertex_numbers[i] = next_free_number;
-	++next_free_number;
-      };
-
-				   // next replace old vertex numbers
-				   // by the new ones
-  for (unsigned int c=0; c<cells.size(); ++c)
-    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-      cells[c].vertices[v] = new_vertex_numbers[cells[c].vertices[v]];
-
-				   // same for boundary data
-  for (unsigned int c=0; c<subcelldata.boundary_lines.size(); ++c)
-    for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
-      subcelldata.boundary_lines[c].vertices[v]
-	= new_vertex_numbers[subcelldata.boundary_lines[c].vertices[v]];
-  for (unsigned int c=0; c<subcelldata.boundary_quads.size(); ++c)
-    for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-      subcelldata.boundary_quads[c].vertices[v]
-	= new_vertex_numbers[subcelldata.boundary_quads[c].vertices[v]];
-
-				   // finally copy over the vertices
-				   // which we really need to a new
-				   // array and replace the old one by
-				   // the new one
-  std::vector<Point<dim> > tmp;
-  tmp.reserve (std::count(vertex_used.begin(), vertex_used.end(), true));
-  for (unsigned int v=0; v<vertices.size(); ++v)
-    if (vertex_used[v] == true)
-      tmp.push_back (vertices[v]);
-  swap (vertices, tmp);
 }
 
 

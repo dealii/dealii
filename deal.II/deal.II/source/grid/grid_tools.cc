@@ -205,6 +205,61 @@ GridTools::cell_measure(const std::vector<Point<dim> > &all_vertices,
 #endif
 
 
+template <int dim>
+void
+GridTools::delete_unused_vertices (std::vector<Point<dim> >    &vertices,
+				   std::vector<CellData<dim> > &cells,
+				   SubCellData                 &subcelldata)
+{
+				   // first check which vertices are
+				   // actually used
+  std::vector<bool> vertex_used (vertices.size(), false);
+  for (unsigned int c=0; c<cells.size(); ++c)
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      vertex_used[cells[c].vertices[v]] = true;
+
+				   // then renumber the vertices that
+				   // are actually used in the same
+				   // order as they were beforehand
+  const unsigned int invalid_vertex = deal_II_numbers::invalid_unsigned_int;
+  std::vector<unsigned int> new_vertex_numbers (vertices.size(), invalid_vertex);
+  unsigned int next_free_number = 0;
+  for (unsigned int i=0; i<vertices.size(); ++i)
+    if (vertex_used[i] == true)
+      {
+	new_vertex_numbers[i] = next_free_number;
+	++next_free_number;
+      };
+
+				   // next replace old vertex numbers
+				   // by the new ones
+  for (unsigned int c=0; c<cells.size(); ++c)
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      cells[c].vertices[v] = new_vertex_numbers[cells[c].vertices[v]];
+
+				   // same for boundary data
+  for (unsigned int c=0; c<subcelldata.boundary_lines.size(); ++c)
+    for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
+      subcelldata.boundary_lines[c].vertices[v]
+	= new_vertex_numbers[subcelldata.boundary_lines[c].vertices[v]];
+  for (unsigned int c=0; c<subcelldata.boundary_quads.size(); ++c)
+    for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+      subcelldata.boundary_quads[c].vertices[v]
+	= new_vertex_numbers[subcelldata.boundary_quads[c].vertices[v]];
+
+				   // finally copy over the vertices
+				   // which we really need to a new
+				   // array and replace the old one by
+				   // the new one
+  std::vector<Point<dim> > tmp;
+  tmp.reserve (std::count(vertex_used.begin(), vertex_used.end(), true));
+  for (unsigned int v=0; v<vertices.size(); ++v)
+    if (vertex_used[v] == true)
+      tmp.push_back (vertices[v]);
+  swap (vertices, tmp);
+}
+
+
 
 // define some transformations in an anonymous namespace
 #ifdef DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
@@ -487,6 +542,11 @@ template
 double
 GridTools::diameter<deal_II_dimension> (const Triangulation<deal_II_dimension> &);
 #endif
+
+template
+void GridTools::delete_unused_vertices (std::vector<Point<deal_II_dimension> > &,
+					std::vector<CellData<deal_II_dimension> > &,
+					SubCellData &);
 
 template
 void GridTools::shift<deal_II_dimension> (const Point<deal_II_dimension> &,
