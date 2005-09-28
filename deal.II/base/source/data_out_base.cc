@@ -360,7 +360,7 @@ DataOutBase::EpsFlags::default_color_function (const double x,
 		rgb_values.blue  = (4.*x-sum13)*rezdif;
 	  default:
 		break;
-	};
+	}
     }
   else // White 
     rgb_values.red = rgb_values.green = rgb_values.blue = 1;
@@ -683,7 +683,7 @@ default_suffix (const OutputFormat output_format)
       default: 
 	    Assert (false, ExcNotImplemented()); 
 	    return "";
-    };
+    }
 }
 
 
@@ -728,7 +728,7 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 	      break;
 	default:
 	      Assert (false, ExcNotImplemented());
-      };
+      }
 
 				   ///////////////////////
 				   // preamble
@@ -749,7 +749,7 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 	  << "# For a description of the UCD format see the AVS Developer's guide."
 	  << std::endl
 	  << "#" << std::endl;
-    };
+    }
 
 				   // start with ucd data
   out << n_nodes << ' '
@@ -798,10 +798,10 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 		    for (unsigned int i=spacedim; i<3; ++i)
 		      out << "0 ";
 		    out << std::endl;
-		  };
+		  }
 		
 		break;
-	      };
+	      }
 	       
 	      case 2:
 	      {
@@ -831,10 +831,10 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 		      out << std::endl;
 
 		      ++present_node;
-		    };
+		    }
 	      
 		break;
-	      };
+	      }
 	       
 	      case 3:
 	      {
@@ -879,20 +879,20 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 			out << std::endl;
 			
 			++present_node;
-		      };
+		      }
 	      
 		break;
-	      };
+	      }
 	       
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
-	};
+	    }
+	}
 
 				       // note that we number starting with 1!
       Assert (present_node == n_nodes+1,
 	      ExcInternalError());
-    };
+    }
 
 				   /////////////////////////////////////////
 				   // write cell. number them consecutively,
@@ -919,7 +919,7 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 		      << first_vertex_of_patch+i+1 << ' '
 		      << first_vertex_of_patch+i+1+1 << std::endl;
 		break;
-	      };
+	      }
 	       
 	      case 2:
 	      {
@@ -934,9 +934,9 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 			  << first_vertex_of_patch+i*(n_subdivisions+1)+j+1+1
 			  << std::endl;
 		      ++present_cell;
-		    };
+		    }
 		break;
-	      };
+	      }
 	       
 	      case 3:
 	      {
@@ -957,13 +957,13 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1+1 << ' '
 			    << std::endl;
 			++present_cell;
-		      };
+		      }
 		break;
-	      };
+	      }
 
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
+	    }
 
 
 					   // finally update the number
@@ -984,14 +984,14 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 		    break;
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
-	};
+	    }
+	}
       out << std::endl;
 
 				       // note that we number starting with 1!
       Assert (present_cell == n_cells+1,
 	      ExcInternalError());
-    };
+    }
 
 
 				   /////////////////////////////
@@ -1040,10 +1040,10 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 		      out << patch->data(data_set,i) << ' ';
 
 		    out << std::endl;
-		  };
+		  }
 	    
 		break;
-	      };
+	      }
 	   
 	      case 2:
 	      {
@@ -1058,10 +1058,10 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 		      out << std::endl;
 
 		      ++present_node;
-		    };
+		    }
 
 		break;
-	      };
+	      }
 
 	      case 3:
 	      {
@@ -1079,16 +1079,16 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 			out << std::endl;
 			
 			++present_node;
-		      };
+		      }
 
 		break;
-	      };
+	      }
 
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
-	};  
-    };
+	    }
+	}  
+    }
 
 				   // no model data
 
@@ -1138,13 +1138,13 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 	      break;
 	default:
 	      Assert (false, ExcNotImplemented());
-      };
+      }
 
 				   // start with vertices order is
 				   // lexicographical, x varying
 				   // fastest
-  out << "object \"vertices\" class array type float rank 1 shape " << spacedim << " items " << n_nodes << " data follows"
-      << std::endl;
+  out << "object \"vertices\" class array type float rank 1 shape " << spacedim
+      << " items " << n_nodes << " data follows" << std::endl;
 
 				   ///////////////////////////////
 				   // first write the coordinates of all vertices
@@ -1171,10 +1171,10 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		    for (unsigned int i=0; i<spacedim; ++i)
 		      out << node(i) << '\t';
 		    out << std::endl;
-		  };
+		  }
 		
 		break;
-	      };
+	      }
 	       
 	      case 2:
 	      {
@@ -1196,10 +1196,10 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		      for (unsigned int i=0; i<spacedim; ++i)
 			out << node(i) << '\t';
 		      out << std::endl;
-		    };
+		    }
 	      
 		break;
-	      };
+	      }
 	       
 	      case 3:
 	      {
@@ -1234,16 +1234,16 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 			for (unsigned int i=0; i<spacedim; ++i)
 			  out << node(i) << '\t';
 			out << std::endl;
-		      };
+		      }
 	      
 		break;
-	      };
+	      }
 	       
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
-	};
-    };
+	    }
+	}
+    }
 
 				   /////////////////////////////////////////
 				   // write cells
@@ -1270,7 +1270,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		    for (unsigned int i=0; i<n_subdivisions; ++i)
 		      out << first_vertex_of_patch+i << '\t'
 			  << first_vertex_of_patch+i+1 << std::endl;
-		  };
+		  }
 		break;
 	      case 2:
 		if (true)
@@ -1283,8 +1283,8 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 			      << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j << '\t'
 			      << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1
 			      << std::endl;
-			};
-		  };
+			}
+		  }
 		break;
 	      case 3:
 		if (true)
@@ -1310,7 +1310,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		break;
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
+	    }
 
 
 					   // finally update the number
@@ -1331,10 +1331,10 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		    break;
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
-	};
+	    }
+	}
       out << std::endl;
-    };
+    }
 
   out << "attribute \"element type\" string \"";
   if (dim==1) out << "lines";
@@ -1511,10 +1511,10 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
 		      out << patch->data(data_set,i) << '\t';
 		    out << std::endl;
-		  };
+		  }
 	    
 		break;
-	      };
+	      }
 	   
 	      case 2:
 	      {
@@ -1524,10 +1524,10 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
 			out << patch->data(data_set,i*(n_subdivisions+1) + j) << '\t';
 		      out << std::endl;
-		    };
+		    }
 
 		break;
-	      };
+	      }
 
 	      case 3:
 	      {
@@ -1540,15 +1540,15 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 					     (i*(n_subdivisions+1)+j)*(n_subdivisions+1)+k)
 			      << '\t';
 			out << std::endl;
-		      };
+		      }
 
 		break;
-	      };
+	      }
 
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
-	};
+	    }
+	}
       out << "attribute \"dep\" string \"positions\"" << std::endl;
     } else {
       out << "object \"data\" class constantarray type float rank 0 items " << n_nodes << " data follows"
@@ -1577,7 +1577,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 	  << time->tm_hour << ":"
 	  << std::setw(2) << time->tm_min << ":"
 	  << std::setw(2) << time->tm_sec << '"' << std::endl;
-    };
+    }
 
   out << "end" << std::endl;
 				   // assert the stream is still ok
@@ -1635,14 +1635,14 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 		
 	  default:
 		Assert (false, ExcNotImplemented());
-	};
+	}
 
       for (unsigned int i=0; i<data_names.size(); ++i)
 	out << '<'
 	    << data_names[i]
 	    << "> ";
       out << std::endl;      
-    };
+    }
 
 
 				   // loop over all patches
@@ -1678,14 +1678,14 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 		  out << patch->data(data_set,i) << ' ';
 
 		out << std::endl;
-	      };
+	      }
 
 					     // end of patch
 	    out << std::endl
 		<< std::endl;
 	    
 	    break;
-	  };
+	  }
 	   
 	  case 2:
 	  {
@@ -1708,17 +1708,17 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 		      out << patch->data(data_set,i*(n_subdivisions+1) + j) << ' ';
 
 		    out << std::endl;
-		  };
+		  }
 
 						 // end of row in patch
 		out << std::endl;
-	      };
+	      }
 
 					     // end of patch
 	    out << std::endl;
 
 	    break;
-	  };
+	  }
 
 	  case 3:
 	  {
@@ -1787,7 +1787,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 							 // end of line
 			out << std::endl
 			    << std::endl;
-		      };
+		      }
 		    
 						     // line into positive y-direction
 						     // if possible
@@ -1822,7 +1822,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 							 // end of line
 			out << std::endl
 			    << std::endl;
-		      };
+		      }
 
 						     // line into positive z-direction
 						     // if possible
@@ -1857,17 +1857,17 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 							 // end of line
 			out << std::endl
 			    << std::endl;
-		      };		    
+		      }		    
 			
-		  };
+		  }
 
 	    break;
-	  };
+	  }
 
 	  default:
 		Assert (false, ExcNotImplemented());
-	};
-    };
+	}
+    }
 
   AssertThrow (out, ExcIO());
 }
@@ -1940,7 +1940,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 	      << "  color White"       << std::endl
 	      << "}"                   << std::endl;
 	}
-    };
+    }
   
 				   // max. and min. heigth of solution 
   double hmin=0, hmax=0;
@@ -2027,8 +2027,8 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 					     (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
 					    ((patch->vertices[2] * x_frac) +
 					     (patch->vertices[3] * (1-x_frac))) * y_frac);
-	    };
-	};
+	    }
+	}
       
       if (!flags.bicubic_patch)
 	{                                    // setting up triangles
@@ -2076,7 +2076,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 					  patch->data(0,(i-1)*(n_subdivisions+1)+j);
 				    h1(2)=ver[(i+1)*(n_subdivisions+1)+j](1)-
 					  ver[(i-1)*(n_subdivisions+1)+j](1);
-				  };
+				  }
 			      if (j==0)
 				{
 				  h2(0)=ver[i*(n_subdivisions+1)+j+1](0)-
@@ -2104,7 +2104,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 					  patch->data(0,i*(n_subdivisions+1)+j-1);
 				    h2(2)=ver[i*(n_subdivisions+1)+j+1](1)-
 					  ver[i*(n_subdivisions+1)+j-1](1);
-				  };
+				  }
 			      nrml[i*(n_subdivisions+1)+j](0)=h1(1)*h2(2)-h1(2)*h2(1);
 			      nrml[i*(n_subdivisions+1)+j](1)=h1(2)*h2(0)-h1(0)*h2(2);
 			      nrml[i*(n_subdivisions+1)+j](2)=h1(0)*h2(1)-h1(1)*h2(0);
@@ -2200,9 +2200,9 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 			  << ver[dl+1](0) << ","
 			  << patch->data(0,dl+1)  << ","
 			   << ver[dl+1](1) << ">}" << std::endl;
-		        };
-		};
-	    };
+		        }
+		}
+	    }
 	}
       else
 	{                                    // writing bicubic_patch
@@ -2218,11 +2218,11 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 	      out << "\t<" << ver[i](0) << "," << patch->data(0,i) << "," << ver[i](1) << ">";
 	      if (i!=15) out << ",";
 	      out << std::endl;
-	    };
+	    }
 	  out << "  texture {Tex}" <<  std::endl
 	      << "}" << std::endl;
-	};
-    };
+	}
+    }
   
   if (!flags.bicubic_patch) 
     {                                   // the end of the mesh
@@ -2304,22 +2304,22 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 			 ((patch->vertices[2] * x_frac) +
 			  (patch->vertices[3] * (1-x_frac))) * y_frac),
 
-			  (((patch->vertices[1] * x_frac1) +
-			    (patch->vertices[0] * (1-x_frac1))) * (1-y_frac) +
-			   ((patch->vertices[2] * x_frac1) +
-			    (patch->vertices[3] * (1-x_frac1))) * y_frac),
-
-			  (((patch->vertices[1] * x_frac1) +
-			    (patch->vertices[0] * (1-x_frac1))) * (1-y_frac1) +
-			   ((patch->vertices[2] * x_frac1) +
-			    (patch->vertices[3] * (1-x_frac1))) * y_frac1),
-
-			  (((patch->vertices[1] * x_frac) +
-			    (patch->vertices[0] * (1-x_frac))) * (1-y_frac1) +
-			   ((patch->vertices[2] * x_frac) +
-			    (patch->vertices[3] * (1-x_frac))) * y_frac1) 
-			  };
-
+			(((patch->vertices[1] * x_frac1) +
+			  (patch->vertices[0] * (1-x_frac1))) * (1-y_frac) +
+			 ((patch->vertices[2] * x_frac1) +
+			  (patch->vertices[3] * (1-x_frac1))) * y_frac),
+			
+			(((patch->vertices[1] * x_frac1) +
+			  (patch->vertices[0] * (1-x_frac1))) * (1-y_frac1) +
+			 ((patch->vertices[2] * x_frac1) +
+			  (patch->vertices[3] * (1-x_frac1))) * y_frac1),
+			
+			(((patch->vertices[1] * x_frac) +
+			  (patch->vertices[0] * (1-x_frac))) * (1-y_frac1) +
+			 ((patch->vertices[2] * x_frac) +
+			  (patch->vertices[3] * (1-x_frac))) * y_frac1) 
+		    };
+		  
 		  switch (spacedim)
 		    {
 		    case 2:
@@ -2402,7 +2402,7 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 //       ( cz -sz 0 )( 1 0    0 )(x)   ( cz*x-sz*(cx*y-sx*z)+0*(sx*y+cx*z) )
 // Dxz = ( sz  cz 0 )( 0 cx -sx )(y) = ( sz*x+cz*(cx*y-sx*z)+0*(sx*y+cx*z) )
 // 	 (  0   0 1 )( 0 sx  cx )(z)   (  0*x+	*(cx*y-sx*z)+1*(sx*y+cx*z) )
-		    };
+		    }
 
 						   // compute coordinates of
 						   // center of cell
@@ -2453,13 +2453,13 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 					     min_color_value : eps_cell.color_value);
 			  max_color_value = (max_color_value > eps_cell.color_value ?
 					     max_color_value : eps_cell.color_value);
-			};
-		    };
+			}
+		    }
 		  
 						   // finally add this cell
 		  cells.insert (eps_cell);
-		};
-	  };
+		}
+	  }
 
 					 // find out minimum and maximum x and
 					 // y coordinates to compute offsets
@@ -2478,7 +2478,7 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 	      x_max = std::max (x_max, cell->vertices[vertex](0));
 	      y_min = std::min (y_min, cell->vertices[vertex](1));
 	      y_max = std::max (y_max, cell->vertices[vertex](1));
-	    };
+	    }
 	
 					 // scale in x-direction such that
 					 // in the output 0 <= x <= 300.
@@ -2545,7 +2545,7 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 					     // even for fine grids, but reduces
 					     // the file size significantly
 	    out << std::setprecision (5);
-	  };
+	  }
 
 					 // check if min and max
 					 // values for the color are
@@ -2598,7 +2598,7 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 		    << (cell->vertices[2]-offset) * scale << " l "
 		    << (cell->vertices[3]-offset) * scale << " lf"
 		    << std::endl;
-	      };
+	      }
 	    
 	    if (flags.draw_mesh)
 	      out << "0 sg "      // draw lines in black
@@ -2607,15 +2607,15 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 		  << (cell->vertices[2]-offset) * scale << " l "
 		  << (cell->vertices[3]-offset) * scale << " lx"
 		  << std::endl;
-	  };
+	  }
 	out << "showpage" << std::endl;
 	
 	break;
-      };
+      }
        
       default:
 	    Assert (false, ExcNotImplemented());
-    };
+    }
 }
 
 
@@ -2673,7 +2673,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 	      break;
 	default:
 	      Assert (false, ExcNotImplemented());
-      };
+      }
 
 
 				   // in gmv format the vertex
@@ -2731,7 +2731,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 			      (patch->vertices[0](0) * (n_subdivisions-i) / n_subdivisions))
 			  << ' ';
 		    break;
-		  };
+		  }
 		   
 		  case 2:
 		  {
@@ -2748,9 +2748,9 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 				  ((patch->vertices[2](d-1) * x_frac) +
 				   (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)
 			      << ' ';
-			};
+			}
 		    break;
-		  };
+		  }
 		   
 		  case 3:
 		  {
@@ -2780,14 +2780,14 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 				     ((patch->vertices[6](d-1) * x_frac) +
 				      (patch->vertices[7](d-1) * (1-x_frac))) * y_frac)   * z_frac)
 				<< ' ';
-			  };
+			  }
 	      
 		    break;
-		  };
+		  }
 		   
 		  default:
 			Assert (false, ExcNotImplemented());
-		};
+		}
 	    }
 	  else
 					     // d>spacedim. write zeros instead
@@ -2796,10 +2796,10 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 		= static_cast<unsigned int>(std::pow (static_cast<double>(n_subdivisions+1), dim));
 	      for (unsigned int i=0; i<n_points; ++i)
 		out << "0 ";
-	    };
-	};
+	    }
+	}
       out << std::endl;
-    };
+    }
 
   out << std::endl;
 
@@ -2829,7 +2829,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 		      << first_vertex_of_patch+i+1 << ' '
 		      << first_vertex_of_patch+i+1+1 << std::endl;
 		break;
-	      };
+	      }
 	       
 	      case 2:
 	      {
@@ -2842,7 +2842,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 			<< first_vertex_of_patch+i*(n_subdivisions+1)+j+1+1
 			<< std::endl;
 		break;
-	      };
+	      }
 	       
 	      case 3:
 	      {
@@ -2861,13 +2861,13 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1+1 << ' '
 			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1+1 << ' '
 			    << std::endl;
-		      };
+		      }
 		break;
-	      };
+	      }
 
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
+	    }
 
 
 					   // finally update the number
@@ -2888,10 +2888,10 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 		    break;
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
-	};
+	    }
+	}
       out << std::endl;
-    };
+    }
 
 				   ///////////////////////////////////////
 				   // data output.
@@ -2914,7 +2914,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 		 std::ostream_iterator<double>(out, " "));
       out << std::endl
 	  << std::endl;
-    };
+    }
 
 
   
@@ -2979,7 +2979,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 	      break;
 	default:
 	      Assert (false, ExcNotImplemented());
-      };
+      }
 
   
 
@@ -3019,12 +3019,10 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 	      break;
 	default:
 	      Assert (false, ExcNotImplemented());
-      };
+      }
     
     for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-      {
-	out << ", \"" << data_names[data_set] << "\"";
-      };
+      out << ", \"" << data_names[data_set] << "\"";
     
     out << std::endl;
     
@@ -3034,21 +3032,19 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 	
 	switch (dim)
 	  {
-	  case 2:
-	    out << "quadrilateral" << std::endl;
-	    break;
-	  case 3:
-	    out << "brick" << std::endl;
-	    break;
-	  default:
-	    Assert (false, ExcNotImplemented());
-	  };
+	    case 2:
+		  out << "quadrilateral" << std::endl;
+		  break;
+	    case 3:
+		  out << "brick" << std::endl;
+		  break;
+	    default:
+		  Assert (false, ExcNotImplemented());
+	  }
       }
     else
-      {
-	out << "zone f=block, n=" << n_nodes << std::endl;
-      };
-  };
+      out << "zone f=block, n=" << n_nodes << std::endl;
+  }
 
   
                                    // in Tecplot FEBLOCK format the vertex
@@ -3103,7 +3099,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
                           (patch->vertices[0](0) * (n_subdivisions-i) / n_subdivisions))
                       << '\n';
                 break;
-              };
+              }
 	      
               case 2:
               {
@@ -3121,9 +3117,9 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
                               ((patch->vertices[2](d-1) * x_frac) +
                                (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)
                           << '\n';
-                    };
+                    }
                 break;
-              };
+              }
 	      
               case 3:
               {
@@ -3154,16 +3150,16 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
                                  ((patch->vertices[6](d-1) * x_frac) +
                                   (patch->vertices[7](d-1) * (1-x_frac))) * y_frac)   * z_frac)
                             << '\n';
-                      };
+                      }
                 break;
-              };
+              }
 	      
               default:
                     Assert (false, ExcNotImplemented());
-            };
-        };
+            }
+        }
       out << std::endl;
-    };
+    }
 
 
                                    ///////////////////////////////////////
@@ -3177,12 +3173,11 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
                                    // then write data.
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     {
-       
       std::copy (data_vectors[data_set].begin(),
 		 data_vectors[data_set].end(),
 		 std::ostream_iterator<double>(out, "\n"));
       out << std::endl;
-    };
+    }
 
   
                                    /////////////////////////////////
@@ -3203,7 +3198,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
           case 1:
           {
             break;
-          };
+          }
           case 2:
           {
             for (unsigned int i=0; i<n_subdivisions; ++i)
@@ -3215,9 +3210,9 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
                       << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1+1 << ' '
                       << first_vertex_of_patch+i*(n_subdivisions+1)+j+1+1
                       << std::endl;
-                };
+                }
             break;
-          };
+          }
 	      
           case 3:
           {
@@ -3236,13 +3231,13 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
                         << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1+1 << ' '
                         << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1+1 << ' '
                         << std::endl;
-                  };
+                  }
             break;
-          };
+          }
 
           default:
                 Assert (false, ExcNotImplemented());
-        };
+        }
 
 
                                        // finally update the number
@@ -3263,9 +3258,9 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
                 break;
           default:
                 Assert (false, ExcNotImplemented());
-        };
+        }
        
-    };
+    }
 
   
                                    // assert the stream is still ok
@@ -3375,7 +3370,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
     {
       write_tecplot (patches, data_names, flags, out);
       return;
-    };
+    }
 
                                    // if the user hasn't specified a
                                    // file name we should call the
@@ -3394,7 +3389,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 			       " file through the TecplotFlags interface."));
       write_tecplot (patches, data_names, flags, out);
       return;      
-    };
+    }
   
   
   AssertThrow (out, ExcIO());
@@ -3436,7 +3431,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 	      break;
 	default:
 	      Assert (false, ExcNotImplemented());
-      };
+      }
 
   
 
@@ -3470,7 +3465,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
     {
       string_size += 1;
       string_size += data_names[data_set].size();
-    };
+    }
 
   
   char *tecVarNames = new char[string_size];
@@ -3487,7 +3482,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 	    break;
       default:
             Assert(false, ExcNotImplemented());
-    };
+    }
 
   switch (dim)
     {
@@ -3500,13 +3495,12 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
       default:
             Assert(false, ExcNotImplemented());	    
     }
-
   
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     {
       tecVarNames = strncat(tecVarNames, " ", 1);
       tecVarNames = strncat(tecVarNames, data_names[data_set].c_str(), data_names[data_set].size());
-    };
+    }
 
 				    // in Tecplot FEBLOCK format the vertex
 				    // coordinates and the data have an
@@ -3528,8 +3522,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				    // the vertices, so do this on a
 				    // separate thread and when wanting
 				    // to write out the data, we wait
-				    // for that thread to finish
-  
+				    // for that thread to finish  
   Table<2,double> data_vectors (n_data_sets, n_nodes);
 
   void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
@@ -3540,9 +3533,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				    ///////////////////////////////
 				    // first make up a list of used
 				    // vertices along with their
-				    // coordinates
-
-  
+				    // coordinates  
   for (unsigned int d=1; d<=spacedim; ++d)
      {       
        unsigned int entry=0;
@@ -3565,15 +3556,15 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 							// compute coordinates for
 							// this patch point
 		       tm.nd((d-1),entry) = static_cast<float>(
-							       (((patch->vertices[1](d-1) * x_frac) +
-								 (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-								((patch->vertices[2](d-1) * x_frac) +
-								 (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)
-							       );
+			 (((patch->vertices[1](d-1) * x_frac) +
+			   (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
+			  ((patch->vertices[2](d-1) * x_frac) +
+			   (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)
+		       );
 		       entry++;
-		     };
+		     }
 		 break;
-	       };
+	       }
 	      
 	       case 3:
 	       {
@@ -3595,25 +3586,25 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 							  // compute coordinates for
 							  // this patch point
 			 tm.nd((d-1),entry) = static_cast<float>(
-								 ((((patch->vertices[1](d-1) * x_frac) +
-								    (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-								   ((patch->vertices[2](d-1) * x_frac) +
-								    (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)   * (1-z_frac) +
-								  (((patch->vertices[5](d-1) * x_frac) +
-								    (patch->vertices[4](d-1) * (1-x_frac))) * (1-y_frac) +
-								   ((patch->vertices[6](d-1) * x_frac) +
-								    (patch->vertices[7](d-1) * (1-x_frac))) * y_frac)   * z_frac)
-								 );
+			   ((((patch->vertices[1](d-1) * x_frac) +
+			      (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
+			     ((patch->vertices[2](d-1) * x_frac) +
+			      (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)   * (1-z_frac) +
+			    (((patch->vertices[5](d-1) * x_frac) +
+			      (patch->vertices[4](d-1) * (1-x_frac))) * (1-y_frac) +
+			     ((patch->vertices[6](d-1) * x_frac) +
+			      (patch->vertices[7](d-1) * (1-x_frac))) * y_frac)   * z_frac)
+			 );
 			 entry++;
-		       };
+		       }
 		 break;
-	       };
+	       }
 	      
 	       default:
 		     Assert (false, ExcNotImplemented());
-	     };
-	 };
-     };
+	     }
+	 }
+     }
 
 
 				    ///////////////////////////////////////
@@ -3632,7 +3623,6 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				    /////////////////////////////////
 				    // now for the cells. note that
 				    // vertices are counted from 1 onwards
-
    unsigned int first_vertex_of_patch = 0;
    unsigned int elem=0;
       
@@ -3657,9 +3647,9 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 		   tm.cd(3,elem) = first_vertex_of_patch+i*(n_subdivisions+1)+j+1+1;
 		   
 		   elem++;
-		 };
+		 }
 	     break;
-	   };
+	   }
 	      
 	   case 3:
 	   {
@@ -3680,13 +3670,13 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 		     tm.cd(7,elem) = first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1+1;
 		     
 		     elem++;
-		   };
+		   }
 	     break;
-	   };
+	   }
 
 	   default:
 		 Assert (false, ExcNotImplemented());
-	 };
+	 }
 
 
 					// finally update the number
@@ -3704,8 +3694,8 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 		 break;
 	   default:
 		 Assert (false, ExcNotImplemented());
-	 };      
-     };
+	 }      
+     }
 
 
    {     
@@ -3747,9 +3737,8 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
      
      ierr = TECEND ();
      
-     Assert (ierr == 0, ExcTecplotAPIError());
-     
-   };
+     Assert (ierr == 0, ExcTecplotAPIError());     
+   }
 
       
    delete [] tecVarNames;
@@ -3798,7 +3787,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 	  << std::endl
 	  << "DATASET UNSTRUCTURED_GRID"
 	  << std::endl;
-    };
+    }
   
 
 				   // first count the number of cells
@@ -3829,7 +3818,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 	      break;
 	default:
 	      Assert (false, ExcNotImplemented());
-      };
+      }
 
 
 				   // in gmv format the vertex
@@ -3882,7 +3871,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 		      (patch->vertices[0](0) * (n_subdivisions-i) / n_subdivisions))
 		  << " 0 0\n";
 	    break;
-	  };
+	  }
 		   
 	  case 2:
 	  {
@@ -3897,9 +3886,9 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 			  ((patch->vertices[2] * x_frac) +
 			   (patch->vertices[3] * (1-x_frac))) * y_frac)
 		      << " 0\n";
-		};
+		}
 	    break;
-	  };
+	  }
 	       
 	  case 3:
 	  {
@@ -3929,15 +3918,15 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 			     ((patch->vertices[6] * x_frac) +
 			      (patch->vertices[7] * (1-x_frac))) * y_frac)   * z_frac)
 			<< std::endl;
-		  };
+		  }
 		
 	    break;
-	  };
+	  }
 	       
 	  default:
 		Assert (false, ExcNotImplemented());
-	};
-    };
+	}
+    }
 
 				   /////////////////////////////////
 				   // now for the cells
@@ -3966,7 +3955,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 		      << first_vertex_of_patch+i << ' '
 		      << first_vertex_of_patch+i+1 << std::endl;
 		break;
-	      };
+	      }
 	       
 	      case 2:
 	      {
@@ -3979,7 +3968,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 			<< first_vertex_of_patch+i*(n_subdivisions+1)+j+1
 			<< std::endl;
 		break;
-	      };
+	      }
 	       
 	      case 3:
 	      {
@@ -3998,13 +3987,13 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1 << ' '
 			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1 << ' '
 			    << std::endl;
-		      };
+		      }
 		break;
-	      };
+	      }
 
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
+	    }
 
 
 					   // finally update the number
@@ -4025,8 +4014,8 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 		    break;
 	      default:
 		    Assert (false, ExcNotImplemented());
-	    };
-	};
+	    }
+	}
 
 				       // next output the types of the
 				       // cells. since all cells are
@@ -4046,8 +4035,8 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 		  break;
 	    default:
 		  Assert (false, ExcNotImplemented());
-	  };
-    };
+	  }
+    }
 
 				   ///////////////////////////////////////
 				   // data output.
@@ -4077,7 +4066,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 		 data_vectors[data_set].end(),
 		 std::ostream_iterator<double>(out, " "));
       out << std::endl;
-    };
+    }
   
 				   // assert the stream is still ok
   AssertThrow (out, ExcIO());
@@ -4175,7 +4164,7 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
 		data_vectors[data_set][next_value] = patch->data(data_set,i);
 		
 	    break;
-	  };
+	  }
 		     
 	  case 2:
 	  {
@@ -4186,10 +4175,10 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
 		    data_vectors[data_set][next_value]
 		      = patch->data(data_set,i*(n_subdivisions+1) + j);
 		  ++next_value;
-		};
+		}
 		
 	    break;
-	  };
+	  }
 	       
 	  case 3:
 	  {
@@ -4202,15 +4191,15 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
 			= patch->data(data_set,
 				      (i*(n_subdivisions+1)+j)*(n_subdivisions+1)+k);
 		    ++next_value;
-		  };
+		  }
 
 	    break;
-	  };
+	  }
 	       
 	  default:
 		Assert (false, ExcNotImplemented());
-	};
-    };
+	}
+    }
 
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     Assert (data_vectors[data_set].size() == next_value,
@@ -4373,7 +4362,7 @@ DataOutInterface<dim,spacedim>::write (std::ostream &out,
 	    
       default:
 	    Assert (false, ExcNotImplemented());
-    };
+    }
 }
 
 
