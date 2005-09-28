@@ -127,6 +127,7 @@ all-headers:
 # the preceding intel_). Thus, strip this part of the compiler name
 compare:
 	cd results; $(MAKE)
+	rm -f compare
 	ln -s results/$(TARGET)+$(GXX-VERSION:intel_%=%) compare
 
 resultname:
