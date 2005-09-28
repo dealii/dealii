@@ -3327,7 +3327,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
   float & TecplotMacros::nd (const unsigned int i,
                              const unsigned int j)
   {
-    return nodalData[(i)*(n_nodes) + (j)]; 
+    return nodalData[i*n_nodes+j]; 
   }
 
 
@@ -3336,7 +3336,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
   int & TecplotMacros::cd (const unsigned int i,
                            const unsigned int j)
   {
-    return connData[(i) + (j)*(n_vert)]; 
+    return connData[i+j*n_vert]; 
   }
  
 }
@@ -3451,39 +3451,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
   int is_double = 0,
       tec_debug = 0,
       cell_type;
-
   
-  unsigned int string_size = 0;
-
-  if (spacedim==2)
-    string_size = 3;
-  else if (spacedim==3)
-    string_size = 5;
-  
-
-  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-    {
-      string_size += 1;
-      string_size += data_names[data_set].size();
-    }
-
-  
-  char *tecVarNames = new char[string_size];
-  *tecVarNames = 0;
-
-  
-  switch (spacedim)
-    {
-      case 2:
-	    tecVarNames  = strncat(tecVarNames, "x y", 3);
-	    break;
-      case 3:
-	    tecVarNames  = strncat(tecVarNames, "x y z", 5);
-	    break;
-      default:
-            Assert(false, ExcNotImplemented());
-    }
-
   switch (dim)
     {
       case 2:
@@ -3496,12 +3464,24 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
             Assert(false, ExcNotImplemented());	    
     }
   
+  std::string tec_var_names;  
+  switch (spacedim)
+    {
+      case 2:
+	    tec_var_names  = "x y";
+	    break;
+      case 3:
+	    tec_var_names  = "x y z";
+	    break;
+      default:
+            Assert(false, ExcNotImplemented());
+    }
+  
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     {
-      tecVarNames = strncat(tecVarNames, " ", 1);
-      tecVarNames = strncat(tecVarNames, data_names[data_set].c_str(), data_names[data_set].size());
+      tec_var_names += " ";
+      tec_var_names += data_names[data_set];
     }
-
 				    // in Tecplot FEBLOCK format the vertex
 				    // coordinates and the data have an
 				    // order that is a bit unpleasant
@@ -3704,8 +3684,15 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
          num_cells = static_cast<int>(n_cells);
 
      char dot[2] = {'.', 0};
+				      // Unfortunately, TECINI takes a
+				      // char *, but c_str() gives a
+				      // const char *.  As we don't do
+				      // anything else with
+				      // tec_var_names following
+				      // const_cast is ok
+     char *var_names=const_cast<char *> (tec_var_names.c_str());
      ierr = TECINI (NULL,
-		    tecVarNames,
+		    var_names,
 		    file_name,
 		    dot,
 		    &tec_debug,
@@ -3739,10 +3726,6 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
      
      Assert (ierr == 0, ExcTecplotAPIError());     
    }
-
-      
-   delete [] tecVarNames;
-         
 #endif
 }
 
