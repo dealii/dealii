@@ -125,10 +125,16 @@ all-headers:
 # proper version number), while for some historic reason we have named
 # the directories in the results/ tree with just icc7.1 (i.e. without
 # the preceding intel_). Thus, strip this part of the compiler name
+#
+# We declare this target as PHONY since we want it to re-run every time we
+# start the testsuite. Reason being that this way we can make sure that all
+# the proper links have been set for this run, even if some new tests have
+# been added.
 compare:
 	cd results; $(MAKE)
 	rm -f compare
 	ln -s results/$(TARGET)+$(GXX-VERSION:intel_%=%) compare
+.PHONY: compare
 
 resultname:
 	@echo $(TARGET)+$(GXX-VERSION)
