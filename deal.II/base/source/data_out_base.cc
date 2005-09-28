@@ -3444,7 +3444,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
   
                                     // local variables only needed to write Tecplot
                                     // binary output files  
-  const unsigned int vars_per_node  = (dim+n_data_sets),  
+  const unsigned int vars_per_node  = (spacedim+n_data_sets),  
                      nodes_per_cell = GeometryInfo<dim>::vertices_per_cell;
   
 #ifdef DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
@@ -3460,9 +3460,9 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
   
   unsigned int string_size = 0;
 
-  if (dim==2)
+  if (spacedim==2)
     string_size = 3;
-  else if (dim==3)
+  else if (spacedim==3)
     string_size = 5;
   
 
@@ -3477,19 +3477,29 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
   *tecVarNames = 0;
 
   
-  switch (dim)
+  switch (spacedim)
     {
       case 2:
-	    cell_type = 1;
 	    tecVarNames  = strncat(tecVarNames, "x y", 3);
 	    break;
       case 3:
-	    cell_type = 3;
 	    tecVarNames  = strncat(tecVarNames, "x y z", 5);
 	    break;
       default:
             Assert(false, ExcNotImplemented());
     };
+
+  switch (dim)
+    {
+      case 2:
+	    cell_type = 1;
+	    break;
+      case 3:
+	    cell_type = 3;
+	    break;
+      default:
+            Assert(false, ExcNotImplemented());	    
+    }
 
   
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
@@ -3614,7 +3624,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				    // then write data.
    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
      for (unsigned int entry=0; entry<data_vectors[data_set].size(); entry++)
-       tm.nd((dim+data_set),entry) = static_cast<float>(data_vectors[data_set][entry]);
+       tm.nd((spacedim+data_set),entry) = static_cast<float>(data_vectors[data_set][entry]);
 
 
 
