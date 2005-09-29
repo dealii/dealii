@@ -1014,6 +1014,10 @@ template <>
 void GridIn<3>::read_netcdf (const std::string &filename)
 {
 #ifndef DEAL_II_HAVE_NETCDF
+                                   // do something with the function argument
+                                   // to make sure it at least looks used,
+                                   // even if it is not
+  (void)filename;
   AssertThrow(false, ExcNeedsNetCDF());
 #else
   const unsigned int dim=3;
