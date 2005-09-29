@@ -224,6 +224,8 @@ template <int dim> class FECollection;
  * be performed for several space dimensions. Therefore, some
  * functions in FETools have been provided to help with these tasks.
  *
+ * <h5>Computing the correct basis from "raw" basis functions</h5>
+ *
  * First, aready the basis of the shape function space may be
  * difficult to implement for arbitrary order and dimension. On the
  * other hand, if the @ref GlossNodes "node values" are given, then
@@ -253,6 +255,45 @@ template <int dim> class FECollection;
  * FETools::compute_node_matrix(). It relies on the existence of
  * #generalized_support_points and implementation of interpolate()
  * with VectorSlice argument.
+ *
+ * The piece of code in the constructor of a finite element
+ * responsible for this looks like
+ * @code
+  FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
+  FETools::compute_node_matrix(M, *this);
+  this->inverse_node_matrix.reinit(this->dofs_per_cell, this->dofs_per_cell);
+  this->inverse_node_matrix.invert(M);
+ * @endcode
+ * Don't forget to make sure that #unit_support_points or
+ * #generalized_support_points are initialized before this!
+ *
+ * <h5>Computing the #prolongation matrices for multigrid</h5>
+ *
+ * Once the shape functions are set up, the grid transfer matrices for
+ * Multigrid accessed by get_prolongation_matrix() can be computed
+ * automatically, using FETools::compute_embedding_matrices().
+ *
+ * This can be achieved by
+ * @code
+  for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
+    this->prolongation[i].reinit (this->dofs_per_cell,
+				  this->dofs_per_cell);
+  FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
+ * @endcode
+ *
+ * <h5>Computing the #restriction matrices for error estimators</h5>
+ *
+ * missing...
+ *
+ * <h5>Computing #interface_constraints</h5>
+ *
+ * Constraint matrices can be computed semi-automatically using
+ * FETools::compute_face_embedding_matrices(). This function computes
+ * the representation of the coarse mesh functions by fine mesh
+ * functions for each child of a face separately. These matrices must
+ * be convoluted into a single rectangular constraint matrix,
+ * eliminating degrees of freedom on common vertices and edges as well
+ * as on the coarse grid vertices. See the discussion above for details.
  *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001, 2005
  */
