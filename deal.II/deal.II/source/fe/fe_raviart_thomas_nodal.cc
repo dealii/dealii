@@ -45,18 +45,54 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 		    std::vector<bool>(dim,true)))
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
+  const unsigned int n_dofs = this->dofs_per_cell;
   
   this->mapping_type = this->independent_on_cartesian;
 				   // These must be done first, since
 				   // they change the evaluation of
 				   // basis functions
+
+				   // Set up the generalized support
+				   // points
   initialize_unit_support_points (deg);
-  initialize_node_matrix();
+
+				   //Now compute the inverse node
+				   //matrix, generating the correct
+				   //basis functions from the raw
+				   //ones.
+  
+				   // We use an auxiliary matrix in
+				   // this function. Therefore,
+				   // inverse_node_matrix is still
+				   // empty and shape_value_component
+				   // returns the 'raw' shape values.
+  FullMatrix<double> M(n_dofs, n_dofs);
+  FETools::compute_node_matrix(M, *this);
+  this->inverse_node_matrix.reinit(n_dofs, n_dofs);
+  this->inverse_node_matrix.invert(M);
+				   // From now on, the shape functions
+				   // will be the correct ones, not
+				   // the raw shape functions anymore.
   
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     this->prolongation[i].reinit (this->dofs_per_cell,
 				  this->dofs_per_cell);
   FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
+  
+  std::vector<FullMatrix<double> >
+    face_embeddings(1<<(dim-1), FullMatrix<double>(this->dofs_per_face,
+						   this->dofs_per_face));
+  FETools::compute_face_embedding_matrices(*this, &face_embeddings[0], 0, 0);
+  interface_constraints.reinit((1<<(dim-1)) * this->dofs_per_face,
+			       this->dofs_per_face);
+  unsigned int target_row=0;
+  for (unsigned int d=0;d<face_embeddings.size();++d)
+    for (unsigned int i=0;i<face_embeddings[d].m();++i)
+      {
+	for (unsigned int j=0;j<face_embeddings[d].n();++j)
+	  interface_constraints(target_row,j) = face_embeddings[d](i,j);
+	++target_row;
+      }
 }
 
 
@@ -358,16 +394,6 @@ template <int dim>
 void
 FE_RaviartThomasNodal<dim>::initialize_node_matrix ()
 {
-  const unsigned int n_dofs = this->dofs_per_cell;
-				   // We use an auxiliary matrix in
-				   // this function. Therefore,
-				   // inverse_node_matrix is still
-				   // empty and shape_value_component
-				   // returns the 'raw' shape values.
-  FullMatrix<double> M(n_dofs, n_dofs);
-  FETools::compute_node_matrix(M, *this);
-  this->inverse_node_matrix.reinit(n_dofs, n_dofs);
-  this->inverse_node_matrix.invert(M);
 }
 
 
