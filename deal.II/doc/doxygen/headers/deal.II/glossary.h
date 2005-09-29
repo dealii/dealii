@@ -43,7 +43,7 @@
  * <dd>It is customary to define a FiniteElement as a pair consisting
  * of a local function space and a set of node values
  * <i>(N<sub>i</sub>)</i> on the mesh cells (usually defined on the
- * @GlossReferenceCell "reference cell"). Then, the basis of the local
+ * @ref GlossReferenceCell "reference cell"). Then, the basis of the local
  * function space is chosen such that <i>N<sub>i</sub>(v<sub>j</sub>)
  * = &delta;<sub>ij</sub></i>, the Kronecker delta.
  *
