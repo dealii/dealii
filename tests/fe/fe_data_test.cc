@@ -144,7 +144,15 @@ void test_fe_datas()
       deallog << "components=" << fe_data->components << std::endl
 	      << "degree=" << fe_data->tensor_degree() << std::endl
 	      << "conformity=" << fe_data->conforming_space << std::endl;
-
+      deallog << "unit_support_points=" << fe_data->get_unit_support_points().size()
+	      << std::endl;
+      deallog << "unit_face_support_points=" << fe_data->get_unit_face_support_points().size()
+	      << std::endl;
+      deallog << "generalized_support_points=" << fe_data->get_generalized_support_points().size()
+	      << std::endl;
+      deallog << "generalized_face_support_points=" << fe_data->get_generalized_face_support_points().size()
+	      << std::endl;
+      
       for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
 	{
 	  deallog << "support on face " << f << ':';
