@@ -471,7 +471,9 @@ FiniteElement<dim>::get_generalized_support_points () const
   Assert ((generalized_support_points.size() == 0) ||
 	  (generalized_support_points.size() == this->dofs_per_cell),
 	  ExcInternalError());
-  return generalized_support_points;
+  return ((generalized_support_points.size() == 0)
+	  ? unit_support_points
+	  : generalized_support_points);
 }
 
 
@@ -480,7 +482,7 @@ template <int dim>
 bool
 FiniteElement<dim>::has_generalized_support_points () const
 {
-  return (generalized_support_points.size() != 0);
+  return (get_generalized_support_points().size() != 0);
 }
 
 
@@ -534,7 +536,9 @@ FiniteElement<dim>::get_generalized_face_support_points () const
   Assert ((generalized_face_support_points.size() == 0) ||
 	  (generalized_face_support_points.size() == this->dofs_per_face),
 	  ExcInternalError());
-  return generalized_face_support_points;
+  return ((generalized_face_support_points.size() == 0)
+	  ? unit_face_support_points
+	  : generalized_face_support_points);
 }
 
 
