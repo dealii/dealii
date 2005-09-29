@@ -324,6 +324,11 @@ class InverseMatrixRichardson
 				      */
     InverseMatrixRichardson (SolverControl& control,
 			     VectorMemory<VECTOR>& mem);
+				     /**
+				      * Since we use two pointers, we
+				      * must implement a destructor.
+				      */
+    ~InverseMatrixRichardson();
     
 				     /**
 				      * Initialization

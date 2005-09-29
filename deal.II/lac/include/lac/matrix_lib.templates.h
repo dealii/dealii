@@ -132,6 +132,12 @@ InverseMatrixRichardson<VECTOR>::InverseMatrixRichardson(
 {}
 
 
+template <class VECTOR>
+InverseMatrixRichardson<VECTOR>::~InverseMatrixRichardson()
+{
+  if (matrix != 0) delete matrix;
+  if (precondition != 0) delete precondition;
+}
 
 
 template <class VECTOR>
