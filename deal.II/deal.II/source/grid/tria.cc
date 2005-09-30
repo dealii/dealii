@@ -121,6 +121,17 @@ Triangulation<dim>::get_boundary (const unsigned int number) const
 }
 
 
+#if deal_II_dimension == 1
+
+template <>
+void
+Triangulation<1>::get_boundary_indicators (
+  std::vector<unsigned char> &boundary_indicators) const 
+{
+  boundary_indicators.resize(0);
+}
+
+#else
 
 template <int dim>
 void
@@ -144,6 +155,7 @@ Triangulation<dim>::get_boundary_indicators (
       boundary_indicators[bi_counter++]=i;
 }
 
+#endif
 
 /*--------- Put the next functions a bit out-or-order to avoid use before
   --------- explicit specialization, which is not allowed.                */
