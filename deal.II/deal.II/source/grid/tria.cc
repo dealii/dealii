@@ -121,6 +121,30 @@ Triangulation<dim>::get_boundary (const unsigned int number) const
 }
 
 
+
+template <int dim>
+void
+Triangulation<dim>::get_boundary_indicators (
+  std::vector<unsigned char> &boundary_indicators) const 
+{
+  std::vector<bool> bi_exists(255, false);
+  active_cell_iterator cell=begin_active();
+  for (; cell!=end(); ++cell)
+    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+      if (cell->at_boundary(face))
+	bi_exists[cell->face(face)->boundary_indicator()]=true;
+
+  const unsigned int n_bi=
+    std::count(bi_exists.begin(), bi_exists.end(), true);
+
+  boundary_indicators.resize(n_bi);
+  unsigned int bi_counter=0;
+  for (unsigned int i=0; i<bi_exists.size(); ++i)
+    if (bi_exists[i]==true)
+      boundary_indicators[bi_counter++]=i;
+}
+
+
 /*--------- Put the next functions a bit out-or-order to avoid use before
   --------- explicit specialization, which is not allowed.                */
 
