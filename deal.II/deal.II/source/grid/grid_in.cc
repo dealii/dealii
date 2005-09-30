@@ -1135,7 +1135,97 @@ void GridIn<3>::read_netcdf (const std::string &filename)
     for (unsigned int i=0; i<vertices_per_hex; ++i)
       cells[cell].vertices[i]=vertex_indices[cell*vertices_per_hex+i];
 
+  				   // we read
+				   //   int marker(no_of_markers)
+  NcDim *marker_dim=nc.get_dim("no_of_markers");
+  AssertThrow(marker_dim->is_valid(), ExcIO());
+  const unsigned int n_markers=marker_dim->size();
+
+  NcVar *marker_var=nc.get_var("marker");
+  AssertThrow(marker_var->is_valid(), ExcIO());
+  AssertThrow(marker_var->num_dims()==1, ExcIO());
+  AssertThrow(static_cast<unsigned int>(
+    marker_var->get_dim(0)->size())==n_markers, ExcIO());
+
+  std::vector<int> marker(n_markers);
+				   // use &* to convert
+				   // vector<int>::iterator to int *
+  marker_var->get(&*marker.begin(), n_markers);
+
+  if (output)
+    {
+      std::cout << "marker: ";
+      for (unsigned int i=0; i<n_markers; ++i)
+	std::cout << marker[i] << " ";
+      std::cout << std::endl;
+    }
+
+				   // next we read
+				   // int boundarymarker_of_surfaces(
+				   //   no_of_surfaceelements)
+  NcDim *bquads_dim=nc.get_dim("no_of_surfacequadrilaterals");
+  AssertThrow(bquads_dim->is_valid(), ExcIO());
+  const unsigned int n_bquads=bquads_dim->size();
+
+  NcVar *bmarker_var=nc.get_var("boundarymarker_of_surfaces");
+  AssertThrow(bmarker_var->is_valid(), ExcIO());
+  AssertThrow(bmarker_var->num_dims()==1, ExcIO());
+  AssertThrow(static_cast<unsigned int>(
+    bmarker_var->get_dim(0)->size())==n_bquads, ExcIO());
+
+  std::vector<int> bmarker(n_bquads);
+  bmarker_var->get(&*bmarker.begin(), n_bquads);
+				   // we only handle boundary
+				   // indicators that fit into an
+				   // unsigned char. Also, we don't
+				   // take 255 as it denotes an
+				   // internal face
+  for (unsigned int i=0; i<bmarker.size(); ++i)
+    Assert(0<=bmarker[i] && bmarker[i]<=254, ExcIO());
+
+				   // next we read
+				   // int points_of_surfacequadrilaterals(
+				   //   no_of_surfacequadrilaterals,
+				   //   points_per_surfacequadrilateral)
+  NcDim *quad_vertices_dim=nc.get_dim("points_per_surfacequadrilateral");
+  AssertThrow(quad_vertices_dim->is_valid(), ExcIO());
+  const unsigned int vertices_per_quad=quad_vertices_dim->size();
+  AssertThrow(vertices_per_quad==GeometryInfo<dim>::vertices_per_face, ExcIO());
+  
+  NcVar *bvertex_indices_var=nc.get_var("points_of_surfacequadrilaterals");
+  AssertThrow(bvertex_indices_var->is_valid(), ExcIO());
+  AssertThrow(bvertex_indices_var->num_dims()==2, ExcIO());
+  AssertThrow(static_cast<unsigned int>(
+    bvertex_indices_var->get_dim(0)->size())==n_bquads, ExcIO());
+  AssertThrow(static_cast<unsigned int>(
+		bvertex_indices_var->get_dim(1)->size())==
+	      GeometryInfo<dim>::vertices_per_face, ExcIO());
+
+  std::vector<int> bvertex_indices(n_bquads*vertices_per_quad);
+  bvertex_indices_var->get(&*bvertex_indices.begin(), n_bquads, vertices_per_quad);
+
+  if (output)
+    {
+      std::cout << "bquads: ";
+      for (unsigned int i=0; i<n_bquads; ++i)
+	{
+	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+	    std::cout << bvertex_indices[
+	      i*GeometryInfo<dim>::vertices_per_face+v] << " ";
+	  std::cout << std::endl;
+	}
+    }
+
   SubCellData subcelldata;
+  subcelldata.boundary_quads.resize(n_bquads);
+  for (unsigned int i=0; i<n_bquads; ++i)
+    {
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+	subcelldata.boundary_quads[i].vertices[v]=bvertex_indices[
+	  i*GeometryInfo<dim>::vertices_per_face+v];
+      subcelldata.boundary_quads[i].material_id=bmarker[i];
+    }
+
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   if (switch_y_z)
     GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
