@@ -1252,7 +1252,7 @@ ParameterHandler::scan_line (std::string        line,
 
 				   // this line matched nothing known
   std::cerr << "Line " << lineno
-            << ": This line matched nothing known:" << std::endl
+            << ": This line matched nothing known ('set' or 'subsection' missing!?):" << std::endl
 	    << "    " << line << std::endl;
   return false;
 }
