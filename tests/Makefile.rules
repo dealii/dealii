@@ -115,12 +115,11 @@ endif
 # anywhere anytime
 ############################################################
 report:
-	@today=`date -u +"%Y-%m-%d %H:%M"` ; \
 	for test in $(sort $(tests)) ; do \
 		if (($(MAKE) $$test.OK stop_on_error=on 2>&1) > /dev/null); then \
-			echo $$today + $$test ; \
+			echo `date -u +"%Y-%m-%d %H:%M"` + $$test ; \
 		else \
-			echo $$today - $$test ; \
+			echo `date -u +"%Y-%m-%d %H:%M"` - $$test ; \
 		fi ; \
 	done
 

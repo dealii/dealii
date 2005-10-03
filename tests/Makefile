@@ -28,11 +28,10 @@ report: compare abort.o
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
 	@echo =======Report: all-headers =======
-	@today=`date -u +"%Y-%m-%d %H:%M"` ; \
 	 if (($(MAKE) all-headers 2>&1) > /dev/null) ; then \
-		echo $$today + all-headers ; \
+		echo `date -u +"%Y-%m-%d %H:%M"` + all-headers ; \
 	 else \
-		echo $$today - all-headers ; \
+		echo `date -u +"%Y-%m-%d %H:%M"` - all-headers ; \
 	 fi
 
 report+mail:
