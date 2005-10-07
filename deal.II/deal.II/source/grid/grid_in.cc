@@ -1177,7 +1177,8 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 				   //   no_of_surfaceelements)
   NcDim *bquads_dim=nc.get_dim("no_of_surfacequadrilaterals");
   AssertThrow(bquads_dim->is_valid(), ExcIO());
-  AssertThrow(bquads_dim->size()==n_bquads, ExcIO());
+  AssertThrow(static_cast<unsigned int>(
+		bquads_dim->size())==n_bquads, ExcIO());
 
   NcVar *bmarker_var=nc.get_var("boundarymarker_of_surfaces");
   AssertThrow(bmarker_var->is_valid(), ExcIO());
