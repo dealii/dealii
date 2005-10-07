@@ -671,6 +671,10 @@ namespace Threads
 		  const unsigned int n_intervals);
 
                                    /**
+                                    * @cond internal
+                                    */
+  
+                                   /**
                                     * A namespace in which helper
                                     * functions and the like for the
                                     * threading subsystem are
@@ -754,6 +758,10 @@ namespace Threads
                                       */
     void deregister_thread ();
   }
+
+                                   /**
+                                    * @endcond
+                                    */
   
 }   // end declarations of namespace Threads
 
@@ -824,6 +832,9 @@ namespace Threads
 
 namespace Threads
 {
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal 
   {
                                      /**
@@ -2823,9 +2834,16 @@ namespace Threads
     };
   }
 
+                                   /**
+                                    * @endcond
+                                    */
+
 #if (DEAL_II_USE_MT == 1)
 #  if defined(DEAL_II_USE_MT_POSIX)
-  
+
+                                   /**
+                                    * @cond internal
+                                    */  
   namespace internal 
   {
                                      /**
@@ -2946,6 +2964,9 @@ namespace Threads
     template <typename, typename> struct wrapper_base;
   }
 
+                                   /**
+                                    * @endcond
+                                    */
 
 
                                    /**
@@ -3080,6 +3101,9 @@ namespace Threads
 
 
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
 
@@ -3526,9 +3550,16 @@ namespace Threads
     class mem_fun_encapsulator;
   }
 
+                                   /**
+                                    * @endcond
+                                    */
 
 // ----------- encapsulators for member functions not taking any parameters
 
+                                   /**
+                                    * @cond internal
+                                    */
+  
   namespace internal
   {
                                      /**
@@ -3558,7 +3589,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
  
                                    /**
                                     * Overload of the non-const spawn
@@ -3589,6 +3622,9 @@ namespace Threads
 
 // ----------- encapsulators for unary member functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -3619,6 +3655,9 @@ namespace Threads
   
   }
 
+                                   /**
+                                    * @endcond
+                                    */
  
                                    /**
                                     * Overload of the non-const spawn
@@ -3649,6 +3688,9 @@ namespace Threads
 
 // ----------- encapsulators for binary member functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -3680,7 +3722,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -3710,6 +3754,9 @@ namespace Threads
 
 // ----------- encapsulators for ternary member functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -3743,7 +3790,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -3778,6 +3827,9 @@ namespace Threads
 
 // ----------- encapsulators for member functions with 4 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -3811,7 +3863,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -3846,6 +3900,9 @@ namespace Threads
 
 // ----------- encapsulators for member functions with 5 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -3881,7 +3938,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -3918,6 +3977,9 @@ namespace Threads
 
 // ----------- encapsulators for member functions with 6 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -3954,7 +4016,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -3992,6 +4056,9 @@ namespace Threads
 
 // ----------- encapsulators for member functions with 7 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4030,7 +4097,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -4074,6 +4143,9 @@ namespace Threads
 
 // ----------- encapsulators for member functions with 8 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4113,7 +4185,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -4161,6 +4235,9 @@ namespace Threads
 
 // ----------- encapsulators for member functions with 9 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4202,7 +4279,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -4250,6 +4329,9 @@ namespace Threads
 
 // ----------- encapsulators for member functions with 10 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4292,7 +4374,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -4345,6 +4429,9 @@ namespace Threads
 
 // ----------- encapsulators for functions not taking any parameters
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4373,7 +4460,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
  
                                    /**
                                     * Overload of the spawn function for
@@ -4392,6 +4481,9 @@ namespace Threads
 
 // ----------- encapsulators for unary functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4420,7 +4512,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
  
                                    /**
                                     * Overload of the spawn function for
@@ -4439,6 +4533,9 @@ namespace Threads
 
 // ----------- encapsulators for binary functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4468,7 +4565,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function for
@@ -4486,6 +4585,9 @@ namespace Threads
 
 // ----------- encapsulators for ternary functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4517,7 +4619,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function for
@@ -4538,6 +4642,9 @@ namespace Threads
 
 // ----------- encapsulators for functions with 4 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4569,7 +4676,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function for
@@ -4590,6 +4699,9 @@ namespace Threads
 
 // ----------- encapsulators for functions with 5 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4623,7 +4735,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function for
@@ -4644,6 +4758,9 @@ namespace Threads
 
 // ----------- encapsulators for functions with 6 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4678,7 +4795,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function for
@@ -4699,6 +4818,9 @@ namespace Threads
 
 // ----------- encapsulators for functions with 7 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4735,7 +4857,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function for
@@ -4759,6 +4883,9 @@ namespace Threads
 
 // ----------- encapsulators for functions with 8 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4796,7 +4923,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function for
@@ -4822,6 +4951,9 @@ namespace Threads
 
 // ----------- encapsulators for functions with 9 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4861,7 +4993,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function for
@@ -4887,6 +5021,9 @@ namespace Threads
 
 // ----------- encapsulators for functions with 10 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -4927,7 +5064,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function for
@@ -5033,6 +5172,9 @@ namespace Threads
   };
   
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -5115,7 +5257,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
  
                                    /**
                                     * Overload of the non-const spawn
@@ -5154,6 +5298,9 @@ namespace Threads
 
 // ----------- forwarders for unary member functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -5183,7 +5330,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
  
                                    /**
                                     * Overload of the non-const spawn
@@ -5222,6 +5371,9 @@ namespace Threads
 
 // ----------- forwarders for binary member functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -5254,7 +5406,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -5292,6 +5446,9 @@ namespace Threads
 
 // ----------- forwarders for ternary member functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -5326,7 +5483,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -5369,6 +5528,9 @@ namespace Threads
 
 // ----------- forwarders for member functions with 4 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -5403,7 +5565,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -5446,6 +5610,9 @@ namespace Threads
 
 // ----------- forwarders for member functions with 5 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -5482,7 +5649,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -5527,6 +5696,9 @@ namespace Threads
 
 // ----------- forwarders for member functions with 6 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -5564,7 +5736,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -5610,6 +5784,9 @@ namespace Threads
 
 // ----------- forwarders for member functions with 7 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -5649,7 +5826,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -5701,6 +5880,9 @@ namespace Threads
 
 // ----------- forwarders for member functions with 8 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -5741,7 +5923,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -5797,6 +5981,9 @@ namespace Threads
 
 // ----------- forwarders for member functions with 9 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -5839,7 +6026,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -5895,6 +6084,9 @@ namespace Threads
 
 // ----------- forwarders for member functions with 10 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -5938,7 +6130,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the non-const spawn
@@ -5999,6 +6193,9 @@ namespace Threads
 
 // ----------- forwarders for functions not taking any parameters
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -6027,7 +6224,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
  
                                    /**
                                     * Overload of the spawn function
@@ -6052,6 +6251,9 @@ namespace Threads
 
 // ----------- forwarders for unary functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -6080,7 +6282,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
  
                                    /**
                                     * Overload of the spawn function
@@ -6103,6 +6307,9 @@ namespace Threads
 
 // ----------- forwarders for binary functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -6133,7 +6340,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function
@@ -6155,6 +6364,9 @@ namespace Threads
 
 // ----------- forwarders for ternary functions
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -6187,7 +6399,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function
@@ -6212,6 +6426,9 @@ namespace Threads
 
 // ----------- forwarders for functions with 4 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -6244,7 +6461,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function
@@ -6269,6 +6488,9 @@ namespace Threads
 
 // ----------- forwarders for functions with 5 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -6303,7 +6525,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function
@@ -6328,6 +6552,9 @@ namespace Threads
 
 // ----------- forwarders for functions with 6 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -6363,7 +6590,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function
@@ -6388,6 +6617,9 @@ namespace Threads
 
 // ----------- forwarders for functions with 7 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -6425,7 +6657,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function
@@ -6453,6 +6687,9 @@ namespace Threads
 
 // ----------- forwarders for functions with 8 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -6491,7 +6728,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function
@@ -6521,6 +6760,9 @@ namespace Threads
 
 // ----------- forwarders for functions with 9 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -6561,7 +6803,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function
@@ -6591,6 +6835,9 @@ namespace Threads
 
 // ----------- forwarders for functions with 10 arguments
 
+                                   /**
+                                    * @cond internal
+                                    */
   namespace internal
   {
                                      /**
@@ -6632,7 +6879,9 @@ namespace Threads
     };
   
   }
-
+                                   /**
+                                    * @endcond
+                                    */
 
                                    /**
                                     * Overload of the spawn function
