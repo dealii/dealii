@@ -363,15 +363,18 @@ namespace PETScWrappers
                 const PetscScalar value);
 
                                        /**
-                                        * Remove all elements from this #row
-                                        * by setting them to zero. The
-                                        * function does not modify the number
-                                        * of allocated nonzero entries, it
-                                        * only sets some entries to zero. It
-                                        * may drop them from the sparsity
-                                        * pattern, though (but retains the
-                                        * allocated memory in case new entries
-                                        * are again added later).
+                                        * Remove all elements from
+                                        * this <tt>row</tt> by setting
+                                        * them to zero. The function
+                                        * does not modify the number
+                                        * of allocated nonzero
+                                        * entries, it only sets some
+                                        * entries to zero. It may drop
+                                        * them from the sparsity
+                                        * pattern, though (but retains
+                                        * the allocated memory in case
+                                        * new entries are again added
+                                        * later).
                                         *
                                         * This operation is used in
                                         * eliminating constraints (e.g. due to

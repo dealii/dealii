@@ -505,6 +505,7 @@ namespace PETScWrappers
   }
 }
 
+/**@}*/
 
 #endif // DEAL_II_USE_PETSC
 

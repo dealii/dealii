@@ -316,6 +316,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
     
 };
 
+/**@}*/
 
 template <typename number>
 template <class MATRIX>

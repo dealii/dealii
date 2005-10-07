@@ -337,6 +337,8 @@ class TridiagonalMatrix
     std::vector<number> right;
 };
 
+/**@}*/
+
 //---------------------------------------------------------------------------
 #ifndef DOXYGEN
 
