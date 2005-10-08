@@ -178,4 +178,4 @@ Makefile.tests: $(shell echo *.cc) Makefile
 		> $@
 
 
-.PHONY: report show-tests
+.PHONY: report show-tests clean distclean
