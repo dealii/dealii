@@ -23,16 +23,10 @@ multigrid: compare abort.o
 	cd multigrid ; $(MAKE)
 
 report: compare abort.o
-	@for i in base lac fe deal.II multigrid bits ; do \
+	@for i in base lac fe deal.II multigrid bits all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
-	@echo =======Report: all-headers =======
-	@if (($(MAKE) all-headers 2>&1) > /dev/null) ; then \
-		echo `date -u +"%Y-%m-%d %H:%M"` + all/headers/all-headers ; \
-	 else \
-		echo `date -u +"%Y-%m-%d %H:%M"` - all-headers/all-headers ; \
-	 fi
 
 report+mail:
 	@$(MAKE) report | tee testresults
@@ -87,35 +81,6 @@ output-multigrid: abort.o
 	cd multigrid ; $(MAKE) output
 
 
-# collect all header files, and for each try to do the following:
-# generate a file tmp.cc that contains nothing but "#include <xxx>"
-# with this particular header file. then try to compile it. this 
-# sometimes fails since this header does not include all other headers
-# it actually needs. we don't usually see this since we may be 
-# including these missing headers into our files before, so that nobody
-# notices the problem. expose it this way.
-#
-# this all happens in a subdir tmp-all-headers, which is removed
-# afterwards again.
-all-headers:
-	@rm -rf tmp-all-headers
-	@mkdir tmp-all-headers 
-	@for i in base lac deal.II ; do \
-		pushd . > /dev/null ; \
-		headers=`cd $D/$$i/include ; \
-			 for j in */*.h ; do echo $$j ; done` ; \
-		popd > /dev/null ; \
-		cd tmp-all-headers ; \
-		cp ../Makefile.headers Makefile ; \
-		for j in $$headers ; do \
-			echo "=====Header======== $$j " ; \
-			echo "#include <$$j>" > tmp.cc ; \
-			if $(MAKE) -s tmp.g.$(OBJEXT) ; then : ; else exit 1 ; fi ; \
-			rm -f tmp.* ; \
-		done ; \
-		cd .. ; \
-	 done
-	@rm -rf tmp-all-headers
 
 
 # generate a link to system specific test program output. we create
