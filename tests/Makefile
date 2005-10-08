@@ -29,9 +29,9 @@ report: compare abort.o
 	 done
 	@echo =======Report: all-headers =======
 	@if (($(MAKE) all-headers 2>&1) > /dev/null) ; then \
-		echo `date -u +"%Y-%m-%d %H:%M"` + all-headers ; \
+		echo `date -u +"%Y-%m-%d %H:%M"` + all/headers/all-headers ; \
 	 else \
-		echo `date -u +"%Y-%m-%d %H:%M"` - all-headers ; \
+		echo `date -u +"%Y-%m-%d %H:%M"` - all-headers/all-headers ; \
 	 fi
 
 report+mail:
