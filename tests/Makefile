@@ -28,7 +28,7 @@ report: compare abort.o
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
 	@echo =======Report: all-headers =======
-	 if (($(MAKE) all-headers 2>&1) > /dev/null) ; then \
+	@if (($(MAKE) all-headers 2>&1) > /dev/null) ; then \
 		echo `date -u +"%Y-%m-%d %H:%M"` + all-headers ; \
 	 else \
 		echo `date -u +"%Y-%m-%d %H:%M"` - all-headers ; \
