@@ -124,6 +124,12 @@ report:
 	done
 
 
+report+mail:
+	@$(MAKE) report | tee testresults
+	@cat testresults | mail regression-tests@dealii.org
+	@rm testresults
+
+
 ############################################################
 # After all these general rules, here is the target to be
 # executed by make: for each entry in the list $(tests)

@@ -79,6 +79,11 @@ report:
 		fi ; \
 	done
 
+report+mail:
+	@$(MAKE) report | tee testresults
+	@cat testresults | mail regression-tests@dealii.org
+	@rm testresults
+
 
 clean:
 	-rm -f Makefile.dep *.$(OBJEXT) \

@@ -28,10 +28,11 @@ report: compare abort.o
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
 
-report+mail:
-	@$(MAKE) report | tee testresults
-	@cat testresults | mail regression-tests@dealii.org
-	@rm testresults
+report+mail: compare abort.o
+	@for i in base lac fe deal.II multigrid bits all-headers ; do \
+		echo =======Report: $$i ======= ; \
+		cd $$i ; $(MAKE) report+mail ; cd .. ; \
+	 done
 
 
 # compilation of tests only, no execution of tests
