@@ -124,19 +124,17 @@ Triangulation<dim>::get_boundary (const unsigned int number) const
 #if deal_II_dimension == 1
 
 template <>
-void
-Triangulation<1>::get_boundary_indicators (
-  std::vector<unsigned char> &boundary_indicators) const 
+std::vector<unsigned char>
+Triangulation<1>::get_boundary_indicators () const 
 {
-  boundary_indicators.resize(0);
+  return std::vector<unsigned char> (0);
 }
 
 #else
 
 template <int dim>
-void
-Triangulation<dim>::get_boundary_indicators (
-  std::vector<unsigned char> &boundary_indicators) const 
+std::vector<unsigned char>
+Triangulation<dim>::get_boundary_indicators () const 
 {
   std::vector<bool> bi_exists(255, false);
   active_cell_iterator cell=begin_active();
@@ -148,11 +146,13 @@ Triangulation<dim>::get_boundary_indicators (
   const unsigned int n_bi=
     std::count(bi_exists.begin(), bi_exists.end(), true);
 
-  boundary_indicators.resize(n_bi);
+  std::vector<unsigned char> boundary_indicators(n_bi);
   unsigned int bi_counter=0;
   for (unsigned int i=0; i<bi_exists.size(); ++i)
     if (bi_exists[i]==true)
       boundary_indicators[bi_counter++]=i;
+
+  return boundary_indicators;
 }
 
 #endif

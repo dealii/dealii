@@ -1702,21 +1702,19 @@ class Triangulation : public Subscriptor
     const Boundary<dim> & get_boundary (const unsigned int number) const;
 
 				     /**
-				      * Fill the boundary_indicators
-				      * vector with all boundary
-				      * indicators assigned to
-				      * boundary faces of this
-				      * Triangulation object. Note,
-				      * that each boundary indicator
-				      * is reported only once. The
-				      * boundary_indicators vector
-				      * will be resized to match the
-				      * number of different indicators
-				      * (which is greater or equal
-				      * one).
+				      * Returns a vector containing
+				      * all boundary indicators
+				      * assigned to boundary faces of
+				      * this Triangulation
+				      * object. Note, that each
+				      * boundary indicator is reported
+				      * only once. The size of the
+				      * return vector will represent
+				      * the number of different
+				      * indicators (which is greater
+				      * or equal one).
 				      */
-    void get_boundary_indicators(
-      std::vector<unsigned char> &boundary_indicators) const;
+    std::vector<unsigned char> get_boundary_indicators() const;
     
 				     /**
 				      *  Copy a triangulation. This
