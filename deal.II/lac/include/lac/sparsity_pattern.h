@@ -33,6 +33,9 @@ class CompressedSparsityPattern;
  *@{
  */
 
+				 /**
+				  * @cond internal
+				  */
 namespace internals
 {
   namespace SparsityPatternIterators
@@ -260,7 +263,9 @@ namespace internals
     
   }
 }
-
+                                   /**
+                                    * @endcond
+                                    */
 
 
 /**

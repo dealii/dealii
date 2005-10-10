@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,6 +29,9 @@
 /*!@addtogroup Solvers */
 /*@{*/
 
+				 /**
+				  * @cond internal
+				  */
 namespace internal
 {
 				   /**
@@ -110,6 +113,9 @@ namespace internal
     };    
   }
 }
+                                   /**
+                                    * @endcond
+                                    */
 
 //! Generalized minimal residual method.
 /**
@@ -371,6 +377,7 @@ class SolverFGMRES : public Solver<VECTOR>
 /* --------------------- Inline and template functions ------------------- */
 
 
+#ifndef DOXYGEN
 namespace internal
 {
   namespace SolverGMRES
@@ -907,5 +914,7 @@ SolverFGMRES<VECTOR>::solve (
     throw SolverControl::NoConvergence (this->control().last_step(),
 					this->control().last_value());
 }
+
+#endif // DOXYGEN
 
 #endif

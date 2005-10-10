@@ -41,6 +41,9 @@ namespace PETScWrappers
                                    // forward declaration
   class VectorBase;
 
+				   /**
+				    * @cond internal
+				    */
   
 /**
  * A namespace for internal implementation details of the PETScWrapper
@@ -178,6 +181,9 @@ namespace PETScWrappers
         friend class ::PETScWrappers::VectorBase;
     };
   }
+                                   /**
+                                    * @endcond
+                                    */
   
 
 /**

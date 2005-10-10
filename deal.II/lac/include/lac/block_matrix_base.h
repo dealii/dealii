@@ -28,7 +28,9 @@
  *@{
  */
 
-
+				 /**
+				  * @cond internal
+				  */
 namespace internal
 {
 
@@ -215,6 +217,9 @@ namespace internal
     };
   }
 }
+                                   /**
+                                    * @endcond
+                                    */
 
 
 /**
@@ -887,6 +892,8 @@ class BlockMatrixBase : public Subscriptor
 
 
 /*@}*/
+
+#ifndef DOXYGEN
 /* ------------------------- Template functions ---------------------- */
 
 
@@ -1850,6 +1857,7 @@ BlockMatrixBase<MatrixType>::collect_sizes ()
   this->column_block_indices.reinit (col_sizes);
 }
 
+#endif // DOXYGEN
 
 
 #endif    // __deal2__block_matrix_base_h
