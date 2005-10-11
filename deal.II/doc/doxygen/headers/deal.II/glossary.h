@@ -41,11 +41,10 @@
  * <dt>@anchor GlossNodes Node values or node functionals</dt>
  *
  * <dd>It is customary to define a FiniteElement as a pair consisting
- * of a local function space and a set of node values
- * <i>(N<sub>i</sub>)</i> on the mesh cells (usually defined on the
- * @ref GlossReferenceCell "reference cell"). Then, the basis of the local
- * function space is chosen such that <i>N<sub>i</sub>(v<sub>j</sub>)
- * = &delta;<sub>ij</sub></i>, the Kronecker delta.
+ * of a local function space and a set of node values $N_i$ on the
+ * mesh cells (usually defined on the @ref GlossReferenceCell
+ * "reference cell"). Then, the basis of the local function space is
+ * chosen such that $N_i(v_j) = \delta_{ij}$, the Kronecker delta.
  *
  * This splitting has several advantages, concerning analysis as well
  * as implementation. For the analysis, it means that conformity with
@@ -80,12 +79,11 @@
  * <dt>@anchor GlossShape Shape functions</dt> <dd>The restriction of
  * the finite element basis functions to a single grid cell.</dd>
  *
- * <dt>@anchor GlossSupport Support points</dt>
- * <dd>Support points are by definition those points <i>p<sub>i</sub></i>,
- * such that for the shape functions <i>v<sub>j</sub></i> holds
- * <i>v<sub>j</sub>(p<sub>i</sub>) = &delta;<sub>ij</sub></i>. Therefore, a
- * finite element interpolation can be defined uniquely by the values in the
- * support points.
+ * <dt>@anchor GlossSupport Support points</dt> <dd>Support points are
+ * by definition those points $p_i$, such that for the shape functions
+ * $v_j$ holds $v_j(p_i) = \delta_{ij}$. Therefore, a finite element
+ * interpolation can be defined uniquely by the values in the support
+ * points.
  *
  * Lagrangian elements fill the vector accessed by
  * FiniteElementBase::get_unit_support_points(), such that the

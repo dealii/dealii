@@ -56,13 +56,12 @@
  *
  * <h4>Determining the correct basis</h4>
  *
- * In most cases, the set of desired node values <i>N<sub>i</sub></i>
- * and the basis functions <i>v<sub>j</sub></i> will not fulfil the
- * interpolation condition <i>N<sub>i</sub>(v<sub>j</sub>) =
- * &delta;<sub>ij</sub></i>.
+ * In most cases, the set of desired node values $N_i$ and the basis
+ * functions $v_j$ will not fulfil the interpolation condition
+ * $N_i(v_j) = \delta_{ij}$.
  *
  * The use of the membaer data #inverse_node_matrix allows to compute
- * the basis <i>v<sub>j</sub></i> automatically, after the node values
+ * the basis $v_j$ automatically, after the node values
  * for ech original basis function of the polynomial space have been
  * computed.
  *
