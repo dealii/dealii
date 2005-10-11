@@ -22,8 +22,9 @@
 
 
 
-
-
+				 /**
+				  * @cond internal
+				  */
 namespace internal
 {
 /**
@@ -836,7 +837,9 @@ namespace internal
     };    
   }  // namespace GridReordering3d
 }  // namespace internal
-
+				 /**
+				  * @endcond
+				  */
 
 
 #endif
