@@ -565,7 +565,7 @@ namespace internal
       return (sides[mquads[qnum].side[lsn]].v0 == 
 	      mquads[qnum].v[ConnectGlobals::DefaultOrientation[lsn][0]]);
     }
-  } // namespace GridReordering2
+  } // namespace GridReordering2d
 } // namespace internal
 
 
@@ -1428,8 +1428,8 @@ namespace internal
 	    the_cell.nodes[i] = temp[i];
 	}
     }
-  }
-}
+  } // namespace GridReordering3d
+} // namespace internal
 
 
 template<>
