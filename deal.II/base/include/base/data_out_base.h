@@ -1400,20 +1400,21 @@ class DataOutBase
  * i.e. two points each associated with one or more data sets.  There
  * are therefore 12 lines for each subcells of a patch.
  *
- * Given the lines as described above, a cut through this data in Gnuplot
- * can then be achieved like this:
+ * Given the lines as described above, a cut through this data in
+ * Gnuplot can then be achieved like this (& stands for the dollar
+ * sign in the following):
  * @verbatim
  *   set data style lines
- *   splot [:][:][0:] "T" using 1:2:($3==.5 ? $4 : -1)
+ *   splot [:][:][0:] "T" using 1:2:(&3==.5 ? &4 : -1)
  * @endverbatim
  *
  * This command plots data in x- and y-direction unbounded, but in
  * z-direction only those data points which are above the x-y-plane
  * (we assume here a positive solution, if it has negative values, you
  * might want to decrease the lower bound). Furthermore, it only takes
- * the data points with z-values (<tt>$3</tt>) equal to 0.5, i.e. a
+ * the data points with z-values (<tt>&3</tt>) equal to 0.5, i.e. a
  * cut through the domain at <tt>z=0.5</tt>. For the data points on
- * this plane, the data values of the first data set (<tt>$4</tt>) are
+ * this plane, the data values of the first data set (<tt>&4</tt>) are
  * raised in z-direction above the x-y-plane; all other points are
  * denoted the value <tt>-1</tt> instead of the value of the data
  * vector and are not plotted due to the lower bound in z plotting
