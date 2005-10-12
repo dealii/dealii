@@ -105,6 +105,8 @@ bool
 FE_DGP<dim>::has_support_on_face (const unsigned int,
 				  const unsigned int) const
 {
+                                   // all shape functions have support on all
+                                   // faces
   return true;
 }
 
