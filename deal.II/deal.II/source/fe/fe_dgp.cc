@@ -87,7 +87,7 @@ FE_DGP<dim>::clone() const
 
 template <int dim>
 std::vector<unsigned int>
-FE_DGP<dim>::get_dpo_vector(unsigned int deg)
+FE_DGP<dim>::get_dpo_vector(const unsigned int deg)
 {
   std::vector<unsigned int> dpo(dim+1, 0U);
   dpo[dim] = ++deg;
