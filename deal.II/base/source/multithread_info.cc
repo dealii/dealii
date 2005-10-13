@@ -61,7 +61,7 @@ unsigned int MultithreadInfo::get_n_cpus()
   while(cpuinfo)
     {
       cpuinfo >> search;
-      if (search.find("processor")!=std::string::npos)
+      if (search.find("processor") != std::string::npos)
 	nCPU++;	  
     }
   cpuinfo.close();
