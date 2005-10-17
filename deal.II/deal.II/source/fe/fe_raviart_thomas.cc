@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <base/quadrature.h>
+#include <base/quadrature_lib.h>
 #include <base/qprojector.h>
 #include <base/table.h>
 #include <grid/tria.h>
@@ -138,7 +139,9 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int rt_order)
 								    std::vector<bool>(dim,true))),
 		rt_order(rt_order),
                 polynomials (create_polynomials(rt_order)),
-                renumber (compute_renumber(rt_order))
+                renumber (compute_renumber(rt_order)),
+		face_quadrature((dim>1) ? rt_order+1 : 0),
+		legendre_polynomials(rt_order)
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
 
@@ -809,20 +812,54 @@ FE_RaviartThomas<3>::initialize_restriction ()
 #endif
 
 
-//TODO: Unit support points should go away according to new definition.
 
 template <int dim>
 void
-FE_RaviartThomas<dim>::initialize_support_points (const unsigned int)
+FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 {
-//   unsigned int n_face_points = (dim>1) ? 1 : 0;
-// 				   // compute (deg+1)^(dim-1)
-//   for (unsigned int d=1;d<dim;++d)
-//     n_face_points *= deg+1;
+  QGauss<dim> cell_quadrature(deg+1);
+  const unsigned int n_interior_points
+    = (deg>1) ? cell_quadrature.n_quadrature_points : 0;
   
-//   this->unit_generalized_support_points.resize (this->dofs_per_cell);
-//   this->generalized_face_support_points.resize (this->dofs_per_face);
+  unsigned int n_face_points = (dim>1) ? 1 : 0;
+				   // compute (deg+1)^(dim-1)
+  for (unsigned int d=1;d<dim;++d)
+    n_face_points *= deg+1;
+
   
+  this->generalized_support_points.resize (GeometryInfo<dim>::faces_per_cell*n_face_points
+					   +cell_quadrature.n_quadrature_points);
+  this->generalized_face_support_points.resize (n_face_points);
+  
+				   // Number of the point being entered
+  unsigned int current = 0;
+
+  if (dim>1)
+    {
+      QGauss<dim-1> face_points (deg+1);
+      Assert (face_points.n_quadrature_points == this->dofs_per_face,
+	      ExcInternalError());
+      
+      for (unsigned int k=0;k<this->dofs_per_face;++k)
+	this->generalized_face_support_points[k] = face_points.point(k);
+      Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(face_points);
+      for (unsigned int k=0;
+	   k<this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
+	   ++k)
+	this->generalized_support_points[k] = faces.point(k);
+
+      current = this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
+    }
+  
+  if (deg==0) return;
+  
+  for (unsigned int k=0;k<cell_quadrature.n_quadrature_points;++k)
+    this->generalized_support_points[current++] = cell_quadrature.point(k);
+  
+  Assert (current == this->generalized_support_points.size(),
+	  ExcInternalError());
+
+//TODO: Unit support points should go away according to new definition.
   
   this->unit_support_points.resize (this->dofs_per_cell);
   switch (dim) 
@@ -1867,6 +1904,43 @@ FE_RaviartThomas<dim>::has_support_on_face (const unsigned int shape_index,
   return true;
 }
 
+
+
+template <int dim>
+void
+FE_RaviartThomas<dim>::interpolate(
+  std::vector<double>&,
+  const std::vector<double>&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+
+template <int dim>
+void
+FE_RaviartThomas<dim>::interpolate(
+  std::vector<double>&    local_dofs,
+  const std::vector<Vector<double> >& values,
+  unsigned int offset) const
+{
+  Assert (values.size() == this->generalized_support_points.size(),
+	  ExcDimensionMismatch(values.size(), this->generalized_support_points.size()));
+  Assert (local_dofs.size() == this->dofs_per_cell,
+	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
+  Assert (values[0].size() >= offset+this->n_components(),
+	  ExcDimensionMismatch(values[0].size(),offset+this->n_components()));
+
+  std::fill(local_dofs.begin(), local_dofs.end(), 0.);
+}
+
+
+template <int dim>
+void
+FE_RaviartThomas<dim>::interpolate(
+  std::vector<double>& /*local_dofs*/,
+  const VectorSlice<const std::vector<std::vector<double> > >& /*values*/) const
+{}
 
 
 template <int dim>

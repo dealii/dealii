@@ -15,10 +15,13 @@
 
 #include <base/config.h>
 #include <base/polynomials_raviart_thomas.h>
+#include <base/polynomial.h>
 #include <base/tensor_product_polynomials.h>
 #include <base/geometry_info.h>
 #include <fe/fe.h>
 #include <fe/fe_poly_tensor.h>
+
+#include <vector>
 
 template <int dim> class MappingQ;
 
@@ -325,15 +328,15 @@ class FE_RaviartThomas : public FiniteElement<dim>
 			    typename Mapping<dim>::InternalDataBase      &fe_internal,
 			    FEValuesData<dim>& data) const;
 
-//     virtual void interpolate(std::vector<double>&                local_dofs,
-// 			     const std::vector<double>& values) const;
-//     virtual void interpolate(std::vector<double>&                local_dofs,
-// 			     const std::vector<Vector<double> >& values,
-// 			     unsigned int offset = 0) const;
+    virtual void interpolate(std::vector<double>&                local_dofs,
+			     const std::vector<double>& values) const;
+    virtual void interpolate(std::vector<double>&                local_dofs,
+			     const std::vector<Vector<double> >& values,
+			     unsigned int offset = 0) const;
     
-//     virtual void interpolate(
-//       std::vector<double>& local_dofs,
-//       const VectorSlice<const std::vector<std::vector<double> > >& values) const;
+    virtual void interpolate(
+      std::vector<double>& local_dofs,
+      const VectorSlice<const std::vector<std::vector<double> > >& values) const;
   private:
 				     /**
 				      * The order of the
@@ -548,6 +551,23 @@ class FE_RaviartThomas : public FiniteElement<dim>
 					  */
 	std::vector<std::vector<Tensor<2,dim> > > shape_gradients;
     };
+
+				     /**
+				      * The quadrature formula used to
+				      * generate support points on
+				      * faces and computing the
+				      * moments on faces. Its number
+				      * of points is one order higher
+				      * than the degree of the RT
+				      * space.
+				      */
+    QGauss<dim-1> face_quadrature;
+
+				     /**
+				      * Legendre polynomials are used
+				      * for computing the moments.
+				      */
+    std::vector<Polynomials::Polynomial<double> > legendre_polynomials;
     
 				     /**
 				      * Allow access from other
