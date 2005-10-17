@@ -443,7 +443,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      * class. Called from the
 				      * constructor.
 				      */
-    void initialize_unit_support_points ();
+    void initialize_support_points (const unsigned int rt_degree);
 
 				     /**
 				      * Initialize the
@@ -452,8 +452,7 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      * class. Called from the
 				      * constructor.
 				      */
-    void initialize_unit_face_support_points ();
-    
+    void initialize_face_support_points ();
 				     /**
 				      * Given a set of flags indicating
 				      * what quantities are requested
@@ -663,20 +662,12 @@ class FE_RaviartThomasNodal
     get_ria_vector (const unsigned int degree);
     				     /**
 				      * Initialize the
-				      * FiniteElement<dim>::unit_support_points
-				      * and FiniteElement<dim>::unit_face_support_points
+				      * FiniteElement<dim>::generalized_support_points
+				      * and FiniteElement<dim>::generalized_face_support_points
 				      * fields. Called from the
 				      * constructor.
 				      */
-    void initialize_unit_support_points (const unsigned int degree);
-
-				     /**
-				      * Initialize the
-				      * #inverse_node_matrix
-				      * field. Called from the
-				      * constructor.
-				      */
-    void initialize_node_matrix ();
+    void initialize_support_points (const unsigned int rt_degree);
 };
 
 
@@ -687,7 +678,7 @@ class FE_RaviartThomasNodal
 #ifndef DOXYGEN
 
 template <>
-void FE_RaviartThomas<1>::initialize_unit_face_support_points ();
+void FE_RaviartThomas<1>::initialize_face_support_points ();
 
 template <>
 std::vector<unsigned int> FE_RaviartThomas<1>::get_dpo_vector (const unsigned int);

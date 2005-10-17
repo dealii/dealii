@@ -54,7 +54,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 
 				   // Set up the generalized support
 				   // points
-  initialize_unit_support_points (deg);
+  initialize_support_points (deg);
 
 				   //Now compute the inverse node
 				   //matrix, generating the correct
@@ -338,7 +338,7 @@ FE_RaviartThomasNodal<dim>::get_ria_vector (const unsigned int deg)
 
 template <int dim>
 void
-FE_RaviartThomasNodal<dim>::initialize_unit_support_points (const unsigned int deg)
+FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
 {
   this->generalized_support_points.resize (this->dofs_per_cell);
   this->generalized_face_support_points.resize (this->dofs_per_face);
@@ -388,14 +388,6 @@ FE_RaviartThomasNodal<dim>::initialize_unit_support_points (const unsigned int d
     }
   Assert (current == this->dofs_per_cell, ExcInternalError());
 }
-
-
-template <int dim>
-void
-FE_RaviartThomasNodal<dim>::initialize_node_matrix ()
-{
-}
-
 
 
 template class FE_RaviartThomasNodal<deal_II_dimension>;

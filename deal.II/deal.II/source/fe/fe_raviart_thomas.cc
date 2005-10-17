@@ -167,8 +167,8 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int rt_order)
 
 				   // finally fill in support points
 				   // on cell and face
-  initialize_unit_support_points ();
-  initialize_unit_face_support_points ();
+  initialize_support_points (rt_order);
+  initialize_face_support_points ();
 
                                    // then make
                                    // system_to_component_table
@@ -809,10 +809,21 @@ FE_RaviartThomas<3>::initialize_restriction ()
 #endif
 
 
+//TODO: Unit support points should go away according to new definition.
+
 template <int dim>
 void
-FE_RaviartThomas<dim>::initialize_unit_support_points ()
+FE_RaviartThomas<dim>::initialize_support_points (const unsigned int)
 {
+//   unsigned int n_face_points = (dim>1) ? 1 : 0;
+// 				   // compute (deg+1)^(dim-1)
+//   for (unsigned int d=1;d<dim;++d)
+//     n_face_points *= deg+1;
+  
+//   this->unit_generalized_support_points.resize (this->dofs_per_cell);
+//   this->generalized_face_support_points.resize (this->dofs_per_face);
+  
+  
   this->unit_support_points.resize (this->dofs_per_cell);
   switch (dim) 
     {
@@ -893,7 +904,7 @@ FE_RaviartThomas<dim>::initialize_unit_support_points ()
 #if deal_II_dimension == 1
 
 template <>
-void FE_RaviartThomas<1>::initialize_unit_face_support_points ()
+void FE_RaviartThomas<1>::initialize_face_support_points ()
 {
 				   // no faces in 1d, so nothing to do
 }
@@ -902,7 +913,7 @@ void FE_RaviartThomas<1>::initialize_unit_face_support_points ()
 
 
 template <int dim>
-void FE_RaviartThomas<dim>::initialize_unit_face_support_points ()
+void FE_RaviartThomas<dim>::initialize_face_support_points ()
 {
   this->unit_face_support_points.resize (this->dofs_per_face);
 
