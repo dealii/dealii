@@ -342,7 +342,8 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
 {
   this->generalized_support_points.resize (this->dofs_per_cell);
   this->generalized_face_support_points.resize (this->dofs_per_face);
-  
+
+				   // Number of the point being entered
   unsigned int current = 0;
 
 				   // On the faces, we choose as many
@@ -359,8 +360,9 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
       for (unsigned int k=0;k<this->dofs_per_face;++k)
 	this->generalized_face_support_points[k] = face_points.point(k);
       Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(face_points);
-      for (unsigned int k=0;k<//faces.n_quadrature_points
-			  this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;++k)
+      for (unsigned int k=0;
+	   k<this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
+	   ++k)
 	this->generalized_support_points[k] = faces.point(k);
 
       current = this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
