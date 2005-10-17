@@ -468,9 +468,6 @@ FiniteElement<dim>::get_generalized_support_points () const
 				   // support points, but only if
 				   // there are as many as there are
 				   // degrees of freedom
-  Assert ((generalized_support_points.size() == 0) ||
-	  (generalized_support_points.size() == this->dofs_per_cell),
-	  ExcInternalError());
   return ((generalized_support_points.size() == 0)
 	  ? unit_support_points
 	  : generalized_support_points);
@@ -533,9 +530,6 @@ FiniteElement<dim>::get_generalized_face_support_points () const
 				   // support points, but only if
 				   // there are as many as there are
 				   // degrees of freedom on a face
-  Assert ((generalized_face_support_points.size() == 0) ||
-	  (generalized_face_support_points.size() == this->dofs_per_face),
-	  ExcInternalError());
   return ((generalized_face_support_points.size() == 0)
 	  ? unit_face_support_points
 	  : generalized_face_support_points);
