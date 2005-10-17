@@ -27,67 +27,58 @@ template <int dim> class MappingQ;
 /*@{*/
 
 /**
- * Implementation of continuous Raviart-Thomas elements for the space
- * H_div. Note, however, that continuity only concerns the normal
- * component of the vector field.
+ * Implementation of Raviart-Thomas (RT) elements, conforming with the
+ * space H<sup>div</sup>. These elements generate vector fields with
+ * normel components continuous between mesh cells.
  *
- * The constructor of this class takes the degree @p p of this finite
- * element. The numbering of the degree of this element in the
- * literature is somewhat funny: the degree is defined not as the
- * polynomial degree of the finite element space, but as that of the
- * normal component of the traces onto the boundary. Thus, the lowest
- * order, zero, has linear shape functions, but on the faces, the
- * traces of the normal component of these elements is constant on
- * each face.
+ * We follow the usual definition of the degree of RT elements, which
+ * denotes the polynomial degree of the largest complete polynomial
+ * subspace contained in the RT space. Then, approciamtion order of
+ * the function itself is <i>degree+1</i>, as with usual polynomial
+ * spaces.
  * 
- * 
- * <h3>Interpolation to finer and coarser meshes</h3>
+ * <h3>Interpolation</h3>
  *
- * Each finite element class in deal.II provides matrices that are
- * used to interpolate from coarser to finer meshes and the other way
- * round. Interpolation from a mother cell to its children is usually
- * trivial, since finite element spaces are normally nested and this
- * kind of interpolation is therefore exact. On the other hand, when
- * we interpolate from child cells to the mother cell, we usually have
- * to throw away some information.
+ * The @ref GlossInterpolation "interpolation" operators associated
+ * with the RT element are constructed such that interpolation and
+ * computing the divergence are commuting operations. We require this
+ * from interpolating arbitrary functions as well as the #restriction
+ * matrices.  It can be achieved by two interpolation schemes, the
+ * simplified one in FE_RaviartThomasNodal and the original one here:
  *
- * For continuous elements, this transfer usually happens by
- * interpolating the values on the child cells at the support points
- * of the shape functions of the mother cell. However, for
- * discontinuous elements, we often use a projection from the child
- * cells to the mother cell. The projection approach is only possible
- * for discontinuous elements, since it cannot be guaranteed that the
- * values of the projected functions on one cell and its neighbor
- * match. In this case, only an interpolation can be
- * used. (Internally, whether the values of a shape function are
- * interpolated or projected, or better: whether the matrices the
- * finite element provides are to be treated with the properties of a
- * projection or of an interpolation, is controlled by the
- * @p restriction_is_additive flag. See there for more information.)
+ * <h4>Node values on edges/faces</h4>
  *
- * Here, things are not so simple: since the element has some
- * continuity requirements across faces, we can only resort to some
- * kind of interpolation. On the other hand, for the lowest order
- * elements, the values of generating functionals are the (constant)
- * tangential values of the shape functions. We would therefore really
- * like to take the mean value of the normal values of the child
- * faces, and make this the value of the mother face. Then, however,
- * taking a mean value of two piecewise constant function is not an
- * interpolation, but a restriction. Since this is not possible, we
- * cannot use this.
+ * On edges or faces, the @GlossNodes "node values" are the moments of
+ * the normal component of the interpolated function with respect to
+ * the traces of the RT polynomials. Since the normal trace of the RT
+ * space of degree <i>k</i> on an edge/face is the space
+ * <i>Q<sub>k</sub></i>, the moments are taken with respect to this
+ * space.
  *
- * To make a long story somewhat shorter, when interpolating from
- * refined edges to a coarse one, we do not take the mean value, but
- * pick only one (the one from the first child edge). While this is
- * not optimal, it is certainly a valid choice (using an interpolation
- * point that is not in the middle of the cell, but shifted to one
- * side), and it also preserves the order of the interpolation.
- * 
+ * <h4>Interior node values</h4>
  *
+ * Higher order RT spaces have interior nodes. These are moments taken
+ * with respect to the gradient of functions in <i>Q<sub>k</sub></i>
+ * on the cell (this space is the matching space for RT<sub>k</sub> in
+ * a mixed formulation).
+ *
+ * <h4>Generalized support points</h4>
+ *
+ * The node values above rely on integrals, which will be computed by
+ * quadrature rules themselves. The generalized support points are a
+ * set of points such that this quadrature can be performed with
+ * sufficient accuracy. The points needed are thode of
+ * QGauss<sub>k+1</k> on each face as well as QGauss<sub>k</k> in
+ * the interior of the cell (or none for RT<sub>0</sub>).
+ *
+ * @internal
  * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
- * Raviart-Thomas elements have their degrees of freedom on edges, with shape
- * functions being vector valued and pointing in normal
+ * This paragraph is obsolete and will be removed after reconstruction
+ * of the element is complete.
+ *
+ * Raviart-Thomas elements have their degrees of freedom on edges,
+ * with shape functions being vector valued and pointing in normal
  * direction. We use the standard enumeration and direction of edges
  * in deal.II, yielding the following shape functions in 2d:
  *
