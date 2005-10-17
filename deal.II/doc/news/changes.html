@@ -109,6 +109,16 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 <ol>
   <li> <p>
+       Fixed: The <code class="class">SparseMatrix</code> iterators had a
+       problem when one wrote code like <code>iterator->value()=0</code>
+       (i.e. with a zero integer, rather than a floating point number on the
+       right), in that that opened up a second conversion sequence and the
+       compiler complained about an ambiguity. This is now fixed.
+       <br> 
+       (WB 2005/10/17)
+       </p>
+
+  <li> <p>
        New: Now the class <code class="class">SparseILU</code> supports
        also the <code class="member">Tvmult</code> method. This feature
        allows the straightforward use of <code class="class">SparseILU</code>
@@ -116,7 +126,6 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        <br> 
        (Oliver Kayser-Herold 2005/09/15)
        </p>
-
 </ol>
 
 

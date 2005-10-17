@@ -155,14 +155,46 @@ namespace internals
                                           * address of this matrix entry, we
                                           * have to go through functions to do
                                           * all this.
+                                          *
+                                          * The constructor takes a pointer to
+                                          * an accessor object that describes
+                                          * which element of the matrix it
+                                          * points to. This creates an
+                                          * ambiguity when one writes code
+                                          * like iterator->value()=0 (instead
+                                          * of iterator->value()=0.0), since
+                                          * the right hand side is an integer
+                                          * that can both be converted to a
+                                          * <tt>number</tt> (i.e., most
+                                          * commonly a double) or to another
+                                          * object of type
+                                          * <tt>Reference</tt>. The compiler
+                                          * then complains about not knowing
+                                          * which conversion to take.
+                                          *
+                                          * For some reason, adding another
+                                          * overload operator=(int) doesn't
+                                          * seem to cure the problem. We avoid
+                                          * it, however, by adding a second,
+                                          * dummy argument to the Reference
+                                          * constructor, that is unused, but
+                                          * makes sure there is no second
+                                          * matching conversion sequence using
+                                          * a one-argument right hand side.
+                                          *
+                                          * The testcase oliver_01 checks that
+                                          * this actually works as intended.
                                           */
         class Reference 
         {
           public:
                                              /**
-                                              * Constructor.
+                                              * Constructor. For the second
+                                              * argument, see the general
+                                              * class documentation.
                                               */
-            Reference (const Accessor *accessor);
+            Reference (const Accessor *accessor,
+                       const bool dummy);
 
                                              /**
                                               * Conversion operator to the
@@ -175,7 +207,7 @@ namespace internals
                                               * we presently point to to @p n.
                                               */
             const Reference & operator = (const number n) const;
-            
+
                                              /**
                                               * Add @p n to the element of the
                                               * matrix we presently point to.
@@ -275,6 +307,11 @@ namespace internals
                                       * denotes the underlying numeric type,
                                       * the second the constness of the
                                       * matrix.
+                                      *
+                                      * Since there is a specialization of
+                                      * this class for
+                                      * <tt>Constness=false</tt>, this class
+                                      * is for iterators to constant matrices.
 				      */
     template <typename number, bool Constness>
     class Iterator
@@ -1956,7 +1993,8 @@ namespace internals
     template <typename number>
     inline
     Accessor<number, false>::Reference::
-    Reference (const Accessor *accessor)
+    Reference (const Accessor *accessor,
+               const bool)
                     :
                     accessor (accessor)
     {}
@@ -2067,7 +2105,7 @@ namespace internals
     typename Accessor<number, false>::Reference
     Accessor<number, false>::value() const
     {
-      return this;
+      return Reference(this,true);
     }
 
 
