@@ -35,7 +35,7 @@ fill_vector (std::vector<Quadrature<dim> *>& quadratures)
   quadratures.push_back (new QSimpson<dim>());
   quadratures.push_back (new QMilne<dim>());
   quadratures.push_back (new QWeddle<dim>());
-  for (unsigned int i=1;i<9;++i)
+  for (unsigned int i=0;i<9;++i)
     {
       quadratures.push_back (new QGauss<dim>(i));
     }
