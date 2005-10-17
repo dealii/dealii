@@ -51,6 +51,9 @@ QGauss<1>::QGauss (const unsigned int n)
                 :
                 Quadrature<1> (n)
 {
+  if (n == 0)
+    return;
+  
   const unsigned int m = (n+1)/2;
 
                                    // tolerance for the Newton

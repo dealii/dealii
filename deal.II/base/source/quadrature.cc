@@ -140,13 +140,16 @@ Quadrature<dim>::Quadrature (const SubQuadrature &q1,
       };
 
 #ifdef DEBUG
-  double sum = 0;
-  for (unsigned int i=0; i<n_quadrature_points; ++i)
-    sum += weights[i];
-				   // we cant guarantee the sum of weights
-				   // to be exactly one, but it should be
-				   // near that. 
-  Assert ((sum>0.999999) && (sum<1.000001), ExcInternalError());
+  if (n_quadrature_points > 0)
+    {
+      double sum = 0;
+      for (unsigned int i=0; i<n_quadrature_points; ++i)
+	sum += weights[i];
+				       // we cant guarantee the sum of weights
+				       // to be exactly one, but it should be
+				       // near that. 
+      Assert ((sum>0.999999) && (sum<1.000001), ExcInternalError());
+    }
 #endif
 }
 
