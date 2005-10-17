@@ -70,6 +70,7 @@ tests_x = geometry_info_* \
 	  nedelec_* \
 	  get_fe_from_name \
 	  christian_* \
+	  oliver_* \
 	  accessor_equality*
 
 # tests for the hp branch:
