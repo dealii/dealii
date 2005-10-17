@@ -20,7 +20,7 @@
  * regular @ref GlossSupport "support points". Instead, FiniteElement defines
  * a couple of interpolation functions doing the actual interpolation.
  *
- * @note If a finite element is Lagrangian, generalized support points
+ * If a finite element is Lagrangian, generalized support points
  * and support points coincide.
  * </dd>
  *
@@ -70,6 +70,9 @@
  * <tr><th>FE_RaviartThomas (2d)</th>
  * <td><i>Q<sub>k+1,k</sub> x Q<sub>k,k+1</sub></i></td>
  * <td>moments on edges and in the interior</td></tr>
+ * <tr><th>FE_RaviartThomasNodal</th>
+ * <td><i>Q<sub>k+1,k</sub> x Q<sub>k,k+1</sub></i></td>
+ * <td>Gauss points on edges(faces) and anisotropic Gauss points in the interior</td></tr>
  * </table>
  *
  * <dt>@anchor GlossReferenceCell Reference cell</dt>
