@@ -82,6 +82,18 @@ class TableIndicesBase
 template <int N>
 class TableIndices
 {
+				     /**
+				      * Standard constructor, setting
+				      * all indices to zero.
+				      */
+    TableIndices();
+				     /**
+				      * The actual constructor, taking
+				      * @p N arguments of type
+				      * <tt>unsigned int</tt> to
+				      * initialize the index object.
+				      */
+    TableIndices(...);
 };
 
 
