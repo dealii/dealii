@@ -24,6 +24,11 @@
 template <int dim> class Point;
 
 /**
+ * @addtogroup Polynomials
+ * @{
+ */
+
+/**
  * A namespace in which classes relating to the description of
  * 1d polynomial spaces are declared.
  */
@@ -531,6 +536,7 @@ namespace Polynomials
    };  
 }
 
+/** @} */
 
 /* -------------------------- inline functions --------------------- */
 

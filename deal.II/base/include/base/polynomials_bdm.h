@@ -26,6 +26,11 @@
 
 
 /**
+ * @addtogroup Polynomials
+ * @{
+ */
+
+/**
  * @brief The set of BDM polynomials on tensor product cells
  *
  * This class implements the <i>H<sup>div</sup></i>-conforming,
@@ -159,7 +164,7 @@ class PolynomialsBDM
     mutable std::vector<Tensor<2,dim> > p_grad_grads;
 };
 
-
+/** @} */
 
 template <int dim>
 inline unsigned int

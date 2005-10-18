@@ -25,6 +25,10 @@
 
 #include <vector>
 
+/**
+ * @addtogroup Polynomials
+ * @{
+ */
 
 /**
  * This class implements the <i>H<sup>div</sup></i>-conforming,
@@ -153,7 +157,7 @@ class PolynomialsRaviartThomas
     mutable std::vector<Tensor<2,dim> > p_grad_grads;
 };
 
-
+/** @} */
 
 template <int dim>
 inline unsigned int

@@ -24,6 +24,11 @@
 
 
 /**
+ * @addtogroup Polynomials
+ * @{
+ */
+
+/**
  * Tensor product of given polynomials.
  *
  * Given a vector of <i>n</i> one-dimensional polynomials
@@ -484,6 +489,7 @@ class AnisotropicPolynomials
     get_n_tensor_pols (const std::vector<std::vector<Polynomials::Polynomial<double> > > &pols);
 };
 
+/** @} */
 
 #ifndef DOXYGEN
 

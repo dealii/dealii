@@ -24,11 +24,12 @@
 
 #include <vector>
 
+/**
+ * @addtogroup Polynomials
+ * @{
+ */
 
 /**
- * @brief The complete polynomial space of degree <tt>p</tt> based on
- * the monomials.
- *
  * This class implements the polynomial space of degree <tt>p</tt>
  * based on the monomials ${1,x,x^2,...}$. I.e. in <tt>d</tt>
  * dimensions it constructs all polynomials of the form $\prod_{i=1}^d
@@ -91,7 +92,7 @@ class PolynomialsP: public PolynomialSpace<dim>
     const unsigned int p;
 };
 
-
+/** @} */
 
 template <int dim>
 inline unsigned int
