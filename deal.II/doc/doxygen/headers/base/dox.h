@@ -54,3 +54,7 @@
  * specialized needs, like DataOutFaces, DataOutRotation and
  * DataOutStack.
  */
+
+/**
+ * @defgroup Polynomials Polynomials and polynomial spaces
+ */
