@@ -19,7 +19,7 @@
 
 #include <fstream>
 
-// FE_Q<dim>::interpolate(...)
+// FE_RaviartThomasNodal<dim>::interpolate(...)
 
 template <int dim>
 void check1(const Function<dim>& f,
