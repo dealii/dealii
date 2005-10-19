@@ -19,13 +19,13 @@
 
 #include <fstream>
 
-// FE_RaviartThomasNodal<dim>::interpolate(...)
+// FE_RaviartThomas<dim>::interpolate(...)
 
 template <int dim>
 void check1(const Function<dim>& f,
 	    const unsigned int degree)
 {
-  FE_RaviartThomasNodal<dim> fe(degree);
+  FE_RaviartThomas<dim> fe(degree);
   deallog << fe.get_name() << ' ';
   deallog << fe.get_generalized_support_points().size() << ' ';
   
@@ -51,23 +51,23 @@ void check1(const Function<dim>& f,
 
 int main()
 {
-  std::ofstream logfile ("interpolate_rtn.output");
+  std::ofstream logfile ("interpolate_rt.output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-13);
+  deallog.threshold_double(1.e-15);
 
-//    Q1WedgeFunction<1,1,2> w1;
-//    check1(w1,1,2);
-//    check1(w1,2,2);
-//    check1(w1,3,2);
-  Q1WedgeFunction<2,1,2> w2;
-  check1(w2,1);
-  check1(w2,2);
+//   Q1WedgeFunction<1,1,2> w1;
+//   check1(w1,1,2);
+//   check1(w1,2,2);
+//   check1(w1,3,2);
+  Q1WedgeFunction<2,1,2> w21;
+  check1(w21,1);
+  check1(w21,2);
   Q1WedgeFunction<2,2,2> w22;
   check1(w22,2);
   Q1WedgeFunction<2,3,2> w23;
   check1(w23,3);
-  Q1WedgeFunction<3,1,3> w3;
-  check1(w3,1);
-  check1(w3,2);
+//  Q1WedgeFunction<3,1,3> w3;
+//  check1(w3,1);
+//  check1(w3,2);
 }
