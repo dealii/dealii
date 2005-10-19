@@ -11,7 +11,7 @@
 //
 //----------------------------------------------------------------------
 
-// FE_RaviartThomasNodal and FE_RaviartThomas
+// compare the FE_RaviartThomasNodal and FE_RaviartThomas elements
 
 // compare the shape funcions and shape values after converting to the
 // same basis.
