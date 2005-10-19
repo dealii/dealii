@@ -30,7 +30,7 @@
 char fname[50];
 
 ////////////////////////////////////////////////////////////////////////////
-// Plot shape function values at quarature points inside the cell [0,1]^d
+// Plot shape function values at quadrature points inside the cell [0,1]^d
 //
 // Output values in each line are
 //
