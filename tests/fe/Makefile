@@ -30,7 +30,8 @@ tests = fe_data_test traits fe_tools fe_tools_test mapping \
         transfer internals \
 	dgq_1 \
 	q_1 q_2 q_3 q_4 interpolate_q1 \
-	rt_1 rt_2 rt_3 rt_4 rt_5 rt_6 rtdiff rtn_1 interpolate_rt interpolate_rtn \
+	rt_1 rt_2 rt_3 rt_4 rt_5 rt_6 rt_7 rtdiff rtn_1 rtn_2 \
+	interpolate_rt interpolate_rtn \
 	dgp_monomial_1 dgp_monomial_2 \
 	system_1 interpolate_system \
         non_primitive_1 non_primitive_2 \
