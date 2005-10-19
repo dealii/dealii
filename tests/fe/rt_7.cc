@@ -37,7 +37,7 @@ template<int dim>
 void
 plot_shape_functions(const unsigned int degree)
 {
-  FE_RaviartThomasNodal<dim> fe_rt(degree);
+  FE_RaviartThomas<dim> fe_rt(degree);
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
 
