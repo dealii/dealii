@@ -14,6 +14,7 @@
 #define __deal2__fe_raviart_thomas_h
 
 #include <base/config.h>
+#include <base/table.h>
 #include <base/polynomials_raviart_thomas.h>
 #include <base/polynomial.h>
 #include <base/tensor_product_polynomials.h>
@@ -33,6 +34,10 @@ template <int dim> class MappingQ;
  * Implementation of Raviart-Thomas (RT) elements, conforming with the
  * space H<sup>div</sup>. These elements generate vector fields with
  * normel components continuous between mesh cells.
+ *
+ * @todo Right now, the description of node values and interpolation
+ * does not match the actual state of this class. This will be
+ * improved after some discussion.
  *
  * We follow the usual definition of the degree of RT elements, which
  * denotes the polynomial degree of the largest complete polynomial
@@ -278,6 +283,15 @@ class FE_RaviartThomas : public FiniteElement<dim>
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
 
+    virtual void interpolate(std::vector<double>&                local_dofs,
+			     const std::vector<double>& values) const;
+    virtual void interpolate(std::vector<double>&                local_dofs,
+			     const std::vector<Vector<double> >& values,
+			     unsigned int offset = 0) const;
+    
+    virtual void interpolate(
+      std::vector<double>& local_dofs,
+      const VectorSlice<const std::vector<std::vector<double> > >& values) const;
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -328,15 +342,6 @@ class FE_RaviartThomas : public FiniteElement<dim>
 			    typename Mapping<dim>::InternalDataBase      &fe_internal,
 			    FEValuesData<dim>& data) const;
 
-    virtual void interpolate(std::vector<double>&                local_dofs,
-			     const std::vector<double>& values) const;
-    virtual void interpolate(std::vector<double>&                local_dofs,
-			     const std::vector<Vector<double> >& values,
-			     unsigned int offset = 0) const;
-    
-    virtual void interpolate(
-      std::vector<double>& local_dofs,
-      const VectorSlice<const std::vector<std::vector<double> > >& values) const;
   private:
 				     /**
 				      * The order of the
@@ -440,11 +445,14 @@ class FE_RaviartThomas : public FiniteElement<dim>
     void initialize_restriction ();
     
 				     /**
-				      * Initialize the
-				      * @p unit_support_points field
-				      * of the FiniteElement
-				      * class. Called from the
-				      * constructor.
+				      * Initialize the @p
+				      * generalized_support_points
+				      * field of the FiniteElement
+				      * class and fill the tables with
+				      * interpolation weights
+				      * (#boundary_weights and
+				      * #interior_weights). Called
+				      * from the constructor.
 				      */
     void initialize_support_points (const unsigned int rt_degree);
 
@@ -553,21 +561,31 @@ class FE_RaviartThomas : public FiniteElement<dim>
     };
 
 				     /**
-				      * The quadrature formula used to
-				      * generate support points on
-				      * faces and computing the
-				      * moments on faces. Its number
-				      * of points is one order higher
-				      * than the degree of the RT
-				      * space.
+				      * These are the factors
+				      * multiplied to a function in
+				      * the
+				      * #generalized_face_support_points
+				      * when computing the
+				      * integration. They are
+				      * organized such that there is
+				      * one row for each generalized
+				      * face support point and one
+				      * column for each degree of
+				      * freedom on the face.
 				      */
-    QGauss<dim-1> face_quadrature;
-
+    Table<2, double> boundary_weights;
 				     /**
-				      * Legendre polynomials are used
-				      * for computing the moments.
+				      * Precomputed factors for
+				      * interpolation of interior
+				      * degrees of freedom. The
+				      * rationale for this Table is
+				      * the same as for
+				      * #boundary_weights. Only, this
+				      * table has a third coordinate
+				      * for the space direction of the
+				      * component evaluated.
 				      */
-    std::vector<Polynomials::Polynomial<double> > legendre_polynomials;
+    Table<3, double> interior_weights;
     
 				     /**
 				      * Allow access from other

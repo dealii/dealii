@@ -139,9 +139,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int rt_order)
 								    std::vector<bool>(dim,true))),
 		rt_order(rt_order),
                 polynomials (create_polynomials(rt_order)),
-                renumber (compute_renumber(rt_order)),
-		face_quadrature((dim>1) ? rt_order+1 : 0),
-		legendre_polynomials(rt_order)
+                renumber (compute_renumber(rt_order))
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
 
@@ -812,14 +810,47 @@ FE_RaviartThomas<3>::initialize_restriction ()
 #endif
 
 
+#if deal_II_dimension == 1
 
+template <int dim>
+void
+FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
+{
+  return;
+  
+  Assert (false, ExcNotImplemented());
+  
+  QGauss<dim> cell_quadrature(deg+1);
+  const unsigned int n_interior_points
+    = (deg>0) ? cell_quadrature.n_quadrature_points : 0;
+  
+  this->generalized_support_points.resize (2 + n_interior_points);
+  
+				   // Number of the point being entered
+  unsigned int current = 0;
+
+  
+  if (deg==0) return;
+
+  interior_weights.reinit(TableIndices<3>(2+n_interior_points, 0, dim));
+  
+  for (unsigned int k=0;k<cell_quadrature.n_quadrature_points;++k)
+    this->generalized_support_points[current++] = cell_quadrature.point(k);
+  
+  Assert (current == this->generalized_support_points.size(),
+	  ExcInternalError());
+}
+
+#else
+
+// Version for 2d and higher. See above for 1d version
 template <int dim>
 void
 FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 {
   QGauss<dim> cell_quadrature(deg+1);
   const unsigned int n_interior_points
-    = (deg>1) ? cell_quadrature.n_quadrature_points : 0;
+    = (deg>0) ? cell_quadrature.n_quadrature_points : 0;
   
   unsigned int n_face_points = (dim>1) ? 1 : 0;
 				   // compute (deg+1)^(dim-1)
@@ -828,7 +859,7 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 
   
   this->generalized_support_points.resize (GeometryInfo<dim>::faces_per_cell*n_face_points
-					   +cell_quadrature.n_quadrature_points);
+					   + n_interior_points);
   this->generalized_face_support_points.resize (n_face_points);
   
 				   // Number of the point being entered
@@ -837,106 +868,72 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
   if (dim>1)
     {
       QGauss<dim-1> face_points (deg+1);
+      TensorProductPolynomials<dim-1> legendre
+	= Polynomials::Legendre::generate_complete_basis(deg);
+
+      boundary_weights.reinit(n_face_points, legendre.n());
+      
       Assert (face_points.n_quadrature_points == this->dofs_per_face,
 	      ExcInternalError());
       
-      for (unsigned int k=0;k<this->dofs_per_face;++k)
-	this->generalized_face_support_points[k] = face_points.point(k);
+      for (unsigned int k=0;k<n_face_points;++k)
+	{
+	  this->generalized_face_support_points[k] = face_points.point(k);
+					   // Compute its quadrature
+					   // contribution for each
+					   // moment.
+	  for (unsigned int i=0;i<legendre.n();++i)
+	    {
+	      boundary_weights(k, i)
+		= face_points.weight(k)
+		* legendre.compute_value(i, face_points.point(k));
+	    }
+	}
+      
       Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(face_points);
-      for (unsigned int k=0;
-	   k<this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
-	   ++k)
-	this->generalized_support_points[k] = faces.point(k);
-
-      current = this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
+      for (;current<GeometryInfo<dim>::faces_per_cell*n_face_points;
+	   ++current)
+	{
+					   // Enter the support point
+					   // into the vector
+	  this->generalized_support_points[current] = faces.point(current);
+	}
     }
   
   if (deg==0) return;
   
+				   // Create Legendre basis for the
+				   // space D_xi Q_k
+  std::vector<AnisotropicPolynomials<dim>* > polynomials(dim);
+  for (unsigned int dd=0;dd<dim;++dd)
+    {
+      std::vector<std::vector<Polynomials::Polynomial<double> > > poly(dim);
+      for (unsigned int d=0;d<dim;++d)
+	poly[d] = Polynomials::Legendre::generate_complete_basis(deg);
+      poly[dd] = Polynomials::Legendre::generate_complete_basis(deg-1);
+
+      polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
+    }
+  
+  interior_weights.reinit(TableIndices<3>(n_interior_points, polynomials[0]->n(), dim));
+  
   for (unsigned int k=0;k<cell_quadrature.n_quadrature_points;++k)
-    this->generalized_support_points[current++] = cell_quadrature.point(k);
+    {
+      this->generalized_support_points[current++] = cell_quadrature.point(k);
+      for (unsigned int i=0;i<polynomials[0]->n();++i)
+	for (unsigned int d=0;d<dim;++d)
+	  interior_weights(k,i,d) = cell_quadrature.weight(k)
+				    * polynomials[d]->compute_value(i,cell_quadrature.point(k));
+    }
+
+  for (unsigned int d=0;d<dim;++d)
+    delete polynomials[d];
   
   Assert (current == this->generalized_support_points.size(),
 	  ExcInternalError());
-
-//TODO: Unit support points should go away according to new definition.
-  
-  this->unit_support_points.resize (this->dofs_per_cell);
-  switch (dim) 
-    {
-      case 2:
-      {
-        Assert (rt_order+1 == this->dofs_per_face, ExcInternalError());
-        
-                                         // associate support points
-                                         // with mid-face points if a
-                                         // shape function has a
-                                         // non-zero normal component
-                                         // there, otherwise with the
-                                         // cell center. the reason
-                                         // for this non-unique
-                                         // support point is that we
-                                         // use hierarchical shape
-                                         // functions, rather than
-                                         // Lagrange functions, for
-                                         // which we get into the same
-                                         // trouble as in the
-                                         // FE_Q_Hierarchical element;
-                                         // see the respective
-                                         // function there
-
-                                         // start with the face shape
-                                         // functions
-        for (unsigned int i=0; i<this->dofs_per_face; ++i)
-          this->unit_support_points[0*this->dofs_per_face+i] = Point<dim>(.5, .0);
-        for (unsigned int i=0; i<this->dofs_per_face; ++i)
-          this->unit_support_points[1*this->dofs_per_face+i] = Point<dim>(1., .5);
-        for (unsigned int i=0; i<this->dofs_per_face; ++i)
-          this->unit_support_points[2*this->dofs_per_face+i] = Point<dim>(.5, 1.);
-        for (unsigned int i=0; i<this->dofs_per_face; ++i)
-          this->unit_support_points[3*this->dofs_per_face+i] = Point<dim>(.0, .5);
-
-                                         // associate the rest with
-                                         // the cell center
-        for (unsigned int i=4*this->dofs_per_face; i<this->dofs_per_cell; ++i)
-          this->unit_support_points[i] = Point<dim>(.5, .5);
-        
-        break;
-      }
-
-      case 3:
-      {
-                                         // same as in 2d
-        Assert ((rt_order+1)*(rt_order+1) == this->dofs_per_face, ExcInternalError());
-        
-                                         // start with the face shape
-                                         // functions
-        for (unsigned int i=0; i<this->dofs_per_face; ++i)
-          this->unit_support_points[0*this->dofs_per_face+i] = Point<dim>(.5, .0, .5);
-        for (unsigned int i=0; i<this->dofs_per_face; ++i)
-          this->unit_support_points[1*this->dofs_per_face+i] = Point<dim>(.5, 1., .5);
-        for (unsigned int i=0; i<this->dofs_per_face; ++i)
-          this->unit_support_points[2*this->dofs_per_face+i] = Point<dim>(.5, .5, 0.);
-        for (unsigned int i=0; i<this->dofs_per_face; ++i)
-          this->unit_support_points[3*this->dofs_per_face+i] = Point<dim>(1., .5, .5);
-        for (unsigned int i=0; i<this->dofs_per_face; ++i)
-          this->unit_support_points[4*this->dofs_per_face+i] = Point<dim>(.5, .5, 1.);
-        for (unsigned int i=0; i<this->dofs_per_face; ++i)
-          this->unit_support_points[5*this->dofs_per_face+i] = Point<dim>(.0, .5, .5);
-
-                                         // associate the rest with
-                                         // the cell center
-        for (unsigned int i=6*this->dofs_per_face; i<this->dofs_per_cell; ++i)
-          this->unit_support_points[i] = Point<dim>(.5, .5, .5);
-        
-        break;
-      }
-
-      default:
-	    Assert (false, ExcNotImplemented());
-    };
 }
 
+#endif
 
 #if deal_II_dimension == 1
 
@@ -1932,15 +1929,42 @@ FE_RaviartThomas<dim>::interpolate(
 	  ExcDimensionMismatch(values[0].size(),offset+this->n_components()));
 
   std::fill(local_dofs.begin(), local_dofs.end(), 0.);
+
+  const unsigned int n_face_points = boundary_weights.size(0);
+  for (unsigned int face=0;face<GeometryInfo<dim>::faces_per_cell;++face)
+    for (unsigned int k=0;k<n_face_points;++k)
+      for (unsigned int i=0;i<boundary_weights.size(1);++i)
+      {
+	local_dofs[i] += boundary_weights(k,i)
+			 * values[face*n_face_points+k](offset+GeometryInfo<dim>::unit_normal_direction[face]);
+      }
 }
 
 
 template <int dim>
 void
 FE_RaviartThomas<dim>::interpolate(
-  std::vector<double>& /*local_dofs*/,
-  const VectorSlice<const std::vector<std::vector<double> > >& /*values*/) const
-{}
+  std::vector<double>& local_dofs,
+  const VectorSlice<const std::vector<std::vector<double> > >& values) const
+{
+  Assert (values.size() == this->n_components(),
+	  ExcDimensionMismatch(values.size(), this->n_components()));
+  Assert (values[0].size() == this->generalized_support_points.size(),
+	  ExcDimensionMismatch(values[0].size(), this->generalized_support_points.size()));
+  Assert (local_dofs.size() == this->dofs_per_cell,
+	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
+
+  std::fill(local_dofs.begin(), local_dofs.end(), 0.);
+
+  const unsigned int n_face_points = boundary_weights.size(0);
+  for (unsigned int face=0;face<GeometryInfo<dim>::faces_per_cell;++face)
+    for (unsigned int k=0;k<n_face_points;++k)
+      for (unsigned int i=0;i<boundary_weights.size(1);++i)
+      {
+	local_dofs[i] += boundary_weights(k,i)
+			 * values[GeometryInfo<dim>::unit_normal_direction[face]][face*n_face_points+k];
+      }
+}
 
 
 template <int dim>
