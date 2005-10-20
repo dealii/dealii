@@ -24,29 +24,6 @@
 
 #include <cmath>
 
-// Remark: The following explicit instantiations needed to be moved to
-// this place here to work around a problem with gcc3.3 on Apple MacOSX.
-// The reason is that some of the functions instantiated here are used
-// further down; if they are not explicitly instantiated here, then the
-// compiler will do an implicit instantiation and give it internal linkage
-// (despite the later explicit instantiation that should make sure it
-// gets external linkage). To make sure the functions have external
-// linkage, we need to place the explicit instantiation before the first
-// use.
-//
-// For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
-// +++++++++++++
-
-
-template class TriaObjectAccessor<1, deal_II_dimension>;
-
-#if deal_II_dimension >= 2
-template class TriaObjectAccessor<2, deal_II_dimension>;
-#endif
-
-#if deal_II_dimension >= 3
-template class TriaObjectAccessor<3, deal_II_dimension>;
-#endif
 
 
 /*------------------------ Functions: LineAccessor ---------------------------*/
@@ -1625,6 +1602,29 @@ set_face_orientation (const unsigned int face,
                               +
                               face]  = orientation;
 }
+
+
+// Remark: The following explicit instantiations needed to be moved to
+// this place here to work around a problem with gcc3.3 on Apple MacOSX.
+// The reason is that some of the functions instantiated here are used
+// further down; if they are not explicitly instantiated here, then the
+// compiler will do an implicit instantiation and give it internal linkage
+// (despite the later explicit instantiation that should make sure it
+// gets external linkage). To make sure the functions have external
+// linkage, we need to place the explicit instantiation before the first
+// use.
+//
+// For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
+
+template class TriaObjectAccessor<1, deal_II_dimension>;
+
+#if deal_II_dimension >= 2
+template class TriaObjectAccessor<2, deal_II_dimension>;
+#endif
+
+#if deal_II_dimension >= 3
+template class TriaObjectAccessor<3, deal_II_dimension>;
+#endif
 
 
 
