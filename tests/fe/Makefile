@@ -25,17 +25,27 @@ default: run-tests
 
 ############################################################
 
-tests = fe_data_test traits fe_tools fe_tools_test mapping \
+tests_x=fe_data_test traits fe_tools fe_tools_test mapping \
         mapping_c1 shapes derivatives function numbering mapping_q1_eulerian \
         transfer internals \
 	dgq_1 \
-	q_1 q_2 q_3 q_4 interpolate_q1 \
-	rt_1 rt_2 rt_3 rt_4 rt_5 rt_6 rt_7 rtdiff rtn_1 rtn_2 \
+	q_* \
+	interpolate_q1 \
+	rt_* \
+	rtdiff \
+	rtn_* \
 	interpolate_rt interpolate_rtn \
 	dgp_monomial_1 dgp_monomial_2 \
 	system_1 interpolate_system \
-        non_primitive_1 non_primitive_2 \
-        nedelec nedelec_2 nedelec_3 up_and_down
+        non_primitive_* \
+        nedelec* \
+	up_and_down
+
+# from above list of regular expressions, generate the real set of
+# tests
+expand = $(shell echo $(addsuffix .cc,$(1)) \
+           | $(PERL) -pi -e 's/\.cc//g;')
+tests = $(call expand,$(tests_x))
 
 ############################################################
 
