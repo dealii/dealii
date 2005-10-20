@@ -11,6 +11,9 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+
+const unsigned int degree = 2;
+
 				 // The first few (many?) include
 				 // files have already been used in
 				 // the previous example, so we will
@@ -237,7 +240,7 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 				 // previous example.
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
-                fe (FE_RaviartThomas<dim>(2),1,FE_DGQ<dim>(2),1),
+                fe (FE_RaviartThomas<dim>(degree),1,FE_DGQ<dim>(degree),1),
 		dof_handler (triangulation)
 {}
 
@@ -281,7 +284,7 @@ template <int dim>
 void LaplaceProblem<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, 0, 1);
-  triangulation.refine_global (0);
+  triangulation.refine_global (4);
   
   std::cout << "   Number of active cells: "
 	    << triangulation.n_active_cells()
@@ -415,7 +418,7 @@ double extract_p (const FEValues<dim> &fe_values,
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
-  QGauss<dim>  quadrature_formula(2);
+  QGauss<dim> quadrature_formula(degree+2);
 
 				   // We wanted to have a non-constant
 				   // right hand side, so we use an
@@ -543,15 +546,8 @@ class SchurComplement
         SolverControl           solver_control (tmp1.size(),
                                                 1e-8*tmp1.l2_norm());
         PrimitiveVectorMemory<> vector_memory;
-        SolverGMRES<>              cg (solver_control, vector_memory);
+        SolverCG<>              cg (solver_control, vector_memory);
 
-        A.block(0,0).print_formatted(std::cout, 2, false, 6, " ", 81);
-        FullMatrix<double> F(24,24);
-        F.copy_from (A.block(0,0));
-        std::cout << F.norm2() << ' ' << F.relative_symmetry_norm2() << std::endl;
-        
-        abort ();
-        
         PreconditionSSOR<> precondition;
         precondition.initialize(A.block(0,0));
         cg.solve (A.block(0,0), tmp2, tmp1, precondition);
@@ -587,7 +583,7 @@ void LaplaceProblem<dim>::solve ()
     SolverControl           solver_control (system_matrix.block(0,0).m(),
                                             1e-6*system_rhs.block(1).l2_norm());
     PrimitiveVectorMemory<> vector_memory;
-    SolverGMRES<>              cg (solver_control, vector_memory);
+    SolverCG<>              cg (solver_control, vector_memory);
 
     cg.solve (SchurComplement(system_matrix), solution.block(1),
               system_rhs.block(1),
@@ -639,7 +635,7 @@ void LaplaceProblem<dim>::output_results () const
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");
 
-  data_out.build_patches ();
+  data_out.build_patches (3);
 
 				   // Only difference to the previous
 				   // example: write output in GMV
