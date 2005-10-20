@@ -29,6 +29,7 @@ GXX-VERSION-DETAILED = @GXX_VERSION_DETAILED@
 CC                   = @CC@
 CC-VERSION           = @CC_VERSION@
 SHLIBLD              = @SHLIBLD@
+SHLIBFLAGS           = @SHLIBFLAGS@
 AR                   = @AR@
 RANLIB               = @RANLIB@
 LDFLAGS              = @LDFLAGS@

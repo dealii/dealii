@@ -24,6 +24,30 @@
 
 #include <cmath>
 
+// Remark: The following explicit instantiations needed to be moved to
+// this place here to work around a problem with gcc3.3 on Apple MacOSX.
+// The reason is that some of the functions instantiated here are used
+// further down; if they are not explicitly instantiated here, then the
+// compiler will do an implicit instantiation and give it internal linkage
+// (despite the later explicit instantiation that should make sure it
+// gets external linkage). To make sure the functions have external
+// linkage, we need to place the explicit instantiation before the first
+// use.
+//
+// For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
+// +++++++++++++
+
+
+template class TriaObjectAccessor<1, deal_II_dimension>;
+
+#if deal_II_dimension >= 2
+template class TriaObjectAccessor<2, deal_II_dimension>;
+#endif
+
+#if deal_II_dimension >= 3
+template class TriaObjectAccessor<3, deal_II_dimension>;
+#endif
+
 
 /*------------------------ Functions: LineAccessor ---------------------------*/
 
@@ -2183,10 +2207,13 @@ neighbor_child_on_subface (const unsigned int face,
 #endif
 
 
+// Remark: The explicit instantiations for "TriaObjectAccessor" were moved
+// to the top of this source file. The reason is a slightly buggy version
+// of the Apple gcc v.3.3.
+// For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
 
 // explicit instantiations
 template class TriaAccessor<deal_II_dimension>;
-template class TriaObjectAccessor<1, deal_II_dimension>;
 template class CellAccessor<deal_II_dimension>;
 template class TriaRawIterator<deal_II_dimension,TriaObjectAccessor<1, deal_II_dimension> >;
 template class TriaRawIterator<deal_II_dimension,CellAccessor<deal_II_dimension> >;
@@ -2196,14 +2223,12 @@ template class TriaActiveIterator<deal_II_dimension,TriaObjectAccessor<1, deal_I
 template class TriaActiveIterator<deal_II_dimension,CellAccessor<deal_II_dimension> >;
 
 #if deal_II_dimension >= 2
-template class TriaObjectAccessor<2, deal_II_dimension>;
 template class TriaRawIterator<deal_II_dimension,TriaObjectAccessor<2, deal_II_dimension> >;
 template class TriaIterator<deal_II_dimension,TriaObjectAccessor<2, deal_II_dimension> >;
 template class TriaActiveIterator<deal_II_dimension,TriaObjectAccessor<2, deal_II_dimension> >;
 #endif
 
 #if deal_II_dimension >= 3
-template class TriaObjectAccessor<3, deal_II_dimension>;
 template class TriaRawIterator<deal_II_dimension,TriaObjectAccessor<3, deal_II_dimension> >;
 template class TriaIterator<deal_II_dimension,TriaObjectAccessor<3, deal_II_dimension> >;
 template class TriaActiveIterator<deal_II_dimension,TriaObjectAccessor<3, deal_II_dimension> >;

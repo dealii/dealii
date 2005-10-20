@@ -57,11 +57,11 @@ $(LIBDIR)/libbase.g$(static-lib-suffix): $(go-files)
 
 $(LIBDIR)/libbase$(shared-lib-suffix): $(o-files)
 	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files) $(extra-o-files)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(o-files) $(extra-o-files)
 
 $(LIBDIR)/libbase.g$(shared-lib-suffix): $(go-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files) $(extra-o-files)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(go-files) $(extra-o-files)
 
 
 

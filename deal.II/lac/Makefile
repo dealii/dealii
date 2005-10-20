@@ -89,12 +89,11 @@ $(LIBDIR)/liblac.g$(static-lib-suffix): $(go-files)
 
 $(LIBDIR)/liblac$(shared-lib-suffix): $(o-files)
 	@echo "=====lac==============optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(o-files) $(deplibs.o)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(o-files) $(deplibs.o)
 
 $(LIBDIR)/liblac.g$(shared-lib-suffix): $(go-files)
 	@echo "=====lac==============debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) -shared -o $@ $(go-files) $(deplibs.g)
-
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $@ $(go-files) $(deplibs.g)
 
 
 clean:

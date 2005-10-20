@@ -15,6 +15,23 @@
 #include <lac/block_sparsity_pattern.h>
 
 
+// Remark: The following explicit instantiations needed to be moved to
+// this place here to work around a problem with gcc3.3 on Apple MacOSX.
+// The reason is that some of the functions instantiated here are used
+// further down; if they are not explicitly instantiated here, then the
+// compiler will do an implicit instantiation and give it internal linkage
+// (despite the later explicit instantiation that should make sure it
+// gets external linkage). To make sure the functions have external
+// linkage, we need to place the explicit instantiation before the first
+// use.
+//
+// For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
+// +++++++++++++
+
+
+template class BlockSparsityPatternBase<SparsityPattern>;
+template class BlockSparsityPatternBase<CompressedSparsityPattern>;
+
 
 template <class SparsityPatternBase>
 BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase ()
@@ -340,7 +357,7 @@ CompressedBlockSparsityPattern (const unsigned int n_rows,
 {}
 
 
-
-// explicit instantiations
-template class BlockSparsityPatternBase<SparsityPattern>;
-template class BlockSparsityPatternBase<CompressedSparsityPattern>;
+// Remark: The explicit instantiations for "BlockSparsityPatternBase" were moved
+// to the top of this source file. The reason is a slightly buggy version
+// of the Apple gcc v.3.3.
+// For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331

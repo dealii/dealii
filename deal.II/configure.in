@@ -116,6 +116,7 @@ AC_SUBST(CXXFLAGSG)
 AC_SUBST(CXXFLAGSO)
 AC_SUBST(CXXFLAGSPIC)
 AC_SUBST(SHLIBLD)
+AC_SUBST(SHLIBFLAGS)
 AC_SUBST(OBJEXT)
 AC_SUBST(EXEEXT)
 
@@ -270,7 +271,7 @@ shared_lib_suffix=".so"
 static_lib_suffix=".a"
 
 case "$target" in
-   *-aix4* | alpha*-linux* | alpha*-osf[45]* | powerpc-apple-darwin* | hppa64-unknown-linux-gnu )
+   *-aix4* | alpha*-linux* | alpha*-osf[45]* | hppa64-unknown-linux-gnu )
 	   AC_MSG_WARN(Shared libraries not supported on $target. Using static libs instead)
 	   enableshared=no 
 	   ;;
@@ -283,12 +284,31 @@ case "$target" in
            ;;
 esac  
 
+
+dnl TODO Maybe the major version number should be inserted before .dylib 
+dnl (.5.dylib for example).
+case "$target" in
+   powerpc-apple-darwin* )
+           shared_lib_suffix=".dylib"
+           darwin_shared_lib="yes"
+           ;;
+esac  
+
+
 if test "x$enableshared" = "xyes" ; then
   CFLAGS="$CFLAGS $CFLAGSPIC"
   CXXFLAGSG="$CXXFLAGSG $CXXFLAGSPIC"
   CXXFLAGSO="$CXXFLAGSO $CXXFLAGSPIC"
   F77FLAGSG="$F77FLAGSG $F77FLAGSPIC"
   F77FLAGSO="$F77FLAGSO $F77FLAGSPIC"
+  SHLIBFLAGS="-shared"
+
+  case "$target" in
+    powerpc-apple-darwin* )
+       SHLIBFLAGS="-dynamiclib"
+	   ;;
+  esac
+
 else
 dnl The gcc compiler needs -static for static linking. For the case
 dnl other compilers do not like this flag we should introduce a
@@ -688,6 +708,14 @@ if test "x$cygwin_shared_lib" = "xyes" ; then
   echo "     Please add the line"
   echo "        export PATH=\$PATH:$DEAL2_DIR/lib"
   echo "     to your .bash_profile file so that windows will be"
+  echo "     able to find the deal.II shared libraries when"
+  echo "     executing your programs."
+fi
+
+if test "x$darwin_shared_lib" = "xyes" ; then
+  echo "     Please add the line"
+  echo "        export DYLD_LIBRARY_PATH=\$DYLD_LIBRARY_PATH:$DEAL2_DIR/lib"
+  echo "     to your .bash_profile file so that OSX will be"
   echo "     able to find the deal.II shared libraries when"
   echo "     executing your programs."
 fi
