@@ -396,7 +396,7 @@ void DataOut<dim>::build_some_patches (Data data)
   for (unsigned int i=0; (i<data.this_thread)&&(cell != this->dofs->end()); ++i)
     {
       ++patch;
-      ++cell;
+      cell = next_cell(cell);
     }
 
   				   // now loop over all cells and
