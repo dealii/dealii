@@ -558,6 +558,15 @@ FiniteElement<dim>::unit_face_support_point (const unsigned index) const
 }
 
 
+template <int dim>
+bool
+FiniteElement<dim>::has_support_on_face (
+  const unsigned int,
+  const unsigned int) const
+{
+  return true;
+}
+
 
 template <int dim>
 void

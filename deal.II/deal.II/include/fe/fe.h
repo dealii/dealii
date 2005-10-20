@@ -561,16 +561,24 @@ class FiniteElement : public Subscriptor,
 						     const Point<dim>   &p,
 						     const unsigned int component) const;
 				     /**
-				      * Check for non-zero values on a face.
+				      * Check for non-zero values on a
+				      * face in order to optimize out
+				      * matrix elements.
 				      *
 				      * This function returns
 				      * @p true, if the shape
 				      * function @p shape_index has
 				      * non-zero values on the face
 				      * @p face_index.
+				      *
+				      * A default implementation is
+				      * provided in this basis class
+				      * which always returns @p
+				      * true. This is the safe way to
+				      * go.
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
-				      const unsigned int face_index) const = 0;
+				      const unsigned int face_index) const;
     
 				     //@}
 				     /**
