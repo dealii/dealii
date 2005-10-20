@@ -388,7 +388,7 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
                                         ((d==1) ? low : high),
                                         ((d==2) ? low : high))
                       :
-                      throw ExcNotImplemented())));
+                      throw ExcNotImplemented(), /*dummy=*/QAnisotropic<dim>(high))));
       
       for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
 	this->generalized_support_points[current++] = quadrature.point(k);
