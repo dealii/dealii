@@ -1168,10 +1168,17 @@ class SparseDirectUMFPACK : public Subscriptor
 		Vector<double>             &rhs_and_solution);
 
                                      /**
-                                      * Exception
+                                      * One of the UMFPack routines
+                                      * threw an error. The error code
+                                      * is included in the output and
+                                      * can be looked up in the
+                                      * UMFPack user manual. The name
+                                      * of the routine is included for
+                                      * reference.
                                       */
-    DeclException1 (ExcUMFPACKError, int,
-		    << "UMFPACK returned error status " << arg1);
+    DeclException2 (ExcUMFPACKError, char*, int,
+		    << "UMFPACK routine " << arg1
+		    << " returned error status " << arg2);
     
   private:
                                      /**

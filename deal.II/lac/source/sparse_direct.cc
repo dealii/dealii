@@ -1793,13 +1793,13 @@ factorize (const SparseMatrix<double> &matrix)
                                 &Ap[0], &Ai[0], &Ax[0],
                                 &symbolic_decomposition,
                                 &control[0], 0);
-  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError(status));
+  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError("umfpack_di_symbolic", status));
   
   status = umfpack_di_numeric (&Ap[0], &Ai[0], &Ax[0],
                                symbolic_decomposition,
                                &numeric_decomposition,
                                &control[0], 0);
-  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError(status));
+  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError("umfpack_di_numeric", status));
 
   umfpack_di_free_symbolic (&symbolic_decomposition) ;
 }
@@ -1830,7 +1830,7 @@ SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution) const
                         rhs_and_solution.begin(), rhs.begin(),
                         numeric_decomposition,
                         &control[0], 0);
-  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError(status));
+  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError("umfpack_di_solve", status));
 }
 
 
