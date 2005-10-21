@@ -29,7 +29,7 @@
 template<int dim>
 void test ()
 {
-  for (unsigned int degree=0; degree<5; ++degree)
+  for (unsigned int degree=0; degree<9-2*dim; ++degree)
     {
       FE_RaviartThomasNodal<dim> fe_rtn(degree);
       deallog << fe_rtn.get_name() << ' ' << fe_rtn.dofs_per_cell << std::endl;

@@ -39,7 +39,8 @@ tests_x=fe_data_test traits fe_tools fe_tools_test mapping \
 	system_1 interpolate_system \
         non_primitive_* \
         nedelec* \
-	up_and_down
+	up_and_down \
+	check_derivatives
 
 # from above list of regular expressions, generate the real set of
 # tests
