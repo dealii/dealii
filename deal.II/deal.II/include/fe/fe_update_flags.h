@@ -21,98 +21,184 @@
 /*@{*/
 
 /**
- * Provide a set of flags which tells the FEValues::reinit
- * function, which fields are to be updated for each cell. E.g. if you
- * do not need the gradients since you want to assemble the mass
- * matrix, you can switch that off. By default, all flags are off,
- * i.e. no reinitialization will be done.
+ * The enum type given to the constructors of FEValues, FEFaceValues
+ * and FESubfaceValues, telling those objects which data will be
+ * needed on each mesh cell.
  *
- * A variable of this type has to be passed to the constructor of the
- * FEValues object. You can select more than one flag by concatenation
- * using the <tt>|</tt> (bitwise <tt>or</tt>) operator.
+ * Selecting these flags in a restrictive way is crucial for the
+ * efficiency of FEValues::reinit(), FEFaceValues::reinit() and
+ * FESubfaceValues::reinit(). Therefore, only the flags actually
+ * needed should be selected. It is the responsibility of the involved
+ * Mapping and FiniteElement to add additional flags according to
+ * their own requirements. For instance, most finite elements will
+ * add #update_covariant_transformation if #update_gradients is
+ * selected.
+
+ * By default, all flags are off, i.e. no reinitialization will be
+ * done.
  *
+ * You can select more than one flag by concatenation
+ * using the bitwise or operator|(UpdateFlags,UpdateFlags).
  *
- * <h3>Description of Flags</h3>
+ * <h3>Generating the actual flags</h3>
  *
- * The following flags are declared:
- * <ul>
- * <li> <tt>update_default</tt>: Default: update nothing.
- * <li> <tt>update_values</tt>: Compute the values of the shape
- *     functions at the quadrature points on the real space cell. For
- *     the usual Lagrange elements, these values are equal to the
- *     values of the shape functions at the quadrature points on the
- *     unit cell, but they are different for more complicated
- *     elements, such as BDM or Raviart-Thomas elements.
- * <li> <tt>update_gradients</tt>: Transform gradients on unit cell
- *     to gradients on real cell.
- * <li> <tt>update_second_derivatives</tt>: Update the second
- *     derivatives of the shape functions on the real cell.
- * <li> <tt>update_boundary_forms</tt>: Update boundary forms on the
- *     face.  This flag is only evaluated by the FEFaceValues class.
- *     Giving this flag to the FEValues class will result in an error,
- *     since boundary forms only exist on the boundary.
- * <li> <tt>update_q_points</tt>: Compute quadrature points in real
- *     space (not on unit cell).
- * <li> <tt>update_JxW_values</tt>: Compute the JxW values (Jacobian
- *     determinant at the quadrature point times the weight of this
- *     point).
- * <li> <tt>update_normal_vectors</tt>: Update the outward normal
- *     vectors to the face relative to this cell.  This flag is only
- *     evaluated by the FEFaceValues class.  Giving this flag to the
- *     FEValues class will result in an error, since normal vectors
- *     are not useful in that case.
- * <li> <tt>update_jacobians</tt>: Compute jacobian matrices of the
- *     transform between unit and real cell in the evaluation points.
- * <li> <tt>update_jacobian_grads</tt>: Update gradients of the
- *     jacobian. These are used to compute second derivatives.
- * <li> <tt>update_covariant_transformation</tt>: Update co-variant
- *     transformation.  This flag is used internally to tell Mapping
- *     objects to compute the transformation matrices for co-variant
- *     vectors.
- * <li> <tt>update_contravariant_transformation</tt>: Update
- *     contra-variant transformation.  This flag is used internally to
- *     tell Mapping objects to compute the transformation matrices for
- *     contra-variant vectors.
- * <li> <tt>update_transformation_values</tt>: Update the shape
- *     function values of the transformation.
- * <li> <tt>update_transformation_gradients</tt>: Update the
- *     gradients of the shape functions of the transformation.
- * </ul>
+ * When given a set of UpdateFlags @pflags, the FEValues object must
+ * determine, which values will have to be computed once only for the
+ * reference cell and which values will have to be updated for each
+ * cell. Here, it is important to note that in many cases, the
+ * FiniteElement will require additional updates from the Mapping. To
+ * this end, several auxiliary functions have been implemented:
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, Ralf Hartmann 2004
+ * FiniteElement::update_once(flags) and
+ * FiniteElement::update_each(flags) determine the values required by
+ * the FiniteElement once or on each cell. The same functions exist in Mapping.
+ *
+ * Since the FiniteElement does not know if a value reuired from
+ * Mapping should be computed once or for each cell,
+ * FEValuesBase::compute_update_flags() is used to compute the union
+ * of all values to be computed ever. It does this by first adding to
+ * the flags set by the user all flags (once and each) added by the
+ * FiniteElement. This new set of flags is then given to the Mapping
+ * and all flags required there are added, again once and each.
+ *
+ * This union of all flags is given to Mapping::fill_fe_values() and
+ * FiniteElement::fill_fe_values, where it is split again into the
+ * information generated only once and the information that must be
+ * updated on each cell.
+ *
+ * The flags finally stored in FEValues then are the union of all the
+ * flags required by the user, by FiniteElement and by Mapping, for
+ * computation once or on each cell. Subsequent calls to the functions
+ * @p update_once and @p update_each should just select among these
+ * flags, but should not add new flags.
  */
 enum UpdateFlags
 {
 				       //! No update
       update_default                      = 0,
 				       //! Shape function values
+				       /**
+					* Compute the values of the
+					* shape functions at the
+					* quadrature points on the
+					* real space cell. For the
+					* usual Lagrange elements,
+					* these values are equal to
+					* the values of the shape
+					* functions at the quadrature
+					* points on the unit cell, but
+					* they are different for more
+					* complicated elements, such
+					* as FE_RaviartThomas
+					* elements.
+					*/
       update_values                       = 0x0001,
 				       //! Shape function gradients
+				       /**
+					* Compute the gradients of the
+					* shape functions in
+					* coordinates of the real
+					* cell.
+					*/
       update_gradients                    = 0x0002,
 				       //! Second derivatives of shape functions
+				       /**
+					* Compute the second
+					* derivatives of the shape
+					* functions in coordinates of
+					* the real cell.
+					*/
       update_second_derivatives           = 0x0004,
-				       /*! Normal vector times surface
+				       //! Outter normal vector, not normalized
+				       /**
+					* Vector product of tangential
+					* vectors, yielding a normal
+					* vector with a length
+					* corresponding to the surface
 					* element; may be more
-					* efficient than computing both.
+					* efficient than computing
+					* both.
 					*/
       update_boundary_forms               = 0x0008,
 				       //! Transformed quadrature points
+				       /**
+					* Compute the quadrature
+					* points transformed into real
+					* cell coordinates.
+					*/
       update_q_points                     = 0x0010,
 				       //! Transformed quadrature weights
+				       /**
+					* Compute the quadrature
+					* weights on the real cell,
+					* i.e. the weights of the
+					* quadrature rule multiplied
+					* with the determinant of the
+					* Jacoian of the
+					* transformation from
+					* reference to realcell.
+					*/
       update_JxW_values                   = 0x0020,
-				       //! Transformed normal vectors
+				       //! Normal vectors
+				       /**
+					* Compute the unit outer
+					* normal vector on the face of
+					* a cell.
+					*/
       update_normal_vectors               = 0x0040,
 				       //! Volume element
+				       /**
+					* Compute the Jacobian of the
+					* transformation from the
+					* reference cell to the real
+					* cell.
+					*/
       update_jacobians                    = 0x0080,
 				       //! Gradient of volume element
+				       /**
+					* Compute the dervatives of
+					* the Jacobian of the
+					* transformation.
+					*/
       update_jacobian_grads               = 0x0100,
 				       //! Covariant transformation
+				       /**
+					* Compute all values the
+					* Mapping needs to perform a
+					* contravariant transformation of
+					* vectors. For special
+					* mappings like
+					* MappingCartesian this may be
+					* simpler than
+					* #update_jacobians.
+					*/
       update_covariant_transformation     = 0x0200,
 				       //! Contravariant transformation
+				       /**
+					* Compute all values the
+					* Mapping needs to perform a
+					* contravariant transformation of
+					* vectors. For special
+					* mappings like
+					* MappingCartesian this may be
+					* simpler than
+					* #update_jacobians.
+					*/
       update_contravariant_transformation = 0x0400,
 				       //! Shape function values of transformation
+				       /**
+					* Compute the shape function
+					* values of the transformation
+					* defined by the Mapping.
+					*/
       update_transformation_values        = 0x0800,
 				       //! Shape function gradients of transformation
+				       /**
+					* Compute the shape function
+					* gradients of the
+					* transformation defined by
+					* the Mapping.
+					*/
       update_transformation_gradients     = 0x1000
 };
 
