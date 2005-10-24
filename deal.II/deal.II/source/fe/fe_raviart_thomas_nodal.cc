@@ -377,18 +377,17 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
 
   for (unsigned int d=0;d<dim;++d)
     {
+                                       // guard the following statement
+      Assert (dim <= 3, ExcNotImplemented());
       const QAnisotropic<dim>
         quadrature (dim == 1 ?
                     QAnisotropic<dim>(high) :
                     (dim == 2 ?
                      QAnisotropic<dim>(((d==0) ? low : high),
                                        ((d==1) ? low : high)) :
-                     (dim == 3 ?
-                      QAnisotropic<dim>(((d==0) ? low : high),
-                                        ((d==1) ? low : high),
-                                        ((d==2) ? low : high))
-                      :
-                      throw ExcNotImplemented(), /*dummy=*/QAnisotropic<dim>(high))));
+                     QAnisotropic<dim>(((d==0) ? low : high),
+                                       ((d==1) ? low : high),
+                                       ((d==2) ? low : high))));
       
       for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
 	this->generalized_support_points[current++] = quadrature.point(k);
