@@ -29,8 +29,6 @@
 #  include <strstream>
 #endif
 
-#include <iostream>
-
 template <int dim>
 FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 		:
@@ -55,7 +53,6 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 				   // Set up the generalized support
 				   // points
   initialize_support_points (deg);
-
 				   //Now compute the inverse node
 				   //matrix, generating the correct
 				   //basis functions from the raw
@@ -123,13 +120,13 @@ FE_RaviartThomasNodal<dim>::get_name () const
 }
 
 
-
 template <int dim>
-bool
-FE_RaviartThomasNodal<dim>::has_support_on_face (unsigned int, unsigned int) const
+FiniteElement<dim> *
+FE_RaviartThomasNodal<dim>::clone() const
 {
-  return true;
+  return new FE_RaviartThomasNodal<dim>(this->degree-1);
 }
+
 
 
 template <int dim>
@@ -236,14 +233,6 @@ FE_RaviartThomasNodal<dim>::interpolate(
 }
 
 
-
-
-template <int dim>
-FiniteElement<dim> *
-FE_RaviartThomasNodal<dim>::clone() const
-{
-  return new FE_RaviartThomasNodal<dim>(this->degree-1);
-}
 
 
 #if deal_II_dimension == 1

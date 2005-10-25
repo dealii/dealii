@@ -136,7 +136,9 @@ template <int dim> class MappingQ;
  * @author Wolfgang Bangerth, 2003
  */
 template <int dim>
-class FE_RaviartThomas : public FiniteElement<dim>
+class FE_RaviartThomas
+  :
+  public FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim>
 {
   public:
 				     /**
@@ -156,92 +158,6 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      */
     virtual std::string get_name () const;
 
-				     /**
-				      * Return the value of the
-				      * @p componentth vector
-				      * component of the @p ith shape
-				      * function at the point
-				      * @p p. See the
-				      * FiniteElement base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      */
-    virtual double shape_value_component (const unsigned int i,
-					  const Point<dim> &p,
-					  const unsigned int component) const;
-
-				     /**
-				      * Return the gradient of the
-				      * @p componentth vector
-				      * component of the @p ith shape
-				      * function at the point
-				      * @p p. See the
-				      * FiniteElement base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      */
-    virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-						const Point<dim> &p,
-						const unsigned int component) const;
-
-				     /**
-				      * Return the second derivative
-				      * of the @p componentth vector
-				      * component of the @p ith shape
-				      * function at the point
-				      * @p p. See the
-				      * FiniteElement base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      */
-    virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-						     const Point<dim> &p,
-						     const unsigned int component) const;
-
-				     /**
-				      * Return the order
-				      * of this finite element,
-				      * i.e. the value passed to the
-				      * constructor.
-				      *
-				      * Note that for this element,
-				      * the order is actually one
-				      * lower than the maximal
-				      * polynomial degree, unlike for
-				      * most of the other
-				      * elements. For example, the RT0
-				      * element as piecewise linear
-				      * shape functions, even though
-				      * the normal component of them
-				      * is piecewise constant on each
-				      * face (the latter being the
-				      * property that defines the
-				      * order of the element).
-				      */
-    unsigned int get_degree () const;
-    
-				     /**
-				      * Return the matrix
-				      * interpolating from the given
-				      * finite element to the present
-				      * one. The size of the matrix is
-				      * then @p dofs_per_cell times
-				      * <tt>source.dofs_per_cell</tt>.
-				      *
-				      * These matrices are only
-				      * available if the source
-				      * element is also a Raviart
-				      * Thomas element. Otherwise, an
-				      * exception of type
-				      * FiniteElement<dim>::ExcInterpolationNotImplemented
-				      * is thrown.
-				      */
-    virtual void
-    get_interpolation_matrix (const FiniteElement<dim> &source,
-			      FullMatrix<double>           &matrix) const;
 
 				     /**
 				      * Number of base elements in a
@@ -282,66 +198,18 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
-
+    
     virtual void interpolate(std::vector<double>&                local_dofs,
 			     const std::vector<double>& values) const;
     virtual void interpolate(std::vector<double>&                local_dofs,
 			     const std::vector<Vector<double> >& values,
 			     unsigned int offset = 0) const;
-    
     virtual void interpolate(
       std::vector<double>& local_dofs,
       const VectorSlice<const std::vector<std::vector<double> > >& values) const;
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      *
-				      * This function is made virtual,
-				      * since finite element objects
-				      * are usually accessed through
-				      * pointers to their base class,
-				      * rather than the class itself.
-				      */
     virtual unsigned int memory_consumption () const;
-
-  protected:    
-    
     virtual FiniteElement<dim> * clone() const;
-  
-    virtual
-    typename Mapping<dim>::InternalDataBase *
-    get_data (const UpdateFlags,
-	      const Mapping<dim>& mapping,
-	      const Quadrature<dim>& quadrature) const ;
-
-    virtual void
-    fill_fe_values (const Mapping<dim> &mapping,
-		    const typename Triangulation<dim>::cell_iterator &cell,
-		    const Quadrature<dim>                &quadrature,
-		    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-		    typename Mapping<dim>::InternalDataBase      &fe_internal,
-		    FEValuesData<dim>& data) const;
     
-    virtual void
-    fill_fe_face_values (const Mapping<dim> &mapping,
-			 const typename Triangulation<dim>::cell_iterator &cell,
-			 const unsigned int                    face_no,
-			 const Quadrature<dim-1>                &quadrature,
-			 typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			 typename Mapping<dim>::InternalDataBase      &fe_internal,
-			 FEValuesData<dim>& data) const;
-    
-    virtual void
-    fill_fe_subface_values (const Mapping<dim> &mapping,
-			    const typename Triangulation<dim>::cell_iterator &cell,
-			    const unsigned int                    face_no,
-			    const unsigned int                    sub_no,
-			    const Quadrature<dim-1>                &quadrature,
-			    typename Mapping<dim>::InternalDataBase      &mapping_internal,
-			    typename Mapping<dim>::InternalDataBase      &fe_internal,
-			    FEValuesData<dim>& data) const;
-
   private:
 				     /**
 				      * The order of the
@@ -354,45 +222,6 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      */  
     const unsigned int rt_order;
 
-                                     /**
-                                      * Spaces describing the
-                                      * anisotropic polynomial spaces
-                                      * for each vector component,
-                                      * i.e. there are @p dim
-                                      * elements of this field. The
-                                      * values for this member are
-                                      * created in
-                                      * create_polynomials().
-                                      */
-    const std::vector<AnisotropicPolynomials<dim> > polynomials;
-
-                                     /**
-                                      * For each shape function, store
-                                      * to which vector component (on
-                                      * the unit cell, they are mixed
-                                      * on the real cell by the
-                                      * transformation) they belong,
-                                      * and which index they have
-                                      * within the anisotropic tensor
-                                      * product polynomial space
-                                      * describing this vector
-                                      * component.
-                                      *
-                                      * These values are computed by
-                                      * the compute_renumber()
-                                      * function.
-                                      */
-    const std::vector<std::pair<unsigned int, unsigned int> > renumber;
-    
-    
-                                     /**
-                                      * Generate the polynomial spaces
-                                      * for the polynomials()
-                                      * member.
-                                      */
-    static std::vector<AnisotropicPolynomials<dim> >
-    create_polynomials (const unsigned int degree);
-    
     				     /**
 				      * Only for internal use. Its
 				      * full name is
@@ -416,34 +245,6 @@ class FE_RaviartThomas : public FiniteElement<dim>
     static std::vector<bool>
     get_ria_vector (const unsigned int degree);
 
-                                     /**
-                                      * Compute the values of the
-                                      * @p renumber field.
-                                      */
-    static std::vector<std::pair<unsigned int, unsigned int> >
-    compute_renumber (const unsigned int);
-
-				     /**
-				      * Initialize the hanging node
-				      * constraints matrices. Called
-				      * from the constructor.
-				      */
-    void initialize_constraints ();
-
-				     /**
-				      * Initialize the embedding
-				      * matrices. Called from the
-				      * constructor.
-				      */
-    void initialize_embedding ();
-
-				     /**
-				      * Initialize the restriction
-				      * matrices. Called from the
-				      * constructor.
-				      */
-    void initialize_restriction ();
-    
 				     /**
 				      * Initialize the @p
 				      * generalized_support_points
@@ -456,14 +257,6 @@ class FE_RaviartThomas : public FiniteElement<dim>
 				      */
     void initialize_support_points (const unsigned int rt_degree);
 
-				     /**
-				      * Initialize the
-				      * @p unit_face_support_points field
-				      * of the FiniteElement
-				      * class. Called from the
-				      * constructor.
-				      */
-    void initialize_face_support_points ();
 				     /**
 				      * Given a set of flags indicating
 				      * what quantities are requested
@@ -658,15 +451,6 @@ class FE_RaviartThomasNodal
 
     virtual FiniteElement<dim>* clone () const;
 
-    				     /**
-				      * Check whether a shape function
-				      * may be non-zero on a face.
-				      *
-				      * Right now, always returns
-				      * @p true.
-				      */
-    virtual bool has_support_on_face (const unsigned int shape_index,
-				      const unsigned int face_index) const;    
     virtual void interpolate(std::vector<double>&                local_dofs,
 			     const std::vector<double>& values) const;
     virtual void interpolate(std::vector<double>&                local_dofs,
@@ -716,68 +500,7 @@ class FE_RaviartThomasNodal
 #ifndef DOXYGEN
 
 template <>
-void FE_RaviartThomas<1>::initialize_face_support_points ();
-
-template <>
 std::vector<unsigned int> FE_RaviartThomas<1>::get_dpo_vector (const unsigned int);
-
-template <>
-std::vector<AnisotropicPolynomials<1> >
-FE_RaviartThomas<1>::create_polynomials (const unsigned int);
-
-template <>
-std::vector<AnisotropicPolynomials<2> >
-FE_RaviartThomas<2>::create_polynomials (const unsigned int);
-
-template <>
-std::vector<AnisotropicPolynomials<3> >
-FE_RaviartThomas<3>::create_polynomials (const unsigned int);
-
-template <>
-std::vector<std::pair<unsigned int, unsigned int> >
-FE_RaviartThomas<1>::compute_renumber (const unsigned int);
-
-template <>
-std::vector<std::pair<unsigned int, unsigned int> >
-FE_RaviartThomas<2>::compute_renumber (const unsigned int);
-
-template <>
-std::vector<std::pair<unsigned int, unsigned int> >
-FE_RaviartThomas<3>::compute_renumber (const unsigned int);
-
-template <>
-void
-FE_RaviartThomas<1>::initialize_constraints ();
-
-template <>
-void
-FE_RaviartThomas<2>::initialize_constraints ();
-
-template <>
-void
-FE_RaviartThomas<3>::initialize_constraints ();
-
-template <>
-void
-FE_RaviartThomas<1>::initialize_embedding ();
-
-template <>
-void
-FE_RaviartThomas<1>::initialize_restriction ();
-
-template <>
-void
-FE_RaviartThomas<2>::initialize_restriction ();
-
-template <>
-void
-FE_RaviartThomas<3>::initialize_restriction ();
-
-template <>
-void
-FE_RaviartThomas<1>::
-get_interpolation_matrix (const FiniteElement<1> &,
-			  FullMatrix<double>         &) const;
 
 #endif // DOXYGEN
 
