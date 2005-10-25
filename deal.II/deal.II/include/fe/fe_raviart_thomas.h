@@ -44,7 +44,12 @@ template <int dim> class MappingQ;
  * subspace contained in the RT space. Then, approciamtion order of
  * the function itself is <i>degree+1</i>, as with usual polynomial
  * spaces.
- * 
+ *
+ * @todo Even if this element is implemented for two and three space
+ * dimensions, the definition of the node values relies on
+ * consistently oriented faces in 3D. Therefore, care should be taken
+ * on complicated meshes.
+ *
  * <h3>Interpolation</h3>
  *
  * The @ref GlossInterpolation "interpolation" operators associated
@@ -417,9 +422,14 @@ class FE_RaviartThomas
  * component under consideration. This is emulated by using an
  * anisotropic Gauss formula for integration.
  *
- * @warning The current implementation is for Cartesian meshes
+ * @todo The current implementation is for Cartesian meshes
  * only. You must use MappingCartesian.
  * 
+ * @todo Even if this element is implemented for two and three space
+ * dimensions, the definition of the node values relies on
+ * consistently oriented faces in 3D. Therefore, care should be taken
+ * on complicated meshes.
+ *
  * @note The degree stored in the member variable
  * FiniteElementData<dim>::degree is higher by one than the
  * constructor argument!
