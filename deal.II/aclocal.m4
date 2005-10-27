@@ -3314,6 +3314,80 @@ AC_DEFUN(DEAL_II_CHECK_ANON_NAMESPACE_BUG3, dnl
 
 
 dnl -------------------------------------------------------------
+dnl A test to identify Apples buggy gcc3.3 version. If the
+dnl explicit instantiations are placed at the end of a source
+dnl file, sometimes only weak symbols are generated, which
+dnl lead to linker problems.
+dnl For more information, see 
+dnl http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
+dnl As this bug can be easily avoided by applying the
+dnl "november2004gccupdate" Patch which can be found
+dnl on http://www.apple.com/developer, this check will
+dnl only produce a warning at the end of the configuration
+dnl process.
+dnl
+dnl Usage: DEAL_II_CHECK_WEAK_LINKAGE_BUG
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_WEAK_LINKAGE_BUG, dnl
+[
+  DARWIN_GCC_WEAK_LINKAGE_BUG="no"
+  case "$target" in
+    powerpc-apple-darwin* )
+
+    AC_MSG_CHECKING(for weak linkage bug (Apple gcc.3.3) )
+
+    dnl Create 1st testfile
+    echo "template <int> void SYMBOL() {}" >  conftest.cc
+    echo "int g() { SYMBOL<1> (); }" >>  conftest.cc
+    echo "template void SYMBOL<1> ();"     >> conftest.cc
+
+    dnl Compile it
+    $CXX -c conftest.cc -o conftest.$ac_objext
+
+    dnl and write symbols to file 1
+    nm conftest.$ac_objext | grep SYMBOL > symb1
+
+    dnl Create 2nd testfile
+    echo "template <int> void SYMBOL() {}" >  conftest.cc
+    echo "template void SYMBOL<1> ();"     >> conftest.cc
+    echo "int g() { SYMBOL<1> (); }" >>  conftest.cc
+
+    dnl Compile it
+    $CXX -c conftest.cc -o conftest.$ac_objext
+
+    dnl and write symbols to file 2
+    nm conftest.$ac_objext | grep SYMBOL > symb2
+
+    dnl Compare the relevant symbols. According to the C++
+    dnl standard, both source codes should produce the
+    dnl same symbols.
+    check="`diff symb1 symb2`"
+
+    dnl Then try to link everything
+    if test "x$check" = "x" ;
+    then
+        AC_MSG_RESULT(no)
+    else
+        AC_MSG_RESULT(yes)
+        DARWIN_GCC_WEAK_LINKAGE_BUG="yes"
+        AC_DEFINE(DEAL_II_WEAK_LINKAGE_BUG, 1, 
+                       [This error appears in the Apple edition of the
+  		        gcc 3.3, which ships with Darwin7.9.0 and
+ 		        probably previous version. It leads to
+		        problems during linking.
+                        For the details, look at aclocal.m4 in the
+                        top-level directory.])
+    fi
+    rm -f conftest.$ac_objext 
+    rm -f symb1 symb2
+    ;;
+  esac
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl We have so many templates in deal.II that sometimes we need
 dnl to make it clear with which types a template parameter can
 dnl be instantiated. There is a neat trick to do this: SFINAE

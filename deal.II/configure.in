@@ -120,6 +120,7 @@ AC_SUBST(SHLIBFLAGS)
 AC_SUBST(OBJEXT)
 AC_SUBST(EXEEXT)
 
+
 dnl Do the same for the C compiler. we only use the C compiler for third-party
 dnl code and only for things we optimize, so no need to determine debug flags
 dnl and similar things
@@ -182,6 +183,7 @@ DEAL_II_CHECK_LONG_DOUBLE_LOOP_BUG
 DEAL_II_CHECK_ANON_NAMESPACE_BUG
 DEAL_II_CHECK_ANON_NAMESPACE_BUG2
 DEAL_II_CHECK_ANON_NAMESPACE_BUG3
+DEAL_II_CHECK_WEAK_LINKAGE_BUG
 DEAL_II_CHECK_SFINAE_BUG
 DEAL_II_CHECK_TEMPL_OP_DISAMBIGUATION_BUG
 DEAL_II_CHECK_ARRAY_CONDITIONAL_DECAY_BUG
@@ -718,7 +720,16 @@ if test "x$darwin_shared_lib" = "xyes" ; then
   echo "     to your .bash_profile file so that OSX will be"
   echo "     able to find the deal.II shared libraries when"
   echo "     executing your programs."
+  if test "x$DARWIN_GCC_WEAK_LINKAGE_BUG" = "xyes" ; then
+    echo "     WARNING: The installed compiler version seems to be "
+    echo "     WARNING: the Apple gcc3.3, build 1666, which does not"
+    echo "     WARNING: work properly for building dynamics libs"
+    echo "     WARNING: Please install Apples november 2004 patch"
+    echo "     WARNING: for the gcc, which can be found on:"
+    echo "     WARNING: http://www.apple.com/developer"
+  fi
 fi
+
 
 if test "x$doxygen_not_found" = "xyes" ; then
   echo "     WARNING: During configuration, no version of the doxygen"
