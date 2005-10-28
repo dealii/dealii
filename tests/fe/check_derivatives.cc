@@ -73,9 +73,12 @@ void check (const unsigned int min_degree,
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
     {
-      test<1> (FE<1> (degree), QGauss<1> (degree+1));
-      test<2> (FE<2> (degree), QGauss<2> (degree+1));
-      test<3> (FE<3> (degree), QGauss<3> (degree+1));
+      FE<1> fe1(degree);
+      test<1> (fe1, QGauss<1> (degree+1));
+      FE<2> fe2(degree);
+      test<2> (fe2, QGauss<2> (degree+1));
+      FE<3> fe3(degree);
+      test<3> (fe3, QGauss<3> (degree+1));
     }
 }
 
