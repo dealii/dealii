@@ -13,62 +13,59 @@ include $D/common/Make.global_options
 debug-mode = on
 
 libraries = $(lib-lac.g)  \
-            $(lib-base.g)
-lib-1d    = $(lib-deal2-1d.g)
-lib-2d    = $(lib-deal2-2d.g)
-lib-3d    = $(lib-deal2-3d.g)
+            $(lib-base.g) \
+            $(lib-deal2-1d.g) \
+            $(lib-deal2-2d.g) \
+            $(lib-deal2-3d.g)
 
 default: run-tests 
 
 ############################################################
 
-block_matrices.exe           : block_matrices.g.$(OBJEXT)              $(lib-2d)           $(libraries)
-constraints.exe              : constraints.g.$(OBJEXT)                 $(lib-2d) $(lib-3d) $(libraries) 
-data_out.exe                 : data_out.g.$(OBJEXT)                    $(lib-2d) $(lib-3d) $(libraries)
-derivative_approximation.exe : derivative_approximation.g.$(OBJEXT) $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-derivatives.exe              : derivatives.g.$(OBJEXT)       $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-dof_test.exe                 : dof_test.g.$(OBJEXT)                    $(lib-2d) $(lib-3d) $(libraries)
-dof_renumbering.exe          : dof_renumbering.g.$(OBJEXT)   $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-error_estimator.exe          : error_estimator.g.$(OBJEXT)   $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-gradients.exe                : gradients.g.$(OBJEXT)                   $(lib-2d)           $(libraries)
-grid_out.exe                 : grid_out.g.$(OBJEXT)          $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-grid_test.exe                : grid_test.g.$(OBJEXT)                   $(lib-2d) $(lib-3d) $(libraries)
-grid_transform.exe           : grid_transform.g.$(OBJEXT)              $(lib-2d) $(lib-3d) $(libraries)
-measure_et_al.exe            : measure_et_al.g.$(OBJEXT)               $(lib-2d) $(lib-3d) $(libraries)
-normals_at_vertices.exe	     : normals_at_vertices.g.$(OBJEXT)                   $(lib-3d) $(libraries)
-intergrid_constraints.exe    : intergrid_constraints.g.$(OBJEXT)    $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-intergrid_map.exe            : intergrid_map.g.$(OBJEXT)     $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-matrices.exe                 : matrices.g.$(OBJEXT)          $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-mg.exe                       : mg.g.$(OBJEXT)                          $(lib-2d)           $(libraries)
-mglocal.exe                  : mglocal.g.$(OBJEXT)                     $(lib-2d)           $(libraries)
-second_derivatives.exe       : second_derivatives.g.$(OBJEXT)          $(lib-2d)           $(libraries)
-wave-test-3.exe              : wave-test-3.g.$(OBJEXT)                 $(lib-2d)           $(libraries)
-support_point_map.exe        : support_point_map.g.$(OBJEXT) $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-filtered_matrix.exe          : filtered_matrix.g.$(OBJEXT)   $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-boundaries.exe               : boundaries.g.$(OBJEXT)        $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-sparsity_pattern.exe         : sparsity_pattern.g.$(OBJEXT)  $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-grid_tools.exe               : grid_tools.g.$(OBJEXT)        $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-subdomain_ids.exe            : subdomain_ids.g.$(OBJEXT)     $(lib-1d) $(lib-2d) $(lib-3d) $(libraries)
-filtered_iterator.exe        : filtered_iterator.g.$(OBJEXT)           $(lib-2d)           $(libraries)
-grid_in.exe                  : grid_in.g.$(OBJEXT)                     $(lib-2d)           $(libraries)
-grid_in_3d.exe               : grid_in_3d.g.$(OBJEXT)                            $(lib-3d) $(libraries)
-face_orientations_3d.exe     : face_orientations_3d.g.$(OBJEXT)                  $(lib-3d) $(libraries)
-mg_dof_handler.exe           : mg_dof_handler.g.$(OBJEXT)              $(lib-2d)           $(libraries)
-subcelldata.exe		     : subcelldata.g.$(OBJEXT)                 $(lib-2d) $(lib-3d) $(libraries)
+tests_x = block_matrices \
+	constraints \
+	data_out \
+	derivative_approximation \
+	derivatives \
+	dof_test \
+	dof_renumbering \
+	error_estimator \
+	gradients \
+	grid_out \
+	grid_test \
+	grid_transform \
+	measure_et_al \
+	normals_at_vertices \
+	intergrid_constraints \
+	intergrid_map \
+	matrices \
+	mg \
+	mglocal \
+	second_derivatives \
+	wave-test-3 \
+	support_point_map \
+	filtered_matrix \
+	boundaries \
+	sparsity_pattern \
+	grid_tools \
+	subdomain_ids \
+	filtered_iterator \
+	grid_in \
+	grid_in_3d \
+	face_orientations_3d \
+	mg_dof_handler \
+	subcelldata	
 
+# from above list of regular expressions, generate the real set of
+# tests
+expand = $(shell echo $(addsuffix .cc,$(1)) \
+           | $(PERL) -pi -e 's/\.cc//g;')
+tests = $(call expand,$(tests_x))
 
-tests = $(sort \
-          grid_test subcelldata grid_transform dof_test data_out derivatives gradients \
-	  constraints block_matrices second_derivatives derivative_approximation \
-          matrices error_estimator intergrid_constraints intergrid_map \
-          wave-test-3 dof_renumbering support_point_map filtered_matrix \
-          measure_et_al normals_at_vertices \
-	  boundaries sparsity_pattern grid_tools subdomain_ids \
-	  filtered_iterator grid_out grid_in grid_in_3d face_orientations_3d \
-          mg_dof_handler)
 
 ############################################################
 
 
 include ../Makefile.rules
 include Makefile.depend
+include Makefile.tests
