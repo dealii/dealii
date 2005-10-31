@@ -449,11 +449,7 @@ FE_RaviartThomas<dim>::has_support_on_face (const unsigned int shape_index,
                                                // are the values
                                                // actually zero. list
                                                // these in a table
-              const unsigned int
-                opposite_faces[GeometryInfo<2>::faces_per_cell]
-                = { 2, 3, 0, 1};
-              
-              return (face_index != opposite_faces[shape_index]);
+              return (face_index != GeometryInfo<dim>::opposite_faces[shape_index]);
             }
             
             default:
