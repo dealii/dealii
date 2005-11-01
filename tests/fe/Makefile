@@ -53,3 +53,4 @@ tests = $(call expand,$(tests_x))
 
 include ../Makefile.rules
 include Makefile.depend
+include Makefile.tests
