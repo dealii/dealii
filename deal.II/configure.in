@@ -58,7 +58,6 @@ AC_MSG_RESULT(Configuring deal.II version $PACKAGE_VERSION)
 AC_SUBST(DEAL_II_MAJOR)
 AC_SUBST(DEAL_II_MINOR)
 AC_SUBST(DEAL_II_PATH)
-LDFLAGS="-L$DEAL_II_PATH/lib $LDFLAGS"
 
 dnl    For backward compatibility, also have DEAL2_DIR alias DEAL_II_PATH
 DEAL2_DIR=$DEAL_II_PATH
@@ -677,6 +676,11 @@ namespace deal_II_numbers {
 }
 #endif
 ])
+
+
+dnl Add the deal.II library path to LDFLAGS
+LDFLAGS="-L$DEAL_II_PATH/lib $LDFLAGS"
+
 
 AC_SUBST(LIBS)
 AC_SUBST(LDFLAGS)
