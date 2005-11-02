@@ -117,11 +117,11 @@ namespace PETScWrappers
  *   $m_{ij} = \int_\Omega a(x) \phi_i(x) \phi_j(x) dx$ instead.
  *
  * <li> @p create_laplace_matrix: create the matrix with entries
- *   $m_{ij} = \int_\Omega \nabla\phi_i(x) \nabla\phi_j(x) dx$ by
+ *   $a_{ij} = \int_\Omega \nabla\phi_i(x) \nabla\phi_j(x) dx$ by
  *   numerical quadrature.
  *
  *   Again, a coefficient may be given to evaluate
- *   $m_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \phi_j(x) dx$ instead.
+ *   $a_{ij} = \int_\Omega a(x) \nabla\phi_i(x) \nabla\phi_j(x) dx$ instead.
  * </ul>
  *
  * Make sure that the order of the Quadrature formula given to these
