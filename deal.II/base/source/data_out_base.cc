@@ -1944,10 +1944,12 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
     }
   
 				   // max. and min. heigth of solution 
-  double hmin=0, hmax=0;
+  typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+  Assert(patch!=patches.end(), ExcInternalError());
+  double hmin=patch->data(0,0);
+  double hmax=patch->data(0,0);
 
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-       patch != patches.end(); ++patch)
+  for (; patch != patches.end(); ++patch)
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
       
@@ -1962,12 +1964,14 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 				    0))),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
       
-      for (unsigned int i=0; i<n_subdivisions; ++i)
-	for (unsigned int j=0; j<n_subdivisions; ++j)
+      for (unsigned int i=0; i<n_subdivisions+1; ++i)
+	for (unsigned int j=0; j<n_subdivisions+1; ++j)
 	  {
 	    const int dl = i*(n_subdivisions+1)+j;
-	    if ((hmin==0)||(patch->data(0,dl)<hmin)) hmin=patch->data(0,dl);
-	    if ((hmax==0)||(patch->data(0,dl)>hmax)) hmax=patch->data(0,dl);
+	    if (patch->data(0,dl)<hmin)
+	      hmin=patch->data(0,dl);
+	    if (patch->data(0,dl)>hmax)
+	      hmax=patch->data(0,dl);
 	  }
     }
 
