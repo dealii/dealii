@@ -160,15 +160,15 @@ template <int dim> class FECollection;
  * from the following sketch, where the overall order of the different
  * dof groups is depicted:
  * @verbatim
+ *    *--15--4--16--*
+ *    |      |      |
+ *    10 19  6  20  12
+ *    |      |      |
+ *    1--7---0--8---2
+ *    |      |      |
+ *    9  17  5  18  11
+ *    |      |      |
  *    *--13--3--14--*
- *    |      |      |
- *    16 20  7  19  12
- *    |      |      |
- *    4--8---0--6---2
- *    |      |      |
- *    15 17  5  18  11
- *    |      |      |
- *    *--9---1--10--*
  * @endverbatim
  * The numbering of vertices and lines, as well as the numbering of
  * children within a line is consistent with the one described in

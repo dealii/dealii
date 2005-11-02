@@ -72,8 +72,9 @@ template <int dim, int spacedim>
 bool
 DataOutBase::Patch<dim,spacedim>::operator == (const Patch &patch) const
 {
+  const double eps=3e-16;
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    if (vertices[i] != patch.vertices[i])
+    if (vertices[i].distance(patch.vertices[i]) > eps)
       return false;
 
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)

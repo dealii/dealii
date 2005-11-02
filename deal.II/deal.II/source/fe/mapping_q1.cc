@@ -82,10 +82,6 @@ MappingQ1<dim>::compute_shapes (const std::vector<Point<dim> > &unit_points,
 
 #if (deal_II_dimension == 1)
 
-template<>
-const unsigned int MappingQ1<deal_II_dimension>::vertex_mapping[2] =
-{ 0, 1 };
-
 
 template<>
 void
@@ -117,10 +113,6 @@ MappingQ1<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
 #endif
 
 #if (deal_II_dimension == 2)
-
-template<> const unsigned int
-MappingQ1<2>::vertex_mapping[4] =
-{ 0, 1, 3, 2 };
 
 
 template<>
@@ -162,10 +154,6 @@ MappingQ1<2>::compute_shapes_virtual (const std::vector<Point<2> > &unit_points,
 #endif
 
 #if (deal_II_dimension == 3)
-
-template<>
-const unsigned int MappingQ1<deal_II_dimension>::vertex_mapping[8] =
-{ 0, 1, 4, 5, 3, 2, 7, 6 };
 
 
 template<>
@@ -362,40 +350,46 @@ MappingQ1<dim>::compute_face_data (const UpdateFlags update_flags,
       const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
       data.unit_tangentials.resize (nfaces*(dim-1),
                                     std::vector<Tensor<1,dim> > (n_original_q_points));
-      for (unsigned int i=0; i<nfaces; ++i)
+      if (dim==2)
 	{
-					   // Base index of the
-					   // non-zero entry of the
-					   // tangential vector.  Add
-					   // dim so we can subtract 1
-					   // without getting negative
-					   // values.
-	  unsigned int nindex = this->normal_directions[i]/2 + dim;
-
-					   // First tangential has a
-					   // non-zero in component
-					   // (i+1)%dim, if normal is
-					   // non-zero in i.
-	  Tensor<1,dim> tangential;
-	  tangential[(nindex+1)%dim] = (this->normal_directions[i]%2) ? -1 : 1;
-	  std::fill (data.unit_tangentials[i].begin(),
-		     data.unit_tangentials[i].end(),
-		     tangential);
-	  
-	  if (dim>2)
+					   // ensure a counterclock wise
+					   // orientation of tangentials
+	  static const int tangential_orientation[4]={-1,1,1,-1};
+	  for (unsigned int i=0; i<nfaces; ++i)
 	    {
-					       // Second tangential
-					       // has a non-zero in
-					       // component (i-1)%dim,
-					       // if normal is
-					       // non-zero in
-					       // i. Creates a
-					       // right-handed system.
-	      Tensor<1,dim> tangential;
-	      tangential[(nindex-1)%dim] = 1.;
-	      std::fill (data.unit_tangentials[i+nfaces].begin(),
-			 data.unit_tangentials[i+nfaces].end(),
-			 tangential);
+	      Tensor<1,dim> tang;	      
+	      tang[1-i/2]=tangential_orientation[i];
+	      std::fill (data.unit_tangentials[i].begin(),
+			 data.unit_tangentials[i].end(), tang);
+	    }
+	}
+      else if (dim==3)
+	{
+	  for (unsigned int i=0; i<nfaces; ++i)
+	    {
+	      Tensor<1,dim> tang1, tang2;
+
+	      const unsigned int nd=
+		GeometryInfo<dim>::unit_normal_direction[i];
+	      
+					       // first tangential
+					       // vector in direction
+					       // of the (nd+1)%3 axis
+					       // and inverted in case
+					       // of unit inward normal
+	      tang1[(nd+1)%dim]=GeometryInfo<dim>::unit_normal_orientation[i];
+					       // second tangential
+					       // vector in direction
+					       // of the (nd+2)%3 axis
+	      tang2[(nd+2)%dim]=1.;
+
+					       // same unit tangents
+					       // for all quadrature
+					       // points on this face
+	      std::fill (data.unit_tangentials[i].begin(),
+			 data.unit_tangentials[i].end(), tang1);
+	      std::fill (data.unit_tangentials[nfaces+i].begin(),
+			 data.unit_tangentials[nfaces+i].end(), tang2);
 	    }
 	}
     }
@@ -536,7 +530,7 @@ MappingQ1<dim>::compute_mapping_support_points(
   a.resize(GeometryInfo<dim>::vertices_per_cell);
 
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    a[i] = cell->vertex(vertex_mapping[i]);
+    a[i] = cell->vertex(i);
 }
 
 

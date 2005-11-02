@@ -68,7 +68,7 @@ int main ()
                                    // we know that from the second
                                    // cell, the common face must have
                                    // wrong orientation. check this
-  Assert ((++coarse_grid.begin_active())->face_orientation(4)
+  Assert ((++coarse_grid.begin_active())->face_orientation(5)
           == false,
           ExcInternalError());
 }

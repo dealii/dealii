@@ -352,10 +352,10 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 				       // AVS Developer's Guide, Release 4,
 				       // May, 1992, p. E6
 				       //
-				       // note: vertex numbers are 1-base
+				       // note: vertex numbers are 1-base      
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
 	   ++vertex)
-	out << cell->vertex_index(vertex)+1 << ' ';
+	out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex])+1 << ' ';
       out << std::endl;
     };
 
@@ -443,7 +443,8 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 				       // (dots/inch)
       for (unsigned int k=0;k<=nv;++k)
 	{
-	  const Point<dim>& p = cell->vertex(k % nv);
+	  const Point<dim>& p = cell->vertex(
+	    GeometryInfo<dim>::ucd_to_deal[k % nv]);
 	  for (unsigned int d=0;d<dim;++d)
 	    {
 	      int val = (int)(1200 * xfig_flags.scaling(d) *
@@ -453,11 +454,12 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 	  out << std::endl;
 	}
 				       // Now write boundary edges
+      static const unsigned int face_reorder[4]={2,1,3,0};
       if (xfig_flags.draw_boundary)
 	for (unsigned int f=0;f<nf;++f)
 	  {
 	    typename Triangulation<dim>::face_iterator
-	      face = cell->face(f);
+	      face = cell->face(face_reorder[f]);
 	    const unsigned char bi = face->boundary_indicator();
 	    if (bi != 255)
 	      {
@@ -571,7 +573,7 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
 	  };
 				       // note: vertex numbers are 1-base
 	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
-	  out << face->vertex_index(vertex)+1 << ' ';
+	  out << face->vertex_index(GeometryInfo<dim-1>::ucd_to_deal[vertex])+1 << ' ';
 	out << std::endl;
 
 	++index;
@@ -662,7 +664,7 @@ void GridOut::write_gnuplot (const Triangulation<2> &tria,
 					   // drawing pencil at the
 					   // end
 	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-	    out << cell->vertex(i)
+	    out << cell->vertex(GeometryInfo<dim>::ucd_to_deal[i])
 		<< ' ' << cell->level()
 		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
 	  out << cell->vertex(0)
@@ -779,7 +781,7 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
 	out << "# cell " << cell << std::endl;
 
       if (mapping==0 || n_points==2 || !cell->has_boundary_lines())
-	{	  	    
+	{
 					   // front face
 	  out << cell->vertex(0)
 	      << ' ' << cell->level()
@@ -787,10 +789,10 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
 	      << cell->vertex(1)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << cell->vertex(2)
+	      << cell->vertex(5)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << cell->vertex(3)
+	      << cell->vertex(4)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 	      << cell->vertex(0)
@@ -798,19 +800,19 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 	      << std::endl;
 					   // back face
-	  out << cell->vertex(4)
+	  out << cell->vertex(2)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << cell->vertex(5)
-	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << cell->vertex(6)
+	      << cell->vertex(3)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 	      << cell->vertex(7)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << cell->vertex(4)
+	      << cell->vertex(6)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(2)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 	      << std::endl;
@@ -819,28 +821,28 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
 	  out << cell->vertex(0)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << cell->vertex(4)
+	      << cell->vertex(2)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 	      << std::endl;
 	  out << cell->vertex(1)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << cell->vertex(5)
+	      << cell->vertex(3)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 	      << std::endl;
-	  out << cell->vertex(2)
-	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << cell->vertex(6)
-	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << std::endl;
-	  out << cell->vertex(3)
+	  out << cell->vertex(5)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 	      << cell->vertex(7)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << std::endl;
+	  out << cell->vertex(4)
+	      << ' ' << cell->level()
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << cell->vertex(6)
 	      << ' ' << cell->level()
 	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
 	      << std::endl;

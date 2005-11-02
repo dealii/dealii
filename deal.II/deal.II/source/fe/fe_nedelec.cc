@@ -135,14 +135,14 @@ FE_Nedelec<2>::shape_value_component (const unsigned int i,
       {
 	switch (i)
 	  {
-					     // (1-y, 0)
-	    case 0: return (component == 0 ? 1-p(1) : 0);
+						   // (0, 1-x)
+	    case 0: return (component == 0 ? 0 : 1-p(0));
 						   // (0,x)
 	    case 1: return (component == 0 ? 0 : p(0));
+						   // (1-y, 0)
+	    case 2: return (component == 0 ? 1-p(1) : 0);
 						   // (y, 0)
-	    case 2: return (component == 0 ? p(1) : 0);
-						   // (0, 1-x)
-	    case 3: return (component == 0 ? 0 : 1-p(0));
+	    case 3: return (component == 0 ? p(1) : 0);
                         
 						   // there are only
 						   // four shape
@@ -190,12 +190,12 @@ FE_Nedelec<3>::shape_value_component (const unsigned int i,
 					 // a little. these directions
 					 // are:
 					 //
-					 // for lines 0, 2, 4, 6:
+					 // for lines 2, 3, 6, 7:
 					 //    (1,0,0)
-					 // for lines 1, 3, 5, 7:
-					 //    (0,0,1)
-					 // for lines 8, 9, 10, 11:
+					 // for lines 0, 1, 4, 5:
 					 //    (0,1,0)
+					 // for lines 8, 9, 10, 11:
+					 //    (0,0,1)
 					 //
 					 // thus, sort out all those
 					 // cases where the component
@@ -204,9 +204,9 @@ FE_Nedelec<3>::shape_value_component (const unsigned int i,
 					 // spatially dependent part
 					 // which is then also the
 					 // return value
-	if (((i<8) && (((i%2==0) && (component!=0)) ||
-		       ((i%2==1) && (component!=2)))) ||
-	    ((i>=8) && (component != 1)))
+	if (((i<8) && (((i%4>=2) && (component!=0)) ||
+		       ((i%4<2) && (component!=1)))) ||
+	    ((i>=8) && (component != 2)))
 	  return 0;
 
 					       // now we know that the
@@ -218,20 +218,21 @@ FE_Nedelec<3>::shape_value_component (const unsigned int i,
 		     z = p(2);
 	switch (i)
 	  {
-	    case  0: return (1-y)*(1-z);
-	    case  2: return (1-y)*z;
-	    case  1: return x*(1-y);
-	    case  3: return (1-x)*(1-y);
+	    case  0: return (1-x)*(1-z);
+	    case  1: return     x*(1-z);
+	    case  2: return (1-y)*(1-z);
+	    case  3: return     y*(1-z);
 
-	    case  4: return y*(1-z);
-	    case  6: return y*z;
-	    case  5: return x*y;
-	    case  7: return (1-x)*y;
+	    case  4: return (1-x)*z;
+	    case  5: return     x*z;
+	    case  6: return (1-y)*z;
+	    case  7: return     y*z;
+
+	    case  8: return (1-x)*(1-y);
+	    case  9: return     x*(1-y);
+	    case 10: return (1-x)*y;
+	    case 11: return     x*y;
 			
-	    case  8: return (1-x)*(1-z);
-	    case  9: return x*(1-z);
-	    case 10: return x*z;
-	    case 11: return (1-x)*z;
 	    default:
 		  Assert (false, ExcInternalError());
 		  return 0;
@@ -293,10 +294,10 @@ FE_Nedelec<2>::shape_grad_component (const unsigned int i,
 					 // third index=component
 					 // within gradient
 	static const double unit_gradients[4][2][2]
-	  = { { {0.,-1.}, {0.,0.} },
-	      { {0.,0.},  {1.,0.} },
-	      { {0.,+1.}, {0.,0.} },
-	      { {0.,0.},  {-1.,0.} } };
+	  = { { {0., 0.}, {-1.,0.} },
+	      { {0., 0.}, {+1.,0.} },
+	      { {0.,-1.}, { 0.,0.} },
+	      { {0.,+1.}, { 0.,0.} } };
 	return Tensor<1,dim>(unit_gradients[i][component]);
       };
 
@@ -352,20 +353,20 @@ FE_Nedelec<3>::shape_grad_component (const unsigned int i,
 		     y = p(1),
 		     z = p(2);
 	const double unit_gradients[12][3][3]
-	  = { { {0,-(1-z), -(1-y)}, {0,0,0}, {     0,      0, 0} },
-	      { {0,     0,      0}, {0,0,0}, { (1-y),     -x, 0} },
-	      { {0,    -z,  (1-y)}, {0,0,0}, {     0,      0, 0} },
-	      { {0,     0,      0}, {0,0,0}, {-(1-y), -(1-x), 0} },
-                    
-	      { {0, (1-z),     -y}, {0,0,0}, {     0,      0, 0} },
-	      { {0,     0,      0}, {0,0,0}, {     y,      x, 0} },
-	      { {0,     z,      y}, {0,0,0}, {     0,      0, 0} },
-	      { {0,     0,      0}, {0,0,0}, {    -y,  (1-x), 0} },
-                    
-	      { {0, 0, 0}, {-(1-z), 0, -(1-x)}, {0, 0, 0} },
-	      { {0, 0, 0}, { (1-z), 0,     -x}, {0, 0, 0} },
-	      { {0, 0, 0}, {     z, 0,      x}, {0, 0, 0} },
-	      { {0, 0, 0}, {    -z, 0,  (1-x)}, {0, 0, 0} } };
+	  = { { {0,      0,      0}, {-(1-z), 0, -(1-x)}, {0, 0, 0} },
+	      { {0,      0,      0}, { (1-z), 0,     -x}, {0, 0, 0} },
+	      { {0, -(1-z), -(1-y)}, {0,      0,      0}, {0, 0, 0} },
+	      { {0,  (1-z),     -y}, {0,      0,      0}, {0, 0, 0} },
+	      
+	      { {0,  0,     0}, {-z, 0, (1-x)}, {0, 0, 0} },
+	      { {0,  0,     0}, { z, 0,     x}, {0, 0, 0} },
+	      { {0, -z, (1-y)}, { 0, 0,     0}, {0, 0, 0} },
+	      { {0,  z,     y}, { 0, 0,     0}, {0, 0, 0} },
+
+	      { {0, 0, 0}, {0, 0, 0}, {-(1-y), -(1-x), 0} },
+	      { {0, 0, 0}, {0, 0, 0}, { (1-y),     -x, 0} },
+	      { {0, 0, 0}, {0, 0, 0}, {    -y,  (1-x), 0} },
+	      { {0, 0, 0}, {0, 0, 0}, {     y,      x, 0} } };
 					 // note: simple check whether
 					 // this can at all be: build
 					 // the sum over all these
@@ -469,40 +470,20 @@ FE_Nedelec<3>::shape_grad_grad_component (const unsigned int i,
 					 // second derivative
 	static const double unit_grad_grads[12][3][3][3]
 	  = {
-		{ { {0, 0, 0}, {0, 0, 1}, {0, 1, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0,-1, 0}, {-1, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0,-1}, {0,-1, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 1, 0}, { 1, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0,-1}, {0,-1, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 1, 0}, { 1, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 1}, {0, 1, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0,-1, 0}, {-1, 0, 0}, {0, 0, 0} } },
-
 		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
 		  { {0, 0, 1}, {0, 0, 0}, {1, 0, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
+
+		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
+		  { {0, 0,-1}, {0, 0, 0}, {-1, 0, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
+		
+		{ { {0, 0, 0}, {0, 0, 1}, {0, 1, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
+
+		{ { {0, 0, 0}, {0, 0,-1}, {0,-1, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
 		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
 
 		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
@@ -513,9 +494,30 @@ FE_Nedelec<3>::shape_grad_grad_component (const unsigned int i,
 		  { {0, 0, 1}, {0, 0, 0}, {1, 0, 0} },
 		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
 
+		{ { {0, 0, 0}, {0, 0,-1}, {0,-1, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
+
+		{ { {0, 0, 0}, {0, 0, 1}, {0, 1, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
+
 		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0,-1}, {0, 0, 0}, {-1, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } } };
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
+		  { {0, 1, 0}, {1, 0, 0}, {0, 0, 0} } },
+
+		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
+		  { {0,-1, 0}, {-1, 0, 0}, {0, 0, 0} } },
+
+		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
+		  { {0,-1, 0}, {-1, 0, 0}, {0, 0, 0} } },
+
+		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
+		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
+		  { {0, 1, 0}, {1, 0, 0}, {0, 0, 0} } }
+	  };
 
 	return Tensor<2,dim>(unit_grad_grads[i][component]);
       };
@@ -684,11 +686,11 @@ FE_Nedelec<dim>::initialize_restriction ()
               for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
                 this->restriction[c].reinit (this->dofs_per_cell,
                                              this->dofs_per_cell);
-              
+	      
 	      this->restriction[0](0,0) = 2.;
 	      this->restriction[1](1,1) = 2.;
-	      this->restriction[3](2,2) = 2.;
-	      this->restriction[0](3,3) = 2.;
+	      this->restriction[0](2,2) = 2.;
+	      this->restriction[2](3,3) = 2.;
 
 	      break;
 	    };
@@ -726,14 +728,14 @@ FE_Nedelec<dim>::initialize_restriction ()
                 this->restriction[c].reinit (this->dofs_per_cell,
                                              this->dofs_per_cell);
 	      this->restriction[0](0,0) = 2.;
-	      this->restriction[0](3,3) = 2.;
 	      this->restriction[1](1,1) = 2.;
-	      this->restriction[3](2,2) = 2.;
+	      this->restriction[0](2,2) = 2.;
+	      this->restriction[2](3,3) = 2.;
               
 	      this->restriction[4](4,4) = 2.;
-	      this->restriction[4](7,7) = 2.;
 	      this->restriction[5](5,5) = 2.;
-	      this->restriction[7](6,6) = 2.;
+	      this->restriction[4](6,6) = 2.;
+	      this->restriction[6](7,7) = 2.;
               
 	      this->restriction[0](8,8) = 2.;
 	      this->restriction[1](9,9) = 2.;
@@ -1444,7 +1446,7 @@ FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
                                                // these in a table
               const unsigned int
                 opposite_faces[GeometryInfo<2>::faces_per_cell]
-                = { 2, 3, 0, 1};
+                = { 1, 0, 3, 2};
               
               return (face_index != opposite_faces[shape_index]);
             };
@@ -1460,8 +1462,9 @@ FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
                                                // defined on
               const unsigned int
                 opposite_faces[GeometryInfo<3>::lines_per_cell][2]
-                = { {1,4}, {1,5}, {1,2}, {1,3}, {0,4}, {0,5},
-                    {0,2}, {0,3}, {3,4}, {4,5}, {2,5}, {2,3}};
+                = { {1,5}, {0,5}, {3,5}, {2,5},
+		    {1,4}, {0,4}, {3,4}, {2,4},
+		    {1,3}, {0,3}, {1,2}, {0,2}};
               
               return ((face_index != opposite_faces[shape_index][0])
                       &&

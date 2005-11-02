@@ -360,30 +360,6 @@ class Mapping : public Subscriptor
 				      */
     DeclException0 (ExcInvalidData);
 
-
-    
-  protected:
-
-				     /**
-				      * Vector of unit normal
-				      * directions. The entry divided by
-				      * 2 determines the non-zero
-				      * component of the normal vector:
-				      * 0 means x, 1 means y and 2 means
-				      * z. The entry modulo 2 determines
-				      * the orientation of the first
-				      * tangential vector in the
-				      * cross-product. This has to be
-				      * chosen such that the normal
-				      * vector points outwards.
-				      *
-				      * This variable is purely for
-				      * internal use and its values are
-				      * determined by its usage in the
-				      * source code.
-				      */
-    static const unsigned int normal_directions[2*dim];
-
   private:
     
 				     /**
@@ -509,17 +485,6 @@ class Mapping : public Subscriptor
 };
 
 /*@}*/
-
-/* -------------- declaration of explicit specializations ------------- */
-
-
-// declaration of explicit specializations of member variables, if the
-// compiler allows us to do that (the standard says we must)
-#ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-template<> const unsigned int Mapping<1>::normal_directions[2];
-template<> const unsigned int Mapping<2>::normal_directions[4];
-template<> const unsigned int Mapping<3>::normal_directions[6];
-#endif
 
 /* ------------------------- inline functions ------------------------- */
 

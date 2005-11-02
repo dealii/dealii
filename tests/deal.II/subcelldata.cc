@@ -21,6 +21,15 @@
 #include <fstream>
 
 
+static const unsigned subcells[6][4] = {{0, 1, 2, 3},
+					{4, 5, 6, 7},
+					{0, 1, 5, 4},
+					{1, 5, 6, 2},
+					{3, 2, 6, 7},
+					{0, 4, 7, 3}};
+
+
+
 template <int dim>
 void test()
 {
@@ -75,14 +84,13 @@ void test()
       for(unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	{
 	  for(unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
-	    subcelldata.boundary_quads[f].vertices[i]=
-	      GeometryInfo<dim>::face_to_cell_vertices(f,i);
+	    subcelldata.boundary_quads[f].vertices[i]=subcells[f][i];
 	  subcelldata.boundary_quads[f].material_id=10*f+1;
 	}
     }
 
   Triangulation<dim> tria;
-  tria.create_triangulation (vertices, cells, subcelldata);
+  tria.create_triangulation_compatibility (vertices, cells, subcelldata);
 
   GridOutFlags::Ucd ucd_flags(true,true);
   GridOut grid_out;

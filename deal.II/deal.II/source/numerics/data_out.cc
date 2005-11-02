@@ -405,9 +405,13 @@ void DataOut<dim>::build_some_patches (Data data)
     {
       Assert (patch != this->patches.end(), ExcInternalError());
 
+				       // use ucd_to_deal map as patch
+				       // vertices are in the old,
+				       // unnatural ordering
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-	  patch->vertices[vertex] = data.mapping->transform_unit_to_real_cell
-	      (cell, GeometryInfo<dim>::unit_cell_vertex (vertex));
+	patch->vertices[vertex] = data.mapping->transform_unit_to_real_cell
+				  (cell, GeometryInfo<dim>::unit_cell_vertex (
+				    GeometryInfo<dim>::ucd_to_deal[vertex]));
       
       if (data.n_datasets > 0)
 	{
@@ -515,40 +519,8 @@ void DataOut<dim>::build_some_patches (Data data)
                                            // neighbor, so get its
                                            // patch number and set it
                                            // for the neighbor index
-          const unsigned int neighbor_patch_index
-            = this->patches[(*data.cell_to_patch_index_map)
-                            [neighbor->level()][neighbor->index()]].patch_index;
-          
-	  switch (dim)
-	    {
-	      case 1:
-		    patch->neighbors[f] = neighbor_patch_index;
-		    break;
-		    
-	      case 2:
-                    switch (f)
-                      {
-                        case 0: patch->neighbors[2] = neighbor_patch_index; break;
-                        case 1: patch->neighbors[1] = neighbor_patch_index; break;
-                        case 2: patch->neighbors[3] = neighbor_patch_index; break;
-                        case 3: patch->neighbors[0] = neighbor_patch_index; break;
-                      }
-                    break;
-	      case 3:
-                    switch (f)
-                      {
-                        case 0: patch->neighbors[2] = neighbor_patch_index; break;
-                        case 1: patch->neighbors[3] = neighbor_patch_index; break;
-                        case 2: patch->neighbors[4] = neighbor_patch_index; break;
-                        case 3: patch->neighbors[1] = neighbor_patch_index; break;
-                        case 4: patch->neighbors[5] = neighbor_patch_index; break;
-                        case 5: patch->neighbors[0] = neighbor_patch_index; break;
-                      }
-                    break;
-
-	      default:
-                    Assert(false, ExcNotImplemented());
-	    }          
+          patch->neighbors[f] = this->patches[(*data.cell_to_patch_index_map)
+					     [neighbor->level()][neighbor->index()]].patch_index;
         };
       
       				       // next cell (patch) in this

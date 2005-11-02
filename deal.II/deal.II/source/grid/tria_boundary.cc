@@ -237,8 +237,8 @@ get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
       for (unsigned int j=0; j<m; ++j, x+=ds)
 	points[i*m+j]=((1-x) * vertices[0] +
 		       x     * vertices[1]) * (1-y) +
-		      ((1-x) * vertices[3] +
-		       x     * vertices[2]) * y;
+		      ((1-x) * vertices[2] +
+		       x     * vertices[3]) * y;
     }
 }
 
@@ -288,7 +288,9 @@ get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
 			 Boundary<3>::FaceVertexNormals &face_vertex_normals) const
 {
   const unsigned int vertices_per_face = GeometryInfo<3>::vertices_per_face;
-  
+
+  static const unsigned int neighboring_vertices[4][2]=
+  { {1,2},{3,0},{0,3},{2,1}};
   for (unsigned int vertex=0; vertex<vertices_per_face; ++vertex)
     {
 				       // first define the two tangent
@@ -297,9 +299,9 @@ get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
 				       // radiating away from this
 				       // vertex
       const Tensor<1,3> tangents[2]
-	= { face->vertex((vertex+1) % vertices_per_face)
+	= { face->vertex(neighboring_vertices[vertex][0])
 	      - face->vertex(vertex),
-	    face->vertex((vertex+vertices_per_face-1) % vertices_per_face)
+	    face->vertex(neighboring_vertices[vertex][1])
 	      - face->vertex(vertex)      };
 
 				       // then compute the normal by

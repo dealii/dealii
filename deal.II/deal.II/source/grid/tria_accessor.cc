@@ -267,8 +267,7 @@ int TriaObjectAccessor<2, dim>::vertex_index (const unsigned int corner) const
 {
   Assert (corner<4, ExcIndexRange(corner,0,4));
 
-  static const int corner_convention[4] = { 0,0,1,1 };
-  return line(corner)->vertex_index(corner_convention[corner]);
+  return line(corner%2)->vertex_index(corner/2);
 }
 
 
@@ -437,8 +436,8 @@ bool TriaObjectAccessor<2, dim>::at_boundary () const
 template <int dim>
 double TriaObjectAccessor<2, dim>::diameter () const
 {
-  return std::sqrt(std::max((vertex(2)-vertex(0)).square(),
-			    (vertex(3)-vertex(1)).square()));
+  return std::sqrt(std::max((vertex(3)-vertex(0)).square(),
+			    (vertex(2)-vertex(1)).square()));
 }
 
 
@@ -476,9 +475,9 @@ Point<2> TriaObjectAccessor<2, 2>::barycenter () const
   x := array(0..3);
   y := array(0..3);
   tphi[0] := (1-xi)*(1-eta):
-  tphi[1] := xi*(1-eta):
-  tphi[2] := xi*eta:
-  tphi[3] := (1-xi)*eta:
+  tphi[1] :=     xi*(1-eta):
+  tphi[2] := (1-xi)*eta:
+  tphi[3] :=     xi*eta:
   x_real := sum(x[s]*tphi[s], s=0..3):
   y_real := sum(y[s]*tphi[s], s=0..3):
   detJ := diff(x_real,xi)*diff(y_real,eta) - diff(x_real,eta)*diff(y_real,xi):
@@ -501,30 +500,22 @@ Point<2> TriaObjectAccessor<2, 2>::barycenter () const
 			vertex(2)(1),
 			vertex(3)(1)  };
   const double t1 = x[0]*x[1];
-  const double t4 = x[2]*x[3];
-  const double t7 = x[0]*x[3];
-  const double t9 = x[1]*x[2];
-  const double t11 = x[0]*x[0];
-  const double t13 = x[1]*x[1];
-  const double t15 = x[2]*x[2];
-  const double t17 = x[3]*x[3];
-  const double t25 = -t1*y[0]+t1*y[1]-t4*y[2]+t4*y[3]+t7*y[0]-t9*y[1]
-		     +t11*y[1]-t13*y[0]+t15*y[3]-t17*y[2]-t11*y[3]
-		     +t13*y[2]-t15*y[1]+t17*y[0]+t9*y[2]-t7*y[3];
-  const double t35 = 1/(-x[0]*y[3]-x[1]*y[0]+x[2]*y[3]+x[3]*y[0]
-			+x[0]*y[1]-x[3]*y[2]+x[1]*y[2]-x[2]*y[1]);
-  const double t38 = y[3]*x[3];
-  const double t40 = y[0]*x[0];
-  const double t42 = y[1]*x[1];
-  const double t44 = y[2]*x[2];
-  const double t50 = y[0]*y[0];
-  const double t52 = y[1]*y[1];
-  const double t54 = y[2]*y[2];
-  const double t56 = y[3]*y[3];
-  const double t62 = -t38*y[2]+t40*y[1]-t42*y[0]+t44*y[3]-t40*y[3]
-		     +t42*y[2]-t44*y[1]+t38*y[0]-x[1]*t50+x[0]*t52
-		     -x[3]*t54+x[2]*t56+x[3]*t50-x[2]*t52+x[1]*t54-x[0]*t56;
-  return Point<2> (t25*t35/3.0, t62*t35/3.0);
+  const double t3 = x[0]*x[0];
+  const double t5 = x[1]*x[1];
+  const double t9 = y[0]*x[0];
+  const double t11 = y[1]*x[1];
+  const double t14 = x[2]*x[2];
+  const double t16 = x[3]*x[3];
+  const double t20 = x[2]*x[3];
+  const double t27 = t1*y[1]+t3*y[1]-t5*y[0]-t3*y[2]+t5*y[3]+t9*x[2]-t11*x[3]-t1*y[0]-t14*y[3]+t16*y[2]-t16*y[1]+t14*y[0]-t20*y[3]-x[0]*x[2]*y[2]+x[1]*x[3]*y[3]+t20*y[2];
+  const double t37 = 1/(-x[1]*y[0]+x[1]*y[3]+y[0]*x[2]+x[0]*y[1]-x[0]*y[2]-y[1]*x[3]-x[2]*y[3]+x[3]*y[2]);
+  const double t39 = y[2]*y[2];
+  const double t51 = y[0]*y[0];
+  const double t53 = y[1]*y[1];
+  const double t59 = y[3]*y[3];
+  const double t63 = t39*x[3]+y[2]*y[0]*x[2]+y[3]*x[3]*y[2]-y[2]*x[2]*y[3]-y[3]*y[1]*x[3]-t9*y[2]+t11*y[3]+t51*x[2]-t53*x[3]-x[1]*t51+t9*y[1]-t11*y[0]+x[0]*t53-t59*x[2]+t59*x[1]-t39*x[0];
+
+  return Point<2> (t27*t37/3, t63*t37/3);
 }
 
 
@@ -550,9 +541,9 @@ double TriaObjectAccessor<2, 2>::measure () const
   x := array(0..3);
   y := array(0..3);
   tphi[0] := (1-xi)*(1-eta):
-  tphi[1] := xi*(1-eta):
-  tphi[2] := xi*eta:
-  tphi[3] := (1-xi)*eta:
+  tphi[1] :=     xi*(1-eta):
+  tphi[2] := (1-xi)*eta:
+  tphi[3] :=     xi*eta:
   x_real := sum(x[s]*tphi[s], s=0..3):
   y_real := sum(y[s]*tphi[s], s=0..3):
   detJ := diff(x_real,xi)*diff(y_real,eta) - diff(x_real,eta)*diff(y_real,xi):
@@ -572,8 +563,7 @@ double TriaObjectAccessor<2, 2>::measure () const
 			vertex(2)(1),
 			vertex(3)(1)  };
 
-  return (-x[0]*y[3]/2.0-x[1]*y[0]/2.0+x[2]*y[3]/2.0+x[3]*y[0]/2.0+
-	  x[0]*y[1]/2.0-x[3]*y[2]/2.0+x[1]*y[2]/2.0-x[2]*y[1]/2.0);
+  return (-x[1]*y[0]/2+x[1]*y[3]/2+y[0]*x[2]/2+x[0]*y[1]/2-x[0]*y[2]/2-y[1]*x[3]/2-x[2]*y[3]/2+x[3]*y[2]/2);
 }
 
 
@@ -688,28 +678,28 @@ int TriaObjectAccessor<3, dim>::vertex_index (const unsigned int corner) const
   Assert (corner<8, ExcIndexRange(corner,0,8));
 
 				   // get the corner indices by asking
-				   // either the front or the back
+				   // either the bottom or the top
 				   // face for its vertices. make sure
 				   // we take into account that the
 				   // face might have non-standard
 				   // orientation; if this is not the
-				   // case, transpose vertices 1 and 3
+				   // case, transpose vertices 1 and 2
 				   // of this face
   static const unsigned int vertex_translation[4] = 
-    { 0, 3, 2, 1 };
+    { 0, 2, 1, 3 };
   if (corner<4)
     {
-      if (face_orientation(0) == true)
-        return quad(0)->vertex_index(corner);
+      if (face_orientation(4) == true)
+        return quad(4)->vertex_index(corner);
       else
-        return quad(0)->vertex_index(vertex_translation[corner]);
+        return quad(4)->vertex_index(vertex_translation[corner]);
     }
   else
     {
-      if (face_orientation(1) == true)
-        return quad(1)->vertex_index(corner-4);
+      if (face_orientation(5) == true)
+        return quad(5)->vertex_index(corner-4);
       else
-        return quad(1)->vertex_index(vertex_translation[corner-4]);
+        return quad(5)->vertex_index(vertex_translation[corner-4]);
     }
 }
 
@@ -877,10 +867,10 @@ bool TriaObjectAccessor<3, dim>::at_boundary () const
 template <int dim>
 double TriaObjectAccessor<3, dim>::diameter () const
 {
-  return std::sqrt(std::max( std::max((vertex(6)-vertex(0)).square(),
-				      (vertex(7)-vertex(1)).square()),
-			     std::max((vertex(4)-vertex(2)).square(),
-				      (vertex(5)-vertex(3)).square()) ));
+  return std::sqrt(std::max( std::max((vertex(7)-vertex(0)).square(),
+				      (vertex(6)-vertex(1)).square()),
+			     std::max((vertex(2)-vertex(5)).square(),
+				      (vertex(3)-vertex(4)).square()) ));
 }
 
 
@@ -946,32 +936,55 @@ Point<3> TriaObjectAccessor<3, 3>::barycenter () const
   readlib(C):
 
   C(array(1..3, [xs, ys, zs]));
+
+
+  This script takes more than several hours when using an old version
+  of maple on an old and slow computer. Therefore, when changing to
+  the new deal.II numbering scheme (lexicographic numbering) the code
+  lines below have not been reproduced with maple but only the
+  ordering of points in the definitions of x[], y[] and z[] have been
+  changed.
+
+  For the case, someone is willing to rerun the maple script, he/she
+  should use following ordering of shape functions:
+  
+  tphi[0] := (1-xi)*(1-eta)*(1-zeta):
+  tphi[1] :=     xi*(1-eta)*(1-zeta):
+  tphi[2] := (1-xi)*    eta*(1-zeta):
+  tphi[3] :=     xi*    eta*(1-zeta):
+  tphi[4] := (1-xi)*(1-eta)*zeta:
+  tphi[5] :=     xi*(1-eta)*zeta:
+  tphi[6] := (1-xi)*    eta*zeta:
+  tphi[7] :=     xi*    eta*zeta:
+
+  and change the ordering of points in the definitions of x[], y[] and
+  z[] back to the standard ordering.
 */
 
   const double x[8] = { vertex(0)(0),
 			vertex(1)(0),
+			vertex(5)(0),
+			vertex(4)(0),
 			vertex(2)(0),
 			vertex(3)(0),
-			vertex(4)(0),
-			vertex(5)(0),
-			vertex(6)(0),
-			vertex(7)(0)   };
+			vertex(7)(0),
+			vertex(6)(0)   };
   const double y[8] = { vertex(0)(1),
 			vertex(1)(1),
+			vertex(5)(1),
+			vertex(4)(1),
 			vertex(2)(1),
 			vertex(3)(1),
-			vertex(4)(1),
-			vertex(5)(1),
-			vertex(6)(1),
-			vertex(7)(1)  };
+			vertex(7)(1),
+			vertex(6)(1)   };
   const double z[8] = { vertex(0)(2),
 			vertex(1)(2),
+			vertex(5)(2),
+			vertex(4)(2),
 			vertex(2)(2),
 			vertex(3)(2),
-			vertex(4)(2),
-			vertex(5)(2),
-			vertex(6)(2),
-			vertex(7)(2)  };
+			vertex(7)(2),
+			vertex(6)(2)   };
 
   double s1, s2, s3, s4, s5, s6, s7, s8;
   
@@ -1758,7 +1771,7 @@ bool CellAccessor<2>::point_inside (const Point<2> &p) const
 
 				   // we want the faces in counter
 				   // clockwise orientation
-  static const int direction[4]={1,1,-1,-1};
+  static const int direction[4]={-1,1,1,-1};
   for (unsigned int f=0; f<4; ++f)
     {
 				       // vector from the first vertex
@@ -2145,7 +2158,7 @@ neighbor_child_on_subface (const unsigned int face,
           ExcMessage ("The neighbor must have children!"));
   
   static const unsigned int subface_translation[4]
-    = { 0, 3, 2, 1 };
+    = { 0, 2, 1, 3 };
                                    // see whether face and
                                    // the neighbor's
                                    // counterface share the

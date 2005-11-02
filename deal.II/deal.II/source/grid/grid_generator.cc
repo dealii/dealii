@@ -92,7 +92,8 @@ GridGenerator::hyper_rectangle (Triangulation<dim> &tria,
     cells[0].vertices[i] = i;
   cells[0].material_id = 0;
 
-  tria.create_triangulation (vertices, cells, SubCellData());
+  SubCellData subcelldata;
+  tria.create_triangulation_compatibility (vertices, cells, subcelldata);
 
 				   // Assign boundary indicators
   if (colorize)
@@ -119,25 +120,8 @@ GridGenerator::colorize_hyper_rectangle (Triangulation<dim> &tria)
 				   // there is only one cell, so
 				   // simple task
   const typename Triangulation<dim>::cell_iterator cell = tria.begin();
-  switch(dim)
-    {
-      case 2:
-	    cell->face(0)->set_boundary_indicator (2);
-	    cell->face(1)->set_boundary_indicator (1);
-	    cell->face(2)->set_boundary_indicator (3);
-	    cell->face(3)->set_boundary_indicator (0);
-	    break;
-      case 3:
-	    cell->face(0)->set_boundary_indicator (2);
-	    cell->face(1)->set_boundary_indicator (3);
-	    cell->face(2)->set_boundary_indicator (4);
-	    cell->face(3)->set_boundary_indicator (1);
-	    cell->face(4)->set_boundary_indicator (5);
-	    cell->face(5)->set_boundary_indicator (0);
-	    break;
-      default:
-	    Assert(false, ExcNotImplemented());
-    };
+  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+    cell->face(f)->set_boundary_indicator (f);
 }
 
 #endif
@@ -171,9 +155,9 @@ GridGenerator::parallelogram (
   std::vector<Point<dim> > vertices (GeometryInfo<dim>::vertices_per_cell);
 
   vertices[1] = corners[0];
-  vertices[3] = corners[1];
-  vertices[2] = vertices[1];
-  vertices[2] += vertices[3];
+  vertices[2] = corners[1];
+  vertices[3] = vertices[1];
+  vertices[3] += vertices[2];
 				   // Prepare cell data
   std::vector<CellData<dim> > cells (1);
   for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_cell;++i)
@@ -251,8 +235,8 @@ GridGenerator::subdivided_hyper_cube (Triangulation<dim> &tria,
                   const unsigned int c = x+y*repetitions;
                   cells[c].vertices[0] = y*(repetitions+1)+x;
                   cells[c].vertices[1] = y*(repetitions+1)+x+1;
-                  cells[c].vertices[2] = (y+1)*(repetitions+1)+x+1;
-                  cells[c].vertices[3] = (y+1)*(repetitions+1)+x;
+                  cells[c].vertices[2] = (y+1)*(repetitions+1)+x;
+                  cells[c].vertices[3] = (y+1)*(repetitions+1)+x+1;
                   cells[c].material_id = 0;
                 }
             break;
@@ -365,8 +349,8 @@ subdivided_hyper_rectangle (Triangulation<dim>              &tria,
               const unsigned int c = x+y*repetitions[0];
               cells[c].vertices[0] = y*(repetitions[0]+1)+x;
               cells[c].vertices[1] = y*(repetitions[0]+1)+x+1;
-              cells[c].vertices[2] = (y+1)*(repetitions[0]+1)+x+1;
-              cells[c].vertices[3] = (y+1)*(repetitions[0]+1)+x;
+              cells[c].vertices[2] = (y+1)*(repetitions[0]+1)+x;
+              cells[c].vertices[3] = (y+1)*(repetitions[0]+1)+x+1;
               cells[c].material_id = 0;
             }
         break;
@@ -386,12 +370,12 @@ subdivided_hyper_rectangle (Triangulation<dim>              &tria,
                                        z*repetitions[0]*repetitions[1];
                 cells[c].vertices[0] = z*n_xy + y*n_x + x;
                 cells[c].vertices[1] = z*n_xy + y*n_x + x+1;
-                cells[c].vertices[2] = (z+1)*n_xy + y*n_x + x+1;
-                cells[c].vertices[3] = (z+1)*n_xy + y*n_x + x;
-                cells[c].vertices[4] = z*n_xy + (y+1)*n_x + x;
-                cells[c].vertices[5] = z*n_xy + (y+1)*n_x + x+1;
-                cells[c].vertices[6] = (z+1)*n_xy + (y+1)*n_x + x+1;
-                cells[c].vertices[7] = (z+1)*n_xy + (y+1)*n_x + x;
+                cells[c].vertices[2] = z*n_xy + (y+1)*n_x + x;
+                cells[c].vertices[3] = z*n_xy + (y+1)*n_x + x+1;
+                cells[c].vertices[4] = (z+1)*n_xy + y*n_x + x;
+                cells[c].vertices[5] = (z+1)*n_xy + y*n_x + x+1;
+                cells[c].vertices[6] = (z+1)*n_xy + (y+1)*n_x + x;
+                cells[c].vertices[7] = (z+1)*n_xy + (y+1)*n_x + x+1;
                 cells[c].material_id = 0;
               }
         break;
@@ -572,8 +556,8 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<2> &tria,
       {
 	cells[k].vertices[0] = i1+4*i0;
 	cells[k].vertices[1] = i1+4*i0+1;
-	cells[k].vertices[2] = i1+4*i0+5;
-	cells[k].vertices[3] = i1+4*i0+4;
+	cells[k].vertices[2] = i1+4*i0+4;
+	cells[k].vertices[3] = i1+4*i0+5;
 	if (colorize)
 	  cells[k].material_id = materials[k];
 	++k;
@@ -602,10 +586,10 @@ GridGenerator::hyper_cube_slit (Triangulation<2> &tria,
 				  Point<2>(left, right),
 				  Point<2>(right,right),
 				  Point<2>(rl2,  left ) };
-  const int cell_vertices[4][4] = { { 0,1,2,3 },
-				    { 9,4,5,2 },
-				    { 3,2,6,7 },
-				    { 2,5,8,6 } };
+  const int cell_vertices[4][4] = { { 0,1,3,2 },
+				    { 9,4,2,5 },
+				    { 3,2,7,6 },
+				    { 2,5,6,8 } };
   std::vector<CellData<2> > cells (4, CellData<2>());
   for (unsigned int i=0; i<4; ++i)
     {
@@ -613,9 +597,10 @@ GridGenerator::hyper_cube_slit (Triangulation<2> &tria,
 	cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     };
-  tria.create_triangulation (std::vector<Point<2> >(&vertices[0], &vertices[10]),
-			     cells,
-			     SubCellData());       // no boundary information
+  tria.create_triangulation (
+    std::vector<Point<2> >(&vertices[0], &vertices[10]),
+    cells,
+    SubCellData());       // no boundary information
 
   if (colorize)
     {
@@ -642,9 +627,9 @@ GridGenerator::hyper_L (Triangulation<2> &tria,
 				   Point<dim> (b,(a+b)/2),
 				   Point<dim> (a,b),
 				   Point<dim> ((a+b)/2,b)  };
-  const int cell_vertices[3][4] = {{0, 1, 4, 3},
-				   {1, 2, 5, 4},
-				   {3, 4, 7, 6}};
+  const int cell_vertices[3][4] = {{0, 1, 3, 4},
+				   {1, 2, 4, 5},
+				   {3, 4, 6, 7}};
 
   std::vector<CellData<2> > cells (3, CellData<2>());
   
@@ -655,9 +640,10 @@ GridGenerator::hyper_L (Triangulation<2> &tria,
       cells[i].material_id = 0;
     };
   
-  tria.create_triangulation (std::vector<Point<dim> >(&vertices[0], &vertices[8]),
-			     cells,
-			     SubCellData());       // no boundary information
+  tria.create_triangulation (
+    std::vector<Point<dim> >(&vertices[0], &vertices[8]),
+    cells,
+    SubCellData());       // no boundary information
 }
 
 
@@ -680,11 +666,11 @@ GridGenerator::hyper_ball (Triangulation<2> &tria,
 				 p+Point<2>(-1,+1)*(radius/std::sqrt(2.0)),
 				 p+Point<2>(+1,+1)*(radius/std::sqrt(2.0)) };
   
-  const int cell_vertices[5][4] = {{0, 1, 3, 2},
-				   {0, 2, 4, 6},
-				   {2, 3, 5, 4},
-				   {1, 7, 5, 3},
-				   {6, 4, 5, 7}};
+  const int cell_vertices[5][4] = {{0, 1, 2, 3},
+				   {0, 2, 6, 4},
+				   {2, 3, 4, 5},
+				   {1, 7, 3, 5},
+				   {6, 4, 7, 5}};
 
   std::vector<CellData<2> > cells (5, CellData<2>());
   
@@ -695,9 +681,10 @@ GridGenerator::hyper_ball (Triangulation<2> &tria,
       cells[i].material_id = 0;
     };
   
-  tria.create_triangulation (std::vector<Point<2> >(&vertices[0], &vertices[8]),
-			     cells,
-			     SubCellData());       // no boundary information
+  tria.create_triangulation (
+    std::vector<Point<2> >(&vertices[0], &vertices[8]),
+    cells,
+    SubCellData());       // no boundary information
 }
 
 
@@ -751,13 +738,14 @@ void GridGenerator::hyper_shell (Triangulation<2>   &tria,
     {
       cells[i].vertices[0] = i;
       cells[i].vertices[1] = (i+1)%N;
-      cells[i].vertices[2] = N+((i+1)%N);
-      cells[i].vertices[3] = N+i;
+      cells[i].vertices[2] = N+i;
+      cells[i].vertices[3] = N+((i+1)%N);
 	    
       cells[i].material_id = 0;
     };
   
-  tria.create_triangulation (vertices, cells, SubCellData());
+  tria.create_triangulation (
+    vertices, cells, SubCellData());
 }
 
 
@@ -813,10 +801,10 @@ GridGenerator::half_hyper_ball (Triangulation<2> &tria,
 				 p+Point<2>(0,+1)*radius,
 				 p+Point<2>(+1,+1)*(radius/std::sqrt(2.0)) };
   
-  const int cell_vertices[5][4] = {{0, 1, 3, 2},
-				   {2, 3, 5, 4},
-				   {1, 7, 5, 3},
-				   {6, 4, 5, 7}};
+  const int cell_vertices[5][4] = {{0, 1, 2, 3},
+				   {2, 3, 4, 5},
+				   {1, 7, 3, 5},
+				   {6, 4, 7, 5}};
 
   std::vector<CellData<2> > cells (4, CellData<2>());
   
@@ -827,9 +815,10 @@ GridGenerator::half_hyper_ball (Triangulation<2> &tria,
       cells[i].material_id = 0;
     };
   
-  tria.create_triangulation (std::vector<Point<2> >(&vertices[0], &vertices[8]),
-			     cells,
-			     SubCellData());       // no boundary information
+  tria.create_triangulation (
+    std::vector<Point<2> >(&vertices[0], &vertices[8]),
+    cells,
+    SubCellData());       // no boundary information
 }
 
 
@@ -892,8 +881,8 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
     {
       cells[i].vertices[0] = i;
       cells[i].vertices[1] = (i+1)%(N+1);
-      cells[i].vertices[2] = N+1+((i+1)%(N+1));
-      cells[i].vertices[3] = N+1+i;
+      cells[i].vertices[2] = N+1+i;
+      cells[i].vertices[3] = N+1+((i+1)%(N+1));
 	    
       cells[i].material_id = 0;
     };
@@ -958,19 +947,20 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<3> &tria,
 	{
 	  cells[k].vertices[0] = i2+4*i1+16*i0;
 	  cells[k].vertices[1] = i2+4*i1+16*i0+1;
-	  cells[k].vertices[2] = i2+4*i1+16*i0+5;
-	  cells[k].vertices[3] = i2+4*i1+16*i0+4;
-	  cells[k].vertices[4] = i2+4*i1+16*i0+16;
-	  cells[k].vertices[5] = i2+4*i1+16*i0+17;
-	  cells[k].vertices[6] = i2+4*i1+16*i0+21;
-	  cells[k].vertices[7] = i2+4*i1+16*i0+20;
+	  cells[k].vertices[2] = i2+4*i1+16*i0+16;
+	  cells[k].vertices[3] = i2+4*i1+16*i0+17;
+	  cells[k].vertices[4] = i2+4*i1+16*i0+4;
+	  cells[k].vertices[5] = i2+4*i1+16*i0+5;
+	  cells[k].vertices[6] = i2+4*i1+16*i0+20;
+	  cells[k].vertices[7] = i2+4*i1+16*i0+21;
 	  if (colorize)
 	    cells[k].material_id = materials[k];
 	  ++k;
 	}
-  tria.create_triangulation (vertices,
-			     cells,
-			     SubCellData());       // no boundary information
+  tria.create_triangulation (
+    vertices,
+    cells,
+    SubCellData());       // no boundary information
 }
 
 
@@ -1032,10 +1022,12 @@ GridGenerator::hyper_L (Triangulation<3> &tria,
 	cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     };
-  
-  tria.create_triangulation (std::vector<Point<dim> >(&vertices[0], &vertices[26]),
-			     cells,
-			     SubCellData());       // no boundary information
+
+  SubCellData subcelldata;
+  tria.create_triangulation_compatibility (
+    std::vector<Point<dim> >(&vertices[0], &vertices[26]),
+    cells,
+    subcelldata);       // no boundary information
 }
 
 
@@ -1094,10 +1086,12 @@ GridGenerator::hyper_ball (Triangulation<3> &tria,
     };
 
   GridReordering<3>::reorder_cells (cells);
-  
-  tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[n_vertices]),
-			     cells,
-			     SubCellData());       // no boundary information
+
+  SubCellData subcelldata;
+  tria.create_triangulation_compatibility (
+    std::vector<Point<3> >(&vertices[0], &vertices[n_vertices]),
+    cells,
+    subcelldata);       // no boundary information
 }
 
 
@@ -1166,10 +1160,12 @@ GridGenerator::cylinder (Triangulation<3> &tria,
     };
   
   GridReordering<3>::reorder_cells (cells);
-  
-  tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[24]),
-			     cells,
-			     SubCellData());       // no boundary information
+
+  SubCellData subcelldata;
+  tria.create_triangulation_compatibility (
+    std::vector<Point<3> >(&vertices[0], &vertices[24]),
+    cells,
+    subcelldata);       // no boundary information
 
   Triangulation<3>::cell_iterator cell = tria.begin();
   Triangulation<3>::cell_iterator end = tria.end();
@@ -1267,18 +1263,19 @@ void GridGenerator::cylinder_shell (Triangulation<3>   &tria,
       {
         cells[i+j*N_r].vertices[0] = i + (j+1)*2*N_r;
         cells[i+j*N_r].vertices[1] = (i+1)%N_r + (j+1)*2*N_r;
-        cells[i+j*N_r].vertices[2] = N_r+((i+1)%N_r) + (j+1)*2*N_r;
-        cells[i+j*N_r].vertices[3] = N_r+i + (j+1)*2*N_r;
-        
-        cells[i+j*N_r].vertices[4] = i + j*2*N_r;
-        cells[i+j*N_r].vertices[5] = (i+1)%N_r + j*2*N_r;
-        cells[i+j*N_r].vertices[6] = N_r+((i+1)%N_r) + j*2*N_r;
-        cells[i+j*N_r].vertices[7] = N_r+i + j*2*N_r;
+        cells[i+j*N_r].vertices[2] = i + j*2*N_r;
+        cells[i+j*N_r].vertices[3] = (i+1)%N_r + j*2*N_r;
+
+        cells[i+j*N_r].vertices[4] = N_r+i + (j+1)*2*N_r;
+        cells[i+j*N_r].vertices[5] = N_r+((i+1)%N_r) + (j+1)*2*N_r;
+        cells[i+j*N_r].vertices[6] = N_r+i + j*2*N_r;
+        cells[i+j*N_r].vertices[7] = N_r+((i+1)%N_r) + j*2*N_r;
         
         cells[i+j*N_r].material_id = 0;
       }
   
-  tria.create_triangulation (vertices_3d, cells, SubCellData());
+  tria.create_triangulation (
+    vertices_3d, cells, SubCellData());
 }
 
 

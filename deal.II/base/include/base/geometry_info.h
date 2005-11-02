@@ -108,16 +108,92 @@ struct GeometryInfo<0>
 
 
 
+//! Topological description of cells.
+/**
+ * Dimension independent base class for the <tt>GeometryInfo<dim></tt>
+ * classes with <tt>dim=1,2,3,4</tt>. Includes all data and methods
+ * which can be defined in an dimension indendent way.
+ *
+ * @author Ralf Hartmann, 2005
+ */
+class GeometryInfoBase
+{
+  private:
+				     /**
+				      * The maximal dimension for
+				      * which data in this class is
+				      * implemented.
+				      */
+    static const unsigned int max_dim = 4;
+
+				     /**
+				      * Number of faces of a cell for
+				      * <tt>dim=max_dim</tt>.
+				      */
+    static const unsigned int faces_per_cell_max_dim = 2*max_dim;
+
+  public:
+        
+				     /**
+				      * For each face of the reference
+				      * cell, this field stores the
+				      * coordinate direction in which
+				      * its normal vector points. In
+				      * <tt>dim</tt> dimension these
+				      * are the <tt>2*dim</tt> first
+				      * entries of
+				      * <tt>{0,0,1,1,2,2,3,3}</tt>.
+				      *
+				      * Remark that this is only the
+				      * coordinate number. The actual
+				      * direction of the normal vector
+				      * is obtained by multiplying the
+				      * unit vector in this direction
+				      * with #unit_normal_orientation.
+				      */
+    static const unsigned int unit_normal_direction[faces_per_cell_max_dim];
+
+				     /**
+				      * Orientation of the unit normal
+				      * vector of a face of the
+				      * reference cell. In
+				      * <tt>dim</tt> dimension these
+				      * are the <tt>2*dim<tt> first
+				      * entries of
+				      * <tt>{-1,1,-1,1,-1,1,-1,1}</tt>.
+				      *
+				      * Each value is either
+				      * <tt>1</tt> or <tt>-1</tt>,
+				      * corresponding to a normal
+				      * vector pointing in the
+				      * positive or negative
+				      * coordinate direction,
+				      * respectively.
+				      */
+    static const int unit_normal_orientation[faces_per_cell_max_dim];
+
+				     /**
+				      * List of numbers which denotes
+				      * which face is opposite to a
+				      * given face. Its entries are
+				      * <tt>{ 1, 0, 3, 2, 5, 4, 7, 6}</tt>.
+				      */
+    static const unsigned int opposite_face[faces_per_cell_max_dim];
+};
+
+
+
 /**
  * This template specifies the interface to all topological structure
  * of the mesh cells.
+ * @ref Instantiations: few (dim = 1,2,3,4 and a specialization for dim=0)
  *
  * @ingroup grid
  * @ref Instantiations few (dim = 1,2,3,4 and a specialization for dim=0)
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005
  */
 template <int dim>
-struct GeometryInfo
+struct GeometryInfo: public GeometryInfoBase
 {
     
 				     /**
@@ -198,14 +274,32 @@ struct GeometryInfo
        GeometryInfo<dim-1>::quads_per_cell);
 
 				     /**
-				      * List of numbers which denotes which
-				      * face is opposite to a given face. In
-				      * 1d, this list is <tt>{1,0}</tt>, in 2d
-				      * <tt>{2, 3, 0, 1}</tt>, in 3d <tt>{1,
-				      * 0, 4, 5, 2, 3}</tt>.
+				      * Rearrange vertices for UCD
+				      * output.  For a cell being
+				      * written in UCD format, each
+				      * entry in this field contains
+				      * the number of a vertex in
+				      * <tt>deal.II</tt> that corresponds
+				      * to the UCD numbering at this
+				      * location.
+				      *
+				      * Typical example: write a cell
+				      * and arrange the vertices, such
+				      * that UCD understands them.
+				      *
+				      * \begin{verbatim}
+				      * for (i=0; i< n_vertices; ++i)
+				      *   out << cell->vertex(ucd_to_deal[i]);
+				      * \end{verbatim}
+				      *
+				      * As the vertex numbering in
+				      * deal.II versions <= 5.1
+				      * happened to coincide with the
+				      * UCD numbering, this field can
+				      * also be used like a
+				      * old_to_lexicographic mapping.
 				      */
-    static const unsigned int opposite_face[faces_per_cell];
-    
+    static const unsigned int ucd_to_deal[vertices_per_cell];
 
 				     /**
 				      * Rearrange vertices for OpenDX
@@ -229,36 +323,6 @@ struct GeometryInfo
     static const unsigned int dx_to_deal[vertices_per_cell];
     
 				     /**
-				      * For each face of the reference
-				      * cell, this field stores the
-				      * coordinate direction in which
-				      * its normal vector points.
-				      *
-				      * Remark that this is only the
-				      * coordinate number. The acual
-				      * direction of the normal vector
-				      * is obtained by multiplying the
-				      * unit vector in this direction
-				      * with #unit_normal_orientation.
-				      */
-    static const unsigned int unit_normal_direction[faces_per_cell];
-
-				     /**
-				      * Orientation of the unit normal
-				      * vector of a face of the
-				      * reference cell.
-				      *
-				      * Each value is either
-				      * <tt>1</tt> or <tt>-1</tt>,
-				      * corresponding to a normal
-				      * vector pointing in the
-				      * positive or negative
-				      * coordinate direction,
-				      * respectively.
-				      */
-    static const int unit_normal_orientation[faces_per_cell];
-    
-				     /**
 				      * This field stores which child
 				      * cells are adjacent to a
 				      * certain face of the mother
@@ -267,13 +331,13 @@ struct GeometryInfo
 				      * For example, in 2D the layout of
 				      * a cell is as follows:
 				      * @verbatim
-				      * .      2
-				      * .   3-->--2
+				      * .      3
+				      * .   2-->--3
 				      * .   |     |
-				      * . 3 ^     ^ 1
+				      * . 0 ^     ^ 1
 				      * .   |     |
 				      * .   0-->--1
-				      * .      0
+				      * .      2
 				      * @endverbatim
 				      * Vertices and faces are indicated
 				      * with their numbers, faces also with
@@ -283,16 +347,17 @@ struct GeometryInfo
 				      * like this:
 				      * @verbatim
 				      * *--*--*
-				      * | 3|2 |
+				      * | 2|3 |
 				      * *--*--*
 				      * | 0|1 |
 				      * *--*--*
 				      * @endverbatim
 				      *
-				      * Thus, the child cells on face zero
-				      * are (ordered in the direction of the
-				      * face) 0 and 1, on face 2 they are
-				      * 3 and 2, etc.
+				      * Thus, the child cells on face
+				      * 0 are (ordered in the
+				      * direction of the face) 0 and
+				      * 2, on face 3 they are 2 and 3,
+				      * etc.
 				      *
 				      * For three spatial dimensions,
 				      * the exact order of the
@@ -319,7 +384,7 @@ struct GeometryInfo
 				      * cell vertex number of the
 				      * <tt>vertex</tt>th vertex of
 				      * line <tt>line</tt>, e.g.
-				      * <tt>GeometryInfo<2>::line_to_cell_vertices(2,0)=3</tt>.
+				      * <tt>GeometryInfo<2>::line_to_cell_vertices(3,0)=2</tt>.
 				      *
 				      * The order of the lines, as
 				      * well as their direction (which
@@ -345,7 +410,7 @@ struct GeometryInfo
 				      * cell vertex number of the
 				      * <tt>vertex</tt>th vertex of
 				      * face <tt>face</tt>, e.g.
-				      * <tt>GeometryInfo<2>::face_to_cell_vertices(2,0)=3</tt>.
+				      * <tt>GeometryInfo<2>::face_to_cell_vertices(3,0)=2</tt>.
 				      *
 				      * Through the
 				      * <tt>face_orientation</tt>
@@ -378,7 +443,7 @@ struct GeometryInfo
 				      * cell line number of the
 				      * <tt>line</tt>th line of face
 				      * <tt>face</tt>, e.g.
-				      * <tt>GeometryInfo<3>::face_to_cell_lines(3,1)=5</tt>.
+				      * <tt>GeometryInfo<3>::face_to_cell_lines(5,0)=4</tt>.
 				      *
 				      * Through the
 				      * <tt>face_orientation</tt>
@@ -388,11 +453,8 @@ struct GeometryInfo
 				      * orientation.
 				      * <tt>face_orientation</tt>
 				      * defaults to <tt>true</tt>
-				      * (standard orientation).
-				      *
-				      * This function is useful and
-				      * implemented for
-				      * <tt>dim=3</tt>, only.
+				      * (standard orientation) and has
+				      * no effect in 2d.
 				      */
     static unsigned int face_to_cell_lines (const unsigned int face,
 					    const unsigned int line,
@@ -484,9 +546,7 @@ GeometryInfo<1>::unit_cell_vertex (const unsigned int vertex)
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, vertices_per_cell));
 
-  static const Point<1> vertices[vertices_per_cell] =
-    { Point<1>(0.), Point<1>(1.) };
-  return vertices[vertex];
+  return Point<1>(static_cast<double>(vertex));
 }
 
 
@@ -499,10 +559,7 @@ GeometryInfo<2>::unit_cell_vertex (const unsigned int vertex)
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, vertices_per_cell));
 
-  static const Point<2> vertices[vertices_per_cell] =
-    { Point<2>(0., 0.), Point<2>(1., 0.),
-      Point<2>(1.,1.), Point<2>(0.,1.) };
-  return vertices[vertex];
+  return Point<2>(vertex%2, vertex/2);
 }
 
 
@@ -515,13 +572,9 @@ GeometryInfo<3>::unit_cell_vertex (const unsigned int vertex)
   Assert (vertex < vertices_per_cell,
 	  ExcIndexRange (vertex, 0, vertices_per_cell));
 
-  static const Point<3> vertices[vertices_per_cell] =
-    { Point<3>(0., 0., 0.), Point<3>(1., 0., 0.),
-      Point<3>(1., 0., 1.), Point<3>(0., 0., 1.),
-      Point<3>(0., 1., 0.), Point<3>(1., 1., 0.),
-      Point<3>(1., 1., 1.), Point<3>(0., 1., 1.) };
-  return vertices[vertex];
+  return Point<3>(vertex%2, vertex/2%2, vertex/4);
 }
+
 
 
 template <int dim>
@@ -557,8 +610,8 @@ GeometryInfo<2>::child_cell_from_point (const Point<2> &p)
   Assert ((p[1] >= 0) && (p[1] <= 1), ExcInvalidCoordinate(p[1]));
   
   return (p[0] <= 0.5 ?
-	  (p[1] <= 0.5 ? 0 : 3) :
-	  (p[1] <= 0.5 ? 1 : 2));
+	  (p[1] <= 0.5 ? 0 : 2) :
+	  (p[1] <= 0.5 ? 1 : 3));
 }
 
 
@@ -574,11 +627,11 @@ GeometryInfo<3>::child_cell_from_point (const Point<3> &p)
   
   return (p[0] <= 0.5 ?
 	  (p[1] <= 0.5 ?
-	   (p[2] <= 0.5 ? 0 : 3) :
-	   (p[2] <= 0.5 ? 4 : 7)) :
+	   (p[2] <= 0.5 ? 0 : 4) :
+	   (p[2] <= 0.5 ? 2 : 6)) :
 	  (p[1] <= 0.5 ?
-	   (p[2] <= 0.5 ? 1 : 2) :
-	   (p[2] <= 0.5 ? 5 : 6)));
+	   (p[2] <= 0.5 ? 1 : 5) :
+	   (p[2] <= 0.5 ? 3 : 7)));
 }
 
 

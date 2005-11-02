@@ -68,7 +68,8 @@ void make_tria (Triangulation<3> &tria, int step)
 	cells[0].material_id = 0;
 	cells[1].material_id = 0;
   
-	tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[12]),
+	tria.create_triangulation_compatibility (
+	  std::vector<Point<3> >(&vertices[0], &vertices[12]),
 				   cells,
 				   SubCellData());       // no boundary information
 
@@ -109,7 +110,8 @@ void make_tria (Triangulation<3> &tria, int step)
 	cells[0].material_id = 0;
 	cells[1].material_id = 0;
   
-	tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[12]),
+	tria.create_triangulation_compatibility (
+	  std::vector<Point<3> >(&vertices[0], &vertices[12]),
 				   cells,
 				   SubCellData());       // no boundary information
 
@@ -150,7 +152,8 @@ void make_tria (Triangulation<3> &tria, int step)
 	cells[0].material_id = 0;
 	cells[1].material_id = 0;
 	
-	tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[12]),
+	tria.create_triangulation_compatibility (
+	  std::vector<Point<3> >(&vertices[0], &vertices[12]),
 				   cells,
 				   SubCellData());       // no boundary information
 	
@@ -206,7 +209,8 @@ void make_tria (Triangulation<3> &tria, int step)
 	cells[2].material_id = 0;
 	cells[3].material_id = 0;
   
-	tria.create_triangulation (std::vector<Point<3> >(&vertices[0], &vertices[18]),
+	tria.create_triangulation_compatibility (
+	  std::vector<Point<3> >(&vertices[0], &vertices[18]),
 				   cells,
 				   SubCellData());       // no boundary information
 

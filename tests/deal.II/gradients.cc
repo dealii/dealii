@@ -40,7 +40,7 @@ int main ()
 
   Triangulation<2> tria;
   GridGenerator::hyper_cube (tria,0,1);
-  tria.begin_active()->vertex(2)(0) = 2;
+  tria.begin_active()->vertex(3)(0) = 2;
 
   FE_Q<2> fe(1);
   DoFHandler<2> dof(tria);
@@ -84,16 +84,16 @@ int main ()
 		      (grads[3] == Point<2>(0,-1)));
 		break;
 	  case 2:
-		ok = ((grads[0] == Point<2>(0,0)) &&
-		      (grads[1] == Point<2>(0.5,0)) &&
-		      (grads[2] == Point<2>(0,1)) &&
-		      (grads[3] == Point<2>(0.5,0.5)));
-		break;
-	  case 3:
 		ok = ((grads[0] == Point<2>(0,1)) &&
 		      (grads[1] == Point<2>(-0.5,1)) &&
 		      (grads[2] == Point<2>(0,0)) &&
 		      (grads[3] == Point<2>(-0.5,0.5)));
+		break;
+	  case 3:
+		ok = ((grads[0] == Point<2>(0,0)) &&
+		      (grads[1] == Point<2>(0.5,0)) &&
+		      (grads[2] == Point<2>(0,1)) &&
+		      (grads[3] == Point<2>(0.5,0.5)));
 		break;
 	};
 

@@ -590,20 +590,20 @@ TriaObjectAccessor<3,dim>::line (const unsigned int i) const
                                    // oriented correctly, and c) if in
                                    // the opposite direction
   static const unsigned int lookup_table[12][3] =
-    { { 0, 0, 3 }, // take first four lines from front face
-      { 0, 1, 2 },
-      { 0, 2, 1 },
-      { 0, 3, 0 },
+    { { 4, 0, 2 }, // take first four lines from bottom face
+      { 4, 1, 3 },
+      { 4, 2, 0 },
+      { 4, 3, 1 },
 
-      { 1, 0, 3 }, // second four lines from back face
-      { 1, 1, 2 },
-      { 1, 2, 1 },
-      { 1, 3, 0 },
+      { 5, 0, 2 }, // second four lines from top face
+      { 5, 1, 3 },
+      { 5, 2, 0 },
+      { 5, 3, 1 },
 
-      { 2, 3, 0 }, // the rest randomly
-      { 2, 1, 2 },
-      { 4, 1, 2 },
-      { 4, 3, 0 }};
+      { 0, 0, 2 }, // the rest randomly
+      { 1, 0, 2 },
+      { 0, 1, 3 },
+      { 1, 1, 3 }};
 
   return (this->quad(lookup_table[i][0])
           ->line(face_orientation(lookup_table[i][0]) ?
@@ -648,20 +648,20 @@ TriaObjectAccessor<3,dim>::line_index (const unsigned int i) const
                                    // oriented correctly, and c) if in
                                    // the opposite direction
   static const unsigned int lookup_table[12][3] =
-    { { 0, 0, 3 }, // take first four lines from front face
-      { 0, 1, 2 },
-      { 0, 2, 1 },
-      { 0, 3, 0 },
+    { { 4, 0, 2 }, // take first four lines from bottom face
+      { 4, 1, 3 },
+      { 4, 2, 0 },
+      { 4, 3, 1 },
 
-      { 1, 0, 3 }, // second four lines from back face
-      { 1, 1, 2 },
-      { 1, 2, 1 },
-      { 1, 3, 0 },
+      { 5, 0, 2 }, // second four lines from top face
+      { 5, 1, 3 },
+      { 5, 2, 0 },
+      { 5, 3, 1 },
 
-      { 2, 3, 0 }, // the rest randomly
-      { 2, 1, 2 },
-      { 4, 1, 2 },
-      { 4, 3, 0 }};
+      { 0, 0, 2 }, // the rest randomly
+      { 1, 0, 2 },
+      { 0, 1, 3 },
+      { 1, 1, 3 }};
 
   return (this->quad(lookup_table[i][0])
           ->line_index(face_orientation(lookup_table[i][0]) ?

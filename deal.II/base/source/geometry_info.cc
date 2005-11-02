@@ -49,30 +49,49 @@ namespace internal
 
 
 
+const unsigned int
+GeometryInfoBase::unit_normal_direction[GeometryInfoBase::faces_per_cell_max_dim]
+= { 0, 0, 1, 1, 2, 2, 3, 3 };
+
+const int
+GeometryInfoBase::unit_normal_orientation[GeometryInfoBase::faces_per_cell_max_dim]
+= { -1, 1, -1, 1, -1, 1, -1, 1 };
+
+const unsigned int
+GeometryInfoBase::opposite_face[GeometryInfoBase::faces_per_cell_max_dim]
+= { 1, 0, 3, 2, 5, 4, 7, 6 };
+
 
 template <>
-const unsigned int GeometryInfo<1>::opposite_face[GeometryInfo<1>::faces_per_cell]
-= { 0, 1 };
+const unsigned int GeometryInfo<1>::ucd_to_deal[GeometryInfo<1>::vertices_per_cell]
+= { 0, 1};
 
 template <>
-const unsigned int GeometryInfo<2>::opposite_face[GeometryInfo<2>::faces_per_cell]
-= { 2, 3, 0, 1 };
+const unsigned int GeometryInfo<2>::ucd_to_deal[GeometryInfo<2>::vertices_per_cell]
+= { 0, 1, 3, 2};
 
 template <>
-const unsigned int GeometryInfo<3>::opposite_face[GeometryInfo<3>::faces_per_cell]
-= { 1, 0, 4, 5, 2, 3 };
+const unsigned int GeometryInfo<3>::ucd_to_deal[GeometryInfo<3>::vertices_per_cell]
+= { 0, 1, 5, 4, 2, 3, 7, 6};
 
 template <>
-const unsigned int GeometryInfo<4>::opposite_face[GeometryInfo<4>::faces_per_cell]
-= { invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int };
-
+const unsigned int GeometryInfo<4>::ucd_to_deal[GeometryInfo<4>::vertices_per_cell]
+= {  invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int};
 
 
 template <>
@@ -81,70 +100,30 @@ const unsigned int GeometryInfo<1>::dx_to_deal[GeometryInfo<1>::vertices_per_cel
 
 template <>
 const unsigned int GeometryInfo<2>::dx_to_deal[GeometryInfo<2>::vertices_per_cell]
-= { 0, 3, 1, 2};
+= { 0, 2, 1, 3};
 
 template <>
 const unsigned int GeometryInfo<3>::dx_to_deal[GeometryInfo<3>::vertices_per_cell]
-= { 0, 3, 4, 7, 1, 2, 5, 6};
+= { 0, 4, 2, 6, 1, 5, 3, 7};
 
 template <>
 const unsigned int GeometryInfo<4>::dx_to_deal[GeometryInfo<4>::vertices_per_cell]
-= { invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int,
-    invalid_unsigned_int };
-
-
-//TODO: Use these values in mappings.
-template <>
-const unsigned int
-GeometryInfo<1>::unit_normal_direction[GeometryInfo<1>::faces_per_cell]
-= { 0, 0 };
-template <>
-const int
-GeometryInfo<1>::unit_normal_orientation[GeometryInfo<1>::faces_per_cell]
-= { -1, 1 };
-
-template <>
-const unsigned int
-GeometryInfo<2>::unit_normal_direction[GeometryInfo<2>::faces_per_cell]
-= { 1, 0, 1, 0 };
-template <>
-const int
-GeometryInfo<2>::unit_normal_orientation[GeometryInfo<2>::faces_per_cell]
-= { -1, 1, 1, -1 };
-
-template <>
-const unsigned int
-GeometryInfo<3>::unit_normal_direction[GeometryInfo<3>::faces_per_cell]
-= { 1, 1, 2, 0, 2, 0 };
-template <>
-const int
-GeometryInfo<3>::unit_normal_orientation[GeometryInfo<3>::faces_per_cell]
-= { -1, 1, -1, 1, 1, -1 };
-
-// These are already for the new, regular numbering
-template <>
-const unsigned int
-GeometryInfo<4>::unit_normal_direction[GeometryInfo<4>::faces_per_cell]
-= { 0, 0, 1, 1, 2, 2, 3, 3 };
-template <>
-const int
-GeometryInfo<4>::unit_normal_orientation[GeometryInfo<4>::faces_per_cell]
-= { -1, 1, -1, 1, -1, 1, -1, 1 };
-
+= {  invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int,
+       invalid_unsigned_int};
 
 
 template <>
@@ -171,10 +150,11 @@ GeometryInfo<2>::child_cell_on_face (const unsigned int face,
   Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
   
   static const unsigned
-    subcells[faces_per_cell][subfaces_per_face] = {{0,1},
-                                                   {1,2},
-                                                   {3,2},
-                                                   {0,3}};
+    subcells[faces_per_cell][subfaces_per_face] = {{0,2},
+                                                   {1,3},
+                                                   {0,1},
+                                                   {2,3}};
+
   return subcells[face][subface];
 }
 
@@ -189,15 +169,15 @@ GeometryInfo<3>::child_cell_on_face (const unsigned int face,
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (subface<subfaces_per_face, ExcIndexRange(subface, 0, subfaces_per_face));
 
-  static const unsigned int flip[subfaces_per_face] = { 0, 3, 2, 1 };
+  static const unsigned int flip[subfaces_per_face] = { 0, 2, 1, 3 };
 
   static const unsigned
-    subcells[faces_per_cell][subfaces_per_face] = {{0, 1, 2, 3},
-                                                   {4, 5, 6, 7},
-                                                   {0, 1, 5, 4},
-                                                   {1, 5, 6, 2},
-                                                   {3, 2, 6, 7},
-                                                   {0, 4, 7, 3}};
+    subcells[faces_per_cell][subfaces_per_face] = {{0, 2, 4, 6},
+                                                   {1, 3, 5, 7},
+                                                   {0, 4, 1, 5},
+                                                   {2, 6, 3, 7},
+                                                   {0, 1, 2, 3},
+                                                   {4, 5, 6, 7}};
   return face_orientation ? subcells[face][subface] : subcells[face][flip[subface]];
 }
 
@@ -206,8 +186,8 @@ GeometryInfo<3>::child_cell_on_face (const unsigned int face,
 template <>
 unsigned int
 GeometryInfo<4>::child_cell_on_face (const unsigned int,
-				     const unsigned int,
-				     const bool)
+                                   const unsigned int,
+                                   const bool)
 {
   Assert(false, ExcNotImplemented());
   return invalid_unsigned_int;
@@ -243,19 +223,19 @@ GeometryInfo<3>::line_to_cell_vertices (const unsigned int line,
 					const unsigned int vertex)
 {
   Assert (line<lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
-  Assert (vertex<2, ExcIndexRange(vertex, 0, 2));
+  Assert (vertex<2, ExcIndexRange(vertex, 0, 2));  
   
   static const unsigned
-    vertices[lines_per_cell][2] = {{0, 1},  // front face
-				   {1, 2},
-				   {3, 2},
-				   {0, 3},
-				   {4, 5},  // back face
-				   {5, 6},
-				   {7, 6},
-				   {4, 7},
-				   {0, 4},  // connects of front and back face
-				   {1, 5},
+    vertices[lines_per_cell][2] = {{0, 2},  // bottom face
+				   {1, 3},
+				   {0, 1},
+				   {2, 3},
+				   {4, 6},  // top face
+				   {5, 7},
+				   {4, 5},
+				   {6, 7},
+				   {0, 4},  // connects of bottom
+				   {1, 5},  //   top face
 				   {2, 6},
 				   {3, 7}};
   return vertices[line][vertex];
@@ -265,7 +245,7 @@ GeometryInfo<3>::line_to_cell_vertices (const unsigned int line,
 template <>
 unsigned int
 GeometryInfo<4>::line_to_cell_vertices (const unsigned int,
-					const unsigned int)
+                                      const unsigned int)
 {
   Assert(false, ExcNotImplemented());
   return invalid_unsigned_int;
@@ -312,24 +292,26 @@ GeometryInfo<3>::face_to_cell_lines (const unsigned int face,
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
   Assert (line<lines_per_face, ExcIndexRange(line, 0, lines_per_face));
 
-  static const unsigned
-    lines[faces_per_cell][lines_per_face] = {{0, 1, 2, 3},
-					     {4, 5, 6, 7},
-					     {0, 9, 4, 8},
-					     {9, 5,10, 1},
-					     {2,10, 6,11},
-					     {8, 7,11, 3}};
+				   // also represented by (line+2)%4
+  static const unsigned int flip[lines_per_face] = { 2, 3, 0, 1 };
 
-  return face_orientation ? lines[face][line] : lines[face][3-line];
+  static const unsigned
+    lines[faces_per_cell][lines_per_face] = {{8,10, 0, 4}, // left face
+					     {9,11, 1, 5}, // right face
+					     {2, 6, 8, 9}, // front face
+					     {3, 7,10,11}, // back face
+					     {0, 1, 2, 3}, // bottom face
+					     {4, 5, 6, 7}};// top face
+  return face_orientation ? lines[face][line] : lines[face][flip[line]];
 }
 
 
 
-template <>
+template<int dim>
 unsigned int
-GeometryInfo<4>::face_to_cell_lines (const unsigned int,
-				     const unsigned int,
-				     const bool)
+GeometryInfo<dim>::face_to_cell_lines (const unsigned int,
+				       const unsigned int,
+				       const bool)
 {
   Assert(false, ExcNotImplemented());
   return invalid_unsigned_int;

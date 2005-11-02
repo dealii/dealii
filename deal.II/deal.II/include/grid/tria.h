@@ -1105,25 +1105,45 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   apply some smoothing for multigrid algorithms, but this has to be decided
  *   upon later.
  *
+ *   N4/ face lines in 3d are ordered, such that the induced 2d local
+ *   coordinate system (x,y) implies (right hand rule) a normal in
+ *   face normal direction, see N2/
  *
  *   <h4>Implementation conventions for two spatial dimensions</h4>
+ *   
+ *   From version 5.2 onwards deal.II is based on a numbering scheme,
+ *   which uses a lexicographic ordering (with x running fastest)
+ *   whereever possible, hence trying to adopt a kind of 'canonical'
+ *   ordering.
  *
- *   There is a convention about the direction of the bounding lines of quads in
- *   2D. The direction of a line is the direction of point 0 towards point 1. We
- *   define, that allowed cells contain of lines of which the direction is
- *   as follows:
+ *   The ordering of vertices and faces (lines) in 2d is defined by
+ *
+ *   N1) vertices are numbered in lexicographic ordering
+ *
+ *   N2) faces (lines in 2d): first the two faces with normals in x-
+ *   and then y-direction. For each two faces: first the face with
+ *   normal in negative coordinate direction, then the one with normal
+ *   in positive direction, i.e. the faces are ordered according to
+ *   their normals pointing in -x, x, -y, y direction.
+ *
+ *   N3) the direction of a line is represented by the direction of
+ *   point 0 towards point 1 and is always in one of the coordinate
+ *   directions
+ * 
+ *   The resulting numbering of vertices and faces (lines) in 2d as
+ *   well as the directions of lines is shown in the following.
  *   @verbatim
+ *         3
+ *      2-->--3
+ *      |     |
+ *     0^     ^1
+ *      |     |
+ *      0-->--1
  *          2
- *      3--->---2
- *      |       |
- *     3^       ^1
- *      |       |
- *      0--->---1
- *          0
  *   @endverbatim
- *   The number of the vertices and lines is also indicated. This orientation of
- *   lines has to be checked/generated upon construction of a grid and is
- *   preserved upon refinement.
+ *   We note, that the orientation of lines has to be
+ *   checked/generated upon construction of a grid and is preserved
+ *   upon refinement.
  *
  *   Further we define, that child lines have the same direction as their parent,
  *   i.e. that <tt>subline(0).vertex(0)==line.vertex(0)</tt> and
@@ -1144,15 +1164,16 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   quadrature formulae or the point of definition of trial functions), we
  *   define the following coordinate system for the unit cell:
  *   @verbatim
- *    y^   3-------2
- *     |   |       |
- *     |   |       |
- *     |   |       |
- *     |   0-------1
- *     *-------------->x
+ *    y^   2-----3
+ *     |   |     |
+ *     |   |     |
+ *     |   |     |
+ *     |   0-----1
+ *     *------------>x
  *   @endverbatim
- *   with vertex 0 being the origin of the coordinate system, vertex 1 having
- *   coordinates <tt>(1,0)</tt>, vertex 2 at <tt>(1,1)</tt> and vertex 3 at <tt>(0,1)</tt>.
+ *   with vertex 0 being the origin of the coordinate system, vertex 1
+ *   having coordinates <tt>(1,0)</tt>, vertex 2 at <tt>(0,1)</tt> and
+ *   vertex 3 at <tt>(1,1)</tt>.
  *
  *
  *   <h3>Implementation conventions for three spatial dimensions</h3>
@@ -1161,18 +1182,18 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   for vertices, lines and faces of hexahedra in three space
  *   dimensions. Before giving these conventions we declare the
  *   following sketch to be the standard way of drawing 3d pictures of
- *   hexahedra: 
+ *   hexahedra:
  *   @verbatim
- *         *-------*        *-------*
- *        /|       |       /       /|
- *       / |       |      /       / |
- *      /  |       |     /       /  |
- *     *   |       |    *-------*   |
- *     |   *-------*    |       |   *
- *     |  /       /     |       |  /
- *     | /       /      |       | /
- *     |/       /       |       |/
- *     *-------*        *-------*
+ *                         *-------*        *-------*
+ *                        /|       |       /       /|
+ *                       / |       |      /       / |
+ *    z                 /  |       |     /       /  |
+ *    ^                *   |       |    *-------*   |
+ *    |   ^y           |   *-------*    |       |   *
+ *    |  /             |  /       /     |       |  /
+ *    | /              | /       /      |       | /
+ *    |/               |/       /       |       |/
+ *    *------>x        *-------*        *-------*
  *   @endverbatim
  *   The left part of the picture shows the left, bottom and back face of the
  *   cube, while the right one shall be the top, right and front face. You may
@@ -1182,45 +1203,55 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   conventions can be extracted at run- or compile-time from the
  *   member functions and variables of the GeometryInfo classes.
  *
- *
  *   <h4>Vertices</h4>
+ *  
+ *   The ordering of vertices in 3d is defined by the same rules as in
+ *   the 2d case, i.e.
  *
- *   The vertices on the front face are numbered exactly the same way as are
- *   the vertices on a quadrilateral. The vertices on the back face are numbered
- *   similarly by moving the front face to the back (no turning, no twisting, 
- *   just a shift):
+ *   N1) vertices are numbered in lexicographic ordering
+ *
+ *   Hence, the vertices are numbered as follows   
  *   @verbatim
- *         7-------6        7-------6
+ *         6-------7        6-------7
  *        /|       |       /       /|
  *       / |       |      /       / |
  *      /  |       |     /       /  |
- *     3   |       |    3-------2   |
- *     |   4-------5    |       |   5
+ *     4   |       |    4-------5   |
+ *     |   2-------3    |       |   3
  *     |  /       /     |       |  /
  *     | /       /      |       | /
  *     |/       /       |       |/
  *     0-------1        0-------1
  *   @endverbatim
+ *   
+ *   We note, that first the vertices on the bottom face (z=0) are
+ *   numbered exactly the same way as are the vertices on a
+ *   quadrilateral. Then the vertices on the top face (z=1) are
+ *   numbered similarly by moving the bottom face to the top.
  *
  *   <h4>Lines</h4>
  *
- *   Here, the same holds as for the vertices: the lines of the front face are
- *   numbered as for the quadrilateral, for the back face they are just shifted.
- *   Finally, the four lines connecting front and back face are numbered:
+ *   Here, the same holds as for the vertices:
+ *
+ *   N4) line ordering in 3d:
+ *   <ul>
+ *     <li>first the lines of face (z=0) in 2d line ordering,
+ *     <li>then the lines of face (z=1) in 2d line ordering,
+ *     <li>finally the lines in z direction in lexicographic ordering
+ *   </ul>
  *   @verbatim
- *         *---6---*        *---6---*
+ *         *---7---*        *---7---*
  *        /|       |       /       /|
- *      11 |       5      11     10 5
- *      /  7       |     /       /  |
- *     *   |       |    *---2---*   |
- *     |   *---4---*    |       |   *
- *     |  /       /     |       1  /
- *     3 8       9      3       | 9
+ *       4 |       11     4       5 11
+ *      /  10      |     /       /  |
+ *     *   |       |    *---6---*   |
+ *     |   *---3---*    |       |   *
+ *     |  /       /     |       9  /
+ *     8 0       1      8       | 1
  *     |/       /       |       |/
- *     *---0---*        *---0---*
+ *     *---2---*        *---2---*
  *   @endverbatim
- *   The directions of the front and back lines is as for the respective faces, while
- *   the connecting lines always point to the back:
+ *   As in 2d lines are directed in coordinate directions, see N3.
  *   @verbatim
  *         *--->---*        *--->---*
  *        /|       |       /       /|
@@ -1250,93 +1281,99 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   
  *   <h4>Faces</h4>
  *
- *   The faces are numbered in the same order as the lines were numbered: front
- *   face, back face, then the four side faces:
+ *   The numbering of faces in 3d is defined by a rule analogous to 2d:
+ *
+ *   N2a) faces (quads in 3d): first the two faces with normals in x-,
+ *   then y- and z-direction. For each two faces: first the face with
+ *   normal in negative coordinate direction, then the one with normal
+ *   in positive direction, i.e. the faces are ordered according to
+ *   their normals pointing in -x, x, -y, y, -z, z direction.
+ *
+ *   Therefore, the faces are numbered in the ordering: left, right,
+ *   front, back, bottom and top face:
  *   @verbatim
  *         *-------*        *-------*
  *        /|       |       /       /|
- *       / |   1   |      /   4   / |
+ *       / |   3   |      /   5   / |
  *      /  |       |     /       /  |
  *     *   |       |    *-------*   |
- *     | 5 *-------*    |       | 3 *
+ *     | 0 *-------*    |       | 1 *
  *     |  /       /     |       |  /
- *     | /   2   /      |   0   | /
+ *     | /   4   /      |   2   | /
  *     |/       /       |       |/
  *     *-------*        *-------*
  *   @endverbatim
  *
- *   The <em>standard</em> direction of the faces is determined by the
- *   numbers the lines have within a given face. This is like follows:
+ *   The <em>standard</em> direction of the faces is such, that the
+ *   induced 2d local coordinate system (x,y) implies (right hand
+ *   rule) a normal in face normal direction, see N2a).  In the
+ *   following we show the local coordinate system and the numbering
+ *   of face lines:
  *   <ul>
  *   <li> Faces 0 and 1:
  *    @verbatim
- *          *---2---*        *-------*
- *         /|       |       /       /|
- *        / |       1      /       / |
- *       /  3       |     /       /  |
- *      *   |       |    *---2---*   |
- *      |   *---0---*    |       |   *
- *      |  /       /     |       1  /
- *      | /       /      3       | /
- *      |/       /       |       |/
- *      *-------*        *---0---*
- *    @endverbatim
- * 
- *   <li> Faces 2 and 4:
- *    @verbatim
- *          *-------*        *---2---*
- *         /|       |       /       /|
- *        / |       |      3       1 |
- *       /  |       |     /       /  |
- *      *   |       |    *---0---*   |
- *      |   *---2---*    |       |   *
- *      |  /       /     |       |  /
- *      | 3       1      |       | /
- *      |/       /       |       |/
- *      *---0---*        *-------*
- *    @endverbatim 
- * 
- *   <li> Faces 3 and 5:
- *    @verbatim
+ *            Face 0           Face 1
  *          *-------*        *-------*
  *         /|       |       /       /|
- *        2 1       |      /       2 1
- *       /  |       |     /       /  |
- *      *   |       |    *-------*   |
+ *        3 1       |      /       3 1
+ *      y/  |       |     /      y/  |
+ *      *   |x      |    *-------*   |x
  *      |   *-------*    |       |   *
- *      3  /       /     |       3  /
- *      | 0       /      |       | 0
+ *      0  /       /     |       0  /
+ *      | 2       /      |       | 2
  *      |/       /       |       |/
  *      *-------*        *-------*
  *    @endverbatim
- *   </ul>
  * 
- *   Due to this numbering, the following lines are identical in the
- *   standard orientation:
- *   <ul>
- *   <li> Line 0 of face 0, and line 0 of face 2;
- *   <li> Line 1 of face 0, and line 3 of face 3;
- *   <li> Line 2 of face 0, and line 0 of face 4;
- *   <li> Line 3 of face 0, and line 3 of face 5;
- *   <li> Line 0 of face 1, and line 2 of face 2;
- *   <li> Line 1 of face 1, and line 1 of face 3;
- *   <li> Line 2 of face 1, and line 2 of face 4;
- *   <li> Line 3 of face 1, and line 1 of face 5;
- *   <li> Line 3 of face 2, and line 0 of face 5;
- *   <li> Line 1 of face 2, and line 0 of face 3;
- *   <li> Line 1 of face 4, and line 2 of face 3;
- *   <li> Line 3 of face 4, and line 2 of face 5.
+ *   <li> Faces 2 and 3:
+ *    @verbatim
+ *          x Face 3           Face 2
+ *          *---1---*        *-------*
+ *         /|       |       /       /|
+ *        / |       3      /       / |
+ *       /  2       |    x/       /  |
+ *      *   |       |    *---1---*   |
+ *      |   *---0---*y   |       |   *
+ *      |  /       /     |       3  /
+ *      | /       /      2       | /
+ *      |/       /       |       |/
+ *      *-------*        *---0---*y
+ *    @endverbatim 
+ * 
+ *   <li> Faces 4 and 5:
+ *    @verbatim
+ *            Face 4         y Face 5
+ *          *-------*        *---3---*
+ *         /|       |       /       /|
+ *        / |       |      0       1 |
+ *       /  |       |     /       /  |
+ *      *   |y      |    *---2---* x |
+ *      |   *---3---*    |       |   *
+ *      |  /       /     |       |  /
+ *      | 0       1      |       | /
+ *      |/       /       |       |/
+ *      *---2---* x      *-------*
+ *    @endverbatim
  *   </ul>
  *
- *   This standard orientation of faces in 3d can also be depicted by
- *   assigning a normal vector to each face. The direction of this
- *   vector (pointing into or out of the cell) is implied by the
- *   direction of its bounding lines: if you look onto a face and the
- *   lines are numbered in counter-clockwise sense, then the normal is
- *   pointing towards you. Thus, faces 1, 2, and 5 have normals that
- *   point into the cell in standard face orientation, while the
- *   normals of faces 0, 3, and 4 point outward. Note that opposite
- *   faces have parallel normal vectors.
+ *   The face line numbers (0,1,2,3) correspond to following cell line
+ *   numbers.
+ *   <ul>
+ *   <li> Face 0: lines 8, 10, 0, 4;
+ *   <li> Face 1: lines 9, 11, 1, 5;
+ *   <li> Face 2: lines 2, 6, 8, 9;
+ *   <li> Face 3: lines 3, 7, 10, 11;
+ *   <li> Face 4: lines 0, 1, 2, 3;
+ *   <li> Face 5: lines 4, 5, 6, 7;
+ *   </ul>
+ *   You can get these numbers using the
+ *   GeometryInfo<3>::face_to_cell_lines() function.
+ *
+ *   The face normals can be deduced from the face orientation by
+ *   applying the right hand side rule (x,y -> normal).  We note, that
+ *   in the standard orientation of faces in 3d, faces 0, 2, and 4
+ *   have normals that point into the cell, while the normals of faces
+ *   1, 3, and 5 point outward.
  *
  *   However, it turns out that a significant number of meshes cannot
  *   satisfy this convention. This is due to the fact that the face
@@ -1362,15 +1399,15 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *
  *   <h4>Children</h4>
  *
- *   The eight children of a cell are numbered as follows:
+ *   The eight children of a cell are numbered according to the vertices:
  *   @verbatim
  *         *-------*        *-------*
- *        /| 7   6 |       / 7   6 /|
- *       /7|       |      /       /6|
- *      /  |       |     / 3   2 /  |
- *     *   | 4   5 |    *-------*2 5|
- *     |3 4*-------*    | 3   2 |   *
- *     |  / 4   5 /     |       |  /
+ *        /| 6   7 |       / 6   7 /|
+ *       /6|       |      /       /7|
+ *      /  |       |     / 4   5 /  |
+ *     *   | 2   3 |    *-------*5 3|
+ *     |4 2*-------*    | 4   5 |   *
+ *     |  / 2   3 /     |       |  /
  *     |0/       /      |       |1/
  *     |/0    1 /       | 0   1 |/
  *     *-------*        *-------*
@@ -1379,71 +1416,69 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   Taking into account the orientation of the faces, the following
  *   children are adjacent to the respective faces:
  *   <ul>
- *   <li> Face 0: children 0, 1, 2, 3;
- *   <li> Face 1: children 4, 5, 6, 7;
- *   <li> Face 2: children 0, 1, 5, 4;
- *   <li> Face 3: children 1, 5, 6, 2;
- *   <li> Face 4: children 3, 2, 6, 7;
- *   <li> Face 5: children 0, 4, 7, 3.
+ *   <li> Face 0: children 0, 2, 4, 6;
+ *   <li> Face 1: children 1, 3, 5, 7;
+ *   <li> Face 2: children 0, 4, 1, 5;
+ *   <li> Face 3: children 2, 6, 3, 7;
+ *   <li> Face 4: children 0, 1, 2, 3;
+ *   <li> Face 5: children 4, 5, 6, 7.
  *   </ul>
- *   You can get these numbers using the GeometryInfo<3>@p ::child_cell_on_face
- *   function. Each child is adjacent to the vertex with the same number.
+ *   You can get these numbers using the
+ *   GeometryInfo<3>::child_cell_on_face() function. As each child is
+ *   adjacent to the vertex with the same number these numbers are
+ *   also given by the GeometryInfo<3>::face_to_cell_vertices()
+ *   function.
  *
  *   Note that, again, the above list only holds for faces in their
  *   standard orientation. If a face is not in standard orientation,
- *   then the children at positions 1 and 3 (counting from 0 to 3)
- *   would be swapped.
+ *   then the children at positions 1 and 2 (counting from 0 to 3)
+ *   would be swapped. In fact, this is what the child_cell_on_face
+ *   and the face_to_cell_vertices functions of GeometryInfo<3> do,
+ *   when invoked with a <tt>face_orientation=false</tt> argument.
  *
  *   The information which child cell is at which position of which
  *   face is most often used when computing jump terms across faces
  *   with hanging nodes, using objects of type
- *   FESubfaceValues. Sitting on one cell, you would look at
- *   face and figure out which child of the neighbor is sitting on a
- *   given subface between the present and the neighboring cell. To
- *   avoid having to query the standard orientation of the faces of
- *   the two cells every time in such cases, you should use a function
- *   call like
- *   <tt>cell->neighbor_child_on_subface(face_no,subface_no)</tt>, which
- *   returns the correct result both in 2d (where face orientations
- *   are immaterial) and 3d (where it is necessary to query the face
- *   orientation and possibly swap the result of
- *   <tt>GeometryInfo<3>::child_cell_on_face</tt>). In general, the use of
- *   <tt>GeometryInfo<3>::child_cell_on_face</tt> is best avoided due to
- *   these problems.
+ *   FESubfaceValues. Sitting on one cell, you would look at face and
+ *   figure out which child of the neighbor is sitting on a given
+ *   subface between the present and the neighboring cell. To avoid
+ *   having to query the standard orientation of the faces of the two
+ *   cells every time in such cases, you should use a function call
+ *   like
+ *   <tt>cell->neighbor_child_on_subface(face_no,subface_no)</tt>,
+ *   which returns the correct result both in 2d (where face
+ *   orientations are immaterial) and 3d (where it is necessary to use
+ *   the face orientation as additional argument to
+ *   <tt>GeometryInfo<3>::child_cell_on_face</tt>).
  *
  *   <h4>Coordinate systems</h4>
  *
  *   We define the following coordinate system for the explicit coordinates of
  *   the vertices of the unit cell:
  *   @verbatim
- *                         7-------6        7-------6
+ *                         6-------7        6-------7
  *                        /|       |       /       /|
  *                       / |       |      /       / |
  *    z                 /  |       |     /       /  |
- *    ^                3   |       |    3-------2   |
- *    |   ^y           |   4-------5    |       |   5
+ *    ^                4   |       |    4-------5   |
+ *    |   ^y           |   2-------3    |       |   3
  *    |  /             |  /       /     |       |  /
  *    | /              | /       /      |       | /
  *    |/               |/       /       |       |/
  *    *------>x        0-------1        0-------1
  *   @endverbatim
- *   This convention in conjunction with the numbering of the vertices is a bit
- *   unfortunate, since the vertices 0 through 3 have the coordinates <tt>(x,0,z)</tt>
- *   with @p x and @p z being the same as the @p x and @p y coordinates of a quad
- *   in the plane; more intuitive would have been if they had the coordinates
- *   <tt>(x,y,0)</tt>. However, the vertex numbering was historically chosen as shown.
  *
  *   By the convention laid down as above, the vertices have the following
- *   coordinates:
+ *   coordinates (lexicographic, with x running fastest):
  *   <ul>
  *      <li> Vertex 0: <tt>(0,0,0)</tt>;
  *      <li> Vertex 1: <tt>(1,0,0)</tt>;
- *      <li> Vertex 2: <tt>(1,0,1)</tt>;
- *      <li> Vertex 3: <tt>(0,0,1)</tt>;
- *      <li> Vertex 4: <tt>(0,1,0)</tt>;
- *      <li> Vertex 5: <tt>(1,1,0)</tt>;
- *      <li> Vertex 6: <tt>(1,1,1)</tt>;
- *      <li> Vertex 7: <tt>(0,1,1)</tt>.
+ *      <li> Vertex 2: <tt>(0,1,0)</tt>;
+ *      <li> Vertex 3: <tt>(1,1,0)</tt>;
+ *      <li> Vertex 4: <tt>(0,0,1)</tt>;
+ *      <li> Vertex 5: <tt>(1,0,1)</tt>;
+ *      <li> Vertex 6: <tt>(0,1,1)</tt>;
+ *      <li> Vertex 7: <tt>(1,1,1)</tt>.
  *   </ul>
  *
  *
@@ -1455,7 +1490,7 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   data stored in the triangulation.
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998; Ralf Hartmann, 2005
  */
 template <int dim>
 class Triangulation : public Subscriptor
@@ -1788,7 +1823,22 @@ class Triangulation : public Subscriptor
 				      */
     virtual void create_triangulation (const std::vector<Point<dim> >    &vertices,
 				       const std::vector<CellData<dim> > &cells,
-				       const SubCellData                          &subcelldata);
+				       const SubCellData                 &subcelldata);
+
+				     /**
+				      * For backward compatibility,
+				      * only. This function takes the
+				      * cell data in the ordering as
+				      * requested by deal.II versions
+				      * up to 5.1, converts it to the
+				      * new (lexicographic) ordering
+				      * and calls
+				      * create_triangulation().
+				      */
+    virtual void create_triangulation_compatibility (
+      const std::vector<Point<dim> >    &vertices,
+      const std::vector<CellData<dim> > &cells,
+      const SubCellData                 &subcelldata);
 
 				     /**
 				      * Distort the grid by randomly

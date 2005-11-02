@@ -73,7 +73,7 @@ void check_this (Triangulation<3> &tria)
               = (neighbor->face_orientation(neighbor_neighbor) ==
                  cell->face_orientation(face_no));
             static const unsigned int subface_translation[4]
-              = { 0, 3, 2, 1 };
+              = { 0, 2, 1, 3 };
             const unsigned int neighbor_child_index
               = (GeometryInfo<3>::
                  child_cell_on_face(neighbor_neighbor,

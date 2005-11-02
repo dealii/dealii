@@ -613,15 +613,15 @@ FE_Q<3>::initialize_constraints ()
 				   // described in the documentation
 				   // of the FiniteElement class
 				   // (fe_base.h), i.e.
+				   //   *--15--4--16--*
+				   //   |      |      |
+				   //   10 19  6  20  12
+				   //   |      |      |
+				   //   1--7---0--8---2
+				   //   |      |      |
+				   //   9  17  5  18  11
+				   //   |      |      |
 				   //   *--13--3--14--*
-				   //   |      |      |
-				   //   16 20  7  19  12
-				   //   |      |      |
-				   //   4--8---0--6---2
-				   //   |      |      |
-				   //   15 17  5  18  11
-				   //   |      |      |
-				   //   *--9---1--10--*
   std::vector<Point<dim-1> > constraint_points;
 
                                    // Add midpoint
@@ -629,10 +629,10 @@ FE_Q<3>::initialize_constraints ()
 
                                    // Add midpoints of lines of
                                    // "mother-face"
-  constraint_points.push_back (Point<dim-1> (0.5, 0));
-  constraint_points.push_back (Point<dim-1> (1, 0.5));
-  constraint_points.push_back (Point<dim-1> (0.5, 1));
   constraint_points.push_back (Point<dim-1> (0, 0.5));
+  constraint_points.push_back (Point<dim-1> (1, 0.5));
+  constraint_points.push_back (Point<dim-1> (0.5, 0));
+  constraint_points.push_back (Point<dim-1> (0.5, 1));
 
   if (this->degree>1)
     {
@@ -649,22 +649,22 @@ FE_Q<3>::initialize_constraints ()
 				       // Add nodes of lines interior
 				       // in the "mother-face"
 
-				       // line 5: use line 15
-      QProjector<dim-1>::project_to_subface(qline, 3, 0, p_line);
+				       // line 5: use line 9
+      QProjector<dim-1>::project_to_subface(qline, 0, 0, p_line);
       for (unsigned int i=0; i<n; ++i)
 	constraint_points.push_back (p_line[i] + Point<dim-1> (0.5, 0));
 				       // line 6: use line 10
       QProjector<dim-1>::project_to_subface(qline, 0, 1, p_line);
       for (unsigned int i=0; i<n; ++i)
-	constraint_points.push_back (p_line[i] + Point<dim-1> (0, 0.5));
-				       // line 7: use line 16
-      QProjector<dim-1>::project_to_subface(qline, 3, 1, p_line);
-      for (unsigned int i=0; i<n; ++i)
 	constraint_points.push_back (p_line[i] + Point<dim-1> (0.5, 0));
-				       // line 8: use line 9
-      QProjector<dim-1>::project_to_subface(qline, 0, 0, p_line);
+				       // line 7: use line 13
+      QProjector<dim-1>::project_to_subface(qline, 2, 0, p_line);
       for (unsigned int i=0; i<n; ++i)
-	constraint_points.push_back (p_line[i] + Point<dim-1> (0, 0.5));      
+	constraint_points.push_back (p_line[i] + Point<dim-1> (0, 0.5));
+				       // line 8: use line 14
+      QProjector<dim-1>::project_to_subface(qline, 2, 1, p_line);
+      for (unsigned int i=0; i<n; ++i)
+	constraint_points.push_back (p_line[i] + Point<dim-1> (0, 0.5));
       
 				       // DoFs on bordering lines
 				       // lines 9-16

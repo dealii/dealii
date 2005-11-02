@@ -41,7 +41,7 @@
  * element @p FE_Q of order 1. Therefore, coupling these two yields
  * an isoparametric element.
  *
- * @author Guido Kanschat, Ralf Hartmann, 2000, 2001
+ * @author Guido Kanschat, 2000, 2001; Ralf Hartmann, 2000, 2001, 2005
  */
 template <int dim>
 class MappingQ1 : public Mapping<dim>
@@ -550,13 +550,6 @@ class MappingQ1 : public Mapping<dim>
 					       const Point<dim> &p,
 					       InternalData &mdata,
 					       Point<dim> &p_unit) const;
-    
-				     /**
-				      * Mapping between tensor product
-				      * ordering and real ordering of
-				      * the vertices.
-				      */
-    static const unsigned int vertex_mapping[1<<dim];
 
   private:
 				     /**
@@ -669,13 +662,6 @@ MappingQ1<dim>::InternalData::derivative (const unsigned int qpoint,
 
 #ifndef DOXYGEN
 
-// declaration of explicit specializations of member variables, if the
-// compiler allows us to do that (the standard says we must)
-#ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-template<> const unsigned int MappingQ1<1>::vertex_mapping[2];
-template<> const unsigned int MappingQ1<2>::vertex_mapping[4];
-template<> const unsigned int MappingQ1<3>::vertex_mapping[8];
-#endif
 template<> void MappingQ1<1>::compute_shapes_virtual (
   const std::vector<Point<1> > &unit_points,
   InternalData& data) const;

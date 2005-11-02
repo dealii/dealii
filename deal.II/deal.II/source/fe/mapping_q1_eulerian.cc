@@ -94,12 +94,12 @@ compute_mapping_support_points(const typename Triangulation<dim>::cell_iterator 
 				       // are always numbered first,
 				       // we can access them easily
       for (unsigned int j=0; j<dim; ++j)
-	shift_vector[j] = mapping_values(this->vertex_mapping[i]*dim+j);
+	shift_vector[j] = mapping_values(i*dim+j);
 
 				       // compute new support point by
 				       // old (reference) value and
 				       // added shift
-      a[i] = cell->vertex(this->vertex_mapping[i]) + shift_vector;
+      a[i] = cell->vertex(i) + shift_vector;
     }
 }
 

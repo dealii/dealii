@@ -477,13 +477,13 @@ FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
       
       case 2:
     {
-      if (face_index==0 && shape_index < n)
+      if (face_index==0 && (shape_index % n) == 0)
 	return true;
       if (face_index==1 && (shape_index % n) == this->degree)
 	return true;
-      if (face_index==2 && shape_index >= this->dofs_per_cell-n)
+      if (face_index==2 && shape_index < n)
 	return true;
-      if (face_index==3 && (shape_index % n) == 0)
+      if (face_index==3 && shape_index >= this->dofs_per_cell-n)
 	return true;
       return false;
     };
@@ -492,23 +492,23 @@ FE_DGQ<dim>::has_support_on_face (const unsigned int shape_index,
     {
       const unsigned int in2 = shape_index % n2;
 	
-				       // y=0
-      if (face_index==0 && in2 < n )
-	return true;
-				       // y=1
-      if (face_index==1 && in2 >= n2-n)
-	return true;
-				       // z=0
-      if (face_index==2 && shape_index < n2)
+				       // x=0
+      if (face_index==0 && (shape_index % n) == 0)
 	return true;
 				       // x=1
-      if (face_index==3 && (shape_index % n) == n-1)
+      if (face_index==1 && (shape_index % n) == n-1)
+	return true;
+				       // y=0
+      if (face_index==2 && in2 < n )
+	return true;
+				       // y=1
+      if (face_index==3 && in2 >= n2-n)
+	return true;
+				       // z=0
+      if (face_index==4 && shape_index < n2)
 	return true;
 				       // z=1
-      if (face_index==4 && shape_index >= this->dofs_per_cell - n2)
-	return true;
-				       // x=0
-      if (face_index==5 && (shape_index % n) == 0)
+      if (face_index==5 && shape_index >= this->dofs_per_cell - n2)
 	return true;
       return false;
     };

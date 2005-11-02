@@ -345,7 +345,7 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
                                                  // cell to both the bottom
                                                  // and top surfaces:
                                                  //
-                                                 //         3-------2
+                                                 //         2-------3
                                                  //        /       / 
                                                  //       /       /  
                                                  //      /       /   
@@ -354,7 +354,7 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
                                                  // i.e. the 3d vertex indices
                                                  // 0, 1, ..., 7 are mapped to
                                                  // the 2d indices 0, 1, 1, 0,
-                                                 // 3, 2, 2, 3, but with
+                                                 // 2, 3, 3, 2, but with
                                                  // different z-coordinates
 		patch->vertices[0] = Point<dim+1>(cell->vertex(0)(0),
 		    				  cell->vertex(0)(1),
@@ -369,17 +369,17 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 		    				  cell->vertex(0)(1),
 						  parameter);
 
-                patch->vertices[4] = Point<dim+1>(cell->vertex(3)(0),
+                patch->vertices[4] = Point<dim+1>(cell->vertex(2)(0),
+		    				  cell->vertex(2)(1),
+						  parameter-parameter_step);
+		patch->vertices[5] = Point<dim+1>(cell->vertex(3)(0),
 		    				  cell->vertex(3)(1),
 						  parameter-parameter_step);
-		patch->vertices[5] = Point<dim+1>(cell->vertex(2)(0),
-		    				  cell->vertex(2)(1),
-						  parameter-parameter_step);
-		patch->vertices[6] = Point<dim+1>(cell->vertex(2)(0),
-		    				  cell->vertex(2)(1),
+		patch->vertices[6] = Point<dim+1>(cell->vertex(3)(0),
+		    				  cell->vertex(3)(1),
 						  parameter);
-		patch->vertices[7] = Point<dim+1>(cell->vertex(3)(0),
-		    				  cell->vertex(3)(1),
+		patch->vertices[7] = Point<dim+1>(cell->vertex(2)(0),
+		    				  cell->vertex(2)(1),
 						  parameter);
 		break;
 	

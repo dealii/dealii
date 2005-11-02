@@ -247,6 +247,17 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
 #if deal_II_dimension == 1
 
 template <>
+void Triangulation<1>::create_triangulation_compatibility (
+  const std::vector<Point<1> >    &v,
+  const std::vector<CellData<1> > &cells,
+  const SubCellData               &subcelldata)
+{
+				   // no reordering required
+  create_triangulation(v, cells, subcelldata);
+}
+
+
+template <>
 void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 					     const std::vector<CellData<1> > &cells,
 					     const SubCellData &subcelldata)
@@ -376,6 +387,46 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
 
 
 #if deal_II_dimension == 2
+
+template <>
+void Triangulation<2>::create_triangulation_compatibility (
+  const std::vector<Point<2> >    &v,
+  const std::vector<CellData<2> > &c,
+  const SubCellData               &subcelldata)
+{
+  const bool output=false;
+
+				   // copy cell data as it will be
+				   // modified in the following
+  std::vector<CellData<2> > cells(c);
+  
+  for (unsigned int cell=0; cell<cells.size(); ++cell)
+    {
+      if (output)
+	{
+	  std::cout << "cell" << cell << ": ";
+	  for (unsigned int vertex=0; vertex<4; ++vertex)
+	    std::cout << cells[cell].vertices[vertex] << " ";
+	}
+
+      std::swap(cells[cell].vertices[2],cells[cell].vertices[3]);
+      
+
+      if (output)
+	{
+	  std::cout << "  after swap: ";
+	  for (unsigned int vertex=0; vertex<4; ++vertex)
+	    std::cout << cells[cell].vertices[vertex] << " ";
+	  std::cout << std::endl;
+	}
+    }
+
+				   // subcelldata.boundary_lines refer
+				   // to the vertices in v. they don't
+				   // need to be changed
+  
+  create_triangulation(v, cells, subcelldata);
+}
 
 template <>
 void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
@@ -718,6 +769,84 @@ struct QuadComparator
 
 template <>
 void
+Triangulation<3>::create_triangulation_compatibility (
+  const std::vector<Point<3> >    &v,
+  const std::vector<CellData<3> > &c,
+  const SubCellData               &subc)
+{
+  const bool output1=false;
+  const bool output2=false;
+
+				   // copy cell and subcell data as
+				   // they will be modified in the
+				   // following
+  std::vector<CellData<3> > cells(c);
+  SubCellData subcelldata(subc);
+  
+  unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
+  for (unsigned int cell=0; cell<cells.size(); ++cell)
+    {
+      if (output1)
+	{
+	  std::cout << "cell" << cell << ": ";
+	  for (unsigned int vertex=0;
+	       vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
+	    std::cout << cells[cell].vertices[vertex] << " ";
+	}
+
+      for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+	tmp[i]=cells[cell].vertices[i];
+      for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+	cells[cell].vertices[GeometryInfo<3>::ucd_to_deal[i]]=tmp[i];
+
+      if (output1)
+	{
+	  std::cout << "  after swap: ";
+	  for (unsigned int vertex=0;
+	       vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
+	    std::cout << cells[cell].vertices[vertex] << " ";
+	  std::cout << std::endl;
+	  std::cout << "vertices:" << std::endl;
+	  for (unsigned int vertex=0;
+	       vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
+	    std::cout << v[cells[cell].vertices[vertex]] << std::endl;
+	}
+    }
+
+  if (output2)
+    {
+      std::cout << "vertices:" << std::endl;
+      for (unsigned int i=0; i<vertices.size(); ++i)
+	std::cout << vertices[i] << std::endl;
+    }
+				   // now points in boundary quads
+  std::vector<CellData<2> >::iterator boundary_quad
+    = subcelldata.boundary_quads.begin();
+  std::vector<CellData<2> >::iterator end_quad
+    = subcelldata.boundary_quads.end();
+  for (unsigned int quad_no=0; boundary_quad!=end_quad; ++boundary_quad, ++quad_no)
+    {
+      if (output2)
+	std::cout << quad_no << ": " << boundary_quad->vertices[0]
+		  << ",  " << boundary_quad->vertices[1]
+		  << ",  " << boundary_quad->vertices[2]
+		  << ",  " << boundary_quad->vertices[3];
+      
+      std::swap(boundary_quad->vertices[2], boundary_quad->vertices[3]);
+
+      if (output2)
+	std::cout << ", after swap: " << boundary_quad->vertices[0]
+		  << ",  " << boundary_quad->vertices[1]
+		  << ",  " << boundary_quad->vertices[2]
+		  << ",  " << boundary_quad->vertices[3] << std::endl;
+    }  
+
+  create_triangulation(v, cells, subcelldata);
+}
+
+
+template <>
+void
 Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                                         const std::vector<CellData<3> > &cells,
                                         const SubCellData               &subcelldata)
@@ -966,12 +1095,12 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                                            // set. thus, vertex 0 is
                                            // the one from which two
                                            // edges originate, and
-                                           // vertex 2 is the one to
+                                           // vertex 3 is the one to
                                            // which they converge. we
                                            // are then left with
                                            // orientations 0-1-2-3 and
-                                           // 0-3-2-1 for the order of
-                                           // vertices. the
+                                           // 2-3-0-1 for the order of
+                                           // lines. the
                                            // corresponding quad can
                                            // be easily constructed by
                                            // exchanging lines. we do
@@ -983,8 +1112,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                                            // new one and instead
                                            // later set the
                                            // face_orientation flag
-          const Quad test_quad (quad.line(3), quad.line(2),
-				quad.line(1), quad.line(0));
+          const Quad test_quad (quad.line(2), quad.line(3),
+				quad.line(0), quad.line(1));
           if (needed_quads.find (test_quad) == needed_quads.end())
             needed_quads[quad] = end_quad();
         }
@@ -1073,8 +1202,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 						   // face must be
 						   // available in
 						   // reverse order then
-		  const Quad test_quad (quad.line(3), quad.line(2),
-					quad.line(1), quad.line(0));
+		  const Quad test_quad (quad.line(2), quad.line(3),
+					quad.line(0), quad.line(1));
 		  Assert (needed_quads.find (test_quad) != needed_quads.end(),
 			  ExcInternalError());
 		  face_iterator[face] = needed_quads[test_quad];
@@ -1155,11 +1284,11 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 					       // that line_no in
 					       // standard face
 					       // orientation is
-					       // 3-line_no in
+					       // (line_no+2)%4 in
 					       // non-standard face
 					       // orientation
-	      Assert (face_iterator[face1]->line(face_orientation[face1] ? line1 : 3-line1) ==
-		      face_iterator[face2]->line(face_orientation[face2] ? line2 : 3-line2),
+	      Assert (face_iterator[face1]->line(face_orientation[face1] ? line1 : (line1+2)%4) ==
+		      face_iterator[face2]->line(face_orientation[face2] ? line2 : (line2+2)%4),
 		      ExcInternalErrorOnCell(c));
 	    }
 #endif
@@ -1298,6 +1427,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
       line->set_boundary_indicator (boundary_line->material_id);
     }
 
+  
 				   // now go on with boundary faces
   std::vector<CellData<2> >::const_iterator boundary_quad
     = subcelldata.boundary_quads.begin();
@@ -1358,7 +1488,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // orientation does not carry
 				       // any information.
       Quad quad_compare_1(line[0]->index(), line[1]->index(), line[2]->index(), line[3]->index());
-      Quad quad_compare_2(line[3]->index(), line[2]->index(), line[1]->index(), line[0]->index());
+      Quad quad_compare_2(line[2]->index(), line[3]->index(), line[0]->index(), line[1]->index());
       
 				       // try to find the quad with
 				       // lines situated as
@@ -1367,19 +1497,35 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // the boundary lines 3 times
 				       // until it is found or it does
 				       // not exist.
+
+				       // mapping from counterclock to
+				       // lexicographic ordering of
+				       // quad lines
+      static const unsigned int lex2cclock[4]={3,1,0,2};
+				       // copy lines from
+				       // lexicographic to
+				       // counterclock ordering, as
+				       // rotation is much simpler in
+				       // counterclock ordering
+      line_iterator line_counterclock[4];
+      for (unsigned int i=0; i<4; ++i)
+	line_counterclock[lex2cclock[i]]=line[i];
       unsigned int n_rotations=0;
       bool not_found_quad_1;
       while ( (not_found_quad_1=(needed_quads.find(quad_compare_1) == needed_quads.end())) && 
 	      (                  needed_quads.find(quad_compare_2) == needed_quads.end()) &&
 	      (n_rotations<4))
  	{
- 	  rotate(line, line+1, line+4);
+					   // use the rotate defined
+					   // in <algorithms>
+ 	  rotate(line_counterclock, line_counterclock+1, line_counterclock+4);
 					   // update the quads with
-					   // rotated lines
+					   // rotated lines (i runs in
+					   // lexicographic ordering)
 	  for (unsigned int i=0; i<4; ++i)
 	    {
-	      quad_compare_1.set_line(i,   line[i]->index());
-	      quad_compare_2.set_line(3-i, line[i]->index());
+	      quad_compare_1.set_line(i,       line_counterclock[lex2cclock[i]]->index());
+	      quad_compare_2.set_line((i+2)%4, line_counterclock[lex2cclock[i]]->index());
 	    }
  	      
  	  ++n_rotations;
@@ -4730,33 +4876,33 @@ Triangulation<2>::execute_refinement ()
    Set up an array of the 3x3 vertices, which are distributed on the cell
    (the array consists of indices into the @p{vertices} std::vector
    
-   6--5--4
+   2--7--3
    |  |  |
-   7--8--3
+   4--8--5
    |  |  |
-   0--1--2
+   0--6--1
 	
    Second:  
    Set up an array of the new lines (the array consists of iterator pointers
    into the lines arrays)
    
-   .-4-.-5-.         The directions are:  .->-.->-.
-   7   9   3                              ^   ^   ^
-   .-10.11- .                             .->-.->-.
-   6   8   2                              ^   ^   ^
-   .-0-.-1-.                              .->-.->-.
+   .-6-.-7-.         The directions are:  .->-.->-.
+   1   9   3                              ^   ^   ^
+   .-10.11-.                             .->-.->-.
+   0   8   2                              ^   ^   ^
+   .-4-.-5-.                              .->-.->-.
 
      
    Third:
    Set up an array of neighbors:
    
-      4  5
+      6  7
     .--.--.
-   7|  |  |3
+   1|  |  |3
     .--.--.
-   6|  |  |2
+   0|  |  |2
     .--.--.
-     0   1
+     4   5
 
    We need this array for two reasons: first to get the lines which will
    bound the four subcells (if the neighboring cell is refined, these
@@ -4783,7 +4929,7 @@ Triangulation<2>::execute_refinement ()
    The created children are numbered like this:
 
    .--.--.
-   |3 . 2|
+   |2 . 3|
    .--.--.
    |0 | 1|
    .--.--.
@@ -4801,12 +4947,12 @@ Triangulation<2>::execute_refinement ()
 					     // collect the indices
 					     // all vertices
 	    int new_vertices[9] = {cell->vertex_index(0),
-				   cell->line(0)->child(0)->vertex_index(1),
 				   cell->vertex_index(1),
-				   cell->line(1)->child(0)->vertex_index(1),
 				   cell->vertex_index(2),
-				   cell->line(2)->child(0)->vertex_index(1),
 				   cell->vertex_index(3),
+				   cell->line(0)->child(0)->vertex_index(1),
+				   cell->line(1)->child(0)->vertex_index(1),
+				   cell->line(2)->child(0)->vertex_index(1),
 				   cell->line(3)->child(0)->vertex_index(1),
 				   next_unused_vertex};
 
@@ -4847,10 +4993,10 @@ Triangulation<2>::execute_refinement ()
                         ExcCellShouldBeUnused());
 	      }
 
-	    new_lines[8] ->set (Line(new_vertices[1], new_vertices[8]));
-	    new_lines[9] ->set (Line(new_vertices[8], new_vertices[5]));
-	    new_lines[10]->set (Line(new_vertices[7], new_vertices[8]));
-	    new_lines[11]->set (Line(new_vertices[8], new_vertices[3]));
+	    new_lines[8] ->set (Line(new_vertices[6], new_vertices[8]));
+	    new_lines[9] ->set (Line(new_vertices[8], new_vertices[7]));
+	    new_lines[10]->set (Line(new_vertices[4], new_vertices[8]));
+	    new_lines[11]->set (Line(new_vertices[8], new_vertices[5]));
 	
 	    for (l=8; l<12; ++l)
 	      {
@@ -4889,19 +5035,19 @@ Triangulation<2>::execute_refinement ()
 	    Assert(n_children==4, ExcNotImplemented());
 	    subcells[0]->set (Quad(new_lines[0]->index(),
 				   new_lines[8]->index(),
-				   new_lines[10]->index(),
-				   new_lines[6]->index()));
-	    subcells[1]->set (Quad(new_lines[1]->index(),
-				   new_lines[2]->index(),
-				   new_lines[11]->index(),
-				   new_lines[8]->index()));
-	    subcells[2]->set (Quad(new_lines[11]->index(),
-                                   new_lines[3]->index(),
-				   new_lines[5]->index(),
-                                   new_lines[9]->index()));
-	    subcells[3]->set (Quad(new_lines[10]->index(),
-                                   new_lines[9]->index(),
 				   new_lines[4]->index(),
+				   new_lines[10]->index()));
+	    subcells[1]->set (Quad(new_lines[8]->index(),
+				   new_lines[2]->index(),
+				   new_lines[5]->index(),
+				   new_lines[11]->index()));
+	    subcells[2]->set (Quad(new_lines[1]->index(),
+                                   new_lines[9]->index(),
+				   new_lines[10]->index(),
+                                   new_lines[6]->index()));
+	    subcells[3]->set (Quad(new_lines[9]->index(),
+                                   new_lines[3]->index(),
+				   new_lines[11]->index(),
                                    new_lines[7]->index()));
 
 	    for (unsigned int i=0; i<n_children; ++i)
@@ -5029,22 +5175,22 @@ Triangulation<2>::execute_refinement ()
 					     // in the new cells
 	    subcells[0]->set_neighbor (0, neighbor_cells[0][0]);
 	    subcells[0]->set_neighbor (1, subcells[1]);
-	    subcells[0]->set_neighbor (2, subcells[3]);
-	    subcells[0]->set_neighbor (3, neighbor_cells[3][0]);
+	    subcells[0]->set_neighbor (2, neighbor_cells[2][0]);
+	    subcells[0]->set_neighbor (3, subcells[2]);
 
-	    subcells[1]->set_neighbor (0, neighbor_cells[0][1]);
+	    subcells[1]->set_neighbor (0, subcells[0]);
 	    subcells[1]->set_neighbor (1, neighbor_cells[1][0]);
-	    subcells[1]->set_neighbor (2, subcells[2]);
-	    subcells[1]->set_neighbor (3, subcells[0]);
+	    subcells[1]->set_neighbor (2, neighbor_cells[2][1]);
+	    subcells[1]->set_neighbor (3, subcells[3]);
 
-	    subcells[2]->set_neighbor (0, subcells[1]);
-	    subcells[2]->set_neighbor (1, neighbor_cells[1][1]);
-	    subcells[2]->set_neighbor (2, neighbor_cells[2][1]);
-	    subcells[2]->set_neighbor (3, subcells[3]);
+	    subcells[2]->set_neighbor (0, neighbor_cells[0][1]);
+	    subcells[2]->set_neighbor (1, subcells[3]);
+	    subcells[2]->set_neighbor (2, subcells[0]);
+	    subcells[2]->set_neighbor (3, neighbor_cells[3][0]);
 
-	    subcells[3]->set_neighbor (0, subcells[0]);
-	    subcells[3]->set_neighbor (1, subcells[2]);
-	    subcells[3]->set_neighbor (2, neighbor_cells[2][0]);
+	    subcells[3]->set_neighbor (0, subcells[2]);
+	    subcells[3]->set_neighbor (1, neighbor_cells[1][1]);
+	    subcells[3]->set_neighbor (2, subcells[1]);
 	    subcells[3]->set_neighbor (3, neighbor_cells[3][1]);
 
 					     // now we need to set the
@@ -5544,16 +5690,16 @@ Triangulation<3>::execute_refinement ()
 					     // first collect the
 					     // indices of the five
 					     // vertices:
+					     // *--3--*
+					     // |  |  |
+					     // 0--4--1
+					     // |  |  |
 					     // *--2--*
-					     // |  |  |
-					     // 3--4--1
-					     // |  |  |
-					     // *--0--*
 					     // the lines are numbered
 					     // as follows:
 					     // *--*--*
-					     // |  2  |
-					     // *3-*-1*
+					     // |  1  |
+					     // *2-*-3*
 					     // |  0  |
 					     // *--*--*
 	    const unsigned int vertex_indices[5]
@@ -5564,10 +5710,10 @@ Triangulation<3>::execute_refinement ()
 		  next_unused_vertex 
 	      };
 	    
-	    new_lines[0]->set (Line(vertex_indices[0], vertex_indices[4]));
-	    new_lines[1]->set (Line(vertex_indices[4], vertex_indices[1]));
-	    new_lines[2]->set (Line(vertex_indices[4], vertex_indices[2]));
-	    new_lines[3]->set (Line(vertex_indices[3], vertex_indices[4]));
+	    new_lines[0]->set (Line(vertex_indices[2], vertex_indices[4]));
+	    new_lines[1]->set (Line(vertex_indices[4], vertex_indices[3]));
+	    new_lines[2]->set (Line(vertex_indices[0], vertex_indices[4]));
+	    new_lines[3]->set (Line(vertex_indices[4], vertex_indices[1]));
 
 	    for (unsigned int i=0; i<4; ++i)
 	      {
@@ -5585,20 +5731,20 @@ Triangulation<3>::execute_refinement ()
 					     // about the indices of
 					     // the lines, with the
 					     // following numbering:
-					     // *5-*-4*
-					     // 6  10 3
-					     // *11*-9*
-					     // 7  8  2
-					     // *0-*-1*
+					     //   .-6-.-7-.
+					     //   1   9   3
+					     //   .-10.11-.
+					     //   0   8   2
+					     //   .-4-.-5-.
 	    const unsigned int line_indices[12]
 	      = { quad->line(0)->child(0)->index(),
 		  quad->line(0)->child(1)->index(),
 		  quad->line(1)->child(0)->index(),
 		  quad->line(1)->child(1)->index(),
-		  quad->line(2)->child(1)->index(),
 		  quad->line(2)->child(0)->index(),
-		  quad->line(3)->child(1)->index(),
+		  quad->line(2)->child(1)->index(),
 		  quad->line(3)->child(0)->index(),
+		  quad->line(3)->child(1)->index(),
 		  new_lines[0]->index(),
 		  new_lines[1]->index(),
 		  new_lines[2]->index(),
@@ -5639,20 +5785,20 @@ Triangulation<3>::execute_refinement ()
 
 	    new_quads[0]->set (Quad(line_indices[0],
 				    line_indices[8],
-				    line_indices[11],
-				    line_indices[7]));
-	    new_quads[1]->set (Quad(line_indices[1],
-				    line_indices[2],
-				    line_indices[9],
-				    line_indices[8]));
-	    new_quads[2]->set (Quad(line_indices[9],
-				    line_indices[3],
 				    line_indices[4],
 				    line_indices[10]));
-	    new_quads[3]->set (Quad(line_indices[11],
-				    line_indices[10],
+	    new_quads[1]->set (Quad(line_indices[8],
+				    line_indices[2],
 				    line_indices[5],
+				    line_indices[11]));
+	    new_quads[2]->set (Quad(line_indices[1],
+				    line_indices[9],
+				    line_indices[10],
 				    line_indices[6]));
+	    new_quads[3]->set (Quad(line_indices[9],
+				    line_indices[3],
+				    line_indices[11],
+				    line_indices[7]));
 	    for (unsigned int i=0; i<4; ++i)
 	      {
 		new_quads[i]->set_used_flag();
@@ -5756,7 +5902,7 @@ Triangulation<3>::execute_refinement ()
 					     // orientation
 	    for (unsigned int face=0;
 		 face<GeometryInfo<dim>::faces_per_cell; ++face)
-	      vertices[next_unused_vertex] += hex->face(face)->child(0)->vertex(2) *
+	      vertices[next_unused_vertex] += hex->face(face)->child(0)->vertex(3) *
 					      1./12.;
 
 					     // now that we created
@@ -5788,40 +5934,40 @@ Triangulation<3>::execute_refinement ()
 					     // cutting the hex in two
 					     // vertically and
 					     // horizontally)
-					     //     *--2--*   *--5--*
+					     //     *--3--*   *--5--*
 					     //    /  /  /    |  |  |
-					     //   3--6--1     3--6--1
+					     //   0--6--1     0--6--1
 					     //  /  /  /      |  |  |
-					     // *--0--*       *--4--*
+					     // *--2--*       *--4--*
 					     // the lines are numbered
 					     // as follows:
 					     //     *--*--*   *--*--*
-					     //    /  2  /    |  5  |
-					     //   *3-*-1*     *3-*-1*
+					     //    /  1  /    |  5  |
+					     //   *2-*-3*     *2-*-3*
 					     //  /  0  /      |  4  |
 					     // *--*--*       *--*--*
                                              //
                                              // note that both asking
                                              // for child 0 and for
-                                             // vertex 2 within that
+                                             // vertex 3 within that
                                              // is invariant with
                                              // respect to the face
                                              // orientation, so we do
                                              // not have to ask here
 	    const unsigned int vertex_indices[7]
-	      = { hex->face(0)->child(0)->vertex_index(2),
-		  hex->face(3)->child(0)->vertex_index(2),
-		  hex->face(1)->child(0)->vertex_index(2),
-		  hex->face(5)->child(0)->vertex_index(2),
-		  hex->face(2)->child(0)->vertex_index(2),
-		  hex->face(4)->child(0)->vertex_index(2),
+	      = { hex->face(0)->child(0)->vertex_index(3),
+		  hex->face(1)->child(0)->vertex_index(3),
+		  hex->face(2)->child(0)->vertex_index(3),
+		  hex->face(3)->child(0)->vertex_index(3),
+		  hex->face(4)->child(0)->vertex_index(3),
+		  hex->face(5)->child(0)->vertex_index(3),
 		  next_unused_vertex 
 	      };
 	    
-	    new_lines[0]->set (Line(vertex_indices[0], vertex_indices[6]));
-	    new_lines[1]->set (Line(vertex_indices[6], vertex_indices[1]));
-	    new_lines[2]->set (Line(vertex_indices[6], vertex_indices[2]));
-	    new_lines[3]->set (Line(vertex_indices[3], vertex_indices[6]));
+	    new_lines[0]->set (Line(vertex_indices[2], vertex_indices[6]));
+	    new_lines[1]->set (Line(vertex_indices[6], vertex_indices[3]));
+	    new_lines[2]->set (Line(vertex_indices[0], vertex_indices[6]));
+	    new_lines[3]->set (Line(vertex_indices[6], vertex_indices[1]));
 	    new_lines[4]->set (Line(vertex_indices[4], vertex_indices[6]));
 	    new_lines[5]->set (Line(vertex_indices[6], vertex_indices[5]));
 
@@ -5841,71 +5987,68 @@ Triangulation<3>::execute_refinement ()
 					     // collect some data
 					     // about the indices of
 					     // the lines, with the
-					     // following numbering:	    
-					     // front plane    *---*---*
-					     //                |   2   |
-					     //                *3--*--1*
-					     //                |   0   |
-					     //                *---*---*
-					     //
-					     // middle plane   *9--*--8*
-					     //                10  14  7 
-					     //                *15-*-13*
-					     //                11  12  6 
-					     //                *4--*--5*
-					     //
-					     // back plane     *---*---*
-					     //                |   18  | 
-					     //                *19-*-17*
-					     //                |   16  | 
-					     //                *---*---*
-					     //
-					     // left plane (the
-					     // left-to-right planes
-					     // are displayed twice
-					     // each, for better
-					     // readability of the
-					     // indices; the left part
-					     // is already determined
-					     // by the pictures above)
-					     //                  *            *
-					     //                 /|           /| 
-					     //                * |          * |
-					     //               /| *         /| *
-					     //              *10/|        * |21
-					     //              | * |        | * |
-					     //              |/| *        |20 *
-					     //              *11/         * |/
-					     //              | *          | *
-					     //              |/           |/ 
-					     //              *            *
-					     //
-					     // middle plane
-					     //                  *            *
-					     //                 /|          23| 
-					     //                * 18         * |
-					     //               /| *        22| *
-					     //              *14/16       * |25
-					     //              | * |        | * |
-					     //              2/| *        |24 *
-					     //              *12/         * |27
-					     //              | *          | *
-					     //              0/           |26
-					     //              *            *
-					     //
-					     //
-					     // right plane
-					     //                  *            *
-					     //                 /|           /| 
-					     //                * |          * |
-					     //               /| *         /| *
-					     //              * 6/|        * |29
-					     //              | * |        | * |
-					     //              |/| *        |28 *
-					     //              * 7/         * |/
-					     //              | *          | *
-					     //              |/           |/
-					     //              *            *
+					     // following numbering:
+					     // (note that face 0 and
+					     // 1 each are shown twice
+					     // for better
+					     // readability)
+	    
+					     // face 0: left plane
+					     //       *            *
+					     //      /|           /| 
+					     //     * |          * |
+					     //    /| *         /| *
+					     //   * 1/|        * |3|
+					     //   | * |        | * |
+					     //   |/| *        |2| *
+					     //   * 0/         * |/
+					     //   | *          | *
+					     //   |/           |/ 
+					     //   *            *
+					     // face 1: right plane
+					     //       *            *
+					     //      /|           /| 
+					     //     * |          * |
+					     //    /| *         /| *
+					     //   * 5/|        * |7|
+					     //   | * |        | * |
+					     //   |/| *        |6| *
+					     //   * 4/         * |/
+					     //   | *          | *
+					     //   |/           |/
+					     //   *            *
+					     // face 2: front plane
+					     //   (note: x,y exchanged)
+					     //   *---*---*
+					     //   |   11  |
+					     //   *-8-*-9-*
+					     //   |   10  |
+					     //   *---*---*
+					     // face 3: back plane
+					     //   (note: x,y exchanged)
+					     //   *---*---*
+					     //   |   15  | 
+					     //   *12-*-13*
+					     //   |   14  | 
+					     //   *---*---*
+					     // face 4: bottom plane
+					     //       *---*---*
+					     //      /  17   /
+					     //     *18-*-19*
+					     //    /   16  /
+					     //   *---*---*
+					     // face 5: top plane
+					     //       *---*---*
+					     //      /  21   /
+					     //     *22-*-23*
+					     //    /   20  /
+					     //   *---*---*
+					     // middle planes
+					     //     *---*---*   *---*---*
+					     //    /  25   /    |   29  |
+					     //   *26-*-27*     *26-*-27*
+					     //  /   24  /      |   28  |
+					     // *---*---*       *---*---*
                                              //
                                              // this time we have to
                                              // take into account
@@ -5914,6 +6057,8 @@ Triangulation<3>::execute_refinement ()
                                              // correctly or in the
                                              // opposite direction, so
                                              // store that up front
+
+					     // TODO: shorten this
             const bool face_orientation[6]
               = { hex->face_orientation (0),
                   hex->face_orientation (1),
@@ -5924,67 +6069,71 @@ Triangulation<3>::execute_refinement ()
                     
 	    const unsigned int line_indices[30]
 	      = {
-		    hex->face(0)->child(0                          )
-                    ->line_index(face_orientation[0] ? 1 : 2),   //0
-		    hex->face(0)->child(face_orientation[0] ? 1 : 3)
-                    ->line_index(face_orientation[0] ? 2 : 1),   //1
-		    hex->face(0)->child(2                          )
-                    ->line_index(face_orientation[0] ? 3 : 0),   //2
-		    hex->face(0)->child(face_orientation[0] ? 3 : 1)
-                    ->line_index(face_orientation[0] ? 0 : 3),   //3
+						     // ask for
+						     // children 0 and
+						     // 3 as they are
+						     // invariant
+						     // wrt. face_orientation
+		    hex->face(0)->child(0)
+                    ->line_index(face_orientation[0] ? 1 : 3),   //0
+		    hex->face(0)->child(3)
+                    ->line_index(face_orientation[0] ? 0 : 2),   //1
+		    hex->face(0)->child(0)
+                    ->line_index(face_orientation[0] ? 3 : 1),   //2
+		    hex->face(0)->child(3)
+                    ->line_index(face_orientation[0] ? 2 : 0),   //3
 
-		    hex->face(2)->child(0                          )
-                    ->line_index(face_orientation[2] ? 2 : 1),   //4
-		    hex->face(2)->child(face_orientation[2] ? 1 : 3)
-                    ->line_index(face_orientation[2] ? 2 : 1),   //5
-		    hex->face(3)->child(0                          )
-                    ->line_index(face_orientation[3] ? 1 : 2),   //6
-		    hex->face(3)->child(face_orientation[3] ? 3 : 1)
-                    ->line_index(face_orientation[3] ? 1 : 2),   //7
+		    hex->face(1)->child(0)
+                    ->line_index(face_orientation[1] ? 1 : 3),   //4
+		    hex->face(1)->child(3)
+                    ->line_index(face_orientation[1] ? 0 : 2),   //5
+		    hex->face(1)->child(0)
+                    ->line_index(face_orientation[1] ? 3 : 1),   //6
+		    hex->face(1)->child(3)
+                    ->line_index(face_orientation[1] ? 2 : 0),   //7
 
-		    hex->face(4)->child(face_orientation[4] ? 1 : 3)
-                    ->line_index(face_orientation[4] ? 2 : 1),   //8
-		    hex->face(4)->child(0                          )
-                    ->line_index(face_orientation[4] ? 2 : 1),   //9
-		    hex->face(5)->child(face_orientation[5] ? 3 : 1)
-                    ->line_index(face_orientation[5] ? 1 : 2),   //10
-		    hex->face(5)->child(0                          )
-                    ->line_index(face_orientation[5] ? 1 : 2),   //11
+		    hex->face(2)->child(0)
+                    ->line_index(face_orientation[2] ? 1 : 3),   //8
+		    hex->face(2)->child(3)
+                    ->line_index(face_orientation[2] ? 0 : 2),   //9
+		    hex->face(2)->child(0)
+                    ->line_index(face_orientation[2] ? 3 : 1),   //10
+		    hex->face(2)->child(3)
+                    ->line_index(face_orientation[2] ? 2 : 0),   //11
 
-		    new_lines[4]->index(),                   //12
-		    new_lines[1]->index(),                   //13
-		    new_lines[5]->index(),                   //14
-		    new_lines[3]->index(),                   //15
+		    hex->face(3)->child(0)
+                    ->line_index(face_orientation[3] ? 1 : 3),   //12
+		    hex->face(3)->child(3)
+                    ->line_index(face_orientation[3] ? 0 : 2),   //13
+		    hex->face(3)->child(0)
+                    ->line_index(face_orientation[3] ? 3 : 1),   //14
+		    hex->face(3)->child(3)
+                    ->line_index(face_orientation[3] ? 2 : 0),   //15
 
-		    hex->face(1)->child(0                          )
-                    ->line_index(face_orientation[1] ? 1 : 2),   //16
-		    hex->face(1)->child(face_orientation[1] ? 1 : 3)
-                    ->line_index(face_orientation[1] ? 2 : 1),   //17
-		    hex->face(1)->child(2                          )
-                    ->line_index(face_orientation[1] ? 3 : 0),   //18
-		    hex->face(1)->child(face_orientation[1] ? 3 : 1)
-                    ->line_index(face_orientation[1] ? 0 : 3),   //19
+		    hex->face(4)->child(0)
+                    ->line_index(face_orientation[4] ? 1 : 3),   //16
+		    hex->face(4)->child(3)
+                    ->line_index(face_orientation[4] ? 0 : 2),   //17
+		    hex->face(4)->child(0)
+                    ->line_index(face_orientation[4] ? 3 : 1),   //18
+		    hex->face(4)->child(3)
+                    ->line_index(face_orientation[4] ? 2 : 0),   //19
 
-		    hex->face(5)->child(0                          )
-                    ->line_index(face_orientation[5] ? 2 : 1),   //20
-		    hex->face(5)->child(face_orientation[5] ? 1 : 3)
-                    ->line_index(face_orientation[5] ? 2 : 1),   //21
-		    hex->face(4)->child(0                          )
-                    ->line_index(face_orientation[4] ? 1 : 2),   //22
-		    hex->face(4)->child(face_orientation[4] ? 3 : 1)
-                    ->line_index(face_orientation[4] ? 1 : 2),   //23
+		    hex->face(5)->child(0)
+                    ->line_index(face_orientation[5] ? 1 : 3),   //20
+		    hex->face(5)->child(3)
+                    ->line_index(face_orientation[5] ? 0 : 2),   //21
+		    hex->face(5)->child(0)
+                    ->line_index(face_orientation[5] ? 3 : 1),   //22
+		    hex->face(5)->child(3)
+                    ->line_index(face_orientation[5] ? 2 : 0),   //23
 
-		    new_lines[0]->index(),                   //24
-		    new_lines[2]->index(),                   //25
-		    hex->face(2)->child(0                          )
-                    ->line_index(face_orientation[2] ? 1 : 2),   //26
-		    hex->face(2)->child(face_orientation[2] ? 3 : 1)
-                    ->line_index(face_orientation[2] ? 1 : 2),   //27
-
-		    hex->face(3)->child(0                          )
-                    ->line_index(face_orientation[3] ? 2 : 1),   //28
-		    hex->face(3)->child(face_orientation[3] ? 1 : 3)
-                    ->line_index(face_orientation[3] ? 2 : 1)    //29
+		    new_lines[0]->index(),                       //24
+		    new_lines[1]->index(),                       //25
+		    new_lines[2]->index(),                       //26
+		    new_lines[3]->index(),                       //27
+		    new_lines[4]->index(),                       //28
+		    new_lines[5]->index()                        //29
 	      };
 	    
 					     // find some space for
@@ -6005,88 +6154,83 @@ Triangulation<3>::execute_refinement ()
 
 					     // set up the 12 quads,
 					     // numbered as follows
-					     // (shown are the three
-					     // planes cutting the hex
-					     // in two):
+					     // (left quad numbering,
+					     // right line numbering
+					     // extracted from above)
 					     //
-					     //  *-----*-----*
-					     //  |  3  |  2  |
-					     //  |     |     |
-					     //  *-----*-----*
-					     //  |     |     |
-					     //  |  0  |  1  |
-					     //  *-----*-----*
+					     //      *          *
+					     //     /|        21|
+					     //    * |        * 15
+					     //  y/|3*      20| *  
+					     //  * |/|      * |/| 
+					     //  |2* |x    11 * 14
+					     //  |/|1*      |/| * 
+					     //  * |/       * |17 
+					     //  |0*       10 *
+					     //  |/         |16
+					     //  *          *
 					     //
-					     //       *----*----*
-					     //      / 7  / 6  /
-					     //     *----*----*
-					     //    / 4  / 5  /
-					     //   *----*----*
+					     //  x
+					     //  *---*---*      *22-*-23*
+					     //  | 5 | 7 |      1  29   5
+					     //  *---*---*      *26-*-27*
+					     //  | 4 | 6 |      0  28   4
+					     //  *---*---*y     *18-*-19*
 					     //
-					     //
-					     //             *
-					     //            /|
-					     //           / |
-					     //          *10|
-					     //         /|  *
-					     //        / | /|
-					     //       *  |/ |
-					     //       |11*  |
-					     //       | /| 9*
-					     //       |/ | /
-					     //       *  |/
-					     //       |8 *
-					     //       | /
-					     //       |/
-					     //       *
-	    new_quads[0]->set (Quad(line_indices[4],
-				    line_indices[12],
-				    line_indices[15],
-				    line_indices[11]));
-	    new_quads[1]->set (Quad(line_indices[5],
-				    line_indices[6],
-				    line_indices[13],
-				    line_indices[12]));
-	    new_quads[2]->set (Quad(line_indices[13],
-				    line_indices[7],
-				    line_indices[8],
-				    line_indices[14]));
-	    new_quads[3]->set (Quad(line_indices[15],
-				    line_indices[14],
-				    line_indices[9],
-				    line_indices[10]));
-	    new_quads[4]->set (Quad(line_indices[3],
-				    line_indices[24],
-				    line_indices[15],
-				    line_indices[20]));
-	    new_quads[5]->set (Quad(line_indices[1],
+					     //       y
+					     //      *----*----*      *-12-*-13-*
+					     //     / 10 / 11 /      3   25    7
+					     //    *----*----*      *-26-*-27-*
+					     //   / 8  / 9  /      2   24    6
+					     //  *----*----*x     *--8-*--9-* 
+	    new_quads[0]->set (Quad(line_indices[10],
 				    line_indices[28],
-				    line_indices[13],
+				    line_indices[16],
 				    line_indices[24]));
-	    new_quads[6]->set (Quad(line_indices[13],
-				    line_indices[29],
+	    new_quads[1]->set (Quad(line_indices[28],
+				    line_indices[14],
 				    line_indices[17],
 				    line_indices[25]));
-	    new_quads[7]->set (Quad(line_indices[15],
-				    line_indices[25],
-				    line_indices[19],
-				    line_indices[21]));
-	    new_quads[8]->set (Quad(line_indices[26],
-				    line_indices[12],
+	    new_quads[2]->set (Quad(line_indices[11],
+				    line_indices[29],
 				    line_indices[24],
-				    line_indices[0]));
-	    new_quads[9]->set (Quad(line_indices[27],
-				    line_indices[16],
+				    line_indices[20]));
+	    new_quads[3]->set (Quad(line_indices[29],
+				    line_indices[15],
 				    line_indices[25],
-				    line_indices[12]));
-	    new_quads[10]->set (Quad(line_indices[25],
-				     line_indices[18],
-				     line_indices[23],
-				     line_indices[14]));
-	    new_quads[11]->set (Quad(line_indices[24],
-				     line_indices[14],
-				     line_indices[22],
-				     line_indices[2]));
+				    line_indices[21]));
+	    new_quads[4]->set (Quad(line_indices[18],
+				    line_indices[26],
+				    line_indices[0],
+				    line_indices[28]));
+	    new_quads[5]->set (Quad(line_indices[26],
+				    line_indices[22],
+				    line_indices[1],
+				    line_indices[29]));
+	    new_quads[6]->set (Quad(line_indices[19],
+				    line_indices[27],
+				    line_indices[28],
+				    line_indices[4]));
+	    new_quads[7]->set (Quad(line_indices[27],
+				    line_indices[23],
+				    line_indices[29],
+				    line_indices[5]));
+	    new_quads[8]->set (Quad(line_indices[2],
+				    line_indices[24],
+				    line_indices[8],
+				    line_indices[26]));
+	    new_quads[9]->set (Quad(line_indices[24],
+				    line_indices[6],
+				    line_indices[9],
+				    line_indices[27]));
+	    new_quads[10]->set (Quad(line_indices[3],
+				     line_indices[25],
+				     line_indices[26],
+				     line_indices[12]));
+	    new_quads[11]->set (Quad(line_indices[25],
+				     line_indices[7],
+				     line_indices[27],
+				     line_indices[13]));
 	    for (unsigned int i=0; i<12; ++i)
 	      {
 		new_quads[i]->set_used_flag();
@@ -6110,48 +6254,29 @@ Triangulation<3>::execute_refinement ()
 					     //
 					     // planes in the interior
 					     // of the old hex:
-					     //  *-----*-----*
-					     //  |  3  |  2  |
-					     //  |     |     |
-					     //  *-----*-----*
-					     //  |     |     |
-					     //  |  0  |  1  |
-					     //  *-----*-----*
-					     //
-					     //       *----*----*
-					     //      / 7  / 6  /
-					     //     *----*----*
-					     //    / 4  / 5  /
-					     //   *----*----*
-					     //
-					     //
-					     //             *
-					     //            /|
-					     //           / |
-					     //          *10|
-					     //         /|  *
-					     //        / | /|
-					     //       *  |/ |
-					     //       |11*  |
-					     //       | /| 9*
-					     //       |/ | /
-					     //       *  |/
-					     //       |8 *
-					     //       | /
-					     //       |/
-					     //       *
+					     //      *
+					     //     /|
+					     //    * |
+					     //   /|3*  *---*---*      *----*----*
+					     //  * |/|  | 5 | 7 |     / 10 / 11 /
+					     //  |2* |  *---*---*    *----*----*
+					     //  |/|1*  | 4 | 6 |   / 8  / 9  /
+					     //  * |/   *---*---*y *----*----*x
+					     //  |0*
+					     //  |/
+					     //  *
 					     //
 					     // children of the faces
 					     // of the old hex
 					     //      *-------*        *-------*
-					     //     /|19   18|       /31   30/|
-					     //    34|       |      /       /26
-					     //   /  |       |     /28   29/  |
-					     //  *   |16   17|    *-------*27 |
-					     //  3533*-------*    |15   14| 25*
-					     //  |  /23   22/     |       |  /
-					     //  32/       /      |       |24
-					     //  |/20   21/       |12   13|/
+					     //     /|25   27|       /34   35/|
+					     //    15|       |      /       /19
+					     //   /  |       |     /32   33/  |
+					     //  *   |24   26|    *-------*18 |
+					     //  1413*-------*    |21   23| 17*
+					     //  |  /30   31/     |       |  /
+					     //  12/       /      |       |16
+					     //  |/28   29/       |20   22|/
 					     //  *-------*        *-------*
                                              //
                                              // note that we have to
@@ -6159,11 +6284,13 @@ Triangulation<3>::execute_refinement ()
                                              // orientation of
                                              // faces. as an
                                              // optimization: asking
-                                             // for child 0 or 2 of a
+                                             // for child 0 or 3 of a
                                              // face is invariant
                                              // under the orientation,
                                              // so we don't have to
                                              // ask for it then
+					     //
+					     // TODO: simplify this
 	    const unsigned int quad_indices[36]
 	      = {
 		    new_quads[0]->index(),     //0
@@ -6180,34 +6307,34 @@ Triangulation<3>::execute_refinement ()
 		    new_quads[11]->index(),    //11
 
 		    hex->face(0)->child_index(0),  //12
-		    hex->face(0)->child_index(face_orientation[0] ? 1 : 3),
-		    hex->face(0)->child_index(2),
-		    hex->face(0)->child_index(face_orientation[0] ? 3 : 1),
+		    hex->face(0)->child_index(face_orientation[0] ? 1 : 2),
+		    hex->face(0)->child_index(face_orientation[0] ? 2 : 1),
+		    hex->face(0)->child_index(3),
 
 		    hex->face(1)->child_index(0),  //16
-		    hex->face(1)->child_index(face_orientation[1] ? 1 : 3),
-		    hex->face(1)->child_index(2),
-		    hex->face(1)->child_index(face_orientation[1] ? 3 : 1),
+		    hex->face(1)->child_index(face_orientation[1] ? 1 : 2),
+		    hex->face(1)->child_index(face_orientation[1] ? 2 : 1),
+		    hex->face(1)->child_index(3),
 
 		    hex->face(2)->child_index(0),  //20
-		    hex->face(2)->child_index(face_orientation[2] ? 1 : 3),
-		    hex->face(2)->child_index(2),
-		    hex->face(2)->child_index(face_orientation[2] ? 3 : 1),
+		    hex->face(2)->child_index(face_orientation[2] ? 1 : 2),
+		    hex->face(2)->child_index(face_orientation[2] ? 2 : 1),
+		    hex->face(2)->child_index(3),
 
 		    hex->face(3)->child_index(0),  //24
-		    hex->face(3)->child_index(face_orientation[3] ? 1 : 3),
-		    hex->face(3)->child_index(2),
-		    hex->face(3)->child_index(face_orientation[3] ? 3 : 1),
+		    hex->face(3)->child_index(face_orientation[3] ? 1 : 2),
+		    hex->face(3)->child_index(face_orientation[3] ? 2 : 1),
+		    hex->face(3)->child_index(3),
 
 		    hex->face(4)->child_index(0),  //28
-		    hex->face(4)->child_index(face_orientation[4] ? 1 : 3),
-		    hex->face(4)->child_index(2),
-		    hex->face(4)->child_index(face_orientation[4] ? 3 : 1),
+		    hex->face(4)->child_index(face_orientation[4] ? 1 : 2),
+		    hex->face(4)->child_index(face_orientation[4] ? 2 : 1),
+		    hex->face(4)->child_index(3),
 
 		    hex->face(5)->child_index(0),  //32
-		    hex->face(5)->child_index(face_orientation[5] ? 1 : 3),
-		    hex->face(5)->child_index(2),
-		    hex->face(5)->child_index(face_orientation[5] ? 3 : 1)
+		    hex->face(5)->child_index(face_orientation[5] ? 1 : 2),
+		    hex->face(5)->child_index(face_orientation[5] ? 2 : 1),
+		    hex->face(5)->child_index(3)
 	      };
 
 
@@ -6236,57 +6363,57 @@ Triangulation<3>::execute_refinement ()
 					     // present cell
 	    hex->set_children (new_hexes[0]->index());
 
-					     // front children
+					     // bottom children
 	    new_hexes[0]->set (Hexahedron(quad_indices[12],
 					  quad_indices[0],
 					  quad_indices[20],
-					  quad_indices[8],
 					  quad_indices[4],
-					  quad_indices[32]));
-	    new_hexes[1]->set (Hexahedron(quad_indices[13],
-					  quad_indices[1],
-					  quad_indices[21],
-					  quad_indices[24],
-					  quad_indices[5],
-					  quad_indices[8]));
-	    new_hexes[2]->set (Hexahedron(quad_indices[14],
-					  quad_indices[2],
-					  quad_indices[5],
-					  quad_indices[27],
-					  quad_indices[29],
-					  quad_indices[11]));
-	    new_hexes[3]->set (Hexahedron(quad_indices[15],
-					  quad_indices[3],
-					  quad_indices[4],
-					  quad_indices[11],
 					  quad_indices[28],
-					  quad_indices[35]));
-	    
-					     // back children
-	    new_hexes[4]->set (Hexahedron(quad_indices[0],
+					  quad_indices[8]));
+	    new_hexes[1]->set (Hexahedron(quad_indices[0],
 					  quad_indices[16],
-					  quad_indices[23],
-					  quad_indices[9],
-					  quad_indices[7],
-					  quad_indices[33]));
-	    new_hexes[5]->set (Hexahedron(quad_indices[1],
-					  quad_indices[17],
 					  quad_indices[22],
-					  quad_indices[25],
 					  quad_indices[6],
+					  quad_indices[29],
 					  quad_indices[9]));
-	    new_hexes[6]->set (Hexahedron(quad_indices[2],
-					  quad_indices[18],
-					  quad_indices[6],
-					  quad_indices[26],
+	    new_hexes[2]->set (Hexahedron(quad_indices[13],
+					  quad_indices[1],
+					  quad_indices[4],
+					  quad_indices[24],
 					  quad_indices[30],
 					  quad_indices[10]));
+	    new_hexes[3]->set (Hexahedron(quad_indices[1],
+					  quad_indices[17],
+					  quad_indices[6],
+					  quad_indices[26],
+					  quad_indices[31],
+					  quad_indices[11]));
+	    
+					     // top children
+	    new_hexes[4]->set (Hexahedron(quad_indices[14],
+					  quad_indices[2],
+					  quad_indices[21],
+					  quad_indices[5],
+					  quad_indices[8],
+					  quad_indices[32]));
+	    new_hexes[5]->set (Hexahedron(quad_indices[2],
+					  quad_indices[18],
+					  quad_indices[23],
+					  quad_indices[7],
+					  quad_indices[9],
+					  quad_indices[33]));
+	    new_hexes[6]->set (Hexahedron(quad_indices[15],
+					  quad_indices[3],
+					  quad_indices[5],
+					  quad_indices[25],
+					  quad_indices[10],
+					  quad_indices[34]));
 	    new_hexes[7]->set (Hexahedron(quad_indices[3],
 					  quad_indices[19],
 					  quad_indices[7],
-					  quad_indices[10],
-					  quad_indices[31],
-					  quad_indices[34]));
+					  quad_indices[27],
+					  quad_indices[11],
+					  quad_indices[35]));
 
 
 	    for (unsigned int i=0; i<8; ++i)
@@ -6509,61 +6636,114 @@ Triangulation<3>::execute_refinement ()
 					     // now we've got all
 					     // neighbors, so set them
 					     // in the new cells
+	    
+					     // the subface ordering
+					     // is as follows
+					     // face 0 and 1:
+					     //        * 
+					     //       /| 
+					     //      * | 
+					     //    y/|3* 
+					     //    * |/| 
+					     //    |2* |x
+					     //    |/|1* 
+					     //    * |/  
+					     //    |0*   
+					     //    |/    
+					     //    *
+					     // face 2 and 3:
+					     //  x
+					     //  *---*---*
+					     //  | 1 | 3 |
+					     //  *---*---*
+					     //  | 0 | 2 |
+					     //  *---*---*y
+					     // face 4 and 5:
+					     //       y
+					     //      *---*---*
+					     //     / 2 / 3 /
+					     //    *---*---*
+					     //   / 0 / 1 /
+					     //  *---*---*x
 	    new_hexes[0]->set_neighbor (0, neighbor_cells[0][0]);
-	    new_hexes[0]->set_neighbor (1, new_hexes[4]);
+	    new_hexes[0]->set_neighbor (1, new_hexes[1]);
 	    new_hexes[0]->set_neighbor (2, neighbor_cells[2][0]);
-	    new_hexes[0]->set_neighbor (3, new_hexes[1]);
-	    new_hexes[0]->set_neighbor (4, new_hexes[3]);
-	    new_hexes[0]->set_neighbor (5, neighbor_cells[5][0]);
+	    new_hexes[0]->set_neighbor (3, new_hexes[2]);
+	    new_hexes[0]->set_neighbor (4, neighbor_cells[4][0]);
+	    new_hexes[0]->set_neighbor (5, new_hexes[4]);
+	    Assert(GeometryInfo<dim>::child_cell_on_face(0,0)==0, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(2,0)==0, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(4,0)==0, ExcInternalError());
 
-	    new_hexes[1]->set_neighbor (0, neighbor_cells[0][1]);
-	    new_hexes[1]->set_neighbor (1, new_hexes[5]);
-	    new_hexes[1]->set_neighbor (2, neighbor_cells[2][1]);
-	    new_hexes[1]->set_neighbor (3, neighbor_cells[3][0]);
-	    new_hexes[1]->set_neighbor (4, new_hexes[2]);
-	    new_hexes[1]->set_neighbor (5, new_hexes[0]);
+	    new_hexes[1]->set_neighbor (0, new_hexes[0]);
+	    new_hexes[1]->set_neighbor (1, neighbor_cells[1][0]);
+	    new_hexes[1]->set_neighbor (2, neighbor_cells[2][2]);
+	    new_hexes[1]->set_neighbor (3, new_hexes[3]);
+	    new_hexes[1]->set_neighbor (4, neighbor_cells[4][1]);
+	    new_hexes[1]->set_neighbor (5, new_hexes[5]);
+	    Assert(GeometryInfo<dim>::child_cell_on_face(1,0)==1, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(2,2)==1, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(4,1)==1, ExcInternalError());
 
-	    new_hexes[2]->set_neighbor (0, neighbor_cells[0][2]);
-	    new_hexes[2]->set_neighbor (1, new_hexes[6]);
-	    new_hexes[2]->set_neighbor (2, new_hexes[1]);
-	    new_hexes[2]->set_neighbor (3, neighbor_cells[3][3]);
-	    new_hexes[2]->set_neighbor (4, neighbor_cells[4][1]);
-	    new_hexes[2]->set_neighbor (5, new_hexes[3]);
+	    new_hexes[2]->set_neighbor (0, neighbor_cells[0][1]);
+	    new_hexes[2]->set_neighbor (1, new_hexes[3]);
+	    new_hexes[2]->set_neighbor (2, new_hexes[0]);
+	    new_hexes[2]->set_neighbor (3, neighbor_cells[3][0]);
+	    new_hexes[2]->set_neighbor (4, neighbor_cells[4][2]);
+	    new_hexes[2]->set_neighbor (5, new_hexes[6]);
+	    Assert(GeometryInfo<dim>::child_cell_on_face(0,1)==2, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(3,0)==2, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(4,2)==2, ExcInternalError());
 
-	    new_hexes[3]->set_neighbor (0, neighbor_cells[0][3]);
-	    new_hexes[3]->set_neighbor (1, new_hexes[7]);
-	    new_hexes[3]->set_neighbor (2, new_hexes[0]);
-	    new_hexes[3]->set_neighbor (3, new_hexes[2]);
-	    new_hexes[3]->set_neighbor (4, neighbor_cells[4][0]);
-	    new_hexes[3]->set_neighbor (5, neighbor_cells[5][3]);
+	    new_hexes[3]->set_neighbor (0, new_hexes[2]);
+	    new_hexes[3]->set_neighbor (1, neighbor_cells[1][1]);
+	    new_hexes[3]->set_neighbor (2, new_hexes[1]);
+	    new_hexes[3]->set_neighbor (3, neighbor_cells[3][2]);
+	    new_hexes[3]->set_neighbor (4, neighbor_cells[4][3]);
+	    new_hexes[3]->set_neighbor (5, new_hexes[7]);
+	    Assert(GeometryInfo<dim>::child_cell_on_face(1,1)==3, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(3,2)==3, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(4,3)==3, ExcInternalError());
 
-	    new_hexes[4]->set_neighbor (0, new_hexes[0]);
-	    new_hexes[4]->set_neighbor (1, neighbor_cells[1][0]);
-	    new_hexes[4]->set_neighbor (2, neighbor_cells[2][3]);
-	    new_hexes[4]->set_neighbor (3, new_hexes[5]);
-	    new_hexes[4]->set_neighbor (4, new_hexes[7]);
-	    new_hexes[4]->set_neighbor (5, neighbor_cells[5][1]);
+	    new_hexes[4]->set_neighbor (0, neighbor_cells[0][2]);
+	    new_hexes[4]->set_neighbor (1, new_hexes[5]);
+	    new_hexes[4]->set_neighbor (2, neighbor_cells[2][1]);
+	    new_hexes[4]->set_neighbor (3, new_hexes[6]);
+	    new_hexes[4]->set_neighbor (4, new_hexes[0]);
+	    new_hexes[4]->set_neighbor (5, neighbor_cells[5][0]);
+	    Assert(GeometryInfo<dim>::child_cell_on_face(0,2)==4, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(2,1)==4, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(5,0)==4, ExcInternalError());
 
-	    new_hexes[5]->set_neighbor (0, new_hexes[1]);
-	    new_hexes[5]->set_neighbor (1, neighbor_cells[1][1]);
-	    new_hexes[5]->set_neighbor (2, neighbor_cells[2][2]);
-	    new_hexes[5]->set_neighbor (3, neighbor_cells[3][1]);
-	    new_hexes[5]->set_neighbor (4, new_hexes[6]);
-	    new_hexes[5]->set_neighbor (5, new_hexes[4]);
+	    new_hexes[5]->set_neighbor (0, new_hexes[4]);
+	    new_hexes[5]->set_neighbor (1, neighbor_cells[1][2]);
+	    new_hexes[5]->set_neighbor (2, neighbor_cells[2][3]);
+	    new_hexes[5]->set_neighbor (3, new_hexes[7]);
+	    new_hexes[5]->set_neighbor (4, new_hexes[1]);
+	    new_hexes[5]->set_neighbor (5, neighbor_cells[5][1]);
+	    Assert(GeometryInfo<dim>::child_cell_on_face(1,2)==5, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(2,3)==5, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(5,1)==5, ExcInternalError());
 
-	    new_hexes[6]->set_neighbor (0, new_hexes[2]);
-	    new_hexes[6]->set_neighbor (1, neighbor_cells[1][2]);
-	    new_hexes[6]->set_neighbor (2, new_hexes[5]);
-	    new_hexes[6]->set_neighbor (3, neighbor_cells[3][2]);
-	    new_hexes[6]->set_neighbor (4, neighbor_cells[4][2]);
-	    new_hexes[6]->set_neighbor (5, new_hexes[7]);
+	    new_hexes[6]->set_neighbor (0, neighbor_cells[0][3]);
+	    new_hexes[6]->set_neighbor (1, new_hexes[7]);
+	    new_hexes[6]->set_neighbor (2, new_hexes[4]);
+	    new_hexes[6]->set_neighbor (3, neighbor_cells[3][1]);
+	    new_hexes[6]->set_neighbor (4, new_hexes[2]);
+	    new_hexes[6]->set_neighbor (5, neighbor_cells[5][2]);
+	    Assert(GeometryInfo<dim>::child_cell_on_face(0,3)==6, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(3,1)==6, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(5,2)==6, ExcInternalError());
 
-	    new_hexes[7]->set_neighbor (0, new_hexes[3]);
+	    new_hexes[7]->set_neighbor (0, new_hexes[6]);
 	    new_hexes[7]->set_neighbor (1, neighbor_cells[1][3]);
-	    new_hexes[7]->set_neighbor (2, new_hexes[4]);
-	    new_hexes[7]->set_neighbor (3, new_hexes[6]);
-	    new_hexes[7]->set_neighbor (4, neighbor_cells[4][3]);
-	    new_hexes[7]->set_neighbor (5, neighbor_cells[5][2]);
+	    new_hexes[7]->set_neighbor (2, new_hexes[5]);
+	    new_hexes[7]->set_neighbor (3, neighbor_cells[3][3]);
+	    new_hexes[7]->set_neighbor (4, new_hexes[3]);
+	    new_hexes[7]->set_neighbor (5, neighbor_cells[5][3]);
+	    Assert(GeometryInfo<dim>::child_cell_on_face(1,3)==7, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(3,3)==7, ExcInternalError());
+	    Assert(GeometryInfo<dim>::child_cell_on_face(5,3)==7, ExcInternalError());
 
 
 					     // now we need to set the
@@ -7986,21 +8166,21 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
 				   // that they may appear at unwanted
 				   // places later on...
   cell->child(0)->line(1)->clear_user_pointer();
-  cell->child(0)->line(2)->clear_user_pointer();
-  cell->child(2)->line(0)->clear_user_pointer();
-  cell->child(2)->line(3)->clear_user_pointer();
+  cell->child(0)->line(3)->clear_user_pointer();
+  cell->child(3)->line(0)->clear_user_pointer();
+  cell->child(3)->line(2)->clear_user_pointer();
   
 				   // same for user flags
   cell->child(0)->line(1)->clear_user_flag();
-  cell->child(0)->line(2)->clear_user_flag();
-  cell->child(2)->line(0)->clear_user_flag();
-  cell->child(2)->line(3)->clear_user_flag();
+  cell->child(0)->line(3)->clear_user_flag();
+  cell->child(3)->line(0)->clear_user_flag();
+  cell->child(3)->line(2)->clear_user_flag();
   
 				   // delete the four interior lines
   cell->child(0)->line(1)->clear_used_flag();
-  cell->child(0)->line(2)->clear_used_flag();
-  cell->child(2)->line(0)->clear_used_flag();
-  cell->child(2)->line(3)->clear_used_flag();
+  cell->child(0)->line(3)->clear_used_flag();
+  cell->child(3)->line(0)->clear_used_flag();
+  cell->child(3)->line(2)->clear_used_flag();
 
 				   // for the four faces: if the
 				   // neighbor does not itself need
@@ -8114,7 +8294,7 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 				   // is the vertex at the heart of
 				   // this cell, which is the sixth of
 				   // the first child
-  vertices_used[cell->child(0)->vertex_index(6)] = false;
+  vertices_used[cell->child(0)->vertex_index(7)] = false;
 
 				   ///////////////////////////////////////
 				   // delete interior quads and lines
@@ -8123,30 +8303,29 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 				   // line's and quad's indices
   const quad_iterator interior_quads[12]
     = {  cell->child(0)->face(1),
-	 cell->child(1)->face(1),
 	 cell->child(2)->face(1),
-	 cell->child(3)->face(1),
+	 cell->child(4)->face(1),
+	 cell->child(6)->face(1),
 
 	 cell->child(0)->face(3),
-	 cell->child(3)->face(3),
+	 cell->child(1)->face(3),
 	 cell->child(4)->face(3),
-	 cell->child(7)->face(3),
+	 cell->child(5)->face(3),
 
-	 cell->child(0)->face(4),
-	 cell->child(1)->face(4),
-	 cell->child(4)->face(4),
-	 cell->child(5)->face(4) 
+	 cell->child(0)->face(5),
+	 cell->child(1)->face(5),
+	 cell->child(2)->face(5),
+	 cell->child(3)->face(5) 
     };
 
   const line_iterator interior_lines[6]
-    = {  cell->child(0)->line(10),
-	 cell->child(4)->line(10),
+    = {  cell->child(0)->line(5),
+	 cell->child(0)->line(7),
+	 cell->child(0)->line(11),
 
-	 cell->child(0)->line(6),
-	 cell->child(1)->line(6),
-
-	 cell->child(0)->line(5),
-	 cell->child(3)->line(5) 
+	 cell->child(7)->line(0),
+	 cell->child(7)->line(2),
+	 cell->child(7)->line(8),
     };
 
   				   // clear user pointers, to avoid that
@@ -8183,13 +8362,13 @@ void Triangulation<3>::delete_children (cell_iterator &cell) {
 	quad_iterator quad = cell->face(face);
 	
 					 // delete middle vertex
-	vertices_used[quad->child(0)->vertex_index(2)] = false;
+	vertices_used[quad->child(0)->vertex_index(3)] = false;
 
 	const line_iterator interior_lines[4]
 	  = { quad->child(0)->line(1),
-	      quad->child(0)->line(2),
-	      quad->child(2)->line(0),
-	      quad->child(2)->line(3) 
+	      quad->child(0)->line(3),
+	      quad->child(3)->line(0),
+	      quad->child(3)->line(2) 
 	  };
 
 					 // delete interior lines

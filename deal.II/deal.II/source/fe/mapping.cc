@@ -15,37 +15,6 @@
 #include <fe/mapping.h>
 
 
-#if (deal_II_dimension == 1)
-
-template<>
-const unsigned int Mapping<1>::normal_directions[2] =
-{
-  1, 0
-};
-
-#endif
-
-#if (deal_II_dimension == 2)
-
-template<>
-const unsigned int Mapping<2>::normal_directions[4] =
-{
-  2, 0, 3, 1
-};
-
-#endif
-
-#if (deal_II_dimension == 3)
-
-template<>
-const unsigned int Mapping<3>::normal_directions[6] =
-{
-  3, 2, 5, 0, 4, 1
-};
-
-#endif
-
-
 template <int dim>
 Mapping<dim>::~Mapping ()
 {}

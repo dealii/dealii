@@ -1451,24 +1451,34 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
   const std::vector<Point<3> > &all_vertices,
   std::vector<CellData<3> > &cells)
 {
+  int vertices_lex[GeometryInfo<3>::vertices_per_cell];
   unsigned int n_negative_cells=0;
   for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
-    if (GridTools::cell_measure(all_vertices, cells[cell_no].vertices) < 0)
-      {
-	++n_negative_cells;
-	for (unsigned int i=0; i<4; ++i)
-	  std::swap(cells[cell_no].vertices[i], cells[cell_no].vertices[i+4]);
-	
-					 // check whether the
-					 // resulting cell is now ok.
-					 // if not, then the grid is
-					 // seriously broken and
-					 // should be sticked into the
-					 // bin
-	AssertThrow(GridTools::cell_measure(all_vertices, cells[cell_no].vertices) > 0,
-		    ExcInternalError());
-      }
-
+    {
+				       // GridTools::cell_measure
+				       // requires the vertices to be
+				       // in lexicographic ordering
+      for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+	vertices_lex[GeometryInfo<3>::ucd_to_deal[i]]=cells[cell_no].vertices[i];
+      if (GridTools::cell_measure(all_vertices, vertices_lex) < 0)
+	{
+	  ++n_negative_cells;
+	  for (unsigned int i=0; i<4; ++i)
+	    std::swap(cells[cell_no].vertices[i], cells[cell_no].vertices[i+4]);
+	  
+					   // check whether the
+					   // resulting cell is now ok.
+					   // if not, then the grid is
+					   // seriously broken and
+					   // should be sticked into the
+					   // bin
+	  for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
+	    vertices_lex[GeometryInfo<3>::ucd_to_deal[i]]=cells[cell_no].vertices[i];
+	  AssertThrow(GridTools::cell_measure(all_vertices, vertices_lex) > 0,
+		      ExcInternalError());
+	}
+    }
+  
 				   // We assuming that all cells of a
 				   // grid have either positive or
 				   // negative volumes but not both

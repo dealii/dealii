@@ -55,13 +55,13 @@ int main ()
 
                                    // make sure by hand that certain
                                    // vertices match up
-  Assert (cells[0]->vertex(1) == cells[1]->vertex(3),
+  Assert (cells[0]->vertex(1) == cells[1]->vertex(4),
           ExcInternalError());
-  Assert (cells[0]->vertex(2) == cells[1]->vertex(2),
+  Assert (cells[0]->vertex(3) == cells[1]->vertex(6),
           ExcInternalError());
-  Assert (cells[0]->vertex(5) == cells[1]->vertex(7),
+  Assert (cells[0]->vertex(5) == cells[1]->vertex(5),
           ExcInternalError());
-  Assert (cells[0]->vertex(6) == cells[1]->vertex(6),
+  Assert (cells[0]->vertex(7) == cells[1]->vertex(7),
           ExcInternalError());
 }
 

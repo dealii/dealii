@@ -49,8 +49,8 @@
  * Furthermore, this class assumes that shape functions of the
  * FiniteElement under consideration do <em>not</em> depend on the
  * actual shape of the cells in real space, i.e. update_once()
- * includes update_values. For FiniteElements whose shape functions
- * depend on the cells in real space, the update_once() and
+ * includes <tt>update_values</tt>. For FiniteElements whose shape
+ * functions depend on the cells in real space, the update_once() and
  * update_each() functions must be overloaded.
  *
  * Todos:

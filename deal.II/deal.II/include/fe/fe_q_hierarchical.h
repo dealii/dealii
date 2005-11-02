@@ -78,7 +78,7 @@ template <int dim> class MappingQ;
  *
  * <li> 2D case:
  *   @verbatim
- *      3-------2
+ *      2-------3
  *      |       |
  *      |       |
  *      |       |
@@ -87,28 +87,29 @@ template <int dim> class MappingQ;
  *
  * <li> 3D case:
  *   @verbatim
- *         7-------6        7-------6
+ *         6-------7        6-------7
  *        /|       |       /       /|
  *       / |       |      /       / |
  *      /  |       |     /       /  |
- *     3   |       |    3-------2   |
- *     |   4-------5    |       |   5
+ *     4   |       |    4-------5   |
+ *     |   2-------3    |       |   3
  *     |  /       /     |       |  /
  *     | /       /      |       | /
  *     |/       /       |       |/
  *     0-------1        0-------1
+ *   @endverbatim
  *
  *   The respective coordinate values of the support points of the degrees
  *   of freedom are as follows:
  *   <ul>
  *   <li> Index 0: <tt>[0, 0, 0]</tt>;
  *   <li> Index 1: <tt>[1, 0, 0]</tt>;
- *   <li> Index 2: <tt>[1, 0, 1]</tt>;
- *   <li> Index 3: <tt>[0, 0, 1]</tt>;
- *   <li> Index 4: <tt>[0, 1, 0]</tt>;
- *   <li> Index 5: <tt>[1, 1, 0]</tt>;
- *   <li> Index 6: <tt>[1, 1, 1]</tt>;
- *   <li> Index 7: <tt>[0, 1, 1]</tt>;
+ *   <li> Index 2: <tt>[0, 1, 0]</tt>;
+ *   <li> Index 3: <tt>[1, 1, 0]</tt>;
+ *   <li> Index 4: <tt>[0, 0, 1]</tt>;
+ *   <li> Index 5: <tt>[1, 0, 1]</tt>;
+ *   <li> Index 6: <tt>[0, 1, 1]</tt>;
+ *   <li> Index 7: <tt>[1, 1, 1]</tt>;
  *   </ul>
  * </ul>
  * <h4>Q2 elements</h4>
@@ -120,34 +121,34 @@ template <int dim> class MappingQ;
  *
  * <li> 2D case:
  *   @verbatim
- *      3---6---2
+ *      2---7---3
  *      |       |
- *      7   8   5
+ *      4   8   5
  *      |       |
- *      0---4---1
+ *      0---6---1
  *   @endverbatim
  *
  * <li> 3D case:
  *   @verbatim
- *         7--14---6        7--14---6
+ *         6--15---7        6--15---7
  *        /|       |       /       /|
- *      19 |       13     19      1813
- *      /  15      |     /       /  |
- *     3   |       |    3---10--2   |
- *     |   4--12---5    |       |   5
- *     |  /       /     |       9  /
- *    11 16      17     11      | 17
+ *      12 |       19     12      1319
+ *      /  18      |     /       /  |
+ *     4   |       |    4---14--5   |
+ *     |   2---11--3    |       |   3
+ *     |  /       /     |      17  /
+ *    16 8       9     16       | 9
  *     |/       /       |       |/
- *     0---8---1        0---8---1
+ *     0---10--1        0---8---1
  *
  *         *-------*        *-------*
  *        /|       |       /       /|
- *       / |  21   |      /  24   / |
+ *       / |  23   |      /  25   / |
  *      /  |       |     /       /  |
  *     *   |       |    *-------*   |
- *     |25 *-------*    |       |23 *
- *     |  /       /     |   20  |  /
- *     | /  22   /      |       | /
+ *     |20 *-------*    |       |21 *
+ *     |  /       /     |   22  |  /
+ *     | /  24   /      |       | /
  *     |/       /       |       |/
  *     *-------*        *-------* 
  *   @endverbatim
@@ -158,30 +159,30 @@ template <int dim> class MappingQ;
  *   <ul>
  *   <li> Index 0: <tt>[0, 0, 0]</tt>;
  *   <li> Index 1: <tt>[1, 0, 0]</tt>;
- *   <li> Index 2: <tt>[1, 0, 1]</tt>;
- *   <li> Index 3: <tt>[0, 0, 1]</tt>;
- *   <li> Index 4: <tt>[0, 1, 0]</tt>;
- *   <li> Index 5: <tt>[1, 1, 0]</tt>;
- *   <li> Index 6: <tt>[1, 1, 1]</tt>;
- *   <li> Index 7: <tt>[0, 1, 1]</tt>;
- *   <li> Index 8: <tt>[1/2, 0, 0]</tt>;
- *   <li> Index 9: <tt>[1, 0, 1/2]</tt>;
- *   <li> Index 10: <tt>[1/2, 0, 1]</tt>;
- *   <li> Index 11: <tt>[0, 0, 1/2]</tt>;
- *   <li> Index 12: <tt>[1/2, 1, 0]</tt>;
- *   <li> Index 13: <tt>[1, 1, 1/2]</tt>;
- *   <li> Index 14: <tt>[1/2, 1, 1]</tt>;
- *   <li> Index 15: <tt>[0, 1, 1/2]</tt>;
- *   <li> Index 16: <tt>[0, 1/2, 0]</tt>;
- *   <li> Index 17: <tt>[1, 1/2, 0]</tt>;
- *   <li> Index 18: <tt>[1, 1/2, 1]</tt>;
- *   <li> Index 19: <tt>[0, 1/2, 1]</tt>;
- *   <li> Index 20: <tt>[1/2, 0, 1/2]</tt>;
- *   <li> Index 21: <tt>[1/2, 1, 1/2]</tt>;
- *   <li> Index 22: <tt>[1/2, 1/2, 0]</tt>;
- *   <li> Index 23: <tt>[1, 1/2, 1/2]</tt>;
- *   <li> Index 24: <tt>[1/2, 1/2, 1]</tt>;
- *   <li> Index 25: <tt>[0, 1/2, 1/2]</tt>;
+ *   <li> Index 2: <tt>[0, 1, 0]</tt>;
+ *   <li> Index 3: <tt>[1, 1, 0]</tt>;
+ *   <li> Index 4: <tt>[0, 0, 1]</tt>;
+ *   <li> Index 5: <tt>[1, 0, 1]</tt>;
+ *   <li> Index 6: <tt>[0, 1, 1]</tt>;
+ *   <li> Index 7: <tt>[1, 1, 1]</tt>;
+ *   <li> Index 8: <tt>[0, 1/2, 0]</tt>;
+ *   <li> Index 9: <tt>[1, 1/2, 0]</tt>;
+ *   <li> Index 10: <tt>[1/2, 0, 0]</tt>;
+ *   <li> Index 11: <tt>[1/2, 1, 0]</tt>;
+ *   <li> Index 12: <tt>[0, 1/2, 1]</tt>;
+ *   <li> Index 13: <tt>[1, 1/2, 1]</tt>;
+ *   <li> Index 14: <tt>[1/2, 0, 1]</tt>;
+ *   <li> Index 15: <tt>[1/2, 1, 1]</tt>;
+ *   <li> Index 16: <tt>[0, 0, 1/2]</tt>;
+ *   <li> Index 17: <tt>[1, 0, 1/2]</tt>;
+ *   <li> Index 18: <tt>[0, 1, 1/2]</tt>;
+ *   <li> Index 19: <tt>[1, 1, 1/2]</tt>;
+ *   <li> Index 20: <tt>[0, 1/2, 1/2]</tt>;
+ *   <li> Index 21: <tt>[1, 1/2, 1/2]</tt>;
+ *   <li> Index 22: <tt>[1/2, 0, 1/2]</tt>;
+ *   <li> Index 23: <tt>[1/2, 1, 1/2]</tt>;
+ *   <li> Index 24: <tt>[1/2, 1/2, 0]</tt>;
+ *   <li> Index 25: <tt>[1/2, 1/2, 1]</tt>;
  *   <li> Index 26: <tt>[1/2, 1/2, 1/2]</tt>; 
  *   </ul>
  * </ul>
@@ -194,16 +195,14 @@ template <int dim> class MappingQ;
  *
  * <li> 2D case:
  *   @verbatim
- *      3--8--9--2
+ *      2--10-11-3
  *      |        |
- *      11 14 15 7
+ *      5  14 15 7
  *      |        |
- *      10 12 13 6
+ *      4  12 13 6
  *      |        |
- *      0--4--5--1
+ *      0--8--9--1
  *   @endverbatim
- *   Note the reverse ordering of degrees of freedom on the left and
- *   upper line.
  * </ul>
  * <h4>Q4 elements</h4>
  * <ul>
@@ -214,19 +213,17 @@ template <int dim> class MappingQ;
  *
  * <li> 2D case:
  *   @verbatim
- *      3--10-11-12-2
+ *      2--13-14-15-3
  *      |           |
- *      15 22 23 24 9
+ *      6  22 23 24 9
  *      |           |
- *      14 19 20 21 8
+ *      5  19 20 21 8
  *      |           |
- *      13 16 17 18 7
+ *      4  16 17 18 7
  *      |           |
- *      0--4--5--6--1
+ *      0--10-11-12-1
  *   @endverbatim
  * </ul>
- * Note the reverse ordering of degrees of freedom on the left and upper
- * line.
  *
  * @author Brian Carnes, 2002, Ralf Hartmann 2004, 2005
  */

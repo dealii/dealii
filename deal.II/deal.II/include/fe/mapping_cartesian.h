@@ -32,7 +32,7 @@
  * cartesian meshes. Apply this mapping to a general mesh to get
  * strange results.
  *
- * @author Guido Kanschat, 2001
+ * @author Guido Kanschat, 2001; Ralf Hartmann, 2005
  */
 template <int dim>
 class MappingCartesian : public Mapping<dim>

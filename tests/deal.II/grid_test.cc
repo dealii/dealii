@@ -202,10 +202,9 @@ void test (const int test_case)
 	for (int i=0; i<(dim==2 ? 3 : 2); ++i) 
 	  {
 					     // refine the presently
-					     // second last cell 17
+					     // last cell several
 					     // times
 	    cell = tria.last_active(tria.n_levels()-1);
-	    --cell;
 	    cell->set_refine_flag ();
 	    tria.execute_coarsening_and_refinement ();
 	  };
@@ -218,8 +217,8 @@ void test (const int test_case)
       {
 	if (dim==3)
 	  {
-	    tria.begin_active()->face(2)->set_boundary_indicator(1);
 	    tria.begin_active()->face(4)->set_boundary_indicator(1);
+	    tria.begin_active()->face(5)->set_boundary_indicator(1);
 	  };
 
 
@@ -254,11 +253,10 @@ void test (const int test_case)
 	tria.set_boundary (1);
 	break;
       }
-    };
-
+    }
 
   GridOut().write_ucd (tria, logfile);
-    
+
   deallog << "     Total number of cells        = " << tria.n_cells() << std::endl
 	  << "     Total number of active cells = " << tria.n_active_cells() << std::endl;
 

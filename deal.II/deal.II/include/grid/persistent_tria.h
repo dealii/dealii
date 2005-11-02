@@ -217,7 +217,17 @@ class PersistentTriangulation : public Triangulation<dim>
 				      */
     virtual void create_triangulation (const std::vector<Point<dim> >    &vertices,
 				       const std::vector<CellData<dim> > &cells,
-				       const SubCellData                          &subcelldata);
+				       const SubCellData                 &subcelldata);
+
+				     /**
+				      * Throw an error, since this function
+				      * is not useful in the context of this
+				      * class.
+				      */
+    virtual void create_triangulation_compatibility (
+      const std::vector<Point<dim> >    &vertices,
+      const std::vector<CellData<dim> > &cells,
+      const SubCellData                 &subcelldata);
 
 				     /**
 				      * Writes all refine and coarsen

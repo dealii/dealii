@@ -391,16 +391,16 @@ QProjector<2>::project_to_face (const Quadrature<1>      &quadrature,
     switch (face_no)
       {
 	case 0:
-	      q_points[p] = Point<dim>(quadrature.point(p)(0),0);
+	      q_points[p] = Point<dim>(0,quadrature.point(p)(0));
 	      break;	   
 	case 1:
 	      q_points[p] = Point<dim>(1,quadrature.point(p)(0));
 	      break;	   
 	case 2:
-	      q_points[p] = Point<dim>(quadrature.point(p)(0),1);
+	      q_points[p] = Point<dim>(quadrature.point(p)(0),0);
 	      break;	   
 	case 3:
-	      q_points[p] = Point<dim>(0,quadrature.point(p)(0));
+	      q_points[p] = Point<dim>(quadrature.point(p)(0),1);
 	      break;
 	default:
 	      Assert (false, ExcInternalError());
@@ -424,35 +424,35 @@ QProjector<3>::project_to_face (const Quadrature<2>    &quadrature,
     switch (face_no)
       {
 	case 0:
-	      q_points[p] = Point<dim>(quadrature.point(p)(0),
-				       0,
+	      q_points[p] = Point<dim>(0,
+				       quadrature.point(p)(0),
 				       quadrature.point(p)(1));
 	      break;	   
 	case 1:
-	      q_points[p] = Point<dim>(quadrature.point(p)(0),
-				       1,
-				       quadrature.point(p)(1));
-	      break;	   
-	case 2:
-	      q_points[p] = Point<dim>(quadrature.point(p)(0),
-				       quadrature.point(p)(1),
-				       0);
-	      break;
-	case 3:
 	      q_points[p] = Point<dim>(1,
 				       quadrature.point(p)(0),
 				       quadrature.point(p)(1));
+	      break;	   
+	case 2:
+	      q_points[p] = Point<dim>(quadrature.point(p)(1),
+				       0,
+				       quadrature.point(p)(0));
+	      break;
+	case 3:
+	      q_points[p] = Point<dim>(quadrature.point(p)(1),
+				       1,
+				       quadrature.point(p)(0));
 	      break;
 	case 4:
 	      q_points[p] = Point<dim>(quadrature.point(p)(0),
 				       quadrature.point(p)(1),
-				       1);
+				       0);
 	      break;
 	case 5:
-	      q_points[p] = Point<dim>(0,
-				       quadrature.point(p)(0),
-				       quadrature.point(p)(1));
-	      break;      
+	      q_points[p] = Point<dim>(quadrature.point(p)(0),
+				       quadrature.point(p)(1),
+				       1);
+	      break;
 	      
 	default:
 	      Assert (false, ExcInternalError());
@@ -493,12 +493,10 @@ QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
 	      switch (subface_no) 
 		{
 		  case 0:
-			q_points[p]
-			  = Point<dim>(quadrature.point(p)(0)/2,0);
+			q_points[p] = Point<dim>(0,quadrature.point(p)(0)/2);
 			break;
 		  case 1:
-			q_points[p]
-			  = Point<dim>(quadrature.point(p)(0)/2+0.5,0);
+			q_points[p] = Point<dim>(0,quadrature.point(p)(0)/2+0.5);
 			break;
 		  default:
 			Assert (false, ExcInternalError());
@@ -521,10 +519,12 @@ QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
 	      switch (subface_no) 
 		{
 		  case 0:
-			q_points[p] = Point<dim>(quadrature.point(p)(0)/2,1);
+			q_points[p]
+			  = Point<dim>(quadrature.point(p)(0)/2,0);
 			break;
 		  case 1:
-			q_points[p] = Point<dim>(quadrature.point(p)(0)/2+0.5,1);
+			q_points[p]
+			  = Point<dim>(quadrature.point(p)(0)/2+0.5,0);
 			break;
 		  default:
 			Assert (false, ExcInternalError());
@@ -534,15 +534,16 @@ QProjector<2>::project_to_subface (const Quadrature<1>    &quadrature,
 	      switch (subface_no) 
 		{
 		  case 0:
-			q_points[p] = Point<dim>(0,quadrature.point(p)(0)/2);
+			q_points[p] = Point<dim>(quadrature.point(p)(0)/2,1);
 			break;
 		  case 1:
-			q_points[p] = Point<dim>(0,quadrature.point(p)(0)/2+0.5);
+			q_points[p] = Point<dim>(quadrature.point(p)(0)/2+0.5,1);
 			break;
 		  default:
 			Assert (false, ExcInternalError());
 		};
 	      break;
+
 	default:
 	      Assert (false, ExcInternalError());
       };
@@ -572,117 +573,6 @@ QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
     switch (face_no)
       {
 	case 0:
-	      q_points[p] = Point<dim>(quadrature.point(p)(0)/2,
-				       0,
-				       quadrature.point(p)(1)/2);
-	      switch (subface_no) 
-		{
-		  case 0:
-			break;
-		  case 1:
-			q_points[p][0] += 1./2.;
-			break;
-		  case 2:
-			q_points[p][0] += 1./2.;
-			q_points[p][2] += 1./2.;
-			break;
-		  case 3:
-			q_points[p][2] += 1./2.;
-			break;
-		  default:
-			Assert (false, ExcInternalError());
-		};
-	      
-	      break;	   
-	case 1:
-	      q_points[p] = Point<dim>(quadrature.point(p)(0)/2,
-				       1,
-				       quadrature.point(p)(1)/2);
-	      switch (subface_no) 
-		{
-		  case 0:
-			break;
-		  case 1:
-			q_points[p][0] += 1./2.;
-			break;
-		  case 2:
-			q_points[p][0] += 1./2.;
-			q_points[p][2] += 1./2.;
-			break;
-		  case 3:
-			q_points[p][2] += 1./2.;
-			break;
-		  default:
-			Assert (false, ExcInternalError());
-		};
-	      break;	   
-	case 2:
-	      q_points[p] = Point<dim>(quadrature.point(p)(0)/2,
-				       quadrature.point(p)(1)/2,
-				       0);
-	      switch (subface_no) 
-		{
-		  case 0:
-			break;
-		  case 1:
-			q_points[p][0] += 1./2.;
-			break;
-		  case 2:
-			q_points[p][0] += 1./2.;
-			q_points[p][1] += 1./2.;
-			break;
-		  case 3:
-			q_points[p][1] += 1./2.;
-			break;
-		  default:
-			Assert (false, ExcInternalError());
-		};
-	      break;
-	case 3:
-	      q_points[p] = Point<dim>(1,
-				       quadrature.point(p)(0)/2,
-				       quadrature.point(p)(1)/2);
-	      switch (subface_no) 
-		{
-		  case 0:
-			break;
-		  case 1:
-			q_points[p][1] += 1./2.;
-			break;
-		  case 2:
-			q_points[p][1] += 1./2.;
-			q_points[p][2] += 1./2.;
-			break;
-		  case 3:
-			q_points[p][2] += 1./2.;
-			break;
-		  default:
-			Assert (false, ExcInternalError());
-		};
-	      break;
-	case 4:
-	      q_points[p] = Point<dim>(quadrature.point(p)(0)/2,
-				       quadrature.point(p)(1)/2,
-				       1);
-	      switch (subface_no) 
-		{
-		  case 0:
-			break;
-		  case 1:
-			q_points[p][0] += 1./2.;
-			break;
-		  case 2:
-			q_points[p][0] += 1./2.;
-			q_points[p][1] += 1./2.;
-			break;
-		  case 3:
-			q_points[p][1] += 1./2.;
-			break;
-		  default:
-			Assert (false, ExcInternalError());
-		};
-	      break;
-	case 5:
 	      q_points[p] = Point<dim>(0,
 				       quadrature.point(p)(0)/2,
 				       quadrature.point(p)(1)/2);
@@ -694,16 +584,126 @@ QProjector<3>::project_to_subface (const Quadrature<2>    &quadrature,
 			q_points[p][1] += 1./2.;
 			break;
 		  case 2:
-			q_points[p][1] += 1./2.;
 			q_points[p][2] += 1./2.;
 			break;
 		  case 3:
+			q_points[p][1] += 1./2.;
 			q_points[p][2] += 1./2.;
 			break;
 		  default:
 			Assert (false, ExcInternalError());
 		};
-	      break;      
+	      break;	   
+	case 1:
+	      q_points[p] = Point<dim>(1,
+				       quadrature.point(p)(0)/2,
+				       quadrature.point(p)(1)/2);
+	      switch (subface_no) 
+		{
+		  case 0:
+			break;
+		  case 1:
+			q_points[p][1] += 1./2.;
+			break;
+		  case 2:
+			q_points[p][2] += 1./2.;
+			break;
+		  case 3:
+			q_points[p][1] += 1./2.;
+			q_points[p][2] += 1./2.;
+			break;
+		  default:
+			Assert (false, ExcInternalError());
+		};
+	      break;	   
+	case 2:
+	      q_points[p] = Point<dim>(quadrature.point(p)(1)/2,
+				       0,
+				       quadrature.point(p)(0)/2);
+	      switch (subface_no) 
+		{
+		  case 0:
+			break;
+		  case 1:
+			q_points[p][2] += 1./2.;
+			break;
+		  case 2:
+			q_points[p][0] += 1./2.;
+			break;
+		  case 3:
+			q_points[p][0] += 1./2.;
+			q_points[p][2] += 1./2.;
+			break;
+		  default:
+			Assert (false, ExcInternalError());
+		};
+	      break;
+	case 3:
+	      q_points[p] = Point<dim>(quadrature.point(p)(1)/2,
+				       1,
+				       quadrature.point(p)(0)/2);
+	      switch (subface_no) 
+		{
+		  case 0:
+			break;
+		  case 1:
+			q_points[p][2] += 1./2.;
+			break;
+		  case 2:
+			q_points[p][0] += 1./2.;
+			break;
+		  case 3:
+			q_points[p][0] += 1./2.;
+			q_points[p][2] += 1./2.;
+			break;
+		  default:
+			Assert (false, ExcInternalError());
+		};
+	      break;
+	case 4:
+	      q_points[p] = Point<dim>(quadrature.point(p)(0)/2,
+				       quadrature.point(p)(1)/2,
+				       0);
+	      switch (subface_no) 
+		{
+		  case 0:
+			break;
+		  case 1:
+			q_points[p][0] += 1./2.;
+			break;
+		  case 2:
+			q_points[p][1] += 1./2.;
+			break;
+		  case 3:
+			q_points[p][0] += 1./2.;
+			q_points[p][1] += 1./2.;
+			break;
+		  default:
+			Assert (false, ExcInternalError());
+		};
+	      break;
+	case 5:
+	      q_points[p] = Point<dim>(quadrature.point(p)(0)/2,
+				       quadrature.point(p)(1)/2,
+				       1);
+	      switch (subface_no) 
+		{
+		  case 0:
+			break;
+		  case 1:
+			q_points[p][0] += 1./2.;
+			break;
+		  case 2:
+			q_points[p][1] += 1./2.;
+			break;
+		  case 3:
+			q_points[p][0] += 1./2.;
+			q_points[p][1] += 1./2.;
+			break;
+		  default:
+			Assert (false, ExcInternalError());
+		};
+	      break;
 	default:
 	      Assert (false, ExcInternalError());
       };

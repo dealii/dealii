@@ -257,15 +257,15 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
 				       Point<2>(right,left),
 				       Point<2>(right,right),
 				       Point<2>(left,right)  };
-      const int cell_vertices[1][4] = { { 1,2,3,0 } };
+      const int cell_vertices[1][4] = { { 1,2,0,3 } };
       std::vector<CellData<2> > cells (1, CellData<2>());
       for (unsigned int j=0; j<4; ++j)
 	cells[0].vertices[j] = cell_vertices[0][j];
       cells[0].material_id = 0;
       
       tria->create_triangulation (std::vector<Point<2> >(&vertices[0], &vertices[4]),
-				 cells,
-				 SubCellData());
+				  cells,
+				  SubCellData());
       exact_areas.push_back(9.);
     }
   
@@ -277,9 +277,9 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       GridGenerator::hyper_cube(*tria, 1., 3.);
       Point<2> &v0=tria->begin_quad()->vertex(0);
       v0(0) = 0.;
-      Point<2> &v2=tria->begin_quad()->vertex(2);
-      v2(0) = 5.;
-      v2(1) = 4.;
+      Point<2> &v3=tria->begin_quad()->vertex(3);
+      v3(0) = 5.;
+      v3(1) = 4.;
       exact_areas.push_back(7.);
       show[1][0] = 1;
     }
@@ -296,14 +296,14 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       GridGenerator::hyper_cube(*tria, 1., 5.);
       Point<2> &v2 = tria->begin_active()->vertex(2);
       Point<2> &v3 = tria->begin_active()->vertex(3);
-      v2(0) = 3.;
+      v2(0) = 1.;
       v2(1) = 3.;
-      v3(0) = 1.;
+      v3(0) = 3.;
       v3(1) = 3.;
       tria->set_boundary(1,*boundary1);
       tria->set_boundary(2,*boundary2);
       tria->begin_active()->face(1)->set_boundary_indicator(1);
-      tria->begin_active()->face(2)->set_boundary_indicator(2);
+      tria->begin_active()->face(3)->set_boundary_indicator(2);
       double pi=std::acos(-1.);
       double alpha=2*std::atan(0.5);
       exact_areas.push_back(4+pi-2.5*(alpha-std::sin(alpha)));
@@ -374,7 +374,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       tria=new Triangulation<3>();
       tria_ptr.push_back(tria);
       GridGenerator::hyper_cube(*tria, 1., 3.);
-      Point<3> &v=tria->begin()->vertex(6);
+      Point<3> &v=tria->begin()->vertex(7);
       v(0) = 5.;
       v(1) = 4.;
       v(2) = 4.5;
@@ -396,7 +396,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       tria_ptr.push_back(tria);
       GridGenerator::hyper_cube(*tria, 1., 3.);
       tria->set_boundary(1,*boundary1);
-      tria->begin_active()->face(3)->set_boundary_indicator(1);
+      tria->begin_active()->face(1)->set_boundary_indicator(1);
       exact_areas.push_back(8.+pi/3*h*h*(3*r-h));
     }
 

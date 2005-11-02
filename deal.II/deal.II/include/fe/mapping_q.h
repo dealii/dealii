@@ -33,7 +33,7 @@ template <int dim> class TensorProductPolynomials;
  * <tt>deal.II/doc/reports/mapping_q/index.html</tt> in the `Reports'
  * section of `Documentation'.
  *
- * @author Ralf Hartmann, Guido Kanschat 2000, 2001
+ * @author Ralf Hartmann, 2000, 2001, 2005; Guido Kanschat 2000, 2001
  */
 template <int dim>
 class MappingQ : public MappingQ1<dim>

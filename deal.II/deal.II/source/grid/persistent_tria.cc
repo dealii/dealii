@@ -129,6 +129,17 @@ PersistentTriangulation<dim>::create_triangulation (const std::vector<Point<dim>
 
 template <int dim>
 void
+PersistentTriangulation<dim>::create_triangulation_compatibility (
+  const std::vector<Point<dim> >    &,
+  const std::vector<CellData<dim> > &,
+  const SubCellData                 &)
+{
+  Assert (false, ExcImpossibleInDim(dim));
+}
+
+
+template <int dim>
+void
 PersistentTriangulation<dim>::write_flags(std::ostream &out) const
 {
   const unsigned int n_flag_levels=refine_flags.size();

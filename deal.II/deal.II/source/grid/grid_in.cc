@@ -201,7 +201,7 @@ void GridIn<dim>::read_ucd (std::istream &in)
 				   // ... and cells
   GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
-  tria->create_triangulation (vertices, cells, subcelldata);
+  tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
 
@@ -366,7 +366,7 @@ void GridIn<dim>::read_dbmesh (std::istream &in)
 				   // ...and cells
   GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
-  tria->create_triangulation (vertices, cells, subcelldata);
+  tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
 
@@ -448,7 +448,7 @@ void GridIn<2>::read_xda (std::istream &in)
 				   // ... and cells
   GridReordering<2>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<2>::reorder_cells (cells);
-  tria->create_triangulation (vertices, cells, subcelldata);
+  tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
 #endif // #if deal_II_dimension == 2
@@ -531,7 +531,7 @@ void GridIn<3>::read_xda (std::istream &in)
 				   // ... and cells
   GridReordering<3>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<3>::reorder_cells (cells);
-  tria->create_triangulation (vertices, cells, subcelldata);
+  tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
 #endif // #if deal_II_dimension == 3
@@ -735,7 +735,7 @@ void GridIn<dim>::read_msh (std::istream &in)
 				   // ... and cells
   GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
-  tria->create_triangulation (vertices, cells, subcelldata);
+  tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
 
@@ -1002,7 +1002,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
   SubCellData subcelldata;
   GridTools::delete_unused_vertices(vertices, cells, subcelldata);
   GridReordering<dim>::reorder_cells (cells);
-  tria->create_triangulation (vertices, cells, subcelldata);  
+  tria->create_triangulation_compatibility (vertices, cells, subcelldata);  
 #endif
 }
 
@@ -1212,7 +1212,7 @@ void GridIn<3>::read_netcdf (const std::string &filename)
   if (switch_y_z)
     GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
   GridReordering<dim>::reorder_cells (cells);
-  tria->create_triangulation (vertices, cells, subcelldata);  
+  tria->create_triangulation_compatibility (vertices, cells, subcelldata);  
 #endif
 }
 

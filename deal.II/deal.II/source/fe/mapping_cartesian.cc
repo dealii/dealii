@@ -176,12 +176,12 @@ MappingCartesian<dim>::compute_fill (const typename Triangulation<dim>::cell_ite
 	break;
       case 2:
 	data.length[0] = cell->vertex(1)(0) - start(0);
-	data.length[1] = cell->vertex(3)(1) - start(1);
+	data.length[1] = cell->vertex(2)(1) - start(1);
 	break;
       case 3:
 	data.length[0] = cell->vertex(1)(0) - start(0);
-	data.length[1] = cell->vertex(4)(1) - start(1);
-	data.length[2] = cell->vertex(3)(2) - start(2);
+	data.length[1] = cell->vertex(2)(1) - start(1);
+	data.length[2] = cell->vertex(4)(2) - start(2);
 	break;
       default:
 	Assert(false, ExcNotImplemented());
@@ -240,10 +240,10 @@ MappingCartesian<dim>::compute_fill (const typename Triangulation<dim>::cell_ite
           {
             static const Point<dim>
               normals[GeometryInfo<2>::faces_per_cell]
-              = { Point<dim>(0, -1),
-                  Point<dim>(1,  0),
-                  Point<dim>(0,  1),
-                  Point<dim>(-1, 0) };
+              = { Point<dim>(-1, 0),
+                  Point<dim>( 1, 0),
+                  Point<dim>( 0,-1),
+                  Point<dim>( 0, 1) };
             std::fill (normal_vectors.begin(),
                        normal_vectors.end(),
                        normals[face_no]);
@@ -254,12 +254,12 @@ MappingCartesian<dim>::compute_fill (const typename Triangulation<dim>::cell_ite
           {
             static const Point<dim>
               normals[GeometryInfo<3>::faces_per_cell]
-              = { Point<dim>(0, -1, 0),
-                  Point<dim>(0,  1, 0),
-                  Point<dim>(0,  0, -1),
-                  Point<dim>(1,  0, 0),
-                  Point<dim>(0,  0, 1),
-                  Point<dim>(-1, 0, 0) };
+              = { Point<dim>(-1, 0, 0),
+                  Point<dim>( 1, 0, 0),
+                  Point<dim>( 0,-1, 0),
+                  Point<dim>( 0, 1, 0),
+                  Point<dim>( 0, 0,-1),
+                  Point<dim>( 0, 0, 1) };
             std::fill (normal_vectors.begin(),
                        normal_vectors.end(),
                        normals[face_no]);
@@ -340,8 +340,8 @@ MappingCartesian<dim>::fill_fe_face_values (const typename Triangulation<dim>::c
 				   // product of the local lengths
 				   // since the jacobian is diagonal
   double J = 1.;
-  for (unsigned int d=0;d<dim;++d)
-    if (d != (this->normal_directions[face_no]/2))
+  for (unsigned int d=0; d<dim; ++d)
+    if (d != GeometryInfo<dim>::unit_normal_direction[face_no])
       J *= data.length[d];
   
   if (data.current_update_flags() & update_JxW_values)
@@ -383,8 +383,8 @@ MappingCartesian<dim>::fill_fe_subface_values (const typename Triangulation<dim>
 				   // product of the local lengths
 				   // since the jacobian is diagonal
   double J = 1.;
-  for (unsigned int d=0;d<dim;++d)
-    if (d != (this->normal_directions[face_no]/2))
+  for (unsigned int d=0; d<dim; ++d)
+    if (d != GeometryInfo<dim>::unit_normal_direction[face_no])
       J *= data.length[d];
   
   if (data.current_update_flags() & update_JxW_values)
@@ -552,12 +552,12 @@ MappingCartesian<dim>::transform_unit_to_real_cell (
 	break;
       case 2:
 	length[0] = cell->vertex(1)(0) - start(0);
-	length[1] = cell->vertex(3)(1) - start(1);
+	length[1] = cell->vertex(2)(1) - start(1);
 	break;
       case 3:
 	length[0] = cell->vertex(1)(0) - start(0);
-	length[1] = cell->vertex(4)(1) - start(1);
-	length[2] = cell->vertex(3)(2) - start(2);
+	length[1] = cell->vertex(2)(1) - start(1);
+	length[2] = cell->vertex(4)(2) - start(2);
 	break;
       default:
 	Assert(false, ExcNotImplemented());
@@ -589,12 +589,12 @@ MappingCartesian<dim>::transform_real_to_unit_cell (
 	break;
       case 2:
 	real(0) /= cell->vertex(1)(0) - start(0);
-	real(1) /= cell->vertex(3)(1) - start(1);
+	real(1) /= cell->vertex(2)(1) - start(1);
 	break;
       case 3:
 	real(0) /= cell->vertex(1)(0) - start(0);
-	real(1) /= cell->vertex(4)(1) - start(1);
-	real(2) /= cell->vertex(3)(2) - start(2);
+	real(1) /= cell->vertex(2)(1) - start(1);
+	real(2) /= cell->vertex(4)(2) - start(2);
 	break;
       default:
 	Assert(false, ExcNotImplemented());

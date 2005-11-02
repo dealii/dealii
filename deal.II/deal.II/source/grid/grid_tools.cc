@@ -109,6 +109,12 @@ double
 GridTools::cell_measure(const std::vector<Point<3> > &all_vertices,
 			const int vertex_indices[GeometryInfo<3>::vertices_per_cell])
 {
+				   // note that this is the
+				   // cell_measure based on the new
+				   // deal.II numbering. When called
+				   // from inside GridReordering make
+				   // sure that you reorder the
+				   // vertex_indices before
   const double x[8] = { all_vertices[vertex_indices[0]](0),
 			all_vertices[vertex_indices[1]](0),
 			all_vertices[vertex_indices[2]](0),
@@ -135,60 +141,85 @@ GridTools::cell_measure(const std::vector<Point<3> > &all_vertices,
 			all_vertices[vertex_indices[7]](2)  };
 
 /*
-  Get the computation of the measure by the same little Maple script
-  as in TriaObjectAccessor<3, 3>::barycenter(), see tria_accessor.cc.
-*/
-  double s1, s2, s3;
-  
-  s3 = -x[2]*y[7]*z[3]/12.0+x[1]*y[4]*z[0]/12.0-x[0]*y[3]*z[7]/12.0-z[1]*x
-       [2]*y[0]/12.0+x[5]*y[4]*z[0]/12.0+x[1]*y[5]*z[0]/12.0-x[1]*y[2]*z[0]/12.0-y[2]*
-       x[3]*z[7]/12.0-x[1]*y[0]*z[4]/12.0-y[1]*x[0]*z[2]/12.0-y[0]*x[7]*z[3]/12.0+y[5]
-       *x[4]*z[7]/12.0-x[0]*y[3]*z[4]/12.0-y[1]*x[0]*z[3]/12.0-z[0]*x[7]*y[4]/12.0+x
-       [1]*y[0]*z[3]/12.0-x[2]*y[3]*z[0]/12.0-y[1]*x[2]*z[5]/12.0;
-  s2 = s3+y[0]*x[3]*z[4]/12.0+y[1]*x[2]*z[0]/12.0+y[2]*x[7]*z[3]/12.0+z[1]*
-       x[4]*y[0]/12.0-y[5]*x[4]*z[0]/12.0-y[1]*x[5]*z[0]/12.0+x[5]*y[7]*z[4]/12.0+y[1]
-       *x[3]*z[0]/12.0+x[0]*y[4]*z[7]/12.0+z[0]*x[7]*y[3]/12.0-z[2]*x[3]*y[0]/12.0+y
-       [1]*x[0]*z[5]/12.0-x[1]*y[5]*z[2]/12.0+y[1]*x[0]*z[4]/12.0+z[1]*x[2]*y[5]/12.0-
-       x[5]*y[0]*z[4]/12.0+y[2]*x[3]*z[1]/12.0+x[1]*y[0]*z[2]/12.0;
-  s3 = -z[1]*x[0]*y[4]/12.0+z[1]*x[0]*y[2]/12.0-x[0]*y[7]*z[4]/12.0+z[0]*x
-       [4]*y[7]/12.0+x[2]*y[3]*z[7]/12.0+y[2]*x[6]*z[3]/12.0+y[1]*x[6]*z[2]/12.0-y[2]*
-       x[1]*z[3]/12.0+x[1]*y[2]*z[5]/12.0+y[0]*x[3]*z[7]/12.0+y[2]*x[3]*z[0]/12.0-y[0]
-       *x[4]*z[3]/12.0-y[2]*x[0]*z[3]/12.0-y[1]*x[4]*z[0]/12.0+z[1]*x[5]*y[0]/12.0+x
-       [1]*y[2]*z[6]/12.0-x[1]*y[0]*z[5]/12.0-x[2]*y[3]*z[1]/12.0;
-  s1 = s3-z[0]*x[3]*y[4]/12.0+z[1]*x[0]*y[3]/12.0-z[1]*x[5]*y[2]/12.0+z[1]*
-       x[2]*y[6]/12.0-z[2]*x[3]*y[1]/12.0+z[2]*x[3]*y[6]/12.0+x[2]*y[1]*z[3]/12.0-z[1]
-       *x[3]*y[0]/12.0+x[2]*y[3]*z[6]/12.0-z[0]*x[3]*y[7]/12.0+y[5]*x[0]*z[4]/12.0-z
-       [1]*x[6]*y[2]/12.0-z[2]*x[6]*y[3]/12.0+z[2]*x[0]*y[3]/12.0+z[2]*x[3]*y[7]/12.0+
-       z[2]*x[1]*y[3]/12.0+y[1]*x[5]*z[2]/12.0-z[2]*x[7]*y[3]/12.0+s2;
-  s3 = x[0]*y[7]*z[3]/12.0-z[1]*x[0]*y[5]/12.0-x[1]*y[3]*z[0]/12.0-x[1]*y
-       [6]*z[2]/12.0-x[2]*y[6]*z[3]/12.0-x[5]*y[4]*z[7]/12.0+z[0]*x[4]*y[3]/12.0+x[0]*
-       y[4]*z[3]/12.0-x[6]*y[5]*z[7]/12.0-x[6]*y[7]*z[2]/12.0+z[1]*x[6]*y[5]/12.0+y[6]
-       *x[4]*z[7]/12.0+y[1]*x[5]*z[6]/12.0+x[1]*y[6]*z[5]/12.0-y[5]*x[7]*z[4]/12.0+y
-       [0]*x[7]*z[4]/12.0-y[0]*x[4]*z[7]/12.0-z[5]*x[0]*y[4]/12.0;
-  s2 = s3+z[6]*x[3]*y[7]/12.0+z[6]*x[7]*y[4]/12.0-z[6]*x[4]*y[7]/12.0-z[6]*
-       x[7]*y[3]/12.0+y[6]*x[5]*z[7]/12.0-y[6]*x[7]*z[5]/12.0-x[2]*y[5]*z[6]/12.0+z[6]
-       *x[2]*y[7]/12.0+z[6]*x[7]*y[5]/12.0-z[6]*x[5]*y[7]/12.0-z[6]*x[7]*y[2]/12.0+x
-       [6]*y[7]*z[5]/12.0+z[5]*x[7]*y[4]/12.0-z[5]*x[4]*y[7]/12.0+y[5]*x[1]*z[4]/12.0-
-       y[5]*x[6]*z[4]/12.0-y[5]*x[4]*z[1]/12.0+y[5]*x[4]*z[6]/12.0;
-  s3 = y[6]*x[7]*z[3]/12.0+x[6]*y[5]*z[2]/12.0-x[5]*y[6]*z[2]/12.0-x[6]*y
-       [2]*z[5]/12.0+x[5]*y[2]*z[6]/12.0+x[6]*y[2]*z[7]/12.0+z[5]*x[4]*y[0]/12.0-y[6]*
-       x[2]*z[7]/12.0+x[2]*y[6]*z[5]/12.0+y[6]*x[7]*z[2]/12.0-y[6]*x[3]*z[7]/12.0-x[7]
-       *y[4]*z[3]/12.0-x[6]*y[4]*z[7]/12.0-x[5]*y[1]*z[4]/12.0+x[6]*y[7]*z[4]/12.0+x
-       [7]*y[3]*z[4]/12.0-z[1]*x[5]*y[6]/12.0+x[3]*y[4]*z[7]/12.0+x[5]*y[6]*z[4]/12.0;
+  This is the same Maple script as in the barycenter method above
+  except of that here the shape functions tphi[0]-tphi[7] are ordered
+  according to the lexicographic numbering.
 
-				   // the vertices entered into the
-				   // above field and the vertices
-				   // used by the maple script use
-				   // different orderings (i.e. one is
-				   // the inside-out orientation of
-				   // the other one). the measure is
-				   // thus negative. Thus take the
-				   // negative value of the result
-  return -(s3+x[5]*y[4]*z[1]/12.0-x[5]*y[4]*z[6]/12.0-x[3]*y[7]*z[4]/12.0+x[6]*
-    y[3]*z[7]/12.0-y[1]*x[6]*z[5]/12.0-z[5]*x[1]*y[4]/12.0+z[5]*x[6]*y[4]/12.0+z[5]
-    *x[4]*y[1]/12.0-z[5]*x[4]*y[6]/12.0-x[6]*y[7]*z[3]/12.0-x[4]*y[3]*z[7]/12.0+x
-    [4]*y[7]*z[3]/12.0-x[1]*y[5]*z[6]/12.0-y[6]*x[7]*z[4]/12.0-y[1]*x[2]*z[6]/12.0-
-    y[2]*x[3]*z[6]/12.0+s2+s1+x[2]*y[0]*z[3]/12.0);
+  x := array(0..7):
+  y := array(0..7):
+  z := array(0..7):
+  tphi[0] := (1-xi)*(1-eta)*(1-zeta):
+  tphi[1] :=     xi*(1-eta)*(1-zeta):
+  tphi[2] := (1-xi)*    eta*(1-zeta):
+  tphi[3] :=     xi*    eta*(1-zeta):
+  tphi[4] := (1-xi)*(1-eta)*zeta:
+  tphi[5] :=     xi*(1-eta)*zeta:
+  tphi[6] := (1-xi)*    eta*zeta:
+  tphi[7] :=     xi*    eta*zeta:
+  x_real := sum(x[s]*tphi[s], s=0..7):
+  y_real := sum(y[s]*tphi[s], s=0..7):
+  z_real := sum(z[s]*tphi[s], s=0..7):
+  with (linalg):
+  J := matrix(3,3, [[diff(x_real, xi), diff(x_real, eta), diff(x_real, zeta)],
+  [diff(y_real, xi), diff(y_real, eta), diff(y_real, zeta)],
+  [diff(z_real, xi), diff(z_real, eta), diff(z_real, zeta)]]): 
+  detJ := det (J):
+
+  measure := simplify ( int ( int ( int (detJ, xi=0..1), eta=0..1), zeta=0..1)):
+
+  readlib(C):
+
+  C(measure, optimized);
+
+  The C code produced by this maple script is further optimized by
+  hand. In particular, division by 12 is performed only once, not
+  hundred of times.
+*/
+
+  const double t3 = y[3]*x[2];
+  const double t5 = z[1]*x[5];
+  const double t9 = z[3]*x[2];
+  const double t11 = x[1]*y[0];
+  const double t14 = x[4]*y[0];
+  const double t18 = x[5]*y[7];
+  const double t20 = y[1]*x[3];
+  const double t22 = y[5]*x[4];
+  const double t26 = z[7]*x[6];
+  const double t28 = x[0]*y[4];
+  const double t34 = z[3]*x[1]*y[2]+t3*z[1]-t5*y[7]+y[7]*x[4]*z[6]+t9*y[6]-t11*z[4]-t5*y[3]-t14*z[2]+z[1]*x[4]*y[0]-t18*z[3]+t20*z[0]-t22*z[0]-y[0]*x[5]*z[4]-t26*y[3]+t28*z[2]-t9*y[1]-y[1]*x[4]*z[0]-t11*z[5];
+  const double t37 = y[1]*x[0];
+  const double t44 = x[1]*y[5];
+  const double t46 = z[1]*x[0];
+  const double t49 = x[0]*y[2];
+  const double t52 = y[5]*x[7];
+  const double t54 = x[3]*y[7];
+  const double t56 = x[2]*z[0];
+  const double t58 = x[3]*y[2];
+  const double t64 = -x[6]*y[4]*z[2]-t37*z[2]+t18*z[6]-x[3]*y[6]*z[2]+t11*z[2]+t5*y[0]+t44*z[4]-t46*y[4]-t20*z[7]-t49*z[6]-t22*z[1]+t52*z[3]-t54*z[2]-t56*y[4]-t58*z[0]+y[1]*x[2]*z[0]+t9*y[7]+t37*z[4];
+  const double t66 = x[1]*y[7];
+  const double t68 = y[0]*x[6];
+  const double t70 = x[7]*y[6];
+  const double t73 = z[5]*x[4];
+  const double t76 = x[6]*y[7];
+  const double t90 = x[4]*z[0];
+  const double t92 = x[1]*y[3];
+  const double t95 = -t66*z[3]-t68*z[2]-t70*z[2]+t26*y[5]-t73*y[6]-t14*z[6]+t76*z[2]-t3*z[6]+x[6]*y[2]*z[4]-z[3]*x[6]*y[2]+t26*y[4]-t44*z[3]-x[1]*y[2]*z[0]+x[5]*y[6]*z[4]+t54*z[5]+t90*y[2]-t92*z[2]+t46*y[2];
+  const double t102 = x[2]*y[0];
+  const double t107 = y[3]*x[7];
+  const double t114 = x[0]*y[6];
+  const double t125 = y[0]*x[3]*z[2]-z[7]*x[5]*y[6]-x[2]*y[6]*z[4]+t102*z[6]-t52*z[6]+x[2]*y[4]*z[6]-t107*z[5]-t54*z[6]+t58*z[6]-x[7]*y[4]*z[6]+t37*z[5]-t114*z[4]+t102*z[4]-z[1]*x[2]*y[0]+t28*z[6]-y[5]*x[6]*z[4]-z[5]*x[1]*y[4]-t73*y[7];
+  const double t129 = z[0]*x[6];
+  const double t133 = y[1]*x[7];
+  const double t145 = y[1]*x[5];
+  const double t156 = t90*y[6]-t129*y[4]+z[7]*x[2]*y[6]-t133*z[5]+x[5]*y[3]*z[7]-t26*y[2]-t70*z[3]+t46*y[3]+z[5]*x[7]*y[4]+z[7]*x[3]*y[6]-t49*z[4]+t145*z[7]-x[2]*y[7]*z[6]+t70*z[5]+t66*z[5]-z[7]*x[4]*y[6]+t18*z[4]+x[1]*y[4]*z[0];
+  const double t160 = x[5]*y[4];
+  const double t165 = z[1]*x[7];
+  const double t178 = z[1]*x[3];
+  const double t181 = t107*z[6]+t22*z[7]+t76*z[3]+t160*z[1]-x[4]*y[2]*z[6]+t70*z[4]+t165*y[5]+x[7]*y[2]*z[6]-t76*z[5]-t76*z[4]+t133*z[3]-t58*z[1]+y[5]*x[0]*z[4]+t114*z[2]-t3*z[7]+t20*z[2]+t178*y[7]+t129*y[2];
+  const double t207 = t92*z[7]+t22*z[6]+z[3]*x[0]*y[2]-x[0]*y[3]*z[2]-z[3]*x[7]*y[2]-t165*y[3]-t9*y[0]+t58*z[7]+y[3]*x[6]*z[2]+t107*z[2]+t73*y[0]-x[3]*y[5]*z[7]+t3*z[0]-t56*y[6]-z[5]*x[0]*y[4]+t73*y[1]-t160*z[6]+t160*z[0];
+  const double t228 = -t44*z[7]+z[5]*x[6]*y[4]-t52*z[4]-t145*z[4]+t68*z[4]+t92*z[5]-t92*z[0]+t11*z[3]+t44*z[0]+t178*y[5]-t46*y[5]-t178*y[0]-t145*z[0]-t20*z[5]-t37*z[3]-t160*z[7]+t145*z[3]+x[4]*y[6]*z[2];
+
+  return (t34+t64+t95+t125+t156+t181+t207+t228)/12.;
 }
 
 #else

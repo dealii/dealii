@@ -64,12 +64,12 @@ int main ()
       if (loop==1)
 	{
 	  tria.begin_active()->vertex(1)(0) = 2;
-	  tria.begin_active()->vertex(2)(0) = 2;
+	  tria.begin_active()->vertex(3)(0) = 2;
 	}
       if (loop==2)
 	{
-	  tria.begin_active()->vertex(2)(0) = 3;
-	  tria.begin_active()->vertex(2)(1) = 3;
+	  tria.begin_active()->vertex(3)(0) = 3;
+	  tria.begin_active()->vertex(3)(1) = 3;
 	}
       
       FEValues<2> fevalues(fe,q,update_second_derivatives);

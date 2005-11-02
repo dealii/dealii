@@ -1421,16 +1421,16 @@ void DoFTools::make_hanging_node_constraints (
 
 					   // assert some consistency
 					   // assumptions
-	  Assert ((face->child(0)->vertex_index(2) ==
-		   face->child(1)->vertex_index(3)) &&
-		  (face->child(0)->vertex_index(2) ==
-		   face->child(2)->vertex_index(0)) &&
-		  (face->child(0)->vertex_index(2) ==
-		   face->child(3)->vertex_index(1)),
+	  Assert ((face->child(0)->vertex_index(3) ==
+		   face->child(1)->vertex_index(2)) &&
+		  (face->child(0)->vertex_index(3) ==
+		   face->child(2)->vertex_index(1)) &&
+		  (face->child(0)->vertex_index(3) ==
+		   face->child(3)->vertex_index(0)),
 		  ExcInternalError());
 	  for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
 	    dofs_on_children[next_index++]
-	      = face->child(0)->vertex_dof_index(2,dof);
+	      = face->child(0)->vertex_dof_index(3,dof);
 	  
 					   // dof numbers on the centers of
 					   // the lines bounding this face
@@ -1448,13 +1448,13 @@ void DoFTools::make_hanging_node_constraints (
 	      = face->child(0)->line(1)->dof_index(dof);
 	  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
 	    dofs_on_children[next_index++]
-	      = face->child(1)->line(2)->dof_index(dof);
+	      = face->child(2)->line(1)->dof_index(dof);
 	  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
 	    dofs_on_children[next_index++]
-	      = face->child(2)->line(3)->dof_index(dof);
+	      = face->child(0)->line(3)->dof_index(dof);
 	  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
 	    dofs_on_children[next_index++]
-	      = face->child(3)->line(0)->dof_index(dof);
+	      = face->child(1)->line(3)->dof_index(dof);
 	  
 					   // dofs on the bordering lines
 	  for (unsigned int line=0; line<4; ++line)
