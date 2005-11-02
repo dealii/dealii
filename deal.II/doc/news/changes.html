@@ -30,6 +30,42 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 (Guido Kanschat), RH (Ralf Hartmann).
 </p>
 
+<a name="incompatible"></a>
+<h3 style="color:red">Incompatibilities</h3>
+
+<p style="color:red">
+Following are a few modifications to the library that unfortunately
+are incompatible with previous versions of the library, but which we
+deem necessary for the future maintainability of the
+library. Unfortunately, some of these changes will require
+modifications to application programs. We apologize for the
+inconvenience this causes.
+</p>
+
+
+<ol>
+  <li> <p>
+       Changed: The internal numbering of faces, lines and vertices
+       has been reimplemented. Now the numbering scheme uses a
+       lexicographic ordering (with x running fastest) whereever
+       possible. For more information on the new numbering scheme, see
+       the <a
+       href="http://ganymed.iwr.uni-heidelberg.de/pipermail/dealii/2005/000827.html">announcement</a>
+       on the mailing list.  <br> The ordering of vertices in <code
+       class="class">CellData</code> given to the <code
+       class="member">Triangulation::create_triangulation</code>
+       function has been changed accordingly. For backward
+       compatibility there is now a new <code
+       class="member">Triangulation::create_triangulation_compatibility</code>
+       function which takes <code class="class">CellData</code> in the
+       old vertex ordering. However, as this function might not be
+       supported forever users are advised to change their code to the
+       new numbering scheme and to use the <code
+       class="member">Triangulation::create_triangulation</code>
+       function.  <br> (RH 2005/11/02)
+       </p>
+</ol>
+
 
 <a name="general"></a>
 <h3>General</h3>
