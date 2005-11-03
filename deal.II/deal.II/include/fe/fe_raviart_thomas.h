@@ -35,10 +35,6 @@ template <int dim> class MappingQ;
  * space H<sup>div</sup>. These elements generate vector fields with
  * normel components continuous between mesh cells.
  *
- * @todo Right now, the description of node values and interpolation
- * does not match the actual state of this class. This will be
- * improved after some discussion.
- *
  * We follow the usual definition of the degree of RT elements, which
  * denotes the polynomial degree of the largest complete polynomial
  * subspace contained in the RT space. Then, approciamtion order of
@@ -84,61 +80,8 @@ template <int dim> class MappingQ;
  * QGauss<sub>k+1</sub> on each face as well as QGauss<sub>k</sub> in
  * the interior of the cell (or none for RT<sub>0</sub>).
  *
- * @internal
- * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
- * This paragraph is obsolete and will be removed after reconstruction
- * of the element is complete.
- *
- * Raviart-Thomas elements have their degrees of freedom on edges,
- * with shape functions being vector valued and pointing in normal
- * direction. We use the standard enumeration and direction of edges
- * in deal.II, yielding the following shape functions in 2d:
- *
- *   @verbatim
- *          2
- *      *---^---*
- *      |       |
- *     3>       >1
- *      |       |
- *      *---^---*
- *          0
- *   @endverbatim
- *
- * For the 3d case, the ordering follows the same scheme: the lines
- * are numbered as described in the documentation of the
- * Triangulation class, i.e.
- *   @verbatim
- *         *---6---*        *---6---*
- *        /|       |       /       /|
- *      11 |       5      11     10 5
- *      /  7       |     /       /  |
- *     *   |       |    *---2---*   |
- *     |   *---4---*    |       |   *
- *     |  /       /     |       1  /
- *     3 8       9      3       | 9
- *     |/       /       |       |/
- *     *---0---*        *---0---*
- *   @endverbatim
- * and their directions are as follows:
- *   @verbatim
- *         *--->---*        *--->---*
- *        /|       |       /       /|
- *       ^ |       ^      ^       ^ ^
- *      /  ^       |     /       /  |
- *     *   |       |    *--->---*   |
- *     |   *--->---*    |       |   *
- *     |  /       /     |       ^  /
- *     ^ ^       ^      ^       | ^
- *     |/       /       |       |/
- *     *--->---*        *--->---*
- *   @endverbatim
- *
- * The element does not make much sense in 1d, so it is not
- * implemented there.
- *
- *
- * @author Wolfgang Bangerth, 2003
+ * @author Guido Kanschat, 2005, based on previous Work by Wolfgang Bangerth
  */
 template <int dim>
 class FE_RaviartThomas
