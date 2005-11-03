@@ -61,7 +61,7 @@ template <int dim> class MappingQ;
  *
  * <h4>Node values on edges/faces</h4>
  *
- * On edges or faces, the @GlossNodes "node values" are the moments of
+ * On edges or faces, the @ref GlossNodes "node values" are the moments of
  * the normal component of the interpolated function with respect to
  * the traces of the RT polynomials. Since the normal trace of the RT
  * space of degree <i>k</i> on an edge/face is the space
@@ -81,7 +81,7 @@ template <int dim> class MappingQ;
  * quadrature rules themselves. The generalized support points are a
  * set of points such that this quadrature can be performed with
  * sufficient accuracy. The points needed are thode of
- * QGauss<sub>k+1</k> on each face as well as QGauss<sub>k</k> in
+ * QGauss<sub>k+1</sub> on each face as well as QGauss<sub>k</sub> in
  * the interior of the cell (or none for RT<sub>0</sub>).
  *
  * @internal
