@@ -1,15 +1,12 @@
-/* $Id$ */
-/* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
-
-/*    $Id$       */
-/*    Version: $Name$                                          */
-/*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003 by the deal.II authors */
-/*                                                                */
-/*    This file is subject to QPL and may not be  distributed     */
-/*    without copyright and license information. Please refer     */
-/*    to the file deal.II/doc/license.html for the  text  and     */
-/*    further information on this license.                        */
+// $Id$
+// Version: $Name$
+//
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
 
 
                                  // The most fundamental class in the
@@ -167,9 +164,9 @@ void second_grid ()
                                          // by which we find out about
                                          // the number of faces of a
                                          // cell
-        for (unsigned int vertex=0;
-             vertex < GeometryInfo<2>::vertices_per_cell;
-             ++vertex)
+        for (unsigned int ivertex=0;
+             ivertex < GeometryInfo<2>::vertices_per_cell;
+             ++ivertex)
           {
                                              // If this cell is at the
                                              // inner boundary, then
@@ -178,7 +175,7 @@ void second_grid ()
                                              // distance from the center
                                              // of 0.5
             const Point<2> vector_to_center
-              = (cell->vertex(vertex) - center);
+              = (cell->vertex(ivertex) - center);
             const double distance_from_center
               = std::sqrt(vector_to_center.square());
             
