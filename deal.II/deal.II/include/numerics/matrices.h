@@ -51,10 +51,10 @@ namespace PETScWrappers
 
 
 /**
- * Provide a class which assembles certain standard matrices for a
- * given triangulation, using a given finite element, a given mapping
- * and a quadrature formula.  All functions are static, so it is not
- * necessary to create an object of this type, though you may do so.
+ * This class provides functions that assemble certain standard matrices for a
+ * given triangulation, using a given finite element, a given mapping and a
+ * quadrature formula.  All functions are static, so it is not necessary to
+ * create an object of this type.
  *
  *
  * <h3>Conventions for all functions</h3>
@@ -65,15 +65,7 @@ namespace PETScWrappers
  * be used. Code that uses only MappingQ1 may also use the
  * functions <em>without</em> Mapping argument. Each of these
  * latter functions create a MappingQ1 object and just call the
- * respective functions with that object as mapping argument. The
- * functions without Mapping argument still exist to ensure
- * backward compatibility. Nevertheless it is advised to change the
- * user's codes to store a specific Mapping object and to use
- * the functions that take this @p Mapping object as argument. This
- * gives the possibility to easily extend the user codes to work also
- * on mappings of higher degree, this just by exchanging
- * MappingQ1 by, for example, a MappingQ or another
- * Mapping object of interest.
+ * respective functions with that object as mapping argument.
  *
  * All functions take a sparse matrix object to hold the matrix to be
  * created. The functions assume that the matrix is initialized with a
@@ -82,12 +74,10 @@ namespace PETScWrappers
  * You can do this by calling the DoFTools::make_sparsity_pattern()
  * function.
  *
- * Furthermore it is assumed that no relevant data is in the matrix. All
- * entries will be overwritten. Entries which are not needed by the matrix
- * are not touched and in special are not set to zero.
- * In all cases, the elements of the matrix to be assembled are simply
- * summed up from the contributions of each cell. Therefore you may want
- * to clear the matrix before assemblage.
+ * Furthermore it is assumed that no relevant data is in the matrix. Some
+ * entries will be overwritten and some others will contain invalid data if
+ * the matrix wasn't empty before. Therefore you may want to clear the matrix
+ * before assemblage.
  *
  * All created matrices are `raw': they are not condensed,
  * i.e. hanging nodes are not eliminated. The reason is that you may
@@ -129,12 +119,14 @@ namespace PETScWrappers
  * required accuracy. For the choice of this quadrature rule you need
  * to take into account the polynomial degree of the FiniteElement
  * basis functions, the roughness of the coefficient @p a, as well as
- * the degree of the given @p Mapping.
+ * the degree of the given @p Mapping (if any).
  *
- * Note, that for system elements the mass matrix and the laplace
- * matrix is implemented such that each components couples only with
- * itself. I.e. there is no coupling of shape functions belonging to
- * different components.
+ * Note, that for system elements the mass matrix and the laplace matrix is
+ * implemented such that each components couple only with itself, i.e. there
+ * is no coupling of shape functions belonging to different components. If the
+ * degrees of freedom have been sorted according to their vector component
+ * (e.g., using DoFRenumbering::component_wise()), then the resulting matrices
+ * will be block diagonal.
  *
  * If the finite element for which the mass matrix or the laplace
  * matrix is to be built has more than one component, this function
@@ -146,31 +138,32 @@ namespace PETScWrappers
  *
  * <h3>Matrices on the boundary</h3>
  *
- * The @p create_boundary_mass_matrix creates the matrix with entries
- * $m_{ij} = \int_{\Gamma} \phi_i \phi_j dx$, where $\Gamma$ is the
- * union of boundary parts with indicators contained in a
- * FunctioMap@p ::FunctionMap passed to the function (i.e. if
- * you want to set up the mass matrix for the parts of the boundary
- * with indicators zero and 2, you pass the function a map of
- * <tt>unsigned char</tt>s as parameter @p boundary_functions containing
- * the keys zero and 2). The $\phi_i$ are the basis functions which
- * have at least part of their support on $\Gamma$. The mapping
- * @p dof_to_boundary_mapping required by this function maps global
- * DoF numbers to a numbering of the degrees of freedom located on the
- * boundary, and can be obtained using the function
- * @p DoFTools::map_dof_to_boundary_indices.
+ * The create_boundary_mass_matrix() creates the matrix with entries $m_{ij} =
+ * \int_{\Gamma} \phi_i \phi_j dx$, where $\Gamma$ is the union of boundary
+ * parts with indicators contained in a FunctionMap passed to the function
+ * (i.e. if you want to set up the mass matrix for the parts of the boundary
+ * with indicators zero and 2, you pass the function a map of <tt>unsigned
+ * char</tt>s as parameter @p boundary_functions containing the keys zero and
+ * 2). The size of the matrix is equal to the number of degrees of freedom
+ * that have support on the boundary, i.e. it is <em>not</em> a matrix on all
+ * degrees of freedom, but only a subset. (The $\phi_i$ in the formula are
+ * this subsect of basis functions which have at least part of their support
+ * on $\Gamma$.) In order to determine which shape functions are to be
+ * considered, and in order to determine in which order, the function takes a
+ * @p dof_to_boundary_mapping; this object maps global DoF numbers to a
+ * numbering of the degrees of freedom located on the boundary, and can be
+ * obtained using the function DoFTools::map_dof_to_boundary_indices.
  *
- * Since in most cases we are not interested in the pure mass matrix on the
- * boundary, but rather need it to compute the projection of a function to
- * the boundary, no function is provided to only create the matrix.
- *
- * This function needs to get passed a matrix object to hold the resulting sparse
- * matrix. This object is supposed to be initialized with a suitable sparsity
- * pattern, which can be created using the
- * DoFHandler@p ::make_boundary_sparsity_pattern function.
- *
- * The object describing the exact form of the boundary is obtained from the
- * triangulation object.
+ * In order to work, the function needs a matrix of the correct size, built on
+ * top of a corresponding sparsity pattern. Since we only work on a subset of
+ * the degrees of freedom, we can't use the matrices and sparsity patterns
+ * that are created for the entire set of degrees of freedom. Rather, you
+ * should use the DoFHandler@p ::make_boundary_sparsity_pattern() function to
+ * create the correct sparsity pattern, and build a matrix on top of it.
+ * 
+ * Note that at present there is no function that computes the mass matrix for
+ * <em>all</em> shape functions, though such a function would be trivial to
+ * implement.
  *
  *
  * <h3>Right hand sides</h3>
@@ -184,19 +177,6 @@ namespace PETScWrappers
  * VectorTools::create_right_hand_side() function. The use of the
  * latter may be useful if you want to create many right hand side
  * vectors.
- *
- * Creation of the right hand side is the same for all operators and
- * therefore for all of the functions below. It would be most
- * orthogonal to write one single function which builds up the right
- * hand side and not provide many functions doing the same
- * thing. However, this may result in a heavy performance penalty,
- * since then many values of a certain finite element have to be
- * computed twice, so it is more economical to implement it more than
- * once.
- *
- * All functions in this collection use the finite element given to
- * the DoFHandler object the last time that the degrees of
- * freedom were distributed on the triangulation.
  *
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
