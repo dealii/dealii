@@ -28,7 +28,7 @@
 template <typename> class Vector;
 
 
-/*! @addtogroup PETSc
+/*! @addtogroup PETScWrappers
  *@{
  */
 namespace PETScWrappers
