@@ -152,7 +152,7 @@ namespace PETScWrappers
  * considered, and in order to determine in which order, the function takes a
  * @p dof_to_boundary_mapping; this object maps global DoF numbers to a
  * numbering of the degrees of freedom located on the boundary, and can be
- * obtained using the function DoFTools::map_dof_to_boundary_indices.
+ * obtained using the function DoFTools::map_dof_to_boundary_indices().
  *
  * In order to work, the function needs a matrix of the correct size, built on
  * top of a corresponding sparsity pattern. Since we only work on a subset of
