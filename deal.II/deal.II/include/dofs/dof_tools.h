@@ -63,56 +63,44 @@ template <int dim> class Mapping;
  * but no use of this case is made since no examples where this occurs
  * are known to the author.
  *
- * When setting up sparsity patterns for matrices on the boundary, the same
- * procedure is done, except for the fact that the loop only goes over faces
- * on the boundary and the basis functions thereon. It is assumed that all
- * other basis functions on a cell adjacent to the boundary vanish at the
- * boundary itself, except for those which are located on the boundary.
- *
- *
  *
  * <h3>DoF numberings on boundaries</h3>
  *
- * When projecting the traces of functions to the boundary or parts
- * thereof, one needs to build matrices and vectors with the degrees
- * of freedom on the boundary. What is needed in this case is a
- * numbering of the boundary degrees of freedom, starting from zero on
- * and not considering the degrees of freedom in the interior. The
- * map_dof_to_boundary_indices() function does exactly this, by
- * providing a vector with as many entries as there are degrees of
- * freedom on the whole domain, with each entry being the number in
- * the numbering of the boundary or
- * DoFHandler::invalid_dof_index if the dof is not on the
- * boundary. You should always use this function to get the mapping
- * between local (boundary) and the global numbers, for example to
- * build the mass matrix on the boundary, or to get the global index
- * of a degree of freedom if we want to use the solution of the
- * projection onto the boundary to eliminate the boundary degrees of
- * freedom from the global matrix.
+ * When projecting the traces of functions to the boundary or parts thereof,
+ * one needs to build matrices and vectors that act only on those degrees of
+ * freedom that are located on the boundary, rather than on all degrees of
+ * freedom. One could do that by simply building matrices in which the entries
+ * for all interior DoFs are zero, but such matrices are always very rank
+ * deficient and not very practical to work with.
  *
- * The algorithm to provide this numbering mapping is simple, but you
- * should not rely on it since it may be changed sometimes: we loop
- * over all faces, check whether it is on the boundary, if so get the
- * global numbers of the degrees of freedom on that face, and for each
- * of these we give a sequential boundary number if none has already
- * been given to this dof. But it should be emphasized again that you
- * should not try to use this internal knowledge about the used
- * algorithm, you are better off if you just accept the mapping `as
- * is'.
+ * What is needed instead in this case is a numbering of the boundary degrees
+ * of freedom, i.e. we should enumerate all the degrees of freedom that are
+ * sitting on the boundary, and exclude all other (interior) degrees of
+ * freedom. The map_dof_to_boundary_indices() function does exactly this: it
+ * provides a vector with as many entries as there are degrees of freedom on
+ * the whole domain, with each entry being the number in the numbering of the
+ * boundary or DoFHandler::invalid_dof_index if the dof is not on the
+ * boundary.
  *
- * Actually, there are two map_dof_to_boundary_indices() functions,
- * one producing a numbering for all boundary degrees of freedom and
- * one producing a numbering for only parts of the boundary, namely
- * those parts for which the boundary indicator is listed in a set of
- * indicators given to the function. The latter case is needed if, for
- * example, we would only want to project the boundary values for the
- * Dirichlet part of the boundary, not for the other boundary
- * conditions. You then give the function a list of boundary
- * indicators referring to Dirichlet parts on which the projection is
- * to be performed. The parts of the boundary on which you want to
- * project need not be contiguous; however, it is not guaranteed that
- * the indices of each of the boundary parts are continuous, i.e. the
- * indices of degrees of freedom on different parts may be intermixed.
+ * With this vector, one can get, for any given degree of freedom, a unique
+ * number among those DoFs that sit on the boundary; or, if your DoF was
+ * interior to the domain, the result would be DoFHandler::invalid_dof_index.
+ * We need this mapping, for example, to build the mass matrix on the boundary
+ * (for this, see make_boundary_sparsity_pattern() function, the corresponding
+ * section below, as well as the MatrixCreator class documentation).
+ *
+ * Actually, there are two map_dof_to_boundary_indices() functions, one
+ * producing a numbering for all boundary degrees of freedom and one producing
+ * a numbering for only parts of the boundary, namely those parts for which
+ * the boundary indicator is listed in a set of indicators given to the
+ * function. The latter case is needed if, for example, we would only want to
+ * project the boundary values for the Dirichlet part of the boundary. You
+ * then give the function a list of boundary indicators referring to Dirichlet
+ * parts on which the projection is to be performed. The parts of the boundary
+ * on which you want to project need not be contiguous; however, it is not
+ * guaranteed that the indices of each of the boundary parts are continuous,
+ * i.e. the indices of degrees of freedom on different parts may be
+ * intermixed.
  *
  * Degrees of freedom on the boundary but not on one of the specified
  * boundary parts are given the index DoFHandler::invalid_dof_index, as if
@@ -121,26 +109,54 @@ template <int dim> class Mapping;
  * list, the vector of new indices consists solely of
  * DoFHandler::invalid_dof_index.
  *
- * The question what a degree of freedom on the boundary is, is not so
- * easy.  It should really be a degree of freedom of which the
- * respective basis function has nonzero values on the boundary. At
- * least for Lagrange elements this definition is equal to the
- * statement that the off-point of the shape function, i.e. the point
- * where the function assumes its nominal value (for Lagrange elements
- * this is the point where it has the function value 1), is
- * located on the boundary. We do not check this directly, the
- * criterion is rather defined through the information the finite
- * element class gives: the FiniteElement class defines the
- * numbers of basis functions per vertex, per line, and so on and the
- * basis functions are numbered after this information; a basis
- * function is to be considered to be on the face of a cell (and thus
- * on the boundary if the cell is at the boundary) according to its
- * belonging to a vertex, line, etc but not to the cell. The finite
- * element uses the same cell-wise numbering so that we can say that
- * if a degree of freedom was numbered as one of the dofs on lines, we
- * assume that it is located on the line. Where the off-point actually
- * is, is a secret of the finite element (well, you can ask it, but we
- * don't do it here) and not relevant in this context.
+ * (As a side note, for corner cases: The question what a degree of freedom on
+ * the boundary is, is not so easy.  It should really be a degree of freedom
+ * of which the respective basis function has nonzero values on the
+ * boundary. At least for Lagrange elements this definition is equal to the
+ * statement that the off-point, or what deal.II calls support_point, of the
+ * shape function, i.e. the point where the function assumes its nominal value
+ * (for Lagrange elements this is the point where it has the function value
+ * 1), is located on the boundary. We do not check this directly, the
+ * criterion is rather defined through the information the finite element
+ * class gives: the FiniteElement class defines the numbers of basis functions
+ * per vertex, per line, and so on and the basis functions are numbered after
+ * this information; a basis function is to be considered to be on the face of
+ * a cell (and thus on the boundary if the cell is at the boundary) according
+ * to it belonging to a vertex, line, etc but not to the interior of the
+ * cell. The finite element uses the same cell-wise numbering so that we can
+ * say that if a degree of freedom was numbered as one of the dofs on lines,
+ * we assume that it is located on the line. Where the off-point actually is,
+ * is a secret of the finite element (well, you can ask it, but we don't do it
+ * here) and not relevant in this context.)
+ *
+ *
+ * <h3>Setting up sparsity patterns for boundary matrices</h3>
+ *
+ * In some cases, one wants to only work with DoFs that sit on the
+ * boundary. One application is, for example, if rather than interpolating
+ * non-homogenous boundary values, one would like to project them. For this,
+ * we need two things: a way to identify nodes that are located on (parts of)
+ * the boundary, and a way to build matrices out of only degrees of freedom
+ * that are on the boundary (i.e. much smaller matrices, in which we do not
+ * even build the large zero block that stems from the fact that most degrees
+ * of freedom have no support on the boundary of the domain). The first of
+ * these tasks is done by the map_dof_to_boundary_indices() function of this
+ * class (described above).
+ *
+ * The second part requires us first to build a sparsity pattern for the
+ * couplings between boundary nodes, and then to actually build the components
+ * of this matrix. While actually computing the entries of these small
+ * boundary matrices is discussed in the MatrixCreator class, the creation of
+ * the sparsity pattern is done by the create_boundary_sparsity_pattern()
+ * function. For its work, it needs to have a numbering of all those degrees
+ * of freedom that are on those parts of the boundary that we are interested
+ * in. You can get this from the map_dof_to_boundary_indices() function. It
+ * then builds the sparsity pattern corresponding to integrals like
+ * $\int_\Gamma \varphi_{b2d(i)} \varphi_{b2d(j)} dx$, where $i$ and $j$ are
+ * indices into the matrix, and $b2d(i)$ is the global DoF number of a degree
+ * of freedom sitting on a boundary (i.e., $b2d$ is the inverse of the mapping
+ * returned by map_dof_to_boundary_indices() function).
+ *
  *
  * @ingroup dofs
  * @author Wolfgang Bangerth, Guido Kanschat and others, 1998 - 2005
@@ -437,46 +453,20 @@ class DoFTools
 			   SparsityPattern                       &sparsity_pattern);
     
     				     /**
-				      * Write the sparsity structure
-				      * of the matrix composed of the
-				      * basis functions on the
-				      * boundary into the matrix
-				      * structure. The sparsity
-				      * pattern does not include
-				      * entries introduced by the
-				      * elimination of constrained
-				      * nodes.  The sparsity pattern
-				      * is not compressed, since if
-				      * you want to call
-				      * ConstraintMatrix::condense()
-				      * afterwards, new entries have
-				      * to be added. However, if you
-				      * don't want to call
-				      * ConstraintMatrix::condense(),
-				      * you have to compress the
-				      * matrix yourself, using
-				      * SparsityPattern::compress()
+				      * Create the sparsity pattern for
+				      * boundary matrices. See the general
+				      * documentation of this class for more
+				      * information.
 				      *
-				      * The actual type of the
-				      * sparsity pattern may be
-				      * SparsityPattern,
+				      * The actual type of the sparsity
+				      * pattern may be SparsityPattern,
 				      * CompressedSparsityPattern,
 				      * BlockSparsityPattern,
-				      * CompressedBlockSparsityPattern,
-				      * or any other class that
-				      * satisfies similar
-				      * requirements. It is assumed
-				      * that the size of the sparsity
-				      * pattern matches the number of
-				      * degrees of freedom and that
-				      * enough unused nonzero entries
-				      * are left to fill the sparsity
-				      * pattern. The nonzero entries
-				      * generated by this function are
-				      * overlaid to possible previous
-				      * content of the object, that is
-				      * previously added entries are
-				      * not deleted.
+				      * CompressedBlockSparsityPattern, or any
+				      * other class that satisfies similar
+				      * requirements. It is assumed that the
+				      * size of the sparsity pattern is
+				      * already correct.
 				      */
     template <int dim, class SparsityPattern>
     static void
