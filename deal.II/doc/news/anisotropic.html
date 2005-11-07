@@ -115,6 +115,19 @@ refinement.
 <h3>base</h3>
 
 <ol>
+  <li> <p>
+       New: There is now a new <code
+       class="class">GeometryInfo&lt;dim&gt;</code>::<code
+       class="member">isotropic_refinement</code> variable of type
+       <code>RefineCase::Type</code> representing the isotropic
+       refinement case in <code>dim</code> dimensions,
+       i.e. <code>GeometryInfo&lt;1&gt;::isotropic_refinement=RefineCase::cut_x</code>,
+       <code>GeometryInfo&lt;2&gt;::isotropic_refinement=RefineCase::cut_xy</code>
+       and
+       <code>GeometryInfo&lt;3&gt;::isotropic_refinement=RefineCase::cut_xyz</code>.
+       <br> 
+       (RH 2005/03/03)
+       </p>
 </ol>
 
 
@@ -161,7 +174,8 @@ refinement.
        <code>if(!cell->refine_flag_set())</code> ,
        <code>if(cell->refine_flag_set()==false)</code> and
        <code>if(cell->refine_flag_set())</code> , but you cannot ask
-       <code>if(cell->refine_flag_set()==true)</code> any more.  <br>
+       <code>if(cell->refine_flag_set()==true)</code> any more.
+       <br>
        (RH 2005/03/03)
        </p>
 
@@ -170,21 +184,8 @@ refinement.
        class="member">set_refine_flag</code> function now has a new
        <code>RefineCase::Type</code> argument which defaults to <code
        class="class">GeometryInfo&lt;dim&gt;</code>::<code
-       class="member">isotropic_refinement</code>.  <br> (RH
-       2005/03/03)
-       </p>
-
-  <li> <p>
-       New: There is now a new <code
-       class="class">GeometryInfo&lt;dim&gt;</code>::<code
-       class="member">isotropic_refinement</code> variable of type
-       <code>RefineCase::Type</code> representing the isotropic
-       refinement case in <code>dim</code> dimensions,
-       i.e. <code>GeometryInfo&lt;1&gt;::isotropic_refinement=RefineCase::cut_x</code>,
-       <code>GeometryInfo&lt;2&gt;::isotropic_refinement=RefineCase::cut_xy</code>
-       and
-       <code>GeometryInfo&lt;3&gt;::isotropic_refinement=RefineCase::cut_xyz</code>.
-       <br> 
+       class="member">isotropic_refinement</code>.
+       <br>
        (RH 2005/03/03)
        </p>
 
