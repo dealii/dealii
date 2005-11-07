@@ -34,7 +34,6 @@ test(const unsigned int degree)
   
   FE_RaviartThomas<dim> fe_rt(degree);
 
-  if (fe_rt.restriction_is_implemented())
   for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
     {
       const FullMatrix<double> & m = fe_rt.get_restriction_matrix(c);
