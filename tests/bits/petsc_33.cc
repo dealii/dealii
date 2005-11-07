@@ -34,8 +34,8 @@ void test (PETScWrappers::Vector &v)
 
                                    // then check the norm
   const double eps=typeid(PetscScalar)==typeid(double) ? 1e-14 : 1e-5;
-  Assert (std::fabs(v.lp_norm(3) - std::pow(sum, 1./3.)) <
-          eps*std::pow(sum, 1./3.),
+  const double true_value=std::pow(sum, static_cast<PetscScalar> (1./3.));
+  Assert (std::fabs(v.lp_norm(3) - true_value) < eps*true_value,
           ExcInternalError());
 
   deallog << "OK" << std::endl;
