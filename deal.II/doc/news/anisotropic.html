@@ -116,6 +116,22 @@ refinement.
 
 <ol>
   <li> <p>
+       New: The new <code class="class">GeometryInfo</code>::<code
+       class="member">n_children(ref_case)</code> function returns the
+       number of children a cell/face has when refined with the
+       <code>RefineCase::Type</code> <code>ref_case</code>.
+       <br> 
+       (RH 2005/11/07)
+       </p>
+
+  <li> <p>
+       New: Given a <code>RefineCase::Type</code> of a cell the new
+       <code class="class">GeometryInfo</code>::<code
+       class="member">face_refine_case</code> function returns the
+       <code>RefineCase::Type</code> of a face.  <br> (RH 2005/11/07)
+       </p>
+
+  <li> <p>
        New: There is now a new <code
        class="class">GeometryInfo&lt;dim&gt;</code>::<code
        class="member">isotropic_refinement</code> variable of type
