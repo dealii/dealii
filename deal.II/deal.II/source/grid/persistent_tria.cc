@@ -21,29 +21,34 @@
 
 template <int dim>
 PersistentTriangulation<dim>::
-PersistentTriangulation (const Triangulation<dim> &coarse_grid) :
+PersistentTriangulation (const Triangulation<dim> &coarse_grid)
+                :
 		coarse_grid (&coarse_grid) 
 {}
 
 
+
 template <int dim>
 PersistentTriangulation<dim>::
-PersistentTriangulation (const PersistentTriangulation<dim> &old_tria) :
+PersistentTriangulation (const PersistentTriangulation<dim> &old_tria)
+                :
 						 // default initialize
 						 // tria, i.e. it will be
 						 // empty on first use
 		Triangulation<dim> (),
-  coarse_grid (old_tria.coarse_grid),
-  refine_flags (old_tria.refine_flags),
-  coarsen_flags (old_tria.coarsen_flags)
+                coarse_grid (old_tria.coarse_grid),
+                refine_flags (old_tria.refine_flags),
+                coarsen_flags (old_tria.coarsen_flags)
 {
   Assert (old_tria.n_levels() == 0, ExcTriaNotEmpty ());
 }
 
 
+
 template <int dim>
 PersistentTriangulation<dim>::~PersistentTriangulation () 
 {}
+
 
 
 template <int dim>
@@ -61,6 +66,7 @@ PersistentTriangulation<dim>::execute_coarsening_and_refinement ()
 }
 
 
+
 template <int dim>
 void
 PersistentTriangulation<dim>::restore ()
@@ -72,9 +78,11 @@ PersistentTriangulation<dim>::restore ()
 }
 
 
+
 template <int dim>
 void
-PersistentTriangulation<dim>::restore (const unsigned int step) {
+PersistentTriangulation<dim>::restore (const unsigned int step)
+{
 
   if (step==0)
 				     // copy the old triangulation.
@@ -106,6 +114,7 @@ PersistentTriangulation<dim>::n_refinement_steps() const
 }
 
 
+
 template <int dim>
 void
 PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_grid) 
@@ -115,6 +124,7 @@ PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_
   refine_flags.clear ();
   coarsen_flags.clear ();
 }
+
 
 
 template <int dim>
@@ -127,6 +137,7 @@ PersistentTriangulation<dim>::create_triangulation (const std::vector<Point<dim>
 }
 
 
+
 template <int dim>
 void
 PersistentTriangulation<dim>::create_triangulation_compatibility (
@@ -136,6 +147,7 @@ PersistentTriangulation<dim>::create_triangulation_compatibility (
 {
   Assert (false, ExcImpossibleInDim(dim));
 }
+
 
 
 template <int dim>
@@ -151,15 +163,16 @@ PersistentTriangulation<dim>::write_flags(std::ostream &out) const
   for (unsigned int i=0; i<n_flag_levels; ++i)
     {
       this->write_bool_vector (mn_tria_refine_flags_begin, refine_flags[i],
-			 mn_tria_refine_flags_end, out);
+                               mn_tria_refine_flags_end, out);
       this->write_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags[i],
-			 mn_tria_coarsen_flags_end, out);
+                               mn_tria_coarsen_flags_end, out);
     }
   
   out << mn_persistent_tria_flags_end << std::endl;
 
   AssertThrow (out, ExcIO());
 }
+
 
 
 template <int dim>
@@ -182,9 +195,9 @@ PersistentTriangulation<dim>::read_flags(std::istream &in)
       refine_flags.push_back (std::vector<bool>());
       coarsen_flags.push_back (std::vector<bool>());
       this->read_bool_vector (mn_tria_refine_flags_begin, refine_flags.back(),
-			mn_tria_refine_flags_end, in);
+                              mn_tria_refine_flags_end, in);
       this->read_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags.back(),
-			mn_tria_coarsen_flags_end, in);
+                              mn_tria_coarsen_flags_end, in);
     }
   
   in >> magic_number;
@@ -195,6 +208,7 @@ PersistentTriangulation<dim>::read_flags(std::istream &in)
 }
 
 
+
 template <int dim>
 void
 PersistentTriangulation<dim>::clear_flags()
@@ -202,6 +216,7 @@ PersistentTriangulation<dim>::clear_flags()
   refine_flags.clear();
   coarsen_flags.clear();
 }
+
 
 
 template <int dim>
