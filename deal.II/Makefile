@@ -211,7 +211,7 @@ build-test:
 	echo HOST=`hostname`                       | tee -a build-test-log
 	echo BUILDTESTFLAGS=$(BUILDTESTFLAGS)      | tee -a build-test-log
 	echo BUILDTESTNOTE=$(BUILDTESTNOTE)        | tee -a build-test-log
-	(./configure $(BUILDTESTFLAGS) 2>&1) > build-test-config
+	-(./configure $(BUILDTESTFLAGS) 2>&1) > build-test-config
 	if test -f common/Make.global_options ; then \
 	   grep '^enable-shared' common/Make.global_options | grep = ; \
 	   grep enable-multithreading common/Make.global_options | grep = ; \
@@ -227,7 +227,7 @@ build-test:
 	cat build-test-config                 | tee -a build-test-log
 	echo END CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'`   | tee -a build-test-log
 	echo                                  | tee -a build-test-log
-	$(MAKE) BUILDTEST= build-test-do 2>&1 | tee -a build-test-log
+	-$(MAKE) BUILDTEST= build-test-do 2>&1 | tee -a build-test-log
 
 # target to do the actual compilation tests for an automated build test. build
 # the library, the example programs, and the doxygen example programs. if the
