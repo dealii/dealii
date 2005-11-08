@@ -42,8 +42,13 @@ class Quad
 				      *  indices are set to -1, i.e. an
 				      *  invalid value.
 				      *
-				      *  By convention, the four lines must
-				      *  be numbered in counterclockwise sense!
+				      * By convention, the four lines
+				      * must be numbered as follows
+				      *  .--3--.
+				      *  |     |
+				      *  0     1
+				      *  |     |
+				      *  .--2--.
 				      */
     Quad (const int i0 = -1,
 	  const int i1 = -1,
