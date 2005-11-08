@@ -152,13 +152,13 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * grid is stepwise rebuilt using
 				      * the saved flags.
 				      *
-				      * Note that this function will
-				      * result in an error if the
-				      * underlying triangulation is
-				      * not empty, i.e. it will only
-				      * succeed if this object is
-				      * newly created or <tt>clear()</tt>
-				      * was called on it before.
+				      * Note that this function will result in
+				      * an error if the underlying
+				      * triangulation is not empty, i.e. it
+				      * will only succeed if this object is
+				      * newly created or the <tt>clear()</tt>
+				      * function of the base class was called
+				      * on it before.
 				      *
 				      * Repeatedly calls the
 				      * <tt>restore(unsigned int)</tt>
