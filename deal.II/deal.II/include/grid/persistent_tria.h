@@ -220,6 +220,9 @@ class PersistentTriangulation : public Triangulation<dim>
 				       const SubCellData                 &subcelldata);
 
 				     /**
+				      * An overload of the respective function
+				      * of the base class.
+				      * 
 				      * Throw an error, since this function
 				      * is not useful in the context of this
 				      * class.
