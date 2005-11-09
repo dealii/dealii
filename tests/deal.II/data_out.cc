@@ -46,7 +46,7 @@
 #include <base/logstream.h>
 
 
-std::ofstream logfile("data_out.output");
+std::ofstream logfile("data_out/output");
 
 
 template <int dim>

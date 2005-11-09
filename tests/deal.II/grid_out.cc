@@ -24,7 +24,7 @@
 #include <fstream>
 
 
-std::ofstream logfile("grid_out.output");
+std::ofstream logfile("grid_out/output");
 
 
 template <int dim>

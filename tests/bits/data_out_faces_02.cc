@@ -19,7 +19,7 @@
 #include <numerics/data_out_faces.h>
 
 
-std::string output_file_name = "data_out_faces_02.output";
+std::string output_file_name = "data_out_faces_02/output";
 
 
 

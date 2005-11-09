@@ -171,7 +171,7 @@ void test_fe_datas()
 
 int main(int,char)
 {
-  std::ofstream logfile("fe_data_test.output");
+  std::ofstream logfile("fe_data_test/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

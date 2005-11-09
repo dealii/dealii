@@ -21,7 +21,7 @@
 //	                            ConstraintMatrix      &);
 
 
-std::string output_file_name = "dof_tools_03.output";
+std::string output_file_name = "dof_tools_03/output";
 
 
 template <int dim>

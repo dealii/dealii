@@ -38,7 +38,7 @@
 #define PRECISION 2
 
 
-std::ofstream logfile ("rt_9.output");
+std::ofstream logfile ("rt_9/output");
 
 template<int dim>
 void

@@ -21,7 +21,7 @@
 #include <numerics/data_out.h>
 
 
-std::string output_file_name = "data_out_03.output";
+std::string output_file_name = "data_out_03/output";
 
 
 // have a class that makes sure we can get at the patches and data set

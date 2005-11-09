@@ -20,6 +20,6 @@
 
 int main ()
 {
-  std::ofstream o("anna_5.output");
+  std::ofstream o("anna_5/output");
   BlockSparsityPattern      sparsity_pattern;
 }

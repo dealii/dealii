@@ -197,7 +197,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("filtered_matrix.output");
+  std::ofstream logfile ("filtered_matrix/output");
   logfile.precision (2);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

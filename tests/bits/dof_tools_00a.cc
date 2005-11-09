@@ -19,7 +19,7 @@
 //   DoFTools::
 //   count_dofs_per_component (...);
 
-std::string output_file_name = "dof_tools_00a.output";
+std::string output_file_name = "dof_tools_00a/output";
 
 
 template <int dim>

@@ -31,7 +31,7 @@
 
 int main ()
 {
-  std::ofstream logfile("gradients.output");
+  std::ofstream logfile("gradients/output");
 				   // limit output a bit
   logfile.precision (3);
   deallog.attach(logfile);

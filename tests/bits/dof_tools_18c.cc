@@ -20,7 +20,7 @@
 //   make_flux_sparsity_pattern (const DoFHandler<dim> &,
 //	                         BlockSparsityPattern  &);
 
-std::string output_file_name = "dof_tools_18c.output";
+std::string output_file_name = "dof_tools_18c/output";
 
                                    // set up masks. choose X-shaped
                                    // masks with full first row and

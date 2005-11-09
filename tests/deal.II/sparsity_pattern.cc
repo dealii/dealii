@@ -225,7 +225,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("sparsity_pattern.output");
+  std::ofstream logfile ("sparsity_pattern/output");
   logfile.precision (2);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

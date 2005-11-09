@@ -20,7 +20,7 @@
 //   make_sparsity_pattern (const DoFHandler<dim> &,
 //	                    BlockSparsityPattern  &);
 
-std::string output_file_name = "dof_tools_01c.output";
+std::string output_file_name = "dof_tools_01c/output";
 
 
 template <int dim>

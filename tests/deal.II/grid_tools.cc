@@ -22,7 +22,7 @@
 #include <fstream>
 
 
-std::ofstream logfile("grid_tools.output");
+std::ofstream logfile("grid_tools/output");
 
 
 

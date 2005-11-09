@@ -123,7 +123,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("support_point_map.output");
+  std::ofstream logfile ("support_point_map/output");
   logfile.precision (2);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

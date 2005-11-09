@@ -141,7 +141,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("block_vector.output");
+  std::ofstream logfile("block_vector/output");
   logfile.setf(std::ios::fixed);
   logfile.precision(3);
   deallog.attach(logfile);

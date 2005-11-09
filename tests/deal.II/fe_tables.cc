@@ -30,7 +30,7 @@
 
 #include <base/logstream.h>
 
-std::ofstream logfile("fe_tables.output");
+std::ofstream logfile("fe_tables/output");
 
 #define TEST_ELEMENT(e) { deallog.push(#e); e el;\
   print_fe_statistics(el); deallog.pop(); deallog << std::endl; }

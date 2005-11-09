@@ -663,7 +663,7 @@ void plot_FE_System_shape_functions()
 int
 main()
 {
-  std::ofstream logfile ("shapes.output");
+  std::ofstream logfile ("shapes/output");
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);

@@ -19,7 +19,7 @@
 //   FETools::back_interpolate(6)
 
 
-std::string output_file_name = "fe_tools_06.output";
+std::string output_file_name = "fe_tools_06/output";
 
 
 template <int dim>

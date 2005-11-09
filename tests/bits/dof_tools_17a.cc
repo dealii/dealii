@@ -21,7 +21,7 @@
 //	                         SparsityPattern       &);
 
 
-std::string output_file_name = "dof_tools_17a.output";
+std::string output_file_name = "dof_tools_17a/output";
 
 
 template <int dim>

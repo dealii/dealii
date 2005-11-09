@@ -102,7 +102,7 @@ check ()
 int
 main()
 {
-  std::ofstream logfile ("nedelec_3.output");
+  std::ofstream logfile ("nedelec_3/output");
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

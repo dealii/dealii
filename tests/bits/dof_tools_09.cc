@@ -20,7 +20,7 @@
 //                                         std::vector<unsigned int> &)
 
 
-std::string output_file_name = "dof_tools_09.output";
+std::string output_file_name = "dof_tools_09/output";
 
 
 template <int dim>

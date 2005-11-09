@@ -19,7 +19,7 @@
 //   FETools::interpolation_difference(6)
 
 
-std::string output_file_name = "fe_tools_07.output";
+std::string output_file_name = "fe_tools_07/output";
 
 
 template <int dim>

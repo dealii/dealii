@@ -33,7 +33,7 @@ void f(const std::vector<int>& v)
 
 int main()
 {
-  std::ofstream logfile("slice_vector.output");
+  std::ofstream logfile("slice_vector/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

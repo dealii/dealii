@@ -152,7 +152,7 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
 
 int main()
 {
-  std::ofstream logfile("vector-vector.output");
+  std::ofstream logfile("vector-vector/output");
   logfile.setf(std::ios::fixed);
   logfile.precision(2);
   deallog.attach(logfile);

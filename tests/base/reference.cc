@@ -38,7 +38,7 @@ class Test : public Subscriptor
 
 int main()
 {
-  std::ofstream logfile("reference.output");
+  std::ofstream logfile("reference/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

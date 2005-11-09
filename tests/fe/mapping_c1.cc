@@ -22,7 +22,7 @@
 
 int main ()
 {
-  std::ofstream logfile ("mapping_c1.output");
+  std::ofstream logfile ("mapping_c1/output");
   logfile.setf(std::ios::fixed);  
   logfile.precision (PRECISION);
   deallog.attach(logfile);

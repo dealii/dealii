@@ -25,18 +25,18 @@ ifeq ($(findstring gcc,$(GXX_VERSION)),gcc)
 flags += -Wno-missing-noreturn
 endif
 
-%.g.$(OBJEXT) : %.cc Makefile
+%/obj.g.$(OBJEXT) : %.cc Makefile
 	@echo =====debug========= $<
 	@$(CXX) $(flags) -c $< -o $@
 
-%.$(OBJEXT) : %.cc Makefile
+%/obj.$(OBJEXT) : %.cc Makefile
 	@echo =====optimized===== $<
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 ######################################################################
 # Don't put $(libraries) into this line since it is already in $^
 ######################################################################
-%.exe :
+%/exe :
 	@echo =====linking======= $@
 	@$(CXX) $(LDFLAGS) -o $@ ../abort.o $^ $(LIBS)
 
@@ -59,7 +59,7 @@ endif
 # date and does not need to be regenerated
 ############################################################
 
-%.output : %.exe
+%/output : %/exe
 	@echo =====Running======= $<
 	@ulimit -t 2400 ; ./$< ; \
 	  if test ! $$? = 0 ; then rm $@ ; false ; fi
@@ -84,13 +84,13 @@ endif
 ############################################################
 
 
-%.OK : %.output
+%/OK : %/output
 	@echo '=====Checking======' $<
 	@perl -pi $(normalize)  $<
 	@if test "x$(verbose)" = "xon" ; then \
-		cmd="diff -w $< ../compare/$(WORKDIR)/$<" ; \
+		cmd="diff -w $< ../compare/$(WORKDIR)/$(<:%/output=%).output" ; \
 	 else \
-		cmd="diff -w $< ../compare/$(WORKDIR)/$< > /dev/null" ; \
+		cmd="diff -w $< ../compare/$(WORKDIR)/$(<:%/output=%).output > /dev/null" ; \
 	 fi ; \
 	 if eval $$cmd ; then \
 		echo '=====OK============' $@ ; \
@@ -116,7 +116,7 @@ endif
 ############################################################
 report:
 	@for test in $(sort $(tests)) ; do \
-		if (($(MAKE) $$test.OK stop_on_error=on 2>&1) > /dev/null); then \
+		if (($(MAKE) $$test/OK stop_on_error=on 2>&1) > /dev/null); then \
 			echo `date -u +"%Y-%m-%d %H:%M"` + $(WORKDIR)/$$test ; \
 		else \
 			echo `date -u +"%Y-%m-%d %H:%M"` - $(WORKDIR)/$$test ; \
@@ -135,11 +135,11 @@ report+mail:
 # executed by make: for each entry in the list $(tests)
 # perform a check.
 ############################################################
-run-tests: $(tests:%=%.OK)
+run-tests: $(tests:%=%/OK)
 
-output: $(tests:%=%.output)
+output: $(tests:%=%/output)
 
-build: $(tests:%=%.exe)
+build: $(tests:%=%/exe)
 
 ############################################################
 # Link and copy files in ./results/* to generate checked
@@ -158,11 +158,11 @@ new-platform: output run-tests
 ############################################################
 
 clean:
-	-rm -f Makefile.depend Makefile.tests *.$(OBJEXT) \
-               *.g.$(OBJEXT) *.output *~
+	-rm -f Makefile.depend Makefile.tests */obj.$(OBJEXT) \
+               */obj.g.$(OBJEXT) */output *~
 
 distclean: clean
-	-rm -f *.exe *.testcase *.inp *.gpl *.eps *.gnuplot
+	-rm -f */exe *.testcase *.inp *.gpl *.eps *.gnuplot
 
 
 show-tests:
@@ -175,13 +175,15 @@ show-tests:
 Makefile.depend: $(shell echo *.cc)
 	@echo =====Dependencies== $@
 	@$D/common/scripts/make_dependencies $(INCLUDE) $^ > $@
+	@$(PERL) -pi -e 's#\.((g\.)?$(OBJEXT):)#/obj.\1#g;' $@
 
-Makefile.tests: $(shell echo *.cc) Makefile
+Makefile.tests: $(shell echo *.cc)
 	@echo =====Targets======= $@
 	@for i in $(tests) ; do \
-		echo "$$i.exe : $$i.g.\$$(OBJEXT) \$$(libraries)"; \
+		echo "$$i/exe : $$i/obj.g.\$$(OBJEXT) \$$(libraries)"; \
 	 done \
 		> $@
 
 
 .PHONY: report show-tests clean distclean
+

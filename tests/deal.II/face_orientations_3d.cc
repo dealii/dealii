@@ -30,7 +30,7 @@
 #include <fstream>
 
 
-std::ofstream logfile("face_orientations_3d.output");
+std::ofstream logfile("face_orientations_3d/output");
 
 
 void test (const char *filename)

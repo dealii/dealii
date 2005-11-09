@@ -28,7 +28,7 @@
 
 int main()
 {
-    std::ofstream logfile("eigen.output");
+    std::ofstream logfile("eigen/output");
 //  logfile.setf(std::ios::fixed);
   logfile.precision(4);
   deallog.attach(logfile);

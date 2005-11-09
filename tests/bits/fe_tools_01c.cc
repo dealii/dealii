@@ -87,7 +87,7 @@ main()
 {
   try
     {
-      std::ofstream logfile("fe_tools_01c.output");
+      std::ofstream logfile("fe_tools_01c/output");
       logfile.precision (2);
       deallog.attach(logfile);
       deallog.depth_console(0);

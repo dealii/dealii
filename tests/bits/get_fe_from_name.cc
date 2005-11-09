@@ -47,7 +47,7 @@ public:
 
 int main () 
 {  
-  std::ofstream logfile("get_fe_from_name.output");
+  std::ofstream logfile("get_fe_from_name/output");
   deallog.attach(logfile);
   
   deallog.depth_console(0);

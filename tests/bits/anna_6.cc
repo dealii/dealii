@@ -285,7 +285,7 @@ int main ()
 {
   try
     {
-      std::ofstream logfile("anna_6.output");
+      std::ofstream logfile("anna_6/output");
       logfile.precision (2);      
       deallog.attach(logfile);
       deallog.depth_console(0);

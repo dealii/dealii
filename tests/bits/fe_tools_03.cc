@@ -19,7 +19,7 @@
 //   FETools::get_back_interpolation_matrix
 
 
-std::string output_file_name = "fe_tools_03.output";
+std::string output_file_name = "fe_tools_03/output";
 
 
 template <int dim>

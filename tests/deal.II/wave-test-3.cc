@@ -39,7 +39,7 @@
 
 using namespace std;
 
-std::ofstream logfile("wave-test-3.output");
+std::ofstream logfile("wave-test-3/output");
 
 class UserMatrix;
 class SweepInfo;

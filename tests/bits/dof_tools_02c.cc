@@ -21,7 +21,7 @@
 //                          std::vector<std::vector<bool> > &,
 //	                    BlockSparsityPattern  &);
 
-std::string output_file_name = "dof_tools_02c.output";
+std::string output_file_name = "dof_tools_02c/output";
 
 
 template <int dim>

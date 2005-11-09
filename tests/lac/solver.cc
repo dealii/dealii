@@ -68,7 +68,7 @@ check_Tsolve(SOLVER& solver, const MATRIX& A,
 
 int main()
 {
-  std::ofstream logfile("solver.output");
+  std::ofstream logfile("solver/output");
 //  logfile.setf(std::ios::fixed);
   logfile.precision(4);
   deallog.attach(logfile);

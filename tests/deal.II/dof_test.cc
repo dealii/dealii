@@ -36,7 +36,7 @@
 // 2: refinement of the circle at the boundary
 // 2: refinement of a wiggled area at the boundary
 
-std::ofstream logfile("dof_test.output");
+std::ofstream logfile("dof_test/output");
 
 
 template <int dim>

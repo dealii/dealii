@@ -18,7 +18,7 @@
 //   DoFTools::extract_subdomain_dofs
 
 
-std::string output_file_name = "dof_tools_06.output";
+std::string output_file_name = "dof_tools_06/output";
 
 
 template <int dim>

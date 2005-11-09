@@ -352,7 +352,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::run ()
 
 int main () 
 {
-  std::ofstream logfile("block_matrices.output");
+  std::ofstream logfile("block_matrices/output");
   logfile.precision(2);
   
   deallog.attach(logfile);

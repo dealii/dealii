@@ -20,7 +20,7 @@
 //   make_flux_sparsity_pattern (const DoFHandler<dim> &,
 //	                         CompressedBlockSparsityPattern  &);
 
-std::string output_file_name = "dof_tools_17d.output";
+std::string output_file_name = "dof_tools_17d/output";
 
 
 template <int dim>

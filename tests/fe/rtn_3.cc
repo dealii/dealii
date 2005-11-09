@@ -46,7 +46,7 @@ void test ()
 int
 main()
 {
-  std::ofstream logfile ("rtn_3.output");
+  std::ofstream logfile ("rtn_3/output");
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

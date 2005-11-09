@@ -13,7 +13,7 @@
 #include <fstream>
 
 
-std::ofstream logfile ("numbering.output");
+std::ofstream logfile ("numbering/output");
 
 
 template <int dim>

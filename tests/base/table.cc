@@ -34,7 +34,7 @@ const int entries[] = { 11,12,13,21,
 int
 main ()
 {
-  std::ofstream logfile("table.output");
+  std::ofstream logfile("table/output");
   logfile.setf(std::ios::fixed);
   logfile.precision(3);
   deallog.attach(logfile);

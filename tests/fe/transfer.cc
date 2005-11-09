@@ -76,7 +76,7 @@ print_matrix(Triangulation<dim>& tr,
 int
 main()
 {
-  std::ofstream logfile("transfer.output");
+  std::ofstream logfile("transfer/output");
   deallog.attach(logfile);
   logfile.precision(3);
   deallog.depth_console(0);

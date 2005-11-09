@@ -26,7 +26,7 @@
 
 void test () 
 {
-  std::ofstream logfile("block_matrices.output");
+  std::ofstream logfile("block_matrices/output");
   logfile.setf(std::ios::fixed);
   logfile.precision(2);
   deallog.attach(logfile);

@@ -168,7 +168,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("dof_renumbering.output");
+  std::ofstream logfile ("dof_renumbering/output");
   logfile.precision (2);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

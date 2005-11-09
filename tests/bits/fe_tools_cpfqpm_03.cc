@@ -28,7 +28,7 @@
 // needs to work
 
 
-std::string output_file_name = "fe_tools_cpfqpm_03.output";
+std::string output_file_name = "fe_tools_cpfqpm_03/output";
 
 
 template <int dim>

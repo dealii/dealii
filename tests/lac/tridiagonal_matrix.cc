@@ -62,7 +62,7 @@ check_vmult()
 
 int main()
 {
-  std::ofstream logfile("tridiagonal_matrix.output");
+  std::ofstream logfile("tridiagonal_matrix/output");
   logfile.setf(std::ios::fixed);
   logfile.precision(0);
   deallog.attach(logfile);

@@ -141,7 +141,7 @@ check_dimensions (const std::vector<Polynomial<double> >& p)
 
 int main()
 {
-  std::ofstream logfile("anisotropic_1.output");
+  std::ofstream logfile("anisotropic_1/output");
   logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);

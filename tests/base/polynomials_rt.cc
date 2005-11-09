@@ -51,7 +51,7 @@ void plot(const PolynomialsRaviartThomas<dim>& poly)
 
 int main()
 {
-  std::ofstream logfile("polynomials_rt.output");
+  std::ofstream logfile("polynomials_rt/output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

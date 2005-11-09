@@ -20,7 +20,7 @@
 
 int main ()
 {
-  std::ofstream logfile("symmetric_tensor_03.output");
+  std::ofstream logfile("symmetric_tensor_03/output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

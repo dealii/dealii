@@ -18,7 +18,7 @@
 //   DoFTools::extract_dofs
 
 
-std::string output_file_name = "dof_tools_12.output";
+std::string output_file_name = "dof_tools_12/output";
 
 
 template <int dim>

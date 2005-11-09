@@ -124,7 +124,7 @@ void check<FE_RaviartThomasNodal> (const unsigned int min_degree,
 int
 main()
 {
-  std::ofstream logfile ("check_derivatives.output");
+  std::ofstream logfile ("check_derivatives/output");
   logfile.precision (2);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

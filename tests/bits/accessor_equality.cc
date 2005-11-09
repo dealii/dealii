@@ -96,7 +96,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("accessor_equality.output");
+  std::ofstream logfile("accessor_equality/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 

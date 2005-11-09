@@ -20,7 +20,7 @@
 //   make_sparsity_pattern (const DoFHandler<dim>     &,
 //	                    CompressedSparsityPattern &);
 
-std::string output_file_name = "dof_tools_01b.output";
+std::string output_file_name = "dof_tools_01b/output";
 
 
 template <int dim>

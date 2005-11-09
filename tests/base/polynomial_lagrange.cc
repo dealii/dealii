@@ -76,7 +76,7 @@ check_lge (unsigned int n)
 
 int main()
 {
-  std::ofstream logfile("polynomial_lagrange.output");
+  std::ofstream logfile("polynomial_lagrange/output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

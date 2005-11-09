@@ -33,7 +33,7 @@
 #include <cstdlib>
 
 
-std::ofstream logfile("constraints.output");
+std::ofstream logfile("constraints/output");
 
 
 void make_tria (Triangulation<3> &tria, int step) 

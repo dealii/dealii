@@ -28,7 +28,7 @@ using namespace Polynomials;
 
 int main ()
 {
-  std::ofstream logfile("hierarchical.output");
+  std::ofstream logfile("hierarchical/output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

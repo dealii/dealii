@@ -21,7 +21,7 @@
 //				           std::map<Point<dim>, unsigned int, Comp> &)
 
 
-std::string output_file_name = "dof_tools_11.output";
+std::string output_file_name = "dof_tools_11/output";
 
 struct Comp
 {

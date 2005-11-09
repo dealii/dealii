@@ -21,7 +21,7 @@
 
 int main () 
 {
-  std::ofstream logfile("matrix_out.output");
+  std::ofstream logfile("matrix_out/output");
   logfile.setf(std::ios::fixed);
   logfile.precision(2);
   deallog.attach(logfile);

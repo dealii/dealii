@@ -31,7 +31,7 @@
 #include <fstream>
 
 
-std::ofstream logfile("grid_in_3d.output");
+std::ofstream logfile("grid_in_3d/output");
 
 
 void test (const char *filename)

@@ -42,7 +42,7 @@ int main ()
   GridOut grid_out;
   if (false)
     {
-      std::ofstream eps_stream1("grid_untransformed.output");
+      std::ofstream eps_stream1("grid_untransformed/output");
       grid_out.write_eps(tria, eps_stream1, &mapping);
     }
   
@@ -111,7 +111,7 @@ int main ()
   GridGenerator::laplace_transformation (tria, new_points);
   HyperBallBoundary<dim> inner_ball(n_center, n_radius);
   tria.set_boundary(1, inner_ball);
-  std::ofstream eps_stream2("grid_transform.output");
+  std::ofstream eps_stream2("grid_transform/output");
   grid_out.write_eps(tria, eps_stream2, &mapping);
 
   tria.clear();

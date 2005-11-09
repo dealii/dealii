@@ -20,7 +20,7 @@
 #include <numerics/data_out.h>
 
 
-std::string output_file_name = "data_out_02.output";
+std::string output_file_name = "data_out_02/output";
 
 
 template <int dim>

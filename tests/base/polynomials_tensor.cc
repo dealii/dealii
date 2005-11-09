@@ -90,7 +90,7 @@ void check_rt ()
 
 int main()
 {
-  std::ofstream logfile("polynomials_tensor.output");
+  std::ofstream logfile("polynomials_tensor/output");
   logfile.precision(0);
   deallog.attach(logfile);
   deallog.depth_console(0);

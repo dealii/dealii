@@ -237,7 +237,7 @@ void test ()
 int
 main()
 {
-  std::ofstream logfile ("up_and_down.output");
+  std::ofstream logfile ("up_and_down/output");
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

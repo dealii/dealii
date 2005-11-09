@@ -26,7 +26,7 @@
 
 
 
-std::ofstream logfile("intergrid_constraints.output");
+std::ofstream logfile("intergrid_constraints/output");
 
 
 template <int dim>

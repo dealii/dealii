@@ -185,7 +185,7 @@ void test(const Triangulation<dim> &tria,
 
 int main () 
 {
-  std::ofstream logfile("fe_tools_test.output");
+  std::ofstream logfile("fe_tools_test/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

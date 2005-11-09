@@ -74,7 +74,7 @@ check(const FiniteElement<dim> &fe1,
 int
 main()
 {
-  std::ofstream logfile ("system_1.output");
+  std::ofstream logfile ("system_1/output");
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

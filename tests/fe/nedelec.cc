@@ -145,7 +145,7 @@ plot_shape_functions()
 int
 main()
 {
-  std::ofstream logfile ("nedelec.output");
+  std::ofstream logfile ("nedelec/output");
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

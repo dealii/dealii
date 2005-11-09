@@ -58,7 +58,7 @@ test(const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile ("q_2.output");
+  std::ofstream logfile ("q_2/output");
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

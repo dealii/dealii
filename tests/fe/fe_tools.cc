@@ -180,7 +180,7 @@ void test_renumbering()
 
 int main()
 {
-  std::ofstream logfile("fe_tools.output");
+  std::ofstream logfile("fe_tools/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

@@ -89,7 +89,7 @@ void show_values()
 int
 main()
 {
-  std::ofstream logfile ("mapping_q1_eulerian.output");
+  std::ofstream logfile ("mapping_q1_eulerian/output");
   logfile.precision (2);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

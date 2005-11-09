@@ -559,7 +559,7 @@ void mapping_test()
 
 int main()
 {
-  std::ofstream logfile ("mapping.output");
+  std::ofstream logfile ("mapping/output");
   logfile.precision (PRECISION);
   deallog.attach(logfile);
   deallog.depth_console(0);

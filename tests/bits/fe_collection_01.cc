@@ -44,7 +44,7 @@ check ()
 
 int main()
 {
-  std::ofstream logfile("fe_collection_01.output");
+  std::ofstream logfile("fe_collection_01/output");
   logfile.precision(4);
   deallog.attach(logfile);
   deallog.depth_console(0);

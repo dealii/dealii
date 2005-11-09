@@ -55,7 +55,7 @@ void create_triangulation(const unsigned int case_no,
 
 int main ()
 {
-  std::ofstream logfile ("normals_at_vertices.output");
+  std::ofstream logfile ("normals_at_vertices/output");
   logfile.precision (3);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

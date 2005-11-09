@@ -17,7 +17,7 @@
 #include <numerics/data_out_stack.h>
 
 
-std::string output_file_name = "data_out_stack_01.output";
+std::string output_file_name = "data_out_stack_01/output";
 
 
 template <int dim>

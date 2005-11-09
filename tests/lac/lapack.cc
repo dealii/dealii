@@ -47,7 +47,7 @@ const double rect[] =
 
 int main()
 {
-  std::ofstream logfile("lapack.output");
+  std::ofstream logfile("lapack/output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

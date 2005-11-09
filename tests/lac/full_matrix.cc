@@ -42,7 +42,7 @@ void random_matrix(FullMatrix<double>& A)
 int
 main ()
 {
-  std::ofstream logfile("full_matrix.output");
+  std::ofstream logfile("full_matrix/output");
   logfile.setf(std::ios::fixed);
   logfile.precision(3);
   deallog.attach(logfile);

@@ -196,7 +196,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("error_estimator_01.output");
+  std::ofstream logfile ("error_estimator_01/output");
   logfile.precision (2);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

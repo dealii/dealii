@@ -23,7 +23,7 @@
 #include <fstream>
 
 
-std::ofstream logfile("compressed_sparsity_pattern_06.output");
+std::ofstream logfile("compressed_sparsity_pattern_06/output");
 
 void test ()
 {

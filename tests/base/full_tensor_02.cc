@@ -21,7 +21,7 @@
 
 int main ()
 {
-  std::ofstream logfile("full_tensor_02.output");
+  std::ofstream logfile("full_tensor_02/output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

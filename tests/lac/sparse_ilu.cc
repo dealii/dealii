@@ -31,7 +31,7 @@
 
 int main()
 {
-  std::ofstream logfile("sparse_ilu.output");
+  std::ofstream logfile("sparse_ilu/output");
   logfile.setf(std::ios::fixed);
   logfile.precision(3);
   deallog.attach(logfile);

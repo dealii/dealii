@@ -54,7 +54,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("symmetric_tensor_11.output");
+  std::ofstream logfile("symmetric_tensor_11/output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

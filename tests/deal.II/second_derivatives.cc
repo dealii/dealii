@@ -31,7 +31,7 @@
 
 int main ()
 {
-  std::ofstream logfile("second_derivatives.output");
+  std::ofstream logfile("second_derivatives/output");
   logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);

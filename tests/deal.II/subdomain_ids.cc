@@ -30,7 +30,7 @@
 #include <cmath>
 
 
-std::ofstream logfile("subdomain_ids.output");
+std::ofstream logfile("subdomain_ids/output");
 
 
 DeclException2 (ExcNumberMismatch,

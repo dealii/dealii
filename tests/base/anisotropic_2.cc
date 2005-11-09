@@ -148,7 +148,7 @@ void check ()
 
 int main()
 {
-  std::ofstream logfile("anisotropic_2.output");
+  std::ofstream logfile("anisotropic_2/output");
   logfile.precision(2);
   deallog.attach(logfile);
   deallog.depth_console(0);

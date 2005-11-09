@@ -20,7 +20,7 @@
 
 
 
-std::string output_file_name = "dof_tools_14.output";
+std::string output_file_name = "dof_tools_14/output";
 
 
 template <int dim>
