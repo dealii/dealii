@@ -1830,7 +1830,7 @@ class Triangulation : public Subscriptor
 				      * only. This function takes the
 				      * cell data in the ordering as
 				      * requested by deal.II versions
-				      * up to 5.1, converts it to the
+				      * up to 5.2, converts it to the
 				      * new (lexicographic) ordering
 				      * and calls
 				      * create_triangulation().
