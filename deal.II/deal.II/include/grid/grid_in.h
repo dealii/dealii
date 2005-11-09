@@ -75,9 +75,33 @@ class SubCellData;
  * <li> @p UCD (unstructured cell data) format: this format is used
  * for grid input as well as data output. If there are data vectors in
  * the input file, they are ignored, as we are only interested in the
- * grid in this class. The exact description of the format can be
- * found in the AVS Explorer manual (see http://www.avs.com).
- * The @p UCD format can be read by the read_ucd() function.
+ * grid in this class. The UCD format requires the vertices to be
+ * in following ordering: in 2d
+ * @verbatim
+ *      3-----2
+ *      |     |
+ *      |     |
+ *      |     |
+ *      0-----1
+ * @endverbatim
+ * and in 3d
+ * @verbatim
+ *         7-------6        7-------6
+ *        /|       |       /       /|
+ *       / |       |      /       / |
+ *      /  |       |     /       /  |
+ *     3   |       |    3-------2   |
+ *     |   4-------5    |       |   5
+ *     |  /       /     |       |  /
+ *     | /       /      |       | /
+ *     |/       /       |       |/
+ *     0-------1        0-------1
+ * @endverbatim
+ * Note, that this ordering is different from the deal.II numbering
+ * scheme, see the Triangulation class.  The exact description of the
+ * UCD format can be found in the AVS Explorer manual (see
+ * http://www.avs.com).  The @p UCD format can be read by the
+ * read_ucd() function.
  *
  * <li> <tt>DB mesh</tt> format: this format is used by the @p BAMG mesh
  * generator (see
