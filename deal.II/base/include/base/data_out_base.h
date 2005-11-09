@@ -96,7 +96,7 @@ class ParameterHandler;
  * divided for output; for example, <tt>n_subdivisions==1</tt> yields no subdivision
  * of the cell, <tt>n_subdivisions==2</tt> will produce a grid of 3 times 3 points
  * in two spatial dimensions and 3 times 3 times 3 points in three dimensions,
- * <tt>n_subdivisions==2</tt> will yield 4 times 4 (times 4) points, etc. The actual
+ * <tt>n_subdivisions==3</tt> will yield 4 times 4 (times 4) points, etc. The actual
  * location of these points on the patch will be computed by a multilinear
  * transformation from the vertices given for this patch.
  *
