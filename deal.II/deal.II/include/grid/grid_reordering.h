@@ -28,6 +28,54 @@
  * grids. This class is mainly used when reading in grids from files
  * and converting them to deal.II triangulations.
  *
+ * Note: In contrast to the rest of the deal.II library this class
+ * uses the old deal.II numbering scheme, which was used up to deal.II
+ * version 5.2. That is, the vertex and face ordering in 2d is assumed
+ * to be
+ * @verbatim
+ *          2    
+ *      3--->---2
+ *      |       |
+ *     3^       ^1
+ *      |       |
+ *      0--->---1
+ *          0
+ * @endverbatim
+ * the vertices in 3d:
+ * @verbatim
+ *         7-------6
+ *        /|       |
+ *       / |       |
+ *      /  |       |
+ *     3   |       |
+ *     |   4-------5
+ *     |  /       /
+ *     | /       /
+ *     |/       /
+ *     0-------1
+ * @endverbatim
+ * and the faces in 3d:
+ * @verbatim
+ *         *-------*        *-------*
+ *        /|       |       /       /|
+ *       / |   1   |      /   4   / |
+ *      /  |       |     /       /  |
+ *     *   |       |    *-------*   |
+ *     | 5 *-------*    |       | 3 *
+ *     |  /       /     |       |  /
+ *     | /   2   /      |   0   | /
+ *     |/       /       |       |/
+ *     *-------*        *-------*
+ * @endverbatim
+ *
+ * After calling the GridReordering::reorder_cells() function the
+ * CellData is still in this old numbering scheme. Hence, for creating
+ * a Triangulation based on the resulting CellData the
+ * Triangulation::create_triangulation_compatibility() (and not the
+ * Triangulation::create_triangulation()) function must be used.  For
+ * a typical use of the reorder_cells() function see the
+ * implementation of the GridIn <tt>::read_*()</tt> functions.
+ *
  *
  * <h3>Statement of problems</h3>
  *
