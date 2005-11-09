@@ -40,7 +40,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("sparsity_pattern_iterator_01.output");
+  std::ofstream logfile("sparsity_pattern_iterator_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);

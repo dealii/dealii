@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 {
   PetscInitialize(&argc,&argv,0,0);
   {
-    std::ofstream logfile("petsc_solver_03.output");
+    std::ofstream logfile("petsc_solver_03/output");
     logfile.precision(4);
     deallog.attach(logfile);
     deallog.depth_console(0);

@@ -11,23 +11,27 @@ include ../Makefile.paths
 include $D/common/Make.global_options
 debug-mode = on
 
-libraries = $(lib-lac.g)  \
+libraries = $(lib-deal2-1d.g) \
+            $(lib-deal2-2d.g) \
+            $(lib-deal2-3d.g) \
+            $(lib-lac.g)  \
             $(lib-base.g)
-lib-1d    = $(lib-deal2-1d.g)
-lib-2d    = $(lib-deal2-2d.g)
-lib-3d    = $(lib-deal2-3d.g)
 
 default: run-tests 
 
 ############################################################
 
-transfer.exe      : transfer.g.$(OBJEXT) $(lib-2d)           $(libraries)
-cycles.exe        : cycles.g.$(OBJEXT)   $(lib-2d)           $(libraries)
+tests_x = transfer cycles
 
-tests = cycles transfer
+# from above list of regular expressions, generate the real set of
+# tests
+expand = $(shell echo $(addsuffix .cc,$(1)) \
+           | $(PERL) -pi -e 's/\.cc//g;')
+tests = $(call expand,$(tests_x))
 
 ############################################################
 
 
 include ../Makefile.rules
 include Makefile.depend
+include Makefile.tests

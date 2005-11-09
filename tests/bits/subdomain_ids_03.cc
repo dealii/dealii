@@ -33,7 +33,7 @@
 #include <cmath>
 
 
-std::ofstream logfile("subdomain_ids_03.output");
+std::ofstream logfile("subdomain_ids_03/output");
 
 
 template <int dim>

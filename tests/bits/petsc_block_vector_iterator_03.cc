@@ -320,7 +320,7 @@ void test ()
 
 int main (int argc,char **argv)
 {
-  std::ofstream logfile("petsc_block_vector_iterator_03.output");
+  std::ofstream logfile("petsc_block_vector_iterator_03/output");
   logfile.setf(std::ios::fixed);
   logfile.precision(3);
   deallog.attach(logfile);

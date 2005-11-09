@@ -223,7 +223,7 @@ void check_block(const FiniteElement<dim>& fe,
 
 int main()
 {
-  std::ofstream logfile("transfer.output");
+  std::ofstream logfile("transfer/output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

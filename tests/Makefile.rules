@@ -187,3 +187,6 @@ Makefile.tests: $(shell echo *.cc)
 
 .PHONY: report show-tests clean distclean
 
+subdirs:
+	for i in $(tests) ; do mkdir $$i ; cvs add $$i ; echo "obj.* exe OK output" > $$i/.cvsignore ; cvs add $$i/.cvsignore ; done
+

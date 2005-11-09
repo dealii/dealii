@@ -106,7 +106,7 @@ void test ()
 
 int main (int argc,char **argv) 
 {
-  std::ofstream logfile("petsc_slowness_01.output");
+  std::ofstream logfile("petsc_slowness_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
