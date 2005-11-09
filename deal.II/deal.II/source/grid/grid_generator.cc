@@ -59,27 +59,25 @@ GridGenerator::hyper_rectangle (Triangulation<dim> &tria,
 	    vertices[1] = p2;
 	    break;
       case 2:
-	    vertices[0] = p1;
-	    vertices[2] = p2;
+	    vertices[0] = vertices[1] = p1;
+	    vertices[2] = vertices[3] = p2;
 	    
 	    vertices[1](0) = p2(0);
-	    vertices[3](0) = p1(0);
-	    vertices[1](1) = p1(1);
-	    vertices[3](1) = p2(1);
+	    vertices[2](0) = p1(0);
 	    break;
       case 3:
 	    vertices[0] = vertices[1] = vertices[2] = vertices[3] = p1;
 	    vertices[4] = vertices[5] = vertices[6] = vertices[7] = p2;
 	    
 	    vertices[1](0) = p2(0);
-	    vertices[3](2) = p2(2);
-	    vertices[2](0) = p2(0);
-	    vertices[2](2) = p2(2);
-
-	    vertices[5](2) = p1(2);
-	    vertices[7](0) = p1(0);
+	    vertices[2](1) = p2(1);
+	    vertices[3](0) = p2(0);
+	    vertices[3](1) = p2(1);
+	    
 	    vertices[4](0) = p1(0);
-	    vertices[4](2) = p1(2);
+	    vertices[4](1) = p1(1);
+	    vertices[5](1) = p1(1);
+	    vertices[6](0) = p1(0);
 	    
 	    break;
       default:
@@ -92,8 +90,7 @@ GridGenerator::hyper_rectangle (Triangulation<dim> &tria,
     cells[0].vertices[i] = i;
   cells[0].material_id = 0;
 
-  SubCellData subcelldata;
-  tria.create_triangulation_compatibility (vertices, cells, subcelldata);
+  tria.create_triangulation (vertices, cells, SubCellData());
 
 				   // Assign boundary indicators
   if (colorize)
@@ -1006,13 +1003,13 @@ GridGenerator::hyper_L (Triangulation<3> &tria,
 	  Point<dim> (a,      b,b),
 	  Point<dim> ((a+b)/2,b,b)
     };
-  const int cell_vertices[7][8] = {{0, 1, 4, 3, 9, 10, 13, 12},
-				   {1, 2, 5, 4, 10, 11, 14, 13},
-				   {3, 4, 7, 6, 12, 13, 16, 15},
-				   {4, 5, 8, 7, 13, 14, 17, 16},
-				   {9, 10, 13, 12, 18, 19, 22, 21},
-				   {10, 11, 14, 13, 19, 20, 23, 22},
-				   {12, 13, 16, 15, 21, 22, 25, 24}};
+  const int cell_vertices[7][8] = {{0, 1, 9, 10, 3, 4, 12, 13},
+				   {1, 2, 10, 11, 4, 5, 13, 14},
+				   {3, 4, 12, 13, 6, 7, 15, 16},
+				   {4, 5, 13, 14, 7, 8, 16, 17},
+				   {9, 10, 18, 19, 12, 13, 21, 22},
+				   {10, 11, 19, 20, 13, 14, 22, 23},
+				   {12, 13, 21, 22, 15, 16, 24, 25}};
 
   std::vector<CellData<3> > cells (7, CellData<3>());
   
@@ -1023,11 +1020,10 @@ GridGenerator::hyper_L (Triangulation<3> &tria,
       cells[i].material_id = 0;
     };
 
-  SubCellData subcelldata;
-  tria.create_triangulation_compatibility (
+  tria.create_triangulation (
     std::vector<Point<dim> >(&vertices[0], &vertices[26]),
     cells,
-    subcelldata);       // no boundary information
+    SubCellData());       // no boundary information
 }
 
 
@@ -1068,13 +1064,13 @@ GridGenerator::hyper_ball (Triangulation<3> &tria,
 				   // one needs to draw the seven cubes to
 				   // understand what's going on here
   const unsigned int n_cells = 7;
-  const int cell_vertices[n_cells][8] = {{0, 1, 2, 3, 4, 5, 6, 7}, // center
-					 {8, 9, 1, 0, 12, 13, 5, 4}, // bottom
-					 {9, 13, 14, 10, 1, 5, 6, 2}, // right
-					 {11, 10, 14, 15, 3, 2, 6, 7}, // top
-					 {8, 0, 3, 11, 12, 4, 7, 15}, // left
-					 {8, 9, 10, 11, 0, 1, 2, 3}, // front
-					 {12, 4, 7, 15, 13, 5, 6, 14}}; // back
+  const int cell_vertices[n_cells][8] = {{0, 1, 4, 5, 3, 2, 7, 6}, // center
+					 {8, 9, 12, 13, 0, 1, 4, 5}, // bottom
+					 {9, 13, 1, 5, 10, 14, 2, 6}, // right
+					 {11, 10, 3, 2, 15, 14, 7, 6}, // top
+					 {8, 0, 12, 4, 11, 3, 15, 7}, // left
+					 {8, 9, 0, 1, 11, 10, 3, 2}, // front
+					 {12, 4, 13, 5, 15, 7, 14, 6}}; // back
   
   std::vector<CellData<3> > cells (n_cells, CellData<3>());
   
@@ -1085,13 +1081,10 @@ GridGenerator::hyper_ball (Triangulation<3> &tria,
       cells[i].material_id = 0;
     };
 
-  GridReordering<3>::reorder_cells (cells);
-
-  SubCellData subcelldata;
-  tria.create_triangulation_compatibility (
+  tria.create_triangulation (
     std::vector<Point<3> >(&vertices[0], &vertices[n_vertices]),
     cells,
-    subcelldata);       // no boundary information
+    SubCellData());       // no boundary information
 }
 
 
@@ -1140,11 +1133,11 @@ GridGenerator::cylinder (Triangulation<3> &tria,
     }
   
   int cell_vertices[10][8] = {
-	{0,1,3,2,8,9,11,10},
-	{0,2,4,6,8,10,12,14},
-	{2,3,5,4,10,11,13,12},
-	{1,7,5,3,9,15,13,11},
-	{6,4,5,7,14,12,13,15}
+	{0, 1, 8, 9, 2, 3, 10, 11},
+	{0, 2, 8, 10, 6, 4, 14, 12},
+	{2, 3, 10, 11, 4, 5, 12, 13},
+	{1, 7, 9, 15, 3, 5, 11, 13},
+	{6, 4, 14, 12, 7, 5, 15, 13}
   };
   for (unsigned int i=0;i<5;++i)
     for (unsigned int j=0;j<8;++j)
@@ -1158,14 +1151,11 @@ GridGenerator::cylinder (Triangulation<3> &tria,
 	cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     };
-  
-  GridReordering<3>::reorder_cells (cells);
 
-  SubCellData subcelldata;
-  tria.create_triangulation_compatibility (
+  tria.create_triangulation (
     std::vector<Point<3> >(&vertices[0], &vertices[24]),
     cells,
-    subcelldata);       // no boundary information
+    SubCellData());       // no boundary information
 
   Triangulation<3>::cell_iterator cell = tria.begin();
   Triangulation<3>::cell_iterator end = tria.end();
