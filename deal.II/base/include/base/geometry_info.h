@@ -158,7 +158,7 @@ class GeometryInfoBase
 				      * vector of a face of the
 				      * reference cell. In
 				      * <tt>dim</tt> dimension these
-				      * are the <tt>2*dim<tt> first
+				      * are the <tt>2*dim</tt> first
 				      * entries of
 				      * <tt>{-1,1,-1,1,-1,1,-1,1}</tt>.
 				      *
@@ -186,7 +186,6 @@ class GeometryInfoBase
 /**
  * This template specifies the interface to all topological structure
  * of the mesh cells.
- * @ref Instantiations: few (dim = 1,2,3,4 and a specialization for dim=0)
  *
  * @ingroup grid
  * @ref Instantiations few (dim = 1,2,3,4 and a specialization for dim=0)

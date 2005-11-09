@@ -42,7 +42,7 @@
  *
  * <h3>Generating the actual flags</h3>
  *
- * When given a set of UpdateFlags @pflags, the FEValues object must
+ * When given a set of UpdateFlags @p flags, the FEValues object must
  * determine, which values will have to be computed once only for the
  * reference cell and which values will have to be updated for each
  * cell. Here, it is important to note that in many cases, the
