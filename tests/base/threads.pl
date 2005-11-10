@@ -191,7 +191,7 @@ print "};\n";
 
 
 print "int main () {\n";
-print "  std::ofstream logfile(\"threads.output\");\n";
+print "  std::ofstream logfile(\"threads/output\");\n";
 print "  deallog.attach(logfile);\n";
 print "  deallog.depth_console(0);\n";
 
