@@ -14,6 +14,10 @@ WORKDIR = $(notdir $(shell pwd))
 
 verbose = off
 
+
+PLATFORM = $(TARGET)+$(GXX-VERSION:intel_%=%)
+PLATFORM-HIERARCHY = $(shell $(PERL) ../hierarchy.pl $(PLATFORM))
+
 ############################################################
 # First how to create executables, including all necessary
 # flags:
@@ -72,7 +76,7 @@ endif
 # files. In default mode, do not show diffs as they are 
 # usually overly verbose. Only if user calls `make' with
 # flag `verbose=on' show the diffs. Also note that we
-# usually let the call to `make# continue even if we
+# usually let the call to `make' continue even if we
 # find a difference, since the output is clearly marked
 # as a failing test and we normally want to see the results
 # of all tests at once, including those that come after
@@ -81,30 +85,45 @@ endif
 # if, however, the flag `stop_on_error=on' was given, the
 # check command fails whenever teh output differs from the
 # precomputed file.
+#
+# as to finding which output file to compare with: we simply
+# walk the list of files created by the ./hierarchy.pl file
+# and take the first one.
 ############################################################
 
 
 %/OK : %/output
 	@echo '=====Checking======' $<
-	@perl -pi $(normalize)  $<
-	@if test "x$(verbose)" = "xon" ; then \
-		cmd="diff -w $< ../compare/$(WORKDIR)/$(<:%/output=%).output" ; \
-	 else \
-		cmd="diff -w $< ../compare/$(WORKDIR)/$(<:%/output=%).output > /dev/null" ; \
-	 fi ; \
-	 if eval $$cmd ; then \
-		echo '=====OK============' $@ ; \
-		touch $@ ; \
-	 else \
+	@$(PERL) -pi $(normalize)  $<
+	@for i in $(PLATFORM-HIERARCHY) ; do \
+	    testname=$(<:%/output=%) ; \
+	    if test -f $$testname/cmp/$$i ; then \
+		cmpfile_found=yes ; \
 		if test "x$(verbose)" = "xon" ; then \
-			echo '+++++Error+++++++++' $@ ; \
-		else \
-			echo '+++++Error+++++++++ $@. Use make verbose=on for the diffs' ; \
-		fi ; \
-		if test "x$(stop_on_error)" = "xon" ; then \
-			false ; \
-		fi ; \
-	 fi
+			cmd="diff -w $< $$testname/cmp/$$i" ; \
+		 else \
+			cmd="diff -w $< $$testname/cmp/$$i > /dev/null" ; \
+		 fi ; \
+		 if eval $$cmd ; then \
+			echo '=====OK============' $@ ; \
+			touch $@ ; \
+		 else \
+			if test "x$(verbose)" = "xon" ; then \
+				echo '+++++Error+++++++++' $@ ; \
+			else \
+				echo '+++++Error+++++++++ $@. Use make verbose=on for the diffs' ; \
+			fi ; \
+			if test "x$(stop_on_error)" = "xon" ; then \
+				false ; \
+			fi ; \
+		 fi ; \
+		 break ; \
+	    fi ; \
+	  done && \
+	  if test "x$$cmpfile_found" != "xyes" ; then \
+		echo "*** No suitable file in $$testname/cmp found! ***" ; \
+		false ; \
+	  fi
 
 
 ############################################################
@@ -188,5 +207,18 @@ Makefile.tests: $(shell echo *.cc)
 .PHONY: report show-tests clean distclean
 
 subdirs:
-	for i in $(tests) ; do mkdir $$i ; cvs add $$i ; echo "obj.* exe OK output" > $$i/.cvsignore ; cvs add $$i/.cvsignore ; done
+	for i in $(tests) ; do \
+	  mkdir $$i/cmp ; \
+	  cp ../results/i686-pc-linux-gnu+gcc3.2/bits/$$i.output $$i/cmp/generic ; \
+	  cp ../results/i686-pc-linux-gnu+gcc3.4/bits/$$i.output $$i/cmp/i686-pc-linux-gnu+gcc3.4 ; \
+	  cp ../results/i686-pc-linux-gnu+gcc4.0/bits/$$i.output $$i/cmp/i686-pc-linux-gnu+gcc4.0 ; \
+	  cp ../results/i686-pc-linux-gnu+gcc4.1/bits/$$i.output $$i/cmp/i686-pc-linux-gnu+gcc4.1 ; \
+	  cp ../results/i686-pc-linux-gnu+icc7.1/bits/$$i.output $$i/cmp/i686-pc-linux-gnu+icc7.1 ; \
+          cp ../results/mips-sgi-irix6.5+MIPSpro7.4/bits/$$i.output $$i/cmp/mips-sgi-irix6.5+MIPSpro7.4 ; \
+          cp ../results/x86_64-unknown-linux-gnu+gcc3.3/bits/$$i.output $$i/cmp/x86_64-unknown-linux-gnu+gcc3.3 ; \
+          cd $$i/cmp ; \
+            for j in [imx]* ; do \
+		if diff -q $$j generic ; then rm $$j ; fi ; done ; \
+          cd ../.. ; \
+	done
 

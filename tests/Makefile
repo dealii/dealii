@@ -2,33 +2,33 @@
 # Makefile,v 1.14 2002/09/19 13:53:47 wolf Exp
 # Common Makefile for all test directories
 
-all: compare base lac fe deal.II multigrid bits
+all: base lac fe deal.II multigrid bits
 
-base: compare abort.o
+base: abort.o
 	cd base ; $(MAKE)
 
-lac: compare abort.o
+lac: abort.o
 	cd lac ; $(MAKE)
 
-fe: compare abort.o
+fe: abort.o
 	cd fe ; $(MAKE)
 
-bits: compare abort.o
+bits: abort.o
 	cd bits ; $(MAKE)
 
-deal.II: compare abort.o
+deal.II: abort.o
 	cd deal.II ; $(MAKE)
 
-multigrid: compare abort.o
+multigrid: abort.o
 	cd multigrid ; $(MAKE)
 
-report: compare abort.o
+report: abort.o
 	@for i in base lac fe deal.II multigrid bits all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
 
-report+mail: compare abort.o
+report+mail: abort.o
 	@for i in base lac fe deal.II multigrid bits all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report+mail ; cd .. ; \
@@ -83,23 +83,6 @@ output-multigrid: abort.o
 
 
 
-
-# generate a link to system specific test program output. we create
-# the name out of the system and compiler. unfortunately, for intel
-# compilers, the variable $(GXX-VERSION) reads intel_icc7.1 (with
-# proper version number), while for some historic reason we have named
-# the directories in the results/ tree with just icc7.1 (i.e. without
-# the preceding intel_). Thus, strip this part of the compiler name
-#
-# We declare this target as PHONY since we want it to re-run every time we
-# start the testsuite. Reason being that this way we can make sure that all
-# the proper links have been set for this run, even if some new tests have
-# been added.
-compare:
-	cd results; $(MAKE)
-	rm -f compare
-	ln -s results/$(TARGET)+$(GXX-VERSION:intel_%=%) compare
-.PHONY: compare
 
 resultname:
 	@echo $(TARGET)+$(GXX-VERSION)
