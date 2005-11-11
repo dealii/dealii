@@ -1,0 +1,8 @@
+
+DEAL::Size 32 Unknowns 961
+DEAL::Solver type: 14SolverBicgstabIN13PETScWrappers6VectorEE
+DEAL:Bicgstab::Starting value 31.00
+DEAL:Bicgstab::Convergence step 35 value 0.0004884
+DEAL::Solver stopped after 35 iterations
+DEAL::GrowingVectorMemory:Overall allocated vectors: 8
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 8

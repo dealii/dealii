@@ -1,0 +1,7 @@
+
+DEAL::FE_RaviartThomasNodal<2>(1) 12  vector 0 Vector 0
+DEAL::FE_RaviartThomasNodal<2>(2) 24  vector 0 Vector 0
+DEAL::FE_RaviartThomasNodal<2>(2) 24  vector 0 Vector 0
+DEAL::FE_RaviartThomasNodal<2>(3) 40  vector 0 Vector 0
+DEAL::FE_RaviartThomasNodal<3>(1) 36  vector 0 Vector 0
+DEAL::FE_RaviartThomasNodal<3>(2) 108  vector 0 Vector 0

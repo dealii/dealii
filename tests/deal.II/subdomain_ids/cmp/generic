@@ -1,0 +1,13 @@
+
+DEAL::Check 1 (dim=1) ok
+DEAL::Check 2 (dim=1) ok
+DEAL::Check 3 (dim=1) ok
+DEAL::Check 4 (dim=1) ok
+DEAL::Check 1 (dim=2) ok
+DEAL::Check 2 (dim=2) ok
+DEAL::Check 3 (dim=2) ok
+DEAL::Check 4 (dim=2) ok
+DEAL::Check 1 (dim=3) ok
+DEAL::Check 2 (dim=3) ok
+DEAL::Check 3 (dim=3) ok
+DEAL::Check 4 (dim=3) ok

@@ -1,0 +1,49 @@
+
+DEAL::Construct A
+DEAL::Construct B
+DEAL::a mutable
+DEAL::b const
+DEAL::r mutable
+DEAL::s const
+DEAL::t mutable
+DEAL::u const
+DEAL::Construct C
+DEAL::Construct D
+DEAL::Destruct D
+--------------------------------------------------------
+An error occurred in file <subscriptor.cc> in function
+    virtual Subscriptor::~Subscriptor()
+The violated condition was: 
+    counter == 0
+The name and call sequence of the exception was:
+    ExcInUse(counter, object_info->name(), infostring)
+Additional Information: 
+Object of class 4Test is still used by 1 other objects.
+  from Subscriber Test R
+--------------------------------------------------------
+DEAL::Abort!!!
+DEAL::Destruct C
+--------------------------------------------------------
+An error occurred in file <subscriptor.cc> in function
+    void Subscriptor::unsubscribe(const char*) const
+The violated condition was: 
+    it != counter_map.end()
+The name and call sequence of the exception was:
+    ExcNoSubscriber(object_info->name(), name)
+Additional Information: 
+No subscriber with identifier "Test R" did subscribe to this object of class 4Test
+--------------------------------------------------------
+DEAL::Abort!!!
+--------------------------------------------------------
+An error occurred in file <subscriptor.cc> in function
+    void Subscriptor::unsubscribe(const char*) const
+The violated condition was: 
+    it->second > 0
+The name and call sequence of the exception was:
+    ExcNoSubscriber(object_info->name(), name)
+Additional Information: 
+No subscriber with identifier "Test R" did subscribe to this object of class 4Test
+--------------------------------------------------------
+DEAL::Abort!!!
+DEAL::Destruct B
+DEAL::Destruct A

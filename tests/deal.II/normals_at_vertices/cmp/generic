@@ -1,0 +1,63 @@
+
+DEAL::Case0
+DEAL:: Face0
+DEAL::  vertex=1.000 1.000 1.000,  normal=4.000 0.000 0.000
+DEAL::  vertex=1.000 3.000 1.000,  normal=4.000 0.000 0.000
+DEAL::  vertex=1.000 1.000 3.000,  normal=4.000 0.000 0.000
+DEAL::  vertex=1.000 3.000 3.000,  normal=4.000 0.000 0.000
+DEAL:: Face1
+DEAL::  vertex=3.000 1.000 1.000,  normal=4.000 0.000 0.000
+DEAL::  vertex=3.000 3.000 1.000,  normal=4.000 0.000 0.000
+DEAL::  vertex=3.000 1.000 3.000,  normal=4.000 0.000 0.000
+DEAL::  vertex=3.000 3.000 3.000,  normal=4.000 0.000 0.000
+DEAL:: Face2
+DEAL::  vertex=1.000 1.000 1.000,  normal=0.000 4.000 0.000
+DEAL::  vertex=1.000 1.000 3.000,  normal=0.000 4.000 0.000
+DEAL::  vertex=3.000 1.000 1.000,  normal=0.000 4.000 0.000
+DEAL::  vertex=3.000 1.000 3.000,  normal=0.000 4.000 0.000
+DEAL:: Face3
+DEAL::  vertex=1.000 3.000 1.000,  normal=0.000 4.000 0.000
+DEAL::  vertex=1.000 3.000 3.000,  normal=0.000 4.000 0.000
+DEAL::  vertex=3.000 3.000 1.000,  normal=0.000 4.000 0.000
+DEAL::  vertex=3.000 3.000 3.000,  normal=0.000 4.000 0.000
+DEAL:: Face4
+DEAL::  vertex=1.000 1.000 1.000,  normal=0.000 0.000 4.000
+DEAL::  vertex=3.000 1.000 1.000,  normal=0.000 0.000 4.000
+DEAL::  vertex=1.000 3.000 1.000,  normal=0.000 0.000 4.000
+DEAL::  vertex=3.000 3.000 1.000,  normal=0.000 0.000 4.000
+DEAL:: Face5
+DEAL::  vertex=1.000 1.000 3.000,  normal=0.000 0.000 4.000
+DEAL::  vertex=3.000 1.000 3.000,  normal=0.000 0.000 4.000
+DEAL::  vertex=1.000 3.000 3.000,  normal=0.000 0.000 4.000
+DEAL::  vertex=3.000 3.000 3.000,  normal=0.000 0.000 4.000
+DEAL::Case1
+DEAL:: Face0
+DEAL::  vertex=0.000 -0.500 -1.000,  normal=11.000 -2.000 -2.000
+DEAL::  vertex=1.000 3.000 1.000,  normal=7.000 -2.000 0.000
+DEAL::  vertex=1.000 1.000 3.000,  normal=8.000 0.000 -2.000
+DEAL::  vertex=1.000 3.000 3.000,  normal=4.000 0.000 0.000
+DEAL:: Face1
+DEAL::  vertex=1.250 0.250 0.250,  normal=7.000 -3.500 -3.500
+DEAL::  vertex=3.000 3.000 1.000,  normal=5.500 -3.500 0.000
+DEAL::  vertex=3.000 1.000 3.000,  normal=5.500 0.000 -3.500
+DEAL::  vertex=3.000 3.000 3.000,  normal=4.000 0.000 0.000
+DEAL:: Face2
+DEAL::  vertex=0.000 -0.500 -1.000,  normal=-1.125 3.750 -1.125
+DEAL::  vertex=1.000 1.000 3.000,  normal=0.000 8.000 -3.000
+DEAL::  vertex=1.250 0.250 0.250,  normal=-1.125 1.250 0.375
+DEAL::  vertex=3.000 1.000 3.000,  normal=0.000 5.500 -1.500
+DEAL:: Face3
+DEAL::  vertex=1.000 3.000 1.000,  normal=0.000 4.000 0.000
+DEAL::  vertex=1.000 3.000 3.000,  normal=0.000 4.000 0.000
+DEAL::  vertex=3.000 3.000 1.000,  normal=0.000 4.000 0.000
+DEAL::  vertex=3.000 3.000 3.000,  normal=0.000 4.000 0.000
+DEAL:: Face4
+DEAL::  vertex=0.000 -0.500 -1.000,  normal=-2.875 -1.250 3.625
+DEAL::  vertex=1.250 0.250 0.250,  normal=-2.875 1.250 2.125
+DEAL::  vertex=1.000 3.000 1.000,  normal=0.000 -4.000 7.000
+DEAL::  vertex=3.000 3.000 1.000,  normal=0.000 -1.500 5.500
+DEAL:: Face5
+DEAL::  vertex=1.000 1.000 3.000,  normal=0.000 0.000 4.000
+DEAL::  vertex=3.000 1.000 3.000,  normal=0.000 0.000 4.000
+DEAL::  vertex=1.000 3.000 3.000,  normal=0.000 0.000 4.000
+DEAL::  vertex=3.000 3.000 3.000,  normal=0.000 0.000 4.000

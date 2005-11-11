@@ -1,0 +1,439 @@
+
+DEAL::Checking Q1 against Q1 in 1d:
+DEAL::Checking Q1 against Q1 in 1d:
+DEAL::Checking Q1 against Q1 in 2d:
+DEAL::1.e+02 29. 15.
+DEAL::0 1.0 2.0 3.5 4.0 5.0 6.0 8.0 3.0 4.2 10. 5.5 0.50 12. 7.5 15. 9.5 2.5 
+DEAL::Checking Q1 against Q1 in 2d:
+DEAL::1.e+02 29. 15.
+DEAL::0 1.0 2.0 3.5 4.0 5.0 6.0 8.0 3.0 4.2 10. 5.5 0.50 12. 7.5 15. 9.5 2.5 
+DEAL::Checking Q1 against Q1 in 3d:
+DEAL::8.8e+02 1.4e+02 49.
+DEAL::0 5.5 12. 9.0 12. 16. 18. 21. 24. 14. 10. 16. 0.50 3.0 8.5 40. 17. 34. 6.0 12. 
+DEAL::Checking Q1 against Q1 in 3d:
+DEAL::8.8e+02 1.4e+02 49.
+DEAL::0 5.5 12. 9.0 12. 16. 18. 21. 24. 14. 10. 16. 0.50 3.0 8.5 40. 17. 34. 6.0 12. 
+DEAL::Checking Q1 against Q2 in 1d:
+DEAL::Checking Q2 against Q1 in 1d:
+DEAL::Checking Q1 against Q2 in 2d:
+DEAL::4.1e+02 67. 17.
+DEAL::0 2.0 0 0.25 0.094 5.0 2.2 1.6 7.0 9.0 9.3 8.4 10. 12. 9.9 0.25 6.1 5.6 0.56 13. 15. 13. 15. 17. 15. 2.2 1.6 12. 11. 
+DEAL::Checking Q2 against Q1 in 2d:
+DEAL::2.5e+02 77. 44.
+DEAL::0 1.0 2.0 6.0 9.0 10. 15. 20. 7.5 10. 24. 12. 0.50 34. 20. 44. 26. 5.0 
+DEAL::Checking Q1 against Q2 in 3d:
+DEAL::6.4e+03 4.5e+02 61.
+DEAL::0 1.0 3.8 15. 11. 13. 10. 31. 31. 41. 0.062 22. 22. 5.1 45. 47. 55. 8.0 35. 13. 26. 
+DEAL::Checking Q2 against Q1 in 3d:
+DEAL::3.5e+03 5.8e+02 2.4e+02
+DEAL::0 15. 44. 28. 45. 58. 69. 85. 1.0e+02 60. 38. 66. 0.50 3.0 25. 1.9e+02 69. 1.6e+02 16. 37. 
+DEAL::Checking Q1 against Q3 in 1d:
+DEAL::Checking Q3 against Q1 in 1d:
+DEAL::Checking Q1 against Q3 in 2d:
+DEAL::9.1e+02 96. 16.
+DEAL::0 -0.042 2.3 -0.30 7.5 3.4 6.8 8.5 6.9 9.6 9.8 9.8 6.5 4.8 4.0 13. 12. 12. 16. 14. 14. 13. 8.1 9.9 
+DEAL::Checking Q3 against Q1 in 2d:
+DEAL::4.6e+02 1.5e+02 87.
+DEAL::0 1.0 2.0 9.5 16. 17. 28. 36. 14. 18. 44. 22. 0.50 66. 37. 87. 52. 8.5 
+DEAL::Checking Q1 against Q3 in 3d:
+DEAL::2.3e+04 8.6e+02 56.
+DEAL::0 4.8 32. 8.5 20. 11. 21. 28. 34. 19. 26. 21. 37. 24. 44. 48. 37. 32. 33. 21. 51. 
+DEAL::Checking Q3 against Q1 in 3d:
+DEAL::8.9e+03 1.5e+03 6.6e+02
+DEAL::0 34. 1.1e+02 65. 1.1e+02 1.4e+02 1.7e+02 2.2e+02 2.8e+02 1.6e+02 99. 1.7e+02 0.50 3.0 58. 5.0e+02 1.8e+02 4.2e+02 34. 89. 
+DEAL::Checking Q2 against Q2 in 1d:
+DEAL::Checking Q2 against Q2 in 1d:
+DEAL::Checking Q2 against Q2 in 2d:
+DEAL::1.0e+03 1.8e+02 49.
+DEAL::0 2.0 -1.1 -0.38 -1.9 10. 4.1 1.2 16. 18. 19. 17. 24. 28. 21. -0.38 14. 12. 0.094 38. 42. 33. 44. 49. 43. 4.1 2.3 32. 32. 
+DEAL::Checking Q2 against Q2 in 2d:
+DEAL::1.0e+03 1.8e+02 49.
+DEAL::0 2.0 -1.1 -0.38 -1.9 10. 4.1 1.2 16. 18. 19. 17. 24. 28. 21. -0.38 14. 12. 0.094 38. 42. 33. 44. 49. 43. 4.1 2.3 32. 32. 
+DEAL::Checking Q2 against Q2 in 3d:
+DEAL::2.6e+04 2.0e+03 2.9e+02
+DEAL::0 -3.1 11. 48. 35. 40. 23. 1.1e+02 1.1e+02 1.6e+02 -5.4 84. 92. 7.9 2.2e+02 2.1e+02 2.6e+02 23. 1.7e+02 47. 1.3e+02 
+DEAL::Checking Q2 against Q2 in 3d:
+DEAL::2.6e+04 2.0e+03 2.9e+02
+DEAL::0 -3.1 11. 48. 35. 40. 23. 1.1e+02 1.1e+02 1.6e+02 -5.4 84. 92. 7.9 2.2e+02 2.1e+02 2.6e+02 23. 1.7e+02 47. 1.3e+02 
+DEAL::Checking Q2 against Q3 in 1d:
+DEAL::Checking Q3 against Q2 in 1d:
+DEAL::Checking Q2 against Q3 in 2d:
+DEAL::3.2e+03 3.4e+02 57.
+DEAL::0 -5.1 4.0 0.078 32. 12. 27. 25. 15. 34. 32. 28. 25. 24. 15. 45. 42. 38. 46. 43. 53. 52. 36. 42. 
+DEAL::Checking Q3 against Q2 in 2d:
+DEAL::1.9e+03 3.4e+02 97.
+DEAL::0 2.0 -2.8 -1.2 -4.7 17. 6.8 0.44 29. 31. 33. 29. 44. 50. 36. -1.2 23. 21. -0.56 75. 82. 63. 87. 97. 84. 6.8 3.4 61. 61. 
+DEAL::Checking Q2 against Q3 in 3d:
+DEAL::1.3e+05 5.0e+03 3.2e+02
+DEAL::0 17. 2.1e+02 23. 74. 72. 99. 1.2e+02 1.1e+02 1.1e+02 1.5e+02 1.4e+02 2.1e+02 1.4e+02 2.8e+02 2.7e+02 2.3e+02 2.1e+02 2.1e+02 1.5e+02 3.1e+02 
+DEAL::Checking Q3 against Q2 in 3d:
+DEAL::6.8e+04 5.4e+03 8.1e+02
+DEAL::0 -12. 25. 1.2e+02 84. 94. 49. 2.9e+02 2.9e+02 4.2e+02 -16. 2.1e+02 2.4e+02 14. 6.2e+02 5.7e+02 7.3e+02 52. 4.6e+02 1.2e+02 3.5e+02 
+DEAL::Checking Q3 against Q3 in 1d:
+DEAL::Checking Q3 against Q3 in 1d:
+DEAL::Checking Q3 against Q3 in 2d:
+DEAL::6.3e+03 6.7e+02 1.1e+02
+DEAL::0 -12. 5.1 -3.6 66. 24. 49. 50. 26. 61. 67. 54. 54. 48. 30. 88. 80. 71. 90. 86. 1.1e+02 1.0e+02 71. 85. 
+DEAL::Checking Q3 against Q3 in 2d:
+DEAL::6.3e+03 6.7e+02 1.1e+02
+DEAL::0 -12. 5.1 -3.6 66. 24. 49. 50. 26. 61. 67. 54. 54. 48. 30. 88. 80. 71. 90. 86. 1.1e+02 1.0e+02 71. 85. 
+DEAL::Checking Q3 against Q3 in 3d:
+DEAL::3.7e+05 1.4e+04 9.3e+02
+DEAL::0 29. 5.8e+02 32. 1.8e+02 2.2e+02 2.8e+02 3.2e+02 2.9e+02 3.1e+02 3.8e+02 3.8e+02 6.2e+02 4.2e+02 7.6e+02 7.3e+02 6.6e+02 5.8e+02 5.9e+02 4.3e+02 9.0e+02 
+DEAL::Checking Q3 against Q3 in 3d:
+DEAL::3.7e+05 1.4e+04 9.3e+02
+DEAL::0 29. 5.8e+02 32. 1.8e+02 2.2e+02 2.8e+02 3.2e+02 2.9e+02 3.1e+02 3.8e+02 3.8e+02 6.2e+02 4.2e+02 7.6e+02 7.3e+02 6.6e+02 5.8e+02 5.9e+02 4.3e+02 9.0e+02 
+DEAL::Checking DGQ0 against DGQ0 in 1d:
+DEAL::6.0 3.6 2.5
+DEAL::0.50 0.50 2.5 2.5 
+DEAL::Checking DGQ0 against DGQ0 in 1d:
+DEAL::6.0 3.6 2.5
+DEAL::0.50 0.50 2.5 2.5 
+DEAL::Checking DGQ0 against DGQ0 in 2d:
+DEAL::50. 17. 7.5
+DEAL::3.0 3.0 3.5 3.5 3.5 3.5 7.5 7.5 7.5 7.5 
+DEAL::Checking DGQ0 against DGQ0 in 2d:
+DEAL::50. 17. 7.5
+DEAL::3.0 3.0 3.5 3.5 3.5 3.5 7.5 7.5 7.5 7.5 
+DEAL::Checking DGQ0 against DGQ0 in 3d:
+DEAL::2.5e+02 58. 18.
+DEAL::5.3 5.3 5.3 5.3 5.3 5.3 9.5 9.5 9.5 9.5 9.5 9.5 9.5 9.5 18. 18. 18. 18. 18. 18. 18. 18. 
+DEAL::Checking DGQ0 against DGQ0 in 3d:
+DEAL::2.5e+02 58. 18.
+DEAL::5.3 5.3 5.3 5.3 5.3 5.3 9.5 9.5 9.5 9.5 9.5 9.5 9.5 9.5 18. 18. 18. 18. 18. 18. 18. 18. 
+DEAL::Checking DGQ0 against DGQ1 in 1d:
+DEAL::13. 5.3 3.2
+DEAL::-0.25 0.50 0.50 1.2 1.8 2.5 2.5 3.2 
+DEAL::Checking DGQ1 against DGQ0 in 1d:
+DEAL::14. 8.1 5.5
+DEAL::1.5 1.5 5.5 5.5 
+DEAL::Checking DGQ0 against DGQ1 in 2d:
+DEAL::1.9e+02 34. 9.7
+DEAL::0.94 -0.47 3.0 -0.38 1.2 2.7 2.0 3.5 2.7 4.3 3.5 5.0 5.2 6.7 6.0 7.5 6.7 8.3 7.5 9.0 
+DEAL::Checking DGQ1 against DGQ0 in 2d:
+DEAL::2.2e+02 73. 32.
+DEAL::14. 14. 16. 16. 16. 16. 32. 32. 32. 32. 
+DEAL::Checking DGQ0 against DGQ1 in 3d:
+DEAL::1.9e+03 1.7e+02 23.
+DEAL::3.2 7.5 4.9 9.2 3.1 5.2 4.2 5.0 5.7 6.5 7.2 8.0 8.7 9.5 12. 13. 14. 14. 15. 16. 17. 17. 
+DEAL::Checking DGQ1 against DGQ0 in 3d:
+DEAL::2.1e+03 4.8e+02 1.4e+02
+DEAL::46. 46. 46. 46. 46. 46. 80. 80. 80. 80. 80. 80. 80. 80. 1.4e+02 1.4e+02 1.4e+02 1.4e+02 1.4e+02 1.4e+02 1.4e+02 1.4e+02 
+DEAL::Checking DGQ0 against DGQ2 in 1d:
+DEAL::18. 6.5 3.2
+DEAL::-0.25 0.12 0.50 0.50 0.87 1.2 1.7 2.1 2.5 2.5 2.9 3.2 
+DEAL::Checking DGQ2 against DGQ0 in 1d:
+DEAL::22. 13. 8.5
+DEAL::2.5 2.5 8.5 8.5 
+DEAL::Checking DGQ0 against DGQ2 in 2d:
+DEAL::4.3e+02 52. 9.7
+DEAL::1.4 0.89 -1.3 1.4 -1.3 2.0 2.7 2.4 3.5 2.7 3.9 5.0 4.2 5.4 6.0 6.7 6.4 7.5 6.7 7.9 9.0 8.3 9.4 
+DEAL::Checking DGQ2 against DGQ0 in 2d:
+DEAL::4.9e+02 1.7e+02 72.
+DEAL::31. 31. 36. 36. 36. 36. 72. 72. 72. 72. 
+DEAL::Checking DGQ0 against DGQ2 in 3d:
+DEAL::6.5e+03 3.0e+02 23.
+DEAL::2.9 11. 6.5 6.0 0.61 4.9 6.5 8.0 9.1 9.5 11. 12. 13. 15. 13. 14. 16. 17. 18. 19. 20. 
+DEAL::Checking DGQ2 against DGQ0 in 3d:
+DEAL::7.0e+03 1.6e+03 4.9e+02
+DEAL::1.5e+02 1.5e+02 1.5e+02 1.5e+02 1.5e+02 1.5e+02 2.7e+02 2.7e+02 2.7e+02 2.7e+02 2.7e+02 2.7e+02 2.7e+02 2.7e+02 4.9e+02 4.9e+02 4.9e+02 4.9e+02 4.9e+02 4.9e+02 4.9e+02 4.9e+02 
+DEAL::Checking DGQ0 against DGQ4 in 1d:
+DEAL::30. 8.3 3.1
+DEAL::0.19 -0.093 -0.066 0.17 0.50 0.50 0.83 1.1 1.1 0.81 2.2 1.9 1.9 2.2 2.5 2.5 2.8 3.1 3.1 2.8 
+DEAL::Checking DGQ4 against DGQ0 in 1d:
+DEAL::38. 21. 15.
+DEAL::4.5 4.5 15. 15. 
+DEAL::Checking DGQ0 against DGQ4 in 2d:
+DEAL::1.2e+03 85. 9.3
+DEAL::2.4 -0.40 2.0 0.33 3.0 2.1 2.9 2.6 3.8 3.8 3.8 4.7 5.0 5.7 6.5 6.3 7.4 7.5 8.1 8.1 8.7 
+DEAL::Checking DGQ4 against DGQ0 in 2d:
+DEAL::1.4e+03 4.6e+02 2.0e+02
+DEAL::87. 87. 1.e+02 1.e+02 1.e+02 1.e+02 2.0e+02 2.0e+02 2.0e+02 2.0e+02 
+DEAL::Checking DGQ0 against DGQ4 in 3d:
+DEAL::3.0e+04 6.5e+02 22.
+DEAL::3.9 1.0 6.2 5.8 3.8 5.0 6.7 7.3 8.2 11. 10. 9.6 11. 13. 15. 16. 17. 19. 20. 18. 20. 
+DEAL::Checking DGQ4 against DGQ0 in 3d:
+DEAL::3.2e+04 7.5e+03 2.2e+03
+DEAL::7.2e+02 7.2e+02 7.2e+02 7.2e+02 7.2e+02 7.2e+02 1.2e+03 1.2e+03 1.2e+03 1.2e+03 1.2e+03 1.2e+03 1.2e+03 1.2e+03 2.2e+03 2.2e+03 2.2e+03 2.2e+03 2.2e+03 2.2e+03 2.2e+03 2.2e+03 
+DEAL::Checking DGQ1 against DGQ1 in 1d:
+DEAL::29. 12. 7.2
+DEAL::-0.25 1.5 1.5 3.2 3.8 5.5 5.5 7.2 
+DEAL::Checking DGQ1 against DGQ1 in 1d:
+DEAL::29. 12. 7.2
+DEAL::-0.25 1.5 1.5 3.2 3.8 5.5 5.5 7.2 
+DEAL::Checking DGQ1 against DGQ1 in 2d:
+DEAL::8.1e+02 1.5e+02 41.
+DEAL::5.1 -0.28 13. 0.37 5.7 12. 9.0 15. 12. 19. 15. 22. 22. 28. 25. 31. 28. 35. 31. 38. 
+DEAL::Checking DGQ1 against DGQ1 in 2d:
+DEAL::8.1e+02 1.5e+02 41.
+DEAL::5.1 -0.28 13. 0.37 5.7 12. 9.0 15. 12. 19. 15. 22. 22. 28. 25. 31. 28. 35. 31. 38. 
+DEAL::Checking DGQ1 against DGQ1 in 3d:
+DEAL::1.6e+04 1.4e+03 1.9e+02
+DEAL::28. 63. 42. 77. 28. 45. 36. 42. 48. 54. 61. 67. 73. 79. 1.e+02 1.1e+02 1.1e+02 1.2e+02 1.2e+02 1.3e+02 1.4e+02 1.4e+02 
+DEAL::Checking DGQ1 against DGQ1 in 3d:
+DEAL::1.6e+04 1.4e+03 1.9e+02
+DEAL::28. 63. 42. 77. 28. 45. 36. 42. 48. 54. 61. 67. 73. 79. 1.e+02 1.1e+02 1.1e+02 1.2e+02 1.2e+02 1.3e+02 1.4e+02 1.4e+02 
+DEAL::Checking DGQ1 against DGQ3 in 1d:
+DEAL::56. 17. 6.8
+DEAL::0.19 0.22 0.74 1.5 1.5 2.3 2.8 2.8 4.2 4.2 4.7 5.5 5.5 6.3 6.8 6.8 
+DEAL::Checking DGQ3 against DGQ1 in 1d:
+DEAL::61. 25. 15.
+DEAL::-0.25 3.5 3.5 7.2 7.7 11. 12. 15. 
+DEAL::Checking DGQ1 against DGQ3 in 2d:
+DEAL::3.3e+03 2.9e+02 39.
+DEAL::9.6 0.0015 15. 1.1 9.7 10. 12. 12. 14. 19. 16. 21. 26. 26. 28. 28. 30. 35. 32. 37. 
+DEAL::Checking DGQ3 against DGQ1 in 2d:
+DEAL::3.3e+03 5.9e+02 1.7e+02
+DEAL::22. 1.4 55. 3.7 24. 51. 36. 63. 51. 78. 63. 91. 88. 1.1e+02 1.0e+02 1.3e+02 1.1e+02 1.4e+02 1.3e+02 1.5e+02 
+DEAL::Checking DGQ1 against DGQ3 in 3d:
+DEAL::1.3e+05 3.8e+03 1.8e+02
+DEAL::26. 22. 41. 38. 34. 43. 53. 64. 76. 91. 89. 76. 89. 1.3e+02 1.1e+02 1.3e+02 1.3e+02 1.5e+02 1.6e+02 1.5e+02 1.7e+02 
+DEAL::Checking DGQ3 against DGQ1 in 3d:
+DEAL::1.3e+05 1.1e+04 1.5e+03
+DEAL::2.3e+02 5.0e+02 3.4e+02 6.2e+02 2.3e+02 3.7e+02 2.9e+02 3.4e+02 3.9e+02 4.4e+02 4.9e+02 5.4e+02 5.9e+02 6.4e+02 8.0e+02 8.5e+02 9.0e+02 9.5e+02 1.0e+03 1.1e+03 1.1e+03 1.2e+03 
+DEAL::Checking DGQ1 against DGQ5 in 1d:
+DEAL::84. 20. 7.2
+DEAL::-0.16 0.27 0.34 0.51 0.92 1.5 1.5 2.1 2.5 2.7 2.7 3.2 3.8 4.3 4.3 4.5 4.9 5.5 5.5 6.1 6.5 6.7 6.7 7.2 
+DEAL::Checking DGQ5 against DGQ1 in 1d:
+DEAL::93. 38. 23.
+DEAL::-0.25 5.5 5.5 11. 12. 18. 18. 23. 
+DEAL::Checking DGQ1 against DGQ5 in 2d:
+DEAL::7.2e+03 4.3e+02 40.
+DEAL::8.8 -0.38 16. 2.1 6.6 8.2 9.6 11. 13. 17. 16. 20. 23. 24. 26. 27. 29. 33. 32. 36. 
+DEAL::Checking DGQ5 against DGQ1 in 2d:
+DEAL::7.4e+03 1.3e+03 3.8e+02
+DEAL::50. 4.8 1.3e+02 9.6 54. 1.2e+02 82. 1.4e+02 1.2e+02 1.8e+02 1.4e+02 2.1e+02 2.0e+02 2.6e+02 2.3e+02 2.9e+02 2.6e+02 3.2e+02 2.9e+02 3.5e+02 
+DEAL::Checking DGQ1 against DGQ5 in 3d:
+DEAL::4.2e+05 7.0e+03 1.8e+02
+DEAL::37. -3.5 24. 45. 38. 52. 47. 61. 70. 90. 96. 84. 91. 1.1e+02 1.2e+02 1.3e+02 1.3e+02 1.6e+02 1.5e+02 1.6e+02 1.7e+02 
+DEAL::Checking DGQ5 against DGQ1 in 3d:
+DEAL::4.4e+05 3.7e+04 5.1e+03
+DEAL::7.7e+02 1.7e+03 1.2e+03 2.1e+03 7.7e+02 1.2e+03 9.7e+02 1.1e+03 1.3e+03 1.5e+03 1.7e+03 1.8e+03 2.0e+03 2.2e+03 2.7e+03 2.9e+03 3.0e+03 3.2e+03 3.4e+03 3.6e+03 3.7e+03 3.9e+03 
+DEAL::Checking DGQ2 against DGQ2 in 1d:
+DEAL::66. 23. 11.
+DEAL::-0.25 1.1 2.5 2.5 3.9 5.2 5.7 7.1 8.5 8.5 9.9 11. 
+DEAL::Checking DGQ2 against DGQ2 in 1d:
+DEAL::66. 23. 11.
+DEAL::-0.25 1.1 2.5 2.5 3.9 5.2 5.7 7.1 8.5 8.5 9.9 11. 
+DEAL::Checking DGQ2 against DGQ2 in 2d:
+DEAL::4.2e+03 5.0e+02 94.
+DEAL::16. 12. -5.8 17. -5.0 20. 28. 24. 35. 28. 39. 50. 43. 54. 56. 64. 60. 71. 64. 75. 86. 79. 90. 
+DEAL::Checking DGQ2 against DGQ2 in 2d:
+DEAL::4.2e+03 5.0e+02 94.
+DEAL::16. 12. -5.8 17. -5.0 20. 28. 24. 35. 28. 39. 50. 43. 54. 56. 64. 60. 71. 64. 75. 86. 79. 90. 
+DEAL::Checking DGQ2 against DGQ2 in 3d:
+DEAL::1.8e+05 8.5e+03 6.3e+02
+DEAL::87. 3.2e+02 1.9e+02 1.7e+02 32. 1.5e+02 1.9e+02 2.3e+02 2.6e+02 2.7e+02 3.1e+02 3.4e+02 3.8e+02 4.2e+02 3.7e+02 4.0e+02 4.4e+02 4.8e+02 4.9e+02 5.3e+02 5.6e+02 
+DEAL::Checking DGQ2 against DGQ2 in 3d:
+DEAL::1.8e+05 8.5e+03 6.3e+02
+DEAL::87. 3.2e+02 1.9e+02 1.7e+02 32. 1.5e+02 1.9e+02 2.3e+02 2.6e+02 2.7e+02 3.1e+02 3.4e+02 3.8e+02 4.2e+02 3.7e+02 4.0e+02 4.4e+02 4.8e+02 4.9e+02 5.3e+02 5.6e+02 
+DEAL::Checking DGQ2 against DGQ2 in 1d:
+DEAL::66. 23. 11.
+DEAL::-0.25 1.1 2.5 2.5 3.9 5.2 5.7 7.1 8.5 8.5 9.9 11. 
+DEAL::Checking DGQ2 against DGQ2 in 1d:
+DEAL::66. 23. 11.
+DEAL::-0.25 1.1 2.5 2.5 3.9 5.2 5.7 7.1 8.5 8.5 9.9 11. 
+DEAL::Checking DGQ2 against DGQ2 in 2d:
+DEAL::4.2e+03 5.0e+02 94.
+DEAL::16. 12. -5.8 17. -5.0 20. 28. 24. 35. 28. 39. 50. 43. 54. 56. 64. 60. 71. 64. 75. 86. 79. 90. 
+DEAL::Checking DGQ2 against DGQ2 in 2d:
+DEAL::4.2e+03 5.0e+02 94.
+DEAL::16. 12. -5.8 17. -5.0 20. 28. 24. 35. 28. 39. 50. 43. 54. 56. 64. 60. 71. 64. 75. 86. 79. 90. 
+DEAL::Checking DGQ2 against DGQ2 in 3d:
+DEAL::1.8e+05 8.5e+03 6.3e+02
+DEAL::87. 3.2e+02 1.9e+02 1.7e+02 32. 1.5e+02 1.9e+02 2.3e+02 2.6e+02 2.7e+02 3.1e+02 3.4e+02 3.8e+02 4.2e+02 3.7e+02 4.0e+02 4.4e+02 4.8e+02 4.9e+02 5.3e+02 5.6e+02 
+DEAL::Checking DGQ2 against DGQ2 in 3d:
+DEAL::1.8e+05 8.5e+03 6.3e+02
+DEAL::87. 3.2e+02 1.9e+02 1.7e+02 32. 1.5e+02 1.9e+02 2.3e+02 2.6e+02 2.7e+02 3.1e+02 3.4e+02 3.8e+02 4.2e+02 3.7e+02 4.0e+02 4.4e+02 4.8e+02 4.9e+02 5.3e+02 5.6e+02 
+DEAL::Checking DGQ2 against DGQ4 in 1d:
+DEAL::1.1e+02 29. 11.
+DEAL::0.19 0.41 0.93 1.7 2.5 2.5 3.3 4.1 4.6 4.8 6.2 6.4 6.9 7.7 8.5 8.5 9.3 10. 11. 11. 
+DEAL::Checking DGQ4 against DGQ2 in 1d:
+DEAL::1.1e+02 39. 19.
+DEAL::-0.25 2.1 4.5 4.5 6.9 9.3 9.8 12. 15. 15. 17. 19. 
+DEAL::Checking DGQ2 against DGQ4 in 2d:
+DEAL::1.2e+04 8.2e+02 89.
+DEAL::24. 0.33 25. 6.6 34. 22. 31. 28. 38. 38. 41. 46. 51. 54. 63. 60. 71. 72. 77. 77. 83. 
+DEAL::Checking DGQ4 against DGQ2 in 2d:
+DEAL::1.2e+04 1.4e+03 2.6e+02
+DEAL::45. 35. -14. 49. -12. 57. 80. 67. 98. 80. 1.1e+02 1.4e+02 1.2e+02 1.5e+02 1.6e+02 1.8e+02 1.7e+02 2.0e+02 1.8e+02 2.1e+02 2.4e+02 2.2e+02 2.5e+02 
+DEAL::Checking DGQ2 against DGQ4 in 3d:
+DEAL::8.4e+05 1.8e+04 6.0e+02
+DEAL::1.1e+02 28. 1.8e+02 1.7e+02 1.2e+02 1.5e+02 1.9e+02 2.1e+02 2.4e+02 3.0e+02 3.1e+02 2.7e+02 3.1e+02 3.7e+02 4.2e+02 4.3e+02 4.7e+02 5.3e+02 5.4e+02 5.2e+02 5.6e+02 
+DEAL::Checking DGQ4 against DGQ2 in 3d:
+DEAL::8.5e+05 3.9e+04 2.9e+03
+DEAL::4.1e+02 1.5e+03 8.6e+02 8.0e+02 1.5e+02 6.8e+02 8.6e+02 1.0e+03 1.2e+03 1.2e+03 1.5e+03 1.6e+03 1.7e+03 1.9e+03 1.7e+03 1.9e+03 2.0e+03 2.2e+03 2.3e+03 2.4e+03 2.6e+03 
+DEAL::Checking DGQ3 against DGQ3 in 1d:
+DEAL::1.2e+02 35. 15.
+DEAL::0.19 0.89 2.1 3.5 3.5 4.9 6.1 6.8 8.2 8.9 10. 11. 11. 13. 14. 15. 
+DEAL::Checking DGQ3 against DGQ3 in 1d:
+DEAL::1.2e+02 35. 15.
+DEAL::0.19 0.89 2.1 3.5 3.5 4.9 6.1 6.8 8.2 8.9 10. 11. 11. 13. 14. 15. 
+DEAL::Checking DGQ3 against DGQ3 in 2d:
+DEAL::1.3e+04 1.2e+03 1.6e+02
+DEAL::40. 2.4 62. 6.1 38. 44. 45. 51. 56. 77. 64. 84. 1.0e+02 1.1e+02 1.1e+02 1.1e+02 1.2e+02 1.4e+02 1.3e+02 1.5e+02 
+DEAL::Checking DGQ3 against DGQ3 in 2d:
+DEAL::1.3e+04 1.2e+03 1.6e+02
+DEAL::40. 2.4 62. 6.1 38. 44. 45. 51. 56. 77. 64. 84. 1.0e+02 1.1e+02 1.1e+02 1.1e+02 1.2e+02 1.4e+02 1.3e+02 1.5e+02 
+DEAL::Checking DGQ3 against DGQ3 in 3d:
+DEAL::1.0e+06 3.1e+04 1.4e+03
+DEAL::2.1e+02 1.7e+02 3.4e+02 3.1e+02 2.8e+02 3.4e+02 4.3e+02 5.2e+02 6.2e+02 7.3e+02 7.3e+02 6.1e+02 7.2e+02 1.0e+03 9.1e+02 1.0e+03 1.0e+03 1.2e+03 1.3e+03 1.2e+03 1.3e+03 
+DEAL::Checking DGQ3 against DGQ3 in 3d:
+DEAL::1.0e+06 3.1e+04 1.4e+03
+DEAL::2.1e+02 1.7e+02 3.4e+02 3.1e+02 2.8e+02 3.4e+02 4.3e+02 5.2e+02 6.2e+02 7.3e+02 7.3e+02 6.1e+02 7.2e+02 1.0e+03 9.1e+02 1.0e+03 1.0e+03 1.2e+03 1.3e+03 1.2e+03 1.3e+03 
+DEAL::Checking DGQ3 against DGQ5 in 1d:
+DEAL::1.8e+02 43. 15.
+DEAL::-0.16 0.67 1.1 1.7 2.5 3.5 3.5 4.5 5.3 5.9 6.3 7.2 7.8 8.7 9.1 9.7 11. 11. 12. 12. 13. 14. 14. 15. 
+DEAL::Checking DGQ5 against DGQ3 in 1d:
+DEAL::1.8e+02 54. 23.
+DEAL::0.19 1.6 3.4 5.5 5.5 7.6 9.4 11. 12. 14. 15. 18. 18. 20. 21. 23. 
+DEAL::Checking DGQ3 against DGQ5 in 2d:
+DEAL::2.9e+04 1.8e+03 1.6e+02
+DEAL::37. 0.59 64. 10. 27. 35. 38. 47. 52. 70. 64. 82. 91. 99. 1.0e+02 1.1e+02 1.2e+02 1.3e+02 1.3e+02 1.5e+02 
+DEAL::Checking DGQ5 against DGQ3 in 2d:
+DEAL::3.0e+04 2.7e+03 3.6e+02
+DEAL::92. 7.6 1.4e+02 15. 86. 1.0e+02 1.0e+02 1.2e+02 1.3e+02 1.7e+02 1.4e+02 1.9e+02 2.3e+02 2.4e+02 2.4e+02 2.6e+02 2.7e+02 3.2e+02 2.9e+02 3.3e+02 
+DEAL::Checking DGQ3 against DGQ5 in 3d:
+DEAL::3.4e+06 5.6e+04 1.5e+03
+DEAL::3.0e+02 -31. 2.0e+02 3.6e+02 3.1e+02 4.1e+02 3.8e+02 5.0e+02 5.7e+02 7.2e+02 7.8e+02 6.8e+02 7.3e+02 9.1e+02 9.5e+02 1.0e+03 1.1e+03 1.3e+03 1.2e+03 1.3e+03 1.4e+03 
+DEAL::Checking DGQ5 against DGQ3 in 3d:
+DEAL::3.5e+06 1.0e+05 4.8e+03
+DEAL::7.0e+02 5.7e+02 1.1e+03 1.0e+03 9.5e+02 1.1e+03 1.5e+03 1.8e+03 2.1e+03 2.5e+03 2.5e+03 2.1e+03 2.4e+03 3.4e+03 3.1e+03 3.5e+03 3.5e+03 4.1e+03 4.4e+03 4.2e+03 4.5e+03 
+DEAL::Checking DGQ4 against DGQ5 in 1d:
+DEAL::2.3e+02 54. 19.
+DEAL::-0.16 0.87 1.5 2.3 3.3 4.5 4.5 5.7 6.7 7.5 8.1 9.2 9.8 11. 12. 12. 13. 14. 15. 16. 17. 17. 18. 19. 
+DEAL::Checking DGQ5 against DGQ4 in 1d:
+DEAL::2.3e+02 60. 23.
+DEAL::0.19 1.2 2.4 3.9 5.5 5.5 7.1 8.6 9.8 11. 12. 13. 14. 16. 18. 18. 19. 21. 22. 23. 
+DEAL::Checking DGQ4 against DGQ5 in 2d:
+DEAL::4.6e+04 2.8e+03 2.6e+02
+DEAL::58. 1.5 1.0e+02 16. 42. 56. 60. 74. 82. 1.1e+02 1.e+02 1.3e+02 1.4e+02 1.6e+02 1.6e+02 1.7e+02 1.8e+02 2.1e+02 2.0e+02 2.3e+02 
+DEAL::Checking DGQ5 against DGQ4 in 2d:
+DEAL::4.7e+04 3.3e+03 3.6e+02
+DEAL::97. 2.4 1.1e+02 28. 1.4e+02 90. 1.2e+02 1.1e+02 1.6e+02 1.5e+02 1.7e+02 1.9e+02 2.1e+02 2.2e+02 2.5e+02 2.4e+02 2.9e+02 2.9e+02 3.1e+02 3.1e+02 3.3e+02 
+DEAL::Checking DGQ4 against DGQ5 in 3d:
+DEAL::6.7e+06 1.1e+05 2.9e+03
+DEAL::5.8e+02 -62. 3.8e+02 7.0e+02 6.0e+02 8.1e+02 7.5e+02 9.8e+02 1.1e+03 1.4e+03 1.5e+03 1.3e+03 1.4e+03 1.8e+03 1.9e+03 2.0e+03 2.1e+03 2.5e+03 2.4e+03 2.5e+03 2.7e+03 
+DEAL::Checking DGQ5 against DGQ4 in 3d:
+DEAL::6.7e+06 1.4e+05 4.8e+03
+DEAL::8.3e+02 2.0e+02 1.4e+03 1.3e+03 9.2e+02 1.2e+03 1.6e+03 1.7e+03 1.9e+03 2.4e+03 2.5e+03 2.2e+03 2.5e+03 3.0e+03 3.3e+03 3.5e+03 3.8e+03 4.3e+03 4.4e+03 4.2e+03 4.5e+03 
+DEAL::Checking DGP0 against DGP0 in 1d:
+DEAL::Checking DGP0 against DGP0 in 1d:
+DEAL::Checking DGP0 against DGP0 in 2d:
+DEAL::Checking DGP0 against DGP0 in 2d:
+DEAL::Checking DGP0 against DGP0 in 3d:
+DEAL::Checking DGP0 against DGP0 in 3d:
+DEAL::Checking DGP0 against DGP1 in 1d:
+DEAL::Checking DGP1 against DGP0 in 1d:
+DEAL::Checking DGP0 against DGP1 in 2d:
+DEAL::Checking DGP1 against DGP0 in 2d:
+DEAL::Checking DGP0 against DGP1 in 3d:
+DEAL::Checking DGP1 against DGP0 in 3d:
+DEAL::Checking DGP0 against DGP2 in 1d:
+DEAL::Checking DGP2 against DGP0 in 1d:
+DEAL::Checking DGP0 against DGP2 in 2d:
+DEAL::Checking DGP2 against DGP0 in 2d:
+DEAL::Checking DGP0 against DGP2 in 3d:
+DEAL::Checking DGP2 against DGP0 in 3d:
+DEAL::Checking DGP0 against DGP4 in 1d:
+DEAL::Checking DGP4 against DGP0 in 1d:
+DEAL::Checking DGP0 against DGP4 in 2d:
+DEAL::Checking DGP4 against DGP0 in 2d:
+DEAL::Checking DGP0 against DGP4 in 3d:
+DEAL::Checking DGP4 against DGP0 in 3d:
+DEAL::Checking DGP1 against DGP1 in 1d:
+DEAL::Checking DGP1 against DGP1 in 1d:
+DEAL::Checking DGP1 against DGP1 in 2d:
+DEAL::Checking DGP1 against DGP1 in 2d:
+DEAL::Checking DGP1 against DGP1 in 3d:
+DEAL::Checking DGP1 against DGP1 in 3d:
+DEAL::Checking DGP1 against DGP3 in 1d:
+DEAL::Checking DGP3 against DGP1 in 1d:
+DEAL::Checking DGP1 against DGP3 in 2d:
+DEAL::Checking DGP3 against DGP1 in 2d:
+DEAL::Checking DGP1 against DGP3 in 3d:
+DEAL::Checking DGP3 against DGP1 in 3d:
+DEAL::Checking DGP1 against DGP5 in 1d:
+DEAL::Checking DGP5 against DGP1 in 1d:
+DEAL::Checking DGP1 against DGP5 in 2d:
+DEAL::Checking DGP5 against DGP1 in 2d:
+DEAL::Checking DGP1 against DGP5 in 3d:
+DEAL::Checking DGP5 against DGP1 in 3d:
+DEAL::Checking DGP2 against DGP2 in 1d:
+DEAL::Checking DGP2 against DGP2 in 1d:
+DEAL::Checking DGP2 against DGP2 in 2d:
+DEAL::Checking DGP2 against DGP2 in 2d:
+DEAL::Checking DGP2 against DGP2 in 3d:
+DEAL::Checking DGP2 against DGP2 in 3d:
+DEAL::Checking DGP2 against DGP2 in 1d:
+DEAL::Checking DGP2 against DGP2 in 1d:
+DEAL::Checking DGP2 against DGP2 in 2d:
+DEAL::Checking DGP2 against DGP2 in 2d:
+DEAL::Checking DGP2 against DGP2 in 3d:
+DEAL::Checking DGP2 against DGP2 in 3d:
+DEAL::Checking DGP2 against DGP4 in 1d:
+DEAL::Checking DGP4 against DGP2 in 1d:
+DEAL::Checking DGP2 against DGP4 in 2d:
+DEAL::Checking DGP4 against DGP2 in 2d:
+DEAL::Checking DGP2 against DGP4 in 3d:
+DEAL::Checking DGP4 against DGP2 in 3d:
+DEAL::Checking DGP3 against DGP3 in 1d:
+DEAL::Checking DGP3 against DGP3 in 1d:
+DEAL::Checking DGP3 against DGP3 in 2d:
+DEAL::Checking DGP3 against DGP3 in 2d:
+DEAL::Checking DGP3 against DGP3 in 3d:
+DEAL::Checking DGP3 against DGP3 in 3d:
+DEAL::Checking DGP3 against DGP5 in 1d:
+DEAL::Checking DGP5 against DGP3 in 1d:
+DEAL::Checking DGP3 against DGP5 in 2d:
+DEAL::Checking DGP5 against DGP3 in 2d:
+DEAL::Checking DGP3 against DGP5 in 3d:
+DEAL::Checking DGP5 against DGP3 in 3d:
+DEAL::Checking DGP4 against DGP5 in 1d:
+DEAL::Checking DGP5 against DGP4 in 1d:
+DEAL::Checking DGP4 against DGP5 in 2d:
+DEAL::Checking DGP5 against DGP4 in 2d:
+DEAL::Checking DGP4 against DGP5 in 3d:
+DEAL::Checking DGP5 against DGP4 in 3d:
+DEAL::Checking Nedelec1 against Nedelec1 in 2d:
+DEAL::Checking Nedelec1 against Nedelec1 in 2d:
+DEAL::Checking Nedelec1 against Nedelec1 in 3d:
+DEAL::Checking Nedelec1 against Nedelec1 in 3d:
+DEAL::Checking FE_Q<1>(1)3 against FE_Q<1>(2)3 in 1d:
+DEAL::Checking FE_Q<1>(2)3 against FE_Q<1>(1)3 in 1d:
+DEAL::Checking FE_DGQ<1>(2)2 against FE_DGQ<1>(3)2 in 1d:
+DEAL::3.7e+02 76. 23.
+DEAL::0.75 0.21 1.6 4.0 3.7 3.2 4.6 7.0 4.0 6.4 7.8 7.3 7.0 9.4 11. 10. 13. 12. 14. 16. 16. 15. 17. 19. 16. 18. 20. 19. 19. 21. 23. 22. 
+DEAL::Checking FE_DGQ<1>(3)2 against FE_DGQ<1>(2)2 in 1d:
+DEAL::3.7e+02 89. 32.
+DEAL::-1.3 2.1 5.5 2.7 6.1 9.5 5.5 8.9 12. 9.5 13. 16. 15. 18. 22. 19. 22. 26. 22. 25. 28. 26. 29. 32. 
+DEAL::Checking FE_DGP<1>(3)1 against FE_DGP<1>(1)1 in 1d:
+DEAL::Checking FE_DGP<1>(1)1 against FE_DGP<1>(3)1 in 1d:
+DEAL::Checking FE_Q<2>(1)3 against FE_Q<2>(2)3 in 2d:
+DEAL::3.9e+03 3.6e+02 53.
+DEAL::0 8.0 2.9 0.28 17. 13. 21. 29. 20. 30. 38. 32. 18. 19. 21. 45. 40. 49. 45. 8.8 27. 32. 
+DEAL::Checking FE_Q<2>(2)3 against FE_Q<2>(1)3 in 2d:
+DEAL::2.3e+03 4.1e+02 1.3e+02
+DEAL::0 2.0 4.0 6.0 8.0 19. 27. 29. 31. 45. 47. 60. 22. 24. 31. 72. 74. 38. 1.5 3.5 1.0e+02 58. 60. 1.3e+02 80. 82. 16. 
+DEAL::Checking FE_DGQ<2>(2)2 against FE_DGQ<2>(3)2 in 2d:
+DEAL::3.0e+04 1.9e+03 1.8e+02
+DEAL::42. 51. 66. 75. 45. 54. 52. 61. 60. 69. 67. 76. 1.2e+02 1.3e+02 1.2e+02 1.3e+02 1.3e+02 1.4e+02 1.4e+02 1.5e+02 
+DEAL::Checking FE_DGQ<2>(3)2 against FE_DGQ<2>(2)2 in 2d:
+DEAL::3.0e+04 2.5e+03 3.4e+02
+DEAL::51. 67. 1.2e+02 1.3e+02 44. 60. 68. 84. 95. 1.1e+02 1.2e+02 1.4e+02 1.7e+02 1.9e+02 2.0e+02 2.1e+02 2.2e+02 2.4e+02 2.5e+02 2.6e+02 
+DEAL::Checking FE_DGP<2>(3)1 against FE_DGP<2>(1)1 in 2d:
+DEAL::Checking FE_DGP<2>(1)1 against FE_DGP<2>(3)1 in 2d:
+DEAL::Checking FE_Q<3>(1)3 against FE_Q<3>(2)3 in 3d:
+DEAL::5.9e+04 2.4e+03 1.9e+02
+DEAL::0 3.0 11. 45. 33. 38. 30. 93. 94. 1.2e+02 0.19 65. 67. 15. 1.4e+02 1.4e+02 1.7e+02 24. 1.1e+02 40. 78. 
+DEAL::Checking FE_Q<3>(2)3 against FE_Q<3>(1)3 in 3d:
+DEAL::3.1e+04 3.0e+03 7.3e+02
+DEAL::0 45. 1.3e+02 84. 1.4e+02 1.8e+02 2.1e+02 2.6e+02 3.2e+02 1.8e+02 1.2e+02 2.0e+02 1.5 9.0 75. 5.6e+02 2.1e+02 4.7e+02 46. 1.1e+02 
+DEAL::Checking FE_DGQ<3>(2)2 against FE_DGQ<3>(3)2 in 3d:
+DEAL::1.7e+06 3.7e+04 1.2e+03
+DEAL::1.8e+02 1.4e+02 1.8e+02 53. 2.2e+02 2.4e+02 4.1e+02 3.5e+02 4.4e+02 5.0e+02 5.7e+02 5.5e+02 6.2e+02 8.1e+02 8.2e+02 9.9e+02 9.1e+02 9.7e+02 1.0e+03 1.1e+03 1.1e+03 
+DEAL::Checking FE_DGQ<3>(3)2 against FE_DGQ<3>(2)2 in 3d:
+DEAL::1.7e+06 5.7e+04 3.0e+03
+DEAL::3.9e+02 4.4e+02 5.0e+02 5.9e+02 2.9e+02 1.1e+03 7.2e+02 1.0e+03 1.2e+03 1.3e+03 1.6e+03 1.2e+03 1.4e+03 1.9e+03 2.1e+03 2.3e+03 2.6e+03 2.2e+03 2.3e+03 2.6e+03 2.8e+03 
+DEAL::Checking FE_DGP<3>(3)1 against FE_DGP<3>(1)1 in 3d:
+DEAL::Checking FE_DGP<3>(1)1 against FE_DGP<3>(3)1 in 3d:

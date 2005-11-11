@@ -1,0 +1,8 @@
+
+DEAL::Size 32 Unknowns 961
+DEAL::Solver type: 10SolverQMRSIN13PETScWrappers6VectorEE
+DEAL:QMRS::Starting value 31.00
+DEAL:QMRS::Convergence step 46 value 0.0009063
+DEAL::Solver stopped after 46 iterations
+DEAL::GrowingVectorMemory:Overall allocated vectors: 5
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 5

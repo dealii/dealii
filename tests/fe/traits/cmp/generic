@@ -1,0 +1,639 @@
+
+DEAL::Checking FE_Q<1>(1): 
+DEAL::  Primitivity: 11
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 11
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::Checking FE_Q<1>(2): 
+DEAL::  Primitivity: 111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::Checking FE_DGQ<1>(0): 
+DEAL::  Primitivity: 1
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::Checking FE_DGQ<1>(1): 
+DEAL::  Primitivity: 11
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 11
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::Checking FE_DGQ<1>(2): 
+DEAL::  Primitivity: 111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::Checking FE_DGP<1>(0): 
+DEAL::  Primitivity: 1
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::Checking FE_DGP<1>(1): 
+DEAL::  Primitivity: 11
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 11
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::Checking FE_DGP<1>(2): 
+DEAL::  Primitivity: 111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::Checking FE_Q<1>(1)^2: 
+DEAL::  Primitivity: 1111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 10
+DEAL::    shape function i=1 [1,0]: 01
+DEAL::    shape function i=2 [0,1]: 10
+DEAL::    shape function i=3 [1,1]: 01
+DEAL::Checking FE_Q<1>(2)^2: 
+DEAL::  Primitivity: 111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 10
+DEAL::    shape function i=1 [1,0]: 01
+DEAL::    shape function i=2 [0,1]: 10
+DEAL::    shape function i=3 [1,1]: 01
+DEAL::    shape function i=4 [0,2]: 10
+DEAL::    shape function i=5 [1,2]: 01
+DEAL::Checking FE_Q<1>(1)^2^2: 
+DEAL::  Primitivity: 11111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 11111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1000
+DEAL::    shape function i=1 [1,0]: 0100
+DEAL::    shape function i=2 [2,0]: 0010
+DEAL::    shape function i=3 [3,0]: 0001
+DEAL::    shape function i=4 [0,1]: 1000
+DEAL::    shape function i=5 [1,1]: 0100
+DEAL::    shape function i=6 [2,1]: 0010
+DEAL::    shape function i=7 [3,1]: 0001
+DEAL::Checking FE_Q<1>(2)^2^2: 
+DEAL::  Primitivity: 111111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1000
+DEAL::    shape function i=1 [1,0]: 0100
+DEAL::    shape function i=2 [2,0]: 0010
+DEAL::    shape function i=3 [3,0]: 0001
+DEAL::    shape function i=4 [0,1]: 1000
+DEAL::    shape function i=5 [1,1]: 0100
+DEAL::    shape function i=6 [2,1]: 0010
+DEAL::    shape function i=7 [3,1]: 0001
+DEAL::    shape function i=8 [0,2]: 1000
+DEAL::    shape function i=9 [1,2]: 0100
+DEAL::    shape function i=10 [2,2]: 0010
+DEAL::    shape function i=11 [3,2]: 0001
+DEAL::Checking FE_Q<2>(1): 
+DEAL::  Primitivity: 1111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::    shape function i=3 [0,3]: 1
+DEAL::Checking FE_Q<2>(2): 
+DEAL::  Primitivity: 111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::    shape function i=3 [0,3]: 1
+DEAL::    shape function i=4 [0,4]: 1
+DEAL::    shape function i=5 [0,5]: 1
+DEAL::    shape function i=6 [0,6]: 1
+DEAL::    shape function i=7 [0,7]: 1
+DEAL::    shape function i=8 [0,8]: 1
+DEAL::Checking FE_DGQ<2>(0): 
+DEAL::  Primitivity: 1
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::Checking FE_DGQ<2>(1): 
+DEAL::  Primitivity: 1111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::    shape function i=3 [0,3]: 1
+DEAL::Checking FE_DGQ<2>(2): 
+DEAL::  Primitivity: 111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::    shape function i=3 [0,3]: 1
+DEAL::    shape function i=4 [0,4]: 1
+DEAL::    shape function i=5 [0,5]: 1
+DEAL::    shape function i=6 [0,6]: 1
+DEAL::    shape function i=7 [0,7]: 1
+DEAL::    shape function i=8 [0,8]: 1
+DEAL::Checking FE_DGP<2>(0): 
+DEAL::  Primitivity: 1
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::Checking FE_DGP<2>(1): 
+DEAL::  Primitivity: 111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::Checking FE_DGP<2>(2): 
+DEAL::  Primitivity: 111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::    shape function i=3 [0,3]: 1
+DEAL::    shape function i=4 [0,4]: 1
+DEAL::    shape function i=5 [0,5]: 1
+DEAL::Checking FE_Q<2>(1)^2: 
+DEAL::  Primitivity: 11111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 11111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 10
+DEAL::    shape function i=1 [1,0]: 01
+DEAL::    shape function i=2 [0,1]: 10
+DEAL::    shape function i=3 [1,1]: 01
+DEAL::    shape function i=4 [0,2]: 10
+DEAL::    shape function i=5 [1,2]: 01
+DEAL::    shape function i=6 [0,3]: 10
+DEAL::    shape function i=7 [1,3]: 01
+DEAL::Checking FE_Q<2>(2)^2: 
+DEAL::  Primitivity: 111111111111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111111111111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 10
+DEAL::    shape function i=1 [1,0]: 01
+DEAL::    shape function i=2 [0,1]: 10
+DEAL::    shape function i=3 [1,1]: 01
+DEAL::    shape function i=4 [0,2]: 10
+DEAL::    shape function i=5 [1,2]: 01
+DEAL::    shape function i=6 [0,3]: 10
+DEAL::    shape function i=7 [1,3]: 01
+DEAL::    shape function i=8 [0,4]: 10
+DEAL::    shape function i=9 [1,4]: 01
+DEAL::    shape function i=10 [0,5]: 10
+DEAL::    shape function i=11 [1,5]: 01
+DEAL::    shape function i=12 [0,6]: 10
+DEAL::    shape function i=13 [1,6]: 01
+DEAL::    shape function i=14 [0,7]: 10
+DEAL::    shape function i=15 [1,7]: 01
+DEAL::    shape function i=16 [0,8]: 10
+DEAL::    shape function i=17 [1,8]: 01
+DEAL::Checking FE_Q<2>(1)^2^2: 
+DEAL::  Primitivity: 1111111111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1111111111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1000
+DEAL::    shape function i=1 [1,0]: 0100
+DEAL::    shape function i=2 [2,0]: 0010
+DEAL::    shape function i=3 [3,0]: 0001
+DEAL::    shape function i=4 [0,1]: 1000
+DEAL::    shape function i=5 [1,1]: 0100
+DEAL::    shape function i=6 [2,1]: 0010
+DEAL::    shape function i=7 [3,1]: 0001
+DEAL::    shape function i=8 [0,2]: 1000
+DEAL::    shape function i=9 [1,2]: 0100
+DEAL::    shape function i=10 [2,2]: 0010
+DEAL::    shape function i=11 [3,2]: 0001
+DEAL::    shape function i=12 [0,3]: 1000
+DEAL::    shape function i=13 [1,3]: 0100
+DEAL::    shape function i=14 [2,3]: 0010
+DEAL::    shape function i=15 [3,3]: 0001
+DEAL::Checking FE_Q<2>(2)^2^2: 
+DEAL::  Primitivity: 111111111111111111111111111111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111111111111111111111111111111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1000
+DEAL::    shape function i=1 [1,0]: 0100
+DEAL::    shape function i=2 [2,0]: 0010
+DEAL::    shape function i=3 [3,0]: 0001
+DEAL::    shape function i=4 [0,1]: 1000
+DEAL::    shape function i=5 [1,1]: 0100
+DEAL::    shape function i=6 [2,1]: 0010
+DEAL::    shape function i=7 [3,1]: 0001
+DEAL::    shape function i=8 [0,2]: 1000
+DEAL::    shape function i=9 [1,2]: 0100
+DEAL::    shape function i=10 [2,2]: 0010
+DEAL::    shape function i=11 [3,2]: 0001
+DEAL::    shape function i=12 [0,3]: 1000
+DEAL::    shape function i=13 [1,3]: 0100
+DEAL::    shape function i=14 [2,3]: 0010
+DEAL::    shape function i=15 [3,3]: 0001
+DEAL::    shape function i=16 [0,4]: 1000
+DEAL::    shape function i=17 [1,4]: 0100
+DEAL::    shape function i=18 [2,4]: 0010
+DEAL::    shape function i=19 [3,4]: 0001
+DEAL::    shape function i=20 [0,5]: 1000
+DEAL::    shape function i=21 [1,5]: 0100
+DEAL::    shape function i=22 [2,5]: 0010
+DEAL::    shape function i=23 [3,5]: 0001
+DEAL::    shape function i=24 [0,6]: 1000
+DEAL::    shape function i=25 [1,6]: 0100
+DEAL::    shape function i=26 [2,6]: 0010
+DEAL::    shape function i=27 [3,6]: 0001
+DEAL::    shape function i=28 [0,7]: 1000
+DEAL::    shape function i=29 [1,7]: 0100
+DEAL::    shape function i=30 [2,7]: 0010
+DEAL::    shape function i=31 [3,7]: 0001
+DEAL::    shape function i=32 [0,8]: 1000
+DEAL::    shape function i=33 [1,8]: 0100
+DEAL::    shape function i=34 [2,8]: 0010
+DEAL::    shape function i=35 [3,8]: 0001
+DEAL::Checking FE_Q<3>(1): 
+DEAL::  Primitivity: 11111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 11111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::    shape function i=3 [0,3]: 1
+DEAL::    shape function i=4 [0,4]: 1
+DEAL::    shape function i=5 [0,5]: 1
+DEAL::    shape function i=6 [0,6]: 1
+DEAL::    shape function i=7 [0,7]: 1
+DEAL::Checking FE_Q<3>(2): 
+DEAL::  Primitivity: 111111111111111111111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111111111111111111111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::    shape function i=3 [0,3]: 1
+DEAL::    shape function i=4 [0,4]: 1
+DEAL::    shape function i=5 [0,5]: 1
+DEAL::    shape function i=6 [0,6]: 1
+DEAL::    shape function i=7 [0,7]: 1
+DEAL::    shape function i=8 [0,8]: 1
+DEAL::    shape function i=9 [0,9]: 1
+DEAL::    shape function i=10 [0,10]: 1
+DEAL::    shape function i=11 [0,11]: 1
+DEAL::    shape function i=12 [0,12]: 1
+DEAL::    shape function i=13 [0,13]: 1
+DEAL::    shape function i=14 [0,14]: 1
+DEAL::    shape function i=15 [0,15]: 1
+DEAL::    shape function i=16 [0,16]: 1
+DEAL::    shape function i=17 [0,17]: 1
+DEAL::    shape function i=18 [0,18]: 1
+DEAL::    shape function i=19 [0,19]: 1
+DEAL::    shape function i=20 [0,20]: 1
+DEAL::    shape function i=21 [0,21]: 1
+DEAL::    shape function i=22 [0,22]: 1
+DEAL::    shape function i=23 [0,23]: 1
+DEAL::    shape function i=24 [0,24]: 1
+DEAL::    shape function i=25 [0,25]: 1
+DEAL::    shape function i=26 [0,26]: 1
+DEAL::Checking FE_DGQ<3>(0): 
+DEAL::  Primitivity: 1
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::Checking FE_DGQ<3>(1): 
+DEAL::  Primitivity: 11111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 11111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::    shape function i=3 [0,3]: 1
+DEAL::    shape function i=4 [0,4]: 1
+DEAL::    shape function i=5 [0,5]: 1
+DEAL::    shape function i=6 [0,6]: 1
+DEAL::    shape function i=7 [0,7]: 1
+DEAL::Checking FE_DGQ<3>(2): 
+DEAL::  Primitivity: 111111111111111111111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111111111111111111111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::    shape function i=3 [0,3]: 1
+DEAL::    shape function i=4 [0,4]: 1
+DEAL::    shape function i=5 [0,5]: 1
+DEAL::    shape function i=6 [0,6]: 1
+DEAL::    shape function i=7 [0,7]: 1
+DEAL::    shape function i=8 [0,8]: 1
+DEAL::    shape function i=9 [0,9]: 1
+DEAL::    shape function i=10 [0,10]: 1
+DEAL::    shape function i=11 [0,11]: 1
+DEAL::    shape function i=12 [0,12]: 1
+DEAL::    shape function i=13 [0,13]: 1
+DEAL::    shape function i=14 [0,14]: 1
+DEAL::    shape function i=15 [0,15]: 1
+DEAL::    shape function i=16 [0,16]: 1
+DEAL::    shape function i=17 [0,17]: 1
+DEAL::    shape function i=18 [0,18]: 1
+DEAL::    shape function i=19 [0,19]: 1
+DEAL::    shape function i=20 [0,20]: 1
+DEAL::    shape function i=21 [0,21]: 1
+DEAL::    shape function i=22 [0,22]: 1
+DEAL::    shape function i=23 [0,23]: 1
+DEAL::    shape function i=24 [0,24]: 1
+DEAL::    shape function i=25 [0,25]: 1
+DEAL::    shape function i=26 [0,26]: 1
+DEAL::Checking FE_DGP<3>(0): 
+DEAL::  Primitivity: 1
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::Checking FE_DGP<3>(1): 
+DEAL::  Primitivity: 1111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::    shape function i=3 [0,3]: 1
+DEAL::Checking FE_DGP<3>(2): 
+DEAL::  Primitivity: 1111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1
+DEAL::    shape function i=1 [0,1]: 1
+DEAL::    shape function i=2 [0,2]: 1
+DEAL::    shape function i=3 [0,3]: 1
+DEAL::    shape function i=4 [0,4]: 1
+DEAL::    shape function i=5 [0,5]: 1
+DEAL::    shape function i=6 [0,6]: 1
+DEAL::    shape function i=7 [0,7]: 1
+DEAL::    shape function i=8 [0,8]: 1
+DEAL::    shape function i=9 [0,9]: 1
+DEAL::Checking FE_Q<3>(1)^2: 
+DEAL::  Primitivity: 1111111111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 1111111111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 10
+DEAL::    shape function i=1 [1,0]: 01
+DEAL::    shape function i=2 [0,1]: 10
+DEAL::    shape function i=3 [1,1]: 01
+DEAL::    shape function i=4 [0,2]: 10
+DEAL::    shape function i=5 [1,2]: 01
+DEAL::    shape function i=6 [0,3]: 10
+DEAL::    shape function i=7 [1,3]: 01
+DEAL::    shape function i=8 [0,4]: 10
+DEAL::    shape function i=9 [1,4]: 01
+DEAL::    shape function i=10 [0,5]: 10
+DEAL::    shape function i=11 [1,5]: 01
+DEAL::    shape function i=12 [0,6]: 10
+DEAL::    shape function i=13 [1,6]: 01
+DEAL::    shape function i=14 [0,7]: 10
+DEAL::    shape function i=15 [1,7]: 01
+DEAL::Checking FE_Q<3>(2)^2: 
+DEAL::  Primitivity: 111111111111111111111111111111111111111111111111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111111111111111111111111111111111111111111111111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 10
+DEAL::    shape function i=1 [1,0]: 01
+DEAL::    shape function i=2 [0,1]: 10
+DEAL::    shape function i=3 [1,1]: 01
+DEAL::    shape function i=4 [0,2]: 10
+DEAL::    shape function i=5 [1,2]: 01
+DEAL::    shape function i=6 [0,3]: 10
+DEAL::    shape function i=7 [1,3]: 01
+DEAL::    shape function i=8 [0,4]: 10
+DEAL::    shape function i=9 [1,4]: 01
+DEAL::    shape function i=10 [0,5]: 10
+DEAL::    shape function i=11 [1,5]: 01
+DEAL::    shape function i=12 [0,6]: 10
+DEAL::    shape function i=13 [1,6]: 01
+DEAL::    shape function i=14 [0,7]: 10
+DEAL::    shape function i=15 [1,7]: 01
+DEAL::    shape function i=16 [0,8]: 10
+DEAL::    shape function i=17 [1,8]: 01
+DEAL::    shape function i=18 [0,9]: 10
+DEAL::    shape function i=19 [1,9]: 01
+DEAL::    shape function i=20 [0,10]: 10
+DEAL::    shape function i=21 [1,10]: 01
+DEAL::    shape function i=22 [0,11]: 10
+DEAL::    shape function i=23 [1,11]: 01
+DEAL::    shape function i=24 [0,12]: 10
+DEAL::    shape function i=25 [1,12]: 01
+DEAL::    shape function i=26 [0,13]: 10
+DEAL::    shape function i=27 [1,13]: 01
+DEAL::    shape function i=28 [0,14]: 10
+DEAL::    shape function i=29 [1,14]: 01
+DEAL::    shape function i=30 [0,15]: 10
+DEAL::    shape function i=31 [1,15]: 01
+DEAL::    shape function i=32 [0,16]: 10
+DEAL::    shape function i=33 [1,16]: 01
+DEAL::    shape function i=34 [0,17]: 10
+DEAL::    shape function i=35 [1,17]: 01
+DEAL::    shape function i=36 [0,18]: 10
+DEAL::    shape function i=37 [1,18]: 01
+DEAL::    shape function i=38 [0,19]: 10
+DEAL::    shape function i=39 [1,19]: 01
+DEAL::    shape function i=40 [0,20]: 10
+DEAL::    shape function i=41 [1,20]: 01
+DEAL::    shape function i=42 [0,21]: 10
+DEAL::    shape function i=43 [1,21]: 01
+DEAL::    shape function i=44 [0,22]: 10
+DEAL::    shape function i=45 [1,22]: 01
+DEAL::    shape function i=46 [0,23]: 10
+DEAL::    shape function i=47 [1,23]: 01
+DEAL::    shape function i=48 [0,24]: 10
+DEAL::    shape function i=49 [1,24]: 01
+DEAL::    shape function i=50 [0,25]: 10
+DEAL::    shape function i=51 [1,25]: 01
+DEAL::    shape function i=52 [0,26]: 10
+DEAL::    shape function i=53 [1,26]: 01
+DEAL::Checking FE_Q<3>(1)^2^2: 
+DEAL::  Primitivity: 11111111111111111111111111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 11111111111111111111111111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1000
+DEAL::    shape function i=1 [1,0]: 0100
+DEAL::    shape function i=2 [2,0]: 0010
+DEAL::    shape function i=3 [3,0]: 0001
+DEAL::    shape function i=4 [0,1]: 1000
+DEAL::    shape function i=5 [1,1]: 0100
+DEAL::    shape function i=6 [2,1]: 0010
+DEAL::    shape function i=7 [3,1]: 0001
+DEAL::    shape function i=8 [0,2]: 1000
+DEAL::    shape function i=9 [1,2]: 0100
+DEAL::    shape function i=10 [2,2]: 0010
+DEAL::    shape function i=11 [3,2]: 0001
+DEAL::    shape function i=12 [0,3]: 1000
+DEAL::    shape function i=13 [1,3]: 0100
+DEAL::    shape function i=14 [2,3]: 0010
+DEAL::    shape function i=15 [3,3]: 0001
+DEAL::    shape function i=16 [0,4]: 1000
+DEAL::    shape function i=17 [1,4]: 0100
+DEAL::    shape function i=18 [2,4]: 0010
+DEAL::    shape function i=19 [3,4]: 0001
+DEAL::    shape function i=20 [0,5]: 1000
+DEAL::    shape function i=21 [1,5]: 0100
+DEAL::    shape function i=22 [2,5]: 0010
+DEAL::    shape function i=23 [3,5]: 0001
+DEAL::    shape function i=24 [0,6]: 1000
+DEAL::    shape function i=25 [1,6]: 0100
+DEAL::    shape function i=26 [2,6]: 0010
+DEAL::    shape function i=27 [3,6]: 0001
+DEAL::    shape function i=28 [0,7]: 1000
+DEAL::    shape function i=29 [1,7]: 0100
+DEAL::    shape function i=30 [2,7]: 0010
+DEAL::    shape function i=31 [3,7]: 0001
+DEAL::Checking FE_Q<3>(2)^2^2: 
+DEAL::  Primitivity: 111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+DEAL::  Overall primitivity: 1
+DEAL::  n_nonzero_components: 111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+DEAL::  component pattern for each shape function:
+DEAL::    shape function i=0 [0,0]: 1000
+DEAL::    shape function i=1 [1,0]: 0100
+DEAL::    shape function i=2 [2,0]: 0010
+DEAL::    shape function i=3 [3,0]: 0001
+DEAL::    shape function i=4 [0,1]: 1000
+DEAL::    shape function i=5 [1,1]: 0100
+DEAL::    shape function i=6 [2,1]: 0010
+DEAL::    shape function i=7 [3,1]: 0001
+DEAL::    shape function i=8 [0,2]: 1000
+DEAL::    shape function i=9 [1,2]: 0100
+DEAL::    shape function i=10 [2,2]: 0010
+DEAL::    shape function i=11 [3,2]: 0001
+DEAL::    shape function i=12 [0,3]: 1000
+DEAL::    shape function i=13 [1,3]: 0100
+DEAL::    shape function i=14 [2,3]: 0010
+DEAL::    shape function i=15 [3,3]: 0001
+DEAL::    shape function i=16 [0,4]: 1000
+DEAL::    shape function i=17 [1,4]: 0100
+DEAL::    shape function i=18 [2,4]: 0010
+DEAL::    shape function i=19 [3,4]: 0001
+DEAL::    shape function i=20 [0,5]: 1000
+DEAL::    shape function i=21 [1,5]: 0100
+DEAL::    shape function i=22 [2,5]: 0010
+DEAL::    shape function i=23 [3,5]: 0001
+DEAL::    shape function i=24 [0,6]: 1000
+DEAL::    shape function i=25 [1,6]: 0100
+DEAL::    shape function i=26 [2,6]: 0010
+DEAL::    shape function i=27 [3,6]: 0001
+DEAL::    shape function i=28 [0,7]: 1000
+DEAL::    shape function i=29 [1,7]: 0100
+DEAL::    shape function i=30 [2,7]: 0010
+DEAL::    shape function i=31 [3,7]: 0001
+DEAL::    shape function i=32 [0,8]: 1000
+DEAL::    shape function i=33 [1,8]: 0100
+DEAL::    shape function i=34 [2,8]: 0010
+DEAL::    shape function i=35 [3,8]: 0001
+DEAL::    shape function i=36 [0,9]: 1000
+DEAL::    shape function i=37 [1,9]: 0100
+DEAL::    shape function i=38 [2,9]: 0010
+DEAL::    shape function i=39 [3,9]: 0001
+DEAL::    shape function i=40 [0,10]: 1000
+DEAL::    shape function i=41 [1,10]: 0100
+DEAL::    shape function i=42 [2,10]: 0010
+DEAL::    shape function i=43 [3,10]: 0001
+DEAL::    shape function i=44 [0,11]: 1000
+DEAL::    shape function i=45 [1,11]: 0100
+DEAL::    shape function i=46 [2,11]: 0010
+DEAL::    shape function i=47 [3,11]: 0001
+DEAL::    shape function i=48 [0,12]: 1000
+DEAL::    shape function i=49 [1,12]: 0100
+DEAL::    shape function i=50 [2,12]: 0010
+DEAL::    shape function i=51 [3,12]: 0001
+DEAL::    shape function i=52 [0,13]: 1000
+DEAL::    shape function i=53 [1,13]: 0100
+DEAL::    shape function i=54 [2,13]: 0010
+DEAL::    shape function i=55 [3,13]: 0001
+DEAL::    shape function i=56 [0,14]: 1000
+DEAL::    shape function i=57 [1,14]: 0100
+DEAL::    shape function i=58 [2,14]: 0010
+DEAL::    shape function i=59 [3,14]: 0001
+DEAL::    shape function i=60 [0,15]: 1000
+DEAL::    shape function i=61 [1,15]: 0100
+DEAL::    shape function i=62 [2,15]: 0010
+DEAL::    shape function i=63 [3,15]: 0001
+DEAL::    shape function i=64 [0,16]: 1000
+DEAL::    shape function i=65 [1,16]: 0100
+DEAL::    shape function i=66 [2,16]: 0010
+DEAL::    shape function i=67 [3,16]: 0001
+DEAL::    shape function i=68 [0,17]: 1000
+DEAL::    shape function i=69 [1,17]: 0100
+DEAL::    shape function i=70 [2,17]: 0010
+DEAL::    shape function i=71 [3,17]: 0001
+DEAL::    shape function i=72 [0,18]: 1000
+DEAL::    shape function i=73 [1,18]: 0100
+DEAL::    shape function i=74 [2,18]: 0010
+DEAL::    shape function i=75 [3,18]: 0001
+DEAL::    shape function i=76 [0,19]: 1000
+DEAL::    shape function i=77 [1,19]: 0100
+DEAL::    shape function i=78 [2,19]: 0010
+DEAL::    shape function i=79 [3,19]: 0001
+DEAL::    shape function i=80 [0,20]: 1000
+DEAL::    shape function i=81 [1,20]: 0100
+DEAL::    shape function i=82 [2,20]: 0010
+DEAL::    shape function i=83 [3,20]: 0001
+DEAL::    shape function i=84 [0,21]: 1000
+DEAL::    shape function i=85 [1,21]: 0100
+DEAL::    shape function i=86 [2,21]: 0010
+DEAL::    shape function i=87 [3,21]: 0001
+DEAL::    shape function i=88 [0,22]: 1000
+DEAL::    shape function i=89 [1,22]: 0100
+DEAL::    shape function i=90 [2,22]: 0010
+DEAL::    shape function i=91 [3,22]: 0001
+DEAL::    shape function i=92 [0,23]: 1000
+DEAL::    shape function i=93 [1,23]: 0100
+DEAL::    shape function i=94 [2,23]: 0010
+DEAL::    shape function i=95 [3,23]: 0001
+DEAL::    shape function i=96 [0,24]: 1000
+DEAL::    shape function i=97 [1,24]: 0100
+DEAL::    shape function i=98 [2,24]: 0010
+DEAL::    shape function i=99 [3,24]: 0001
+DEAL::    shape function i=100 [0,25]: 1000
+DEAL::    shape function i=101 [1,25]: 0100
+DEAL::    shape function i=102 [2,25]: 0010
+DEAL::    shape function i=103 [3,25]: 0001
+DEAL::    shape function i=104 [0,26]: 1000
+DEAL::    shape function i=105 [1,26]: 0100
+DEAL::    shape function i=106 [2,26]: 0010
+DEAL::    shape function i=107 [3,26]: 0001

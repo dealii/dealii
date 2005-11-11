@@ -1,0 +1,147 @@
+
+DEAL::Number of active cells: 1
+DEAL::Total number of cells: 1
+DEAL::Number of degrees of freedom: 12
+DEAL::  shapefunction 0 is Nedelec:  false
+DEAL::  shapefunction 1 is Nedelec:  false
+DEAL::  shapefunction 2 is Nedelec:  false
+DEAL::  shapefunction 3 is Nedelec:  false
+DEAL::  shapefunction 4 is Nedelec:  true
+DEAL::  shapefunction 5 is Nedelec:  true
+DEAL::  shapefunction 6 is Nedelec:  true
+DEAL::  shapefunction 7 is Nedelec:  true
+DEAL::  shapefunction 8 is Nedelec:  true
+DEAL::  shapefunction 9 is Nedelec:  true
+DEAL::  shapefunction 10 is Nedelec:  true
+DEAL::  shapefunction 11 is Nedelec:  true
+DEAL::  DoF 0 belongs to base element 1, instance 0
+DEAL::  DoF 1 belongs to base element 1, instance 0
+DEAL::  DoF 2 belongs to base element 1, instance 0
+DEAL::  DoF 3 belongs to base element 1, instance 0
+DEAL::  DoF 4 belongs to base element 0, instance 0
+DEAL::  DoF 5 belongs to base element 0, instance 1
+DEAL::  DoF 6 belongs to base element 0, instance 0
+DEAL::  DoF 7 belongs to base element 0, instance 1
+DEAL::  DoF 8 belongs to base element 0, instance 0
+DEAL::  DoF 9 belongs to base element 0, instance 1
+DEAL::  DoF 10 belongs to base element 0, instance 0
+DEAL::  DoF 11 belongs to base element 0, instance 1
+DEAL::
+DEAL::  Now we renumber the DoFs anti-component-wise:
+DEAL::  *********************************************
+DEAL::  DoF 0 belongs to base 1, instance 0
+DEAL::  DoF 1 belongs to base 1, instance 0
+DEAL::  DoF 2 belongs to base 1, instance 0
+DEAL::  DoF 3 belongs to base 1, instance 0
+DEAL::  DoF 8 belongs to base 0, instance 0
+DEAL::  DoF 4 belongs to base 0, instance 1
+DEAL::  DoF 9 belongs to base 0, instance 0
+DEAL::  DoF 5 belongs to base 0, instance 1
+DEAL::  DoF 10 belongs to base 0, instance 0
+DEAL::  DoF 6 belongs to base 0, instance 1
+DEAL::  DoF 11 belongs to base 0, instance 0
+DEAL::  DoF 7 belongs to base 0, instance 1
+DEAL::
+DEAL::Number of active cells: 1
+DEAL::Total number of cells: 1
+DEAL::Number of degrees of freedom: 32
+DEAL::  shapefunction 0 is Nedelec:  false
+DEAL::  shapefunction 1 is Nedelec:  false
+DEAL::  shapefunction 2 is Nedelec:  false
+DEAL::  shapefunction 3 is Nedelec:  false
+DEAL::  shapefunction 4 is Nedelec:  false
+DEAL::  shapefunction 5 is Nedelec:  false
+DEAL::  shapefunction 6 is Nedelec:  false
+DEAL::  shapefunction 7 is Nedelec:  false
+DEAL::  shapefunction 8 is Nedelec:  true
+DEAL::  shapefunction 9 is Nedelec:  true
+DEAL::  shapefunction 10 is Nedelec:  true
+DEAL::  shapefunction 11 is Nedelec:  true
+DEAL::  shapefunction 12 is Nedelec:  true
+DEAL::  shapefunction 13 is Nedelec:  true
+DEAL::  shapefunction 14 is Nedelec:  true
+DEAL::  shapefunction 15 is Nedelec:  true
+DEAL::  shapefunction 16 is Nedelec:  true
+DEAL::  shapefunction 17 is Nedelec:  true
+DEAL::  shapefunction 18 is Nedelec:  true
+DEAL::  shapefunction 19 is Nedelec:  true
+DEAL::  shapefunction 20 is Nedelec:  true
+DEAL::  shapefunction 21 is Nedelec:  true
+DEAL::  shapefunction 22 is Nedelec:  true
+DEAL::  shapefunction 23 is Nedelec:  true
+DEAL::  shapefunction 24 is Nedelec:  true
+DEAL::  shapefunction 25 is Nedelec:  true
+DEAL::  shapefunction 26 is Nedelec:  true
+DEAL::  shapefunction 27 is Nedelec:  true
+DEAL::  shapefunction 28 is Nedelec:  true
+DEAL::  shapefunction 29 is Nedelec:  true
+DEAL::  shapefunction 30 is Nedelec:  true
+DEAL::  shapefunction 31 is Nedelec:  true
+DEAL::  DoF 0 belongs to base element 1, instance 0
+DEAL::  DoF 1 belongs to base element 1, instance 0
+DEAL::  DoF 2 belongs to base element 1, instance 0
+DEAL::  DoF 3 belongs to base element 1, instance 0
+DEAL::  DoF 4 belongs to base element 1, instance 0
+DEAL::  DoF 5 belongs to base element 1, instance 0
+DEAL::  DoF 6 belongs to base element 1, instance 0
+DEAL::  DoF 7 belongs to base element 1, instance 0
+DEAL::  DoF 8 belongs to base element 0, instance 0
+DEAL::  DoF 9 belongs to base element 0, instance 1
+DEAL::  DoF 10 belongs to base element 0, instance 0
+DEAL::  DoF 11 belongs to base element 0, instance 1
+DEAL::  DoF 12 belongs to base element 0, instance 0
+DEAL::  DoF 13 belongs to base element 0, instance 1
+DEAL::  DoF 14 belongs to base element 0, instance 0
+DEAL::  DoF 15 belongs to base element 0, instance 1
+DEAL::  DoF 16 belongs to base element 0, instance 0
+DEAL::  DoF 17 belongs to base element 0, instance 1
+DEAL::  DoF 18 belongs to base element 0, instance 0
+DEAL::  DoF 19 belongs to base element 0, instance 1
+DEAL::  DoF 20 belongs to base element 0, instance 0
+DEAL::  DoF 21 belongs to base element 0, instance 1
+DEAL::  DoF 22 belongs to base element 0, instance 0
+DEAL::  DoF 23 belongs to base element 0, instance 1
+DEAL::  DoF 24 belongs to base element 0, instance 0
+DEAL::  DoF 25 belongs to base element 0, instance 1
+DEAL::  DoF 26 belongs to base element 0, instance 0
+DEAL::  DoF 27 belongs to base element 0, instance 1
+DEAL::  DoF 28 belongs to base element 0, instance 0
+DEAL::  DoF 29 belongs to base element 0, instance 1
+DEAL::  DoF 30 belongs to base element 0, instance 0
+DEAL::  DoF 31 belongs to base element 0, instance 1
+DEAL::
+DEAL::  Now we renumber the DoFs anti-component-wise:
+DEAL::  *********************************************
+DEAL::  DoF 0 belongs to base 1, instance 0
+DEAL::  DoF 1 belongs to base 1, instance 0
+DEAL::  DoF 2 belongs to base 1, instance 0
+DEAL::  DoF 3 belongs to base 1, instance 0
+DEAL::  DoF 4 belongs to base 1, instance 0
+DEAL::  DoF 5 belongs to base 1, instance 0
+DEAL::  DoF 6 belongs to base 1, instance 0
+DEAL::  DoF 7 belongs to base 1, instance 0
+DEAL::  DoF 20 belongs to base 0, instance 0
+DEAL::  DoF 8 belongs to base 0, instance 1
+DEAL::  DoF 21 belongs to base 0, instance 0
+DEAL::  DoF 9 belongs to base 0, instance 1
+DEAL::  DoF 22 belongs to base 0, instance 0
+DEAL::  DoF 10 belongs to base 0, instance 1
+DEAL::  DoF 23 belongs to base 0, instance 0
+DEAL::  DoF 11 belongs to base 0, instance 1
+DEAL::  DoF 24 belongs to base 0, instance 0
+DEAL::  DoF 12 belongs to base 0, instance 1
+DEAL::  DoF 25 belongs to base 0, instance 0
+DEAL::  DoF 13 belongs to base 0, instance 1
+DEAL::  DoF 26 belongs to base 0, instance 0
+DEAL::  DoF 14 belongs to base 0, instance 1
+DEAL::  DoF 27 belongs to base 0, instance 0
+DEAL::  DoF 15 belongs to base 0, instance 1
+DEAL::  DoF 28 belongs to base 0, instance 0
+DEAL::  DoF 16 belongs to base 0, instance 1
+DEAL::  DoF 29 belongs to base 0, instance 0
+DEAL::  DoF 17 belongs to base 0, instance 1
+DEAL::  DoF 30 belongs to base 0, instance 0
+DEAL::  DoF 18 belongs to base 0, instance 1
+DEAL::  DoF 31 belongs to base 0, instance 0
+DEAL::  DoF 19 belongs to base 0, instance 1
+DEAL::

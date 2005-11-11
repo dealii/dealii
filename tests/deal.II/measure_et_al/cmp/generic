@@ -1,0 +1,13 @@
+
+DEAL::dim2:case0:measure=4.0000
+DEAL::dim2:case0:center=2.0000 2.0000
+DEAL::dim2:case0:barycenter=2.0000 2.0000
+DEAL::dim2:case1:measure=8.0000
+DEAL::dim2:case1:center=2.2500 2.2500
+DEAL::dim2:case1:barycenter=2.3750 2.2917
+DEAL::dim3:case0:measure=8.0000
+DEAL::dim3:case0:center=2.0000 2.0000 2.0000
+DEAL::dim3:case0:barycenter=2.0000 2.0000 2.0000
+DEAL::dim3:case1:measure=9.0000
+DEAL::dim3:case1:center=1.8750 2.0000 2.0000
+DEAL::dim3:case1:barycenter=1.8642 1.9630 1.9630

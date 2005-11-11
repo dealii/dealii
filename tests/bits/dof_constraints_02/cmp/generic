@@ -1,0 +1,19 @@
+
+DEAL::1D
+DEAL::Number of cells: 115
+DEAL::Number of dofs: 116
+DEAL::Number of constraints: 0
+DEAL::|A|=0
+DEAL::|B|=2154.26
+DEAL::2D
+DEAL::Number of cells: 1186
+DEAL::Number of dofs: 1537
+DEAL::Number of constraints: 600
+DEAL::|A|=0
+DEAL::|B|=315328.
+DEAL::3D
+DEAL::Number of cells: 736
+DEAL::Number of dofs: 1311
+DEAL::Number of constraints: 592
+DEAL::|A|=0
+DEAL::|B|=743585.

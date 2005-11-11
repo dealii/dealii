@@ -1,0 +1,5 @@
+
+DEAL:Bicgstab::Starting value 1.00000
+DEAL:Bicgstab::Convergence step 10 value 8.99878e-09
+DEAL::Norm: 6.03105
+DEAL::Residual: 8.99878e-09

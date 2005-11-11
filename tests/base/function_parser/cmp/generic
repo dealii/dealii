@@ -1,0 +1,9 @@
+
+DEAL::Initialize Failed with dim = 2, 1 components, 4 expressions, x,y as variables.
+DEAL::Initialize Succeded with dim = 2, 1 components, cos(pi*y) as function and x,y as variables.
+DEAL::Initialize Failed with dim = 2, 2 components, 4 expressions, x,y as variables.
+DEAL::Initialize Succeded with dim = 2, 2 components, cos(pi*y); sin(2*pi*x) as function and x,y as variables.
+DEAL::Initialize Failed with dim = 2, 3 components, 4 expressions, x,y as variables.
+DEAL::Initialize Succeded with dim = 2, 3 components, cos(pi*y); sin(2*pi*x); cos(2*pi*y*x) as function and x,y as variables.
+DEAL::Initialize Succeded with dim = 2, 4 components, 4 expressions, x,y as variables.
+DEAL::Initialize Succeded with dim = 2, 4 components, cos(pi*y); sin(2*pi*x); cos(2*pi*y*x); if(x<.5,y,exp(x)) as function and x,y as variables.

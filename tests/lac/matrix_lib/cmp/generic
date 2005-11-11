@@ -1,0 +1,9 @@
+
+DEAL::Sizes	4	2
+DEAL:: 1. 2. 3. 4.
+DEAL:: -14. -8.
+DEAL:: -28. -16.
+DEAL:: -172. -88. 172. 88.
+DEAL:: -344. -176. 344. 176.
+DEAL::GrowingVectorMemory:Overall allocated vectors: 4
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 1

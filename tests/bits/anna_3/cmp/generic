@@ -1,0 +1,241 @@
+
+DEAL::************* 2D *************
+DEAL::Number of active cells: 1
+DEAL::Total number of cells: 1
+DEAL::Number of degrees of freedom: 12
+DEAL::Checking for component 0
+DEAL::  DoF 4
+DEAL::  DoF 6
+DEAL::  DoF 8
+DEAL::  DoF 10
+DEAL::Checking for component 1
+DEAL::  DoF 4
+DEAL::  DoF 6
+DEAL::  DoF 8
+DEAL::  DoF 10
+DEAL::Checking for component 2
+DEAL::  DoF 5
+DEAL::  DoF 7
+DEAL::  DoF 9
+DEAL::  DoF 11
+DEAL::Checking for component 3
+DEAL::  DoF 5
+DEAL::  DoF 7
+DEAL::  DoF 9
+DEAL::  DoF 11
+DEAL::Checking for component 4
+DEAL::  DoF 0
+DEAL::  DoF 1
+DEAL::  DoF 2
+DEAL::  DoF 3
+DEAL::DoFs per component: 4 4 4 4 4 
+DEAL::
+DEAL::*** Renumbering ***
+DEAL::Checking for component 0
+DEAL::  DoF 0
+DEAL::  DoF 1
+DEAL::  DoF 2
+DEAL::  DoF 3
+DEAL::Checking for component 1
+DEAL::  DoF 0
+DEAL::  DoF 1
+DEAL::  DoF 2
+DEAL::  DoF 3
+DEAL::Checking for component 2
+DEAL::  DoF 4
+DEAL::  DoF 5
+DEAL::  DoF 6
+DEAL::  DoF 7
+DEAL::Checking for component 3
+DEAL::  DoF 4
+DEAL::  DoF 5
+DEAL::  DoF 6
+DEAL::  DoF 7
+DEAL::Checking for component 4
+DEAL::  DoF 8
+DEAL::  DoF 9
+DEAL::  DoF 10
+DEAL::  DoF 11
+DEAL::DoFs per component: 4 4 4 4 4 
+DEAL::************* 3D *************
+DEAL::Number of active cells: 1
+DEAL::Total number of cells: 1
+DEAL::Number of degrees of freedom: 32
+DEAL::Checking for component 0
+DEAL::  DoF 8
+DEAL::  DoF 10
+DEAL::  DoF 12
+DEAL::  DoF 14
+DEAL::  DoF 16
+DEAL::  DoF 18
+DEAL::  DoF 20
+DEAL::  DoF 22
+DEAL::  DoF 24
+DEAL::  DoF 26
+DEAL::  DoF 28
+DEAL::  DoF 30
+DEAL::Checking for component 1
+DEAL::  DoF 8
+DEAL::  DoF 10
+DEAL::  DoF 12
+DEAL::  DoF 14
+DEAL::  DoF 16
+DEAL::  DoF 18
+DEAL::  DoF 20
+DEAL::  DoF 22
+DEAL::  DoF 24
+DEAL::  DoF 26
+DEAL::  DoF 28
+DEAL::  DoF 30
+DEAL::Checking for component 2
+DEAL::  DoF 8
+DEAL::  DoF 10
+DEAL::  DoF 12
+DEAL::  DoF 14
+DEAL::  DoF 16
+DEAL::  DoF 18
+DEAL::  DoF 20
+DEAL::  DoF 22
+DEAL::  DoF 24
+DEAL::  DoF 26
+DEAL::  DoF 28
+DEAL::  DoF 30
+DEAL::Checking for component 3
+DEAL::  DoF 9
+DEAL::  DoF 11
+DEAL::  DoF 13
+DEAL::  DoF 15
+DEAL::  DoF 17
+DEAL::  DoF 19
+DEAL::  DoF 21
+DEAL::  DoF 23
+DEAL::  DoF 25
+DEAL::  DoF 27
+DEAL::  DoF 29
+DEAL::  DoF 31
+DEAL::Checking for component 4
+DEAL::  DoF 9
+DEAL::  DoF 11
+DEAL::  DoF 13
+DEAL::  DoF 15
+DEAL::  DoF 17
+DEAL::  DoF 19
+DEAL::  DoF 21
+DEAL::  DoF 23
+DEAL::  DoF 25
+DEAL::  DoF 27
+DEAL::  DoF 29
+DEAL::  DoF 31
+DEAL::Checking for component 5
+DEAL::  DoF 9
+DEAL::  DoF 11
+DEAL::  DoF 13
+DEAL::  DoF 15
+DEAL::  DoF 17
+DEAL::  DoF 19
+DEAL::  DoF 21
+DEAL::  DoF 23
+DEAL::  DoF 25
+DEAL::  DoF 27
+DEAL::  DoF 29
+DEAL::  DoF 31
+DEAL::Checking for component 6
+DEAL::  DoF 0
+DEAL::  DoF 1
+DEAL::  DoF 2
+DEAL::  DoF 3
+DEAL::  DoF 4
+DEAL::  DoF 5
+DEAL::  DoF 6
+DEAL::  DoF 7
+DEAL::DoFs per component: 12 12 12 12 12 12 8 
+DEAL::
+DEAL::*** Renumbering ***
+DEAL::Checking for component 0
+DEAL::  DoF 0
+DEAL::  DoF 1
+DEAL::  DoF 2
+DEAL::  DoF 3
+DEAL::  DoF 4
+DEAL::  DoF 5
+DEAL::  DoF 6
+DEAL::  DoF 7
+DEAL::  DoF 8
+DEAL::  DoF 9
+DEAL::  DoF 10
+DEAL::  DoF 11
+DEAL::Checking for component 1
+DEAL::  DoF 0
+DEAL::  DoF 1
+DEAL::  DoF 2
+DEAL::  DoF 3
+DEAL::  DoF 4
+DEAL::  DoF 5
+DEAL::  DoF 6
+DEAL::  DoF 7
+DEAL::  DoF 8
+DEAL::  DoF 9
+DEAL::  DoF 10
+DEAL::  DoF 11
+DEAL::Checking for component 2
+DEAL::  DoF 0
+DEAL::  DoF 1
+DEAL::  DoF 2
+DEAL::  DoF 3
+DEAL::  DoF 4
+DEAL::  DoF 5
+DEAL::  DoF 6
+DEAL::  DoF 7
+DEAL::  DoF 8
+DEAL::  DoF 9
+DEAL::  DoF 10
+DEAL::  DoF 11
+DEAL::Checking for component 3
+DEAL::  DoF 12
+DEAL::  DoF 13
+DEAL::  DoF 14
+DEAL::  DoF 15
+DEAL::  DoF 16
+DEAL::  DoF 17
+DEAL::  DoF 18
+DEAL::  DoF 19
+DEAL::  DoF 20
+DEAL::  DoF 21
+DEAL::  DoF 22
+DEAL::  DoF 23
+DEAL::Checking for component 4
+DEAL::  DoF 12
+DEAL::  DoF 13
+DEAL::  DoF 14
+DEAL::  DoF 15
+DEAL::  DoF 16
+DEAL::  DoF 17
+DEAL::  DoF 18
+DEAL::  DoF 19
+DEAL::  DoF 20
+DEAL::  DoF 21
+DEAL::  DoF 22
+DEAL::  DoF 23
+DEAL::Checking for component 5
+DEAL::  DoF 12
+DEAL::  DoF 13
+DEAL::  DoF 14
+DEAL::  DoF 15
+DEAL::  DoF 16
+DEAL::  DoF 17
+DEAL::  DoF 18
+DEAL::  DoF 19
+DEAL::  DoF 20
+DEAL::  DoF 21
+DEAL::  DoF 22
+DEAL::  DoF 23
+DEAL::Checking for component 6
+DEAL::  DoF 24
+DEAL::  DoF 25
+DEAL::  DoF 26
+DEAL::  DoF 27
+DEAL::  DoF 28
+DEAL::  DoF 29
+DEAL::  DoF 30
+DEAL::  DoF 31
+DEAL::DoFs per component: 12 12 12 12 12 12 8 

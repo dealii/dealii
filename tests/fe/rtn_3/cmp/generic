@@ -1,0 +1,14 @@
+
+DEAL::FE_RaviartThomasNodal<2>(0) 4
+DEAL::FE_RaviartThomas<2>(0) 4
+DEAL::FE_RaviartThomasNodal<2>(1) 12
+DEAL::FE_RaviartThomas<2>(1) 12
+DEAL::FE_RaviartThomasNodal<2>(2) 24
+DEAL::FE_RaviartThomas<2>(2) 24
+DEAL::FE_RaviartThomasNodal<2>(3) 40
+DEAL::FE_RaviartThomas<2>(3) 40
+DEAL::FE_RaviartThomasNodal<2>(4) 60
+DEAL::FE_RaviartThomas<2>(4) 60
+DEAL::FE_RaviartThomasNodal<3>(0) 6
+DEAL::FE_RaviartThomasNodal<3>(1) 36
+DEAL::FE_RaviartThomasNodal<3>(2) 108

@@ -1,0 +1,257 @@
+
+DEAL::Row 0 sparsity:  10000101010000101010000101010
+DEAL::Row=0: expected length=10, actual length=10
+DEAL::Row 1 sparsity:  01010100001010100001010100001
+DEAL::Row=1: expected length=10, actual length=10
+DEAL::Row 2 sparsity:  00001010101000010101000010101
+DEAL::Row=2: expected length=10, actual length=10
+DEAL::Row 3 sparsity:  10101000010101010000101010000
+DEAL::Row=3: expected length=10, actual length=10
+DEAL::Row 4 sparsity:  10000101010000101010100001010
+DEAL::Row=4: expected length=10, actual length=10
+DEAL::Row 5 sparsity:  01010100001010100001010101000
+DEAL::Row=5: expected length=10, actual length=10
+DEAL::Row 6 sparsity:  01000010101000010101000010101
+DEAL::Row=6: expected length=10, actual length=10
+DEAL::Row 7 sparsity:  10101010000101010000101010000
+DEAL::Row=7: expected length=10, actual length=10
+DEAL::Row 8 sparsity:  10000101010100001010100001010
+DEAL::Row=8: expected length=10, actual length=10
+DEAL::Row 9 sparsity:  11010100001010101000010101000
+DEAL::Row=9: expected length=11, actual length=11
+DEAL::Row 10 sparsity:  01000010101000010101010000101
+DEAL::Row=10: expected length=10, actual length=10
+DEAL::Row 11 sparsity:  00101010000101010000101010100
+DEAL::Row=11: expected length=10, actual length=10
+DEAL::Row 12 sparsity:  10110001010100001010100001010
+DEAL::Row=12: expected length=11, actual length=11
+DEAL::Row 13 sparsity:  01011101000010101000010101000
+DEAL::Row=13: expected length=11, actual length=11
+DEAL::Row 14 sparsity:  01000110101010000101010000101
+DEAL::Row=14: expected length=11, actual length=11
+DEAL::Row 15 sparsity:  00101010000101010100001010100
+DEAL::Row=15: expected length=10, actual length=10
+DEAL::Row 16 sparsity:  10100001010100001010101000010
+DEAL::Row=16: expected length=10, actual length=10
+DEAL::Row 17 sparsity:  00010101100010101000010101010
+DEAL::Row=17: expected length=11, actual length=11
+DEAL::Row 18 sparsity:  01010000111010000101010000101
+DEAL::Row=18: expected length=11, actual length=11
+DEAL::196==196
+DEAL::196==196
+DEAL:Iterator::0	0	0.50
+DEAL:Iterator::0	5	0.50
+DEAL:Iterator::0	7	0.50
+DEAL:Iterator::0	9	0.50
+DEAL:Iterator::0	14	0.50
+DEAL:Iterator::0	16	0.50
+DEAL:Iterator::0	18	0.50
+DEAL:Iterator::0	23	0.50
+DEAL:Iterator::0	25	0.50
+DEAL:Iterator::0	27	0.50
+DEAL:Iterator::1	1	1.50
+DEAL:Iterator::1	3	3.50
+DEAL:Iterator::1	5	5.50
+DEAL:Iterator::1	10	10.50
+DEAL:Iterator::1	12	12.50
+DEAL:Iterator::1	14	14.50
+DEAL:Iterator::1	19	19.50
+DEAL:Iterator::1	21	21.50
+DEAL:Iterator::1	23	23.50
+DEAL:Iterator::1	28	28.50
+DEAL:Iterator::2	4	8.50
+DEAL:Iterator::2	6	12.50
+DEAL:Iterator::2	8	16.50
+DEAL:Iterator::2	10	20.50
+DEAL:Iterator::2	15	30.50
+DEAL:Iterator::2	17	34.50
+DEAL:Iterator::2	19	38.50
+DEAL:Iterator::2	24	48.50
+DEAL:Iterator::2	26	52.50
+DEAL:Iterator::2	28	56.50
+DEAL:Iterator::3	0	0.50
+DEAL:Iterator::3	2	6.50
+DEAL:Iterator::3	4	12.50
+DEAL:Iterator::3	9	27.50
+DEAL:Iterator::3	11	33.50
+DEAL:Iterator::3	13	39.50
+DEAL:Iterator::3	15	45.50
+DEAL:Iterator::3	20	60.50
+DEAL:Iterator::3	22	66.50
+DEAL:Iterator::3	24	72.50
+DEAL:Iterator::4	0	0.50
+DEAL:Iterator::4	5	20.50
+DEAL:Iterator::4	7	28.50
+DEAL:Iterator::4	9	36.50
+DEAL:Iterator::4	14	56.50
+DEAL:Iterator::4	16	64.50
+DEAL:Iterator::4	18	72.50
+DEAL:Iterator::4	20	80.50
+DEAL:Iterator::4	25	100.50
+DEAL:Iterator::4	27	108.50
+DEAL:Iterator::5	1	5.50
+DEAL:Iterator::5	3	15.50
+DEAL:Iterator::5	5	25.50
+DEAL:Iterator::5	10	50.50
+DEAL:Iterator::5	12	60.50
+DEAL:Iterator::5	14	70.50
+DEAL:Iterator::5	19	95.50
+DEAL:Iterator::5	21	105.50
+DEAL:Iterator::5	23	115.50
+DEAL:Iterator::5	25	125.50
+DEAL:Iterator::6	1	6.50
+DEAL:Iterator::6	6	36.50
+DEAL:Iterator::6	8	48.50
+DEAL:Iterator::6	10	60.50
+DEAL:Iterator::6	15	90.50
+DEAL:Iterator::6	17	102.50
+DEAL:Iterator::6	19	114.50
+DEAL:Iterator::6	24	144.50
+DEAL:Iterator::6	26	156.50
+DEAL:Iterator::6	28	168.50
+DEAL:Iterator::7	0	0.50
+DEAL:Iterator::7	2	14.50
+DEAL:Iterator::7	4	28.50
+DEAL:Iterator::7	6	42.50
+DEAL:Iterator::7	11	77.50
+DEAL:Iterator::7	13	91.50
+DEAL:Iterator::7	15	105.50
+DEAL:Iterator::7	20	140.50
+DEAL:Iterator::7	22	154.50
+DEAL:Iterator::7	24	168.50
+DEAL:Iterator::8	0	0.50
+DEAL:Iterator::8	5	40.50
+DEAL:Iterator::8	7	56.50
+DEAL:Iterator::8	9	72.50
+DEAL:Iterator::8	11	88.50
+DEAL:Iterator::8	16	128.50
+DEAL:Iterator::8	18	144.50
+DEAL:Iterator::8	20	160.50
+DEAL:Iterator::8	25	200.50
+DEAL:Iterator::8	27	216.50
+DEAL:Iterator::9	0	0
+DEAL:Iterator::9	1	9.50
+DEAL:Iterator::9	3	27.50
+DEAL:Iterator::9	5	45.50
+DEAL:Iterator::9	10	90.50
+DEAL:Iterator::9	12	108.50
+DEAL:Iterator::9	14	126.50
+DEAL:Iterator::9	16	144.50
+DEAL:Iterator::9	21	189.50
+DEAL:Iterator::9	23	207.50
+DEAL:Iterator::9	25	225.50
+DEAL:Iterator::10	1	10.50
+DEAL:Iterator::10	6	60.50
+DEAL:Iterator::10	8	80.50
+DEAL:Iterator::10	10	100.50
+DEAL:Iterator::10	15	150.50
+DEAL:Iterator::10	17	170.50
+DEAL:Iterator::10	19	190.50
+DEAL:Iterator::10	21	210.50
+DEAL:Iterator::10	26	260.50
+DEAL:Iterator::10	28	280.50
+DEAL:Iterator::11	2	22.50
+DEAL:Iterator::11	4	44.50
+DEAL:Iterator::11	6	66.50
+DEAL:Iterator::11	11	121.50
+DEAL:Iterator::11	13	143.50
+DEAL:Iterator::11	15	165.50
+DEAL:Iterator::11	20	220.50
+DEAL:Iterator::11	22	242.50
+DEAL:Iterator::11	24	264.50
+DEAL:Iterator::11	26	286.50
+DEAL:Iterator::12	3	0
+DEAL:Iterator::12	0	0.50
+DEAL:Iterator::12	2	24.50
+DEAL:Iterator::12	7	84.50
+DEAL:Iterator::12	9	108.50
+DEAL:Iterator::12	11	132.50
+DEAL:Iterator::12	16	192.50
+DEAL:Iterator::12	18	216.50
+DEAL:Iterator::12	20	240.50
+DEAL:Iterator::12	25	300.50
+DEAL:Iterator::12	27	324.50
+DEAL:Iterator::13	4	0
+DEAL:Iterator::13	1	13.50
+DEAL:Iterator::13	3	39.50
+DEAL:Iterator::13	5	65.50
+DEAL:Iterator::13	7	91.50
+DEAL:Iterator::13	12	156.50
+DEAL:Iterator::13	14	182.50
+DEAL:Iterator::13	16	208.50
+DEAL:Iterator::13	21	273.50
+DEAL:Iterator::13	23	299.50
+DEAL:Iterator::13	25	325.50
+DEAL:Iterator::14	5	0
+DEAL:Iterator::14	1	14.50
+DEAL:Iterator::14	6	84.50
+DEAL:Iterator::14	8	112.50
+DEAL:Iterator::14	10	140.50
+DEAL:Iterator::14	12	168.50
+DEAL:Iterator::14	17	238.50
+DEAL:Iterator::14	19	266.50
+DEAL:Iterator::14	21	294.50
+DEAL:Iterator::14	26	364.50
+DEAL:Iterator::14	28	392.50
+DEAL:Iterator::15	6	90.50
+DEAL:Iterator::15	2	30.50
+DEAL:Iterator::15	4	60.50
+DEAL:Iterator::15	11	165.50
+DEAL:Iterator::15	13	195.50
+DEAL:Iterator::15	15	225.50
+DEAL:Iterator::15	17	255.50
+DEAL:Iterator::15	22	330.50
+DEAL:Iterator::15	24	360.50
+DEAL:Iterator::15	26	390.50
+DEAL:Iterator::16	7	112.50
+DEAL:Iterator::16	0	0.50
+DEAL:Iterator::16	2	32.50
+DEAL:Iterator::16	9	144.50
+DEAL:Iterator::16	11	176.50
+DEAL:Iterator::16	16	256.50
+DEAL:Iterator::16	18	288.50
+DEAL:Iterator::16	20	320.50
+DEAL:Iterator::16	22	352.50
+DEAL:Iterator::16	27	432.50
+DEAL:Iterator::17	8	0
+DEAL:Iterator::17	3	51.50
+DEAL:Iterator::17	5	85.50
+DEAL:Iterator::17	7	119.50
+DEAL:Iterator::17	12	204.50
+DEAL:Iterator::17	14	238.50
+DEAL:Iterator::17	16	272.50
+DEAL:Iterator::17	21	357.50
+DEAL:Iterator::17	23	391.50
+DEAL:Iterator::17	25	425.50
+DEAL:Iterator::17	27	459.50
+DEAL:Iterator::18	9	0
+DEAL:Iterator::18	1	18.50
+DEAL:Iterator::18	3	54.50
+DEAL:Iterator::18	8	144.50
+DEAL:Iterator::18	10	180.50
+DEAL:Iterator::18	12	216.50
+DEAL:Iterator::18	17	306.50
+DEAL:Iterator::18	19	342.50
+DEAL:Iterator::18	21	378.50
+DEAL:Iterator::18	26	468.50
+DEAL:Iterator::18	28	504.50
+DEAL::vmult 0 72.00 72.00
+DEAL::vmult 1 2658.00 2658.00
+DEAL::vmult 2 6332.50 6332.50
+DEAL::vmult 3 6288.00 6288.00
+DEAL::vmult 4 10810.50 10810.50
+DEAL::vmult 5 12221.50 12221.50
+DEAL::vmult 6 18749.00 18749.00
+DEAL::vmult 7 14275.50 14275.50
+DEAL::vmult 8 20949.00 20949.00
+DEAL::vmult 9 20999.00 20999.00
+DEAL::vmult 10 29845.50 29845.50
+DEAL::vmult 11 29848.50 29848.50
+DEAL::vmult 12 31135.50 31135.50
+DEAL::vmult 13 29638.50 29638.50
+DEAL::vmult 14 40618.00 40618.00
+DEAL::vmult 15 39010.00 39010.00
+DEAL::vmult 16 39234.00 39234.00
+DEAL::vmult 17 51127.50 51127.50
+DEAL::vmult 18 51714.50 51714.50
+DEAL::matrix_scalar_product 15416941535.50 15416941535.50

@@ -1,0 +1,10 @@
+
+DEAL:Rect::operator= (const FullMatrix<number>&) ok
+DEAL:Rect::vmult ok
+DEAL:Rect::vmult_add ok
+DEAL:Rect::Tvmult ok
+DEAL:Rect::Tvmult_add ok
+DEAL::Eigenvalues 5	0
+DEAL::Eigenvalues 1	0
+DEAL::Eigenvalues 5	0
+DEAL::Eigenvalues 5	0

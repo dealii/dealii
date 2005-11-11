@@ -1,0 +1,21 @@
+
+DEAL::Coarse cell 0 vertices:
+DEAL:: 1 2 7 8 4 5 10 11
+DEAL::Coarse cell 1 vertices:
+DEAL:: 1 4 7 10 0 3 6 9
+DEAL::Interior face with children:
+DEAL::  cell=0.1
+DEAL::  face_no=4
+DEAL::  vertices=1 7 4 10
+DEAL::  face orientation=false
+DEAL::  neighbor face vertices=1 7 4 10
+DEAL::  neighbor->face_orientation(nb_of_nb)=true
+DEAL::  checking subfaces:
+DEAL::    subface_no=0
+DEAL::      center=0.00000 0.250000 0.750000
+DEAL::    subface_no=1
+DEAL::      center=0.00000 0.250000 0.250000
+DEAL::    subface_no=2
+DEAL::      center=0.00000 0.750000 0.750000
+DEAL::    subface_no=3
+DEAL::      center=0.00000 0.750000 0.250000

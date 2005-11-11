@@ -1,0 +1,33 @@
+
+DEAL::1d, hypercube diameter, 0 refinements: 1.000
+DEAL::1d, hypercube diameter, 2 refinements: 1.000
+DEAL::2d, hypercube diameter, 0 refinements: 1.414
+DEAL::2d, hypercube diameter, 2 refinements: 1.414
+DEAL::2d, hyperball diameter, 0 refinements: 2.000
+DEAL::2d, hyperball diameter, 2 refinements: 2.000
+DEAL::3d, hypercube diameter, 0 refinements: 1.732
+DEAL::3d, hypercube diameter, 2 refinements: 1.732
+Unchanged grid:
+0.000 0.000 0 0
+1.000 0.000 0 0
+1.000 1.000 0 0
+0.000 1.000 0 0
+0.000 0.000 0 0
+
+
+Shifted grid:
+1.000 2.000 0 0
+2.000 2.000 0 0
+2.000 3.000 0 0
+1.000 3.000 0 0
+1.000 2.000 0 0
+
+
+Rotated grid:
+-0.7071 2.121 0 0
+7.140e-10 2.828 0 0
+-0.7071 3.536 0 0
+-1.414 2.828 0 0
+-0.7071 2.121 0 0
+
+

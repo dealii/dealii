@@ -1,0 +1,531 @@
+
+DEAL::Empty matrix
+DEAL::Final
+DEAL::Final
+DEAL::cols:
+DEAL::Final
+DEAL::Final
+DEAL::cols:
+DEAL::Final
+DEAL::Final
+DEAL::cols:
+DEAL::Final
+DEAL::Final
+DEAL::cols:
+DEAL::Final
+DEAL::Final
+DEAL::cols:
+DEAL::Final
+DEAL::Final
+DEAL::cols:
+DEAL::Repeat row 2
+DEAL::Irregular matrix
+DEAL::0	0	0	1.0
+DEAL::	1
+DEAL::cols:	,0	,1	,2	,3
+DEAL::1	1	0	2.0
+DEAL::	2
+DEAL::cols:	,0
+DEAL::2	2	0	3.0
+DEAL::	4
+DEAL::cols:	,0
+DEAL::3	4	3	17.
+DEAL::	4
+DEAL::cols:
+DEAL::4	4	3	17.
+DEAL::Final
+DEAL::cols:	,3
+DEAL::Final
+DEAL::Final
+DEAL::cols:
+DEAL::	0	0	1.0
+DEAL::	0	1	1.0
+DEAL::	0	2	2.0
+DEAL::	0	3	3.0
+DEAL::	1	0	2.0
+DEAL::	2	0	3.0
+DEAL::	4	3	17.
+DEAL::Repeat row 2
+DEAL::	2	0	3.0
+First conjugate
+0	0	4.0
+0	1	18.
+0	2	32.
+1	0	16.
+1	1	70.
+1	2	1.2e+02
+2	0	28.
+2	1	1.2e+02
+2	2	2.2e+02
+Second conjugate
+0	0	2.8e+02
+0	1	4.0e+02
+1	0	3.8e+02
+1	1	5.5e+02
+DEAL::Structure
+DEAL::Assemble
+DEAL:5-SparseMatrix<double>:Richardson::Starting value 4.0
+DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 value 3.6
+DEAL:5-SparseMatrix<double>:Richardson::Starting value 3.6
+DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 value 1.2
+DEAL:5-SparseMatrix<double>:Richardson::Starting value 1.2
+DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 value 0.00061
+DEAL:5-SparseMatrix<double>:Richardson::Starting value 0.00061
+DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 value 2.1e-07
+DEAL:5-SparseMatrix<double>:Richardson::Starting value 4.0
+DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 value 0.0059
+DEAL:5-SparseMatrix<double>:Richardson::Starting value 0.0059
+DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 value 0.00052
+DEAL:5-SparseMatrix<double>:Richardson::Starting value 0.00052
+DEAL:5-SparseMatrix<double>:Richardson::Failure step 10 value 0
+DEAL:5-SparseMatrix<double>::Transpose
+DEAL:5-SparseMatrix<double>:RichardsonT::Starting value 4.0
+DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 value 3.6
+DEAL:5-SparseMatrix<double>:RichardsonT::Starting value 3.6
+DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 value 1.2
+DEAL:5-SparseMatrix<double>:RichardsonT::Starting value 1.2
+DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 value 0.0054
+DEAL:5-SparseMatrix<double>:RichardsonT::Starting value 0.0054
+DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 value 0.00026
+DEAL:5-SparseMatrix<double>:RichardsonT::Starting value 4.0
+DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 value 0.0034
+DEAL:5-SparseMatrix<double>:RichardsonT::Starting value 0.0034
+DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 value 0.0041
+DEAL:5-SparseMatrix<double>:RichardsonT::Starting value 0.0041
+DEAL:5-SparseMatrix<double>:RichardsonT::Failure step 10 value 3.0e-05
+DEAL::GrowingVectorMemory:Overall allocated vectors: 28
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
+DEAL::	0	0	5.0
+DEAL::	0	1	-2.0
+DEAL::	0	4	-1.0
+DEAL::	1	1	5.0
+DEAL::	1	0	-1.0
+DEAL::	1	2	-2.0
+DEAL::	1	5	-1.0
+DEAL::	2	2	5.0
+DEAL::	2	1	-1.0
+DEAL::	2	3	-2.0
+DEAL::	2	6	-1.0
+DEAL::	3	3	5.0
+DEAL::	3	2	-1.0
+DEAL::	3	7	-1.0
+DEAL::	4	4	5.0
+DEAL::	4	0	-1.0
+DEAL::	4	5	-2.0
+DEAL::	4	8	-1.0
+DEAL::	5	5	5.0
+DEAL::	5	1	-1.0
+DEAL::	5	4	-1.0
+DEAL::	5	6	-2.0
+DEAL::	5	9	-1.0
+DEAL::	6	6	5.0
+DEAL::	6	2	-1.0
+DEAL::	6	5	-1.0
+DEAL::	6	7	-2.0
+DEAL::	6	10	-1.0
+DEAL::	7	7	5.0
+DEAL::	7	3	-1.0
+DEAL::	7	6	-1.0
+DEAL::	7	11	-1.0
+DEAL::	8	8	5.0
+DEAL::	8	4	-1.0
+DEAL::	8	9	-2.0
+DEAL::	8	12	-1.0
+DEAL::	9	9	5.0
+DEAL::	9	5	-1.0
+DEAL::	9	8	-1.0
+DEAL::	9	10	-2.0
+DEAL::	9	13	-1.0
+DEAL::	10	10	5.0
+DEAL::	10	6	-1.0
+DEAL::	10	9	-1.0
+DEAL::	10	11	-2.0
+DEAL::	10	14	-1.0
+DEAL::	11	11	5.0
+DEAL::	11	7	-1.0
+DEAL::	11	10	-1.0
+DEAL::	11	15	-1.0
+DEAL::	12	12	5.0
+DEAL::	12	8	-1.0
+DEAL::	12	13	-2.0
+DEAL::	13	13	5.0
+DEAL::	13	9	-1.0
+DEAL::	13	12	-1.0
+DEAL::	13	14	-2.0
+DEAL::	14	14	5.0
+DEAL::	14	10	-1.0
+DEAL::	14	13	-1.0
+DEAL::	14	15	-2.0
+DEAL::	15	15	5.0
+DEAL::	15	11	-1.0
+DEAL::	15	14	-1.0
+DEAL::Repeat row 2
+DEAL::	2	2	5.0
+DEAL::	2	1	-1.0
+DEAL::	2	3	-2.0
+DEAL::	2	6	-1.0
+DEAL::Structure
+DEAL::Assemble
+DEAL:5-BlockSparseMatrix<double>:Richardson::Starting value 4.0
+DEAL:5-BlockSparseMatrix<double>:Richardson::Failure step 10 value 3.6
+DEAL:5-BlockSparseMatrix<double>:Richardson::Starting value 3.6
+DEAL:5-BlockSparseMatrix<double>:Richardson::Failure step 10 value 1.2
+DEAL:5-BlockSparseMatrix<double>:Richardson::Starting value 4.0
+DEAL:5-BlockSparseMatrix<double>:Richardson::Failure step 10 value 0.0059
+DEAL:5-BlockSparseMatrix<double>::Transpose
+DEAL:5-BlockSparseMatrix<double>:RichardsonT::Starting value 4.0
+DEAL:5-BlockSparseMatrix<double>:RichardsonT::Failure step 10 value 3.6
+DEAL:5-BlockSparseMatrix<double>:RichardsonT::Starting value 3.6
+DEAL:5-BlockSparseMatrix<double>:RichardsonT::Failure step 10 value 1.2
+DEAL:5-BlockSparseMatrix<double>:RichardsonT::Starting value 4.0
+DEAL:5-BlockSparseMatrix<double>:RichardsonT::Failure step 10 value 0.0034
+DEAL::GrowingVectorMemory:Overall allocated vectors: 12
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
+DEAL::	0	0	5.0
+DEAL::	0	1	-2.0
+DEAL::	0	4	-1.0
+DEAL::	1	1	5.0
+DEAL::	1	0	-1.0
+DEAL::	1	2	-2.0
+DEAL::	1	5	-1.0
+DEAL::	2	2	5.0
+DEAL::	2	1	-1.0
+DEAL::	2	3	-2.0
+DEAL::	2	6	-1.0
+DEAL::	3	3	5.0
+DEAL::	3	2	-1.0
+DEAL::	3	7	-1.0
+DEAL::	4	4	5.0
+DEAL::	4	0	-1.0
+DEAL::	4	5	-2.0
+DEAL::	4	8	-1.0
+DEAL::	5	5	5.0
+DEAL::	5	1	-1.0
+DEAL::	5	4	-1.0
+DEAL::	5	6	-2.0
+DEAL::	5	9	-1.0
+DEAL::	6	6	5.0
+DEAL::	6	2	-1.0
+DEAL::	6	5	-1.0
+DEAL::	6	7	-2.0
+DEAL::	6	10	-1.0
+DEAL::	7	7	5.0
+DEAL::	7	3	-1.0
+DEAL::	7	6	-1.0
+DEAL::	7	11	-1.0
+DEAL::	8	8	5.0
+DEAL::	8	4	-1.0
+DEAL::	8	9	-2.0
+DEAL::	8	12	-1.0
+DEAL::	9	9	5.0
+DEAL::	9	5	-1.0
+DEAL::	9	8	-1.0
+DEAL::	9	10	-2.0
+DEAL::	9	13	-1.0
+DEAL::	10	10	5.0
+DEAL::	10	6	-1.0
+DEAL::	10	9	-1.0
+DEAL::	10	11	-2.0
+DEAL::	10	14	-1.0
+DEAL::	11	11	5.0
+DEAL::	11	7	-1.0
+DEAL::	11	10	-1.0
+DEAL::	11	15	-1.0
+DEAL::	12	12	5.0
+DEAL::	12	8	-1.0
+DEAL::	12	13	-2.0
+DEAL::	13	13	5.0
+DEAL::	13	9	-1.0
+DEAL::	13	12	-1.0
+DEAL::	13	14	-2.0
+DEAL::	14	14	5.0
+DEAL::	14	10	-1.0
+DEAL::	14	13	-1.0
+DEAL::	14	15	-2.0
+DEAL::	15	15	5.0
+DEAL::	15	11	-1.0
+DEAL::	15	14	-1.0
+DEAL::Repeat row 2
+DEAL::	2	2	5.0
+DEAL::	2	1	-1.0
+DEAL::	2	3	-2.0
+DEAL::	2	6	-1.0
+DEAL::Assemble
+DEAL:5-SparseMatrixEZ<double>:Richardson::Starting value 4.0
+DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 value 3.6
+DEAL:5-SparseMatrixEZ<double>:Richardson::Starting value 3.6
+DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 value 1.2
+DEAL:5-SparseMatrixEZ<double>:Richardson::Starting value 1.2
+DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 value 0.00061
+DEAL:5-SparseMatrixEZ<double>:Richardson::Starting value 0.00061
+DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 value 2.1e-07
+DEAL:5-SparseMatrixEZ<double>:Richardson::Starting value 4.0
+DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 value 0.0059
+DEAL:5-SparseMatrixEZ<double>:Richardson::Starting value 0.0059
+DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 value 0.00052
+DEAL:5-SparseMatrixEZ<double>:Richardson::Starting value 0.00052
+DEAL:5-SparseMatrixEZ<double>:Richardson::Failure step 10 value 0
+DEAL:5-SparseMatrixEZ<double>::Transpose
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting value 4.0
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 3.6
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting value 3.6
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 1.2
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting value 1.2
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 0.0054
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting value 0.0054
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 0.00026
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting value 4.0
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 0.0034
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting value 0.0034
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 0.0041
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Starting value 0.0041
+DEAL:5-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 3.0e-05
+DEAL::GrowingVectorMemory:Overall allocated vectors: 28
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
+DEAL::	0	0	5.0
+DEAL::	0	1	-2.0
+DEAL::	0	4	-1.0
+DEAL::	1	0	-1.0
+DEAL::	1	1	5.0
+DEAL::	1	2	-2.0
+DEAL::	1	5	-1.0
+DEAL::	2	1	-1.0
+DEAL::	2	2	5.0
+DEAL::	2	3	-2.0
+DEAL::	2	6	-1.0
+DEAL::	3	2	-1.0
+DEAL::	3	3	5.0
+DEAL::	3	7	-1.0
+DEAL::	4	0	-1.0
+DEAL::	4	4	5.0
+DEAL::	4	5	-2.0
+DEAL::	4	8	-1.0
+DEAL::	5	1	-1.0
+DEAL::	5	4	-1.0
+DEAL::	5	5	5.0
+DEAL::	5	6	-2.0
+DEAL::	5	9	-1.0
+DEAL::	6	2	-1.0
+DEAL::	6	5	-1.0
+DEAL::	6	6	5.0
+DEAL::	6	7	-2.0
+DEAL::	6	10	-1.0
+DEAL::	7	3	-1.0
+DEAL::	7	6	-1.0
+DEAL::	7	7	5.0
+DEAL::	7	11	-1.0
+DEAL::	8	4	-1.0
+DEAL::	8	8	5.0
+DEAL::	8	9	-2.0
+DEAL::	8	12	-1.0
+DEAL::	9	5	-1.0
+DEAL::	9	8	-1.0
+DEAL::	9	9	5.0
+DEAL::	9	10	-2.0
+DEAL::	9	13	-1.0
+DEAL::	10	6	-1.0
+DEAL::	10	9	-1.0
+DEAL::	10	10	5.0
+DEAL::	10	11	-2.0
+DEAL::	10	14	-1.0
+DEAL::	11	7	-1.0
+DEAL::	11	10	-1.0
+DEAL::	11	11	5.0
+DEAL::	11	15	-1.0
+DEAL::	12	8	-1.0
+DEAL::	12	12	5.0
+DEAL::	12	13	-2.0
+DEAL::	13	9	-1.0
+DEAL::	13	12	-1.0
+DEAL::	13	13	5.0
+DEAL::	13	14	-2.0
+DEAL::	14	10	-1.0
+DEAL::	14	13	-1.0
+DEAL::	14	14	5.0
+DEAL::	14	15	-2.0
+DEAL::	15	11	-1.0
+DEAL::	15	14	-1.0
+DEAL::	15	15	5.0
+DEAL::Repeat row 2
+DEAL::	2	1	-1.0
+DEAL::	2	2	5.0
+DEAL::	2	3	-2.0
+DEAL::	2	6	-1.0
+DEAL::SparseMatrixEZ:used      entries:64
+DEAL::SparseMatrixEZ:allocated entries:72
+DEAL::SparseMatrixEZ:reserved  entries:96
+DEAL::SparseMatrixEZ:entries	3	rows	4
+DEAL::SparseMatrixEZ:entries	4	rows	8
+DEAL::SparseMatrixEZ:entries	5	rows	4
+DEAL::Matrices are equal
+DEAL::Structure
+DEAL::Assemble
+DEAL:9-SparseMatrix<double>:Richardson::Starting value 4.0
+DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 value 2.4
+DEAL:9-SparseMatrix<double>:Richardson::Starting value 2.4
+DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 value 0.74
+DEAL:9-SparseMatrix<double>:Richardson::Starting value 0.74
+DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 value 0.00035
+DEAL:9-SparseMatrix<double>:Richardson::Starting value 0.00035
+DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 value 9.6e-08
+DEAL:9-SparseMatrix<double>:Richardson::Starting value 4.0
+DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 value 0.025
+DEAL:9-SparseMatrix<double>:Richardson::Starting value 0.025
+DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 value 0.0021
+DEAL:9-SparseMatrix<double>:Richardson::Starting value 0.0021
+DEAL:9-SparseMatrix<double>:Richardson::Failure step 10 value 0
+DEAL:9-SparseMatrix<double>::Transpose
+DEAL:9-SparseMatrix<double>:RichardsonT::Starting value 4.0
+DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 value 2.4
+DEAL:9-SparseMatrix<double>:RichardsonT::Starting value 2.4
+DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 value 0.74
+DEAL:9-SparseMatrix<double>:RichardsonT::Starting value 0.74
+DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 value 0.00035
+DEAL:9-SparseMatrix<double>:RichardsonT::Starting value 0.00035
+DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 value 6.4e-08
+DEAL:9-SparseMatrix<double>:RichardsonT::Starting value 4.0
+DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 value 0.025
+DEAL:9-SparseMatrix<double>:RichardsonT::Starting value 0.025
+DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 value 0.0021
+DEAL:9-SparseMatrix<double>:RichardsonT::Starting value 0.0021
+DEAL:9-SparseMatrix<double>:RichardsonT::Failure step 10 value 0
+DEAL::GrowingVectorMemory:Overall allocated vectors: 28
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
+DEAL::Assemble
+DEAL:9-SparseMatrixEZ<double>:Richardson::Starting value 4.0
+DEAL:9-SparseMatrixEZ<double>:Richardson::Failure step 10 value 2.4
+DEAL:9-SparseMatrixEZ<double>:Richardson::Starting value 2.4
+DEAL:9-SparseMatrixEZ<double>:Richardson::Failure step 10 value 0.74
+DEAL:9-SparseMatrixEZ<double>:Richardson::Starting value 0.74
+DEAL:9-SparseMatrixEZ<double>:Richardson::Failure step 10 value 0.00035
+DEAL:9-SparseMatrixEZ<double>:Richardson::Starting value 0.00035
+DEAL:9-SparseMatrixEZ<double>:Richardson::Failure step 10 value 9.6e-08
+DEAL:9-SparseMatrixEZ<double>:Richardson::Starting value 4.0
+DEAL:9-SparseMatrixEZ<double>:Richardson::Failure step 10 value 0.025
+DEAL:9-SparseMatrixEZ<double>:Richardson::Starting value 0.025
+DEAL:9-SparseMatrixEZ<double>:Richardson::Failure step 10 value 0.0021
+DEAL:9-SparseMatrixEZ<double>:Richardson::Starting value 0.0021
+DEAL:9-SparseMatrixEZ<double>:Richardson::Failure step 10 value 0
+DEAL:9-SparseMatrixEZ<double>::Transpose
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting value 4.0
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 2.4
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting value 2.4
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 0.74
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting value 0.74
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 0.00035
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting value 0.00035
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 6.4e-08
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting value 4.0
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 0.025
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting value 0.025
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 0.0021
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Starting value 0.0021
+DEAL:9-SparseMatrixEZ<double>:RichardsonT::Failure step 10 value 0
+DEAL::GrowingVectorMemory:Overall allocated vectors: 28
+DEAL::GrowingVectorMemory:Maximum allocated vectors: 2
+DEAL::SparseMatrixEZ:used      entries:100
+DEAL::SparseMatrixEZ:allocated entries:111
+DEAL::SparseMatrixEZ:reserved  entries:192
+DEAL::SparseMatrixEZ:entries	4	rows	4
+DEAL::SparseMatrixEZ:entries	6	rows	8
+DEAL::SparseMatrixEZ:entries	9	rows	4
+DEAL::write/read-error at global position 0
+DEAL::write/read-error at global position 1
+DEAL::write/read-error at global position 2
+DEAL::write/read-error at global position 3
+DEAL::write/read-error at global position 4
+DEAL::write/read-error at global position 5
+DEAL::write/read-error at global position 6
+DEAL::write/read-error at global position 7
+DEAL::write/read-error at global position 8
+DEAL::write/read-error at global position 9
+DEAL::write/read-error at global position 10
+DEAL::write/read-error at global position 11
+DEAL::write/read-error at global position 12
+DEAL::write/read-error at global position 13
+DEAL::write/read-error at global position 14
+DEAL::write/read-error at global position 15
+DEAL::write/read-error at global position 16
+DEAL::write/read-error at global position 17
+DEAL::write/read-error at global position 18
+DEAL::write/read-error at global position 19
+DEAL::write/read-error at global position 20
+DEAL::write/read-error at global position 21
+DEAL::write/read-error at global position 22
+DEAL::write/read-error at global position 23
+DEAL::write/read-error at global position 24
+DEAL::write/read-error at global position 25
+DEAL::write/read-error at global position 26
+DEAL::write/read-error at global position 27
+DEAL::write/read-error at global position 28
+DEAL::write/read-error at global position 29
+DEAL::write/read-error at global position 30
+DEAL::write/read-error at global position 31
+DEAL::write/read-error at global position 32
+DEAL::write/read-error at global position 33
+DEAL::write/read-error at global position 34
+DEAL::write/read-error at global position 35
+DEAL::write/read-error at global position 36
+DEAL::write/read-error at global position 37
+DEAL::write/read-error at global position 38
+DEAL::write/read-error at global position 39
+DEAL::write/read-error at global position 40
+DEAL::write/read-error at global position 41
+DEAL::write/read-error at global position 42
+DEAL::write/read-error at global position 43
+DEAL::write/read-error at global position 44
+DEAL::write/read-error at global position 45
+DEAL::write/read-error at global position 46
+DEAL::write/read-error at global position 47
+DEAL::write/read-error at global position 48
+DEAL::write/read-error at global position 49
+DEAL::write/read-error at global position 50
+DEAL::write/read-error at global position 51
+DEAL::write/read-error at global position 52
+DEAL::write/read-error at global position 53
+DEAL::write/read-error at global position 54
+DEAL::write/read-error at global position 55
+DEAL::write/read-error at global position 56
+DEAL::write/read-error at global position 57
+DEAL::write/read-error at global position 58
+DEAL::write/read-error at global position 59
+DEAL::write/read-error at global position 60
+DEAL::write/read-error at global position 61
+DEAL::write/read-error at global position 62
+DEAL::write/read-error at global position 63
+DEAL::write/read-error at global position 64
+DEAL::write/read-error at global position 65
+DEAL::write/read-error at global position 66
+DEAL::write/read-error at global position 67
+DEAL::write/read-error at global position 68
+DEAL::write/read-error at global position 69
+DEAL::write/read-error at global position 70
+DEAL::write/read-error at global position 71
+DEAL::write/read-error at global position 72
+DEAL::write/read-error at global position 73
+DEAL::write/read-error at global position 74
+DEAL::write/read-error at global position 75
+DEAL::write/read-error at global position 76
+DEAL::write/read-error at global position 77
+DEAL::write/read-error at global position 78
+DEAL::write/read-error at global position 79
+DEAL::write/read-error at global position 80
+DEAL::write/read-error at global position 81
+DEAL::write/read-error at global position 82
+DEAL::write/read-error at global position 83
+DEAL::write/read-error at global position 84
+DEAL::write/read-error at global position 85
+DEAL::write/read-error at global position 86
+DEAL::write/read-error at global position 87
+DEAL::write/read-error at global position 88
+DEAL::write/read-error at global position 89
+DEAL::write/read-error at global position 90
+DEAL::write/read-error at global position 91
+DEAL::write/read-error at global position 92
+DEAL::write/read-error at global position 93
+DEAL::write/read-error at global position 94
+DEAL::write/read-error at global position 95
+DEAL::write/read-error at global position 96
+DEAL::write/read-error at global position 97
+DEAL::write/read-error at global position 98
+DEAL::write/read-error at global position 99

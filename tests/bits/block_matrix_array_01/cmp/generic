@@ -1,0 +1,5 @@
+
+DEAL::\begin{array}{cc}
+DEAL::	M0+2xM1^T &	-3xM2-3xM2^T\\
+DEAL::	 &	M3^T\\
+DEAL::\end{array}

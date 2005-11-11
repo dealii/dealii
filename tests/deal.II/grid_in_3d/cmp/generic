@@ -1,0 +1,58 @@
+
+DEAL::Reading grid_in_3d_1.in
+DEAL::  16480 active cells
+DEAL::  hash=950760495
+DEAL::Reading grid_in_3d_2.in
+DEAL::  360 active cells
+DEAL::  hash=454134
+DEAL::Reading grid_in_3d_3.in
+DEAL::  2 active cells
+DEAL::  hash=2
+DEAL::Reading grid_in_3d_4.in
+DEAL::  13824 active cells
+DEAL::  hash=667584889
+DEAL::Reading grid_in_3d_evil_0.in
+DEAL::  10 active cells
+DEAL::  hash=318
+DEAL::Reading grid_in_3d_evil_1.in
+DEAL::  caught exception:
+DEAL::--------------------------------------------------------
+An error occurred in file <grid_reordering.cc> in function
+    void internal::GridReordering3d::Orienter::orient_edges()
+The violated condition was: 
+    cell_is_consistent(cur_posn)
+The name and call sequence of the exception was:
+    ExcGridOrientError("Mesh is Unorientable")
+Additional Information: 
+Grid Orientation Error: Mesh is Unorientable
+--------------------------------------------------------
+
+DEAL::Reading grid_in_3d_evil_2.in
+DEAL::  caught exception:
+DEAL::--------------------------------------------------------
+An error occurred in file <grid_reordering.cc> in function
+    void internal::GridReordering3d::Orienter::orient_edges()
+The violated condition was: 
+    cell_is_consistent(cur_posn)
+The name and call sequence of the exception was:
+    ExcGridOrientError("Mesh is Unorientable")
+Additional Information: 
+Grid Orientation Error: Mesh is Unorientable
+--------------------------------------------------------
+
+DEAL::Reading grid_in_3d_evil_3.in
+DEAL::  caught exception:
+DEAL::--------------------------------------------------------
+An error occurred in file <grid_reordering.cc> in function
+    void internal::GridReordering3d::Orienter::orient_edges()
+The violated condition was: 
+    cell_is_consistent(cur_posn)
+The name and call sequence of the exception was:
+    ExcGridOrientError("Mesh is Unorientable")
+Additional Information: 
+Grid Orientation Error: Mesh is Unorientable
+--------------------------------------------------------
+
+DEAL::Reading grid_in_3d_evil_4.in
+DEAL::  10 active cells
+DEAL::  hash=318
