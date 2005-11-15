@@ -761,7 +761,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * components of the finite
 				      * element.
 				      *
-				      * Depending on the last
+				      * Depending on the value of the last
 				      * argument, the outer vector of
 				      * <tt>values</tt> has either the
 				      * length of the quadrature rule
@@ -770,7 +770,7 @@ class FEValuesBase : protected FEValuesData<dim>
 				      * of components to be filled
 				      * <tt>quadrature_points_fastest
 				      * == true</tt>. If <tt>p</tt> is
-				      * the xurrent quadrature point
+				      * the current quadrature point
 				      * number and <tt>i</tt> is the
 				      * vector component of the
 				      * solution desired, the access
@@ -800,7 +800,7 @@ class FEValuesBase : protected FEValuesData<dim>
     void get_function_values (const InputVector& fe_function,
 			      const VectorSlice<const std::vector<unsigned int> >& indices,
 			      std::vector<std::vector<number> >& values,
-			      bool quadrature_points_fastest) const;
+			      const bool quadrature_points_fastest) const;
 
 				     /**
 				      * Compute the gradients of the finite
