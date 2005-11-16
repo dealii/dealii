@@ -50,9 +50,11 @@ $hierarchy{"x86_64-unknown-linux-gnu+gcc4.1"} = "x86_64-unknown-linux-gnu+gcc4.0
 $configuration = $ARGV[0];
 
 # first check whether the given configuration is known at all. if not,
-# we can only resort to the generic files
+# we don't know anything about the hierarchy we have to search, but we should
+# certainly search under the name of this configuration as well as the generic
+# one as well
 if (! defined $hierarchy{$configuration}) {
-    print "generic\n";
+    print "$configuration generic\n";
     exit;
 }
 
