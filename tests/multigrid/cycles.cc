@@ -51,6 +51,9 @@ class MGAll
     virtual void restrict_and_add (const unsigned int,
 				   VECTOR &, const VECTOR &) const
       {}
+
+    virtual void clear () 
+      {}
     
     virtual void operator() (const unsigned int,
 			     VECTOR &, const VECTOR &) const
