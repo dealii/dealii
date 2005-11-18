@@ -44,8 +44,16 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
 {
   public:
 				     /**
+				      * Standard constructor. Matrices
+				      * and the memory pool must be
+				      * added later using
+				      * initialize().
+				      */
+    ProductMatrix();
+    
+				     /**
 				      * Constructor only assigning the
-				      * memory pool. Matricesmust be
+				      * memory pool. Matrices must be
 				      * added by reinit() later.
 				      */
     ProductMatrix(VectorMemory<VECTOR>& mem);
@@ -66,6 +74,13 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
 				      */
     template <class MATRIX1, class MATRIX2>
     void reinit(const MATRIX1& m1, const MATRIX2& m2);
+    
+				     /**
+				      * Change the matrices and memory pool.
+				      */
+    template <class MATRIX1, class MATRIX2>
+    void initialize(const MATRIX1& m1, const MATRIX2& m2,
+		    VectorMemory<VECTOR>& mem);
     
 				     /**
 				      * Destructor.
@@ -402,6 +417,12 @@ class InverseMatrixRichardson
 //---------------------------------------------------------------------------
 
 template<class VECTOR>
+ProductMatrix<VECTOR>::ProductMatrix ()
+  : m1(0), m2(0), mem(0, typeid(*this).name())
+{}
+
+
+template<class VECTOR>
 ProductMatrix<VECTOR>::ProductMatrix (VectorMemory<VECTOR>& m)
   : m1(0), m2(0), mem(&m, typeid(*this).name())
 {}
@@ -435,6 +456,22 @@ ProductMatrix<VECTOR>::reinit (
 
 
 template<class VECTOR>
+template<class MATRIX1, class MATRIX2>
+void
+ProductMatrix<VECTOR>::initialize (
+  const MATRIX1& mat1,
+  const MATRIX2& mat2,
+  VectorMemory<VECTOR>& memory)
+{
+  mem = &memory;
+  if (m1) delete m1;
+  if (m2) delete m2;
+  m1 = new PointerMatrix<MATRIX1, VECTOR>(&mat1, typeid(*this).name());
+  m2 = new PointerMatrix<MATRIX2, VECTOR>(&mat2, typeid(*this).name());
+}
+
+
+template<class VECTOR>
 ProductMatrix<VECTOR>::~ProductMatrix ()
 {
   if (m1) delete m1;
@@ -446,6 +483,7 @@ template<class VECTOR>
 void
 ProductMatrix<VECTOR>::vmult (VECTOR& dst, const VECTOR& src) const
 {
+  Assert (mem != 0, ExcNotInitialized());
   Assert (m1 != 0, ExcNotInitialized());
   Assert (m2 != 0, ExcNotInitialized());
   
@@ -461,6 +499,7 @@ template<class VECTOR>
 void
 ProductMatrix<VECTOR>::vmult_add (VECTOR& dst, const VECTOR& src) const
 {
+  Assert (mem != 0, ExcNotInitialized());
   Assert (m1 != 0, ExcNotInitialized());
   Assert (m2 != 0, ExcNotInitialized());
   
@@ -476,6 +515,7 @@ template<class VECTOR>
 void
 ProductMatrix<VECTOR>::Tvmult (VECTOR& dst, const VECTOR& src) const
 {
+  Assert (mem != 0, ExcNotInitialized());
   Assert (m1 != 0, ExcNotInitialized());
   Assert (m2 != 0, ExcNotInitialized());
   
@@ -491,6 +531,7 @@ template<class VECTOR>
 void
 ProductMatrix<VECTOR>::Tvmult_add (VECTOR& dst, const VECTOR& src) const
 {
+  Assert (mem != 0, ExcNotInitialized());
   Assert (m1 != 0, ExcNotInitialized());
   Assert (m2 != 0, ExcNotInitialized());
   
