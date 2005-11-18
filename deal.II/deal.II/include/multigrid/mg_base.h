@@ -212,11 +212,15 @@ template <class VECTOR>
 class MGSmootherBase : public Subscriptor
 {
   public:
-				   /**
-				    * Virtual destructor.
-				    */
-  virtual ~MGSmootherBase();
-
+				     /**
+				      * Virtual destructor.
+				      */
+    virtual ~MGSmootherBase();
+				     /**
+				      * Release matrices.
+				      */
+    virtual void clear() = 0;
+    
 				   /**
 				    * Smoothing function. This is the
 				    * function used in multigrid
