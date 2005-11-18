@@ -23,8 +23,12 @@
 #  include <lac/sparsity_pattern.h>
 #  include <lac/block_sparsity_pattern.h>
 #endif
+#include <lac/vector_memory.h>
+
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_level_object.h>
+
+
 
 #include <dofs/dof_handler.h>
 
@@ -314,7 +318,7 @@ class MGTransferBlockBase
 				    * all levels.
 				    */
     std::vector<std::vector<unsigned int> > mg_component_start;
-
+    
 				     /**
 				      * Call build_matrices()
 				      * function first.
@@ -389,9 +393,23 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 {
   public:
 				     /**
+				      * Default constructor.
+				      */
+    MGTransferBlock();
+
+				     /**
 				      * Destructor.
 				      */
     virtual ~MGTransferBlock ();
+    
+				     /**
+				      * Initialize additional #factors
+				      * and #memory if the restriction
+				      * of the components is to be
+				      * weighted differently.
+				      */
+    void initialize (const std::vector<number>& factors,
+		     VectorMemory<Vector<number> >& memory);
     
 				     /**
 				      * Build the prolongation
@@ -400,12 +418,6 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 				      * This function is a front-end
 				      * for the same function in
 				      * MGTransferBlockBase.
-				      *
-				      * @arg selected: Opional
-				      * argument indicating that only
-				      * matrices for these components
-				      * are to be built. By default,
-				      * all matrices are built.
 				      *
 				      * If <tt>mg_target_component</tt> is
 				      * present, this refers to the
@@ -428,7 +440,6 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
     template <int dim>
     void build_matrices (const DoFHandler<dim> &dof,
 			 const MGDoFHandler<dim> &mg_dof,
-			 std::vector<bool> selected = std::vector<bool>(),
 			 const std::vector<unsigned int>& target_component
 			 = std::vector<unsigned int>(),
 			 const std::vector<unsigned int>& mg_target_component
@@ -556,6 +567,21 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 		MGLevelObject<BlockVector<number> > &dst,
 		const InVector                      &src,
 		const is_1d<false>                  &) const;    
+    
+				     /**
+				      * Optional multiplication
+				      * factors for each
+				      * component. Requires
+				      * initialization of #memory.
+				      */
+    std::vector<number> factors;
+
+				     /**
+				      * Memory pool required if
+				      * additional multiplication
+				      * using #factors is desired.
+				      */
+    SmartPointer<VectorMemory<Vector<number> > > memory;
 };
 
 

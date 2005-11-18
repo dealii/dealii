@@ -336,12 +336,11 @@ template <int dim>
 void MGTransferBlock<number>::build_matrices (
   const DoFHandler<dim> &dof,
   const MGDoFHandler<dim> &mg_dof,
-  std::vector<bool> select,
   const std::vector<unsigned int>& t_component,
   const std::vector<unsigned int>& mg_t_component)
 {
-//TODO:[GK] What about selected?  
-  mg_selected = select;
+  if (selected.size() == 0)
+    selected = std::vector<bool> (mg_dof.get_fe().n_components(), true);
   if (mg_selected.size() == 0)
     mg_selected = std::vector<bool> (mg_dof.get_fe().n_components(), true);
 
@@ -445,7 +444,6 @@ template
 void MGTransferBlock<float>::build_matrices<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
  const MGDoFHandler<deal_II_dimension> &,
- std::vector<bool>,
  const std::vector<unsigned int>&,
  const std::vector<unsigned int>&);
 
@@ -461,7 +459,6 @@ template
 void MGTransferBlock<double>::build_matrices<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
  const MGDoFHandler<deal_II_dimension> &,
- std::vector<bool>,
  const std::vector<unsigned int>&,
  const std::vector<unsigned int>&);
 

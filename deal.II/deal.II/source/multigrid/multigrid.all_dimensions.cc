@@ -21,8 +21,6 @@
 #include <multigrid/mg_transfer.templates.h>
 #include <multigrid/multigrid.templates.h>
 
-
-
 // Warning: the following function is for debugging purposes only. It
 // will be compiled only, if the additional and undocumented compiler
 // flag MG_DEBUG is set. Furthermore, as soon as this function is
@@ -133,8 +131,27 @@ void MGTransferPrebuilt<VECTOR>::restrict_and_add (
 
 
 template <typename number>
-MGTransferBlock<number>::~MGTransferBlock () 
+MGTransferBlock<number>::MGTransferBlock ()
+		:
+		memory(0, typeid(*this).name())
 {}
+
+
+template <typename number>
+MGTransferBlock<number>::~MGTransferBlock ()
+{
+  if (memory != 0) memory = 0;
+}
+
+
+template <typename number>
+void
+MGTransferBlock<number>::initialize (const std::vector<number>& f,
+				     VectorMemory<Vector<number> >& mem) 
+{
+  factors = f;
+  memory = &mem;
+}
 
 
 template <typename number>
@@ -171,7 +188,20 @@ void MGTransferBlock<number>::restrict_and_add (
     {
       if (!selected[k])
 	++k;
-      prolongation_matrices[from_level-1]->block(k,k).Tvmult_add (dst.block(b), src.block(b));
+      if (factors.size() != 0)
+	{
+	  Assert (memory != 0, ExcNotInitialized());
+	  Vector<number>* aux = memory->alloc();
+	  aux->reinit(dst.block(b));
+	  prolongation_matrices[from_level-1]->block(k,k).Tvmult (*aux, src.block(b));
+	  dst.block(b).add(factors[k], *aux);
+	  memory->free(aux);
+	}
+      else
+	{
+	prolongation_matrices[from_level-1]->block(k,k).Tvmult_add (dst.block(b),
+								    src.block(b));
+	}
       ++k;
     }
 }
