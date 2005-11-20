@@ -6,7 +6,7 @@
 ###############################
 # Configured variables
 
-D     = @DEAL2_DIR@
+D     = @prefix@
 include $D/common/Make.global_options
 
 
@@ -20,9 +20,9 @@ private:
 %.tag: %.dox
 	@DOXYGEN@ $<
 
-base.tag: ../../base/include/*/*.h headers/base/*.h
-lac.tag:  base.tag ../../lac/include/*/*.h headers/lac/*.h
-deal.tag: lac.tag  ../../deal.II/include/*/*.h headers/deal.II/*.h
+base.tag: @prefix@/base/include/*/*.h headers/base/*.h
+lac.tag:  base.tag @prefix@/lac/include/*/*.h headers/lac/*.h
+deal.tag: lac.tag  @prefix@/deal.II/include/*/*.h headers/deal.II/*.h
 
 base:    base.tag
 lac:     lac.tag

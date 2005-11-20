@@ -1,6 +1,6 @@
 # Directory with the DEAL distribution
 
-D = @DEAL2_DIR@
+D = @prefix@
 
 
 # Include general rules for making deal.II object files

@@ -8,4 +8,4 @@
 # since the perl script is not usually called from the directory which
 # it is in, we need to have the path to the C++ executable. Autoconf
 # does this for us upon configuration time.
-print `@DEAL2_DIR@/common/scripts/make_dependencies @ARGV`
+print `@prefix@/common/scripts/make_dependencies @ARGV`

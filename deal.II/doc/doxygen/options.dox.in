@@ -104,7 +104,7 @@ FULL_PATH_NAMES        = YES
 # If left blank the directory from which doxygen is run is used as the 
 # path to strip.
 
-STRIP_FROM_PATH        = @DEAL2_DIR@
+STRIP_FROM_PATH        = @prefix@
 
 # If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter 
 # (but less readable) file names. This can be useful is your file systems 
@@ -429,7 +429,7 @@ EXCLUDE_PATTERNS       = *.templates.h
 # directories that contain example code fragments that are included (see 
 # the \include command).
 
-EXAMPLE_PATH           = @DEAL2_DIR@/examples/doxygen
+EXAMPLE_PATH           = @prefix@/examples/doxygen
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the 
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -899,9 +899,9 @@ SEARCH_INCLUDES        = YES
 # contain include files that are not input files but should be processed by 
 # the preprocessor.
 
-INCLUDE_PATH           = @DEAL2_DIR@/base/include \
-			 @DEAL2_DIR@/lac/include \
-			 @DEAL2_DIR@/deal.II/include
+INCLUDE_PATH           = @prefix@/base/include \
+			 @prefix@/lac/include \
+			 @prefix@/deal.II/include
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard 
 # patterns (like *.h and *.hpp) to filter out the header-files in the 

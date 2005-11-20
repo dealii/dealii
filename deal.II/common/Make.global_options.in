@@ -21,7 +21,7 @@
 # the following lines will be replaced by the output 
 # of ./configure
 
-D                    = @DEAL2_DIR@
+D                    = @prefix@
 CC                   = @CC@
 CXX                  = @CXX@
 GXX-VERSION          = @GXX_VERSION@
@@ -32,7 +32,7 @@ SHLIBLD              = @SHLIBLD@
 SHLIBFLAGS           = @SHLIBFLAGS@
 AR                   = @AR@
 RANLIB               = @RANLIB@
-LDFLAGS              = @LDFLAGS@
+LDFLAGS              = -L@prefix@/lib @LDFLAGS@
 F77                  = @F77@
 F77-VERSION          = @F77_VERSION@
 F77LIBS              = @F77LIBS@

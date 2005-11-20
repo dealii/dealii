@@ -43,6 +43,7 @@ dnl                    Globals: Paths and versions
 dnl -------------------------------------------------------------
 
 dnl    Set the path to the deal.II libraries to `pwd`
+AC_PREFIX_DEFAULT(`pwd`)
 DEAL_II_PATH=`pwd`
 
 dnl    Split version number in major and minor

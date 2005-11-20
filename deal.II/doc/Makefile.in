@@ -3,7 +3,7 @@
 ###############################
 # Configured variables
 
-D     = @DEAL2_DIR@
+D     = @prefix@
 include $D/common/Make.global_options
 
 

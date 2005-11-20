@@ -7,7 +7,7 @@
 # Include general settings for including DEAL libraries
 ############################################################
 
-D = @DEAL2_DIR@
+D = @prefix@
 include $D/common/Make.global_options
 debug-mode = off
 
