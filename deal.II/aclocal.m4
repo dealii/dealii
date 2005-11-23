@@ -912,6 +912,10 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
   	AC_MSG_RESULT(C compiler is gcc-4.1)
   	CC_VERSION=gcc4.1
   	;;
+      *version\ 4.2*)
+  	AC_MSG_RESULT(C compiler is gcc-4.2)
+  	CC_VERSION=gcc4.2
+  	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	AC_MSG_RESULT(C compiler is $CC_VERSION_STRING)
   	AC_MSG_ERROR(C compiler is not supported)
