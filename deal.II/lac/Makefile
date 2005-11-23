@@ -108,8 +108,8 @@ clean:
 #
 # If the command fails, then remove Makefile.dep again and fail
 Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
-	@echo ============================ Remaking base/Makefile
-	@$D/common/scripts/make_dependencies $(INCLUDE) "-B$(LIBDIR)/base" $(cc-files) \
+	@echo ============================ Remaking lac/Makefile
+	@$D/common/scripts/make_dependencies $(INCLUDE) "-B$(LIBDIR)/lac" $(cc-files) \
 		> $@ \
 	 || (rm -f $@ ; false)
 
