@@ -76,14 +76,12 @@ clean:
 # to remake this file upon inclusion at the bottom
 # of this file.
 #
-# If the file should turn out to be empty, then blow it
-# away to let make issue a proper error message rather than
-# some obscure follow-up problems
+# If the command fails, then remove Makefile.dep again and fail
 Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
 	@echo ============================ Remaking base/Makefile
 	@$D/common/scripts/make_dependencies $(INCLUDE) "-B$(LIBDIR)/base" $(cc-files) \
-		> Makefile.dep
-	@if test -s $@ ; then : else rm $@ ; fi
+		> $@ \
+	 || (rm -f $@ ; false)
 
 
 

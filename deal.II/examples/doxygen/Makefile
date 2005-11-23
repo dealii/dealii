@@ -55,14 +55,13 @@ clean:
 # i.e. whenever one of the cc-/h-files changed. Make detects whether
 # to remake this file upon inclusion at the bottom of this file.
 #
-# If the file should turn out to be empty, then blow it
-# away to let make issue a proper error message rather than
-# some obscure follow-up problems
+# If the creation of Makefile.dep fails, blow it away and fail
 Makefile.dep: *.cc Makefile \
               $(shell echo $D/*/include/*/*.h)
 	@echo ============================ Remaking $@
 	@$D/common/scripts/make_dependencies  $(INCLUDE) -B. *.cc \
-		> Makefile.dep
+		> $@ \
+	  || (rm -f $@ ; false)
 	@if test -s $@ ; then : else rm $@ ; fi
 
 

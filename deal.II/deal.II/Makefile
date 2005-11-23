@@ -159,17 +159,15 @@ $(LIBDIR)/libdeal_II_3d$(shared-lib-suffix): $(o-files-3d)
 # to remake this file upon inclusion at the bottom
 # of this file.
 #
-# If the file should turn out to be empty, then blow it
-# away to let make issue a proper error message rather than
-# some obscure follow-up problems
+# If the command fails, then remove Makefile.dep again and fail
 Makefile.dep: $(cc-files) $(h-files) Makefile $D/common/Make.global_options
 	@echo "============================ Remaking deal.II/Makefile"
 	@$D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)" $(cc-files) \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
 		| $(PERL) -pe 's!((\.g)?.$(OBJEXT)):!_DIM_PLACEHOLDER$$1:!g;' \
 	        | $(PERL) -pe 's!^(.*)/DIM_PLACEHOLDER/(.*)_DIM_PLACEHOLDER(\..*):!$$1/1d/$$2_1d$$3 $$1/2d/$$2_2d$$3 $$1/3d/$$2_3d$$3:!g;'\
-		> Makefile.dep
-	@if test -s $@ ; then : else rm $@ ; fi
+		> $@ \
+	 || (rm -f $@ ; false)
 
 
 # include all the dependencies
