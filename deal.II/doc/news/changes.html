@@ -72,6 +72,22 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: In all directories, including those for tutorial
+       programs, we generate a file called <code>Makefile.dep</code>
+       that lists the dependencies of object files on source files,
+       and that the <code>make</code> uses to determine which files to
+       recompile. If the generation of this file failed (for example
+       if <code>LD_LIBRARY_PATH</code> hadn't been set correctly), a
+       number of very strange things would happen, among others the
+       attempt to link an empty object file. This was almost
+       impossible to figure out if you didn't know what was going
+       on. This mechanism has now been robustified and should yield
+       better error messages.
+       <br> 
+       (WB 2005/11/23)
+       </p>
+
+  <li> <p>
        New: The dynamic libraries, which is the name of shared libs
        under Apples OSX, are now supported on these platforms and
        enabled by default. They should safe a lot of harddisk space.
