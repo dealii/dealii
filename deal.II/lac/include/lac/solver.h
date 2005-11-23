@@ -138,7 +138,7 @@ class SolverControl;
  * way to give these additional data to the @p SolverSelector object for each
  * solver which it may use.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001
+ * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001, 2005
  */
 template <class VECTOR = Vector<double> >
 class Solver : public Subscriptor
@@ -146,8 +146,9 @@ class Solver : public Subscriptor
   public:
 				     /**
 				      * Constructor. Assign a control
-				      * object which stores the required
-				      * precision and an object to provide
+				      * object which evaluates the
+				      * conditions for convergence,
+				      * and an object to provide
 				      * memory.
 				      *
 				      * Of both objects, a reference is
@@ -159,7 +160,7 @@ class Solver : public Subscriptor
 				      */
     Solver (SolverControl        &,
             VectorMemory<VECTOR> &);
-
+    
 				     /**
 				      * Access to object that controls
 				      * convergence.
