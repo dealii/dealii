@@ -86,6 +86,9 @@ class ProductMatrix : public PointerMatrixBase<VECTOR>
 				      * Destructor.
 				      */
     ~ProductMatrix();
+
+				     // Doc in PointerMatrixBase
+    void clear();
     
 				     /**
 				      * Matrix-vector product <i>w =
@@ -476,6 +479,17 @@ ProductMatrix<VECTOR>::~ProductMatrix ()
 {
   if (m1) delete m1;
   if (m2) delete m2;
+}
+
+
+template<class VECTOR>
+void
+ProductMatrix<VECTOR>::clear ()
+{
+  if (m1) delete m1;
+  m1 = 0;
+  if (m2) delete m2;
+  m2 = 0;
 }
 
 
