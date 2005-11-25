@@ -24,15 +24,15 @@
 
 /**
  * An array with an object for each level.  The purpose of this class
- * is mostly to allow access by level number, even if the lower levels
- * are not used and therefore have no object at all; this is done by
- * simply shifting the given index by the minimum level we have
- * stored.
+ * is mostly to store objects and allow access by level number, even
+ * if the lower levels are not used and therefore have no object at
+ * all; this is done by simply shifting the given index by the minimum
+ * level we have stored.
  *
  * In most cases, the objects which are stored on each levels, are
  * either matrices or vectors.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2005
  */
 template<class Object>
 class MGLevelObject : public Subscriptor
@@ -88,7 +88,7 @@ class MGLevelObject : public Subscriptor
     void clear();
 
 				     /**
-				      * @brief Coarsest level for multigrid.
+				      * Coarsest level for multigrid.
 				      */
     unsigned int get_minlevel () const;
     
