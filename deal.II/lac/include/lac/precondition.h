@@ -301,6 +301,12 @@ class PreconditionRelaxation : public Subscriptor
     void initialize (const MATRIX &A,
 		     AdditionalData parameters = AdditionalData());
     
+				     /**
+				      * Release the matrix and reset
+				      * its pointer.
+				      */
+    void clear();
+    
   protected:
 				     /**
 				      * Pointer to the matrix object.
@@ -813,6 +819,15 @@ PreconditionRelaxation<MATRIX>::initialize (const MATRIX &rA,
   A = &rA;
   relaxation = parameters.relaxation;
 }
+
+
+template <class MATRIX>
+inline void
+PreconditionRelaxation<MATRIX>::clear ()
+{
+  A = 0;
+}
+
 
 //---------------------------------------------------------------------------
 

@@ -57,6 +57,12 @@ class PointerMatrixBase : public Subscriptor
     virtual ~PointerMatrixBase ();
 
 				     /**
+				      * Reset pointer and release the
+				      * matrix pointed to.
+				      */
+    virtual void clear () = 0;
+    
+				     /**
 				      * Find out if two matrices point
 				      * to the same object.
 				      */
@@ -169,6 +175,9 @@ class PointerMatrix : public PointerMatrixBase<VECTOR>
 				      */
     PointerMatrix(const MATRIX* M,
 		  const char* name);
+
+				     // Use doc from base class
+    virtual void clear();
     
 				     /**
 				      * Return whether the object is
@@ -333,6 +342,14 @@ PointerMatrix<MATRIX, VECTOR>::PointerMatrix (
   const char* name)
   : m(M, name)
 {}
+
+
+template<class MATRIX, class VECTOR>
+inline void
+PointerMatrix<MATRIX, VECTOR>::clear ()
+{
+  m = 0;
+}
 
 
 template<class MATRIX, class VECTOR>
