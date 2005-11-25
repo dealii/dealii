@@ -182,6 +182,22 @@ class ProductSparseMatrix : public PointerMatrixBase<Vector<vector_number> >
 			VectorMemory<VectorType>& mem);
 
 				     /**
+				      * Constructor leaving an
+				      * unitialized
+				      * matrix. initialize() must be
+				      * called, before the matrix can
+				      * be used.
+				      */
+    ProductSparseMatrix();
+    
+    void initialize(const MatrixType& m1,
+		    const MatrixType& m2,
+		    VectorMemory<VectorType>& mem);
+    
+				     // Doc in PointerMatrixBase
+    void clear();
+    
+				     /**
 				      * Matrix-vector product <i>w =
 				      * m1 * m2 * v</i>.
 				      */
