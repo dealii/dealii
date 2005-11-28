@@ -103,6 +103,14 @@ class SolverBicgstab : public Solver<VECTOR>
 		    const AdditionalData &data=AdditionalData());
 
 				     /**
+				      * Constructor. Use an object of
+				      * type PrimitiveVectorMemory as
+				      * a default to allocate memory.
+				      */
+    SolverBicgstab (SolverControl        &cn,
+		    const AdditionalData &data=AdditionalData());
+    
+				     /**
 				      * Virtual destructor.
 				      */
     virtual ~SolverBicgstab ();
@@ -242,6 +250,16 @@ SolverBicgstab<VECTOR>::SolverBicgstab (SolverControl &cn,
 					const AdditionalData &data)
 		:
 		Solver<VECTOR>(cn,mem),
+		additional_data(data)
+{}
+
+
+
+template<class VECTOR>
+SolverBicgstab<VECTOR>::SolverBicgstab (SolverControl &cn,
+					const AdditionalData &data)
+		:
+		Solver<VECTOR>(cn),
 		additional_data(data)
 {}
 

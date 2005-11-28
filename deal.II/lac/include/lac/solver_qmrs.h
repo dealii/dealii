@@ -112,8 +112,16 @@ class SolverQMRS : public Solver<VECTOR>
 				      * Constructor.
 				      */
     SolverQMRS (SolverControl &cn,
-	      VectorMemory<VECTOR> &mem,
-	      const AdditionalData &data=AdditionalData());
+		VectorMemory<VECTOR> &mem,
+		const AdditionalData &data=AdditionalData());
+
+				     /**
+				      * Constructor. Use an object of
+				      * type PrimitiveVectorMemory as
+				      * a default to allocate memory.
+				      */
+    SolverQMRS (SolverControl        &cn,
+		const AdditionalData &data=AdditionalData());
 
 				     /**
 				      * Solve the linear system $Ax=b$
@@ -202,10 +210,22 @@ class SolverQMRS : public Solver<VECTOR>
 template<class VECTOR>
 SolverQMRS<VECTOR>::SolverQMRS(SolverControl &cn,
 			       VectorMemory<VECTOR> &mem,
-			       const AdditionalData &data) :
+			       const AdditionalData &data)
+		:
 		Solver<VECTOR>(cn,mem),
 		additional_data(data)
 {}
+
+
+
+template<class VECTOR>
+SolverQMRS<VECTOR>::SolverQMRS(SolverControl &cn,
+			       const AdditionalData &data)
+		:
+		Solver<VECTOR>(cn),
+		additional_data(data)
+{}
+
 
 
 template<class VECTOR>

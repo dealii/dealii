@@ -178,6 +178,24 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: All solver classes took an argument of type <code
+       class="class">VectorMemory</code> which they use to allocate
+       memory for temporary vectors. A clever implementation of this
+       class might allow reusing temporary vectors, and thus reduce
+       the overhead of repeatedly allocating and freeing
+       memory. However, almost all instances of using these classes
+       used the <code class="class">PrimitiveVectorMemory</code>
+       class. The solver class have now been changed so that if one
+       omits the respective argument, they fall back to using such a
+       memory object. Also, all example programs that did not
+       specifically use a different memory allocation class, have been
+       changed to not specify anything at all, and thus fall back to
+       the default.
+       <br> 
+       (WB 2005/11/23)
+       </p>
+
+  <li> <p>
        Fixed: The <code class="class">SparseMatrix</code> iterators had a
        problem when one wrote code like <code>iterator->value()=0</code>
        (i.e. with a zero integer, rather than a floating point number on the

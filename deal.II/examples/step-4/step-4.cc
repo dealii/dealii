@@ -33,7 +33,6 @@
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
-#include <lac/vector_memory.h>
 #include <lac/precondition.h>
 
 #include <numerics/data_out.h>
@@ -497,8 +496,7 @@ template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
   SolverControl           solver_control (1000, 1e-12);
-  PrimitiveVectorMemory<> vector_memory;
-  SolverCG<>              cg (solver_control, vector_memory);
+  SolverCG<>              cg (solver_control);
   cg.solve (system_matrix, solution, system_rhs,
 	    PreconditionIdentity());
 

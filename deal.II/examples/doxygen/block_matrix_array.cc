@@ -18,7 +18,6 @@
 #include <lac/full_matrix.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
-#include <lac/vector_memory.h>
 #include <lac/precondition.h>
 #include <lac/solver_cg.h>
 #include <lac/solver_gmres.h>

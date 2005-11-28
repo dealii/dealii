@@ -22,7 +22,6 @@
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <lac/solver_bicgstab.h>
-#include <lac/vector_memory.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -1330,8 +1329,7 @@ template <int dim>
 void AdvectionProblem<dim>::solve () 
 {
   SolverControl           solver_control (1000, 1e-12);
-  PrimitiveVectorMemory<> vector_memory;
-  SolverBicgstab<>        bicgstab (solver_control, vector_memory);
+  SolverBicgstab<>        bicgstab (solver_control);
 
   PreconditionJacobi<> preconditioner;
   preconditioner.initialize(system_matrix, 1.0);

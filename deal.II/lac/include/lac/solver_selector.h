@@ -95,13 +95,13 @@ class SolverSelector : public Subscriptor
   public:
 
 				     /**
-				      * Constructor. Takes the @p SolverName,
-				      * the @p SolverControl and the 
-				      * @p VectorMemory as argument.
+				      * Constructor. Use the arguments
+				      * to initialize actual solver
+				      * objects.
 				      */
     SolverSelector (const std::string    &solvername,
 		    SolverControl        &control,
-		    VectorMemory<VECTOR> &vectorm);
+		    VectorMemory<VECTOR> &vector_memory);
   
 				     /**
 				      * Destructor
@@ -246,31 +246,31 @@ SolverSelector<VECTOR>::solve(const Matrix &A,
   if (solver_name=="richardson")
     {
       SolverRichardson<VECTOR> solver(*control,*vector_memory,
-					     richardson_data);
+				      richardson_data);
       solver.solve(A,x,b,precond);
     }       
   else if (solver_name=="cg")
     {
       SolverCG<VECTOR> solver(*control,*vector_memory,
-				     cg_data);
+			      cg_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="bicgstab")
     {
       SolverBicgstab<VECTOR> solver(*control,*vector_memory,
-					   bicgstab_data);
+				    bicgstab_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="gmres")
     {
       SolverGMRES<VECTOR> solver(*control,*vector_memory,
-					gmres_data);
+				 gmres_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="fgmres")
     {
       SolverFGMRES<VECTOR> solver(*control,*vector_memory,
-					fgmres_data);
+				  fgmres_data);
       solver.solve(A,x,b,precond);
     }
   else

@@ -99,6 +99,14 @@ class SolverCG : public Solver<VECTOR>
 	      const AdditionalData &data = AdditionalData());
 
 				     /**
+				      * Constructor. Use an object of
+				      * type PrimitiveVectorMemory as
+				      * a default to allocate memory.
+				      */
+    SolverCG (SolverControl        &cn,
+	      const AdditionalData &data=AdditionalData());
+
+				     /**
 				      * Virtual destructor.
 				      */
     virtual ~SolverCG ();
@@ -184,12 +192,23 @@ AdditionalData (const bool log_coefficients)
 {}
     
 
+
 template <class VECTOR>
-SolverCG<VECTOR>::SolverCG(SolverControl        &cn,
-			   VectorMemory<VECTOR> &mem,
-			   const AdditionalData &data)
+SolverCG<VECTOR>::SolverCG (SolverControl        &cn,
+			    VectorMemory<VECTOR> &mem,
+			    const AdditionalData &data)
 		:
                 Solver<VECTOR>(cn,mem),
+                additional_data(data)
+{}
+
+
+
+template <class VECTOR>
+SolverCG<VECTOR>::SolverCG (SolverControl        &cn,
+			    const AdditionalData &data)
+		:
+                Solver<VECTOR>(cn),
                 additional_data(data)
 {}
 

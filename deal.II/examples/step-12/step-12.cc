@@ -19,7 +19,6 @@
 #include <base/function.h>
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
-#include <lac/vector_memory.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_out.h>
@@ -1431,8 +1430,7 @@ template <int dim>
 void DGMethod<dim>::solve (Vector<double> &solution) 
 {
   SolverControl           solver_control (1000, 1e-12, false, false);
-  PrimitiveVectorMemory<> vector_memory;
-  SolverRichardson<>      solver (solver_control, vector_memory);
+  SolverRichardson<>      solver (solver_control);
 
 				   // Here we create the
 				   // preconditioner,

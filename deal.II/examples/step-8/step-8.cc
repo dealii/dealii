@@ -21,7 +21,6 @@
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
-#include <lac/vector_memory.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -761,8 +760,7 @@ template <int dim>
 void ElasticProblem<dim>::solve () 
 {
   SolverControl           solver_control (1000, 1e-12);
-  PrimitiveVectorMemory<> vector_memory;
-  SolverCG<>              cg (solver_control, vector_memory);
+  SolverCG<>              cg (solver_control);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);

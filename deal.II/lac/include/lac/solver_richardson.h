@@ -85,6 +85,14 @@ class SolverRichardson : public Solver<VECTOR>
 		      const AdditionalData &data=AdditionalData());
 
 				     /**
+				      * Constructor. Use an object of
+				      * type PrimitiveVectorMemory as
+				      * a default to allocate memory.
+				      */
+    SolverRichardson (SolverControl        &cn,
+		      const AdditionalData &data=AdditionalData());
+    
+				     /**
 				      * Virtual destructor.
 				      */
     virtual ~SolverRichardson ();
@@ -188,11 +196,23 @@ AdditionalData (const double omega,
                 use_preconditioned_residual(use_preconditioned_residual)
 {}
 
+
 template <class VECTOR>
 SolverRichardson<VECTOR>::SolverRichardson(SolverControl &cn,
 					   VectorMemory<VECTOR> &mem,
-					   const AdditionalData &data):
+					   const AdditionalData &data)
+		:
 		Solver<VECTOR> (cn,mem),
+		additional_data(data)
+{}
+
+
+
+template <class VECTOR>
+SolverRichardson<VECTOR>::SolverRichardson(SolverControl &cn,
+					   const AdditionalData &data)
+		:
+		Solver<VECTOR> (cn),
 		additional_data(data)
 {}
 

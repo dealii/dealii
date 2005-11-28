@@ -40,7 +40,6 @@ const unsigned int degree = 2;
 #include <lac/block_sparse_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/solver_gmres.h>
-#include <lac/vector_memory.h>
 #include <lac/precondition.h>
 
 #include <numerics/data_out.h>
@@ -545,8 +544,7 @@ class SchurComplement
 
         SolverControl           solver_control (tmp1.size(),
                                                 1e-8*tmp1.l2_norm());
-        PrimitiveVectorMemory<> vector_memory;
-        SolverCG<>              cg (solver_control, vector_memory);
+        SolverCG<>              cg (solver_control);
 
         PreconditionSSOR<> precondition;
         precondition.initialize(A.block(0,0));
@@ -582,8 +580,7 @@ void LaplaceProblem<dim>::solve ()
   {
     SolverControl           solver_control (system_matrix.block(0,0).m(),
                                             1e-6*system_rhs.block(1).l2_norm());
-    PrimitiveVectorMemory<> vector_memory;
-    SolverCG<>              cg (solver_control, vector_memory);
+    SolverCG<>              cg (solver_control);
 
     cg.solve (SchurComplement(system_matrix), solution.block(1),
               system_rhs.block(1),
@@ -604,8 +601,7 @@ void LaplaceProblem<dim>::solve ()
     
     SolverControl           solver_control (system_matrix.block(0,0).m(),
                                             1e-6*tmp.l2_norm());
-    PrimitiveVectorMemory<> vector_memory;
-    SolverGMRES<>              cg (solver_control, vector_memory);
+    SolverGMRES<>              cg (solver_control);
 
     cg.solve (system_matrix.block(0,0), solution.block(0),
               tmp, PreconditionIdentity());

@@ -15,9 +15,10 @@
 
 #include <base/config.h>
 #include <base/subscriptor.h>
+#include <lac/vector_memory.h>
+
 
 template <typename number> class Vector;
-template <class VECTOR>    class VectorMemory;
 class SolverControl;
 
 /*!@addtogroup Solvers */
@@ -145,7 +146,7 @@ class Solver : public Subscriptor
 {
   public:
 				     /**
-				      * Constructor. Assign a control
+				      * Constructor. Takes a control
 				      * object which evaluates the
 				      * conditions for convergence,
 				      * and an object to provide
@@ -158,8 +159,28 @@ class Solver : public Subscriptor
 				      * least as long as that of the solver
 				      * object.
 				      */
-    Solver (SolverControl        &,
-            VectorMemory<VECTOR> &);
+    Solver (SolverControl        &solver_control,
+            VectorMemory<VECTOR> &vector_memory);
+
+				     /**
+				      * Constructor. Takes a control
+				      * object which evaluates the
+				      * conditions for convergence. In
+				      * contrast to the other
+				      * constructor, this constructor
+				      * denotes an internal object of
+				      * type PrimitiveVectorMemory to
+				      * allocate memory.
+				      *
+				      * A reference to the control
+				      * object is stored, so it is the
+				      * user's responsibility to
+				      * guarantee that the lifetime of
+				      * the two arguments is at least
+				      * as long as that of the solver
+				      * object.
+				      */
+    Solver (SolverControl        &solver_control);
     
 				     /**
 				      * Access to object that controls
@@ -168,7 +189,14 @@ class Solver : public Subscriptor
     SolverControl & control() const;
   
   protected:
-
+				     /**
+				      * A static vector memory object
+				      * to be used whenever no such
+				      * object has been given to the
+				      * constructor.
+				      */
+    static PrimitiveVectorMemory<VECTOR> static_vector_memory;
+    
 				     /**
 				      * Control structure.
 				      */
@@ -183,6 +211,27 @@ class Solver : public Subscriptor
 /*@}*/
 /*-------------------------------- Inline functions ------------------------*/
 
+template<class VECTOR>
+inline
+Solver<VECTOR>::Solver (SolverControl        &solver_control,
+			VectorMemory<VECTOR> &vector_memory)
+		:
+		cntrl(solver_control),
+		memory(vector_memory)
+{}
+
+
+
+template<class VECTOR>
+inline
+Solver<VECTOR>::Solver (SolverControl        &solver_control)
+		:
+		cntrl(solver_control),
+		memory(static_vector_memory)
+{}
+
+
+
 template <class VECTOR>
 inline
 SolverControl &
@@ -192,12 +241,6 @@ Solver<VECTOR>::control() const
 }
 
 
-template<class VECTOR>
-inline
-Solver<VECTOR>::Solver(SolverControl &cn, VectorMemory<VECTOR> &mem)
-		: cntrl(cn),
-		  memory(mem)
-{}
 
 
 #endif

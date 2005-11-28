@@ -234,6 +234,14 @@ class SolverGMRES : public Solver<VECTOR>
 		 const AdditionalData &data=AdditionalData());
 
 				     /**
+				      * Constructor. Use an object of
+				      * type PrimitiveVectorMemory as
+				      * a default to allocate memory.
+				      */
+    SolverGMRES (SolverControl        &cn,
+		 const AdditionalData &data=AdditionalData());
+
+				     /**
 				      * Solve the linear system $Ax=b$
 				      * for x.
 				      */
@@ -348,6 +356,14 @@ class SolverFGMRES : public Solver<VECTOR>
 		  const AdditionalData &data=AdditionalData());
 
 				     /**
+				      * Constructor. Use an object of
+				      * type PrimitiveVectorMemory as
+				      * a default to allocate memory.
+				      */
+    SolverFGMRES (SolverControl        &cn,
+		  const AdditionalData &data=AdditionalData());
+
+				     /**
 				      * Solve the linear system $Ax=b$
 				      * for x.
 				      */
@@ -448,13 +464,25 @@ AdditionalData (const unsigned int max_n_tmp_vectors,
                 use_default_residual(use_default_residual)
 {}
 
+
 template <class VECTOR>
 SolverGMRES<VECTOR>::SolverGMRES (SolverControl        &cn,
                                   VectorMemory<VECTOR> &mem,
-                                  const AdditionalData &data) :
+                                  const AdditionalData &data)
+		:
 		Solver<VECTOR> (cn,mem),
 		additional_data(data)
 {}
+
+
+
+template <class VECTOR>
+SolverGMRES<VECTOR>::SolverGMRES (SolverControl        &cn,
+                                  const AdditionalData &data) :
+		Solver<VECTOR> (cn),
+		additional_data(data)
+{}
+
 
 
 template <class VECTOR>
@@ -482,6 +510,7 @@ SolverGMRES<VECTOR>::givens_rotation (Vector<double> &h,
   b(col+1)= -si(col)*b(col);
   b(col) *=  ci(col);
 }
+
 
 
 template<class VECTOR>
@@ -795,6 +824,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 }
 
 
+
 template<class VECTOR>
 double
 SolverGMRES<VECTOR>::criterion () 
@@ -815,8 +845,19 @@ SolverFGMRES<VECTOR>::SolverFGMRES (SolverControl        &cn,
 				    const AdditionalData &data)
 		:
 		Solver<VECTOR> (cn, mem),
-  additional_data(data)
+		additional_data(data)
 {}
+
+
+
+template <class VECTOR>
+SolverFGMRES<VECTOR>::SolverFGMRES (SolverControl        &cn,
+				    const AdditionalData &data)
+		:
+		Solver<VECTOR> (cn),
+		additional_data(data)
+{}
+
 
 
 template<class VECTOR>

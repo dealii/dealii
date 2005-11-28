@@ -21,7 +21,6 @@
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
-#include <lac/vector_memory.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -804,8 +803,7 @@ void MinimizationProblem<dim>::do_step ()
   {
     SolverControl           solver_control (residual.size(),
                                             1e-2*residual.l2_norm());
-    PrimitiveVectorMemory<> vector_memory;
-    SolverCG<>              solver (solver_control, vector_memory);
+    SolverCG<>              solver (solver_control);
     
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(matrix);

@@ -79,7 +79,6 @@
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
-#include <lac/vector_memory.h>
 #include <lac/precondition.h>
 
 				 // Finally, this is for output to a
@@ -719,30 +718,14 @@ void LaplaceProblem::solve ()
 				   // latter criterion will be the one
 				   // which stops the iteration.
   SolverControl           solver_control (1000, 1e-12);
-				   // Furthermore, the CG algorithm
-				   // needs some space for temporary
-				   // vectors. Rather than allocating
-				   // it on the stack or heap itself,
-				   // it relies on helper objects,
-				   // which can sometimes do a better
-				   // job at this. The
-				   // PrimitiveVectorMemory class is
-				   // such a helper class which the
-				   // solver can ask for memory. The
-				   // angle brackets ``<>'' indicate
-				   // that this class really takes a
-				   // template parameter (here the
-				   // data type of the vectors we
-				   // use), which however has a
-				   // default value, which is
-				   // appropriate here.
-  PrimitiveVectorMemory<> vector_memory;
 				   // Then we need the solver
 				   // itself. The template parameters
 				   // here are the matrix type and the
-				   // type of the vectors. They
-				   // default to the ones we use here.
-  SolverCG<>              cg (solver_control, vector_memory);
+				   // type of the vectors, but the
+				   // empty angle brackets indicate
+				   // that we simply take the default
+				   // arguments.
+  SolverCG<>              cg (solver_control);
 
 				   // Now solve the system of
 				   // equations. The CG solver takes a

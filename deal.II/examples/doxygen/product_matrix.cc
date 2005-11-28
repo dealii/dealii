@@ -17,7 +17,6 @@
 #include <lac/matrix_lib.h>
 #include <lac/full_matrix.h>
 #include <lac/vector.h>
-#include <lac/vector_memory.h>
 
 
 double Adata[] =

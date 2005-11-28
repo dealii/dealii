@@ -21,7 +21,6 @@
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
-#include <lac/vector_memory.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
@@ -393,8 +392,8 @@ void LaplaceProblem<dim>::solve ()
 				   // Create a memory handler for
 				   // regular vectors. Note, that
 				   // GrowingVectorMemory is more time
-				   // efficient than
-				   // PrimitiveVectorMemory.
+				   // efficient than the
+				   // PrimitiveVectorMemory class.
   GrowingVectorMemory<>   vector_memory;
 
 				   // Now, create an object handling
@@ -466,7 +465,7 @@ void LaplaceProblem<dim>::solve ()
 				   // Finally, create the solver
 				   // object and solve the system
   SolverControl           solver_control (1000, 1e-12);
-  SolverCG<>              cg (solver_control, vector_memory);
+  SolverCG<>              cg (solver_control);
 
   
   cg.solve (system_matrix, solution, system_rhs,

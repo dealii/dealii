@@ -76,6 +76,14 @@ class SolverMinRes : public Solver<VECTOR>
 		  const AdditionalData &data=AdditionalData());
 
 				     /**
+				      * Constructor. Use an object of
+				      * type PrimitiveVectorMemory as
+				      * a default to allocate memory.
+				      */
+    SolverMinRes (SolverControl        &cn,
+		  const AdditionalData &data=AdditionalData());
+
+				     /**
 				      * Virtual destructor.
 				      */
     virtual ~SolverMinRes ();
@@ -154,6 +162,15 @@ SolverMinRes<VECTOR>::SolverMinRes (SolverControl &cn,
 				    const AdditionalData &)
 		:
 		Solver<VECTOR>(cn,mem)
+{}
+
+
+
+template<class VECTOR>
+SolverMinRes<VECTOR>::SolverMinRes (SolverControl &cn,
+				    const AdditionalData &)
+		:
+		Solver<VECTOR>(cn)
 {}
 
 
