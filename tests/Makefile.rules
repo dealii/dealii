@@ -150,6 +150,28 @@ report+mail:
 
 
 ############################################################
+# Generating references: Useful when creating references for
+# a new platform or when updating several non-generic
+# references.
+############################################################
+
+
+%/ref : %/output
+	@$(PERL) -pi $(normalize)  $<
+	@for i in $(PLATFORM-HIERARCHY) ; do \
+	    testname=$(<:%/output=%) ; \
+	    if test -f $$testname/cmp/$$i ; then \
+	        cmd="diff -w $< $$testname/cmp/$$i > /dev/null" ; \
+		if eval ! $$cmd ; then \
+		    echo '=====Creating======' $$testname/cmp/$(PLATFORM) ; \
+		    cp $$testname/output $$testname/cmp/$(PLATFORM); \
+		fi ; \
+		break ; \
+	    fi ; \
+	  done
+
+
+############################################################
 # After all these general rules, here is the target to be
 # executed by make: for each entry in the list $(tests)
 # perform a check.
@@ -159,6 +181,8 @@ run-tests: $(tests:%=%/OK)
 output: $(tests:%=%/output)
 
 build: $(tests:%=%/exe)
+
+refs: $(tests:%=%/ref)
 
 ############################################################
 # Link and copy files in ./results/* to generate checked
@@ -205,7 +229,7 @@ Makefile.tests: $(shell echo *.cc)
 		> $@
 
 
-.PHONY: report show-tests clean distclean
+.PHONY: report show-tests clean distclean %/ref
 
 subdirs:
 	for i in $(tests) ; do \

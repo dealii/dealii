@@ -83,6 +83,29 @@ output-multigrid: abort.o
 
 
 
+# update/generate references
+
+refs: refs-base refs-lac refs-fe refs-deal.II refs-bits
+
+refs-base: abort.o
+	cd base ; $(MAKE) refs
+
+refs-lac: abort.o
+	cd lac ; $(MAKE) refs
+
+refs-fe: abort.o
+	cd fe ; $(MAKE) refs
+
+refs-bits: abort.o
+	cd bits ; $(MAKE) refs
+
+refs-deal.II: abort.o
+	cd deal.II ; $(MAKE) refs
+
+refs-multigrid: abort.o
+	cd multigrid ; $(MAKE) refs
+
+
 
 resultname:
 	@echo $(TARGET)+$(GXX-VERSION)
