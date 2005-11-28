@@ -229,19 +229,3 @@ Makefile.tests: $(shell echo *.cc)
 
 .PHONY: report show-tests clean distclean %/ref
 
-subdirs:
-	for i in $(tests) ; do \
-	  mkdir $$i/cmp ; \
-	  cp ../results/i686-pc-linux-gnu+gcc3.2/bits/$$i.output $$i/cmp/generic ; \
-	  cp ../results/i686-pc-linux-gnu+gcc3.4/bits/$$i.output $$i/cmp/i686-pc-linux-gnu+gcc3.4 ; \
-	  cp ../results/i686-pc-linux-gnu+gcc4.0/bits/$$i.output $$i/cmp/i686-pc-linux-gnu+gcc4.0 ; \
-	  cp ../results/i686-pc-linux-gnu+gcc4.1/bits/$$i.output $$i/cmp/i686-pc-linux-gnu+gcc4.1 ; \
-	  cp ../results/i686-pc-linux-gnu+icc7.1/bits/$$i.output $$i/cmp/i686-pc-linux-gnu+icc7.1 ; \
-          cp ../results/mips-sgi-irix6.5+MIPSpro7.4/bits/$$i.output $$i/cmp/mips-sgi-irix6.5+MIPSpro7.4 ; \
-          cp ../results/x86_64-unknown-linux-gnu+gcc3.3/bits/$$i.output $$i/cmp/x86_64-unknown-linux-gnu+gcc3.3 ; \
-          cd $$i/cmp ; \
-            for j in [imx]* ; do \
-		if diff -q $$j generic ; then rm $$j ; fi ; done ; \
-          cd ../.. ; \
-	done
-
