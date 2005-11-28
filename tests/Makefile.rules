@@ -154,8 +154,6 @@ report+mail:
 # a new platform or when updating several non-generic
 # references.
 ############################################################
-
-
 %/ref : %/output
 	@$(PERL) -pi $(normalize)  $<
 	@for i in $(PLATFORM-HIERARCHY) ; do \
