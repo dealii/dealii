@@ -59,14 +59,14 @@ check_solve( SOLVER& solver, const MATRIX& A,
 
 int main(int argc, char **argv)
 {
-  PetscInitialize(&argc,&argv,0,0);
-  {
-    std::ofstream logfile("petsc_deal_solver_05/output");
-    logfile.precision(4);
-    deallog.attach(logfile);
-    deallog.depth_console(0);
+  std::ofstream logfile("petsc_deal_solver_05/output");
+  logfile.precision(4);
+  deallog.attach(logfile);
+  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   
+  PetscInitialize(&argc,&argv,0,0);
+  {
     SolverControl control(100, 1.e-3);
 
     const unsigned int size = 32;
