@@ -3475,6 +3475,10 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
           fi fi
 
 	  	  	  case "$target" in
+            *x86_64*)
+	        LDFLAGS="$LDFLAGS -lpthread"
+	        ;;
+
 	    *86*)
 		CXXFLAGSO="$CXXFLAGSO -tpp6"
 		;;
@@ -3873,6 +3877,7 @@ echo "${ECHO_T}C compiler is unknown version but accepted MIPSpro compiler versi
 	  version6="`echo $is_intel_icc | grep 'Version 6'`"
 	  version7="`echo $is_intel_icc | grep 'Version 7'`"
 	  version8="`echo $is_intel_icc | grep 'Version 8'`"
+	  version9="`echo $is_intel_icc | grep 'Version 9'`"
           if test "x$version5" != "x" ; then
             echo "$as_me:$LINENO: result: C compiler is icc-5" >&5
 echo "${ECHO_T}C compiler is icc-5" >&6
@@ -3889,6 +3894,10 @@ echo "${ECHO_T}C compiler is icc-7" >&6
             echo "$as_me:$LINENO: result: C compiler is icc-8" >&5
 echo "${ECHO_T}C compiler is icc-8" >&6
             CC_VERSION=intel_icc8
+          else if test "x$version9" != "x" ; then
+            echo "$as_me:$LINENO: result: C compiler is icc-9" >&5
+echo "${ECHO_T}C compiler is icc-9" >&6
+            CC_VERSION=intel_icc9
           else
             echo "$as_me:$LINENO: result: C compiler is icc" >&5
 echo "${ECHO_T}C compiler is icc" >&6

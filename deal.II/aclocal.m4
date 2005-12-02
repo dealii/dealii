@@ -613,6 +613,10 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl If we are on an x86 platform, add -tpp6 to optimization
 	  dnl flags
 	  case "$target" in
+            *x86_64*)
+	        LDFLAGS="$LDFLAGS -lpthread"
+	        ;;
+
 	    *86*)
 		CXXFLAGSO="$CXXFLAGSO -tpp6"
 		;;
