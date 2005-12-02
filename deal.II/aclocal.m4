@@ -1015,7 +1015,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
           else
             AC_MSG_RESULT(C compiler is icc)
             CC_VERSION=intel_icc
-          fi fi fi fi
+          fi fi fi fi fi
         else
   
           dnl Or DEC's cxx compiler?
