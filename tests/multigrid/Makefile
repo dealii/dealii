@@ -21,7 +21,8 @@ default: run-tests
 
 ############################################################
 
-tests_x = cycles transfer transfer_select transfer_block
+tests_x = cycles transfer transfer_select transfer_block \
+	smoother_block
 
 # from above list of regular expressions, generate the real set of
 # tests
