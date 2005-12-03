@@ -268,7 +268,8 @@ CompressedSparsityPattern::max_entries_per_row () const
   unsigned int m = 0;
   for (unsigned int i=0; i<rows; ++i)
     {
-      lines[i].flush_cache ();
+      if (lines[i].cache_entries != 0)
+	lines[i].flush_cache ();
       m = std::max (m, static_cast<unsigned int>(lines[i].entries.size()));
     }
   
@@ -284,7 +285,8 @@ CompressedSparsityPattern::exists (const unsigned int i,
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));
 
-  lines[i].flush_cache();
+  if (lines[i].cache_entries != 0)
+    lines[i].flush_cache();
   return std::binary_search (lines[i].entries.begin(),
                              lines[i].entries.end(),
                              j);
@@ -310,7 +312,8 @@ CompressedSparsityPattern::symmetrize ()
 				   // already exist without any harm
   for (unsigned int row=0; row<rows; ++row)
     {
-      lines[row].flush_cache ();
+      if (lines[row].cache_entries != 0)
+	lines[row].flush_cache ();
       for (std::vector<unsigned int>::const_iterator
              j=lines[row].entries.begin();
            j != lines[row].entries.end();
@@ -329,7 +332,8 @@ CompressedSparsityPattern::print_gnuplot (std::ostream &out) const
 { 
   for (unsigned int row=0; row<rows; ++row)
     {
-      lines[row].flush_cache ();
+      if (lines[row].cache_entries != 0)
+	lines[row].flush_cache ();
       for (std::vector<unsigned int>::const_iterator
              j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
@@ -353,7 +357,8 @@ CompressedSparsityPattern::bandwidth () const
   unsigned int b=0;
   for (unsigned int row=0; row<rows; ++row)
     {
-      lines[row].flush_cache ();
+      if (lines[row].cache_entries != 0)
+	lines[row].flush_cache ();
 
       for (std::vector<unsigned int>::const_iterator
              j=lines[row].entries.begin();
@@ -373,7 +378,8 @@ CompressedSparsityPattern::n_nonzero_elements () const
   unsigned int n=0;
   for (unsigned int i=0; i<rows; ++i)
     {
-      lines[i].flush_cache ();
+      if (lines[i].cache_entries != 0)
+	lines[i].flush_cache ();
       n += lines[i].entries.size();
     }
   
