@@ -186,14 +186,14 @@ void MGTransferBlock<number>::restrict_and_add (
   unsigned int k=0;
   for (unsigned int b=0; b<src.n_blocks();++b)
     {
-      if (!selected[k])
-	++k;
+      while (!selected[k]) ++k;
       if (factors.size() != 0)
 	{
 	  Assert (memory != 0, ExcNotInitialized());
 	  Vector<number>* aux = memory->alloc();
 	  aux->reinit(dst.block(b));
 	  prolongation_matrices[from_level-1]->block(k,k).Tvmult (*aux, src.block(b));
+	  
 	  dst.block(b).add(factors[k], *aux);
 	  memory->free(aux);
 	}
