@@ -442,152 +442,6 @@ class CompressedSparsityPattern : public Subscriptor
 
 inline
 void
-CompressedSparsityPattern::Line::flush_cache () const
-{
-                                   // do nothing if the cache is empty
-  if (cache_entries == 0)
-    return;
-  
-                                   // first sort the entries in the cache, so
-                                   // that it is easier to merge it with the
-                                   // main array. note that due to the way
-                                   // add() inserts elements, there can be no
-                                   // duplicates in the cache
-                                   //
-                                   // do the sorting in a way that is fast for
-                                   // the small cache sizes we have
-                                   // here. basically, use bubble sort
-  switch (cache_entries)
-    {
-      case 1:
-      {
-        break;
-      }
-
-      case 2:
-      {
-        if (cache[1] < cache[0])
-          std::swap (cache[0], cache[1]);
-        break;
-      }
-
-      case 3:
-      {
-        if (cache[1] < cache[0])
-          std::swap (cache[0], cache[1]);
-        if (cache[2] < cache[1])
-          std::swap (cache[1], cache[2]);
-        if (cache[1] < cache[0])
-          std::swap (cache[0], cache[1]);
-        break;
-      }
-
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-      {
-        for (unsigned int i=0; i<cache_entries; ++i)
-          for (unsigned int j=i+1; j<cache_entries; ++j)
-            if (cache[j] < cache[i])
-              std::swap (cache[i], cache[j]);
-        break;
-      }
-
-      default:
-      {
-        std::sort (&cache[0], &cache[cache_entries]);
-        break;
-      }
-    }
-
-                                   // next job is to merge the two
-                                   // arrays. special case the case that the
-                                   // original array is empty.
-  if (entries.size() == 0)
-    {
-      entries.resize (cache_entries);
-      for (unsigned int i=0; i<cache_entries; ++i)
-        entries[i] = cache[i];
-    }
-  else
-    {
-                                       // first count how many of the cache
-                                       // entries are already in the main
-                                       // array, so that we can efficiently
-                                       // allocate memory
-      unsigned int n_new_entries = 0;
-      {
-        unsigned int cache_position = 0;
-        unsigned int entry_position = 0;
-        while ((entry_position<entries.size()) &&
-               (cache_position<cache_entries))
-          {
-            ++n_new_entries;
-            if (entries[entry_position] < cache[cache_position])
-              ++entry_position;
-            else if (entries[entry_position] == cache[cache_position])
-              {
-                ++entry_position;
-                ++cache_position;
-              }
-            else
-              ++cache_position;
-          }
-
-                                         // scoop up leftovers in arrays
-        n_new_entries += (entries.size() - entry_position) +
-                         (cache_entries - cache_position);
-      }
-
-                                       // then allocate new memory and merge
-                                       // arrays
-      std::vector<unsigned int> new_entries;
-      new_entries.reserve (n_new_entries);
-      unsigned int cache_position = 0;
-      unsigned int entry_position = 0;
-      while ((entry_position<entries.size()) && (cache_position<cache_entries))
-        if (entries[entry_position] < cache[cache_position])
-          {
-            new_entries.push_back (entries[entry_position]);
-            ++entry_position;
-          }
-        else if (entries[entry_position] == cache[cache_position])
-          {
-            new_entries.push_back (entries[entry_position]);
-            ++entry_position;
-            ++cache_position;
-          }
-        else
-          {
-            new_entries.push_back (cache[cache_position]);
-            ++cache_position;
-          }
-
-                                       // copy remaining elements from the
-                                       // array that we haven't finished. note
-                                       // that at most one of the following
-                                       // loops will run at all
-      for (; entry_position < entries.size(); ++entry_position)
-        new_entries.push_back (entries[entry_position]);
-      for (; cache_position < cache_entries; ++cache_position)
-        new_entries.push_back (cache[cache_position]);
-      
-      Assert (new_entries.size() == n_new_entries,
-              ExcInternalError());
-
-                                       // finally swap old and new array, and
-                                       // set cache size to zero
-      new_entries.swap (entries);
-    }
-  
-  cache_entries = 0;
-}
-
-
-
-inline
-void
 CompressedSparsityPattern::Line::add (const unsigned int j)
 {
                                    // first check whether this entry is
@@ -600,7 +454,7 @@ CompressedSparsityPattern::Line::add (const unsigned int j)
                                    // if not, see whether there is still some
                                    // space in the cache. if not, then flush
                                    // the cache first
-  if (cache_entries == cache_size)
+  if (cache_entries == cache_size && cache_entries != 0)
     flush_cache ();
   
   cache[cache_entries] = j;
@@ -653,8 +507,9 @@ unsigned int
 CompressedSparsityPattern::row_length (const unsigned int row) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
-  
-  lines[row].flush_cache ();
+
+  if (lines[row].cache_entries != 0)
+    lines[row].flush_cache ();
   return lines[row].entries.size();
 }
 
@@ -669,7 +524,8 @@ CompressedSparsityPattern::column_number (const unsigned int row,
   Assert (index < lines[row].entries.size(),
 	  ExcIndexRange (index, 0, lines[row].entries.size()));
 
-  lines[row].flush_cache ();
+  if (lines[row].cache_entries != 0)
+    lines[row].flush_cache ();
   return lines[row].entries[index];
 }
 
