@@ -532,7 +532,22 @@ class BlockTrianglePrecondition
 				      * @{ */
 
 				     /**
-				      * Multiple diagonal element.
+				      * Each diagonal block must
+				      * contain one and only one
+				      * matrix. If this exception is
+				      * thrown, you did not enter a
+				      * matrix here.
+				      */
+    DeclException1(ExcNoDiagonal,
+		   unsigned int,
+		   << "No diagonal entry was added for block " << arg1);
+    
+				     /**
+				      * Each diagonal block must
+				      * contain one and only one
+				      * matrix. If this exception is
+				      * thrown, you entered a second
+				      * matrix here.
 				      */
     DeclException1(ExcMultipleDiagonal,
 		   unsigned int,

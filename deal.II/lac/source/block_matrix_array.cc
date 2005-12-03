@@ -333,6 +333,8 @@ BlockTrianglePrecondition<number>::do_row (
 	  dst.block(i).add (-1 * m->prefix, aux);
 	}
     }
+  Assert (diagonal != end, ExcNoDiagonal(row_num));
+  
   if (diagonal->transpose)
     diagonal->matrix->Tvmult(aux, dst.block(row_num));
   else
