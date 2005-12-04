@@ -109,9 +109,9 @@ endif
 			touch $@ ; \
 		 else \
 			if test "x$(verbose)" = "xon" ; then \
-				echo '+++++Error+++++++++' $@ ; \
+				echo '+++++Error+++++++++' $@ " ($$testname/cmp/$$i)" ; \
 			else \
-				echo '+++++Error+++++++++ $@. Use make verbose=on for the diffs' ; \
+				echo '+++++Error+++++++++' $@ "($$testname/cmp/$$i) Use make verbose=on for the diffs" ; \
 			fi ; \
 			if test "x$(stop_on_error)" = "xon" ; then \
 				false ; \
