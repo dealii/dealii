@@ -27,13 +27,13 @@ const unsigned int CompressedSparsityPattern::Line::cache_size;
 
 
 // This function was originally inlined, because it was called very
-// often without any need, because cache_entries==0. Onn the other
+// often without any need, because cache_entries==0. On the other
 // hand, it is very long and causes linker warnings on certain
 // systems.
 
 // Therefore, we require now, that the caller checks if this function
 // is necessary and only calls it, if it is actually used. Since it is
-// it called less often, it ies removed from the inlined section.
+// it called less often, it is removed from the inlined section.
 void
 CompressedSparsityPattern::Line::flush_cache () const
 {
