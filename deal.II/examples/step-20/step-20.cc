@@ -313,7 +313,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
   sparsity_pattern.block(0,1).reinit (n_u, n_p,
                                       dof_handler.max_couplings_between_dofs());
   sparsity_pattern.block(1,1).reinit (n_p, n_p,
-                                dof_handler.max_couplings_between_dofs());
+				      dof_handler.max_couplings_between_dofs());
   sparsity_pattern.collect_sizes();
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress();
@@ -580,9 +580,9 @@ template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
   {
-    SolverControl           solver_control (system_matrix.block(0,0).m(),
-                                            1e-6*system_rhs.block(1).l2_norm());
-    SolverCG<>              cg (solver_control);
+    SolverControl solver_control (system_matrix.block(0,0).m(),
+				  1e-6*system_rhs.block(1).l2_norm());
+    SolverCG<>    cg (solver_control);
 
     cg.solve (SchurComplement(system_matrix), solution.block(1),
               system_rhs.block(1),
@@ -601,9 +601,9 @@ void LaplaceProblem<dim>::solve ()
     Vector<double> tmp (system_matrix.block(0,0).m());
     system_matrix.block(0,1).vmult (tmp, solution.block(1));
     
-    SolverControl           solver_control (system_matrix.block(0,0).m(),
-                                            1e-6*tmp.l2_norm());
-    SolverGMRES<>              cg (solver_control);
+    SolverControl solver_control (system_matrix.block(0,0).m(),
+				  1e-6*tmp.l2_norm());
+    SolverGMRES<> cg (solver_control);
 
     cg.solve (system_matrix.block(0,0), solution.block(0),
               tmp, PreconditionIdentity());
