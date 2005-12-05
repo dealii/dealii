@@ -795,40 +795,53 @@ class VectorTools
 					 std::map<unsigned int,double> &boundary_values);
 
     				     /**
-				      * Compute the error of the finite element solution.
-				      * Integrate the difference between
-				      * a finite element function and
-				      * a reference function, which
-				      * is given as a continuous function
-				      * object.
+				      * Compute the error of the
+				      * finite element solution.
+				      * Integrate the difference
+				      * between a finite element
+				      * function and a reference
+				      * function, which is given as a
+				      * continuous function object.
 				      *
 				      * The value of @p exponent is
 				      * used for computing $L^p$-norms
 				      * and $W^{1,p}$-norms.
 				      *
-				      * The additional argument
-				      * @p weight allows to evaluate
+				      * The additional argument @p
+				      * weight allows to evaluate
 				      * weighted norms.  The weight
-				      * function may be
-				      * one-dimensional, establishing
-				      * a weight in the domain. It
-				      * also may have as many
+				      * function may be scalar,
+				      * establishing a weight in the
+				      * domain for all components
+				      * equally. This may be used, for
+				      * instance, to only integrates
+				      * over parts of the domain.
+				      *
+				      * The weight function may also
+				      * be vector-valued, with as many
 				      * components as the finite
 				      * element function: Then,
 				      * different components get
-				      * different weights.  This can
-				      * be applied for instant with
-				      * the characteristic function of
-				      * a subset of the domain or a
-				      * weight function selecting only
-				      * some components of the
-				      * solution. The weight function
-				      * is expected to be positive,
-				      * but negative values are not
+				      * different weights. A typical
+				      * application is when the error
+				      * with respect to only one or a
+				      * subset of the solution
+				      * variables is to be computed,
+				      * in which the other components
+				      * would have weight values equal
+				      * to zero. The
+				      * ComponentSelectFunction class
+				      * is particularly useful for
+				      * this purpose.
+				      *
+				      * The weight function is
+				      * expected to be positive, but
+				      * negative values are not
 				      * filtered. By default, no
 				      * weighting function is given,
 				      * i.e. weight=1 in the whole
-				      * domain.
+				      * domain for all vector
+				      * components uniformly.
 				      *
 				      * It is assumed that the number
 				      * of components of the function

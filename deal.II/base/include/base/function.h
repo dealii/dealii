@@ -591,10 +591,10 @@ class ComponentSelectFunction : public ConstantFunction<dim>
 {
   public:
 				     /**
-				      * Constructor. Provide the
-				      * component selected, the value
-				      * for that component and the
-				      * number of components.
+				      * Constructor. Arguments denote
+				      * the component selected, the
+				      * value for that component and
+				      * the total number of components.
 				      */
     ComponentSelectFunction (const unsigned int selected,
 			     const double       value,
