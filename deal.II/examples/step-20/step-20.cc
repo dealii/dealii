@@ -86,6 +86,7 @@ class LaplaceProblem
     void make_grid_and_dofs ();
     void assemble_system ();
     void solve ();
+    void compute_errors () const;
     void output_results () const;
 
     Triangulation<dim>   triangulation;
@@ -175,6 +176,16 @@ class BoundaryValues : public Function<dim>
 };
 
 
+template <int dim>
+class ExactSolution : public Function<dim> 
+{
+  public:
+    ExactSolution () : Function<dim>(dim+1) {};
+    
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+};
+
 
 
 				 // We wanted the right hand side
@@ -204,6 +215,18 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 				  const unsigned int) const 
 {
   double return_value = deal_II_numbers::PI * deal_II_numbers::PI * dim;
+  for (unsigned int i=0; i<dim; ++i)
+    return_value *= std::sin(deal_II_numbers::PI*p(i));
+
+  return return_value;
+}
+
+
+template <int dim>
+double ExactSolution<dim>::value (const Point<dim>  &p,
+				  const unsigned int component) const 
+{
+  double return_value = 1;
   for (unsigned int i=0; i<dim; ++i)
     return_value *= std::sin(deal_II_numbers::PI*p(i));
 
@@ -283,7 +306,7 @@ template <int dim>
 void LaplaceProblem<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, 0, 1);
-  triangulation.refine_global (4);
+  triangulation.refine_global (5);
   
   std::cout << "   Number of active cells: "
 	    << triangulation.n_active_cells()
@@ -621,6 +644,53 @@ void LaplaceProblem<dim>::solve ()
 
 
 
+template <int dim>
+void LaplaceProblem<dim>::compute_errors () const
+{
+  Vector<double> tmp (triangulation.n_active_cells());
+  ExactSolution<dim> exact_solution;
+  {
+    const ComponentSelectFunction<dim> mask (dim, 1., dim+1);
+    VectorTools::integrate_difference (dof_handler, solution, exact_solution,
+				       tmp, QGauss<dim>(degree+1),
+				       VectorTools::L2_norm,
+				       &mask);
+  }
+  const double p_l2_error = tmp.l2_norm();
+  
+  double u_l2_error = 0;
+  for (unsigned int d=0; d<dim; ++d)
+    {
+      const ComponentSelectFunction<dim> mask(d, 1., dim+1);
+      VectorTools::integrate_difference (dof_handler, solution, exact_solution,
+					 tmp, QGauss<dim>(degree+1),
+					 VectorTools::L2_norm,
+					 &mask);
+      u_l2_error = std::sqrt (u_l2_error*u_l2_error +
+			      tmp.l2_norm() * tmp.l2_norm());
+    }
+  
+  double u_h1_error = 0;
+  for (unsigned int d=0; d<dim; ++d)
+    {
+      const ComponentSelectFunction<dim> mask(d, 1., dim+1);
+      VectorTools::integrate_difference (dof_handler, solution, exact_solution,
+					 tmp, QGauss<dim>(degree+1),
+					 VectorTools::H1_seminorm,
+					 &mask);
+      u_h1_error = std::sqrt (u_h1_error*u_h1_error +
+			      tmp.l2_norm() * tmp.l2_norm());
+    }
+
+
+  std::cout << "Errors: ||e_p||_L2 = " << p_l2_error
+	    << ",   ||e_u||_L2 = " << u_l2_error
+    	    << ",   |e_u|_H1 = " << u_h1_error
+	    << std::endl;
+}
+
+
+
 				 // This function also does what the
 				 // respective one did in the previous
 				 // example. No changes here for
@@ -667,6 +737,7 @@ void LaplaceProblem<dim>::run ()
   make_grid_and_dofs();
   assemble_system ();
   solve ();
+  compute_errors ();
   output_results ();
 }
 
