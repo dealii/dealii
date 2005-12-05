@@ -114,7 +114,7 @@ endif
 				echo '+++++Error+++++++++' $@ "($$testname/cmp/$$i) Use make verbose=on for the diffs" ; \
 			fi ; \
 			if test "x$(stop_on_error)" = "xon" ; then \
-				false ; \
+				exit 1 ; \
 			fi ; \
 		 fi ; \
 		 break ; \
