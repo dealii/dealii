@@ -600,6 +600,16 @@ class ComponentSelectFunction : public ConstantFunction<dim>
 			     const double       value,
 			     const unsigned int n_components);
 
+				     /**
+				      * Constructor. As before, but
+				      * the value for the selected
+				      * component is assumed to be
+				      * one. In essence, this function
+				      * then works as a mask.
+				      */
+    ComponentSelectFunction (const unsigned int selected,
+			     const unsigned int n_components);
+    
     				     /**
 				      * Return the value of the function
 				      * at the given point for all

@@ -416,6 +416,17 @@ ComponentSelectFunction (const unsigned int selected,
 
 
 template <int dim>
+ComponentSelectFunction<dim>::
+ComponentSelectFunction (const unsigned int selected,
+                         const unsigned int n_components)
+		:
+		ConstantFunction<dim> (1., n_components),
+                selected(selected)
+{}
+
+
+
+template <int dim>
 void ComponentSelectFunction<dim>::vector_value (const Point<dim> &,
 						 Vector<double>   &return_value) const
 {
