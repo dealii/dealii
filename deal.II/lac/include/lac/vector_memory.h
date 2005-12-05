@@ -28,15 +28,38 @@
 //! Base class for vector memory management
 /**
  * Memory management base class for vectors. This is an abstract base
- * class used by all iterative methods to allocate space for
- * auxilliary vectors. An object of a derived class with an actual
- * implementation of the memory management must be created by the
- * application program to be used in iterative methods.
+ * class used, among other places, by all iterative methods to
+ * allocate space for auxiliary vectors.
  *
- * The purpose of this class is avoiding interaction with the
- * operating system whenever a vector is needed. Especially, when an
- * iterative method is invoked as part of an outer iteration, this
- * would lead to runtime overhead and memory fragmentation.
+ * The purpose of this class is as follows: in iterative solvers and
+ * other places, one needs to allocate temporary storage for vectors,
+ * for example for auxiliary vectors. One could allocate and release
+ * them anew every time, but this may be expensive in some situations
+ * if it has to happen very frequently. A common case for this is when
+ * an iterative method is used to invert a matrix in each iteration an
+ * outer solver, such as when inverting a matrix block for a Schur
+ * complement solver.
+ *
+ * In such situations, allocating and deallocating vectors anew in
+ * each call to the inner solver is expensive and leads to memory
+ * fragmentation. The present class allows to avoid this by offering
+ * an interface that other classes can use to allocate and deallocate
+ * vectors. Different derived classes then implement different
+ * strategies to provide temporary storage vectors to using
+ * classes.
+ *
+ * For example, the PrimitiveVectorMemory class simply allocates and
+ * deallocated vectors each time it is asked for a vector. It is an
+ * appropriate implementation to use for iterative solvers that are
+ * called only once, or very infrequently.
+ *
+ * On the other hand, the GrowingVectorMemory class never returns
+ * memory space to the operating system memory management subsystem
+ * during its lifetime; it only marks them as unused and allows them
+ * to be reused next time a vector is requested.
+ *
+ * Yet other classes, when implemented, could provide even other
+ * strategies for memory management.
  *
  * @author Guido Kanschat, 1998-2003
 */
@@ -53,13 +76,22 @@ class VectorMemory : public Subscriptor
     virtual ~VectorMemory() {};
 
 				     /**
-				      * Return new vector from the pool.
+				      * Return a pointer to a new
+				      * vector. The number of elements
+				      * or their subdivision into
+				      * blocks (if applicable) is
+				      * unspecified and users of this
+				      * function should reset vectors
+				      * to their proper size.
 				      */
     virtual VECTOR* alloc() = 0;
     
 				     /**
-				      * Return a vector into the pool
-				      * for later use.
+				      * Return a vector and indicate
+				      * that it is not going to be
+				      * used any further by the
+				      * instance that called alloc()
+				      * to get a pointer to it.
 				      */
     virtual void free (const VECTOR * const) = 0;
 
@@ -78,12 +110,16 @@ class VectorMemory : public Subscriptor
 				     //@}
 };
 
+
+
 //! Sample implementation using system memory management.
 /**
- * Simple memory management.  This memory class is just made for
- * tests. It just allocates and deletes
+ * Simple memory management. See the documentation of the base class
+ * for a description of its purpose.
+ *
+ * This class allocates and deletes
  * vectors as needed from the global heap, i.e. performs no
- * specially adapted actions to the purpose of this class.
+ * specially adapted actions for memory management.
  */
 template<class VECTOR = ::Vector<double> >
 class PrimitiveVectorMemory : public VectorMemory<VECTOR>
@@ -95,8 +131,18 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
     PrimitiveVectorMemory () {}
 
 				     /**
-				      * Allocate a vector
-				      * from the global heap.
+				      * Return a pointer to a new
+				      * vector. The number of elements
+				      * or their subdivision into
+				      * blocks (if applicable) is
+				      * unspecified and users of this
+				      * function should reset vectors
+				      * to their proper size.
+				      *
+				      * For the present class, calling
+				      * this function will allocate a
+				      * new vector on the heap and
+				      * returning a pointer to it.
 				      */
     virtual VECTOR* alloc()
       {
@@ -104,7 +150,16 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
       }
     
 				     /**
-				      * Return a vector to the global heap.
+				      * Return a vector and indicate
+				      * that it is not going to be
+				      * used any further by the
+				      * instance that called alloc()
+				      * to get a pointer to it.
+				      *
+				      *
+				      * For the present class, this
+				      * means that the vector is
+				      * returned to the global heap.
 				      */
     virtual void free (const VECTOR * const v)
       {
@@ -112,12 +167,24 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
       }
 };
 
+
+
 //! Keeps all vectors and avoids reallocation.
 /**
- * Memory keeping allocated vectors.  This @p VectorMemory is able to
- * grow infinitely (according to computer memory).  A vector once
- * allocated will stay in the memory pool, though, and it will be
- * reused in later allocation.
+ * A pool based memory management class. See the documentation of the
+ * base class for a description of its purpose.
+ *
+ * Each time a vector is requested from this class, it checks if it
+ * has one available and returns its address, or allocates a new one
+ * on the heap. If a vector is returned, through the free() member
+ * function, it doesn't return it to the operating system memory
+ * subsystem, but keeps it around unused for later use if alloc() is
+ * called again, or until the object is destroyed. The class therefore
+ * avoid the overhead of repeatedly allocating memory on the heap if
+ * temporary vectors are required and released frequently; on the
+ * other hand, it doesn't release once-allocated memory at the
+ * earliest possible time and may therefore lead to an increased
+ * overall memory consumption.
  * 
  * @author Guido Kanschat, 1999
  */
@@ -126,10 +193,10 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 {
   public:
 				     /**
-				      * Constructor.
-				      * The argument allows to
-				      * preallocate a certain number
-				      * of vectors.
+				      * Constructor.  The argument
+				      * allows to preallocate a
+				      * certain number of vectors. The
+				      * default is not to do this.
 				      */
     GrowingVectorMemory (const unsigned int initial_size = 0);
 
@@ -147,13 +214,27 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
     ~GrowingVectorMemory();
     
 				     /**
-				      * Return new vector from the pool.
+				      * Return a pointer to a new
+				      * vector. The number of elements
+				      * or their subdivision into
+				      * blocks (if applicable) is
+				      * unspecified and users of this
+				      * function should reset vectors
+				      * to their proper size.
 				      */
     virtual VECTOR* alloc();
     
 				     /**
-				      * Return a vector into the pool
-				      * for later use.
+				      * Return a vector and indicate
+				      * that it is not going to be
+				      * used any further by the
+				      * instance that called alloc()
+				      * to get a pointer to it.
+				      *
+				      * For the present class, this
+				      * means retaining the vector for
+				      * later reuse by the alloc()
+				      * method.
 				      */
     virtual void free (const VECTOR * const);
 
@@ -180,7 +261,11 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
     std::vector<entry_type> pool;
     
 				     /**
-				      * Overall number of allocations.
+				      * Overall number of
+				      * allocations. Only used for
+				      * bookkeeping and to generate
+				      * output at the end of an
+				      * object's lifetime.
 				      */
     unsigned int n_alloc;
     
@@ -199,8 +284,9 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 
 
 template <typename VECTOR>
-GrowingVectorMemory<VECTOR>::GrowingVectorMemory(const unsigned int initial_size)
-		: pool(initial_size)
+GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const unsigned int initial_size)
+		:
+		pool(initial_size)
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);
   for (typename std::vector<entry_type>::iterator i=pool.begin();
@@ -209,7 +295,7 @@ GrowingVectorMemory<VECTOR>::GrowingVectorMemory(const unsigned int initial_size
     {
       i->first = false;
       i->second = new VECTOR;
-    };
+    }
 
 				   // no vectors yet claimed
   n_alloc = 0;
@@ -250,10 +336,13 @@ GrowingVectorMemory<VECTOR>::~GrowingVectorMemory()
 
 template<typename VECTOR>
 VECTOR *
-GrowingVectorMemory<VECTOR>::alloc()
+GrowingVectorMemory<VECTOR>::alloc ()
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);
   ++n_alloc;
+
+				   // see if there is a free vector
+				   // available in our list
   for (typename std::vector<entry_type>::iterator i=pool.begin();
        i != pool.end();
        ++i)
@@ -264,7 +353,9 @@ GrowingVectorMemory<VECTOR>::alloc()
 	  return (i->second);
 	}
     }
-  
+
+				   // no free vector found, so let's
+				   // just allocate a new one
   const entry_type t (true, new VECTOR);
   pool.push_back(t);
   
@@ -288,6 +379,7 @@ GrowingVectorMemory<VECTOR>::free(const VECTOR* const v)
     }
   Assert(false, typename VectorMemory<VECTOR>::ExcNotAllocatedHere());
 }
+
 
 
 template<typename VECTOR>
