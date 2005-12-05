@@ -544,7 +544,7 @@ class SchurComplement
 
         SolverControl           solver_control (tmp1.size(),
                                                 1e-8*tmp1.l2_norm());
-        SolverCG<>              cg (solver_control);
+        SolverCG<>              cg (solver_control, vector_memory);
 
         PreconditionSSOR<> precondition;
         precondition.initialize(A.block(0,0));
@@ -562,6 +562,8 @@ class SchurComplement
   private:
     const BlockSparseMatrix<double> &A;
 
+    mutable GrowingVectorMemory<> vector_memory;
+    
     mutable Vector<double> tmp1, tmp2;
 };
 
@@ -645,9 +647,9 @@ void LaplaceProblem<dim>::output_results () const
 				   // neglect this here for the sake
 				   // of brevity).
   std::ofstream output (dim == 2 ?
-			"solution-2d" :
-			"solution-3d");
-  data_out.write_gnuplot (output);
+			"solution-2d.gmv" :
+			"solution-3d.gmv");
+  data_out.write_gmv (output);
 }
 
 
