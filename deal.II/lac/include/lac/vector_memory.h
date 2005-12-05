@@ -82,9 +82,11 @@ class VectorMemory : public Subscriptor
 				      * blocks (if applicable) is
 				      * unspecified and users of this
 				      * function should reset vectors
-				      * to their proper size.
+				      * to their proper size. The same
+				      * holds for the contents of
+				      * vectors: they are unspecified.
 				      */
-    virtual VECTOR* alloc() = 0;
+    virtual VECTOR* alloc () = 0;
     
 				     /**
 				      * Return a vector and indicate
@@ -137,14 +139,16 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
 				      * blocks (if applicable) is
 				      * unspecified and users of this
 				      * function should reset vectors
-				      * to their proper size.
+				      * to their proper size. The same
+				      * holds for the contents of
+				      * vectors: they are unspecified.
 				      *
 				      * For the present class, calling
 				      * this function will allocate a
 				      * new vector on the heap and
 				      * returning a pointer to it.
 				      */
-    virtual VECTOR* alloc()
+    virtual VECTOR* alloc ()
       {
 	return new VECTOR();
       }
@@ -220,9 +224,11 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      * blocks (if applicable) is
 				      * unspecified and users of this
 				      * function should reset vectors
-				      * to their proper size.
+				      * to their proper size. The same
+				      * holds for the contents of
+				      * vectors: they are unspecified.
 				      */
-    virtual VECTOR* alloc();
+    virtual VECTOR* alloc ();
     
 				     /**
 				      * Return a vector and indicate
