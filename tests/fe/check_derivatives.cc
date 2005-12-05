@@ -59,7 +59,7 @@ void test (const FiniteElement<dim> &fe,
                            delta_x;
             }
 
-          Assert ((gradient-fd_grad).norm () <= 1e-5,
+          Assert ((gradient-fd_grad).norm () <= 2e-5,
                   ExcInternalError());
         }
   deallog << "OK" << std::endl;
