@@ -136,9 +136,9 @@ endif
 report:
 	@for test in $(sort $(tests)) ; do \
 		if (($(MAKE) $$test/OK stop_on_error=on 2>&1) > /dev/null); then \
-			echo `date -u +"%Y-%m-%d %H:%M"`   +  $(WORKDIR)/$$test ; \
+			echo `date -u +"%Y-%m-%d %H:%M"` "  +  $(WORKDIR)/$$test" ; \
 		else \
-			echo `date -u +"%Y-%m-%d %H:%M"`   -  $(WORKDIR)/$$test ; \
+			echo `date -u +"%Y-%m-%d %H:%M"` "  -  $(WORKDIR)/$$test" ; \
 		fi ; \
 	done
 
