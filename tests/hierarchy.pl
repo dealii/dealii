@@ -46,6 +46,8 @@ $hierarchy{"x86_64-unknown-linux-gnu+gcc3.4"} = "x86_64-unknown-linux-gnu+gcc3.3
 $hierarchy{"x86_64-unknown-linux-gnu+gcc4.0"} = "x86_64-unknown-linux-gnu+gcc3.4";
 $hierarchy{"x86_64-unknown-linux-gnu+gcc4.1"} = "x86_64-unknown-linux-gnu+gcc4.0";
 
+$hierarchy{"x86_64-unknown-linux-gnu+icc9"} = "x86_64-unknown-linux-gnu+gcc3.3";
+
 
 $configuration = $ARGV[0];
 
