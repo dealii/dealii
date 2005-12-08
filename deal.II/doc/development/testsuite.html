@@ -18,9 +18,9 @@
     
     <p>The deal.II testsuite consists of two parts, the build tests and
     the regression tests. While the build tests just check if the
-    library can be compiled on different systems, the regression tests
-    actually are actually run and compare the output of the testy
-    programs with precomputed values. These two testsuites are
+    library can be compiled on different systems and with different (versions
+    of) compilers, the regression tests are actually run and their output
+    compared with previously stored. These two testsuites are
     described below.</p>
 
     <h2>The build tests</h2>
@@ -35,7 +35,9 @@
     users with configurations not found on the <a
     href="http://www.dealii.org/build.php">build test page</a> to
     participate. Assuming you checked out deal.II into the directory
-    <code>dealtest</code>, running it is as simple as:</p>
+    <code>dealtest</code>, running it is as simple as (you may want to pass
+    different options than the ones given as <code>BUILDTESTFLAGS</code> to
+    <code>./configure</code>):</p>
 
     <pre>
 
@@ -51,19 +53,24 @@
     most recent version, the <code>make</code> command configures the
     library (here for use of UMFPack and LAPACK libraries) and
     compiles everything. The result is in the file
-    <code>build-test-log</code>, Which is sent to the build test demon
-    in the end.</p>
+    <code>build-test-log</code>, which is sent to the build test demon
+    in the end. A status indicator should appear on the build test website
+    after some time (results are collected and processed by a program that is
+    run periodically, but not immediately after a mail has been received).
+    </p>
     
     <h3>Configuring for a special compiler</h3>
     
     <p>If your compiler is not in the standard path or has a strange
     name (like <code>mycc</code> for C and <code>myCC</code> for C++),
-    your template would be something like this:</p>
+    your template would be something like this (assuming you work with the
+    <code>bash</code> shell):</p>
 
     <pre>
 
     export PATH=/my/compiler/path:$PATH
-    
+    export CXX=myCC
+
     cd dealtest
     make clean
     cvs update -d -P
@@ -71,10 +78,43 @@
     mail build-tests@dealii.org < build-test-log
 
     </pre>
+
+
+    <h3>Dedicated tests</h3>
+
+    <p>
+    Most of our tests are built in dedicated directories, i.e. work on copies
+    of deal.II that we don't usually use to work on every day. We do this,
+    because we want to see if the version in the CVS repository can be
+    compiled, not the version that we have made changes in.
+    </p>
+
+    <p>
+    In this case, one would check out a new version, and do essentially the
+    same things as above:
+
+    <pre>
+
+    export PATH=/my/compiler/path:$PATH
+    export CXX=myCC
+
+    cvs checkout deal.II
+    cd deal.II
+    cvs update -d -P
+    make build-test BUILDTEST=yes BUILDTESTFLAGS='CC=mycc CXX=myCC'
+    mail build-tests@dealii.org < build-test-log
+    cd ..
+    rm -rf deal.II
+
+    </pre>
     
-    If the directory has never been configured before calling
-    <code>make build-test</code>, then the option
-    <code>BUILDTEST=yes</code> must be added.
+    The only difference is that one has to give the option
+    <code>BUILDTEST=yes</code> to the call to <code>make</code>. This is so
+    because for the make file to work it depends on a file that is created by
+    <code>./configure</code>; the latter, however, hasn't run on this pristine
+    copy yet.
+    </p>
+
 
     <h2>The regression tests</h2>
 
