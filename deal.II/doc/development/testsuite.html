@@ -222,7 +222,7 @@
     </pre>
     This generates a report (that we "tee" into a file called "report"
     and show on screen at the same time). It shows the time at which
-    the tests were started, an indicator of success, and the name of a
+    the tests was run, an indicator of success, and the name of a
     test. The indicator is either a plus, which means that the test
     compiled and linked successfully and that the output compared
     successfully against the stored results. Or it is a minus,
@@ -261,45 +261,47 @@
     given in the line with the equals signs; there are tests in other
     directories as well) and then type
     <pre>
-      make hierarchical.exe
+      make hierarchical/exe
     </pre>
-    to compile and link the executable. (Note that executables in the
-    tests directories have the extension <code>.exe</code> even on
-    unix systems, as this made writing the makefiles much simpler.) If
+    to compile and link the executable. (For each test there is a not
+    only a file with suffic <code>.cc</code> but also a subdirectory with the
+    same name, in which we store among other things the executable for that
+    test, under the name <code>exe</code>.) If this fails, i.e. if
     you can't compile or link, then you probably already know where
     the problem is, and how to fix it. If you could compile and link
     the test, you will want to make sure that it executes correctly
     and produces an output file:
     <pre>
-      make hierarchical.output
+      make hierarchical/output
     </pre>
-    If this produces errors or triggers assertions, then you will want
-    to use a debugger on the executable to figure out what happens. On
+    (As you see, the output file is also stored in the subdirectory with the
+    test's name.) If this produces errors or triggers assertions, then you will
+    want to use a debugger on the executable to figure out what happens. On
     the other hand, if you are sure that this also worked, you will
     want to compare the output with the stored output from CVS:
     <pre>
-      make hierarchical.OK
+      make hierarchical/OK
     </pre>
     If the output isn't equal, then you'll get to see something like
     this:
     <pre>
-      =====Checking====== hierarchical.output
-      +++++Error+++++++++ hierarchical.OK. Use make verbose=on for the diffs
+      =====Checking====== hierarchical/output
+      +++++Error+++++++++ hierarchical/OK. Use make verbose=on for the diffs
     </pre>
     Because the diffs between the output we get and the output we
     expected can sometimes be very large, you don't get to see it by
     default. However, following the suggestion printed, if you type
     <pre>
-      make hierarchical.OK verbose=on
+      make hierarchical/OK verbose=on
     </pre>
     you get to see it all:
     <pre>
-      =====Checking====== hierarchical.output
+      =====Checking====== hierarchical/output
       12c12
       < DEAL::0.333 1.667 0.333 -0.889 0.296 -0.988 0.329 -0.999 0.333 -1.000 0.333 -1.000
       ---
       > DEAL::0.333 0.667 0.333 -0.889 0.296 -0.988 0.329 -0.999 0.333 -1.000 0.333 -1.000
-      +++++Error+++++++++ hierarchical.OK
+      +++++Error+++++++++ hierarchical/OK
     </pre>
     In this case, the second number on line 12 is off by one. To find
     the reason for this, you again should use a debugger or other
@@ -349,7 +351,7 @@
 
 int main () 
 {
-  std::ofstream logfile("my_new_test.output");
+  std::ofstream logfile("my_new_test/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
@@ -360,8 +362,9 @@ int main ()
   return 0;
 }
     </pre>
-    The basic idea is that you open an output file with the same base
-    name as your test, and then write all output you generate to it,
+    The basic idea is that you open an output file in a directory with the same
+    name as your test (don't forget to create this directory), and then write
+    all output you generate to it, 
     through the <code>deallog</code> stream (which works just like any
     other <code>std::ostream</code> except that it does a few more
     things behind the scenes that are helpful in this context). In
@@ -386,7 +389,7 @@ int main ()
     library, often only a single function. These tests go into the
     <code>bits/</code> directory and often have names that are
     composed of the name of the class being tested and a two-digit
-    number. 
+    number (for example, <code>dof_tools_11</code>). 
     </p>
 
     
@@ -409,7 +412,7 @@ int main ()
     <p>
     If you have done this, you can try to run
     <pre>
-      make my_new_test.output
+      make my_new_test/output
     </pre>
     which should compile, link, and run your test. Running your test
     should generate the desired output file.
@@ -421,7 +424,8 @@ int main ()
 
     <p>
     If you run your new test executable, you will get an output file
-    that should be used to compare all future runs with. If the test
+    <code>mytestname/output</code> that should be used to compare all future
+    runs with. If the test 
     is relatively simple, it is often a good idea to look at the
     output and make sure that the output is actually what you had
     expected. However, if you do complex operations, this may
@@ -432,41 +436,83 @@ int main ()
 
     <p>
     The next step is to copy this output file to the place where the
-    scripts can find it when they compare with newer runs. For this,
-    there are directories 
-    <code>tests/results/i686-pc-linux-gnu+gcc2.95</code>,
-    <code>tests/results/i686-pc-linux-gnu+icc7.1</code>,
-    <code>tests/results/mips-sgi-irix6.5+MIPSpro7.4</code>, etc. that
-    encode on which platform and with which compiler the output was
-    generated. These different directories are necessary since
-    floating point computations are often not exactly reproducible
-    quantitatively if you use different CPUs or compilers, even though
-    they may be qualitatively equivalent. We may therefore have to
-    store multiple output files for the same test.
+    scripts can find it when they compare with newer runs. For this, you first
+    have to understand how correct results are verified. It works in the
+    following way: for each test, we have subdirectories
+    <code>testname/cmp</code> where we store the expected results in a file
+    <code>testname/cmp/generic</code>. If you create a new test, you should
+    therefore create this directory, and copy the output of your program, 
+    <code>testname/output</code> to <code>testname/cmp/generic</code>.
+    </p>
+
+    <p>
+    So why <code>generic</code>? The reason is that sometimes test results
+    differ slightly from platform to platform, for example because numerical
+    roundoff is different due to different floating point implementations on
+    different CPUs. What this means is that sometimes a single stored output is
+    not enough to verify that a test functioned properly: if you happen to be
+    on a platform different from the one on which the generic output was
+    created, your test will always fail even though it produces almost exactly
+    the same output.
+    </p>
+
+    <p>
+    To avoid this, what the makefiles do is to first check whether an output
+    file is stored for this test and your particular configuration (platform
+    and compiler). If this isn't the case, it goes through a hierarchy of files
+    with related configurations, and only if none of them does it take the
+    generic output file. It then compares the output of your test run with the
+    first file it found in this process. To make things a bit clearer, if you
+    are, for example, on a <code>i686-pc-linux-gnu</code> box and use
+    <code>gcc4.0</code> as your compiler, then the following files will be
+    searched for (in this order): 
+    <pre>
+testname/cmp/i686-pc-linux-gnu+gcc4.0 
+testname/cmp/i686-pc-linux-gnu+gcc3.4 
+testname/cmp/i686-pc-linux-gnu+gcc3.3
+testname/cmp/generic
+    </pre>
+    (This list is generated by the <code>tests/hierarchy.pl</code> script.)
+    Your output will then be compared with the first one that is actually
+    found. The virtue of this is that we don't have to store the output files
+    from all possible platforms (this would amount to gigabytes of data), but
+    that we only have store an output file for gcc4.0 if it differs from that
+    of gcc3.4, and for gcc3.4 if it differs from gcc3.3. If all of them are the
+    same, we would only have the generic output file.
     </p>
 
     <p>
     Most of the time, you will be able to generate output files only
     for your own platform and compiler, and that's alright: someone
     else will create the output files for other platforms
-    eventually. You only have to put your file into the correct
-    directory, which is actually easy to find: there is a link
-    <code>tests/compare</code> that points to the directory that will
-    be used to compare with. If you have put your test
-    <code>my_new_test.cc</code> into <code>tests/bits/</code>, for
-    example, then you chould copy <code>my_new_test.output</code> into
-    <code>tests/compare/bits</code>. 
+    eventually. You therefore only have to copy your output file to
+    <code>testname/cmp/generic</code>. 
     </p>
 
     <p>
     At this point you can run
     <pre>
-      make my_new_test.OK
+      make my_new_test/OK
     </pre>
     which should compare the present output with what you have just
     copied into the compare directory. This should, of course,
     succeed, since the two files should be identical.
     </p>
+
+    <p>
+    On the other hand, if you realize that an existing test fails on your
+    system, but that the differences (as shown when running with
+    <code>verbose=on</code>, see above) are only marginal and around the 6th or
+    8th digit, then you should check in your output file for the platform you
+    work on. For this, you could copy <code>testname/output</code> to
+    <code>testname/cmp/myplatform+compiler</code>, but your life can be easier
+    if you simply type
+    <pre>
+      make my_new_test/ref
+    </pre>
+    which takes your output and copies it to the right place automatically.
+    </p>
+
 
 
 
@@ -480,85 +526,16 @@ int main ()
     file, and to commit them together with the changed Makefile, like
     so:
     <pre>
-      cvs add bits/my_new_test.cc compare/bits/my_new_test.output
-      cvs commit -m "New test" bits/my_new_test.cc \
-                   compare/bits/my_new_test.output bits/Makefile
+      cvs add bits/my_new_test.cc 
+      cvs add bits/my_new_test
+      cvs add bits/my_new_test/cmp
+      cvs add bits/my_new_test/cmp/generic
+      cvs commit -m "New test" bits/my_new_test* bits/Makefile
     </pre>
     If you don't have CVS write access, talk to us on the mailing
-    list; writing testcase is a worthy and laudable task, and we would
+    list; writing testcases is a worthy and laudable task, and we would
     like to encourage it by giving people the opportunity to
     contribute!
-    </p>
-
-
-    <h3>Adding a new system</h3>
-
-    <p>
-    If you are working on a system or with a compiler for which test
-    output files haven't been generated yet, things a slightly more
-    complicated because you have to set up a new directory in
-    <code>tests/results</code> so that <code>tests/compare</code> can
-    point to it. There are several ways to do that.
-    </p>
-
-    <p>
-    First, there are combinations of system and compiler for which we
-    get exactly the same output as for another combination. For
-    example, on an x86 linux, gcc 3.3 produces the same output as gcc
-    3.2. There is no need to have two directories under
-    <code>tests/results</code> that contain the many megabytes of
-    output files twice. If your system is of this type, then your
-    simplest way is to edit <code>tests/results/Makefile</code>: at
-    the bottom of this file is a target <code>.links</code> that
-    allows to create symbolic links from one (existing) directory to a
-    new one. For example, you will find there
-    <pre>
-      linkdirs-i686-pc-linux-gnu+gcc3.3-to-i686-pc-linux-gnu+gcc3.2
-    </pre>
-    which creates a directory <code>i686-pc-linux-gnu+gcc3.3</code>
-    that really is only a link to
-    <code>i686-pc-linux-gnu+gcc3.2</code>.
-    </p>
-
-    <p>
-    The second, and most frequent possibility is that your combination
-    of system and compiler yields output files that are almost always
-    equal to another one, and only a few tests yield different
-    output. In this case, you would generate all output files (using
-    just <code>make</code> in <code>tests/</code> will generate them),
-    then create a new directory in <code>results/</code> for your
-    combination, and populate it with the output files you
-    generated. Then pick the existing directory for which the test
-    results are closest to yours, and in your own copy delete all the
-    output files that are identical to the ones in the other
-    directory. Finally, add a target to the Makefile of the form
-    <pre>
-      linkfiles-mips-sgi-irix6.5+MIPSpro7.4-to-i686-pc-linux-gnu+gcc3.2
-    </pre>
-    What happens in this case is that when you call the makefile, it
-    goes through the <code>mips-sgi-irix6.5+MIPSpro7.4</code> (for
-    output files generated on SGI/Mips systems with the SGI MIPSpro
-    compiler) and for each test for which there is no output file it
-    creates a link to the corresponding output file in
-    <code>i686-pc-linux-gnu+gcc3.2</code>. In this particular case,
-    only 51 output files are presently stored, whereas the other
-    roughly 400 are identical to the ones generated by gcc 3.2 on
-    linux.
-    </p>
-
-    <p>
-    The third possibility is that you entirely populate your directory
-    with your output file. However, this is inefficient. In order to
-    store <i>all</i> output files, it presently takes 28MB; however,
-    this should be unnecessary since most compilers and platforms
-    generate identical output for almost all tests. Thus, populating
-    CVS with large and unnecessary files is not a good idea. It is
-    also an unnecessary burden when tests are added: if entire
-    directories or single output files are linked as shown above, then
-    a new output file has to be added only once to be used by a larger
-    number of platform/compiler combinations, but it has to be added
-    for every fully populated directory. We therefore discourage this
-    option.
     </p>
 
     
