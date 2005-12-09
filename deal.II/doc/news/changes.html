@@ -222,6 +222,15 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: A new <code>TriaAccessor::ExcCellHasNoChildren</code>
+       exception will be raised if the <code
+       class="member">TriaObjectAccessor::child_index</code> function
+       is invoked for cells without children.
+       <br> 
+       (RH 2005/12/09)
+       </p>
+
+  <li> <p>
        Fixed: We had a bug in <code class="member">DataOut::build_patches</code>
        that, when used in multithreaded mode, caused an exception to be
        thrown. In particular, this happened when the step-14 program was run on

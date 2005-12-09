@@ -207,6 +207,7 @@ int
 TriaObjectAccessor<1,dim>::child_index (unsigned const int i) const
 {
   Assert (i<2, ExcIndexRange(i,0,2));
+  Assert (has_children(), typename TriaAccessor<dim>::ExcCellHasNoChildren());
   return this->tria->levels[this->present_level]->lines.children[this->present_index]+i;
 }
 
@@ -414,6 +415,7 @@ inline
 int TriaObjectAccessor<2,dim>::child_index (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange(i,0,4));
+  Assert (has_children(), typename TriaAccessor<dim>::ExcCellHasNoChildren());
   return this->tria->levels[this->present_level]->quads.children[this->present_index]+i;
 }
 
@@ -705,6 +707,7 @@ inline
 int TriaObjectAccessor<3,dim>::child_index (const unsigned int i) const
 {
   Assert (i<8, ExcIndexRange(i,0,8));
+  Assert (has_children(), typename TriaAccessor<dim>::ExcCellHasNoChildren());
   return this->tria->levels[this->present_level]->hexes.children[this->present_index]+i;
 }
 

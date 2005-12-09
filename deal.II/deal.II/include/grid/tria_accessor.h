@@ -240,6 +240,10 @@ class TriaAccessor
 				     /**
 				      * @ingroup Exceptions
 				      */
+    DeclException0 (ExcCellHasNoChildren);
+				     /**
+				      * @ingroup Exceptions
+				      */
     DeclException0 (ExcUnusedCellAsChild);
 				     /**
 				      * @ingroup Exceptions
