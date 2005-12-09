@@ -314,19 +314,24 @@ class TriangulationLevel<1> : public TriangulationLevel<0>
     LinesData lines;
 
     				     /**
-				      *  Assert that enough space is allocated
-				      *  to accomodate @p new_lines new lines.
-				      *  This function does not only call
-				      *  <tt>vector::reserve()</tt>, but does really
-				      *  append the needed elements.
-				      *  There are pendants for higher
-				      *  dimensions, which you have to call
-				      *  explicitly (they can't hand down the
-				      *  call because there is no easy relation
-				      *  between the number of new quads and
-				      *  the number of new lines, etc.). Also
-				      *  don't forget to call the
-				      *  TriangulationLevel<0>@p ::reserve_space
+				      *  Assert that enough space is
+				      *  allocated to accomodate
+				      *  <tt>new_lines</tt> new lines.
+				      *  This function does not only
+				      *  call
+				      *  <tt>vector::reserve()</tt>,
+				      *  but does really append the
+				      *  needed elements.  There are
+				      *  pendants for higher
+				      *  dimensions, which you have to
+				      *  call explicitly (they can't
+				      *  hand down the call because
+				      *  there is no easy relation
+				      *  between the number of new
+				      *  quads and the number of new
+				      *  lines, etc.). Also don't
+				      *  forget to call the
+				      *  <tt>TriangulationLevel<0>::reserve_space</tt>
 				      *  function.
 				      */
     void reserve_space (const unsigned int new_lines);
@@ -446,8 +451,9 @@ class TriangulationLevel<2> :  public TriangulationLevel<1>
     QuadsData quads;
 
     				     /**
-				      *  Assert that enough space is allocated
-				      *  to accomodate @p new_quads new quads.
+				      *  Assert that enough space is
+				      *  allocated to accomodate
+				      *  <tt>new_quads</tt> new quads.
 				      */
     void reserve_space (const unsigned int new_quads);
 
@@ -627,10 +633,11 @@ class TriangulationLevel<3> :  public TriangulationLevel<2>
     HexesData hexes;
 
     				     /**
-				      *  Assert that enough space is allocated
-				      *  to accomodate @p new_quads new quads.
+				      *  Assert that enough space is
+				      *  allocated to accomodate
+				      *  <tt>new_hexes</tt> new hexes.
 				      */
-    void reserve_space (const unsigned int new_quads);
+    void reserve_space (const unsigned int new_hexes);
 
 				     /**
 				      *  Check the memory consistency
