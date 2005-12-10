@@ -84,7 +84,8 @@ SolverControl::SolverControl (const unsigned int maxiter,
 		failure_residual(0),
 		m_log_history(m_log_history),
 		m_log_frequency(1),
-		m_log_result(m_log_result)
+		m_log_result(m_log_result),
+		history_data_enabled(false)
 {}
 
 
@@ -102,8 +103,12 @@ SolverControl::check (const unsigned int step,
 				   // come here, then store the
 				   // residual for later comparisons
   if (step==0)
-    initial_val = check_value;
-
+    {
+      initial_val = check_value;
+      if (history_data_enabled)
+	history_data.resize(maxsteps);
+    }
+  
   if (m_log_history && ((step % m_log_frequency) == 0))
     deallog << "Check " << step << "\t" << check_value << std::endl;
   
@@ -119,6 +124,9 @@ SolverControl::check (const unsigned int step,
 	deallog << "Starting value " << check_value << std::endl;
     }
 
+  if (history_data_enabled)
+    history_data[step] = check_value;
+  
   if (check_value <= tol)
     {
       if (m_log_result)
@@ -193,6 +201,48 @@ SolverControl::log_frequency (unsigned int f)
 }
 
 
+void
+SolverControl::enable_history_data ()
+{
+  history_data_enabled = true;
+}
+
+
+double
+SolverControl::average_reduction() const
+{
+  if (lstep == 0)
+    return 0.;
+  
+  Assert (history_data_enabled, ExcHistoryDataRequired());
+  Assert (history_data.size() > lstep, ExcInternalError());
+  Assert (history_data[0] > 0., ExcInternalError());
+  Assert (history_data[lstep] > 0., ExcInternalError());
+  
+  return std::pow(history_data[lstep]/history_data[0], 1./lstep);
+}
+
+
+
+double
+SolverControl::step_reduction(unsigned int step) const
+{
+  Assert (history_data_enabled, ExcHistoryDataRequired());
+  Assert (history_data.size() > lstep, ExcInternalError());
+  Assert (step <=lstep, ExcIndexRange(step,1,lstep+1));
+  Assert (step>0, ExcIndexRange(step,1,lstep+1));
+  
+  return history_data[step]/history_data[step-1];
+}
+
+
+double
+SolverControl::final_reduction() const
+{
+  return step_reduction(lstep);
+}
+
+  
 void
 SolverControl::declare_parameters (ParameterHandler& param)
 {

@@ -17,6 +17,8 @@
 #include <base/config.h>
 #include <base/subscriptor.h>
 
+#include <vector>
+
 class ParameterHandler;
 
 /*!@addtogroup Solvers */
@@ -271,6 +273,42 @@ class SolverControl : public Subscriptor
     double set_tolerance (const double);
 
 				     /**
+				      * Enables writing residuals of
+				      * each step into a vector for
+				      * later analysis.
+				      */
+    void enable_history_data();
+
+				     /**
+				      * Average error reduction over
+				      * all steps.
+				      *
+				      * Requires
+				      * enable_history_data()
+				      */
+    double average_reduction() const;
+				     /**
+				      * Error reduction of the last
+				      * step; for stationary
+				      * iterations, this approximates
+				      * the norm of the iteration
+				      * matrix.
+				      *
+				      * Requires
+				      * enable_history_data()
+				      */
+    double final_reduction() const;
+    
+				     /**
+				      * Error reduction of any
+				      * iteration step.
+				      *
+				      * Requires
+				      * enable_history_data()
+				      */
+    double step_reduction(unsigned int step) const;
+    
+				     /**
 				      * Log each iteration step. Use
 				      * @p log_frequency for skipping
 				      * steps.
@@ -296,6 +334,17 @@ class SolverControl : public Subscriptor
 				      * Returns the @p log_result flag.
 				      */
     bool log_result () const;
+
+				     /**
+				      * This exception is thrown if a
+				      * function operating on the
+				      * vector of history data of a
+				      * SolverControl object id
+				      * called, but storage of history
+				      * data was not enabled by
+				      * enable_history_data().
+				      */
+    DeclException0(ExcHistoryDataRequired);
     
   protected:
 				     /**
@@ -372,7 +421,25 @@ class SolverControl : public Subscriptor
 				      * and @p lvalue are logged.
 				      */
     bool         m_log_result;
+
+				     /**
+				      * Control over the storage of
+				      * history data. Set by
+				      * enable_history_data().
+				      */
+    bool history_data_enabled;
+    
+				     /**
+				      * Vector storing the result
+				      * after each iteration step for
+				      * later statistical analysis.
+				      *
+				      * Use of this vector is enabled
+				      * by enable_history_data().
+				      */
+    std::vector<double> history_data;
 };
+
 
 //! Control of the stopping criterion depending on the initial residual.
 /**
