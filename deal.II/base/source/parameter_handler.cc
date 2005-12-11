@@ -1486,10 +1486,10 @@ void MultipleParameterLoop::init_branches ()
 				   // has only one single value after reading the
 				   // input
   if (multiple_choices.size() > 0)
-    for (std::vector<Entry>::iterator i=multiple_choices.end()-1;
-	 i >= multiple_choices.begin(); --i)
+    for (std::vector<Entry>::reverse_iterator i=multiple_choices.rbegin();
+	 i != multiple_choices.rend(); ++i)
       if (i->different_values.size() == 1)
-	multiple_choices.erase (i);
+	multiple_choices.erase (i.base());
 
 				   // finally calculate number of branches
   n_branches = 1;
