@@ -1481,10 +1481,10 @@ void MultipleParameterLoop::init_branches ()
   for (unsigned int i=0; i<multiple_choices.size(); ++i)
     multiple_choices[i].split_different_values ();
   
-				   // check whether we have included a multiple
-				   // choice entry from the defaults section which
-				   // has only one single value after reading the
-				   // input
+				   // check whether we have included a
+				   // multiple choice entry from the defaults
+				   // section which has only one single value
+				   // after reading the input
   if (multiple_choices.size() > 0)
     for (std::vector<Entry>::reverse_iterator i=multiple_choices.rbegin();
 	 i != multiple_choices.rend(); ++i)
