@@ -943,8 +943,10 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   often necessary to use the flags in more than one function consecutively and
  *   is then error prone to dedicate one of these to clear the flags.
  *
- *   It is recommended that a functions using the flags states so in its
- *   documentation.
+ *   It is recommended that a functions using the flags states so in
+ *   its documentation. For example, the
+ *   execute_coarsening_and_refinement() function uses the face user
+ *   flags.
  *
  *   There is another set of user data, namely a <tt>void *</tt>, for
  *   each line, quad, etc. You can access these user pointers through
@@ -953,7 +955,8 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *   the accessor classes. These pointers are not used nor changed in
  *   many places of the library, and those classes and functions that
  *   do use them should document this clearly; the most prominent user
- *   of these pointers is the Solutiontransfer class.
+ *   of these pointers is the SolutionTransfer class which uses the
+ *   cell->user_pointers.
  *
  *   The value of these user pointers is @p NULL by default. Note that
  *   the pointers are not inherited to children upon
@@ -1905,16 +1908,22 @@ class Triangulation : public Subscriptor
 				      * The function resets all
 				      * refinement and coarsening
 				      * flags to false. It uses the
-				      * user flags.
+				      * <tt>line->user_flags</tt> for
+				      * <tt>dim=2,3</tt> and the
+				      * <tt>quad->user_flags</tt> for
+				      * <tt>dim=3</tt>.
 				      *
                                       * See the general docs for more
                                       * information.
 				      *
 				      * Note that this function is
-				      * @p virtual to allow derived
-				      * classes to insert hooks, such
-				      * as saving refinement flags and
-				      * the like.
+				      * <tt>virtual</tt> to allow
+				      * derived classes to insert
+				      * hooks, such as saving
+				      * refinement flags and the like
+				      * (see e.g. the
+				      * PersistentTriangulation
+				      * class).
 				      */
     virtual void execute_coarsening_and_refinement ();
     
@@ -3248,6 +3257,12 @@ class Triangulation : public Subscriptor
 				     /**
 				      *  Refine all cells on all levels which
 				      *  were previously flagged for refinement.
+				      *
+				      *  Note, that this function uses
+				      *  the <tt>line->user_flags</tt>
+				      *  for <tt>dim=2,3</tt> and the
+				      *  <tt>quad->user_flags</tt> for
+				      *  <tt>dim=3</tt>.
 				      */ 
     void execute_refinement ();
 
