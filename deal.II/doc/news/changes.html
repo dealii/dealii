@@ -45,6 +45,25 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: Previously, if <code>mg_dof_handler</code> was a
+       multilevel DoF handler object, calling
+       <code>DoFRenumbering::component_wise(mg_dof_handler)</code>)
+       didn't quite do what was probably intended: it did an implicit
+       cast of <code>mg_dof_handler</code> to its base class,
+       <code>DoFHandler</code> and then renumbered the <em>global</em>
+       degrees of freedom, but didn't touch the multilevel part. This
+       has now been fixed: there is another function that takes a
+       <code>MGDoFHandler</code> object and that renumbers the global
+       part as well as all levels of the multigrid part. The change is
+       incompatible since the previous call now leads to a different
+       action; if you really want the old behavior back, cast the
+       argument to the base class before the call, like so:
+       <code>DoFRenumbering::component_wise(static_cast&lt;DoFHandler&lt;dim&gt;&&gt;(mg_dof_handler))</code>)
+       <br> 
+       (WB 2005/12/15)
+       </p>
+
+  <li> <p>
        Changed: The internal numbering of faces, lines and vertices
        has been reimplemented. Now the numbering scheme uses a
        lexicographic ordering (with x running fastest) whereever
@@ -62,7 +81,9 @@ inconvenience this causes.
        supported forever users are advised to change their code to the
        new numbering scheme and to use the <code
        class="member">Triangulation::create_triangulation</code>
-       function.  <br> (RH 2005/11/02)
+       function.  
+       <br> 
+       (RH 2005/11/02)
        </p>
 </ol>
 
