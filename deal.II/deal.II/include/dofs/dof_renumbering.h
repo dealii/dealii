@@ -338,8 +338,10 @@ class DoFRenumbering
 				      * component. It does the same
 				      * thing as the above function,
 				      * only that it does this for one
-				      * level of a multi-level
-				      * discretization.
+				      * single level of a multi-level
+				      * discretization. The
+				      * non-multigrid part of the
+				      * MGDoFHandler is not touched.
 				      */
     template <int dim>
     static void
@@ -347,6 +349,22 @@ class DoFRenumbering
 		    unsigned int                     level,
 		    const std::vector<unsigned int>& target_component = std::vector<unsigned int>());
 
+
+				     /**
+				      * Sort the degrees of freedom by
+				      * component. It does the same
+				      * thing as the previous
+				      * functions, but more: it
+				      * renumbers not only every level
+				      * of the multigrid part, but
+				      * also the global,
+				      * i.e. non-multigrid components.
+				      */
+    template <int dim>
+    static void
+    component_wise (MGDoFHandler<dim>&               dof_handler,
+		    const std::vector<unsigned int>& target_component = std::vector<unsigned int>());
+    
 				     /**
 				      * Computes the renumbering
 				      * vector needed by the

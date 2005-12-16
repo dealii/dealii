@@ -18,6 +18,7 @@
 //    sparsity structure, possibly compressed and return a vector
 //    of numbers. Simple task.
 
+#include <base/thread_management.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <dofs/dof_accessor.h>
@@ -616,7 +617,7 @@ component_wise (MGDoFHandler<dim> &dof_handler,
     iend = dof_handler.end(level);
   const ITERATOR end = iend;
 
-  unsigned int result =
+  const unsigned int result =
     compute_component_wise<dim, ITERATOR, ITERATOR>(
       renumbering, start, end, component_order_arg);
 
@@ -628,6 +629,29 @@ component_wise (MGDoFHandler<dim> &dof_handler,
   if (renumbering.size()!=0)
     dof_handler.renumber_dofs (level, renumbering);
 }
+
+
+
+template <int dim>
+void DoFRenumbering::
+component_wise (MGDoFHandler<dim> &dof_handler,
+                const std::vector<unsigned int> &component_order_arg)
+{
+  Threads::ThreadGroup<> threads;
+
+  void (*non_mg_part) (DoFHandler<dim> &, const std::vector<unsigned int> &)
+    = &DoFRenumbering::component_wise<dim>;
+  void (*mg_part) (MGDoFHandler<dim> &, unsigned int, const std::vector<unsigned int> &)
+    = &DoFRenumbering::component_wise<dim>;
+  
+  threads += Threads::spawn (non_mg_part) (static_cast<DoFHandler<dim>&> (dof_handler),
+					   component_order_arg);
+  for (unsigned int level=0; level<dof_handler.get_tria().n_levels(); ++level)
+    threads += Threads::spawn (mg_part) (dof_handler, level, component_order_arg);
+
+  threads.join_all();
+}
+
 
 
 
@@ -1252,6 +1276,11 @@ template
 void DoFRenumbering::component_wise<deal_II_dimension>
 (MGDoFHandler<deal_II_dimension>&,
  unsigned int,
+ const std::vector<unsigned int>&);
+
+template
+void DoFRenumbering::component_wise<deal_II_dimension>
+(MGDoFHandler<deal_II_dimension>&,
  const std::vector<unsigned int>&);
 
 
