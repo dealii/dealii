@@ -224,7 +224,7 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 
 template <int dim>
 double ExactSolution<dim>::value (const Point<dim>  &p,
-				  const unsigned int component) const 
+				  const unsigned int /*component*/) const 
 {
   double return_value = 1;
   for (unsigned int i=0; i<dim; ++i)
