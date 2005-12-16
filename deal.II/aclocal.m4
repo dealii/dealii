@@ -4708,6 +4708,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
   if test "$USE_CONTRIB_PETSC" = "yes" ; then
     DEAL_II_CONFIGURE_PETSC_VERSION
     DEAL_II_CONFIGURE_PETSC_ARCH
+    DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
 
     dnl Finally set with_petsc if this hasn't happened yet
     if test "x$with_petsc" = "x" ; then
@@ -4811,6 +4812,33 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_VERSION, dnl
                                | perl -pi -e 's/.*MINOR\s+//g;'`
   PETSC_VERSION="$DEAL_II_PETSC_VERSION_MAJOR.$DEAL_II_PETSC_VERSION_MINOR.$DEAL_II_PETSC_VERSION_SUBMINOR"
   AC_MSG_RESULT($PETSC_VERSION)
+])
+
+
+
+
+dnl ------------------------------------------------------------
+dnl See if there is a library libmpiuni.a/so available. We need
+dnl to link with it on some systems.
+dnl
+dnl Usage: DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB, dnl
+[
+  AC_MSG_CHECKING(for PETSc libmpiuni library)
+
+  if test -f $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.a ; then
+    DEAL_II_PETSC_MPIUNI_LIB=$DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.a ;
+  else if test -f $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a ; then
+    DEAL_II_PETSC_MPIUNI_LIB=$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.a ;
+  else if test -f $DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.so ; then
+    DEAL_II_PETSC_MPIUNI_LIB=$DEAL_II_PETSC_DIR/lib/libg_c++/$DEAL_II_PETSC_ARCH/libmpiuni.so ;
+  else if test -f $DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.so ; then
+    DEAL_II_PETSC_MPIUNI_LIB=$DEAL_II_PETSC_DIR/lib/$DEAL_II_PETSC_ARCH/libmpiuni.so ;
+  fi fi fi fi
+
+  AC_MSG_RESULT($DEAL_II_PETSC_MPIUNI_LIB)
 ])
 
 
