@@ -36,6 +36,8 @@ template <template <int> class GridClass, int dim> class InterGridMap;
 template <int dim> class Mapping;
 
 
+//TODO: map_support_points_to_dofs should generate a multimap, rather than just a map, since several dofs may be located at the same support point
+
 /**
  * This is a collection of functions operating on, and manipulating
  * the numbers of degrees of freedom. The documentation of the member
