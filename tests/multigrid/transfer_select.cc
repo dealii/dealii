@@ -54,7 +54,8 @@ void check_select(const FiniteElement<dim>& fe,
   MGDoFHandler<dim> mgdof(tr);
   DoFHandler<dim>& dof=mgdof;
   mgdof.distribute_dofs(fe);
-  DoFRenumbering::component_wise(mgdof, target_component);
+  DoFRenumbering::component_wise(static_cast<DoFHandler<dim>&>(mgdof),
+                                 target_component);
   vector<unsigned int> ndofs(fe.n_components());
   DoFTools::count_dofs_per_component(mgdof, ndofs, true, target_component);
   
