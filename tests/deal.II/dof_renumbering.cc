@@ -129,8 +129,16 @@ check_renumbering(MGDoFHandler<dim>& mgdof, bool discontinuous)
 	{
 	  DoFRenumbering::downstream_dg(mgdof, level, direction);
 	}
-  
-      DoFRenumbering::component_wise (mgdof, order);
+
+                                       // renumber the non-MG part of the
+                                       // DoFHandler again. this is probably
+                                       // not what was meant in the first
+                                       // place, but is compatible with the
+                                       // behavior of the
+                                       // DoFRenumbering::component_wise set
+                                       // of functions before December 2005
+      DoFRenumbering::component_wise (static_cast<DoFHandler<dim>&>(mgdof),
+                                      order);
       print_dofs (mgdof, level);
     }
 
