@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 #include <utility>
@@ -331,7 +332,7 @@ namespace MemoryConsumption
   template <typename T>
   inline
   unsigned int memory_consumption (const T * const);
-
+  
 				   /**
 				    * Return the amount of memory
 				    * used by a pointer. Make sure
@@ -366,6 +367,17 @@ namespace MemoryConsumption
   inline
   unsigned int memory_consumption (void * const);
     
+				   /**
+				    * Return the amount of memory used
+				    * by a boost shared pointer. Make
+				    * sure that you are really
+				    * interested in this, and not the
+				    * amount of memory required by the
+				    * object pointed to.
+				    */
+  template <typename T>
+  inline
+  unsigned int memory_consumption (const boost::shared_ptr<T> &);
     
 				   /**
 				    * For all other types which are
@@ -584,7 +596,17 @@ namespace MemoryConsumption
   {
     return sizeof(void*);
   }
-    
+
+
+
+  template <typename T>
+  inline
+  unsigned int
+  memory_consumption (const boost::shared_ptr<T> &ptr)
+  {
+    return sizeof(ptr);
+  }
+  
     
 	
   template <typename T>
