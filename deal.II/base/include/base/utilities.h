@@ -16,6 +16,7 @@
 #include <base/config.h>
 
 #include <vector>
+#include <utility>
 #include <string>
 
 #ifdef DEAL_II_USE_PETSC
@@ -95,7 +96,33 @@ namespace Utilities
   break_text_into_lines (const std::string &original_text,
                          const unsigned int width);
 
-  
+
+				   /**
+				    * Teturn true if the given pattern
+				    * string appears in the first
+				    * position of the string.
+				    */
+  bool
+  match_at_string_start (const std::string &name,
+			 const std::string &pattern);
+
+				   /**
+				    * Read a (signed) integer starting
+				    * at the position in #name
+				    * indicated by the second
+				    * argument, and retun this integer
+				    * as a pair together with how many
+				    * characters it takes up in the
+				    * string.
+				    *
+				    * If no integer can be read at the
+				    * indicated position, return
+				    * (-1,deal_II_numbers::invalid_unsigned_int)
+				    */
+  std::pair<int, unsigned int>
+  get_integer_at_position (const std::string &name,
+			   const unsigned int position);
+    
                                    /**
                                     * Generate a random number from a
                                     * normalized Gaussian probability

@@ -236,6 +236,66 @@ namespace Utilities
     return lines;
   }
   
+
+
+  bool
+  match_at_string_start (const std::string &name,
+			 const std::string &pattern)
+  {
+    if (pattern.size() > name.size())
+      return false;
+
+    for (unsigned int i=0; i<pattern.size(); ++i)
+      if (pattern[i] != name[i])
+	return false;
+
+    return true;
+  }
+
+  
+
+  std::pair<int, unsigned int>
+  get_integer_at_position (const std::string &name,
+			   const unsigned int position)
+  {
+    Assert (position < name.size(), ExcInternalError());
+    
+    const std::string test_string (name.begin()+position,
+				   name.end());
+    
+#ifdef HAVE_STD_STRINGSTREAM
+    std::istringstream str(test_string);
+#else
+    std::istrstream str(test_string.c_str());
+#endif
+
+    int i;
+    if (str >> i)
+      {
+					 // compute the number of
+					 // digits of i. assuming it
+					 // is less than 6 is likely
+					 // ok
+	if (i<10)
+	  return std::make_pair (i, 1U);
+	else if (i<100)
+	  return std::make_pair (i, 2U);
+	else if (i<1000)
+	  return std::make_pair (i, 3U);
+	else if (i<10000)
+	  return std::make_pair (i, 4U);
+	else if (i<100000)
+	  return std::make_pair (i, 5U);
+	else
+	  {
+	    Assert (false, ExcNotImplemented());
+	    return std::make_pair (-1, deal_II_numbers::invalid_unsigned_int);
+	  }
+      }
+    else
+      return std::make_pair (-1, deal_II_numbers::invalid_unsigned_int);
+  }
+
   
 
   double

@@ -15,6 +15,7 @@
 #include <base/quadrature_lib.h>
 #include <base/qprojector.h>
 #include <base/logstream.h>
+#include <base/utilities.h>
 #include <lac/full_matrix.h>
 #include <lac/householder.h>
 #include <lac/vector.h>
@@ -109,79 +110,6 @@ namespace
                             interpolation_matrix.n());
     fe2.get_interpolation_matrix (fe1, tmp);
     interpolation_matrix = tmp;
-  }
-
-				   // return true if the given pattern
-				   // string matches the given name at
-				   // the first position of the string
-  inline
-  bool
-  match_at_string_start (const std::string &name,
-			 const std::string &pattern)
-  {
-    if (pattern.size() > name.size())
-      return false;
-
-    for (unsigned int i=0; i<pattern.size(); ++i)
-      if (pattern[i] != name[i])
-	return false;
-
-    return true;
-  }
-
-
-
-				   // read an integer at the position
-				   // in "name" indicated by the
-				   // second argument, and retun this
-				   // integer together with how many
-				   // characters it takes in the
-				   // string
-				   //
-				   // if no integer can be read at the
-				   // indicated position, return
-				   // (-1,-1)
-  inline
-  std::pair<int, unsigned int>
-  get_integer (const std::string &name,
-	       const unsigned int position)
-  {
-    Assert (position < name.size(), ExcInternalError());
-    
-    const std::string test_string (name.begin()+position,
-				   name.end());
-    
-#ifdef HAVE_STD_STRINGSTREAM
-    std::istringstream str(test_string);
-#else
-    std::istrstream str(test_string.c_str());
-#endif
-
-    int i;
-    if (str >> i)
-      {
-					 // compute the number of
-					 // digits of i. assuming it
-					 // is less than 6 is likely
-					 // ok
-	if (i<10)
-	  return std::make_pair (i, 1U);
-	else if (i<100)
-	  return std::make_pair (i, 2U);
-	else if (i<1000)
-	  return std::make_pair (i, 3U);
-	else if (i<10000)
-	  return std::make_pair (i, 4U);
-	else if (i<100000)
-	  return std::make_pair (i, 5U);
-	else
-	  {
-	    Assert (false, ExcNotImplemented());
-	    return std::make_pair (-1, deal_II_numbers::invalid_unsigned_int);
-	  }
-      }
-    else
-      return std::make_pair (-1, deal_II_numbers::invalid_unsigned_int);
   }
 
 
@@ -1343,7 +1271,7 @@ FETools::get_fe_from_name_aux (const std::string &name)
 				   // make sure we don't match FE_Q
 				   // when it's actually a
 				   // FE_Q_Hierarchic
-  if (match_at_string_start (name, std::string("FE_Q_Hierarchical")))
+  if (Utilities::match_at_string_start (name, std::string("FE_Q_Hierarchical")))
     {
       unsigned int position = std::string("FE_Q_Hierarchical").size();
 				       // as described in the
@@ -1364,7 +1292,8 @@ FETools::get_fe_from_name_aux (const std::string &name)
       ++position;
 				       // next thing is to parse the
 				       // degree of the finite element
-      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+      const std::pair<int,unsigned int> tmp
+	= Utilities::get_integer_at_position (name, position);
       AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
       position += tmp.second;
 
@@ -1383,13 +1312,16 @@ FETools::get_fe_from_name_aux (const std::string &name)
     }
 				   // check other possibilities in
 				   // exactly the same way
-  else if (match_at_string_start (name, std::string("FE_RaviartThomas")))
+  else if (Utilities::match_at_string_start (name, std::string("FE_RaviartThomas")))
     {
       unsigned int position = std::string("FE_RaviartThomas").size();
       position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
-      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+
+      const std::pair<int,unsigned int> tmp
+	= Utilities::get_integer_at_position (name, position);
+
       AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
@@ -1398,13 +1330,16 @@ FETools::get_fe_from_name_aux (const std::string &name)
 			     (new FE_RaviartThomas<dim>(tmp.first)),
 			     position);
     }
-  else if (match_at_string_start (name, std::string("FE_Nedelec")))
+  else if (Utilities::match_at_string_start (name, std::string("FE_Nedelec")))
     {
       unsigned int position = std::string("FE_Nedelec").size();
       position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
-      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+
+      const std::pair<int,unsigned int> tmp
+	= Utilities::get_integer_at_position (name, position);
+      
       AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
@@ -1413,13 +1348,16 @@ FETools::get_fe_from_name_aux (const std::string &name)
 			     (new FE_Nedelec<dim>(tmp.first)),
 			     position);
     }
-  else if (match_at_string_start (name, std::string("FE_DGPNonparametric")))
+  else if (Utilities::match_at_string_start (name, std::string("FE_DGPNonparametric")))
     {
       unsigned int position = std::string("FE_DGPNonparametric").size();
       position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
-      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+
+      const std::pair<int,unsigned int> tmp
+	= Utilities::get_integer_at_position (name, position);
+      
       AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
@@ -1428,13 +1366,16 @@ FETools::get_fe_from_name_aux (const std::string &name)
 			     (new FE_DGPNonparametric<dim>(tmp.first)),
 			     position);
     }
-  else if (match_at_string_start (name, std::string("FE_DGP")))
+  else if (Utilities::match_at_string_start (name, std::string("FE_DGP")))
     {
       unsigned int position = std::string("FE_DGP").size();
       position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
-      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+
+      const std::pair<int,unsigned int> tmp
+	= Utilities::get_integer_at_position (name, position);
+      
       AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
@@ -1442,13 +1383,16 @@ FETools::get_fe_from_name_aux (const std::string &name)
       return std::make_pair (static_cast<FiniteElement<dim>*>(new FE_DGP<dim>(tmp.first)),
 			     position);
     }
-  else if (match_at_string_start (name, std::string("FE_DGQ")))
+  else if (Utilities::match_at_string_start (name, std::string("FE_DGQ")))
     {
       unsigned int position = std::string("FE_DGQ").size();
       position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
-      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+
+      const std::pair<int,unsigned int> tmp
+	= Utilities::get_integer_at_position (name, position);
+      
       AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
@@ -1456,13 +1400,16 @@ FETools::get_fe_from_name_aux (const std::string &name)
       return std::make_pair (static_cast<FiniteElement<dim>*> (new FE_DGQ<dim>(tmp.first)),
 			     position);
     }
-  else if (match_at_string_start (name, std::string("FE_Q")))
+  else if (Utilities::match_at_string_start (name, std::string("FE_Q")))
     {
       unsigned int position = std::string("FE_Q").size();
       position += match_dimension<dim> (name, position);
       AssertThrow (name[position] == '(', ExcInvalidFEName(name));
       ++position;
-      const std::pair<int,unsigned int> tmp = get_integer (name, position);
+
+      const std::pair<int,unsigned int> tmp
+	= Utilities::get_integer_at_position (name, position);
+      
       AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
       position += tmp.second;
       AssertThrow (name[position] == ')', ExcInvalidFEName(name));
@@ -1478,7 +1425,7 @@ FETools::get_fe_from_name_aux (const std::string &name)
 				     // have to figure out what the
 				     // base elements are. this can
 				     // only be done recursively
-    if (match_at_string_start (name, std::string("FESystem")))
+    if (Utilities::match_at_string_start (name, std::string("FESystem")))
       {
 	unsigned int position = std::string("FESystem").size();
 	position += match_dimension<dim> (name, position);
@@ -1531,8 +1478,10 @@ FETools::get_fe_from_name_aux (const std::string &name)
 						     // and read this
 						     // multiplicity
 		    ++position;
-		    const std::pair<int,unsigned int> tmp = get_integer (name,
-									 position);
+
+		    const std::pair<int,unsigned int> tmp
+		      = Utilities::get_integer_at_position (name, position);
+		    
 		    AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
 		    position += tmp.second;
 		    base_multiplicities.push_back (tmp.first);
