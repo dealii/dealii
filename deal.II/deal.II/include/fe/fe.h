@@ -989,7 +989,18 @@ class FiniteElement : public Subscriptor,
                                       * Same as
                                       * @p system_to_base_index, but
                                       * for degrees of freedom located
-                                      * on a face.
+                                      * on a face. The range of allowed
+				      * indices is therefore
+				      * 0..dofs_per_face.
+				      *
+				      * You will rarely need this
+				      * function in application
+				      * programs, since almost all
+				      * application codes only need to
+				      * deal with cell indices, not
+				      * face indices. The function is
+				      * mainly there for use inside
+				      * the library.
                                       */
     std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
     face_system_to_base_index (const unsigned int index) const;
