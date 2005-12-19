@@ -925,9 +925,22 @@ class FiniteElement : public Subscriptor,
                                           const unsigned int index) const;
   
 				     /**
-				      * Same as above, but do it for
-				      * shape functions and their
-				      * indices on a face.
+				      * Same as
+				      * system_to_component_index(),
+				      * but do it for shape functions
+				      * and their indices on a
+				      * face. The range of allowed
+				      * indices is therefore
+				      * 0..dofs_per_face.
+				      *
+				      * You will rarely need this
+				      * function in application
+				      * programs, since almost all
+				      * application codes only need to
+				      * deal with cell indices, not
+				      * face indices. The function is
+				      * mainly there for use inside
+				      * the library.
 				      */
     std::pair<unsigned int, unsigned int>
     face_system_to_component_index (const unsigned int index) const;
