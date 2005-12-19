@@ -161,6 +161,40 @@ refinement.
 
 <ol>
   <li> <p>
+       Extended: The <code
+       class="class">CellAccessor&lt;dim&gt;</code>::<code
+       class="member">neighbor_of_neighbor</code> function is now
+       extended to anisotropic refinement.
+       <br> 
+       (RH 2005/12/15)
+       </p>
+
+  <li> <p>
+       Extended: The <code
+       class="class">TriaAccessor&lt;1&gt;</code>::<code
+       class="member">operator ==</code> function is now overloaded by
+       <code class="class">TriaObjectAccessor&lt;1,dim&gt;</code> for
+       <code>dim>1</code> to allow the identification of a line with
+       its duplicate.
+       <br> 
+       (RH 2005/12/15)
+       </p>
+
+  <li> <p>
+       Extended (internal): Lines on <code>level>0</code> have always
+       been stored pairwise. In order to allow the creation of
+       duplicate lines we now also allow storage of single lines. The
+       <code class="class">TriangulationLevel&lt;1&gt;</code>::<code
+       class="member">reserve_space</code> function now takes an
+       additional <code>n_consecutive_lines</code> parameter which
+       allows to create new single as well as pairs for lines
+       (<code>n_consecutive_lines=1</code> or
+       <code>n_consecutive_lines=1</code>, respectively.
+       <br> 
+       (RH 2005/12/15)
+       </p>
+
+  <li> <p>
        Changed: When allowing anisotropic refinement it cannot be
        garantueed that all children of a cell are stored in
        consecutive components of the <code>quads.quads</code> or the
