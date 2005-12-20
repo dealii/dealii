@@ -405,8 +405,10 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
         dnl but of course this might lead to strange program behaviour if
         dnl you accidentally defined one symbol multiple times...
         dnl (added 2005/07/13, Ralf B. Schulz)
-        CXXFLAGSPIC="-Xlinker --allow-multiple-definition"
-        LDFLAGSPIC="--allow-multiple-definition"
+	dnl (modified 2005/12/20, Ralf B. Schulz)
+        CXXFLAGSPIC=
+	LDFLAGS="$LDFLAGS -Xlinker --allow-multiple-definition"
+        SHLIBFLAGS="$SHLIBFLAGS -Xlinker --allow-multiple-definition"
         ;;
 
       *)
