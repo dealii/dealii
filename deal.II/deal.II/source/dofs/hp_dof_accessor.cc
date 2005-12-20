@@ -32,37 +32,18 @@
 
 #if deal_II_dimension == 1
 
-template <>
-TriaIterator<1, DoFObjectAccessor<0,1,hpDoFHandler> >
-DoFCellAccessor<1,hpDoFHandler>::face (const unsigned int) const
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return TriaIterator<1, DoFObjectAccessor<0,1, hpDoFHandler> >();
-}
 
 #endif
 
 
 #if deal_II_dimension == 2
 
-template <>
-TriaIterator<2, DoFObjectAccessor<1,2,hpDoFHandler> >
-DoFCellAccessor<2,hpDoFHandler>::face (const unsigned int i) const
-{
-  return this->line(i);
-}
 
 #endif
 
 
 #if deal_II_dimension == 3
 
-template <>
-TriaIterator<3, DoFObjectAccessor<2, 3, hpDoFHandler> >
-DoFCellAccessor<3,hpDoFHandler>::face (const unsigned int i) const
-{
-  return this->quad(i);
-}
 
 #endif
 
