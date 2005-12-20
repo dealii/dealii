@@ -22,6 +22,9 @@ deal.II: abort.o
 multigrid: abort.o
 	cd multigrid ; $(MAKE)
 
+hp: abort.o
+	cd hp ; $(MAKE)
+
 report: abort.o
 	@for i in base lac fe deal.II multigrid bits all-headers ; do \
 		echo =======Report: $$i ======= ; \
