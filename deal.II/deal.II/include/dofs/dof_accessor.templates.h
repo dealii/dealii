@@ -1169,6 +1169,85 @@ DoFObjectAccessor<1,3,hpDoFHandler>::dof_index (const unsigned int i) const
 }
 
 
+
+template <>
+inline
+void
+DoFObjectAccessor<1, 1, hpDoFHandler>::set_dof_index (const unsigned int i,
+                                                      const unsigned int index) const
+{
+  typedef DoFAccessor<1, hpDoFHandler> BaseClass;
+
+  Assert (this->dof_handler != 0,
+	  BaseClass::ExcInvalidObject());
+				   // make sure a FE has been selected
+				   // and enough room was reserved
+  Assert (&this->get_fe() != 0,
+	  BaseClass::ExcInvalidObject());
+  Assert (i<this->get_fe().dofs_per_line,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_line_index_offset[this->present_index];
+  this->dof_handler->levels[this->present_level]
+    ->line_dofs[offset+i] = index;
+}
+
+
+template <>
+inline
+void
+DoFObjectAccessor<1, 2, hpDoFHandler>::set_dof_index (const unsigned int i,
+                                                      const unsigned int index) const
+{
+  typedef DoFAccessor<2, hpDoFHandler> BaseClass;
+
+  Assert (this->dof_handler != 0,
+	  BaseClass::ExcInvalidObject());
+				   // make sure a FE has been selected
+				   // and enough room was reserved
+  Assert (&this->get_fe() != 0,
+	  BaseClass::ExcInvalidObject());
+  Assert (i<this->get_fe().dofs_per_line,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+
+//TODO:[?] In two dimension it could happen that we have different active_fe_indices
+// on a line between to cells. Hence we have to differentiate between these two cases.
+// Unfortunately, this requires more information then available now.
+
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_line_index_offset[this->present_index];
+  this->dof_handler->levels[this->present_level]
+    ->line_dofs[offset+i] = index;
+}
+
+
+template <>
+inline
+void
+DoFObjectAccessor<1, 3, hpDoFHandler>::set_dof_index (const unsigned int i,
+                                                      const unsigned int index) const
+{
+  typedef DoFAccessor<3, hpDoFHandler> BaseClass;
+
+  Assert (this->dof_handler != 0,
+	  BaseClass::ExcInvalidObject());
+				   // make sure a FE has been selected
+				   // and enough room was reserved
+  Assert (&this->get_fe() != 0,
+	  BaseClass::ExcInvalidObject());
+  Assert (i<this->get_fe().dofs_per_line,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_line_index_offset[this->present_index];
+  this->dof_handler->levels[this->present_level]
+    ->line_dofs[offset+i] = index;
+}
+
+
+
+
 template <>
 inline
 const FiniteElement<1> &
@@ -1324,11 +1403,63 @@ unsigned int DoFObjectAccessor<2,3,hpDoFHandler>::dof_index (const unsigned int 
 
 template <>
 inline
+void
+DoFObjectAccessor<2, 2, hpDoFHandler>::set_dof_index (const unsigned int i,
+                                                      const unsigned int index) const
+{
+  typedef DoFAccessor<2, hpDoFHandler> BaseClass;
+
+  Assert (this->dof_handler != 0,
+	  BaseClass::ExcInvalidObject());
+				   // make sure a FE has been selected
+				   // and enough room was reserved
+  Assert (&this->get_fe() != 0,
+	  BaseClass::ExcInvalidObject());
+  Assert (i<this->get_fe().dofs_per_quad,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
+
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_quad_index_offset[this->present_index];
+  this->dof_handler->levels[this->present_level]
+    ->quad_dofs[offset+i] = index;
+}
+
+
+template <>
+inline
+void
+DoFObjectAccessor<2, 3, hpDoFHandler>::set_dof_index (const unsigned int i,
+                                                      const unsigned int index) const
+{
+  typedef DoFAccessor<3, hpDoFHandler> BaseClass;
+
+  Assert (this->dof_handler != 0,
+	  BaseClass::ExcInvalidObject());
+				   // make sure a FE has been selected
+				   // and enough room was reserved
+  Assert (&this->get_fe() != 0,
+	  BaseClass::ExcInvalidObject());
+  Assert (i<this->get_fe().dofs_per_quad,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
+
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_quad_index_offset[this->present_index];
+  this->dof_handler->levels[this->present_level]
+    ->quad_dofs[offset+i] = index;
+}
+
+
+
+template <>
+inline
 const FiniteElement<2> &
 DoFObjectAccessor<2,2,hpDoFHandler>::get_fe () const
 {
   return dof_handler->finite_elements->get_fe(active_fe_index ());
 }
+
+
+
 template <>
 inline
 const FiniteElement<3> &
@@ -1336,6 +1467,7 @@ DoFObjectAccessor<2,3,hpDoFHandler>::get_fe () const
 {
   return dof_handler->finite_elements->get_fe(active_fe_index ());
 }
+
 
 
 template <>
@@ -1429,6 +1561,31 @@ DoFObjectAccessor<3,3,hpDoFHandler>::dof_index (const unsigned int i) const
 
 template <>
 inline
+void
+DoFObjectAccessor<3, 3, hpDoFHandler>::set_dof_index (const unsigned int i,
+                                                      const unsigned int index) const
+{
+  typedef DoFAccessor<3, hpDoFHandler> BaseClass;
+    
+  Assert (this->dof_handler != 0,
+	  BaseClass::ExcInvalidObject());
+				   // make sure a FE has been selected
+				   // and enough room was reserved
+  Assert (&this->get_fe() != 0,
+	  BaseClass::ExcInvalidObject());
+  Assert (i<this->get_fe().dofs_per_hex,
+	  ExcIndexRange (i, 0, this->get_fe().dofs_per_hex));
+
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_hex_index_offset[this->present_index];
+  this->dof_handler->levels[this->present_level]
+    ->hex_dofs[offset+i] = index;
+}
+
+
+
+template <>
+inline
 const FiniteElement<3> &
 DoFObjectAccessor<3,3,hpDoFHandler>::get_fe () const
 {
@@ -1448,6 +1605,7 @@ DoFObjectAccessor<3,3,hpDoFHandler>::active_fe_index () const
   return dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index];
 }
+
 
 
 template <>
