@@ -13,10 +13,14 @@
 
 
 #include <base/function.h>
+#include <base/quadrature.h>
 #include <base/thread_management.h>
 #include <base/multithread_info.h>
+#include <grid/tria_iterator.h>
+#include <grid/geometry_info.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
+#include <dofs/dof_tools.h>
 #include <grid/tria_iterator.h>
 #include <base/geometry_info.h>
 #include <base/quadrature.h>
@@ -471,8 +475,9 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
 	  }
 
 				       // transfer everything into the
-				       // global object
-      mutex.acquire ();
+				       // global object. lock the
+				       // matrix meanwhile
+      Threads::ThreadMutex::ScopedLock lock (mutex);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  if ((n_components==1) ||
@@ -482,7 +487,6 @@ MatrixCreator::create_mass_matrix_2 (const Mapping<dim>       &mapping,
 			cell_matrix(i,j));
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	rhs_vector(dof_indices[i]) += local_rhs(i);
-      mutex.release ();
     };
 }
 
@@ -587,9 +591,10 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   const unsigned int n_components  = fe.n_components();
-  const bool         fe_is_system  = (n_components != 1);  
+  const bool         fe_is_system  = (n_components != 1);
 
-  Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions), ExcInternalError());
+  Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
+          ExcInternalError());
   Assert (matrix.n() == matrix.m(), ExcInternalError());
   Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
   Assert (boundary_functions.size() != 0, ExcInternalError());
@@ -845,7 +850,6 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 				 !=
 				 dofs_on_face_vector.end());
 	  
-#ifdef DEBUG
 					   // in debug mode: compute an element
 					   // in the matrix which is
 					   // guaranteed to belong to a boundary
@@ -868,13 +872,15 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 					   // must be an element belonging to
 					   // the boundary. we take the maximum
 					   // diagonal entry.
+#ifdef DEBUG
 	  double max_diag_entry = 0;
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    if (std::fabs(cell_matrix(i,i)) > max_diag_entry)
 	      max_diag_entry = std::fabs(cell_matrix(i,i));
 #endif  
 
-	  mutex.acquire ();
+                                           // lock the matrix
+          Threads::ThreadMutex::ScopedLock lock (mutex);
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      if (dof_is_on_face[i] && dof_is_on_face[j])
@@ -926,7 +932,6 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
 		Assert (std::fabs(cell_vector(j)) <= 1e-10 * max_diag_entry,
 			ExcInternalError());
 	      };
-	  mutex.release ();
 	};
 }
 
@@ -1099,8 +1104,9 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
 	  }
     
 				       // transfer everything into the
-				       // global object
-      mutex.acquire ();
+				       // global object. lock the
+				       // matrix meanwhile
+      Threads::ThreadMutex::ScopedLock lock (mutex);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  if ((n_components==1) ||
@@ -1108,7 +1114,6 @@ void MatrixCreator::create_laplace_matrix_1 (const Mapping<dim>       &mapping,
 	       fe.system_to_component_index(j).first))
 	    matrix.add (dof_indices[i], dof_indices[j],
 			cell_matrix(i,j));
-      mutex.release ();
     }
 }
 
@@ -1298,8 +1303,9 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 	  }
 
 				       // transfer everything into the
-				       // global object
-      mutex.acquire ();
+				       // global object. lock the
+				       // matrix meanwhile
+      Threads::ThreadMutex::ScopedLock lock (mutex);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  if ((n_components==1) ||
@@ -1309,7 +1315,6 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 			cell_matrix(i,j));
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	rhs_vector(dof_indices[i]) += local_rhs(i);
-      mutex.release ();
     };
 }
 

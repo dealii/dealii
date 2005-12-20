@@ -713,9 +713,12 @@ VectorTools::create_boundary_right_hand_side (const DoFHandler<dim>   &dof_handl
 
 #if deal_II_dimension == 1
 
+//TODO[?] Actually the Mapping object should be a MappingCollection object for the
+// hpDoFHandler.
+template <template <int> class DH>
 void
 VectorTools::interpolate_boundary_values (const Mapping<1>         &,
-					  const DoFHandler<1>      &dof,
+					  const DH<1>              &dof,
 					  const unsigned char       boundary_component,
 					  const Function<1>        &boundary_function,
 					  std::map<unsigned int,double> &boundary_values,
@@ -724,19 +727,6 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
   Assert (boundary_component != 255,
 	  ExcInvalidBoundaryIndicator());
 
-  const FiniteElement<1> &fe = dof.get_fe();
-  Assert (fe.n_components() == boundary_function.n_components,
-	  ExcComponentMismatch());
-
-				   // set the component mask to either
-				   // the original value or a vector
-				   // of @p{true}s
-  const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-					  std::vector<bool> (fe.n_components(), true) :
-					  component_mask_);
-  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-	  ExcComponentMismatch());
-  
 				   // check whether boundary values at
 				   // the left or right boundary of
 				   // the line are
@@ -752,12 +742,27 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
 				   // cell by first traversing the coarse
 				   // grid to its end and then going
 				   // to the children
-  DoFHandler<1>::cell_iterator outermost_cell = dof.begin(0);
+  typename DH<1>::cell_iterator outermost_cell = dof.begin(0);
   while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
     outermost_cell = outermost_cell->neighbor(direction);
   
   while (outermost_cell->has_children())
     outermost_cell = outermost_cell->child(direction);
+
+                                   // get the FE corresponding to this
+                                   // cell
+  const FiniteElement<1> &fe = outermost_cell->get_fe();
+  Assert (fe.n_components() == boundary_function.n_components,
+	  ExcComponentMismatch());
+
+				   // set the component mask to either
+				   // the original value or a vector
+				   // of @p{true}s
+  const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
+					  std::vector<bool> (fe.n_components(), true) :
+					  component_mask_);
+  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
+	  ExcComponentMismatch());
 
 				   // now set the value of the
 				   // outermost degree of
@@ -785,7 +790,8 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
 }
 
 
-
+//TODO[?] Actually the Mapping object should be a MappingCollection object for the
+// hpDoFHandler.
 void
 VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping,
 					  const DoFHandler<1>           &dof,
@@ -800,14 +806,30 @@ VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping
 }
 
 
+//TODO[?] Actually the Mapping object should be a MappingCollection object for the
+// hpDoFHandler.
+void
+VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping,
+					  const hpDoFHandler<1>           &dof,
+					  const FunctionMap<1>::type    &function_map,
+					  std::map<unsigned int,double> &boundary_values,
+					  const std::vector<bool>       &component_mask)
+{
+  for (FunctionMap<1>::type::const_iterator i=function_map.begin();
+       i!=function_map.end(); ++i)
+    interpolate_boundary_values (mapping, dof, i->first, *i->second,
+				 boundary_values, component_mask);
+}
+
+
 #endif
 
 
-template <int dim>
+template <int dim, template <int> class DH>
 void
 VectorTools::
 interpolate_boundary_values (const Mapping<dim>            &mapping,
-                             const DoFHandler<dim>         &dof,
+                             const DH<dim>                 &dof,
                              const typename FunctionMap<dim>::type &function_map,
                              std::map<unsigned int,double> &boundary_values,
                              const std::vector<bool>       &component_mask_)
@@ -821,8 +843,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
   Assert (function_map.find(255) == function_map.end(),
 	  ExcInvalidBoundaryIndicator());
 
-  const FiniteElement<dim> &fe           = dof.get_fe();
-  const unsigned int        n_components = fe.n_components();
+  const unsigned int        n_components = get_n_components(dof);
   const bool                fe_is_system = (n_components != 1);
 
   for (typename FunctionMap<dim>::type::const_iterator i=function_map.begin();
@@ -834,85 +855,109 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 				   // the original value or a vector
 				   // of @p{true}s
   const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-					  std::vector<bool> (fe.n_components(), true) :
+					  std::vector<bool> (n_components, true) :
 					  component_mask_);
   Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
 	  ExcComponentMismatch());
 
 				   // field to store the indices
-  std::vector<unsigned int> face_dofs (fe.dofs_per_face,
-				       DoFHandler<dim>::invalid_dof_index);
-  std::vector<Point<dim> >  dof_locations (face_dofs.size(), Point<dim>());
-  
+  std::vector<unsigned int> face_dofs;
+  face_dofs.reserve (max_dofs_per_face(dof));
+  std::fill (face_dofs.begin (), face_dofs.end (), DoFHandler<dim>::invalid_dof_index);
+
+  std::vector<Point<dim> >  dof_locations;
+  dof_locations.reserve (max_dofs_per_face(dof));
+  std::fill (dof_locations.begin(), dof_locations.end (), Point<dim>());
+
 				   // array to store the values of
 				   // the boundary function at the
 				   // boundary points. have to arrays
 				   // for scalar and vector functions
 				   // to use the more efficient one
 				   // respectively
-  std::vector<double>          dof_values_scalar (fe.dofs_per_face);
-  std::vector<Vector<double> > dof_values_system (fe.dofs_per_face,
-						  Vector<double>(fe.n_components()));
+  std::vector<double>          dof_values_scalar;
+  std::vector<Vector<double> > dof_values_system;
+  dof_values_scalar.reserve (max_dofs_per_face (dof));
+  dof_values_system.reserve (max_dofs_per_face (dof));
 
-				   // next generate a quadrature rule
-				   // on the face from the unit
-				   // support points. this wil be used
-				   // to obtain the quadrature points
-				   // on the real cell's face
-  std::vector<Point<dim-1> >
-    unit_support_points = fe.get_unit_face_support_points();
-  
-				   // check whether there are support
-				   // points on the face. if not, then
-				   // we should try a more clever
-				   // way. the idea is that a finite
-				   // element may not offer support
-				   // points for all its shape
-				   // functions, but maybe only
-				   // some. if it offers support
-				   // points for the components we are
-				   // interested in in this function,
-				   // then that's fine. if not, the
-				   // function we call in the finite
-				   // element will raise an
-				   // exception. the support points
-				   // for the other shape functions
-				   // are left uninitialized (well,
-				   // initialized by the default
-				   // constructor), since we don't
-				   // need them anyway.
-  if (unit_support_points.size() == 0)
-    {
-      unit_support_points.resize (fe.dofs_per_face);
-      for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-        if (component_mask[fe.face_system_to_component_index(i).first]
-            == true)
-          unit_support_points[i] = fe.unit_face_support_point(i);
-    };
-
-  Quadrature<dim-1> aux_quad (unit_support_points);
-  FEFaceValues<dim> fe_values (mapping, fe, aux_quad, update_q_points);
-
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-						 endc = dof.end();
+  typename DH<dim>::active_cell_iterator cell = dof.begin_active(),
+					 endc = dof.end();
   for (; cell!=endc; ++cell)
     for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
 	 ++face_no)
       {
-	typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
+        const FiniteElement<dim> &fe = cell->get_fe();
+        
+	typename DH<dim>::face_iterator face = cell->face(face_no);
 	const unsigned char boundary_component = face->boundary_indicator();
 	if (function_map.find(boundary_component) != function_map.end()) 
 					   // face is of the right component
 	  {
+//TODO[?] Should work for both DoFHandlers. But probably not the most efficient
+// implementation.
+				             // next generate a quadrature rule
+				             // on the face from the unit
+				             // support points. this wil be used
+				             // to obtain the quadrature points
+				             // on the real cell's face
+            std::vector<Point<dim-1> > 
+		unit_support_points = fe.get_unit_face_support_points();
+  
+				             // check whether there are support
+				             // points on the face. if not, then
+				             // we should try a more clever
+				             // way. the idea is that a finite
+				             // element may not offer support
+				             // points for all its shape
+				             // functions, but maybe only
+				             // some. if it offers support
+				             // points for the components we are
+				             // interested in in this function,
+				             // then that's fine. if not, the
+				             // function we call in the finite
+				             // element will raise an
+				             // exception. the support points
+				             // for the other shape functions
+				             // are left uninitialized (well,
+				             // initialized by the default
+				             // constructor), since we don't
+				             // need them anyway.
+	    if (unit_support_points.size() == 0)
+	      {
+	        unit_support_points.resize (fe.dofs_per_face);
+                for (unsigned int i=0; i<fe.dofs_per_face; ++i)
+                  if (component_mask[fe.face_system_to_component_index(i).first]
+                      == true)
+                unit_support_points[i] = fe.unit_face_support_point(i);
+              };
+
+            Quadrature<dim-1> aux_quad (unit_support_points);
+            FEFaceValues<dim> fe_values (mapping, fe, aux_quad, update_q_points);
+//TODO[?] End of inefficient code
+
 					     // get indices, physical location and
 					     // boundary values of dofs on this
 					     // face
+            face_dofs.resize (fe.dofs_per_face);
 	    face->get_dof_indices (face_dofs);
 	    fe_values.reinit(cell, face_no);
-	    const std::vector<Point<dim> > &dof_locations = fe_values.get_quadrature_points ();
+	    const std::vector<Point<dim> > &dof_locations
+              = fe_values.get_quadrature_points ();
 	    
 	    if (fe_is_system)
 	      {
+                                                 // resize
+                                                 // array. avoid
+                                                 // construction of a
+                                                 // memory allocating
+                                                 // temporary if
+                                                 // possible
+                if (dof_values_system.size() < fe.dofs_per_face)
+                  dof_values_system.resize (fe.dofs_per_face,
+                                            Vector<double>(fe.n_components()));
+                else
+                  dof_values_system.resize (fe.dofs_per_face);
+                
 		function_map.find(boundary_component)->second
                   ->vector_value_list (dof_locations, dof_values_system);
 		
@@ -1034,9 +1079,9 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 	      {
 						 // get only the one component that
 						 // this function has
-		function_map.find(boundary_component)->second->value_list (dof_locations,
-									   dof_values_scalar,
-									   0);
+                dof_values_scalar.resize (fe.dofs_per_face);
+		function_map.find(boundary_component)->second
+                  ->value_list (dof_locations, dof_values_scalar, 0);
 		
 						 // enter into list
 		
@@ -1049,10 +1094,10 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 
 
 
-template <int dim>
+template <int dim, template <int> class DH>
 void
 VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping,
-					  const DoFHandler<dim>         &dof,
+					  const DH<dim>                 &dof,
 					  const unsigned char            boundary_component,
 					  const Function<dim>           &boundary_function,
 					  std::map<unsigned int,double> &boundary_values,
@@ -1066,9 +1111,11 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
 
 
   
-template <int dim>
+//TODO[?] Change for real hpDoFHandler
+// This function might not work anymore if the real hpDoFHandler is available.
+template <int dim, template <int> class DH>
 void
-VectorTools::interpolate_boundary_values (const DoFHandler<dim>         &dof,
+VectorTools::interpolate_boundary_values (const DH<dim>                 &dof,
 					  const unsigned char            boundary_component,
 					  const Function<dim>           &boundary_function,
 					  std::map<unsigned int,double> &boundary_values,
@@ -1082,9 +1129,11 @@ VectorTools::interpolate_boundary_values (const DoFHandler<dim>         &dof,
 
 
 
-template <int dim>
+//TODO[?] Change for real hpDoFHandler
+// This function might not work anymore if the real hpDoFHandler is available.
+template <int dim, template <int> class DH>
 void
-VectorTools::interpolate_boundary_values (const DoFHandler<dim>         &dof,
+VectorTools::interpolate_boundary_values (const DH<dim>                 &dof,
 					  const typename FunctionMap<dim>::type &function_map,
 					  std::map<unsigned int,double> &boundary_values,
 					  const std::vector<bool>       &component_mask)
@@ -1141,7 +1190,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 					 dof_to_boundary_mapping);
   
 				   // set up sparsity structure
-  SparsityPattern sparsity(dof.n_boundary_dofs(boundary_functions),
+  SparsityPattern sparsity(dof.n_boundary_dofs (boundary_functions),
 			   dof.max_couplings_between_boundary_dofs());
   DoFTools::make_boundary_sparsity_pattern (dof,
 					    boundary_functions,

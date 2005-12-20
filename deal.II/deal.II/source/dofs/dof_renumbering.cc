@@ -137,10 +137,10 @@ struct CompareDownstream
 
 
 
-template <int dim>
+template <int dim, template <int> class DH>
 void
 DoFRenumbering::
-Cuthill_McKee (DoFHandler<dim> &dof_handler,
+Cuthill_McKee (DH<dim>         &dof_handler,
                const bool       reversed_numbering,
                const bool       use_constraints,
                const std::vector<unsigned int> &starting_indices)
@@ -158,11 +158,11 @@ Cuthill_McKee (DoFHandler<dim> &dof_handler,
 
 
 
-template <int dim>
+template <int dim, template <int> class DH>
 void
 DoFRenumbering::
 compute_Cuthill_McKee (std::vector<unsigned int>& new_indices,
-                       const DoFHandler<dim>&     dof_handler,
+                       const DH<dim>&             dof_handler,
                        const bool                 reversed_numbering,
                        const bool                 use_constraints,
                        const std::vector<unsigned int>& starting_indices)
@@ -663,7 +663,7 @@ compute_component_wise (std::vector<unsigned int>& new_indices,
                         const ENDITERATOR& end,
                         const std::vector<unsigned int> &component_order_arg)
 {
-// Modify for hp
+//TODO: Modify for hp
   const FiniteElement<dim>& fe = start->get_fe();
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
@@ -1245,7 +1245,7 @@ compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
 
 // explicit instantiations
 template
-void DoFRenumbering::Cuthill_McKee<deal_II_dimension>
+void DoFRenumbering::Cuthill_McKee<deal_II_dimension, DoFHandler>
 (DoFHandler<deal_II_dimension>&,
  const bool,
  const bool,
@@ -1253,12 +1253,30 @@ void DoFRenumbering::Cuthill_McKee<deal_II_dimension>
 
 template
 void
-DoFRenumbering::compute_Cuthill_McKee<deal_II_dimension>
+DoFRenumbering::compute_Cuthill_McKee<deal_II_dimension, DoFHandler>
 (std::vector<unsigned int>&,
  const DoFHandler<deal_II_dimension>&,
  const bool,
  const bool,
  const std::vector<unsigned int>&);
+
+
+template
+void DoFRenumbering::Cuthill_McKee<deal_II_dimension, hpDoFHandler>
+(hpDoFHandler<deal_II_dimension>&,
+ const bool,
+ const bool,
+ const std::vector<unsigned int>&);
+
+template
+void
+DoFRenumbering::compute_Cuthill_McKee<deal_II_dimension, hpDoFHandler>
+(std::vector<unsigned int>&,
+ const hpDoFHandler<deal_II_dimension>&,
+ const bool,
+ const bool,
+ const std::vector<unsigned int>&);
+
 
 template
 void DoFRenumbering::component_wise<deal_II_dimension>

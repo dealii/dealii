@@ -30,6 +30,7 @@ template <int dim> class Function;
 template <int dim> class Point;
 template <int dim> class FiniteElement;
 template <int dim> class DoFHandler;
+template <int dim> class hpDoFHandler;
 template <int dim> class MGDoFHandler;
 class ConstraintMatrix;
 template <template <int> class GridClass, int dim> class InterGridMap;
@@ -348,11 +349,11 @@ class DoFTools
 				      * previously added entries are
 				      * not deleted.
 				      */
-    template <int dim, class SparsityPattern>
+    template <int dim, class SparsityPattern, template <int> class DH>
     static
     void
-    make_sparsity_pattern (const DoFHandler<dim> &dof,
-			   SparsityPattern       &sparsity_pattern);
+    make_sparsity_pattern (const DH<dim>   &dof,
+			   SparsityPattern &sparsity_pattern);
 
 				     /**
 				      * Locate non-zero entries for
@@ -470,9 +471,9 @@ class DoFTools
 				      * size of the sparsity pattern is
 				      * already correct.
 				      */
-    template <int dim, class SparsityPattern>
+    template <int dim, class SparsityPattern, template <int> class DH>
     static void
-    make_boundary_sparsity_pattern (const DoFHandler<dim>           &dof,
+    make_boundary_sparsity_pattern (const DH<dim>                   &dof,
 				    const std::vector<unsigned int> &dof_to_boundary_mapping,
 				    SparsityPattern                 &sparsity_pattern);
 
@@ -484,9 +485,9 @@ class DoFTools
 				      * specified end points to each
 				      * other.
 				      */
-    template <class SparsityPattern>
+    template <class SparsityPattern, template <int> class DH>
     static void
-    make_boundary_sparsity_pattern (const DoFHandler<1>             &dof,
+    make_boundary_sparsity_pattern (const DH<1>                     &dof,
 				    const std::vector<unsigned int> &dof_to_boundary_mapping,
 				    SparsityPattern                 &sparsity_pattern);
 
@@ -521,9 +522,9 @@ class DoFTools
 				      * pattern, the same holds as
 				      * said above.
 				      */
-    template <int dim, class SparsityPattern>
+    template <int dim, class SparsityPattern, template <int> class DH>
     static void
-    make_boundary_sparsity_pattern (const DoFHandler<dim> &dof,
+    make_boundary_sparsity_pattern (const DH<dim> &dof,
 				    const typename FunctionMap<dim>::type &boundary_indicators,
 				    const std::vector<unsigned int>  &dof_to_boundary_mapping,
 				    SparsityPattern    &sparsity); 
@@ -537,9 +538,9 @@ class DoFTools
 				      * specified end points to each
 				      * other.
 				      */
-    template <class SparsityPattern>
+    template <class SparsityPattern, template <int> class DH>
     static void
-    make_boundary_sparsity_pattern (const DoFHandler<1>             &dof,
+    make_boundary_sparsity_pattern (const DH<1>                     &dof,
 				    const FunctionMap<1>::type      &boundary_indicators,
 				    const std::vector<unsigned int> &dof_to_boundary_mapping,
 				    SparsityPattern                 &sparsity); 
@@ -561,18 +562,18 @@ class DoFTools
 				      * extra matrix entries are
 				      * considered.
 				      */
-    template<int dim, class SparsityPattern>
+    template<int dim, class SparsityPattern, template <int> class DH>
     static void
-    make_flux_sparsity_pattern (const DoFHandler<dim> &dof_handler,
-				SparsityPattern       &sparsity_pattern);
+    make_flux_sparsity_pattern (const DH<dim>   &dof_handler,
+				SparsityPattern &sparsity_pattern);
 
 				     /**
 				      * Same function, but for 1d.
 				      */
-    template<class SparsityPattern>
+    template<class SparsityPattern, template <int> class DH>
     static void
-    make_flux_sparsity_pattern (const DoFHandler<1> &dof_handler,
-				SparsityPattern     &sparsity_pattern);
+    make_flux_sparsity_pattern (const DH<1>     &dof_handler,
+				SparsityPattern &sparsity_pattern);
     
 				     /**
 				      * This function does the same as
@@ -651,6 +652,31 @@ class DoFTools
     static void
     make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
 				   ConstraintMatrix    &constraints);
+
+				     /**
+				      * Declaration of same function
+				      * for hpDoFHandler
+				      */
+    static void
+    make_hanging_node_constraints (const hpDoFHandler<1> &dof_handler,
+				   ConstraintMatrix      &constraints);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void
+    make_hanging_node_constraints (const hpDoFHandler<2> &dof_handler,
+				   ConstraintMatrix      &constraints);
+
+				     /**
+				      * Declaration of same function
+				      * for different space dimension.
+				      */
+    static void
+    make_hanging_node_constraints (const hpDoFHandler<3> &dof_handler,
+				   ConstraintMatrix      &constraints);
+
 				     //@}
     
 				     /**
@@ -712,9 +738,9 @@ class DoFTools
 				      * speak: they are
 				      * non-primitive).
 				      */
-    template <int dim, typename Number>
+    template <int dim, typename Number, template <int> class DH>
     static void
-    distribute_cell_to_dof_vector (const DoFHandler<dim> &dof_handler,
+    distribute_cell_to_dof_vector (const DH<dim>         &dof_handler,
 				   const Vector<Number>  &cell_data,
 				   Vector<double>        &dof_data,
 				   const unsigned int     component = 0);
@@ -770,9 +796,9 @@ class DoFTools
 				      */
     template <int dim>
     static void
-    extract_dofs (const DoFHandler<dim>      &dof_handler,
-		  const std::vector<bool>    &component_select,
-		  std::vector<bool>          &selected_dofs);
+    extract_dofs (const DoFHandler<dim>   &dof_handler,
+		  const std::vector<bool> &component_select,
+		  std::vector<bool>       &selected_dofs);
 
 				     /**
 				      * Do the same thing as
@@ -832,9 +858,9 @@ class DoFTools
 				      * in the mask corresponding to
 				      * later components are ignored.
 				      */
-    template <int dim>
+    template <int dim, template <int> class DH>
     static void
-    extract_boundary_dofs (const DoFHandler<dim>      &dof_handler,
+    extract_boundary_dofs (const DH<dim>              &dof_handler,
 			   const std::vector<bool>    &component_select,
 			   std::vector<bool>          &selected_dofs,
 			   const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
@@ -843,8 +869,9 @@ class DoFTools
 				      * Declaration of same function
 				      * for different space dimension.
 				      */
+    template <template <int> class DH>
     static void
-    extract_boundary_dofs (const DoFHandler<1>        &dof_handler,
+    extract_boundary_dofs (const DH<1>                &dof_handler,
 			   const std::vector<bool>    &component_select,
 			   std::vector<bool>          &selected_dofs,
 			   const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
@@ -904,12 +931,12 @@ class DoFTools
 				      * @p get_subdomain_association
 				      * function.
 				      */
-    template <int dim>
+    template <int dim, template <int> class DH>
     static void
-    extract_subdomain_dofs (const DoFHandler<dim> &dof_handler,
-			    const unsigned int     subdomain_id,
-			    std::vector<bool>     &selected_dofs);
-
+    extract_subdomain_dofs (const DH<dim>      &dof_handler,
+			    const unsigned int  subdomain_id,
+			    std::vector<bool>  &selected_dofs);
+    
                                      /**
                                       * For each DoF, return in the output
                                       * array to which subdomain (as given by
@@ -1054,7 +1081,8 @@ class DoFTools
 			      std::vector<unsigned int>& dofs_per_component,
 			      const bool vector_valued_once = false,
 			      std::vector<unsigned int>  target_component
-			      =std::vector<unsigned int>());
+			      = std::vector<unsigned int>());
+
 
 				     /**
 				      * @deprecated See the previous
@@ -1353,9 +1381,9 @@ class DoFTools
 				      * Prior content of @p mapping
 				      * is deleted.
 				      */
-    template <int dim>
+    template <int dim, template <int> class DH>
     static void
-    map_dof_to_boundary_indices (const DoFHandler<dim>      &dof_handler,
+    map_dof_to_boundary_indices (const DH<dim>              &dof_handler,
 				 std::vector<unsigned int>  &mapping);
 
 				     /**
@@ -1363,8 +1391,8 @@ class DoFTools
 				      * for different space dimension.
 				      */
     static void
-    map_dof_to_boundary_indices (const DoFHandler<1>        &dof_handler,
-				 std::vector<unsigned int>  &mapping);
+    map_dof_to_boundary_indices (const DoFHandler<1>       &dof_handler,
+				 std::vector<unsigned int> &mapping);
     
 				     /**
 				      * Same as the previous function,
@@ -1377,9 +1405,9 @@ class DoFTools
 				      * See the general doc of this
 				      * class for more information.
 				      */
-    template <int dim>
+    template <int dim, template <int> class DH>
     static void
-    map_dof_to_boundary_indices (const DoFHandler<dim>         &dof_handler,
+    map_dof_to_boundary_indices (const DH<dim>              &dof_handler,
 				 const std::set<unsigned char> &boundary_indicators,
 				 std::vector<unsigned int>     &mapping);
 
@@ -1387,8 +1415,9 @@ class DoFTools
 				      * Declaration of same function
 				      * for different space dimension.
 				      */
+    template <template <int> class DH>
     static void
-    map_dof_to_boundary_indices (const DoFHandler<1>           &dof_handler,
+    map_dof_to_boundary_indices (const DH<1>                   &dof_handler,
 				 const std::set<unsigned char> &boundary_indicators,
 				 std::vector<unsigned int>     &mapping);
     
@@ -1442,10 +1471,10 @@ class DoFTools
 				      * of support points of all its
 				      * components.
 				      */
-    template <int dim, class Comp>
+    template <int dim, template <int> class DH, class Comp>
     static void
-    map_support_points_to_dofs (const Mapping<dim>       &mapping,
-				const DoFHandler<dim>    &dof_handler,
+    map_support_points_to_dofs (const Mapping<dim>    &mapping,
+				const DH<dim>         &dof_handler,
 				std::map<Point<dim>, unsigned int, Comp> &point_to_index_map);
     
 				     /**
@@ -1593,11 +1622,11 @@ DoFTools::make_sparsity_pattern (
 }
 
 
-template <int dim, class Comp>
+template <int dim, template <int> class DH, class Comp>
 void
 DoFTools::map_support_points_to_dofs (
   const Mapping<dim>       &mapping,
-  const DoFHandler<dim>    &dof_handler,
+  const DH<dim>            &dof_handler,
   std::map<Point<dim>, unsigned int, Comp> &point_to_index_map)
 {
 				   // let the checking of arguments be

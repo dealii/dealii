@@ -23,12 +23,14 @@
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/hp_fe_values.h>
+#include <fe/select_fe_values.h>
 #include <fe/mapping_q1.h>
 
 
 
-template <int dim>
-void DataOutFaces<dim>::build_some_patches (Data data)
+template <int dim, template <int> class DH>
+void DataOutFaces<dim,DH>::build_some_patches (Data data)
 {
   QTrapez<1>        q_trapez;
   QIterated<dim-1>  patch_points (q_trapez, data.n_subdivisions);
@@ -39,8 +41,9 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 				   // we don't support anything else
 				   // as well
   static const MappingQ1<dim> mapping;
-  FEFaceValues<dim> fe_patch_values (mapping, this->dofs->get_fe(),
-				     patch_points, update_values);
+  typename SelectFEValues<DH<dim> >::FEFaceValues
+    x_fe_patch_values (mapping, this->dofs->get_fe(),
+                       patch_points, update_values);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
@@ -65,7 +68,9 @@ void DataOutFaces<dim>::build_some_patches (Data data)
       
       if (data.n_datasets > 0)
 	{
-	  fe_patch_values.reinit (face.first, face.second);
+	  x_fe_patch_values.reinit (face.first, face.second);
+          const FEFaceValues<dim> &fe_patch_values
+            = x_fe_patch_values.get_present_fe_values ();
 	  
 					   // first fill dof_data
 	  for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
@@ -108,7 +113,7 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 	      Assert (face.first->active(), ExcCellNotActiveForCellData());
 	      const unsigned int cell_number
 		= std::distance (this->dofs->begin_active(),
-				 typename DoFHandler<dim>::active_cell_iterator(face.first));
+				 typename DH<dim>::active_cell_iterator(face.first));
 
               const double value
                 = this->cell_data[dataset]->get_cell_data_value (cell_number);
@@ -130,14 +135,14 @@ void DataOutFaces<dim>::build_some_patches (Data data)
 
 
 
-template <int dim>
-void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
-				       const unsigned int n_threads_) 
+template <int dim, template <int> class DH>
+void DataOutFaces<dim,DH>::build_patches (const unsigned int n_subdivisions,
+					  const unsigned int n_threads_) 
 {
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
-  typedef DataOut_DoFData<dim,dim+1> BaseClass;
+  typedef DataOut_DoFData<dim,DH,dim+1> BaseClass;
   Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
   const unsigned int n_threads = (DEAL_II_USE_MT ? n_threads_ : 1);
@@ -200,7 +205,7 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
     {
       Threads::ThreadGroup<> threads;  
       for (unsigned int l=0;l<n_threads;++l)
-        threads += Threads::spawn (*this, &DataOutFaces<dim>::build_some_patches)(thread_data[l]);
+        threads += Threads::spawn (*this, &DataOutFaces<dim,DH>::build_some_patches)(thread_data[l]);
       threads.join_all();
     }
   else
@@ -210,13 +215,13 @@ void DataOutFaces<dim>::build_patches (const unsigned int n_subdivisions,
 
 
 
-template <int dim>
-typename DataOutFaces<dim>::FaceDescriptor
-DataOutFaces<dim>::first_face () 
+template <int dim, template <int> class DH>
+typename DataOutFaces<dim,DH>::FaceDescriptor
+DataOutFaces<dim,DH>::first_face () 
 {
 				   // simply find first active cell
 				   // with a face on the boundary
-  typename DoFHandler<dim>::active_cell_iterator cell = this->dofs->begin_active();
+  typename DH<dim>::active_cell_iterator cell = this->dofs->begin_active();
   for (; cell != this->dofs->end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->face(f)->at_boundary())
@@ -231,9 +236,9 @@ DataOutFaces<dim>::first_face ()
 
 
 
-template <int dim>
-typename DataOutFaces<dim>::FaceDescriptor
-DataOutFaces<dim>::next_face (const FaceDescriptor &old_face)
+template <int dim, template <int> class DH>
+typename DataOutFaces<dim,DH>::FaceDescriptor
+DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 {
   FaceDescriptor face = old_face;
   
@@ -255,7 +260,7 @@ DataOutFaces<dim>::next_face (const FaceDescriptor &old_face)
 				   // convert the iterator to an
 				   // active_iterator and advance
 				   // this to the next active cell
-  typename DoFHandler<dim>::active_cell_iterator active_cell = face.first;
+  typename DH<dim>::active_cell_iterator active_cell = face.first;
 
 				   // increase face pointer by one
   ++active_cell;
@@ -289,5 +294,6 @@ DataOutFaces<dim>::next_face (const FaceDescriptor &old_face)
 // explicit instantiations
 // don't instantiate anything for the 1d and 2d cases
 #if deal_II_dimension >=2
-template class DataOutFaces<deal_II_dimension>;
+template class DataOutFaces<deal_II_dimension,DoFHandler>;
+template class DataOutFaces<deal_II_dimension,hpDoFHandler>;
 #endif

@@ -71,7 +71,8 @@ void MGDoFHandler<dim>::MGVertexDoFs::init (const unsigned int cl,
 
 
 template <int dim>
-MGDoFHandler<dim>::MGVertexDoFs::~MGVertexDoFs () {
+MGDoFHandler<dim>::MGVertexDoFs::~MGVertexDoFs ()
+{
   delete[] indices;
 }
 
@@ -119,77 +120,88 @@ MGDoFHandler<dim>::~MGDoFHandler ()
 
 template <>
 MGDoFHandler<1>::raw_cell_iterator
-MGDoFHandler<1>::begin_raw (const unsigned int level) const {
+MGDoFHandler<1>::begin_raw (const unsigned int level) const
+{
   return begin_raw_line (level);
 }
 
 
 template <>
 MGDoFHandler<1>::cell_iterator
-MGDoFHandler<1>::begin (const unsigned int level) const {
+MGDoFHandler<1>::begin (const unsigned int level) const
+{
   return begin_line (level);
 }
 
 
 template <>
 MGDoFHandler<1>::active_cell_iterator
-MGDoFHandler<1>::begin_active (const unsigned int level) const {
+MGDoFHandler<1>::begin_active (const unsigned int level) const
+{
   return begin_active_line (level);
 }
 
 
 template <>
 MGDoFHandler<1>::raw_cell_iterator
-MGDoFHandler<1>::end () const {
+MGDoFHandler<1>::end () const
+{
   return end_line ();
 }
 
 
 template <>
 MGDoFHandler<1>::raw_cell_iterator
-MGDoFHandler<1>::last_raw () const {
+MGDoFHandler<1>::last_raw () const
+{
   return last_raw_line ();
 }
 
 
 template <>
 MGDoFHandler<1>::raw_cell_iterator
-MGDoFHandler<1>::last_raw (const unsigned int level) const {
+MGDoFHandler<1>::last_raw (const unsigned int level) const
+{
   return last_raw_line (level);
 }
 
 
 template <>
 MGDoFHandler<1>::cell_iterator
-MGDoFHandler<1>::last () const {
+MGDoFHandler<1>::last () const
+{
   return last_line ();
 }
 
 
 template <>
 MGDoFHandler<1>::cell_iterator
-MGDoFHandler<1>::last (const unsigned int level) const {
+MGDoFHandler<1>::last (const unsigned int level) const
+{
   return last_line (level);
 }
 
 
 template <>
 MGDoFHandler<1>::active_cell_iterator
-MGDoFHandler<1>::last_active () const {
+MGDoFHandler<1>::last_active () const
+{
   return last_active_line ();
 }
 
 
 template <>
 MGDoFHandler<1>::active_cell_iterator
-MGDoFHandler<1>::last_active (const unsigned int level) const {
+MGDoFHandler<1>::last_active (const unsigned int level) const
+{
   return last_active_line (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<1>::raw_face_iterator
-MGDoFHandler<1>::begin_raw_face (const unsigned int) const {
+MGDoFHandler<1>::begin_raw_face (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -197,7 +209,8 @@ MGDoFHandler<1>::begin_raw_face (const unsigned int) const {
 
 template <>
 MGDoFDimensionInfo<1>::face_iterator
-MGDoFHandler<1>::begin_face (const unsigned int) const {
+MGDoFHandler<1>::begin_face (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -205,7 +218,8 @@ MGDoFHandler<1>::begin_face (const unsigned int) const {
 
 template <>
 MGDoFDimensionInfo<1>::active_face_iterator
-MGDoFHandler<1>::begin_active_face (const unsigned int) const {
+MGDoFHandler<1>::begin_active_face (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -213,7 +227,8 @@ MGDoFHandler<1>::begin_active_face (const unsigned int) const {
 
 template <>
 MGDoFDimensionInfo<1>::raw_face_iterator
-MGDoFHandler<1>::end_face () const {
+MGDoFHandler<1>::end_face () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -221,7 +236,8 @@ MGDoFHandler<1>::end_face () const {
 
 template <>
 MGDoFDimensionInfo<1>::raw_face_iterator
-MGDoFHandler<1>::last_raw_face () const {
+MGDoFHandler<1>::last_raw_face () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -229,7 +245,8 @@ MGDoFHandler<1>::last_raw_face () const {
 
 template <>
 MGDoFDimensionInfo<1>::raw_face_iterator
-MGDoFHandler<1>::last_raw_face (const unsigned int) const {
+MGDoFHandler<1>::last_raw_face (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -237,7 +254,8 @@ MGDoFHandler<1>::last_raw_face (const unsigned int) const {
 
 template <>
 MGDoFDimensionInfo<1>::face_iterator
-MGDoFHandler<1>::last_face () const {
+MGDoFHandler<1>::last_face () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -245,7 +263,8 @@ MGDoFHandler<1>::last_face () const {
 
 template <>
 MGDoFDimensionInfo<1>::face_iterator
-MGDoFHandler<1>::last_face (const unsigned int) const {
+MGDoFHandler<1>::last_face (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -253,7 +272,8 @@ MGDoFHandler<1>::last_face (const unsigned int) const {
 
 template <>
 MGDoFDimensionInfo<1>::active_face_iterator
-MGDoFHandler<1>::last_active_face () const {
+MGDoFHandler<1>::last_active_face () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -261,7 +281,8 @@ MGDoFHandler<1>::last_active_face () const {
 
 template <>
 MGDoFDimensionInfo<1>::active_face_iterator
-MGDoFHandler<1>::last_active_face (const unsigned int) const {
+MGDoFHandler<1>::last_active_face (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -269,7 +290,8 @@ MGDoFHandler<1>::last_active_face (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::raw_quad_iterator
-MGDoFHandler<1>::begin_raw_quad (const unsigned int) const {
+MGDoFHandler<1>::begin_raw_quad (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -277,7 +299,8 @@ MGDoFHandler<1>::begin_raw_quad (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::quad_iterator
-MGDoFHandler<1>::begin_quad (const unsigned int) const {
+MGDoFHandler<1>::begin_quad (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -285,7 +308,8 @@ MGDoFHandler<1>::begin_quad (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::active_quad_iterator
-MGDoFHandler<1>::begin_active_quad (const unsigned int) const {
+MGDoFHandler<1>::begin_active_quad (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -293,7 +317,8 @@ MGDoFHandler<1>::begin_active_quad (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::raw_quad_iterator
-MGDoFHandler<1>::end_quad () const {
+MGDoFHandler<1>::end_quad () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -301,7 +326,8 @@ MGDoFHandler<1>::end_quad () const {
 
 template <>
 MGDoFHandler<1>::raw_quad_iterator
-MGDoFHandler<1>::last_raw_quad (const unsigned int) const {
+MGDoFHandler<1>::last_raw_quad (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -309,7 +335,8 @@ MGDoFHandler<1>::last_raw_quad (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::quad_iterator
-MGDoFHandler<1>::last_quad (const unsigned int) const {
+MGDoFHandler<1>::last_quad (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -317,7 +344,8 @@ MGDoFHandler<1>::last_quad (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::active_quad_iterator
-MGDoFHandler<1>::last_active_quad (const unsigned int) const {
+MGDoFHandler<1>::last_active_quad (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -325,7 +353,8 @@ MGDoFHandler<1>::last_active_quad (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::raw_quad_iterator
-MGDoFHandler<1>::last_raw_quad () const {
+MGDoFHandler<1>::last_raw_quad () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -333,7 +362,8 @@ MGDoFHandler<1>::last_raw_quad () const {
 
 template <>
 MGDoFHandler<1>::quad_iterator
-MGDoFHandler<1>::last_quad () const {
+MGDoFHandler<1>::last_quad () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -341,7 +371,8 @@ MGDoFHandler<1>::last_quad () const {
 
 template <>
 MGDoFHandler<1>::active_quad_iterator
-MGDoFHandler<1>::last_active_quad () const {
+MGDoFHandler<1>::last_active_quad () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -349,7 +380,8 @@ MGDoFHandler<1>::last_active_quad () const {
 
 template <>
 MGDoFHandler<1>::raw_hex_iterator
-MGDoFHandler<1>::begin_raw_hex (const unsigned int) const {
+MGDoFHandler<1>::begin_raw_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -357,7 +389,8 @@ MGDoFHandler<1>::begin_raw_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::hex_iterator
-MGDoFHandler<1>::begin_hex (const unsigned int) const {
+MGDoFHandler<1>::begin_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -365,7 +398,8 @@ MGDoFHandler<1>::begin_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::active_hex_iterator
-MGDoFHandler<1>::begin_active_hex (const unsigned int) const {
+MGDoFHandler<1>::begin_active_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -373,7 +407,8 @@ MGDoFHandler<1>::begin_active_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::raw_hex_iterator
-MGDoFHandler<1>::end_hex () const {
+MGDoFHandler<1>::end_hex () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -381,7 +416,8 @@ MGDoFHandler<1>::end_hex () const {
 
 template <>
 MGDoFHandler<1>::raw_hex_iterator
-MGDoFHandler<1>::last_raw_hex (const unsigned int) const {
+MGDoFHandler<1>::last_raw_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -389,7 +425,8 @@ MGDoFHandler<1>::last_raw_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::hex_iterator
-MGDoFHandler<1>::last_hex (const unsigned int) const {
+MGDoFHandler<1>::last_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -397,7 +434,8 @@ MGDoFHandler<1>::last_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::active_hex_iterator
-MGDoFHandler<1>::last_active_hex (const unsigned int) const {
+MGDoFHandler<1>::last_active_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -405,7 +443,8 @@ MGDoFHandler<1>::last_active_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<1>::raw_hex_iterator
-MGDoFHandler<1>::last_raw_hex () const {
+MGDoFHandler<1>::last_raw_hex () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -413,7 +452,8 @@ MGDoFHandler<1>::last_raw_hex () const {
 
 template <>
 MGDoFHandler<1>::hex_iterator
-MGDoFHandler<1>::last_hex () const {
+MGDoFHandler<1>::last_hex () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -421,7 +461,8 @@ MGDoFHandler<1>::last_hex () const {
 
 template <>
 MGDoFHandler<1>::active_hex_iterator
-MGDoFHandler<1>::last_active_hex () const {
+MGDoFHandler<1>::last_active_hex () const
+{
   Assert (false, ExcImpossibleInDim(1));
   return 0;
 }
@@ -433,147 +474,168 @@ MGDoFHandler<1>::last_active_hex () const {
 
 template <>
 MGDoFHandler<2>::raw_cell_iterator
-MGDoFHandler<2>::begin_raw (const unsigned int level) const {
+MGDoFHandler<2>::begin_raw (const unsigned int level) const
+{
   return begin_raw_quad (level);
 }
 
 
 template <>
 MGDoFHandler<2>::cell_iterator
-MGDoFHandler<2>::begin (const unsigned int level) const {
+MGDoFHandler<2>::begin (const unsigned int level) const
+{
   return begin_quad (level);
 }
 
 
 template <>
 MGDoFHandler<2>::active_cell_iterator
-MGDoFHandler<2>::begin_active (const unsigned int level) const {
+MGDoFHandler<2>::begin_active (const unsigned int level) const
+{
   return begin_active_quad (level);
 }
 
 
 template <>
 MGDoFHandler<2>::raw_cell_iterator
-MGDoFHandler<2>::end () const {
+MGDoFHandler<2>::end () const
+{
   return end_quad ();
 }
 
 
 template <>
 MGDoFHandler<2>::raw_cell_iterator
-MGDoFHandler<2>::last_raw () const {
+MGDoFHandler<2>::last_raw () const
+{
   return last_raw_quad ();
 }
 
 
 template <>
 MGDoFHandler<2>::raw_cell_iterator
-MGDoFHandler<2>::last_raw (const unsigned int level) const {
+MGDoFHandler<2>::last_raw (const unsigned int level) const
+{
   return last_raw_quad (level);
 }
 
 
 template <>
 MGDoFHandler<2>::cell_iterator
-MGDoFHandler<2>::last () const {
+MGDoFHandler<2>::last () const
+{
   return last_quad ();
 }
 
 
 template <>
 MGDoFHandler<2>::cell_iterator
-MGDoFHandler<2>::last (const unsigned int level) const {
+MGDoFHandler<2>::last (const unsigned int level) const
+{
   return last_quad (level);
 }
 
 
 template <>
 MGDoFHandler<2>::active_cell_iterator
-MGDoFHandler<2>::last_active () const {
+MGDoFHandler<2>::last_active () const
+{
   return last_active_quad ();
 }
 
 
 template <>
 MGDoFHandler<2>::active_cell_iterator
-MGDoFHandler<2>::last_active (const unsigned int level) const {
+MGDoFHandler<2>::last_active (const unsigned int level) const
+{
   return last_active_quad (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<2>::raw_face_iterator
-MGDoFHandler<2>::begin_raw_face (const unsigned int level) const {
+MGDoFHandler<2>::begin_raw_face (const unsigned int level) const
+{
   return begin_raw_line (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<2>::face_iterator
-MGDoFHandler<2>::begin_face (const unsigned int level) const {
+MGDoFHandler<2>::begin_face (const unsigned int level) const
+{
   return begin_line (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<2>::active_face_iterator
-MGDoFHandler<2>::begin_active_face (const unsigned int level) const {
+MGDoFHandler<2>::begin_active_face (const unsigned int level) const
+{
   return begin_active_line (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<2>::raw_face_iterator
-MGDoFHandler<2>::end_face () const {
+MGDoFHandler<2>::end_face () const
+{
   return end_line ();
 }
 
 
 template <>
 MGDoFDimensionInfo<2>::raw_face_iterator
-MGDoFHandler<2>::last_raw_face () const {
+MGDoFHandler<2>::last_raw_face () const
+{
   return last_raw_line ();
 }
 
 
 template <>
 MGDoFDimensionInfo<2>::raw_face_iterator
-MGDoFHandler<2>::last_raw_face (const unsigned int level) const {
+MGDoFHandler<2>::last_raw_face (const unsigned int level) const
+{
   return last_raw_line (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<2>::face_iterator
-MGDoFHandler<2>::last_face () const {
+MGDoFHandler<2>::last_face () const
+{
   return last_line ();
 }
 
 
 template <>
 MGDoFDimensionInfo<2>::face_iterator
-MGDoFHandler<2>::last_face (const unsigned int level) const {
+MGDoFHandler<2>::last_face (const unsigned int level) const
+{
   return last_line (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<2>::active_face_iterator
-MGDoFHandler<2>::last_active_face () const {
+MGDoFHandler<2>::last_active_face () const
+{
   return last_active_line ();
 }
 
 
 template <>
 MGDoFDimensionInfo<2>::active_face_iterator
-MGDoFHandler<2>::last_active_face (const unsigned int level) const {
+MGDoFHandler<2>::last_active_face (const unsigned int level) const
+{
   return last_active_line (level);
 }
 
 
 template <>
 MGDoFHandler<2>::raw_hex_iterator
-MGDoFHandler<2>::begin_raw_hex (const unsigned int) const {
+MGDoFHandler<2>::begin_raw_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
@@ -581,7 +643,8 @@ MGDoFHandler<2>::begin_raw_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<2>::hex_iterator
-MGDoFHandler<2>::begin_hex (const unsigned int) const {
+MGDoFHandler<2>::begin_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
@@ -589,7 +652,8 @@ MGDoFHandler<2>::begin_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<2>::active_hex_iterator
-MGDoFHandler<2>::begin_active_hex (const unsigned int) const {
+MGDoFHandler<2>::begin_active_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
@@ -597,7 +661,8 @@ MGDoFHandler<2>::begin_active_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<2>::raw_hex_iterator
-MGDoFHandler<2>::end_hex () const {
+MGDoFHandler<2>::end_hex () const
+{
   Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
@@ -605,7 +670,8 @@ MGDoFHandler<2>::end_hex () const {
 
 template <>
 MGDoFHandler<2>::raw_hex_iterator
-MGDoFHandler<2>::last_raw_hex (const unsigned int) const {
+MGDoFHandler<2>::last_raw_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
@@ -613,7 +679,8 @@ MGDoFHandler<2>::last_raw_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<2>::hex_iterator
-MGDoFHandler<2>::last_hex (const unsigned int) const {
+MGDoFHandler<2>::last_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
@@ -621,7 +688,8 @@ MGDoFHandler<2>::last_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<2>::active_hex_iterator
-MGDoFHandler<2>::last_active_hex (const unsigned int) const {
+MGDoFHandler<2>::last_active_hex (const unsigned int) const
+{
   Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
@@ -629,7 +697,8 @@ MGDoFHandler<2>::last_active_hex (const unsigned int) const {
 
 template <>
 MGDoFHandler<2>::raw_hex_iterator
-MGDoFHandler<2>::last_raw_hex () const {
+MGDoFHandler<2>::last_raw_hex () const
+{
   Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
@@ -637,7 +706,8 @@ MGDoFHandler<2>::last_raw_hex () const {
 
 template <>
 MGDoFHandler<2>::hex_iterator
-MGDoFHandler<2>::last_hex () const {
+MGDoFHandler<2>::last_hex () const
+{
   Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
@@ -645,7 +715,8 @@ MGDoFHandler<2>::last_hex () const {
 
 template <>
 MGDoFHandler<2>::active_hex_iterator
-MGDoFHandler<2>::last_active_hex () const {
+MGDoFHandler<2>::last_active_hex () const
+{
   Assert (false, ExcImpossibleInDim(2));
   return 0;
 }
@@ -658,140 +729,160 @@ MGDoFHandler<2>::last_active_hex () const {
 
 template <>
 MGDoFHandler<3>::raw_cell_iterator
-MGDoFHandler<3>::begin_raw (const unsigned int level) const {
+MGDoFHandler<3>::begin_raw (const unsigned int level) const
+{
   return begin_raw_hex (level);
 }
 
 
 template <>
 MGDoFHandler<3>::cell_iterator
-MGDoFHandler<3>::begin (const unsigned int level) const {
+MGDoFHandler<3>::begin (const unsigned int level) const
+{
   return begin_hex (level);
 }
 
 
 template <>
 MGDoFHandler<3>::active_cell_iterator
-MGDoFHandler<3>::begin_active (const unsigned int level) const {
+MGDoFHandler<3>::begin_active (const unsigned int level) const
+{
   return begin_active_hex (level);
 }
 
 
 template <>
 MGDoFHandler<3>::raw_cell_iterator
-MGDoFHandler<3>::end () const {
+MGDoFHandler<3>::end () const
+{
   return end_hex ();
 }
 
 
 template <>
 MGDoFHandler<3>::raw_cell_iterator
-MGDoFHandler<3>::last_raw () const {
+MGDoFHandler<3>::last_raw () const
+{
   return last_raw_hex ();
 }
 
 
 template <>
 MGDoFHandler<3>::raw_cell_iterator
-MGDoFHandler<3>::last_raw (const unsigned int level) const {
+MGDoFHandler<3>::last_raw (const unsigned int level) const
+{
   return last_raw_hex (level);
 }
 
 
 template <>
 MGDoFHandler<3>::cell_iterator
-MGDoFHandler<3>::last () const {
+MGDoFHandler<3>::last () const
+{
   return last_hex ();
 }
 
 
 template <>
 MGDoFHandler<3>::cell_iterator
-MGDoFHandler<3>::last (const unsigned int level) const {
+MGDoFHandler<3>::last (const unsigned int level) const
+{
   return last_hex (level);
 }
 
 
 template <>
 MGDoFHandler<3>::active_cell_iterator
-MGDoFHandler<3>::last_active () const {
+MGDoFHandler<3>::last_active () const
+{
   return last_active_hex ();
 }
 
 
 template <>
 MGDoFHandler<3>::active_cell_iterator
-MGDoFHandler<3>::last_active (const unsigned int level) const {
+MGDoFHandler<3>::last_active (const unsigned int level) const
+{
   return last_active_hex (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<3>::raw_face_iterator
-MGDoFHandler<3>::begin_raw_face (const unsigned int level) const {
+MGDoFHandler<3>::begin_raw_face (const unsigned int level) const
+{
   return begin_raw_quad (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<3>::face_iterator
-MGDoFHandler<3>::begin_face (const unsigned int level) const {
+MGDoFHandler<3>::begin_face (const unsigned int level) const
+{
   return begin_quad (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<3>::active_face_iterator
-MGDoFHandler<3>::begin_active_face (const unsigned int level) const {
+MGDoFHandler<3>::begin_active_face (const unsigned int level) const
+{
   return begin_active_quad (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<3>::raw_face_iterator
-MGDoFHandler<3>::end_face () const {
+MGDoFHandler<3>::end_face () const
+{
   return end_quad ();
 }
 
 
 template <>
 MGDoFDimensionInfo<3>::raw_face_iterator
-MGDoFHandler<3>::last_raw_face () const {
+MGDoFHandler<3>::last_raw_face () const
+{
   return last_raw_quad ();
 }
 
 
 template <>
 MGDoFDimensionInfo<3>::raw_face_iterator
-MGDoFHandler<3>::last_raw_face (const unsigned int level) const {
+MGDoFHandler<3>::last_raw_face (const unsigned int level) const
+{
   return last_raw_quad (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<3>::face_iterator
-MGDoFHandler<3>::last_face () const {
+MGDoFHandler<3>::last_face () const
+{
   return last_quad ();
 }
 
 
 template <>
 MGDoFDimensionInfo<3>::face_iterator
-MGDoFHandler<3>::last_face (const unsigned int level) const {
+MGDoFHandler<3>::last_face (const unsigned int level) const
+{
   return last_quad (level);
 }
 
 
 template <>
 MGDoFDimensionInfo<3>::active_face_iterator
-MGDoFHandler<3>::last_active_face () const {
+MGDoFHandler<3>::last_active_face () const
+{
   return last_active_quad ();
 }
 
 
 template <>
 MGDoFDimensionInfo<3>::active_face_iterator
-MGDoFHandler<3>::last_active_face (const unsigned int level) const {
+MGDoFHandler<3>::last_active_face (const unsigned int level) const
+{
   return last_active_quad (level);
 }
 
@@ -800,7 +891,8 @@ MGDoFHandler<3>::last_active_face (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_line_iterator
-MGDoFHandler<dim>::begin_raw_line (const unsigned int level) const {
+MGDoFHandler<dim>::begin_raw_line (const unsigned int level) const
+{
   return raw_line_iterator (this->tria,
 			    this->tria->begin_raw_line(level)->level(),
 			    this->tria->begin_raw_line(level)->index(),
@@ -810,7 +902,8 @@ MGDoFHandler<dim>::begin_raw_line (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::line_iterator
-MGDoFHandler<dim>::begin_line (const unsigned int level) const {
+MGDoFHandler<dim>::begin_line (const unsigned int level) const
+{
   return line_iterator (this->tria,
 			this->tria->begin_line(level)->level(),
 			this->tria->begin_line(level)->index(),
@@ -820,7 +913,8 @@ MGDoFHandler<dim>::begin_line (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::active_line_iterator
-MGDoFHandler<dim>::begin_active_line (const unsigned int level) const {
+MGDoFHandler<dim>::begin_active_line (const unsigned int level) const
+{
   return active_line_iterator (this->tria,
 			       this->tria->begin_active_line(level)->level(),
 			       this->tria->begin_active_line(level)->index(),
@@ -830,7 +924,8 @@ MGDoFHandler<dim>::begin_active_line (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_quad_iterator
-MGDoFHandler<dim>::begin_raw_quad (const unsigned int level) const {
+MGDoFHandler<dim>::begin_raw_quad (const unsigned int level) const
+{
   return raw_quad_iterator (this->tria,
 			    this->tria->begin_raw_quad(level)->level(),
 			    this->tria->begin_raw_quad(level)->index(),
@@ -840,7 +935,8 @@ MGDoFHandler<dim>::begin_raw_quad (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::quad_iterator
-MGDoFHandler<dim>::begin_quad (const unsigned int level) const {
+MGDoFHandler<dim>::begin_quad (const unsigned int level) const
+{
   return quad_iterator (this->tria,
 			this->tria->begin_quad(level)->level(),
 			this->tria->begin_quad(level)->index(),
@@ -850,7 +946,8 @@ MGDoFHandler<dim>::begin_quad (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::active_quad_iterator
-MGDoFHandler<dim>::begin_active_quad (const unsigned int level) const {
+MGDoFHandler<dim>::begin_active_quad (const unsigned int level) const
+{
   return active_quad_iterator (this->tria,
 			       this->tria->begin_active_quad(level)->level(),
 			       this->tria->begin_active_quad(level)->index(),
@@ -860,7 +957,8 @@ MGDoFHandler<dim>::begin_active_quad (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_hex_iterator
-MGDoFHandler<dim>::begin_raw_hex (const unsigned int level) const {
+MGDoFHandler<dim>::begin_raw_hex (const unsigned int level) const
+{
   return raw_hex_iterator (this->tria,
 			   this->tria->begin_raw_hex(level)->level(),
 			   this->tria->begin_raw_hex(level)->index(),
@@ -870,7 +968,8 @@ MGDoFHandler<dim>::begin_raw_hex (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::hex_iterator
-MGDoFHandler<dim>::begin_hex (const unsigned int level) const {
+MGDoFHandler<dim>::begin_hex (const unsigned int level) const
+{
   return hex_iterator (this->tria,
 		       this->tria->begin_hex(level)->level(),
 		       this->tria->begin_hex(level)->index(),
@@ -880,7 +979,8 @@ MGDoFHandler<dim>::begin_hex (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::active_hex_iterator
-MGDoFHandler<dim>::begin_active_hex (const unsigned int level) const {
+MGDoFHandler<dim>::begin_active_hex (const unsigned int level) const
+{
   return active_hex_iterator (this->tria,
 			      this->tria->begin_active_hex(level)->level(),
 			      this->tria->begin_active_hex(level)->index(),
@@ -890,28 +990,32 @@ MGDoFHandler<dim>::begin_active_hex (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_line_iterator
-MGDoFHandler<dim>::end_line () const {
+MGDoFHandler<dim>::end_line () const
+{
   return raw_line_iterator (this->tria, -1, -1, this);
 }
 
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_quad_iterator
-MGDoFHandler<dim>::end_quad () const {
+MGDoFHandler<dim>::end_quad () const
+{
   return raw_quad_iterator (this->tria, -1, -1, this);
 }
 
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_hex_iterator
-MGDoFHandler<dim>::end_hex () const {
+MGDoFHandler<dim>::end_hex () const
+{
   return raw_hex_iterator (this->tria, -1, -1, this);
 }
 
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::raw_cell_iterator
-MGDoFHandler<dim>::end_raw (const unsigned int level) const {
+MGDoFHandler<dim>::end_raw (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  end() :
 	  begin_raw (level+1));
@@ -920,7 +1024,8 @@ MGDoFHandler<dim>::end_raw (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::cell_iterator
-MGDoFHandler<dim>::end (const unsigned int level) const {
+MGDoFHandler<dim>::end (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  cell_iterator(end()) :
 	  begin (level+1));
@@ -929,7 +1034,8 @@ MGDoFHandler<dim>::end (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::active_cell_iterator
-MGDoFHandler<dim>::end_active (const unsigned int level) const {
+MGDoFHandler<dim>::end_active (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  active_cell_iterator(end()) :
 	  begin_active (level+1));
@@ -938,7 +1044,8 @@ MGDoFHandler<dim>::end_active (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::raw_face_iterator
-MGDoFHandler<dim>::end_raw_face (const unsigned int level) const {
+MGDoFHandler<dim>::end_raw_face (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  end_face() :
 	  begin_raw_face (level+1));
@@ -947,7 +1054,8 @@ MGDoFHandler<dim>::end_raw_face (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::face_iterator
-MGDoFHandler<dim>::end_face (const unsigned int level) const {
+MGDoFHandler<dim>::end_face (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  face_iterator(end_face()) :
 	  begin_face (level+1));
@@ -956,7 +1064,8 @@ MGDoFHandler<dim>::end_face (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::active_face_iterator
-MGDoFHandler<dim>::end_active_face (const unsigned int level) const {
+MGDoFHandler<dim>::end_active_face (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  active_face_iterator(end_face()) :
 	  begin_active_face (level+1));
@@ -965,7 +1074,8 @@ MGDoFHandler<dim>::end_active_face (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::raw_line_iterator
-MGDoFHandler<dim>::end_raw_line (const unsigned int level) const {
+MGDoFHandler<dim>::end_raw_line (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  end_line() :
 	  begin_raw_line (level+1));
@@ -974,7 +1084,8 @@ MGDoFHandler<dim>::end_raw_line (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::line_iterator
-MGDoFHandler<dim>::end_line (const unsigned int level) const {
+MGDoFHandler<dim>::end_line (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  line_iterator(end_line()) :
 	  begin_line (level+1));
@@ -983,7 +1094,8 @@ MGDoFHandler<dim>::end_line (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::active_line_iterator
-MGDoFHandler<dim>::end_active_line (const unsigned int level) const {
+MGDoFHandler<dim>::end_active_line (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  active_line_iterator(end_line()) :
 	  begin_active_line (level+1));
@@ -992,7 +1104,8 @@ MGDoFHandler<dim>::end_active_line (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::raw_quad_iterator
-MGDoFHandler<dim>::end_raw_quad (const unsigned int level) const {
+MGDoFHandler<dim>::end_raw_quad (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  end_quad() :
 	  begin_raw_quad (level+1));
@@ -1001,7 +1114,8 @@ MGDoFHandler<dim>::end_raw_quad (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::quad_iterator
-MGDoFHandler<dim>::end_quad (const unsigned int level) const {
+MGDoFHandler<dim>::end_quad (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  quad_iterator(end_quad()) :
 	  begin_quad (level+1));
@@ -1010,7 +1124,8 @@ MGDoFHandler<dim>::end_quad (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::active_quad_iterator
-MGDoFHandler<dim>::end_active_quad (const unsigned int level) const {
+MGDoFHandler<dim>::end_active_quad (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  active_quad_iterator(end_quad()) :
 	  begin_active_quad (level+1));
@@ -1019,7 +1134,8 @@ MGDoFHandler<dim>::end_active_quad (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::raw_hex_iterator
-MGDoFHandler<dim>::end_raw_hex (const unsigned int level) const {
+MGDoFHandler<dim>::end_raw_hex (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  end_hex() :
 	  begin_raw_hex (level+1));
@@ -1028,7 +1144,8 @@ MGDoFHandler<dim>::end_raw_hex (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::hex_iterator
-MGDoFHandler<dim>::end_hex (const unsigned int level) const {
+MGDoFHandler<dim>::end_hex (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  hex_iterator(end_hex()) :
 	  begin_hex (level+1));
@@ -1037,7 +1154,8 @@ MGDoFHandler<dim>::end_hex (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFDimensionInfo<dim>::active_hex_iterator
-MGDoFHandler<dim>::end_active_hex (const unsigned int level) const {
+MGDoFHandler<dim>::end_active_hex (const unsigned int level) const
+{
   return (level == mg_levels.size()-1 ?
 	  active_hex_iterator(end_hex()) :
 	  begin_active_hex (level+1));
@@ -1046,7 +1164,8 @@ MGDoFHandler<dim>::end_active_hex (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_line_iterator
-MGDoFHandler<dim>::last_raw_line (const unsigned int level) const {
+MGDoFHandler<dim>::last_raw_line (const unsigned int level) const
+{
   return raw_line_iterator (this->tria,
 			    this->tria->last_raw_line(level)->level(),
 			    this->tria->last_raw_line(level)->index(),
@@ -1056,7 +1175,8 @@ MGDoFHandler<dim>::last_raw_line (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::line_iterator
-MGDoFHandler<dim>::last_line (const unsigned int level) const {
+MGDoFHandler<dim>::last_line (const unsigned int level) const
+{
   return line_iterator (this->tria,
 			this->tria->last_line(level)->level(),
 			this->tria->last_line(level)->index(),
@@ -1066,7 +1186,8 @@ MGDoFHandler<dim>::last_line (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::active_line_iterator
-MGDoFHandler<dim>::last_active_line (const unsigned int level) const {
+MGDoFHandler<dim>::last_active_line (const unsigned int level) const
+{
   return active_line_iterator (this->tria,
 			       this->tria->last_active_line(level)->level(),
 			       this->tria->last_active_line(level)->index(),
@@ -1076,7 +1197,8 @@ MGDoFHandler<dim>::last_active_line (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_quad_iterator
-MGDoFHandler<dim>::last_raw_quad (const unsigned int level) const {
+MGDoFHandler<dim>::last_raw_quad (const unsigned int level) const
+{
   return raw_quad_iterator (this->tria,
 			    this->tria->last_raw_quad(level)->level(),
 			    this->tria->last_raw_quad(level)->index(),
@@ -1086,7 +1208,8 @@ MGDoFHandler<dim>::last_raw_quad (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::quad_iterator
-MGDoFHandler<dim>::last_quad (const unsigned int level) const {
+MGDoFHandler<dim>::last_quad (const unsigned int level) const
+{
   return quad_iterator (this->tria,
 			this->tria->last_quad(level)->level(),
 			this->tria->last_quad(level)->index(),
@@ -1096,7 +1219,8 @@ MGDoFHandler<dim>::last_quad (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::active_quad_iterator
-MGDoFHandler<dim>::last_active_quad (const unsigned int level) const {
+MGDoFHandler<dim>::last_active_quad (const unsigned int level) const
+{
   return active_quad_iterator (this->tria,
 			       this->tria->last_active_quad(level)->level(),
 			       this->tria->last_active_quad(level)->index(),
@@ -1106,7 +1230,8 @@ MGDoFHandler<dim>::last_active_quad (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_hex_iterator
-MGDoFHandler<dim>::last_raw_hex (const unsigned int level) const {
+MGDoFHandler<dim>::last_raw_hex (const unsigned int level) const
+{
   return raw_hex_iterator (this->tria,
 			   this->tria->last_raw_hex(level)->level(),
 			   this->tria->last_raw_hex(level)->index(),
@@ -1116,7 +1241,8 @@ MGDoFHandler<dim>::last_raw_hex (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::hex_iterator
-MGDoFHandler<dim>::last_hex (const unsigned int level) const {
+MGDoFHandler<dim>::last_hex (const unsigned int level) const
+{
   return hex_iterator (this->tria,
 		       this->tria->last_hex(level)->level(),
 		       this->tria->last_hex(level)->index(),
@@ -1126,7 +1252,8 @@ MGDoFHandler<dim>::last_hex (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::active_hex_iterator
-MGDoFHandler<dim>::last_active_hex (const unsigned int level) const {
+MGDoFHandler<dim>::last_active_hex (const unsigned int level) const
+{
   return active_hex_iterator (this->tria,
 			      this->tria->last_active_hex(level)->level(),
 			      this->tria->last_active_hex(level)->index(),
@@ -1136,63 +1263,72 @@ MGDoFHandler<dim>::last_active_hex (const unsigned int level) const {
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_line_iterator
-MGDoFHandler<dim>::last_raw_line () const {
+MGDoFHandler<dim>::last_raw_line () const
+{
   return last_raw_line (mg_levels.size()-1);
 }
 
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_quad_iterator
-MGDoFHandler<dim>::last_raw_quad () const {
+MGDoFHandler<dim>::last_raw_quad () const
+{
   return last_raw_quad (mg_levels.size()-1);
 }
 
 
 template <int dim>
 typename MGDoFHandler<dim>::raw_hex_iterator
-MGDoFHandler<dim>::last_raw_hex () const {
+MGDoFHandler<dim>::last_raw_hex () const
+{
   return last_raw_hex (mg_levels.size()-1);
 }
 
 
 template <int dim>
 typename MGDoFHandler<dim>::line_iterator
-MGDoFHandler<dim>::last_line () const {
+MGDoFHandler<dim>::last_line () const
+{
   return last_line (mg_levels.size()-1);
 }
 
 
 template <int dim>
 typename MGDoFHandler<dim>::quad_iterator
-MGDoFHandler<dim>::last_quad () const {
+MGDoFHandler<dim>::last_quad () const
+{
   return last_quad (mg_levels.size()-1);
 }
 
 
 template <int dim>
 typename MGDoFHandler<dim>::hex_iterator
-MGDoFHandler<dim>::last_hex () const {
+MGDoFHandler<dim>::last_hex () const
+{
   return last_hex (mg_levels.size()-1);
 }
 
 
 template <int dim>
 typename MGDoFHandler<dim>::active_line_iterator
-MGDoFHandler<dim>::last_active_line () const {
+MGDoFHandler<dim>::last_active_line () const
+{
   return last_active_line (mg_levels.size()-1);
 }
 
 
 template <int dim>
 typename MGDoFHandler<dim>::active_quad_iterator
-MGDoFHandler<dim>::last_active_quad () const {
+MGDoFHandler<dim>::last_active_quad () const
+{
   return last_active_quad (mg_levels.size()-1);
 }
 
 
 template <int dim>
 typename MGDoFHandler<dim>::active_hex_iterator
-MGDoFHandler<dim>::last_active_hex () const {
+MGDoFHandler<dim>::last_active_hex () const
+{
   return last_active_hex (mg_levels.size()-1);
 }
 
@@ -1205,7 +1341,7 @@ void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe,
 					 const unsigned int        offset)
 {
 				   // first distribute global dofs
-  DoFHandler<dim>::distribute_dofs (fe, offset);
+  DoFHandler<dim>::distribute_dofs (fe);
 
 
 				   // reserve space for the MG dof numbers
@@ -1248,7 +1384,8 @@ void MGDoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &fe,
 template <>
 unsigned int
 MGDoFHandler<1>::distribute_dofs_on_cell (cell_iterator &cell,
-					  unsigned int   next_free_dof) {
+					  unsigned int   next_free_dof)
+{
 
 				   // distribute dofs of vertices
   if (this->selected_fe->dofs_per_vertex > 0)
@@ -1691,7 +1828,7 @@ void MGDoFHandler<2>::reserve_space () {
 
 	mg_vertex_dofs[vertex].init (min_level[vertex],
 				     max_level[vertex],
-				     this->selected_fe->dofs_per_vertex);
+				     this->get_fe().dofs_per_vertex);
       }
     else
       {

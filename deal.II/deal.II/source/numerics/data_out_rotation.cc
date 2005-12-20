@@ -22,6 +22,8 @@
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/hp_fe_values.h>
+#include <fe/select_fe_values.h>
 #include <fe/mapping_q1.h>
 #include <numerics/data_out_rotation.h>
 
@@ -29,8 +31,8 @@
 
 
 
-template <int dim>
-void DataOutRotation<dim>::build_some_patches (Data data)
+template <int dim, template <int> class DH>
+void DataOutRotation<dim,DH>::build_some_patches (Data data)
 {
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, data.n_subdivisions);
@@ -41,8 +43,9 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 				   // we don't support anything else
 				   // as well
   static const MappingQ1<dim> mapping;
-  FEValues<dim> fe_patch_values (mapping, this->dofs->get_fe(),
-				 patch_points, update_values);
+  typename SelectFEValues<DH<dim> >::FEValues
+    x_fe_patch_values (mapping, this->dofs->get_fe(),
+                       patch_points, update_values);
 
   const unsigned int n_patches_per_circle = data.n_patches_per_circle;
 
@@ -73,7 +76,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
   unsigned int cell_number = 0;
   typename std::vector< ::DataOutBase::Patch<dim+1> >::iterator
     patch = this->patches.begin();
-  typename DoFHandler<dim>::cell_iterator cell=first_cell();
+  cell_iterator cell=first_cell();
 
 				   // get first cell in this thread
   for (unsigned int i=0; (i<data.this_thread)&&(cell != this->dofs->end()); ++i)
@@ -152,8 +155,10 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 					   // then fill in data
 	  if (data.n_datasets > 0)
 	    {
-	      fe_patch_values.reinit (cell);
-	      
+	      x_fe_patch_values.reinit (cell);
+              const FEValues<dim> &fe_patch_values
+                = x_fe_patch_values.get_present_fe_values ();
+
 					       // first fill dof_data
 	      for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
 		{
@@ -286,7 +291,7 @@ void DataOutRotation<dim>::build_some_patches (Data data)
 #if deal_II_dimension == 3
 
 template <>
-void DataOutRotation<3>::build_some_patches (Data)
+void DataOutRotation<3,DoFHandler>::build_some_patches (Data)
 {
 				   // would this function make any
 				   // sense after all? who would want
@@ -299,15 +304,15 @@ void DataOutRotation<3>::build_some_patches (Data)
 
 
 
-template <int dim>
-void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circle,
-					  const unsigned int n_subdivisions,
-					  const unsigned int n_threads_) 
+template <int dim, template <int> class DH>
+void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_circle,
+					     const unsigned int n_subdivisions,
+					     const unsigned int n_threads_) 
 {
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
-  typedef DataOut_DoFData<dim,dim+1> BaseClass;
+  typedef DataOut_DoFData<dim,DH,dim+1> BaseClass;
   Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
   const unsigned int n_threads = (DEAL_II_USE_MT ? n_threads_ : 1);
@@ -335,8 +340,7 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 				   // create patches of and make sure
 				   // there is enough memory for that
   unsigned int n_patches = 0;
-  for (typename DoFHandler<dim>::cell_iterator cell=first_cell();
-       cell != this->dofs->end();
+  for (cell_iterator cell=first_cell(); cell != this->dofs->end();
        cell = next_cell(cell))
     ++n_patches;
 				   // then also take into account that
@@ -376,8 +380,8 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 
   if (DEAL_II_USE_MT)
     {
-      void (DataOutRotation<dim>::*p) (Data)
-        = &DataOutRotation<dim>::build_some_patches;
+      void (DataOutRotation<dim,DH>::*p) (Data)
+        = &DataOutRotation<dim,DH>::build_some_patches;
 
       Threads::ThreadGroup<> threads;
       for (unsigned int l=0;l<n_threads;++l)
@@ -391,26 +395,26 @@ void DataOutRotation<dim>::build_patches (const unsigned int n_patches_per_circl
 
 
 
-template <int dim>
-typename DoFHandler<dim>::cell_iterator
-DataOutRotation<dim>::first_cell () 
+template <int dim, template <int> class DH>
+typename DataOutRotation<dim,DH>::cell_iterator
+DataOutRotation<dim,DH>::first_cell () 
 {
   return this->dofs->begin_active ();
 }
 
 
-template <int dim>
-typename DoFHandler<dim>::cell_iterator
-DataOutRotation<dim>::next_cell (const typename DoFHandler<dim>::cell_iterator &cell) 
+template <int dim, template <int> class DH>
+typename DataOutRotation<dim,DH>::cell_iterator
+DataOutRotation<dim,DH>::next_cell (const cell_iterator &cell) 
 {
 				   // convert the iterator to an
 				   // active_iterator and advance
 				   // this to the next active cell
-  typename DoFHandler<dim>::active_cell_iterator active_cell = cell;
+  typename DH<dim>::active_cell_iterator active_cell = cell;
   ++active_cell;
   return active_cell;
 }
 
 
 // explicit instantiations
-template class DataOutRotation<deal_II_dimension>;
+template class DataOutRotation<deal_II_dimension,DoFHandler>;

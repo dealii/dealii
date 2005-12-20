@@ -132,7 +132,7 @@ DoFHandler<1>::last_active (const unsigned int level) const
 
 
 template <>
-DoFDimensionInfo<1>::raw_face_iterator
+DoFHandler<1>::raw_face_iterator
 DoFHandler<1>::begin_raw_face (const unsigned int) const
 {
   Assert (false, ExcImpossibleInDim(1));
@@ -141,7 +141,7 @@ DoFHandler<1>::begin_raw_face (const unsigned int) const
 
 
 template <>
-DoFDimensionInfo<1>::face_iterator
+DoFHandler<1>::face_iterator
 DoFHandler<1>::begin_face (const unsigned int) const
 {
   Assert (false, ExcImpossibleInDim(1));
@@ -150,7 +150,7 @@ DoFHandler<1>::begin_face (const unsigned int) const
 
 
 template <>
-DoFDimensionInfo<1>::active_face_iterator
+DoFHandler<1>::active_face_iterator
 DoFHandler<1>::begin_active_face (const unsigned int) const
 {
   Assert (false, ExcImpossibleInDim(1));
@@ -159,7 +159,7 @@ DoFHandler<1>::begin_active_face (const unsigned int) const
 
 
 template <>
-DoFDimensionInfo<1>::raw_face_iterator
+DoFHandler<1>::raw_face_iterator
 DoFHandler<1>::end_face () const
 {
   Assert (false, ExcImpossibleInDim(1));
@@ -168,8 +168,8 @@ DoFHandler<1>::end_face () const
 
 
 template <>
-DoFDimensionInfo<1>::raw_face_iterator
-DoFHandler<1>::last_raw_face () const
+DoFHandler<1>::raw_face_iterator
+DoFHandler<1>::last_raw_face () const 
 {
   Assert (false, ExcImpossibleInDim(1));
   return 0;
@@ -177,7 +177,7 @@ DoFHandler<1>::last_raw_face () const
 
 
 template <>
-DoFDimensionInfo<1>::raw_face_iterator
+DoFHandler<1>::raw_face_iterator
 DoFHandler<1>::last_raw_face (const unsigned int) const
 {
   Assert (false, ExcImpossibleInDim(1));
@@ -186,7 +186,7 @@ DoFHandler<1>::last_raw_face (const unsigned int) const
 
 
 template <>
-DoFDimensionInfo<1>::face_iterator
+DoFHandler<1>::face_iterator
 DoFHandler<1>::last_face () const
 {
   Assert (false, ExcImpossibleInDim(1));
@@ -195,7 +195,7 @@ DoFHandler<1>::last_face () const
 
 
 template <>
-DoFDimensionInfo<1>::face_iterator
+DoFHandler<1>::face_iterator
 DoFHandler<1>::last_face (const unsigned int) const
 {
   Assert (false, ExcImpossibleInDim(1));
@@ -204,7 +204,7 @@ DoFHandler<1>::last_face (const unsigned int) const
 
 
 template <>
-DoFDimensionInfo<1>::active_face_iterator
+DoFHandler<1>::active_face_iterator
 DoFHandler<1>::last_active_face () const
 {
   Assert (false, ExcImpossibleInDim(1));
@@ -213,7 +213,7 @@ DoFHandler<1>::last_active_face () const
 
 
 template <>
-DoFDimensionInfo<1>::active_face_iterator
+DoFHandler<1>::active_face_iterator
 DoFHandler<1>::last_active_face (const unsigned int) const
 {
   return 0;
@@ -485,7 +485,7 @@ DoFHandler<2>::last_active (const unsigned int level) const
 
 
 template <>
-DoFDimensionInfo<2>::raw_face_iterator
+DoFHandler<2>::raw_face_iterator
 DoFHandler<2>::begin_raw_face (const unsigned int level) const
 {
   return begin_raw_line (level);
@@ -493,7 +493,7 @@ DoFHandler<2>::begin_raw_face (const unsigned int level) const
 
 
 template <>
-DoFDimensionInfo<2>::face_iterator
+DoFHandler<2>::face_iterator
 DoFHandler<2>::begin_face (const unsigned int level) const
 {
   return begin_line (level);
@@ -501,7 +501,7 @@ DoFHandler<2>::begin_face (const unsigned int level) const
 
 
 template <>
-DoFDimensionInfo<2>::active_face_iterator
+DoFHandler<2>::active_face_iterator
 DoFHandler<2>::begin_active_face (const unsigned int level) const
 {
   return begin_active_line (level);
@@ -509,7 +509,7 @@ DoFHandler<2>::begin_active_face (const unsigned int level) const
 
 
 template <>
-DoFDimensionInfo<2>::raw_face_iterator
+DoFHandler<2>::raw_face_iterator
 DoFHandler<2>::end_face () const
 {
   return end_line ();
@@ -517,7 +517,7 @@ DoFHandler<2>::end_face () const
 
 
 template <>
-DoFDimensionInfo<2>::raw_face_iterator
+DoFHandler<2>::raw_face_iterator
 DoFHandler<2>::last_raw_face () const
 {
   return last_raw_line ();
@@ -525,7 +525,7 @@ DoFHandler<2>::last_raw_face () const
 
 
 template <>
-DoFDimensionInfo<2>::raw_face_iterator
+DoFHandler<2>::raw_face_iterator
 DoFHandler<2>::last_raw_face (const unsigned int level) const
 {
   return last_raw_line (level);
@@ -533,7 +533,7 @@ DoFHandler<2>::last_raw_face (const unsigned int level) const
 
 
 template <>
-DoFDimensionInfo<2>::face_iterator
+DoFHandler<2>::face_iterator
 DoFHandler<2>::last_face () const
 {
   return last_line ();
@@ -541,7 +541,7 @@ DoFHandler<2>::last_face () const
 
 
 template <>
-DoFDimensionInfo<2>::face_iterator
+DoFHandler<2>::face_iterator
 DoFHandler<2>::last_face (const unsigned int level) const
 {
   return last_line (level);
@@ -549,7 +549,7 @@ DoFHandler<2>::last_face (const unsigned int level) const
 
 
 template <>
-DoFDimensionInfo<2>::active_face_iterator
+DoFHandler<2>::active_face_iterator
 DoFHandler<2>::last_active_face () const
 {
   return last_active_line ();
@@ -557,7 +557,7 @@ DoFHandler<2>::last_active_face () const
 
 
 template <>
-DoFDimensionInfo<2>::active_face_iterator
+DoFHandler<2>::active_face_iterator
 DoFHandler<2>::last_active_face (const unsigned int level) const
 {
   return last_active_line (level);
@@ -946,7 +946,7 @@ DoFHandler<dim>::end_hex () const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::raw_cell_iterator
+typename DoFHandler<dim>::raw_cell_iterator
 DoFHandler<dim>::end_raw (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -956,7 +956,7 @@ DoFHandler<dim>::end_raw (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::cell_iterator
+typename DoFHandler<dim>::cell_iterator
 DoFHandler<dim>::end (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -966,7 +966,7 @@ DoFHandler<dim>::end (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::active_cell_iterator
+typename DoFHandler<dim>::active_cell_iterator
 DoFHandler<dim>::end_active (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -976,7 +976,7 @@ DoFHandler<dim>::end_active (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::raw_face_iterator
+typename DoFHandler<dim>::raw_face_iterator
 DoFHandler<dim>::end_raw_face (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -986,7 +986,7 @@ DoFHandler<dim>::end_raw_face (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::face_iterator
+typename DoFHandler<dim>::face_iterator
 DoFHandler<dim>::end_face (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -996,7 +996,7 @@ DoFHandler<dim>::end_face (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::active_face_iterator
+typename DoFHandler<dim>::active_face_iterator
 DoFHandler<dim>::end_active_face (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -1006,7 +1006,7 @@ DoFHandler<dim>::end_active_face (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::raw_line_iterator
+typename DoFHandler<dim>::raw_line_iterator
 DoFHandler<dim>::end_raw_line (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -1016,7 +1016,7 @@ DoFHandler<dim>::end_raw_line (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::line_iterator
+typename DoFHandler<dim>::line_iterator
 DoFHandler<dim>::end_line (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -1026,7 +1026,7 @@ DoFHandler<dim>::end_line (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::active_line_iterator
+typename DoFHandler<dim>::active_line_iterator
 DoFHandler<dim>::end_active_line (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -1036,7 +1036,7 @@ DoFHandler<dim>::end_active_line (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::raw_quad_iterator
+typename DoFHandler<dim>::raw_quad_iterator
 DoFHandler<dim>::end_raw_quad (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -1046,7 +1046,7 @@ DoFHandler<dim>::end_raw_quad (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::quad_iterator
+typename DoFHandler<dim>::quad_iterator
 DoFHandler<dim>::end_quad (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -1056,7 +1056,7 @@ DoFHandler<dim>::end_quad (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::active_quad_iterator
+typename DoFHandler<dim>::active_quad_iterator
 DoFHandler<dim>::end_active_quad (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -1066,7 +1066,7 @@ DoFHandler<dim>::end_active_quad (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::raw_hex_iterator
+typename DoFHandler<dim>::raw_hex_iterator
 DoFHandler<dim>::end_raw_hex (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -1076,7 +1076,7 @@ DoFHandler<dim>::end_raw_hex (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::hex_iterator
+typename DoFHandler<dim>::hex_iterator
 DoFHandler<dim>::end_hex (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -1086,7 +1086,7 @@ DoFHandler<dim>::end_hex (const unsigned int level) const
 
 
 template <int dim>
-typename DoFDimensionInfo<dim>::active_hex_iterator
+typename DoFHandler<dim>::active_hex_iterator
 DoFHandler<dim>::end_active_hex (const unsigned int level) const
 {
   return (level == levels.size()-1 ?
@@ -1406,15 +1406,6 @@ DoFHandler<dim>::n_boundary_dofs (const std::set<unsigned char> &boundary_indica
 }
 
 
-
-template <int dim>
-const Triangulation<dim> & DoFHandler<dim>::get_tria () const
-{
-  return *tria;
-}
-
-
-
 template <int dim>
 unsigned int
 DoFHandler<dim>::memory_consumption () const
@@ -1482,8 +1473,10 @@ void DoFHandler<dim>::clear () {
 #if deal_II_dimension == 1
 
 template <>
-unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
-						     unsigned int          next_free_dof) {
+unsigned int
+DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
+					unsigned int          next_free_dof)
+{
 
 				   // distribute dofs of vertices
   for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
@@ -1536,8 +1529,10 @@ unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
 #if deal_II_dimension == 2
 
 template <>
-unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
-						     unsigned int          next_free_dof) {
+unsigned int
+DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
+					unsigned int          next_free_dof)
+{
   if (selected_fe->dofs_per_vertex > 0)
 				     // number dofs on vertices
     for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
@@ -1582,8 +1577,10 @@ unsigned int DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
 #if deal_II_dimension == 3
 
 template <>
-unsigned int DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
-						     unsigned int          next_free_dof) {
+unsigned int
+DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
+					unsigned int          next_free_dof)
+{
   if (selected_fe->dofs_per_vertex > 0)
 				     // number dofs on vertices
     for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
@@ -1803,7 +1800,8 @@ void DoFHandler<3>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 #if deal_II_dimension == 1
 
 template <>
-unsigned int DoFHandler<1>::max_couplings_between_dofs () const
+unsigned int
+DoFHandler<1>::max_couplings_between_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
   return std::min(3*selected_fe->dofs_per_vertex +
@@ -1813,7 +1811,8 @@ unsigned int DoFHandler<1>::max_couplings_between_dofs () const
 
 
 template <>
-unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const
+unsigned int
+DoFHandler<1>::max_couplings_between_boundary_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
   return selected_fe->dofs_per_vertex;
@@ -1825,7 +1824,8 @@ unsigned int DoFHandler<1>::max_couplings_between_boundary_dofs () const
 #if deal_II_dimension == 2
 
 template <>
-unsigned int DoFHandler<2>::max_couplings_between_dofs () const
+unsigned int
+DoFHandler<2>::max_couplings_between_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
 
@@ -1888,7 +1888,8 @@ unsigned int DoFHandler<2>::max_couplings_between_dofs () const
 
 
 template <>
-unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const
+unsigned int
+DoFHandler<2>::max_couplings_between_boundary_dofs () const
 {
   Assert (selected_fe != 0, ExcNoFESelected());
   return 3*selected_fe->dofs_per_vertex + 2*selected_fe->dofs_per_line;
@@ -1900,7 +1901,8 @@ unsigned int DoFHandler<2>::max_couplings_between_boundary_dofs () const
 #if deal_II_dimension == 3
 
 template <>
-unsigned int DoFHandler<3>::max_couplings_between_dofs () const
+unsigned int
+DoFHandler<3>::max_couplings_between_dofs () const
 {
 //TODO:[?] Invent significantly better estimates than the ones in this function  
   Assert (selected_fe != 0, ExcNoFESelected());
@@ -1933,7 +1935,9 @@ unsigned int DoFHandler<3>::max_couplings_between_dofs () const
 
 
 template <>
-unsigned int DoFHandler<3>::max_couplings_between_boundary_dofs () const {
+unsigned int
+DoFHandler<3>::max_couplings_between_boundary_dofs () const
+{
   Assert (selected_fe != 0, ExcNoFESelected());
 				   // we need to take refinement of
 				   // one boundary face into consideration

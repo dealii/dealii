@@ -101,7 +101,7 @@ template <int dim> class DoFHandler;
  * @ingroup IO
  * @author Wolfgang Bangerth, 1999
  */
-template <int dim>
+template <int dim, template <int> class DH = DoFHandler>
 class DataOutStack : public DataOutInterface<dim+1> 
 {
   public:
@@ -141,7 +141,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * data vectors for the present
 				      * parameter value.
 				      */
-    void attach_dof_handler (const DoFHandler<dim> &dof_handler);
+    void attach_dof_handler (const DH<dim> &dof_handler);
 
 				     /**
 				      * Declare a data vector. The @p vector_type
@@ -370,7 +370,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * corresponding to the present parameter
 				      * value.
 				      */
-    SmartPointer<const DoFHandler<dim> > dof_handler;
+    SmartPointer<const DH<dim> > dof_handler;
 
 				     /**
 				      * List of patches of all past and

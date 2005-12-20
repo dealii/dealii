@@ -78,11 +78,18 @@ template <int dim> class DoFHandler;
  * @ingroup IO
  * @author Wolfgang Bangerth, 2000
  */
-template <int dim>
-class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
+template <int dim, template <int> class DH = DoFHandler>
+class DataOutFaces : public DataOut_DoFData<dim,DH,dim-1,dim>
 {
   public:
-    				     /**
+				     /**
+				      * Typedef to the iterator type
+				      * of the dof handler class under
+				      * consideration.
+				      */
+    typedef typename DataOut_DoFData<dim,DH,dim-1,dim>::cell_iterator cell_iterator;
+
+                                     /**
 				      * This is the central function
 				      * of this class since it builds
 				      * the list of patches to be
@@ -120,7 +127,7 @@ class DataOutFaces : public DataOut_DoFData<dim,dim-1,dim>
 				      * aliased to a name that is
 				      * better to type.
 				      */
-    typedef typename std::pair<typename DoFHandler<dim>::cell_iterator,unsigned int> FaceDescriptor;
+    typedef typename std::pair<cell_iterator,unsigned int> FaceDescriptor;
     
     
 				     /**

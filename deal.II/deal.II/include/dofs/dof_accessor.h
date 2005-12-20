@@ -23,13 +23,14 @@ template <typename number> class SparseMatrix;
 template <typename number> class Vector;
 
 template <int dim> class DoFHandler;
+template <int dim> class hpDoFHandler;
 template <int dim> class FiniteElement;
 
-template <int celldim, int dim> class DoFObjectAccessor;
-template <int dim>              class DoFObjectAccessor<0, dim>;
-template <int dim>              class DoFObjectAccessor<1, dim>;
-template <int dim>              class DoFObjectAccessor<2, dim>;
-template <int dim>              class DoFObjectAccessor<3, dim>;
+template <int celldim, int dim, template <int> class DH> class DoFObjectAccessor;
+template <int dim, template <int> class DH>              class DoFObjectAccessor<0, dim, DH>;
+template <int dim, template <int> class DH>              class DoFObjectAccessor<1, dim, DH>;
+template <int dim, template <int> class DH>              class DoFObjectAccessor<2, dim, DH>;
+template <int dim, template <int> class DH>              class DoFObjectAccessor<3, dim, DH>;
 
 template <int dim, typename Accessor> class TriaRawIterator;
 
@@ -67,7 +68,7 @@ template <int dim, typename Accessor> class TriaRawIterator;
  * @ingroup Accessors 
  * @author Wolfgang Bangerth, 1998
  */
-template <int dim>
+template <int dim, template <int> class DH>
 class DoFAccessor
 {
   public:
@@ -86,35 +87,27 @@ class DoFAccessor
 				      * non-const, even if they preserve
 				      * constness.
 				      */
-    DoFAccessor (const DoFHandler<dim> *dof_handler);
+    DoFAccessor (const DH<dim> *dof_handler);
 
 				     /**
 				      * Reset the DoF handler pointer.
 				      */
-    void set_dof_handler (DoFHandler<dim> *dh);
+    void set_dof_handler (DH<dim> *dh);
 
 				     /**
 				      * Return a handle on the
 				      * DoFHandler object which we
 				      * are using.
 				      */
-    const DoFHandler<dim> &
+    const DH<dim> &
     get_dof_handler () const;
 
-                                     /**
-                                      * Return the finite element that
-                                      * is used on the cell pointed to
-                                      * by this iterator.
-                                      */
-    const FiniteElement<dim> &
-    get_fe () const;
-    
 				     /**
 				      * Copy operator.
 				      */
-    DoFAccessor<dim> &
-    operator = (const DoFAccessor<dim> &da);
-    
+    DoFAccessor<dim, DH> &
+    operator = (const DoFAccessor<dim, DH> &da);
+
 				     /**
 				      * Exception for child classes
 				      *
@@ -170,7 +163,7 @@ class DoFAccessor
 				      * Store the address of the DoFHandler object
 				      * to be accessed.
 				      */
-    DoFHandler<dim> *dof_handler;
+    DH<dim> *dof_handler;  
 };
 
 
@@ -275,22 +268,23 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * @ingroup dofs 
  * @ingroup Accessors 
  */
-template<int celldim, int dim>
-class DoFObjectAccessor : public DoFAccessor<dim>,
+template<int celldim, int dim, template <int> class DH>
+class DoFObjectAccessor : public DoFAccessor<dim, DH>,
 			  public TriaObjectAccessor<celldim,dim>
 {
   public:
 				     /**
 				      * Data type  passed by the iterator class.
 				      */
-    typedef DoFHandler<dim> AccessorData;
+    typedef DH<dim> AccessorData;
 
 				     /**
 				      * Declare base class as a local typedef
 				      * for simpler access.
 				      */
     typedef TriaObjectAccessor<celldim,dim> BaseClass;
-    
+
+
 				     /**
 				      * Default constructor. Unused, thus
 				      * not implemented.
@@ -414,19 +408,47 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
     template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
 			 OutputVector         &values) const;
+                         
+
+                                     /**
+                                      * Return the finite element that
+                                      * is used on the cell pointed to
+                                      * by this iterator. For non-hp
+                                      * DoF handlers, this is of
+                                      * course always the same
+                                      * element, independent of the
+                                      * cell we are presently on, but
+                                      * for hp DoF handlers, this may
+                                      * change from cell to cell.
+                                      */
+    const FiniteElement<dim> &
+    get_fe () const;
+    
+                                     /**
+				      *  Returns the index inside the FECollection
+				      *  of the FiniteElement used for this cell.
+				      */
+    unsigned int active_fe_index () const;
+
+                                     /**
+				      *  Sets the index of the FiniteElement used for
+				      *  this cell.
+				      */
+    void set_active_fe_index (const unsigned int i);
+
 
     				     /**
 				      *  Pointer to the <i>i</i>th line
 				      *  bounding this Object.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<1, dim> >
+    TriaIterator<dim,DoFObjectAccessor<1, dim, DH> >
     line (const unsigned int i) const;
 
     				     /**
 				      *  Pointer to the <i>i</i>th quad
 				      *  bounding this Object.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<2, dim> >
+    TriaIterator<dim,DoFObjectAccessor<2, dim, DH> >
     quad (const unsigned int i) const;
     
 				     /**
@@ -436,7 +458,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * class returns a hex accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<celldim, dim> > child (const unsigned int) const;
+    TriaIterator<dim,DoFObjectAccessor<celldim, dim, DH> > child (const unsigned int) const;
 
 				     /**
 				      * Distribute a local (cell
@@ -477,7 +499,7 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
-    void copy_from (const DoFObjectAccessor<celldim, dim> &a);
+    void copy_from (const DoFObjectAccessor<celldim, dim, DH> &a);
 
   protected:    
 				     /**
@@ -504,9 +526,9 @@ class DoFObjectAccessor : public DoFAccessor<dim>,
  * Closure class.
  * @ingroup dofs
  */
-template<int dim>
-class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
-				  public DoFObjectAccessor_Inheritance<0,dim>::BaseClass
+template<int dim, template <int> class DH>
+class DoFObjectAccessor<0, dim, DH> : public DoFAccessor<dim, DH>,
+				      public DoFObjectAccessor_Inheritance<0,dim>::BaseClass
 {
   public:
     typedef void AccessorData;
@@ -555,9 +577,9 @@ class DoFObjectAccessor<0, dim> : public DoFAccessor<dim>,
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
-template <int dim>
-class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
-				   public DoFObjectAccessor_Inheritance<1,dim>::BaseClass
+template <int dim, template <int> class DH>
+class DoFObjectAccessor<1, dim, DH> :  public DoFAccessor<dim, DH>,
+				       public DoFObjectAccessor_Inheritance<1,dim>::BaseClass
 {
   public:
 				     /**
@@ -565,7 +587,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef DoFHandler<dim> AccessorData;
+    typedef DH<dim> AccessorData;
 
 				     /**
 				      * Declare base class as a local typedef
@@ -693,6 +715,33 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
     void set_dof_values (const Vector<number> &local_values,
 			 OutputVector         &values) const;
 
+
+                                     /**
+                                      * Return the finite element that
+                                      * is used on the cell pointed to
+                                      * by this iterator. For non-hp
+                                      * DoF handlers, this is of
+                                      * course always the same
+                                      * element, independent of the
+                                      * cell we are presently on, but
+                                      * for hp DoF handlers, this may
+                                      * change from cell to cell.
+                                      */
+    const FiniteElement<dim> &
+    get_fe () const;
+    
+                                     /**
+				      *  Returns the index inside the FECollection
+				      *  of the FiniteElement used for this cell.
+				      */
+    unsigned int active_fe_index () const;
+
+                                     /**
+				      *  Sets the index of the FiniteElement used for
+				      *  this cell.
+				      */
+    void set_active_fe_index (const unsigned int i);
+
 				     /**
 				      * Return the @p ith child as a DoF line
 				      * iterator. This function is needed since
@@ -700,7 +749,7 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * class returns a line accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<1,dim> > child (const unsigned int) const;
+    TriaIterator<dim,DoFObjectAccessor<1,dim,DH> > child (const unsigned int) const;
 
 				     /**
 				      * Distribute a local (cell based) vector
@@ -739,18 +788,18 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
-    void copy_from (const DoFObjectAccessor<1,dim> &a);
+    void copy_from (const DoFObjectAccessor<1,dim,DH> &a);
 
   protected:    
 				     /**
 				      *  Compare for equality.            
 				      */
-    bool operator == (const DoFObjectAccessor<1,dim> &) const;
+    bool operator == (const DoFObjectAccessor<1,dim,DH> &) const;
 	
 				     /**
 				      * Compare for inequality.
 				      */
-    bool operator != (const DoFObjectAccessor<1,dim> &) const;
+    bool operator != (const DoFObjectAccessor<1,dim,DH> &) const;
 
 
                                      /**
@@ -767,9 +816,9 @@ class DoFObjectAccessor<1, dim> :  public DoFAccessor<dim>,
  *
  * @ingroup dofs
  */
-template <int dim>
-class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
-				   public DoFObjectAccessor_Inheritance<2,dim>::BaseClass
+template <int dim, template <int> class DH>
+class DoFObjectAccessor<2, dim, DH> :  public DoFAccessor<dim, DH>,
+				       public DoFObjectAccessor_Inheritance<2,dim>::BaseClass
 {
   public:
 				     /**
@@ -777,7 +826,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef DoFHandler<dim> AccessorData;
+    typedef DH<dim> AccessorData;
 
 				     /**
 				      * Declare base class as a local typedef
@@ -906,11 +955,38 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
     void set_dof_values (const Vector<number> &local_values,
 			 OutputVector         &values) const;
 
+
+                                     /**
+                                      * Return the finite element that
+                                      * is used on the cell pointed to
+                                      * by this iterator. For non-hp
+                                      * DoF handlers, this is of
+                                      * course always the same
+                                      * element, independent of the
+                                      * cell we are presently on, but
+                                      * for hp DoF handlers, this may
+                                      * change from cell to cell.
+                                      */
+    const FiniteElement<dim> &
+    get_fe () const;
+    
+                                     /**
+				      *  Returns the index inside the FECollection
+				      *  of the FiniteElement used for this cell.
+				      */
+    unsigned int active_fe_index () const;
+
+                                     /**
+				      *  Sets the index of the FiniteElement used for
+				      *  this cell.
+				      */
+    void set_active_fe_index (const unsigned int i);
+
     				     /**
 				      *  Return a pointer to the @p ith line
 				      *  bounding this @p Quad.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<1, dim> >
+    TriaIterator<dim,DoFObjectAccessor<1, dim, DH> >
     line (const unsigned int i) const;
     
 				     /**
@@ -920,7 +996,7 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * class returns a quad accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<2, dim> >
+    TriaIterator<dim,DoFObjectAccessor<2, dim, DH> >
     child (const unsigned int) const;
 
 				     /**
@@ -960,18 +1036,18 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
-    void copy_from (const DoFObjectAccessor<2, dim> &a);
+    void copy_from (const DoFObjectAccessor<2, dim, DH> &a);
 
   protected:    
 				     /**
 				      *  Compare for equality.            
 				      */
-    bool operator == (const DoFObjectAccessor<2,dim> &) const;
+    bool operator == (const DoFObjectAccessor<2,dim,DH> &) const;
 	
 				     /**
 				      * Compare for inequality.
 				      */
-    bool operator != (const DoFObjectAccessor<2,dim> &) const;
+    bool operator != (const DoFObjectAccessor<2,dim,DH> &) const;
 
 
                                      /**
@@ -988,9 +1064,9 @@ class DoFObjectAccessor<2, dim> :  public DoFAccessor<dim>,
  *
  * @ingroup dofs
  */
-template <int dim>
-class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
-				   public DoFObjectAccessor_Inheritance<3,dim>::BaseClass
+template <int dim, template <int> class DH>
+class DoFObjectAccessor<3, dim, DH> :  public DoFAccessor<dim, DH>,
+				       public DoFObjectAccessor_Inheritance<3,dim>::BaseClass
 {
   public:
 				     /**
@@ -998,7 +1074,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * class expects to get passed from the
 				      * iterator classes.
 				      */
-    typedef DoFHandler<dim> AccessorData;
+    typedef DH<dim> AccessorData;
 
 				     /**
 				      * Declare base class as a local typedef
@@ -1127,18 +1203,45 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
     void set_dof_values (const Vector<number> &local_values,
 			 OutputVector         &values) const;
 
+
+                                     /**
+                                      * Return the finite element that
+                                      * is used on the cell pointed to
+                                      * by this iterator. For non-hp
+                                      * DoF handlers, this is of
+                                      * course always the same
+                                      * element, independent of the
+                                      * cell we are presently on, but
+                                      * for hp DoF handlers, this may
+                                      * change from cell to cell.
+                                      */
+    const FiniteElement<dim> &
+    get_fe () const;
+
+                                     /**
+				      *  Returns the index inside the FECollection
+				      *  of the FiniteElement used for this cell.
+				      */
+    unsigned int active_fe_index () const;
+
+                                     /**
+				      *  Sets the index of the FiniteElement used for
+				      *  this cell.
+				      */
+    void set_active_fe_index (const unsigned int i);
+
     				     /**
 				      *  Return a pointer to the @p ith line
 				      *  bounding this @p Hex.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<1, dim> >
+    TriaIterator<dim,DoFObjectAccessor<1, dim, DH> >
     line (const unsigned int i) const;
 
     				     /**
 				      *  Return a pointer to the @p ith quad
 				      *  bounding this @p Hex.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<2, dim> >
+    TriaIterator<dim,DoFObjectAccessor<2, dim, DH> >
     quad (const unsigned int i) const;
     
 				     /**
@@ -1148,7 +1251,7 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * class returns a hex accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<3, dim> > child (const unsigned int) const;
+    TriaIterator<dim,DoFObjectAccessor<3, dim, DH> > child (const unsigned int) const;
 
 				     /**
 				      * Distribute a local (cell
@@ -1189,18 +1292,18 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
-    void copy_from (const DoFObjectAccessor<3, dim> &a);
+    void copy_from (const DoFObjectAccessor<3, dim, DH> &a);
 
   protected:    
 				     /**
 				      *  Compare for equality.            
 				      */
-    bool operator == (const DoFObjectAccessor<3,dim> &) const;
+    bool operator == (const DoFObjectAccessor<3,dim,DH> &) const;
 	
 				     /**
 				      * Compare for inequality.
 				      */
-    bool operator != (const DoFObjectAccessor<3,dim> &) const;
+    bool operator != (const DoFObjectAccessor<3,dim,DH> &) const;
 
 
                                      /**
@@ -1232,8 +1335,8 @@ class DoFObjectAccessor<3, dim> :  public DoFAccessor<dim>,
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
-template <int dim>
-class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
+template <int dim, template <int> class DH>
+class DoFCellAccessor :  public DoFObjectAccessor<dim, dim, DH>
 {
   public:
 				     /**
@@ -1242,7 +1345,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * get passed from the iterator
 				      * classes.
 				      */
-    typedef typename DoFObjectAccessor<dim, dim>::AccessorData AccessorData;
+    typedef typename DoFObjectAccessor<dim, dim, DH>::AccessorData AccessorData;
     
     				     /**
 				      * Constructor
@@ -1261,7 +1364,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * without access to the DoF
 				      * data.
 				      */
-    TriaIterator<dim,DoFCellAccessor<dim> >
+    TriaIterator<dim,DoFCellAccessor<dim, DH> >
     neighbor (const unsigned int) const;
 
     				     /**
@@ -1273,20 +1376,21 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * without access to the DoF
 				      * data.
 				      */
-    TriaIterator<dim,DoFCellAccessor<dim> >
+    TriaIterator<dim,DoFCellAccessor<dim, DH> >
     child (const unsigned int) const;
 
     				     /**
 				      * Return an iterator to the @p ith face
 				      * of this cell.
 				      *
-				      * This function is not implemented in 1D,
-				      * and maps to DoFObjectAccessor<2, dim>::line in 2D.
+				      * This function is not implemented in
+				      * 1D, and maps to DoFObjectAccessor<2,
+				      * dim>::line in 2D.
 				      */
-    TriaIterator<dim, DoFObjectAccessor<dim-1, dim> >
+    TriaIterator<dim, DoFObjectAccessor<dim-1, dim, DH> >
     face (const unsigned int i) const;
 
-				     /**
+                                     /**
 				      * Return the result of the
 				      * @p neighbor_child_on_subface
 				      * function of the base class,
@@ -1297,7 +1401,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * access to the triangulation
 				      * data).
 				      */
-    TriaIterator<dim,DoFCellAccessor<dim> >
+    TriaIterator<dim,DoFCellAccessor<dim,DH> >
     neighbor_child_on_subface (const unsigned int face_no,
                                const unsigned int subface_no) const;
 
@@ -1334,7 +1438,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 				      * child alone, i.e.  it should
 				      * be possible to compute the
 				      * restriction by writing values
-				      * obtained from each child
+			              * obtained from each child
 				      * directly into the output
 				      * vector, without, for example,
 				      * computing an average over all
@@ -1463,9 +1567,72 @@ class DoFCellAccessor :  public DoFObjectAccessor<dim, dim>
 
 /* -------------- declaration of explicit specializations ------------- */
 
-template <> TriaIterator<1, DoFObjectAccessor<0,1> > DoFCellAccessor<1>::face (const unsigned int) const;
-template <> TriaIterator<2, DoFObjectAccessor<1,2> > DoFCellAccessor<2>::face (const unsigned int i) const;
-template <> TriaIterator<3, DoFObjectAccessor<2,3> > DoFCellAccessor<3>::face (const unsigned int i) const;
+template <>
+TriaIterator<1, DoFObjectAccessor<0,1, DoFHandler> >
+DoFCellAccessor<1, DoFHandler>::face (const unsigned int) const;
+template <>
+TriaIterator<2, DoFObjectAccessor<1,2, DoFHandler> >
+DoFCellAccessor<2, DoFHandler>::face (const unsigned int i) const;
+template <>
+TriaIterator<3, DoFObjectAccessor<2,3, DoFHandler> >
+DoFCellAccessor<3, DoFHandler>::face (const unsigned int i) const;
+
+template <>
+const FiniteElement<1> &
+DoFObjectAccessor<1,1,hpDoFHandler>::get_fe () const;
+template <>
+const FiniteElement<2> &
+DoFObjectAccessor<1,2,hpDoFHandler>::get_fe () const;
+template <>
+const FiniteElement<3> &
+DoFObjectAccessor<1,3,hpDoFHandler>::get_fe () const;
+template <>
+const FiniteElement<2> &
+DoFObjectAccessor<2,2,hpDoFHandler>::get_fe () const;
+template <>
+const FiniteElement<3> &
+DoFObjectAccessor<2,3,hpDoFHandler>::get_fe () const;
+template <>
+const FiniteElement<3> &
+DoFObjectAccessor<3,3,hpDoFHandler>::get_fe () const;
+
+template <>
+unsigned int
+DoFObjectAccessor<1,1,hpDoFHandler>::active_fe_index () const;
+template <>
+unsigned int
+DoFObjectAccessor<1,2,hpDoFHandler>::active_fe_index () const;
+template <>
+unsigned int
+DoFObjectAccessor<1,3,hpDoFHandler>::active_fe_index () const;
+template <>
+unsigned int
+DoFObjectAccessor<2,2,hpDoFHandler>::active_fe_index () const;
+template <>
+unsigned int
+DoFObjectAccessor<2,3,hpDoFHandler>::active_fe_index () const;
+template <>
+unsigned int
+DoFObjectAccessor<3,3,hpDoFHandler>::active_fe_index () const;
+
+template <>
+void
+DoFObjectAccessor<1,1,hpDoFHandler>::set_active_fe_index (const unsigned int i);
+template <>
+void
+DoFObjectAccessor<1,2,hpDoFHandler>::set_active_fe_index (const unsigned int i);
+template <>
+void
+DoFObjectAccessor<1,3,hpDoFHandler>::set_active_fe_index (const unsigned int i);
+template <>
+void
+DoFObjectAccessor<2,2,hpDoFHandler>::set_active_fe_index (const unsigned int i);
+template <>
+void
+DoFObjectAccessor<2,3,hpDoFHandler>::set_active_fe_index (const unsigned int i);
+template <>
+void
+DoFObjectAccessor<3,3,hpDoFHandler>::set_active_fe_index (const unsigned int i);
 
 
 // include more templates

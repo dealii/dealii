@@ -31,6 +31,7 @@ template <typename number> class Vector;
 template <typename number> class FullMatrix;
 template <int dim> class Mapping;
 template <int dim> class DoFHandler;
+template <int dim> class hpDoFHandler;
 class ConstraintMatrix;
 
 
@@ -667,23 +668,40 @@ class VectorTools
 				      * See the general doc for more
 				      * information.
 				      */
-    template <int dim>
-    static void interpolate_boundary_values (const Mapping<dim>            &mapping,
-					     const DoFHandler<dim>         &dof,
-					     const typename FunctionMap<dim>::type &function_map,
-					     std::map<unsigned int,double> &boundary_values,
-					     const std::vector<bool>       &component_mask = std::vector<bool>());
+    template <int dim, template <int> class DH>
+    static
+    void
+    interpolate_boundary_values (const Mapping<dim>            &mapping,
+                                 const DH<dim>                 &dof,
+                                 const typename FunctionMap<dim>::type &function_map,
+                                 std::map<unsigned int,double> &boundary_values,
+                                 const std::vector<bool>       &component_mask = std::vector<bool>());
 
 				     /**
 				      * Declaration of specialization
 				      * of the previous function for
-				      * 1d.
+				      * 1d and a DoFHandler.
 				      */
-    static void interpolate_boundary_values (const Mapping<1>              &mapping,
-					     const DoFHandler<1>           &dof,
-					     const FunctionMap<1>::type    &function_map,
-					     std::map<unsigned int,double> &boundary_values,
-					     const std::vector<bool>       &component_mask = std::vector<bool>());
+    static
+    void
+    interpolate_boundary_values (const Mapping<1>              &mapping,
+                                 const DoFHandler<1>           &dof,
+                                 const FunctionMap<1>::type    &function_map,
+                                 std::map<unsigned int,double> &boundary_values,
+                                 const std::vector<bool>       &component_mask = std::vector<bool>());
+
+				     /**
+				      * Declaration of specialization
+				      * of the previous function for
+				      * 1d and a hpDoFHandler().
+				      */
+    static
+    void
+    interpolate_boundary_values (const Mapping<1>              &mapping,
+                                 const hpDoFHandler<1>         &dof,
+                                 const FunctionMap<1>::type    &function_map,
+                                 std::map<unsigned int,double> &boundary_values,
+                                 const std::vector<bool>       &component_mask = std::vector<bool>());
 
 				     /**
 				      * Same function as above, but
@@ -697,52 +715,63 @@ class VectorTools
 				      * This function is there mainly
 				      * for backward compatibility.
 				      */
-    template <int dim>
-    static void interpolate_boundary_values (const Mapping<dim>            &mapping,
-					     const DoFHandler<dim>         &dof,
-					     const unsigned char            boundary_component,
-					     const Function<dim>           &boundary_function,
-					     std::map<unsigned int,double> &boundary_values,
-					     const std::vector<bool>       &component_mask = std::vector<bool>());
+    template <int dim, template <int> class DH>
+    static
+    void
+    interpolate_boundary_values (const Mapping<dim>            &mapping,
+                                 const DH<dim>                 &dof,
+                                 const unsigned char            boundary_component,
+                                 const Function<dim>           &boundary_function,
+                                 std::map<unsigned int,double> &boundary_values,
+                                 const std::vector<bool>       &component_mask = std::vector<bool>());
 
 				     /**
 				      * Declaration of specialization
 				      * of the previous function for
 				      * 1d.
 				      */
-    static void interpolate_boundary_values (const Mapping<1>              &mapping,
-					     const DoFHandler<1>           &dof,
-					     const unsigned char            boundary_component,
-					     const Function<1>             &boundary_function,
-					     std::map<unsigned int,double> &boundary_values,
-					     const std::vector<bool>       &component_mask = std::vector<bool>());
+    template <template <int> class DH>
+    static
+    void
+    interpolate_boundary_values (const Mapping<1>              &mapping,
+                                 const DH<1>                   &dof,
+                                 const unsigned char            boundary_component,
+                                 const Function<1>             &boundary_function,
+                                 std::map<unsigned int,double> &boundary_values,
+                                 const std::vector<bool>       &component_mask = std::vector<bool>());
 
+    
 				     /**
 				      * Calls the other
 				      * @p interpolate_boundary_values
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
-    template <int dim>
-    static void interpolate_boundary_values (const DoFHandler<dim>         &dof,
-					     const unsigned char            boundary_component,
-					     const Function<dim>           &boundary_function,
-					     std::map<unsigned int,double> &boundary_values,
-					     const std::vector<bool>       &component_mask = std::vector<bool>());
+    template <int dim, template <int> class DH>
+    static
+    void
+    interpolate_boundary_values (const DH<dim>                 &dof,
+                                 const unsigned char            boundary_component,
+                                 const Function<dim>           &boundary_function,
+                                 std::map<unsigned int,double> &boundary_values,
+                                 const std::vector<bool>       &component_mask = std::vector<bool>());
 
+    
 				     /**
 				      * Calls the other
 				      * @p interpolate_boundary_values
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
-    template <int dim>
-    static void interpolate_boundary_values (const DoFHandler<dim>         &dof,
-					     const typename FunctionMap<dim>::type &function_map,
-					     std::map<unsigned int,double> &boundary_values,
-					     const std::vector<bool>       &component_mask = std::vector<bool>());
-
-
+    template <int dim, template <int> class DH>
+    static
+    void
+    interpolate_boundary_values (const DH<dim>                 &dof,
+                                 const typename FunctionMap<dim>::type &function_map,
+                                 std::map<unsigned int,double> &boundary_values,
+                                 const std::vector<bool>       &component_mask = std::vector<bool>());
+    
+    
 				     /**
 				      * Project @p function to the boundary
 				      * of the domain, using the given quadrature

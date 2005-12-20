@@ -22,6 +22,8 @@
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/hp_fe_values.h>
+#include <fe/select_fe_values.h>
 #include <fe/mapping_q1.h>
 
 #ifdef HAVE_STD_STRINGSTREAM
@@ -30,10 +32,9 @@
 #  include <strstream>
 #endif
 
-
-template <int dim>
+template <int dim, template <int> class DH>
 unsigned int
-DataOutStack<dim>::DataVector::memory_consumption () const
+DataOutStack<dim,DH>::DataVector::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (data) +
 	  MemoryConsumption::memory_consumption (names));
@@ -41,14 +42,14 @@ DataOutStack<dim>::DataVector::memory_consumption () const
 
 
 
-template <int dim>
-DataOutStack<dim>::~DataOutStack ()
+template <int dim, template <int> class DH>
+DataOutStack<dim,DH>::~DataOutStack ()
 {}
 
 
-template <int dim>
-void DataOutStack<dim>::new_parameter_value (const double p,
-					     const double dp)
+template <int dim, template <int> class DH>
+void DataOutStack<dim,DH>::new_parameter_value (const double p,
+						const double dp)
 {
   parameter      = p;
   parameter_step = dp;
@@ -70,16 +71,16 @@ void DataOutStack<dim>::new_parameter_value (const double p,
 }
 
 
-template <int dim>
-void DataOutStack<dim>::attach_dof_handler (const DoFHandler<dim> &dof) 
+template <int dim, template <int> class DH>
+void DataOutStack<dim,DH>::attach_dof_handler (const DH<dim> &dof) 
 {
   dof_handler = &dof;
 }
 
 
-template <int dim>
-void DataOutStack<dim>::declare_data_vector (const std::string &name,
-					     const VectorType   vector_type)
+template <int dim, template <int> class DH>
+void DataOutStack<dim,DH>::declare_data_vector (const std::string &name,
+						const VectorType   vector_type)
 {
   std::vector<std::string> names;
   names.push_back (name);
@@ -87,9 +88,9 @@ void DataOutStack<dim>::declare_data_vector (const std::string &name,
 }
 
 
-template <int dim>
-void DataOutStack<dim>::declare_data_vector (const std::vector<std::string> &names,
-					     const VectorType    vector_type)
+template <int dim, template <int> class DH>
+void DataOutStack<dim,DH>::declare_data_vector (const std::vector<std::string> &names,
+						const VectorType    vector_type)
 {
 				   // make sure this function is
 				   // not called after some parameter
@@ -127,10 +128,10 @@ void DataOutStack<dim>::declare_data_vector (const std::vector<std::string> &nam
 }
 
 
-template <int dim>
+template <int dim, template <int> class DH>
 template <typename number>
-void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
-					 const std::string    &name)
+void DataOutStack<dim,DH>::add_data_vector (const Vector<number> &vec,
+					    const std::string    &name)
 {
   const unsigned int n_components = dof_handler->get_fe().n_components ();
 
@@ -167,10 +168,10 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
 }
 
 
-template <int dim>
+template <int dim, template <int> class DH>
 template <typename number>
-void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
-					 const std::vector<std::string> &names)
+void DataOutStack<dim,DH>::add_data_vector (const Vector<number> &vec,
+					    const std::vector<std::string> &names)
 {
   Assert (dof_handler != 0, ExcNoDoFHandlerSelected ());
 				   // either cell data and one name,
@@ -234,8 +235,8 @@ void DataOutStack<dim>::add_data_vector (const Vector<number> &vec,
 }
 
 
-template <int dim>
-void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions) 
+template <int dim, template <int> class DH>
+void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions) 
 {
 				   // this is mostly copied from the
 				   // DataOut class
@@ -251,7 +252,7 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 				   // create patches of and make sure
 				   // there is enough memory for that
   unsigned int n_patches = 0;
-  for (typename DoFHandler<dim>::active_cell_iterator
+  for (typename DH<dim>::active_cell_iterator
 	 cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell)
     ++n_patches;
@@ -272,8 +273,9 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 				   // we don't support anything else
 				   // as well
   static const MappingQ1<dim> mapping;
-  FEValues<dim>  fe_patch_values (mapping, dof_handler->get_fe(),
-				  patch_points, update_values);
+  typename SelectFEValues<DH<dim> >::FEValues
+    x_fe_patch_values (mapping, dof_handler->get_fe(),
+                       patch_points, update_values);
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   std::vector<double>          patch_values (n_q_points);
   std::vector<Vector<double> > patch_values_system (n_q_points,
@@ -294,7 +296,7 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
   typename std::vector< ::DataOutBase::Patch<dim+1,dim+1> >::iterator
     patch = patches.begin() + (patches.size()-n_patches);
   unsigned int cell_number = 0;
-  for (typename DoFHandler<dim>::active_cell_iterator cell=dof_handler->begin_active();
+  for (typename DH<dim>::active_cell_iterator cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell, ++patch, ++cell_number)
     {
       Assert (patch != patches.end(), ExcInternalError());
@@ -396,7 +398,9 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 				       // in succession
       if (n_datasets > 0)
 	{
-	  fe_patch_values.reinit (cell);
+	  x_fe_patch_values.reinit (cell);
+          const FEValues<dim> &fe_patch_values
+            = x_fe_patch_values.get_present_fe_values ();
 	  
 					   // first fill dof_data
 	  for (unsigned int dataset=0; dataset<dof_data.size(); ++dataset)
@@ -437,8 +441,8 @@ void DataOutStack<dim>::build_patches (const unsigned int n_subdivisions)
 }
 
 
-template <int dim>
-void DataOutStack<dim>::finish_parameter_value ()
+template <int dim, template <int> class DH>
+void DataOutStack<dim,DH>::finish_parameter_value ()
 {
 				   // release lock on dof handler
   dof_handler = 0;
@@ -453,9 +457,9 @@ void DataOutStack<dim>::finish_parameter_value ()
 
 
 
-template <int dim>
+template <int dim, template <int> class DH>
 unsigned int
-DataOutStack<dim>::memory_consumption () const
+DataOutStack<dim,DH>::memory_consumption () const
 {
   return (DataOutInterface<dim+1>::memory_consumption () +
 	  MemoryConsumption::memory_consumption (parameter) +
@@ -468,17 +472,17 @@ DataOutStack<dim>::memory_consumption () const
 
 
 
-template <int dim>
+template <int dim, template <int> class DH>
 const std::vector< ::DataOutBase::Patch<dim+1,dim+1> > &
-DataOutStack<dim>::get_patches () const
+DataOutStack<dim,DH>::get_patches () const
 {
   return patches;
 }
 
 
 
-template <int dim>
-std::vector<std::string> DataOutStack<dim>::get_dataset_names () const
+template <int dim, template <int> class DH>
+std::vector<std::string> DataOutStack<dim,DH>::get_dataset_names () const
 {
   std::vector<std::string> names;
   for (typename std::vector<DataVector>::const_iterator dataset=dof_data.begin();
@@ -493,17 +497,21 @@ std::vector<std::string> DataOutStack<dim>::get_dataset_names () const
 
 
 // explicit instantiations
-template class DataOutStack<deal_II_dimension>;
+template class DataOutStack<deal_II_dimension,DoFHandler>;
 
-template void DataOutStack<deal_II_dimension>::
+template void DataOutStack<deal_II_dimension,DoFHandler>::
 add_data_vector<double> (const Vector<double> &vec,
 			 const std::string    &name);
 
-template void DataOutStack<deal_II_dimension>::
-add_data_vector<double> (const Vector<double> &vec,
-			 const std::vector<std::string> &names);
+template void DataOutStack<deal_II_dimension,DoFHandler>::
+add_data_vector<float> (const Vector<float>  &vec,
+			const std::string    &name);
 
-template void DataOutStack<deal_II_dimension>::
+template class DataOutStack<deal_II_dimension,hpDoFHandler>;
+template void DataOutStack<deal_II_dimension,hpDoFHandler>::
+add_data_vector<double> (const Vector<double> &vec,
+			 const std::string    &name);
+template void DataOutStack<deal_II_dimension,hpDoFHandler>::
 add_data_vector<float> (const Vector<float>  &vec,
 			const std::string    &name);
 

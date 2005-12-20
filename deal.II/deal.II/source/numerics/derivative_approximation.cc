@@ -24,6 +24,8 @@
 #include <dofs/dof_handler.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/hp_fe_values.h>
+#include <fe/select_fe_values.h>
 #include <fe/mapping_q1.h>
 #include <numerics/derivative_approximation.h>
 
@@ -304,11 +306,11 @@ C DEFINE A TEST MATRIX
   double EE[3] = { 0, 0, 0 };
 				   // the eigenvalues are away from
 				   // @p{am} in the order of R. thus,
-				   // if R<<AM, then we have
+				   // if R<<AM, then we have the
 				   // degenerate case with three
 				   // identical eigenvalues. check
 				   // this first
-  if (R < 1e-14*std::fabs(am))
+  if (R <= 1e-14*std::fabs(am))
     EE[0] = EE[1] = EE[2] = am;
   else
     {
@@ -386,27 +388,27 @@ DerivativeApproximation::SecondDerivative<dim>::symmetrize (Derivative &d)
 
 
 
-template <int dim, class InputVector>
+template <int dim, template <int> class DH, class InputVector>
 void 
 DerivativeApproximation::
 approximate_gradient (const Mapping<dim>    &mapping,
-		      const DoFHandler<dim> &dof_handler,
+		      const DH<dim>         &dof_handler,
 		      const InputVector     &solution,
 		      Vector<float>         &derivative_norm,
 		      const unsigned int     component)
 {
   approximate_derivative<Gradient<dim>,dim> (mapping,
-					     dof_handler,
-					     solution,
-					     component,
-					     derivative_norm);
+                                             dof_handler,
+                                             solution,
+                                             component,
+                                             derivative_norm);
 }
 
 
-template <int dim, class InputVector>
+template <int dim, template <int> class DH, class InputVector>
 void 
 DerivativeApproximation::
-approximate_gradient (const DoFHandler<dim> &dof_handler,
+approximate_gradient (const DH<dim>         &dof_handler,
 		      const InputVector     &solution,
 		      Vector<float>         &derivative_norm,
 		      const unsigned int     component)
@@ -414,18 +416,18 @@ approximate_gradient (const DoFHandler<dim> &dof_handler,
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   approximate_derivative<Gradient<dim>,dim> (mapping,
-					     dof_handler,
-					     solution,
-					     component,
-					     derivative_norm);
+                                             dof_handler,
+                                             solution,
+                                             component,
+                                             derivative_norm);
 }
 
 
-template <int dim, class InputVector>
+template <int dim, template <int> class DH, class InputVector>
 void 
 DerivativeApproximation::
 approximate_second_derivative (const Mapping<dim>    &mapping,
-			       const DoFHandler<dim> &dof_handler,
+			       const DH<dim>         &dof_handler,
 			       const InputVector     &solution,
 			       Vector<float>         &derivative_norm,
 			       const unsigned int     component)
@@ -438,10 +440,10 @@ approximate_second_derivative (const Mapping<dim>    &mapping,
 }
 
 
-template <int dim, class InputVector>
+template <int dim, template <int> class DH, class InputVector>
 void 
 DerivativeApproximation::
-approximate_second_derivative (const DoFHandler<dim> &dof_handler,
+approximate_second_derivative (const DH<dim>         &dof_handler,
 			       const InputVector     &solution,
 			       Vector<float>         &derivative_norm,
 			       const unsigned int     component)
@@ -456,11 +458,36 @@ approximate_second_derivative (const DoFHandler<dim> &dof_handler,
 }
 
 
-template <class DerivativeDescription, int dim, class InputVector>
+namespace WorkAround
+{
+// gcc 2.95 is not happy if we take the address of a template function as in
+//
+//  DerivativeApproximation::template approximate<DerivativeDescription,dim,DH>
+//
+// if one of the template arguments is a template-template
+// parameter. so work around this problem in a rather unnerving and
+// weird way, but at least it works
+  template <template <int> class DH> struct IsHP
+  {
+      static const bool value = false;
+  };
+  template <template <int> class DH> const bool IsHP<DH>::value;
+
+  template <> struct IsHP<hpDoFHandler>
+  {
+      static const bool value = true;
+  };
+  const bool IsHP<hpDoFHandler>::value;  
+}
+
+
+
+template <class DerivativeDescription, int dim,
+          template <int> class DH, class InputVector>
 void 
 DerivativeApproximation::
 approximate_derivative (const Mapping<dim>    &mapping,
-			const DoFHandler<dim> &dof_handler,
+			const DH<dim>         &dof_handler,
 			const InputVector     &solution,
 			const unsigned int     component,
 			Vector<float>         &derivative_norm)
@@ -473,14 +500,25 @@ approximate_derivative (const Mapping<dim>    &mapping,
   std::vector<IndexInterval> index_intervals
     = Threads::split_interval (0, dof_handler.get_tria().n_active_cells(),
 			       n_threads);
+
   Threads::ThreadGroup<> threads;
-  void (*fun_ptr) (const Mapping<dim>    &,
-		   const DoFHandler<dim> &,
-		   const InputVector     &,
-		   const unsigned int     ,
-		   const IndexInterval   &,
-		   Vector<float>         &)
-    = &DerivativeApproximation::template approximate<DerivativeDescription,dim,InputVector>;
+  
+  typedef void (*FunPtr) (const Mapping<dim>    &,
+                          const DH<dim>         &,
+                          const InputVector     &,
+                          const unsigned int     ,
+                          const IndexInterval   &,
+                          Vector<float>         &);
+
+#ifdef DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG
+  const FunPtr fun_ptr
+    = (WorkAround::IsHP<DH>::value ?
+       &DerivativeApproximation::template approximate<DerivativeDescription,dim,hpDoFHandler,InputVector> :
+       &DerivativeApproximation::template approximate<DerivativeDescription,dim,DoFHandler,InputVector>);
+#else
+  const FunPtr fun_ptr
+    = &DerivativeApproximation::template approximate<DerivativeDescription,dim,DH,InputVector>;
+#endif
   for (unsigned int i=0; i<n_threads; ++i)
     threads += Threads::spawn (fun_ptr)(mapping, dof_handler, solution, component,
                                         index_intervals[i],
@@ -490,20 +528,22 @@ approximate_derivative (const Mapping<dim>    &mapping,
 
 
 
-template <class DerivativeDescription, int dim, class InputVector>
+template <class DerivativeDescription, int dim,
+          template <int> class DH, class InputVector>
 void 
 DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
-				      const DoFHandler<dim> &dof_handler,
+				      const DH<dim>         &dof_handler,
 				      const InputVector     &solution,
 				      const unsigned int     component,
 				      const IndexInterval   &index_interval,
 				      Vector<float>         &derivative_norm)
 {
   QMidpoint<dim> midpoint_rule;
-  FEValues<dim>  fe_midpoint_value (mapping, dof_handler.get_fe(),
-				    midpoint_rule,
-				    UpdateFlags(DerivativeDescription::update_flags |
-						update_q_points));
+  typename SelectFEValues<DH<dim> >::FEValues
+    x_fe_midpoint_value (mapping, dof_handler.get_fe(),
+                         midpoint_rule,
+                         UpdateFlags(DerivativeDescription::update_flags |
+                                     update_q_points));
   
 				   // matrix Y=sum_i y_i y_i^T
   Tensor<2,dim> Y;
@@ -515,18 +555,18 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
     derivative_norm_on_this_cell
     = derivative_norm.begin() + index_interval.first;
   
-  typename DoFHandler<dim>::active_cell_iterator cell, endc;
+  typename DH<dim>::active_cell_iterator cell, endc;
   cell = endc = dof_handler.begin_active();
 				   // (static_cast to avoid warnings
 				   // about unsigned always >=0)
-  advance (cell, static_cast<int>(index_interval.first));
-  advance (endc, static_cast<int>(index_interval.second));
+  std::advance (cell, static_cast<int>(index_interval.first));
+  std::advance (endc, static_cast<int>(index_interval.second));
 
 				   // vector to hold iterators to all
 				   // active neighbors of a cell
 				   // reserve the maximal number of
 				   // active neighbors
-  std::vector<typename DoFHandler<dim>::active_cell_iterator> active_neighbors;
+  std::vector<typename DH<dim>::active_cell_iterator> active_neighbors;
   active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
 			    GeometryInfo<dim>::subfaces_per_face);
 
@@ -540,7 +580,9 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
       typename DerivativeDescription::Derivative projected_derivative;
 
 				       // reinit fe values object...
-      fe_midpoint_value.reinit (cell);
+      x_fe_midpoint_value.reinit (cell);
+      const FEValues<dim> &fe_midpoint_value
+        = x_fe_midpoint_value.get_present_fe_values();
 
 				       // ...and get the value of the
 				       // projected derivative...
@@ -569,7 +611,7 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
       for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
 	if (! cell->at_boundary(n))
 	  {
-	    typename DoFHandler<dim>::cell_iterator
+	    typename DH<dim>::cell_iterator
 	      neighbor = cell->neighbor(n);
 	    if (neighbor->active())
 	      active_neighbors.push_back (neighbor);
@@ -594,7 +636,7 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
 						 // present cell
 		if (dim == 1)
 		  {
-		    typename DoFHandler<dim>::cell_iterator
+		    typename DH<dim>::cell_iterator
 		      neighbor_child = neighbor;
 		    while (neighbor_child->has_children())
 		      neighbor_child = neighbor_child->child (n==0 ? 1 : 0);
@@ -619,15 +661,17 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
 				       // now loop over all active
 				       // neighbors and collect the
 				       // data we need
-      typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
+      typename std::vector<typename DH<dim>::active_cell_iterator>::const_iterator
 	neighbor_ptr = active_neighbors.begin();
       for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
 	{
-	  const typename DoFHandler<dim>::active_cell_iterator
+	  const typename DH<dim>::active_cell_iterator
 	    neighbor = *neighbor_ptr;
 	    
 					   // reinit fe values object...
-	  fe_midpoint_value.reinit (neighbor);
+          x_fe_midpoint_value.reinit (neighbor);
+          const FEValues<dim> &fe_midpoint_value
+            = x_fe_midpoint_value.get_present_fe_values();
 	  
 					   // ...and get the value of the
 					   // solution...
@@ -708,16 +752,16 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
 }
 
 
-
+// --------------------------------------------------------------------
 
 // explicit instantiations
-#define INSTANTIATE(InputVector)                   \
+#define INSTANTIATE(InputVector,DH)                \
 template                                           \
 void                                               \
 DerivativeApproximation::                          \
 approximate_gradient<deal_II_dimension>            \
 (const Mapping<deal_II_dimension> &mapping,        \
- const DoFHandler<deal_II_dimension> &dof_handler, \
+ const DH<deal_II_dimension> &dof_handler,         \
  const InputVector  &solution,                     \
  Vector<float>         &derivative_norm,           \
  const unsigned int     component);                \
@@ -726,7 +770,7 @@ template                                           \
 void                                               \
 DerivativeApproximation::                          \
 approximate_gradient<deal_II_dimension>            \
-(const DoFHandler<deal_II_dimension> &dof_handler, \
+(const DH<deal_II_dimension> &dof_handler,         \
  const InputVector     &solution,                  \
  Vector<float>         &derivative_norm,           \
  const unsigned int     component);                \
@@ -736,7 +780,7 @@ void                                               \
 DerivativeApproximation::                          \
 approximate_second_derivative<deal_II_dimension>   \
 (const Mapping<deal_II_dimension> &mapping,        \
- const DoFHandler<deal_II_dimension> &dof_handler, \
+ const DH<deal_II_dimension> &dof_handler,         \
  const InputVector  &solution,                     \
  Vector<float>         &derivative_norm,           \
  const unsigned int     component);                \
@@ -745,19 +789,27 @@ template                                           \
 void                                               \
 DerivativeApproximation::                          \
 approximate_second_derivative<deal_II_dimension>   \
-(const DoFHandler<deal_II_dimension> &dof_handler, \
+(const DH<deal_II_dimension> &dof_handler,         \
  const InputVector     &solution,                  \
  Vector<float>         &derivative_norm,           \
  const unsigned int     component)
 
-INSTANTIATE(Vector<double>);
-INSTANTIATE(Vector<float>);
-INSTANTIATE(BlockVector<double>);
-INSTANTIATE(BlockVector<float>);
+INSTANTIATE(Vector<double>, DoFHandler);
+INSTANTIATE(Vector<float>, DoFHandler);
+INSTANTIATE(BlockVector<double>, DoFHandler);
+INSTANTIATE(BlockVector<float>, DoFHandler);
+
+INSTANTIATE(Vector<double>, hpDoFHandler);
+INSTANTIATE(Vector<float>, hpDoFHandler);
+INSTANTIATE(BlockVector<double>, hpDoFHandler);
+INSTANTIATE(BlockVector<float>, hpDoFHandler);
 
 #ifdef DEAL_II_USE_PETSC
-INSTANTIATE(PETScWrappers::Vector);
-INSTANTIATE(PETScWrappers::BlockVector);
+INSTANTIATE(PETScWrappers::Vector, DoFHandler);
+INSTANTIATE(PETScWrappers::BlockVector, DoFHandler);
+
+INSTANTIATE(PETScWrappers::Vector, hpDoFHandler);
+INSTANTIATE(PETScWrappers::BlockVector, hpDoFHandler);
 #endif
 
 

@@ -23,10 +23,13 @@
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
+#include <dofs/hp_dof_handler.h>
 #include <grid/tria_iterator.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/hp_fe_values.h>
 #include <fe/mapping_q1.h>
+#include <fe/select_fe_values.h>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
@@ -36,8 +39,9 @@
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataEntryBase::
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::DataEntryBase::
 DataEntryBase (const std::vector<std::string> &names)
 		:
 		names(names)
@@ -45,16 +49,18 @@ DataEntryBase (const std::vector<std::string> &names)
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::DataEntryBase::
 DataEntryBase::~DataEntryBase ()
 {}
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim,  template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 template <typename VectorType>
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
 DataEntry (const VectorType               *data,
 	   const std::vector<std::string> &names)
@@ -64,11 +70,11 @@ DataEntry (const VectorType               *data,
 {}
 
 
-
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 template <typename VectorType>
 double
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
 get_cell_data_value (const unsigned int cell_number) const
 {
@@ -77,10 +83,11 @@ get_cell_data_value (const unsigned int cell_number) const
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 template <typename VectorType>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
 get_function_values (const FEValuesBase<dof_handler_dim> &fe_patch_values,
                      std::vector<Vector<double> >    &patch_values_system) const
@@ -90,10 +97,11 @@ get_function_values (const FEValuesBase<dof_handler_dim> &fe_patch_values,
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 template <typename VectorType>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::
 get_function_values (const FEValuesBase<dof_handler_dim> &fe_patch_values,
                      std::vector<double>             &patch_values) const
@@ -103,10 +111,11 @@ get_function_values (const FEValuesBase<dof_handler_dim> &fe_patch_values,
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 template <typename VectorType>
 unsigned int
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::memory_consumption () const
 {
   return (sizeof (vector) +
@@ -115,10 +124,11 @@ DataEntry<VectorType>::memory_consumption () const
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim,  template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 template <typename VectorType>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::clear ()
 {
   vector = 0;
@@ -127,27 +137,29 @@ DataEntry<VectorType>::clear ()
 
 
 
-
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::DataOut_DoFData ()
-		:
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::DataOut_DoFData ()
+                :
 		dofs(0,typeid(*this).name())
 {}
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::~DataOut_DoFData ()
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::~DataOut_DoFData ()
 {
   clear ();
 }
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
-attach_dof_handler (const DoFHandler<dof_handler_dim> &d)
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
+attach_dof_handler (const DH<dof_handler_dim> &d)
 {
   Assert (dof_data.size() == 0, ExcOldDataStillPresent());
   Assert (cell_data.size() == 0, ExcOldDataStillPresent());
@@ -157,10 +169,11 @@ attach_dof_handler (const DoFHandler<dof_handler_dim> &d)
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 template <class VECTOR>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
 add_data_vector (const VECTOR                   &vec,
 		 const std::vector<std::string> &names,
 		 const DataVectorType            type)
@@ -229,10 +242,12 @@ add_data_vector (const VECTOR                   &vec,
 }
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 template <class VECTOR>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
 add_data_vector (const VECTOR         &vec,
 		 const std::string    &name,
 		 const DataVectorType  type)
@@ -274,8 +289,9 @@ add_data_vector (const VECTOR         &vec,
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
-void DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear_data_vectors ()
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
+void DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::clear_data_vectors ()
 {
   dof_data.erase (dof_data.begin(), dof_data.end());
   cell_data.erase (cell_data.begin(), cell_data.end());
@@ -287,9 +303,10 @@ void DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear_data_vect
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
 clear_input_data_references ()
 {
   for (unsigned int i=0; i<dof_data.size(); ++i)
@@ -304,9 +321,10 @@ clear_input_data_references ()
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+          int patch_dim, int patch_space_dim>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear ()
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::clear ()
 {
   dof_data.erase (dof_data.begin(), dof_data.end());
   cell_data.erase (cell_data.begin(), cell_data.end());
@@ -321,9 +339,10 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::clear ()
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 std::vector<std::string>
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
 get_dataset_names () const 
 {
   std::vector<std::string> names;
@@ -348,18 +367,20 @@ get_dataset_names () const
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 const std::vector< ::DataOutBase::Patch<patch_dim, patch_space_dim> > &
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::get_patches () const
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::get_patches () const
 {
   return patches;
 }
 
 
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim>
 unsigned int
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::memory_consumption () const
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::memory_consumption () const
 {
   return (DataOutInterface<patch_dim,patch_space_dim>::memory_consumption () +
 	  MemoryConsumption::memory_consumption (dofs) +
@@ -372,8 +393,8 @@ DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::memory_consumption (
 
 
 
-template <int dim>
-void DataOut<dim>::build_some_patches (Data data)
+template <int dim, template <int> class DH>
+void DataOut<dim,DH>::build_some_patches (Data data)
 {
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, data.n_subdivisions);
@@ -384,13 +405,14 @@ void DataOut<dim>::build_some_patches (Data data)
 				   // we don't support anything else
 				   // as well
   static const MappingQ1<dim> mapping;
-  FEValues<dim> fe_patch_values (mapping, this->dofs->get_fe(),
-				 patch_points, update_values);
+  typename SelectFEValues<DH<dim> >::FEValues
+    x_fe_patch_values (mapping, this->dofs->get_fe(),
+                       patch_points, update_values);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
   typename std::vector< ::DataOutBase::Patch<dim> >::iterator patch = this->patches.begin();
-  typename DoFHandler<dim>::cell_iterator cell = first_cell();
+  cell_iterator cell=first_cell();
   
 				   // get first cell in this thread
   for (unsigned int i=0; (i<data.this_thread)&&(cell != this->dofs->end()); ++i)
@@ -415,7 +437,9 @@ void DataOut<dim>::build_some_patches (Data data)
       
       if (data.n_datasets > 0)
 	{
-	  fe_patch_values.reinit (cell);
+          x_fe_patch_values.reinit (cell);
+          const FEValues<dim> &fe_patch_values
+            = x_fe_patch_values.get_present_fe_values ();
 	  
 					   // first fill dof_data
 	  for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
@@ -454,7 +478,7 @@ void DataOut<dim>::build_some_patches (Data data)
 //TODO: This introduces a quadratic component into the algorithm. We may be doing better if we always kept track of the cell_number when 'cell' is increased, but we have to make sure that we only do this if cell_number is actually used, since we don't want to enforce the activeness constraints otherwise
               const unsigned int cell_number
                 = std::distance (this->dofs->begin_active(),
-                                 typename DoFHandler<dim>::active_cell_iterator(cell));
+                                 active_cell_iterator (cell));
               
               for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
                 {
@@ -467,7 +491,7 @@ void DataOut<dim>::build_some_patches (Data data)
             }
 	}
 
-                                       // now fill the neighbors fields
+
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         {
                                            // let's look up whether
@@ -502,8 +526,7 @@ void DataOut<dim>::build_some_patches (Data data)
               (cell->neighbor(f)->level() != cell->level()))
             continue;
 
-          const typename DoFHandler<dim>::cell_iterator
-            neighbor = cell->neighbor(f);
+          const cell_iterator neighbor = cell->neighbor(f);
           Assert (static_cast<unsigned int>(neighbor->level()) <
                   data.cell_to_patch_index_map->size(),
                   ExcInternalError());
@@ -535,24 +558,25 @@ void DataOut<dim>::build_some_patches (Data data)
 }
 
 
-template <int dim>
-void DataOut<dim>::build_patches (const unsigned int n_subdivisions,
-				  const unsigned int n_threads_) 
+
+template <int dim, template <int> class DH>
+void DataOut<dim,DH>::build_patches (const unsigned int n_subdivisions,
+				     const unsigned int n_threads_) 
 {
   static const MappingQ1<dim> mapping;
   build_patches (mapping, n_subdivisions, n_threads_);
 }
 
 
-template <int dim>
-void DataOut<dim>::build_patches (const Mapping<dim> &mapping,
-				  const unsigned int n_subdivisions,
-				  const unsigned int n_threads_) 
+template <int dim, template <int> class DH>
+void DataOut<dim,DH>::build_patches (const Mapping<dim> &mapping,
+				     const unsigned int n_subdivisions,
+				     const unsigned int n_threads_) 
 {
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
-  typedef DataOut_DoFData<dim,dim> BaseClass;
+  typedef DataOut_DoFData<dim,DH,dim> BaseClass;
   Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
   const unsigned int n_threads = (DEAL_II_USE_MT ? n_threads_ : 1);
@@ -588,8 +612,7 @@ void DataOut<dim>::build_patches (const Mapping<dim> &mapping,
   for (unsigned int l=0; l<this->dofs->get_tria().n_levels(); ++l) 
     {
       unsigned int max_index = 0;
-      for (typename DoFHandler<dim>::cell_iterator cell=first_cell();
-           cell != this->dofs->end();
+      for (cell_iterator cell=first_cell(); cell != this->dofs->end();
            cell = next_cell(cell))
         if (static_cast<unsigned int>(cell->level()) == l)
           max_index = std::max (max_index,
@@ -600,8 +623,7 @@ void DataOut<dim>::build_patches (const Mapping<dim> &mapping,
     };
                                   
   unsigned int n_patches = 0;
-  for (typename DoFHandler<dim>::cell_iterator cell=first_cell();
-       cell != this->dofs->end();
+  for (cell_iterator cell=first_cell(); cell != this->dofs->end();
        cell = next_cell(cell))
     {
       Assert (static_cast<unsigned int>(cell->level()) <
@@ -655,226 +677,91 @@ void DataOut<dim>::build_patches (const Mapping<dim> &mapping,
 
   Threads::ThreadGroup<> threads;  
   for (unsigned int l=0; l<n_threads; ++l)
-    threads += Threads::spawn (*this, &DataOut<dim>::build_some_patches)(thread_data[l]);
+    threads += Threads::spawn (*this, &DataOut<dim,DH>::build_some_patches)(thread_data[l]);
   threads.join_all();
 }
 
 
-template <int dim>
-typename DoFHandler<dim>::cell_iterator
-DataOut<dim>::first_cell () 
+
+template <int dim, template <int> class DH>
+typename DataOut<dim,DH>::cell_iterator
+DataOut<dim,DH>::first_cell () 
 {
   return this->dofs->begin_active ();
 }
 
 
-template <int dim>
-typename DoFHandler<dim>::cell_iterator
-DataOut<dim>::next_cell (const typename DoFHandler<dim>::cell_iterator &cell) 
+
+template <int dim, template <int> class DH>
+typename DataOut<dim,DH>::cell_iterator
+DataOut<dim,DH>::next_cell (const typename DataOut<dim,DH>::cell_iterator &cell) 
 {
 				   // convert the iterator to an
 				   // active_iterator and advance
 				   // this to the next active cell
-  typename DoFHandler<dim>::active_cell_iterator active_cell = cell;
+  typename DH<dim>::active_cell_iterator active_cell = cell;
   ++active_cell;
   return active_cell;
 }
 
 
-// explicit instantiations
-template class DataOut_DoFData<deal_II_dimension,deal_II_dimension>;
+// explicit instantiations 
 
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
-add_data_vector<Vector<double> > (
-  const Vector<double> &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
+#define INSTANTIATE(D1,DH,D2,D3,V) \
+template void \
+DataOut_DoFData<D1,DH,D2,D3>:: \
+add_data_vector<V > (const V             &, \
+                     const std::string   &, \
+                     const DataVectorType); \
+\
+template void \
+DataOut_DoFData<D1,DH,D2,D3>:: \
+add_data_vector<V > (const V                        &, \
+                     const std::vector<std::string> &, \
+                     const DataVectorType)
 
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
-add_data_vector<BlockVector<double> > (
-  const BlockVector<double> &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
-
-#ifdef DEAL_II_USE_PETSC
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
-add_data_vector<PETScWrappers::Vector> (
-  const PETScWrappers::Vector &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
-add_data_vector<PETScWrappers::BlockVector> (
-  const PETScWrappers::BlockVector &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
+#ifndef DEAL_II_USE_PETSC
+# define INSTANTIATE_VECTORS(D1,DH,D2,D3) \
+    INSTANTIATE(D1,DH,D2,D3,Vector<double>); \
+    INSTANTIATE(D1,DH,D2,D3,Vector<float>); \
+    INSTANTIATE(D1,DH,D2,D3,BlockVector<double>) ; \
+    INSTANTIATE(D1,DH,D2,D3,BlockVector<float>)
+#else
+# define INSTANTIATE_VECTORS(D1,DH,D2,D3) \
+    INSTANTIATE(D1,DH,D2,D3,Vector<double>); \
+    INSTANTIATE(D1,DH,D2,D3,Vector<float>); \
+    INSTANTIATE(D1,DH,D2,D3,BlockVector<double>) ; \
+    INSTANTIATE(D1,DH,D2,D3,BlockVector<float>); \
+    INSTANTIATE(D1,DH,D2,D3,PETScWrappers::Vector); \
+    INSTANTIATE(D1,DH,D2,D3,PETScWrappers::BlockVector)
 #endif
 
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
-add_data_vector<Vector<double> > (
-  const Vector<double> &vec,
-  const std::string    &name,
-  const DataVectorType  type);
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
-add_data_vector<BlockVector<double> > (
-  const BlockVector<double> &vec,
-  const std::string    &name,
-  const DataVectorType  type);
-
-#ifdef DEAL_II_USE_PETSC
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
-add_data_vector<PETScWrappers::Vector> (
-  const PETScWrappers::Vector &vec,
-  const std::string    &name,
-  const DataVectorType  type);
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension>::
-add_data_vector<PETScWrappers::BlockVector> (
-  const PETScWrappers::BlockVector &vec,
-  const std::string    &name,
-  const DataVectorType  type);
-#endif
-
-
-
-template class DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>;
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
-add_data_vector<Vector<double> > (
-  const Vector<double> &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
-add_data_vector<BlockVector<double> > (
-  const BlockVector<double> &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
-
-#ifdef DEAL_II_USE_PETSC
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
-add_data_vector<PETScWrappers::Vector> (
-  const PETScWrappers::Vector &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
-add_data_vector<PETScWrappers::BlockVector> (
-  const PETScWrappers::BlockVector &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
-#endif
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
-add_data_vector<Vector<double> > (
-  const Vector<double> &vec,
-  const std::string    &name,
-  const DataVectorType  type);
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
-add_data_vector<BlockVector<double> > (
-  const BlockVector<double> &vec,
-  const std::string    &name,
-  const DataVectorType  type);
-
-#ifdef DEAL_II_USE_PETSC
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
-add_data_vector<PETScWrappers::Vector> (
-  const PETScWrappers::Vector &vec,
-  const std::string    &name,
-  const DataVectorType  type);
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension+1>::
-add_data_vector<PETScWrappers::BlockVector> (
-  const PETScWrappers::BlockVector &vec,
-  const std::string    &name,
-  const DataVectorType  type);
-#endif
-
-
-template class DataOut<deal_II_dimension>;
-
-
+// now do actual instantiations, first for DoFHandler...
+template class DataOut_DoFData<deal_II_dimension,DoFHandler,deal_II_dimension>;
+template class DataOut_DoFData<deal_II_dimension,DoFHandler,deal_II_dimension+1>;
+INSTANTIATE_VECTORS(deal_II_dimension,DoFHandler,deal_II_dimension,deal_II_dimension);
+INSTANTIATE_VECTORS(deal_II_dimension,DoFHandler,deal_II_dimension+1,deal_II_dimension+1);
 
 // for 3d, also generate an extra class
 #if deal_II_dimension >= 2
-template class DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>;
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
-add_data_vector<Vector<double> > (
-  const Vector<double> &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
-add_data_vector<BlockVector<double> > (
-  const BlockVector<double> &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
-
-#ifdef DEAL_II_USE_PETSC
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
-add_data_vector<PETScWrappers::Vector> (
-  const PETScWrappers::Vector &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
-
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
-add_data_vector<PETScWrappers::BlockVector> (
-  const PETScWrappers::BlockVector &vec,
-  const std::vector<std::string>    &name,
-  const DataVectorType  type);
+template class DataOut_DoFData<deal_II_dimension,DoFHandler,
+			       deal_II_dimension-1,deal_II_dimension>;
+INSTANTIATE_VECTORS(deal_II_dimension,DoFHandler,deal_II_dimension-1,deal_II_dimension);
 #endif
 
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
-add_data_vector<Vector<double> > (
-  const Vector<double> &vec,
-  const std::string    &name,
-  const DataVectorType  type);
+template class DataOut<deal_II_dimension,DoFHandler>;
 
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
-add_data_vector<BlockVector<double> > (
-  const BlockVector<double> &vec,
-  const std::string    &name,
-  const DataVectorType  type);
 
-#ifdef DEAL_II_USE_PETSC
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
-add_data_vector<PETScWrappers::Vector> (
-  const PETScWrappers::Vector &vec,
-  const std::string    &name,
-  const DataVectorType  type);
+// ...and now for hpDoFHandler
+template class DataOut_DoFData<deal_II_dimension,hpDoFHandler,deal_II_dimension>;
+template class DataOut_DoFData<deal_II_dimension,hpDoFHandler,deal_II_dimension+1>;
+INSTANTIATE_VECTORS(deal_II_dimension,hpDoFHandler,deal_II_dimension,deal_II_dimension);
+INSTANTIATE_VECTORS(deal_II_dimension,hpDoFHandler,deal_II_dimension+1,deal_II_dimension+1);
 
-template void
-DataOut_DoFData<deal_II_dimension,deal_II_dimension-1,deal_II_dimension>::
-add_data_vector<PETScWrappers::BlockVector> (
-  const PETScWrappers::BlockVector &vec,
-  const std::string    &name,
-  const DataVectorType  type);
+#if deal_II_dimension >= 2
+template class DataOut_DoFData<deal_II_dimension,hpDoFHandler,
+			       deal_II_dimension-1,deal_II_dimension>;
+INSTANTIATE_VECTORS(deal_II_dimension,hpDoFHandler,deal_II_dimension-1,deal_II_dimension);
 #endif
 
-#endif
+template class DataOut<deal_II_dimension,hpDoFHandler>;

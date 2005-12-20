@@ -162,10 +162,51 @@ template <int>      class FEValuesBase;
  * @ingroup IO
  * @author Wolfgang Bangerth, 1999
  */
-template <int dof_handler_dim, int patch_dim, int patch_space_dim=patch_dim>
+template <int dof_handler_dim, template <int> class DH,
+	  int patch_dim, int patch_space_dim=patch_dim>
 class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 {
+#ifdef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
+				     // helper class
+    struct DH_dim : public DH<dof_handler_dim>
+    {
+					 // constructor. will
+					 // not be implemented,
+					 // but suppresses compiler
+					 // warning about non-default
+					 // constructor of GridClass
+	DH_dim ();
+
+					 /**
+					  * Declare iterator type, for
+					  * access from outside.
+					  */
+	typedef typename DH<dof_handler_dim>::cell_iterator cell_iterator;
+	typedef typename DH<dof_handler_dim>::active_cell_iterator active_cell_iterator;
+    };
   public:
+    
+				     /**
+				      * Typedef to the iterator type
+				      * of the dof handler class under
+				      * consideration.
+				      */
+    typedef typename DH_dim::cell_iterator cell_iterator;
+    typedef typename DH_dim::active_cell_iterator active_cell_iterator;
+
+#else
+  public:
+
+				     /**
+				      * Typedef to the iterator type
+				      * of the dof handler class under
+				      * consideration.
+				      */
+    typedef typename DH<dof_handler_dim>::cell_iterator cell_iterator;
+    typedef typename DH<dof_handler_dim>::active_cell_iterator active_cell_iterator;
+#endif
+  public:
+
 				     /**
 				      * Type describing what the
 				      * vector given to
@@ -210,7 +251,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * and the mapping between nodes
 				      * and node values.
 				      */
-    void attach_dof_handler (const DoFHandler<dof_handler_dim> &);
+    void attach_dof_handler (const DH<dof_handler_dim> &);
 
 				     /**
 				      * Add a data vector together
@@ -416,7 +457,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                       * patches.
                                       */
     template <int dof_handler_dim2>
-    void merge_patches (const DataOut_DoFData<dof_handler_dim2,patch_dim,patch_space_dim> &source,
+    void merge_patches (const DataOut_DoFData<dof_handler_dim2,DH,patch_dim,patch_space_dim> &source,
 			const Point<patch_space_dim> &shift = Point<patch_space_dim>());
     
 				     /**
@@ -669,7 +710,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				     /**
 				      * Pointer to the dof handler object.
 				      */
-    SmartPointer<const DoFHandler<dof_handler_dim> > dofs;
+    SmartPointer<const DH<dof_handler_dim> > dofs;
 
 				     /**
 				      * List of data elements with vectors of
@@ -714,7 +755,8 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * friends. Needed for the
 				      * merge_patches() function.
 				      */
-    template <int,int,int> friend class DataOut_DoFData;
+    template <int,template <int> class, int,int>
+    friend class DataOut_DoFData;
 
 #ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
                                      /**
@@ -736,9 +778,9 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 #  ifdef DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG
     template <typename> friend class DataEntry;
 #  else
-    template <int N1, int N2, int N3>
+    template <int N1, template <int> class DH, int N2, int N3>
     template <typename>
-    friend class DataOut_DoFData<N1,N2,N3>::DataEntry;
+    friend class DataOut_DoFData<N1,DH,N2,N3>::DataEntry;
 #  endif
 #endif
 };
@@ -819,10 +861,18 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * @ingroup IO
  * @author Wolfgang Bangerth, 1999
  */
-template <int dim>
-class DataOut : public DataOut_DoFData<dim,dim> 
+template <int dim, template <int> class DH = DoFHandler>
+class DataOut : public DataOut_DoFData<dim,DH,dim> 
 {
   public:
+				     /**
+				      * Typedef to the iterator type
+				      * of the dof handler class under
+				      * consideration.
+				      */
+    typedef typename DataOut_DoFData<dim,DH,dim>::cell_iterator cell_iterator;
+    typedef typename DataOut_DoFData<dim,DH,dim>::active_cell_iterator active_cell_iterator;
+    
     				     /**
 				      * This is the central function
 				      * of this class since it builds
@@ -891,8 +941,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      * might want to return other
 				      * cells in a derived class.
 				      */
-    virtual typename DoFHandler<dim>::cell_iterator
-    first_cell ();
+    virtual cell_iterator first_cell ();
     
 				     /**
 				      * Return the next cell after
@@ -915,8 +964,7 @@ class DataOut : public DataOut_DoFData<dim,dim>
 				      * only one of the two functions
 				      * might not be a good idea.
 				      */
-    virtual typename DoFHandler<dim>::cell_iterator
-    next_cell (const typename DoFHandler<dim>::cell_iterator &cell);
+    virtual cell_iterator next_cell (const cell_iterator &cell);
 
 				     /**
 				      * Exception
@@ -973,11 +1021,12 @@ class DataOut : public DataOut_DoFData<dim,dim>
 
 // -------------------- template and inline functions ------------------------
 
-template <int dof_handler_dim, int patch_dim, int patch_space_dim>
+template <int dof_handler_dim, template <int> class DH,
+          int patch_dim, int patch_space_dim>
 template <int dof_handler_dim2>
 void
-DataOut_DoFData<dof_handler_dim,patch_dim,patch_space_dim>::
-merge_patches (const DataOut_DoFData<dof_handler_dim2,patch_dim,patch_space_dim> &source,
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
+merge_patches (const DataOut_DoFData<dof_handler_dim2,DH,patch_dim,patch_space_dim> &source,
 	       const Point<patch_space_dim> &shift)
 {
   const std::vector<Patch> source_patches = source.get_patches ();

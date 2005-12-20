@@ -15,10 +15,12 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
-#include <dofs/dof_handler.h>
 #include <fe/fe_update_flags.h>
 #include <fe/mapping.h>
 #include <utility>
+
+template <int dim> class DoFHandler;
+template <int dim> class hpDoFHandler;
 
 
 
@@ -184,10 +186,10 @@ class DerivativeApproximation
 				      * number of vector components can be
 				      * given here.
 				      */
-    template <int dim, class InputVector>
+    template <int dim, template <int> class DH, class InputVector>
     static void
     approximate_gradient (const Mapping<dim>    &mapping,
-			  const DoFHandler<dim> &dof,
+			  const DH<dim>         &dof,
 			  const InputVector     &solution,
 			  Vector<float>         &derivative_norm,
 			  const unsigned int     component = 0);
@@ -197,9 +199,9 @@ class DerivativeApproximation
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
-    template <int dim, class InputVector>
+    template <int dim, template <int> class DH, class InputVector>
     static void
-    approximate_gradient (const DoFHandler<dim> &dof,
+    approximate_gradient (const DH<dim>         &dof,
 			  const InputVector     &solution,
 			  Vector<float>         &derivative_norm,
 			  const unsigned int     component = 0);
@@ -231,10 +233,10 @@ class DerivativeApproximation
 				      * number of vector components can be
 				      * given here.
 				      */
-    template <int dim, class InputVector>
+    template <int dim, template <int> class DH, class InputVector>
     static void
     approximate_second_derivative (const Mapping<dim>    &mapping,
-				   const DoFHandler<dim> &dof,
+				   const DH<dim>         &dof,
 				   const InputVector     &solution,
 				   Vector<float>         &derivative_norm,
 				   const unsigned int     component = 0);
@@ -244,9 +246,9 @@ class DerivativeApproximation
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
-    template <int dim, class InputVector>
+    template <int dim, template <int> class DH, class InputVector>
     static void
-    approximate_second_derivative (const DoFHandler<dim> &dof,
+    approximate_second_derivative (const DH<dim>         &dof,
 				   const InputVector     &solution,
 				   Vector<float>         &derivative_norm,
 				   const unsigned int     component = 0);
@@ -463,10 +465,11 @@ class DerivativeApproximation
 				      * solution vector we are to work
 				      * on.
 				      */
-    template <class DerivativeDescription, int dim, class InputVector>
+    template <class DerivativeDescription, int dim,
+              template <int> class DH, class InputVector>
     static void
     approximate_derivative (const Mapping<dim>    &mapping,
-			    const DoFHandler<dim> &dof,
+			    const DH<dim>         &dof,
 			    const InputVector     &solution,
 			    const unsigned int     component,
 			    Vector<float>         &derivative_norm);
@@ -477,10 +480,11 @@ class DerivativeApproximation
 				      * the range given by the third
 				      * parameter.
 				      */
-    template <class DerivativeDescription, int dim, class InputVector>
+    template <class DerivativeDescription, int dim,
+              template <int> class DH, class InputVector>
     static void
     approximate (const Mapping<dim>    &mapping,
-		 const DoFHandler<dim> &dof,
+		 const DH<dim>         &dof,
 		 const InputVector     &solution,
 		 const unsigned int     component,
 		 const IndexInterval   &index_interval,
@@ -490,12 +494,17 @@ class DerivativeApproximation
 
 /* -------------- declaration of explicit specializations ------------- */
 
-template <> double DerivativeApproximation::SecondDerivative<1>::derivative_norm (
-  const Derivative &d);
-template <> double DerivativeApproximation::SecondDerivative<2>::derivative_norm (
-  const Derivative &d);
-template <> double DerivativeApproximation::SecondDerivative<3>::derivative_norm (
-  const Derivative &d);
+template <>
+double
+DerivativeApproximation::SecondDerivative<1>::derivative_norm (const Derivative &d);
+
+template <>
+double
+DerivativeApproximation::SecondDerivative<2>::derivative_norm (const Derivative &d);
+
+template <>
+double
+DerivativeApproximation::SecondDerivative<3>::derivative_norm (const Derivative &d);
 
 
 #endif

@@ -410,7 +410,7 @@ void MGTransferSelect<number>::build_matrices (
 				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
 	{
-	  DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
+	  DoFObjectAccessor<dim, dim, DoFHandler>& global_cell = *level_cell;
 					   // get the dof numbers of
 					   // this cell for the global
 					   // and the level-wise

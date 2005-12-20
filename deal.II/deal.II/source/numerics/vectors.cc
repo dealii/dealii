@@ -11,6 +11,63 @@
 //
 //---------------------------------------------------------------------------
 
+#include <dofs/dof_handler.h>
+#include <dofs/hp_dof_handler.h>
+
+namespace 
+{
+  // Functions for the DoFHandler
+  template <int dim>
+  unsigned int
+  max_dofs_per_cell (const DoFHandler<dim> &dh)
+  {
+    return dh.get_fe().dofs_per_cell;
+  }
+
+
+  template <int dim>
+  unsigned int
+  max_dofs_per_face (const DoFHandler<dim> &dh) 
+  {
+    return dh.get_fe().dofs_per_face;
+  }
+
+
+  template <int dim>
+  unsigned int
+  get_n_components (const DoFHandler<dim> &dh) 
+  {
+    return dh.get_fe().n_components();
+  }
+
+
+  // Functions for the hpDoFHandler
+  template <int dim>
+  unsigned int
+  max_dofs_per_cell (const hpDoFHandler<dim> &dh) 
+  {
+    return dh.get_fe().max_dofs_per_cell ();
+  }
+
+
+  template <int dim>
+  unsigned int
+  max_dofs_per_face (const hpDoFHandler<dim> &dh) 
+  {
+    return dh.get_fe().max_dofs_per_face ();
+  }
+
+
+
+  template <int dim>
+  unsigned int
+  get_n_components (const hpDoFHandler<dim> &dh) 
+  {
+    return dh.get_fe().n_components();
+  }
+}
+
+
 #include<numerics/vectors.templates.h>
 
 // explicit instantiations
@@ -101,6 +158,20 @@ void VectorTools::project_boundary_values<deal_II_dimension>
  const Quadrature<deal_II_dimension-1>&,
  std::map<unsigned int,double>        &);
 
+
+
+// Due to introducing the DoFHandler as a template parameter,
+// the following instantiations are required in 1d
+#if deal_II_dimension == 1
+template
+void VectorTools::interpolate_boundary_values<deal_II_dimension> 
+(const Mapping<1>         &,
+ const DoFHandler<1>      &,
+ const unsigned char,
+ const Function<1>        &,
+ std::map<unsigned int,double> &,
+ const std::vector<bool>       &);
+#endif
 
 // the following two functions are not derived from a template in 1d
 // and thus need no explicit instantiation

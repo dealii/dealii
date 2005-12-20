@@ -80,7 +80,8 @@ class MGDoFAccessor {
 				      * Reset the DoF handler pointer.
 				      */
     void set_mg_dof_handler (MGDoFHandler<dim> *dh) {
-      Assert (dh != 0, typename DoFAccessor<dim>::ExcInvalidObject());
+	typedef DoFAccessor<dim, DoFHandler> BaseClass;
+      Assert (dh != 0, typename BaseClass::ExcInvalidObject());
       mg_dof_handler = dh;
     };
 
@@ -130,7 +131,7 @@ class MGDoFObjectAccessor_Inheritance
 				      * See the full documentation for
 				      * more information.
 				      */
-    typedef DoFObjectAccessor<celldim,dim> BaseClass;
+    typedef DoFObjectAccessor<celldim,dim,DoFHandler> BaseClass;
 };
 
 
@@ -156,7 +157,7 @@ class MGDoFObjectAccessor_Inheritance<dim,dim>
 				      * See the full documentation for
 				      * more information.
 				      */
-    typedef DoFCellAccessor<dim> BaseClass;
+    typedef DoFCellAccessor<dim, DoFHandler> BaseClass;
 };
 
 

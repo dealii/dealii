@@ -80,11 +80,18 @@ template <int dim> class DoFHandler;
  * @ingroup IO
  * @author Wolfgang Bangerth, 2000
  */
-template <int dim>
-class DataOutRotation : public DataOut_DoFData<dim,dim+1>
+template <int dim, template <int> class DH = DoFHandler>
+class DataOutRotation : public DataOut_DoFData<dim,DH,dim+1>
 {
   public:
-    				     /**
+				     /**
+				      * Typedef to the iterator type
+				      * of the dof handler class under
+				      * consideration.
+				      */
+    typedef typename DataOut_DoFData<dim,DH,dim+1>::cell_iterator cell_iterator;
+
+                                     /**
 				      * This is the central function
 				      * of this class since it builds
 				      * the list of patches to be
@@ -124,8 +131,7 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 				      * return other cells in a
 				      * derived class.
 				      */
-    virtual typename DoFHandler<dim>::cell_iterator
-    first_cell ();
+    virtual cell_iterator first_cell ();
     
 				     /**
 				      * Return the next cell after @p cell which
@@ -146,8 +152,7 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 				      * of the two functions might not be
 				      * a good idea.
 				      */
-    virtual typename DoFHandler<dim>::cell_iterator
-    next_cell (const typename DoFHandler<dim>::cell_iterator &cell);
+    virtual cell_iterator next_cell (const cell_iterator &cell);
 
 				     /**
 				      * Exception
@@ -199,7 +204,7 @@ class DataOutRotation : public DataOut_DoFData<dim,dim+1>
 
 /* -------------- declaration of explicit specializations ------------- */
 
-template <> void DataOutRotation<3>::build_some_patches (Data);
+template <> void DataOutRotation<3,DoFHandler>::build_some_patches (Data);
 
 
 #endif

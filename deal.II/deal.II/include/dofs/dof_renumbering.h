@@ -218,9 +218,9 @@ class DoFRenumbering
 				      * of this class for details on
 				      * the different methods.
 				      */
-    template <int dim>
+    template <int dim, template <int> class DH>
     static void 
-    Cuthill_McKee (DoFHandler<dim>            &dof_handler,
+    Cuthill_McKee (DH<dim>                    &dof_handler,
 		   const bool                  reversed_numbering = false,
 		   const bool                  use_constraints    = false,
 		   const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int>());
@@ -234,10 +234,10 @@ class DoFRenumbering
 				      * returns the renumbering
 				      * vector.
 				      */    
-    template <int dim>
+    template <int dim, template <int> class DH>
     static void
     compute_Cuthill_McKee (std::vector<unsigned int>& new_dof_indices,
-			   const DoFHandler<dim>&,
+			   const DH<dim>&,
 			   const bool reversed_numbering = false,
 			   const bool use_constraints    = false,
 			   const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int>());

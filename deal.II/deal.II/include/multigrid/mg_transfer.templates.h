@@ -113,12 +113,11 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
 	{
-	  DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
 					   // get the dof numbers of
 					   // this cell for the global
 					   // and the level-wise
 					   // numbering
-	  global_cell.get_dof_indices(global_dof_indices);
+	  level_cell->get_dof_indices(global_dof_indices);
 	  level_cell->get_mg_dof_indices (level_dof_indices);
 
 					   // transfer the global
@@ -184,14 +183,13 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
 				   // monotonuosly increasing
   for (; level_cell != endc; ++level_cell)
     {
-      DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
       const unsigned int level = level_cell->level();
       
 				       // get the dof numbers of
 				       // this cell for the global
 				       // and the level-wise
 				       // numbering
-      global_cell.get_dof_indices (global_dof_indices);
+      level_cell->get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
 
 				       // copy level-wise data to
@@ -232,14 +230,13 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
 				   // monotonuosly increasing
   for (; level_cell != endc; ++level_cell)
     {
-      DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
       const unsigned int level = level_cell->level();
       
 				       // get the dof numbers of
 				       // this cell for the global
 				       // and the level-wise
 				       // numbering
-      global_cell.get_dof_indices (global_dof_indices);
+      level_cell->get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
 
 //TODO:[GK] Probably wrong for continuous elements
@@ -400,12 +397,11 @@ MGTransferSelect<number>::do_copy_to_mg (
 				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
 	{
-	  DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
 					   // get the dof numbers of
 					   // this cell for the global
 					   // and the level-wise
 					   // numbering
-	  global_cell.get_dof_indices(global_dof_indices);
+	  level_cell->get_dof_indices(global_dof_indices);
 	  level_cell->get_mg_dof_indices (level_dof_indices);
 
 					   // transfer the global
@@ -522,14 +518,13 @@ MGTransferSelect<number>::do_copy_from_mg (
 				   // monotonuosly increasing
   for (; level_cell != endc; ++level_cell)
     {
-       DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
       const unsigned int level = level_cell->level();
 
 				       // get the dof numbers of
 				       // this cell for the global
 				       // and the level-wise
 				       // numbering
-      global_cell.get_dof_indices (global_dof_indices);
+      level_cell->get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
 
 				       // copy level-wise data to
@@ -583,14 +578,13 @@ MGTransferSelect<number>::do_copy_from_mg_add (
 				   // monotonuosly increasing
   for (; level_cell != endc; ++level_cell)
     {
-       DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
       const unsigned int level = level_cell->level();
 
 				       // get the dof numbers of
 				       // this cell for the global
 				       // and the level-wise
 				       // numbering
-      global_cell.get_dof_indices (global_dof_indices);
+      level_cell->get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
 
 //TODO:[GK+WB] Probably wrong for continuous elements
@@ -708,12 +702,11 @@ MGTransferBlock<number>::copy_to_mg (
 				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
 	{
-	  DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
 					   // get the dof numbers of
 					   // this cell for the global
 					   // and the level-wise
 					   // numbering
-	  global_cell.get_dof_indices(global_dof_indices);
+	  level_cell->get_dof_indices(global_dof_indices);
 	  level_cell->get_mg_dof_indices (level_dof_indices);
 
 					   // transfer the global
@@ -769,13 +762,12 @@ MGTransferBlock<number>::copy_from_mg (
 				   // increasing
   for (; level_cell != endc; ++level_cell)
     {
-       DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
       const unsigned int level = level_cell->level();
 				       // get the dof numbers of
 				       // this cell for the global
 				       // and the level-wise
 				       // numbering
-      global_cell.get_dof_indices (global_dof_indices);
+      level_cell->get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
 
 				       // copy level-wise data to
@@ -816,14 +808,13 @@ MGTransferBlock<number>::copy_from_mg_add (
 				   // increasing
   for (; level_cell != endc; ++level_cell)
     {
-       DoFObjectAccessor<dim, dim>& global_cell = *level_cell;
       const unsigned int level = level_cell->level();
 
 				       // get the dof numbers of
 				       // this cell for the global
 				       // and the level-wise
 				       // numbering
-      global_cell.get_dof_indices (global_dof_indices);
+      level_cell->get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
 
 //TODO:[GK] Probably wrong for continuous elements
