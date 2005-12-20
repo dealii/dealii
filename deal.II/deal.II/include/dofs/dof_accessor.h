@@ -1597,6 +1597,26 @@ const FiniteElement<3> &
 DoFObjectAccessor<3,3,hpDoFHandler>::get_fe () const;
 
 template <>
+void DoFObjectAccessor<1,1,hpDoFHandler>::set_dof_index (const unsigned int,
+                                                         const unsigned int) const;
+template <>
+void DoFObjectAccessor<1,2,hpDoFHandler>::set_dof_index (const unsigned int,
+                                                         const unsigned int) const;
+template <>
+void DoFObjectAccessor<1,3,hpDoFHandler>::set_dof_index (const unsigned int,
+                                                         const unsigned int) const;
+template <>
+void DoFObjectAccessor<2,2,hpDoFHandler>::set_dof_index (const unsigned int,
+                                                         const unsigned int) const;
+template <>
+void DoFObjectAccessor<2,3,hpDoFHandler>::set_dof_index (const unsigned int,
+                                                         const unsigned int) const;
+template <>
+void DoFObjectAccessor<3,3,hpDoFHandler>::set_dof_index (const unsigned int,
+                                                         const unsigned int) const;
+
+
+template <>
 unsigned int
 DoFObjectAccessor<1,1,hpDoFHandler>::active_fe_index () const;
 template <>
