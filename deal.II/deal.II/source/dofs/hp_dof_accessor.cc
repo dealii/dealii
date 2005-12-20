@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -84,8 +84,8 @@ void DoFObjectAccessor<1, 1, hpDoFHandler>::set_dof_index (const unsigned int i,
   Assert (i<this->get_fe().dofs_per_line,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
 
-  unsigned int offset = this->dof_handler->levels[this->present_level]
-      ->dof_line_index_offset[this->present_index];
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_line_index_offset[this->present_index];
   this->dof_handler->levels[this->present_level]
       ->line_dofs[offset+i] = index;
 }
@@ -110,8 +110,8 @@ void DoFObjectAccessor<1, 2, hpDoFHandler>::set_dof_index (const unsigned int i,
 // on a line between to cells. Hence we have to differentiate between these two cases.
 // Unfortunately, this requires more information then available now.
 
-  unsigned int offset = this->dof_handler->levels[this->present_level]
-      ->dof_line_index_offset[this->present_index];
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_line_index_offset[this->present_index];
   this->dof_handler->levels[this->present_level]
       ->line_dofs[offset+i] = index;
 }
@@ -132,8 +132,8 @@ void DoFObjectAccessor<1, 3, hpDoFHandler>::set_dof_index (const unsigned int i,
   Assert (i<this->get_fe().dofs_per_line,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
 
-  unsigned int offset = this->dof_handler->levels[this->present_level]
-      ->dof_line_index_offset[this->present_index];
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_line_index_offset[this->present_index];
   this->dof_handler->levels[this->present_level]
       ->line_dofs[offset+i] = index;
 }
@@ -157,8 +157,8 @@ void DoFObjectAccessor<2, 2, hpDoFHandler>::set_dof_index (const unsigned int i,
   Assert (i<this->get_fe().dofs_per_quad,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
 
-  unsigned int offset = this->dof_handler->levels[this->present_level]
-      ->dof_quad_index_offset[this->present_index];
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_quad_index_offset[this->present_index];
   this->dof_handler->levels[this->present_level]
       ->quad_dofs[offset+i] = index;
 }
@@ -179,8 +179,8 @@ void DoFObjectAccessor<2, 3, hpDoFHandler>::set_dof_index (const unsigned int i,
   Assert (i<this->get_fe().dofs_per_quad,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
 
-  unsigned int offset = this->dof_handler->levels[this->present_level]
-      ->dof_quad_index_offset[this->present_index];
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_quad_index_offset[this->present_index];
   this->dof_handler->levels[this->present_level]
       ->quad_dofs[offset+i] = index;
 }
@@ -203,8 +203,8 @@ void DoFObjectAccessor<3, 3, hpDoFHandler>::set_dof_index (const unsigned int i,
   Assert (i<this->get_fe().dofs_per_hex,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_hex));
 
-  unsigned int offset = this->dof_handler->levels[this->present_level]
-      ->dof_hex_index_offset[this->present_index];
+  const unsigned int offset = this->dof_handler->levels[this->present_level]
+                              ->dof_hex_index_offset[this->present_index];
   this->dof_handler->levels[this->present_level]
       ->hex_dofs[offset+i] = index;
 }
