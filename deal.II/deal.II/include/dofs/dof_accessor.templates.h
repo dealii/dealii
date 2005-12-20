@@ -1027,56 +1027,6 @@ DoFObjectAccessor<3,dim,DH>::operator != (const DoFObjectAccessor<3,dim,DH> &a) 
 }
 
 
-/*------------------------- Functions: DoFCellAccessor -----------------------*/
-
-template <int dim, template <int> class DH>
-inline
-DoFCellAccessor<dim,DH>::
-DoFCellAccessor (const Triangulation<dim> *tria,
-                 const int                 level,
-                 const int                 index,
-                 const AccessorData       *local_data)
-                :
-                DoFObjectAccessor<dim, dim, DH> (tria,level,index,local_data)
-{}
-
-
-template <int dim, template <int> class DH>
-inline
-TriaIterator<dim,DoFCellAccessor<dim,DH> >
-DoFCellAccessor<dim,DH>::neighbor (const unsigned int i) const
-{
-  TriaIterator<dim,DoFCellAccessor<dim,DH> > q (this->tria,
-						this->neighbor_level (i),
-						this->neighbor_index (i),
-						this->dof_handler);
-  
-#ifdef DEBUG
-  if (q.state() != IteratorState::past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
-#endif
-  return q;
-}
-
-
-template <int dim, template <int> class DH>
-inline
-TriaIterator<dim,DoFCellAccessor<dim,DH> >
-DoFCellAccessor<dim,DH>::child (const unsigned int i) const
-{
-  TriaIterator<dim,DoFCellAccessor<dim,DH> > q (this->tria,
-						this->present_level+1,
-						this->child_index (i),
-						this->dof_handler);
-  
-#ifdef DEBUG
-  if (q.state() != IteratorState::past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
-#endif
-  return q;
-}
-
-
 /*--------------- Functions: DoFObjectAccessor<1,dim,hpDoFHandler> -----------*/
 
 template <>
@@ -1623,6 +1573,57 @@ DoFObjectAccessor<3,3,hpDoFHandler>::set_active_fe_index (const unsigned int i)
   dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
+
+
+/*------------------------- Functions: DoFCellAccessor -----------------------*/
+
+template <int dim, template <int> class DH>
+inline
+DoFCellAccessor<dim,DH>::
+DoFCellAccessor (const Triangulation<dim> *tria,
+                 const int                 level,
+                 const int                 index,
+                 const AccessorData       *local_data)
+                :
+                DoFObjectAccessor<dim, dim, DH> (tria,level,index,local_data)
+{}
+
+
+template <int dim, template <int> class DH>
+inline
+TriaIterator<dim,DoFCellAccessor<dim,DH> >
+DoFCellAccessor<dim,DH>::neighbor (const unsigned int i) const
+{
+  TriaIterator<dim,DoFCellAccessor<dim,DH> > q (this->tria,
+						this->neighbor_level (i),
+						this->neighbor_index (i),
+						this->dof_handler);
+  
+#ifdef DEBUG
+  if (q.state() != IteratorState::past_the_end)
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsNeighbor());
+#endif
+  return q;
+}
+
+
+template <int dim, template <int> class DH>
+inline
+TriaIterator<dim,DoFCellAccessor<dim,DH> >
+DoFCellAccessor<dim,DH>::child (const unsigned int i) const
+{
+  TriaIterator<dim,DoFCellAccessor<dim,DH> > q (this->tria,
+						this->present_level+1,
+						this->child_index (i),
+						this->dof_handler);
+  
+#ifdef DEBUG
+  if (q.state() != IteratorState::past_the_end)
+    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
+#endif
+  return q;
+}
+
 
 
 #endif
