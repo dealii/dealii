@@ -62,12 +62,12 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
 				   // write the vertices
   out << "object \"vertices\" class array type float rank 1 shape " << dim
       << " items " << n_vertices << " data follows"
-      << std::endl;
+      << '\n';
   
   for (unsigned int i=0; i<vertices.size(); ++i)
     if (vertex_used[i])
       {
-	out << '\t' << vertices[i] << std::endl;
+	out << '\t' << vertices[i] << '\n';
       };
   
 				   // write cells or faces
@@ -85,55 +85,55 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
     {
       out << "object \"cells\" class array type int rank 1 shape "
 	  << n_vertices_per_cell
-	  << " items " << n_cells << " data follows" << std::endl;
+	  << " items " << n_cells << " data follows" << '\n';
       
       for (cell = tria.begin_active(); cell != endc; ++cell)
 	{
 	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
 	    out << '\t' << cell->vertex_index(GeometryInfo<dim>::dx_to_deal[v]);
-	  out << std::endl;
+	  out << '\n';
 	}
       out << "attribute \"element type\" string \"";
       if (dim==1) out << "lines";
       if (dim==2) out << "quads";
       if (dim==3) out << "cubes";
-      out << "\"" << std::endl
-	  << "attribute \"ref\" string \"positions\"" << std::endl << std::endl;
+      out << "\"" << '\n'
+	  << "attribute \"ref\" string \"positions\"" << '\n' << '\n';
 
 				       // Additional cell information
       
       out << "object \"material\" class array type int rank 0 items "
-	  << n_cells << " data follows" << std::endl;
+	  << n_cells << " data follows" << '\n';
       for (cell = tria.begin_active(); cell != endc; ++cell)
 	out << ' ' << (unsigned int)cell->material_id();
-      out  << std::endl
-	   << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+      out  << '\n'
+	   << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
       
       out << "object \"level\" class array type int rank 0 items "
-	  << n_cells << " data follows" << std::endl;
+	  << n_cells << " data follows" << '\n';
       for (cell = tria.begin_active(); cell != endc; ++cell)
 	out << ' ' << cell->level();
-      out  << std::endl
-	   << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+      out  << '\n'
+	   << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
       
       if (dx_flags.write_measure)
 	{
 	  out << "object \"measure\" class array type float rank 0 items "
-	      << n_cells << " data follows" << std::endl;
+	      << n_cells << " data follows" << '\n';
 	  for (cell = tria.begin_active(); cell != endc; ++cell)
 	    out << '\t' << cell->measure();
-	  out  << std::endl
-	       << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+	  out  << '\n'
+	       << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
 	}
       
       if (dx_flags.write_diameter)
 	{
 	  out << "object \"diameter\" class array type float rank 0 items "
-	      << n_cells << " data follows" << std::endl;
+	      << n_cells << " data follows" << '\n';
 	  for (cell = tria.begin_active(); cell != endc; ++cell)
 	    out << '\t' << cell->diameter();
-	  out  << std::endl
-	       << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+	  out  << '\n'
+	       << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
 	}
     }
   
@@ -142,7 +142,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
       out << "object \"faces\" class array type int rank 1 shape "
 	  << n_vertices_per_face
 	  << " items " << n_faces << " data follows"
-	  << std::endl;
+	  << '\n';
 
       for (cell = tria.begin_active(); cell != endc; ++cell)
 	{
@@ -152,54 +152,54 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
 	      
 	      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
 		out << '\t' << face->vertex_index(GeometryInfo<dim-1>::dx_to_deal[v]);
-	      out << std::endl;
+	      out << '\n';
 	    }
 	}
       out << "attribute \"element type\" string \"";
       if (dim==2) out << "lines";
       if (dim==3) out << "quads";
-      out << "\"" << std::endl
-	  << "attribute \"ref\" string \"positions\"" << std::endl << std::endl;
+      out << "\"" << '\n'
+	  << "attribute \"ref\" string \"positions\"" << '\n' << '\n';
       
 
 				       // Additional face information
       
       out << "object \"boundary\" class array type int rank 0 items "
-	  << n_faces << " data follows" << std::endl;
+	  << n_faces << " data follows" << '\n';
       for (cell = tria.begin_active(); cell != endc; ++cell)
 	{
 					   // Little trick to get -1
 					   // for the interior
 	  for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
 	    out << ' ' << (int)(signed char)cell->face(f)->boundary_indicator();
-	  out << std::endl;
+	  out << '\n';
 	}
-      out << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+      out << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
       
       if (dx_flags.write_measure)
 	{
 	  out << "object \"face measure\" class array type float rank 0 items "
-	      << n_faces << " data follows" << std::endl;
+	      << n_faces << " data follows" << '\n';
 	  for (cell = tria.begin_active(); cell != endc; ++cell)
 	    {
 	      for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
 		out << ' ' << cell->face(f)->measure();
-	      out << std::endl;
+	      out << '\n';
 	    }
-	  out << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+	  out << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
 	}
 
       if (dx_flags.write_diameter)
 	{
 	  out << "object \"face diameter\" class array type float rank 0 items "
-	      << n_faces << " data follows" << std::endl;
+	      << n_faces << " data follows" << '\n';
 	  for (cell = tria.begin_active(); cell != endc; ++cell)
 	    {
 	      for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
 		out << ' ' << cell->face(f)->diameter();
-	      out << std::endl;
+	      out << '\n';
 	    }
-	  out << "attribute \"dep\" string \"connections\"" << std::endl << std::endl;
+	  out << "attribute \"dep\" string \"connections\"" << '\n' << '\n';
 	}
 
     }
@@ -213,45 +213,51 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
     }
   else
     {
-     }
+    }
 
 				   // The wrapper
-  out << "object \"deal data\" class field" << std::endl
-      << "component \"positions\" value \"vertices\"" << std::endl
-      << "component \"connections\" value \"cells\"" << std::endl;
+  out << "object \"deal data\" class field" << '\n'
+      << "component \"positions\" value \"vertices\"" << '\n'
+      << "component \"connections\" value \"cells\"" << '\n';
 
   if (write_cells)
     {
-      out << "object \"cell data\" class field" << std::endl
-	  << "component \"positions\" value \"vertices\"" << std::endl
-	  << "component \"connections\" value \"cells\"" << std::endl;
-      out << "component \"material\" value \"material\"" << std::endl;
-      out << "component \"level\" value \"level\"" << std::endl;
+      out << "object \"cell data\" class field" << '\n'
+	  << "component \"positions\" value \"vertices\"" << '\n'
+	  << "component \"connections\" value \"cells\"" << '\n';
+      out << "component \"material\" value \"material\"" << '\n';
+      out << "component \"level\" value \"level\"" << '\n';
       if (dx_flags.write_measure)
-	out << "component \"measure\" value \"measure\"" << std::endl;
+	out << "component \"measure\" value \"measure\"" << '\n';
       if (dx_flags.write_diameter)
-	out << "component \"diameter\" value \"diameter\"" << std::endl;
+	out << "component \"diameter\" value \"diameter\"" << '\n';
     }
 
   if (write_faces)
     {
-      out << "object \"face data\" class field" << std::endl
-	  << "component \"positions\" value \"vertices\"" << std::endl
-	  << "component \"connections\" value \"faces\"" << std::endl;
-      out << "component \"boundary\" value \"boundary\"" << std::endl;
+      out << "object \"face data\" class field" << '\n'
+	  << "component \"positions\" value \"vertices\"" << '\n'
+	  << "component \"connections\" value \"faces\"" << '\n';
+      out << "component \"boundary\" value \"boundary\"" << '\n';
       if (dx_flags.write_measure)
-	out << "component \"measure\" value \"face measure\"" << std::endl;
+	out << "component \"measure\" value \"face measure\"" << '\n';
       if (dx_flags.write_diameter)
-	out << "component \"diameter\" value \"face diameter\"" << std::endl;
+	out << "component \"diameter\" value \"face diameter\"" << '\n';
     }
   
-  out << std::endl
-      << "object \"grid data\" class group" << std::endl;
+  out << '\n'
+      << "object \"grid data\" class group" << '\n';
     if (write_cells)
-      out << "member \"cells\" value \"cell data\"" << std::endl;
+      out << "member \"cells\" value \"cell data\"" << '\n';
     if (write_faces)
-      out << "member \"faces\" value \"face data\"" << std::endl;
-  out << "end" << std::endl;  
+      out << "member \"faces\" value \"face data\"" << '\n';
+  out << "end" << '\n';  
+
+				   // make sure everything now gets to
+				   // disk
+  out.flush ();
+
+  AssertThrow (out, ExcIO());
 }
 
 
@@ -283,19 +289,19 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 				       // use
       std::time_t  time1= std::time (0);
       std::tm     *time = std::localtime(&time1); 
-      out << "# This file was generated by the deal.II library." << std::endl
+      out << "# This file was generated by the deal.II library." << '\n'
 	  << "# Date =  "
 	  << time->tm_year+1900 << "/"
 	  << time->tm_mon+1 << "/"
-	  << time->tm_mday << std::endl
+	  << time->tm_mday << '\n'
 	  << "# Time =  "
 	  << time->tm_hour << ":"
 	  << std::setw(2) << time->tm_min << ":"
-	  << std::setw(2) << time->tm_sec << std::endl
-	  << "#" << std::endl
+	  << std::setw(2) << time->tm_sec << '\n'
+	  << "#" << '\n'
 	  << "# For a description of the UCD format see the AVS Developer's guide."
-	  << std::endl
-	  << "#" << std::endl;
+	  << '\n'
+	  << "#" << '\n';
     };
 
 				   // start with ucd data
@@ -304,7 +310,7 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 				  n_boundary_faces(tria) :
 				  0)
       << " 0 0 0"                  // no data
-      << std::endl;
+      << '\n';
 
 				   // actually write the vertices.
 				   // note that we shall number them
@@ -317,7 +323,7 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 	    << vertices[i];
 	for (unsigned int d=dim+1; d<=3; ++d)
 	  out << " 0";             // fill with zeroes
-	out << std::endl;
+	out << '\n';
       };
 	
 				   // write cells. Enumerate cells
@@ -356,7 +362,7 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
 	   ++vertex)
 	out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex])+1 << ' ';
-      out << std::endl;
+      out << '\n';
     };
 
 				   // write faces with non-zero boundary
@@ -364,6 +370,10 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
   if (ucd_flags.write_faces)
     write_ucd_faces (tria, cell_index, out);
     
+				   // make sure everything now gets to
+				   // disk
+  out.flush ();
+
   AssertThrow (out, ExcIO());
 }
 
@@ -393,13 +403,13 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 
 				   // The following text was copied
 				   // from an existing XFig file.
-  out << "#FIG 3.2\nLandscape\nCenter\nInches" << std::endl
-      << "A4\n100.00\nSingle" << std::endl
+  out << "#FIG 3.2\nLandscape\nCenter\nInches" << '\n'
+      << "A4\n100.00\nSingle" << '\n'
 				     // Background is transparent
-      << "-3" << std::endl
-      << "# generated by deal.II GridOut class" << std::endl
-      << "# reduce first number to scale up image" << std::endl
-      << "1200 2" << std::endl;
+      << "-3" << '\n'
+      << "# generated by deal.II GridOut class" << '\n'
+      << "# reduce first number to scale up image" << '\n'
+      << "1200 2" << '\n';
 
 				   // We write all cells and cells on
 				   // coarser levels are behind cells
@@ -435,7 +445,7 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 					 // some style parameters
 	  << " 0 0 -1 0 0 "
 					 // number of points
-	  << nv+1 << std::endl;
+	  << nv+1 << '\n';
 
 				       // For each point, write scaled
 				       // and shifted coordinates
@@ -451,7 +461,7 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 			      (p(d)-xfig_flags.offset(d)));
 	      out << '\t' << val;
 	    }
-	  out << std::endl;
+	  out << '\n';
 	}
 				       // Now write boundary edges
       static const unsigned int face_reorder[4]={2,1,3,0};
@@ -480,7 +490,7 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 						   // some style parameters
 		    << " 0 0 -1 0 0 "
 						   // number of points
-		    << nvf << std::endl;
+		    << nvf << '\n';
 		
 						 // For each point, write scaled
 						 // and shifted coordinates
@@ -496,11 +506,17 @@ void GridOut::write_xfig (const Triangulation<dim>& tria,
 					(p(d)-xfig_flags.offset(d)));
 			out << '\t' << val;
 		      }
-		    out << std::endl;
+		    out << '\n';
 		  } 
 	      }
 	  }
     }
+
+				   // make sure everything now gets to
+				   // disk
+  out.flush ();
+
+  AssertThrow (out, ExcIO());
 }
 
 #endif
@@ -574,7 +590,7 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
 				       // note: vertex numbers are 1-base
 	for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
 	  out << face->vertex_index(GeometryInfo<dim-1>::ucd_to_deal[vertex])+1 << ' ';
-	out << std::endl;
+	out << '\n';
 
 	++index;
       };	  
@@ -595,17 +611,22 @@ void GridOut::write_gnuplot (const Triangulation<1> &tria,
   for (; cell!=endc; ++cell)
     {
       if (gnuplot_flags.write_cell_numbers)
-	out << "# cell " << cell << std::endl;
+	out << "# cell " << cell << '\n';
 
       out << cell->vertex(0)
 	  << ' ' << cell->level()
-	  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	  << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	  << cell->vertex(1)
 		    << ' ' << cell->level()
-	  << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	  << std::endl;
+	  << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
+	  << '\n';
       break;
     }
+
+				   // make sure everything now gets to
+				   // disk
+  out.flush ();
+
   AssertThrow (out, ExcIO());
 }
 
@@ -652,7 +673,7 @@ void GridOut::write_gnuplot (const Triangulation<2> &tria,
   for (; cell!=endc; ++cell)
     {
       if (gnuplot_flags.write_cell_numbers)
-	out << "# cell " << cell << std::endl;
+	out << "# cell " << cell << '\n';
 
       if (mapping==0 || !cell->at_boundary())
 	{
@@ -666,12 +687,12 @@ void GridOut::write_gnuplot (const Triangulation<2> &tria,
 	  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
 	    out << cell->vertex(GeometryInfo<dim>::ucd_to_deal[i])
 		<< ' ' << cell->level()
-		<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+		<< ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
 	  out << cell->vertex(0)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << std::endl  // double new line for gnuplot 3d plots
-	      << std::endl;
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
+	      << '\n'  // double new line for gnuplot 3d plots
+	      << '\n';
 	}
       else
 					 // cell is at boundary and we
@@ -698,10 +719,10 @@ void GridOut::write_gnuplot (const Triangulation<2> &tria,
 			    (cell, q_projector->point(offset+i)))
 			<< ' ' << cell->level()
 			<< ' ' << static_cast<unsigned int>(cell->material_id())
-			<< std::endl;
+			<< '\n';
 		  
-		  out << std::endl
-		      << std::endl;
+		  out << '\n'
+		      << '\n';
 		}
 	      else
 		{
@@ -713,22 +734,25 @@ void GridOut::write_gnuplot (const Triangulation<2> &tria,
 		  out << face->vertex(0)
 		      << ' ' << cell->level()
 		      << ' ' << static_cast<unsigned int>(cell->material_id())
-		      << std::endl
+		      << '\n'
 		      << face->vertex(1)
 		      << ' ' << cell->level()
 		      << ' ' << static_cast<unsigned int>(cell->material_id())
-		      << std::endl
-		      << std::endl
-		      << std::endl;
+		      << '\n'
+		      << '\n'
+		      << '\n';
 		}
 	    }
 	}
     }
 
   if (q_projector != 0)
-    delete q_projector;
+    delete q_projector;  
   
-  
+				   // make sure everything now gets to
+				   // disk
+  out.flush ();
+
   AssertThrow (out, ExcIO());
 }
 
@@ -778,74 +802,74 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
   for (; cell!=endc; ++cell)
     {
       if (gnuplot_flags.write_cell_numbers)
-	out << "# cell " << cell << std::endl;
+	out << "# cell " << cell << '\n';
 
       if (mapping==0 || n_points==2 || !cell->has_boundary_lines())
 	{
 					   // front face
 	  out << cell->vertex(0)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(1)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(5)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(4)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(0)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << std::endl;
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
+	      << '\n';
 					   // back face
 	  out << cell->vertex(2)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(3)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(7)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(6)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(2)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << std::endl;
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
+	      << '\n';
 	  
 					   // now for the four connecting lines
 	  out << cell->vertex(0)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(2)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << std::endl;
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
+	      << '\n';
 	  out << cell->vertex(1)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(3)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << std::endl;
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
+	      << '\n';
 	  out << cell->vertex(5)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(7)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << std::endl;
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
+	      << '\n';
 	  out << cell->vertex(4)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 	      << cell->vertex(6)
 	      << ' ' << cell->level()
-	      << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
-	      << std::endl;
+	      << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
+	      << '\n';
 	}
       else
 	{
@@ -864,27 +888,27 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
 			  cell, q_projector->point(offset+i*n_points+j));
 			out << p0
 			    << ' ' << cell->level()
-			    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			    << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
 			out << (mapping->transform_unit_to_real_cell(
 				  cell, q_projector->point(offset+(i+1)*n_points+j)))
 			    << ' ' << cell->level()
-			    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			    << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
 			out << (mapping->transform_unit_to_real_cell(
 				  cell, q_projector->point(offset+(i+1)*n_points+j+1)))
 			    << ' ' << cell->level()
-			    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			    << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
 			out << (mapping->transform_unit_to_real_cell(
 				  cell, q_projector->point(offset+i*n_points+j+1)))
 			    << ' ' << cell->level()
-			    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			    << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
 							 // and the
 							 // first
 							 // point
 							 // again
 			out << p0
 			    << ' ' << cell->level()
-			    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
-			out << std::endl << std::endl;
+			    << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
+			out << '\n' << '\n';
 		      }
 		}
 	      else
@@ -913,17 +937,17 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
 			    out << (mapping->transform_unit_to_real_cell
 				    (cell, (1-boundary_points[i][0])*u0+boundary_points[i][0]*u1))
 				<< ' ' << cell->level()
-				<< ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+				<< ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
 			}
 		      else
 			out << v0
 			    << ' ' << cell->level()
-			    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl
+			    << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
 			    << v1
 			    << ' ' << cell->level()
-			    << ' ' << static_cast<unsigned int>(cell->material_id()) << std::endl;
+			    << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
 
-		      out << std::endl << std::endl;
+		      out << '\n' << '\n';
 		    }
 		}
 	    }
@@ -934,6 +958,10 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
     delete q_projector;
   
   
+				   // make sure everything now gets to
+				   // disk
+  out.flush ();
+
   AssertThrow (out, ExcIO());
 }
 
@@ -1232,16 +1260,16 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 				       // use
       std::time_t  time1= std::time (0);
       std::tm     *time = std::localtime(&time1); 
-      out << "%!PS-Adobe-2.0 EPSF-1.2" << std::endl
-	  << "%%Title: deal.II Output" << std::endl
-	  << "%%Creator: the deal.II library" << std::endl
+      out << "%!PS-Adobe-2.0 EPSF-1.2" << '\n'
+	  << "%%Title: deal.II Output" << '\n'
+	  << "%%Creator: the deal.II library" << '\n'
 	  << "%%Creation Date: " 
 	  << time->tm_year+1900 << "/"
 	  << time->tm_mon+1 << "/"
 	  << time->tm_mday << " - "
 	  << time->tm_hour << ":"
 	  << std::setw(2) << time->tm_min << ":"
-	  << std::setw(2) << time->tm_sec << std::endl
+	  << std::setw(2) << time->tm_sec << '\n'
 	  << "%%BoundingBox: "
 					 // lower left corner
 	  << "0 0 "
@@ -1249,7 +1277,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	  << static_cast<unsigned int>(std::floor(( (x_max-x_min) * scale )+1))
 	  << ' '
           << static_cast<unsigned int>(std::floor(( (y_max-y_min) * scale )+1))
-	  << std::endl;
+	  << '\n';
 
 				       // define some abbreviations to keep
 				       // the output small:
@@ -1257,10 +1285,10 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 				       // x=execute line stroke
 				       // b=black pen
 				       // r=red pen
-      out << "/m {moveto} bind def" << std::endl
-	  << "/x {lineto stroke} bind def" << std::endl
-	  << "/b {0 0 0 setrgbcolor} def" << std::endl
-	  << "/r {1 0 0 setrgbcolor} def" << std::endl;
+      out << "/m {moveto} bind def" << '\n'
+	  << "/x {lineto stroke} bind def" << '\n'
+	  << "/b {0 0 0 setrgbcolor} def" << '\n'
+	  << "/r {1 0 0 setrgbcolor} def" << '\n';
 
 				       // calculate colors for level
 				       // coloring; level 0 is black,
@@ -1271,7 +1299,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	     << (max_level)
 	     << " add "
 	     << (0.66666/std::max(1U,(max_level-1)))
-	     << " mul 1 0.8 sethsbcolor} def" << std::endl;
+	     << " mul 1 0.8 sethsbcolor} def" << '\n';
 
 				       // in 2d, we can also plot cell
 				       // and vertex numbers, but this
@@ -1297,14 +1325,14 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 		  "{pop} ifelse} forall} bind def\n"
 		  "/MCshow { currentpoint stroke m\n"
 		  "exch dup MFwidth -2 div 3 -1 roll R MFshow } def\n")
-	      << std::endl;
+	      << '\n';
 	};
       
-      out << "%%EndProlog" << std::endl
-	  << std::endl;
+      out << "%%EndProlog" << '\n'
+	  << '\n';
 
 				       // set fine lines
-      out << eps_flags_base.line_width << " setlinewidth" << std::endl;
+      out << eps_flags_base.line_width << " setlinewidth" << '\n';
     };
 
 				   // now write the lines
@@ -1320,18 +1348,18 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
       out << line->level
 	  << " l "
 	  << (line->first  - offset) * scale << " m "
-	  << (line->second - offset) * scale << " x" << std::endl;
+	  << (line->second - offset) * scale << " x" << '\n';
     else
       out << ((line->colorize && eps_flags_base.color_lines_on_user_flag) ? "r " : "b ")
 	  << (line->first  - offset) * scale << " m "
-	  << (line->second - offset) * scale << " x" << std::endl;
+	  << (line->second - offset) * scale << " x" << '\n';
     
 				   // finally write the cell numbers
 				   // in 2d, if that is desired
   if ((dim == 2) && (eps_flags_2.write_cell_numbers == true))
     {
       out << "(Helvetica) findfont 140 scalefont setfont"
-	  << std::endl;
+	  << '\n';
       
       typename Triangulation<dim>::active_cell_iterator
 	cell = tria.begin_active (),
@@ -1340,7 +1368,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	{
 	  out << (cell->center()(0)-offset(0))*scale << ' '
 	      << (cell->center()(1)-offset(1))*scale
-	      << " m" << std::endl
+	      << " m" << '\n'
 	      << "[ [(Helvetica) 12.0 0.0 true true (";
 	  if (eps_flags_2.write_cell_number_level)
 	    out << cell;
@@ -1349,7 +1377,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 
 	  out << ")] "
 	      << "] -6 MCshow"
-	      << std::endl;
+	      << '\n';
 	};
     };
 
@@ -1357,7 +1385,7 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
   if ((dim == 2) && (eps_flags_2.write_vertex_numbers == true))
     {
       out << "(Helvetica) findfont 140 scalefont setfont"
-	  << std::endl;
+	  << '\n';
 
 				       // have a list of those
 				       // vertices which we have
@@ -1379,17 +1407,21 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 	      
 	      out << (cell->vertex(vertex)(0)-offset(0))*scale << ' '
 		  << (cell->vertex(vertex)(1)-offset(1))*scale
-		  << " m" << std::endl
+		  << " m" << '\n'
 		  << "[ [(Helvetica) 10.0 0.0 true true ("
 		  << cell->vertex_index(vertex)
 		  << ")] "
 		  << "] -6 MCshow"
-		  << std::endl;
+		  << '\n';
 	    };
     };
   
-  out << "showpage" << std::endl;
+  out << "showpage" << '\n';
   
+				   // make sure everything now gets to
+				   // disk
+  out.flush ();
+
   AssertThrow (out, ExcIO());
 }
 
