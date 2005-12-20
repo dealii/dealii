@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2002, 2003, 2004 by the deal.II authors */
+/*    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -1703,9 +1703,9 @@ namespace Data
 				     // triangulation to the library,
 				     // but we don't want that here,
 				     // so we give an empty object:
-    coarse_grid.create_triangulation (vertices,
-				      cells,
-				      SubCellData());
+    coarse_grid.create_triangulation_compatibility (vertices,
+						    cells,
+						    SubCellData());
     
 				     // And since we want that the
 				     // evaluation point (3/4,3/4) in
