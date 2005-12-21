@@ -1661,18 +1661,18 @@ namespace Data
 				     // open and let it be computed
 				     // afterwards:
     static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell]
-      = {{0, 1, 6,5},
-	 {1, 2, 7, 6},
-	 {2, 3, 8, 7},
-	 {3, 4, 9, 8},
-	 {5, 6, 11, 10},
-	 {8, 9, 13, 12},
-	 {10, 11, 15, 14},
-	 {12, 13, 18, 17},
-	 {14, 15, 20, 19},
-	 {15, 16, 21, 20},
-	 {16, 17, 22, 21},
-	 {17, 18, 23, 22}};
+      = {{0, 1, 5, 6},
+	 {1, 2, 6, 7},
+	 {2, 3, 7, 8},
+	 {3, 4, 8, 9},
+	 {5, 6, 10, 11},
+	 {8, 9, 12, 13},
+	 {10, 11, 14, 15},
+	 {12, 13, 17, 18},
+	 {14, 15, 19, 20},
+	 {15, 16, 20, 21},
+	 {16, 17, 21, 22},
+	 {17, 18, 22, 23}};
     const unsigned int
       n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
 
@@ -1703,7 +1703,7 @@ namespace Data
 				     // triangulation to the library,
 				     // but we don't want that here,
 				     // so we give an empty object:
-    coarse_grid.create_triangulation_compatibility (vertices,
+    coarse_grid.create_triangulation (vertices,
 						    cells,
 						    SubCellData());
     
