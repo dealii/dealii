@@ -125,6 +125,12 @@ class DoFHandler  :  public Subscriptor
 				      * declared elsewhere.
 				      */
     typedef typename ::FunctionMap<dim>::type FunctionMap;
+
+				     /**
+				      * Make the dimension available
+				      * in function templates.
+				      */
+    static const unsigned int dimension = dim;
     
 				     /**
 				      * When the arrays holding the

@@ -1,15 +1,15 @@
-//----------------------------  hp_dof_handler.h  ------------------------
+//----------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  hp_dof_handler.h  ------------------------
+//----------------------------------------------------------------------
 #ifndef __deal2__hp_dof_handler_h
 #define __deal2__hp_dof_handler_h
 
@@ -64,6 +64,12 @@ class hpDoFHandler  :  public Subscriptor,
 				      * declared elsewhere.
 				      */
     typedef typename FunctionMap<dim>::type FunctionMap;
+    
+				     /**
+				      * Make the dimension available
+				      * in function templates.
+				      */
+    static const unsigned int dimension = dim;
     
 				     /**
 				      * When the arrays holding the
