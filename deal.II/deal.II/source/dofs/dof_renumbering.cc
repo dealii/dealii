@@ -876,7 +876,7 @@ template <class DH>
 void
 DoFRenumbering::cell_wise_dg (
   DH& dof,
-  const typename std::vector<typename DH::cell_iterator>& cells)
+  const std::vector<typename DH::cell_iterator>& cells)
 {
   std::vector<unsigned int> renumbering(dof.n_dofs());
   compute_cell_wise_dg(renumbering, dof, cells);
@@ -1331,7 +1331,7 @@ template
 void
 DoFRenumbering::cell_wise_dg
 (hpDoFHandler<deal_II_dimension>&,
- const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
+ const std::vector<hpDoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
 void
