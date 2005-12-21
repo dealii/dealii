@@ -26,13 +26,13 @@ hp: abort.o
 	cd hp ; $(MAKE)
 
 report: abort.o
-	@for i in base lac fe deal.II multigrid bits all-headers ; do \
+	@for i in base lac fe deal.II multigrid bits hp all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
 
 report+mail: abort.o
-	@for i in base lac fe deal.II multigrid bits all-headers ; do \
+	@for i in base lac fe deal.II multigrid bits hp all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report+mail ; cd .. ; \
 	 done
@@ -40,7 +40,7 @@ report+mail: abort.o
 
 # compilation of tests only, no execution of tests
 
-build: build-base build-lac build-fe build-deal.II build-multigrid build-bits
+build: build-base build-lac build-fe build-deal.II build-multigrid build-bits build-hp
 
 build-base: abort.o
 	cd base ; $(MAKE) build
@@ -60,11 +60,14 @@ build-deal.II: abort.o
 build-multigrid: abort.o
 	cd multigrid ; $(MAKE) build
 
+build-hp: abort.o
+	cd hp ; $(MAKE) build
+
 
 # compilation and execution of tests only, no comparison with
 # reference values
 
-output: output-base output-lac output-fe output-deal.II output-bits
+output: output-base output-lac output-fe output-deal.II output-bits output-hp
 
 output-base: abort.o
 	cd base ; $(MAKE) output
@@ -84,11 +87,14 @@ output-deal.II: abort.o
 output-multigrid: abort.o
 	cd multigrid ; $(MAKE) output
 
+output-hp: abort.o
+	cd hp ; $(MAKE) output
+
 
 
 # update/generate references
 
-refs: refs-base refs-lac refs-fe refs-deal.II refs-bits
+refs: refs-base refs-lac refs-fe refs-deal.II refs-bits refs-hp
 
 refs-base: abort.o
 	cd base ; $(MAKE) refs
@@ -108,15 +114,18 @@ refs-deal.II: abort.o
 refs-multigrid: abort.o
 	cd multigrid ; $(MAKE) refs
 
+refs-hp: abort.o
+	cd hp ; $(MAKE) refs
+
 
 
 resultname:
 	@echo $(TARGET)+$(GXX-VERSION)
 
-clean: clean-base clean-lac clean-deal.II clean-fe clean-bits
+clean: clean-base clean-lac clean-deal.II clean-fe clean-bits clean-hp
 	-rm -f abort.o
 
-distclean: distclean-base distclean-lac distclean-deal.II distclean-fe distclean-bits
+distclean: distclean-base distclean-lac distclean-deal.II distclean-fe distclean-bits distclean-hp
 	-rm -f abort.o
 
 clean-base:
@@ -155,13 +164,21 @@ clean-bits:
 distclean-bits:
 	cd bits ; $(MAKE) distclean
 
+clean-hp:
+	cd hp ; $(MAKE) clean
+
+distclean-hp:
+	cd hp ; $(MAKE) distclean
+
+
 abort.o: abort.cc
 	 @$(CXX) $(CXXFLAGS.g) -o $@ -c $<
 
 .PHONY : all base lac fe deal.II multigrid bits \
-	clean clean-base clean-lac clean-fe clean-deal.II clean-multigrid clean-bits \
+	clean clean-base clean-lac clean-fe \
+	clean-deal.II clean-multigrid clean-bits clean-hp \
 	distclean distclean-base distclean-lac distclean-fe \
-	distclean-deal.II distclean-multigrid distclean-bits
+	distclean-deal.II distclean-multigrid distclean-bits distclean-hp
 
 include Makefile.paths
 include $D/common/Make.global_options
