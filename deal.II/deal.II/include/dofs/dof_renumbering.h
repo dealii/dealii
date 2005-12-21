@@ -400,10 +400,10 @@ class DoFRenumbering
 				      * freedom have to be associated
 				      * with the interior of the cell.
 				      */
-    template <int dim>
+    template <class DH>
     static void
-    cell_wise_dg (DoFHandler<dim> &dof_handler,
-		  const std::vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
+    cell_wise_dg (DH &dof_handler,
+		  const std::vector<typename DH::cell_iterator> &cell_order);
 
 				     /**
 				      * Computes the renumbering
@@ -414,11 +414,11 @@ class DoFRenumbering
 				      * returns the renumbering
 				      * vector.
 				      */
-    template <int dim>
+    template <class DH>
     static void
     compute_cell_wise_dg (std::vector<unsigned int> &new_dof_indices,
-			  const DoFHandler<dim> &dof_handler,
-			  const std::vector<typename DoFHandler<dim>::cell_iterator> &cell_order);
+			  const DH &dof_handler,
+			  const std::vector<typename DH::cell_iterator> &cell_order);
 
 				     /**
 				      * Cell-wise renumbering on one
@@ -460,10 +460,10 @@ class DoFRenumbering
 				      * have to be associated with the
 				      * interior of the cell.
 				      */
-    template <int dim>
+    template <class DH, int dim>
     static void
-    downstream_dg (DoFHandler<dim>  &dof_handler,
-		   const Point<dim> &direction);
+    downstream_dg (DH&               dof_handler,
+		   const Point<dim>& direction);
 
 				     /**
 				      * Cell-wise downstream numbering
@@ -487,11 +487,11 @@ class DoFRenumbering
 				      * returns the renumbering
 				      * vector.
 				      */
-    template <int dim>
+    template <class DH, int dim>
     static void
-    compute_downstream_dg (std::vector<unsigned int> &new_dof_indices,
-			   const DoFHandler<dim>  &dof_handler,
-			   const Point<dim> &direction);
+    compute_downstream_dg (std::vector<unsigned int>& new_dof_indices,
+			   const DH&                  dof_handler,
+			   const Point<dim>&          direction);
 
 //TODO:[GK] Documentation!    
 				     /**
