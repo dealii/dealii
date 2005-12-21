@@ -508,11 +508,11 @@ class DoFRenumbering
 				      * have to be associated with the
 				      * interior of the cell.
 				      */
-    template <int dim>
+    template <class DH, int dim>
     static void
-    clockwise_dg (DoFHandler<dim>  &dof_handler,
-		  const Point<dim> &center,
-		  const bool counter = false);
+    clockwise_dg (DH&               dof_handler,
+		  const Point<dim>& center,
+		  const bool        counter = false);
 
 				     /**
 				      * Cell-wise clockwise numbering
@@ -535,12 +535,12 @@ class DoFRenumbering
 				      * returns the renumbering
 				      * vector.
 				      */
-    template <int dim>
+    template <class DH, int dim>
     static void
-    compute_clockwise_dg (std::vector<unsigned int> &new_dof_indices,
-			  const DoFHandler<dim>  &dof_handler,
-			  const Point<dim> &center,
-			  const bool counter);
+    compute_clockwise_dg (std::vector<unsigned int>& new_dof_indices,
+			  const DH&                  dof_handler,
+			  const Point<dim>&          center,
+			  const bool                 counter);
 
 				     /**
 				      * Sort those degrees of freedom
@@ -555,10 +555,10 @@ class DoFRenumbering
 				      * order within the untagged
 				      * ones.
 				      */
-    template <int dim>
+    template <class DH>
     static void
-    sort_selected_dofs_back (DoFHandler<dim>         &dof_handler,
-			     const std::vector<bool> &selected_dofs);
+    sort_selected_dofs_back (DH&                      dof_handler,
+			     const std::vector<bool>& selected_dofs);
 
     				     /**
 				      * Computes the renumbering
@@ -569,19 +569,19 @@ class DoFRenumbering
 				      * dofs but returns the
 				      * renumbering vector.
 				      */
-    template <int dim>
+    template <class DH>
     static void
-    compute_sort_selected_dofs_back (std::vector<unsigned int> &new_dof_indices,
-				     const DoFHandler<dim>&,
-				     const std::vector<bool>&selected_dofs);
+    compute_sort_selected_dofs_back (std::vector<unsigned int>& new_dof_indices,
+				     const DH&                  dof_handler,
+				     const std::vector<bool>&   selected_dofs);
 
 				     /**
 				      * Renumber the degrees of
 				      * freedom in a random way.
 				      */
-    template <int dim>
+    template <class DH>
     static void
-    random (DoFHandler<dim> &dof_handler);
+    random (DH& dof_handler);
 
     				     /**
 				      * Computes the renumbering
@@ -591,10 +591,10 @@ class DoFRenumbering
 				      * dofs but returns the
 				      * renumbering vector.
 				      */   
-    template <int dim>
+    template <class DH>
     static void
     compute_random (std::vector<unsigned int> &new_dof_indices,
-		    const DoFHandler<dim> &dof_handler);
+		    const DH& dof_handler);
 
 				     /**
 				      * Renumber the degrees of

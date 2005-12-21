@@ -818,14 +818,14 @@ compute_component_wise (std::vector<unsigned int>& new_indices,
 
 
 
-template <int dim>
+template <class DH>
 void
 DoFRenumbering::sort_selected_dofs_back (
-  DoFHandler<dim>         &dof_handler,
-  const std::vector<bool> &selected_dofs)
+  DH&                      dof_handler,
+  const std::vector<bool>& selected_dofs)
 {
   std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
-					DoFHandler<dim>::invalid_dof_index);
+					DH::invalid_dof_index);
   compute_sort_selected_dofs_back(renumbering, dof_handler, selected_dofs);
 
   dof_handler.renumber_dofs(renumbering);
@@ -833,11 +833,11 @@ DoFRenumbering::sort_selected_dofs_back (
 
 
 
-template <int dim>
+template <class DH>
 void
 DoFRenumbering::compute_sort_selected_dofs_back (
   std::vector<unsigned int>& new_indices,
-  const DoFHandler<dim>&     dof_handler,
+  const DH&                  dof_handler,
   const std::vector<bool>&   selected_dofs)
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
@@ -1076,9 +1076,10 @@ struct ClockCells
       {}
 				     /**
 				      * Comparison operator
-				      */    
-    bool operator () (const typename DoFHandler<dim>::cell_iterator& c1,
-		      const typename DoFHandler<dim>::cell_iterator&c2) const
+				      */
+    template <class DHCellIterator>
+    bool operator () (const DHCellIterator& c1,
+		      const DHCellIterator& c2) const
       {
 	
 	const Point<dim> v1 = c1->center() - center;
@@ -1090,11 +1091,12 @@ struct ClockCells
 };
 
 
-template <int dim>
+template <class DH, int dim>
 void
-DoFRenumbering::clockwise_dg (DoFHandler<dim>& dof,
-			      const Point<dim>& center,
-			      const bool counter)
+DoFRenumbering::clockwise_dg (
+  DH& dof,
+  const Point<dim>& center,
+  const bool counter)
 {
   std::vector<unsigned int> renumbering(dof.n_dofs());
   compute_clockwise_dg(renumbering, dof, center, counter);
@@ -1104,20 +1106,20 @@ DoFRenumbering::clockwise_dg (DoFHandler<dim>& dof,
 
 
 
-template <int dim>
+template <class DH, int dim>
 void
 DoFRenumbering::compute_clockwise_dg (
   std::vector<unsigned int>& new_indices,
-  const DoFHandler<dim>& dof,
+  const DH& dof,
   const Point<dim>& center,
   const bool counter)
 {
-  std::vector<typename DoFHandler<dim>::cell_iterator>
+  std::vector<typename DH::cell_iterator>
     ordered_cells(dof.get_tria().n_active_cells());
   ClockCells<dim> comparator(center, counter);
   
-  typename DoFHandler<dim>::active_cell_iterator begin = dof.begin_active();
-  typename DoFHandler<dim>::active_cell_iterator end = dof.end();
+  typename DH::active_cell_iterator begin = dof.begin_active();
+  typename DH::active_cell_iterator end = dof.end();
   
   copy (begin, end, ordered_cells.begin());
   sort (ordered_cells.begin(), ordered_cells.end(), comparator);
@@ -1147,22 +1149,23 @@ void DoFRenumbering::clockwise_dg (MGDoFHandler<dim>& dof,
 
 
 
-template <int dim>
+template <class DH>
 void
-DoFRenumbering::random (DoFHandler<dim> &dof_handler)
+DoFRenumbering::random (DH& dof_handler)
 {
   std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
-					DoFHandler<dim>::invalid_dof_index);
+					DH::invalid_dof_index);
   compute_random(renumbering, dof_handler);
 
   dof_handler.renumber_dofs(renumbering);
 }
 
 
-template <int dim>
+template <class DH>
 void
-DoFRenumbering::compute_random (std::vector<unsigned int> &new_indices,
-                                const DoFHandler<dim>     &dof_handler)
+DoFRenumbering::compute_random (
+  std::vector<unsigned int>& new_indices,
+  const DH&                  dof_handler)
 {
   const unsigned int n_dofs = dof_handler.n_dofs();
   Assert(new_indices.size() == n_dofs,
@@ -1325,6 +1328,20 @@ DoFRenumbering::compute_downstream_dg
  const DoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&);
 
+template
+void
+DoFRenumbering::clockwise_dg
+(DoFHandler<deal_II_dimension>&,
+ const Point<deal_II_dimension>&, bool);
+
+template
+void
+DoFRenumbering::compute_clockwise_dg
+(std::vector<unsigned int>&,
+ const DoFHandler<deal_II_dimension>&,
+ const Point<deal_II_dimension>&,
+ const bool);
+
 // DG renumbering for hpDoFHandler
 
 template
@@ -1353,6 +1370,20 @@ DoFRenumbering::compute_downstream_dg
  const hpDoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&);
 
+template
+void
+DoFRenumbering::clockwise_dg
+(hpDoFHandler<deal_II_dimension>&,
+ const Point<deal_II_dimension>&, bool);
+
+template
+void
+DoFRenumbering::compute_clockwise_dg
+(std::vector<unsigned int>&,
+ const hpDoFHandler<deal_II_dimension>&,
+ const Point<deal_II_dimension>&,
+ const bool);
+
 // MG
 
 template
@@ -1362,49 +1393,60 @@ void DoFRenumbering::downstream_dg<deal_II_dimension>
  const Point<deal_II_dimension>&);
 
 template
-void
-DoFRenumbering::clockwise_dg<deal_II_dimension>
-(DoFHandler<deal_II_dimension>&,
- const Point<deal_II_dimension>&, bool);
-
-template
-void
-DoFRenumbering::compute_clockwise_dg<deal_II_dimension>
-(std::vector<unsigned int>&,
- const DoFHandler<deal_II_dimension>&,
- const Point<deal_II_dimension>&, bool);
-
-template
 void DoFRenumbering::clockwise_dg<deal_II_dimension>
 (MGDoFHandler<deal_II_dimension>&,
  const unsigned int,
  const Point<deal_II_dimension>&, bool);
 
+// Generic numbering schemes
+
 template
-void DoFRenumbering::sort_selected_dofs_back<deal_II_dimension>
+void DoFRenumbering::random
+(DoFHandler<deal_II_dimension> &);
+
+template
+void
+DoFRenumbering::compute_random
+(std::vector<unsigned int>&,
+ const DoFHandler<deal_II_dimension> &);
+
+template
+void DoFRenumbering::sort_selected_dofs_back
 (DoFHandler<deal_II_dimension> &,
  const std::vector<bool> &);
 
 template
 void
-DoFRenumbering::compute_sort_selected_dofs_back<deal_II_dimension>
+DoFRenumbering::compute_sort_selected_dofs_back
 (std::vector<unsigned int>&,
  const DoFHandler<deal_II_dimension> &,
  const std::vector<bool> &);
 
 template
-void DoFRenumbering::random<deal_II_dimension>
-(DoFHandler<deal_II_dimension> &);
+void DoFRenumbering::random
+(hpDoFHandler<deal_II_dimension> &);
+
+template
+void
+DoFRenumbering::compute_random
+(std::vector<unsigned int>&,
+ const hpDoFHandler<deal_II_dimension> &);
+
+template
+void DoFRenumbering::sort_selected_dofs_back
+(hpDoFHandler<deal_II_dimension> &,
+ const std::vector<bool> &);
+
+template
+void
+DoFRenumbering::compute_sort_selected_dofs_back
+(std::vector<unsigned int>&,
+ const hpDoFHandler<deal_II_dimension> &,
+ const std::vector<bool> &);
 
 template
 void DoFRenumbering::subdomain_wise<deal_II_dimension>
 (DoFHandler<deal_II_dimension> &);
-
-template
-void
-DoFRenumbering::compute_random<deal_II_dimension>
-(std::vector<unsigned int>&,
- const DoFHandler<deal_II_dimension> &);
 
 template
 void
