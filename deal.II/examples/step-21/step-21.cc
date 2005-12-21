@@ -21,6 +21,9 @@
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
 #include <lac/vector_memory.h>
+#include <lac/solver_gmres.h>
+#include <lac/precondition.h>
+#include <lac/sparse_ilu.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_out.h>
@@ -42,20 +45,11 @@
                                  // include files.
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
+#include <dofs/dof_renumbering.h>
 #include <numerics/data_out.h>
 
 #include <fe/mapping_q1.h>
 #include <fe/fe_dgq.h>
-
-                                 // The PETSc vector and matrix
-                                 // classes are used to have access to
-                                 // the PETSc preconditioners.
-#include <lac/petsc_vector.h>
-#include <lac/petsc_sparse_matrix.h>
-                                 // Then we also need interfaces for solvers
-                                 // and preconditioners that PETSc provides:
-#include <lac/petsc_solver.h>
-#include <lac/petsc_precondition.h>
 
 				 // We are going to use gradients as
 				 // refinement indicator.
@@ -599,7 +593,7 @@ class DGMethod
     void setup_system ();
     void assemble_system1 ();
     void assemble_system2 ();
-    void solve (PETScWrappers::Vector &solution);
+    void solve (Vector<double> &solution);
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
@@ -628,7 +622,8 @@ class DGMethod
                                      // replaced by a hpDoFHandler.
     hpDoFHandler<dim>    dof_handler;
 
-    PETScWrappers::SparseMatrix system_matrix;
+    SparsityPattern sparsity;
+    SparseMatrix<double> system_matrix;
 
 				     // We define the quadrature
 				     // formulae for the cell and the
@@ -651,9 +646,9 @@ class DGMethod
 				     // different assembling routines
 				     // ``assemble_system1'' and
 				     // ``assemble_system2'';
-    PETScWrappers::Vector       solution1;
-    PETScWrappers::Vector       solution2;
-    PETScWrappers::Vector       right_hand_side;
+    Vector<double>       solution1;
+    Vector<double>       solution2;
+    Vector<double>       right_hand_side;
     
 				     // Finally this class includes an
 				     // object of the
@@ -732,7 +727,22 @@ void DGMethod<dim>::setup_system ()
 				   // First we need to distribute the
 				   // DoFs.
   dof_handler.distribute_dofs (fe_collection);
-
+				   // In order to get a good
+				   // preconditioner, the degrees of
+				   // freedom should be ordered in
+				   // downstream direction.  First, we
+				   // initalize a vector fairly close
+				   // to the real vector field; since
+				   // this is for preconditioning
+				   // only, a rough approximation is
+				   // sufficient.
+  Point<dim> sorting_direction;
+  for (unsigned int d=0;d<dim;++d)
+    sorting_direction(d) = 1.;
+				   // Now do the sorting of the
+				   // degrees of freedom.
+  DoFRenumbering::downstream_dg(dof_handler, sorting_direction);
+  
 				   // The DoFs of a cell are coupled
 				   // with all DoFs of all neighboring
 				   // cells.  Therefore the maximum
@@ -745,7 +755,8 @@ void DGMethod<dim>::setup_system ()
   DoFTools::make_sparsity_pattern (dof_handler, compressed_pattern);
   DoFTools::make_flux_sparsity_pattern (dof_handler, compressed_pattern);
 
-  system_matrix.reinit (compressed_pattern);
+  sparsity.copy_from(compressed_pattern);
+  system_matrix.reinit (sparsity);
 
   solution1.reinit (dof_handler.n_dofs());
   solution2.reinit (dof_handler.n_dofs());
@@ -1259,9 +1270,6 @@ void DGMethod<dim>::assemble_system1 ()
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	right_hand_side(dofs[i]) += cell_vector(i);
     }
-
-  system_matrix.compress ();
-  right_hand_side.compress ();
 }
 
 
@@ -1505,50 +1513,43 @@ void DGMethod<dim>::assemble_system2 ()
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	right_hand_side(dofs[i]) += cell_vector(i);
     }
-
-  system_matrix.compress ();
-  right_hand_side.compress ();
 }
 
 
 				 // @sect3{All the rest}
 				 //
-				 // For this simple problem we use the
-				 // simplest possible solver, called
-				 // Richardson iteration, that
-				 // represents a simple defect
-				 // correction. This, in combination
-				 // with a block SSOR preconditioner,
-				 // that uses the special block matrix
-				 // structur of system matrices
-				 // arising from DG
-				 // discretizations. The size of these
-				 // blocks are the number of DoFs per
-				 // cell. Here, we use a SSOR
-				 // preconditioning as we have not
-				 // renumbered the DoFs according to
-				 // the flow field. If the DoFs are
-				 // renumbered downstream the flow,
-				 // then a block Gauss-Seidel
-				 // preconditioner (see the
-				 // PreconditionBlockSOR class with
-				 // relaxation=1) makes a much better
-				 // job.
+				 // First, we have to solve the
+				 // discrete system. Since we solve a
+				 // transport equation, the matrix is
+				 // nonsymmetric. Hence, we use a
+				 // GMRES solver.
+				 //
+				 // For a preconditioner, we use the
+				 // ILU method. Since we already
+				 // sorted the degrees of freedom in
+				 // downwind direction, this should be
+				 // quite efficient. Actually, a block
+				 // Gauss-Seidel method would be an
+				 // exact solver, but it has not been
+				 // implemented for variable block
+				 // sizes yet.
+				 //
 template <int dim>
-void DGMethod<dim>::solve (PETScWrappers::Vector &solution) 
+void DGMethod<dim>::solve (Vector<double> &solution) 
 {
-  SolverControl           solver_control (solution.size(), 
-                                          1e-13, false, false);
-  PETScWrappers::SolverBiCG bicg (solver_control);
-  PETScWrappers::PreconditionILU preconditioner(system_matrix);
-
-                                   // Then solve the system:
-  bicg.solve (system_matrix, solution, right_hand_side,
+  SolverControl solver_control (10000, 1e-12, false, true);
+  SolverGMRES<Vector<double> > solver (solver_control);
+				   // Initialize the ILU
+				   // preconditioner. We decide for
+				   // two additional off diagonals in
+				   // order to enhance its
+				   // performance.
+  SparseILU<double>::AdditionalData data(0., 2);
+  SparseILU<double> preconditioner;
+  preconditioner.initialize (system_matrix, data);
+				   // Then solve the system:
+  solver.solve (system_matrix, solution, right_hand_side,
 	      preconditioner);
-
-  solution.compress ();
-
-  std::cout << "Iterations : " << solver_control.last_step() << std::endl;
 }
 
 
@@ -1655,7 +1656,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
   Assert (cycle < 10, ExcInternalError());
   
   filename += ".eps";
-  std::cout << "Writing grid to <" << filename << ">..." << std::endl;
+  deallog << "Writing grid to <" << filename << ">..." << std::endl;
   std::ofstream eps_output (filename.c_str());
 
   GridOut grid_out;
@@ -1669,7 +1670,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
   
   //  filename += ".gnuplot";
   filename += ".vtk";
-  std::cout << "Writing solution to <" << filename << ">..."
+  deallog << "Writing solution to <" << filename << ">..."
 	    << std::endl << std::endl;
   std::ofstream gnuplot_output (filename.c_str());
   
@@ -1702,7 +1703,7 @@ void DGMethod<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<5; ++cycle)
     {
-      std::cout << "Cycle " << cycle << ':' << std::endl;
+      deallog << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
 	{
@@ -1714,13 +1715,13 @@ void DGMethod<dim>::run ()
 	refine_grid ();
       
 
-      std::cout << "   Number of active cells:       "
+      deallog << "   Number of active cells:       "
 		<< triangulation.n_active_cells()
 		<< std::endl;
 
       setup_system ();
 
-      std::cout << "   Number of degrees of freedom: "
+      deallog << "   Number of degrees of freedom: "
 		<< dof_handler.n_dofs()
 		<< std::endl;
 
@@ -1734,7 +1735,7 @@ void DGMethod<dim>::run ()
 				       // current time without
 				       // disturbing the time
 				       // measurement.
-      std::cout << "Time of assemble_system1: "
+      deallog << "Time of assemble_system1: "
 		<< assemble_timer()
 		<< std::endl;
       solve (solution1);
@@ -1754,7 +1755,7 @@ void DGMethod<dim>::run ()
 				       // call the second assembling routine
       assemble_system2 ();
 				       // and access the current time.
-      std::cout << "Time of assemble_system2: "
+      deallog << "Time of assemble_system2: "
 		<< assemble_timer()
 		<< std::endl;
       solve (solution2);
@@ -1768,10 +1769,10 @@ void DGMethod<dim>::run ()
       solution1-=solution2;
 
       const double difference=solution1.linfty_norm();
-      if (difference>1e-13)
-	std::cout << "solution1 and solution2 differ!!" << std::endl;
+      if (difference>1e-12)
+	deallog << "solution1 and solution2 differ!!" << std::endl;
       else
-	std::cout << "solution1 and solution2 coincide." << std::endl;
+	deallog << "solution1 and solution2 coincide." << std::endl;
 	
 				       // Finally we perform the
 				       // output.
@@ -1782,18 +1783,12 @@ void DGMethod<dim>::run ()
 				 // The following ``main'' function is
 				 // similar to previous examples and
 				 // need not to be commented on.
-int main (int argc, char **argv) 
+int main () 
 {
   try
     {
-      PetscInitialize(&argc,&argv,0,0);
-
-      {
 	  DGMethod<2> dgmethod;
 	  dgmethod.run ();
-      }
-      
-      PetscFinalize ();
     }
   catch (std::exception &exc)
     {
