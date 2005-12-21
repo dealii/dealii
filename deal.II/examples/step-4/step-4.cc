@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -278,18 +278,18 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (4);
   
-  std::cout << "   Number of active cells: "
-	    << triangulation.n_active_cells()
-	    << std::endl
-	    << "   Total number of cells: "
-	    << triangulation.n_cells()
-	    << std::endl;
+  deallog << "Number of active cells: "
+	  << triangulation.n_active_cells()
+	  << std::endl
+	  << "Total number of cells:  "
+	  << triangulation.n_cells()
+	  << std::endl;
 
   dof_handler.distribute_dofs (fe);
 
-  std::cout << "   Number of degrees of freedom: "
-	    << dof_handler.n_dofs()
-	    << std::endl;
+  deallog << "Number of degrees of freedom: "
+	  << dof_handler.n_dofs()
+	  << std::endl;
 
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
@@ -499,15 +499,6 @@ void LaplaceProblem<dim>::solve ()
   SolverCG<>              cg (solver_control);
   cg.solve (system_matrix, solution, system_rhs,
 	    PreconditionIdentity());
-
-				   // We have made one addition,
-				   // though: since we suppress output
-				   // from the linear solvers, we have
-				   // to print the number of
-				   // iterations by hand.
-  std::cout << "   " << solver_control.last_step()
-	    << " CG iterations needed to obtain convergence."
-	    << std::endl;
 }
 
 
@@ -553,12 +544,17 @@ void LaplaceProblem<dim>::output_results () const
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
-  
+  deallog << "Solving problem in " << dim << " space dimensions." << std::endl;
+				   // Here we make use of the feature
+				   // of LogStream that allows us
+				   // indenting output inside blocks.
+  deallog.push("  ");
   make_grid_and_dofs();
   assemble_system ();
   solve ();
   output_results ();
+				   // Remove the indentation of output again
+  deallog.pop();
 }
 
     
@@ -568,61 +564,6 @@ void LaplaceProblem<dim>::run ()
 				 // previous example:
 int main () 
 {
-				   // In the previous example, we had
-				   // the output from the linear
-				   // solvers about the starting
-				   // residual and the number of the
-				   // iteration where convergence was
-				   // detected. This can be suppressed
-				   // like this:
-  deallog.depth_console (0);
-				   // The rationale here is the
-				   // following: the deallog
-				   // (i.e. deal-log, not de-allog)
-				   // variable represents a stream to
-				   // which some parts of the library
-				   // write output. It redirects this
-				   // output to the console and if
-				   // required to a file. The output
-				   // is nested in a way that each
-				   // function can use a prefix string
-				   // (separated by colons) for each
-				   // line of output; if it calls
-				   // another function, that may also
-				   // use its prefix which is then
-				   // printed after the one of the
-				   // calling function. Since output
-				   // from functions which are nested
-				   // deep below is usually not as
-				   // important as top-level output,
-				   // you can give the deallog
-				   // variable a maximal depth of
-				   // nested output for output to
-				   // console and file. The depth zero
-				   // which we gave here means that no
-				   // output is written.
-
-				   // After having done this
-				   // administrative stuff, we can go
-				   // on just as before: define one of
-				   // these top-level objects and
-				   // transfer control to
-				   // it. Actually, now is the point
-				   // where we have to tell the
-				   // compiler which dimension we
-				   // would like to use; all functions
-				   // up to now including the classes
-				   // were only templates and nothing
-				   // has been compiled by now, but by
-				   // declaring the following objects,
-				   // the compiler will start to
-				   // compile all the functions at the
-				   // top using the template parameter
-				   // replaced with a concrete value.
-				   //
-				   // For demonstration, we will first
-				   // let the whole thing run in 2D
-				   // and then in 3D:
   LaplaceProblem<2> laplace_problem_2d;
   laplace_problem_2d.run ();
 
