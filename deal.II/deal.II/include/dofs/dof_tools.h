@@ -223,10 +223,10 @@ class DoFTools
 				      * couplings between cells are
 				      * counted.
 				      */
-    template<int dim>
+    template<class DH>
     static
     void compute_row_length_vector(
-      const DoFHandler<dim>& dofs,
+      const DH& dofs,
       std::vector<unsigned int>& row_lengths,
       const Coupling flux_couplings = none);
     
@@ -273,13 +273,12 @@ class DoFTools
 				      *
 				      * @todo This function is only
 				      * implemented for primitive
-				      * elements. Implementation in 1D
-				      * is missing completely.
+				      * elements.
 				     */
-    template<int dim>
+    template<class DH>
     static
     void compute_row_length_vector(
-      const DoFHandler<dim>& dofs,
+      const DH& dofs,
       std::vector<unsigned int>& row_lengths,
       const Table<2,Coupling>& couplings /*= typename Table<2,Coupling>()*/,
       const Table<2,Coupling>& flux_couplings /*= Table<2,Coupling>()*/);

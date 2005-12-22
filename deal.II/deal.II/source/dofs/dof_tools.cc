@@ -135,14 +135,14 @@ namespace
 #if  deal_II_dimension == 1
 
 // Specialization for 1D
-template <int dim>
+template <class DH>
 void
 DoFTools::
-compute_row_length_vector(const DoFHandler<dim>     &dofs,
-                          std::vector<unsigned int> &row_lengths,
-                          const Coupling             flux_coupling)
+compute_row_length_vector(
+  const DH&                  dofs,
+  std::vector<unsigned int>& row_lengths,
+  const Coupling             flux_coupling)
 {
-  const FiniteElement<dim>& fe = dofs.get_fe();
   Assert (row_lengths.size() == dofs.n_dofs(),
 	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
 
@@ -150,12 +150,14 @@ compute_row_length_vector(const DoFHandler<dim>     &dofs,
 				   // resetting the counters.
   std::fill(row_lengths.begin(), row_lengths.end(), 0);
   
-  const typename DoFHandler<dim>::cell_iterator end = dofs.end();
-  typename DoFHandler<dim>::active_cell_iterator cell;
-  std::vector<unsigned int> cell_indices(fe.dofs_per_cell);
+  const typename DH::cell_iterator end = dofs.end();
+  typename DH::active_cell_iterator cell;
+  std::vector<unsigned int> cell_indices;
   
   for (cell = dofs.begin_active(); cell != end; ++cell)
     {
+      const FiniteElement<DH::dimension>& fe = cell->get_fe();
+      cell_indices.resize(fe.dofs_per_cell);
       cell->get_dof_indices(cell_indices);
 
                                        // each dof can couple with each other
@@ -166,58 +168,52 @@ compute_row_length_vector(const DoFHandler<dim>     &dofs,
 				       // If fluxes couple, add
 				       // coupling to neighbor cells
       if (flux_coupling != none)
-	for (unsigned int face=0;face<GeometryInfo<dim>::faces_per_cell;++face)
+	for (unsigned int face=0;face<GeometryInfo<DH::dimension>::faces_per_cell;++face)
 	  {
 	    if (cell->at_boundary(face))
               continue;
-            
+            const FiniteElement<DH::dimension>& nfe = cell->get_fe();
 	    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	      row_lengths[cell_indices[i]] += fe.dofs_per_cell;
+	      row_lengths[cell_indices[i]] += nfe.dofs_per_cell;
 	}
     }
 }
 
 
 // Specialization for 1D
-template <int dim>
+template <class DH>
 void
 DoFTools::compute_row_length_vector(
-  const DoFHandler<dim>& dofs,
+  const DH& dofs,
   std::vector<unsigned int>& row_lengths,
   const Table<2,Coupling>& couplings,
   const Table<2,Coupling>& flux_couplings)
 {
-  const FiniteElement<dim>& fe = dofs.get_fe();
-  Assert (fe.is_primitive(), typename FiniteElement<dim>::ExcFENotPrimitive());
   Assert (row_lengths.size() == dofs.n_dofs(),
 	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
-  Assert (couplings.n_rows()==fe.n_components(),
-	  ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
-  Assert (couplings.n_cols()==fe.n_components(),
-	  ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
-  Assert (flux_couplings.n_rows()==fe.n_components(),
-	  ExcDimensionMismatch(flux_couplings.n_rows(), fe.n_components()));
-  Assert (flux_couplings.n_cols()==fe.n_components(),
-	  ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
   
   				   // Function starts here by
 				   // resetting the counters.
-  std::fill(row_lengths.begin(), row_lengths.end(), 0);
+  std::fill(row_lengths.begin(), row_lengths.end(), 0);  
   
-  				   // Two vectors containing the
-				   // number of dofs of a cell, split
-				   // by components.
-  std::vector<unsigned int> dofs_cell(fe.n_components());
-  
-  for (unsigned int comp=0;comp<fe.n_components();++comp)
-      dofs_cell[comp] = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell;
-  
-  const typename DoFHandler<dim>::cell_iterator end = dofs.end();
-  typename DoFHandler<dim>::active_cell_iterator cell;
-  std::vector<unsigned int> cell_indices(fe.dofs_per_cell);
+  const typename DH::cell_iterator end = dofs.end();
+  typename DH::active_cell_iterator cell;
+  std::vector<unsigned int> cell_indices;
   
   for (cell = dofs.begin_active(); cell != end; ++cell)
     {
+      const FiniteElement<DH::dimension>& fe = cell->get_fe();
+      Assert (fe.is_primitive(), typename FiniteElement<DH::dimension>::ExcFENotPrimitive());
+      Assert (couplings.n_rows()==fe.n_components(),
+	      ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
+      Assert (couplings.n_cols()==fe.n_components(),
+	      ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
+      Assert (flux_couplings.n_rows()==fe.n_components(),
+	      ExcDimensionMismatch(flux_couplings.n_rows(), fe.n_components()));
+      Assert (flux_couplings.n_cols()==fe.n_components(),
+	      ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
+
+      cell_indices.resize(fe.dofs_per_cell);
       cell->get_dof_indices(cell_indices);
       
                                        // each dof can couple with each other
@@ -225,17 +221,20 @@ DoFTools::compute_row_length_vector(
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	for (unsigned int comp=0;comp<fe.n_components();++comp)
 	  if (couplings(fe.system_to_component_index(i).first,comp) != none)
-	    row_lengths[cell_indices[i]] += dofs_cell[comp];
+	    row_lengths[cell_indices[i]]
+	      += fe.base_element(fe.component_to_base(comp).first).dofs_per_cell;
       
 				       // If fluxes couple, add
 				       // coupling to neighbor cells
-      for (unsigned int face=0;face<GeometryInfo<dim>::faces_per_cell;++face)
+      for (unsigned int face=0;face<GeometryInfo<DH::dimension>::faces_per_cell;++face)
 	{
 	  if (cell->at_boundary(face)) continue;
+	  const FiniteElement<DH::dimension>& nfe = cell->neighbor(face)->get_fe();
 	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	    for (unsigned int comp=0;comp<fe.n_components();++comp)
 	      if (flux_couplings(fe.system_to_component_index(i).first,comp) != none)
-		row_lengths[cell_indices[i]] += dofs_cell[comp];
+		row_lengths[cell_indices[i]]
+		  += nfe.base_element(fe.component_to_base(comp).first).dofs_per_cell;
 	}
     }
 }
@@ -244,13 +243,13 @@ DoFTools::compute_row_length_vector(
 #else
 
 // Template for 2D and 3D. For 1D see specialization above
-template <int dim>
+template <class DH>
 void
-DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
-                                    std::vector<unsigned int> &row_lengths,
-                                    const Coupling             flux_coupling)
+DoFTools::compute_row_length_vector(
+  const DH&                  dofs,
+  std::vector<unsigned int>& row_lengths,
+  const Coupling             flux_coupling)
 {
-  const FiniteElement<dim>& fe = dofs.get_fe();
   Assert (row_lengths.size() == dofs.n_dofs(),
 	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
 
@@ -264,15 +263,15 @@ DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
 				   // triangulation for the user
 				   // flags. Since we restore them in
 				   // the end, this cast is safe.
-  Triangulation<dim>& user_flags_triangulation =
-    const_cast<Triangulation<dim>&> (dofs.get_tria());
+  Triangulation<DH::dimension>& user_flags_triangulation =
+    const_cast<Triangulation<DH::dimension>&> (dofs.get_tria());
   user_flags_triangulation.save_user_flags(old_flags);
   user_flags_triangulation.clear_user_flags();
   
-  const typename DoFHandler<dim>::cell_iterator end = dofs.end();
-  typename DoFHandler<dim>::active_cell_iterator cell;
-  std::vector<unsigned int> cell_indices(fe.dofs_per_cell);
-  std::vector<unsigned int> neighbor_indices(fe.dofs_per_cell);
+  const typename DH::cell_iterator end = dofs.end();
+  typename DH::active_cell_iterator cell;
+  std::vector<unsigned int> cell_indices;
+  std::vector<unsigned int> neighbor_indices;
 
 				   // We loop over cells and go from
 				   // cells to lower dimensional
@@ -283,6 +282,8 @@ DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
 				   // smaller than dim-1.
   for (cell = dofs.begin_active(); cell != end; ++cell)
     {
+      const FiniteElement<DH::dimension>& fe = cell->get_fe();
+      cell_indices.resize(fe.dofs_per_cell);
       cell->get_dof_indices(cell_indices);
       unsigned int i = 0;
 				       // First, dofs on
@@ -306,7 +307,8 @@ DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
 				       // dofs_per_vertex is
 				       // arbitrary, not the other way
 				       // round.
-      unsigned int increment = fe.dofs_per_cell - dim * fe.dofs_per_face;
+//TODO: This assumes that even in hp context, the dofs per face coincide!      
+      unsigned int increment = fe.dofs_per_cell - DH::dimension * fe.dofs_per_face;
       while (i < fe.first_line_index)
 	row_lengths[cell_indices[i++]] += increment;
 				       // From now on, if an object is
@@ -319,20 +321,20 @@ DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
 				       // In all other cases we
 				       // subtract adjacent faces to be
 				       // added in the loop below.
-      increment = (dim>1)
-		  ? fe.dofs_per_cell - (dim-1) * fe.dofs_per_face
-		  : fe.dofs_per_cell - GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
+      increment = (DH::dimension>1)
+		  ? fe.dofs_per_cell - (DH::dimension-1) * fe.dofs_per_face
+		  : fe.dofs_per_cell - GeometryInfo<DH::dimension>::faces_per_cell * fe.dofs_per_face;
       while (i < fe.first_quad_index)
 	row_lengths[cell_indices[i++]] += increment;
       
 				       // Now quads in 2D and 3D
-      increment = (dim>2)
-		  ? fe.dofs_per_cell - (dim-2) * fe.dofs_per_face
-		  : fe.dofs_per_cell - GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
+      increment = (DH::dimension>2)
+		  ? fe.dofs_per_cell - (DH::dimension-2) * fe.dofs_per_face
+		  : fe.dofs_per_cell - GeometryInfo<DH::dimension>::faces_per_cell * fe.dofs_per_face;
       while (i < fe.first_hex_index)
 	row_lengths[cell_indices[i++]] += increment;
 				       // Finally, cells in 3D
-      increment = fe.dofs_per_cell - GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
+      increment = fe.dofs_per_cell - GeometryInfo<DH::dimension>::faces_per_cell * fe.dofs_per_face;
       while (i < fe.dofs_per_cell)
 	row_lengths[cell_indices[i++]] += increment;
 
@@ -347,7 +349,7 @@ DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
 				   // and add the missing
 				   // contribution as well as the
 				   // flux contributions.
-      for (unsigned int iface=0;iface<GeometryInfo<dim>::faces_per_cell;++iface)
+      for (unsigned int iface=0;iface<GeometryInfo<DH::dimension>::faces_per_cell;++iface)
 	{
 	  if (cell->at_boundary(iface))
 	    {
@@ -356,13 +358,9 @@ DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
 	      continue;
 	    }
 	  
-	  const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(iface);
-//	  const bool neighbor_same_level = (neighbor->level() == cell->level());
-// 	  const unsigned int
-// 	    nface = neighbor_same_level
-// 	    ? cell->neighbor_of_neighbor(iface)
-// 	    : cell->neighbor_of_coarser_neighbor(iface).first;
-	  typename DoFHandler<dim>::face_iterator face = cell->face(iface);
+	  const typename DH::cell_iterator neighbor = cell->neighbor(iface);
+	  const FiniteElement<DH::dimension>& nfe = neighbor->get_fe();
+	  typename DH::face_iterator face = cell->face(iface);
 	  
 					   // Flux couplings are
 					   // computed from both sides
@@ -374,7 +372,7 @@ DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
 					   // here.
 	  if (flux_coupling != none)
 	    {
-	      unsigned int increment = fe.dofs_per_cell - fe.dofs_per_face;
+	      unsigned int increment = nfe.dofs_per_cell - nfe.dofs_per_face;
 	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
 		row_lengths[cell_indices[i]] += increment;
 	    }
@@ -397,12 +395,12 @@ DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
 					   // is refined, all the fine
 					   // face dofs couple with
 					   // the coarse one.
+	  neighbor_indices.resize(nfe.dofs_per_cell);
 	  neighbor->get_dof_indices(neighbor_indices);
 	  for (unsigned int i=0;i<fe.dofs_per_cell;++i)
-	    {
-	      row_lengths[cell_indices[i]] += fe.dofs_per_face;
-	      row_lengths[neighbor_indices[i]] += fe.dofs_per_face;
-	    }
+	    row_lengths[cell_indices[i]] += nfe.dofs_per_face;
+	  for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
+	    row_lengths[neighbor_indices[i]] += fe.dofs_per_face;
 	}
     }
   user_flags_triangulation.load_user_flags(old_flags);
@@ -411,26 +409,16 @@ DoFTools::compute_row_length_vector(const DoFHandler<dim>     &dofs,
 
 //TODO:[GK] Extend this to non-primitive elements
 // This is the template for 2D and 3D. See version for 1D above
-template <int dim>
+template <class DH>
 void
 DoFTools::compute_row_length_vector(
-  const DoFHandler<dim>& dofs,
+  const DH& dofs,
   std::vector<unsigned int>& row_lengths,
   const Table<2,Coupling>& couplings,
   const Table<2,Coupling>& flux_couplings)
 {
-  const FiniteElement<dim>& fe = dofs.get_fe();
-  Assert (fe.is_primitive(), typename FiniteElement<dim>::ExcFENotPrimitive());
   Assert (row_lengths.size() == dofs.n_dofs(),
 	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
-  Assert (couplings.n_rows()==fe.n_components(),
-	  ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
-  Assert (couplings.n_cols()==fe.n_components(),
-	  ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
-  Assert (flux_couplings.n_rows()==fe.n_components(),
-	  ExcDimensionMismatch(flux_couplings.n_rows(), fe.n_components()));
-  Assert (flux_couplings.n_cols()==fe.n_components(),
-	  ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
   
 				   // Function starts here by
 				   // resetting the counters.
@@ -442,28 +430,16 @@ DoFTools::compute_row_length_vector(
 				   // triangulation for the user
 				   // flags. Since we restore them in
 				   // the end, this cast is safe.
-  Triangulation<dim>& user_flags_triangulation =
-    const_cast<Triangulation<dim>&> (dofs.get_tria());
+  Triangulation<DH::dimension>& user_flags_triangulation =
+    const_cast<Triangulation<DH::dimension>&> (dofs.get_tria());
   user_flags_triangulation.save_user_flags(old_flags);
   user_flags_triangulation.clear_user_flags();
   
-  const typename DoFHandler<dim>::cell_iterator end = dofs.end();
-  typename DoFHandler<dim>::active_cell_iterator cell;
-  std::vector<unsigned int> cell_indices(fe.dofs_per_cell);
-  std::vector<unsigned int> neighbor_indices(fe.dofs_per_cell);
+  const typename DH::cell_iterator end = dofs.end();
+  typename DH::active_cell_iterator cell;
+  std::vector<unsigned int> cell_indices;
+  std::vector<unsigned int> neighbor_indices;
 
-				   // Two vectors containing the
-				   // number of dofs of a cell and of
-				   // a face, split by components.
-  std::vector<unsigned int> dofs_cell(fe.n_components());
-  std::vector<unsigned int> dofs_face(fe.n_components());
-
-  for (unsigned int comp=0;comp<fe.n_components();++comp)
-    {
-      dofs_cell[comp] = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell;
-      dofs_face[comp] = fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
-    }
-  
 				   // We loop over cells and go from
 				   // cells to lower dimensional
 				   // objects. This is the only way to
@@ -473,7 +449,19 @@ DoFTools::compute_row_length_vector(
 				   // smaller than dim-1.
   for (cell = dofs.begin_active(); cell != end; ++cell)
     {
+      const FiniteElement<DH::dimension>& fe = cell->get_fe();
+      Assert (fe.is_primitive(), typename FiniteElement<DH::dimension>::ExcFENotPrimitive());
+      Assert (couplings.n_rows()==fe.n_components(),
+	      ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
+      Assert (couplings.n_cols()==fe.n_components(),
+	      ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
+      Assert (flux_couplings.n_rows()==fe.n_components(),
+	      ExcDimensionMismatch(flux_couplings.n_rows(), fe.n_components()));
+      Assert (flux_couplings.n_cols()==fe.n_components(),
+	      ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
+      
       cell->get_dof_indices(cell_indices);
+      cell_indices.resize(fe.dofs_per_cell);
       unsigned int i = 0;
 				       // First, dofs on
 				       // vertices. We assume that
@@ -502,7 +490,8 @@ DoFTools::compute_row_length_vector(
 	  for (unsigned int comp=0;comp<fe.n_components();++comp)
 	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
 	      {
-		increment = dofs_cell[comp] - dim * dofs_face[comp];
+		increment = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell
+			    - DH::dimension * fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
 		row_lengths[cell_indices[i]] += increment;
 	      }
 	  ++i;
@@ -522,9 +511,11 @@ DoFTools::compute_row_length_vector(
 	  for (unsigned int comp=0;comp<fe.n_components();++comp)
 	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
 	      {
-		increment = (dim>1)
-			    ? dofs_cell[comp] - (dim-1) * dofs_face[comp]
-			    : dofs_cell[comp] - GeometryInfo<dim>::faces_per_cell * dofs_face[comp];
+		increment = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell
+			    - ((DH::dimension>1)
+			       ? (DH::dimension-1)
+			       : GeometryInfo<DH::dimension>::faces_per_cell)
+			    * fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
 		row_lengths[cell_indices[i]] += increment;
 	      }
 	  ++i;
@@ -536,9 +527,11 @@ DoFTools::compute_row_length_vector(
 	  for (unsigned int comp=0;comp<fe.n_components();++comp)
 	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
 	      {
-		increment = (dim>2)
-			    ? dofs_cell[comp] - (dim-2) * dofs_face[comp]
-			    : dofs_cell[comp] - GeometryInfo<dim>::faces_per_cell * dofs_face[comp];
+		increment = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell
+			    - ((DH::dimension>2)
+			       ? (DH::dimension-2)
+			       : GeometryInfo<DH::dimension>::faces_per_cell)
+			    * fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
 		row_lengths[cell_indices[i]] += increment;
 	      }
 	  ++i;
@@ -550,7 +543,9 @@ DoFTools::compute_row_length_vector(
 	  for (unsigned int comp=0;comp<fe.n_components();++comp)
 	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
 	      {
-		increment = dofs_cell[comp] - GeometryInfo<dim>::faces_per_cell * dofs_face[comp];
+		increment = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell
+			    - GeometryInfo<DH::dimension>::faces_per_cell
+			    * fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
 		row_lengths[cell_indices[i]] += increment;
 	      }
 	  ++i;
@@ -567,7 +562,7 @@ DoFTools::compute_row_length_vector(
 				   // and add the missing
 				   // contribution as well as the
 				   // flux contributions.
-      for (unsigned int iface=0;iface<GeometryInfo<dim>::faces_per_cell;++iface)
+      for (unsigned int iface=0;iface<GeometryInfo<DH::dimension>::faces_per_cell;++iface)
 	{
 	  if (cell->at_boundary(iface))
 	    {
@@ -576,13 +571,9 @@ DoFTools::compute_row_length_vector(
 	      continue;
 	    }
 	  
-	  const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(iface);
-//	  const bool neighbor_same_level = (neighbor->level() == cell->level());
-// 	  const unsigned int
-// 	    nface = neighbor_same_level
-// 	    ? cell->neighbor_of_neighbor(iface)
-// 	    : cell->neighbor_of_coarser_neighbor(iface).first;
-	  typename DoFHandler<dim>::face_iterator face = cell->face(iface);
+	  const typename DH::cell_iterator neighbor = cell->neighbor(iface);
+	  const FiniteElement<DH::dimension>& nfe = neighbor->get_fe();
+	  typename DH::face_iterator face = cell->face(iface);
 	  
 					   // Flux couplings are
 					   // computed from both sides
@@ -596,7 +587,8 @@ DoFTools::compute_row_length_vector(
 	    for (unsigned int i=0;i<fe.dofs_per_cell;++i)
 	      if (flux_couplings(fe.system_to_component_index(i).first,comp) != none)
 		{
-		  unsigned int increment = dofs_cell[comp] - dofs_face[comp];
+		  unsigned int increment = nfe.base_element(fe.component_to_base(comp).first).dofs_per_cell
+					   - nfe.base_element(fe.component_to_base(comp).first).dofs_per_face;
 		  row_lengths[cell_indices[i]] += increment;
 		}
 	  
@@ -622,16 +614,20 @@ DoFTools::compute_row_length_vector(
 					   // Wolfgang, do they couple
 					   // with each other by
 					   // constraints?
+	  neighbor_indices.resize(fe.dofs_per_cell);
 	  neighbor->get_dof_indices(neighbor_indices);
 	  for (unsigned int comp=0;comp<fe.n_components();++comp)
 	    for (unsigned int i=0;i<fe.dofs_per_cell;++i)
 	      if (couplings(fe.system_to_component_index(i).first,comp) != none)
-		{
-		  row_lengths[cell_indices[i]] += dofs_face[comp];
-		  row_lengths[neighbor_indices[i]] += dofs_face[comp];
-		}
+		row_lengths[cell_indices[i]]
+		  += nfe.base_element(fe.component_to_base(comp).first).dofs_per_face;
+	  for (unsigned int comp=0;comp<nfe.n_components();++comp)
+	    for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
+	      if (couplings(nfe.system_to_component_index(i).first,comp) != none)
+		row_lengths[neighbor_indices[i]]
+		  += fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
 	}
-    }  
+    }
   user_flags_triangulation.load_user_flags(old_flags);
 }
 
@@ -3561,7 +3557,17 @@ DoFTools::compute_row_length_vector(
 
 template void
 DoFTools::compute_row_length_vector(
+  const hpDoFHandler<deal_II_dimension>& dofs, std::vector<unsigned int>& row_lengths,
+  const Coupling flux_coupling);
+
+template void
+DoFTools::compute_row_length_vector(
   const DoFHandler<deal_II_dimension>& dofs, std::vector<unsigned int>& row_lengths,
+  const Table<2,Coupling>& couplings, const Table<2,Coupling>& flux_couplings);
+
+template void
+DoFTools::compute_row_length_vector(
+  const hpDoFHandler<deal_II_dimension>& dofs, std::vector<unsigned int>& row_lengths,
   const Table<2,Coupling>& couplings, const Table<2,Coupling>& flux_couplings);
 
 template void
