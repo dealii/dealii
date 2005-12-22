@@ -32,7 +32,9 @@ template <int> class hpDoFLevel;
 /**
  * Manage the distribution and numbering of the degrees of freedom for
  * hp-FEM algorithms.
- */
+ *
+ * @ingroup dofs
+*/
 template <int dim>
 class hpDoFHandler  :  public Subscriptor,
                        protected Triangulation<dim>::RefinementListener
@@ -1004,6 +1006,8 @@ class hpDoFHandler  :  public Subscriptor,
 
 /* -------------- declaration of explicit specializations ------------- */
 
+#ifndef DOXYGEN
+
 template <> unsigned int hpDoFHandler<1>::n_boundary_dofs () const;
 template <> unsigned int hpDoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
 template <> unsigned int hpDoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &) const;
@@ -1151,7 +1155,7 @@ hpDoFHandler<dim>::get_tria () const
 }
 
 
-/*----------------------------   dof.h     ---------------------------*/
+#endif
 
 #endif
-/*----------------------------   dof.h     ---------------------------*/
+
