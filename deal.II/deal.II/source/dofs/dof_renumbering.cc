@@ -1304,39 +1304,39 @@ void DoFRenumbering::component_wise<deal_II_dimension>
 
 template
 void
-DoFRenumbering::cell_wise_dg
+DoFRenumbering::cell_wise_dg<DoFHandler<deal_II_dimension> >
 (DoFHandler<deal_II_dimension>&,
  const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
 void
-DoFRenumbering::compute_cell_wise_dg
+DoFRenumbering::compute_cell_wise_dg<DoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const DoFHandler<deal_II_dimension>&,
  const std::vector<DoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
 void
-DoFRenumbering::downstream_dg
+DoFRenumbering::downstream_dg<DoFHandler<deal_II_dimension> >
 (DoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&);
 
 template
 void
-DoFRenumbering::compute_downstream_dg
+DoFRenumbering::compute_downstream_dg<DoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const DoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&);
 
 template
 void
-DoFRenumbering::clockwise_dg
+DoFRenumbering::clockwise_dg<DoFHandler<deal_II_dimension> >
 (DoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&, bool);
 
 template
 void
-DoFRenumbering::compute_clockwise_dg
+DoFRenumbering::compute_clockwise_dg<DoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const DoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&,
@@ -1346,39 +1346,39 @@ DoFRenumbering::compute_clockwise_dg
 
 template
 void
-DoFRenumbering::cell_wise_dg
+DoFRenumbering::cell_wise_dg<hpDoFHandler<deal_II_dimension> >
 (hpDoFHandler<deal_II_dimension>&,
  const std::vector<hpDoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
 void
-DoFRenumbering::compute_cell_wise_dg
+DoFRenumbering::compute_cell_wise_dg<hpDoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const hpDoFHandler<deal_II_dimension>&,
  const std::vector<hpDoFHandler<deal_II_dimension>::cell_iterator>&);
 
 template
 void
-DoFRenumbering::downstream_dg
+DoFRenumbering::downstream_dg<hpDoFHandler<deal_II_dimension> >
 (hpDoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&);
 
 template
 void
-DoFRenumbering::compute_downstream_dg
+DoFRenumbering::compute_downstream_dg<hpDoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const hpDoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&);
 
 template
 void
-DoFRenumbering::clockwise_dg
+DoFRenumbering::clockwise_dg<hpDoFHandler<deal_II_dimension> >
 (hpDoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&, bool);
 
 template
 void
-DoFRenumbering::compute_clockwise_dg
+DoFRenumbering::compute_clockwise_dg<hpDoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const hpDoFHandler<deal_II_dimension>&,
  const Point<deal_II_dimension>&,
