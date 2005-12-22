@@ -139,16 +139,16 @@ struct CompareDownstream
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 void
 DoFRenumbering::
-Cuthill_McKee (DH<dim>         &dof_handler,
+Cuthill_McKee (DH&              dof_handler,
                const bool       reversed_numbering,
                const bool       use_constraints,
                const std::vector<unsigned int> &starting_indices)
 {
   std::vector<unsigned int> renumbering(dof_handler.n_dofs(),
-					DoFHandler<dim>::invalid_dof_index);
+					DH::invalid_dof_index);
   compute_Cuthill_McKee(renumbering, dof_handler, reversed_numbering,
 			use_constraints, starting_indices);
 
@@ -160,11 +160,11 @@ Cuthill_McKee (DH<dim>         &dof_handler,
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 void
 DoFRenumbering::
 compute_Cuthill_McKee (std::vector<unsigned int>& new_indices,
-                       const DH<dim>&             dof_handler,
+                       const DH&                  dof_handler,
                        const bool                 reversed_numbering,
                        const bool                 use_constraints,
                        const std::vector<unsigned int>& starting_indices)
@@ -189,7 +189,7 @@ compute_Cuthill_McKee (std::vector<unsigned int>& new_indices,
   constraints.close ();
     
   SparsityPattern sparsity;
-  if (dim <= 2)
+  if (DH::dimension <= 2)
     {
       sparsity.reinit (dof_handler.n_dofs(),
 		       dof_handler.n_dofs(),
@@ -223,13 +223,13 @@ compute_Cuthill_McKee (std::vector<unsigned int>& new_indices,
   
 				   // delete disallowed elements
   for (unsigned int i=0; i<last_round_dofs.size(); ++i)
-    if ((last_round_dofs[i]==DoFHandler<dim>::invalid_dof_index) ||
+    if ((last_round_dofs[i]==DH::invalid_dof_index) ||
 	(last_round_dofs[i]>=n_dofs))
-      last_round_dofs[i] = DoFHandler<dim>::invalid_dof_index;
+      last_round_dofs[i] = DH::invalid_dof_index;
   
   std::remove_if (last_round_dofs.begin(), last_round_dofs.end(),
 		  std::bind2nd(std::equal_to<unsigned int>(),
-			       DoFHandler<dim>::invalid_dof_index));
+			       DH::invalid_dof_index));
   
 				   // now if no valid points remain:
 				   // find dof with lowest coordination
@@ -237,7 +237,7 @@ compute_Cuthill_McKee (std::vector<unsigned int>& new_indices,
   
   if (last_round_dofs.size() == 0)
     {
-      unsigned int starting_point   = DoFHandler<dim>::invalid_dof_index;
+      unsigned int starting_point   = DH::invalid_dof_index;
       unsigned int min_coordination = n_dofs;
       for (unsigned int row=0; row<n_dofs; ++row) 
 	{
@@ -270,7 +270,7 @@ compute_Cuthill_McKee (std::vector<unsigned int>& new_indices,
 				       // if that should be the case, we can
 				       // chose an arbitrary dof as starting
 				       // point, e.g. the one with number zero
-      if (starting_point == DoFHandler<dim>::invalid_dof_index)
+      if (starting_point == DH::invalid_dof_index)
 	starting_point = 0;
       
 				       // initialize the first dof
@@ -317,7 +317,7 @@ compute_Cuthill_McKee (std::vector<unsigned int>& new_indices,
 				       // eliminate dofs which are
 				       // already numbered
       for (int s=next_round_dofs.size()-1; s>=0; --s)
-	if (new_indices[next_round_dofs[s]] != DoFHandler<dim>::invalid_dof_index)
+	if (new_indices[next_round_dofs[s]] != DH::invalid_dof_index)
 	  next_round_dofs.erase (next_round_dofs.begin() + s);
 
 				       // check whether there are any new
@@ -381,7 +381,7 @@ compute_Cuthill_McKee (std::vector<unsigned int>& new_indices,
 				   // In any case, if not all DoFs
 				   // have been reached, renumbering
 				   // will not be possible
-  if (std::find (new_indices.begin(), new_indices.end(), DoFHandler<dim>::invalid_dof_index)
+  if (std::find (new_indices.begin(), new_indices.end(), DH::invalid_dof_index)
       !=
       new_indices.end())
     Assert (false, ExcRenumberingIncomplete());
@@ -1244,7 +1244,7 @@ compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
 
 // explicit instantiations
 template
-void DoFRenumbering::Cuthill_McKee<deal_II_dimension, DoFHandler>
+void DoFRenumbering::Cuthill_McKee<DoFHandler<deal_II_dimension> >
 (DoFHandler<deal_II_dimension>&,
  const bool,
  const bool,
@@ -1252,7 +1252,7 @@ void DoFRenumbering::Cuthill_McKee<deal_II_dimension, DoFHandler>
 
 template
 void
-DoFRenumbering::compute_Cuthill_McKee<deal_II_dimension, DoFHandler>
+DoFRenumbering::compute_Cuthill_McKee<DoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const DoFHandler<deal_II_dimension>&,
  const bool,
@@ -1261,7 +1261,7 @@ DoFRenumbering::compute_Cuthill_McKee<deal_II_dimension, DoFHandler>
 
 
 template
-void DoFRenumbering::Cuthill_McKee<deal_II_dimension, hpDoFHandler>
+void DoFRenumbering::Cuthill_McKee<hpDoFHandler<deal_II_dimension> >
 (hpDoFHandler<deal_II_dimension>&,
  const bool,
  const bool,
@@ -1269,7 +1269,7 @@ void DoFRenumbering::Cuthill_McKee<deal_II_dimension, hpDoFHandler>
 
 template
 void
-DoFRenumbering::compute_Cuthill_McKee<deal_II_dimension, hpDoFHandler>
+DoFRenumbering::compute_Cuthill_McKee<hpDoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const hpDoFHandler<deal_II_dimension>&,
  const bool,
