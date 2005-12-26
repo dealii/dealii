@@ -27,21 +27,22 @@ namespace internal
   
   template <int dim, class FEValues>
   FEValues &
-  FEValuesMap<dim,FEValues>::select_fe_values (const FiniteElement<dim> &fe)
+  FEValuesMap<dim,FEValues>::select_fe_values (const FiniteElement<dim> &fe,
+					       const unsigned int active_fe_index)
   {
                                      // check if the finite element
                                      // does not exist as a key in the
                                      // map
-    if (fe_to_fe_values_map.find (&fe) ==
+    if (fe_to_fe_values_map.find (std::make_pair(&fe, active_fe_index)) ==
         fe_to_fe_values_map.end())
                                        // a-ha! doesn't yet, so let's
                                        // make it up
-      fe_to_fe_values_map[&fe]
-        = boost::shared_ptr<FEValues> (create_fe_values (fe));
+      fe_to_fe_values_map[std::make_pair(&fe, active_fe_index)]
+        = boost::shared_ptr<FEValues> (create_fe_values (fe, active_fe_index));
 
 
                                      // now there definitely is one!
-    present_fe_values = fe_to_fe_values_map[&fe];
+    present_fe_values = fe_to_fe_values_map[std::make_pair (&fe, active_fe_index)];
 
     return *present_fe_values;
   }
@@ -109,18 +110,19 @@ void
 hpFEValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell)
 {
   this->present_fe_index = cell->active_fe_index ();
-  this->select_fe_values (cell->get_fe()).reinit (cell);
+  this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell);
 }
 
 
 
 template <int dim>
 FEValues<dim> *
-hpFEValues<dim>::create_fe_values (const FiniteElement<dim> &fe) const
+hpFEValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
+				   const unsigned int active_fe_index) const
 {
   return new FEValues<dim> (
-      this->mapping_collection.get_mapping (this->present_fe_index), fe,
-      this->qcollection.get_quadrature (this->present_fe_index),
+      this->mapping_collection.get_mapping (active_fe_index), fe,
+      this->qcollection.get_quadrature (active_fe_index),
       this->update_flags);
 }
 
@@ -156,18 +158,29 @@ hpFEFaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &ce
                              const unsigned int face_no)
 {
   this->present_fe_index = cell->active_fe_index ();
-  this->select_fe_values (cell->get_fe()).reinit (cell, face_no);
+  this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell, face_no);
 }
 
+
+template <int dim>
+void
+hpFEFaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
+			     const unsigned int face_no,
+			     const unsigned int active_fe_index)
+{
+  this->present_fe_index = active_fe_index;
+  this->select_fe_values (cell->get_fe(), active_fe_index).reinit (cell, face_no);
+}
 
 
 template <int dim>
 FEFaceValues<dim> *
-hpFEFaceValues<dim>::create_fe_values (const FiniteElement<dim> &fe) const
+hpFEFaceValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
+				       const unsigned int active_fe_index) const
 {
   return new FEFaceValues<dim> (
-      this->mapping_collection.get_mapping (this->present_fe_index), fe,
-      this->qcollection.get_quadrature (this->present_fe_index),
+      this->mapping_collection.get_mapping (active_fe_index), fe,
+      this->qcollection.get_quadrature (active_fe_index),
       this->update_flags);
 }
 
@@ -204,18 +217,30 @@ hpFESubfaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator 
                                 const unsigned int subface_no)
 {
   this->present_fe_index = cell->active_fe_index ();
-  this->select_fe_values (cell->get_fe()).reinit (cell, face_no, subface_no);
+  this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell, face_no, subface_no);
 }
 
+
+template <int dim>
+void
+hpFESubfaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
+                                const unsigned int face_no,
+                                const unsigned int subface_no,
+				const unsigned int active_fe_index)
+{
+  this->present_fe_index = active_fe_index;
+  this->select_fe_values (cell->get_fe(), active_fe_index).reinit (cell, face_no, subface_no);
+}
 
 
 template <int dim>
 FESubfaceValues<dim> *
-hpFESubfaceValues<dim>::create_fe_values (const FiniteElement<dim> &fe) const
+hpFESubfaceValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
+					  const unsigned int active_fe_index) const
 {
   return new FESubfaceValues<dim> (
-      this->mapping_collection.get_mapping (this->present_fe_index), fe,
-      this->qcollection.get_quadrature (this->present_fe_index),
+      this->mapping_collection.get_mapping (active_fe_index), fe,
+      this->qcollection.get_quadrature (active_fe_index),
       this->update_flags);
 }
 

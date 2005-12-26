@@ -75,7 +75,8 @@ namespace internal
                                         * to derived classes.
                                         */
       virtual
-      FEValues * create_fe_values (const FiniteElement<dim> &fe) const = 0;
+      FEValues * create_fe_values (const FiniteElement<dim> &fe,
+				   const unsigned int active_fe_index) const = 0;
       
                                        /**
                                         * Select the @p FEValues
@@ -92,8 +93,9 @@ namespace internal
                                         * this object is returned.
                                         */
       FEValues &
-      select_fe_values (const FiniteElement<dim> &fe);
-      
+      select_fe_values (const FiniteElement<dim> &fe,
+			const unsigned int active_fe_index);
+
 
                                        /**
                                         * This field remembers the
@@ -116,7 +118,7 @@ namespace internal
                                         * destructor of this class is
                                         * run.
                                         */
-      std::map<SmartPointer<const FiniteElement<dim> >,
+      std::map<std::pair<SmartPointer<const FiniteElement<dim> >, unsigned int>,
                boost::shared_ptr<FEValues> > fe_to_fe_values_map;
 
                                        /**
@@ -284,7 +286,8 @@ class hpFEValues : public internal::FEValuesMap<dim,FEValues<dim> >,
                                       */
     virtual
     FEValues<dim> *
-    create_fe_values (const FiniteElement<dim> &fe) const;
+    create_fe_values (const FiniteElement<dim> &fe,
+		      const unsigned int active_fe_index) const;
 };
 
 
@@ -360,6 +363,30 @@ class hpFEFaceValues : public internal::FEValuesMap<dim,FEFaceValues<dim> >,
     reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
             const unsigned int face_no);
 
+
+                                     /**
+                                      * Reinitialize the object for
+                                      * the given cell. In this
+				      * method, the user can specify
+				      * which active_fe_index
+				      * should be used to initialise
+				      * the underlying FEValues
+				      * object. This functionality
+				      * is required, if the face terms
+				      * between two cells with different
+				      * polynomial degree should be
+				      * assembled. In this case the
+				      * values on the face of the
+				      * lower order element have to
+				      * be evaluated at the quadratrure
+				      * points of the higher order
+				      * element.
+                                      */
+    void
+    reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
+            const unsigned int face_no,
+	    const unsigned int active_fe_index);
+
   protected:
                                      /**
                                       * Create an object of type
@@ -368,7 +395,8 @@ class hpFEFaceValues : public internal::FEValuesMap<dim,FEFaceValues<dim> >,
                                       */
     virtual
     FEFaceValues<dim> *
-    create_fe_values (const FiniteElement<dim> &fe) const;
+    create_fe_values (const FiniteElement<dim> &fe,
+		      const unsigned int active_fe_index) const;
 };
 
 
@@ -445,6 +473,32 @@ class hpFESubfaceValues : public internal::FEValuesMap<dim,FESubfaceValues<dim> 
             const unsigned int face_no,
             const unsigned int subface_no);
 
+
+                                     /**
+                                      * Reinitialize the object for
+                                      * the given cell. In this
+				      * method, the user can specify
+				      * which active_fe_index
+				      * should be used to initialise
+				      * the underlying FEValues
+				      * object. This functionality
+				      * is required, if the face terms
+				      * between two cells with different
+				      * polynomial degree should be
+				      * assembled. In this case the
+				      * values on the face of the
+				      * lower order element have to
+				      * be evaluated at the quadratrure
+				      * points of the higher order
+				      * element.
+                                      */
+    void
+    reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
+            const unsigned int face_no,
+            const unsigned int subface_no,
+	    const unsigned int active_fe_index);
+
+
   protected:
                                      /**
                                       * Create an object of type
@@ -453,7 +507,8 @@ class hpFESubfaceValues : public internal::FEValuesMap<dim,FESubfaceValues<dim> 
                                       */
     virtual
     FESubfaceValues<dim> *
-    create_fe_values (const FiniteElement<dim> &fe) const;
+    create_fe_values (const FiniteElement<dim> &fe,
+		      const unsigned int active_fe_index) const;
 };
 
 
