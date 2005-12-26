@@ -356,7 +356,7 @@ class FEValuesData
  * @author Wolfgang Bangerth, 1998, 2003, Guido Kanschat, 2001
  */
 template <int dim>
-class FEValuesBase : protected FEValuesData<dim>
+class FEValuesBase : protected FEValuesData<dim>, public Subscriptor
 {
   public:
 				     /**
