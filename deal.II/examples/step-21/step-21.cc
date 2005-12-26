@@ -683,18 +683,8 @@ DGMethod<dim>::DGMethod ()
 	quad.push_back (quad_temp);
 	quadrature->add_quadrature (*quad_temp);
 
-	//TODO: This is currently a design error in the hp Framework.
-	// While the idea of using a QuadratureCollection for the 
-	// element stiffness matrices is straightforward, it is
-	// not complete for the face terms. At these places, we can
-	// have different polynomial degrees on the two faces. Therefore
-	// a quadrature rule, which is sufficient for the highest polynomial
-	// degree on both faces, would be required. This will certainly need
-	// some changes in the hpFEValues classes. But for a first example,
-	// simply using a uniformly high quadrature rule will do the job
-	// although is obviously not very efficient, as even linear polynomials
-	// will be integrated with 7th order Gauss formulas.
-	face_quad_temp = new QGauss<dim-1> (7); // (i+2);
+	//	face_quad_temp = new QGauss<dim-1> (7);
+	face_quad_temp = new QGauss<dim-1> (i+2);
 	face_quad.push_back (face_quad_temp);
 	face_quadrature->add_quadrature (*face_quad_temp);
     }
@@ -1059,6 +1049,21 @@ void DGMethod<dim>::assemble_system1 ()
 			neighbor->child(GeometryInfo<dim>::
 					child_cell_on_face(neighbor2,subface_no));
 
+						       // an additional speciality
+						       // for the hp method appears
+						       // on the faces. To get an
+						       // efficient assembly, the
+						       // lowest order but 
+		                                       // sufficient quadrature
+						       // rule should be used. Hence
+						       // the face quadrature rule of the
+						       // higher order element
+						       // will be used.
+		      const unsigned int use_fe_index = 
+			neighbor_child->active_fe_index () > cell->active_fe_index () ?
+			neighbor_child->active_fe_index () : cell->active_fe_index ();
+			
+
 						       // As these are
 						       // quite
 						       // complicated
@@ -1111,8 +1116,8 @@ void DGMethod<dim>::assemble_system1 ()
 						       // of the
 						       // neighboring
 						       // child cell.
-		      fe_v_subface_x.reinit (cell, face_no, subface_no);
-		      fe_v_face_neighbor_x.reinit (neighbor_child, neighbor2);
+		      fe_v_subface_x.reinit (cell, face_no, subface_no, use_fe_index);
+		      fe_v_face_neighbor_x.reinit (neighbor_child, neighbor2, use_fe_index);
 
 		      dg.assemble_face_term1(fe_v_subface_x.get_present_fe_values (),
 					     fe_v_face_neighbor_x.get_present_fe_values (),
@@ -1164,6 +1169,14 @@ void DGMethod<dim>::assemble_system1 ()
 						       // cell.
 		      const unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
 
+		                                       // Like before. Use
+		                                       // quadrature rule
+                                                       // of higher order
+                                                       // cell.
+		      const unsigned int use_fe_index = 
+			neighbor->active_fe_index () > cell->active_fe_index () ?
+			neighbor->active_fe_index () : cell->active_fe_index ();
+
 						       // We reinit
 						       // the
 						       // ``FEFaceValues''
@@ -1176,8 +1189,8 @@ void DGMethod<dim>::assemble_system1 ()
 						       // the
 						       // corresponding
 						       // face terms.
-		      fe_v_face_x.reinit (cell, face_no);
-		      fe_v_face_neighbor_x.reinit (neighbor, neighbor2);
+		      fe_v_face_x.reinit (cell, face_no, use_fe_index);
+		      fe_v_face_neighbor_x.reinit (neighbor, neighbor2, use_fe_index);
 		      
 		      dg.assemble_face_term1(fe_v_face_x.get_present_fe_values (),
 					     fe_v_face_neighbor_x.get_present_fe_values (),
@@ -1224,15 +1237,24 @@ void DGMethod<dim>::assemble_system1 ()
 			      ->child(GeometryInfo<dim>::child_cell_on_face(
 				face_no,neighbor_subface_no)) == cell, ExcInternalError());
 
+
+		                                       // Like before. Use
+		                                       // quadrature rule
+                                                       // of higher order
+                                                       // cell.
+		      const unsigned int use_fe_index = 
+			neighbor->active_fe_index () > cell->active_fe_index () ?
+			neighbor->active_fe_index () : cell->active_fe_index ();
+
 						       // Reinit the
 						       // appropriate
 						       // ``FEFaceValues''
 						       // and assemble
 						       // the face
 						       // terms.
-		      fe_v_face_x.reinit (cell, face_no);
+		      fe_v_face_x.reinit (cell, face_no, use_fe_index);
 		      fe_v_subface_neighbor_x.reinit (neighbor, neighbor_face_no,
-						      neighbor_subface_no);
+						      neighbor_subface_no, use_fe_index);
 		      
 		      dg.assemble_face_term1(fe_v_face_x.get_present_fe_values (),
 					     fe_v_subface_neighbor_x.get_present_fe_values (),
@@ -1417,6 +1439,10 @@ void DGMethod<dim>::assemble_system2 ()
 			  neighbor2,subface_no));
 		      const unsigned int dofs_on_neighbor_child = neighbor_child->get_fe().dofs_per_cell;
 
+		      const unsigned int use_fe_index = 
+			neighbor_child->active_fe_index () > cell->active_fe_index () ?
+			neighbor_child->active_fe_index () : cell->active_fe_index ();
+
 		      Assert (neighbor_child->face(neighbor2) == face->child(subface_no),
 			      ExcInternalError());
 		      Assert (!neighbor_child->has_children(), ExcInternalError());
@@ -1425,8 +1451,8 @@ void DGMethod<dim>::assemble_system2 ()
 		      u_vn_matrix = 0;
 		      un_vn_matrix = 0;
 		      
-		      fe_v_subface_x.reinit (cell, face_no, subface_no);
-		      fe_v_face_neighbor_x.reinit (neighbor_child, neighbor2);
+		      fe_v_subface_x.reinit (cell, face_no, subface_no, use_fe_index);
+		      fe_v_face_neighbor_x.reinit (neighbor_child, neighbor2, use_fe_index);
 
 		      dg.assemble_face_term2(fe_v_subface_x.get_present_fe_values (),
 					     fe_v_face_neighbor_x.get_present_fe_values (),
@@ -1464,12 +1490,16 @@ void DGMethod<dim>::assemble_system2 ()
 		    {
 		      const unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
 		      
+		      const unsigned int use_fe_index = 
+			neighbor->active_fe_index () > cell->active_fe_index () ?
+			neighbor->active_fe_index () : cell->active_fe_index ();
+
 		      un_v_matrix = 0;
 		      u_vn_matrix = 0;
 		      un_vn_matrix = 0;
 		      
-		      fe_v_face_x.reinit (cell, face_no);
-		      fe_v_face_neighbor_x.reinit (neighbor, neighbor2);
+		      fe_v_face_x.reinit (cell, face_no, use_fe_index);
+		      fe_v_face_neighbor_x.reinit (neighbor, neighbor2, use_fe_index);
 
 		      dg.assemble_face_term2(fe_v_face_x.get_present_fe_values (),
 					     fe_v_face_neighbor_x.get_present_fe_values (),
@@ -1787,7 +1817,7 @@ int main ()
 {
   try
     {
-	  DGMethod<2> dgmethod;
+	  DGMethod<3> dgmethod;
 	  dgmethod.run ();
     }
   catch (std::exception &exc)
