@@ -1817,7 +1817,7 @@ int main ()
 {
   try
     {
-	  DGMethod<3> dgmethod;
+	  DGMethod<2> dgmethod;
 	  dgmethod.run ();
     }
   catch (std::exception &exc)
