@@ -1001,8 +1001,7 @@ face (const unsigned int face_no,
   Assert (dim != 1, ExcInternalError());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcInternalError());
-  Assert (n_quadrature_points > 0, ExcInternalError());
-    
+  
   switch (dim)
     {
       case 1:
@@ -1045,8 +1044,7 @@ sub_face (const unsigned int face_no,
                                    // that we get a warning in 1d
   Assert (subface_no+1 < GeometryInfo<dim>::subfaces_per_face+1,
           ExcInternalError());
-  Assert (n_quadrature_points > 0, ExcInternalError());
-
+  
   switch (dim)
     {
       case 1:
