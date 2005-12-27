@@ -20,6 +20,7 @@
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <base/qprojector.h>
+#include <base/geometry_info.h>
 #include <cmath>
 
 template<int dim>
@@ -50,31 +51,69 @@ void check_line(Quadrature<1>& quadrature)
   deallog << "length: " << s << std::endl;
 }
 
+template<int dim>
+void check_face(Quadrature<1>& q1)
+{
+  deallog << "Checking dim " << dim
+	  << " 1d-points " << q1.n_quadrature_points
+	  << std::endl;
+  
+  Quadrature<dim-1> subquadrature(q1);
+  for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+    {
+      deallog << "Face " << f
+	      << std::endl;
+      
+      Quadrature<dim> quadrature
+	= QProjector<dim>::project_to_face(subquadrature, f);
+      for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+	deallog << quadrature.point(k) << std::endl;
+    }
+
+  for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+    for (unsigned int s=0;s<GeometryInfo<dim>::subfaces_per_face;++s)
+      {
+	deallog << "Face " << f << " subface " << s
+		<< std::endl;
+	
+	Quadrature<dim> quadrature
+	  = QProjector<dim>::project_to_face(subquadrature, f);
+	for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+	  deallog << quadrature.point(k) << std::endl;
+      }
+}
+
+void check(Quadrature<1>& q)
+{
+  check_line<1> (q);
+  check_line<2> (q);
+  check_line<3> (q);
+  
+  check_face<2>(q);
+  check_face<3>(q);  
+}
 
 int main()
 {
   std::ofstream logfile("qprojector/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
+  logfile.precision(2);
+  
   deallog.threshold_double(1.e-10);
+
+  Quadrature<1> none(0);
+  check(none);
   
   QTrapez<1> trapez;
-  check_line<1> (trapez);
-  check_line<2> (trapez);
-  check_line<3> (trapez);
+  check(trapez);
   
   QSimpson<1> simpson;
-  check_line<1> (simpson);
-  check_line<2> (simpson);
-  check_line<3> (simpson);
+  check(simpson);
 
   QMilne<1> milne;
-  check_line<1> (milne);
-  check_line<2> (milne);
-  check_line<3> (milne);
+  check(milne);
 
   QWeddle<1> weddle;
-  check_line<1> (weddle);
-  check_line<2> (weddle);
-  check_line<3> (weddle);
+  check(weddle);
 }
