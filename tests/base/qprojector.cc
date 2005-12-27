@@ -83,14 +83,91 @@ void check_face(Quadrature<1>& q1)
       }
 }
 
+template<int dim>
+void check_faces (Quadrature<1>& q1)
+{
+  const unsigned int nq = q1.n_quadrature_points;
+  
+  deallog << "Checking dim " << dim
+	  << " 1d-points " << nq
+	  << std::endl;
+
+
+  Quadrature<dim-1> subquadrature(q1);
+  const unsigned int nqs = subquadrature.n_quadrature_points;
+  
+  Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(subquadrature);
+
+  for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+    {
+
+      deallog << "Face " << f
+	      << " orientation false"
+	      << std::endl;
+
+      unsigned int
+	offset = QProjector<dim>::DataSetDescriptor::face(f, false, nqs);
+      
+      for (unsigned int k=0;k<nqs;++k)
+	deallog << faces.point(offset+k) << std::endl;
+      
+      deallog << "Face " << f
+	      << " orientation true"
+	      << std::endl;
+      
+      offset = QProjector<dim>::DataSetDescriptor::face(f, true, nqs);
+      
+      for (unsigned int k=0;k<nqs;++k)
+	deallog << faces.point(offset+k) << std::endl;
+    }
+  
+				   /*
+  Quadrature<dim> subs = QProjector<dim>::project_to_all_subfaces(subquadrature);
+
+
+  for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+    for (unsigned int s=0;s<GeometryInfo<dim>::subfaces_per_face;++s)
+      {
+
+	deallog << "Face " << f << " subface " << s
+		<< " orientation false"
+		<< std::endl;
+	
+	unsigned int
+	  offset = QProjector<dim>::DataSetDescriptor::sub_face(f, s, false, nqs);
+	
+	for (unsigned int k=0;k<nqs;++k)
+	  deallog << faces.point(offset+k) << std::endl;
+	
+	deallog << "Face " << f << " subface " << s
+		<< " orientation true"
+		<< std::endl;
+	
+	offset = QProjector<dim>::DataSetDescriptor::sub_face(f, s, true, nqs);
+	
+	for (unsigned int k=0;k<nqs;++k)
+	  deallog << faces.point(offset+k) << std::endl;
+      }
+				   */
+}
+
+
 void check(Quadrature<1>& q)
 {
+  deallog << std::endl;
+  deallog.push("line");
   check_line<1> (q);
   check_line<2> (q);
   check_line<3> (q);
-  
+  deallog.pop();
+  deallog.push("face");
   check_face<2>(q);
-  check_face<3>(q);  
+  check_face<3>(q);
+  deallog.pop();
+  deallog.push("all");
+  check_faces<2>(q);
+  check_faces<3>(q);
+  deallog.pop();
 }
 
 int main()
@@ -104,6 +181,9 @@ int main()
 
   Quadrature<1> none(0);
   check(none);
+
+  QGauss<1> midpoint(1);
+  check(midpoint);
   
   QTrapez<1> trapez;
   check(trapez);
@@ -113,7 +193,4 @@ int main()
 
   QMilne<1> milne;
   check(milne);
-
-  QWeddle<1> weddle;
-  check(weddle);
 }
