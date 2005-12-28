@@ -215,31 +215,57 @@ GridGenerator::subdivided_hyper_cube (Triangulation<dim> &tria,
                                    // next create the cells
 				   // Prepare cell data
   std::vector<CellData<dim> > cells;
+				   // Define these as abbreviations
+				   // for the step sizes below. The
+				   // number of points in a single
+				   // direction is repetitions+1
+  const unsigned int dy = repetitions+1;
+  const unsigned int dz = dy*dy;
   switch (dim)
     {
       case 1:
-            cells.resize (repetitions);
-            for (unsigned int x=0; x<repetitions; ++x)
-              {
-                cells[x].vertices[0] = x;
-                cells[x].vertices[1] = x+1;
-                cells[x].material_id = 0;
-              }
-            break;
-
+	cells.resize (repetitions);
+	for (unsigned int x=0; x<repetitions; ++x)
+	  {
+	    cells[x].vertices[0] = x;
+	    cells[x].vertices[1] = x+1;
+	    cells[x].material_id = 0;
+	  }
+	break;
+	
       case 2:
-            cells.resize (repetitions*repetitions);
-            for (unsigned int y=0; y<repetitions; ++y)
-              for (unsigned int x=0; x<repetitions; ++x)
-                {
-                  const unsigned int c = x+y*repetitions;
-                  cells[c].vertices[0] = y*(repetitions+1)+x;
-                  cells[c].vertices[1] = y*(repetitions+1)+x+1;
-                  cells[c].vertices[2] = (y+1)*(repetitions+1)+x;
-                  cells[c].vertices[3] = (y+1)*(repetitions+1)+x+1;
-                  cells[c].material_id = 0;
-                }
-            break;
+	cells.resize (repetitions*repetitions);
+	for (unsigned int y=0; y<repetitions; ++y)
+	  for (unsigned int x=0; x<repetitions; ++x)
+	    {
+	      const unsigned int c = x  +y*repetitions;
+	      cells[c].vertices[0] = x  +y*dy;
+	      cells[c].vertices[1] = x+1+y*dy;
+	      cells[c].vertices[2] = x  +(y+1)*dy;
+	      cells[c].vertices[3] = x+1+(y+1)*dy;
+	      cells[c].material_id = 0;
+	    }
+	break;
+//TODO: Make sure this is correct!	
+      case 3:
+	cells.resize (repetitions*repetitions*repetitions);
+	for (unsigned int z=0; z<repetitions; ++z)
+	  for (unsigned int y=0; y<repetitions; ++y)
+	    for (unsigned int x=0; x<repetitions; ++x)
+	      {
+		const unsigned int c = x+y*repetitions
+				       +z*repetitions*repetitions;
+		cells[c].vertices[0] = x  +y*dy    +z*dz;
+		cells[c].vertices[1] = x+1+y*dy    +z*dz;
+		cells[c].vertices[2] = x  +(y+1)*dy+z*dz;
+		cells[c].vertices[3] = x+1+(y+1)*dy+z*dz;
+		cells[c].vertices[4] = x  +y*dy    +(z+1)*dz;
+		cells[c].vertices[5] = x+1+y*dy    +(z+1)*dz;
+		cells[c].vertices[6] = x  +(y+1)*dy+(z+1)*dz;
+		cells[c].vertices[7] = x+1+(y+1)*dy+(z+1)*dz;
+		cells[c].material_id = 0;
+	      }
+	break;
 
       default:
                                              // should be trivial to
@@ -1016,10 +1042,10 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
   coords[3] = r+d;
 
   unsigned int k=0;
-  for (unsigned int i0=0;i0<4;++i0)
-    for (unsigned int i1=0;i1<4;++i1)
-      for (unsigned int i2=0;i2<4;++i2)
-	vertices[k++] = Point<dim>(coords[i2], coords[i1], coords[i0]);
+  for (unsigned int z=0;z<4;++z)
+    for (unsigned int y=0;y<4;++y)
+      for (unsigned int x=0;x<4;++x)
+	vertices[k++] = Point<dim>(coords[x], coords[y], coords[z]);
 
   const unsigned char materials[27] = {
 	21,20,22,
@@ -1035,18 +1061,18 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
   
   std::vector<CellData<dim> > cells(27);
   k = 0;
-  for (unsigned int i0=0;i0<3;++i0)
-    for (unsigned int i1=0;i1<3;++i1)
-      for (unsigned int i2=0;i2<3;++i2)
+  for (unsigned int z=0;z<3;++z)
+    for (unsigned int y=0;y<3;++y)
+      for (unsigned int x=0;x<3;++x)
 	{
-	  cells[k].vertices[0] = i2+4*i1+16*i0;
-	  cells[k].vertices[1] = i2+4*i1+16*i0+1;
-	  cells[k].vertices[2] = i2+4*i1+16*i0+16;
-	  cells[k].vertices[3] = i2+4*i1+16*i0+17;
-	  cells[k].vertices[4] = i2+4*i1+16*i0+4;
-	  cells[k].vertices[5] = i2+4*i1+16*i0+5;
-	  cells[k].vertices[6] = i2+4*i1+16*i0+20;
-	  cells[k].vertices[7] = i2+4*i1+16*i0+21;
+	  cells[k].vertices[0] = x+4*y+16*z;
+	  cells[k].vertices[1] = x+4*y+16*z+1;
+	  cells[k].vertices[2] = x+4*y+16*z+4;
+	  cells[k].vertices[3] = x+4*y+16*z+5;
+	  cells[k].vertices[4] = x+4*y+16*z+16;
+	  cells[k].vertices[5] = x+4*y+16*z+17;
+	  cells[k].vertices[6] = x+4*y+16*z+20;
+	  cells[k].vertices[7] = x+4*y+16*z+21;
 	  if (colorize)
 	    cells[k].material_id = materials[k];
 	  ++k;
