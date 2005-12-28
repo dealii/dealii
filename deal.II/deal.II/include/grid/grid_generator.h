@@ -301,26 +301,13 @@ class GridGenerator
 				      * void upon calling this
 				      * function.
 				      */
-    static void enclosed_hyper_cube (Triangulation<2> &tria,
+    template <int dim>
+    static void enclosed_hyper_cube (Triangulation<dim> &tria,
 	 			     const double      left = 0.,
 				     const double      right= 1.,
 				     const double      thickness = 1.,
 				     const bool        colorize = false);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      */
-    static void enclosed_hyper_cube (Triangulation<3> &tria,
-	 			     const double      left = 0.,
-				     const double      right= 1.,
-				     const double      thickness = 1.,
-				     const bool        colorize = false);
-
+    
 				     /**
 				      * Initialize the given
 				      * triangulation with a
@@ -346,32 +333,9 @@ class GridGenerator
 				      * void upon calling this
 				      * function.
 				      */    
-    static void hyper_ball (Triangulation<1> &tria,
-			    const Point<1>   &center = Point<1>(),
-			    const double      radius = 1.);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      */
-    static void hyper_ball (Triangulation<2> &tria,
-			    const Point<2>   &center = Point<2>(),
-			    const double      radius = 1.);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      */
-    static void hyper_ball (Triangulation<3> &tria,
-			    const Point<3>   &center = Point<3>(),
+    template <int dim>
+    static void hyper_ball (Triangulation<dim> &tria,
+			    const Point<dim>   &center = Point<dim>(),
 			    const double      radius = 1.);
 
 				     /**
@@ -382,6 +346,13 @@ class GridGenerator
 				      * projection into the
 				      * @p yz-plane is a circle of
 				      * radius @p radius.
+				      *
+				      * In two dimensions, the
+				      * cylinder is a rectangle from
+				      * <tt>x=-half_length</tt> to
+				      * <tt>x=+half_length</tt> and
+				      * from <tt>y=-radius</tt> to
+				      * <tt>y=radius</tt>.
 				      *
 				      * The boundaries are colored
 				      * according to the following
@@ -394,40 +365,11 @@ class GridGenerator
 				      * void upon calling this
 				      * function.
 				      */
-    static void cylinder (Triangulation<3> &tria,
+    template <int dim>
+    static void cylinder (Triangulation<dim> &tria,
 			  const double      radius = 1.,
 			  const double      half_length = 1.);
-
-				     /**
-				      * Projection of the
-				      * three-dimensional cylinder
-				      * into the @p xy-plane.
-				      * Therefore, this is simply a square.
-				      *
-				      * Coloring is like in 3D.
-				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      */
-    static void cylinder (Triangulation<2> &tria,
-			  const double      radius = 1.,
-			  const double      half_length = 1.);
-
-				     /**
-				      * Non-implemented dummy for compilation
-				      * purposes.
-				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      */
-    static void cylinder (Triangulation<1> &tria,
-			  const double      radius,
-			  const double      half_length);
-
-
-
+    
 				     /**
 				      * Initialize the given
 				      * triangulation with a hyper-L
@@ -452,31 +394,8 @@ class GridGenerator
 				      * void upon calling this
 				      * function.
 				      */
-    static void hyper_L (Triangulation<1> &tria,
-			 const double      left = -1.,
-			 const double      right= 1.);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      */
-    static void hyper_L (Triangulation<2> &tria,
-			 const double      left = -1.,
-			 const double      right= 1.);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      */
-    static void hyper_L (Triangulation<3> &tria,
+    template <int dim>
+    static void hyper_L (Triangulation<dim> &tria,
 			 const double      left = -1.,
 			 const double      right= 1.);
     
@@ -510,46 +429,12 @@ class GridGenerator
 				      * void upon calling this
 				      * function.
 				      */
-    static void hyper_cube_slit (Triangulation<1> &tria,
+    template <int dim>
+    static void hyper_cube_slit (Triangulation<dim> &tria,
 				 const double      left = 0.,
 				 const double      right= 1.,
 				 const bool colorize = false);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      *
-				      * If colorize is selected, then
-				      * the two edges forming the slit
-				      * carry numbers 1 and 2, while
-				      * the outer boundary has number
-				      * 0.
-				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      */
-    static void hyper_cube_slit (Triangulation<2> &tria,
-				 const double      left = 0.,
-				 const double      right= 1.,
-				 const bool colorize = false);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      *
-				      * Colorization is not
-				      * implemented in 3D.
-				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      */
-    static void hyper_cube_slit (Triangulation<3> &tria,
-				 const double      left = 0.,
-				 const double      right= 1.,
-				 const bool colorize = false);
-
+    
 				     /**
 				      * Produce a hyper-shell,
 				      * i.e. the space between two
@@ -581,40 +466,13 @@ class GridGenerator
 				      * void upon calling this
 				      * function.
 				      */
-    static void hyper_shell (Triangulation<1>   &tria,
-			     const Point<1>     &center,
+    template <int dim>
+    static void hyper_shell (Triangulation<dim>   &tria,
+			     const Point<dim>     &center,
 			     const double        inner_radius,
 			     const double        outer_radius,
 			     const unsigned int  n_cells = 0);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      */
-    static void hyper_shell (Triangulation<2>   &tria,
-			     const Point<2>     &center,
-			     const double        inner_radius,
-			     const double        outer_radius,
-			     const unsigned int  n_cells = 0);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      */
-    static void hyper_shell (Triangulation<3>   &tria,
-			     const Point<3>     &center,
-			     const double        inner_radius,
-			     const double        outer_radius,
-			     const unsigned int  n_cells = 0);
-
+    
 				     /**
 				      * Produce a domain that is the space
 				      * between two cylinders in 3d, with
@@ -628,14 +486,17 @@ class GridGenerator
 				      * ratio. The same holds for @p
 				      * n_axial_cells.
 				      *
-				      * The triangulation needs to be void
-				      * upon calling this function.
+				      * @note Although this function
+				      * is declared as a template, it
+				      * does not make sense in 1D and
+				      * 2D.
 				      *
-				      * @note The triangulation needs to be
-				      * void upon calling this
+				      * @note The triangulation needs
+				      * to be void upon calling this
 				      * function.
 				      */
-    static void cylinder_shell (Triangulation<3>   &tria,
+    template <int dim>
+    static void cylinder_shell (Triangulation<dim>   &tria,
                                 const double        length,
                                 const double        inner_radius,
                                 const double        outer_radius,
@@ -659,8 +520,9 @@ class GridGenerator
 				      * void upon calling this
 				      * function.
 				      */
-    static void half_hyper_ball (Triangulation<2> &tria,
-				 const Point<2>   &center = Point<2>(),
+    template <int dim>
+    static void half_hyper_ball (Triangulation<dim> &tria,
+				 const Point<dim>   &center = Point<dim>(),
 				 const double      radius = 1.);
 
 				     /**
@@ -705,8 +567,9 @@ class GridGenerator
 				      * void upon calling this
 				      * function.
 				      */
-    static void half_hyper_shell (Triangulation<2>   &tria,
-				  const Point<2>     &center,
+    template <int dim>
+    static void half_hyper_shell (Triangulation<dim>   &tria,
+				  const Point<dim>     &center,
 				  const double        inner_radius,
 				  const double        outer_radius,
 				  const unsigned int  n_cells = 0);
@@ -738,13 +601,6 @@ class GridGenerator
     static void laplace_transformation (Triangulation<dim> &tria,
 					const std::map<unsigned int,Point<dim> > &new_points);
 
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      */
-    static void laplace_transformation (Triangulation<1> &tria,
-					const std::map<unsigned int,Point<1> > &new_points);
-    
 				     /**
 				      * Exception
 				      */
