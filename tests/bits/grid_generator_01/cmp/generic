@@ -1,5 +1,37 @@
 
-DEAL:2d-GridTest::hyper_cube
+DEAL:1d::hyper_cube
+3.00000 0 0
+7.00000 0 0
+
+DEAL:1d::subdivided_hyper_cube
+1.00000 0 0
+3.00000 0 0
+
+DEAL:1d::hyper_rectangle
+2.00000 0 0
+3.00000 0 0
+
+DEAL:1d::subdivided_hyper_rectangle
+2.00000 0 0
+2.50000 0 0
+
+DEAL:1d::enclosed_hyper_cube
+DEAL:1d::Abort!!!
+DEAL:1d::hyper_ball
+DEAL:1d::Abort!!!
+DEAL:1d::cylinder
+DEAL:1d::Abort!!!
+DEAL:1d::hyper_L
+DEAL:1d::Abort!!!
+DEAL:1d::hyper_cube_slit
+DEAL:1d::Abort!!!
+DEAL:1d::hyper_shell
+DEAL:1d::Abort!!!
+DEAL:1d::half_hyper_ball
+DEAL:1d::Abort!!!
+DEAL:1d::half_hyper_shell
+DEAL:1d::Abort!!!
+DEAL:2d::hyper_cube
 #FIG 3.2
 Landscape
 Center
@@ -29,7 +61,7 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	3600	3600
 	3600	8400
-DEAL:2d-GridTest::subdivided_hyper_cube
+DEAL:2d::subdivided_hyper_cube
 #FIG 3.2
 Landscape
 Center
@@ -131,7 +163,7 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	6000	8400
 	8400	8400
-DEAL:2d-GridTest::hyper_rectangle
+DEAL:2d::hyper_rectangle
 #FIG 3.2
 Landscape
 Center
@@ -161,7 +193,7 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	2400	-1200
 	2400	2400
-DEAL:2d-GridTest::subdivided_hyper_rectangle
+DEAL:2d::subdivided_hyper_rectangle
 #FIG 3.2
 Landscape
 Center
@@ -239,7 +271,7 @@ Single
 2 1 0 3 4 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	3000	2400
 	3600	2400
-DEAL:2d-GridTest::parallelogram
+DEAL:2d::parallelogram
 #FIG 3.2
 Landscape
 Center
@@ -269,7 +301,7 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	0	0
 	3600	2400
-DEAL:2d-GridTest::enclosed_hyper_cube
+DEAL:2d::enclosed_hyper_cube
 #FIG 3.2
 Landscape
 Center
@@ -371,7 +403,7 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	8400	9600
 	9600	9600
-DEAL:2d-GridTest::hyper_ball
+DEAL:2d::hyper_ball
 #FIG 3.2
 Landscape
 Center
@@ -425,7 +457,7 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	-145	1345
 	4945	1345
-DEAL:2d-GridTest::cylinder
+DEAL:2d::cylinder
 #FIG 3.2
 Landscape
 Center
@@ -455,7 +487,7 @@ Single
 2 1 0 3 2 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	-3600	-1200
 	-3600	1200
-DEAL:2d-GridTest::hyper_L
+DEAL:2d::hyper_L
 #FIG 3.2
 Landscape
 Center
@@ -509,7 +541,7 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	-1200	0
 	-1200	1200
-DEAL:2d-GridTest::hyper_cube_slit
+DEAL:2d::hyper_cube_slit
 #FIG 3.2
 Landscape
 Center
@@ -581,7 +613,7 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	0	2400
 	2400	2400
-DEAL:2d-GridTest::hyper_shell
+DEAL:2d::hyper_shell
 #FIG 3.2
 Landscape
 Center
@@ -785,7 +817,7 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	6834	-3036
 	7200	-1200
-DEAL:2d-GridTest::half_hyper_ball
+DEAL:2d::half_hyper_ball
 #FIG 3.2
 Landscape
 Center
@@ -839,7 +871,7 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	2400	2400
 	4945	1345
-DEAL:2d-GridTest::half_hyper_shell
+DEAL:2d::half_hyper_shell
 #FIG 3.2
 Landscape
 Center
@@ -953,3 +985,593 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	4236	3234
 	2400	3600
+DEAL:3d::hyper_cube
+object "vertices" class array type float rank 1 shape 3 items 8 data follows
+	3.00000 3.00000 3.00000
+	7.00000 3.00000 3.00000
+	3.00000 7.00000 3.00000
+	7.00000 7.00000 3.00000
+	3.00000 3.00000 7.00000
+	7.00000 3.00000 7.00000
+	3.00000 7.00000 7.00000
+	7.00000 7.00000 7.00000
+object "cells" class array type int rank 1 shape 8 items 1 data follows
+	0	4	2	6	1	5	3	7
+attribute "element type" string "cubes"
+attribute "ref" string "positions"
+
+object "material" class array type int rank 0 items 1 data follows
+ 0
+attribute "dep" string "connections"
+
+object "level" class array type int rank 0 items 1 data follows
+ 0
+attribute "dep" string "connections"
+
+object "deal data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+object "cell data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+component "material" value "material"
+component "level" value "level"
+
+object "grid data" class group
+member "cells" value "cell data"
+end
+DEAL:3d::subdivided_hyper_cube
+object "vertices" class array type float rank 1 shape 3 items 64 data follows
+	1.00000 1.00000 1.00000
+	3.00000 1.00000 1.00000
+	5.00000 1.00000 1.00000
+	7.00000 1.00000 1.00000
+	1.00000 3.00000 1.00000
+	3.00000 3.00000 1.00000
+	5.00000 3.00000 1.00000
+	7.00000 3.00000 1.00000
+	1.00000 5.00000 1.00000
+	3.00000 5.00000 1.00000
+	5.00000 5.00000 1.00000
+	7.00000 5.00000 1.00000
+	1.00000 7.00000 1.00000
+	3.00000 7.00000 1.00000
+	5.00000 7.00000 1.00000
+	7.00000 7.00000 1.00000
+	1.00000 1.00000 3.00000
+	3.00000 1.00000 3.00000
+	5.00000 1.00000 3.00000
+	7.00000 1.00000 3.00000
+	1.00000 3.00000 3.00000
+	3.00000 3.00000 3.00000
+	5.00000 3.00000 3.00000
+	7.00000 3.00000 3.00000
+	1.00000 5.00000 3.00000
+	3.00000 5.00000 3.00000
+	5.00000 5.00000 3.00000
+	7.00000 5.00000 3.00000
+	1.00000 7.00000 3.00000
+	3.00000 7.00000 3.00000
+	5.00000 7.00000 3.00000
+	7.00000 7.00000 3.00000
+	1.00000 1.00000 5.00000
+	3.00000 1.00000 5.00000
+	5.00000 1.00000 5.00000
+	7.00000 1.00000 5.00000
+	1.00000 3.00000 5.00000
+	3.00000 3.00000 5.00000
+	5.00000 3.00000 5.00000
+	7.00000 3.00000 5.00000
+	1.00000 5.00000 5.00000
+	3.00000 5.00000 5.00000
+	5.00000 5.00000 5.00000
+	7.00000 5.00000 5.00000
+	1.00000 7.00000 5.00000
+	3.00000 7.00000 5.00000
+	5.00000 7.00000 5.00000
+	7.00000 7.00000 5.00000
+	1.00000 1.00000 7.00000
+	3.00000 1.00000 7.00000
+	5.00000 1.00000 7.00000
+	7.00000 1.00000 7.00000
+	1.00000 3.00000 7.00000
+	3.00000 3.00000 7.00000
+	5.00000 3.00000 7.00000
+	7.00000 3.00000 7.00000
+	1.00000 5.00000 7.00000
+	3.00000 5.00000 7.00000
+	5.00000 5.00000 7.00000
+	7.00000 5.00000 7.00000
+	1.00000 7.00000 7.00000
+	3.00000 7.00000 7.00000
+	5.00000 7.00000 7.00000
+	7.00000 7.00000 7.00000
+object "cells" class array type int rank 1 shape 8 items 27 data follows
+	0	16	4	20	1	17	5	21
+	1	17	5	21	2	18	6	22
+	2	18	6	22	3	19	7	23
+	4	20	8	24	5	21	9	25
+	5	21	9	25	6	22	10	26
+	6	22	10	26	7	23	11	27
+	8	24	12	28	9	25	13	29
+	9	25	13	29	10	26	14	30
+	10	26	14	30	11	27	15	31
+	16	32	20	36	17	33	21	37
+	17	33	21	37	18	34	22	38
+	18	34	22	38	19	35	23	39
+	20	36	24	40	21	37	25	41
+	21	37	25	41	22	38	26	42
+	22	38	26	42	23	39	27	43
+	24	40	28	44	25	41	29	45
+	25	41	29	45	26	42	30	46
+	26	42	30	46	27	43	31	47
+	32	48	36	52	33	49	37	53
+	33	49	37	53	34	50	38	54
+	34	50	38	54	35	51	39	55
+	36	52	40	56	37	53	41	57
+	37	53	41	57	38	54	42	58
+	38	54	42	58	39	55	43	59
+	40	56	44	60	41	57	45	61
+	41	57	45	61	42	58	46	62
+	42	58	46	62	43	59	47	63
+attribute "element type" string "cubes"
+attribute "ref" string "positions"
+
+object "material" class array type int rank 0 items 27 data follows
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "level" class array type int rank 0 items 27 data follows
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "deal data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+object "cell data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+component "material" value "material"
+component "level" value "level"
+
+object "grid data" class group
+member "cells" value "cell data"
+end
+DEAL:3d::hyper_rectangle
+object "vertices" class array type float rank 1 shape 3 items 8 data follows
+	2.00000 -1.00000 0.00000
+	3.00000 -1.00000 0.00000
+	2.00000 2.00000 0.00000
+	3.00000 2.00000 0.00000
+	2.00000 -1.00000 4.00000
+	3.00000 -1.00000 4.00000
+	2.00000 2.00000 4.00000
+	3.00000 2.00000 4.00000
+object "cells" class array type int rank 1 shape 8 items 1 data follows
+	0	4	2	6	1	5	3	7
+attribute "element type" string "cubes"
+attribute "ref" string "positions"
+
+object "material" class array type int rank 0 items 1 data follows
+ 0
+attribute "dep" string "connections"
+
+object "level" class array type int rank 0 items 1 data follows
+ 0
+attribute "dep" string "connections"
+
+object "deal data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+object "cell data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+component "material" value "material"
+component "level" value "level"
+
+object "grid data" class group
+member "cells" value "cell data"
+end
+DEAL:3d::subdivided_hyper_rectangle
+object "vertices" class array type float rank 1 shape 3 items 60 data follows
+	2.00000 -1.00000 0.00000
+	2.50000 -1.00000 0.00000
+	3.00000 -1.00000 0.00000
+	2.00000 0.00000 0.00000
+	2.50000 0.00000 0.00000
+	3.00000 0.00000 0.00000
+	2.00000 1.00000 0.00000
+	2.50000 1.00000 0.00000
+	3.00000 1.00000 0.00000
+	2.00000 2.00000 0.00000
+	2.50000 2.00000 0.00000
+	3.00000 2.00000 0.00000
+	2.00000 -1.00000 1.00000
+	2.50000 -1.00000 1.00000
+	3.00000 -1.00000 1.00000
+	2.00000 0.00000 1.00000
+	2.50000 0.00000 1.00000
+	3.00000 0.00000 1.00000
+	2.00000 1.00000 1.00000
+	2.50000 1.00000 1.00000
+	3.00000 1.00000 1.00000
+	2.00000 2.00000 1.00000
+	2.50000 2.00000 1.00000
+	3.00000 2.00000 1.00000
+	2.00000 -1.00000 2.00000
+	2.50000 -1.00000 2.00000
+	3.00000 -1.00000 2.00000
+	2.00000 0.00000 2.00000
+	2.50000 0.00000 2.00000
+	3.00000 0.00000 2.00000
+	2.00000 1.00000 2.00000
+	2.50000 1.00000 2.00000
+	3.00000 1.00000 2.00000
+	2.00000 2.00000 2.00000
+	2.50000 2.00000 2.00000
+	3.00000 2.00000 2.00000
+	2.00000 -1.00000 3.00000
+	2.50000 -1.00000 3.00000
+	3.00000 -1.00000 3.00000
+	2.00000 0.00000 3.00000
+	2.50000 0.00000 3.00000
+	3.00000 0.00000 3.00000
+	2.00000 1.00000 3.00000
+	2.50000 1.00000 3.00000
+	3.00000 1.00000 3.00000
+	2.00000 2.00000 3.00000
+	2.50000 2.00000 3.00000
+	3.00000 2.00000 3.00000
+	2.00000 -1.00000 4.00000
+	2.50000 -1.00000 4.00000
+	3.00000 -1.00000 4.00000
+	2.00000 0.00000 4.00000
+	2.50000 0.00000 4.00000
+	3.00000 0.00000 4.00000
+	2.00000 1.00000 4.00000
+	2.50000 1.00000 4.00000
+	3.00000 1.00000 4.00000
+	2.00000 2.00000 4.00000
+	2.50000 2.00000 4.00000
+	3.00000 2.00000 4.00000
+object "cells" class array type int rank 1 shape 8 items 24 data follows
+	0	12	3	15	1	13	4	16
+	1	13	4	16	2	14	5	17
+	3	15	6	18	4	16	7	19
+	4	16	7	19	5	17	8	20
+	6	18	9	21	7	19	10	22
+	7	19	10	22	8	20	11	23
+	12	24	15	27	13	25	16	28
+	13	25	16	28	14	26	17	29
+	15	27	18	30	16	28	19	31
+	16	28	19	31	17	29	20	32
+	18	30	21	33	19	31	22	34
+	19	31	22	34	20	32	23	35
+	24	36	27	39	25	37	28	40
+	25	37	28	40	26	38	29	41
+	27	39	30	42	28	40	31	43
+	28	40	31	43	29	41	32	44
+	30	42	33	45	31	43	34	46
+	31	43	34	46	32	44	35	47
+	36	48	39	51	37	49	40	52
+	37	49	40	52	38	50	41	53
+	39	51	42	54	40	52	43	55
+	40	52	43	55	41	53	44	56
+	42	54	45	57	43	55	46	58
+	43	55	46	58	44	56	47	59
+attribute "element type" string "cubes"
+attribute "ref" string "positions"
+
+object "material" class array type int rank 0 items 24 data follows
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "level" class array type int rank 0 items 24 data follows
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "deal data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+object "cell data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+component "material" value "material"
+component "level" value "level"
+
+object "grid data" class group
+member "cells" value "cell data"
+end
+DEAL:3d::enclosed_hyper_cube
+object "vertices" class array type float rank 1 shape 3 items 64 data follows
+	2.00000 2.00000 2.00000
+	3.00000 2.00000 2.00000
+	7.00000 2.00000 2.00000
+	8.00000 2.00000 2.00000
+	2.00000 3.00000 2.00000
+	3.00000 3.00000 2.00000
+	7.00000 3.00000 2.00000
+	8.00000 3.00000 2.00000
+	2.00000 7.00000 2.00000
+	3.00000 7.00000 2.00000
+	7.00000 7.00000 2.00000
+	8.00000 7.00000 2.00000
+	2.00000 8.00000 2.00000
+	3.00000 8.00000 2.00000
+	7.00000 8.00000 2.00000
+	8.00000 8.00000 2.00000
+	2.00000 2.00000 3.00000
+	3.00000 2.00000 3.00000
+	7.00000 2.00000 3.00000
+	8.00000 2.00000 3.00000
+	2.00000 3.00000 3.00000
+	3.00000 3.00000 3.00000
+	7.00000 3.00000 3.00000
+	8.00000 3.00000 3.00000
+	2.00000 7.00000 3.00000
+	3.00000 7.00000 3.00000
+	7.00000 7.00000 3.00000
+	8.00000 7.00000 3.00000
+	2.00000 8.00000 3.00000
+	3.00000 8.00000 3.00000
+	7.00000 8.00000 3.00000
+	8.00000 8.00000 3.00000
+	2.00000 2.00000 7.00000
+	3.00000 2.00000 7.00000
+	7.00000 2.00000 7.00000
+	8.00000 2.00000 7.00000
+	2.00000 3.00000 7.00000
+	3.00000 3.00000 7.00000
+	7.00000 3.00000 7.00000
+	8.00000 3.00000 7.00000
+	2.00000 7.00000 7.00000
+	3.00000 7.00000 7.00000
+	7.00000 7.00000 7.00000
+	8.00000 7.00000 7.00000
+	2.00000 8.00000 7.00000
+	3.00000 8.00000 7.00000
+	7.00000 8.00000 7.00000
+	8.00000 8.00000 7.00000
+	2.00000 2.00000 8.00000
+	3.00000 2.00000 8.00000
+	7.00000 2.00000 8.00000
+	8.00000 2.00000 8.00000
+	2.00000 3.00000 8.00000
+	3.00000 3.00000 8.00000
+	7.00000 3.00000 8.00000
+	8.00000 3.00000 8.00000
+	2.00000 7.00000 8.00000
+	3.00000 7.00000 8.00000
+	7.00000 7.00000 8.00000
+	8.00000 7.00000 8.00000
+	2.00000 8.00000 8.00000
+	3.00000 8.00000 8.00000
+	7.00000 8.00000 8.00000
+	8.00000 8.00000 8.00000
+object "cells" class array type int rank 1 shape 8 items 27 data follows
+	0	16	4	20	1	17	5	21
+	1	17	5	21	2	18	6	22
+	2	18	6	22	3	19	7	23
+	4	20	8	24	5	21	9	25
+	5	21	9	25	6	22	10	26
+	6	22	10	26	7	23	11	27
+	8	24	12	28	9	25	13	29
+	9	25	13	29	10	26	14	30
+	10	26	14	30	11	27	15	31
+	16	32	20	36	17	33	21	37
+	17	33	21	37	18	34	22	38
+	18	34	22	38	19	35	23	39
+	20	36	24	40	21	37	25	41
+	21	37	25	41	22	38	26	42
+	22	38	26	42	23	39	27	43
+	24	40	28	44	25	41	29	45
+	25	41	29	45	26	42	30	46
+	26	42	30	46	27	43	31	47
+	32	48	36	52	33	49	37	53
+	33	49	37	53	34	50	38	54
+	34	50	38	54	35	51	39	55
+	36	52	40	56	37	53	41	57
+	37	53	41	57	38	54	42	58
+	38	54	42	58	39	55	43	59
+	40	56	44	60	41	57	45	61
+	41	57	45	61	42	58	46	62
+	42	58	46	62	43	59	47	63
+attribute "element type" string "cubes"
+attribute "ref" string "positions"
+
+object "material" class array type int rank 0 items 27 data follows
+ 21 20 22 17 16 18 25 24 26 5 4 6 1 0 2 9 8 10 37 36 38 33 32 34 41 40 42
+attribute "dep" string "connections"
+
+object "level" class array type int rank 0 items 27 data follows
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "deal data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+object "cell data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+component "material" value "material"
+component "level" value "level"
+
+object "grid data" class group
+member "cells" value "cell data"
+end
+DEAL:3d::hyper_ball
+object "vertices" class array type float rank 1 shape 3 items 16 data follows
+	1.36603 -1.63397 -0.633975
+	2.63397 -1.63397 -0.633975
+	2.63397 -1.63397 0.633975
+	1.36603 -1.63397 0.633975
+	1.36603 -0.366025 -0.633975
+	2.63397 -0.366025 -0.633975
+	2.63397 -0.366025 0.633975
+	1.36603 -0.366025 0.633975
+	0.267949 -2.73205 -1.73205
+	3.73205 -2.73205 -1.73205
+	3.73205 -2.73205 1.73205
+	0.267949 -2.73205 1.73205
+	0.267949 0.732051 -1.73205
+	3.73205 0.732051 -1.73205
+	3.73205 0.732051 1.73205
+	0.267949 0.732051 1.73205
+object "cells" class array type int rank 1 shape 8 items 7 data follows
+	0	3	4	7	1	2	5	6
+	8	0	12	4	9	1	13	5
+	9	10	1	2	13	14	5	6
+	11	15	3	7	10	14	2	6
+	8	11	12	15	0	3	4	7
+	8	11	0	3	9	10	1	2
+	12	15	13	14	4	7	5	6
+attribute "element type" string "cubes"
+attribute "ref" string "positions"
+
+object "material" class array type int rank 0 items 7 data follows
+ 0 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "level" class array type int rank 0 items 7 data follows
+ 0 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "deal data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+object "cell data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+component "material" value "material"
+component "level" value "level"
+
+object "grid data" class group
+member "cells" value "cell data"
+end
+DEAL:3d::cylinder
+object "vertices" class array type float rank 1 shape 3 items 24 data follows
+	-3.00000 0.707107 -0.707107
+	-3.00000 -0.707107 -0.707107
+	-3.00000 0.292893 -0.292893
+	-3.00000 -0.292893 -0.292893
+	-3.00000 0.292893 0.292893
+	-3.00000 -0.292893 0.292893
+	-3.00000 0.707107 0.707107
+	-3.00000 -0.707107 0.707107
+	0.00000 0.707107 -0.707107
+	0.00000 -0.707107 -0.707107
+	0.00000 0.292893 -0.292893
+	0.00000 -0.292893 -0.292893
+	0.00000 0.292893 0.292893
+	0.00000 -0.292893 0.292893
+	0.00000 0.707107 0.707107
+	0.00000 -0.707107 0.707107
+	3.00000 0.707107 -0.707107
+	3.00000 -0.707107 -0.707107
+	3.00000 0.292893 -0.292893
+	3.00000 -0.292893 -0.292893
+	3.00000 0.292893 0.292893
+	3.00000 -0.292893 0.292893
+	3.00000 0.707107 0.707107
+	3.00000 -0.707107 0.707107
+object "cells" class array type int rank 1 shape 8 items 10 data follows
+	0	2	8	10	1	3	9	11
+	0	6	8	14	2	4	10	12
+	2	4	10	12	3	5	11	13
+	1	3	9	11	7	5	15	13
+	6	7	14	15	4	5	12	13
+	8	10	16	18	9	11	17	19
+	8	14	16	22	10	12	18	20
+	10	12	18	20	11	13	19	21
+	9	11	17	19	15	13	23	21
+	14	15	22	23	12	13	20	21
+attribute "element type" string "cubes"
+attribute "ref" string "positions"
+
+object "material" class array type int rank 0 items 10 data follows
+ 0 0 0 0 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "level" class array type int rank 0 items 10 data follows
+ 0 0 0 0 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "deal data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+object "cell data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+component "material" value "material"
+component "level" value "level"
+
+object "grid data" class group
+member "cells" value "cell data"
+end
+DEAL:3d::hyper_L
+object "vertices" class array type float rank 1 shape 3 items 26 data follows
+	-1.00000 -1.00000 -1.00000
+	0.00000 -1.00000 -1.00000
+	1.00000 -1.00000 -1.00000
+	-1.00000 -1.00000 0.00000
+	0.00000 -1.00000 0.00000
+	1.00000 -1.00000 0.00000
+	-1.00000 -1.00000 1.00000
+	0.00000 -1.00000 1.00000
+	1.00000 -1.00000 1.00000
+	-1.00000 0.00000 -1.00000
+	0.00000 0.00000 -1.00000
+	1.00000 0.00000 -1.00000
+	-1.00000 0.00000 0.00000
+	0.00000 0.00000 0.00000
+	1.00000 0.00000 0.00000
+	-1.00000 0.00000 1.00000
+	0.00000 0.00000 1.00000
+	1.00000 0.00000 1.00000
+	-1.00000 1.00000 -1.00000
+	0.00000 1.00000 -1.00000
+	1.00000 1.00000 -1.00000
+	-1.00000 1.00000 0.00000
+	0.00000 1.00000 0.00000
+	1.00000 1.00000 0.00000
+	-1.00000 1.00000 1.00000
+	0.00000 1.00000 1.00000
+object "cells" class array type int rank 1 shape 8 items 7 data follows
+	0	3	9	12	1	4	10	13
+	1	4	10	13	2	5	11	14
+	3	6	12	15	4	7	13	16
+	4	7	13	16	5	8	14	17
+	9	12	18	21	10	13	19	22
+	10	13	19	22	11	14	20	23
+	12	15	21	24	13	16	22	25
+attribute "element type" string "cubes"
+attribute "ref" string "positions"
+
+object "material" class array type int rank 0 items 7 data follows
+ 0 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "level" class array type int rank 0 items 7 data follows
+ 0 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "deal data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+object "cell data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+component "material" value "material"
+component "level" value "level"
+
+object "grid data" class group
+member "cells" value "cell data"
+end
+DEAL:3d::hyper_cube_slit
+DEAL:3d::Abort!!!
+DEAL:3d::hyper_shell
+DEAL:3d::Abort!!!
+DEAL:3d::half_hyper_ball
+DEAL:3d::Abort!!!
+DEAL:3d::half_hyper_shell
+DEAL:3d::Abort!!!

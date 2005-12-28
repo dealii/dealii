@@ -47,28 +47,33 @@ void test(std::ostream& out)
   
   go.set_flags(xfig_flags);
   
-  GridOut::OutputFormat format = (dim==2) ? GridOut::xfig : GridOut::dx;
+  GridOut::OutputFormat format = GridOut::gnuplot;
+  if (dim==2) format = GridOut::xfig;
+  if (dim==3) format = GridOut::dx;
   
   if (true)
     {
       deallog << "hyper_cube" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::hyper_cube(tr, 3., 7.);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }
   if (true)
     {
       deallog << "subdivided_hyper_cube" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::subdivided_hyper_cube(tr, 3, 1., 7.);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }
   if (true)
     {
       deallog << "hyper_rectangle" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::hyper_rectangle(tr, p1, p2, true);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }
   if (true)
     {
@@ -79,74 +84,84 @@ void test(std::ostream& out)
       if (dim>1) sub[1] = 3;
       if (dim>2) sub[2] = 4;
       GridGenerator::subdivided_hyper_rectangle(tr, sub, p1, p2, true);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }
-  if (dim == 2)
+  if (dim==2)
     {
       deallog << "parallelogram" << std::endl;
       Triangulation<dim> tr;
-      Tensor<dim,2> corners;
+      Tensor<2,dim> corners;
       corners[0] = p1;
       if (dim>1) corners[1] = p2;
       if (dim>2) corners[2] = p3;
       GridGenerator::parallelogram(tr, corners, true);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }
-  if (dim>1)
+  if (true)
     {
       deallog << "enclosed_hyper_cube" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::enclosed_hyper_cube(tr, 3., 7., 1., true);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }
   if (true)
     {
       deallog << "hyper_ball" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::hyper_ball(tr, p1, 3.);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }  
   if (true)
     {
       deallog << "cylinder" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::cylinder(tr, 1., 3.);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }  
   if (true)
     {
       deallog << "hyper_L" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::hyper_L(tr, -1., 1.);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }  
   if (true)
     {
       deallog << "hyper_cube_slit" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::hyper_cube_slit(tr, -2., 2., true);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }  
   if (true)
     {
       deallog << "hyper_shell" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::hyper_shell(tr, p1, 4., 6.);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }  
   if (true)
     {
       deallog << "half_hyper_ball" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::half_hyper_ball(tr, p1, 3.);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }  
   if (true)
     {
       deallog << "half_hyper_shell" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::half_hyper_shell(tr, p1, 4., 6.);
-      go.write(tr, out, format);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
     }  
 }
 
@@ -158,7 +173,13 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   
-  deallog.push("2d-GridTest");
+  deallog.push("1d");
+  test<1>(logfile);
+  deallog.pop();
+  deallog.push("2d");
   test<2>(logfile);
+  deallog.pop();
+  deallog.push("3d");
+  test<3>(logfile);
   deallog.pop();
 }
