@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-// Test the various functions in grid generator.
+// Test grid generation functions  in GridGenerator.
 
 #include <base/logstream.h>
 #include <base/tensor.h>
@@ -144,6 +144,14 @@ void test(std::ostream& out)
       deallog << "hyper_shell" << std::endl;
       Triangulation<dim> tr;
       GridGenerator::hyper_shell(tr, p1, 4., 6.);
+      if (tr.n_cells() > 0)
+	go.write(tr, out, format);
+    }  
+  if (true)
+    {
+      deallog << "cylinder_shell" << std::endl;
+      Triangulation<dim> tr;
+      GridGenerator::cylinder_shell(tr, 2., 5., 6.);
       if (tr.n_cells() > 0)
 	go.write(tr, out, format);
     }  
