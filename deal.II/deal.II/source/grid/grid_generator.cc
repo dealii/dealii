@@ -1384,20 +1384,20 @@ void GridGenerator::cylinder_shell (Triangulation<dim>   &tria,
 				   // first N ones are on the
 				   // outer one, and all are
 				   // numbered counter-clockwise
-  std::vector<Point<dim> > vertices_2d(2*N_r);
+  std::vector<Point<2> > vertices_2d(2*N_r);
   for (unsigned int i=0; i<N_r; ++i)
     {
-      vertices_2d[i] = Point<dim>( std::cos(2*pi * i/N_r),
+      vertices_2d[i] = Point<2>( std::cos(2*pi * i/N_r),
                                  std::sin(2*pi * i/N_r)) * outer_radius;
       vertices_2d[i+N_r] = vertices_2d[i] * (inner_radius/outer_radius);
     };
 
-  std::vector<Point<dim> > vertices_3d;
+  std::vector<Point<3> > vertices_3d;
   vertices_3d.reserve (2*N_r*(N_z+1));
   for (unsigned int j=0; j<=N_z; ++j)
     for (unsigned int i=0; i<2*N_r; ++i)
       {
-        const Point<dim> v (vertices_2d[i][0],
+        const Point<3> v (vertices_2d[i][0],
                           vertices_2d[i][1],
                           j*length/N_z);
         vertices_3d.push_back (v);
