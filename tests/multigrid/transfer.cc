@@ -21,6 +21,7 @@
 #include <dofs/dof_tools.h>
 #include <fe/fe_dgp.h>
 #include <fe/fe_dgq.h>
+#include <fe/fe_raviart_thomas.h>
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>
 #include <multigrid/mg_dof_handler.h>
@@ -107,6 +108,9 @@ int main()
   check_simple (FE_Q<2>(2));
   check_simple (FESystem<2>(FE_DGQ<2>(1), 2));
   check_simple (FESystem<2>(FE_DGP<2>(1), 2, FE_DGQ<2>(1), 3));
+
+  check_simple (FE_RaviartThomas<2>(2));
+  check_simple (FESystem<2>(FE_RaviartThomas<2>(1),1,FE_DGQ<2>(0),2));
   
   check_simple (FE_DGQ<3>(1));
   check_simple (FE_Q<3>(2));
