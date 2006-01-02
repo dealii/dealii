@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 dnl
 dnl $Id$
 
@@ -119,6 +119,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 	  *version\ 3.4.3*) GXX_VERSION_DETAILED=gcc3.4.3 ;;
 	  *version\ 3.4.4*) GXX_VERSION_DETAILED=gcc3.4.4 ;;
 	  *version\ 3.4.5*) GXX_VERSION_DETAILED=gcc3.4.5 ;;
+	  *version\ 3.4.6*) GXX_VERSION_DETAILED=gcc3.4.6 ;;
 	  *)                GXX_VERSION_DETAILED=gcc3.4.x ;;
         esac
   	GXX_VERSION=gcc3.4
