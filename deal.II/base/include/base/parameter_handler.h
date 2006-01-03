@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1368,20 +1368,76 @@ class ParameterHandler
     
 				     /**
 				      * Return value of entry
-				      * <tt>entry_string</tt> as
+				      * <tt>entry_name</tt> as
 				      * <tt>double</tt>.
 				      */
-    double         get_double (const std::string &entry_string) const;
+    double         get_double (const std::string &entry_name) const;
 
 				     /**
 				      * Return value of entry
-				      * <tt>entry_string</tt> as <tt>bool</tt>.
+				      * <tt>entry_name</tt> as <tt>bool</tt>.
                                       * The entry may be "true" or "yes" 
                                       * for <tt>true</tt>, "false" or
                                       * "no" for <tt>false</tt> respectively.
                                       */
-    bool           get_bool (const std::string &entry_string) const;
+    bool           get_bool (const std::string &entry_name) const;
 
+                                     /**
+                                      * Change the value presently stored for
+                                      * <tt>entry_name</tt> to the one given
+                                      * in the second argument.
+                                      *
+                                      * The parameter must already exist in
+                                      * the present subsection.
+                                      */
+    void           set (const std::string &entry_name,
+                        const std::string &new_value);
+
+    void           set (const std::string &entry_name,
+                        const char        *new_value);
+    
+                                     /**
+                                      * Change the value presently stored for
+                                      * <tt>entry_name</tt> to the one given
+                                      * in the second argument.
+                                      *
+                                      * The parameter must already exist in
+                                      * the present subsection.
+                                      */
+    void           set (const std::string &entry_name,
+                        const long int    &new_value);
+
+                                     /**
+                                      * Change the value presently stored for
+                                      * <tt>entry_name</tt> to the one given
+                                      * in the second argument.
+                                      *
+                                      * The parameter must already exist in
+                                      * the present subsection.
+                                      *
+                                      * For internal purposes, the new value
+                                      * needs to be converted to a
+                                      * string. This is done using 16 digits
+                                      * of accuracy, so the set value and the
+                                      * one you can get back out using
+                                      * get_double() may differ in the 16th
+                                      * digit.
+                                      */
+    void           set (const std::string &entry_name,
+                        const double      &new_value);
+
+                                     /**
+                                      * Change the value presently stored for
+                                      * <tt>entry_name</tt> to the one given
+                                      * in the second argument.
+                                      *
+                                      * The parameter must already exist in
+                                      * the present subsection.
+                                      */
+    void           set (const std::string &entry_name,
+                        const bool        &new_value);
+    
+    
 				     /**
 				      * Print all parameters with the
 				      * given style to

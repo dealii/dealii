@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -727,13 +727,14 @@ bool ParameterHandler::leave_subsection ()
 
 
 
-const std::string & ParameterHandler::get (const std::string &entry_string) const
+const std::string &
+ParameterHandler::get (const std::string &entry_string) const
 {
   const Section* pd = get_present_defaults_subsection ();
   const Section* pc = get_present_changed_subsection ();
 
-				   // assert that the according entry is already
-				   // declared in the defaults tree
+				   // assert that the according entry is
+				   // already declared in the defaults tree
   Assert (pd->entries.find (entry_string) != pd->entries.end(),
 	  ExcEntryUndeclared(entry_string));
   
@@ -790,11 +791,108 @@ bool ParameterHandler::get_bool (const std::string &entry_string) const
 {
   std::string s = get(entry_string);
 
-  AssertThrow ((s=="true") || (s=="false") || (s=="yes") || (s=="no"), ExcConversionError(s));
+  AssertThrow ((s=="true") || (s=="false") ||
+               (s=="yes") || (s=="no"),
+               ExcConversionError(s));
   if (s=="true" || s=="yes")
     return true;
   else
     return false;
+}
+
+
+
+void
+ParameterHandler::set (const std::string &entry_string,
+                       const std::string &new_value)
+{
+  const Section* pd = get_present_defaults_subsection ();
+  Section* pc = get_present_changed_subsection ();
+
+				   // assert that the according entry is
+				   // already declared in the defaults tree
+  Assert (pd->entries.find (entry_string) != pd->entries.end(),
+	  ExcEntryUndeclared(entry_string));
+  
+                                   // entry exists; now set it (if the entry
+                                   // in pc hasn't existed yet, create it and
+                                   // set the pattern to the null pointer
+                                   // since it isn't used)
+  if (pc->entries.find (entry_string) == pc->entries.end())
+    pc->entries[entry_string].pattern = 0;
+  pc->entries[entry_string].value = new_value;
+}
+
+
+void
+ParameterHandler::set (const std::string &entry_string,
+                       const char        *new_value)
+{
+                                   // simply forward
+  set (entry_string, std::string(new_value));
+}
+
+  
+void
+ParameterHandler::set (const std::string &entry_string,
+                       const double      &new_value)
+{
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream s;
+#else
+  std::ostrstream s;
+#endif
+  s << std::setprecision(16);
+  s << new_value;
+#ifndef HAVE_STD_STRINGSTREAM
+  s << std::ends;
+#endif
+
+                                   // hand this off to the function that
+                                   // actually sets the value as a string
+  set (entry_string, s.str());
+}
+
+
+
+void
+ParameterHandler::set (const std::string &entry_string,
+                       const long int    &new_value)
+{
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream s;
+#else
+  std::ostrstream s;
+#endif
+  s << new_value;
+#ifndef HAVE_STD_STRINGSTREAM
+  s << std::ends;
+#endif
+
+                                   // hand this off to the function that
+                                   // actually sets the value as a string
+  set (entry_string, s.str());
+}
+
+
+
+void
+ParameterHandler::set (const std::string &entry_string,
+                       const bool        &new_value)
+{
+#ifdef HAVE_STD_STRINGSTREAM
+  std::ostringstream s;
+#else
+  std::ostrstream s;
+#endif
+  s << new_value;
+#ifndef HAVE_STD_STRINGSTREAM
+  s << std::ends;
+#endif
+
+                                   // hand this off to the function that
+                                   // actually sets the value as a string
+  set (entry_string, s.str());
 }
 
 
