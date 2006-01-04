@@ -86,7 +86,6 @@
                                  // enable the user to write DoFHandler
                                  // independent code.
 #include <fe/hp_fe_values.h>
-#include <fe/select_fe_values.h>
 
                                  // A compressed sparsity pattern is
                                  // not an explicit prerequisite for the
