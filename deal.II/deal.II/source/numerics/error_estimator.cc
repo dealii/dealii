@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -76,13 +76,14 @@ estimate (const Mapping<1>      &mapping,
           const std::vector<bool> &component_mask,
           const Function<1>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id)
+          const unsigned int       subdomain_id,
+          const unsigned int       material_id)
 {
 				   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
   std::vector<Vector<float>*>              errors (1, &error);
   estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
-	    component_mask, coefficients, n_threads, subdomain_id);
+	    component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
 
 
@@ -97,12 +98,13 @@ estimate (const DoFHandler<1>   &dof_handler,
           const std::vector<bool> &component_mask,
           const Function<1>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id)
+          const unsigned int       subdomain_id,
+          const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<1> mapping;
   estimate(mapping, dof_handler, quadrature, neumann_bc, solution,
-	   error, component_mask, coefficients, n_threads, subdomain_id);
+	   error, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
 
 
@@ -118,12 +120,13 @@ estimate (const DoFHandler<1>   &dof_handler,
           const std::vector<bool> &component_mask,
           const Function<1>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id)
+          const unsigned int       subdomain_id,
+          const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<1> mapping;
   estimate(mapping, dof_handler, quadrature, neumann_bc, solutions,
-	   errors, component_mask, coefficients, n_threads, subdomain_id);
+	   errors, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
 
 
@@ -139,7 +142,8 @@ estimate (const Mapping<1>                    &mapping,
           const std::vector<bool>                  &component_mask_,
           const Function<1>                   *coefficient,
           const unsigned int,
-          const unsigned int                  subdomain_id)
+          const unsigned int                  subdomain_id,
+          const unsigned int                  material_id)
 {
   const unsigned int n_components       = dof_handler.get_fe().n_components();
   const unsigned int n_solution_vectors = solutions.size();
@@ -232,9 +236,13 @@ estimate (const Mapping<1>                    &mapping,
   DoFHandler<1>::active_cell_iterator cell = dof_handler.begin_active();
   for (unsigned int cell_index=0; cell != dof_handler.end();
        ++cell, ++cell_index)
-    if ((subdomain_id == deal_II_numbers::invalid_unsigned_int)
-        ||
-        (cell->subdomain_id() == subdomain_id))
+    if (((subdomain_id == deal_II_numbers::invalid_unsigned_int)
+         ||
+         (cell->subdomain_id() == subdomain_id))
+        &&
+        ((material_id == deal_II_numbers::invalid_unsigned_int)
+         ||
+         (cell->material_id() == material_id)))
       {
         for (unsigned int n=0; n<n_solution_vectors; ++n)
           (*errors[n])(cell_index) = 0;
@@ -357,9 +365,11 @@ KellyErrorEstimator<dim>::PerThreadData::
 PerThreadData (const unsigned int n_solution_vectors,
 	       const unsigned int n_components,
 	       const unsigned int n_q_points,
-               const unsigned int subdomain_id)
+               const unsigned int subdomain_id,
+               const unsigned int material_id)
                 :
-                subdomain_id (subdomain_id)
+                subdomain_id (subdomain_id),
+                material_id (material_id)
 {
 				   // Init the size of a lot of vectors
 				   // needed in the calculations once
@@ -409,13 +419,14 @@ estimate (const Mapping<dim>      &mapping,
           const std::vector<bool> &component_mask,
           const Function<dim>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id)
+          const unsigned int       subdomain_id,
+          const unsigned int       material_id)
 {
 				   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
   std::vector<Vector<float>*>              errors (1, &error);
   estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
-	    component_mask, coefficients, n_threads, subdomain_id);
+	    component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
 
 
@@ -431,12 +442,14 @@ estimate (const DoFHandler<dim>   &dof_handler,
           const std::vector<bool> &component_mask,
           const Function<dim>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id)
+          const unsigned int       subdomain_id,
+          const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   static const MappingQ1<dim> mapping;
   estimate(mapping, dof_handler, quadrature, neumann_bc, solution,
-	   error, component_mask, coefficients, n_threads, subdomain_id);
+	   error, component_mask, coefficients, n_threads,
+           subdomain_id, material_id);
 }
 
 
@@ -459,6 +472,7 @@ estimate_some (const Mapping<dim>                  &mapping,
   const unsigned int n_solution_vectors = solutions.size();
 
   const unsigned int subdomain_id = per_thread_data.subdomain_id;
+  const unsigned int material_id  = per_thread_data.material_id;
   
 				   // make up a fe face values object
 				   // for the restriction of the
@@ -589,15 +603,20 @@ estimate_some (const Mapping<dim>                  &mapping,
 	      continue;
 	    }
 
-                                           // finally: note that we only
-                                           // have to do something if either
-                                           // the present cell is on the
-                                           // subdomain we care for, or if one
-                                           // of the neighbors behind the face
-                                           // is on the subdomain we care for
-          if ( ! ((subdomain_id == deal_II_numbers::invalid_unsigned_int)
-                  ||
-                  (cell->subdomain_id() == subdomain_id)))
+                                           // finally: note that we only have
+                                           // to do something if either the
+                                           // present cell is on the subdomain
+                                           // we care for (and the same for
+                                           // material_id), or if one of the
+                                           // neighbors behind the face is on
+                                           // the subdomain we care for
+          if ( ! ( ((subdomain_id == deal_II_numbers::invalid_unsigned_int)
+                    ||
+                    (cell->subdomain_id() == subdomain_id))
+                   &&
+                   ((material_id == deal_II_numbers::invalid_unsigned_int)
+                    ||
+                    (cell->material_id() == material_id))) )
             {
                                                // ok, cell is unwanted, but
                                                // maybe its neighbor behind
@@ -609,14 +628,28 @@ estimate_some (const Mapping<dim>                  &mapping,
 
               bool care_for_cell = false;
               if (cell->neighbor(face_no)->has_children() == false)
-                care_for_cell |= (cell->neighbor(face_no)->subdomain_id()
-                                  == subdomain_id);
+                care_for_cell |= ((cell->neighbor(face_no)->subdomain_id()
+                                   == subdomain_id) ||
+                                  (subdomain_id == deal_II_numbers::invalid_unsigned_int))
+                                 &&
+                                 ((cell->neighbor(face_no)->material_id()
+                                   == material_id) ||
+                                  (material_id == deal_II_numbers::invalid_unsigned_int));
               else
                 {
                   for (unsigned int sf=0;
                        sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
-                    if (cell->neighbor_child_on_subface(face_no,sf)
-                        ->subdomain_id() == subdomain_id)
+                    if (((cell->neighbor_child_on_subface(face_no,sf)
+                          ->subdomain_id() == subdomain_id)
+                         &&
+                         (material_id ==
+                          deal_II_numbers::invalid_unsigned_int))
+                        ||
+                        ((cell->neighbor_child_on_subface(face_no,sf)
+                          ->material_id() == material_id)
+                         &&
+                         (subdomain_id ==
+                          deal_II_numbers::invalid_unsigned_int)))
                       {
                         care_for_cell = true;
                         break;
@@ -624,8 +657,9 @@ estimate_some (const Mapping<dim>                  &mapping,
                 }
 
                                                // so if none of the neighbors
-                                               // cares for this subdomain
-                                               // either, then try next face
+                                               // cares for this subdomain or
+                                               // material either, then try
+                                               // next face
               if (care_for_cell == false)
                 continue;
             }
@@ -684,7 +718,8 @@ estimate (const Mapping<dim>                  &mapping,
           const std::vector<bool>                  &component_mask_,
           const Function<dim>                 *coefficients,
           const unsigned int                   n_threads_,
-          const unsigned int                   subdomain_id)
+          const unsigned int                   subdomain_id,
+          const unsigned int                   material_id)
 {
   const unsigned int n_components = dof_handler.get_fe().n_components();
 
@@ -774,7 +809,7 @@ estimate (const Mapping<dim>                  &mapping,
       = new PerThreadData (solutions.size(),
                            dof_handler.get_fe().n_components(),
                            quadrature.n_quadrature_points,
-                           subdomain_id);
+                           subdomain_id, material_id);
   
 				   // split all cells into threads if
 				   // multithreading is used and run
@@ -837,9 +872,13 @@ estimate (const Mapping<dim>                  &mapping,
   for (active_cell_iterator cell=dof_handler.begin_active();
        cell!=dof_handler.end();
        ++cell, ++present_cell)
-    if ((subdomain_id == deal_II_numbers::invalid_unsigned_int)
-        ||
-        (cell->subdomain_id() == subdomain_id))
+    if ( ((subdomain_id == deal_II_numbers::invalid_unsigned_int)
+          ||
+          (cell->subdomain_id() == subdomain_id))
+         &&
+         ((material_id == deal_II_numbers::invalid_unsigned_int)
+          ||
+          (cell->material_id() == material_id)))
       {
                                          // loop over all faces of this cell
         for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
@@ -879,12 +918,14 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &do
 					 const std::vector<bool>                  &component_mask,
 					 const Function<dim>                 *coefficients,
 					 const unsigned int                   n_threads,
-                                         const unsigned int       subdomain_id)
+                                         const unsigned int       subdomain_id,
+                                         const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));  
   static const MappingQ1<dim> mapping;
   estimate(mapping, dof_handler, quadrature, neumann_bc, solutions,
-	   errors, component_mask, coefficients, n_threads, subdomain_id);
+	   errors, component_mask, coefficients, n_threads,
+           subdomain_id, material_id);
 }
 
 
@@ -1295,6 +1336,7 @@ estimate<InputVector > (const Mapping<deal_II_dimension>      &,    \
           const std::vector<bool> &,    \
           const Function<deal_II_dimension>     *,    \
           const unsigned int       , \
+          const unsigned int       , \
           const unsigned int);    \
     \
 template    \
@@ -1307,6 +1349,7 @@ estimate<InputVector > (const DoFHandler<deal_II_dimension>   &,    \
           Vector<float>           &,    \
           const std::vector<bool> &,    \
           const Function<deal_II_dimension>     *,    \
+          const unsigned int       , \
           const unsigned int       , \
           const unsigned int);    \
         \
@@ -1322,6 +1365,7 @@ estimate<InputVector > (const Mapping<deal_II_dimension>          &,    \
           const std::vector<bool>     &,    \
           const Function<deal_II_dimension>         *,    \
           const unsigned int           , \
+          const unsigned int           , \
           const unsigned int);    \
     \
 template    \
@@ -1334,6 +1378,7 @@ estimate<InputVector > (const DoFHandler<deal_II_dimension>       &,    \
           std::vector<Vector<float>*> &,    \
           const std::vector<bool>     &,    \
           const Function<deal_II_dimension>         *,    \
+          const unsigned int           , \
           const unsigned int           , \
           const unsigned int)
 

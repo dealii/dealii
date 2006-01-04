@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -290,6 +290,13 @@ class KellyErrorEstimator
 				      * needs to access DoF values on
 				      * neighboring cells as well, even if
 				      * they belong to a different subdomain.
+				      *
+				      * The @p material_id parameter has a
+				      * similar meaning: if not set to its
+				      * default value, it means that
+				      * indicators will only be computed for
+				      * cells with this particular material
+				      * id.
 				      */
     template <typename InputVector>
     static void estimate (const Mapping<dim>      &mapping,
@@ -301,8 +308,9 @@ class KellyErrorEstimator
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int);
-
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+    
 				     /**
 				      * Calls the @p estimate
 				      * function, see above, with
@@ -317,7 +325,8 @@ class KellyErrorEstimator
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
     
 				     /**
 				      * Same function as above, but
@@ -356,7 +365,8 @@ class KellyErrorEstimator
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
 				      * Calls the @p estimate
@@ -372,7 +382,8 @@ class KellyErrorEstimator
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
 
     
 				     /**
@@ -543,10 +554,15 @@ class KellyErrorEstimator
 	std::vector<double>          JxW_values;
 
                                          /**
-                                          * The subdomain ids we are to care
+                                          * The subdomain id we are to care
                                           * for.
                                           */
         const unsigned int subdomain_id;
+                                         /**
+                                          * The material id we are to care
+                                          * for.
+                                          */
+        const unsigned int material_id;
         
 					 /**
 					  * Constructor.
@@ -554,7 +570,8 @@ class KellyErrorEstimator
 	PerThreadData (const unsigned int n_solution_vectors,
 		       const unsigned int n_components,
 		       const unsigned int n_q_points,
-                       const unsigned int subdomain_id);
+                       const unsigned int subdomain_id,
+                       const unsigned int material_id);
     };
 
 
@@ -699,23 +716,20 @@ class KellyErrorEstimator<1>
 				      * the respective component in
 				      * the coefficient.
 				      *
-				      * You might give a list of
-				      * components you want to
-				      * evaluate, in case the finite
-				      * element used by the
-				      * DoFHandler object is
-				      * vector-valued. You then have
-				      * to set those entries to true
-				      * in the bit-vector
-				      * @p component_mask for which the
-				      * respective component is to be
-				      * used in the error
-				      * estimator. The default is to
-				      * use all components, which is
-				      * done by either providing a
-				      * bit-vector with all-set
-				      * entries, or an empty
-				      * bit-vector.
+				      * You might give a list of components
+				      * you want to evaluate, in case the
+				      * finite element used by the DoFHandler
+				      * object is vector-valued. You then have
+				      * to set those entries to true in the
+				      * bit-vector @p component_mask for which
+				      * the respective component is to be used
+				      * in the error estimator. The default is
+				      * to use all components, which is done
+				      * by either providing a bit-vector with
+				      * all-set entries, or an empty
+				      * bit-vector. All the other parameters
+				      * are as in the general case used for 2d
+				      * and higher.
 				      *
 				      * The estimator supports multithreading
 				      * and splits the cells to
@@ -740,7 +754,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
 				      * Calls the @p estimate
@@ -756,7 +771,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
     
 				     /**
 				      * Same function as above, but
@@ -795,7 +811,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
 				      * Calls the @p estimate
@@ -811,7 +828,8 @@ class KellyErrorEstimator<1>
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int);
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
 
     
 				     /**
