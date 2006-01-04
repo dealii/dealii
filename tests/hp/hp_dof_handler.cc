@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,7 @@
 
 
 /* Author: Ralf Hartmann, 2005, O. Kayser-Herold, simply modified
-  the mg_dof_handler.cc test for the hpDoFHandler. */
+  the mg_dof_handler.cc test for the hp::DoFHandler. */
 
 #include <base/logstream.h>
 #include <grid/tria.h>
@@ -42,7 +42,7 @@ int main ()
   FECollection<dim> fe_collection;
   fe_collection.add_fe (FE_DGQ<dim> (1));
 
-  hpDoFHandler<dim> dof_handler(tria);
+  hp::DoFHandler<dim> dof_handler(tria);
   
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();

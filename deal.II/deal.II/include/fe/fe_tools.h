@@ -25,7 +25,7 @@ template <typename number> class Vector;
 template <int dim> class Quadrature;
 template <int dim> class FiniteElement;
 template <int dim> class DoFHandler;
-template <int dim> class hpDoFHandler;
+template <int dim> class hp::DoFHandler;
 template <int dim> class FiniteElementData;
 class ConstraintMatrix;
 
@@ -595,7 +595,7 @@ class FETools
                                       * Same as last function, except
                                       * that one or both of the dof
                                       * handler objects might be of
-                                      * type @p hpDoFHandler.
+                                      * type @p hp::DoFHandler.
                                       */
     template <int dim,
               template <int> class DH1,
@@ -644,7 +644,7 @@ class FETools
                                       * Same as last function, except
                                       * that the dof handler objects
                                       * might be of type
-                                      * @p hpDoFHandler.
+                                      * @p hp::DoFHandler.
                                       */
     template <int dim,
               template <int> class DH,

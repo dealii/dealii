@@ -1676,7 +1676,7 @@ class FEValues : public FEValuesBase<dim>
 				      * Reinitialize the gradients,
 				      * Jacobi determinants, etc for
 				      * the given cell of type
-				      * "iterator into a hpDoFHandler
+				      * "iterator into a hp::DoFHandler
 				      * object", and the finite
 				      * element associated with this
 				      * object. It is assumed that the
@@ -1685,7 +1685,7 @@ class FEValues : public FEValuesBase<dim>
 				      * used by this @p FEValues
 				      * object.
 				      */
-    void reinit (const typename hpDoFHandler<dim>::cell_iterator &cell);
+    void reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell);
 
 				     /**
 				      * Reinitialize the gradients,
@@ -1963,7 +1963,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * Reinitialize the gradients,
 				      * Jacobi determinants, etc for
 				      * the given cell of type
-				      * "iterator into a hpDoFHandler
+				      * "iterator into a hp::DoFHandler
 				      * object", and the finite
 				      * element associated with this
 				      * object. It is assumed that the
@@ -1972,7 +1972,7 @@ class FEFaceValues : public FEFaceValuesBase<dim>
 				      * used by this FEValues
 				      * object.
 				      */
-    void reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
+    void reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                              face_no);
 
 				     /**
@@ -2130,7 +2130,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * Reinitialize the gradients,
 				      * Jacobi determinants, etc for
 				      * the given cell of type
-				      * "iterator into a hpDoFHandler
+				      * "iterator into a hp::DoFHandler
 				      * object", and the finite
 				      * element associated with this
 				      * object. It is assumed that the
@@ -2139,7 +2139,7 @@ class FESubfaceValues : public FEFaceValuesBase<dim>
 				      * used by this FEValues
 				      * object.
 				      */
-    void reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
+    void reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
 		 const unsigned int                    face_no,
 		 const unsigned int                    subface_no);
     

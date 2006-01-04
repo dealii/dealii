@@ -594,6 +594,7 @@ void ElasticProblem<dim>::assemble_system ()
                 for (unsigned int q_point=0; q_point<n_q_points;
                      ++q_point)
                   {
+//TODO investigate really small values here                    
                     cell_matrix(i,j) 
                       += 
                       (

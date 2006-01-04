@@ -24,7 +24,7 @@
 
 /**
  * This class implements a collection of quadrature objects used in the
- * hpDoFHandler(). It is thus to a hpDoFHandler() what a Quadrature is to a
+ * hp::DoFHandler(). It is thus to a hp::DoFHandler() what a Quadrature is to a
  * DoFHandler. This collection stores pointers to the original quadrature
  * elements added to it. Hence the handling of the memory consumed by
  * the quadrature objects must be done by the user of the class.

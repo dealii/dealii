@@ -714,7 +714,7 @@ VectorTools::create_boundary_right_hand_side (const DoFHandler<dim>   &dof_handl
 #if deal_II_dimension == 1
 
 //TODO[?] Actually the Mapping object should be a MappingCollection object for the
-// hpDoFHandler.
+// hp::DoFHandler.
 template <template <int> class DH>
 void
 VectorTools::interpolate_boundary_values (const Mapping<1>         &,
@@ -791,7 +791,7 @@ VectorTools::interpolate_boundary_values (const Mapping<1>         &,
 
 
 //TODO[?] Actually the Mapping object should be a MappingCollection object for the
-// hpDoFHandler.
+// hp::DoFHandler.
 void
 VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping,
 					  const DoFHandler<1>           &dof,
@@ -807,10 +807,10 @@ VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping
 
 
 //TODO[?] Actually the Mapping object should be a MappingCollection object for the
-// hpDoFHandler.
+// hp::DoFHandler.
 void
 VectorTools::interpolate_boundary_values (const Mapping<1>              &mapping,
-					  const hpDoFHandler<1>           &dof,
+					  const hp::DoFHandler<1>           &dof,
 					  const FunctionMap<1>::type    &function_map,
 					  std::map<unsigned int,double> &boundary_values,
 					  const std::vector<bool>       &component_mask)
@@ -1111,8 +1111,8 @@ VectorTools::interpolate_boundary_values (const Mapping<dim>            &mapping
 
 
   
-//TODO[?] Change for real hpDoFHandler
-// This function might not work anymore if the real hpDoFHandler is available.
+//TODO[?] Change for real hp::DoFHandler
+// This function might not work anymore if the real hp::DoFHandler is available.
 template <int dim, template <int> class DH>
 void
 VectorTools::interpolate_boundary_values (const DH<dim>                 &dof,
@@ -1129,8 +1129,8 @@ VectorTools::interpolate_boundary_values (const DH<dim>                 &dof,
 
 
 
-//TODO[?] Change for real hpDoFHandler
-// This function might not work anymore if the real hpDoFHandler is available.
+//TODO[?] Change for real hp::DoFHandler
+// This function might not work anymore if the real hp::DoFHandler is available.
 template <int dim, template <int> class DH>
 void
 VectorTools::interpolate_boundary_values (const DH<dim>                 &dof,

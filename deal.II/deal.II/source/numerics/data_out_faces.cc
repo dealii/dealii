@@ -295,5 +295,5 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 // don't instantiate anything for the 1d and 2d cases
 #if deal_II_dimension >=2
 template class DataOutFaces<deal_II_dimension,DoFHandler>;
-template class DataOutFaces<deal_II_dimension,hpDoFHandler>;
+template class DataOutFaces<deal_II_dimension,hp::DoFHandler>;
 #endif

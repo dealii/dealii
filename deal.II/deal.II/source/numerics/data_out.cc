@@ -752,16 +752,16 @@ INSTANTIATE_VECTORS(deal_II_dimension,DoFHandler,deal_II_dimension-1,deal_II_dim
 template class DataOut<deal_II_dimension,DoFHandler>;
 
 
-// ...and now for hpDoFHandler
-template class DataOut_DoFData<deal_II_dimension,hpDoFHandler,deal_II_dimension>;
-template class DataOut_DoFData<deal_II_dimension,hpDoFHandler,deal_II_dimension+1>;
-INSTANTIATE_VECTORS(deal_II_dimension,hpDoFHandler,deal_II_dimension,deal_II_dimension);
-INSTANTIATE_VECTORS(deal_II_dimension,hpDoFHandler,deal_II_dimension+1,deal_II_dimension+1);
+// ...and now for hp::DoFHandler
+template class DataOut_DoFData<deal_II_dimension,hp::DoFHandler,deal_II_dimension>;
+template class DataOut_DoFData<deal_II_dimension,hp::DoFHandler,deal_II_dimension+1>;
+INSTANTIATE_VECTORS(deal_II_dimension,hp::DoFHandler,deal_II_dimension,deal_II_dimension);
+INSTANTIATE_VECTORS(deal_II_dimension,hp::DoFHandler,deal_II_dimension+1,deal_II_dimension+1);
 
 #if deal_II_dimension >= 2
-template class DataOut_DoFData<deal_II_dimension,hpDoFHandler,
+template class DataOut_DoFData<deal_II_dimension,hp::DoFHandler,
 			       deal_II_dimension-1,deal_II_dimension>;
-INSTANTIATE_VECTORS(deal_II_dimension,hpDoFHandler,deal_II_dimension-1,deal_II_dimension);
+INSTANTIATE_VECTORS(deal_II_dimension,hp::DoFHandler,deal_II_dimension-1,deal_II_dimension);
 #endif
 
-template class DataOut<deal_II_dimension,hpDoFHandler>;
+template class DataOut<deal_II_dimension,hp::DoFHandler>;

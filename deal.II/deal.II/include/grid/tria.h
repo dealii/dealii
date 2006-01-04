@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,7 +28,10 @@ template <int dim> class Boundary;
 template <int dim> class StraightBoundary;
 template <int dim> class TriangulationLevel;
 template <int dim> class DoFHandler;
-template <int dim> class hpDoFHandler;
+namespace hp
+{
+  template <int dim> class DoFHandler;
+}
 template <int dim> class MGDoFHandler;
 
 /*------------------------------------------------------------------------*/
@@ -1598,7 +1601,7 @@ class Triangulation : public Subscriptor
 				      *  post_refinement_notification().
 				      *  Both methods are called in the method
 				      *  execute_coarsening_and_refinement().
-				      *  For an example see hpDoFHandler().
+				      *  For an example see hp::DoFHandler().
 				      */
     class RefinementListener
     {
@@ -3431,7 +3434,7 @@ class Triangulation : public Subscriptor
     friend class TriaRawIterator<3,CellAccessor<3> >;
 
     friend class DoFHandler<dim>;
-    friend class hpDoFHandler<dim>;
+    friend class hp::DoFHandler<dim>;
     friend class MGDoFHandler<dim>;
 };
 

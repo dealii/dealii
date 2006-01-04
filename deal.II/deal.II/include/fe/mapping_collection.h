@@ -25,7 +25,7 @@
 
 /**
  * This class implements a collection of mapping objects used in the
- * hpDoFHandler(). It is thus to a hpDoFHandler() what a Mapping is to a
+ * hp::DoFHandler(). It is thus to a hp::DoFHandler() what a Mapping is to a
  * DoFHandler. This collection stores pointers to the original mapping
  * objects added to it. Hence the handling of the memory consumed by
  * the mapping objects must be done by the user of the class.

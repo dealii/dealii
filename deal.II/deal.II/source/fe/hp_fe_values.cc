@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,251 +18,255 @@
 
 // -------------------------- FEValuesMap -------------------------
 
-namespace internal 
+namespace hp
 {
-  template <int dim, class FEValues>
-  FEValuesMap<dim,FEValues>::~FEValuesMap () 
-  {}
   
-  
-  template <int dim, class FEValues>
-  FEValues &
-  FEValuesMap<dim,FEValues>::select_fe_values (const FiniteElement<dim> &fe,
-					       const unsigned int active_fe_index)
+  namespace internal 
   {
-                                     // check if the finite element
-                                     // does not exist as a key in the
-                                     // map
-    if (fe_to_fe_values_map.find (std::make_pair(&fe, active_fe_index)) ==
-        fe_to_fe_values_map.end())
-                                       // a-ha! doesn't yet, so let's
-                                       // make it up
-      fe_to_fe_values_map[std::make_pair(&fe, active_fe_index)]
-        = boost::shared_ptr<FEValues> (create_fe_values (fe, active_fe_index));
+    template <int dim, class FEValues>
+    FEValuesMap<dim,FEValues>::~FEValuesMap () 
+    {}
+  
+  
+    template <int dim, class FEValues>
+    FEValues &
+    FEValuesMap<dim,FEValues>::select_fe_values (const FiniteElement<dim> &fe,
+                                                 const unsigned int active_fe_index)
+    {
+                                       // check if the finite element
+                                       // does not exist as a key in the
+                                       // map
+      if (fe_to_fe_values_map.find (std::make_pair(&fe, active_fe_index)) ==
+          fe_to_fe_values_map.end())
+                                         // a-ha! doesn't yet, so let's
+                                         // make it up
+        fe_to_fe_values_map[std::make_pair(&fe, active_fe_index)]
+          = boost::shared_ptr<FEValues> (create_fe_values (fe, active_fe_index));
 
 
-                                     // now there definitely is one!
-    present_fe_values = fe_to_fe_values_map[std::make_pair (&fe, active_fe_index)];
+                                       // now there definitely is one!
+      present_fe_values = fe_to_fe_values_map[std::make_pair (&fe, active_fe_index)];
 
-    return *present_fe_values;
-  }
+      return *present_fe_values;
+    }
 
 
-// -------------------------- hpFEValuesBase -------------------------
+// -------------------------- FEValuesBase -------------------------
 
-  template <int dim, int q_dim>
-  const MappingQ1<dim>
-  hpFEValuesBase<dim,q_dim>::default_mapping;
+    template <int dim, int q_dim>
+    const MappingQ1<dim>
+    FEValuesBase<dim,q_dim>::default_mapping;
 
   
 
-  template <int dim, int q_dim>
-  hpFEValuesBase<dim,q_dim>::hpFEValuesBase (
+    template <int dim, int q_dim>
+    FEValuesBase<dim,q_dim>::FEValuesBase (
       const MappingCollection<dim> &mapping_collection,
       const QCollection<q_dim>     &qcollection,
       const UpdateFlags             update_flags)
-      :
-                  mapping_collection (mapping_collection),
-                  qcollection (qcollection),
-                  update_flags (update_flags)
-  {}
+                    :
+                    mapping_collection (mapping_collection),
+                    qcollection (qcollection),
+                    update_flags (update_flags)
+    {}
 
 
-  template <int dim, int q_dim>
-  hpFEValuesBase<dim,q_dim>::hpFEValuesBase (const QCollection<q_dim> &qcollection,
-                                             const UpdateFlags         update_flags)
+    template <int dim, int q_dim>
+    FEValuesBase<dim,q_dim>::FEValuesBase (const QCollection<q_dim> &qcollection,
+                                           const UpdateFlags         update_flags)
+                    :
+                    mapping_collection (default_mapping),
+                    qcollection (qcollection),
+                    update_flags (update_flags)
+    {}
+
+  }
+
+
+// -------------------------- FEValues -------------------------
+
+
+  template <int dim>
+  FEValues<dim>::FEValues (const MappingCollection<dim> &mapping,
+                           const FECollection<dim>      &/*fe_collection*/,
+                           const QCollection<dim>       &qcollection,
+                           const UpdateFlags             update_flags)
                   :
-                  mapping_collection (default_mapping),
-                  qcollection (qcollection),
-                  update_flags (update_flags)
-  {}
-
-}
-
-
-// -------------------------- hpFEValues -------------------------
-
-
-template <int dim>
-hpFEValues<dim>::hpFEValues (const MappingCollection<dim> &mapping,
-                             const FECollection<dim>      &/*fe_collection*/,
-                             const QCollection<dim>       &qcollection,
-                             const UpdateFlags             update_flags)
-                :
-                internal::hpFEValuesBase<dim,dim> (mapping,
+                  internal::FEValuesBase<dim,dim> (mapping,
                                                    qcollection,
                                                    update_flags)
-{}
+  {}
 
 
-template <int dim>
-hpFEValues<dim>::hpFEValues (const FECollection<dim> &/*fe_collection*/,
-                             const QCollection<dim>  &qcollection,
-                             const UpdateFlags        update_flags)
-                :
-                internal::hpFEValuesBase<dim,dim> (qcollection,
+  template <int dim>
+  FEValues<dim>::FEValues (const FECollection<dim> &/*fe_collection*/,
+                           const QCollection<dim>  &qcollection,
+                           const UpdateFlags        update_flags)
+                  :
+                  internal::FEValuesBase<dim,dim> (qcollection,
                                                    update_flags)
-{}
+  {}
 
 
-template <int dim>
-void
-hpFEValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell)
-{
-  this->present_fe_index = cell->active_fe_index ();
-  this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell);
-}
+  template <int dim>
+  void
+  FEValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell)
+  {
+    this->present_fe_index = cell->active_fe_index ();
+    this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell);
+  }
 
 
 
-template <int dim>
-FEValues<dim> *
-hpFEValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
-				   const unsigned int active_fe_index) const
-{
-  return new FEValues<dim> (
+  template <int dim>
+  ::FEValues<dim> *
+  FEValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
+                                   const unsigned int active_fe_index) const
+  {
+    return new ::FEValues<dim> (
       this->mapping_collection.get_mapping (active_fe_index), fe,
       this->qcollection.get_quadrature (active_fe_index),
       this->update_flags);
-}
+  }
 
 
-// -------------------------- hpFEFaceValues -------------------------
+// -------------------------- FEFaceValues -------------------------
 
 
-template <int dim>
-hpFEFaceValues<dim>::hpFEFaceValues (const MappingCollection<dim> &mapping,
-                                     const FECollection<dim>  &/*fe_collection*/,
-                                     const QCollection<dim-1> &qcollection,
-                                     const UpdateFlags         update_flags)
-                :
-                internal::hpFEValuesBase<dim,dim-1> (mapping,
+  template <int dim>
+  FEFaceValues<dim>::FEFaceValues (const MappingCollection<dim> &mapping,
+                                   const FECollection<dim>  &/*fe_collection*/,
+                                   const QCollection<dim-1> &qcollection,
+                                   const UpdateFlags         update_flags)
+                  :
+                  internal::FEValuesBase<dim,dim-1> (mapping,
                                                      qcollection,
                                                      update_flags)
-{}
+  {}
 
 
-template <int dim>
-hpFEFaceValues<dim>::hpFEFaceValues (const FECollection<dim>  &/*fe_collection*/,
-                                     const QCollection<dim-1> &qcollection,
-                                     const UpdateFlags         update_flags)
-                :
-                internal::hpFEValuesBase<dim,dim-1> (qcollection,
+  template <int dim>
+  FEFaceValues<dim>::FEFaceValues (const FECollection<dim>  &/*fe_collection*/,
+                                   const QCollection<dim-1> &qcollection,
+                                   const UpdateFlags         update_flags)
+                  :
+                  internal::FEValuesBase<dim,dim-1> (qcollection,
                                                      update_flags)
-{}
+  {}
 
 
-template <int dim>
-void
-hpFEFaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
+  template <int dim>
+  void
+  FEFaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
                              const unsigned int face_no)
-{
-  this->present_fe_index = cell->active_fe_index ();
-  this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell, face_no);
-}
+  {
+    this->present_fe_index = cell->active_fe_index ();
+    this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell, face_no);
+  }
 
 
-template <int dim>
-void
-hpFEFaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
-			     const unsigned int face_no,
-			     const unsigned int active_fe_index)
-{
-  this->present_fe_index = active_fe_index;
-  this->select_fe_values (cell->get_fe(), active_fe_index).reinit (cell, face_no);
-}
+  template <int dim>
+  void
+  FEFaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
+                             const unsigned int face_no,
+                             const unsigned int active_fe_index)
+  {
+    this->present_fe_index = active_fe_index;
+    this->select_fe_values (cell->get_fe(), active_fe_index).reinit (cell, face_no);
+  }
 
 
-template <int dim>
-FEFaceValues<dim> *
-hpFEFaceValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
-				       const unsigned int active_fe_index) const
-{
-  return new FEFaceValues<dim> (
+  template <int dim>
+  ::FEFaceValues<dim> *
+  FEFaceValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
+                                       const unsigned int active_fe_index) const
+  {
+    return new ::FEFaceValues<dim> (
       this->mapping_collection.get_mapping (active_fe_index), fe,
       this->qcollection.get_quadrature (active_fe_index),
       this->update_flags);
-}
+  }
 
 
-// -------------------------- hpFESubfaceValues -------------------------
+// -------------------------- FESubfaceValues -------------------------
 
 
-template <int dim>
-hpFESubfaceValues<dim>::hpFESubfaceValues (const MappingCollection<dim> &mapping,
-                                           const FECollection<dim>  &/*fe_collection*/,
-                                           const QCollection<dim-1> &qcollection,
-                                           const UpdateFlags         update_flags)
-                :
-                internal::hpFEValuesBase<dim,dim-1> (mapping,
+  template <int dim>
+  FESubfaceValues<dim>::FESubfaceValues (const MappingCollection<dim> &mapping,
+                                         const FECollection<dim>  &/*fe_collection*/,
+                                         const QCollection<dim-1> &qcollection,
+                                         const UpdateFlags         update_flags)
+                  :
+                  internal::FEValuesBase<dim,dim-1> (mapping,
                                                      qcollection,
                                                      update_flags)
-{}
+  {}
 
 
-template <int dim>
-hpFESubfaceValues<dim>::hpFESubfaceValues (const FECollection<dim>  &/*fe_collection*/,
-                                           const QCollection<dim-1> &qcollection,
-                                           const UpdateFlags         update_flags)
-                :
-                internal::hpFEValuesBase<dim,dim-1> (qcollection,
+  template <int dim>
+  FESubfaceValues<dim>::FESubfaceValues (const FECollection<dim>  &/*fe_collection*/,
+                                         const QCollection<dim-1> &qcollection,
+                                         const UpdateFlags         update_flags)
+                  :
+                  internal::FEValuesBase<dim,dim-1> (qcollection,
                                                      update_flags)
-{}
+  {}
 
 
-template <int dim>
-void
-hpFESubfaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
+  template <int dim>
+  void
+  FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
                                 const unsigned int face_no,
                                 const unsigned int subface_no)
-{
-  this->present_fe_index = cell->active_fe_index ();
-  this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell, face_no, subface_no);
-}
+  {
+    this->present_fe_index = cell->active_fe_index ();
+    this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell, face_no, subface_no);
+  }
 
 
-template <int dim>
-void
-hpFESubfaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
+  template <int dim>
+  void
+  FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
                                 const unsigned int face_no,
                                 const unsigned int subface_no,
-				const unsigned int active_fe_index)
-{
-  this->present_fe_index = active_fe_index;
-  this->select_fe_values (cell->get_fe(), active_fe_index).reinit (cell, face_no, subface_no);
-}
+                                const unsigned int active_fe_index)
+  {
+    this->present_fe_index = active_fe_index;
+    this->select_fe_values (cell->get_fe(), active_fe_index).reinit (cell, face_no, subface_no);
+  }
 
 
-template <int dim>
-FESubfaceValues<dim> *
-hpFESubfaceValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
-					  const unsigned int active_fe_index) const
-{
-  return new FESubfaceValues<dim> (
+  template <int dim>
+  ::FESubfaceValues<dim> *
+  FESubfaceValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
+                                          const unsigned int active_fe_index) const
+  {
+    return new ::FESubfaceValues<dim> (
       this->mapping_collection.get_mapping (active_fe_index), fe,
       this->qcollection.get_quadrature (active_fe_index),
       this->update_flags);
-}
+  }
 
 
 
 
 // explicit instantiations
-namespace internal
-{
-  template class FEValuesMap<deal_II_dimension,FEValues<deal_II_dimension> >;
-  template class FEValuesMap<deal_II_dimension,FEFaceValues<deal_II_dimension> >;
-  template class FEValuesMap<deal_II_dimension,FESubfaceValues<deal_II_dimension> >;
+  namespace internal
+  {
+    template class FEValuesMap<deal_II_dimension,FEValues<deal_II_dimension> >;
+    template class FEValuesMap<deal_II_dimension,FEFaceValues<deal_II_dimension> >;
+    template class FEValuesMap<deal_II_dimension,FESubfaceValues<deal_II_dimension> >;
 
-  template class hpFEValuesBase<deal_II_dimension,deal_II_dimension>;
+    template class FEValuesBase<deal_II_dimension,deal_II_dimension>;
 #if deal_II_dimension >= 2
-  template class hpFEValuesBase<deal_II_dimension,deal_II_dimension-1>;
+    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1>;
 #endif
+  }
+
+  template class FEValues<deal_II_dimension>;
+#if deal_II_dimension >= 2
+  template class FEFaceValues<deal_II_dimension>;
+  template class FESubfaceValues<deal_II_dimension>;
+#endif
+  
 }
-
-template class hpFEValues<deal_II_dimension>;
-#if deal_II_dimension >= 2
-template class hpFEFaceValues<deal_II_dimension>;
-template class hpFESubfaceValues<deal_II_dimension>;
-#endif
-

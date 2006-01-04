@@ -20,7 +20,7 @@
 #include <utility>
 
 template <int dim> class DoFHandler;
-template <int dim> class hpDoFHandler;
+template <int dim> class hp::DoFHandler;
 
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,7 +31,10 @@ template <typename number> class Vector;
 template <typename number> class FullMatrix;
 template <int dim> class Mapping;
 template <int dim> class DoFHandler;
-template <int dim> class hpDoFHandler;
+namespace hp
+{
+  template <int dim> class DoFHandler;
+}
 class ConstraintMatrix;
 
 
@@ -693,12 +696,12 @@ class VectorTools
 				     /**
 				      * Declaration of specialization
 				      * of the previous function for
-				      * 1d and a hpDoFHandler().
+				      * 1d and a hp::DoFHandler().
 				      */
     static
     void
     interpolate_boundary_values (const Mapping<1>              &mapping,
-                                 const hpDoFHandler<1>         &dof,
+                                 const hp::DoFHandler<1>         &dof,
                                  const FunctionMap<1>::type    &function_map,
                                  std::map<unsigned int,double> &boundary_values,
                                  const std::vector<bool>       &component_mask = std::vector<bool>());

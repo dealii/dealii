@@ -41,10 +41,10 @@ namespace
   }
 
 
-  // Functions for the hpDoFHandler
+  // Functions for the hp::DoFHandler
   template <int dim>
   unsigned int
-  max_dofs_per_cell (const hpDoFHandler<dim> &dh) 
+  max_dofs_per_cell (const hp::DoFHandler<dim> &dh) 
   {
     return dh.get_fe().max_dofs_per_cell ();
   }
@@ -52,7 +52,7 @@ namespace
 
   template <int dim>
   unsigned int
-  max_dofs_per_face (const hpDoFHandler<dim> &dh) 
+  max_dofs_per_face (const hp::DoFHandler<dim> &dh) 
   {
     return dh.get_fe().max_dofs_per_face ();
   }
@@ -61,7 +61,7 @@ namespace
 
   template <int dim>
   unsigned int
-  get_n_components (const hpDoFHandler<dim> &dh) 
+  get_n_components (const hp::DoFHandler<dim> &dh) 
   {
     return dh.get_fe().n_components();
   }

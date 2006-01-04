@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,15 +16,18 @@
 #include <base/config.h>
 
 template <int> class DoFHandler;
-template <int> class hpDoFHandler;
+template <int> class hp::DoFHandler;
 
 template <int> class FEValues;
 template <int> class FEFaceValues;
 template <int> class FESubfaceValues;
 
-template <int> class hpFEValues;
-template <int> class hpFEFaceValues;
-template <int> class hpFESubfaceValues;
+namespace hp
+{
+  template <int> class FEValues;
+  template <int> class FEFaceValues;
+  template <int> class FESubfaceValues;
+}
 
 
 
@@ -38,11 +41,11 @@ template <int dim> struct SelectFEValues<DoFHandler<dim> >
 };
 
 
-template <int dim> struct SelectFEValues<hpDoFHandler<dim> >
+template <int dim> struct SelectFEValues<hp::DoFHandler<dim> >
 {
-    typedef hpFEValues<dim>        FEValues;
-    typedef hpFEFaceValues<dim>    FEFaceValues;
-    typedef hpFESubfaceValues<dim> FESubfaceValues;
+    typedef hp::FEValues<dim>        FEValues;
+    typedef hp::FEFaceValues<dim>    FEFaceValues;
+    typedef hp::FESubfaceValues<dim> FESubfaceValues;
 };
 
 

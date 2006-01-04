@@ -1141,94 +1141,94 @@ template class TriaActiveIterator<deal_II_dimension,DoFCellAccessor<deal_II_dime
 
 
 // --------------------------------------------------------------------------
-// explicit instantiations (for hpDoFHandler)
+// explicit instantiations (for hp::DoFHandler)
 
 
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<double>,double>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<double>,double>
 (const Vector<double>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<double>,double>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<double>,double>
 (const Vector<double>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<double>,float>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<double>,float>
 (const Vector<double>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<float>,double>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<float>,double>
 (const Vector<double>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<float>,double>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<float>,double>
 (const Vector<float>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<double>,float>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<double>,float>
 (const Vector<float>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<float>,float>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<float>,float>
 (const Vector<float>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<float>,float>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<float>,float>
 (const Vector<float>&, Vector<float>&) const;
 
 
 // for block vector
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<double>,double>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<double>,double>
 (const BlockVector<double> &, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<double>,double>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<double>,double>
 (const Vector<double>&, BlockVector<double>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<double>,float>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<double>,float>
 (const BlockVector<double> &, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<float>,double>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<float>,double>
 (const Vector<double>&, BlockVector<float>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<float>,double>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<float>,double>
 (const BlockVector<float> &, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<double>,float>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<double>,float>
 (const Vector<float>&, BlockVector<double>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<float>,float>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<float>,float>
 (const BlockVector<float>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<float>,float>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
 
 // for Petsc vectors
 #if DEAL_II_USE_PETSC
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::get_dof_values<PETScWrappers::Vector,double>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::get_dof_values<PETScWrappers::Vector,double>
 (const PETScWrappers::Vector &, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::get_dof_values<PETScWrappers::Vector,float>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::get_dof_values<PETScWrappers::Vector,float>
 (const PETScWrappers::Vector &, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::set_dof_values<PETScWrappers::Vector,double>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::set_dof_values<PETScWrappers::Vector,double>
 (const Vector<double> &, PETScWrappers::Vector&) const;
 template
 void
-DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::set_dof_values<PETScWrappers::Vector,float>
+DoFObjectAccessor<1,deal_II_dimension,hp::DoFHandler>::set_dof_values<PETScWrappers::Vector,float>
 (const Vector<float>&, PETScWrappers::Vector&) const;
 #endif
 
@@ -1236,89 +1236,89 @@ DoFObjectAccessor<1,deal_II_dimension,hpDoFHandler>::set_dof_values<PETScWrapper
 #if deal_II_dimension >= 2
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<double>,double>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<double>,double>
 (const Vector<double>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<double>,double>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<double>,double>
 (const Vector<double>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<double>,float>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<double>,float>
 (const Vector<double>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<float>,double>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<float>,double>
 (const Vector<double>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<float>,double>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<float>,double>
 (const Vector<float>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<double>,float>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<double>,float>
 (const Vector<float>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<float>,float>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<float>,float>
 (const Vector<float>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<float>,float>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<float>,float>
 (const Vector<float>&, Vector<float>&) const;
 
 
 // for block vector
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<double>,double>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<double>,double>
 (const BlockVector<double>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<double>,double>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<double>,double>
 (const Vector<double>&, BlockVector<double>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<double>,float>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<double>,float>
 (const BlockVector<double>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<float>,double>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<float>,double>
 (const Vector<double>&, BlockVector<float>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<float>,double>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<float>,double>
 (const BlockVector<float>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<double>,float>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<double>,float>
 (const Vector<float>&, BlockVector<double>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<float>,float>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<float>,float>
 (const BlockVector<float>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<float>,float>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
 
 // for Petsc vectors
 #if DEAL_II_USE_PETSC
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::get_dof_values<PETScWrappers::Vector,double>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::get_dof_values<PETScWrappers::Vector,double>
 (const PETScWrappers::Vector &, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::get_dof_values<PETScWrappers::Vector,float>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::get_dof_values<PETScWrappers::Vector,float>
 (const PETScWrappers::Vector &, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::set_dof_values<PETScWrappers::Vector,double>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::set_dof_values<PETScWrappers::Vector,double>
 (const Vector<double> &, PETScWrappers::Vector&) const;
 template
 void
-DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::set_dof_values<PETScWrappers::Vector,float>
+DoFObjectAccessor<2,deal_II_dimension,hp::DoFHandler>::set_dof_values<PETScWrappers::Vector,float>
 (const Vector<float>&, PETScWrappers::Vector&) const;
 #endif
 
@@ -1328,35 +1328,35 @@ DoFObjectAccessor<2,deal_II_dimension,hpDoFHandler>::set_dof_values<PETScWrapper
 // for double
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<double>,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<double>,double>
 (const Vector<double>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<double>,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<double>,double>
 (const Vector<double>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<double>,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<double>,float>
 (const Vector<double>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<float>,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<float>,double>
 (const Vector<double>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<float>,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<float>,double>
 (const Vector<float>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<double>,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<double>,float>
 (const Vector<float>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<Vector<float>,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<Vector<float>,float>
 (const Vector<float>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<float>,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<Vector<float>,float>
 (const Vector<float>&, Vector<float>&) const;
 
 
@@ -1364,35 +1364,35 @@ DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<Vector<float
 // for block vector
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<double>,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<double>,double>
 (const BlockVector<double>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<double>,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<double>,double>
 (const Vector<double>&, BlockVector<double>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<double>,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<double>,float>
 (const BlockVector<double>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<float>,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<float>,double>
 (const Vector<double>&, BlockVector<float>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<float>,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<float>,double>
 (const BlockVector<float>&, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<double>,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<double>,float>
 (const Vector<float>&, BlockVector<double>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<BlockVector<float>,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<BlockVector<float>,float>
 (const BlockVector<float>&, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<float>,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
 
 
@@ -1400,36 +1400,36 @@ DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<BlockVector<
 #ifdef DEAL_II_USE_PETSC
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<PETScWrappers::Vector,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<PETScWrappers::Vector,double>
 (const PETScWrappers::Vector &, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<PETScWrappers::Vector,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<PETScWrappers::Vector,float>
 (const PETScWrappers::Vector &, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<PETScWrappers::Vector,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<PETScWrappers::Vector,double>
 (const Vector<double> &, PETScWrappers::Vector&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<PETScWrappers::Vector,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<PETScWrappers::Vector,float>
 (const Vector<float>&, PETScWrappers::Vector&) const;
 
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<PETScWrappers::BlockVector,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<PETScWrappers::BlockVector,double>
 (const PETScWrappers::BlockVector &, Vector<double>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::get_dof_values<PETScWrappers::BlockVector,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::get_dof_values<PETScWrappers::BlockVector,float>
 (const PETScWrappers::BlockVector &, Vector<float>&) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<PETScWrappers::BlockVector,double>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<PETScWrappers::BlockVector,double>
 (const Vector<double>&, PETScWrappers::BlockVector &) const;
 template
 void
-DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<PETScWrappers::BlockVector,float>
+DoFObjectAccessor<3,deal_II_dimension,hp::DoFHandler>::set_dof_values<PETScWrappers::BlockVector,float>
 (const Vector<float>&, PETScWrappers::BlockVector&) const;
 #endif
 #endif
@@ -1438,92 +1438,92 @@ DoFObjectAccessor<3,deal_II_dimension,hpDoFHandler>::set_dof_values<PETScWrapper
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<Vector<double>,double>
 (const Vector<double>&, Vector<double>&) const;
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<Vector<double>,double>
 (const Vector<double>&, Vector<double>&) const;
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<Vector<double>,float>
 (const Vector<double>&, Vector<float>&) const;
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<Vector<float>,double>
 (const Vector<double>&, Vector<float>&) const;
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<Vector<float>,double>
 (const Vector<float>&, Vector<double>&) const;
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<Vector<double>,float>
 (const Vector<float>&, Vector<double>&) const;
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<Vector<float>,float>
 (const Vector<float>&, Vector<float>&) const;
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<Vector<float>,float>
 (const Vector<float>&, Vector<float>&) const;
 
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<BlockVector<double>,double>
 (const BlockVector<double>&, Vector<double>&) const;
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<BlockVector<double>,double>
 (const Vector<double>&, BlockVector<double>&) const;
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<BlockVector<double>,float>
 (const BlockVector<double>&, Vector<float>&) const;
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<BlockVector<float>,double>
 (const Vector<double>&, BlockVector<float>&) const;
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<BlockVector<float>,double>
 (const BlockVector<float>&, Vector<double>&) const;
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<BlockVector<double>,float>
 (const Vector<float>&, BlockVector<double>&) const;
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<BlockVector<float>,float>
 (const BlockVector<float>&, Vector<float>&) const;
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<BlockVector<float>,float>
 (const Vector<float>&, BlockVector<float>&) const;
 
@@ -1531,84 +1531,84 @@ set_dof_values_by_interpolation<BlockVector<float>,float>
 #ifdef DEAL_II_USE_PETSC
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<PETScWrappers::Vector,double>
 (const PETScWrappers::Vector&, Vector<double>&) const;
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<PETScWrappers::Vector,double>
 (const Vector<double>&, PETScWrappers::Vector&) const;
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<PETScWrappers::Vector,float>
 (const PETScWrappers::Vector&, Vector<float>&) const;
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<PETScWrappers::Vector,float>
 (const Vector<float>&, PETScWrappers::Vector&) const;
 
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<PETScWrappers::BlockVector,double>
 (const PETScWrappers::BlockVector&, Vector<double>&) const;
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<PETScWrappers::BlockVector,double>
 (const Vector<double>&, PETScWrappers::BlockVector&) const;
 
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 get_interpolated_dof_values<PETScWrappers::BlockVector,float>
 (const PETScWrappers::BlockVector&, Vector<float>&) const;
 template
 void
-DoFCellAccessor<deal_II_dimension,hpDoFHandler>::
+DoFCellAccessor<deal_II_dimension,hp::DoFHandler>::
 set_dof_values_by_interpolation<PETScWrappers::BlockVector,float>
 (const Vector<float>&, PETScWrappers::BlockVector&) const;
 #endif
 
 
-template class DoFAccessor<deal_II_dimension, hpDoFHandler>;
+template class DoFAccessor<deal_II_dimension, hp::DoFHandler>;
 
 #if deal_II_dimension == 1
-template class DoFObjectAccessor<1, 1, hpDoFHandler>;
+template class DoFObjectAccessor<1, 1, hp::DoFHandler>;
 #endif
 
 #if deal_II_dimension == 2
-template class DoFObjectAccessor<1, 2, hpDoFHandler>;
-template class DoFObjectAccessor<2, 2, hpDoFHandler>;
+template class DoFObjectAccessor<1, 2, hp::DoFHandler>;
+template class DoFObjectAccessor<2, 2, hp::DoFHandler>;
 
-template class TriaRawIterator   <2,DoFObjectAccessor<1, 2, hpDoFHandler> >;
-template class TriaIterator      <2,DoFObjectAccessor<1, 2, hpDoFHandler> >;
-template class TriaActiveIterator<2,DoFObjectAccessor<1, 2, hpDoFHandler> >;
+template class TriaRawIterator   <2,DoFObjectAccessor<1, 2, hp::DoFHandler> >;
+template class TriaIterator      <2,DoFObjectAccessor<1, 2, hp::DoFHandler> >;
+template class TriaActiveIterator<2,DoFObjectAccessor<1, 2, hp::DoFHandler> >;
 #endif
 
 
 #if deal_II_dimension == 3
-template class DoFObjectAccessor<1, 3, hpDoFHandler>;
-template class DoFObjectAccessor<2, 3, hpDoFHandler>;
-template class DoFObjectAccessor<3, 3, hpDoFHandler>;
+template class DoFObjectAccessor<1, 3, hp::DoFHandler>;
+template class DoFObjectAccessor<2, 3, hp::DoFHandler>;
+template class DoFObjectAccessor<3, 3, hp::DoFHandler>;
 
-template class TriaRawIterator   <3,DoFObjectAccessor<1, 3, hpDoFHandler> >;
-template class TriaIterator      <3,DoFObjectAccessor<1, 3, hpDoFHandler> >;
-template class TriaActiveIterator<3,DoFObjectAccessor<1, 3, hpDoFHandler> >;
-template class TriaRawIterator   <3,DoFObjectAccessor<2, 3, hpDoFHandler> >;
-template class TriaIterator      <3,DoFObjectAccessor<2, 3, hpDoFHandler> >;
-template class TriaActiveIterator<3,DoFObjectAccessor<2, 3, hpDoFHandler> >;
+template class TriaRawIterator   <3,DoFObjectAccessor<1, 3, hp::DoFHandler> >;
+template class TriaIterator      <3,DoFObjectAccessor<1, 3, hp::DoFHandler> >;
+template class TriaActiveIterator<3,DoFObjectAccessor<1, 3, hp::DoFHandler> >;
+template class TriaRawIterator   <3,DoFObjectAccessor<2, 3, hp::DoFHandler> >;
+template class TriaIterator      <3,DoFObjectAccessor<2, 3, hp::DoFHandler> >;
+template class TriaActiveIterator<3,DoFObjectAccessor<2, 3, hp::DoFHandler> >;
 #endif
 
 
-template class DoFCellAccessor<deal_II_dimension, hpDoFHandler>;
+template class DoFCellAccessor<deal_II_dimension, hp::DoFHandler>;
 
-template class TriaRawIterator   <deal_II_dimension,DoFCellAccessor<deal_II_dimension, hpDoFHandler> >;
-template class TriaIterator      <deal_II_dimension,DoFCellAccessor<deal_II_dimension, hpDoFHandler> >;
-template class TriaActiveIterator<deal_II_dimension,DoFCellAccessor<deal_II_dimension, hpDoFHandler> >;
+template class TriaRawIterator   <deal_II_dimension,DoFCellAccessor<deal_II_dimension, hp::DoFHandler> >;
+template class TriaIterator      <deal_II_dimension,DoFCellAccessor<deal_II_dimension, hp::DoFHandler> >;
+template class TriaActiveIterator<deal_II_dimension,DoFCellAccessor<deal_II_dimension, hp::DoFHandler> >;
 

@@ -473,11 +473,11 @@ namespace WorkAround
   };
   template <template <int> class DH> const bool IsHP<DH>::value;
 
-  template <> struct IsHP<hpDoFHandler>
+  template <> struct IsHP<hp::DoFHandler>
   {
       static const bool value = true;
   };
-  const bool IsHP<hpDoFHandler>::value;  
+  const bool IsHP<hp::DoFHandler>::value;  
 }
 
 
@@ -513,7 +513,7 @@ approximate_derivative (const Mapping<dim>    &mapping,
 #ifdef DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG
   const FunPtr fun_ptr
     = (WorkAround::IsHP<DH>::value ?
-       &DerivativeApproximation::template approximate<DerivativeDescription,dim,hpDoFHandler,InputVector> :
+       &DerivativeApproximation::template approximate<DerivativeDescription,dim,hp::DoFHandler,InputVector> :
        &DerivativeApproximation::template approximate<DerivativeDescription,dim,DoFHandler,InputVector>);
 #else
   const FunPtr fun_ptr
@@ -799,17 +799,17 @@ INSTANTIATE(Vector<float>, DoFHandler);
 INSTANTIATE(BlockVector<double>, DoFHandler);
 INSTANTIATE(BlockVector<float>, DoFHandler);
 
-INSTANTIATE(Vector<double>, hpDoFHandler);
-INSTANTIATE(Vector<float>, hpDoFHandler);
-INSTANTIATE(BlockVector<double>, hpDoFHandler);
-INSTANTIATE(BlockVector<float>, hpDoFHandler);
+INSTANTIATE(Vector<double>, hp::DoFHandler);
+INSTANTIATE(Vector<float>, hp::DoFHandler);
+INSTANTIATE(BlockVector<double>, hp::DoFHandler);
+INSTANTIATE(BlockVector<float>, hp::DoFHandler);
 
 #ifdef DEAL_II_USE_PETSC
 INSTANTIATE(PETScWrappers::Vector, DoFHandler);
 INSTANTIATE(PETScWrappers::BlockVector, DoFHandler);
 
-INSTANTIATE(PETScWrappers::Vector, hpDoFHandler);
-INSTANTIATE(PETScWrappers::BlockVector, hpDoFHandler);
+INSTANTIATE(PETScWrappers::Vector, hp::DoFHandler);
+INSTANTIATE(PETScWrappers::BlockVector, hp::DoFHandler);
 #endif
 
 

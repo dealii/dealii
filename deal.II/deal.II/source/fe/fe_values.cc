@@ -1135,7 +1135,7 @@ FEValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &cell)
 
 template <int dim>
 void
-FEValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell)
+FEValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell)
 {
 				   // assert that the finite elements
 				   // passed to the constructor and
@@ -1152,7 +1152,7 @@ FEValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell)
                                    // destruction of this class
   this->present_cell.reset 
     (new typename FEValuesBase<dim>::template
-     CellIterator<typename hpDoFHandler<dim>::cell_iterator> (cell));
+     CellIterator<typename hp::DoFHandler<dim>::cell_iterator> (cell));
 
                                    // this was the part of the work
                                    // that is dependent on the actual
@@ -1394,11 +1394,11 @@ void FEFaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator &c
 
 
 
-//TODO:[?] Change for real hpDoFHandler
-// Probably the first assertion has to be changed, when the real hpDoFHandler
+//TODO:[?] Change for real hp::DoFHandler
+// Probably the first assertion has to be changed, when the real hp::DoFHandler
 // is available.
 template <int dim>
-void FEFaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
+void FEFaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
 				const unsigned int              face_no)
 {
 				   // assert that the finite elements
@@ -1419,7 +1419,7 @@ void FEFaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator 
                                    // destruction of this class
   this->present_cell.reset 
     (new typename FEValuesBase<dim>::template
-     CellIterator<typename hpDoFHandler<dim>::cell_iterator> (cell));
+     CellIterator<typename hp::DoFHandler<dim>::cell_iterator> (cell));
 
                                    // this was the part of the work
                                    // that is dependent on the actual
@@ -1608,17 +1608,17 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 }
 
 
-//TODO:[?] Change for real hpDoFHandler
-// Probably the first assertion has to be changed, when the real hpDoFHandler
+//TODO:[?] Change for real hp::DoFHandler
+// Probably the first assertion has to be changed, when the real hp::DoFHandler
 // is available.
 template <int dim>
-void FESubfaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterator &cell,
+void FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
 				   const unsigned int         face_no,
 				   const unsigned int         subface_no)
 {
 				   // assert that the finite elements
 				   // passed to the constructor and
-				   // used by the hpDoFHandler used by
+				   // used by the hp::DoFHandler used by
 				   // this cell, are the same
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
 	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe().get_fe (cell->active_fe_index ())),
@@ -1639,7 +1639,7 @@ void FESubfaceValues<dim>::reinit (const typename hpDoFHandler<dim>::cell_iterat
                                    // destruction of this class
   this->present_cell.reset
     (new typename FEValuesBase<dim>::template
-     CellIterator<typename hpDoFHandler<dim>::cell_iterator> (cell));
+     CellIterator<typename hp::DoFHandler<dim>::cell_iterator> (cell));
 
                                    // this was the part of the work
                                    // that is dependent on the actual

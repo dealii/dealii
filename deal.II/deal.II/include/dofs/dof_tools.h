@@ -30,7 +30,7 @@ template <int dim> class Function;
 template <int dim> class Point;
 template <int dim> class FiniteElement;
 template <int dim> class DoFHandler;
-template <int dim> class hpDoFHandler;
+template <int dim> class hp::DoFHandler;
 template <int dim> class MGDoFHandler;
 class ConstraintMatrix;
 template <template <int> class GridClass, int dim> class InterGridMap;
@@ -654,10 +654,10 @@ class DoFTools
 
 				     /**
 				      * Declaration of same function
-				      * for hpDoFHandler
+				      * for hp::DoFHandler
 				      */
     static void
-    make_hanging_node_constraints (const hpDoFHandler<1> &dof_handler,
+    make_hanging_node_constraints (const hp::DoFHandler<1> &dof_handler,
 				   ConstraintMatrix      &constraints);
 
 				     /**
@@ -665,7 +665,7 @@ class DoFTools
 				      * for different space dimension.
 				      */
     static void
-    make_hanging_node_constraints (const hpDoFHandler<2> &dof_handler,
+    make_hanging_node_constraints (const hp::DoFHandler<2> &dof_handler,
 				   ConstraintMatrix      &constraints);
 
 				     /**
@@ -673,7 +673,7 @@ class DoFTools
 				      * for different space dimension.
 				      */
     static void
-    make_hanging_node_constraints (const hpDoFHandler<3> &dof_handler,
+    make_hanging_node_constraints (const hp::DoFHandler<3> &dof_handler,
 				   ConstraintMatrix      &constraints);
 
 				     //@}

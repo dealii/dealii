@@ -32,7 +32,7 @@
 #include <grid/tria_iterator.h>
 #include <fe/fe_values.h>
                                  // Instead of the usual DoFHandler
-                                 // the hpDoFHandler class has to be
+                                 // the hp::DoFHandler class has to be
                                  // used to gain access to the
                                  // hp-Functionality. The hpDoFHandler
                                  // provides essentially the same
@@ -72,7 +72,7 @@
 #include <fe/q_collection.h>
 
 				 // The first of the following
-                                 // two files provides the hpFEValues
+                                 // two files provides the hp::FEValues
                                  // class, which implements the same
                                  // functionality as the FEValues class
                                  // with the difference that it takes
@@ -618,8 +618,8 @@ class DGMethod
 
 				     // As already mentioned, the
                                      // standard DoFHandler has to be
-                                     // replaced by a hpDoFHandler.
-    hpDoFHandler<dim>    dof_handler;
+                                     // replaced by a hp::DoFHandler.
+    hp::DoFHandler<dim>    dof_handler;
 
     SparsityPattern sparsity;
     SparseMatrix<double> system_matrix;
@@ -854,7 +854,7 @@ void DGMethod<dim>::assemble_system1 ()
 				   // assumes a ``MappingQ1'' mapping)
 				   // and makes it easier to change
 				   // the mapping object later.
-  hpFEValues<dim> fe_v_x (mapping, fe_collection, *quadrature, update_flags);
+  hp::FEValues<dim> fe_v_x (mapping, fe_collection, *quadrature, update_flags);
   
 				   // Similarly we create the
 				   // ``FEFaceValues'' and
@@ -866,13 +866,13 @@ void DGMethod<dim>::assemble_system1 ()
 				   // they will be reinited to the
 				   // current cell and the face (and
 				   // subface) number.
-  hpFEFaceValues<dim> fe_v_face_x (
+  hp::FEFaceValues<dim> fe_v_face_x (
     mapping, fe_collection, *face_quadrature, face_update_flags);
-  hpFESubfaceValues<dim> fe_v_subface_x (
+  hp::FESubfaceValues<dim> fe_v_subface_x (
     mapping, fe_collection, *face_quadrature, face_update_flags);
-  hpFEFaceValues<dim> fe_v_face_neighbor_x (
+  hp::FEFaceValues<dim> fe_v_face_neighbor_x (
     mapping, fe_collection, *face_quadrature, neighbor_face_update_flags);
-  hpFESubfaceValues<dim> fe_v_subface_neighbor_x (
+  hp::FESubfaceValues<dim> fe_v_subface_neighbor_x (
     mapping, fe_collection, *face_quadrature, neighbor_face_update_flags);
 
 				   // Now we create the cell matrices
@@ -897,7 +897,7 @@ void DGMethod<dim>::assemble_system1 ()
 
 				   // Furthermore we need some cell
 				   // iterators.
-  typename hpDoFHandler<dim>::active_cell_iterator
+  typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
@@ -948,7 +948,7 @@ void DGMethod<dim>::assemble_system1 ()
 	{
 					   // First we set the face
 					   // iterator
-	  typename hpDoFHandler<dim>::face_iterator face=cell->face(face_no);
+	  typename hp::DoFHandler<dim>::face_iterator face=cell->face(face_no);
 	  
 					   // and clear the
 					   // ``un_v_matrix'' on each
@@ -983,7 +983,7 @@ void DGMethod<dim>::assemble_system1 ()
 					       // domain, therefore
 					       // there must exist a
 					       // neighboring cell.
-	      typename hpDoFHandler<dim>::cell_iterator neighbor=
+	      typename hp::DoFHandler<dim>::cell_iterator neighbor=
 		cell->neighbor(face_no);
 	      
 					       // We proceed with the
@@ -1043,7 +1043,7 @@ void DGMethod<dim>::assemble_system1 ()
 						       // `behind' the
 						       // current
 						       // subface.
-		      typename hpDoFHandler<dim>::active_cell_iterator neighbor_child=
+		      typename hp::DoFHandler<dim>::active_cell_iterator neighbor_child=
 			neighbor->child(GeometryInfo<dim>::
 					child_cell_on_face(neighbor2,subface_no));
 
@@ -1347,13 +1347,13 @@ void DGMethod<dim>::assemble_system2 ()
 				   // Here we do not need
 				   // ``fe_v_face_neighbor'' as case 4
 				   // does not occur.
-  hpFEValues<dim> fe_v_x (
+  hp::FEValues<dim> fe_v_x (
     mapping, fe_collection, *quadrature, update_flags);
-  hpFEFaceValues<dim> fe_v_face_x (
+  hp::FEFaceValues<dim> fe_v_face_x (
     mapping, fe_collection, *face_quadrature, face_update_flags);
-  hpFESubfaceValues<dim> fe_v_subface_x (
+  hp::FESubfaceValues<dim> fe_v_subface_x (
     mapping, fe_collection, *face_quadrature, face_update_flags);
-  hpFEFaceValues<dim> fe_v_face_neighbor_x (
+  hp::FEFaceValues<dim> fe_v_face_neighbor_x (
     mapping, fe_collection, *face_quadrature, neighbor_face_update_flags);
 
   const unsigned int max_dofs_per_cell = fe_collection.max_dofs_per_cell ();
@@ -1379,7 +1379,7 @@ void DGMethod<dim>::assemble_system2 ()
 				   // The following lines are roughly
 				   // the same as in the previous
 				   // function.
-  typename hpDoFHandler<dim>::active_cell_iterator
+  typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (;cell!=endc; ++cell) 
@@ -1401,7 +1401,7 @@ void DGMethod<dim>::assemble_system2 ()
 
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	{
-	  typename hpDoFHandler<dim>::face_iterator face=
+	  typename hp::DoFHandler<dim>::face_iterator face=
 	    cell->face(face_no);
 
 					   // Case 1:
@@ -1417,7 +1417,7 @@ void DGMethod<dim>::assemble_system2 ()
 	    {
 	      Assert (cell->neighbor(face_no).state() == IteratorState::valid,
 		      ExcInternalError());
-	      typename hpDoFHandler<dim>::cell_iterator neighbor=
+	      typename hp::DoFHandler<dim>::cell_iterator neighbor=
 		cell->neighbor(face_no);
 
 	      const unsigned int dofs_on_neighbor = neighbor->get_fe().dofs_per_cell;
@@ -1432,7 +1432,7 @@ void DGMethod<dim>::assemble_system2 ()
 		       subface_no<GeometryInfo<dim>::subfaces_per_face;
 		       ++subface_no)
 		    {
-		      typename hpDoFHandler<dim>::cell_iterator neighbor_child=
+		      typename hp::DoFHandler<dim>::cell_iterator neighbor_child=
 			neighbor->child(GeometryInfo<dim>::child_cell_on_face(
 			  neighbor2,subface_no));
 		      const unsigned int dofs_on_neighbor_child = neighbor_child->get_fe().dofs_per_cell;
@@ -1640,7 +1640,7 @@ void DGMethod<dim>::refine_grid ()
 
 				   // and they are cell-wise scaled by
 				   // the factor $h^{1+d/2}$
-  typename hpDoFHandler<dim>::active_cell_iterator
+  typename hp::DoFHandler<dim>::active_cell_iterator
      cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
@@ -1702,7 +1702,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
 	    << std::endl << std::endl;
   std::ofstream gnuplot_output (filename.c_str());
   
-  DataOut<dim, hpDoFHandler> data_out;
+  DataOut<dim, hp::DoFHandler> data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution2, "u");
 

@@ -23,7 +23,7 @@ template <typename number> class SparseMatrix;
 template <typename number> class Vector;
 
 template <int dim> class DoFHandler;
-template <int dim> class hpDoFHandler;
+template <int dim> class hp::DoFHandler;
 template <int dim> class FiniteElement;
 
 template <int celldim, int dim, template <int> class DH> class DoFObjectAccessor;
@@ -1579,80 +1579,80 @@ DoFCellAccessor<3, DoFHandler>::face (const unsigned int i) const;
 
 template <>
 const FiniteElement<1> &
-DoFObjectAccessor<1,1,hpDoFHandler>::get_fe () const;
+DoFObjectAccessor<1,1,hp::DoFHandler>::get_fe () const;
 template <>
 const FiniteElement<2> &
-DoFObjectAccessor<1,2,hpDoFHandler>::get_fe () const;
+DoFObjectAccessor<1,2,hp::DoFHandler>::get_fe () const;
 template <>
 const FiniteElement<3> &
-DoFObjectAccessor<1,3,hpDoFHandler>::get_fe () const;
+DoFObjectAccessor<1,3,hp::DoFHandler>::get_fe () const;
 template <>
 const FiniteElement<2> &
-DoFObjectAccessor<2,2,hpDoFHandler>::get_fe () const;
+DoFObjectAccessor<2,2,hp::DoFHandler>::get_fe () const;
 template <>
 const FiniteElement<3> &
-DoFObjectAccessor<2,3,hpDoFHandler>::get_fe () const;
+DoFObjectAccessor<2,3,hp::DoFHandler>::get_fe () const;
 template <>
 const FiniteElement<3> &
-DoFObjectAccessor<3,3,hpDoFHandler>::get_fe () const;
+DoFObjectAccessor<3,3,hp::DoFHandler>::get_fe () const;
 
 template <>
-void DoFObjectAccessor<1,1,hpDoFHandler>::set_dof_index (const unsigned int,
+void DoFObjectAccessor<1,1,hp::DoFHandler>::set_dof_index (const unsigned int,
                                                          const unsigned int) const;
 template <>
-void DoFObjectAccessor<1,2,hpDoFHandler>::set_dof_index (const unsigned int,
+void DoFObjectAccessor<1,2,hp::DoFHandler>::set_dof_index (const unsigned int,
                                                          const unsigned int) const;
 template <>
-void DoFObjectAccessor<1,3,hpDoFHandler>::set_dof_index (const unsigned int,
+void DoFObjectAccessor<1,3,hp::DoFHandler>::set_dof_index (const unsigned int,
                                                          const unsigned int) const;
 template <>
-void DoFObjectAccessor<2,2,hpDoFHandler>::set_dof_index (const unsigned int,
+void DoFObjectAccessor<2,2,hp::DoFHandler>::set_dof_index (const unsigned int,
                                                          const unsigned int) const;
 template <>
-void DoFObjectAccessor<2,3,hpDoFHandler>::set_dof_index (const unsigned int,
+void DoFObjectAccessor<2,3,hp::DoFHandler>::set_dof_index (const unsigned int,
                                                          const unsigned int) const;
 template <>
-void DoFObjectAccessor<3,3,hpDoFHandler>::set_dof_index (const unsigned int,
+void DoFObjectAccessor<3,3,hp::DoFHandler>::set_dof_index (const unsigned int,
                                                          const unsigned int) const;
 
 
 template <>
 unsigned int
-DoFObjectAccessor<1,1,hpDoFHandler>::active_fe_index () const;
+DoFObjectAccessor<1,1,hp::DoFHandler>::active_fe_index () const;
 template <>
 unsigned int
-DoFObjectAccessor<1,2,hpDoFHandler>::active_fe_index () const;
+DoFObjectAccessor<1,2,hp::DoFHandler>::active_fe_index () const;
 template <>
 unsigned int
-DoFObjectAccessor<1,3,hpDoFHandler>::active_fe_index () const;
+DoFObjectAccessor<1,3,hp::DoFHandler>::active_fe_index () const;
 template <>
 unsigned int
-DoFObjectAccessor<2,2,hpDoFHandler>::active_fe_index () const;
+DoFObjectAccessor<2,2,hp::DoFHandler>::active_fe_index () const;
 template <>
 unsigned int
-DoFObjectAccessor<2,3,hpDoFHandler>::active_fe_index () const;
+DoFObjectAccessor<2,3,hp::DoFHandler>::active_fe_index () const;
 template <>
 unsigned int
-DoFObjectAccessor<3,3,hpDoFHandler>::active_fe_index () const;
+DoFObjectAccessor<3,3,hp::DoFHandler>::active_fe_index () const;
 
 template <>
 void
-DoFObjectAccessor<1,1,hpDoFHandler>::set_active_fe_index (const unsigned int i);
+DoFObjectAccessor<1,1,hp::DoFHandler>::set_active_fe_index (const unsigned int i);
 template <>
 void
-DoFObjectAccessor<1,2,hpDoFHandler>::set_active_fe_index (const unsigned int i);
+DoFObjectAccessor<1,2,hp::DoFHandler>::set_active_fe_index (const unsigned int i);
 template <>
 void
-DoFObjectAccessor<1,3,hpDoFHandler>::set_active_fe_index (const unsigned int i);
+DoFObjectAccessor<1,3,hp::DoFHandler>::set_active_fe_index (const unsigned int i);
 template <>
 void
-DoFObjectAccessor<2,2,hpDoFHandler>::set_active_fe_index (const unsigned int i);
+DoFObjectAccessor<2,2,hp::DoFHandler>::set_active_fe_index (const unsigned int i);
 template <>
 void
-DoFObjectAccessor<2,3,hpDoFHandler>::set_active_fe_index (const unsigned int i);
+DoFObjectAccessor<2,3,hp::DoFHandler>::set_active_fe_index (const unsigned int i);
 template <>
 void
-DoFObjectAccessor<3,3,hpDoFHandler>::set_active_fe_index (const unsigned int i);
+DoFObjectAccessor<3,3,hp::DoFHandler>::set_active_fe_index (const unsigned int i);
 
 
 // include more templates

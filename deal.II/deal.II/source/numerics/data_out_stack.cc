@@ -507,11 +507,11 @@ template void DataOutStack<deal_II_dimension,DoFHandler>::
 add_data_vector<float> (const Vector<float>  &vec,
 			const std::string    &name);
 
-template class DataOutStack<deal_II_dimension,hpDoFHandler>;
-template void DataOutStack<deal_II_dimension,hpDoFHandler>::
+template class DataOutStack<deal_II_dimension,hp::DoFHandler>;
+template void DataOutStack<deal_II_dimension,hp::DoFHandler>::
 add_data_vector<double> (const Vector<double> &vec,
 			 const std::string    &name);
-template void DataOutStack<deal_II_dimension,hpDoFHandler>::
+template void DataOutStack<deal_II_dimension,hp::DoFHandler>::
 add_data_vector<float> (const Vector<float>  &vec,
 			const std::string    &name);
 

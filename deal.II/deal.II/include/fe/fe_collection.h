@@ -20,7 +20,7 @@
 
 /**
  * This class acts as a collection of finite element objects used in the
- * hpDoFHandler(). It is thus to a hpDoFHandler() what a
+ * hp::DoFHandler(). It is thus to a hp::DoFHandler() what a
  * FiniteElement is to a DoFHandler. This collection stores copies
  * of the original elements added to it, and is therefore handling its memory
  * manegement itself.
