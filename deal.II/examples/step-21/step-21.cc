@@ -5,7 +5,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001-2005 by the deal.II authors              */
+/*    Copyright (C) 2001-2006 by the deal.II authors              */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -855,8 +855,7 @@ void DGMethod<dim>::assemble_system1 ()
 				   // assumes a ``MappingQ1'' mapping)
 				   // and makes it easier to change
 				   // the mapping object later.
-  typename SelectFEValues<hpDoFHandler<dim> >::FEValues fe_v_x (
-    mapping, fe_collection, *quadrature, update_flags);
+  hpFEValues<dim> fe_v_x (mapping, fe_collection, *quadrature, update_flags);
   
 				   // Similarly we create the
 				   // ``FEFaceValues'' and
@@ -868,13 +867,13 @@ void DGMethod<dim>::assemble_system1 ()
 				   // they will be reinited to the
 				   // current cell and the face (and
 				   // subface) number.
-  typename SelectFEValues<hpDoFHandler<dim> >::FEFaceValues fe_v_face_x (
+  hpFEFaceValues<dim> fe_v_face_x (
     mapping, fe_collection, *face_quadrature, face_update_flags);
-  typename SelectFEValues<hpDoFHandler<dim> >::FESubfaceValues fe_v_subface_x (
+  hpFESubfaceValues<dim> fe_v_subface_x (
     mapping, fe_collection, *face_quadrature, face_update_flags);
-  typename SelectFEValues<hpDoFHandler<dim> >::FEFaceValues fe_v_face_neighbor_x (
+  hpFEFaceValues<dim> fe_v_face_neighbor_x (
     mapping, fe_collection, *face_quadrature, neighbor_face_update_flags);
-  typename SelectFEValues<hpDoFHandler<dim> >::FESubfaceValues fe_v_subface_neighbor_x (
+  hpFESubfaceValues<dim> fe_v_subface_neighbor_x (
     mapping, fe_collection, *face_quadrature, neighbor_face_update_flags);
 
 				   // Now we create the cell matrices
@@ -1349,13 +1348,13 @@ void DGMethod<dim>::assemble_system2 ()
 				   // Here we do not need
 				   // ``fe_v_face_neighbor'' as case 4
 				   // does not occur.
-  typename SelectFEValues<hpDoFHandler<dim> >::FEValues fe_v_x (
+  hpFEValues<dim> fe_v_x (
     mapping, fe_collection, *quadrature, update_flags);
-  typename SelectFEValues<hpDoFHandler<dim> >::FEFaceValues fe_v_face_x (
+  hpFEFaceValues<dim> fe_v_face_x (
     mapping, fe_collection, *face_quadrature, face_update_flags);
-  typename SelectFEValues<hpDoFHandler<dim> >::FESubfaceValues fe_v_subface_x (
+  hpFESubfaceValues<dim> fe_v_subface_x (
     mapping, fe_collection, *face_quadrature, face_update_flags);
-  typename SelectFEValues<hpDoFHandler<dim> >::FEFaceValues fe_v_face_neighbor_x (
+  hpFEFaceValues<dim> fe_v_face_neighbor_x (
     mapping, fe_collection, *face_quadrature, neighbor_face_update_flags);
 
   const unsigned int max_dofs_per_cell = fe_collection.max_dofs_per_cell ();
