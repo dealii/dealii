@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -40,11 +40,13 @@ class hpDoFLevel
 
 
 /**
- *  Store all information which belongs to one level of the multilevel hierarchy.
+ *  Store all information which belongs to one level of the multilevel
+ *  hierarchy.
  *
- *  In @ref{hpDoFLevel<0>} all data is stored which is not
- *  dependent on the dimension, e.g. a field to store the
- *  index referring to the FECollection class.
+ *  In @ref{hpDoFLevel<0>} all data is stored which is not dependent on the
+ *  dimension, e.g. a field to store the index referring to the FECollection
+ *  class. The data therefore corresponds to cells, rather than vertices,
+ *  lines, quads, etc.
  */
 template <>
 class hpDoFLevel<0>
