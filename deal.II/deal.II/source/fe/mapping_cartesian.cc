@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -207,7 +207,7 @@ MappingCartesian<dim>::compute_fill (const typename Triangulation<dim>::cell_ite
 						      quadrature_points.size())
 	    :
 					     // called from FESubfaceValues
-	    QProjector<dim>::DataSetDescriptor::sub_face (face_no, sub_no,
+	    QProjector<dim>::DataSetDescriptor::subface (face_no, sub_no,
 							  cell->face_orientation(face_no),
 							  quadrature_points.size())
 	   ));

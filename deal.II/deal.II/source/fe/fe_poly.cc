@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -346,7 +346,7 @@ FE_Poly<POLY,dim>::fill_fe_subface_values (const Mapping<dim>                   
 
   const typename QProjector<dim>::DataSetDescriptor dsd;
   const typename QProjector<dim>::DataSetDescriptor offset
-    = dsd.sub_face (face, subface, cell->face_orientation(face),
+    = dsd.subface (face, subface, cell->face_orientation(face),
 		    quadrature.n_quadrature_points);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);

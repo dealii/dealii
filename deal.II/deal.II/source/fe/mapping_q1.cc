@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -712,7 +712,7 @@ MappingQ1<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_
   
   compute_fill_face (cell, face_no, true,
 		     n_q_points,
-		     DataSetDescriptor::sub_face (face_no, sub_no,
+		     DataSetDescriptor::subface (face_no, sub_no,
                                                   cell->face_orientation(face_no),
                                                   n_q_points),
 		     q.get_weights(),
