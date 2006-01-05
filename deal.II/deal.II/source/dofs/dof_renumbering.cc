@@ -2,7 +2,7 @@
 //    $id$
 //    Version: $name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1401,45 +1401,45 @@ void DoFRenumbering::clockwise_dg<deal_II_dimension>
 // Generic numbering schemes
 
 template
-void DoFRenumbering::random
+void DoFRenumbering::random<DoFHandler<deal_II_dimension> >
 (DoFHandler<deal_II_dimension> &);
 
 template
 void
-DoFRenumbering::compute_random
+DoFRenumbering::compute_random<DoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const DoFHandler<deal_II_dimension> &);
 
 template
-void DoFRenumbering::sort_selected_dofs_back
+void DoFRenumbering::sort_selected_dofs_back<DoFHandler<deal_II_dimension> >
 (DoFHandler<deal_II_dimension> &,
  const std::vector<bool> &);
 
 template
 void
-DoFRenumbering::compute_sort_selected_dofs_back
+DoFRenumbering::compute_sort_selected_dofs_back<DoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const DoFHandler<deal_II_dimension> &,
  const std::vector<bool> &);
 
 template
-void DoFRenumbering::random
+void DoFRenumbering::random<hp::DoFHandler<deal_II_dimension> >
 (hp::DoFHandler<deal_II_dimension> &);
 
 template
 void
-DoFRenumbering::compute_random
+DoFRenumbering::compute_random<hp::DoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const hp::DoFHandler<deal_II_dimension> &);
 
 template
-void DoFRenumbering::sort_selected_dofs_back
+void DoFRenumbering::sort_selected_dofs_back<hp::DoFHandler<deal_II_dimension> >
 (hp::DoFHandler<deal_II_dimension> &,
  const std::vector<bool> &);
 
 template
 void
-DoFRenumbering::compute_sort_selected_dofs_back
+DoFRenumbering::compute_sort_selected_dofs_back<hp::DoFHandler<deal_II_dimension> >
 (std::vector<unsigned int>&,
  const hp::DoFHandler<deal_II_dimension> &,
  const std::vector<bool> &);
