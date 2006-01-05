@@ -16,7 +16,10 @@
 #include <base/config.h>
 
 template <int> class DoFHandler;
-template <int> class hp::DoFHandler;
+namespace hp
+{
+  template <int> class DoFHandler;
+}
 
 template <int> class FEValues;
 template <int> class FEFaceValues;
