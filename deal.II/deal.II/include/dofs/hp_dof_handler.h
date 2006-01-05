@@ -26,6 +26,13 @@
 #include <map>
 #include <set>
 
+// forward declarations
+template <int celldim, int dim, template <int> class DH> class DoFObjectAccessor;
+template <int dim, template <int> class DH>              class DoFObjectAccessor<0, dim, DH>;
+template <int dim, template <int> class DH>              class DoFObjectAccessor<1, dim, DH>;
+template <int dim, template <int> class DH>              class DoFObjectAccessor<2, dim, DH>;
+template <int dim, template <int> class DH>              class DoFObjectAccessor<3, dim, DH>;
+
 
 /**
  * A namespace that holds all the classes that have to do with hp finite
