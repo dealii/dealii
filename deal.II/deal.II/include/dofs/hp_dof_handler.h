@@ -1002,6 +1002,10 @@ namespace hp
                                         * Make accessor objects friends.
                                         */
       template <int dim1, int dim2, template <int> class DH> friend class DoFObjectAccessor;
+      template <int dim1, template <int> class DH> friend class DoFObjectAccessor<0, dim1, DH>;
+      template <int dim1, template <int> class DH> friend class DoFObjectAccessor<1, dim1, DH>;
+      template <int dim1, template <int> class DH> friend class DoFObjectAccessor<2, dim1, DH>;
+      template <int dim1, template <int> class DH> friend class DoFObjectAccessor<3, dim1, DH>;
   };
 
 
