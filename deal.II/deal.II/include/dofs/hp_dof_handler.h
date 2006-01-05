@@ -26,13 +26,6 @@
 #include <map>
 #include <set>
 
-// forward declarations
-template <int celldim, int dim, template <int> class DH> class DoFObjectAccessor;
-template <int dim, template <int> class DH>              class DoFObjectAccessor<0, dim, DH>;
-template <int dim, template <int> class DH>              class DoFObjectAccessor<1, dim, DH>;
-template <int dim, template <int> class DH>              class DoFObjectAccessor<2, dim, DH>;
-template <int dim, template <int> class DH>              class DoFObjectAccessor<3, dim, DH>;
-
 
 /**
  * A namespace that holds all the classes that have to do with hp finite
@@ -1009,10 +1002,11 @@ namespace hp
                                         * Make accessor objects friends.
                                         */
       template <int dim1, int dim2, template <int> class DH> friend class DoFObjectAccessor;
-      template <int dim1, template <int> class DH> friend class DoFObjectAccessor<0, dim1, DH>;
-      template <int dim1, template <int> class DH> friend class DoFObjectAccessor<1, dim1, DH>;
-      template <int dim1, template <int> class DH> friend class DoFObjectAccessor<2, dim1, DH>;
-      template <int dim1, template <int> class DH> friend class DoFObjectAccessor<3, dim1, DH>;
+
+                                       /**
+                                        * Make Triangulation friend.
+                                        */
+//    friend class Triangulation<dim>;
   };
 
 
