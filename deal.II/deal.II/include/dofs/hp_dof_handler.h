@@ -1002,11 +1002,6 @@ namespace hp
                                         * Make accessor objects friends.
                                         */
       template <int dim1, int dim2, template <int> class DH> friend class DoFObjectAccessor;
-
-                                       /**
-                                        * Make Triangulation friend.
-                                        */
-//    friend class Triangulation<dim>;
   };
 
 
