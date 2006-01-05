@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -412,11 +412,52 @@ class DataOutBase
 					  * end at cell boundaries.
 					  */
 	bool write_neighbors;
-
+					 /**
+					  * Write integer values of
+					  * the Triangulation in
+					  * binary format.
+					  */
+	bool int_binary;
+					 /**
+					  * Write coordinate vectors in
+					  * binary format.
+					  */
+	bool coordinates_binary;
+	
+					 /**
+					  * Write data vectors in
+					  * binary format.
+					  */
+	bool data_binary;
+	
+					 /**
+					  * Write binary integer
+					  * values with 64 bit
+					  * accuracy instead of 32.
+					  */
+	bool int_64;
+	
+					 /**
+					  * Write binary coordinate
+					  * vectors as double (64 bit)
+					  * numbers instead of float (32 bit).
+					  */
+	bool coordinates_double;
+	
+					 /**
+					  * Write binary coordinate
+					  * vectors as double (64 bit)
+					  * numbers instead of float (32 bit).
+					  */
+	bool data_double;
+	
 					 /**
 					  * Constructor.
 					  */
-	DXFlags (const bool write_neighbors = false);
+	DXFlags (const bool write_neighbors = false,
+		 const bool int_binary = false,
+		 const bool coordinates_binary = false,
+		 const bool data_binary = false);
         
 					 /**
 					  * Declare all flags with name
@@ -1727,6 +1768,37 @@ class DataOutBase
     
 				     //@}  
   private:
+				     /**
+				      * Write the coordinates of nodes
+				      * in the desired format.
+				      */
+    template <int dim, int spacedim>
+    static void write_dx_nodes (const std::vector<Patch<dim,spacedim> >& patches,
+				const bool binary,
+				const bool double_precision,
+				std::ostream& out);
+
+				     /**
+				      * Write the node numbers of a
+				      * cell in the desired format.
+				      */
+    template <int dim, int spacedim>
+    static void write_dx_cells (const std::vector<Patch<dim,spacedim> >& patches,
+				const bool binary,
+				const bool int_64,
+				std::ostream& out);
+
+				     /**
+				      * Write data in the desired
+				      * format.
+				      */
+    template <int dim, int spacedim>
+    static void write_dx_data (const std::vector<Patch<dim,spacedim> >& patches,
+			       const unsigned int n_data_sets,
+			       const bool binary,
+			       const bool double_precision,
+			       std::ostream& out);
+
 				     /**
 				      * Class holding the data of one
 				      * cell of a patch in two space

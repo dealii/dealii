@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,6 +22,7 @@
 #include <ctime>
 #include <cmath>
 #include <set>
+#include <boost/shared_ptr.hpp>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>
@@ -134,9 +135,18 @@ DataOutBase::PovrayFlags::PovrayFlags (const bool smooth,
 {}
 
 
-DataOutBase::DXFlags::DXFlags (const bool write_neighbors)
+DataOutBase::DXFlags::DXFlags (const bool write_neighbors,
+			       const bool int_binary,
+			       const bool coordinates_binary,
+			       const bool data_binary)
                 :
-		write_neighbors(write_neighbors)
+		write_neighbors(write_neighbors),
+		int_binary(int_binary),
+		coordinates_binary(coordinates_binary),
+		data_binary(data_binary),
+		int_64(false),
+		coordinates_double(false),
+		data_double(false)
 {}
 
 
@@ -147,6 +157,21 @@ void DataOutBase::DXFlags::declare_parameters (ParameterHandler &prm)
                      "A boolean field indicating whether neighborship "
                      "information between cells is to be written to the "
                      "OpenDX output file");
+  prm.declare_entry ("Integer format", "ascii",
+                     Patterns::Selection("ascii|32|64"),
+                     "Output format of integer numbers, which is "
+		     "either a text representation (ascii) or binary integer "
+		     "values of 32 or 64 bits length");
+  prm.declare_entry ("Coordinates format", "ascii",
+                     Patterns::Selection("ascii|32|64"),
+                     "Output format of vertex coordinates, which is "
+		     "either a text representation (ascii) or binary "
+		     "floating point values of 32 or 64 bits length");
+  prm.declare_entry ("Data format", "ascii",
+                     Patterns::Selection("ascii|32|64"),
+                     "Output format of data values, which is "
+		     "either a text representation (ascii) or binary "
+		     "floating point values of 32 or 64 bits length");
 }
 
 
@@ -154,6 +179,7 @@ void DataOutBase::DXFlags::declare_parameters (ParameterHandler &prm)
 void DataOutBase::DXFlags::parse_parameters (ParameterHandler &prm)
 {
   write_neighbors = prm.get_bool ("Write neighbors");
+//TODO:[GK] Read the new  parameters
 }
 
 
@@ -1102,6 +1128,371 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 }
 
 
+// Write a node in binary format, either with float or double numbers
+template <int spacedim, typename type>
+void write_dx_node(const Point<spacedim>& node,
+		   type* data,
+		   std::ostream& out)
+{
+  for (unsigned int i=0; i<spacedim; ++i)
+    data[i] = node(i);
+  out.write(reinterpret_cast<const char*>(data),
+	    spacedim * sizeof(*data));
+}
+
+
+template <int dim, int spacedim>
+void
+DataOutBase::write_dx_nodes (
+  const std::vector<Patch<dim,spacedim> >& patches,
+  const bool binary,
+  const bool double_precision,
+  std::ostream& out)
+{
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+       patch!=patches.end(); ++patch)
+    {
+      const unsigned int n_subdivisions = patch->n_subdivisions;
+      
+				       // if we have nonzero values for
+				       // this coordinate
+      float floats[spacedim];
+      double doubles[spacedim];
+      switch (dim)
+	{
+	  case 1:
+	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
+	      {
+		const Point<spacedim>
+		  node = ((patch->vertices[1] * i / n_subdivisions) +
+			  (patch->vertices[0] * (n_subdivisions-i) / n_subdivisions));
+		
+						 // write out coordinates
+		if (binary)
+		  {
+		    if (double_precision)
+		      write_dx_node(node, doubles, out);
+		    else
+		      write_dx_node(node, floats, out);
+		  }
+		else
+		  {
+		    for (unsigned int i=0; i<spacedim; ++i)
+		      out << node(i) << '\t';
+		    out << '\n';
+		  }
+	      }
+	    break;
+	    
+	  case 2:
+	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
+	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
+		{
+		  const double x_frac = i * 1./n_subdivisions,
+			       y_frac = j * 1./n_subdivisions;
+		  
+						   // compute coordinates for
+						   // this patch point
+		  const Point<spacedim>
+		    node = (((patch->vertices[1] * x_frac) +
+			     (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
+			    ((patch->vertices[2] * x_frac) +
+			     (patch->vertices[3] * (1-x_frac))) * y_frac);
+		  
+						   // write out coordinates
+		  if (binary)
+		    {
+		      if (double_precision)
+			write_dx_node(node, doubles, out);
+		      else
+			write_dx_node(node, floats, out);
+		    }
+		  else
+		    {
+		      for (unsigned int i=0; i<spacedim; ++i)
+			out << node(i) << '\t';
+		      out << '\n';
+		    }
+		}
+	    
+	    break;
+	    
+	  case 3:
+	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
+	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
+		for (unsigned int k=0; k<n_subdivisions+1; ++k)
+		  {
+						     // note the broken
+						     // design of hexahedra
+						     // in deal.II, where
+						     // first the z-component
+						     // is counted up, before
+						     // increasing the y-
+						     // coordinate
+		    const double x_frac = i * 1./n_subdivisions,
+				 y_frac = k * 1./n_subdivisions,
+				 z_frac = j * 1./n_subdivisions;
+		    
+						     // compute coordinates for
+						     // this patch point
+		    const Point<spacedim>
+		      node = ((((patch->vertices[1] * x_frac) +
+				(patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
+			       ((patch->vertices[2] * x_frac) +
+				(patch->vertices[3] * (1-x_frac))) * y_frac)   * (1-z_frac) +
+			      (((patch->vertices[5] * x_frac) +
+				(patch->vertices[4] * (1-x_frac))) * (1-y_frac) +
+			       ((patch->vertices[6] * x_frac) +
+				(patch->vertices[7] * (1-x_frac))) * y_frac)   * z_frac);
+		    
+						     // write out coordinates
+		    if (binary)
+		      {
+			if (double_precision)
+			  write_dx_node(node, doubles, out);
+			else
+			  write_dx_node(node, floats, out);
+		      }
+		    else
+		      {
+			for (unsigned int i=0; i<spacedim; ++i)
+			  out << node(i) << '\t';
+			out << '\n';
+		      }
+		  }
+	    break;
+	
+	  default:
+	    Assert (false, ExcNotImplemented());
+	}
+    }
+}
+
+template <class data>
+inline
+void
+write_dx_cell (unsigned int dim,
+	       data* nodes,
+	       const bool binary,
+	       std::ostream& out)
+{
+  if (binary)
+    out.write(reinterpret_cast<const char*>(nodes),
+	      (1<<dim) * sizeof(*nodes));
+  else
+    {
+      for (int i=0;i< (1<<dim);++i)
+	out << nodes[i] << '\t';
+      out << '\n';
+    }
+}
+
+
+template <int dim, int spacedim>
+void DataOutBase::write_dx_cells(
+  const std::vector<Patch<dim,spacedim> >& patches,
+  const bool binary,
+  const bool int_64,
+  std::ostream& out)
+{
+  unsigned int first_vertex_of_patch = 0;
+
+				   // Array to hold all the node
+				   // numbers of a cell. 8 is
+				   // sufficient for 3D
+  unsigned int ints[8];
+  unsigned long longs[8];
+  
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+       patch!=patches.end(); ++patch)
+    {
+      const unsigned int n_subdivisions = patch->n_subdivisions;
+      
+				       // write out the cells making
+				       // up this patch
+      switch (dim)
+	{
+	  case 1:
+	    for (unsigned int i=0; i<n_subdivisions; ++i)
+	      {
+		if (int_64)
+		  {
+		    longs[0] = first_vertex_of_patch+i;
+		    longs[1] = first_vertex_of_patch+i+1;
+		    write_dx_cell(dim, longs, binary, out);
+		  }
+		else
+		  {
+		    ints[0] = first_vertex_of_patch+i;
+		    ints[1] = first_vertex_of_patch+i+1;
+		    write_dx_cell(dim, ints, binary, out);
+		  }
+	      }
+	    break;
+	  case 2:
+	    for (unsigned int i=0; i<n_subdivisions; ++i)
+	      for (unsigned int j=0; j<n_subdivisions; ++j)
+		{
+		  if (int_64)
+		    {
+		      longs[0] = first_vertex_of_patch+i*(n_subdivisions+1)+j;
+		      longs[1] = first_vertex_of_patch+i*(n_subdivisions+1)+j+1;
+		      longs[2] = first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j;
+		      longs[3] = first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1;
+		      write_dx_cell(dim, longs, binary, out);
+		    }
+		  else
+		    {
+		      ints[0] = first_vertex_of_patch+i*(n_subdivisions+1)+j;
+		      ints[1] = first_vertex_of_patch+i*(n_subdivisions+1)+j+1;
+		      ints[2] = first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j;
+		      ints[3] = first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1;
+		      write_dx_cell(dim, ints, binary, out);
+		    }
+		}
+	    break;
+	  case 3:
+	    if (true)
+	      {
+		const unsigned int nvt = n_subdivisions+1;
+		for (unsigned int i=0; i<n_subdivisions; ++i)
+		  for (unsigned int j=0; j<n_subdivisions; ++j)
+		    for (unsigned int k=0; k<n_subdivisions; ++k)
+		      {
+			if (int_64)
+			  {
+			    longs[0] = first_vertex_of_patch+((i  )*nvt+j  )*nvt+k   ;
+			    longs[1] = first_vertex_of_patch+((i  )*nvt+j  )*nvt+k+1 ;
+			    longs[2] = first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k   ;
+			    longs[3] = first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k+1 ;
+			    longs[4] = first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k   ;
+			    longs[5] = first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k+1 ;
+			    longs[6] = first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k   ;
+			    longs[7] = first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k+1 ;
+			    write_dx_cell(dim, longs, binary, out);
+			  }
+			else
+			  {
+			    ints[0] = first_vertex_of_patch+((i  )*nvt+j  )*nvt+k   ;
+			    ints[1] = first_vertex_of_patch+((i  )*nvt+j  )*nvt+k+1 ;
+			    ints[2] = first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k   ;
+			    ints[3] = first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k+1 ;
+			    ints[4] = first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k   ;
+			    ints[5] = first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k+1 ;
+			    ints[6] = first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k   ;
+			    ints[7] = first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k+1 ;
+			    write_dx_cell(dim, ints, binary, out);
+			  }
+		      }
+	      }
+	    break;
+	  default:
+	    Assert (false, ExcNotImplemented());
+	}
+      
+      
+				       // finally update the number
+				       // of the first vertex of this patch
+      switch (dim)
+	{
+	  case 1:
+	    first_vertex_of_patch += n_subdivisions+1;
+	    break;
+	  case 2:
+	    first_vertex_of_patch += (n_subdivisions+1) *
+				     (n_subdivisions+1);
+	    break;
+	  case 3:
+	    first_vertex_of_patch += (n_subdivisions+1) *
+				     (n_subdivisions+1) *
+				     (n_subdivisions+1);
+	    break;
+	  default:
+	    Assert (false, ExcNotImplemented());
+	}
+    }
+  if (!binary)
+    out << '\n';
+}
+
+
+template<typename data>
+inline
+void
+write_dx_dataset(const std::vector<data>& values,
+		 const bool binary,
+		 std::ostream& out)
+{
+  if (binary)
+    {
+      out.write(reinterpret_cast<const char*>(&values[0]),
+		values.size()*sizeof(data));
+    }
+  else
+    {
+      for (unsigned int i=0;i<values.size();++i)
+	out << values[i] << '\t';
+      out << '\n';
+    }
+}
+
+
+template <int dim, int spacedim>
+void
+DataOutBase::write_dx_data (
+  const std::vector<Patch<dim,spacedim> >& patches,
+  unsigned int n_data_sets,
+  const bool binary,
+  const bool double_precision,
+  std::ostream& out)
+{
+  Assert (dim<=3, ExcNotImplemented());
+  
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch
+	 = patches.begin();
+       patch != patches.end(); ++patch)
+    {
+      const unsigned int n_subdivisions = patch->n_subdivisions;
+      const unsigned int n = n_subdivisions+1;
+      
+      Assert (patch->data.n_rows() == n_data_sets,
+	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
+      Assert (patch->data.n_cols() == (dim==1 ?
+				       n :
+				       (dim==2 ?
+					n*n :
+					(dim==3 ?
+					 n*n*n :
+					 0))),
+	      ExcInvalidDatasetSize (patch->data.n_cols(), n));
+      
+      std::vector<float>  floats(n_data_sets);
+      std::vector<double> doubles(n_data_sets);
+
+      const unsigned int n1 = (dim>0) ? n : 1;
+      const unsigned int n2 = (dim>1) ? n : 1;
+      const unsigned int n3 = (dim>2) ? n : 1;
+      
+      for (unsigned int i3=0; i3<n3; ++i3)
+	for (unsigned int i2=0; i2<n2; ++i2)
+	  for (unsigned int i1=0; i1<n1; ++i1)
+	    {
+	      if (double_precision)
+		{
+		  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+		    doubles[data_set] = patch->data(data_set,(i3*n+i2)*n+i1);
+		  write_dx_dataset(doubles, binary, out);
+		}
+	      else
+		{
+		  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+		    floats[data_set] = patch->data(data_set,(i3*n+i2)*n+i1);
+		  write_dx_dataset(floats, binary, out);
+		}
+	    }
+    }
+}
+
 
 template <int dim, int spacedim>
 void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
@@ -1112,6 +1503,10 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
   AssertThrow (out, ExcIO());
 
   Assert (patches.size() > 0, ExcNoPatches());
+  
+				   // Variable counting the offset of
+				   // binary data.
+  unsigned int offset = 0;
   
   const unsigned int n_data_sets = data_names.size();
 
@@ -1148,198 +1543,47 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 				   // start with vertices order is
 				   // lexicographical, x varying
 				   // fastest
-  out << "object \"vertices\" class array type float rank 1 shape " << spacedim
-      << " items " << n_nodes << " data follows" << '\n';
+  out << "object \"vertices\" class array type "
+      << ((flags.coordinates_double) ? "double" : "float")
+      << " rank 1 shape " << spacedim
+      << " items " << n_nodes;
 
+  if (flags.coordinates_binary)
+    {
+      out << "lsb ieee data 0" << '\n';
+      offset += n_nodes * spacedim * ((flags.coordinates_double)
+				      ? sizeof(double)
+				      : sizeof(float));
+    }
+  else
+    {
+      out << " data follows" << '\n';
+      write_dx_nodes(patches, false, false, out);
+    }
+  
 				   ///////////////////////////////
 				   // first write the coordinates of all vertices
-  if (true)
-    {
-      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	   patch!=patches.end(); ++patch)
-	{
-	  const unsigned int n_subdivisions = patch->n_subdivisions;
-	  
-					   // if we have nonzero values for
-					   // this coordinate
-	  switch (dim)
-	    {
-	      case 1:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		  {
-		    const Point<spacedim>
-		      node = ((patch->vertices[1] * i / n_subdivisions) +
-			      (patch->vertices[0] * (n_subdivisions-i) / n_subdivisions));
-
-						     // write out coordinates
-		    for (unsigned int i=0; i<spacedim; ++i)
-		      out << node(i) << '\t';
-		    out << '\n';
-		  }
-		
-		break;
-	      }
-	       
-	      case 2:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		    {
-		      const double x_frac = i * 1./n_subdivisions,
-				   y_frac = j * 1./n_subdivisions;
-		      
-						       // compute coordinates for
-						       // this patch point
-		      const Point<spacedim>
-			node = (((patch->vertices[1] * x_frac) +
-				 (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-				((patch->vertices[2] * x_frac) +
-				 (patch->vertices[3] * (1-x_frac))) * y_frac);
-		      
-						       // write out coordinates
-		      for (unsigned int i=0; i<spacedim; ++i)
-			out << node(i) << '\t';
-		      out << '\n';
-		    }
-	      
-		break;
-	      }
-	       
-	      case 3:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		    for (unsigned int k=0; k<n_subdivisions+1; ++k)
-		      {
-							 // note the broken
-							 // design of hexahedra
-							 // in deal.II, where
-							 // first the z-component
-							 // is counted up, before
-							 // increasing the y-
-							 // coordinate
-			const double x_frac = i * 1./n_subdivisions,
-				     y_frac = k * 1./n_subdivisions,
-				     z_frac = j * 1./n_subdivisions;
-			
-							 // compute coordinates for
-							 // this patch point
-			const Point<spacedim>
-			  node = ((((patch->vertices[1] * x_frac) +
-				    (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-				   ((patch->vertices[2] * x_frac) +
-				    (patch->vertices[3] * (1-x_frac))) * y_frac)   * (1-z_frac) +
-				  (((patch->vertices[5] * x_frac) +
-				    (patch->vertices[4] * (1-x_frac))) * (1-y_frac) +
-				   ((patch->vertices[6] * x_frac) +
-				    (patch->vertices[7] * (1-x_frac))) * y_frac)   * z_frac);
-			
-							 // write out coordinates
-			for (unsigned int i=0; i<spacedim; ++i)
-			  out << node(i) << '\t';
-			out << '\n';
-		      }
-	      
-		break;
-	      }
-	       
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
-	}
-    }
 
 				   /////////////////////////////////////////
 				   // write cells
-  out << "object \"cells\" class array type int rank 1 shape " << GeometryInfo<dim>::vertices_per_cell
-      << " items " << n_cells << " data follows"
-      << '\n';
-  
-  if (true)
+  out << "object \"cells\" class array type "
+      << ((flags.int_64) ? "hyper" : "int")
+      << " rank 1 shape " << GeometryInfo<dim>::vertices_per_cell
+      << " items " << n_cells;
+
+  if (flags.int_binary)
     {
-      unsigned int first_vertex_of_patch = 0;
-      
-      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	   patch!=patches.end(); ++patch)
-	{
-	  const unsigned int n_subdivisions = patch->n_subdivisions;
-	  
-					   // write out the cells making
-					   // up this patch
-	  switch (dim)
-	    {
-	      case 1:
-		if (true)
-		  {
-		    for (unsigned int i=0; i<n_subdivisions; ++i)
-		      out << first_vertex_of_patch+i << '\t'
-			  << first_vertex_of_patch+i+1 << '\n';
-		  }
-		break;
-	      case 2:
-		if (true)
-		  {
-		    for (unsigned int i=0; i<n_subdivisions; ++i)
-		      for (unsigned int j=0; j<n_subdivisions; ++j)
-			{
-			  out << first_vertex_of_patch+i*(n_subdivisions+1)+j << '\t'
-			      << first_vertex_of_patch+i*(n_subdivisions+1)+j+1 << '\t'
-			      << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j << '\t'
-			      << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1
-			      << '\n';
-			}
-		  }
-		break;
-	      case 3:
-		if (true)
-		  {
-		    const unsigned int nvt = n_subdivisions+1;
-		    for (unsigned int i=0; i<n_subdivisions; ++i)
-		      for (unsigned int j=0; j<n_subdivisions; ++j)
-			for (unsigned int k=0; k<n_subdivisions; ++k)
-			  {
-			    out
-			      << first_vertex_of_patch+((i  )*nvt+j  )*nvt+k   << '\t'
-			      << first_vertex_of_patch+((i  )*nvt+j  )*nvt+k+1 << '\t'
-			      << first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k   << '\t'
-			      << first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k+1 << '\t'
-			      << first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k   << '\t'
-			      << first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k+1 << '\t'
-			      << first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k   << '\t'
-			      << first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k+1 << '\t'
-			      ;
-			    out << '\n';
-			  }
-		  }
-		break;
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
-
-
-					   // finally update the number
-					   // of the first vertex of this patch
-	  switch (dim)
-	    {
-	      case 1:
-		    first_vertex_of_patch += n_subdivisions+1;
-		    break;
-	      case 2:
-		    first_vertex_of_patch += (n_subdivisions+1) *
-					     (n_subdivisions+1);
-		    break;
-	      case 3:
-		    first_vertex_of_patch += (n_subdivisions+1) *
-					     (n_subdivisions+1) *
-					     (n_subdivisions+1);
-		    break;
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
-	}
-      out << '\n';
+      out << " lsb binary data " << offset << '\n';
+      offset += n_cells * (1<<dim) * ((flags.int_64)
+				      ? sizeof(long)
+				      : sizeof (int));
     }
+  else
+    {
+      out << " data follows" << '\n';
+      write_dx_cells(patches, false, flags.int_64, out);
+    }
+  
 
   out << "attribute \"element type\" string \"";
   if (dim==1) out << "lines";
@@ -1488,72 +1732,22 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
     {      
       out << "object \"data\" class array type float rank 1 shape "
 	  << n_data_sets
-	  << " items " << n_nodes << " data follows" << '\n';
+	  << " items " << n_nodes;
 
-				       // loop over all patches
-      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	   patch != patches.end(); ++patch)
+      if (flags.data_binary)
 	{
-	  const unsigned int n_subdivisions = patch->n_subdivisions;
-      
-	  Assert (patch->data.n_rows() == n_data_sets,
-		  ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
-	  Assert (patch->data.n_cols() == (dim==1 ?
-				      n_subdivisions+1 :
-				      (dim==2 ?
-				       (n_subdivisions+1)*(n_subdivisions+1) :
-				       (dim==3 ?
-					(n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
-					0))),
-		  ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
-
-	  switch (dim)
-	    {
-	      case 1:
-	      {      
-		for (unsigned int i=0; i<n_subdivisions+1; ++i) 
-		  {
-		    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		      out << patch->data(data_set,i) << '\t';
-		    out << '\n';
-		  }
-	    
-		break;
-	      }
-	   
-	      case 2:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		    {
-		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			out << patch->data(data_set,i*(n_subdivisions+1) + j) << '\t';
-		      out << '\n';
-		    }
-
-		break;
-	      }
-
-	      case 3:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		    for (unsigned int k=0; k<n_subdivisions+1; ++k)
-		      {
-			for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			  out << patch->data(data_set,
-					     (i*(n_subdivisions+1)+j)*(n_subdivisions+1)+k)
-			      << '\t';
-			out << '\n';
-		      }
-
-		break;
-	      }
-
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
+	  out << " lsb ieee data " << offset << '\n';
+	  offset += n_data_sets * n_nodes * ((flags.data_double)
+					     ? sizeof(double)
+					     : sizeof(float));
 	}
+      else
+	{
+	  out << " data follows" << '\n';
+	  write_dx_data(patches, n_data_sets, false, flags.data_double, out);
+	}
+      
+				       // loop over all patches
       out << "attribute \"dep\" string \"positions\"" << '\n';
     } else {
       out << "object \"data\" class constantarray type float rank 0 items " << n_nodes << " data follows"
@@ -1585,6 +1779,14 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
     }
 
   out << "end" << '\n';
+				   // Write all binary data now
+  if (flags.coordinates_binary)
+    write_dx_nodes(patches, true, flags.coordinates_double, out);
+  if (flags.int_binary)
+    write_dx_cells(patches, true, flags.int_64, out);
+  if (flags.data_binary)
+    write_dx_data(patches, n_data_sets, true, flags.data_double, out);
+  
 				   // make sure everything now gets to
 				   // disk
   out.flush ();
