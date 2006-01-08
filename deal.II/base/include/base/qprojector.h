@@ -324,9 +324,9 @@ class QProjector
         static
         DataSetDescriptor
         subface (const unsigned int face_no,
-                  const unsigned int subface_no,
-                  const bool         face_orientation,
-                  const unsigned int n_quadrature_points);
+                 const unsigned int subface_no,
+                 const bool         face_orientation,
+                 const unsigned int n_quadrature_points);
 
                                          /**
                                           * Conversion operator to an
