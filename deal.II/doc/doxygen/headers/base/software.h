@@ -35,7 +35,7 @@
  *
  * @subsection SoftwareXFig XFig
  *
- * Not a visualization tool at all, you can write grids in XFig format
- * 3.2. Those can be postprocessed manually within XFig and written in
- * many different graphics formats. See http://www.xfig.org
+ * Though not a visualization tool at all, you can nevertheless write grids in
+ * XFig format 3.2. Those can be postprocessed manually within XFig and
+ * written in many different graphics formats. See http://www.xfig.org
  */
