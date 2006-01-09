@@ -179,9 +179,9 @@ class ParameterHandler;
  * <li>EPS output based on an earlier implementation by Stefan Nauber
  * for the old DataOut class
  *
- * <li>Povray output by Thomas Richter
+ * <li>@ref SoftwarePovray output by Thomas Richter
  *
- * <li>Tecplot output by Benjamin Shelton Kirk
+ * <li>@ref SoftwareTecplot output by Benjamin Shelton Kirk
  *
  * </ul>
  *
@@ -487,8 +487,9 @@ class DataOutBase
     };
 
 				     /**
-				      * Flags controlling the details of
-				      * output in UCD format.
+				      * Flags controlling the details
+				      * of output in UCD format for
+				      * @ref SoftwareAVS.
 				      *
 				      * @ingroup IO
 				      */
@@ -499,7 +500,7 @@ class DataOutBase
 					  * of the file stating the date of
 					  * creation and some other data.
 					  * While this is supported by the
-					  * UCD format (and the AVS program),
+					  * UCD format and @ref SoftwareAVS,
 					  * some other programs get confused
 					  * by this, so you can switch it off
 					  * this way.
@@ -1079,8 +1080,9 @@ class DataOutBase
     };
 
     				     /**
-				      * Flags controlling the details of
-				      * output in Tecplot format.
+				      * Flags controlling the details
+				      * of output in @ref
+				      * SoftwareTecplot format.
 				      *
 				      * @ingroup IO
 				      */
@@ -1271,19 +1273,23 @@ class DataOutBase
     enum OutputFormat {
 	  default_format,
 					   /**
-					    * Output for IBM OpenDX.
+					    * Output for @ref SoftwareOpenDX.
 					    */
 	  dx,
 					   /**
-					    * Output in AVS UCD format.
+					    * Output in the UCD format
+					    * for @ref SoftwareAVS.
 					    */
 	  ucd,
 					   /**
-					    * Output for the gnuplot tool.
+					    * Output for the @ref
+					    * SoftwareGnuplot tool.
 					    */
 	  gnuplot,
 					   /**
-					    * Output for the povray raytracer.
+					    * Output for the @ref
+					    * SoftwarePovray
+					    * raytracer.
 					    */
 	  povray,
 					   /**
@@ -1296,15 +1302,17 @@ class DataOutBase
 					    */
 	  gmv,
 					   /**
-					    * Output for tecplot in
-					    * text format.
+					    * Output for @ref
+					    * SoftwareTecplot in text
+					    * format.
 					    */
 	  
 	  tecplot,
 					   /**
-					    * Output for tecplot in
-					    * binaryformat. Faster and
-					    * smaller than text
+					    * Output for @ref
+					    * SoftwareTecplot in
+					    * binary format. Faster
+					    * and smaller than text
 					    * format.
 					    */
 	  tecplot_binary,
@@ -1320,10 +1328,10 @@ class DataOutBase
     };
 
 /**
- * Write the given list of patches to the output stream in <a
- * href="www.opendx.org">OpenDX</a> format.
+ * Write the given list of patches to the output stream in @ref
+ * SoftwareOpenDX format.
  *
- * Since OpenDX uses some kind of visual data flow oriented
+ * Since @ref SoftwareOpenDX uses some kind of visual data flow oriented
  * programming language, some of these programs are provided in
  * <tt>contrib/dx</tt>.
  */
@@ -1525,9 +1533,8 @@ class DataOutBase
 			      std::ostream                            &out);
 
 /**
- * Write the given list of patches to the output stream in <a
- * href="http://www.amtec.com">Tecplot</a>
- * ASCII format (FEBLOCK).
+ * Write the given list of patches to the output stream in @ref
+ * SoftwareTecplot ASCII format (FEBLOCK).
  *
  * For more information consult the Tecplot Users and Reference
  * manuals.
@@ -1539,8 +1546,8 @@ class DataOutBase
 			       std::ostream                            &out);
 
 /**
- * Write the given list of patches to the output stream in Tecplot
- * binary format.
+ * Write the given list of patches to the output stream in @ref
+ * SoftwareTecplot binary format.
  *
  * For this to work properly <tt>./configure</tt> checks for the
  * Tecplot API at build time. To write Tecplot binary files directly
@@ -1568,12 +1575,13 @@ class DataOutBase
 
 /**
  * Write the given list of patches to the output stream in UCD format
- * described in the AVS developer's guide. Due to limitations in the
- * present format, only node based data can be output, which in one
- * reason why we invented the patch concept. In order to write higher
- * order elements, you may split them up into several subdivisions of
- * each cell. These subcells will then, however, also appear as
- * different cells by programs which understand the UCD format.
+ * described in the AVS developer's guide (now @ref SoftwareAVS). Due
+ * to limitations in the present format, only node based data can be
+ * output, which in one reason why we invented the patch concept. In
+ * order to write higher order elements, you may split them up into
+ * several subdivisions of each cell. These subcells will then,
+ * however, also appear as different cells by programs which
+ * understand the UCD format.
  * 
  * No use is made of the possibility to give model data since these
  * are not supported by all UCD aware programs. You may give cell data
@@ -2079,9 +2087,10 @@ class DataOutInterface : private DataOutBase
     void write_tecplot_binary (std::ostream &out) const;
 
 				     /**
-				      * Obtain data through get_patches()
-				      * and write it to <tt>out</tt>
-				      * in UCD format. See
+				      * Obtain data through
+				      * get_patches() and write it to
+				      * <tt>out</tt> in UCD format for
+				      * @ref SoftwareAVS. See
 				      * DataOut::write_ucd.
 				      */
     void write_ucd (std::ostream &out) const;
