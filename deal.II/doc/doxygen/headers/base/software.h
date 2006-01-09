@@ -33,7 +33,7 @@
  * deal.II writes textual and binary files for Tecplot. @see
  * http://www.tecplot.com for more details on this software.
  *
- * @subsection @SoftwareXFig XFig
+ * @subsection SoftwareXFig XFig
  *
  * Not a visualization tool at all, you can write grids in XFig format
  * 3.2. Those can be postprocessed manually within XFig and written in
