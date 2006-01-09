@@ -17,12 +17,12 @@
  * gnuplot, even on locally refined and unstructured meshes, See
  * http://www.gnuplot.info/
  *
- * @subsection SoftwareOpenDX
+ * @subsection SoftwareOpenDX OpenDX
  *
  * The former IBM Visual Data Explorer, now an OpenSource project at
  * http://www.opendx.org.
  *
- * @subsection SoftwarePovray
+ * @subsection SoftwarePovray Povray
  *
  * While it is not actually taylored to scientific visualization, you
  * may be able to produce impressive pictures of three-dimensional
