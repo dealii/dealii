@@ -39,7 +39,7 @@ int main ()
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
 
-  FECollection<dim> fe_collection;
+  hp::FECollection<dim> fe_collection;
   fe_collection.add_fe (FE_DGQ<dim> (1));
 
   hp::DoFHandler<dim> dof_handler(tria);
