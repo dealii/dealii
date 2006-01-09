@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -107,8 +107,16 @@ class MappingQ1Eulerian : public MappingQ1<dim>
 				      */
     MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
                        const DoFHandler<dim> &shiftmap_dof_handler);
+    
+                                     /**
+                                      * Return a pointer to a copy of the
+                                      * present object. The caller of this
+                                      * copy then assumes ownership of it.
+                                      */
+    virtual
+    Mapping<dim> * clone () const;
 
-
+    
 				     /**
 				      * Exception
 				      */

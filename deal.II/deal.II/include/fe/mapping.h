@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -354,6 +354,22 @@ class Mapping : public Subscriptor
 				      * each grid cell.
 				      */
     virtual UpdateFlags update_each (const UpdateFlags) const = 0;
+
+                                     /**
+                                      * Return a pointer to a copy of the
+                                      * present object. The caller of this
+                                      * copy then assumes ownership of it.
+                                      *
+                                      * Since one can't create
+                                      * objects of class Mapping, this
+                                      * function of course has to be
+                                      * implemented by derived classes.
+                                      *
+                                      * This function is mainly used by the
+                                      * hp::MappingCollection class.
+                                      */
+    virtual
+    Mapping<dim> * clone () const = 0;
     
 				     /**
 				      * Exception

@@ -603,6 +603,14 @@ MappingCartesian<dim>::transform_real_to_unit_cell (
 }
 
 
+template <int dim>
+Mapping<dim> *
+MappingCartesian<dim>::clone () const
+{
+  return new MappingCartesian<dim>(*this);
+}
+
+
 //---------------------------------------------------------------------------
 // explicit instantiations
 

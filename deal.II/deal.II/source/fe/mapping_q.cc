@@ -1299,6 +1299,15 @@ MappingQ<dim>::get_degree() const
   return degree;
 }
 
+
+
+template <int dim>
+Mapping<dim> *
+MappingQ<dim>::clone () const
+{
+  return new MappingQ<dim>(*this);
+}
+
   
 // explicit instantiation
 template class MappingQ<deal_II_dimension>;

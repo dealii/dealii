@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,7 +23,11 @@ template <int dim> class FEValues;
 template <int dim> class FEFaceValues;
 template <int dim> class FESubfaceValues;
 template <int dim> class FESystem;
-template <int dim> class FECollection;
+namespace hp
+{
+  template <int dim> class FECollection;
+}
+
 
 /*!@addtogroup febase */
 /*@{*/
@@ -1999,7 +2003,7 @@ class FiniteElement : public Subscriptor,
 				      *
 				      * This function is needed by the
 				      * constructors of FESystem as well
-				      * as by the FECollection class.
+				      * as by the hp::FECollection class.
 				      */
     virtual FiniteElement<dim> *clone() const = 0;
     
@@ -2136,7 +2140,7 @@ class FiniteElement : public Subscriptor,
     friend class FEFaceValues<dim>;
     friend class FESubfaceValues<dim>;
     friend class FESystem<dim>;
-    friend class FECollection<dim>;
+    friend class hp::FECollection<dim>;
 };
 
 /*@}*/

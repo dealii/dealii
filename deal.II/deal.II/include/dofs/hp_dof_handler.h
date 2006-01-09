@@ -129,7 +129,7 @@ namespace hp
                                         * releases the lock of this
                                         * object to the finite element.
                                         */
-      virtual void distribute_dofs (const FECollection<dim> &fe);
+      virtual void distribute_dofs (const hp::FECollection<dim> &fe);
 
                                        /**
                                         * Clear all data of this object and
@@ -796,7 +796,7 @@ namespace hp
                                         * objects that are used by this
                                         * @p DoFHandler.
                                         */
-      const FECollection<dim> & get_fe () const;
+      const hp::FECollection<dim> & get_fe () const;
 
                                        /**
                                         * Return a constant reference to the
@@ -879,7 +879,7 @@ namespace hp
                                         * (this clears all data of this
                                         * object as well, though).
                                         */
-      SmartPointer<const FECollection<dim> > finite_elements;
+      SmartPointer<const hp::FECollection<dim> > finite_elements;
 
     private:
 
@@ -1002,11 +1002,6 @@ namespace hp
                                         * Make accessor objects friends.
                                         */
       template <int dim1, int dim2, template <int> class DH> friend class DoFObjectAccessor;
-
-                                       /**
-                                        * Make Triangulation friend.
-                                        */
-//    friend class Triangulation<dim>;
   };
 
 
@@ -1147,7 +1142,7 @@ namespace hp
 
   template <int dim>
   inline
-  const FECollection<dim> &
+  const hp::FECollection<dim> &
   DoFHandler<dim>::get_fe () const
   {
     return *finite_elements;

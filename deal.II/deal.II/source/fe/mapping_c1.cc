@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -237,6 +237,15 @@ MappingC1<dim>::add_quad_support_points (const typename Triangulation<dim>::cell
 					 std::vector<Point<dim> > &) const
 {
   Assert (false, ExcNotImplemented());
+}
+
+
+
+template <int dim>
+Mapping<dim> *
+MappingC1<dim>::clone () const
+{
+  return new MappingC1<dim>(*this);
 }
 
 

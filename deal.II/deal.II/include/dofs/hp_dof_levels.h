@@ -47,25 +47,26 @@ namespace hp
  *  hierarchy.
  *
  *  In @ref{DoFLevel<0>} all data is stored which is not dependent on the
- *  dimension, e.g. a field to store the index referring to the FECollection
- *  class. The data therefore corresponds to cells, rather than vertices,
- *  lines, quads, etc.
+ *  dimension, e.g. a field to store the index referring to the
+ *  hp::FECollection class. The data therefore corresponds to cells, rather
+ *  than vertices, lines, quads, etc.
  */
   template <>
   class DoFLevel<0>
   {
     public:
                                        /**
-                                        *  Indices specifying the finite element
-                                        *  of FECollection to use for the
-                                        *  different cells. The meaning
-                                        *  what a cell is, is dimension specific,
-                                        *  therefore also the length of this
-                                        *  vector depends on the dimension: in
-                                        *  one dimension, the length of this
-                                        *  vector equals the length of the
-                                        *  @p lines vector, in two dimensions
-                                        *  that of the @p quads vector, etc.
+                                        *  Indices specifying the finite
+                                        *  element of hp::FECollection to use
+                                        *  for the different cells. The
+                                        *  meaning what a cell is, is
+                                        *  dimension specific, therefore also
+                                        *  the length of this vector depends
+                                        *  on the dimension: in one dimension,
+                                        *  the length of this vector equals
+                                        *  the length of the @p lines vector,
+                                        *  in two dimensions that of the @p
+                                        *  quads vector, etc.
                                         */
 
       std::vector<unsigned int> active_fe_indices;

@@ -61,22 +61,22 @@ namespace hp
 
     template <int dim, int q_dim>
     FEValuesBase<dim,q_dim>::FEValuesBase (
-      const MappingCollection<dim> &mapping_collection,
-      const QCollection<q_dim>     &qcollection,
+      const hp::MappingCollection<dim> &mapping_collection,
+      const hp::QCollection<q_dim>     &q_collection,
       const UpdateFlags             update_flags)
                     :
                     mapping_collection (mapping_collection),
-                    qcollection (qcollection),
+                    q_collection (q_collection),
                     update_flags (update_flags)
     {}
 
 
     template <int dim, int q_dim>
-    FEValuesBase<dim,q_dim>::FEValuesBase (const QCollection<q_dim> &qcollection,
+    FEValuesBase<dim,q_dim>::FEValuesBase (const hp::QCollection<q_dim> &q_collection,
                                            const UpdateFlags         update_flags)
                     :
                     mapping_collection (default_mapping),
-                    qcollection (qcollection),
+                    q_collection (q_collection),
                     update_flags (update_flags)
     {}
 
@@ -87,23 +87,23 @@ namespace hp
 
 
   template <int dim>
-  FEValues<dim>::FEValues (const MappingCollection<dim> &mapping,
-                           const FECollection<dim>      &/*fe_collection*/,
-                           const QCollection<dim>       &qcollection,
+  FEValues<dim>::FEValues (const hp::MappingCollection<dim> &mapping,
+                           const hp::FECollection<dim>  &/*fe_collection*/,
+                           const hp::QCollection<dim>       &q_collection,
                            const UpdateFlags             update_flags)
                   :
                   internal::FEValuesBase<dim,dim> (mapping,
-                                                   qcollection,
+                                                   q_collection,
                                                    update_flags)
   {}
 
 
   template <int dim>
-  FEValues<dim>::FEValues (const FECollection<dim> &/*fe_collection*/,
-                           const QCollection<dim>  &qcollection,
-                           const UpdateFlags        update_flags)
+  FEValues<dim>::FEValues (const hp::FECollection<dim> &/*fe_collection*/,
+                           const hp::QCollection<dim>      &q_collection,
+                           const UpdateFlags            update_flags)
                   :
-                  internal::FEValuesBase<dim,dim> (qcollection,
+                  internal::FEValuesBase<dim,dim> (q_collection,
                                                    update_flags)
   {}
 
@@ -125,7 +125,7 @@ namespace hp
   {
     return new ::FEValues<dim> (
       this->mapping_collection.get_mapping (active_fe_index), fe,
-      this->qcollection.get_quadrature (active_fe_index),
+      this->q_collection.get_quadrature (active_fe_index),
       this->update_flags);
   }
 
@@ -134,23 +134,23 @@ namespace hp
 
 
   template <int dim>
-  FEFaceValues<dim>::FEFaceValues (const MappingCollection<dim> &mapping,
-                                   const FECollection<dim>  &/*fe_collection*/,
-                                   const QCollection<dim-1> &qcollection,
+  FEFaceValues<dim>::FEFaceValues (const hp::MappingCollection<dim> &mapping,
+                                   const hp::FECollection<dim>  &/*fe_collection*/,
+                                   const hp::QCollection<dim-1> &q_collection,
                                    const UpdateFlags         update_flags)
                   :
                   internal::FEValuesBase<dim,dim-1> (mapping,
-                                                     qcollection,
+                                                     q_collection,
                                                      update_flags)
   {}
 
 
   template <int dim>
-  FEFaceValues<dim>::FEFaceValues (const FECollection<dim>  &/*fe_collection*/,
-                                   const QCollection<dim-1> &qcollection,
+  FEFaceValues<dim>::FEFaceValues (const hp::FECollection<dim>  &/*fe_collection*/,
+                                   const hp::QCollection<dim-1> &q_collection,
                                    const UpdateFlags         update_flags)
                   :
-                  internal::FEValuesBase<dim,dim-1> (qcollection,
+                  internal::FEValuesBase<dim,dim-1> (q_collection,
                                                      update_flags)
   {}
 
@@ -183,7 +183,7 @@ namespace hp
   {
     return new ::FEFaceValues<dim> (
       this->mapping_collection.get_mapping (active_fe_index), fe,
-      this->qcollection.get_quadrature (active_fe_index),
+      this->q_collection.get_quadrature (active_fe_index),
       this->update_flags);
   }
 
@@ -192,23 +192,23 @@ namespace hp
 
 
   template <int dim>
-  FESubfaceValues<dim>::FESubfaceValues (const MappingCollection<dim> &mapping,
-                                         const FECollection<dim>  &/*fe_collection*/,
-                                         const QCollection<dim-1> &qcollection,
+  FESubfaceValues<dim>::FESubfaceValues (const hp::MappingCollection<dim> &mapping,
+                                         const hp::FECollection<dim>  &/*fe_collection*/,
+                                         const hp::QCollection<dim-1> &q_collection,
                                          const UpdateFlags         update_flags)
                   :
                   internal::FEValuesBase<dim,dim-1> (mapping,
-                                                     qcollection,
+                                                     q_collection,
                                                      update_flags)
   {}
 
 
   template <int dim>
-  FESubfaceValues<dim>::FESubfaceValues (const FECollection<dim>  &/*fe_collection*/,
-                                         const QCollection<dim-1> &qcollection,
+  FESubfaceValues<dim>::FESubfaceValues (const hp::FECollection<dim>  &/*fe_collection*/,
+                                         const hp::QCollection<dim-1> &q_collection,
                                          const UpdateFlags         update_flags)
                   :
-                  internal::FEValuesBase<dim,dim-1> (qcollection,
+                  internal::FEValuesBase<dim,dim-1> (q_collection,
                                                      update_flags)
   {}
 
@@ -243,7 +243,7 @@ namespace hp
   {
     return new ::FESubfaceValues<dim> (
       this->mapping_collection.get_mapping (active_fe_index), fe,
-      this->qcollection.get_quadrature (active_fe_index),
+      this->q_collection.get_quadrature (active_fe_index),
       this->update_flags);
   }
 

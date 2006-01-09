@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -123,6 +123,14 @@ class MappingQ : public MappingQ1<dim>
 				      * was passed to the constructor.
 				      */
     unsigned int get_degree () const;
+
+                                     /**
+                                      * Return a pointer to a copy of the
+                                      * present object. The caller of this
+                                      * copy then assumes ownership of it.
+                                      */
+    virtual
+    Mapping<dim> * clone () const;
     
 				     /** 
 				      * Storage for internal data of

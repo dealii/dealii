@@ -614,7 +614,7 @@ class DGMethod
                                      // objects for the different polynomial
                                      // degrees will be stored in the
                                      // fe_collection object.
-    FECollection<dim>    fe_collection;
+    hp::FECollection<dim>    fe_collection;
 
 				     // As already mentioned, the
                                      // standard DoFHandler has to be
@@ -633,10 +633,8 @@ class DGMethod
                                      // rules for each polynomial
                                      // degree which will be used in the
                                      // computations.
-    std::vector<Quadrature<dim> *> quad;
-    QCollection<dim>   *quadrature;
-    std::vector<Quadrature<dim-1> *> face_quad;
-    QCollection<dim-1> *face_quadrature;
+    hp::QCollection<dim>   quadratures;
+    hp::QCollection<dim-1> face_quadratures;
     
 				     // And there are two solution
 				     // vectors, that store the
@@ -664,11 +662,6 @@ DGMethod<dim>::DGMethod ()
 		dof_handler (triangulation),
 		dg ()
 {
-    quadrature = new QCollection<dim> ();
-    face_quadrature = new QCollection<dim-1> (); 
-    
-    Quadrature<dim> *quad_temp;
-    Quadrature<dim-1> *face_quad_temp;
 				     // Change here for hp
 				     // methods of
 				     // different maximum degrees.
@@ -677,15 +670,8 @@ DGMethod<dim>::DGMethod ()
     for (unsigned int i = 0; i < hp_degree; ++i)
     {
 	elm_no = fe_collection.add_fe (FE_DGQ<dim> (i+1));
-
-	quad_temp = new QGauss<dim> (i+2);
-	quad.push_back (quad_temp);
-	quadrature->add_quadrature (*quad_temp);
-
-	//	face_quad_temp = new QGauss<dim-1> (7);
-	face_quad_temp = new QGauss<dim-1> (i+2);
-	face_quad.push_back (face_quad_temp);
-	face_quadrature->add_quadrature (*face_quad_temp);
+	quadratures.add_quadrature (QGauss<dim> (i+2));
+	face_quadratures.add_quadrature (QGauss<dim-1> (i+2));
     }
 }
 
@@ -694,19 +680,6 @@ template <int dim>
 DGMethod<dim>::~DGMethod () 
 {
   dof_handler.clear ();
-
-  // Free the dynamically created quadrature rules
-  delete quadrature;
-  delete face_quadrature;
-
-  typename std::vector<Quadrature<dim> *>::iterator quad_iter;
-  for (quad_iter = quad.begin (); quad_iter != quad.end (); ++quad_iter)
-    delete (*quad_iter);
-
-  typename std::vector<Quadrature<dim-1> *>::iterator face_quad_iter;
-  for (face_quad_iter = face_quad.begin (); 
-       face_quad_iter != face_quad.end (); ++face_quad_iter)
-    delete (*face_quad_iter);
 }
 
 
@@ -854,7 +827,7 @@ void DGMethod<dim>::assemble_system1 ()
 				   // assumes a ``MappingQ1'' mapping)
 				   // and makes it easier to change
 				   // the mapping object later.
-  hp::FEValues<dim> fe_v_x (mapping, fe_collection, *quadrature, update_flags);
+  hp::FEValues<dim> fe_v_x (mapping, fe_collection, quadratures, update_flags);
   
 				   // Similarly we create the
 				   // ``FEFaceValues'' and
@@ -867,13 +840,13 @@ void DGMethod<dim>::assemble_system1 ()
 				   // current cell and the face (and
 				   // subface) number.
   hp::FEFaceValues<dim> fe_v_face_x (
-    mapping, fe_collection, *face_quadrature, face_update_flags);
+    mapping, fe_collection, face_quadratures, face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_x (
-    mapping, fe_collection, *face_quadrature, face_update_flags);
+    mapping, fe_collection, face_quadratures, face_update_flags);
   hp::FEFaceValues<dim> fe_v_face_neighbor_x (
-    mapping, fe_collection, *face_quadrature, neighbor_face_update_flags);
+    mapping, fe_collection, face_quadratures, neighbor_face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_neighbor_x (
-    mapping, fe_collection, *face_quadrature, neighbor_face_update_flags);
+    mapping, fe_collection, face_quadratures, neighbor_face_update_flags);
 
 				   // Now we create the cell matrices
 				   // and vectors. Here we need two
@@ -1348,13 +1321,13 @@ void DGMethod<dim>::assemble_system2 ()
 				   // ``fe_v_face_neighbor'' as case 4
 				   // does not occur.
   hp::FEValues<dim> fe_v_x (
-    mapping, fe_collection, *quadrature, update_flags);
+    mapping, fe_collection, quadratures, update_flags);
   hp::FEFaceValues<dim> fe_v_face_x (
-    mapping, fe_collection, *face_quadrature, face_update_flags);
+    mapping, fe_collection, face_quadratures, face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_x (
-    mapping, fe_collection, *face_quadrature, face_update_flags);
+    mapping, fe_collection, face_quadratures, face_update_flags);
   hp::FEFaceValues<dim> fe_v_face_neighbor_x (
-    mapping, fe_collection, *face_quadrature, neighbor_face_update_flags);
+    mapping, fe_collection, face_quadratures, neighbor_face_update_flags);
 
   const unsigned int max_dofs_per_cell = fe_collection.max_dofs_per_cell ();
 

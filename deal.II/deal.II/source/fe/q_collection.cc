@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003 by the deal.II authors
+//    Copyright (C) 2003, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,65 +15,78 @@
 #include <fe/q_collection.h>
 
 
-template <int dim>
-QCollection<dim>::QCollection () :
-    single_quadrature (false)
+
+namespace hp
 {
-}
+  
+  template <int dim>
+  QCollection<dim>::QCollection ()
+                  :
+                  single_quadrature (false)
+  {
+  }
 
 
-template <int dim>
-QCollection<dim>::QCollection (const Quadrature<dim> &quadrature) :
-    single_quadrature (true)
-{
-    quadratures.push_back (&quadrature);
-}
+  template <int dim>
+  QCollection<dim>::QCollection (const Quadrature<dim> &quadrature)
+                  :
+                  single_quadrature (true)
+  {
+    quadratures
+      .push_back (boost::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(quadrature)));
+  }
 
+  
 
-template <int dim>
-inline
-const Quadrature<dim> &
-QCollection<dim>::get_quadrature (const unsigned int active_fe_index) const
-{
-    SmartPointer<const Quadrature<dim> > quad;
-
+  template <int dim>
+  inline
+  const Quadrature<dim> &
+  QCollection<dim>::get_quadrature (const unsigned int active_fe_index) const
+  {
+                                     // if we have only a single quadrature
+                                     // that was given during construction,
+                                     // return this one. otherwise pick out
+                                     // the correct one
     if (single_quadrature)
-	quad = quadratures[0];
+      return *quadratures[0];
     else
-    {
+      {
 	Assert (active_fe_index < quadratures.size (),
 		ExcIndexRange (active_fe_index, 0, quadratures.size ()));
-	quad = quadratures[active_fe_index];
-    }
-
-    return *quad;
-}
+	return *quadratures[active_fe_index];
+      }
+  }
 
 
-template <int dim>
-unsigned int
-QCollection<dim>::memory_consumption () const
-{
+  template <int dim>
+  unsigned int
+  QCollection<dim>::memory_consumption () const
+  {
     return (sizeof(*this) +
 	    MemoryConsumption::memory_consumption (quadratures));
-}
+  }
 
 
-template <int dim>
-unsigned int QCollection<dim>::
-add_quadrature (const Quadrature<dim> &new_quadrature)
-{
-    // A QCollection, which was initialized as single QCollection cannot
-    // administrate other Quadratures.
-    Assert (!single_quadrature,
-	    ExcNotInitialized ());
-    quadratures.push_back (&new_quadrature);
-    return (quadratures.size ());
-}
+  template <int dim>
+  unsigned int QCollection<dim>::
+  add_quadrature (const Quadrature<dim> &new_quadrature)
+  {
+                                     // A QCollection, which was initialized
+                                     // as single QCollection cannot
+                                     // administrate other Quadratures.
+    Assert (!single_quadrature, ExcNotInitialized ());
+
+    quadratures
+      .push_back (boost::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(new_quadrature)));
+    return quadratures.size ();
+  }
 
 
 // explicit instantiations
-template class QCollection<deal_II_dimension>;
+  template class QCollection<deal_II_dimension>;
 #if deal_II_dimension >= 2
-template class QCollection<deal_II_dimension-1>;
+  template class QCollection<deal_II_dimension-1>;
 #endif
+
+  
+}

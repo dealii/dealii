@@ -1377,7 +1377,7 @@ namespace hp
 
 
   template <int dim>
-  void DoFHandler<dim>::distribute_dofs (const FECollection<dim> &ff)
+  void DoFHandler<dim>::distribute_dofs (const hp::FECollection<dim> &ff)
   {
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
 

@@ -167,8 +167,8 @@ namespace hp
                                           * indicated by the parameters
                                           * to the constructor.
                                           */
-        FEValuesBase (const MappingCollection<dim> &mapping_collection,
-                      const QCollection<q_dim>     &qcollection,
+        FEValuesBase (const hp::MappingCollection<dim> &mapping_collection,
+                      const hp::QCollection<q_dim>     &q_collection,
                       const UpdateFlags             update_flags);
 
 
@@ -181,18 +181,18 @@ namespace hp
                                           * object for the mapping
                                           * object.
                                           */
-        FEValuesBase (const QCollection<q_dim> &qcollection,
+        FEValuesBase (const hp::QCollection<q_dim> &q_collection,
                       const UpdateFlags         update_flags);
 
 
       protected:
                                          /**
-                                          * A copy of the MappingCollection
+                                          * A copy of the hp::MappingCollection
                                           * object, which was specified
                                           * upon construction of the
                                           * object.
                                           */
-        const MappingCollection<dim> mapping_collection;
+        const hp::MappingCollection<dim> mapping_collection;
     
                                          /**
                                           * Copy of the quadrature
@@ -200,7 +200,7 @@ namespace hp
                                           * provided to the
                                           * constructor.
                                           */
-        const QCollection<q_dim> qcollection;
+        const hp::QCollection<q_dim> q_collection;
 
                                          /**
                                           * Values of the update flags as
@@ -237,9 +237,9 @@ namespace hp
                                         * DoFHandler<tt>::get_fe()</tt>
                                         * function.
                                         */
-      FEValues (const MappingCollection<dim> &mapping_collection,
-                const FECollection<dim>      &fe_collection,
-                const QCollection<dim>       &qcollection,
+      FEValues (const hp::MappingCollection<dim> &mapping_collection,
+                const hp::FECollection<dim>  &fe_collection,
+                const hp::QCollection<dim>       &q_collection,
                 const UpdateFlags             update_flags);
 
 
@@ -265,9 +265,9 @@ namespace hp
                                         * DoFHandler<tt>::get_fe()</tt>
                                         * function.
                                         */
-      FEValues (const FECollection<dim> &fe_collection,
-                const QCollection<dim>  &qcollection,
-                const UpdateFlags        update_flags);
+      FEValues (const hp::FECollection<dim> &fe_collection,
+                const hp::QCollection<dim>      &q_collection,
+                const UpdateFlags            update_flags);
 
 
                                        /**
@@ -321,9 +321,9 @@ namespace hp
                                         * DoFHandler<tt>::get_fe()</tt>
                                         * function.
                                         */
-      FEFaceValues (const MappingCollection<dim> &mapping_collection,
-                    const FECollection<dim>      &fe_collection,
-                    const QCollection<dim-1>     &qcollection,
+      FEFaceValues (const hp::MappingCollection<dim> &mapping_collection,
+                    const hp::FECollection<dim>  &fe_collection,
+                    const hp::QCollection<dim-1>     &q_collection,
                     const UpdateFlags             update_flags);
 
 
@@ -349,9 +349,9 @@ namespace hp
                                         * DoFHandler<tt>::get_fe()</tt>
                                         * function.
                                         */
-      FEFaceValues (const FECollection<dim>  &fe_collection,
-                    const QCollection<dim-1> &qcollection,
-                    const UpdateFlags         update_flags);
+      FEFaceValues (const hp::FECollection<dim>  &fe_collection,
+                    const hp::QCollection<dim-1>     &q_collection,
+                    const UpdateFlags             update_flags);
 
 
                                        /**
@@ -430,9 +430,9 @@ namespace hp
                                         * DoFHandler<tt>::get_fe()</tt>
                                         * function.
                                         */
-      FESubfaceValues (const MappingCollection<dim> &mapping_collection,
-                       const FECollection<dim>      &fe_collection,
-                       const QCollection<dim-1>     &qcollection,
+      FESubfaceValues (const hp::MappingCollection<dim> &mapping_collection,
+                       const hp::FECollection<dim>  &fe_collection,
+                       const hp::QCollection<dim-1>     &q_collection,
                        const UpdateFlags             update_flags);
 
 
@@ -458,9 +458,9 @@ namespace hp
                                         * DoFHandler<tt>::get_fe()</tt>
                                         * function.
                                         */
-      FESubfaceValues (const FECollection<dim>  &fe_collection,
-                       const QCollection<dim-1> &qcollection,
-                       const UpdateFlags         update_flags);
+      FESubfaceValues (const hp::FECollection<dim> &fe_collection,
+                       const hp::QCollection<dim-1>    &q_collection,
+                       const UpdateFlags            update_flags);
 
 
                                        /**

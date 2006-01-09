@@ -428,8 +428,9 @@ class DoFObjectAccessor : public DoFAccessor<dim, DH>,
     get_fe () const;
     
                                      /**
-				      *  Returns the index inside the FECollection
-				      *  of the FiniteElement used for this cell.
+				      *  Returns the index inside the
+				      *  hp::FECollection of the FiniteElement
+				      *  used for this cell.
 				      */
     unsigned int active_fe_index () const;
 
@@ -734,8 +735,9 @@ class DoFObjectAccessor<1, dim, DH> :  public DoFAccessor<dim, DH>,
     get_fe () const;
     
                                      /**
-				      *  Returns the index inside the FECollection
-				      *  of the FiniteElement used for this cell.
+				      *  Returns the index inside the
+				      *  hp::FECollection of the FiniteElement
+				      *  used for this cell.
 				      */
     unsigned int active_fe_index () const;
 
@@ -974,8 +976,9 @@ class DoFObjectAccessor<2, dim, DH> :  public DoFAccessor<dim, DH>,
     get_fe () const;
     
                                      /**
-				      *  Returns the index inside the FECollection
-				      *  of the FiniteElement used for this cell.
+				      *  Returns the index inside the
+				      *  hp::FECollection of the FiniteElement
+				      *  used for this cell.
 				      */
     unsigned int active_fe_index () const;
 
@@ -1222,8 +1225,9 @@ class DoFObjectAccessor<3, dim, DH> :  public DoFAccessor<dim, DH>,
     get_fe () const;
 
                                      /**
-				      *  Returns the index inside the FECollection
-				      *  of the FiniteElement used for this cell.
+				      *  Returns the index inside the
+				      *  hp::FECollection of the FiniteElement
+				      *  used for this cell.
 				      */
     unsigned int active_fe_index () const;
 

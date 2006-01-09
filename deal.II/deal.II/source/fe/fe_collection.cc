@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,53 +15,44 @@
 #include <fe/fe_collection.h>
 
 
-template <int dim>
-FECollection<dim>::~FECollection ()
+namespace hp
 {
-  for (unsigned int i=0; i<finite_elements.size(); ++i)
-    {
-      const FiniteElement<dim> *p = finite_elements[i];
-      finite_elements[i] = 0;
-      delete p;
-    }
+  template <int dim>
+  unsigned int FECollection<dim>::add_fe (const FiniteElement<dim> &new_fe)
+  {
+                                     // check that the new element has the right
+                                     // number of components. only check with
+                                     // the first element, since all the other
+                                     // elements have already passed the test
+                                     // against the first element
+    if (finite_elements.size() != 0)
+      Assert (new_fe.n_components() == finite_elements[0]->n_components(),
+              ExcMessage ("All elements inside a collection need to have the "
+                          "same number of vector components!"));
   
-  finite_elements.clear ();
-}
+    finite_elements
+      .push_back (boost::shared_ptr<const FiniteElement<dim> >(new_fe.clone()));
+    
+    return finite_elements.size ();
+  }
 
 
 
-template <int dim>
-unsigned int FECollection<dim>::add_fe (const FiniteElement<dim> &new_fe)
-{
-                                   // check that the new element has the right
-                                   // number of components. only check with
-                                   // the first element, since all the other
-                                   // elements have already passed the test
-                                   // against the first element
-  if (finite_elements.size() != 0)
-    Assert (new_fe.n_components() == finite_elements[0]->n_components(),
-            ExcMessage ("All elements inside a collection need to have the "
-                        "same number of vector components!"));
-  
-  finite_elements.push_back (new_fe.clone());
-  return (finite_elements.size ());
-}
+  template <int dim>
+  unsigned int
+  FECollection<dim>::memory_consumption () const
+  {
+    unsigned int mem
+      = (sizeof(*this) +
+         MemoryConsumption::memory_consumption (finite_elements));
+    for (unsigned int i=0; i<finite_elements.size(); ++i)
+      mem += finite_elements[i]->memory_consumption();
 
-
-
-template <int dim>
-unsigned int
-FECollection<dim>::memory_consumption () const
-{
-  unsigned int mem
-    = (sizeof(*this) +
-       MemoryConsumption::memory_consumption (finite_elements));
-  for (unsigned int i=0; i<finite_elements.size(); ++i)
-    mem += finite_elements[i]->memory_consumption();
-
-  return mem;
-}
+    return mem;
+  }
 
 
 // explicit instantiations
-template class FECollection<deal_II_dimension>;
+  template class FECollection<deal_II_dimension>;
+  
+}

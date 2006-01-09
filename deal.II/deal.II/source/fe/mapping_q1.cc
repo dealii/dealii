@@ -1021,6 +1021,15 @@ transform_real_to_unit_cell_internal
     }
 }
 
+
+
+template <int dim>
+Mapping<dim> *
+MappingQ1<dim>::clone () const
+{
+  return new MappingQ1<dim>(*this);
+}
+
 //---------------------------------------------------------------------------
 
 template class MappingQ1<deal_II_dimension>;
