@@ -102,6 +102,12 @@
  * @ref GlossGeneralizedSupport "generalized support points".
  * </dd>
  *
+ * <dt>@anchor GlossTargetComponent Target component</dt> <dd>When
+ * vectors and matrices are grouped into blocks by component, it is
+ * often desirable to collect several of the original components into
+ * a single one. This could be for instance, grouping the velocities
+ * of a Stokes system into a single block.</dd>
+ * 
  * <dt>@anchor GlossUnitCell Unit cell</dt>
  * <dd>See @ref GlossReferenceCell "Reference cell".</dd>
  *
