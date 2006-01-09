@@ -27,9 +27,15 @@
 #include <set>
 
 
+/*!@addtogroup hp */
+/*@{*/
+
+
 /**
  * A namespace that holds all the classes that have to do with hp finite
  * elements.
+ * 
+ * @ingroup hp
  */
 namespace hp
 {
@@ -41,11 +47,11 @@ namespace hp
  * Manage the distribution and numbering of the degrees of freedom for
  * hp-FEM algorithms.
  *
- * @ingroup dofs
+ * @ingroup hp
  */
   template <int dim>
-  class DoFHandler  :  public Subscriptor,
-                       protected Triangulation<dim>::RefinementListener
+  class DoFHandler : public Subscriptor,
+                     protected Triangulation<dim>::RefinementListener
   {
       typedef internal::DoFIteratorSelector<DoFHandler<dim> > IteratorSelector;
     public:
@@ -996,12 +1002,12 @@ namespace hp
                                        /**
                                         * Make accessor objects friends.
                                         */
-      template <int dim1, template <int> class DH> friend class DoFAccessor;
+      template <int dim1, template <int> class DH> friend class ::DoFAccessor;
 
                                        /**
                                         * Make accessor objects friends.
                                         */
-      template <int dim1, int dim2, template <int> class DH> friend class DoFObjectAccessor;
+      template <int dim1, int dim2, template <int> class DH> friend class ::DoFObjectAccessor;
   };
 
 
@@ -1159,6 +1165,7 @@ namespace hp
   
 }
 
+/*@}*/
 
 #endif
 
