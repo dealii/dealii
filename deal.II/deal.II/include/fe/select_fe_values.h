@@ -34,8 +34,16 @@ namespace hp
 
 
 
+/**
+ * 
+ * @ingroup hp
+ */  
 template <typename> struct SelectFEValues;
 
+/**
+ * 
+ * @ingroup hp
+ */  
 template <int dim> struct SelectFEValues<DoFHandler<dim> >
 {
     typedef FEValues<dim>        FEValues;
@@ -44,6 +52,10 @@ template <int dim> struct SelectFEValues<DoFHandler<dim> >
 };
 
 
+/**
+ * 
+ * @ingroup hp
+ */  
 template <int dim> struct SelectFEValues<hp::DoFHandler<dim> >
 {
     typedef hp::FEValues<dim>        FEValues;

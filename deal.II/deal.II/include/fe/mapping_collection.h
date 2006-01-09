@@ -37,6 +37,8 @@ namespace hp
  * achieve optimal convergence rates.  Hence providing a single mapping object
  * will usually suffice.
  * 
+ * @ingroup hp
+ * 
  * @author Oliver Kayser-Herold, 2005
  */
   template <int dim>

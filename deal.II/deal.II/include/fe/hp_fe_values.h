@@ -29,7 +29,12 @@ template <int dim> class FiniteElement;
 
 namespace hp
 {
-  
+
+/**
+ * A namespace for hp implementation details.
+ * 
+ * @ingroup hp
+ */
   namespace internal 
   {
 /**
@@ -38,6 +43,8 @@ namespace hp
  * <tt>FEFaceValues<dim></tt>, ...) objects. The <tt>hpFE*Values</tt> classes
  * use this to hold an <tt>FE*Values</tt> object for each finite element
  * that is used in the triangulation that it integrates on.
+ * 
+ * @ingroup hp
  */
     template <int dim, class FEValues>
     class FEValuesMap
@@ -146,6 +153,8 @@ namespace hp
  * dimension we are in, the second the dimensionality of the object
  * that we integrate on, i.e. for usual @p hp::FEValues it is equal to
  * the first one, while for face integration it is one less.
+ * 
+ * @ingroup hp
  *
  * @author Wolfgang Bangerth, 2003
  */
@@ -211,7 +220,10 @@ namespace hp
   }
 
 
-
+/**
+ * 
+ * @ingroup hp
+ */  
   template <int dim>
   class FEValues : public hp::internal::FEValuesMap<dim,::FEValues<dim> >,
                    protected hp::internal::FEValuesBase<dim,dim>
@@ -296,6 +308,10 @@ namespace hp
 
 
 
+/**
+ * 
+ * @ingroup hp
+ */  
   template <int dim>
   class FEFaceValues : public hp::internal::FEValuesMap<dim,::FEFaceValues<dim> >,
                        protected hp::internal::FEValuesBase<dim,dim-1>
@@ -405,6 +421,10 @@ namespace hp
 
 
 
+/**
+ * 
+ * @ingroup hp
+ */  
   template <int dim>
   class FESubfaceValues : public hp::internal::FEValuesMap<dim,::FESubfaceValues<dim> >,
                           protected hp::internal::FEValuesBase<dim,dim-1>

@@ -40,6 +40,8 @@ namespace hp
  * is the DataOut class. Due to this conversion constructor, these lines
  * of code continue to work without modifications.
  * 
+ * @ingroup hp
+ * 
  * @author Oliver Kayser-Herold, 2005
  */
   template <int dim>

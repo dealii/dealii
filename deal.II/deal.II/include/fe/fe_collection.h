@@ -34,6 +34,8 @@ namespace hp
  * the worst case when using the finite elements associated with the cells of
  * a triangulation.
  * 
+ * @ingroup hp
+ * 
  * @author Wolfgang Bangerth, 2003
  */
   template <int dim>

@@ -26,6 +26,8 @@ namespace hp
  * objects of dimension @p N.  Declare this general template
  * class, but do not actually use it. Rather, only specializations of
  * this class are used.
+ * 
+ * @ingroup hp
  *
  * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
  */
@@ -50,6 +52,8 @@ namespace hp
  *  dimension, e.g. a field to store the index referring to the
  *  hp::FECollection class. The data therefore corresponds to cells, rather
  *  than vertices, lines, quads, etc.
+ * 
+ * @ingroup hp
  */
   template <>
   class DoFLevel<0>
@@ -123,6 +127,8 @@ namespace hp
  * is used, the indices are stored in the @p vertex_dofs array of the
  * DoFHandler class.
  *
+ * 
+ * @ingroup hp
  * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
  */
   template <>
@@ -157,6 +163,8 @@ namespace hp
 /**
  * Store the indices of the degrees of freedom which are located on
  * quads.  See @ref{DoFLevel<1>} for more information.
+ * 
+ * @ingroup hp
  *
  * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
  */
@@ -193,6 +201,8 @@ namespace hp
 /**
  * Store the indices of the degrees of freedom which are located on
  * hexhedra.  See @ref{DoFLevel<1>} for more information.
+ * 
+ * @ingroup hp
  *
  * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
  */

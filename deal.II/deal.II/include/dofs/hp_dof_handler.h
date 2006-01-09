@@ -27,10 +27,6 @@
 #include <set>
 
 
-/*!@addtogroup hp */
-/*@{*/
-
-
 /**
  * A namespace that holds all the classes that have to do with hp finite
  * elements.
@@ -1164,8 +1160,6 @@ namespace hp
   }
   
 }
-
-/*@}*/
 
 #endif
 
