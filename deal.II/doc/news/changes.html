@@ -215,6 +215,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: The <code class="class">FilteredMatrix</code> class
+       was able to filter only the <code class="class">SparseMatrix</code>
+       matrix class.
+       A new (faster) version is now in its place with the same interface 
+       that is able to perform such a filter on anything that provides 
+       the usual matrix vector operations.
+       <br> 
+       (Luca Heltai 2006/01/09)
+       </p>
+
+  <li> <p>
        New: All solver classes took an argument of type <code
        class="class">VectorMemory</code> which they use to allocate
        memory for temporary vectors. A clever implementation of this
