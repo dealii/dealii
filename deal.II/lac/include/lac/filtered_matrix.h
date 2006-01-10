@@ -169,7 +169,7 @@ template <typename number> class Vector;
  * <h3>Template arguments</h3>
  *
  * This class takes as template arguments a matrix and a vector
- * class. The former must provide @p vmult, @p Tvmult, and
+ * class. The former must provide @p vmult, @p vmult_add,  @p Tvmult, and
  * @p residual member function that operate on the vector type (the
  * second template argument). The latter template parameter must
  * provide access to indivual elements through <tt>operator()</tt>,
@@ -190,7 +190,7 @@ template <typename number> class Vector;
  * bottleneck. If you don't want this serialization of operations, you
  * have to use several objects of this type.
  *
- * @author Wolfgang Bangerth 2001
+ * @author Wolfgang Bangerth 2001, Luca Heltai 2006
  */
 template <class MATRIX, class VECTOR=Vector<typename MATRIX::value_type> >
 class FilteredMatrix : public Subscriptor
@@ -278,19 +278,7 @@ class FilteredMatrix : public Subscriptor
 				      * contains an entry for a degree
 				      * of freedom that has already
 				      * been constrained
-				      * previously. Furthermore, it is
-				      * assumed that the list of
-				      * constraints is sorted. If the
-				      * input argument is a
-				      * <tt>std::map<unsigned,value_type></tt>,
-				      * this is automatically the
-				      * case.
-				      *
-				      * Note that we do not check
-				      * whether the input range is
-				      * sorted, as this would be too
-				      * expensive. You have to ensure
-				      * this yourself.
+				      * previously.
 				      */
     template <class ConstraintList>
     void add_constraints (const ConstraintList &new_constraints);
@@ -552,22 +540,6 @@ class FilteredMatrix : public Subscriptor
 				      */
     void allocate_tmp_vector ();
 
-				     /**
-				      * Determine all entries in the
-				      * given column of the matrix
-				      * except for the diagonal entry
-				      * and return their index/value
-				      * pairs. If the matrix is
-				      * symmetric, use a faster
-				      * algorithm.
-				      *
-				      * This function needs to be
-				      * specialized for the different
-				      * matrix types.
-				      */
-    void get_column_entries (const unsigned int           index,
-			     std::vector<IndexValuePair> &column_entries,
-			     const bool                   matrix_is_symmetric) const;
 };
 
 /*@}*/
