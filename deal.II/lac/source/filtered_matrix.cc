@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,11 +37,11 @@ allocate_tmp_vector ()    \
 }
 
 FILT(SparseMatrix<double>, Vector<double>)
-FILT(SparseMatrix<float>, Vector<float>)
+BFILT(BlockSparseMatrix<double>, BlockVector<double>)
 template class FilteredMatrix<SparseMatrix<double>,Vector<double> >;
 template class FilteredMatrix<BlockSparseMatrix<double>,BlockVector<double> >;
 
-BFILT(BlockSparseMatrix<double>, BlockVector<double>)
+FILT(SparseMatrix<float>, Vector<float>)
 BFILT(BlockSparseMatrix<float>, BlockVector<float>)
 template class FilteredMatrix<SparseMatrix<float>,Vector<float> >;
 template class FilteredMatrix<BlockSparseMatrix<float>,BlockVector<float> >;
