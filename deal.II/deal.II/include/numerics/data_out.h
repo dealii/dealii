@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -778,9 +778,9 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 #  ifdef DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG
     template <typename> friend class DataEntry;
 #  else
-    template <int N1, template <int> class DH, int N2, int N3>
+    template <int N1, template <int> class DH1, int N2, int N3>
     template <typename>
-    friend class DataOut_DoFData<N1,DH,N2,N3>::DataEntry;
+    friend class DataOut_DoFData<N1,DH1,N2,N3>::DataEntry;
 #  endif
 #endif
 };
