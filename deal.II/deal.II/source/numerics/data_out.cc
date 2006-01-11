@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,8 +41,8 @@
 
 template <int dof_handler_dim, template <int> class DH,
 	  int patch_dim, int patch_space_dim>
-DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::DataEntryBase::
-DataEntryBase (const std::vector<std::string> &names)
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
+DataEntryBase::DataEntryBase (const std::vector<std::string> &names)
 		:
 		names(names)
 {}
@@ -51,7 +51,7 @@ DataEntryBase (const std::vector<std::string> &names)
 
 template <int dof_handler_dim, template <int> class DH,
 	  int patch_dim, int patch_space_dim>
-DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::DataEntryBase::
+DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::
 DataEntryBase::~DataEntryBase ()
 {}
 
