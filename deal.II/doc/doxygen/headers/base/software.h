@@ -1,5 +1,5 @@
 /**
- * @page DEALSoftware Third party software deal.II collaborates with.
+ * @page DEALSoftware Third party software deal.II collaborates with
  *
  * @note Names of software products are trademarks of their respective owners.
  *
