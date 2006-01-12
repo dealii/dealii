@@ -89,7 +89,7 @@
  /*@}*/
 
 /**
- * @defgroup Solvers Linear Solver classes
+ * @defgroup Solvers Linear solver classes
  *
  * Here we collect iterative solvers and some control classes. All
  * solvers inherit from the class template Solver, which provides some
