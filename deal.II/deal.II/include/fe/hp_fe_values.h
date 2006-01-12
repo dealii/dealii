@@ -246,7 +246,7 @@ namespace hp
                                         * the respective parameter in
                                         * that function also being the
                                         * return value of the
-                                        * DoFHandler<tt>::get_fe()</tt>
+                                        * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
       FEValues (const hp::MappingCollection<dim> &mapping_collection,
@@ -274,7 +274,7 @@ namespace hp
                                         * the respective parameter in
                                         * that function also being the
                                         * return value of the
-                                        * DoFHandler<tt>::get_fe()</tt>
+                                        * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
       FEValues (const hp::FECollection<dim> &fe_collection,
@@ -334,7 +334,7 @@ namespace hp
                                         * the respective parameter in
                                         * that function also being the
                                         * return value of the
-                                        * DoFHandler<tt>::get_fe()</tt>
+                                        * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
       FEFaceValues (const hp::MappingCollection<dim> &mapping_collection,
@@ -362,7 +362,7 @@ namespace hp
                                         * the respective parameter in
                                         * that function also being the
                                         * return value of the
-                                        * DoFHandler<tt>::get_fe()</tt>
+                                        * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
       FEFaceValues (const hp::FECollection<dim>  &fe_collection,
@@ -447,7 +447,7 @@ namespace hp
                                         * the respective parameter in
                                         * that function also being the
                                         * return value of the
-                                        * DoFHandler<tt>::get_fe()</tt>
+                                        * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
       FESubfaceValues (const hp::MappingCollection<dim> &mapping_collection,
@@ -475,7 +475,7 @@ namespace hp
                                         * the respective parameter in
                                         * that function also being the
                                         * return value of the
-                                        * DoFHandler<tt>::get_fe()</tt>
+                                        * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
       FESubfaceValues (const hp::FECollection<dim> &fe_collection,
