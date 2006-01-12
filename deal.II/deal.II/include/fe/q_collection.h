@@ -64,13 +64,15 @@ namespace hp
 
                                        /**
                                         * Returns a reference to the
-                                        * quadrature rule which was specified
-                                        * by the user for the active_fe_index
-                                        * which is provided as a parameter to
-                                        * this method.
+                                        * quadrature rule specified by the
+                                        * argument.
+                                        *
+                                        * \pre @p index must be between zero
+                                        * and the number of elements of the
+                                        * collection.
                                         */
       const Quadrature<dim> &
-      get_quadrature (const unsigned int active_fe_index) const;
+      get_quadrature (const unsigned int index) const;
 
                                        /**
                                         * Adds a new quadrature rule to the

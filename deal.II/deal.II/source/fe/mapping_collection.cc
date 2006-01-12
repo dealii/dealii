@@ -37,15 +37,15 @@ namespace hp
   template <int dim>
   inline
   const Mapping<dim> &
-  MappingCollection<dim>::get_mapping (const unsigned int active_fe_index) const
+  MappingCollection<dim>::get_mapping (const unsigned int index) const
   {
     if (single_mapping)
       return *mappings[0];
     else
       {
-	Assert (active_fe_index < mappings.size (),
-		ExcIndexRange (active_fe_index, 0, mappings.size ()));
-	return *mappings[active_fe_index];
+	Assert (index < mappings.size (),
+		ExcIndexRange (index, 0, mappings.size ()));
+	return *mappings[index];
       }
   }
 

@@ -66,6 +66,10 @@ namespace hp
                                        /**
                                         * Get a reference to the given element
                                         * in this collection.
+                                        *
+                                        * \pre @p index must be between zero
+                                        * and the number of elements of the
+                                        * collection.
                                         */
       const FiniteElement<dim> &
       get_fe (const unsigned int index) const;

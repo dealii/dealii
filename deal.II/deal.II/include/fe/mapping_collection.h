@@ -75,9 +75,13 @@ namespace hp
                                         * was specified by the user for the
                                         * active_fe_index which is provided
                                         * as a parameter to this method.
+                                        *
+                                        * \pre @p index must be between zero
+                                        * and the number of elements of the
+                                        * collection.
                                         */
       const Mapping<dim> &
-      get_mapping (const unsigned int active_fe_index) const;
+      get_mapping (const unsigned int index) const;
     
                                        /**
                                         * Determine an estimate for the

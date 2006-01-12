@@ -41,7 +41,7 @@ namespace hp
   template <int dim>
   inline
   const Quadrature<dim> &
-  QCollection<dim>::get_quadrature (const unsigned int active_fe_index) const
+  QCollection<dim>::get_quadrature (const unsigned int index) const
   {
                                      // if we have only a single quadrature
                                      // that was given during construction,
@@ -51,9 +51,9 @@ namespace hp
       return *quadratures[0];
     else
       {
-	Assert (active_fe_index < quadratures.size (),
-		ExcIndexRange (active_fe_index, 0, quadratures.size ()));
-	return *quadratures[active_fe_index];
+	Assert (index < quadratures.size (),
+		ExcIndexRange (index, 0, quadratures.size ()));
+	return *quadratures[index];
       }
   }
 
