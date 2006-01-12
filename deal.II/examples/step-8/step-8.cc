@@ -351,7 +351,7 @@ ElasticProblem<dim>::ElasticProblem () :
 				 // possibilities in later examples.
 				 //
 				 // It should be noted that the
-				 // ``FESystem'' object thus created
+				 // ``FESystem'' object so created
 				 // does not actually use the finite
 				 // element which we have passed to it
 				 // as first parameter. We could thus
