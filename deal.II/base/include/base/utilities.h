@@ -108,7 +108,7 @@ namespace Utilities
 
 				   /**
 				    * Read a (signed) integer starting
-				    * at the position in #name
+				    * at the position in @p name
 				    * indicated by the second
 				    * argument, and retun this integer
 				    * as a pair together with how many
