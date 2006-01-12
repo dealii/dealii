@@ -24,9 +24,10 @@ namespace hp
 /**
  * This class acts as a collection of finite element objects used in the
  * hp::DoFHandler. It is thus to a hp::DoFHandler what a
- * FiniteElement is to a ::DoFHandler. This collection stores copies
- * of the original elements added to it, and is therefore handling its memory
- * manegement itself.
+ * FiniteElement is to a ::DoFHandler.
+ *
+ * It implements the concepts stated in the @ref hpcollection module described
+ * in the doxygen documentation.
  *
  * In addition to offering access to the elements of the collection, this
  * class provides access to the maximal number of degrees of freedom per
@@ -34,7 +35,7 @@ namespace hp
  * the worst case when using the finite elements associated with the cells of
  * a triangulation.
  * 
- * @ingroup hp
+ * @ingroup hp hpcollection
  * 
  * @author Wolfgang Bangerth, 2003
  */

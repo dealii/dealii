@@ -29,18 +29,10 @@ namespace hp
  * This class implements a collection of quadrature objects in the same way as
  * the hp::FECollection implements a collection of finite element classes.
  *
- * Although it is strongly recommended to supply an appropriate quadrature
- * for each finite element type used in a hp-computation, the QCollection
- * class implements a conversion constructor from a single quadrature.
- * Therefore it is possible to offer only a single quadrature to the
- * hpFEValues class instead of a QCollection. The reason for this
- * mechanism lies in the structure of the deal.II library. At many places
- * throughout the library pseudo quadrature rules are constructed to obtain
- * the values of the finite element function at certain points. An example
- * is the DataOut class. Due to this conversion constructor, these lines
- * of code continue to work without modifications.
+ * It implements the concepts stated in the @ref hpcollection module described
+ * in the doxygen documentation.
  * 
- * @ingroup hp
+ * @ingroup hp hpcollection
  * 
  * @author Oliver Kayser-Herold, 2005
  */

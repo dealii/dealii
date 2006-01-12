@@ -28,16 +28,19 @@ namespace hp
  * This class implements a collection of mapping objects in the same way as
  * the hp::FECollection implements a collection of finite element classes.
  *
+ * It implements the concepts stated in the @ref hpcollection module described
+ * in the doxygen documentation.
+ * 
  * Although it is recommended to supply an appropriate mapping for each finite
  * element kind used in a hp-computation, the MappingCollection class
  * implements a conversion constructor from a single mapping.  Therefore it is
- * possible to offer only a single mapping to the hpFEValues class instead of
- * a MappingCollection. This is for the convenience of the user, as many
+ * possible to offer only a single mapping to the hp::FEValues class instead of
+ * a hp::MappingCollection. This is for the convenience of the user, as many
  * simple geometries do not require different mappings along the boundary to
  * achieve optimal convergence rates.  Hence providing a single mapping object
  * will usually suffice.
  * 
- * @ingroup hp
+ * @ingroup hp hpcollection
  * 
  * @author Oliver Kayser-Herold, 2005
  */
