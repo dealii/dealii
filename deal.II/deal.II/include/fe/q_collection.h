@@ -67,7 +67,7 @@ namespace hp
                                         * quadrature rule specified by the
                                         * argument.
                                         *
-                                        * \pre @p index must be between zero
+                                        * @pre @p index must be between zero
                                         * and the number of elements of the
                                         * collection.
                                         */

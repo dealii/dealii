@@ -76,7 +76,7 @@ namespace hp
                                         * active_fe_index which is provided
                                         * as a parameter to this method.
                                         *
-                                        * \pre @p index must be between zero
+                                        * @pre @p index must be between zero
                                         * and the number of elements of the
                                         * collection.
                                         */
