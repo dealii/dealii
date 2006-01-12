@@ -24,8 +24,8 @@ template <int dim> class Quadrature;
 /*@{*/
 
 /**
- * Discontinuous tensor product elements based on equidistant support
- * points.
+ * Implementation of scalar, discontinuous tensor product elements
+ * based on equidistant support points.
  *
  * This is a discontinuous finite element based on tensor products of
  * Lagrangian polynomials. The shape functions are Lagrangian

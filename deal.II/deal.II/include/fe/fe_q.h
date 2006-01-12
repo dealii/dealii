@@ -22,10 +22,11 @@
 /*@{*/
 
 /**
- * Implementation of Lagrange finite elements @p Qp that yield the
- * finite element space of continuous, piecewise polynomials of degree
- * @p p. This class is realized using tensor product polynomials
- * based on equidistant support points.
+ * Implementation of a scalar Lagrange finite elements @p Qp that
+ * yield the finite element space of continuous, piecewise polynomials
+ * of degree @p p in each coordinate direction. This class is realized
+ * using tensor product polynomials based on equidistant support
+ * points.
  *
  * The constructor of this class takes the degree @p p of this finite
  * element.
