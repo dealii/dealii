@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,11 +11,25 @@
 //
 //-------------------------------------------------------------------------
 
+
+/**
+ * @defgroup LAC Linear algebra classes
+ *
+ * In this module, classes that have to do with linear algebra are collected,
+ * i.e. mainly those associated matrices, vectors, and the solution of linear
+ * systems.
+ *
+ * The description of individual groups of classes can be found in
+ * sub-modules.
+ */
+
 /**
  * @defgroup Vectors Vector classes
  *
  * Here, we list all the classes that can be used as VECTOR in linear solvers
  * (see Solver) and for matrix operations.
+ *
+ * @ingroup LAC
  */
 
 /**
@@ -34,6 +48,8 @@
  * operations on vectors.
  *
  * @author Guido Kanschat, 2003
+ *
+ * @ingroup LAC
  */
 
 /**
@@ -44,6 +60,8 @@
  * interface required by linear solvers (see Solver).
  *
  * @author Guido Kanschat, 2003
+ *
+ * @ingroup LAC
  */
 
 
@@ -54,6 +72,8 @@
  * operations using the interface defined in Solver.
  *
  * @author Guido Kanschat, 2003
+ *
+ * @ingroup LAC
  */
 
 /**
@@ -62,6 +82,8 @@
  * only used in a special context, we put them in a separate group.
  *
  * @author Guido Kanschat, 2003
+ *
+ * @ingroup LAC
  */
 
  /*@}*/
@@ -82,6 +104,8 @@
  * documentation of Solver are admissible.
  *
  * @author Guido Kanschat, 2003
+ *
+ * @ingroup LAC
  */
 
 /**
@@ -94,6 +118,8 @@
  * overwhelming.
  *
  * @author Guido Kanschat, 2003
+ *
+ * @ingroup LAC
  */
 
 /**
@@ -110,4 +136,6 @@
  * about this.
  *
  * @author Wolfgang Bangerth, 2004
+ *
+ * @ingroup LAC
  */
