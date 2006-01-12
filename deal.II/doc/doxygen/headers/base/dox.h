@@ -28,7 +28,7 @@
  * well as the definition of quadrature formulas that are not tensor products.
  *
  * 
- * @subsection Use
+ * <h3>Use</h3>
  * 
  * Quadrature formulas are used, among other uses, when integrating matrix
  * entries and the components of the right hand side vector. To this end, the
@@ -56,7 +56,7 @@
  * these points.
  * 
  *
- * @subsection QIterated
+ * <h3>QIterated</h3>
  * 
  * The class QIterated is used to construct an iterated quadrature formula out
  * of an existing one, thereby increasing the accuracy of the formula without
@@ -71,7 +71,7 @@
  * products of one-dimensional iterated formulas.
  *
  *
- * @subsection QAnisotropic
+ * <h3>QAnisotropic</h3>
  *
  * While the usual quadrature formulæ of higher dimensions
  * generate tensor products which are equal in each direction, the
@@ -79,7 +79,7 @@
  * formulæ in each direction.
  *
  *
- * @subsection QProjector
+ * <h3>QProjector</h3>
  *
  * The class QProjector is not actually a quadrature rule by itself,
  * but it provides functions for computing quadrature formulas on the
