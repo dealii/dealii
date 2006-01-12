@@ -1609,7 +1609,7 @@ class DataOutBase
 
 /**
  * Write the given list of patches to the output stream in deal.II
- * intermediate format. This is not a format that read by any other
+ * intermediate format. This is not a format understood by any other
  * graphics program, but is rather a direct dump of the intermediate
  * internal format used by deal.II. This internal format is generated
  * by the various classes that can generate output using the
