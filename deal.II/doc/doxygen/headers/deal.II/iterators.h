@@ -331,10 +331,15 @@ a hexehedron in 3d), there are corresponding types and calls like
 dimension independent geometric objects line, quad, and hex. These calls,
 just as the ones above, exist in active and non-active forms.
 
-*/
-/**
-@defgroup Accessors Accessor classes of the mesh iterators
+@ingroup grid
 */
 
 //@}
+
+
+/**
+ * @defgroup Accessors Accessor classes of the mesh iterators
+ * @ingroup Iterators
+*/
+
 
