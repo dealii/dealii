@@ -30,7 +30,8 @@
  * This class provides an interface to group several elements together
  * into one. To the outside world, the resulting object looks just
  * like a usual finite element object, which is composed of several
- * other finite elements that are possibly of different type.
+ * other finite elements that are possibly of different type. The
+ * result is then a vector-valued finite element.
  *
  * The overall numbering of degrees of freedom is as follows: for each
  * subobject (vertex, line, quad, or hex), the degrees of freedom are
