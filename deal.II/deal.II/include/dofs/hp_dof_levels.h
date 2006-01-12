@@ -81,9 +81,9 @@ namespace hp
  * Store the indices of the degrees of freedom which are located on
  * the lines.
  *
- * @sect3{Information for all DoFLevel() classes}
+ * @sect3{Information for all DoFLevel classes}
  *
- * The DoFLevel()<tt><N></tt> classes 
+ * The <tt>DoFLevel<N></tt> classes 
  * store the global indices of the degrees of freedom for each cell on a
  * certain level. The index or number of a degree of freedom is the zero-based
  * index of the according value in the solution vector and the row and column
@@ -96,19 +96,19 @@ namespace hp
  * be viewed as the index into a block vector, where each block contains the
  * different values according to a degree of freedom. It is left to the derived
  * classes, whether the values in a block are stored consecutively or distributed
- * (e.g. if the solution function is $u=(u_1, u_2)$, we could store the values
+ * (e.g. if the solution function is <tt>u=(u_1, u_2)</tt>, we could store the values
  * in the solution vector like
- * $\ldots, u_1^m, u_2^m, u_1^{m+1}, u_2^{m+1},\ldots$ with $m$ denoting the
- * $m$th basis function, or $\ldots, u_1^m, u_1^{m+1}, u_1^{m+2}, \ldots,
- * u_2^m, u_2^{m+1}, u_2^{m+2}, \ldots$, respectively). Likewise, the
- * constraint matrix returned by DoFHandler<tt>::make_hanging_node_constraints ()</tt>
- * is then
- * to be understood as a block matrix.
+ * \f[\ldots, u_1^m, u_2^m, u_1^{m+1}, u_2^{m+1},\ldots\f] with <tt>m</tt> denoting the
+ * <tt>m</tt>-th basis function, or
+ * \f[\ldots, u_1^m, u_1^{m+1}, u_1^{m+2}, \ldots, u_2^m, u_2^{m+1}, u_2^{m+2}, \ldots,\f]
+ * respectively). Likewise, the constraint matrix returned by
+ * DoFHandler::make_hanging_node_constraints ()
+ * is then to be understood as a block matrix.
  *
  * The storage format of the degrees of freedom indices (short: DoF
  * indices) is somewhat like a mirror of the data structures of the
  * triangulation classes.  There is a hierarchy of
- * DoFLevel()<tt><dim></tt> classes for the different dimensions which
+ * <tt>DoFLevel<dim></tt> classes for the different dimensions which
  * have objects named @p line_dofs, @p quad_dofs and so on, in which
  * the indices of DoFs located on lines and quads, respectively, are
  * stored. The indices are stored levelwise. 
