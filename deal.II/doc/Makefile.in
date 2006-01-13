@@ -40,6 +40,7 @@ validate-xrefs:
 
 clean:
 	cd tutorial ; $(MAKE) clean
+	cd doxygen ; $(MAKE) clean
 	cd development ; $(MAKE) clean
 	cd glossary ; $(MAKE) clean
 	-rm class_index.html
