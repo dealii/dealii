@@ -185,7 +185,7 @@ class ParameterHandler;
  *
  * </ul>
  *
- * @ingroup IO
+ * @ingroup output
  * @author Wolfgang Bangerth, Guido Kanschat 1999, 2000, 2001, 2002, 2005.
  */
 class DataOutBase 
@@ -215,7 +215,7 @@ class DataOutBase
 				      * |  |  |  |  |
 				      * |__|__|__|__|
 				      * @endverbatim
-				      * @ingroup IO
+				      * @ingroup output
 				      * @author Wolfgang Bangerth
 				      */
     template <int dim, int spacedim=dim>
@@ -396,7 +396,7 @@ class DataOutBase
 				      * Flags controlling the details of
 				      * output in OpenDX format.
 				      *
-				      * @ingroup IO
+				      * @ingroup output
 				      */
     struct DXFlags 
     {
@@ -491,7 +491,7 @@ class DataOutBase
 				      * of output in UCD format for
 				      * @ref SoftwareAVS.
 				      *
-				      * @ingroup IO
+				      * @ingroup output
 				      */
     struct UcdFlags 
     {
@@ -556,7 +556,7 @@ class DataOutBase
 				      * output in Gnuplot format. At
 				      * present no flags are implemented.
 				      *
-				      * @ingroup IO
+				      * @ingroup output
 				      */
     struct GnuplotFlags 
     {
@@ -616,7 +616,7 @@ class DataOutBase
 				      * implemented, see their
 				      * respective documentation.
 				      *
-				      * @ingroup IO
+				      * @ingroup output
 				      */
     struct PovrayFlags 
     {
@@ -696,7 +696,7 @@ class DataOutBase
 				      * output in encapsulated postscript
 				      * format.
 				      *
-				      * @ingroup IO
+				      * @ingroup output
 				      */
     struct EpsFlags 
     {
@@ -1026,7 +1026,7 @@ class DataOutBase
 				      * output in gmv format. At
 				      * present no flags are implemented.
 				      *
-				      * @ingroup IO
+				      * @ingroup output
 				      */
     struct GmvFlags 
     {
@@ -1084,7 +1084,7 @@ class DataOutBase
 				      * of output in @ref
 				      * SoftwareTecplot format.
 				      *
-				      * @ingroup IO
+				      * @ingroup output
 				      */
     struct TecplotFlags 
     {
@@ -1148,9 +1148,9 @@ class DataOutBase
 				      * Flags controlling the details
 				      * of output in VTK format. At
 				      * present no flags are
-				      * implemented.
+				      * implemented. See @ref SoftwareVTK.
 				      *
-				      * @ingroup IO
+				      * @ingroup output
 				      */
     struct VtkFlags 
     {
@@ -1212,7 +1212,7 @@ class DataOutBase
 				      * present no flags are
 				      * implemented.
 				      *
-				      * @ingroup IO
+				      * @ingroup output
 				      */
     struct Deal_II_IntermediateFlags
     {
@@ -1316,10 +1316,13 @@ class DataOutBase
 					    * format.
 					    */
 	  tecplot_binary,
+          
 					   /**
 					    * Output in VTK format.
+					    * @ref SoftwareVTK
 					    */
 	  vtk,
+          
 					   /**
 					    * Output in deal.II
 					    * intermediate format.
@@ -1481,7 +1484,7 @@ class DataOutBase
 
 /**
  * Write the given list of patches to the output stream for the <a
- * href="www.povray.org">povray</a> raytracer.
+ * href="http://www.povray.org">povray</a> raytracer.
  *
  * Output in this format creates a povray source file, include
  * standard camera and light source definition for rendering with
@@ -1990,7 +1993,7 @@ class DataOutBase
  * suffix for the output file name can be obtained by <tt>default_suffix</tt>
  * without arguments.
  *
- * @ingroup IO
+ * @ingroup output
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim, int spacedim=dim>
@@ -2422,7 +2425,7 @@ class DataOutInterface : private DataOutBase
  * function is explained in step-19.
  * 
  *
- * @ingroup IO
+ * @ingroup input output
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, int spacedim=dim>

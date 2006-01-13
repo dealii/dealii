@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -178,7 +178,7 @@ class SubCellData;
  * through this class.
  *
  * @ingroup grid
- * @ingroup IO
+ * @ingroup input
  * @author Wolfgang Bangerth, 1998, 2000, Luca Heltai, 2004
  */
 template <int dim>

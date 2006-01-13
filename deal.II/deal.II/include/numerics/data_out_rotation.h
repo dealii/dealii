@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -77,7 +77,7 @@ template <int dim> class DoFHandler;
  * It is in the responsibility of the user to make sure that the
  * radial variable attains only non-negative values.
  *
- * @ingroup IO
+ * @ingroup output
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim, template <int> class DH = DoFHandler>

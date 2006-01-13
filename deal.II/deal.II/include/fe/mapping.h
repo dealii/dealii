@@ -30,8 +30,6 @@ template <int dim> class FESubfaceValues;
 
 //TODO: Offset in transform functions should be replaced by initializing VectorSlice correctly
 
-/*!@addtogroup febase */
-/*@{*/
 
 /**
  * Abstract base class for mapping classes.
@@ -53,6 +51,7 @@ template <int dim> class FESubfaceValues;
  * A hint to implementators: no function except the two functions
  * @p update_once and @p update_each may add any flags.
  *
+ * @ingroup mapping
  * @author Guido Kanschat, Ralf Hartmann 2000, 2001
  */
 template <int dim>
@@ -500,7 +499,6 @@ class Mapping : public Subscriptor
   friend class FESubfaceValues<dim>;
 };
 
-/*@}*/
 
 /* ------------------------- inline functions ------------------------- */
 

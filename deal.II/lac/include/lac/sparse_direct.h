@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,10 +23,6 @@
 #include <lac/sparse_matrix.h>
 
 
-
-/*! @addtogroup Preconditioners
- *@{
- */
 
 /**
  * This class provides an interface to the sparse direct solver MA27
@@ -182,6 +178,7 @@
  * seconds. After that time, the detached solver should have noticed
  * the main programs demise.
  * 
+ * @ingroup Solvers Preconditioners
  * 
  * @author Wolfgang Bangerth, 2000, 2001, 2002
  */
@@ -666,6 +663,9 @@ class SparseDirectMA27 : public Subscriptor
  * A detached mode as for MA27 has not yet been implemented for this
  * class.
  *
+ * 
+ * @ingroup Solvers Preconditioners
+ *
  * @author Wolfgang Bangerth, 2000, 2001
  */
 class SparseDirectMA47 : public Subscriptor
@@ -1027,6 +1027,9 @@ class SparseDirectMA47 : public Subscriptor
  * from the deal.II ReadMe file. UMFPACK is included courtesy of its author,
  * <a href="http://www.cise.ufl.edu/~davis/">Timothy A. Davis</a>.
  *
+ * 
+ * @ingroup Solvers Preconditioners
+ *
  * @author Wolfgang Bangerth, 2004
  */
 class SparseDirectUMFPACK : public Subscriptor
@@ -1213,8 +1216,6 @@ class SparseDirectUMFPACK : public Subscriptor
     std::vector<double> control;
 };
 
-
-/*@}*/
 
 
 

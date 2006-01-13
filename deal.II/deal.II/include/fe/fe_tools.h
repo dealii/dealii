@@ -38,7 +38,7 @@ class ConstraintMatrix;
 #include <vector>
 #include <string>
 
-/*!@addtogroup febase */
+/*!@addtogroup feall */
 /*@{*/
 
 

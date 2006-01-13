@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,14 +31,14 @@ template <int dim> class Mapping;
  * different subclasses and the documentation of the GridOut
  * class for more details.
  *
- * @ingroup IO
+ * @ingroup output
  */
 namespace GridOutFlags
 {
 				   /**
 				    * Flags for grid output in OpenDX format.
 				    *
-				    * @ingroup IO
+				    * @ingroup output
 				    */
   struct DX
   {
@@ -82,7 +82,7 @@ namespace GridOutFlags
 				    * Flags describing the details of
 				    * output in UCD format.
 				    *
-				    * @ingroup IO
+				    * @ingroup output
 				    */
   struct Ucd 
   {
@@ -131,7 +131,7 @@ namespace GridOutFlags
 				    * Flags describing the details of
 				    * output in GNUPLOT format.
 				    *
-				    * @ingroup IO
+				    * @ingroup output
 				    */
   struct Gnuplot
   {
@@ -184,7 +184,7 @@ namespace GridOutFlags
 				    * is scaled such that the width equals
 				    * 300 units.
 				    *
-				    * @ingroup IO
+				    * @ingroup output
 				    */
   struct EpsFlagsBase
   {
@@ -282,7 +282,7 @@ namespace GridOutFlags
 				    * general template and declare
 				    * explicit specializations below.
 				    *
-				    * @ingroup IO
+				    * @ingroup output
 				   */
   template <int dim>
   struct Eps
@@ -292,7 +292,7 @@ namespace GridOutFlags
 				    * Flags specific to the output of
 				    * grids in one space dimensions.
 				    *
-				    * @ingroup IO
+				    * @ingroup output
 				    */
   template <>
   struct Eps<1> : public EpsFlagsBase 
@@ -312,7 +312,7 @@ namespace GridOutFlags
 				    * Flags specific to the output of
 				    * grids in two space dimensions.
 				    *
-				    * @ingroup IO
+				    * @ingroup output
 				    */
   template <>
   struct Eps<2> : public EpsFlagsBase 
@@ -376,7 +376,7 @@ namespace GridOutFlags
 				    * Flags specific to the output of
 				    * grids in three space dimensions.
 				    *
-				    * @ingroup IO
+				    * @ingroup output
 				    */
   template <>
   struct Eps<3> : public EpsFlagsBase
@@ -419,7 +419,7 @@ namespace GridOutFlags
 				   /**
 				    * Flags for XFig output.
 				    *
-				    * @ingroup IO
+				    * @ingroup output
 				    */
   struct XFig
   {
@@ -581,7 +581,7 @@ namespace GridOutFlags
  * as usual.
  *
  * @ingroup grid
- * @ingroup IO
+ * @ingroup output
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2003; postscript format based on an implementation by Stefan Nauber, 1999
  */
 class GridOut 

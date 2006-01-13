@@ -159,7 +159,7 @@ template <int>      class FEValuesBase;
  * triangulation, so that the last template parameter has the same
  * value as the second one.
  *
- * @ingroup IO
+ * @ingroup output
  * @author Wolfgang Bangerth, 1999
  */
 template <int dof_handler_dim, template <int> class DH,
@@ -858,7 +858,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * this pair of functions and they return a non-active cell, then an exception
  * will be thrown.
  * 
- * @ingroup IO
+ * @ingroup output
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim, template <int> class DH = DoFHandler>
