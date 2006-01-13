@@ -113,7 +113,11 @@
  *
  * <dt>@anchor GlossUnitSupport Unit support points</dt>
  * <dd>@ref GlossSupport "Support points" on the reference cell, defined in
- * FiniteElementBase.
+ * FiniteElementBase. For example, the usual Q1 element in 1d has support
+ * points  at <tt>x=0</tt> and <tt>x=1</tt> (and similarly, in higher
+ * dimensions at the vertices of the unit square or cube). On the other
+ * hand, higher order Lagrangian elements have unit support points also
+ * in the interior of the unit line, square, or cube.
  * </dd>
  *
  * </dl>

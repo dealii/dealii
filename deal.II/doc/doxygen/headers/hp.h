@@ -12,48 +12,10 @@
 //-------------------------------------------------------------------------
 
 /**
- * @defgroup grid Grid Classes
- */
-
-/**
- * @defgroup dofs Degrees of Freedom
- */
-
-/**
- * @defgroup feall Finite Elements
- *
- * All classes related to shape functions and to access to shape
- * functions.  This concerns the actual values of finite elements. For
- * the numbering of degrees of freedom refer to @ref dofs.
- *
- * @{
- */
-/**
- * @defgroup febase Base classes
- */
-
-/**
- * @defgroup feaccess Finite element access classes (FEValues etc.)
- */
-
-/**
- * @defgroup fe Finite element shape functions
- */
-
-/**
- * @defgroup mapping Mappings to the reference cell
- */
-
-/*@}*/
-
-/**
- * @defgroup mg Multilevel support
- */
-
-/**
  * @defgroup hp hp finite element support
  *
- * Classes and functions that have to do with hp finite elements.
+ * Classes and functions that have to do with hp finite elements. See the
+ * step-21 tutorial program for an example of how to use these classes.
  */
 
 /**
