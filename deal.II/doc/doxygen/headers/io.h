@@ -33,6 +33,11 @@
  * DataOutReader class reads this data back in, and it can then be converted
  * to any of a number of data formats supported by visualization programs.
  *
+ * Finally, the ParameterHandler and MultipleParameterLoop classes (and the
+ * associated Patterns namespace) are used to deal with parameter files
+ * describing run-time parameters to a program that one doesn't want to
+ * hard-code within the program source.
+ * 
  * @ingroup IO
  */
 

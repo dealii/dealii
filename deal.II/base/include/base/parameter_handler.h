@@ -40,6 +40,8 @@ class LogStream;
 /**
  * Declare some regexps which
  * may be used to define patterns.
+ *
+ * @ingroup input
  */ 
 namespace Patterns
 {
@@ -839,13 +841,15 @@ namespace Patterns
  *     };
  *   @endcode
  *
- *   For class member functions which declare the different entries we propose to use the
- *   common name <tt>declare_parameters</tt>. In normal cases this method can be <tt>static</tt> since the
- *   entries will not depend on any previous knowledge. Classes for which entries should
- *   logically be grouped into subsections should declare these subsections themselves. If
- *   a class has two or more member variables of the same type both of which should have
- *   their own parameters, this parent class' method <tt>declare_parameters</tt> is responsible to
- *   group them into different subsections:
+ *   For class member functions which declare the different entries we propose
+ *   to use the common name <tt>declare_parameters</tt>. In normal cases this
+ *   method can be <tt>static</tt> since the entries will not depend on any
+ *   previous knowledge. Classes for which entries should logically be grouped
+ *   into subsections should declare these subsections themselves. If a class
+ *   has two or more member variables of the same type both of which should
+ *   have their own parameters, this parent class' method
+ *   <tt>declare_parameters</tt> is responsible to group them into different
+ *   subsections:
  *   @code
  *     void NonLinEq::declare_parameters (ParameterHandler &prm) {
  *       prm.enter_subsection ("Nonlinear solver");
@@ -1197,6 +1201,8 @@ namespace Patterns
  *   <h3>References</h3>
  *
  *   This class is inspired by the <tt>MenuSystem</tt> class of <tt>DiffPack</tt>.
+ *
+ *   @ingroup input
  *
  *   @author Wolfgang Bangerth, October 1997, revised February 1998
   */
@@ -1955,6 +1961,8 @@ class ParameterHandler
  *   <h3>References</h3>
  *
  *   This class is inspired by the <tt>Multipleloop</tt> class of <tt>DiffPack</tt>.
+ *
+ *   @ingroup input
  *
  *   @author Wolfgang Bangerth, October 1997
  */
