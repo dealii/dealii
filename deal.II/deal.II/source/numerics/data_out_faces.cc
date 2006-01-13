@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -64,7 +64,8 @@ void DataOutFaces<dim,DH>::build_some_patches (Data data)
       Assert (patch != this->patches.end(), ExcInternalError());
       
       for (unsigned int vertex=0; vertex<GeometryInfo<dim-1>::vertices_per_cell; ++vertex)
-	patch->vertices[vertex] = face.first->face(face.second)->vertex(vertex);
+	patch->vertices[vertex] = face.first->face(face.second)->vertex(
+	  GeometryInfo<dim-1>::ucd_to_deal[vertex]);
       
       if (data.n_datasets > 0)
 	{
