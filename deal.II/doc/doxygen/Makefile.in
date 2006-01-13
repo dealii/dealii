@@ -17,15 +17,18 @@ private:
 	perl -pi -e 's/(EXTRACT_PRIVATE\s*=\s*)NO/$$1YES/;s/(INTERNAL_DOCS\s*=\s*)NO/$$1YES/;' options.dox
 	$(MAKE) html
 
-%.tag: %.dox
-	@DOXYGEN@ $<
+# generate documentation. write the output to a file so as not to hide the
+# important message to impatient observers that this process can take quite
+# a while
+deal.tag: deal.dox \
+	  $D/base/include/*/*.h \
+	  $D/lac/include/*/*.h \
+	  $D/deal.II/include/*/*.h \
+	  headers/*.h
+	@echo "=== Generating reference documentation. " \
+              "This can take several minutes..."
+	@DOXYGEN@ deal.dox > doxygen.log
 
-base.tag: @prefix@/base/include/*/*.h headers/base/*.h
-lac.tag:  base.tag @prefix@/lac/include/*/*.h headers/lac/*.h
-deal.tag: lac.tag  @prefix@/deal.II/include/*/*.h headers/deal.II/*.h
-
-base:    base.tag
-lac:     lac.tag
 deal.II: deal.tag
 
 # validate cross references. there are so many html files in these
@@ -33,20 +36,18 @@ deal.II: deal.tag
 #    $(PERL) $D/common/scripts/validate-xrefs.pl deal.II/*.html
 # as this leads to error messages of the kind "/usr/bin/perl: Argument 
 # list too long". Instead, use a loop over all html files
-validate-xrefs-%:
-	@echo --- Validating xrefs in $(@:validate-xrefs-%=%)/ ---
-	cd $(@:validate-xrefs-%=%) ; \
+validate-xrefs:
+	@echo --- Validating xrefs in doxygen/deal.II/ ---
+	@cd deal.II ; \
 		for i in *.html ; do \
-			$(PERL) $D/common/scripts/validate-xrefs.pl $i ; \
+			$(PERL) $D/common/scripts/validate-xrefs.pl $$i ; \
 		done
 
-validate-xrefs: validate-xrefs-base \
-                validate-xrefs-lac  \
-                validate-xrefs-deal.II
+# we have so many files that we can't just do "rm deal.II/*" because that
+# leads to overlong command lines. gotta split it up
+clean:
+	for i in {base,lac,deal.II}/* ; do rm $$i ; done
+	rm *.tag
 
-
-.PHONY: html private base lac deal.II \
-	validate-xrefs \
-	validate-xrefs-base \
-        validate-xrefs-lac  \
-        validate-xrefs-deal.II
+.PHONY: html private deal.II \
+	validate-xrefs clean

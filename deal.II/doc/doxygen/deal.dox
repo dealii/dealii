@@ -2,7 +2,7 @@
 
 PROJECT_NAME = "deal.II library"
 
-INPUT    = headers/base/ headers/lac/ headers/deal.II/ \
+INPUT    = headers/ \
 	../../base/include/base \
 	../../lac/include/lac \
 	../../deal.II/include/dofs \
