@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -235,7 +235,7 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
 
   levels.reserve (old_tria.levels.size());
   for (unsigned int level=0; level<old_tria.levels.size(); ++level)
-    levels.push_back (new TriangulationLevel<dim>(*old_tria.levels[level]));
+    levels.push_back (new internal::Triangulation::TriaLevel<dim>(*old_tria.levels[level]));
 
   number_cache = old_tria.number_cache;
   
@@ -287,9 +287,11 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
   std::vector<std::vector<int> > lines_at_vertex (v.size());
 
 				   // reserve enough space
-  levels.push_back (new TriangulationLevel<dim>);
-  levels[0]->TriangulationLevel<0>::reserve_space (cells.size(), dim);
-  levels[0]->TriangulationLevel<1>::reserve_space (cells.size());
+  levels.push_back (new internal::Triangulation::TriaLevel<dim>);
+  levels[0]->internal::Triangulation::TriaLevel<0>
+    ::reserve_space (cells.size(), dim);
+  levels[0]->internal::Triangulation::TriaLevel<1>
+    ::reserve_space (cells.size());
   
 				   // make up cells
   raw_line_iterator next_free_line = begin_raw_line ();
@@ -298,7 +300,9 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
       while (next_free_line->used())
 	++next_free_line;
       
-      next_free_line->set (Line (cells[cell].vertices[0], cells[cell].vertices[1]));
+      next_free_line->set (internal::Triangulation
+                           ::Line (cells[cell].vertices[0],
+                                   cells[cell].vertices[1]));
       next_free_line->set_used_flag ();
       next_free_line->set_material_id (cells[cell].material_id);
       next_free_line->clear_user_pointer ();
@@ -568,10 +572,13 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
     }
 	
   				   // reserve enough space
-  levels.push_back (new TriangulationLevel<dim>);
-  levels[0]->TriangulationLevel<0>::reserve_space (cells.size(), dim);
-  levels[0]->TriangulationLevel<1>::reserve_space (needed_lines.size());
-  levels[0]->TriangulationLevel<2>::reserve_space (cells.size());
+  levels.push_back (new internal::Triangulation::TriaLevel<dim>);
+  levels[0]->internal::Triangulation::TriaLevel<0>
+    ::reserve_space (cells.size(), dim);
+  levels[0]->internal::Triangulation::TriaLevel<1>
+    ::reserve_space (needed_lines.size());
+  levels[0]->internal::Triangulation::TriaLevel<2>
+    ::reserve_space (cells.size());
 
 				   // make up lines
   if (true) 
@@ -580,7 +587,8 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
       std::map<std::pair<int,int>,line_iterator>::iterator i;
       for (i = needed_lines.begin(); line!=end_line(); ++line, ++i) 
 	{
-	  line->set (Line(i->first.first, i->first.second));
+	  line->set (internal::Triangulation::Line(i->first.first,
+                                                   i->first.second));
 	  line->set_used_flag ();
 	  line->clear_user_flag ();
 	  line->clear_user_pointer ();
@@ -605,10 +613,10 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 0)],
 	      cells[c].vertices[GeometryInfo<dim>::line_to_cell_vertices(line, 1)])];
 	  
-	  cell->set (Quad(lines[0]->index(),
-			  lines[1]->index(),
-			  lines[2]->index(),
-			  lines[3]->index()));
+	  cell->set (internal::Triangulation::Quad(lines[0]->index(),
+                                                   lines[1]->index(),
+                                                   lines[2]->index(),
+                                                   lines[3]->index()));
 	  
 	  cell->set_used_flag ();
 	  cell->set_material_id (cells[c].material_id);
@@ -735,16 +743,17 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 #if deal_II_dimension == 3
 
 /**
- * Invent an object which compares two Quads against each other. This
- * comparison is needed in order to establish a map of Quads to
- * iterators in the Triangulation<3>::create_triangulation function.
+ * Invent an object which compares two internal::Triangulation::Quad against
+ * each other. This comparison is needed in order to establish a map of Quads
+ * to iterators in the Triangulation<3>::create_triangulation function.
  *
  * Since this comparison is not canonical, we do not include it into
- * the general Quad class.
+ * the general internal::Triangulation::Quad class.
  */
 struct QuadComparator
 {
-    inline bool operator () (const Quad &q1, const Quad &q2) const
+    inline bool operator () (const internal::Triangulation::Quad &q1,
+                             const internal::Triangulation::Quad &q2) const
       {
 					 // here is room to optimize
 					 // the repeated equality test
@@ -992,9 +1001,11 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // actually set up data structures
 				   // for the lines
   				   // reserve enough space
-  levels.push_back (new TriangulationLevel<dim>);
-  levels[0]->TriangulationLevel<0>::reserve_space (cells.size(), dim);
-  levels[0]->TriangulationLevel<1>::reserve_space (needed_lines.size());
+  levels.push_back (new internal::Triangulation::TriaLevel<dim>);
+  levels[0]->internal::Triangulation::TriaLevel<0>
+    ::reserve_space (cells.size(), dim);
+  levels[0]->internal::Triangulation::TriaLevel<1>
+    ::reserve_space (needed_lines.size());
 
 				   // make up lines
   if (true) 
@@ -1003,7 +1014,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
       std::map<std::pair<int,int>,line_iterator>::iterator i;
       for (i = needed_lines.begin(); line!=end_line(); ++line, ++i) 
 	{
-	  line->set (Line(i->first.first, i->first.second));
+	  line->set (internal::Triangulation::Line(i->first.first,
+                                                   i->first.second));
 	  line->set_used_flag ();
 	  line->clear_user_flag ();
 	  line->clear_user_pointer ();
@@ -1026,7 +1038,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // note that QuadComparator is a
 				   // class declared and defined in
 				   // this file
-  std::map<Quad,quad_iterator,QuadComparator> needed_quads;
+  std::map<internal::Triangulation::Quad,quad_iterator,QuadComparator>
+    needed_quads;
   for (unsigned int cell=0; cell<cells.size(); ++cell) 
     {
 				       // the faces are quads which
@@ -1065,14 +1078,15 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // get the cell line number
 				       // (0-11) through the
 				       // face_to_cell_lines function
-	  Quad quad(needed_lines[line_list[GeometryInfo<dim>::
-					  face_to_cell_lines(face,0)]]->index(),
-		    needed_lines[line_list[GeometryInfo<dim>::
-					  face_to_cell_lines(face,1)]]->index(),
-		    needed_lines[line_list[GeometryInfo<dim>::
-					  face_to_cell_lines(face,2)]]->index(),
-		    needed_lines[line_list[GeometryInfo<dim>::
-					  face_to_cell_lines(face,3)]]->index());
+	  internal::Triangulation::Quad
+            quad(needed_lines[line_list[GeometryInfo<dim>::
+                                        face_to_cell_lines(face,0)]]->index(),
+                 needed_lines[line_list[GeometryInfo<dim>::
+                                        face_to_cell_lines(face,1)]]->index(),
+                 needed_lines[line_list[GeometryInfo<dim>::
+                                        face_to_cell_lines(face,2)]]->index(),
+                 needed_lines[line_list[GeometryInfo<dim>::
+                                        face_to_cell_lines(face,3)]]->index());
 	  
                                            // insert quad, with
                                            // invalid iterator
@@ -1112,8 +1126,9 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
                                            // new one and instead
                                            // later set the
                                            // face_orientation flag
-          const Quad test_quad (quad.line(2), quad.line(3),
-				quad.line(0), quad.line(1));
+          const internal::Triangulation::Quad
+            test_quad (quad.line(2), quad.line(3),
+                       quad.line(0), quad.line(1));
           if (needed_quads.find (test_quad) == needed_quads.end())
             needed_quads[quad] = end_quad();
         }
@@ -1125,11 +1140,14 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // the arrays of the Triangulation
 				   //
 				   // first reserve enough space
-  levels[0]->TriangulationLevel<2>::reserve_space (needed_quads.size());
+  levels[0]->internal::Triangulation::TriaLevel<2>
+    ::reserve_space (needed_quads.size());
+  
   if (true) 
     {
       raw_quad_iterator quad = begin_raw_quad();
-      std::map<Quad,quad_iterator,QuadComparator>::iterator q;
+      std::map<internal::Triangulation::Quad,quad_iterator,QuadComparator>
+        ::iterator q;
       for (q = needed_quads.begin(); quad!=end_quad(); ++quad, ++q)
 	{
 	  quad->set (q->first);
@@ -1145,7 +1163,8 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 
 				   /////////////////////////////////
 				   // finally create the cells
-  levels[0]->TriangulationLevel<3>::reserve_space (cells.size());  
+  levels[0]->internal::Triangulation::TriaLevel<3>
+    ::reserve_space (cells.size());  
 
 				   // store for each quad index the
 				   // adjacent cells
@@ -1183,14 +1202,15 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
           bool face_orientation[GeometryInfo<dim>::faces_per_cell];
           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	    {
-	      Quad quad(needed_lines[line_list[GeometryInfo<dim>::
-					      face_to_cell_lines(face,0)]]->index(),
-			needed_lines[line_list[GeometryInfo<dim>::
-					      face_to_cell_lines(face,1)]]->index(),
-			needed_lines[line_list[GeometryInfo<dim>::
-					      face_to_cell_lines(face,2)]]->index(),
-			needed_lines[line_list[GeometryInfo<dim>::
-					      face_to_cell_lines(face,3)]]->index());
+	      internal::Triangulation::Quad
+                quad(needed_lines[line_list[GeometryInfo<dim>::
+                                            face_to_cell_lines(face,0)]]->index(),
+                     needed_lines[line_list[GeometryInfo<dim>::
+                                            face_to_cell_lines(face,1)]]->index(),
+                     needed_lines[line_list[GeometryInfo<dim>::
+                                            face_to_cell_lines(face,2)]]->index(),
+                     needed_lines[line_list[GeometryInfo<dim>::
+                                            face_to_cell_lines(face,3)]]->index());
 	      
 	      if (needed_quads.find (quad) != needed_quads.end())
 		{
@@ -1202,8 +1222,9 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 						   // face must be
 						   // available in
 						   // reverse order then
-		  const Quad test_quad (quad.line(2), quad.line(3),
-					quad.line(0), quad.line(1));
+		  const internal::Triangulation::Quad
+                    test_quad (quad.line(2), quad.line(3),
+                               quad.line(0), quad.line(1));
 		  Assert (needed_quads.find (test_quad) != needed_quads.end(),
 			  ExcInternalError());
 		  face_iterator[face] = needed_quads[test_quad];
@@ -1213,12 +1234,13 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 	  
 					   // make the cell out of
 					   // these iterators
-	  cell->set (Hexahedron(face_iterator[0]->index(),
-				face_iterator[1]->index(),
-				face_iterator[2]->index(),
-				face_iterator[3]->index(),
-				face_iterator[4]->index(),
-				face_iterator[5]->index()));
+	  cell->set (internal::Triangulation
+                     ::Hexahedron(face_iterator[0]->index(),
+                                  face_iterator[1]->index(),
+                                  face_iterator[2]->index(),
+                                  face_iterator[3]->index(),
+                                  face_iterator[4]->index(),
+                                  face_iterator[5]->index()));
 	  
 	  cell->set_used_flag ();
 	  cell->set_material_id (cells[c].material_id);
@@ -1487,8 +1509,12 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // and because boundary quad
 				       // orientation does not carry
 				       // any information.
-      Quad quad_compare_1(line[0]->index(), line[1]->index(), line[2]->index(), line[3]->index());
-      Quad quad_compare_2(line[2]->index(), line[3]->index(), line[0]->index(), line[1]->index());
+      internal::Triangulation::Quad
+        quad_compare_1(line[0]->index(), line[1]->index(),
+                       line[2]->index(), line[3]->index());
+      internal::Triangulation::Quad
+        quad_compare_2(line[2]->index(), line[3]->index(),
+                       line[0]->index(), line[1]->index());
       
 				       // try to find the quad with
 				       // lines situated as
@@ -4340,7 +4366,7 @@ Triangulation<dim>::clear_despite_subscriptions()
   for (unsigned int i=0; i<255; ++i)
     boundary[i] = straight_boundary;
   
-  number_cache = TriaNumberCache<dim>();
+  number_cache = internal::Triangulation::NumberCache<dim>();
 }
 
 
@@ -4366,7 +4392,7 @@ Triangulation<1>::execute_refinement ()
 	if (cell->used())
 	  if (cell->refine_flag_set()) 
 	    {
-	      levels.push_back (new TriangulationLevel<dim>);
+	      levels.push_back (new internal::Triangulation::TriaLevel<dim>);
 	      break;
 	    }
     }
@@ -4406,14 +4432,16 @@ Triangulation<1>::execute_refinement ()
 				       // 2*flagged_cells that will be
 				       // created on that level
       levels[level+1]->
-	TriangulationLevel<0>::reserve_space (used_cells+
-					      GeometryInfo<1>::children_per_cell *
-					      flagged_cells, 1);
+	internal::Triangulation::TriaLevel<0>
+        ::reserve_space (used_cells+
+                         GeometryInfo<1>::children_per_cell *
+                         flagged_cells, 1);
 				       // reserve space for
 				       // 2*flagged_cells new lines on
 				       // the next higher level
       levels[level+1]->
-	TriangulationLevel<1>::reserve_space (GeometryInfo<1>::children_per_cell*flagged_cells);
+	internal::Triangulation::TriaLevel<1>
+        ::reserve_space (GeometryInfo<1>::children_per_cell*flagged_cells);
       
       needed_vertices += flagged_cells;
     }
@@ -4491,13 +4519,15 @@ Triangulation<1>::execute_refinement ()
 					     // insert first child
 	    cell->set_children (first_child->index());
 	    first_child->clear_children ();
-	    first_child->set (Line (cell->vertex_index(0), next_unused_vertex));
+	    first_child->set (internal::Triangulation
+                              ::Line (cell->vertex_index(0),
+                                      next_unused_vertex));
 	    first_child->set_material_id (cell->material_id());
 	    first_child->set_subdomain_id (cell->subdomain_id());	    
 	    
-					     // reset neighborship
-					     // info (refer to
-					     // \Ref{TriangulationLevel<0>}
+					     // reset neighborship info (refer
+					     // to
+					     // internal::Triangulation::TriaLevel<0>
 					     // for details)
 	    first_child->set_neighbor (1, second_child);
 	    if (cell->neighbor(0).state() != IteratorState::valid)
@@ -4544,7 +4574,9 @@ Triangulation<1>::execute_refinement ()
 	    
 					     // insert second child
 	    second_child->clear_children ();
-	    second_child->set (Line (next_unused_vertex, cell->vertex_index(1)));
+	    second_child->set (internal::Triangulation
+                               ::Line (next_unused_vertex,
+                                       cell->vertex_index(1)));
 	    second_child->set_neighbor (0, first_child);
 	    second_child->set_material_id (cell->material_id());
 	    second_child->set_subdomain_id (cell->subdomain_id());	    
@@ -4623,7 +4655,7 @@ Triangulation<2>::execute_refinement ()
 	if (cell->used())
 	  if (cell->refine_flag_set()) 
 	    {
-	      levels.push_back (new TriangulationLevel<dim>);
+	      levels.push_back (new internal::Triangulation::TriaLevel<dim>);
 	      break;
 	    }
     }
@@ -4715,17 +4747,20 @@ Triangulation<2>::execute_refinement ()
 				       // 4*flagged_cells that will be
 				       // created on that level
       levels[level+1]->
-	TriangulationLevel<0>::reserve_space (used_cells+4*flagged_cells, 2);
+	internal::Triangulation::TriaLevel<0>
+        ::reserve_space (used_cells+4*flagged_cells, 2);
 				       // reserve space for
 				       // needed_lines new lines
       levels[level+1]->
-	TriangulationLevel<1>::reserve_space (needed_lines);
+	internal::Triangulation::TriaLevel<1>
+        ::reserve_space (needed_lines);
       				       // reserve space for
       				       // 4*flagged_cells
 				       // new quads on the next higher
 				       // level
       levels[level+1]->
-	TriangulationLevel<2>::reserve_space (4*flagged_cells);
+	internal::Triangulation::TriaLevel<2>
+        ::reserve_space (4*flagged_cells);
     }
 
 				   // add to needed vertices how many
@@ -4814,10 +4849,12 @@ Triangulation<2>::execute_refinement ()
 	    Assert (children[0]->used() == false, ExcCellShouldBeUnused());
 	    Assert (children[1]->used() == false, ExcCellShouldBeUnused());
 	  
-	    children[0]->set (Line(line->vertex_index(0),
-				   next_unused_vertex));
-	    children[1]->set (Line(next_unused_vertex,
-				   line->vertex_index(1)));
+	    children[0]->set (internal::Triangulation
+                              ::Line(line->vertex_index(0),
+                                     next_unused_vertex));
+	    children[1]->set (internal::Triangulation
+                              ::Line(next_unused_vertex,
+                                     line->vertex_index(1)));
     
 	    children[0]->set_used_flag();
 	    children[1]->set_used_flag();
@@ -4993,10 +5030,14 @@ Triangulation<2>::execute_refinement ()
                         ExcCellShouldBeUnused());
 	      }
 
-	    new_lines[8] ->set (Line(new_vertices[6], new_vertices[8]));
-	    new_lines[9] ->set (Line(new_vertices[8], new_vertices[7]));
-	    new_lines[10]->set (Line(new_vertices[4], new_vertices[8]));
-	    new_lines[11]->set (Line(new_vertices[8], new_vertices[5]));
+	    new_lines[8] ->set (internal::Triangulation
+                                ::Line(new_vertices[6], new_vertices[8]));
+	    new_lines[9] ->set (internal::Triangulation
+                                ::Line(new_vertices[8], new_vertices[7]));
+	    new_lines[10]->set (internal::Triangulation
+                                ::Line(new_vertices[4], new_vertices[8]));
+	    new_lines[11]->set (internal::Triangulation
+                                ::Line(new_vertices[8], new_vertices[5]));
 	
 	    for (l=8; l<12; ++l)
 	      {
@@ -5033,22 +5074,26 @@ Triangulation<2>::execute_refinement ()
 	    cell->set_children (subcells[0]->index());
 
 	    Assert(n_children==4, ExcNotImplemented());
-	    subcells[0]->set (Quad(new_lines[0]->index(),
-				   new_lines[8]->index(),
-				   new_lines[4]->index(),
-				   new_lines[10]->index()));
-	    subcells[1]->set (Quad(new_lines[8]->index(),
-				   new_lines[2]->index(),
-				   new_lines[5]->index(),
-				   new_lines[11]->index()));
-	    subcells[2]->set (Quad(new_lines[1]->index(),
-                                   new_lines[9]->index(),
-				   new_lines[10]->index(),
-                                   new_lines[6]->index()));
-	    subcells[3]->set (Quad(new_lines[9]->index(),
-                                   new_lines[3]->index(),
-				   new_lines[11]->index(),
-                                   new_lines[7]->index()));
+	    subcells[0]->set (internal::Triangulation
+                              ::Quad(new_lines[0]->index(),
+                                     new_lines[8]->index(),
+                                     new_lines[4]->index(),
+                                     new_lines[10]->index()));
+	    subcells[1]->set (internal::Triangulation
+                              ::Quad(new_lines[8]->index(),
+                                     new_lines[2]->index(),
+                                     new_lines[5]->index(),
+                                     new_lines[11]->index()));
+	    subcells[2]->set (internal::Triangulation
+                              ::Quad(new_lines[1]->index(),
+                                     new_lines[9]->index(),
+                                     new_lines[10]->index(),
+                                     new_lines[6]->index()));
+	    subcells[3]->set (internal::Triangulation
+                              ::Quad(new_lines[9]->index(),
+                                     new_lines[3]->index(),
+                                     new_lines[11]->index(),
+                                     new_lines[7]->index()));
 
 	    for (unsigned int i=0; i<n_children; ++i)
 	      {
@@ -5302,7 +5347,7 @@ Triangulation<3>::execute_refinement ()
 	if (cell->used())
 	  if (cell->refine_flag_set()) 
 	    {
-	      levels.push_back (new TriangulationLevel<dim>);
+	      levels.push_back (new internal::Triangulation::TriaLevel<dim>);
 	      break;
 	    }
     }
@@ -5419,21 +5464,25 @@ Triangulation<3>::execute_refinement ()
 				       // 8*flagged_cells that will be
 				       // created on that level
       levels[level+1]->
-	TriangulationLevel<0>::reserve_space (used_cells+8*flagged_cells, 3);
+	internal::Triangulation::TriaLevel<0>
+        ::reserve_space (used_cells+8*flagged_cells, 3);
 				       // reserve space for
 				       // needed_lines new lines
       levels[level+1]->
-	TriangulationLevel<1>::reserve_space (needed_lines);
+	internal::Triangulation::TriaLevel<1>
+        ::reserve_space (needed_lines);
 				       // reserve space for
 				       // needed_quads new quads
       levels[level+1]->
-	TriangulationLevel<2>::reserve_space (needed_quads);
+	internal::Triangulation::TriaLevel<2>
+        ::reserve_space (needed_quads);
       				       // reserve space for
       				       // 8*flagged_cells
 				       // new hexes on the next higher
 				       // level
       levels[level+1]->
-	TriangulationLevel<3>::reserve_space (8*flagged_cells);
+	internal::Triangulation::TriaLevel<3>
+        ::reserve_space (8*flagged_cells);
     }
 
 				   // add to needed vertices how many
@@ -5554,10 +5603,12 @@ Triangulation<3>::execute_refinement ()
 	    Assert (children[0]->used() == false, ExcCellShouldBeUnused());
 	    Assert (children[1]->used() == false, ExcCellShouldBeUnused());
 	  
-	    children[0]->set (Line(line->vertex_index(0),
-				   next_unused_vertex));
-	    children[1]->set (Line(next_unused_vertex,
-				   line->vertex_index(1)));
+	    children[0]->set (internal::Triangulation
+                              ::Line(line->vertex_index(0),
+                                     next_unused_vertex));
+	    children[1]->set (internal::Triangulation
+                              ::Line(next_unused_vertex,
+                                     line->vertex_index(1)));
     
 	    children[0]->set_used_flag();
 	    children[1]->set_used_flag();
@@ -5710,10 +5761,14 @@ Triangulation<3>::execute_refinement ()
 		  next_unused_vertex 
 	      };
 	    
-	    new_lines[0]->set (Line(vertex_indices[2], vertex_indices[4]));
-	    new_lines[1]->set (Line(vertex_indices[4], vertex_indices[3]));
-	    new_lines[2]->set (Line(vertex_indices[0], vertex_indices[4]));
-	    new_lines[3]->set (Line(vertex_indices[4], vertex_indices[1]));
+	    new_lines[0]->set (internal::Triangulation
+                               ::Line(vertex_indices[2], vertex_indices[4]));
+	    new_lines[1]->set (internal::Triangulation
+                               ::Line(vertex_indices[4], vertex_indices[3]));
+	    new_lines[2]->set (internal::Triangulation
+                               ::Line(vertex_indices[0], vertex_indices[4]));
+	    new_lines[3]->set (internal::Triangulation
+                               ::Line(vertex_indices[4], vertex_indices[1]));
 
 	    for (unsigned int i=0; i<4; ++i)
 	      {
@@ -5783,22 +5838,26 @@ Triangulation<3>::execute_refinement ()
 					     // present one
 	    quad->set_children (new_quads[0]->index());
 
-	    new_quads[0]->set (Quad(line_indices[0],
-				    line_indices[8],
-				    line_indices[4],
-				    line_indices[10]));
-	    new_quads[1]->set (Quad(line_indices[8],
-				    line_indices[2],
-				    line_indices[5],
-				    line_indices[11]));
-	    new_quads[2]->set (Quad(line_indices[1],
-				    line_indices[9],
-				    line_indices[10],
-				    line_indices[6]));
-	    new_quads[3]->set (Quad(line_indices[9],
-				    line_indices[3],
-				    line_indices[11],
-				    line_indices[7]));
+	    new_quads[0]->set (internal::Triangulation
+                               ::Quad(line_indices[0],
+                                      line_indices[8],
+                                      line_indices[4],
+                                      line_indices[10]));
+	    new_quads[1]->set (internal::Triangulation
+                               ::Quad(line_indices[8],
+                                      line_indices[2],
+                                      line_indices[5],
+                                      line_indices[11]));
+	    new_quads[2]->set (internal::Triangulation
+                               ::Quad(line_indices[1],
+                                      line_indices[9],
+                                      line_indices[10],
+                                      line_indices[6]));
+	    new_quads[3]->set (internal::Triangulation
+                               ::Quad(line_indices[9],
+                                      line_indices[3],
+                                      line_indices[11],
+                                      line_indices[7]));
 	    for (unsigned int i=0; i<4; ++i)
 	      {
 		new_quads[i]->set_used_flag();
@@ -5964,12 +6023,18 @@ Triangulation<3>::execute_refinement ()
 		  next_unused_vertex 
 	      };
 	    
-	    new_lines[0]->set (Line(vertex_indices[2], vertex_indices[6]));
-	    new_lines[1]->set (Line(vertex_indices[6], vertex_indices[3]));
-	    new_lines[2]->set (Line(vertex_indices[0], vertex_indices[6]));
-	    new_lines[3]->set (Line(vertex_indices[6], vertex_indices[1]));
-	    new_lines[4]->set (Line(vertex_indices[4], vertex_indices[6]));
-	    new_lines[5]->set (Line(vertex_indices[6], vertex_indices[5]));
+	    new_lines[0]->set (internal::Triangulation
+                               ::Line(vertex_indices[2], vertex_indices[6]));
+	    new_lines[1]->set (internal::Triangulation
+                               ::Line(vertex_indices[6], vertex_indices[3]));
+	    new_lines[2]->set (internal::Triangulation
+                               ::Line(vertex_indices[0], vertex_indices[6]));
+	    new_lines[3]->set (internal::Triangulation
+                               ::Line(vertex_indices[6], vertex_indices[1]));
+	    new_lines[4]->set (internal::Triangulation
+                               ::Line(vertex_indices[4], vertex_indices[6]));
+	    new_lines[5]->set (internal::Triangulation
+                               ::Line(vertex_indices[6], vertex_indices[5]));
 
 	    for (unsigned int i=0; i<6; ++i)
 	      {
@@ -6183,54 +6248,66 @@ Triangulation<3>::execute_refinement ()
 					     //    *----*----*      *-26-*-27-*
 					     //   / 8  / 9  /      2   24    6
 					     //  *----*----*x     *--8-*--9-* 
-	    new_quads[0]->set (Quad(line_indices[10],
-				    line_indices[28],
-				    line_indices[16],
-				    line_indices[24]));
-	    new_quads[1]->set (Quad(line_indices[28],
-				    line_indices[14],
-				    line_indices[17],
-				    line_indices[25]));
-	    new_quads[2]->set (Quad(line_indices[11],
-				    line_indices[29],
-				    line_indices[24],
-				    line_indices[20]));
-	    new_quads[3]->set (Quad(line_indices[29],
-				    line_indices[15],
-				    line_indices[25],
-				    line_indices[21]));
-	    new_quads[4]->set (Quad(line_indices[18],
-				    line_indices[26],
-				    line_indices[0],
-				    line_indices[28]));
-	    new_quads[5]->set (Quad(line_indices[26],
-				    line_indices[22],
-				    line_indices[1],
-				    line_indices[29]));
-	    new_quads[6]->set (Quad(line_indices[19],
-				    line_indices[27],
-				    line_indices[28],
-				    line_indices[4]));
-	    new_quads[7]->set (Quad(line_indices[27],
-				    line_indices[23],
-				    line_indices[29],
-				    line_indices[5]));
-	    new_quads[8]->set (Quad(line_indices[2],
-				    line_indices[24],
-				    line_indices[8],
-				    line_indices[26]));
-	    new_quads[9]->set (Quad(line_indices[24],
-				    line_indices[6],
-				    line_indices[9],
-				    line_indices[27]));
-	    new_quads[10]->set (Quad(line_indices[3],
-				     line_indices[25],
-				     line_indices[26],
-				     line_indices[12]));
-	    new_quads[11]->set (Quad(line_indices[25],
-				     line_indices[7],
-				     line_indices[27],
-				     line_indices[13]));
+	    new_quads[0]->set (internal::Triangulation
+                               ::Quad(line_indices[10],
+                                      line_indices[28],
+                                      line_indices[16],
+                                      line_indices[24]));
+	    new_quads[1]->set (internal::Triangulation
+                               ::Quad(line_indices[28],
+                                      line_indices[14],
+                                      line_indices[17],
+                                      line_indices[25]));
+	    new_quads[2]->set (internal::Triangulation
+                               ::Quad(line_indices[11],
+                                      line_indices[29],
+                                      line_indices[24],
+                                      line_indices[20]));
+	    new_quads[3]->set (internal::Triangulation
+                               ::Quad(line_indices[29],
+                                      line_indices[15],
+                                      line_indices[25],
+                                      line_indices[21]));
+	    new_quads[4]->set (internal::Triangulation
+                               ::Quad(line_indices[18],
+                                      line_indices[26],
+                                      line_indices[0],
+                                      line_indices[28]));
+	    new_quads[5]->set (internal::Triangulation
+                               ::Quad(line_indices[26],
+                                      line_indices[22],
+                                      line_indices[1],
+                                      line_indices[29]));
+	    new_quads[6]->set (internal::Triangulation
+                               ::Quad(line_indices[19],
+                                      line_indices[27],
+                                      line_indices[28],
+                                      line_indices[4]));
+	    new_quads[7]->set (internal::Triangulation
+                               ::Quad(line_indices[27],
+                                      line_indices[23],
+                                      line_indices[29],
+                                      line_indices[5]));
+	    new_quads[8]->set (internal::Triangulation
+                               ::Quad(line_indices[2],
+                                      line_indices[24],
+                                      line_indices[8],
+                                      line_indices[26]));
+	    new_quads[9]->set (internal::Triangulation
+                               ::Quad(line_indices[24],
+                                      line_indices[6],
+                                      line_indices[9],
+                                      line_indices[27]));
+	    new_quads[10]->set (internal::Triangulation
+                                ::Quad(line_indices[3],
+                                       line_indices[25],
+                                       line_indices[26],
+                                       line_indices[12]));
+	    new_quads[11]->set (internal::Triangulation
+                                ::Quad(line_indices[25],
+                                       line_indices[7],
+                                       line_indices[27],
+                                       line_indices[13]));
 	    for (unsigned int i=0; i<12; ++i)
 	      {
 		new_quads[i]->set_used_flag();
@@ -6364,57 +6441,65 @@ Triangulation<3>::execute_refinement ()
 	    hex->set_children (new_hexes[0]->index());
 
 					     // bottom children
-	    new_hexes[0]->set (Hexahedron(quad_indices[12],
-					  quad_indices[0],
-					  quad_indices[20],
-					  quad_indices[4],
-					  quad_indices[28],
-					  quad_indices[8]));
-	    new_hexes[1]->set (Hexahedron(quad_indices[0],
-					  quad_indices[16],
-					  quad_indices[22],
-					  quad_indices[6],
-					  quad_indices[29],
-					  quad_indices[9]));
-	    new_hexes[2]->set (Hexahedron(quad_indices[13],
-					  quad_indices[1],
-					  quad_indices[4],
-					  quad_indices[24],
-					  quad_indices[30],
-					  quad_indices[10]));
-	    new_hexes[3]->set (Hexahedron(quad_indices[1],
-					  quad_indices[17],
-					  quad_indices[6],
-					  quad_indices[26],
-					  quad_indices[31],
-					  quad_indices[11]));
+	    new_hexes[0]->set (internal::Triangulation
+                               ::Hexahedron(quad_indices[12],
+                                            quad_indices[0],
+                                            quad_indices[20],
+                                            quad_indices[4],
+                                            quad_indices[28],
+                                            quad_indices[8]));
+	    new_hexes[1]->set (internal::Triangulation
+                               ::Hexahedron(quad_indices[0],
+                                            quad_indices[16],
+                                            quad_indices[22],
+                                            quad_indices[6],
+                                            quad_indices[29],
+                                            quad_indices[9]));
+	    new_hexes[2]->set (internal::Triangulation
+                               ::Hexahedron(quad_indices[13],
+                                            quad_indices[1],
+                                            quad_indices[4],
+                                            quad_indices[24],
+                                            quad_indices[30],
+                                            quad_indices[10]));
+	    new_hexes[3]->set (internal::Triangulation
+                               ::Hexahedron(quad_indices[1],
+                                            quad_indices[17],
+                                            quad_indices[6],
+                                            quad_indices[26],
+                                            quad_indices[31],
+                                            quad_indices[11]));
 	    
 					     // top children
-	    new_hexes[4]->set (Hexahedron(quad_indices[14],
-					  quad_indices[2],
-					  quad_indices[21],
-					  quad_indices[5],
-					  quad_indices[8],
-					  quad_indices[32]));
-	    new_hexes[5]->set (Hexahedron(quad_indices[2],
-					  quad_indices[18],
-					  quad_indices[23],
-					  quad_indices[7],
-					  quad_indices[9],
-					  quad_indices[33]));
-	    new_hexes[6]->set (Hexahedron(quad_indices[15],
-					  quad_indices[3],
-					  quad_indices[5],
-					  quad_indices[25],
-					  quad_indices[10],
-					  quad_indices[34]));
-	    new_hexes[7]->set (Hexahedron(quad_indices[3],
-					  quad_indices[19],
-					  quad_indices[7],
-					  quad_indices[27],
-					  quad_indices[11],
-					  quad_indices[35]));
-
+	    new_hexes[4]->set (internal::Triangulation
+                               ::Hexahedron(quad_indices[14],
+                                            quad_indices[2],
+                                            quad_indices[21],
+                                            quad_indices[5],
+                                            quad_indices[8],
+                                            quad_indices[32]));
+	    new_hexes[5]->set (internal::Triangulation
+                               ::Hexahedron(quad_indices[2],
+                                            quad_indices[18],
+                                            quad_indices[23],
+                                            quad_indices[7],
+                                            quad_indices[9],
+                                            quad_indices[33]));
+	    new_hexes[6]->set (internal::Triangulation
+                               ::Hexahedron(quad_indices[15],
+                                            quad_indices[3],
+                                            quad_indices[5],
+                                            quad_indices[25],
+                                            quad_indices[10],
+                                            quad_indices[34]));
+	    new_hexes[7]->set (internal::Triangulation
+                               ::Hexahedron(quad_indices[3],
+                                            quad_indices[19],
+                                            quad_indices[7],
+                                            quad_indices[27],
+                                            quad_indices[11],
+                                            quad_indices[35]));
+            
 
 	    for (unsigned int i=0; i<8; ++i)
 	      {

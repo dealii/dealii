@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,9 +29,12 @@
 /*------------------------ Functions: LineAccessor ---------------------------*/
 
 template <int dim>
-void TriaObjectAccessor<1, dim>::set (const Line &line) const
+void
+TriaObjectAccessor<1, dim>::
+set (const internal::Triangulation::Line &line) const
 {
-  this->tria->levels[this->present_level]->lines.lines[this->present_index] = line;
+  this->tria->levels[this->present_level]
+    ->lines.lines[this->present_index] = line;
 }
 
 
@@ -255,9 +258,12 @@ unsigned int TriaObjectAccessor<1, dim>::number_of_children () const
 /*------------------------ Functions: QuadAccessor ---------------------------*/
 
 template <int dim>
-void TriaObjectAccessor<2, dim>::set (const Quad &quad) const
+void
+TriaObjectAccessor<2, dim>::
+set (const internal::Triangulation::Quad &quad) const
 {
-  this->tria->levels[this->present_level]->quads.quads[this->present_index] = quad;
+  this->tria->levels[this->present_level]
+    ->quads.quads[this->present_index] = quad;
 }
 
 
@@ -665,9 +671,12 @@ unsigned int TriaObjectAccessor<2, dim>::number_of_children () const
 /*------------------------ Functions: TriaObjectAccessor ---------------------------*/
 
 template <int dim>
-void TriaObjectAccessor<3, dim>::set (const Hexahedron &hex) const
+void
+TriaObjectAccessor<3, dim>::
+set (const internal::Triangulation::Hexahedron &hex) const
 {
-  this->tria->levels[this->present_level]->hexes.hexes[this->present_index] = hex;
+  this->tria->levels[this->present_level]
+    ->hexes.hexes[this->present_index] = hex;
 }
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,10 +25,15 @@ template <int dim> class Triangulation;
 template <int dim, typename Accessor> class TriaRawIterator;
 template <int dim, typename Accessor> class TriaIterator;
 template <int dim, typename Accessor> class TriaActiveIterator;
-class Line;
-class Quad;
-class Hexahedron;
-
+namespace internal
+{
+  namespace Triangulation
+  {
+    class Line;
+    class Quad;
+    class Hexahedron;
+  }
+}
 template <int celldim, int dim> class TriaObjectAccessor;
 template <int dim>              class TriaObjectAccessor<0, dim>;
 template <int dim>              class TriaObjectAccessor<1, dim>;
@@ -345,21 +350,21 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * <tt>celldim==1</tt>.
 				      */
 
-    void set (const Line&) const;
+    void set (const internal::Triangulation::Line&) const;
     
 				     /**
 				      * Copy the data of the given
 				      * quad. Only implemented for
 				      * <tt>celldim==2</tt>.
 				      */
-    void set (const Quad&) const;
+    void set (const internal::Triangulation::Quad&) const;
     
 				     /**
 				      * Copy the data of the given
 				      * hex. Only implemented for
 				      * <tt>celldim==3</tt>.
 				      */
-    void set (const Hexahedron&) const;
+    void set (const internal::Triangulation::Hexahedron&) const;
     
 				     /**
 				      *  Index of vertex. The
@@ -879,7 +884,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  Copy the data of the given
 				      *  line.
 				      */
-    void set (const Line &l) const;
+    void set (const internal::Triangulation::Line &l) const;
 
 				     /**
 				      *  Return the index of vertex
@@ -1331,7 +1336,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				     /**
 				      *  Copy the data of the given quad.
 				      */
-    void set (const Quad &q) const;
+    void set (const internal::Triangulation::Quad &q) const;
     
 				     /**
 				      * Return index of a vertex of a
@@ -1838,7 +1843,7 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  Copy the data of the given
 				      *  hex.
 				      */
-    void set (const Hexahedron &h) const;
+    void set (const internal::Triangulation::Hexahedron &h) const;
     
 				     /**
 				      *  Return index of a vertex of a hex in the internal structures of Triangulation.

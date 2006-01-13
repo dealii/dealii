@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -71,7 +71,7 @@ template <int dim> class Triangulation;
  *   HyperBallBoundary creating a hyperball with given radius
  *   around a given center point.
  *
- * @ingroup grid
+ * @ingroup boundary
  *   @author Wolfgang Bangerth, 1999, 2001, Ralf Hartmann, 2001
  */
 template <int dim>
@@ -261,6 +261,8 @@ class Boundary : public Subscriptor
  *   assumes that the boundary of the domain is given by the
  *   polygon/polyhedron defined by the boundary of the initial coarse
  *   triangulation.
+ *
+ *   @ingroup boundary
  *
  *   @author Wolfgang Bangerth, 1998, 2001, Ralf Hartmann, 2001
  */

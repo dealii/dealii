@@ -26,7 +26,13 @@
 
 template <int dim> class Boundary;
 template <int dim> class StraightBoundary;
-template <int dim> class TriangulationLevel;
+namespace internal
+{
+  namespace Triangulation
+  {
+    template <int dim> class TriaLevel;
+  }
+}
 template <int dim> class DoFHandler;
 namespace hp
 {
@@ -124,7 +130,15 @@ struct SubCellData
 /*------------------------------------------------------------------------*/
 
 
-
+namespace internal
+{
+				 /**
+				  * A namespace for classes internal to the
+				  * triangulation classes and helpers.
+				  */  
+  namespace Triangulation
+  {
+    
 /**
  * Cache class used to store the number of used and active elements
  * (lines or quads etc) within the levels of a triangulation. This
@@ -143,10 +157,10 @@ struct SubCellData
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
-template <int dim>
-struct TriaNumberCache
-{
-};
+    template <int dim>
+    struct NumberCache
+    {
+    };
 
 /**
  * Cache class used to store the number of used and active elements
@@ -165,53 +179,53 @@ struct TriaNumberCache
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
-template <>
-struct TriaNumberCache<1> 
-{
-				     /**
-				      * Number of used lines in the whole
-				      * triangulation.
-				      */
-    unsigned int n_lines;
+    template <>
+    struct NumberCache<1> 
+    {
+                                         /**
+                                          * Number of used lines in the whole
+                                          * triangulation.
+                                          */
+        unsigned int n_lines;
 
-				     /**
-				      * Array holding the number of used
-				      * lines on each level.
-				      */
-    std::vector<unsigned int> n_lines_level;
+                                         /**
+                                          * Array holding the number of used
+                                          * lines on each level.
+                                          */
+        std::vector<unsigned int> n_lines_level;
     
-				     /**
-				      * Number of active lines in the
-				      * whole triangulation.
-				      */
-    unsigned int n_active_lines;
+                                         /**
+                                          * Number of active lines in the
+                                          * whole triangulation.
+                                          */
+        unsigned int n_active_lines;
 
-				     /**
-				      * Array holding the number of active
-				      * lines on each level.
-				      */
-    std::vector<unsigned int> n_active_lines_level;
+                                         /**
+                                          * Array holding the number of active
+                                          * lines on each level.
+                                          */
+        std::vector<unsigned int> n_active_lines_level;
 
-				     /**
-				      * Constructor. Set values to zero
-				      * by default.
-				      */
-    TriaNumberCache ();
+                                         /**
+                                          * Constructor. Set values to zero
+                                          * by default.
+                                          */
+        NumberCache ();
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    unsigned int memory_consumption () const;
-};
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        unsigned int memory_consumption () const;
+    };
 
 
 /**
  * Cache class used to store the number of used and active elements
  * (lines or quads etc) within the levels of a triangulation. This
  * specialization stores the numbers of quads. Due to the inheritance
- * from the base class TriaNumberCache<1>, the numbers of lines
+ * from the base class NumberCache<1>, the numbers of lines
  * are also within this class.
  *
  * In the old days, whenever one wanted to access one of these
@@ -226,46 +240,46 @@ struct TriaNumberCache<1>
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
-template <>
-struct TriaNumberCache<2> : public TriaNumberCache<1>
-{
-				     /**
-				      * Number of used quads in the whole
-				      * triangulation.
-				      */
-    unsigned int n_quads;
+    template <>
+    struct NumberCache<2> : public NumberCache<1>
+    {
+                                         /**
+                                          * Number of used quads in the whole
+                                          * triangulation.
+                                          */
+        unsigned int n_quads;
 
-				     /**
-				      * Array holding the number of used
-				      * quads on each level.
-				      */
-    std::vector<unsigned int> n_quads_level;
+                                         /**
+                                          * Array holding the number of used
+                                          * quads on each level.
+                                          */
+        std::vector<unsigned int> n_quads_level;
     
-				     /**
-				      * Number of active quads in the
-				      * whole triangulation.
-				      */
-    unsigned int n_active_quads;
+                                         /**
+                                          * Number of active quads in the
+                                          * whole triangulation.
+                                          */
+        unsigned int n_active_quads;
 
-				     /**
-				      * Array holding the number of active
-				      * quads on each level.
-				      */
-    std::vector<unsigned int> n_active_quads_level;
+                                         /**
+                                          * Array holding the number of active
+                                          * quads on each level.
+                                          */
+        std::vector<unsigned int> n_active_quads_level;
 
-				     /**
-				      * Constructor. Set values to zero
-				      * by default.
-				      */
-    TriaNumberCache ();
+                                         /**
+                                          * Constructor. Set values to zero
+                                          * by default.
+                                          */
+        NumberCache ();
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    unsigned int memory_consumption () const;
-};
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        unsigned int memory_consumption () const;
+    };
 
 //TODO: Replace boundary[255] by a std::vector so we can use constructor of SmartPointer
 
@@ -273,7 +287,7 @@ struct TriaNumberCache<2> : public TriaNumberCache<1>
  * Cache class used to store the number of used and active elements
  * (lines or quads etc) within the levels of a triangulation. This
  * specialization stores the numbers of hexes. Due to the inheritance
- * from the base class TriaNumberCache<2>, the numbers of lines
+ * from the base class NumberCache<2>, the numbers of lines
  * and quads are also within this class.
  *
  * In the old days, whenever one wanted to access one of these
@@ -288,46 +302,48 @@ struct TriaNumberCache<2> : public TriaNumberCache<1>
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
-template <>
-struct TriaNumberCache<3> : public TriaNumberCache<2>
-{
-				     /**
-				      * Number of used hexes in the whole
-				      * triangulation.
-				      */
-    unsigned int n_hexes;
+    template <>
+    struct NumberCache<3> : public NumberCache<2>
+    {
+                                         /**
+                                          * Number of used hexes in the whole
+                                          * triangulation.
+                                          */
+        unsigned int n_hexes;
 
-				     /**
-				      * Array holding the number of used
-				      * hexes on each level.
-				      */
-    std::vector<unsigned int> n_hexes_level;
+                                         /**
+                                          * Array holding the number of used
+                                          * hexes on each level.
+                                          */
+        std::vector<unsigned int> n_hexes_level;
     
-				     /**
-				      * Number of active hexes in the
-				      * whole triangulation.
-				      */
-    unsigned int n_active_hexes;
+                                         /**
+                                          * Number of active hexes in the
+                                          * whole triangulation.
+                                          */
+        unsigned int n_active_hexes;
 
-				     /**
-				      * Array holding the number of active
-				      * hexes on each level.
-				      */
-    std::vector<unsigned int> n_active_hexes_level;
+                                         /**
+                                          * Array holding the number of active
+                                          * hexes on each level.
+                                          */
+        std::vector<unsigned int> n_active_hexes_level;
 
-				     /**
-				      * Constructor. Set values to zero
-				      * by default.
-				      */
-    TriaNumberCache ();
+                                         /**
+                                          * Constructor. Set values to zero
+                                          * by default.
+                                          */
+        NumberCache ();
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    unsigned int memory_consumption () const;
-};
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        unsigned int memory_consumption () const;
+    };
+  }
+}
 
 
 /*------------------------------------------------------------------------*/
@@ -338,11 +354,12 @@ struct TriaNumberCache<3> : public TriaNumberCache<2>
  *  form a region in @p dim spatial dimensions.
  *
  *  This class is written to be as independent of the dimension as possible
- *  (thus the complex construction of the TriangulationLevel classes) to
- *  allow code-sharing, to allow reducing the need to mirror changes in the code
- *  for one dimension to the code for other dimensions. Nonetheless, some of
- *  the functions are dependent of the dimension and there only exist
- *  specialized versions for distinct dimensions.
+ *  (thus the complex construction of the internal::Triangulation::TriaLevel
+ *  classes) to allow code-sharing, to allow reducing the need to mirror
+ *  changes in the code for one dimension to the code for other
+ *  dimensions. Nonetheless, some of the functions are dependent of the
+ *  dimension and there only exist specialized versions for distinct
+ *  dimensions.
  *
  *
  *  <h3>Structure and iterators</h3>
@@ -3348,13 +3365,10 @@ class Triangulation : public Subscriptor
 
 				     /**
 				      *  Array of pointers pointing to the
-				      *  <tt>TriangulationLevel<dim></tt> objects
-				      *  storing the data on the different
-				      *  levels.
-				      *
-				      *  Usage is like <tt>levels[3]->quads</tt>.
+				      *  objects storing the data on the
+				      *  different levels.
 				      */
-    std::vector<TriangulationLevel<dim>*> levels;
+    std::vector<internal::Triangulation::TriaLevel<dim>*> levels;
 
 				     /**
 				      *  Array of the vertices of this
@@ -3403,7 +3417,7 @@ class Triangulation : public Subscriptor
 				      * frequent operation, this was not
 				      * an optimal solution.
 				      */
-    TriaNumberCache<dim>             number_cache;
+    internal::Triangulation::NumberCache<dim> number_cache;
 
 				     /**
 				      *  List of RefinementListeners,

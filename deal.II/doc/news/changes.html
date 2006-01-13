@@ -45,6 +45,18 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: Several classes related to the storage of data in the
+       Triangulation and DoFHandler classes have been moved into internal
+       namespaces, and some have also been removed. Since these were not for
+       use anywhere outside the library, it is unlikely that this poses
+       problems to application programs. On the other hand, it moves common
+       names like <code>Line</code> and <code>Quad</code> out of the global
+       namespace.
+       <br> 
+       (WB 2006/01/13)
+       </p>
+
+  <li> <p>
        Changed: Previously, if <code>mg_dof_handler</code> was a
        multilevel DoF handler object, calling
        <code>DoFRenumbering::component_wise(mg_dof_handler)</code>)

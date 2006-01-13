@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,6 +18,11 @@
 #include <base/exceptions.h>
 
 
+namespace internal
+{
+  namespace Triangulation
+  {
+    
 /**
  *   @p Quads denote the fundamental entities of triangulations in two dimensions
  *   and the boundaries of hexaeders in three dimensions. They are
@@ -32,99 +37,103 @@
  * @ingroup grid
  *   @author Wolfgang Bangerth, 1998
  */
-class Quad
-{
-  public:
+    class Quad
+    {
+      public:
 
-				     /**
-				      *  Construct a Quad with line
-				      *  indices @p i0 through @p i3. By default,
-				      *  indices are set to -1, i.e. an
-				      *  invalid value.
-				      *
-				      * By convention, the four lines
-				      * must be numbered as follows
-				      *  .--3--.
-				      *  |     |
-				      *  0     1
-				      *  |     |
-				      *  .--2--.
-				      */
-    Quad (const int i0 = -1,
-	  const int i1 = -1,
-	  const int i2 = -1,
-	  const int i3 = -1);
+                                         /**
+                                          *  Construct a Quad with line
+                                          *  indices @p i0 through @p i3. By default,
+                                          *  indices are set to -1, i.e. an
+                                          *  invalid value.
+                                          *
+                                          * By convention, the four lines
+                                          * must be numbered as follows
+                                          *  .--3--.
+                                          *  |     |
+                                          *  0     1
+                                          *  |     |
+                                          *  .--2--.
+                                          */
+        Quad (const int i0 = -1,
+              const int i1 = -1,
+              const int i2 = -1,
+              const int i3 = -1);
     
-				     /**
-				      *  Return the index of line @p i=0
-				      *  through 3.
-				      */
-    int line (const int i) const;
+                                         /**
+                                          *  Return the index of line @p i=0
+                                          *  through 3.
+                                          */
+        int line (const int i) const;
     
-				     /**
-				      *  Set the index of the @p ith line to
-				      *  @p index. @p i=0 through 3.
-				      */
-    void set_line (const int i, const int index);
+                                         /**
+                                          *  Set the index of the @p ith line to
+                                          *  @p index. @p i=0 through 3.
+                                          */
+        void set_line (const int i, const int index);
     
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    static unsigned int memory_consumption ();
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        static unsigned int memory_consumption ();
 
-				     /**
-				      *  Exception
-				      */ 
-    DeclException1 (ExcRange,
-		    int,
-		    << "Indices for the line number must be 0, 1, 2 or 3, "
-		    << "but you gave " << arg1); 
-  protected:
-    int lines[4];
-};
+                                         /**
+                                          *  Exception
+                                          */ 
+        DeclException1 (ExcRange,
+                        int,
+                        << "Indices for the line number must be 0, 1, 2 or 3, "
+                        << "but you gave " << arg1); 
+      protected:
+        int lines[4];
+    };
 
 
 /*----------------------------- Inline Function: Quad ------------------------*/
 
 
-inline
-Quad::Quad (const int i0, const int i1, const int i2, const int i3)
-{
-  lines[0] = i0;
-  lines[1] = i1;
-  lines[2] = i2;
-  lines[3] = i3;
-}
+    inline
+    Quad::Quad (const int i0, const int i1, const int i2, const int i3)
+    {
+      lines[0] = i0;
+      lines[1] = i1;
+      lines[2] = i2;
+      lines[3] = i3;
+    }
 
 
 
-inline
-int Quad::line (const int i) const
-{
-  Assert ((i>=0) && (i<4),
-	  ExcRange(i));
-  return lines[i];
-}
+    inline
+    int Quad::line (const int i) const
+    {
+      Assert ((i>=0) && (i<4),
+              ExcRange(i));
+      return lines[i];
+    }
 
 
 
-inline
-void Quad::set_line (const int i, const int index)
-{
-  Assert ((i>=0) && (i<4),
-	  ExcRange(i));
-  lines[i] = index;
-}
+    inline
+    void Quad::set_line (const int i, const int index)
+    {
+      Assert ((i>=0) && (i<4),
+              ExcRange(i));
+      lines[i] = index;
+    }
 
 
 
-inline
-unsigned int
-Quad::memory_consumption ()
-{
-  return sizeof(Quad);
+    inline
+    unsigned int
+    Quad::memory_consumption ()
+    {
+      return sizeof(Quad);
+    }
+    
+  }
+  
 }
 
 #endif

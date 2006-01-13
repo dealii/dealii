@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,6 +33,8 @@
  * This class is derived from StraightBoundary rather than from
  * Boundary, which would seem natural, since this way we can use the
  * StraightBoundary::in_between() function.
+ *
+ * @ingroup boundary
  *
  * @author Guido Kanschat, 2001
  */
@@ -172,6 +174,8 @@ class CylinderBoundary : public StraightBoundary<dim>
  *   This class is derived from StraightBoundary rather than from
  *   Boundary, which would seem natural, since this way we can use the
  *   StraightBoundary::in_between() function.
+ *
+ *   @ingroup boundary
  *
  *   @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
@@ -319,6 +323,8 @@ class HyperBallBoundary : public StraightBoundary<dim>
  * might be useful for computations with rotational symmetry, where
  * one dimension is the radius from the axis of rotation.
  *
+ * @ingroup boundary
+ *
  * @author Wolfgang Bangerth, 1999, 2001
  */
 template <int dim>
@@ -396,6 +402,8 @@ class HalfHyperBallBoundary : public HyperBallBoundary<dim>
  * sphere are computed automatically upon calling one of the virtual
  * functions.
  *
+ * @ingroup boundary
+ *
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
@@ -425,6 +433,8 @@ class HyperShellBoundary : public HyperBallBoundary<dim>
  * in three space dimensions it is a half shell. This class might be
  * useful for computations with rotational symmetry, where one
  * dimension is the radius from the axis of rotation.
+ *
+ * @ingroup boundary
  *
  * @author Wolfgang Bangerth, 2000
  */
