@@ -23,9 +23,6 @@
 #include <utility>
 
 
-/*!@addtogroup febase fe */
-/*@{*/
-
 /**
  * This class provides an interface to group several elements together
  * into one. To the outside world, the resulting object looks just
@@ -67,6 +64,8 @@
  * coupled to @p u at the vertices and the line on the larger cell next to this
  * vertex, there is no interaction with @p v and @p w of this or the other cell.
  *
+ * @ingroup febase fe
+ * 
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, partial reimplementation Ralf Hartmann 2001.
  */
 template <int dim>
@@ -896,7 +895,6 @@ class FESystem : public FiniteElement<dim>
     };
 };
 
-/*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
 

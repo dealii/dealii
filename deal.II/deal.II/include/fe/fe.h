@@ -299,6 +299,8 @@ namespace hp
  * eliminating degrees of freedom on common vertices and edges as well
  * as on the coarse grid vertices. See the discussion above for details.
  *
+ * @ingroup febase fe
+ * 
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001, 2005
  */
 template <int dim>

@@ -63,15 +63,33 @@
 
 
 /**
- * @defgroup feaccess Finite element access classes (FEValues etc.)
+ * @defgroup feaccess Finite element access/FEValues classes
  *
  * @ingroup feall
  */
 
 
 /**
- * @defgroup fe Finite element shape functions
+ * @defgroup fe Finite element space descriptions
  *
+ * The classes here describe finite element spaces, such as the simplest Q1
+ * (bi-/trilinear) spaces, and higher order Lagrangian spaces Qp, but also
+ * more specialized spaces such as Nedelec or Raviart-Thomas ones. Concrete
+ * implementations are derived from the abstract FiniteElement base class.
+ *
+ * In essence, the functions these classes have to implement provide the
+ * ability to query the value or derivatives of a shape function at a given
+ * point on the unit cell. To be useful in integrating matrix and right hand
+ * side entries, one has to have the ability to map these shape functions and
+ * gradients to the real cell. This is done using classes derived from the
+ * Mapping base class (see the @ref mapping module) in conjunction with the
+ * FEValues class (see the @ref feaccess module).
+ *
+ * The FESystem class is different since it doesn't describe shape functions
+ * itself, but assembles a vector-valued finite element from other finite
+ * element objects. This functionality is described step-8, step-17 and other
+ * tutorial programs after that.
+ * 
  * @ingroup feall
  */
 
@@ -84,7 +102,7 @@
  * class that provides a Q1 (bi-/trilinear) mapping (i.e. a mapping that is
  * isoparametric for the usual Q1 elements). However, there are other classes
  * that implement higher-order mappings as well to provide for curvilinear
-$* elements.
+ * elements. These are discussed in the step-11 and step-12 tutorial programs.
  *
  * The MappingQ1Eulerian class is an extension to the MappingQ1 class in that
  * it accepts a vector that describes a displacement field for each position
