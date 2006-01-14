@@ -79,5 +79,24 @@
 /**
  * @defgroup mapping Mappings between reference and real cell
  *
+ * The classes in this module are used to map from unit coordinates to the
+ * coordinates of a cell in real cell. Most commonly, one uses the MappingQ1
+ * class that provides a Q1 (bi-/trilinear) mapping (i.e. a mapping that is
+ * isoparametric for the usual Q1 elements). However, there are other classes
+ * that implement higher-order mappings as well to provide for curvilinear
+$* elements.
+ *
+ * The MappingQ1Eulerian class is an extension to the MappingQ1 class in that
+ * it accepts a vector that describes a displacement field for each position
+ * of the domain. This is used in Eulerian computations without the need to
+ * actually move vertices after each time step.
+ * 
+ * In addition, the MappingC1 class provides for a boundary of the
+ * computational domain that is not only curved, but also has a continuous
+ * derivative at the interface between two cells on the boundary.
+ * 
+ * Finally, the MappingCartesian class is an optimization for elements that
+ * are brick-shaped and with edges parallel to the coordinate axes.
+ * 
  * @ingroup feall
  */
