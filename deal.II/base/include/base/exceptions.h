@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -316,6 +316,7 @@
  *  also no output sequence is allowed.
  *
  *
+ *  @ingroup Exceptions
  *  @author Wolfgang Bangerth, November 1997, extensions 1998
  */
 class ExceptionBase : public std::exception
@@ -453,6 +454,8 @@ class ExceptionBase : public std::exception
 /**
  * In this namespace functions in connection with the Assert and
  * AssertThrow mechanism are declared.
+ * 
+ * @ingroup Exceptions
  */
 namespace deal_II_exceptions
 {
@@ -533,6 +536,8 @@ namespace deal_II_exceptions
  * and AssertThrow mechanism but are solely for internal purposes and
  * are not for use outside the exception handling and throwing
  * mechanism.
+ * 
+ *  @ingroup Exceptions
  */
   namespace internals
   {
@@ -621,6 +626,7 @@ namespace deal_II_exceptions
  *
  * See the ExceptionBase class for more information.
  *
+ * @ingroup Exceptions
  * @author Wolfgang Bangerth, November 1997, extensions 1998
  */
 #define Assert(cond, exc)                                           \
@@ -659,6 +665,7 @@ namespace deal_II_exceptions
  * See the <tt>ExceptionBase</tt> class for more information.
  *
  * @ref ExceptionBase
+ * @ingroup Exceptions
  * @author Wolfgang Bangerth, November 1997, extensions 1998
  */
 #ifndef DISABLE_ASSERT_THROW
@@ -695,6 +702,7 @@ namespace deal_II_exceptions
 /**
  * Declare an exception class derived from ExceptionBase without parameters.
  * @author Wolfgang Bangerth, November 1997
+ * @ingroup Exceptions
  */
 #define DeclException0(Exception0)  \
 class Exception0 :  public ExceptionBase {}
@@ -722,6 +730,7 @@ class Exception1 : public ExceptionBase {                             \
 /**
  *  Declare an exception class derived from ExceptionBase with
  *  two additional parameters.
+ *  @ingroup Exceptions
  */
 #define DeclException2(Exception2, type1, type2, outsequence)         \
 class Exception2 : public ExceptionBase {                             \
@@ -742,6 +751,7 @@ class Exception2 : public ExceptionBase {                             \
 /**
  *  Declare an exception class derived from ExceptionBase with
  *  three additional parameters.
+ *  @ingroup Exceptions
  */
 #define DeclException3(Exception3, type1, type2, type3, outsequence)  \
 class Exception3 : public ExceptionBase {                             \
@@ -763,6 +773,7 @@ class Exception3 : public ExceptionBase {                             \
 /**
  *  Declare an exception class derived from ExceptionBase with
  *  four additional parameters.
+ *  @ingroup Exceptions
  */
 #define DeclException4(Exception4, type1, type2, type3, type4, outsequence) \
 class Exception4 : public ExceptionBase {                             \
@@ -786,6 +797,7 @@ class Exception4 : public ExceptionBase {                             \
 /**
  *  Declare an exception class derived from ExceptionBase with
  *  five additional parameters.
+ *  @ingroup Exceptions
  */
 #define DeclException5(Exception5, type1, type2, type3, type4, type5, outsequence) \
 class Exception5 : public ExceptionBase {                             \
@@ -815,6 +827,8 @@ class Exception5 : public ExceptionBase {                             \
  * @code
  * using namespace StandardExceptions;
  * @endcode
+ *
+ * @ingroup Exceptions
  */
 namespace StandardExceptions 
 {
@@ -953,11 +967,11 @@ namespace StandardExceptions
 				    */
   DeclException0 (ExcNotInitialized);
 
-				     /**
-				      * The object is in a state not
-				      * suitable for this operation.
-				      */
-    DeclException0 (ExcInvalidState);
+                                   /**
+                                    * The object is in a state not
+                                    * suitable for this operation.
+                                    */
+  DeclException0 (ExcInvalidState);
     
 				   /**
 				    * This exception is raised if a
@@ -1000,14 +1014,14 @@ namespace StandardExceptions
 		  int, int,
 		  << "Dimension " << arg1 << " not equal to " << arg2);
 
-				     /**
-				      * The first dimension should be
-				      * either equal to the second or
-				      * the third, but it is neither.
-				      */
-    DeclException3 (ExcDimensionMismatch2,
-		    int, int, int,
-		    << "Dimension " << arg1 << " neither equal to " << arg2 << " nor to " << arg3);
+                                   /**
+                                    * The first dimension should be
+                                    * either equal to the second or
+                                    * the third, but it is neither.
+                                    */
+  DeclException3 (ExcDimensionMismatch2,
+                  int, int, int,
+                  << "Dimension " << arg1 << " neither equal to " << arg2 << " nor to " << arg3);
 
 				   /**
 				    * This exception is one of the
