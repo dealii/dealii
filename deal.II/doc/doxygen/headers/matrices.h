@@ -40,7 +40,7 @@
  *
  * @author Guido Kanschat, 2003
  *
- * @ingroup LAC Matrices
+ * @ingroup Matrices
  */
 
 
@@ -52,5 +52,5 @@
  *
  * @author Guido Kanschat, 2003
  *
- * @ingroup LAC Matrices
+ * @ingroup Matrices
  */
