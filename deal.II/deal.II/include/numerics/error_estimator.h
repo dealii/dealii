@@ -203,7 +203,8 @@ template <int dim> class FESubfaceValues;
  *  function that accepts several in- and output vectors at the same
  *  time. 
  *
- *  @author Wolfgang Bangerth, 1998, 1999, 2000; parallelization by Thomas Richter, 2000
+ *  @ingroup numerics
+ *  @author Wolfgang Bangerth, 1998, 1999, 2000, 2004, 2006; parallelization by Thomas Richter, 2000
  */
 template <int dim>
 class KellyErrorEstimator

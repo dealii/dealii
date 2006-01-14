@@ -163,6 +163,7 @@ namespace hp
  * the appropriate analogues for the derivative that is to be
  * approximated.
  *
+ * @ingroup numerics
  * @author Wolfgang Bangerth, 2000
  */
 class DerivativeApproximation

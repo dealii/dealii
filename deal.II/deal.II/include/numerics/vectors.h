@@ -297,6 +297,8 @@ class ConstraintMatrix;
  * pointer stored within the triangulation object is accessed.
  *
  * @ref Instantiations : some (Vector<float>, Vector<double>, BlockVector<float>, BlockVector<double>, see also individual functions)
+ *
+ * @ingroup numerics
  * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, 1998, 1999, 2000, 2001
  */
 class VectorTools

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -178,6 +178,7 @@ namespace PETScWrappers
  * latter may be useful if you want to create many right hand side
  * vectors.
  *
+ * @ingroup numerics
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
 class MatrixCreator
@@ -737,6 +738,7 @@ class MatrixCreator
  * there are no hanging nodes and even then doesn't always work fully
  * satisfactorily.
  * 
+ * @ingroup numerics
  * @author Wolfgang Bangerth, 1998, 2000, 2004, 2005
  */
 class MatrixTools : public MatrixCreator
