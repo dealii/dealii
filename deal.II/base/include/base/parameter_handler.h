@@ -38,8 +38,10 @@ class LogStream;
 
 
 /**
- * Declare some regexps which
- * may be used to define patterns.
+ * Namespace for a few classes that act as patterns for the ParameterHandler
+ * class. These classes implement an interface that checks whether a parameter
+ * in an input file matches a certain pattern, such as "being boolean", "an
+ * integer value", etc.
  *
  * @ingroup input
  */ 
