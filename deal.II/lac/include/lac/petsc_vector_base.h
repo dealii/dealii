@@ -34,7 +34,7 @@ template <typename number> class Vector;
  * A namespace in which wrapper classes for PETSc objects reside.
  *
  * @ingroup PETScWrappers
- * @ref SoftwarePETSc
+ * @see @ref SoftwarePETSc
  * @author Wolfgang Bangerth, 2004
  */
 namespace PETScWrappers
