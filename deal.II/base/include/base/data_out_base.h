@@ -1601,7 +1601,7 @@ class DataOutBase
  * Write the given list of patches to the output stream in vtk format.
  *
  * This is the file format used by the Visualization Toolkit <a
- * href="http://www.kitware.com/vtk.html">VTK</a>, as described in
+ * href="http://public.kitware.com/VTK/">VTK</a>, as described in
  * their manual, section 14.3. It is similar to write_gmv().
  */
     template <int dim, int spacedim>
