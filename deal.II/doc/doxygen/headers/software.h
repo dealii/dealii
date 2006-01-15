@@ -62,7 +62,7 @@
  *
  * VTK is an open format supported by a number of visualization
  * projects such as ParaView, VisIt, or MayaVi. See
- * http://www.kitware.com/vtk.html
+ * http://public.kitware.com/VTK/
  *
  *
  * 
