@@ -68,19 +68,19 @@
  * The classes in this module are used when one wants to assemble matrices or
  * vectors. They link finite elements, quadrature objects, and mappins: the
  * finite element classes describes a finite element space on a unit cell
- * (i.e. the unit line segment, square, or cube @f$[0,1]^d@f$), the quadrature
- * classes describe where quadrature points are located and what weight they
- * have, and the mapping classes describe how to map a point from the unit
- * cell to a real cell and back. Since integration happens at quadrature
- * points on the real cell, and needs to know their location as well as the
- * values and gradients of finite element shape functions at these points. The
- * FEValues class coordinates getting this information. For integrations on
- * faces (for example for integration on the boundary, or interfaces between
- * cells), the FEFaceValues class offers similar functionality as the FEValues
- * class does for cells. Finally, the FESubfaceValues class offers the
- * possibility to ingrate on parts of faces if the neighboring cell is refined
- * and the present cell shares only a part of its face with the neighboring
- * cell.
+ * (i.e. the unit line segment, square, or cube <tt>[0,1]^d</tt>), the
+ * quadrature classes describe where quadrature points are located and what
+ * weight they have, and the mapping classes describe how to map a point from
+ * the unit cell to a real cell and back. Since integration happens at
+ * quadrature points on the real cell, and needs to know their location as
+ * well as the values and gradients of finite element shape functions at these
+ * points. The FEValues class coordinates getting this information. For
+ * integrations on faces (for example for integration on the boundary, or
+ * interfaces between cells), the FEFaceValues class offers similar
+ * functionality as the FEValues class does for cells. Finally, the
+ * FESubfaceValues class offers the possibility to ingrate on parts of faces
+ * if the neighboring cell is refined and the present cell shares only a part
+ * of its face with the neighboring cell.
  *
  * The last member of this group, the UpdateFlags enumeration, is used as an
  * optimization: instead of letting the FEValues class compute every possible
