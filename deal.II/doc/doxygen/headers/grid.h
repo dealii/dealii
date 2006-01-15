@@ -82,7 +82,7 @@
  *
  * Meshes can be written to output files in a number of different formats. If
  * this involves simulation results obtained on this mesh, then this is done
- * using the DataOut class (described in more detail in the @ref Output
+ * using the DataOut class (described in more detail in the @ref output
  * module). On the other hand, if only the geometry and topology of the mesh
  * is to be written to a file, the GridOut class can do this for you.
  *
