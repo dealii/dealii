@@ -1029,6 +1029,7 @@ class SparseDirectMA47 : public Subscriptor
  *
  * 
  * @ingroup Solvers Preconditioners
+ * @see @ref SoftwareUMFPACK
  *
  * @author Wolfgang Bangerth, 2004
  */

@@ -87,11 +87,19 @@
  * PETSc can be obtained from http://www.mcs.anl.gov/petsc/.
  *
  *
- * @subsection METIS METIS
+ * @subsection SoftwareMETIS METIS
  *
  * METIS is a tool that allows to partition a graph into chunks of roughly
  * equal size. We use it to subdivide a domain into blocks that have about the
  * same number of cells, when distributing work for parallel programs. METIS
  * can be obtained from http://www-users.cs.umn.edu/~karypis/metis/index.html
+ *
  * 
+ * @subsection SoftwareUMFPACK UMFPACK
+ *
+ * UMFPACK is a sparse direct solver and is included by permission with
+ * deal.II distributions. To configure its available, read the README file.
+ *
+ * UMFPACK can be obtained from
+ * http://www.cise.ufl.edu/research/sparse/umfpack/
  */
