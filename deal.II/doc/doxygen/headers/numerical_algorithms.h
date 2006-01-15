@@ -26,5 +26,11 @@
  *
  * The remaining classes MatrixCreator, MatrixTools, and VectorTools provide
  * an assortment of services, such as creating a Laplac matrix, projecting or
- * interpolating a function onto the present finite element space, etc.
+ * interpolating a function onto the present finite element space, etc.  The
+ * difference to the functions in the DoFTools and FETools functions is that
+ * they work on vectors (i.e. members of a finite element function space on a
+ * given triangulation) or help in the creation of it. On the other hand, the
+ * DoFTools functions only act on a given DoFHandler object without reference
+ * to a data vector, and the FETools objects generally work with finite
+ * element classes but again without any associated data vectors.
  */
