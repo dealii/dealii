@@ -14,5 +14,17 @@
 /**
  * @defgroup numerics Numerical algorithms
  *
+ * This module groups a diverse set of classes that generally implement some
+ * sort of numerical algorithm on top all the basic triangulation, DoFHandler,
+ * and finite element classes in the library. They are generally unconnected
+ * to each other.
  *
+ * Some of the classes, like DerivativeApproximation, KellyErrorEstimator and
+ * SolutionTransfer, act on solutions already obtained, and compute derived
+ * quantities in the first two cases, or help transfering a set of vectors
+ * from one mesh to another.
+ *
+ * The remaining classes MatrixCreator, MatrixTools, and VectorTools provide
+ * an assortment of services, such as creating a Laplac matrix, projecting or
+ * interpolating a function onto the present finite element space, etc.
  */
