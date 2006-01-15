@@ -3,6 +3,12 @@
  *
  * @note Names of software products are trademarks of their respective owners.
  *
+ * This is a list of software packages that deal.II interacts with in some
+ * way, either by supporting a data format of another program, or by actively
+ * calling functions of other packages. Configuration of interfaces, if
+ * necessary at all, is described in the deal.II ReadMe file.
+ * 
+ * 
  * @section SodtwarePrePost Pre- and Postprocessing
  *
  * @subsection SoftwareVis Visualization tools
@@ -58,5 +64,24 @@
  * projects such as ParaView, VisIt, or MayaVi. See
  * http://www.kitware.com/vtk.html
  *
+ *
+ * 
  * @section SoftwareLibs Libraries used inside deal.II
+ *
+ * @subsection PETSc PETSc
+ *
+ * PETSc is a library that supports, among other things, a large number of
+ * linear algebra data structures and algorithms, in much the same way as we
+ * do in the linear algebra classes of deal.II (see @ref LAC). However, PETSc
+ * goes beyond what we have to offer in that it has more algorithms (for
+ * example algebraic multigrid) and most importantly it works in parallel on
+ * distributed memory clusters, using MPI.
+ *
+ * In order to support parallel computations in deal.II, we have written
+ * interfaces to many PETSc functions and data structures in the PETScWrapper
+ * namespace, that allow the use of PETSc in much the same way as deal.II's
+ * own linear algebra classes are used. The use of these wrappers is explained
+ * in the step-17 and step-18 example programs.
+ *
+ * PETSc can be obtained from http://www.mcs.anl.gov/petsc/.
  */
