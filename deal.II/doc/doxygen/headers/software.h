@@ -68,7 +68,7 @@
  * 
  * @section SoftwareLibs Libraries used inside deal.II
  *
- * @subsection PETSc PETSc
+ * @subsection SoftwarePETSc PETSc
  *
  * PETSc is a library that supports, among other things, a large number of
  * linear algebra data structures and algorithms, in much the same way as we
@@ -81,7 +81,17 @@
  * interfaces to many PETSc functions and data structures in the PETScWrapper
  * namespace, that allow the use of PETSc in much the same way as deal.II's
  * own linear algebra classes are used. The use of these wrappers is explained
- * in the step-17 and step-18 example programs.
+ * in the step-17 and step-18 example programs, as well as in the @ref
+ * PETScWrappers module.
  *
  * PETSc can be obtained from http://www.mcs.anl.gov/petsc/.
+ *
+ *
+ * @subsection METIS METIS
+ *
+ * METIS is a tool that allows to partition a graph into chunks of roughly
+ * equal size. We use it to subdivide a domain into blocks that have about the
+ * same number of cells, when distributing work for parallel programs. METIS
+ * can be obtained from http://www-users.cs.umn.edu/~karypis/metis/index.html
+ * 
  */
