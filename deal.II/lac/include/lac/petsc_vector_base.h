@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,6 +34,7 @@ template <typename number> class Vector;
  * A namespace in which wrapper classes for PETSc objects reside.
  *
  * @ingroup PETScWrappers
+ * @ref SoftwarePETSc
  * @author Wolfgang Bangerth, 2004
  */
 namespace PETScWrappers

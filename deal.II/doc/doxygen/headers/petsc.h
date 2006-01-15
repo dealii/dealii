@@ -26,6 +26,7 @@
  * about this.
  *
  * @author Wolfgang Bangerth, 2004
+ * @ref SoftwarePETSc
  *
  * @ingroup LAC
  */
