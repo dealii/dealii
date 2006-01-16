@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -134,7 +134,7 @@ void check_faces (Quadrature<1>& q1)
 		<< std::endl;
 	
 	unsigned int
-	  offset = QProjector<dim>::DataSetDescriptor::sub_face(f, s, false, nqs);
+	  offset = QProjector<dim>::DataSetDescriptor::subface(f, s, false, nqs);
 	
 	for (unsigned int k=0;k<nqs;++k)
 	  deallog << faces.point(offset+k) << std::endl;
@@ -143,7 +143,7 @@ void check_faces (Quadrature<1>& q1)
 		<< " orientation true"
 		<< std::endl;
 	
-	offset = QProjector<dim>::DataSetDescriptor::sub_face(f, s, true, nqs);
+	offset = QProjector<dim>::DataSetDescriptor::subface(f, s, true, nqs);
 	
 	for (unsigned int k=0;k<nqs;++k)
 	  deallog << faces.point(offset+k) << std::endl;

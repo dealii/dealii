@@ -22,7 +22,9 @@
 
 //TODO: Several functions are commented out since implementations are missing
 
-#define WRITE(type) DataOutBase::write_ ## type (patches, names, type ## flags, out)
+#define WRITE(type) { out << "Writing " # type " dimensions " \
+<< dim << ',' << spacedim << std::endl; \
+DataOutBase::write_ ## type (patches, names, type ## flags, out); }
 
 template <int dim, int spacedim>
 void
@@ -52,6 +54,8 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> >& patches,
   WRITE(ucd);
   WRITE(vtk);
   WRITE(deal_II_intermediate);
+//  if (dim==2)
+//    WRITE(eps);
 }
 
 template<int dim>
@@ -73,8 +77,8 @@ template <>
 double PatchInfo<2>::vertices[4][3]
 = {{0, 0, 0}
   ,{3, 0, 3}
-  ,{3, 3, 6}
   ,{3, 0, 3}
+  ,{3, 3, 6}
 };
 
 
@@ -82,12 +86,12 @@ template <>
 double PatchInfo<3>::vertices[8][3]
 = {{0, 0, 0}
   ,{3, 0, 0}
-  ,{3, 3, 0}
   ,{0, 3, 0}
+  ,{3, 3, 0}
   ,{0, 0, 3}
   ,{3, 0, 3}
-  ,{3, 3, 3}
   ,{0, 3, 3}
+  ,{3, 3, 3}
 };
 
 

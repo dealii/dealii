@@ -29,7 +29,7 @@
 
 
 template <int dim, int spacedim>
-void check(DataOutBase::EpsFlags flags,
+void check(DataOutBase::GnuplotFlags flags,
 	   std::ostream& out)
 {
   const unsigned int np = 4;
@@ -44,7 +44,7 @@ void check(DataOutBase::EpsFlags flags,
   names[2] = "x3";
   names[3] = "x4";
   names[4] = "i";
-  DataOutBase::write_eps(patches, names, flags, out);
+  DataOutBase::write_gnuplot(patches, names, flags, out);
 }
 
 
@@ -56,14 +56,11 @@ void check_all(std::ostream& log)
 #endif
   
   char name[100];
-  const char* format = "data_out_base_eps/%d%d%d%s.eps";
-  DataOutBase::EpsFlags flags;
+  const char* format = "data_out_base_gnuplot/%d%d.gnuplot";
+  DataOutBase::GnuplotFlags flags;
   for (unsigned int i=0;i<5;++i)
     {
-      flags.height_vector = i;
-      flags.color_vector = i;
-      
-      sprintf(name, format, dim, spacedim, i, "");
+      sprintf(name, format, dim, spacedim, "");
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else
@@ -77,10 +74,10 @@ void check_all(std::ostream& log)
 
 int main()
 {
-  std::ofstream logfile("data_out_base_eps/output");
-//  check_all<1,1>(logfile);
-//  check_all<1,2>(logfile);
+  std::ofstream logfile("data_out_base_gnuplot/output");
+  check_all<1,1>(logfile);
+  check_all<1,2>(logfile);
   check_all<2,2>(logfile);
   check_all<2,3>(logfile);
-//  check_all<3,3>(logfile);  
+  check_all<3,3>(logfile);  
 }

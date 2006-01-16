@@ -53,10 +53,10 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim> > & patches)
 	    for (unsigned int i1=0;i1<n1;++i1)
 	      {
 		const unsigned int i = i1+nsubp*(i2+nsubp*(i3+nsubp*i4));
-		const float x1 = 2.*i1/n1-1.;
-		const float x2 = 2.*i2/n2-1.;
-		const float x3 = 2.*i3/n3-1.;
-		const float x4 = 2.*i4/n4-1.;
+		const float x1 = 1.*i1/nsub;
+		const float x2 = 1.*i2/nsub;
+		const float x3 = 1.*i3/nsub;
+		const float x4 = 1.*i4/nsub;
 		
 		patch.data(0,i) = p+x1;
 		patch.data(1,i) = p+x2;

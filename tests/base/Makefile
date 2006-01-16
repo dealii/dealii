@@ -37,7 +37,7 @@ tests_x =  logtest \
 	   auto_derivative_function \
 	   anisotropic_* \
            hierarchical \
-	   data_out_base \
+	   data_out_base* \
 	   function_parser \
 	   utilities_*
 

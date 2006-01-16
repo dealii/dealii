@@ -24,6 +24,10 @@
 
 // Output data on repetitions of the unit hypercube
 
+// define this as 1 to get output into a separate file for each testcase
+#define SEPARATE_FILES 0
+
+
 template <int dim, int spacedim>
 void check(DataOutBase::DXFlags flags,
 	   std::ostream& out)
@@ -45,35 +49,82 @@ void check(DataOutBase::DXFlags flags,
 
 
 template<int dim, int spacedim>
-void check_all()
+void check_all(std::ostream& log)
 {
+#if SEPARATE_FILES == 0
+  std::ostream& out = log;
+#endif
+  
+  char name[100];
+  const char* format = "data_out_base_dx/%d%d%s.dx";
   DataOutBase::DXFlags flags(false, false, false, false);
   if (true) {
-    std::ofstream out("data_out_base_dx/fff3ff22.dx");
+    sprintf(name, format, dim, spacedim, "ffff");
+#if SEPARATE_FILES==1
+    std::ofstream out(name);
+#else
+	out << "==============================\n"
+	    << name
+	    << "\n==============================\n";
+#endif
     check<dim,spacedim>(flags, out);
   }
   flags.int_binary = true;
   if (true) {
-    std::ofstream out("data_out_base_dx/tff3ff22.dx");
+    sprintf(name, format, dim, spacedim, "tfff");
+#if SEPARATE_FILES==1
+    std::ofstream out(name);
+#else
+	out << "==============================\n"
+	    << name
+	    << "\n==============================\n";
+#endif
     check<dim,spacedim>(flags, out);
   }
   flags.coordinates_binary = true;
   if (true) {
-    std::ofstream out("data_out_base_dx/ttf3ff22.dx");
+    sprintf(name, format, dim, spacedim, "ttff");
+#if SEPARATE_FILES==1
+    std::ofstream out(name);
+#else
+	out << "==============================\n"
+	    << name
+	    << "\n==============================\n";
+#endif
     check<dim,spacedim>(flags, out);
   }
   flags.data_binary = true;
   if (true) {
-    std::ofstream out("data_out_base_dx/ttt3ff22.dx");
+    sprintf(name, format, dim, spacedim, "tttf");
+#if SEPARATE_FILES==1
+    std::ofstream out(name);
+#else
+	out << "==============================\n"
+	    << name
+	    << "\n==============================\n";
+#endif
+    check<dim,spacedim>(flags, out);
+  }
+  flags.data_double = true;
+  if (true) {
+    sprintf(name, format, dim, spacedim, "tttf");
+#if SEPARATE_FILES==1
+    std::ofstream out(name);
+#else
+	out << "==============================\n"
+	    << name
+	    << "\n==============================\n";
+#endif
     check<dim,spacedim>(flags, out);
   }
 }
 
 int main()
 {
-  check_all<1,1>();
-  check_all<1,2>();
-  check_all<2,2>();
-  check_all<2,3>();
-  check_all<3,3>();  
+  std::ofstream logfile("data_out_base_dx/output");
+  check_all<1,1>(logfile);
+  check_all<1,2>(logfile);
+  check_all<2,2>(logfile);
+  check_all<2,3>(logfile);
+  check_all<3,3>(logfile);  
 }
