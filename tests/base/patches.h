@@ -62,9 +62,8 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim> > & patches)
 		patch.data(1,i) = p+x2;
 		patch.data(2,i) = p+x3;
 		patch.data(3,i) = p+x4;
-		patch.data(4,i) = i;//x1*x1+x2*x2+x3*x3+x4*x4;
+		patch.data(4,i) = i;
 	      }
-
     }
 }
 

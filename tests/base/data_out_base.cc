@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,7 +34,7 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> >& patches,
   names[1] = std::string("last name");
 
   DataOutBase::DXFlags dxflags;
-//  DataOutBase::EpsFlags epsflags;
+  DataOutBase::EpsFlags epsflags;
   DataOutBase::GnuplotFlags gnuplotflags;
   DataOutBase::GmvFlags gmvflags;
   DataOutBase::PovrayFlags povrayflags;
@@ -43,7 +43,8 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> >& patches,
   DataOutBase::Deal_II_IntermediateFlags deal_II_intermediateflags;
   
   WRITE(dx);
-//  WRITE(eps);
+  if (dim==2)
+    WRITE(eps);
   WRITE(gnuplot);
   WRITE(gmv);
   if (dim==2 && spacedim==2)
