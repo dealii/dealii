@@ -105,6 +105,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: If you do have a PETSc installation
+       and have set the <code>PETSC_DIR</code> and
+       <code>PETSC_ARCH</code> environment variables but do not wish
+       <acronym>deal.II</acronym> to be configured for PETSc use, you
+       should specify <code>--with-petsc=no</code> as a flag during
+       configuration. 
+       <br> 
+       (WB 2006/01/16)
+       </p>
+
+  <li> <p>
        Improved: In all directories, including those for tutorial
        programs, we generate a file called <code>Makefile.dep</code>
        that lists the dependencies of object files on source files,

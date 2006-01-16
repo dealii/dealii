@@ -4663,16 +4663,22 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
                           are subdirs; use this if you want to override
                           the PETSC_DIR environment variable.],
      [
-	USE_CONTRIB_PETSC=yes
-        DEAL_II_PETSC_DIR=$withval
-	AC_MSG_RESULT($DEAL_II_PETSC_DIR)
+        dnl Special case when someone does --with-petsc=no
+        if test "x$withval" = "xno" ; then
+          AC_MSG_RESULT([explicitly disabled])
+          USE_CONTRIB_PETSC=no
+        else
+	  USE_CONTRIB_PETSC=yes
+          DEAL_II_PETSC_DIR=$withval
+	  AC_MSG_RESULT($DEAL_II_PETSC_DIR)
 
-        dnl Make sure that what was specified is actually correct
-        if test ! -d $DEAL_II_PETSC_DIR/include \
-             -o ! -d $DEAL_II_PETSC_DIR/lib ; then
-          AC_MSG_ERROR([Path to PETSc specified with --with-petsc does not
- 			point to a complete PETSc installation])
-	fi
+          dnl Make sure that what was specified is actually correct
+          if test ! -d $DEAL_II_PETSC_DIR/include \
+               -o ! -d $DEAL_II_PETSC_DIR/lib ; then
+            AC_MSG_ERROR([Path to PETSc specified with --with-petsc does not
+ 		  	  point to a complete PETSc installation])
+	  fi
+        fi
      ],
      [
         dnl Take something from the environment variables, if it is there

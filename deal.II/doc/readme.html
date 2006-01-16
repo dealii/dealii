@@ -816,7 +816,13 @@
       enable the wrapper classes (they are disabled by default, if PETSc is
       unavailable). However, you can override the values of these environment
       variablaes by using the <code>--with-petsc=DIR</code> and
-      <code>--with-mpi-arch=ARCH</code> switches to <code>./configure</code>.
+      <code>--with-mpi-arch=ARCH</code> switches to
+      <code>./configure</code>. If you do have a PETSc installation
+      and have set the <code>PETSC_DIR</code> and
+      <code>PETSC_ARCH</code> environment variables but do not wish
+      <acronym>deal.II</acronym> to be configured for PETSc use, you
+      should specify <code>--with-petsc=no</code> as a flag during
+      configuration. 
       </p>
 
       <p>
