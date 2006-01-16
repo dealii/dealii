@@ -1,7 +1,7 @@
 ######################################################################
 # Makefile.rules,v 1.11 2001/04/24 13:18:09 wolf Exp
 #
-# Copyright (C) 2001, 2002, 2003, 2004, 2005, the deal.II authors
+# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, the deal.II authors
 #
 # Common make rules for test files. To be included by the Makefiles
 # in the subdirectories.
@@ -40,7 +40,7 @@ endif
 ######################################################################
 # Don't put $(libraries) into this line since it is already in $^
 ######################################################################
-%/exe :
+%/exe : %/obj.g.$(OBJEXT)
 	@echo =====linking======= $@
 	@$(CXX) $(LDFLAGS) -o $@ ../abort.o $^ $(LIBS)
 
@@ -100,7 +100,7 @@ endif
 	    if test -f $$testname/cmp/$$i ; then \
 		cmpfile_found=yes ; \
 		if test "x$(verbose)" = "xon" ; then \
-			cmd="diff -w $< $$testname/cmp/$$i" ; \
+			cmd="diff $(DIFFOPT) -w $< $$testname/cmp/$$i" ; \
 		 else \
 			cmd="diff -w $< $$testname/cmp/$$i > /dev/null" ; \
 		 fi ; \
