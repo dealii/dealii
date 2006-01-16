@@ -248,15 +248,9 @@ namespace hp
   }
 
 
-
-
 // explicit instantiations
   namespace internal
   {
-    template class FEValuesMap<deal_II_dimension,FEValues<deal_II_dimension> >;
-    template class FEValuesMap<deal_II_dimension,FEFaceValues<deal_II_dimension> >;
-    template class FEValuesMap<deal_II_dimension,FESubfaceValues<deal_II_dimension> >;
-
     template class FEValuesBase<deal_II_dimension,deal_II_dimension>;
 #if deal_II_dimension >= 2
     template class FEValuesBase<deal_II_dimension,deal_II_dimension-1>;
@@ -268,5 +262,11 @@ namespace hp
   template class FEFaceValues<deal_II_dimension>;
   template class FESubfaceValues<deal_II_dimension>;
 #endif
-  
 }
+
+// Putting the following explicit instantiations into the brackets 
+// of the appropriate namespace somehow causes problems with the 
+// Apple gcc3.3. Therefore these are separated.
+template class hp::internal::FEValuesMap<deal_II_dimension,FEValues<deal_II_dimension> >;
+template class hp::internal::FEValuesMap<deal_II_dimension,FEFaceValues<deal_II_dimension> >;
+template class hp::internal::FEValuesMap<deal_II_dimension,FESubfaceValues<deal_II_dimension> >;
