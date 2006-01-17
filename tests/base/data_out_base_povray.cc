@@ -14,12 +14,13 @@
 #include "../tests.h"
 #include <base/data_out_base.h>
 #include <base/logstream.h>
+#include <base/quadrature_lib.h>
+#include <base/function_lib.h>
 
 #include <vector>
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <stdio.h>
 
 #include "patches.h"
 
@@ -30,7 +31,7 @@
 
 
 template <int dim, int spacedim>
-void check(DataOutBase::TecplotFlags flags,
+void check(DataOutBase::PovrayFlags flags,
 	   std::ostream& out)
 {
   const unsigned int np = 4;
@@ -45,7 +46,23 @@ void check(DataOutBase::TecplotFlags flags,
   names[2] = "x3";
   names[3] = "x4";
   names[4] = "i";
-  DataOutBase::write_tecplot(patches, names, flags, out);
+  DataOutBase::write_povray(patches, names, flags, out);
+}
+
+
+template <int dim>
+void check_cont(unsigned int ncells,
+		unsigned int nsub,
+		DataOutBase::PovrayFlags flags,
+		std::ostream& out)
+{
+  std::vector<DataOutBase::Patch<dim, dim> > patches;
+  
+  create_continuous_patches(patches, ncells, nsub);
+  
+  std::vector<std::string> names(1);
+  names[0] = "CutOff";
+  DataOutBase::write_povray(patches, names, flags, out);
 }
 
 
@@ -57,27 +74,29 @@ void check_all(std::ostream& log)
 #endif
   
   char name[100];
-  DataOutBase::TecplotFlags flags;
-  if (true) {
-    sprintf(name, "data_out_base_tecplot/%d%d.tecplot", dim, spacedim);
+  const char* format = "data_out_base_povray/%d%d%d%s.povray";
+  DataOutBase::PovrayFlags flags;
+
+  if (true)
+    {
+      sprintf(name, "data_out_base_povray/cont%d%d%d.povray", dim, 4, 4);
 #if SEPARATE_FILES==1
-    std::ofstream out(name);
+      std::ofstream out(name);
 #else
-	out << "==============================\n"
-	    << name
-	    << "\n==============================\n";
+      out << "==============================\n"
+	  << name
+	  << "\n==============================\n";
 #endif
-    check<dim,spacedim>(flags, out);
-  }
+      check_cont<dim>(4, 4, flags, out);
+    }
 }
 
 int main()
 {
-  std::ofstream logfile("data_out_base_tecplot/output",
-			std::ios_base::trunc | std::ios_base::binary);
-  check_all<1,1>(logfile);
-  check_all<1,2>(logfile);
+  std::ofstream logfile("data_out_base_povray/output");
+//  check_all<1,1>(logfile);
+//  check_all<1,2>(logfile);
   check_all<2,2>(logfile);
   check_all<2,3>(logfile);
-  check_all<3,3>(logfile);
+//  check_all<3,3>(logfile);  
 }
