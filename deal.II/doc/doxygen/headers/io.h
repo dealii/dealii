@@ -117,7 +117,7 @@
  * Through the MatrixOut class, deal.II can also give a graphical
  * visualization of matrices, in the form of color or skyline plots. The
  * MatrixOut class uses the DataOutBase for output. Therefore, matrices can be
- * visualization in all formats supported by the latter class.
+ * visualized in all formats supported by the latter class.
  *
  *
  * <h3>The ConditionalOStream class</h3>
@@ -130,7 +130,7 @@
  * program.
  *
  *
- * <h3>LogStream</h3>
+ * <h3>The LogStream class</h3>
  *
  * The LogStream class is used to write status output of programs to
  * logfiles. It, again, acts like <code>std::ostream</code>, but
