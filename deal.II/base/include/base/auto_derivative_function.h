@@ -67,6 +67,7 @@
  * as intermediate class between the base Function class and the
  * user defined function class.
  *
+ * @ingroup functions
  * @author Ralf Hartmann, 2001
  */
 template <int dim>
