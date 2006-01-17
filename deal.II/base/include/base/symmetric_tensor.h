@@ -599,6 +599,7 @@ namespace internal
  * application programs to restrict operations on individual elements
  * to simple reads or writes.
  *
+ * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 2005
  */
 template <int rank, int dim>

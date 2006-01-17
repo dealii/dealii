@@ -60,6 +60,9 @@ template <int dim> class Tensor<1,dim>;
  * other uses, such as the gradient of a scalar function (which is a tensor of
  * rank 1, or vector, with as many elements as a point object, but with
  * different physical units), we use the <tt>Tensor<1,dim></tt> class.
+ *
+ * @ingroup geomprimitives
+ * @author Wolfgang Bangerth, 1998-2005
  */
 template <int dim>
 class Tensor<1,dim>
@@ -706,10 +709,14 @@ Tensor<1,dim>::memory_consumption ()
 }
 
 
+#endif // DOXYGEN
+
 
 /**
  * Output operator for tensors of rank 1. Print the elements
  * consecutively, with a space in between.
+ *
+ * @relates Tensor<1,dim>
  */
 template <int dim>
 inline
@@ -728,6 +735,8 @@ std::ostream & operator << (std::ostream &out, const Tensor<1,dim> &p)
  * Output operator for tensors of rank 1 and dimension 1. This is
  * implemented specialized from the general template in order to avoid
  * a compiler warning that the loop is empty.
+ *
+ * @relates Tensor<1,dim>
  */
 inline
 std::ostream & operator << (std::ostream &out, const Tensor<1,1> &p)
@@ -741,6 +750,8 @@ std::ostream & operator << (std::ostream &out, const Tensor<1,1> &p)
 
 /**
  * Multiplication of a tensor of rank 1 with a scalar double from the right.
+ *
+ * @relates Tensor<1,dim>
  */
 template <int dim>
 inline
@@ -758,6 +769,8 @@ operator * (const Tensor<1,dim> &t,
 
 /**
  * Multiplication of a tensor of rank 1 with a scalar double from the left.
+ *
+ * @relates Tensor<1,dim>
  */
 template <int dim>
 inline
@@ -775,6 +788,8 @@ operator * (const double         factor,
 
 /**
  * Division of a tensor of rank 1 by a scalar double.
+ *
+ * @relates Tensor<1,dim>
  */
 template <int dim>
 inline
@@ -787,8 +802,6 @@ operator / (const Tensor<1,dim> &t,
     tt[d] = t[d] / factor;
   return tt;
 }
-
-#endif // DOXYGEN
 
 #endif
 

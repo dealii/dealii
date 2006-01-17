@@ -22,98 +22,13 @@
 template <int dim> class GeometryInfo;
 
 
-/**
- * Topological description of zero dimensional cells,
- * i.e. points. This class might not look too useful but often is if
- * in a certain dimension we would like to enquire information about
- * objects with dimension one lower than the present, e.g. about
- * faces.
- *
- * This class contains as static members information on vertices and
- * faces of a @p dim-dimensional grid cell. The interface is the same
- * for all dimensions. If a value is of no use in a low dimensional
- * cell, it is (correctly) set to zero, e.g. #subfaces_per_face in
- * 1d.
- *
- * This information should always replace hard-coded numbers of
- * vertices, neighbors and so on, since it can be used dimension
- * independently.
- *
- * @ingroup grid
- * @author Wolfgang Bangerth, 1998
- */
-template <>
-struct GeometryInfo<0> 
-{
 
-				     /**
-				      * Number of children a cell has.
-				      */
-    static const unsigned int children_per_cell = 1;
-
-				     /**
-				      * Number of faces a cell has.
-				      */
-    static const unsigned int faces_per_cell    = 0;
-
-				     /**
-				      * Number of children each face has
-				      * when the adjacent cell is refined.
-				      */
-    static const unsigned int subfaces_per_face = 0;
-
-				     /**
-				      * Number of vertices a cell has.
-				      */
-    static const unsigned int vertices_per_cell = 1;
-
-				     /**
-				      * Number of vertices each face has.
-				      * Since this is not useful in one
-				      * dimension, we provide a useless
-				      * number (in the hope that a compiler
-				      * may warn when it sees constructs like
-				      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
-				      * at least if @p i is an <tt>unsigned int</tt>.
-				      */
-    static const unsigned int vertices_per_face = 0;
-
-				     /**
-				      * Number of lines each face has.
-				      */
-    static const unsigned int lines_per_face    = 0;
-    
-				     /**
-				      * Number of quads on each face.
-				      */
-    static const unsigned int quads_per_face    = 0;
-
-				     /**
-				      * Number of lines of a cell.
-				      */
-    static const unsigned int lines_per_cell    = 0;
-
-				     /**
-				      * Number of quadrilaterals of a
-				      * cell.
-				      */
-    static const unsigned int quads_per_cell    = 0;
-
-				     /**
-				      * Number of hexahedra of a
-				      * cell.
-				      */
-    static const unsigned int hexes_per_cell    = 0;
-};
-
-
-
-//! Topological description of cells.
 /**
  * Dimension independent base class for the <tt>GeometryInfo<dim></tt>
  * classes with <tt>dim=1,2,3,4</tt>. Includes all data and methods
  * which can be defined in an dimension indendent way.
  *
+ * @ingroup grid geomprimitives
  * @author Ralf Hartmann, 2005
  */
 class GeometryInfoBase
@@ -183,11 +98,100 @@ class GeometryInfoBase
 
 
 
+
+/**
+ * Topological description of zero dimensional cells,
+ * i.e. points. This class might not look too useful but often is if
+ * in a certain dimension we would like to enquire information about
+ * objects with dimension one lower than the present, e.g. about
+ * faces.
+ *
+ * This class contains as static members information on vertices and
+ * faces of a @p dim-dimensional grid cell. The interface is the same
+ * for all dimensions. If a value is of no use in a low dimensional
+ * cell, it is (correctly) set to zero, e.g. #subfaces_per_face in
+ * 1d.
+ *
+ * This information should always replace hard-coded numbers of
+ * vertices, neighbors and so on, since it can be used dimension
+ * independently.
+ *
+ * @ingroup grid geomprimitives
+ * @author Wolfgang Bangerth, 1998
+ */
+template <>
+struct GeometryInfo<0> 
+{
+
+				     /**
+				      * Number of children a cell has.
+				      */
+    static const unsigned int children_per_cell = 1;
+
+				     /**
+				      * Number of faces a cell has.
+				      */
+    static const unsigned int faces_per_cell    = 0;
+
+				     /**
+				      * Number of children each face has
+				      * when the adjacent cell is refined.
+				      */
+    static const unsigned int subfaces_per_face = 0;
+
+				     /**
+				      * Number of vertices a cell has.
+				      */
+    static const unsigned int vertices_per_cell = 1;
+
+				     /**
+				      * Number of vertices each face has.
+				      * Since this is not useful in one
+				      * dimension, we provide a useless
+				      * number (in the hope that a compiler
+				      * may warn when it sees constructs like
+				      * <tt>for (i=0; i<vertices_per_face; ++i)</tt>,
+				      * at least if @p i is an <tt>unsigned int</tt>.
+				      */
+    static const unsigned int vertices_per_face = 0;
+
+				     /**
+				      * Number of lines each face has.
+				      */
+    static const unsigned int lines_per_face    = 0;
+    
+				     /**
+				      * Number of quads on each face.
+				      */
+    static const unsigned int quads_per_face    = 0;
+
+				     /**
+				      * Number of lines of a cell.
+				      */
+    static const unsigned int lines_per_cell    = 0;
+
+				     /**
+				      * Number of quadrilaterals of a
+				      * cell.
+				      */
+    static const unsigned int quads_per_cell    = 0;
+
+				     /**
+				      * Number of hexahedra of a
+				      * cell.
+				      */
+    static const unsigned int hexes_per_cell    = 0;
+};
+
+
+
+
+
 /**
  * This template specifies the interface to all topological structure
  * of the mesh cells.
  *
- * @ingroup grid
+ * @ingroup grid geomprimitives
  * @ref Instantiations few (dim = 1,2,3,4 and a specialization for dim=0)
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005
  */

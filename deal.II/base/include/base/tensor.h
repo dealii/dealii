@@ -32,6 +32,9 @@ template <int dim> class Tensor<1,dim>;
  * as well as the location of the data. It is therefore possible to
  * produce far more efficient code than for matrices with
  * runtime-dependent dimension.
+ *
+ * @ingroup geomprimitives
+ * @author Wolfgang Bangerth, 1998-2005
  */
 template <int rank_, int dim>
 class Tensor
@@ -465,6 +468,8 @@ Tensor<rank_,dim>::memory_consumption ()
  * Output operator for tensors. Print the elements consecutively, with
  * a space in between, two spaces between rank 1 subtensors, three
  * between rank 2 and so on.
+ *
+ * @relates Tensor
  */
 template <int rank_, int dim>
 inline

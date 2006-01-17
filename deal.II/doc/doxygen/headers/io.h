@@ -37,7 +37,15 @@
  * associated Patterns namespace) are used to deal with parameter files
  * describing run-time parameters to a program that one doesn't want to
  * hard-code within the program source.
- * 
+ *
+ *
+ * <h3>The PathSearch class</h3>
+ *
+ * The PathSearch class is a helper class in input handling. It is
+ * used to find a file in a list of directories, in much the same way
+ * as unix systems find executables among the directories listed in
+ * the <code>PATH</code> environment variable.
+ *
  * @ingroup IO
  */
 
@@ -48,6 +56,9 @@
  * in formats understood by several mesh readers (including those of deal.II
  * itself), and it can create output used for visualization of data. Finally,
  * it can output matrices in a graphical format.
+ *
+ * In addition, deal.II has a number of helper classes for
+ * output. They are introduced in sections of their own below.
  *
  * 
  * <h3>Visualization of data</h3>
@@ -107,6 +118,28 @@
  * visualization of matrices, in the form of color or skyline plots. The
  * MatrixOut class uses the DataOutBase for output. Therefore, matrices can be
  * visualization in all formats supported by the latter class.
+ *
+ *
+ * <h3>The ConditionalOStream class</h3>
+ *
+ * The ConditionalOStream class is a class that acts like
+ * <code>std::ostream</code> in that you can pipe output into it using
+ * <code>operator &lt;&lt;</code>. However, it only writes these
+ * things to a file (or the screen) if a flag is set. This is useful
+ * in parallel programs, and is discussed in the step-17 tutorial
+ * program.
+ *
+ *
+ * <h3>LogStream</h3>
+ *
+ * The LogStream class is used to write status output of programs to
+ * logfiles. It, again, acts like <code>std::ostream</code>, but
+ * instead of writing things to a file or the screen only, it has the
+ * ability to write things to both a log file as well as the
+ * screen. It can also add a time stamp to each line of output, and
+ * can selectively write only certain parts of the output that are
+ * interesting enough to the screen, and suppress other parts that
+ * then only show up in the log file.
  *
  * @ingroup IO
  */

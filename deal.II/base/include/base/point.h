@@ -44,6 +44,7 @@
  * 1, or vector, with as many elements as a point object, but with different
  * physical units), we use the <tt>Tensor<1,dim></tt> class.
  *
+ * @ingroup geomprimitives
  * @author Wolfgang Bangerth, 1997
  */
 template <int dim>
