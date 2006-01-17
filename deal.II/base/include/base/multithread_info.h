@@ -29,7 +29,8 @@
  * <tt>n_default_threads</tt> is set to the number of CPUs by default, but
  * can be adjusted by the user to fit the requirements.
  *
- * @author Thomas Richter, 2000
+ * @ingroup threads
+ * @author Thomas Richter, Wolfgang Bangerth, 2000
  */
 class MultithreadInfo
 {
@@ -115,8 +116,10 @@ class MultithreadInfo
 
 /**
  * Global variable of type <tt>MultithreadInfo</tt> which you may ask for the
- * number of CPUs in you system, as well as for the default number of
+ * number of CPUs in your system, as well as for the default number of
  * threads that multithreaded functions shall use.
+ *
+ * @ingroup threads
  */
 extern MultithreadInfo multithread_info;
 

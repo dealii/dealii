@@ -48,6 +48,7 @@
  * a constant object (disallowing write access when dereferenced), while
  * <tt>SmartPointer<ABC></tt> is a mutable pointer.
  *
+ * @ingroup memory
  * @author Guido Kanschat, Wolfgang Bangerth, 1998 - 2005
  */
 template<typename T>

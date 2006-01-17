@@ -76,6 +76,8 @@
  *    x<sup>0</sup>y<sup>0</sup>z<sup>n</sup>
  *    </i>
  * </dl>
+ *
+ * @ingroup Polynomials
  * @author Guido Kanschat, Wolfgang Bangerth, Ralf Hartmann 2002, 2003, 2004, 2005
  */
 template <int dim>

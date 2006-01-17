@@ -31,6 +31,7 @@
  * schemes). Experimenting with <tt>h</tt> and the difference scheme may be
  * necessary to obtain sufficient results.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 2000
  */
 template <int dim>

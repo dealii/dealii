@@ -21,6 +21,7 @@
 #include <map>
 #include <string>
 
+
 /**
  * Handling of subscriptions.
  *
@@ -45,6 +46,7 @@
  * @note Due to a problem with <tt>volatile</tt> declarations, this
  * additional feature is switched of if multithreading is used.
  *
+ * @ingroup memory
  * @author Guido Kanschat, 1998 - 2005
  */
 class Subscriptor

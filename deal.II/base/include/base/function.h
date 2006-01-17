@@ -93,6 +93,7 @@ template <typename number> class Vector;
  * are a priori known (for example, <tt>dim</tt> elements), you might
  * consider using the TensorFunction class instead.
  *
+ * @ingroup functions
  * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
@@ -360,6 +361,7 @@ class Function : public FunctionTime,
  * This function is of use when you want to implement homogeneous boundary
  * conditions, or zero initial conditions.
  *
+ * @ingroup functions
  * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
@@ -488,6 +490,7 @@ class ZeroFunction : public Function<dim>
  * in all its components, which might not be overly useful a feature
  * in most cases, however.
  *
+ * @ingroup functions
  * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim>
@@ -584,6 +587,7 @@ class ConstantFunction : public ZeroFunction<dim>
  * <tt>VectorTools::integrate_difference</tt>, where it allows to integrate
  * only one component.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 2000
  */
 template <int dim>

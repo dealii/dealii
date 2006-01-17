@@ -39,6 +39,8 @@
  * deal.II. Most of the content of this namespace is discussed in
  * detail in one of the reports linked to from the documentation page
  * of deal.II.
+ *
+ * @ingroup threads
  */
 namespace Threads 
 {

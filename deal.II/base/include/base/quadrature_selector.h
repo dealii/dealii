@@ -30,7 +30,8 @@
  * This class is useful if you want to use flexible quadrature rules,
  * that are read from a parameter file (see ParameterHandler for
  * this).
- * 
+ *
+ * @ingroup Quadrature
  * @author Ralf Schulz, 2003
  */
 template<int dim>

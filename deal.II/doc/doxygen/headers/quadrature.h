@@ -87,4 +87,12 @@
  *
  * All other classes in this module actually implement quadrature
  * rules of different order and other characteristics.
+ *
+ *
+ * <h3>QuadratureSelector</h3>
+ *
+ * This class is used to generate a quadrature object based on a
+ * string that identifies the quadrature formula. This is useful in
+ * cases where one wants to specify a certain quadrature formula in an
+ * input file, rather than hardcode it in the program.
  */

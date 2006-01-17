@@ -56,6 +56,7 @@
  *  purpose than the intended one! This will inevitably lead to confusion.
  *
  *
+ *  @ingroup functions
  *  @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999
  */
 class FunctionTime
@@ -101,11 +102,14 @@ class FunctionTime
 
 /*------------------------------ Inline functions ------------------------------*/
 
+#ifndef DOXYGEN
+
 inline double
 FunctionTime::get_time () const
 {
   return time;
 }
 
+#endif
 
 #endif

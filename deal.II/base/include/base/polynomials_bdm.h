@@ -31,8 +31,6 @@
  */
 
 /**
- * @brief The set of BDM polynomials on tensor product cells
- *
  * This class implements the <i>H<sup>div</sup></i>-conforming,
  * vector-valued Brezzi-Douglas-Marini polynomials as described in the
  * book by Brezzi and Fortin.

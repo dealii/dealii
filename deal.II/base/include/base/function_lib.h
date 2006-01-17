@@ -23,8 +23,10 @@
  * Namespace implementing some concrete classes derived from the
  * Function class that describe actual functions. This is rather
  * a collection of classes that we have needed for our own programs
- * once and thought they might be useful to others as well at some
+ * once and thought might be useful to others as well at some
  * point.
+ *
+ * @ingroup functions
  */
 namespace Functions
 {
@@ -37,6 +39,7 @@ namespace Functions
  *
  * Together with the function, its derivatives and Laplacian are defined.
  *
+ * @ingroup functions
  * @author: Guido Kanschat, 1999
  */
   template<int dim>
@@ -89,6 +92,7 @@ namespace Functions
  * The function <tt>xy</tt>. This function serves as an example for
  * a vanishing Laplacian.
  *
+ * @ingroup functions
  * @author: Guido Kanschat, 2000
  */
   template<int dim>
@@ -149,6 +153,7 @@ namespace Functions
  *
  * Together with the function, its derivatives and Laplacian are defined.
  *
+ * @ingroup functions
  * @author: Guido Kanschat, 1999
  */
   template<int dim>
@@ -210,6 +215,8 @@ namespace Functions
  * Cosine-shaped pillow function.
  * This is another function with zero boundary values on $[-1,1]^d$. In the interior
  * it is the product of $\cos(\pi/2 x_i)$.
+ *
+ * @ingroup functions
  * @author Guido Kanschat, 1999
  */
   template<int dim>
@@ -275,6 +282,8 @@ namespace Functions
   
 /**
  * Product of exponential functions in each coordinate direction.
+ *
+ * @ingroup functions
  * @author Guido Kanschat, 1999
  */
   template<int dim>
@@ -326,6 +335,7 @@ namespace Functions
 /**
  * Singularity on the L-shaped domain in 2D.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 1999
  */
   class LSingularityFunction : public Function<2>
@@ -376,6 +386,7 @@ namespace Functions
 /**
  * Singularity on the slit domain in 2D.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 1999
  */
   class SlitSingularityFunction : public Function<2>
@@ -425,6 +436,7 @@ namespace Functions
 /**
  * Singularity on the slit domain with one Neumann boundary in 2D.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 2002
  */
   class SlitHyperSingularityFunction : public Function<2>
@@ -469,6 +481,7 @@ namespace Functions
 				   std::vector<double>          &values,
 				   const unsigned int            component = 0) const;
   };
+
   
   
 /**
@@ -483,6 +496,7 @@ namespace Functions
  *
  * Together with the function, its derivatives and Laplacian are defined.
  *
+ * @ingroup functions
  * @author: Guido Kanschat, 2000
  */
   template<int dim>
@@ -594,6 +608,7 @@ namespace Functions
  * The class has its name from the fact that it resembles one
  * component of a Fourier cosine decomposition.
  *
+ * @ingroup functions
  * @author Wolfgang Bangerth, 2001
  */
   template <int dim>
@@ -653,6 +668,7 @@ namespace Functions
  * The class has its name from the fact that it resembles one
  * component of a Fourier sine decomposition.
  *
+ * @ingroup functions
  * @author Wolfgang Bangerth, 2001
  */
   template <int dim>
@@ -709,6 +725,7 @@ namespace Functions
  * function is then recovered as
  * $f(x) = \sum_j w_j sin(\sum_i k_i x_i) = Im(\sum_j w_j \exp(i k.x))$.
  *
+ * @ingroup functions
  * @author Wolfgang Bangerth, 2001
  */
   template <int dim>
@@ -769,6 +786,7 @@ namespace Functions
  * function is then recovered as
  * $f(x) = \sum_j w_j cos(\sum_i k_i x_i) = Re(\sum_j w_j \exp(i k.x))$.
  *
+ * @ingroup functions
  * @author Wolfgang Bangerth, 2001
  */
   template <int dim>
@@ -828,6 +846,7 @@ namespace Functions
  * also stores the number of the non-zero component, if the function
  * is vector-valued.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 2002
  */
   template <int dim>
@@ -901,6 +920,7 @@ namespace Functions
  * If vector valued, it can be restricted
  * to a single component.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 2001, 2002
  */
   template<int dim>
@@ -950,6 +970,7 @@ namespace Functions
  * maximum value is 1. If vector valued, it can be restricted
  * to a single component.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 2001, 2002
  */
   template<int dim>
@@ -1000,6 +1021,7 @@ namespace Functions
  * distance to the center, and $s$ is the radius of the sphere. If
  * vector valued, it can be restricted to a single component.
  *
+ * @ingroup functions
  * @author Guido Kanschat, 2001, 2002
  */
   template<int dim>

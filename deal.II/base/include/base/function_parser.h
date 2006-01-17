@@ -246,6 +246,7 @@ template <typename> class Vector;
      @endverbatim
  *    
  *
+ * @ingroup functions
  * @author Luca Heltai, 2005
  */
 template <int dim>

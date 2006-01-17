@@ -80,6 +80,7 @@
  * maps, lists, etc. If you need such functions feel free to implement
  * them and send them to us for inclusion.
  *
+ * @ingroup memory
  * @author Wolfgang Bangerth, 2000
  */
 namespace MemoryConsumption
