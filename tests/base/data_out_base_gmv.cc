@@ -26,7 +26,7 @@
 // Output data on repetitions of the unit hypercube
 
 // define this as 1 to get output into a separate file for each testcase
-#define SEPARATE_FILES 1
+#define SEPARATE_FILES 0
 
 
 template <int dim, int spacedim>

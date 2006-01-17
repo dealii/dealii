@@ -74,12 +74,12 @@ void check_all(std::ostream& log)
 #endif
   
   char name[100];
-  const char* format = "data_out_base_povray/%d%d%d%s.povray";
+//  const char* format = "data_out_base_povray/%d%d%d%s.pov";
   DataOutBase::PovrayFlags flags;
 
   if (true)
     {
-      sprintf(name, "data_out_base_povray/cont%d%d%d.povray", dim, 4, 4);
+      sprintf(name, "data_out_base_povray/cont%d%d%d.pov", dim, 4, 4);
 #if SEPARATE_FILES==1
       std::ofstream out(name);
 #else
