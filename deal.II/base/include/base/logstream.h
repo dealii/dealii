@@ -51,6 +51,7 @@
  * <li> <tt>deallog.pop()</tt> when leaving that stage entered with <tt>push</tt>.
  * </ul>
  *
+ * @ingroup output
  * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003
  */
 class LogStream

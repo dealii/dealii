@@ -75,6 +75,7 @@
  *   system_matrix.print_formatted(cout);
  * @endcode
  *
+ * @ingroup output
  * @author Ralf Hartmann, Wolfgang Bangerth, 2004
  */
 class ConditionalOStream
