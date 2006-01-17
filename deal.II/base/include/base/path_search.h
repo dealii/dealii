@@ -75,6 +75,7 @@
  * 
  * @todo Add support for environment variables like in kpathsea.
  *
+ * @ingroup input
  * @author Guido Kanschat, Luca Heltai 2005
  */
 class PathSearch
