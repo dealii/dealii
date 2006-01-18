@@ -491,6 +491,19 @@ AC_ARG_WITH(lapack,
                           use -llapack.],
   DEAL_II_WITH_LAPACK($withval))
 
+dnl Check for the compression library zlib.
+dnl First activate if no option given
+if test "x$with_zlib" = "x" ; then
+  with_zlib="yes"
+fi
+
+AC_ARG_WITH(zlib,
+  [  --with-zlib=zlib use the compression library zlib for gzipped input and output
+         and link it with -lzlib (the default is -lz).
+         Make sure the library is in the search path of ld.],
+  DEAL_II_WITH_ZLIB($withval))
+
+
 dnl -------------------------------------------------------------
 dnl       Optimizations and consistency of compiler flags
 dnl -------------------------------------------------------------

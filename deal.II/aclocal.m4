@@ -4971,3 +4971,20 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
   fi
   AC_SUBST(NEEDS_F77LIBS, "yes")
 ])
+
+dnl --------------------------------------------------
+dnl Include the LAPACK library
+dnl --------------------------------------------------
+AC_DEFUN(DEAL_II_WITH_ZLIB, dnl
+[
+  if test "x$1" != "xyes" ; then
+    AC_CHECK_LIB($1, crc32,
+    [ LIBS="-l$1 $LIBS"
+      AC_DEFINE(HAVE_LIBZ)
+    ])
+dnl    fi
+  else
+    AC_CHECK_LIB(z, crc32)
+  fi
+])
+
