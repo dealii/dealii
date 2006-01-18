@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1980,7 +1980,7 @@ void DoFHandler<1>::reserve_space () {
     
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
-      levels.push_back (new DoFLevel<1>);
+      levels.push_back (new internal::DoFHandler::DoFLevel<1>);
 
       levels.back()->line_dofs = std::vector<unsigned int>(tria->levels[i]->lines.lines.size() *
 							   selected_fe->dofs_per_line,
@@ -2010,7 +2010,7 @@ void DoFHandler<2>::reserve_space () {
 
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
-      levels.push_back (new DoFLevel<2>);
+      levels.push_back (new internal::DoFHandler::DoFLevel<2>);
 
       levels.back()->line_dofs = std::vector<unsigned int> (tria->levels[i]->lines.lines.size() *
 							    selected_fe->dofs_per_line,
@@ -2042,7 +2042,7 @@ void DoFHandler<3>::reserve_space () {
 
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
-      levels.push_back (new DoFLevel<3>);
+      levels.push_back (new internal::DoFHandler::DoFLevel<3>);
 
       levels.back()->line_dofs = std::vector<unsigned int> (tria->levels[i]->lines.lines.size() *
 							    selected_fe->dofs_per_line,

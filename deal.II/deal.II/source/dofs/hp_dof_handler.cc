@@ -1939,7 +1939,7 @@ namespace hp
 
     for (unsigned int i=0; i<tria->n_levels(); ++i) 
       {
-        levels.push_back (new hp::DoFLevel<1>);
+        levels.push_back (new internal::hp::DoFLevel<1>);
         std::swap (active_fe_backup[i], levels.back()->active_fe_indices);
 
         levels.back()->dof_line_index_offset = std::vector<unsigned int>
@@ -1991,7 +1991,7 @@ namespace hp
 // number of DoFs due to the different active_fe_index of the adjacent cells.
     for (unsigned int i=0; i<tria->n_levels(); ++i) 
       {
-        levels.push_back (new hp::DoFLevel<2>);
+        levels.push_back (new internal::hp::DoFLevel<2>);
         std::swap (active_fe_backup[i], levels.back()->active_fe_indices);
 
         levels.back()->dof_line_index_offset = std::vector<unsigned int>
@@ -2155,7 +2155,7 @@ namespace hp
 // number of DoFs due to the different active_fe_index of the adjacent cells.
     for (unsigned int i=0; i<tria->n_levels(); ++i) 
       {
-        levels.push_back (new hp::DoFLevel<3>);
+        levels.push_back (new internal::hp::DoFLevel<3>);
         std::swap (active_fe_backup[i], levels.back()->active_fe_indices);
 
         levels.back()->dof_line_index_offset = std::vector<unsigned int>
@@ -2217,7 +2217,7 @@ namespace hp
   {
                                      // Create sufficiently many hpDoFLevels.
     while (levels.size () < tria->n_levels ())
-      levels.push_back (new hp::DoFLevel<dim>);
+      levels.push_back (new internal::hp::DoFLevel<dim>);
 
     for (unsigned int i=0; i<levels.size(); ++i)
       {
@@ -2345,7 +2345,7 @@ namespace hp
                                      // it is appended to the DoFHandler
                                      // levels.
     if (levels.size () < tria.n_levels ())
-      levels.push_back (new hp::DoFLevel<dim>);
+      levels.push_back (new internal::hp::DoFLevel<dim>);
 
                                      // Coarsening can lead to the loss
                                      // of levels. Hence remove them.

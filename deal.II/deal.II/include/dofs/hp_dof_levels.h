@@ -18,8 +18,10 @@
 #include <vector>
 
 
-namespace hp
+namespace internal
 {
+  namespace hp
+  {
 
 /**
  * Store the indices of the degrees of freedom which are located on
@@ -31,17 +33,17 @@ namespace hp
  *
  * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
  */
-  template <int N>
-  class DoFLevel
-  {
-    private:
-                                       /**
-                                        * Make the constructor private
-                                        * to avoid that someone uses
-                                        * this class.
-                                        */
-      DoFLevel ();
-  };
+    template <int N>
+    class DoFLevel
+    {
+      private:
+                                         /**
+                                          * Make the constructor private
+                                          * to avoid that someone uses
+                                          * this class.
+                                          */
+        DoFLevel ();
+    };
 
 
 /**
@@ -55,26 +57,26 @@ namespace hp
  * 
  * @ingroup hp
  */
-  template <>
-  class DoFLevel<0>
-  {
-    public:
-                                       /**
-                                        *  Indices specifying the finite
-                                        *  element of hp::FECollection to use
-                                        *  for the different cells. The
-                                        *  meaning what a cell is, is
-                                        *  dimension specific, therefore also
-                                        *  the length of this vector depends
-                                        *  on the dimension: in one dimension,
-                                        *  the length of this vector equals
-                                        *  the length of the @p lines vector,
-                                        *  in two dimensions that of the @p
-                                        *  quads vector, etc.
-                                        */
+    template <>
+    class DoFLevel<0>
+    {
+      public:
+                                         /**
+                                          *  Indices specifying the finite
+                                          *  element of hp::FECollection to use
+                                          *  for the different cells. The
+                                          *  meaning what a cell is, is
+                                          *  dimension specific, therefore also
+                                          *  the length of this vector depends
+                                          *  on the dimension: in one dimension,
+                                          *  the length of this vector equals
+                                          *  the length of the @p lines vector,
+                                          *  in two dimensions that of the @p
+                                          *  quads vector, etc.
+                                          */
 
-      std::vector<unsigned int> active_fe_indices;
-  };
+        std::vector<unsigned int> active_fe_indices;
+    };
 
 
 /**
@@ -131,33 +133,33 @@ namespace hp
  * @ingroup hp
  * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
  */
-  template <>
-  class DoFLevel<1> : public DoFLevel<0>
-  {
-    public:
+    template <>
+    class DoFLevel<1> : public DoFLevel<0>
+    {
+      public:
 
-                                       /**
-					* Store the start index for
-					* the degrees of freedom of each
-					* line in the @p line_dofs array.
-					*/
-      std::vector<unsigned int> dof_line_index_offset;
+                                         /**
+                                          * Store the start index for
+                                          * the degrees of freedom of each
+                                          * line in the @p line_dofs array.
+                                          */
+        std::vector<unsigned int> dof_line_index_offset;
 
-                                       /**
-                                        * Store the global indices of
-                                        * the degrees of freedom. See
-                                        * DoFLevel() for detailed
-                                        * information.
-                                        */
-      std::vector<unsigned int> line_dofs;
+                                         /**
+                                          * Store the global indices of
+                                          * the degrees of freedom. See
+                                          * DoFLevel() for detailed
+                                          * information.
+                                          */
+        std::vector<unsigned int> line_dofs;
 
-                                       /**
-                                        * Determine an estimate for the
-                                        * memory consumption (in bytes)
-                                        * of this object.
-                                        */
-      unsigned int memory_consumption () const;
-  };
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        unsigned int memory_consumption () const;
+    };
 
 
 /**
@@ -168,33 +170,33 @@ namespace hp
  *
  * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
  */
-  template <>
-  class DoFLevel<2> : public DoFLevel<1>
-  {
-    public:
+    template <>
+    class DoFLevel<2> : public DoFLevel<1>
+    {
+      public:
 
-                                       /**
-					* Store the start index for
-					* the degrees of freedom of each
-					* quad in the @p quad_dofs array.
-					*/
-      std::vector<unsigned int> dof_quad_index_offset;
+                                         /**
+                                          * Store the start index for
+                                          * the degrees of freedom of each
+                                          * quad in the @p quad_dofs array.
+                                          */
+        std::vector<unsigned int> dof_quad_index_offset;
 
-                                       /**
-                                        * Store the global indices of
-                                        * the degrees of freedom. See
-                                        * DoFLevel() for detailed
-                                        * information.
-                                        */
-      std::vector<unsigned int> quad_dofs;
+                                         /**
+                                          * Store the global indices of
+                                          * the degrees of freedom. See
+                                          * DoFLevel() for detailed
+                                          * information.
+                                          */
+        std::vector<unsigned int> quad_dofs;
 
-                                       /**
-                                        * Determine an estimate for the
-                                        * memory consumption (in bytes)
-                                        * of this object.
-                                        */
-      unsigned int memory_consumption () const;
-  };
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        unsigned int memory_consumption () const;
+    };
 
 
 
@@ -206,34 +208,36 @@ namespace hp
  *
  * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
  */
-  template <>
-  class DoFLevel<3> : public DoFLevel<2>
-  {
-    public:
+    template <>
+    class DoFLevel<3> : public DoFLevel<2>
+    {
+      public:
 
-                                       /**
-					* Store the start index for
-					* the degrees of freedom of each
-					* hex in the @p hex_dofs array.
-					*/
-      std::vector<unsigned int> dof_hex_index_offset;
+                                         /**
+                                          * Store the start index for
+                                          * the degrees of freedom of each
+                                          * hex in the @p hex_dofs array.
+                                          */
+        std::vector<unsigned int> dof_hex_index_offset;
 
-                                       /**
-                                        * Store the global indices of
-                                        * the degrees of freedom. See
-                                        * DoFLevel() for detailed
-                                        * information.
-                                        */
-      std::vector<unsigned int> hex_dofs;
+                                         /**
+                                          * Store the global indices of
+                                          * the degrees of freedom. See
+                                          * DoFLevel() for detailed
+                                          * information.
+                                          */
+        std::vector<unsigned int> hex_dofs;
 
-                                       /**
-                                        * Determine an estimate for the
-                                        * memory consumption (in bytes)
-                                        * of this object.
-                                        */
-      unsigned int memory_consumption () const;
-  };
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        unsigned int memory_consumption () const;
+    };
   
-} // namespace hp
+  } // namespace hp
+  
+} // namespace internal
 
 #endif

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,6 +18,16 @@
 #include <vector>
 
 
+namespace internal
+{
+/**
+ * A namespace for internal data structures of the DoFHandler group of classes.
+ *
+ * @ingroup dofs
+ */
+  namespace DoFHandler
+  {
+    
 /**
  * Store the indices of the degrees of freedom which are located on
  * objects of dimension @p N.  Declare this general template
@@ -27,17 +37,17 @@
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
-template <int N>
-class DoFLevel
-{
-  private:
-				     /**
-				      * Make the constructor private
-				      * to avoid that someone uses
-				      * this class.
-				      */
-    DoFLevel ();
-};
+    template <int N>
+    class DoFLevel
+    {
+      private:
+                                         /**
+                                          * Make the constructor private
+                                          * to avoid that someone uses
+                                          * this class.
+                                          */
+        DoFLevel ();
+    };
 
 
 /**
@@ -90,25 +100,25 @@ class DoFLevel
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
-template <>
-class DoFLevel<1>
-{
-  public:
-				     /**
-				      * Store the global indices of
-				      * the degrees of freedom. See
-				      * DoFLevel for detailed
-				      * information.
-				      */
-    std::vector<unsigned int> line_dofs;
+    template <>
+    class DoFLevel<1>
+    {
+      public:
+                                         /**
+                                          * Store the global indices of
+                                          * the degrees of freedom. See
+                                          * DoFLevel for detailed
+                                          * information.
+                                          */
+        std::vector<unsigned int> line_dofs;
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    unsigned int memory_consumption () const;
-};
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        unsigned int memory_consumption () const;
+    };
 
 
 
@@ -119,25 +129,25 @@ class DoFLevel<1>
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
-template <>
-class DoFLevel<2> : public DoFLevel<1>
-{
-  public:
-				     /**
-				      * Store the global indices of
-				      * the degrees of freedom. See
-				      * DoFLevel for detailed
-				      * information.
-				      */
-    std::vector<unsigned int> quad_dofs;
+    template <>
+    class DoFLevel<2> : public DoFLevel<1>
+    {
+      public:
+                                         /**
+                                          * Store the global indices of
+                                          * the degrees of freedom. See
+                                          * DoFLevel for detailed
+                                          * information.
+                                          */
+        std::vector<unsigned int> quad_dofs;
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    unsigned int memory_consumption () const;
-};
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        unsigned int memory_consumption () const;
+    };
 
 
 
@@ -148,25 +158,28 @@ class DoFLevel<2> : public DoFLevel<1>
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
-template <>
-class DoFLevel<3> : public DoFLevel<2>
-{
-  public:
-				     /**
-				      * Store the global indices of
-				      * the degrees of freedom. See
-				      * DoFLevel for detailed
-				      * information.
-				      */
-    std::vector<unsigned int> hex_dofs;
+    template <>
+    class DoFLevel<3> : public DoFLevel<2>
+    {
+      public:
+                                         /**
+                                          * Store the global indices of
+                                          * the degrees of freedom. See
+                                          * DoFLevel for detailed
+                                          * information.
+                                          */
+        std::vector<unsigned int> hex_dofs;
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    unsigned int memory_consumption () const;
-};
-
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        unsigned int memory_consumption () const;
+    };
+    
+  }
+  
+}
 
 #endif

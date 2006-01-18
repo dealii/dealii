@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,7 +25,13 @@
 #include <map>
 #include <set>
 
-template <int dim> class DoFLevel;
+namespace internal
+{
+  namespace DoFHandler
+  {
+    template <int dim> class DoFLevel;
+  }
+}
 
 
 /**
@@ -39,7 +45,7 @@ template <int dim> class DoFLevel;
  * to the fact that indices in global vectors and matrices also refer to all
  * degrees of freedom and some kind of condensation is needed to restrict the
  * systems of equations to the unconstrained degrees of freedom only. The
- * actual layout of storage of the indices is described in the DoFLevel class
+ * actual layout of storage of the indices is described in the internal::DoFHandler::DoFLevel class
  * documentation.
  *
  * The class offers iterators to traverse all cells, in much the same way as
@@ -1026,7 +1032,7 @@ class DoFHandler  :  public Subscriptor
 				      * <tt>levels[]</tt> tree of the Triangulation
 				      * objects.
 				      */
-    std::vector<DoFLevel<dim>*>    levels;
+    std::vector<internal::DoFHandler::DoFLevel<dim>*>    levels;
 
 				     /**
 				      * Store the number of dofs created last

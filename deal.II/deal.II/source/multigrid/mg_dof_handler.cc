@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1701,7 +1701,7 @@ void MGDoFHandler<1>::reserve_space () {
 				   // lines on each level
   for (unsigned int i=0; i<this->tria->n_levels(); ++i) 
     {
-      mg_levels.push_back (new DoFLevel<1>);
+      mg_levels.push_back (new internal::DoFHandler::DoFLevel<1>);
 
       mg_levels.back()->line_dofs = std::vector<unsigned int>(this->tria->levels[i]->lines.lines.size() *
 							 this->selected_fe->dofs_per_line,
@@ -1774,7 +1774,7 @@ void MGDoFHandler<2>::reserve_space () {
 				   // lines and quads on each level
   for (unsigned int i=0; i<this->tria->n_levels(); ++i) 
     {
-      mg_levels.push_back (new DoFLevel<2>);
+      mg_levels.push_back (new internal::DoFHandler::DoFLevel<2>);
 
       mg_levels.back()->line_dofs = std::vector<unsigned int> (this->tria->levels[i]->lines.lines.size() *
 							  this->selected_fe->dofs_per_line,
@@ -1863,7 +1863,7 @@ void MGDoFHandler<3>::reserve_space () {
 				   // lines and quads on each level
   for (unsigned int i=0; i<this->tria->n_levels(); ++i) 
     {
-      mg_levels.push_back (new DoFLevel<3>);
+      mg_levels.push_back (new internal::DoFHandler::DoFLevel<3>);
 
       mg_levels.back()->line_dofs = std::vector<unsigned int> (this->tria->levels[i]->lines.lines.size() *
 							  this->selected_fe->dofs_per_line,

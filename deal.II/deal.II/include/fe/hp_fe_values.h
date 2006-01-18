@@ -27,15 +27,9 @@ template <int dim> class MappingQ1;
 template <int dim> class FiniteElement;
 
 
-namespace hp
+namespace internal
 {
-
-/**
- * A namespace for hp implementation details.
- * 
- * @ingroup hp
- */
-  namespace internal 
+  namespace hp
   {
 /**
  * Map between finite element objects and @p FEValues (the second
@@ -176,8 +170,8 @@ namespace hp
                                           * indicated by the parameters
                                           * to the constructor.
                                           */
-        FEValuesBase (const hp::MappingCollection<dim> &mapping_collection,
-                      const hp::QCollection<q_dim>     &q_collection,
+        FEValuesBase (const ::hp::MappingCollection<dim> &mapping_collection,
+                      const ::hp::QCollection<q_dim>     &q_collection,
                       const UpdateFlags             update_flags);
 
 
@@ -190,7 +184,7 @@ namespace hp
                                           * object for the mapping
                                           * object.
                                           */
-        FEValuesBase (const hp::QCollection<q_dim> &q_collection,
+        FEValuesBase (const ::hp::QCollection<q_dim> &q_collection,
                       const UpdateFlags         update_flags);
 
 
@@ -201,7 +195,7 @@ namespace hp
                                           * upon construction of the
                                           * object.
                                           */
-        const hp::MappingCollection<dim> mapping_collection;
+        const ::hp::MappingCollection<dim> mapping_collection;
     
                                          /**
                                           * Copy of the quadrature
@@ -209,7 +203,7 @@ namespace hp
                                           * provided to the
                                           * constructor.
                                           */
-        const hp::QCollection<q_dim> q_collection;
+        const ::hp::QCollection<q_dim> q_collection;
 
                                          /**
                                           * Values of the update flags as
@@ -217,16 +211,22 @@ namespace hp
                                           */
         const UpdateFlags update_flags;
     };
+
   }
+  
+}
 
 
+namespace hp
+{
+  
 /**
  * 
  * @ingroup hp
  */  
   template <int dim>
-  class FEValues : public hp::internal::FEValuesMap<dim,::FEValues<dim> >,
-                   protected hp::internal::FEValuesBase<dim,dim>
+  class FEValues : public internal::hp::FEValuesMap<dim,::FEValues<dim> >,
+                   protected internal::hp::FEValuesBase<dim,dim>
   {
     public:
                                        /**
@@ -249,9 +249,9 @@ namespace hp
                                         * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
-      FEValues (const hp::MappingCollection<dim> &mapping_collection,
-                const hp::FECollection<dim>  &fe_collection,
-                const hp::QCollection<dim>       &q_collection,
+      FEValues (const ::hp::MappingCollection<dim> &mapping_collection,
+                const ::hp::FECollection<dim>  &fe_collection,
+                const ::hp::QCollection<dim>       &q_collection,
                 const UpdateFlags             update_flags);
 
 
@@ -313,8 +313,8 @@ namespace hp
  * @ingroup hp
  */  
   template <int dim>
-  class FEFaceValues : public hp::internal::FEValuesMap<dim,::FEFaceValues<dim> >,
-                       protected hp::internal::FEValuesBase<dim,dim-1>
+  class FEFaceValues : public internal::hp::FEValuesMap<dim,::FEFaceValues<dim> >,
+                       protected internal::hp::FEValuesBase<dim,dim-1>
   {
     public:
                                        /**
@@ -426,8 +426,8 @@ namespace hp
  * @ingroup hp
  */  
   template <int dim>
-  class FESubfaceValues : public hp::internal::FEValuesMap<dim,::FESubfaceValues<dim> >,
-                          protected hp::internal::FEValuesBase<dim,dim-1>
+  class FESubfaceValues : public internal::hp::FEValuesMap<dim,::FESubfaceValues<dim> >,
+                          protected internal::hp::FEValuesBase<dim,dim-1>
   {
     public:
                                        /**
@@ -534,11 +534,15 @@ namespace hp
       create_fe_values (const FiniteElement<dim> &fe,
                         const unsigned int active_fe_index) const;
   };
+  
+}
 
 
 // -------------- inline and template functions --------------
 
-  namespace internal 
+namespace internal 
+{
+  namespace hp
   {
     template <int dim, class FEValues>
     inline

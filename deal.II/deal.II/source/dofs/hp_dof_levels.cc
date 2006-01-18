@@ -16,32 +16,35 @@
 #include <dofs/hp_dof_levels.h>
 
 
-namespace hp
+namespace internal
 {
-  unsigned int
-  DoFLevel<1>::memory_consumption () const
+  namespace hp
   {
-    return (MemoryConsumption::memory_consumption (line_dofs) +
-            MemoryConsumption::memory_consumption (dof_line_index_offset));
-  }
+    unsigned int
+    DoFLevel<1>::memory_consumption () const
+    {
+      return (MemoryConsumption::memory_consumption (line_dofs) +
+              MemoryConsumption::memory_consumption (dof_line_index_offset));
+    }
 
 
 
-  unsigned int
-  DoFLevel<2>::memory_consumption () const
-  {
-    return (hp::DoFLevel<1>::memory_consumption () +
-            MemoryConsumption::memory_consumption (quad_dofs) +
-            MemoryConsumption::memory_consumption (dof_quad_index_offset));
-  }
+    unsigned int
+    DoFLevel<2>::memory_consumption () const
+    {
+      return (DoFLevel<1>::memory_consumption () +
+              MemoryConsumption::memory_consumption (quad_dofs) +
+              MemoryConsumption::memory_consumption (dof_quad_index_offset));
+    }
 
 
 
-  unsigned int
-  DoFLevel<3>::memory_consumption () const
-  {
-    return (hp::DoFLevel<2>::memory_consumption () +
-            MemoryConsumption::memory_consumption (hex_dofs) +
-            MemoryConsumption::memory_consumption (dof_hex_index_offset));
+    unsigned int
+    DoFLevel<3>::memory_consumption () const
+    {
+      return (DoFLevel<2>::memory_consumption () +
+              MemoryConsumption::memory_consumption (hex_dofs) +
+              MemoryConsumption::memory_consumption (dof_hex_index_offset));
+    }
   }
 }

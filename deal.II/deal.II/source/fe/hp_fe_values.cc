@@ -18,10 +18,10 @@
 
 // -------------------------- FEValuesMap -------------------------
 
-namespace hp
+namespace internal
 {
   
-  namespace internal 
+  namespace hp
   {
     template <int dim, class FEValues>
     FEValuesMap<dim,FEValues>::~FEValuesMap () 
@@ -61,8 +61,8 @@ namespace hp
 
     template <int dim, int q_dim>
     FEValuesBase<dim,q_dim>::FEValuesBase (
-      const hp::MappingCollection<dim> &mapping_collection,
-      const hp::QCollection<q_dim>     &q_collection,
+      const ::hp::MappingCollection<dim> &mapping_collection,
+      const ::hp::QCollection<q_dim>     &q_collection,
       const UpdateFlags             update_flags)
                     :
                     mapping_collection (mapping_collection),
@@ -72,17 +72,22 @@ namespace hp
 
 
     template <int dim, int q_dim>
-    FEValuesBase<dim,q_dim>::FEValuesBase (const hp::QCollection<q_dim> &q_collection,
+    FEValuesBase<dim,q_dim>::FEValuesBase (const ::hp::QCollection<q_dim> &q_collection,
                                            const UpdateFlags         update_flags)
                     :
                     mapping_collection (default_mapping),
                     q_collection (q_collection),
                     update_flags (update_flags)
     {}
-
+    
   }
+}
 
 
+
+namespace hp
+{
+  
 // -------------------------- FEValues -------------------------
 
 
@@ -92,9 +97,9 @@ namespace hp
                            const hp::QCollection<dim>       &q_collection,
                            const UpdateFlags             update_flags)
                   :
-                  internal::FEValuesBase<dim,dim> (mapping,
-                                                   q_collection,
-                                                   update_flags)
+                  internal::hp::FEValuesBase<dim,dim> (mapping,
+                                                       q_collection,
+                                                       update_flags)
   {}
 
 
@@ -103,8 +108,8 @@ namespace hp
                            const hp::QCollection<dim>      &q_collection,
                            const UpdateFlags            update_flags)
                   :
-                  internal::FEValuesBase<dim,dim> (q_collection,
-                                                   update_flags)
+                  internal::hp::FEValuesBase<dim,dim> (q_collection,
+                                                       update_flags)
   {}
 
 
@@ -139,9 +144,9 @@ namespace hp
                                    const hp::QCollection<dim-1> &q_collection,
                                    const UpdateFlags         update_flags)
                   :
-                  internal::FEValuesBase<dim,dim-1> (mapping,
-                                                     q_collection,
-                                                     update_flags)
+                  internal::hp::FEValuesBase<dim,dim-1> (mapping,
+                                                         q_collection,
+                                                         update_flags)
   {}
 
 
@@ -150,8 +155,8 @@ namespace hp
                                    const hp::QCollection<dim-1> &q_collection,
                                    const UpdateFlags         update_flags)
                   :
-                  internal::FEValuesBase<dim,dim-1> (q_collection,
-                                                     update_flags)
+                  internal::hp::FEValuesBase<dim,dim-1> (q_collection,
+                                                         update_flags)
   {}
 
 
@@ -197,9 +202,9 @@ namespace hp
                                          const hp::QCollection<dim-1> &q_collection,
                                          const UpdateFlags         update_flags)
                   :
-                  internal::FEValuesBase<dim,dim-1> (mapping,
-                                                     q_collection,
-                                                     update_flags)
+                  internal::hp::FEValuesBase<dim,dim-1> (mapping,
+                                                         q_collection,
+                                                         update_flags)
   {}
 
 
@@ -208,8 +213,8 @@ namespace hp
                                          const hp::QCollection<dim-1> &q_collection,
                                          const UpdateFlags         update_flags)
                   :
-                  internal::FEValuesBase<dim,dim-1> (q_collection,
-                                                     update_flags)
+                  internal::hp::FEValuesBase<dim,dim-1> (q_collection,
+                                                         update_flags)
   {}
 
 
@@ -246,17 +251,23 @@ namespace hp
       this->q_collection.get_quadrature (active_fe_index),
       this->update_flags);
   }
+}
 
 
 // explicit instantiations
-  namespace internal
+namespace internal
+{
+  namespace hp
   {
     template class FEValuesBase<deal_II_dimension,deal_II_dimension>;
 #if deal_II_dimension >= 2
     template class FEValuesBase<deal_II_dimension,deal_II_dimension-1>;
 #endif
   }
+}
 
+namespace hp
+{
   template class FEValues<deal_II_dimension>;
 #if deal_II_dimension >= 2
   template class FEFaceValues<deal_II_dimension>;
@@ -267,6 +278,6 @@ namespace hp
 // Putting the following explicit instantiations into the brackets 
 // of the appropriate namespace somehow causes problems with the 
 // Apple gcc3.3. Therefore these are separated.
-template class hp::internal::FEValuesMap<deal_II_dimension,FEValues<deal_II_dimension> >;
-template class hp::internal::FEValuesMap<deal_II_dimension,FEFaceValues<deal_II_dimension> >;
-template class hp::internal::FEValuesMap<deal_II_dimension,FESubfaceValues<deal_II_dimension> >;
+template class internal::hp::FEValuesMap<deal_II_dimension,FEValues<deal_II_dimension> >;
+template class internal::hp::FEValuesMap<deal_II_dimension,FEFaceValues<deal_II_dimension> >;
+template class internal::hp::FEValuesMap<deal_II_dimension,FESubfaceValues<deal_II_dimension> >;

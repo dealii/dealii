@@ -27,6 +27,16 @@
 #include <set>
 
 
+namespace internal
+{
+  namespace hp
+  {
+    template <int> class DoFLevel;
+  }
+}
+
+    
+
 /**
  * A namespace that holds all the classes that have to do with hp finite
  * elements.
@@ -35,9 +45,6 @@
  */
 namespace hp
 {
-
-  template <int> class DoFLevel;
-
 
 /**
  * Manage the distribution and numbering of the degrees of freedom for
@@ -944,7 +951,7 @@ namespace hp
                                        /**
                                         *  Create default tables for the
                                         *  active_fe_indices in the
-                                        *  hp::DoFLevels. They are
+                                        *  internal::hp::DoFLevels. They are
                                         *  initialized with the base fe.
                                         *  This method is called before
                                         *  refinement and before distribute_dofs
@@ -972,7 +979,7 @@ namespace hp
                                         * <tt>levels[]</tt> tree of the Triangulation
                                         * objects.
                                         */
-      std::vector<hp::DoFLevel<dim>*>    levels;
+      std::vector<internal::hp::DoFLevel<dim>*>    levels;
 
                                        /**
                                         * Store the number of dofs created last

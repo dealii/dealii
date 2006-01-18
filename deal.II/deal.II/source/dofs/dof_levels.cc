@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,28 +16,35 @@
 #include <dofs/dof_levels.h>
 
 
-
-unsigned int
-DoFLevel<1>::memory_consumption () const
+namespace internal
 {
-  return MemoryConsumption::memory_consumption (line_dofs);
+  namespace DoFHandler
+  {
+    
+    unsigned int
+    DoFLevel<1>::memory_consumption () const
+    {
+      return MemoryConsumption::memory_consumption (line_dofs);
+    }
+
+
+
+    unsigned int
+    DoFLevel<2>::memory_consumption () const
+    {
+      return (DoFLevel<1>::memory_consumption () +
+              MemoryConsumption::memory_consumption (quad_dofs));
+    }
+
+
+
+    unsigned int
+    DoFLevel<3>::memory_consumption () const
+    {
+      return (DoFLevel<2>::memory_consumption () +
+              MemoryConsumption::memory_consumption (hex_dofs));
+    }
+    
+  }
+  
 }
-
-
-
-unsigned int
-DoFLevel<2>::memory_consumption () const
-{
-  return (DoFLevel<1>::memory_consumption () +
-          MemoryConsumption::memory_consumption (quad_dofs));
-}
-
-
-
-unsigned int
-DoFLevel<3>::memory_consumption () const
-{
-  return (DoFLevel<2>::memory_consumption () +
-          MemoryConsumption::memory_consumption (hex_dofs));
-}
-
