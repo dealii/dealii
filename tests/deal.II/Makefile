@@ -38,7 +38,6 @@ tests_x = block_matrices \
 	intergrid_constraints \
 	intergrid_map \
 	matrices \
-	second_derivatives \
 	wave-test-3 \
 	support_point_map \
 	filtered_matrix \
