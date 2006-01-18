@@ -14,6 +14,8 @@
 #include "../tests.h"
 #include <base/data_out_base.h>
 #include <base/logstream.h>
+#include <base/quadrature_lib.h>
+#include <base/function_lib.h>
 
 #include <vector>
 #include <iostream>
@@ -48,6 +50,22 @@ void check(DataOutBase::DXFlags flags,
 }
 
 
+template <int dim>
+void check_cont(unsigned int ncells,
+		unsigned int nsub,
+		DataOutBase::DXFlags flags,
+		std::ostream& out)
+{
+  std::vector<DataOutBase::Patch<dim, dim> > patches;
+  
+  create_continuous_patches(patches, ncells, nsub);
+  
+  std::vector<std::string> names(1);
+  names[0] = "CutOff";
+  DataOutBase::write_dx(patches, names, flags, out);
+}
+
+
 template<int dim, int spacedim>
 void check_all(std::ostream& log)
 {
@@ -58,6 +76,17 @@ void check_all(std::ostream& log)
   char name[100];
   const char* format = "data_out_base_dx/%d%d%s.dx";
   DataOutBase::DXFlags flags(false, false, false, false);
+  if (dim == 2 && spacedim == 2) {
+    sprintf(name, format, dim, spacedim, "ffffcont");
+#if SEPARATE_FILES==1
+    std::ofstream out(name);
+#else
+	out << "==============================\n"
+	    << name
+	    << "\n==============================\n";
+#endif
+    check_cont<dim>(4,4,flags, out);
+  }
   if (true) {
     sprintf(name, format, dim, spacedim, "ffff");
 #if SEPARATE_FILES==1
