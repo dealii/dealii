@@ -89,6 +89,48 @@ void check_all(std::ostream& log)
 #endif
       check_cont<dim>(4, 4, flags, out);
     }
+  
+  flags.external_data = true;
+  if (true)
+    {
+      sprintf(name, "data_out_base_povray/cont%d%d%dtri.pov", dim, 4, 4);
+#if SEPARATE_FILES==1
+      std::ofstream out(name);
+#else
+      out << "==============================\n"
+	  << name
+	  << "\n==============================\n";
+#endif
+      check_cont<dim>(4, 4, flags, out);
+    }
+
+  flags.smooth = true;
+  if (true)
+    {
+      sprintf(name, "data_out_base_povray/cont%d%d%dsmooth.pov", dim, 4, 4);
+#if SEPARATE_FILES==1
+      std::ofstream out(name);
+#else
+      out << "==============================\n"
+	  << name
+	  << "\n==============================\n";
+#endif
+      check_cont<dim>(4, 4, flags, out);
+    }
+  
+  flags.bicubic_patch = true;
+  if (true)
+    {
+      sprintf(name, "data_out_base_povray/cont%d%d%dbic.pov", dim, 4, 3);
+#if SEPARATE_FILES==1
+      std::ofstream out(name);
+#else
+      out << "==============================\n"
+	  << name
+	  << "\n==============================\n";
+#endif
+      check_cont<dim>(4, 3, flags, out);
+    }
 }
 
 int main()
