@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,6 +25,7 @@
  * not only stores indices into the TableBase class, but also the sizes of the
  * table in its various coordinates.
  *
+ * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
 template <int N>
@@ -77,6 +78,7 @@ class TableIndicesBase
  * of and access to data is done by the TableIndicesBase base
  * class of a specializations.
  *
+ * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
 template <int N>
@@ -108,6 +110,7 @@ class TableIndices
  * data is done by the TableIndicesBase base class of a
  * specializations.
  *
+ * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
 template <>
@@ -138,6 +141,7 @@ class TableIndices<1> : public TableIndicesBase<1>
  * specializations. Actual storage of and access to data is done by
  * the TableIndicesBase base class of a specializations.
  *
+ * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
 template <>
@@ -180,6 +184,7 @@ class TableIndices<2> : public TableIndicesBase<2>
  * specializations. Actual storage of and access to data is done by
  * the TableIndicesBase base class of a specializations.
  *
+ * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
 template <>
@@ -222,6 +227,7 @@ class TableIndices<3> : public TableIndicesBase<3>
  * specializations. Actual storage of and access to data is done by
  * the TableIndicesBase base class of a specializations.
  *
+ * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
 template <>
@@ -265,6 +271,7 @@ class TableIndices<4> : public TableIndicesBase<4>
  * specializations. Actual storage of and access to data is done by
  * the TableIndicesBase base class of a specializations.
  *
+ * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
 template <>
@@ -309,6 +316,7 @@ class TableIndices<5> : public TableIndicesBase<5>
  * specializations. Actual storage of and access to data is done by
  * the TableIndicesBase base class of a specializations.
  *
+ * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
 template <>
@@ -354,6 +362,7 @@ class TableIndices<6> : public TableIndicesBase<6>
  * specializations. Actual storage of and access to data is done by
  * the TableIndicesBase base class of a specializations.
  *
+ * @ingroup data
  * @author Wolfgang Bangerth, 2002, Ralf Hartmann 2004
  */
 template <>

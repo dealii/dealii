@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,6 +27,7 @@
  * useful if a matrix is composed of several blocks, where you have to
  * translate global row and column indices to local ones.
  *
+ * @ingroup data
  * @author Wolfgang Bangerth, Guido Kanschat, 2000
  */
 class BlockIndices

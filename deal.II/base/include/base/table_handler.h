@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,6 +36,7 @@
  * Abstract base class for the <tt>TableEntry</tt> class. See there.
  * This class is not to be used by the user.
  *
+ * @ingroup textoutput
  * @author Ralf Hartmann, 1999
  */
 class TableEntryBase 
@@ -72,6 +73,7 @@ class TableEntryBase
  *
  * For more detail see the <tt>TableHandler</tt> class.
  *
+ * @ingroup textoutput
  * @author Ralf Hartmann, 1999
  */
 template <typename value_type>
@@ -137,6 +139,10 @@ class TableEntry : public TableEntryBase
  * to prescribe the format and the captions the columns are written
  * with in tex mode.
  *
+ * A detailed explanation of this class is also given in the step-13 tutorial
+ * program.
+ * 
+ * 
  * <h3>Example</h3>
  * 
  * This is a simple example demonstrating the usage of this class. The
@@ -170,6 +176,7 @@ class TableEntry : public TableEntryBase
  * out_file.close();
  * @endcode
  *
+ * @ingroup textoutput
  * @author Ralf Hartmann, 1999
  */
 class TableHandler

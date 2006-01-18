@@ -94,6 +94,9 @@
  * triangulations, computing the diameter of a domain, or subdividing it into
  * chunks of roughly equal size for parallel computations.
  *
+ * The GridRefinement class implements a number of mesh refinement algorithms,
+ * based on refinement indicators given to its member functions.
+ *
  * 
  * <h3>Internal classes</h3>
  *

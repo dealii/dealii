@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,9 +29,8 @@
 /*!@addtogroup Solvers */
 /*@{*/
 
-//! Power method for eigenvalues.
 /**
- * Power method (von Mises).
+ * Power method (von Mises) for eigenvalue computations.
  *
  * This method determines the largest eigenvalue of a matrix by
  * applying increasing powers of this matrix to a vector. If there is
@@ -109,9 +108,8 @@ class EigenPower : private Solver<VECTOR>
     AdditionalData additional_data;
 };
 
-//! Inverse iteration for eigenvalues.
 /**
- * Inverse iteration (Wieland).
+ * Inverse iteration (Wieland) for eigenvalue computations.
  *
  * This class implements an adaptive version of the inverse iteration by Wieland.
  *

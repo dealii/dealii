@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -470,7 +470,8 @@ namespace internal
  * table is needed here. Furthermore, you may want to store, say, the
  * gradients of shape functions, so the data type is not a single
  * scalar value, but a tensor itself.
- * 
+ *
+ * @ingroup data
  * @author Wolfgang Bangerth, 2002.
  */
 template <int N, typename T>
@@ -736,6 +737,7 @@ class TableBase : public Subscriptor
  * dimensions. See there, and in the documentation of the base class
  * for more information.
  * 
+ * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
 template <int N,typename T>
@@ -754,6 +756,7 @@ class Table : public TableBase<N,T>
  * For the rationale of this class, and a description of the
  * interface, see the base class.
  * 
+ * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
 template <typename T>
@@ -826,6 +829,7 @@ class Table<1,T> : public TableBase<1,T>
  * compatibility with a predecessor class (<tt>vector2d</tt>), some
  * additional functions are provided.
  * 
+ * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
 template <typename T>
@@ -977,6 +981,470 @@ class Table<2,T> : public TableBase<2,T>
 
 
 /**
+ * A class representing a three-dimensional table of objects (not
+ * necessarily only numbers).
+ *
+ * For the rationale of this class, and a description of the
+ * interface, see the base class.
+ * 
+ * @ingroup data
+ * @author Wolfgang Bangerth, 2002
+ */
+template <typename T>
+class Table<3,T> : public TableBase<3,T>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * dimensions to zero.
+                                      */
+    Table ();
+
+                                     /**
+                                      * Constructor. Pass down the
+                                      * given dimensions to the base
+                                      * class.
+                                      */
+    Table (const unsigned int size1,
+           const unsigned int size2,
+           const unsigned int size3);
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested two-dimensional
+                                      * subobject of this
+                                      * three-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    internal::TableBaseAccessors::Accessor<3,T,true,2>
+    operator [] (const unsigned int i) const;
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested two-dimensional
+                                      * subobject of this
+                                      * three-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    internal::TableBaseAccessors::Accessor<3,T,false,2>
+    operator [] (const unsigned int i);
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    const T & operator () (const unsigned int i,
+                           const unsigned int j,
+                           const unsigned int k) const;
+    
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    T & operator () (const unsigned int i,
+                     const unsigned int j,
+                     const unsigned int k);
+};
+
+
+
+/**
+ * A class representing a four-dimensional table of objects (not
+ * necessarily only numbers).
+ *
+ * For the rationale of this class, and a description of the
+ * interface, see the base class.
+ * 
+ * @ingroup data
+ * @author Wolfgang Bangerth, Ralf Hartmann 2002
+ */
+template <typename T>
+class Table<4,T> : public TableBase<4,T>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * dimensions to zero.
+                                      */
+    Table ();
+
+                                     /**
+                                      * Constructor. Pass down the
+                                      * given dimensions to the base
+                                      * class.
+                                      */
+    Table (const unsigned int size1,
+           const unsigned int size2,
+           const unsigned int size3,
+	   const unsigned int size4);
+    
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested three-dimensional
+                                      * subobject of this
+                                      * four-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    internal::TableBaseAccessors::Accessor<4,T,true,3>
+    operator [] (const unsigned int i) const;
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested three-dimensional
+                                      * subobject of this
+                                      * four-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    internal::TableBaseAccessors::Accessor<4,T,false,3>
+    operator [] (const unsigned int i);
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    const T & operator () (const unsigned int i,
+                           const unsigned int j,
+                           const unsigned int k,
+			   const unsigned int l) const;
+    
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    T & operator () (const unsigned int i,
+                     const unsigned int j,
+                     const unsigned int k,
+		     const unsigned int l);
+};
+
+
+
+/**
+ * A class representing a five-dimensional table of objects (not
+ * necessarily only numbers).
+ *
+ * For the rationale of this class, and a description of the
+ * interface, see the base class.
+ * 
+ * @ingroup data
+ * @author Wolfgang Bangerth, Ralf Hartmann 2002
+ */
+template <typename T>
+class Table<5,T> : public TableBase<5,T>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * dimensions to zero.
+                                      */
+    Table ();
+
+                                     /**
+                                      * Constructor. Pass down the
+                                      * given dimensions to the base
+                                      * class.
+                                      */
+    Table (const unsigned int size1,
+           const unsigned int size2,
+           const unsigned int size3,
+	   const unsigned int size4,
+	   const unsigned int size5);
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested four-dimensional
+                                      * subobject of this
+                                      * five-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    internal::TableBaseAccessors::Accessor<5,T,true,4>
+    operator [] (const unsigned int i) const;
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested four-dimensional
+                                      * subobject of this
+                                      * five-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    internal::TableBaseAccessors::Accessor<5,T,false,4>
+    operator [] (const unsigned int i);
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    const T & operator () (const unsigned int i,
+                           const unsigned int j,
+                           const unsigned int k,
+			   const unsigned int l,
+			   const unsigned int m) const;
+    
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    T & operator () (const unsigned int i,
+                     const unsigned int j,
+                     const unsigned int k,
+		     const unsigned int l,
+		     const unsigned int m);
+};
+
+
+
+/**
+ * A class representing a six-dimensional table of objects (not
+ * necessarily only numbers).
+ *
+ * For the rationale of this class, and a description of the
+ * interface, see the base class.
+ * 
+ * @ingroup data
+ * @author Wolfgang Bangerth, Ralf Hartmann 2002
+ */
+template <typename T>
+class Table<6,T> : public TableBase<6,T>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * dimensions to zero.
+                                      */
+    Table ();
+
+                                     /**
+                                      * Constructor. Pass down the
+                                      * given dimensions to the base
+                                      * class.
+                                      */
+    Table (const unsigned int size1,
+           const unsigned int size2,
+           const unsigned int size3,
+	   const unsigned int size4,
+	   const unsigned int size5,
+	   const unsigned int size6);
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested five-dimensional
+                                      * subobject of this
+                                      * six-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    internal::TableBaseAccessors::Accessor<6,T,true,5>
+    operator [] (const unsigned int i) const;
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested five-dimensional
+                                      * subobject of this
+                                      * six-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    internal::TableBaseAccessors::Accessor<6,T,false,5>
+    operator [] (const unsigned int i);
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    const T & operator () (const unsigned int i,
+                           const unsigned int j,
+                           const unsigned int k,
+			   const unsigned int l,
+			   const unsigned int m,
+			   const unsigned int n) const;
+    
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    T & operator () (const unsigned int i,
+                     const unsigned int j,
+                     const unsigned int k,
+		     const unsigned int l,
+		     const unsigned int m,
+		     const unsigned int n);
+};
+
+
+/**
+ * A class representing a seven-dimensional table of objects (not
+ * necessarily only numbers).
+ *
+ * For the rationale of this class, and a description of the
+ * interface, see the base class.
+ * 
+ * @ingroup data
+ * @author Wolfgang Bangerth, 2002, Ralf Hartmann 2004
+ */
+template <typename T>
+class Table<7,T> : public TableBase<7,T>
+{
+  public:
+                                     /**
+                                      * Default constructor. Set all
+                                      * dimensions to zero.
+                                      */
+    Table ();
+
+                                     /**
+                                      * Constructor. Pass down the
+                                      * given dimensions to the base
+                                      * class.
+                                      */
+    Table (const unsigned int size1,
+           const unsigned int size2,
+           const unsigned int size3,
+	   const unsigned int size4,
+	   const unsigned int size5,
+	   const unsigned int size6,
+	   const unsigned int size7);
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested six-dimensional
+                                      * subobject of this
+                                      * seven-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    internal::TableBaseAccessors::Accessor<7,T,true,6>
+    operator [] (const unsigned int i) const;
+
+                                     /**
+                                      * Access operator. Generate an
+                                      * object that accesses the
+                                      * requested six-dimensional
+                                      * subobject of this
+                                      * seven-dimensional table. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    internal::TableBaseAccessors::Accessor<7,T,false,6>
+    operator [] (const unsigned int i);
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * only allows read access.
+                                      */
+    const T & operator () (const unsigned int i,
+                           const unsigned int j,
+                           const unsigned int k,
+			   const unsigned int l,
+			   const unsigned int m,
+			   const unsigned int n,
+			   const unsigned int o) const;
+    
+
+                                     /**
+                                      * Direct access to one element
+                                      * of the table by specifying all
+                                      * indices at the same time. Range
+                                      * checks are performed.
+                                      *
+                                      * This version of the function
+                                      * allows read-write access.
+                                      */
+    T & operator () (const unsigned int i,
+                     const unsigned int j,
+                     const unsigned int k,
+		     const unsigned int l,
+		     const unsigned int m,
+		     const unsigned int n,
+		     const unsigned int o);
+};
+
+
+
+/**
  * A class representing a transpose two-dimensional table, i.e. a matrix of
  * objects (not necessarily only numbers) in column first numbering (FORTRAN
  * convention). The only real difference is therefore really in the storage
@@ -986,6 +1454,7 @@ class Table<2,T> : public TableBase<2,T>
  * access and the dimensions will be for the transpose ordering of the
  * data field in TableBase.
  *
+ * @ingroup data
  * @author Guido Kanschat, 2005
  */
 template <typename T>
@@ -1108,464 +1577,6 @@ class TransposeTable : public TableBase<2,T>
                   const unsigned int j) const;
 };
 
-
-
-/**
- * A class representing a three-dimensional table of objects (not
- * necessarily only numbers).
- *
- * For the rationale of this class, and a description of the
- * interface, see the base class.
- * 
- * @author Wolfgang Bangerth, 2002
- */
-template <typename T>
-class Table<3,T> : public TableBase<3,T>
-{
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * dimensions to zero.
-                                      */
-    Table ();
-
-                                     /**
-                                      * Constructor. Pass down the
-                                      * given dimensions to the base
-                                      * class.
-                                      */
-    Table (const unsigned int size1,
-           const unsigned int size2,
-           const unsigned int size3);
-
-                                     /**
-                                      * Access operator. Generate an
-                                      * object that accesses the
-                                      * requested two-dimensional
-                                      * subobject of this
-                                      * three-dimensional table. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * only allows read access.
-                                      */
-    internal::TableBaseAccessors::Accessor<3,T,true,2>
-    operator [] (const unsigned int i) const;
-
-                                     /**
-                                      * Access operator. Generate an
-                                      * object that accesses the
-                                      * requested two-dimensional
-                                      * subobject of this
-                                      * three-dimensional table. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * allows read-write access.
-                                      */
-    internal::TableBaseAccessors::Accessor<3,T,false,2>
-    operator [] (const unsigned int i);
-
-                                     /**
-                                      * Direct access to one element
-                                      * of the table by specifying all
-                                      * indices at the same time. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * only allows read access.
-                                      */
-    const T & operator () (const unsigned int i,
-                           const unsigned int j,
-                           const unsigned int k) const;
-    
-
-                                     /**
-                                      * Direct access to one element
-                                      * of the table by specifying all
-                                      * indices at the same time. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * allows read-write access.
-                                      */
-    T & operator () (const unsigned int i,
-                     const unsigned int j,
-                     const unsigned int k);
-};
-
-
-
-/**
- * A class representing a four-dimensional table of objects (not
- * necessarily only numbers).
- *
- * For the rationale of this class, and a description of the
- * interface, see the base class.
- * 
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
- */
-template <typename T>
-class Table<4,T> : public TableBase<4,T>
-{
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * dimensions to zero.
-                                      */
-    Table ();
-
-                                     /**
-                                      * Constructor. Pass down the
-                                      * given dimensions to the base
-                                      * class.
-                                      */
-    Table (const unsigned int size1,
-           const unsigned int size2,
-           const unsigned int size3,
-	   const unsigned int size4);
-    
-                                     /**
-                                      * Access operator. Generate an
-                                      * object that accesses the
-                                      * requested three-dimensional
-                                      * subobject of this
-                                      * four-dimensional table. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * only allows read access.
-                                      */
-    internal::TableBaseAccessors::Accessor<4,T,true,3>
-    operator [] (const unsigned int i) const;
-
-                                     /**
-                                      * Access operator. Generate an
-                                      * object that accesses the
-                                      * requested three-dimensional
-                                      * subobject of this
-                                      * four-dimensional table. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * allows read-write access.
-                                      */
-    internal::TableBaseAccessors::Accessor<4,T,false,3>
-    operator [] (const unsigned int i);
-
-                                     /**
-                                      * Direct access to one element
-                                      * of the table by specifying all
-                                      * indices at the same time. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * only allows read access.
-                                      */
-    const T & operator () (const unsigned int i,
-                           const unsigned int j,
-                           const unsigned int k,
-			   const unsigned int l) const;
-    
-
-                                     /**
-                                      * Direct access to one element
-                                      * of the table by specifying all
-                                      * indices at the same time. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * allows read-write access.
-                                      */
-    T & operator () (const unsigned int i,
-                     const unsigned int j,
-                     const unsigned int k,
-		     const unsigned int l);
-};
-
-
-
-/**
- * A class representing a five-dimensional table of objects (not
- * necessarily only numbers).
- *
- * For the rationale of this class, and a description of the
- * interface, see the base class.
- * 
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
- */
-template <typename T>
-class Table<5,T> : public TableBase<5,T>
-{
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * dimensions to zero.
-                                      */
-    Table ();
-
-                                     /**
-                                      * Constructor. Pass down the
-                                      * given dimensions to the base
-                                      * class.
-                                      */
-    Table (const unsigned int size1,
-           const unsigned int size2,
-           const unsigned int size3,
-	   const unsigned int size4,
-	   const unsigned int size5);
-
-                                     /**
-                                      * Access operator. Generate an
-                                      * object that accesses the
-                                      * requested four-dimensional
-                                      * subobject of this
-                                      * five-dimensional table. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * only allows read access.
-                                      */
-    internal::TableBaseAccessors::Accessor<5,T,true,4>
-    operator [] (const unsigned int i) const;
-
-                                     /**
-                                      * Access operator. Generate an
-                                      * object that accesses the
-                                      * requested four-dimensional
-                                      * subobject of this
-                                      * five-dimensional table. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * allows read-write access.
-                                      */
-    internal::TableBaseAccessors::Accessor<5,T,false,4>
-    operator [] (const unsigned int i);
-
-                                     /**
-                                      * Direct access to one element
-                                      * of the table by specifying all
-                                      * indices at the same time. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * only allows read access.
-                                      */
-    const T & operator () (const unsigned int i,
-                           const unsigned int j,
-                           const unsigned int k,
-			   const unsigned int l,
-			   const unsigned int m) const;
-    
-
-                                     /**
-                                      * Direct access to one element
-                                      * of the table by specifying all
-                                      * indices at the same time. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * allows read-write access.
-                                      */
-    T & operator () (const unsigned int i,
-                     const unsigned int j,
-                     const unsigned int k,
-		     const unsigned int l,
-		     const unsigned int m);
-};
-
-
-
-/**
- * A class representing a six-dimensional table of objects (not
- * necessarily only numbers).
- *
- * For the rationale of this class, and a description of the
- * interface, see the base class.
- * 
- * @author Wolfgang Bangerth, Ralf Hartmann 2002
- */
-template <typename T>
-class Table<6,T> : public TableBase<6,T>
-{
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * dimensions to zero.
-                                      */
-    Table ();
-
-                                     /**
-                                      * Constructor. Pass down the
-                                      * given dimensions to the base
-                                      * class.
-                                      */
-    Table (const unsigned int size1,
-           const unsigned int size2,
-           const unsigned int size3,
-	   const unsigned int size4,
-	   const unsigned int size5,
-	   const unsigned int size6);
-
-                                     /**
-                                      * Access operator. Generate an
-                                      * object that accesses the
-                                      * requested five-dimensional
-                                      * subobject of this
-                                      * six-dimensional table. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * only allows read access.
-                                      */
-    internal::TableBaseAccessors::Accessor<6,T,true,5>
-    operator [] (const unsigned int i) const;
-
-                                     /**
-                                      * Access operator. Generate an
-                                      * object that accesses the
-                                      * requested five-dimensional
-                                      * subobject of this
-                                      * six-dimensional table. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * allows read-write access.
-                                      */
-    internal::TableBaseAccessors::Accessor<6,T,false,5>
-    operator [] (const unsigned int i);
-
-                                     /**
-                                      * Direct access to one element
-                                      * of the table by specifying all
-                                      * indices at the same time. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * only allows read access.
-                                      */
-    const T & operator () (const unsigned int i,
-                           const unsigned int j,
-                           const unsigned int k,
-			   const unsigned int l,
-			   const unsigned int m,
-			   const unsigned int n) const;
-    
-
-                                     /**
-                                      * Direct access to one element
-                                      * of the table by specifying all
-                                      * indices at the same time. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * allows read-write access.
-                                      */
-    T & operator () (const unsigned int i,
-                     const unsigned int j,
-                     const unsigned int k,
-		     const unsigned int l,
-		     const unsigned int m,
-		     const unsigned int n);
-};
-
-
-/**
- * A class representing a seven-dimensional table of objects (not
- * necessarily only numbers).
- *
- * For the rationale of this class, and a description of the
- * interface, see the base class.
- * 
- * @author Wolfgang Bangerth, 2002, Ralf Hartmann 2004
- */
-template <typename T>
-class Table<7,T> : public TableBase<7,T>
-{
-  public:
-                                     /**
-                                      * Default constructor. Set all
-                                      * dimensions to zero.
-                                      */
-    Table ();
-
-                                     /**
-                                      * Constructor. Pass down the
-                                      * given dimensions to the base
-                                      * class.
-                                      */
-    Table (const unsigned int size1,
-           const unsigned int size2,
-           const unsigned int size3,
-	   const unsigned int size4,
-	   const unsigned int size5,
-	   const unsigned int size6,
-	   const unsigned int size7);
-
-                                     /**
-                                      * Access operator. Generate an
-                                      * object that accesses the
-                                      * requested six-dimensional
-                                      * subobject of this
-                                      * seven-dimensional table. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * only allows read access.
-                                      */
-    internal::TableBaseAccessors::Accessor<7,T,true,6>
-    operator [] (const unsigned int i) const;
-
-                                     /**
-                                      * Access operator. Generate an
-                                      * object that accesses the
-                                      * requested six-dimensional
-                                      * subobject of this
-                                      * seven-dimensional table. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * allows read-write access.
-                                      */
-    internal::TableBaseAccessors::Accessor<7,T,false,6>
-    operator [] (const unsigned int i);
-
-                                     /**
-                                      * Direct access to one element
-                                      * of the table by specifying all
-                                      * indices at the same time. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * only allows read access.
-                                      */
-    const T & operator () (const unsigned int i,
-                           const unsigned int j,
-                           const unsigned int k,
-			   const unsigned int l,
-			   const unsigned int m,
-			   const unsigned int n,
-			   const unsigned int o) const;
-    
-
-                                     /**
-                                      * Direct access to one element
-                                      * of the table by specifying all
-                                      * indices at the same time. Range
-                                      * checks are performed.
-                                      *
-                                      * This version of the function
-                                      * allows read-write access.
-                                      */
-    T & operator () (const unsigned int i,
-                     const unsigned int j,
-                     const unsigned int k,
-		     const unsigned int l,
-		     const unsigned int m,
-		     const unsigned int n,
-		     const unsigned int o);
-};
 
 
 

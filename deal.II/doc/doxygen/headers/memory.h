@@ -32,4 +32,6 @@
  * estimate). For deal.II classes, it uses the
  * <code>memory_consumption</code> member function that most classes
  * have.
+ *
+ * @ingroup utilities
  */

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,10 +17,10 @@
 #include <base/exceptions.h>
 
 /**
- * Filter a range out of any object having a random access operator
- * <tt>[] (unsigned int)</tt> and a function <tt>size() const</tt>.
+ * Filter a range out of any object having a random access <tt>operator[]
+ * (unsigned int)</tt> and a function <tt>size() const</tt>.
  *
- * The use of this object is straight forward. It reduplicates the
+ * The use of this object is straightforward. It reduplicates the
  * random access operator of the <tt>VECTOR</tt> and adds an offset to
  * every index.
  *
@@ -36,6 +36,7 @@
  *   }
  * @endcode
  *
+ * @ingroup data
  * @author Guido Kanschat, 2004
  */
 template <class VECTOR>

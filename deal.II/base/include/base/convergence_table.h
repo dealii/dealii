@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,10 +33,10 @@
  * implementations of these non-standard methods is left to a user.
  *
  * The number of cells and the number of DoFs may be added to the table by
- * calling e.g.  <tt>add_value("n cells", n_cells)</tt>. The table
- * data is also added by calling add_value().
- * Before the output of the table the functions evaluate_convergence_rates() and
- * evaluate_all_convergence_rates() may be called (even multiply).
+ * calling e.g.  <tt>add_value("n cells", n_cells)</tt>. The table data is
+ * also added by calling add_value().  Before the output of the table the
+ * functions evaluate_convergence_rates() and evaluate_all_convergence_rates()
+ * may be called (even multiply).
  *
  * There are two possibilities of how to evaluate the convergence rates of multiple 
  * columns in the same RateMode.
@@ -48,7 +48,10 @@
  * that are not signed to be omitted.
  * </ol>
  *
+ * A detailed discussion of this class can also be found in the step-7 and
+ * step-13 example programs.
  *
+ * @ingroup textoutput
  * @author Ralf Hartmann, 1999
  */
 class ConvergenceTable: public TableHandler

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -117,7 +117,6 @@ namespace internal
                                     * @endcond
                                     */
 
-//! Generalized minimal residual method.
 /**
  * Implementation of the Restarted Preconditioned Direct Generalized
  * Minimal Residual Method. The stopping criterion is the norm of the
@@ -296,9 +295,9 @@ class SolverGMRES : public Solver<VECTOR>
     SolverGMRES (const SolverGMRES<VECTOR>&);
 };
 
-//! Generalized minimal residual method with flexible preconditioning.
 /**
- * Flexible GMRES.
+ * Implementation of the Generalized minimal residual method with flexible
+ * preconditioning method.
  *
  * This version of the GMRES method allows for the use of a different
  * preconditioner in each iteration step. Therefore, it is also more

@@ -34,6 +34,9 @@
  * particular value and all other components are zero. Some more
  * specialized functions are also defined in the Functions namespace.
  *
+ *
+ * <h3>Time dependent functions</h3>
+ * 
  * For time dependent computations, boundary conditions and/or right
  * hand side functions may also change with time. Since at a given
  * time step one is usually only interested in the spatial dependence
@@ -54,4 +57,12 @@
  * referencing a particular time. In above example, one would set the
  * time of the function object to the present time step before handing
  * it off to the VectorTools::interpolate_boundary_values method.
+ *
+ * 
+ * <h3>Tensor-valued functions</h3>
+ *
+ * The Function class is the most frequently used, but sometimes one needs a
+ * function the values of which are tensors, rather than scalars. The
+ * TensorFunction template can do this for you. Apart from the return type,
+ * the interface is most the same as that of the Function class.
  */

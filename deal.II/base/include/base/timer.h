@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,6 +52,7 @@
  * right now. In this case, we would like to sum up the time needed by
  * all children. Furthermore, a wall clock option would be nice.
  *
+ * @ingroup utilities
  * @author G. Kanschat, W. Bangerth
  */
 //TODO:[?] make class work with multithreading as well. better docs.

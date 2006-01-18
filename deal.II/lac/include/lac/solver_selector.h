@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,8 +31,9 @@
 /*!@addtogroup Solvers */
 /*@{*/
 
-//! Selects a solver by changing a parameter.
 /**
+ * Selects a solver by changing a parameter.
+ * 
  * By calling the @p solve function of this @p SolverSelector, it selects
  * the @p solve function of that @p Solver that was specified in the constructor
  * of this class.

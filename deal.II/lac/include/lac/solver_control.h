@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,6 @@ class ParameterHandler;
 /*!@addtogroup Solvers */
 /*@{*/
 
-//! Control of the stopping criterion for solvers
 /**
  * Control class for iterative solvers.
  *
@@ -441,7 +440,6 @@ class SolverControl : public Subscriptor
 };
 
 
-//! Control of the stopping criterion depending on the initial residual.
 /**
  * Specialization of @p SolverControl which returns @p success if either
  * the specified tolerance is achieved or if the initial residual (or

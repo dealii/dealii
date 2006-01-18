@@ -50,15 +50,12 @@
  */
 
 /**
- * @defgroup output Output
+ * @defgroup output Graphical output
  *
  * deal.II generates three types of output: it can write triangulations/meshes
  * in formats understood by several mesh readers (including those of deal.II
  * itself), and it can create output used for visualization of data. Finally,
  * it can output matrices in a graphical format.
- *
- * In addition, deal.II has a number of helper classes for
- * output. They are introduced in sections of their own below.
  *
  * 
  * <h3>Visualization of data</h3>
@@ -119,27 +116,16 @@
  * MatrixOut class uses the DataOutBase for output. Therefore, matrices can be
  * visualized in all formats supported by the latter class.
  *
+ * @ingroup IO
+ */
+
+/**
+ * @defgroup textoutput Textual output
  *
- * <h3>The ConditionalOStream class</h3>
- *
- * The ConditionalOStream class is a class that acts like
- * <code>std::ostream</code> in that you can pipe output into it using
- * <code>operator &lt;&lt;</code>. However, it only writes these
- * things to a file (or the screen) if a flag is set. This is useful
- * in parallel programs, and is discussed in the step-17 tutorial
- * program.
- *
- *
- * <h3>The LogStream class</h3>
- *
- * The LogStream class is used to write status output of programs to
- * logfiles. It, again, acts like <code>std::ostream</code>, but
- * instead of writing things to a file or the screen only, it has the
- * ability to write things to both a log file as well as the
- * screen. It can also add a time stamp to each line of output, and
- * can selectively write only certain parts of the output that are
- * interesting enough to the screen, and suppress other parts that
- * then only show up in the log file.
+ * In addition to classes that provide graphical output formats (see the @ref
+ * output module), deal.II has a number of classes that facilitate textual
+ * output in a number of ways. They are collected in this module. See the
+ * documentation of these classes for more details.
  *
  * @ingroup IO
  */

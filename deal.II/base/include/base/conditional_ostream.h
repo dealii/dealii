@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -75,7 +75,7 @@
  *   system_matrix.print_formatted(cout);
  * @endcode
  *
- * @ingroup output
+ * @ingroup textoutput
  * @author Ralf Hartmann, Wolfgang Bangerth, 2004
  */
 class ConditionalOStream

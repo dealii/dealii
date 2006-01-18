@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -48,6 +48,7 @@
  *  returned, not only vectors, as for them the size can be determined
  *  similarly simply.
  *
+ *  @ingroup functions
  *  @author Guido Kanschat, 1999 
  */
 template <int rank, int dim>

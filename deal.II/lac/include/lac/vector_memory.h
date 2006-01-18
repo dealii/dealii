@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,7 +25,6 @@
 /*!@addtogroup VMemory */
 /*@{*/
 
-//! Base class for vector memory management
 /**
  * Memory management base class for vectors. This is an abstract base
  * class used, among other places, by all iterative methods to
@@ -114,7 +113,6 @@ class VectorMemory : public Subscriptor
 
 
 
-//! Sample implementation using system memory management.
 /**
  * Simple memory management. See the documentation of the base class
  * for a description of its purpose.
@@ -173,7 +171,6 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
 
 
 
-//! Keeps all vectors and avoids reallocation.
 /**
  * A pool based memory management class. See the documentation of the
  * base class for a description of its purpose.

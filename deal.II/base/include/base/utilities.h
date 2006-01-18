@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,6 +30,7 @@ typedef int MPI_Comm;
  * finite element computing or numerical programs, but nevertheless are needed
  * in various contexts when writing applications.
  *
+ * @ingroup utilities
  * @author Wolfgang Bangerth, 2005
  */
 namespace Utilities
@@ -137,6 +138,8 @@ namespace Utilities
                                    /**
                                     * A namespace for utility functions that
                                     * probe system properties.
+                                    * 
+                                    * @ingroup utilities
                                     */
   namespace System
   {
