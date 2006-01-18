@@ -84,8 +84,7 @@ check ()
 
       for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
         {
-          deallog << "    q=" << q
-                  << ", xq=" << fe.quadrature_point(q)
+          deallog << ", xq=" << fe.quadrature_point(q)
                   << ", f=[";
           for (unsigned int d=0; d<dim; ++d)
             deallog << (d==0 ? "" : " ")
