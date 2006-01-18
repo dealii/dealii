@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -147,15 +147,11 @@ main()
 
       CHECK_ALL(DGQ,0);
       CHECK_ALL(DGQ,1);
-      CHECK_ALL(DGQ,2);
       CHECK_ALL(DGQ,3);
-      CHECK_ALL(DGQ,4);
 
       CHECK_ALL(DGP,0);
       CHECK_ALL(DGP,1);
-      CHECK_ALL(DGP,2);
       CHECK_ALL(DGP,3);
-      CHECK_ALL(DGP,4);
 
       CHECK(Nedelec, 1, 2);
       CHECK(Nedelec, 1, 3);
@@ -192,11 +188,6 @@ main()
       CHECK_SYS2(FE_DGQ<2>(2),2,FE_DGP<2>(3),1,2);
       CHECK_SYS2(FE_DGP<2>(3),1,FE_DGQ<2>(2),2,2);
 
-      CHECK_SYS2(FE_Q<3>(1)  ,3,FE_DGQ<3>(2),2,3);
-      CHECK_SYS2(FE_DGQ<3>(2),2,FE_DGP<3>(3),1,3);
-      CHECK_SYS2(FE_DGP<3>(3),1,FE_DGQ<3>(2),2,3);
-
-
       CHECK_SYS3(FE_Q<1>(1),  3,FE_DGP<1>(3),1,FE_Q<1>(1),3,1);
       CHECK_SYS3(FE_DGQ<1>(2),2,FE_DGQ<1>(2),2,FE_Q<1>(3),3,1);
       CHECK_SYS3(FE_DGP<1>(3),1,FE_DGP<1>(3),1,FE_Q<1>(2),3,1);
@@ -205,18 +196,16 @@ main()
       CHECK_SYS3(FE_DGQ<2>(2),2,FE_DGQ<2>(2),2,FE_Q<2>(3),3,2);
       CHECK_SYS3(FE_DGP<2>(3),1,FE_DGP<2>(3),1,FE_Q<2>(2),3,2);
 
-      CHECK_SYS3(FE_Q<3>(1),  3,FE_DGP<3>(3),1,FE_Q<3>(1),3,3);
-      CHECK_SYS3(FE_DGQ<3>(2),2,FE_DGQ<3>(2),2,FE_Q<3>(3),3,3);
-      CHECK_SYS3(FE_DGP<3>(3),1,FE_DGP<3>(3),1,FE_Q<3>(2),3,3);
+      CHECK_SYS3(FE_DGQ<3>(1),  3,FE_DGP<3>(3),1,FE_Q<3>(1),3,3);
 
                                        // systems of systems  
       CHECK_SYS3((FESystem<2>(FE_Q<2>(1),3)), 3,
-                 FE_DGQ<2>(3), 1,
+                 FE_DGQ<2>(0), 1,
                  FE_Q<2>(1), 3,
                  2);
       CHECK_SYS3(FE_DGQ<2>(3), 1,
-                 FESystem<2>(FE_DGQ<2>(3),3), 1,
-                 FESystem<2>(FE_Q<2>(2),3,
+                 FESystem<2>(FE_DGQ<2>(0),3), 1,
+                 FESystem<2>(FE_Q<2>(2),1,
                              FE_DGQ<2>(0),1),2,
                  2);
 
@@ -225,8 +214,8 @@ main()
                   FE_Nedelec<2>(1), 2,
                   2);
       CHECK_SYS3(FE_Nedelec<2>(1), 1,
-                 FESystem<2>(FE_DGQ<2>(3),3), 1,
-                 FESystem<2>(FE_Q<2>(2),3,
+                 FESystem<2>(FE_DGQ<2>(1),2), 1,
+                 FESystem<2>(FE_Q<2>(2),1,
                              FE_Nedelec<2>(1),2),2,
                  2);
   
