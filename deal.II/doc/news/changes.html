@@ -105,6 +105,15 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: The order of quadrature points is now x fastest, z slowest, as
+       well as the vertices of cells. Also, the nodes and subcells of patches
+       in DataOutBase follow the same ordering. Output code could be simplified
+       a lot, saving 900 lines of code.
+       <br>
+       (GK 2006/01/18)
+       </p>
+
+  <li> <p>
        Improved: The link to the manual now points directly to
        Doxygen's module list, and almost all classes are now grouped
        into modules that capture related functionality.
@@ -181,6 +190,12 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p>Improved: <code class="class">DataOutBase</code> now writes binary
+  files for OpenDX.
+  <br>
+  (GK 2006/01/18)
+  </p>
+
   <li> <p>
        New: There are now functions
        <code>ParameterHandler::set</code> that allow to set the value of a
