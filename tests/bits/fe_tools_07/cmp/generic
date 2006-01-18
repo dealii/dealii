@@ -191,24 +191,6 @@ DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 DEAL::Checking DGQ3 against DGQ1 in 3d:
 DEAL::0 0 0
 DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ1 against DGQ5 in 1d:
-DEAL::0 0 0
-DEAL::0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ5 against DGQ1 in 1d:
-DEAL::0 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ1 against DGQ5 in 2d:
-DEAL::0 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ5 against DGQ1 in 2d:
-DEAL::8.8e-10 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ1 against DGQ5 in 3d:
-DEAL::0 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ5 against DGQ1 in 3d:
-DEAL::2.4e-07 4.5e-09 2.8e-10
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 -1.4e-10 0 -1.2e-10 -1.0e-10 -1.6e-10 -1.2e-10 0 0 
 DEAL::Checking DGQ2 against DGQ2 in 1d:
 DEAL::0 0 0
 DEAL::0 0 0 0 0 0 0 0 0 0 0 0 
@@ -281,42 +263,6 @@ DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 DEAL::Checking DGQ3 against DGQ3 in 3d:
 DEAL::0 0 0
 DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ3 against DGQ5 in 1d:
-DEAL::0 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ5 against DGQ3 in 1d:
-DEAL::0 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ3 against DGQ5 in 2d:
-DEAL::0 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ5 against DGQ3 in 2d:
-DEAL::2.9e-10 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ3 against DGQ5 in 3d:
-DEAL::6.8e-09 2.6e-10 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ5 against DGQ3 in 3d:
-DEAL::6.6e-08 1.4e-09 1.0e-10
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ4 against DGQ5 in 1d:
-DEAL::0 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ5 against DGQ4 in 1d:
-DEAL::0 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ4 against DGQ5 in 2d:
-DEAL::2.3e-10 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ5 against DGQ4 in 2d:
-DEAL::5.5e-10 0 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ4 against DGQ5 in 3d:
-DEAL::4.0e-08 1.1e-09 0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ5 against DGQ4 in 3d:
-DEAL::1.4e-07 3.1e-09 2.5e-10
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
 DEAL::Checking DGP0 against DGP0 in 1d:
 DEAL::Checking DGP0 against DGP0 in 1d:
 DEAL::Checking DGP0 against DGP0 in 2d:
@@ -353,12 +299,6 @@ DEAL::Checking DGP1 against DGP3 in 2d:
 DEAL::Checking DGP3 against DGP1 in 2d:
 DEAL::Checking DGP1 against DGP3 in 3d:
 DEAL::Checking DGP3 against DGP1 in 3d:
-DEAL::Checking DGP1 against DGP5 in 1d:
-DEAL::Checking DGP5 against DGP1 in 1d:
-DEAL::Checking DGP1 against DGP5 in 2d:
-DEAL::Checking DGP5 against DGP1 in 2d:
-DEAL::Checking DGP1 against DGP5 in 3d:
-DEAL::Checking DGP5 against DGP1 in 3d:
 DEAL::Checking DGP2 against DGP2 in 1d:
 DEAL::Checking DGP2 against DGP2 in 1d:
 DEAL::Checking DGP2 against DGP2 in 2d:
@@ -383,18 +323,6 @@ DEAL::Checking DGP3 against DGP3 in 2d:
 DEAL::Checking DGP3 against DGP3 in 2d:
 DEAL::Checking DGP3 against DGP3 in 3d:
 DEAL::Checking DGP3 against DGP3 in 3d:
-DEAL::Checking DGP3 against DGP5 in 1d:
-DEAL::Checking DGP5 against DGP3 in 1d:
-DEAL::Checking DGP3 against DGP5 in 2d:
-DEAL::Checking DGP5 against DGP3 in 2d:
-DEAL::Checking DGP3 against DGP5 in 3d:
-DEAL::Checking DGP5 against DGP3 in 3d:
-DEAL::Checking DGP4 against DGP5 in 1d:
-DEAL::Checking DGP5 against DGP4 in 1d:
-DEAL::Checking DGP4 against DGP5 in 2d:
-DEAL::Checking DGP5 against DGP4 in 2d:
-DEAL::Checking DGP4 against DGP5 in 3d:
-DEAL::Checking DGP5 against DGP4 in 3d:
 DEAL::Checking Nedelec1 against Nedelec1 in 2d:
 DEAL::Checking Nedelec1 against Nedelec1 in 2d:
 DEAL::Checking Nedelec1 against Nedelec1 in 3d:

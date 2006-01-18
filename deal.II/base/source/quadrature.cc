@@ -122,19 +122,19 @@ Quadrature<dim>::Quadrature (const SubQuadrature &q1,
 		weights (n_quadrature_points, 0)
 {
   unsigned int present_index = 0;
-  for (unsigned int i=0; i<q1.n_quadrature_points; ++i)
-    for (unsigned int j=0; j<q2.n_quadrature_points; ++j)
+  for (unsigned int i2=0; i2<q2.n_quadrature_points; ++i2)
+    for (unsigned int i1=0; i1<q1.n_quadrature_points; ++i1)
       {
 					 // compose coordinates of
 					 // new quadrature point by tensor
 					 // product in the last component
 	for (unsigned int d=0; d<dim-1; ++d)
 	  quadrature_points[present_index](d)
-	    = q1.point(i)(d);
+	    = q1.point(i1)(d);
 	quadrature_points[present_index](dim-1)
-	  = q2.point(j)(0);
+	  = q2.point(i2)(0);
 					       
-	weights[present_index] = q1.weight(i) * q2.weight(j);
+	weights[present_index] = q1.weight(i1) * q2.weight(i2);
 
 	++present_index;
       };

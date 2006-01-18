@@ -11,6 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
+//TODO: Do neighbors for dx and povray smooth triangles
 
 #include <base/data_out_base.h>
 #include <base/parameter_handler.h>
@@ -31,6 +32,8 @@
 #endif
 
 
+//TODO: Is it reasonable to have undocumented exceptions?
+
 DeclException2 (ExcUnexpectedInput,
                 std::string, std::string,
                 << "Unexpected input: expected line\n  <"
@@ -44,6 +47,108 @@ DeclException4 (ExcIncompatibleDimensions,
                 << arg2 << "> or the space dimensions <"
                 << arg3 << "> and <" << arg4
                 << "> do not match!");
+
+
+//----------------------------------------------------------------------//
+//Auxiliary data
+//----------------------------------------------------------------------//
+static const char* gmv_cell_type[4] =
+{
+      "", "line 2", "quad 4", "hex 8"
+};
+
+static const char* ucd_cell_type[4] =
+{
+      "", "line", "quad", "hex"
+};
+
+static const char* tecplot_cell_type[4] =
+{
+      "", "", "quadrilateral", "brick"
+};
+
+#ifdef DEAL_II_HAVE_TECPLOT
+static unsigned int tecplot_binary_cell_type[4] =
+{
+      0, 0, 1, 3
+};
+#endif
+
+static unsigned int vtk_cell_type[4] =
+{
+      0, 3, 9, 12
+};
+
+//----------------------------------------------------------------------//
+//Auxiliary functions
+//----------------------------------------------------------------------//
+//For a given patch, compute the node interpolating the corner nodes
+//linearly at the point (xfrac, yfrac, zfrac).
+template <int dim, int spacedim>
+inline
+void
+compute_node(
+  Point<spacedim>& node,
+  const DataOutBase::Patch<dim,spacedim>* patch,
+  const float xfrac,
+  const float yfrac,
+  const float zfrac)
+{
+  node = (patch->vertices[1] * xfrac) + (patch->vertices[0] * (1-xfrac));
+  if (dim>1)
+    {
+      node*= 1-yfrac;
+      node += ((patch->vertices[3] * xfrac) + (patch->vertices[2] * (1-xfrac))) * yfrac;
+      if (dim>2)
+	{
+	  node *= (1-zfrac);
+	  node += (((patch->vertices[5] * xfrac) + (patch->vertices[4] * (1-xfrac)))
+		   * (1-yfrac) +
+		   ((patch->vertices[7] * xfrac) + (patch->vertices[6] * (1-xfrac)))
+		   * yfrac) * zfrac;
+	}
+    }
+}
+
+
+//TODO: Should this go to the utilities namespace?
+
+// Compute n^dim, where dim is a template parameter
+template<int dim>
+inline
+unsigned int template_power(const unsigned int n)
+{
+  Assert (dim>0, ExcNotImplemented());
+				   // The argument already contains the first power.
+  if (dim==1) return n;
+				   // Else, we must compute.
+  unsigned int result = n;  
+  for (unsigned int d=1;d<dim;++d)
+    result *= n;
+  return result;
+}
+
+
+template<int dim, int spacedim>
+static
+void
+compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim> >& patches,
+	      unsigned int& n_nodes,
+	      unsigned int& n_cells)
+{
+  n_nodes = 0;
+  n_cells = 0;
+  for (typename std::vector<DataOutBase::Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+       patch!=patches.end(); ++patch)
+    {
+      n_nodes += template_power<dim>(patch->n_subdivisions+1);
+      n_cells += template_power<dim>(patch->n_subdivisions);
+    }
+}
+
+  
+//----------------------------------------------------------------------//
+
 
 
 template <int dim, int spacedim>
@@ -144,8 +249,6 @@ DataOutBase::DXFlags::DXFlags (const bool write_neighbors,
 		int_binary(int_binary),
 		coordinates_binary(coordinates_binary),
 		data_binary(data_binary),
-		int_64(false),
-		coordinates_double(false),
 		data_double(false)
 {}
 
@@ -713,6 +816,484 @@ default_suffix (const OutputFormat output_format)
     }
 }
 
+//----------------------------------------------------------------------//
+
+DataOutBase::DXStream::DXStream(std::ostream& out, DataOutBase::DXFlags f)
+		:
+		stream(out), flags(f)
+{}
+
+
+template<int dim>
+void
+DataOutBase::DXStream::write (const unsigned int,
+			      const Point<dim>& p)
+{
+  if (flags.coordinates_binary)
+    {
+      float data[dim];
+      for (unsigned int d=0; d<dim; ++d)
+	data[d] = p(d);
+      stream.write(reinterpret_cast<const char*>(data),
+		   dim * sizeof(*data));
+    }
+  else
+    {	      
+      for (unsigned int d=0; d<dim; ++d)
+	stream << p(d) << '\t';
+      stream << '\n';
+    }
+}
+
+
+template<int dim>
+void
+DataOutBase::DXStream::write_cell(
+  unsigned int,
+  unsigned int start,
+  unsigned int d1,
+  unsigned int d2,
+  unsigned int d3)
+{
+  int nodes[8];
+  nodes[GeometryInfo<dim>::dx_to_deal[0]] = start;
+  nodes[GeometryInfo<dim>::dx_to_deal[1]] = start+d1;
+  if (dim>=2)
+    {
+				       // Add shifted line in y direction
+      nodes[GeometryInfo<dim>::dx_to_deal[2]] = start+d2;
+      nodes[GeometryInfo<dim>::dx_to_deal[3]] = start+d2+d1;
+      if (dim>=3)
+	{
+					   // Add shifted quad in z direction
+	  nodes[GeometryInfo<dim>::dx_to_deal[4]] = start+d3;
+	  nodes[GeometryInfo<dim>::dx_to_deal[5]] = start+d3+d1;
+	  nodes[GeometryInfo<dim>::dx_to_deal[6]] = start+d3+d2;  
+	  nodes[GeometryInfo<dim>::dx_to_deal[7]] = start+d3+d2+d1;
+	}
+    }
+  
+  if (flags.int_binary)
+    stream.write(reinterpret_cast<const char*>(nodes),
+		 (1<<dim) * sizeof(*nodes));
+  else
+    {
+      const unsigned int final = (1<<dim) - 1;
+      for (unsigned int i=0;i<final ;++i)
+	stream << nodes[i] << '\t';
+      stream << nodes[final] << '\n';
+    }
+}
+
+
+template<typename data>
+inline
+void
+DataOutBase::DXStream::write_dataset(unsigned int,
+				     const std::vector<data>& values)
+{
+  if (flags.data_binary)
+    {
+      stream.write(reinterpret_cast<const char*>(&values[0]),
+		   values.size()*sizeof(data));
+    }
+  else
+    {
+      for (unsigned int i=0;i<values.size();++i)
+	stream << '\t' << values[i];
+      stream << '\n';
+    }
+}
+
+
+
+//----------------------------------------------------------------------//
+
+DataOutBase::GmvStream::GmvStream(std::ostream& out, DataOutBase::GmvFlags f)
+		:
+		selected_component(deal_II_numbers::invalid_unsigned_int),
+		stream(out), flags(f)
+{}
+
+
+template<int dim>
+void
+DataOutBase::GmvStream::write (const unsigned int,
+			      const Point<dim>& p)
+{
+  Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
+	 ExcNotInitialized());
+  stream << p(selected_component) << ' ';
+}
+
+
+template<int dim>
+void
+DataOutBase::GmvStream::write_cell(
+  unsigned int,
+  unsigned int s,
+  unsigned int d1,
+  unsigned int d2,
+  unsigned int d3)
+{
+				   // Vertices are numbered starting
+				   // with one.
+  const unsigned int start=s+1;
+  stream << gmv_cell_type[dim] << '\n';
+  
+  stream << start << '\t'
+	 << start+d1;
+  if (dim>=2)
+    {
+      stream << '\t' << start+d2+d1
+	     << '\t' << start+d2;
+      if (dim>=3)
+	{
+	  stream << '\t' << start+d3
+		 << '\t' << start+d3+d1
+		 << '\t' << start+d3+d2+d1
+		 << '\t' << start+d3+d2;
+	}
+    }
+  stream << '\n';
+}
+
+
+template<typename data>
+inline
+void
+DataOutBase::GmvStream::write_dataset(unsigned int,
+				     const std::vector<data>& values)
+{
+}
+
+
+
+//----------------------------------------------------------------------//
+
+DataOutBase::TecplotStream::TecplotStream(std::ostream& out, DataOutBase::TecplotFlags f)
+		:
+		selected_component(deal_II_numbers::invalid_unsigned_int),
+		stream(out), flags(f)
+{}
+
+
+template<int dim>
+void
+DataOutBase::TecplotStream::write (const unsigned int,
+			      const Point<dim>& p)
+{
+  Assert(selected_component != deal_II_numbers::invalid_unsigned_int,
+	 ExcNotInitialized());
+  stream << p(selected_component) << '\n';
+}
+
+
+template<int dim>
+void
+DataOutBase::TecplotStream::write_cell(
+  unsigned int,
+  unsigned int s,
+  unsigned int d1,
+  unsigned int d2,
+  unsigned int d3)
+{
+  const unsigned int start = s+1;
+  
+  stream << start << '\t'
+	 << start+d1;
+  if (dim>=2)
+    {
+      stream << '\t' << start+d2+d1
+	     << '\t' << start+d2;
+      if (dim>=3)
+	{
+	  stream << '\t' << start+d3
+		 << '\t' << start+d3+d1
+		 << '\t' << start+d3+d2+d1
+		 << '\t' << start+d3+d2;
+	}
+    }
+  stream << '\n';
+}
+
+
+template<typename data>
+inline
+void
+DataOutBase::TecplotStream::write_dataset(unsigned int,
+				     const std::vector<data>& values)
+{
+}
+
+
+
+//----------------------------------------------------------------------//
+
+DataOutBase::UcdStream::UcdStream(std::ostream& out, DataOutBase::UcdFlags f)
+		:
+		stream(out), flags(f)
+{}
+
+
+template<int dim>
+void
+DataOutBase::UcdStream::write (const unsigned int index,
+			       const Point<dim>& p)
+{
+  stream << index+1
+      << "   ";
+				   // write out coordinates
+  for (unsigned int i=0; i<dim; ++i)
+    stream << p(i) << ' ';
+				   // fill with zeroes
+  for (unsigned int i=dim; i<3; ++i)
+    stream << "0 ";
+  stream << '\n';
+}
+
+
+template<int dim>
+void
+DataOutBase::UcdStream::write_cell(
+  unsigned int index,
+  unsigned int start,
+  unsigned int d1,
+  unsigned int d2,
+  unsigned int d3)
+{
+  int nodes[8];
+  nodes[GeometryInfo<dim>::ucd_to_deal[0]] = start;
+  nodes[GeometryInfo<dim>::ucd_to_deal[1]] = start+d1;
+  if (dim>=2)
+    {
+				       // Add shifted line in y direction
+      nodes[GeometryInfo<dim>::ucd_to_deal[2]] = start+d2;
+      nodes[GeometryInfo<dim>::ucd_to_deal[3]] = start+d2+d1;
+      if (dim>=3)
+	{
+					   // Add shifted quad in z direction
+	  nodes[GeometryInfo<dim>::ucd_to_deal[4]] = start+d3;
+	  nodes[GeometryInfo<dim>::ucd_to_deal[5]] = start+d3+d1;
+	  nodes[GeometryInfo<dim>::ucd_to_deal[6]] = start+d3+d2;  
+	  nodes[GeometryInfo<dim>::ucd_to_deal[7]] = start+d3+d2+d1;
+	}
+    }
+
+				   // Write out all cells and remember
+				   // that all indices must be shifted
+				   // by one.
+  stream << index+1 << "\t0 " << ucd_cell_type[dim];
+  const unsigned int final = (1<<dim);
+  for (unsigned int i=0;i<final ;++i)
+    stream << '\t' << nodes[i]+1;
+  stream << '\n';
+}
+
+
+template<typename data>
+inline
+void
+DataOutBase::UcdStream::write_dataset(unsigned int index,
+				      const std::vector<data>& values)
+{
+  stream << index+1;
+  for (unsigned int i=0;i<values.size();++i)
+    stream << '\t' << values[i];
+  stream << '\n';
+}
+
+
+
+//----------------------------------------------------------------------//
+
+DataOutBase::VtkStream::VtkStream(std::ostream& out, DataOutBase::VtkFlags f)
+		:
+		stream(out), flags(f)
+{}
+
+
+template<int dim>
+void
+DataOutBase::VtkStream::write (const unsigned int,
+			       const Point<dim>& p)
+{
+				   // write out coordinates
+    stream << p;
+				   // fill with zeroes
+  for (unsigned int i=dim; i<3; ++i)
+    stream << " 0";
+  stream << '\n';
+}
+
+
+template<int dim>
+void
+DataOutBase::VtkStream::write_cell(
+  unsigned int,
+  unsigned int start,
+  unsigned int d1,
+  unsigned int d2,
+  unsigned int d3)
+{
+  stream << GeometryInfo<dim>::vertices_per_cell << '\t'
+	 << start << '\t'
+	 << start+d1;
+  if (dim>=2)
+    {
+      stream << '\t' << start+d2+d1
+	     << '\t' << start+d2;
+      if (dim>=3)
+	{
+	  stream << '\t' << start+d3
+		 << '\t' << start+d3+d1
+		 << '\t' << start+d3+d2+d1
+		 << '\t' << start+d3+d2;
+	}
+    }
+  stream << '\n';
+}
+
+
+template<typename data>
+inline
+void
+DataOutBase::VtkStream::write_dataset(unsigned int,
+				      const std::vector<data>& values)
+{
+  for (unsigned int i=0;i<values.size();++i)
+    stream << '\t' << values[i];
+  stream << '\n';
+}
+
+
+
+//----------------------------------------------------------------------//
+
+template <int dim, int spacedim, typename STREAM>
+void
+DataOutBase::write_nodes (
+  const std::vector<Patch<dim,spacedim> >& patches,
+  STREAM& out)
+{
+  Assert (dim<=3, ExcNotImplemented());
+  unsigned int count = 0;
+				   // We only need this point below,
+				   // but it does not harm to declare
+				   // it here.
+  Point<spacedim> node;
+  
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+       patch!=patches.end(); ++patch)
+    {
+      const unsigned int n_subdivisions = patch->n_subdivisions;
+      const unsigned int n = n_subdivisions+1;
+				       // Length of loops in all
+				       // dimensions. If a dimension
+				       // is not used, a loop of
+				       // length one will do the job.
+      const unsigned int n1 = (dim>0) ? n : 1;
+      const unsigned int n2 = (dim>1) ? n : 1;
+      const unsigned int n3 = (dim>2) ? n : 1;      
+      
+      for (unsigned int i3=0; i3<n3; ++i3)
+	for (unsigned int i2=0; i2<n2; ++i2)
+	  for (unsigned int i1=0; i1<n1; ++i1)
+	    {
+	      compute_node(node, &*patch,
+			   i1 * 1./n_subdivisions,
+			   i2 * 1./n_subdivisions,
+			   i3 * 1./n_subdivisions);
+	      out.write(count++, node);
+	    }
+    }
+}
+
+template <int dim, int spacedim, typename STREAM>
+void DataOutBase::write_cells(
+  const std::vector<Patch<dim,spacedim> >& patches,
+  STREAM& out)
+{
+  Assert (dim<=3, ExcNotImplemented());
+  unsigned int count = 0;
+  unsigned int first_vertex_of_patch = 0;
+				   // Array to hold all the node
+				   // numbers of a cell. 8 is
+				   // sufficient for 3D
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+       patch!=patches.end(); ++patch)
+    {
+      const unsigned int n_subdivisions = patch->n_subdivisions;
+      const unsigned int n = n_subdivisions+1;
+				       // Length of loops in all dimensons
+      const unsigned int n1 = (dim>0) ? n_subdivisions : 1;
+      const unsigned int n2 = (dim>1) ? n_subdivisions : 1;
+      const unsigned int n3 = (dim>2) ? n_subdivisions : 1;
+				       // Offsets of outer loops
+//       const unsigned int d1 = 1;
+//       const unsigned int d2 = n_subdivisions+1;
+//       const unsigned int d3 = d2*d2;
+      unsigned int d1 = 1;
+      unsigned int d2 = n;
+      unsigned int d3 = n*n;
+      for (unsigned int i3=0; i3<n3; ++i3)
+	for (unsigned int i2=0; i2<n2; ++i2)
+	  for (unsigned int i1=0; i1<n1; ++i1)
+	    {
+	      const unsigned int offset = first_vertex_of_patch+i3*d3+i2*d2+i1*d1;
+					       // First write line in x direction
+	      out.template write_cell<dim>(count++, offset, d1, d2, d3);
+	    }
+				       // finally update the number
+				       // of the first vertex of this patch
+      first_vertex_of_patch += template_power<dim>(n_subdivisions+1);
+    }
+}
+
+
+template <int dim, int spacedim, class STREAM>
+void
+DataOutBase::write_data (
+  const std::vector<Patch<dim,spacedim> >& patches,
+  unsigned int n_data_sets,
+  const bool double_precision,
+  STREAM& out)
+{
+  Assert (dim<=3, ExcNotImplemented());
+  unsigned int count = 0;
+  
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch
+	 = patches.begin();
+       patch != patches.end(); ++patch)
+    {
+      const unsigned int n_subdivisions = patch->n_subdivisions;
+      const unsigned int n = n_subdivisions+1;
+				       // Length of loops in all dimensions
+      Assert (patch->data.n_rows() == n_data_sets,
+	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
+      Assert (patch->data.n_cols() == template_power<dim>(n),
+	      ExcInvalidDatasetSize (patch->data.n_cols(), n));
+      
+      std::vector<float>  floats(n_data_sets);
+      std::vector<double> doubles(n_data_sets);
+
+				       // Data is already in
+				       // lexicographic ordering
+      for (unsigned int i=0; i<template_power<dim>(n); ++i)
+	if (double_precision)
+	  {
+	    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+	      doubles[data_set] = patch->data(data_set, i);
+	    out.write_dataset(count++, doubles);
+	  }
+	else
+	  {
+	    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+	      floats[data_set] = patch->data(data_set, i);
+	    out.write_dataset(count++, floats);
+	  }
+    }
+}
 
 
 template <int dim, int spacedim>
@@ -727,36 +1308,13 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
   
   const unsigned int n_data_sets = data_names.size();
 
+  UcdStream ucd_out(out, flags);
+  
 				   // first count the number of cells
 				   // and cells for later use
-  unsigned int n_cells = 0,
-	       n_nodes = 0;
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-       patch!=patches.end(); ++patch)
-    switch (dim)
-      {
-	case 1:
-	      n_cells += patch->n_subdivisions;
-	      n_nodes += patch->n_subdivisions+1;
-	      break;
-	case 2:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	case 3:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	default:
-	      Assert (false, ExcNotImplemented());
-      }
-
+  unsigned int n_nodes;
+  unsigned int n_cells;
+  compute_sizes (patches, n_nodes, n_cells);
 				   ///////////////////////
 				   // preamble
   if (flags.write_preamble)
@@ -786,241 +1344,12 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
       << 0                         // no model data
       << '\n';
 
-				   ///////////////////////////////
-				   // first make up the list of used
-				   // nodes along with their
-				   // coordinates. number them
-				   // consecutively starting with 1
-				   //
-				   // note that we have to print
-				   // d=1..3 dimensions
-  if (true)
-    {
-      unsigned int present_node = 1;
-      
-      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	   patch!=patches.end(); ++patch)
-	{
-	  const unsigned int n_subdivisions = patch->n_subdivisions;
-	  
-					   // if we have nonzero values for
-					   // this coordinate
-	  switch (dim)
-	    {
-	      case 1:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i, ++present_node)
-		  {
-		    out << present_node
-			<< "   ";
-
-		    const Point<spacedim>
-		      node = ((patch->vertices[1] * i / n_subdivisions) +
-			      (patch->vertices[0] * (n_subdivisions-i) / n_subdivisions));
-
-						     // write out coordinates
-		    for (unsigned int i=0; i<spacedim; ++i)
-		      out << node(i) << ' ';
-						     // fill with zeroes
-		    for (unsigned int i=spacedim; i<3; ++i)
-		      out << "0 ";
-		    out << '\n';
-		  }
-		
-		break;
-	      }
-	       
-	      case 2:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		    {
-		      const double x_frac = i * 1./n_subdivisions,
-				   y_frac = j * 1./n_subdivisions;
-		      
-		      out << present_node
-			  << "   ";
-		      
-						       // compute coordinates for
-						       // this patch point
-		      const Point<spacedim>
-			node = (((patch->vertices[1] * x_frac) +
-				 (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-				((patch->vertices[2] * x_frac) +
-				 (patch->vertices[3] * (1-x_frac))) * y_frac);
-		      
-						       // write out coordinates
-		      for (unsigned int i=0; i<spacedim; ++i)
-			out << node(i) << ' ';
-						       // fill with zeroes
-		      for (unsigned int i=spacedim; i<3; ++i)
-			out << "0 ";
-		      out << '\n';
-
-		      ++present_node;
-		    }
-	      
-		break;
-	      }
-	       
-	      case 3:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		    for (unsigned int k=0; k<n_subdivisions+1; ++k)
-		      {
-							 // note the broken
-							 // design of hexahedra
-							 // in deal.II, where
-							 // first the z-component
-							 // is counted up, before
-							 // increasing the y-
-							 // coordinate
-			const double x_frac = i * 1./n_subdivisions,
-				     y_frac = k * 1./n_subdivisions,
-				     z_frac = j * 1./n_subdivisions;
-			
-							 // compute coordinates for
-							 // this patch point
-			out << present_node
-			    << "   ";
-			
-							 // compute coordinates for
-							 // this patch point
-			const Point<spacedim>
-			  node = ((((patch->vertices[1] * x_frac) +
-				    (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-				   ((patch->vertices[2] * x_frac) +
-				    (patch->vertices[3] * (1-x_frac))) * y_frac)   * (1-z_frac) +
-				  (((patch->vertices[5] * x_frac) +
-				    (patch->vertices[4] * (1-x_frac))) * (1-y_frac) +
-				   ((patch->vertices[6] * x_frac) +
-				    (patch->vertices[7] * (1-x_frac))) * y_frac)   * z_frac);
-			
-							 // write out coordinates
-			for (unsigned int i=0; i<spacedim; ++i)
-			  out << node(i) << ' ';
-							 // fill with zeroes unnecessary here
-			for (unsigned int i=spacedim; i<3; ++i)
-			  out << "0 ";
-			out << '\n';
-			
-			++present_node;
-		      }
-	      
-		break;
-	      }
-	       
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
-	}
-
-				       // note that we number starting with 1!
-      Assert (present_node == n_nodes+1,
-	      ExcInternalError());
-    }
-
-				   /////////////////////////////////////////
-				   // write cell. number them consecutively,
-				   // starting with 1
-  if (true)
-    {
-      unsigned int present_cell = 1;      
-      unsigned int first_vertex_of_patch = 0;
-      
-      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	   patch!=patches.end(); ++patch)
-	{
-	  const unsigned int n_subdivisions = patch->n_subdivisions;
-	  
-					   // write out the cells making
-					   // up this patch
-	  switch (dim)
-	    {
-	      case 1:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i, ++present_cell)
-		  out << present_cell
-		      << " 0  line  "        // set material id to 0
-		      << first_vertex_of_patch+i+1 << ' '
-		      << first_vertex_of_patch+i+1+1 << '\n';
-		break;
-	      }
-	       
-	      case 2:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  for (unsigned int j=0; j<n_subdivisions; ++j)
-		    {
-		      out << present_cell
-			  << " 0  quad  "    // set material id to 0
-			  << first_vertex_of_patch+i*(n_subdivisions+1)+j+1 << ' '
-			  << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1 << ' '
-			  << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1+1 << ' '
-			  << first_vertex_of_patch+i*(n_subdivisions+1)+j+1+1
-			  << '\n';
-		      ++present_cell;
-		    }
-		break;
-	      }
-	       
-	      case 3:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  for (unsigned int j=0; j<n_subdivisions; ++j)
-		    for (unsigned int k=0; k<n_subdivisions; ++k)
-		      {
-			out << present_cell
-			    << " 0  hex  "    // set material id to 0
-							   // note: vertex indices start with 1!
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k+1+1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1+1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1+1 << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1+1 << ' '
-			    << '\n';
-			++present_cell;
-		      }
-		break;
-	      }
-
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
-
-
-					   // finally update the number
-					   // of the first vertex of this patch
-	  switch (dim)
-	    {
-	      case 1:
-		    first_vertex_of_patch += n_subdivisions+1;
-		    break;
-	      case 2:
-		    first_vertex_of_patch += (n_subdivisions+1) *
-					     (n_subdivisions+1);
-		    break;
-	      case 3:
-		    first_vertex_of_patch += (n_subdivisions+1) *
-					     (n_subdivisions+1) *
-					     (n_subdivisions+1);
-		    break;
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
-	}
-      out << '\n';
-
-				       // note that we number starting with 1!
-      Assert (present_cell == n_cells+1,
-	      ExcInternalError());
-    }
-
-
+  write_nodes(patches, ucd_out);
+  out << '\n';
+  
+  write_cells(patches, ucd_out);
+  out << '\n';
+  
 				   /////////////////////////////
 				   // now write data
   if (n_data_sets != 0)
@@ -1030,468 +1359,21 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 	out << 1 << ' ';               // number of components;
 				       // only 1 supported presently
       out << '\n';
-
+      
       for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
 	out << data_names[data_set]
 	    << ",dimensionless"      // no units supported at present
 	    << '\n';
-
-
-				       // loop over all patches
-      unsigned int present_node = 1;
-      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	   patch != patches.end(); ++patch)
-	{
-	  const unsigned int n_subdivisions = patch->n_subdivisions;
       
-	  Assert (patch->data.n_rows() == n_data_sets,
-		  ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
-	  Assert (patch->data.n_cols() == (dim==1 ?
-				      n_subdivisions+1 :
-				      (dim==2 ?
-				       (n_subdivisions+1)*(n_subdivisions+1) :
-				       (dim==3 ?
-					(n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
-					0))),
-		  ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
-
-	  switch (dim)
-	    {
-	      case 1:
-	      {      
-		for (unsigned int i=0; i<n_subdivisions+1; ++i, ++present_node) 
-		  {
-		    out << present_node
-			<< "  ";
-		    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		      out << patch->data(data_set,i) << ' ';
-
-		    out << '\n';
-		  }
-	    
-		break;
-	      }
-	   
-	      case 2:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		    {
-		      out << present_node
-			  << "  ";
-		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			out << patch->data(data_set,i*(n_subdivisions+1) + j) << ' ';
-
-		      out << '\n';
-
-		      ++present_node;
-		    }
-
-		break;
-	      }
-
-	      case 3:
-	      {
-		for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		    for (unsigned int k=0; k<n_subdivisions+1; ++k)
-		      {
-			out << present_node
-			    << "  ";
-			for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			  out << patch->data(data_set,
-					     (i*(n_subdivisions+1)+j)*(n_subdivisions+1)+k)
-			      << ' ';
-			
-			out << '\n';
-			
-			++present_node;
-		      }
-
-		break;
-	      }
-
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
-	}  
+      write_data(patches, n_data_sets, true, ucd_out);
     }
-
-				   // no model data
-
 				   // make sure everything now gets to
 				   // disk
   out.flush ();
   
 				   // assert the stream is still ok
   AssertThrow (out, ExcIO());
-}
-
-
-// Write a node in binary format, either with float or double numbers
-template <int spacedim, typename type>
-void write_dx_node(const Point<spacedim>& node,
-		   type* data,
-		   std::ostream& out)
-{
-  for (unsigned int i=0; i<spacedim; ++i)
-    data[i] = node(i);
-  out.write(reinterpret_cast<const char*>(data),
-	    spacedim * sizeof(*data));
-}
-
-
-template <int dim, int spacedim>
-void
-DataOutBase::write_dx_nodes (
-  const std::vector<Patch<dim,spacedim> >& patches,
-  const bool binary,
-  const bool double_precision,
-  std::ostream& out)
-{
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-       patch!=patches.end(); ++patch)
-    {
-      const unsigned int n_subdivisions = patch->n_subdivisions;
-      
-				       // if we have nonzero values for
-				       // this coordinate
-      float floats[spacedim];
-      double doubles[spacedim];
-      switch (dim)
-	{
-	  case 1:
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-	      {
-		const Point<spacedim>
-		  node = ((patch->vertices[1] * i / n_subdivisions) +
-			  (patch->vertices[0] * (n_subdivisions-i) / n_subdivisions));
-		
-						 // write out coordinates
-		if (binary)
-		  {
-		    if (double_precision)
-		      write_dx_node(node, doubles, out);
-		    else
-		      write_dx_node(node, floats, out);
-		  }
-		else
-		  {
-		    for (unsigned int i=0; i<spacedim; ++i)
-		      out << node(i) << '\t';
-		    out << '\n';
-		  }
-	      }
-	    break;
-	    
-	  case 2:
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		{
-		  const double x_frac = i * 1./n_subdivisions,
-			       y_frac = j * 1./n_subdivisions;
-		  
-						   // compute coordinates for
-						   // this patch point
-		  const Point<spacedim>
-		    node = (((patch->vertices[1] * x_frac) +
-			     (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-			    ((patch->vertices[2] * x_frac) +
-			     (patch->vertices[3] * (1-x_frac))) * y_frac);
-		  
-						   // write out coordinates
-		  if (binary)
-		    {
-		      if (double_precision)
-			write_dx_node(node, doubles, out);
-		      else
-			write_dx_node(node, floats, out);
-		    }
-		  else
-		    {
-		      for (unsigned int i=0; i<spacedim; ++i)
-			out << node(i) << '\t';
-		      out << '\n';
-		    }
-		}
-	    
-	    break;
-	    
-	  case 3:
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		for (unsigned int k=0; k<n_subdivisions+1; ++k)
-		  {
-						     // note the broken
-						     // design of hexahedra
-						     // in deal.II, where
-						     // first the z-component
-						     // is counted up, before
-						     // increasing the y-
-						     // coordinate
-		    const double x_frac = i * 1./n_subdivisions,
-				 y_frac = k * 1./n_subdivisions,
-				 z_frac = j * 1./n_subdivisions;
-		    
-						     // compute coordinates for
-						     // this patch point
-		    const Point<spacedim>
-		      node = ((((patch->vertices[1] * x_frac) +
-				(patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-			       ((patch->vertices[2] * x_frac) +
-				(patch->vertices[3] * (1-x_frac))) * y_frac)   * (1-z_frac) +
-			      (((patch->vertices[5] * x_frac) +
-				(patch->vertices[4] * (1-x_frac))) * (1-y_frac) +
-			       ((patch->vertices[6] * x_frac) +
-				(patch->vertices[7] * (1-x_frac))) * y_frac)   * z_frac);
-		    
-						     // write out coordinates
-		    if (binary)
-		      {
-			if (double_precision)
-			  write_dx_node(node, doubles, out);
-			else
-			  write_dx_node(node, floats, out);
-		      }
-		    else
-		      {
-			for (unsigned int i=0; i<spacedim; ++i)
-			  out << node(i) << '\t';
-			out << '\n';
-		      }
-		  }
-	    break;
-	
-	  default:
-	    Assert (false, ExcNotImplemented());
-	}
     }
-}
-
-template <class data>
-inline
-void
-write_dx_cell (unsigned int dim,
-	       data* nodes,
-	       const bool binary,
-	       std::ostream& out)
-{
-  if (binary)
-    out.write(reinterpret_cast<const char*>(nodes),
-	      (1<<dim) * sizeof(*nodes));
-  else
-    {
-      for (int i=0;i< (1<<dim);++i)
-	out << nodes[i] << '\t';
-      out << '\n';
-    }
-}
-
-
-template <int dim, int spacedim>
-void DataOutBase::write_dx_cells(
-  const std::vector<Patch<dim,spacedim> >& patches,
-  const bool binary,
-  const bool int_64,
-  std::ostream& out)
-{
-  unsigned int first_vertex_of_patch = 0;
-
-				   // Array to hold all the node
-				   // numbers of a cell. 8 is
-				   // sufficient for 3D
-  unsigned int ints[8];
-  unsigned long longs[8];
-  
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-       patch!=patches.end(); ++patch)
-    {
-      const unsigned int n_subdivisions = patch->n_subdivisions;
-      
-				       // write out the cells making
-				       // up this patch
-      switch (dim)
-	{
-	  case 1:
-	    for (unsigned int i=0; i<n_subdivisions; ++i)
-	      {
-		if (int_64)
-		  {
-		    longs[0] = first_vertex_of_patch+i;
-		    longs[1] = first_vertex_of_patch+i+1;
-		    write_dx_cell(dim, longs, binary, out);
-		  }
-		else
-		  {
-		    ints[0] = first_vertex_of_patch+i;
-		    ints[1] = first_vertex_of_patch+i+1;
-		    write_dx_cell(dim, ints, binary, out);
-		  }
-	      }
-	    break;
-	  case 2:
-	    for (unsigned int i=0; i<n_subdivisions; ++i)
-	      for (unsigned int j=0; j<n_subdivisions; ++j)
-		{
-		  if (int_64)
-		    {
-		      longs[0] = first_vertex_of_patch+i*(n_subdivisions+1)+j;
-		      longs[1] = first_vertex_of_patch+i*(n_subdivisions+1)+j+1;
-		      longs[2] = first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j;
-		      longs[3] = first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1;
-		      write_dx_cell(dim, longs, binary, out);
-		    }
-		  else
-		    {
-		      ints[0] = first_vertex_of_patch+i*(n_subdivisions+1)+j;
-		      ints[1] = first_vertex_of_patch+i*(n_subdivisions+1)+j+1;
-		      ints[2] = first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j;
-		      ints[3] = first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1;
-		      write_dx_cell(dim, ints, binary, out);
-		    }
-		}
-	    break;
-	  case 3:
-	    if (true)
-	      {
-		const unsigned int nvt = n_subdivisions+1;
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  for (unsigned int j=0; j<n_subdivisions; ++j)
-		    for (unsigned int k=0; k<n_subdivisions; ++k)
-		      {
-			if (int_64)
-			  {
-			    longs[0] = first_vertex_of_patch+((i  )*nvt+j  )*nvt+k   ;
-			    longs[1] = first_vertex_of_patch+((i  )*nvt+j  )*nvt+k+1 ;
-			    longs[2] = first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k   ;
-			    longs[3] = first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k+1 ;
-			    longs[4] = first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k   ;
-			    longs[5] = first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k+1 ;
-			    longs[6] = first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k   ;
-			    longs[7] = first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k+1 ;
-			    write_dx_cell(dim, longs, binary, out);
-			  }
-			else
-			  {
-			    ints[0] = first_vertex_of_patch+((i  )*nvt+j  )*nvt+k   ;
-			    ints[1] = first_vertex_of_patch+((i  )*nvt+j  )*nvt+k+1 ;
-			    ints[2] = first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k   ;
-			    ints[3] = first_vertex_of_patch+((i  )*nvt+j+1)*nvt+k+1 ;
-			    ints[4] = first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k   ;
-			    ints[5] = first_vertex_of_patch+((i+1)*nvt+j  )*nvt+k+1 ;
-			    ints[6] = first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k   ;
-			    ints[7] = first_vertex_of_patch+((i+1)*nvt+j+1)*nvt+k+1 ;
-			    write_dx_cell(dim, ints, binary, out);
-			  }
-		      }
-	      }
-	    break;
-	  default:
-	    Assert (false, ExcNotImplemented());
-	}
-      
-      
-				       // finally update the number
-				       // of the first vertex of this patch
-      switch (dim)
-	{
-	  case 1:
-	    first_vertex_of_patch += n_subdivisions+1;
-	    break;
-	  case 2:
-	    first_vertex_of_patch += (n_subdivisions+1) *
-				     (n_subdivisions+1);
-	    break;
-	  case 3:
-	    first_vertex_of_patch += (n_subdivisions+1) *
-				     (n_subdivisions+1) *
-				     (n_subdivisions+1);
-	    break;
-	  default:
-	    Assert (false, ExcNotImplemented());
-	}
-    }
-  if (!binary)
-    out << '\n';
-}
-
-
-template<typename data>
-inline
-void
-write_dx_dataset(const std::vector<data>& values,
-		 const bool binary,
-		 std::ostream& out)
-{
-  if (binary)
-    {
-      out.write(reinterpret_cast<const char*>(&values[0]),
-		values.size()*sizeof(data));
-    }
-  else
-    {
-      for (unsigned int i=0;i<values.size();++i)
-	out << values[i] << '\t';
-      out << '\n';
-    }
-}
-
-
-template <int dim, int spacedim>
-void
-DataOutBase::write_dx_data (
-  const std::vector<Patch<dim,spacedim> >& patches,
-  unsigned int n_data_sets,
-  const bool binary,
-  const bool double_precision,
-  std::ostream& out)
-{
-  Assert (dim<=3, ExcNotImplemented());
-  
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch
-	 = patches.begin();
-       patch != patches.end(); ++patch)
-    {
-      const unsigned int n_subdivisions = patch->n_subdivisions;
-      const unsigned int n = n_subdivisions+1;
-      
-      Assert (patch->data.n_rows() == n_data_sets,
-	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
-      Assert (patch->data.n_cols() == (dim==1 ?
-				       n :
-				       (dim==2 ?
-					n*n :
-					(dim==3 ?
-					 n*n*n :
-					 0))),
-	      ExcInvalidDatasetSize (patch->data.n_cols(), n));
-      
-      std::vector<float>  floats(n_data_sets);
-      std::vector<double> doubles(n_data_sets);
-
-      const unsigned int n1 = (dim>0) ? n : 1;
-      const unsigned int n2 = (dim>1) ? n : 1;
-      const unsigned int n3 = (dim>2) ? n : 1;
-      
-      for (unsigned int i3=0; i3<n3; ++i3)
-	for (unsigned int i2=0; i2<n2; ++i2)
-	  for (unsigned int i1=0; i1<n1; ++i1)
-	    {
-	      if (double_precision)
-		{
-		  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		    doubles[data_set] = patch->data(data_set,(i3*n+i2)*n+i1);
-		  write_dx_dataset(doubles, binary, out);
-		}
-	      else
-		{
-		  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		    floats[data_set] = patch->data(data_set,(i3*n+i2)*n+i1);
-		  write_dx_dataset(floats, binary, out);
-		}
-	    }
-    }
-}
 
 
 template <int dim, int spacedim>
@@ -1503,6 +1385,8 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
   AssertThrow (out, ExcIO());
 
   Assert (patches.size() > 0, ExcNoPatches());
+				   // Stream with special features for dx output
+  DXStream dx_out(out, flags);
   
 				   // Variable counting the offset of
 				   // binary data.
@@ -1512,53 +1396,24 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 
 				   // first count the number of cells
 				   // and cells for later use
-  unsigned int n_cells = 0,
-	       n_nodes = 0;
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-       patch!=patches.end(); ++patch)
-    switch (dim)
-      {
-	case 1:
-	      n_cells += patch->n_subdivisions;
-	      n_nodes += patch->n_subdivisions+1;
-	      break;
-	case 2:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	case 3:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	default:
-	      Assert (false, ExcNotImplemented());
-      }
-
+  unsigned int n_nodes;
+  unsigned int n_cells;
+  compute_sizes(patches, n_nodes, n_cells);
 				   // start with vertices order is
 				   // lexicographical, x varying
 				   // fastest
-  out << "object \"vertices\" class array type "
-      << ((flags.coordinates_double) ? "double" : "float")
-      << " rank 1 shape " << spacedim
+  out << "object \"vertices\" class array type float rank 1 shape " << spacedim
       << " items " << n_nodes;
 
   if (flags.coordinates_binary)
     {
-      out << "lsb ieee data 0" << '\n';
-      offset += n_nodes * spacedim * ((flags.coordinates_double)
-				      ? sizeof(double)
-				      : sizeof(float));
+      out << " lsb ieee data 0" << '\n';
+      offset += n_nodes * spacedim *  sizeof(float);
     }
   else
     {
       out << " data follows" << '\n';
-      write_dx_nodes(patches, false, false, out);
+      write_nodes(patches, dx_out);
     }
   
 				   ///////////////////////////////
@@ -1566,22 +1421,20 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 
 				   /////////////////////////////////////////
 				   // write cells
-  out << "object \"cells\" class array type "
-      << ((flags.int_64) ? "hyper" : "int")
-      << " rank 1 shape " << GeometryInfo<dim>::vertices_per_cell
+  out << "object \"cells\" class array type int rank 1 shape "
+      << GeometryInfo<dim>::vertices_per_cell
       << " items " << n_cells;
 
   if (flags.int_binary)
     {
       out << " lsb binary data " << offset << '\n';
-      offset += n_cells * (1<<dim) * ((flags.int_64)
-				      ? sizeof(long)
-				      : sizeof (int));
+      offset += n_cells * sizeof (int);
     }
   else
     {
       out << " data follows" << '\n';
-      write_dx_cells(patches, false, flags.int_64, out);
+      write_cells(patches, dx_out);
+      out << '\n';
     }
   
 
@@ -1607,28 +1460,16 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 	   patch!=patches.end(); ++patch)
 	{
 	  const unsigned int n = patch->n_subdivisions;
-	  unsigned int cells_per_patch = 1;
+	  unsigned int cells_per_patch = template_power<dim>(n);
 	  unsigned int dx = 1;
-	  unsigned int dy = 1;
-	  unsigned int dz = 1;
-	  switch(dim)
-	    {
-	      case 3:
-		dx *= n;
-		dy *= n;
-		cells_per_patch *= n;
-	      case 2:
-		dx *= n;
-		cells_per_patch *= n;
-	      case 1:
-		cells_per_patch *= n;
-	    }
+	  unsigned int dy = n;
+	  unsigned int dz = n*n;
 
 	  const unsigned int patch_start = patch->patch_index * cells_per_patch;
 
-	  for (unsigned int ix=0;ix<n;++ix)
+	  for (unsigned int iz=0;iz<((dim>2) ? n : 1);++iz)
 	    for (unsigned int iy=0;iy<((dim>1) ? n : 1);++iy)
-	      for (unsigned int iz=0;iz<((dim>2) ? n : 1);++iz)
+	      for (unsigned int ix=0;ix<n;++ix)
 		{
 		  const unsigned int nx = ix*dx;
 		  const unsigned int ny = iy*dy;
@@ -1744,7 +1585,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
       else
 	{
 	  out << " data follows" << '\n';
-	  write_dx_data(patches, n_data_sets, false, flags.data_double, out);
+	  write_data(patches, n_data_sets, flags.data_double, dx_out);
 	}
       
 				       // loop over all patches
@@ -1781,11 +1622,11 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
   out << "end" << '\n';
 				   // Write all binary data now
   if (flags.coordinates_binary)
-    write_dx_nodes(patches, true, flags.coordinates_double, out);
+    write_nodes(patches, dx_out);
   if (flags.int_binary)
-    write_dx_cells(patches, true, flags.int_64, out);
+    write_cells(patches, dx_out);
   if (flags.data_binary)
-    write_dx_data(patches, n_data_sets, true, flags.data_double, out);
+    write_data(patches, n_data_sets, flags.data_double, dx_out);
   
 				   // make sure everything now gets to
 				   // disk
@@ -1849,9 +1690,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 	}
 
       for (unsigned int i=0; i<data_names.size(); ++i)
-	out << '<'
-	    << data_names[i]
-	    << "> ";
+	out << '<' << data_names[i] << "> ";
       out << '\n';      
     }
 
@@ -1861,229 +1700,159 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
        patch != patches.end(); ++patch)
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
+      const unsigned int n = n_subdivisions+1;
+				       // Length of loops in all dimensons
+      const unsigned int n1 = (dim>0) ? n : 1;
+      const unsigned int n2 = (dim>1) ? n : 1;
+      const unsigned int n3 = (dim>2) ? n : 1;
+      unsigned int d1 = 1;
+      unsigned int d2 = n;
+      unsigned int d3 = n*n;
       
       Assert (patch->data.n_rows() == n_data_sets,
 	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
-      Assert (patch->data.n_cols() == (dim==1 ?
-				  n_subdivisions+1 :
-				  (dim==2 ?
-				   (n_subdivisions+1)*(n_subdivisions+1) :
-				   (dim==3 ?
-				    (n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
-				    0))),
+      Assert (patch->data.n_cols() == template_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
-      switch (dim)
+      Point<spacedim> this_point;
+      Point<spacedim> node;
+      if (dim<3)
 	{
-	  case 1:
-	  {      
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i) 
-	      {
-						 // compute coordinates for
-						 // this patch point
-		out << ((patch->vertices[1] * i / n_subdivisions) +
-			(patch->vertices[0] * (n_subdivisions-i) / n_subdivisions))
-		    << ' ';
-
-		for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		  out << patch->data(data_set,i) << ' ';
-
+	  for (unsigned int d2=0; d2<n2; ++d2)
+	    {
+	      for (unsigned int i1=0; i1<n1; ++i1)
+		{
+		  const double x_frac = i1 * 1./n_subdivisions,
+			       y_frac = d2 * 1./n_subdivisions;
+		  
+						   // compute coordinates for
+						   // this patch point
+		  compute_node(node, &*patch, x_frac, y_frac, 0.);
+		  out << node << ' ';
+		  
+		  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+		    out << patch->data(data_set,i1*d1+d2*d2) << ' ';
+		  out << '\n';
+		}
+					       // end of row in patch
+	      if (dim>1)
 		out << '\n';
-	      }
-
-					     // end of patch
-	    out << '\n'
-		<< '\n';
-	    
-	    break;
-	  }
-	   
-	  case 2:
-	  {
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-	      {
-		for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		  {
-		    const double x_frac = i * 1./n_subdivisions,
-				 y_frac = j * 1./n_subdivisions;
-		    
-						     // compute coordinates for
-						     // this patch point
-		    out << (((patch->vertices[1] * x_frac) +
-			     (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-			    ((patch->vertices[2] * x_frac) +
-			     (patch->vertices[3] * (1-x_frac))) * y_frac)
-			<< ' ';
-		    
-		    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		      out << patch->data(data_set,i*(n_subdivisions+1) + j) << ' ';
-
-		    out << '\n';
-		  }
-
-						 // end of row in patch
-		out << '\n';
-	      }
-
-					     // end of patch
+	    }
+					   // end of patch
+	  if (dim==1)
 	    out << '\n';
-
-	    break;
-	  }
-
-	  case 3:
-	  {
-					     // for all grid points: draw
-					     // lines into all positive
-					     // coordinate directions if
-					     // there is another grid point
-					     // there
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		for (unsigned int k=0; k<n_subdivisions+1; ++k)
-		  {
-						     // note the broken
-						     // design of hexahedra
-						     // in deal.II, where
-						     // first the z-component
-						     // is counted up, before
-						     // increasing the y-
-						     // coordinate
-		    const double x_frac = i * 1./n_subdivisions,
-				 y_frac = k * 1./n_subdivisions,
-				 z_frac = j * 1./n_subdivisions;
-
-						     // compute coordinates for
-						     // this patch point
-		    const Point<spacedim> this_point
-		      = ((((patch->vertices[1] * x_frac) +
-			   (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-			  ((patch->vertices[2] * x_frac) +
-			   (patch->vertices[3] * (1-x_frac))) * y_frac)   * (1-z_frac) +
-			 (((patch->vertices[5] * x_frac) +
-			   (patch->vertices[4] * (1-x_frac))) * (1-y_frac) +
-			  ((patch->vertices[6] * x_frac) +
-			   (patch->vertices[7] * (1-x_frac))) * y_frac)   * z_frac);
-
-						     // line into positive x-direction
-						     // if possible
-		    if (i < n_subdivisions)
-		      {
-							 // write point here
-							 // and its data
-			out << this_point;
-			for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			  out  << ' '
-			       << patch->data(data_set,
-					      (i*(n_subdivisions+1) + j)*(n_subdivisions+1)+k);
-			out << '\n';
-			
-							 // write point there
-							 // and its data
-			const double x_frac_new = x_frac + 1./n_subdivisions;
-			out << ((((patch->vertices[1] * x_frac_new) +
-				  (patch->vertices[0] * (1-x_frac_new))) * (1-y_frac) +
-				 ((patch->vertices[2] * x_frac_new) +
-				  (patch->vertices[3] * (1-x_frac_new))) * y_frac)   * (1-z_frac) +
-				(((patch->vertices[5] * x_frac_new) +
-				  (patch->vertices[4] * (1-x_frac_new))) * (1-y_frac) +
-				 ((patch->vertices[6] * x_frac_new) +
-				  (patch->vertices[7] * (1-x_frac_new))) * y_frac)   * z_frac);
-			for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			  out  << ' '
-			       << patch->data(data_set,
-					      ((i+1)*(n_subdivisions+1) + j)*(n_subdivisions+1)+k);
-			out << '\n';
-
-							 // end of line
-			out << '\n'
-			    << '\n';
-		      }
-		    
-						     // line into positive y-direction
-						     // if possible
-		    if (j < n_subdivisions)
-		      {
-							 // write point here
-							 // and its data
-			out << this_point;
-			for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			  out  << ' '
-			       << patch->data(data_set,
-					      (i*(n_subdivisions+1) + j)*(n_subdivisions+1)+k);
-			out << '\n';
-			
-							 // write point there
-							 // and its data
-			const double z_frac_new = z_frac + 1./n_subdivisions;
-			out << ((((patch->vertices[1] * x_frac) +
-				  (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-				 ((patch->vertices[2] * x_frac) +
-				  (patch->vertices[3] * (1-x_frac))) * y_frac)   * (1-z_frac_new) +
-				(((patch->vertices[5] * x_frac) +
-				  (patch->vertices[4] * (1-x_frac))) * (1-y_frac) +
-				 ((patch->vertices[6] * x_frac) +
-				  (patch->vertices[7] * (1-x_frac))) * y_frac)   * z_frac_new);
-			for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			  out  << ' '
-			       << patch->data(data_set,
-					      (i*(n_subdivisions+1) + (j+1))*(n_subdivisions+1)+k);
-			out << '\n';
-
-							 // end of line
-			out << '\n'
-			    << '\n';
-		      }
-
-						     // line into positive z-direction
-						     // if possible
-		    if (k < n_subdivisions)
-		      {
-							 // write point here
-							 // and its data
-			out << this_point;
-			for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			  out  << ' '
-			       << patch->data(data_set,
-					      (i*(n_subdivisions+1) + j)*(n_subdivisions+1)+k);
-			out << '\n';
-			
-							 // write point there
-							 // and its data
-			const double y_frac_new = y_frac + 1./n_subdivisions;
-			out << ((((patch->vertices[1] * x_frac) +
-				  (patch->vertices[0] * (1-x_frac))) * (1-y_frac_new) +
-				 ((patch->vertices[2] * x_frac) +
-				  (patch->vertices[3] * (1-x_frac))) * y_frac_new)   * (1-z_frac) +
-				(((patch->vertices[5] * x_frac) +
-				  (patch->vertices[4] * (1-x_frac))) * (1-y_frac_new) +
-				 ((patch->vertices[6] * x_frac) +
-				  (patch->vertices[7] * (1-x_frac))) * y_frac_new)   * z_frac);
-			for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-			  out  << ' '
-			       << patch->data(data_set,
-					      (i*(n_subdivisions+1) + j)*(n_subdivisions+1)+k+1);
-			out << '\n';
-
-							 // end of line
-			out << '\n'
-			    << '\n';
-		      }		    
-			
-		  }
-
-	    break;
-	  }
-
-	  default:
-		Assert (false, ExcNotImplemented());
+	  out << '\n';
 	}
+      else if (dim==3)
+	{
+					   // for all grid points: draw
+					   // lines into all positive
+					   // coordinate directions if
+					   // there is another grid point
+					   // there
+	  for (unsigned int i3=0; i3<n3; ++i3)
+	    for (unsigned int i2=0; i2<n2; ++i2)
+	      for (unsigned int i1=0; i1<n1; ++i1)
+		{
+		  const double x_frac = i1 * 1./n_subdivisions,
+			       y_frac = i2 * 1./n_subdivisions,
+			       z_frac = i3 * 1./n_subdivisions;
+		  
+						   // compute coordinates for
+						   // this patch point
+		  compute_node(this_point, &*patch, x_frac, y_frac, z_frac);
+						   // line into positive x-direction
+						   // if possible
+		  if (i1 < n_subdivisions)
+		    {
+						       // write point here
+						       // and its data
+		      out << this_point;
+		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+			out  << ' '
+			     << patch->data(data_set,i1*d1+i2*d2+i3*d3);
+		      out << '\n';
+		      
+						       // write point there
+						       // and its data
+		      const double x_frac_new = x_frac + 1./n_subdivisions;
+		      compute_node(node, &*patch, x_frac_new, y_frac, z_frac);
+		      out << node;
+		      
+		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+			out  << ' '
+			     << patch->data(data_set,(i1+1)*d1+i2*d2+i3*d3);
+		      out << '\n';
+		      
+						       // end of line
+		      out << '\n'
+			  << '\n';
+		    }
+		  
+						   // line into positive y-direction
+						   // if possible
+		  if (i2 < n_subdivisions)
+		    {
+						       // write point here
+						       // and its data
+		      out << this_point;
+		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+			out  << ' '
+			     << patch->data(data_set, i1*d1+i2*d2+i3*d3);
+		      out << '\n';
+		      
+						       // write point there
+						       // and its data
+		      const double y_frac_new = y_frac + 1./n_subdivisions;
+		      compute_node(node, &*patch, x_frac, y_frac_new, z_frac);
+		      out << node;
+		      
+		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+			out  << ' '
+			     << patch->data(data_set,i1*d1+(i2+1)*d2+i3*d3);
+		      out << '\n';
+		      
+						       // end of line
+		      out << '\n'
+			  << '\n';
+		    }		    
+		  
+						   // line into positive z-direction
+						   // if possible
+		  if (i3 < n_subdivisions)
+		    {
+						       // write point here
+						       // and its data
+		      out << this_point;
+		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+			out  << ' '
+			     << patch->data(data_set,i1*d1+i2*d2+i3*d3);
+		      out << '\n';
+		      
+						       // write point there
+						       // and its data
+		      const double z_frac_new = z_frac + 1./n_subdivisions;
+		      compute_node(node, &*patch, x_frac, y_frac, z_frac_new);
+		      out << node;
+		      
+		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+			out  << ' '
+			     << patch->data(data_set,i1*d1+i2*d2+(i3+1)*d3);
+		      out << '\n';
+						       // end of line
+		      out << '\n'
+			  << '\n';
+		    }
+		  
+		}
+	}
+      else
+	Assert (false, ExcNotImplemented());
     }
-
 				   // make sure everything now gets to
 				   // disk
   out.flush ();
-
+  
   AssertThrow (out, ExcIO());
 }
 
@@ -2169,13 +1938,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
       
       Assert (patch->data.n_rows() == n_data_sets,
 	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
-      Assert (patch->data.n_cols() == (dim==1 ?
-				  n_subdivisions+1 :
-				  (dim==2 ?
-				   (n_subdivisions+1)*(n_subdivisions+1) :
-				   (dim==3 ?
-				    (n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
-				    0))),
+      Assert (patch->data.n_cols() == template_power<dim>(n_subdivisions+1),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
       
       for (unsigned int i=0; i<n_subdivisions+1; ++i)
@@ -2218,210 +1981,181 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
        patch != patches.end(); ++patch)
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
+      const unsigned int n = n_subdivisions+1;
+      const unsigned int d1=1;
+      const unsigned int d2=n;
       
       Assert (patch->data.n_rows() == n_data_sets,
 	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
-      Assert (patch->data.n_cols() == (dim==1 ?
-				  n_subdivisions+1 :
-				  (dim==2 ?
-				   (n_subdivisions+1)*(n_subdivisions+1) :
-				   (dim==3 ?
-				    (n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
-				    0))),
+      Assert (patch->data.n_cols() == template_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
 
-      std::vector<Point<spacedim> > ver((n_subdivisions+1)*
-					(n_subdivisions+1));
+      std::vector<Point<spacedim> > ver(n*n);
       
-      for (unsigned int i=0; i<n_subdivisions+1; ++i)
-	{
-	  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-	    {
-	      const double x_frac = i * 1./n_subdivisions,
-			   y_frac = j * 1./n_subdivisions;
-					       // compute coordinates for
-					       // this patch point, storing in ver
-	      ver[i*(n_subdivisions+1)+j]= (((patch->vertices[1] * x_frac) +
-					     (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-					    ((patch->vertices[2] * x_frac) +
-					     (patch->vertices[3] * (1-x_frac))) * y_frac);
-	    }
-	}
+      for (unsigned int i2=0; i2<n; ++i2)
+	for (unsigned int i1=0; i1<n; ++i1)
+	  {
+	    const double x_frac = i1 * 1./n_subdivisions,
+			 y_frac = i2 * 1./n_subdivisions;
+					     // compute coordinates for
+					     // this patch point, storing in ver
+	    compute_node(ver[i1*d1+i2*d2], &*patch, x_frac, y_frac, 0.);
+	  }
+
       
       if (!flags.bicubic_patch)
-	{                                    // setting up triangles
-	  for (unsigned int i=0; i<n_subdivisions; ++i)
+	{
+					   // aproximate normal
+					   // vectors in patch
+	  std::vector<Point<3> > nrml;
+					   // only if smooth triangles are used
+	  if (flags.smooth)
 	    {
-	      for (unsigned int j=0; j<n_subdivisions; ++j)
-		{
-						   // down/left vertex of triangle
-		  const int dl = i*(n_subdivisions+1)+j;
-		  if (flags.smooth)               // only if smooth triangles are used
-		    {
-						       // aproximate normal
-						       // vectors in patch
-		      std::vector<Point<3> > nrml((n_subdivisions+1)*
-						  (n_subdivisions+1));
-		      Point<3> h1,h2;
-		      for (unsigned int i=0; i<n_subdivisions+1;++i)
-			{
-			  for (unsigned int j=0; j<n_subdivisions+1;++j)
-			    {
-			      if (i==0)
-				{
-				  h1(0)=ver[(i+1)*(n_subdivisions+1)+j](0)-
-					ver[i*(n_subdivisions+1)+j](0);
-				  h1(1)=patch->data(0,(i+1)*(n_subdivisions+1)+j)-
-					patch->data(0,i*(n_subdivisions+1)+j);
-				  h1(2)=ver[(i+1)*(n_subdivisions+1)+j](1)-
-					ver[i*(n_subdivisions+1)+j](1);
-				}
-			      else
-				if (i==n_subdivisions)
-				  {
-				    h1(0)=ver[i*(n_subdivisions+1)+j](0)-
-					  ver[(i-1)*(n_subdivisions+1)+j](0);
-				    h1(1)=patch->data(0,i*(n_subdivisions+1)+j)-
-					  patch->data(0,(i-1)*(n_subdivisions+1)+j);
-				    h1(2)=ver[i*(n_subdivisions+1)+j](1)-
-					  ver[(i-1)*(n_subdivisions+1)+j](1);
-				  }
-				else
-				  {
-				    h1(0)=ver[(i+1)*(n_subdivisions+1)+j](0)-
-					  ver[(i-1)*(n_subdivisions+1)+j](0);
-				    h1(1)=patch->data(0,(i+1)*(n_subdivisions+1)+j)-
-					  patch->data(0,(i-1)*(n_subdivisions+1)+j);
-				    h1(2)=ver[(i+1)*(n_subdivisions+1)+j](1)-
-					  ver[(i-1)*(n_subdivisions+1)+j](1);
-				  }
-			      if (j==0)
-				{
-				  h2(0)=ver[i*(n_subdivisions+1)+j+1](0)-
-					ver[i*(n_subdivisions+1)+j](0);
-				  h2(1)=patch->data(0,i*(n_subdivisions+1)+j+1)-
-					patch->data(0,i*(n_subdivisions+1)+j);
-				  h2(2)=ver[i*(n_subdivisions+1)+j+1](1)-
-					ver[i*(n_subdivisions+1)+j](1);
-				}
-			      else
-				if (j==n_subdivisions)
-				  {
-				    h2(0)=ver[i*(n_subdivisions+1)+j](0)-
-					  ver[i*(n_subdivisions+1)+j-1](0);
-				    h2(1)=patch->data(0,i*(n_subdivisions+1)+j)-
-					  patch->data(0,i*(n_subdivisions+1)+j-1);
-				    h2(2)=ver[i*(n_subdivisions+1)+j](1)-
-					  ver[i*(n_subdivisions+1)+j-1](1);
-				  }
-				else
-				  {
-				    h2(0)=ver[i*(n_subdivisions+1)+j+1](0)-
-					  ver[i*(n_subdivisions+1)+j-1](0);
-				    h2(1)=patch->data(0,i*(n_subdivisions+1)+j+1)-
-					  patch->data(0,i*(n_subdivisions+1)+j-1);
-				    h2(2)=ver[i*(n_subdivisions+1)+j+1](1)-
-					  ver[i*(n_subdivisions+1)+j-1](1);
-				  }
-			      nrml[i*(n_subdivisions+1)+j](0)=h1(1)*h2(2)-h1(2)*h2(1);
-			      nrml[i*(n_subdivisions+1)+j](1)=h1(2)*h2(0)-h1(0)*h2(2);
-			      nrml[i*(n_subdivisions+1)+j](2)=h1(0)*h2(1)-h1(1)*h2(0);
-
-							       // normalize Vector
-			      double norm=std::sqrt(
-				std::pow(nrml[i*(n_subdivisions+1)+j](0),2.)+
-				std::pow(nrml[i*(n_subdivisions+1)+j](1),2.)+
-				std::pow(nrml[i*(n_subdivisions+1)+j](2),2.));
-			      
-			      if (nrml[i*(n_subdivisions+1)+j](1)<0)
-				norm*=-1.;
-			      
-			      for (unsigned int k=0;k<3;++k)
-				nrml[i*(n_subdivisions+1)+j](k)/=norm;
-			    }
-			}
-						       // writing smooth_triangles
-		      
-						       // down/right triangle
-		      out << "smooth_triangle {" << '\n' << "\t<" 
-			  << ver[dl](0) << ","   
-			  << patch->data(0,dl) << ","
-			  << ver[dl](1) << ">, <"
-			  << nrml[dl](0) << ", " << nrml[dl](1) << ", " << nrml[dl](2)
-			  << ">," << '\n';
-		      out << " \t<" 
-			  << ver[dl+n_subdivisions+1](0) << "," 
-			  << patch->data(0,dl+n_subdivisions+1)  << ","
-			  << ver[dl+n_subdivisions+1](1) << ">, <"
-			  << nrml[dl+n_subdivisions+1](0) << ", "
-			  << nrml[dl+n_subdivisions+1](1) << ", "
-			  << nrml[dl+n_subdivisions+1](2)
-			  << ">," << '\n';
-		      out << "\t<" 
-			  << ver[dl+n_subdivisions+2](0) << "," 
-			  << patch->data(0,dl+n_subdivisions+2)  << ","
-			  << ver[dl+n_subdivisions+2](1) << ">, <"
-			  << nrml[dl+n_subdivisions+2](0) << ", "
-			  << nrml[dl+n_subdivisions+2](1) << ", "
-			  << nrml[dl+n_subdivisions+2](2) 
-			  << ">}" << '\n'; 
-		      
-						       // upper/left triangle
-		      out << "smooth_triangle {" << '\n' << "\t<" 
-			  << ver[dl](0) << "," 
-			  << patch->data(0,dl) << ","
-			  << ver[dl](1) << ">, <"
-			  << nrml[dl](0) << ", " << nrml[dl](1) << ", " << nrml[dl](2) 
-			  << ">," << '\n';
-		      out << "\t<" 
-			  << ver[dl+n_subdivisions+2](0) << "," 
-			  << patch->data(0,dl+n_subdivisions+2)  << ","
-			  << ver[dl+n_subdivisions+2](1) << ">, <"
-			  << nrml[dl+n_subdivisions+2](0) << ", "
-			  << nrml[dl+n_subdivisions+2](1) << ", "
-			  << nrml[dl+n_subdivisions+2](2)
-			  << ">," << '\n';
-		      out << "\t<" 
-			  << ver[dl+1](0) << "," 
-			  << patch->data(0,dl+1)  << ","
-			  << ver[dl+1](1) << ">, <"
-			  << nrml[dl+1](0) << ", " << nrml[dl+1](1) << ", " << nrml[dl+1](2)
-			  << ">}" << '\n';
-		    }
-		  else
-		    {		
-						       // writing standard triangles
-						       // down/right triangle
-		      out << "triangle {" << '\n' << "\t<" 
-			  << ver[dl](0) << "," 
-			  << patch->data(0,dl) << ","
-			  << ver[dl](1) << ">," << '\n';
-		      out << "\t<" 
-			  << ver[dl+n_subdivisions+1](0) << "," 
-			  << patch->data(0,dl+n_subdivisions+1)  << ","
-			  << ver[dl+n_subdivisions+1](1) << ">," << '\n';
-		      out << "\t<" 
-			  << ver[dl+n_subdivisions+2](0) << "," 
-			  << patch->data(0,dl+n_subdivisions+2)  << ","
-			  << ver[dl+n_subdivisions+2](1) << ">}" << '\n'; 
-			    
-						       // upper/left triangle
-		      out << "triangle {" << '\n' << "\t<" 
-			  << ver[dl](0) << "," 
-			  << patch->data(0,dl) << ","
-			  << ver[dl](1) << ">," << '\n';
-		      out << "\t<"
-			  << ver[dl+n_subdivisions+2](0) << "," 
-			  << patch->data(0,dl+n_subdivisions+2)  << ","
-			  << ver[dl+n_subdivisions+2](1) << ">," << '\n';
-		      out << "\t<" 
-			  << ver[dl+1](0) << ","
-			  << patch->data(0,dl+1)  << ","
-			   << ver[dl+1](1) << ">}" << '\n';
-		        }
-		}
+	      nrml.resize(n*n);
+					       // These are
+					       // difference
+					       // quotients of
+					       // the surface
+					       // mapping. We
+					       // take them
+					       // symmetric
+					       // inside the
+					       // patch and
+					       // one-sided at
+					       // the edges
+	      Point<3> h1,h2;
+					       // Now compute normals in every point
+	      for (unsigned int i=0; i<n;++i)
+		for (unsigned int j=0; j<n;++j)
+		  {
+		    const unsigned int il = (i==0) ? i : (i-1);
+		    const unsigned int ir = (i==n_subdivisions) ? i : (i+1);
+		    const unsigned int jl = (j==0) ? j : (j-1);
+		    const unsigned int jr = (j==n_subdivisions) ? j : (j+1);
+		    
+		    h1(0)=ver[ir*d1+j*d2](0) - ver[il*d1+j*d2](0);
+		    h1(1)=patch->data(0,ir*d1+j*d2)-
+			  patch->data(0,il*d1+j*d2);
+		    h1(2)=ver[ir*d1+j*d2](1) - ver[il*d1+j*d2](1);
+		    
+		    h2(0)=ver[i*d1+jr*d2](0) - ver[i*d1+jl*d2](0);
+		    h2(1)=patch->data(0,i*d1+jr*d2)-
+			  patch->data(0,i*d1+jl*d2);
+		    h2(2)=ver[i*d1+jr*d2](1) - ver[i*d1+jl*d2](1);
+		    
+		    nrml[i*d1+j*d2](0)=h1(1)*h2(2)-h1(2)*h2(1);
+		    nrml[i*d1+j*d2](1)=h1(2)*h2(0)-h1(0)*h2(2);
+		    nrml[i*d1+j*d2](2)=h1(0)*h2(1)-h1(1)*h2(0);
+		    
+						     // normalize Vector
+		    double norm=std::sqrt(
+		      std::pow(nrml[i*d1+j*d2](0),2.)+
+		      std::pow(nrml[i*d1+j*d2](1),2.)+
+		      std::pow(nrml[i*d1+j*d2](2),2.));
+		    
+		    if (nrml[i*d1+j*d2](1)<0)
+		      norm*=-1.;
+		    
+		    for (unsigned int k=0;k<3;++k)
+		      nrml[i*d1+j*d2](k)/=norm;
+		  }
 	    }
+      
+					   // setting up triangles
+	  for (unsigned int i=0; i<n_subdivisions; ++i)
+	    for (unsigned int j=0; j<n_subdivisions; ++j)
+	      {
+						 // down/left vertex of triangle
+		const int dl = i*d1+j*d2;
+		if (flags.smooth)
+		  {
+						     // writing smooth_triangles
+		    
+						     // down/right triangle
+		    out << "smooth_triangle {" << '\n' << "\t<" 
+			<< ver[dl](0) << ","   
+			<< patch->data(0,dl) << ","
+			<< ver[dl](1) << ">, <"
+			<< nrml[dl](0) << ", "
+			<< nrml[dl](1) << ", "
+			<< nrml[dl](2)
+			<< ">," << '\n';
+		    out << " \t<" 
+			<< ver[dl+d1](0) << "," 
+			<< patch->data(0,dl+d1)  << ","
+			<< ver[dl+d1](1) << ">, <"
+			<< nrml[dl+d1](0) << ", "
+			<< nrml[dl+d1](1) << ", "
+			<< nrml[dl+d1](2)
+			<< ">," << '\n';
+		    out << "\t<" 
+			<< ver[dl+d1+d2](0) << "," 
+			<< patch->data(0,dl+d1+d2)  << ","
+			<< ver[dl+d1+d2](1) << ">, <"
+			<< nrml[dl+d1+d2](0) << ", "
+			<< nrml[dl+d1+d2](1) << ", "
+			<< nrml[dl+d1+d2](2) 
+			<< ">}" << '\n'; 
+		    
+						     // upper/left triangle
+		    out << "smooth_triangle {" << '\n' << "\t<" 
+			<< ver[dl](0) << "," 
+			<< patch->data(0,dl) << ","
+			<< ver[dl](1) << ">, <"
+			<< nrml[dl](0) << ", "
+			<< nrml[dl](1) << ", "
+			<< nrml[dl](2) 
+			<< ">," << '\n';
+		    out << "\t<" 
+			<< ver[dl+d1+d2](0) << "," 
+			<< patch->data(0,dl+d1+d2)  << ","
+			<< ver[dl+d1+d2](1) << ">, <"
+			<< nrml[dl+d1+d2](0) << ", "
+			<< nrml[dl+d1+d2](1) << ", "
+			<< nrml[dl+d1+d2](2)
+			<< ">," << '\n';
+		    out << "\t<" 
+			<< ver[dl+d2](0) << "," 
+			<< patch->data(0,dl+d2)  << ","
+			<< ver[dl+d2](1) << ">, <"
+			<< nrml[dl+d2](0) << ", "
+			<< nrml[dl+d2](1) << ", "
+			<< nrml[dl+d2](2)
+			<< ">}" << '\n';
+		  }
+		else
+		  {		
+						     // writing standard triangles
+						     // down/right triangle
+		    out << "triangle {" << '\n' << "\t<" 
+			<< ver[dl](0) << "," 
+			<< patch->data(0,dl) << ","
+			<< ver[dl](1) << ">," << '\n';
+		    out << "\t<" 
+			<< ver[dl+d1](0) << "," 
+			<< patch->data(0,dl+d1)  << ","
+			<< ver[dl+d1](1) << ">," << '\n';
+		    out << "\t<" 
+			<< ver[dl+d1+d2](0) << "," 
+			<< patch->data(0,dl+d1+d2)  << ","
+			<< ver[dl+d1+d2](1) << ">}" << '\n'; 
+		    
+						     // upper/left triangle
+		    out << "triangle {" << '\n' << "\t<" 
+			<< ver[dl](0) << "," 
+			<< patch->data(0,dl) << ","
+			<< ver[dl](1) << ">," << '\n';
+		    out << "\t<"
+			<< ver[dl+d1+d2](0) << "," 
+			<< patch->data(0,dl+d1+d2)  << ","
+			<< ver[dl+d1+d2](1) << ">," << '\n';
+		    out << "\t<" 
+			<< ver[dl+d2](0) << ","
+			<< patch->data(0,dl+d2)  << ","
+			<< ver[dl+d2](1) << ">}" << '\n';
+		  }
+	      }
 	}
       else
 	{                                    // writing bicubic_patch
@@ -2470,380 +2204,357 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
   Assert (patches.size() > 0, ExcNoPatches());
 
 				   // Do not allow volume rendering
-  AssertThrow (dim<=2, ExcNotImplemented());
+  AssertThrow (dim==2, ExcNotImplemented());
+
+  const unsigned int old_precision = out.precision();
   
-  switch (dim) 
+				   // set up an array of cells to be
+				   // written later. this array holds the
+				   // cells of all the patches as
+				   // projected to the plane perpendicular
+				   // to the line of sight.
+				   //
+				   // note that they are kept sorted by
+				   // the set, where we chose the value
+				   // of the center point of the cell
+				   // along the line of sight as value
+				   // for sorting
+  std::multiset<EpsCell2d> cells;
+  
+				   // two variables in which we
+				   // will store the minimum and
+				   // maximum values of the field
+				   // to be used for colorization
+				   //
+				   // preset them by 0 to calm down the
+				   // compiler; they are initialized later
+  double min_color_value=0, max_color_value=0;
+  
+				   // Array for z-coordinates of points.
+				   // The elevation determined by a function if spacedim=2
+				   // or the z-cooridate of the grid point if spacedim=3
+  double heights[4];
+
+				   // compute the cells for output and
+				   // enter them into the set above
+				   // note that since dim==2, we
+				   // have exactly four vertices per
+				   // patch and per cell
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+       patch!=patches.end(); ++patch)
     {
-      case 2:
-      {
-					 // set up an array of cells to be
-					 // written later. this array holds the
-					 // cells of all the patches as
-					 // projected to the plane perpendicular
-					 // to the line of sight.
-					 //
-					 // note that they are kept sorted by
-					 // the set, where we chose the value
-					 // of the center point of the cell
-					 // along the line of sight as value
-					 // for sorting
-	std::multiset<EpsCell2d> cells;
-
-					 // two variables in which we
-					 // will store the minimum and
-					 // maximum values of the field
-					 // to be used for colorization
-					 //
-					 // preset them by 0 to calm down the
-					 // compiler; they are initialized later
-	double min_color_value=0, max_color_value=0;
-	
-					 // Array for z-coordinates of points.
-					 // The elevation determined by a function if spacedim=2
-					 // or the z-cooridate of the grid point if spacedim=3
-	double heights[4];
-
-					 // compute the cells for output and
-					 // enter them into the set above
-					 // note that since dim==2, we
-					 // have exactly four vertices per
-					 // patch and per cell
-	for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	     patch!=patches.end(); ++patch)
+      const unsigned int n_subdivisions = patch->n_subdivisions;
+      const unsigned int n = n_subdivisions+1;
+      const unsigned int d1 = 1;
+      const unsigned int d2 = n;
+      
+      for (unsigned int i2=0; i2<n_subdivisions; ++i2)
+	for (unsigned int i1=0; i1<n_subdivisions; ++i1)
 	  {
-	    const unsigned int n_subdivisions = patch->n_subdivisions;
-	    for (unsigned int i=0; i<n_subdivisions; ++i)
-	      for (unsigned int j=0; j<n_subdivisions; ++j)
-		{
-		  const double x_frac = i * 1./n_subdivisions,
-			       y_frac = j * 1./n_subdivisions,
-					
-			      x_frac1 = (i+1) * 1./n_subdivisions,
-			      y_frac1 = (j+1) * 1./n_subdivisions;
+	    const double x_frac = i1 * 1./n_subdivisions,
+			 y_frac = i2 * 1./n_subdivisions,
+				  
+			x_frac1 = (i1+1) * 1./n_subdivisions,
+			y_frac1 = (i2+1) * 1./n_subdivisions;
+	    
+	    Point<spacedim> points[4];
+	    compute_node(points[0], &*patch, x_frac, y_frac, 0.);
+	    compute_node(points[1], &*patch, x_frac1, y_frac, 0.);
+	    compute_node(points[2], &*patch, x_frac, y_frac1, 0.);
+	    compute_node(points[3], &*patch, x_frac1, y_frac1, 0.);
+	    
+	    switch (spacedim)
+	      {
+		case 2:
+		  Assert ((flags.height_vector < patch->data.n_rows()) ||
+			  patch->data.n_rows() == 0,
+			  ExcIndexRange (flags.height_vector, 0,
+					 patch->data.n_rows()));
+		  heights[0] = patch->data.n_rows() != 0 ?
+			       patch->data(flags.height_vector,i1*d1 + i2*d2) * flags.z_scaling
+			       : 0;
+		  heights[1] = patch->data.n_rows() != 0 ?
+			       patch->data(flags.height_vector,(i1+1)*d1 + i2*d2) * flags.z_scaling
+			       : 0;		  
+		  heights[2] = patch->data.n_rows() != 0 ?
+			       patch->data(flags.height_vector,i1*d1 + (i2+1)*d2) * flags.z_scaling
+			       : 0;
+		  heights[3] = patch->data.n_rows() != 0 ?
+			       patch->data(flags.height_vector,(i1+1)*d1 + (i2+1)*d2) * flags.z_scaling
+			       : 0;
 		  
-		  const Point<spacedim> points[4]
-		    = { (((patch->vertices[1] * x_frac) +
-			  (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-			 ((patch->vertices[2] * x_frac) +
-			  (patch->vertices[3] * (1-x_frac))) * y_frac),
-
-			(((patch->vertices[1] * x_frac1) +
-			  (patch->vertices[0] * (1-x_frac1))) * (1-y_frac) +
-			 ((patch->vertices[2] * x_frac1) +
-			  (patch->vertices[3] * (1-x_frac1))) * y_frac),
-			
-			(((patch->vertices[1] * x_frac1) +
-			  (patch->vertices[0] * (1-x_frac1))) * (1-y_frac1) +
-			 ((patch->vertices[2] * x_frac1) +
-			  (patch->vertices[3] * (1-x_frac1))) * y_frac1),
-			
-			(((patch->vertices[1] * x_frac) +
-			  (patch->vertices[0] * (1-x_frac))) * (1-y_frac1) +
-			 ((patch->vertices[2] * x_frac) +
-			  (patch->vertices[3] * (1-x_frac))) * y_frac1) 
-		    };
-		  
-		  switch (spacedim)
-		    {
-		    case 2:
-		      Assert ((flags.height_vector < patch->data.n_rows()) ||
-			      patch->data.n_rows() == 0,
-			      ExcIndexRange (flags.height_vector, 0,
-					     patch->data.n_rows()));
-		      heights[0] = patch->data.n_rows() != 0 ?
-			patch->data(flags.height_vector,i*(n_subdivisions+1) + j) * flags.z_scaling
-			: 0;
-			
-		      heights[1] = patch->data.n_rows() != 0 ?
-			patch->data(flags.height_vector,(i+1)*(n_subdivisions+1) + j) * flags.z_scaling
-			: 0;
-			
-		      heights[2] = patch->data.n_rows() != 0 ?
-			patch->data(flags.height_vector,(i+1)*(n_subdivisions+1) + j+1) * flags.z_scaling
-			: 0;
-			
-		      heights[3] = patch->data.n_rows() != 0 ?
-			patch->data(flags.height_vector,i*(n_subdivisions+1) + j+1) * flags.z_scaling
-			: 0;
-		      break;
-		    case 3:
-						       // Copy z-coordinates into the height vector
-		      for (unsigned int i=0;i<4;++i)
-			heights[i] = points[i](2);
-		      break;
-		    default:
-		      Assert(false, ExcNotImplemented());
-		    }
-		  
-
-						   // now compute the projection of
-						   // the bilinear cell given by the
-						   // four vertices and their heights
-						   // and write them to a proper
-						   // cell object. note that we only
-						   // need the first two components
-						   // of the projected position for
-						   // output, but we need the value
-						   // along the line of sight for
-						   // sorting the cells for back-to-
-						   // front-output
-						   //
-						   // this computation was first written
-						   // by Stefan Nauber. please no-one
-						   // ask me why it works that way (or
-						   // may be not), especially not about
-						   // the angles and the sign of
-						   // the height field, I don't know
-						   // it.
-		  EpsCell2d eps_cell;
-		  const double pi = deal_II_numbers::PI;
-		  const double cx = -std::cos(pi-flags.azimut_angle * 2*pi / 360.),
-			       cz = -std::cos(flags.turn_angle * 2*pi / 360.),
-			       sx = std::sin(pi-flags.azimut_angle * 2*pi / 360.),
-			       sz = std::sin(flags.turn_angle * 2*pi / 360.);
-		  for (unsigned int vertex=0; vertex<4; ++vertex)
-		    {
-		      const double x = points[vertex](0),
-			y = points[vertex](1),
-			z = -heights[vertex];
-		      
-		      eps_cell.vertices[vertex](0) = -   cz*x+   sz*y;
-		      eps_cell.vertices[vertex](1) = -cx*sz*x-cx*cz*y-sx*z;
-
-						       //      ( 1 0    0 )
-						       // Dx = ( 0 cx -sx ) 
-						       //      ( 0 sx  cx )
-
-						       //      ( cy 0 sy )
-						       // Dy = (  0 1  0 )
-						       //      (-sy 0 cy )
-
-						       //      ( cz -sz 0 )
-						       // Dz = ( sz  cz 0 )
-						       //      (  0   0 1 )
-
+		  break;
+		case 3:
+						   // Copy z-coordinates into the height vector
+		  for (unsigned int i=0;i<4;++i)
+		    heights[i] = points[i](2);
+		  break;
+		default:
+		  Assert(false, ExcNotImplemented());
+	      }
+	    
+	    
+					     // now compute the projection of
+					     // the bilinear cell given by the
+					     // four vertices and their heights
+					     // and write them to a proper
+					     // cell object. note that we only
+					     // need the first two components
+					     // of the projected position for
+					     // output, but we need the value
+					     // along the line of sight for
+					     // sorting the cells for back-to-
+					     // front-output
+					     //
+					     // this computation was first written
+					     // by Stefan Nauber. please no-one
+					     // ask me why it works that way (or
+					     // may be not), especially not about
+					     // the angles and the sign of
+					     // the height field, I don't know
+					     // it.
+	    EpsCell2d eps_cell;
+	    const double pi = deal_II_numbers::PI;
+	    const double cx = -std::cos(pi-flags.azimut_angle * 2*pi / 360.),
+			 cz = -std::cos(flags.turn_angle * 2*pi / 360.),
+			 sx = std::sin(pi-flags.azimut_angle * 2*pi / 360.),
+			 sz = std::sin(flags.turn_angle * 2*pi / 360.);
+	    for (unsigned int vertex=0; vertex<4; ++vertex)
+	      {
+		const double x = points[vertex](0),
+			     y = points[vertex](1),
+			     z = -heights[vertex];
+		
+		eps_cell.vertices[vertex](0) = -   cz*x+   sz*y;
+		eps_cell.vertices[vertex](1) = -cx*sz*x-cx*cz*y-sx*z;
+		
+						 //      ( 1 0    0 )
+						 // D1 = ( 0 cx -sx ) 
+						 //      ( 0 sx  cx )
+		
+						 //      ( cy 0 sy )
+						 // Dy = (  0 1  0 )
+						 //      (-sy 0 cy )
+		
+						 //      ( cz -sz 0 )
+						 // Dz = ( sz  cz 0 )
+						 //      (  0   0 1 )
+		
 //       ( cz -sz 0 )( 1 0    0 )(x)   ( cz*x-sz*(cx*y-sx*z)+0*(sx*y+cx*z) )
 // Dxz = ( sz  cz 0 )( 0 cx -sx )(y) = ( sz*x+cz*(cx*y-sx*z)+0*(sx*y+cx*z) )
 // 	 (  0   0 1 )( 0 sx  cx )(z)   (  0*x+	*(cx*y-sx*z)+1*(sx*y+cx*z) )
-		    }
-
-						   // compute coordinates of
-						   // center of cell
-		  const Point<spacedim> center_point
-		    = (points[0] + points[1] + points[2] + points[3]) / 4;
-		  const double center_height
-		    = -(heights[0] + heights[1] + heights[2] + heights[3]) / 4;
-
-						   // compute the depth into
-						   // the picture
-		  eps_cell.depth = -sx*sz*center_point(0)
-				   -sx*cz*center_point(1)
-				   +cx*center_height;
-
-		  if (flags.draw_cells && flags.shade_cells)
-		    {
-		      Assert ((flags.color_vector < patch->data.n_rows()) ||
-			      patch->data.n_rows() == 0,
-			      ExcIndexRange (flags.color_vector, 0,
-					     patch->data.n_rows()));
-		      const double color_values[4]
-			= { patch->data.n_rows() != 0 ?
-			    patch->data(flags.color_vector,i*(n_subdivisions+1) + j)       : 1,
-			
-			    patch->data.n_rows() != 0 ?
-			    patch->data(flags.color_vector,(i+1)*(n_subdivisions+1) + j)   : 1,
-			    
-			    patch->data.n_rows() != 0 ?
-			    patch->data(flags.color_vector,(i+1)*(n_subdivisions+1) + j+1) : 1,
-			    
-			    patch->data.n_rows() != 0 ?
-			    patch->data(flags.color_vector,i*(n_subdivisions+1) + j+1)     : 1};
-
-						       // set color value to average of the value
-						       // at the vertices
-		      eps_cell.color_value = (color_values[0] +
-					      color_values[1] +
-					      color_values[2] +
-					      color_values[3]) / 4;
-
-						       // update bounds of color
-						       // field
-		      if (patch == patches.begin())
-			min_color_value = max_color_value = eps_cell.color_value;
-		      else
-			{
-			  min_color_value = (min_color_value < eps_cell.color_value ?
-					     min_color_value : eps_cell.color_value);
-			  max_color_value = (max_color_value > eps_cell.color_value ?
-					     max_color_value : eps_cell.color_value);
-			}
-		    }
-		  
-						   // finally add this cell
-		  cells.insert (eps_cell);
-		}
-	  }
-
-					 // find out minimum and maximum x and
-					 // y coordinates to compute offsets
-					 // and scaling factors
-	double x_min = cells.begin()->vertices[0](0);
-	double x_max = x_min;
-	double y_min = cells.begin()->vertices[0](1);
-	double y_max = y_min;
-	
-	for (typename std::multiset<EpsCell2d>::const_iterator
-	       cell=cells.begin();
-	     cell!=cells.end(); ++cell)
-	  for (unsigned int vertex=0; vertex<4; ++vertex)
-	    {
-	      x_min = std::min (x_min, cell->vertices[vertex](0));
-	      x_max = std::max (x_max, cell->vertices[vertex](0));
-	      y_min = std::min (y_min, cell->vertices[vertex](1));
-	      y_max = std::max (y_max, cell->vertices[vertex](1));
-	    }
-	
-					 // scale in x-direction such that
-					 // in the output 0 <= x <= 300.
-					 // don't scale in y-direction to
-					 // preserve the shape of the
-					 // triangulation
-	const double scale = (flags.size /
-			      (flags.size_type==EpsFlags::width ?
-			       x_max - x_min :
-			       y_min - y_max));
-	
-	const Point<2> offset(x_min, y_min);
-
-
-					 // now write preamble
-	if (true) 
-	  {
-					     // block this to have local
-					     // variables destroyed after
-					     // use
-	    std::time_t  time1= std::time (0);
-	    std::tm     *time = std::localtime(&time1); 
-	    out << "%!PS-Adobe-2.0 EPSF-1.2" << '\n'
-		<< "%%Title: deal.II Output" << '\n'
-		<< "%%Creator: the deal.II library" << '\n'
-		<< "%%Creation Date: " 
-		<< time->tm_year+1900 << "/"
-		<< time->tm_mon+1 << "/"
-		<< time->tm_mday << " - "
-		<< time->tm_hour << ":"
-		<< std::setw(2) << time->tm_min << ":"
-		<< std::setw(2) << time->tm_sec << '\n'
-		<< "%%BoundingBox: "
-					       // lower left corner
-		<< "0 0 "
-					       // upper right corner
-		<< static_cast<unsigned int>( rint((x_max-x_min) * scale ))
-		<< ' '
-		<< static_cast<unsigned int>( rint((y_max-y_min) * scale ))
-		<< '\n';
-	    
-					     // define some abbreviations to keep
-					     // the output small:
-					     // m=move turtle to
-					     // l=define a line
-					     // s=set rgb color
-					     // sg=set gray value
-					     // lx=close the line and plot the line
-					     // lf=close the line and fill the interior
-	    out << "/m {moveto} bind def"      << '\n'
-		<< "/l {lineto} bind def"      << '\n'
-		<< "/s {setrgbcolor} bind def" << '\n'
-		<< "/sg {setgray} bind def"    << '\n'
-		<< "/lx {lineto closepath stroke} bind def" << '\n'
-		<< "/lf {lineto closepath fill} bind def"   << '\n';
-	    
-	    out << "%%EndProlog" << '\n'
-		<< '\n';
-					     // set fine lines
-	    out << flags.line_width << " setlinewidth" << '\n';
-					     // allow only five digits
-					     // for output (instead of the
-					     // default six); this should suffice
-					     // even for fine grids, but reduces
-					     // the file size significantly
-	    out << std::setprecision (5);
-	  }
-
-					 // check if min and max
-					 // values for the color are
-					 // actually different. If
-					 // that is not the case (such
-					 // things happen, for
-					 // example, in the very first
-					 // time step of a time
-					 // dependent problem, if the
-					 // initial values are zero),
-					 // all values are equal, and
-					 // then we can draw
-					 // everything in an arbitrary
-					 // color. Thus, change one of
-					 // the two values arbitrarily
-	if (max_color_value == min_color_value)
-	  max_color_value = min_color_value+1;
-
-					 // now we've got all the information
-					 // we need. write the cells.
-					 // note: due to the ordering, we
-					 // traverse the list of cells
-					 // back-to-front
-	for (typename std::multiset<EpsCell2d>::const_iterator
-	       cell=cells.begin();
-	     cell!=cells.end(); ++cell)
-	  {
-	    if (flags.draw_cells) 
-	      {
-		if (flags.shade_cells)
-		  {
-		    const EpsFlags::RgbValues rgb_values
-		      = (*flags.color_function) (cell->color_value,
-						 min_color_value,
-						 max_color_value);
-
-						     // write out color
-		    if (rgb_values.is_grey())
-		      out << rgb_values.red << " sg ";
-		    else
-		      out << rgb_values.red   << ' '
-			  << rgb_values.green << ' '
-			  << rgb_values.blue  << " s ";
-		  }
-		else
-		  out << "1 sg ";
-
-		out << (cell->vertices[0]-offset) * scale << " m "
-		    << (cell->vertices[1]-offset) * scale << " l "
-		    << (cell->vertices[2]-offset) * scale << " l "
-		    << (cell->vertices[3]-offset) * scale << " lf"
-		    << '\n';
 	      }
 	    
-	    if (flags.draw_mesh)
-	      out << "0 sg "      // draw lines in black
-		  << (cell->vertices[0]-offset) * scale << " m "
-		  << (cell->vertices[1]-offset) * scale << " l "
-		  << (cell->vertices[2]-offset) * scale << " l "
-		  << (cell->vertices[3]-offset) * scale << " lx"
-		  << '\n';
+					     // compute coordinates of
+					     // center of cell
+	    const Point<spacedim> center_point
+	      = (points[0] + points[1] + points[2] + points[3]) / 4;
+	    const double center_height
+	      = -(heights[0] + heights[1] + heights[2] + heights[3]) / 4;
+	    
+					     // compute the depth into
+					     // the picture
+	    eps_cell.depth = -sx*sz*center_point(0)
+			     -sx*cz*center_point(1)
+			     +cx*center_height;
+	    
+	    if (flags.draw_cells && flags.shade_cells)
+	      {
+		Assert ((flags.color_vector < patch->data.n_rows()) ||
+			patch->data.n_rows() == 0,
+			ExcIndexRange (flags.color_vector, 0,
+				       patch->data.n_rows()));
+		const double color_values[4]
+		  = { patch->data.n_rows() != 0 ?
+		      patch->data(flags.color_vector,i1*d1 + i2*d2)       : 1,
+		      
+		      patch->data.n_rows() != 0 ?
+		      patch->data(flags.color_vector,(i1+1)*d1 + i2*d2)   : 1,
+		      
+		      patch->data.n_rows() != 0 ?
+		      patch->data(flags.color_vector,i1*d1 + (i2+1)*d2)     : 1,
+		      
+		      patch->data.n_rows() != 0 ?
+		      patch->data(flags.color_vector,(i1+1)*d1 + (i2+1)*d2) : 1};
+		
+						 // set color value to average of the value
+						 // at the vertices
+		eps_cell.color_value = (color_values[0] +
+					color_values[1] +
+					color_values[3] +
+					color_values[2]) / 4;
+		
+						 // update bounds of color
+						 // field
+		if (patch == patches.begin())
+		  min_color_value = max_color_value = eps_cell.color_value;
+		else
+		  {
+		    min_color_value = (min_color_value < eps_cell.color_value ?
+				       min_color_value : eps_cell.color_value);
+		    max_color_value = (max_color_value > eps_cell.color_value ?
+				       max_color_value : eps_cell.color_value);
+		  }
+	      }
+	    
+					     // finally add this cell
+	    cells.insert (eps_cell);
 	  }
-	out << "showpage" << '\n';
-	
-	break;
-      }
-       
-      default:
-	    Assert (false, ExcNotImplemented());
     }
-
+  
+				   // find out minimum and maximum x and
+				   // y coordinates to compute offsets
+				   // and scaling factors
+  double x_min = cells.begin()->vertices[0](0);
+  double x_max = x_min;
+  double y_min = cells.begin()->vertices[0](1);
+  double y_max = y_min;
+  
+  for (typename std::multiset<EpsCell2d>::const_iterator
+	 cell=cells.begin();
+       cell!=cells.end(); ++cell)
+    for (unsigned int vertex=0; vertex<4; ++vertex)
+      {
+	x_min = std::min (x_min, cell->vertices[vertex](0));
+	x_max = std::max (x_max, cell->vertices[vertex](0));
+	y_min = std::min (y_min, cell->vertices[vertex](1));
+	y_max = std::max (y_max, cell->vertices[vertex](1));
+      }
+  
+				   // scale in x-direction such that
+				   // in the output 0 <= x <= 300.
+				   // don't scale in y-direction to
+				   // preserve the shape of the
+				   // triangulation
+  const double scale = (flags.size /
+			(flags.size_type==EpsFlags::width ?
+			 x_max - x_min :
+			 y_min - y_max));
+  
+  const Point<2> offset(x_min, y_min);
+  
+  
+				   // now write preamble
+  if (true) 
+    {
+				       // block this to have local
+				       // variables destroyed after
+				       // use
+      std::time_t  time1= std::time (0);
+      std::tm     *time = std::localtime(&time1); 
+      out << "%!PS-Adobe-2.0 EPSF-1.2" << '\n'
+	  << "%%Title: deal.II Output" << '\n'
+	  << "%%Creator: the deal.II library" << '\n'
+	  << "%%Creation Date: " 
+	  << time->tm_year+1900 << "/"
+	  << time->tm_mon+1 << "/"
+	  << time->tm_mday << " - "
+	  << time->tm_hour << ":"
+	  << std::setw(2) << time->tm_min << ":"
+	  << std::setw(2) << time->tm_sec << '\n'
+	  << "%%BoundingBox: "
+					 // lower left corner
+	  << "0 0 "
+					 // upper right corner
+	  << static_cast<unsigned int>( rint((x_max-x_min) * scale ))
+	  << ' '
+	  << static_cast<unsigned int>( rint((y_max-y_min) * scale ))
+	  << '\n';
+      
+				       // define some abbreviations to keep
+				       // the output small:
+				       // m=move turtle to
+				       // l=define a line
+				       // s=set rgb color
+				       // sg=set gray value
+				       // lx=close the line and plot the line
+				       // lf=close the line and fill the interior
+      out << "/m {moveto} bind def"      << '\n'
+	  << "/l {lineto} bind def"      << '\n'
+	  << "/s {setrgbcolor} bind def" << '\n'
+	  << "/sg {setgray} bind def"    << '\n'
+	  << "/lx {lineto closepath stroke} bind def" << '\n'
+	  << "/lf {lineto closepath fill} bind def"   << '\n';
+      
+      out << "%%EndProlog" << '\n'
+	  << '\n';
+				       // set fine lines
+      out << flags.line_width << " setlinewidth" << '\n';
+				       // allow only five digits
+				       // for output (instead of the
+				       // default six); this should suffice
+				       // even for fine grids, but reduces
+				       // the file size significantly
+      out << std::setprecision (5);
+    }
+  
+				   // check if min and max
+				   // values for the color are
+				   // actually different. If
+				   // that is not the case (such
+				   // things happen, for
+				   // example, in the very first
+				   // time step of a time
+				   // dependent problem, if the
+				   // initial values are zero),
+				   // all values are equal, and
+				   // then we can draw
+				   // everything in an arbitrary
+				   // color. Thus, change one of
+				   // the two values arbitrarily
+  if (max_color_value == min_color_value)
+    max_color_value = min_color_value+1;
+  
+				   // now we've got all the information
+				   // we need. write the cells.
+				   // note: due to the ordering, we
+				   // traverse the list of cells
+				   // back-to-front
+  for (typename std::multiset<EpsCell2d>::const_iterator
+	 cell=cells.begin();
+       cell!=cells.end(); ++cell)
+    {
+      if (flags.draw_cells) 
+	{
+	  if (flags.shade_cells)
+	    {
+	      const EpsFlags::RgbValues rgb_values
+		= (*flags.color_function) (cell->color_value,
+					   min_color_value,
+					   max_color_value);
+	      
+					       // write out color
+	      if (rgb_values.is_grey())
+		out << rgb_values.red << " sg ";
+	      else
+		out << rgb_values.red   << ' '
+		    << rgb_values.green << ' '
+		    << rgb_values.blue  << " s ";
+	    }
+	  else
+	    out << "1 sg ";
+	  
+	  out << (cell->vertices[0]-offset) * scale << " m "
+	      << (cell->vertices[1]-offset) * scale << " l "
+	      << (cell->vertices[3]-offset) * scale << " l "
+	      << (cell->vertices[2]-offset) * scale << " lf"
+	      << '\n';
+	}
+      
+      if (flags.draw_mesh)
+	out << "0 sg "      // draw lines in black
+	    << (cell->vertices[0]-offset) * scale << " m "
+	    << (cell->vertices[1]-offset) * scale << " l "
+	    << (cell->vertices[3]-offset) * scale << " l "
+	    << (cell->vertices[2]-offset) * scale << " lx"
+	    << '\n';
+    }
+  out << "showpage" << '\n';
 				   // make sure everything now gets to
 				   // disk
+  out << std::setprecision(old_precision);
   out.flush ();
-
+  
   AssertThrow (out, ExcIO());
 }
 
@@ -2852,13 +2563,14 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 template <int dim, int spacedim>
 void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &data_names,
-			     const GmvFlags                          &/*flags*/,
+			     const GmvFlags                          &flags,
 			     std::ostream                            &out) 
 {
+  Assert(dim<=3, ExcNotImplemented());
   AssertThrow (out, ExcIO());
-
   Assert (patches.size() > 0, ExcNoPatches());
- 
+  
+  GmvStream gmv_out(out, flags);
   const unsigned int n_data_sets = data_names.size();
 				   // check against # of data sets in
 				   // first patch. checks against all
@@ -2876,35 +2588,10 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 
 				   // first count the number of cells
 				   // and cells for later use
-  unsigned int n_cells = 0,
-	       n_nodes = 0;
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-       patch!=patches.end(); ++patch)
-    switch (dim)
-      {
-	case 1:
-	      n_cells += patch->n_subdivisions;
-	      n_nodes += patch->n_subdivisions+1;
-	      break;
-	case 2:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	case 3:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	default:
-	      Assert (false, ExcNotImplemented());
-      }
-
-
+  unsigned int n_nodes;
+  unsigned int n_cells;
+  compute_sizes(patches, n_nodes, n_cells);
+  
 				   // in gmv format the vertex
 				   // coordinates and the data have an
 				   // order that is a bit unpleasant
@@ -2938,189 +2625,28 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 				   // coordinates
 				   //
 				   // note that we have to print
-				   // d=1..3 dimensions
+				   // 3 dimensions
   out << "nodes " << n_nodes << '\n';
-  for (unsigned int d=1; d<=3; ++d)
+  for (unsigned int d=0;d<spacedim;++d)
     {
-      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	   patch!=patches.end(); ++patch)
-	{
-	  const unsigned int n_subdivisions = patch->n_subdivisions;
-	  
-					   // if we have nonzero values for
-					   // this coordinate
-	  if (d<=spacedim)
-	    {
-	      switch (dim)
-		{
-		  case 1:
-		  {
-		    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		      out << ((patch->vertices[1](0) * i / n_subdivisions) +
-			      (patch->vertices[0](0) * (n_subdivisions-i) / n_subdivisions))
-			  << ' ';
-		    break;
-		  }
-		   
-		  case 2:
-		  {
-		    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		      for (unsigned int j=0; j<n_subdivisions+1; ++j)
-			{
-			  const double x_frac = i * 1./n_subdivisions,
-				       y_frac = j * 1./n_subdivisions;
-			  
-							   // compute coordinates for
-							   // this patch point
-			  out << (((patch->vertices[1](d-1) * x_frac) +
-				   (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-				  ((patch->vertices[2](d-1) * x_frac) +
-				   (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)
-			      << ' ';
-			}
-		    break;
-		  }
-		   
-		  case 3:
-		  {
-		    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		      for (unsigned int j=0; j<n_subdivisions+1; ++j)
-			for (unsigned int k=0; k<n_subdivisions+1; ++k)
-			  {
-							     // note the broken
-							     // design of hexahedra
-							     // in deal.II, where
-							     // first the z-component
-							     // is counted up, before
-							     // increasing the y-
-							     // coordinate
-			    const double x_frac = i * 1./n_subdivisions,
-					 y_frac = k * 1./n_subdivisions,
-					 z_frac = j * 1./n_subdivisions;
-			    
-							     // compute coordinates for
-							     // this patch point
-			    out << ((((patch->vertices[1](d-1) * x_frac) +
-				      (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-				     ((patch->vertices[2](d-1) * x_frac) +
-				      (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)   * (1-z_frac) +
-				    (((patch->vertices[5](d-1) * x_frac) +
-				      (patch->vertices[4](d-1) * (1-x_frac))) * (1-y_frac) +
-				     ((patch->vertices[6](d-1) * x_frac) +
-				      (patch->vertices[7](d-1) * (1-x_frac))) * y_frac)   * z_frac)
-				<< ' ';
-			  }
-	      
-		    break;
-		  }
-		   
-		  default:
-			Assert (false, ExcNotImplemented());
-		}
-	    }
-	  else
-					     // d>spacedim. write zeros instead
-	    {
-	      const unsigned int n_points
-		= static_cast<unsigned int>(std::pow (static_cast<double>(n_subdivisions+1), dim));
-	      for (unsigned int i=0; i<n_points; ++i)
-		out << "0 ";
-	    }
-	}
+      gmv_out.selected_component = d;
+      write_nodes(patches, gmv_out);
       out << '\n';
     }
+  gmv_out.selected_component = deal_II_numbers::invalid_unsigned_int;
 
-  out << '\n';
-
+  for (unsigned int d=spacedim;d<3;++d)
+    {
+      for (unsigned int i=0;i<n_nodes;++i)
+	out << "0 ";
+      out << '\n';
+    }
+  
 				   /////////////////////////////////
 				   // now for the cells. note that
 				   // vertices are counted from 1 onwards
-  if (true)
-    {
-      out << "cells " << n_cells << '\n';
-
-
-      unsigned int first_vertex_of_patch = 0;
-      
-      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	   patch!=patches.end(); ++patch)
-	{
-	  const unsigned int n_subdivisions = patch->n_subdivisions;
-
-					   // write out the cells making
-					   // up this patch
-	  switch (dim)
-	    {
-	      case 1:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  out << "line 2\n  "
-		      << first_vertex_of_patch+i+1 << ' '
-		      << first_vertex_of_patch+i+1+1 << '\n';
-		break;
-	      }
-	       
-	      case 2:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  for (unsigned int j=0; j<n_subdivisions; ++j)
-		    out << "quad 4\n  "
-			<< first_vertex_of_patch+i*(n_subdivisions+1)+j+1 << ' '
-			<< first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1 << ' '
-			<< first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1+1 << ' '
-			<< first_vertex_of_patch+i*(n_subdivisions+1)+j+1+1
-			<< '\n';
-		break;
-	      }
-	       
-	      case 3:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  for (unsigned int j=0; j<n_subdivisions; ++j)
-		    for (unsigned int k=0; k<n_subdivisions; ++k)
-		      {
-			out << "hex 8\n   "
-							   // note: vertex indices start with 1!
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k  +1 << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k+1+1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1+1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1+1 << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1+1 << ' '
-			    << '\n';
-		      }
-		break;
-	      }
-
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
-
-
-					   // finally update the number
-					   // of the first vertex of this patch
-	  switch (dim)
-	    {
-	      case 1:
-		    first_vertex_of_patch += n_subdivisions+1;
-		    break;
-	      case 2:
-		    first_vertex_of_patch += (n_subdivisions+1) *
-					     (n_subdivisions+1);
-		    break;
-	      case 3:
-		    first_vertex_of_patch += (n_subdivisions+1) *
-					     (n_subdivisions+1) *
-					     (n_subdivisions+1);
-		    break;
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
-	}
-      out << '\n';
-    }
+  out << "cells " << n_cells << '\n';
+  write_cells(patches, gmv_out);
 
 				   ///////////////////////////////////////
 				   // data output.
@@ -3167,13 +2693,15 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 template <int dim, int spacedim>
 void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patches,
 				 const std::vector<std::string>          &data_names,
-				 const TecplotFlags                      &/*flags*/,
+				 const TecplotFlags                      &flags,
 				 std::ostream                            &out)
 {
   AssertThrow (out, ExcIO());
 
   Assert (patches.size() > 0, ExcNoPatches());
- 
+
+  TecplotStream tecplot_out(out, flags);
+  
   const unsigned int n_data_sets = data_names.size();
 				   // check against # of data sets in
 				   // first patch. checks against all
@@ -3186,36 +2714,9 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
   
 				   // first count the number of cells
 				   // and cells for later use
-  unsigned int n_cells = 0,
-               n_nodes = 0;
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-       patch!=patches.end(); ++patch)
-    switch (dim)
-      {
-	case 1:
-	      n_cells += patch->n_subdivisions;
-	      n_nodes += patch->n_subdivisions+1;
-	      break;
-	case 2:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	case 3:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	default:
-	      Assert (false, ExcNotImplemented());
-      }
-
-  
-
+  unsigned int n_nodes;
+  unsigned int n_cells;
+  compute_sizes(patches, n_nodes, n_cells);
 
 				   ///////////
 				   // preamble
@@ -3261,19 +2762,8 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
     
     if (dim > 1)
       {
-	out << "zone f=feblock, n=" << n_nodes << ", e=" << n_cells << ", et=";
-	
-	switch (dim)
-	  {
-	    case 2:
-		  out << "quadrilateral" << '\n';
-		  break;
-	    case 3:
-		  out << "brick" << '\n';
-		  break;
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  }
+	out << "zone f=feblock, n=" << n_nodes << ", e=" << n_cells
+	    << ", et=" << tecplot_cell_type[dim] << '\n';
       }
     else
       out << "zone f=block, n=" << n_nodes << '\n';
@@ -3315,82 +2805,10 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
                                    // coordinates
 
   
-  for (unsigned int d=1; d<=spacedim; ++d)
+  for (unsigned int d=0; d<spacedim; ++d)
     {       
-          
-      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-           patch!=patches.end(); ++patch)
-        {
-          const unsigned int n_subdivisions = patch->n_subdivisions;
-	  
-          switch (dim)
-            {
-              case 1:
-              {
-                for (unsigned int i=0; i<n_subdivisions+1; ++i)
-                  out << ((patch->vertices[1](0) * i / n_subdivisions) +
-                          (patch->vertices[0](0) * (n_subdivisions-i) / n_subdivisions))
-                      << '\n';
-                break;
-              }
-	      
-              case 2:
-              {
-                for (unsigned int i=0; i<n_subdivisions+1; ++i)
-                  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-                    {
-                      const double x_frac = i * 1./n_subdivisions,
-                                   y_frac = j * 1./n_subdivisions;
-		      
-                                                       // compute coordinates for
-                                                       // this patch point
-
-                      out << (((patch->vertices[1](d-1) * x_frac) +
-                               (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-                              ((patch->vertices[2](d-1) * x_frac) +
-                               (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)
-                          << '\n';
-                    }
-                break;
-              }
-	      
-              case 3:
-              {
-                for (unsigned int i=0; i<n_subdivisions+1; ++i)
-                  for (unsigned int j=0; j<n_subdivisions+1; ++j)
-                    for (unsigned int k=0; k<n_subdivisions+1; ++k)
-                      {
-                                                         // note the broken
-                                                         // design of hexahedra
-                                                         // in deal.II, where
-                                                         // first the z-component
-                                                         // is counted up, before
-                                                         // increasing the y-
-                                                         // coordinate
-                        const double x_frac = i * 1./n_subdivisions,
-                                     y_frac = k * 1./n_subdivisions,
-                                     z_frac = j * 1./n_subdivisions;
-			
-                                                         // compute coordinates for
-                                                         // this patch point
-			 
-                        out << ((((patch->vertices[1](d-1) * x_frac) +
-                                  (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-                                 ((patch->vertices[2](d-1) * x_frac) +
-                                  (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)   * (1-z_frac) +
-                                (((patch->vertices[5](d-1) * x_frac) +
-                                  (patch->vertices[4](d-1) * (1-x_frac))) * (1-y_frac) +
-                                 ((patch->vertices[6](d-1) * x_frac) +
-                                  (patch->vertices[7](d-1) * (1-x_frac))) * y_frac)   * z_frac)
-                            << '\n';
-                      }
-                break;
-              }
-	      
-              default:
-                    Assert (false, ExcNotImplemented());
-            }
-        }
+      tecplot_out.selected_component = d;
+      write_nodes(patches, tecplot_out);
       out << '\n';
     }
 
@@ -3411,90 +2829,9 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 		 std::ostream_iterator<double>(out, "\n"));
       out << '\n';
     }
-
   
-                                   /////////////////////////////////
-                                   // now for the cells. note that
-                                   // vertices are counted from 1 onwards
-
-  unsigned int first_vertex_of_patch = 0;
-      
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-       patch!=patches.end(); ++patch)
-    {
-      const unsigned int n_subdivisions = patch->n_subdivisions;
-      
-                                       // write out the cells making
-                                       // up this patch
-      switch (dim)
-        {
-          case 1:
-          {
-            break;
-          }
-          case 2:
-          {
-            for (unsigned int i=0; i<n_subdivisions; ++i)
-              for (unsigned int j=0; j<n_subdivisions; ++j)
-                {
-
-                  out << first_vertex_of_patch+i*(n_subdivisions+1)+j+1 << ' '
-                      << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1 << ' '
-                      << first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1+1 << ' '
-                      << first_vertex_of_patch+i*(n_subdivisions+1)+j+1+1
-                      << '\n';
-                }
-            break;
-          }
-	      
-          case 3:
-          {
-            for (unsigned int i=0; i<n_subdivisions; ++i)
-              for (unsigned int j=0; j<n_subdivisions; ++j)
-                for (unsigned int k=0; k<n_subdivisions; ++k)
-                  {
-                                                     // note: vertex indices start with 1!
-		     
-                    out << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k  +1 << ' '
-                        << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k  +1 << ' '
-                        << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k  +1 << ' '
-                        << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k  +1 << ' '
-                        << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k+1+1 << ' '
-                        << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1+1 << ' '
-                        << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1+1 << ' '
-                        << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1+1 << ' '
-                        << '\n';
-                  }
-            break;
-          }
-
-          default:
-                Assert (false, ExcNotImplemented());
-        }
-
-
-                                       // finally update the number
-                                       // of the first vertex of this patch
-      switch (dim)
-        {
-          case 1:
-                first_vertex_of_patch += n_subdivisions+1;
-                break;
-          case 2:
-                first_vertex_of_patch += (n_subdivisions+1) *
-                                         (n_subdivisions+1);
-                break;
-          case 3:
-                first_vertex_of_patch += (n_subdivisions+1) *
-                                         (n_subdivisions+1) *
-                                         (n_subdivisions+1);
-                break;
-          default:
-                Assert (false, ExcNotImplemented());
-        }
-       
-    }
-
+  write_cells(patches, tecplot_out);
+  
 				   // make sure everything now gets to
 				   // disk
   out.flush ();
@@ -3644,35 +2981,9 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
   
 				   // first count the number of cells
 				   // and cells for later use
-  unsigned int n_cells = 0,
-               n_nodes = 0;
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator
-         patch=patches.begin();
-       patch!=patches.end(); ++patch)
-    switch (dim)
-      {
-	case 2:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	case 3:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	default:
-	      Assert (false, ExcNotImplemented());
-      }
-
-  
-
-  
-  
+  unsigned int n_nodes;
+  unsigned int n_cells;
+  compute_sizes(patches, n_nodes, n_cells);
                                     // local variables only needed to write Tecplot
                                     // binary output files  
   const unsigned int vars_per_node  = (spacedim+n_data_sets),  
@@ -3686,19 +2997,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
   
   int is_double = 0,
       tec_debug = 0,
-      cell_type;
-  
-  switch (dim)
-    {
-      case 2:
-	    cell_type = 1;
-	    break;
-      case 3:
-	    cell_type = 3;
-	    break;
-      default:
-            Assert(false, ExcNotImplemented());	    
-    }
+      cell_type = tecplot_binary_cell_type[dim];
   
   std::string tec_var_names;  
   switch (spacedim)
@@ -3745,7 +3044,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
                    Table<2,double> &)
     = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
   Threads::Thread<> reorder_thread = Threads::spawn (fun_ptr)(patches, data_vectors);
-
+  
 				    ///////////////////////////////
 				    // first make up a list of used
 				    // vertices along with their
@@ -3763,19 +3062,17 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 	     {
 	       case 2:
 	       {
-		 for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		   for (unsigned int j=0; j<n_subdivisions+1; ++j)
+		 for (unsigned int j=0; j<n_subdivisions+1; ++j)
+		   for (unsigned int i=0; i<n_subdivisions+1; ++i)
 		     {
 		       const double x_frac = i * 1./n_subdivisions,
 				    y_frac = j * 1./n_subdivisions;
 		      
-							// compute coordinates for
-							// this patch point
 		       tm.nd((d-1),entry) = static_cast<float>(
 			 (((patch->vertices[1](d-1) * x_frac) +
 			   (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-			  ((patch->vertices[2](d-1) * x_frac) +
-			   (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)
+			  ((patch->vertices[3](d-1) * x_frac) +
+			   (patch->vertices[2](d-1) * (1-x_frac))) * y_frac)
 		       );
 		       entry++;
 		     }
@@ -3784,17 +3081,10 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 	      
 	       case 3:
 	       {
-		 for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		   for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		     for (unsigned int k=0; k<n_subdivisions+1; ++k)
+		 for (unsigned int j=0; j<n_subdivisions+1; ++j)
+		   for (unsigned int k=0; k<n_subdivisions+1; ++k)
+		     for (unsigned int i=0; i<n_subdivisions+1; ++i)
 		       {
-							  // note the broken
-							  // design of hexahedra
-							  // in deal.II, where
-							  // first the z-component
-							  // is counted up, before
-							  // increasing the y-
-							  // coordinate
 			 const double x_frac = i * 1./n_subdivisions,
 				      y_frac = k * 1./n_subdivisions,
 				      z_frac = j * 1./n_subdivisions;
@@ -3804,12 +3094,12 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 			 tm.nd((d-1),entry) = static_cast<float>(
 			   ((((patch->vertices[1](d-1) * x_frac) +
 			      (patch->vertices[0](d-1) * (1-x_frac))) * (1-y_frac) +
-			     ((patch->vertices[2](d-1) * x_frac) +
-			      (patch->vertices[3](d-1) * (1-x_frac))) * y_frac)   * (1-z_frac) +
+			     ((patch->vertices[3](d-1) * x_frac) +
+			      (patch->vertices[2](d-1) * (1-x_frac))) * y_frac)   * (1-z_frac) +
 			    (((patch->vertices[5](d-1) * x_frac) +
 			      (patch->vertices[4](d-1) * (1-x_frac))) * (1-y_frac) +
-			     ((patch->vertices[6](d-1) * x_frac) +
-			      (patch->vertices[7](d-1) * (1-x_frac))) * y_frac)   * z_frac)
+			     ((patch->vertices[7](d-1) * x_frac) +
+			      (patch->vertices[6](d-1) * (1-x_frac))) * y_frac)   * z_frac)
 			 );
 			 entry++;
 		       }
@@ -3846,21 +3136,23 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 	patch!=patches.end(); ++patch)
      {
        const unsigned int n_subdivisions = patch->n_subdivisions;
-      
+       const unsigned int n = n_subdivisions+1;
+       const unsigned int d1=1;
+       const unsigned int d2=n;
+       const unsigned int d3=n*n;
 					// write out the cells making
 					// up this patch
        switch (dim)
 	 {
 	   case 2:
 	   {
-	     for (unsigned int i=0; i<n_subdivisions; ++i)
-	       for (unsigned int j=0; j<n_subdivisions; ++j)
+	     for (unsigned int i2=0; i2<n_subdivisions; ++i2)
+	       for (unsigned int i1=0; i1<n_subdivisions; ++i1)
 		 {
-
-		   tm.cd(0,elem) = first_vertex_of_patch+i*(n_subdivisions+1)+j+1;
-		   tm.cd(1,elem) = first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1;
-		   tm.cd(2,elem) = first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1+1;
-		   tm.cd(3,elem) = first_vertex_of_patch+i*(n_subdivisions+1)+j+1+1;
+		   tm.cd(0,elem) = first_vertex_of_patch+(i1  )*d1+(i2  )*d2+1;
+		   tm.cd(1,elem) = first_vertex_of_patch+(i1+1)*d1+(i2  )*d2+1;
+		   tm.cd(2,elem) = first_vertex_of_patch+(i1+1)*d1+(i2+1)*d2+1;
+		   tm.cd(3,elem) = first_vertex_of_patch+(i1  )*d1+(i2+1)*d2+1;
 		   
 		   elem++;
 		 }
@@ -3869,21 +3161,21 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 	      
 	   case 3:
 	   {
-	     for (unsigned int i=0; i<n_subdivisions; ++i)
-	       for (unsigned int j=0; j<n_subdivisions; ++j)
-		 for (unsigned int k=0; k<n_subdivisions; ++k)
+	     for (unsigned int i3=0; i3<n_subdivisions; ++i3)
+	       for (unsigned int i2=0; i2<n_subdivisions; ++i2)
+		 for (unsigned int i1=0; i1<n_subdivisions; ++i1)
 		   {
 						      // note: vertex indices start with 1!
 
 		     
-		     tm.cd(0,elem) = first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k  +1;
-		     tm.cd(1,elem) = first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k  +1;
-		     tm.cd(2,elem) = first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k  +1;
-		     tm.cd(3,elem) = first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k  +1;
-		     tm.cd(4,elem) = first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k+1+1;
-		     tm.cd(5,elem) = first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1+1;
-		     tm.cd(6,elem) = first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1+1;
-		     tm.cd(7,elem) = first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1+1;
+		     tm.cd(0,elem) = first_vertex_of_patch+(i1  )*d1+(i2  )*d2+(i3  )*d3+1;
+		     tm.cd(1,elem) = first_vertex_of_patch+(i1+1)*d1+(i2  )*d2+(i3  )*d3+1;
+		     tm.cd(2,elem) = first_vertex_of_patch+(i1+1)*d1+(i2+1)*d2+(i3  )*d3+1;
+		     tm.cd(3,elem) = first_vertex_of_patch+(i1  )*d1+(i2+1)*d2+(i3  )*d3+1;
+		     tm.cd(4,elem) = first_vertex_of_patch+(i1  )*d1+(i2  )*d2+(i3+1)*d3+1;
+		     tm.cd(5,elem) = first_vertex_of_patch+(i1+1)*d1+(i2  )*d2+(i3+1)*d3+1;
+		     tm.cd(6,elem) = first_vertex_of_patch+(i1+1)*d1+(i2+1)*d2+(i3+1)*d3+1;
+		     tm.cd(7,elem) = first_vertex_of_patch+(i1  )*d1+(i2+1)*d2+(i3+1)*d3+1;
 		     
 		     elem++;
 		   }
@@ -3897,20 +3189,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 
 					// finally update the number
 					// of the first vertex of this patch
-       switch (dim)
-	 {
-	   case 2:
-		 first_vertex_of_patch += (n_subdivisions+1) *
-					  (n_subdivisions+1);
-		 break;
-	   case 3:
-		 first_vertex_of_patch += (n_subdivisions+1) *
-					  (n_subdivisions+1) *
-					  (n_subdivisions+1);
-		 break;
-	   default:
-		 Assert (false, ExcNotImplemented());
-	 }      
+       first_vertex_of_patch += template_power<dim>(n);
      }
 
 
@@ -3970,13 +3249,14 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 template <int dim, int spacedim>
 void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 			     const std::vector<std::string>          &data_names,
-			     const VtkFlags                          &/*flags*/,
+			     const VtkFlags                          &flags,
 			     std::ostream                            &out) 
 {
   AssertThrow (out, ExcIO());
 
   Assert (patches.size() > 0, ExcNoPatches());
- 
+  VtkStream vtk_out(out, flags);
+  
   const unsigned int n_data_sets = data_names.size();
 				   // check against # of data sets in
 				   // first patch. checks against all
@@ -3994,7 +3274,7 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
       std::tm     *time = std::localtime(&time1);
       out << "# vtk DataFile Version 3.0"
 	  << '\n'
-	  << "This file was generated by the deal.II library on "
+	  << "#This file was generated by the deal.II library on "
 	  << time->tm_year+1900 << "/"
 	  << time->tm_mon+1 << "/"
 	  << time->tm_mday << " at "
@@ -4004,42 +3284,16 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 	  << '\n'
 	  << "ASCII"
 	  << '\n'
-	  << "DATASET UNSTRUCTURED_GRID"
+	  << "DATASET UNSTRUCTURED_GRID\n"
 	  << '\n';
     }
   
 
 				   // first count the number of cells
 				   // and cells for later use
-  unsigned int n_cells = 0,
-	       n_nodes = 0;
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-       patch!=patches.end(); ++patch)
-    switch (dim)
-      {
-	case 1:
-	      n_cells += patch->n_subdivisions;
-	      n_nodes += patch->n_subdivisions+1;
-	      break;
-	case 2:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	case 3:
-	      n_cells += patch->n_subdivisions *
-			 patch->n_subdivisions *
-			 patch->n_subdivisions;
-	      n_nodes += (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1) *
-			 (patch->n_subdivisions+1);
-	      break;
-	default:
-	      Assert (false, ExcNotImplemented());
-      }
-
-
+  unsigned int n_nodes;
+  unsigned int n_cells;
+  compute_sizes(patches, n_nodes, n_cells);
 				   // in gmv format the vertex
 				   // coordinates and the data have an
 				   // order that is a bit unpleasant
@@ -4076,187 +3330,22 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				   // note that we have to print
 				   // d=1..3 dimensions
   out << "POINTS " << n_nodes << " double" << '\n';
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-       patch!=patches.end(); ++patch)
-    {
-      const unsigned int n_subdivisions = patch->n_subdivisions;
-      
-      switch (dim)
-	{
-	  case 1:
-	  {
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-	      out << ((patch->vertices[1](0) * i / n_subdivisions) +
-		      (patch->vertices[0](0) * (n_subdivisions-i) / n_subdivisions))
-		  << " 0 0\n";
-	    break;
-	  }
-		   
-	  case 2:
-	  {
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		{
-		  const double x_frac = i * 1./n_subdivisions,
-			       y_frac = j * 1./n_subdivisions;
-		      
-		  out << (((patch->vertices[1] * x_frac) +
-			   (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-			  ((patch->vertices[2] * x_frac) +
-			   (patch->vertices[3] * (1-x_frac))) * y_frac)
-		      << " 0\n";
-		}
-	    break;
-	  }
-	       
-	  case 3:
-	  {
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		for (unsigned int k=0; k<n_subdivisions+1; ++k)
-		  {
-						     // note the broken
-						     // design of hexahedra
-						     // in deal.II, where
-						     // first the z-component
-						     // is counted up, before
-						     // increasing the y-
-						     // coordinate
-		    const double x_frac = i * 1./n_subdivisions,
-				 y_frac = k * 1./n_subdivisions,
-				 z_frac = j * 1./n_subdivisions;
-			
-						     // compute coordinates for
-						     // this patch point
-		    out << ((((patch->vertices[1] * x_frac) +
-			      (patch->vertices[0] * (1-x_frac))) * (1-y_frac) +
-			     ((patch->vertices[2] * x_frac) +
-			      (patch->vertices[3] * (1-x_frac))) * y_frac)   * (1-z_frac) +
-			    (((patch->vertices[5] * x_frac) +
-			      (patch->vertices[4] * (1-x_frac))) * (1-y_frac) +
-			     ((patch->vertices[6] * x_frac) +
-			      (patch->vertices[7] * (1-x_frac))) * y_frac)   * z_frac)
-			<< '\n';
-		  }
-		
-	    break;
-	  }
-	       
-	  default:
-		Assert (false, ExcNotImplemented());
-	}
-    }
-
+  write_nodes(patches, vtk_out);
+  out << '\n';
 				   /////////////////////////////////
 				   // now for the cells
-  if (true)
-    {
-      out << "CELLS " << n_cells << ' '
-	  << n_cells*(GeometryInfo<dim>::vertices_per_cell+1)
-	  << '\n';
-
-
-      unsigned int first_vertex_of_patch = 0;
-      
-      for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	   patch!=patches.end(); ++patch)
-	{
-	  const unsigned int n_subdivisions = patch->n_subdivisions;
-
-					   // write out the cells making
-					   // up this patch
-	  switch (dim)
-	    {
-	      case 1:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  out << "2 "
-		      << first_vertex_of_patch+i << ' '
-		      << first_vertex_of_patch+i+1 << '\n';
-		break;
-	      }
-	       
-	      case 2:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  for (unsigned int j=0; j<n_subdivisions; ++j)
-		    out << "4 "
-			<< first_vertex_of_patch+i*(n_subdivisions+1)+j << ' '
-			<< first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j << ' '
-			<< first_vertex_of_patch+(i+1)*(n_subdivisions+1)+j+1 << ' '
-			<< first_vertex_of_patch+i*(n_subdivisions+1)+j+1
-			<< '\n';
-		break;
-	      }
-	       
-	      case 3:
-	      {
-		for (unsigned int i=0; i<n_subdivisions; ++i)
-		  for (unsigned int j=0; j<n_subdivisions; ++j)
-		    for (unsigned int k=0; k<n_subdivisions; ++k)
-		      {
-			out << "8 "
-							   // note: vertex indices start with 1!
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k   << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k   << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k   << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k   << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j      )*(n_subdivisions+1)+k+1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j  )*(n_subdivisions+1)+k+1 << ' '
-			    << first_vertex_of_patch+((i+1)*(n_subdivisions+1)+j+1)*(n_subdivisions+1)+k+1 << ' '
-			    << first_vertex_of_patch+(i*(n_subdivisions+1)+j+1    )*(n_subdivisions+1)+k+1 << ' '
-			    << '\n';
-		      }
-		break;
-	      }
-
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
-
-
-					   // finally update the number
-					   // of the first vertex of this patch
-	  switch (dim)
-	    {
-	      case 1:
-		    first_vertex_of_patch += n_subdivisions+1;
-		    break;
-	      case 2:
-		    first_vertex_of_patch += (n_subdivisions+1) *
-					     (n_subdivisions+1);
-		    break;
-	      case 3:
-		    first_vertex_of_patch += (n_subdivisions+1) *
-					     (n_subdivisions+1) *
-					     (n_subdivisions+1);
-		    break;
-	      default:
-		    Assert (false, ExcNotImplemented());
-	    }
-	}
-
+  out << "CELLS " << n_cells << ' '
+      << n_cells*(GeometryInfo<dim>::vertices_per_cell+1)
+      << '\n';
+  write_cells(patches, vtk_out);
+  out << '\n';
 				       // next output the types of the
 				       // cells. since all cells are
 				       // the same, this is simple
-      out << "CELL_TYPES " << n_cells << '\n';
-      for (unsigned int i=0; i<n_cells; ++i)
-	switch (dim)
-	  {
-	    case 1:
-		  out << "3\n";    // represents VTK_LINE
-		  break;
-	    case 2:
-		  out << "9\n";    // represents VTK_QUAD
-		  break;
-	    case 3:
-		  out << "12\n";    // represents VTK_HEXAHEDRON
-		  break;
-	    default:
-		  Assert (false, ExcNotImplemented());
-	  }
-    }
-
+  out << "CELL_TYPES " << n_cells << '\n';
+  for (unsigned int i=0; i<n_cells; ++i)
+    out << ' ' << vtk_cell_type[dim];
+  out << '\n';
 				   ///////////////////////////////////////
 				   // data output.
 
@@ -4369,64 +3458,17 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
        patch != patches.end(); ++patch)
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
-	  
+      
       Assert (patch->data.n_rows() == n_data_sets,
 	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
-      Assert (patch->data.n_cols() == (dim==1 ?
-				  n_subdivisions+1 :
-				  (dim==2 ?
-				   (n_subdivisions+1)*(n_subdivisions+1) :
-				   (dim==3 ?
-				    (n_subdivisions+1)*(n_subdivisions+1)*(n_subdivisions+1) :
-				    0))),
+      Assert (patch->data.n_cols() == template_power<dim>(n_subdivisions+1),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
-	  
-      switch (dim)
-	{
-	  case 1:
-	  {      
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i, ++next_value) 
-	      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		data_vectors[data_set][next_value] = patch->data(data_set,i);
-		
-	    break;
-	  }
-		     
-	  case 2:
-	  {
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		{
-		  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		    data_vectors[data_set][next_value]
-		      = patch->data(data_set,i*(n_subdivisions+1) + j);
-		  ++next_value;
-		}
-		
-	    break;
-	  }
-	       
-	  case 3:
-	  {
-	    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-	      for (unsigned int j=0; j<n_subdivisions+1; ++j)
-		for (unsigned int k=0; k<n_subdivisions+1; ++k)
-		  {
-		    for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		      data_vectors[data_set][next_value]
-			= patch->data(data_set,
-				      (i*(n_subdivisions+1)+j)*(n_subdivisions+1)+k);
-		    ++next_value;
-		  }
-
-	    break;
-	  }
-	       
-	  default:
-		Assert (false, ExcNotImplemented());
-	}
+      
+      for (unsigned int i=0;i<patch->data.n_cols();++i, ++next_value)
+	for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
+	  data_vectors[data_set][next_value] = patch->data(data_set,i);
     }
-
+  
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     Assert (data_vectors[data_set].size() == next_value,
 	    ExcInternalError());
@@ -4976,7 +4018,7 @@ operator << (std::ostream                           &out,
 				   // then write all the data that is
 				   // in this patch
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    out << patch.vertices[i] << " ";
+    out << patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]] << " ";
   out << '\n';
 
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
@@ -5039,7 +4081,7 @@ operator >> (std::istream                     &in,
 				   // then read all the data that is
 				   // in this patch
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-    in >> patch.vertices[i];
+    in >> patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]];
 
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     in >> patch.neighbors[i];

@@ -59,18 +59,6 @@ DEAL::Checking DGQ1 in 3d:
 DEAL::0
 DEAL::0
 DEAL::0
-DEAL::Checking DGQ2 in 1d:
-DEAL::0
-DEAL::0
-DEAL::0
-DEAL::Checking DGQ2 in 2d:
-DEAL::0
-DEAL::0
-DEAL::0
-DEAL::Checking DGQ2 in 3d:
-DEAL::0
-DEAL::0
-DEAL::0
 DEAL::Checking DGQ3 in 1d:
 DEAL::0
 DEAL::0
@@ -80,18 +68,6 @@ DEAL::0
 DEAL::0
 DEAL::0
 DEAL::Checking DGQ3 in 3d:
-DEAL::0
-DEAL::0
-DEAL::0
-DEAL::Checking DGQ4 in 1d:
-DEAL::0
-DEAL::0
-DEAL::0
-DEAL::Checking DGQ4 in 2d:
-DEAL::0
-DEAL::0
-DEAL::0
-DEAL::Checking DGQ4 in 3d:
 DEAL::0
 DEAL::0
 DEAL::0
@@ -119,18 +95,6 @@ DEAL::Checking DGP1 in 3d:
 DEAL::0
 DEAL::0
 DEAL::0
-DEAL::Checking DGP2 in 1d:
-DEAL::0
-DEAL::0
-DEAL::0
-DEAL::Checking DGP2 in 2d:
-DEAL::0
-DEAL::0
-DEAL::0
-DEAL::Checking DGP2 in 3d:
-DEAL::0
-DEAL::0
-DEAL::0
 DEAL::Checking DGP3 in 1d:
 DEAL::0
 DEAL::0
@@ -140,18 +104,6 @@ DEAL::0
 DEAL::0
 DEAL::0
 DEAL::Checking DGP3 in 3d:
-DEAL::0
-DEAL::0
-DEAL::0
-DEAL::Checking DGP4 in 1d:
-DEAL::0
-DEAL::0
-DEAL::0
-DEAL::Checking DGP4 in 2d:
-DEAL::0
-DEAL::0
-DEAL::0
-DEAL::Checking DGP4 in 3d:
 DEAL::0
 DEAL::0
 DEAL::0
@@ -259,18 +211,6 @@ DEAL::Checking FE_DGP<2>(3)1FE_DGQ<2>(2)2 in 2d:
 DEAL::0
 DEAL::0
 DEAL::0
-DEAL::Checking FE_Q<3>(1)3FE_DGQ<3>(2)2 in 3d:
-DEAL::144
-DEAL::42
-DEAL::42
-DEAL::Checking FE_DGQ<3>(2)2FE_DGP<3>(3)1 in 3d:
-DEAL::0
-DEAL::0
-DEAL::0
-DEAL::Checking FE_DGP<3>(3)1FE_DGQ<3>(2)2 in 3d:
-DEAL::0
-DEAL::0
-DEAL::0
 DEAL::Checking FE_Q<1>(1)3FE_DGP<1>(3)1FE_Q<1>(1)3 in 1d:
 DEAL::12
 DEAL::6
@@ -295,31 +235,23 @@ DEAL::Checking FE_DGP<2>(3)1FE_DGP<2>(3)1FE_Q<2>(2)3 in 2d:
 DEAL::72
 DEAL::21
 DEAL::21
-DEAL::Checking FE_Q<3>(1)3FE_DGP<3>(3)1FE_Q<3>(1)3 in 3d:
-DEAL::288
-DEAL::84
-DEAL::84
-DEAL::Checking FE_DGQ<3>(2)2FE_DGQ<3>(2)2FE_Q<3>(3)3 in 3d:
-DEAL::1224
-DEAL::258
-DEAL::258
-DEAL::Checking FE_DGP<3>(3)1FE_DGP<3>(3)1FE_Q<3>(2)3 in 3d:
-DEAL::558
-DEAL::129
-DEAL::129
-DEAL::Checking (FESystem<2>(FE_Q<2>(1),3))3FE_DGQ<2>(3)1FE_Q<2>(1)3 in 2d:
-DEAL::144
-DEAL::48
-DEAL::48
-DEAL::Checking FE_DGQ<2>(3)1FESystem<2>(FE_DGQ<2>(3),3)1FESystem<2>(FE_Q<2>(2),3, FE_DGQ<2>(0),1)2 in 2d:
+DEAL::Checking FE_DGQ<3>(1)3FE_DGP<3>(3)1FE_Q<3>(1)3 in 3d:
 DEAL::144
 DEAL::42
 DEAL::42
+DEAL::Checking (FESystem<2>(FE_Q<2>(1),3))3FE_DGQ<2>(0)1FE_Q<2>(1)3 in 2d:
+DEAL::144
+DEAL::48
+DEAL::48
+DEAL::Checking FE_DGQ<2>(3)1FESystem<2>(FE_DGQ<2>(0),3)1FESystem<2>(FE_Q<2>(2),1, FE_DGQ<2>(0),1)2 in 2d:
+DEAL::48
+DEAL::14
+DEAL::14
 DEAL::Checking FE_DGQ<2>(3)1FE_Nedelec<2>(1)2 in 2d:
 DEAL::24
 DEAL::6
 DEAL::6
-DEAL::Checking FE_Nedelec<2>(1)1FESystem<2>(FE_DGQ<2>(3),3)1FESystem<2>(FE_Q<2>(2),3, FE_Nedelec<2>(1),2)2 in 2d:
-DEAL::204
-DEAL::57
-DEAL::57
+DEAL::Checking FE_Nedelec<2>(1)1FESystem<2>(FE_DGQ<2>(1),2)1FESystem<2>(FE_Q<2>(2),1, FE_Nedelec<2>(1),2)2 in 2d:
+DEAL::108
+DEAL::29
+DEAL::29

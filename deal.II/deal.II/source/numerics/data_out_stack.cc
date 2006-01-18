@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -307,11 +307,11 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions)
 	  case 1:
 		patch->vertices[0] = Point<dim+1>(cell->vertex(0)(0),
 						  parameter-parameter_step);
-		patch->vertices[3] = Point<dim+1>(cell->vertex(0)(0),
+		patch->vertices[2] = Point<dim+1>(cell->vertex(0)(0),
 						  parameter);
 		patch->vertices[1] = Point<dim+1>(cell->vertex(1)(0),
 						  parameter-parameter_step);
-		patch->vertices[2] = Point<dim+1>(cell->vertex(1)(0),
+		patch->vertices[3] = Point<dim+1>(cell->vertex(1)(0),
 						  parameter);
 		break;
 		
@@ -364,24 +364,23 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions)
 		patch->vertices[1] = Point<dim+1>(cell->vertex(1)(0),
 		    				  cell->vertex(1)(1),
 						  parameter-parameter_step);
-		patch->vertices[2] = Point<dim+1>(cell->vertex(1)(0),
-		    				  cell->vertex(1)(1),
-						  parameter);
-		patch->vertices[3] = Point<dim+1>(cell->vertex(0)(0),
+                patch->vertices[2] = Point<dim+1>(cell->vertex(2)(0),
+		    				  cell->vertex(2)(1),
+						  parameter-parameter_step);
+		patch->vertices[3] = Point<dim+1>(cell->vertex(3)(0),
+		    				  cell->vertex(3)(1),
+						  parameter-parameter_step);
+		patch->vertices[4] = Point<dim+1>(cell->vertex(0)(0),
 		    				  cell->vertex(0)(1),
 						  parameter);
-
-                patch->vertices[4] = Point<dim+1>(cell->vertex(2)(0),
-		    				  cell->vertex(2)(1),
-						  parameter-parameter_step);
-		patch->vertices[5] = Point<dim+1>(cell->vertex(3)(0),
-		    				  cell->vertex(3)(1),
-						  parameter-parameter_step);
-		patch->vertices[6] = Point<dim+1>(cell->vertex(3)(0),
-		    				  cell->vertex(3)(1),
+		patch->vertices[5] = Point<dim+1>(cell->vertex(1)(0),
+		    				  cell->vertex(1)(1),
 						  parameter);
-		patch->vertices[7] = Point<dim+1>(cell->vertex(2)(0),
+		patch->vertices[6] = Point<dim+1>(cell->vertex(2)(0),
 		    				  cell->vertex(2)(1),
+						  parameter);
+		patch->vertices[7] = Point<dim+1>(cell->vertex(3)(0),
+		    				  cell->vertex(3)(1),
 						  parameter);
 		break;
 	

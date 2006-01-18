@@ -432,8 +432,7 @@ void DataOut<dim,DH>::build_some_patches (Data data)
 				       // unnatural ordering
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
 	patch->vertices[vertex] = data.mapping->transform_unit_to_real_cell
-				  (cell, GeometryInfo<dim>::unit_cell_vertex (
-				    GeometryInfo<dim>::ucd_to_deal[vertex]));
+				  (cell, GeometryInfo<dim>::unit_cell_vertex (vertex));
       
       if (data.n_datasets > 0)
 	{

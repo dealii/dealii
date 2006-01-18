@@ -71,8 +71,11 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
 
 				   // initialize the various matrices
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
-    this->prolongation[i].reinit (n_dofs,
-				  n_dofs);
+    {
+      this->prolongation[i].reinit (n_dofs, n_dofs);
+      this->restriction[i].reinit (0, 0);
+    }
+  
   FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
   
   std::vector<FullMatrix<double> >

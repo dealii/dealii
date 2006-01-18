@@ -215,24 +215,6 @@ DEAL::FE_DGQ<dim>(3) ok
 DEAL::Checking DGQ3 against DGQ1 in 3d:
 DEAL::FE_DGQ<dim>(3) ok
 DEAL::FE_DGQ<dim>(1) ok
-DEAL::Checking DGQ1 against DGQ5 in 1d:
-DEAL::FE_DGQ<dim>(1) ok
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::Checking DGQ5 against DGQ1 in 1d:
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::FE_DGQ<dim>(1) ok
-DEAL::Checking DGQ1 against DGQ5 in 2d:
-DEAL::FE_DGQ<dim>(1) ok
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::Checking DGQ5 against DGQ1 in 2d:
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::FE_DGQ<dim>(1) ok
-DEAL::Checking DGQ1 against DGQ5 in 3d:
-DEAL::FE_DGQ<dim>(1) ok
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::Checking DGQ5 against DGQ1 in 3d:
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::FE_DGQ<dim>(1) ok
 DEAL::Checking DGQ2 against DGQ2 in 1d:
 DEAL::FE_DGQ<dim>(2) ok
 DEAL::FE_DGQ<dim>(2) ok
@@ -305,42 +287,6 @@ DEAL::FE_DGQ<dim>(3) ok
 DEAL::Checking DGQ3 against DGQ3 in 3d:
 DEAL::FE_DGQ<dim>(3) ok
 DEAL::FE_DGQ<dim>(3) ok
-DEAL::Checking DGQ3 against DGQ5 in 1d:
-DEAL::FE_DGQ<dim>(3) ok
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::Checking DGQ5 against DGQ3 in 1d:
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::FE_DGQ<dim>(3) ok
-DEAL::Checking DGQ3 against DGQ5 in 2d:
-DEAL::FE_DGQ<dim>(3) ok
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::Checking DGQ5 against DGQ3 in 2d:
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::FE_DGQ<dim>(3) ok
-DEAL::Checking DGQ3 against DGQ5 in 3d:
-DEAL::FE_DGQ<dim>(3) ok
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::Checking DGQ5 against DGQ3 in 3d:
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::FE_DGQ<dim>(3) ok
-DEAL::Checking DGQ4 against DGQ5 in 1d:
-DEAL::FE_DGQ<dim>(4) ok
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::Checking DGQ5 against DGQ4 in 1d:
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::FE_DGQ<dim>(4) ok
-DEAL::Checking DGQ4 against DGQ5 in 2d:
-DEAL::FE_DGQ<dim>(4) ok
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::Checking DGQ5 against DGQ4 in 2d:
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::FE_DGQ<dim>(4) ok
-DEAL::Checking DGQ4 against DGQ5 in 3d:
-DEAL::FE_DGQ<dim>(4) ok
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::Checking DGQ5 against DGQ4 in 3d:
-DEAL::FE_DGQ<dim>(5) ok
-DEAL::FE_DGQ<dim>(4) ok
 DEAL::Checking DGP0 against DGP0 in 1d:
 DEAL::FE_DGP<dim>(0) ok
 DEAL::FE_DGP<dim>(0) ok
@@ -449,24 +395,6 @@ DEAL::FE_DGP<dim>(3) ok
 DEAL::Checking DGP3 against DGP1 in 3d:
 DEAL::FE_DGP<dim>(3) ok
 DEAL::FE_DGP<dim>(1) ok
-DEAL::Checking DGP1 against DGP5 in 1d:
-DEAL::FE_DGP<dim>(1) ok
-DEAL::FE_DGP<dim>(5) ok
-DEAL::Checking DGP5 against DGP1 in 1d:
-DEAL::FE_DGP<dim>(5) ok
-DEAL::FE_DGP<dim>(1) ok
-DEAL::Checking DGP1 against DGP5 in 2d:
-DEAL::FE_DGP<dim>(1) ok
-DEAL::FE_DGP<dim>(5) ok
-DEAL::Checking DGP5 against DGP1 in 2d:
-DEAL::FE_DGP<dim>(5) ok
-DEAL::FE_DGP<dim>(1) ok
-DEAL::Checking DGP1 against DGP5 in 3d:
-DEAL::FE_DGP<dim>(1) ok
-DEAL::FE_DGP<dim>(5) ok
-DEAL::Checking DGP5 against DGP1 in 3d:
-DEAL::FE_DGP<dim>(5) ok
-DEAL::FE_DGP<dim>(1) ok
 DEAL::Checking DGP2 against DGP2 in 1d:
 DEAL::FE_DGP<dim>(2) ok
 DEAL::FE_DGP<dim>(2) ok
@@ -539,42 +467,6 @@ DEAL::FE_DGP<dim>(3) ok
 DEAL::Checking DGP3 against DGP3 in 3d:
 DEAL::FE_DGP<dim>(3) ok
 DEAL::FE_DGP<dim>(3) ok
-DEAL::Checking DGP3 against DGP5 in 1d:
-DEAL::FE_DGP<dim>(3) ok
-DEAL::FE_DGP<dim>(5) ok
-DEAL::Checking DGP5 against DGP3 in 1d:
-DEAL::FE_DGP<dim>(5) ok
-DEAL::FE_DGP<dim>(3) ok
-DEAL::Checking DGP3 against DGP5 in 2d:
-DEAL::FE_DGP<dim>(3) ok
-DEAL::FE_DGP<dim>(5) ok
-DEAL::Checking DGP5 against DGP3 in 2d:
-DEAL::FE_DGP<dim>(5) ok
-DEAL::FE_DGP<dim>(3) ok
-DEAL::Checking DGP3 against DGP5 in 3d:
-DEAL::FE_DGP<dim>(3) ok
-DEAL::FE_DGP<dim>(5) ok
-DEAL::Checking DGP5 against DGP3 in 3d:
-DEAL::FE_DGP<dim>(5) ok
-DEAL::FE_DGP<dim>(3) ok
-DEAL::Checking DGP4 against DGP5 in 1d:
-DEAL::FE_DGP<dim>(4) ok
-DEAL::FE_DGP<dim>(5) ok
-DEAL::Checking DGP5 against DGP4 in 1d:
-DEAL::FE_DGP<dim>(5) ok
-DEAL::FE_DGP<dim>(4) ok
-DEAL::Checking DGP4 against DGP5 in 2d:
-DEAL::FE_DGP<dim>(4) ok
-DEAL::FE_DGP<dim>(5) ok
-DEAL::Checking DGP5 against DGP4 in 2d:
-DEAL::FE_DGP<dim>(5) ok
-DEAL::FE_DGP<dim>(4) ok
-DEAL::Checking DGP4 against DGP5 in 3d:
-DEAL::FE_DGP<dim>(4) ok
-DEAL::FE_DGP<dim>(5) ok
-DEAL::Checking DGP5 against DGP4 in 3d:
-DEAL::FE_DGP<dim>(5) ok
-DEAL::FE_DGP<dim>(4) ok
 DEAL::Checking Nedelec1 against Nedelec1 in 2d:
 DEAL::FE_Nedelec<dim>(1) ok
 DEAL::FE_Nedelec<dim>(1) ok

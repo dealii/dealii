@@ -167,24 +167,6 @@ DEAL::dofs_per_cell=64, n_q_points=64
 DEAL::0 0
 DEAL::0
 DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ1 against DGQ5 in 1d:
-DEAL::Checking DGQ5 against DGQ1 in 1d:
-DEAL::dofs_per_cell=6, n_q_points=6
-DEAL::0 0
-DEAL::0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ1 against DGQ5 in 2d:
-DEAL::Checking DGQ5 against DGQ1 in 2d:
-DEAL::dofs_per_cell=36, n_q_points=36
-DEAL::0 0
-DEAL::0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGQ1 against DGQ5 in 3d:
-DEAL::Checking DGQ5 against DGQ1 in 3d:
-DEAL::dofs_per_cell=216, n_q_points=216
-DEAL::0 0
-DEAL::0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
 DEAL::Checking DGQ2 against DGQ2 in 1d:
 DEAL::Checking DGQ2 against DGQ2 in 1d:
 DEAL::Checking DGQ2 against DGQ2 in 2d:
@@ -209,18 +191,6 @@ DEAL::Checking DGQ3 against DGQ3 in 2d:
 DEAL::Checking DGQ3 against DGQ3 in 2d:
 DEAL::Checking DGQ3 against DGQ3 in 3d:
 DEAL::Checking DGQ3 against DGQ3 in 3d:
-DEAL::Checking DGQ3 against DGQ5 in 1d:
-DEAL::Checking DGQ5 against DGQ3 in 1d:
-DEAL::Checking DGQ3 against DGQ5 in 2d:
-DEAL::Checking DGQ5 against DGQ3 in 2d:
-DEAL::Checking DGQ3 against DGQ5 in 3d:
-DEAL::Checking DGQ5 against DGQ3 in 3d:
-DEAL::Checking DGQ4 against DGQ5 in 1d:
-DEAL::Checking DGQ5 against DGQ4 in 1d:
-DEAL::Checking DGQ4 against DGQ5 in 2d:
-DEAL::Checking DGQ5 against DGQ4 in 2d:
-DEAL::Checking DGQ4 against DGQ5 in 3d:
-DEAL::Checking DGQ5 against DGQ4 in 3d:
 DEAL::Checking DGP0 against DGP0 in 1d:
 DEAL::dofs_per_cell=1, n_q_points=1
 DEAL::0 0
@@ -285,16 +255,6 @@ DEAL::Checking DGP1 against DGP3 in 2d:
 DEAL::Checking DGP3 against DGP1 in 2d:
 DEAL::Checking DGP1 against DGP3 in 3d:
 DEAL::Checking DGP3 against DGP1 in 3d:
-DEAL::Checking DGP1 against DGP5 in 1d:
-DEAL::Checking DGP5 against DGP1 in 1d:
-DEAL::dofs_per_cell=6, n_q_points=6
-DEAL::0 0
-DEAL::0
-DEAL::0 0 0 0 0 0 0 0 0 0 0 0 
-DEAL::Checking DGP1 against DGP5 in 2d:
-DEAL::Checking DGP5 against DGP1 in 2d:
-DEAL::Checking DGP1 against DGP5 in 3d:
-DEAL::Checking DGP5 against DGP1 in 3d:
 DEAL::Checking DGP2 against DGP2 in 1d:
 DEAL::Checking DGP2 against DGP2 in 1d:
 DEAL::Checking DGP2 against DGP2 in 2d:
@@ -319,18 +279,6 @@ DEAL::Checking DGP3 against DGP3 in 2d:
 DEAL::Checking DGP3 against DGP3 in 2d:
 DEAL::Checking DGP3 against DGP3 in 3d:
 DEAL::Checking DGP3 against DGP3 in 3d:
-DEAL::Checking DGP3 against DGP5 in 1d:
-DEAL::Checking DGP5 against DGP3 in 1d:
-DEAL::Checking DGP3 against DGP5 in 2d:
-DEAL::Checking DGP5 against DGP3 in 2d:
-DEAL::Checking DGP3 against DGP5 in 3d:
-DEAL::Checking DGP5 against DGP3 in 3d:
-DEAL::Checking DGP4 against DGP5 in 1d:
-DEAL::Checking DGP5 against DGP4 in 1d:
-DEAL::Checking DGP4 against DGP5 in 2d:
-DEAL::Checking DGP5 against DGP4 in 2d:
-DEAL::Checking DGP4 against DGP5 in 3d:
-DEAL::Checking DGP5 against DGP4 in 3d:
 DEAL::Checking Nedelec1 against Nedelec1 in 2d:
 DEAL::Checking Nedelec1 against Nedelec1 in 2d:
 DEAL::Checking Nedelec1 against Nedelec1 in 3d:

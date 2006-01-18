@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -185,13 +185,10 @@ main()
       CHECK_ALL(DGQ,0,DGQ,4);
       CHECK_ALL(DGQ,1,DGQ,1);
       CHECK_ALL(DGQ,1,DGQ,3);
-      CHECK_ALL(DGQ,1,DGQ,5);
       CHECK_ALL(DGQ,2,DGQ,2);
       CHECK_ALL(DGQ,2,DGQ,2);
       CHECK_ALL(DGQ,2,DGQ,4);
       CHECK_ALL(DGQ,3,DGQ,3);
-      CHECK_ALL(DGQ,3,DGQ,5);
-      CHECK_ALL(DGQ,4,DGQ,5);
 
       CHECK_ALL(DGP,0,DGP,0);
       CHECK_ALL(DGP,0,DGP,1);
@@ -199,13 +196,10 @@ main()
       CHECK_ALL(DGP,0,DGP,4);
       CHECK_ALL(DGP,1,DGP,1);
       CHECK_ALL(DGP,1,DGP,3);
-      CHECK_ALL(DGP,1,DGP,5);
       CHECK_ALL(DGP,2,DGP,2);
       CHECK_ALL(DGP,2,DGP,2);
       CHECK_ALL(DGP,2,DGP,4);
       CHECK_ALL(DGP,3,DGP,3);
-      CHECK_ALL(DGP,3,DGP,5);
-      CHECK_ALL(DGP,4,DGP,5);
       
       CHECK(Nedelec, 1, Nedelec, 1, 2);
       CHECK(Nedelec, 1, Nedelec, 1, 3);

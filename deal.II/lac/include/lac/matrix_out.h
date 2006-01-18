@@ -435,9 +435,9 @@ MatrixOut::build_patches (const Matrix      &matrix,
 	patches[index].vertices[1](0) = j;
 	patches[index].vertices[1](1) = static_cast<signed int>(-i-1);
 	patches[index].vertices[2](0) = j+1;
-	patches[index].vertices[2](1) = static_cast<signed int>(-i-1);
+	patches[index].vertices[2](1) = static_cast<signed int>(-i);
 	patches[index].vertices[3](0) = j+1;
-	patches[index].vertices[3](1) = static_cast<signed int>(-i);
+	patches[index].vertices[3](1) = static_cast<signed int>(-i-1);
 					 // next scale all the patch
 					 // coordinates by the block
 					 // size, to get original
@@ -456,8 +456,8 @@ MatrixOut::build_patches (const Matrix      &matrix,
 	    patches[index].data(0,3) = get_gridpoint_value(matrix, i, j, options);
 	  } else {
 	    patches[index].data(0,0) = get_gridpoint_value(matrix, i,   j,   options);
-	    patches[index].data(0,1) = get_gridpoint_value(matrix, i,   j+1, options);
-	    patches[index].data(0,2) = get_gridpoint_value(matrix, i+1, j,   options);
+	    patches[index].data(0,1) = get_gridpoint_value(matrix, i+1, j,   options);
+	    patches[index].data(0,2) = get_gridpoint_value(matrix, i,   j+1, options);
 	    patches[index].data(0,3) = get_gridpoint_value(matrix, i+1, j+1, options);
 	  }
       };

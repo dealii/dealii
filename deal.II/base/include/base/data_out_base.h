@@ -74,6 +74,13 @@ class ParameterHandler;
  * as actual triangulations and handling of data vectors. These things shall
  * be provided by derived class which have a user callable interface then.
  *
+ * Inside each patch, the data is organized in the usual
+ * lexicographical order, <i>x</i> running fastest, then <i>y</i> and
+ * <i>z</i>. Nodes are stored in this order and cells as well. Each
+ * cell in 3D is stored such that the front face is in the
+ * <i>xz</i>-plane, where the numbering depends on the output format
+ * (see DXStream, GmvStream, TecplotStream, UcdStream, VtkStream).
+ *
  * In order to enhance intellegibility of this concept, the following
  * two sections are kept from a previous version of this documentation.
  *
@@ -173,6 +180,22 @@ class ParameterHandler;
  * more parameters, though, since there the output file has to contain all
  * details of the viewpoint, light source, etc.
  *
+ * <h3>Writing backends</h3>
+ *
+ * An abstraction layer has been introduced to facilitate coding
+ * backends for additional visualization tools. It is applicable for
+ * data formats separating the information into a field of vertices, a
+ * field of connection information for the grid cells and data fields.
+ *
+ * For each of these fields, output functions are implemented, namely
+ * write_nodes(), write_cells() and write_data(). In order to use
+ * these functions, a format specific output stream must be written,
+ * following the examples of DXStream, GmvStream, VtkStream and so on.
+ *
+ * In this framework, the implementation of a new output format is
+ * reduced to writing the section headers and the new output stream
+ * class for writing a single mesh object.
+ *
  * <h3>Credits</h3>
  * <ul>
  *
@@ -186,7 +209,7 @@ class ParameterHandler;
  * </ul>
  *
  * @ingroup output
- * @author Wolfgang Bangerth, Guido Kanschat 1999, 2000, 2001, 2002, 2005.
+ * @author Wolfgang Bangerth, Guido Kanschat 1999, 2000, 2001, 2002, 2005, 2006.
  */
 class DataOutBase 
 {
@@ -194,7 +217,22 @@ class DataOutBase
 				     /**
 				      * Data structure describing a patch of
 				      * data in <tt>dim</tt> space
-				      * dimensions. See the general
+				      * dimensions.
+				      *
+				      * A patch consists of the following data:
+				      * <ul>
+				      * <li>the corner #vertices,
+				      * <li> the number
+				      * #n_subdivisions of the number
+				      * of cells the Patch has in each
+				      * space direction,
+				      * <li> the #data attached to
+				      * each vertex, in the usual
+				      * lexicographic ordering,
+				      * <li> Information on #neighbors.
+				      * </ul>
+				      *
+				      * See the general
 				      * documentation of the
 				      * <tt>DataOutBase</tt> class for more
 				      * information on its contents and
@@ -204,19 +242,10 @@ class DataOutBase
 				      * because the number of (sub)cells
 				      * within each patch is equal to
 				      * <tt>2^dim</tt>.
-				      * @verbatim
-				      *  __ __ __ __
-				      * |  |  |  |  |
-				      * |__|__|__|__| 
-				      * |  |  |  |  |
-				      * |__|__|__|__|
-				      * |  |  |  |  |
-				      * |__|__|__|__| 
-				      * |  |  |  |  |
-				      * |__|__|__|__|
-				      * @endverbatim
+				      *
 				      * @ingroup output
-				      * @author Wolfgang Bangerth
+				      *
+				      * @author Wolfgang Bangerth, Guido Kanschat
 				      */
     template <int dim, int spacedim=dim>
     struct Patch
@@ -279,58 +308,18 @@ class DataOutBase
 					  * data vectors.
 					  *
 					  * Within each column,
-					  * <tt>data(.,j)</tt> are the data
-					  * values at the output point
-					  * <tt>j</tt>, where <tt>j</tt> runs first
-					  * over the last direction,
-					  * then over the second last
-					  * one etc, just as if it was
-					  * organized as an array
-					  * <tt>double[x][y][z]</tt>. This is
-					  * also the order of points
-					  * as provided by the
-					  * <tt>QIterated</tt> class when
-					  * used with the <tt>QTrapez</tt>
-					  * class as subquadrature.
-					  * Note that if
-					  * <tt>subdivisions==1</tt>, the
-					  * elements of <tt>data[i]</tt>
-					  * correspond to vertices
-					  * <tt>(0,1)</tt> in 1d, 
-					  * <tt>(0, 3, 1,2)</tt> in 2d, and 
-					  * <tt>(0, 4, 3, 7, 1, 5, 2, 6)</tt>
-					  * in 3d as following:
-					  * @verbatim
-					  *  
-					  *      7________6
-					  *      /       /|
-					  *     /       / |
-					  *   3/______2/  |   
-					  *   |   |   |   |
-					  |   |   4___|___5
-					  *   |  /    |  /
-					  *   | /     | /
-					  *  0|/______1/
-					  * @endverbatim
-					  * 
-					  * For exemple in 2d: If
-					  * <tt>subdivisions==2</tt> the
-					  * elements of <tt>data[i]</tt> are
-					  * given by the following
-					  * numeration:
-					  *
-					  * @verbatim
-					  *  2 ____5 ____8
-					  *   |     |     |
-					  *   |     |     | 
-					  *   |     |     | 
-					  *  1|____4|____7|
-					  *   |     |     |
-					  *   |     |     | 
-					  *   |     |     | 
-					  *  0|____3|____6|
-					  * @endverbatim
-					  *
+					  * <tt>data(.,j)</tt> are the
+					  * data values at the output
+					  * point <tt>j</tt>, where
+					  * <tt>j</tt> denotes the
+					  * usual lexicographic
+					  * ordering in deal.II. This
+					  * is also the order of
+					  * points as provided by the
+					  * <tt>QIterated</tt> class
+					  * when used with the
+					  * <tt>QTrapez</tt> class as
+					  * subquadrature.					  *
 					  * Since the number of data vectors
 					  * is usually the same for all
 					  * patches to be printed, <tt>data.size()</tt>
@@ -429,20 +418,6 @@ class DataOutBase
 					  * binary format.
 					  */
 	bool data_binary;
-	
-					 /**
-					  * Write binary integer
-					  * values with 64 bit
-					  * accuracy instead of 32.
-					  */
-	bool int_64;
-	
-					 /**
-					  * Write binary coordinate
-					  * vectors as double (64 bit)
-					  * numbers instead of float (32 bit).
-					  */
-	bool coordinates_double;
 	
 					 /**
 					  * Write binary coordinate
@@ -1329,7 +1304,395 @@ class DataOutBase
 					    */
 	  deal_II_intermediate
     };
+    
+				     /**
+				      * Class for writing basic
+				      * entities in OpenDX format,
+				      * depending on the flags.
+				      */
+    class DXStream
+    {
+      public:
+					 /**
+					  * Constructor, storing
+					  * persistent values for
+					  * later use.
+					  */
+	DXStream (std::ostream& stream, DXFlags flags);
+					 /**
+					  * Output operator for points.
+					  */
+	template <int dim>
+	void write(const unsigned int index, const Point<dim>&);
+					 /**
+					  * Write dim-dimensional cell
+					  * with first vertex at
+					  * number start and further
+					  * vertices offset by the
+					  * specified values. Values
+					  * not needed are ignored.
+					  *
+					  * The order of vertices for
+					  * these cells in different
+					  * dimensions is
+					  * <ol>
+					  * <li> [0,1]
+					  * <li> [0,2,1,3]
+					  * <li> [0,4,2,6,1,5,3,7]
+					  * </ol>
+					  */
+	template <int dim>
+	void write_cell(const unsigned int index,
+			const unsigned int start,
+			const unsigned int x_offset,
+			const unsigned int y_offset,
+			const unsigned int z_offset);
 
+					 /**
+					  * Write a complete set of
+					  * data for a single node.
+					  */
+	template<typename data>
+	void write_dataset(unsigned int index,
+			   const std::vector<data>& values);
+	
+					 /**
+					  * Forwarding of output stream
+					  */
+	template <typename T>
+	std::ostream& operator<< (const T&);
+      private:
+					 /**
+					  * The ostream to use. Since
+					  * the life span of these
+					  * objects is small, we use a
+					  * very simple storage
+					  * technique.
+					  */
+	std::ostream& stream;
+					 /**
+					  * The flags controlling the output
+					  */
+	DXFlags flags;
+    };
+    
+				     /**
+				      * Class for writing basic
+				      * entities in GMV format,
+				      * depending on the flags.
+				      */
+    class GmvStream
+    {
+      public:
+					 /**
+					  * Constructor, storing
+					  * persistent values for
+					  * later use.
+					  */
+	GmvStream (std::ostream& stream, GmvFlags flags);
+					 /**
+					  * Output operator for points.
+					  */
+	template <int dim>
+	void write(const unsigned int index, const Point<dim>&);
+					 /**
+					  * Write dim-dimensional cell
+					  * with first vertex at
+					  * number start and further
+					  * vertices offset by the
+					  * specified values. Values
+					  * not needed are ignored.
+					  *
+					  * The order of vertices for
+					  * these cells in different
+					  * dimensions is
+					  * <ol>
+					  * <li> [0,1]
+					  * <li> [0,1,3,2]
+					  * <li> [0,1,3,2,4,5,7,6]
+					  * </ol>
+					  */
+	template <int dim>
+	void write_cell(const unsigned int index,
+			const unsigned int start,
+			const unsigned int x_offset,
+			const unsigned int y_offset,
+			const unsigned int z_offset);
+
+					 /**
+					  * Write a complete set of
+					  * data for a single node.
+					  */
+	template<typename data>
+	void write_dataset(unsigned int index,
+			   const std::vector<data>& values);
+	
+					 /**
+					  * Forwarding of output stream
+					  */
+	template <typename T>
+	std::ostream& operator<< (const T&);
+					 /**
+					  * Since GMV reads the x, y
+					  * and z coordinates in
+					  * separate fields, we enable
+					  * write() to output only a
+					  * single selected component
+					  * at once and do this dim
+					  * times for the whole set of
+					  * nodes. This integer can be
+					  * used to select the
+					  * component written.
+					  */
+	unsigned int selected_component;
+	
+      private:
+					 /**
+					  * The ostream to use. Since
+					  * the life span of these
+					  * objects is small, we use a
+					  * very simple storage
+					  * technique.
+					  */
+	std::ostream& stream;
+					 /**
+					  * The flags controlling the output
+					  */
+	GmvFlags flags;
+    };
+    
+				     /**
+				      * Class for writing basic
+				      * entities in @ref
+				      * SoftwareTecplot format,
+				      * depending on the flags.
+				      */
+    class TecplotStream
+    {
+      public:
+					 /**
+					  * Constructor, storing
+					  * persistent values for
+					  * later use.
+					  */
+	TecplotStream (std::ostream& stream, TecplotFlags flags);
+					 /**
+					  * Output operator for points.
+					  */
+	template <int dim>
+	void write(const unsigned int index, const Point<dim>&);
+					 /**
+					  * Write dim-dimensional cell
+					  * with first vertex at
+					  * number start and further
+					  * vertices offset by the
+					  * specified values. Values
+					  * not needed are ignored.
+					  *
+					  * The order of vertices for
+					  * these cells in different
+					  * dimensions is
+					  * <ol>
+					  * <li> [0,1]
+					  * <li> [0,1,3,2]
+					  * <li> [0,1,3,2,4,5,7,6]
+					  * </ol>
+					  */
+	template <int dim>
+	void write_cell(const unsigned int index,
+			const unsigned int start,
+			const unsigned int x_offset,
+			const unsigned int y_offset,
+			const unsigned int z_offset);
+
+					 /**
+					  * Write a complete set of
+					  * data for a single node.
+					  */
+	template<typename data>
+	void write_dataset(unsigned int index,
+			   const std::vector<data>& values);
+	
+					 /**
+					  * Forwarding of output stream
+					  */
+	template <typename T>
+	std::ostream& operator<< (const T&);
+					 /**
+					  * Since TECPLOT reads the x, y
+					  * and z coordinates in
+					  * separate fields, we enable
+					  * write() to output only a
+					  * single selected component
+					  * at once and do this dim
+					  * times for the whole set of
+					  * nodes. This integer can be
+					  * used to select the
+					  * component written.
+					  */
+	unsigned int selected_component;
+	
+      private:
+					 /**
+					  * The ostream to use. Since
+					  * the life span of these
+					  * objects is small, we use a
+					  * very simple storage
+					  * technique.
+					  */
+	std::ostream& stream;
+					 /**
+					  * The flags controlling the output
+					  */
+	TecplotFlags flags;
+    };
+    
+				     /**
+				      * Class for writing basic
+				      * entities in UCD format,
+				      * depending on the flags.
+				      */
+    class UcdStream
+    {
+      public:
+					 /**
+					  * Constructor, storing
+					  * persistent values for
+					  * later use.
+					  */
+	UcdStream (std::ostream& stream, UcdFlags flags);
+					 /**
+					  * Output operator for points.
+					  */
+	template <int dim>
+	void write(const unsigned int index, const Point<dim>&);
+					 /**
+					  * Write dim-dimensional cell
+					  * with first vertex at
+					  * number start and further
+					  * vertices offset by the
+					  * specified values. Values
+					  * not needed are ignored.
+					  *
+					  * The additional offset 1 is
+					  * added inside this
+					  * function.
+					  *
+					  * The order of vertices for
+					  * these cells in different
+					  * dimensions is
+					  * <ol>
+					  * <li> [0,1]
+					  * <li> [0,1,3,2]
+					  * <li> [0,1,5,4,2,3,7,6]
+					  * </ol>
+					  */
+	template <int dim>
+	void write_cell(const unsigned int index,
+			const unsigned int start,
+			const unsigned int x_offset,
+			const unsigned int y_offset,
+			const unsigned int z_offset);
+	
+					 /**
+					  * Write a complete set of
+					  * data for a single node.
+					  */
+	template<typename data>
+	void write_dataset(unsigned int index,
+			   const std::vector<data>& values);
+	
+					 /**
+					  * Forwarding of output stream
+					  */
+	template <typename T>
+	std::ostream& operator<< (const T&);
+      private:
+					 /**
+					  * The ostream to use. Since
+					  * the life span of these
+					  * objects is small, we use a
+					  * very simple storage
+					  * technique.
+					  */
+	std::ostream& stream;
+					 /**
+					  * The flags controlling the output
+					  */
+	UcdFlags flags;
+    };
+    
+				     /**
+				      * Class for writing basic
+				      * entities in VTK format,
+				      * depending on the flags.
+				      */
+    class VtkStream
+    {
+      public:
+					 /**
+					  * Constructor, storing
+					  * persistent values for
+					  * later use.
+					  */
+	VtkStream (std::ostream& stream, VtkFlags flags);
+					 /**
+					  * Output operator for points.
+					  */
+	template <int dim>
+	void write(const unsigned int index, const Point<dim>&);
+					 /**
+					  * Write dim-dimensional cell
+					  * with first vertex at
+					  * number start and further
+					  * vertices offset by the
+					  * specified values. Values
+					  * not needed are ignored.
+					  *
+					  * The order of vertices for
+					  * these cells in different
+					  * dimensions is
+					  * <ol>
+					  * <li> [0,1]
+					  * <li> []
+					  * <li> []
+					  * </ol>
+					  */
+	template <int dim>
+	void write_cell(const unsigned int index,
+			const unsigned int start,
+			const unsigned int x_offset,
+			const unsigned int y_offset,
+			const unsigned int z_offset);
+	
+					 /**
+					  * Write a complete set of
+					  * data for a single node.
+					  */
+	template<typename data>
+	void write_dataset(unsigned int index,
+			   const std::vector<data>& values);
+	
+					 /**
+					  * Forwarding of output stream
+					  */
+	template <typename T>
+	std::ostream& operator<< (const T&);
+      private:
+					 /**
+					  * The ostream to use. Since
+					  * the life span of these
+					  * objects is small, we use a
+					  * very simple storage
+					  * technique.
+					  */
+	std::ostream& stream;
+					 /**
+					  * The flags controlling the output
+					  */
+	VtkFlags flags;
+    };
+    
 /**
  * Write the given list of patches to the output stream in @ref
  * SoftwareOpenDX format.
@@ -1783,32 +2146,27 @@ class DataOutBase
 				      * Write the coordinates of nodes
 				      * in the desired format.
 				      */
-    template <int dim, int spacedim>
-    static void write_dx_nodes (const std::vector<Patch<dim,spacedim> >& patches,
-				const bool binary,
-				const bool double_precision,
-				std::ostream& out);
+    template <int dim, int spacedim, typename STREAM>
+    static void write_nodes (const std::vector<Patch<dim,spacedim> >& patches,
+			     STREAM& out);
 
 				     /**
 				      * Write the node numbers of a
 				      * cell in the desired format.
 				      */
-    template <int dim, int spacedim>
-    static void write_dx_cells (const std::vector<Patch<dim,spacedim> >& patches,
-				const bool binary,
-				const bool int_64,
-				std::ostream& out);
+    template <int dim, int spacedim, typename STREAM>
+    static void write_cells (const std::vector<Patch<dim,spacedim> >& patches,
+			     STREAM& out);
 
 				     /**
 				      * Write data in the desired
 				      * format.
 				      */
-    template <int dim, int spacedim>
-    static void write_dx_data (const std::vector<Patch<dim,spacedim> >& patches,
-			       const unsigned int n_data_sets,
-			       const bool binary,
-			       const bool double_precision,
-			       std::ostream& out);
+    template <int dim, int spacedim, class STREAM>
+    static void write_data (const std::vector<Patch<dim,spacedim> >& patches,
+			    const unsigned int n_data_sets,
+			    const bool double_precision,
+			    STREAM& out);
 
 				     /**
 				      * Class holding the data of one
@@ -2583,6 +2941,42 @@ std::istream &
 operator >> (std::istream                     &in,
 	     DataOutBase::Patch<dim,spacedim> &patch);
 
+
+
+template <typename T>
+std::ostream&
+DataOutBase::DXStream::operator<< (const T& t)
+{
+  stream << t;
+  return stream;
+}
+
+
+template <typename T>
+std::ostream&
+DataOutBase::GmvStream::operator<< (const T& t)
+{
+  stream << t;
+  return stream;
+}
+
+
+template <typename T>
+std::ostream&
+DataOutBase::UcdStream::operator<< (const T& t)
+{
+  stream << t;
+  return stream;
+}
+
+
+template <typename T>
+std::ostream&
+DataOutBase::VtkStream::operator<< (const T& t)
+{
+  stream << t;
+  return stream;
+}
 
 
 #endif

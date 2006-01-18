@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,7 +29,8 @@
 
 #include <cmath>
 
-
+//TODO: Update documentation
+//TODO: Unify code for dimensions
 
 template <int dim, template <int> class DH>
 void DataOutRotation<dim,DH>::build_some_patches (Data data)
@@ -66,9 +67,9 @@ void DataOutRotation<dim,DH>::build_some_patches (Data data)
   std::vector<Point<dim+1> > angle_directions (n_patches_per_circle+1);
   for (unsigned int i=0; i<=n_patches_per_circle; ++i)
     {
-      angle_directions[i][0] = std::cos(2*deal_II_numbers::PI *
+      angle_directions[i][dim-1] = std::cos(2*deal_II_numbers::PI *
                                         i/n_patches_per_circle);
-      angle_directions[i][1] = std::sin(2*deal_II_numbers::PI *
+      angle_directions[i][dim] = std::sin(2*deal_II_numbers::PI *
                                         i/n_patches_per_circle);
     };
   
@@ -113,8 +114,8 @@ void DataOutRotation<dim,DH>::build_some_patches (Data data)
 		
 		patch->vertices[0] = r1*angle_directions[angle];
 		patch->vertices[1] = r2*angle_directions[angle];
-		patch->vertices[2] = r2*angle_directions[angle+1];
-		patch->vertices[3] = r1*angle_directions[angle+1];
+		patch->vertices[2] = r1*angle_directions[angle+1];
+		patch->vertices[3] = r2*angle_directions[angle+1];
 
 		break;
 	      };
@@ -136,11 +137,11 @@ void DataOutRotation<dim,DH>::build_some_patches (Data data)
 						     // now set the vertices
 						     // of the patch
 		    patch->vertices[vertex] = v(0) * angle_directions[angle];
-		    patch->vertices[vertex][2] = v(1);
+		    patch->vertices[vertex][0] = v(1);
 		    
 		    patch->vertices[vertex+GeometryInfo<dim>::vertices_per_cell]
 		      = v(0) * angle_directions[angle+1];
-		    patch->vertices[vertex+GeometryInfo<dim>::vertices_per_cell][2]
+		    patch->vertices[vertex+GeometryInfo<dim>::vertices_per_cell][0]
 		      = v(1);
 		  };
 		
@@ -166,28 +167,28 @@ void DataOutRotation<dim,DH>::build_some_patches (Data data)
 		    {
                       this->dof_data[dataset]->get_function_values (fe_patch_values,
                                                                     data.patch_values);
-
+		      
 		      switch (dim)
 			{
 			  case 1:
-				for (unsigned int x=0; x<n_points; ++x)
-				  for (unsigned int y=0; y<n_points; ++y)
-				    patch->data(dataset,
-						x*n_points + y)
-					= data.patch_values[x];
-				break;
-				
+			    for (unsigned int x=0; x<n_points; ++x)
+			      for (unsigned int y=0; y<n_points; ++y)
+				patch->data(dataset,
+					    x*n_points + y)
+				  = data.patch_values[x];
+			    break;
+			    
 			  case 2:
-				for (unsigned int x=0; x<n_points; ++x)
-				  for (unsigned int y=0; y<n_points; ++y)
-				    for (unsigned int z=0; z<n_points; ++z)
-				      patch->data(dataset,
-						  x*n_points*n_points +
-						  y*n_points +
-						  z)
-					= data.patch_values[x*n_points+z];
-				break;
-				
+			    for (unsigned int x=0; x<n_points; ++x)
+			      for (unsigned int y=0; y<n_points; ++y)
+				for (unsigned int z=0; z<n_points; ++z)
+				  patch->data(dataset,
+					      x*n_points*n_points +
+					      y +
+					      z*n_points)
+				    = data.patch_values[x*n_points+z];
+			    break;
+			    
 			  default:
 				Assert (false, ExcNotImplemented());
 			};
