@@ -5,16 +5,25 @@
 # deal.II top level directory
 D=..
 
+# get options which hold for all files of the project
+include $D/common/Make.global_options
+
 
 # create lists of file names
 cc-files     = $(shell echo source/*.cc)
-o-files-base = $(addprefix $(LIBDIR)/lac/, $(patsubst source/%,%,$(cc-files:.cc=.$(OBJEXT))))
-o-files      = $(sort $(o-files-base))
-go-files     = $(o-files:.$(OBJEXT)=.g.$(OBJEXT))
+o-files-base = $(sort $(addprefix $(LIBDIR)/lac/, $(patsubst source/%,%,$(cc-files:.cc=.$(OBJEXT)))))
+o-files      = $(o-files-base)
+go-files     = $(o-files-base:.$(OBJEXT)=.g.$(OBJEXT))
 h-files      = $(sort $(shell echo include/lac/*.h))
 
-# get options which hold for all files of the project
-include $D/common/Make.global_options
+# if umfpack was configured, simply link all the umfpack files into liblac.
+# these object files should have been generated before we got to the present
+# directory
+ifeq ($(USE_CONTRIB_UMFPACK),yes)
+  umfpack-files = $(sort $(shell echo $(LIBDIR)/contrib/umfpack/*.$(OBJEXT)))
+  o-files += $(umfpack-files)
+  go-files += $(umfpack-files)
+endif
 
 
 # production rules
@@ -55,12 +64,6 @@ ifneq ($(GXX-VERSION),compaq_cxx)
   ifeq ($(USE_CONTRIB_PETSC),yes)
     deplibs.g += $(lib-contrib-petsc.g)
     deplibs.o += $(lib-contrib-petsc.o)
-  endif
-
-  # and UMFPACK
-  ifeq ($(USE_CONTRIB_UMFPACK),yes)
-    deplibs.g += $(LIBDIR)/liblac_umfpack$(lib-suffix)
-    deplibs.o += $(LIBDIR)/liblac_umfpack$(lib-suffix)
   endif
 
   # for cygwin, also llapack and such are necessary

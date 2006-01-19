@@ -4927,7 +4927,6 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
     grep "UMFPACK v" $1/README
   else
     AC_MSG_CHECKING(UmfPack library)
-    UMFPACK_LIB='$(LIBDIR)/liblac_umfpack$(lib-suffix)'
     UMFPACK_INCLUDE_DIR='-I$D/contrib/umfpack/UMFPACK/Include'
     USE_CONTRIB_UMFPACK='yes'
     AC_MSG_RESULT(using included version)

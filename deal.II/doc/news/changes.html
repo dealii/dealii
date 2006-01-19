@@ -105,6 +105,16 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: Previously, the UMFPACK code was linked into its own
+       library, <code>liblac_umfpack.*</code>. Instead, it is now
+       directly linked into the <code>liblac.*</code> libraries. This
+       makes further linking simpler than before and also simplified
+       the link process.
+       <br>
+       (WB 2006/01/19)
+       </p>
+
+  <li> <p>
        Improved: The order of quadrature points is now x fastest, z slowest, as
        well as the vertices of cells. Also, the nodes and subcells of patches
        in DataOutBase follow the same ordering. Output code could be simplified

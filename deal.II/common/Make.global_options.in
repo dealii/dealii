@@ -89,8 +89,8 @@ EXEEXT     = @EXEEXT@
 lib-base.o     = $(LIBDIR)/libbase$(lib-suffix)
 lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix)
 
-lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix) @UMFPACK_LIB@
-lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix) @UMFPACK_LIB@
+lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix)
+lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix)
 
 ifeq ($(USE_CONTRIB_HSL),yes)
   lib-lac.o += $(LIBDIR)/libhsl$(lib-suffix) 
