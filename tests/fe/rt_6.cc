@@ -2,7 +2,7 @@
 //    rt_6.cc,v 1.1 2003/06/09 15:59:07 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -86,7 +86,7 @@ void check_element (const Triangulation<dim> &tr,
         for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
           Assert (cell->child(c)->active(), ExcInternalError());
 
-                                         // then restrict and prolong
+                                         // then restrict and prolongate
         cell->get_interpolated_dof_values (tmp, v);
         cell->set_dof_values_by_interpolation (v, x);
       };
@@ -116,13 +116,11 @@ void check_element (const Triangulation<dim> &tr,
           << (relative_residual<threshold ? "ok" : "botched up!")
 	  << " (relative residual=" << relative_residual << ")"
           << std::endl;
-  
-  Assert (relative_residual < threshold*x.l2_norm(), ExcInternalError());
 }
 
 
 template <int dim>
-void test () 
+void test ()
 {
                                    // make a coarse triangulation as a
                                    // hypercube. if in more than 1d,
@@ -144,7 +142,8 @@ void test ()
     = 
     {
           new FE_RaviartThomas<dim>(0),
-          new FE_RaviartThomas<dim>(1)
+          new FE_RaviartThomas<dim>(1),
+	  new FE_RaviartThomas<dim>(2)
     };
   
   for (unsigned int i=0; i<sizeof(fe_list)/sizeof(fe_list[0]); ++i)
@@ -168,7 +167,7 @@ main()
   deallog.threshold_double(1.e-10);
   
   test<2>();
-  
+  test<3>();
   return 0;
 }
 
