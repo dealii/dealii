@@ -349,7 +349,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
 						   // subcell are NOT
 						   // transformed, so we
 						   // have to do it here.
-		  restriction[child](face*this->dofs_per_face+i_face,
+		  this->restriction[child](face*this->dofs_per_face+i_face,
 				     i_child)
 		    += std::pow(.5, dim-1.) * q_sub.weight(k)
 		    * cached_values(i_child, k)
@@ -398,7 +398,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
 	  for (unsigned int d=0;d<dim;++d)
 	    for (unsigned int i_weight=0;i_weight<polynomials[d]->n();++i_weight)
 	      {
-		restriction[child](start_cell_dofs+i_weight*dim+d,
+		this->restriction[child](start_cell_dofs+i_weight*dim+d,
 				   i_child)
 		  += q_sub.weight(k)
 		  * cached_values(i_child, k, d)
