@@ -54,6 +54,8 @@ void check_all(std::ostream& log)
 {
 #if SEPARATE_FILES == 0
   std::ostream& out = log;
+#else
+  (void)log;
 #endif
   
   char name[100];
