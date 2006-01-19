@@ -300,56 +300,66 @@ FE_RaviartThomas<dim>::initialize_restriction()
 				   // First, compute interpolation on
 				   // subfaces
   for (unsigned int face=0;face<GeometryInfo<dim>::faces_per_cell;++face)
-    for (unsigned int sub=0;sub<GeometryInfo<dim>::subfaces_per_face;++sub)
-      {
-					 // The shape functions of the
-					 // child cell are evaluated
-					 // in the quadrature points
-					 // of a full face.
-	Quadrature<dim> q_face
-	  = QProjector<dim>::project_to_face(q_base, face);
-					 // The weight fuctions for
-					 // the coarse face are
-					 // evaluated on the subface
-					 // only.
- 	Quadrature<dim> q_sub
- 	  = QProjector<dim>::project_to_subface(q_base, face, sub);
-	const unsigned int child
-	  = GeometryInfo<dim>::child_cell_on_face(face, sub);
-	
-					 // On a certain face, we must
-					 // compute the moments of ALL
-					 // fine level functions with
-					 // the coarse level weight
-					 // functions belonging to
-					 // that face. Due to the
-					 // orthogonalization process
-					 // when building the shape
-					 // functions, these weights
-					 // are equal to the
-					 // corresponding shpe
-					 // functions.
-	for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
-	  for (unsigned int i_face = 0; i_face < this->dofs_per_face; ++i_face)
-	    {
-	      double s = 0.;
-					       // The quadrature
-					       // weights on the
-					       // subcell are NOT
-					       // transformed, so we
-					       // have to do it here.
-	      for (unsigned int k=0;k<n_face_points;++k)
-		s += std::pow(.5, dim-1.) * q_sub.weight(k)
-		     * this->shape_value_component(i_child, q_face.point(k),
-						   GeometryInfo<dim>::unit_normal_direction[face])
-		     * this->shape_value_component(face*this->dofs_per_face+i_face,
-						   q_sub.point(k),
-						   GeometryInfo<dim>::unit_normal_direction[face]);
-	      this->restriction[child](face*this->dofs_per_face+i_face,
-				 i_child) = s;
-	    }
-      }
+    {
+				       // The shape functions of the
+				       // child cell are evaluated
+				       // in the quadrature points
+				       // of a full face.
+      Quadrature<dim> q_face
+	= QProjector<dim>::project_to_face(q_base, face);
+				       // Store shape values, since the
+				       // evaluation suffers if not
+				       // ordered by point
+      Table<2,double> cached_values(this->dofs_per_cell, q_face.n_quadrature_points);
+      for (unsigned int k=0;k<q_face.n_quadrature_points;++k)
+	for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+	  cached_values(i,k)
+	    = this->shape_value_component(i, q_face.point(k),
+					  GeometryInfo<dim>::unit_normal_direction[face]);
 
+      for (unsigned int sub=0;sub<GeometryInfo<dim>::subfaces_per_face;++sub)
+	{
+					   // The weight fuctions for
+					   // the coarse face are
+					   // evaluated on the subface
+					   // only.
+	  Quadrature<dim> q_sub
+	    = QProjector<dim>::project_to_subface(q_base, face, sub);
+	  const unsigned int child
+	    = GeometryInfo<dim>::child_cell_on_face(face, sub);
+	  
+					   // On a certain face, we must
+					   // compute the moments of ALL
+					   // fine level functions with
+					   // the coarse level weight
+					   // functions belonging to
+					   // that face. Due to the
+					   // orthogonalization process
+					   // when building the shape
+					   // functions, these weights
+					   // are equal to the
+					   // corresponding shpe
+					   // functions.
+	  for (unsigned int k=0;k<n_face_points;++k)
+	    for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
+	      for (unsigned int i_face = 0; i_face < this->dofs_per_face; ++i_face)
+		{
+						   // The quadrature
+						   // weights on the
+						   // subcell are NOT
+						   // transformed, so we
+						   // have to do it here.
+		  restriction[child](face*this->dofs_per_face+i_face,
+				     i_child)
+		    += std::pow(.5, dim-1.) * q_sub.weight(k)
+		    * cached_values(i_child, k)
+		    * this->shape_value_component(face*this->dofs_per_face+i_face,
+						  q_sub.point(k),
+						  GeometryInfo<dim>::unit_normal_direction[face]);
+		}
+	}
+    }
+  
   if (rt_order==0) return;
   
 				   // Create Legendre basis for the
@@ -369,23 +379,31 @@ FE_RaviartThomas<dim>::initialize_restriction()
   QGauss<dim> q_cell(rt_order+1);
   const unsigned int start_cell_dofs
     = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
+
+				   // Store shape values, since the
+				   // evaluation suffers if not
+				   // ordered by point
+  Table<3,double> cached_values(this->dofs_per_cell, q_cell.n_quadrature_points, dim);
+  for (unsigned int k=0;k<q_cell.n_quadrature_points;++k)
+    for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+      for (unsigned int d=0;d<dim;++d)
+	cached_values(i,k,d) = this->shape_value_component(i, q_cell.point(k), d);
   
   for (unsigned int child=0;child<GeometryInfo<dim>::children_per_cell;++child)
     {
       Quadrature<dim> q_sub = QProjector<dim>::project_to_child(q_cell, child);
       
-      for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
-	for (unsigned int d=0;d<dim;++d)
-	  for (unsigned int i_weight=0;i_weight<polynomials[d]->n();++i_weight)
-	    {
-	      double s = 0.;
-	      for (unsigned int k=0;k<q_sub.n_quadrature_points;++k)
-		s += q_sub.weight(k)
-		     * this->shape_value_component(i_child, q_cell.point(k), d)
-		     * polynomials[d]->compute_value(i_weight, q_sub.point(k));
-	      this->restriction[child](start_cell_dofs+i_weight*dim+d,
-				 i_child) = s;
-	    }
+      for (unsigned int k=0;k<q_sub.n_quadrature_points;++k)
+	for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
+	  for (unsigned int d=0;d<dim;++d)
+	    for (unsigned int i_weight=0;i_weight<polynomials[d]->n();++i_weight)
+	      {
+		restriction[child](start_cell_dofs+i_weight*dim+d,
+				   i_child)
+		  += q_sub.weight(k)
+		  * cached_values(i_child, k, d)
+		  * polynomials[d]->compute_value(i_weight, q_sub.point(k));
+	      }
     }
   
   for (unsigned int d=0;d<dim;++d)
