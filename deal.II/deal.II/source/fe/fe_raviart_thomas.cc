@@ -276,7 +276,7 @@ void
 FE_RaviartThomas<dim>::initialize_restriction()
 {
   for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
-    restriction[i].reinit(0,0);
+    this->restriction[i].reinit(0,0);
 }
 
 #else
@@ -345,7 +345,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
 		     * this->shape_value_component(face*this->dofs_per_face+i_face,
 						   q_sub.point(k),
 						   GeometryInfo<dim>::unit_normal_direction[face]);
-	      restriction[child](face*this->dofs_per_face+i_face,
+	      this->restriction[child](face*this->dofs_per_face+i_face,
 				 i_child) = s;
 	    }
       }
@@ -383,7 +383,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
 		s += q_sub.weight(k)
 		     * this->shape_value_component(i_child, q_cell.point(k), d)
 		     * polynomials[d]->compute_value(i_weight, q_sub.point(k));
-	      restriction[child](start_cell_dofs+i_weight*dim+d,
+	      this->restriction[child](start_cell_dofs+i_weight*dim+d,
 				 i_child) = s;
 	    }
     }
