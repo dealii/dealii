@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -184,16 +184,6 @@ class FE_RaviartThomas
     get_dpo_vector (const unsigned int degree);
 
 				     /**
-				      * Compute the vector used for
-				      * the
-				      * @p restriction_is_additive
-				      * field passed to the base
-				      * class's constructor.
-				      */
-    static std::vector<bool>
-    get_ria_vector (const unsigned int degree);
-
-				     /**
 				      * Initialize the @p
 				      * generalized_support_points
 				      * field of the FiniteElement
@@ -205,6 +195,19 @@ class FE_RaviartThomas
 				      */
     void initialize_support_points (const unsigned int rt_degree);
 
+				     /**
+				      * Initialize the interpolation
+				      * from functions on refined mesh
+				      * cells onto the father
+				      * cell. According to the
+				      * philosophy of the
+				      * Raviart-Thomas element, this
+				      * restriction operator preserves
+				      * the divergence of a function
+				      * weakly.
+				      */
+    void initialize_restriction ();
+    
 				     /**
 				      * Given a set of flags indicating
 				      * what quantities are requested

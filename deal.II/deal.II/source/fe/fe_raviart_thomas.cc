@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,11 +41,9 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
 		  deg,
 		  FiniteElementData<dim>(get_dpo_vector(deg),
 					 dim, deg+1, FiniteElementData<dim>::Hdiv),
-		  get_ria_vector (deg),
-		  std::vector<std::vector<bool> >(
-		    FiniteElementData<dim>(get_dpo_vector(deg),
-					   dim,deg+1).dofs_per_cell,
-		    std::vector<bool>(dim,true))),
+		  std::vector<bool>(PolynomialsRaviartThomas<dim>::compute_n_pols(deg), true),
+		  std::vector<std::vector<bool> >(PolynomialsRaviartThomas<dim>::compute_n_pols(deg),
+						  std::vector<bool>(dim,true))),
 		rt_order(deg)
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
@@ -73,10 +71,11 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     {
       this->prolongation[i].reinit (n_dofs, n_dofs);
-      this->restriction[i].reinit (0, 0);
+      this->restriction[i].reinit (n_dofs, n_dofs);
     }
   
   FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
+  initialize_restriction();
   
   std::vector<FullMatrix<double> >
     face_embeddings(1<<(dim-1), FullMatrix<double>(this->dofs_per_face,
@@ -272,6 +271,131 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 
 #if deal_II_dimension == 1
 
+template <int dim>
+void
+FE_RaviartThomas<dim>::initialize_restriction()
+{
+  for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+    restriction[i].reinit(0,0);
+}
+
+#else
+
+// This function is the same Raviart-Thomas interpolation performed by
+// interpolate. Still, we cannot use interpolate, since it was written
+// for smooth functions. Thefunctions interpolated here are not
+// smooth, maybe even not continuous. Therefore, we must double the
+// number of quadrature points in each direction in order to integrate
+// only smooth functions.
+
+// Then again, the interpolated function is chosen such that the
+// moments coincide with the function to be interpolated.
+
+template <int dim>
+void
+FE_RaviartThomas<dim>::initialize_restriction()
+{
+  QGauss<dim-1> q_base (rt_order+1);
+  const unsigned int n_face_points = q_base.n_quadrature_points;
+				   // First, compute interpolation on
+				   // subfaces
+  for (unsigned int face=0;face<GeometryInfo<dim>::faces_per_cell;++face)
+    for (unsigned int sub=0;sub<GeometryInfo<dim>::subfaces_per_face;++sub)
+      {
+					 // The shape functions of the
+					 // child cell are evaluated
+					 // in the quadrature points
+					 // of a full face.
+	Quadrature<dim> q_face
+	  = QProjector<dim>::project_to_face(q_base, face);
+					 // The weight fuctions for
+					 // the coarse face are
+					 // evaluated on the subface
+					 // only.
+ 	Quadrature<dim> q_sub
+ 	  = QProjector<dim>::project_to_subface(q_base, face, sub);
+	const unsigned int child
+	  = GeometryInfo<dim>::child_cell_on_face(face, sub);
+	
+					 // On a certain face, we must
+					 // compute the moments of ALL
+					 // fine level functions with
+					 // the coarse level weight
+					 // functions belonging to
+					 // that face. Due to the
+					 // orthogonalization process
+					 // when building the shape
+					 // functions, these weights
+					 // are equal to the
+					 // corresponding shpe
+					 // functions.
+	for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
+	  for (unsigned int i_face = 0; i_face < this->dofs_per_face; ++i_face)
+	    {
+	      double s = 0.;
+					       // The quadrature
+					       // weights on the
+					       // subcell are NOT
+					       // transformed, so we
+					       // have to do it here.
+	      for (unsigned int k=0;k<n_face_points;++k)
+		s += std::pow(.5, dim-1.) * q_sub.weight(k)
+		     * this->shape_value_component(i_child, q_face.point(k),
+						   GeometryInfo<dim>::unit_normal_direction[face])
+		     * this->shape_value_component(face*this->dofs_per_face+i_face,
+						   q_sub.point(k),
+						   GeometryInfo<dim>::unit_normal_direction[face]);
+	      restriction[child](face*this->dofs_per_face+i_face,
+				 i_child) = s;
+	    }
+      }
+
+  if (rt_order==0) return;
+  
+				   // Create Legendre basis for the
+				   // space D_xi Q_k. Here, we cannot
+				   // use the shape functions
+  std::vector<AnisotropicPolynomials<dim>* > polynomials(dim);
+  for (unsigned int dd=0;dd<dim;++dd)
+    {
+      std::vector<std::vector<Polynomials::Polynomial<double> > > poly(dim);
+      for (unsigned int d=0;d<dim;++d)
+	poly[d] = Polynomials::Legendre::generate_complete_basis(rt_order);
+      poly[dd] = Polynomials::Legendre::generate_complete_basis(rt_order-1);
+
+      polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
+    }
+  
+  QGauss<dim> q_cell(rt_order+1);
+  const unsigned int start_cell_dofs
+    = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
+  
+  for (unsigned int child=0;child<GeometryInfo<dim>::children_per_cell;++child)
+    {
+      Quadrature<dim> q_sub = QProjector<dim>::project_to_child(q_cell, child);
+      
+      for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
+	for (unsigned int d=0;d<dim;++d)
+	  for (unsigned int i_weight=0;i_weight<polynomials[d]->n();++i_weight)
+	    {
+	      double s = 0.;
+	      for (unsigned int k=0;k<q_sub.n_quadrature_points;++k)
+		s += q_sub.weight(k)
+		     * this->shape_value_component(i_child, q_cell.point(k), d)
+		     * polynomials[d]->compute_value(i_weight, q_sub.point(k));
+	      restriction[child](start_cell_dofs+i_weight*dim+d,
+				 i_child) = s;
+	    }
+    }
+  
+  for (unsigned int d=0;d<dim;++d)
+    delete polynomials[d];
+}
+
+#endif
+
+#if deal_II_dimension == 1
+
 template <>
 std::vector<unsigned int>
 FE_RaviartThomas<1>::get_dpo_vector (const unsigned int)
@@ -305,59 +429,6 @@ FE_RaviartThomas<dim>::get_dpo_vector (const unsigned int rt_order)
   dpo[dim]   = interior_dofs;
   
   return dpo;
-}
-
-
-
-#if deal_II_dimension == 1
-
-template <>
-std::vector<bool>
-FE_RaviartThomas<1>::get_ria_vector (const unsigned int)
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return std::vector<bool>();
-}
-
-#endif
-
-
-template <int dim>
-std::vector<bool>
-FE_RaviartThomas<dim>::get_ria_vector (const unsigned int rt_order)
-{
-  unsigned int dofs_per_cell, dofs_per_face;
-  switch (dim)
-    {
-      case 2:
-	    dofs_per_face = rt_order+1;
-	    dofs_per_cell = 2*(rt_order+1)*(rt_order+2);
-	    break;
-      case 3:
-	    dofs_per_face = (rt_order+1)*(rt_order+1);
-	    dofs_per_cell = 3*(rt_order+1)*(rt_order+1)*(rt_order+2);
-	    break;
-      default:
-	    Assert (false, ExcNotImplemented());
-    }
-  Assert (FiniteElementData<dim>(get_dpo_vector(rt_order),dim).dofs_per_cell ==
-	  dofs_per_cell,
-	  ExcInternalError());
-  Assert (FiniteElementData<dim>(get_dpo_vector(rt_order),dim).dofs_per_face ==
-	  dofs_per_face,
-	  ExcInternalError());
-  
-				   // all face dofs need to be
-				   // non-additive, since they have
-				   // continuity requirements.
-				   // however, the interior dofs are
-				   // made additive
-  std::vector<bool> ret_val(dofs_per_cell,false);
-  for (unsigned int i=GeometryInfo<dim>::faces_per_cell*dofs_per_face;
-       i < dofs_per_cell; ++i)
-    ret_val[i] = true;
-
-  return ret_val;
 }
 
 
