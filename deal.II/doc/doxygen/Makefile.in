@@ -46,8 +46,8 @@ validate-xrefs:
 # we have so many files that we can't just do "rm deal.II/*" because that
 # leads to overlong command lines. gotta split it up
 clean:
-	for i in {base,lac,deal.II}/* ; do rm $$i ; done
-	rm *.tag
+	-for i in deal.II/* ; do rm $$i ; done
+	-rm *.tag
 
 .PHONY: html private deal.II \
 	validate-xrefs clean
