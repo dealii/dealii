@@ -74,13 +74,13 @@
    aclocal.m4 in the top-level directory. */
 #undef DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG
 
-/* Flag indicating whether the library shall be compiled to use the Tecplot
-   interface */
-#undef DEAL_II_HAVE_TECPLOT
-
 /* Flag indicating whether the library shall be compiled to use the NetCDF
    interface */
 #undef DEAL_II_HAVE_NETCDF
+
+/* Flag indicating whether the library shall be compiled to use the Tecplot
+   interface */
+#undef DEAL_II_HAVE_TECPLOT
 
 /* Defined if the compiler refuses to compile the definition of a function
    that was previously declared abstract. */
@@ -202,6 +202,11 @@
 /* Defined if a PETSc installation was found and is going to be used */
 #undef DEAL_II_USE_PETSC
 
+/* This error appears in the Apple edition of the gcc 3.3, which ships with
+   Darwin7.9.0 and probably previous version. It leads to problems during
+   linking. For the details, look at aclocal.m4 in the top-level directory. */
+#undef DEAL_II_WEAK_LINKAGE_BUG
+
 /* Define if the compiler provides __builtin_expect */
 #undef HAVE_BUILTIN_EXPECT
 
@@ -230,6 +235,9 @@
 
 /* Define to 1 if you have the `umfpack' library (-lumfpack). */
 #undef HAVE_LIBUMFPACK
+
+/* Define to 1 if you have the `z' library (-lz). */
+#undef HAVE_LIBZ
 
 /* Define if you have the rand_r function */
 #undef HAVE_RAND_R
