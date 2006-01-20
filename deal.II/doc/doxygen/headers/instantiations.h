@@ -50,7 +50,7 @@
  * double</code>.
  * 
  *
- * @section Inst2 Some instantiations
+ * @section Inst2 A few instantiations, most of which are known
  *
  * These are class templates usually having a small number of instantiations,
  * but additional instantiations may be necessary. Therefore, a set of
@@ -99,7 +99,7 @@
  @endverbatim
  *
  *
- * @section Inst3 Many instantiations
+ * @section Inst3 Many unknown instantiations
  *
  * These are the classes, where no reasonable predetermined set of instances
  * exists. Therefore, all member definitions are included in the header file
