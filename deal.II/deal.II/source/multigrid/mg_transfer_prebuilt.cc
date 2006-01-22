@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -50,21 +50,14 @@ void MGTransferPrebuilt<number>::build_matrices (
 				   // deleting the object it points to
 				   // by itself
   prolongation_matrices.resize (0);
-#ifndef DEAL_PREFER_MATRIX_EZ
   prolongation_sparsities.resize (0);
-#endif
-
+  
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
-#ifndef DEAL_PREFER_MATRIX_EZ
       prolongation_sparsities
 	.push_back (boost::shared_ptr<SparsityPattern> (new SparsityPattern));
       prolongation_matrices
 	.push_back (boost::shared_ptr<SparseMatrix<double> > (new SparseMatrix<double>));
-#else
-      prolongation_matrices
-	.push_back (boost::shared_ptr<SparseMatrix<double> > (new SparseMatrixEZ<double>));
-#endif
     }
   
 				   // two fields which will store the
@@ -87,11 +80,6 @@ void MGTransferPrebuilt<number>::build_matrices (
 				       // necessary. this, of course, is the
 				       // number of degrees of freedom per
 				       // cell
-#ifdef DEAL_PREFER_MATRIX_EZ      
-      prolongation_matrices[level]->reinit (sizes[level+1],
-					    sizes[level],
-					    dofs_per_cell);
-#else
 				       // increment dofs_per_cell
 				       // since a useless diagonal
 				       // element will be stored
@@ -133,7 +121,6 @@ void MGTransferPrebuilt<number>::build_matrices (
       prolongation_sparsities[level]->compress ();
 
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
-#endif
 
 				       // now actually build the matrices
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);

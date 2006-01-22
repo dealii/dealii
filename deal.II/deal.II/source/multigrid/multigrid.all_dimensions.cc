@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -208,6 +208,20 @@ void MGTransferBlock<number>::restrict_and_add (
 
 
 
+//TODO:[GK] Add all those little vectors.
+unsigned int
+MGTransferBlockBase::memory_consumption () const
+{
+  unsigned int result = sizeof(*this);
+  result += sizeof(unsigned int) * sizes.size();
+  for (unsigned int i=0;i<prolongation_matrices.size();++i)
+    result += prolongation_matrices[i]->memory_consumption()
+	      + prolongation_sparsities[i]->memory_consumption();
+  return result;
+}
+
+
+//----------------------------------------------------------------------//
 
 template <typename number>
 MGTransferSelect<number>::~MGTransferSelect () 

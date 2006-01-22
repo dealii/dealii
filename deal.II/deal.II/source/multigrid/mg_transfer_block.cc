@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -145,21 +145,14 @@ void MGTransferBlockBase::build_matrices (
 				   // deleting the object it points to
 				   // by itself
   prolongation_matrices.resize (0);
-#ifndef DEAL_PREFER_MATRIX_EZ
   prolongation_sparsities.resize (0);
-#endif
 
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
-#ifndef DEAL_PREFER_MATRIX_EZ
       prolongation_sparsities
 	.push_back (boost::shared_ptr<BlockSparsityPattern> (new BlockSparsityPattern));
       prolongation_matrices
 	.push_back (boost::shared_ptr<BlockSparseMatrix<double> > (new BlockSparseMatrix<double>));
-#else
-      prolongation_matrices
-	.push_back (boost::shared_ptr<BlockSparseMatrix<double> > (new BlockSparseMatrixEZ<double>));
-#endif
     }
 
 				   // two fields which will store the
@@ -185,26 +178,6 @@ void MGTransferBlockBase::build_matrices (
 				       // is necessary. this, is the
 				       // number of degrees of freedom
 				       // per cell
-#ifdef DEAL_PREFER_MATRIX_EZ
-//TODO:[GK] Optimize here: 
-// this allocates too much memory, since the cell matrices contain
-// many zeroes. If SparseMatrixEZ::reinit can handle a vector of
-// row-lengths, this should be used here to specify the length of
-// every single row.
-
-      prolongation_matrices[level]->reinit (n_components, n_components);
-      for (unsigned int i=0;i<n_components;++i)
-	for (unsigned int j=0;j<n_components;++j)
-	  if (i==j)
-	    prolongation_matrices[level]->block(i,j)
-	      .reinit(sizes[level+1][i],
-		      sizes[level][j], dofs_per_cell, 0);
-	  else
-	    prolongation_matrices[level]->block(i,j)
-	      .reinit(sizes[level+1][i],
-		      sizes[level][j], 0);
-      prolongation_matrices[level]->collect_sizes();
-#else
       prolongation_sparsities[level]->reinit (n_components, n_components);
       for (unsigned int i=0; i<n_components; ++i)
 	for (unsigned int j=0; j<n_components; ++j)
@@ -258,7 +231,6 @@ void MGTransferBlockBase::build_matrices (
       prolongation_sparsities[level]->compress ();
 
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
-#endif
 				       // now actually build the matrices
       for (typename MGDoFHandler<dim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
@@ -289,46 +261,11 @@ void MGTransferBlockBase::build_matrices (
 			  prolongation_matrices[level]->set(dof_indices_child[i],
 							    dof_indices_parent[j],
 							    prolongation(i,j));
-		      };
-	      };
-	  };
-    };
-#if defined(DEAL_PREFER_MATRIX_EZ) && 1 == 0
-  deallog.push("Transfer");
-  for (unsigned int level=0;level<n_levels-1; ++level)
-    for (unsigned int i=0;i<n_components;++i)
-      for (unsigned int j=0;j<n_components;++j)
-	{
-	  deallog << "level " << level
-		  << " block " << i << ' ' << j << std::endl;
-	  
-	  prolongation_matrices[level]->block(i,j).print_statistics(deallog,true);
-	}
-  deallog.pop();
-#endif  
+		      }
+	      }
+	  }
+    }
 }
-
-
-//TODO[GK]: the following function needs to be in mg_transfer_base.all_dimensions.cc
-//TODO:[GK] Add all those little vectors.
-unsigned int
-MGTransferBlockBase::memory_consumption () const
-{
-  unsigned int result = sizeof(*this);
-  result += sizeof(unsigned int) * sizes.size();
-#ifdef DEAL_PREFER_MATRIX_EZ
-  std::vector<boost::shared_ptr<SparseMatrixEZ<double> > >::const_iterator m;
-  const std::vector<boost::shared_ptr<SparseMatrixEZ<double> > >::const_iterator end = prolongation_matrices.end();
-  for (m = prolongation_matrices.begin(); m != end ; ++m)
-    result += *m->memory_consumption();
-#else
-  for (unsigned int i=0;i<prolongation_matrices.size();++i)
-    result += prolongation_matrices[i]->memory_consumption()
-	      + prolongation_sparsities[i]->memory_consumption();
-#endif
-  return result;
-}
-
 
 
 template <typename number>
