@@ -36,7 +36,9 @@
  * allocation of vectors and provides functions that are specific to the
  * underlying vector type.
  *
- * @ref Instantiations : some (<tt>@<float@> @<double@></tt>)
+ * @note Instantiations for this template are provided for <tt>@<float@> and
+ * @<double@></tt>; others can be generated in application programs (see the
+ * section on @ref Instantiations in the manual).
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */

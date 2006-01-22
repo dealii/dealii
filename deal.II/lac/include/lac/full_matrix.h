@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,7 +46,9 @@ template<typename number> class Vector;
  * vector argument to functions. If there is no argument with a number
  * type, the matrix number type is used.
  *
- * @ref Instantiations : some (<tt>@<float@> @<double@></tt>)
+ * @note Instantiations for this template are provided for <tt>@<float@> and
+ * @<double@></tt>; others can be generated in application programs (see the
+ * section on @ref Instantiations in the manual).
  *
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth, 1993-2004
  */

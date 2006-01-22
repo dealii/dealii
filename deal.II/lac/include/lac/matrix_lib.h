@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -347,13 +347,14 @@ class MeanValueFilter : public Subscriptor
  * vmult_add() and Tvmult_add() start the iteration with a zero
  * vector.
  *
- * @ref Instantiations : some (Vector<float>, Vector<double>, BlockVector<float>, BlockVector<double>)
+ * @note Instantiations for this template are provided for <tt>@<float@> and
+ * @<double@></tt>; others can be generated in application programs (see the
+ * section on @ref Instantiations in the manual).
+ * 
  * @author Guido Kanschat, 2005
  */
 template<class VECTOR>
-class InverseMatrixRichardson
-  :
-  public Subscriptor
+class InverseMatrixRichardson : public Subscriptor
 {
   public:
 				     /**

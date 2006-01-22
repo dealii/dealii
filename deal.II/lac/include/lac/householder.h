@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,7 +38,9 @@ template<typename number> class Vector;
  * compute the vector <i>x</i> minimizing <i>||Ax-b||</i> for a given
  * vector <i>b</i>.
  *
- * @ref Instantiations : some (<tt>@<float@> @<double@></tt>)
+ * @note Instantiations for this template are provided for <tt>@<float@> and
+ * @<double@></tt>; others can be generated in application programs (see the
+ * section on @ref Instantiations in the manual).
  *
  * @author Guido Kanschat, 2005
  */

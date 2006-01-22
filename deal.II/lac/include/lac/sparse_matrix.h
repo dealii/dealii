@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -446,9 +446,11 @@ namespace internals
  * importantly one can associate more than one matrix with the same
  * sparsity pattern.
  *
- * @ref Instantiations some
- 
- * @author several, 1994-2004
+ * @note Instantiations for this template are provided for <tt>@<float@> and
+ * @<double@></tt>; others can be generated in application programs (see the
+ * section on @ref Instantiations in the manual).
+ *
+ * @author Essentially everyone who has ever worked on deal.II, 1994-2004
  */
 template <typename number>
 class SparseMatrix : public virtual Subscriptor

@@ -296,7 +296,11 @@ class ConstraintMatrix;
  * if access to an object describing the exact form of the boundary is needed, the
  * pointer stored within the triangulation object is accessed.
  *
- * @ref Instantiations : some (Vector<float>, Vector<double>, BlockVector<float>, BlockVector<double>, see also individual functions)
+ * @note Instantiations for this template are provided for some vector types,
+ * in particular <code>Vector&lt;float&gt;, Vector&lt;double&gt;,
+ * BlockVector&lt;float&gt;, BlockVector&lt;double&gt;</code>; others can be
+ * generated in application code (see the section on @ref Instantiations in
+ * the manual).
  *
  * @ingroup numerics
  * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, 1998, 1999, 2000, 2001
@@ -440,14 +444,13 @@ class VectorTools
 				      * make the result continuous
 				      * again.
 				      *
-				      * @ref Instantiations : some (the
-				      * standard vector types
-				      * mentioned in the class
-				      * documentation are
-				      * instantiated, but only the
-				      * same vector for InVector and
-				      * OutVector. Other combinations
-				      * must be instantiated by hand.)
+				      * @note Instantiations for this template
+				      * are provided for some vector types
+				      * (see the general documentation of the
+				      * class), but only the same vector for
+				      * InVector and OutVector. Other
+				      * combinations must be instantiated by
+				      * hand.
 				      */
     template <int dim, class InVector, class OutVector>
     static void interpolate (const DoFHandler<dim>    &dof_1,
@@ -886,11 +889,13 @@ class VectorTools
 				      * See the general documentation of this
 				      * class for more information.
 				      *
-				      * @ref Instantiations : some
-				      * (InVectors as in the
-				      * documentation of the class,
-				      * OutVector only Vector<double>
-				      * and Vector<float>)
+				      * @note Instantiations for this template
+				      * are provided for some vector types
+				      * (see the general documentation of the
+				      * class), but only for InVectors as in
+				      * the documentation of the class,
+				      * OutVector only Vector<double> and
+				      * Vector<float>.
 				      */
     template <int dim, class InVector, class OutVector>
     static void integrate_difference (const Mapping<dim>    &mapping,

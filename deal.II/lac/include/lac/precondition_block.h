@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -406,7 +406,10 @@ class PreconditionBlock : public virtual Subscriptor
  * Block Jacobi preconditioning.
  * See PreconditionBlock for requirements on the matrix.
  *
- * @ref Instantiations : some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
+ * @note Instantiations for this template are provided for <tt>@<float@> and
+ * @<double@></tt>; others can be generated in application programs (see the
+ * section on @ref Instantiations in the manual).
+ * 
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -690,7 +693,11 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
  * arbitrarily.
  *
  * See PreconditionBlock for requirements on the matrix.
- * @ref Instantiations : some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
+ * 
+ * @note Instantiations for this template are provided for <tt>@<float@> and
+ * @<double@></tt>; others can be generated in application programs (see the
+ * section on @ref Instantiations in the manual).
+ * 
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000, 2001, 2002, 2003
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
@@ -846,7 +853,11 @@ class PreconditionBlockSOR : public virtual Subscriptor,
  * class requires storage of the diagonal blocks and their inverses.
  *
  * See PreconditionBlock for requirements on the matrix.
- * @ref Instantiations : some (SparseMatrix<double>, SparseMatrix<float>, <tt>double</tt>, <tt>float</tt>)
+ * 
+ * @note Instantiations for this template are provided for <tt>@<float@> and
+ * @<double@></tt>; others can be generated in application programs (see the
+ * section on @ref Instantiations in the manual).
+ * 
  * @author Ralf Hartmann, Guido Kanschat, 1999, 2000
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>

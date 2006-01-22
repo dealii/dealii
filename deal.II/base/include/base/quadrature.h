@@ -73,7 +73,8 @@
  * necessary to provide a class Point@<0@> to make the compiler
  * happy. This class also does nothing.
  *
- * @ref Instantiations few
+ * @note Instantiations for this template are provided for dimensions 1, 2,
+ * and 3 (see the section on @ref Instantiations in the manual).
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2005
  */

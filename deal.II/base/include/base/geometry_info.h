@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -191,8 +191,11 @@ struct GeometryInfo<0>
  * This template specifies the interface to all topological structure
  * of the mesh cells.
  *
+ * @note Instantiations for this template are provided for dimensions 1,2,3,4,
+ * and there is a specialization for dim=0 (see the section on @ref
+ * Instantiations in the manual).
+ *
  * @ingroup grid geomprimitives
- * @ref Instantiations few (dim = 1,2,3,4 and a specialization for dim=0)
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005
  */
 template <int dim>

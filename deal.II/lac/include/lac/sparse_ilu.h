@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -51,7 +51,10 @@
  * Refer to SparseLUDecomposition documentation for suggested
  * usage and state management.
  *
- * @ref Instantiations : some (float, double)
+ * @note Instantiations for this template are provided for <tt>@<float@> and
+ * @<double@></tt>; others can be generated in application programs (see the
+ * section on @ref Instantiations in the manual).
+ * 
  * @author Wolfgang Bangerth, 1999, based on a similar implementation
  * by Malte Braack; unified interface: Ralf Hartmann
  */

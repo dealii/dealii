@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -274,7 +274,10 @@ namespace internal
  * you attempt anyway, you will likely get a number of compiler
  * errors.
  *
- * @ref Instantiations : some (<tt>@<float@> @<double@></tt>).
+ * @note Instantiations for this template are provided for <tt>@<float@> and
+ * @<double@></tt>; others can be generated in application programs (see the
+ * section on @ref Instantiations in the manual).
+ *
  * @author Wolfgang Bangerth, 2000, 2004
  */
 template <typename MatrixType>
