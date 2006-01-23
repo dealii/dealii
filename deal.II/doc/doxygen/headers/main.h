@@ -36,7 +36,17 @@
  *   prisms.
  *   
  *   <li> Triangulation:
- *   <li> Finite Element:
+ *
+ *   <li> Finite Element: Finite element classes describe the
+ *   properties of a finite element space as defined on the unit
+ *   cell. This includes, for example, how many degrees of freedom are
+ *   located at vertices, on lines, or in the interior of cells. In
+ *   addition to this, finite element classes of course have to
+ *   provide values and gradients of individual shape functions at
+ *   points on the unit cell.
+ *
+ *   The finite element classes are described in the @ref feall module.
+ *
  *   <li> Quadrature
  *   <li> DoFHandler:
  *   <li> Mapping:
