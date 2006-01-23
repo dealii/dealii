@@ -326,6 +326,16 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: The <code class="class">MGDoFHandler</code>::<code
+       class="member">distribute_dofs</code> and <code
+       class="member">renumber</code> functions could not handle
+       coarsened grids (unused vertices, faces and cells). This is now
+       fixed.
+       <br> 
+       (RH 2006/1/23)
+       </p>
+
+  <li> <p>
        New: The <code>Mapping</code> class and derived classes now have
        functions <code>clone()</code> that return a new object of the same
        (derived) type.
