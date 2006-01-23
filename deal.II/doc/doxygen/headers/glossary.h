@@ -13,6 +13,40 @@
  * <dd>Mesh cells not refined any further in the hierarchy.</dd>
  *
  *
+ * <dt>@anchor GlossFaceOrientation <b>Face orientation</b></dt>
+ * <dd>In a triangulation, the normal vector to a face
+ * can be deduced from the face orientation by
+ * applying the right hand side rule (x,y -> normal).  We note, that
+ * in the standard orientation of faces in 2d, faces 0 and 2 have
+ * normals that point into the cell, and faces 1 and 3 have normals
+ * pointing outward. In 3d, faces 0, 2, and 4
+ * have normals that point into the cell, while the normals of faces
+ * 1, 3, and 5 point outward. This information, again, can be queried from
+ * GeometryInfo<dim>::unit_normal_orientation.
+ *
+ * However, it turns out that a significant number of 3d meshes cannot
+ * satisfy this convention. This is due to the fact that the face
+ * convention for one cell already implies something for the
+ * neighbor, since they share a common face and fixing it for the
+ * first cell also fixes the normal vectors of the opposite faces of
+ * both cells. It is easy to construct cases of loops of cells for
+ * which this leads to cases where we cannot find orientations for
+ * all faces that are consistent with this convention.
+ *
+ * For this reason, above convention is only what we call the
+ * <em>standard orientation</em>. deal.II actually allows faces in 3d
+ * to have either the standard direction, or its opposite, in which
+ * case the lines that make up a cell would have reverted orders, and
+ * the normal vector would have the opposite direction. You can ask a
+ * cell whether a given face has standard orientation by calling
+ * <tt>cell->face_orientation(face_no)</tt>: if the result is @p true,
+ * then the face has standard orientation, otherwise its normal vector
+ * is pointing the other direction. There are not very many places in
+ * application programs where you need this information actually, but
+ * a few places in the library make use of this. Note that in 2d, the
+ * result is always @p true.
+ *
+ *
  * <dt>@anchor GlossGeneralizedSupport <b>Generalized support points</b></dt>
  * <dd>While @ref GlossSupport "support points" allow very simple interpolation
  * into the finite element space, their concept is restricted to
