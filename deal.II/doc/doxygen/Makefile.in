@@ -20,6 +20,10 @@ private:
 # generate documentation. write the output to a file so as not to hide the
 # important message to impatient observers that this process can take quite
 # a while
+#
+# also copy the collaboration.png file into this directory. although
+# the documentation says that doxygen does that by itself, some
+# versions seem to forget about it
 deal.tag: deal.dox \
 	  $D/base/include/*/*.h \
 	  $D/lac/include/*/*.h \
@@ -28,6 +32,7 @@ deal.tag: deal.dox \
 	@echo "=== Generating reference documentation. " \
               "This can take several minutes..."
 	@DOXYGEN@ deal.dox > doxygen.log
+	@cp collaboration.png deal.II
 
 deal.II: deal.tag
 
@@ -48,6 +53,7 @@ validate-xrefs:
 clean:
 	-for i in deal.II/* ; do rm $$i ; done
 	-rm *.tag
+	-rm -f deal.II/collaboration.png
 
 .PHONY: html private deal.II \
 	validate-xrefs clean
