@@ -1422,7 +1422,9 @@ namespace internal
  *   otherwise its normal vector is pointing the other
  *   direction. There are not very many places in application programs
  *   where you need this information actually, but a few places in the
- *   library make use of this.
+ *   library make use of this. Note that in 2d, the
+ *   result is always @p true.
+ *
  *
  *   <h4>Children</h4>
  *
