@@ -1395,9 +1395,12 @@ namespace internal
  *
  *   The face normals can be deduced from the face orientation by
  *   applying the right hand side rule (x,y -> normal).  We note, that
- *   in the standard orientation of faces in 3d, faces 0, 2, and 4
+ *   in the standard orientation of faces in 2d, faces 0 and 2 have
+ *   normals that point into the cell, and faces 1 and 3 have normals
+ *   pointing outward. In 3d, faces 0, 2, and 4
  *   have normals that point into the cell, while the normals of faces
- *   1, 3, and 5 point outward.
+ *   1, 3, and 5 point outward. This information, again, can be queried from
+ *   GeometryInfo<dim>::unit_normal_orientation.
  *
  *   However, it turns out that a significant number of meshes cannot
  *   satisfy this convention. This is due to the fact that the face
