@@ -205,7 +205,7 @@ class QProjector
 				      * extends over a fraction of the
 				      * cell, the weights of the
 				      * resulting object are divided by
-				      * GeometryInfo@<dim@>::children_per_cell.
+				      * GeometryInfo<dim>::children_per_cell.
 				      */
     static
     Quadrature<dim>
@@ -224,6 +224,7 @@ class QProjector
     project_to_line(const Quadrature<1>& quadrature,
 		    const Point<dim>& p1,
 		    const Point<dim>& p2);
+
                                      /**
                                       * Since the
                                       * project_to_all_faces() and
