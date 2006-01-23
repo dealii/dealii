@@ -1402,7 +1402,7 @@ namespace internal
  *   1, 3, and 5 point outward. This information, again, can be queried from
  *   GeometryInfo<dim>::unit_normal_orientation.
  *
- *   However, it turns out that a significant number of meshes cannot
+ *   However, it turns out that a significant number of 3d meshes cannot
  *   satisfy this convention. This is due to the fact that the face
  *   convention for one cell already implies something for the
  *   neighbor, since they share a common face and fixing it for the
