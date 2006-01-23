@@ -1128,9 +1128,6 @@ namespace internal
  *   apply some smoothing for multigrid algorithms, but this has to be decided
  *   upon later.
  *
- *   N4/ face lines in 3d are ordered, such that the induced 2d local
- *   coordinate system (x,y) implies (right hand rule) a normal in
- *   face normal direction, see N2/
  *
  *   <h4>Implementation conventions for two spatial dimensions</h4>
  *   
@@ -1153,6 +1150,10 @@ namespace internal
  *   point 0 towards point 1 and is always in one of the coordinate
  *   directions
  * 
+ *   N4/ face lines in 3d are ordered, such that the induced 2d local
+ *   coordinate system (x,y) implies (right hand rule) a normal in
+ *   face normal direction, see N2/.
+ *
  *   The resulting numbering of vertices and faces (lines) in 2d as
  *   well as the directions of lines is shown in the following.
  *   @verbatim
