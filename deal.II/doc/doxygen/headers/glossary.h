@@ -1,12 +1,19 @@
 /**
  * @page DEALGlossary Glossary
  *
+ * This glossary explains a few terms that are frequently used in the
+ * documentation of classes of deal.II. The glossary often only gives
+ * a microscopic view of a particular concept; if you struggle with
+ * the bigger picture, it may therefore also be worth to consult the
+ * global overview of classes on the main/@ref index page.
+ *
  * <dl>
  *
- * <dt>@anchor GlossActive Active cells</dt>
+ * <dt>@anchor GlossActive <b>Active cells</b></dt>
  * <dd>Mesh cells not refined any further in the hierarchy.</dd>
  *
- * <dt>@anchor GlossGeneralizedSupport Generalized support points</dt>
+ *
+ * <dt>@anchor GlossGeneralizedSupport <b>Generalized support points</b></dt>
  * <dd>While @ref GlossSupport "support points" allow very simple interpolation
  * into the finite element space, their concept is restricted to
  * @ref GlossLagrange "Lagrange elements". For other elements, more general
@@ -24,7 +31,8 @@
  * and support points coincide.
  * </dd>
  *
- * <dt>@anchor GlossInterpolation Interpolation with finite elements</dt>
+ *
+ * <dt>@anchor GlossInterpolation <b>Interpolation with finite elements</b></dt>
  * <dd>The purpose of interpolation with finite elements is computing
  * a vector of coefficients representing a finite element function,
  * such that the @ref GlossNodes "node values" of the original
@@ -34,11 +42,13 @@
  * <i>f</i> and store the result as entry <i>i</i> in the coefficient
  * vector.
  *
- * <dt>@anchor GlossLagrange Lagrange elements</dt>
+ *
+ * <dt>@anchor GlossLagrange <b>Lagrange elements</b></dt>
  * <dd>Finite elements based on Lagrangian interpolation at
  * @ref GlossSupport "support points".</dd>
  *
- * <dt>@anchor GlossNodes Node values or node functionals</dt>
+ *
+ * <dt>@anchor GlossNodes <b>Node values or node functionals</b></dt>
  *
  * <dd>It is customary to define a FiniteElement as a pair consisting
  * of a local function space and a set of node values $N_i$ on the
@@ -75,14 +85,17 @@
  * <td>Gauss points on edges(faces) and anisotropic Gauss points in the interior</td></tr>
  * </table>
  *
- * <dt>@anchor GlossReferenceCell Reference cell</dt>
+ *
+ * <dt>@anchor GlossReferenceCell <b>Reference cell</b></dt>
  * <dd>The hypercube [0,1]<sup>dim</sup>, on which all parametric finite
  * element shape functions are defined.</dd>
  *
- * <dt>@anchor GlossShape Shape functions</dt> <dd>The restriction of
+ *
+ * <dt>@anchor GlossShape <b>Shape functions</b></dt> <dd>The restriction of
  * the finite element basis functions to a single grid cell.</dd>
  *
- * <dt>@anchor GlossSupport Support points</dt> <dd>Support points are
+ *
+ * <dt>@anchor GlossSupport <b>Support points</b></dt> <dd>Support points are
  * by definition those points $p_i$, such that for the shape functions
  * $v_j$ holds $v_j(p_i) = \delta_{ij}$. Therefore, a finite element
  * interpolation can be defined uniquely by the values in the support
@@ -102,16 +115,19 @@
  * @ref GlossGeneralizedSupport "generalized support points".
  * </dd>
  *
- * <dt>@anchor GlossTargetComponent Target component</dt> <dd>When
+ *
+ * <dt>@anchor GlossTargetComponent <b>Target component</b></dt> <dd>When
  * vectors and matrices are grouped into blocks by component, it is
  * often desirable to collect several of the original components into
  * a single one. This could be for instance, grouping the velocities
  * of a Stokes system into a single block.</dd>
- * 
- * <dt>@anchor GlossUnitCell Unit cell</dt>
+ *
+ *
+ * <dt>@anchor GlossUnitCell <b>Unit cell</b></dt>
  * <dd>See @ref GlossReferenceCell "Reference cell".</dd>
  *
- * <dt>@anchor GlossUnitSupport Unit support points</dt>
+ *
+ * <dt>@anchor GlossUnitSupport <b>Unit support points</b></dt>
  * <dd>@ref GlossSupport "Support points" on the reference cell, defined in
  * FiniteElementBase. For example, the usual Q1 element in 1d has support
  * points  at <tt>x=0</tt> and <tt>x=1</tt> (and similarly, in higher
