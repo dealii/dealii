@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,19 +56,14 @@ Multigrid<VECTOR>::Multigrid (const unsigned int minlevel,
 
 
 
-//TODO: This function cannot work. At least maxlevel should be tested!
 template <class VECTOR>
 void
 Multigrid<VECTOR>::reinit(const unsigned int min_level,
 			  const unsigned int max_level)
 {
-  Assert(false, ExcNotImplemented());
-  
   minlevel=min_level;
   maxlevel=max_level;
   defect.resize(minlevel, maxlevel);
-  solution.resize(minlevel, maxlevel);
-  t.resize(minlevel, maxlevel);
 }
 
 
