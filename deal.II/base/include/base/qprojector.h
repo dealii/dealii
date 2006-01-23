@@ -54,14 +54,17 @@
  *  For the 3d case, you should note that the orientation of faces is
  *  even more intricate than for two dimensions. Quadrature formulae
  *  are projected upon the faces in their standard orientation, not to
- *  the inside or outside of the hexahedron. Refer to the
- *  documentation of the <tt>Triangulation</tt> class for a description of
- *  the orientation of the different faces. To make things more
+ *  the inside or outside of the hexahedron. To make things more
  *  complicated, in 3d we allow faces in two orientations (which can
- *  be identified using <tt>cell->face_orientation(face)</tt>), so we have
- *  to project quadrature formula onto faces and subfaces in two
- *  orientations. The DataSetDescriptor member class is used to
- *  identify where each dataset starts.
+ *  be identified using <tt>cell->face_orientation(face)</tt>), so we
+ *  have to project quadrature formula onto faces and subfaces in two
+ *  orientations. (Refer to the documentation of the Triangulation
+ *  class for a description of the orientation of the different faces,
+ *  as well as to
+ *  @ref GlossFaceOrientation "the glossary entry on face orientation"
+ *  for more information on this.) The
+ *  DataSetDescriptor member class is used to identify where each
+ *  dataset starts.
  *
  *  @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2003, 2005
  */

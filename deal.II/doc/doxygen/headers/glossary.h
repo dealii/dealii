@@ -46,6 +46,10 @@
  * a few places in the library make use of this. Note that in 2d, the
  * result is always @p true.
  *
+ * The only places in the library where face orientations play a
+ * significant role are in the Triangulation and its accessors, and in
+ * the QProjector class and its users.
+ *
  *
  * <dt>@anchor GlossGeneralizedSupport <b>Generalized support points</b></dt>
  * <dd>While @ref GlossSupport "support points" allow very simple interpolation
