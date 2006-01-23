@@ -1592,9 +1592,12 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i) 
     {
-      Assert (*i != DoFHandler<1>::invalid_dof_index, ExcInternalError());
-      *i = new_numbers[*i];
-    };
+      if (*i != DoFHandler<1>::invalid_dof_index)
+	{
+	  Assert(*i<new_numbers.size(), ExcInternalError());
+	  *i = new_numbers[*i];
+	}
+    }
 }
 
 #endif
@@ -1622,16 +1625,22 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i)
     {
-      Assert (*i != DoFHandler<2>::invalid_dof_index, ExcInternalError());
-      *i = new_numbers[*i];
-    };
+      if (*i != DoFHandler<2>::invalid_dof_index)
+	{
+	  Assert(*i<new_numbers.size(), ExcInternalError());
+	  *i = new_numbers[*i];
+	}
+    }
 
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->quad_dofs.begin();
        i!=mg_levels[level]->quad_dofs.end(); ++i)
     {
-      Assert (*i != DoFHandler<2>::invalid_dof_index, ExcInternalError());
-      *i = new_numbers[*i];
-    };
+      if (*i != DoFHandler<2>::invalid_dof_index)
+	{
+	  Assert(*i<new_numbers.size(), ExcInternalError());
+	  *i = new_numbers[*i];
+	}
+    }
 }
 
 #endif
@@ -1659,23 +1668,32 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->line_dofs.begin();
        i!=mg_levels[level]->line_dofs.end(); ++i)
     {
-      Assert (*i != DoFHandler<3>::invalid_dof_index, ExcInternalError());
-      *i = new_numbers[*i];
-    };
+      if (*i != DoFHandler<3>::invalid_dof_index)
+	{
+	  Assert(*i<new_numbers.size(), ExcInternalError());
+	  *i = new_numbers[*i];
+	}
+    }
 
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->quad_dofs.begin();
        i!=mg_levels[level]->quad_dofs.end(); ++i)
     {
-      Assert (*i != DoFHandler<3>::invalid_dof_index, ExcInternalError());
-      *i = new_numbers[*i];
-    };
+      if (*i != DoFHandler<3>::invalid_dof_index)
+	{
+	  Assert(*i<new_numbers.size(), ExcInternalError());
+	  *i = new_numbers[*i];
+	}
+    }
 
   for (std::vector<unsigned int>::iterator i=mg_levels[level]->hex_dofs.begin();
        i!=mg_levels[level]->hex_dofs.end(); ++i)
     {
-      Assert (*i != DoFHandler<3>::invalid_dof_index, ExcInternalError());
-      *i = new_numbers[*i];
-    };
+      if (*i != DoFHandler<3>::invalid_dof_index)
+	{
+	  Assert(*i<new_numbers.size(), ExcInternalError());
+	  *i = new_numbers[*i];
+	}
+    }
 }
 
 #endif
@@ -1740,15 +1758,23 @@ void MGDoFHandler<1>::reserve_space () {
 
 				   // now allocate the needed space
   for (unsigned int vertex=0; vertex<this->tria->vertices.size(); ++vertex)
-    {
-//TODO:[WB,GK] These conditions are violated on unused vertices
-      Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
-      Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
-
-      mg_vertex_dofs[vertex].init (min_level[vertex],
-				   max_level[vertex],
-				   this->selected_fe->dofs_per_vertex);
-    };
+    if (this->tria->vertices_used[vertex])
+      {
+	Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
+	Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
+	
+	mg_vertex_dofs[vertex].init (min_level[vertex],
+				     max_level[vertex],
+				     this->get_fe().dofs_per_vertex);
+      }
+    else
+      {
+	Assert (min_level[vertex] == this->tria->n_levels(),   ExcInternalError());
+	Assert (max_level[vertex] == 0, ExcInternalError());
+	
+					 // reset to original state
+	mg_vertex_dofs[vertex].init (1, 0, 0);
+      }
 }
 
 #endif
@@ -1910,15 +1936,23 @@ void MGDoFHandler<3>::reserve_space () {
 
 				   // now allocate the needed space
   for (unsigned int vertex=0; vertex<this->tria->vertices.size(); ++vertex)
-    {
-//TODO:[WB,GK] These conditions are violated on unused vertices
-      Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
-      Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
-
-      mg_vertex_dofs[vertex].init (min_level[vertex],
-				   max_level[vertex],
-				   this->selected_fe->dofs_per_vertex);
-    };
+    if (this->tria->vertices_used[vertex])
+      {
+	Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
+	Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
+	
+	mg_vertex_dofs[vertex].init (min_level[vertex],
+				     max_level[vertex],
+				     this->get_fe().dofs_per_vertex);
+      }
+    else
+      {
+	Assert (min_level[vertex] == this->tria->n_levels(),   ExcInternalError());
+	Assert (max_level[vertex] == 0, ExcInternalError());
+	
+					 // reset to original state
+	mg_vertex_dofs[vertex].init (1, 0, 0);
+      }
 }
 
 #endif
