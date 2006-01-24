@@ -84,6 +84,20 @@ class GeometryInfoBase
 				      * positive or negative
 				      * coordinate direction,
 				      * respectively.
+				      *
+				      * Note that this is only the
+				      * <em>standard orientation</em>
+				      * of faces. At least in 3d,
+				      * actual faces of cells in a
+				      * triangulation can also have
+				      * the opposite orientation,
+				      * depending on a flag that one
+				      * can query from the cell it
+				      * belongs to. For more
+				      * information, see the
+				      * @ref GlossFaceOrientation "glossary"
+				      * entry on
+				      * face orientation.
 				      */
     static const int unit_normal_orientation[faces_per_cell_max_dim];
 
