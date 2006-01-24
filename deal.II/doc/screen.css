@@ -35,6 +35,7 @@ frameset {
 }
 
 a:hover { text-decoration: underline; }
+A.bold { font-weight: bold;}
 
 
 img {
