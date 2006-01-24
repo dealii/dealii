@@ -29,9 +29,6 @@ namespace hp
 }
 
 
-/*!@addtogroup febase */
-/*@{*/
-
 /**
  * Base class for finite elements in arbitrary dimensions. This class
  * provides several fields which describe a specific finite element
@@ -2145,7 +2142,7 @@ class FiniteElement : public Subscriptor,
     friend class hp::FECollection<dim>;
 };
 
-/*@}*/
+
 //----------------------------------------------------------------------//
 
 template <int dim>  
