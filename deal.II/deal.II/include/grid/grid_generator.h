@@ -286,7 +286,7 @@ class GridGenerator
 				      *
 				      * If the flag colorize is set,
 				      * the outer cells get material
-				      * id's according tho the
+				      * id's according to the
 				      * following scheme: extending
 				      * over the inner cube in
 				      * (+/-) x-direction: 1/2. In y-direction

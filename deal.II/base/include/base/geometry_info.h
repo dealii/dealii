@@ -205,6 +205,10 @@ struct GeometryInfo<0>
  * This template specifies the interface to all topological structure
  * of the mesh cells.
  *
+ * The information of this class is used extensively in the geometric
+ * description of Triangulation objects, as well as in various other
+ * parts of the code.
+ *
  * @note Instantiations for this template are provided for dimensions 1,2,3,4,
  * and there is a specialization for dim=0 (see the section on @ref
  * Instantiations in the manual).
