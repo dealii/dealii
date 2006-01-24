@@ -1898,30 +1898,6 @@ class FiniteElement : public Subscriptor,
     std::vector<unsigned int>
     compute_n_nonzero_components (const std::vector<std::vector<bool> > &nonzero_components);
     
-				     /**
-				      * Allow the FESystem class to access the
-				      * restriction and prolongation matrices
-				      * directly. Hence, FESystem has the
-				      * possibility to see if these matrices
-				      * are initialized without accessing
-				      * these matrices through the
-				      * @p get_restriction_matrix and
-				      * @p get_prolongation_matrix
-				      * functions. This is important as these
-				      * functions include assertions that
-				      * throw if the matrices are not already
-				      * initialized.
-				      */
-    template <int dim_> friend class FESystem;
-
-                                     /**
-                                      * Make the inner class a
-                                      * friend. This is not strictly
-                                      * necessary, but the Intel
-                                      * compiler seems to want this.
-                                      */
-    friend class InternalDataBase;
-    
 
 				     /**
 				      * Exception
@@ -2131,6 +2107,30 @@ class FiniteElement : public Subscriptor,
 			    FEValuesData<dim>                    &data) const = 0;
 
 				     /**
+				      * Allow the FESystem class to access the
+				      * restriction and prolongation matrices
+				      * directly. Hence, FESystem has the
+				      * possibility to see if these matrices
+				      * are initialized without accessing
+				      * these matrices through the
+				      * @p get_restriction_matrix and
+				      * @p get_prolongation_matrix
+				      * functions. This is important as these
+				      * functions include assertions that
+				      * throw if the matrices are not already
+				      * initialized.
+				      */
+    template <int dim_> friend class FESystem;
+
+                                     /**
+                                      * Make the inner class a
+                                      * friend. This is not strictly
+                                      * necessary, but the Intel
+                                      * compiler seems to want this.
+                                      */
+    friend class InternalDataBase;
+    
+				     /**
 				      * Declare some other classes as
 				      * friends of this class.
 				      */
@@ -2138,7 +2138,6 @@ class FiniteElement : public Subscriptor,
     friend class FEValues<dim>;
     friend class FEFaceValues<dim>;
     friend class FESubfaceValues<dim>;
-    friend class FESystem<dim>;
     friend class hp::FECollection<dim>;
 };
 
