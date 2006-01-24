@@ -317,7 +317,7 @@ void second_grid ()
 
 
 
-				 // @sect3{Creating the second mesh}
+				 // @sect3{The main function}
 
                                  // Finally, the main function. There
                                  // isn't much to do here, only to
