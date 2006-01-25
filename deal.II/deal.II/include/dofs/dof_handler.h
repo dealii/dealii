@@ -287,7 +287,7 @@ class DoFHandler  :  public Subscriptor
 				      * the boundary can couple with.
 				      *
 				      * The number is the same as for
-				      * @p max_coupling_between_dofs in one
+				      * max_couplings_between_dofs() in one
 				      * dimension less.
 				      */
     unsigned int max_couplings_between_boundary_dofs () const;
