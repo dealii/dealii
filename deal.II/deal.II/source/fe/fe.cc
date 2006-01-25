@@ -183,7 +183,7 @@ FiniteElement<dim>::FiniteElement (
 				   // only one (vector-)component; if
 				   // the element is not primitive,
 				   // leave these tables empty.
-  if (!cached_primitivity)
+  if (cached_primitivity)
     {
       system_to_component_table.resize(this->dofs_per_cell);
       face_system_to_component_table.resize(this->dofs_per_face);
