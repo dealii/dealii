@@ -263,13 +263,8 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * documentation directory.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, 1998; Guido Kanschat, 1999
- * 
- * (Internal: inheritance is necessary for the general template due to
- * a compiler error.)
- *
- * @ingroup dofs 
  * @ingroup Accessors 
+ * @author Wolfgang Bangerth, 1998; Guido Kanschat, 1999
  */
 template<int celldim, int dim, template <int> class DH>
 class DoFObjectAccessor : public DoFAccessor<dim, DH>,
