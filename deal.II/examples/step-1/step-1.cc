@@ -256,8 +256,8 @@ void second_grid ()
               {
                 cell->set_refine_flag ();
                 break;
-              };
-          };
+              }
+          }
 
                                        // Now that we have marked all
                                        // the cells that we want
@@ -271,7 +271,7 @@ void second_grid ()
                                        // function does coarsening and
                                        // refinement all at once:
       triangulation.execute_coarsening_and_refinement ();
-    };
+    }
   
   
                                    // Finally, after these five
