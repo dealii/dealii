@@ -1062,6 +1062,8 @@ class DoFHandler  :  public Subscriptor
 
 /* -------------- declaration of explicit specializations ------------- */
 
+#ifndef DOXYGEN
+
 template <> unsigned int DoFHandler<1>::n_boundary_dofs () const;
 template <> unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
 template <> unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &) const;
@@ -1210,6 +1212,8 @@ DoFHandler<dim>::get_tria () const
   return *tria;
 }
 
+
+#endif // DOXYGEN
 
 /*----------------------------   dof_handler.h     ---------------------------*/
 
