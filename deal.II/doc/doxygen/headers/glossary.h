@@ -23,7 +23,7 @@
  * @ref GlossComponent. Since the introduction of non-@ref GlossPrimitive
  * "primitive" elements, they became different. Take for instance the
  * solution of the mixed Laplacian system with
- * FE_RaviartThomas. There, the first <tt>dim</dim> components are the
+ * FE_RaviartThomas. There, the first <tt>dim</tt> components are the
  * directional derivatives. Since the shape functions are linear
  * combinations of those, they constitute only a single block. The
  * primal function <i>u</i> would be in the second block, but in the
@@ -37,7 +37,7 @@
  * <tt>dim</tt> components are the derivatives in each coordinate
  * direction and the last component is the primal function <i>u</i>.
  *
- * Originally, components were not distinguished from @ref GlossBlocks
+ * Originally, components were not distinguished from @ref GlossBlock
  * "blocks", but since the introduction of non-@ref GlossPrimitive
  * "primitive" elements, they have to be distinguished. See
  * FiniteElementData::n_components() and the documentation of
