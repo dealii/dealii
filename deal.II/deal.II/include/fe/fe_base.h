@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,9 +30,6 @@
 
 template<int dim> class FESystem;
 
-/*!@addtogroup febase */
-/*@{*/
-
 /**
  * Dimension independent data for finite elements. See the derived
  * class FiniteElement class for information on its use. All
@@ -45,6 +42,7 @@ template<int dim> class FESystem;
  * version, FiniteElementData and FiniteElement should be private
  * base classes of FiniteElement.
  *
+ * @ingroup febase
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2001, 2003, 2005
  */
 template <int dim>
@@ -255,7 +253,19 @@ class FiniteElementData
 				      * base element.
 				      */
     const unsigned int components;
-
+				     /**
+				      * The number of vector blocks a
+				      * BlockVector for this element
+				      * should contain. For primitive
+				      * elements, this is equal to
+				      * #components, but for vector
+				      * valued base elements it may
+				      * differ. Actually, in systems
+				      * this is the sum of the base
+				      * element multiplicities.
+				      */
+    const unsigned int blocks;
+    
 				     /**
 				      * Maximal polynomial degree of a
 				      * shape function in a single
@@ -300,11 +310,14 @@ class FiniteElementData
 				      * @param conformity The finite
 				      * element space has continuity
 				      * of this Sobolev space.
+				      * @param n_blocks Number of
+				      * vector blocks.
 				      */
     FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
 		       const unsigned int n_components,
-		       const unsigned int degree = deal_II_numbers::invalid_unsigned_int,
-		       const Conformity conformity = unknown);
+		       const unsigned int degree,
+		       const Conformity conformity = unknown,
+		       const unsigned int n_blocks = deal_II_numbers::invalid_unsigned_int);
 
 				     /**
 				      * Number of dofs per vertex.
@@ -353,6 +366,11 @@ class FiniteElementData
 				      */
     unsigned int n_components () const;
 
+    				     /**
+				      * Number of blocks.
+				      */
+    unsigned int n_blocks () const;
+
 				     /**
 				      * Maximal polynomial degree of a
 				      * shape function in a single
@@ -382,15 +400,6 @@ class FiniteElementData
 				      */
     bool operator == (const FiniteElementData &) const;
 };
-
-
-
-
-/**
- *
- * @author Wolfgang Bangerth, 1998, 2002; Ralf Hartmann, Guido Kanschat, 2001
- */
-/*@}*/
 
 
 // --------- inline and template functions ---------------
@@ -455,6 +464,16 @@ unsigned int
 FiniteElementData<dim>::n_components () const
 {
   return components;
+}
+
+
+
+template <int dim>
+inline
+unsigned int 
+FiniteElementData<dim>::n_blocks () const
+{
+  return blocks;
 }
 
 

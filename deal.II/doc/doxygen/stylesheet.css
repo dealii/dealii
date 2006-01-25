@@ -306,3 +306,8 @@ INPUT.search { font-size: 75%;
 }
 TD.tiny      { font-size: 75%;
 }
+
+dt.glossary {
+              font-size: large;
+              font-weight: bold;
+}

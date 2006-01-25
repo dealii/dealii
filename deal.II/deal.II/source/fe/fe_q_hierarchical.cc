@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -755,7 +755,7 @@ std::vector<unsigned int>
 FE_Q_Hierarchical<dim>::
 face_fe_q_hierarchical_to_hierarchic_numbering (const unsigned int degree)
 {
-  FiniteElementData<dim-1> fe_data(FE_Q_Hierarchical<dim-1>::get_dpo_vector(degree),1);
+  FiniteElementData<dim-1> fe_data(FE_Q_Hierarchical<dim-1>::get_dpo_vector(degree),1,degree);
   return invert_numbering(FE_Q_Hierarchical<dim-1>::
 			  hierarchic_to_fe_q_hierarchical_numbering (fe_data));
 }

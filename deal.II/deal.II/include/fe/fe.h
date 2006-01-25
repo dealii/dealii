@@ -59,6 +59,28 @@ namespace hp
  * under consideration here is hanging nodes constraints and grid
  * transfer, respectively.
  *
+ * <h3>Components and blocks</h3>
+ *
+ * For vector valued elements shape functions may have nonzero entries
+ * in one or several @ref GlossComponent "components" of the vector
+ * valued function. If the element is @ref GlossPrimitive "primitive",
+ * there is indeed a single component with a nonzero entry for each
+ * shape function. This component can be determined by
+ * system_to_component_index(), the number of components is
+ * FiniteElementData::n_components().
+ *
+ * Furthermore, you may want to split your linear system into @ref
+ * GlossBlock "blocks" for the use in BlockVector, BlockSparseMatrix,
+ * BlockMatrixArray and so on. If you use non-primitive elements, you
+ * cannot determine the block number by
+ * system_to_component_index(). Instead, you can use
+ * system_to_block_index(), which will automatically take care of the
+ * additional components occupied by vector valued elements. The
+ * number of generated blocks can be determined by
+ * FiniteElementData::n_blocks().
+ *
+ * If you decide to operate by base element and multiplicity, the
+ * function first_block_of_base() will be helpful.
  *
  * <h3>Support points</h3>
  *
@@ -948,66 +970,6 @@ class FiniteElement : public Subscriptor,
     std::pair<unsigned int, unsigned int>
     face_system_to_component_index (const unsigned int index) const;
 
-                                     /**
-                                      * Return for shape function
-                                      * @p index the base element it
-                                      * belongs to, the number of the
-                                      * copy of this base element
-                                      * (which is between zero and the
-                                      * multiplicity of this element),
-                                      * and the index of this shape
-                                      * function within this base
-                                      * element.
-                                      *
-                                      * If the element is not composed of
-				      * others, then base and instance
-				      * are always zero, and the index
-				      * is equal to the number of the
-				      * shape function. If the element
-				      * is composed of single
-				      * instances of other elements
-				      * (i.e. all with multiplicity
-				      * one) all of which are scalar,
-				      * then base values and dof
-				      * indices within this element
-				      * are equal to the
-				      * @p system_to_component_table. It
-				      * differs only in case the
-				      * element is composed of other
-				      * elements and at least one of
-				      * them is vector-valued itself.
-				      *
-				      * This function returns valid
-				      * values also in the case of
-				      * vector-valued
-				      * (i.e. non-primitive) shape
-				      * functions, in contrast to the
-				      * @p system_to_component_index
-				      * function.
-                                      */
-    std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
-    system_to_base_index (const unsigned int index) const;
-
-                                     /**
-                                      * Same as
-                                      * @p system_to_base_index, but
-                                      * for degrees of freedom located
-                                      * on a face. The range of allowed
-				      * indices is therefore
-				      * 0..dofs_per_face.
-				      *
-				      * You will rarely need this
-				      * function in application
-				      * programs, since almost all
-				      * application codes only need to
-				      * deal with cell indices, not
-				      * face indices. The function is
-				      * mainly there for use inside
-				      * the library.
-                                      */
-    std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
-    face_system_to_base_index (const unsigned int index) const;
-    
 				     /**
 				      * Return in which of the vector
 				      * components of this finite
@@ -1154,6 +1116,73 @@ class FiniteElement : public Subscriptor,
     unsigned int
     element_multiplicity (const unsigned int index) const = 0;
     
+                                     /**
+                                      * Return for shape function
+                                      * @p index the base element it
+                                      * belongs to, the number of the
+                                      * copy of this base element
+                                      * (which is between zero and the
+                                      * multiplicity of this element),
+                                      * and the index of this shape
+                                      * function within this base
+                                      * element.
+                                      *
+                                      * If the element is not composed of
+				      * others, then base and instance
+				      * are always zero, and the index
+				      * is equal to the number of the
+				      * shape function. If the element
+				      * is composed of single
+				      * instances of other elements
+				      * (i.e. all with multiplicity
+				      * one) all of which are scalar,
+				      * then base values and dof
+				      * indices within this element
+				      * are equal to the
+				      * @p system_to_component_table. It
+				      * differs only in case the
+				      * element is composed of other
+				      * elements and at least one of
+				      * them is vector-valued itself.
+				      *
+				      * This function returns valid
+				      * values also in the case of
+				      * vector-valued
+				      * (i.e. non-primitive) shape
+				      * functions, in contrast to the
+				      * @p system_to_component_index
+				      * function.
+                                      */
+    std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
+    system_to_base_index (const unsigned int index) const;
+
+                                     /**
+                                      * Same as
+                                      * @p system_to_base_index, but
+                                      * for degrees of freedom located
+                                      * on a face. The range of allowed
+				      * indices is therefore
+				      * 0..dofs_per_face.
+				      *
+				      * You will rarely need this
+				      * function in application
+				      * programs, since almost all
+				      * application codes only need to
+				      * deal with cell indices, not
+				      * face indices. The function is
+				      * mainly there for use inside
+				      * the library.
+                                      */
+    std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
+    face_system_to_base_index (const unsigned int index) const;
+
+				     /**
+				      * Given a base element number,
+				      * return the first block of a
+				      * BlockVector it would generate.
+				      */
+    unsigned int first_block_of_base(unsigned int b) const;
+    
  				     /**
 				      * Given a vector component,
 				      * return an index which base
@@ -1180,6 +1209,15 @@ class FiniteElement : public Subscriptor,
 				      */
     std::pair<unsigned int,unsigned int>
     component_to_base (const unsigned int component) const;
+
+				     /**
+				      * The vector block and the index
+				      * inside the block for this
+				      * shape function.
+				      */
+    std::pair<unsigned int,unsigned int>
+    system_to_block_index (const unsigned int component) const;
+
 				     //@}
     
 				     /**
@@ -1616,6 +1654,170 @@ class FiniteElement : public Subscriptor,
     interface_constraints_size () const;
     
 				     /**
+				      * Store whether all shape
+				      * functions are primitive. Since
+				      * finding this out is a very
+				      * common operation, we cache the
+				      * result, i.e. compute the value
+				      * in the constructor for simpler
+				      * access.
+				      */
+    const bool cached_primitivity;
+
+                                     /**
+				      * Compute second derivatives by
+				      * finite differences of
+				      * gradients.
+				      */
+    void compute_2nd (const Mapping<dim>                      &mapping,
+		      const typename Triangulation<dim>::cell_iterator    &cell,
+		      const unsigned int                       offset,
+		      typename Mapping<dim>::InternalDataBase &mapping_internal,
+		      InternalDataBase                        &fe_internal,
+		      FEValuesData<dim>                       &data) const;
+
+				     /**
+				      * Given the pattern of nonzero
+				      * components for each shape
+				      * function, compute for each
+				      * entry how many components are
+				      * non-zero for each shape
+				      * function. This function is
+				      * used in the constructor of
+				      * this class.
+				      */
+    static
+    std::vector<unsigned int>
+    compute_n_nonzero_components (const std::vector<std::vector<bool> > &nonzero_components);
+    
+				     /**
+				      * Exception
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcBoundaryFaceUsed);
+				     /**
+				      * Exception
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcJacobiDeterminantHasWrongSign);
+
+				     /**
+				      * Determine the values a finite
+				      * element should compute on
+				      * initialization of data for
+				      * @p FEValues.
+				      *
+				      * Given a set of flags
+				      * indicating what quantities are
+				      * requested from a @p FEValues
+				      * object, @p update_once and
+				      * @p update_each compute which
+				      * values must really be
+				      * computed. Then, the
+				      * <tt>fill_*_values</tt> functions
+				      * are called with the result of
+				      * these.
+				      *
+				      * Furthermore, values must be
+				      * computed either on the unit
+				      * cell or on the physical
+				      * cell. For instance, the
+				      * function values of @p FE_Q do
+				      * only depend on the quadrature
+				      * points on the unit
+				      * cell. Therefore, this flags
+				      * will be returned by
+				      * @p update_once. The gradients
+				      * require computation of the
+				      * covariant transformation
+				      * matrix. Therefore,
+				      * @p update_covariant_transformation
+				      * and @p update_gradients will
+				      * be returned by
+				      * @p update_each.
+				      *
+				      * For an example see the same
+				      * function in the derived class
+				      * @p FE_Q.
+				      */
+    virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
+  
+				     /**
+				      * Complementary function for
+				      * @p update_once.
+				      *
+				      * While @p update_once returns
+				      * the values to be computed on
+				      * the unit cell for yielding the
+				      * required data, this function
+				      * determines the values that
+				      * must be recomputed on each
+				      * cell.
+				      *
+				      * Refer to @p update_once for
+				      * more details.
+				      */
+    virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
+  
+				     /**
+				      * @p clone function instead of
+				      * a copy constructor.
+				      *
+				      * This function is needed by the
+				      * constructors of FESystem as well
+				      * as by the hp::FECollection class.
+				      */
+    virtual FiniteElement<dim> *clone() const = 0;
+    
+				     /**
+				      * List of support points on the
+				      * unit cell, in case the finite
+				      * element has any. The
+				      * constructor leaves this field
+				      * empty, derived classes may
+				      * write in some contents.
+				      *
+				      * Finite elements that allow
+				      * some kind of interpolation
+				      * operation usually have support
+				      * points. On the other hand,
+				      * elements that define their
+				      * degrees of freedom by, for
+				      * example, moments on faces, or
+				      * as derivatives, don't have
+				      * support points. In that case,
+				      * this field remains empty.
+				      */
+    std::vector<Point<dim> > unit_support_points;
+
+				     /**
+				      * Same for the faces. See the
+				      * description of the
+				      * @p get_unit_face_support_points
+				      * function for a discussion of
+				      * what contributes a face
+				      * support point.
+				      */
+    std::vector<Point<dim-1> > unit_face_support_points;
+    
+				     /**
+				      * Support points used for
+				      * interpolation functions of
+				      * non-Lagrangian elements.
+				      */
+    std::vector<Point<dim> > generalized_support_points;
+    
+				     /**
+				      * Face support points used for
+				      * interpolation functions of
+				      * non-Lagrangian elements.
+				      */    
+    std::vector<Point<dim-1> > generalized_face_support_points;
+    
+  private:
+				     /**
 				      * Store what
 				      * @p system_to_component_index
 				      * will return.
@@ -1682,6 +1884,12 @@ class FiniteElement : public Subscriptor,
 				      */
     std::vector<std::pair<std::pair<unsigned int,unsigned int>,unsigned int> >
     face_system_to_base_table;
+				     /**
+				      * For each base element, store
+				      * the first block in a block
+				      * vector it will generate.
+				      */
+    std::vector<unsigned int> first_block_of_base_table;
     
 				     /**
 				      * The base element establishing
@@ -1786,51 +1994,6 @@ class FiniteElement : public Subscriptor,
     const std::vector<bool> restriction_is_additive_flags;
 
 				     /**
-				      * List of support points on the
-				      * unit cell, in case the finite
-				      * element has any. The
-				      * constructor leaves this field
-				      * empty, derived classes may
-				      * write in some contents.
-				      *
-				      * Finite elements that allow
-				      * some kind of interpolation
-				      * operation usually have support
-				      * points. On the other hand,
-				      * elements that define their
-				      * degrees of freedom by, for
-				      * example, moments on faces, or
-				      * as derivatives, don't have
-				      * support points. In that case,
-				      * this field remains empty.
-				      */
-    std::vector<Point<dim> > unit_support_points;
-
-				     /**
-				      * Same for the faces. See the
-				      * description of the
-				      * @p get_unit_face_support_points
-				      * function for a discussion of
-				      * what contributes a face
-				      * support point.
-				      */
-    std::vector<Point<dim-1> > unit_face_support_points;
-    
-				     /**
-				      * Support points used for
-				      * interpolation functions of
-				      * non-Lagrangian elements.
-				      */
-    std::vector<Point<dim> > generalized_support_points;
-    
-				     /**
-				      * Face support points used for
-				      * interpolation functions of
-				      * non-Lagrangian elements.
-				      */    
-    std::vector<Point<dim-1> > generalized_face_support_points;
-    
-				     /**
 				      * For each shape function, give
 				      * a vector of bools (with size
 				      * equal to the number of vector
@@ -1861,128 +2024,6 @@ class FiniteElement : public Subscriptor,
 				      */
     const std::vector<unsigned int> n_nonzero_components_table;
 
-				     /**
-				      * Store whether all shape
-				      * functions are primitive. Since
-				      * finding this out is a very
-				      * common operation, we cache the
-				      * result, i.e. compute the value
-				      * in the constructor for simpler
-				      * access.
-				      */
-    const bool cached_primitivity;
-
-                                     /**
-				      * Compute second derivatives by
-				      * finite differences of
-				      * gradients.
-				      */
-    void compute_2nd (const Mapping<dim>                      &mapping,
-		      const typename Triangulation<dim>::cell_iterator    &cell,
-		      const unsigned int                       offset,
-		      typename Mapping<dim>::InternalDataBase &mapping_internal,
-		      InternalDataBase                        &fe_internal,
-		      FEValuesData<dim>                       &data) const;
-
-				     /**
-				      * Given the pattern of nonzero
-				      * components for each shape
-				      * function, compute for each
-				      * entry how many components are
-				      * non-zero for each shape
-				      * function. This function is
-				      * used in the constructor of
-				      * this class.
-				      */
-    static
-    std::vector<unsigned int>
-    compute_n_nonzero_components (const std::vector<std::vector<bool> > &nonzero_components);
-    
-
-				     /**
-				      * Exception
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcBoundaryFaceUsed);
-				     /**
-				      * Exception
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcJacobiDeterminantHasWrongSign);
-
-  protected:
-
-				     /**
-				      * Determine the values a finite
-				      * element should compute on
-				      * initialization of data for
-				      * @p FEValues.
-				      *
-				      * Given a set of flags
-				      * indicating what quantities are
-				      * requested from a @p FEValues
-				      * object, @p update_once and
-				      * @p update_each compute which
-				      * values must really be
-				      * computed. Then, the
-				      * <tt>fill_*_values</tt> functions
-				      * are called with the result of
-				      * these.
-				      *
-				      * Furthermore, values must be
-				      * computed either on the unit
-				      * cell or on the physical
-				      * cell. For instance, the
-				      * function values of @p FE_Q do
-				      * only depend on the quadrature
-				      * points on the unit
-				      * cell. Therefore, this flags
-				      * will be returned by
-				      * @p update_once. The gradients
-				      * require computation of the
-				      * covariant transformation
-				      * matrix. Therefore,
-				      * @p update_covariant_transformation
-				      * and @p update_gradients will
-				      * be returned by
-				      * @p update_each.
-				      *
-				      * For an example see the same
-				      * function in the derived class
-				      * @p FE_Q.
-				      */
-    virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
-  
-				     /**
-				      * Complementary function for
-				      * @p update_once.
-				      *
-				      * While @p update_once returns
-				      * the values to be computed on
-				      * the unit cell for yielding the
-				      * required data, this function
-				      * determines the values that
-				      * must be recomputed on each
-				      * cell.
-				      *
-				      * Refer to @p update_once for
-				      * more details.
-				      */
-    virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
-  
-				     /**
-				      * @p clone function instead of
-				      * a copy constructor.
-				      *
-				      * This function is needed by the
-				      * constructors of FESystem as well
-				      * as by the hp::FECollection class.
-				      */
-    virtual FiniteElement<dim> *clone() const = 0;
-    
-  private:
 				     /**
 				      * Second derivatives of shapes
 				      * functions are not computed
@@ -2106,38 +2147,12 @@ class FiniteElement : public Subscriptor,
 			    typename Mapping<dim>::InternalDataBase &fe_internal,
 			    FEValuesData<dim>                    &data) const = 0;
 
-				     /**
-				      * Allow the FESystem class to access the
-				      * restriction and prolongation matrices
-				      * directly. Hence, FESystem has the
-				      * possibility to see if these matrices
-				      * are initialized without accessing
-				      * these matrices through the
-				      * @p get_restriction_matrix and
-				      * @p get_prolongation_matrix
-				      * functions. This is important as these
-				      * functions include assertions that
-				      * throw if the matrices are not already
-				      * initialized.
-				      */
-    template <int dim_> friend class FESystem;
-
-                                     /**
-                                      * Make the inner class a
-                                      * friend. This is not strictly
-                                      * necessary, but the Intel
-                                      * compiler seems to want this.
-                                      */
     friend class InternalDataBase;
-    
-				     /**
-				      * Declare some other classes as
-				      * friends of this class.
-				      */
     friend class FEValuesBase<dim>;
     friend class FEValues<dim>;
     friend class FEFaceValues<dim>;
     friend class FESubfaceValues<dim>;
+    template <int dim_> friend class FESystem;
     friend class hp::FECollection<dim>;
 };
 
@@ -2273,6 +2288,18 @@ FiniteElement<dim>::face_system_to_base_index (const unsigned int index) const
 
 template <int dim>  
 inline
+unsigned int
+FiniteElement<dim>::first_block_of_base (const unsigned int index) const
+{
+  Assert(index < first_block_of_base_table.size(),
+	 ExcIndexRange(index, 0, first_block_of_base_table.size()));
+
+  return first_block_of_base_table[index];
+}
+
+
+template <int dim>  
+inline
 std::pair<unsigned int,unsigned int>
 FiniteElement<dim>::component_to_base (const unsigned int index) const
 {
@@ -2280,6 +2307,23 @@ FiniteElement<dim>::component_to_base (const unsigned int index) const
 	 ExcIndexRange(index, 0, component_to_base_table.size()));
 
   return component_to_base_table[index];
+}
+
+
+template <int dim>  
+inline
+std::pair<unsigned int,unsigned int>
+FiniteElement<dim>::system_to_block_index (const unsigned int index) const
+{
+  Assert (index < this->n_blocks(),
+	 ExcIndexRange(index, 0, this->n_blocks()));
+				   // The block is computed simply as
+				   // first block of this base plus
+				   // the index within the base blocks
+  return std::pair<unsigned int, unsigned int>(
+     first_block_of_base(system_to_base_table[index].first.first)
+     + system_to_base_table[index].first.second,
+     system_to_base_table[index].second);
 }
 
 

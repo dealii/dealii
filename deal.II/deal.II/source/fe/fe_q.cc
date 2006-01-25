@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -435,7 +435,7 @@ template <int dim>
 std::vector<unsigned int>
 FE_Q<dim>::face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
 {
-  const FiniteElementData<dim-1> face_data(FE_Q<dim-1>::get_dpo_vector(degree),1);
+  const FiniteElementData<dim-1> face_data(FE_Q<dim-1>::get_dpo_vector(degree),1,degree);
   std::vector<unsigned int> face_renumber (face_data.dofs_per_cell);  
   FETools::lexicographic_to_hierarchic_numbering (face_data, face_renumber);
   return face_renumber;

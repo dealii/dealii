@@ -40,7 +40,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
 		FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim> (
 		  deg,
 		  FiniteElementData<dim>(get_dpo_vector(deg),
-					 dim, deg+1, FiniteElementData<dim>::Hdiv),
+					 dim, deg+1, FiniteElementData<dim>::Hdiv, 1),
 		  std::vector<bool>(PolynomialsRaviartThomas<dim>::compute_n_pols(deg), true),
 		  std::vector<std::vector<bool> >(PolynomialsRaviartThomas<dim>::compute_n_pols(deg),
 						  std::vector<bool>(dim,true))),
@@ -91,14 +91,6 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
 	  this->interface_constraints(target_row,j) = face_embeddings[d](i,j);
 	++target_row;
       }
-//TODO:[WB] What is this?
-                                   // then make
-                                   // system_to_component_table
-                                   // invalid, since this has no
-                                   // meaning for the present element
-  std::vector<std::pair<unsigned,unsigned> > tmp1, tmp2;
-  this->system_to_component_table.swap (tmp1);
-  this->face_system_to_component_table.swap (tmp2);
 }
 
 

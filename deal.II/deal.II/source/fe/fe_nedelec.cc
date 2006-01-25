@@ -34,10 +34,16 @@
 template <int dim>
 FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 		:
-		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree), dim, degree+1, FiniteElementData<dim>::Hcurl),
-				    std::vector<bool> (FiniteElementData<dim>(get_dpo_vector(degree),dim).dofs_per_cell,false),
-				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),dim).dofs_per_cell,
-								    std::vector<bool>(dim,true))),
+		FiniteElement<dim> (
+		  FiniteElementData<dim>(get_dpo_vector(degree), dim,
+					 degree+1, FiniteElementData<dim>::Hcurl, 1),
+				    std::vector<bool> (
+				      FiniteElementData<dim>(get_dpo_vector(degree), dim,
+							     degree+1).dofs_per_cell,false),
+				    std::vector<std::vector<bool> >(
+				      FiniteElementData<dim>(get_dpo_vector(degree), dim,
+							     degree+1).dofs_per_cell,
+				      std::vector<bool>(dim,true))),
 		degree(degree)
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
@@ -54,14 +60,6 @@ FE_Nedelec<dim>::FE_Nedelec (const unsigned int degree)
 				   // on cell and face
   initialize_unit_support_points ();
   initialize_unit_face_support_points ();
-
-                                   // then make
-                                   // system_to_component_table
-                                   // invalid, since this has no
-                                   // meaning for the present element
-  std::vector<std::pair<unsigned,unsigned> > tmp1, tmp2;
-  this->system_to_component_table.swap (tmp1);
-  this->face_system_to_component_table.swap (tmp2);
 }
 
 

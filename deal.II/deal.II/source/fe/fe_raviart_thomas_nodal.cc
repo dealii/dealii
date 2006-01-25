@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,12 +35,10 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 		FE_PolyTensor<PolynomialsRaviartThomas<dim>, dim> (
 		  deg,
 		  FiniteElementData<dim>(get_dpo_vector(deg),
-					 dim, deg+1, FiniteElementData<dim>::Hdiv),
+					 dim, deg+1, FiniteElementData<dim>::Hdiv, 1),
 		  get_ria_vector (deg),
-		  std::vector<std::vector<bool> >(
-		    FiniteElementData<dim>(get_dpo_vector(deg),
-					   dim,deg+1).dofs_per_cell,
-		    std::vector<bool>(dim,true)))
+		  std::vector<std::vector<bool> >(PolynomialsRaviartThomas<dim>::compute_n_pols(deg),
+						  std::vector<bool>(dim,true)))
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
@@ -290,27 +288,10 @@ template <int dim>
 std::vector<bool>
 FE_RaviartThomasNodal<dim>::get_ria_vector (const unsigned int deg)
 {
-  unsigned int dofs_per_cell, dofs_per_face;
-  switch (dim)
-    {
-      case 2:
-	    dofs_per_face = deg+1;
-	    dofs_per_cell = 2*(deg+1)*(deg+2);
-	    break;
-      case 3:
-	    dofs_per_face = (deg+1)*(deg+1);
-	    dofs_per_cell = 3*(deg+1)*(deg+1)*(deg+2);
-	    break;
-      default:
-	    Assert (false, ExcNotImplemented());
-    }
-  Assert (FiniteElementData<dim>(get_dpo_vector(deg),dim).dofs_per_cell ==
-	  dofs_per_cell,
-	  ExcInternalError());
-  Assert (FiniteElementData<dim>(get_dpo_vector(deg),dim).dofs_per_face ==
-	  dofs_per_face,
-	  ExcInternalError());
-  
+  const unsigned int dofs_per_cell = PolynomialsRaviartThomas<dim>::compute_n_pols(deg);
+  unsigned int dofs_per_face = deg+1;
+  for (unsigned int d=2;d<dim;++d)
+    dofs_per_face *= deg+1;
 				   // all face dofs need to be
 				   // non-additive, since they have
 				   // continuity requirements.

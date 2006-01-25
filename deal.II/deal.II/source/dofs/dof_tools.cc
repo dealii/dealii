@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -203,7 +203,8 @@ DoFTools::compute_row_length_vector(
   for (cell = dofs.begin_active(); cell != end; ++cell)
     {
       const FiniteElement<DH::dimension>& fe = cell->get_fe();
-      Assert (fe.is_primitive(), typename FiniteElement<DH::dimension>::ExcFENotPrimitive());
+      Assert (fe.is_primitive(),
+	      typename FiniteElement<DH::dimension>::ExcFENotPrimitive());
       Assert (couplings.n_rows()==fe.n_components(),
 	      ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
       Assert (couplings.n_cols()==fe.n_components(),

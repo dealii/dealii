@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,10 +30,14 @@
 template <int dim>
 FE_DGPNonparametric<dim>::FE_DGPNonparametric (const unsigned int degree)
 		:
-		FiniteElement<dim> (FiniteElementData<dim>(get_dpo_vector(degree),1, FiniteElementData<dim>::L2),
-				    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,true),
-				    std::vector<std::vector<bool> >(FiniteElementData<dim>(get_dpo_vector(degree),1).dofs_per_cell,
-								    std::vector<bool>(1,true))),
+		FiniteElement<dim> (
+		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree,
+					 FiniteElementData<dim>::L2),
+		  std::vector<bool>(
+		    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
+				    std::vector<std::vector<bool> >(
+				      FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell,
+				      std::vector<bool>(1,true))),
                 degree(degree),
                 polynomial_space (Polynomials::Legendre::generate_complete_basis(degree))
 {

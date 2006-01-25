@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1730,8 +1730,11 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
   if (dim>1) dpo.push_back(fe_data.dofs_per_quad * N);
   if (dim>2) dpo.push_back(fe_data.dofs_per_hex * N);
   
-  return FiniteElementData<dim> (dpo, fe_data.n_components() * N, fe_data.tensor_degree(),
-				 fe_data.conforming_space);
+  return FiniteElementData<dim> (dpo,
+				 fe_data.n_components() * N,
+				 fe_data.tensor_degree(),
+				 fe_data.conforming_space,
+				 fe_data.n_blocks() * N);
 }
 
 
@@ -1849,13 +1852,13 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 				   // makes the degree of the system
 				   // unknown.
   unsigned int degree = std::max(fe1.tensor_degree(), fe2.tensor_degree());
-  return FiniteElementData<dim> (dpo,
-				 fe1.n_components() * N1 +
-				 fe2.n_components() * N2,
-				 degree,
-				 typename
-				 FiniteElementData<dim>::Conformity(fe1.conforming_space
-								    & fe2.conforming_space));
+  return FiniteElementData<dim> (
+    dpo,
+    fe1.n_components() * N1 + fe2.n_components() * N2,
+    degree,
+    typename FiniteElementData<dim>::Conformity(fe1.conforming_space
+						& fe2.conforming_space),
+    fe1.n_blocks() * N1 + fe2.n_blocks() * N2);
 }
 
 
@@ -1885,14 +1888,14 @@ FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 				   // degree is the maximal degree of the components
   unsigned int degree = std::max(fe1.tensor_degree(), fe2.tensor_degree());
   degree = std::max(degree, fe3.tensor_degree());
-  return FiniteElementData<dim> (dpo,
-				 fe1.n_components() * N1 +
-				 fe2.n_components() * N2 +
-				 fe3.n_components() * N3, degree,
-				 typename
-				 FiniteElementData<dim>::Conformity(fe1.conforming_space
-								    & fe2.conforming_space
-								    & fe3.conforming_space));
+  return FiniteElementData<dim> (
+    dpo,
+    fe1.n_components() * N1 + fe2.n_components() * N2 + fe3.n_components() * N3,
+    degree,
+    typename FiniteElementData<dim>::Conformity(fe1.conforming_space
+						& fe2.conforming_space
+						& fe3.conforming_space),
+    fe1.n_blocks() * N1 + fe2.n_blocks() * N2 + fe3.n_blocks() * N3);
 }
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -112,15 +112,13 @@ FiniteElement<dim>::FiniteElement (
   const std::vector<std::vector<bool> > &nonzero_c)
 		:
 		FiniteElementData<dim> (fe_data),
-                system_to_component_table (this->dofs_per_cell),
-                face_system_to_component_table(this->dofs_per_face),
+		cached_primitivity(false),
                 system_to_base_table(this->dofs_per_cell),
                 face_system_to_base_table(this->dofs_per_face),		
                 component_to_base_table (this->components,
                                          std::make_pair(0U, 0U)),
                 restriction_is_additive_flags(r_i_a_f),
-		nonzero_components (nonzero_c),
-		cached_primitivity(false)
+		nonzero_components (nonzero_c)
 {
 				   // Special handling of vectors of
 				   // length one: in this case, we
@@ -183,18 +181,22 @@ FiniteElement<dim>::FiniteElement (
                                    // initialize some tables in the
 				   // default way, i.e. if there is
 				   // only one (vector-)component; if
-				   // there are several, then the
-				   // constructor of the derived class
-				   // needs to overwrite these arrays
-  for (unsigned int j=0 ; j<this->dofs_per_cell ; ++j)
+				   // the element is not primitive,
+				   // leave these tables empty.
+  if (!cached_primitivity)
     {
-      system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
-      system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
-    }
-  for (unsigned int j=0 ; j<this->dofs_per_face ; ++j)
-    {
-      face_system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
-      face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
+      system_to_component_table.resize(this->dofs_per_cell);
+      face_system_to_component_table.resize(this->dofs_per_face);
+      for (unsigned int j=0 ; j<this->dofs_per_cell ; ++j)
+	{
+	  system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
+	  system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
+	}
+      for (unsigned int j=0 ; j<this->dofs_per_face ; ++j)
+	{
+	  face_system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
+	  face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
+	}
     }
 }
 

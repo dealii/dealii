@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,6 +31,7 @@ FiniteElementData<dim>::FiniteElementData ()
 		dofs_per_face(0),
 		dofs_per_cell (0),
 		components(0),
+		blocks(0),
 		degree(0),
 		conforming_space(unknown)
 {}
@@ -42,7 +43,8 @@ FiniteElementData<dim>::
 FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
                    const unsigned int n_components,
                    const unsigned int degree,
-		   const Conformity conformity)
+		   const Conformity conformity,
+		   const unsigned int n_blocks)
                 :
 		dofs_per_vertex(dofs_per_object[0]),
 		dofs_per_line(dofs_per_object[1]),
@@ -73,6 +75,8 @@ FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
 			       GeometryInfo<dim>::quads_per_cell * dofs_per_quad +
 			       GeometryInfo<dim>::hexes_per_cell * dofs_per_hex),
 		components(n_components),
+		blocks(n_blocks == deal_II_numbers::invalid_unsigned_int
+		       ? n_components : n_blocks),
 		degree(degree),
 		conforming_space(conformity)
 {
