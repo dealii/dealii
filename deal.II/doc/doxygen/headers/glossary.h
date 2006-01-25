@@ -20,15 +20,14 @@
  * prepared by DoFRenumbering::component_wise().
  *
  * Originally, this concept was intermixed with the idea of the vector
- * @ref GlossComponent. Since the introduction of non-@ref GlossPrimitive
- * "primitive" elements, they became different. Take for instance the
- * solution of the mixed Laplacian system with
+ * @ref GlossComponent "component". Since the introduction of non-@ref
+ * GlossPrimitive "primitive" elements, they became different. Take
+ * for instance the solution of the mixed Laplacian system with
  * FE_RaviartThomas. There, the first <tt>dim</tt> components are the
  * directional derivatives. Since the shape functions are linear
  * combinations of those, they constitute only a single block. The
  * primal function <i>u</i> would be in the second block, but in the
- * <tt>dim+1</tt>st component.
- * </dd>
+ * <tt>dim+1</tt>st component.  </dd>
  *
  * <dt class="glossary">@anchor GlossComponent component</dt>
  *
@@ -155,7 +154,7 @@
  *
  * <dt class="glossary">@anchor GlossPrimitive Primitive finite elements</dt>
  * <dd>Finite element shape function sets with a unique relation from
- * shape function number to vector @ref GlossComponent.</dd>
+ * shape function number to vector @ref GlossComponent "component".</dd>
  *
  * <dt class="glossary">@anchor GlossReferenceCell Reference cell</dt>
  * <dd>The hypercube [0,1]<sup>dim</sup>, on which all parametric finite
