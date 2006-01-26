@@ -1731,7 +1731,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 		  out << node << ' ';
 		  
 		  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		    out << patch->data(data_set,i1*d1+d2*d2) << ' ';
+		    out << patch->data(data_set,i1*d1+d2*n1) << ' ';
 		  out << '\n';
 		}
 					       // end of row in patch
