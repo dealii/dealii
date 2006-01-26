@@ -612,6 +612,15 @@ class TableBase : public Subscriptor
                                       */
     template<typename T2>
     void fill (const T2 *entries);
+
+				     /**
+				      * Fill all table entries with
+				      * the same value. The type of
+				      * value must be convertible to t
+				      * he value type of the table.
+				      */
+    template<typename T2>
+    void fill (const T2& value);
     
                                      /**
                                       * Return a read-write reference
@@ -1835,6 +1844,17 @@ TableBase<N,T>::reset_values ()
   if (n_elements() != 0)
     std::fill_n (val, n_elements(), T());
 }
+
+
+template <int N, typename T>
+template <typename T2>
+void
+TableBase<N,T>::fill (const T2& value)
+{
+  if (n_elements() != 0)
+    std::fill_n(val, n_elements(), value);
+}
+
 
 
 
