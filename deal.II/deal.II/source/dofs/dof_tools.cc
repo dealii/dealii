@@ -440,7 +440,16 @@ DoFTools::compute_row_length_vector(
   typename DH::active_cell_iterator cell;
   std::vector<unsigned int> cell_indices;
   std::vector<unsigned int> neighbor_indices;
-
+  
+				   // We have to translate the
+				   // couplings from components to
+				   // blocks, so this works for
+				   // nonprimitive elements as well.
+  std::vector<Table<2, Coupling> > couple_cell;
+  std::vector<Table<2, Coupling> > couple_face;
+  convert_couplings_to_blocks(dofs, couplings, couple_cell);
+  convert_couplings_to_blocks(dofs, flux_couplings, couple_face);
+  
 				   // We loop over cells and go from
 				   // cells to lower dimensional
 				   // objects. This is the only way to
@@ -451,6 +460,8 @@ DoFTools::compute_row_length_vector(
   for (cell = dofs.begin_active(); cell != end; ++cell)
     {
       const FiniteElement<DH::dimension>& fe = cell->get_fe();
+      const unsigned int fe_index = cell->active_fe_index();
+      
       Assert (fe.is_primitive(), typename FiniteElement<DH::dimension>::ExcFENotPrimitive());
       Assert (couplings.n_rows()==fe.n_components(),
 	      ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
@@ -488,13 +499,15 @@ DoFTools::compute_row_length_vector(
       unsigned int increment;
       while (i < fe.first_line_index)
 	{
-	  for (unsigned int comp=0;comp<fe.n_components();++comp)
-	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
-	      {
-		increment = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell
-			    - DH::dimension * fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
-		row_lengths[cell_indices[i]] += increment;
-	      }
+	  for (unsigned int base=0;base<fe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
+					fe.first_block_of_base(base) + mult) != none)
+		{
+		  increment = fe.base_element(base).dofs_per_cell
+			      - DH::dimension * fe.base_element(base).dofs_per_face;
+		  row_lengths[cell_indices[i]] += increment;
+		}
 	  ++i;
 	}
 				       // From now on, if an object is
@@ -509,30 +522,34 @@ DoFTools::compute_row_length_vector(
 				       // added in the loop below.
       while (i < fe.first_quad_index)
 	{
-	  for (unsigned int comp=0;comp<fe.n_components();++comp)
-	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
-	      {
-		increment = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell
-			    - ((DH::dimension>1)
-			       ? (DH::dimension-1)
-			       : GeometryInfo<DH::dimension>::faces_per_cell)
-			    * fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
+	  for (unsigned int base=0;base<fe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
+					fe.first_block_of_base(base) + mult) != none)
+		{
+		  increment = fe.base_element(base).dofs_per_cell
+			      - ((DH::dimension>1)
+				 ? (DH::dimension-1)
+				 : GeometryInfo<DH::dimension>::faces_per_cell)
+			      * fe.base_element(base).dofs_per_face;
 		row_lengths[cell_indices[i]] += increment;
-	      }
+		}
 	  ++i;
 	}
       
 				       // Now quads in 2D and 3D
       while (i < fe.first_hex_index)
 	{
-	  for (unsigned int comp=0;comp<fe.n_components();++comp)
-	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
-	      {
-		increment = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell
-			    - ((DH::dimension>2)
-			       ? (DH::dimension-2)
-			       : GeometryInfo<DH::dimension>::faces_per_cell)
-			    * fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
+	  for (unsigned int base=0;base<fe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
+					fe.first_block_of_base(base) + mult) != none)
+		{
+		  increment = fe.base_element(base).dofs_per_cell
+			      - ((DH::dimension>2)
+				 ? (DH::dimension-2)
+				 : GeometryInfo<DH::dimension>::faces_per_cell)
+			      * fe.base_element(base).dofs_per_face;
 		row_lengths[cell_indices[i]] += increment;
 	      }
 	  ++i;
@@ -541,14 +558,16 @@ DoFTools::compute_row_length_vector(
 				       // Finally, cells in 3D
       while (i < fe.dofs_per_cell)
 	{
-	  for (unsigned int comp=0;comp<fe.n_components();++comp)
-	    if (couplings(fe.system_to_component_index(i).first,comp) != none)
-	      {
-		increment = fe.base_element(fe.component_to_base(comp).first).dofs_per_cell
-			    - GeometryInfo<DH::dimension>::faces_per_cell
-			    * fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
-		row_lengths[cell_indices[i]] += increment;
-	      }
+	  for (unsigned int base=0;base<fe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
+					fe.first_block_of_base(base) + mult) != none)
+		{
+		  increment = fe.base_element(base).dofs_per_cell
+			      - GeometryInfo<DH::dimension>::faces_per_cell
+			      * fe.base_element(base).dofs_per_face;
+		  row_lengths[cell_indices[i]] += increment;
+		}
 	  ++i;
 	}
       
@@ -584,12 +603,14 @@ DoFTools::compute_row_length_vector(
 					   // will be handled below,
 					   // therefore, we subtract them
 					   // here.
-	  for (unsigned int comp=0;comp<fe.n_components();++comp)
-	    for (unsigned int i=0;i<fe.dofs_per_cell;++i)
-	      if (flux_couplings(fe.system_to_component_index(i).first,comp) != none)
+	  for (unsigned int base=0;base<nfe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<nfe.element_multiplicity(base);++mult)
+	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		if (couple_face[fe_index](fe.system_to_block_index(i).first,
+					  nfe.first_block_of_base(base) + mult) != none)
 		{
-		  unsigned int increment = nfe.base_element(fe.component_to_base(comp).first).dofs_per_cell
-					   - nfe.base_element(fe.component_to_base(comp).first).dofs_per_face;
+		  unsigned int increment = nfe.base_element(base).dofs_per_cell
+					   - nfe.base_element(base).dofs_per_face;
 		  row_lengths[cell_indices[i]] += increment;
 		}
 	  
@@ -615,18 +636,26 @@ DoFTools::compute_row_length_vector(
 					   // Wolfgang, do they couple
 					   // with each other by
 					   // constraints?
+
+					   // This will not work with
+					   // different couplings on
+					   // different cells.
 	  neighbor_indices.resize(fe.dofs_per_cell);
 	  neighbor->get_dof_indices(neighbor_indices);
-	  for (unsigned int comp=0;comp<fe.n_components();++comp)
-	    for (unsigned int i=0;i<fe.dofs_per_cell;++i)
-	      if (couplings(fe.system_to_component_index(i).first,comp) != none)
-		row_lengths[cell_indices[i]]
-		  += nfe.base_element(fe.component_to_base(comp).first).dofs_per_face;
-	  for (unsigned int comp=0;comp<nfe.n_components();++comp)
-	    for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
-	      if (couplings(nfe.system_to_component_index(i).first,comp) != none)
-		row_lengths[neighbor_indices[i]]
-		  += fe.base_element(fe.component_to_base(comp).first).dofs_per_face;
+	  for (unsigned int base=0;base<nfe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<nfe.element_multiplicity(base);++mult)
+	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		if (couple_cell[fe_index](fe.system_to_component_index(i).first,
+					  nfe.first_block_of_base(base) + mult) != none)
+		  row_lengths[cell_indices[i]]
+		    += nfe.base_element(base).dofs_per_face;
+	  for (unsigned int base=0;base<fe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	      for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
+		if (couple_cell[fe_index](nfe.system_to_component_index(i).first,
+					  fe.first_block_of_base(base) + mult) != none)
+		  row_lengths[neighbor_indices[i]]
+		    += fe.base_element(base).dofs_per_face;
 	}
     }
   user_flags_triangulation.load_user_flags(old_flags);
@@ -3586,11 +3615,11 @@ DoFTools::convert_couplings_to_blocks (
   const hp::FECollection<dim>& coll = dof_handler.get_fe();
   tables_by_block.resize(coll.n_finite_elements());
 
-  for (unsigned int f=0;f<coll.n_finite_elements();++n)
+  for (unsigned int f=0;f<coll.n_finite_elements();++f)
     {
-      const FiniteElement<dim>& fe = coll.ge_fe(f);
+      const FiniteElement<dim>& fe = coll.get_fe(f);
       
-      const unsigned int nb = fe.n_blocks();  
+      const unsigned int nb = fe.n_blocks();
       tables_by_block[f].reinit(nb, nb);
       tables_by_block[f].fill(none);
       for (unsigned int i=0;i<fe.n_components();++i)
