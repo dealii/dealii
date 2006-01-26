@@ -1478,6 +1478,45 @@ class DoFTools
     map_support_points_to_dofs (const Mapping<dim>    &mapping,
 				const DH<dim>         &dof_handler,
 				std::map<Point<dim>, unsigned int, Comp> &point_to_index_map);
+
+				     /**
+				      * Map a coupling table from the
+				      * user friendly organization by
+				      * components to the organization
+				      * by blocks. Specializations of
+				      * this function for DoFHandler
+				      * and hp::DoFHandler are
+				      * required due to the different
+				      * results of their finite
+				      * element access.
+				      *
+				      * The return vector will be
+				      * initialized to the correct
+				      * length inside this function.
+				      */
+    template <int dim>
+    void convert_couplings_to_blocks (const hp::DoFHandler<dim>& dof_handler,
+				      const Table<2, Coupling>& table_by_component,
+				      std::vector<Table<2,Coupling> >& tables_by_block);
+				     /**
+				      * Map a coupling table from the
+				      * user friendly organization by
+				      * components to the organization
+				      * by blocks. Specializations of
+				      * this function for DoFHandler
+				      * and hp::DoFHandler are
+				      * required due to the different
+				      * results of their finite
+				      * element access.
+				      *
+				      * The return vector will be
+				      * initialized to the correct
+				      * length inside this function.
+				      */
+    template <int dim>
+    void convert_couplings_to_blocks (const DoFHandler<dim>& dof_handler,
+				      const Table<2, Coupling>& table_by_component,
+				      std::vector<Table<2,Coupling> >& tables_by_block);
     
 				     /**
 				      * Exception
@@ -1594,6 +1633,36 @@ class DoFTools
 };
 
 
+/**
+ * Operator computing the maximum coupling out of two.
+ *
+ * @relates DoFTools
+ */
+DoFTools::Coupling operator |= (const DoFTools::Coupling& c1,
+				const DoFTools::Coupling& c2)
+{
+  if (c1 == DoFTools::always || c2 == DoFTools::always)
+    return DoFTools::always;
+  if (c1 == DoFTools::nonzero || c2 == DoFTools::nonzero)
+    return DoFTools::nonzero;
+  return DoFTools::none;
+}
+
+
+/**
+ * Operator computing the maximum coupling out of two.
+ *
+ * @relates DoFTools
+ */
+DoFTools::Coupling operator | (const DoFTools::Coupling& c1,
+			       const DoFTools::Coupling& c2)
+{
+  if (c1 == DoFTools::always || c2 == DoFTools::always)
+    return DoFTools::always;
+  if (c1 == DoFTools::nonzero || c2 == DoFTools::nonzero)
+    return DoFTools::nonzero;
+  return DoFTools::none;
+}
 
 
 // ---------------------- inline and template functions --------------------

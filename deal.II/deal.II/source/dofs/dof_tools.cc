@@ -3550,6 +3550,62 @@ DoFTools::compute_dof_couplings(
 }
 
 
+template<int dim>
+void
+DoFTools::convert_couplings_to_blocks (
+  const DoFHandler<dim>& dof_handler,
+  const Table<2, Coupling>& table,
+  std::vector<Table<2,Coupling> >& tables_by_block)
+{
+  const FiniteElement<dim>& fe = dof_handler.get_fe();
+  const unsigned int nb = fe.n_blocks();
+  
+  tables_by_block.resize(1);
+  tables_by_block[0].reinit(nb, nb);
+  tables_by_block[0].fill(none);
+  
+  for (unsigned int i=0;i<fe.n_components();++i)
+    {
+      const unsigned int ib = fe.component_to_block(i);
+      for (unsigned int j=0;j<fe.n_components();++j)
+	{
+	  const unsigned int jb = fe.component_to_block(j);
+	  tables_by_block[0](ib,jb) |= table(i,j);
+	}
+    }
+}
+
+
+template<int dim>
+void
+DoFTools::convert_couplings_to_blocks (
+  const hp::DoFHandler<dim>& dof_handler,
+  const Table<2, Coupling>& table,
+  std::vector<Table<2,Coupling> >& tables_by_block)
+{
+  const hp::FECollection<dim>& coll = dof_handler.get_fe();
+  tables_by_block.resize(coll.n_finite_elements());
+
+  for (unsigned int f=0;f<coll.n_finite_elements();++n)
+    {
+      const FiniteElement<dim>& fe = coll.ge_fe(f);
+      
+      const unsigned int nb = fe.n_blocks();  
+      tables_by_block[f].reinit(nb, nb);
+      tables_by_block[f].fill(none);
+      for (unsigned int i=0;i<fe.n_components();++i)
+	{
+	  const unsigned int ib = fe.component_to_block(i);
+	  for (unsigned int j=0;j<fe.n_components();++j)
+	    {
+	      const unsigned int jb = fe.component_to_block(j);
+	      tables_by_block[f](ib,jb) |= table(i,j);
+	    }
+	}
+    }
+}
+
+
 // explicit instantiations
 template void
 DoFTools::compute_row_length_vector(
@@ -4041,13 +4097,25 @@ DoFTools::map_dof_to_boundary_indices<deal_II_dimension>
 template
 void
 DoFTools::map_dofs_to_support_points<deal_II_dimension>
-(const Mapping<deal_II_dimension>       &mapping,
- const DoFHandler<deal_II_dimension>    &dof_handler,
- std::vector<Point<deal_II_dimension> > &support_points);
+(const Mapping<deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ std::vector<Point<deal_II_dimension> >&);
 
 template
 void
 DoFTools::compute_dof_couplings<deal_II_dimension>(
-  Table<2,Coupling>&       dof_couplings,
-  const Table<2,Coupling>& component_couplings,
-  const FiniteElement<deal_II_dimension>&      fe);
+  Table<2,Coupling>&, const Table<2,Coupling>&,
+  const FiniteElement<deal_II_dimension>&);
+
+template
+void
+DoFTools::convert_couplings_to_blocks (
+  const DoFHandler<deal_II_dimension>&, const Table<2, Coupling>&,
+  std::vector<Table<2,Coupling> >&);
+
+template
+void
+DoFTools::convert_couplings_to_blocks (
+  const hp::DoFHandler<deal_II_dimension>&, const Table<2, Coupling>&,
+  std::vector<Table<2,Coupling> >&);
+
