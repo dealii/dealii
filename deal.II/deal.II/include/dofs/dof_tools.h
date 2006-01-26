@@ -1638,14 +1638,14 @@ class DoFTools
  *
  * @relates DoFTools
  */
-DoFTools::Coupling operator |= (const DoFTools::Coupling& c1,
-				const DoFTools::Coupling& c2)
+DoFTools::Coupling operator |= (DoFTools::Coupling& c1,
+				const DoFTools::Coupling c2)
 {
-  if (c1 == DoFTools::always || c2 == DoFTools::always)
-    return DoFTools::always;
-  if (c1 == DoFTools::nonzero || c2 == DoFTools::nonzero)
-    return DoFTools::nonzero;
-  return DoFTools::none;
+  if (c2 == DoFTools::always)
+    c1 = DoFTools::always;
+  else if (c1 != DoFTools::always && c2 == DoFTools::nonzero)
+    return c1 = DoFTools::nonzero;
+  return c1;
 }
 
 
@@ -1654,8 +1654,8 @@ DoFTools::Coupling operator |= (const DoFTools::Coupling& c1,
  *
  * @relates DoFTools
  */
-DoFTools::Coupling operator | (const DoFTools::Coupling& c1,
-			       const DoFTools::Coupling& c2)
+DoFTools::Coupling operator | (const DoFTools::Coupling c1,
+			       const DoFTools::Coupling c2)
 {
   if (c1 == DoFTools::always || c2 == DoFTools::always)
     return DoFTools::always;
