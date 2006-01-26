@@ -7,8 +7,11 @@ D     = @prefix@
 include $D/common/Make.global_options
 
 
-# generic targets
-default: doxygen tutorial development validate-xrefs
+# default target. make sure validate-xrefs is only run after
+# everything else (can't appear in the list of dependencies since
+# would be run at the same time for parallel makes)
+default: doxygen tutorial development
+	@$(MAKE) validate-xrefs
 
 all: default
 
