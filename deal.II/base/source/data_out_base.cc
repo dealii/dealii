@@ -13,6 +13,22 @@
 
 //TODO: Do neighbors for dx and povray smooth triangles
 
+//////////////////////////////////////////////////////////////////////
+// Remarks on the implementations
+//
+// Variable names: in most functions, variable names have been
+// standardized in the following way:
+//
+// n1, n2, ni Number of points in coordinate direction 1, 2, i
+//    will be 1 if i>=dim
+//
+// i1, i2, ii Loop variable running up to ni
+//
+// d1, d2, di Multiplicators for ii to find positions in the
+//    array of nodes.
+//////////////////////////////////////////////////////////////////////
+
+
 #include <base/data_out_base.h>
 #include <base/parameter_handler.h>
 #include <base/thread_management.h>
@@ -30,7 +46,6 @@
 #else
 #  include <strstream>
 #endif
-
 
 //TODO: Is it reasonable to have undocumented exceptions?
 
@@ -1460,6 +1475,9 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 	   patch!=patches.end(); ++patch)
 	{
 	  const unsigned int n = patch->n_subdivisions;
+	  const unsigned int n1 = (dim>0) ? n : 1;
+	  const unsigned int n2 = (dim>1) ? n : 1;
+	  const unsigned int n3 = (dim>2) ? n : 1;
 	  unsigned int cells_per_patch = template_power<dim>(n);
 	  unsigned int dx = 1;
 	  unsigned int dy = n;
@@ -1467,19 +1485,19 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 
 	  const unsigned int patch_start = patch->patch_index * cells_per_patch;
 
-	  for (unsigned int iz=0;iz<((dim>2) ? n : 1);++iz)
-	    for (unsigned int iy=0;iy<((dim>1) ? n : 1);++iy)
-	      for (unsigned int ix=0;ix<n;++ix)
+	  for (unsigned int i3=0;i3<n3;++i3)
+	    for (unsigned int i2=0;i2<n2;++i2)
+	      for (unsigned int i1=0;i1<n1;++i1)
 		{
-		  const unsigned int nx = ix*dx;
-		  const unsigned int ny = iy*dy;
-		  const unsigned int nz = iz*dz;
+		  const unsigned int nx = i1*dx;
+		  const unsigned int ny = i2*dy;
+		  const unsigned int nz = i3*dz;
 
 		  out << '\n';
 						   // Direction -x
 						   // Last cell in row
 						   // of other patch
-		  if (ix==0)
+		  if (i1==0)
 		    {
 		      const unsigned int nn = patch->neighbors[0];
 		      out << '\t';
@@ -1494,7 +1512,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 						       // Direction +x
 						       // First cell in row
 						       // of other patch
-		  if (ix == n-1)
+		  if (i1 == n-1)
 		    {
 		      const unsigned int nn = patch->neighbors[1];
 		      out << '\t';
@@ -1509,7 +1527,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		  if (dim<2)
 		    continue;
 						   // Direction -y
-		  if (iy==0)
+		  if (i2==0)
 		    {
 		      const unsigned int nn = patch->neighbors[2];
 		      out << '\t';
@@ -1522,7 +1540,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 			  << patch_start+nx+ny-dy+nz;
 		    }
 						   // Direction +y
-		  if (iy == n-1)
+		  if (i2 == n-1)
 		    {
 		      const unsigned int nn = patch->neighbors[3];
 		      out << '\t';
@@ -1538,7 +1556,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 		    continue;
 		  
 						   // Direction -z
-		  if (iz==0)
+		  if (i3==0)
 		    {
 		      const unsigned int nn = patch->neighbors[4];
 		      out << '\t';
@@ -1551,7 +1569,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 			  << patch_start+nx+ny+nz-dz;
 		    }
 						   // Direction +z
-		  if (iz == n-1)
+		  if (i3 == n-1)
 		    {
 		      const unsigned int nn = patch->neighbors[5];
 		      out << '\t';
@@ -1718,12 +1736,12 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
       Point<spacedim> node;
       if (dim<3)
 	{
-	  for (unsigned int d2=0; d2<n2; ++d2)
+	  for (unsigned int i2=0; i2<n2; ++i2)
 	    {
 	      for (unsigned int i1=0; i1<n1; ++i1)
 		{
 		  const double x_frac = i1 * 1./n_subdivisions,
-			       y_frac = d2 * 1./n_subdivisions;
+			       y_frac = i2 * 1./n_subdivisions;
 		  
 						   // compute coordinates for
 						   // this patch point
@@ -1731,7 +1749,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 		  out << node << ' ';
 		  
 		  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
-		    out << patch->data(data_set,i1*d1+d2*n1) << ' ';
+		    out << patch->data(data_set,i1*d1+i2*d2) << ' ';
 		  out << '\n';
 		}
 					       // end of row in patch
