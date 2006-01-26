@@ -1218,6 +1218,13 @@ class FiniteElement : public Subscriptor,
     std::pair<unsigned int,unsigned int>
     system_to_block_index (const unsigned int component) const;
 
+				     /**
+				      * The vector block for this
+				      * component.
+				      */
+    unsigned int
+    component_to_block (const unsigned int component) const;
+
 				     //@}
     
 				     /**
@@ -2320,6 +2327,22 @@ FiniteElement<dim>::system_to_block_index (const unsigned int index) const
      first_block_of_base(system_to_base_table[index].first.first)
      + system_to_base_table[index].first.second,
      system_to_base_table[index].second);
+}
+
+
+template <int dim>  
+inline
+unsigned int
+FiniteElement<dim>::component_to_block (const unsigned int index) const
+{
+  Assert (index < this->n_components(),
+	  ExcIndexRange(index, 0, this->n_components()));
+				   // The block is computed simply as
+				   // first block of this base plus
+				   // the index within the base blocks
+  const std::pair<unsigned int, unsigned int>
+    base = component_to_base(index);
+  return first_block_of_base(base.first) + base.second;
 }
 
 
