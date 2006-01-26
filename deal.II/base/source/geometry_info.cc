@@ -49,17 +49,70 @@ namespace internal
 
 
 
+template <>
 const unsigned int
-GeometryInfoBase::unit_normal_direction[GeometryInfoBase::faces_per_cell_max_dim]
+GeometryInfo<1>::unit_normal_direction[faces_per_cell]
+= { 0, 0 };
+
+template <>
+const unsigned int
+GeometryInfo<2>::unit_normal_direction[faces_per_cell]
+= { 0, 0, 1, 1 };
+
+template <>
+const unsigned int
+GeometryInfo<3>::unit_normal_direction[faces_per_cell]
+= { 0, 0, 1, 1, 2, 2 };
+
+template <>
+const unsigned int
+GeometryInfo<4>::unit_normal_direction[faces_per_cell]
 = { 0, 0, 1, 1, 2, 2, 3, 3 };
 
+
+
+template <>
 const int
-GeometryInfoBase::unit_normal_orientation[GeometryInfoBase::faces_per_cell_max_dim]
+GeometryInfo<1>::unit_normal_orientation[faces_per_cell]
+= { -1, 1 };
+
+template <>
+const int
+GeometryInfo<2>::unit_normal_orientation[faces_per_cell]
+= { -1, 1, -1, 1 };
+
+template <>
+const int
+GeometryInfo<3>::unit_normal_orientation[faces_per_cell]
+= { -1, 1, -1, 1, -1, 1 };
+
+template <>
+const int
+GeometryInfo<4>::unit_normal_orientation[faces_per_cell]
 = { -1, 1, -1, 1, -1, 1, -1, 1 };
 
+
+
+template <>
 const unsigned int
-GeometryInfoBase::opposite_face[GeometryInfoBase::faces_per_cell_max_dim]
+GeometryInfo<1>::opposite_face[faces_per_cell]
+= { 1, 0 };
+
+template <>
+const unsigned int
+GeometryInfo<2>::opposite_face[faces_per_cell]
+= { 1, 0, 3, 2 };
+
+template <>
+const unsigned int
+GeometryInfo<3>::opposite_face[faces_per_cell]
+= { 1, 0, 3, 2, 5, 4 };
+
+template <>
+const unsigned int
+GeometryInfo<4>::opposite_face[faces_per_cell]
 = { 1, 0, 3, 2, 5, 4, 7, 6 };
+
 
 
 template <>

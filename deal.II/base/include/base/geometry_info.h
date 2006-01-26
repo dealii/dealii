@@ -23,95 +23,6 @@ template <int dim> class GeometryInfo;
 
 
 
-/**
- * Dimension independent base class for the <tt>GeometryInfo<dim></tt>
- * classes with <tt>dim=1,2,3,4</tt>. Includes all data and methods
- * which can be defined in an dimension indendent way.
- *
- * @ingroup grid geomprimitives
- * @author Ralf Hartmann, 2005
- */
-class GeometryInfoBase
-{
-  private:
-				     /**
-				      * The maximal dimension for
-				      * which data in this class is
-				      * implemented.
-				      */
-    static const unsigned int max_dim = 4;
-
-				     /**
-				      * Number of faces of a cell for
-				      * <tt>dim=max_dim</tt>.
-				      */
-    static const unsigned int faces_per_cell_max_dim = 2*max_dim;
-
-  public:
-        
-				     /**
-				      * For each face of the reference
-				      * cell, this field stores the
-				      * coordinate direction in which
-				      * its normal vector points. In
-				      * <tt>dim</tt> dimension these
-				      * are the <tt>2*dim</tt> first
-				      * entries of
-				      * <tt>{0,0,1,1,2,2,3,3}</tt>.
-				      *
-				      * Remark that this is only the
-				      * coordinate number. The actual
-				      * direction of the normal vector
-				      * is obtained by multiplying the
-				      * unit vector in this direction
-				      * with #unit_normal_orientation.
-				      */
-    static const unsigned int unit_normal_direction[faces_per_cell_max_dim];
-
-				     /**
-				      * Orientation of the unit normal
-				      * vector of a face of the
-				      * reference cell. In
-				      * <tt>dim</tt> dimension these
-				      * are the <tt>2*dim</tt> first
-				      * entries of
-				      * <tt>{-1,1,-1,1,-1,1,-1,1}</tt>.
-				      *
-				      * Each value is either
-				      * <tt>1</tt> or <tt>-1</tt>,
-				      * corresponding to a normal
-				      * vector pointing in the
-				      * positive or negative
-				      * coordinate direction,
-				      * respectively.
-				      *
-				      * Note that this is only the
-				      * <em>standard orientation</em>
-				      * of faces. At least in 3d,
-				      * actual faces of cells in a
-				      * triangulation can also have
-				      * the opposite orientation,
-				      * depending on a flag that one
-				      * can query from the cell it
-				      * belongs to. For more
-				      * information, see the
-				      * @ref GlossFaceOrientation "glossary"
-				      * entry on
-				      * face orientation.
-				      */
-    static const int unit_normal_orientation[faces_per_cell_max_dim];
-
-				     /**
-				      * List of numbers which denotes
-				      * which face is opposite to a
-				      * given face. Its entries are
-				      * <tt>{ 1, 0, 3, 2, 5, 4, 7, 6}</tt>.
-				      */
-    static const unsigned int opposite_face[faces_per_cell_max_dim];
-};
-
-
-
 
 /**
  * Topological description of zero dimensional cells,
@@ -217,7 +128,7 @@ struct GeometryInfo<0>
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2005
  */
 template <int dim>
-struct GeometryInfo: public GeometryInfoBase
+struct GeometryInfo
 {
     
 				     /**
@@ -548,6 +459,68 @@ struct GeometryInfo: public GeometryInfoBase
     static bool is_inside_unit_cell (const Point<dim> &p);
     
 				     /**
+				      * For each face of the reference
+				      * cell, this field stores the
+				      * coordinate direction in which
+				      * its normal vector points. In
+				      * <tt>dim</tt> dimension these
+				      * are the <tt>2*dim</tt> first
+				      * entries of
+				      * <tt>{0,0,1,1,2,2,3,3}</tt>.
+				      *
+				      * Note that this is only the
+				      * coordinate number. The actual
+				      * direction of the normal vector
+				      * is obtained by multiplying the
+				      * unit vector in this direction
+				      * with #unit_normal_orientation.
+				      */
+    static const unsigned int unit_normal_direction[faces_per_cell];
+
+				     /**
+				      * Orientation of the unit normal
+				      * vector of a face of the
+				      * reference cell. In
+				      * <tt>dim</tt> dimension these
+				      * are the <tt>2*dim</tt> first
+				      * entries of
+				      * <tt>{-1,1,-1,1,-1,1,-1,1}</tt>.
+				      *
+				      * Each value is either
+				      * <tt>1</tt> or <tt>-1</tt>,
+				      * corresponding to a normal
+				      * vector pointing in the
+				      * positive or negative
+				      * coordinate direction,
+				      * respectively.
+				      *
+				      * Note that this is only the
+				      * <em>standard orientation</em>
+				      * of faces. At least in 3d,
+				      * actual faces of cells in a
+				      * triangulation can also have
+				      * the opposite orientation,
+				      * depending on a flag that one
+				      * can query from the cell it
+				      * belongs to. For more
+				      * information, see the
+				      * @ref GlossFaceOrientation "glossary"
+				      * entry on
+				      * face orientation.
+				      */
+    static const int unit_normal_orientation[faces_per_cell];
+
+				     /**
+				      * List of numbers which denotes which
+				      * face is opposite to a given face. Its
+				      * entries are the first <tt>2*dim</tt>
+				      * entries of
+				      * <tt>{ 1, 0, 3, 2, 5, 4, 7, 6}</tt>.
+				      */
+    static const unsigned int opposite_face[faces_per_cell];
+
+
+                                     /**
 				      * Exception
 				      */
     DeclException1 (ExcInvalidCoordinate,
@@ -557,10 +530,43 @@ struct GeometryInfo: public GeometryInfoBase
 };
 
 
-/* -------------- declaration of explicit specializations ------------- */
 
 
 #ifndef DOXYGEN
+
+
+/* -------------- declaration of explicit specializations ------------- */
+
+template <>
+const unsigned int GeometryInfo<1>::unit_normal_direction[faces_per_cell];
+template <>
+const unsigned int GeometryInfo<2>::unit_normal_direction[faces_per_cell];
+template <>
+const unsigned int GeometryInfo<3>::unit_normal_direction[faces_per_cell];
+template <>
+const unsigned int GeometryInfo<4>::unit_normal_direction[faces_per_cell];
+
+template <>
+const int GeometryInfo<1>::unit_normal_orientation[faces_per_cell];
+template <>
+const int GeometryInfo<2>::unit_normal_orientation[faces_per_cell];
+template <>
+const int GeometryInfo<3>::unit_normal_orientation[faces_per_cell];
+template <>
+const int GeometryInfo<4>::unit_normal_orientation[faces_per_cell];
+
+template <>
+const unsigned int GeometryInfo<1>::opposite_face[faces_per_cell];
+template <>
+const unsigned int GeometryInfo<2>::opposite_face[faces_per_cell];
+template <>
+const unsigned int GeometryInfo<3>::opposite_face[faces_per_cell];
+template <>
+const unsigned int GeometryInfo<4>::opposite_face[faces_per_cell];
+
+
+/* -------------- inline functions ------------- */
+
 
 template <>
 inline
