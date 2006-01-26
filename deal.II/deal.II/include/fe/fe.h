@@ -1584,30 +1584,26 @@ class FiniteElement : public Subscriptor,
     
   protected:  
  				     /**
-				      * Array of projection matrices. See
-				      * get_restriction_matrix() above.
-				      *
-				      * Matrices in this array are
-				      * automatically initialized to
-				      * correct size. If the derived
-				      * finite element class does not
-				      * implement these matrices, they
-				      * should be resized to zero
-				      * size.
+				      * Array of projection
+				      * matrices. See
+				      * get_restriction_matrix()
+				      * above. The constructor
+				      * initializes these matrices to
+				      * zero dimensions, which can be
+				      * changed by derived classes
+				      * implementing them.
 				      */
     FullMatrix<double> restriction[GeometryInfo<dim>::children_per_cell];
 
     				     /**
-				      * Array of embedding matrices. See
-				      * <tt>get_prolongation_matrix()</tt> above.
-				      *
-				      * Matrices in this array are
-				      * automatically initialized to
-				      * correct size. If the derived
-				      * finite element class does not
-				      * implement these matrices, they
-				      * should be resized to zero
-				      * size.
+				      * Array of embedding
+				      * matrices. See
+				      * <tt>get_prolongation_matrix()</tt>
+				      * above. The constructor
+				      * initializes these matrices to
+				      * zero dimensions, which can be
+				      * changed by derived classes
+				      * implementing them.
 				      */
     FullMatrix<double> prolongation[GeometryInfo<dim>::children_per_cell];
 
