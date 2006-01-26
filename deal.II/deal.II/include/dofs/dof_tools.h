@@ -1495,9 +1495,10 @@ class DoFTools
 				      * length inside this function.
 				      */
     template <int dim>
-    void convert_couplings_to_blocks (const hp::DoFHandler<dim>& dof_handler,
-				      const Table<2, Coupling>& table_by_component,
-				      std::vector<Table<2,Coupling> >& tables_by_block);
+    static void
+    convert_couplings_to_blocks (const hp::DoFHandler<dim>& dof_handler,
+				 const Table<2, Coupling>& table_by_component,
+				 std::vector<Table<2,Coupling> >& tables_by_block);
 				     /**
 				      * Map a coupling table from the
 				      * user friendly organization by
@@ -1514,9 +1515,10 @@ class DoFTools
 				      * length inside this function.
 				      */
     template <int dim>
-    void convert_couplings_to_blocks (const DoFHandler<dim>& dof_handler,
-				      const Table<2, Coupling>& table_by_component,
-				      std::vector<Table<2,Coupling> >& tables_by_block);
+    static void
+    convert_couplings_to_blocks (const DoFHandler<dim>& dof_handler,
+				 const Table<2, Coupling>& table_by_component,
+				 std::vector<Table<2,Coupling> >& tables_by_block);
     
 				     /**
 				      * Exception
@@ -1638,6 +1640,7 @@ class DoFTools
  *
  * @relates DoFTools
  */
+inline
 DoFTools::Coupling operator |= (DoFTools::Coupling& c1,
 				const DoFTools::Coupling c2)
 {
@@ -1654,6 +1657,7 @@ DoFTools::Coupling operator |= (DoFTools::Coupling& c1,
  *
  * @relates DoFTools
  */
+inline
 DoFTools::Coupling operator | (const DoFTools::Coupling c1,
 			       const DoFTools::Coupling c2)
 {
