@@ -39,13 +39,6 @@ int main ()
   GridGenerator::hyper_shell(tria, origin, inner_radius, outer_radius, 8);
   tria.refine_global(2);
   
-  GridOut grid_out;
-  if (false)
-    {
-      std::ofstream eps_stream1("grid_untransformed/output");
-      grid_out.write_eps(tria, eps_stream1, &mapping);
-    }
-  
 				   // build up a map of vertex indices
 				   // of boundary vertices to the new
 				   // boundary points
@@ -99,18 +92,11 @@ int main ()
 	  }
     }
 
-				   // test output
-  if (false)
-    {
-      std::cout << "New points:" << std::endl;
-      std::map<unsigned int,Point<dim> >::const_iterator map_iter;
-      for (map_iter=new_points.begin(); map_iter!=new_points.end(); ++map_iter)
-	std::cout << "vertex " << map_iter->first << ": " << map_iter->second << std::endl;
-    }
-
   GridGenerator::laplace_transformation (tria, new_points);
   HyperBallBoundary<dim> inner_ball(n_center, n_radius);
   tria.set_boundary(1, inner_ball);
+
+  GridOut grid_out;
   std::ofstream eps_stream2("grid_transform/output");
   grid_out.write_eps(tria, eps_stream2, &mapping);
 
