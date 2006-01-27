@@ -56,7 +56,7 @@ class MGTools
       const MGDoFHandler<dim>& dofs,
       const unsigned int level,
       std::vector<unsigned int>& row_lengths,
-      const DoFTools::Coupling flux_couplings = none);
+      const DoFTools::Coupling flux_couplings = DoFTools::none);
     
 				     /**
 				      * Compute row length vector for
