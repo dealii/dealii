@@ -1,16 +1,18 @@
-//----------------------------  grid_transform.cc  ---------------------------
+//----------------------------  grid_transform_3d.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  grid_transform.cc  ---------------------------
+//----------------------------  grid_transform_3d.cc  ---------------------------
 
+// a test to check GridTransform in 3d. Produces a simplified version of the
+// mesh used in Wolfgang's 2006 NIH proposal
 
 
 #include "../tests.h"
@@ -20,9 +22,6 @@
 #include <grid/tria_boundary_lib.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_out.h>
-#include <fe/fe_q.h>
-#include <numerics/data_out.h>
-#include <lac/vector.h>
 
 #include <fstream>
 #include <iostream>
@@ -46,15 +45,13 @@ int main ()
   Triangulation<dim>::active_cell_iterator cell=tria.begin_active(),
 					   endc=tria.end();
 
-  for (unsigned int i=0; i<4; ++i)
-    {
-      for (cell=tria.begin_active(); cell!=endc; ++cell)
-	if ((cell->center()[0]-.2)*(cell->center()[0]-.2) +
-	    (cell->center()[2]-cell->center()[1]/4)*(cell->center()[2]-cell->center()[1]/4)
-	    < cell->diameter() * cell->diameter())
-	  cell->set_refine_flag ();
-      tria.execute_coarsening_and_refinement();
-    }
+  for (cell=tria.begin_active(); cell!=endc; ++cell)
+    if ((cell->center()[0]-.2)*(cell->center()[0]-.2) +
+        (cell->center()[2]-cell->center()[1]/4)*(cell->center()[2]-cell->center()[1]/4)
+        < cell->diameter() * cell->diameter())
+      cell->set_refine_flag ();
+  tria.execute_coarsening_and_refinement();
+
   for (cell=tria.begin_active(); cell!=endc; ++cell)
     if ((cell->center()[0]-.2)*(cell->center()[0]-.2) +
 	(cell->center()[2]-cell->center()[1]/4)*(cell->center()[2]-cell->center()[1]/4)
@@ -87,28 +84,11 @@ int main ()
       }
 
   GridGenerator::laplace_transformation (tria, new_points);
-
     
   
-  if (false)
-    {
-      GridOut grid_out;
-      std::ofstream out("grid_transform_3d/output");
-      grid_out.write_gnuplot(tria, out);
-    }
-  else
-    {
-      FE_Q<dim> fe(1);
-      DoFHandler<dim> dof_handler (tria);
-      dof_handler.distribute_dofs(fe);
-      Vector<double> v(dof_handler.n_dofs());
-      DataOut<dim> data_out;
-      data_out.attach_dof_handler (dof_handler);
-      data_out.add_data_vector (v, "v");
-      data_out.build_patches();
-      std::ofstream out("grid_transform_3d/output.gmv");
-      data_out.write_gmv(out);
-    }
+  GridOut grid_out;
+  std::ofstream out("grid_transform_3d/output");
+  grid_out.write_gnuplot(tria, out);
   
   tria.clear();
   
