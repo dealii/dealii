@@ -283,8 +283,8 @@ class DoFTools
     void compute_row_length_vector(
       const DH& dofs,
       std::vector<unsigned int>& row_lengths,
-      const Table<2,Coupling>& couplings /*= typename Table<2,Coupling>()*/,
-      const Table<2,Coupling>& flux_couplings /*= Table<2,Coupling>()*/);
+      const Table<2,Coupling>& couplings,
+      const Table<2,Coupling>& flux_couplings);
     
 				     /**
 				      * Locate non-zero entries of the
@@ -1084,7 +1084,6 @@ class DoFTools
 			      const bool vector_valued_once = false,
 			      std::vector<unsigned int>  target_component
 			      = std::vector<unsigned int>());
-
 
 				     /**
 				      * @deprecated See the previous

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,6 +46,33 @@ template <class number> class FullMatrix;
 class MGTools
 {
   public:
+				     /**
+				      * Compute row length vector for
+				      * multilevel methods.
+				      */
+    template <int dim>
+    static
+    void compute_row_length_vector(
+      const MGDoFHandler<dim>& dofs,
+      const unsigned int level,
+      std::vector<unsigned int>& row_lengths,
+      const DoFTools::Coupling flux_couplings = none);
+    
+				     /**
+				      * Compute row length vector for
+				      * multilevel methods with
+				      * optimization for block
+				      * couplings.
+				      */
+    template <int dim>
+    static
+    void compute_row_length_vector(
+      const MGDoFHandler<dim>& dofs,
+      const unsigned int level,
+      std::vector<unsigned int>& row_lengths,
+      const Table<2,DoFTools::Coupling>& couplings,
+      const Table<2,DoFTools::Coupling>& flux_couplings);
+
 				     /**
 				      * Write the sparsity structure
 				      * of the matrix belonging to the

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,6 +33,470 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+
+
+#if deal_II_dimension == 1
+
+template <int dim>
+void
+MGTools::compute_row_length_vector(
+  const MGDoFHandler<dim>&,
+  const unsigned int,
+  std::vector<unsigned int>&,
+  const DoFTools::Coupling)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template <int dim>
+void
+MGTools::compute_row_length_vector(
+  const MGDoFHandler<dim>&,
+  const unsigned int,
+  std::vector<unsigned int>&,
+  const Table<2,DoFTools::Coupling>&,
+  const Table<2,DoFTools::Coupling>&)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+#else
+
+// Template for 2D and 3D. For 1D see specialization above
+template <int dim>
+void
+MGTools::compute_row_length_vector(
+  const MGDoFHandler<dim>& dofs,
+  const unsigned int level,
+  std::vector<unsigned int>& row_lengths,
+  const DoFTools::Coupling             flux_coupling)
+{
+  Assert (row_lengths.size() == dofs.n_dofs(),
+	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+
+				   // Function starts here by
+				   // resetting the counters.
+  std::fill(row_lengths.begin(), row_lengths.end(), 0);
+				   // We need the user flags, so we
+				   // save them for later restoration
+  std::vector<bool> old_flags;
+				   // We need a non-constant
+				   // triangulation for the user
+				   // flags. Since we restore them in
+				   // the end, this cast is safe.
+  Triangulation<dim>& user_flags_triangulation =
+    const_cast<Triangulation<dim>&> (dofs.get_tria());
+  user_flags_triangulation.save_user_flags(old_flags);
+  user_flags_triangulation.clear_user_flags();
+  
+  const typename MGDoFHandler<dim>::cell_iterator end = dofs.end(level);
+  typename MGDoFHandler<dim>::active_cell_iterator cell;
+  std::vector<unsigned int> cell_indices;
+  std::vector<unsigned int> neighbor_indices;
+
+				   // We loop over cells and go from
+				   // cells to lower dimensional
+				   // objects. This is the only way to
+				   // cope with the fact, that an
+				   // unknown number of cells may
+				   // share an object of dimension
+				   // smaller than dim-1.
+  for (cell = dofs.begin(level); cell != end; ++cell)
+    {
+      const FiniteElement<dim>& fe = cell->get_fe();
+      cell_indices.resize(fe.dofs_per_cell);
+      cell->get_mg_dof_indices(cell_indices);
+      unsigned int i = 0;
+				       // First, dofs on
+				       // vertices. We assume that
+				       // each vertex dof couples
+				       // with all dofs on
+				       // adjacent grid cells.
+
+				       // Adding all dofs of the cells
+				       // will add dofs of the faces
+				       // of the cell adjacent to the
+				       // vertex twice. Therefore, we
+				       // subtract these here and add
+				       // them in a loop over the
+				       // faces below.
+
+				       // in 1d, faces and vertices
+				       // are identical. Nevertheless,
+				       // this will only work if
+				       // dofs_per_face is zero and
+				       // dofs_per_vertex is
+				       // arbitrary, not the other way
+				       // round.
+//TODO: This assumes that even in hp context, the dofs per face coincide!      
+      unsigned int increment = fe.dofs_per_cell - dim * fe.dofs_per_face;
+      while (i < fe.first_line_index)
+	row_lengths[cell_indices[i++]] += increment;
+				       // From now on, if an object is
+				       // a cell, its dofs only couple
+				       // inside the cell. Since the
+				       // faces are handled below, we
+				       // have to subtract ALL faces
+				       // in this case.
+      
+				       // In all other cases we
+				       // subtract adjacent faces to be
+				       // added in the loop below.
+      increment = (dim>1)
+		  ? fe.dofs_per_cell - (dim-1) * fe.dofs_per_face
+		  : fe.dofs_per_cell - GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
+      while (i < fe.first_quad_index)
+	row_lengths[cell_indices[i++]] += increment;
+      
+				       // Now quads in 2D and 3D
+      increment = (dim>2)
+		  ? fe.dofs_per_cell - (dim-2) * fe.dofs_per_face
+		  : fe.dofs_per_cell - GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
+      while (i < fe.first_hex_index)
+	row_lengths[cell_indices[i++]] += increment;
+				       // Finally, cells in 3D
+      increment = fe.dofs_per_cell - GeometryInfo<dim>::faces_per_cell * fe.dofs_per_face;
+      while (i < fe.dofs_per_cell)
+	row_lengths[cell_indices[i++]] += increment;
+
+				   // At this point, we have
+				   // counted all dofs
+				   // contributiong from cells
+				   // coupled topologically to the
+				   // adjacent cells, but we
+				   // subtracted some faces.
+  
+				   // Now, let's go by the faces
+				   // and add the missing
+				   // contribution as well as the
+				   // flux contributions.
+      for (unsigned int iface=0;iface<GeometryInfo<dim>::faces_per_cell;++iface)
+	{
+	  bool level_boundary = cell->at_boundary(iface);
+	  typename MGDoFHandler<dim>::cell_iterator neighbor;
+	  if (!level_boundary)
+	    {
+	      neighbor = cell->neighbor(iface);
+	      if (static_cast<unsigned int>(neighbor->level()) != level)
+		level_boundary = true;
+	    }
+	  
+	  if (level_boundary)
+	    {
+	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		row_lengths[cell_indices[i]] += fe.dofs_per_face;
+	      continue;
+	    }
+	  
+	  const FiniteElement<dim>& nfe = neighbor->get_fe();
+	  typename MGDoFHandler<dim>::face_iterator face = cell->face(iface);
+	  
+					   // Flux couplings are
+					   // computed from both sides
+					   // for simplicity.
+	  
+					   // The dofs on the common face
+					   // will be handled below,
+					   // therefore, we subtract them
+					   // here.
+	  if (flux_coupling != DoFTools::none)
+	    {
+	      unsigned int increment = nfe.dofs_per_cell - nfe.dofs_per_face;
+	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		row_lengths[cell_indices[i]] += increment;
+	    }
+	  
+					   // Do this only once per
+					   // face.
+	  if (face->user_flag_set())
+	    continue;
+	  face->set_user_flag();
+					   // At this point, we assume
+					   // that each cell added its
+					   // dofs minus the face to
+					   // the couplings of the
+					   // face dofs. Since we
+					   // subtracted two faces, we
+					   // have to re-add one.
+	  
+					   // If one side of the face
+					   // is refined, all the fine
+					   // face dofs couple with
+					   // the coarse one.
+	  neighbor_indices.resize(nfe.dofs_per_cell);
+	  neighbor->get_mg_dof_indices(neighbor_indices);
+	  for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+	    row_lengths[cell_indices[i]] += nfe.dofs_per_face;
+	  for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
+	    row_lengths[neighbor_indices[i]] += fe.dofs_per_face;
+	}
+    }
+  user_flags_triangulation.load_user_flags(old_flags);
+}
+
+
+// This is the template for 2D and 3D. See version for 1D above
+template <int dim>
+void
+MGTools::compute_row_length_vector(
+  const MGDoFHandler<dim>& dofs,
+  const unsigned int level,
+  std::vector<unsigned int>& row_lengths,
+  const Table<2,DoFTools::Coupling>& couplings,
+  const Table<2,DoFTools::Coupling>& flux_couplings)
+{
+  Assert (row_lengths.size() == dofs.n_dofs(),
+	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+  
+				   // Function starts here by
+				   // resetting the counters.
+  std::fill(row_lengths.begin(), row_lengths.end(), 0);
+				   // We need the user flags, so we
+				   // save them for later restoration
+  std::vector<bool> old_flags;
+				   // We need a non-constant
+				   // triangulation for the user
+				   // flags. Since we restore them in
+				   // the end, this cast is safe.
+  Triangulation<dim>& user_flags_triangulation =
+    const_cast<Triangulation<dim>&> (dofs.get_tria());
+  user_flags_triangulation.save_user_flags(old_flags);
+  user_flags_triangulation.clear_user_flags();
+  
+  const typename MGDoFHandler<dim>::cell_iterator end = dofs.end(level);
+  typename MGDoFHandler<dim>::active_cell_iterator cell;
+  std::vector<unsigned int> cell_indices;
+  std::vector<unsigned int> neighbor_indices;
+  
+				   // We have to translate the
+				   // couplings from components to
+				   // blocks, so this works for
+				   // nonprimitive elements as well.
+  std::vector<Table<2, DoFTools::Coupling> > couple_cell;
+  std::vector<Table<2, DoFTools::Coupling> > couple_face;
+  DoFTools::convert_couplings_to_blocks(dofs, couplings, couple_cell);
+  DoFTools::convert_couplings_to_blocks(dofs, flux_couplings, couple_face);
+  
+				   // We loop over cells and go from
+				   // cells to lower dimensional
+				   // objects. This is the only way to
+				   // cope withthe fact, that an
+				   // unknown number of cells may
+				   // share an object of dimension
+				   // smaller than dim-1.
+  for (cell = dofs.begin_active(); cell != end; ++cell)
+    {
+      const FiniteElement<dim>& fe = cell->get_fe();
+      const unsigned int fe_index = cell->active_fe_index();
+      
+      Assert (couplings.n_rows()==fe.n_components(),
+	      ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
+      Assert (couplings.n_cols()==fe.n_components(),
+	      ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
+      Assert (flux_couplings.n_rows()==fe.n_components(),
+	      ExcDimensionMismatch(flux_couplings.n_rows(), fe.n_components()));
+      Assert (flux_couplings.n_cols()==fe.n_components(),
+	      ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
+      
+      cell_indices.resize(fe.dofs_per_cell);
+      cell->get_mg_dof_indices(cell_indices);
+      unsigned int i = 0;
+				       // First, dofs on
+				       // vertices. We assume that
+				       // each vertex dof couples
+				       // with all dofs on
+				       // adjacent grid cells.
+
+				       // Adding all dofs of the cells
+				       // will add dofs of the faces
+				       // of the cell adjacent to the
+				       // vertex twice. Therefore, we
+				       // subtract these here and add
+				       // them in a loop over the
+				       // faces below.
+
+				       // in 1d, faces and vertices
+				       // are identical. Nevertheless,
+				       // this will only work if
+				       // dofs_per_face is zero and
+				       // dofs_per_vertex is
+				       // arbitrary, not the other way
+				       // round.
+      unsigned int increment;
+      while (i < fe.first_line_index)
+	{
+	  for (unsigned int base=0;base<fe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
+					fe.first_block_of_base(base) + mult) != DoFTools::none)
+		{
+		  increment = fe.base_element(base).dofs_per_cell
+			      - dim * fe.base_element(base).dofs_per_face;
+		  row_lengths[cell_indices[i]] += increment;
+		}
+	  ++i;
+	}
+				       // From now on, if an object is
+				       // a cell, its dofs only couple
+				       // inside the cell. Since the
+				       // faces are handled below, we
+				       // have to subtract ALL faces
+				       // in this case.
+      
+				       // In all other cases we
+				       // subtract adjacent faces to be
+				       // added in the loop below.
+      while (i < fe.first_quad_index)
+	{
+	  for (unsigned int base=0;base<fe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
+					fe.first_block_of_base(base) + mult) != DoFTools::none)
+		{
+		  increment = fe.base_element(base).dofs_per_cell
+			      - ((dim>1)
+				 ? (dim-1)
+				 : GeometryInfo<dim>::faces_per_cell)
+			      * fe.base_element(base).dofs_per_face;
+		row_lengths[cell_indices[i]] += increment;
+		}
+	  ++i;
+	}
+      
+				       // Now quads in 2D and 3D
+      while (i < fe.first_hex_index)
+	{
+	  for (unsigned int base=0;base<fe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
+					fe.first_block_of_base(base) + mult) != DoFTools::none)
+		{
+		  increment = fe.base_element(base).dofs_per_cell
+			      - ((dim>2)
+				 ? (dim-2)
+				 : GeometryInfo<dim>::faces_per_cell)
+			      * fe.base_element(base).dofs_per_face;
+		row_lengths[cell_indices[i]] += increment;
+	      }
+	  ++i;
+	}
+      
+				       // Finally, cells in 3D
+      while (i < fe.dofs_per_cell)
+	{
+	  for (unsigned int base=0;base<fe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
+					fe.first_block_of_base(base) + mult) != DoFTools::none)
+		{
+		  increment = fe.base_element(base).dofs_per_cell
+			      - GeometryInfo<dim>::faces_per_cell
+			      * fe.base_element(base).dofs_per_face;
+		  row_lengths[cell_indices[i]] += increment;
+		}
+	  ++i;
+	}
+      
+				   // At this point, we have
+				   // counted all dofs
+				   // contributiong from cells
+				   // coupled topologically to the
+				   // adjacent cells, but we
+				   // subtracted some faces.
+  
+				   // Now, let's go by the faces
+				   // and add the missing
+				   // contribution as well as the
+				   // flux contributions.
+      for (unsigned int iface=0;iface<GeometryInfo<dim>::faces_per_cell;++iface)
+	{
+	  bool level_boundary = cell->at_boundary(iface);
+	  typename MGDoFHandler<dim>::cell_iterator neighbor;
+	  if (!level_boundary)
+	    {
+	      neighbor = cell->neighbor(iface);
+	      if (static_cast<unsigned int>(neighbor->level()) != level)
+		level_boundary = true;
+	    }
+	  
+	  if (level_boundary)
+	    {
+	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		row_lengths[cell_indices[i]] += fe.dofs_per_face;
+	      continue;
+	    }
+	  
+	  const FiniteElement<dim>& nfe = neighbor->get_fe();
+	  typename MGDoFHandler<dim>::face_iterator face = cell->face(iface);
+	  
+					   // Flux couplings are
+					   // computed from both sides
+					   // for simplicity.
+	  
+					   // The dofs on the common face
+					   // will be handled below,
+					   // therefore, we subtract them
+					   // here.
+	  for (unsigned int base=0;base<nfe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<nfe.element_multiplicity(base);++mult)
+	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		if (couple_face[fe_index](fe.system_to_block_index(i).first,
+					  nfe.first_block_of_base(base) + mult) != DoFTools::none)
+		{
+		  unsigned int increment = nfe.base_element(base).dofs_per_cell
+					   - nfe.base_element(base).dofs_per_face;
+		  row_lengths[cell_indices[i]] += increment;
+		}
+	  
+					   // Do this only once per
+					   // face and not on the
+					   // hanging faces.
+	  if (face->user_flag_set())
+	    continue;
+	  face->set_user_flag();
+					   // At this point, we assume
+					   // that each cell added its
+					   // dofs minus the face to
+					   // the couplings of the
+					   // face dofs. Since we
+					   // subtracted two faces, we
+					   // have to re-add one.
+	  
+					   // If one side of the face
+					   // is refined, all the fine
+					   // face dofs couple with
+					   // the coarse one.
+	  
+					   // Wolfgang, do they couple
+					   // with each other by
+					   // constraints?
+
+					   // This will not work with
+					   // different couplings on
+					   // different cells.
+	  neighbor_indices.resize(nfe.dofs_per_cell);
+	  neighbor->get_mg_dof_indices(neighbor_indices);
+	  for (unsigned int base=0;base<nfe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<nfe.element_multiplicity(base);++mult)
+	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		if (couple_cell[fe_index](fe.system_to_component_index(i).first,
+					  nfe.first_block_of_base(base) + mult) != DoFTools::none)
+		  row_lengths[cell_indices[i]]
+		    += nfe.base_element(base).dofs_per_face;
+	  for (unsigned int base=0;base<fe.n_base_elements();++base)
+	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	      for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
+		if (couple_cell[fe_index](nfe.system_to_component_index(i).first,
+					  fe.first_block_of_base(base) + mult) != DoFTools::none)
+		  row_lengths[neighbor_indices[i]]
+		    += fe.base_element(base).dofs_per_face;
+	}
+    }
+  user_flags_triangulation.load_user_flags(old_flags);
+}
+#endif
 
 
 template <int dim, class SparsityPattern>
@@ -190,8 +654,8 @@ MGTools::make_flux_sparsity_pattern (
   const MGDoFHandler<dim> &dof,
   SparsityPattern       &sparsity,
   const unsigned int level,
-  const Table<2,DoFTools::Coupling> &int_mask,
-  const Table<2,DoFTools::Coupling> &flux_mask)
+  const Table<2,DoFTools::DoFTools::Coupling> &int_mask,
+  const Table<2,DoFTools::DoFTools::Coupling> &flux_mask)
 {
   const FiniteElement<dim>& fe = dof.get_fe();
   const unsigned int n_dofs = dof.n_dofs(level);
@@ -218,8 +682,8 @@ MGTools::make_flux_sparsity_pattern (
   typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
 
-  Table<2,DoFTools::Coupling> int_dof_mask(total_dofs, total_dofs);
-  Table<2,DoFTools::Coupling> flux_dof_mask(total_dofs, total_dofs);
+  Table<2,DoFTools::DoFTools::Coupling> int_dof_mask(total_dofs, total_dofs);
+  Table<2,DoFTools::DoFTools::Coupling> flux_dof_mask(total_dofs, total_dofs);
 
   DoFTools::compute_dof_couplings(int_dof_mask, int_mask, fe);
   DoFTools::compute_dof_couplings(flux_dof_mask, flux_mask, fe);
@@ -369,7 +833,7 @@ MGTools::make_flux_sparsity_pattern_edge (
   const MGDoFHandler<dim> &dof,
   SparsityPattern       &sparsity,
   const unsigned int level,
-  const Table<2,DoFTools::Coupling> &flux_mask)
+  const Table<2,DoFTools::DoFTools::Coupling> &flux_mask)
 {
   const FiniteElement<dim>& fe = dof.get_fe();
   const unsigned int n_comp = fe.n_components();
@@ -399,7 +863,7 @@ MGTools::make_flux_sparsity_pattern_edge (
   typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
 
-   Table<2,DoFTools::Coupling> flux_dof_mask(dofs_per_cell, dofs_per_cell);
+   Table<2,DoFTools::DoFTools::Coupling> flux_dof_mask(dofs_per_cell, dofs_per_cell);
 
    DoFTools::compute_dof_couplings(flux_dof_mask, flux_mask, fe);
   
@@ -701,6 +1165,16 @@ MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
 #include "mg_tools.pattern.in.h"
 #undef PATTERN
 
+
+template void
+MGTools::compute_row_length_vector(
+  const MGDoFHandler<deal_II_dimension>&, unsigned int,
+  std::vector<unsigned int>&, const DoFTools::Coupling);
+template void
+MGTools::compute_row_length_vector(
+  const MGDoFHandler<deal_II_dimension>&, unsigned int,
+  std::vector<unsigned int>&,
+  const Table<2,DoFTools::Coupling>&, const Table<2,DoFTools::Coupling>&);
 
 template void MGTools::reinit_vector<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,

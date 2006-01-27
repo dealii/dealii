@@ -408,7 +408,6 @@ DoFTools::compute_row_length_vector(
 }
 
 
-//TODO:[GK] Extend this to non-primitive elements
 // This is the template for 2D and 3D. See version for 1D above
 template <class DH>
 void
@@ -462,7 +461,6 @@ DoFTools::compute_row_length_vector(
       const FiniteElement<DH::dimension>& fe = cell->get_fe();
       const unsigned int fe_index = cell->active_fe_index();
       
-      Assert (fe.is_primitive(), typename FiniteElement<DH::dimension>::ExcFENotPrimitive());
       Assert (couplings.n_rows()==fe.n_components(),
 	      ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
       Assert (couplings.n_cols()==fe.n_components(),
@@ -472,8 +470,8 @@ DoFTools::compute_row_length_vector(
       Assert (flux_couplings.n_cols()==fe.n_components(),
 	      ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
       
-      cell->get_dof_indices(cell_indices);
       cell_indices.resize(fe.dofs_per_cell);
+      cell->get_dof_indices(cell_indices);
       unsigned int i = 0;
 				       // First, dofs on
 				       // vertices. We assume that
@@ -640,7 +638,7 @@ DoFTools::compute_row_length_vector(
 					   // This will not work with
 					   // different couplings on
 					   // different cells.
-	  neighbor_indices.resize(fe.dofs_per_cell);
+	  neighbor_indices.resize(nfe.dofs_per_cell);
 	  neighbor->get_dof_indices(neighbor_indices);
 	  for (unsigned int base=0;base<nfe.n_base_elements();++base)
 	    for (unsigned int mult=0;mult<nfe.element_multiplicity(base);++mult)
