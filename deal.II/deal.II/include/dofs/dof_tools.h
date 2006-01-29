@@ -751,27 +751,29 @@ class DoFTools
 				      * Extract the indices of the
 				      * degrees of freedom belonging
 				      * to certain vector components
-				      * of a vector-valued finite
-				      * element. The bit vector
-				      * @p select defines, which
-				      * components of an
-				      * FESystem are to be
-				      * extracted from the
-				      * DoFHandler @p dof. The
-				      * entries in @p selected_dofs
-				      * corresponding to degrees of
-				      * freedom belonging to these
-				      * components are then flagged
-				      * @p true, while all others are
-				      * set to @p false.
+				      * or blocks (if the last
+				      * argument is <tt>true</tt>) of
+				      * a vector-valued finite
+				      * element. The bit vector @p
+				      * select defines, which
+				      * components or blocks of an
+				      * FESystem are to be extracted
+				      * from the DoFHandler @p
+				      * dof. The entries in @p
+				      * selected_dofs corresponding to
+				      * degrees of freedom belonging
+				      * to these components are then
+				      * flagged @p true, while all
+				      * others are set to @p false.
 				      *
-				      * The size of
-				      * @p component_select shall
+				      * The size of @p select must
 				      * equal the number of components
-				      * in the finite element used by
-				      * @p dof. The size of
-				      * @p selected_dofs shall equal
-				      * <tt>dof_handler.n_dofs()</tt>. Previous
+				      * or blocks in the FiniteElement
+				      * used by @p dof, depending on
+				      * the argument
+				      * <tt>blocks</tt>. The size of
+				      * @p selected_dofs must equal
+				      * DoFHandler::n_dofs(). Previous
 				      * contents of this array are
 				      * overwritten.
 				      *
@@ -781,8 +783,8 @@ class DoFTools
 				      * of its shape functions are
 				      * non-zero in more than one
 				      * vector component (which holds,
-				      * for example, for Nedelec or
-				      * Raviart-Thomas elements), then
+				      * for example, for FE_Nedelec or
+				      * FE_RaviartThomas elements), then
 				      * shape functions cannot be
 				      * associated with a single
 				      * vector component. In this
@@ -799,12 +801,13 @@ class DoFTools
     template <int dim>
     static void
     extract_dofs (const DoFHandler<dim>   &dof_handler,
-		  const std::vector<bool> &component_select,
-		  std::vector<bool>       &selected_dofs);
+		  const std::vector<bool> &select,
+		  std::vector<bool>       &selected_dofs,
+		  bool blocks = false);
 
 				     /**
 				      * Do the same thing as
-				      * @p extract_dofs for one level
+				      * extract_dofs() for one level
 				      * of a multi-grid DoF numbering.
 				      */
     template <int dim>
@@ -812,7 +815,8 @@ class DoFTools
     extract_level_dofs (const unsigned int       level,
 			const MGDoFHandler<dim> &dof,
 			const std::vector<bool> &select,
-			std::vector<bool>       &selected_dofs);
+			std::vector<bool>       &selected_dofs,
+			bool blocks = false);
 
 				     /**
 				      * Extract all degrees of freedom
