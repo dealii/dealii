@@ -52,8 +52,6 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 
   Assert(sizes.size()==mg_dof_handler.get_tria().n_levels(),
 	 ExcMatricesNotBuilt());
-//  for (unsigned int l=minlevel;l<=maxlevel;++l)
-//    dst[l].reinit(sizes[l]);
   
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
@@ -147,10 +145,7 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
 				       // global vector
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	dst(global_dof_indices[i]) = src[level](level_dof_indices[i]);
-    };
-
-				   // clear constrained nodes
-//TODO:[GK]  constraints->set_zero(dst);
+    }
 }
 
 
@@ -191,17 +186,11 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
 				       // numbering
       level_cell->get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
-
-//TODO:[GK] Probably wrong for continuous elements
-
 				       // copy level-wise data to
 				       // global vector
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	dst(global_dof_indices[i]) += src[level](level_dof_indices[i]);
-    };
-
-				   // clear constrained nodes
-//TODO:[GK]  constraints->set_zero(dst);
+    }
 }
 
 
@@ -313,11 +302,6 @@ MGTransferSelect<number>::do_copy_to_mg (
 	level_cell = mg_dof_handler.begin_active(level);
       const typename MGDoFHandler<dim>::active_cell_iterator
 	level_end  = mg_dof_handler.end_active(level);
-
-//TODO:[?] Treat hanging nodes properly
-// The single-level vector is not an FE-function, because the values at
-// hanging nodes are set to zero. This should be treated before the restriction.
-
 				       // Compute coarse level right hand side
 				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
@@ -466,10 +450,7 @@ MGTransferSelect<number>::do_copy_from_mg (
 	      = src[level](level_dof_indices[i]-level_start);
 	  }
 	}
-    };
-
-				   // clear constrained nodes
-//TODO:[GK]  constraints->set_zero(dst);
+    }
 }
 
 
@@ -511,9 +492,6 @@ MGTransferSelect<number>::do_copy_from_mg_add (
 				       // numbering
       level_cell->get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
-
-//TODO:[GK+WB] Probably wrong for continuous elements
-
 				       // copy level-wise data to
 				       // global vector
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -529,8 +507,6 @@ MGTransferSelect<number>::do_copy_from_mg_add (
 	    }
 	}
     }
-				   // clear constrained nodes
-//TODO:[GK+WB]  constraints->set_zero(dst);
 }
 
 
@@ -706,9 +682,6 @@ MGTransferBlock<number>::copy_from_mg_add (
 				       // numbering
       level_cell->get_dof_indices (global_dof_indices);
       level_cell->get_mg_dof_indices(level_dof_indices);
-
-//TODO:[GK] Probably wrong for continuous elements
-
 				       // copy level-wise data to
 				       // global vector
       for (unsigned int i=0; i<dofs_per_cell; ++i)
