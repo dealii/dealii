@@ -962,11 +962,12 @@ MGTools::count_dofs_per_component (
 	      void (*fun_ptr) (const unsigned int       level,
 			       const MGDoFHandler<dim>    &,
 			       const std::vector<bool>    &,
-			       std::vector<bool>          &)
+			       std::vector<bool>          &,
+			       bool)
 		= &DoFTools::template extract_level_dofs<dim>;
 	      component_select[i][i] = true;
 	      threads += Threads::spawn (fun_ptr)(l, dof_handler, component_select[i],
-                                                  dofs_in_component[i]);
+                                                  dofs_in_component[i], false);
 	    }
 	  threads.join_all();
 
