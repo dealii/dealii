@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,40 +38,11 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
   MGLevelObject<VECTOR> &dst,
   const InVector                 &src) const
 {
-				   // forward to the correct
-				   // specialization
-  copy_to_mg (mg_dof_handler, dst, src, is_1d<(dim==1)>());
-}
-
-
-template <class VECTOR>
-template <int dim, class InVector>
-void
-MGTransferPrebuilt<VECTOR>::copy_to_mg (
-  const MGDoFHandler<dim>        &,
-  MGLevelObject<VECTOR> &,
-  const InVector                 &,
-  const is_1d<true>              &) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-template <class VECTOR>
-template <int dim, class InVector>
-void
-MGTransferPrebuilt<VECTOR>::copy_to_mg (
-  const MGDoFHandler<dim>& mg_dof_handler,
-  MGLevelObject<VECTOR>& dst,
-  const InVector&          src,
-  const is_1d<false>&) const
-{
-				   // Make src a real finite element function
-//  InVector src = osrc;
-//  constraints->distribute(src);
-  const unsigned int dofs_per_cell = mg_dof_handler.get_fe().dofs_per_cell;
-  const unsigned int dofs_per_face = mg_dof_handler.get_fe().dofs_per_face;
-
+  const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
+  
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+  
 				   // set the elements of the vectors
 				   // on all levels to zero
   unsigned int minlevel = dst.get_minlevel();
@@ -86,8 +57,7 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
   
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
-  std::vector<unsigned int> level_face_indices (dofs_per_face);
-
+  
 				   // traverse the grid top-down
 				   // (i.e. starting with the most
 				   // refined grid). this way, we can
@@ -105,10 +75,6 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
       const typename MGDoFHandler<dim>::active_cell_iterator
 	level_end  = mg_dof_handler.end_active(level);
 
-//TODO:[?] Treat hanging nodes properly
-// The single-level vector is not an FE-function, because the values at
-// hanging nodes are set to zero. This should be treated before the restriction.
-
 				       // Compute coarse level right hand side
 				       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
@@ -125,24 +91,7 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 					   // into the level-wise one
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    dst[level](level_dof_indices[i]) = src(global_dof_indices[i]);
-
-	  for (unsigned int face_n=0; face_n<GeometryInfo<dim>::faces_per_cell; ++face_n)
-	    {
-	      const typename MGDoFHandler<dim>::face_iterator
-		face = level_cell->face(face_n);
-	      if (face->has_children())
-		{
-		  face->get_mg_dof_indices(level_face_indices);
-
-
-						   // Delete values on refinement edge,
-						   // since restriction will add them again.
-		  for (unsigned int i=0; i<dofs_per_face; ++i)
-		    dst[level](level_face_indices[i])
-		      = 0.;
-		};
-	    };
-	};
+	}
 				       // for that part of the level
 				       // which is further refined:
 				       // get the defect by
@@ -152,7 +101,7 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 	{
 	  restrict_and_add (level+1, dst[level], dst[level+1]);
 	}
-    };
+    }
 }
 
 
@@ -165,8 +114,10 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
   OutVector&                     dst,
   const MGLevelObject<VECTOR>& src) const
 {
-  const unsigned int dofs_per_cell = mg_dof_handler.get_fe().dofs_per_cell;
-
+  const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
+  
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
@@ -212,8 +163,10 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
   OutVector                            &dst,
   const MGLevelObject<VECTOR> &src) const
 {
-  const unsigned int dofs_per_cell = mg_dof_handler.get_fe().dofs_per_cell;
-
+  const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
+  
+  const unsigned int dofs_per_cell = fe.dofs_per_cell;
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
@@ -283,11 +236,7 @@ MGTransferSelect<number>::copy_to_mg (
   MGLevelObject<Vector<number> > &dst,
   const BlockVector<number2>     &src) const
 {
-				   // forward to the correct
-				   // specialization
-  do_copy_to_mg (mg_dof_handler, dst, src,
-		 0, //component_start[selected_component],
-		 is_1d<(dim==1)>());
+  do_copy_to_mg (mg_dof_handler, dst, src, 0);
 }
 
 
@@ -300,26 +249,7 @@ MGTransferSelect<number>::copy_to_mg (
   MGLevelObject<Vector<number> > &dst,
   const Vector<number2>          &src) const
 {
-				   // forward to the correct
-				   // specialization
-  do_copy_to_mg (mg_dof_handler, dst, src,
-		 component_start[selected_component],
-		 is_1d<(dim==1)>());
-}
-
-
-
-template <typename number>
-template <int dim, class InVector>
-void
-MGTransferSelect<number>::do_copy_to_mg (
-  const MGDoFHandler<dim>&,
-  MGLevelObject<Vector<number> >&,
-  const InVector&,
-  const unsigned int,
-  const is_1d<true>&) const
-{
-  Assert(false, ExcNotImplemented());
+  do_copy_to_mg (mg_dof_handler, dst, src, component_start[selected_component]);
 }
 
 
@@ -331,17 +261,13 @@ MGTransferSelect<number>::do_copy_to_mg (
   const MGDoFHandler<dim>&        mg_dof_handler,
   MGLevelObject<Vector<number> >& dst,
   const InVector&                 src,
-  const unsigned int              offset,
-  const is_1d<false>&) const
+  const unsigned int              offset) const
 {
-				   // Make src a real finite element function
-//  InVector src = osrc;
-//  constraints->distribute(src);
-
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
+  
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int dofs_per_face = fe.dofs_per_face;
-
+  
 				   // set the elements of the vectors
 				   // on all levels to zero
   unsigned int minlevel = dst.get_minlevel();
@@ -357,8 +283,7 @@ MGTransferSelect<number>::do_copy_to_mg (
   
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
-  std::vector<unsigned int> level_face_indices (dofs_per_face);
-
+  
 				   // Build a vector of the selected
 				   // indices, since traversing all
 				   // indices on each cell is too
@@ -498,10 +423,10 @@ MGTransferSelect<number>::do_copy_from_mg (
   const MGLevelObject<Vector<number> > &src,
   const unsigned int offset) const
 {
-
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
+  
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
@@ -558,8 +483,8 @@ MGTransferSelect<number>::do_copy_from_mg_add (
   const MGLevelObject<Vector<number> > &src,
   const unsigned int offset) const
 {
-
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
@@ -629,44 +554,10 @@ MGTransferBlock<number>::copy_to_mg (
   MGLevelObject<BlockVector<number> > &dst,
   const InVector                      &src) const
 {
-				   // forward to the correct
-				   // specialization
-  copy_to_mg (mg_dof_handler, dst, src, is_1d<(dim==1)>());
-}
-
-
-
-template <typename number>
-template <int dim, class InVector>
-void
-MGTransferBlock<number>::copy_to_mg (
-  const MGDoFHandler<dim>             &,
-  MGLevelObject<BlockVector<number> > &,
-  const InVector                      &,
-  const is_1d<true>                   &) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-
-template <typename number>
-template <int dim, class InVector>
-void
-MGTransferBlock<number>::copy_to_mg (
-  const MGDoFHandler<dim>             &mg_dof_handler,
-  MGLevelObject<BlockVector<number> > &dst,
-  const InVector                      &src,
-  const is_1d<false>                  &) const
-{
-				   // Make src a real finite element
-				   // function
-//  InVector src = osrc;
-//  constraints->distribute(src);
-
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
+  
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int dofs_per_face = fe.dofs_per_face;
 
 				   // set the elements of the vectors
 				   // on all levels to zero
@@ -679,8 +570,7 @@ MGTransferBlock<number>::copy_to_mg (
   
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
-  std::vector<unsigned int> level_face_indices (dofs_per_face);
-
+  
 				   // traverse the grid top-down
 				   // (i.e. starting with the most
 				   // refined grid). this way, we can
@@ -718,7 +608,6 @@ MGTransferBlock<number>::copy_to_mg (
 	      dst[level](level_dof_indices[i])
 		= src(global_dof_indices[i]);
 	    }
-//TODO: Special treatment of faces? Copy from MGTransferPrebuilt when done there.
 	}
 				       // for that part of the level
 				       // which is further refined:
@@ -743,10 +632,10 @@ MGTransferBlock<number>::copy_from_mg (
   OutVector                                 &dst,
   const MGLevelObject<BlockVector<number> > &src) const
 {
-
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
+  
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
@@ -790,8 +679,9 @@ MGTransferBlock<number>::copy_from_mg_add (
   const MGLevelObject<BlockVector<number> > &src) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
+  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
+  
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
-
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 

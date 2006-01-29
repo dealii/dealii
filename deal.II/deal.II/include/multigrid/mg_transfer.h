@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -90,7 +90,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
     void
     copy_to_mg (const MGDoFHandler<dim>& mg_dof,
 		MGLevelObject<VECTOR>& dst,
-		const InVector&          src) const;
+		const InVector& src) const;
 
 				     /**
 				      * Transfer from multi-level vector to
@@ -106,8 +106,8 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      */
     template <int dim, class OutVector>
     void
-    copy_from_mg (const MGDoFHandler<dim>              &mg_dof,
-		  OutVector                            &dst,
+    copy_from_mg (const MGDoFHandler<dim>& mg_dof,
+		  OutVector& dst,
 		  const MGLevelObject<VECTOR> &src) const;
 
 				     /**
@@ -120,9 +120,9 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      */
     template <int dim, class OutVector>
     void
-    copy_from_mg_add (const MGDoFHandler<dim>              &mg_dof,
-		      OutVector                            &dst,
-		      const MGLevelObject<VECTOR> &src) const;
+    copy_from_mg_add (const MGDoFHandler<dim>& mg_dof,
+		      OutVector& dst,
+		      const MGLevelObject<VECTOR>& src) const;
 
 				     /**
 				      * Finite element does not
@@ -149,17 +149,6 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				    */
     std::vector<unsigned int> sizes;
 
-#ifdef DEAL_PREFER_MATRIX_EZ
-				     /**
-				      * The actual prolongation matrix.
-				      * column indices belong to the
-				      * dof indices of the mother cell,
-				      * i.e. the coarse level.
-				      * while row indices belong to the
-				      * child cell, i.e. the fine level.
-				      */
-    std::vector<boost::shared_ptr<SparseMatrixEZ<double> > > prolongation_matrices;
-#else
 				     /**
 				      * Sparsity patterns for transfer
 				      * matrices.
@@ -174,56 +163,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
 				      * while row indices belong to the
 				      * child cell, i.e. the fine level.
 				      */
-    std::vector<boost::shared_ptr<SparseMatrix<double> > > prolongation_matrices;
-#endif
-
-				     /**
-				      * Structure that is used to
-				      * disambiguate calls to
-				      * @p copy_to_mg for 1d and
-				      * non-1d. We provide two
-				      * functions of @p copy_to_mg,
-				      * where the 1d function takes an
-				      * argument of type
-				      * <tt>is_1d<true></tt> and the other
-				      * one of type <tt>is_1d<false></tt>.
-				      */
-    template <bool> struct is_1d {};
-    
-				     /**
-				      * Implementation of the
-				      * copy_to_mg() function for
-				      * 1d. We have to resort to some
-				      * template trickery because we
-				      * can't specialize template
-				      * functions on the (outer)
-				      * template of the class, without
-				      * also fully specializing the
-				      * inner (member function)
-				      * template parameters. However,
-				      * it can be done by adding the
-				      * additional argument that
-				      * converts template
-				      * specialization into function
-				      * overloading.
-				      */
-    template <int dim, class InVector>
-    void
-    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
-		MGLevelObject<VECTOR> &dst,
-		const InVector                 &src,
-		const is_1d<true>              &) const;
-
-				     /**
-				      * Same for all other space
-				      * dimensions.
-				      */
-    template <int dim, class InVector>
-    void
-    copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
-		MGLevelObject<VECTOR> &dst,
-		const InVector                 &src,
-		const is_1d<false>             &) const;
+    std::vector<boost::shared_ptr<SparseMatrix<double> > > prolongation_matrices;    
 };
 
 
@@ -324,25 +264,12 @@ class MGTransferBlockBase
 				      * function first.
 				      */
     DeclException0(ExcMatricesNotBuilt);
-
-#ifdef DEAL_PREFER_MATRIX_EZ
-  protected:
-  
-				     /**
-				      * The actual prolongation matrix.
-				      * column indices belong to the
-				      * dof indices of the mother cell,
-				      * i.e. the coarse level.
-				      * while row indices belong to the
-				      * child cell, i.e. the fine level.
-				      */
-    std::vector<boost::shared_ptr<BlockSparseMatrixEZ<double> > > prolongation_matrices;
-#else
+    
   private:
     std::vector<boost::shared_ptr<BlockSparsityPattern> >   prolongation_sparsities;
-
+    
   protected:
-  
+    
 				     /**
 				      * The actual prolongation matrix.
 				      * column indices belong to the
@@ -352,8 +279,7 @@ class MGTransferBlockBase
 				      * child cell, i.e. the fine level.
 				      */
     std::vector<boost::shared_ptr<BlockSparseMatrix<double> > > prolongation_matrices;
-#endif
-
+    
 				     /**
 				      * Unused now, but intended to
 				      * hold the mapping for the
@@ -521,54 +447,6 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
     
   private:
 				     /**
-				      * Structure that is used to
-				      * disambiguate calls to
-				      * @p copy_to_mg for 1d and
-				      * non-1d. We provide two
-				      * functions of @p copy_to_mg,
-				      * where the 1d function takes an
-				      * argument of type
-				      * <tt>is_1d<true></tt> and the other
-				      * one of type <tt>is_1d<false></tt>.
-				      */
-    template <bool> struct is_1d {};
-
-				     /**
-				      * Implementation of the
-				      * @p copy_to_mg function for
-				      * 1d. We have to resort to some
-				      * template trickery because we
-				      * can't specialize template
-				      * functions on the (outer)
-				      * template of the class, without
-				      * also fully specializing the
-				      * inner (member function)
-				      * template parameters. However,
-				      * it can be done by adding the
-				      * additional argument that
-				      * converts template
-				      * specialization into function
-				      * overloading.
-				      */
-    template <int dim, class InVector>
-    void
-    copy_to_mg (const MGDoFHandler<dim>             &mg_dof,
-		MGLevelObject<BlockVector<number> > &dst,
-		const InVector                      &src,
-		const is_1d<true>                   &) const;
-
-				     /**
-				      * Same for all other space
-				      * dimensions.
-				      */
-    template <int dim, class InVector>
-    void
-    copy_to_mg (const MGDoFHandler<dim>             &mg_dof,
-		MGLevelObject<BlockVector<number> > &dst,
-		const InVector                      &src,
-		const is_1d<false>                  &) const;    
-    
-				     /**
 				      * Optional multiplication
 				      * factors for each
 				      * component. Requires
@@ -671,19 +549,6 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
     virtual void restrict_and_add (const unsigned int    from_level,
 				   Vector<number>       &dst,
 				   const Vector<number> &src) const;
-
-				     /**
-				      * Structure that is used to
-				      * disambiguate calls to
-				      * copy_to_mg() for 1d and
-				      * non-1d. We provide two
-				      * functions of copy_to_mg(),
-				      * where the 1d function takes an
-				      * argument of type
-				      * <tt>is_1d<true></tt> and the other
-				      * one of type <tt>is_1d<false></tt>}.
-				      */
-    template <bool> struct is_1d {};
     
     				     /**
 				      * Transfer from a vector on the
@@ -793,43 +658,15 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 			 const unsigned int offset) const;
 
 				     /**
-				      * Implementation of the
-				      * copy_to_mg() function for
-				      * 1d. We have to resort to some
-				      * template trickery because we
-				      * can't specialize template
-				      * functions on the (outer)
-				      * template of the class, without
-				      * also fully specializing the
-				      * inner (member function)
-				      * template parameters. However,
-				      * it can be done by adding the
-				      * additional argument that
-				      * converts template
-				      * specialization into function
-				      * overloading.
+				      * Actual implementation of
+				      * copy_to_mg().
 				      */
     template <int dim, class InVector>
     void
     do_copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
 		   MGLevelObject<Vector<number> > &dst,
 		   const InVector                 &src,
-		   const unsigned int              offset,
-		   const is_1d<true>              &) const;
-
-				     /**
-				      * Implementation of the
-				      * copy_to_mg() function for
-				      * higher dimensions.
-				      */
-    template <int dim, class InVector>
-    void
-    do_copy_to_mg (const MGDoFHandler<dim>        &mg_dof,
-		   MGLevelObject<Vector<number> > &dst,
-		   const InVector                 &src,
-		   const unsigned int              offset,
-		   const is_1d<false>             &) const;
-
+		   const unsigned int              offset) const;
                                      /**
                                       * Selected component of global vector.
                                       */
