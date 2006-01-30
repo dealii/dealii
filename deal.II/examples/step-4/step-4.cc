@@ -4,12 +4,14 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
+
+                                 // @sect3{Include files}
 
 				 // The first few (many?) include
 				 // files have already been used in
@@ -39,20 +41,19 @@
 #include <fstream>
 #include <iostream>
 
-				 // This is new, however: in the
-				 // previous example we got some
-				 // unwanted output from the linear
-				 // solvers. If we want to suppress
-				 // it, we have to include this file
-				 // and add a line somewhere to the
-				 // program; in this program, it was
-				 // added to the main function.
+				 // This is new, however: in the previous
+				 // example we got some unwanted output from
+				 // the linear solvers. If we want to suppress
+				 // it, we have to include this file and add a
+				 // single line somewhere to the program (see
+				 // the main() function below for that):
 #include <base/logstream.h>
 
 
+                                 // @sect3{The ``LaplaceProblem'' class template}
 
 				 // This is again the same
-				 // LaplaceProblem class as in the
+				 // ``LaplaceProblem'' class as in the
 				 // previous example. The only
 				 // difference is that we have now
 				 // declared it as a class with a
@@ -93,13 +94,14 @@ class LaplaceProblem
 };
 
 
-				 // In the following, we declare two
-				 // more classes, which will represent
-				 // the functions of the
-				 // dim-dimensional space denoting the
-				 // right hand side and the
-				 // non-homogeneous Dirichlet boundary
-				 // values.
+                                 // @sect3{Right hand side and boundary values}
+
+				 // In the following, we declare two more
+				 // classes denoting the right hand side and
+				 // the non-homogeneous Dirichlet boundary
+				 // values. Both are functions of a
+				 // dim-dimensional space variable, so we
+				 // declare them as templates as well.
 				 //
 				 // Each of these classes is derived
 				 // from a common, abstract base class
@@ -114,26 +116,25 @@ class LaplaceProblem
 				 // value at that point as a `double'
 				 // variable.
 				 //
-				 // The `value' function takes a
-				 // second argument, which we have
-				 // here named `component': This is
-				 // only meant for vector valued
-				 // functions, where you may want to
-				 // access a certain component of the
-				 // vector at the point `p'. However,
-				 // our functions are scalar, so we
-				 // need not worry about this
-				 // parameter and we will not use it
-				 // in the implementation of the
-				 // functions. Note that in the base
-				 // class (Function), the declaration
-				 // of the `value' function has a
-				 // default value of zero for the
-				 // component, so we will access the
-				 // `value' function of the right hand
-				 // side with only one parameter,
-				 // namely the point where we want to
-				 // evaluate the function.
+				 // The `value' function takes a second
+				 // argument, which we have here named
+				 // `component': This is only meant for vector
+				 // valued functions, where you may want to
+				 // access a certain component of the vector
+				 // at the point `p'. However, our functions
+				 // are scalar, so we need not worry about
+				 // this parameter and we will not use it in
+				 // the implementation of the
+				 // functions. Inside the library's header
+				 // files, the Function base class's
+				 // declaration of the `value' function has a
+				 // default value of zero for the component,
+				 // so we will access the `value' function of
+				 // the right hand side with only one
+				 // parameter, namely the point where we want
+				 // to evaluate the function. A value for the
+				 // component can then simply be omitted for
+				 // scalar functions.
 				 //
 				 // Note that the C++ language forces
 				 // us to declare and define a
@@ -170,28 +171,38 @@ class BoundaryValues : public Function<dim>
 
 
 
-				 // We wanted the right hand side
-				 // function to be 4*(x**4+y**4) in
-				 // 2D, or 4*(x**4+y**4+z**4) in
-				 // 3D. Unfortunately, this is not as
-				 // elegantly feasible dimension
-				 // independently as much of the rest
-				 // of this program, so we have to do
-				 // it using a small
-				 // loop. Fortunately, the compiler
-				 // knows the size of the loop at
-				 // compile time, i.e. the number of
-				 // times the body will be executed,
-				 // so it can optimize away the
-				 // overhead needed for the loop and
-				 // the result will be as fast as if
-				 // we had used the formulas above
-				 // right away.
+				 // For this example, we choose as right hand
+				 // side function to function 4*(x^4+y^4) in
+				 // 2D, or 4*(x^4+y^4+z^4) in 3D. We could
+				 // write this distinction using an
+				 // if-statement on the space dimension, but
+				 // here is a simple way that also allows us
+				 // to use the same function in 1D (or in 4D,
+				 // if you should desire to do so), by using a
+				 // short loop.  Fortunately, the compiler
+				 // knows the size of the loop at compile time
+				 // (remember that at the time when you define
+				 // the template, the compiler doesn't know
+				 // the value of ``dim'', but when it later
+				 // encounters a statement or declaration
+				 // ``RightHandSide<2>'', it will take the
+				 // template, replace all occurrences of dim
+				 // by 2 and compile the resulting function);
+				 // in other words, at the time of compiling
+				 // this function, the number of times the
+				 // body will be executed is known, and the
+				 // compiler can optimize away the overhead
+				 // needed for the loop and the result will be
+				 // as fast as if we had used the formulas
+				 // above right away.
 				 //
-				 // Note that the different
-				 // coordinates (i.e. `x', `y', ...)
-				 // of the point are accessed using
-				 // the () operator.
+				 // The last thing to note is that a
+				 // ``Point<dim>'' denotes a point in
+				 // dim-dimensionsal space, and its individual
+				 // components (i.e. `x', `y',
+				 // ... coordinates) can be accessed using the
+				 // () operator (in fact, the [] operator will
+				 // work just as well).
 template <int dim>
 double RightHandSide<dim>::value (const Point<dim> &p,
 				  const unsigned int) const 
@@ -204,15 +215,13 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 }
 
 
-				 // The boundary values were to be
-				 // chosen to be x*x+y*y in 2D, and
-				 // x*x+y*y+z*z in 3D. This happens to
-				 // be equal to the square of the
-				 // vector from the origin to the
-				 // point at which we would like to
-				 // evaluate the function,
-				 // irrespective of the dimension. So
-				 // that is what we return:
+				 // As boundary values, we choose x*x+y*y in
+				 // 2D, and x*x+y*y+z*z in 3D. This happens to
+				 // be equal to the square of the vector from
+				 // the origin to the point at which we would
+				 // like to evaluate the function,
+				 // irrespective of the dimension. So that is
+				 // what we return:
 template <int dim>
 double BoundaryValues<dim>::value (const Point<dim> &p,
 				   const unsigned int) const 
@@ -222,6 +231,8 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 
 
 
+                                 // @sect3{Implementation of the ``LaplaceProblem'' class}
+                                 // @sect4{LaplaceProblem::LaplaceProblem}
 
 				 // This is the constructor of the
 				 // LaplaceProblem class. It specifies
@@ -229,7 +240,7 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 				 // the finite elements and associates
 				 // the DoFHandler to the
 				 // triangulation just as in the
-				 // previous example.
+				 // previous example program, step-3:
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
                 fe (1),
@@ -237,6 +248,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 {}
 
 
+                                 // @sect4{LaplaceProblem::make_grid_and_dofs}
 
 				 // Grid creation is something
 				 // inherently dimension
@@ -262,7 +274,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // freedom with each vertex is
 				 // something which certainly looks
 				 // different in 2D and 3D, but that
-				 // does not need to bother you. This
+				 // does not need to bother you either. This
 				 // function therefore looks exactly
 				 // like in the previous example,
 				 // although it performs actions that
