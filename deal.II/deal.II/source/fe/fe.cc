@@ -198,6 +198,10 @@ FiniteElement<dim>::FiniteElement (
 	  face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
 	}
     }
+				   // Fill with default value; may be
+				   // changed by constructor of
+				   // derived class.
+  first_block_of_base_table.resize(1,0);
 }
 
 
