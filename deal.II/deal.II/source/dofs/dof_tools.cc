@@ -2542,6 +2542,70 @@ DoFTools::count_dofs_per_component (
 
 template <int dim>
 void
+DoFTools::count_dofs_per_block (
+  const DoFHandler<dim>&     dof_handler,
+  std::vector<unsigned int>& dofs_per_block,
+  std::vector<unsigned int>  target_block)
+{
+  const FiniteElement<dim>& fe = dof_handler.get_fe();
+  const unsigned int n_blocks = fe.n_blocks();
+  dofs_per_block.resize (n_blocks);
+  std::fill (dofs_per_block.begin(), dofs_per_block.end(), 0U);
+  
+				   // If the empty vector was given as
+				   // default argument, set up this
+				   // vector as identity.
+  if (target_block.size()==0)
+    {
+      target_block.resize(n_blocks);
+      for (unsigned int i=0;i<n_blocks;++i)
+	target_block[i] = i;
+    }
+  
+  Assert(target_block.size()==n_blocks,
+	 ExcDimensionMismatch(target_block.size(),n_blocks));
+
+				   // special case for only one
+				   // block. treat this first
+				   // since it does not require any
+				   // computations
+  if (n_blocks == 1)
+    {
+      dofs_per_block[0] = dof_handler.n_dofs();
+      return;
+    } 
+				   // otherwise determine the number
+				   // of dofs in each block
+				   // separately. do so in parallel
+  std::vector<std::vector<bool> >
+    dofs_in_block (n_blocks, std::vector<bool>(dof_handler.n_dofs(), false));
+  std::vector<std::vector<bool> >
+    block_select (n_blocks, std::vector<bool>(n_blocks, false));
+  Threads::ThreadGroup<> threads;
+  for (unsigned int i=0; i<n_blocks; ++i)
+    {
+      void (*fun_ptr) (const DoFHandler<dim>   &,
+		       const std::vector<bool> &,
+		       std::vector<bool>       &,
+		       bool)
+        = &DoFTools::template extract_dofs<dim>;
+      block_select[i][i] = true;
+      threads += Threads::spawn (fun_ptr)(dof_handler, block_select[i],
+                                          dofs_in_block[i], true);
+    };
+  threads.join_all ();
+
+				   // next count what we got
+  for (unsigned int block=0;block<fe.n_blocks();++block)
+    dofs_per_block[target_block[block]]
+      += std::count(dofs_in_block[block].begin(),
+		    dofs_in_block[block].end(),
+		    true);
+}
+
+
+template <int dim>
+void
 DoFTools::count_dofs_per_component (
   const DoFHandler<dim>&     dof_handler,
   std::vector<unsigned int>& dofs_per_component,
@@ -4099,6 +4163,12 @@ void
 DoFTools::count_dofs_per_component<deal_II_dimension> (
   const DoFHandler<deal_II_dimension>&,
   std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+
+template
+void
+DoFTools::count_dofs_per_block<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension>&,
+  std::vector<unsigned int>&, std::vector<unsigned int>);
 
 template
 void

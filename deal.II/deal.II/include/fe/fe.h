@@ -2318,8 +2318,8 @@ inline
 std::pair<unsigned int,unsigned int>
 FiniteElement<dim>::system_to_block_index (const unsigned int index) const
 {
-  Assert (index < this->n_blocks(),
-	 ExcIndexRange(index, 0, this->n_blocks()));
+  Assert (index < this->dofs_per_cell,
+	  ExcIndexRange(index, 0, this->dofs_per_cell));
 				   // The block is computed simply as
 				   // first block of this base plus
 				   // the index within the base blocks

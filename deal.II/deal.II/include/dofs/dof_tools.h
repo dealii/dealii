@@ -1090,6 +1090,24 @@ class DoFTools
 			      = std::vector<unsigned int>());
 
 				     /**
+				      * Count the degrees of freedom
+				      * in each block. This function
+				      * is similar to
+				      * count_dofs_per_component(),
+				      * with the difference that the
+				      * counting is done by
+				      * blocks. See @ref GlossBlock
+				      * "blocks" in the glossary for
+				      * details.
+				      */
+    template <int dim>
+    static void
+    count_dofs_per_block (const DoFHandler<dim>&     dof_handler,
+			  std::vector<unsigned int>& dofs_per_component,
+			  std::vector<unsigned int>  target_block
+			  = std::vector<unsigned int>());
+    
+				     /**
 				      * @deprecated See the previous
 				      * function with the same name
 				      * for a description. This
