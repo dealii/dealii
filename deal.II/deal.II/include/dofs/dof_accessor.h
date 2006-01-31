@@ -46,26 +46,15 @@ template <int dim, typename Accessor> class TriaRawIterator;
 
 
 /**
- * Define the basis for accessors to the degrees of freedom.
+ * Define the base class for accessors to the degrees of
+ * freedom. Accessors are used to, well, access the data that pertains
+ * to edges, faces, and cells of a triangulation. The concept is
+ * explained in more detail in connection to @ref Iterators.
  *
- * Note that it is allowed to construct an object of which
- * #dof_handler is a Null pointer. Such an object would
- * result in a strange kind of behaviour, though every reasonable
- * operating system should disallow access through that pointer.
- * The reason we do not check for the null pointer in the
- * constructor which gets passed the DoFHandler pointer is that
- * if we did we could not make dof iterators member of other classes
- * (like in the FEValues class) if we did not know about the
- * DoFHandler object to be used upon construction of that object.
- * Through the way this class is implemented here, we allow the
- * creation of a kind of virgin object which only gets useful if
- * assigned to from another object before first usage.
- *
- * Opposite to construction, it is not possible to copy an object
- * which has an invalid dof handler pointer. This is to guarantee
- * that every iterator which is once assigned to is a valid
- * object. However, this assertion only holds in debug mode, when
- * the #Assert macro is switched on.
+ * The first template argument of this class refers to the space
+ * dimension in which we work. The second one denotes the type of DoF
+ * handler we should work on. It can either be ::DoFHandler or
+ * hp::DoFHandler.
  *
  * @ingroup dofs
  * @ingroup Accessors 
