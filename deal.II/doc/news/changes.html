@@ -57,6 +57,17 @@ inconvenience this causes.
        </p>
 
   <li> <p>
+       Changed: The <code>DoFObjectAccessor</code> and derived classes
+       used to take only the space dimension and the dimension of the
+       object they represented as template arguments. They now also
+       take an argument pertaining to the type of DoFHandler they
+       correspond to. This may be <code>::DoFHandler</code> or
+       <code>hp::DoFHandler</code>.
+       <br> 
+       (WB 2005/12/20)
+       </p>
+
+  <li> <p>
        Changed: Previously, if <code>mg_dof_handler</code> was a
        multilevel DoF handler object, calling
        <code>DoFRenumbering::component_wise(mg_dof_handler)</code>)
