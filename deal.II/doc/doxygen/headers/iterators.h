@@ -231,8 +231,14 @@ The normal iterator types and calls to get them for cells and faces are:
 
   <tr>
     <th>DoFHandler</th>
-    <td>TriaIterator&lt;dim, DoFCellAccessor&lt;dim&gt; &gt;</td>
+    <td>TriaIterator&lt;dim, DoFCellAccessor&lt;dim, ::DoFHandler&gt; &gt;</td>
     <td>dof_handler.begin()</td>
+  </tr>
+
+  <tr>
+    <th>hp::DoFHandler</th>
+    <td>TriaIterator&lt;dim, DoFCellAccessor&lt;dim, hp::DoFHandler&gt; &gt;</td>
+    <td>hp_dof_handler.begin()</td>
   </tr>
 
   <tr>
@@ -258,8 +264,14 @@ The normal iterator types and calls to get them for cells and faces are:
 
   <tr>
     <th>DoFHandler</th>
-    <td>TriaIterator&lt;dim, DoFObjectAccessor&lt;dim-1, dim&gt; &gt;</td>
+    <td>TriaIterator&lt;dim, DoFObjectAccessor&lt;dim-1, dim, ::DoFHandler&gt; &gt;</td>
     <td>dof_handler.begin_face()</td>
+  </tr>
+
+  <tr>
+    <th>hp::DoFHandler</th>
+    <td>TriaIterator&lt;dim, DoFObjectAccessor&lt;dim-1, dim, hp::DoFHandler&gt; &gt;</td>
+    <td>hp_dof_handler.begin_face()</td>
   </tr>
 
   <tr>
@@ -286,8 +298,14 @@ Likewise, active iterators are as follows:
 
   <tr>
     <th>DoFHandler</th>
-    <td>TriaActiveIterator&lt;dim, DoFCellAccessor&lt;dim&gt; &gt;</td>
+    <td>TriaActiveIterator&lt;dim, DoFCellAccessor&lt;dim, ::DoFHandler&gt; &gt;</td>
     <td>dof_handler.begin_active()</td>
+  </tr>
+
+  <tr>
+    <th>hp::DoFHandler</th>
+    <td>TriaActiveIterator&lt;dim, DoFCellAccessor&lt;dim, hp::DoFHandler&gt; &gt;</td>
+    <td>hp_dof_handler.begin_active()</td>
   </tr>
 
   <tr>
@@ -313,8 +331,14 @@ Likewise, active iterators are as follows:
 
   <tr>
     <th>DoFHandler</th>
-    <td>TriaActiveIterator&lt;dim, DoFObjectAccessor&lt;dim-1, dim&gt; &gt;</td>
+    <td>TriaActiveIterator&lt;dim, DoFObjectAccessor&lt;dim-1, dim, ::DoFHandler&gt; &gt;</td>
     <td>dof_handler.begin_active_face()</td>
+  </tr>
+
+  <tr>
+    <th>hp::DoFHandler</th>
+    <td>TriaActiveIterator&lt;dim, DoFObjectAccessor&lt;dim-1, dim, hp::DoFHandler&gt; &gt;</td>
+    <td>hp_dof_handler.begin_active_face()</td>
   </tr>
 
   <tr>
