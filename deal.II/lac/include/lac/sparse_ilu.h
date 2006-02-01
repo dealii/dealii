@@ -67,22 +67,21 @@ class SparseILU : public SparseLUDecomposition<number>
 				      *
 				      * Call the @p initialize
 				      * function before using this
-				      * object as preconditioner
-				      * (@p vmult).
+				      * object as preconditioner.
                                       */
     SparseILU ();
 
                                      /**
-				      * This method is deprecated, and
-				      * left for backward
-				      * compability. It will be
-				      * removed in later versions.
+				      * @deprecated This method is
+				      * deprecated, and left for
+				      * backward compability. It will
+				      * be removed in later versions.
                                       */
     SparseILU (const SparsityPattern &sparsity);
 
 				     /**
-				      * Make the @p AdditionalData
-				      * type in the base class
+				      * Make
+				      * SparseLUDecomposition::AdditionalData
 				      * accessible to this class as
 				      * well.
 				      */
@@ -150,8 +149,8 @@ class SparseILU : public SparseLUDecomposition<number>
 				      * i.e. do one forward-backward step
 				      * $dst=(LU)^{-1}src$.
 				      *
-				      * The @p initialize function
-				      * needs to be called beforehand.
+				      * The initialize() function
+				      * needs to be called before.
 				      */
     template <typename somenumber>
     void vmult (Vector<somenumber>       &dst,
@@ -164,8 +163,8 @@ class SparseILU : public SparseLUDecomposition<number>
 				      * i.e. do one forward-backward step
 				      * $dst=(LU)^{-T}src$.
 				      *
-				      * The @p initialize function
-				      * needs to be called beforehand.
+				      * The initialize() function
+				      * needs to be called before.
 				      */
     template <typename somenumber>
     void Tvmult (Vector<somenumber>       &dst,
