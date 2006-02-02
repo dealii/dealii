@@ -206,7 +206,7 @@ class BoundaryValues : public Function<dim>
 				 // at zero as usual in C and C++.
 template <int dim>
 double RightHandSide<dim>::value (const Point<dim> &p,
-				  const unsigned int) const 
+				  const unsigned int /*component*/) const 
 {
   double return_value = 0;
   for (unsigned int i=0; i<dim; ++i)
@@ -225,7 +225,7 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 				 // what we return:
 template <int dim>
 double BoundaryValues<dim>::value (const Point<dim> &p,
-				   const unsigned int) const 
+				   const unsigned int /*component*/) const 
 {
   return p.square();
 }
