@@ -143,7 +143,7 @@ struct GeometryInfo<0>
  *
  * The ordering of vertices and faces (lines) in 2d is defined by
  *
- * N1) vertices are numbered in lexicographically
+ * N1) vertices are numbered in lexicographic ordering
  *
  * N2) faces (lines in 2d): first the two faces with normals in x-
  * and then y-direction. For each two faces: first the face with
@@ -299,19 +299,18 @@ struct GeometryInfo<0>
  *   *--->---*        *--->---*
  * @endverbatim
  *
- * The fact that edges (just as vertices and faces) are entities
- * that are stored in their own right rather than constructed from
- * cells each time they are needed, means that adjacent cells
- * actually have pointers to edges that are thus shared between
- * them. This implies that the convention that sets of parallel
- * edges have parallel directions is not only a local
- * condition. Before a list of cells is passed to an object of this
- * class for creation of a triangulation, you therefore have to make
- * sure that cells are oriented in a compatible fashion, so that
- * edge directions are globally according to above
- * convention. However, the GridReordering class can do this
- * for you, by reorienting cells and edges of an arbitrary list of
- * input cells that need not be already sorted.
+ * The fact that edges (just as vertices and faces) are entities that
+ * are stored in their own right rather than constructed from cells
+ * each time they are needed, means that adjacent cells actually have
+ * pointers to edges that are thus shared between them. This implies
+ * that the convention that sets of parallel edges have parallel
+ * directions is not only a local condition. Before a list of cells is
+ * passed to an object of the Triangulation class for creation of a
+ * triangulation, you therefore have to make sure that cells are
+ * oriented in a compatible fashion, so that edge directions are
+ * globally according to above convention. However, the GridReordering
+ * class can do this for you, by reorienting cells and edges of an
+ * arbitrary list of input cells that need not be already sorted.
  * 
  * <h4>Faces</h4>
  *
@@ -475,19 +474,18 @@ struct GeometryInfo<0>
  * and the face_to_cell_vertices functions of GeometryInfo<3> do,
  * when invoked with a <tt>face_orientation=false</tt> argument.
  *
- * The information which child cell is at which position of which
- * face is most often used when computing jump terms across faces
- * with hanging nodes, using objects of type
- * FESubfaceValues. Sitting on one cell, you would look at face and
- * figure out which child of the neighbor is sitting on a given
- * subface between the present and the neighboring cell. To avoid
- * having to query the standard orientation of the faces of the two
- * cells every time in such cases, you should use a function call
- * like
- * <tt>cell->neighbor_child_on_subface(face_no,subface_no)</tt>,
- * which returns the correct result both in 2d (where face
- * orientations are immaterial) and 3d (where it is necessary to use
- * the face orientation as additional argument to
+ * The information which child cell is at which position of which face
+ * is most often used when computing jump terms across faces with
+ * hanging nodes, using objects of type FESubfaceValues. Sitting on
+ * one cell, you would look at a face and figure out which child of
+ * the neighbor is sitting on a given subface between the present and
+ * the neighboring cell. To avoid having to query the standard
+ * orientation of the faces of the two cells every time in such cases,
+ * you should use a function call like
+ * <tt>cell->neighbor_child_on_subface(face_no,subface_no)</tt>, which
+ * returns the correct result both in 2d (where face orientations are
+ * immaterial) and 3d (where it is necessary to use the face
+ * orientation as additional argument to
  * <tt>GeometryInfo<3>::child_cell_on_face</tt>).
  *
  * <h4>Coordinate systems</h4>
