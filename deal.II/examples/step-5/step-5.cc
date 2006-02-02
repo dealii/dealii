@@ -146,7 +146,7 @@ class LaplaceProblem
 };
 
 
-                                 // @sect3{Nonconstant coefficients}
+                                 // @sect3{Nonconstant coefficients, using ``Assert''}
 
 				 // In step-4, we showed how to use
 				 // non-constant boundary values and
@@ -242,7 +242,7 @@ double Coefficient<dim>::value (const Point<dim> &p,
 				 // should try to make sure that the
 				 // parameters are valid. For this,
 				 // the ``Assert'' macro is a good means,
-				 // since it verifies that the
+				 // since it makes sure that the
 				 // condition which is given as first
 				 // argument is valid, and if not
 				 // throws an exception (its second
@@ -402,6 +402,8 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 }
 
 
+                                 // @sect3{The ``LaplaceProblem'' class implementation}
+
                                  // @sect4{LaplaceProblem::LaplaceProblem}
 
 				 // This function is as before.
@@ -472,23 +474,18 @@ void LaplaceProblem<dim>::setup_system ()
 				 // are not changed with respect to
 				 // the previous example are not
 				 // commented on.
+				 //
+				 // The first parts of the function
+				 // are completely unchanged from
+				 // before:
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
-				   // This time, we will again use a
-				   // constant right hand side
-				   // function, but a variable
-				   // coefficient. The following
-				   // object will be used for this:
-  const Coefficient<dim> coefficient;
-
   QGauss<dim>  quadrature_formula(2);
 
   FEValues<dim> fe_values (fe, quadrature_formula, 
-			   UpdateFlags(update_values    |
-				       update_gradients |
-				       update_q_points  |
-				       update_JxW_values));
+			   update_values    |  update_gradients |
+			   update_q_points  |  update_JxW_values);
 
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
@@ -498,86 +495,110 @@ void LaplaceProblem<dim>::assemble_system ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-				   // Below, we will ask the
-				   // Coefficient class to compute the
-				   // values of the coefficient at all
-				   // quadrature points on one cell at
-				   // once. For this, we need some
-				   // space to store the values in,
-				   // which we use the following
-				   // variable for:
-  std::vector<double>     coefficient_values (n_q_points);
+				   // Here is one difference: for this
+				   // program, we will again use a
+				   // constant right hand side
+				   // function and zero boundary
+				   // values, but a variable
+				   // coefficient. We have already
+				   // declared the class that
+				   // represents this coefficient
+				   // above, so we only have to
+				   // declare a corresponding object
+				   // here.
+				   //
+				   // Then, below, we will ask the
+				   // ``coefficient'' function object
+				   // to compute the values of the
+				   // coefficient at all quadrature
+				   // points on one cell at once. The
+				   // reason for this is that, if you
+				   // look back at how we did this in
+				   // step-4, you will realize that we
+				   // called the function computing
+				   // the right hand side value inside
+				   // nested loops over all degrees of
+				   // freedom and over all quadrature
+				   // points,
+				   // i.e. dofs_per_cell*n_q_points
+				   // times. For the coefficient that
+				   // is used inside the matrix, this
+				   // would actually be
+				   // dofs_per_cell*dofs_per_cell*n_q_points. On
+				   // the other hand, the function
+				   // will of course return the same
+				   // value everytime it is called
+				   // with the same quadrature point,
+				   // independently of what shape
+				   // function we presently treat;
+				   // secondly, these are virtual
+				   // function calls, so are rather
+				   // expensive. Obviously, there are
+				   // only n_q_point different values,
+				   // and we shouldn't call the
+				   // function more often than
+				   // that. Or, even better than this,
+				   // compute all of these values at
+				   // once, and get away with a single
+				   // function call per cell.
+				   //
+				   // This is exactly what we are
+				   // going to do. For this, we need
+				   // some space to store the values
+				   // in. We therefore also have to
+				   // declare an array to hold these
+				   // values:
+  const Coefficient<dim> coefficient;
+  std::vector<double>    coefficient_values (n_q_points);
 
-  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-						 endc = dof_handler.end();
+				   // Next is the typical loop over
+				   // all cells to compute local
+				   // contributions and then to
+				   // transfer them into the global
+				   // matrix and vector.
+				   //
+				   // The only two things in which
+				   // this loop differs from step-4 is
+				   // that we want to compute the
+				   // value of the coefficient in all
+				   // quadrature points on the present
+				   // cell at the beginning, and then
+				   // use it in the computation of the
+				   // local contributions. This is
+				   // what we do in the call to
+				   // ``coefficient.value_list'' in
+				   // the fourth line of the loop.
+				   //
+				   // The second change is how we make
+				   // use of this coefficient in
+				   // computing the cell matrix
+				   // contributions. This is in the
+				   // obvious way, and not worth more
+				   // comments. For the right hand
+				   // side, we use a constant value
+				   // again.
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       cell_matrix = 0;
       cell_rhs = 0;
 
-				       // As before, we want the
-				       // FEValues object to compute
-				       // the quantities which we told
-				       // him to compute in the
-				       // constructor using the update
-				       // flags.
       fe_values.reinit (cell);
 
-				       // There is one more thing: in
-				       // this example, we want to use
-				       // a non-constant
-				       // coefficient. In the previous
-				       // example, we have called the
-				       // ``value'' function of the
-				       // right hand side object for
-				       // each quadrature
-				       // point. Unfortunately, that
-				       // is a virtual function, so
-				       // calling it is relatively
-				       // expensive. Therefore, we use
-				       // a function of the ``Function''
-				       // class which returns the
-				       // values at all quadrature
-				       // points at once; that
-				       // function is still virtual,
-				       // but it needs to be computed
-				       // once per cell only, not once
-				       // in the inner loop:
       coefficient.value_list (fe_values.get_quadrature_points(),
 			      coefficient_values);
-				       // It should be noted that the
-				       // creation of the
-				       // coefficient_values object is
-				       // done outside the loop over
-				       // all cells to avoid memory
-				       // allocation each time we
-				       // visit a new cell.
       
-				       // With all this, the loops
-				       // then look like this (the
-				       // parentheses around the
-				       // product of the two gradients
-				       // are needed to indicate the
-				       // dot product; we have to
-				       // overrule associativity of
-				       // the operator* here, since
-				       // the compiler would otherwise
-				       // complain about an undefined
-				       // product of double*gradient
-				       // since it parses
-				       // left-to-right):
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      cell_matrix(i,j) += (coefficient_values[q_point] *
-				   (fe_values.shape_grad(i,q_point)    *
-				    fe_values.shape_grad(j,q_point))   *
+				   fe_values.shape_grad(i,q_point) *
+				   fe_values.shape_grad(j,q_point) *
 				   fe_values.JxW(q_point));
 
-					     // For the right hand
-					     // side, a constant value
-					     // is used again:
 	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
 			    1.0 *
 			    fe_values.JxW(q_point));
@@ -596,7 +617,8 @@ void LaplaceProblem<dim>::assemble_system ()
 	}
     }
 
-				   // Again use zero boundary values:
+				   // With the matrix so built, we use
+				   // zero boundary values again:
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -609,57 +631,56 @@ void LaplaceProblem<dim>::assemble_system ()
 }
 
 
+                                 // @sect4{LaplaceProblem::solve}
 
 				 // The solution process again looks
 				 // mostly like in the previous
 				 // examples. However, we will now use
 				 // a preconditioned conjugate
 				 // gradient algorithm. It is not very
-				 // difficult to make this change:
+				 // difficult to make this change. In
+				 // fact, the only thing we have to
+				 // alter is that we need an object
+				 // which will act as a
+				 // preconditioner. We will use SSOR
+				 // (symmetric successive
+				 // overrelaxation), with a relaxation
+				 // factor of 1.2. For this purpose,
+				 // the ``SparseMatrix'' class has a
+				 // function which does one SSOR step,
+				 // and we need to package the address
+				 // of this function together with the
+				 // matrix on which it should act
+				 // (which is the matrix to be
+				 // inverted) and the relaxation
+				 // factor into one object. The
+				 // ``PreconditionSSOR'' class does
+				 // this for us. (``PreconditionSSOR''
+				 // class takes a template argument
+				 // denoting the matrix type it is
+				 // supposed to work on. The default
+				 // value is ``SparseMatrix<double>'',
+				 // which is exactly what we need
+				 // here, so we simply stick with the
+				 // default and do not specify
+				 // anything in the angle brackets.)
+				 //
+				 // With this, the rest of the
+				 // function is trivial: instead of
+				 // the ``PreconditionIdentity''
+				 // object we have created before, we
+				 // now use the preconditioner we have
+				 // declared, and the CG solver will
+				 // do the rest for us:
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
 
-				   // The only thing we have to alter
-				   // is that we need an object which
-				   // will act as a preconditioner. We
-				   // will use SSOR (symmetric
-				   // successive overrelaxation), with
-				   // a relaxation factor of 1.2. For
-				   // this purpose, the SparseMatrix
-				   // class has a function which does
-				   // one SSOR step, and we need to
-				   // package the address of this
-				   // function together with the
-				   // matrix on which it should act
-				   // (which is the matrix to be
-				   // inverted) and the relaxation
-				   // factor into one object. This can
-				   // be done like this:
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
-				   // (Note that we did not have to
-				   // explicitely pass the address of
-				   // the SSOR function of the matrix
-				   // to this objects, rather it is
-				   // hardcoded into the object, thus
-				   // the name.)
-				   //
-				   // The default template parameters
-				   // of the ``PreconditionRelaxation''
-				   // class is the matrix type, which
-				   // defaults to the types used in
-				   // this program.
 
-				   // Calling the solver now looks
-				   // mostly like in the example
-				   // before, but where there was an
-				   // object of type
-				   // PreconditionIdentity before,
-				   // there now is the newly generated
-				   // preconditioner object.
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
 
@@ -669,6 +690,7 @@ void LaplaceProblem<dim>::solve ()
 }
 
 
+                                 // @sect4{LaplaceProblem::output_results and setting output flags}
 
 				 // Writing output to a file is mostly
 				 // the same as for the previous
@@ -713,7 +735,9 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // demonstrate how to change
 				   // them. For this, we first have to
 				   // generate an object describing
-				   // the flags for EPS output:
+				   // the flags for EPS output
+				   // (similar flag classes exist for
+				   // all supported output formats):
   DataOutBase::EpsFlags eps_flags;
 				   // They are initialized with the
 				   // default values, so we only have
@@ -755,9 +779,13 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // we would like to use different
 				   // flags. This is inconvenient, and
 				   // we will see more advanced ways
-				   // in following examples where the
-				   // output flags are determined at
-				   // run time using an input file.
+				   // in step-19 where the output
+				   // flags are determined at run time
+				   // using an input file (step-19
+				   // doesn't show many other things;
+				   // you should feel free to read
+				   // over it even if you haven't done
+				   // step-6 to step-18 yet).
 
 				   // Finally, we need the filename to
 				   // which the results are to be
@@ -777,7 +805,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // string. This applies the usual
 				   // conversions from integer to
 				   // strings, and one could as well
-				   // give stream modifiers such as
+				   // use stream modifiers such as
 				   // ``setw'', ``setprecision'', and
 				   // so on.
 				   //
@@ -839,19 +867,37 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // function, otherwise the result
 				   // is a char* right away. Use that
 				   // as filename for the output
-				   // stream:
+				   // stream and then write the data
+				   // to the file:
 #ifdef HAVE_STD_STRINGSTREAM
   std::ofstream output (filename.str().c_str());
 #else
   std::ofstream output (filename.str());
 #endif
-				   // And then write the data to the
-				   // file.
+
   data_out.write_eps (output);
 }
 
 
 
+                                 // @sect4{LaplaceProblem::run}
+
+				 // The second to last thing in this
+				 // program is the definition of the
+				 // ``run()'' function. In contrast to
+				 // the previous programs, we will
+				 // compute on a sequence of meshes
+				 // that after each iteration is
+				 // globall refined. The function
+				 // therefore consists of a loop over
+				 // 6 cycles. In each cycle, we first
+				 // print the cycle number, and then
+				 // have to decide what to do with the
+				 // mesh. If this is not the first
+				 // cycle, we can simply refine the
+				 // existing mesh once globally. If
+				 // this is the first cycle, however,
+				 // we first have to generate a mesh:
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
@@ -859,34 +905,40 @@ void LaplaceProblem<dim>::run ()
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
-				       // If this is the first round,
-				       // then we have no grid yet,
-				       // and we will create it
-				       // here. In previous examples,
-				       // we have already used some of
-				       // the functions from the
-				       // GridGenerator class. Here we
-				       // would like to read a grid
-				       // from a file where the cells
-				       // are stored and which may
-				       // originate from someone else,
-				       // or may be the product of a
-				       // mesh generator tool.
-				       //
-				       // In order to read a grid from
-				       // a file, we generate an
-				       // object of data type GridIn
-				       // and associate the
-				       // triangulation to it (i.e. we
-				       // tell it to fill our
-				       // triangulation object when we
-				       // ask it to read the
-				       // file). Then we open the
-				       // respective file and
-				       // initialize the triangulation
-				       // with the data in the file:
-      if (cycle == 0)
+      if (cycle != 0)
+	triangulation.refine_global (1);
+      else
 	{
+					   // If this is the first
+					   // round, then we have no
+					   // grid yet, and we will
+					   // create it here. In
+					   // previous examples, we
+					   // have already used some
+					   // of the functions from
+					   // the ``GridGenerator''
+					   // class. Here we would
+					   // like to read a grid from
+					   // a file where the cells
+					   // are stored and which may
+					   // originate from someone
+					   // else, or may be the
+					   // product of a mesh
+					   // generator tool.
+					   //
+					   // In order to read a grid
+					   // from a file, we generate
+					   // an object of data type
+					   // GridIn and associate the
+					   // triangulation to it
+					   // (i.e. we tell it to fill
+					   // our triangulation object
+					   // when we ask it to read
+					   // the file). Then we open
+					   // the respective file and
+					   // initialize the
+					   // triangulation with the
+					   // data in the file:
 	  GridIn<dim> grid_in;
 	  grid_in.attach_triangulation (triangulation);
 	  std::ifstream input_file("circle-grid.inp");
@@ -938,8 +990,11 @@ void LaplaceProblem<dim>::run ()
 					   // what not to do, after
 					   // all.
 	  
-					   // We can now actually read
-					   // the grid. It is in UCD
+					   // So if we got past the
+					   // assertion, we know that
+					   // dim==2, and we can now
+					   // actually read the
+					   // grid. It is in UCD
 					   // (unstructured cell data)
 					   // format (but the ending
 					   // of the ``UCD''-file is
@@ -984,16 +1039,12 @@ void LaplaceProblem<dim>::run ()
 	  static const HyperBallBoundary<dim> boundary;
 	  triangulation.set_boundary (0, boundary);
 	}
-				       // If this is not the first
-				       // cycle, then simply refine
-				       // the grid once globally.
-      else
-	triangulation.refine_global (1);
 
-				       // Write some output and do all
-				       // the things that we have
-				       // already seen in the previous
-				       // examples.
+				       // Now that we have a mesh for
+				       // sure, we write some output
+				       // and do all the things that
+				       // we have already seen in the
+				       // previous examples.
       std::cout << "   Number of active cells: "
 		<< triangulation.n_active_cells()
 		<< std::endl
@@ -1008,12 +1059,13 @@ void LaplaceProblem<dim>::run ()
     }
 }
 
-    
+
+                                 // @sect4{The ``main'' function}
 
 				 // The main function looks mostly
 				 // like the one in the previous
 				 // example, so we won't comment on it
-				 // further.
+				 // further:
 int main () 
 {
   deallog.depth_console (0);
@@ -1023,21 +1075,26 @@ int main ()
 
 				   // Finally, we have promised to
 				   // trigger an exception in the
-				   // Coefficient class. For this, we
+				   // ``Coefficient'' class through
+				   // the ``Assert'' macro we have
+				   // introduced there. For this, we
 				   // have to call its ``value_list''
 				   // function with two arrays of
 				   // different size (the number in
-				   // parentheses behind the name of
-				   // the object). We have commented
-				   // out these lines in order to
-				   // allow the program to exit
-				   // gracefully in normal situations
-				   // (we use the program in
-				   // day-to-day testing of changes to
-				   // the library as well), so you
+				   // parentheses behind the
+				   // declaration of the object). We
+				   // have commented out these lines
+				   // in order to allow the program to
+				   // exit gracefully in normal
+				   // situations (we use the program
+				   // in day-to-day testing of changes
+				   // to the library as well), so you
 				   // will only get the exception by
 				   // un-commenting the following
-				   // lines.
+				   // lines. Take a look at the
+				   // Results section of the program
+				   // to see what happens when the
+				   // code is actually run:
 /*  
   Coefficient<2>    coefficient;
   std::vector<Point<2> > points (2);
