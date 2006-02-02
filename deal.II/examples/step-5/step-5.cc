@@ -11,6 +11,8 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+                                 // @sect3{Include files}
+
 				 // Again, the first few include files
 				 // are already known, so we won't
 				 // comment on them:
@@ -107,14 +109,16 @@
 #endif
 
 
+                                 // @sect3{The ``LaplaceProblem'' class template}
+
 				 // The main class is mostly as in the
 				 // previous example. The most visible
 				 // change is that the function
 				 // ``make_grid_and_dofs'' has been
-				 // removed, since making of the grid
+				 // removed, since creating the grid
 				 // is now done in the ``run''
 				 // function and the rest of its
-				 // functionality now is in
+				 // functionality is now in
 				 // ``setup_system''. Apart from this,
 				 // everything is as before.
 template <int dim>
@@ -142,12 +146,16 @@ class LaplaceProblem
 };
 
 
+                                 // @sect3{Nonconstant coefficients}
 
-				 // In this example, we want to use a
-				 // variable coefficient in the
-				 // elliptic operator. Of course, the
-				 // suitable object is a Function, as
-				 // we have used it for the right hand
+				 // In step-4, we showed how to use
+				 // non-constant boundary values and
+				 // right hand side.  In this example,
+				 // we want to use a variable
+				 // coefficient in the elliptic
+				 // operator instead. Of course, the
+				 // suitable object is a ``Function'',
+				 // as we have used for the right hand
 				 // side and boundary values in the
 				 // last example. We will use it
 				 // again, but we implement another
@@ -184,11 +192,18 @@ class Coefficient : public Function<dim>
 				 // This is the implementation of the
 				 // coefficient function for a single
 				 // point. We let it return 20 if the
-				 // distance to the point of origin is
-				 // less than 0.5, and 1 otherwise:
+				 // distance to the origin is less
+				 // than 0.5, and 1 otherwise. As in
+				 // the previous example, we simply
+				 // ignore the second parameter of the
+				 // function that is used to denote
+				 // different components of
+				 // vector-valued functions (we deal
+				 // only with a scalar function here,
+				 // after all):
 template <int dim>
 double Coefficient<dim>::value (const Point<dim> &p,
-				const unsigned int) const 
+				const unsigned int /*component*/) const 
 {
   if (p.square() < 0.5*0.5)
     return 20;
@@ -201,78 +216,114 @@ double Coefficient<dim>::value (const Point<dim> &p,
 				 // And this is the function that
 				 // returns the value of the
 				 // coefficient at a whole list of
-				 // points at once. Of course, the
-				 // values are the same as if we would
-				 // ask the ``value'' function.
+				 // points at once. Of course, we need
+				 // to make sure that the values are
+				 // the same as if we would ask the
+				 // ``value'' function for each point
+				 // individually.
+				 //
+				 // This method takes three
+				 // parameters: a list of points at
+				 // which to evaluate the function, a
+				 // list that will hold the values at
+				 // these points, and the vector
+				 // component that should be zero here
+				 // since we only have a single scalar
+				 // function.  Now, of course the size
+				 // of the output array (``values'')
+				 // must be the same as that of the
+				 // input array (``points''), and we
+				 // could simply assume that. However,
+				 // in practice, it turns out that
+				 // more than 90 per cent of
+				 // programming errors are invalid
+				 // function parameters such as
+				 // invalid array sizes, etc, so we
+				 // should try to make sure that the
+				 // parameters are valid. For this,
+				 // the ``Assert'' macro is a good means,
+				 // since it verifies that the
+				 // condition which is given as first
+				 // argument is valid, and if not
+				 // throws an exception (its second
+				 // argument) which will usually
+				 // terminate the program giving
+				 // information where the error
+				 // occured and what the reason
+				 // was. This generally reduces the
+				 // time to find programming errors
+				 // dramatically and we have found
+				 // assertions an invaluable means to
+				 // program fast.
+				 //
+				 // On the other hand, all these
+				 // checks (there are more than 4200
+				 // of them in the library at present)
+				 // should not slow down the program
+				 // too much if you want to do large
+				 // computations. To this end, the
+				 // ``Assert'' macro is only used in
+				 // debug mode and expands to nothing
+				 // if in optimized mode. Therefore,
+				 // while you test your program on
+				 // small problems and debug it, the
+				 // assertions will tell you where the
+				 // problems are.  Once your program
+				 // is stable, you can switch off
+				 // debugging and the program will run
+				 // your real computations without the
+				 // assertions and at maximum
+				 // speed. (In fact, it turns out the
+				 // switching off all the checks in
+				 // the library that prevent you from
+				 // calling functions with the wrong
+				 // arguments by switching to
+				 // optimized mode, makes most
+				 // programs run faster by about a
+				 // factor of four. This should,
+				 // however, not try to induce you to
+				 // always run in optimized mode: Most
+				 // people who have tried that soon
+				 // realize that they introduce lots
+				 // of errors that would have easily
+				 // been caught had they run the
+				 // program in debug mode while
+				 // developing.) For those who want to
+				 // try: The way to switch from debug
+				 // mode to optimized mode is to go
+				 // edit the Makefile in this
+				 // directory. It should have a line
+				 // ``debug-mode = on''; simply
+				 // replace it by ``debug-mode = off''
+				 // and recompile your program. The
+				 // output of the ``make'' program
+				 // should already indicate to you
+				 // that the program is now compiled
+				 // in optimized mode, and it will
+				 // later also be linked to libraries
+				 // that have been compiled for
+				 // optimized mode.
+				 //
+				 // Here, as has been said above, we
+				 // would like to make sure that the
+				 // size of the two arrays is equal,
+				 // and if not throw an
+				 // exception. Comparing the sizes of
+				 // two arrays is one of the most
+				 // frequent checks, which is why
+				 // there is already an exception
+				 // class ``ExcDimensionMismatch''
+				 // that takes the sizes of two
+				 // vectors and prints some output in
+				 // case the condition is violated:
+
 template <int dim>
 void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
 				   const unsigned int              component) const 
 {
-				   // Use n_q_points as an
-				   // abbreviation for the number of
-				   // points for which function values
-				   // are requested:
-  const unsigned int n_points = points.size();
-
-				   // Now, of course the size of the
-				   // output array (``values'') must
-				   // be the same as that of the input
-				   // array (``points''), and we could
-				   // simply assume that. However, in
-				   // practice more than 90 per cent
-				   // of programming errors are
-				   // invalid function parameters such
-				   // as invalid array sizes, etc, so
-				   // we should try to make sure that
-				   // the parameters are valid. For
-				   // this, the Assert macro is a good
-				   // means, since it asserts that the
-				   // condition which is given as
-				   // first argument is valid, and if
-				   // not throws an exception (its
-				   // second argument) which will
-				   // usually terminate the program
-				   // giving information where the
-				   // error occured and what the
-				   // reason was. This generally
-				   // reduces the time to find
-				   // programming errors dramatically
-				   // and we have found assertions an
-				   // invaluable means to program
-				   // fast.
-				   //
-				   // On the other hand, all these
-				   // checks (there are more than 4200
-				   // of them in the library at present) should
-				   // not slow down the program too
-				   // much, which is why the Assert
-				   // macro is only used in debug mode
-				   // and expands to nothing if in
-				   // optimized mode. Therefore, while
-				   // you test your program and debug
-				   // it, the assertions will tell you
-				   // where the problems are, and once
-				   // your program is stable you can
-				   // switch off debugging and the
-				   // program will run without the
-				   // assertions and at maximum speed.
-				   //
-				   // Here, as has been said above, we
-				   // would like to make sure that the
-				   // size of the two arrays is equal,
-				   // and if not throw an
-				   // exception. Since the following
-				   // test is rather frequent for the
-				   // classes derived from
-				   // ``Function'', that class
-				   // declares an exception
-				   // ``ExcDimensionMismatch'' which
-				   // takes the sizes of two vectors
-				   // and prints some output in case
-				   // the condition is violated:
-  Assert (values.size() == n_points, 
-	  ExcDimensionMismatch (values.size(), n_points));
+  Assert (values.size() == points.size(), 
+	  ExcDimensionMismatch (values.size(), points.size()));
 				   // Since examples are not very good
 				   // if they do not demonstrate their
 				   // point, we will show how to
@@ -296,32 +347,62 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
   
 				   // While we're at it, we can do
 				   // another check: the coefficient
-				   // is a scalar, but the Function
-				   // class also represents
-				   // vector-valued function. A scalar
-				   // function must therefore be
-				   // considered as a vector-valued
-				   // function with only one
-				   // component, so the only valid
+				   // is a scalar, but the
+				   // ``Function'' class also
+				   // represents vector-valued
+				   // function. A scalar function must
+				   // therefore be considered as a
+				   // vector-valued function with only
+				   // one component, so the only valid
 				   // component for which a user might
 				   // ask is zero (we always count
 				   // from zero). The following
-				   // assertion checks this. (The
-				   // ``1'' is denotes the number of
-				   // components that this function
-				   // has.)
+				   // assertion checks this. If the
+				   // condition in the ``Assert'' call
+				   // is violated, an exception of
+				   // type ``ExcRange'' will be
+				   // triggered; that class takes the
+				   // violating index as first
+				   // argument, and the second and
+				   // third arguments denote a range
+				   // that includes the left point but
+				   // is open at the right, i.e. here
+				   // the interval [0,1). For integer
+				   // arguments, this means that the
+				   // only value in the range is the
+				   // zero, of course. (The interval
+				   // is half open since we also want
+				   // to write exceptions like
+				   // ``ExcRange(i,0,v.size())'',
+				   // where an index must be between
+				   // zero but less than the size of
+				   // an array. To save us the effort
+				   // of writing ``v.size()-1'' in
+				   // many places, the range is
+				   // defined as half-open.)
   Assert (component == 0, 
 	  ExcIndexRange (component, 0, 1));
-  
+
+				   // The rest of the function is
+				   // uneventful: we define
+				   // ``n_q_points'' as an
+				   // abbreviation for the number of
+				   // points for which function values
+				   // are requested, and then simply
+				   // fill the output value:
+  const unsigned int n_points = points.size();
+
   for (unsigned int i=0; i<n_points; ++i)
     {
       if (points[i].square() < 0.5*0.5)
 	values[i] = 20;
       else
 	values[i] = 1;
-    };
+    }
 }
 
+
+                                 // @sect4{LaplaceProblem::LaplaceProblem}
 
 				 // This function is as before.
 template <int dim>
@@ -332,11 +413,13 @@ LaplaceProblem<dim>::LaplaceProblem () :
 
 
 
+                                 // @sect4{LaplaceProblem::setup_system}
+
 				 // This is the function
 				 // ``make_grid_and_dofs'' from the
 				 // previous example, minus the
 				 // generation of the grid. Everything
-				 // else is unchanged.
+				 // else is unchanged:
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
@@ -359,6 +442,8 @@ void LaplaceProblem<dim>::setup_system ()
 }
 
 
+
+                                 // @sect4{LaplaceProblem::assemble_system}
 
 				 // As in the previous examples, this
 				 // function is not changed much with
@@ -496,7 +581,7 @@ void LaplaceProblem<dim>::assemble_system ()
 	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
 			    1.0 *
 			    fe_values.JxW(q_point));
-	  };
+	  }
 
 
       cell->get_dof_indices (local_dof_indices);
@@ -508,8 +593,8 @@ void LaplaceProblem<dim>::assemble_system ()
 			       cell_matrix(i,j));
 	  
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
-	};
-    };
+	}
+    }
 
 				   // Again use zero boundary values:
   std::map<unsigned int,double> boundary_values;
@@ -920,7 +1005,7 @@ void LaplaceProblem<dim>::run ()
       assemble_system ();
       solve ();
       output_results (cycle);
-    };
+    }
 }
 
     
