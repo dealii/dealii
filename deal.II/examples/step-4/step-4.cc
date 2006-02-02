@@ -327,18 +327,18 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (4);
   
-  deallog << "Number of active cells: "
-	  << triangulation.n_active_cells()
-	  << std::endl
-	  << "Total number of cells:  "
-	  << triangulation.n_cells()
-	  << std::endl;
+  std::cout << "   Number of active cells: "
+	    << triangulation.n_active_cells()
+	    << std::endl
+	    << "   Total number of cells: "
+	    << triangulation.n_cells()
+	    << std::endl;
 
   dof_handler.distribute_dofs (fe);
 
-  deallog << "Number of degrees of freedom: "
-	  << dof_handler.n_dofs()
-	  << std::endl;
+  std::cout << "   Number of degrees of freedom: "
+	    << dof_handler.n_dofs()
+	    << std::endl;
 
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
@@ -570,6 +570,15 @@ void LaplaceProblem<dim>::solve ()
   SolverCG<>              cg (solver_control);
   cg.solve (system_matrix, solution, system_rhs,
 	    PreconditionIdentity());
+
+				   // We have made one addition,
+				   // though: since we suppress output
+				   // from the linear solvers, we have
+				   // to print the number of
+				   // iterations by hand.
+  std::cout << "   " << solver_control.last_step()
+	    << " CG iterations needed to obtain convergence."
+	    << std::endl;
 }
 
 
@@ -629,25 +638,21 @@ void LaplaceProblem<dim>::output_results () const
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  deallog << "Solving problem in " << dim << " space dimensions." << std::endl;
-				   // Here we make use of the feature
-				   // of LogStream that allows us
-				   // indenting output inside blocks.
-  deallog.push("  ");
+  std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
+  
   make_grid_and_dofs();
   assemble_system ();
   solve ();
   output_results ();
-				   // Remove the indentation of output again
-  deallog.pop();
 }
 
 
                                  // @sect4{The ``main'' function}
 
 				 // And this is the main function. It also
-				 // looks mostly like in step-3, but note how
-				 // we first create a variable of type
+				 // looks mostly like in step-3, but if you
+				 // look at the code below, note how we first
+				 // create a variable of type
 				 // ``LaplaceProblem<2>'' (forcing the
 				 // compiler to compile the class template
 				 // with ``dim'' replaced by ``2'') and run a
@@ -685,8 +690,40 @@ void LaplaceProblem<dim>::run ()
 				 // i.e. after running the 3d problem, and
 				 // would needlessly hog memory while the 3d
 				 // run could actually use it.
+                                 //
+                                 // Finally, the first line of the function is
+                                 // used to suppress some output.  Remember
+                                 // that in the previous example, we had the
+                                 // output from the linear solvers about the
+                                 // starting residual and the number of the
+                                 // iteration where convergence was
+                                 // detected. This can be suppressed through
+                                 // the ``deallog.depth_console(0)'' call.
+                                 //
+                                 // The rationale here is the following: the
+                                 // deallog (i.e. deal-log, not de-allog)
+                                 // variable represents a stream to which some
+                                 // parts of the library write output. It
+                                 // redirects this output to the console and
+                                 // if required to a file. The output is
+                                 // nested in a way so that each function can
+                                 // use a prefix string (separated by colons)
+                                 // for each line of output; if it calls
+                                 // another function, that may also use its
+                                 // prefix which is then printed after the one
+                                 // of the calling function. Since output from
+                                 // functions which are nested deep below is
+                                 // usually not as important as top-level
+                                 // output, you can give the deallog variable
+                                 // a maximal depth of nested output for
+                                 // output to console and file. The depth zero
+                                 // which we gave here means that no output is
+                                 // written. By changing it you can get more
+                                 // information about the innards of the
+                                 // library.
 int main () 
 {
+  deallog.depth_console (0);
   {
     LaplaceProblem<2> laplace_problem_2d;
     laplace_problem_2d.run ();
