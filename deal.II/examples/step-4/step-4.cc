@@ -202,7 +202,8 @@ class BoundaryValues : public Function<dim>
 				 // components (i.e. `x', `y',
 				 // ... coordinates) can be accessed using the
 				 // () operator (in fact, the [] operator will
-				 // work just as well).
+				 // work just as well) with indices starting
+				 // at zero as usual in C and C++.
 template <int dim>
 double RightHandSide<dim>::value (const Point<dim> &p,
 				  const unsigned int) const 
@@ -232,15 +233,52 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 
 
                                  // @sect3{Implementation of the ``LaplaceProblem'' class}
+
+                                 // Next for the implementation of the class
+                                 // template that makes use of the functions
+                                 // above. As before, we will write everything
+                                 // as templates that have a formal parameter
+                                 // ``dim'' that we assume unknown at the time
+                                 // we define the template functions. Only
+                                 // later, the compiler will find a
+                                 // declaration of ``LaplaceProblem<2>'' (in
+                                 // the ``main'' function, actually) and
+                                 // compile the entire class with ``dim''
+                                 // replaced by 2, a process referred to as
+                                 // `instantiation of a template'. When doing
+                                 // so, it will also replace instances of
+                                 // ``RightHandSide<dim>'' by
+                                 // ``RightHandSide<2>'' and instantiate the
+                                 // latter class from the class template.
+                                 //
+                                 // In fact, the compiler will also find a
+                                 // declaration ``LaplaceProblem<3>'' in
+                                 // ``main()''. This will cause it to again go
+                                 // back to the general
+                                 // ``LaplaceProblem<dim>'' template, replace
+                                 // all occurrences of ``dim'', this time by
+                                 // 3, and compile the class a second
+                                 // time. Note that the two instantiations
+                                 // ``LaplaceProblem<2>'' and
+                                 // ``LaplaceProblem<3>'' are completely
+                                 // independent classes; their only common
+                                 // feature is that they are both instantiated
+                                 // from the same general template, but they
+                                 // are not convertible into each other, for
+                                 // example, and share no code (both
+                                 // instantiations are compiled completely
+                                 // independently).
+
+
                                  // @sect4{LaplaceProblem::LaplaceProblem}
 
-				 // This is the constructor of the
-				 // LaplaceProblem class. It specifies
-				 // the desired polynomial degree of
-				 // the finite elements and associates
-				 // the DoFHandler to the
-				 // triangulation just as in the
-				 // previous example program, step-3:
+				 // After this introduction, here is the
+				 // constructor of the ``LaplaceProblem''
+				 // class. It specifies the desired polynomial
+				 // degree of the finite elements and
+				 // associates the DoFHandler to the
+				 // triangulation just as in the previous
+				 // example program, step-3:
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
                 fe (1),
@@ -270,19 +308,18 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // about. Let the library handle the
 				 // difficult things.
 				 //
-				 // Likewise, associating a degree of
-				 // freedom with each vertex is
-				 // something which certainly looks
-				 // different in 2D and 3D, but that
-				 // does not need to bother you either. This
-				 // function therefore looks exactly
-				 // like in the previous example,
-				 // although it performs actions that
-				 // in their details are quite
-				 // different. The only significant
-				 // difference is the number of cells
-				 // resulting, which is much higher in
-				 // three than in two space
+				 // Likewise, associating a degree of freedom
+				 // with each vertex is something which
+				 // certainly looks different in 2D and 3D,
+				 // but that does not need to bother you
+				 // either. This function therefore looks
+				 // exactly like in the previous example,
+				 // although it performs actions that in their
+				 // details are quite different if ``dim''
+				 // happens to be 3. The only significant
+				 // difference from a user's perspective is
+				 // the number of cells resulting, which is
+				 // much higher in three than in two space
 				 // dimensions!
 template <int dim>
 void LaplaceProblem<dim>::make_grid_and_dofs ()
@@ -316,6 +353,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 }
 
 
+                                 // @sect4{LaplaceProblem::assemble_system}
 
 				 // Unlike in the previous example, we
 				 // would now like to use a
@@ -331,7 +369,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 				 // way we assemble matrix and right
 				 // hand side vector dimension
 				 // independently: there is simply no
-				 // difference to the pure
+				 // difference to the 
 				 // two-dimensional case. Since the
 				 // important objects used in this
 				 // function (quadrature formula,
@@ -352,46 +390,38 @@ void LaplaceProblem<dim>::assemble_system ()
 {  
   QGauss<dim>  quadrature_formula(2);
 
-				   // We wanted to have a non-constant
-				   // right hand side, so we use an
-				   // object of the class declared
-				   // above to generate the necessary
-				   // data. Since this right hand side
-				   // object is only used in this
-				   // function, we only declare it
-				   // here, rather than as a member
-				   // variable of the LaplaceProblem
-				   // class, or somewhere else.
+				   // We wanted to have a non-constant right
+				   // hand side, so we use an object of the
+				   // class declared above to generate the
+				   // necessary data. Since this right hand
+				   // side object is only used locally in the
+				   // present function, we declare it here as
+				   // a local variable:
   const RightHandSide<dim> right_hand_side;
 
-				   // Compared to the previous
-				   // example, in order to evaluate
-				   // the non-constant right hand side
-				   // function we now also need the
-				   // quadrature points on the cell we
-				   // are presently on (previously,
-				   // they were only needed on the
-				   // unit cell, in order to compute
-				   // the values and gradients of the
-				   // shape function, which are
-				   // defined on the unit cell
-				   // however). We can tell the
-				   // FEValues object to do for us by
-				   // giving it the update_q_points
-				   // flag:
+				   // Compared to the previous example, in
+				   // order to evaluate the non-constant right
+				   // hand side function we now also need the
+				   // quadrature points on the cell we are
+				   // presently on (previously, we only
+				   // required values and gradients of the
+				   // shape function from the ``FEValues''
+				   // object, as well as the quadrature
+				   // weights, ``JxW''). We can tell the
+				   // ``FEValues'' object to do for us by also
+				   // giving it the ``update_q_points'' flag:
   FEValues<dim> fe_values (fe, quadrature_formula, 
-			   UpdateFlags(update_values    |
-				       update_gradients |
-				       update_q_points  |
-				       update_JxW_values));
+			   update_values   | update_gradients |
+                           update_q_points | update_JxW_values);
 
-				   // Note that the following numbers
-				   // depend on the dimension which we
-				   // are presently using. However,
-				   // the FE and Quadrature classes do
-				   // all the necessary work for you
-				   // and you don't have to care about
-				   // the dimension dependent parts:
+				   // We then again define a few
+				   // abbreviations. The values of these
+				   // variables of course depend on the
+				   // dimension which we are presently
+				   // using. However, the FE and Quadrature
+				   // classes do all the necessary work for
+				   // you and you don't have to care about the
+				   // dimension dependent parts:
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
@@ -400,18 +430,18 @@ void LaplaceProblem<dim>::assemble_system ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-				   // Note here, that a cell is a
-				   // quadrilateral in two space
-				   // dimensions, but a hexahedron in
-				   // 3D. In fact, the
-				   // active_cell_iterator data type
-				   // is something different,
-				   // depending on the dimension we
-				   // are in, but to the outside world
-				   // they look alike and you will
-				   // probably never see a difference
-				   // although they are totally
-				   // unrelated.
+                                   // Next, we again have to loop over all
+				   // cells and assemble local contributions.
+				   // Note, that a cell is a quadrilateral in
+				   // two space dimensions, but a hexahedron
+				   // in 3D. In fact, the
+				   // ``active_cell_iterator'' data type is
+				   // something different, depending on the
+				   // dimension we are in, but to the outside
+				   // world they look alike and you will
+				   // probably never see a difference although
+				   // the classes that this typedef stands for
+				   // are in fact completelye unrelated:
   typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
 						 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -431,8 +461,17 @@ void LaplaceProblem<dim>::assemble_system ()
 				       // of each other) and merge the
 				       // loops for the local matrix
 				       // and the local vector as far
-				       // as possible; this makes
+				       // as possible to make
 				       // things a bit faster.
+                                       //
+                                       // Assembling the right hand side
+                                       // presents the only significant
+                                       // difference to how we did things in
+                                       // step-3: Instead of using a constant
+                                       // right hand side with value 1, we use
+                                       // the object representing the right
+                                       // hand side and evaluate it at the
+                                       // quadrature points:
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
@@ -441,26 +480,45 @@ void LaplaceProblem<dim>::assemble_system ()
 				   fe_values.shape_grad (j, q_point) *
 				   fe_values.JxW (q_point));
 
-					     // Here is about the only
-					     // difference to the
-					     // previous example:
-					     // instead of using a
-					     // constant right hand
-					     // side, we use the
-					     // respective object and
-					     // evaluate it at the
-					     // quadrature points.
 	    cell_rhs(i) += (fe_values.shape_value (i, q_point) *
 			    right_hand_side.value (fe_values.quadrature_point (q_point)) *
 			    fe_values.JxW (q_point));
-	  };
+	  }
+                                       // As a final remark to these loops:
+                                       // when we assemble the local
+                                       // contributions, we have to multiply
+                                       // the gradients of shape functions i
+                                       // and j at point q_point and multiply
+                                       // it with the scalar weights JxW. This
+                                       // is actually what happens:
+                                       // ``fe_values.shape_grad(i,q_point)''
+                                       // returns a ``dim'' dimensional
+                                       // vector, represented by a
+                                       // ``Tensor<1,dim>'' object, and the
+                                       // operator* that multiplies it with
+                                       // the result of
+                                       // ``fe_values.shape_grad(j,q_point)''
+                                       // makes sure that the ``dim''
+                                       // components of the two vectors are
+                                       // properly contracted, and the result
+                                       // is a scalar floating point number
+                                       // that then is multiplied with the
+                                       // weights. Internally, this operator*
+                                       // makes sure that this happens
+                                       // correctly for all ``dim'' components
+                                       // of the vectors, whether ``dim'' be
+                                       // 2, 3, or any other space dimension;
+                                       // from a user's perspective, this is
+                                       // not something worth bothering with,
+                                       // however, making things a lot simpler
+                                       // if one wants to write code dimension
+                                       // independently.
       
-				       // The transfer into the global
-				       // matrix and right hand side
-				       // is done exactly as before,
-				       // but here we have again
-				       // merged some loops for
-				       // efficiency:
+				       // With the local systems assembled,
+				       // the transfer into the global matrix
+				       // and right hand side is done exactly
+				       // as before, but here we have again
+				       // merged some loops for efficiency:
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
@@ -470,21 +528,20 @@ void LaplaceProblem<dim>::assemble_system ()
 			       cell_matrix(i,j));
 	  
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
-	};
-    };
+	}
+    }
 
   
-				   // We wanted to have
-				   // non-homogeneous boundary values
-				   // in this example, contrary to the
-				   // one before. This is a simple
-				   // task, we only have to replace
-				   // the ZeroFunction used there by
-				   // an object of the class which
-				   // describes the boundary values we
-				   // would like to use (i.e. the
-				   // BoundaryValues class declared
-				   // above):
+				   // As the final step in this function, we
+				   // wanted to have non-homogeneous boundary
+				   // values in this example, contrary to the
+				   // one before. This is a simple task, we
+				   // only have to replace the
+				   // ``ZeroFunction'' used there by an object
+				   // of the class which describes the
+				   // boundary values we would like to use
+				   // (i.e. the ``BoundaryValues'' class
+				   // declared above):
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -497,12 +554,14 @@ void LaplaceProblem<dim>::assemble_system ()
 }
 
 
+                                 // @sect4{LaplaceProblem::solve}
+
 				 // Solving the linear system of
-				 // equation is something that looks
+				 // equations is something that looks
 				 // almost identical in most
 				 // programs. In particular, it is
 				 // dimension independent, so this
-				 // function is mostly copied from the
+				 // function is copied verbatim from the
 				 // previous example.
 template <int dim>
 void LaplaceProblem<dim>::solve () 
@@ -514,11 +573,34 @@ void LaplaceProblem<dim>::solve ()
 }
 
 
+                                 // @sect4{LaplaceProblem::output_results}
 
 				 // This function also does what the
-				 // respective one did in the previous
-				 // example. No changes here for
-				 // dimension independence either.
+				 // respective one did in step-3. No changes
+				 // here for dimension independence either.
+                                 //
+                                 // The only difference to the previous
+                                 // example is that we want to write output in
+                                 // GMV format, rather than for gnuplot (GMV
+                                 // is another graphics program that, contrary
+                                 // to gnuplot, shows data in nice colors,
+                                 // allows rotation of geometries with the
+                                 // mouse, and generates reasonable
+                                 // representations of 3d data; for ways to
+                                 // obtain it see the ReadMe file of
+                                 // deal.II). To write data in this format, we
+                                 // simply replace the
+                                 // ``data_out.write_gnuplot'' call by
+                                 // ``data_out.write_gmv''.
+                                 //
+                                 // Since the program will run both 2d and 3d
+                                 // versions of the laplace solver, we use the
+                                 // dimension in the filename to generate
+                                 // distinct filenames for each run (in a
+                                 // better program, one would check whether
+                                 // `dim' can have other values than 2 or 3,
+                                 // but we neglect this here for the sake of
+                                 // brevity).
 template <int dim>
 void LaplaceProblem<dim>::output_results () const
 {
@@ -529,17 +611,6 @@ void LaplaceProblem<dim>::output_results () const
 
   data_out.build_patches ();
 
-				   // Only difference to the previous
-				   // example: write output in GMV
-				   // format, rather than for
-				   // gnuplot. We use the dimension in
-				   // the filename to generate
-				   // distinct filenames for each run
-				   // (in a better program, one would
-				   // check whether `dim' can have
-				   // other values than 2 or 3, but we
-				   // neglect this here for the sake
-				   // of brevity).
   std::ofstream output (dim == 2 ?
 			"solution-2d.gmv" :
 			"solution-3d.gmv");
@@ -548,7 +619,9 @@ void LaplaceProblem<dim>::output_results () const
 
 
 
-				 // This is the function which has the
+                                 // @sect4{LaplaceProblem::run}
+
+                                 // This is the function which has the
 				 // top-level control over
 				 // everything. Apart from one line of
 				 // additional output, it is the same
@@ -569,18 +642,60 @@ void LaplaceProblem<dim>::run ()
   deallog.pop();
 }
 
-    
 
-				 // And this is the main function. It
-				 // also looks mostly like in the
-				 // previous example:
+                                 // @sect4{The ``main'' function}
+
+				 // And this is the main function. It also
+				 // looks mostly like in step-3, but note how
+				 // we first create a variable of type
+				 // ``LaplaceProblem<2>'' (forcing the
+				 // compiler to compile the class template
+				 // with ``dim'' replaced by ``2'') and run a
+				 // 2d simulation, and then we do the whole
+				 // thing over in 3d.
+				 //
+				 // In practice, this is probably not what you
+				 // would do very frequently (you probably
+				 // either want to solve a 2d problem, or one
+				 // in 3d, but not both at the same
+				 // time). However, it demonstrates the
+				 // mechanism by which we can simply change
+				 // which dimension we want in a single place,
+				 // and thereby force the compiler to
+				 // recompile the dimension independent class
+				 // templates for the dimension we
+				 // request. The emphasis here lies on the
+				 // fact that we only need to change a single
+				 // place. This makes it rather trivial to
+				 // debug the program in 2d where computations
+				 // are fast, and then switch a single place
+				 // to a 3 to run the much more computing
+				 // intensive program in 3d for `real'
+				 // computations.
+				 //
+				 // Each of the two blocks is enclosed in
+				 // braces to make sure that the
+				 // ``laplace_problem_2d'' variable goes out
+				 // of scope (and releases the memory it
+				 // holds) before we move on to allocate
+				 // memory for the 3d case. Without the
+				 // additional braces, the
+				 // ``laplace_problem_2d'' variable would only
+				 // be destroyed at the end of the function,
+				 // i.e. after running the 3d problem, and
+				 // would needlessly hog memory while the 3d
+				 // run could actually use it.
 int main () 
 {
-  LaplaceProblem<2> laplace_problem_2d;
-  laplace_problem_2d.run ();
-
-  LaplaceProblem<3> laplace_problem_3d;
-  laplace_problem_3d.run ();
+  {
+    LaplaceProblem<2> laplace_problem_2d;
+    laplace_problem_2d.run ();
+  }
+  
+  {
+    LaplaceProblem<3> laplace_problem_3d;
+    laplace_problem_3d.run ();
+  }
   
   return 0;
 }
