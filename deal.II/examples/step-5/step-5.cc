@@ -243,8 +243,8 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   // fast.
 				   //
 				   // On the other hand, all these
-				   // checks (there are more than 2000
-				   // of them in the library) should
+				   // checks (there are more than 4200
+				   // of them in the library at present) should
 				   // not slow down the program too
 				   // much, which is why the Assert
 				   // macro is only used in debug mode
