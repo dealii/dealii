@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -185,6 +185,21 @@ class BlockMatrixArray : public Subscriptor
 		const unsigned int col,
 		const double       prefix = 1.,
 		const bool         transpose = false);
+
+				     /**
+				      * Add an entry like with enter,
+				      * but use PointerMatrixAux for
+				      * matrices not having functions
+				      * vmult_add() and TVmult_add().
+				      */
+    template <class MATRIX>
+    void enter_aux (VectorMemory<Vector<number> >& mem,
+		    const MATRIX      &matrix,
+		    const unsigned int row,
+		    const unsigned int col,
+		    const double       prefix = 1.,
+		    const bool         transpose = false);
+
     
 				     /**
 				      * Delete all entries, i.e. reset
@@ -284,13 +299,30 @@ class BlockMatrixArray : public Subscriptor
     {
       public:
 					 /**
-					  * Constructor initializing all
-					  * data fields.
+					  * Constructor initializing
+					  * all data fields. A
+					  * PointerMatrix object is
+					  * generated for
+					  * <tt>matrix</tt>.
 					  */
 	template<class MATRIX> 
 	Entry (const MATRIX& matrix,
 	       unsigned row, unsigned int col,
 	       double prefix, bool transpose);
+	
+					 /**
+					  * Constructor initializing
+					  * all data fields. A
+					  * PointerMatrixAux object is
+					  * generated for
+					  * <tt>matrix</tt>.
+					  */
+	template<class MATRIX> 
+	Entry (const MATRIX& matrix,
+	       unsigned row, unsigned int col,
+	       double prefix, bool transpose,
+	       VectorMemory<Vector<number> >& mem);
+	
 					 /**
 					  * Copy constructor
 					  * invalidating the old
@@ -484,6 +516,21 @@ class BlockTrianglePrecondition
 		const double       prefix = 1.,
 		const bool         transpose = false);
 
+				     /**
+				      * Enter a block. This calls
+				      * BlockMatrixArray::enter_aux(). Remember
+				      * that the diagonal blocks
+				      * should actually be inverse
+				      * matrices or preconditioners.
+				      */
+    template <class MATRIX>
+    void enter_aux (VectorMemory<Vector<double> >& mem,
+		    const MATRIX      &matrix,
+		    const unsigned int row,
+		    const unsigned int col,
+		    const double       prefix = 1.,
+		    const bool         transpose = false);
+
                                      /**
 				      * Preconditioning.
 				      */
@@ -578,15 +625,38 @@ class BlockTrianglePrecondition
 template <typename number>
 template <class MATRIX>
 inline
-BlockMatrixArray<number>::Entry::Entry (const MATRIX& matrix,
-					unsigned row, unsigned int col,
-					double prefix, bool transpose)
+BlockMatrixArray<number>::Entry::Entry (
+  const MATRIX& m,
+  unsigned int row,
+  unsigned int col,
+  double prefix,
+  bool transpose)
 		:
 		row (row),
 		col (col),
 		prefix (prefix),
 		transpose (transpose),
-		matrix (new PointerMatrix<MATRIX, Vector<number> >(&matrix, typeid(*this).name()))
+		matrix (new PointerMatrix<MATRIX, Vector<number> >(&m, typeid(*this).name()))
+{}
+
+
+
+template <typename number>
+template <class MATRIX>
+inline
+BlockMatrixArray<number>::Entry::Entry (
+  const MATRIX& m,
+  unsigned row,
+  unsigned int col,
+  double prefix,
+  bool transpose,
+  VectorMemory<Vector<number> >& mem)
+		:
+		row (row),
+		col (col),
+		prefix (prefix),
+		transpose (transpose),
+		matrix (new PointerMatrixAux<MATRIX, Vector<number> >(&mem, &m, typeid(*this).name()))
 {}
 
 
@@ -595,14 +665,35 @@ template <typename number>
 template <class MATRIX>
 inline
 void
-BlockMatrixArray<number>::enter (const MATRIX& matrix,
-				 unsigned row, unsigned int col,
-				 double prefix, bool transpose)
+BlockMatrixArray<number>::enter (
+  const MATRIX& matrix,
+  unsigned int row,
+  unsigned int col,
+  double prefix,
+  bool transpose)
 {
   Assert (mem != 0, ExcNotInitialized());
   Assert(row<n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
   Assert(col<n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
   entries.push_back(Entry(matrix, row, col, prefix, transpose));
+}
+
+
+template <typename number>
+template <class MATRIX>
+inline
+void
+BlockMatrixArray<number>::enter_aux (
+  VectorMemory<Vector<number> >& mem,
+  const MATRIX& matrix,
+  unsigned int row,
+  unsigned int col,
+  double prefix,
+  bool transpose)
+{
+  Assert(row<n_block_rows(), ExcIndexRange(row, 0, n_block_rows()));
+  Assert(col<n_block_cols(), ExcIndexRange(col, 0, n_block_cols()));
+  entries.push_back(Entry(matrix, row, col, prefix, transpose, mem));
 }
 
 
@@ -700,6 +791,23 @@ BlockTrianglePrecondition<number>::enter (const MATRIX& matrix,
 					  double prefix, bool transpose)
 {
   BlockMatrixArray<number>::enter(matrix, row, col, prefix, transpose);
+}
+
+
+
+template <typename number>
+template <class MATRIX>
+inline
+void
+BlockTrianglePrecondition<number>::enter_aux (
+  VectorMemory<Vector<double> >& mem,
+  const MATRIX& matrix,
+  unsigned int row,
+  unsigned int col,
+  double prefix,
+  bool transpose)
+{
+  BlockMatrixArray<number>::enter_aux(mem, matrix, row, col, prefix, transpose);
 }
 
 

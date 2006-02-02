@@ -298,6 +298,23 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+
+
+  >li> <p> Improved: <code class="class">BlockMatrixArray</class>::<code
+  class="member">enter_aux</class> allows using matrices without adding vector
+  muiltplication by using <code class="class">PointerMatrixAux</class>.
+  <br>
+  (GK 2006/02/02)
+  </p>  
+
+  <li> <p> New: The class <code class="class">PointerMatrixAux</class> was
+  introduced for use with matrix classes lacking the adding vector
+  multiplication functions. It implements these by using its own auxiliary
+  vector.
+  <br>
+  (GK 2006/02/02)
+  </p>
+
   <li> <p>
        Improved: The <code class="class">FilteredMatrix</code> class
        was able to filter only the <code class="class">SparseMatrix</code>
