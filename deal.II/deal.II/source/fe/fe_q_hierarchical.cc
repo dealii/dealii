@@ -14,11 +14,7 @@
 #include <fe/fe_q_hierarchical.h>
 
 #include <cmath>
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 
 namespace 
@@ -102,17 +98,9 @@ FE_Q_Hierarchical<dim>::get_name () const
 				   // this function returns, so they
 				   // have to be kept in synch
 
-#ifdef HAVE_STD_STRINGSTREAM
-  std::ostringstream namebuf;
-#else
-  std::ostrstream namebuf;
-#endif
-  
+  std::ostringstream namebuf;  
   namebuf << "FE_Q_Hierarchical<" << dim << ">(" << this->degree << ")";
 
-#ifndef HAVE_STD_STRINGSTREAM
-  namebuf << std::ends;
-#endif
   return namebuf.str();
 }
 

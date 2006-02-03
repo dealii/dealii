@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2000, 2004, 2005 by the deal.II authors */
+/*    Copyright (C) 2000, 2004, 2005, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -96,11 +96,7 @@
                                  // And this is simply C++ again:
 #include <fstream>
 #include <iostream>
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 
                                  // Now, here comes the declaration of the
@@ -939,7 +935,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
                                    // with setting up the output file as in
                                    // step-8, and attaching the (localized)
                                    // solution vector to the output
-                                   // object. (The code to generate the output
+                                   // object:. (The code to generate the output
                                    // file name is stolen and slightly
                                    // modified from step-5, since we expect
                                    // that we can do a number of cycles
@@ -947,15 +943,10 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
                                    // what the code in step-8 could handle.)
   if (this_mpi_process == 0)
     {
-#ifdef HAVE_STD_STRINGSTREAM
       std::ostringstream filename;
       filename << "solution-" << cycle << ".gmv";
+
       std::ofstream output (filename.str().c_str());
-#else
-      std::ostrstream filename;
-      filename << "solution-" << cycle << ".gmv";
-      std::ofstream output (filename.str());
-#endif
 
       DataOut<dim> data_out;
       data_out.attach_dof_handler (dof_handler);

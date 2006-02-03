@@ -45,6 +45,14 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Removed: Support for gcc2.95 in particular, and all compilers that do
+       not support the <code>std::ostringstream</code> class in general,
+       has been removed.
+       <br> 
+       (WB 2006/02/03)
+       </p>
+
+  <li> <p>
        Changed: Several classes related to the storage of data in the
        Triangulation and DoFHandler classes have been moved into internal
        namespaces, and some have also been removed. Since these were not for

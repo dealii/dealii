@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1998, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,12 +16,7 @@
 #include <string>
 #include <cstdlib>
 #include <iostream>
-
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 #ifdef HAVE_GLIBC_STACKTRACE
 #  include <execinfo.h>
@@ -211,11 +206,7 @@ const char * ExceptionBase::what () const throw ()
                                        // convert the messages printed by
                                        // the exceptions into a
                                        // std::string
-#ifdef HAVE_STD_STRINGSTREAM
       std::ostringstream converter;
-#else
-      std::ostrstream converter;
-#endif
 
       converter << "--------------------------------------------------------"
                 << std::endl;
@@ -228,9 +219,6 @@ const char * ExceptionBase::what () const throw ()
 
       converter << "--------------------------------------------------------"
                 << std::endl;
-#ifndef HAVE_STD_STRINGSTREAM
-      converter << std::ends;
-#endif
 
       description = converter.str();
 

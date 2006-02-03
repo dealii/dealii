@@ -24,12 +24,7 @@
 #include <map>
 #include <string>
 #include <memory>
-
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 
 template <typename> class BlockVector;
@@ -737,25 +732,14 @@ BlockMatrixArray<number>::print_latex (STREAM& out) const
 	    matrix_names.insert(
 	      std::pair<const PointerMatrixBase<Vector<number> >*, std::string> (m->matrix,
                                                      std::string("M")));
-#ifdef HAVE_STD_STRINGSTREAM
           std::ostringstream stream;
-#else
-          std::ostrstream stream;
-#endif
-	  
 	  stream << matrix_number++;
-	  
-#ifndef HAVE_STD_STRINGSTREAM
-          stream << std::ends;
-#endif
-	  x.first->second += stream.str();
+
+          x.first->second += stream.str();
 	}
       
-#ifdef HAVE_STD_STRINGSTREAM
       std::ostringstream stream;
-#else
-      std::ostrstream stream;
-#endif
+
       if (array(m->row, m->col) != "" && m->prefix >= 0)
 	stream << "+";
       if (m->prefix != 1.)
@@ -765,9 +749,6 @@ BlockMatrixArray<number>::print_latex (STREAM& out) const
       if (m->transpose)
 	stream << "^T";
 
-#ifndef HAVE_STD_STRINGSTREAM
-      stream << std::ends;
-#endif
       array(m->row, m->col) += stream.str();
     }
   for (unsigned int i=0;i<n_block_rows();++i)

@@ -2,7 +2,7 @@
 //      $Id$   
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,11 +24,8 @@
 #include <cmath>
 #include <unistd.h>
 #include <sys/types.h>
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
+
 #ifdef HAVE_STD_NUMERIC_LIMITS
 #  include <limits>
 #else
@@ -108,11 +105,7 @@ namespace Utilities
   int
   string_to_int (const std::string &s)
   {
-#ifdef HAVE_STD_STRINGSTREAM
     std::istringstream ss(s);
-#else
-    std::ostrstream ss(s.c_str());
-#endif
 
 #ifdef HAVE_STD_NUMERIC_LIMITS
     static const int max_int = std::numeric_limits<int>::max();
@@ -263,11 +256,7 @@ namespace Utilities
     const std::string test_string (name.begin()+position,
 				   name.end());
     
-#ifdef HAVE_STD_STRINGSTREAM
     std::istringstream str(test_string);
-#else
-    std::istrstream str(test_string.c_str());
-#endif
 
     int i;
     if (str >> i)
@@ -380,17 +369,11 @@ namespace Utilities
       std::time_t  time1= std::time (0);
       std::tm     *time = std::localtime(&time1); 
 
-#ifdef HAVE_STD_STRINGSTREAM
       std::ostringstream o;
-#else
-      std::ostrstream o;
-#endif
       o << time->tm_hour << ":"
         << (time->tm_min < 10 ? "0" : "") << time->tm_min << ":"
         << (time->tm_sec < 10 ? "0" : "") << time->tm_sec;
-#ifndef HAVE_STD_STRINGSTREAM
-      o << std::ends;
-#endif
+
       return o.str();
     }
 

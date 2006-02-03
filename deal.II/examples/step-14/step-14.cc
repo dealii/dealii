@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors */
+/*    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -45,12 +45,7 @@
 #include <list>
 #include <algorithm>
 #include <numeric>
-
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 				 // @sect3{Evaluating the solution}
 
@@ -423,21 +418,13 @@ namespace Evaluation
   GridOutput<dim>::operator () (const DoFHandler<dim> &dof_handler,
 				const Vector<double>  &/*solution*/) const
   {
-#ifdef HAVE_STD_STRINGSTREAM
     std::ostringstream filename;
-#else
-    std::ostrstream filename;
-#endif
     filename << output_name_base << "-"
 	     << this->refinement_cycle
 	     << ".eps"
 	     << std::ends;
-#ifdef HAVE_STD_STRINGSTREAM
-    std::ofstream out (filename.str().c_str());
-#else
-    std::ofstream out (filename.str());
-#endif
     
+    std::ofstream out (filename.str().c_str());
     GridOut().write_eps (dof_handler.get_tria(), out);
   }
 }
@@ -927,21 +914,13 @@ namespace LaplaceSolver
     data_out.add_data_vector (this->solution, "solution");
     data_out.build_patches ();
 
-#ifdef HAVE_STD_STRINGSTREAM
     std::ostringstream filename;
-#else
-    std::ostrstream filename;
-#endif
     filename << "solution-"
 	     << this->refinement_cycle
 	     << ".gnuplot"
 	     << std::ends;
-#ifdef HAVE_STD_STRINGSTREAM
-    std::ofstream out (filename.str().c_str());
-#else
-    std::ofstream out (filename.str());
-#endif
     
+    std::ofstream out (filename.str().c_str());
     data_out.write (out, DataOut<dim>::gnuplot);
   }
   
@@ -2846,21 +2825,13 @@ namespace LaplaceSolver
     
     data_out.build_patches ();
   
-#ifdef HAVE_STD_STRINGSTREAM
     std::ostringstream filename;
-#else
-    std::ostrstream filename;
-#endif
     filename << "solution-"
 	     << this->refinement_cycle
 	     << ".gnuplot"
 	     << std::ends;
-#ifdef HAVE_STD_STRINGSTREAM
-    std::ofstream out (filename.str().c_str());
-#else
-    std::ofstream out (filename.str());
-#endif
     
+    std::ofstream out (filename.str().c_str());    
     data_out.write (out, DataOut<dim>::gnuplot);
   }
 

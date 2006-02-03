@@ -20,12 +20,9 @@
 #include <fe/mapping.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
+
 #include <iostream>
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 
 /* ----------------------- FESystem::InternalData ------------------- */
@@ -238,11 +235,7 @@ FESystem<dim>::get_name () const
 				   // this function returns, so they
 				   // have to be kept in synch
 
-#ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream namebuf;
-#else
-  std::ostrstream namebuf;
-#endif
 
   namebuf << "FESystem<" << dim << ">[";
   for (unsigned int i=0; i<n_base_elements(); ++i)
@@ -255,9 +248,6 @@ FESystem<dim>::get_name () const
     }
   namebuf << ']';
 
-#ifndef HAVE_STD_STRINGSTREAM
-  namebuf << std::ends;
-#endif
   return namebuf.str();
 }
 

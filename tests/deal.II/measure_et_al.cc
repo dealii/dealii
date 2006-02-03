@@ -1,5 +1,5 @@
 // $Id$
-// Copyright (C) 2005 by the deal.II authors
+// Copyright (C) 2005, 2006 by the deal.II authors
 //
 // Computes measure, center and barycenter on a variety of cells
 
@@ -9,17 +9,6 @@
 #include <grid/tria_accessor.h>
 #include <grid/grid_generator.h>
 #include <fstream>
-
-
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#  define SSTREAM std::ostringstream
-#  define ENDSTRING
-#else
-#  include <strstream>
-#  define SSTREAM std::ostrstream
-#  define ENDSTRING << std::ends
-#endif
 
 #define PRECISION 5
 

@@ -31,11 +31,7 @@
 #include <fe/mapping_q1.h>
 #include <fe/select_fe_values.h>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 
 
@@ -271,18 +267,11 @@ add_data_vector (const VECTOR         &vec,
       names.resize (n_components);
       for (unsigned int i=0; i<n_components; ++i)
 	{
-#ifdef HAVE_STD_STRINGSTREAM
 	  std::ostringstream namebuf;
-#else
-	  std::ostrstream namebuf;
-#endif
 	  namebuf << '_' << i;
-#ifndef HAVE_STD_STRINGSTREAM
-	  namebuf << std::ends;
-#endif
   	  names[i] = name + namebuf.str();
-  	};
-    };
+  	}
+    }
   
   add_data_vector (vec, names, type);
 }

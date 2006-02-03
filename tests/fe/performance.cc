@@ -22,11 +22,6 @@
 #include <fstream>
 #include <string>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
 
 template <int dim>
 void performance (Triangulation<dim>& tr,

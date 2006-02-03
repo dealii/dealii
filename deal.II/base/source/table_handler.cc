@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,12 +15,7 @@
 #include <base/table_handler.h>
 #include <base/table.h>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
-
+#include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <strings.h>
@@ -265,11 +260,7 @@ void TableHandler::write_text(std::ostream &out) const
 					 // write it into a dummy
 					 // stream, just to get its
 					 // size upon output
-#ifdef HAVE_STD_STRINGSTREAM
 	std::ostringstream dummy_out;
-#else
-	std::ostrstream dummy_out;
-#endif
 	
 	dummy_out << std::setprecision(column.precision);
 
@@ -278,19 +269,12 @@ void TableHandler::write_text(std::ostream &out) const
 	else
 	  dummy_out.setf (std::ios::fixed, std::ios::floatfield);
 	column.entries[i]->write_text (dummy_out);
-#ifndef HAVE_STD_STRINGSTREAM
-	dummy_out << std::ends;
-#endif
 	
 					 // get size, note that we are
 					 // not interested in the
 					 // trailing \0
-#ifdef HAVE_STD_STRINGSTREAM
 	entry_widths[i][j] = dummy_out.str().length();
-#else
-	entry_widths[i][j] = strlen(dummy_out.str());
-#endif
-      };
+      }
 
 				   // next compute the width each row
 				   // has to have to suit all entries

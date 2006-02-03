@@ -1,5 +1,5 @@
 // mapping.cc,v 1.19 2004/01/30 09:56:19 hartmann Exp
-// Copyright (C) 2001, 2002, 2003, 2004, 2005 Ralf Hartmann
+// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Ralf Hartmann
 //
 // Shows the shape functions implemented and computes the area of cells.
 
@@ -23,15 +23,7 @@
 #include <fstream>
 #include <string>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#  define SSTREAM std::ostringstream
-#  define ENDSTRING
-#else
-#  include <strstream>
-#  define SSTREAM std::ostrstream
-#  define ENDSTRING << std::ends
-#endif
+#include <sstream>
 
 #define PRECISION 2
 
@@ -489,9 +481,9 @@ void mapping_test()
 	  {
 	    if (true)
 	      {
-		SSTREAM ost;
+		std::ostringstream ost;
 		ost << "Mapping" << dim << "d-" << i << '-'
-		    << mapping_strings[j] ENDSTRING;
+		    << mapping_strings[j];
 		deallog << ost.str() << std::endl;
 		plot_transformation(*mapping_ptr[j], fe_q4, cell, ost.str());
 		compute_area(*mapping_ptr[j], fe_q4, cell);
@@ -499,18 +491,18 @@ void mapping_test()
 	    
 	    if (dim>1)
 	      {
-		SSTREAM ost;
+		std::ostringstream ost;
 		ost << "MappingFace" << dim << "d-" << i << '-'
-		    << mapping_strings[j] ENDSTRING;
+		    << mapping_strings[j];
 		deallog << ost.str() << std::endl;	    
 		plot_faces(*mapping_ptr[j], fe_q4, cell, ost.str());
 	      }
 
 	    if (dim>1)
 	      {
-		SSTREAM ost;
+		std::ostringstream ost;
 		ost << "MappingSubface" << dim << "d-" << i << '-'
-		    << mapping_strings[j] ENDSTRING;
+		    << mapping_strings[j];
 		deallog << ost.str() << std::endl;	    
 		plot_subfaces(*mapping_ptr[j], fe_q4, cell, ost.str());
 	      }

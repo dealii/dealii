@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2003, 2004, 2005 by the deal.II authors */
+/*    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -56,14 +56,9 @@
 #include <multigrid/mg_smoother.h>
 #include <multigrid/mg_matrix.h>
 
-				 // This is C++ ... see step 5 for
-				 // further comments.
+				 // This is C++:
 #include <fstream>
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 
 				 // This class is based on the same
@@ -495,29 +490,13 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
 				   // The following block generates
 				   // the file name and opens the
-				   // file. This looks awkward because
-				   // of a change in the handling of
-				   // string streams (See step 5 for explanation).
-  
-#ifdef HAVE_STD_STRINGSTREAM
+				   // file:
   std::ostringstream filename;
-#else
-  std::ostrstream filename;
-#endif
   filename << "solution-"
 	   << cycle
 	   << ".gnuplot";
 
-#ifndef HAVE_STD_STRINGSTREAM
-  filename << std::ends;
-#endif
-
-#ifdef HAVE_STD_STRINGSTREAM
   std::ofstream output (filename.str().c_str());
-#else
-  std::ofstream output (filename.str());
-#endif
-
   data_out.write_gnuplot (output);
 }
 

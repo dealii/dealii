@@ -41,11 +41,7 @@
 #include <set>
 #include <boost/shared_ptr.hpp>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 //TODO: Is it reasonable to have undocumented exceptions?
 
@@ -3910,17 +3906,8 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     std::string header;
     getline (in, header);
 
-#ifdef HAVE_STD_STRINGSTREAM
     std::ostringstream s;
-#else
-    std::ostrstream s;
-#endif
-
     s << "[deal.II intermediate format graphics data]";
-
-#ifndef HAVE_STD_STRINGSTREAM
-    s << std::ends;
-#endif
     
     Assert (header == s.str(), ExcUnexpectedInput(s.str(),header));
   }
@@ -3928,17 +3915,8 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     std::string header;
     getline (in, header);
 
-#ifdef HAVE_STD_STRINGSTREAM
     std::ostringstream s;
-#else
-    std::ostrstream s;
-#endif
-
     s << "[written by " << PACKAGE_STRING << "]";
-
-#ifndef HAVE_STD_STRINGSTREAM
-    s << std::ends;
-#endif
     
     Assert (header == s.str(), ExcUnexpectedInput(s.str(),header));
   }  
@@ -4080,17 +4058,8 @@ operator >> (std::istream                     &in,
       }
     while ((header == "") && in);
 
-#ifdef HAVE_STD_STRINGSTREAM
     std::ostringstream s;
-#else
-    std::ostrstream s;
-#endif
-
     s << "[deal.II intermediate Patch<" << dim << ',' << spacedim << ">]";
-
-#ifndef HAVE_STD_STRINGSTREAM
-    s << std::ends;
-#endif
     
     Assert (header == s.str(), ExcUnexpectedInput(s.str(),header));
   }

@@ -23,11 +23,7 @@
 #include <fe/fe_values.h>
 #include <fe/fe_tools.h>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 template <int dim>
 FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
@@ -103,17 +99,9 @@ FE_RaviartThomasNodal<dim>::get_name () const
 				   // this function returns, so they
 				   // have to be kept in synch
 
-#ifdef HAVE_STD_STRINGSTREAM
-  std::ostringstream namebuf;
-#else
-  std::ostrstream namebuf;
-#endif
-  
+  std::ostringstream namebuf;  
   namebuf << "FE_RaviartThomasNodal<" << dim << ">(" << this->degree-1 << ")";
 
-#ifndef HAVE_STD_STRINGSTREAM
-  namebuf << std::ends;
-#endif
   return namebuf.str();
 }
 

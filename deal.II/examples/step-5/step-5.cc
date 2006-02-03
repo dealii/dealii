@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -52,61 +52,8 @@
 				 // ... and this is too: We will
 				 // convert integers to strings using
 				 // the C++ stringstream class
-				 // ``ostringstream''. One annoying
-				 // complication arises here in that
-				 // the classes ``std::istringstream''
-				 // and ``std::ostringstream'' (with
-				 // these names) have not been part of
-				 // standard libraries of C++
-				 // compilers for long. They have only
-				 // been part of C++ compilers since
-				 // around the time the C++ standard
-				 // was made in 1999. For example, the
-				 // gcc compiler up to and including
-				 // version 2.95.2 did not have them,
-				 // but instead provided classes
-				 // ``istrstream'' and ``ostrstream''
-				 // with a similar, but nevertheless
-				 // slightly different
-				 // interface. Furthermore, they were
-				 // declared in the include file
-				 // ``<strstream>'', while the new
-				 // standards conforming classes are
-				 // declared in ``<sstream>''. Many
-				 // other compilers followed the gcc
-				 // scheme, so whenever we want to
-				 // support versions of compilers that
-				 // appeared before approximately
-				 // 2000/2001, we have to support
-				 // these old classes.
-				 //
-				 // Since we do want to support these
-				 // compilers, the ``./configure''
-				 // script you run as the very first
-				 // step of installing the library
-				 // determines whether the compiler
-				 // you want to use supports the new
-				 // classes, or whether we have to
-				 // fall back on the old ones. If the
-				 // new classes are supported, then
-				 // the preprocessor variable
-				 // ``HAVE_STD_STRINGSTREAM'' is set
-				 // in the ``base/config.h'' include
-				 // file, that all include files in
-				 // the library also include. Since we
-				 // have included quite a number of
-				 // files from the library at this
-				 // point, the definition or
-				 // non-definition of this
-				 // preprocessor variable can now be
-				 // used to decide whether old or new
-				 // header names have to be used to
-				 // import string stream classes:
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+				 // ``ostringstream'':
+#include <sstream>
 
 
                                  // @sect3{The ``LaplaceProblem'' class template}
@@ -807,36 +754,10 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // strings, and one could as well
 				   // use stream modifiers such as
 				   // ``setw'', ``setprecision'', and
-				   // so on.
-				   //
-				   // In C++, you can do this by using
-				   // the so-called stringstream
-				   // classes. As already discussed at
-				   // the point of inclusion of the
-				   // respective header file above,
-				   // there is some historical
-				   // confusion we have to work around
-				   // here, since the class we'd like
-				   // to use used to be called
-				   // ``ostrstream'', but now is named
-				   // ``ostringstream''. In the same
-				   // way as done above in deciding
-				   // which file to include, we here
-				   // decide which class name to use:
-#ifdef HAVE_STD_STRINGSTREAM
+				   // so on. In C++, you can do this
+				   // by using the so-called stringstream
+				   // classes:
   std::ostringstream filename;
-#else
-  std::ostrstream filename;
-#endif
-				   // Fortunately, the interface of
-				   // the two classes which we might
-				   // now be using, depending on which
-				   // one is available, is close
-				   // enough that we need to take care
-				   // about the differences only once
-				   // below, so we can use them in a
-				   // rather straightforward way, even
-				   // if they are not identical.
 
 				   // In order to now actually
 				   // generate a filename, we fill the
@@ -847,33 +768,15 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   filename << "solution-"
 	   << cycle
 	   << ".eps";
-  
-				   // For the old string stream
-				   // classes, we have to append the
-				   // final '\0' that appears at the
-				   // end of ``char *''
-				   // variables. This is done by the
-				   // following construct:
-#ifndef HAVE_STD_STRINGSTREAM
-  filename << std::ends;
-#endif
-				   // We can get whatever we wrote to
-				   // the stream using the ``str()''
-				   // function. If the new
-				   // stringstream classes are used,
-				   // then the result is a string
-				   // which we have to convert to a
-				   // char* using the ``c_str()''
-				   // function, otherwise the result
-				   // is a char* right away. Use that
-				   // as filename for the output
-				   // stream and then write the data
-				   // to the file:
-#ifdef HAVE_STD_STRINGSTREAM
+
+                                   // We can get whatever we wrote to the
+				   // stream using the ``str()'' function. The
+				   // result is a string which we have to
+				   // convert to a char* using the ``c_str()''
+				   // function. Use that as filename for the
+				   // output stream and then write the data to
+				   // the file:
   std::ofstream output (filename.str().c_str());
-#else
-  std::ofstream output (filename.str());
-#endif
 
   data_out.write_eps (output);
 }

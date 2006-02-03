@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,12 +17,7 @@
 #include <lac/solver_control.h>
 
 #include <cmath>
-
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 /*----------------------- SolverControl ---------------------------------*/
 
@@ -52,17 +47,9 @@ SolverControl::NoConvergence::what () const throw ()
   static std::string description;
 				   // convert the messages printed by the
 				   // exceptions into a std::string
-#ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream out;
-#else
-  std::ostrstream out;
-#endif
-
   out << "Iterative method reported convergence failure in step "
       << last_step << " with residual " << last_residual;
-#ifndef HAVE_STD_STRINGSTREAM
-  out << std::ends;
-#endif
 
   description = out.str();
   return description.c_str();

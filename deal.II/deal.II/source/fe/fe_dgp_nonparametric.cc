@@ -20,11 +20,7 @@
 #include <fe/fe_dgp_nonparametric.h>
 #include <fe/fe_values.h>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 
 template <int dim>
@@ -89,17 +85,9 @@ FE_DGPNonparametric<dim>::get_name () const
 				   // this function returns, so they
 				   // have to be kept in synch
 
-#ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream namebuf;
-#else
-  std::ostrstream namebuf;
-#endif
-  
   namebuf << "FE_DGPNonparametric<" << dim << ">(" << degree << ")";
 
-#ifndef HAVE_STD_STRINGSTREAM
-  namebuf << std::ends;
-#endif
   return namebuf.str();
 }
 

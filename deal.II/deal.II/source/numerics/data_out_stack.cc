@@ -26,11 +26,8 @@
 #include <fe/select_fe_values.h>
 #include <fe/mapping_q1.h>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
+
 
 template <int dim, template <int> class DH>
 unsigned int
@@ -151,15 +148,8 @@ void DataOutStack<dim,DH>::add_data_vector (const Vector<number> &vec,
       names.resize (n_components);
       for (unsigned int i=0; i<n_components; ++i)
 	{
-#ifdef HAVE_STD_STRINGSTREAM
 	  std::ostringstream namebuf;
-#else
-	  std::ostrstream namebuf;
-#endif
 	  namebuf << '_' << i;
-#ifndef HAVE_STD_STRINGSTREAM
-	  namebuf << std::ends;
-#endif
   	  names[i] = name + namebuf.str();
   	}
     }

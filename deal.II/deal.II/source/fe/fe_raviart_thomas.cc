@@ -24,14 +24,8 @@
 #include <fe/fe_values.h>
 #include <fe/fe_tools.h>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
-
+#include <sstream>
 #include <iostream>
-using namespace std;
 
 
 template <int dim>
@@ -106,17 +100,9 @@ FE_RaviartThomas<dim>::get_name () const
 				   // this function returns, so they
 				   // have to be kept in synch
 
-#ifdef HAVE_STD_STRINGSTREAM
-  std::ostringstream namebuf;
-#else
-  std::ostrstream namebuf;
-#endif
-  
+  std::ostringstream namebuf;  
   namebuf << "FE_RaviartThomas<" << dim << ">(" << rt_order << ")";
 
-#ifndef HAVE_STD_STRINGSTREAM
-  namebuf << std::ends;
-#endif
   return namebuf.str();
 }
 

@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2002, 2003, 2004 by the deal.II authors                   */
+/*    Copyright (C) 2002, 2003, 2004, 2006 by the deal.II authors                   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -48,12 +48,7 @@
                                  // header files:
 #include <fstream>
 #include <iostream>
-
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 
                                  // The first thing we have here is a helper
@@ -833,21 +828,13 @@ MinimizationProblem<dim>::output_results () const
   data_out.add_data_vector (present_solution, "solution");
   data_out.build_patches ();
 
-#ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream filename;
-#else
-  std::ostrstream filename;
-#endif
   filename << "solution-"
            << run_number
            << ".gnuplot"
            << std::ends;
-#ifdef HAVE_STD_STRINGSTREAM
-  std::ofstream out (filename.str().c_str());
-#else
-  std::ofstream out (filename.str());
-#endif
 
+  std::ofstream out (filename.str().c_str());
   data_out.write_gnuplot (out);
 }
 

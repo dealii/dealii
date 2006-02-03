@@ -21,12 +21,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <list>
-
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 #ifdef HAVE_STD_NUMERIC_LIMITS
 # include <limits>
@@ -86,11 +81,7 @@ namespace Patterns
 
   bool Integer::match (const std::string &test_string) const
   {
-#ifdef HAVE_STD_STRINGSTREAM
     std::istringstream str(test_string);
-#else
-    std::istrstream str(test_string.c_str());
-#endif
     
     int i;
     if (str >> i)
@@ -117,18 +108,11 @@ namespace Patterns
 				     // output their values
     if (lower_bound <= upper_bound)
       {
-#ifdef HAVE_STD_STRINGSTREAM
 	std::ostringstream description;	
-#else
-	std::ostrstream description;
-#endif
 	
 	description << "[Integer range "
 		    << lower_bound << "..." << upper_bound
 		    << " (inclusive)]";
-#ifndef HAVE_STD_STRINGSTREAM
-	description << std::ends;
-#endif
 	return description.str();
       }
     else
@@ -172,11 +156,7 @@ namespace Patterns
 
   bool Double::match (const std::string &test_string) const
   {
-#ifdef HAVE_STD_STRINGSTREAM
     std::istringstream str(test_string);
-#else
-    std::istrstream str(test_string.c_str());
-#endif
 
     double d;
     if (str >> d)
@@ -202,18 +182,11 @@ namespace Patterns
 				     // output their values
     if (lower_bound <= upper_bound)
       {
-#ifdef HAVE_STD_STRINGSTREAM
 	std::ostringstream description;	
-#else
-	std::ostrstream description;
-#endif
 
 	description << "[Floating point range "
 		    << lower_bound << "..." << upper_bound
 		    << " (inclusive)]";
-#ifndef HAVE_STD_STRINGSTREAM	
-	description << std::ends;
-#endif
 	return description.str();
       }
     else
@@ -366,19 +339,11 @@ namespace Patterns
 
   std::string List::description () const
   {
-#ifdef HAVE_STD_STRINGSTREAM
     std::ostringstream description;	
-#else
-    std::ostrstream description;
-#endif
 	
     description << "list of <" << pattern->description() << ">" 
                 << " of length " << min_elements << "..." << max_elements
                 << " (inclusive)";
-
-#ifndef HAVE_STD_STRINGSTREAM
-    description << std::ends;
-#endif
 
     return description.str();
   }
@@ -837,16 +802,9 @@ void
 ParameterHandler::set (const std::string &entry_string,
                        const double      &new_value)
 {
-#ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream s;
-#else
-  std::ostrstream s;
-#endif
   s << std::setprecision(16);
   s << new_value;
-#ifndef HAVE_STD_STRINGSTREAM
-  s << std::ends;
-#endif
 
                                    // hand this off to the function that
                                    // actually sets the value as a string
@@ -859,15 +817,8 @@ void
 ParameterHandler::set (const std::string &entry_string,
                        const long int    &new_value)
 {
-#ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream s;
-#else
-  std::ostrstream s;
-#endif
   s << new_value;
-#ifndef HAVE_STD_STRINGSTREAM
-  s << std::ends;
-#endif
 
                                    // hand this off to the function that
                                    // actually sets the value as a string
@@ -880,15 +831,8 @@ void
 ParameterHandler::set (const std::string &entry_string,
                        const bool        &new_value)
 {
-#ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream s;
-#else
-  std::ostrstream s;
-#endif
   s << new_value;
-#ifndef HAVE_STD_STRINGSTREAM
-  s << std::ends;
-#endif
 
                                    // hand this off to the function that
                                    // actually sets the value as a string

@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -51,19 +51,7 @@
 #include <iostream>
 #include <fstream>
 #include <list>
-
-				 // Just as in the step-5 example
-				 // program (see there for a lengthy
-				 // discussion of the subject), we
-				 // have to work around some
-				 // historical confusion with the
-				 // files declaring the stringstream
-				 // classes:
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 
 				 // @sect3{Evaluation of the solution}
@@ -663,13 +651,6 @@ namespace Evaluation
 				   // value of the format descriptor
 				   // passed as second argument.
 				   //
-				   // The somewhat complicated use of
-				   // the stringstream class,
-				   // involving support from the
-				   // preprocessor, is as already
-				   // explained in the step-5 example
-				   // program.
-				   //
 				   // Also note that we have to prefix
 				   // ``this->'' to access a member
 				   // variable of the template
@@ -689,20 +670,12 @@ namespace Evaluation
     data_out.add_data_vector (solution, "solution");
     data_out.build_patches ();
   
-#ifdef HAVE_STD_STRINGSTREAM
     std::ostringstream filename;
-#else
-    std::ostrstream filename;
-#endif
     filename << output_name_base << "-"
 	     << this->refinement_cycle
 	     << data_out.default_suffix (output_format)
 	     << std::ends;
-#ifdef HAVE_STD_STRINGSTREAM
     std::ofstream out (filename.str().c_str());
-#else
-    std::ofstream out (filename.str());
-#endif
     
     data_out.write (out, output_format);
   }

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,12 +25,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 
 // on SunOS 4.x, getrusage is stated in the man pages and exists, but
@@ -208,16 +203,9 @@ LogStream::print_line_head()
 #ifdef DEALII_MEMORY_DEBUG
   static const pid_t id = getpid();
   
-#ifdef HAVE_STD_STRINGSTREAM
   std::ostringstream statname;
-#else
-  std::ostrstream statname;
-#endif
-  
   statname << "/proc/" << id << "/stat";
-#ifndef HAVE_STD_STRINGSTREAM
-  statname << std::ends;
-#endif
+
   static long size;
   static string dummy;
   ifstream stat(statname.str());

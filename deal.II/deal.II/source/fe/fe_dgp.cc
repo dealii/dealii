@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,11 +14,7 @@
 #include <fe/fe_dgp.h>
 #include <fe/fe_tools.h>
 
-#ifdef HAVE_STD_STRINGSTREAM
-#  include <sstream>
-#else
-#  include <strstream>
-#endif
+#include <sstream>
 
 
 template <int dim>
@@ -55,17 +51,9 @@ FE_DGP<dim>::get_name () const
 				   // this function returns, so they
 				   // have to be kept in synch
 
-#ifdef HAVE_STD_STRINGSTREAM
-  std::ostringstream namebuf;
-#else
-  std::ostrstream namebuf;
-#endif
-  
+  std::ostringstream namebuf;  
   namebuf << "FE_DGP<" << dim << ">(" << this->degree << ")";
 
-#ifndef HAVE_STD_STRINGSTREAM
-  namebuf << std::ends;
-#endif
   return namebuf.str();
 }
 
