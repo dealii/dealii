@@ -654,8 +654,8 @@ MGTools::make_flux_sparsity_pattern (
   const MGDoFHandler<dim> &dof,
   SparsityPattern       &sparsity,
   const unsigned int level,
-  const Table<2,DoFTools::DoFTools::Coupling> &int_mask,
-  const Table<2,DoFTools::DoFTools::Coupling> &flux_mask)
+  const Table<2,DoFTools::Coupling> &int_mask,
+  const Table<2,DoFTools::Coupling> &flux_mask)
 {
   const FiniteElement<dim>& fe = dof.get_fe();
   const unsigned int n_dofs = dof.n_dofs(level);
@@ -682,8 +682,8 @@ MGTools::make_flux_sparsity_pattern (
   typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
 
-  Table<2,DoFTools::DoFTools::Coupling> int_dof_mask(total_dofs, total_dofs);
-  Table<2,DoFTools::DoFTools::Coupling> flux_dof_mask(total_dofs, total_dofs);
+  Table<2,DoFTools::Coupling> int_dof_mask(total_dofs, total_dofs);
+  Table<2,DoFTools::Coupling> flux_dof_mask(total_dofs, total_dofs);
 
   DoFTools::compute_dof_couplings(int_dof_mask, int_mask, fe);
   DoFTools::compute_dof_couplings(flux_dof_mask, flux_mask, fe);
@@ -833,7 +833,7 @@ MGTools::make_flux_sparsity_pattern_edge (
   const MGDoFHandler<dim> &dof,
   SparsityPattern       &sparsity,
   const unsigned int level,
-  const Table<2,DoFTools::DoFTools::Coupling> &flux_mask)
+  const Table<2,DoFTools::Coupling> &flux_mask)
 {
   const FiniteElement<dim>& fe = dof.get_fe();
   const unsigned int n_comp = fe.n_components();
@@ -863,7 +863,7 @@ MGTools::make_flux_sparsity_pattern_edge (
   typename MGDoFHandler<dim>::cell_iterator cell = dof.begin(level),
 					    endc = dof.end(level);
 
-   Table<2,DoFTools::DoFTools::Coupling> flux_dof_mask(dofs_per_cell, dofs_per_cell);
+   Table<2,DoFTools::Coupling> flux_dof_mask(dofs_per_cell, dofs_per_cell);
 
    DoFTools::compute_dof_couplings(flux_dof_mask, flux_mask, fe);
   
