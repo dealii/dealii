@@ -64,8 +64,7 @@ void DataOutFaces<dim,DH>::build_some_patches (Data data)
       Assert (patch != this->patches.end(), ExcInternalError());
       
       for (unsigned int vertex=0; vertex<GeometryInfo<dim-1>::vertices_per_cell; ++vertex)
-	patch->vertices[vertex] = face.first->face(face.second)->vertex(
-	  GeometryInfo<dim-1>::ucd_to_deal[vertex]);
+	patch->vertices[vertex] = face.first->face(face.second)->vertex(vertex);
       
       if (data.n_datasets > 0)
 	{
