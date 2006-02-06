@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
+//    transfer.cc,v 1.13 2005/12/30 16:07:03 guido Exp
+//    Version: 
 //
 //    Copyright (C) 2000 - 2005 by the deal.II authors
 //
@@ -62,16 +62,16 @@ void check_simple(const FiniteElement<dim>& fe)
   u0 = 1;
   transfer.prolongate(1,u1,u0);
   transfer.prolongate(2,u2,u1);
-  deallog << "u0\t" << (int) (u0*u0+.5) << std::endl
-	  << "u1\t" << (int) (u1*u1+.5) << std::endl
-	  << "u2\t" << (int) (u2*u2+.5) << std::endl;
+  deallog << "u0\t" <<  (u0*u0+.5) << std::endl
+	  << "u1\t" <<  (u1*u1+.5) << std::endl
+	  << "u2\t" <<  (u2*u2+.5) << std::endl;
 				   // Now restrict the same vectors.
   u1 = 0.;
   u0 = 0.;
   transfer.restrict_and_add(2,u1,u2);
   transfer.restrict_and_add(1,u0,u1);
-  deallog << "u1\t" << (int) (u1*u1+.5) << std::endl
-	  << "u0\t" << (int) (u0*u0+.5) << std::endl;
+  deallog << "u1\t" <<  (u1*u1+.5) << std::endl
+	  << "u0\t" <<  (u0*u0+.5) << std::endl;
   
 				   // Now the same for a non-constant
 				   // vector
@@ -79,16 +79,16 @@ void check_simple(const FiniteElement<dim>& fe)
     u0(i) = i;
   transfer.prolongate(1,u1,u0);
   transfer.prolongate(2,u2,u1);
-  deallog << "u0\t" << (int) (u0*u0+.5) << std::endl
-	  << "u1\t" << (int) (u1*u1+.5) << std::endl
-	  << "u2\t" << (int) (u2*u2+.5) << std::endl;
+  deallog << "u0\t" <<  (u0*u0+.5) << std::endl
+	  << "u1\t" <<  (u1*u1+.5) << std::endl
+	  << "u2\t" <<  (u2*u2+.5) << std::endl;
 				   // Now restrict the same vectors.
   u1 = 0.;
   u0 = 0.;
   transfer.restrict_and_add(2,u1,u2);
   transfer.restrict_and_add(1,u0,u1);
-  deallog << "u1\t" << (int) (u1*u1+.5) << std::endl
-	  << "u0\t" << (int) (u0*u0+.5) << std::endl;  
+  deallog << "u1\t" <<  (u1*u1+.5) << std::endl
+	  << "u0\t" <<  (u0*u0+.5) << std::endl;  
 }
 
 
