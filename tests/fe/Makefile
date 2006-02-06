@@ -19,10 +19,6 @@ libraries = $(lib-deal2-1d.g) \
 
 default: run-tests
 
-%.exe: %.g.$(OBJEXT) $(libraries)
-	@echo =====linking======= $@
-	@$(CXX) $(LDFLAGS) -o $@ ../abort.o $^ $(LIBS)
-
 ############################################################
 
 tests_x=fe_data_test traits fe_tools fe_tools_test mapping \
