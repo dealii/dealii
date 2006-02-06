@@ -4,12 +4,14 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
+
+                                 // @sect3{Include files}
 
 				 // The first few files have already
 				 // been covered in previous examples
@@ -35,30 +37,32 @@
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
+
+#include <fstream>
+#include <iostream>
+
 				 // From the following include file we
 				 // will import the declaration of
 				 // H1-conforming finite element shape
-				 // functions. This family of 
-				 // finite elements is called ``FE_Q''.
+				 // functions. This family of finite
+				 // elements is called ``FE_Q'', and
+				 // was used in all examples before
+				 // already to define the usual bi- or
+				 // tri-linear elements, but we will
+				 // now use it for bi-quadratic
+				 // elements:
 #include <fe/fe_q.h>
 				 // We will not read the grid from a
 				 // file as in the previous example,
 				 // but generate it using a function
 				 // of the library. However, we will
 				 // want to write out the locally
-				 // refined grids in each step, so we
+				 // refined grids (just the grid, not
+				 // the solution) in each step, so we
 				 // need the following include file
 				 // instead of ``grid_in.h'':
 #include <grid/grid_out.h>
 
-				 // In order to refine our grids
-				 // locally, we need a function from
-				 // the library that decides which
-				 // cells to flag for refinement or
-				 // coarsening based on the error
-				 // indicators we have computed. This
-				 // function is defined here:
-#include <grid/grid_refinement.h>
 
 				 // When using locally refined grids,
 				 // we will get so-called ``hanging
@@ -75,9 +79,19 @@
 				 // constraints:
 #include <dofs/dof_constraints.h>
 
-				 // Finally, we would like to use a
-				 // simple way to adaptively refine
-				 // the grid. While in general,
+				 // In order to refine our grids
+				 // locally, we need a function from
+				 // the library that decides which
+				 // cells to flag for refinement or
+				 // coarsening based on the error
+				 // indicators we have computed. This
+				 // function is defined here:
+#include <grid/grid_refinement.h>
+
+				 // Finally, we need a simple way to
+				 // actually compute the refinement
+				 // indicators based on some error
+				 // estimat. While in general,
 				 // adaptivity is very
 				 // problem-specific, the error
 				 // indicator in the following file
@@ -86,31 +100,31 @@
 				 // problems.
 #include <numerics/error_estimator.h>
 
-#include <fstream>
-#include <iostream>
 
+
+                                 // @sect3{The ``LaplaceProblem'' class template}
 
 				 // The main class is again almost
 				 // unchanged. Two additions, however,
 				 // are made: we have added the
-				 // ``refine'' function, which is used
-				 // to adaptively refine the grid
+				 // ``refine_grid'' function, which is
+				 // used to adaptively refine the grid
 				 // (instead of the global refinement
 				 // in the previous examples), and a
 				 // variable which will hold the
 				 // constraints associated to the
-				 // hanging nodes.
+				 // hanging nodes. In addition, we
+				 // have added a destructor to the
+				 // class for reasons that will become
+				 // clear when we discuss its
+				 // implementation.
 template <int dim>
 class LaplaceProblem 
 {
   public:
     LaplaceProblem ();
-				     // For educational purposes, we
-				     // add a destructor here. The
-				     // reason why we do so will be
-				     // explained in the definition of
-				     // this function.
     ~LaplaceProblem ();
+
     void run ();
     
   private:
@@ -122,19 +136,14 @@ class LaplaceProblem
 
     Triangulation<dim>   triangulation;
 
-				     // We need a finite element
-				     // again. This time, we will want
-				     // to use quadratic polynomials
-				     // (but this is only specified in
-				     // the constructor):
     FE_Q<dim>            fe;
     DoFHandler<dim>      dof_handler;
 
 				     // This is the new variable in
 				     // the main class. We need an
 				     // object which holds a list of
-				     // the constraints from the
-				     // hanging nodes:
+				     // constraints originating from
+				     // the hanging nodes:
     ConstraintMatrix     hanging_node_constraints;
 
     SparsityPattern      sparsity_pattern;
@@ -145,6 +154,11 @@ class LaplaceProblem
 };
 
 
+                                 // @sect3{Nonconstant coefficients}
+
+				 // The implementation of nonconstant
+				 // coefficients is copied verbatim
+				 // from step-5:
 
 template <int dim>
 class Coefficient : public Function<dim> 
@@ -193,12 +207,17 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 	values[i] = 20;
       else
 	values[i] = 1;
-    };
+    }
 }
 
 
-				 // This is mostly the same as before,
-				 // but this time we want to use the
+                                 // @sect3{The ``LaplaceProblem'' class implementation}
+
+                                 // @sect4{LaplaceProblem::LaplaceProblem}
+
+				 // The constructor of this class is
+				 // mostly the same as before, but
+				 // this time we want to use the
 				 // quadratic element. To do so, we
 				 // only have to replace the
 				 // constructor argument (which was
@@ -212,19 +231,21 @@ LaplaceProblem<dim>::LaplaceProblem () :
 {}
 
 
+                                 // @sect4{LaplaceProblem::~LaplaceProblem}
+
 				 // Here comes the added destructor of
-				 // the class. The reason why we
-				 // needed to do so is a subtle change
-				 // in the order of data elements in
-				 // the class as compared to all
-				 // previous examples: the
-				 // ``dof_handler'' object was defined
-				 // before and not after the ``fe''
-				 // object. Of course we could have
-				 // left this order unchanged, but we
-				 // would like to show what happens if
-				 // the order is reversed since this
-				 // produces a rather nasty effect and
+				 // the class. The reason why we want
+				 // to add it is a subtle change in
+				 // the order of data elements in the
+				 // class as compared to all previous
+				 // examples: the ``dof_handler''
+				 // object was defined before and not
+				 // after the ``fe'' object. Of course
+				 // we could have left this order
+				 // unchanged, but we would like to
+				 // show what happens if the order is
+				 // reversed since this produces a
+				 // rather nasty side-effect and
 				 // results in an error which is
 				 // difficult to track down if one
 				 // does not know what happens.
@@ -242,20 +263,21 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // re-distributed using another
 				 // finite element object or until the
 				 // ``dof_handler'' object is
-				 // destroyed, it would be unwise if we
-				 // would allow the finite element
-				 // object to be deleted before
+				 // destroyed, it would be unwise if
+				 // we would allow the finite element
+				 // object to be deleted before the
 				 // ``dof_handler'' object. To
 				 // disallow this, the DoF handler
 				 // increases a counter inside the
 				 // finite element object which counts
 				 // how many objects use that finite
 				 // element (this is what the
-				 // ``Subscriptor'' class is used for,
-				 // in case you want something like
-				 // this for your own programs). The
-				 // finite element object will refuse
-				 // its destruction if that counter is
+				 // ``Subscriptor''/``SmartPointer''
+				 // class pair is used for, in case
+				 // you want something like this for
+				 // your own programs). The finite
+				 // element object will refuse its
+				 // destruction if that counter is
 				 // larger than zero, since then some
 				 // other objects might rely on the
 				 // persistence of the finite element
@@ -264,16 +286,17 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // usually abort upon the attempt to
 				 // destroy the finite element.
 				 //
-				 // As a side-note, we remark that
-				 // this exception about still used
-				 // objects are not particularly
-				 // popular among programmers using
-				 // deal.II, since they only tell us
-				 // that something is wrong, namely
-				 // that some other object is still
-				 // using the object that is presently
-				 // destructed, but not which one. It
-				 // is therefore often rather
+				 // To be fair, such exceptions about
+				 // still used objects are not
+				 // particularly popular among
+				 // programmers using deal.II, since
+				 // they only tell us that something
+				 // is wrong, namely that some other
+				 // object is still using the object
+				 // that is presently being
+				 // destructed, but most of the time
+				 // not who this user is. It is
+				 // therefore often rather
 				 // time-consuming to find out where
 				 // the problem exactly is, although
 				 // it is then usually straightforward
@@ -297,7 +320,9 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // above. The reason is that member
 				 // variables of the
 				 // ``LaplaceProblem'' class are
-				 // destructed bottom-up, as always in
+				 // destructed bottom-up (i.e. in
+				 // reverse order of their declaration
+				 // in the class), as always in
 				 // C++. Thus, the finite element
 				 // object will be destructed before
 				 // the DoF handler object, since its
@@ -317,18 +342,17 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // from it. For this purpose, the
 				 // ``DoFHandler'' class has a
 				 // function ``clear'' which deletes
-				 // all degrees of freedom, releases
-				 // its lock to the finite element and
-				 // sets its internal pointer to a
-				 // null pointer. After this, you can
+				 // all degrees of freedom, and
+				 // releases its lock to the finite
+				 // element. After this, you can
 				 // safely destruct the finite element
 				 // object since its internal counter
 				 // is then zero.
 				 //
 				 // For completeness, we add the
 				 // output of the exception that would
-				 // be triggered without this
-				 // destructor to the end of the
+				 // have been triggered without this
+				 // destructor, to the end of the
 				 // results section of this example.
 template <int dim>
 LaplaceProblem<dim>::~LaplaceProblem () 
@@ -337,46 +361,95 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 }
 
 
+                                 // @sect4{LaplaceProblem::setup_system}
 
+				 // The next function is setting up
+				 // all the variables that describe
+				 // the linear finite element problem,
+				 // such as the DoF handler, the
+				 // matrices, and vectors. The
+				 // difference to what we did in
+				 // step-5 is only that we now also
+				 // have to take care of handing node
+				 // constraints. These constraints are
+				 // handled almost transparently by
+				 // the library, i.e. you only need to
+				 // know that they exist and how to
+				 // get them, but you do not have to
+				 // know how they are formed or what
+				 // exactly is done with them.
+				 //
+				 // At the beginning of the function,
+				 // you find all the things that are
+				 // the same as in step-5: setting up
+				 // the degrees of freedom (this time
+				 // we have quadratic elements, but
+				 // there is no difference from a user
+				 // code perspective to the linear --
+				 // or cubic, for that matter --
+				 // case), generating the sparsity
+				 // pattern, and initializing the
+				 // solution and right hand side
+				 // vectors. Note that the sparsity
+				 // pattern will have significantly
+				 // more entries per row now, since
+				 // there are now 9 degrees of freedom
+				 // per cell, not only four, that can
+				 // couple with each other. The
+				 // ``dof_Handler.max_couplings_between_dofs()''
+				 // call will take care of this,
+				 // however:
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
-				   // To distribute degrees of
-				   // freedom, the ``dof_handler''
-				   // variable takes only the finite
-				   // element object. In this case, it
-				   // will distribute one degree of
-				   // freedom per vertex, one per line
-				   // and one in the interior of the
-				   // cell. You need not specify these
-				   // details since they are encoded
-				   // into the finite element object
-				   // from which the ``dof_handler''
-				   // gets the necessary information.
   dof_handler.distribute_dofs (fe);
 
+  sparsity_pattern.reinit (dof_handler.n_dofs(),
+			   dof_handler.n_dofs(),
+			   dof_handler.max_couplings_between_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+
+  solution.reinit (dof_handler.n_dofs());
+  system_rhs.reinit (dof_handler.n_dofs());
+
+  
 				   // After setting up all the degrees
-				   // of freedoms, we can make up the
-				   // list of constraints associated
-				   // with the hanging nodes. This is
-				   // done using the following
-				   // function calls (the first clears
-				   // the contents of the object,
-				   // which is still there from the
-				   // previous cycle, i.e. before the
-				   // grid was refined):
+				   // of freedoms, here are now the
+				   // differences compared to step-5,
+				   // all of which are related to
+				   // constraints associated with the
+				   // hanging nodes. In the class
+				   // desclaration, we have already
+				   // allocated space for an object
+				   // ``hanging_node_constraints''
+				   // that will hold a list of these
+				   // constraints (they form a matrix,
+				   // which is reflected in the name
+				   // of the class, but that is
+				   // immaterial for the moment). Now
+				   // we have to fill this
+				   // object. This is done using the
+				   // following function calls (the
+				   // first clears the contents of the
+				   // object that may still be left
+				   // over from computations on the
+				   // previous mesh before the last
+				   // adaptive refinement):
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
-				   // In principle, the
-				   // ConstraintMatrix class can hold
-				   // other constraints as well,
+
+				   // The next step is ``closing''
+				   // this object. For this note that,
+				   // in principle, the
+				   // ``ConstraintMatrix'' class can
+				   // hold other constraints as well,
 				   // i.e. constraints that do not
 				   // stem from hanging
 				   // nodes. Sometimes, it is useful
 				   // to use such constraints, in
 				   // which case they may be added to
-				   // the ConstraintMatrix object
+				   // the ``ConstraintMatrix'' object
 				   // after the hanging node
 				   // constraints were computed. After
 				   // all constraints have been added,
@@ -384,22 +457,10 @@ void LaplaceProblem<dim>::setup_system ()
 				   // rearranged to perform some
 				   // actions more efficiently. This
 				   // postprocessing is done using the
-				   // ``close'' function, after which
+				   // ``close()'' function, after which
 				   // no further constraints may be
-				   // added any more.
+				   // added any more:
   hanging_node_constraints.close ();
-
-				   // Since we use higher order finite
-				   // elements, the maximum number of
-				   // entries per line of the matrix
-				   // is larger than for the linear
-				   // elements. The
-				   // ``max_couplings_between_dofs()''
-				   // function takes care of this:
-  sparsity_pattern.reinit (dof_handler.n_dofs(),
-			   dof_handler.n_dofs(),
-			   dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
 				   // The constrained hanging nodes
 				   // will later be eliminated from
@@ -429,57 +490,64 @@ void LaplaceProblem<dim>::setup_system ()
 				   // unneeded space:
   sparsity_pattern.compress();
 
+				   // Finally, the so-constructed
+				   // sparsity pattern serves as the
+				   // basis on top of which we will
+				   // create the sparse matrix:
   system_matrix.reinit (sparsity_pattern);
-
-  solution.reinit (dof_handler.n_dofs());
-  system_rhs.reinit (dof_handler.n_dofs());
 }
 
+                                 // @sect4{LaplaceProblem::assemble_system}
 
-
+				 // Next, we have to assemble the
+				 // matrix again. There are no code
+				 // changes compared to step-5 except
+				 // for a single place: We have to use
+				 // a higher-order quadrature formula
+				 // to account for the higher
+				 // polynomial degree in the finite
+				 // element shape functions. This is
+				 // easy to change: the constructor of
+				 // the ``QGauss'' class takes the
+				 // number of quadrature points in
+				 // each space direction. Previously,
+				 // we had two points for bilinear
+				 // elements. Now we should use three
+				 // points for biquadratic elements.
+				 //
+				 // The rest of the code that forms
+				 // the local contributions and
+				 // transfers them into the global
+				 // objects remains unchanged. It is
+				 // worth noting, however, that under
+				 // the hood several things are
+				 // different than before. First, the
+				 // variables ``dofs_per_cell'' and
+				 // ``n_q_points'' now are 9 each,
+				 // where they were 4
+				 // before. Introducing such variables
+				 // as abbreviations is a good
+				 // strategy to make code work with
+				 // different elements without having
+				 // to change too much code. Secondly,
+				 // the ``fe_values'' object of course
+				 // needs to do other things as well,
+				 // since the shape functions are now
+				 // quadratic, rather than linear, in
+				 // each coordinate variable. Again,
+				 // however, this is something that is
+				 // completely transparent to user
+				 // code and nothing that you have to
+				 // worry about.
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
-  const Coefficient<dim> coefficient;
-				   // Since we use a higher order
-				   // finite element, we also need to
-				   // adjust the order of the
-				   // quadrature formula in order to
-				   // integrate the matrix entries
-				   // with sufficient accuracy. For
-				   // the quadratic polynomials of
-				   // which the finite element which
-				   // we use consist, a Gauss formula
-				   // with three points in each
-				   // direction is sufficient.
-  QGauss<dim>  quadrature_formula(3);
+  const QGauss<dim>  quadrature_formula(3);
 
-				   // The ``FEValues'' object
-				   // automatically adjusts the
-				   // computation of values to the
-				   // finite element. In fact, the
-				   // ``FEValues'' class does not do
-				   // many computations itself, but
-				   // mostly delegates its work to the
-				   // finite element class to which
-				   // its first parameter
-				   // belongs. That class then knows
-				   // how to compute the values of
-				   // shape functions, etc.
   FEValues<dim> fe_values (fe, quadrature_formula, 
-			   UpdateFlags(update_values    |
-				       update_gradients |
-				       update_q_points  |
-				       update_JxW_values));
+			   update_values    |  update_gradients |
+			   update_q_points  |  update_JxW_values);
 
-				   // Here it comes handy that we have
-				   // introduced an abbreviation for
-				   // the number of degrees of freedom
-				   // per cell before: the following
-				   // value will be set to 9 (in 2D
-				   // because of the biquadratic
-				   // element used) now, where it was
-				   // 4 before.
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
@@ -488,24 +556,12 @@ void LaplaceProblem<dim>::assemble_system ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-  std::vector<double>       coefficient_values (n_q_points);
+  const Coefficient<dim> coefficient;
+  std::vector<double>    coefficient_values (n_q_points);
 
-				   // We can now go on with assembling
-				   // the matrix and right hand
-				   // side. Note that this code is
-				   // copied without change from the
-				   // previous example, even though we
-				   // are now using another finite
-				   // element. The actual difference
-				   // in what is done is inside the
-				   // call to ``fe_values.reinit
-				   // (cell)'', but you need not care
-				   // about what happens there. For
-				   // the user of the ``fe_values''
-				   // object, the actual finite
-				   // element type is transparent.
-  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-						 endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       cell_matrix = 0;
@@ -521,15 +577,14 @@ void LaplaceProblem<dim>::assemble_system ()
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      cell_matrix(i,j) += (coefficient_values[q_point] *
-				   (fe_values.shape_grad(i,q_point)    *
-				    fe_values.shape_grad(j,q_point))   *
+				   fe_values.shape_grad(i,q_point) *
+				   fe_values.shape_grad(j,q_point) *
 				   fe_values.JxW(q_point));
 
 	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
 			    1.0 *
 			    fe_values.JxW(q_point));
-	  };
-
+	  }
 
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -540,8 +595,8 @@ void LaplaceProblem<dim>::assemble_system ()
 			       cell_matrix(i,j));
 	  
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
-	};
-    };
+	}
+    }
 
 				   // After the system of equations
 				   // has been assembled just as for
@@ -556,22 +611,28 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // associated to hanging nodes have
 				   // been removed from the linear
 				   // system and the independent
-				   // variables are only regular
+				   // variables are only the regular
 				   // nodes. The constrained nodes are
 				   // still in the linear system
 				   // (there is a one on the diagonal
 				   // of the matrix and all other
 				   // entries for this line are set to
 				   // zero) but the computed values
-				   // are invalid. They are set to
-				   // reasonable values in the
-				   // ``solve'' function.
+				   // are invalid (the ``condense''
+				   // function modifies the system so
+				   // that the values in the solution
+				   // corresponding to constrained
+				   // nodes are invalid, but that the
+				   // system still has a well-defined
+				   // solution; we compute the correct
+				   // values for these nodes at the
+				   // end of the ``solve'' function).
 
 				   // As almost all the stuff before,
 				   // the interpolation of boundary
 				   // values works also for higher
-				   // order elements, but you need not
-				   // change your code for that. We
+				   // order elements without the need
+				   // to change your code for that. We
 				   // note that for proper results, it
 				   // is important that the
 				   // elimination of boundary nodes
@@ -591,6 +652,36 @@ void LaplaceProblem<dim>::assemble_system ()
 
 
 
+                                 // @sect4{LaplaceProblem::solve}
+
+				 // We continue with gradual
+				 // improvements. The function that
+				 // solves the linear system again
+				 // uses the SSOR preconditioner, and
+				 // is again unchanged except that we
+				 // have to incorporate hanging node
+				 // constraints. As mentioned above,
+				 // the degrees of freedom
+				 // corresponding to hanging node
+				 // constraints have been removed from
+				 // the linear system by giving the
+				 // rows and columns of the matrix a
+				 // special treatment. This way, the
+				 // values for these degrees of
+				 // freedom have wrong, but
+				 // well-defined values after solving
+				 // the linear system. What we then
+				 // have to do is to use the
+				 // constraints to assign to them the
+				 // values that they should have. This
+				 // process, called ``distributing''
+				 // hanging nodes, computes the values
+				 // of constrained nodes from the
+				 // values of the unconstrained ones,
+				 // and requires only a single
+				 // additional function call that you
+				 // find at the end of this function:
+
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
@@ -603,17 +694,11 @@ void LaplaceProblem<dim>::solve ()
   cg.solve (system_matrix, solution, system_rhs,
 	    preconditioner);
 
-				   // To set the constrained nodes to
-				   // reasonable values, you have to
-				   // use the following function. It
-				   // computes the values of these
-				   // nodes from the values of the
-				   // unconstrained nodes, which are
-				   // the solutions of the linear
-				   // system just solved.
   hanging_node_constraints.distribute (solution);
 }
 
+
+                                 // @sect4{LaplaceProblem::refine_grid}
 
 				 // Instead of global refinement, we
 				 // now use a slightly more elaborate
@@ -632,7 +717,7 @@ void LaplaceProblem<dim>::solve ()
 				 //
 				 // Although the error estimator
 				 // derived by Kelly et al. was
-				 // originally developed for Laplace's
+				 // originally developed for the Laplace
 				 // equation, we have found that it is
 				 // also well suited to quickly
 				 // generate locally refined grids for
@@ -656,85 +741,86 @@ void LaplaceProblem<dim>::solve ()
 				 // problem. This error estimator may
 				 // therefore be understood as a quick
 				 // way to test an adaptive program.
+				 //
+				 // The way the estimator works is to
+				 // take a ``DoFHandler'' object
+				 // describing the degrees of freedom
+				 // and a vector of values for each
+				 // degree of freedom as input and
+				 // compute a single indicator value
+				 // for each active cell of the
+				 // triangulation (i.e. one value for
+				 // each of the
+				 // ``triangulation.n_active_cells()''
+				 // cells). To do so, it needs two
+				 // additional pieces of information:
+				 // a quadrature formula on the faces
+				 // (i.e. quadrature formula on
+				 // ``dim-1'' dimensional objects. We
+				 // use a 3-point Gauss rule again, a
+				 // pick that is consistent and
+				 // appropriate with the choice
+				 // bi-quadratic finite element shape
+				 // functions in this program.
+				 // (What constitutes a suitable
+				 // quadrature rule here of course
+				 // depends on knowledge of the way
+				 // the error estimator evaluates
+				 // the solution field. As said
+				 // above, the jump of the gradient
+				 // is integrated over each face,
+				 // which would be a quadratic
+				 // function on each face for the
+				 // quadratic elements in use in
+				 // this example. In fact, however,
+				 // it is the square of the jump of
+				 // the gradient, as explained in
+				 // the documentation of that class,
+				 // and that is a quartic function,
+				 // for which a 3 point Gauss
+				 // formula is sufficient since it
+				 // integrates polynomials up to
+				 // order 5 exactly.)
+				 //
+				 // Secondly, the function wants a
+				 // list of boundaries where we have
+				 // imposed Neumann value, and the
+				 // corresponding Neumann values. This
+				 // information is represented by an
+				 // object of type
+				 // ``FunctionMap<dim>::type'' that is
+				 // essentially a map from boundary
+				 // indicators to function objects
+				 // describing Neumann boundary values
+				 // (in the present example program,
+				 // we do not use Neumann boundary
+				 // values, so this map is empty, and
+				 // in fact constructed using the
+				 // default constructor of the map in
+				 // the place where the function call
+				 // expects the respective function
+				 // argument).
+				 //
+				 // The output, as mentioned is a
+				 // vector of values for all
+				 // cells. While it may make sense to
+				 // compute the *value* of a degree of
+				 // freedom very accurately, it is
+				 // usually not helpful to compute the
+				 // *error indicator* corresponding to
+				 // a cell particularly accurately. We
+				 // therefore typically use a vector
+				 // of floats instead of a vector of
+				 // doubles to represent error
+				 // indicators.
 template <int dim>
 void LaplaceProblem<dim>::refine_grid ()
 {
-				   // The output of the error
-				   // estimator class is an error
-				   // indicator for each cell. We
-				   // therefore need a vector with as
-				   // many elements as there are
-				   // active cells. Since accuracy is
-				   // not that important here, the
-				   // data type for the error values
-				   // on each cell is ``float''
-				   // instead of ``double''.
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-				   // Next, the error estimator can
-				   // handle Neumann boundary
-				   // conditions. For this, it needs
-				   // to know which parts of the
-				   // boundary have Neumann boundary
-				   // conditions and the respective
-				   // boundary values there. This
-				   // information is mediated by a map
-				   // in which the keys are the
-				   // boundary part numbers and the
-				   // values are pointers to the
-				   // boundary value functions. We
-				   // create such a map, but since we
-				   // do not use Neumann boundary
-				   // conditions, the map will not
-				   // contain entries.
-  typename FunctionMap<dim>::type neumann_boundary;
-
-				   // Now we call the error
-				   // estimator. The parameters should
-				   // be clear apart from the
-				   // quadrature formula: as said
-				   // above, the jump of the gradients
-				   // of the solution across the faces
-				   // of a cell are considered. They
-				   // are integrated along the face,
-				   // but as usual in finite element
-				   // programs the integration is done
-				   // using quadrature. Since the
-				   // error estimator class can't know
-				   // itself which quadrature formula
-				   // might be appropriate, we have to
-				   // pass one to the function (of
-				   // course, the order of the
-				   // quadrature formula should be
-				   // adapted to the finite element
-				   // under consideration). Note that
-				   // since the quadrature has to take
-				   // place along faces, the dimension
-				   // of the quadrature formula is
-				   // ``dim-1'' rather then ``dim''.
-				   //
-				   // (What constitutes a suitable
-				   // quadrature rule here of course
-				   // depends on knowledge of the way
-				   // the error estimator evaluates
-				   // the solution field. As said
-				   // above, the jump of the gradient
-				   // is integrated over each face,
-				   // which would be a quadratic
-				   // function on each face for the
-				   // quadratic elements in use in
-				   // this example. In fact, however,
-				   // it is the square of the jump of
-				   // the gradient, as explained in
-				   // the documentation of that class,
-				   // and that is a quartic function,
-				   // for which a 3 point Gauss
-				   // formula is sufficient since it
-				   // integrates polynomials up to
-				   // order 5 exactly.)
   KellyErrorEstimator<dim>::estimate (dof_handler,
 				      QGauss<dim-1>(3),
-				      neumann_boundary,
+				      typename FunctionMap<dim>::type(),
 				      solution,
 				      estimated_error_per_cell);
 
@@ -755,14 +841,16 @@ void LaplaceProblem<dim>::refine_grid ()
 				   // in a doubling of cells in each
 				   // step in two space dimensions,
 				   // since for each of the 30 per
-				   // cent of cells four new would be
-				   // replaced. In practice, some more
-				   // cells are usually produced since
-				   // it is disallowed that a cell is
-				   // refined twice while the neighbor
-				   // cell is not refined; in that
-				   // case, the neighbor cell would be
-				   // refined as well.
+				   // cent of cells, four new would be
+				   // replaced, while the remaining 70
+				   // per cent of cells remain
+				   // untouched. In practice, some
+				   // more cells are usually produced
+				   // since it is disallowed that a
+				   // cell is refined twice while the
+				   // neighbor cell is not refined; in
+				   // that case, the neighbor cell
+				   // would be refined as well.
 				   //
 				   // In many applications, the number
 				   // of cells to be coarsened would
@@ -803,48 +891,138 @@ void LaplaceProblem<dim>::refine_grid ()
 				   // for coarsening. The refinement
 				   // or coarsening itself is not
 				   // performed by now, however, since
-				   // there are many cases where
-				   // further modifications of these
-				   // flags is useful. Here, we don't
-				   // want to do any such thing, so we
-				   // can tell the triangulation to
+				   // there are cases where further
+				   // modifications of these flags is
+				   // useful. Here, we don't want to
+				   // do any such thing, so we can
+				   // tell the triangulation to
 				   // perform the actions for which
-				   // the cells are flagged.
+				   // the cells are flagged:
   triangulation.execute_coarsening_and_refinement ();
 }
 
 
+                                 // @sect4{LaplaceProblem::output_results}
 
+				 // At the end of computations on each
+				 // grid, and just before we continue
+				 // the next cycle with mesh
+				 // refinement, we want to output the
+				 // results from this cycle.
+				 //
+				 // In the present program, we will
+				 // not write the solution (except for
+				 // in the last step, see the next
+				 // function), but only the meshes
+				 // that we generated, as a
+				 // two-dimensional Encapsulated
+				 // Postscript (EPS) file.
+				 //
+				 // We have already seen in step-1 how
+				 // this can be achieved. The only
+				 // thing we have to change is the
+				 // generation of the file name, since
+				 // it should contain the number of
+				 // the present refinement cycle
+				 // provided to this function as an
+				 // argument. The most general way is
+				 // to use the std::stringstream class
+				 // as shown in step-5, but here's a
+				 // little hack that makes it simpler
+				 // if we know that we have less than
+				 // 10 iterations: assume that the
+				 // numbers `0' through `9' are
+				 // represented consecutively in the
+				 // character set used on your machine
+				 // (this is in fact the case in all
+				 // known character sets), then
+				 // '0'+cycle gives the character
+				 // corresponding to the present cycle
+				 // number. Of course, this will only
+				 // work if the number of cycles is
+				 // actually less than 10, and rather
+				 // than waiting for the disaster to
+				 // happen, we safeguard our little
+				 // hack with an explicit assertion at
+				 // the beginning of the function. If
+				 // this assertion is triggered,
+				 // i.e. when ``cycle'' is larger than
+				 // or equal to 10, an exception of
+				 // type ``ExcNotImplemented'' is
+				 // raised, indicating that some
+				 // functionality is not implemented
+				 // for this case (the functionality
+				 // that is missing, of course, is the
+				 // generation of file names for that
+				 // case):
 template <int dim>
 void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
-				   // We want to write the grid in
-				   // each cycle. Here is another way
-				   // to quickly produce a filename
-				   // based on the cycle number. It
-				   // assumes that the numbers `0'
-				   // through `9' are represented
-				   // consecutively in the character
-				   // set (which is the case in all
-				   // known character sets). However,
-				   // this will only work if the cycle
-				   // number is less than ten, which
-				   // we check by an assertion.
+  Assert (cycle < 10, ExcNotImplemented());
+
   std::string filename = "grid-";
   filename += ('0' + cycle);
-  Assert (cycle < 10, ExcInternalError());
-  
   filename += ".eps";
+  
   std::ofstream output (filename.c_str());
 
-				   // Using this filename, we write
-				   // each grid as a postscript file.
   GridOut grid_out;
   grid_out.write_eps (triangulation, output);
 }
 
 
 
+                                 // @sect4{LaplaceProblem::run}
+
+				 // The final function before
+				 // ``main()'' is again the main
+				 // driver of the class, ``run()''. It
+				 // is similar to the one of step-5,
+				 // except that we generate a file in
+				 // the program again instead of
+				 // reading it from disk, in that we
+				 // adaptively instead of globally
+				 // refine the mesh, and that we
+				 // output the solution on the final
+				 // mesh in the present function.
+				 //
+				 // The first block in the main loop
+				 // of the function deals with mesh
+				 // generation. If this is the first
+				 // cycle of the program, instead of
+				 // reading the grid from a file on
+				 // disk as in the previous example,
+				 // we now again create it using a
+				 // library function. The domain is
+				 // again a circle, which is why we
+				 // have to provide a suitable
+				 // boundary object as well. We place
+				 // the center of the circle at the
+				 // origin and have the radius be one
+				 // (these are the two hidden
+				 // arguments to the function, which
+				 // have default values).
+				 //
+				 // You will notice by looking at the
+				 // coarse grid that it is of inferior
+				 // quality than the one which we read
+				 // from the file in the previous
+				 // example: the cells are less
+				 // equally formed. However, using the
+				 // library function this program
+				 // works in any space dimension,
+				 // which was not the case before.
+				 //
+				 // In case we find that this is not
+				 // the first cycle, we want to refine
+				 // the grid. Unlike the global
+				 // refinement employed in the last
+				 // example program, we now use the
+				 // adaptive procedure described
+				 // above.
+				 //
+				 // The rest of the loop looks as
+				 // before:
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
@@ -854,38 +1032,6 @@ void LaplaceProblem<dim>::run ()
 
       if (cycle == 0)
 	{
-					   // Instead of reading the
-					   // grid from a file on disk
-					   // as in the previous
-					   // example, we now again
-					   // create it using a
-					   // library function. The
-					   // domain is again a
-					   // circle, which is why we
-					   // have to provide a
-					   // suitable boundary object
-					   // as well. We place the
-					   // center of the circle at
-					   // the origin and have the
-					   // radius be one (these are
-					   // the two hidden arguments
-					   // to the function, which
-					   // have default values).
-					   //
-					   // You will notice by
-					   // looking at the coarse
-					   // grid that it is of
-					   // inferior quality than
-					   // the one which we read
-					   // from the file in the
-					   // previous example: the
-					   // cells are less equally
-					   // formed. However, using
-					   // the library function
-					   // this program works in
-					   // any space dimension,
-					   // which was not the case
-					   // before.
 	  GridGenerator::hyper_ball (triangulation);
 
 	  static const HyperBallBoundary<dim> boundary;
@@ -894,18 +1040,7 @@ void LaplaceProblem<dim>::run ()
 	  triangulation.refine_global (1);
 	}
       else
-					 // In case this is not the
-					 // first cycle, we want to
-					 // refine the grid. Unlike
-					 // the global refinement
-					 // employed in the last
-					 // example, we now use the
-					 // adaptive procedure
-					 // described in the function
-					 // which we now call:
-	{
-	  refine_grid ();
-	};
+	refine_grid ();
       
 
       std::cout << "   Number of active cells:       "
@@ -921,16 +1056,20 @@ void LaplaceProblem<dim>::run ()
       assemble_system ();
       solve ();
       output_results (cycle);
-    };
+    }
 
-				   // The solution on the final grid
-				   // is now written to a file. As
-				   // already done in one of the
-				   // previous examples, we use the
-				   // EPS format for output, and to
-				   // obtain a reasonable view on the
-				   // solution, we rescale the z-axis
-				   // by a factor of four.
+				   // After we have finished computing
+				   // the solution on the finesh mesh,
+				   // and writing all the grids to
+				   // disk, we want to also write the
+				   // actual solution on this final
+				   // mesh to a file. As already done
+				   // in one of the previous examples,
+				   // we use the EPS format for
+				   // output, and to obtain a
+				   // reasonable view on the solution,
+				   // we rescale the z-axis by a
+				   // factor of four.
   DataOutBase::EpsFlags eps_flags;
   eps_flags.z_scaling = 4;
   
@@ -945,9 +1084,11 @@ void LaplaceProblem<dim>::run ()
   data_out.write_eps (output);
 }
 
-    
+
+                                 // @sect4{The ``main'' function}
+
 				 // The main function is unaltered in
-				 // its functionality against the
+				 // its functionality from the
 				 // previous example, but we have
 				 // taken a step of additional
 				 // caution. Sometimes, something goes
@@ -958,31 +1099,33 @@ void LaplaceProblem<dim>::run ()
 				 // if we can't read from or write to
 				 // a file for whatever reason), and
 				 // in these cases the library will
-				 // throw exceptions. Since they do
-				 // not constitute programming errors,
-				 // these exceptions also are not
-				 // switched off in optimized mode, in
-				 // contrast to the ``Assert'' macro
-				 // which we have used to test against
-				 // programming errors. If uncaught,
-				 // these exceptions propagate the
-				 // call tree up to the ``main''
-				 // function, and if they are not
-				 // caught there either, the program
-				 // is aborted. In many cases, like if
-				 // there is not enough memory or disk
-				 // space, we can't do anything but we
-				 // can at least print some text
-				 // trying to explain the reason why
-				 // the program failed. A way to do so
-				 // is shown in the following. It is
-				 // certainly useful to write any
-				 // larger program in this way, and
-				 // you can do so by more or less
-				 // copying this function apart from
-				 // the ``try'' block which contains
-				 // the code that constitutes the
-				 // actual functionality.
+				 // throw exceptions. Since these are
+				 // run-time problems, not programming
+				 // errors that can be fixed once and
+				 // for all, this kind of exceptions
+				 // is not switched off in optimized
+				 // mode, in contrast to the
+				 // ``Assert'' macro which we have
+				 // used to test against programming
+				 // errors. If uncaught, these
+				 // exceptions propagate the call tree
+				 // up to the ``main'' function, and
+				 // if they are not caught there
+				 // either, the program is aborted. In
+				 // many cases, like if there is not
+				 // enough memory or disk space, we
+				 // can't do anything but we can at
+				 // least print some text trying to
+				 // explain the reason why the program
+				 // failed. A way to do so is shown in
+				 // the following. It is certainly
+				 // useful to write any larger program
+				 // in this way, and you can do so by
+				 // more or less copying this function
+				 // except for the ``try'' block that
+				 // actually encodes the functionality
+				 // particular to the present
+				 // application.
 int main () 
 {
 
@@ -1024,8 +1167,14 @@ int main ()
 				   // file and line number of where
 				   // the exception occured, and some
 				   // other information. This is also
-				   // what would be printed in the
-				   // following.
+				   // what the following statements
+				   // would print.
+				   //
+				   // Apart from this, there isn't
+				   // much that we can do except
+				   // exiting the program with an
+				   // error code (this is what the
+				   // ``return 1;'' does):
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
@@ -1036,10 +1185,7 @@ int main ()
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-				       // We can't do much more than
-				       // printing as much information
-				       // as we can get to, so abort
-				       // with error:
+
       return 1;
     }
 				   // If the exception that was thrown
@@ -1059,14 +1205,14 @@ int main ()
 		<< "----------------------------------------------------"
 		<< std::endl;
       return 1;
-    };
+    }
 
 				   // If we got to this point, there
 				   // was no exception which
 				   // propagated up to the main
-				   // function (maybe there were some,
-				   // but they were caught somewhere
-				   // in the program or the
+				   // function (there may have been
+				   // exceptions, but they were caught
+				   // somewhere in the program or the
 				   // library). Therefore, the program
 				   // performed as was expected and we
 				   // can return without error.
