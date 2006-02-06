@@ -136,8 +136,8 @@ class LaplaceProblem
 
     Triangulation<dim>   triangulation;
 
-    FE_Q<dim>            fe;
     DoFHandler<dim>      dof_handler;
+    FE_Q<dim>            fe;
 
 				     // This is the new variable in
 				     // the main class. We need an
@@ -226,8 +226,8 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				 // (here ``2''):
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
-                fe (2),
-		dof_handler (triangulation)
+		dof_handler (triangulation),
+                fe (2)
 {}
 
 
