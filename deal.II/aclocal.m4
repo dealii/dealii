@@ -4704,12 +4704,23 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
     AC_DEFINE(DEAL_II_USE_PETSC, 1,
               [Defined if a PETSc installation was found and is going
                to be used])
+
     dnl Set an additional variable (not via AC_DEFINE, since we don't want
     dnl to have it in config.h) which we can use in doc/doxygen/options.dox.in.
     dnl If we have PETSc, then the value of this variable expands to
     dnl defining the string "DEAL_II_USE_PETSC" for the preprocessor. If
     dnl we don't have no PETSc, then it does not define this string.
     DEAL_II_DEFINE_DEAL_II_USE_PETSC=DEAL_II_USE_PETSC
+
+    dnl Also work around a stupidity in PETSc that makes sure it interferes in
+    dnl a completely obnoxious way with boost.
+    AC_DEFINE(PETSC_SKIP_UNDERSCORE_CHKERR, 1,
+              [Make sure PETSc doesn't re-define the underscore through the
+	       preprocessor, since this interferes with boost. PETSc redefines
+               the underscore to be "__gterr =", but then forgets to undef this
+               thing. Boost simply wants to concatenate the underscore with another
+               string to form a class name, which then of course isn't valid
+               any more. See mails in early Feb 2006.])
   fi
 
 
