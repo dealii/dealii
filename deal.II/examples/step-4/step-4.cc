@@ -647,7 +647,7 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-                                 // @sect4{The ``main'' function}
+                                 // @sect3{The ``main'' function}
 
 				 // And this is the main function. It also
 				 // looks mostly like in step-3, but if you
