@@ -9383,7 +9383,14 @@ cat >>confdefs.h <<\_ACEOF
 #define DEAL_II_USE_PETSC 1
 _ACEOF
 
+
                         DEAL_II_DEFINE_DEAL_II_USE_PETSC=DEAL_II_USE_PETSC
+
+
+cat >>confdefs.h <<\_ACEOF
+#define PETSC_SKIP_UNDERSCORE_CHKERR 1
+_ACEOF
+
   fi
 
 

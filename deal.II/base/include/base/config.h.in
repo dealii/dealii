@@ -288,6 +288,13 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Make sure PETSc doesn't re-define the underscore through the preprocessor,
+   since this interferes with boost. PETSc redefines the underscore to be
+   "__gterr =", but then forgets to undef this thing. Boost simply wants to
+   concatenate the underscore with another string to form a class name, which
+   then of course isn't valid any more. See mails in early Feb 2006. */
+#undef PETSC_SKIP_UNDERSCORE_CHKERR
+
 /* If already available, do not define at all. Otherwise, define to __func__
    if that is available. In all other cases, indicate that no information
    about the present function is available for this compiler. */
