@@ -19,10 +19,11 @@
  * elsewhere. In particular, there are tutorial programs on the use of this
  * library.
  *
- * Many of the classes in the deal.II library can be grouped into modules (see
- * the Modules entry in the menu at the top of this page). These modules
- * follow roughly the following collaboration diagram that finite element
- * programs follow:
+ * Many of the classes in the deal.II library can be grouped into
+ * modules (see the <a href="modules.html">Modules page</a> or the
+ * corresponding entry in the menu at the top of this page). These
+ * modules follow roughly the following collaboration diagram that
+ * finite element programs follow:
  *
  * @image html collaboration.png "Collaboration diagram for the most important groups of classes in deal.II"
  * @image latex collaboration.eps "Collaboration diagram for the most important groups of classes in deal.II" width=.9\textwidth
