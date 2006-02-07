@@ -1085,7 +1085,7 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-                                 // @sect4{The ``main'' function}
+                                 // @sect3{The ``main'' function}
 
 				 // The main function is unaltered in
 				 // its functionality from the
