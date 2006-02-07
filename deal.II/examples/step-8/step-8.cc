@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -447,10 +447,8 @@ void ElasticProblem<dim>::assemble_system ()
 				   // where they are precomputed upon
 				   // construction).
   FEValues<dim> fe_values (fe, quadrature_formula, 
-			   UpdateFlags(update_values    |
-				       update_gradients |
-				       update_q_points  |
-				       update_JxW_values));
+			   update_values   | update_gradients |
+                           update_q_points | update_JxW_values);
 
 				   // The number of degrees of freedom
 				   // per cell we now obviously ask

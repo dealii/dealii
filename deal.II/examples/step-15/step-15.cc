@@ -407,10 +407,8 @@ void MinimizationProblem<dim>::assemble_step ()
                                    // the one we have chosen here.
   QGauss<dim>  quadrature_formula(4);
   FEValues<dim> fe_values (fe, quadrature_formula, 
-			   UpdateFlags(update_values    |
-				       update_gradients |
-				       update_q_points  |
-				       update_JxW_values));
+			   update_values   | update_gradients |
+                           update_q_points | update_JxW_values);
 
                                    // Next, here are the usual two convenience
                                    // variables, followed by declarations for
@@ -1252,10 +1250,8 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
                                    // is appropriate:
   QGauss<dim>  quadrature_formula(4);
   FEValues<dim> fe_values (dof_handler.get_fe(), quadrature_formula, 
-			   UpdateFlags(update_values    |
-				       update_gradients |
-				       update_q_points  |
-				       update_JxW_values));
+			   update_values   | update_gradients |
+                           update_q_points | update_JxW_values);
 
   const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 

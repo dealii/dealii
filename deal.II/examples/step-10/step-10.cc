@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003, 2004 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -385,7 +385,7 @@ void compute_pi_by_area ()
 				       // the dummy finite element and
 				       // the quadrature object to the
 				       // constructor, together with
-				       // the UpdateFlags asking for
+				       // the update flags asking for
 				       // the `JxW' values at the
 				       // quadrature points only. This
 				       // tells the FEValues object
@@ -409,7 +409,8 @@ void compute_pi_by_area ()
 				       // omitted, resulting in the
 				       // implicit use of an object of
 				       // type MappingQ1.
-      FEValues<dim> fe_values (mapping, dummy_fe, quadrature, update_JxW_values);
+      FEValues<dim> fe_values (mapping, dummy_fe, quadrature,
+                               update_JxW_values);
 
 				       // We employ an object of the
 				       // ConvergenceTable class to
@@ -577,7 +578,8 @@ void compute_pi_by_perimeter ()
 				       // the previous
 				       // function. Again, we pass a
 				       // mapping as first argument.
-      FEFaceValues<dim> fe_face_values (mapping, fe, quadrature, update_JxW_values);
+      FEFaceValues<dim> fe_face_values (mapping, fe, quadrature,
+                                        update_JxW_values);
       ConvergenceTable table;
 
       for (unsigned int refinement=0; refinement<6;

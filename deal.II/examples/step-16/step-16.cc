@@ -191,10 +191,8 @@ void LaplaceProblem<dim>::assemble_system ()
   QGauss<dim>  quadrature_formula(2);
 
   FEValues<dim> fe_values (fe, quadrature_formula, 
-			   UpdateFlags(update_values    |
-				       update_gradients |
-				       update_q_points  |
-				       update_JxW_values));
+			   update_values   | update_gradients |
+                           update_q_points | update_JxW_values);
 
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
@@ -298,10 +296,8 @@ void LaplaceProblem<dim>::assemble_multigrid ()
   QGauss<dim>  quadrature_formula(2);
 
   FEValues<dim> fe_values (fe, quadrature_formula, 
-			   UpdateFlags(update_values |
-				       update_gradients |
-				       update_q_points  |
-				       update_JxW_values));
+			   update_values   | update_gradients |
+                           update_q_points | update_JxW_values);
 
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;

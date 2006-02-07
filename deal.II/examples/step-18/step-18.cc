@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2000, 2004, 2005 by the deal.II authors */
+/*    Copyright (C) 2000, 2004, 2005, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -1477,10 +1477,8 @@ namespace QuasiStaticElasticity
     system_matrix = 0;
 
     FEValues<dim> fe_values (fe, quadrature_formula, 
-			     UpdateFlags(update_values    |
-					 update_gradients |
-					 update_q_points  |
-					 update_JxW_values));
+			     update_values   | update_gradients |
+                             update_q_points | update_JxW_values);
 
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;

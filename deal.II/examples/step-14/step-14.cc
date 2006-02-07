@@ -677,8 +677,7 @@ namespace LaplaceSolver
 				Threads::ThreadMutex                                 &mutex) const
   {
     FEValues<dim> fe_values (*fe, *quadrature, 
-			     UpdateFlags(update_gradients |
-					 update_JxW_values));
+			     update_gradients | update_JxW_values);
 
     const unsigned int   dofs_per_cell = fe->dofs_per_cell;
     const unsigned int   n_q_points    = quadrature->n_quadrature_points;
@@ -932,9 +931,8 @@ namespace LaplaceSolver
   assemble_rhs (Vector<double> &rhs) const 
   {
     FEValues<dim> fe_values (*this->fe, *this->quadrature, 
-			     UpdateFlags(update_values    |
-					 update_q_points  |
-					 update_JxW_values));
+			     update_values  | update_q_points  |
+                             update_JxW_values);
 
     const unsigned int   dofs_per_cell = this->fe->dofs_per_cell;
     const unsigned int   n_q_points    = this->quadrature->n_quadrature_points;

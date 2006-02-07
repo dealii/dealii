@@ -789,18 +789,18 @@ void DGMethod<dim>::assemble_system1 ()
 				   // ``UpdateFlags'' for the
 				   // ``FEValues'' and the
 				   // ``FEFaceValues'' objects.
-  UpdateFlags update_flags = update_values
-			     | update_gradients
-			     | update_q_points
-			     | update_JxW_values;
+  const UpdateFlags update_flags = update_values
+                                   | update_gradients
+                                   | update_q_points
+                                   | update_JxW_values;
 
 				   // Note, that on faces we do not
 				   // need gradients but we need
 				   // normal vectors.
-  UpdateFlags face_update_flags = update_values
-				  | update_q_points
-				  | update_JxW_values
-				  | update_normal_vectors;
+  const UpdateFlags face_update_flags = update_values
+                                        | update_q_points
+                                        | update_JxW_values
+                                        | update_normal_vectors;
   
 				   // On the neighboring cell we only
 				   // need the shape values. Given a
@@ -810,7 +810,7 @@ void DGMethod<dim>::assemble_system1 ()
 				   // the normal vectors are known to
 				   // be the negative of the normal
 				   // vectors of the current cell.
-  UpdateFlags neighbor_face_update_flags = update_values;
+  const UpdateFlags neighbor_face_update_flags = update_values;
    
 				   // Then we create the ``FEValues''
 				   // object. Note, that since version
@@ -1305,17 +1305,17 @@ void DGMethod<dim>::assemble_system1 ()
 template <int dim>
 void DGMethod<dim>::assemble_system2 () 
 {
-  UpdateFlags update_flags = update_values
-			     | update_gradients
-			     | update_q_points
-			     | update_JxW_values;
+  const UpdateFlags update_flags = update_values
+                                   | update_gradients
+                                   | update_q_points
+                                   | update_JxW_values;
   
-  UpdateFlags face_update_flags = update_values
-				  | update_q_points
-				  | update_JxW_values
-				  | update_normal_vectors;
+  const UpdateFlags face_update_flags = update_values
+                                        | update_q_points
+                                        | update_JxW_values
+                                        | update_normal_vectors;
   
-  UpdateFlags neighbor_face_update_flags = update_values;
+  const UpdateFlags neighbor_face_update_flags = update_values;
 
 				   // Here we do not need
 				   // ``fe_v_face_neighbor'' as case 4

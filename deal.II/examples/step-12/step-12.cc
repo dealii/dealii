@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors */
+/*    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -736,21 +736,21 @@ void DGMethod<dim>::assemble_system1 ()
   std::vector<unsigned int> dofs_neighbor (dofs_per_cell);
 
 				   // First we create the
-				   // ``UpdateFlags'' for the
+				   // ``update_flags'' for the
 				   // ``FEValues'' and the
 				   // ``FEFaceValues'' objects.
-  UpdateFlags update_flags = update_values
-			     | update_gradients
-			     | update_q_points
-			     | update_JxW_values;
+  const UpdateFlags update_flags = update_values
+                                   | update_gradients
+                                   | update_q_points
+                                   | update_JxW_values;
 
 				   // Note, that on faces we do not
 				   // need gradients but we need
 				   // normal vectors.
-  UpdateFlags face_update_flags = update_values
-				  | update_q_points
-				  | update_JxW_values
-				  | update_normal_vectors;
+  const UpdateFlags face_update_flags = update_values
+                                        | update_q_points
+                                        | update_JxW_values
+                                        | update_normal_vectors;
   
 				   // On the neighboring cell we only
 				   // need the shape values. Given a
@@ -760,7 +760,7 @@ void DGMethod<dim>::assemble_system1 ()
 				   // the normal vectors are known to
 				   // be the negative of the normal
 				   // vectors of the current cell.
-  UpdateFlags neighbor_face_update_flags = update_values;
+  const UpdateFlags neighbor_face_update_flags = update_values;
    
 				   // Then we create the ``FEValues''
 				   // object. Note, that since version
@@ -1221,17 +1221,17 @@ void DGMethod<dim>::assemble_system2 ()
   std::vector<unsigned int> dofs (dofs_per_cell);
   std::vector<unsigned int> dofs_neighbor (dofs_per_cell);
 
-  UpdateFlags update_flags = update_values
-			     | update_gradients
-			     | update_q_points
-			     | update_JxW_values;
+  const UpdateFlags update_flags = update_values
+                                   | update_gradients
+                                   | update_q_points
+                                   | update_JxW_values;
   
-  UpdateFlags face_update_flags = update_values
-				  | update_q_points
-				  | update_JxW_values
-				  | update_normal_vectors;
+  const UpdateFlags face_update_flags = update_values
+                                        | update_q_points
+                                        | update_JxW_values
+                                        | update_normal_vectors;
   
-  UpdateFlags neighbor_face_update_flags = update_values;
+  const UpdateFlags neighbor_face_update_flags = update_values;
 
 				   // Here we do not need
 				   // ``fe_v_face_neighbor'' as case 4

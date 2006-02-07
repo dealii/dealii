@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2000, 2001, 2002, 2003, 2004 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -988,15 +988,11 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				   // gradients, but rather the normal
 				   // vectors to the cells.
   FEValues<dim> fe_values (fe, quadrature_formula, 
-			   UpdateFlags(update_values    |
-				       update_gradients |
-				       update_q_points  |
-				       update_JxW_values));
+			   update_values   | update_gradients |
+                           update_q_points | update_JxW_values);
   FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula,
-				    UpdateFlags (update_values     |
-						 update_q_points   |
-						 update_JxW_values |
-						 update_normal_vectors));
+				    update_values     | update_q_points   |
+                                    update_JxW_values | update_normal_vectors);
 
 				   // Then we define some
 				   // abbreviations to avoid
@@ -1598,8 +1594,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
   QMidpoint<dim> midpoint_rule;
   FEValues<dim>  fe_midpoint_value (dof_handler.get_fe(),
 				    midpoint_rule,
-				    UpdateFlags(update_values |
-						update_q_points));
+				    update_values | update_q_points);
   
 				   // Then we need space foe the
 				   // tensor ``Y'', which is the sum
