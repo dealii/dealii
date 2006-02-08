@@ -11,6 +11,8 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+                                 // @sect3{Include files}
+
 				 // As usual, the first few include
 				 // files are already known, so we
 				 // will not comment on them further.
@@ -54,12 +56,30 @@
 #include <iostream>
 
 
+                                 // @sect3{The ``ElasticProblem'' class template}
+
 				 // The main class is, except for its
 				 // name, almost unchanged with
-				 // respect to the step-6 example. The
-				 // only change is the use of a
+				 // respect to the step-6 example.
+				 //
+				 // The only change is the use of a
 				 // different class for the ``fe''
-				 // variable.
+				 // variable: Instead of a concrete
+				 // finite element class such as
+				 // ``FE_Q'', we now use a more
+				 // generic one, ``FESystem''. In
+				 // fact, ``FESystem'' is not really a
+				 // finite element itself in that it
+				 // does not implement shape functions
+				 // of its own.  Rather, it is a class
+				 // that can be used to stack several
+				 // other elements together to form
+				 // one vector-valued finite
+				 // element. In our case, we will
+				 // compose the vector-valued element
+				 // of ``FE_Q(1)'' objects, as shown
+				 // below in the constructor of this
+				 // class.
 template <int dim>
 class ElasticProblem 
 {
@@ -78,21 +98,6 @@ class ElasticProblem
     Triangulation<dim>   triangulation;
     DoFHandler<dim>      dof_handler;
 
-				     // Instead of a concrete finite
-				     // element class such as
-				     // ``FE_Q'', we now use a more
-				     // generic one, ``FESystem''. In
-				     // fact, it is not a finite
-				     // element itself, but rather a
-				     // class that can be used to
-				     // stack several usual elements
-				     // together to form one
-				     // vector-valued finite
-				     // element. In our case, we will
-				     // compose the vector-valued
-				     // element of ``FE_Q(1)'' objects,
-				     // as shown below in the
-				     // constructor of this class.
     FESystem<dim>        fe;
 
     ConstraintMatrix     hanging_node_constraints;
@@ -105,6 +110,8 @@ class ElasticProblem
 };
 
 
+                                 // @sect3{Right hand side values}
+
 				 // Before going over to the
 				 // implementation of the main class,
 				 // we declare and define the class
@@ -112,44 +119,52 @@ class ElasticProblem
 				 // side. This time, the right hand
 				 // side is vector-valued, as is the
 				 // solution, so we will describe the
-				 // new elements in some more detail.
+				 // changes required for this in some
+				 // more detail.
+				 //
+				 // The first thing is that
+				 // vector-valued functions have to
+				 // have a constructor, since they
+				 // need to pass down to the base
+				 // class of how many components the
+				 // function consists. The default
+				 // value in the constructor of the
+				 // base class is one (i.e.: a scalar
+				 // function), which is why we did not
+				 // need not define a constructor for
+				 // the scalar function used in
+				 // previous programs.
 template <int dim>
 class RightHandSide :  public Function<dim> 
 {
   public:
-				     // The first thing is that
-				     // vector-valued functions have a
-				     // constructor, since they need
-				     // to pass down to the base class
-				     // of how many components the
-				     // function consists. The default
-				     // value in the constructor of
-				     // the base class is one, so we
-				     // need not define a constructor
-				     // for the usual scalar function.
     RightHandSide ();
     
-				     // The next function is a
-				     // replacement for the ``value''
-				     // function of the previous
-				     // examples. There, a second
-				     // parameter ``component'' was
-				     // given, which denoted which
+				     // The next change is that we
+				     // want a replacement for the
+				     // ``value'' function of the
+				     // previous examples. There, a
+				     // second parameter ``component''
+				     // was given, which denoted which
 				     // component was requested. Here,
 				     // we implement a function that
 				     // returns the whole vector of
 				     // values at the given place at
-				     // once.
-    virtual void vector_value (const Point<dim> &p,
-			       Vector<double>   &values) const;
-
-				     // Then, in analogy to the
+				     // once, in the second argument
+				     // of the function. The obvious
+				     // name for such a replacement
+				     // function is ``vector_value''.
+				     //
+				     // Secondly, in analogy to the
 				     // ``value_list'' function, there
 				     // is a function
 				     // ``vector_value_list'', which
 				     // returns the values of the
 				     // vector-valued function at
 				     // several points at once:
+    virtual void vector_value (const Point<dim> &p,
+			       Vector<double>   &values) const;
+
     virtual void vector_value_list (const std::vector<Point<dim> > &points,
 				    std::vector<Vector<double> >   &value_list) const;
 };
@@ -160,69 +175,110 @@ class RightHandSide :  public Function<dim>
 				 // above, it only passes down to the
 				 // base class the number of
 				 // components, which is ``dim'' in
-				 // the present case. Note that
-				 // although the implementation is
-				 // very short here, we do not move it
-				 // into the class declaration, since
-				 // our style guides require that
-				 // inside the class declaration only
-				 // declarations have to happen and
-				 // that definitions are always to be
-				 // found outside.
+				 // the present case (one force
+				 // component in each of the ``dim''
+				 // space directions).
+				 //
+				 // Some people would have moved the
+				 // definition of such a short
+				 // function right into the class
+				 // declaration. We do not do that, as
+				 // a matter of style: the deal.II
+				 // style guides require that class
+				 // declarations contain only
+				 // declarations, and that definitions
+				 // are always to be found
+				 // outside. This is, obviously, as
+				 // much as matter of taste as
+				 // indentation, but we try to be
+				 // consistent in this direction.
 template <int dim>
-RightHandSide<dim>::RightHandSide () :
+RightHandSide<dim>::RightHandSide ()
+		:
 		Function<dim> (dim)
 {}
 
 
-				 // This is the function that returns
+				 // Next the function that returns
 				 // the whole vector of values at the
-				 // point ``p'' at once:
+				 // point ``p'' at once.
+				 //
+				 // To prevent cases where the return
+				 // vector has not previously been set
+				 // to the right size we test for this
+				 // case and otherwise throw an
+				 // exception at the beginning of the
+				 // function. Note that enforcing that
+				 // output arguments already have the
+				 // correct size is a convention in
+				 // deal.II, and enforced almost
+				 // everywhere. The reason is that we
+				 // would otherwise have to check at
+				 // the beginning of the function and
+				 // possibly change the size of the
+				 // output vector. This is expensive,
+				 // and would almost always be
+				 // unnecessary (the first call to the
+				 // function would set the vector to
+				 // the right size, and subsequent
+				 // calls would only have to do
+				 // redundant checks). In addition,
+				 // checking and possibly resizing the
+				 // vector is an operation that can
+				 // not be removed if we can't rely on
+				 // the assumption that the vector
+				 // already has the correct size; this
+				 // is in contract to the ``Assert''
+				 // call that is completely removed if
+				 // the program is compiled in
+				 // optimized mode.
+				 //
+				 // Likewise, if by some accident
+				 // someone tried to compile and run
+				 // the program in only one space
+				 // dimension (in which the elastic
+				 // equations do not make much sense
+				 // since they reduce to the ordinary
+				 // Laplace equation), we terminate
+				 // the program in the second
+				 // assertion. The program will work
+				 // just fine in 3d, however.
 template <int dim>
 inline
 void RightHandSide<dim>::vector_value (const Point<dim> &p,
 				       Vector<double>   &values) const 
 {
-				   // To prevent cases where the
-				   // return value has not previously
-				   // been set to the right size
-				   // (which is kind of a convention
-				   // in the deal.II library), we test
-				   // for this case and otherwise
-				   // throw an exception:
   Assert (values.size() == dim, 
 	  ExcDimensionMismatch (values.size(), dim));
-				   // Likewise, if by some accident
-				   // someone tried to compile and run
-				   // the program in only one space
-				   // dimension (in which the elastic
-				   // equations do not make much sense
-				   // since they reduce to the
-				   // ordinary Laplace equation), we
-				   // terminate the program if the
-				   // dimension is not as expected.
-  Assert (dim >= 2, ExcInternalError());
+  Assert (dim >= 2, ExcNotImplemented());
   
-				   // The rest of the function is as
-				   // would probably be expected given
-				   // the form of the right hand side
-				   // function. First we define the
-				   // centers of the two points around
-				   // which are the sources of
-				   // x-displacement, i.e. (0.5,0) and
-				   // (-0.5,0). Note that upon
-				   // construction of the ``Point''
-				   // objects, all components are set
-				   // to zero.
+				   // The rest of the function
+				   // implements computing force
+				   // values. We will use a constant
+				   // (unit) force in x-direction
+				   // located in two little circles
+				   // (or spheres, in 3d) around
+				   // points (0.5,0) and (-0.5,0), and
+				   // y-force in an area around the
+				   // origin; in 3d, the z-component
+				   // of these centers is zero as
+				   // well.
+				   //
+				   // For this, let us first define
+				   // two objects that denote the
+				   // centers of these areas. Note
+				   // that upon construction of the
+				   // ``Point'' objects, all
+				   // components are set to zero.
   Point<dim> point_1, point_2;
   point_1(0) = 0.5;
   point_2(0) = -0.5;
   
-				   // If now the point ``p'' is in the
-				   // circle of radius 0.2 around one
-				   // of these points, then set the
-				   // force in x-direction to one,
-				   // otherwise to zero:
+				   // If now the point ``p'' is in a
+				   // circle (sphere) of radius 0.2
+				   // around one of these points, then
+				   // set the force in x-direction to
+				   // one, otherwise to zero:
   if (((p-point_1).square() < 0.2*0.2) ||
       ((p-point_2).square() < 0.2*0.2))
     values(0) = 1;
@@ -244,22 +300,24 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
 				 // Now, this is the function of the
 				 // right hand side class that returns
 				 // the values at several points at
-				 // once.
+				 // once. The function starts out with
+				 // checking that the number of input
+				 // and output arguments is equal (the
+				 // sizes of the individual output
+				 // vectors will be checked in the
+				 // function that we call further down
+				 // below). Next, we define an
+				 // abbreviation for the number of
+				 // points which we shall work on, to
+				 // make some things simpler below.
 template <int dim>
 void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &points,
 					    std::vector<Vector<double> >   &value_list) const 
 {
-				   // First we define an abbreviation
-				   // for the number of points which
-				   // we shall work on:
-  const unsigned int n_points = points.size();
+  Assert (value_list.size() == points.size(), 
+	  ExcDimensionMismatch (value_list.size(), points.size()));
 
-				   // Then we check whether the number
-				   // of output slots has been set
-				   // correctly, i.e. to the number of
-				   // input points:
-  Assert (value_list.size() == n_points, 
-	  ExcDimensionMismatch (value_list.size(), n_points));
+  const unsigned int n_points = points.size();
 
 				   // Finally we treat each of the
 				   // points. In one of the previous
@@ -274,73 +332,105 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 				   // twice, which can lead to
 				   // confusion if one function is
 				   // changed but the other is
-				   // not. However, we can prevent
-				   // this situation using the
-				   // following construct:
+				   // not.
+				   //
+				   // We can prevent this situation by
+				   // calling
+				   // ``RightHandSide<dim>::vector_valued''
+				   // on each point in the input
+				   // list. Note that by giving the
+				   // full name of the function,
+				   // including the class name, we
+				   // instruct the compiler to
+				   // explicitly call this function,
+				   // and not to use the virtual
+				   // function call mechanism that
+				   // would be used if we had just
+				   // called ``vector_value''. This is
+				   // important, since the compiler
+				   // generally can't make any
+				   // assumptions which function is
+				   // called when using virtual
+				   // functions, and it therefore
+				   // can't inline the called function
+				   // into the site of the call. On
+				   // the contrary, here we give the
+				   // fully qualified name, which
+				   // bypasses the virtual function
+				   // call, and consequently the
+				   // compiler knows exactly which
+				   // function is called and will
+				   // inline above function into the
+				   // present location. (Note that we
+				   // have declared the
+				   // ``vector_value'' function above
+				   // ``inline'', though modern
+				   // compilers are also able to
+				   // inline functions even if they
+				   // have not been declared as
+				   // inline).
+				   //
+				   // It is worth noting why we go to
+				   // such length explaining what we
+				   // do. Using this construct, we
+				   // manage to avoid any
+				   // inconsistency: if we want to
+				   // change the right hand side
+				   // function, it would be difficult
+				   // to always remember that we
+				   // always have to change two
+				   // functions in the same way. Using
+				   // this forwarding mechanism, we
+				   // only have to change a single
+				   // place (the ``vector_value''
+				   // function), and the second place
+				   // (the ``vector_value_list''
+				   // function) will always be
+				   // consistent with it. At the same
+				   // time, using virtual function
+				   // call bypassing, the code is no
+				   // less efficient than if we had
+				   // written it twice in the first
+				   // place:
   for (unsigned int p=0; p<n_points; ++p)
     RightHandSide<dim>::vector_value (points[p],
 				      value_list[p]);
-				   // It calls the ``vector_value''
-				   // function defined above for each
-				   // point, and thus preempts all
-				   // chances for inconsistency. It is
-				   // important to note how the
-				   // function was called: using the
-				   // full class qualification using
-				   // ``RightHandSide::'', since this
-				   // calls the function directly and
-				   // not using the virtual function
-				   // table. The call is thus as fast
-				   // as a call to any non-virtual
-				   // function. In addition, we have
-				   // declared the ``vector_value''
-				   // function ``inline'', i.e. the
-				   // compiler can remove the function
-				   // call altogether and the
-				   // resulting code can in principle
-				   // be as fast as if we had
-				   // duplicated the code.
 }
 
 
 
+                                 // @sect3{The ``ElasticProblem'' class implementation}
+
+                                 // @sect4{ElasticProblem::ElasticProblem}
+
+				 // Following is the constructor of
+				 // the main class. As said before, we
+				 // would like to construct a
+				 // vector-valued finite element that
+				 // is composed of several scalar
+				 // finite elements (i.e., we want to
+				 // build the vector-valued element so
+				 // that each of its vector components
+				 // consists of the shape functions of
+				 // a scalar element). Of course, the
+				 // number of scalar finite elements we
+				 // would like to stack together
+				 // equals the number of components
+				 // the solution function has, which
+				 // is ``dim'' since we consider
+				 // displacement in each space
+				 // direction. The ``FESystem'' class
+				 // can handle this: we pass it the
+				 // finite element of which we would
+				 // like to compose the system of, and
+				 // how often it shall be repeated:
 
 template <int dim>
-ElasticProblem<dim>::ElasticProblem () :
+ElasticProblem<dim>::ElasticProblem ()
+		:
 		dof_handler (triangulation),
-						 // As said before, we
-						 // would like to
-						 // construct one
-						 // vector-valued
-						 // finite element as
-						 // outer product of
-						 // several scalar
-						 // finite
-						 // elements. Of
-						 // course, the number
-						 // of scalar finite
-						 // element we would
-						 // like to stack
-						 // together equals
-						 // the number of
-						 // components the
-						 // solution function
-						 // has, which is
-						 // ``dim'' since we
-						 // consider
-						 // displacement in
-						 // each space
-						 // direction. The
-						 // ``FESystem'' class
-						 // can handle this:
-						 // we pass it the
-						 // finite element of
-						 // which we would
-						 // like to compose
-						 // the system of, and
-						 // how often it shall
-						 // be repeated:
 		fe (FE_Q<dim>(1), dim)
+{}
 				 // In fact, the ``FESystem'' class
 				 // has several more constructors
 				 // which can perform more complex
@@ -349,21 +439,13 @@ ElasticProblem<dim>::ElasticProblem () :
 				 // elements of the same type into
 				 // one; we will get to know these
 				 // possibilities in later examples.
-				 //
-				 // It should be noted that the
-				 // ``FESystem'' object so created
-				 // does not actually use the finite
-				 // element which we have passed to it
-				 // as first parameter. We could thus
-				 // use an anonymous object created
-				 // in-place. The ``FESystem''
-				 // constructor only needs the
-				 // parameter to generate a copy of
-				 // the finite element from this.
-{}
 
 
 
+                                 // @sect4{ElasticProblem::~ElasticProblem}
+
+				 // The destructor, on the other hand,
+				 // is exactly as in step-6:
 template <int dim>
 ElasticProblem<dim>::~ElasticProblem () 
 {
@@ -371,23 +453,29 @@ ElasticProblem<dim>::~ElasticProblem ()
 }
 
 
+                                 // @sect4{ElasticProblem::setup_system}
+
 				 // Setting up the system of equations
-				 // is equal to the function used in
-				 // the step-6 example. The
+				 // is identitical to the function
+				 // used in the step-6 example. The
 				 // ``DoFHandler'' class and all other
-				 // classes used take care of the
-				 // vector-valuedness of the finite
-				 // element themselves (in fact, the
-				 // do not do so, since they only take
-				 // care how many degrees of freedom
-				 // there are per vertex, line and
-				 // cell, and they do not ask what they
-				 // represent, i.e. whether the finite
-				 // element under consideration is
-				 // vector-valued or whether it is,
-				 // for example, a scalar Hermite
-				 // element with several degrees of
-				 // freedom on each vertex).
+				 // classes used here are fully aware
+				 // that the finite element we want to
+				 // use is vector-valued, and take
+				 // care of the vector-valuedness of
+				 // the finite element themselves. (In
+				 // fact, they do not, but this does
+				 // not need to bother you: since they
+				 // only need to know how many degrees
+				 // of freedom there are per vertex,
+				 // line and cell, and they do not ask
+				 // what they represent, i.e. whether
+				 // the finite element under
+				 // consideration is vector-valued or
+				 // whether it is, for example, a
+				 // scalar Hermite element with
+				 // several degrees of freedom on each
+				 // vertex).
 template <int dim>
 void ElasticProblem<dim>::setup_system ()
 {
@@ -399,13 +487,6 @@ void ElasticProblem<dim>::setup_system ()
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
 			   dof_handler.max_couplings_between_dofs());
-				   // When making the sparsity
-				   // pattern, there is some potential
-				   // for optimization if not all
-				   // components couple to all
-				   // others. However, this is not the
-				   // case for the elastic equations,
-				   // so we use the standard call:
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
   hanging_node_constraints.condense (sparsity_pattern);
@@ -418,6 +499,8 @@ void ElasticProblem<dim>::setup_system ()
   system_rhs.reinit (dof_handler.n_dofs());
 }
 
+
+                                 // @sect4{ElasticProblem::assemble_system}
 
 				 // The big changes in this program
 				 // are in the creation of matrix and
@@ -1058,6 +1141,7 @@ void ElasticProblem<dim>::run ()
     };
 }
 
+                                 // @sect3{The ``main'' function}
 
 				 // The main function is again exactly
 				 // like in step-6 (apart from the
