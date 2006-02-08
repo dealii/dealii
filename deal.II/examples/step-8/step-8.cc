@@ -509,39 +509,37 @@ void ElasticProblem<dim>::setup_system ()
 				 // through that process step-by-step,
 				 // since it is a bit more complicated
 				 // than in previous examples.
+				 //
+				 // The first parts of this function
+				 // are the same as before, however:
+				 // setting up a suitable quadrature
+				 // formula, initializing an
+				 // ``FEValues'' object for the
+				 // (vector-valued) finite element we
+				 // use as well as the quadrature
+				 // object, and declaring a number of
+				 // auxiliary arrays. In addition, we
+				 // declare the ever same two
+				 // abbreviations: ``n_q_points'' and
+				 // ``dofs_per_cell''. The number of
+				 // degrees of freedom per cell we now
+				 // obviously ask from the composed
+				 // finite element rather than from
+				 // the underlying scalar Q1
+				 // element. Here, it is ``dim'' times
+				 // the number of degrees of freedom
+				 // per cell of the Q1 element, though
+				 // this is not explicit knowledge we
+				 // need to care about:
 template <int dim>
 void ElasticProblem<dim>::assemble_system () 
 {  
-				   // First thing: the quadrature
-				   // formula does not need
-				   // modification since we still deal
-				   // with bilinear functions.
   QGauss<dim>  quadrature_formula(2);
-				   // Also, the ``FEValues'' objects
-				   // takes care of everything for us
-				   // (or better: it does not really
-				   // so; as in the comment in the
-				   // function setting up the system,
-				   // here as well the ``FEValues''
-				   // object computes the same data on
-				   // each cell, but it has some
-				   // functionality to access data
-				   // stored inside the finite element
-				   // where they are precomputed upon
-				   // construction).
+
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   update_values   | update_gradients |
                            update_q_points | update_JxW_values);
 
-				   // The number of degrees of freedom
-				   // per cell we now obviously ask
-				   // from the composed finite element
-				   // rather than from the underlying
-				   // scalar Q1 element. Here, it is
-				   // ``dim'' times the number of
-				   // degrees of freedom per cell of
-				   // the Q1 element, but this is not
-				   // something we need to care about.
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
@@ -604,50 +602,65 @@ void ElasticProblem<dim>::assemble_system ()
       
 				       // Next we get the values of
 				       // the coefficients at the
-				       // quadrature points:
+				       // quadrature points. Likewise
+				       // for the right hand side:
       lambda.value_list (fe_values.get_quadrature_points(), lambda_values);
       mu.value_list     (fe_values.get_quadrature_points(), mu_values);
 
+      right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
+					 rhs_values);
+      
 				       // Then assemble the entries of
 				       // the local stiffness matrix
 				       // and right hand side
 				       // vector. This follows almost
 				       // one-to-one the pattern
 				       // described in the
-				       // introduction of this example
-				       // and will not comment much on
-				       // this.
+				       // introduction of this
+				       // example.  One of the few
+				       // comments in place is that we
+				       // can compute the number
+				       // ``comp(i)'', i.e. the index
+				       // of the only nonzero vector
+				       // component of shape function
+				       // ``i'' using the
+				       // ``fe.system_to_component_index(i).first''
+				       // function call below.
+				       //
+				       // (By accessing the
+				       // ``first'' variable of
+				       // the return value of the
+				       // ``system_to_component_index''
+				       // function, you might
+				       // already have guessed
+				       // that there is more in
+				       // it. In fact, the
+				       // function returns a
+				       // ``std::pair<unsigned int,
+				       // unsigned int>'', of
+				       // which the first element
+				       // is ``comp(i)'' and the
+				       // second is the value
+				       // ``base(i)'' also noted
+				       // in the introduction, i.e.
+				       // the index
+				       // of this shape function
+				       // within all the shape
+				       // functions that are nonzero
+				       // in this component,
+				       // i.e. ``base(i)'' in the
+				       // diction of the
+				       // introduction. This is not a
+				       // number that we are usually
+				       // interested in, however.)
+				       //
+				       // With this knowledge, we can
+				       // assemble the local matrix
+				       // contributions:
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
-					   // One of the few comments
-					   // in place is how we access
-					   // the function ``comp(i)''
-					   // used in the
-					   // introduction. This is
-					   // possible as follows:
 	  const unsigned int 
 	    component_i = fe.system_to_component_index(i).first;
-					   // By accessing the
-					   // ``first'' variable of
-					   // the return value of the
-					   // ``system_to_component_index''
-					   // function, you might
-					   // already have guessed
-					   // that there is more in
-					   // it. In fact, the
-					   // function returns a
-					   // ``std::pair<unsigned int,
-					   // unsigned int>'', of
-					   // which the first element
-					   // is ``comp(i)'' and the
-					   // second is the value
-					   // ``base(i)'' also noted
-					   // in the text. You will
-					   // rather seldom need to
-					   // access this second
-					   // value, but the first is
-					   // important when using
-					   // vector valued elements.
 	  
 	  for (unsigned int j=0; j<dofs_per_cell; ++j) 
 	    {
@@ -657,15 +670,13 @@ void ElasticProblem<dim>::assemble_system ()
 	      for (unsigned int q_point=0; q_point<n_q_points;
 		   ++q_point)
 		{
-						   // Now add up the
-						   // contribution of
-						   // this cell to the
-						   // local matrix:
 		  cell_matrix(i,j) 
 		    += 
-						     // This first term is
-						     // (lambda d_i u_i, d_j v_j)
-						     // + (mu d_i u_j, d_j v_i).
+						     // The first term
+						     // is (lambda d_i
+						     // u_i, d_j v_j)
+						     // + (mu d_i u_j,
+						     // d_j v_i).
 						     // Note that
 						     // ``shape_grad(i,q_point)''
 						     // returns the
@@ -750,18 +761,14 @@ void ElasticProblem<dim>::assemble_system ()
 		    )
 		    *
 		    fe_values.JxW(q_point);
-		};
-	    };
-	};
+		}
+	    }
+	}
 
 				       // Assembling the right hand
 				       // side is also just as
 				       // discussed in the
-				       // introduction. We will
-				       // therefore not discuss it
-				       // further.
-      right_hand_side.vector_value_list (fe_values.get_quadrature_points(),
-					 rhs_values);
+				       // introduction:
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
 	  const unsigned int 
@@ -771,7 +778,7 @@ void ElasticProblem<dim>::assemble_system ()
 	    cell_rhs(i) += fe_values.shape_value(i,q_point) *
 			   rhs_values[q_point](component_i) *
 			   fe_values.JxW(q_point);
-	};
+	}
 
 				       // The transfer from local
 				       // degrees of freedom into the
@@ -780,7 +787,12 @@ void ElasticProblem<dim>::assemble_system ()
 				       // on the equation under
 				       // consideration, and is thus
 				       // the same as in all previous
-				       // examples.
+				       // examples. The same holds for
+				       // the elimination of hanging
+				       // nodes from the matrix and
+				       // right hand side, once we are
+				       // done with assembling the
+				       // entire linear system:
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
@@ -790,8 +802,8 @@ void ElasticProblem<dim>::assemble_system ()
 			       cell_matrix(i,j));
 	  
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
-	};
-    };
+	}
+    }
 
   hanging_node_constraints.condense (system_matrix);
   hanging_node_constraints.condense (system_rhs);
@@ -800,7 +812,7 @@ void ElasticProblem<dim>::assemble_system ()
 				   // boundary values needs a small
 				   // modification: since the solution
 				   // function is vector-valued, so
-				   // needs to be the boundary
+				   // need to be the boundary
 				   // values. The ``ZeroFunction''
 				   // constructor accepts a parameter
 				   // that tells it that it shall
@@ -829,14 +841,16 @@ void ElasticProblem<dim>::assemble_system ()
 
 
 
+                                 // @sect4{ElasticProblem::solve}
+
 				 // The solver does not care about
 				 // where the system of equations
 				 // comes, as long as it stays
 				 // positive definite and symmetric
 				 // (which are the requirements for
 				 // the use of the CG solver), which
-				 // the system is. Therefore, we need
-				 // not change anything.
+				 // the system indeed is. Therefore,
+				 // we need not change anything.
 template <int dim>
 void ElasticProblem<dim>::solve () 
 {
@@ -853,6 +867,7 @@ void ElasticProblem<dim>::solve ()
 }
 
 
+                                 // @sect4{ElasticProblem::refine_grid}
 
 				 // The function that does the
 				 // refinement of the grid is the same
@@ -862,8 +877,8 @@ void ElasticProblem<dim>::solve ()
 				 // that the error estimator by
 				 // default adds up the estimated
 				 // obtained from all components of
-				 // the finite element solution, that
-				 // is it uses the displacement in all
+				 // the finite element solution, i.e.,
+				 // it uses the displacement in all
 				 // directions with the same
 				 // weight. If we would like the grid
 				 // to be adapted to the
@@ -873,7 +888,11 @@ void ElasticProblem<dim>::solve ()
 				 // and do not consider the
 				 // displacements in all other
 				 // directions for the error
-				 // indicators.
+				 // indicators. However, for the
+				 // current problem, it seems
+				 // appropriate to consider all
+				 // displacement components with equal
+				 // weight.
 template <int dim>
 void ElasticProblem<dim>::refine_grid ()
 {
@@ -893,6 +912,8 @@ void ElasticProblem<dim>::refine_grid ()
   triangulation.execute_coarsening_and_refinement ();
 }
 
+
+                                 // @sect4{ElasticProblem::output_results}
 
 				 // The output happens mostly as has
 				 // been shown in previous examples
@@ -944,6 +965,20 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 				   // library will throw an exception
 				   // otherwise, at least if in debug
 				   // mode.
+				   //
+				   // After listing the 1d, 2d, and 3d
+				   // case, it is good style to let
+				   // the program die if we run upon a
+				   // case which we did not
+				   // consider. Remember that the
+				   // ``Assert'' macro generates an
+				   // exception if the condition in
+				   // the first parameter is not
+				   // satisfied. Of course, the
+				   // condition ``false'' can never be
+				   // satisfied, so the program will
+				   // always abort whenever it gets to
+				   // the default statement:
   std::vector<std::string> solution_names;
   switch (dim)
     {
@@ -959,26 +994,9 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 	    solution_names.push_back ("y_displacement");
 	    solution_names.push_back ("z_displacement");
 	    break;
-					     // It is good style to
-					     // let the program die if
-					     // we run upon a case
-					     // which we did not
-					     // consider. Remember
-					     // that the ``Assert''
-					     // macro throws an
-					     // exception if the
-					     // condition in the first
-					     // parameter is not
-					     // satisfied. Of course,
-					     // the condition
-					     // ``false'' can never be
-					     // satisfied, so the
-					     // program will always
-					     // abort whenever it gets
-					     // to this statement:
       default:
-	    Assert (false, ExcInternalError());
-    };
+	    Assert (false, ExcNotImplemented());
+    }
 	     
 				   // After setting up the names for
 				   // the different components of the
@@ -1005,6 +1023,84 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 
 
 
+                                 // @sect4{ElasticProblem::run}
+
+				 // The ``run'' function does the same
+				 // things as in step-6, for
+				 // example. This time, we use the
+				 // square [-1,1]^d as domain, and we
+				 // refine it twice globally before
+				 // starting the first iteration.
+				 //
+				 // The reason is the following: we
+				 // use the ``Gauss'' quadrature
+				 // formula with two points in each
+				 // direction for integration of the
+				 // right hand side; that means that
+				 // there are four quadrature points
+				 // on each cell (in 2D). If we only
+				 // refine the initial grid once
+				 // globally, then there will be only
+				 // four quadrature points in each
+				 // direction on the domain. However,
+				 // the right hand side function was
+				 // chosen to be rather localized and
+				 // in that case all quadrature points
+				 // lie outside the support of the
+				 // right hand side function. The
+				 // right hand side vector will then
+				 // contain only zeroes and the
+				 // solution of the system of
+				 // equations is the zero vector,
+				 // i.e. a finite element function
+				 // that it zero everywhere. We should
+				 // not be surprised about such things
+				 // happening, since we have chosen an
+				 // initial grid that is totally
+				 // unsuitable for the problem at
+				 // hand.
+				 //
+				 // The unfortunate thing is that if
+				 // the discrete solution is constant,
+				 // then the error indicators computed
+				 // by the ``KellyErrorEstimator''
+				 // class are zero for each cell as
+				 // well, and the call to
+				 // ``refine_and_coarsen_fixed_number''
+				 // on the ``triangulation'' object
+				 // will not flag any cells for
+				 // refinement (why should it if the
+				 // indicated error is zero for each
+				 // cell?). The grid in the next
+				 // iteration will therefore consist
+				 // of four cells only as well, and
+				 // the same problem occurs again.
+				 //
+				 // The conclusion needs to be: while
+				 // of course we will not choose the
+				 // initial grid to be well-suited for
+				 // the accurate solution of the
+				 // problem, we must at least choose
+				 // it such that it has the chance to
+				 // capture the most striking features
+				 // of the solution. In this case, it
+				 // needs to be able to see the right
+				 // hand side. Thus, we refine twice
+				 // globally. (Note that the
+				 // ``refine_global'' function is not
+				 // part of the ``GridRefinement''
+				 // class in which
+				 // ``refine_and_coarsen_fixed_number''
+				 // is declared, for example. The
+				 // reason is first that it is not an
+				 // algorithm that computed refinement
+				 // flags from indicators, but more
+				 // importantly that it actually
+				 // performs the refinement, in
+				 // contrast to the functions in
+				 // ``GridRefinement'' that only flag
+				 // cells without actually refining
+				 // the grid.)
 template <int dim>
 void ElasticProblem<dim>::run () 
 {
@@ -1014,112 +1110,7 @@ void ElasticProblem<dim>::run ()
 
       if (cycle == 0)
 	{
-					   // As in previous examples,
-					   // we use the unit square
-					   // (or cube) as domain.
 	  GridGenerator::hyper_cube (triangulation, -1, 1);
-					   // This time, we have to
-					   // refine the coarse grid
-					   // twice before we first
-					   // solve on it. The reason
-					   // is the following: we use
-					   // the ``Gauss''
-					   // quadrature formula with
-					   // two points in each direction for
-					   // integration of the right
-					   // hand side; that means
-					   // that there are four
-					   // quadrature points on
-					   // each cell (in 2D). If we
-					   // only refine the initial
-					   // grid once globally, then
-					   // there will be only four
-					   // quadrature points in
-					   // each direction on the
-					   // domain. However, the
-					   // right hand side function
-					   // was chosen to be rather
-					   // localized and in that
-					   // case all quadrature
-					   // points lie outside the
-					   // support of the right
-					   // hand side function. The
-					   // right hand side vector
-					   // will then contain only
-					   // zeroes and the solution
-					   // of the system of
-					   // equations is the zero
-					   // vector, i.e. a finite
-					   // element function that it
-					   // zero everywhere. We
-					   // should not be surprised
-					   // about such things
-					   // happening, since we have
-					   // chosen an initial grid
-					   // that is totally
-					   // unsuitable for the
-					   // problem at hand.
-					   //
-					   // The unfortunate thing is
-					   // that if the discrete
-					   // solution is constant,
-					   // then the error
-					   // indicators computed by
-					   // the
-					   // ``KellyErrorEstimator''
-					   // class are zero for each
-					   // cell as well, and the
-					   // call to
-					   // ``refine_and_coarsen_fixed_number''
-					   // on the ``triangulation''
-					   // object will not flag any
-					   // cells for refinement
-					   // (why should it if the
-					   // indicated error is zero
-					   // for each cell?). The
-					   // grid in the next
-					   // iteration will therefore
-					   // consist of four cells
-					   // only as well, and the
-					   // same problem occurs
-					   // again.
-					   //
-					   // The conclusion needs to
-					   // be: while of course we
-					   // will not choose the
-					   // initial grid to be
-					   // well-suited for the
-					   // accurate solution of the
-					   // problem, we must at
-					   // least choose it such
-					   // that it has the chance
-					   // to capture the most
-					   // striking features of the
-					   // solution. In this case,
-					   // it needs to be able to
-					   // see the right hand
-					   // side. Thus, we refine
-					   // twice globally. (Note
-					   // that the
-					   // ``refine_global''
-					   // function is not part of
-					   // the ``GridRefinement''
-					   // class in which
-					   // ``refine_and_coarsen_fixed_number''
-					   // is declared, for
-					   // example. The reason is
-					   // first that it is not an
-					   // algorithm that computed
-					   // refinement flags from
-					   // indicators, but more
-					   // importantly that it
-					   // actually performs the
-					   // refinement, in contrast
-					   // to the functions in
-					   // ``GridRefinement'' that
-					   // only flag cells without
-					   // actually refining the
-					   // grid.)
 	  triangulation.refine_global (2);
 	}
       else
@@ -1138,7 +1129,7 @@ void ElasticProblem<dim>::run ()
       assemble_system ();
       solve ();
       output_results (cycle);
-    };
+    }
 }
 
                                  // @sect3{The ``main'' function}
@@ -1178,7 +1169,7 @@ int main ()
 		<< "----------------------------------------------------"
 		<< std::endl;
       return 1;
-    };
+    }
 
   return 0;
 }
