@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -373,8 +373,11 @@ void FEValuesBase<dim>::get_function_values (
 	  ExcDimensionMismatch(fe->n_components(), 1));
   Assert (values.size() == n_quadrature_points,
 	  ExcDimensionMismatch(values.size(), n_quadrature_points));
+  Assert (present_cell.get() != 0,
+	  ExcMessage ("FEValues object is not reinit'ed to any cell"));
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
-	  ExcDimensionMismatch(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
+	  ExcDimensionMismatch(fe_function.size(),
+			       present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -448,6 +451,8 @@ void FEValuesBase<dim>::get_function_values (
 //	  ExcDimensionMismatch(fe_function.size(),
 //			     present_cell->get_dof_handler().n_dofs()));
 				   // One entry per quadrature point
+  Assert (present_cell.get() != 0,
+	  ExcMessage ("FEValues object is not reinit'ed to any cell"));
   Assert (values.size() == n_quadrature_points,
 	  ExcDimensionMismatch(values.size(), n_quadrature_points));
 
@@ -663,8 +668,11 @@ get_function_grads (const InputVector           &fe_function,
 	  ExcDimensionMismatch(fe->n_components(), 1));
   Assert (gradients.size() == n_quadrature_points,
 	  ExcDimensionMismatch(gradients.size(), n_quadrature_points));
+  Assert (present_cell.get() != 0,
+	  ExcMessage ("FEValues object is not reinit'ed to any cell"));
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
-	  ExcDimensionMismatch(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
+	  ExcDimensionMismatch(fe_function.size(),
+			       present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -688,6 +696,7 @@ get_function_grads (const InputVector           &fe_function,
 	gradients[point] += tmp;
       };
 }
+
 
 
 template <int dim>
@@ -744,8 +753,11 @@ get_function_grads (const InputVector                         &fe_function,
 	    ExcDimensionMismatch(gradients[i].size(), n_components));
 
   Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
+  Assert (present_cell.get() != 0,
+	  ExcMessage ("FEValues object is not reinit'ed to any cell"));
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
-	  ExcDimensionMismatch(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
+	  ExcDimensionMismatch(fe_function.size(),
+			       present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -885,8 +897,11 @@ get_function_2nd_derivatives (const InputVector           &fe_function,
   Assert (second_derivatives.size() == n_quadrature_points,
 	  ExcDimensionMismatch(second_derivatives.size(), n_quadrature_points));
   Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+  Assert (present_cell.get() != 0,
+	  ExcMessage ("FEValues object is not reinit'ed to any cell"));
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
-	  ExcDimensionMismatch(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
+	  ExcDimensionMismatch(fe_function.size(),
+			       present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
@@ -930,8 +945,11 @@ get_function_2nd_derivatives (const InputVector                         &fe_func
 	    ExcDimensionMismatch(second_derivs[i].size(), n_components));
 
   Assert (this->update_flags & update_second_derivatives, ExcAccessToUninitializedField());
+  Assert (present_cell.get() != 0,
+	  ExcMessage ("FEValues object is not reinit'ed to any cell"));
   Assert (fe_function.size() == present_cell->n_dofs_for_dof_handler(),
-	  ExcDimensionMismatch(fe_function.size(), present_cell->n_dofs_for_dof_handler()));
+	  ExcDimensionMismatch(fe_function.size(),
+			       present_cell->n_dofs_for_dof_handler()));
 
 				   // get function values of dofs
 				   // on this cell
