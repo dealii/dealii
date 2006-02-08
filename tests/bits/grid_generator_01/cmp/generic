@@ -842,7 +842,7 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	2400	-4800
 	4945	-3745
-2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
+2 1 0 3 2 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	2400	-4800
 	2400	-2254
 2 3  0 1 0 1 900 0 25 0.0  0 0 -1 0 0 5
@@ -851,7 +851,7 @@ Single
 	3454	-145
 	2400	-145
 	2400	-2254
-2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
+2 1 0 3 2 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	2400	-2254
 	2400	-145
 2 3  0 1 0 1 900 0 25 0.0  0 0 -1 0 0 5
@@ -869,7 +869,7 @@ Single
 	3454	-145
 	4945	1345
 	2400	2400
-2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
+2 1 0 3 2 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	2400	2400
 	2400	-145
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
@@ -1987,6 +1987,52 @@ object "grid data" class group
 member "cells" value "cell data"
 end
 DEAL:3d::half_hyper_ball
-DEAL:3d::Abort!!!
+object "vertices" class array type float rank 1 shape 3 items 16 data follows
+	2.00000 1.12132 -2.12132
+	2.00000 -3.12132 -2.12132
+	2.00000 -0.121320 -0.878680
+	2.00000 -1.87868 -0.878680
+	2.00000 -0.121320 0.878680
+	2.00000 -1.87868 0.878680
+	2.00000 1.12132 2.12132
+	2.00000 -3.12132 2.12132
+	3.83712 0.0606602 -1.06066
+	3.83712 -2.06066 -1.06066
+	2.76096 -0.560660 -0.439340
+	2.76096 -1.43934 -0.439340
+	2.76096 -0.560660 0.439340
+	2.76096 -1.43934 0.439340
+	3.83712 0.0606602 1.06066
+	3.83712 -2.06066 1.06066
+object "cells" class array type int rank 1 shape 8 items 6 data follows
+	0	2	8	10	1	3	9	11
+	0	6	8	14	2	4	10	12
+	2	4	10	12	3	5	11	13
+	1	3	9	11	7	5	15	13
+	6	7	14	15	4	5	12	13
+	8	14	9	15	10	12	11	13
+attribute "element type" string "cubes"
+attribute "ref" string "positions"
+
+object "material" class array type int rank 0 items 6 data follows
+ 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "level" class array type int rank 0 items 6 data follows
+ 0 0 0 0 0 0
+attribute "dep" string "connections"
+
+object "deal data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+object "cell data" class field
+component "positions" value "vertices"
+component "connections" value "cells"
+component "material" value "material"
+component "level" value "level"
+
+object "grid data" class group
+member "cells" value "cell data"
+end
 DEAL:3d::half_hyper_shell
 DEAL:3d::Abort!!!

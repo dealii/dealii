@@ -894,8 +894,6 @@ void GridGenerator::cylinder_shell (Triangulation<dim>&,
 }
 
 
-//TODO: Colorize edges as circumference and cut plane
-// Implementation for 2D only
 template <int dim>
 void
 GridGenerator::half_hyper_ball (Triangulation<dim> &tria,
@@ -933,6 +931,24 @@ GridGenerator::half_hyper_ball (Triangulation<dim> &tria,
     std::vector<Point<dim> >(&vertices[0], &vertices[8]),
     cells,
     SubCellData());       // no boundary information
+
+    typename Triangulation<dim>::cell_iterator cell = tria.begin();
+    typename Triangulation<dim>::cell_iterator end = tria.end();
+
+
+    while (cell != end)
+    {
+	for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+	{
+	    if (cell->face(i)->boundary_indicator() == 255)
+		continue;
+
+	    // If x is zero, then this is part of the plane
+	    if (cell->face(i)->center()(0) < p(0)+1.e-5)
+		cell->face(i)->set_boundary_indicator(1);
+	}
+	++cell;
+    }
 }
 
 
@@ -1309,13 +1325,81 @@ GridGenerator::cylinder (Triangulation<dim> &tria,
 // Implementation for 3D only
 template <int dim>
 void
-GridGenerator::half_hyper_ball (Triangulation<dim>&,
-				const Point<dim>&,
-				const double)
+GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
+				const Point<dim>& center,
+				const double radius)
 {
-  Assert (false, ExcNotImplemented());
-}
+    // These are for the two lower squares
+    const double d = radius/std::sqrt(2.0);
+    const double a = d/(1+std::sqrt(2.0));
+    // These are for the two upper square
+    const double b = a/2.0;
+    const double c = d/2.0;
+    // And so are these
+    const double hb = a*std::sqrt(3.0)/2.0;
+    const double hc = d*std::sqrt(3.0)/2.0;
 
+    Point<dim> vertices[16] = {
+	center+Point<dim>( 0,  d, -d),
+	center+Point<dim>( 0, -d, -d),
+	center+Point<dim>( 0,  a, -a),
+	center+Point<dim>( 0, -a, -a),
+	center+Point<dim>( 0,  a,  a),
+	center+Point<dim>( 0, -a,  a),
+	center+Point<dim>( 0,  d,  d),
+	center+Point<dim>( 0, -d,  d),
+
+	center+Point<dim>(hc,  c, -c),
+	center+Point<dim>(hc, -c, -c),
+	center+Point<dim>(hb,  b, -b),
+	center+Point<dim>(hb, -b, -b),
+	center+Point<dim>(hb,  b,  b),
+	center+Point<dim>(hb, -b,  b),
+	center+Point<dim>(hc,  c,  c),
+	center+Point<dim>(hc, -c,  c),
+    };
+
+    int cell_vertices[6][8] = {
+	{0, 1, 8, 9, 2, 3, 10, 11},
+	{0, 2, 8, 10, 6, 4, 14, 12},
+	{2, 3, 10, 11, 4, 5, 12, 13},
+	{1, 7, 9, 15, 3, 5, 11, 13},
+	{6, 4, 14, 12, 7, 5, 15, 13},
+	{8, 10, 9, 11, 14, 12, 15, 13}
+    };
+
+    std::vector<CellData<dim> > cells (6, CellData<dim>());
+
+    for (unsigned int i=0; i<6; ++i) 
+    {
+	for (unsigned int j=0; j<8; ++j)
+	    cells[i].vertices[j] = cell_vertices[i][j];
+	cells[i].material_id = 0;
+    };
+
+    tria.create_triangulation (
+	    std::vector<Point<dim> >(&vertices[0], &vertices[16]),
+	    cells,
+	    SubCellData());       // no boundary information
+
+    typename Triangulation<dim>::cell_iterator cell = tria.begin();
+    typename Triangulation<dim>::cell_iterator end = tria.end();
+
+    while (cell != end)
+    {
+	for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+	{
+	    if (cell->face(i)->boundary_indicator() == 255)
+		continue;
+
+	    // If the center is on the plane x=0, this is a plane 
+	    // element
+	    if (cell->face(i)->center()(0) < center(0)+1.e-5) 
+		cell->face(i)->set_boundary_indicator(1);
+	}
+	++cell;
+    }
+}
 
 
 // Implementation for 3D only
