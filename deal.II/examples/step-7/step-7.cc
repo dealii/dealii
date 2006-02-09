@@ -11,7 +11,9 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
-				 // These first include files have all
+                                 // @sect3{Include files}
+
+                                 // These first include files have all
 				 // been treated in previous examples,
 				 // so we won't explain what is in
 				 // them again.
@@ -374,7 +376,7 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
 }
 
 
-				 // @sect3{The Laplace solver class}
+				 // @sect3{The Helmholtz solver class}
 
 				 // Then we need the class that does
 				 // all the work. It is mostly the
@@ -384,7 +386,7 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
 				 // respective functions or variables
 				 // below.
 template <int dim>
-class LaplaceProblem 
+class HelmholtzProblem 
 {
   public:
 				     // We will use this class in
@@ -407,13 +409,13 @@ class LaplaceProblem
 				     // element and the refinement
 				     // mode as parameter and stores
 				     // them in local variables.
-    LaplaceProblem (const FiniteElement<dim> &fe,
-		    const RefinementMode      refinement_mode);
+    HelmholtzProblem (const FiniteElement<dim> &fe,
+                      const RefinementMode      refinement_mode);
 
 				     // The following two functions
 				     // are the same as in previous
 				     // examples.
-    ~LaplaceProblem ();
+    ~HelmholtzProblem ();
 
     void run ();
     
@@ -672,8 +674,8 @@ class LaplaceProblem
 				 // triangulation (which is empty at
 				 // present, however).
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem (const FiniteElement<dim> &fe,
-				     const RefinementMode refinement_mode) :
+HelmholtzProblem<dim>::HelmholtzProblem (const FiniteElement<dim> &fe,
+                                         const RefinementMode refinement_mode) :
 		dof_handler (triangulation),
 		fe (&fe),
 		refinement_mode (refinement_mode)
@@ -682,7 +684,7 @@ LaplaceProblem<dim>::LaplaceProblem (const FiniteElement<dim> &fe,
 
 
 template <int dim>
-LaplaceProblem<dim>::~LaplaceProblem () 
+HelmholtzProblem<dim>::~HelmholtzProblem () 
 {
   dof_handler.clear ();
 }
@@ -696,7 +698,7 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 				 // difference being the renumbering
 				 // step.
 template <int dim>
-void LaplaceProblem<dim>::setup_system ()
+void HelmholtzProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (*fe);
 				   // Renumbering the degrees of
@@ -755,7 +757,7 @@ void LaplaceProblem<dim>::setup_system ()
 				 // changed anyway, so we comment on
 				 // this function fairly extensively.
 template <int dim>
-void LaplaceProblem<dim>::assemble_system () 
+void HelmholtzProblem<dim>::assemble_system () 
 {  
 				   // First we need to define objects
 				   // which will be used as quadrature
@@ -1049,7 +1051,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // Solving the system of equations is
 				 // done in the same way as before.
 template <int dim>
-void LaplaceProblem<dim>::solve () 
+void HelmholtzProblem<dim>::solve () 
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
@@ -1070,7 +1072,7 @@ void LaplaceProblem<dim>::solve ()
 				 // constructor, we do global or
 				 // adaptive refinement.
 template <int dim>
-void LaplaceProblem<dim>::refine_grid ()
+void HelmholtzProblem<dim>::refine_grid ()
 {
   switch (refinement_mode) 
     {
@@ -1082,26 +1084,26 @@ void LaplaceProblem<dim>::refine_grid ()
 	break;
       };
 
-					// In case of adaptive
-					// refinement, we use the same
-					// functions and classes as in
-					// the previous example
-					// program. Note that one
-					// could treat Neumann
-					// boundaries differently than
-					// Dirichlet boundaries, and
-					// one should in fact do so
-					// here since we have Neumann
-					// boundary conditions on part
-					// of the boundaries, but
-					// since we don't have a
-					// function here that
-					// describes the Neumann
-					// values (we only construct
-					// these values from the exact
-					// solution when assembling
-					// the matrix), we omit this
-					// detail here.
+                                       // In case of adaptive
+                                       // refinement, we use the same
+                                       // functions and classes as in
+                                       // the previous example
+                                       // program. Note that one
+                                       // could treat Neumann
+                                       // boundaries differently than
+                                       // Dirichlet boundaries, and
+                                       // one should in fact do so
+                                       // here since we have Neumann
+                                       // boundary conditions on part
+                                       // of the boundaries, but
+                                       // since we don't have a
+                                       // function here that
+                                       // describes the Neumann
+                                       // values (we only construct
+                                       // these values from the exact
+                                       // solution when assembling
+                                       // the matrix), we omit this
+                                       // detail here.
       case adaptive_refinement:
       {
 	Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
@@ -1134,7 +1136,7 @@ void LaplaceProblem<dim>::refine_grid ()
 				 // convergence against the continuous
 				 // solution in a nice format.
 template <int dim>
-void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
+void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 {
 				   // In order to integrate the
 				   // difference between computed
@@ -1319,7 +1321,7 @@ void LaplaceProblem<dim>::process_solution (const unsigned int cycle)
 				 // linear system, solution, and
 				 // post-processing.
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void HelmholtzProblem<dim>::run () 
 {
   for (unsigned int cycle=0; cycle<7; ++cycle)
     {
@@ -1510,16 +1512,16 @@ void LaplaceProblem<dim>::run ()
 	    break;
 
       default:
-				       // The finite element is
-				       // neither Q1 nor Q2. This
-				       // should not have happened,
-				       // but maybe someone has tried
-				       // to change this in ``main'',
-				       // so it might happen. We catch
-				       // this case and throw an
-				       // exception, since we don't
-				       // know how to name the
-				       // respective output file
+                                             // The finite element is
+                                             // neither Q1 nor Q2. This
+                                             // should not have happened,
+                                             // but maybe someone has tried
+                                             // to change this in ``main'',
+                                             // so it might happen. We catch
+                                             // this case and throw an
+                                             // exception, since we don't
+                                             // know how to name the
+                                             // respective output file
 	    Assert (false, ExcInternalError());
     };
   
@@ -1786,7 +1788,7 @@ int main ()
 				       // order to destroy the
 				       // respective objects (i.e. the
 				       // finite element and the
-				       // LaplaceProblem object) at
+				       // HelmholtzProblem object) at
 				       // the end of the block and
 				       // before we go to the next
 				       // run.
@@ -1796,8 +1798,8 @@ int main ()
 		  << std::endl;
 	
 	FE_Q<dim> fe(1);
-	LaplaceProblem<dim> laplace_problem_2d (fe, LaplaceProblem<dim>::adaptive_refinement);
-	laplace_problem_2d.run ();
+	HelmholtzProblem<dim> helmholtz_problem_2d (fe, HelmholtzProblem<dim>::adaptive_refinement);
+	helmholtz_problem_2d.run ();
 
 	std::cout << std::endl;
       };
@@ -1808,8 +1810,8 @@ int main ()
 		  << std::endl;
 	
 	FE_Q<dim> fe(1);
-	LaplaceProblem<dim> laplace_problem_2d (fe, LaplaceProblem<dim>::global_refinement);
-	laplace_problem_2d.run ();
+	HelmholtzProblem<dim> helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
+	helmholtz_problem_2d.run ();
 
 	std::cout << std::endl;
       };
@@ -1820,8 +1822,8 @@ int main ()
 		  << std::endl;
 	
 	FE_Q<dim> fe(2);
-	LaplaceProblem<dim> laplace_problem_2d (fe, LaplaceProblem<dim>::global_refinement);
-	laplace_problem_2d.run ();
+	HelmholtzProblem<dim> helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
+	helmholtz_problem_2d.run ();
 
 	std::cout << std::endl;
       };
