@@ -40,46 +40,43 @@
 #include <numerics/error_estimator.h>
 #include <numerics/data_out.h>
 
-				 // In this example, we will not use
-				 // the numeration scheme which is
-				 // used per default by the
-				 // ``DoFHandler'' class, but will
-				 // renumber them using the
-				 // Cuthill-McKee algorithm. The
-				 // necessary functions are declared
-				 // in the following file:
+				 // In this example, we will not use the
+				 // numeration scheme which is used per
+				 // default by the ``DoFHandler'' class, but
+				 // will renumber them using the Cuthill-McKee
+				 // algorithm. As has already been explained
+				 // in step-2, the necessary functions are
+				 // declared in the following file:
 #include <dofs/dof_renumbering.h>
 				 // Then we will show a little trick
 				 // how we can make sure that objects
 				 // are not deleted while they are
 				 // still in use. For this purpose,
-				 // there is the ``SmartPointer''
+				 // deal.II has the ``SmartPointer''
 				 // helper class, which is declared in
 				 // this file:
 #include <base/smartpointer.h>
-				 // Then we will want to use the
+				 // Next, we will want to use the
 				 // ``integrate_difference'' function
-				 // mentioned in the introduction. It
-				 // comes from this file:
+				 // mentioned in the introduction, and we are
+				 // going to use a ``ConvergenceTable'' that
+				 // collects all important data during a run
+				 // and prints it at the end as a table. These
+				 // comes from the following two files:
 #include <numerics/vectors.h>
-				 // We are going to use a
-				 // ``ConvergenceTable'' that collects
-				 // all important data during a run
-				 // and prints it at the end as a
-				 // table.
 #include <base/convergence_table.h>
 				 // And finally, we need to use the
 				 // ``FEFaceValues'' class, which is
-				 // declare in the same file as the
+				 // declared in the same file as the
 				 // ``FEValues'' class:
 #include <fe/fe_values.h>
 
-				 // We need one more include from
-				 // standard C++, which is necessary
-				 // when we try to find out the actual
-				 // type behind a pointer to a base
-				 // class. We will explain this in
-				 // slightly more detail below.
+				 // We need one more include from standard
+				 // C++, which is necessary when we try to
+				 // find out the actual type behind a pointer
+				 // to a base class. We will explain this in
+				 // slightly more detail below. The other two
+				 // include files are obvious then:
 #include <typeinfo>
 #include <fstream>
 #include <iostream>
@@ -87,42 +84,36 @@
 
 				 // @sect3{Equation data}
 
-				 // Before implementing the classes
-				 // that actually solve something, we
-				 // first declare and define some
-				 // function classes that represent
-				 // right hand side and solution
-				 // classes. Since we want to compare
-				 // the exactly known continuous
-				 // solution to the computed one, we
-				 // need a function object which
-				 // represents the continuous
-				 // solution. On the other hand, we
-				 // need the right hand side function,
-				 // and that one of course shares some
-				 // characteristics with the
-				 // solution. In order to reduce
-				 // dependencies which arise if we
-				 // have to change something in both
-				 // classes at the same time, we
-				 // exclude the common characteristics
-				 // of both functions into a base
-				 // class.
+				 // Before implementing the classes that
+				 // actually solve something, we first declare
+				 // and define some function classes that
+				 // represent right hand side and solution
+				 // classes. Since we want to compare the
+				 // numerically obtained solution to the exact
+				 // continuous one, we need a function object
+				 // that represents the continuous
+				 // solution. On the other hand, we need the
+				 // right hand side function, and that one of
+				 // course shares some characteristics with
+				 // the solution. In order to reduce
+				 // dependencies which arise if we have to
+				 // change something in both classes at the
+				 // same time, we move the common
+				 // characteristics of both functions into a
+				 // base class.
 				 //
-				 // The common characteristics for the
-				 // given solution, which as explained
-				 // in the introduction is a sum of
-				 // three exponentials, are here: the
-				 // number of exponentials, their
-				 // centers, and their half width. We
-				 // declare them in the following
-				 // class. Since the number of
-				 // exponentials is a constant scalar
-				 // integral quantity, C++ allows its
-				 // definition (i.e. assigning a
-				 // value) right at the place of
-				 // declaration (i.e. where we declare
-				 // that such a variable exists).
+				 // The common characteristics for solution
+				 // (as explained in the introduction, we
+				 // choose a sum of three exponentials) and
+				 // right hand side, are these: the number of
+				 // exponentials, their centers, and their
+				 // half width. We declare them in the
+				 // following class. Since the number of
+				 // exponentials is a constant scalar integral
+				 // quantity, C++ allows its definition
+				 // (i.e. assigning a value) right at the
+				 // place of declaration (i.e. where we
+				 // declare that such a variable exists).
 template <int dim>
 class SolutionBase 
 {
@@ -147,10 +138,25 @@ class SolutionBase
 				 // the 1d case for exposition of a
 				 // useful technique.
 				 //
-				 // First we assign values to the
-				 // centers for the 1d case, where we
-				 // place the centers equidistantly at
-				 // -1/3, 0, and 1/3:
+				 // First we assign values to the centers for
+				 // the 1d case, where we place the centers
+				 // equidistantly at -1/3, 0, and 1/3. The
+				 // ``template <>'' header for this definition
+				 // indicates an explicit specialization. This
+				 // means, that the variable belongs to a
+				 // template, but that instead of providing
+				 // the compiler with a template from which it
+				 // can specialize a concrete variable by
+				 // substituting ``dim'' with some concrete
+				 // value, we provide a specialization
+				 // ourselves, in this case for ``dim=1''. If
+				 // the compiler then sees a reference to this
+				 // variable in a place where the template
+				 // argument equals one, it knows that it
+				 // doesn't have to generate the variable from
+				 // a template by substituting ``dim'', but
+				 // can immediately use the following
+				 // definition:
 template <>
 const Point<1>
 SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers]
@@ -158,8 +164,9 @@ SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers]
     Point<1>(0.0), 
     Point<1>(+1.0 / 3.0)   };
 
-				 // Then we place the centers for the
-				 // 2d case as follows:
+				 // Likewise, we can provide an explicit
+				 // specialization for ``dim=2''. We place the
+				 // centers for the 2d case as follows:
 template <>
 const Point<2>
 SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers]
@@ -167,11 +174,14 @@ SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers]
     Point<2>(-0.5, -0.5), 
     Point<2>(+0.5, -0.5)   };
 
-				 // There remains to assign a value to
-				 // the half-width of the
-				 // exponentials. We would like to use
-				 // the same value for all dimensions,
-				 // so here is how that works:
+				 // There remains to assign a value to the
+				 // half-width of the exponentials. We would
+				 // like to use the same value for all
+				 // dimensions. In this case, we simply
+				 // provide the compiler with a template from
+				 // which it can generate a concrete
+				 // instantiation by substituting ``dim'' with
+				 // a concrete value:
 template <int dim>
 const double SolutionBase<dim>::width = 1./3.;
 
@@ -188,17 +198,26 @@ const double SolutionBase<dim>::width = 1./3.;
 				 // the characteristics defined in the
 				 // ``SolutionBase'' class.
 				 //
-				 // The actual classes are declared in
-				 // the following. Note that in order
-				 // to compute the error of the
-				 // numerical solution against the
-				 // continuous one in the L2 and H1
-				 // norms, we have to export value and
-				 // gradient of the exact solution,
-				 // which is done by overloading the
-				 // respective virtual member
-				 // functions in the ``Function'' base
-				 // class.
+				 // The actual classes are declared in the
+				 // following. Note that in order to compute
+				 // the error of the numerical solution
+				 // against the continuous one in the L2 and
+				 // H1 norms, we have to provide value and
+				 // gradient of the exact solution. This is
+				 // more than we have done in previous
+				 // examples, where all we provided was the
+				 // value at one or a list of
+				 // points. Fortunately, the ``Function''
+				 // class also has virtual functions for the
+				 // gradient, so we can simply overload the
+				 // respective virtual member functions in the
+				 // ``Function'' base class. Note that the
+				 // gradient of a function in ``dim'' space
+				 // dimensions is a vector of size ``dim'',
+				 // i.e. a tensor of rank 1 and dimension
+				 // ``dim''. As for so many other things, the
+				 // library provides a suitable class for
+				 // this.
 				 //
 				 // Just as in previous examples, we
 				 // are forced by the C++ language
@@ -214,17 +233,16 @@ class Solution : public Function<dim>,
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
+    
     virtual Tensor<1,dim> gradient (const Point<dim>   &p,
 				    const unsigned int  component = 0) const;
 };
 
 
-				 // The actual definition of the
-				 // values and gradients of the exact
-				 // solution class is according to
-				 // their mathematical definition and
-				 // probably needs not much
-				 // explanation.
+				 // The actual definition of the values and
+				 // gradients of the exact solution class is
+				 // according to their mathematical definition
+				 // and does not need much explanation.
 				 //
 				 // The only thing that is worth
 				 // mentioning is that if we access
@@ -238,7 +256,7 @@ class Solution : public Function<dim>,
 				 // qualification is not necessary if
 				 // the base class is not template
 				 // dependent, and also that the gcc
-				 // compilers, among others, don't
+				 // compilers prior to version 3.4 don't
 				 // enforce this requirement of the
 				 // C++ standard. The reason why this
 				 // is necessary is complicated; some
@@ -253,70 +271,74 @@ double Solution<dim>::value (const Point<dim>   &p,
   double return_value = 0;
   for (unsigned int i=0; i<this->n_source_centers; ++i)
     {
-				       // One of the few things worth
-				       // mentioning is the following
-				       // variables, which represents
-				       // the vector (x-x_i). It is
-				       // computed in the way that one
-				       // would intuitively expect:
-      const Point<dim> shifted_point = p-this->source_centers[i];
-      
-				       // The ``Point<dim>'' class
-				       // offers a member function
-				       // ``square'' that does what
-				       // it's name suggests.
-      return_value += std::exp(-shifted_point.square() /
+      const Point<dim> x_minus_xi = p - this->source_centers[i];
+      return_value += std::exp(-x_minus_xi.square() /
 			       (this->width * this->width));
-    };
+    }
   
   return return_value;
 }
 
 
-
+                                 // Likewise, this is the computation of the
+                                 // gradient of the solution.  In order to
+                                 // accumulate the gradient from the
+                                 // contributions of the exponentials, we
+                                 // allocate an object ``return_value'' that
+                                 // denotes the mathematical quantity of a
+                                 // tensor of rank ``1'' and dimension
+                                 // ``dim''. Its default constructor sets it
+                                 // to the vector containing only zeroes, so
+                                 // we need not explicitly care for its
+                                 // initialization.
+                                 //
+                                 // Note that we could as well have taken the
+                                 // type of the object to be ``Point<dim>''
+                                 // instead of ``Tensor<1,dim>''. Tensors of
+                                 // rank 1 and points are almost exchangeable,
+                                 // and have only very slightly different
+                                 // mathematical meanings. In fact, the
+                                 // ``Point<dim>'' class is derived from the
+                                 // ``Tensor<1,dim>'' class, which makes up
+                                 // for their mutual exchange ability. Their
+                                 // main difference is in what they logically
+                                 // mean: points are points in space, such as
+                                 // the location at which we want to evaluate
+                                 // a function (see the type of the first
+                                 // argument of this function for example). On
+                                 // the other hand, tensors of rank 1 share
+                                 // the same transformation properties, for
+                                 // example that they need to be rotated in a
+                                 // certain way when we change the coordinate
+                                 // system; however, they do not share the
+                                 // same connotation that points have and are
+                                 // only objects in a more abstract space than
+                                 // the one spanned by the coordinate
+                                 // directions. (In fact, gradients live in
+                                 // `reciprocal' space, since the dimension of
+                                 // their components is not that of a length,
+                                 // but one over length).
 template <int dim>
 Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
 				       const unsigned int) const
 {
-				   // In order to accumulate the
-				   // gradient from the contributions
-				   // of the exponentials, we allocate
-				   // an object which denotes the
-				   // mathematical quantity of a
-				   // tensor of rank ``1'' and
-				   // dimension ``dim''. Its default
-				   // constructor sets it to the
-				   // vector containing only zeroes,
-				   // so we need not explicitly care
-				   // for its initialization.
   Tensor<1,dim> return_value;
-				   // Note that we could as well have
-				   // taken the type of the object to
-				   // be ``Point<dim>''. Tensors of
-				   // rank 1 and points are almost
-				   // exchangeable, and have only very
-				   // slightly different mathematical
-				   // meanings. In fact, the
-				   // ``Point<dim>'' class is derived
-				   // from the ``Tensor<1,dim>''
-				   // class, which makes up for their
-				   // mutual exchange ability.
 
   for (unsigned int i=0; i<this->n_source_centers; ++i)
     {
-      const Point<dim> shifted_point = p-this->source_centers[i];
+      const Point<dim> x_minus_xi = p - this->source_centers[i];
       
 				       // For the gradient, note that
-				       // it's direction is along
+				       // its direction is along
 				       // (x-x_i), so we add up
 				       // multiples of this distance
 				       // vector, where the factor is
 				       // given by the exponentials.
       return_value += (-2 / (this->width * this->width) *
-		       std::exp(-shifted_point.square() /
+		       std::exp(-x_minus_xi.square() /
 				(this->width * this->width)) *
-		       shifted_point);
-    };
+		       x_minus_xi);
+    }
   
   return return_value;
 }
@@ -357,20 +379,20 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
   double return_value = 0;
   for (unsigned int i=0; i<this->n_source_centers; ++i)
     {
-      const Point<dim> shifted_point = p-this->source_centers[i];
+      const Point<dim> x_minus_xi = p - this->source_centers[i];
       
 				       // The first contribution is
 				       // the Laplacian:
-      return_value += ((2*dim - 4*shifted_point.square()/
+      return_value += ((2*dim - 4*x_minus_xi.square()/
 			(this->width * this->width)) / 
 		       (this->width * this->width) *
-		       std::exp(-shifted_point.square() /
+		       std::exp(-x_minus_xi.square() /
 				(this->width * this->width)));
 				       // And the second is the
 				       // solution itself:
-      return_value += std::exp(-shifted_point.square() /
+      return_value += std::exp(-x_minus_xi.square() /
 			       (this->width * this->width));
-    };
+    }
   
   return return_value;
 }
@@ -378,70 +400,58 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
 
 				 // @sect3{The Helmholtz solver class}
 
-				 // Then we need the class that does
-				 // all the work. It is mostly the
-				 // same as in previous examples, and
-				 // we will discuss the differences
-				 // only when we declare the
-				 // respective functions or variables
-				 // below.
+				 // Then we need the class that does all the
+				 // work. Except for its name, its interface
+				 // is mostly the same as in previous
+				 // examples.
+                                 //
+                                 // One of the differences is that we will use
+                                 // this class in several modes: for different
+                                 // finite elements, as well as for adaptive
+                                 // and global refinement. The decision
+                                 // whether global or adaptive refinement
+                                 // shall be used is communicated to the
+                                 // constructor of this class through an
+                                 // enumeration type declared at the top of
+                                 // the class. The constructor then takes a
+                                 // finite element object and the refinement
+                                 // mode as arguments.
+                                 //
+                                 // The rest of the member functions are as
+                                 // before except for the ``process_solution''
+                                 // function: After the solution has been
+                                 // computed, we perform some analysis on it,
+                                 // such as computing the error in various
+                                 // norms. To enable some output, it requires
+                                 // the number of the refinement cycle, and
+                                 // consequently gets it as an argument.
 template <int dim>
 class HelmholtzProblem 
 {
   public:
-				     // We will use this class in
-				     // several modes: for different
-				     // finite elements, as well as
-				     // for adaptive and global
-				     // refinement. The decision
-				     // whether global or adaptive
-				     // refinement shall be used is
-				     // communicated to the
-				     // constructor of this class
-				     // through an enumeration type,
-				     // which we declare here:
     enum RefinementMode {
 	  global_refinement, adaptive_refinement
     };
     
-				     // This is the constructor of the
-				     // class, it takes the finite
-				     // element and the refinement
-				     // mode as parameter and stores
-				     // them in local variables.
     HelmholtzProblem (const FiniteElement<dim> &fe,
                       const RefinementMode      refinement_mode);
 
-				     // The following two functions
-				     // are the same as in previous
-				     // examples.
     ~HelmholtzProblem ();
 
     void run ();
     
   private:
-				     // As are these:
     void setup_system ();
     void assemble_system ();
     void solve ();
     void refine_grid ();
-
-				     // After the solution has been
-				     // computed, we perform some
-				     // analysis on it, such as
-				     // computing the error in various
-				     // norms. This is done in the
-				     // following function. To enable
-				     // some output, we pass it the
-				     // number of the refinement
-				     // cycle.
     void process_solution (const unsigned int cycle);
 
 				     // Now for the data elements of
-				     // this class:
-    Triangulation<dim>                      triangulation;
-    DoFHandler<dim>                         dof_handler;
-
+				     // this class. Among the variables
+				     // that we have already used in
+				     // previous examples, only the
+				     // finite element object differs:
 				     // The finite elements which the
 				     // objects of this class operate
 				     // on are passed to the
@@ -478,7 +488,7 @@ class HelmholtzProblem
 				     // which the ``DoFHandler'' uses,
 				     // live at least as long as they
 				     // are in use? This means that
-				     // the ``DoFHandler'' must have a
+				     // the ``DoFHandler'' must have some
 				     // kind of lock on the
 				     // destruction of the other
 				     // objects, and it can only
@@ -518,20 +528,22 @@ class HelmholtzProblem
 				     // subscribe to, thus the name of
 				     // the class. Whenever we
 				     // initialize a pointer to that
-				     // object, we can increase it use
+				     // object, we can increase its use
 				     // counter, and when we move away
 				     // our pointer or do not need it
 				     // any more, we decrease the
 				     // counter again. This way, we
 				     // can always check how many
 				     // objects still use that
-				     // object. If an object of a
+				     // object.
+				     //
+				     // On the other hand, if an object of a
 				     // class that is derived from the
-				     // ``Subscriptor'' class is
-				     // destroyed, it also has to call
-				     // the destructor of the
-				     // ``Subscriptor'' class; this
-				     // will then check whether the
+				     // ``Subscriptor'' class is destroyed, it
+				     // also has to call the destructor of the
+				     // ``Subscriptor'' class. In this
+				     // destructor, there
+				     // will then be a check whether the
 				     // counter is really zero. If
 				     // yes, then there are no active
 				     // references to this object any
@@ -542,9 +554,9 @@ class HelmholtzProblem
 				     // stale and thus potentially
 				     // dangerous pointers, and we
 				     // rather throw an exception to
-				     // alert the programmer that she
+				     // alert the programmer that this
 				     // is doing something dangerous
-				     // and better had her program
+				     // and the program better be
 				     // fixed.
 				     //
 				     // While this certainly all
@@ -560,12 +572,12 @@ class HelmholtzProblem
 				     // difficult to find bugs, since
 				     // the place where we have
 				     // forgotten something may be
-				     // very far away from the place
+				     // far away from the place
 				     // where the check for zeroness
 				     // of the counter upon
 				     // destruction actually
 				     // fails. This kind of bug is
-				     // very annoying and usually very
+				     // rather annoying and usually very
 				     // hard to fix.
 				     //
 				     // The solution to this problem
@@ -602,29 +614,30 @@ class HelmholtzProblem
 				     // as long as it is derived from
 				     // the ``Subscriptor'' class.
 				     //
-				     // In the present example
-				     // program, we protect object
-				     // using the pointer to the
-				     // finite element, i.e. the
-				     // following member variable,
-				     // from the situation that for
-				     // some reason the finite element
-				     // pointed to is destroyed while
-				     // still in use. Note that the
-				     // pointer is assigned at
-				     // construction time of this
-				     // object, and destroyed upon
-				     // destruction of this object, so
-				     // the lock on the destruction of
-				     // the finite element object is
-				     // basically all through the
-				     // lifetime of this object.
+				     // In the present example program, we
+				     // want to protect the finite element
+				     // object from the situation that for
+				     // some reason the finite element pointed
+				     // to is destroyed while still in use. We
+				     // therefore use a ``SmartPointer'' to
+				     // the finite element object; since the
+				     // finite element object is actually
+				     // never changed in our computations, we
+				     // pass a ``const FiniteElement<dim>'' as
+				     // template argument to the
+				     // ``SmartPointer'' class. Note that the
+				     // pointer so declared is assigned at
+				     // construction time of the solve object,
+				     // and destroyed upon destruction, so the
+				     // lock on the destruction of the finite
+				     // element object extends throughout the
+				     // lifetime of this ``HelmholtzProblem''
+				     // object.
+    Triangulation<dim>                      triangulation;
+    DoFHandler<dim>                         dof_handler;
+
     SmartPointer<const FiniteElement<dim> > fe;
 
-				     // The next few member variables
-				     // are unspectacular, since they
-				     // have already been discussed in
-				     // detail:
     ConstraintMatrix                        hanging_node_constraints;
 
     SparsityPattern                         sparsity_pattern;
@@ -633,7 +646,7 @@ class HelmholtzProblem
     Vector<double>                          solution;
     Vector<double>                          system_rhs;
 
-				     // The second last variable
+				     // The second to last variable
 				     // stores the refinement mode
 				     // passed to the
 				     // constructor. Since it is only
@@ -646,30 +659,30 @@ class HelmholtzProblem
 				     // chance).
     const RefinementMode                    refinement_mode;
 
-				     // For each refinement level some
-				     // important data (like the
-				     // number of cells, or the L2
-				     // error of the numerical
-				     // solution) is printed out. The
-				     // ``TableHandler'' can be used
-				     // to collect all this data and
-				     // to output it at the end of the
-				     // run as a table in a simple
-				     // text format or in Tex
-				     // format. Here we don't only use
-				     // the ``TableHandler'' but we
-				     // use the derived class
-				     // ``ConvergenceTable'' that
-				     // additionally evaluates rates
-				     // of convergence.
+				     // For each refinement level some data
+				     // (like the number of cells, or the L2
+				     // error of the numerical solution) will
+				     // be generated and later printed. The
+				     // ``TableHandler'' can be used to
+				     // collect all this data and to output it
+				     // at the end of the run as a table in a
+				     // simple text or in LaTeX
+				     // format. Here we don't only use the
+				     // ``TableHandler'' but we use the
+				     // derived class ``ConvergenceTable''
+				     // that additionally evaluates rates of
+				     // convergence:
     ConvergenceTable                        convergence_table;
 };
 
 
+                                 // @sect3{The ``HelmholtzProblem'' class implementation}
+
+                                 // @sect4{HelmholtzProblem::HelmholtzProblem}
 
 				 // In the constructor of this class,
 				 // we only set the variables passed
-				 // to this object, and associate the
+				 // as arguments, and associate the
 				 // DoF handler object with the
 				 // triangulation (which is empty at
 				 // present, however).
@@ -682,7 +695,9 @@ HelmholtzProblem<dim>::HelmholtzProblem (const FiniteElement<dim> &fe,
 {}
 
 
+                                 // @sect4{HelmholtzProblem::~HelmholtzProblem}
 
+                                 // This is no different than before:
 template <int dim>
 HelmholtzProblem<dim>::~HelmholtzProblem () 
 {
@@ -690,46 +705,61 @@ HelmholtzProblem<dim>::~HelmholtzProblem ()
 }
 
 
-				 // The following function sets up the
+                                 // @sect4{HelmholtzProblem::setup_system}
+
+                                 // The following function sets up the
 				 // degrees of freedom, sizes of
 				 // matrices and vectors, etc. Most of
 				 // its functionality has been showed
 				 // in previous examples, the only
 				 // difference being the renumbering
-				 // step.
+				 // step immediately after first
+				 // distributing degrees of freedom.
+                                 //
+                                 // Renumbering the degrees of
+                                 // freedom is not overly difficult,
+                                 // as long as you use one of the
+                                 // algorithms included in the
+                                 // library. It requires only a single
+                                 // line of code. Some more information
+                                 // on this can be found in step-2.
+                                 // 
+                                 // Note, however, that when you
+                                 // renumber the degrees of freedom,
+                                 // you must do so immediately after
+                                 // distributing them, since such
+                                 // things as hanging nodes, the
+                                 // sparsity pattern etc. depend on
+                                 // the absolute numbers which are
+                                 // altered by renumbering.
+                                 //
+                                 // The reason why we introduce renumbering
+                                 // here is that it is a relatively cheap
+                                 // operation but often has a beneficial
+                                 // effect: While the CG iteration itself is
+                                 // independent of the actual ordering of
+                                 // degrees of freedom, we will use SSOR as a
+                                 // preconditioner. SSOR goes through all
+                                 // degrees of freedom and does some
+                                 // operations that depend on what happened
+                                 // before; the SSOR operation is therefore
+                                 // not independent of the numbering of
+                                 // degrees of freedom, and it is known that
+                                 // its performance improves by using
+                                 // renumbering techniques. A little
+                                 // experiment shows that indeed, for example,
+                                 // the number of CG iterations for the fifth
+                                 // refinement cycle of adaptive refinement
+                                 // with the Q1 program used here is 40
+                                 // without, but 36 with renumbering. Similar
+                                 // savings can generally be observed for all
+                                 // the computations in this program.
 template <int dim>
 void HelmholtzProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (*fe);
-				   // Renumbering the degrees of
-				   // freedom is not overly difficult,
-				   // as long as you use one of the
-				   // algorithms included in the
-				   // library. It requires just one
-				   // line of code, namely the
-				   // following:
   DoFRenumbering::Cuthill_McKee (dof_handler);
-				   // Note, however, that when you
-				   // renumber the degrees of freedom,
-				   // you must do so immediately after
-				   // distributing them, since such
-				   // things as hanging nodes, the
-				   // sparsity pattern etc. depend on
-				   // the absolute numbers which are
-				   // altered by renumbering.
-				   //
-				   // Renumbering does not serve any
-				   // specific purpose in this
-				   // example, it is done only for
-				   // exposition of the technique. To
-				   // see the effect of renumbering on
-				   // the sparsity pattern of the
-				   // matrix, refer to the second
-				   // example program.
 
-				   // The rest of the function is
-				   // almost identically taken over
-				   // from previous examples:
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
@@ -749,6 +779,7 @@ void HelmholtzProblem<dim>::setup_system ()
 }
 
 
+                                 // @sect4{HelmholtzProblem::assemble_system}
 
 				 // Assembling the system of equations
 				 // for the problem at hand is mostly
@@ -756,25 +787,34 @@ void HelmholtzProblem<dim>::setup_system ()
 				 // before. However, some things have
 				 // changed anyway, so we comment on
 				 // this function fairly extensively.
+                                 //
+                                 // At the top of the function you will find
+                                 // the usual assortment of variable
+                                 // declarations. Compared to previous
+                                 // programs, of importance is only that we
+                                 // expect to solve problems also with
+                                 // bi-quadratic elements and therefore have
+                                 // to use sufficiently accurate quadrature
+                                 // formula. In addition, we need to compute
+                                 // integrals over faces, i.e. ``dim-1''
+                                 // dimensional objects. The declaration of a
+                                 // face quadrature formula is then
+                                 // straightforward:
 template <int dim>
 void HelmholtzProblem<dim>::assemble_system () 
 {  
-				   // First we need to define objects
-				   // which will be used as quadrature
-				   // formula for domain and face
-				   // integrals.
-				   //
-				   // Note the way in which we define
-				   // a quadrature rule for the faces:
-				   // it is simply a quadrature rule
-				   // for one dimension less!
   QGauss<dim>   quadrature_formula(3);
   QGauss<dim-1> face_quadrature_formula(3);
-				   // For simpler use later on, we
-				   // alias the number of quadrature
-				   // points to local variables:
+
   const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
   const unsigned int n_face_q_points = face_quadrature_formula.n_quadrature_points;
+
+  const unsigned int dofs_per_cell = fe->dofs_per_cell;
+
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_rhs (dofs_per_cell);
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   
 				   // Then we need objects which can
 				   // evaluate the values, gradients,
@@ -791,11 +831,11 @@ void HelmholtzProblem<dim>::assemble_system ()
 				   // requires the measure of the face
 				   // in a lower-dimensional
 				   // manifold. Internally these two
-				   // classes are rooted on a common
+				   // classes are rooted in a common
 				   // base class which does most of
-				   // the work; that, however, is
-				   // something that you need not
-				   // worry about.
+				   // the work and offers the same
+				   // interface to both domain and
+				   // interface integrals.
 				   //
 				   // For the domain integrals in the
 				   // bilinear form for Helmholtz's
@@ -806,11 +846,11 @@ void HelmholtzProblem<dim>::assemble_system ()
 				   // quadrature points on the real
 				   // cell (rather than on the unit
 				   // cell) to evaluate the right hand
-				   // side function.
-  FEValues<dim>  fe_values (*fe, quadrature_formula, 
-			    update_values   | update_gradients |
-                            update_q_points | update_JxW_values);
-
+				   // side function. The object we use
+				   // to get at this information is
+				   // the ``FEValues'' class discussed
+				   // previously.
+                                   //
 				   // For the face integrals, we only
 				   // need the values of the shape
 				   // functions, as well as the
@@ -819,18 +859,16 @@ void HelmholtzProblem<dim>::assemble_system ()
 				   // the real cell since we want to
 				   // determine the Neumann values
 				   // from the exact solution object
-				   // (see below).
+				   // (see below). The class that gives
+				   // us this information is called
+				   // ``FEFaceValues'':
+  FEValues<dim>  fe_values (*fe, quadrature_formula, 
+			    update_values   | update_gradients |
+                            update_q_points | update_JxW_values);
+
   FEFaceValues<dim> fe_face_values (*fe, face_quadrature_formula, 
 				    update_values         | update_q_points  |
                                     update_normal_vectors | update_JxW_values);
-
-				   // In order to make programming
-				   // more readable below, we alias
-				   // the number of degrees of freedom
-				   // per cell to a local variable, as
-				   // already done for the number of
-				   // quadrature points above:
-  const unsigned int   dofs_per_cell = fe->dofs_per_cell;
 
 				   // Then we need some objects
 				   // already known from previous
@@ -841,38 +879,40 @@ void HelmholtzProblem<dim>::assemble_system ()
 				   // right hand side, and the indices
 				   // of the degrees of freedom on a
 				   // cell.
-  RightHandSide<dim>   right_hand_side;
-  std::vector<double>       rhs_values (n_q_points);
+                                   //
+                                   // Note that the operations we will do with
+                                   // the right hand side object are only
+                                   // querying data, never changing the
+                                   // object. We can therefore declare it
+                                   // ``const'':
+  const RightHandSide<dim> right_hand_side;
+  std::vector<double>  rhs_values (n_q_points);
 
-  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs (dofs_per_cell);
-
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-				   // Then we define an object
+				   // Finally we define an object
 				   // denoting the exact solution
 				   // function. We will use it to
 				   // compute the Neumann values at
 				   // the boundary from it. Usually,
 				   // one would of course do so using
 				   // a separate object, in particular
-				   // since the exact solution is not
-				   // known while the Neumann values
+				   // since the exact solution is generally
+				   // unknown while the Neumann values
 				   // are prescribed. We will,
 				   // however, be a little bit lazy
 				   // and use what we already have in
 				   // information. Real-life programs
 				   // would to go other ways here, of
 				   // course.
-  Solution<dim> exact_solution;
+  const Solution<dim> exact_solution;
   
 				   // Now for the main loop over all
 				   // cells. This is mostly unchanged
 				   // from previous examples, so we
 				   // only comment on the things that
 				   // have changed.
-  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-						 endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       cell_matrix = 0;
@@ -880,7 +920,8 @@ void HelmholtzProblem<dim>::assemble_system ()
 
       fe_values.reinit (cell);
 
-      right_hand_side.value_list (fe_values.get_quadrature_points(), rhs_values);
+      right_hand_side.value_list (fe_values.get_quadrature_points(),
+                                  rhs_values);
       
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -892,31 +933,24 @@ void HelmholtzProblem<dim>::assemble_system ()
 					       // now contains the
 					       // additional term from
 					       // the Helmholtz
-					       // equation, namely the
-					       // scalar products of
-					       // the two function
-					       // values, rather than
-					       // their gradients,
-					       // which is the second
-					       // term below:
+					       // equation:
 	      cell_matrix(i,j) += ((fe_values.shape_grad(i,q_point) *
-				    fe_values.shape_grad(j,q_point) *
-				    fe_values.JxW(q_point))
-				   +
-				   (fe_values.shape_value(i,q_point) *
-				    fe_values.shape_value(j,q_point) *
-				    fe_values.JxW(q_point)));
+				    fe_values.shape_grad(j,q_point)
+                                    +
+                                    fe_values.shape_value(i,q_point) *
+				    fe_values.shape_value(j,q_point)) *
+                                   fe_values.JxW(q_point));
 
 	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
 			    rhs_values [q_point] *
 			    fe_values.JxW(q_point));
-	  };
+	  }
 
 				       // Then there is that second
 				       // term on the right hand side,
 				       // the contour integral. First
 				       // we have to find out whether
-				       // the intersection of the face
+				       // the intersection of the faces
 				       // of this cell with the
 				       // boundary part Gamma2 is
 				       // nonzero. To this end, we
@@ -926,20 +960,18 @@ void HelmholtzProblem<dim>::assemble_system ()
 				       // which is the value that we
 				       // have assigned to that
 				       // portions of the boundary
-				       // composing Gamma2 in a
-				       // function further below. The
+				       // composing Gamma2 in the 
+				       // ``run()'' function further
+				       // below. (The
 				       // default value of boundary
-				       // indicators is ``0'' for
-				       // external faces, and ``255''
-				       // for internal faces (the
-				       // latter value should never be
-				       // changed, and there is also
-				       // no need to do so), so faces
+				       // indicators is ``0'', so faces
 				       // can only have an indicator
 				       // equal to ``1'' if we have
-				       // explicitly set it.
+				       // explicitly set it.)
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	if (cell->face(face)->boundary_indicator() == 1)
+	if (cell->face(face)->at_boundary()
+            &&
+            (cell->face(face)->boundary_indicator() == 1))
 	  {
 					     // If we came into here,
 					     // then we have found an
@@ -965,42 +997,39 @@ void HelmholtzProblem<dim>::assemble_system ()
 					     // integration by using a
 					     // loop over all
 					     // quadrature points.
+                                             //
+                                             // On each quadrature point, we
+                                             // first compute the value of the
+                                             // normal derivative. We do so
+                                             // using the gradient of the
+                                             // exact solution and the normal
+                                             // vector to the face at the
+                                             // present quadrature point
+                                             // obtained from the
+                                             // ``fe_face_values''
+                                             // object. This is then used to
+                                             // compute the additional
+                                             // contribution of this face to
+                                             // the right hand side:
 	    for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
 	      {
-						 // On each quadrature
-						 // point, we first
-						 // compute the value
-						 // of the normal
-						 // derivative. We do
-						 // so using the
-						 // gradient of the
-						 // exact solution and
-						 // the normal vector
-						 // to the face at the
-						 // present quadrature
-						 // point:
 		const double neumann_value
 		  = (exact_solution.gradient (fe_face_values.quadrature_point(q_point)) *
 		     fe_face_values.normal_vector(q_point));
 
-						 // Using this, we can
-						 // compute the
-						 // contribution of
-						 // this face for each
-						 // shape function:
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  cell_rhs(i) += (neumann_value *
 				  fe_face_values.shape_value(i,q_point) *
 				  fe_face_values.JxW(q_point));
-	      };
-	  };
+	      }
+	  }
 
 				       // Now that we have the
 				       // contributions of the present
 				       // cell, we can transfer it to
 				       // the global matrix and right
 				       // hand side vector, as in the
-				       // examples before.
+				       // examples before:
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
@@ -1010,24 +1039,21 @@ void HelmholtzProblem<dim>::assemble_system ()
 			       cell_matrix(i,j));
 	  
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
-	};
-    };
+	}
+    }
 
-				   // The rest of the function has
-				   // also been shown previously:
-  hanging_node_constraints.condense (system_matrix);
-  hanging_node_constraints.condense (system_rhs);
-
-				   // Only with the interpolation of
-				   // boundary values, there is one
-				   // notable thing, namely that now
+				   // Likewise, elimination and treatment of
+				   // boundary values has been shown
+				   // previously.
+                                   //
+				   // We note, however that now
 				   // the boundary indicator for which
 				   // we interpolate boundary values
 				   // (denoted by the second parameter
 				   // to
 				   // ``interpolate_boundary_values'')
 				   // does not represent the whole
-				   // boundary an more. Rather, it is
+				   // boundary any more. Rather, it is
 				   // that portion of the boundary
 				   // which we have not assigned
 				   // another indicator (see
@@ -1035,7 +1061,11 @@ void HelmholtzProblem<dim>::assemble_system ()
 				   // at the boundary that do not
 				   // belong to Gamma1 are therefore
 				   // excluded from the interpolation
-				   // of boundary values.
+				   // of boundary values, just as
+				   // we want.
+  hanging_node_constraints.condense (system_matrix);
+  hanging_node_constraints.condense (system_rhs);
+
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -1048,8 +1078,10 @@ void HelmholtzProblem<dim>::assemble_system ()
 }
 
 
-				 // Solving the system of equations is
-				 // done in the same way as before.
+                                 // @sect4{HelmholtzProblem::solve}
+
+                                 // Solving the system of equations is
+				 // done in the same way as before:
 template <int dim>
 void HelmholtzProblem<dim>::solve () 
 {
@@ -1066,44 +1098,79 @@ void HelmholtzProblem<dim>::solve ()
 }
 
 
-				 // Now for the function doing grid
+                                 // @sect4{HelmholtzProblem::refine_grid}
+
+                                 // Now for the function doing grid
 				 // refinement. Depending on the
 				 // refinement mode passed to the
 				 // constructor, we do global or
 				 // adaptive refinement.
+                                 //
+                                 // Global refinement is simple,
+                                 // so there is
+                                 // not much to comment on.
+                                 // In case of adaptive
+                                 // refinement, we use the same
+                                 // functions and classes as in
+                                 // the previous example
+                                 // program. Note that one
+                                 // could treat Neumann
+                                 // boundaries differently than
+                                 // Dirichlet boundaries, and
+                                 // one should in fact do so
+                                 // here since we have Neumann
+                                 // boundary conditions on part
+                                 // of the boundaries, but
+                                 // since we don't have a
+                                 // function here that
+                                 // describes the Neumann
+                                 // values (we only construct
+                                 // these values from the exact
+                                 // solution when assembling
+                                 // the matrix), we omit this
+                                 // detail even though they would
+                                 // not be hard to add.
+                                 //
+                                 // At the end of the switch, we have a
+                                 // default case that looks slightly strange:
+                                 // an ``Assert'' statement with a ``false''
+                                 // condition. Since the ``Assert'' macro
+                                 // raises an error whenever the condition is
+                                 // false, this means that whenever we hit
+                                 // this statement the program will be
+                                 // aborted. This in intentional: Right now we
+                                 // have only implemented two refinement
+                                 // strategies (global and adaptive), but
+                                 // someone might want to add a third strategy
+                                 // (for example adaptivity with a different
+                                 // refinement criterion) and add a third
+                                 // member to the enumeration that determines
+                                 // the refinement mode. If it weren't for the
+                                 // default case of the switch statement, this
+                                 // function would simply run to its end
+                                 // without doing anything. This is most
+                                 // likely not what was intended. One of the
+                                 // defensive programming techniques that you
+                                 // will find all over the deal.II library is
+                                 // therefore to always have default cases
+                                 // that abort, to make sure that values not
+                                 // considered when listing the cases in the
+                                 // switch statement are eventually caught,
+                                 // and forcing programmers to add code to
+                                 // handle them. We will use this same
+                                 // technique in other places further down as
+                                 // well.
 template <int dim>
 void HelmholtzProblem<dim>::refine_grid ()
 {
   switch (refinement_mode) 
     {
-				       // If global refinement is
-				       // required, this is simple:
       case global_refinement:
       {
 	triangulation.refine_global (1);
 	break;
-      };
+      }
 
-                                       // In case of adaptive
-                                       // refinement, we use the same
-                                       // functions and classes as in
-                                       // the previous example
-                                       // program. Note that one
-                                       // could treat Neumann
-                                       // boundaries differently than
-                                       // Dirichlet boundaries, and
-                                       // one should in fact do so
-                                       // here since we have Neumann
-                                       // boundary conditions on part
-                                       // of the boundaries, but
-                                       // since we don't have a
-                                       // function here that
-                                       // describes the Neumann
-                                       // values (we only construct
-                                       // these values from the exact
-                                       // solution when assembling
-                                       // the matrix), we omit this
-                                       // detail here.
       case adaptive_refinement:
       {
 	Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
@@ -1122,24 +1189,30 @@ void HelmholtzProblem<dim>::refine_grid ()
 	triangulation.execute_coarsening_and_refinement ();
 
 	break;
-      };
-    };
+      }
+
+      default:
+      {
+        Assert (false, ExcNotImplemented());
+      }
+    }
 }
 
 
+                                 // @sect4{HelmholtzProblem::process_solution}
 
-				 // Finally process the solution after
-				 // it has been computed. For this, we
-				 // integrate the error in various
-				 // norms, and we generate tables that
-				 // will be later used to display the
-				 // convergence against the continuous
-				 // solution in a nice format.
+				 // Finally we want to process the solution
+				 // after it has been computed. For this, we
+				 // integrate the error in various norms, and
+				 // we generate tables that will later be used
+				 // to display the convergence against the
+				 // continuous solution in a nice format.
 template <int dim>
 void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 {
-				   // In order to integrate the
-				   // difference between computed
+				   // Our first task is to compute
+				   // error norms. In order to integrate
+				   // the difference between computed
 				   // numerical solution and the
 				   // continuous solution (described
 				   // by the ``Solution'' class
@@ -1152,12 +1225,11 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // quantities, we save some memory
 				   // by using ``float'' instead of
 				   // ``double'' values.
-  Vector<float> difference_per_cell (triangulation.n_active_cells());
-
-				   // Next we use a function from the
-				   // library which computes the error
-				   // in the L2 norm on each cell. We
-				   // have to pass it the DoF handler
+                                   //
+				   // The next step is to use a function
+				   // from the library which computes the
+				   // error in the L2 norm on each cell.
+				   // We have to pass it the DoF handler
 				   // object, the vector holding the
 				   // nodal values of the numerical
 				   // solution, the continuous
@@ -1171,12 +1243,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // formula with three points in
 				   // each space direction, and
 				   // compute the L2 norm.
-  VectorTools::integrate_difference (dof_handler,
-				     solution,
-				     Solution<dim>(),
-				     difference_per_cell,
-				     QGauss<dim>(3),
-				     VectorTools::L2_norm);
+                                   //
 				   // Finally, we want to get the
 				   // global L2 norm. This can of
 				   // course be obtained by summing
@@ -1185,11 +1252,21 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // of that value. This is
 				   // equivalent to taking the l2
 				   // (lower case ``l'') norm of the
-				   // vector of norms on each cell:
+				   // vector of norms on each cell:  
+  Vector<float> difference_per_cell (triangulation.n_active_cells());
+  VectorTools::integrate_difference (dof_handler,
+				     solution,
+				     Solution<dim>(),
+				     difference_per_cell,
+				     QGauss<dim>(3),
+				     VectorTools::L2_norm);
   const double L2_error = difference_per_cell.l2_norm();
 
-				   // The same procedure is done to
-				   // get the H1 semi-norm:
+				   // By same procedure we get the H1
+				   // semi-norm. We re-use the
+				   // ``difference_per_cell'' vector since it
+				   // is no longer used after computing the
+				   // ``L2_error'' variable above.
   VectorTools::integrate_difference (dof_handler,
 				     solution,
 				     Solution<dim>(),
@@ -1200,10 +1277,10 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 
 				   // Finally, we compute the maximum
 				   // norm. Of course, we can't
-				   // actually use the true maximum,
+				   // actually compute the true maximum,
 				   // but only the maximum at the
 				   // quadrature points. Since this
-				   // quite sensitively depends on the
+				   // depends quite sensitively on the
 				   // quadrature rule being used, and
 				   // since we would like to avoid
 				   // false results due to
@@ -1219,27 +1296,40 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // that tells it how often it shall
 				   // use this rule in each space
 				   // direction.
-  QTrapez<1>     q_trapez;
-  QIterated<dim> q_iterated (q_trapez, 5);
-
-				   // Using this special quadrature
-				   // rule, we can now try to find the
-				   // maximal error on each cell:
+                                   //
+  				   // Using this special quadrature rule, we
+				   // can then try to find the maximal error
+				   // on each cell. Finally, we compute the
+				   // global L infinity error from the L
+				   // infinite errors on each cell. Instead of
+				   // summing squares, we now have to take the
+				   // maximum value over all cell-wise
+				   // entries, an operation that is
+				   // conveniently done using the
+				   // ``Vector<float>::linfty'' function:
+  const QTrapez<1>     q_trapez;
+  const QIterated<dim> q_iterated (q_trapez, 5);
   VectorTools::integrate_difference (dof_handler,
 				     solution,
 				     Solution<dim>(),
 				     difference_per_cell,
 				     q_iterated,
 				     VectorTools::Linfty_norm);
-				   // Obviously, the maximal error
-				   // globally is the maximum over the
-				   // maximal errors on each cell:
   const double Linfty_error = difference_per_cell.linfty_norm();
 
 				   // After all these errors have been
 				   // computed, we finally write some
-				   // output and put all the data into
-				   // a table.
+				   // output. In addition, we add the
+				   // important data to the
+				   // ``TableHandler'' by specifying
+				   // the key of the column and the value.
+				   // Note that it is not necessary to
+				   // define column keys beforehand -- it is
+				   // sufficient to just add values,
+				   // and columns will be
+				   // introduced into the table in the
+				   // order values are added the
+				   // first time.
   const unsigned int n_active_cells=triangulation.n_active_cells();
   const unsigned int n_dofs=dof_handler.n_dofs();
   
@@ -1252,180 +1342,109 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 	    << n_dofs
 	    << std::endl;
 
-				   // Add the important data to the
-				   // ``TableHandler'' by giving the key
-				   // of the column and the value.
-				   // You don't need to define the keys
-				   // beforehand, just add the values,
-				   // and the column will be
-				   // introduced into the table in the
-				   // order the values are added the
-				   // first time.
   convergence_table.add_value("cycle", cycle);
   convergence_table.add_value("cells", n_active_cells);
   convergence_table.add_value("dofs", n_dofs);
   convergence_table.add_value("L2", L2_error);
   convergence_table.add_value("H1", H1_error);
   convergence_table.add_value("Linfty", Linfty_error);
-				   // You may set the precision with
-				   // which the values will be written
-				   // upon output.
-  convergence_table.set_precision("L2", 3);
-  convergence_table.set_precision("H1", 3);
-  convergence_table.set_precision("Linfty", 3);
-				   // The default notation is fixed
-				   // point. For the columns you'd
-				   // like to see in scientific notation
-				   // set the `scientific_flag' `true'
-				   // by the following lines:
-  convergence_table.set_scientific("L2", true);
-  convergence_table.set_scientific("H1", true);
-  convergence_table.set_scientific("Linfty", true);
-				   // For the output of a table into a
-				   // LaTeX file, the default captions of
-				   // the columns are the keys given
-				   // as argument to the ``add_value''
-				   // functions.  If you'd like to
-				   // have TeX captions that differ
-				   // from the default ones you can
-				   // specify them by the following.
-  convergence_table.set_tex_caption("cells", "\\# cells");
-  convergence_table.set_tex_caption("dofs", "\\# dofs");
-  convergence_table.set_tex_caption("L2", "$L^2$-error");
-  convergence_table.set_tex_caption("H1", "$H^1$-error");
-  convergence_table.set_tex_caption("Linfty", "$L^\\infty$-error");
-				   // Note, that `\\' is reduced to
-				   // `\' by the compiler such that the
-				   // real TeX caption is e.g.
-				   // `$L^\infty$-error'.
-				   //
-				   // The default TeX format of each
-				   // column of the table is `c'
-				   // (centered). To specify a
-				   // different (e.g. `right') one,
-				   // the following function may be
-				   // used:
-  convergence_table.set_tex_format("cells", "r");
-  convergence_table.set_tex_format("dofs", "r");
 }
 
 
+                                 // @sect4{HelmholtzProblem::run}
 
-				 // The following function is the main
-				 // one which controls the flow of
-				 // execution. The basic layout is as
-				 // in previous examples: an outer
-				 // loop over successively refined
-				 // grids, and in this loop first
-				 // problem setup, assemblage of the
+				 // As in previous example programs, the
+				 // ``run'' function controls controls the
+				 // flow of execution. The basic layout is as
+				 // in previous examples: an outer loop over
+				 // successively refined grids, and in this
+				 // loop first problem setup, assembling the
 				 // linear system, solution, and
 				 // post-processing.
+                                 //
+                                 // The first task in the main loop is
+                                 // creation and refinement of grids. This is
+                                 // as in previous examples, with the only
+                                 // difference that we want to have part of
+                                 // the boundary marked as Neumann type,
+                                 // rather than Dirichlet.
+                                 // 
+                                 // For this, we will use the following
+                                 // convention: Faces belonging to Gamma1 will
+                                 // have the boundary indicator ``0'' (which
+                                 // is the default, so we don't have to set it
+                                 // explicitely), and faces belonging to
+                                 // Gamma2 will use ``1'' as boundary
+                                 // indicator.  To set these values, we loop
+                                 // over all cells, then over all faces of a
+                                 // given cell, check whether it is part of
+                                 // the boundary that we want to denote by
+                                 // Gamma2, and if so set its boundary
+                                 // indicator to ``1''. For the present
+                                 // program, we consider the left and bottom
+                                 // boundaries as Gamma2. We determine whether
+                                 // a face is part of that boundary by asking
+                                 // whether the x or y coordinates
+                                 // (i.e. vector components 0 and 1) of the
+                                 // midpoint of a face equals -1.
+                                 //
+                                 // It is worth noting that
+                                 // we have to loop over all
+                                 // cells here, not only the
+                                 // active ones. The reason
+                                 // is that upon refinement,
+                                 // newly created faces
+                                 // inherit the boundary
+                                 // indicator of their
+                                 // parent face. If we now
+                                 // only set the boundary
+                                 // indicator for active
+                                 // faces, coarsen some
+                                 // cells and refine them
+                                 // later on, they will
+                                 // again have the boundary
+                                 // indicator of the parent
+                                 // cell which we have not
+                                 // modified, instead of the
+                                 // one we
+                                 // intended. Consequently, we
+                                 // have to change the
+                                 // boundary indicators of
+                                 // faces of all cells on Gamma2,
+                                 // whether they are active or not.
+                                 // Alternatively, we could of
+                                 // course have done this job on
+                                 // the coarsest mesh (i.e. before
+                                 // the first refinement step) and
+                                 // refined the mesh only after that.
 template <int dim>
 void HelmholtzProblem<dim>::run () 
 {
   for (unsigned int cycle=0; cycle<7; ++cycle)
     {
-				       // The first action in each
-				       // iteration of the outer loop
-				       // is setting up the grid on
-				       // which we will solve in this
-				       // iteration. In the first
-				       // iteration, the coarsest grid
-				       // is generated, in later
-				       // iterations it is refined,
-				       // for which we call the
-				       // ``refine_grid'' function.
       if (cycle == 0)
 	{
-					   // Setting up the coarse
-					   // grid is done as in
-					   // previous examples: we
-					   // first create an initial
-					   // grid, which is the unit
-					   // square [-1,1]x[-1,1] in
-					   // the present case. Then
-					   // we refine it globally a
-					   // specific number of
-					   // times.
 	  GridGenerator::hyper_cube (triangulation, -1, 1);
 	  triangulation.refine_global (1);
 
-					   // However, here we have to
-					   // do something else in
-					   // addition: mark those
-					   // faces that belong to the
-					   // different components of
-					   // the boundary, Gamma1 and
-					   // Gamma2. We will use the
-					   // following convention:
-					   // Faces belonging to
-					   // Gamma1 will have the
-					   // boundary indicator ``0''
-					   // (which is the default,
-					   // so we don't have to set
-					   // it explicitely), and
-					   // faces belonging to
-					   // Gamma2 will use ``1'' as
-					   // boundary indicator.
-					   //
-					   // To set these values, we
-					   // loop over all cells,
-					   // then over all faces of a
-					   // given cell, check
-					   // whether it belongs to
-					   // the boundary Gamma2, and
-					   // if so set its boundary
-					   // indicator to ``1''.
-					   //
-					   // It is worth noting that
-					   // we have to loop over all
-					   // cells here, not only the
-					   // active ones. The reason
-					   // is that upon refinement,
-					   // newly created faces
-					   // inherit the boundary
-					   // indicator of their
-					   // parent face. If we now
-					   // only set the boundary
-					   // indicator for active
-					   // faces, coarsen some
-					   // cells and refine them
-					   // later on, they will
-					   // again have the boundary
-					   // indicator of the parent
-					   // cell which we have not
-					   // modified, instead of the
-					   // one we
-					   // intended. Therefore, we
-					   // have to change the
-					   // boundary indicators of
-					   // all faces on Gamma2,
-					   // irrespective whether
-					   // they are active or not.
-	  typename Triangulation<dim>::cell_iterator cell = triangulation.begin (),
-						     endc = triangulation.end();
+          typename Triangulation<dim>::cell_iterator
+            cell = triangulation.begin (),
+            endc = triangulation.end();
 	  for (; cell!=endc; ++cell)
-	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	    for (unsigned int face=0;
+                 face<GeometryInfo<dim>::faces_per_cell;
+                 ++face)
 	      if ((cell->face(face)->center()(0) == -1)
 		  ||
 		  (cell->face(face)->center()(1) == -1))
 		cell->face(face)->set_boundary_indicator (1);
 	}
       else
-	{
-					   // If this is not the first
-					   // step, the we call
-					   // ``refine_grid'' to
-					   // actually refine the grid
-					   // according to the
-					   // refinement mode passed to
-					   // the constructor.
-	  refine_grid ();
-	};
+        refine_grid ();
       
 
-				       // The next steps you already
-				       // know from previous
+				       // The next steps are already
+				       // known from previous
 				       // examples. This is mostly the
 				       // basic set-up of every finite
 				       // element program:
@@ -1436,100 +1455,87 @@ void HelmholtzProblem<dim>::run ()
 
 				       // The last step in this chain
 				       // of function calls is usually
-				       // evaluation of the computed
+				       // the evaluation of the computed
 				       // solution for the quantities
 				       // one is interested in. This
 				       // is done in the following
-				       // function. We pass the number
-				       // of the loop iteration since
-				       // that might be of interest to
-				       // see in the logs which this
-				       // function produces.
+				       // function. Since the function
+				       // generates output that indicates
+				       // the number of the present
+				       // refinement step, we pass this
+				       // number as an argument.
       process_solution (cycle);
-    };
+    }
   
-				   // After the last iteration we
-				   // output the solution on the
-				   // finest grid. This is done using
-				   // the following sequence of
-				   // statements which you have
-				   // already seen in previous
-				   // examples:
-  std::string filename;
+				   // After the last iteration we output the
+				   // solution on the finest grid. This is
+				   // done using the following sequence of
+				   // statements which we have already
+				   // discussed in previous examples. The
+				   // first step is to generate a suitable
+				   // filename (called ``gmv_filename'' here,
+				   // since we want to output data in GMV
+				   // format; we add the prefix to distinguish
+				   // the filename from that used for other
+				   // output files further down below). Here,
+				   // we augment the name by the mesh
+				   // refinement algorithm, and as above we
+				   // make sure that we abort the program if
+				   // another refinement method is added and
+				   // not handled by the following switch
+				   // statement:
+  std::string gmv_filename;
   switch (refinement_mode)
     {
       case global_refinement:
-	    filename = "solution-global";
+	    gmv_filename = "solution-global";
 	    break;
       case adaptive_refinement:
-	    filename = "solution-adaptive";
+	    gmv_filename = "solution-adaptive";
 	    break;
       default:
-	    Assert (false, ExcInternalError());
-    };
+	    Assert (false, ExcNotImplemented());
+    }
 
-				   // We augment the filename by a
-				   // postfix denoting the finite
-				   // element which we have used in
-				   // the computation. Finding out
-				   // which finite element we are
-				   // actually using is not that
-				   // simple here, since we only have
-				   // a pointer to the common base
-				   // class of all finite elements,
-				   // which does not know anything
-				   // about polynomial
-				   // degrees. However, we actually
-				   // know that we have generated a
-				   // finite element of class
-				   // ``FE_Q'', so we can use some C++
-				   // feature to actually get a
-				   // reference to the ``FE_Q''
-				   // element pointed to by the
-				   // reference and ask it for the
-				   // polynomial degree. Note that if
-				   // for whatever reason the object
-				   // referenced behind the pointer to
-				   // the base class should not be of
-				   // type ``FE_Q'', then the C++
-				   // language lets the
-				   // ``dynamic_cast'' operator
-				   // applied to a reference type
-				   // throw an exception (if it were a
-				   // pointer type, then a null
-				   // pointer would be returned, which
-				   // would then yield a segmentation
-				   // fault when dereferenced in the
-				   // subsequent call to
-				   // ``get_order'').
-  switch (dynamic_cast<const FE_Q<dim>&>(*fe).get_degree())
+				   // We augment the filename by a postfix
+				   // denoting the finite element which we
+				   // have used in the computation. To this
+				   // end, the finite element base class
+				   // stores the maximal polynomial degree of
+				   // shape functions in each coordinate
+				   // variable as a variable ``degree'', and
+				   // we use for the switch statement (note
+				   // that the polynomial degree of bilinear
+				   // shape functions is really 2, since they
+				   // contain the term ``x*y''; however, the
+				   // polynomial degree in each coordinate
+				   // variable is still only 1). We again use
+				   // the same defensive programming technique
+				   // to safeguard against the case that the
+				   // polynomial degree has an unexpected
+				   // value, using the ``Assert (false,
+				   // ExcNotImplemented())'' idiom in the
+				   // default branch of the switch statement:
+  switch (fe->degree)
     {
       case 1:
-	    filename += "-q1";
+	    gmv_filename += "-q1";
 	    break;
       case 2:
-	    filename += "-q2";
+	    gmv_filename += "-q2";
 	    break;
 
       default:
-                                             // The finite element is
-                                             // neither Q1 nor Q2. This
-                                             // should not have happened,
-                                             // but maybe someone has tried
-                                             // to change this in ``main'',
-                                             // so it might happen. We catch
-                                             // this case and throw an
-                                             // exception, since we don't
-                                             // know how to name the
-                                             // respective output file
-	    Assert (false, ExcInternalError());
-    };
-  
-    
-  filename += ".gmv";
-	    
-  std::ofstream output (filename.c_str());
+	    Assert (false, ExcNotImplemented());
+    }
 
+                                   // Once we have the base name for the
+                                   // output file, we add an extension
+                                   // appropriate for GMV output, open a file,
+                                   // and add the solution vector to the
+                                   // object that will do the actual output:
+  gmv_filename += ".gmv";    
+  std::ofstream output (gmv_filename.c_str());
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
@@ -1547,8 +1553,8 @@ void HelmholtzProblem<dim>::run ()
 				   // all output formats only support
 				   // bilinear data, the data is
 				   // written only bilinear, and
-				   // information is lost
-				   // therefore. Of course, we can't
+				   // information is consequently lost.
+				   // Of course, we can't
 				   // change the format in which
 				   // graphic programs accept their
 				   // inputs, but we can write the
@@ -1590,67 +1596,120 @@ void HelmholtzProblem<dim>::run ()
 				   // ``q'' subdivisions, and the
 				   // order of the elements is
 				   // determined in the same way as
-				   // above in the ``run'' function:
-  const unsigned int
-    n_subcells = dynamic_cast<const FE_Q<dim>&>(*fe).get_degree();
-  data_out.build_patches (n_subcells);
-
-				   // Finally write out the data in
-				   // GMV format.
+				   // above.
+				   //
+				   // With the intermediate format
+                                   // so generated, we can then actually
+                                   // write the graphical output in GMV
+                                   // format:
+  data_out.build_patches (fe->degree);
   data_out.write_gmv (output);
 
-				   // In each cycle values were added
-				   // to the TableHandler. Now write
-				   // the table to the standard output
-				   // stream `std::cout'. Note, that the
-				   // output in text format is a quite
-				   // simple one and the captions may
-				   // not be printed directly above
-				   // the specific columns.
-  convergence_table.write_text(std::cout);
-				   // The table can also be written
-				   // into a Tex file.  The (nicely)
-				   // formatted table can be viewed at
-				   // after calling `latex filename'
-				   // and e.g. `xdvi filename', where
-				   // filename is the name of the file
-				   // which we construct from the name
-				   // of the finite element and the
-				   // refinement mode, as above
-  if (true)
-    {
-      std::string filename = "error";
-      switch (refinement_mode)
-	{
-	  case global_refinement:
-		filename += "-global";
-		break;
-	  case adaptive_refinement:
-		filename += "-adaptive";
-		break;
-	  default:
-		Assert (false, ExcInternalError());
-	};
-
-      switch (dynamic_cast<const FE_Q<dim>&>(*fe).get_degree())
-	{
-	  case 1:
-		filename += "-q1";
-		break;
-	  case 2:
-		filename += "-q2";
-		break;
-	  default:
-		Assert (false, ExcInternalError());
-	};
+                                   // After graphical output, we would also
+                                   // like to generate tables from the error
+                                   // computations we have done in
+                                   // ``process_solution''. There, we have
+                                   // filled a table object with the number of
+                                   // cells for each refinement step as well
+                                   // as the errors in different norms.
   
-      filename += ".tex";
-      
-      std::ofstream table_file(filename.c_str());
-      convergence_table.write_tex(table_file);
-      table_file.close();
+				   // For a nicer textual output of this data,
+				   // one may want to set the precision with
+				   // which the values will be written upon
+				   // output. We use 3 digits for this, which
+				   // is usually sufficient for error
+				   // norms. By default, data is written in
+				   // fixed point notation. However, for
+				   // columns one would like to see in
+				   // scientific notation another function
+				   // call sets the `scientific_flag' to
+				   // `true', leading to floating point
+				   // representation of numbers.
+  convergence_table.set_precision("L2", 3);
+  convergence_table.set_precision("H1", 3);
+  convergence_table.set_precision("Linfty", 3);
+
+  convergence_table.set_scientific("L2", true);
+  convergence_table.set_scientific("H1", true);
+  convergence_table.set_scientific("Linfty", true);
+
+  				   // For the output of a table into a LaTeX
+				   // file, the default captions of the
+				   // columns are the keys given as argument
+				   // to the ``add_value'' functions. To have
+				   // TeX captions that differ from the
+				   // default ones you can specify them by the
+				   // following function calls.
+				   // Note, that `\\' is reduced to
+				   // `\' by the compiler such that the
+				   // real TeX caption is, e.g.,
+				   // `$L^\infty$-error'.
+  convergence_table.set_tex_caption("cells", "\\# cells");
+  convergence_table.set_tex_caption("dofs", "\\# dofs");
+  convergence_table.set_tex_caption("L2", "$L^2$-error");
+  convergence_table.set_tex_caption("H1", "$H^1$-error");
+  convergence_table.set_tex_caption("Linfty", "$L^\\infty$-error");
+
+				   // Finally, the default LaTeX format for
+				   // each column of the table is `c'
+				   // (centered). To specify a different
+				   // (e.g. `right') one, the following
+				   // function may be used:
+  convergence_table.set_tex_format("cells", "r");
+  convergence_table.set_tex_format("dofs", "r");
+
+  				   // After this, we can finally write the
+				   // table to the standard output stream
+				   // ``std::cout'' (after one extra empty
+				   // line, to make things look
+				   // prettier). Note, that the output in text
+				   // format is quite simple and that
+				   // captions may not be printed directly
+				   // above the specific columns.
+  std::cout << std::endl;
+  convergence_table.write_text(std::cout);
+  
+				   // The table can also be written into a
+				   // LaTeX file.  The (nicely) formatted
+				   // table can be viewed at after calling
+				   // `latex filename' and e.g. `xdvi
+				   // filename', where filename is the name of
+				   // the file to which we will write output
+				   // now. We construct its name in the same
+				   // way as before, but with a different
+				   // prefix "error":
+  std::string error_filename = "error";
+  switch (refinement_mode)
+    {
+      case global_refinement:
+            error_filename += "-global";
+            break;
+      case adaptive_refinement:
+            error_filename += "-adaptive";
+            break;
+      default:
+            Assert (false, ExcNotImplemented());
     }
-				   // In case you want the same
+
+  switch (fe->degree)
+    {
+      case 1:
+            error_filename += "-q1";
+            break;
+      case 2:
+            error_filename += "-q2";
+            break;
+      default:
+            Assert (false, ExcNotImplemented());
+    }
+  
+  error_filename += ".tex";
+  std::ofstream error_table_file(error_filename.c_str());
+  
+  convergence_table.write_tex(error_table_file);
+
+  
+  				   // In case you want the same
 				   // caption for several columns, you
 				   // can merge some columns to a
 				   // super column by
@@ -1731,9 +1790,9 @@ void HelmholtzProblem<dim>::run ()
 		filename += "-adaptive";
 		break;
 	  default:
-		Assert (false, ExcInternalError());
-	};
-      switch (dynamic_cast<const FE_Q<dim>&>(*fe).get_degree())
+		Assert (false, ExcNotImplemented());
+	}
+      switch (fe->degree)
 	{
 	  case 1:
 		filename += "-q1";
@@ -1742,8 +1801,8 @@ void HelmholtzProblem<dim>::run ()
 		filename += "-q2";
 		break;
 	  default:
-		Assert (false, ExcInternalError());
-	};
+		Assert (false, ExcNotImplemented());
+	}
       filename += ".tex";
 
       std::ofstream table_file(filename.c_str());
@@ -1802,7 +1861,7 @@ int main ()
 	helmholtz_problem_2d.run ();
 
 	std::cout << std::endl;
-      };
+      }
 	
       {
 	std::cout << "Solving with Q1 elements, global refinement" << std::endl
@@ -1814,7 +1873,7 @@ int main ()
 	helmholtz_problem_2d.run ();
 
 	std::cout << std::endl;
-      };
+      }
        
       {
 	std::cout << "Solving with Q2 elements, global refinement" << std::endl
@@ -1826,7 +1885,7 @@ int main ()
 	helmholtz_problem_2d.run ();
 
 	std::cout << std::endl;
-      };
+      }
        
     }
   catch (std::exception &exc)
@@ -1851,7 +1910,7 @@ int main ()
 		<< "----------------------------------------------------"
 		<< std::endl;
       return 1;
-    };
+    }
 
   return 0;
 }
