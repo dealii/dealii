@@ -275,7 +275,9 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // ``Subscriptor''/``SmartPointer''
 				 // class pair is used for, in case
 				 // you want something like this for
-				 // your own programs). The finite
+				 // your own programs; see step-7 for
+				 // a more complete discussion
+				 // of this topic). The finite
 				 // element object will refuse its
 				 // destruction if that counter is
 				 // larger than zero, since then some
