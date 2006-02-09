@@ -803,7 +803,7 @@ class DoFTools
     extract_dofs (const DoFHandler<dim>   &dof_handler,
 		  const std::vector<bool> &select,
 		  std::vector<bool>       &selected_dofs,
-		  bool blocks = false);
+		  const bool               blocks = false);
 
 				     /**
 				      * Do the same thing as
@@ -816,7 +816,7 @@ class DoFTools
 			const MGDoFHandler<dim> &dof,
 			const std::vector<bool> &select,
 			std::vector<bool>       &selected_dofs,
-			bool blocks = false);
+			const bool               blocks = false);
 
 				     /**
 				      * Extract all degrees of freedom

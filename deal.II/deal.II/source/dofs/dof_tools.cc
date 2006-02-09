@@ -1736,11 +1736,11 @@ DoFTools::extract_dofs (
   const DoFHandler<dim>   &dof,
   const std::vector<bool> &component_select,
   std::vector<bool>       &selected_dofs,
-  bool count_by_blocks)
+  const bool               count_by_blocks)
 {
   const FiniteElement<dim> &fe = dof.get_fe();
   
-  if (count_by_blocks)
+  if (count_by_blocks == true)
     {
       Assert(component_select.size() == fe.n_blocks(),
 	     ExcDimensionMismatch(component_select.size(), fe.n_blocks()));
@@ -1781,7 +1781,7 @@ DoFTools::extract_dofs (
                                    // something interesting or not
   std::vector<bool> local_selected_dofs (fe.dofs_per_cell, false);
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    if (count_by_blocks)
+    if (count_by_blocks == true)
       local_selected_dofs[i]
         = component_select[fe.system_to_block_index(i).first];
     else
@@ -1850,11 +1850,11 @@ DoFTools::extract_level_dofs(
   const MGDoFHandler<dim> &dof,
   const std::vector<bool> &component_select,
   std::vector<bool>       &selected_dofs,
-  bool count_by_blocks)
+  const bool               count_by_blocks)
 {
   const FiniteElement<dim>& fe = dof.get_fe();
   
-  if (count_by_blocks)
+  if (count_by_blocks == true)
     {
       Assert(component_select.size() == fe.n_blocks(),
 	     ExcDimensionMismatch(component_select.size(), fe.n_blocks()));
@@ -1894,7 +1894,7 @@ DoFTools::extract_level_dofs(
                                    // something interesting or not
   std::vector<bool> local_selected_dofs (fe.dofs_per_cell, false);
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    if (count_by_blocks)
+    if (count_by_blocks == true)
       local_selected_dofs[i]
         = component_select[fe.system_to_block_index(i).first];
     else
