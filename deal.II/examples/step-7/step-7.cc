@@ -1353,70 +1353,69 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 
                                  // @sect4{HelmholtzProblem::run}
 
-				 // As in previous example programs, the
-				 // ``run'' function controls controls the
-				 // flow of execution. The basic layout is as
-				 // in previous examples: an outer loop over
-				 // successively refined grids, and in this
-				 // loop first problem setup, assembling the
-				 // linear system, solution, and
+				 // As in previous example programs,
+				 // the ``run'' function controls the
+				 // flow of execution. The basic
+				 // layout is as in previous examples:
+				 // an outer loop over successively
+				 // refined grids, and in this loop
+				 // first problem setup, assembling
+				 // the linear system, solution, and
 				 // post-processing.
                                  //
                                  // The first task in the main loop is
-                                 // creation and refinement of grids. This is
-                                 // as in previous examples, with the only
-                                 // difference that we want to have part of
-                                 // the boundary marked as Neumann type,
+                                 // creation and refinement of
+                                 // grids. This is as in previous
+                                 // examples, with the only difference
+                                 // that we want to have part of the
+                                 // boundary marked as Neumann type,
                                  // rather than Dirichlet.
                                  // 
-                                 // For this, we will use the following
-                                 // convention: Faces belonging to Gamma1 will
-                                 // have the boundary indicator ``0'' (which
-                                 // is the default, so we don't have to set it
-                                 // explicitely), and faces belonging to
-                                 // Gamma2 will use ``1'' as boundary
-                                 // indicator.  To set these values, we loop
-                                 // over all cells, then over all faces of a
-                                 // given cell, check whether it is part of
-                                 // the boundary that we want to denote by
-                                 // Gamma2, and if so set its boundary
-                                 // indicator to ``1''. For the present
-                                 // program, we consider the left and bottom
-                                 // boundaries as Gamma2. We determine whether
-                                 // a face is part of that boundary by asking
-                                 // whether the x or y coordinates
-                                 // (i.e. vector components 0 and 1) of the
+                                 // For this, we will use the
+                                 // following convention: Faces
+                                 // belonging to Gamma1 will have the
+                                 // boundary indicator ``0'' (which is
+                                 // the default, so we don't have to
+                                 // set it explicitely), and faces
+                                 // belonging to Gamma2 will use ``1''
+                                 // as boundary indicator.  To set
+                                 // these values, we loop over all
+                                 // cells, then over all faces of a
+                                 // given cell, check whether it is
+                                 // part of the boundary that we want
+                                 // to denote by Gamma2, and if so set
+                                 // its boundary indicator to
+                                 // ``1''. For the present program, we
+                                 // consider the left and bottom
+                                 // boundaries as Gamma2. We determine
+                                 // whether a face is part of that
+                                 // boundary by asking whether the x
+                                 // or y coordinates (i.e. vector
+                                 // components 0 and 1) of the
                                  // midpoint of a face equals -1.
                                  //
-                                 // It is worth noting that
-                                 // we have to loop over all
-                                 // cells here, not only the
-                                 // active ones. The reason
-                                 // is that upon refinement,
-                                 // newly created faces
-                                 // inherit the boundary
-                                 // indicator of their
-                                 // parent face. If we now
-                                 // only set the boundary
-                                 // indicator for active
-                                 // faces, coarsen some
-                                 // cells and refine them
-                                 // later on, they will
-                                 // again have the boundary
-                                 // indicator of the parent
-                                 // cell which we have not
-                                 // modified, instead of the
-                                 // one we
-                                 // intended. Consequently, we
-                                 // have to change the
-                                 // boundary indicators of
+                                 // It is worth noting that we have to
+                                 // loop over all cells here, not only
+                                 // the active ones. The reason is
+                                 // that upon refinement, newly
+                                 // created faces inherit the boundary
+                                 // indicator of their parent face. If
+                                 // we now only set the boundary
+                                 // indicator for active faces,
+                                 // coarsen some cells and refine them
+                                 // later on, they will again have the
+                                 // boundary indicator of the parent
+                                 // cell which we have not modified,
+                                 // instead of the one we
+                                 // intended. Consequently, we have to
+                                 // change the boundary indicators of
                                  // faces of all cells on Gamma2,
                                  // whether they are active or not.
-                                 // Alternatively, we could of
-                                 // course have done this job on
-                                 // the coarsest mesh (i.e. before
-                                 // the first refinement step) and
-                                 // refined the mesh only after that.
+                                 // Alternatively, we could of course
+                                 // have done this job on the coarsest
+                                 // mesh (i.e. before the first
+                                 // refinement step) and refined the
+                                 // mesh only after that.
 template <int dim>
 void HelmholtzProblem<dim>::run () 
 {
@@ -1466,6 +1465,8 @@ void HelmholtzProblem<dim>::run ()
 				       // number as an argument.
       process_solution (cycle);
     }
+  
+				   // @sect5{Output of graphical data}
   
 				   // After the last iteration we output the
 				   // solution on the finest grid. This is
@@ -1605,6 +1606,8 @@ void HelmholtzProblem<dim>::run ()
   data_out.build_patches (fe->degree);
   data_out.write_gmv (output);
 
+				   // @sect5{Output of convergence tables}
+  
                                    // After graphical output, we would also
                                    // like to generate tables from the error
                                    // computations we have done in
@@ -1622,8 +1625,8 @@ void HelmholtzProblem<dim>::run ()
 				   // fixed point notation. However, for
 				   // columns one would like to see in
 				   // scientific notation another function
-				   // call sets the `scientific_flag' to
-				   // `true', leading to floating point
+				   // call sets the ``scientific_flag'' to
+				   // ``true'', leading to floating point
 				   // representation of numbers.
   convergence_table.set_precision("L2", 3);
   convergence_table.set_precision("H1", 3);
@@ -1669,15 +1672,16 @@ void HelmholtzProblem<dim>::run ()
   std::cout << std::endl;
   convergence_table.write_text(std::cout);
   
-				   // The table can also be written into a
-				   // LaTeX file.  The (nicely) formatted
-				   // table can be viewed at after calling
-				   // `latex filename' and e.g. `xdvi
-				   // filename', where filename is the name of
-				   // the file to which we will write output
-				   // now. We construct its name in the same
-				   // way as before, but with a different
-				   // prefix "error":
+				   // The table can also be written
+				   // into a LaTeX file.  The (nicely)
+				   // formatted table can be viewed at
+				   // after calling `latex filename'
+				   // and e.g. `xdvi filename', where
+				   // filename is the name of the file
+				   // to which we will write output
+				   // now. We construct the file name
+				   // in the same way as before, but
+				   // with a different prefix "error":
   std::string error_filename = "error";
   switch (refinement_mode)
     {
@@ -1709,28 +1713,7 @@ void HelmholtzProblem<dim>::run ()
   convergence_table.write_tex(error_table_file);
 
   
-  				   // In case you want the same
-				   // caption for several columns, you
-				   // can merge some columns to a
-				   // super column by
-  convergence_table.add_column_to_supercolumn("cycle", "n cells");
-  convergence_table.add_column_to_supercolumn("cells", "n cells");
-				   // You don't always need to output
-				   // all columns. Also you don't need
-				   // to restrict the order of the
-				   // columns in the table to the
-				   // order the columns were
-				   // originally added during the run.
-				   // Select and re-order the columns
-				   // by adding the columns or the
-				   // supercolumns to a new string
-				   // vector.
-  std::vector<std::string> new_order;
-  new_order.push_back("n cells");
-  new_order.push_back("H1");
-  new_order.push_back("L2");
-				   // and call
-  convergence_table.set_column_order (new_order);
+				   // @sect5{Further table manipulations}
 
 				   // In case of global refinement, it
 				   // might be of interest to also
@@ -1744,50 +1727,92 @@ void HelmholtzProblem<dim>::run ()
 				   // since for adaptive refinement
 				   // the determination of something
 				   // like an order of convergence is
-				   // somewhat more involved.
+				   // somewhat more involved. While we
+				   // are at it, we also show a few
+				   // other things that can be done
+				   // with tables.
   if (refinement_mode==global_refinement)
     {
-				       // For everything that happened to
-				       // the `ConvergenceTable' until
-				       // this point, it would have been
-				       // sufficient to use a simple
-				       // `TableHandler'. Indeed, the
-				       // `ConvergenceTable' is derived
-				       // from the `TableHandler' but it
-				       // offers the additional
-				       // functionality of automatically
-				       // evaluating convergence rates
-      convergence_table.evaluate_convergence_rates(
-	"L2", ConvergenceTable::reduction_rate);
-				       // and/or the order of convergence.
-      convergence_table.evaluate_convergence_rates(
-	"L2", ConvergenceTable::reduction_rate_log2);
-      convergence_table.evaluate_convergence_rates(
-	"H1", ConvergenceTable::reduction_rate_log2);
-				       // Each of the last three
+				       // The first thing is that one
+				       // can group individual columns
+				       // together to form so-called
+				       // super columns. Essentially,
+				       // the columns remain the same,
+				       // but the ones that were
+				       // grouped together will get a
+				       // caption running across all
+				       // columns in a group. For
+				       // example, let's merge the
+				       // "cycle" and "cells" columns
+				       // into a super column named "n
+				       // cells":
+      convergence_table.add_column_to_supercolumn("cycle", "n cells");
+      convergence_table.add_column_to_supercolumn("cells", "n cells");
+      
+				       // Next, it isn't necessary to
+				       // always output all columns,
+				       // or in the order in which
+				       // they were originally added
+				       // during the run.  Selecting
+				       // and re-ordering the columns
+				       // works as follows (note that
+				       // this includes super
+				       // columns):
+      std::vector<std::string> new_order;
+      new_order.push_back("n cells");
+      new_order.push_back("H1");
+      new_order.push_back("L2");
+      convergence_table.set_column_order (new_order);
+
+				       // For everything that happened
+				       // to the ``ConvergenceTable''
+				       // until this point, it would
+				       // have been sufficient to use
+				       // a simple
+				       // ``TableHandler''. Indeed, the
+				       // ``ConvergenceTable'' is
+				       // derived from the
+				       // ``TableHandler'' but it offers
+				       // the additional functionality
+				       // of automatically evaluating
+				       // convergence rates. For
+				       // example, here is how we can
+				       // let the table compute
+				       // reduction and convergence
+				       // rates (convergence rates are
+				       // the binary logarithm of the
+				       // reduction rate):
+      convergence_table
+	.evaluate_convergence_rates("L2", ConvergenceTable::reduction_rate);
+      convergence_table
+	.evaluate_convergence_rates("L2", ConvergenceTable::reduction_rate_log2);
+      convergence_table
+	.evaluate_convergence_rates("H1", ConvergenceTable::reduction_rate_log2);
+				       // Each of these
 				       // function calls produces an
 				       // additional column that is
 				       // merged with the original
 				       // column (in our example the
 				       // `L2' and the `H1' column) to
 				       // a supercolumn.
-    }
 
-				   // Finally, the convergence chart
-				   // is written. The filename is
-				   // again constructed as above.
-  convergence_table.write_text(std::cout);
+				       // Finally, we want to write
+				       // this convergence chart
+				       // again, first to the screen
+				       // and then, in LaTeX format,
+				       // to disk. The filename is
+				       // again constructed as above.
+      std::cout << std::endl;
+      convergence_table.write_text(std::cout);
 
-  if (true)
-    {
-      std::string filename = "convergence";
+      std::string conv_filename = "convergence";
       switch (refinement_mode)
 	{
 	  case global_refinement:
-		filename += "-global";
+		conv_filename += "-global";
 		break;
 	  case adaptive_refinement:
-		filename += "-adaptive";
+		conv_filename += "-adaptive";
 		break;
 	  default:
 		Assert (false, ExcNotImplemented());
@@ -1795,19 +1820,18 @@ void HelmholtzProblem<dim>::run ()
       switch (fe->degree)
 	{
 	  case 1:
-		filename += "-q1";
+		conv_filename += "-q1";
 		break;
 	  case 2:
-		filename += "-q2";
+		conv_filename += "-q2";
 		break;
 	  default:
 		Assert (false, ExcNotImplemented());
 	}
-      filename += ".tex";
+      conv_filename += ".tex";
 
-      std::ofstream table_file(filename.c_str());
+      std::ofstream table_file(conv_filename.c_str());
       convergence_table.write_tex(table_file);
-      table_file.close();
     }
 }
 
@@ -1820,25 +1844,25 @@ void HelmholtzProblem<dim>::run ()
 				 // once for Q1 elements and global
 				 // refinement, and once for Q2
 				 // elements and global refinement.
+				 //
+				 // Since we instantiate several
+				 // template classes below for two
+				 // space dimensions, we make this
+				 // more generic by declaring a
+				 // constant at the beginning of the
+				 // function denoting the number of
+				 // space dimensions. If you want to
+				 // run the program in 1d or 2d, you
+				 // will then only have to change this
+				 // one instance, rather than all uses
+				 // below:
 int main () 
 {
+  const unsigned int dim = 2;
+
   try
     {
       deallog.depth_console (0);
-
-                                       // Since we instantiate the
-                                       // several template classes
-                                       // below for two space
-                                       // dimensions, let us make this
-                                       // more generic by having a
-                                       // constant denoting the number
-                                       // of space dimensions. If you
-                                       // want to run the program in
-                                       // 1d or 2d, you will then only
-                                       // have to change this one
-                                       // instance, rather than all
-                                       // uses below:
-      const int dim = 2;
       
       
 				       // Now for the three calls to
@@ -1847,17 +1871,26 @@ int main ()
 				       // order to destroy the
 				       // respective objects (i.e. the
 				       // finite element and the
-				       // HelmholtzProblem object) at
-				       // the end of the block and
+				       // ``HelmholtzProblem'' object)
+				       // at the end of the block and
 				       // before we go to the next
-				       // run.
+				       // run. This avoids conflicts
+				       // with variable names, and
+				       // also makes sure that memory
+				       // is released immediately
+				       // after one of the three runs
+				       // has finished, and not only
+				       // at the end of the ``try''
+				       // block.
       {
 	std::cout << "Solving with Q1 elements, adaptive refinement" << std::endl
 		  << "=============================================" << std::endl
 		  << std::endl;
 	
 	FE_Q<dim> fe(1);
-	HelmholtzProblem<dim> helmholtz_problem_2d (fe, HelmholtzProblem<dim>::adaptive_refinement);
+	HelmholtzProblem<dim>
+	  helmholtz_problem_2d (fe, HelmholtzProblem<dim>::adaptive_refinement);
+
 	helmholtz_problem_2d.run ();
 
 	std::cout << std::endl;
@@ -1869,7 +1902,9 @@ int main ()
 		  << std::endl;
 	
 	FE_Q<dim> fe(1);
-	HelmholtzProblem<dim> helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
+	HelmholtzProblem<dim>
+	  helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
+
 	helmholtz_problem_2d.run ();
 
 	std::cout << std::endl;
@@ -1881,7 +1916,9 @@ int main ()
 		  << std::endl;
 	
 	FE_Q<dim> fe(2);
-	HelmholtzProblem<dim> helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
+	HelmholtzProblem<dim>
+	  helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
+
 	helmholtz_problem_2d.run ();
 
 	std::cout << std::endl;
