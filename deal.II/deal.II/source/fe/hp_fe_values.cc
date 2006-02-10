@@ -130,8 +130,7 @@ namespace hp
   {
     return new ::FEValues<dim> (
       this->mapping_collection.get_mapping (active_fe_index), fe,
-      this->q_collection.get_quadrature (active_fe_index),
-      this->update_flags);
+      this->q_collection[active_fe_index], this->update_flags);
   }
 
 
@@ -188,8 +187,7 @@ namespace hp
   {
     return new ::FEFaceValues<dim> (
       this->mapping_collection.get_mapping (active_fe_index), fe,
-      this->q_collection.get_quadrature (active_fe_index),
-      this->update_flags);
+      this->q_collection[active_fe_index], this->update_flags);
   }
 
 
@@ -248,8 +246,7 @@ namespace hp
   {
     return new ::FESubfaceValues<dim> (
       this->mapping_collection.get_mapping (active_fe_index), fe,
-      this->q_collection.get_quadrature (active_fe_index),
-      this->update_flags);
+      this->q_collection[active_fe_index], this->update_flags);
   }
 }
 

@@ -60,7 +60,7 @@ namespace hp
                                         * Returns the number of quadrature
                                         * pointers stored in this object.
                                         */
-      unsigned int n_quadratures () const;
+      unsigned int size () const;
 
                                        /**
                                         * Returns a reference to the
@@ -72,7 +72,7 @@ namespace hp
                                         * collection.
                                         */
       const Quadrature<dim> &
-      get_quadrature (const unsigned int index) const;
+      operator[] (const unsigned int index) const;
 
                                        /**
                                         * Adds a new quadrature rule to the
@@ -139,7 +139,7 @@ namespace hp
   template <int dim>
   inline
   unsigned int
-  QCollection<dim>::n_quadratures () const 
+  QCollection<dim>::size () const 
   {
     return quadratures.size();
   }

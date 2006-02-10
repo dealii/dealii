@@ -41,7 +41,7 @@ namespace hp
   template <int dim>
   inline
   const Quadrature<dim> &
-  QCollection<dim>::get_quadrature (const unsigned int index) const
+  QCollection<dim>::operator[] (const unsigned int index) const
   {
                                      // if we have only a single quadrature
                                      // that was given during construction,
