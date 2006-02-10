@@ -38,21 +38,22 @@
  * quadrature formula with two points in each space direction) may be
  * sufficient, but on another cell where a Q3 element is used, this would lead
  * to underintegration and we should use a QGauss(4) formula instead. Just as
- * above, the exists a class hp::QCollection that acts as a collection of
+ * above, there exists a class hp::QCollection that acts as a collection of
  * quadrature formulas
  *
  * Finally, one may want to use different orders for the boundary
  * approximation for cells with different orders for the finite element. The
  * hp::MappingCollection class allows to do this.
  *
- * All of these three classes, the hp::FECollection, hp::QCollection, and
- * hp::MappingCollection classes, implement a similar interface. They have
- * functions <code>add_*()</code> to add a finite element, quadrature formula,
- * or mapping to the collection. They have a <code>get_*(unsigned int)</code>
- * function that allows to retrieve a reference to a given element of the
- * collection. And they have a <code>n_*()</code> function that returns the
- * number of elements in the collection. Some of the classes, in particular
- * that holding finite element objects, also implement other functions
+ * All of these three classes, the hp::FECollection, hp::QCollection,
+ * and hp::MappingCollection classes, implement a similar
+ * interface. They have functions <code>add_*()</code> to add a finite
+ * element, quadrature formula, or mapping to the collection. They
+ * have an <code>operator[] (unsigned int)</code> function that allows to
+ * retrieve a reference to a given element of the collection. And they
+ * have a <code>size()</code> function that returns the number of
+ * elements in the collection. Some of the classes, in particular that
+ * holding finite element objects, also implement other functions
  * specific to their purpose.
  *
  * The similarity goes beyond the interface: When adding an element to the
