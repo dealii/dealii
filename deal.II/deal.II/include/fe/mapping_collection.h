@@ -68,7 +68,7 @@ namespace hp
                                         * Returns the number of mapping
                                         * objects stored in this container.
                                         */
-      unsigned int n_mappings () const;
+      unsigned int size () const;
 
                                        /**
                                         * Returns the mapping object which
@@ -81,7 +81,7 @@ namespace hp
                                         * collection.
                                         */
       const Mapping<dim> &
-      get_mapping (const unsigned int index) const;
+      operator[] (const unsigned int index) const;
     
                                        /**
                                         * Determine an estimate for the
@@ -132,7 +132,7 @@ namespace hp
   template <int dim>
   inline
   unsigned int
-  MappingCollection<dim>::n_mappings () const 
+  MappingCollection<dim>::size () const 
   {
     return mappings.size();
   }

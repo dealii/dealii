@@ -37,7 +37,7 @@ namespace hp
   template <int dim>
   inline
   const Mapping<dim> &
-  MappingCollection<dim>::get_mapping (const unsigned int index) const
+  MappingCollection<dim>::operator[] (const unsigned int index) const
   {
     if (single_mapping)
       return *mappings[0];

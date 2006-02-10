@@ -129,7 +129,7 @@ namespace hp
                                    const unsigned int active_fe_index) const
   {
     return new ::FEValues<dim> (
-      this->mapping_collection.get_mapping (active_fe_index), fe,
+      this->mapping_collection[active_fe_index], fe,
       this->q_collection[active_fe_index], this->update_flags);
   }
 
@@ -186,7 +186,7 @@ namespace hp
                                        const unsigned int active_fe_index) const
   {
     return new ::FEFaceValues<dim> (
-      this->mapping_collection.get_mapping (active_fe_index), fe,
+      this->mapping_collection[active_fe_index], fe,
       this->q_collection[active_fe_index], this->update_flags);
   }
 
@@ -245,7 +245,7 @@ namespace hp
                                           const unsigned int active_fe_index) const
   {
     return new ::FESubfaceValues<dim> (
-      this->mapping_collection.get_mapping (active_fe_index), fe,
+      this->mapping_collection[active_fe_index], fe,
       this->q_collection[active_fe_index], this->update_flags);
   }
 }
