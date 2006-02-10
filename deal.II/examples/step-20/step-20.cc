@@ -12,8 +12,6 @@
 /*    further information on this license.                        */
 
 
-const unsigned int degree = 2;
-
 				 // The first few (many?) include
 				 // files have already been used in
 				 // the previous example, so we will
@@ -59,7 +57,7 @@ const unsigned int degree = 2;
 
 
 				 // This is again the same
-				 // LaplaceProblem class as in the
+				 // MixedLaplaceProblem class as in the
 				 // previous example. The only
 				 // difference is that we have now
 				 // declared it as a class with a
@@ -76,10 +74,10 @@ const unsigned int degree = 2;
 				 // respectively. Apart from this,
 				 // everything is as before.
 template <int dim>
-class LaplaceProblem 
+class MixedLaplaceProblem 
 {
   public:
-    LaplaceProblem ();
+    MixedLaplaceProblem (const unsigned int degree);
     void run ();
     
   private:
@@ -89,8 +87,10 @@ class LaplaceProblem
     void compute_errors () const;
     void output_results () const;
 
+    const unsigned int   degree;
+    
     Triangulation<dim>   triangulation;
-    FESystem<dim>            fe;
+    FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
 
     BlockSparsityPattern      sparsity_pattern;
@@ -268,14 +268,16 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 
 
 				 // This is the constructor of the
-				 // LaplaceProblem class. It specifies
+				 // MixedLaplaceProblem class. It specifies
 				 // the desired polynomial degree of
 				 // the finite elements and associates
 				 // the DoFHandler to the
 				 // triangulation just as in the
 				 // previous example.
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem () :
+MixedLaplaceProblem<dim>::MixedLaplaceProblem (const unsigned int degree)
+		:
+		degree (degree),
                 fe (FE_RaviartThomas<dim>(degree),1,FE_DGQ<dim>(degree),1),
 		dof_handler (triangulation)
 {}
@@ -317,10 +319,10 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // three than in two space
 				 // dimensions!
 template <int dim>
-void LaplaceProblem<dim>::make_grid_and_dofs ()
+void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, 0, 1);
-  triangulation.refine_global (2);
+  triangulation.refine_global (4);
   
   std::cout << "   Number of active cells: "
 	    << triangulation.n_active_cells()
@@ -452,7 +454,7 @@ double extract_p (const FEValues<dim> &fe_values,
 				 // don't have to care about most
 				 // things.
 template <int dim>
-void LaplaceProblem<dim>::assemble_system () 
+void MixedLaplaceProblem<dim>::assemble_system () 
 {  
   QGauss<dim> quadrature_formula(degree+2);
 
@@ -464,7 +466,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // object is only used in this
 				   // function, we only declare it
 				   // here, rather than as a member
-				   // variable of the LaplaceProblem
+				   // variable of the MixedLaplaceProblem
 				   // class, or somewhere else.
   const RightHandSide<dim> right_hand_side;
 
@@ -612,7 +614,7 @@ class SchurComplement
 				 // function is mostly copied from the
 				 // previous example.
 template <int dim>
-void LaplaceProblem<dim>::solve () 
+void MixedLaplaceProblem<dim>::solve () 
 {
   {
     SolverControl solver_control (system_matrix.block(0,0).m(),
@@ -657,7 +659,7 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::compute_errors () const
+void MixedLaplaceProblem<dim>::compute_errors () const
 {
   Vector<double> tmp (triangulation.n_active_cells());
   ExactSolution<dim> exact_solution;
@@ -708,14 +710,14 @@ void LaplaceProblem<dim>::compute_errors () const
 				 // example. No changes here for
 				 // dimension independence either.
 template <int dim>
-void LaplaceProblem<dim>::output_results () const
+void MixedLaplaceProblem<dim>::output_results () const
 {
   DataOut<dim> data_out;
 
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");
 
-  data_out.build_patches (3);
+  data_out.build_patches (degree+1);
 
 				   // Only difference to the previous
 				   // example: write output in GMV
@@ -742,7 +744,7 @@ void LaplaceProblem<dim>::output_results () const
 				 // additional output, it is the same
 				 // as for the previous example.
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void MixedLaplaceProblem<dim>::run () 
 {
   std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
   
@@ -815,11 +817,8 @@ int main ()
 				   // For demonstration, we will first
 				   // let the whole thing run in 2D
 				   // and then in 3D:
-  LaplaceProblem<2> laplace_problem_2d;
-  laplace_problem_2d.run ();
+  MixedLaplaceProblem<2> mixed_laplace_problem (0);
+  mixed_laplace_problem.run ();
 
-//   LaplaceProblem<3> laplace_problem_3d;
-//   laplace_problem_3d.run ();
-  
   return 0;
 }
