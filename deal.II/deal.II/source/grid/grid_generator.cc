@@ -183,6 +183,8 @@ GridGenerator::subdivided_hyper_cube (Triangulation<dim> &tria,
                                       const double        right)
 {
   Assert (repetitions >= 1, ExcInvalidRepetitions(repetitions));
+  Assert (left < right,
+	  ExcMessage ("Invalid left and right bounds of hypercube"));
   
                                    // first generate the necessary
                                    // points
