@@ -388,6 +388,21 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Changed: The <code class="class">FECollection</code>::<code
+       class="member">get_fe</code> and <code
+       class="class">QCollection</code>::<code
+       class="member">get_quadrature</code> functions are now renamed
+       to the standard <code class="member">operator[]</code>
+       function. Similarly, the <code
+       class="class">FECollection</code>::<code
+       class="member">n_finite_elements</code> and <code
+       class="class">QCollection</code>::<code
+       class="member">n_quadratures</code> functions are now renamed
+       to the standard <code class="member">size()</code> function.
+       <br> 
+       (RH 2006/02/10)
+       </p>
 
   <li> <p>
        Improved: <code class="class">GridGenerator</code>::<code
@@ -398,13 +413,14 @@ inconvenience this causes.
        (Luca Heltai 2006/02/07)
        </p>
 
-
-  <li> <p> Improved: <code class="class">FiniteElementData</code> and <code
-  class="class">FiniteElement</code> now support the concept of blocks along
-  with components. See the glossary for the difference.
-  <br>
-  (GK 2006/01/25)
-  </p>
+  <li> <p>
+       Improved: <code class="class">FiniteElementData</code> and
+       <code class="class">FiniteElement</code> now support the
+       concept of blocks along with components. See the glossary for
+       the difference.
+       <br>
+       (GK 2006/01/25)
+       </p>
 
   <li> <p>
        Fixed: The <code class="class">MGDoFHandler</code>::<code
