@@ -182,8 +182,8 @@ class ExactSolution : public Function<dim>
   public:
     ExactSolution () : Function<dim>(dim+1) {};
     
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component = 0) const;
+    virtual void vector_value (const Point<dim> &p, 
+			       Vector<double>   &value) const;
 };
 
 
@@ -223,15 +223,29 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 
 
 template <int dim>
-double ExactSolution<dim>::value (const Point<dim>  &p,
-				  const unsigned int /*component*/) const 
+void
+ExactSolution<dim>::vector_value (const Point<dim> &p,
+				  Vector<double>   &values) const 
 {
-  double return_value = 1;
-  for (unsigned int i=0; i<dim; ++i)
-    return_value *= std::sin(deal_II_numbers::PI*p(i));
+  Assert (values.size() == dim+1,
+	  ExcDimensionMismatch (values.size(), dim+1));
+  
+  for (unsigned int component=0; component<dim; ++component)
+    {
+      values(component) = deal_II_numbers::PI;
+      
+      for (unsigned int i=0; i<dim; ++i)
+	if (i==component)
+	  values(component) *= std::cos(deal_II_numbers::PI*p(i));
+	else
+	  values(component) *= std::sin(deal_II_numbers::PI*p(i));
+    }
 
-  return return_value;
+  values(dim) = 1;
+  for (unsigned int i=0; i<dim; ++i)
+    values(dim) *= std::sin(deal_II_numbers::PI*p(i));
 }
+
 
 
 				 // The boundary values were to be
@@ -306,7 +320,7 @@ template <int dim>
 void LaplaceProblem<dim>::make_grid_and_dofs ()
 {
   GridGenerator::hyper_cube (triangulation, 0, 1);
-  triangulation.refine_global (5);
+  triangulation.refine_global (2);
   
   std::cout << "   Number of active cells: "
 	    << triangulation.n_active_cells()
@@ -668,22 +682,22 @@ void LaplaceProblem<dim>::compute_errors () const
 			      tmp.l2_norm() * tmp.l2_norm());
     }
   
-  double u_h1_error = 0;
-  for (unsigned int d=0; d<dim; ++d)
-    {
-      const ComponentSelectFunction<dim> mask(d, 1., dim+1);
-      VectorTools::integrate_difference (dof_handler, solution, exact_solution,
-					 tmp, QGauss<dim>(degree+1),
-					 VectorTools::H1_seminorm,
-					 &mask);
-      u_h1_error = std::sqrt (u_h1_error*u_h1_error +
-			      tmp.l2_norm() * tmp.l2_norm());
-    }
+//   double u_h1_error = 0;
+//   for (unsigned int d=0; d<dim; ++d)
+//     {
+//       const ComponentSelectFunction<dim> mask(d, 1., dim+1);
+//       VectorTools::integrate_difference (dof_handler, solution, exact_solution,
+// 					 tmp, QGauss<dim>(degree+1),
+// 					 VectorTools::H1_seminorm,
+// 					 &mask);
+//       u_h1_error = std::sqrt (u_h1_error*u_h1_error +
+// 			      tmp.l2_norm() * tmp.l2_norm());
+//     }
 
 
   std::cout << "Errors: ||e_p||_L2 = " << p_l2_error
 	    << ",   ||e_u||_L2 = " << u_l2_error
-    	    << ",   |e_u|_H1 = " << u_h1_error
+//    	    << ",   |e_u|_H1 = " << u_h1_error
 	    << std::endl;
 }
 
