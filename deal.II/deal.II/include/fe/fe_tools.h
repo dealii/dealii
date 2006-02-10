@@ -555,20 +555,20 @@ class FETools
     
 				     /**
 				      * Gives the interpolation of a
-				      * the @p dof1-function @p u1
-				      * to a @p dof2-function
-				      * @p u2. @p dof1 and @p dof2
-				      * need to be DoFHandlers
-				      * based on the same
-				      * triangulation.
-				      * @p constraints is a hanging
-				      * node constraints object
-				      * corresponding to
-				      * @p dof2. This object is
-				      * particular important when
-				      * interpolating onto continuous
-				      * elements on grids with hanging
-				      * nodes (locally refined grids).
+				      * the @p dof1-function @p u1 to
+				      * a @p dof2-function @p u2. @p
+				      * dof1 and @p dof2 need to be
+				      * DoFHandlers (or
+				      * hp::DoFHandlers) based on the
+				      * same triangulation.  @p
+				      * constraints is a hanging node
+				      * constraints object
+				      * corresponding to @p dof2. This
+				      * object is particular important
+				      * when interpolating onto
+				      * continuous elements on grids
+				      * with hanging nodes (locally
+				      * refined grids).
 				      *
 				      * If the elements @p fe1 and @p fe2
 				      * are either both continuous or
@@ -586,20 +586,6 @@ class FETools
 				      * at the DoF values on the
 				      * discontinuities.
 				      */
-    template <int dim, class InVector, class OutVector>
-    static void interpolate (const DoFHandler<dim>&  dof1,
-			     const InVector&         u1,
-			     const DoFHandler<dim>&  dof2,
-			     const ConstraintMatrix& constraints,
-			     OutVector&              u2);
-
-
-                                     /**
-                                      * Same as last function, except
-                                      * that one or both of the dof
-                                      * handler objects might be of
-                                      * type @p hp::DoFHandler.
-                                      */
     template <int dim,
               template <int> class DH1,
               template <int> class DH2,              
@@ -608,8 +594,7 @@ class FETools
 			     const InVector         &u1,
 			     const DH2<dim>         &dof2,
 			     const ConstraintMatrix &constraints,
-			     OutVector&              u2);
-    
+			     OutVector&              u2);    
 
 				     /**
 				      * Gives the interpolation of the

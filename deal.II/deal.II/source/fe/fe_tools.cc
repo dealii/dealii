@@ -848,89 +848,7 @@ FETools::interpolate(const DH1<dim> &dof1,
   ConstraintMatrix dummy;
   dummy.close();
   interpolate(dof1, u1, dof2, dummy, u2);
-}
-
-  
-template <int dim, class InVector, class OutVector>
-void
-FETools::interpolate(const DoFHandler<dim>  &dof1,
-                     const InVector         &u1,
-                     const DoFHandler<dim>  &dof2,
-                     const ConstraintMatrix &constraints,
-                     OutVector              &u2)
-{
-  Assert(&dof1.get_tria() == &dof2.get_tria(), ExcTriangulationMismatch());
-  Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
-	 ExcDimensionMismatch(dof1.get_fe().n_components(),
-                              dof2.get_fe().n_components()));
-  Assert(u1.size()==dof1.n_dofs(),
-         ExcDimensionMismatch(u1.size(), dof1.n_dofs()));  
-  Assert(u2.size()==dof2.n_dofs(),
-         ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
-
-				   // for continuous elements on grids
-				   // with hanging nodes we need
-				   // hanging node
-				   // constraints. Consequentely, if
-				   // there are no constraints then
-				   // hanging nodes are not allowed.
-  const bool hanging_nodes_not_allowed
-    = ((dof2.get_fe().dofs_per_vertex != 0) &&
-       (constraints.n_constraints() == 0));
-  
-  const unsigned int dofs_per_cell1=dof1.get_fe().dofs_per_cell;
-  const unsigned int dofs_per_cell2=dof2.get_fe().dofs_per_cell;
-  
-  Vector<typename OutVector::value_type> u1_local(dofs_per_cell1);
-  Vector<typename OutVector::value_type> u2_local(dofs_per_cell2);
-
-  FullMatrix<double> interpolation_matrix(dofs_per_cell2,
-					  dofs_per_cell1);
-  FETools::get_interpolation_matrix(dof1.get_fe(), dof2.get_fe(),
-				    interpolation_matrix);
-  
-  typename DoFHandler<dim>::active_cell_iterator cell1 = dof1.begin_active(),
-						 endc1 = dof1.end(),
-						 cell2 = dof2.begin_active(),
-						 endc2 = dof2.end();
-
-  std::vector<unsigned int> touch_count(dof2.n_dofs(),0);
-  std::vector<unsigned int> dofs (dofs_per_cell2);
-  u2 = 0;
-
-  for (; cell1!=endc1; ++cell1, ++cell2) 
-    {
-      if (hanging_nodes_not_allowed)
-	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	  Assert (cell1->at_boundary(face) ||
-		  cell1->neighbor(face)->level() == cell1->level(),
-		  ExcHangingNodesNotAllowed(0));
-      
-      cell1->get_dof_values(u1, u1_local);
-      interpolation_matrix.vmult(u2_local, u1_local);
-      cell2->get_dof_indices(dofs);
-      for (unsigned int i=0; i<dofs_per_cell2; ++i)
-	{
-	  u2(dofs[i])+=u2_local(i);
-	  ++touch_count[dofs[i]];
-	}
-    }
-                                   // cell1 is at the end, so should
-                                   // be cell2
-  Assert (cell2 == endc2, ExcInternalError());
-  
-				   // when a discontinuous element is
-				   // interpolated to a continuous
-				   // one, we take the mean values.
-  for (unsigned int i=0; i<dof2.n_dofs(); ++i)
-    {
-      Assert(touch_count[i]!=0, ExcInternalError());
-      u2(i) /= touch_count[i];
-    }
-
-				   // Apply hanging node constraints.
-  constraints.distribute(u2);
-}
+}  
 
 
 
@@ -976,7 +894,7 @@ FETools::interpolate (const DH1<dim>         &dof1,
   std::vector<unsigned int> touch_count(dof2.n_dofs(),0);
   std::vector<unsigned int> dofs;
   dofs.reserve (max_dofs_per_cell (dof2));
-  u2.clear ();
+  u2 = 0;
 
   for (; cell1!=endc1; ++cell1, ++cell2) 
     {
