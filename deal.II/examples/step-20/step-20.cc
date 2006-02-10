@@ -1,78 +1,79 @@
 /* $Id$ */
-/* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
+/* Author: Wolfgang Bangerth, Texas A&M University, 2005, 2006 */
 
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors */
+/*    Copyright (C) 2005, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+                                 // @sect3{Include files}
 
-				 // The first few (many?) include
-				 // files have already been used in
-				 // the previous example, so we will
-				 // not explain their meaning here
-				 // again.
-#include <grid/tria.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_renumbering.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe_raviart_thomas.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_system.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_values.h>
+				 // Since this program is only an
+				 // adaptation of step-4, there is not
+				 // much new stuff in terms of header
+				 // files. In deal.II, we usually list
+				 // include files in the order
+				 // base-lac-grid-dofs-fe-numerics,
+				 // followed by C++ standard include
+				 // files:
 #include <base/quadrature_lib.h>
+#include <base/logstream.h>
 #include <base/function.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
 #include <lac/block_vector.h>
 #include <lac/full_matrix.h>
 #include <lac/block_sparse_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/solver_gmres.h>
 #include <lac/precondition.h>
-
+#include <grid/tria.h>
+#include <grid/grid_generator.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_renumbering.h>
+#include <dofs/dof_accessor.h>
+#include <dofs/dof_tools.h>
+#include <fe/fe_dgq.h>
+#include <fe/fe_system.h>
+#include <fe/fe_values.h>
+#include <numerics/vectors.h>
+#include <numerics/matrices.h>
 #include <numerics/data_out.h>
+
 #include <fstream>
 #include <iostream>
 
-				 // This is new, however: in the
-				 // previous example we got some
-				 // unwanted output from the linear
-				 // solvers. If we want to suppress
-				 // it, we have to include this file
-				 // and add a line somewhere to the
-				 // program; in this program, it was
-				 // added to the main function.
-#include <base/logstream.h>
+				 // This is the only new header,
+				 // namely the one in which the
+				 // Raviart-Thomas finite element is
+				 // declared:
+#include <fe/fe_raviart_thomas.h>
 
 
+                                 // @sect3{The ``MixedLaplaceProblem'' class template}
 
-				 // This is again the same
-				 // MixedLaplaceProblem class as in the
-				 // previous example. The only
-				 // difference is that we have now
-				 // declared it as a class with a
-				 // template parameter, and the
-				 // template parameter is of course
-				 // the spatial dimension in which we
-				 // would like to solve the Laplace
-				 // equation. Of course, several of
-				 // the member variables depend on
-				 // this dimension as well, in
-				 // particular the Triangulation
-				 // class, which has to represent
-				 // quadrilaterals or hexahedra,
-				 // respectively. Apart from this,
-				 // everything is as before.
+				 // Again, since this is an adaptation
+				 // of step-6, the main class is
+				 // almost the same as the one in that
+				 // tutorial program. In terms of
+				 // member functions, the main
+				 // differences are that the
+				 // constructor takes the degree of
+				 // the Raviart-Thomas element as an
+				 // argument (and that there is a
+				 // corresponding member variable to
+				 // store this value) and the addition
+				 // of the ``compute_error'' function
+				 // in which, no surprise, we will
+				 // compute the difference between the
+				 // exact and the numerical solution
+				 // to determine convergence of our
+				 // computations:
 template <int dim>
 class MixedLaplaceProblem 
 {
@@ -93,6 +94,19 @@ class MixedLaplaceProblem
     FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
 
+				     // The second difference is that
+				     // the sparsity pattern, the
+				     // system matrix, and solution
+				     // and right hand side vectors
+				     // are now blocked. What this
+				     // means and what one can do with
+				     // such objects is explained in
+				     // the introduction to this
+				     // program as well as further
+				     // down below when we explain the
+				     // linear solvers and
+				     // preconditioners for this
+				     // problem:
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
 
@@ -101,63 +115,34 @@ class MixedLaplaceProblem
 };
 
 
-				 // In the following, we declare two
-				 // more classes, which will represent
-				 // the functions of the
-				 // dim-dimensional space denoting the
-				 // right hand side and the
-				 // non-homogeneous Dirichlet boundary
-				 // values.
-				 //
-				 // Each of these classes is derived
-				 // from a common, abstract base class
-				 // Function, which declares the
-				 // common interface which all
-				 // functions have to follow. In
-				 // particular, concrete classes have
-				 // to overload the `value' function,
-				 // which takes a point in
-				 // dim-dimensional space as
-				 // parameters and shall return the
-				 // value at that point as a `double'
-				 // variable.
-				 //
-				 // The `value' function takes a
-				 // second argument, which we have
-				 // here named `component': This is
-				 // only meant for vector valued
-				 // functions, where you may want to
-				 // access a certain component of the
-				 // vector at the point `p'. However,
-				 // our functions are scalar, so we
-				 // need not worry about this
-				 // parameter and we will not use it
-				 // in the implementation of the
-				 // functions. Note that in the base
-				 // class (Function), the declaration
-				 // of the `value' function has a
-				 // default value of zero for the
-				 // component, so we will access the
-				 // `value' function of the right hand
-				 // side with only one parameter,
-				 // namely the point where we want to
-				 // evaluate the function.
-				 //
-				 // Note that the C++ language forces
-				 // us to declare and define a
-				 // constructor to the following
-				 // classes even though they are
-				 // empty. This is due to the fact
-				 // that the base class has no default
-				 // constructor (i.e. one without
-				 // arguments), even though it has a
-				 // constructor which has default
-				 // values for all arguments.
+				 // @sect3{Right hand side, coefficient, and exact solution}
+
+				 // Our next task is to define the
+				 // right hand side of our problem
+				 // (i.e., the scalar right hand side
+				 // for the pressure in the original
+				 // Laplace equation), boundary values
+				 // for the pressure, as well as a
+				 // function that describes both the
+				 // pressure and the velocity of the
+				 // exact solution for later
+				 // computations of the error. Note
+				 // that these functions have one,
+				 // one, and ``dim+1'' components,
+				 // respectively, and that we pass the
+				 // number of components down to the
+				 // ``Function<dim>'' base class. For
+				 // the exact solution, we only
+				 // declare the function that actually
+				 // returns the entire solution vector
+				 // (i.e. all components of it) at
+				 // once. Here are the respective
+				 // declarations:
 template <int dim>
 class RightHandSide : public Function<dim> 
 {
   public:
-    RightHandSide () : Function<dim>() {};
+    RightHandSide () : Function<dim>(1) {};
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -166,10 +151,10 @@ class RightHandSide : public Function<dim>
 
 
 template <int dim>
-class BoundaryValues : public Function<dim> 
+class PressureBoundaryValues : public Function<dim> 
 {
   public:
-    BoundaryValues () : Function<dim>() {};
+    PressureBoundaryValues () : Function<dim>(1) {};
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -187,39 +172,30 @@ class ExactSolution : public Function<dim>
 };
 
 
-
-				 // We wanted the right hand side
-				 // function to be 4*(x**4+y**4) in
-				 // 2D, or 4*(x**4+y**4+z**4) in
-				 // 3D. Unfortunately, this is not as
-				 // elegantly feasible dimension
-				 // independently as much of the rest
-				 // of this program, so we have to do
-				 // it using a small
-				 // loop. Fortunately, the compiler
-				 // knows the size of the loop at
-				 // compile time, i.e. the number of
-				 // times the body will be executed,
-				 // so it can optimize away the
-				 // overhead needed for the loop and
-				 // the result will be as fast as if
-				 // we had used the formulas above
-				 // right away.
-				 //
-				 // Note that the different
-				 // coordinates (i.e. `x', `y', ...)
-				 // of the point are accessed using
-				 // the () operator.
+				 // And then we also have to define
+				 // these respective functions, of
+				 // course. Given the ones that we
+				 // discussed in the introduction, the
+				 // following computations should be
+				 // straightforward:
 template <int dim>
-double RightHandSide<dim>::value (const Point<dim> &p,
-				  const unsigned int) const 
+double RightHandSide<dim>::value (const Point<dim>  &/*p*/,
+				  const unsigned int /*component*/) const 
 {
-  double return_value = deal_II_numbers::PI * deal_II_numbers::PI * dim;
-  for (unsigned int i=0; i<dim; ++i)
-    return_value *= std::sin(deal_II_numbers::PI*p(i));
-
-  return return_value;
+  return 0;
 }
+
+
+
+template <int dim>
+double PressureBoundaryValues<dim>::value (const Point<dim>  &p,
+					   const unsigned int /*component*/) const 
+{
+  const double alpha = 0.1;
+  const double beta = 1;
+  return -(alpha*p[0]*p[1]*p[1]/2 + beta*p[0] - alpha*p[0]*p[0]*p[0]/6);
+}
+
 
 
 template <int dim>
@@ -229,51 +205,17 @@ ExactSolution<dim>::vector_value (const Point<dim> &p,
 {
   Assert (values.size() == dim+1,
 	  ExcDimensionMismatch (values.size(), dim+1));
-  
-  for (unsigned int component=0; component<dim; ++component)
-    {
-      values(component) = deal_II_numbers::PI;
-      
-      for (unsigned int i=0; i<dim; ++i)
-	if (i==component)
-	  values(component) *= std::cos(deal_II_numbers::PI*p(i));
-	else
-	  values(component) *= std::sin(deal_II_numbers::PI*p(i));
-    }
 
-  values(dim) = 1;
-  for (unsigned int i=0; i<dim; ++i)
-    values(dim) *= std::sin(deal_II_numbers::PI*p(i));
+  const double alpha = 0.1;
+  const double beta = 1;
+
+  values(0) = alpha*p[1]*p[1]/2 + beta - alpha*p[0]*p[0]/2;
+  values(1) = alpha*p[0]*p[1];
+  values(2) = -(alpha*p[0]*p[1]*p[1]/2 + beta*p[0] - alpha*p[0]*p[0]*p[0]/6);
 }
 
 
 
-				 // The boundary values were to be
-				 // chosen to be x*x+y*y in 2D, and
-				 // x*x+y*y+z*z in 3D. This happens to
-				 // be equal to the square of the
-				 // vector from the origin to the
-				 // point at which we would like to
-				 // evaluate the function,
-				 // irrespective of the dimension. So
-				 // that is what we return:
-template <int dim>
-double BoundaryValues<dim>::value (const Point<dim> &p,
-				   const unsigned int) const 
-{
-  return p.square();
-}
-
-
-
-
-				 // This is the constructor of the
-				 // MixedLaplaceProblem class. It specifies
-				 // the desired polynomial degree of
-				 // the finite elements and associates
-				 // the DoFHandler to the
-				 // triangulation just as in the
-				 // previous example.
 template <int dim>
 MixedLaplaceProblem<dim>::MixedLaplaceProblem (const unsigned int degree)
 		:
@@ -283,46 +225,11 @@ MixedLaplaceProblem<dim>::MixedLaplaceProblem (const unsigned int degree)
 {}
 
 
-
-				 // Grid creation is something
-				 // inherently dimension
-				 // dependent. However, as long as the
-				 // domains are sufficiently similar
-				 // in 2D or 3D, the library can
-				 // abstract for you. In our case, we
-				 // would like to again solve on the
-				 // square [-1,1]x[-1,1] in 2D, or on
-				 // the cube [-1,1]x[-1,1]x[-1,1] in
-				 // 3D; both can be termed
-				 // ``hyper_cube'', so we may use the
-				 // same function in whatever
-				 // dimension we are. Of course, the
-				 // functions that create a hypercube
-				 // in two and three dimensions are
-				 // very much different, but that is
-				 // something you need not care
-				 // about. Let the library handle the
-				 // difficult things.
-				 //
-				 // Likewise, associating a degree of
-				 // freedom with each vertex is
-				 // something which certainly looks
-				 // different in 2D and 3D, but that
-				 // does not need to bother you. This
-				 // function therefore looks exactly
-				 // like in the previous example,
-				 // although it performs actions that
-				 // in their details are quite
-				 // different. The only significant
-				 // difference is the number of cells
-				 // resulting, which is much higher in
-				 // three than in two space
-				 // dimensions!
 template <int dim>
 void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
 {
-  GridGenerator::hyper_cube (triangulation, 0, 1);
-  triangulation.refine_global (4);
+  GridGenerator::hyper_cube (triangulation, -1, 1);
+  triangulation.refine_global (3);
   
   std::cout << "   Number of active cells: "
 	    << triangulation.n_active_cells()
@@ -367,7 +274,9 @@ void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
 }
 
 
-Tensor<1,2> extract_u (const FEValues<2> &fe_values,
+
+
+Tensor<1,2> extract_u (const FEValuesBase<2> &fe_values,
                        const unsigned int j,
                        const unsigned int q)
 {
@@ -379,7 +288,7 @@ Tensor<1,2> extract_u (const FEValues<2> &fe_values,
 
 
 
-Tensor<1,3> extract_u (const FEValues<3> &fe_values,
+Tensor<1,3> extract_u (const FEValuesBase<3> &fe_values,
                        const unsigned int j,
                        const unsigned int q)
 {
@@ -394,7 +303,7 @@ Tensor<1,3> extract_u (const FEValues<3> &fe_values,
 
 
 
-double extract_div_u (const FEValues<2> &fe_values,
+double extract_div_u (const FEValuesBase<2> &fe_values,
                       const unsigned int j,
                       const unsigned int q)
 {
@@ -403,7 +312,7 @@ double extract_div_u (const FEValues<2> &fe_values,
 }
 
 
-double extract_div_u (const FEValues<3> &fe_values,
+double extract_div_u (const FEValuesBase<3> &fe_values,
                       const unsigned int j,
                       const unsigned int q)
 {
@@ -414,7 +323,7 @@ double extract_div_u (const FEValues<3> &fe_values,
 
   
 template <int dim>
-double extract_p (const FEValues<dim> &fe_values,
+double extract_p (const FEValuesBase<dim> &fe_values,
                   const unsigned int j,
                   const unsigned int q)
 {
@@ -422,103 +331,38 @@ double extract_p (const FEValues<dim> &fe_values,
 }
 
 
-
-				 // Unlike in the previous example, we
-				 // would now like to use a
-				 // non-constant right hand side
-				 // function and non-zero boundary
-				 // values. Both are tasks that are
-				 // readily achieved with a only a few
-				 // new lines of code in the
-				 // assemblage of the matrix and right
-				 // hand side.
-				 //
-				 // More interesting, though, is the
-				 // way we assemble matrix and right
-				 // hand side vector dimension
-				 // independently: there is simply no
-				 // difference to the pure
-				 // two-dimensional case. Since the
-				 // important objects used in this
-				 // function (quadrature formula,
-				 // FEValues) depend on the dimension
-				 // by way of a template parameter as
-				 // well, they can take care of
-				 // setting up properly everything for
-				 // the dimension for which this
-				 // function is compiled. By declaring
-				 // all classes which might depend on
-				 // the dimension using a template
-				 // parameter, the library can make
-				 // nearly all work for you and you
-				 // don't have to care about most
-				 // things.
 template <int dim>
 void MixedLaplaceProblem<dim>::assemble_system () 
 {  
-  QGauss<dim> quadrature_formula(degree+2);
+  QGauss<dim>   quadrature_formula(degree+2);
+  QGauss<dim-1> face_quadrature_formula(degree+2);
 
-				   // We wanted to have a non-constant
-				   // right hand side, so we use an
-				   // object of the class declared
-				   // above to generate the necessary
-				   // data. Since this right hand side
-				   // object is only used in this
-				   // function, we only declare it
-				   // here, rather than as a member
-				   // variable of the MixedLaplaceProblem
-				   // class, or somewhere else.
-  const RightHandSide<dim> right_hand_side;
-
-				   // Compared to the previous
-				   // example, in order to evaluate
-				   // the non-constant right hand side
-				   // function we now also need the
-				   // quadrature points on the cell we
-				   // are presently on (previously,
-				   // they were only needed on the
-				   // unit cell, in order to compute
-				   // the values and gradients of the
-				   // shape function, which are
-				   // defined on the unit cell
-				   // however). We can tell the
-				   // FEValues object to do for us by
-				   // giving it the update_q_points
-				   // flag:
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   update_values    | update_gradients |
                            update_q_points  | update_JxW_values);
+  FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula, 
+				    update_values    | update_normal_vectors |
+				    update_q_points  | update_JxW_values);
 
-				   // Note that the following numbers
-				   // depend on the dimension which we
-				   // are presently using. However,
-				   // the FE and Quadrature classes do
-				   // all the necessary work for you
-				   // and you don't have to care about
-				   // the dimension dependent parts:
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+  const unsigned int   n_q_points      = quadrature_formula.n_quadrature_points;
+  const unsigned int   n_face_q_points = face_quadrature_formula.n_quadrature_points;
 
   FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       local_rhs (dofs_per_cell);
+
+
+  const RightHandSide<dim> right_hand_side;
+  const PressureBoundaryValues<dim> pressure_boundary_values;
+
   std::vector<double> rhs_values (n_q_points);
+  std::vector<double> boundary_values (n_face_q_points);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-				   // Note here, that a cell is a
-				   // quadrilateral in two space
-				   // dimensions, but a hexahedron in
-				   // 3D. In fact, the
-				   // active_cell_iterator data type
-				   // is something different,
-				   // depending on the dimension we
-				   // are in, but to the outside world
-				   // they look alike and you will
-				   // probably never see a difference
-				   // although they are totally
-				   // unrelated.
-  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-						 endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);
@@ -543,14 +387,34 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                 
                 local_matrix(i,j) += (phi_i_u * phi_j_u
                                       - div_phi_i_u * phi_j_p
-                                      + phi_i_p * div_phi_j_u)
+                                      - phi_i_p * div_phi_j_u)
                                      * fe_values.JxW(q);
               }
 
-            local_rhs(i) += phi_i_p *
+            local_rhs(i) += -phi_i_p *
                             rhs_values[q] *
                             fe_values.JxW(q);
           }
+
+      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+	if (cell->at_boundary(face_no))
+	  {
+	    fe_face_values.reinit (cell, face_no);
+	    
+	    pressure_boundary_values.value_list (fe_face_values.get_quadrature_points(),
+						 boundary_values);
+
+	    for (unsigned int q=0; q<n_face_q_points; ++q) 
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		{
+		  const Tensor<1,dim> phi_i_u = extract_u (fe_face_values, i, q);
+
+		  local_rhs(i) += -(phi_i_u *
+				    fe_face_values.normal_vector(q) *
+				    boundary_values[q] *
+				    fe_face_values.JxW(q));
+		}
+	  }
       
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -592,8 +456,6 @@ class SchurComplement
                   << std::endl;
         
         A.block(1,0).vmult (dst, tmp2);
-
-        dst *= -1;
       }
 
   private:
@@ -604,54 +466,58 @@ class SchurComplement
     mutable Vector<double> tmp1, tmp2;
 };
 
-        
 
-				 // Solving the linear system of
-				 // equation is something that looks
-				 // almost identical in most
-				 // programs. In particular, it is
-				 // dimension independent, so this
-				 // function is mostly copied from the
-				 // previous example.
+
 template <int dim>
 void MixedLaplaceProblem<dim>::solve () 
 {
   {
+    Vector<double> schur_rhs (solution.block(1).size());
+    {
+      Vector<double> tmp (solution.block(0).size());
+      
+      SolverControl solver_control (system_matrix.block(0,0).m(),
+				    1e-6*system_rhs.l2_norm());
+      SolverCG<> cg (solver_control);
+
+      cg.solve (system_matrix.block(0,0), tmp,
+		system_rhs.block(0), PreconditionIdentity());
+  
+      std::cout << "   " << solver_control.last_step()
+		<< " CG mass matrix iterations needed to obtain convergence."
+		<< std::endl;
+
+      system_matrix.block(1,0).vmult (schur_rhs, tmp);
+      schur_rhs -= system_rhs.block(1);
+    }
+
     SolverControl solver_control (system_matrix.block(0,0).m(),
-				  1e-6*system_rhs.block(1).l2_norm());
+				  1e-6*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
     cg.solve (SchurComplement(system_matrix), solution.block(1),
-              system_rhs.block(1),
+              schur_rhs,
               PreconditionIdentity());
   
-                                     // We have made one addition,
-                                     // though: since we suppress output
-                                     // from the linear solvers, we have
-                                     // to print the number of
-                                     // iterations by hand.
     std::cout << "   " << solver_control.last_step()
-              << " CG mass matrix iterations needed to obtain convergence."
+              << " CG Schur complement iterations needed to obtain convergence."
               << std::endl;
   }
   {
-    Vector<double> tmp (system_matrix.block(0,0).m());
+    Vector<double> tmp (solution.block(0).size());
     system_matrix.block(0,1).vmult (tmp, solution.block(1));
+    tmp *= -1;
+    tmp += system_rhs.block(0);
     
     SolverControl solver_control (system_matrix.block(0,0).m(),
 				  1e-6*tmp.l2_norm());
-    SolverGMRES<> cg (solver_control);
+    SolverCG<> cg (solver_control);
 
     cg.solve (system_matrix.block(0,0), solution.block(0),
               tmp, PreconditionIdentity());
   
-                                     // We have made one addition,
-                                     // though: since we suppress output
-                                     // from the linear solvers, we have
-                                     // to print the number of
-                                     // iterations by hand.
     std::cout << "   " << solver_control.last_step()
-              << " CG Schur complement iterations needed to obtain convergence."
+              << " CG mass matrix iterations needed to obtain convergence."
               << std::endl;
   }
 }
@@ -663,10 +529,14 @@ void MixedLaplaceProblem<dim>::compute_errors () const
 {
   Vector<double> tmp (triangulation.n_active_cells());
   ExactSolution<dim> exact_solution;
+
+				     // do NOT use QGauss here!
+  QTrapez<1> q_trapez;
+  QIterated<dim> quadrature (q_trapez, 5);
   {
     const ComponentSelectFunction<dim> mask (dim, 1., dim+1);
     VectorTools::integrate_difference (dof_handler, solution, exact_solution,
-				       tmp, QGauss<dim>(degree+1),
+				       tmp, quadrature,
 				       VectorTools::L2_norm,
 				       &mask);
   }
@@ -677,7 +547,7 @@ void MixedLaplaceProblem<dim>::compute_errors () const
     {
       const ComponentSelectFunction<dim> mask(d, 1., dim+1);
       VectorTools::integrate_difference (dof_handler, solution, exact_solution,
-					 tmp, QGauss<dim>(degree+1),
+					 tmp, quadrature,
 					 VectorTools::L2_norm,
 					 &mask);
       u_l2_error = std::sqrt (u_l2_error*u_l2_error +
@@ -704,11 +574,6 @@ void MixedLaplaceProblem<dim>::compute_errors () const
 }
 
 
-
-				 // This function also does what the
-				 // respective one did in the previous
-				 // example. No changes here for
-				 // dimension independence either.
 template <int dim>
 void MixedLaplaceProblem<dim>::output_results () const
 {
@@ -716,20 +581,10 @@ void MixedLaplaceProblem<dim>::output_results () const
 
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");
+  data_out.add_data_vector (system_rhs, "rhs");
 
   data_out.build_patches (degree+1);
 
-				   // Only difference to the previous
-				   // example: write output in GMV
-				   // format, rather than for
-				   // gnuplot. We use the dimension in
-				   // the filename to generate
-				   // distinct filenames for each run
-				   // (in a better program, one would
-				   // check whether `dim' can have
-				   // other values than 2 or 3, but we
-				   // neglect this here for the sake
-				   // of brevity).
   std::ofstream output (dim == 2 ?
 			"solution-2d.gmv" :
 			"solution-3d.gmv");
@@ -738,11 +593,6 @@ void MixedLaplaceProblem<dim>::output_results () const
 
 
 
-				 // This is the function which has the
-				 // top-level control over
-				 // everything. Apart from one line of
-				 // additional output, it is the same
-				 // as for the previous example.
 template <int dim>
 void MixedLaplaceProblem<dim>::run () 
 {
@@ -756,68 +606,11 @@ void MixedLaplaceProblem<dim>::run ()
 }
 
     
-
-				 // And this is the main function. It
-				 // also looks mostly like in the
-				 // previous example:
 int main () 
 {
-				   // In the previous example, we had
-				   // the output from the linear
-				   // solvers about the starting
-				   // residual and the number of the
-				   // iteration where convergence was
-				   // detected. This can be suppressed
-				   // like this:
   deallog.depth_console (0);
-				   // The rationale here is the
-				   // following: the deallog
-				   // (i.e. deal-log, not de-allog)
-				   // variable represents a stream to
-				   // which some parts of the library
-				   // write output. It redirects this
-				   // output to the console and if
-				   // required to a file. The output
-				   // is nested in a way that each
-				   // function can use a prefix string
-				   // (separated by colons) for each
-				   // line of output; if it calls
-				   // another function, that may also
-				   // use its prefix which is then
-				   // printed after the one of the
-				   // calling function. Since output
-				   // from functions which are nested
-				   // deep below is usually not as
-				   // important as top-level output,
-				   // you can give the deallog
-				   // variable a maximal depth of
-				   // nested output for output to
-				   // console and file. The depth zero
-				   // which we gave here means that no
-				   // output is written.
 
-				   // After having done this
-				   // administrative stuff, we can go
-				   // on just as before: define one of
-				   // these top-level objects and
-				   // transfer control to
-				   // it. Actually, now is the point
-				   // where we have to tell the
-				   // compiler which dimension we
-				   // would like to use; all functions
-				   // up to now including the classes
-				   // were only templates and nothing
-				   // has been compiled by now, but by
-				   // declaring the following objects,
-				   // the compiler will start to
-				   // compile all the functions at the
-				   // top using the template parameter
-				   // replaced with a concrete value.
-				   //
-				   // For demonstration, we will first
-				   // let the whole thing run in 2D
-				   // and then in 3D:
-  MixedLaplaceProblem<2> mixed_laplace_problem (0);
+  MixedLaplaceProblem<2> mixed_laplace_problem (1);
   mixed_laplace_problem.run ();
 
   return 0;
