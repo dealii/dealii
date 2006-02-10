@@ -16,8 +16,6 @@
 
 #include <base/config.h>
 #include <dofs/dof_accessor.h>
-#include <dofs/dof_handler.h>
-#include <dofs/hp_dof_handler.h>
 #include <dofs/dof_levels.h>
 #include <dofs/hp_dof_levels.h>
 #include <grid/tria_iterator.h>
@@ -29,8 +27,8 @@
 /*------------------------- Functions: DoFAccessor ---------------------------*/
 
 
-template <int dim, template <int> class DH>
-DoFAccessor<dim, DH>::DoFAccessor ()
+template <class DH>
+DoFAccessor<DH>::DoFAccessor ()
                 :
 		dof_handler(0)
 {
@@ -39,17 +37,17 @@ DoFAccessor<dim, DH>::DoFAccessor ()
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-DoFAccessor<dim, DH>::DoFAccessor (const DH<dim> *dof_handler) :
-		dof_handler(const_cast<DH<dim>*>(dof_handler))
+DoFAccessor<DH>::DoFAccessor (const DH *dof_handler) :
+		dof_handler(const_cast<DH*>(dof_handler))
 {}
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 void
-DoFAccessor<dim, DH>::set_dof_handler (DH<dim> *dh)
+DoFAccessor<DH>::set_dof_handler (DH *dh)
 {
   Assert (dh != 0, ExcInvalidObject());
   dof_handler = dh;
@@ -57,19 +55,19 @@ DoFAccessor<dim, DH>::set_dof_handler (DH<dim> *dh)
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-const DH<dim> &
-DoFAccessor<dim, DH>::get_dof_handler () const
+const DH &
+DoFAccessor<DH>::get_dof_handler () const
 {
   return *this->dof_handler;
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-DoFAccessor<dim, DH> &
-DoFAccessor<dim, DH>::operator = (const DoFAccessor<dim, DH> &da)
+DoFAccessor<DH> &
+DoFAccessor<DH>::operator = (const DoFAccessor<DH> &da)
 {
   this->set_dof_handler (da.dof_handler);
   return *this;
@@ -77,10 +75,10 @@ DoFAccessor<dim, DH>::operator = (const DoFAccessor<dim, DH> &da)
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 bool
-DoFAccessor<dim, DH>::operator == (const DoFAccessor<dim, DH> &a) const
+DoFAccessor<DH>::operator == (const DoFAccessor<DH> &a) const
 {
   Assert (dof_handler == a.dof_handler, ExcCantCompareIterators());
 
@@ -92,10 +90,10 @@ DoFAccessor<dim, DH>::operator == (const DoFAccessor<dim, DH> &a) const
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 bool
-DoFAccessor<dim, DH>::operator != (const DoFAccessor<dim, DH> &a) const
+DoFAccessor<DH>::operator != (const DoFAccessor<DH> &a) const
 {
   Assert (dof_handler == a.dof_handler, ExcCantCompareIterators());
 
@@ -114,26 +112,26 @@ DoFAccessor<dim, DH>::operator != (const DoFAccessor<dim, DH> &a) const
 /*------------------------- Functions: DoFObjectAccessor<1,dim> -----------------------*/
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-DoFObjectAccessor<1,dim,DH>::
-DoFObjectAccessor (const Triangulation<dim> *tria,
+DoFObjectAccessor<1,DH>::
+DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
                    const int                 level,
                    const int                 index,
                    const AccessorData       *local_data)
                 :
-                DoFAccessor<dim,DH> (local_data),
-                DoFObjectAccessor_Inheritance<1,dim>::BaseClass (tria,
-                                                                 level,
-                                                                 index)
+                DoFAccessor<DH> (local_data),
+                DoFObjectAccessor_Inheritance<1,DH::dimension>::BaseClass (tria,
+									   level,
+									   index)
 {}
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 unsigned int
-DoFObjectAccessor<1,dim,DH>::dof_index (const unsigned int i) const
+DoFObjectAccessor<1,DH>::dof_index (const unsigned int i) const
 {
 				   // since the exception classes are
 				   // from a template dependent base
@@ -144,7 +142,7 @@ DoFObjectAccessor<1,dim,DH>::dof_index (const unsigned int i) const
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<dim, DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   
   Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -158,10 +156,10 @@ DoFObjectAccessor<1,dim,DH>::dof_index (const unsigned int i) const
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 unsigned int
-DoFObjectAccessor<1,dim,DH>::vertex_dof_index (const unsigned int vertex,
+DoFObjectAccessor<1,DH>::vertex_dof_index (const unsigned int vertex,
 					       const unsigned int i) const
 {
 				   // since the exception classes are
@@ -173,7 +171,7 @@ DoFObjectAccessor<1,dim,DH>::vertex_dof_index (const unsigned int vertex,
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<dim, DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   
   Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
   Assert (&this->get_fe() != 0, typename BaseClass::ExcInvalidObject());
@@ -188,10 +186,10 @@ DoFObjectAccessor<1,dim,DH>::vertex_dof_index (const unsigned int vertex,
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 void
-DoFObjectAccessor<1,dim,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
+DoFObjectAccessor<1,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
 				   // since the exception classes are
 				   // from a template dependent base
@@ -202,7 +200,7 @@ DoFObjectAccessor<1,dim,DH>::get_dof_indices (std::vector<unsigned int> &dof_ind
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<dim, DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   
   Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
   Assert (&this->get_fe() != 0, typename BaseClass::ExcInvalidObject());
@@ -235,15 +233,15 @@ DoFObjectAccessor<1,dim,DH>::get_dof_indices (std::vector<unsigned int> &dof_ind
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-TriaIterator<dim,DoFObjectAccessor<1,dim,DH> >
-DoFObjectAccessor<1,dim,DH>::child (const unsigned int i) const
+TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> >
+DoFObjectAccessor<1,DH>::child (const unsigned int i) const
 {
-  TriaIterator<dim,DoFObjectAccessor<1,dim,DH> > q (this->tria,
-						    this->present_level+1,
-						    this->child_index (i),
-						    this->dof_handler);
+  TriaIterator<dim,DoFObjectAccessor<1,DH> > q (this->tria,
+						this->present_level+1,
+						this->child_index (i),
+						this->dof_handler);
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -254,39 +252,39 @@ DoFObjectAccessor<1,dim,DH>::child (const unsigned int i) const
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-const FiniteElement<dim> &
-DoFObjectAccessor<1,dim,DH>::get_fe () const
+const FiniteElement<DH::dimension> &
+DoFObjectAccessor<1,DH>::get_fe () const
 {
   return *this->dof_handler->selected_fe;
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 unsigned int
-DoFObjectAccessor<1,dim,DH>::active_fe_index () const
+DoFObjectAccessor<1,DH>::active_fe_index () const
 {
     return 0;
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 void
-DoFObjectAccessor<1,dim,DH>::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<1,DH>::set_active_fe_index (const unsigned int i)
 {
-  typedef DoFAccessor<dim, DoFHandler> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   Assert (i == 0, typename BaseClass::ExcInvalidObject());
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 template <typename number, typename OutputVector>
 inline
 void
-DoFObjectAccessor<1, dim, DH>::
+DoFObjectAccessor<1,DH>::
 distribute_local_to_global (const Vector<number> &local_source,
 			    OutputVector         &global_destination) const
 {
@@ -299,7 +297,7 @@ distribute_local_to_global (const Vector<number> &local_source,
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<dim,DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -326,11 +324,11 @@ distribute_local_to_global (const Vector<number> &local_source,
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 template <typename number, typename OutputMatrix>
 inline
 void
-DoFObjectAccessor<1, dim, DH>::
+DoFObjectAccessor<1,DH>::
 distribute_local_to_global (const FullMatrix<number> &local_source,
 			    OutputMatrix             &global_destination) const
 {
@@ -343,7 +341,7 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<dim,DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -375,10 +373,10 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 void
-DoFObjectAccessor<1,dim,DH>::copy_from (const DoFObjectAccessor<1,dim,DH> &a)
+DoFObjectAccessor<1,DH>::copy_from (const DoFObjectAccessor<1,DH> &a)
 {
   BaseClass::copy_from (a);
   this->set_dof_handler (a.dof_handler);
@@ -386,38 +384,38 @@ DoFObjectAccessor<1,dim,DH>::copy_from (const DoFObjectAccessor<1,dim,DH> &a)
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 bool
-DoFObjectAccessor<1,dim,DH>::operator == (const DoFObjectAccessor<1,dim,DH> &a) const
+DoFObjectAccessor<1,DH>::operator == (const DoFObjectAccessor<1,DH> &a) const
 {
   return (TriaObjectAccessor<1,dim>::operator == (a)
           &&
-          DoFAccessor<dim,DH>::operator == (a));
+          DoFAccessor<DH>::operator == (a));
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 bool
-DoFObjectAccessor<1,dim,DH>::operator != (const DoFObjectAccessor<1,dim,DH> &a) const
+DoFObjectAccessor<1,DH>::operator != (const DoFObjectAccessor<1,DH> &a) const
 {
   return (TriaObjectAccessor<1,dim>::operator != (a)
           ||
-          DoFAccessor<dim,DH>::operator != (a));
+          DoFAccessor<DH>::operator != (a));
 }
 
 
 /*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
 
-template <int dim, template <int> class DH>
-DoFObjectAccessor<2,dim,DH>::
-DoFObjectAccessor (const Triangulation<dim> *tria,
+template <class DH>
+DoFObjectAccessor<2,DH>::
+DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
                    const int                 level,
                    const int                 index,
                    const AccessorData       *local_data)
                 :
-                DoFAccessor<dim,DH> (local_data),
+                DoFAccessor<DH> (local_data),
                 DoFObjectAccessor_Inheritance<2,dim>::BaseClass (tria,
                                                                  level,
                                                                  index)
@@ -425,12 +423,12 @@ DoFObjectAccessor (const Triangulation<dim> *tria,
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 unsigned int
-DoFObjectAccessor<2,dim,DH>::dof_index (const unsigned int i) const
+DoFObjectAccessor<2,DH>::dof_index (const unsigned int i) const
 {
-  typedef DoFAccessor<dim,DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -446,13 +444,13 @@ DoFObjectAccessor<2,dim,DH>::dof_index (const unsigned int i) const
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 unsigned int
-DoFObjectAccessor<2,dim,DH>::vertex_dof_index (const unsigned int vertex,
+DoFObjectAccessor<2,DH>::vertex_dof_index (const unsigned int vertex,
 					       const unsigned int i) const
 {
-  typedef DoFAccessor<dim, DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
 
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -470,12 +468,12 @@ DoFObjectAccessor<2,dim,DH>::vertex_dof_index (const unsigned int vertex,
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 void
-DoFObjectAccessor<2,dim,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
+DoFObjectAccessor<2,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
-  typedef DoFAccessor<dim, DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
 
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -515,14 +513,14 @@ DoFObjectAccessor<2,dim,DH>::get_dof_indices (std::vector<unsigned int> &dof_ind
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-TriaIterator<dim,DoFObjectAccessor<1,dim,DH> >
-DoFObjectAccessor<2,dim,DH>::line (const unsigned int i) const
+TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> >
+DoFObjectAccessor<2,DH>::line (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange (i, 0, 4));
 
-  return TriaIterator<dim,DoFObjectAccessor<1,dim,DH> >
+  return TriaIterator<dim,DoFObjectAccessor<1,DH> >
     (
       this->tria,
       this->present_level,
@@ -532,15 +530,15 @@ DoFObjectAccessor<2,dim,DH>::line (const unsigned int i) const
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-TriaIterator<dim,DoFObjectAccessor<2,dim,DH> >
-DoFObjectAccessor<2,dim,DH>::child (const unsigned int i) const
+TriaIterator<DH::dimension,DoFObjectAccessor<2,DH> >
+DoFObjectAccessor<2,DH>::child (const unsigned int i) const
 {
-  TriaIterator<dim,DoFObjectAccessor<2,dim,DH> > q (this->tria,
-						 this->present_level+1,
-						 this->child_index (i),
-						 this->dof_handler);
+  TriaIterator<dim,DoFObjectAccessor<2,DH> > q (this->tria,
+						this->present_level+1,
+						this->child_index (i),
+						this->dof_handler);
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -550,40 +548,40 @@ DoFObjectAccessor<2,dim,DH>::child (const unsigned int i) const
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-const FiniteElement<dim> &
-DoFObjectAccessor<2,dim,DH>::get_fe () const
+const FiniteElement<DH::dimension> &
+DoFObjectAccessor<2,DH>::get_fe () const
 {
   return *this->dof_handler->selected_fe;
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 unsigned int
-DoFObjectAccessor<2,dim,DH>::active_fe_index () const
+DoFObjectAccessor<2,DH>::active_fe_index () const
 {
     return 0;
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 void
-DoFObjectAccessor<2,dim,DH>::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<2,DH>::set_active_fe_index (const unsigned int i)
 {
-  typedef DoFAccessor<dim, DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   Assert (i == 0, typename BaseClass::ExcInvalidObject());
 }
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 template <typename number, typename OutputVector>
 inline
 void
-DoFObjectAccessor<2, dim, DH>::
+DoFObjectAccessor<2,DH>::
 distribute_local_to_global (const Vector<number> &local_source,
 			    OutputVector         &global_destination) const
 {
@@ -596,7 +594,7 @@ distribute_local_to_global (const Vector<number> &local_source,
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<dim,DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -624,11 +622,11 @@ distribute_local_to_global (const Vector<number> &local_source,
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 template <typename number, typename OutputMatrix>
 inline
 void
-DoFObjectAccessor<2, dim, DH>::
+DoFObjectAccessor<2,DH>::
 distribute_local_to_global (const FullMatrix<number> &local_source,
 			    OutputMatrix             &global_destination) const
 {
@@ -641,7 +639,7 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<dim,DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -674,10 +672,10 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 void
-DoFObjectAccessor<2,dim,DH>::copy_from (const DoFObjectAccessor<2,dim,DH> &a)
+DoFObjectAccessor<2,DH>::copy_from (const DoFObjectAccessor<2,DH> &a)
 {
   BaseClass::copy_from (a);
   this->set_dof_handler (a.dof_handler);
@@ -685,40 +683,40 @@ DoFObjectAccessor<2,dim,DH>::copy_from (const DoFObjectAccessor<2,dim,DH> &a)
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 bool
-DoFObjectAccessor<2,dim,DH>::operator == (const DoFObjectAccessor<2,dim,DH> &a) const
+DoFObjectAccessor<2,DH>::operator == (const DoFObjectAccessor<2,DH> &a) const
 {
   return (TriaObjectAccessor<2,dim>::operator == (a)
           &&
-          DoFAccessor<dim,DH>::operator == (a));
+          DoFAccessor<DH>::operator == (a));
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 bool
-DoFObjectAccessor<2,dim,DH>::operator != (const DoFObjectAccessor<2,dim,DH> &a) const
+DoFObjectAccessor<2,DH>::operator != (const DoFObjectAccessor<2,DH> &a) const
 {
   return (TriaObjectAccessor<2,dim>::operator != (a)
           ||
-          DoFAccessor<dim,DH>::operator != (a));
+          DoFAccessor<DH>::operator != (a));
 }
 
 
 
 /*------------------------- Functions: DoFObjectAccessor<3,dim> -----------------------*/
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-DoFObjectAccessor<3,dim,DH>::
-DoFObjectAccessor (const Triangulation<dim> *tria,
+DoFObjectAccessor<3,DH>::
+DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
                    const int                 level,
                    const int                 index,
                    const AccessorData       *local_data)
                 :
-                DoFAccessor<dim,DH> (local_data),
+                DoFAccessor<DH> (local_data),
                 DoFObjectAccessor_Inheritance<3,dim>::BaseClass (tria,
                                                                  level,
                                                                  index)
@@ -726,12 +724,12 @@ DoFObjectAccessor (const Triangulation<dim> *tria,
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 unsigned int
-DoFObjectAccessor<3,dim,DH>::dof_index (const unsigned int i) const
+DoFObjectAccessor<3,DH>::dof_index (const unsigned int i) const
 {
-  typedef DoFAccessor<dim, DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
 
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -747,13 +745,13 @@ DoFObjectAccessor<3,dim,DH>::dof_index (const unsigned int i) const
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 unsigned int
-DoFObjectAccessor<3,dim,DH>::vertex_dof_index (const unsigned int vertex,
+DoFObjectAccessor<3,DH>::vertex_dof_index (const unsigned int vertex,
 					       const unsigned int i) const
 {
-  typedef DoFAccessor<dim, DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
 
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -770,12 +768,12 @@ DoFObjectAccessor<3,dim,DH>::vertex_dof_index (const unsigned int vertex,
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 void
-DoFObjectAccessor<3,dim,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
+DoFObjectAccessor<3,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
-  typedef DoFAccessor<dim, DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
 
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -820,13 +818,13 @@ DoFObjectAccessor<3,dim,DH>::get_dof_indices (std::vector<unsigned int> &dof_ind
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-TriaIterator<dim,DoFObjectAccessor<1,dim,DH> >
-DoFObjectAccessor<3,dim,DH>::line (const unsigned int i) const
+TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> >
+DoFObjectAccessor<3,DH>::line (const unsigned int i) const
 {
   TriaIterator<dim,TriaObjectAccessor<1,dim> > l = BaseClass::line(i);
-  return TriaIterator<dim,DoFObjectAccessor<1,dim,DH> >
+  return TriaIterator<dim,DoFObjectAccessor<1,DH> >
     (
       this->tria,
       this->present_level,
@@ -836,14 +834,14 @@ DoFObjectAccessor<3,dim,DH>::line (const unsigned int i) const
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-TriaIterator<dim,DoFObjectAccessor<2,dim,DH> >
-DoFObjectAccessor<3,dim,DH>::quad (const unsigned int i) const
+TriaIterator<DH::dimension,DoFObjectAccessor<2,DH> >
+DoFObjectAccessor<3,DH>::quad (const unsigned int i) const
 {
   Assert (i<6, ExcIndexRange (i, 0, 6));
 
-  return TriaIterator<dim,DoFObjectAccessor<2,dim,DH> >
+  return TriaIterator<dim,DoFObjectAccessor<2,DH> >
     (
       this->tria,
       this->present_level,
@@ -853,15 +851,15 @@ DoFObjectAccessor<3,dim,DH>::quad (const unsigned int i) const
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-TriaIterator<dim,DoFObjectAccessor<3,dim,DH> >
-DoFObjectAccessor<3,dim,DH>::child (const unsigned int i) const
+TriaIterator<DH::dimension,DoFObjectAccessor<3,DH> >
+DoFObjectAccessor<3,DH>::child (const unsigned int i) const
 {
-  TriaIterator<dim,DoFObjectAccessor<3,dim,DH> > q (this->tria,
-						    this->present_level+1,
-						    this->child_index (i),
-						    this->dof_handler);
+  TriaIterator<dim,DoFObjectAccessor<3,DH> > q (this->tria,
+						this->present_level+1,
+						this->child_index (i),
+						this->dof_handler);
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -871,39 +869,39 @@ DoFObjectAccessor<3,dim,DH>::child (const unsigned int i) const
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-const FiniteElement<dim> &
-DoFObjectAccessor<3,dim,DH>::get_fe () const
+const FiniteElement<DH::dimension> &
+DoFObjectAccessor<3,DH>::get_fe () const
 {
   return *this->dof_handler->selected_fe;
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 unsigned int
-DoFObjectAccessor<3,dim,DH>::active_fe_index () const
+DoFObjectAccessor<3,DH>::active_fe_index () const
 {
     return 0;
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 void
-DoFObjectAccessor<3,dim,DH>::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<3,DH>::set_active_fe_index (const unsigned int i)
 {
-  typedef DoFAccessor<dim, DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   Assert (i == 0, typename BaseClass::ExcInvalidObject());
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 template <typename number, typename OutputVector>
 inline
 void
-DoFObjectAccessor<3, dim, DH>::
+DoFObjectAccessor<3,DH>::
 distribute_local_to_global (const Vector<number> &local_source,
 			    OutputVector         &global_destination) const
 {
@@ -916,7 +914,7 @@ distribute_local_to_global (const Vector<number> &local_source,
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<dim,DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -945,11 +943,11 @@ distribute_local_to_global (const Vector<number> &local_source,
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 template <typename number, typename OutputMatrix>
 inline
 void
-DoFObjectAccessor<3, dim, DH>::
+DoFObjectAccessor<3,DH>::
 distribute_local_to_global (const FullMatrix<number> &local_source,
 			    OutputMatrix             &global_destination) const
 {
@@ -962,7 +960,7 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<dim,DH> BaseClass;
+  typedef DoFAccessor<DH> BaseClass;
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -996,8 +994,8 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 
 
 
-template <int dim, template <int> class DH>
-void DoFObjectAccessor<3,dim,DH>::copy_from (const DoFObjectAccessor<3,dim,DH> &a)
+template <class DH>
+void DoFObjectAccessor<3,DH>::copy_from (const DoFObjectAccessor<3,DH> &a)
 {
   BaseClass::copy_from (a);
   this->set_dof_handler (a.dof_handler);
@@ -1005,25 +1003,25 @@ void DoFObjectAccessor<3,dim,DH>::copy_from (const DoFObjectAccessor<3,dim,DH> &
 
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 bool
-DoFObjectAccessor<3,dim,DH>::operator == (const DoFObjectAccessor<3,dim,DH> &a) const
+DoFObjectAccessor<3,DH>::operator == (const DoFObjectAccessor<3,DH> &a) const
 {
   return (TriaObjectAccessor<3,dim>::operator == (a)
           &&
-          DoFAccessor<dim,DH>::operator == (a));
+          DoFAccessor<DH>::operator == (a));
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
 bool
-DoFObjectAccessor<3,dim,DH>::operator != (const DoFObjectAccessor<3,dim,DH> &a) const
+DoFObjectAccessor<3,DH>::operator != (const DoFObjectAccessor<3,DH> &a) const
 {
   return (TriaObjectAccessor<3,dim>::operator != (a)
           ||
-          DoFAccessor<dim,DH>::operator != (a));
+          DoFAccessor<DH>::operator != (a));
 }
 
 
@@ -1032,7 +1030,7 @@ DoFObjectAccessor<3,dim,DH>::operator != (const DoFObjectAccessor<3,dim,DH> &a) 
 template <>
 inline
 unsigned int
-DoFObjectAccessor<1,1,hp::DoFHandler>::dof_index (const unsigned int i) const
+DoFObjectAccessor<1,hp::DoFHandler<1> >::dof_index (const unsigned int i) const
 {
 				   // since the exception classes are
 				   // from a template dependent base
@@ -1043,7 +1041,7 @@ DoFObjectAccessor<1,1,hp::DoFHandler>::dof_index (const unsigned int i) const
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<1, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<1> > BaseClass;
   
   Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -1062,7 +1060,7 @@ DoFObjectAccessor<1,1,hp::DoFHandler>::dof_index (const unsigned int i) const
 template <>
 inline
 unsigned int
-DoFObjectAccessor<1,2,hp::DoFHandler>::dof_index (const unsigned int i) const
+DoFObjectAccessor<1,hp::DoFHandler<2> >::dof_index (const unsigned int i) const
 {
 				   // since the exception classes are
 				   // from a template dependent base
@@ -1073,7 +1071,7 @@ DoFObjectAccessor<1,2,hp::DoFHandler>::dof_index (const unsigned int i) const
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<2, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<2> > BaseClass;
   
   Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -1092,7 +1090,7 @@ DoFObjectAccessor<1,2,hp::DoFHandler>::dof_index (const unsigned int i) const
 template <>
 inline
 unsigned int
-DoFObjectAccessor<1,3,hp::DoFHandler>::dof_index (const unsigned int i) const
+DoFObjectAccessor<1,hp::DoFHandler<3> >::dof_index (const unsigned int i) const
 {
 				   // since the exception classes are
 				   // from a template dependent base
@@ -1103,7 +1101,7 @@ DoFObjectAccessor<1,3,hp::DoFHandler>::dof_index (const unsigned int i) const
 				   // non-template dependent name and
 				   // use that to specify the
 				   // qualified exception names
-  typedef DoFAccessor<3, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
   
   Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -1123,10 +1121,10 @@ DoFObjectAccessor<1,3,hp::DoFHandler>::dof_index (const unsigned int i) const
 template <>
 inline
 void
-DoFObjectAccessor<1, 1, hp::DoFHandler>::set_dof_index (const unsigned int i,
-                                                      const unsigned int index) const
+DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_index (const unsigned int i,
+							const unsigned int index) const
 {
-  typedef DoFAccessor<1, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<1> > BaseClass;
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
@@ -1147,10 +1145,10 @@ DoFObjectAccessor<1, 1, hp::DoFHandler>::set_dof_index (const unsigned int i,
 template <>
 inline
 void
-DoFObjectAccessor<1, 2, hp::DoFHandler>::set_dof_index (const unsigned int i,
-                                                      const unsigned int index) const
+DoFObjectAccessor<1, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
+							 const unsigned int index) const
 {
-  typedef DoFAccessor<2, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<2> > BaseClass;
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
@@ -1175,10 +1173,10 @@ DoFObjectAccessor<1, 2, hp::DoFHandler>::set_dof_index (const unsigned int i,
 template <>
 inline
 void
-DoFObjectAccessor<1, 3, hp::DoFHandler>::set_dof_index (const unsigned int i,
-                                                      const unsigned int index) const
+DoFObjectAccessor<1, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
+							 const unsigned int index) const
 {
-  typedef DoFAccessor<3, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
@@ -1201,21 +1199,21 @@ DoFObjectAccessor<1, 3, hp::DoFHandler>::set_dof_index (const unsigned int i,
 template <>
 inline
 const FiniteElement<1> &
-DoFObjectAccessor<1,1,hp::DoFHandler>::get_fe () const
+DoFObjectAccessor<1,hp::DoFHandler<1> >::get_fe () const
 {
   return (*dof_handler->finite_elements)[active_fe_index ()];
 }
 template <>
 inline
 const FiniteElement<2> &
-DoFObjectAccessor<1,2,hp::DoFHandler>::get_fe () const
+DoFObjectAccessor<1,hp::DoFHandler<2> >::get_fe () const
 {
   return (*dof_handler->finite_elements)[active_fe_index ()];
 }
 template <>
 inline
 const FiniteElement<3> &
-DoFObjectAccessor<1,3,hp::DoFHandler>::get_fe () const
+DoFObjectAccessor<1,hp::DoFHandler<3> >::get_fe () const
 {
   return (*dof_handler->finite_elements)[active_fe_index ()];
 }
@@ -1224,7 +1222,7 @@ DoFObjectAccessor<1,3,hp::DoFHandler>::get_fe () const
 template <>
 inline
 unsigned int
-DoFObjectAccessor<1,1,hp::DoFHandler>::active_fe_index () const
+DoFObjectAccessor<1,hp::DoFHandler<1> >::active_fe_index () const
 {
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
 	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
@@ -1236,7 +1234,7 @@ DoFObjectAccessor<1,1,hp::DoFHandler>::active_fe_index () const
 template <>
 inline
 unsigned int
-DoFObjectAccessor<1,2,hp::DoFHandler>::active_fe_index () const
+DoFObjectAccessor<1,hp::DoFHandler<2> >::active_fe_index () const
 {
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
 	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
@@ -1248,7 +1246,7 @@ DoFObjectAccessor<1,2,hp::DoFHandler>::active_fe_index () const
 template <>
 inline
 unsigned int
-DoFObjectAccessor<1,3,hp::DoFHandler>::active_fe_index () const
+DoFObjectAccessor<1,hp::DoFHandler<3> >::active_fe_index () const
 {
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
 	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
@@ -1262,7 +1260,7 @@ DoFObjectAccessor<1,3,hp::DoFHandler>::active_fe_index () const
 template <>
 inline
 void
-DoFObjectAccessor<1,1,hp::DoFHandler>::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<1,hp::DoFHandler<1> >::set_active_fe_index (const unsigned int i)
 {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
@@ -1277,7 +1275,7 @@ DoFObjectAccessor<1,1,hp::DoFHandler>::set_active_fe_index (const unsigned int i
 template <>
 inline
 void
-DoFObjectAccessor<1,2,hp::DoFHandler>::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<1,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i)
 {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
@@ -1292,7 +1290,7 @@ DoFObjectAccessor<1,2,hp::DoFHandler>::set_active_fe_index (const unsigned int i
 template <>
 inline
 void
-DoFObjectAccessor<1,3,hp::DoFHandler>::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<1,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i)
 {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
@@ -1310,9 +1308,9 @@ DoFObjectAccessor<1,3,hp::DoFHandler>::set_active_fe_index (const unsigned int i
 
 template <>
 inline
-unsigned int DoFObjectAccessor<2,2,hp::DoFHandler>::dof_index (const unsigned int i) const
+unsigned int DoFObjectAccessor<2,hp::DoFHandler<2> >::dof_index (const unsigned int i) const
 {
-  typedef DoFAccessor<2, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<2> > BaseClass;
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
@@ -1331,9 +1329,9 @@ unsigned int DoFObjectAccessor<2,2,hp::DoFHandler>::dof_index (const unsigned in
 
 template <>
 inline
-unsigned int DoFObjectAccessor<2,3,hp::DoFHandler>::dof_index (const unsigned int i) const
+unsigned int DoFObjectAccessor<2,hp::DoFHandler<3> >::dof_index (const unsigned int i) const
 {
-  typedef DoFAccessor<3, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
@@ -1354,10 +1352,10 @@ unsigned int DoFObjectAccessor<2,3,hp::DoFHandler>::dof_index (const unsigned in
 template <>
 inline
 void
-DoFObjectAccessor<2, 2, hp::DoFHandler>::set_dof_index (const unsigned int i,
-                                                      const unsigned int index) const
+DoFObjectAccessor<2, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
+							 const unsigned int index) const
 {
-  typedef DoFAccessor<2, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<2> > BaseClass;
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
@@ -1378,10 +1376,10 @@ DoFObjectAccessor<2, 2, hp::DoFHandler>::set_dof_index (const unsigned int i,
 template <>
 inline
 void
-DoFObjectAccessor<2, 3, hp::DoFHandler>::set_dof_index (const unsigned int i,
+DoFObjectAccessor<2, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
                                                       const unsigned int index) const
 {
-  typedef DoFAccessor<3, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
@@ -1403,7 +1401,7 @@ DoFObjectAccessor<2, 3, hp::DoFHandler>::set_dof_index (const unsigned int i,
 template <>
 inline
 const FiniteElement<2> &
-DoFObjectAccessor<2,2,hp::DoFHandler>::get_fe () const
+DoFObjectAccessor<2,hp::DoFHandler<2> >::get_fe () const
 {
   return (*dof_handler->finite_elements)[active_fe_index ()];
 }
@@ -1413,7 +1411,7 @@ DoFObjectAccessor<2,2,hp::DoFHandler>::get_fe () const
 template <>
 inline
 const FiniteElement<3> &
-DoFObjectAccessor<2,3,hp::DoFHandler>::get_fe () const
+DoFObjectAccessor<2,hp::DoFHandler<3> >::get_fe () const
 {
   return (*dof_handler->finite_elements)[active_fe_index ()];
 }
@@ -1423,7 +1421,7 @@ DoFObjectAccessor<2,3,hp::DoFHandler>::get_fe () const
 template <>
 inline
 unsigned int
-DoFObjectAccessor<2,2,hp::DoFHandler>::active_fe_index () const
+DoFObjectAccessor<2,hp::DoFHandler<2> >::active_fe_index () const
 {
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
 	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
@@ -1438,7 +1436,7 @@ DoFObjectAccessor<2,2,hp::DoFHandler>::active_fe_index () const
 template <>
 inline
 unsigned int
-DoFObjectAccessor<2,3,hp::DoFHandler>::active_fe_index () const
+DoFObjectAccessor<2,hp::DoFHandler<3> >::active_fe_index () const
 {
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
 	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
@@ -1452,7 +1450,7 @@ DoFObjectAccessor<2,3,hp::DoFHandler>::active_fe_index () const
 template <>
 inline
 void
-DoFObjectAccessor<2,2,hp::DoFHandler>::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<2,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i)
 {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
@@ -1470,7 +1468,7 @@ DoFObjectAccessor<2,2,hp::DoFHandler>::set_active_fe_index (const unsigned int i
 template <>
 inline
 void
-DoFObjectAccessor<2,3,hp::DoFHandler>::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<2,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i)
 {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
@@ -1489,9 +1487,9 @@ DoFObjectAccessor<2,3,hp::DoFHandler>::set_active_fe_index (const unsigned int i
 template <>
 inline
 unsigned int
-DoFObjectAccessor<3,3,hp::DoFHandler>::dof_index (const unsigned int i) const
+DoFObjectAccessor<3,hp::DoFHandler<3> >::dof_index (const unsigned int i) const
 {
-  typedef DoFAccessor<3, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
@@ -1512,10 +1510,10 @@ DoFObjectAccessor<3,3,hp::DoFHandler>::dof_index (const unsigned int i) const
 template <>
 inline
 void
-DoFObjectAccessor<3, 3, hp::DoFHandler>::set_dof_index (const unsigned int i,
+DoFObjectAccessor<3, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
                                                       const unsigned int index) const
 {
-  typedef DoFAccessor<3, hp::DoFHandler> BaseClass;
+  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
     
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
@@ -1537,7 +1535,7 @@ DoFObjectAccessor<3, 3, hp::DoFHandler>::set_dof_index (const unsigned int i,
 template <>
 inline
 const FiniteElement<3> &
-DoFObjectAccessor<3,3,hp::DoFHandler>::get_fe () const
+DoFObjectAccessor<3,hp::DoFHandler<3> >::get_fe () const
 {
   return (*dof_handler->finite_elements)[active_fe_index ()];
 }
@@ -1546,7 +1544,7 @@ DoFObjectAccessor<3,3,hp::DoFHandler>::get_fe () const
 template <>
 inline
 unsigned int
-DoFObjectAccessor<3,3,hp::DoFHandler>::active_fe_index () const
+DoFObjectAccessor<3,hp::DoFHandler<3> >::active_fe_index () const
 {
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
 	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
@@ -1561,7 +1559,7 @@ DoFObjectAccessor<3,3,hp::DoFHandler>::active_fe_index () const
 template <>
 inline
 void
-DoFObjectAccessor<3,3,hp::DoFHandler>::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<3,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i)
 {
   Assert (dof_handler != 0, ExcInvalidObject());
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
@@ -1577,27 +1575,27 @@ DoFObjectAccessor<3,3,hp::DoFHandler>::set_active_fe_index (const unsigned int i
 
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-DoFCellAccessor<dim,DH>::
-DoFCellAccessor (const Triangulation<dim> *tria,
+DoFCellAccessor<DH>::
+DoFCellAccessor (const Triangulation<DH::dimension> *tria,
                  const int                 level,
                  const int                 index,
                  const AccessorData       *local_data)
                 :
-                DoFObjectAccessor<dim, dim, DH> (tria,level,index,local_data)
+                DoFObjectAccessor<DH::dimension,DH> (tria,level,index,local_data)
 {}
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-TriaIterator<dim,DoFCellAccessor<dim,DH> >
-DoFCellAccessor<dim,DH>::neighbor (const unsigned int i) const
+TriaIterator<DH::dimension,DoFCellAccessor<DH> >
+DoFCellAccessor<DH>::neighbor (const unsigned int i) const
 {
-  TriaIterator<dim,DoFCellAccessor<dim,DH> > q (this->tria,
-						this->neighbor_level (i),
-						this->neighbor_index (i),
-						this->dof_handler);
+  TriaIterator<dim,DoFCellAccessor<DH> > q (this->tria,
+					    this->neighbor_level (i),
+					    this->neighbor_index (i),
+					    this->dof_handler);
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -1607,15 +1605,15 @@ DoFCellAccessor<dim,DH>::neighbor (const unsigned int i) const
 }
 
 
-template <int dim, template <int> class DH>
+template <class DH>
 inline
-TriaIterator<dim,DoFCellAccessor<dim,DH> >
-DoFCellAccessor<dim,DH>::child (const unsigned int i) const
+TriaIterator<DH::dimension,DoFCellAccessor<DH> >
+DoFCellAccessor<DH>::child (const unsigned int i) const
 {
-  TriaIterator<dim,DoFCellAccessor<dim,DH> > q (this->tria,
-						this->present_level+1,
-						this->child_index (i),
-						this->dof_handler);
+  TriaIterator<dim,DoFCellAccessor<DH> > q (this->tria,
+					    this->present_level+1,
+					    this->child_index (i),
+					    this->dof_handler);
   
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
@@ -1628,19 +1626,19 @@ DoFCellAccessor<dim,DH>::child (const unsigned int i) const
 
 template <>
 inline
-TriaIterator<1, DoFObjectAccessor<0,1,hp::DoFHandler> >
-DoFCellAccessor<1,hp::DoFHandler>::face (const unsigned int) const
+TriaIterator<1, DoFObjectAccessor<0,hp::DoFHandler<1> > >
+DoFCellAccessor<hp::DoFHandler<1> >::face (const unsigned int) const
 {
   Assert (false, ExcImpossibleInDim(1));
-  return TriaIterator<1, DoFObjectAccessor<0,1, hp::DoFHandler> >();
+  return TriaIterator<1, DoFObjectAccessor<0,hp::DoFHandler<1> > >();
 }
 
 
 
 template <>
 inline
-TriaIterator<2, DoFObjectAccessor<1,2,hp::DoFHandler> >
-DoFCellAccessor<2,hp::DoFHandler>::face (const unsigned int i) const
+TriaIterator<2, DoFObjectAccessor<1,hp::DoFHandler<2> > >
+DoFCellAccessor<hp::DoFHandler<2> >::face (const unsigned int i) const
 {
   return this->line(i);
 }
@@ -1649,8 +1647,8 @@ DoFCellAccessor<2,hp::DoFHandler>::face (const unsigned int i) const
 
 template <>
 inline
-TriaIterator<3, DoFObjectAccessor<2, 3, hp::DoFHandler> >
-DoFCellAccessor<3,hp::DoFHandler>::face (const unsigned int i) const
+TriaIterator<3, DoFObjectAccessor<2, hp::DoFHandler<3> > >
+DoFCellAccessor<hp::DoFHandler<3> >::face (const unsigned int i) const
 {
   return this->quad(i);
 }

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,13 +13,9 @@
 #ifndef __deal2__dof_iterator_selector_h
 #define __deal2__dof_iterator_selector_h
 
-template <int dim, template <int> class DH> class DoFAccessor;
-template <int dim, template <int> class DH> class DoFCellAccessor;
-template <int celldim, int dim, template <int> class DH> class DoFObjectAccessor;
-template <int dim, template <int> class DH>              class DoFObjectAccessor<0, dim, DH>;
-template <int dim, template <int> class DH>              class DoFObjectAccessor<1, dim, DH>;
-template <int dim, template <int> class DH>              class DoFObjectAccessor<2, dim, DH>;
-template <int dim, template <int> class DH>              class DoFObjectAccessor<3, dim, DH>;
+template <class DH> class DoFAccessor;
+template <class DH> class DoFCellAccessor;
+template <int celldim, class DH> class DoFObjectAccessor;
 template <int dim> class FiniteElement;
 template <int dim, typename Accessor> class TriaRawIterator;
 template <int dim, typename Accessor> class TriaIterator;
@@ -60,9 +56,9 @@ namespace internal
   template <template <int> class DH>
   struct DoFIteratorSelector<DH<1> >
   {
-      typedef TriaRawIterator<1,DoFCellAccessor<1, DH> >    raw_line_iterator;
-      typedef TriaIterator<1,DoFCellAccessor<1, DH> >       line_iterator;
-      typedef TriaActiveIterator<1,DoFCellAccessor<1, DH> > active_line_iterator;
+      typedef TriaRawIterator<1,DoFCellAccessor<DH<1> > >    raw_line_iterator;
+      typedef TriaIterator<1,DoFCellAccessor<DH<1> > >       line_iterator;
+      typedef TriaActiveIterator<1,DoFCellAccessor<DH<1> > > active_line_iterator;
       
       typedef void * raw_quad_iterator;
       typedef void * quad_iterator;
@@ -96,13 +92,13 @@ namespace internal
   template <template <int> class DH>
   struct DoFIteratorSelector<DH<2> >
   {
-      typedef TriaRawIterator<2,DoFObjectAccessor<1, 2, DH> >    raw_line_iterator;
-      typedef TriaIterator<2,DoFObjectAccessor<1, 2, DH> >       line_iterator;
-      typedef TriaActiveIterator<2,DoFObjectAccessor<1, 2, DH> > active_line_iterator;
+      typedef TriaRawIterator<2,DoFObjectAccessor<1, DH<2> > >    raw_line_iterator;
+      typedef TriaIterator<2,DoFObjectAccessor<1, DH<2> > >       line_iterator;
+      typedef TriaActiveIterator<2,DoFObjectAccessor<1, DH<2> > > active_line_iterator;
       
-      typedef TriaRawIterator<2,DoFCellAccessor<2, DH> >         raw_quad_iterator;
-      typedef TriaIterator<2,DoFCellAccessor<2, DH> >            quad_iterator;
-      typedef TriaActiveIterator<2,DoFCellAccessor<2, DH> >      active_quad_iterator;
+      typedef TriaRawIterator<2,DoFCellAccessor<DH<2> > >         raw_quad_iterator;
+      typedef TriaIterator<2,DoFCellAccessor<DH<2> > >            quad_iterator;
+      typedef TriaActiveIterator<2,DoFCellAccessor<DH<2> > >      active_quad_iterator;
       
       typedef void * raw_hex_iterator;
       typedef void * hex_iterator;
@@ -132,17 +128,17 @@ namespace internal
   template <template <int> class DH>
   struct DoFIteratorSelector<DH<3> >
   {
-      typedef TriaRawIterator<3,DoFObjectAccessor<1, 3, DH> >    raw_line_iterator;
-      typedef TriaIterator<3,DoFObjectAccessor<1, 3, DH> >       line_iterator;
-      typedef TriaActiveIterator<3,DoFObjectAccessor<1, 3, DH> > active_line_iterator;
+      typedef TriaRawIterator<3,DoFObjectAccessor<1, DH<3> > >    raw_line_iterator;
+      typedef TriaIterator<3,DoFObjectAccessor<1, DH<3> > >       line_iterator;
+      typedef TriaActiveIterator<3,DoFObjectAccessor<1, DH<3> > > active_line_iterator;
       
-      typedef TriaRawIterator<3,DoFObjectAccessor<2, 3, DH> >    raw_quad_iterator;
-      typedef TriaIterator<3,DoFObjectAccessor<2, 3, DH> >       quad_iterator;
-      typedef TriaActiveIterator<3,DoFObjectAccessor<2, 3, DH> > active_quad_iterator;
+      typedef TriaRawIterator<3,DoFObjectAccessor<2, DH<3> > >    raw_quad_iterator;
+      typedef TriaIterator<3,DoFObjectAccessor<2, DH<3> > >       quad_iterator;
+      typedef TriaActiveIterator<3,DoFObjectAccessor<2, DH<3> > > active_quad_iterator;
       
-      typedef TriaRawIterator<3,DoFCellAccessor<3, DH> >         raw_hex_iterator;
-      typedef TriaIterator<3,DoFCellAccessor<3, DH> >            hex_iterator;
-      typedef TriaActiveIterator<3,DoFCellAccessor<3, DH> >      active_hex_iterator;
+      typedef TriaRawIterator<3,DoFCellAccessor<DH<3> > >         raw_hex_iterator;
+      typedef TriaIterator<3,DoFCellAccessor<DH<3> > >            hex_iterator;
+      typedef TriaActiveIterator<3,DoFCellAccessor<DH<3> > >      active_hex_iterator;
       
       typedef raw_hex_iterator    raw_cell_iterator;
       typedef hex_iterator        cell_iterator;

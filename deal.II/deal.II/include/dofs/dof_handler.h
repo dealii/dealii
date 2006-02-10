@@ -1049,12 +1049,12 @@ class DoFHandler  :  public Subscriptor
 				     /*
 				      * Make accessor objects friends.
 				      */
-    template <int dim1, template <int> class DH> friend class DoFAccessor;
+    template <class DH> friend class DoFAccessor;
 
 				     /*
 				      * Make accessor objects friends.
 				      */
-    template <int dim1, int dim2, template <int> class DH> friend class DoFObjectAccessor;
+    template <int dim1, class DH> friend class DoFObjectAccessor;
 };
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -80,7 +80,7 @@ class MGDoFAccessor {
 				      * Reset the DoF handler pointer.
 				      */
     void set_mg_dof_handler (MGDoFHandler<dim> *dh) {
-	typedef DoFAccessor<dim, DoFHandler> BaseClass;
+	typedef DoFAccessor<DoFHandler<dim> > BaseClass;
       Assert (dh != 0, typename BaseClass::ExcInvalidObject());
       mg_dof_handler = dh;
     };
@@ -131,7 +131,7 @@ class MGDoFObjectAccessor_Inheritance
 				      * See the full documentation for
 				      * more information.
 				      */
-    typedef DoFObjectAccessor<celldim,dim,DoFHandler> BaseClass;
+    typedef DoFObjectAccessor<celldim,DoFHandler<dim> > BaseClass;
 };
 
 
@@ -157,7 +157,7 @@ class MGDoFObjectAccessor_Inheritance<dim,dim>
 				      * See the full documentation for
 				      * more information.
 				      */
-    typedef DoFCellAccessor<dim, DoFHandler> BaseClass;
+    typedef DoFCellAccessor<DoFHandler<dim> > BaseClass;
 };
 
 
