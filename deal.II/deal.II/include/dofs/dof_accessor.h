@@ -49,10 +49,10 @@ template <int dim, typename Accessor> class TriaRawIterator;
  * to edges, faces, and cells of a triangulation. The concept is
  * explained in more detail in connection to @ref Iterators.
  *
- * The first template argument of this class refers to the space
- * dimension in which we work. The second one denotes the type of DoF
- * handler we should work on. It can either be ::DoFHandler or
- * hp::DoFHandler.
+ * The template argument of this class refers to the type of DoF
+ * handler we should work on. It can either be ::DoFHandler<dim> or
+ * hp::DoFHandler<dim>. The space dimension of the object we are to
+ * work on is automatically extracted from the DH template argument.
  *
  * @ingroup dofs
  * @ingroup Accessors 
@@ -253,7 +253,7 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * @ingroup Accessors 
  * @author Wolfgang Bangerth, 1998; Guido Kanschat, 1999
  */
-template<int celldim, class DH>
+template <int celldim, class DH>
 class DoFObjectAccessor : public DoFAccessor<DH>,
 			  public TriaObjectAccessor<celldim, DH::dimension>
 {
@@ -517,7 +517,7 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
  * Closure class.
  * @ingroup dofs
  */
-template<class DH>
+template <class DH>
 class DoFObjectAccessor<0, DH> : public DoFAccessor<DH>,
 				 public DoFObjectAccessor_Inheritance<0,DH::dimension>::BaseClass
 {
