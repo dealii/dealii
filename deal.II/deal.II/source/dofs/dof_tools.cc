@@ -3706,12 +3706,12 @@ DoFTools::convert_couplings_to_blocks (
   const Table<2, Coupling>& table,
   std::vector<Table<2,Coupling> >& tables_by_block)
 {
-  const hp::FECollection<dim>& coll = dof_handler.get_fe();
-  tables_by_block.resize(coll.n_finite_elements());
+  const hp::FECollection<dim>& fe_collection = dof_handler.get_fe();
+  tables_by_block.resize(fe_collection.size());
 
-  for (unsigned int f=0;f<coll.n_finite_elements();++f)
+  for (unsigned int f=0;f<fe_collection.size();++f)
     {
-      const FiniteElement<dim>& fe = coll.get_fe(f);
+      const FiniteElement<dim>& fe = fe_collection[f];
       
       const unsigned int nb = fe.n_blocks();
       tables_by_block[f].reinit(nb, nb);

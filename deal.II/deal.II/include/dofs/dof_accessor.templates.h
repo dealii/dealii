@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1203,21 +1203,21 @@ inline
 const FiniteElement<1> &
 DoFObjectAccessor<1,1,hp::DoFHandler>::get_fe () const
 {
-  return dof_handler->finite_elements->get_fe(active_fe_index ());
+  return (*dof_handler->finite_elements)[active_fe_index ()];
 }
 template <>
 inline
 const FiniteElement<2> &
 DoFObjectAccessor<1,2,hp::DoFHandler>::get_fe () const
 {
-  return dof_handler->finite_elements->get_fe(active_fe_index ());
+  return (*dof_handler->finite_elements)[active_fe_index ()];
 }
 template <>
 inline
 const FiniteElement<3> &
 DoFObjectAccessor<1,3,hp::DoFHandler>::get_fe () const
 {
-  return dof_handler->finite_elements->get_fe(active_fe_index ());
+  return (*dof_handler->finite_elements)[active_fe_index ()];
 }
 
 
@@ -1405,7 +1405,7 @@ inline
 const FiniteElement<2> &
 DoFObjectAccessor<2,2,hp::DoFHandler>::get_fe () const
 {
-  return dof_handler->finite_elements->get_fe(active_fe_index ());
+  return (*dof_handler->finite_elements)[active_fe_index ()];
 }
 
 
@@ -1415,7 +1415,7 @@ inline
 const FiniteElement<3> &
 DoFObjectAccessor<2,3,hp::DoFHandler>::get_fe () const
 {
-  return dof_handler->finite_elements->get_fe(active_fe_index ());
+  return (*dof_handler->finite_elements)[active_fe_index ()];
 }
 
 
@@ -1539,7 +1539,7 @@ inline
 const FiniteElement<3> &
 DoFObjectAccessor<3,3,hp::DoFHandler>::get_fe () const
 {
-  return dof_handler->finite_elements->get_fe(active_fe_index ());
+  return (*dof_handler->finite_elements)[active_fe_index ()];
 }
 
 

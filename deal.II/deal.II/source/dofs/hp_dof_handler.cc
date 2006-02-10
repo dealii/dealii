@@ -1934,7 +1934,7 @@ namespace hp
                                      // their size
     clear_space ();
 
-    vertex_dofs.resize(tria->vertices.size()*finite_elements->get_fe(0).dofs_per_vertex,
+    vertex_dofs.resize(tria->vertices.size()*(*finite_elements)[0].dofs_per_vertex,
                        invalid_dof_index);
 
     for (unsigned int i=0; i<tria->n_levels(); ++i) 
@@ -1948,8 +1948,8 @@ namespace hp
         for (unsigned int j = 0; j < tria->levels[i]->lines.lines.size(); ++j)
           {
             levels.back()->dof_line_index_offset[j] = dofs_for_lines;
-            dofs_for_lines += finite_elements->
-                              get_fe (levels.back ()->active_fe_indices[j]).dofs_per_line;
+            dofs_for_lines += (*finite_elements)[
+	      levels.back ()->active_fe_indices[j]].dofs_per_line;
           }
 
         levels.back()->line_dofs = std::vector<unsigned int>(dofs_for_lines,
@@ -1984,7 +1984,7 @@ namespace hp
                                      // their size
     clear_space ();
   
-    vertex_dofs.resize(tria->vertices.size()*finite_elements->get_fe(0).dofs_per_vertex,
+    vertex_dofs.resize(tria->vertices.size()*(*finite_elements)[0].dofs_per_vertex,
                        invalid_dof_index);
 
 //TODO[?] Does not work for continuous FEs. Problem is at faces, which might have a different
@@ -2065,18 +2065,18 @@ namespace hp
 	      active_fe2 = active_fe1;
 
             if (active_fe1 == active_fe2)
-	      dofs_for_lines += finite_elements->get_fe (active_fe1).dofs_per_line + 2;
+	      dofs_for_lines += (*finite_elements)[active_fe1].dofs_per_line + 2;
             else
-	      dofs_for_lines += finite_elements->get_fe (active_fe1).dofs_per_line +
-                                finite_elements->get_fe (active_fe2).dofs_per_line + 4;
+	      dofs_for_lines += (*finite_elements)[active_fe1].dofs_per_line +
+                                (*finite_elements)[active_fe2].dofs_per_line + 4;
           }
 
         unsigned int dofs_for_quads = 0;
         for (unsigned int j = 0; j < tria->levels[i]->quads.quads.size (); ++j)
           {
             levels.back()->dof_quad_index_offset[j] = dofs_for_quads;
-            dofs_for_quads += finite_elements->
-                              get_fe (levels.back ()->active_fe_indices[j]).dofs_per_quad;
+            dofs_for_quads += (*finite_elements)[
+	      levels.back ()->active_fe_indices[j]].dofs_per_quad;
           }
 
         levels.back()->line_dofs = std::vector<unsigned int> (dofs_for_lines,
@@ -2109,8 +2109,8 @@ namespace hp
                 static_cast<unsigned int>(-1);
             else
               {
-                unsigned int start_next_fe = dofs_for_lines + 
-                                             finite_elements->get_fe (active_fe1).dofs_per_line + 2;
+                const unsigned int start_next_fe =
+		  dofs_for_lines + (*finite_elements)[active_fe1].dofs_per_line + 2;
 
                 levels.back()->line_dofs[dofs_for_lines + 1] = start_next_fe;
 
@@ -2148,7 +2148,7 @@ namespace hp
                                      // their size
     clear_space ();
   
-    vertex_dofs.resize(tria->vertices.size()*finite_elements->get_fe(0).dofs_per_vertex,
+    vertex_dofs.resize(tria->vertices.size()*(*finite_elements)[0].dofs_per_vertex,
                        invalid_dof_index);
 
 //TODO[?] Does not work for continuous FEs. Problem is at faces, which might have a different
@@ -2189,8 +2189,8 @@ namespace hp
         for (unsigned int j=0; j<tria->levels[i]->hexes.hexes.size(); ++j)
           {
             levels.back()->dof_hex_index_offset[j] = dofs_for_hexes;
-            dofs_for_hexes += finite_elements->
-                              get_fe (levels.back ()->active_fe_indices[j]).dofs_per_hex;
+            dofs_for_hexes += (*finite_elements)[
+	      levels.back ()->active_fe_indices[j]].dofs_per_hex;
           }
 
         levels.back()->line_dofs = std::vector<unsigned int> (dofs_for_lines,

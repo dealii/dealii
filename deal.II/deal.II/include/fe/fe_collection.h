@@ -72,13 +72,13 @@ namespace hp
                                         * collection.
                                         */
       const FiniteElement<dim> &
-      get_fe (const unsigned int index) const;
+      operator[] (const unsigned int index) const;
 
                                        /**
                                         * Return the number of finite element
                                         * objects stored in this collection.
                                         */
-      unsigned int n_finite_elements () const;
+      unsigned int size () const;
 
                                        /**
                                         * Return the number of vector
@@ -157,7 +157,7 @@ namespace hp
   template <int dim>
   inline
   unsigned int
-  FECollection<dim>::n_finite_elements () const 
+  FECollection<dim>::size () const 
   {
     return finite_elements.size();
   }
@@ -176,7 +176,7 @@ namespace hp
   template <int dim>
   inline
   const FiniteElement<dim> &
-  FECollection<dim>::get_fe (const unsigned int index) const 
+  FECollection<dim>::operator[] (const unsigned int index) const 
   {
     Assert (index < finite_elements.size(),
             ExcIndexRange (index, 0, finite_elements.size()));

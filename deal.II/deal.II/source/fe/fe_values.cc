@@ -1424,7 +1424,8 @@ void FEFaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterato
 				   // used by the DoFHandler used by
 				   // this cell, are the same
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe().get_fe (cell->active_fe_index ())),
+	  static_cast<const FiniteElementData<dim>&>(
+	    cell->get_dof_handler().get_fe()[cell->active_fe_index ()]),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
 
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
@@ -1639,7 +1640,8 @@ void FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iter
 				   // used by the hp::DoFHandler used by
 				   // this cell, are the same
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-	  static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe().get_fe (cell->active_fe_index ())),
+	  static_cast<const FiniteElementData<dim>&>(
+	    cell->get_dof_handler().get_fe()[cell->active_fe_index ()]),
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
