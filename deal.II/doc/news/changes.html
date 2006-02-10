@@ -389,17 +389,21 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
-       Changed: The <code class="class">FECollection</code>::<code
-       class="member">get_fe</code> and <code
-       class="class">QCollection</code>::<code
-       class="member">get_quadrature</code> functions are now renamed
-       to the standard <code class="member">operator[]</code>
+       Changed: The <code class="class">hp::FECollection</code>::<code
+       class="member">get_fe</code>, <code
+       class="class">hp::QCollection</code>::<code
+       class="member">get_quadrature</code> and <code
+       class="class">hp::MappingCollection</code>::<code
+       class="member">get_mapping</code> functions are now renamed to
+       the standard <code class="member">operator[]</code>
        function. Similarly, the <code
        class="class">FECollection</code>::<code
-       class="member">n_finite_elements</code> and <code
+       class="member">n_finite_elements</code>, <code
        class="class">QCollection</code>::<code
-       class="member">n_quadratures</code> functions are now renamed
-       to the standard <code class="member">size()</code> function.
+       class="member">n_quadratures</code> and <code
+       class="class">MappingCollection</code>::<code
+       class="member">n_mappings</code> functions are now renamed to
+       the standard <code class="member">size()</code> function.
        <br> 
        (RH 2006/02/10)
        </p>
