@@ -364,6 +364,6 @@ just as the ones above, exist in active and non-active forms.
 /**
  * @defgroup Accessors Accessor classes of the mesh iterators
  * @ingroup Iterators
-*/
+ */
 
 
