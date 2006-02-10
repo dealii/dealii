@@ -1336,8 +1336,8 @@ GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
     const double b = a/2.0;
     const double c = d/2.0;
     // And so are these
-    const double hb = a*std::sqrt(3.0)/2.0;
-    const double hc = d*std::sqrt(3.0)/2.0;
+    const double hb = radius*std::sqrt(3.0)/4.0;
+    const double hc = radius*std::sqrt(3.0)/2.0;
 
     Point<dim> vertices[16] = {
 	center+Point<dim>( 0,  d, -d),
@@ -1392,15 +1392,30 @@ GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
 	    if (cell->face(i)->boundary_indicator() == 255)
 		continue;
 
-	    // If the center is on the plane x=0, this is a plane 
+	    // If the center is on the plane x=0, this is a planar
 	    // element
-	    if (cell->face(i)->center()(0) < center(0)+1.e-5) 
+	    if (cell->face(i)->center()(0) < center(0)+1.e-5) {
 		cell->face(i)->set_boundary_indicator(1);
+		for (unsigned int j=0;j<GeometryInfo<dim>::lines_per_face;++j) 
+		    cell->face(i)->line(j)->set_boundary_indicator(1);
+	    }
+	}
+	// With this loop we restore back the indicator of the outer lines
+	for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+	{
+	    if (cell->face(i)->boundary_indicator() == 255)
+		continue;
+
+	    // If the center is not on the plane x=0, this is a curvilinear
+	    // element
+	    if (cell->face(i)->center()(0) > center(0)+1.e-5) {
+		for (unsigned int j=0;j<GeometryInfo<dim>::lines_per_face;++j) 
+		    cell->face(i)->line(j)->set_boundary_indicator(0);
+	    }
 	}
 	++cell;
     }
 }
-
 
 // Implementation for 3D only
 template <int dim>
