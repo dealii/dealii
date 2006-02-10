@@ -28,7 +28,6 @@
 #include <lac/full_matrix.h>
 #include <lac/block_sparse_matrix.h>
 #include <lac/solver_cg.h>
-#include <lac/solver_gmres.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -191,7 +190,7 @@ template <int dim>
 double PressureBoundaryValues<dim>::value (const Point<dim>  &p,
 					   const unsigned int /*component*/) const 
 {
-  const double alpha = 0.1;
+  const double alpha = 0.3;
   const double beta = 1;
   return -(alpha*p[0]*p[1]*p[1]/2 + beta*p[0] - alpha*p[0]*p[0]*p[0]/6);
 }
@@ -206,7 +205,7 @@ ExactSolution<dim>::vector_value (const Point<dim> &p,
   Assert (values.size() == dim+1,
 	  ExcDimensionMismatch (values.size(), dim+1));
 
-  const double alpha = 0.1;
+  const double alpha = 0.3;
   const double beta = 1;
 
   values(0) = alpha*p[1]*p[1]/2 + beta - alpha*p[0]*p[0]/2;
