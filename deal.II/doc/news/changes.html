@@ -45,6 +45,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: The <code>DoFObjectAccessor</code> and derived classes
+       used to take only the space dimension and the dimension of the
+       object they represented as template arguments. Now the later
+       argument is replaced by the type of DoFHandler they correspond
+       to. This may be <code>::DoFHandler</code> or
+       <code>hp::DoFHandler</code>.
+       <br> 
+       (RH 2006/02/10, WB 2005/12/20)
+       </p>
+
+  <li> <p>
        Removed: Support for gcc2.95 in particular, and all compilers that do
        not support the <code>std::ostringstream</code> class in general,
        has been removed.
@@ -62,17 +73,6 @@ inconvenience this causes.
        namespace.
        <br> 
        (WB 2006/01/13)
-       </p>
-
-  <li> <p>
-       Changed: The <code>DoFObjectAccessor</code> and derived classes
-       used to take only the space dimension and the dimension of the
-       object they represented as template arguments. They now also
-       take an argument pertaining to the type of DoFHandler they
-       correspond to. This may be <code>::DoFHandler</code> or
-       <code>hp::DoFHandler</code>.
-       <br> 
-       (WB 2005/12/20)
        </p>
 
   <li> <p>
