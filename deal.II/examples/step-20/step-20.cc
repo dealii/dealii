@@ -47,11 +47,21 @@
 #include <fstream>
 #include <iostream>
 
-				 // This is the only new header,
-				 // namely the one in which the
-				 // Raviart-Thomas finite element is
-				 // declared:
+				 // This is the only significant new
+				 // header, namely the one in which
+				 // the Raviart-Thomas finite element
+				 // is declared:
 #include <fe/fe_raviart_thomas.h>
+
+				 // Finally, as a bonus in this
+				 // program, we will use a tensorial
+				 // coefficient. Since it may have a
+				 // spatial dependence, we consider it
+				 // a tensor-valued function. The
+				 // following include file provides
+				 // the ``TensorFunction'' class that
+				 // offers such functionality:
+#include <base/tensor_function.h>
 
 
                                  // @sect3{The ``MixedLaplaceProblem'' class template}
@@ -114,7 +124,7 @@ class MixedLaplaceProblem
 };
 
 
-				 // @sect3{Right hand side, coefficient, and exact solution}
+				 // @sect3{Right hand side, boundary values, and exact solution}
 
 				 // Our next task is to define the
 				 // right hand side of our problem
@@ -215,6 +225,38 @@ ExactSolution<dim>::vector_value (const Point<dim> &p,
 
 
 
+				 // @sect3{The permability tensor K}
+
+template <int dim>
+class Coefficient : public TensorFunction<2,dim>
+{
+  public:
+    virtual void value_list (const std::vector<Point<dim> > &points,
+			     std::vector<Tensor<2,dim> >    &values) const;
+};
+
+
+template <int dim>
+void
+Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
+			      std::vector<Tensor<2,dim> >    &values) const
+{
+  Assert (points.size() == values.size(),
+	  ExcDimensionMismatch (points.size(), values.size()));
+
+  for (unsigned int p=0; p<points.size(); ++p)
+    {
+      values[p].clear ();
+
+      for (unsigned int d=0; d<dim; ++d)
+	values[p][d][d] = 1.;
+    }
+}
+
+
+
+
+
 template <int dim>
 MixedLaplaceProblem<dim>::MixedLaplaceProblem (const unsigned int degree)
 		:
@@ -275,59 +317,45 @@ void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
 
 
 
-Tensor<1,2> extract_u (const FEValuesBase<2> &fe_values,
-                       const unsigned int j,
-                       const unsigned int q)
+template <int dim>
+Tensor<1,dim>
+extract_u (const FEValuesBase<dim> &fe_values,
+	   const unsigned int i,
+	   const unsigned int q)
 {
-  Tensor<1,2> tmp;
-  tmp[0] = fe_values.shape_value_component (j,q,0);
-  tmp[1] = fe_values.shape_value_component (j,q,1);
+  Tensor<1,dim> tmp;
+
+  for (unsigned int d=0; d<dim; ++d)
+    tmp[d] = fe_values.shape_value_component (i,q,d);
+
   return tmp;
 }
 
 
 
-Tensor<1,3> extract_u (const FEValuesBase<3> &fe_values,
-                       const unsigned int j,
-                       const unsigned int q)
+template <int dim>
+double
+extract_div_u (const FEValuesBase<dim> &fe_values,
+	       const unsigned int i,
+	       const unsigned int q)
 {
-  Tensor<1,3> tmp;
-  tmp[0] = fe_values.shape_value_component (j,q,0);
-  tmp[1] = fe_values.shape_value_component (j,q,1);
-  tmp[2] = fe_values.shape_value_component (j,q,2);
-  return tmp;
+  double divergence = 0;
+  for (unsigned int d=0; d<dim; ++d)
+    divergence += fe_values.shape_grad_component (i,q,d)[d];
+
+  return divergence;
 }
 
-
-
-
-
-double extract_div_u (const FEValuesBase<2> &fe_values,
-                      const unsigned int j,
-                      const unsigned int q)
-{
-  return fe_values.shape_grad_component (j,q,0)[0] +
-    fe_values.shape_grad_component (j,q,1)[1];
-}
-
-
-double extract_div_u (const FEValuesBase<3> &fe_values,
-                      const unsigned int j,
-                      const unsigned int q)
-{
-  return fe_values.shape_grad_component (j,q,0)[0] +
-    fe_values.shape_grad_component (j,q,1)[1] +
-    fe_values.shape_grad_component (j,q,2)[2];
-}
 
   
 template <int dim>
 double extract_p (const FEValuesBase<dim> &fe_values,
-                  const unsigned int j,
+                  const unsigned int i,
                   const unsigned int q)
 {
-  return fe_values.shape_value_component (j,q,dim);
+  return fe_values.shape_value_component (i,q,dim);
 }
+
 
 
 template <int dim>
@@ -351,14 +379,17 @@ void MixedLaplaceProblem<dim>::assemble_system ()
   Vector<double>       local_rhs (dofs_per_cell);
 
 
-  const RightHandSide<dim> right_hand_side;
+  const RightHandSide<dim>          right_hand_side;
   const PressureBoundaryValues<dim> pressure_boundary_values;
-
+  const Coefficient<dim>            coefficient;
+  
   std::vector<double> rhs_values (n_q_points);
   std::vector<double> boundary_values (n_face_q_points);
+  std::vector<Tensor<2,dim> > Kinverse (n_q_points);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
+  
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -370,6 +401,8 @@ void MixedLaplaceProblem<dim>::assemble_system ()
 
       right_hand_side.value_list (fe_values.get_quadrature_points(),
                                   rhs_values);
+      coefficient.value_list (fe_values.get_quadrature_points(),
+			      Kinverse);
       
       for (unsigned int q=0; q<n_q_points; ++q) 
         for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -384,7 +417,7 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                 const double div_phi_j_u = extract_div_u (fe_values, j, q);
                 const double phi_j_p = extract_p (fe_values, j, q);
                 
-                local_matrix(i,j) += (phi_i_u * phi_j_u
+                local_matrix(i,j) += (phi_i_u * Kinverse[q] * phi_j_u
                                       - div_phi_i_u * phi_j_p
                                       - phi_i_p * div_phi_j_u)
                                      * fe_values.JxW(q);
@@ -395,18 +428,22 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                             fe_values.JxW(q);
           }
 
-      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+      for (unsigned int face_no=0;
+	   face_no<GeometryInfo<dim>::faces_per_cell;
+	   ++face_no)
 	if (cell->at_boundary(face_no))
 	  {
 	    fe_face_values.reinit (cell, face_no);
 	    
-	    pressure_boundary_values.value_list (fe_face_values.get_quadrature_points(),
-						 boundary_values);
+	    pressure_boundary_values
+	      .value_list (fe_face_values.get_quadrature_points(),
+			   boundary_values);
 
 	    for (unsigned int q=0; q<n_face_q_points; ++q) 
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
 		{
-		  const Tensor<1,dim> phi_i_u = extract_u (fe_face_values, i, q);
+		  const Tensor<1,dim>
+		    phi_i_u = extract_u (fe_face_values, i, q);
 
 		  local_rhs(i) += -(phi_i_u *
 				    fe_face_values.normal_vector(q) *
@@ -609,7 +646,7 @@ int main ()
 {
   deallog.depth_console (0);
 
-  MixedLaplaceProblem<2> mixed_laplace_problem (1);
+  MixedLaplaceProblem<2> mixed_laplace_problem (0);
   mixed_laplace_problem.run ();
 
   return 0;
