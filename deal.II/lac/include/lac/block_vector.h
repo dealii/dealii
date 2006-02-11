@@ -192,11 +192,23 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
 				      * contain <tt>num_blocks</tt> blocks of
 				      * size <tt>block_size</tt> each.
 				      *
+				      * If the second argument is left
+				      * at its default value, then the
+				      * block vector allocates the
+				      * specified number of blocks but
+				      * leaves them at zero size. You
+				      * then need to later
+				      * reinitialize the individual
+				      * blocks, and call
+				      * collect_sizes() to update the
+				      * block system's knowledge of
+				      * its individual block's sizes.
+				      * 
 				      * If <tt>fast==false</tt>, the vector
 				      * is filled with zeros.
 				      */
     void reinit (const unsigned int num_blocks,
-		 const unsigned int block_size,
+		 const unsigned int block_size = 0,
 		 const bool fast = false);
   
 				     /**
