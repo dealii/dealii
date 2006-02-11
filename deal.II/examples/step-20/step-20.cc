@@ -807,7 +807,7 @@ class SchurComplement
 template <int dim>
 void MixedLaplaceProblem<dim>::solve () 
 {
-  InverseMatrix m_inverse (system_matrix.block(0,0));
+  const InverseMatrix m_inverse (system_matrix.block(0,0));
   Vector<double> tmp (solution.block(0).size());
   
   {
