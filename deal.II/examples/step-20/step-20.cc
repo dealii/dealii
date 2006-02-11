@@ -183,8 +183,9 @@ class ExactSolution : public Function<dim>
 
 				 // And then we also have to define
 				 // these respective functions, of
-				 // course. Given the ones that we
-				 // discussed in the introduction, the
+				 // course. Given our discussion in
+				 // the introduction of how the
+				 // solution should look like, the
 				 // following computations should be
 				 // straightforward:
 template <int dim>
@@ -225,10 +226,56 @@ ExactSolution<dim>::vector_value (const Point<dim> &p,
 
 
 
-				 // @sect3{The permability tensor K}
+				 // @sect3{The inverse permability tensor}
 
+                                 // In addition to the other equation
+                                 // data, we also want to use a
+                                 // permeability tensor, or better --
+                                 // because this is all that appears
+                                 // in the weak form -- the inverse of
+                                 // the permeability tensor,
+                                 // ``KInverse''. For the purpose of
+                                 // verifying the exactness of the
+                                 // solution and determining
+                                 // convergence orders, this tensor is
+                                 // more in the way than helpful. We
+                                 // will therefore simply set it to
+                                 // the identity matrix.
+                                 //
+                                 // However, a spatially varying
+                                 // permeability tensor is
+                                 // indispensable in real-life porous
+                                 // media flow simulations, and we
+                                 // would like to use the opportunity
+                                 // to demonstrate the technique to
+                                 // use tensor valued functions.
+                                 //
+                                 // Possibly unsurprising, deal.II
+                                 // also has a base class not only for
+                                 // scalar and generally vector-valued
+                                 // functions (the ``Function'' base
+                                 // class) but also for functions that
+                                 // return tensors of fixed dimension
+                                 // and rank, the ``TensorFunction''
+                                 // template. Here, the function under
+                                 // consideration returns a dim-by-dim
+                                 // matrix, i.e. a tensor of rank 2
+                                 // and dimension ``dim''. We then
+                                 // choose the template arguments of
+                                 // the base class appropriately.
+                                 //
+                                 // The interface that the
+                                 // ``TensorFunction'' class provides
+                                 // is essentially equivalent to the
+                                 // ``Function'' class. In particular,
+                                 // there exists a ``value_list''
+                                 // function that takes a list of
+                                 // points at which to evaluate the
+                                 // function, and returns the values
+                                 // of the function in the second
+                                 // argument, a list of tensors:
 template <int dim>
-class Coefficient : public TensorFunction<2,dim>
+class KInverse : public TensorFunction<2,dim>
 {
   public:
     virtual void value_list (const std::vector<Point<dim> > &points,
@@ -236,9 +283,23 @@ class Coefficient : public TensorFunction<2,dim>
 };
 
 
+                                 // The implementation is less
+                                 // interesting. As in previous
+                                 // examples, we add a check to the
+                                 // beginning of the class to make
+                                 // sure that the sizes of input and
+                                 // output parameters are the same
+                                 // (see step-5 for a discussion of
+                                 // this technique). Then we loop over
+                                 // all evaluation points, and for
+                                 // each one first clear the output
+                                 // tensor and then set all its
+                                 // diagonal elements to one
+                                 // (i.e. fill the tensor with the
+                                 // identity matrix):
 template <int dim>
 void
-Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
+KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
 			      std::vector<Tensor<2,dim> >    &values) const
 {
   Assert (points.size() == values.size(),
@@ -254,69 +315,14 @@ Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 }
 
 
+                                 // @sect3{extract_u and friends}
 
-
-
-template <int dim>
-MixedLaplaceProblem<dim>::MixedLaplaceProblem (const unsigned int degree)
-		:
-		degree (degree),
-                fe (FE_RaviartThomas<dim>(degree),1,FE_DGQ<dim>(degree),1),
-		dof_handler (triangulation)
-{}
-
-
-template <int dim>
-void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
-{
-  GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (3);
-  
-  std::cout << "   Number of active cells: "
-	    << triangulation.n_active_cells()
-	    << std::endl
-	    << "   Total number of cells: "
-	    << triangulation.n_cells()
-	    << std::endl;
-
-  dof_handler.distribute_dofs (fe);
-  DoFRenumbering::component_wise (dof_handler);
-  
-  std::vector<unsigned int> dofs_per_component (dim+1);
-  DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
-  const unsigned int n_u = dofs_per_component[0],
-                     n_p = dofs_per_component[dim];
-
-  std::cout << "   Number of degrees of freedom: "
-	    << dof_handler.n_dofs()
-            << " (" << n_u << '+' << n_p << ')'
-	    << std::endl;
-  
-  sparsity_pattern.reinit (2,2);
-  sparsity_pattern.block(0,0).reinit (n_u, n_u,
-                                      dof_handler.max_couplings_between_dofs());
-  sparsity_pattern.block(1,0).reinit (n_p, n_u,
-                                      dof_handler.max_couplings_between_dofs());
-  sparsity_pattern.block(0,1).reinit (n_u, n_p,
-                                      dof_handler.max_couplings_between_dofs());
-  sparsity_pattern.block(1,1).reinit (n_p, n_p,
-				      dof_handler.max_couplings_between_dofs());
-  sparsity_pattern.collect_sizes();
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-  sparsity_pattern.compress();
-
-  system_matrix.reinit (sparsity_pattern);
-
-  std::vector<unsigned int> block_components (2);
-  block_components[0] = n_u;
-  block_components[1] = n_p;
-  solution.reinit (block_components);
-  system_rhs.reinit (block_components);
-}
-
-
-
-
+                                 // The next three functions are
+                                 // needed for matrix and right hand
+                                 // side assembly. They are described
+                                 // in detail in the introduction to
+                                 // this program, so that we do not
+                                 // need to discuss them here again:
 template <int dim>
 Tensor<1,dim>
 extract_u (const FEValuesBase<dim> &fe_values,
@@ -358,6 +364,221 @@ double extract_p (const FEValuesBase<dim> &fe_values,
 
 
 
+                                 // @sect3{MixedLaplaceProblem class implementation}
+
+                                 // @sect4{MixedLaplaceProblem::MixedLaplaceProblem}
+
+                                 // In the constructor of this class,
+                                 // we first store the value that was
+                                 // passed in concerning the degree of
+                                 // the finite elements we shall use
+                                 // (a degree of zero, for example,
+                                 // means to use RT(0) and DG(0)), and
+                                 // then construct the vector valued
+                                 // element belonging to the space X_h
+                                 // described in the introduction. The
+                                 // rest of the constructor is as in
+                                 // the early tutorial programs.
+                                 //
+                                 // The only thing worth describing
+                                 // here is the constructor call of
+                                 // the ``fe'' variable. The
+                                 // ``FESystem'' class to which this
+                                 // variable belongs has a number of
+                                 // different constructors that all
+                                 // refer to binding simpler elements
+                                 // together into one larger
+                                 // element. In the present case, we
+                                 // want to couple a single RT(degree)
+                                 // element with a single DQ(degree)
+                                 // element. The constructor to
+                                 // ``FESystem'' that does this
+                                 // requires us to specity first the
+                                 // first base element (the
+                                 // ``FE_RaviartThomas'' object of
+                                 // given degree) and then the number
+                                 // of copies for this base element,
+                                 // and then similarly the kind and
+                                 // number of ``FE_DGQ''
+                                 // elements. Note that the Raviart
+                                 // Thomas element already has ``dim''
+                                 // vector components, so that the
+                                 // coupled element will have
+                                 // ``dim+1'' vector components, the
+                                 // first ``dim'' of which correspond
+                                 // to the velocity variable whereas the
+                                 // last one corresponds to the
+                                 // pressure.
+                                 //
+                                 // It is also worth comparing the way
+                                 // we constructed this element from
+                                 // its base elements, with the way we
+                                 // have done so in step-8: there, we
+                                 // have built it as ``fe
+                                 // (FE_Q<dim>(1), dim)'', i.e. we
+                                 // have simply used ``dim'' copies of
+                                 // the ``FE_Q(1)'' element, one copy
+                                 // for the displacement in each
+                                 // coordinate direction.
+template <int dim>
+MixedLaplaceProblem<dim>::MixedLaplaceProblem (const unsigned int degree)
+		:
+		degree (degree),
+                fe (FE_RaviartThomas<dim>(degree), 1,
+                    FE_DGQ<dim>(degree), 1),
+		dof_handler (triangulation)
+{}
+
+
+
+                                 // @sect4{MixedLaplaceProblem::make_grid_and_dofs}
+
+                                 // This next function starts out with
+                                 // well-known functions calls that
+                                 // create and refine a mesh, and then
+                                 // associate degrees of freedom with
+                                 // it:
+template <int dim>
+void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
+{
+  GridGenerator::hyper_cube (triangulation, -1, 1);
+  triangulation.refine_global (3);
+  
+  dof_handler.distribute_dofs (fe);
+
+                                   // However, then things become
+                                   // different. As mentioned in the
+                                   // introduction, we want to
+                                   // subdivide the matrix into blocks
+                                   // corresponding to the two
+                                   // different kinds of variables,
+                                   // velocity and pressure. To this end,
+                                   // we first have to make sure that
+                                   // the indices corresponding to
+                                   // velocities and pressures are not
+                                   // intermingled: First all velocity
+                                   // degrees of freedom, then all
+                                   // pressure DoFs. This way, the
+                                   // global matrix separates nicely
+                                   // into a 2x2 system. To achieve
+                                   // this, we have to renumber
+                                   // degrees of freedom base on their
+                                   // vector component, an operation
+                                   // that conveniently is already
+                                   // implemented:
+  DoFRenumbering::component_wise (dof_handler);
+
+                                   // The next thing is that we want
+                                   // to figure out the sizes of these
+                                   // blocks, so that we can allocate
+                                   // an appropriate amount of
+                                   // space. To this end, we call the
+                                   // ``DoFTools::count_dofs_per_component''
+                                   // function that counts how many
+                                   // shape functions are non-zero for
+                                   // a particular vector
+                                   // component. We have ``dim+1''
+                                   // vector components, and we have
+                                   // to use the knowledge that for
+                                   // Raviart-Thomas elements all
+                                   // shape functions are nonzero in
+                                   // all components. In other words,
+                                   // the number of velocity shape
+                                   // functions equals the number of
+                                   // overall shape functions that are
+                                   // nonzero in the zeroth vector
+                                   // component. On the other hand,
+                                   // the number of pressure variables
+                                   // equals the number of shape
+                                   // functions that are nonzero in
+                                   // the dim-th component. Let us
+                                   // compute these numbers and then
+                                   // create some nice output with
+                                   // that:
+  std::vector<unsigned int> dofs_per_component (dim+1);
+  DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);  
+  const unsigned int n_u = dofs_per_component[0],
+                     n_p = dofs_per_component[dim];
+
+  std::cout << "   Number of active cells: "
+	    << triangulation.n_active_cells()
+	    << std::endl
+	    << "   Total number of cells: "
+	    << triangulation.n_cells()
+	    << std::endl
+            << "   Number of degrees of freedom: "
+	    << dof_handler.n_dofs()
+            << " (" << n_u << '+' << n_p << ')'
+	    << std::endl;
+
+                                   // The next task is to allocate a
+                                   // sparsity pattern for the matrix
+                                   // that we will create. The way
+                                   // this works is that we first
+                                   // obtain a guess for the maximal
+                                   // number of nonzero entries per
+                                   // row (this could be done more
+                                   // efficiently in this case, but we
+                                   // only want to solve relatively
+                                   // small problems for which this is
+                                   // not so important). In the second
+                                   // step, we allocate a 2x2 block
+                                   // pattern and then reinitialize
+                                   // each of the blocks to its
+                                   // correct size using the ``n_u''
+                                   // and ``n_p'' variables defined
+                                   // above that hold the number of
+                                   // velocity and pressure
+                                   // variables. In this second step,
+                                   // we only operate on the
+                                   // individual blocks of the
+                                   // system. In the third step, we
+                                   // therefore have to instruct the
+                                   // overlying block system to update
+                                   // its knowledge about the sizes of
+                                   // the blocks it manages; this
+                                   // happens with the
+                                   // ``sparsity_pattern.collect_sizes()''
+                                   // call:
+  const unsigned int
+    n_couplings = dof_handler.max_couplings_between_dofs();
+  
+  sparsity_pattern.reinit (2,2);
+  sparsity_pattern.block(0,0).reinit (n_u, n_u, n_couplings);
+  sparsity_pattern.block(1,0).reinit (n_p, n_u, n_couplings);
+  sparsity_pattern.block(0,1).reinit (n_u, n_p, n_couplings);
+  sparsity_pattern.block(1,1).reinit (n_p, n_p, n_couplings);
+  sparsity_pattern.collect_sizes();
+
+                                   // Now that the sparsity pattern
+                                   // and its blocks have the correct
+                                   // sizes, we actually need to
+                                   // construct the content of this
+                                   // pattern, and as usual compress
+                                   // it, before we also initialize a
+                                   // block matrix with this block
+                                   // sparsity pattern:
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+  sparsity_pattern.compress();
+
+  system_matrix.reinit (sparsity_pattern);
+
+                                   // Then we have to resize the
+                                   // solution and right hand side
+                                   // vectors in exactly the same way:
+  solution.reinit (2);
+  solution.block(0).reinit (n_u);
+  solution.block(1).reinit (n_p);
+  solution.collect_sizes ();
+  
+  system_rhs.reinit (2);
+  system_rhs.block(0).reinit (n_u);
+  system_rhs.block(1).reinit (n_p);
+  system_rhs.collect_sizes ();
+}
+
+
+                                 // @sect4{MixedLaplaceProblem::assemble_system}
 template <int dim>
 void MixedLaplaceProblem<dim>::assemble_system () 
 {  
@@ -381,11 +602,11 @@ void MixedLaplaceProblem<dim>::assemble_system ()
 
   const RightHandSide<dim>          right_hand_side;
   const PressureBoundaryValues<dim> pressure_boundary_values;
-  const Coefficient<dim>            coefficient;
+  const KInverse<dim>               k_inverse;
   
   std::vector<double> rhs_values (n_q_points);
   std::vector<double> boundary_values (n_face_q_points);
-  std::vector<Tensor<2,dim> > Kinverse (n_q_points);
+  std::vector<Tensor<2,dim> > k_inverse_values (n_q_points);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
@@ -401,8 +622,8 @@ void MixedLaplaceProblem<dim>::assemble_system ()
 
       right_hand_side.value_list (fe_values.get_quadrature_points(),
                                   rhs_values);
-      coefficient.value_list (fe_values.get_quadrature_points(),
-			      Kinverse);
+      k_inverse.value_list (fe_values.get_quadrature_points(),
+                            k_inverse_values);
       
       for (unsigned int q=0; q<n_q_points; ++q) 
         for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -417,7 +638,7 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                 const double div_phi_j_u = extract_div_u (fe_values, j, q);
                 const double phi_j_p = extract_p (fe_values, j, q);
                 
-                local_matrix(i,j) += (phi_i_u * Kinverse[q] * phi_j_u
+                local_matrix(i,j) += (phi_i_u * k_inverse_values[q] * phi_j_u
                                       - div_phi_i_u * phi_j_p
                                       - phi_i_p * div_phi_j_u)
                                      * fe_values.JxW(q);
@@ -565,7 +786,7 @@ void MixedLaplaceProblem<dim>::compute_errors () const
   Vector<double> tmp (triangulation.n_active_cells());
   ExactSolution<dim> exact_solution;
 
-				     // do NOT use QGauss here!
+                                   // do NOT use QGauss here!
   QTrapez<1> q_trapez;
   QIterated<dim> quadrature (q_trapez, 5);
   {
