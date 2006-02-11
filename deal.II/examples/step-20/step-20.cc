@@ -842,7 +842,7 @@ void MixedLaplaceProblem<dim>::compute_errors () const
 
                                    // do NOT use QGauss here!
   QTrapez<1> q_trapez;
-  QIterated<dim> quadrature (q_trapez, 5);
+  QIterated<dim> quadrature (q_trapez, degree+2);
   {
     const ComponentSelectFunction<dim> mask (dim, 1., dim+1);
     VectorTools::integrate_difference (dof_handler, solution, exact_solution,
@@ -860,26 +860,12 @@ void MixedLaplaceProblem<dim>::compute_errors () const
 					 tmp, quadrature,
 					 VectorTools::L2_norm,
 					 &mask);
-      u_l2_error = std::sqrt (u_l2_error*u_l2_error +
+      u_l2_error = std::sqrt (u_l2_error * u_l2_error +
 			      tmp.l2_norm() * tmp.l2_norm());
     }
   
-//   double u_h1_error = 0;
-//   for (unsigned int d=0; d<dim; ++d)
-//     {
-//       const ComponentSelectFunction<dim> mask(d, 1., dim+1);
-//       VectorTools::integrate_difference (dof_handler, solution, exact_solution,
-// 					 tmp, QGauss<dim>(degree+1),
-// 					 VectorTools::H1_seminorm,
-// 					 &mask);
-//       u_h1_error = std::sqrt (u_h1_error*u_h1_error +
-// 			      tmp.l2_norm() * tmp.l2_norm());
-//     }
-
-
   std::cout << "Errors: ||e_p||_L2 = " << p_l2_error
 	    << ",   ||e_u||_L2 = " << u_l2_error
-//    	    << ",   |e_u|_H1 = " << u_h1_error
 	    << std::endl;
 }
 
@@ -891,7 +877,6 @@ void MixedLaplaceProblem<dim>::output_results () const
 
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");
-  data_out.add_data_vector (system_rhs, "rhs");
 
   data_out.build_patches (degree+1);
 
@@ -906,7 +891,8 @@ void MixedLaplaceProblem<dim>::output_results () const
 template <int dim>
 void MixedLaplaceProblem<dim>::run () 
 {
-  std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
+  std::cout << "Solving problem in " << dim
+            << " space dimensions." << std::endl;
   
   make_grid_and_dofs();
   assemble_system ();
@@ -916,12 +902,50 @@ void MixedLaplaceProblem<dim>::run ()
 }
 
     
+                                 // @sect3{The ``main'' function}
+
+				 // The main function we stole from
+				 // step-6 instead of step-4. It is
+				 // almost equal to the one in step-6
+				 // (apart from the changed class
+				 // names, of course), the only
+				 // exception is that we pass the
+				 // degree of the finite element space
+				 // to the constructor of the mixed
+				 // laplace problem.
 int main () 
 {
-  deallog.depth_console (0);
+  try
+    {
+      deallog.depth_console (0);
 
-  MixedLaplaceProblem<2> mixed_laplace_problem (0);
-  mixed_laplace_problem.run ();
+      MixedLaplaceProblem<2> mixed_laplace_problem(0);
+      mixed_laplace_problem.run ();
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      
+      return 1;
+    }
+  catch (...) 
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      return 1;
+    }
 
   return 0;
 }
