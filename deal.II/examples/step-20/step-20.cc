@@ -483,9 +483,8 @@ class SchurComplement
                                                 1e-8*tmp1.l2_norm());
         SolverCG<>              cg (solver_control, vector_memory);
 
-        PreconditionSSOR<> precondition;
-        precondition.initialize(A.block(0,0));
-        cg.solve (A.block(0,0), tmp2, tmp1, precondition);
+        cg.solve (A.block(0,0), tmp2, tmp1,
+		  PreconditionIdentity());
 
         std::cout << "     " << solver_control.last_step()
                   << " inner iterations needed to obtain convergence."
