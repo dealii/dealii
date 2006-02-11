@@ -739,12 +739,50 @@ void MixedLaplaceProblem<dim>::assemble_system ()
 }
 
 
+class InverseMatrix : public Subscriptor
+{
+  public:
+    InverseMatrix (const SparseMatrix<double> &matrix);
+
+    void vmult (Vector<double>       &dst,
+                const Vector<double> &src) const;
+
+  private:
+    const SmartPointer<const SparseMatrix<double> > mass_matrix;
+
+    mutable GrowingVectorMemory<> vector_memory;    
+};
+
+
+InverseMatrix::InverseMatrix (const SparseMatrix<double> &matrix)
+                :
+                mass_matrix (&matrix)
+{}
+
+
+void InverseMatrix::vmult (Vector<double>       &dst,
+                           const Vector<double> &src) const
+{
+  SolverControl solver_control (mass_matrix->m(), 1e-8*src.l2_norm());
+  SolverCG<>    cg (solver_control, vector_memory);
+
+  cg.solve (*mass_matrix, dst, src, PreconditionIdentity());        
+
+  std::cout << "     " << solver_control.last_step()
+            << " inner iterations needed to obtain convergence."
+            << std::endl;
+}
+
+
+
 class SchurComplement 
 {
   public:
-    SchurComplement (const BlockSparseMatrix<double> &A)
+    SchurComplement (const BlockSparseMatrix<double> &A,
+                     const InverseMatrix              &Minv)
                     :
-                    A (A),
+                    system_matrix (&A),
+                    m_inverse (&Minv),
                     tmp1 (A.block(0,0).m()),
                     tmp2 (A.block(0,0).m())
       {}
@@ -752,26 +790,14 @@ class SchurComplement
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const
       {
-        A.block(0,1).vmult (tmp1, src);
-
-        SolverControl           solver_control (tmp1.size(),
-                                                1e-8*tmp1.l2_norm());
-        SolverCG<>              cg (solver_control, vector_memory);
-
-        cg.solve (A.block(0,0), tmp2, tmp1,
-		  PreconditionIdentity());
-
-        std::cout << "     " << solver_control.last_step()
-                  << " inner iterations needed to obtain convergence."
-                  << std::endl;
-        
-        A.block(1,0).vmult (dst, tmp2);
+        system_matrix->block(0,1).vmult (tmp1, src);
+        m_inverse->vmult (tmp2, tmp1);
+        system_matrix->block(1,0).vmult (dst, tmp2);
       }
 
   private:
-    const BlockSparseMatrix<double> &A;
-
-    mutable GrowingVectorMemory<> vector_memory;
+    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
+    const SmartPointer<const InverseMatrix>              m_inverse;
     
     mutable Vector<double> tmp1, tmp2;
 };
@@ -781,31 +807,22 @@ class SchurComplement
 template <int dim>
 void MixedLaplaceProblem<dim>::solve () 
 {
+  InverseMatrix m_inverse (system_matrix.block(0,0));
+  Vector<double> tmp (solution.block(0).size());
+  
   {
     Vector<double> schur_rhs (solution.block(1).size());
-    {
-      Vector<double> tmp (solution.block(0).size());
-      
-      SolverControl solver_control (system_matrix.block(0,0).m(),
-				    1e-6*system_rhs.l2_norm());
-      SolverCG<> cg (solver_control);
 
-      cg.solve (system_matrix.block(0,0), tmp,
-		system_rhs.block(0), PreconditionIdentity());
-  
-      std::cout << "   " << solver_control.last_step()
-		<< " CG mass matrix iterations needed to obtain convergence."
-		<< std::endl;
-
-      system_matrix.block(1,0).vmult (schur_rhs, tmp);
-      schur_rhs -= system_rhs.block(1);
-    }
+    m_inverse.vmult (tmp, system_rhs.block(0));
+    system_matrix.block(1,0).vmult (schur_rhs, tmp);
+    schur_rhs -= system_rhs.block(1);
 
     SolverControl solver_control (system_matrix.block(0,0).m(),
 				  1e-6*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
-    cg.solve (SchurComplement(system_matrix), solution.block(1),
+    cg.solve (SchurComplement(system_matrix, m_inverse),
+              solution.block(1),
               schur_rhs,
               PreconditionIdentity());
   
@@ -814,21 +831,11 @@ void MixedLaplaceProblem<dim>::solve ()
               << std::endl;
   }
   {
-    Vector<double> tmp (solution.block(0).size());
     system_matrix.block(0,1).vmult (tmp, solution.block(1));
     tmp *= -1;
     tmp += system_rhs.block(0);
     
-    SolverControl solver_control (system_matrix.block(0,0).m(),
-				  1e-6*tmp.l2_norm());
-    SolverCG<> cg (solver_control);
-
-    cg.solve (system_matrix.block(0,0), solution.block(0),
-              tmp, PreconditionIdentity());
-  
-    std::cout << "   " << solver_control.last_step()
-              << " CG mass matrix iterations needed to obtain convergence."
-              << std::endl;
+    m_inverse.vmult (solution.block(0), tmp);
   }
 }
 
