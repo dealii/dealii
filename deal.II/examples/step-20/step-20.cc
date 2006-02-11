@@ -579,6 +579,24 @@ void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
 
 
                                  // @sect4{MixedLaplaceProblem::assemble_system}
+                                 // Similarly, the function that
+                                 // assembles the linear system has
+                                 // mostly been discussed already in
+                                 // the introduction to this
+                                 // example. At its top, what happens
+                                 // are all the usual steps, with the
+                                 // addition that we do not only
+                                 // allocate quadrature and
+                                 // ``FEValues'' objects for the cell
+                                 // terms, but also for face
+                                 // terms. After that, we define the
+                                 // usual abbreviations for variables,
+                                 // and the allocate space for the
+                                 // local matrix and right hand side
+                                 // contributions, and the array that
+                                 // holds the global numbers of the
+                                 // degrees of freedom local to the
+                                 // present cell.
 template <int dim>
 void MixedLaplaceProblem<dim>::assemble_system () 
 {  
@@ -599,7 +617,22 @@ void MixedLaplaceProblem<dim>::assemble_system ()
   FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       local_rhs (dofs_per_cell);
 
-
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  
+                                   // The next step is to declare
+                                   // objects that represent the
+                                   // source term, pressure boundary
+                                   // value, and coefficient in the
+                                   // equation. In addition to these
+                                   // objects that represent
+                                   // continuous functions, we also
+                                   // need arrays to hold their values
+                                   // at the quadrature points of
+                                   // individual cells (or faces, for
+                                   // the boundary values). Note that
+                                   // in the case of the coefficient,
+                                   // the array has to be one of
+                                   // matrices.
   const RightHandSide<dim>          right_hand_side;
   const PressureBoundaryValues<dim> pressure_boundary_values;
   const KInverse<dim>               k_inverse;
@@ -608,9 +641,13 @@ void MixedLaplaceProblem<dim>::assemble_system ()
   std::vector<double> boundary_values (n_face_q_points);
   std::vector<Tensor<2,dim> > k_inverse_values (n_q_points);
 
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-  
+                                   // With all this in place, we can
+                                   // go on with the loop over all
+                                   // cells. The body of this loop has
+                                   // been discussed in the
+                                   // introduction, and will not be
+                                   // commented any further here:
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -672,7 +709,24 @@ void MixedLaplaceProblem<dim>::assemble_system ()
 				    fe_face_values.JxW(q));
 		}
 	  }
-      
+
+                                       // The final step in the loop
+                                       // over all cells is to
+                                       // transfer local contributions
+                                       // into the global matrix and
+                                       // right hand side vector. Note
+                                       // that we use exactly the same
+                                       // interface as in previous
+                                       // examples, although we now
+                                       // use block matrices and
+                                       // vectors instead of the
+                                       // regular ones. In other
+                                       // words, to the outside world,
+                                       // block objects have the same
+                                       // interface as matrices and
+                                       // vectors, but they
+                                       // additionally allow to access
+                                       // individual blocks.
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         for (unsigned int j=0; j<dofs_per_cell; ++j)
