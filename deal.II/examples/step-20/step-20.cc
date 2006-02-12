@@ -920,7 +920,49 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
 }
 
 
+                                 // @sect4{The ``SchurComplement'' class template}
 
+                                 // The next class is the Schur
+                                 // complement class. Its rationale
+                                 // has also been discussed in length
+                                 // in the introduction. The only
+                                 // things we would like to note is
+                                 // that the class, too, is derived
+                                 // from the ``Subscriptor'' class and
+                                 // that as mentioned above it stores
+                                 // pointers to the entire block
+                                 // matrix and the inverse of the mass
+                                 // matrix block using
+                                 // ``SmartPointer'' objects.
+                                 //
+                                 // The ``vmult'' function requires
+                                 // two temporary vectors that we do
+                                 // not want to re-allocate and free
+                                 // every time we call this
+                                 // function. Since here, we have full
+                                 // control over the use of these
+                                 // vectors (unlike above, where a
+                                 // class called by the ``vmult''
+                                 // function required these vectors,
+                                 // not the ``vmult'' function
+                                 // itself), we allocate them
+                                 // directly, rather than going
+                                 // through the ``VectorMemory''
+                                 // mechanism. However, again, these
+                                 // member variables do not carry any
+                                 // state between successive calls to
+                                 // the member functions of this class
+                                 // (i.e., we never care what values
+                                 // they were set to the last time a
+                                 // member function was called), we
+                                 // mark these vectors as ``mutable''.
+                                 //
+                                 // The rest of the (short)
+                                 // implementation of this class is
+                                 // straightforward if you know the
+                                 // order of matrix-vector
+                                 // multiplications performed by the
+                                 // ``vmult'' function:
 class SchurComplement : public Subscriptor
 {
   public:
@@ -957,7 +999,24 @@ void SchurComplement::vmult (Vector<double>       &dst,
 }
 
 
+                                 // @sect4{The ``ApproximateSchurComplement'' class template}
 
+                                 // The third component of our solver
+                                 // and preconditioner system is the
+                                 // class that approximates the Schur
+                                 // complement so we can form a
+                                 // ``InverseMatrix<ApproximateSchurComplement>''
+                                 // object that approximates the
+                                 // inverse of the Schur
+                                 // complement. It follows the same
+                                 // pattern as the Schur complement
+                                 // class, with the only exception
+                                 // that we do not multiply with the
+                                 // inverse mass matrix in ``vmult'',
+                                 // but rather just do a single Jacobi
+                                 // step. Consequently, the class also
+                                 // does not have to store a pointer
+                                 // to an inverse mass matrix object.
 class ApproximateSchurComplement : public Subscriptor
 {
   public:
@@ -991,15 +1050,43 @@ void ApproximateSchurComplement::vmult (Vector<double>       &dst,
 
 
 
+                                 // @sect4{MixedLaplace::solve}
 
-
+                                 // After all these preparations, we
+                                 // can finally write the function
+                                 // that actually solves the linear
+                                 // problem. We will go through the
+                                 // two parts it has that each solve
+                                 // one of the two equations, the
+                                 // first one for the pressure
+                                 // (component 1 of the solution),
+                                 // then the velocities (component 0
+                                 // of the solution). Both parts need
+                                 // an object representing the inverse
+                                 // mass matrix and an auxiliary
+                                 // vector, and we therefore declare
+                                 // these objects at the beginning of
+                                 // this function.
 template <int dim>
 void MixedLaplaceProblem<dim>::solve () 
 {
   const InverseMatrix<SparseMatrix<double> >
     m_inverse (system_matrix.block(0,0));
   Vector<double> tmp (solution.block(0).size());
-  
+
+                                   // Now on to the first
+                                   // equation. The right hand side of
+                                   // it is BM^{-1}F-G, which is what
+                                   // we compute in the first few
+                                   // lines. We then declare the
+                                   // objects representing the Schur
+                                   // complement, its approximation,
+                                   // and the inverse of the
+                                   // approximation. Finally, we
+                                   // declare a solver object and hand
+                                   // off all these matrices and
+                                   // vectors to it to compute block 1
+                                   // (the pressure) of the solution:
   {
     Vector<double> schur_rhs (solution.block(1).size());
 
@@ -1007,6 +1094,7 @@ void MixedLaplaceProblem<dim>::solve ()
     system_matrix.block(1,0).vmult (schur_rhs, tmp);
     schur_rhs -= system_rhs.block(1);
 
+    
     SchurComplement
       schur_complement (system_matrix, m_inverse);
     
@@ -1015,6 +1103,7 @@ void MixedLaplaceProblem<dim>::solve ()
       
     InverseMatrix<ApproximateSchurComplement>
       preconditioner (approximate_schur_complement);
+
     
     SolverControl solver_control (system_matrix.block(0,0).m(),
 				  1e-6*schur_rhs.l2_norm());
@@ -1024,9 +1113,18 @@ void MixedLaplaceProblem<dim>::solve ()
               preconditioner);
   
     std::cout << "   " << solver_control.last_step()
-              << " CG Schur complement iterations needed to obtain convergence."
+              << " CG Schur complement iterations to obtain convergence."
               << std::endl;
   }
+
+                                   // After we have the pressure, we
+                                   // can compute the velocity. The
+                                   // equation reads MU=-B^TP+F, and
+                                   // we solve it by first computing
+                                   // the right hand side, and then
+                                   // multiplying it with the object
+                                   // that represents the inverse of
+                                   // the mass matrix:
   {
     system_matrix.block(0,1).vmult (tmp, solution.block(1));
     tmp *= -1;
