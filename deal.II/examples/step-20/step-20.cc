@@ -742,35 +742,31 @@ void MixedLaplaceProblem<dim>::assemble_system ()
 class InverseMatrix : public Subscriptor
 {
   public:
-    InverseMatrix (const SparseMatrix<double> &matrix);
+    InverseMatrix (const SparseMatrix<double> &m);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const SparseMatrix<double> > mass_matrix;
+    const SmartPointer<const SparseMatrix<double> > matrix;
 
     mutable GrowingVectorMemory<> vector_memory;    
 };
 
 
-InverseMatrix::InverseMatrix (const SparseMatrix<double> &matrix)
+InverseMatrix::InverseMatrix (const SparseMatrix<double> &m)
                 :
-                mass_matrix (&matrix)
+                matrix (&m)
 {}
 
 
 void InverseMatrix::vmult (Vector<double>       &dst,
                            const Vector<double> &src) const
 {
-  SolverControl solver_control (mass_matrix->m(), 1e-8*src.l2_norm());
+  SolverControl solver_control (matrix->m(), 1e-8*src.l2_norm());
   SolverCG<>    cg (solver_control, vector_memory);
 
-  cg.solve (*mass_matrix, dst, src, PreconditionIdentity());        
-
-  std::cout << "     " << solver_control.last_step()
-            << " inner iterations needed to obtain convergence."
-            << std::endl;
+  cg.solve (*matrix, dst, src, PreconditionIdentity());        
 }
 
 
@@ -779,21 +775,10 @@ class SchurComplement
 {
   public:
     SchurComplement (const BlockSparseMatrix<double> &A,
-                     const InverseMatrix              &Minv)
-                    :
-                    system_matrix (&A),
-                    m_inverse (&Minv),
-                    tmp1 (A.block(0,0).m()),
-                    tmp2 (A.block(0,0).m())
-      {}
+                     const InverseMatrix             &Minv);
 
     void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const
-      {
-        system_matrix->block(0,1).vmult (tmp1, src);
-        m_inverse->vmult (tmp2, tmp1);
-        system_matrix->block(1,0).vmult (dst, tmp2);
-      }
+                const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
@@ -802,6 +787,24 @@ class SchurComplement
     mutable Vector<double> tmp1, tmp2;
 };
 
+
+SchurComplement::SchurComplement (const BlockSparseMatrix<double> &A,
+                                  const InverseMatrix             &Minv)
+                :
+                system_matrix (&A),
+                m_inverse (&Minv),
+                tmp1 (A.block(0,0).m()),
+                tmp2 (A.block(0,0).m())
+{}
+
+
+void SchurComplement::vmult (Vector<double>       &dst,
+                             const Vector<double> &src) const
+{
+  system_matrix->block(0,1).vmult (tmp1, src);
+  m_inverse->vmult (tmp2, tmp1);
+  system_matrix->block(1,0).vmult (dst, tmp2);
+}
 
 
 template <int dim>
