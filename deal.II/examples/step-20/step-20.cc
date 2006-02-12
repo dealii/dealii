@@ -739,7 +739,138 @@ void MixedLaplaceProblem<dim>::assemble_system ()
 }
 
 
+                                 // @sect3{Linear solvers and preconditioners}
 
+                                 // The linear solvers and
+                                 // preconditioners we use in this
+                                 // example have been discussed in
+                                 // significant detail already in the
+                                 // introduction. We will therefore
+                                 // not discuss the rationale for
+                                 // these classes here any more, but
+                                 // rather only comment on
+                                 // implementational aspects.
+
+                                 // @sect4{The ``InverseMatrix'' class template}
+
+                                 // The first component of our linear
+                                 // solver scheme was the creation of
+                                 // a class that acts like the inverse
+                                 // of a matrix, i.e. which has a
+                                 // ``vmult'' function that multiplies
+                                 // a vector with an inverse matrix by
+                                 // solving a linear system.
+                                 //
+                                 // While most of the code below
+                                 // should be obvious given the
+                                 // purpose of this class, two
+                                 // comments are in order. First, the
+                                 // class is derived from the
+                                 // ``Subscriptor'' class so that we
+                                 // can use the ``SmartPointer'' class
+                                 // with inverse matrix objects. The
+                                 // use of the ``Subscriptor'' class
+                                 // has been explained before in
+                                 // step-7 and step-20. The present
+                                 // class also sits on the receiving
+                                 // end of this
+                                 // ``Subscriptor''/``SmartPointer''
+                                 // pair: it holds its pointer to the
+                                 // matrix it is supposed to be the
+                                 // inverse of through a
+                                 // ``SmartPointer'' to make sure that
+                                 // this matrix is not destroyed while
+                                 // we still have a pointer to it.
+                                 //
+                                 // Secondly, we realize that we will
+                                 // probably perform many
+                                 // matrix-vector products with
+                                 // inverse matrix objects. Now, every
+                                 // time we do so, we have to call the
+                                 // CG solver to solve a linear
+                                 // system. To work, the CG solver
+                                 // needs to allocate four temporary
+                                 // vectors that it will release again
+                                 // at the end of its operation. What
+                                 // this means is that through
+                                 // repeated calls to the ``vmult''
+                                 // function of this class we have to
+                                 // allocate and release vectors over
+                                 // and over again.
+                                 //
+                                 // The natural question is then:
+                                 // Wouldn't it be nice if we could
+                                 // avoid this, and allocate vectors
+                                 // only once? In fact, deal.II offers
+                                 // a way to do exactly this. What all
+                                 // the linear solvers do is not to
+                                 // allocate memory using ``new'' and
+                                 // ``delete'', but rather to allocate
+                                 // them from an object derived from
+                                 // the ``VectorMemory'' class (see
+                                 // the module on Vector memory
+                                 // management in the API reference
+                                 // manual). By default, the linear
+                                 // solvers use a derived class
+                                 // ``PrimitiveVectorMemory'' that,
+                                 // ever time a vector is requested,
+                                 // allocates one using ``new'', and
+                                 // calls ``delete'' on it again once
+                                 // the solver returns it to the
+                                 // ``PrimitiveVectorMemory''
+                                 // object. This is the appropriate
+                                 // thing to do if we do not
+                                 // anticipate that the vectors may be
+                                 // reused any time soon.
+                                 //
+                                 // On the other hand, for the present
+                                 // case, we would like to have a
+                                 // vector memory object that
+                                 // allocates vectors when asked by a
+                                 // linear solver, but when the linear
+                                 // solver returns the vectors, the
+                                 // vector memory object holds on to
+                                 // them for later requests by linear
+                                 // solvers. The
+                                 // ``GrowingVectorMemory'' class does
+                                 // exactly this: when asked by a
+                                 // linear solver for a vector, it
+                                 // first looks whether it has unused
+                                 // ones in its pool and if so offers
+                                 // this vector. If it doesn't, it
+                                 // simply grows its pool. Vectors are
+                                 // only returned to the C++ runtime
+                                 // memory system once the
+                                 // ``GrowingVectorMemory'' object is
+                                 // destroyed itself.
+                                 //
+                                 // What we therefore need to do is
+                                 // have the present matrix have an
+                                 // object of type
+                                 // ``GrowingVectorMemory'' as a
+                                 // member variable and use it
+                                 // whenever we create a linear solver
+                                 // object. There is a slight
+                                 // complication here: Since the
+                                 // ``vmult'' function is marked as
+                                 // ``const'' (it doesn't change the
+                                 // state of the object, after all,
+                                 // and simply operates on its
+                                 // arguments), it can only pass an
+                                 // unchanging vector memory object to
+                                 // the solvers. The solvers, however,
+                                 // do change the state of the vector
+                                 // memory object, even though this
+                                 // has no impact on the actual state
+                                 // of the inverse matrix object. The
+                                 // compiler would therefore flag any
+                                 // such attempt as an error, if we
+                                 // didn't make use of a rarely used
+                                 // feature of C++: we mark the
+                                 // variable as ``mutable''. What this
+                                 // does is to allow us to change a
+                                 // member variable even from a
+                                 // ``const'' member function.
 template <class Matrix>
 class InverseMatrix : public Subscriptor
 {
@@ -763,6 +894,19 @@ InverseMatrix<Matrix>::InverseMatrix (const Matrix &m)
 {}
 
 
+                                 // Here now is the function that
+                                 // implements multiplication with the
+                                 // inverse matrix by calling a CG
+                                 // solver. Note how we pass the
+                                 // vector memory object discussed
+                                 // above to the linear solver. Note
+                                 // also that we set the solution
+                                 // vector to zero before starting the
+                                 // solve, since we do not want to use
+                                 // the possible previous and unknown
+                                 // content of that variable as
+                                 // starting vector for the linear
+                                 // solve:
 template <class Matrix>
 void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
                                    const Vector<double> &src) const
@@ -788,14 +932,14 @@ class SchurComplement : public Subscriptor
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double> > >              m_inverse;
+    const SmartPointer<const InverseMatrix<SparseMatrix<double> > > m_inverse;
     
     mutable Vector<double> tmp1, tmp2;
 };
 
 
 SchurComplement::SchurComplement (const BlockSparseMatrix<double> &A,
-                                  const InverseMatrix<SparseMatrix<double> >              &Minv)
+                                  const InverseMatrix<SparseMatrix<double> > &Minv)
                 :
                 system_matrix (&A),
                 m_inverse (&Minv),
