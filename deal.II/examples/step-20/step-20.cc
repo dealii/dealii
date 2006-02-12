@@ -1135,38 +1135,138 @@ void MixedLaplaceProblem<dim>::solve ()
 }
 
 
+                                 // @sect3{MixedLaplaceProblem class implementation (continued)}
 
+                                 // @sect4{MixedLaplace::compute_errors}
+
+                                 // After we have dealt with the
+                                 // linear solver and preconditioners,
+                                 // we continue with the
+                                 // implementation of our main
+                                 // class. In particular, the next
+                                 // task is to compute the errors in
+                                 // our numerical solution, in both
+                                 // the pressures as well as
+                                 // velocities.
+                                 //
+                                 // To compute errors in the solution,
+                                 // we have already introduced the
+                                 // ``VectorTools::integrate_difference''
+                                 // function in step-7 and
+                                 // step-11. However, there we only
+                                 // dealt with scalar solutions,
+                                 // whereas here we have a
+                                 // vector-valued solution with
+                                 // components that even denote
+                                 // different quantities and may have
+                                 // different orders of convergence
+                                 // (this isn't the case here, by
+                                 // choice of the used finite
+                                 // elements, but is frequently the
+                                 // case in mixed finite element
+                                 // applications). What we therefore
+                                 // have to do is to `mask' the
+                                 // components that we are interested
+                                 // in. This is easily done: the
+                                 // ``VectorTools::integrate_difference''
+                                 // function takes as its last
+                                 // argument a pointer to a weight
+                                 // function (the parameter defaults
+                                 // to the null pointer, meaning unit
+                                 // weights). What we simply have to
+                                 // do is to pass a function object
+                                 // that equals one in the components
+                                 // we are interested in, and zero in
+                                 // the other ones. For example, to
+                                 // compute the pressure error, we
+                                 // should pass a function that
+                                 // represents the constant vector
+                                 // with a unit value in component
+                                 // ``dim'', whereas for the velocity
+                                 // the constant vector should be one
+                                 // in the first ``dim'' components,
+                                 // and zero in the location of the
+                                 // pressure.
+                                 //
+                                 // In deal.II, the
+                                 // ``ComponentSelectFunction'' does
+                                 // exactly this: it wants to know how
+                                 // many vector components the
+                                 // function it is to represent should
+                                 // have (in our case this would be
+                                 // ``dim+1'', for the joint
+                                 // velocity-pressure space) and which
+                                 // individual or range of components
+                                 // should be equal to one. We
+                                 // therefore define two such masks at
+                                 // the beginning of the function,
+                                 // following by an object
+                                 // representing the exact solution
+                                 // and a vector in which we will
+                                 // store the cellwise errors as
+                                 // computed by
+                                 // ``integrate_difference'':
 template <int dim>
 void MixedLaplaceProblem<dim>::compute_errors () const
 {
-  Vector<double> tmp (triangulation.n_active_cells());
-  ExactSolution<dim> exact_solution;
+  const ComponentSelectFunction<dim>
+    pressure_mask (dim, dim+1);
+  const ComponentSelectFunction<dim>
+    velocity_mask(std::make_pair(0, dim), dim+1);
 
-                                   // do NOT use QGauss here!
-  QTrapez<1> q_trapez;
+  ExactSolution<dim> exact_solution;
+  Vector<double> cellwise_errors (triangulation.n_active_cells());
+
+                                   // As already discussed in step-7,
+                                   // we have to realize that it is
+                                   // impossible to integrate the
+                                   // errors exactly. All we can do is
+                                   // approximate this integral using
+                                   // quadrature. This actually
+                                   // presents a slight twist here: if
+                                   // we naively chose an object of
+                                   // type ``QGauss<dim>(degree+1)''
+                                   // as one may be inclined to do
+                                   // (this is what we used for
+                                   // integrating the linear system),
+                                   // one realizes that the error is
+                                   // very small and does not follow
+                                   // the expected convergence curves
+                                   // at all. What is happening is
+                                   // that for the mixed finite
+                                   // elements used here, the Gauss
+                                   // points happen to be
+                                   // superconvergence points in which
+                                   // the pointwise error is much
+                                   // smaller (and converges with
+                                   // higher order) than anywhere
+                                   // else. These are therefore not
+                                   // particularly good points for
+                                   // ingration. To avoid this
+                                   // problem, we simply use a
+                                   // trapezoidal rule and iterate it
+                                   // ``degree+2'' times in each
+                                   // coordinate direction (again as
+                                   // explained in step-7):
+  QTrapez<1>     q_trapez;
   QIterated<dim> quadrature (q_trapez, degree+2);
-  {
-    const ComponentSelectFunction<dim> mask (dim, 1., dim+1);
-    VectorTools::integrate_difference (dof_handler, solution, exact_solution,
-				       tmp, quadrature,
-				       VectorTools::L2_norm,
-				       &mask);
-  }
-  const double p_l2_error = tmp.l2_norm();
+
+                                   // With this, we can then let the
+                                   // library compute the errors and
+                                   // output them to the screen:
+  VectorTools::integrate_difference (dof_handler, solution, exact_solution,
+                                     cellwise_errors, quadrature,
+                                     VectorTools::L2_norm,
+                                     &pressure_mask);
+  const double p_l2_error = cellwise_errors.l2_norm();
   
-  double u_l2_error = 0;
-  for (unsigned int d=0; d<dim; ++d)
-    {
-      const ComponentSelectFunction<dim> mask(d, 1., dim+1);
-      VectorTools::integrate_difference (dof_handler, solution, exact_solution,
-					 tmp, quadrature,
-					 VectorTools::L2_norm,
-					 &mask);
-      u_l2_error = std::sqrt (u_l2_error * u_l2_error +
-			      tmp.l2_norm() * tmp.l2_norm());
-    }
+  VectorTools::integrate_difference (dof_handler, solution, exact_solution,
+                                     cellwise_errors, quadrature,
+                                     VectorTools::L2_norm,
+                                     &velocity_mask);
+  const double u_l2_error = cellwise_errors.l2_norm();
   
-  std::cout << "Errors: ||e_p||_L2 = " << p_l2_error
+  std::cout << "   Errors: ||e_p||_L2 = " << p_l2_error
 	    << ",   ||e_u||_L2 = " << u_l2_error
 	    << std::endl;
 }
