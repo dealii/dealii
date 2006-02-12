@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -410,7 +410,7 @@ ComponentSelectFunction (const unsigned int selected,
                          const unsigned int n_components)
 		:
 		ConstantFunction<dim> (value, n_components),
-                selected(selected)
+                selected_components(std::make_pair(selected,selected+1))
 {}
 
 
@@ -421,8 +421,26 @@ ComponentSelectFunction (const unsigned int selected,
                          const unsigned int n_components)
 		:
 		ConstantFunction<dim> (1., n_components),
-                selected(selected)
+                selected_components(std::make_pair(selected,selected+1))
 {}
+
+
+
+template <int dim>
+ComponentSelectFunction<dim>::
+ComponentSelectFunction (const std::pair<unsigned int,unsigned int> &selected,
+                         const unsigned int n_components)
+		:
+		ConstantFunction<dim> (1., n_components),
+                selected_components(selected)
+{
+  Assert (selected_components.first < selected_components.second,
+          ExcMessage ("The upper bound of the interval must be larger than "
+                      "the lower bound"));
+  Assert (selected_components.second <= n_components,
+          ExcMessage ("The upper bound of the interval must be less than "
+                      "or equal to the total number of vector components"));
+}
 
 
 
@@ -433,8 +451,10 @@ void ComponentSelectFunction<dim>::vector_value (const Point<dim> &,
   Assert (return_value.size() == this->n_components,
 	  ExcDimensionMismatch (return_value.size(), this->n_components));
 
-  std::fill (return_value.begin(), return_value.end(), 0.);
-  return_value(selected) = this->function_value;
+  return_value = 0;
+  std::fill (return_value.begin()+selected_components.first,
+             return_value.begin()+selected_components.second,
+             this->function_value);
 }
 
 
@@ -447,12 +467,8 @@ void ComponentSelectFunction<dim>::vector_value_list (const std::vector<Point<di
 	  ExcDimensionMismatch(values.size(), points.size()));
 
   for (unsigned int i=0; i<points.size(); ++i)
-    {
-      Assert (values[i].size() == this->n_components,
-	      ExcDimensionMismatch(values[i].size(), this->n_components));
-      std::fill (values[i].begin(), values[i].end(), 0.);
-      values[i](selected) = this->function_value;
-    }
+    ComponentSelectFunction<dim>::vector_value (points[i],
+                                                values[i]);
 }
 
 

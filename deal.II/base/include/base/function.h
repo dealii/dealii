@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -580,25 +580,29 @@ class ConstantFunction : public ZeroFunction<dim>
 
 
 /**
- * This is a constant vector-valued function, that is different from
- * zero only in one component.
- *
- * It is especially useful as a weight function for
- * <tt>VectorTools::integrate_difference</tt>, where it allows to integrate
- * only one component.
+ * This is a constant vector-valued function, in which one or more
+ * components of the vector have a constant value and all other
+ * components are zero.  It is especially useful as a weight function
+ * for <tt>VectorTools::integrate_difference</tt>, where it allows to
+ * integrate only one or a few vector components, rather than the
+ * entire vector-valued solution. See the @ref step_20 "step-20"
+ * tutorial program for a detailed explanation.
  *
  * @ingroup functions
- * @author Guido Kanschat, 2000
+ * @author Guido Kanschat, 2000, Wolfgang Bangerth 2006
  */
 template <int dim>
 class ComponentSelectFunction : public ConstantFunction<dim>
 {
   public:
 				     /**
-				      * Constructor. Arguments denote
-				      * the component selected, the
-				      * value for that component and
-				      * the total number of components.
+				      * Constructor if only a single
+				      * component shall be
+				      * non-zero. Arguments denote the
+				      * component selected, the value
+				      * for that component and the
+				      * total number of vector
+				      * components.
 				      */
     ComponentSelectFunction (const unsigned int selected,
 			     const double       value,
@@ -613,6 +617,23 @@ class ComponentSelectFunction : public ConstantFunction<dim>
 				      */
     ComponentSelectFunction (const unsigned int selected,
 			     const unsigned int n_components);
+
+                                     /**
+				      * Constructor if multiple
+				      * components shall have
+				      * non-zero, unit values
+				      * (i.e. this should be a mask
+				      * for multiple components). The
+				      * first argument denotes a
+				      * half-open interval of
+				      * components (for example
+				      * std::pair(0,dim) for the first
+				      * dim components), and the
+				      * second argument is the total
+				      * number of vector components.
+				      */
+    ComponentSelectFunction (const std::pair<unsigned int, unsigned int> &selected,
+			     const unsigned int n_components);    
     
     				     /**
 				      * Return the value of the function
@@ -654,9 +675,11 @@ class ComponentSelectFunction : public ConstantFunction<dim>
 
   protected:
 				     /**
-				      * Index of the selected component.
+				      * Half-open interval of the
+				      * indices of selected
+				      * components.
 				      */
-    const unsigned int selected;
+    const std::pair<unsigned int,unsigned int> selected_components;
 };
 
 
