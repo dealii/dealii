@@ -93,122 +93,122 @@ class SchurMatrix : public Subscriptor
 {
   public:
 
-				   /**
-				    * Constructor. This constructor
-				    * receives all the matrices
-				    * needed. Furthermore, it gets a
-				    * reference to a memory structure
-				    * for obtaining block vectors.
-				    *
-				    * Optionally, the length of the
-				    * @p u-vector can be provided.
-				    *
-				    * For the meaning of the matrices
-				    * see the class documentation.
-				    */
-  SchurMatrix(const MA_inverse& Ainv,
-	      const MB& B,
-	      const MDt& Dt,
-	      const MC& C,
-	      VectorMemory<BlockVector<double> >& mem,
-	      const std::vector<unsigned int>& signature = std::vector<unsigned int>(0));
+                                     /**
+                                      * Constructor. This constructor
+                                      * receives all the matrices
+                                      * needed. Furthermore, it gets a
+                                      * reference to a memory structure
+                                      * for obtaining block vectors.
+                                      *
+                                      * Optionally, the length of the
+                                      * @p u-vector can be provided.
+                                      *
+                                      * For the meaning of the matrices
+                                      * see the class documentation.
+                                      */
+    SchurMatrix(const MA_inverse& Ainv,
+                const MB& B,
+                const MDt& Dt,
+                const MC& C,
+                VectorMemory<BlockVector<double> >& mem,
+                const std::vector<unsigned int>& signature = std::vector<unsigned int>(0));
 
-				   /**
-				    * Do block elimination of the
-				    * right hand side. Given right
-				    * hand sides for both components
-				    * of the block system, this
-				    * function provides the right hand
-				    * side for the Schur complement.
-				    *
-				    * The result is stored in the
-				    * first argument, which is also
-				    * part of the input data. If it is
-				    * necessary to conserve the data,
-				    * @p dst must be copied before
-				    * calling this function. This is
-				    * reasonable, since in many cases,
-				    * only the pre-processed right
-				    * hand side is needed.
-				    */
-  void prepare_rhs (BlockVector<double>& dst,
-		    const BlockVector<double>& src) const;
+                                     /**
+                                      * Do block elimination of the
+                                      * right hand side. Given right
+                                      * hand sides for both components
+                                      * of the block system, this
+                                      * function provides the right hand
+                                      * side for the Schur complement.
+                                      *
+                                      * The result is stored in the
+                                      * first argument, which is also
+                                      * part of the input data. If it is
+                                      * necessary to conserve the data,
+                                      * @p dst must be copied before
+                                      * calling this function. This is
+                                      * reasonable, since in many cases,
+                                      * only the pre-processed right
+                                      * hand side is needed.
+                                      */
+    void prepare_rhs (BlockVector<double>& dst,
+                      const BlockVector<double>& src) const;
 
-				   /**
-				    * Multiplication with the Schur
-				    * complement.
-				    */
-  void vmult (BlockVector<double>& dst,
-	      const BlockVector<double>& src) const;
+                                     /**
+                                      * Multiplication with the Schur
+                                      * complement.
+                                      */
+    void vmult (BlockVector<double>& dst,
+                const BlockVector<double>& src) const;
 
 //  void Tmult(BlockVector<double>& dst, const BlockVector<double>& src) const;
 
-				   /**
-				    * Computation of the residual of
-				    * the Schur complement.
-				    */
-  double residual (BlockVector<double>& dst,
-		   const BlockVector<double>& src,
-		   const BlockVector<double>& rhs) const;
+                                     /**
+                                      * Computation of the residual of
+                                      * the Schur complement.
+                                      */
+    double residual (BlockVector<double>& dst,
+                     const BlockVector<double>& src,
+                     const BlockVector<double>& rhs) const;
 
-				   /**
-				    * Compute the eliminated variable
-				    * from the solution of the Schur
-				    * complement problem.
-				    */
-  void postprocess (BlockVector<double>& dst,
-		    const BlockVector<double>& src,
-		    const BlockVector<double>& rhs) const;
+                                     /**
+                                      * Compute the eliminated variable
+                                      * from the solution of the Schur
+                                      * complement problem.
+                                      */
+    void postprocess (BlockVector<double>& dst,
+                      const BlockVector<double>& src,
+                      const BlockVector<double>& rhs) const;
 
-				   /**
-				    * Select debugging information for
-				    * log-file.  Debug level 1 is
-				    * defined and writes the norm of
-				    * every vector before and after
-				    * each operation. Debug level 0
-				    * turns off debugging information.
-				    */
-  void debug_level(unsigned int l);
+                                     /**
+                                      * Select debugging information for
+                                      * log-file.  Debug level 1 is
+                                      * defined and writes the norm of
+                                      * every vector before and after
+                                      * each operation. Debug level 0
+                                      * turns off debugging information.
+                                      */
+    void debug_level(unsigned int l);
   private:
-				   /**
-				    * No copy constructor.
-				    */
-  SchurMatrix (const SchurMatrix<MA_inverse, MB, MDt, MC>&);
-				   /**
-				    * No assignment.
-				    */
-  SchurMatrix& operator = (const SchurMatrix<MA_inverse, MB, MDt, MC>&);
+                                     /**
+                                      * No copy constructor.
+                                      */
+    SchurMatrix (const SchurMatrix<MA_inverse, MB, MDt, MC>&);
+                                     /**
+                                      * No assignment.
+                                      */
+    SchurMatrix& operator = (const SchurMatrix<MA_inverse, MB, MDt, MC>&);
 
-				   /**
-				    * Pointer to inverse of upper left block.
-				    */
-  const SmartPointer<const MA_inverse> Ainv;
-				   /**
-				    * Pointer to lower left block.
-				    */
-  const SmartPointer<const MB> B;
-				   /**
-				    * Pointer to transpose of upper right block.
-				    */
-  const SmartPointer<const MDt> Dt;
-				   /**
-				    * Pointer to lower right block.
-				    */
-  const SmartPointer<const MC> C;
-				   /**
-				    * Auxiliary memory for vectors.
-				    */
-  VectorMemory<BlockVector<double> >& mem;
+                                     /**
+                                      * Pointer to inverse of upper left block.
+                                      */
+    const SmartPointer<const MA_inverse> Ainv;
+                                     /**
+                                      * Pointer to lower left block.
+                                      */
+    const SmartPointer<const MB> B;
+                                     /**
+                                      * Pointer to transpose of upper right block.
+                                      */
+    const SmartPointer<const MDt> Dt;
+                                     /**
+                                      * Pointer to lower right block.
+                                      */
+    const SmartPointer<const MC> C;
+                                     /**
+                                      * Auxiliary memory for vectors.
+                                      */
+    VectorMemory<BlockVector<double> >& mem;
 
-				   /**
-				    * Optional signature of the @p u-vector.
-				    */
-  std::vector<unsigned int> signature;
+                                     /**
+                                      * Optional signature of the @p u-vector.
+                                      */
+    std::vector<unsigned int> signature;
   
-				   /**
-				    * Switch for debugging information.
-				    */
-  unsigned int debug;
+                                     /**
+                                      * Switch for debugging information.
+                                      */
+    unsigned int debug;
 };
 
 /*@}*/
@@ -224,8 +224,8 @@ SchurMatrix<MA_inverse, MB, MDt, MC>
 	      const std::vector<unsigned int>& signature)
 		: Ainv(&Ainv), B(&B), Dt(&Dt), C(&C),
 		  mem(mem),
-		signature(signature),
-		debug(0)
+                  signature(signature),
+                  debug(0)
 {
 }
 
