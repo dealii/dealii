@@ -768,7 +768,7 @@ namespace Patterns
  *   Input may be sorted into subsection trees in order to give the input a
  *   logical structure.
  *
- *   The ParameterHandler class is discussed in detail in the step-19 example
+ *   The ParameterHandler class is discussed in detail in the @ref step_19 "step-19" example
  *   program.
  *   
  *   <h3>Declaring entries</h3>

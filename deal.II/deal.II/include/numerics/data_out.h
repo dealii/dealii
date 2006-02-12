@@ -835,7 +835,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * By default, this class produces patches for all active cells. Sometimes,
  * this is not what you want, maybe because they are simply too many (and too
  * small to be seen individually) or because you only want to see a certain
- * region of the domain (for example in parallel programs such as the step-18
+ * region of the domain (for example in parallel programs such as the @ref step_18 "step-18"
  * example program), or for some other reason.
  *
  * For this, internally build_patches() does not generate

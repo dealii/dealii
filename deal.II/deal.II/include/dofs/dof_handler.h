@@ -274,10 +274,10 @@ class DoFHandler  :  public Subscriptor
 				      * problem is to use an
 				      * intermediate compressed
 				      * sparsity pattern that only
-				      * allocated memory on
-				      * demand. Refer to the step-11
-				      * example program on how to do
-				      * this.
+				      * allocates memory on
+				      * demand. Refer to the @ref
+				      * step_11 "step-11" example
+				      * program on how to do this.
 				      */
     unsigned int max_couplings_between_dofs () const;
 
