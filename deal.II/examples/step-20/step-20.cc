@@ -500,13 +500,13 @@ void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
   const unsigned int n_u = dofs_per_component[0],
                      n_p = dofs_per_component[dim];
 
-  std::cout << "   Number of active cells: "
+  std::cout << "Number of active cells: "
 	    << triangulation.n_active_cells()
 	    << std::endl
-	    << "   Total number of cells: "
+	    << "Total number of cells: "
 	    << triangulation.n_cells()
 	    << std::endl
-            << "   Number of degrees of freedom: "
+            << "Number of degrees of freedom: "
 	    << dof_handler.n_dofs()
             << " (" << n_u << '+' << n_p << ')'
 	    << std::endl;
@@ -1112,7 +1112,7 @@ void MixedLaplaceProblem<dim>::solve ()
     cg.solve (schur_complement, solution.block(1), schur_rhs,
               preconditioner);
   
-    std::cout << "   " << solver_control.last_step()
+    std::cout << solver_control.last_step()
               << " CG Schur complement iterations to obtain convergence."
               << std::endl;
   }
@@ -1266,7 +1266,7 @@ void MixedLaplaceProblem<dim>::compute_errors () const
                                      &velocity_mask);
   const double u_l2_error = cellwise_errors.l2_norm();
   
-  std::cout << "   Errors: ||e_p||_L2 = " << p_l2_error
+  std::cout << "Errors: ||e_p||_L2 = " << p_l2_error
 	    << ",   ||e_u||_L2 = " << u_l2_error
 	    << std::endl;
 }
@@ -1357,7 +1357,8 @@ void MixedLaplaceProblem<dim>::run ()
 				 // exception is that we pass the
 				 // degree of the finite element space
 				 // to the constructor of the mixed
-				 // laplace problem.
+				 // laplace problem (here, we use
+				 // zero-th order elements).
 int main () 
 {
   try
