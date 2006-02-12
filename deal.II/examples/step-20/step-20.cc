@@ -1272,30 +1272,73 @@ void MixedLaplaceProblem<dim>::compute_errors () const
 }
 
 
+                                 // @sect4{MixedLaplace::output_results}
+
+                                 // The last interesting function is
+                                 // the one in which we generate
+                                 // graphical output. Everything here
+                                 // looks obvious and familiar. Note
+                                 // how we construct unique names for
+                                 // all the solution variables at the
+                                 // beginning, like we did in step-8
+                                 // and other programs later on. The
+                                 // only thing worth mentioning is
+                                 // that for higher order elements, in
+                                 // seems inappropriate to only show a
+                                 // single bilinear quadrilateral per
+                                 // cell in the graphical output. We
+                                 // therefore generate patches of size
+                                 // (degree+1)x(degree+1) to capture
+                                 // the full information content of
+                                 // the solution. See the step-7
+                                 // tutorial program for more
+                                 // information on this.
 template <int dim>
 void MixedLaplaceProblem<dim>::output_results () const
 {
+  std::vector<std::string> solution_names;
+  switch (dim)
+    {
+      case 2:
+            solution_names.push_back ("u");
+            solution_names.push_back ("v");
+            solution_names.push_back ("p");
+            break;
+            
+      case 3:
+            solution_names.push_back ("u");
+            solution_names.push_back ("v");
+            solution_names.push_back ("w");
+            solution_names.push_back ("p");
+            break;
+            
+      default:
+            Assert (false, ExcNotImplemented());
+    }
+  
+  
   DataOut<dim> data_out;
 
   data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, "solution");
+  data_out.add_data_vector (solution, solution_names);
 
   data_out.build_patches (degree+1);
 
-  std::ofstream output (dim == 2 ?
-			"solution-2d.gmv" :
-			"solution-3d.gmv");
+  std::ofstream output ("solution.gmv");
   data_out.write_gmv (output);
 }
 
 
 
+                                 // @sect4{MixedLaplace::run}
+
+                                 // This is the final function of our
+                                 // main class. It's only job is to
+                                 // call the other functions in their
+                                 // natural order:
 template <int dim>
 void MixedLaplaceProblem<dim>::run () 
 {
-  std::cout << "Solving problem in " << dim
-            << " space dimensions." << std::endl;
-  
   make_grid_and_dofs();
   assemble_system ();
   solve ();
