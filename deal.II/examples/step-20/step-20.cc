@@ -739,57 +739,63 @@ void MixedLaplaceProblem<dim>::assemble_system ()
 }
 
 
+
+template <class Matrix>
 class InverseMatrix : public Subscriptor
 {
   public:
-    InverseMatrix (const SparseMatrix<double> &m);
+    InverseMatrix (const Matrix &m);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
-    const SmartPointer<const SparseMatrix<double> > matrix;
+    const SmartPointer<const Matrix> matrix;
 
     mutable GrowingVectorMemory<> vector_memory;    
 };
 
 
-InverseMatrix::InverseMatrix (const SparseMatrix<double> &m)
+template <class Matrix>
+InverseMatrix<Matrix>::InverseMatrix (const Matrix &m)
                 :
                 matrix (&m)
 {}
 
 
-void InverseMatrix::vmult (Vector<double>       &dst,
-                           const Vector<double> &src) const
+template <class Matrix>
+void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
+                                   const Vector<double> &src) const
 {
-  SolverControl solver_control (matrix->m(), 1e-8*src.l2_norm());
-  SolverCG<>    cg (solver_control, vector_memory);
+  SolverControl solver_control (src.size(), 1e-8*src.l2_norm());
+  SolverCG<> cg (solver_control, vector_memory);
 
+  dst = 0;
+  
   cg.solve (*matrix, dst, src, PreconditionIdentity());        
 }
 
 
 
-class SchurComplement 
+class SchurComplement : public Subscriptor
 {
   public:
     SchurComplement (const BlockSparseMatrix<double> &A,
-                     const InverseMatrix             &Minv);
+                     const InverseMatrix<SparseMatrix<double> > &Minv);
 
     void vmult (Vector<double>       &dst,
                 const Vector<double> &src) const;
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix>              m_inverse;
+    const SmartPointer<const InverseMatrix<SparseMatrix<double> > >              m_inverse;
     
     mutable Vector<double> tmp1, tmp2;
 };
 
 
 SchurComplement::SchurComplement (const BlockSparseMatrix<double> &A,
-                                  const InverseMatrix             &Minv)
+                                  const InverseMatrix<SparseMatrix<double> >              &Minv)
                 :
                 system_matrix (&A),
                 m_inverse (&Minv),
@@ -807,10 +813,47 @@ void SchurComplement::vmult (Vector<double>       &dst,
 }
 
 
+
+class ApproximateSchurComplement : public Subscriptor
+{
+  public:
+    ApproximateSchurComplement (const BlockSparseMatrix<double> &A);
+
+    void vmult (Vector<double>       &dst,
+                const Vector<double> &src) const;
+
+  private:
+    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
+    
+    mutable Vector<double> tmp1, tmp2;
+};
+
+
+ApproximateSchurComplement::ApproximateSchurComplement (const BlockSparseMatrix<double> &A)
+                :
+                system_matrix (&A),
+                tmp1 (A.block(0,0).m()),
+                tmp2 (A.block(0,0).m())
+{}
+
+
+void ApproximateSchurComplement::vmult (Vector<double>       &dst,
+                                   const Vector<double> &src) const
+{
+  system_matrix->block(0,1).vmult (tmp1, src);
+  system_matrix->block(0,0).precondition_Jacobi (tmp2, tmp1);
+  system_matrix->block(1,0).vmult (dst, tmp2);
+}
+
+
+
+
+
 template <int dim>
 void MixedLaplaceProblem<dim>::solve () 
 {
-  const InverseMatrix m_inverse (system_matrix.block(0,0));
+  const InverseMatrix<SparseMatrix<double> >
+    m_inverse (system_matrix.block(0,0));
   Vector<double> tmp (solution.block(0).size());
   
   {
@@ -820,14 +863,21 @@ void MixedLaplaceProblem<dim>::solve ()
     system_matrix.block(1,0).vmult (schur_rhs, tmp);
     schur_rhs -= system_rhs.block(1);
 
+    SchurComplement
+      schur_complement (system_matrix, m_inverse);
+    
+    ApproximateSchurComplement
+      approximate_schur_complement (system_matrix);
+      
+    InverseMatrix<ApproximateSchurComplement>
+      preconditioner (approximate_schur_complement);
+    
     SolverControl solver_control (system_matrix.block(0,0).m(),
 				  1e-6*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
-    cg.solve (SchurComplement(system_matrix, m_inverse),
-              solution.block(1),
-              schur_rhs,
-              PreconditionIdentity());
+    cg.solve (schur_complement, solution.block(1), schur_rhs,
+              preconditioner);
   
     std::cout << "   " << solver_control.last_step()
               << " CG Schur complement iterations needed to obtain convergence."
