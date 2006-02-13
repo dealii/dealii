@@ -2067,6 +2067,16 @@ namespace hp
             if (active_fe2 == invalid_dof_index)
 	      active_fe2 = active_fe1;
 
+					     // at this point, all
+					     // indices should be ok
+					     // (but weren't at one
+					     // point, thus the
+					     // crash_01 testcase)
+	    Assert (active_fe1 < finite_elements->size(),
+		    ExcInternalError());
+	    Assert (active_fe2 < finite_elements->size(),
+		    ExcInternalError());
+	    
             if (active_fe1 == active_fe2)
 	      dofs_for_lines += (*finite_elements)[active_fe1].dofs_per_line + 2;
             else
@@ -2087,9 +2097,13 @@ namespace hp
         levels.back()->quad_dofs = std::vector<unsigned int> (dofs_for_quads,
                                                               invalid_dof_index);
 
-                                         // As we already have the active_fe_indices for the lines, it is probably
-                                         // a good idea to directly use those to create the linked list structure
-                                         // within the line_dofs field.
+                                         // As we already have the
+                                         // active_fe_indices for the
+                                         // lines, it is probably a
+                                         // good idea to directly use
+                                         // those to create the linked
+                                         // list structure within the
+                                         // line_dofs field.
         for (unsigned int j = 0; j < tria->n_raw_lines(i); ++j)
           {
             dofs_for_lines = levels.back()->dof_line_index_offset[j];
@@ -2098,14 +2112,29 @@ namespace hp
             unsigned int active_fe1 = line_active_fe_indices[j*2],
                          active_fe2 = line_active_fe_indices[j*2+1];
 
-                                             // Check for boundary lines, where clearly one of the line indices
-                                             // is missing.
+                                             // Check for boundary
+                                             // lines, where clearly
+                                             // one of the line
+                                             // indices is missing.
             if (active_fe1 == invalid_dof_index)
 	      active_fe1 = active_fe2;
             if (active_fe2 == invalid_dof_index)
 	      active_fe2 = active_fe1;
 
-                                             // Now create prepare linked list, with either 1 or two entries.
+					     // at this point, all
+					     // indices should be ok
+					     // (but weren't at one
+					     // point, thus the
+					     // crash_01 testcase)
+	    Assert (active_fe1 < finite_elements->size(),
+		    ExcInternalError());
+	    Assert (active_fe2 < finite_elements->size(),
+		    ExcInternalError());
+
+                                             // Now create prepare
+                                             // linked list, with
+                                             // either 1 or two
+                                             // entries.
             levels.back()->line_dofs[dofs_for_lines] = active_fe1;
             if (active_fe1 == active_fe2)
 	      levels.back()->line_dofs[dofs_for_lines + 1] = 
