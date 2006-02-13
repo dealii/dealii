@@ -300,7 +300,7 @@ class KInverse : public TensorFunction<2,dim>
 template <int dim>
 void
 KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
-			      std::vector<Tensor<2,dim> >    &values) const
+                           std::vector<Tensor<2,dim> >    &values) const
 {
   Assert (points.size() == values.size(),
 	  ExcDimensionMismatch (points.size(), values.size()));
@@ -1041,7 +1041,7 @@ ApproximateSchurComplement::ApproximateSchurComplement (const BlockSparseMatrix<
 
 
 void ApproximateSchurComplement::vmult (Vector<double>       &dst,
-                                   const Vector<double> &src) const
+                                        const Vector<double> &src) const
 {
   system_matrix->block(0,1).vmult (tmp1, src);
   system_matrix->block(0,0).precondition_Jacobi (tmp2, tmp1);
