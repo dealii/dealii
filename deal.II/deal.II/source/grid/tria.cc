@@ -4060,7 +4060,7 @@ unsigned int Triangulation<dim>::n_lines () const {
 template <int dim>
 unsigned int Triangulation<dim>::n_raw_lines (const unsigned int level) const
 {
-  Assert(levels<n_levels(), ExcIndexRange(level,0,n_levels()));
+  Assert(level < n_levels(), ExcIndexRange(level,0,n_levels()));
   return levels[level]->lines.lines.size();
 }
 
@@ -4105,15 +4105,15 @@ unsigned int Triangulation<1>::n_quads (const unsigned int) const
 }
 
 
-template <int dim>
-unsigned int Triangulation<dim>::n_raw_quads (const unsigned int level) const
+template <>
+unsigned int Triangulation<1>::n_raw_quads (const unsigned int) const
 {
   return 0;
 }
 
 
-template <int dim>
-unsigned int Triangulation<dim>::n_raw_hexs (const unsigned int level) const
+template <>
+unsigned int Triangulation<1>::n_raw_hexs (const unsigned int) const
 {
   return 0;
 }
@@ -4154,15 +4154,8 @@ unsigned int Triangulation<dim>::n_quads (const unsigned int level) const {
 template <int dim>
 unsigned int Triangulation<dim>::n_raw_quads (const unsigned int level) const
 {
-  Assert(levels<n_levels(), ExcIndexRange(level,0,n_levels()));
+  Assert(level < n_levels(), ExcIndexRange(level,0,n_levels()));
   return levels[level]->quads.quads.size();
-}
-
-
-template <int dim>
-unsigned int Triangulation<dim>::n_raw_hexs (const unsigned int level) const
-{
-  return 0;
 }
 
 
@@ -4197,6 +4190,13 @@ unsigned int Triangulation<dim>::n_hexs (const unsigned int) const
   return 0;
 }
 
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_raw_hexs (const unsigned int) const
+{
+  return 0;
+}
 
 
 template <int dim>
@@ -4237,18 +4237,10 @@ unsigned int Triangulation<dim>::n_hexs (const unsigned int level) const
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_raw_quads (const unsigned int level) const
-{
-  Assert(levels<n_levels(), ExcIndexRange(level,0,n_levels()));
-  return levels[level]->quads.quads.size();
-}
-
-
-template <int dim>
 unsigned int Triangulation<dim>::n_raw_hexs (const unsigned int level) const
 {
-  Assert(levels<n_levels(), ExcIndexRange(level,0,n_levels()));
-  return levels[level]->hexs.hexs.size();
+  Assert(level < n_levels(), ExcIndexRange(level,0,n_levels()));
+  return levels[level]->hexes.hexes.size();
 }
 
 
