@@ -1943,7 +1943,7 @@ namespace hp
         std::swap (active_fe_backup[i], levels.back()->active_fe_indices);
 
         levels.back()->dof_line_index_offset = std::vector<unsigned int>
-                                               (tria->levels[i]->lines.lines.size (),static_cast<unsigned int>(-1));
+                                               (tria->n_raw_lines(i),invalid_dof_index);
         unsigned int dofs_for_lines = 0;
         for (unsigned int j = 0; j < tria->levels[i]->lines.lines.size(); ++j)
           {
@@ -1984,7 +1984,7 @@ namespace hp
                                      // their size
     clear_space ();
   
-    vertex_dofs.resize(tria->vertices.size()*(*finite_elements)[0].dofs_per_vertex,
+    vertex_dofs.resize(tria->n_vertices()*(*finite_elements)[0].dofs_per_vertex,
                        invalid_dof_index);
 
 //TODO[?] Does not work for continuous FEs. Problem is at faces, which might have a different
@@ -1994,20 +1994,23 @@ namespace hp
         levels.push_back (new internal::hp::DoFLevel<2>);
         std::swap (active_fe_backup[i], levels.back()->active_fe_indices);
 
-        levels.back()->dof_line_index_offset = std::vector<unsigned int>
-                                               (tria->levels[i]->lines.lines.size (),static_cast<unsigned int>(-1));
-        levels.back()->dof_quad_index_offset = std::vector<unsigned int>
-                                               (tria->levels[i]->quads.quads.size (),static_cast<unsigned int>(-1));
+        levels.back()->dof_line_index_offset
+	  = std::vector<unsigned int> (tria->n_raw_lines(i),
+				       invalid_dof_index);
+        levels.back()->dof_quad_index_offset
+	  = std::vector<unsigned int> (tria->n_raw_quads(i),
+				       invalid_dof_index);
 
                                          // Create table of active_fe_levels of cells
                                          // adjacent to the lines.
         std::vector<unsigned int> line_active_fe_indices
-	  (tria->levels[i]->lines.lines.size () * 2, 
-	   static_cast<unsigned int>(-1));
+	  (tria->n_raw_lines(i) * 2, 
+	   invalid_dof_index);
 
-        for (unsigned int j = 0; j < tria->levels[i]->quads.quads.size (); ++j)
+        for (unsigned int j = 0; j < tria->n_raw_quads(i); ++j)
           {
-            const unsigned int cell_fe_index = levels.back ()->active_fe_indices[j];
+            const unsigned int cell_fe_index
+	      = levels.back ()->active_fe_indices[j];
 
                                              // Referring to the following diagram from
                                              // documentation of the triangulation class,
@@ -2034,7 +2037,7 @@ namespace hp
           }
 
         unsigned int dofs_for_lines = 0;
-        for (unsigned int j = 0; j < tria->levels[i]->lines.lines.size (); ++j)
+        for (unsigned int j = 0; j < tria->n_raw_lines(i); ++j)
           {
             levels.back()->dof_line_index_offset[j] = dofs_for_lines;
 
@@ -2059,9 +2062,9 @@ namespace hp
 
                                              // Check for boundary lines, where clearly one of the line indices
                                              // is missing.
-            if (active_fe1 == static_cast<unsigned int>(-1))
+            if (active_fe1 == invalid_dof_index)
 	      active_fe1 = active_fe2;
-            if (active_fe2 == static_cast<unsigned int>(-1))
+            if (active_fe2 == invalid_dof_index)
 	      active_fe2 = active_fe1;
 
             if (active_fe1 == active_fe2)
@@ -2072,7 +2075,7 @@ namespace hp
           }
 
         unsigned int dofs_for_quads = 0;
-        for (unsigned int j = 0; j < tria->levels[i]->quads.quads.size (); ++j)
+        for (unsigned int j = 0; j < tria->n_raw_quads(i); ++j)
           {
             levels.back()->dof_quad_index_offset[j] = dofs_for_quads;
             dofs_for_quads += (*finite_elements)[
@@ -2087,7 +2090,7 @@ namespace hp
                                          // As we already have the active_fe_indices for the lines, it is probably
                                          // a good idea to directly use those to create the linked list structure
                                          // within the line_dofs field.
-        for (unsigned int j = 0; j < tria->levels[i]->lines.lines.size (); ++j)
+        for (unsigned int j = 0; j < tria->n_raw_lines(i); ++j)
           {
             dofs_for_lines = levels.back()->dof_line_index_offset[j];
 
@@ -2097,16 +2100,16 @@ namespace hp
 
                                              // Check for boundary lines, where clearly one of the line indices
                                              // is missing.
-            if (active_fe1 == static_cast<unsigned int>(-1))
+            if (active_fe1 == invalid_dof_index)
 	      active_fe1 = active_fe2;
-            if (active_fe2 == static_cast<unsigned int>(-1))
+            if (active_fe2 == invalid_dof_index)
 	      active_fe2 = active_fe1;
 
                                              // Now create prepare linked list, with either 1 or two entries.
             levels.back()->line_dofs[dofs_for_lines] = active_fe1;
             if (active_fe1 == active_fe2)
 	      levels.back()->line_dofs[dofs_for_lines + 1] = 
-                static_cast<unsigned int>(-1);
+                invalid_dof_index;
             else
               {
                 const unsigned int start_next_fe =
@@ -2116,7 +2119,7 @@ namespace hp
 
                 levels.back()->line_dofs[start_next_fe] = active_fe2;
                 levels.back()->line_dofs[start_next_fe + 1] = 
-		  static_cast<unsigned int>(-1);
+		  invalid_dof_index;
               }
           }
       };
@@ -2159,11 +2162,11 @@ namespace hp
         std::swap (active_fe_backup[i], levels.back()->active_fe_indices);
 
         levels.back()->dof_line_index_offset = std::vector<unsigned int>
-                                               (tria->levels[i]->lines.lines.size (),static_cast<unsigned int>(-1));
+                                               (tria->n_raw_lines(i),invalid_dof_index);
         levels.back()->dof_quad_index_offset = std::vector<unsigned int>
-                                               (tria->levels[i]->quads.quads.size (),static_cast<unsigned int>(-1));
+                                               (tria->n_raw_quads(i),invalid_dof_index);
         levels.back()->dof_hex_index_offset = std::vector<unsigned int>
-                                              (tria->levels[i]->hexes.hexes.size (),static_cast<unsigned int>(-1));
+                                              (tria->n_raw_hexes(i),invalid_dof_index);
 
         unsigned int dofs_for_lines = 0;
 /* Uncommented as we actually need some information about how many DoFs should be reserved
