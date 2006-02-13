@@ -608,7 +608,7 @@ class DoFObjectAccessor<1, DH> :
 				      * argument is assumed to be a pointer
 				      * to a DoFHandler object.
 				      */
-    DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
+    DoFObjectAccessor (const Triangulation<dim> *tria,
 		       const int                 level,
 		       const int                 index,
 		       const AccessorData       *local_data);
@@ -854,7 +854,7 @@ class DoFObjectAccessor<2, DH> :
 				      * argument is assumed to be a pointer
 				      * to a DoFHandler object.
 				      */
-    DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
+    DoFObjectAccessor (const Triangulation<dim> *tria,
 		       const int                 level,
 		       const int                 index,
 		       const AccessorData       *local_data);
@@ -1109,7 +1109,7 @@ class DoFObjectAccessor<3, DH> :
 				      * argument is assumed to be a pointer
 				      * to a DoFHandler object.
 				      */
-    DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
+    DoFObjectAccessor (const Triangulation<dim> *tria,
 		       const int                 level,
 		       const int                 index,
 		       const AccessorData       *local_data);

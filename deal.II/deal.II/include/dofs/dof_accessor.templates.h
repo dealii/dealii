@@ -115,15 +115,15 @@ DoFAccessor<DH>::operator != (const DoFAccessor<DH> &a) const
 template <class DH>
 inline
 DoFObjectAccessor<1,DH>::
-DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
+DoFObjectAccessor (const Triangulation<dim> *tria,
                    const int                 level,
                    const int                 index,
                    const AccessorData       *local_data)
                 :
                 DoFAccessor<DH> (local_data),
-                DoFObjectAccessor_Inheritance<1,DH::dimension>::BaseClass (tria,
-									   level,
-									   index)
+                DoFObjectAccessor_Inheritance<1,dim>::BaseClass (tria,
+								 level,
+								 index)
 {}
 
 
@@ -410,7 +410,7 @@ DoFObjectAccessor<1,DH>::operator != (const DoFObjectAccessor<1,DH> &a) const
 
 template <class DH>
 DoFObjectAccessor<2,DH>::
-DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
+DoFObjectAccessor (const Triangulation<dim> *tria,
                    const int                 level,
                    const int                 index,
                    const AccessorData       *local_data)
@@ -711,7 +711,7 @@ DoFObjectAccessor<2,DH>::operator != (const DoFObjectAccessor<2,DH> &a) const
 template <class DH>
 inline
 DoFObjectAccessor<3,DH>::
-DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
+DoFObjectAccessor (const Triangulation<dim> *tria,
                    const int                 level,
                    const int                 index,
                    const AccessorData       *local_data)
