@@ -460,7 +460,7 @@ DoFCellAccessor<DoFHandler<3> >::face (const unsigned int i) const
 
 
 template <class DH>
-TriaIterator<DH::dimension,DoFCellAccessor<DH> >
+TriaIterator<DoFCellAccessor<DH>::dim,DoFCellAccessor<DH> >
 DoFCellAccessor<DH>::neighbor_child_on_subface (const unsigned int face,
 						const unsigned int subface) const
 {

@@ -411,7 +411,7 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
                                       * for hp DoF handlers, this may
                                       * change from cell to cell.
                                       */
-    const FiniteElement<dim> &
+    const FiniteElement<DoFObjectAccessor<celldim,DH>::dim> &
     get_fe () const;
     
                                      /**
@@ -432,14 +432,14 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
 				      *  Pointer to the <i>i</i>th line
 				      *  bounding this Object.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<1, DH> >
+    TriaIterator<DoFObjectAccessor<celldim,DH>::dim,DoFObjectAccessor<1, DH> >
     line (const unsigned int i) const;
 
     				     /**
 				      *  Pointer to the <i>i</i>th quad
 				      *  bounding this Object.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<2, DH> >
+    TriaIterator<DoFObjectAccessor<celldim,DH>::dim,DoFObjectAccessor<2, DH> >
     quad (const unsigned int i) const;
     
 				     /**
@@ -449,7 +449,8 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
 				      * class returns a hex accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<dim,DoFObjectAccessor<celldim, DH> > child (const unsigned int) const;
+    TriaIterator<DoFObjectAccessor<celldim,DH>::dim,DoFObjectAccessor<celldim, DH> >
+    child (const unsigned int) const;
 
 				     /**
 				      * Distribute a local (cell
@@ -729,7 +730,7 @@ class DoFObjectAccessor<1, DH> :
                                       * for hp DoF handlers, this may
                                       * change from cell to cell.
                                       */
-    const FiniteElement<DH::dimension> &
+    const FiniteElement<DoFObjectAccessor<1,DH>::dim> &
     get_fe () const;
     
                                      /**
@@ -752,7 +753,8 @@ class DoFObjectAccessor<1, DH> :
 				      * class returns a line accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> > child (const unsigned int) const;
+    TriaIterator<DoFObjectAccessor<1,DH>::dim,DoFObjectAccessor<1,DH> >
+    child (const unsigned int) const;
 
 				     /**
 				      * Distribute a local (cell based) vector
@@ -976,7 +978,7 @@ class DoFObjectAccessor<2, DH> :
                                       * for hp DoF handlers, this may
                                       * change from cell to cell.
                                       */
-    const FiniteElement<DH::dimension> &
+    const FiniteElement<DoFObjectAccessor<2,DH>::dim> &
     get_fe () const;
     
                                      /**
@@ -996,7 +998,7 @@ class DoFObjectAccessor<2, DH> :
 				      *  Return a pointer to the @p ith line
 				      *  bounding this @p Quad.
 				      */
-    TriaIterator<DH::dimension,DoFObjectAccessor<1, DH> >
+    TriaIterator<DoFObjectAccessor<2,DH>::dim,DoFObjectAccessor<1, DH> >
     line (const unsigned int i) const;
     
 				     /**
@@ -1006,7 +1008,7 @@ class DoFObjectAccessor<2, DH> :
 				      * class returns a quad accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<DH::dimension,DoFObjectAccessor<2, DH> >
+    TriaIterator<DoFObjectAccessor<2,DH>::dim,DoFObjectAccessor<2, DH> >
     child (const unsigned int) const;
 
 				     /**
@@ -1231,7 +1233,7 @@ class DoFObjectAccessor<3, DH> :
                                       * for hp DoF handlers, this may
                                       * change from cell to cell.
                                       */
-    const FiniteElement<DH::dimension> &
+    const FiniteElement<DoFObjectAccessor<3, DH>::dim> &
     get_fe () const;
 
                                      /**
@@ -1251,14 +1253,14 @@ class DoFObjectAccessor<3, DH> :
 				      *  Return a pointer to the @p ith line
 				      *  bounding this @p Hex.
 				      */
-    TriaIterator<DH::dimension,DoFObjectAccessor<1, DH> >
+    TriaIterator<DoFObjectAccessor<3, DH>::dim,DoFObjectAccessor<1, DH> >
     line (const unsigned int i) const;
 
     				     /**
 				      *  Return a pointer to the @p ith quad
 				      *  bounding this @p Hex.
 				      */
-    TriaIterator<DH::dimension,DoFObjectAccessor<2, DH> >
+    TriaIterator<DoFObjectAccessor<3, DH>::dim,DoFObjectAccessor<2, DH> >
     quad (const unsigned int i) const;
     
 				     /**
@@ -1268,7 +1270,8 @@ class DoFObjectAccessor<3, DH> :
 				      * class returns a hex accessor without
 				      * access to the DoF data.
 				      */
-    TriaIterator<DH::dimension,DoFObjectAccessor<3, DH> > child (const unsigned int) const;
+    TriaIterator<DoFObjectAccessor<3, DH>::dim,DoFObjectAccessor<3, DH> >
+    child (const unsigned int) const;
 
 				     /**
 				      * Distribute a local (cell
@@ -1367,12 +1370,12 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * get passed from the iterator
 				      * classes.
 				      */
-    typedef typename DoFObjectAccessor<DH::dimension,DH>::AccessorData AccessorData;
+    typedef typename DoFObjectAccessor<dim,DH>::AccessorData AccessorData;
     
     				     /**
 				      * Constructor
 				      */
-    DoFCellAccessor (const Triangulation<DH::dimension> *tria,
+    DoFCellAccessor (const Triangulation<dim> *tria,
 		     const int                 level,
 		     const int                 index,
 		     const AccessorData       *local_data);
@@ -1386,7 +1389,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * without access to the DoF
 				      * data.
 				      */
-    TriaIterator<DH::dimension,DoFCellAccessor<DH> >
+    TriaIterator<dim,DoFCellAccessor<DH> >
     neighbor (const unsigned int) const;
 
     				     /**
@@ -1398,7 +1401,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * without access to the DoF
 				      * data.
 				      */
-    TriaIterator<DH::dimension,DoFCellAccessor<DH> >
+    TriaIterator<dim,DoFCellAccessor<DH> >
     child (const unsigned int) const;
 
     				     /**
@@ -1409,7 +1412,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * 1D, and maps to DoFObjectAccessor<2,
 				      * dim>::line in 2D.
 				      */
-    TriaIterator<DH::dimension, DoFObjectAccessor<dim-1, DH> >
+    TriaIterator<dim, DoFObjectAccessor<dim-1, DH> >
     face (const unsigned int i) const;
 
                                      /**
@@ -1423,7 +1426,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * access to the triangulation
 				      * data).
 				      */
-    TriaIterator<DH::dimension,DoFCellAccessor<DH> >
+    TriaIterator<dim,DoFCellAccessor<DH> >
     neighbor_child_on_subface (const unsigned int face_no,
                                const unsigned int subface_no) const;
 
