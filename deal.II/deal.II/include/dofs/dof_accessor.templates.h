@@ -115,15 +115,15 @@ DoFAccessor<DH>::operator != (const DoFAccessor<DH> &a) const
 template <class DH>
 inline
 DoFObjectAccessor<1,DH>::
-DoFObjectAccessor (const Triangulation<dim> *tria,
+DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
                    const int                 level,
                    const int                 index,
                    const AccessorData       *local_data)
                 :
                 DoFAccessor<DH> (local_data),
-                DoFObjectAccessor_Inheritance<1,dim>::BaseClass (tria,
-								 level,
-								 index)
+                DoFObjectAccessor_Inheritance<1,DH::dimension>::BaseClass (tria,
+									   level,
+									   index)
 {}
 
 
@@ -235,7 +235,7 @@ DoFObjectAccessor<1,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
 
 template <class DH>
 inline
-TriaIterator<DoFObjectAccessor<1,DH>::dim,DoFObjectAccessor<1,DH> >
+TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> >
 DoFObjectAccessor<1,DH>::child (const unsigned int i) const
 {
   TriaIterator<dim,DoFObjectAccessor<1,DH> > q (this->tria,
@@ -254,7 +254,7 @@ DoFObjectAccessor<1,DH>::child (const unsigned int i) const
 
 template <class DH>
 inline
-const FiniteElement<DoFObjectAccessor<1,DH>::dim> &
+const FiniteElement<DH::dimension> &
 DoFObjectAccessor<1,DH>::get_fe () const
 {
   return *this->dof_handler->selected_fe;
@@ -410,7 +410,7 @@ DoFObjectAccessor<1,DH>::operator != (const DoFObjectAccessor<1,DH> &a) const
 
 template <class DH>
 DoFObjectAccessor<2,DH>::
-DoFObjectAccessor (const Triangulation<dim> *tria,
+DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
                    const int                 level,
                    const int                 index,
                    const AccessorData       *local_data)
@@ -515,7 +515,7 @@ DoFObjectAccessor<2,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
 
 template <class DH>
 inline
-TriaIterator<DoFObjectAccessor<2,DH>::dim,DoFObjectAccessor<1,DH> >
+TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> >
 DoFObjectAccessor<2,DH>::line (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange (i, 0, 4));
@@ -532,7 +532,7 @@ DoFObjectAccessor<2,DH>::line (const unsigned int i) const
 
 template <class DH>
 inline
-TriaIterator<DoFObjectAccessor<2,DH>::dim,DoFObjectAccessor<2,DH> >
+TriaIterator<DH::dimension,DoFObjectAccessor<2,DH> >
 DoFObjectAccessor<2,DH>::child (const unsigned int i) const
 {
   TriaIterator<dim,DoFObjectAccessor<2,DH> > q (this->tria,
@@ -550,7 +550,7 @@ DoFObjectAccessor<2,DH>::child (const unsigned int i) const
 
 template <class DH>
 inline
-const FiniteElement<DoFObjectAccessor<2,DH>::dim> &
+const FiniteElement<DH::dimension> &
 DoFObjectAccessor<2,DH>::get_fe () const
 {
   return *this->dof_handler->selected_fe;
@@ -711,7 +711,7 @@ DoFObjectAccessor<2,DH>::operator != (const DoFObjectAccessor<2,DH> &a) const
 template <class DH>
 inline
 DoFObjectAccessor<3,DH>::
-DoFObjectAccessor (const Triangulation<dim> *tria,
+DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
                    const int                 level,
                    const int                 index,
                    const AccessorData       *local_data)
@@ -820,7 +820,7 @@ DoFObjectAccessor<3,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
 
 template <class DH>
 inline
-TriaIterator<DoFObjectAccessor<3,DH>::dim,DoFObjectAccessor<1,DH> >
+TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> >
 DoFObjectAccessor<3,DH>::line (const unsigned int i) const
 {
   TriaIterator<dim,TriaObjectAccessor<1,dim> > l = BaseClass::line(i);
@@ -836,7 +836,7 @@ DoFObjectAccessor<3,DH>::line (const unsigned int i) const
 
 template <class DH>
 inline
-TriaIterator<DoFObjectAccessor<3,DH>::dim,DoFObjectAccessor<2,DH> >
+TriaIterator<DH::dimension,DoFObjectAccessor<2,DH> >
 DoFObjectAccessor<3,DH>::quad (const unsigned int i) const
 {
   Assert (i<6, ExcIndexRange (i, 0, 6));
@@ -853,7 +853,7 @@ DoFObjectAccessor<3,DH>::quad (const unsigned int i) const
 
 template <class DH>
 inline
-TriaIterator<DoFObjectAccessor<3,DH>::dim,DoFObjectAccessor<3,DH> >
+TriaIterator<DH::dimension,DoFObjectAccessor<3,DH> >
 DoFObjectAccessor<3,DH>::child (const unsigned int i) const
 {
   TriaIterator<dim,DoFObjectAccessor<3,DH> > q (this->tria,
@@ -871,7 +871,7 @@ DoFObjectAccessor<3,DH>::child (const unsigned int i) const
 
 template <class DH>
 inline
-const FiniteElement<DoFObjectAccessor<3,DH>::dim> &
+const FiniteElement<DH::dimension> &
 DoFObjectAccessor<3,DH>::get_fe () const
 {
   return *this->dof_handler->selected_fe;
@@ -1578,18 +1578,18 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int
 template <class DH>
 inline
 DoFCellAccessor<DH>::
-DoFCellAccessor (const Triangulation<dim> *tria,
+DoFCellAccessor (const Triangulation<DH::dimension> *tria,
                  const int                 level,
                  const int                 index,
                  const AccessorData       *local_data)
                 :
-                DoFObjectAccessor<dim,DH> (tria,level,index,local_data)
+                DoFObjectAccessor<DH::dimension,DH> (tria,level,index,local_data)
 {}
 
 
 template <class DH>
 inline
-TriaIterator<DoFCellAccessor<DH>::dim,DoFCellAccessor<DH> >
+TriaIterator<DH::dimension,DoFCellAccessor<DH> >
 DoFCellAccessor<DH>::neighbor (const unsigned int i) const
 {
   TriaIterator<dim,DoFCellAccessor<DH> > q (this->tria,
@@ -1607,7 +1607,7 @@ DoFCellAccessor<DH>::neighbor (const unsigned int i) const
 
 template <class DH>
 inline
-TriaIterator<DoFCellAccessor<DH>::dim,DoFCellAccessor<DH> >
+TriaIterator<DH::dimension,DoFCellAccessor<DH> >
 DoFCellAccessor<DH>::child (const unsigned int i) const
 {
   TriaIterator<dim,DoFCellAccessor<DH> > q (this->tria,
