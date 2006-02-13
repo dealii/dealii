@@ -2580,6 +2580,22 @@ class Triangulation : public Subscriptor
 				      */
     unsigned int n_active_faces (const unsigned int level) const;
 
+
+				     /**
+				      * Number of lines, used or unused.
+				      */
+    unsigned int n_raw_lines(const unsigned int level) const;
+
+				     /**
+				      * Number of quads, used or unused.
+				      */
+    unsigned int n_raw_quads(const unsigned int level) const;
+
+				     /**
+				      * Number of hexes, used or unused.
+				      */
+    unsigned int n_raw_hexs(const unsigned int level) const;
+
 				     /**
 				      * Return number of levels in use. This
 				      * may be less than the number of levels
@@ -2627,7 +2643,7 @@ class Triangulation : public Subscriptor
 				      */
     const std::vector<Point<dim> > &
     get_vertices () const;
-    
+
 				     /**
 				      * Return the number of vertices
 				      * that are presently in use,
@@ -3071,9 +3087,9 @@ class Triangulation : public Subscriptor
     friend class TriaRawIterator<3,TriaObjectAccessor<3, 3> >;
     friend class TriaRawIterator<3,CellAccessor<3> >;
 
-    friend class DoFHandler<dim>;
-    friend class hp::DoFHandler<dim>;
-    friend class MGDoFHandler<dim>;
+//    friend class DoFHandler<dim>;
+//    friend class hp::DoFHandler<dim>;
+//    friend class MGDoFHandler<dim>;
 };
 
 

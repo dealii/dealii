@@ -4058,6 +4058,14 @@ unsigned int Triangulation<dim>::n_lines () const {
 
 
 template <int dim>
+unsigned int Triangulation<dim>::n_raw_lines (const unsigned int level) const
+{
+  Assert(levels<n_levels(), ExcIndexRange(level,0,n_levels()));
+  return levels[level]->lines.lines.size();
+}
+
+
+template <int dim>
 unsigned int Triangulation<dim>::n_lines (const unsigned int level) const {
   Assert (level < number_cache.n_lines_level.size(),
 	  ExcIndexRange (level, 0, number_cache.n_lines_level.size()));
@@ -4097,6 +4105,20 @@ unsigned int Triangulation<1>::n_quads (const unsigned int) const
 }
 
 
+template <int dim>
+unsigned int Triangulation<dim>::n_raw_quads (const unsigned int level) const
+{
+  return 0;
+}
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_raw_hexs (const unsigned int level) const
+{
+  return 0;
+}
+
+
 template <>
 unsigned int Triangulation<1>::n_active_quads (const unsigned int) const
 {
@@ -4126,6 +4148,21 @@ unsigned int Triangulation<dim>::n_quads (const unsigned int level) const {
 	  ExcIndexRange (level, 0, number_cache.n_quads_level.size()));
   
   return number_cache.n_quads_level[level];
+}
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_raw_quads (const unsigned int level) const
+{
+  Assert(levels<n_levels(), ExcIndexRange(level,0,n_levels()));
+  return levels[level]->quads.quads.size();
+}
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_raw_hexs (const unsigned int level) const
+{
+  return 0;
 }
 
 
@@ -4197,6 +4234,22 @@ unsigned int Triangulation<dim>::n_hexs (const unsigned int level) const
   return number_cache.n_hexes_level[level];
 }
 
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_raw_quads (const unsigned int level) const
+{
+  Assert(levels<n_levels(), ExcIndexRange(level,0,n_levels()));
+  return levels[level]->quads.quads.size();
+}
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_raw_hexs (const unsigned int level) const
+{
+  Assert(levels<n_levels(), ExcIndexRange(level,0,n_levels()));
+  return levels[level]->hexs.hexs.size();
+}
 
 
 template <int dim>
