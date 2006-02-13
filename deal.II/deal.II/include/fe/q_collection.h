@@ -23,6 +23,11 @@
 #include <boost/shared_ptr.hpp>
 
 
+//TODO[WB]: Make the conversion constructor 'explicit'. This is
+//presently calling for big trouble when doing things like
+// QGauss<dim> q;
+// hp::FEValues<dim> fe_values(fe, q, ...);
+
 namespace hp
 {
 /**
