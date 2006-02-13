@@ -257,14 +257,8 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions)
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, n_subdivisions);
   
-				   // since most output formats can't
-				   // handle cells that are not
-				   // transformed using a Q1 mapping,
-				   // we don't support anything else
-				   // as well
-  static const MappingQ1<dim> mapping;
   typename SelectFEValues<DH<dim> >::FEValues
-    x_fe_patch_values (mapping, dof_handler->get_fe(),
+    x_fe_patch_values (dof_handler->get_fe(),
                        patch_points, update_values);
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   std::vector<double>          patch_values (n_q_points);
