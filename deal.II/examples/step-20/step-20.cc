@@ -1106,7 +1106,7 @@ void MixedLaplaceProblem<dim>::solve ()
 
     
     SolverControl solver_control (system_matrix.block(0,0).m(),
-				  1e-6*schur_rhs.l2_norm());
+				  1e-12*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
     cg.solve (schur_complement, solution.block(1), schur_rhs,
