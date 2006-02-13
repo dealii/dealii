@@ -1,4 +1,4 @@
-//----------------------------  mg_dof_handler.cc  ---------------------------
+//----------------------------  hp_dof_handler.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  mg_dof_handler.cc  ---------------------------
+//----------------------------  hp_dof_handler.cc  ---------------------------
 
 
 /* Author: Ralf Hartmann, 2005, O. Kayser-Herold, simply modified
