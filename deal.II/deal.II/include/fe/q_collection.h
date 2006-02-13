@@ -54,7 +54,7 @@ namespace hp
                                         * quadrature is used for all active_fe
                                         * indices.
                                         */
-      QCollection (const Quadrature<dim> &quadrature);
+      explicit QCollection (const Quadrature<dim> &quadrature);
 
                                        /**
                                         * Returns the number of quadrature
