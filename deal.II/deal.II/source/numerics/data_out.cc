@@ -388,6 +388,9 @@ void DataOut<dim,DH>::build_some_patches (Data data)
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, data.n_subdivisions);
 
+//TODO[RH]: This is strange -- Data has a member 'mapping' that should
+//be used here, but it isn't. Rather, up until version 1.94, we were
+//actually initializing a local mapping object and used that...
   typename SelectFEValues<DH<dim> >::FEValues
     x_fe_patch_values (this->dofs->get_fe(),
                        patch_points, update_values);
