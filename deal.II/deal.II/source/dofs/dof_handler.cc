@@ -1671,9 +1671,9 @@ void DoFHandler<1>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
     else
 				       // if index is invalid_dof_index: check if this one
 				       // really is unused
-      Assert (tria->vertices_used[(i-vertex_dofs.begin()) /
-				 selected_fe->dofs_per_vertex] == false,
-	      ExcInternalError ());
+//       Assert (tria->vertices_used[(i-vertex_dofs.begin()) /
+// 				 selected_fe->dofs_per_vertex] == false,
+// 	      ExcInternalError ());
   
   for (unsigned int level=0; level<levels.size(); ++level) 
     for (std::vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
@@ -1719,9 +1719,9 @@ void DoFHandler<2>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
     else
 				       // if index is invalid_dof_index: check if this one
 				       // really is unused
-      Assert (tria->vertices_used[(i-vertex_dofs.begin()) /
-				 selected_fe->dofs_per_vertex] == false,
-	      ExcInternalError ());
+//       Assert (tria->vertices_used[(i-vertex_dofs.begin()) /
+// 				 selected_fe->dofs_per_vertex] == false,
+// 	      ExcInternalError ());
   
   for (unsigned int level=0; level<levels.size(); ++level) 
     {
@@ -1773,9 +1773,9 @@ void DoFHandler<3>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
     else
 				       // if index is invalid_dof_index: check if this one
 				       // really is unused
-      Assert (tria->vertices_used[(i-vertex_dofs.begin()) /
-				 selected_fe->dofs_per_vertex] == false,
-	      ExcInternalError ());
+//       Assert (tria->vertices_used[(i-vertex_dofs.begin()) /
+// 				 selected_fe->dofs_per_vertex] == false,
+// 	      ExcInternalError ());
   
   for (unsigned int level=0; level<levels.size(); ++level) 
     {
@@ -1975,17 +1975,18 @@ void DoFHandler<1>::reserve_space () {
                                    // their size
   clear_space ();
   
-  vertex_dofs.resize(tria->vertices.size()*selected_fe->dofs_per_vertex,
+  vertex_dofs.resize(tria->n_vertices()*selected_fe->dofs_per_vertex,
 		     invalid_dof_index);
     
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new internal::DoFHandler::DoFLevel<1>);
 
-      levels.back()->line_dofs = std::vector<unsigned int>(tria->levels[i]->lines.lines.size() *
-							   selected_fe->dofs_per_line,
-							   invalid_dof_index);
-    };
+      levels.back()->line_dofs
+	= std::vector<unsigned int>(tria->n_raw_lines(i) *
+				    selected_fe->dofs_per_line,
+				    invalid_dof_index);
+    }
 }
 
 
@@ -2005,19 +2006,21 @@ void DoFHandler<2>::reserve_space () {
                                    // their size
   clear_space ();
   
-  vertex_dofs.resize(tria->vertices.size()*selected_fe->dofs_per_vertex,
+  vertex_dofs.resize(tria->n_vertices()*selected_fe->dofs_per_vertex,
 		     invalid_dof_index);
 
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new internal::DoFHandler::DoFLevel<2>);
 
-      levels.back()->line_dofs = std::vector<unsigned int> (tria->levels[i]->lines.lines.size() *
-							    selected_fe->dofs_per_line,
-							    invalid_dof_index);
-      levels.back()->quad_dofs = std::vector<unsigned int> (tria->levels[i]->quads.quads.size() *
-							    selected_fe->dofs_per_quad,
-							    invalid_dof_index);
+      levels.back()->line_dofs
+	= std::vector<unsigned int> (tria->n_raw_lines(i) *
+				     selected_fe->dofs_per_line,
+				     invalid_dof_index);
+      levels.back()->quad_dofs
+	= std::vector<unsigned int> (tria->n_raw_quads(i) *
+				     selected_fe->dofs_per_quad,
+				     invalid_dof_index);
     };
 }
 
@@ -2037,22 +2040,25 @@ void DoFHandler<3>::reserve_space () {
                                    // their size
   clear_space ();
   
-  vertex_dofs.resize(tria->vertices.size()*selected_fe->dofs_per_vertex,
+  vertex_dofs.resize(tria->n_vertices()*selected_fe->dofs_per_vertex,
 		     invalid_dof_index);
 
   for (unsigned int i=0; i<tria->n_levels(); ++i) 
     {
       levels.push_back (new internal::DoFHandler::DoFLevel<3>);
 
-      levels.back()->line_dofs = std::vector<unsigned int> (tria->levels[i]->lines.lines.size() *
-							    selected_fe->dofs_per_line,
-							    invalid_dof_index);
-      levels.back()->quad_dofs = std::vector<unsigned int> (tria->levels[i]->quads.quads.size() *
-							    selected_fe->dofs_per_quad,
-							    invalid_dof_index);
-      levels.back()->hex_dofs = std::vector<unsigned int> (tria->levels[i]->hexes.hexes.size() *
-							   selected_fe->dofs_per_hex,
-							   invalid_dof_index);
+      levels.back()->line_dofs
+	= std::vector<unsigned int> (tria->n_raw_lines(i) *
+				     selected_fe->dofs_per_line,
+				     invalid_dof_index);
+      levels.back()->quad_dofs
+	= std::vector<unsigned int> (tria->n_raw_quads(i) *
+				     selected_fe->dofs_per_quad,
+				     invalid_dof_index);
+      levels.back()->hex_dofs
+	= std::vector<unsigned int> (tria->n_raw_hexs(i) *
+				     selected_fe->dofs_per_hex,
+				     invalid_dof_index);
     };
 }
 

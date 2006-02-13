@@ -3086,8 +3086,7 @@ class Triangulation : public Subscriptor
     friend class TriaRawIterator<3,TriaObjectAccessor<2, 3> >;
     friend class TriaRawIterator<3,TriaObjectAccessor<3, 3> >;
     friend class TriaRawIterator<3,CellAccessor<3> >;
-
-    friend class DoFHandler<dim>;
+    
     friend class hp::DoFHandler<dim>;
     friend class MGDoFHandler<dim>;
 };
