@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
+//    mg_transfer.templates.h,v 1.22 2006/01/29 15:03:55 guido Exp
+//    Version: 
 //
 //    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
@@ -39,7 +39,6 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
   const InVector                 &src) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   
@@ -113,7 +112,6 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
   const MGLevelObject<VECTOR>& src) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
@@ -159,7 +157,6 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
   const MGLevelObject<VECTOR> &src) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
@@ -253,7 +250,6 @@ MGTransferSelect<number>::do_copy_to_mg (
   const unsigned int              offset) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   
@@ -408,7 +404,6 @@ MGTransferSelect<number>::do_copy_from_mg (
   const unsigned int offset) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
@@ -465,7 +460,6 @@ MGTransferSelect<number>::do_copy_from_mg_add (
   const unsigned int offset) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
@@ -531,7 +525,6 @@ MGTransferBlock<number>::copy_to_mg (
   const InVector                      &src) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
@@ -609,7 +602,6 @@ MGTransferBlock<number>::copy_from_mg (
   const MGLevelObject<BlockVector<number> > &src) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
@@ -655,7 +647,6 @@ MGTransferBlock<number>::copy_from_mg_add (
   const MGLevelObject<BlockVector<number> > &src) const
 {
   const FiniteElement<dim>& fe = mg_dof_handler.get_fe();
-  Assert (fe.dofs_per_face == 0, ExcDimensionMismatch(fe.dofs_per_face, 0));
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
