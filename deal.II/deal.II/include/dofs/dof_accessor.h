@@ -1389,7 +1389,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * without access to the DoF
 				      * data.
 				      */
-    TriaIterator<dim,DoFCellAccessor<DH> >
+    TriaIterator<DoFCellAccessor<DH>::dim,DoFCellAccessor<DH> >
     neighbor (const unsigned int) const;
 
     				     /**
@@ -1401,7 +1401,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * without access to the DoF
 				      * data.
 				      */
-    TriaIterator<dim,DoFCellAccessor<DH> >
+    TriaIterator<DoFCellAccessor<DH>::dim,DoFCellAccessor<DH> >
     child (const unsigned int) const;
 
     				     /**
@@ -1426,7 +1426,7 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * access to the triangulation
 				      * data).
 				      */
-    TriaIterator<dim,DoFCellAccessor<DH> >
+    TriaIterator<DoFCellAccessor<DH>::dim,DoFCellAccessor<DH> >
     neighbor_child_on_subface (const unsigned int face_no,
                                const unsigned int subface_no) const;
 
