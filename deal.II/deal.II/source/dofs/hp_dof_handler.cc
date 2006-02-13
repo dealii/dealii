@@ -2195,7 +2195,7 @@ namespace hp
         levels.back()->dof_quad_index_offset = std::vector<unsigned int>
                                                (tria->n_raw_quads(i),invalid_dof_index);
         levels.back()->dof_hex_index_offset = std::vector<unsigned int>
-                                              (tria->n_raw_hexes(i),invalid_dof_index);
+                                              (tria->n_raw_hexs(i),invalid_dof_index);
 
         unsigned int dofs_for_lines = 0;
 /* Uncommented as we actually need some information about how many DoFs should be reserved
