@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -799,17 +799,17 @@ INSTANTIATE(Vector<float>, DoFHandler);
 INSTANTIATE(BlockVector<double>, DoFHandler);
 INSTANTIATE(BlockVector<float>, DoFHandler);
 
-INSTANTIATE(Vector<double>, hp::DoFHandler);
-INSTANTIATE(Vector<float>, hp::DoFHandler);
-INSTANTIATE(BlockVector<double>, hp::DoFHandler);
-INSTANTIATE(BlockVector<float>, hp::DoFHandler);
+// INSTANTIATE(Vector<double>, hp::DoFHandler);
+// INSTANTIATE(Vector<float>, hp::DoFHandler);
+// INSTANTIATE(BlockVector<double>, hp::DoFHandler);
+// INSTANTIATE(BlockVector<float>, hp::DoFHandler);
 
 #ifdef DEAL_II_USE_PETSC
 INSTANTIATE(PETScWrappers::Vector, DoFHandler);
 INSTANTIATE(PETScWrappers::BlockVector, DoFHandler);
 
-INSTANTIATE(PETScWrappers::Vector, hp::DoFHandler);
-INSTANTIATE(PETScWrappers::BlockVector, hp::DoFHandler);
+// INSTANTIATE(PETScWrappers::Vector, hp::DoFHandler);
+// INSTANTIATE(PETScWrappers::BlockVector, hp::DoFHandler);
 #endif
 
 
