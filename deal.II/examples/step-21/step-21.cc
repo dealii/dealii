@@ -86,6 +86,7 @@
                                  // enable the user to write DoFHandler
                                  // independent code.
 #include <fe/hp_fe_values.h>
+#include <fe/mapping_collection.h>
 
                                  // A compressed sparsity pattern is
                                  // not an explicit prerequisite for the
@@ -605,7 +606,7 @@ class DGMethod
                                      // boundaries come into play, this
                                      // object should be replaced by
                                      // a MappingCollection.
-    const MappingQ1<dim> mapping;
+    hp::MappingCollection<dim> mapping_collection;
     
 				     // In contrast to the example code
                                      // of step-12, this time DG elements
@@ -658,7 +659,6 @@ class DGMethod
 template <int dim>
 DGMethod<dim>::DGMethod ()
 		:
-		mapping (),
 		dof_handler (triangulation),
 		dg ()
 {
@@ -669,10 +669,13 @@ DGMethod<dim>::DGMethod ()
     unsigned int elm_no;
     for (unsigned int i = 0; i < hp_degree; ++i)
     {
-	elm_no = fe_collection.add_fe (FE_DGQ<dim> (i+1));
+	elm_no = fe_collection.add_fe (FE_DGQ<dim> (i));
 	quadratures.add_quadrature (QGauss<dim> (i+2));
 	face_quadratures.add_quadrature (QGauss<dim-1> (i+2));
     }
+
+    static const MappingQ1<dim> mapping;
+    mapping_collection.add_mapping (mapping);
 }
 
 
@@ -827,7 +830,7 @@ void DGMethod<dim>::assemble_system1 ()
 				   // assumes a ``MappingQ1'' mapping)
 				   // and makes it easier to change
 				   // the mapping object later.
-  hp::FEValues<dim> fe_v_x (mapping, fe_collection, quadratures, update_flags);
+  hp::FEValues<dim> fe_v_x (mapping_collection, fe_collection, quadratures, update_flags);
   
 				   // Similarly we create the
 				   // ``FEFaceValues'' and
@@ -840,13 +843,13 @@ void DGMethod<dim>::assemble_system1 ()
 				   // current cell and the face (and
 				   // subface) number.
   hp::FEFaceValues<dim> fe_v_face_x (
-    mapping, fe_collection, face_quadratures, face_update_flags);
+    mapping_collection, fe_collection, face_quadratures, face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_x (
-    mapping, fe_collection, face_quadratures, face_update_flags);
+    mapping_collection, fe_collection, face_quadratures, face_update_flags);
   hp::FEFaceValues<dim> fe_v_face_neighbor_x (
-    mapping, fe_collection, face_quadratures, neighbor_face_update_flags);
+    mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_neighbor_x (
-    mapping, fe_collection, face_quadratures, neighbor_face_update_flags);
+    mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
 
 				   // Now we create the cell matrices
 				   // and vectors. Here we need two
@@ -1321,13 +1324,13 @@ void DGMethod<dim>::assemble_system2 ()
 				   // ``fe_v_face_neighbor'' as case 4
 				   // does not occur.
   hp::FEValues<dim> fe_v_x (
-    mapping, fe_collection, quadratures, update_flags);
+    mapping_collection, fe_collection, quadratures, update_flags);
   hp::FEFaceValues<dim> fe_v_face_x (
-    mapping, fe_collection, face_quadratures, face_update_flags);
+    mapping_collection, fe_collection, face_quadratures, face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_x (
-    mapping, fe_collection, face_quadratures, face_update_flags);
+    mapping_collection, fe_collection, face_quadratures, face_update_flags);
   hp::FEFaceValues<dim> fe_v_face_neighbor_x (
-    mapping, fe_collection, face_quadratures, neighbor_face_update_flags);
+    mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
 
   const unsigned int max_dofs_per_cell = fe_collection.max_dofs_per_cell ();
 
@@ -1606,7 +1609,7 @@ void DGMethod<dim>::refine_grid ()
 
 				   // Now the approximate gradients
 				   // are computed
-  DerivativeApproximation::approximate_gradient (mapping,
+  DerivativeApproximation::approximate_gradient (mapping_collection[0],
 						 dof_handler,
 						 solution2,
 						 gradient_indicator);
@@ -1710,7 +1713,7 @@ void DGMethod<dim>::run ()
 	{
 	  GridGenerator::hyper_cube (triangulation);
 
-	  triangulation.refine_global (3);
+	  triangulation.refine_global (1);
 	}
       else
 	refine_grid ();
