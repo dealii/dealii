@@ -799,17 +799,17 @@ INSTANTIATE(Vector<float>, DoFHandler);
 INSTANTIATE(BlockVector<double>, DoFHandler);
 INSTANTIATE(BlockVector<float>, DoFHandler);
 
-// INSTANTIATE(Vector<double>, hp::DoFHandler);
-// INSTANTIATE(Vector<float>, hp::DoFHandler);
-// INSTANTIATE(BlockVector<double>, hp::DoFHandler);
-// INSTANTIATE(BlockVector<float>, hp::DoFHandler);
+INSTANTIATE(Vector<double>, hp::DoFHandler);
+INSTANTIATE(Vector<float>, hp::DoFHandler);
+INSTANTIATE(BlockVector<double>, hp::DoFHandler);
+INSTANTIATE(BlockVector<float>, hp::DoFHandler);
 
 #ifdef DEAL_II_USE_PETSC
 INSTANTIATE(PETScWrappers::Vector, DoFHandler);
 INSTANTIATE(PETScWrappers::BlockVector, DoFHandler);
 
-// INSTANTIATE(PETScWrappers::Vector, hp::DoFHandler);
-// INSTANTIATE(PETScWrappers::BlockVector, hp::DoFHandler);
+INSTANTIATE(PETScWrappers::Vector, hp::DoFHandler);
+INSTANTIATE(PETScWrappers::BlockVector, hp::DoFHandler);
 #endif
 
 
