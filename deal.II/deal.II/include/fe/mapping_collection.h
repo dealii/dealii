@@ -62,7 +62,7 @@ namespace hp
                                         * mapping is used for all active_fe
                                         * indices.
                                         */
-      explicit MappingCollection (const Mapping<dim> &mapping);
+      MappingCollection (const Mapping<dim> &mapping);
 
                                        /**
                                         * Returns the number of mapping
