@@ -1609,11 +1609,19 @@ void DGMethod<dim>::refine_grid ()
 
 				   // Now the approximate gradients
 				   // are computed
-  DerivativeApproximation::approximate_gradient (mapping_collection[0],
-						 dof_handler,
-						 solution2,
-						 gradient_indicator);
+  
+//TODO: disable this for the moment and replace by some more or less
+//random refinement. we need to do this since DerivativeApproximation
+//isn't really ready yet for hp
+  
+//   DerivativeApproximation::approximate_gradient (mapping_collection[0],
+// 						 dof_handler,
+// 						 solution2,
+// 						 gradient_indicator);
 
+  for (unsigned int i=0; i<gradient_indicator.size(); ++i)
+    gradient_indicator(i) = std::sin(1.*i);
+  
 				   // and they are cell-wise scaled by
 				   // the factor $h^{1+d/2}$
   typename hp::DoFHandler<dim>::active_cell_iterator
