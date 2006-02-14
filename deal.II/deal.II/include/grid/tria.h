@@ -2653,6 +2653,12 @@ class Triangulation : public Subscriptor
     unsigned int n_used_vertices () const;
 
 				     /**
+				      * Return @p true if the vertex
+				      * with this @p index is used.
+				      */
+    bool vertex_used (unsigned int index) const;
+    
+				     /**
 				      * Return a constant reference to
 				      * the array of @p bools
 				      * indicating whether an entry in
@@ -3088,13 +3094,25 @@ class Triangulation : public Subscriptor
     friend class TriaRawIterator<3,CellAccessor<3> >;
     
     friend class hp::DoFHandler<dim>;
-    friend class MGDoFHandler<dim>;
 };
+
+
+#ifndef DOXYGEN
+
+template <int dim>
+inline
+bool
+Triangulation<dim>::vertex_used(const unsigned int index) const
+{
+  Assert (index < vertices_used.size(),
+	  ExcIndexRange(index, 0, vertices_used.size()));
+  return vertices_used[index];
+}
 
 
 /* -------------- declaration of explicit specializations ------------- */
 
-#ifndef DOXYGEN
+
 
 template <> Triangulation<1>::cell_iterator Triangulation<1>::begin (const unsigned int level) const;
 template <> Triangulation<1>::raw_cell_iterator Triangulation<1>::end () const;
@@ -3223,6 +3241,8 @@ template <> unsigned int Triangulation<3>::n_cells (const unsigned int level) co
 template <> unsigned int Triangulation<3>::n_active_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<1>::n_quads () const;
 template <> unsigned int Triangulation<1>::n_quads (const unsigned int) const;
+template <> unsigned int Triangulation<1>::n_raw_quads (const unsigned int) const;
+template <> unsigned int Triangulation<1>::n_raw_hexs (const unsigned int) const;
 template <> unsigned int Triangulation<1>::n_active_quads (const unsigned int) const;
 template <> unsigned int Triangulation<1>::n_active_quads () const;
 template <> unsigned int Triangulation<1>::max_adjacent_cells () const;
