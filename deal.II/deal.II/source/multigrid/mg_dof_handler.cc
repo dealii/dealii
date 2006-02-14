@@ -1721,7 +1721,7 @@ void MGDoFHandler<1>::reserve_space () {
     {
       mg_levels.push_back (new internal::DoFHandler::DoFLevel<1>);
 
-      mg_levels.back()->line_dofs = std::vector<unsigned int>(this->tria->levels[i]->lines.lines.size() *
+      mg_levels.back()->line_dofs = std::vector<unsigned int>(this->tria->n_raw_lines(i) *
 							 this->selected_fe->dofs_per_line,
 							 DoFHandler<1>::invalid_dof_index);
     };
@@ -1738,10 +1738,10 @@ void MGDoFHandler<1>::reserve_space () {
 				   // over all cells and storing the
 				   // maximum and minimum level each
 				   // vertex we pass by  belongs to
-  mg_vertex_dofs.resize (this->tria->vertices.size());
+  mg_vertex_dofs.resize (this->tria->n_vertices());
 
-  std::vector<unsigned int> min_level (this->tria->vertices.size(), this->tria->n_levels());
-  std::vector<unsigned int> max_level (this->tria->vertices.size(), 0);
+  std::vector<unsigned int> min_level (this->tria->n_vertices(), this->tria->n_levels());
+  std::vector<unsigned int> max_level (this->tria->n_vertices(), 0);
 
   Triangulation<dim>::cell_iterator cell = this->tria->begin(),
 				    endc = this->tria->end();
@@ -1757,8 +1757,8 @@ void MGDoFHandler<1>::reserve_space () {
       };
 
 				   // now allocate the needed space
-  for (unsigned int vertex=0; vertex<this->tria->vertices.size(); ++vertex)
-    if (this->tria->vertices_used[vertex])
+  for (unsigned int vertex=0; vertex<this->tria->n_vertices(); ++vertex)
+    if (this->tria->vertex_used(vertex))
       {
 	Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
 	Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
@@ -1802,10 +1802,10 @@ void MGDoFHandler<2>::reserve_space () {
     {
       mg_levels.push_back (new internal::DoFHandler::DoFLevel<2>);
 
-      mg_levels.back()->line_dofs = std::vector<unsigned int> (this->tria->levels[i]->lines.lines.size() *
+      mg_levels.back()->line_dofs = std::vector<unsigned int> (this->tria->n_raw_lines(i) *
 							  this->selected_fe->dofs_per_line,
 							  DoFHandler<2>::invalid_dof_index);
-      mg_levels.back()->quad_dofs = std::vector<unsigned int> (this->tria->levels[i]->quads.quads.size() *
+      mg_levels.back()->quad_dofs = std::vector<unsigned int> (this->tria->n_raw_quads(i) *
 							  this->selected_fe->dofs_per_quad,
 							  DoFHandler<2>::invalid_dof_index);
     };
@@ -1823,13 +1823,13 @@ void MGDoFHandler<2>::reserve_space () {
 				   // over all cells and storing the
 				   // maximum and minimum level each
 				   // vertex we pass by  belongs to
-  mg_vertex_dofs.resize (this->tria->vertices.size());
+  mg_vertex_dofs.resize (this->tria->n_vertices());
 
 				   // initialize these arrays with
 				   // invalid values (min>max)
-  std::vector<unsigned int> min_level (this->tria->vertices.size(),
+  std::vector<unsigned int> min_level (this->tria->n_vertices(),
 				       this->tria->n_levels());
-  std::vector<unsigned int> max_level (this->tria->vertices.size(), 0);
+  std::vector<unsigned int> max_level (this->tria->n_vertices(), 0);
 
   Triangulation<dim>::cell_iterator cell = this->tria->begin(),
 				    endc = this->tria->end();
@@ -1846,10 +1846,10 @@ void MGDoFHandler<2>::reserve_space () {
 
 
                                    // now allocate the needed space
-  for (unsigned int vertex=0; vertex<this->tria->vertices.size(); ++vertex)
-    if (this->tria->vertices_used[vertex])
+  for (unsigned int vertex=0; vertex<this->tria->n_vertices(); ++vertex)
+    if (this->tria->vertex_used(vertex))
       {
-	Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
+	Assert (min_level[vertex] < this->tria->n_levels(), ExcInternalError());
 	Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 
 	mg_vertex_dofs[vertex].init (min_level[vertex],
@@ -1891,15 +1891,18 @@ void MGDoFHandler<3>::reserve_space () {
     {
       mg_levels.push_back (new internal::DoFHandler::DoFLevel<3>);
 
-      mg_levels.back()->line_dofs = std::vector<unsigned int> (this->tria->levels[i]->lines.lines.size() *
-							  this->selected_fe->dofs_per_line,
-							  DoFHandler<3>::invalid_dof_index);
-      mg_levels.back()->quad_dofs = std::vector<unsigned int> (this->tria->levels[i]->quads.quads.size() *
-							  this->selected_fe->dofs_per_quad,
-							  DoFHandler<3>::invalid_dof_index);
-      mg_levels.back()->hex_dofs = std::vector<unsigned int> (this->tria->levels[i]->hexes.hexes.size() *
-							 this->selected_fe->dofs_per_hex,
-							 DoFHandler<3>::invalid_dof_index);
+      mg_levels.back()->line_dofs
+	= std::vector<unsigned int> (this->tria->n_raw_lines(i) *
+				     this->selected_fe->dofs_per_line,
+				     DoFHandler<3>::invalid_dof_index);
+      mg_levels.back()->quad_dofs
+	= std::vector<unsigned int> (this->tria->n_raw_quads(i) *
+				     this->selected_fe->dofs_per_quad,
+				     DoFHandler<3>::invalid_dof_index);
+      mg_levels.back()->hex_dofs
+	= std::vector<unsigned int> (this->tria->n_raw_hexs(i) *
+				     this->selected_fe->dofs_per_hex,
+				     DoFHandler<3>::invalid_dof_index);
     };
 
 
@@ -1915,10 +1918,10 @@ void MGDoFHandler<3>::reserve_space () {
 				   // over all cells and storing the
 				   // maximum and minimum level each
 				   // vertex we pass by  belongs to
-  mg_vertex_dofs.resize (this->tria->vertices.size());
+  mg_vertex_dofs.resize (this->tria->n_vertices());
 
-  std::vector<unsigned int> min_level (this->tria->vertices.size(), this->tria->n_levels());
-  std::vector<unsigned int> max_level (this->tria->vertices.size(), 0);
+  std::vector<unsigned int> min_level (this->tria->n_vertices(), this->tria->n_levels());
+  std::vector<unsigned int> max_level (this->tria->n_vertices(), 0);
 
   Triangulation<dim>::cell_iterator cell = this->tria->begin(),
 				    endc = this->tria->end();
@@ -1935,10 +1938,10 @@ void MGDoFHandler<3>::reserve_space () {
 
 
 				   // now allocate the needed space
-  for (unsigned int vertex=0; vertex<this->tria->vertices.size(); ++vertex)
-    if (this->tria->vertices_used[vertex])
+  for (unsigned int vertex=0; vertex<this->tria->n_vertices(); ++vertex)
+    if (this->tria->vertex_used(vertex))
       {
-	Assert (min_level[vertex] < this->tria->n_levels(),   ExcInternalError());
+	Assert (min_level[vertex] < this->tria->n_levels(), ExcInternalError());
 	Assert (max_level[vertex] >= min_level[vertex], ExcInternalError());
 	
 	mg_vertex_dofs[vertex].init (min_level[vertex],
@@ -1947,7 +1950,7 @@ void MGDoFHandler<3>::reserve_space () {
       }
     else
       {
-	Assert (min_level[vertex] == this->tria->n_levels(),   ExcInternalError());
+	Assert (min_level[vertex] == this->tria->n_levels(), ExcInternalError());
 	Assert (max_level[vertex] == 0, ExcInternalError());
 	
 					 // reset to original state
