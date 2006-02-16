@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,9 +33,9 @@ template FullMatrix<TYPEMAT>& FullMatrix<TYPEMAT>::operator =(
 template void FullMatrix<TYPEMAT>::fill<TYPEMAT2> (
   const FullMatrix<TYPEMAT2>&, unsigned, unsigned, unsigned, unsigned);
 template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
+template void FullMatrix<TYPEMAT>::add_scaled<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::add<TYPEMAT2> (
   const FullMatrix<TYPEMAT2>&, double, unsigned, unsigned, unsigned, unsigned);
-template void FullMatrix<TYPEMAT>::add_scaled<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (const TYPEMAT, const FullMatrix<TYPEMAT2>&);
 template void FullMatrix<TYPEMAT>::Tadd<TYPEMAT2> (
   const FullMatrix<TYPEMAT2>&, double, unsigned, unsigned, unsigned, unsigned);

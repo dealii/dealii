@@ -510,9 +510,29 @@ class BlockMatrixBase : public Subscriptor
 				      * this matrix.
 				      */
     template <class BlockMatrixType>
+    void add (const value_type       factor,
+	      const BlockMatrixType &matrix);    
+  
+    
+				     /**
+				      * @deprecated Add
+				      * <tt>matrix</tt> scaled by
+				      * <tt>factor</tt> to this
+				      * matrix, i.e. the matrix
+				      * <tt>factor*matrix</tt> is
+				      * added to <tt>this</tt>.
+				      *
+				      * This function is
+				      * deprecated. Use <tt>add</tt>
+				      * instead, since this has the
+				      * same interface as the other
+				      * matrix and vector classes in
+				      * the library.
+				      */
+    template <class BlockMatrixType>
     void add_scaled (const value_type       factor,
 		     const BlockMatrixType &matrix);    
-  
+    
 				     /**
 				      * Adding Matrix-vector
 				      * multiplication. Add $M*src$ on
@@ -1469,7 +1489,7 @@ add_scaled (const value_type factor,
 {
   for (unsigned int r=0; r<n_block_rows(); ++r)
     for (unsigned int c=0; c<n_block_cols(); ++c)
-      block(r,c).add_scaled (factor, matrix.block(r,c));
+      block(r,c).add (factor, matrix.block(r,c));
 }
 
 

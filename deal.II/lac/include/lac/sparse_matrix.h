@@ -844,6 +844,25 @@ class SparseMatrix : public virtual Subscriptor
 				      * this matrix.
 				      */
     template <typename somenumber>
+    void add (const number factor,
+	      const SparseMatrix<somenumber> &matrix);    
+    
+				     /**
+				      * @deprecated Add
+				      * <tt>matrix</tt> scaled by
+				      * <tt>factor</tt> to this
+				      * matrix, i.e. the matrix
+				      * <tt>factor*matrix</tt> is
+				      * added to <tt>this</tt>.
+				      *
+				      * This function is
+				      * deprecated. Use <tt>add</tt>
+				      * instead, since this has the
+				      * same interface as the other
+				      * matrix and vector classes in
+				      * the library.
+				      */
+    template <typename somenumber>
     void add_scaled (const number factor,
 		     const SparseMatrix<somenumber> &matrix);
     

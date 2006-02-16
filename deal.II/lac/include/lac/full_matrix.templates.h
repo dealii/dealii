@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -750,8 +750,8 @@ FullMatrix<number>::print (STREAM             &s,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::add_scaled (const number               s,
-                                const FullMatrix<number2> &src)
+FullMatrix<number>::add (const number               s,
+			 const FullMatrix<number2> &src)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   
@@ -925,12 +925,13 @@ void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::add (const number               s,
-			 const FullMatrix<number2> &src)
+FullMatrix<number>::add_scaled (const number               s,
+				const FullMatrix<number2> &src)
 {
-                                   // this function is deprecated. forward to
-                                   // the other one
-  add_scaled (s, src);
+                                   // this function is
+                                   // deprecated. forward to the other
+                                   // one
+  add (s, src);
 }
 
 

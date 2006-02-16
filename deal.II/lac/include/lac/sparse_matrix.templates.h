@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -272,8 +272,8 @@ SparseMatrix<number>::copy_from (const FullMatrix<somenumber> &matrix)
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::add_scaled (const number factor,
-				  const SparseMatrix<somenumber> &matrix)
+SparseMatrix<number>::add (const number factor,
+			   const SparseMatrix<somenumber> &matrix)
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
@@ -285,6 +285,16 @@ SparseMatrix<number>::add_scaled (const number factor,
 
   while (val_ptr != end_ptr)
     *val_ptr++ += factor * *matrix_ptr++;
+}
+
+
+template <typename number>
+template <typename somenumber>
+void
+SparseMatrix<number>::add_scaled (const number factor,
+				  const SparseMatrix<somenumber> &matrix)
+{
+  add(factor, matrix);
 }
 
 

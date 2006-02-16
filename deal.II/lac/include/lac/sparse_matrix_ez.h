@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -591,6 +591,22 @@ class SparseMatrixEZ : public Subscriptor
 				      * convertible to the data type
 				      * of this matrix and it has the
 				      * standard @p const_iterator.
+				      */
+    template <class MATRIX>
+    void add (const number factor,
+	      const MATRIX &matrix);
+
+    				     /**
+				      * @deprecated Add @p matrix
+				      * scaled by @p factor to this
+				      * matrix.
+				      *
+				      * This function is
+				      * deprecated. Use <tt>add</tt>
+				      * instead, since this has the
+				      * same interface as the other
+				      * matrix and vector classes in
+				      * the library.
 				      */
     template <class MATRIX>
     void add_scaled (const number factor,
@@ -1584,8 +1600,8 @@ template<typename number>
 template <class MATRIX>
 inline
 void
-SparseMatrixEZ<number>::add_scaled (const number factor,
-				    const MATRIX& M)
+SparseMatrixEZ<number>::add (const number factor,
+			     const MATRIX& M)
 {
   Assert (M.m() == m(), ExcDimensionMismatch(M.m(), m()));
   Assert (M.n() == n(), ExcDimensionMismatch(M.n(), n()));
@@ -1602,6 +1618,17 @@ SparseMatrixEZ<number>::add_scaled (const number factor,
 	add(start->row(), start->column(), factor * start->value());
       ++start;
     }
+}
+
+
+template<typename number>
+template <class MATRIX>
+inline
+void
+SparseMatrixEZ<number>::add_scaled (const number factor,
+				    const MATRIX& M)
+{
+  add (factor, M);
 }
 
 

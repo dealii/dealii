@@ -584,11 +584,9 @@ class FullMatrix : public Table<2,number>
 				      */
     FullMatrix & operator /= (const double factor);
     
-				     /**
-				      * Add <tt>matrix</tt> scaled by
-				      * <tt>factor</tt> to this matrix,
-				      * i.e. the matrix <tt>factor*matrix</tt>
-				      * is added to <tt>this</tt>.
+                                     /**
+				      * Weighted addition. The matrix
+				      * <tt>s*B</tt> is added to <tt>this</tt>.
 				      *
 				      * The source matrix may be a full matrix
 				      * over an arbitrary underlying scalar
@@ -596,22 +594,26 @@ class FullMatrix : public Table<2,number>
 				      * convertible to the data type of this
 				      * matrix.
 				      */
-    template <typename somenumber>
-    void add_scaled (const number factor,
-		     const FullMatrix<somenumber> &matrix);
-
-                                     /**
-				      * Weighted addition. The matrix
-				      * <tt>s*B</tt> is added to <tt>this</tt>.
-				      *
-				      * This function is deprecated. Use
-				      * <tt>add_scaled</tt> instead, since
-				      * this has the same interface as the
-				      * other matrix classes in the library.
-				      */
     template<typename number2>
     void add (const number               s,
 	      const FullMatrix<number2> &B);
+
+				     /**
+				      * @deprecated Weighted
+				      * addition. The matrix
+				      * <tt>s*B</tt> is added to
+				      * <tt>this</tt>.
+				      *
+				      * This function is
+				      * deprecated. Use <tt>add</tt>
+				      * instead, since this has the
+				      * same interface as the other
+				      * matrix and vector classes in
+				      * the library.
+				      */
+    template <typename somenumber>
+    void add_scaled (const number factor,
+		     const FullMatrix<somenumber> &matrix);
 
 				     /**
 				      * Add rectangular block.
