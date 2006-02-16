@@ -750,127 +750,505 @@ FullMatrix<number>::print (STREAM             &s,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::add (const number               s,
-			 const FullMatrix<number2> &src)
+FullMatrix<number>::add (const number               a,
+			 const FullMatrix<number2> &A)
 {
   Assert (!this->empty(), ExcEmptyMatrix());
   
-  Assert (m() == src.m(), ExcDimensionMismatch(m(), src.m()));
-  Assert (n() == src.n(), ExcDimensionMismatch(n(), src.n()));
+  Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
 
   number* val = const_cast<number*> (this->data());
-  const number2* srcval = src.data();
+  const number2* Aval = A.data();
   
-  if ((n()==3) && (m()==3))
+  if ((n()==2) && (m()==2))
     {
-      val[0] += s * srcval[0];
-      val[1] += s * srcval[1];
-      val[2] += s * srcval[2];
-      val[3] += s * srcval[3];
-      val[4] += s * srcval[4];
-      val[5] += s * srcval[5];
-      val[6] += s * srcval[6];
-      val[7] += s * srcval[7];
-      val[8] += s * srcval[8];
+      val[0]  += a * Aval[0];
+      val[1]  += a * Aval[1];
+      val[2]  += a * Aval[2];
+      val[3]  += a * Aval[3];
+    }
+  else if ((n()==3) && (m()==3))
+    {
+      val[0]  += a * Aval[0];
+      val[1]  += a * Aval[1];
+      val[2]  += a * Aval[2];
+      val[3]  += a * Aval[3];
+      val[4]  += a * Aval[4];
+      val[5]  += a * Aval[5];
+      val[6]  += a * Aval[6];
+      val[7]  += a * Aval[7];
+      val[8]  += a * Aval[8];
     }
   else if ((n()==4) && (m()==4))
     {
-      val[0] += s * srcval[0];
-      val[1] += s * srcval[1];
-      val[2] += s * srcval[2];
-      val[3] += s * srcval[3];
-      val[4] += s * srcval[4];
-      val[5] += s * srcval[5];
-      val[6] += s * srcval[6];
-      val[7] += s * srcval[7];
-      val[8] += s * srcval[8];
-      val[9] += s * srcval[9];
-      val[10] += s * srcval[10];
-      val[11] += s * srcval[11];
-      val[12] += s * srcval[12];
-      val[13] += s * srcval[13];
-      val[14] += s * srcval[14];
-      val[15] += s * srcval[15];
+      val[0]  += a * Aval[0];
+      val[1]  += a * Aval[1];
+      val[2]  += a * Aval[2];
+      val[3]  += a * Aval[3];
+      val[4]  += a * Aval[4];
+      val[5]  += a * Aval[5];
+      val[6]  += a * Aval[6];
+      val[7]  += a * Aval[7];
+      val[8]  += a * Aval[8];
+      val[9]  += a * Aval[9];
+      val[10] += a * Aval[10];
+      val[11] += a * Aval[11];
+      val[12] += a * Aval[12];
+      val[13] += a * Aval[13];
+      val[14] += a * Aval[14];
+      val[15] += a * Aval[15];
+    }
+  else if ((n()==5) && (m()==5))
+    {
+      val[0]  += a * Aval[0];
+      val[1]  += a * Aval[1];
+      val[2]  += a * Aval[2];
+      val[3]  += a * Aval[3];
+      val[4]  += a * Aval[4];
+      val[5]  += a * Aval[5];
+      val[6]  += a * Aval[6];
+      val[7]  += a * Aval[7];
+      val[8]  += a * Aval[8];
+      val[9]  += a * Aval[9];
+      val[10] += a * Aval[10];
+      val[11] += a * Aval[11];
+      val[12] += a * Aval[12];
+      val[13] += a * Aval[13];
+      val[14] += a * Aval[14];
+      val[15] += a * Aval[15];
+      val[16] += a * Aval[16];
+      val[17] += a * Aval[17];
+      val[18] += a * Aval[18];
+      val[19] += a * Aval[19];
+
+      val[20] += a * Aval[20];
+      val[21] += a * Aval[21];
+      val[22] += a * Aval[22];
+      val[23] += a * Aval[23];
+      val[24] += a * Aval[24];
     }
   else if ((n()==8) && (m()==8))
     {
-      val[0] += s * srcval[0];
-      val[1] += s * srcval[1];
-      val[2] += s * srcval[2];
-      val[3] += s * srcval[3];
-      val[4] += s * srcval[4];
-      val[5] += s * srcval[5];
-      val[6] += s * srcval[6];
-      val[7] += s * srcval[7];
-      val[8] += s * srcval[8];
-      val[9] += s * srcval[9];
-      val[10] += s * srcval[10];
-      val[11] += s * srcval[11];
-      val[12] += s * srcval[12];
-      val[13] += s * srcval[13];
-      val[14] += s * srcval[14];
-      val[15] += s * srcval[15];
-      val[16] += s * srcval[16];
-      val[17] += s * srcval[17];
-      val[18] += s * srcval[18];
-      val[19] += s * srcval[19];
+      val[0]  += a * Aval[0];
+      val[1]  += a * Aval[1];
+      val[2]  += a * Aval[2];
+      val[3]  += a * Aval[3];
+      val[4]  += a * Aval[4];
+      val[5]  += a * Aval[5];
+      val[6]  += a * Aval[6];
+      val[7]  += a * Aval[7];
+      val[8]  += a * Aval[8];
+      val[9]  += a * Aval[9];
+      val[10] += a * Aval[10];
+      val[11] += a * Aval[11];
+      val[12] += a * Aval[12];
+      val[13] += a * Aval[13];
+      val[14] += a * Aval[14];
+      val[15] += a * Aval[15];
+      val[16] += a * Aval[16];
+      val[17] += a * Aval[17];
+      val[18] += a * Aval[18];
+      val[19] += a * Aval[19];
 
-      val[20] += s * srcval[20];
-      val[21] += s * srcval[21];
-      val[22] += s * srcval[22];
-      val[23] += s * srcval[23];
-      val[24] += s * srcval[24];
-      val[25] += s * srcval[25];
-      val[26] += s * srcval[26];
-      val[27] += s * srcval[27];
-      val[28] += s * srcval[28];
-      val[29] += s * srcval[29];
+      val[20] += a * Aval[20];
+      val[21] += a * Aval[21];
+      val[22] += a * Aval[22];
+      val[23] += a * Aval[23];
+      val[24] += a * Aval[24];
+      val[25] += a * Aval[25];
+      val[26] += a * Aval[26];
+      val[27] += a * Aval[27];
+      val[28] += a * Aval[28];
+      val[29] += a * Aval[29];
 
-      val[30] += s * srcval[30];
-      val[31] += s * srcval[31];
-      val[32] += s * srcval[32];
-      val[33] += s * srcval[33];
-      val[34] += s * srcval[34];
-      val[35] += s * srcval[35];
-      val[36] += s * srcval[36];
-      val[37] += s * srcval[37];
-      val[38] += s * srcval[38];
-      val[39] += s * srcval[39];
+      val[30] += a * Aval[30];
+      val[31] += a * Aval[31];
+      val[32] += a * Aval[32];
+      val[33] += a * Aval[33];
+      val[34] += a * Aval[34];
+      val[35] += a * Aval[35];
+      val[36] += a * Aval[36];
+      val[37] += a * Aval[37];
+      val[38] += a * Aval[38];
+      val[39] += a * Aval[39];
 
-      val[40] += s * srcval[40];
-      val[41] += s * srcval[41];
-      val[42] += s * srcval[42];
-      val[43] += s * srcval[43];
-      val[44] += s * srcval[44];
-      val[45] += s * srcval[45];
-      val[46] += s * srcval[46];
-      val[47] += s * srcval[47];
-      val[48] += s * srcval[48];
-      val[49] += s * srcval[49];
+      val[40] += a * Aval[40];
+      val[41] += a * Aval[41];
+      val[42] += a * Aval[42];
+      val[43] += a * Aval[43];
+      val[44] += a * Aval[44];
+      val[45] += a * Aval[45];
+      val[46] += a * Aval[46];
+      val[47] += a * Aval[47];
+      val[48] += a * Aval[48];
+      val[49] += a * Aval[49];
 
-      val[50] += s * srcval[50];
-      val[51] += s * srcval[51];
-      val[52] += s * srcval[52];
-      val[53] += s * srcval[53];
-      val[54] += s * srcval[54];
-      val[55] += s * srcval[55];
-      val[56] += s * srcval[56];
-      val[57] += s * srcval[57];
-      val[58] += s * srcval[58];
-      val[59] += s * srcval[59];
+      val[50] += a * Aval[50];
+      val[51] += a * Aval[51];
+      val[52] += a * Aval[52];
+      val[53] += a * Aval[53];
+      val[54] += a * Aval[54];
+      val[55] += a * Aval[55];
+      val[56] += a * Aval[56];
+      val[57] += a * Aval[57];
+      val[58] += a * Aval[58];
+      val[59] += a * Aval[59];
 
-      val[60] += s * srcval[60];
-      val[61] += s * srcval[61];
-      val[62] += s * srcval[62];
-      val[63] += s * srcval[63];
+      val[60] += a * Aval[60];
+      val[61] += a * Aval[61];
+      val[62] += a * Aval[62];
+      val[63] += a * Aval[63];
     }
   else
     {
       const unsigned int size = n()*m();
       for (unsigned int i=0; i<size; i++)
-        val[i] += s * srcval[i];
+        val[i] += a * Aval[i];
     }
 }
+
+
+template <typename number>
+template <typename number2>
+void
+FullMatrix<number>::add (const number               a,
+			 const FullMatrix<number2> &A,
+			 const number               b,
+			 const FullMatrix<number2> &B)
+{
+  Assert (!this->empty(), ExcEmptyMatrix());
+  
+  Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+  Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+  Assert (n() == B.n(), ExcDimensionMismatch(n(), B.n()));
+
+  number* val = const_cast<number*> (this->data());
+  const number2* Aval = A.data();
+  const number2* Bval = B.data();
+  
+  if ((n()==2) && (m()==2))
+    {
+      val[0]  += a * Aval[0]  + b * Bval[0];
+      val[1]  += a * Aval[1]  + b * Bval[1];
+      val[2]  += a * Aval[2]  + b * Bval[2];
+      val[3]  += a * Aval[3]  + b * Bval[3];
+    }
+  else if ((n()==3) && (m()==3))
+    {
+      val[0]  += a * Aval[0]  + b * Bval[0];
+      val[1]  += a * Aval[1]  + b * Bval[1];
+      val[2]  += a * Aval[2]  + b * Bval[2];
+      val[3]  += a * Aval[3]  + b * Bval[3];
+      val[4]  += a * Aval[4]  + b * Bval[4];
+      val[5]  += a * Aval[5]  + b * Bval[5];
+      val[6]  += a * Aval[6]  + b * Bval[6];
+      val[7]  += a * Aval[7]  + b * Bval[7];
+      val[8]  += a * Aval[8]  + b * Bval[8];
+    }
+  else if ((n()==4) && (m()==4))
+    {
+      val[0]  += a * Aval[0]  + b * Bval[0];
+      val[1]  += a * Aval[1]  + b * Bval[1];
+      val[2]  += a * Aval[2]  + b * Bval[2];
+      val[3]  += a * Aval[3]  + b * Bval[3];
+      val[4]  += a * Aval[4]  + b * Bval[4];
+      val[5]  += a * Aval[5]  + b * Bval[5];
+      val[6]  += a * Aval[6]  + b * Bval[6];
+      val[7]  += a * Aval[7]  + b * Bval[7];
+      val[8]  += a * Aval[8]  + b * Bval[8];
+      val[9]  += a * Aval[9]  + b * Bval[9];
+      val[10] += a * Aval[10] + b * Bval[10];
+      val[11] += a * Aval[11] + b * Bval[11];
+      val[12] += a * Aval[12] + b * Bval[12];
+      val[13] += a * Aval[13] + b * Bval[13];
+      val[14] += a * Aval[14] + b * Bval[14];
+      val[15] += a * Aval[15] + b * Bval[15];
+    }
+  else if ((n()==5) && (m()==5))
+    {
+      val[0]  += a * Aval[0]  + b * Bval[0];
+      val[1]  += a * Aval[1]  + b * Bval[1];
+      val[2]  += a * Aval[2]  + b * Bval[2];
+      val[3]  += a * Aval[3]  + b * Bval[3];
+      val[4]  += a * Aval[4]  + b * Bval[4];
+      val[5]  += a * Aval[5]  + b * Bval[5];
+      val[6]  += a * Aval[6]  + b * Bval[6];
+      val[7]  += a * Aval[7]  + b * Bval[7];
+      val[8]  += a * Aval[8]  + b * Bval[8];
+      val[9]  += a * Aval[9]  + b * Bval[9];
+      val[10] += a * Aval[10] + b * Bval[10];
+      val[11] += a * Aval[11] + b * Bval[11];
+      val[12] += a * Aval[12] + b * Bval[12];
+      val[13] += a * Aval[13] + b * Bval[13];
+      val[14] += a * Aval[14] + b * Bval[14];
+      val[15] += a * Aval[15] + b * Bval[15];
+      val[16] += a * Aval[16] + b * Bval[16];
+      val[17] += a * Aval[17] + b * Bval[17];
+      val[18] += a * Aval[18] + b * Bval[18];
+      val[19] += a * Aval[19] + b * Bval[19];
+
+      val[20] += a * Aval[20] + b * Bval[20];
+      val[21] += a * Aval[21] + b * Bval[21];
+      val[22] += a * Aval[22] + b * Bval[22];
+      val[23] += a * Aval[23] + b * Bval[23];
+      val[24] += a * Aval[24] + b * Bval[24];
+    }
+  else if ((n()==8) && (m()==8))
+    {
+      val[0]  += a * Aval[0]  + b * Bval[0];
+      val[1]  += a * Aval[1]  + b * Bval[1];
+      val[2]  += a * Aval[2]  + b * Bval[2];
+      val[3]  += a * Aval[3]  + b * Bval[3];
+      val[4]  += a * Aval[4]  + b * Bval[4];
+      val[5]  += a * Aval[5]  + b * Bval[5];
+      val[6]  += a * Aval[6]  + b * Bval[6];
+      val[7]  += a * Aval[7]  + b * Bval[7];
+      val[8]  += a * Aval[8]  + b * Bval[8];
+      val[9]  += a * Aval[9]  + b * Bval[9];
+      val[10] += a * Aval[10] + b * Bval[10];
+      val[11] += a * Aval[11] + b * Bval[11];
+      val[12] += a * Aval[12] + b * Bval[12];
+      val[13] += a * Aval[13] + b * Bval[13];
+      val[14] += a * Aval[14] + b * Bval[14];
+      val[15] += a * Aval[15] + b * Bval[15];
+      val[16] += a * Aval[16] + b * Bval[16];
+      val[17] += a * Aval[17] + b * Bval[17];
+      val[18] += a * Aval[18] + b * Bval[18];
+      val[19] += a * Aval[19] + b * Bval[19];
+
+      val[20] += a * Aval[20] + b * Bval[20];
+      val[21] += a * Aval[21] + b * Bval[21];
+      val[22] += a * Aval[22] + b * Bval[22];
+      val[23] += a * Aval[23] + b * Bval[23];
+      val[24] += a * Aval[24] + b * Bval[24];
+      val[25] += a * Aval[25] + b * Bval[25];
+      val[26] += a * Aval[26] + b * Bval[26];
+      val[27] += a * Aval[27] + b * Bval[27];
+      val[28] += a * Aval[28] + b * Bval[28];
+      val[29] += a * Aval[29] + b * Bval[29];
+
+      val[30] += a * Aval[30] + b * Bval[30];
+      val[31] += a * Aval[31] + b * Bval[31];
+      val[32] += a * Aval[32] + b * Bval[32];
+      val[33] += a * Aval[33] + b * Bval[33];
+      val[34] += a * Aval[34] + b * Bval[34];
+      val[35] += a * Aval[35] + b * Bval[35];
+      val[36] += a * Aval[36] + b * Bval[36];
+      val[37] += a * Aval[37] + b * Bval[37];
+      val[38] += a * Aval[38] + b * Bval[38];
+      val[39] += a * Aval[39] + b * Bval[39];
+
+      val[40] += a * Aval[40] + b * Bval[40];
+      val[41] += a * Aval[41] + b * Bval[41];
+      val[42] += a * Aval[42] + b * Bval[42];
+      val[43] += a * Aval[43] + b * Bval[43];
+      val[44] += a * Aval[44] + b * Bval[44];
+      val[45] += a * Aval[45] + b * Bval[45];
+      val[46] += a * Aval[46] + b * Bval[46];
+      val[47] += a * Aval[47] + b * Bval[47];
+      val[48] += a * Aval[48] + b * Bval[48];
+      val[49] += a * Aval[49] + b * Bval[49];
+
+      val[50] += a * Aval[50] + b * Bval[50];
+      val[51] += a * Aval[51] + b * Bval[51];
+      val[52] += a * Aval[52] + b * Bval[52];
+      val[53] += a * Aval[53] + b * Bval[53];
+      val[54] += a * Aval[54] + b * Bval[54];
+      val[55] += a * Aval[55] + b * Bval[55];
+      val[56] += a * Aval[56] + b * Bval[56];
+      val[57] += a * Aval[57] + b * Bval[57];
+      val[58] += a * Aval[58] + b * Bval[58];
+      val[59] += a * Aval[59] + b * Bval[59];
+
+      val[60] += a * Aval[60] + b * Bval[60];
+      val[61] += a * Aval[61] + b * Bval[61];
+      val[62] += a * Aval[62] + b * Bval[62];
+      val[63] += a * Aval[63] + b * Bval[63];
+    }
+  else
+    {
+      const unsigned int size = n()*m();
+      for (unsigned int i=0; i<size; i++)
+        val[i] += a * Aval[i] + b * Bval[i];
+    }
+}
+
+
+
+template <typename number>
+template <typename number2>
+void
+FullMatrix<number>::add (const number               a,
+			 const FullMatrix<number2> &A,
+			 const number               b,
+			 const FullMatrix<number2> &B,
+			 const number               c,
+			 const FullMatrix<number2> &C)
+{
+  Assert (!this->empty(), ExcEmptyMatrix());
+  
+  Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+  Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+  Assert (n() == B.n(), ExcDimensionMismatch(n(), B.n()));
+  Assert (m() == C.m(), ExcDimensionMismatch(m(), C.m()));
+  Assert (n() == C.n(), ExcDimensionMismatch(n(), C.n()));
+
+  number* val = const_cast<number*> (this->data());
+  const number2* Aval = A.data();
+  const number2* Bval = B.data();
+  const number2* Cval = C.data();
+  
+  if ((n()==2) && (m()==2))
+    {
+      val[0]  += a * Aval[0]  + b * Bval[0]  + c * Cval[0];
+      val[1]  += a * Aval[1]  + b * Bval[1]  + c * Cval[1];
+      val[2]  += a * Aval[2]  + b * Bval[2]  + c * Cval[2];
+      val[3]  += a * Aval[3]  + b * Bval[3]  + c * Cval[3];
+    }
+  else if ((n()==3) && (m()==3))
+    {
+      val[0]  += a * Aval[0]  + b * Bval[0]  + c * Cval[0];
+      val[1]  += a * Aval[1]  + b * Bval[1]  + c * Cval[1];
+      val[2]  += a * Aval[2]  + b * Bval[2]  + c * Cval[2];
+      val[3]  += a * Aval[3]  + b * Bval[3]  + c * Cval[3];
+      val[4]  += a * Aval[4]  + b * Bval[4]  + c * Cval[4];
+      val[5]  += a * Aval[5]  + b * Bval[5]  + c * Cval[5];
+      val[6]  += a * Aval[6]  + b * Bval[6]  + c * Cval[6];
+      val[7]  += a * Aval[7]  + b * Bval[7]  + c * Cval[7];
+      val[8]  += a * Aval[8]  + b * Bval[8]  + c * Cval[8];
+    }
+  else if ((n()==4) && (m()==4))
+    {
+      val[0]  += a * Aval[0]  + b * Bval[0]  + c * Cval[0];
+      val[1]  += a * Aval[1]  + b * Bval[1]  + c * Cval[1];
+      val[2]  += a * Aval[2]  + b * Bval[2]  + c * Cval[2];
+      val[3]  += a * Aval[3]  + b * Bval[3]  + c * Cval[3];
+      val[4]  += a * Aval[4]  + b * Bval[4]  + c * Cval[4];
+      val[5]  += a * Aval[5]  + b * Bval[5]  + c * Cval[5];
+      val[6]  += a * Aval[6]  + b * Bval[6]  + c * Cval[6];
+      val[7]  += a * Aval[7]  + b * Bval[7]  + c * Cval[7];
+      val[8]  += a * Aval[8]  + b * Bval[8]  + c * Cval[8];
+      val[9]  += a * Aval[9]  + b * Bval[9]  + c * Cval[9];
+      val[10] += a * Aval[10] + b * Bval[10] + c * Cval[10];
+      val[11] += a * Aval[11] + b * Bval[11] + c * Cval[11];
+      val[12] += a * Aval[12] + b * Bval[12] + c * Cval[12];
+      val[13] += a * Aval[13] + b * Bval[13] + c * Cval[13];
+      val[14] += a * Aval[14] + b * Bval[14] + c * Cval[14];
+      val[15] += a * Aval[15] + b * Bval[15] + c * Cval[15];
+    }
+  else if ((n()==5) && (m()==5))
+    {
+      val[0]  += a * Aval[0]  + b * Bval[0]  + c * Cval[0];
+      val[1]  += a * Aval[1]  + b * Bval[1]  + c * Cval[1];
+      val[2]  += a * Aval[2]  + b * Bval[2]  + c * Cval[2];
+      val[3]  += a * Aval[3]  + b * Bval[3]  + c * Cval[3];
+      val[4]  += a * Aval[4]  + b * Bval[4]  + c * Cval[4];
+      val[5]  += a * Aval[5]  + b * Bval[5]  + c * Cval[5];
+      val[6]  += a * Aval[6]  + b * Bval[6]  + c * Cval[6];
+      val[7]  += a * Aval[7]  + b * Bval[7]  + c * Cval[7];
+      val[8]  += a * Aval[8]  + b * Bval[8]  + c * Cval[8];
+      val[9]  += a * Aval[9]  + b * Bval[9]  + c * Cval[9];
+      val[10] += a * Aval[10] + b * Bval[10] + c * Cval[10];
+      val[11] += a * Aval[11] + b * Bval[11] + c * Cval[11];
+      val[12] += a * Aval[12] + b * Bval[12] + c * Cval[12];
+      val[13] += a * Aval[13] + b * Bval[13] + c * Cval[13];
+      val[14] += a * Aval[14] + b * Bval[14] + c * Cval[14];
+      val[15] += a * Aval[15] + b * Bval[15] + c * Cval[15];
+      val[16] += a * Aval[16] + b * Bval[16] + c * Cval[16];
+      val[17] += a * Aval[17] + b * Bval[17] + c * Cval[17];
+      val[18] += a * Aval[18] + b * Bval[18] + c * Cval[18];
+      val[19] += a * Aval[19] + b * Bval[19] + c * Cval[19];
+
+      val[20] += a * Aval[20] + b * Bval[20] + c * Cval[20];
+      val[21] += a * Aval[21] + b * Bval[21] + c * Cval[21];
+      val[22] += a * Aval[22] + b * Bval[22] + c * Cval[22];
+      val[23] += a * Aval[23] + b * Bval[23] + c * Cval[23];
+      val[24] += a * Aval[24] + b * Bval[24] + c * Cval[24];
+    }
+  else if ((n()==8) && (m()==8))
+    {
+      val[0]  += a * Aval[0]  + b * Bval[0]  + c * Cval[0];
+      val[1]  += a * Aval[1]  + b * Bval[1]  + c * Cval[1];
+      val[2]  += a * Aval[2]  + b * Bval[2]  + c * Cval[2];
+      val[3]  += a * Aval[3]  + b * Bval[3]  + c * Cval[3];
+      val[4]  += a * Aval[4]  + b * Bval[4]  + c * Cval[4];
+      val[5]  += a * Aval[5]  + b * Bval[5]  + c * Cval[5];
+      val[6]  += a * Aval[6]  + b * Bval[6]  + c * Cval[6];
+      val[7]  += a * Aval[7]  + b * Bval[7]  + c * Cval[7];
+      val[8]  += a * Aval[8]  + b * Bval[8]  + c * Cval[8];
+      val[9]  += a * Aval[9]  + b * Bval[9]  + c * Cval[9];
+      val[10] += a * Aval[10] + b * Bval[10] + c * Cval[10];
+      val[11] += a * Aval[11] + b * Bval[11] + c * Cval[11];
+      val[12] += a * Aval[12] + b * Bval[12] + c * Cval[12];
+      val[13] += a * Aval[13] + b * Bval[13] + c * Cval[13];
+      val[14] += a * Aval[14] + b * Bval[14] + c * Cval[14];
+      val[15] += a * Aval[15] + b * Bval[15] + c * Cval[15];
+      val[16] += a * Aval[16] + b * Bval[16] + c * Cval[16];
+      val[17] += a * Aval[17] + b * Bval[17] + c * Cval[17];
+      val[18] += a * Aval[18] + b * Bval[18] + c * Cval[18];
+      val[19] += a * Aval[19] + b * Bval[19] + c * Cval[19];
+
+      val[20] += a * Aval[20] + b * Bval[20] + c * Cval[20];
+      val[21] += a * Aval[21] + b * Bval[21] + c * Cval[21];
+      val[22] += a * Aval[22] + b * Bval[22] + c * Cval[22];
+      val[23] += a * Aval[23] + b * Bval[23] + c * Cval[23];
+      val[24] += a * Aval[24] + b * Bval[24] + c * Cval[24];
+      val[25] += a * Aval[25] + b * Bval[25] + c * Cval[25];
+      val[26] += a * Aval[26] + b * Bval[26] + c * Cval[26];
+      val[27] += a * Aval[27] + b * Bval[27] + c * Cval[27];
+      val[28] += a * Aval[28] + b * Bval[28] + c * Cval[28];
+      val[29] += a * Aval[29] + b * Bval[29] + c * Cval[29];
+
+      val[30] += a * Aval[30] + b * Bval[30] + c * Cval[30];
+      val[31] += a * Aval[31] + b * Bval[31] + c * Cval[31];
+      val[32] += a * Aval[32] + b * Bval[32] + c * Cval[32];
+      val[33] += a * Aval[33] + b * Bval[33] + c * Cval[33];
+      val[34] += a * Aval[34] + b * Bval[34] + c * Cval[34];
+      val[35] += a * Aval[35] + b * Bval[35] + c * Cval[35];
+      val[36] += a * Aval[36] + b * Bval[36] + c * Cval[36];
+      val[37] += a * Aval[37] + b * Bval[37] + c * Cval[37];
+      val[38] += a * Aval[38] + b * Bval[38] + c * Cval[38];
+      val[39] += a * Aval[39] + b * Bval[39] + c * Cval[39];
+
+      val[40] += a * Aval[40] + b * Bval[40] + c * Cval[40];
+      val[41] += a * Aval[41] + b * Bval[41] + c * Cval[41];
+      val[42] += a * Aval[42] + b * Bval[42] + c * Cval[42];
+      val[43] += a * Aval[43] + b * Bval[43] + c * Cval[43];
+      val[44] += a * Aval[44] + b * Bval[44] + c * Cval[44];
+      val[45] += a * Aval[45] + b * Bval[45] + c * Cval[45];
+      val[46] += a * Aval[46] + b * Bval[46] + c * Cval[46];
+      val[47] += a * Aval[47] + b * Bval[47] + c * Cval[47];
+      val[48] += a * Aval[48] + b * Bval[48] + c * Cval[48];
+      val[49] += a * Aval[49] + b * Bval[49] + c * Cval[49];
+
+      val[50] += a * Aval[50] + b * Bval[50] + c * Cval[50];
+      val[51] += a * Aval[51] + b * Bval[51] + c * Cval[51];
+      val[52] += a * Aval[52] + b * Bval[52] + c * Cval[52];
+      val[53] += a * Aval[53] + b * Bval[53] + c * Cval[53];
+      val[54] += a * Aval[54] + b * Bval[54] + c * Cval[54];
+      val[55] += a * Aval[55] + b * Bval[55] + c * Cval[55];
+      val[56] += a * Aval[56] + b * Bval[56] + c * Cval[56];
+      val[57] += a * Aval[57] + b * Bval[57] + c * Cval[57];
+      val[58] += a * Aval[58] + b * Bval[58] + c * Cval[58];
+      val[59] += a * Aval[59] + b * Bval[59] + c * Cval[59];
+
+      val[60] += a * Aval[60] + b * Bval[60] + c * Cval[60];
+      val[61] += a * Aval[61] + b * Bval[61] + c * Cval[61];
+      val[62] += a * Aval[62] + b * Bval[62] + c * Cval[62];
+      val[63] += a * Aval[63] + b * Bval[63] + c * Cval[63];
+    }
+  else
+    {
+      const unsigned int size = n()*m();
+      for (unsigned int i=0; i<size; i++)
+        val[i] += a * Aval[i] + b * Bval[i] + c * Cval[i];
+    }
+}
+
+
 
 template <typename number>
 template <typename number2>

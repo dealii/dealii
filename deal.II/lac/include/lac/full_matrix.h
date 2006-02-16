@@ -585,24 +585,65 @@ class FullMatrix : public Table<2,number>
     FullMatrix & operator /= (const double factor);
     
                                      /**
-				      * Weighted addition. The matrix
-				      * <tt>s*B</tt> is added to <tt>this</tt>.
+				      * Simple addition of a scaled
+				      * matrix, i.e. <tt>*this +=
+				      * a*A</tt>.
 				      *
-				      * The source matrix may be a full matrix
-				      * over an arbitrary underlying scalar
-				      * type, as long as its data type is
-				      * convertible to the data type of this
-				      * matrix.
+				      * The matrix <tt>A</tt> may be a
+				      * full matrix over an arbitrary
+				      * underlying scalar type, as
+				      * long as its data type is
+				      * convertible to the data type
+				      * of this matrix.
 				      */
     template<typename number2>
-    void add (const number               s,
+    void add (const number               a,
+	      const FullMatrix<number2> &A);
+    
+                                     /**
+				      * Multiple addition of scaled
+				      * matrices, i.e. <tt>*this +=
+				      * a*A + b*B</tt>.
+				      *
+				      * The matrices <tt>A</tt> and
+				      * <tt>B</tt> may be a full
+				      * matrix over an arbitrary
+				      * underlying scalar type, as
+				      * long as its data type is
+				      * convertible to the data type
+				      * of this matrix.
+				      */
+    template<typename number2>
+    void add (const number               a,
+	      const FullMatrix<number2> &A,
+	      const number               b,
 	      const FullMatrix<number2> &B);
+    
+                                     /**
+				      * Multiple addition of scaled
+				      * matrices, i.e. <tt>*this +=
+				      * a*A + b*B + c*C</tt>.
+				      *
+				      * The matrices <tt>A</tt>,
+				      * <tt>B</tt> and <tt>C</tt> may
+				      * be a full matrix over an
+				      * arbitrary underlying scalar
+				      * type, as long as its data type
+				      * is convertible to the data
+				      * type of this matrix.
+				      */
+    template<typename number2>
+    void add (const number               a,
+	      const FullMatrix<number2> &A,
+	      const number               b,
+	      const FullMatrix<number2> &B,
+	      const number               c,
+	      const FullMatrix<number2> &C);
 
 				     /**
-				      * @deprecated Weighted
-				      * addition. The matrix
-				      * <tt>s*B</tt> is added to
-				      * <tt>this</tt>.
+				      * @deprecated Simple addition of
+				      * a scaled matrix,
+				      * i.e. <tt>*this += a*A</tt>.
 				      *
 				      * This function is
 				      * deprecated. Use <tt>add</tt>
@@ -611,9 +652,9 @@ class FullMatrix : public Table<2,number>
 				      * matrix and vector classes in
 				      * the library.
 				      */
-    template <typename somenumber>
-    void add_scaled (const number factor,
-		     const FullMatrix<somenumber> &matrix);
+    template <typename number2>
+    void add_scaled (const number               a,
+		     const FullMatrix<number2> &A);
 
 				     /**
 				      * Add rectangular block.
