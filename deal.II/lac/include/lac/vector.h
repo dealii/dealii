@@ -710,13 +710,13 @@ class Vector
 				      * vector.  Get this number by
 				      * calling <tt>size()</tt>.
 				      */
-    unsigned int dim;
+    unsigned int vec_size;
 
 				     /**
 				      * Amount of memory actually
 				      * reserved for this vector. This
 				      * number may be greater than
-				      * @p dim if a @p reinit was
+				      * @p vec_size if a @p reinit was
 				      * called with less memory
 				      * requirements than the vector
 				      * needed last time. At present
@@ -724,7 +724,7 @@ class Vector
 				      * memory when the number of
 				      * needed elements is reduced.
 				      */
-    unsigned int maxdim;
+    unsigned int max_vec_size;
 
 				     /**
 				      * Pointer to the array of
@@ -753,8 +753,8 @@ template <typename Number>
 inline
 Vector<Number>::Vector ()
                 :
-		dim(0),
-		maxdim(0),
+		vec_size(0),
+		max_vec_size(0),
 		val(0)
 {}
 
@@ -764,8 +764,8 @@ template <typename Number>
 template <typename InputIterator>
 Vector<Number>::Vector (const InputIterator first, const InputIterator last)
 		:
-		dim (0),
-		maxdim (0),
+		vec_size (0),
+		max_vec_size (0),
 		val (0)
 {
 				   // allocate memory. do not
@@ -781,8 +781,8 @@ template <typename Number>
 inline
 Vector<Number>::Vector (const unsigned int n)
                 :
-		dim(0),
-		maxdim(0),
+		vec_size(0),
+		max_vec_size(0),
 		val(0)
 {
   reinit (n, false);
@@ -811,18 +811,18 @@ void Vector<Number>::reinit (const unsigned int n, const bool fast)
     {
       if (val) delete[] val;
       val = 0;
-      maxdim = dim = 0;
+      max_vec_size = vec_size = 0;
       return;
     };
   
-  if (n>maxdim)
+  if (n>max_vec_size)
     {
       if (val) delete[] val;
       val = new value_type[n];
       Assert (val != 0, ExcOutOfMemory());
-      maxdim = n;
+      max_vec_size = n;
     };
-  dim = n;
+  vec_size = n;
   if (fast == false)
     *this = 0;
 }
@@ -834,8 +834,8 @@ inline
 Vector<Number> & Vector<Number>::operator = (const Number s)
 {
   if (s != 0.)
-    Assert (dim!=0, ExcEmptyObject());
-  if (dim!=0)
+    Assert (vec_size!=0, ExcEmptyObject());
+  if (vec_size!=0)
     std::fill (begin(), end(), s);
   return *this;
 }
@@ -846,7 +846,7 @@ template <typename Number>
 inline
 unsigned int Vector<Number>::size () const
 {
-  return dim;
+  return vec_size;
 }
 
 
@@ -876,7 +876,7 @@ inline
 typename Vector<Number>::iterator
 Vector<Number>::end () 
 {
-  return &val[dim];
+  return &val[vec_size];
 }
 
 
@@ -886,7 +886,7 @@ inline
 typename Vector<Number>::const_iterator
 Vector<Number>::end () const
 {
-  return &val[dim];
+  return &val[vec_size];
 }
 
 
@@ -895,7 +895,7 @@ template <typename Number>
 inline
 Number Vector<Number>::operator() (const unsigned int i) const
 {
-  Assert (i<dim, ExcIndexRange(i,0,dim));
+  Assert (i<vec_size, ExcIndexRange(i,0,vec_size));
   return val[i];
 }
 
@@ -905,7 +905,7 @@ template <typename Number>
 inline
 Number& Vector<Number>::operator() (const unsigned int i)
 {
-  Assert (i<dim, ExcIndexRange(i,0,dim));
+  Assert (i<vec_size, ExcIndexRange(i,0,vec_size));
   return val[i];
 }
 

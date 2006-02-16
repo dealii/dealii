@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -54,13 +54,13 @@ namespace internal
 template <typename Number>
 Vector<Number>::Vector (const Vector<Number>& v)
                 :
-		dim(v.size()),
-		maxdim(v.size()),
+		vec_size(v.size()),
+		max_vec_size(v.size()),
 		val(0)
 {
-  if (dim != 0)
+  if (vec_size != 0)
     {
-      val = new Number[maxdim];
+      val = new Number[max_vec_size];
       Assert (val != 0, ExcOutOfMemory());
       std::copy (v.begin(), v.end(), begin());
     }
@@ -73,13 +73,13 @@ template <typename Number>
 template <typename OtherNumber>
 Vector<Number>::Vector (const Vector<OtherNumber>& v)
                 :
-		dim(v.size()),
-		maxdim(v.size()),
+		vec_size(v.size()),
+		max_vec_size(v.size()),
 		val(0)
 {
-  if (dim != 0)
+  if (vec_size != 0)
     {
-      val = new Number[maxdim];
+      val = new Number[max_vec_size];
       Assert (val != 0, ExcOutOfMemory());
       std::copy (v.begin(), v.end(), begin());
     }
@@ -92,13 +92,13 @@ Vector<Number>::Vector (const Vector<OtherNumber>& v)
 template <typename Number>
 Vector<Number>::Vector (const PETScWrappers::Vector &v)
                 :
-		dim(v.size()),
-		maxdim(v.size()),
+		vec_size(v.size()),
+		max_vec_size(v.size()),
 		val(0)
 {
-  if (dim != 0)
+  if (vec_size != 0)
     {
-      val = new Number[maxdim];
+      val = new Number[max_vec_size];
       Assert (val != 0, ExcOutOfMemory());
 
                                        // get a representation of the vector
@@ -107,7 +107,7 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
       int ierr = VecGetArray (static_cast<const Vec&>(v), &start_ptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
       
-      std::copy (start_ptr, start_ptr+dim, begin());
+      std::copy (start_ptr, start_ptr+vec_size, begin());
 
                                        // restore the representation of the
                                        // vector
@@ -121,8 +121,8 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
 template <typename Number>
 Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
                 :
-		dim(0),
-		maxdim(0),
+		vec_size(0),
+		max_vec_size(0),
 		val(0)
 {
   if (v.size() != 0)
@@ -151,8 +151,8 @@ template <typename Number>
 void
 Vector<Number>::swap (Vector<Number> &v)
 {
-  std::swap (dim,    v.dim);
-  std::swap (maxdim, v.maxdim);
+  std::swap (vec_size,    v.vec_size);
+  std::swap (max_vec_size, v.max_vec_size);
   std::swap (val,    v.val);
 }
 
@@ -162,7 +162,7 @@ template <typename Number>
 bool
 Vector<Number>::all_zero () const
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
   
   const_iterator p = begin(),
 		 e = end();
@@ -178,7 +178,7 @@ template <typename Number>
 bool
 Vector<Number>::is_non_negative () const
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
   
   const_iterator p = begin(),
 		 e = end();
@@ -194,12 +194,12 @@ template <typename Number>
 template <typename Number2>
 Number Vector<Number>::operator * (const Vector<Number2>& v) const
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
   
   if (this == reinterpret_cast<const Vector<Number>*>(&v))
     return norm_sqr();
   
-  Assert (dim == v.size(), ExcDimensionMismatch(dim, v.size()));
+  Assert (vec_size == v.size(), ExcDimensionMismatch(vec_size, v.size()));
   
   Number sum0 = 0,
 	 sum1 = 0,
@@ -210,7 +210,7 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
 				   // allowing pipelined commands to be
 				   // executed in parallel
   const_iterator ptr  = begin(),
-		 eptr = ptr + (dim/4)*4;
+		 eptr = ptr + (vec_size/4)*4;
   typename Vector<Number2>::const_iterator vptr = v.begin();
   while (ptr!=eptr)
     {
@@ -230,7 +230,7 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
 template <typename Number>
 Number Vector<Number>::norm_sqr () const
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
 
   Number sum0 = 0,
 	 sum1 = 0,
@@ -241,7 +241,7 @@ Number Vector<Number>::norm_sqr () const
 				   // allowing pipelined commands to be
 				   // executed in parallel
   const_iterator ptr  = begin(),
-		 eptr = ptr + (dim/4)*4;
+		 eptr = ptr + (vec_size/4)*4;
   while (ptr!=eptr)
     {
       sum0 += internal::VectorHelper::sqr(*ptr++);
@@ -260,7 +260,7 @@ Number Vector<Number>::norm_sqr () const
 template <typename Number>
 Number Vector<Number>::mean_value () const
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
 
   Number sum0 = 0,
 	 sum1 = 0,
@@ -271,7 +271,7 @@ Number Vector<Number>::mean_value () const
 				   // allowing pipelined commands to be
 				   // executed in parallel
   const_iterator ptr  = begin(),
-		 eptr = ptr + (dim/4)*4;
+		 eptr = ptr + (vec_size/4)*4;
   while (ptr!=eptr)
     {
       sum0 += *ptr++;
@@ -291,7 +291,7 @@ Number Vector<Number>::mean_value () const
 template <typename Number>
 Number Vector<Number>::l1_norm () const
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
 
   Number sum0 = 0,
 	 sum1 = 0,
@@ -302,7 +302,7 @@ Number Vector<Number>::l1_norm () const
 				   // allowing pipelined commands to be
 				   // executed in parallel
   const_iterator ptr  = begin(),
-		 eptr = ptr + (dim/4)*4;
+		 eptr = ptr + (vec_size/4)*4;
   while (ptr!=eptr)
     {
       sum0 += std::fabs(*ptr++);
@@ -328,7 +328,7 @@ Number Vector<Number>::l2_norm () const
 template <typename Number>
 Number Vector<Number>::lp_norm (const Number p) const
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
 
   Number sum0 = 0,
 	 sum1 = 0,
@@ -339,7 +339,7 @@ Number Vector<Number>::lp_norm (const Number p) const
 				   // allowing pipelined commands to be
 				   // executed in parallel
   const_iterator ptr  = begin(),
-		 eptr = ptr + (dim/4)*4;
+		 eptr = ptr + (vec_size/4)*4;
   while (ptr!=eptr)
     {
       sum0 += std::pow(std::fabs(*ptr++), p);
@@ -359,13 +359,13 @@ Number Vector<Number>::lp_norm (const Number p) const
 template <typename Number>
 Number Vector<Number>::linfty_norm () const
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
 
   Number max0=0.,
 	 max1=0.,
 	 max2=0.,
 	 max3=0.;
-  for (unsigned int i=0; i<(dim/4); ++i) 
+  for (unsigned int i=0; i<(vec_size/4); ++i) 
     {
       if (max0<std::fabs(val[4*i]))   max0=std::fabs(val[4*i]);
       if (max1<std::fabs(val[4*i+1])) max1=std::fabs(val[4*i+1]);
@@ -373,7 +373,7 @@ Number Vector<Number>::linfty_norm () const
       if (max3<std::fabs(val[4*i+3])) max3=std::fabs(val[4*i+3]);
     };
 				   // add up remaining elements
-  for (unsigned int i=(dim/4)*4; i<dim; ++i)
+  for (unsigned int i=(vec_size/4)*4; i<vec_size; ++i)
     if (max0<std::fabs(val[i]))
       max0 = std::fabs(val[i]);
 
@@ -385,7 +385,7 @@ Number Vector<Number>::linfty_norm () const
 template <typename Number>
 Vector<Number>& Vector<Number>::operator += (const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
 
   add (v);
   return *this;
@@ -395,8 +395,8 @@ Vector<Number>& Vector<Number>::operator += (const Vector<Number>& v)
 template <typename Number>
 Vector<Number>& Vector<Number>::operator -= (const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -411,7 +411,7 @@ Vector<Number>& Vector<Number>::operator -= (const Vector<Number>& v)
 template <typename Number>
 void Vector<Number>::add (const Number v)
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
 
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -423,8 +423,8 @@ void Vector<Number>::add (const Number v)
 template <typename Number>
 void Vector<Number>::add (const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -437,8 +437,8 @@ void Vector<Number>::add (const Vector<Number>& v)
 template <typename Number>
 void Vector<Number>::add (const Number a, const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
   iterator i_ptr = begin(),
 	   i_end = end();
@@ -452,9 +452,9 @@ template <typename Number>
 void Vector<Number>::add (const Number a, const Vector<Number>& v,
 			  const Number b, const Vector<Number>& w)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
-  Assert (dim == w.dim, ExcDimensionMismatch(dim, w.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+  Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin(),
@@ -467,8 +467,8 @@ void Vector<Number>::add (const Number a, const Vector<Number>& v,
 template <typename Number>
 void Vector<Number>::sadd (const Number x, const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin();
@@ -481,8 +481,8 @@ template <typename Number>
 void Vector<Number>::sadd (const Number x, const Number a,
                            const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin();
@@ -496,9 +496,9 @@ void Vector<Number>::sadd (const Number x, const Number a,
 			   const Vector<Number>& v, const Number b,
                            const Vector<Number>& w)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
-  Assert (dim == w.dim, ExcDimensionMismatch(dim, w.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+  Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin(),
@@ -514,10 +514,10 @@ void Vector<Number>::sadd (const Number x, const Number a,
 			   const Vector<Number>& w, const Number c,
                            const Vector<Number>& y)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
-  Assert (dim == w.dim, ExcDimensionMismatch(dim, w.dim));
-  Assert (dim == y.dim, ExcDimensionMismatch(dim, y.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+  Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
+  Assert (vec_size == y.vec_size, ExcDimensionMismatch(vec_size, y.vec_size));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator v_ptr = v.begin(),
@@ -533,7 +533,7 @@ void Vector<Number>::sadd (const Number x, const Number a,
 template <typename Number>
 void Vector<Number>::scale (const Number factor)
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
 
   iterator             ptr  = begin();
   const const_iterator eptr = end();
@@ -547,8 +547,8 @@ template <typename Number>
 template <typename Number2>
 void Vector<Number>::scale (const Vector<Number2> &s)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == s.dim, ExcDimensionMismatch(dim, s.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
   
   iterator             ptr  = begin();
   const const_iterator eptr = end();
@@ -563,9 +563,9 @@ template <typename Number>
 void Vector<Number>::equ (const Number a, const Vector<Number>& u,
 			  const Number b, const Vector<Number>& v)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == u.dim, ExcDimensionMismatch(dim, u.dim));
-  Assert (dim == v.dim, ExcDimensionMismatch(dim, v.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   iterator i_ptr = begin(),
 	   i_end = end();
   const_iterator u_ptr = u.begin(),
@@ -580,8 +580,8 @@ template <typename Number>
 template <typename Number2>
 void Vector<Number>::equ (const Number a, const Vector<Number2>& u)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == u.dim, ExcDimensionMismatch(dim, u.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
   iterator i_ptr = begin(),
 	   i_end = end();
   typename Vector<Number2>::const_iterator u_ptr = u.begin();
@@ -594,8 +594,8 @@ void Vector<Number>::equ (const Number a, const Vector<Number2>& u)
 template <typename Number>
 void Vector<Number>::ratio (const Vector<Number> &a, const Vector<Number> &b)
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (a.dim == b.dim, ExcDimensionMismatch (a.dim, b.dim));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (a.vec_size == b.vec_size, ExcDimensionMismatch (a.vec_size, b.vec_size));
 
 				   // no need to reinit with zeros, since
 				   // we overwrite them anyway
@@ -614,9 +614,9 @@ template <typename Number>
 Vector<Number>&
 Vector<Number>::operator = (const Vector<Number>& v)
 {
-  if (v.dim != dim)
-    reinit (v.dim, true);
-  if (dim!=0)
+  if (v.vec_size != vec_size)
+    reinit (v.vec_size, true);
+  if (vec_size!=0)
     std::copy (v.begin(), v.end(), begin());
   
   return *this;
@@ -629,9 +629,9 @@ template <typename Number2>
 Vector<Number>&
 Vector<Number>::operator = (const Vector<Number2>& v)
 {
-  if (v.size() != dim)
+  if (v.size() != vec_size)
     reinit (v.size(), true);
-  if (dim!=0)
+  if (vec_size!=0)
     std::copy (v.begin(), v.end(), begin());
   
   return *this;
@@ -645,9 +645,9 @@ template <typename Number>
 Vector<Number> &
 Vector<Number>::operator = (const PETScWrappers::Vector &v)
 {
-  if (v.size() != dim)
+  if (v.size() != vec_size)
     reinit (v.size(), true);
-  if (dim != 0)
+  if (vec_size != 0)
     {
                                        // get a representation of the vector
                                        // and copy it
@@ -655,7 +655,7 @@ Vector<Number>::operator = (const PETScWrappers::Vector &v)
       int ierr = VecGetArray (static_cast<const Vec&>(v), &start_ptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
       
-      std::copy (start_ptr, start_ptr+dim, begin());
+      std::copy (start_ptr, start_ptr+vec_size, begin());
 
                                        // restore the representation of the
                                        // vector
@@ -689,10 +689,10 @@ template <typename Number2>
 bool
 Vector<Number>::operator == (const Vector<Number2>& v) const
 {
-  Assert (dim!=0, ExcEmptyObject());
-  Assert (dim == v.size(), ExcDimensionMismatch(dim, v.size()));
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.size(), ExcDimensionMismatch(vec_size, v.size()));
 
-  for (unsigned int i=0; i<dim; ++i)
+  for (unsigned int i=0; i<vec_size; ++i)
     if (val[i] != v.val[i])
       return false;
 
@@ -704,7 +704,7 @@ Vector<Number>::operator == (const Vector<Number2>& v) const
 template <typename Number>
 void Vector<Number>::print (const char* format) const
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
   if (!format) format = " %5.2f";
   for (unsigned int j=0;j<size();j++)
     std::printf (format, val[j]);
@@ -719,7 +719,7 @@ void Vector<Number>::print (std::ostream      &out,
 			    const bool         scientific,
 			    const bool         across) const
 {
-  Assert (dim!=0, ExcEmptyObject());
+  Assert (vec_size!=0, ExcEmptyObject());
   AssertThrow (out, ExcIO());
 
   std::ios::fmtflags old_flags = out.flags();
@@ -815,7 +815,7 @@ template <typename Number>
 unsigned int
 Vector<Number>::memory_consumption () const
 {
-  return sizeof(*this) + (maxdim * sizeof(Number));
+  return sizeof(*this) + (max_vec_size * sizeof(Number));
 }
 
 
