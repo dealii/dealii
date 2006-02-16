@@ -331,22 +331,36 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li> <p>
+       Changed: The matrix classes <code
+       class="class">FullMatrix</code>, <code
+       class="class">SparseMatrix</code>, <code
+       class="class">SparseMatrixEZ</code> and <code
+       class="class">BlockMatrixBase</code> now have an <code
+       class="member">add</code> function analogous to the <code
+       class="member">add</code> of vector classes. The old <code
+       class="member">add_scaled</code> functions are now deprecated.
+       <br>
+       (RH 2006/02/16)
+       </p>  
 
+  <li> <p>       
+       Improved: <code class="class">BlockMatrixArray</code>::<code
+       class="member">enter_aux</code> allows using matrices without
+       adding vector multiplication by using <code
+       class="class">PointerMatrixAux</code>.
+       <br>
+       (GK 2006/02/02)
+       </p>  
 
-  <li> <p> Improved: <code class="class">BlockMatrixArray</class>::<code
-  class="member">enter_aux</code> allows using matrices without adding vector
-  multiplication by using <code class="class">PointerMatrixAux</code>.
-  <br>
-  (GK 2006/02/02)
-  </p>  
-
-  <li> <p> New: The class <code class="class">PointerMatrixAux</code> was
-  introduced for use with matrix classes lacking the adding vector
-  multiplication functions. It implements these by using its own auxiliary
-  vector.
-  <br>
-  (GK 2006/02/02)
-  </p>
+  <li> <p>
+       New: The class <code class="class">PointerMatrixAux</code> was
+       introduced for use with matrix classes lacking the adding
+       vector multiplication functions. It implements these by using
+       its own auxiliary vector.
+       <br>
+       (GK 2006/02/02)
+       </p>
 
   <li> <p>
        Improved: The <code class="class">FilteredMatrix</code> class
