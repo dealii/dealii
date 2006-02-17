@@ -730,8 +730,7 @@ long int ParameterHandler::get_integer (const std::string &entry_string) const
   char *endptr;
   long int i = std::strtol (s.c_str(), &endptr, 10);
 				   // assert there was no error
-  AssertThrow ((s.c_str()!='\0') || (*endptr == '\0'),
-	       ExcConversionError(s));
+  AssertThrow (*endptr == '\0', ExcConversionError(s));
 
   return i;
 }

@@ -247,6 +247,15 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p>Fixed: The <code class="member">ParameterHandler::get_integer</code>
+       had an erroneous check that the value given for a parameter really
+       represented an integer. This check always succeeded, even in face of an
+       error, and a zero value was returned every time the value in the
+       parameter file happened to be not an integer.
+       <br>
+       (WB 2006/02/17)
+       </p>
+
   <li> <p>Improved: The <code class="class">ComponentSelect</code> class can
        now also handle the case that one wants to select multiple vector
        components at once, not only a single one.
