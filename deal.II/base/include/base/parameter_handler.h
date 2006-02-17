@@ -826,7 +826,7 @@ namespace Patterns
  *		            ParameterHandler::RegularExpressions::Integer());
  *       ...
  *       prm.leave_subsection ();
- *     };
+ *     }
  *   @endcode
  *
  *   Subsections may be nested. For example a nonlinear solver may have a linear solver
@@ -840,7 +840,7 @@ namespace Patterns
  *		            ParameterHandler::RegularExpressions::Anything());
  *       eq.declare_parameters (prm);
  *       prm.leave_subsection ();
- *     };
+ *     }
  *   @endcode
  *
  *   For class member functions which declare the different entries we propose
@@ -863,7 +863,7 @@ namespace Patterns
  *       eq2.declare_parameters (prm);
  *       prm.leave_subsection ();
  *       prm.leave_subsection ();
- *     };	
+ *     }	
  *   @endcode
  *
  *
@@ -937,7 +937,7 @@ namespace Patterns
  *       std::string method = prm.get ("Nonlinear method");
  *       eq.get_parameters (prm);
  *       prm.leave_subsection ();
- *     };
+ *     }
  *   @endcode
  *   get() returns the value of the given entry. If the entry was not specified in the input
  *   source(s), the default value is returned. You have to enter and leave subsections
@@ -1032,7 +1032,7 @@ namespace Patterns
  *                          "20",
  *                          Patterns::Integer());
  *       prm.leave_subsection ();
- *     };
+ *     }
  *           
  *           
  *     void LinEq::get_parameters (ParameterHandler &prm) {
@@ -1041,7 +1041,7 @@ namespace Patterns
  *       MaxIterations = prm.get_integer ("Maximum number of iterations");
  *       prm.leave_subsection ();
  *       std::cout << "  LinEq: Method=" << Method << ", MaxIterations=" << MaxIterations << std::endl;
- *     };
+ *     }
  *           
  *           
  *           
@@ -1079,7 +1079,7 @@ namespace Patterns
  *                          Patterns::Selection("Full|Sparse|Diagonal"));
  *       LinEq::declare_parameters (prm);  // for eq2
  *       prm.leave_subsection ();
- *     };
+ *     }
  *           
  *           
  *     void Problem::get_parameters (ParameterHandler &prm) {
@@ -1106,7 +1106,7 @@ namespace Patterns
  *       std::cout << "  Problem: outfile=" << outfile << std::endl
  *            << "           eq1="     << equation1 << ", eq2=" << equation2 << std::endl
  *            << "           Matrix1=" << Matrix1 << ", Matrix2=" << Matrix2 << std::endl;
- *     };
+ *     }
  *          
  *           
  *           
@@ -1133,7 +1133,7 @@ namespace Patterns
  *                                        // now run the program with these
  *                                        // input parameters
  *       p.do_something ();
- *     };
+ *     }
  *   @endcode
  *
  *   
@@ -1815,39 +1815,37 @@ class ParameterHandler
  *     };
  *           
  *           
- *     HelperClass::HelperClass () : p(0) {};
+ *     HelperClass::HelperClass () : p(0) {}
  *           
  *           
  *     void HelperClass::create_new (unsigned int runNo) {
  *       if (p) delete p;
  *       p = new Problem;
- *     };
+ *     }
  *                    
  *           
  *     void HelperClass::declare_parameters (ParameterHandler &prm) {
  *           				   // entries of the problem class
  *             			   // note: must be static member!
  *       Problem::declare_parameters (prm);
- *     };
+ *     }
  *           
  *           
  *     void HelperClass::run (ParameterHandler &prm) {
  *       p->get_parameters (prm);
- *     };
+ *       p->do_useful_work ();
+ *     }
  *               
  *           
  *           
  *     void main () {
- *                                        // don't know why we have to write
- *     				   // "class" here, but it won't work
- *     				   // otherwise
  *       class MultipleParameterLoop prm;
  *       HelperClass h;
  *           
  *       h.declare_parameters (prm);
  *       prm.read_input ("prmtest.prm");
  *       prm.loop (h);
- *     };    
+ *     }    
  *   @endcode
  *         
  *   As can be seen, first a new helper class has to be set up. This must contain
@@ -1858,8 +1856,7 @@ class ParameterHandler
  *   multiple inheritance and derive a helper class from both the
  *   MultipleParameterLoop::UserClass and the problem class. In any case,
  *   <tt>create_new</tt> has to provide a clean problem object which is the problem in
- *   the second and third possibility. However, if possible, the second way should
- *   be chosen.
+ *   the second and third possibility.
  *
  *   The derived class also
  *   has to provide for member functions which declare the entries and which run
@@ -1875,10 +1872,10 @@ class ParameterHandler
  *       {
  *         UserObject.create_new (runNo);
  *
- *  set parameters for this run
+ *         // set parameters for this run
  *  
  *         UserObject.run (*this);
- *       };
+ *       }
  *   @endcode
  *   <tt>UserObject</tt> is the parameter to the <tt>loop</tt> function. <tt>create_new</tt> is given the number
  *   of the run (starting from one) to enable naming output files differently for each
