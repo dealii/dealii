@@ -77,7 +77,41 @@ namespace GridOutFlags
 	const bool write_measure = false,
 	const bool write_all_faces = true);  
   };			   
-    
+     
+				   /**
+				    * Flags describing the details of
+				    * output in MSH format.
+				    *
+				    * @ingroup output
+				    */
+  struct Msh 
+  {
+				       /**
+					* When writing a mesh, write boundary
+					* faces explicitly if their boundary
+					* indicator is not the default
+					* boundary indicator, which is zero.
+					* This is necessary if you later
+					* want to re-read the grid and want
+					* to get the same boundary indicators
+					* for the different parts of the
+					* boundary of the triangulation.
+					*
+					* It is not necessary if you only want
+					* to write the triangulation to
+					* view or print it.
+					*
+					* Default: @p false.
+					*/
+      bool write_faces;
+      
+				       /**
+					* Constructor.
+					*/
+      Msh (const bool write_faces    = false);
+  };
+  
+ 
 				   /**
 				    * Flags describing the details of
 				    * output in UCD format.
@@ -582,7 +616,7 @@ namespace GridOutFlags
  *
  * @ingroup grid
  * @ingroup output
- * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2003; postscript format based on an implementation by Stefan Nauber, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, Luca Heltai, 1999, 2003, 2006; postscript format based on an implementation by Stefan Nauber, 1999
  */
 class GridOut 
 {
@@ -608,7 +642,9 @@ class GridOut
 					   /// write() calls write_ucd()
 	  ucd,
 					   /// write() calls write_xfig()
-	  xfig
+	  xfig,	    
+					   /// write() calls write_msh()
+	  msh
     };
     
 				     /**
@@ -703,6 +739,44 @@ class GridOut
 			std::ostream           &out,
 			const Mapping<1>       *mapping=0);
     
+				     /**
+				      * Write the triangulation in the
+				      * msh format.
+				      *
+				      * Msh 
+				      * is the format used by Gmsh and it is
+				      * described in the gmsh
+				      * user's guide. Besides the
+				      * usual output of the grid
+				      * only, you can decide through
+				      * additional flags (see below,
+				      * and the documentation of the
+				      * GridOutFlags::Msh() class)
+				      * whether boundary faces with
+				      * non-zero boundary indicator
+				      * shall be written to the file
+				      * explicitly. This is useful,
+				      * if you want to re-read the
+				      * grid later on, since
+				      * <tt>deal.II</tt> sets the boundary
+				      * indicator to zero by default;
+				      * therefore, to obtain the
+				      * same triangulation as before,
+				      * you have to specify faces
+				      * with differing boundary
+				      * indicators explicitly, which
+				      * is done by this flag.
+				      *
+				      * Names and values of further
+				      * flags controlling the output
+				      * can be found in the
+				      * documentation of the
+				      * GridOut::Msh() class.
+				      */
+    template <int dim>
+    void write_msh (const Triangulation<dim> &tria,
+		    std::ostream             &out);
+
 				     /**
 				      * Write the triangulation in the
 				      * ucd format.
@@ -859,6 +933,11 @@ class GridOut
     void set_flags (const GridOutFlags::DX &flags);
 
 				     /**
+				      * Set flags for GMSH output
+				      */
+    void set_flags (const GridOutFlags::Msh &flags);
+
+				     /**
 				      * Set flags for UCD output
 				      */
     void set_flags (const GridOutFlags::Ucd &flags);
@@ -961,6 +1040,13 @@ class GridOut
     GridOutFlags::DX dx_flags;
   
 				     /**
+				      * Flags for GMSH output. Can be
+				      * changed by using the
+				      * @p set_flags function.
+				      */
+    GridOutFlags::Msh     msh_flags;
+  
+				     /**
 				      * Flags for UCD output. Can be
 				      * changed by using the
 				      * @p set_flags function.
@@ -1002,7 +1088,45 @@ class GridOut
 				      * Flags used for XFig output.
 				      */
     GridOutFlags::XFig xfig_flags;
-    
+     
+				     /**
+				      * Write the grid information about
+				      * faces to @p out. Only those faces
+				      * are printed which are on the boundary
+				      * and which have a boundary indicator
+				      * not equal to zero, since the latter
+				      * is the default for boundary faces.
+				      *
+				      * Since cells and faces are continuously
+				      * numbered, the @p starting_index for
+				      * the numbering of the faces is passed
+				      * also.
+				      *
+				      * This function unfortunately can not
+				      * be included in the regular @p write_msh
+				      * function, since it needs special
+				      * treatment for the case <tt>dim==1</tt>, in
+				      * which case the face iterators are
+				      * <tt>void*</tt>'s and lack the member functions
+				      * which are called. We would not actually
+				      * call these functions, but the compiler
+				      * would complain anyway when compiling
+				      * the function for <tt>dim==1</tt>. Bad luck.
+				      */
+    template <int dim>
+    void write_msh_faces (const Triangulation<dim> &tria,
+			  const unsigned int        starting_index,
+			  std::ostream             &out) const;
+
+				     /**
+				      * Declaration of the specialization
+				      * of above function for 1d. Does
+				      * nothing.
+				      */
+    void write_msh_faces (const Triangulation<1> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+   
 				     /**
 				      * Write the grid information about
 				      * faces to @p out. Only those faces

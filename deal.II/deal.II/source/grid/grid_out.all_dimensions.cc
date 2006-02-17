@@ -31,6 +31,11 @@ namespace GridOutFlags
 
   
   
+  Msh::Msh (const bool write_faces) :
+		  write_faces (write_faces)
+  {}
+  
+
   Ucd::Ucd (const bool write_preamble,
 	    const bool write_faces) :
 		  write_preamble (write_preamble),
@@ -138,6 +143,12 @@ void GridOut::set_flags (const GridOutFlags::DX &flags)
 
 
 
+void GridOut::set_flags (const GridOutFlags::Msh &flags) 
+{
+  msh_flags = flags;
+}
+
+
 void GridOut::set_flags (const GridOutFlags::Ucd &flags) 
 {
   ucd_flags = flags;
@@ -197,6 +208,8 @@ GridOut::default_suffix (const OutputFormat output_format)
 	return ".eps";
       case xfig:
 	return ".fig";
+      case msh:
+	return ".msh";
       default: 
 	    Assert (false, ExcNotImplemented()); 
 	    return "";
@@ -226,6 +239,9 @@ GridOut::parse_output_format (const std::string &format_name)
   if (format_name == "xfig")
     return xfig;
   
+  if (format_name == "msh")
+    return msh;
+  
   AssertThrow (false, ExcInvalidState ());
 				   // return something weird
   return OutputFormat(-1);
@@ -235,7 +251,7 @@ GridOut::parse_output_format (const std::string &format_name)
 
 std::string GridOut::get_output_format_names () 
 {
-  return "none|dx|gnuplot|eps|ucd|xfig";
+  return "none|dx|gnuplot|eps|ucd|xfig|msh";
 }
 
 

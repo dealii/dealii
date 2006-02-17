@@ -30,7 +30,7 @@ class SubCellData;
 /**
  * This class implements an input mechanism for grid data. It allows
  * to read a grid structure into a triangulation object. At present,
- * only UCD (unstructured cell data) and DB Mesh is supported as input
+ * UCD (unstructured cell data), DB Mesh and Gmsh are supported as input
  * format for grid data. Any numerical data after the block of
  * topological information is ignored.
  *

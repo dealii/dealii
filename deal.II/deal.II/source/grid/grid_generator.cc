@@ -1394,7 +1394,7 @@ GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
     {
 	for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
 	{
-	    if (cell->face(i)->boundary_indicator() == 255)
+	    if (!cell->at_boundary(i))
 		continue;
 
 	    // If the center is on the plane x=0, this is a planar
@@ -1408,7 +1408,7 @@ GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
 	// With this loop we restore back the indicator of the outer lines
 	for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
 	{
-	    if (cell->face(i)->boundary_indicator() == 255)
+	    if (!cell->at_boundary(i))
 		continue;
 
 	    // If the center is not on the plane x=0, this is a curvilinear
