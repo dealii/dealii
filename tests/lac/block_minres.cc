@@ -81,4 +81,6 @@ int main()
   SolverMinRes<BlockVector<double> > minres (solver_control);
 
   minres.solve (block_A, b, a, PreconditionIdentity());
+
+  deallog << "OK" << std::endl;
 }
