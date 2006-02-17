@@ -1104,13 +1104,13 @@ MAX_DOT_GRAPH_HEIGHT   = 1024
 # not sufficient to fit the graph (see MAX_DOT_GRAPH_WIDTH and MAX_DOT_GRAPH_HEIGHT). 
 # If 0 is used for the depth value (the default), the graph is not depth-constrained.
 
-MAX_DOT_GRAPH_DEPTH    = 0
+MAX_DOT_GRAPH_DEPTH    = 2
 
 # If the GENERATE_LEGEND tag is set to YES (the default) Doxygen will 
 # generate a legend page explaining the meaning of the various boxes and 
 # arrows in the dot generated graphs.
 
-GENERATE_LEGEND        = NO
+GENERATE_LEGEND        = YES
 
 # If the DOT_CLEANUP tag is set to YES (the default) Doxygen will 
 # remove the intermediate dot files that are used to generate 
