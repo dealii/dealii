@@ -1052,8 +1052,13 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::dof_index (const unsigned int i) const
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
       ->dof_line_index_offset[this->present_index];
-  return this->dof_handler->levels[this->present_level]
-    ->line_dofs[offset+i];
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->line_dofs.size(),
+          ExcInternalError());
+  
+  return this->dof_handler->levels[this->present_level]->line_dofs[offset+i];
 }
 
 
@@ -1082,8 +1087,13 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::dof_index (const unsigned int i) const
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
       ->dof_line_index_offset[this->present_index];
-  return this->dof_handler->levels[this->present_level]
-    ->line_dofs[offset+i];
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->line_dofs.size(),
+          ExcInternalError());
+
+  return this->dof_handler->levels[this->present_level]->line_dofs[offset+i];
 }
 
 
@@ -1112,8 +1122,13 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::dof_index (const unsigned int i) const
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
       ->dof_line_index_offset[this->present_index];
-  return this->dof_handler->levels[this->present_level]
-    ->line_dofs[offset+i];
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->line_dofs.size(),
+          ExcInternalError());
+
+  return this->dof_handler->levels[this->present_level]->line_dofs[offset+i];
 }
 
 
@@ -1137,8 +1152,13 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_index (const unsigned int i,
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_line_index_offset[this->present_index];
-  this->dof_handler->levels[this->present_level]
-    ->line_dofs[offset+i] = index;
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->line_dofs.size(),
+          ExcInternalError());
+
+  this->dof_handler->levels[this->present_level]->line_dofs[offset+i] = index;
 }
 
 
@@ -1165,8 +1185,13 @@ DoFObjectAccessor<1, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_line_index_offset[this->present_index];
-  this->dof_handler->levels[this->present_level]
-    ->line_dofs[offset+i] = index;
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->line_dofs.size(),
+          ExcInternalError());
+
+  this->dof_handler->levels[this->present_level]->line_dofs[offset+i] = index;
 }
 
 
@@ -1189,8 +1214,13 @@ DoFObjectAccessor<1, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_line_index_offset[this->present_index];
-  this->dof_handler->levels[this->present_level]
-    ->line_dofs[offset+i] = index;
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->line_dofs.size(),
+          ExcInternalError());
+
+  this->dof_handler->levels[this->present_level]->line_dofs[offset+i] = index;
 }
 
 
@@ -1203,6 +1233,9 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::get_fe () const
 {
   return (*dof_handler->finite_elements)[active_fe_index ()];
 }
+
+
+
 template <>
 inline
 const FiniteElement<2> &
@@ -1210,6 +1243,9 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::get_fe () const
 {
   return (*dof_handler->finite_elements)[active_fe_index ()];
 }
+
+
+
 template <>
 inline
 const FiniteElement<3> &
@@ -1217,6 +1253,7 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::get_fe () const
 {
   return (*dof_handler->finite_elements)[active_fe_index ()];
 }
+
 
 
 template <>
@@ -1231,6 +1268,9 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::active_fe_index () const
   return dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index];
 }
+
+
+
 template <>
 inline
 unsigned int
@@ -1243,6 +1283,9 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::active_fe_index () const
   return dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index];
 }
+
+
+
 template <>
 inline
 unsigned int
@@ -1255,6 +1298,7 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::active_fe_index () const
   return dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index];
 }
+
 
 
 template <>
@@ -1272,6 +1316,9 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::set_active_fe_index (const unsigned int
   dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
+
+
+
 template <>
 inline
 void
@@ -1287,6 +1334,9 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int
   dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
+
+
+
 template <>
 inline
 void
@@ -1323,9 +1373,16 @@ unsigned int DoFObjectAccessor<2,hp::DoFHandler<2> >::dof_index (const unsigned 
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
       ->dof_quad_index_offset[this->present_index];
-  return this->dof_handler->levels[this->present_level]
-    ->quad_dofs[offset+i];
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->quad_dofs.size(),
+          ExcInternalError());
+
+  return this->dof_handler->levels[this->present_level]->quad_dofs[offset+i];
 }
+
+
 
 template <>
 inline
@@ -1344,9 +1401,15 @@ unsigned int DoFObjectAccessor<2,hp::DoFHandler<3> >::dof_index (const unsigned 
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
       ->dof_quad_index_offset[this->present_index];
-  return this->dof_handler->levels[this->present_level]
-    ->quad_dofs[offset+i];
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->quad_dofs.size(),
+          ExcInternalError());
+
+  return this->dof_handler->levels[this->present_level]->quad_dofs[offset+i];
 }
+
 
 
 template <>
@@ -1368,9 +1431,15 @@ DoFObjectAccessor<2, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_quad_index_offset[this->present_index];
-  this->dof_handler->levels[this->present_level]
-    ->quad_dofs[offset+i] = index;
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->quad_dofs.size(),
+          ExcInternalError());
+
+  this->dof_handler->levels[this->present_level]->quad_dofs[offset+i] = index;
 }
+
 
 
 template <>
@@ -1392,8 +1461,13 @@ DoFObjectAccessor<2, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_quad_index_offset[this->present_index];
-  this->dof_handler->levels[this->present_level]
-    ->quad_dofs[offset+i] = index;
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->quad_dofs.size(),
+          ExcInternalError());
+
+  this->dof_handler->levels[this->present_level]->quad_dofs[offset+i] = index;
 }
 
 
@@ -1502,8 +1576,13 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::dof_index (const unsigned int i) const
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
       ->dof_hex_index_offset[this->present_index];
-  return this->dof_handler->levels[this->present_level]
-    ->hex_dofs[offset+i];
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->hex_dofs.size(),
+          ExcInternalError());
+
+  return this->dof_handler->levels[this->present_level]->hex_dofs[offset+i];
 }
 
 
@@ -1526,8 +1605,13 @@ DoFObjectAccessor<3, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_hex_index_offset[this->present_index];
-  this->dof_handler->levels[this->present_level]
-    ->hex_dofs[offset+i] = index;
+  Assert (offset != this->dof_handler->invalid_dof_index,
+          ExcInternalError());
+  Assert (offset+i <
+          this->dof_handler->levels[this->present_level]->hex_dofs.size(),
+          ExcInternalError());
+
+  this->dof_handler->levels[this->present_level]->hex_dofs[offset+i] = index;
 }
 
 
