@@ -68,8 +68,9 @@ namespace hp
 
 
   template <int dim>
-  unsigned int QCollection<dim>::
-  add_quadrature (const Quadrature<dim> &new_quadrature)
+  unsigned int
+  QCollection<dim>::
+  push_back (const Quadrature<dim> &new_quadrature)
   {
                                      // A QCollection, which was initialized
                                      // as single QCollection cannot

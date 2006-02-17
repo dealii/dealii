@@ -46,10 +46,11 @@
  * hp::MappingCollection class allows to do this.
  *
  * All of these three classes, the hp::FECollection, hp::QCollection,
- * and hp::MappingCollection classes, implement a similar
- * interface. They have functions <code>add_*()</code> to add a finite
- * element, quadrature formula, or mapping to the collection. They
- * have an <code>operator[] (unsigned int)</code> function that allows to
+ * and hp::MappingCollection classes, implement an interface very
+ * similar to that of <code>std::vector</code>. They have functions
+ * <code>push_back()</code> to add a finite element, quadrature
+ * formula, or mapping to the collection. They have an
+ * <code>operator[] (unsigned int)</code> function that allows to
  * retrieve a reference to a given element of the collection. And they
  * have a <code>size()</code> function that returns the number of
  * elements in the collection. Some of the classes, in particular that
@@ -63,7 +64,7 @@
  * @verbatim
  *   FECollection<dim> fe_collection;
  *   for (unsigned int degree=1; degree<5; ++degree)
- *     fe_collection.add_fe (FE_Q<dim>(degree));
+ *     fe_collection.push_back (FE_Q<dim>(degree));
  * @endverbatim
  * 
  * This way, one can add elements of polynomial degree 1 through 4 to the

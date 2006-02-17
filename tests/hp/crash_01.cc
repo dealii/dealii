@@ -41,7 +41,7 @@ int main ()
     GridGenerator::hyper_cube(tria);
 
     hp::FECollection<dim> fe_collection;
-    fe_collection.add_fe (FE_DGQ<dim> (1));
+    fe_collection.push_back (FE_DGQ<dim> (1));
 
     hp::DoFHandler<dim> dof_handler(tria);
     dof_handler.distribute_dofs(fe_collection);
@@ -53,7 +53,7 @@ int main ()
     GridGenerator::hyper_cube(tria);
 
     hp::FECollection<dim> fe_collection;
-    fe_collection.add_fe (FE_DGQ<dim> (1));
+    fe_collection.push_back (FE_DGQ<dim> (1));
 
     hp::DoFHandler<dim> dof_handler(tria);
     dof_handler.distribute_dofs(fe_collection);

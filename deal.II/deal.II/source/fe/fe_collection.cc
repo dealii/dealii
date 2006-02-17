@@ -18,7 +18,7 @@
 namespace hp
 {
   template <int dim>
-  unsigned int FECollection<dim>::add_fe (const FiniteElement<dim> &new_fe)
+  unsigned int FECollection<dim>::push_back (const FiniteElement<dim> &new_fe)
   {
                                      // check that the new element has the right
                                      // number of components. only check with

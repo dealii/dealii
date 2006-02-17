@@ -669,13 +669,13 @@ DGMethod<dim>::DGMethod ()
     unsigned int elm_no;
     for (unsigned int i = 0; i < hp_degree; ++i)
     {
-	elm_no = fe_collection.add_fe (FE_DGQ<dim> (i));
-	quadratures.add_quadrature (QGauss<dim> (i+2));
-	face_quadratures.add_quadrature (QGauss<dim-1> (i+2));
+	elm_no = fe_collection.push_back (FE_DGQ<dim> (i));
+	quadratures.push_back (QGauss<dim> (i+2));
+	face_quadratures.push_back (QGauss<dim-1> (i+2));
     }
 
     static const MappingQ1<dim> mapping;
-    mapping_collection.add_mapping (mapping);
+    mapping_collection.push_back (mapping);
 }
 
 

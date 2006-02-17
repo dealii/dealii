@@ -61,7 +61,7 @@ namespace hp
                                         * already in the collection.
                                         */
       unsigned int
-      add_fe (const FiniteElement<dim> &new_fe);
+      push_back (const FiniteElement<dim> &new_fe);
 
                                        /**
                                         * Get a reference to the given element

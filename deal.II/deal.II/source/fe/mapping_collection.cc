@@ -26,7 +26,8 @@ namespace hp
 
 
   template <int dim>
-  MappingCollection<dim>::MappingCollection (const Mapping<dim> &mapping) :
+  MappingCollection<dim>::MappingCollection (const Mapping<dim> &mapping)
+                  :
                   single_mapping (true)
   {
     mappings
@@ -60,8 +61,8 @@ namespace hp
 
 
   template <int dim>
-  unsigned int MappingCollection<dim>::
-  add_mapping (const Mapping<dim> &new_mapping)
+  unsigned int
+  MappingCollection<dim>::push_back (const Mapping<dim> &new_mapping)
   {
                                      // A MappingCollection, which was
                                      // initialized as single
