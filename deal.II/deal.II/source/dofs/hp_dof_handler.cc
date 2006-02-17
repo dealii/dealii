@@ -1966,192 +1966,92 @@ namespace hp
   template <>
   void DoFHandler<2>::reserve_space ()
   {
-//TODO: This presently works only on the first FE of the FECollection. Fix this
     Assert (finite_elements != 0, ExcNoFESelected());
+    Assert (finite_elements->size() > 0, ExcNoFESelected());
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
     Assert (tria->n_levels() == levels.size (), ExcInternalError ());
-  
-                                     // Backup the active_fe_indices vectors.
-                                     // The user might have put something
-                                     // important in them.
-    std::vector<std::vector<unsigned int> > active_fe_backup(levels.size ());
-    for (unsigned int i = 0; i < levels.size (); ++i)
-      std::swap (levels[i]->active_fe_indices, active_fe_backup[i]);
 
-                                     // delete all levels and set them up
-                                     // newly, since vectors are
-                                     // troublesome if you want to change
-                                     // their size
-    clear_space ();
-  
-    vertex_dofs.resize(tria->n_vertices()*(*finite_elements)[0].dofs_per_vertex,
-                       invalid_dof_index);
+    Assert (finite_elements->max_dofs_per_face() == 0,
+            ExcMessage ("hp finite elements are presently only supported "
+                        "for discontinuous elements"));
 
-//TODO[?] Does not work for continuous FEs. Problem is at faces, which might have a different
-// number of DoFs due to the different active_fe_index of the adjacent cells.
-    for (unsigned int i=0; i<tria->n_levels(); ++i) 
+                                     // Release all space except the
+                                     // active_fe_indices field which
+                                     // we have to backup before
+    {
+      std::vector<std::vector<unsigned int> > active_fe_backup(levels.size ());
+      for (unsigned int level = 0; level<levels.size (); ++level)
+        std::swap (levels[level]->active_fe_indices, active_fe_backup[level]);
+
+                                       // delete all levels and set them up
+                                       // newly, since vectors are
+                                       // troublesome if you want to change
+                                       // their size
+      clear_space ();
+  
+      for (unsigned int level=0; level<tria->n_levels(); ++level) 
+        {
+          levels.push_back (new internal::hp::DoFLevel<2>);
+          std::swap (active_fe_backup[level], levels[level]->active_fe_indices);
+        }
+    }
+
+                                     // count how much space we need
+                                     // on each level and set the
+                                     // dof_*_index_offset
+                                     // data. initially set the latter
+                                     // to an invalid index, and only
+                                     // later set it to something
+                                     // reasonable for active cells
+    for (unsigned int level=0; level<tria->n_levels(); ++level) 
       {
-        levels.push_back (new internal::hp::DoFLevel<2>);
-        std::swap (active_fe_backup[i], levels.back()->active_fe_indices);
+        levels[level]->dof_quad_index_offset
+          = std::vector<unsigned int> (tria->n_raw_quads(level),
+                                       invalid_dof_index);
 
-        levels.back()->dof_line_index_offset
-	  = std::vector<unsigned int> (tria->n_raw_lines(i),
-				       invalid_dof_index);
-        levels.back()->dof_quad_index_offset
-	  = std::vector<unsigned int> (tria->n_raw_quads(i),
-				       invalid_dof_index);
-
-                                         // Create table of active_fe_levels of cells
-                                         // adjacent to the lines.
-        std::vector<unsigned int> line_active_fe_indices
-	  (tria->n_raw_lines(i) * 2, 
-	   invalid_dof_index);
-
-        for (unsigned int j = 0; j < tria->n_raw_quads(i); ++j)
+//TODO: do the same for line dofs        
+        unsigned int next_free_quad_dof = 0;
+        for (active_cell_iterator cell=begin_active(level);
+             cell!=end_active(level); ++cell)
+          if (!cell->has_children())
           {
-            const unsigned int cell_fe_index
-	      = levels.back ()->active_fe_indices[j];
-
-                                             // Referring to the following diagram from
-                                             // documentation of the triangulation class,
-                                             // it can be seen where the indices in the
-                                             // following lines of code come from.
-                                             //          2
-                                             //      3--->---2
-                                             //      |       |
-                                             //     3^       ^1
-                                             //      |       |
-                                             //      0--->---1
-                                             //          0
-                                             // Face 0 and 1 have the cell to the left,
-                                             // while Face 2 and 3 have the cell to
-                                             // the right (if the line points upward).
-            line_active_fe_indices[tria->levels[i]->
-                                   quads.quads[j].line(0) * 2] = cell_fe_index;
-            line_active_fe_indices[tria->levels[i]->
-                                   quads.quads[j].line(1) * 2] = cell_fe_index;
-            line_active_fe_indices[tria->levels[i]->
-                                   quads.quads[j].line(2) * 2 + 1] = cell_fe_index;
-            line_active_fe_indices[tria->levels[i]->
-                                   quads.quads[j].line(3) * 2 + 1] = cell_fe_index;
+            levels[level]->dof_quad_index_offset[cell->index()] = next_free_quad_dof;
+            next_free_quad_dof +=
+              (*finite_elements)[cell->active_fe_index()].dofs_per_quad;
           }
 
-        unsigned int dofs_for_lines = 0;
-        for (unsigned int j = 0; j < tria->n_raw_lines(i); ++j)
-          {
-            levels.back()->dof_line_index_offset[j] = dofs_for_lines;
-
-// The "line_dofs" field in the hpDoFLevel class for 2D gets a
-// slightly different meaning in 2D. Actually in 2D one line can have
-// two different active_fe_indices. Therefore it is not sufficient to
-// reserve some space for the DoFs on one active_fe_index. Instead
-// the DoF indices for both active_fe_indices will be stored in the
-// "line_dofs" field. To differentiate between these field later,
-// a simple linked list based will be maintained to allow access to
-// the correct DoFs:
-// 0: active_fe_index of line, to which the following DoFs belong.
-// 1: index of next active_fe_index for this line. Value: (x + 1)
-// 2-x: DoFs (will be filled out by distribute_dofs_on_cell
-// x+1: active_fe_index of line, to which the following DoFs belong.
-// x+2: index to next active_fe_index for this line. Value: (y + 1)
-// ...
-// In 3D, the same datastructure is used but can have up to 4 different
-// active_fe_indices on one line.
-            unsigned int active_fe1 = line_active_fe_indices[j*2],
-                         active_fe2 = line_active_fe_indices[j*2+1];
-
-                                             // Check for boundary lines, where clearly one of the line indices
-                                             // is missing.
-            if (active_fe1 == invalid_dof_index)
-	      active_fe1 = active_fe2;
-            if (active_fe2 == invalid_dof_index)
-	      active_fe2 = active_fe1;
-
-					     // at this point, all
-					     // indices should be ok
-					     // (but weren't at one
-					     // point, thus the
-					     // crash_01 testcase)
-	    Assert (active_fe1 < finite_elements->size(),
-		    ExcInternalError());
-	    Assert (active_fe2 < finite_elements->size(),
-		    ExcInternalError());
-	    
-            if (active_fe1 == active_fe2)
-	      dofs_for_lines += (*finite_elements)[active_fe1].dofs_per_line + 2;
-            else
-	      dofs_for_lines += (*finite_elements)[active_fe1].dofs_per_line +
-                                (*finite_elements)[active_fe2].dofs_per_line + 4;
-          }
-
-        unsigned int dofs_for_quads = 0;
-        for (unsigned int j = 0; j < tria->n_raw_quads(i); ++j)
-          {
-            levels.back()->dof_quad_index_offset[j] = dofs_for_quads;
-            dofs_for_quads += (*finite_elements)[
-	      levels.back ()->active_fe_indices[j]].dofs_per_quad;
-          }
-
-        levels.back()->line_dofs = std::vector<unsigned int> (dofs_for_lines,
+        levels[level]->quad_dofs = std::vector<unsigned int> (next_free_quad_dof,
                                                               invalid_dof_index);
-        levels.back()->quad_dofs = std::vector<unsigned int> (dofs_for_quads,
-                                                              invalid_dof_index);
+      }
 
-                                         // As we already have the
-                                         // active_fe_indices for the
-                                         // lines, it is probably a
-                                         // good idea to directly use
-                                         // those to create the linked
-                                         // list structure within the
-                                         // line_dofs field.
-        for (unsigned int j = 0; j < tria->n_raw_lines(i); ++j)
-          {
-            dofs_for_lines = levels.back()->dof_line_index_offset[j];
 
-            levels.back()->dof_line_index_offset[j] = dofs_for_lines;
-            unsigned int active_fe1 = line_active_fe_indices[j*2],
-                         active_fe2 = line_active_fe_indices[j*2+1];
-
-                                             // Check for boundary
-                                             // lines, where clearly
-                                             // one of the line
-                                             // indices is missing.
-            if (active_fe1 == invalid_dof_index)
-	      active_fe1 = active_fe2;
-            if (active_fe2 == invalid_dof_index)
-	      active_fe2 = active_fe1;
-
-					     // at this point, all
-					     // indices should be ok
-					     // (but weren't at one
-					     // point, thus the
-					     // crash_01 testcase)
-	    Assert (active_fe1 < finite_elements->size(),
-		    ExcInternalError());
-	    Assert (active_fe2 < finite_elements->size(),
-		    ExcInternalError());
-
-                                             // Now create prepare
-                                             // linked list, with
-                                             // either 1 or two
-                                             // entries.
-            levels.back()->line_dofs[dofs_for_lines] = active_fe1;
-            if (active_fe1 == active_fe2)
-	      levels.back()->line_dofs[dofs_for_lines + 1] = 
-                invalid_dof_index;
-            else
-              {
-                const unsigned int start_next_fe =
-		  dofs_for_lines + (*finite_elements)[active_fe1].dofs_per_line + 2;
-
-                levels.back()->line_dofs[dofs_for_lines + 1] = start_next_fe;
-
-                levels.back()->line_dofs[start_next_fe] = active_fe2;
-                levels.back()->line_dofs[start_next_fe + 1] = 
-		  invalid_dof_index;
-              }
-          }
-      };
+                                     // safety check: make sure that
+                                     // the number of DoFs we
+                                     // allocated is actually correct
+                                     // (above we have also set the
+                                     // dof_*_index_offset field, so
+                                     // we couldn't use this simpler
+                                     // algorithm)
+#ifdef DEBUG
+    for (unsigned int level=0; level<tria->n_levels(); ++level)
+      {
+        unsigned int n_quad_dofs = 0;
+        for (cell_iterator cell=begin_active(level);
+             cell!=end_active(level); ++cell)
+          if (!cell->has_children())
+            n_quad_dofs +=
+              (*finite_elements)[cell->active_fe_index()].dofs_per_quad;
+        
+        Assert (levels[level]->quad_dofs.size() == n_quad_dofs, ExcInternalError());
+        Assert (static_cast<unsigned int>
+                (std::count (levels[level]->dof_quad_index_offset.begin(),
+                             levels[level]->dof_quad_index_offset.end(),
+                             invalid_dof_index))
+                ==
+                tria->n_raw_quads(level) - tria->n_active_quads(level),
+                ExcInternalError());
+      }
+#endif
   }
 
 #endif
