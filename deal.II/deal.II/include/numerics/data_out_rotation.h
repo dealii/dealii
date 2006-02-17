@@ -198,13 +198,13 @@ class DataOutRotation : public DataOut_DoFData<dim,DH,dim+1>
 				      * used, the function is called
 				      * once and generates all patches.
 				      */
-    void build_some_patches (Data data);
+    void build_some_patches (Data &data);
 };
 
 
 /* -------------- declaration of explicit specializations ------------- */
 
-template <> void DataOutRotation<3,DoFHandler>::build_some_patches (Data);
+template <> void DataOutRotation<3,DoFHandler>::build_some_patches (Data &);
 
 
 #endif

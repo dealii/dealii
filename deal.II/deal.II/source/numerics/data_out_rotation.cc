@@ -33,7 +33,7 @@
 //TODO: Unify code for dimensions
 
 template <int dim, template <int> class DH>
-void DataOutRotation<dim,DH>::build_some_patches (Data data)
+void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 {
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, data.n_subdivisions);
@@ -292,7 +292,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data data)
 #if deal_II_dimension == 3
 
 template <>
-void DataOutRotation<3,DoFHandler>::build_some_patches (Data)
+void DataOutRotation<3,DoFHandler>::build_some_patches (Data &)
 {
 				   // would this function make any
 				   // sense after all? who would want
@@ -381,7 +381,7 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
 
   if (DEAL_II_USE_MT)
     {
-      void (DataOutRotation<dim,DH>::*p) (Data)
+      void (DataOutRotation<dim,DH>::*p) (Data &)
         = &DataOutRotation<dim,DH>::build_some_patches;
 
       Threads::ThreadGroup<> threads;

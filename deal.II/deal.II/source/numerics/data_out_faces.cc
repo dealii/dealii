@@ -30,7 +30,7 @@
 
 
 template <int dim, template <int> class DH>
-void DataOutFaces<dim,DH>::build_some_patches (Data data)
+void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 {
   QTrapez<1>        q_trapez;
   QIterated<dim-1>  patch_points (q_trapez, data.n_subdivisions);
