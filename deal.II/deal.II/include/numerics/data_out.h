@@ -1014,7 +1014,7 @@ class DataOut : public DataOut_DoFData<dim,DH,dim>
 				      * used, the function is called
 				      * once and generates all patches.
 				      */
-    void build_some_patches (Data data);
+    void build_some_patches (Data &data);
 };
 
 

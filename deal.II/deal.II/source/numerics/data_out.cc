@@ -383,7 +383,7 @@ DataOut_DoFData<dof_handler_dim,DH,patch_dim,patch_space_dim>::memory_consumptio
 
 
 template <int dim, template <int> class DH>
-void DataOut<dim,DH>::build_some_patches (Data data)
+void DataOut<dim,DH>::build_some_patches (Data &data)
 {
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, data.n_subdivisions);
