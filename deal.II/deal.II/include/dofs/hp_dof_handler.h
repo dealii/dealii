@@ -949,24 +949,32 @@ namespace hp
 
 
                                        /**
-                                        *  Create default tables for the
-                                        *  active_fe_indices in the
-                                        *  internal::hp::DoFLevels. They are
-                                        *  initialized with the base fe.
-                                        *  This method is called before
-                                        *  refinement and before distribute_dofs
-                                        *  is called. It ensures each cell has
-                                        *  a valid active_fe_index.
+                                        *  Create default tables for
+                                        *  the active_fe_indices in
+                                        *  the
+                                        *  internal::hp::DoFLevels. They
+                                        *  are initialized with the a
+                                        *  zero indicator, meaning
+                                        *  that fe[0] is going to be
+                                        *  used by default.  This
+                                        *  method is called before
+                                        *  refinement and before
+                                        *  distribute_dofs is
+                                        *  called. It ensures each
+                                        *  cell has a valid
+                                        *  active_fe_index.
                                         */
 
       void create_active_fe_table ();
 
                                        /**
-                                        *  Methods of the RefinementListener
-                                        *  coming from the Triangulation.
-                                        *  Here they are used to administrate the
-                                        *  the active_fe_fields during the spatial
-                                        *  refinement.
+                                        *  Methods of the
+                                        *  RefinementListener coming
+                                        *  from the Triangulation.
+                                        *  Here they are used to
+                                        *  administrate the the
+                                        *  active_fe_fields during the
+                                        *  spatial refinement.
                                         */
 
       virtual void pre_refinement_notification (const Triangulation<dim> &tria);
@@ -974,31 +982,35 @@ namespace hp
 
 
                                        /**
-                                        * Space to store the DoF numbers for the
-                                        * different levels. Analogous to the
-                                        * <tt>levels[]</tt> tree of the Triangulation
-                                        * objects.
+                                        * Space to store the DoF
+                                        * numbers for the different
+                                        * levels. Analogous to the
+                                        * <tt>levels[]</tt> tree of
+                                        * the Triangulation objects.
                                         */
       std::vector<internal::hp::DoFLevel<dim>*>    levels;
 
                                        /**
-                                        * Store the number of dofs created last
-                                        * time.
+                                        * Store the number of dofs
+                                        * created last time.
                                         */
       unsigned int              used_dofs;
 
                                        /**
-                                        * Array to store the indices for degrees
-                                        * of freedom located at vertices.
+                                        * Array to store the indices
+                                        * for degrees of freedom
+                                        * located at vertices.
                                         */
       std::vector<unsigned int>      vertex_dofs;
 
                                        /**
-                                        * Array to store the information, if a
-                                        * cell on some level has children or
-                                        * not. It is used by the refinement
-                                        * listeners as a persistent buffer during
-                                        * the refinement.
+                                        * Array to store the
+                                        * information, if a cell on
+                                        * some level has children or
+                                        * not. It is used by the
+                                        * refinement listeners as a
+                                        * persistent buffer during the
+                                        * refinement.
                                         */
       std::vector<std::vector<bool> *> has_children;
 				      
