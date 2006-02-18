@@ -2255,7 +2255,7 @@ namespace hp
     Assert (has_children.size () == 0, ExcInternalError ());
     for (unsigned int i=0; i<levels.size(); ++i)
       {
-	const unsigned int lines_on_level = tria.levels[i]->lines.lines.size ();
+	const unsigned int lines_on_level = tria.n_raw_lines(i);
 	std::vector<bool> *has_children_level =
           new std::vector<bool> (lines_on_level);
 
@@ -2284,15 +2284,15 @@ namespace hp
     Assert (has_children.size () == 0, ExcInternalError ());
     for (unsigned int i=0; i<levels.size(); ++i)
       {
-	const unsigned int quads_on_level = tria.levels[i]->quads.quads.size ();
+	const unsigned int quads_on_level = tria.n_raw_quads (i);
 	std::vector<bool> *has_children_level =
           new std::vector<bool> (quads_on_level);
 
                                          // Check for each cell, if it has children.
-	transform (tria.levels[i]->quads.children.begin (),
-		   tria.levels[i]->quads.children.end (),
-		   has_children_level->begin (),
-		   std::bind2nd (std::not_equal_to<int>(), -1));
+	std::transform (tria.levels[i]->quads.children.begin (),
+                        tria.levels[i]->quads.children.end (),
+                        has_children_level->begin (),
+                        std::bind2nd (std::not_equal_to<int>(), -1));
 
 	has_children.push_back (has_children_level);
       }
@@ -2312,11 +2312,12 @@ namespace hp
     Assert (has_children.size () == 0, ExcInternalError ());
     for (unsigned int i=0; i<levels.size(); ++i)
       {
-	const unsigned int hexes_on_level = tria.levels[i]->hexes.hexes.size ();
+	const unsigned int hexes_on_level = tria.n_raw_hexs(i);
 	std::vector<bool> *has_children_level =
           new std::vector<bool> (hexes_on_level);
 
-                                         // Check for each cell, if it has children.
+                                         // Check for each cell, if it
+                                         // has children.
 	transform (tria.levels[i]->hexes.children.begin (),
 		   tria.levels[i]->hexes.children.end (),
 		   has_children_level->begin (),
@@ -2349,7 +2350,7 @@ namespace hp
 
                                      // Resize active_fe_indices vectors
     for (unsigned int i=0; i<levels.size(); ++i)
-      levels[i]->active_fe_indices.resize (tria.levels[i]->refine_flags.size ());
+      levels[i]->active_fe_indices.resize (tria.n_raw_cells(i));
 
     cell_iterator cell = begin(),
                   endc = end ();
