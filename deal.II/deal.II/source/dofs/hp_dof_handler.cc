@@ -1383,8 +1383,9 @@ namespace hp
 
     finite_elements = &ff;
   
-                                     // This call ensures, the active_fe_indices
-                                     // vectors are initialized correctly.
+                                     // This call ensures that the
+                                     // active_fe_indices vectors are
+                                     // initialized correctly.
     create_active_fe_table ();
 
     reserve_space ();
@@ -2147,30 +2148,28 @@ namespace hp
   template <int dim>
   void DoFHandler<dim>::create_active_fe_table ()
   {
-                                     // Create sufficiently many hpDoFLevels.
+                                     // Create sufficiently many hp::DoFLevels.
     while (levels.size () < tria->n_levels ())
       levels.push_back (new internal::hp::DoFLevel<dim>);
 
-    for (unsigned int i=0; i<levels.size(); ++i)
+    for (unsigned int level=0; level<levels.size(); ++level)
       {
-        if (levels[i]->active_fe_indices.size () == 0)
-          {
-// The size of "refine_flags" serves as
-// the number of cells available on that
-// level. The alternative would be to
-// implement this method for each dimension.
-            levels[i]->active_fe_indices.reserve (tria->levels[i]->refine_flags.size ());
-            std::fill (levels[i]->active_fe_indices.begin (),
-                       levels[i]->active_fe_indices.end (),
-                       0);
-          }
+        if (levels[level]->active_fe_indices.size () == 0)
+          levels[level]->active_fe_indices.resize (tria->n_raw_cells(level),
+                                                   deal_II_numbers::invalid_unsigned_int);
         else
           {
-                                             // Either the active_fe_indices have size
-                                             // zero, or the correct size. Other sizes
-                                             // indicate that something went wrong.
-            Assert (levels[i]->active_fe_indices.size () ==
-                    tria->levels[i]->refine_flags.size (), ExcInternalError ());
+                                             // Either the
+                                             // active_fe_indices have
+                                             // size zero because they
+                                             // were just created, or
+                                             // the correct
+                                             // size. Other sizes
+                                             // indicate that
+                                             // something went wrong.
+            Assert (levels[level]->active_fe_indices.size () ==
+                    tria->n_raw_cells(level),
+                    ExcInternalError ());
           }
       }
   }
