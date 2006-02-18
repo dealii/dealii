@@ -40,7 +40,7 @@ void test ()
 
   hp::DoFHandler<dim> dof_handler(tria);
   tria.refine_global(1);
-  for (hp::DoFHandler<dim>::active_cell_iterator
+  for (typename hp::DoFHandler<dim>::active_cell_iterator
          cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     cell->set_active_fe_index (0);
