@@ -20,8 +20,10 @@
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/grid_out.h>
-#include <fe/fe_dgq.h>
+#include <grid/tria_iterator.h>
 #include <dofs/hp_dof_handler.h>
+#include <dofs/dof_accessor.h>
+#include <fe/fe_dgq.h>
 
 #include <fstream>
 
@@ -44,6 +46,12 @@ int main ()
     fe_collection.push_back (FE_DGQ<dim> (1));
 
     hp::DoFHandler<dim> dof_handler(tria);
+    tria.refine_global(1);
+    for (hp::DoFHandler<dim>::active_cell_iterator
+           cell=dof_handler.begin_active();
+         cell!=dof_handler.end(); ++cell)
+      cell->set_active_fe_index (0);
+         
     dof_handler.distribute_dofs(fe_collection);
   }
 
@@ -56,6 +64,12 @@ int main ()
     fe_collection.push_back (FE_DGQ<dim> (1));
 
     hp::DoFHandler<dim> dof_handler(tria);
+    tria.refine_global(1);
+    for (hp::DoFHandler<dim>::active_cell_iterator
+           cell=dof_handler.begin_active();
+         cell!=dof_handler.end(); ++cell)
+      cell->set_active_fe_index (0);
+
     dof_handler.distribute_dofs(fe_collection);
   }
   
