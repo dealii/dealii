@@ -2138,25 +2138,25 @@ namespace hp
 #endif
 
 
-//
-// Method to create a standard table for the active_fe vector.
-// It is called before the Triangulation is refined and before
-// distribute_dofs is called. That are probably the two places,
-// where an incorrect active_fe table can cause some trouble.
-//
 
   template <int dim>
   void DoFHandler<dim>::create_active_fe_table ()
   {
-                                     // Create sufficiently many hp::DoFLevels.
+                                     // Create sufficiently many
+                                     // hp::DoFLevels.
     while (levels.size () < tria->n_levels ())
       levels.push_back (new internal::hp::DoFLevel<dim>);
 
+                                     // then make sure that on each
+                                     // level we have the appropriate
+                                     // size of active_fe_indices;
+                                     // preset them to zero, i.e. the
+                                     // default FE
     for (unsigned int level=0; level<levels.size(); ++level)
       {
         if (levels[level]->active_fe_indices.size () == 0)
           levels[level]->active_fe_indices.resize (tria->n_raw_cells(level),
-                                                   deal_II_numbers::invalid_unsigned_int);
+                                                   0);
         else
           {
                                              // Either the
