@@ -163,14 +163,16 @@ Triangulation<dim>::get_boundary_indicators () const
 #if deal_II_dimension == 1
 template <>
 Triangulation<1>::cell_iterator
-Triangulation<1>::begin (const unsigned int level) const {
+Triangulation<1>::begin (const unsigned int level) const
+{
   return begin_line (level);
 }
 
 
 template <>
 Triangulation<1>::raw_cell_iterator
-Triangulation<1>::end () const {
+Triangulation<1>::end () const
+{
   return end_line ();
 }
 
@@ -181,14 +183,16 @@ Triangulation<1>::end () const {
 
 template <>
 Triangulation<2>::cell_iterator
-Triangulation<2>::begin (const unsigned int level) const {
+Triangulation<2>::begin (const unsigned int level) const
+{
   return begin_quad (level);
 }
 
 
 template <>
 Triangulation<2>::raw_cell_iterator
-Triangulation<2>::end () const {
+Triangulation<2>::end () const
+{
   return end_quad ();
 }
 
@@ -199,14 +203,16 @@ Triangulation<2>::end () const {
 
 template <>
 Triangulation<3>::cell_iterator
-Triangulation<3>::begin (const unsigned int level) const {
+Triangulation<3>::begin (const unsigned int level) const
+{
   return begin_hex (level);
 }
 
 
 template <>
 Triangulation<3>::raw_cell_iterator
-Triangulation<3>::end () const {
+Triangulation<3>::end () const
+{
   return end_hex ();
 }
 
@@ -3627,7 +3633,8 @@ Triangulation<dim>::last_raw_line (const unsigned int level) const
 
 template <int dim>
 typename Triangulation<dim>::raw_quad_iterator
-Triangulation<dim>::last_raw_quad (const unsigned int level) const {
+Triangulation<dim>::last_raw_quad (const unsigned int level) const
+{
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
   Assert (levels[level]->quads.quads.size() != 0,
@@ -3641,7 +3648,8 @@ Triangulation<dim>::last_raw_quad (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::raw_hex_iterator
-Triangulation<dim>::last_raw_hex (const unsigned int level) const {
+Triangulation<dim>::last_raw_hex (const unsigned int level) const
+{
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
   Assert (levels[level]->hexes.hexes.size() != 0,
@@ -3655,28 +3663,32 @@ Triangulation<dim>::last_raw_hex (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::raw_line_iterator
-Triangulation<dim>::last_raw_line () const {
+Triangulation<dim>::last_raw_line () const
+{
   return last_raw_line (levels.size()-1);
 }
 
 
 template <int dim>
 typename Triangulation<dim>::raw_quad_iterator
-Triangulation<dim>::last_raw_quad () const {
+Triangulation<dim>::last_raw_quad () const
+{
   return last_raw_quad (levels.size()-1);
 }
 
 
 template <int dim>
 typename Triangulation<dim>::raw_hex_iterator
-Triangulation<dim>::last_raw_hex () const {
+Triangulation<dim>::last_raw_hex () const
+{
   return last_raw_hex (levels.size()-1);
 }
 
 
 template <int dim>
 typename Triangulation<dim>::line_iterator
-Triangulation<dim>::last_line (const unsigned int level) const {
+Triangulation<dim>::last_line (const unsigned int level) const
+{
   				   // level is checked in begin_raw
   raw_line_iterator ri = last_raw_line(level);
   if (ri->used()==true)
@@ -3690,7 +3702,8 @@ Triangulation<dim>::last_line (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::quad_iterator
-Triangulation<dim>::last_quad (const unsigned int level) const {
+Triangulation<dim>::last_quad (const unsigned int level) const
+{
   				   // level is checked in begin_raw
   raw_quad_iterator ri = last_raw_quad(level);
   if (ri->used()==true)
@@ -3704,7 +3717,8 @@ Triangulation<dim>::last_quad (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::hex_iterator
-Triangulation<dim>::last_hex (const unsigned int level) const {
+Triangulation<dim>::last_hex (const unsigned int level) const
+{
   				   // level is checked in begin_raw
   raw_hex_iterator ri = last_raw_hex(level);
   if (ri->used()==true)
@@ -3718,28 +3732,32 @@ Triangulation<dim>::last_hex (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::line_iterator
-Triangulation<dim>::last_line () const {
+Triangulation<dim>::last_line () const
+{
   return last_line (levels.size()-1);
 }
 
 
 template <int dim>
 typename Triangulation<dim>::quad_iterator
-Triangulation<dim>::last_quad () const {
+Triangulation<dim>::last_quad () const
+{
   return last_quad (levels.size()-1);
 }
 
 
 template <int dim>
 typename Triangulation<dim>::hex_iterator
-Triangulation<dim>::last_hex () const {
+Triangulation<dim>::last_hex () const
+{
   return last_hex (levels.size()-1);
 }
 
 
 template <int dim>
 typename Triangulation<dim>::active_line_iterator
-Triangulation<dim>::last_active_line (const unsigned int level) const {
+Triangulation<dim>::last_active_line (const unsigned int level) const
+{
 				   // level is checked in begin_raw
   line_iterator i = last_line(level);
   if (i->has_children()==false)
@@ -3753,7 +3771,8 @@ Triangulation<dim>::last_active_line (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::active_quad_iterator
-Triangulation<dim>::last_active_quad (const unsigned int level) const {
+Triangulation<dim>::last_active_quad (const unsigned int level) const
+{
 				   // level is checked in begin_raw
   quad_iterator i = last_quad(level);
   if (i->has_children()==false)
@@ -3767,7 +3786,8 @@ Triangulation<dim>::last_active_quad (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::active_hex_iterator
-Triangulation<dim>::last_active_hex (const unsigned int level) const {
+Triangulation<dim>::last_active_hex (const unsigned int level) const
+{
 				   // level is checked in begin_raw
   hex_iterator i = last_hex(level);
   if (i->has_children()==false)
@@ -3781,28 +3801,32 @@ Triangulation<dim>::last_active_hex (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::active_line_iterator
-Triangulation<dim>::last_active_line () const {
+Triangulation<dim>::last_active_line () const
+{
   return last_active_line (levels.size()-1);
 }
 
 
 template <int dim>
 typename Triangulation<dim>::active_quad_iterator
-Triangulation<dim>::last_active_quad () const {
+Triangulation<dim>::last_active_quad () const
+{
   return last_active_quad (levels.size()-1);
 }
 
 
 template <int dim>
 typename Triangulation<dim>::active_hex_iterator
-Triangulation<dim>::last_active_hex () const {
+Triangulation<dim>::last_active_hex () const
+{
   return last_active_hex (levels.size()-1);
 }
 
 
 template <int dim>
 typename Triangulation<dim>::raw_cell_iterator
-Triangulation<dim>::end_raw (const unsigned int level) const {
+Triangulation<dim>::end_raw (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  end() :
 	  begin_raw (level+1));
@@ -3811,7 +3835,8 @@ Triangulation<dim>::end_raw (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::cell_iterator
-Triangulation<dim>::end (const unsigned int level) const {
+Triangulation<dim>::end (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  cell_iterator(end()) :
 	  begin (level+1));
@@ -3820,7 +3845,8 @@ Triangulation<dim>::end (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::active_cell_iterator
-Triangulation<dim>::end_active (const unsigned int level) const {
+Triangulation<dim>::end_active (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  active_cell_iterator(end()) :
 	  begin_active (level+1));
@@ -3829,7 +3855,8 @@ Triangulation<dim>::end_active (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::raw_face_iterator
-Triangulation<dim>::end_raw_face (const unsigned int level) const {
+Triangulation<dim>::end_raw_face (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  end_face() :
 	  begin_raw_face (level+1));
@@ -3838,7 +3865,8 @@ Triangulation<dim>::end_raw_face (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::face_iterator
-Triangulation<dim>::end_face (const unsigned int level) const {
+Triangulation<dim>::end_face (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  face_iterator(end_face()) :
 	  begin_face (level+1));
@@ -3847,7 +3875,8 @@ Triangulation<dim>::end_face (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::active_face_iterator
-Triangulation<dim>::end_active_face (const unsigned int level) const {
+Triangulation<dim>::end_active_face (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  active_face_iterator(end_face()) :
 	  begin_active_face (level+1));
@@ -3856,7 +3885,8 @@ Triangulation<dim>::end_active_face (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::raw_line_iterator
-Triangulation<dim>::end_raw_line (const unsigned int level) const {
+Triangulation<dim>::end_raw_line (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  end_line() :
 	  begin_raw_line (level+1));
@@ -3865,7 +3895,8 @@ Triangulation<dim>::end_raw_line (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::line_iterator
-Triangulation<dim>::end_line (const unsigned int level) const {
+Triangulation<dim>::end_line (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  line_iterator(end_line()) :
 	  begin_line (level+1));
@@ -3874,7 +3905,8 @@ Triangulation<dim>::end_line (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::active_line_iterator
-Triangulation<dim>::end_active_line (const unsigned int level) const {
+Triangulation<dim>::end_active_line (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  active_line_iterator(end_line()) :
 	  begin_active_line (level+1));
@@ -3883,7 +3915,8 @@ Triangulation<dim>::end_active_line (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::raw_quad_iterator
-Triangulation<dim>::end_raw_quad (const unsigned int level) const {
+Triangulation<dim>::end_raw_quad (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  end_quad() :
 	  begin_raw_quad (level+1));
@@ -3892,7 +3925,8 @@ Triangulation<dim>::end_raw_quad (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::quad_iterator
-Triangulation<dim>::end_quad (const unsigned int level) const {
+Triangulation<dim>::end_quad (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  quad_iterator(end_quad()) :
 	  begin_quad (level+1));
@@ -3901,7 +3935,8 @@ Triangulation<dim>::end_quad (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::active_quad_iterator
-Triangulation<dim>::end_active_quad (const unsigned int level) const {
+Triangulation<dim>::end_active_quad (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  active_quad_iterator(end_quad()) :
 	  begin_active_quad (level+1));
@@ -3910,7 +3945,8 @@ Triangulation<dim>::end_active_quad (const unsigned int level) const {
 
 template <int dim>
 typename Triangulation<dim>::raw_hex_iterator
-Triangulation<dim>::end_raw_hex (const unsigned int level) const {
+Triangulation<dim>::end_raw_hex (const unsigned int level) const
+{
   return (level == levels.size()-1 ?
 	  end_hex() :
 	  begin_raw_hex (level+1));
@@ -4006,15 +4042,24 @@ Triangulation<dim>::n_active_faces(unsigned int l) const
 #if deal_II_dimension == 1
 
 template <>
-unsigned int Triangulation<1>::n_active_cells (const unsigned int level) const {
-  return n_active_lines (level);
+unsigned int Triangulation<1>::n_raw_cells (const unsigned int level) const
+{
+  return n_raw_lines (level);
+}
+
+template <>
+unsigned int Triangulation<1>::n_cells (const unsigned int level) const
+{
+  return n_lines (level);
 }
 
 
 template <>
-unsigned int Triangulation<1>::n_cells (const unsigned int level) const {
-  return n_lines (level);
+unsigned int Triangulation<1>::n_active_cells (const unsigned int level) const
+{
+  return n_active_lines (level);
 }
+
 
 #endif
 
@@ -4022,13 +4067,22 @@ unsigned int Triangulation<1>::n_cells (const unsigned int level) const {
 #if deal_II_dimension == 2
 
 template <>
-unsigned int Triangulation<2>::n_cells (const unsigned int level) const {
+unsigned int Triangulation<2>::n_raw_cells (const unsigned int level) const
+{
+  return n_raw_quads (level);
+}
+
+
+template <>
+unsigned int Triangulation<2>::n_cells (const unsigned int level) const
+{
   return n_quads (level);
 }
 
 
 template <>
-unsigned int Triangulation<2>::n_active_cells (const unsigned int level) const {
+unsigned int Triangulation<2>::n_active_cells (const unsigned int level) const
+{
   return n_active_quads (level);
 }
 
@@ -4038,13 +4092,22 @@ unsigned int Triangulation<2>::n_active_cells (const unsigned int level) const {
 #if deal_II_dimension == 3
 
 template <>
-unsigned int Triangulation<3>::n_cells (const unsigned int level) const {
+unsigned int Triangulation<3>::n_raw_cells (const unsigned int level) const
+{
+  return n_raw_hexs (level);
+}
+
+
+template <>
+unsigned int Triangulation<3>::n_cells (const unsigned int level) const
+{
   return n_hexs (level);
 }
 
 
 template <>
-unsigned int Triangulation<3>::n_active_cells (const unsigned int level) const {
+unsigned int Triangulation<3>::n_active_cells (const unsigned int level) const
+{
   return n_active_hexs (level);
 }
 
@@ -4052,7 +4115,8 @@ unsigned int Triangulation<3>::n_active_cells (const unsigned int level) const {
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_lines () const {
+unsigned int Triangulation<dim>::n_lines () const
+{
   return number_cache.n_lines;
 }
 
@@ -4066,7 +4130,8 @@ unsigned int Triangulation<dim>::n_raw_lines (const unsigned int level) const
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_lines (const unsigned int level) const {
+unsigned int Triangulation<dim>::n_lines (const unsigned int level) const
+{
   Assert (level < number_cache.n_lines_level.size(),
 	  ExcIndexRange (level, 0, number_cache.n_lines_level.size()));
   
@@ -4075,13 +4140,15 @@ unsigned int Triangulation<dim>::n_lines (const unsigned int level) const {
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_active_lines () const {
+unsigned int Triangulation<dim>::n_active_lines () const
+{
   return number_cache.n_active_lines;
 }
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_active_lines (const unsigned int level) const {
+unsigned int Triangulation<dim>::n_active_lines (const unsigned int level) const
+{
   Assert (level < number_cache.n_lines_level.size(),
 	  ExcIndexRange (level, 0, number_cache.n_lines_level.size()));
   
@@ -4137,13 +4204,15 @@ unsigned int Triangulation<1>::n_active_quads () const
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_quads () const {
+unsigned int Triangulation<dim>::n_quads () const
+{
   return number_cache.n_quads;
 }
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_quads (const unsigned int level) const {
+unsigned int Triangulation<dim>::n_quads (const unsigned int level) const
+{
   Assert (level < number_cache.n_quads_level.size(),
 	  ExcIndexRange (level, 0, number_cache.n_quads_level.size()));
   
@@ -4160,13 +4229,15 @@ unsigned int Triangulation<dim>::n_raw_quads (const unsigned int level) const
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_active_quads () const {
+unsigned int Triangulation<dim>::n_active_quads () const
+{
   return number_cache.n_active_quads;
 }
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_active_quads (const unsigned int level) const {
+unsigned int Triangulation<dim>::n_active_quads (const unsigned int level) const
+{
   Assert (level < number_cache.n_quads_level.size(),
 	  ExcIndexRange (level, 0, number_cache.n_quads_level.size()));
   
@@ -4339,7 +4410,8 @@ unsigned int Triangulation<1>::max_adjacent_cells () const
 
 
 template <int dim>
-unsigned int Triangulation<dim>::max_adjacent_cells () const {
+unsigned int Triangulation<dim>::max_adjacent_cells () const
+{
   cell_iterator cell = begin(0),
 		endc = (levels.size() > 1 ? begin(1) : cell_iterator(end()));
 				   // store the largest index of the
@@ -7223,7 +7295,8 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 
 
 template <int dim>
-void Triangulation<dim>::fix_coarsen_flags () {
+void Triangulation<dim>::fix_coarsen_flags ()
+{
 				   // loop over all cells. Flag all
 				   // cells of which all children are
 				   // flagged for coarsening and
@@ -7346,7 +7419,8 @@ void Triangulation<dim>::fix_coarsen_flags () {
 
 
 template <int dim>
-bool Triangulation<dim>::prepare_coarsening_and_refinement () {
+bool Triangulation<dim>::prepare_coarsening_and_refinement ()
+{
       
 				   // save the flags to determine
 				   // whether something was changed in
@@ -8126,7 +8200,8 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement () {
 #if deal_II_dimension == 1
 
 template <>
-void Triangulation<1>::delete_children (cell_iterator &cell) {
+void Triangulation<1>::delete_children (cell_iterator &cell)
+{
   const unsigned int dim=1;
 				   // first we need to reset the
 				   // neighbor pointers of the
@@ -8225,7 +8300,8 @@ void Triangulation<1>::delete_children (cell_iterator &cell) {
 #if deal_II_dimension == 2
 
 template <>
-void Triangulation<2>::delete_children (cell_iterator &cell) {
+void Triangulation<2>::delete_children (cell_iterator &cell)
+{
   const unsigned int dim=2;
 				   // first we need to reset the
 				   // neighbor pointers of the
@@ -8359,7 +8435,8 @@ void Triangulation<2>::delete_children (cell_iterator &cell) {
 
 
 template <>
-void Triangulation<3>::delete_children (cell_iterator &cell) {
+void Triangulation<3>::delete_children (cell_iterator &cell)
+{
   const unsigned int dim=3;
 				   // first we need to reset the
 				   // neighbor pointers of the
@@ -8720,7 +8797,8 @@ template <int dim>
 void Triangulation<dim>::write_bool_vector (const unsigned int  magic_number1,
 					    const std::vector<bool> &v,
 					    const unsigned int  magic_number2,
-					    std::ostream            &out) {
+					    std::ostream            &out)
+{
   const unsigned int N = v.size();
   unsigned char *flags = new unsigned char[N/8+1];
   for (unsigned int i=0; i<N/8+1; ++i) flags[i]=0;

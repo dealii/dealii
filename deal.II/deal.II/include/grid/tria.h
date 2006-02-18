@@ -2447,6 +2447,13 @@ class Triangulation : public Subscriptor
 				      * @name Information about the triangulation
 				      */
 				     /*@{*/
+
+				     /**
+				      * Number of lines, used or
+				      * unused, on the given level.
+				      */
+    unsigned int n_raw_lines (const unsigned int level) const;
+
 				     /**
 				      *  Return total number of used lines,
 				      *  active or not.
@@ -2470,6 +2477,12 @@ class Triangulation : public Subscriptor
 				      */
     unsigned int n_active_lines (const unsigned int level) const;
     
+				     /**
+				      * Number of quads, used or
+				      * unused, on the given level.
+				      */
+    unsigned int n_raw_quads (const unsigned int level) const;
+
 				     /**
 				      *  Return total number of used quads,
 				      *  active or not.
@@ -2495,6 +2508,12 @@ class Triangulation : public Subscriptor
     unsigned int n_active_quads (const unsigned int level) const;
     
 				     /**
+				      * Number of hexs, used or
+				      * unused, on the given level.
+				      */
+    unsigned int n_raw_hexs (const unsigned int level) const;
+
+				     /**
 				      *  Return total number of used hexahedra,
 				      *  active or not.
 				      */
@@ -2519,6 +2538,12 @@ class Triangulation : public Subscriptor
     unsigned int n_active_hexs(const unsigned int level) const;
 
 				     /**
+				      * Number of cells, used or
+				      * unused, on the given level.
+				      */
+    unsigned int n_raw_cells (const unsigned int level) const;
+
+    				     /**
 				      *  Return total number of used cells,
 				      *  active or not.
 				      *  Maps to <tt>n_lines()</tt> in one space
@@ -2579,22 +2604,6 @@ class Triangulation : public Subscriptor
 				      * space dimensions and so on.
 				      */
     unsigned int n_active_faces (const unsigned int level) const;
-
-
-				     /**
-				      * Number of lines, used or unused.
-				      */
-    unsigned int n_raw_lines(const unsigned int level) const;
-
-				     /**
-				      * Number of quads, used or unused.
-				      */
-    unsigned int n_raw_quads(const unsigned int level) const;
-
-				     /**
-				      * Number of hexes, used or unused.
-				      */
-    unsigned int n_raw_hexs(const unsigned int level) const;
 
 				     /**
 				      * Return number of levels in use. This
@@ -3233,10 +3242,14 @@ template <> Triangulation<3>::face_iterator Triangulation<3>::last_face () const
 template <> Triangulation<3>::face_iterator Triangulation<3>::last_face (const unsigned int level) const;
 template <> Triangulation<3>::active_face_iterator Triangulation<3>::last_active_face () const;
 template <> Triangulation<3>::active_face_iterator Triangulation<3>::last_active_face (const unsigned int level) const;
-template <> unsigned int Triangulation<1>::n_active_cells (const unsigned int level) const;
+
+template <> unsigned int Triangulation<1>::n_raw_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<1>::n_cells (const unsigned int level) const;
+template <> unsigned int Triangulation<1>::n_active_cells (const unsigned int level) const;
+template <> unsigned int Triangulation<2>::n_raw_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<2>::n_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<2>::n_active_cells (const unsigned int level) const;
+template <> unsigned int Triangulation<3>::n_raw_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<3>::n_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<3>::n_active_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<1>::n_quads () const;
