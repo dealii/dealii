@@ -50,7 +50,7 @@ void
 DoFAccessor<DH>::set_dof_handler (DH *dh)
 {
   Assert (dh != 0, ExcInvalidObject());
-  dof_handler = dh;
+  this->dof_handler = dh;
 }
 
 
@@ -80,10 +80,10 @@ inline
 bool
 DoFAccessor<DH>::operator == (const DoFAccessor<DH> &a) const
 {
-  Assert (dof_handler == a.dof_handler, ExcCantCompareIterators());
+  Assert (this->dof_handler == a.dof_handler, ExcCantCompareIterators());
 
                                    // there is no real data to compare, except
-                                   // to make sure that the dof_handler
+                                   // to make sure that the this->dof_handler
                                    // objects in use are the same
   return true;
 }
@@ -95,10 +95,10 @@ inline
 bool
 DoFAccessor<DH>::operator != (const DoFAccessor<DH> &a) const
 {
-  Assert (dof_handler == a.dof_handler, ExcCantCompareIterators());
+  Assert (this->dof_handler == a.dof_handler, ExcCantCompareIterators());
 
                                    // there is no real data to compare, except
-                                   // to make sure that the dof_handler
+                                   // to make sure that the this->dof_handler
                                    // objects in use are the same. this is
                                    // checked above, and apart from this there
                                    // is no reason for us to believe that the
@@ -133,7 +133,7 @@ inline
 unsigned int
 DoFObjectAccessor<1,DH>::dof_index (const unsigned int i) const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
                                    // since the exception classes are
@@ -165,7 +165,7 @@ unsigned int
 DoFObjectAccessor<1,DH>::vertex_dof_index (const unsigned int vertex,
                                            const unsigned int i) const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
                                    // since the exception classes are
@@ -197,7 +197,7 @@ inline
 void
 DoFObjectAccessor<1,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
                                    // since the exception classes are
@@ -247,7 +247,7 @@ inline
 TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> >
 DoFObjectAccessor<1,DH>::child (const unsigned int i) const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   TriaIterator<dim,DoFObjectAccessor<1,DH> > q (this->tria,
@@ -450,7 +450,7 @@ DoFObjectAccessor<2,DH>::dof_index (const unsigned int i) const
 	  typename BaseClass::ExcInvalidObject());
   Assert (i<this->get_fe().dofs_per_quad,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   return this->dof_handler->levels[this->present_level]
@@ -473,7 +473,7 @@ DoFObjectAccessor<2,DH>::vertex_dof_index (const unsigned int vertex,
   Assert (vertex<4, ExcIndexRange (i,0,4));
   Assert (i<this->get_fe().dofs_per_vertex,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
@@ -513,7 +513,7 @@ DoFObjectAccessor<2,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
 	   4*this->get_fe().dofs_per_vertex),
 	  typename BaseClass::ExcNotActive());
   
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   
   const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
@@ -537,7 +537,7 @@ TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> >
 DoFObjectAccessor<2,DH>::line (const unsigned int i) const
 {
   Assert (i<4, ExcIndexRange (i, 0, 4));
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   return TriaIterator<dim,DoFObjectAccessor<1,DH> >
@@ -556,7 +556,7 @@ inline
 TriaIterator<DH::dimension,DoFObjectAccessor<2,DH> >
 DoFObjectAccessor<2,DH>::child (const unsigned int i) const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   TriaIterator<dim,DoFObjectAccessor<2,DH> > q (this->tria,
@@ -634,7 +634,7 @@ distribute_local_to_global (const Vector<number> &local_source,
   Assert (this->dof_handler->n_dofs() == global_destination.size(),
 	  typename BaseClass::ExcVectorDoesNotMatch());
 
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   const unsigned int n_dofs = local_source.size();
@@ -685,7 +685,7 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 	  typename BaseClass::ExcMatrixDoesNotMatch());
   Assert (global_destination.m() == global_destination.n(),
 	  typename BaseClass::ExcMatrixDoesNotMatch());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   const unsigned int n_dofs = local_source.m();
@@ -771,7 +771,7 @@ DoFObjectAccessor<3,DH>::dof_index (const unsigned int i) const
 	  typename BaseClass::ExcInvalidObject());
   Assert (i<this->get_fe().dofs_per_hex,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_hex));
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   return this->dof_handler->levels[this->present_level]
@@ -795,7 +795,7 @@ DoFObjectAccessor<3,DH>::vertex_dof_index (const unsigned int vertex,
   Assert (vertex<8, ExcIndexRange (i,0,8));
   Assert (i<this->get_fe().dofs_per_vertex,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
@@ -821,7 +821,7 @@ DoFObjectAccessor<3,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
 				 6*this->get_fe().dofs_per_quad +
 				 this->get_fe().dofs_per_hex),
 	  typename BaseClass::ExcVectorDoesNotMatch());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
 				   // this function really only makes
@@ -836,7 +836,7 @@ DoFObjectAccessor<3,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
 	  (this->get_fe().dofs_per_cell ==
 	   8*this->get_fe().dofs_per_vertex),
 	  typename BaseClass::ExcNotActive());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   
   const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
@@ -968,7 +968,7 @@ distribute_local_to_global (const Vector<number> &local_source,
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (this->dof_handler->n_dofs() == global_destination.size(),
 	  typename BaseClass::ExcVectorDoesNotMatch());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   const unsigned int n_dofs = local_source.size();
@@ -1020,7 +1020,7 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 	  typename BaseClass::ExcMatrixDoesNotMatch());
   Assert (global_destination.m() == global_destination.n(),
 	  typename BaseClass::ExcMatrixDoesNotMatch());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   const unsigned int n_dofs = local_source.m();
@@ -1089,7 +1089,7 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::dof_index (const unsigned int i) const
   typedef DoFAccessor<hp::DoFHandler<1> > BaseClass;
   
   Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1126,7 +1126,7 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::dof_index (const unsigned int i) const
   typedef DoFAccessor<hp::DoFHandler<2> > BaseClass;
   
   Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1163,7 +1163,7 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::dof_index (const unsigned int i) const
   typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
   
   Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1194,7 +1194,7 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_index (const unsigned int i,
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1225,7 +1225,7 @@ DoFObjectAccessor<1, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1260,7 +1260,7 @@ DoFObjectAccessor<1, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1318,13 +1318,13 @@ inline
 unsigned int
 DoFObjectAccessor<1,hp::DoFHandler<1> >::active_fe_index () const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  return this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index];
 }
 
@@ -1335,13 +1335,13 @@ inline
 unsigned int
 DoFObjectAccessor<1,hp::DoFHandler<2> >::active_fe_index () const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  return this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index];
 }
 
@@ -1352,13 +1352,13 @@ inline
 unsigned int
 DoFObjectAccessor<1,hp::DoFHandler<3> >::active_fe_index () const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  return this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index];
 }
 
@@ -1369,16 +1369,16 @@ inline
 void
 DoFObjectAccessor<1,hp::DoFHandler<1> >::set_active_fe_index (const unsigned int i)
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (this->dof_handler != 0, ExcInvalidObject());
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
-  dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+//TODO: this->dof_handler->finite_elements not always defined, when this method is called
+//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
 
@@ -1389,16 +1389,16 @@ inline
 void
 DoFObjectAccessor<1,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i)
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (this->dof_handler != 0, ExcInvalidObject());
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
-  dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+//TODO: this->dof_handler->finite_elements not always defined, when this method is called
+//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
 
@@ -1409,16 +1409,16 @@ inline
 void
 DoFObjectAccessor<1,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i)
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (this->dof_handler != 0, ExcInvalidObject());
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
-  dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+//TODO: this->dof_handler->finite_elements not always defined, when this method is called
+//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
 
@@ -1433,7 +1433,7 @@ unsigned int DoFObjectAccessor<2,hp::DoFHandler<2> >::dof_index (const unsigned 
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1463,7 +1463,7 @@ unsigned int DoFObjectAccessor<2,hp::DoFHandler<3> >::dof_index (const unsigned 
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1495,7 +1495,7 @@ DoFObjectAccessor<2, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1527,7 +1527,7 @@ DoFObjectAccessor<2, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1574,13 +1574,13 @@ inline
 unsigned int
 DoFObjectAccessor<2,hp::DoFHandler<2> >::active_fe_index () const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  return this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index];
 }
 
@@ -1591,13 +1591,13 @@ inline
 unsigned int
 DoFObjectAccessor<2,hp::DoFHandler<3> >::active_fe_index () const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  return this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index];
 }
 
@@ -1607,18 +1607,18 @@ inline
 void
 DoFObjectAccessor<2,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i)
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (this->dof_handler != 0, ExcInvalidObject());
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
-  dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+//TODO: this->dof_handler->finite_elements not always defined, when this method is called
+//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
 
@@ -1629,16 +1629,16 @@ inline
 void
 DoFObjectAccessor<2,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i)
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (this->dof_handler != 0, ExcInvalidObject());
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
-  dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+//TODO: this->dof_handler->finite_elements not always defined, when this method is called
+//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
 
@@ -1654,7 +1654,7 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::dof_index (const unsigned int i) const
 
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1685,7 +1685,7 @@ DoFObjectAccessor<3, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
     
   Assert (this->dof_handler != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
@@ -1722,13 +1722,13 @@ inline
 unsigned int
 DoFObjectAccessor<3,hp::DoFHandler<3> >::active_fe_index () const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  return this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index];
 }
 
@@ -1739,16 +1739,16 @@ inline
 void
 DoFObjectAccessor<3,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i)
 {
-  Assert (dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < dof_handler->levels.size(),
+  Assert (this->dof_handler != 0, ExcInvalidObject());
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
-			 dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
-  dof_handler->levels[this->present_level]
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+//TODO: this->dof_handler->finite_elements not always defined, when this method is called
+//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
 
