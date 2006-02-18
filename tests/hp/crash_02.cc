@@ -51,5 +51,17 @@ int main ()
     dof_handler.begin_active()->set_active_fe_index(0);
   }
   
+  {
+    const unsigned int dim=3;
+    Triangulation<dim> tria;
+    GridGenerator::hyper_cube(tria);
+
+    hp::FECollection<dim> fe_collection;
+    fe_collection.push_back (FE_DGQ<dim> (1));
+
+    hp::DoFHandler<dim> dof_handler(tria);
+    dof_handler.begin_active()->set_active_fe_index(0);
+  }
+  
   deallog << "OK" << std::endl;
 }
