@@ -12,9 +12,7 @@
 //----------------------------  crash_02.cc  ---------------------------
 
 
-// check a crash in hp::DoFHandler because the
-// DoFHandler::active_fe_indices array isn't initialized when
-// attaching to a triangulation
+// trigger an error in hp::DoFHandler::create_active_fe_table
 
 
 #include <base/logstream.h>
