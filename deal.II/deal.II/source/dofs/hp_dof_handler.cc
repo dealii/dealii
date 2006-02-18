@@ -1917,45 +1917,91 @@ namespace hp
   template <>
   void DoFHandler<1>::reserve_space ()
   {
-//TODO: This presently works only on the first FE of the FECollection. Fix this
     Assert (finite_elements != 0, ExcNoFESelected());
+    Assert (finite_elements->size() > 0, ExcNoFESelected());
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
     Assert (tria->n_levels() == levels.size (), ExcInternalError ());
+
+    Assert (finite_elements->max_dofs_per_vertex() == 0,
+            ExcMessage ("hp finite elements are presently only supported "
+                        "for discontinuous elements"));
+
+                                     // Release all space except the
+                                     // active_fe_indices field which
+                                     // we have to backup before
+    {
+      std::vector<std::vector<unsigned int> > active_fe_backup(levels.size ());
+      for (unsigned int level = 0; level<levels.size (); ++level)
+        std::swap (levels[level]->active_fe_indices, active_fe_backup[level]);
+
+                                       // delete all levels and set them up
+                                       // newly, since vectors are
+                                       // troublesome if you want to change
+                                       // their size
+      clear_space ();
   
-                                     // Backup the active_fe_indices vectors.
-                                     // The user might have put something
-                                     // important in them.
-    std::vector<std::vector<unsigned int> > active_fe_backup(levels.size ());
-    for (unsigned int i = 0; i < levels.size (); ++i)
-      std::swap (levels[i]->active_fe_indices, active_fe_backup[i]);
+      for (unsigned int level=0; level<tria->n_levels(); ++level) 
+        {
+          levels.push_back (new internal::hp::DoFLevel<1>);
+          std::swap (active_fe_backup[level], levels[level]->active_fe_indices);
+        }
+    }
 
-                                     // delete all levels and set them up
-                                     // newly, since vectors are
-                                     // troublesome if you want to change
-                                     // their size
-    clear_space ();
-
-    vertex_dofs.resize(tria->vertices.size()*(*finite_elements)[0].dofs_per_vertex,
-                       invalid_dof_index);
-
-    for (unsigned int i=0; i<tria->n_levels(); ++i) 
+                                     // count how much space we need
+                                     // on each level and set the
+                                     // dof_*_index_offset
+                                     // data. initially set the latter
+                                     // to an invalid index, and only
+                                     // later set it to something
+                                     // reasonable for active cells
+    for (unsigned int level=0; level<tria->n_levels(); ++level) 
       {
-        levels.push_back (new internal::hp::DoFLevel<1>);
-        std::swap (active_fe_backup[i], levels.back()->active_fe_indices);
+        levels[level]->dof_line_index_offset
+          = std::vector<unsigned int> (tria->n_raw_lines(level),
+                                       invalid_dof_index);
 
-        levels.back()->dof_line_index_offset = std::vector<unsigned int>
-                                               (tria->n_raw_lines(i),invalid_dof_index);
-        unsigned int dofs_for_lines = 0;
-        for (unsigned int j = 0; j < tria->levels[i]->lines.lines.size(); ++j)
+        unsigned int next_free_line_dof = 0;
+        for (active_cell_iterator cell=begin_active(level);
+             cell!=end_active(level); ++cell)
+          if (!cell->has_children())
           {
-            levels.back()->dof_line_index_offset[j] = dofs_for_lines;
-            dofs_for_lines += (*finite_elements)[
-	      levels.back ()->active_fe_indices[j]].dofs_per_line;
+            levels[level]->dof_line_index_offset[cell->index()] = next_free_line_dof;
+            next_free_line_dof +=
+              (*finite_elements)[cell->active_fe_index()].dofs_per_line;
           }
 
-        levels.back()->line_dofs = std::vector<unsigned int>(dofs_for_lines,
-                                                             invalid_dof_index);
-      };
+        levels[level]->line_dofs = std::vector<unsigned int> (next_free_line_dof,
+                                                              invalid_dof_index);
+      }
+
+
+                                     // safety check: make sure that
+                                     // the number of DoFs we
+                                     // allocated is actually correct
+                                     // (above we have also set the
+                                     // dof_*_index_offset field, so
+                                     // we couldn't use this simpler
+                                     // algorithm)
+#ifdef DEBUG
+    for (unsigned int level=0; level<tria->n_levels(); ++level)
+      {
+        unsigned int n_line_dofs = 0;
+        for (cell_iterator cell=begin_active(level);
+             cell!=end_active(level); ++cell)
+          if (!cell->has_children())
+            n_line_dofs +=
+              (*finite_elements)[cell->active_fe_index()].dofs_per_line;
+        
+        Assert (levels[level]->line_dofs.size() == n_line_dofs, ExcInternalError());
+        Assert (static_cast<unsigned int>
+                (std::count (levels[level]->dof_line_index_offset.begin(),
+                             levels[level]->dof_line_index_offset.end(),
+                             invalid_dof_index))
+                ==
+                tria->n_raw_lines(level) - tria->n_active_lines(level),
+                ExcInternalError());
+      }
+#endif
   }
 
 
@@ -2010,7 +2056,6 @@ namespace hp
           = std::vector<unsigned int> (tria->n_raw_quads(level),
                                        invalid_dof_index);
 
-//TODO: do the same for line dofs        
         unsigned int next_free_quad_dof = 0;
         for (active_cell_iterator cell=begin_active(level);
              cell!=end_active(level); ++cell)
@@ -2063,76 +2108,91 @@ namespace hp
   template <>
   void DoFHandler<3>::reserve_space ()
   {
-//TODO: This presently works only on the first FE of the FECollection. Fix this
     Assert (finite_elements != 0, ExcNoFESelected());
+    Assert (finite_elements->size() > 0, ExcNoFESelected());
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
     Assert (tria->n_levels() == levels.size (), ExcInternalError ());
-  
-                                     // Backup the active_fe_indices vectors.
-                                     // The user might have put something
-                                     // important in them.
-    std::vector<std::vector<unsigned int> > active_fe_backup(levels.size ());
-    for (unsigned int i = 0; i < levels.size (); ++i)
-      std::swap (levels[i]->active_fe_indices, active_fe_backup[i]);
 
-                                     // delete all levels and set them up
-                                     // newly, since vectors are
-                                     // troublesome if you want to change
-                                     // their size
-    clear_space ();
-  
-    vertex_dofs.resize(tria->vertices.size()*(*finite_elements)[0].dofs_per_vertex,
-                       invalid_dof_index);
+    Assert (finite_elements->max_dofs_per_face() == 0,
+            ExcMessage ("hp finite elements are presently only supported "
+                        "for discontinuous elements"));
 
-//TODO[?] Does not work for continuous FEs. Problem is at faces, which might have a different
-// number of DoFs due to the different active_fe_index of the adjacent cells.
-    for (unsigned int i=0; i<tria->n_levels(); ++i) 
+                                     // Release all space except the
+                                     // active_fe_indices field which
+                                     // we have to backup before
+    {
+      std::vector<std::vector<unsigned int> > active_fe_backup(levels.size ());
+      for (unsigned int level = 0; level<levels.size (); ++level)
+        std::swap (levels[level]->active_fe_indices, active_fe_backup[level]);
+
+                                       // delete all levels and set them up
+                                       // newly, since vectors are
+                                       // troublesome if you want to change
+                                       // their size
+      clear_space ();
+  
+      for (unsigned int level=0; level<tria->n_levels(); ++level) 
+        {
+          levels.push_back (new internal::hp::DoFLevel<3>);
+          std::swap (active_fe_backup[level], levels[level]->active_fe_indices);
+        }
+    }
+
+                                     // count how much space we need
+                                     // on each level and set the
+                                     // dof_*_index_offset
+                                     // data. initially set the latter
+                                     // to an invalid index, and only
+                                     // later set it to something
+                                     // reasonable for active cells
+    for (unsigned int level=0; level<tria->n_levels(); ++level) 
       {
-        levels.push_back (new internal::hp::DoFLevel<3>);
-        std::swap (active_fe_backup[i], levels.back()->active_fe_indices);
+        levels[level]->dof_hex_index_offset
+          = std::vector<unsigned int> (tria->n_raw_hexs(level),
+                                       invalid_dof_index);
 
-        levels.back()->dof_line_index_offset = std::vector<unsigned int>
-                                               (tria->n_raw_lines(i),invalid_dof_index);
-        levels.back()->dof_quad_index_offset = std::vector<unsigned int>
-                                               (tria->n_raw_quads(i),invalid_dof_index);
-        levels.back()->dof_hex_index_offset = std::vector<unsigned int>
-                                              (tria->n_raw_hexs(i),invalid_dof_index);
-
-        unsigned int dofs_for_lines = 0;
-/* Uncommented as we actually need some information about how many DoFs should be reserved
-   for the lines, which could have different active_fe_indices. For DG there should be no
-   DoFs on lines or quads anyway.
-   for (unsigned int j=0; j<tria->levels[i]->lines.lines.size(); ++j)
-   {
-   levels.back()->dof_line_index_offset[j] = dofs_for_lines;
-   dofs_for_lines += finite_elements->
-   get_fe (levels.back ()->active_fe_indices[j]).dofs_per_line;
-   }
-*/
-        unsigned int dofs_for_quads = 0;
-/*
-  for (unsigned int j=0; j<tria->levels[i]->quads.quads.size(); ++j)
-  {
-  levels.back()->dof_quad_index_offset[j] = dofs_for_quads;
-  dofs_for_quads += finite_elements->
-  get_fe (levels.back ()->active_fe_indices[j]).dofs_per_quad;
-  }
-*/
-        unsigned int dofs_for_hexes = 0;
-        for (unsigned int j=0; j<tria->levels[i]->hexes.hexes.size(); ++j)
+        unsigned int next_free_hex_dof = 0;
+        for (active_cell_iterator cell=begin_active(level);
+             cell!=end_active(level); ++cell)
+          if (!cell->has_children())
           {
-            levels.back()->dof_hex_index_offset[j] = dofs_for_hexes;
-            dofs_for_hexes += (*finite_elements)[
-	      levels.back ()->active_fe_indices[j]].dofs_per_hex;
+            levels[level]->dof_hex_index_offset[cell->index()] = next_free_hex_dof;
+            next_free_hex_dof +=
+              (*finite_elements)[cell->active_fe_index()].dofs_per_hex;
           }
 
-        levels.back()->line_dofs = std::vector<unsigned int> (dofs_for_lines,
+        levels[level]->hex_dofs = std::vector<unsigned int> (next_free_hex_dof,
                                                               invalid_dof_index);
-        levels.back()->quad_dofs = std::vector<unsigned int> (dofs_for_quads,
-                                                              invalid_dof_index);
-        levels.back()->hex_dofs = std::vector<unsigned int> (dofs_for_hexes,
-                                                             invalid_dof_index);
-      };
+      }
+
+
+                                     // safety check: make sure that
+                                     // the number of DoFs we
+                                     // allocated is actually correct
+                                     // (above we have also set the
+                                     // dof_*_index_offset field, so
+                                     // we couldn't use this simpler
+                                     // algorithm)
+#ifdef DEBUG
+    for (unsigned int level=0; level<tria->n_levels(); ++level)
+      {
+        unsigned int n_hex_dofs = 0;
+        for (cell_iterator cell=begin_active(level);
+             cell!=end_active(level); ++cell)
+          if (!cell->has_children())
+            n_hex_dofs +=
+              (*finite_elements)[cell->active_fe_index()].dofs_per_hex;
+        
+        Assert (levels[level]->hex_dofs.size() == n_hex_dofs, ExcInternalError());
+        Assert (static_cast<unsigned int>
+                (std::count (levels[level]->dof_hex_index_offset.begin(),
+                             levels[level]->dof_hex_index_offset.end(),
+                             invalid_dof_index))
+                ==
+                tria->n_raw_hexs(level) - tria->n_active_hexs(level),
+                ExcInternalError());
+      }
+#endif
   }
 
 #endif
@@ -2210,6 +2270,7 @@ namespace hp
   }
 #endif
 
+  
 #if deal_II_dimension == 2
   template <>
   void DoFHandler<2>::pre_refinement_notification (const Triangulation<2> &tria)
