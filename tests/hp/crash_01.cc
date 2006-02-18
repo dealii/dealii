@@ -28,6 +28,27 @@
 #include <fstream>
 
 
+
+template <int dim>
+void test ()
+{
+  Triangulation<dim> tria;
+  GridGenerator::hyper_cube(tria);
+
+  hp::FECollection<dim> fe_collection;
+  fe_collection.push_back (FE_DGQ<dim> (1));
+
+  hp::DoFHandler<dim> dof_handler(tria);
+  tria.refine_global(1);
+  for (hp::DoFHandler<dim>::active_cell_iterator
+         cell=dof_handler.begin_active();
+       cell!=dof_handler.end(); ++cell)
+    cell->set_active_fe_index (0);
+         
+  dof_handler.distribute_dofs(fe_collection);
+}
+
+
 int main ()
 {
   std::ofstream logfile("crash_01/output");
@@ -35,43 +56,11 @@ int main ()
   
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
-  
-  {
-    const unsigned int dim=2;
-    Triangulation<dim> tria;
-    GridGenerator::hyper_cube(tria);
+  deallog.threshold_double(1.e-10);  
 
-    hp::FECollection<dim> fe_collection;
-    fe_collection.push_back (FE_DGQ<dim> (1));
-
-    hp::DoFHandler<dim> dof_handler(tria);
-    tria.refine_global(1);
-    for (hp::DoFHandler<dim>::active_cell_iterator
-           cell=dof_handler.begin_active();
-         cell!=dof_handler.end(); ++cell)
-      cell->set_active_fe_index (0);
-         
-    dof_handler.distribute_dofs(fe_collection);
-  }
-
-  {
-    const unsigned int dim=3;
-    Triangulation<dim> tria;
-    GridGenerator::hyper_cube(tria);
-
-    hp::FECollection<dim> fe_collection;
-    fe_collection.push_back (FE_DGQ<dim> (1));
-
-    hp::DoFHandler<dim> dof_handler(tria);
-    tria.refine_global(1);
-    for (hp::DoFHandler<dim>::active_cell_iterator
-           cell=dof_handler.begin_active();
-         cell!=dof_handler.end(); ++cell)
-      cell->set_active_fe_index (0);
-
-    dof_handler.distribute_dofs(fe_collection);
-  }
+  test<1> ();
+  test<2> ();
+  test<3> ();
   
   deallog << "OK" << std::endl;
 }

@@ -30,6 +30,21 @@
 #include <fstream>
 
 
+template <int dim>
+void test ()
+{
+  Triangulation<dim> tria;
+  GridGenerator::hyper_cube(tria);
+
+  hp::FECollection<dim> fe_collection;
+  fe_collection.push_back (FE_DGQ<dim> (1));
+
+  hp::DoFHandler<dim> dof_handler(tria);
+  dof_handler.begin_active()->set_active_fe_index(0);
+}
+
+
+
 int main ()
 {
   std::ofstream logfile("crash_02/output");
@@ -39,29 +54,9 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   
-  {
-    const unsigned int dim=2;
-    Triangulation<dim> tria;
-    GridGenerator::hyper_cube(tria);
-
-    hp::FECollection<dim> fe_collection;
-    fe_collection.push_back (FE_DGQ<dim> (1));
-
-    hp::DoFHandler<dim> dof_handler(tria);
-    dof_handler.begin_active()->set_active_fe_index(0);
-  }
-  
-  {
-    const unsigned int dim=3;
-    Triangulation<dim> tria;
-    GridGenerator::hyper_cube(tria);
-
-    hp::FECollection<dim> fe_collection;
-    fe_collection.push_back (FE_DGQ<dim> (1));
-
-    hp::DoFHandler<dim> dof_handler(tria);
-    dof_handler.begin_active()->set_active_fe_index(0);
-  }
+  test<1> ();
+  test<2> ();
+  test<3> ();
   
   deallog << "OK" << std::endl;
 }
