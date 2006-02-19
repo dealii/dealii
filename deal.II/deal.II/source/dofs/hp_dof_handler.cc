@@ -64,77 +64,88 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_cell_iterator
-  DoFHandler<1>::begin_raw (const unsigned int level) const {
+  DoFHandler<1>::begin_raw (const unsigned int level) const
+  {
     return begin_raw_line (level);
   }
 
 
   template <>
   DoFHandler<1>::cell_iterator
-  DoFHandler<1>::begin (const unsigned int level) const {
+  DoFHandler<1>::begin (const unsigned int level) const
+  {
     return begin_line (level);
   }
 
 
   template <>
   DoFHandler<1>::active_cell_iterator
-  DoFHandler<1>::begin_active (const unsigned int level) const {
+  DoFHandler<1>::begin_active (const unsigned int level) const
+  {
     return begin_active_line (level);
   }
 
 
   template <>
   DoFHandler<1>::raw_cell_iterator
-  DoFHandler<1>::end () const {
+  DoFHandler<1>::end () const
+  {
     return end_line ();
   }
 
 
   template <>
   DoFHandler<1>::raw_cell_iterator
-  DoFHandler<1>::last_raw () const {
+  DoFHandler<1>::last_raw () const
+  {
     return last_raw_line ();
   }
 
 
   template <>
   DoFHandler<1>::raw_cell_iterator
-  DoFHandler<1>::last_raw (const unsigned int level) const {
+  DoFHandler<1>::last_raw (const unsigned int level) const
+  {
     return last_raw_line (level);
   }
 
 
   template <>
   DoFHandler<1>::cell_iterator
-  DoFHandler<1>::last () const {
+  DoFHandler<1>::last () const
+  {
     return last_line ();
   }
 
 
   template <>
   DoFHandler<1>::cell_iterator
-  DoFHandler<1>::last (const unsigned int level) const {
+  DoFHandler<1>::last (const unsigned int level) const
+  {
     return last_line (level);
   }
 
 
   template <>
   DoFHandler<1>::active_cell_iterator
-  DoFHandler<1>::last_active () const {
+  DoFHandler<1>::last_active () const
+  {
     return last_active_line ();
   }
 
 
   template <>
   DoFHandler<1>::active_cell_iterator
-  DoFHandler<1>::last_active (const unsigned int level) const {
+  DoFHandler<1>::last_active (const unsigned int level) const
+  {
     return last_active_line (level);
   }
 
 
   template <>
   DoFHandler<1>::raw_face_iterator
-  DoFHandler<1>::begin_raw_face (const unsigned int) const {
+  DoFHandler<1>::begin_raw_face (const unsigned int) const
+  {
     Assert (false, ExcFunctionNotUseful());
     return 0;
   }
@@ -142,7 +153,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::face_iterator
-  DoFHandler<1>::begin_face (const unsigned int) const {
+  DoFHandler<1>::begin_face (const unsigned int) const
+  {
     Assert (false, ExcFunctionNotUseful());
     return 0;
   }
@@ -150,7 +162,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::active_face_iterator
-  DoFHandler<1>::begin_active_face (const unsigned int) const {
+  DoFHandler<1>::begin_active_face (const unsigned int) const
+  {
     Assert (false, ExcFunctionNotUseful());
     return 0;
   }
@@ -158,7 +171,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_face_iterator
-  DoFHandler<1>::end_face () const {
+  DoFHandler<1>::end_face () const
+  {
     Assert (false, ExcFunctionNotUseful());
     return 0;
   }
@@ -166,7 +180,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_face_iterator
-  DoFHandler<1>::last_raw_face () const {
+  DoFHandler<1>::last_raw_face () const
+  {
     Assert (false, ExcFunctionNotUseful());
     return 0;
   }
@@ -174,7 +189,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_face_iterator
-  DoFHandler<1>::last_raw_face (const unsigned int) const {
+  DoFHandler<1>::last_raw_face (const unsigned int) const
+  {
     Assert (false, ExcFunctionNotUseful());
     return 0;
   }
@@ -182,7 +198,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::face_iterator
-  DoFHandler<1>::last_face () const {
+  DoFHandler<1>::last_face () const
+  {
     Assert (false, ExcFunctionNotUseful());
     return 0;
   }
@@ -190,7 +207,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::face_iterator
-  DoFHandler<1>::last_face (const unsigned int) const {
+  DoFHandler<1>::last_face (const unsigned int) const
+  {
     Assert (false, ExcFunctionNotUseful());
     return 0;
   }
@@ -198,7 +216,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::active_face_iterator
-  DoFHandler<1>::last_active_face () const {
+  DoFHandler<1>::last_active_face () const
+  {
     Assert (false, ExcFunctionNotUseful());
     return 0;
   }
@@ -206,7 +225,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::active_face_iterator
-  DoFHandler<1>::last_active_face (const unsigned int) const {
+  DoFHandler<1>::last_active_face (const unsigned int) const
+  {
     Assert (false, ExcFunctionNotUseful());
     return 0;
   }
@@ -214,7 +234,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_quad_iterator
-  DoFHandler<1>::begin_raw_quad (const unsigned int) const {
+  DoFHandler<1>::begin_raw_quad (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -222,7 +243,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::quad_iterator
-  DoFHandler<1>::begin_quad (const unsigned int) const {
+  DoFHandler<1>::begin_quad (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -230,7 +252,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::active_quad_iterator
-  DoFHandler<1>::begin_active_quad (const unsigned int) const {
+  DoFHandler<1>::begin_active_quad (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -238,7 +261,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_quad_iterator
-  DoFHandler<1>::end_quad () const {
+  DoFHandler<1>::end_quad () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -246,7 +270,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_quad_iterator
-  DoFHandler<1>::last_raw_quad (const unsigned int) const {
+  DoFHandler<1>::last_raw_quad (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -254,7 +279,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::quad_iterator
-  DoFHandler<1>::last_quad (const unsigned int) const {
+  DoFHandler<1>::last_quad (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -262,7 +288,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::active_quad_iterator
-  DoFHandler<1>::last_active_quad (const unsigned int) const {
+  DoFHandler<1>::last_active_quad (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -270,7 +297,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_quad_iterator
-  DoFHandler<1>::last_raw_quad () const {
+  DoFHandler<1>::last_raw_quad () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -278,7 +306,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::quad_iterator
-  DoFHandler<1>::last_quad () const {
+  DoFHandler<1>::last_quad () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -286,7 +315,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::active_quad_iterator
-  DoFHandler<1>::last_active_quad () const {
+  DoFHandler<1>::last_active_quad () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -294,7 +324,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_hex_iterator
-  DoFHandler<1>::begin_raw_hex (const unsigned int) const {
+  DoFHandler<1>::begin_raw_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -302,7 +333,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::hex_iterator
-  DoFHandler<1>::begin_hex (const unsigned int) const {
+  DoFHandler<1>::begin_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -310,7 +342,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::active_hex_iterator
-  DoFHandler<1>::begin_active_hex (const unsigned int) const {
+  DoFHandler<1>::begin_active_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -318,7 +351,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_hex_iterator
-  DoFHandler<1>::end_hex () const {
+  DoFHandler<1>::end_hex () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -326,7 +360,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_hex_iterator
-  DoFHandler<1>::last_raw_hex (const unsigned int) const {
+  DoFHandler<1>::last_raw_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -334,7 +369,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_hex_iterator
-  DoFHandler<1>::last_raw_hex () const {
+  DoFHandler<1>::last_raw_hex () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -342,7 +378,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::hex_iterator
-  DoFHandler<1>::last_hex (const unsigned int) const {
+  DoFHandler<1>::last_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -350,7 +387,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::hex_iterator
-  DoFHandler<1>::last_hex () const {
+  DoFHandler<1>::last_hex () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -358,7 +396,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::active_hex_iterator
-  DoFHandler<1>::last_active_hex (const unsigned int) const {
+  DoFHandler<1>::last_active_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -366,7 +405,8 @@ namespace hp
 
   template <>
   DoFHandler<1>::active_hex_iterator
-  DoFHandler<1>::last_active_hex () const {
+  DoFHandler<1>::last_active_hex () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -378,147 +418,168 @@ namespace hp
 
   template <>
   DoFHandler<2>::raw_cell_iterator
-  DoFHandler<2>::begin_raw (const unsigned int level) const {
+  DoFHandler<2>::begin_raw (const unsigned int level) const
+  {
     return begin_raw_quad (level);
   }
 
 
   template <>
   DoFHandler<2>::cell_iterator
-  DoFHandler<2>::begin (const unsigned int level) const {
+  DoFHandler<2>::begin (const unsigned int level) const
+  {
     return begin_quad (level);
   }
 
 
   template <>
   DoFHandler<2>::active_cell_iterator
-  DoFHandler<2>::begin_active (const unsigned int level) const {
+  DoFHandler<2>::begin_active (const unsigned int level) const
+  {
     return begin_active_quad (level);
   }
 
 
   template <>
   DoFHandler<2>::raw_cell_iterator
-  DoFHandler<2>::end () const {
+  DoFHandler<2>::end () const
+  {
     return end_quad ();
   }
 
 
   template <>
   DoFHandler<2>::raw_cell_iterator
-  DoFHandler<2>::last_raw () const {
+  DoFHandler<2>::last_raw () const
+  {
     return last_raw_quad ();
   }
 
 
   template <>
   DoFHandler<2>::raw_cell_iterator
-  DoFHandler<2>::last_raw (const unsigned int level) const {
+  DoFHandler<2>::last_raw (const unsigned int level) const
+  {
     return last_raw_quad (level);
   }
 
 
   template <>
   DoFHandler<2>::cell_iterator
-  DoFHandler<2>::last () const {
+  DoFHandler<2>::last () const
+  {
     return last_quad ();
   }
 
 
   template <>
   DoFHandler<2>::cell_iterator
-  DoFHandler<2>::last (const unsigned int level) const {
+  DoFHandler<2>::last (const unsigned int level) const
+  {
     return last_quad (level);
   }
 
 
   template <>
   DoFHandler<2>::active_cell_iterator
-  DoFHandler<2>::last_active () const {
+  DoFHandler<2>::last_active () const
+  {
     return last_active_quad ();
   }
 
 
   template <>
   DoFHandler<2>::active_cell_iterator
-  DoFHandler<2>::last_active (const unsigned int level) const {
+  DoFHandler<2>::last_active (const unsigned int level) const
+  {
     return last_active_quad (level);
   }
 
 
   template <>
   DoFHandler<2>::raw_face_iterator
-  DoFHandler<2>::begin_raw_face (const unsigned int level) const {
+  DoFHandler<2>::begin_raw_face (const unsigned int level) const
+  {
     return begin_raw_line (level);
   }
 
 
   template <>
   DoFHandler<2>::face_iterator
-  DoFHandler<2>::begin_face (const unsigned int level) const {
+  DoFHandler<2>::begin_face (const unsigned int level) const
+  {
     return begin_line (level);
   }
 
 
   template <>
   DoFHandler<2>::active_face_iterator
-  DoFHandler<2>::begin_active_face (const unsigned int level) const {
+  DoFHandler<2>::begin_active_face (const unsigned int level) const
+  {
     return begin_active_line (level);
   }
 
 
   template <>
   DoFHandler<2>::raw_face_iterator
-  DoFHandler<2>::end_face () const {
+  DoFHandler<2>::end_face () const
+  {
     return end_line ();
   }
 
 
   template <>
   DoFHandler<2>::raw_face_iterator
-  DoFHandler<2>::last_raw_face () const {
+  DoFHandler<2>::last_raw_face () const
+  {
     return last_raw_line ();
   }
 
 
   template <>
   DoFHandler<2>::raw_face_iterator
-  DoFHandler<2>::last_raw_face (const unsigned int level) const {
+  DoFHandler<2>::last_raw_face (const unsigned int level) const
+  {
     return last_raw_line (level);
   }
 
 
   template <>
   DoFHandler<2>::face_iterator
-  DoFHandler<2>::last_face () const {
+  DoFHandler<2>::last_face () const
+  {
     return last_line ();
   }
 
 
   template <>
   DoFHandler<2>::face_iterator
-  DoFHandler<2>::last_face (const unsigned int level) const {
+  DoFHandler<2>::last_face (const unsigned int level) const
+  {
     return last_line (level);
   }
 
 
   template <>
   DoFHandler<2>::active_face_iterator
-  DoFHandler<2>::last_active_face () const {
+  DoFHandler<2>::last_active_face () const
+  {
     return last_active_line ();
   }
 
 
   template <>
   DoFHandler<2>::active_face_iterator
-  DoFHandler<2>::last_active_face (const unsigned int level) const {
+  DoFHandler<2>::last_active_face (const unsigned int level) const
+  {
     return last_active_line (level);
   }
 
 
   template <>
   DoFHandler<2>::raw_hex_iterator
-  DoFHandler<2>::begin_raw_hex (const unsigned int) const {
+  DoFHandler<2>::begin_raw_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -526,7 +587,8 @@ namespace hp
 
   template <>
   DoFHandler<2>::hex_iterator
-  DoFHandler<2>::begin_hex (const unsigned int) const {
+  DoFHandler<2>::begin_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -534,7 +596,8 @@ namespace hp
 
   template <>
   DoFHandler<2>::active_hex_iterator
-  DoFHandler<2>::begin_active_hex (const unsigned int) const {
+  DoFHandler<2>::begin_active_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -542,7 +605,8 @@ namespace hp
 
   template <>
   DoFHandler<2>::raw_hex_iterator
-  DoFHandler<2>::end_hex () const {
+  DoFHandler<2>::end_hex () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -550,7 +614,8 @@ namespace hp
 
   template <>
   DoFHandler<2>::raw_hex_iterator
-  DoFHandler<2>::last_raw_hex (const unsigned int) const {
+  DoFHandler<2>::last_raw_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -558,7 +623,8 @@ namespace hp
 
   template <>
   DoFHandler<2>::raw_hex_iterator
-  DoFHandler<2>::last_raw_hex () const {
+  DoFHandler<2>::last_raw_hex () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -566,7 +632,8 @@ namespace hp
 
   template <>
   DoFHandler<2>::hex_iterator
-  DoFHandler<2>::last_hex (const unsigned int) const {
+  DoFHandler<2>::last_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -574,7 +641,8 @@ namespace hp
 
   template <>
   DoFHandler<2>::hex_iterator
-  DoFHandler<2>::last_hex () const {
+  DoFHandler<2>::last_hex () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -582,7 +650,8 @@ namespace hp
 
   template <>
   DoFHandler<2>::active_hex_iterator
-  DoFHandler<2>::last_active_hex (const unsigned int) const {
+  DoFHandler<2>::last_active_hex (const unsigned int) const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -590,7 +659,8 @@ namespace hp
 
   template <>
   DoFHandler<2>::active_hex_iterator
-  DoFHandler<2>::last_active_hex () const {
+  DoFHandler<2>::last_active_hex () const
+  {
     Assert (false, ExcNotImplemented());
     return 0;
   }
@@ -603,140 +673,160 @@ namespace hp
 
   template <>
   DoFHandler<3>::raw_cell_iterator
-  DoFHandler<3>::begin_raw (const unsigned int level) const {
+  DoFHandler<3>::begin_raw (const unsigned int level) const
+  {
     return begin_raw_hex (level);
   }
 
 
   template <>
   DoFHandler<3>::cell_iterator
-  DoFHandler<3>::begin (const unsigned int level) const {
+  DoFHandler<3>::begin (const unsigned int level) const
+  {
     return begin_hex (level);
   }
 
 
   template <>
   DoFHandler<3>::active_cell_iterator
-  DoFHandler<3>::begin_active (const unsigned int level) const {
+  DoFHandler<3>::begin_active (const unsigned int level) const
+  {
     return begin_active_hex (level);
   }
 
 
   template <>
   DoFHandler<3>::raw_cell_iterator
-  DoFHandler<3>::end () const {
+  DoFHandler<3>::end () const
+  {
     return end_hex ();
   }
 
 
   template <>
   DoFHandler<3>::raw_cell_iterator
-  DoFHandler<3>::last_raw () const {
+  DoFHandler<3>::last_raw () const
+  {
     return last_raw_hex ();
   }
 
 
   template <>
   DoFHandler<3>::raw_cell_iterator
-  DoFHandler<3>::last_raw (const unsigned int level) const {
+  DoFHandler<3>::last_raw (const unsigned int level) const
+  {
     return last_raw_hex (level);
   }
 
 
   template <>
   DoFHandler<3>::cell_iterator
-  DoFHandler<3>::last () const {
+  DoFHandler<3>::last () const
+  {
     return last_hex ();
   }
 
 
   template <>
   DoFHandler<3>::cell_iterator
-  DoFHandler<3>::last (const unsigned int level) const {
+  DoFHandler<3>::last (const unsigned int level) const
+  {
     return last_hex (level);
   }
 
 
   template <>
   DoFHandler<3>::active_cell_iterator
-  DoFHandler<3>::last_active () const {
+  DoFHandler<3>::last_active () const
+  {
     return last_active_hex ();
   }
 
 
   template <>
   DoFHandler<3>::active_cell_iterator
-  DoFHandler<3>::last_active (const unsigned int level) const {
+  DoFHandler<3>::last_active (const unsigned int level) const
+  {
     return last_active_hex (level);
   }
 
 
   template <>
   DoFHandler<3>::raw_face_iterator
-  DoFHandler<3>::begin_raw_face (const unsigned int level) const {
+  DoFHandler<3>::begin_raw_face (const unsigned int level) const
+  {
     return begin_raw_quad (level);
   }
 
 
   template <>
   DoFHandler<3>::face_iterator
-  DoFHandler<3>::begin_face (const unsigned int level) const {
+  DoFHandler<3>::begin_face (const unsigned int level) const
+  {
     return begin_quad (level);
   }
 
 
   template <>
   DoFHandler<3>::active_face_iterator
-  DoFHandler<3>::begin_active_face (const unsigned int level) const {
+  DoFHandler<3>::begin_active_face (const unsigned int level) const
+  {
     return begin_active_quad (level);
   }
 
 
   template <>
   DoFHandler<3>::raw_face_iterator
-  DoFHandler<3>::end_face () const {
+  DoFHandler<3>::end_face () const
+  {
     return end_quad ();
   }
 
 
   template <>
   DoFHandler<3>::raw_face_iterator
-  DoFHandler<3>::last_raw_face () const {
+  DoFHandler<3>::last_raw_face () const
+  {
     return last_raw_quad ();
   }
 
 
   template <>
   DoFHandler<3>::raw_face_iterator
-  DoFHandler<3>::last_raw_face (const unsigned int level) const {
+  DoFHandler<3>::last_raw_face (const unsigned int level) const
+  {
     return last_raw_quad (level);
   }
 
 
   template <>
   DoFHandler<3>::face_iterator
-  DoFHandler<3>::last_face () const {
+  DoFHandler<3>::last_face () const
+  {
     return last_quad ();
   }
 
 
   template <>
   DoFHandler<3>::face_iterator
-  DoFHandler<3>::last_face (const unsigned int level) const {
+  DoFHandler<3>::last_face (const unsigned int level) const
+  {
     return last_quad (level);
   }
 
 
   template <>
   DoFHandler<3>::active_face_iterator
-  DoFHandler<3>::last_active_face () const {
+  DoFHandler<3>::last_active_face () const
+  {
     return last_active_quad ();
   }
 
 
   template <>
   DoFHandler<3>::active_face_iterator
-  DoFHandler<3>::last_active_face (const unsigned int level) const {
+  DoFHandler<3>::last_active_face (const unsigned int level) const
+  {
     return last_active_quad (level);
   }
 
@@ -746,7 +836,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_line_iterator
-  DoFHandler<dim>::begin_raw_line (const unsigned int level) const {
+  DoFHandler<dim>::begin_raw_line (const unsigned int level) const
+  {
     return raw_line_iterator (tria,
                               tria->begin_raw_line(level)->level(),
                               tria->begin_raw_line(level)->index(),
@@ -756,7 +847,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::line_iterator
-  DoFHandler<dim>::begin_line (const unsigned int level) const {
+  DoFHandler<dim>::begin_line (const unsigned int level) const
+  {
     return line_iterator (tria,
                           tria->begin_line(level)->level(),
                           tria->begin_line(level)->index(),
@@ -766,7 +858,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::active_line_iterator
-  DoFHandler<dim>::begin_active_line (const unsigned int level) const {
+  DoFHandler<dim>::begin_active_line (const unsigned int level) const
+  {
     return active_line_iterator (tria,
                                  tria->begin_active_line(level)->level(),
                                  tria->begin_active_line(level)->index(),
@@ -776,7 +869,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_quad_iterator
-  DoFHandler<dim>::begin_raw_quad (const unsigned int level) const {
+  DoFHandler<dim>::begin_raw_quad (const unsigned int level) const
+  {
     return raw_quad_iterator (tria,
                               tria->begin_raw_quad(level)->level(),
                               tria->begin_raw_quad(level)->index(),
@@ -786,7 +880,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::quad_iterator
-  DoFHandler<dim>::begin_quad (const unsigned int level) const {
+  DoFHandler<dim>::begin_quad (const unsigned int level) const
+  {
     return quad_iterator (tria,
                           tria->begin_quad(level)->level(),
                           tria->begin_quad(level)->index(),
@@ -796,7 +891,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::active_quad_iterator
-  DoFHandler<dim>::begin_active_quad (const unsigned int level) const {
+  DoFHandler<dim>::begin_active_quad (const unsigned int level) const
+  {
     return active_quad_iterator (tria,
                                  tria->begin_active_quad(level)->level(),
                                  tria->begin_active_quad(level)->index(),
@@ -806,7 +902,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_hex_iterator
-  DoFHandler<dim>::begin_raw_hex (const unsigned int level) const {
+  DoFHandler<dim>::begin_raw_hex (const unsigned int level) const
+  {
     return raw_hex_iterator (tria,
                              tria->begin_raw_hex(level)->level(),
                              tria->begin_raw_hex(level)->index(),
@@ -816,7 +913,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::hex_iterator
-  DoFHandler<dim>::begin_hex (const unsigned int level) const {
+  DoFHandler<dim>::begin_hex (const unsigned int level) const
+  {
     return hex_iterator (tria,
                          tria->begin_hex(level)->level(),
                          tria->begin_hex(level)->index(),
@@ -826,7 +924,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::active_hex_iterator
-  DoFHandler<dim>::begin_active_hex (const unsigned int level) const {
+  DoFHandler<dim>::begin_active_hex (const unsigned int level) const
+  {
     return active_hex_iterator (tria,
                                 tria->begin_active_hex(level)->level(),
                                 tria->begin_active_hex(level)->index(),
@@ -836,28 +935,32 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_line_iterator
-  DoFHandler<dim>::end_line () const {
+  DoFHandler<dim>::end_line () const
+  {
     return raw_line_iterator (tria, -1, -1, this);
   }
 
 
   template <int dim>
   typename DoFHandler<dim>::raw_quad_iterator
-  DoFHandler<dim>::end_quad () const {
+  DoFHandler<dim>::end_quad () const
+  {
     return raw_quad_iterator (tria, -1, -1, this);
   }
 
 
   template <int dim>
   typename DoFHandler<dim>::raw_hex_iterator
-  DoFHandler<dim>::end_hex () const {
+  DoFHandler<dim>::end_hex () const
+  {
     return raw_hex_iterator (tria, -1, -1, this);
   }
 
 
   template <int dim>
   typename DoFHandler<dim>::raw_cell_iterator
-  DoFHandler<dim>::end_raw (const unsigned int level) const {
+  DoFHandler<dim>::end_raw (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             end() :
             begin_raw (level+1));
@@ -866,7 +969,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::cell_iterator
-  DoFHandler<dim>::end (const unsigned int level) const {
+  DoFHandler<dim>::end (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             cell_iterator(end()) :
             begin (level+1));
@@ -875,7 +979,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::active_cell_iterator
-  DoFHandler<dim>::end_active (const unsigned int level) const {
+  DoFHandler<dim>::end_active (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             active_cell_iterator(end()) :
             begin_active (level+1));
@@ -884,7 +989,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_face_iterator
-  DoFHandler<dim>::end_raw_face (const unsigned int level) const {
+  DoFHandler<dim>::end_raw_face (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             end_face() :
             begin_raw_face (level+1));
@@ -893,7 +999,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::face_iterator
-  DoFHandler<dim>::end_face (const unsigned int level) const {
+  DoFHandler<dim>::end_face (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             face_iterator(end_face()) :
             begin_face (level+1));
@@ -902,7 +1009,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::active_face_iterator
-  DoFHandler<dim>::end_active_face (const unsigned int level) const {
+  DoFHandler<dim>::end_active_face (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             active_face_iterator(end_face()) :
             begin_active_face (level+1));
@@ -911,7 +1019,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_line_iterator
-  DoFHandler<dim>::end_raw_line (const unsigned int level) const {
+  DoFHandler<dim>::end_raw_line (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             end_line() :
             begin_raw_line (level+1));
@@ -920,7 +1029,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::line_iterator
-  DoFHandler<dim>::end_line (const unsigned int level) const {
+  DoFHandler<dim>::end_line (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             line_iterator(end_line()) :
             begin_line (level+1));
@@ -929,7 +1039,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::active_line_iterator
-  DoFHandler<dim>::end_active_line (const unsigned int level) const {
+  DoFHandler<dim>::end_active_line (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             active_line_iterator(end_line()) :
             begin_active_line (level+1));
@@ -938,7 +1049,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_quad_iterator
-  DoFHandler<dim>::end_raw_quad (const unsigned int level) const {
+  DoFHandler<dim>::end_raw_quad (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             end_quad() :
             begin_raw_quad (level+1));
@@ -947,7 +1059,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::quad_iterator
-  DoFHandler<dim>::end_quad (const unsigned int level) const {
+  DoFHandler<dim>::end_quad (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             quad_iterator(end_quad()) :
             begin_quad (level+1));
@@ -956,7 +1069,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::active_quad_iterator
-  DoFHandler<dim>::end_active_quad (const unsigned int level) const {
+  DoFHandler<dim>::end_active_quad (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             active_quad_iterator(end_quad()) :
             begin_active_quad (level+1));
@@ -965,7 +1079,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_hex_iterator
-  DoFHandler<dim>::end_raw_hex (const unsigned int level) const {
+  DoFHandler<dim>::end_raw_hex (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             end_hex() :
             begin_raw_hex (level+1));
@@ -974,7 +1089,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::hex_iterator
-  DoFHandler<dim>::end_hex (const unsigned int level) const {
+  DoFHandler<dim>::end_hex (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             hex_iterator(end_hex()) :
             begin_hex (level+1));
@@ -983,7 +1099,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::active_hex_iterator
-  DoFHandler<dim>::end_active_hex (const unsigned int level) const {
+  DoFHandler<dim>::end_active_hex (const unsigned int level) const
+  {
     return (level == levels.size()-1 ?
             active_hex_iterator(end_hex()) :
             begin_active_hex (level+1));
@@ -992,7 +1109,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_line_iterator
-  DoFHandler<dim>::last_raw_line (const unsigned int level) const {
+  DoFHandler<dim>::last_raw_line (const unsigned int level) const
+  {
     return raw_line_iterator (tria,
                               tria->last_raw_line(level)->level(),
                               tria->last_raw_line(level)->index(),
@@ -1002,7 +1120,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::line_iterator
-  DoFHandler<dim>::last_line (const unsigned int level) const {
+  DoFHandler<dim>::last_line (const unsigned int level) const
+  {
     return line_iterator (tria,
                           tria->last_line(level)->level(),
                           tria->last_line(level)->index(),
@@ -1012,7 +1131,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::active_line_iterator
-  DoFHandler<dim>::last_active_line (const unsigned int level) const {
+  DoFHandler<dim>::last_active_line (const unsigned int level) const
+  {
     return active_line_iterator (tria,
                                  tria->last_active_line(level)->level(),
                                  tria->last_active_line(level)->index(),
@@ -1022,7 +1142,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_quad_iterator
-  DoFHandler<dim>::last_raw_quad (const unsigned int level) const {
+  DoFHandler<dim>::last_raw_quad (const unsigned int level) const
+  {
     return raw_quad_iterator (tria,
                               tria->last_raw_quad(level)->level(),
                               tria->last_raw_quad(level)->index(),
@@ -1032,7 +1153,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::quad_iterator
-  DoFHandler<dim>::last_quad (const unsigned int level) const {
+  DoFHandler<dim>::last_quad (const unsigned int level) const
+  {
     return quad_iterator (tria,
                           tria->last_quad(level)->level(),
                           tria->last_quad(level)->index(),
@@ -1042,7 +1164,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::active_quad_iterator
-  DoFHandler<dim>::last_active_quad (const unsigned int level) const {
+  DoFHandler<dim>::last_active_quad (const unsigned int level) const
+  {
     return active_quad_iterator (tria,
                                  tria->last_active_quad(level)->level(),
                                  tria->last_active_quad(level)->index(),
@@ -1052,7 +1175,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_hex_iterator
-  DoFHandler<dim>::last_raw_hex (const unsigned int level) const {
+  DoFHandler<dim>::last_raw_hex (const unsigned int level) const
+  {
     return raw_hex_iterator (tria,
                              tria->last_raw_hex(level)->level(),
                              tria->last_raw_hex(level)->index(),
@@ -1062,7 +1186,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::hex_iterator
-  DoFHandler<dim>::last_hex (const unsigned int level) const {
+  DoFHandler<dim>::last_hex (const unsigned int level) const
+  {
     return hex_iterator (tria,
                          tria->last_hex(level)->level(),
                          tria->last_hex(level)->index(),
@@ -1072,7 +1197,8 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::active_hex_iterator
-  DoFHandler<dim>::last_active_hex (const unsigned int level) const {
+  DoFHandler<dim>::last_active_hex (const unsigned int level) const
+  {
     return active_hex_iterator (tria,
                                 tria->last_active_hex(level)->level(),
                                 tria->last_active_hex(level)->index(),
@@ -1082,63 +1208,72 @@ namespace hp
 
   template <int dim>
   typename DoFHandler<dim>::raw_line_iterator
-  DoFHandler<dim>::last_raw_line () const {
+  DoFHandler<dim>::last_raw_line () const
+  {
     return last_raw_line (levels.size()-1);
   }
 
 
   template <int dim>
   typename DoFHandler<dim>::raw_quad_iterator
-  DoFHandler<dim>::last_raw_quad () const {
+  DoFHandler<dim>::last_raw_quad () const
+  {
     return last_raw_quad (levels.size()-1);
   }
 
 
   template <int dim>
   typename DoFHandler<dim>::raw_hex_iterator
-  DoFHandler<dim>::last_raw_hex () const {
+  DoFHandler<dim>::last_raw_hex () const
+  {
     return last_raw_hex (levels.size()-1);
   }
 
 
   template <int dim>
   typename DoFHandler<dim>::line_iterator
-  DoFHandler<dim>::last_line () const {
+  DoFHandler<dim>::last_line () const
+  {
     return last_line (levels.size()-1);
   }
 
 
   template <int dim>
   typename DoFHandler<dim>::quad_iterator
-  DoFHandler<dim>::last_quad () const {
+  DoFHandler<dim>::last_quad () const
+  {
     return last_quad (levels.size()-1);
   }
 
 
   template <int dim>
   typename DoFHandler<dim>::hex_iterator
-  DoFHandler<dim>::last_hex () const {
+  DoFHandler<dim>::last_hex () const
+  {
     return last_hex (levels.size()-1);
   }
 
 
   template <int dim>
   typename DoFHandler<dim>::active_line_iterator
-  DoFHandler<dim>::last_active_line () const {
+  DoFHandler<dim>::last_active_line () const
+  {
     return last_active_line (levels.size()-1);
   }
 
 
   template <int dim>
   typename DoFHandler<dim>::active_quad_iterator
-  DoFHandler<dim>::last_active_quad () const {
+  DoFHandler<dim>::last_active_quad () const
+  {
     return last_active_quad (levels.size()-1);
   }
 
 
   template <int dim>
   typename DoFHandler<dim>::active_hex_iterator
-  DoFHandler<dim>::last_active_hex () const {
+  DoFHandler<dim>::last_active_hex () const
+  {
     return last_active_hex (levels.size()-1);
   }
 
@@ -2396,7 +2531,8 @@ namespace hp
 
 
   template <int dim>
-  void DoFHandler<dim>::clear_space () {  
+  void DoFHandler<dim>::clear_space ()
+  {  
     for (unsigned int i=0; i<levels.size(); ++i)
       delete levels[i];
     levels.resize (0);
