@@ -1,4 +1,4 @@
-//----------------------------  crash_02.cc  ---------------------------
+//----------------------------  crash_03.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  crash_02.cc  ---------------------------
+//----------------------------  crash_03.cc  ---------------------------
 
 
 // trigger an error in hp::DoFHandler::create_active_fe_table
@@ -56,7 +56,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("crash_02/output");
+  std::ofstream logfile("crash_03/output");
   logfile.precision(2);
   
   deallog.attach(logfile);
