@@ -43,6 +43,7 @@ namespace hp
                   tria(&tria),
                   used_dofs (0)
   {
+    create_active_fe_table ();
     tria.add_refinement_listener (*this);
   }
 
