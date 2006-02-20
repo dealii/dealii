@@ -100,7 +100,7 @@ namespace hp
                                         * first, followed by the mapping
                                         * object for active_fe_index 1.
                                         */
-      unsigned int push_back (const Mapping<dim> &new_mapping);
+      void push_back (const Mapping<dim> &new_mapping);
 
     private:
                                        /**

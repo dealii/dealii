@@ -60,8 +60,7 @@ namespace hp
                                         * components as all other elements
                                         * already in the collection.
                                         */
-      unsigned int
-      push_back (const FiniteElement<dim> &new_fe);
+      void push_back (const FiniteElement<dim> &new_fe);
 
                                        /**
                                         * Get a reference to the given element

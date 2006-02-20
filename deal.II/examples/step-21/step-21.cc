@@ -662,20 +662,19 @@ DGMethod<dim>::DGMethod ()
 		dof_handler (triangulation),
 		dg ()
 {
-				     // Change here for hp
-				     // methods of
-				     // different maximum degrees.
-    const unsigned int hp_degree = 5;
-    unsigned int elm_no;
-    for (unsigned int i = 0; i < hp_degree; ++i)
+				   // Change here for hp
+				   // methods of
+				   // different maximum degrees.
+  const unsigned int hp_degree = 5;
+  for (unsigned int i = 0; i < hp_degree; ++i)
     {
-	elm_no = fe_collection.push_back (FE_DGQ<dim> (i));
-	quadratures.push_back (QGauss<dim> (i+2));
-	face_quadratures.push_back (QGauss<dim-1> (i+2));
+      fe_collection.push_back (FE_DGQ<dim> (i));
+      quadratures.push_back (QGauss<dim> (i+2));
+      face_quadratures.push_back (QGauss<dim-1> (i+2));
     }
 
-    static const MappingQ1<dim> mapping;
-    mapping_collection.push_back (mapping);
+  static const MappingQ1<dim> mapping;
+  mapping_collection.push_back (mapping);
 }
 
 

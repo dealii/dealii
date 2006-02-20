@@ -61,7 +61,7 @@ namespace hp
 
 
   template <int dim>
-  unsigned int
+  void
   MappingCollection<dim>::push_back (const Mapping<dim> &new_mapping)
   {
                                      // A MappingCollection, which was
@@ -72,8 +72,6 @@ namespace hp
     
     mappings
       .push_back (boost::shared_ptr<const Mapping<dim> >(new_mapping.clone()));
-
-    return mappings.size ();
   }
 
 

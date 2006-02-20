@@ -99,7 +99,7 @@ namespace hp
                                         * this object upon destruction of the
                                         * entire collection.
                                         */
-      unsigned int push_back (const Quadrature<dim> &new_quadrature);
+      void push_back (const Quadrature<dim> &new_quadrature);
     
                                        /**
                                         * Determine an estimate for the

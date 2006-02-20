@@ -68,9 +68,8 @@ namespace hp
 
 
   template <int dim>
-  unsigned int
-  QCollection<dim>::
-  push_back (const Quadrature<dim> &new_quadrature)
+  void
+  QCollection<dim>::push_back (const Quadrature<dim> &new_quadrature)
   {
                                      // A QCollection, which was initialized
                                      // as single QCollection cannot
@@ -79,7 +78,6 @@ namespace hp
 
     quadratures
       .push_back (boost::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(new_quadrature)));
-    return quadratures.size ();
   }
 
 

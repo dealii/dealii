@@ -18,7 +18,7 @@
 namespace hp
 {
   template <int dim>
-  unsigned int FECollection<dim>::push_back (const FiniteElement<dim> &new_fe)
+  void FECollection<dim>::push_back (const FiniteElement<dim> &new_fe)
   {
                                      // check that the new element has the right
                                      // number of components. only check with
@@ -32,8 +32,6 @@ namespace hp
   
     finite_elements
       .push_back (boost::shared_ptr<const FiniteElement<dim> >(new_fe.clone()));
-    
-    return finite_elements.size ();
   }
 
 
