@@ -53,7 +53,7 @@ namespace internal
 
 template <typename Number>
 Vector<Number>::Vector (const Vector<Number>& v)
-                :
+                : Subscriptor(),
 		vec_size(v.size()),
 		max_vec_size(v.size()),
 		val(0)
@@ -72,7 +72,7 @@ Vector<Number>::Vector (const Vector<Number>& v)
 template <typename Number>
 template <typename OtherNumber>
 Vector<Number>::Vector (const Vector<OtherNumber>& v)
-                :
+                : Subscriptor(),
 		vec_size(v.size()),
 		max_vec_size(v.size()),
 		val(0)
@@ -91,7 +91,7 @@ Vector<Number>::Vector (const Vector<OtherNumber>& v)
 
 template <typename Number>
 Vector<Number>::Vector (const PETScWrappers::Vector &v)
-                :
+                : Subscriptor(),
 		vec_size(v.size()),
 		max_vec_size(v.size()),
 		val(0)
@@ -120,7 +120,7 @@ Vector<Number>::Vector (const PETScWrappers::Vector &v)
 
 template <typename Number>
 Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
-                :
+                : Subscriptor(),
 		vec_size(0),
 		max_vec_size(0),
 		val(0)

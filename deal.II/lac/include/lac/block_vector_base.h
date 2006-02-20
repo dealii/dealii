@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/subscriptor.h>
 #include <lac/exceptions.h>
 #include <lac/block_indices.h>
 
@@ -656,6 +657,7 @@ namespace internal
  */
 template <class VectorType>
 class BlockVectorBase
+  : public Subscriptor
 {
   public:
                                      /**

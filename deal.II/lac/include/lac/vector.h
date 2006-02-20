@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/subscriptor.h>
 
 #include <cstdio>
 
@@ -55,7 +56,8 @@ template<typename number> class LAPACKFullMatrix;
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template <typename Number>
-class Vector
+class Vector :
+  public Subscriptor
 {
   public:
 				     /**
