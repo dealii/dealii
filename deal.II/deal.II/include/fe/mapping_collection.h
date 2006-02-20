@@ -65,23 +65,41 @@ namespace hp
       MappingCollection (const Mapping<dim> &mapping);
 
                                        /**
-                                        * Returns the number of mapping
-                                        * objects stored in this container.
+                                        * Adds a new mapping to the
+                                        * MappingCollection.  The
+                                        * mappings have to be added in
+                                        * the order of the
+                                        * active_fe_indices. Thus the
+                                        * reference to the mapping
+                                        * object for active_fe_index 0
+                                        * has to be added first,
+                                        * followed by the mapping
+                                        * object for active_fe_index
+                                        * 1.
                                         */
-      unsigned int size () const;
+      void push_back (const Mapping<dim> &new_mapping);
 
                                        /**
-                                        * Returns the mapping object which
-                                        * was specified by the user for the
-                                        * active_fe_index which is provided
-                                        * as a parameter to this method.
+                                        * Returns the mapping object
+                                        * which was specified by the
+                                        * user for the active_fe_index
+                                        * which is provided as a
+                                        * parameter to this method.
                                         *
-                                        * @pre @p index must be between zero
-                                        * and the number of elements of the
+                                        * @pre @p index must be
+                                        * between zero and the number
+                                        * of elements of the
                                         * collection.
                                         */
       const Mapping<dim> &
       operator[] (const unsigned int index) const;
+
+                                       /**
+                                        * Returns the number of
+                                        * mapping objects stored in
+                                        * this container.
+                                        */
+      unsigned int size () const;
     
                                        /**
                                         * Determine an estimate for the
@@ -89,18 +107,6 @@ namespace hp
                                         * of this object.
                                         */
       unsigned int memory_consumption () const;
-
-                                       /**
-                                        * Adds a new mapping to the
-                                        * MappingCollection.  The mappings
-                                        * have to be added in the order of the
-                                        * active_fe_indices. Thus the
-                                        * reference to the mapping object for
-                                        * active_fe_index 0 has to be added
-                                        * first, followed by the mapping
-                                        * object for active_fe_index 1.
-                                        */
-      void push_back (const Mapping<dim> &new_mapping);
 
     private:
                                        /**

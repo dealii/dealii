@@ -44,38 +44,40 @@ namespace hp
   {
     public:
                                        /**
-                                        * Add a finite element. This function
-                                        * generates a copy of the given
-                                        * element, i.e. you can do things like
-                                        * <tt>add_fe(FE_Q<dim>(1));</tt>. The
-                                        * internal copy is later destroyed by
-                                        * this object upon destruction of the
+                                        * Add a finite element. This
+                                        * function generates a copy of
+                                        * the given element, i.e. you
+                                        * can do things like
+                                        * <tt>push_back(FE_Q<dim>(1));</tt>. The
+                                        * internal copy is later
+                                        * destroyed by this object
+                                        * upon destruction of the
                                         * entire collection.
                                         *
-                                        * The returned value is the new number
-                                        * of finite elements in the collection.
-                                        *
-                                        * When a new element is added, it needs
-                                        * to have the same number of vector
-                                        * components as all other elements
+                                        * When a new element is added,
+                                        * it needs to have the same
+                                        * number of vector components
+                                        * as all other elements
                                         * already in the collection.
                                         */
       void push_back (const FiniteElement<dim> &new_fe);
 
                                        /**
-                                        * Get a reference to the given element
-                                        * in this collection.
+                                        * Get a reference to the given
+                                        * element in this collection.
                                         *
-                                        * @pre @p index must be between zero
-                                        * and the number of elements of the
+                                        * @pre @p index must be
+                                        * between zero and the number
+                                        * of elements of the
                                         * collection.
                                         */
       const FiniteElement<dim> &
       operator[] (const unsigned int index) const;
 
                                        /**
-                                        * Return the number of finite element
-                                        * objects stored in this collection.
+                                        * Return the number of finite
+                                        * element objects stored in
+                                        * this collection.
                                         */
       unsigned int size () const;
 

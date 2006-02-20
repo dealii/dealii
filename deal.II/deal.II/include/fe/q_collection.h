@@ -62,10 +62,30 @@ namespace hp
       QCollection (const Quadrature<dim> &quadrature);
 
                                        /**
-                                        * Returns the number of quadrature
-                                        * pointers stored in this object.
+                                        * Adds a new quadrature rule
+                                        * to the QCollection.  The
+                                        * quadrature rules have to be
+                                        * added in the same order as
+                                        * for the FECollection for
+                                        * which this quadrature rule
+                                        * collection is meant. Thus
+                                        * the reference to the
+                                        * quadrature rule for
+                                        * active_fe_index 0 has to be
+                                        * added first, followed by the
+                                        * quadrature rule for
+                                        * active_fe_index 1.
+                                        *
+                                        * This class creates a copy of
+                                        * the given quadrature object,
+                                        * i.e. you can do things like
+                                        * <tt>push_back(QGauss<dim>(3));</tt>. The
+                                        * internal copy is later
+                                        * destroyed by this object
+                                        * upon destruction of the
+                                        * entire collection.
                                         */
-      unsigned int size () const;
+      void push_back (const Quadrature<dim> &new_quadrature);
 
                                        /**
                                         * Returns a reference to the
@@ -80,26 +100,11 @@ namespace hp
       operator[] (const unsigned int index) const;
 
                                        /**
-                                        * Adds a new quadrature rule to the
-                                        * QCollection.  The quadrature rules
-                                        * have to be added in the same order
-                                        * as for the FECollection for which
-                                        * this quadrature rule collection is
-                                        * meant. Thus the reference to the
-                                        * quadrature rule for active_fe_index
-                                        * 0 has to be added first, followed by
-                                        * the quadrature rule for
-                                        * active_fe_index 1.
-                                        *
-                                        * This class creates a copy of the
-                                        * given quadrature object, i.e. you
-                                        * can do things like
-                                        * <tt>add_quadrature(QGauss<dim>(3));</tt>. The
-                                        * internal copy is later destroyed by
-                                        * this object upon destruction of the
-                                        * entire collection.
+                                        * Returns the number of
+                                        * quadrature pointers stored
+                                        * in this object.
                                         */
-      void push_back (const Quadrature<dim> &new_quadrature);
+      unsigned int size () const;
     
                                        /**
                                         * Determine an estimate for the
