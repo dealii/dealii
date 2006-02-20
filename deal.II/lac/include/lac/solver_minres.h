@@ -210,7 +210,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   deallog.push("minres");
 
 
-  unsigned int VS = b.size();
+  // unsigned int VS = b.size();
 
   
 				   // Memory allocation
@@ -229,13 +229,13 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
 				   // resize the vectors, but do not set
 				   // the values since they'd be overwritten
 				   // soon anyway.
-  u[0]->reinit(VS,true);
-  u[1]->reinit(VS,true);
-  u[2]->reinit(VS,true);
-  m[0]->reinit(VS,true);
-  m[1]->reinit(VS,true);
-  m[2]->reinit(VS,true);
-  v.reinit(VS,true);
+  u[0]->reinit(b,true);
+  u[1]->reinit(b,true);
+  u[2]->reinit(b,true);
+  m[0]->reinit(b,true);
+  m[1]->reinit(b,true);
+  m[2]->reinit(b,true);
+  v.reinit(b,true);
 
 				   // some values needed
   double delta[3];
@@ -274,11 +274,11 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
   r_l2 = r0;
   
   
-  u[0]->reinit(VS);
+  u[0]->reinit(b);
   delta[0] = 1.;
-  m[0]->reinit(VS);
-  m[1]->reinit(VS);
-  m[2]->reinit(VS);
+  m[0]->reinit(b);
+  m[1]->reinit(b);
+  m[2]->reinit(b);
 				   
   conv = this->control().check(0,r_l2);
   
@@ -287,7 +287,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
       if (delta[1]!=0)
 	v *= 1./std::sqrt(delta[1]);
       else
-	v.reinit(VS);
+	v.reinit(b);
 
       A.vmult(*u[2],v);
       u[2]->add (-std::sqrt(delta[1]/delta[0]), *u[0]);
