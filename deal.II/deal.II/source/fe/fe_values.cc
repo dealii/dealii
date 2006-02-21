@@ -1047,15 +1047,6 @@ FEValuesBase<dim>::compute_update_flags (const UpdateFlags update_flags) const
 
 
 
-template <int dim>
-const Mapping<dim> &
-FEValuesBase<dim>::get_default_mapping ()
-{
-  static const MappingQ1<dim> mapping_q1;
-  return mapping_q1;
-}
-
-
 /*------------------------------- FEValues -------------------------------*/
 
 
@@ -1086,7 +1077,7 @@ FEValues<dim>::FEValues (const FiniteElement<dim> &fe,
 		FEValuesBase<dim> (q.n_quadrature_points,
 				   fe.dofs_per_cell,
 				   update_default,
-				   this->get_default_mapping(),
+				   StaticMappingQ1<dim>::mapping,
 				   fe),
   quadrature (q)
 {
@@ -1350,7 +1341,7 @@ FEFaceValues<dim>::FEFaceValues (const FiniteElement<dim> &fe,
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_cell,
 				       update_flags,
-				       this->get_default_mapping(),
+				       StaticMappingQ1<dim>::mapping,
 				       fe, quadrature)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1558,7 +1549,7 @@ FESubfaceValues<dim>::FESubfaceValues (const FiniteElement<dim> &fe,
 		FEFaceValuesBase<dim> (quadrature.n_quadrature_points,
 				       fe.dofs_per_cell,
 				       update_flags,
-				       this->get_default_mapping(),
+				       StaticMappingQ1<dim>::mapping,
 				       fe, quadrature)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
