@@ -155,14 +155,6 @@ namespace internal
     template <int dim, int q_dim>
     class FEValuesBase 
     {
-      private:
-                                         /**
-                                          * Default mapping, in case
-                                          * none was provided through
-                                          * the call to the constructor.
-                                          */
-        static const MappingQ1<dim> default_mapping;
-
       public:
                                          /**
                                           * Constructor. Set the fields
@@ -195,7 +187,7 @@ namespace internal
                                           * upon construction of the
                                           * object.
                                           */
-        const ::hp::MappingCollection<dim> mapping_collection;
+        SmartPointer<const ::hp::MappingCollection<dim> > mapping_collection;
     
                                          /**
                                           * Copy of the quadrature

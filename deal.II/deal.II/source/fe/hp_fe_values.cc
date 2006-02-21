@@ -55,18 +55,12 @@ namespace internal
 // -------------------------- FEValuesBase -------------------------
 
     template <int dim, int q_dim>
-    const MappingQ1<dim>
-    FEValuesBase<dim,q_dim>::default_mapping;
-
-  
-
-    template <int dim, int q_dim>
     FEValuesBase<dim,q_dim>::FEValuesBase (
       const ::hp::MappingCollection<dim> &mapping_collection,
       const ::hp::QCollection<q_dim>     &q_collection,
       const UpdateFlags             update_flags)
                     :
-                    mapping_collection (mapping_collection),
+                    mapping_collection (&mapping_collection),
                     q_collection (q_collection),
                     update_flags (update_flags)
     {}
@@ -76,7 +70,7 @@ namespace internal
     FEValuesBase<dim,q_dim>::FEValuesBase (const ::hp::QCollection<q_dim> &q_collection,
                                            const UpdateFlags         update_flags)
                     :
-                    mapping_collection (default_mapping),
+                    mapping_collection (&::hp::StaticMappingQ1<dim>::mapping_collection),
                     q_collection (q_collection),
                     update_flags (update_flags)
     {}
@@ -130,7 +124,7 @@ namespace hp
                                    const unsigned int active_fe_index) const
   {
     return new ::FEValues<dim> (
-      this->mapping_collection[active_fe_index], fe,
+      (*this->mapping_collection)[active_fe_index], fe,
       this->q_collection[active_fe_index], this->update_flags);
   }
 
@@ -187,7 +181,7 @@ namespace hp
                                        const unsigned int active_fe_index) const
   {
     return new ::FEFaceValues<dim> (
-      this->mapping_collection[active_fe_index], fe,
+      (*this->mapping_collection)[active_fe_index], fe,
       this->q_collection[active_fe_index], this->update_flags);
   }
 
@@ -246,7 +240,7 @@ namespace hp
                                           const unsigned int active_fe_index) const
   {
     return new ::FESubfaceValues<dim> (
-      this->mapping_collection[active_fe_index], fe,
+      (*this->mapping_collection)[active_fe_index], fe,
       this->q_collection[active_fe_index], this->update_flags);
   }
 }
