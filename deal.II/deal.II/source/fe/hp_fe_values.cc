@@ -33,19 +33,20 @@ namespace internal
     FEValuesMap<dim,FEValues>::select_fe_values (const FiniteElement<dim> &fe,
                                                  const unsigned int active_fe_index)
     {
+      std::pair<SmartPointer<const FiniteElement<dim> >, unsigned int> fe_pair=
+	std::make_pair(&fe, active_fe_index);
                                        // check if the finite element
                                        // does not exist as a key in the
                                        // map
-      if (fe_to_fe_values_map.find (std::make_pair(&fe, active_fe_index)) ==
-          fe_to_fe_values_map.end())
+      if (fe_to_fe_values_map.find (fe_pair) == fe_to_fe_values_map.end())
                                          // a-ha! doesn't yet, so let's
                                          // make it up
-        fe_to_fe_values_map[std::make_pair(&fe, active_fe_index)]
+        fe_to_fe_values_map[fe_pair]
           = boost::shared_ptr<FEValues> (create_fe_values (fe, active_fe_index));
 
 
                                        // now there definitely is one!
-      present_fe_values = fe_to_fe_values_map[std::make_pair (&fe, active_fe_index)];
+      present_fe_values = fe_to_fe_values_map[fe_pair];
 
       return *present_fe_values;
     }
