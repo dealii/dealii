@@ -90,7 +90,7 @@
  *  Both modes use exception classes, which need to have special features
  *  in additional to the <tt>C++</tt> standard's <tt>std::exception</tt> class.
  *  Such a class is declared by the following lines of code:
- *   @code
+ *  @code
  *     DeclException2 (ExcDomain, int, int,
  *                     << "Index= " << arg1 << "Upper Bound= " << arg2);
  *  @endcode
@@ -200,7 +200,7 @@
  *  raise the exception by the following construct:
  *  @code
  *    Assert (false, ExcInternalError());
- *  @code
+ *  @endcode
  *  See the @ref step_7 "step-7" and several other of the tutorial programs for
  *  a use of this construct.
  *
@@ -343,7 +343,7 @@
  *    Additional Information: 
  *      i=5, m=3
  *    --------------------------------------------------------
- *  @code
+ *  @endcode
  *  
  *  Obviously for the <tt>DeclException0(name)</tt> macro, no types and
  *  also no output sequence is allowed.
