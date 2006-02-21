@@ -598,15 +598,6 @@ class DGMethod
     void output_results (const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
-
-				     // Currently this example code
-                                     // works on a rectangular domain.
-                                     // Hence a linear mapping of degree
-                                     // 1 is sufficient. If irregular
-                                     // boundaries come into play, this
-                                     // object should be replaced by
-                                     // a MappingCollection.
-    hp::MappingCollection<dim> mapping_collection;
     
 				     // In contrast to the example code
                                      // of step-12, this time DG elements
@@ -672,9 +663,6 @@ DGMethod<dim>::DGMethod ()
       quadratures.push_back (QGauss<dim> (i+2));
       face_quadratures.push_back (QGauss<dim-1> (i+2));
     }
-
-  static const MappingQ1<dim> mapping;
-  mapping_collection.push_back (mapping);
 }
 
 
@@ -829,7 +817,8 @@ void DGMethod<dim>::assemble_system1 ()
 				   // assumes a ``MappingQ1'' mapping)
 				   // and makes it easier to change
 				   // the mapping object later.
-  hp::FEValues<dim> fe_v_x (mapping_collection, fe_collection, quadratures, update_flags);
+  hp::FEValues<dim> fe_v_x (hp::StaticMappingQ1<dim>::mapping_collection,
+			    fe_collection, quadratures, update_flags);
   
 				   // Similarly we create the
 				   // ``FEFaceValues'' and
@@ -842,13 +831,13 @@ void DGMethod<dim>::assemble_system1 ()
 				   // current cell and the face (and
 				   // subface) number.
   hp::FEFaceValues<dim> fe_v_face_x (
-    mapping_collection, fe_collection, face_quadratures, face_update_flags);
+    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_x (
-    mapping_collection, fe_collection, face_quadratures, face_update_flags);
+    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, face_update_flags);
   hp::FEFaceValues<dim> fe_v_face_neighbor_x (
-    mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
+    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_neighbor_x (
-    mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
+    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
 
 				   // Now we create the cell matrices
 				   // and vectors. Here we need two
@@ -1323,13 +1312,13 @@ void DGMethod<dim>::assemble_system2 ()
 				   // ``fe_v_face_neighbor'' as case 4
 				   // does not occur.
   hp::FEValues<dim> fe_v_x (
-    mapping_collection, fe_collection, quadratures, update_flags);
+    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, quadratures, update_flags);
   hp::FEFaceValues<dim> fe_v_face_x (
-    mapping_collection, fe_collection, face_quadratures, face_update_flags);
+    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_x (
-    mapping_collection, fe_collection, face_quadratures, face_update_flags);
+    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, face_update_flags);
   hp::FEFaceValues<dim> fe_v_face_neighbor_x (
-    mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
+    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
 
   const unsigned int max_dofs_per_cell = fe_collection.max_dofs_per_cell ();
 
@@ -1619,7 +1608,7 @@ void DGMethod<dim>::refine_grid ()
 // 						 gradient_indicator);
 
   for (unsigned int i=0; i<gradient_indicator.size(); ++i)
-    gradient_indicator(i) = std::sin(1.*i);
+    gradient_indicator(i) = std::sin(3.14*i/gradient_indicator.size());
   
 				   // and they are cell-wise scaled by
 				   // the factor $h^{1+d/2}$
