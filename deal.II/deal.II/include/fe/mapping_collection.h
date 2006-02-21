@@ -15,7 +15,7 @@
 
 #include <base/config.h>
 #include <base/subscriptor.h>
-#include <fe/mapping.h>
+#include <fe/mapping_q1.h>
 #include <fe/fe.h>
 
 #include <vector>
@@ -131,6 +131,18 @@ namespace hp
       std::vector<boost::shared_ptr<const Mapping<dim> > > mappings;
   };
 
+
+/**
+ * In order to avoid creation of static MappingQ1 objects at several
+ * places in the library (in particular in backward compatibility
+ * functions), we define a static MappingQ1 objects once and for all
+ * places where it is needed.
+ */
+  template <int dim>
+  struct StaticMappingQ1
+  {
+      static MappingCollection<dim> mapping_collection;
+  };
 
 
 /* --------------- inline functions ------------------- */

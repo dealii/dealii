@@ -74,9 +74,14 @@ namespace hp
       .push_back (boost::shared_ptr<const Mapping<dim> >(new_mapping.clone()));
   }
 
+//---------------------------------------------------------------------------
+
+
+  template <int dim> MappingCollection<dim>
+  StaticMappingQ1<dim>::mapping_collection(::StaticMappingQ1<dim>::mapping);
 
 // explicit instantiations
   template class MappingCollection<deal_II_dimension>;
-
+  template struct StaticMappingQ1<deal_II_dimension>;
   
 }
