@@ -1032,4 +1032,15 @@ MappingQ1<dim>::clone () const
 
 //---------------------------------------------------------------------------
 
+
+template <int dim> MappingQ1<dim> StaticMappingQ1<dim>::mapping;
+
+
+
+//---------------------------------------------------------------------------
+
 template class MappingQ1<deal_II_dimension>;
+template struct StaticMappingQ1<deal_II_dimension>;
+
+
+

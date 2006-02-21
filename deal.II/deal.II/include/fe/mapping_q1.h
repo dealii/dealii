@@ -605,6 +605,20 @@ class MappingQ1 : public Mapping<dim>
     static const unsigned int n_shape_functions = GeometryInfo<dim>::vertices_per_cell;
 };
 
+
+/**
+ * In order to avoid creation of static MappingQ1 objects at several
+ * places in the library (in particular in backward compatibility
+ * functions), we define a static MappingQ1 objects once and for all
+ * places where it is needed.
+ */
+template <int dim>
+struct StaticMappingQ1
+{
+    static MappingQ1<dim> mapping;
+};
+
+
 /*@}*/
 
 /*----------------------------------------------------------------------*/
