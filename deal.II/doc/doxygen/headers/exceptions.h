@@ -64,7 +64,7 @@
  *
  *  The error handling mechanism in <tt>deal.II</tt> is generally used in two ways.
  *  The first uses error checking in debug mode only and is useful for programs
- *  which are not fully tested. When the program shows no error anymore, one may
+ *  which are not fully tested. When the program shows no errors anymore, one may
  *  switch off error handling and get better performance by this, since checks
  *  for errors are done quite frequently in the library (a typical speed up is
  *  a factor of four!). This mode of exception generation is most useful for
@@ -88,37 +88,41 @@
  *  this.
  *
  *  Both modes use exception classes, which need to have special features
- *  in additional to the <tt>C++</tt> standard's <tt>exception</tt> class. Such a class
- *  is declared by the following lines of code:
+ *  in additional to the <tt>C++</tt> standard's <tt>std::exception</tt> class.
+ *  Such a class is declared by the following lines of code:
  *   @code
  *     DeclException2 (ExcDomain, int, int,
  *                     << "Index= " << arg1 << "Upper Bound= " << arg2);
  *  @endcode
+ *  
  *  This declares an exception class named <tt>ExcDomain</tt>, which
- *  has two variables as additional information (named
- *  <tt>arg1</tt> and <tt>arg2</tt> by default) and which outputs the
- *  given sequence (which is appended to an <tt>std::ostream</tt>
- *  variable's name, thus the weird syntax). There are
- *  other <tt>DeclExceptionN</tt> macros for exception classes
- *  with more or no parameters. It is proposed to let start
- *  the name of all exceptions by <tt>Exc...</tt> and to declare them locally to
- *  the class it is to be used in. Declaring exceptions globally is possible
- *  but pollutes the global namespace, is less readable and thus unnecessary.
+ *  has two variables as additional information (named <tt>arg1</tt>
+ *  and <tt>arg2</tt> by default) and which outputs the given sequence
+ *  (which is appended to an <tt>std::ostream</tt> variable's name,
+ *  thus the weird syntax). There are other <tt>DeclExceptionN</tt>
+ *  macros for exception classes with more or no parameters. By
+ *  convention, the name of all exception classes starts with
+ *  <tt>Exc...</tt> and most of them are declared locally to the class
+ *  it is to be used in (a few very frequently found ones are also
+ *  declared in the StandardExceptions namespace and are available
+ *  everywhere). Declaring exceptions globally is possible but
+ *  pollutes the global namespace, is less readable and most of the time
+ *  unnecessary.
  *
- *  Since exception classes are declared the same way for both modes of error
- *  checking, it is possible to use an exception declared through the
- *  <tt>DeclExceptionN(...)</tt> macro family in both modes; there is no need to
- *  declare different classes for each of these.
+ *  Since exception classes are declared the same way for both modes
+ *  of error checking, it is possible to use an exception declared
+ *  through the <tt>DeclExceptionN(...)</tt> macro family for both
+ *  static as well as dynamic checks.
  *
  *
- *  <h3>Use of the debug mode exceptions</h3>
+ *  <h3>Use of the debug mode exceptions (static checks)</h3>
  *
  *  To use the exception mechanism for debug mode error checking, write lines
  *  like the following in your source code:
  *  @code
  *    Assert (n<dim, ExcDomain(n,dim));
  *  @endcode
- *  which by macro expansion does the following:
+ *  which by macro expansion does essentially the following:
  *  @code
  *    #ifdef DEBUG
  *        if (!(cond))
@@ -140,8 +144,7 @@
  *
  *  If the <tt>DEBUG</tt> preprocessor directive is set, the call <tt>Assert
  *  (cond, exc);</tt> is basically converted by the preprocessor into the
- *  sequence (note that function names and exact calling sequences may
- *  change over time, but the general principle remains the same)
+ *  following sequence:
  *  @code
  *    if (!(cond))
  *      deal_II_exceptions::internals::issue_error_assert_1
@@ -152,28 +155,33 @@
  *              #exc,
  *              &exc);
  *  @endcode
- *  i.e. if the given condition is violated, then the file and
- *  line in which the exception occured as well as
- *  the condition itself and the call sequence of the
- *  exception object is transferred. Additionally an object
- *  of the form given by <tt>exc</tt> is created (this is normally an
- *  unnamed object like in <tt>ExcDomain (n, dim)</tt> of class
- *  <tt>ExcDomain</tt>) and transferred to the deal_II_exceptions::internals::issue_error_assert_1()
- *  function.
+ *  
+ *  (Note that function names and exact calling sequences may change
+ *  over time, but the general principle remains the same.) I.e., if
+ *  the given condition is violated, then the file and line in which
+ *  the exception occured as well as the condition itself and the call
+ *  sequence of the exception object is passed to the
+ *  deal_II_exceptions::internals::issue_error_assert_1()
+ *  function. Additionally an object of the form given by <tt>exc</tt>
+ *  is created (this is normally an unnamed object like in
+ *  <tt>ExcDomain (n, dim)</tt> of class <tt>ExcDomain</tt>) and
+ *  transferred to this function.
  *
  *  <tt>__PRETTY__FUNCTION__</tt> is a macro defined by some compilers and
  *  gives the name of the function. If another compiler is used, we
  *  try to set this function to something reasonable, if the compiler
  *  provides us with that, and <tt>"(not available)"</tt> otherwise.
  *
- *  In <tt>__IssueError</tt> the given data is transferred into the
- *  <tt>exc</tt> object by calling the set_fields() function; after that, the
- *  general error info is printed onto <tt>std::cerr</tt> using the
- *  PrintError() function of <tt>exc</tt> and finally the exception specific
- *  data is printed using the user defined function PrintError() (which is
- *  normally created using the <tt>DeclException (...)</tt> macro family. If
- *  it can be obtained from the operating system, the output may also contain
- *  a stacktrace to show where the error happened.
+ *  In <tt>issue_error_assert</tt>, the given data is transferred into
+ *  the <tt>exc</tt> object by calling the set_fields() function;
+ *  after that, the general error info is printed onto
+ *  <tt>std::cerr</tt> using the PrintError() function of <tt>exc</tt>
+ *  and finally the exception specific data is printed using the user
+ *  defined function PrintError() (which is normally created using the
+ *  <tt>DeclException (...)</tt> macro family. If it can be obtained
+ *  from the operating system, the output may also contain a
+ *  stacktrace to show where the error happened. Several of the
+ *  @ref Tutorial programs show a typical output.
  *
  *  After printing all this information,
  *  deal_II_exceptions::internals::abort() is called (with one
@@ -193,6 +201,8 @@
  *  @verbatim
  *    Assert (false, ExcInternalError());
  *  @endverbatim
+ *  See the @ref step_7 "step-7" and several other of the tutorial programs for
+ *  a use of this construct.
  *
  *  As mentioned above, the program is terminated once a call to
  *  <tt>Assert</tt> fails. However, there is one case where we do not want
@@ -221,7 +231,8 @@
  *
  *  <h3>Use of run-time exceptions</h3>
  *
- *  For this mode, the standard <tt>C++</tt> <tt>throw</tt> and <tt>catch</tt> concept exists. We
+ *  For this mode, the standard <tt>C++</tt> <tt>throw</tt> and <tt>catch</tt>
+ *  concept exists. We
  *  want to keep to this, but want to extend it a bit. In general, the
  *  structure is the same, i.e. you normally raise and exception by
  *  @code
@@ -280,25 +291,26 @@
  *
  *  <h3>Description of the DeclExceptionN macro family</h3>
  *
- *  Declare an exception class without any additional parameters.
- *  There is a whole family of <tt>DeclException?</tt> macros
- *  where <tt>?</tt> is to be replaced by the number of additional
+ *  There is a whole family of <tt>DeclExceptionX</tt> macros
+ *  where <tt>X</tt> is to be replaced by the number of additional
  *  parameters (0 to 5 presently).
- *  
- *  The syntax is as follows:
+ *  These macros are used to declare exception classes in the following
+ *  way:
  *  @code
  *    DeclException2 (ExcDomain,
  *                    int,
  *                    int,
  *                    << " i=" << arg1 << ", m=" << arg2);
  *  @endcode
- *  The first is the name of the exception class to be created.
+ *  The first argument denotes the name of the exception class to be created.
  *  The next arguments are the types of the parameters (in this
- *  case there are two type names needed) and finally the output
+ *  case there two types, corresponding to the <tt>X</tt> in
+ *  <tt>DeclExceptionX</tt>) and finally the output
  *  sequence with which you can print additional information.
  *  
  *  The syntax of the output sequence is a bit weird but gets
- *  clear once you see how this macro is defined:
+ *  clearer once you see how this macro is defined (again schematically, actual
+ *  function names and definitions may change over time and be different):
  *  @code
  *  class name : public ExceptionBase {
  *    public:
