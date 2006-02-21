@@ -558,6 +558,19 @@ void Vector<Number>::scale (const Vector<Number2> &s)
 }
 
 
+template <typename Number>
+template <typename Number2>
+void Vector<Number>::equ (const Number a, const Vector<Number2>& u)
+{
+  Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
+  iterator i_ptr = begin(),
+	   i_end = end();
+  typename Vector<Number2>::const_iterator u_ptr = u.begin();
+  while (i_ptr!=i_end)
+    *i_ptr++ = a * *u_ptr++;
+}
+
 
 template <typename Number>
 void Vector<Number>::equ (const Number a, const Vector<Number>& u,
@@ -575,20 +588,23 @@ void Vector<Number>::equ (const Number a, const Vector<Number>& u,
 }
 
 
-
 template <typename Number>
-template <typename Number2>
-void Vector<Number>::equ (const Number a, const Vector<Number2>& u)
+void Vector<Number>::equ (const Number a, const Vector<Number>& u,
+			  const Number b, const Vector<Number>& v,
+			  const Number c, const Vector<Number>& w)
 {
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
+  Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
   iterator i_ptr = begin(),
 	   i_end = end();
-  typename Vector<Number2>::const_iterator u_ptr = u.begin();
+  const_iterator u_ptr = u.begin(),
+		 v_ptr = v.begin(),
+		 w_ptr = w.begin();
   while (i_ptr!=i_end)
-    *i_ptr++ = a * *u_ptr++;
+    *i_ptr++ = a * *u_ptr++  + b * *v_ptr++ + c * *w_ptr++;
 }
-
 
 
 template <typename Number>

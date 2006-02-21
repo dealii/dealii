@@ -604,16 +604,23 @@ class Vector :
     void scale (const Vector<Number2> &scaling_factors);
     
 				     /**
-				      * Assignment <tt>*this = a*V</tt>.
+				      * Assignment <tt>*this = a*u</tt>.
 				      */
     template <typename Number2>
-    void equ (const Number a, const Vector<Number2>& V);
+    void equ (const Number a, const Vector<Number2>& u);
     
 				     /**
-				      * Assignment <tt>*this = a*V + b*W</tt>.
+				      * Assignment <tt>*this = a*u + b*v</tt>.
 				      */
-    void equ (const Number a, const Vector<Number>& V,
-	      const Number b, const Vector<Number>& W);
+    void equ (const Number a, const Vector<Number>& u,
+	      const Number b, const Vector<Number>& v);
+    
+				     /**
+				      * Assignment <tt>*this = a*u + b*v + b*w</tt>.
+				      */
+    void equ (const Number a, const Vector<Number>& u,
+	      const Number b, const Vector<Number>& v,
+	      const Number c, const Vector<Number>& w);
 
 				     /**
 				      * Compute the elementwise ratio of the
