@@ -445,6 +445,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: There is now a <code
+       class="class">StaticMappingQ1</code>::<code
+       class="member">mapping</code> object of type <code
+       class="class">MappingQ1</code> which is used in several parts
+       of the library. This way multiple creation and storage of <code
+       class="class">MappingQ1</code> objects can be avoided.
+       <br> 
+       (RH 2006/02/21)
+       </p>
+
+  <li> <p>
        New: There is now a <code class="class">GridOut</code>::<code
        class="member">write_gmsh</code> function to write in the gmsh 
        format. It has the same features of the write_ucd one. 
