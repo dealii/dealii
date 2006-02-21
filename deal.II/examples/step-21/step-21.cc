@@ -86,7 +86,6 @@
                                  // enable the user to write DoFHandler
                                  // independent code.
 #include <fe/hp_fe_values.h>
-#include <fe/mapping_collection.h>
 
                                  // A compressed sparsity pattern is
                                  // not an explicit prerequisite for the
@@ -803,22 +802,12 @@ void DGMethod<dim>::assemble_system1 ()
   const UpdateFlags neighbor_face_update_flags = update_values;
    
 				   // Then we create the ``FEValues''
-				   // object. Note, that since version
-				   // 3.2.0 of deal.II the constructor
-				   // of this class takes a
-				   // ``Mapping'' object as first
-				   // argument. Although the
-				   // constructor without ``Mapping''
-				   // argument is still supported it
-				   // is recommended to use the new
-				   // constructor. This reduces the
-				   // effect of `hidden magic' (the
-				   // old constructor implicitely
-				   // assumes a ``MappingQ1'' mapping)
-				   // and makes it easier to change
-				   // the mapping object later.
-  hp::FEValues<dim> fe_v_x (hp::StaticMappingQ1<dim>::mapping_collection,
-			    fe_collection, quadratures, update_flags);
+				   // object. Here, we use the default
+				   // MappingQ1. different mapping
+				   // create a MappingCollection first
+				   // and call the respective
+				   // hp::FEValues constructor.
+  hp::FEValues<dim> fe_v_x (fe_collection, quadratures, update_flags);
   
 				   // Similarly we create the
 				   // ``FEFaceValues'' and
@@ -831,13 +820,13 @@ void DGMethod<dim>::assemble_system1 ()
 				   // current cell and the face (and
 				   // subface) number.
   hp::FEFaceValues<dim> fe_v_face_x (
-    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, face_update_flags);
+    fe_collection, face_quadratures, face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_x (
-    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, face_update_flags);
+    fe_collection, face_quadratures, face_update_flags);
   hp::FEFaceValues<dim> fe_v_face_neighbor_x (
-    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
+    fe_collection, face_quadratures, neighbor_face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_neighbor_x (
-    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
+    fe_collection, face_quadratures, neighbor_face_update_flags);
 
 				   // Now we create the cell matrices
 				   // and vectors. Here we need two
@@ -1312,13 +1301,13 @@ void DGMethod<dim>::assemble_system2 ()
 				   // ``fe_v_face_neighbor'' as case 4
 				   // does not occur.
   hp::FEValues<dim> fe_v_x (
-    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, quadratures, update_flags);
+    fe_collection, quadratures, update_flags);
   hp::FEFaceValues<dim> fe_v_face_x (
-    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, face_update_flags);
+    fe_collection, face_quadratures, face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface_x (
-    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, face_update_flags);
+    fe_collection, face_quadratures, face_update_flags);
   hp::FEFaceValues<dim> fe_v_face_neighbor_x (
-    hp::StaticMappingQ1<dim>::mapping_collection, fe_collection, face_quadratures, neighbor_face_update_flags);
+    fe_collection, face_quadratures, neighbor_face_update_flags);
 
   const unsigned int max_dofs_per_cell = fe_collection.max_dofs_per_cell ();
 
