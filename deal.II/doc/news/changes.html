@@ -247,6 +247,22 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p>Fixed: The <code class="member">QGauss</code> constructor
+       hangs on x86 linux systems when deal.II is run from inside
+       MATLAB. The reason is that while the processor offers long
+       double accuracy, MATLAB switches off support for that inside
+       the CPU. It therefore leaves codes that expect the additional
+       accuracy high and dry. Annoyingly, these codes of course run
+       just fine outside of MATLAB's environment. This behavior leads
+       to an infinite loop inside the QGauss constructor, where we
+       want to use the additional accuracy to compute quadrature
+       points to high precision. To avoid the infinite loop, we now
+       check during runtime whether the extra precision is available,
+       not only at compile time.
+       <br>
+       (Christian Kamm, WB 2006/02/21)
+       </p>
+
   <li> <p>Fixed: The <code class="member">ParameterHandler::get_integer</code>
        had an erroneous check that the value given for a parameter really
        represented an integer. This check always succeeded, even in face of an

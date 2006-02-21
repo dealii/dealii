@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -66,20 +66,42 @@ QGauss<1>::QGauss (const unsigned int n)
                                    // of the accuracy of double there,
                                    // while on other machines we'd
                                    // like to go further down
-#ifdef HAVE_STD_NUMERIC_LIMITS    
-  const long double tolerance
-    = std::max (static_cast<long double>(std::numeric_limits<double>::epsilon() / 100),
-                static_cast<long double>(std::numeric_limits<long double>::epsilon() * 5));
+				   //
+				   // the situation is complicated by
+				   // the fact that even if long
+				   // double exists and is described
+				   // by std::numeric_limits, we may
+				   // not actually get the additional
+				   // precission. One case where this
+				   // happens is on x86, where one can
+				   // set hardware flags that disable
+				   // long double precision even for
+				   // long double variables. these
+				   // flags are not usually set, but
+				   // for example matlab sets them and
+				   // this then breaks deal.II code
+				   // that is run as a subroutine to
+				   // matlab...
+#ifdef HAVE_STD_NUMERIC_LIMITS
+  const long double
+    long_double_eps = static_cast<long double>(std::numeric_limits<long double>::epsilon()),
+    double_eps      = static_cast<long double>(std::numeric_limits<double>::epsilon());
 #else
-				   // well, if there is no <limits>
-				   // header, then we can do not much
-				   // better than just checking by
-				   // hand that long double is not the
-				   // same as double and set some
-				   // values by hand
-  const long double tolerance
-    = (sizeof(long double) != sizeof(double) ? 1.e-19 : 5e-16);
+  const long double
+    long_double_eps = 1.09-19L,
+    double_eps      = 2.23-16;
 #endif
+
+				   // now check whether long double is
+				   // more accurate than double, and
+				   // set tolerances accordingly
+  const long double tolerance
+    = (static_cast<long double>(1.0) + long_double_eps != static_cast<long double>(1.0)
+       ?
+       std::max (double_eps / 100, long_double_eps * 5)
+       :
+       double_eps * 5
+       );
 
   
   for (unsigned int i=1; i<=m; ++i)
