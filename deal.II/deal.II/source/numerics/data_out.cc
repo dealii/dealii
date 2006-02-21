@@ -548,8 +548,7 @@ template <int dim, template <int> class DH>
 void DataOut<dim,DH>::build_patches (const unsigned int n_subdivisions,
 				     const unsigned int n_threads_) 
 {
-  static const MappingQ1<dim> mapping;
-  build_patches (mapping, n_subdivisions, n_threads_);
+  build_patches (StaticMappingQ1<dim>::mapping, n_subdivisions, n_threads_);
 }
 
 

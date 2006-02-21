@@ -102,8 +102,7 @@ estimate (const DoFHandler<1>   &dof_handler,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<1> mapping;
-  estimate(mapping, dof_handler, quadrature, neumann_bc, solution,
+  estimate(StaticMappingQ1<1>::mapping, dof_handler, quadrature, neumann_bc, solution,
 	   error, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
 
@@ -124,8 +123,7 @@ estimate (const DoFHandler<1>   &dof_handler,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<1> mapping;
-  estimate(mapping, dof_handler, quadrature, neumann_bc, solutions,
+  estimate(StaticMappingQ1<1>::mapping, dof_handler, quadrature, neumann_bc, solutions,
 	   errors, component_mask, coefficients, n_threads, subdomain_id, material_id);
 }
 
@@ -446,8 +444,7 @@ estimate (const DoFHandler<dim>   &dof_handler,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  estimate(mapping, dof_handler, quadrature, neumann_bc, solution,
+  estimate(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, neumann_bc, solution,
 	   error, component_mask, coefficients, n_threads,
            subdomain_id, material_id);
 }
@@ -922,8 +919,7 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &do
                                          const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));  
-  static const MappingQ1<dim> mapping;
-  estimate(mapping, dof_handler, quadrature, neumann_bc, solutions,
+  estimate(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
 	   errors, component_mask, coefficients, n_threads,
            subdomain_id, material_id);
 }

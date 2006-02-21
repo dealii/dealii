@@ -1893,12 +1893,9 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
 				   // carefully: transform to the
 				   // unit cube
 				   // and check there.
-  static const MappingQ1<dim> mapping;
-
   const TriaRawIterator<dim, CellAccessor<dim> > cell_iterator (*this);
-  return (GeometryInfo<dim>::
-	  is_inside_unit_cell (mapping.transform_real_to_unit_cell(cell_iterator,
-								   p)));
+  return (GeometryInfo<dim>::is_inside_unit_cell (
+    StaticMappingQ1<dim>::mapping.transform_real_to_unit_cell(cell_iterator, p)));
 }
 
 

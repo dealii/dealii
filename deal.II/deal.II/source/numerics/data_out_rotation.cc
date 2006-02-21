@@ -43,9 +43,8 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 				   // transformed using a Q1 mapping,
 				   // we don't support anything else
 				   // as well
-  static const MappingQ1<dim> mapping;
   typename SelectFEValues<DH<dim> >::FEValues
-    x_fe_patch_values (mapping, this->dofs->get_fe(),
+    x_fe_patch_values (StaticMappingQ1<dim>::mapping, this->dofs->get_fe(),
                        patch_points, update_values);
 
   const unsigned int n_patches_per_circle = data.n_patches_per_circle;

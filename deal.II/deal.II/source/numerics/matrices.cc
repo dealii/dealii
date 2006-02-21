@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -302,8 +302,7 @@ void MatrixCreator::create_mass_matrix (const DoFHandler<dim>    &dof,
 					const Function<dim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  create_mass_matrix(mapping, dof, q, matrix, coefficient);
+  create_mass_matrix(StaticMappingQ1<dim>::mapping, dof, q, matrix, coefficient);
 }
 
 
@@ -500,8 +499,8 @@ void MatrixCreator::create_mass_matrix (const DoFHandler<dim>    &dof,
 					const Function<dim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  create_mass_matrix(mapping, dof, q, matrix, rhs, rhs_vector, coefficient);
+  create_mass_matrix(StaticMappingQ1<dim>::mapping,
+		     dof, q, matrix, rhs, rhs_vector, coefficient);
 }
 
 
@@ -946,9 +945,8 @@ void MatrixCreator::create_boundary_mass_matrix (const DoFHandler<dim>     &dof,
 						 const Function<dim> * const a)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  create_boundary_mass_matrix(mapping, dof, q, matrix, rhs, rhs_vector,
-			      dof_to_boundary_mapping, a);
+  create_boundary_mass_matrix(StaticMappingQ1<dim>::mapping, dof, q,
+			      matrix,rhs, rhs_vector, dof_to_boundary_mapping, a);
 }
 
 
@@ -1126,8 +1124,7 @@ void MatrixCreator::create_laplace_matrix (const DoFHandler<dim>    &dof,
 					   const Function<dim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  create_laplace_matrix(mapping, dof, q, matrix, coefficient);
+  create_laplace_matrix(StaticMappingQ1<dim>::mapping, dof, q, matrix, coefficient);
 }
 
 
@@ -1329,8 +1326,8 @@ void MatrixCreator::create_laplace_matrix (const DoFHandler<dim>    &dof,
 					   const Function<dim> * const coefficient)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;  
-  create_laplace_matrix(mapping, dof, q, matrix, rhs, rhs_vector, coefficient);
+  create_laplace_matrix(StaticMappingQ1<dim>::mapping, dof, q,
+			matrix, rhs, rhs_vector, coefficient);
 }
 
 
