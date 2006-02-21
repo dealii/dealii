@@ -794,6 +794,36 @@ class FullMatrix : public Table<2,number>
     void diagadd (const number s);
 
 				     /**
+				      * Assignment <tt>*this =
+				      * a*A</tt>.
+				      */
+    template<typename number2>
+    void equ (const number               a,
+	      const FullMatrix<number2> &A);
+
+				     /**
+				      * Assignment <tt>*this = a*A +
+				      * b*B</tt>.
+				      */
+    template<typename number2>
+    void equ (const number               a,
+	      const FullMatrix<number2> &A,
+	      const number               b,
+	      const FullMatrix<number2> &B);
+
+				     /**
+				      * Assignment <tt>*this = a*A +
+				      * b*B + c*C</tt>.
+				      */
+    template<typename number2>
+    void equ (const number               a,
+	      const FullMatrix<number2> &A,
+	      const number               b,
+	      const FullMatrix<number2> &B,
+	      const number               c,
+	      const FullMatrix<number2> &C);    
+
+				     /**
 				      * Symmetrize the matrix by
 				      * forming the mean value between
 				      * the existing matrix and its

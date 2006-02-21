@@ -548,6 +548,291 @@ void FullMatrix<number>::diagadd (const number src)
 
 template <typename number>
 template <typename number2>
+void FullMatrix<number>::equ (const number               a,
+			      const FullMatrix<number2> &A)
+{
+  Assert (!this->empty(), ExcEmptyMatrix());
+  
+  Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+
+  number* val = const_cast<number*> (this->data());
+  const number2* Aval = A.data();
+  
+  if ((n()==2) && (m()==2))
+    {
+      val[0]  = a * Aval[0];
+      val[1]  = a * Aval[1];
+      val[2]  = a * Aval[2];
+      val[3]  = a * Aval[3];
+    }
+  else if ((n()==3) && (m()==3))
+    {
+      val[0]  = a * Aval[0];
+      val[1]  = a * Aval[1];
+      val[2]  = a * Aval[2];
+      val[3]  = a * Aval[3];
+      val[4]  = a * Aval[4];
+      val[5]  = a * Aval[5];
+      val[6]  = a * Aval[6];
+      val[7]  = a * Aval[7];
+      val[8]  = a * Aval[8];
+    }
+  else if ((n()==4) && (m()==4))
+    {
+      val[0]  = a * Aval[0];
+      val[1]  = a * Aval[1];
+      val[2]  = a * Aval[2];
+      val[3]  = a * Aval[3];
+      val[4]  = a * Aval[4];
+      val[5]  = a * Aval[5];
+      val[6]  = a * Aval[6];
+      val[7]  = a * Aval[7];
+      val[8]  = a * Aval[8];
+      val[9]  = a * Aval[9];
+      val[10] = a * Aval[10];
+      val[11] = a * Aval[11];
+      val[12] = a * Aval[12];
+      val[13] = a * Aval[13];
+      val[14] = a * Aval[14];
+      val[15] = a * Aval[15];
+    }
+  else if ((n()==5) && (m()==5))
+    {
+      val[0]  = a * Aval[0];
+      val[1]  = a * Aval[1];
+      val[2]  = a * Aval[2];
+      val[3]  = a * Aval[3];
+      val[4]  = a * Aval[4];
+      val[5]  = a * Aval[5];
+      val[6]  = a * Aval[6];
+      val[7]  = a * Aval[7];
+      val[8]  = a * Aval[8];
+      val[9]  = a * Aval[9];
+      val[10] = a * Aval[10];
+      val[11] = a * Aval[11];
+      val[12] = a * Aval[12];
+      val[13] = a * Aval[13];
+      val[14] = a * Aval[14];
+      val[15] = a * Aval[15];
+      val[16] = a * Aval[16];
+      val[17] = a * Aval[17];
+      val[18] = a * Aval[18];
+      val[19] = a * Aval[19];
+
+      val[20] = a * Aval[20];
+      val[21] = a * Aval[21];
+      val[22] = a * Aval[22];
+      val[23] = a * Aval[23];
+      val[24] = a * Aval[24];
+    }
+  else
+    {
+      const unsigned int size = n()*m();
+      for (unsigned int i=0; i<size; i++)
+        val[i] = a * Aval[i];
+    }
+}
+
+
+template <typename number>
+template <typename number2>
+void
+FullMatrix<number>::equ (const number               a,
+			 const FullMatrix<number2> &A,
+			 const number               b,
+			 const FullMatrix<number2> &B)
+{
+  Assert (!this->empty(), ExcEmptyMatrix());
+  
+  Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+  Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+  Assert (n() == B.n(), ExcDimensionMismatch(n(), B.n()));
+
+  number* val = const_cast<number*> (this->data());
+  const number2* Aval = A.data();
+  const number2* Bval = B.data();
+  
+  if ((n()==2) && (m()==2))
+    {
+      val[0]  = a * Aval[0]  + b * Bval[0];
+      val[1]  = a * Aval[1]  + b * Bval[1];
+      val[2]  = a * Aval[2]  + b * Bval[2];
+      val[3]  = a * Aval[3]  + b * Bval[3];
+    }
+  else if ((n()==3) && (m()==3))
+    {
+      val[0]  = a * Aval[0]  + b * Bval[0];
+      val[1]  = a * Aval[1]  + b * Bval[1];
+      val[2]  = a * Aval[2]  + b * Bval[2];
+      val[3]  = a * Aval[3]  + b * Bval[3];
+      val[4]  = a * Aval[4]  + b * Bval[4];
+      val[5]  = a * Aval[5]  + b * Bval[5];
+      val[6]  = a * Aval[6]  + b * Bval[6];
+      val[7]  = a * Aval[7]  + b * Bval[7];
+      val[8]  = a * Aval[8]  + b * Bval[8];
+    }
+  else if ((n()==4) && (m()==4))
+    {
+      val[0]  = a * Aval[0]  + b * Bval[0];
+      val[1]  = a * Aval[1]  + b * Bval[1];
+      val[2]  = a * Aval[2]  + b * Bval[2];
+      val[3]  = a * Aval[3]  + b * Bval[3];
+      val[4]  = a * Aval[4]  + b * Bval[4];
+      val[5]  = a * Aval[5]  + b * Bval[5];
+      val[6]  = a * Aval[6]  + b * Bval[6];
+      val[7]  = a * Aval[7]  + b * Bval[7];
+      val[8]  = a * Aval[8]  + b * Bval[8];
+      val[9]  = a * Aval[9]  + b * Bval[9];
+      val[10] = a * Aval[10] + b * Bval[10];
+      val[11] = a * Aval[11] + b * Bval[11];
+      val[12] = a * Aval[12] + b * Bval[12];
+      val[13] = a * Aval[13] + b * Bval[13];
+      val[14] = a * Aval[14] + b * Bval[14];
+      val[15] = a * Aval[15] + b * Bval[15];
+    }
+  else if ((n()==5) && (m()==5))
+    {
+      val[0]  = a * Aval[0]  + b * Bval[0];
+      val[1]  = a * Aval[1]  + b * Bval[1];
+      val[2]  = a * Aval[2]  + b * Bval[2];
+      val[3]  = a * Aval[3]  + b * Bval[3];
+      val[4]  = a * Aval[4]  + b * Bval[4];
+      val[5]  = a * Aval[5]  + b * Bval[5];
+      val[6]  = a * Aval[6]  + b * Bval[6];
+      val[7]  = a * Aval[7]  + b * Bval[7];
+      val[8]  = a * Aval[8]  + b * Bval[8];
+      val[9]  = a * Aval[9]  + b * Bval[9];
+      val[10] = a * Aval[10] + b * Bval[10];
+      val[11] = a * Aval[11] + b * Bval[11];
+      val[12] = a * Aval[12] + b * Bval[12];
+      val[13] = a * Aval[13] + b * Bval[13];
+      val[14] = a * Aval[14] + b * Bval[14];
+      val[15] = a * Aval[15] + b * Bval[15];
+      val[16] = a * Aval[16] + b * Bval[16];
+      val[17] = a * Aval[17] + b * Bval[17];
+      val[18] = a * Aval[18] + b * Bval[18];
+      val[19] = a * Aval[19] + b * Bval[19];
+
+      val[20] = a * Aval[20] + b * Bval[20];
+      val[21] = a * Aval[21] + b * Bval[21];
+      val[22] = a * Aval[22] + b * Bval[22];
+      val[23] = a * Aval[23] + b * Bval[23];
+      val[24] = a * Aval[24] + b * Bval[24];
+    }
+  else
+    {
+      const unsigned int size = n()*m();
+      for (unsigned int i=0; i<size; i++)
+        val[i] = a * Aval[i] + b * Bval[i];
+    }
+}
+
+
+template <typename number>
+template <typename number2>
+void
+FullMatrix<number>::equ (const number               a,
+			 const FullMatrix<number2> &A,
+			 const number               b,
+			 const FullMatrix<number2> &B,
+			 const number               c,
+			 const FullMatrix<number2> &C)
+{
+  Assert (!this->empty(), ExcEmptyMatrix());
+  
+  Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+  Assert (m() == B.m(), ExcDimensionMismatch(m(), B.m()));
+  Assert (n() == B.n(), ExcDimensionMismatch(n(), B.n()));
+  Assert (m() == C.m(), ExcDimensionMismatch(m(), C.m()));
+  Assert (n() == C.n(), ExcDimensionMismatch(n(), C.n()));
+
+  number* val = const_cast<number*> (this->data());
+  const number2* Aval = A.data();
+  const number2* Bval = B.data();
+  const number2* Cval = C.data();
+  
+  if ((n()==2) && (m()==2))
+    {
+      val[0]  = a * Aval[0]  + b * Bval[0]  + c * Cval[0];
+      val[1]  = a * Aval[1]  + b * Bval[1]  + c * Cval[1];
+      val[2]  = a * Aval[2]  + b * Bval[2]  + c * Cval[2];
+      val[3]  = a * Aval[3]  + b * Bval[3]  + c * Cval[3];
+    }
+  else if ((n()==3) && (m()==3))
+    {
+      val[0]  = a * Aval[0]  + b * Bval[0]  + c * Cval[0];
+      val[1]  = a * Aval[1]  + b * Bval[1]  + c * Cval[1];
+      val[2]  = a * Aval[2]  + b * Bval[2]  + c * Cval[2];
+      val[3]  = a * Aval[3]  + b * Bval[3]  + c * Cval[3];
+      val[4]  = a * Aval[4]  + b * Bval[4]  + c * Cval[4];
+      val[5]  = a * Aval[5]  + b * Bval[5]  + c * Cval[5];
+      val[6]  = a * Aval[6]  + b * Bval[6]  + c * Cval[6];
+      val[7]  = a * Aval[7]  + b * Bval[7]  + c * Cval[7];
+      val[8]  = a * Aval[8]  + b * Bval[8]  + c * Cval[8];
+    }
+  else if ((n()==4) && (m()==4))
+    {
+      val[0]  = a * Aval[0]  + b * Bval[0]  + c * Cval[0];
+      val[1]  = a * Aval[1]  + b * Bval[1]  + c * Cval[1];
+      val[2]  = a * Aval[2]  + b * Bval[2]  + c * Cval[2];
+      val[3]  = a * Aval[3]  + b * Bval[3]  + c * Cval[3];
+      val[4]  = a * Aval[4]  + b * Bval[4]  + c * Cval[4];
+      val[5]  = a * Aval[5]  + b * Bval[5]  + c * Cval[5];
+      val[6]  = a * Aval[6]  + b * Bval[6]  + c * Cval[6];
+      val[7]  = a * Aval[7]  + b * Bval[7]  + c * Cval[7];
+      val[8]  = a * Aval[8]  + b * Bval[8]  + c * Cval[8];
+      val[9]  = a * Aval[9]  + b * Bval[9]  + c * Cval[9];
+      val[10] = a * Aval[10] + b * Bval[10] + c * Cval[10];
+      val[11] = a * Aval[11] + b * Bval[11] + c * Cval[11];
+      val[12] = a * Aval[12] + b * Bval[12] + c * Cval[12];
+      val[13] = a * Aval[13] + b * Bval[13] + c * Cval[13];
+      val[14] = a * Aval[14] + b * Bval[14] + c * Cval[14];
+      val[15] = a * Aval[15] + b * Bval[15] + c * Cval[15];
+    }
+  else if ((n()==5) && (m()==5))
+    {
+      val[0]  = a * Aval[0]  + b * Bval[0]  + c * Cval[0];
+      val[1]  = a * Aval[1]  + b * Bval[1]  + c * Cval[1];
+      val[2]  = a * Aval[2]  + b * Bval[2]  + c * Cval[2];
+      val[3]  = a * Aval[3]  + b * Bval[3]  + c * Cval[3];
+      val[4]  = a * Aval[4]  + b * Bval[4]  + c * Cval[4];
+      val[5]  = a * Aval[5]  + b * Bval[5]  + c * Cval[5];
+      val[6]  = a * Aval[6]  + b * Bval[6]  + c * Cval[6];
+      val[7]  = a * Aval[7]  + b * Bval[7]  + c * Cval[7];
+      val[8]  = a * Aval[8]  + b * Bval[8]  + c * Cval[8];
+      val[9]  = a * Aval[9]  + b * Bval[9]  + c * Cval[9];
+      val[10] = a * Aval[10] + b * Bval[10] + c * Cval[10];
+      val[11] = a * Aval[11] + b * Bval[11] + c * Cval[11];
+      val[12] = a * Aval[12] + b * Bval[12] + c * Cval[12];
+      val[13] = a * Aval[13] + b * Bval[13] + c * Cval[13];
+      val[14] = a * Aval[14] + b * Bval[14] + c * Cval[14];
+      val[15] = a * Aval[15] + b * Bval[15] + c * Cval[15];
+      val[16] = a * Aval[16] + b * Bval[16] + c * Cval[16];
+      val[17] = a * Aval[17] + b * Bval[17] + c * Cval[17];
+      val[18] = a * Aval[18] + b * Bval[18] + c * Cval[18];
+      val[19] = a * Aval[19] + b * Bval[19] + c * Cval[19];
+
+      val[20] = a * Aval[20] + b * Bval[20] + c * Cval[20];
+      val[21] = a * Aval[21] + b * Bval[21] + c * Cval[21];
+      val[22] = a * Aval[22] + b * Bval[22] + c * Cval[22];
+      val[23] = a * Aval[23] + b * Bval[23] + c * Cval[23];
+      val[24] = a * Aval[24] + b * Bval[24] + c * Cval[24];
+    }
+  else
+    {
+      const unsigned int size = n()*m();
+      for (unsigned int i=0; i<size; i++)
+        val[i] = a * Aval[i] + b * Bval[i] + c * Cval[i];
+    }
+}
+
+
+
+template <typename number>
+template <typename number2>
 void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 				const FullMatrix<number2> &src,
 				const bool                 adding) const
