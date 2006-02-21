@@ -209,10 +209,6 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
 
   deallog.push("minres");
 
-
-  // unsigned int VS = b.size();
-
-  
 				   // Memory allocation
   Vu0  = this->memory.alloc();
   Vu1  = this->memory.alloc();
