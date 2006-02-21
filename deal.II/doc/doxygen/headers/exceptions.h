@@ -198,9 +198,9 @@
  *  than that the program flow should not have reached a certain point,
  *  e.g. a <tt>default</tt> section of a <tt>switch</tt> statement. In this case,
  *  raise the exception by the following construct:
- *  @verbatim
+ *  @code
  *    Assert (false, ExcInternalError());
- *  @endverbatim
+ *  @code
  *  See the @ref step_7 "step-7" and several other of the tutorial programs for
  *  a use of this construct.
  *
@@ -333,7 +333,7 @@
  *    Assert (i<m, MyExc2(i,m));
  *  @endcode
  *  and the output if the condition fails will be
- *  @verbatim
+ *  @code
  *    --------------------------------------------------------
  *    An error occurred in line <301> of file <exc-test.cc>.
  *    The violated condition was: 
@@ -343,7 +343,7 @@
  *    Additional Information: 
  *      i=5, m=3
  *    --------------------------------------------------------
- *  @endverbatim
+ *  @code
  *  
  *  Obviously for the <tt>DeclException0(name)</tt> macro, no types and
  *  also no output sequence is allowed.
