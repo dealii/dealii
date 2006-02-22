@@ -33,7 +33,14 @@ namespace internal
   {
 /**
  * Base class for the <tt>hp::FE*Values</tt> classes, storing the data
- * that is common to them. The first template parameter denotes the
+ * that is common to them. The main task of this class is to provide a
+ * table where for every combination of finite element, mapping, and
+ * quadrature object from their corresponding collection objects there
+ * is a matching ::FEValues, ::FEFaceValues, or ::FESubfaceValues
+ * object. To make things more efficient, however, these FE*Values
+ * objects are only created once requested (lazy allocation).
+ *
+ * The first template parameter denotes the
  * space dimension we are in, the second the dimensionality of the
  * object that we integrate on, i.e. for usual @p hp::FEValues it is
  * equal to the first one, while for face integration it is one
