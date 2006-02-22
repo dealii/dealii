@@ -40,13 +40,13 @@ namespace internal
  * object. To make things more efficient, however, these FE*Values
  * objects are only created once requested (lazy allocation).
  *
- * The first template parameter denotes the
- * space dimension we are in, the second the dimensionality of the
- * object that we integrate on, i.e. for usual @p hp::FEValues it is
- * equal to the first one, while for face integration it is one
- * less. The third template parameter indicates the type of underlying
- * non-hp FE*Values base type, i.e. it could either be ::FEValues,
- * ::FEFaceValues, or ::FESubfaceValues.
+ * The first template parameter denotes the space dimension we are in,
+ * the second the dimensionality of the object that we integrate on,
+ * i.e. for usual @p hp::FEValues it is equal to the first one, while
+ * for face integration it is one less. The third template parameter
+ * indicates the type of underlying non-hp FE*Values base type,
+ * i.e. it could either be ::FEValues, ::FEFaceValues, or
+ * ::FESubfaceValues.
  * 
  * @ingroup hp
  *

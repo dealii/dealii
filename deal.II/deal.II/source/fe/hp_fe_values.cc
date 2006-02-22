@@ -118,9 +118,9 @@ namespace hp
                            const UpdateFlags                 update_flags)
                   :
                   internal::hp::FEValuesBase<dim,dim,::FEValues<dim> > (mapping,
-                                                                  fe_collection,
-                                                                  q_collection,
-                                                                  update_flags)
+									fe_collection,
+									q_collection,
+									update_flags)
   {}
 
 
@@ -130,8 +130,8 @@ namespace hp
                            const UpdateFlags            update_flags)
                   :
                   internal::hp::FEValuesBase<dim,dim,::FEValues<dim> > (fe_collection,
-                                                       q_collection,
-                                                       update_flags)
+									q_collection,
+									update_flags)
   {}
 
 
@@ -190,9 +190,9 @@ namespace hp
                                    const UpdateFlags         update_flags)
                   :
                   internal::hp::FEValuesBase<dim,dim-1,::FEFaceValues<dim> > (mapping,
-                                                         fe_collection,
-                                                         q_collection,
-                                                         update_flags)
+									      fe_collection,
+									      q_collection,
+									      update_flags)
   {}
 
 
@@ -202,8 +202,8 @@ namespace hp
                                    const UpdateFlags         update_flags)
                   :
                   internal::hp::FEValuesBase<dim,dim-1,::FEFaceValues<dim> > (fe_collection,
-                                                         q_collection,
-                                                         update_flags)
+									      q_collection,
+									      update_flags)
   {}
 
 
@@ -263,9 +263,9 @@ namespace hp
                                          const UpdateFlags         update_flags)
                   :
                   internal::hp::FEValuesBase<dim,dim-1,::FESubfaceValues<dim> > (mapping,
-                                                         fe_collection,
-                                                         q_collection,
-                                                         update_flags)
+										 fe_collection,
+										 q_collection,
+										 update_flags)
   {}
 
 
@@ -275,8 +275,8 @@ namespace hp
                                          const UpdateFlags         update_flags)
                   :
                   internal::hp::FEValuesBase<dim,dim-1,::FESubfaceValues<dim> > (fe_collection,
-                                                         q_collection,
-                                                         update_flags)
+										 q_collection,
+										 update_flags)
   {}
 
 
