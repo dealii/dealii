@@ -82,6 +82,14 @@ QGauss<1>::QGauss (const unsigned int n)
 				   // this then breaks deal.II code
 				   // that is run as a subroutine to
 				   // matlab...
+                                   //
+                                   // a similar situation exists, btw,
+                                   // when running programs under
+                                   // valgrind up to and including at
+                                   // least version 3.1: valgrind's
+                                   // emulator only supports 64 bit
+                                   // arithmetic, even for 80 bit long
+                                   // doubles.
 #ifdef HAVE_STD_NUMERIC_LIMITS
   const long double
     long_double_eps = static_cast<long double>(std::numeric_limits<long double>::epsilon()),
