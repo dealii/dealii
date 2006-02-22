@@ -1050,6 +1050,13 @@ FEValuesBase<dim>::compute_update_flags (const UpdateFlags update_flags) const
 /*------------------------------- FEValues -------------------------------*/
 
 
+template <int dim>
+const unsigned int FEValues<dim>::dimension;
+
+template <int dim>
+const unsigned int FEValues<dim>::integral_dimension;
+
+
 
 template <int dim>
 FEValues<dim>::FEValues (const Mapping<dim>       &mapping,
@@ -1315,6 +1322,12 @@ FEFaceValuesBase<dim>::memory_consumption () const
 
 /*------------------------------- FEFaceValues -------------------------------*/
 
+template <int dim>
+const unsigned int FEFaceValues<dim>::dimension;
+
+template <int dim>
+const unsigned int FEFaceValues<dim>::integral_dimension;
+
 
 template <int dim>
 FEFaceValues<dim>::FEFaceValues (const Mapping<dim>       &mapping,
@@ -1522,6 +1535,14 @@ void FEFaceValues<dim>::do_reinit (const unsigned int face_no)
 
 
 /*------------------------------- FESubFaceValues -------------------------------*/
+
+
+template <int dim>
+const unsigned int FESubfaceValues<dim>::dimension;
+
+template <int dim>
+const unsigned int FESubfaceValues<dim>::integral_dimension;
+
 
 
 template <int dim>

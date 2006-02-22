@@ -356,7 +356,8 @@ class FEValuesData
  * @author Wolfgang Bangerth, 1998, 2003, Guido Kanschat, 2001
  */
 template <int dim>
-class FEValuesBase : protected FEValuesData<dim>, public Subscriptor
+class FEValuesBase : protected FEValuesData<dim>,
+                     public Subscriptor
 {
   public:
 				     /**
@@ -1628,6 +1629,20 @@ template <int dim>
 class FEValues : public FEValuesBase<dim>
 {
   public:
+                                     /**
+                                      * Dimension in which this object
+                                      * operates.
+                                      */
+    static const unsigned int dimension = dim;
+
+                                     /**
+                                      * Dimension of the object over
+                                      * which we integrate. For the
+                                      * present class, this is equal
+                                      * to <code>dim</code>.
+                                      */
+    static const unsigned int integral_dimension = dim;
+    
 				     /**
 				      * Constructor. Gets cell
 				      * independent data from mapping
@@ -1921,7 +1936,21 @@ template <int dim>
 class FEFaceValues : public FEFaceValuesBase<dim>
 {
   public:
-				     /**
+                                     /**
+                                      * Dimension in which this object
+                                      * operates.
+                                      */
+    static const unsigned int dimension = dim;
+
+                                     /**
+                                      * Dimension of the object over
+                                      * which we integrate. For the
+                                      * present class, this is equal
+                                      * to <code>dim-1</code>.
+                                      */
+    static const unsigned int integral_dimension = dim-1;
+
+    				     /**
 				      * Constructor. Gets cell
 				      * independent data from mapping
 				      * and finite element objects,
@@ -2080,6 +2109,20 @@ template <int dim>
 class FESubfaceValues : public FEFaceValuesBase<dim>
 {
   public:
+                                     /**
+                                      * Dimension in which this object
+                                      * operates.
+                                      */
+    static const unsigned int dimension = dim;
+
+                                     /**
+                                      * Dimension of the object over
+                                      * which we integrate. For the
+                                      * present class, this is equal
+                                      * to <code>dim-1</code>.
+                                      */
+    static const unsigned int integral_dimension = dim-1;
+
 				     /**
 				      * Constructor. Gets cell
 				      * independent data from mapping
