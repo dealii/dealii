@@ -31,6 +31,7 @@ int main()
   std::ofstream logfile("block_minres/output");
   logfile.precision(2);
   deallog.attach(logfile);
+  deallog.depth_console(0);
 
 
 				   // assemble a 2x2 block identity
