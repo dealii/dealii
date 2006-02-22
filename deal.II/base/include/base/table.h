@@ -821,6 +821,24 @@ class Table<1,T> : public TableBase<1,T>
                                       */
     T &
     operator () (const unsigned int i);
+
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    T &
+    operator() (const TableIndices<1> &indices);
+  
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    const T &
+    operator() (const TableIndices<1> &indices) const;
 };
 
 
@@ -919,6 +937,24 @@ class Table<2,T> : public TableBase<2,T>
                                       */
     T & operator () (const unsigned int i,
                      const unsigned int j);
+
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    T &
+    operator() (const TableIndices<2> &indices);
+  
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    const T &
+    operator() (const TableIndices<2> &indices) const;
 
     
                                      /**
@@ -1069,6 +1105,22 @@ class Table<3,T> : public TableBase<3,T>
     T & operator () (const unsigned int i,
                      const unsigned int j,
                      const unsigned int k);
+
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    T & operator() (const TableIndices<3> &indices);
+  
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    const T & operator() (const TableIndices<3> &indices) const;
 };
 
 
@@ -1159,6 +1211,24 @@ class Table<4,T> : public TableBase<4,T>
                      const unsigned int j,
                      const unsigned int k,
 		     const unsigned int l);
+
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    T &
+    operator() (const TableIndices<4> &indices);
+  
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    const T &
+    operator() (const TableIndices<4> &indices) const;
 };
 
 
@@ -1237,7 +1307,6 @@ class Table<5,T> : public TableBase<5,T>
 			   const unsigned int l,
 			   const unsigned int m) const;
     
-
                                      /**
                                       * Direct access to one element
                                       * of the table by specifying all
@@ -1252,6 +1321,24 @@ class Table<5,T> : public TableBase<5,T>
                      const unsigned int k,
 		     const unsigned int l,
 		     const unsigned int m);
+
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    T &
+    operator() (const TableIndices<5> &indices);
+  
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    const T &
+    operator() (const TableIndices<5> &indices) const;
 };
 
 
@@ -1330,8 +1417,7 @@ class Table<6,T> : public TableBase<6,T>
                            const unsigned int k,
 			   const unsigned int l,
 			   const unsigned int m,
-			   const unsigned int n) const;
-    
+			   const unsigned int n) const;    
 
                                      /**
                                       * Direct access to one element
@@ -1348,6 +1434,24 @@ class Table<6,T> : public TableBase<6,T>
 		     const unsigned int l,
 		     const unsigned int m,
 		     const unsigned int n);
+
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    T &
+    operator() (const TableIndices<6> &indices);
+  
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    const T &
+    operator() (const TableIndices<6> &indices) const;
 };
 
 
@@ -1427,8 +1531,7 @@ class Table<7,T> : public TableBase<7,T>
 			   const unsigned int l,
 			   const unsigned int m,
 			   const unsigned int n,
-			   const unsigned int o) const;
-    
+			   const unsigned int o) const;    
 
                                      /**
                                       * Direct access to one element
@@ -1446,6 +1549,24 @@ class Table<7,T> : public TableBase<7,T>
 		     const unsigned int m,
 		     const unsigned int n,
 		     const unsigned int o);
+
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    T &
+    operator() (const TableIndices<7> &indices);
+  
+                                     /**
+                                      * Make the corresponding
+                                      * operator() from the TableBase
+                                      * base class available also in
+                                      * this class.
+                                      */
+    const T &
+    operator() (const TableIndices<7> &indices) const;
 };
 
 
@@ -1505,7 +1626,6 @@ class TransposeTable : public TableBase<2,T>
                                       */
     const T & operator () (const unsigned int i,
                            const unsigned int j) const;
-    
 
                                      /**
                                       * Direct access to one element
@@ -1518,7 +1638,6 @@ class TransposeTable : public TableBase<2,T>
                                       */
     T & operator () (const unsigned int i,
                      const unsigned int j);
-
     
                                      /**
                                       * Number of rows. This function
@@ -1976,6 +2095,7 @@ TableBase<N,T>::memory_consumption () const
 }
 
 
+
 template <int N, typename T>
 inline
 unsigned int
@@ -2004,7 +2124,6 @@ TableBase<N,T>::position (const TableIndices<N> &indices) const
       };
     };
 }
-
 
 
 
@@ -2120,6 +2239,26 @@ Table<1,T>::operator () (const unsigned int i)
 }
 
 
+
+template <typename T>
+inline
+const T &
+Table<1,T>::operator () (const TableIndices<1> &indices) const
+{
+  return TableBase<1,T>::operator() (indices);
+}
+
+
+
+template <typename T>
+inline
+T &
+Table<1,T>::operator () (const TableIndices<1> &indices)
+{
+  return TableBase<1,T>::operator() (indices);
+}
+
+
 //---------------------------------------------------------------------------
 
 template <typename T>
@@ -2199,6 +2338,26 @@ Table<2,T>::operator () (const unsigned int i,
   Assert (j < this->table_size[1],
           ExcIndexRange (j, 0, this->table_size[1]));
   return this->val[i*this->table_size[1]+j];
+}
+
+
+
+template <typename T>
+inline
+const T &
+Table<2,T>::operator () (const TableIndices<2> &indices) const
+{
+  return TableBase<2,T>::operator() (indices);
+}
+
+
+
+template <typename T>
+inline
+T &
+Table<2,T>::operator () (const TableIndices<2> &indices)
+{
+  return TableBase<2,T>::operator() (indices);
 }
 
 
@@ -2434,6 +2593,26 @@ Table<3,T>::operator () (const unsigned int i,
 
 
 template <typename T>
+inline
+const T &
+Table<3,T>::operator () (const TableIndices<3> &indices) const
+{
+  return TableBase<3,T>::operator() (indices);
+}
+
+
+
+template <typename T>
+inline
+T &
+Table<3,T>::operator () (const TableIndices<3> &indices)
+{
+  return TableBase<3,T>::operator() (indices);
+}
+
+
+
+template <typename T>
 Table<4,T>::Table ()
 {}
 
@@ -2526,6 +2705,26 @@ Table<4,T>::operator () (const unsigned int i,
   return this->val[((i*this->table_size[1]+j)
 		    *this->table_size[2] + k)
                    *this->table_size[3] + l];
+}
+
+
+
+template <typename T>
+inline
+const T &
+Table<4,T>::operator () (const TableIndices<4> &indices) const
+{
+  return TableBase<4,T>::operator() (indices);
+}
+
+
+
+template <typename T>
+inline
+T &
+Table<4,T>::operator () (const TableIndices<4> &indices)
+{
+  return TableBase<4,T>::operator() (indices);
 }
 
 
@@ -2635,6 +2834,26 @@ Table<5,T>::operator () (const unsigned int i,
 		     *this->table_size[2] + k)
 		    *this->table_size[3] + l)
                    *this->table_size[4] + m];
+}
+
+
+
+template <typename T>
+inline
+const T &
+Table<5,T>::operator () (const TableIndices<5> &indices) const
+{
+  return TableBase<5,T>::operator() (indices);
+}
+
+
+
+template <typename T>
+inline
+T &
+Table<5,T>::operator () (const TableIndices<5> &indices)
+{
+  return TableBase<5,T>::operator() (indices);
 }
 
 
@@ -2754,6 +2973,26 @@ Table<6,T>::operator () (const unsigned int i,
 		     *this->table_size[3] + l)
 		    *this->table_size[4] + m)
                    *this->table_size[5] + n];
+}
+
+
+
+template <typename T>
+inline
+const T &
+Table<6,T>::operator () (const TableIndices<6> &indices) const
+{
+  return TableBase<6,T>::operator() (indices);
+}
+
+
+
+template <typename T>
+inline
+T &
+Table<6,T>::operator () (const TableIndices<6> &indices)
+{
+  return TableBase<6,T>::operator() (indices);
 }
 
 
@@ -2885,6 +3124,27 @@ Table<7,T>::operator () (const unsigned int i,
 		    *this->table_size[5] + n)
 		   *this->table_size[6] + o];
 }
+
+
+
+template <typename T>
+inline
+const T &
+Table<7,T>::operator () (const TableIndices<7> &indices) const
+{
+  return TableBase<7,T>::operator() (indices);
+}
+
+
+
+template <typename T>
+inline
+T &
+Table<7,T>::operator () (const TableIndices<7> &indices)
+{
+  return TableBase<7,T>::operator() (indices);
+}
+
 
 #endif // DOXYGEN
 

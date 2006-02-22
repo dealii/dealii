@@ -247,6 +247,18 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p>Improved: The <code class="member">TableBase</code> base class of all
+       the <code class="member">Table</code> classes had an
+       <code>operator()</code> that takes a <code>TableIndices</code> object
+       that represents the entire set of indices at once. However, due to C++
+       name lookup rules, this operator wasn't accessible through the
+       <code>Table</code> class without explicitly specifying the base class
+       name. This is now fixed by also providing a similar
+       <code>operator()</code> in the derived classes.
+       <br>
+       (WB 2006/02/21)
+       </p>
+
   <li> <p>Fixed: The <code class="member">QGauss</code> constructor
        hangs on x86 linux systems when deal.II is run from inside
        MATLAB. The reason is that while the processor offers long
