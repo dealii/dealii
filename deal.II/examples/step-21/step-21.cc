@@ -1010,9 +1010,9 @@ void DGMethod<dim>::assemble_system1 ()
 						       // the face quadrature rule of the
 						       // higher order element
 						       // will be used.
-		      const unsigned int use_fe_index = 
-			neighbor_child->active_fe_index () > cell->active_fe_index () ?
-			neighbor_child->active_fe_index () : cell->active_fe_index ();
+		      const unsigned int quadrature_index = 
+			std::max (neighbor_child->active_fe_index (),
+                                  cell->active_fe_index ());
 			
 
 						       // As these are
@@ -1067,8 +1067,8 @@ void DGMethod<dim>::assemble_system1 ()
 						       // of the
 						       // neighboring
 						       // child cell.
-		      fe_v_subface_x.reinit (cell, face_no, subface_no, use_fe_index);
-		      fe_v_face_neighbor_x.reinit (neighbor_child, neighbor2, use_fe_index);
+		      fe_v_subface_x.reinit (cell, face_no, subface_no, quadrature_index);
+		      fe_v_face_neighbor_x.reinit (neighbor_child, neighbor2, quadrature_index);
 
 		      dg.assemble_face_term1(fe_v_subface_x.get_present_fe_values (),
 					     fe_v_face_neighbor_x.get_present_fe_values (),
@@ -1124,9 +1124,9 @@ void DGMethod<dim>::assemble_system1 ()
 		                                       // quadrature rule
                                                        // of higher order
                                                        // cell.
-		      const unsigned int use_fe_index = 
-			neighbor->active_fe_index () > cell->active_fe_index () ?
-			neighbor->active_fe_index () : cell->active_fe_index ();
+		      const unsigned int quadrature_index = 
+			std::max (neighbor->active_fe_index (),
+                                  cell->active_fe_index ());
 
 						       // We reinit
 						       // the
@@ -1140,8 +1140,8 @@ void DGMethod<dim>::assemble_system1 ()
 						       // the
 						       // corresponding
 						       // face terms.
-		      fe_v_face_x.reinit (cell, face_no, use_fe_index);
-		      fe_v_face_neighbor_x.reinit (neighbor, neighbor2, use_fe_index);
+		      fe_v_face_x.reinit (cell, face_no, quadrature_index);
+		      fe_v_face_neighbor_x.reinit (neighbor, neighbor2, quadrature_index);
 		      
 		      dg.assemble_face_term1(fe_v_face_x.get_present_fe_values (),
 					     fe_v_face_neighbor_x.get_present_fe_values (),
@@ -1193,9 +1193,9 @@ void DGMethod<dim>::assemble_system1 ()
 		                                       // quadrature rule
                                                        // of higher order
                                                        // cell.
-		      const unsigned int use_fe_index = 
-			neighbor->active_fe_index () > cell->active_fe_index () ?
-			neighbor->active_fe_index () : cell->active_fe_index ();
+		      const unsigned int quadrature_index = 
+			std::max (neighbor->active_fe_index (),
+                                  cell->active_fe_index ());
 
 						       // Reinit the
 						       // appropriate
@@ -1203,9 +1203,9 @@ void DGMethod<dim>::assemble_system1 ()
 						       // and assemble
 						       // the face
 						       // terms.
-		      fe_v_face_x.reinit (cell, face_no, use_fe_index);
+		      fe_v_face_x.reinit (cell, face_no, quadrature_index);
 		      fe_v_subface_neighbor_x.reinit (neighbor, neighbor_face_no,
-						      neighbor_subface_no, use_fe_index);
+						      neighbor_subface_no, quadrature_index);
 		      
 		      dg.assemble_face_term1(fe_v_face_x.get_present_fe_values (),
 					     fe_v_subface_neighbor_x.get_present_fe_values (),
@@ -1390,9 +1390,9 @@ void DGMethod<dim>::assemble_system2 ()
 			  neighbor2,subface_no));
 		      const unsigned int dofs_on_neighbor_child = neighbor_child->get_fe().dofs_per_cell;
 
-		      const unsigned int use_fe_index = 
-			neighbor_child->active_fe_index () > cell->active_fe_index () ?
-			neighbor_child->active_fe_index () : cell->active_fe_index ();
+		      const unsigned int quadrature_index = 
+			std::max (neighbor_child->active_fe_index (),
+                                  cell->active_fe_index ());
 
 		      Assert (neighbor_child->face(neighbor2) == face->child(subface_no),
 			      ExcInternalError());
@@ -1402,8 +1402,8 @@ void DGMethod<dim>::assemble_system2 ()
 		      u_vn_matrix = 0;
 		      un_vn_matrix = 0;
 		      
-		      fe_v_subface_x.reinit (cell, face_no, subface_no, use_fe_index);
-		      fe_v_face_neighbor_x.reinit (neighbor_child, neighbor2, use_fe_index);
+		      fe_v_subface_x.reinit (cell, face_no, subface_no, quadrature_index);
+		      fe_v_face_neighbor_x.reinit (neighbor_child, neighbor2, quadrature_index);
 
 		      dg.assemble_face_term2(fe_v_subface_x.get_present_fe_values (),
 					     fe_v_face_neighbor_x.get_present_fe_values (),
@@ -1441,16 +1441,16 @@ void DGMethod<dim>::assemble_system2 ()
 		    {
 		      const unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
 		      
-		      const unsigned int use_fe_index = 
-			neighbor->active_fe_index () > cell->active_fe_index () ?
-			neighbor->active_fe_index () : cell->active_fe_index ();
+		      const unsigned int quadrature_index = 
+			std::max (neighbor->active_fe_index (),
+                                  cell->active_fe_index ());
 
 		      un_v_matrix = 0;
 		      u_vn_matrix = 0;
 		      un_vn_matrix = 0;
 		      
-		      fe_v_face_x.reinit (cell, face_no, use_fe_index);
-		      fe_v_face_neighbor_x.reinit (neighbor, neighbor2, use_fe_index);
+		      fe_v_face_x.reinit (cell, face_no, quadrature_index);
+		      fe_v_face_neighbor_x.reinit (neighbor, neighbor2, quadrature_index);
 
 		      dg.assemble_face_term2(fe_v_face_x.get_present_fe_values (),
 					     fe_v_face_neighbor_x.get_present_fe_values (),
@@ -1658,7 +1658,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
   Assert (cycle < 10, ExcInternalError());
   
   //  filename += ".gnuplot";
-  filename += ".vtk";
+  filename += ".gmv";
   deallog << "Writing solution to <" << filename << ">..."
 	    << std::endl << std::endl;
   std::ofstream gnuplot_output (filename.c_str());
@@ -1670,7 +1670,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
   data_out.build_patches (5);
   
 //  data_out.write_gnuplot(gnuplot_output);
-  data_out.write_vtk(gnuplot_output);
+  data_out.write_gmv(gnuplot_output);
 }
 
 

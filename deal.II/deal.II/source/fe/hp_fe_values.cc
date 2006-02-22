@@ -16,65 +16,90 @@
 #include <fe/mapping_q1.h>
 
 
-// -------------------------- FEValuesMap -------------------------
-
 namespace internal
 {
   
   namespace hp
   {
-    template <int dim, class FEValues>
-    FEValuesMap<dim,FEValues>::~FEValuesMap () 
-    {}
-  
-  
-    template <int dim, class FEValues>
-    FEValues &
-    FEValuesMap<dim,FEValues>::select_fe_values (const FiniteElement<dim> &fe,
-                                                 const unsigned int active_fe_index)
-    {
-      std::pair<SmartPointer<const FiniteElement<dim> >, unsigned int> fe_pair=
-	std::make_pair(&fe, active_fe_index);
-                                       // check if the finite element
-                                       // does not exist as a key in the
-                                       // map
-      if (fe_to_fe_values_map.find (fe_pair) == fe_to_fe_values_map.end())
-                                         // a-ha! doesn't yet, so let's
-                                         // make it up
-        fe_to_fe_values_map[fe_pair]
-          = boost::shared_ptr<FEValues> (create_fe_values (fe, active_fe_index));
-
-
-                                       // now there definitely is one!
-      present_fe_values = fe_to_fe_values_map[fe_pair];
-
-      return *present_fe_values;
-    }
-
-
 // -------------------------- FEValuesBase -------------------------
 
-    template <int dim, int q_dim>
-    FEValuesBase<dim,q_dim>::FEValuesBase (
-      const ::hp::MappingCollection<dim> &mapping_collection,
-      const ::hp::QCollection<q_dim>     &q_collection,
-      const UpdateFlags             update_flags)
+    template <int dim, int q_dim, class FEValues>
+    FEValuesBase<dim,q_dim,FEValues>::
+    FEValuesBase (const ::hp::MappingCollection<dim> &mapping_collection,
+                  const ::hp::FECollection<dim>      &fe_collection,
+                  const ::hp::QCollection<q_dim>     &q_collection,
+                  const UpdateFlags                   update_flags)
                     :
+                    fe_collection (&fe_collection),
                     mapping_collection (&mapping_collection),
                     q_collection (q_collection),
+                    fe_values_table (fe_collection.size(),
+                                     mapping_collection.size(),
+                                     q_collection.size()),
+                    present_fe_values_index (deal_II_numbers::invalid_unsigned_int,
+                                             deal_II_numbers::invalid_unsigned_int,
+                                             deal_II_numbers::invalid_unsigned_int),
                     update_flags (update_flags)
     {}
 
 
-    template <int dim, int q_dim>
-    FEValuesBase<dim,q_dim>::FEValuesBase (const ::hp::QCollection<q_dim> &q_collection,
-                                           const UpdateFlags         update_flags)
+    template <int dim, int q_dim, class FEValues>
+    FEValuesBase<dim,q_dim,FEValues>::
+    FEValuesBase (const ::hp::FECollection<dim>      &fe_collection,
+                  const ::hp::QCollection<q_dim> &q_collection,
+                  const UpdateFlags         update_flags)
                     :
+                    fe_collection (&fe_collection),
                     mapping_collection (&::hp::StaticMappingQ1<dim>::mapping_collection),
                     q_collection (q_collection),
+                    fe_values_table (fe_collection.size(),
+                                     1,
+                                     q_collection.size()),
+                    present_fe_values_index (deal_II_numbers::invalid_unsigned_int,
+                                             deal_II_numbers::invalid_unsigned_int,
+                                             deal_II_numbers::invalid_unsigned_int),
                     update_flags (update_flags)
     {}
-    
+
+
+
+    template <int dim, int q_dim, class FEValues>
+    FEValues &
+    FEValuesBase<dim,q_dim,FEValues>::
+    select_fe_values (const unsigned int fe_index,
+                      const unsigned int mapping_index,
+                      const unsigned int q_index)
+    {
+      Assert (fe_index < fe_collection->size(),
+              ExcIndexRange (fe_index, 0, fe_collection->size()));
+      Assert (mapping_index < mapping_collection->size(),
+              ExcIndexRange (mapping_index, 0, mapping_collection->size()));
+      Assert (q_index < q_collection.size(),
+              ExcIndexRange (q_index, 0, q_collection.size()));
+
+
+                                       // set the triple of indices
+                                       // that we want to work with
+      present_fe_values_index = TableIndices<3> (fe_index,
+                                                 mapping_index,
+                                                 q_index);
+                                       
+                                       // first check whether we
+                                       // already have an object for
+                                       // this particular combination
+                                       // of indices
+      if (fe_values_table(present_fe_values_index) == 0)
+        fe_values_table(present_fe_values_index)
+          =
+          boost::shared_ptr<FEValues>
+          (new FEValues ((*mapping_collection)[mapping_index],
+                         (*fe_collection)[fe_index],
+                         q_collection[q_index],
+                         update_flags));
+
+                                       // now there definitely is one!
+      return *fe_values_table(present_fe_values_index);
+    }    
   }
 }
 
@@ -88,44 +113,70 @@ namespace hp
 
   template <int dim>
   FEValues<dim>::FEValues (const hp::MappingCollection<dim> &mapping,
-                           const hp::FECollection<dim>  &/*fe_collection*/,
+                           const hp::FECollection<dim>      &fe_collection,
                            const hp::QCollection<dim>       &q_collection,
-                           const UpdateFlags             update_flags)
+                           const UpdateFlags                 update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim> (mapping,
+                  internal::hp::FEValuesBase<dim,dim,::FEValues<dim> > (mapping,
+                                                                  fe_collection,
+                                                                  q_collection,
+                                                                  update_flags)
+  {}
+
+
+  template <int dim>
+  FEValues<dim>::FEValues (const hp::FECollection<dim> &fe_collection,
+                           const hp::QCollection<dim>      &q_collection,
+                           const UpdateFlags            update_flags)
+                  :
+                  internal::hp::FEValuesBase<dim,dim,::FEValues<dim> > (fe_collection,
                                                        q_collection,
                                                        update_flags)
   {}
 
 
   template <int dim>
-  FEValues<dim>::FEValues (const hp::FECollection<dim> &/*fe_collection*/,
-                           const hp::QCollection<dim>      &q_collection,
-                           const UpdateFlags            update_flags)
-                  :
-                  internal::hp::FEValuesBase<dim,dim> (q_collection,
-                                                       update_flags)
-  {}
-
-
-  template <int dim>
   void
-  FEValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell)
+  FEValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
+                         const unsigned int q_index,
+                         const unsigned int mapping_index,
+                         const unsigned int fe_index)
   {
-    this->present_fe_index = cell->active_fe_index ();
-    this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell);
-  }
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
 
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      if (q_collection.size() > 1)
+        real_q_index = cell->active_fe_index();
+      else
+        real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      if (mapping_collection->size() > 1)
+        real_mapping_index = cell->active_fe_index();
+      else
+        real_mapping_index = 0;
 
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = cell->active_fe_index();
 
-  template <int dim>
-  ::FEValues<dim> *
-  FEValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
-                                   const unsigned int active_fe_index) const
-  {
-    return new ::FEValues<dim> (
-      (*this->mapping_collection)[active_fe_index], fe,
-      this->q_collection[active_fe_index], this->update_flags);
+                                     // some checks
+    Assert (real_q_index < q_collection.size(),
+            ExcIndexRange (real_q_index, 0, q_collection.size()));
+    Assert (real_mapping_index < mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, mapping_collection->size()));
+    Assert (real_fe_index < fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell);
   }
 
 
@@ -134,22 +185,24 @@ namespace hp
 
   template <int dim>
   FEFaceValues<dim>::FEFaceValues (const hp::MappingCollection<dim> &mapping,
-                                   const hp::FECollection<dim>  &/*fe_collection*/,
+                                   const hp::FECollection<dim>  &fe_collection,
                                    const hp::QCollection<dim-1> &q_collection,
                                    const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1> (mapping,
+                  internal::hp::FEValuesBase<dim,dim-1,::FEFaceValues<dim> > (mapping,
+                                                         fe_collection,
                                                          q_collection,
                                                          update_flags)
   {}
 
 
   template <int dim>
-  FEFaceValues<dim>::FEFaceValues (const hp::FECollection<dim>  &/*fe_collection*/,
+  FEFaceValues<dim>::FEFaceValues (const hp::FECollection<dim>  &fe_collection,
                                    const hp::QCollection<dim-1> &q_collection,
                                    const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1> (q_collection,
+                  internal::hp::FEValuesBase<dim,dim-1,::FEFaceValues<dim> > (fe_collection,
+                                                         q_collection,
                                                          update_flags)
   {}
 
@@ -157,32 +210,46 @@ namespace hp
   template <int dim>
   void
   FEFaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
-                             const unsigned int face_no)
-  {
-    this->present_fe_index = cell->active_fe_index ();
-    this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell, face_no);
-  }
-
-
-  template <int dim>
-  void
-  FEFaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
                              const unsigned int face_no,
-                             const unsigned int active_fe_index)
+                             const unsigned int q_index,
+                             const unsigned int mapping_index,
+                             const unsigned int fe_index)
   {
-    this->present_fe_index = active_fe_index;
-    this->select_fe_values (cell->get_fe(), active_fe_index).reinit (cell, face_no);
-  }
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
 
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      if (q_collection.size() > 1)
+        real_q_index = cell->active_fe_index();
+      else
+        real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      if (mapping_collection->size() > 1)
+        real_mapping_index = cell->active_fe_index();
+      else
+        real_mapping_index = 0;
 
-  template <int dim>
-  ::FEFaceValues<dim> *
-  FEFaceValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
-                                       const unsigned int active_fe_index) const
-  {
-    return new ::FEFaceValues<dim> (
-      (*this->mapping_collection)[active_fe_index], fe,
-      this->q_collection[active_fe_index], this->update_flags);
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = cell->active_fe_index();
+
+                                     // some checks
+    Assert (real_q_index < q_collection.size(),
+            ExcIndexRange (real_q_index, 0, q_collection.size()));
+    Assert (real_mapping_index < mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, mapping_collection->size()));
+    Assert (real_fe_index < fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell, face_no);
   }
 
 
@@ -191,35 +258,26 @@ namespace hp
 
   template <int dim>
   FESubfaceValues<dim>::FESubfaceValues (const hp::MappingCollection<dim> &mapping,
-                                         const hp::FECollection<dim>  &/*fe_collection*/,
+                                         const hp::FECollection<dim>  &fe_collection,
                                          const hp::QCollection<dim-1> &q_collection,
                                          const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1> (mapping,
+                  internal::hp::FEValuesBase<dim,dim-1,::FESubfaceValues<dim> > (mapping,
+                                                         fe_collection,
                                                          q_collection,
                                                          update_flags)
   {}
 
 
   template <int dim>
-  FESubfaceValues<dim>::FESubfaceValues (const hp::FECollection<dim>  &/*fe_collection*/,
+  FESubfaceValues<dim>::FESubfaceValues (const hp::FECollection<dim>  &fe_collection,
                                          const hp::QCollection<dim-1> &q_collection,
                                          const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1> (q_collection,
+                  internal::hp::FEValuesBase<dim,dim-1,::FESubfaceValues<dim> > (fe_collection,
+                                                         q_collection,
                                                          update_flags)
   {}
-
-
-  template <int dim>
-  void
-  FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
-                                const unsigned int face_no,
-                                const unsigned int subface_no)
-  {
-    this->present_fe_index = cell->active_fe_index ();
-    this->select_fe_values (cell->get_fe(), this->present_fe_index).reinit (cell, face_no, subface_no);
-  }
 
 
   template <int dim>
@@ -227,21 +285,45 @@ namespace hp
   FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
                                 const unsigned int face_no,
                                 const unsigned int subface_no,
-                                const unsigned int active_fe_index)
+                                const unsigned int q_index,
+                                const unsigned int mapping_index,
+                                const unsigned int fe_index)
   {
-    this->present_fe_index = active_fe_index;
-    this->select_fe_values (cell->get_fe(), active_fe_index).reinit (cell, face_no, subface_no);
-  }
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
 
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      if (q_collection.size() > 1)
+        real_q_index = cell->active_fe_index();
+      else
+        real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      if (mapping_collection->size() > 1)
+        real_mapping_index = cell->active_fe_index();
+      else
+        real_mapping_index = 0;
 
-  template <int dim>
-  ::FESubfaceValues<dim> *
-  FESubfaceValues<dim>::create_fe_values (const FiniteElement<dim> &fe,
-                                          const unsigned int active_fe_index) const
-  {
-    return new ::FESubfaceValues<dim> (
-      (*this->mapping_collection)[active_fe_index], fe,
-      this->q_collection[active_fe_index], this->update_flags);
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = cell->active_fe_index();
+
+                                     // some checks
+    Assert (real_q_index < q_collection.size(),
+            ExcIndexRange (real_q_index, 0, q_collection.size()));
+    Assert (real_mapping_index < mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, mapping_collection->size()));
+    Assert (real_fe_index < fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell, face_no, subface_no);
   }
 }
 
@@ -251,9 +333,13 @@ namespace internal
 {
   namespace hp
   {
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension>;
+    template class FEValuesBase<deal_II_dimension,deal_II_dimension,
+                                ::FEValues<deal_II_dimension> >;
 #if deal_II_dimension >= 2
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1>;
+    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
+                                ::FEFaceValues<deal_II_dimension> >;
+    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
+                                ::FESubfaceValues<deal_II_dimension> >;
 #endif
   }
 }
@@ -266,10 +352,3 @@ namespace hp
   template class FESubfaceValues<deal_II_dimension>;
 #endif
 }
-
-// Putting the following explicit instantiations into the brackets 
-// of the appropriate namespace somehow causes problems with the 
-// Apple gcc3.3. Therefore these are separated.
-template class internal::hp::FEValuesMap<deal_II_dimension,FEValues<deal_II_dimension> >;
-template class internal::hp::FEValuesMap<deal_II_dimension,FEFaceValues<deal_II_dimension> >;
-template class internal::hp::FEValuesMap<deal_II_dimension,FESubfaceValues<deal_II_dimension> >;
