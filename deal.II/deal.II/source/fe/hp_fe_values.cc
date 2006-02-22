@@ -149,13 +149,13 @@ namespace hp
                  real_fe_index      = fe_index;
 
     if (real_q_index == deal_II_numbers::invalid_unsigned_int)
-      if (q_collection.size() > 1)
+      if (this->q_collection.size() > 1)
         real_q_index = cell->active_fe_index();
       else
         real_q_index = 0;
     
     if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
-      if (mapping_collection->size() > 1)
+      if (this->mapping_collection->size() > 1)
         real_mapping_index = cell->active_fe_index();
       else
         real_mapping_index = 0;
@@ -164,12 +164,12 @@ namespace hp
       real_fe_index = cell->active_fe_index();
 
                                      // some checks
-    Assert (real_q_index < q_collection.size(),
-            ExcIndexRange (real_q_index, 0, q_collection.size()));
-    Assert (real_mapping_index < mapping_collection->size(),
-            ExcIndexRange (real_mapping_index, 0, mapping_collection->size()));
-    Assert (real_fe_index < fe_collection->size(),
-            ExcIndexRange (real_fe_index, 0, fe_collection->size()));
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
     
                                      // now finally actually get the
                                      // corresponding object and
@@ -222,13 +222,13 @@ namespace hp
                  real_fe_index      = fe_index;
 
     if (real_q_index == deal_II_numbers::invalid_unsigned_int)
-      if (q_collection.size() > 1)
+      if (this->q_collection.size() > 1)
         real_q_index = cell->active_fe_index();
       else
         real_q_index = 0;
     
     if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
-      if (mapping_collection->size() > 1)
+      if (this->mapping_collection->size() > 1)
         real_mapping_index = cell->active_fe_index();
       else
         real_mapping_index = 0;
@@ -237,12 +237,12 @@ namespace hp
       real_fe_index = cell->active_fe_index();
 
                                      // some checks
-    Assert (real_q_index < q_collection.size(),
-            ExcIndexRange (real_q_index, 0, q_collection.size()));
-    Assert (real_mapping_index < mapping_collection->size(),
-            ExcIndexRange (real_mapping_index, 0, mapping_collection->size()));
-    Assert (real_fe_index < fe_collection->size(),
-            ExcIndexRange (real_fe_index, 0, fe_collection->size()));
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
     
                                      // now finally actually get the
                                      // corresponding object and
@@ -296,13 +296,13 @@ namespace hp
                  real_fe_index      = fe_index;
 
     if (real_q_index == deal_II_numbers::invalid_unsigned_int)
-      if (q_collection.size() > 1)
+      if (this->q_collection.size() > 1)
         real_q_index = cell->active_fe_index();
       else
         real_q_index = 0;
     
     if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
-      if (mapping_collection->size() > 1)
+      if (this->mapping_collection->size() > 1)
         real_mapping_index = cell->active_fe_index();
       else
         real_mapping_index = 0;
@@ -311,12 +311,12 @@ namespace hp
       real_fe_index = cell->active_fe_index();
 
                                      // some checks
-    Assert (real_q_index < q_collection.size(),
-            ExcIndexRange (real_q_index, 0, q_collection.size()));
-    Assert (real_mapping_index < mapping_collection->size(),
-            ExcIndexRange (real_mapping_index, 0, mapping_collection->size()));
-    Assert (real_fe_index < fe_collection->size(),
-            ExcIndexRange (real_fe_index, 0, fe_collection->size()));
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
     
                                      // now finally actually get the
                                      // corresponding object and
