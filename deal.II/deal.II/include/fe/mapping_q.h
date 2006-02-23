@@ -47,6 +47,16 @@ class MappingQ : public MappingQ1<dim>
     MappingQ (const unsigned int p);
 
 				     /**
+				      * Copy constructor. Performs a
+				      * deep copy, i.e. duplicates
+				      * what #tensor_pols points to
+				      * instead of simply copying the
+				      * #tensor_pols pointer as done
+				      * by a default copy constructor.
+				      */
+    MappingQ (const MappingQ<dim> &mapping);
+
+				     /**
 				      * Destructor.
 				      */
     virtual ~MappingQ ();
