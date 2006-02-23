@@ -27,6 +27,9 @@ template <int dim> class MappingQ1;
 template <int dim> class FiniteElement;
 
 
+//TODO[WB]: Document these classes
+
+
 namespace internal
 {
   namespace hp
