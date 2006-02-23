@@ -439,9 +439,13 @@ void mapping_test()
 
   MappingCartesian<dim> cart;
   MappingQ1<dim> q1_old;
-  MappingQ<dim> q1(1);
-  MappingQ<dim> q2(2);
-  MappingQ<dim> q3(3);
+  MappingQ<dim> q1tmp(1);
+  MappingQ<dim> q2tmp(2);
+  MappingQ<dim> q3tmp(3);
+				   // check MappingQ copy constructor
+  MappingQ<dim> q1(q1tmp);
+  MappingQ<dim> q2(q2tmp);
+  MappingQ<dim> q3(q3tmp);
 //  MappingQ<dim> q4(4);
   mapping_ptr.push_back(&q1_old);
   mapping_ptr.push_back(&q1);
