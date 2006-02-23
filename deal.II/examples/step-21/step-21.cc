@@ -1648,6 +1648,16 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
 
   GridOut grid_out;
   grid_out.write_eps (triangulation, eps_output);
+
+  Vector<double> active_fe_indices (triangulation.n_active_cells());
+  {
+    unsigned int index = 0;
+    for (typename hp::DoFHandler<dim>::active_cell_iterator
+	   cell = dof_handler.begin_active();
+	 cell != dof_handler.end(); ++cell, ++index)
+      active_fe_indices(index) = cell->active_fe_index ();
+  }
+  
   
 				   // Output of the solution in
 				   // gnuplot format.
@@ -1664,6 +1674,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
   DataOut<dim, hp::DoFHandler> data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution2, "u");
+  data_out.add_data_vector (active_fe_indices, "fe_index");
 
   data_out.build_patches (4);
   
