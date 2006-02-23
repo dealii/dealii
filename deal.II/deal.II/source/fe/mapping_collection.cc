@@ -20,17 +20,40 @@ namespace hp
 
   template <int dim>
   MappingCollection<dim>::MappingCollection ()
-  {
-  }
+  {}
 
 
+  
   template <int dim>
-  MappingCollection<dim>::MappingCollection (const Mapping<dim> &mapping)
+  MappingCollection<dim>::
+  MappingCollection (const Mapping<dim> &mapping)
   {
     mappings
       .push_back (boost::shared_ptr<const Mapping<dim> >(mapping.clone()));
   }
 
+
+
+  template <int dim>
+  MappingCollection<dim>::
+  MappingCollection (const MappingCollection<dim> &mapping_collection)
+                  :
+                  Subscriptor (),
+                                                   // copy the array
+                                                   // of shared
+                                                   // pointers. nothing
+                                                   // bad should
+                                                   // happen -- they
+                                                   // simply all point
+                                                   // to the same
+                                                   // objects, and the
+                                                   // last one to die
+                                                   // will delete the
+                                                   // mappings
+                  mappings (mapping_collection.mappings)
+  {}
+  
+  
 
   template <int dim>
   inline
