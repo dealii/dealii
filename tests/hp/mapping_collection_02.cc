@@ -26,8 +26,7 @@
 template <int dim>
 void test ()
 {
-  hp::MappingCollection<dim> mapping_collection;
-  mapping_collection.push_back (MappingQ<dim>(2));
+  hp::MappingCollection<dim> mapping_collection(MappingQ<dim>(2));
 }
 
 
