@@ -180,6 +180,126 @@ namespace hp
   }
 
 
+
+  template <int dim>
+  void
+  FEValues<dim>::reinit (const typename ::DoFHandler<dim>::cell_iterator &cell,
+                         const unsigned int q_index,
+                         const unsigned int mapping_index,
+                         const unsigned int fe_index)
+  {
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
+
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      real_mapping_index = 0;
+
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = 0;
+
+                                     // some checks
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell);
+  }
+
+
+
+  template <int dim>
+  void
+  FEValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
+                         const unsigned int q_index,
+                         const unsigned int mapping_index,
+                         const unsigned int fe_index)
+  {
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
+
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      real_mapping_index = 0;
+
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = 0;
+
+                                     // some checks
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell);
+  }
+
+
+
+  template <int dim>
+  void
+  FEValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell,
+                         const unsigned int q_index,
+                         const unsigned int mapping_index,
+                         const unsigned int fe_index)
+  {
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
+
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      real_mapping_index = 0;
+
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = 0;
+
+                                     // some checks
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell);
+  }
+  
+
 // -------------------------- FEFaceValues -------------------------
 
 
@@ -253,6 +373,129 @@ namespace hp
   }
 
 
+
+  template <int dim>
+  void
+  FEFaceValues<dim>::reinit (const typename ::DoFHandler<dim>::cell_iterator &cell,
+                             const unsigned int face_no,
+                             const unsigned int q_index,
+                             const unsigned int mapping_index,
+                             const unsigned int fe_index)
+  {
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
+
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      real_mapping_index = 0;
+
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = 0;
+
+                                     // some checks
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell, face_no);
+  }
+
+
+
+  template <int dim>
+  void
+  FEFaceValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
+                             const unsigned int face_no,
+                             const unsigned int q_index,
+                             const unsigned int mapping_index,
+                             const unsigned int fe_index)
+  {
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
+
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      real_mapping_index = 0;
+
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = 0;
+
+                                     // some checks
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell, face_no);
+  }
+
+
+
+  template <int dim>
+  void
+  FEFaceValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell,
+                             const unsigned int face_no,
+                             const unsigned int q_index,
+                             const unsigned int mapping_index,
+                             const unsigned int fe_index)
+  {
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
+
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      real_mapping_index = 0;
+
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = 0;
+
+                                     // some checks
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell, face_no);
+  }
+  
+
 // -------------------------- FESubfaceValues -------------------------
 
 
@@ -309,6 +552,132 @@ namespace hp
 
     if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
       real_fe_index = cell->active_fe_index();
+
+                                     // some checks
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell, face_no, subface_no);
+  }
+
+
+
+  template <int dim>
+  void
+  FESubfaceValues<dim>::reinit (const typename ::DoFHandler<dim>::cell_iterator &cell,
+                                const unsigned int face_no,
+                                const unsigned int subface_no,
+                                const unsigned int q_index,
+                                const unsigned int mapping_index,
+                                const unsigned int fe_index)
+  {
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
+
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      real_mapping_index = 0;
+
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = 0;
+
+                                     // some checks
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell, face_no, subface_no);
+  }
+
+
+
+  template <int dim>
+  void
+  FESubfaceValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
+                                const unsigned int face_no,
+                                const unsigned int subface_no,
+                                const unsigned int q_index,
+                                const unsigned int mapping_index,
+                                const unsigned int fe_index)
+  {
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
+
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      real_mapping_index = 0;
+
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = 0;
+
+                                     // some checks
+    Assert (real_q_index < this->q_collection.size(),
+            ExcIndexRange (real_q_index, 0, this->q_collection.size()));
+    Assert (real_mapping_index < this->mapping_collection->size(),
+            ExcIndexRange (real_mapping_index, 0, this->mapping_collection->size()));
+    Assert (real_fe_index < this->fe_collection->size(),
+            ExcIndexRange (real_fe_index, 0, this->fe_collection->size()));
+    
+                                     // now finally actually get the
+                                     // corresponding object and
+                                     // initialize it
+    this->select_fe_values (real_fe_index,
+                            real_mapping_index,
+                            real_q_index).reinit (cell, face_no, subface_no);
+  }
+
+
+
+  template <int dim>
+  void
+  FESubfaceValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell,
+                                const unsigned int face_no,
+                                const unsigned int subface_no,
+                                const unsigned int q_index,
+                                const unsigned int mapping_index,
+                                const unsigned int fe_index)
+  {
+                                     // determine which indices we
+                                     // should actually use
+    unsigned int real_q_index       = q_index,
+                 real_mapping_index = mapping_index,
+                 real_fe_index      = fe_index;
+
+    if (real_q_index == deal_II_numbers::invalid_unsigned_int)
+      real_q_index = 0;
+    
+    if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
+      real_mapping_index = 0;
+
+    if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
+      real_fe_index = 0;
 
                                      // some checks
     Assert (real_q_index < this->q_collection.size(),
