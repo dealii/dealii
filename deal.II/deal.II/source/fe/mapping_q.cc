@@ -72,6 +72,18 @@ MappingQ<1>::MappingQ (const unsigned int):
 
 
 template<>
+MappingQ<1>::MappingQ (const MappingQ<1> &):
+		MappingQ1<1> (),
+		degree(1),
+		n_inner(0),
+		n_outer(0),
+		tensor_pols(0),
+		n_shape_functions(2),
+		renumber(0)
+{}
+
+
+template<>
 MappingQ<1>::~MappingQ ()
 {}
 
@@ -126,8 +138,20 @@ MappingQ<dim>::MappingQ (const unsigned int p)
 				   // shape functions of the Qp
 				   // mapping.
   renumber.resize(n_shape_functions,0);
-  FETools::lexicographic_to_hierarchic_numbering (FE_Q<dim>(degree),
-						  renumber);
+				   // instead of creating a full FE_Q
+				   // object to be passed to the
+				   // lexicographic_to_hierarchic_numbering
+				   // function we only create the
+				   // underlying FiniteElementData
+				   // object. We can't access
+				   // FE_Q::get_dpo_vector as MappingQ
+				   // is not friend of FE_Q. Create
+				   // the dpo vector ourselve.
+  std::vector<unsigned int> dpo(dim+1, 1U);
+  for (unsigned int i=1; i<dpo.size(); ++i)
+    dpo[i]=dpo[i-1]*(degree-1);
+  FETools::lexicographic_to_hierarchic_numbering (
+    FiniteElementData<dim> (dpo, 1, degree), renumber);
 
 				   // build laplace_on_quad_vector
   if (degree>1)
@@ -137,6 +161,22 @@ MappingQ<dim>::MappingQ (const unsigned int p)
       if (dim >= 3)
 	set_laplace_on_hex_vector(laplace_on_hex_vector);
     }
+}
+
+
+template<int dim>
+MappingQ<dim>::MappingQ (const MappingQ<dim> &mapping):
+		MappingQ1<dim>(),
+  degree(mapping.degree),
+  n_inner(mapping.n_inner),
+  n_outer(n_outer),
+  tensor_pols(0),
+  n_shape_functions(mapping.n_shape_functions),
+  renumber(mapping.renumber)
+{
+  tensor_pols=new TensorProductPolynomials<dim> (*mapping.tensor_pols);
+  laplace_on_quad_vector=mapping.laplace_on_quad_vector;
+  laplace_on_hex_vector=mapping.laplace_on_hex_vector;
 }
 
 
