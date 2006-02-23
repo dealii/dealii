@@ -1591,13 +1591,9 @@ void DGMethod<dim>::refine_grid ()
 //random refinement. we need to do this since DerivativeApproximation
 //isn't really ready yet for hp
   
-//   DerivativeApproximation::approximate_gradient (mapping_collection[0],
-// 						 dof_handler,
-// 						 solution2,
-// 						 gradient_indicator);
-
-  for (unsigned int i=0; i<gradient_indicator.size(); ++i)
-    gradient_indicator(i) = std::sin(3.14*i/gradient_indicator.size());
+  DerivativeApproximation::approximate_gradient (dof_handler,
+						 solution2,
+						 gradient_indicator);
   
 				   // and they are cell-wise scaled by
 				   // the factor $h^{1+d/2}$
@@ -1622,7 +1618,9 @@ void DGMethod<dim>::refine_grid ()
                                    // h-refinement.
   cell = dof_handler.begin_active ();
   for (; cell!=endc; ++cell)
-    if (!cell->refine_flag_set ())
+    if (!cell->refine_flag_set ()
+	&&
+	(cell->active_fe_index() < fe_collection.size()-1))
       cell->set_active_fe_index (cell->active_fe_index () + 1);
 
   triangulation.execute_coarsening_and_refinement ();
@@ -1667,7 +1665,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution2, "u");
 
-  data_out.build_patches (5);
+  data_out.build_patches (4);
   
 //  data_out.write_gnuplot(gnuplot_output);
   data_out.write_gmv(gnuplot_output);
@@ -1690,7 +1688,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
 template <int dim>
 void DGMethod<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<5; ++cycle)
+  for (unsigned int cycle=0; cycle<7; ++cycle)
     {
       deallog << "Cycle " << cycle << ':' << std::endl;
 
