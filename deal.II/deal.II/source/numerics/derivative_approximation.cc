@@ -27,6 +27,9 @@
 #include <fe/hp_fe_values.h>
 #include <fe/select_fe_values.h>
 #include <fe/mapping_q1.h>
+#include <fe/q_collection.h>
+#include <fe/fe_collection.h>
+#include <fe/mapping_collection.h>
 #include <numerics/derivative_approximation.h>
 
 #include <cmath>
@@ -537,11 +540,22 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
 				      Vector<float>         &derivative_norm)
 {
   QMidpoint<dim> midpoint_rule;
-  typename SelectFEValues<DH<dim> >::FEValues
-    x_fe_midpoint_value (mapping, dof_handler.get_fe(),
-                         midpoint_rule,
-                         UpdateFlags(DerivativeDescription::update_flags |
-                                     update_q_points));
+
+				   // create collection objects from
+				   // single quadratures, mappings,
+				   // and finite elements. if we have
+				   // an hp DoFHandler,
+				   // dof_handler.get_fe() returns a
+				   // collection of which we do a
+				   // shallow copy instead
+  const hp::QCollection<dim>       q_collection (midpoint_rule);
+  const hp::FECollection<dim>      fe_collection(dof_handler.get_fe());
+  const hp::MappingCollection<dim> mapping_collection (mapping);
+  
+  hp::FEValues<dim> x_fe_midpoint_value (mapping_collection, fe_collection,
+					 q_collection,
+					 DerivativeDescription::update_flags |
+					 update_q_points);
   
 				   // matrix Y=sum_i y_i y_i^T
   Tensor<2,dim> Y;
