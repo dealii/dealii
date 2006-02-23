@@ -34,8 +34,7 @@ void test ()
   GridGenerator::hyper_cube(tria);
   tria.refine_global (1);
 
-  hp::FECollection<dim> fe_collection;
-  fe_collection.push_back (FE_DGQ<dim> (1));
+  hp::FECollection<dim> fe_collection (FE_DGQ<dim> (1));
 
   hp::DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs (fe_collection);
