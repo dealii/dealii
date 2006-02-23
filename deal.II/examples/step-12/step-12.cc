@@ -42,20 +42,21 @@
 				 // due to the pre-knowledge of the
 				 // actual polynomial degree 1.
 #include <fe/mapping_q1.h>
-				 // Here the discontinuous finite elements are
-				 // defined. They are used in the same way as
-				 // all other finite elements, though -- as
-				 // you have seen in previous tutorial
+				 // Here the discontinuous finite
+				 // elements are defined. They are
+				 // used in the same way as all other
+				 // finite elements, though -- as you
+				 // have seen in previous tutorial
 				 // programs -- there isn't much user
-				 // interaction with finite element classes at
-				 // all: the are passed to ``DoFHandler'' and
-				 // ``FEValues'' objects, and that is about
-				 // it.
+				 // interaction with finite element
+				 // classes at all: the are passed to
+				 // ``DoFHandler'' and ``FEValues''
+				 // objects, and that is about it.
 #include <fe/fe_dgq.h>
 				 // We are going to use the simplest
 				 // possible solver, called Richardson
-				 // iteration, that represents a simple
-				 // defect correction. This, in
+				 // iteration, that represents a
+				 // simple defect correction. This, in
 				 // combination with a block SSOR
 				 // preconditioner (defined in
 				 // precondition_block.h), that uses
@@ -231,24 +232,24 @@ class DGTransportEquation
     DGTransportEquation();
 
     void assemble_cell_term(const FEValues<dim>& fe_v,
-			    FullMatrix<double> &u_v_matrix,
+			    FullMatrix<double> &ui_vi_matrix,
 			    Vector<double> &cell_vector) const;
     
     void assemble_boundary_term(const FEFaceValues<dim>& fe_v,
-				FullMatrix<double> &u_v_matrix,
+				FullMatrix<double> &ui_vi_matrix,
 				Vector<double> &cell_vector) const;
     
     void assemble_face_term1(const FEFaceValuesBase<dim>& fe_v,
 			     const FEFaceValuesBase<dim>& fe_v_neighbor,
-			     FullMatrix<double> &u_v_matrix,
-			     FullMatrix<double> &un_v_matrix) const;
+			     FullMatrix<double> &ui_vi_matrix,
+			     FullMatrix<double> &ue_vi_matrix) const;
 
     void assemble_face_term2(const FEFaceValuesBase<dim>& fe_v,
 			     const FEFaceValuesBase<dim>& fe_v_neighbor,
-			     FullMatrix<double> &u_v_matrix,
-			     FullMatrix<double> &un_v_matrix,
-			     FullMatrix<double> &u_vn_matrix,
-			     FullMatrix<double> &un_vn_matrix) const;
+			     FullMatrix<double> &ui_vi_matrix,
+			     FullMatrix<double> &ue_vi_matrix,
+			     FullMatrix<double> &ui_ve_matrix,
+			     FullMatrix<double> &ue_ve_matrix) const;
   private:
     const Beta<dim> beta_function;
     const RHS<dim> rhs_function;
@@ -270,7 +271,7 @@ DGTransportEquation<dim>::DGTransportEquation ()
 				 // The ``assemble_cell_term''
 				 // function assembles the cell terms
 				 // of the discretization.
-				 // ``u_v_matrix'' is a cell matrix,
+				 // ``ui_vi_matrix'' is a cell matrix,
 				 // i.e. for a DG method of degree 1,
 				 // it is of size 4 times 4, and
 				 // ``cell_vector'' is of size 4.
@@ -281,7 +282,7 @@ DGTransportEquation<dim>::DGTransportEquation ()
 template <int dim>
 void DGTransportEquation<dim>::assemble_cell_term(
   const FEValues<dim> &fe_v,
-  FullMatrix<double> &u_v_matrix,
+  FullMatrix<double> &ui_vi_matrix,
   Vector<double> &cell_vector) const
 {
 				   // First we ask ``fe_v'' for the
@@ -305,7 +306,7 @@ void DGTransportEquation<dim>::assemble_cell_term(
     for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i) 
       {
 	for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-	  u_v_matrix(i,j) -= beta[point]*fe_v.shape_grad(i,point)*
+	  ui_vi_matrix(i,j) -= beta[point]*fe_v.shape_grad(i,point)*
 			      fe_v.shape_value(j,point) *
 			      JxW[point];
 	
@@ -327,7 +328,7 @@ void DGTransportEquation<dim>::assemble_cell_term(
 template <int dim>
 void DGTransportEquation<dim>::assemble_boundary_term(
   const FEFaceValues<dim>& fe_v,    
-  FullMatrix<double> &u_v_matrix,
+  FullMatrix<double> &ui_vi_matrix,
   Vector<double> &cell_vector) const
 {
 				   // Again, as in the previous
@@ -356,18 +357,18 @@ void DGTransportEquation<dim>::assemble_boundary_term(
       const double beta_n=beta[point] * normals[point];      
 					 // We assemble the term
 					 // $(\beta\cdot n
-					 // u,v)_{\partial K_+}$,
+					 // u,v)_{\partial\kappa_+}$,
       if (beta_n>0)
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-	    u_v_matrix(i,j) += beta_n *
+	    ui_vi_matrix(i,j) += beta_n *
 			       fe_v.shape_value(j,point) *
 			       fe_v.shape_value(i,point) *
 			       JxW[point];
       else
 					 // and the term $(\beta\cdot
 					 // n g,v)_{\partial
-					 // K_-\cap\partial\Omega}$,
+					 // \kappa_-\cap\partial\Omega}$,
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  cell_vector(i) -= beta_n *
 			    g[point] *
@@ -397,8 +398,8 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 				 // on the face.
 				 //
 				 // In addition to the cell matrix
-				 // ``u_v_matrix'' this function gets
-				 // a new argument ``un_v_matrix'',
+				 // ``ui_vi_matrix'' this function gets
+				 // a new argument ``ue_vi_matrix'',
 				 // that stores contributions to the
 				 // system matrix that are based on
 				 // outer values of u, see $\hat u_h$
@@ -411,8 +412,8 @@ template <int dim>
 void DGTransportEquation<dim>::assemble_face_term1(
   const FEFaceValuesBase<dim>& fe_v,
   const FEFaceValuesBase<dim>& fe_v_neighbor,      
-  FullMatrix<double> &u_v_matrix,
-  FullMatrix<double> &un_v_matrix) const
+  FullMatrix<double> &ui_vi_matrix,
+  FullMatrix<double> &ue_vi_matrix) const
 {
 				   // Again, as in the previous
 				   // function, we ask the FEValues
@@ -435,11 +436,11 @@ void DGTransportEquation<dim>::assemble_face_term1(
       const double beta_n=beta[point] * normals[point];
 					 // We assemble the term
 					 // $(\beta\cdot n
-					 // u,v)_{\partial K_+}$,
+					 // u,v)_{\partial\kappa_+}$,
       if (beta_n>0)
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-	    u_v_matrix(i,j) += beta_n *
+	    ui_vi_matrix(i,j) += beta_n *
 			       fe_v.shape_value(j,point) *
 			       fe_v.shape_value(i,point) *
 			       JxW[point];
@@ -447,10 +448,10 @@ void DGTransportEquation<dim>::assemble_face_term1(
 					 // and the
 					 // term $(\beta\cdot n
 					 // \hat u,v)_{\partial
-					 // K_-}$.
+					 // \kappa_-}$.
 	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
-	    un_v_matrix(i,k) += beta_n *
+	    ue_vi_matrix(i,k) += beta_n *
 				fe_v_neighbor.shape_value(k,point) *
 				fe_v.shape_value(i,point) *
 				JxW[point];
@@ -469,8 +470,8 @@ void DGTransportEquation<dim>::assemble_face_term1(
 				 // terms are given as a sum of
 				 // integrals over all faces.  Here we
 				 // need two additional cell matrices
-				 // ``u_vn_matrix'' and
-				 // ``un_vn_matrix'' that will store
+				 // ``ui_ve_matrix'' and
+				 // ``ue_ve_matrix'' that will store
 				 // contributions due to terms
 				 // involving u and vn as well as un
 				 // and vn.
@@ -478,10 +479,10 @@ template <int dim>
 void DGTransportEquation<dim>::assemble_face_term2(
   const FEFaceValuesBase<dim>& fe_v,
   const FEFaceValuesBase<dim>& fe_v_neighbor,      
-  FullMatrix<double> &u_v_matrix,
-  FullMatrix<double> &un_v_matrix,
-  FullMatrix<double> &u_vn_matrix,
-  FullMatrix<double> &un_vn_matrix) const
+  FullMatrix<double> &ui_vi_matrix,
+  FullMatrix<double> &ue_vi_matrix,
+  FullMatrix<double> &ui_ve_matrix,
+  FullMatrix<double> &ue_ve_matrix) const
 {
 				   // the first few lines are the same
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
@@ -496,10 +497,11 @@ void DGTransportEquation<dim>::assemble_face_term2(
       const double beta_n=beta[point] * normals[point];
       if (beta_n>0)
 	{
-					   // This terms we've already seen.
+					   // This term we've already
+					   // seen.
 	  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	    for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-	      u_v_matrix(i,j) += beta_n *
+	      ui_vi_matrix(i,j) += beta_n *
 				 fe_v.shape_value(j,point) *
 				 fe_v.shape_value(i,point) *
 				 JxW[point];
@@ -507,10 +509,10 @@ void DGTransportEquation<dim>::assemble_face_term2(
 					   // We additionally assemble
 					   // the term $(\beta\cdot n
 					   // u,\hat v)_{\partial
-					   // K_+},
+					   // \kappa_+},
 	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
 	    for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-	      u_vn_matrix(k,j) -= beta_n *
+	      ui_ve_matrix(k,j) -= beta_n *
 				  fe_v.shape_value(j,point) *
 				  fe_v_neighbor.shape_value(k,point) *
 				  JxW[point];
@@ -521,7 +523,7 @@ void DGTransportEquation<dim>::assemble_face_term2(
 					   // seen, too.
 	  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
 	    for (unsigned int l=0; l<fe_v_neighbor.dofs_per_cell; ++l)
-	      un_v_matrix(i,l) += beta_n *
+	      ue_vi_matrix(i,l) += beta_n *
 				  fe_v_neighbor.shape_value(l,point) *
 				  fe_v.shape_value(i,point) *
 				  JxW[point];
@@ -529,10 +531,10 @@ void DGTransportEquation<dim>::assemble_face_term2(
 					   // And this is another new
 					   // one: $(\beta\cdot n \hat
 					   // u,\hat v)_{\partial
-					   // K_-}$.
+					   // \kappa_-}$.
 	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
 	    for (unsigned int l=0; l<fe_v_neighbor.dofs_per_cell; ++l)
-	      un_vn_matrix(k,l) -= beta_n *
+	      ue_ve_matrix(k,l) -= beta_n *
 				   fe_v_neighbor.shape_value(l,point) *
 				   fe_v_neighbor.shape_value(k,point) *
 				   JxW[point];
@@ -803,18 +805,19 @@ void DGMethod<dim>::assemble_system1 ()
 				   // and vectors. Here we need two
 				   // cell matrices, both for face
 				   // terms that include test
-				   // functions ``v'' (shape functions
+				   // functions ``vi'' (internal shape
+				   // functions, i.e. shape functions
 				   // of the current cell). To be more
 				   // precise, the first matrix will
-				   // include the `u and v terms' and
-				   // the second that will include the
-				   // `un and v terms'. Here we recall
-				   // the convention that `un' is
-				   // the shortcut for `u_neighbor'
-				   // and represents the $u_hat$, see
+				   // include the `ui and vi terms'
+				   // and the second will include the
+				   // `ue and vi terms'. Here we
+				   // recall the convention that `ui'
+				   // is the shortcut for $u_h^+$ and
+				   // `ue' represents $u_h_-$, see the
 				   // introduction.
-  FullMatrix<double> u_v_matrix (dofs_per_cell, dofs_per_cell);
-  FullMatrix<double> un_v_matrix (dofs_per_cell, dofs_per_cell);
+  FullMatrix<double> ui_vi_matrix (dofs_per_cell, dofs_per_cell);
+  FullMatrix<double> ue_vi_matrix (dofs_per_cell, dofs_per_cell);
 
   Vector<double>  cell_vector (dofs_per_cell);
 
@@ -835,10 +838,10 @@ void DGMethod<dim>::assemble_system1 ()
 				       // cell vector are only
 				       // ADDED. Therefore on each
 				       // cell we need to reset the
-				       // ``u_v_matrix'' and
+				       // ``ui_vi_matrix'' and
 				       // ``cell_vector'' to zero,
 				       // before assembling the cell terms.
-      u_v_matrix = 0;
+      ui_vi_matrix = 0;
       cell_vector = 0;
       
 				       // Now we reinit the ``FEValues''
@@ -852,7 +855,7 @@ void DGMethod<dim>::assemble_system1 ()
 				       // previously reinit'ed on the
 				       // current cell.
       dg.assemble_cell_term(fe_v,
-			    u_v_matrix,
+			    ui_vi_matrix,
 			    cell_vector);
 
 				       // As in previous examples the
@@ -869,9 +872,9 @@ void DGMethod<dim>::assemble_system1 ()
 	  typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
 	  
 					   // and clear the
-					   // ``un_v_matrix'' on each
+					   // ``ue_vi_matrix'' on each
 					   // face.
-	  un_v_matrix = 0;
+	  ue_vi_matrix = 0;
 		  
 					   // Now we distinguish the
 					   // four different cases in
@@ -891,7 +894,7 @@ void DGMethod<dim>::assemble_system1 ()
 					       // corresponding face
 					       // terms.
 	      dg.assemble_boundary_term(fe_v_face,
-					u_v_matrix,
+					ui_vi_matrix,
 					cell_vector);
 	    }
 	  else
@@ -984,7 +987,7 @@ void DGMethod<dim>::assemble_system1 ()
 
 						       // We need to
 						       // reset the
-						       // ``un_v_matrix''
+						       // ``ue_vi_matrix''
 						       // on each
 						       // subface
 						       // because on
@@ -994,7 +997,7 @@ void DGMethod<dim>::assemble_system1 ()
 						       // different
 						       // neighboring
 						       // cells.
-		      un_v_matrix = 0;
+		      ue_vi_matrix = 0;
 		      
 						       // As already
 						       // mentioned
@@ -1022,8 +1025,8 @@ void DGMethod<dim>::assemble_system1 ()
 
 		      dg.assemble_face_term1(fe_v_subface,
 					     fe_v_face_neighbor,
-					     u_v_matrix,
-					     un_v_matrix);
+					     ui_vi_matrix,
+					     ue_vi_matrix);
 		      
 						       // Then we get
 						       // the dof
@@ -1035,13 +1038,13 @@ void DGMethod<dim>::assemble_system1 ()
 		      						
 						       // and
 						       // distribute
-						       // ``un_v_matrix''
+						       // ``ue_vi_matrix''
 						       // to the
 						       // system_matrix
 		      for (unsigned int i=0; i<dofs_per_cell; ++i)
 			for (unsigned int k=0; k<dofs_per_cell; ++k)
 			  system_matrix.add(dofs[i], dofs_neighbor[k],
-					    un_v_matrix(i,k));
+					    ue_vi_matrix(i,k));
 		    }
 						   // End of ``if
 						   // (face->has_children())''
@@ -1086,8 +1089,8 @@ void DGMethod<dim>::assemble_system1 ()
 		      
 		      dg.assemble_face_term1(fe_v_face,
 					     fe_v_face_neighbor,
-					     u_v_matrix,
-					     un_v_matrix);
+					     ui_vi_matrix,
+					     ue_vi_matrix);
 						       // End of ``if
 						       // (neighbor->level()
 						       // ==
@@ -1142,8 +1145,8 @@ void DGMethod<dim>::assemble_system1 ()
 		      
 		      dg.assemble_face_term1(fe_v_face,
 					     fe_v_subface_neighbor,
-					     u_v_matrix,
-					     un_v_matrix);
+					     ui_vi_matrix,
+					     ue_vi_matrix);
 		    }
 
 						   // Now we get the
@@ -1154,11 +1157,11 @@ void DGMethod<dim>::assemble_system1 ()
 		  neighbor->get_dof_indices (dofs_neighbor);
 		 						
 						   // and distribute the
-						   // ``un_v_matrix''.
+						   // ``ue_vi_matrix''.
 		  for (unsigned int i=0; i<dofs_per_cell; ++i)
 		    for (unsigned int k=0; k<dofs_per_cell; ++k)
 		      system_matrix.add(dofs[i], dofs_neighbor[k],
-					un_v_matrix(i,k));
+					ue_vi_matrix(i,k));
 		}
 					       // End of ``face not at boundary'':
 	    }
@@ -1166,10 +1169,10 @@ void DGMethod<dim>::assemble_system1 ()
 	}
       
 				       // Finally we distribute the
-				       // ``u_v_matrix''
+				       // ``ui_vi_matrix''
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  system_matrix.add(dofs[i], dofs[j], u_v_matrix(i,j));
+	  system_matrix.add(dofs[i], dofs[j], ui_vi_matrix(i,j));
       
 				       // and the cell vector.
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -1246,21 +1249,22 @@ void DGMethod<dim>::assemble_system2 ()
     mapping, fe, face_quadrature, neighbor_face_update_flags);
 
 
-  FullMatrix<double> u_v_matrix (dofs_per_cell, dofs_per_cell);
-  FullMatrix<double> un_v_matrix (dofs_per_cell, dofs_per_cell);
+  FullMatrix<double> ui_vi_matrix (dofs_per_cell, dofs_per_cell);
+  FullMatrix<double> ue_vi_matrix (dofs_per_cell, dofs_per_cell);
   
 				   // Additionally we need the
 				   // following two cell matrices,
 				   // both for face term that include
-				   // test function ``vn'' (shape
+				   // test function ``ve'' (external
+				   // shape functions, i.e. shape
 				   // functions of the neighboring
 				   // cell). To be more precise, the
 				   // first matrix will include the `u
 				   // and vn terms' and the second
 				   // that will include the `un and vn
 				   // terms'.
-  FullMatrix<double> u_vn_matrix (dofs_per_cell, dofs_per_cell);
-  FullMatrix<double> un_vn_matrix (dofs_per_cell, dofs_per_cell);
+  FullMatrix<double> ui_ve_matrix (dofs_per_cell, dofs_per_cell);
+  FullMatrix<double> ue_ve_matrix (dofs_per_cell, dofs_per_cell);
   
   Vector<double>  cell_vector (dofs_per_cell);
 
@@ -1272,13 +1276,13 @@ void DGMethod<dim>::assemble_system2 ()
     endc = dof_handler.end();
   for (;cell!=endc; ++cell) 
     {
-      u_v_matrix = 0;
+      ui_vi_matrix = 0;
       cell_vector = 0;
 
       fe_v.reinit (cell);
 
       dg.assemble_cell_term(fe_v,
-			    u_v_matrix,
+			    ui_vi_matrix,
 			    cell_vector);
       
       cell->get_dof_indices (dofs);
@@ -1294,7 +1298,7 @@ void DGMethod<dim>::assemble_system2 ()
 	      fe_v_face.reinit (cell, face_no);
 
 	      dg.assemble_boundary_term(fe_v_face,
-					u_v_matrix,
+					ui_vi_matrix,
 					cell_vector);
 	    }
 	  else
@@ -1319,19 +1323,19 @@ void DGMethod<dim>::assemble_system2 ()
 			      ExcInternalError());
 		      Assert (!neighbor_child->has_children(), ExcInternalError());
 		      
-		      un_v_matrix = 0;
-		      u_vn_matrix = 0;
-		      un_vn_matrix = 0;
+		      ue_vi_matrix = 0;
+		      ui_ve_matrix = 0;
+		      ue_ve_matrix = 0;
 		      
 		      fe_v_subface.reinit (cell, face_no, subface_no);
 		      fe_v_face_neighbor.reinit (neighbor_child, neighbor2);
 
 		      dg.assemble_face_term2(fe_v_subface,
 					     fe_v_face_neighbor,
-					     u_v_matrix,
-					     un_v_matrix,
-					     u_vn_matrix,
-					     un_vn_matrix);
+					     ui_vi_matrix,
+					     ue_vi_matrix,
+					     ui_ve_matrix,
+					     ue_ve_matrix);
 		  
 		      neighbor_child->get_dof_indices (dofs_neighbor);
 		      						
@@ -1339,11 +1343,11 @@ void DGMethod<dim>::assemble_system2 ()
 			for (unsigned int j=0; j<dofs_per_cell; ++j)
 			  {
 			    system_matrix.add(dofs[i], dofs_neighbor[j],
-					      un_v_matrix(i,j));
+					      ue_vi_matrix(i,j));
 			    system_matrix.add(dofs_neighbor[i], dofs[j],
-					      u_vn_matrix(i,j));
+					      ui_ve_matrix(i,j));
 			    system_matrix.add(dofs_neighbor[i], dofs_neighbor[j],
-					      un_vn_matrix(i,j));
+					      ue_ve_matrix(i,j));
 			  }
 		    }
 		}
@@ -1357,19 +1361,19 @@ void DGMethod<dim>::assemble_system2 ()
 		    {
 		      const unsigned int neighbor2=cell->neighbor_of_neighbor(face_no);
 		      
-		      un_v_matrix = 0;
-		      u_vn_matrix = 0;
-		      un_vn_matrix = 0;
+		      ue_vi_matrix = 0;
+		      ui_ve_matrix = 0;
+		      ue_ve_matrix = 0;
 		      
 		      fe_v_face.reinit (cell, face_no);
 		      fe_v_face_neighbor.reinit (neighbor, neighbor2);
 		      
 		      dg.assemble_face_term2(fe_v_face,
 					     fe_v_face_neighbor,
-					     u_v_matrix,
-					     un_v_matrix,
-					     u_vn_matrix,
-					     un_vn_matrix);
+					     ui_vi_matrix,
+					     ue_vi_matrix,
+					     ui_ve_matrix,
+					     ue_ve_matrix);
 
 		      neighbor->get_dof_indices (dofs_neighbor);
 
@@ -1377,11 +1381,11 @@ void DGMethod<dim>::assemble_system2 ()
 			for (unsigned int j=0; j<dofs_per_cell; ++j)
 			  {
 			    system_matrix.add(dofs[i], dofs_neighbor[j],
-					      un_v_matrix(i,j));
+					      ue_vi_matrix(i,j));
 			    system_matrix.add(dofs_neighbor[i], dofs[j],
-					      u_vn_matrix(i,j));
+					      ui_ve_matrix(i,j));
 			    system_matrix.add(dofs_neighbor[i], dofs_neighbor[j],
-					      un_vn_matrix(i,j));
+					      ue_ve_matrix(i,j));
 			  }
 		    }
 
@@ -1395,7 +1399,7 @@ void DGMethod<dim>::assemble_system2 ()
       
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  system_matrix.add(dofs[i], dofs[j], u_v_matrix(i,j));
+	  system_matrix.add(dofs[i], dofs[j], ui_vi_matrix(i,j));
       
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	right_hand_side(dofs[i]) += cell_vector(i);
