@@ -19,16 +19,13 @@ namespace hp
 {
 
   template <int dim>
-  MappingCollection<dim>::MappingCollection () :
-                  single_mapping (false)
+  MappingCollection<dim>::MappingCollection ()
   {
   }
 
 
   template <int dim>
   MappingCollection<dim>::MappingCollection (const Mapping<dim> &mapping)
-                  :
-                  single_mapping (true)
   {
     mappings
       .push_back (boost::shared_ptr<const Mapping<dim> >(mapping.clone()));
@@ -40,14 +37,9 @@ namespace hp
   const Mapping<dim> &
   MappingCollection<dim>::operator[] (const unsigned int index) const
   {
-    if (single_mapping)
-      return *mappings[0];
-    else
-      {
-	Assert (index < mappings.size (),
-		ExcIndexRange (index, 0, mappings.size ()));
-	return *mappings[index];
-      }
+    Assert (index < mappings.size (),
+            ExcIndexRange (index, 0, mappings.size ()));
+    return *mappings[index];
   }
 
 
@@ -64,12 +56,6 @@ namespace hp
   void
   MappingCollection<dim>::push_back (const Mapping<dim> &new_mapping)
   {
-                                     // A MappingCollection, which was
-                                     // initialized as single
-                                     // MappingCollection cannot administrate
-                                     // other Mappings.
-    Assert (!single_mapping, ExcNotInitialized ());
-    
     mappings
       .push_back (boost::shared_ptr<const Mapping<dim> >(new_mapping.clone()));
   }

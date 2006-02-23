@@ -31,14 +31,17 @@ namespace hp
  * It implements the concepts stated in the @ref hpcollection module described
  * in the doxygen documentation.
  * 
- * Although it is recommended to supply an appropriate mapping for each finite
- * element kind used in a hp-computation, the MappingCollection class
- * implements a conversion constructor from a single mapping.  Therefore it is
- * possible to offer only a single mapping to the hp::FEValues class instead of
- * a hp::MappingCollection. This is for the convenience of the user, as many
- * simple geometries do not require different mappings along the boundary to
- * achieve optimal convergence rates.  Hence providing a single mapping object
- * will usually suffice.
+ * Although it is recommended to supply an appropriate mapping for
+ * each finite element kind used in a hp-computation, the
+ * MappingCollection class implements a conversion constructor from a
+ * single mapping.  Therefore it is possible to offer only a single
+ * mapping to the hp::FEValues class instead of a
+ * hp::MappingCollection. This is for the convenience of the user, as
+ * many simple geometries do not require different mappings along the
+ * boundary to achieve optimal convergence rates.  Hence providing a
+ * single mapping object will usually suffice. See the hp::FEValues
+ * class for the rules which mapping will be selected for a given
+ * cell.
  * 
  * @ingroup hp hpcollection
  * 
@@ -56,11 +59,14 @@ namespace hp
 
                                        /**
                                         * Conversion constructor. This
-                                        * constructor creates a MappingCollection
-                                        * from a single mapping. In
-                                        * the newly created MappingCollection, this
-                                        * mapping is used for all active_fe
-                                        * indices.
+                                        * constructor creates a
+                                        * MappingCollection from a
+                                        * single mapping. More
+                                        * mappings can be added with
+                                        * push_back(), if desired,
+                                        * though it would probably be
+                                        * clearer to add all mappings
+                                        * the same way.
                                         */
       MappingCollection (const Mapping<dim> &mapping);
 
@@ -109,20 +115,6 @@ namespace hp
       unsigned int memory_consumption () const;
 
     private:
-                                       /**
-                                        * Upon construction of a
-                                        * <tt>MappingCollection</tt> the later
-                                        * functionality of the class is
-                                        * specified.  Either it is a real
-                                        * collection, which provides different
-                                        * mappings for each active_fe_index or
-                                        * its a "unreal" collection, which
-                                        * returns a the same mapping for all
-                                        * active_fe_indices.  This boolean
-                                        * remembers which type this object is.
-                                        */
-      const bool single_mapping;
-
                                        /**
                                         * The real container, which stores
                                         * pointers to the different Mapping
