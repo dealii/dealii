@@ -56,17 +56,6 @@ namespace hp
   
 
   template <int dim>
-  inline
-  const Mapping<dim> &
-  MappingCollection<dim>::operator[] (const unsigned int index) const
-  {
-    Assert (index < mappings.size (),
-            ExcIndexRange (index, 0, mappings.size ()));
-    return *mappings[index];
-  }
-
-
-  template <int dim>
   unsigned int
   MappingCollection<dim>::memory_consumption () const
   {
@@ -74,6 +63,7 @@ namespace hp
 	    MemoryConsumption::memory_consumption (mappings));
   }
 
+  
 
   template <int dim>
   void

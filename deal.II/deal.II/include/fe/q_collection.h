@@ -130,21 +130,6 @@ namespace hp
     
     private:
                                        /**
-                                        * Upon construction of a
-                                        * <tt>QCollection</tt> the later
-                                        * functionality of the class is
-                                        * specified.  Either it is a real
-                                        * collection, which provides different
-                                        * quadrature rules for each
-                                        * active_fe_index or its a "unreal"
-                                        * collection, which returns a the same
-                                        * quadrature rule for all
-                                        * active_fe_indices.  This boolean
-                                        * remembers which type this object is.
-                                        */
-      const bool single_quadrature;
-
-                                       /**
                                         * The real container, which stores
                                         * pointers to the different quadrature
                                         * objects.
@@ -162,6 +147,18 @@ namespace hp
   QCollection<dim>::size () const 
   {
     return quadratures.size();
+  }
+
+
+
+  template <int dim>
+  inline
+  const Quadrature<dim> &
+  QCollection<dim>::operator[] (const unsigned int index) const
+  {
+    Assert (index < quadratures.size (),
+	    ExcIndexRange (index, 0, quadratures.size ()));
+    return *quadratures[index];
   }
   
 } // namespace hp

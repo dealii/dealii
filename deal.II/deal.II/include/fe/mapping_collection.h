@@ -155,6 +155,18 @@ namespace hp
   {
     return mappings.size();
   }
+
+
+
+  template <int dim>
+  inline
+  const Mapping<dim> &
+  MappingCollection<dim>::operator[] (const unsigned int index) const
+  {
+    Assert (index < mappings.size (),
+            ExcIndexRange (index, 0, mappings.size ()));
+    return *mappings[index];
+  }
   
 } // namespace hp
 

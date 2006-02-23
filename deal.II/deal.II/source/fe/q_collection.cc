@@ -21,16 +21,11 @@ namespace hp
   
   template <int dim>
   QCollection<dim>::QCollection ()
-                  :
-                  single_quadrature (false)
-  {
-  }
+  {}
 
 
   template <int dim>
   QCollection<dim>::QCollection (const Quadrature<dim> &quadrature)
-                  :
-                  single_quadrature (true)
   {
     quadratures
       .push_back (boost::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(quadrature)));
@@ -54,29 +49,9 @@ namespace hp
                                                    // last one to die
                                                    // will delete the
                                                    // mappings
-                  quadratures (q_collection.quadratures),
-		  single_quadrature (true)
+                  quadratures (q_collection.quadratures)
   {}
 
-
-
-  template <int dim>
-  const Quadrature<dim> &
-  QCollection<dim>::operator[] (const unsigned int index) const
-  {
-                                     // if we have only a single quadrature
-                                     // that was given during construction,
-                                     // return this one. otherwise pick out
-                                     // the correct one
-    if (single_quadrature)
-      return *quadratures[0];
-    else
-      {
-	Assert (index < quadratures.size (),
-		ExcIndexRange (index, 0, quadratures.size ()));
-	return *quadratures[index];
-      }
-  }
 
 
   template <int dim>
@@ -92,11 +67,6 @@ namespace hp
   void
   QCollection<dim>::push_back (const Quadrature<dim> &new_quadrature)
   {
-                                     // A QCollection, which was initialized
-                                     // as single QCollection cannot
-                                     // administrate other Quadratures.
-    Assert (!single_quadrature, ExcNotInitialized ());
-
     quadratures
       .push_back (boost::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(new_quadrature)));
   }
