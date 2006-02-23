@@ -1,4 +1,4 @@
-//----------------------------  mapping_collection_01.cc  ---------------------------
+//----------------------------  mapping_collection_02.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,18 +9,16 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  mapping_collection_01.cc  ---------------------------
+//----------------------------  mapping_collection_02.cc  ---------------------------
 
 
-// test that MappingCollection objects are copyable without running into
-// troubles when the copy is destroyed earlier than the original
-// object
+// a test that triggers really hard to track down failures in
+// mapping_collection_01 in a really simple way
 
 
 #include <base/logstream.h>
 #include <fe/mapping_collection.h>
 #include <fe/mapping_q.h>
-#include <fe/mapping_q1.h>
 
 #include <fstream>
 
@@ -31,20 +29,13 @@ void test ()
   hp::MappingCollection<dim> mapping_collection;
   mapping_collection.push_back (MappingQ<dim>(2));
   mapping_collection.push_back (MappingQ<dim>(1));
-
-                                   // now create a copy and make sure
-                                   // it goes out of scope before the
-                                   // original
-  {
-    hp::MappingCollection<dim> copy (mapping_collection);
-  }
 }
 
 
 
 int main ()
 {
-  std::ofstream logfile("mapping_collection_01/output");
+  std::ofstream logfile("mapping_collection_02/output");
   logfile.precision(2);
   
   deallog.attach(logfile);
