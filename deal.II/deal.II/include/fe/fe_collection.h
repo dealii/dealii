@@ -44,6 +44,32 @@ namespace hp
   {
     public:
                                        /**
+                                        * Default constructor. Leads
+                                        * to an empty collection that
+                                        * can later be filled using
+                                        * push_back().
+                                        */
+      FECollection ();
+
+                                       /**
+                                        * Conversion constructor. This
+                                        * constructor creates a
+                                        * FECollection from a single
+                                        * finite element. More finite
+                                        * element objects can be added
+                                        * with push_back(), if
+                                        * desired, though it would
+                                        * probably be clearer to add
+                                        * all mappings the same way.
+                                        */
+      FECollection (const FiniteElement<dim> &fe);
+
+                                       /**
+                                        * Copy constructor.
+                                        */
+      FECollection (const FECollection<dim> &fe_collection);
+
+                                       /**
                                         * Add a finite element. This
                                         * function generates a copy of
                                         * the given element, i.e. you

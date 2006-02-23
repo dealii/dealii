@@ -18,6 +18,41 @@
 namespace hp
 {
   template <int dim>
+  FECollection<dim>::FECollection ()
+  {}
+  
+
+  
+  template <int dim>
+  FECollection<dim>::FECollection (const FiniteElement<dim> &fe)
+  {
+    push_back (fe);
+  }
+  
+
+  
+  template <int dim>
+  FECollection<dim>::
+  FECollection (const FECollection<dim> &fe_collection)
+                  :
+                  Subscriptor (),
+                                                   // copy the array
+                                                   // of shared
+                                                   // pointers. nothing
+                                                   // bad should
+                                                   // happen -- they
+                                                   // simply all point
+                                                   // to the same
+                                                   // objects, and the
+                                                   // last one to die
+                                                   // will delete the
+                                                   // mappings
+                  finite_elements (fe_collection.finite_elements)
+  {}
+
+
+
+  template <int dim>
   void FECollection<dim>::push_back (const FiniteElement<dim> &new_fe)
   {
                                      // check that the new element has the right

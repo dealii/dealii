@@ -39,7 +39,28 @@ namespace hp
   
 
   template <int dim>
-  inline
+  QCollection<dim>::
+  QCollection (const QCollection<dim> &q_collection)
+                  :
+                  Subscriptor (),
+                                                   // copy the array
+                                                   // of shared
+                                                   // pointers. nothing
+                                                   // bad should
+                                                   // happen -- they
+                                                   // simply all point
+                                                   // to the same
+                                                   // objects, and the
+                                                   // last one to die
+                                                   // will delete the
+                                                   // mappings
+                  quadratures (q_collection.quadratures),
+		  single_quadrature (true)
+  {}
+
+
+
+  template <int dim>
   const Quadrature<dim> &
   QCollection<dim>::operator[] (const unsigned int index) const
   {

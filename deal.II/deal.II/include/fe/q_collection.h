@@ -46,20 +46,30 @@ namespace hp
   {
     public:
                                        /**
-                                        * Default constructor. Initialises
-                                        * this QCollection.
+                                        * Default constructor. Leads
+                                        * to an empty collection that
+                                        * can later be filled using
+                                        * push_back().
                                         */
       QCollection ();
 
                                        /**
                                         * Conversion constructor. This
-                                        * constructor creates a QCollection
-                                        * from a single quadrature rule. In
-                                        * the newly created QCollection, this
-                                        * quadrature is used for all active_fe
-                                        * indices.
+                                        * constructor creates a
+                                        * QCollection from a single
+                                        * quadrature rule. More
+                                        * quadrature formulas can be
+                                        * added with push_back(), if
+                                        * desired, though it would
+                                        * probably be clearer to add
+                                        * all mappings the same way.
                                         */
       QCollection (const Quadrature<dim> &quadrature);
+
+                                       /**
+                                        * Copy constructor.
+                                        */
+      QCollection (const QCollection<dim> &q_collection);
 
                                        /**
                                         * Adds a new quadrature rule

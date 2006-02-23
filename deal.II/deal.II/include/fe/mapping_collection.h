@@ -54,8 +54,10 @@ namespace hp
   {
     public:
                                        /**
-                                        * Default constructor. Initialises
-                                        * this MappingCollection.
+                                        * Default constructor. Leads
+                                        * to an empty collection that
+                                        * can later be filled using
+                                        * push_back().
                                         */
       MappingCollection ();
 
