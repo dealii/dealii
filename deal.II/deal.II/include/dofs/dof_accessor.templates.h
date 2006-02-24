@@ -1370,14 +1370,15 @@ void
 DoFObjectAccessor<1,hp::DoFHandler<1> >::set_active_fe_index (const unsigned int i)
 {
   Assert (this->dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+  Assert (static_cast<unsigned int>(this->present_level) <
+          this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
   Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
 	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
 			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: this->dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  Assert (i < this->dof_handler->finite_elements->size (),
+          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
   this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
@@ -1396,8 +1397,9 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int
 	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
 			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: this->dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  Assert (i < this->dof_handler->finite_elements->size (),
+          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
+
   this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
@@ -1416,8 +1418,9 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int
 	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
 			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: this->dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  Assert (i < this->dof_handler->finite_elements->size (),
+          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
+
   this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
@@ -1616,8 +1619,9 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int
 	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
 			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: this->dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  Assert (i < this->dof_handler->finite_elements->size (),
+          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
+
   this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
@@ -1636,8 +1640,9 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int
 	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
 			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: this->dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  Assert (i < this->dof_handler->finite_elements->size (),
+          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
+
   this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
@@ -1746,8 +1751,9 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int
 	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
 			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-//TODO: this->dof_handler->finite_elements not always defined, when this method is called
-//  Assert (i < this->dof_handler->finite_elements->n_finite_elements (), ExcInvalidObject());
+  Assert (i < this->dof_handler->finite_elements->size (),
+          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
+
   this->dof_handler->levels[this->present_level]
       ->active_fe_indices[this->present_index] = i;
 }
