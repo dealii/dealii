@@ -35,8 +35,7 @@ void test ()
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
 
-  hp::FECollection<dim> fe_collection;
-  fe_collection.push_back (FE_DGQ<dim> (1));
+  const hp::FECollection<dim> fe_collection (FE_DGQ<dim> (1));
 
   hp::DoFHandler<dim> dof_handler(tria);
   tria.refine_global(1);
