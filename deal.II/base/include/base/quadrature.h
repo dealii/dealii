@@ -122,13 +122,26 @@ class Quadrature : public Subscriptor
 				      * one dimension.
 				      *
 				      * Assuming that the points in
-				      * the on-dimensional rule are in
+				      * the one-dimensional rule are in
 				      * ascending order, the points of
 				      * the resulting rule are ordered
 				      * lexicographically with
 				      * <i>x</i> running fastest.
+				      *
+				      * In order to avoid a conflict
+				      * with the copy constructor in
+				      * 1d, we let the argument be a
+				      * 0d quadrature formula for
+				      * dim==1, and a 1d quadrature
+				      * formula for all other space
+				      * dimensions.
 				      */
-    Quadrature (const Quadrature<1> &);
+    explicit Quadrature (const Quadrature<dim != 1 ? 1 : 0> &quadrature_1d);
+
+                                     /**
+                                      * Copy constructor.
+                                      */
+    Quadrature (const Quadrature<dim> &q);
     
 				     /**
 				      * Construct a quadrature formula
@@ -330,9 +343,14 @@ Quadrature<0>::Quadrature (const Quadrature<-1> &,
 			   const Quadrature<1> &);
 template <>
 Quadrature<0>::~Quadrature ();
+
 template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &,
 			   const Quadrature<1> &);
+
+template <>
+Quadrature<1>::Quadrature (const Quadrature<0> &);
+
 template <>
 const Point<0> & Quadrature<0>::point (const unsigned int) const;
 template <>

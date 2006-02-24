@@ -155,8 +155,24 @@ Quadrature<dim>::Quadrature (const SubQuadrature &q1,
 
 
 
+template <>
+Quadrature<1>::Quadrature (const Quadrature<0> &)
+		:
+		Subscriptor(),
+		n_quadrature_points (deal_II_numbers::invalid_unsigned_int),
+		quadrature_points (),
+		weights ()
+{
+                                   // this function should never be
+                                   // called -- this should be the
+                                   // copy constructor in 1d...
+  Assert (false, ExcInternalError());
+}
+
+
+
 template <int dim>
-Quadrature<dim>::Quadrature (const Quadrature<1> &q)
+Quadrature<dim>::Quadrature (const Quadrature<dim != 1 ? 1 : 0> &q)
 		:
 		Subscriptor(),
 		n_quadrature_points (dimpow<dim>(q.n_quadrature_points)),
@@ -187,6 +203,17 @@ Quadrature<dim>::Quadrature (const Quadrature<1> &q)
 	  ++k;
 	}
 }
+
+
+
+template <int dim>
+Quadrature<dim>::Quadrature (const Quadrature<dim> &q)
+		:
+		Subscriptor(),
+		n_quadrature_points (q.n_quadrature_points),
+		quadrature_points (q.quadrature_points),
+		weights (q.weights)
+{}
 
 
 
