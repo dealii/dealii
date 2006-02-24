@@ -351,10 +351,10 @@ class DoFTools
 				      * previously added entries are
 				      * not deleted.
 				      */
-    template <int dim, class SparsityPattern, template <int> class DH>
+    template <class DH, class SparsityPattern>
     static
     void
-    make_sparsity_pattern (const DH<dim>   &dof,
+    make_sparsity_pattern (const DH        &dof,
 			   SparsityPattern &sparsity_pattern);
 
 				     /**
@@ -443,6 +443,7 @@ class DoFTools
     make_sparsity_pattern (const DoFHandler<dim>&    dof,
 			   const Table<2, Coupling>& coupling,
 			   SparsityPattern&          sparsity_pattern);
+    
 				     /**
 				      * @deprecated This is the old
 				      * form of the previous
@@ -473,26 +474,11 @@ class DoFTools
 				      * size of the sparsity pattern is
 				      * already correct.
 				      */
-    template <int dim, class SparsityPattern, template <int> class DH>
+    template <class DH, class SparsityPattern>
     static void
-    make_boundary_sparsity_pattern (const DH<dim>                   &dof,
+    make_boundary_sparsity_pattern (const DH                        &dof,
 				    const std::vector<unsigned int> &dof_to_boundary_mapping,
 				    SparsityPattern                 &sparsity_pattern);
-
-				     /**
-				      * Declaration of same function
-				      * for one space dimension. The
-				      * resulting sparsity pattern
-				      * couples all dofs of the
-				      * specified end points to each
-				      * other.
-				      */
-    template <class SparsityPattern, template <int> class DH>
-    static void
-    make_boundary_sparsity_pattern (const DH<1>                     &dof,
-				    const std::vector<unsigned int> &dof_to_boundary_mapping,
-				    SparsityPattern                 &sparsity_pattern);
-
     
 				     /**
 				      * Write the sparsity structure of the
@@ -524,29 +510,12 @@ class DoFTools
 				      * pattern, the same holds as
 				      * said above.
 				      */
-    template <int dim, class SparsityPattern, template <int> class DH>
+    template <class DH, class SparsityPattern>
     static void
-    make_boundary_sparsity_pattern (const DH<dim> &dof,
-				    const typename FunctionMap<dim>::type &boundary_indicators,
-				    const std::vector<unsigned int>  &dof_to_boundary_mapping,
-				    SparsityPattern    &sparsity); 
-
-
-				     /**
-				      * Declaration of same function
-				      * for one space dimension. The
-				      * resulting sparsity pattern
-				      * couples all dofs of the
-				      * specified end points to each
-				      * other.
-				      */
-    template <class SparsityPattern, template <int> class DH>
-    static void
-    make_boundary_sparsity_pattern (const DH<1>                     &dof,
-				    const FunctionMap<1>::type      &boundary_indicators,
+    make_boundary_sparsity_pattern (const DH &dof,
+				    const typename FunctionMap<DH::dimension>::type &boundary_indicators,
 				    const std::vector<unsigned int> &dof_to_boundary_mapping,
-				    SparsityPattern                 &sparsity); 
-
+				    SparsityPattern    &sparsity);
 
 				     /**
 				      * Generate sparsity pattern for
@@ -564,17 +533,9 @@ class DoFTools
 				      * extra matrix entries are
 				      * considered.
 				      */
-    template<int dim, class SparsityPattern, template <int> class DH>
+    template<class DH, class SparsityPattern>
     static void
-    make_flux_sparsity_pattern (const DH<dim>   &dof_handler,
-				SparsityPattern &sparsity_pattern);
-
-				     /**
-				      * Same function, but for 1d.
-				      */
-    template<class SparsityPattern, template <int> class DH>
-    static void
-    make_flux_sparsity_pattern (const DH<1>     &dof_handler,
+    make_flux_sparsity_pattern (const DH        &dof_handler,
 				SparsityPattern &sparsity_pattern);
     
 				     /**
