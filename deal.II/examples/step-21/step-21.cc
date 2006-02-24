@@ -1585,12 +1585,7 @@ void DGMethod<dim>::refine_grid ()
   Vector<float> gradient_indicator (triangulation.n_active_cells());
 
 				   // Now the approximate gradients
-				   // are computed
-  
-//TODO: disable this for the moment and replace by some more or less
-//random refinement. we need to do this since DerivativeApproximation
-//isn't really ready yet for hp
-  
+				   // are computed  
   DerivativeApproximation::approximate_gradient (dof_handler,
 						 solution2,
 						 gradient_indicator);
