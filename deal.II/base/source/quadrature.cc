@@ -163,6 +163,8 @@ Quadrature<dim>::Quadrature (const Quadrature<1> &q)
 		quadrature_points (n_quadrature_points),
 		weights (n_quadrature_points, 0.)
 {
+  Assert (dim <= 3, ExcNotImplemented());
+  
   const unsigned int n0 = q.n_quadrature_points;
   const unsigned int n1 = (dim>1) ? n0 : 1;
   const unsigned int n2 = (dim>2) ? n0 : 1;
