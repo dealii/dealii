@@ -80,11 +80,7 @@
                                  // single finite element or quadrature
                                  // objects. I.e. instead of the
                                  // usual Quadrature object a
-                                 // QCollection object is needed. The
-                                 // select_fe_values file finally
-                                 // provides some wrappers, which should
-                                 // enable the user to write DoFHandler
-                                 // independent code.
+                                 // QCollection object is needed.
 #include <fe/hp_fe_values.h>
 
                                  // A compressed sparsity pattern is
