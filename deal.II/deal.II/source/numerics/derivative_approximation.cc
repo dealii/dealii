@@ -25,7 +25,6 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <fe/hp_fe_values.h>
-#include <fe/select_fe_values.h>
 #include <fe/mapping_q1.h>
 #include <fe/q_collection.h>
 #include <fe/fe_collection.h>
