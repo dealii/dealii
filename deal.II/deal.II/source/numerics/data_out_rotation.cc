@@ -23,7 +23,6 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <fe/hp_fe_values.h>
-#include <fe/select_fe_values.h>
 #include <fe/mapping_q1.h>
 #include <numerics/data_out_rotation.h>
 
@@ -38,14 +37,24 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, data.n_subdivisions);
 
+				   // create collection objects from
+				   // single quadratures,
+				   // and finite elements. if we have
+				   // an hp DoFHandler,
+				   // dof_handler.get_fe() returns a
+				   // collection of which we do a
+				   // shallow copy instead
+                                   //
 				   // since most output formats can't
 				   // handle cells that are not
 				   // transformed using a Q1 mapping,
 				   // we don't support anything else
 				   // as well
-  typename SelectFEValues<DH<dim> >::FEValues
-    x_fe_patch_values (StaticMappingQ1<dim>::mapping, this->dofs->get_fe(),
-                       patch_points, update_values);
+  const hp::QCollection<dim>       q_collection (patch_points);
+  const hp::FECollection<dim>      fe_collection(this->dofs->get_fe());
+  
+  hp::FEValues<dim> x_fe_patch_values (fe_collection, q_collection,
+                                       update_values);
 
   const unsigned int n_patches_per_circle = data.n_patches_per_circle;
 

@@ -23,7 +23,6 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <fe/hp_fe_values.h>
-#include <fe/select_fe_values.h>
 #include <fe/mapping_q1.h>
 
 #include <sstream>
@@ -257,9 +256,19 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions)
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, n_subdivisions);
   
-  typename SelectFEValues<DH<dim> >::FEValues
-    x_fe_patch_values (dof_handler->get_fe(),
-                       patch_points, update_values);
+				   // create collection objects from
+				   // single quadratures,
+				   // and finite elements. if we have
+				   // an hp DoFHandler,
+				   // dof_handler.get_fe() returns a
+				   // collection of which we do a
+				   // shallow copy instead
+  const hp::QCollection<dim>       q_collection (patch_points);
+  const hp::FECollection<dim>      fe_collection(dof_handler->get_fe());
+  
+  hp::FEValues<dim> x_fe_patch_values (fe_collection, q_collection,
+                                       update_values);
+
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   std::vector<double>          patch_values (n_q_points);
   std::vector<Vector<double> > patch_values_system (n_q_points,

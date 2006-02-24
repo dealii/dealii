@@ -24,7 +24,6 @@
 #include <fe/fe.h>
 #include <fe/fe_values.h>
 #include <fe/hp_fe_values.h>
-#include <fe/select_fe_values.h>
 #include <fe/mapping_q1.h>
 
 
@@ -35,9 +34,26 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
   QTrapez<1>        q_trapez;
   QIterated<dim-1>  patch_points (q_trapez, data.n_subdivisions);
   
-  typename SelectFEValues<DH<dim> >::FEFaceValues
-    x_fe_patch_values (this->dofs->get_fe(),
-                       patch_points, update_values);
+//TODO[?]: This is strange -- Data has a member 'mapping' that should
+//be used here, but it isn't. Rather, up until version 1.94, we were
+//actually initializing a local mapping object and used that... While
+//we use the mapping to transform the vertex coordinates, we do not
+//use the mapping to transform the shape functions (necessary for
+//example for Raviart-Thomas elements). This could lead to trouble
+//when someone tries to use MappingEulerian with such elements
+
+				   // create collection objects from
+				   // single quadratures,
+				   // and finite elements. if we have
+				   // an hp DoFHandler,
+				   // dof_handler.get_fe() returns a
+				   // collection of which we do a
+				   // shallow copy instead
+  const hp::QCollection<dim-1>     q_collection (patch_points);
+  const hp::FECollection<dim>      fe_collection(this->dofs->get_fe());
+  
+  hp::FEFaceValues<dim> x_fe_patch_values (fe_collection, q_collection,
+                                           update_values);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
