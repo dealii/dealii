@@ -2484,37 +2484,56 @@ namespace hp
 	levels.pop_back ();
       }
 
-                                     // Resize active_fe_indices vectors
+                                     // Resize active_fe_indices
+                                     // vectors. use zero indicator to
+                                     // extend
     for (unsigned int i=0; i<levels.size(); ++i)
-      levels[i]->active_fe_indices.resize (tria.n_raw_cells(i));
+      levels[i]->active_fe_indices.resize (tria.n_raw_cells(i), 0);
 
-    cell_iterator cell = begin(),
-                  endc = end ();
-    for (; cell != endc; ++cell)
+                                     // if a finite element collection
+                                     // has already been set, then
+                                     // actually try to set
+                                     // active_fe_indices for child
+                                     // cells of refined cells to the
+                                     // active_fe_index of the mother
+                                     // cell. if no finite element
+                                     // collection has been assigned
+                                     // yet, then all indicators are
+                                     // zero anyway, and there is no
+                                     // point trying to set anything
+                                     // (besides, we would trip over
+                                     // an assertion in
+                                     // set_active_fe_index)
+    if (finite_elements != 0)
       {
-                                         // Look if the cell got children during
-                                         // refinement
-                                         // Note: Although one level is added to
-                                         // the DoFHandler levels, when the
-                                         // triangulation got one, for the buffer
-                                         // has_children this new level is not
-                                         // required, because the cells on the
-                                         // finest level never have children. Hence
-                                         // cell->has_children () will always return
-                                         // false on that level, which would cause
-                                         // shortcut evaluation of the following
-                                         // expression. Thus an index error in
-                                         // has_children should never occur.
-	if (cell->has_children () &&
-	    !(*has_children [cell->level ()])[cell->index ()])
+        cell_iterator cell = begin(),
+                      endc = end ();
+        for (; cell != endc; ++cell)
           {
-                                             // Set active_fe_index in children to the
-                                             // same value as in the parent cell.
-	    for (unsigned int i = 0; i < GeometryInfo<dim>::children_per_cell; ++i)
-              cell->child (i)->set_active_fe_index (cell->active_fe_index ());
+                                             // Look if the cell got children during
+                                             // refinement
+                                             // Note: Although one level is added to
+                                             // the DoFHandler levels, when the
+                                             // triangulation got one, for the buffer
+                                             // has_children this new level is not
+                                             // required, because the cells on the
+                                             // finest level never have children. Hence
+                                             // cell->has_children () will always return
+                                             // false on that level, which would cause
+                                             // shortcut evaluation of the following
+                                             // expression. Thus an index error in
+                                             // has_children should never occur.
+            if (cell->has_children () &&
+                !(*has_children [cell->level ()])[cell->index ()])
+              {
+                                                 // Set active_fe_index in children to the
+                                                 // same value as in the parent cell.
+                for (unsigned int i = 0; i < GeometryInfo<dim>::children_per_cell; ++i)
+                  cell->child (i)->set_active_fe_index (cell->active_fe_index ());
+              }
           }
       }
-
+    
                                      // Free buffer objects
     std::vector<std::vector<bool> *>::iterator children_level;
     for (children_level = has_children.begin ();
