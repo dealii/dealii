@@ -22,8 +22,6 @@
 #include <boost/shared_ptr.hpp>
 
 
-//TODO[WB]: The conversion constructor should really be 'explicit'
-
 namespace hp
 {
 /**
@@ -72,7 +70,7 @@ namespace hp
                                         * clearer to add all mappings
                                         * the same way.
                                         */
-      MappingCollection (const Mapping<dim> &mapping);
+      explicit MappingCollection (const Mapping<dim> &mapping);
 
                                        /**
                                         * Copy constructor.

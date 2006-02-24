@@ -62,7 +62,7 @@ namespace hp
                                         * probably be clearer to add
                                         * all mappings the same way.
                                         */
-      FECollection (const FiniteElement<dim> &fe);
+      explicit FECollection (const FiniteElement<dim> &fe);
 
                                        /**
                                         * Copy constructor.
