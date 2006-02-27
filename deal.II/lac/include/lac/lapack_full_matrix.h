@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -344,20 +344,17 @@ LAPACKFullMatrix<number>::fill (
   const unsigned int src_offset_i,
   const unsigned int src_offset_j)
 {
-  const unsigned int endcol = src_offset_j + this->n_cols();
-  
-  const typename MATRIX::const_iterator
-    end = M.end(src_offset_i+this->n_rows()-dst_offset_i-1);
+  const typename MATRIX::const_iterator end = M.end();
   for (typename MATRIX::const_iterator entry = M.begin(src_offset_i);
        entry != end; ++entry)
     {
       const unsigned int i = entry->row();
       const unsigned int j = entry->column();
-      
-      if (j >= src_offset_j && j < endcol)
-	this->operator()(dst_offset_i-src_offset_i+i,
-			 dst_offset_j-src_offset_j+j)
-	  = entry->value();
+
+      const unsigned int dst_i=dst_offset_i+i-src_offset_i;
+      const unsigned int dst_j=dst_offset_j+j-src_offset_j;
+      if (dst_i<this->n_rows() && dst_j<this->n_cols())
+	(*this)(dst_i, dst_j) = entry->value();
     }
   
   state = LAPACKSupport::matrix;
