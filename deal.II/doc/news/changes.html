@@ -45,6 +45,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: The template argument of the <code
+       class="class">InterGridMap</code> class has been changed. Code
+       like e.g. <code
+       class="class">InterGridMap&lt;DoFHandler,2&gt;</code> must be
+       replaced by <code
+       class="class">InterGridMap&lt;DoFHandler&lt;2&gt; &gt;</code>.
+       <br> 
+       (RH 2006/02/27)
+       </p>
+
+  <li> <p>
        Changed: The <code>DoFObjectAccessor</code> and derived classes
        used to take only the space dimension and the dimension of the
        object they represented as template arguments. Now the later
@@ -484,6 +495,20 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Improved: The <code class="class">Triangulation</code>, <code
+       class="class">PersistentTriangulation</code>, <code
+       class="class">DoFHandler</code>, <code
+       class="class">hp::DoFHandler</code> and <code
+       class="class">MGDoFHandler</code> classes now all have a <code
+       class="member">dimension</code> variable which allows to ask
+       the template argument <tt>dim</tt> by
+       <class="class">SomeClass</code>::<code
+       class="member">dimension</code>.
+       <br> 
+       (RH 2006/02/27)
+       </p>
+
   <li> <p>
        Fixed: When used, the copy constructor of <code
        class="class">MappingQ</code> would lead to memory
