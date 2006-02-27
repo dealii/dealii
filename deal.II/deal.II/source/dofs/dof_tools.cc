@@ -4071,7 +4071,7 @@ DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension> >
  const std::set<unsigned char> &,
  std::vector<unsigned int> &);
 
-// #if deal_II_dimension != 1
+#if deal_II_dimension != 1
 
 template
 void
@@ -4079,7 +4079,7 @@ DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &,
  std::vector<unsigned int> &);
 
-// #endif
+#endif
 
 
 template
