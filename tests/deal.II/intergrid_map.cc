@@ -49,8 +49,8 @@ void check ()
       dof_2.distribute_dofs (fe_2);
 
 				       // create some mapping
-      InterGridMap<DoFHandler,dim> intergrid_map_1;
-      InterGridMap<DoFHandler,dim> intergrid_map_2;
+      InterGridMap<DoFHandler<dim> > intergrid_map_1;
+      InterGridMap<DoFHandler<dim> > intergrid_map_2;
       intergrid_map_1.make_mapping (dof_1, dof_2);
       intergrid_map_2.make_mapping (dof_2, dof_1);
 

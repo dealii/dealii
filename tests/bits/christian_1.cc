@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors and Christian Kamm
+//    Copyright (C) 2005, 2006 by the deal.II authors and Christian Kamm
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,7 +53,7 @@ DoFToolsEx::transfer(const DoFHandler<dim>& source_dof, const InVector& source_v
   // any sanity tests? Trias derived from same coarse grid?
   
   // build mappings between the cells
-  InterGridMap<DoFHandler, dim> source2target, target2source;
+  InterGridMap<DoFHandler<dim> > source2target, target2source;
   source2target.make_mapping(source_dof, target_dof);
   target2source.make_mapping(target_dof, source_dof);
   
