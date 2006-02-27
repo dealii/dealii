@@ -36,7 +36,7 @@ namespace hp
 }
 template <int dim> class MGDoFHandler;
 class ConstraintMatrix;
-template <template <int> class GridClass, int dim> class InterGridMap;
+template <class GridClass> class InterGridMap;
 template <int dim> class Mapping;
 
 
@@ -1297,7 +1297,7 @@ class DoFTools
 				   const unsigned int                  coarse_component,
 				   const DoFHandler<dim>              &fine_grid,
 				   const unsigned int                  fine_component,
-				   const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+				   const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
 				   ConstraintMatrix                   &constraints);
 
 
@@ -1330,7 +1330,7 @@ class DoFTools
 					       const unsigned int                  coarse_component,
 					       const DoFHandler<dim>              &fine_grid,
 					       const unsigned int                  fine_component,
-					       const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+					       const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
 					       std::vector<std::map<unsigned int, float> > &transfer_representation);
     
 				     /**
@@ -1539,7 +1539,7 @@ class DoFTools
 				 const unsigned int                  coarse_component,
 				 const DoFHandler<dim>              &fine_grid,
 				 const unsigned int                  fine_component,
-				 const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+				 const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
 				 std::vector<std::map<unsigned int, float> > &weights,
 				 std::vector<int>                   &weight_mapping);
     
@@ -1554,7 +1554,7 @@ class DoFTools
     static void
     compute_intergrid_weights_2 (const DoFHandler<dim>              &coarse_grid,
 				 const unsigned int                  coarse_component,
-				 const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+				 const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
 				 const std::vector<Vector<double> > &parameter_dofs,
 				 const std::vector<int>             &weight_mapping,
 				 std::vector<std::map<unsigned int, float> > &weights);
@@ -1573,7 +1573,7 @@ class DoFTools
     static void
     compute_intergrid_weights_3 (const DoFHandler<dim>              &coarse_grid,
 				 const unsigned int                  coarse_component,
-				 const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+				 const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
 				 const std::vector<Vector<double> > &parameter_dofs,
 				 const std::vector<int>             &weight_mapping,
 				 std::vector<std::map<unsigned int, float> > &weights,

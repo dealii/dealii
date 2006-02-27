@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,8 +52,8 @@ get_n_levels (const Triangulation<dim> &grid)
 }
 
 
-template <template <int> class GridClass, int dim>
-InterGridMap<GridClass,dim>::InterGridMap ()
+template <class GridClass>
+InterGridMap<GridClass>::InterGridMap ()
 		:
 		source_grid(0, typeid(*this).name()),
 		destination_grid(0, typeid(*this).name())
@@ -62,9 +62,9 @@ InterGridMap<GridClass,dim>::InterGridMap ()
 
 
 
-template <template <int> class GridClass, int dim>
-void InterGridMap<GridClass,dim>::make_mapping (const GridClass<dim> &source_grid,
-						const GridClass<dim> &destination_grid) 
+template <class GridClass>
+void InterGridMap<GridClass>::make_mapping (const GridClass &source_grid,
+					    const GridClass &destination_grid) 
 {
 				   // first delete all contents
   clear ();
@@ -119,10 +119,10 @@ void InterGridMap<GridClass,dim>::make_mapping (const GridClass<dim> &source_gri
 
 
 
-template <template <int> class GridClass, int dim>
+template <class GridClass>
 void
-InterGridMap<GridClass,dim>::set_mapping (const cell_iterator &src_cell,
-					  const cell_iterator &dst_cell)
+InterGridMap<GridClass>::set_mapping (const cell_iterator &src_cell,
+				      const cell_iterator &dst_cell)
 {
 				   // first set the map for this cell
   mapping[src_cell->level()][src_cell->index()] = dst_cell;
@@ -130,7 +130,7 @@ InterGridMap<GridClass,dim>::set_mapping (const cell_iterator &src_cell,
 				   // if both cells have children, we may
 				   // recurse further into the hierarchy
   if (src_cell->has_children() && dst_cell->has_children())
-    for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+    for (unsigned int c=0; c<GeometryInfo<GridClass::dimension>::children_per_cell; ++c)
       set_mapping (src_cell->child(c),
 		   dst_cell->child(c));
   else
@@ -140,7 +140,7 @@ InterGridMap<GridClass,dim>::set_mapping (const cell_iterator &src_cell,
 				       // set entries for all children
 				       // of this cell to the one
 				       // dst_cell
-      for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+      for (unsigned int c=0; c<GeometryInfo<GridClass::dimension>::children_per_cell; ++c)
 	set_entries_to_cell (src_cell->child(c),
 			     dst_cell);
 				   // else (no cell is refined or
@@ -150,10 +150,10 @@ InterGridMap<GridClass,dim>::set_mapping (const cell_iterator &src_cell,
 
 
 
-template <template <int> class GridClass, int dim>
+template <class GridClass>
 void
-InterGridMap<GridClass,dim>::set_entries_to_cell (const cell_iterator &src_cell,
-						  const cell_iterator &dst_cell)
+InterGridMap<GridClass>::set_entries_to_cell (const cell_iterator &src_cell,
+					      const cell_iterator &dst_cell)
 {
   				   // first set the map for this cell
   mapping[src_cell->level()][src_cell->index()] = dst_cell;
@@ -161,15 +161,15 @@ InterGridMap<GridClass,dim>::set_entries_to_cell (const cell_iterator &src_cell,
 				   // then do so for the children as well
 				   // if there are any
   if (src_cell->has_children())
-    for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+    for (unsigned int c=0; c<GeometryInfo<GridClass::dimension>::children_per_cell; ++c)
       set_entries_to_cell (src_cell->child(c),
 			   dst_cell);
 }
 
 
-template <template <int> class GridClass, int dim>
-typename InterGridMap<GridClass,dim>::cell_iterator
-InterGridMap<GridClass,dim>::operator [] (const cell_iterator &source_cell) const
+template <class GridClass>
+typename InterGridMap<GridClass>::cell_iterator
+InterGridMap<GridClass>::operator [] (const cell_iterator &source_cell) const
 {
   Assert (source_cell.state() == IteratorState::valid,
 	  ExcInvalidKey (source_cell));
@@ -183,8 +183,8 @@ InterGridMap<GridClass,dim>::operator [] (const cell_iterator &source_cell) cons
 
 
 
-template <template <int> class GridClass, int dim>
-void InterGridMap<GridClass,dim>::clear () 
+template <class GridClass>
+void InterGridMap<GridClass>::clear () 
 {
   mapping.clear ();
   source_grid      = 0;
@@ -193,27 +193,27 @@ void InterGridMap<GridClass,dim>::clear ()
 
 
 
-template <template <int> class GridClass, int dim>
-const GridClass<dim> &
-InterGridMap<GridClass,dim>::get_source_grid () const
+template <class GridClass>
+const GridClass &
+InterGridMap<GridClass>::get_source_grid () const
 {
   return *source_grid;
 }
 
 
 
-template <template <int> class GridClass, int dim>
-const GridClass<dim> &
-InterGridMap<GridClass,dim>::get_destination_grid () const
+template <class GridClass>
+const GridClass &
+InterGridMap<GridClass>::get_destination_grid () const
 {
   return *destination_grid;
 }
 
 
 
-template <template <int> class GridClass, int dim>
+template <class GridClass>
 unsigned int
-InterGridMap<GridClass,dim>::memory_consumption () const
+InterGridMap<GridClass>::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (mapping) +
 	  MemoryConsumption::memory_consumption (source_grid) +
@@ -223,7 +223,8 @@ InterGridMap<GridClass,dim>::memory_consumption () const
 
   
 // explicit instantiations
-template class InterGridMap<Triangulation, deal_II_dimension>;
-template class InterGridMap<DoFHandler, deal_II_dimension>;
+template class InterGridMap<Triangulation<deal_II_dimension> >;
+template class InterGridMap<DoFHandler<deal_II_dimension> >;
 
-template class InterGridMap<MGDoFHandler, deal_II_dimension>;
+template class InterGridMap<hp::DoFHandler<deal_II_dimension> >;
+template class InterGridMap<MGDoFHandler<deal_II_dimension> >;

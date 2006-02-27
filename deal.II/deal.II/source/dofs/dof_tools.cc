@@ -2627,7 +2627,7 @@ DoFTools::compute_intergrid_constraints (
   const unsigned int                  coarse_component,
   const DoFHandler<dim>              &fine_grid,
   const unsigned int                  fine_component,
-  const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+  const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
   ConstraintMatrix                   &constraints)
 {
 				   // store the weights with which a dof
@@ -2851,7 +2851,7 @@ compute_intergrid_transfer_representation (
   const unsigned int                  coarse_component,
   const DoFHandler<dim>              &fine_grid,
   const unsigned int                  fine_component,
-  const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+  const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
   std::vector<std::map<unsigned int, float> > &transfer_representation)
 {
 				   // store the weights with which a dof
@@ -2961,7 +2961,7 @@ DoFTools::compute_intergrid_weights_1 (
   const unsigned int                  coarse_component,
   const DoFHandler<dim>              &fine_grid,
   const unsigned int                  fine_component,
-  const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+  const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
   std::vector<std::map<unsigned int, float> > &weights,
   std::vector<int>                   &weight_mapping)
 {
@@ -3196,7 +3196,7 @@ void
 DoFTools::compute_intergrid_weights_2 (
   const DoFHandler<dim>              &coarse_grid,
   const unsigned int                  coarse_component,
-  const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+  const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
   const std::vector<Vector<double> > &parameter_dofs,
   const std::vector<int>             &weight_mapping,
   std::vector<std::map<unsigned int,float> > &weights)
@@ -3212,7 +3212,7 @@ DoFTools::compute_intergrid_weights_2 (
   Threads::ThreadGroup<> threads;
   void (*fun_ptr) (const DoFHandler<dim>              &,
 		   const unsigned int                  ,
-		   const InterGridMap<DoFHandler,dim> &,
+		   const InterGridMap<DoFHandler<dim> > &,
 		   const std::vector<Vector<double> > &,
 		   const std::vector<int>             &,
 		   std::vector<std::map<unsigned int, float> > &,
@@ -3237,7 +3237,7 @@ void
 DoFTools::compute_intergrid_weights_3 (
   const DoFHandler<dim>              &coarse_grid,
   const unsigned int                  coarse_component,
-  const InterGridMap<DoFHandler,dim> &coarse_to_fine_grid_map,
+  const InterGridMap<DoFHandler<dim> > &coarse_to_fine_grid_map,
   const std::vector<Vector<double> > &parameter_dofs,
   const std::vector<int>             &weight_mapping,
   std::vector<std::map<unsigned int, float> > &weights,
@@ -4063,7 +4063,7 @@ void
 DoFTools::compute_intergrid_constraints<deal_II_dimension> (
   const DoFHandler<deal_II_dimension> &, const unsigned int,
   const DoFHandler<deal_II_dimension> &, const unsigned int,
-  const InterGridMap<DoFHandler,deal_II_dimension> &,
+  const InterGridMap<DoFHandler<deal_II_dimension> > &,
   ConstraintMatrix&);
 
 template
@@ -4071,7 +4071,7 @@ void
 DoFTools::compute_intergrid_transfer_representation<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const unsigned int,
  const DoFHandler<deal_II_dimension> &, const unsigned int,
- const InterGridMap<DoFHandler,deal_II_dimension> &,
+ const InterGridMap<DoFHandler<deal_II_dimension> > &,
  std::vector<std::map<unsigned int, float> > &);
 
 

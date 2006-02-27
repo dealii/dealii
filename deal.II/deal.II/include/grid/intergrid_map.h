@@ -89,7 +89,7 @@
  *                   // distribute degrees of freedom, etc
  *   ...
  *                   // create the mapping
- *   InterGridMap<DoFHandler,dim> grid_1_to_2_map;
+ *   InterGridMap<DoFHandler<dim> > grid_1_to_2_map;
  *   grid_1_to_2_map.make_mapping (dof_handler_1,
  *                                 dof_handler_2);
  *   ...
@@ -103,50 +103,24 @@
  * @endverbatim
  *
  * Note that the template parameters to this class have to be given as
- * <tt>InterGridMap<DoFHandler,2></tt>, i.e. the dimension is given explicitly and
- * no dimension is attributed to the first parameter, which here is
- * DoFHandler (and could equally well be Triangulation or MGDoFHandler).
+ * <tt>InterGridMap<DoFHandler<2> ></tt>, which here is DoFHandler
+ * (and could equally well be Triangulation, PersistentTriangulation,
+ * hp::DoFHandler or MGDoFHandler).
  *
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
-template <template <int> class GridClass, int dim>
+template <class GridClass>
 class InterGridMap 
 {
   public:
 
-#ifdef DEAL_II_TEMPLATE_TEMPLATE_TYPEDEF_BUG
-				     // helper class
-    struct GridClass_dim : public GridClass<dim>
-    {
-					 // constructor. will
-					 // not be implemented,
-					 // but suppresses compiler
-					 // warning about non-default
-					 // constructor of GridClass
-	GridClass_dim ();
-
-					 /**
-					  * Declare iterator type, for
-					  * access from outside.
-					  */
-	typedef typename GridClass<dim>::cell_iterator cell_iterator;
-    };
-    
 				     /**
 				      * Typedef to the iterator type of
 				      * the grid class under consideration.
 				      */
-    typedef typename GridClass_dim::cell_iterator cell_iterator;
+    typedef typename GridClass::cell_iterator cell_iterator;
 
-#else
-
-				     /**
-				      * Typedef to the iterator type of
-				      * the grid class under consideration.
-				      */
-    typedef typename GridClass<dim>::cell_iterator cell_iterator;
-#endif
 				     /**
 				      * Constructor setting the class
 				      * name arguments in the
@@ -158,8 +132,8 @@ class InterGridMap
 				      * Create the mapping between the two
 				      * grids.
 				      */
-    void make_mapping (const GridClass<dim> &source_grid,
-		       const GridClass<dim> &destination_grid);
+    void make_mapping (const GridClass &source_grid,
+		       const GridClass &destination_grid);
 
 				     /**
 				      * Access operator: give a cell
@@ -182,13 +156,13 @@ class InterGridMap
 				      * Return a pointer to the source
 				      * grid.
 				      */
-    const GridClass<dim> & get_source_grid () const;
+    const GridClass & get_source_grid () const;
     
 				     /**
 				      * Return a pointer to the
 				      * destination grid.
 				      */
-    const GridClass<dim> & get_destination_grid () const;
+    const GridClass & get_destination_grid () const;
 
 				     /**
 				      * Determine an estimate for the
@@ -219,12 +193,12 @@ class InterGridMap
 				     /**
 				      * Store a pointer to the source grid.
 				      */
-    SmartPointer<const GridClass<dim> > source_grid;
+    SmartPointer<const GridClass > source_grid;
 
 				     /**
 				      * Likewise for the destination grid.
 				      */
-    SmartPointer<const GridClass<dim> > destination_grid;
+    SmartPointer<const GridClass > destination_grid;
 
 				     /**
 				      * Set the mapping for the pair of
