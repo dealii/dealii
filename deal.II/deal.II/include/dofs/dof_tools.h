@@ -936,9 +936,9 @@ class DoFTools
 				      * <tt>GridTools::get_subdomain_association</tt>
 				      * function.
                                       */
-    template <int dim>
+    template <class DH>
     static void
-    get_subdomain_association (const DoFHandler<dim>     &dof_handler,
+    get_subdomain_association (const DH                  &dof_handler,
                                std::vector<unsigned int> &subdomain);
 
                                      /**
@@ -964,10 +964,10 @@ class DoFTools
 				      * <tt>GridTools::count_cells_with_subdomain_association</tt>
 				      * function.
                                       */
-    template <int dim>
+    template <class DH>
     static unsigned int
-    count_dofs_with_subdomain_association (const DoFHandler<dim> &dof_handler,
-                                           const unsigned int     subdomain);
+    count_dofs_with_subdomain_association (const DH           &dof_handler,
+                                           const unsigned int  subdomain);
 
                                      /**
 				      * Count how many degrees of

@@ -126,7 +126,7 @@ namespace
   fe_is_primitive (const hp::DoFHandler<dim> &dh) 
   {
 //TODO:[?] Verify that this is really correct
-    return dh.get_fe().get_fe(0).is_primitive();
+    return dh.get_fe()[0].is_primitive();
   }
 }
 
@@ -2368,11 +2368,10 @@ DoFTools::extract_subdomain_dofs (const DH           &dof_handler,
 
 
 
-template <int dim>
+template <class DH>
 void
-DoFTools::
-get_subdomain_association (const DoFHandler<dim>     &dof_handler,
-                           std::vector<unsigned int> &subdomain_association)
+DoFTools::get_subdomain_association (const DH                  &dof_handler,
+				     std::vector<unsigned int> &subdomain_association)
 {
   Assert(subdomain_association.size() == dof_handler.n_dofs(),
 	 ExcDimensionMismatch(subdomain_association.size(),
@@ -2382,19 +2381,21 @@ get_subdomain_association (const DoFHandler<dim>     &dof_handler,
   std::fill_n (subdomain_association.begin(), dof_handler.n_dofs(),
                deal_II_numbers::invalid_unsigned_int);
 
-  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices;
+  local_dof_indices.reserve (max_dofs_per_cell(dof_handler));
   
 				   // this function is similar to the
 				   // make_sparsity_pattern function,
 				   // see there for more information
 
-  typename DoFHandler<dim>::active_cell_iterator
+  typename DH::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       const unsigned int subdomain_id = cell->subdomain_id();
+      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+      local_dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (local_dof_indices);
 
                                        // set subdomain ids. if dofs already
@@ -2414,11 +2415,11 @@ get_subdomain_association (const DoFHandler<dim>     &dof_handler,
 
 
 
-template <int dim>
+template <class DH>
 unsigned int
 DoFTools::count_dofs_with_subdomain_association (
-  const DoFHandler<dim> &dof_handler,
-  const unsigned int     subdomain)
+  const DH           &dof_handler,
+  const unsigned int  subdomain)
 {
                                    // in debug mode, make sure that there are
                                    // some cells at least with this subdomain
@@ -2426,7 +2427,7 @@ DoFTools::count_dofs_with_subdomain_association (
 #ifdef DEBUG
   {
     bool found = false;
-    for (typename Triangulation<dim>::active_cell_iterator
+    for (typename Triangulation<DH::dimension>::active_cell_iterator
            cell=dof_handler.get_tria().begin_active();
          cell!=dof_handler.get_tria().end(); ++cell)
       if (cell->subdomain_id() == subdomain)
@@ -3972,8 +3973,8 @@ DoFTools::distribute_cell_to_dof_vector<DoFHandler<deal_II_dimension> >
 
 template
 void
-DoFTools::distribute_cell_to_dof_vector<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &dof_handler,
+DoFTools::distribute_cell_to_dof_vector<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &dof_handler,
  const Vector<double> &cell_data,
  Vector<double>       &dof_data,
  const unsigned int    component);
@@ -4017,16 +4018,26 @@ DoFTools::extract_subdomain_dofs<hp::DoFHandler<deal_II_dimension> >
 
 template
 void
-DoFTools::get_subdomain_association<deal_II_dimension>
+DoFTools::get_subdomain_association<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &dof_handler,
+ std::vector<unsigned int>           &subdomain_association);
+template
+void
+DoFTools::get_subdomain_association<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &dof_handler,
  std::vector<unsigned int>           &subdomain_association);
 
 
 template
 unsigned int
-DoFTools::
-count_dofs_with_subdomain_association (const DoFHandler<deal_II_dimension> &,
-                                       const unsigned int);
+DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &,
+ const unsigned int);
+template
+unsigned int
+DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ const unsigned int);
 
 
 template
