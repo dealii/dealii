@@ -1594,6 +1594,19 @@ class DoFTools
 };
 
 
+
+/* ------------------------- explicit specializations -------------- */
+
+template <>
+void
+DoFTools::map_dof_to_boundary_indices (const DoFHandler<1>       &dof_handler,
+                                       std::vector<unsigned int> &mapping);
+
+
+
+/* ------------------------- inline functions -------------- */
+
+
 /**
  * Operator computing the maximum coupling out of two.
  *
