@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -102,7 +102,13 @@
 template <int dim>
 class PersistentTriangulation : public Triangulation<dim> 
 {
-  public:
+  public:    
+				     /**
+				      * Make the dimension available
+				      * in function templates.
+				      */
+    static const unsigned int dimension = dim;
+    
 				     /**
 				      * Build up the triangulation from the
 				      * coarse grid in future. Copy smoothing

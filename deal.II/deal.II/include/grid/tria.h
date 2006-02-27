@@ -1278,6 +1278,12 @@ class Triangulation : public Subscriptor
     };
     
 				     /**
+				      * Make the dimension available
+				      * in function templates.
+				      */
+    static const unsigned int dimension = dim;
+
+				     /**
 				      *  Create a triangulation and create
 				      *  the first level of the hierarchy.
 				      *  Do not create any cells.

@@ -231,6 +231,12 @@ class MGDoFHandler : public DoFHandler<dim>
     typedef typename MGDoFDimensionInfo<dim>::active_face_iterator active_face_iterator;
 
 				     /**
+				      * Make the dimension available
+				      * in function templates.
+				      */
+    static const unsigned int dimension = dim;
+
+				     /**
 				      * Constructor. Take @p tria as
 				      * the triangulation to work on.
 				      */

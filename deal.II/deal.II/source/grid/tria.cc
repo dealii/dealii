@@ -43,6 +43,9 @@ template <int dim>
 const StraightBoundary<dim> *
 Triangulation<dim>::straight_boundary = &dummy_straight_boundary;
 
+template <int dim>
+const unsigned int
+Triangulation<dim>::dimension;
 
 
 template <int dim>
