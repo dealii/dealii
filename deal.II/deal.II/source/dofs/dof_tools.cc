@@ -3967,10 +3967,24 @@ template
 void
 DoFTools::distribute_cell_to_dof_vector<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &dof_handler,
- const Vector<float>  &cell_data,
+ const Vector<float> &cell_data,
+ Vector<double>      &dof_data,
+ const unsigned int   component);
+template
+void
+DoFTools::distribute_cell_to_dof_vector<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ const Vector<double> &cell_data,
  Vector<double>       &dof_data,
  const unsigned int    component);
 
+template
+void
+DoFTools::distribute_cell_to_dof_vector<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &dof_handler,
+ const Vector<float> &cell_data,
+ Vector<double>      &dof_data,
+ const unsigned int   component);
 template
 void
 DoFTools::distribute_cell_to_dof_vector<hp::DoFHandler<deal_II_dimension> >
