@@ -398,16 +398,16 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 				 // on the face.
 				 //
 				 // In addition to the cell matrix
-				 // ``ui_vi_matrix'' this function gets
-				 // a new argument ``ue_vi_matrix'',
-				 // that stores contributions to the
-				 // system matrix that are based on
-				 // outer values of u, see $\hat u_h$
-				 // in the introduction, and inner
-				 // values of v, see $v_h$. Here we
-				 // note that ``un'' is the short
-				 // notation for ``u_neighbor'' and
-				 // represents $\hat u_h$.
+				 // ``ui_vi_matrix'' this function
+				 // gets a new argument
+				 // ``ue_vi_matrix'', that stores
+				 // contributions to the system matrix
+				 // that are based on exterior values
+				 // of $u$ and interior values of
+				 // $v$. Here we note that ``ue'' is
+				 // the short notation for ``u
+				 // exterior'' and represents $u_h^-$,
+				 // see the introduction.
 template <int dim>
 void DGTransportEquation<dim>::assemble_face_term1(
   const FEFaceValuesBase<dim>& fe_v,
@@ -473,8 +473,8 @@ void DGTransportEquation<dim>::assemble_face_term1(
 				 // ``ui_ve_matrix'' and
 				 // ``ue_ve_matrix'' that will store
 				 // contributions due to terms
-				 // involving u and vn as well as un
-				 // and vn.
+				 // involving ui and ve as well as ue
+				 // and ve.
 template <int dim>
 void DGTransportEquation<dim>::assemble_face_term2(
   const FEFaceValuesBase<dim>& fe_v,
