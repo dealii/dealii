@@ -1614,8 +1614,21 @@ void FESubfaceValues<dim>::reinit (const typename DoFHandler<dim>::cell_iterator
 // 	  typename FEValuesBase<dim>::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
+				   // We would like to check for
+				   // subface_no < cell->face(face_no)->n_children(),
+				   // but unfortunately the current
+				   // function is also called for
+				   // faces without children (see
+				   // tests/fe/mapping.cc). Therefore,
+				   // we must use following workaround
+				   // of two separate assertions
+  Assert (cell->face(face_no)->has_children() ||
+	  subface_no < GeometryInfo<dim>::subfaces_per_face,
 	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
+  Assert (!cell->face(face_no)->has_children() ||
+	  subface_no < cell->face(face_no)->n_children(),
+	  ExcIndexRange (subface_no, 0, cell->face(face_no)->n_children()));
+
   Assert (cell->has_children() == false,
           ExcMessage ("You can't use subface data for cells that are "
                       "already refined. Iterate over their children "
@@ -1657,8 +1670,8 @@ void FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iter
 	  typename FEValuesBase<dim>::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
-	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
+  Assert (subface_no < cell->face(face_no)->n_children(),
+	  ExcIndexRange (subface_no, 0, cell->face(face_no)->n_children()));
   Assert (cell->has_children() == false,
           ExcMessage ("You can't use subface data for cells that are "
                       "already refined. Iterate over their children "
@@ -1692,8 +1705,8 @@ void FESubfaceValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterat
 	   typename FEValuesBase<dim>::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
-	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
+  Assert (subface_no < cell->face(face_no)->n_children(),
+	  ExcIndexRange (subface_no, 0, cell->face(face_no)->n_children()));
   Assert (cell->has_children() == false,
           ExcMessage ("You can't use subface data for cells that are "
                       "already refined. Iterate over their children "
@@ -1725,8 +1738,8 @@ void FESubfaceValues<dim>::reinit (const typename Triangulation<dim>::cell_itera
 {
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
 	  ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert (subface_no < GeometryInfo<dim>::subfaces_per_face,
-	  ExcIndexRange (subface_no, 0, GeometryInfo<dim>::subfaces_per_face));
+  Assert (subface_no < cell->face(face_no)->n_children(),
+	  ExcIndexRange (subface_no, 0, cell->face(face_no)->n_children()));
   
                                    // set new cell. auto_ptr will take
                                    // care that old object gets

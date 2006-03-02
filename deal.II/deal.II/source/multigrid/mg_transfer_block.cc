@@ -200,8 +200,7 @@ void MGTransferBlockBase::build_matrices (
 	  {
 	    cell->get_mg_dof_indices (dof_indices_parent);
 
-	    for (unsigned int child=0;
-		 child<GeometryInfo<dim>::children_per_cell; ++child)
+	    for (unsigned int child=0; child<cell->n_children(); ++child)
 	      {
 						 // set an alias to the
 						 // prolongation matrix for
@@ -238,8 +237,7 @@ void MGTransferBlockBase::build_matrices (
 	  {
 	    cell->get_mg_dof_indices (dof_indices_parent);
 
-	    for (unsigned int child=0;
-		 child<GeometryInfo<dim>::children_per_cell; ++child)
+	    for (unsigned int child=0; child<cell->n_children(); ++child)
 	      {
 						 // set an alias to the
 						 // prolongation matrix for

@@ -540,6 +540,9 @@ estimate_some (const Mapping<dim>                  &mapping,
       for (unsigned int face_no=0;
            face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	{
+	  const typename DoFHandler<dim>::face_iterator
+	    face=cell->face(face_no);
+
 					   // make sure we do work
 					   // only once: this face
 					   // may either be regular
@@ -554,7 +557,7 @@ estimate_some (const Mapping<dim>                  &mapping,
 					   // boundary, or if the
 					   // face is irregular,
 					   // then do the work below
-	  if ((cell->face(face_no)->has_children() == false) &&
+	  if ((face->has_children() == false) &&
 	      !cell->at_boundary(face_no) &&
 	      (cell->neighbor(face_no)->level() == cell->level()) &&
 	      (cell->neighbor(face_no)->index() < cell->index()))
@@ -567,7 +570,7 @@ estimate_some (const Mapping<dim>                  &mapping,
 					   // solution vector, as we
 					   // treat them all at the
 					   // same time
-	  if (face_integrals[cell->face(face_no)][0] >=0)
+	  if (face_integrals[face][0] >=0)
 	    continue;
 
 
@@ -590,13 +593,13 @@ estimate_some (const Mapping<dim>                  &mapping,
 					   // the list of faces with
 					   // contribution zero.
 	  const unsigned char boundary_indicator
-	    = cell->face(face_no)->boundary_indicator();
-	  if (cell->face(face_no)->at_boundary()
+	    = face->boundary_indicator();
+	  if (face->at_boundary()
 	      &&
 	      neumann_bc.find(boundary_indicator)==neumann_bc.end()) 
 	    {
 	      for (unsigned int n=0; n<n_solution_vectors; ++n)
-		face_integrals[cell->face(face_no)][n] = 0;
+		face_integrals[face][n] = 0;
 	      continue;
 	    }
 
@@ -620,11 +623,11 @@ estimate_some (const Mapping<dim>                  &mapping,
                                                // the face we presently work
                                                // on? oh is there a face at
                                                // all?
-              if (cell->at_boundary(face_no))
+              if (face->at_boundary())
                 continue;
 
               bool care_for_cell = false;
-              if (cell->neighbor(face_no)->has_children() == false)
+              if (face->has_children() == false)
                 care_for_cell |= ((cell->neighbor(face_no)->subdomain_id()
                                    == subdomain_id) ||
                                   (subdomain_id == deal_II_numbers::invalid_unsigned_int))
@@ -634,8 +637,7 @@ estimate_some (const Mapping<dim>                  &mapping,
                                   (material_id == deal_II_numbers::invalid_unsigned_int));
               else
                 {
-                  for (unsigned int sf=0;
-                       sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
+                  for (unsigned int sf=0; sf<face->n_children(); ++sf)
                     if (((cell->neighbor_child_on_subface(face_no,sf)
                           ->subdomain_id() == subdomain_id)
                          &&
@@ -665,7 +667,7 @@ estimate_some (const Mapping<dim>                  &mapping,
                                            // so now we know that we care for
                                            // this face, let's do something
                                            // about it:
-	  if (cell->face(face_no)->has_children() == false)
+	  if (face->has_children() == false)
 					     // if the face is a regular one,
 					     // i.e.  either on the other side
 					     // there is nirvana (face is at
@@ -1138,9 +1140,11 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
   const unsigned int n_q_points         = quadrature.n_quadrature_points,
 		     n_components       = dof_handler.get_fe().n_components(),
 		     n_solution_vectors = solutions.size();
+  const typename DoFHandler<dim>::face_iterator
+    face=cell->face(face_no);
 
   Assert (neighbor.state() == IteratorState::valid, ExcInternalError());
-  Assert (neighbor->has_children(), ExcInternalError());
+  Assert (face->has_children(), ExcInternalError());
 				   // set up a vector of the gradients
 				   // of the finite element function
 				   // on this cell at the quadrature
@@ -1162,9 +1166,7 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
           ExcInternalError());
   
 				   // loop over all subfaces
-  for (unsigned int subface_no=0;
-       subface_no<GeometryInfo<dim>::subfaces_per_face;
-       ++subface_no)
+  for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
     {
 				       // get an iterator pointing to the
 				       // cell behind the present subface
@@ -1288,9 +1290,7 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
 				   // subfaces and store them with the
 				   // mother face
   std::vector<double> sum (n_solution_vectors, 0);
-  typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
-  for (unsigned int subface_no=0; subface_no<GeometryInfo<dim>::subfaces_per_face;
-       ++subface_no) 
+  for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no) 
     {
       Assert (face_integrals.find(face->child(subface_no)) !=
 	      face_integrals.end(),

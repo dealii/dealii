@@ -314,7 +314,7 @@ void TriaObjectAccessor<2, dim>::recursively_set_user_flag () const
   set_user_flag ();
 
   if (has_children())
-    for (unsigned int c=0; c<4; ++c)
+    for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_set_user_flag ();
 }
 
@@ -326,7 +326,7 @@ void TriaObjectAccessor<2, dim>::recursively_clear_user_flag () const
   clear_user_flag ();
 
   if (has_children())
-    for (unsigned int c=0; c<4; ++c)
+    for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_clear_user_flag ();
 }
 
@@ -366,7 +366,7 @@ TriaObjectAccessor<2, dim>::recursively_set_user_pointer (void *p) const
   set_user_pointer (p);
 
   if (has_children())
-    for (unsigned int c=0; c<4; ++c)
+    for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_set_user_pointer (p);
 }
 
@@ -379,7 +379,7 @@ TriaObjectAccessor<2, dim>::recursively_clear_user_pointer () const
   clear_user_pointer ();
 
   if (has_children())
-    for (unsigned int c=0; c<4; ++c)
+    for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_clear_user_pointer ();
 }
 
@@ -659,7 +659,7 @@ unsigned int TriaObjectAccessor<2, dim>::number_of_children () const
   else
     {
       unsigned int sum = 0;
-      for (unsigned int c=0; c<4; ++c)
+      for (unsigned int c=0; c<n_children(); ++c)
 	sum += child(c)->number_of_children();
       return sum;
     };
@@ -749,7 +749,7 @@ void TriaObjectAccessor<3, dim>::recursively_set_user_flag () const
   set_user_flag ();
 
   if (has_children())
-    for (unsigned int c=0; c<8; ++c)
+    for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_set_user_flag ();
 }
 
@@ -761,7 +761,7 @@ void TriaObjectAccessor<3, dim>::recursively_clear_user_flag () const
   clear_user_flag ();
 
   if (has_children())
-    for (unsigned int c=0; c<8; ++c)
+    for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_clear_user_flag ();
 }
 
@@ -801,7 +801,7 @@ TriaObjectAccessor<3, dim>::recursively_set_user_pointer (void *p) const
   set_user_pointer (p);
 
   if (has_children())
-    for (unsigned int c=0; c<8; ++c)
+    for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_set_user_pointer (p);
 }
 
@@ -814,7 +814,7 @@ TriaObjectAccessor<3, dim>::recursively_clear_user_pointer () const
   clear_user_pointer ();
 
   if (has_children())
-    for (unsigned int c=0; c<8; ++c)
+    for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_clear_user_pointer ();
 }
 
@@ -1596,7 +1596,7 @@ unsigned int TriaObjectAccessor<3, dim>::number_of_children () const
   else
     {
       unsigned int sum = 0;
-      for (unsigned int c=0; c<8; ++c)
+      for (unsigned int c=0; c<n_children(); ++c)
 	sum += child(c)->number_of_children();
       return sum;
     };
@@ -1754,7 +1754,7 @@ void CellAccessor<2>::recursively_set_material_id (const unsigned char mat_id) c
   set_material_id (mat_id);
 
   if (this->has_children())
-    for (unsigned int c=0; c<4; ++c)
+    for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_set_material_id (mat_id);
 }
 
@@ -1855,7 +1855,7 @@ void CellAccessor<3>::recursively_set_material_id (const unsigned char mat_id) c
   set_material_id (mat_id);
 
   if (this->has_children())
-    for (unsigned int c=0; c<8; ++c)
+    for (unsigned int c=0; c<n_children(); ++c)
       child(c)->recursively_set_material_id (mat_id);
 }
 
@@ -2040,7 +2040,7 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
     =neighbor_cell->face(face_no_guess);
   
   if (face_guess->has_children())
-    for (unsigned int subface_no=0; subface_no<GeometryInfo<dim>::subfaces_per_face; ++subface_no)
+    for (unsigned int subface_no=0; face_guess->n_children(); ++subface_no)
       if (face_guess->child(subface_no)==this_face)
 	return std::make_pair (face_no_guess, subface_no);
 
@@ -2055,7 +2055,7 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
 	  const TriaIterator<dim,TriaObjectAccessor<dim-1, dim> > face
 	    =neighbor_cell->face(face_no);
 	  if (face->has_children())
-	    for (unsigned int subface_no=0; subface_no<GeometryInfo<dim>::subfaces_per_face; ++subface_no)
+	    for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
 	      if (face->child(subface_no)==this_face)
 		return std::make_pair (face_no, subface_no);
 	}

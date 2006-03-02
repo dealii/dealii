@@ -2530,7 +2530,7 @@ namespace hp
               {
                                                  // Set active_fe_index in children to the
                                                  // same value as in the parent cell.
-                for (unsigned int i = 0; i < GeometryInfo<dim>::children_per_cell; ++i)
+                for (unsigned int i = 0; i < cell->n_children(); ++i)
                   cell->child (i)->set_active_fe_index (cell->active_fe_index ());
               }
           }

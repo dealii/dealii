@@ -662,7 +662,7 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
 						   // children. find out
 						   // which border to the
 						   // present cell
-		  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+		  for (unsigned int c=0; c<neighbor->n_children(); ++c)
 		    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 		      if (neighbor->child(c)->neighbor(f) == cell)
 			active_neighbors.push_back (neighbor->child(c));

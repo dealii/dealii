@@ -427,15 +427,15 @@ GridTools::find_active_cell_around_point (const Container  &container,
                                    // grandchild
   while (cell->has_children())
     {
+      const unsigned int n_children=cell->n_children();
       unsigned int c=0;
-      for (; c<GeometryInfo<dim>::children_per_cell; ++c)
+      for (; c<n_children; ++c)
         if (cell->child(c)->point_inside (p))
           break;
 
                                        // make sure we found a child
                                        // cell
-      AssertThrow (c != GeometryInfo<dim>::children_per_cell,
-                   ExcPointNotFound<dim> (p));
+      AssertThrow (c != n_children, ExcPointNotFound<dim> (p));
 
                                        // then reset cell to the child
       cell = cell->child(c);

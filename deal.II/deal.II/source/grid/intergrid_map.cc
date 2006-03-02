@@ -140,7 +140,7 @@ InterGridMap<GridClass>::set_mapping (const cell_iterator &src_cell,
 				       // set entries for all children
 				       // of this cell to the one
 				       // dst_cell
-      for (unsigned int c=0; c<GeometryInfo<GridClass::dimension>::children_per_cell; ++c)
+      for (unsigned int c=0; c<src_cell->n_children(); ++c)
 	set_entries_to_cell (src_cell->child(c),
 			     dst_cell);
 				   // else (no cell is refined or
@@ -161,7 +161,7 @@ InterGridMap<GridClass>::set_entries_to_cell (const cell_iterator &src_cell,
 				   // then do so for the children as well
 				   // if there are any
   if (src_cell->has_children())
-    for (unsigned int c=0; c<GeometryInfo<GridClass::dimension>::children_per_cell; ++c)
+    for (unsigned int c=0; c<src_cell->n_children(); ++c)
       set_entries_to_cell (src_cell->child(c),
 			   dst_cell);
 }

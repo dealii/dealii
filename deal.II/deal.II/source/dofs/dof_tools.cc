@@ -1007,7 +1007,7 @@ DoFTools::make_flux_sparsity_pattern (
 	  if (cell_face->user_flag_set ())
 	    continue;
 
-	  if (! cell->at_boundary (face) )
+	  if (! cell_face->at_boundary() )
 	    {
 	      typename DH::cell_iterator neighbor = cell->neighbor(face);
 					       // Refinement edges are
@@ -1019,10 +1019,10 @@ DoFTools::make_flux_sparsity_pattern (
 	      const unsigned int neighbor_face
                 = cell->neighbor_of_neighbor(face);
 
-	      if (neighbor->has_children())
+	      if (cell_face->has_children())
 		{
 		  for (unsigned int sub_nr = 0;
-		       sub_nr != GeometryInfo<DH::dimension>::subfaces_per_face;
+		       sub_nr != cell_face->n_children();
 		       ++sub_nr)
 		    {
 		      const typename DH::cell_iterator
@@ -1231,13 +1231,14 @@ DoFTools::make_flux_sparsity_pattern (
 	      if (neighbor->level() < cell->level())
 		continue;
 	      
+	      typename DH::face_iterator cell_face = cell->face(face);
 	      const unsigned int
                 neighbor_face = cell->neighbor_of_neighbor(face);
 	      
-	      if (neighbor->has_children())
+	      if (cell_face->has_children())
 		{
 		  for (unsigned int sub_nr = 0;
-		       sub_nr != GeometryInfo<DH::dimension>::subfaces_per_face;
+		       sub_nr != cell_face->n_children();
 		       ++sub_nr)
 		    {
 		      const typename DH::cell_iterator

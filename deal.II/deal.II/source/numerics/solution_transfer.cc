@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -248,7 +248,7 @@ prepare_for_coarsening_and_refinement(const std::vector<Vector<number> > &all_in
 					   // coaresen flag, then all should
 					   // have if Tria::prepare_* has
 					   // worked correctly
-	  for (unsigned int i=1; i<GeometryInfo<dim>::children_per_cell; ++i)
+	  for (unsigned int i=1; i<cell->n_children(); ++i)
 	    Assert(cell->child(i)->coarsen_flag_set(),
 		   ExcTriaPrepCoarseningNotCalledBefore());
 	      

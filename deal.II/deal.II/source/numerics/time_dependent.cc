@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -581,9 +581,12 @@ namespace
 	return;
       };
 
-    if (old_cell->has_children() && new_cell->has_children()) 
-      for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-	::mirror_refinement_flags<dim> (new_cell->child(c), old_cell->child(c));
+    if (old_cell->has_children() && new_cell->has_children())
+      {
+	Assert(old_cell->n_children()==new_cell->n_children(), ExcNotImplemented());
+	for (unsigned int c=0; c<new_cell->n_children(); ++c)
+	  ::mirror_refinement_flags<dim> (new_cell->child(c), old_cell->child(c));
+      }
   }
 
 
@@ -597,8 +600,9 @@ namespace
     if (cell2->has_children() && cell1->has_children()) 
       {
 	bool grids_changed = false;
-      
-	for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c) 
+
+	Assert(cell2->n_children()==cell1->n_children(), ExcNotImplemented());
+	for (unsigned int c=0; c<cell1->n_children(); ++c) 
 	  grids_changed |= ::adapt_grid_cells<dim> (cell1->child(c),
 						    cell2->child(c));
 	return grids_changed;
@@ -654,7 +658,7 @@ namespace
 	  };
       
 	if (!cell2->refine_flag_set())
-	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+	  for (unsigned int c=0; c<cell1->n_children(); ++c)
 	    if (cell1->child(c)->refine_flag_set() ||
 		cell1->child(c)->has_children()) 
 	      {
@@ -676,7 +680,7 @@ namespace
 	  };
       
 	if (!cell1->refine_flag_set())
-	  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+	  for (unsigned int c=0; c<cell2->n_children(); ++c)
 	    if (cell2->child(c)->refine_flag_set() ||
 		cell2->child(c)->has_children())
 	      {
