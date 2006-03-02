@@ -599,6 +599,12 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     bool has_children () const;
 
 				     /**
+				      * Return the number of
+				      * children of this cell.
+				      */
+    unsigned int n_children() const;
+
+				     /**
 				      * Number of times that this
 				      * object is refined. Note that
 				      * not all its children are
@@ -1075,6 +1081,12 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  children.
 				      */
     bool has_children () const;
+
+				     /**
+				      * Return the number of
+				      * children of this cell.
+				      */
+    unsigned int n_children() const;
 
 				     /**
 				      * Return the number of times
@@ -1555,6 +1567,12 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *  children.
 				      */
     bool has_children () const;
+
+				     /**
+				      * Return the number of
+				      * children of this cell.
+				      */
+    unsigned int n_children() const;
 
 				     /**
 				      * Return the number of times
@@ -2077,6 +2095,12 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  children.
 				      */
     bool has_children () const;
+
+				     /**
+				      * Return the number of
+				      * children of this cell.
+				      */
+    unsigned int n_children() const;
 
 				     /**
 				      * Return the number of times

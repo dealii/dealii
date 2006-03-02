@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -224,6 +224,17 @@ TriaObjectAccessor<1,dim>::has_children () const
 }
 
 
+template <int dim>
+inline
+unsigned int
+TriaObjectAccessor<1,dim>::n_children () const
+{
+  Assert (this->state() == IteratorState::valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
+				   // a line has always 2 children
+  return has_children() ? 2 : 0;
+}
+
 
 template <int dim>
 inline
@@ -429,6 +440,18 @@ TriaObjectAccessor<2,dim>::has_children () const
   Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return (this->tria->levels[this->present_level]->quads.children[this->present_index] != -1);
+}
+
+
+template <int dim>
+inline
+unsigned int
+TriaObjectAccessor<2,dim>::n_children () const
+{
+  Assert (this->state() == IteratorState::valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
+  				   // a quad has always 4 children
+  return has_children() ? 4 : 0;
 }
 
 
@@ -714,13 +737,26 @@ int TriaObjectAccessor<3,dim>::child_index (const unsigned int i) const
 
 
 template <int dim>
-bool TriaObjectAccessor<3,dim>::has_children () const
+inline
+bool
+TriaObjectAccessor<3,dim>::has_children () const
 {
   Assert (this->state() == IteratorState::valid,
 	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
   return (this->tria->levels[this->present_level]->hexes.children[this->present_index] != -1);
 }
 
+
+template <int dim>
+inline
+unsigned int
+TriaObjectAccessor<3,dim>::n_children () const
+{
+  Assert (this->state() == IteratorState::valid,
+	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
+  				   // a hex has always 8 children
+  return has_children() ? 8 : 0;
+}
 
 
 template <int dim>
