@@ -4052,6 +4052,11 @@ unsigned int
 DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &,
  const unsigned int);
+template
+unsigned int
+DoFTools::count_dofs_with_subdomain_association<MGDoFHandler<deal_II_dimension> >
+(const MGDoFHandler<deal_II_dimension> &,
+ const unsigned int);
 
 
 template
