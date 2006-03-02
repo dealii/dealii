@@ -278,6 +278,8 @@ template <int dim>
 class KInverse : public TensorFunction<2,dim>
 {
   public:
+    KInverse () : TensorFunction<2,dim>() {}
+    
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<Tensor<2,dim> >    &values) const;
 };
