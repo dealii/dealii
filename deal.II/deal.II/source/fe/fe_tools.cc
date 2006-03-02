@@ -1438,6 +1438,26 @@ FETools::get_fe_from_name_aux (const std::string &name)
 			     (new FE_RaviartThomas<dim>(tmp.first)),
 			     position);
     }
+				   // check other possibilities in
+				   // exactly the same way
+  else if (Utilities::match_at_string_start (name, std::string("FE_RaviartThomasNodal")))
+    {
+      unsigned int position = std::string("FE_RaviartThomasNodal").size();
+      position += match_dimension<dim> (name, position);
+      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
+      ++position;
+
+      const std::pair<int,unsigned int> tmp
+	= Utilities::get_integer_at_position (name, position);
+
+      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
+      position += tmp.second;
+      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
+      ++position;
+      return std::make_pair (static_cast<FiniteElement<dim>*>
+			     (new FE_RaviartThomasNodal<dim>(tmp.first)),
+			     position);
+    }
   else if (Utilities::match_at_string_start (name, std::string("FE_Nedelec")))
     {
       unsigned int position = std::string("FE_Nedelec").size();
