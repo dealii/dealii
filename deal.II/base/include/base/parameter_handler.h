@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/subscriptor.h>
 
 #include <map>
 #include <vector>
@@ -1208,7 +1209,7 @@ namespace Patterns
  *
  *   @author Wolfgang Bangerth, October 1997, revised February 1998
   */
-class ParameterHandler
+class ParameterHandler : public Subscriptor
 {
   private:
 				     /**
