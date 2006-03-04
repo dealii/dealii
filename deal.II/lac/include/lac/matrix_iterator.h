@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <base/exceptions.h>
 
 				 /**
 				  * STL conforming iterator for constant
