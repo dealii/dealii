@@ -599,8 +599,8 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     bool has_children () const;
 
 				     /**
-				      * Return the number of
-				      * children of this cell.
+				      * Return the number of immediate
+				      * children of this object.
 				      */
     unsigned int n_children() const;
 
@@ -1083,8 +1083,8 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
     bool has_children () const;
 
 				     /**
-				      * Return the number of
-				      * children of this cell.
+				      * Return the number of immediate
+				      * children of this object.
 				      */
     unsigned int n_children() const;
 
@@ -1569,8 +1569,8 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
     bool has_children () const;
 
 				     /**
-				      * Return the number of
-				      * children of this cell.
+				      * Return the number of immediate
+				      * children of this object.
 				      */
     unsigned int n_children() const;
 
@@ -2097,8 +2097,8 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
     bool has_children () const;
 
 				     /**
-				      * Return the number of
-				      * children of this cell.
+				      * Return the number of immediate
+				      * children of this object.
 				      */
     unsigned int n_children() const;
 
