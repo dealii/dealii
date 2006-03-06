@@ -68,20 +68,28 @@ namespace hp
  * each element by the correct power of the respective cell size.
  *
  * The computation of this quantity must fail if a cell has only
- * neighbors for which the direction vectors do not span the whole
- * space. As can easily be verified, this can only happen on very
+ * neighbors for which the direction vectors $y_K$ do not span the
+ * whole space, since then the matrix $Y$ is no longer invertible. If
+ * this happens, you will get an error similar to this one:
+ * @code
+ * --------------------------------------------------------
+ * An error occurred in line <749> of file <source/numerics/derivative_approximation.cc> in function
+ *     static void DerivativeApproximation::approximate(const Mapping<dim>&, const DH<dim>&, const InputVector&, unsigned int, const
+ *  std::pair<unsigned int, unsigned int>&, Vector<float>&) [with DerivativeDescription = DerivativeApproximation::Gradient<3>, int
+ * dim = 3, DH = DoFHandler, InputVector = Vector<double>]
+ * The violated condition was:
+ *     determinant(Y) != 0
+ * The name and call sequence of the exception was:
+ *     ExcInsufficientDirections()
+ * Additional Information:
+ * (none)
+ * --------------------------------------------------------
+ * @endcode
+ * As can easily be verified, this can only happen on very
  * coarse grids, when some cells and all their neighbors have not been
  * refined even once. You should therefore only call the functions of
  * this class if all cells are at least once refined. In practice this
- * is not much of a restriction. If for some cells, the neighbors do
- * not span the whole space, an exception is thrown.
- *
- * Note that for the computation of the quantities of this class, only
- * the values of the finite element field at the centers of the cells
- * are taken. It might therefore only be useful to use this class for
- * discontinuous, piecewise constant elements (i.e. using the
- * FEDG_Q0 class), since all other finite elements can approximate
- * gradients themselves.
+ * is not much of a restriction.
  *
  *
  * <h3>Approximation of higher derivatives</h3>
