@@ -229,10 +229,8 @@ inline
 unsigned int
 TriaObjectAccessor<1,dim>::n_children () const
 {
-  Assert (this->state() == IteratorState::valid,
-	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
-				   // a line has always 2 children
-  return has_children() ? 2 : 0;
+  Assert (has_children()==true, TriaAccessor<1>::ExcCellHasNoChildren());
+  return GeometryInfo<1>::children_per_cell;
 }
 
 
@@ -448,10 +446,8 @@ inline
 unsigned int
 TriaObjectAccessor<2,dim>::n_children () const
 {
-  Assert (this->state() == IteratorState::valid,
-	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
-  				   // a quad has always 4 children
-  return has_children() ? 4 : 0;
+  Assert (has_children()==true, TriaAccessor<2>::ExcCellHasNoChildren());
+  return GeometryInfo<2>::children_per_cell;
 }
 
 
@@ -752,10 +748,8 @@ inline
 unsigned int
 TriaObjectAccessor<3,dim>::n_children () const
 {
-  Assert (this->state() == IteratorState::valid,
-	  typename TriaAccessor<dim>::ExcDereferenceInvalidObject());
-  				   // a hex has always 8 children
-  return has_children() ? 8 : 0;
+  Assert (has_children()==true, TriaAccessor<3>::ExcCellHasNoChildren());
+  return GeometryInfo<3>::children_per_cell;
 }
 
 
