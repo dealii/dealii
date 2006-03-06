@@ -980,8 +980,7 @@ void DGMethod<dim>::assemble_system1 ()
 						   // We loop over
 						   // subfaces
 		  for (unsigned int subface_no=0;
-		       subface_no<GeometryInfo<dim>::subfaces_per_face;
-		       ++subface_no)
+		       subface_no<face->n_children(); ++subface_no)
 		    {
 						       // and set the
 						       // cell
@@ -1378,8 +1377,7 @@ void DGMethod<dim>::assemble_system2 ()
 		    cell->neighbor_of_neighbor(face_no);
 		  
 		  for (unsigned int subface_no=0;
-		       subface_no<GeometryInfo<dim>::subfaces_per_face;
-		       ++subface_no)
+		       subface_no<face->n_children(); ++subface_no)
 		    {
 		      typename hp::DoFHandler<dim>::cell_iterator neighbor_child=
 			neighbor->child(GeometryInfo<dim>::child_cell_on_face(

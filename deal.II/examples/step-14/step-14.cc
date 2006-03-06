@@ -3471,6 +3471,8 @@ namespace LaplaceSolver
     const unsigned int
       n_q_points = face_data.fe_face_values_cell.n_quadrature_points;
 
+    const typename DoFHandler<dim>::face_iterator
+      face = cell->face(face_no);    
     const typename DoFHandler<dim>::cell_iterator
       neighbor = cell->neighbor(face_no);    
     Assert (neighbor.state() == IteratorState::valid,
@@ -3495,8 +3497,7 @@ namespace LaplaceSolver
 				     // for one face for all the
 				     // sub-faces now:
     for (unsigned int subface_no=0;
-	 subface_no<GeometryInfo<dim>::subfaces_per_face;
-	 ++subface_no)
+	 subface_no<face->n_children(); ++subface_no)
       {
 					 // Start with some checks
 					 // again: get an iterator
@@ -3584,10 +3585,8 @@ namespace LaplaceSolver
 				     // computed and do not carry an
 				     // invalid value.
     double sum = 0;
-    typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
     for (unsigned int subface_no=0;
-	 subface_no<GeometryInfo<dim>::subfaces_per_face;
-	 ++subface_no) 
+	 subface_no<face->n_children(); ++subface_no) 
       {
 	Assert (face_integrals.find(face->child(subface_no)) !=
 		face_integrals.end(),
