@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,7 @@
 
 
 #include <grid/grid_out.h>
-
+#include <base/parameter_handler.h>
 
 namespace GridOutFlags
 {
@@ -29,13 +29,41 @@ namespace GridOutFlags
     write_all_faces (write_all_faces)
   {}
 
+  void DX::declare_parameters (ParameterHandler& param)
+  {
+    param.declare_entry("Write cells", "true", Patterns::Bool());
+    param.declare_entry("Write faces", "false", Patterns::Bool());
+    param.declare_entry("Write diameter", "false", Patterns::Bool());
+    param.declare_entry("Write measure", "false", Patterns::Bool());
+    param.declare_entry("Write all faces", "true", Patterns::Bool());
+  }
+  
+  void DX::parse_parameters (ParameterHandler& param)
+  {
+    write_cells = param.get_bool("Write cells");
+    write_faces = param.get_bool("Write faces");
+    write_diameter = param.get_bool("Write diameter");
+    write_measure = param.get_bool("Write measure");
+    write_all_faces = param.get_bool("Write all faces");
+  }
   
   
   Msh::Msh (const bool write_faces) :
 		  write_faces (write_faces)
   {}
   
+  void Msh::declare_parameters (ParameterHandler& param)
+  {
+    param.declare_entry("Write faces", "false", Patterns::Bool());
+  }
 
+
+  void Msh::parse_parameters (ParameterHandler& param)
+  {
+    write_faces = param.get_bool("Write faces");
+  }
+
+  
   Ucd::Ucd (const bool write_preamble,
 	    const bool write_faces) :
 		  write_preamble (write_preamble),
@@ -43,6 +71,20 @@ namespace GridOutFlags
   {}
 
   
+  
+  void Ucd::declare_parameters (ParameterHandler& param)
+  {
+    param.declare_entry("Write preamble", "true", Patterns::Bool());
+    param.declare_entry("Write faces", "false", Patterns::Bool());
+  }
+
+
+  void Ucd::parse_parameters (ParameterHandler& param)
+  {
+    write_preamble = param.get_bool("Write preamble");
+    write_faces = param.get_bool("Write faces");
+  }
+
   
   Gnuplot::Gnuplot (const bool write_cell_numbers,
 		    const unsigned int n_boundary_face_points) :
@@ -52,21 +94,61 @@ namespace GridOutFlags
 
   
   
+  void Gnuplot::declare_parameters (ParameterHandler& param)
+  {
+    param.declare_entry("Cell number", "false", Patterns::Bool());
+    param.declare_entry("Boundary points", "2", Patterns::Integer());
+  }
+
+
+  void Gnuplot::parse_parameters (ParameterHandler& param)
+  {
+    write_cell_numbers = param.get_bool("Cell number");
+    n_boundary_face_points = param.get_integer("Boundary points");
+  }
+
+  
   EpsFlagsBase::EpsFlagsBase (const SizeType     size_type,
 			      const unsigned int size,
 			      const double       line_width,
 			      const bool color_lines_on_user_flag,
-                            const unsigned int n_boundary_face_points,
-                            const bool color_lines_level) :
+			      const unsigned int n_boundary_face_points,
+			      const bool color_lines_level) :
 		  size_type (size_type),
 		  size (size),
 		  line_width (line_width),
 		  color_lines_on_user_flag(color_lines_on_user_flag),
-                n_boundary_face_points(n_boundary_face_points),
-                color_lines_level(color_lines_level)
+		  n_boundary_face_points(n_boundary_face_points),
+		  color_lines_level(color_lines_level)
   {}
   
 
+  void EpsFlagsBase::declare_parameters (ParameterHandler& param)
+  {
+    param.declare_entry("Size by", "width",
+			    Patterns::Selection("width|height"));
+    param.declare_entry("Size", "300", Patterns::Integer());
+    param.declare_entry("Line width", "0.5", Patterns::Double());
+    param.declare_entry("Color by flag", "false", Patterns::Bool());
+    param.declare_entry("Boundary points", "2", Patterns::Integer());
+    param.declare_entry("Color by level", "false", Patterns::Bool());
+  }
+
+
+  void EpsFlagsBase::parse_parameters (ParameterHandler& param)
+  {
+    if (param.get("Size by") == std::string("width"))
+      size_type = width;
+    else if (param.get("Size by") == std::string("height"))
+      size_type = height;
+    size = param.get_integer("Size");
+    line_width = param.get_double("Line width");
+    color_lines_on_user_flag = param.get_bool("Color by flag");
+    n_boundary_face_points = param.get_integer("Boundary points");
+    color_lines_level = param.get_bool("Color by level");
+  }
+
+  
   
   Eps<1>::Eps (const SizeType     size_type,
 	       const unsigned int size,
@@ -80,6 +162,16 @@ namespace GridOutFlags
   {}
 
   
+  void Eps<1>::declare_parameters (ParameterHandler&)
+  {}
+
+
+  void Eps<1>::parse_parameters (ParameterHandler& param)
+  {
+    EpsFlagsBase::parse_parameters(param);
+  }
+
+  
   
   Eps<2>::Eps (const SizeType     size_type,
 	       const unsigned int size,
@@ -88,20 +180,37 @@ namespace GridOutFlags
 	       const unsigned int n_boundary_face_points,
 	       const bool         write_cell_numbers,
 	       const bool         write_cell_number_level,
-             const bool         write_vertex_numbers,
-             const bool         color_lines_level
+	       const bool         write_vertex_numbers,
+	       const bool         color_lines_level
       )
 		  :
 		  EpsFlagsBase(size_type, size, line_width,
 			       color_lines_on_user_flag,
-                             n_boundary_face_points,
-                             color_lines_level),
+			       n_boundary_face_points,
+			       color_lines_level),
 		  write_cell_numbers (write_cell_numbers),
 		  write_cell_number_level (write_cell_number_level),
 		  write_vertex_numbers (write_vertex_numbers)
   {}
+  
+  
+  void Eps<2>::declare_parameters (ParameterHandler& param)
+  {
+    param.declare_entry("Cell number", "false", Patterns::Bool());
+    param.declare_entry("Level number", "false", Patterns::Bool());
+    param.declare_entry("Vertex number", "false", Patterns::Bool());
+  }
 
 
+  void Eps<2>::parse_parameters (ParameterHandler& param)
+  {
+    EpsFlagsBase::parse_parameters(param);
+    write_cell_numbers = param.get_bool("Cell number");
+    write_cell_number_level = param.get_bool("Level number");
+    write_vertex_numbers = param.get_bool("Vertex number");
+  }
+
+  
   
   Eps<3>::Eps (const SizeType     size_type,
 	       const unsigned int size,
@@ -117,8 +226,24 @@ namespace GridOutFlags
 		  azimut_angle (azimut_angle),
 		  turn_angle (turn_angle)
   {}
+  
+  
+  void Eps<3>::declare_parameters (ParameterHandler& param)
+  {
+    param.declare_entry("Azimut angle", "60", Patterns::Double());
+    param.declare_entry("Turn angle", "30", Patterns::Double());    
+  }
 
 
+  void Eps<3>::parse_parameters (ParameterHandler& param)
+  {
+    EpsFlagsBase::parse_parameters(param);
+    azimut_angle = param.get_double("Azimut angle");
+    turn_angle = param.get_double("Turn angle");
+  }
+
+  
+  
   XFig::XFig ()
 		  :
     draw_boundary(true),
@@ -132,6 +257,37 @@ namespace GridOutFlags
     boundary_style(0),
     boundary_thickness(3)
   {}
+
+  
+  void XFig::declare_parameters (ParameterHandler& param)
+  {
+    param.declare_entry("Boundary", "true", Patterns::Bool());
+    param.declare_entry("Level color", "false", Patterns::Bool());
+    param.declare_entry("Level depth", "true", Patterns::Bool());
+//TODO: Unify this number with other output formats
+    param.declare_entry("Boundary points", "0", Patterns::Integer());
+    param.declare_entry("Fill style", "20", Patterns::Integer());
+    param.declare_entry("Line style", "0", Patterns::Integer());
+    param.declare_entry("Line width", "1", Patterns::Integer());
+    param.declare_entry("Boundary style", "0", Patterns::Integer());
+    param.declare_entry("Boundary width", "3", Patterns::Integer());
+  }
+
+
+  void XFig::parse_parameters (ParameterHandler& param)
+  {
+    draw_boundary = param.get_bool("Boundary");
+    level_color = param.get_bool("Level color");
+    level_depth = param.get_bool("Level depth");
+    n_boundary_face_points = param.get_integer("Boundary points");
+    fill_style = param.get_integer("Fill style");
+    line_style = param.get_integer("Line style");
+    line_thickness = param.get_integer("Line width");
+    boundary_style = param.get_integer("Boundary style");
+    boundary_thickness = param.get_integer("Boundary width");
+  }
+
+  
 }  // end namespace GridOutFlags
 
 
@@ -255,11 +411,47 @@ std::string GridOut::get_output_format_names ()
 }
 
 
+void
+GridOut::declare_parameters(ParameterHandler& param)
+{
+  param.declare_entry("Format", "none",
+		      Patterns::Selection(get_output_format_names()));
+
+  param.enter_subsection("DX");
+  GridOutFlags::DX::declare_parameters(param);
+  param.leave_subsection();
+  
+  param.enter_subsection("Msh");
+  GridOutFlags::Msh::declare_parameters(param);
+  param.leave_subsection();
+  
+  param.enter_subsection("Ucd");
+  GridOutFlags::Ucd::declare_parameters(param);
+  param.leave_subsection();
+  
+  param.enter_subsection("Gnuplot");
+  GridOutFlags::Gnuplot::declare_parameters(param);
+  param.leave_subsection();
+  
+  param.enter_subsection("Eps");
+  GridOutFlags::EpsFlagsBase::declare_parameters(param);
+  GridOutFlags::Eps<1>::declare_parameters(param);
+  GridOutFlags::Eps<2>::declare_parameters(param);
+  GridOutFlags::Eps<3>::declare_parameters(param);
+  param.leave_subsection();
+  
+  param.enter_subsection("XFig");
+  GridOutFlags::XFig::declare_parameters(param);
+  param.leave_subsection();
+}
+
 
 unsigned int
 GridOut::memory_consumption () const
 {
-  return (sizeof(ucd_flags) +
+  return (sizeof(dx_flags) +
+	  sizeof(msh_flags) +
+	  sizeof(ucd_flags) +
 	  sizeof(gnuplot_flags) +
 	  sizeof(eps_flags_1) +
 	  sizeof(eps_flags_2) +

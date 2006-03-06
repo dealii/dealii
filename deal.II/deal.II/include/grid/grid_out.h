@@ -20,6 +20,7 @@
 #include <base/point.h>
 #include <string>
 
+class ParameterHandler;
 template <int dim> class Triangulation;
 template <int dim> class Mapping;
 
@@ -42,40 +43,54 @@ namespace GridOutFlags
 				    */
   struct DX
   {
-				     /**
-				      * Write cells.
-				      */
-    bool write_cells;
+				       /**
+					* Write cells.
+					*/
+      bool write_cells;
       
-				     /**
-				      * Write faces.
-				      */
-    bool write_faces;
+				       /**
+					* Write faces.
+					*/
+      bool write_faces;
+      
+				       /**
+					* Write field with diameters.
+					*/
+      bool write_diameter;
+      
+				       /**
+					* Write field with area/volume.
+					*/
+      bool write_measure;      
+      
+				       /**
+					* Write all faces, including
+					* interior faces. If
+					* <tt>false</tt>, only
+					* boundary faces are written.
+					*/
+      bool write_all_faces;
+      
+				       /**
+					* Constructor.
+					*/
+      DX (const bool write_cells = true,
+	  const bool write_faces = false,
+	  const bool write_diameter = false,
+	  const bool write_measure = false,
+	  const bool write_all_faces = true);
 
-				     /**
-				      * Write field with diameters.
-				      */
-    bool write_diameter;
+				       /**
+					* Declare parameters in
+					* ParameterHandler.
+					*/
+      static void declare_parameters (ParameterHandler& param);
 
-				     /**
-				      * Write field with area/volume.
-				      */
-    bool write_measure;      
-				      
-				     /**
-				      * Write all faces, including
-				      * interior faces.
-				      */
-    bool write_all_faces;
-    
-				     /**
-				      * Constructor.
-				      */
-    DX (const bool write_cells = true,
-	const bool write_faces = false,
-	const bool write_diameter = false,
-	const bool write_measure = false,
-	const bool write_all_faces = true);  
+				       /**
+					* Parse parameters of
+					* ParameterHandler.
+					*/
+      void parse_parameters (ParameterHandler& param);
   };			   
      
 				   /**
@@ -109,6 +124,17 @@ namespace GridOutFlags
 					* Constructor.
 					*/
       Msh (const bool write_faces    = false);
+      				       /**
+					* Declare parameters in
+					* ParameterHandler.
+					*/
+      static void declare_parameters (ParameterHandler& param);
+
+				       /**
+					* Parse parameters of
+					* ParameterHandler.
+					*/
+      void parse_parameters (ParameterHandler& param);
   };
   
  
@@ -158,6 +184,17 @@ namespace GridOutFlags
 					*/
       Ucd (const bool write_preamble = true,
 	   const bool write_faces    = false);
+				       /**
+					* Declare parameters in
+					* ParameterHandler.
+					*/
+      static void declare_parameters (ParameterHandler& param);
+
+				       /**
+					* Parse parameters of
+					* ParameterHandler.
+					*/
+      void parse_parameters (ParameterHandler& param);
   };
   
   
@@ -203,6 +240,17 @@ namespace GridOutFlags
 					*/
       Gnuplot (const bool         write_cell_number = false,
 	       const unsigned int n_boundary_face_points = 2);
+				       /**
+					* Declare parameters in
+					* ParameterHandler.
+					*/
+      static void declare_parameters (ParameterHandler& param);
+
+				       /**
+					* Parse parameters of
+					* ParameterHandler.
+					*/
+      void parse_parameters (ParameterHandler& param);
   };
 
 				   /**
@@ -300,6 +348,17 @@ namespace GridOutFlags
 		    const bool color_lines_on_user_flag = false,
 		    const unsigned int n_boundary_face_points = 2,
 		    const bool color_lines_level = false);
+				       /**
+					* Declare parameters in
+					* ParameterHandler.
+					*/
+      static void declare_parameters (ParameterHandler& param);
+
+				       /**
+					* Parse parameters of
+					* ParameterHandler.
+					*/
+      void parse_parameters (ParameterHandler& param);
   };
   
   
@@ -339,6 +398,17 @@ namespace GridOutFlags
 	   const double       line_width = 0.5,
 	   const bool         color_lines_on_user_flag = false,
 	   const unsigned int n_boundary_face_points = 2);
+				       /**
+					* Declare parameters in
+					* ParameterHandler.
+					*/
+      static void declare_parameters (ParameterHandler& param);
+
+				       /**
+					* Parse parameters of
+					* ParameterHandler.
+					*/
+      void parse_parameters (ParameterHandler& param);
   };
 
     
@@ -404,6 +474,17 @@ namespace GridOutFlags
 	   const bool         write_cell_number_level = true,
 	   const bool         write_vertex_numbers = false,
 	   const bool         color_lines_level = false);
+				       /**
+					* Declare parameters in
+					* ParameterHandler.
+					*/
+      static void declare_parameters (ParameterHandler& param);
+
+				       /**
+					* Parse parameters of
+					* ParameterHandler.
+					*/
+      void parse_parameters (ParameterHandler& param);
   };
   
 				   /**
@@ -449,6 +530,17 @@ namespace GridOutFlags
 	   const unsigned int n_boundary_face_points = 2,
 	   const double       azimut_angle    = 60,
 	   const double       turn_angle      = 30);
+				       /**
+					* Declare parameters in
+					* ParameterHandler.
+					*/
+      static void declare_parameters (ParameterHandler& param);
+
+				       /**
+					* Parse parameters of
+					* ParameterHandler.
+					*/
+      void parse_parameters (ParameterHandler& param);
   };
 				   /**
 				    * Flags for XFig output.
@@ -539,6 +631,17 @@ namespace GridOutFlags
 					* Constructor.
 					*/
       XFig();
+				       /**
+					* Declare parameters in
+					* ParameterHandler.
+					*/
+      static void declare_parameters (ParameterHandler& param);
+
+				       /**
+					* Parse parameters of
+					* ParameterHandler.
+					*/
+      void parse_parameters (ParameterHandler& param);
   };
   
 }
@@ -1021,6 +1124,18 @@ class GridOut
 				      */
     static std::string get_output_format_names ();
 
+				     /**
+				      * Declare parameters in
+				      * ParameterHandler.
+				      */
+    static void declare_parameters (ParameterHandler& param);
+    
+				     /**
+				      * Parse parameters of
+				      * ParameterHandler.
+				      */
+    void parse_parameters (ParameterHandler& param);
+    
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
