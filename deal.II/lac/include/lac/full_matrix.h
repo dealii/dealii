@@ -1100,7 +1100,7 @@ class FullMatrix : public Table<2,number>
     template<typename number2>
     double least_squares (Vector<number2> &dst,
 			  Vector<number2> &src);
-//@}
+                                     //@}
 
 				     /** @addtogroup Exceptions
 				      * @{ */
