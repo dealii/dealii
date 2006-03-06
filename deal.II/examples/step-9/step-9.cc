@@ -1721,24 +1721,26 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				       // iterators to the active
 				       // neighbors, of course.
       active_neighbors.clear ();
-      for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-	if (! cell->at_boundary(n))
+      for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+	if (! cell->at_boundary(face_no))
 	  {
 					     // First define an
 					     // abbreviation for the
-					     // iterator to the
-					     // neighbor:
+					     // iterator to the face
+					     // and the neighbor
+	    const typename DoFHandler<dim>::face_iterator 
+	      face = cell->face(face_no);
 	    const typename DoFHandler<dim>::cell_iterator 
-	      neighbor = cell->neighbor(n);
+	      neighbor = cell->neighbor(face_no);
 
-					     // Then check whether it
-					     // is active. If it is,
-					     // then it is on the same
-					     // level or one level
-					     // coarser (if we are not
-					     // in 1D), and we are
-					     // interested in it in
-					     // any case.
+					     // Then check whether the
+					     // neighbor is active. If
+					     // it is, then it is on
+					     // the same level or one
+					     // level coarser (if we
+					     // are not in 1D), and we
+					     // are interested in it
+					     // in any case.
 	    if (neighbor->active())
 	      active_neighbors.push_back (neighbor);
 	    else
@@ -1770,7 +1772,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 		    typename DoFHandler<dim>::cell_iterator
 		      neighbor_child = neighbor;
 		    while (neighbor_child->has_children())
-		      neighbor_child = neighbor_child->child (n==0 ? 1 : 0);
+		      neighbor_child = neighbor_child->child (face_no==0 ? 1 : 0);
 		    
 						     // As this used
 						     // some
@@ -1853,7 +1855,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 						     // exception
 						     // class to throw
 						     // here.
-		    Assert (neighbor_child->neighbor(n==0 ? 1 : 0)==cell,
+		    Assert (neighbor_child->neighbor(face_no==0 ? 1 : 0)==cell,
 			    ExcInternalError());
 		    
 						     // If the check
@@ -1868,29 +1870,15 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 		  }
 		else
 						   // If we are not in
-						   // 1d, then we have
-						   // to loop over all
-						   // children and
-						   // find out which
-						   // of them bound to
-						   // the present cell
-						   // by checking all
-						   // neighbors of
-						   // that child. If
-						   // we have found
-						   // that a child
-						   // borders to the
-						   // present cell,
-						   // then we can
-						   // break the
-						   // innermost loop.
-		  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-		    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-		      if (neighbor->child(c)->neighbor(f) == cell)
-			{
-			  active_neighbors.push_back (neighbor->child(c));
-			  break;
-			};
+						   // 1d, we collect
+						   // all neighbor
+						   // children
+						   // `behind' the
+						   // subfaces of the
+						   // current face
+		  for (unsigned int subface_no=0; subface_no<face->n_children(); ++subface_no)
+		    active_neighbors.push_back (
+		      cell->neighbor_child_on_subface(face_no, subface_no));
 	      };
 	  };
 
