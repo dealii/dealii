@@ -938,7 +938,7 @@ class VectorTools
 				      * simple test for checking
 				      * whether a point is in a cell,
 				      * it is only implemented for
-				      * Q1-mapping yet.
+				      * Q1-mapping at this time.
 				      */
     template <int dim, class InVector>
     static void point_difference (const DoFHandler<dim>& dof,
@@ -947,6 +947,39 @@ class VectorTools
 				  Vector<double>&        difference,
 				  const Point<dim>&      point);
 
+				     /**
+				      * Evaluate a possibly
+				      * vector-valued finite element
+				      * function defined by the given
+				      * DoFHandler and nodal vector at
+				      * the given point, and return
+				      * the (vector) value of this
+				      * function through the last
+				      * argument.
+				      */
+    template <int dim, class InVector>
+    static
+    void
+    point_value (const DoFHandler<dim> &dof,
+		 const InVector        &fe_function,
+		 const Point<dim>      &point,
+		 Vector<double>        &value);
+
+				     /**
+				      * Evaluate a scalar finite
+				      * element function defined by
+				      * the given DoFHandler and nodal
+				      * vector at the given point, and
+				      * return the value of this
+				      * function.
+				      */
+    template <int dim, class InVector>
+    static
+    double
+    point_value (const DoFHandler<dim> &dof,
+		 const InVector        &fe_function,
+		 const Point<dim>      &point);
+    
 				     /**
 				      * Subtract the (algebraic) mean value
 				      * from a vector. This function is most

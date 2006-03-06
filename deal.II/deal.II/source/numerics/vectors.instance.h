@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -86,6 +86,19 @@ void VectorTools::point_difference<deal_II_dimension> (
   const VEC&,
   const Function<deal_II_dimension>&,
   Vector<double>&,
+  const Point<deal_II_dimension>&);
+
+template
+void VectorTools::point_value<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension>&,
+  const VEC&,
+  const Point<deal_II_dimension>&,
+  Vector<double>&);
+
+template
+double VectorTools::point_value<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension>&,
+  const VEC&,
   const Point<deal_II_dimension>&);
 
 template

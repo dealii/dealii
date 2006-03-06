@@ -1,6 +1,6 @@
 ############################################################
 # Makefile,v 1.15 2002/06/13 12:51:13 hartmann Exp
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -65,6 +65,7 @@ tests_x = geometry_info_* \
 	  cylinder_shell_* \
 	  compressed_sparsity_pattern_* \
 	  point_difference_* \
+	  point_value_* \
 	  fe_q_3d* \
           rt_* \
 	  nedelec_* \
