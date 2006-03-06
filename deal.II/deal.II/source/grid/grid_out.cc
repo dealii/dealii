@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1613,46 +1613,55 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
 #endif
 
 
-    template <int dim>
-void GridOut::write (const Triangulation<dim> &tria,
-	std::ostream             &out,
-	const OutputFormat        output_format,
-	const Mapping<dim>       *mapping)
+template <int dim>
+void GridOut::write (
+  const Triangulation<dim> &tria,
+  std::ostream             &out,
+  const OutputFormat        output_format,
+  const Mapping<dim>       *mapping)
 {
-    switch (output_format)
+  switch (output_format)
     {
-	case none:
-	    return;
-
-	case dx:
-	    write_dx (tria, out);
-	    return;
-
-	case ucd:
-	    write_ucd (tria, out);
-	    return;
-
-	case gnuplot:
-	    write_gnuplot (tria, out, mapping);
-	    return;
-
-	case eps:
-	    write_eps (tria, out, mapping);
-	    return;
-
-	case xfig:
-	    write_xfig (tria, out, mapping);
-	    return;
-
-	case msh:
-	    write_msh (tria, out);
-	    return;
+      case none:
+	return;
+	
+      case dx:
+	write_dx (tria, out);
+	return;
+	
+      case ucd:
+	write_ucd (tria, out);
+	return;
+	
+      case gnuplot:
+	write_gnuplot (tria, out, mapping);
+	return;
+	
+      case eps:
+	write_eps (tria, out, mapping);
+	return;
+	
+      case xfig:
+	write_xfig (tria, out, mapping);
+	return;
+	
+      case msh:
+	write_msh (tria, out);
+	return;
     }
-
-    Assert (false, ExcInternalError());
+  
+  Assert (false, ExcInternalError());
 }
 
 
+template <int dim>
+void GridOut::write (
+  const Triangulation<dim> &tria,
+  std::ostream             &out,
+  const Mapping<dim>       *mapping)
+{
+  write(tria, out, default_format, mapping);
+}
 
 // explicit instantiations
 template void GridOut::write_ucd<deal_II_dimension>
@@ -1666,6 +1675,8 @@ template void GridOut::write_eps<deal_II_dimension>
 #endif
 template void GridOut::write<deal_II_dimension>
 (const Triangulation<deal_II_dimension> &,
- std::ostream &,
- const OutputFormat,
+ std::ostream &, const OutputFormat,
  const Mapping<deal_II_dimension> *);
+template void GridOut::write<deal_II_dimension>
+(const Triangulation<deal_II_dimension> &,
+ std::ostream &, const Mapping<deal_II_dimension> *);

@@ -31,11 +31,19 @@ namespace GridOutFlags
 
   void DX::declare_parameters (ParameterHandler& param)
   {
-    param.declare_entry("Write cells", "true", Patterns::Bool());
-    param.declare_entry("Write faces", "false", Patterns::Bool());
-    param.declare_entry("Write diameter", "false", Patterns::Bool());
-    param.declare_entry("Write measure", "false", Patterns::Bool());
-    param.declare_entry("Write all faces", "true", Patterns::Bool());
+    param.declare_entry("Write cells", "true", Patterns::Bool(),
+			"Write the mesh connectivity as DX grid cells");
+    param.declare_entry("Write faces", "false", Patterns::Bool(),
+			"Write faces of cells. These may be boundary faces\n"
+			"or all faces between mesh cells, according to\n"
+			"\"Write all faces\"");
+    param.declare_entry("Write diameter", "false", Patterns::Bool(),
+			"If cells are written, additionally write their"
+			" diameter\nas data for visualization");
+    param.declare_entry("Write measure", "false", Patterns::Bool(),
+			"Write the volume of each cell as data");
+    param.declare_entry("Write all faces", "true", Patterns::Bool(),
+			"Write all faces, not only boundary");
   }
   
   void DX::parse_parameters (ParameterHandler& param)
@@ -126,12 +134,21 @@ namespace GridOutFlags
   void EpsFlagsBase::declare_parameters (ParameterHandler& param)
   {
     param.declare_entry("Size by", "width",
-			    Patterns::Selection("width|height"));
-    param.declare_entry("Size", "300", Patterns::Integer());
-    param.declare_entry("Line width", "0.5", Patterns::Double());
-    param.declare_entry("Color by flag", "false", Patterns::Bool());
-    param.declare_entry("Boundary points", "2", Patterns::Integer());
-    param.declare_entry("Color by level", "false", Patterns::Bool());
+			    Patterns::Selection("width|height"),
+			"Depending on this parameter, either the"
+			"width or height\n"
+			"of the eps is scaled to \"Size\"");
+    param.declare_entry("Size", "300", Patterns::Integer(),
+			"Size of the output in points");
+    param.declare_entry("Line width", "0.5", Patterns::Double(),
+			"Width of the lines drawn in points");
+    param.declare_entry("Color by flag", "false", Patterns::Bool(),
+			"Draw lines with user flag set in different color");
+    param.declare_entry("Boundary points", "2", Patterns::Integer(),
+			"Number of points on boundary edges.\n"
+			"Increase this beyond 2 to see curved boundaries.");
+    param.declare_entry("Color by level", "false", Patterns::Bool(),
+			"Draw different colors according to grid level.");
   }
 
 
@@ -196,9 +213,14 @@ namespace GridOutFlags
   
   void Eps<2>::declare_parameters (ParameterHandler& param)
   {
-    param.declare_entry("Cell number", "false", Patterns::Bool());
-    param.declare_entry("Level number", "false", Patterns::Bool());
-    param.declare_entry("Vertex number", "false", Patterns::Bool());
+    param.declare_entry("Cell number", "false", Patterns::Bool(),
+			"(2D only) Write cell numbers"
+			" into the centers of cells");
+    param.declare_entry("Level number", "false", Patterns::Bool(),
+			"(2D only) if \"Cell number\" is true, write"
+			"numbers in the form level.number");
+    param.declare_entry("Vertex number", "false", Patterns::Bool(),
+			"Write numbers for each vertex");
   }
 
 
@@ -230,15 +252,18 @@ namespace GridOutFlags
   
   void Eps<3>::declare_parameters (ParameterHandler& param)
   {
-    param.declare_entry("Azimut angle", "60", Patterns::Double());
-    param.declare_entry("Turn angle", "30", Patterns::Double());    
+    param.declare_entry("Azimuth", "30", Patterns::Double(),
+			"Azimuth of the viw point, that is, the angle\n"
+			"in the plane from the x-axis.");
+    param.declare_entry("Elevation", "30", Patterns::Double(),
+			"Elevation of the view point above the xy-plane.");    
   }
 
 
   void Eps<3>::parse_parameters (ParameterHandler& param)
   {
     EpsFlagsBase::parse_parameters(param);
-    azimut_angle = param.get_double("Azimut angle");
+    azimut_angle = 90- param.get_double("Elevation");
     turn_angle = param.get_double("Turn angle");
   }
 
@@ -374,6 +399,14 @@ GridOut::default_suffix (const OutputFormat output_format)
 
 
 
+std::string
+GridOut::default_suffix () const
+{
+  return default_suffix(default_format);
+}
+
+
+
 GridOut::OutputFormat
 GridOut::parse_output_format (const std::string &format_name)
 {
@@ -444,6 +477,41 @@ GridOut::declare_parameters(ParameterHandler& param)
   GridOutFlags::XFig::declare_parameters(param);
   param.leave_subsection();
 }
+
+
+
+void
+GridOut::parse_parameters(ParameterHandler& param)
+{
+  default_format = parse_output_format(param.get("Format"));
+  
+  param.enter_subsection("DX");
+  dx_flags.parse_parameters(param);
+  param.leave_subsection();
+  
+  param.enter_subsection("Msh");
+  msh_flags.parse_parameters(param);
+  param.leave_subsection();
+  
+  param.enter_subsection("Ucd");
+  ucd_flags.parse_parameters(param);
+  param.leave_subsection();
+  
+  param.enter_subsection("Gnuplot");
+  gnuplot_flags.parse_parameters(param);
+  param.leave_subsection();
+  
+  param.enter_subsection("Eps");
+  eps_flags_1.parse_parameters(param);
+  eps_flags_2.parse_parameters(param);
+  eps_flags_3.parse_parameters(param);
+  param.leave_subsection();
+  
+  param.enter_subsection("XFig");
+  xfig_flags.parse_parameters(param);
+  param.leave_subsection();
+}
+
 
 
 unsigned int

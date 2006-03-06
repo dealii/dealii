@@ -1018,18 +1018,29 @@ class GridOut
     void write_xfig (const Triangulation<dim> &tria,
 		    std::ostream             &out,
 		    const Mapping<dim>       *mapping=0);
+    
 				     /**
-				      * Write data and grid to @p out according
-				      * to the given data format. This function
-				      * simply calls the appropriate
-				      * <tt>write_*</tt> function.
+				      * Write grid to @p out according
+				      * to the given data format. This
+				      * function simply calls the
+				      * appropriate <tt>write_*</tt>
+				      * function.
 				      */
     template <int dim>
     void write (const Triangulation<dim> &tria,
 		std::ostream             &out,
 		const OutputFormat        output_format,
 		const Mapping<dim>       *mapping=0);
-
+    
+				     /**
+				      * Write mesh in default format
+				      * set by ParameterHandler.
+				      */
+    template <int dim>
+    void write (const Triangulation<dim> &tria,
+		std::ostream             &out,
+		const Mapping<dim>       *mapping=0);
+    
 				     /**
 				      * Set flags for DX output
 				      */
@@ -1094,6 +1105,13 @@ class GridOut
     static std::string default_suffix (const OutputFormat output_format);
 
 				     /**
+				      * Default suffix for the default
+				      * output format selected throuw
+				      * ParameterHandler.
+				      */
+    std::string default_suffix () const;
+    
+				     /**
 				      * Return the @p OutputFormat value
 				      * corresponding to the given string. If
 				      * the string does not match any known
@@ -1149,6 +1167,12 @@ class GridOut
     DeclException0 (ExcInvalidState);
 
   private:
+				     /**
+				      * The default output format, set
+				      * by a ParameterHandler.
+				      */
+    OutputFormat default_format;
+    
 				     /**
 				      * Flags for OpenDX output.
 				      */
