@@ -243,12 +243,12 @@ DoFTools::compute_row_length_vector(
 
 #else
 
-template <class DH>
+template <class DH, class CellIterator>
 static
 void
 compute_cell_row_length_matrix(
   Table<2, unsigned int>& matrix,
-  const typename DH::cell_iterator& cell,
+  const CellIterator& cell,
   const FiniteElement<DH::dimension>& fe,
   const Table<2,DoFTools::Coupling>& couple_cell,
   const Table<2,DoFTools::Coupling>& couple_face)
@@ -400,7 +400,8 @@ compute_cell_row_length_matrix(
 		  for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
 		    {
 		      const unsigned int jblock = fe.first_block_of_base(base) + mult;
-		      if (couple_cell(iblock, jblock) != DoFTools::none)
+		      if (couple_cell(iblock, jblock) != DoFTools::none ||
+			  couple_face(iblock, jblock) != DoFTools::none)
 			{
 			  matrix(i, jblock) += increment;
 			}
@@ -411,15 +412,14 @@ compute_cell_row_length_matrix(
     }
 }
 
+// This will not work if the block structures of fe and nfe
+// differ. Then, the coupling tables will have to be doubled.
 template <class DH>
 static
 void
 compute_face_row_length_matrix(
   Table<2, unsigned int>& matrix,
   Table<2, unsigned int>& nmatrix,
-  const typename DH::face_iterator& face,
-  const typename DH::cell_iterator& cell,
-  const typename DH::cell_iterator& neighbor,
   const FiniteElement<DH::dimension>& fe,
   const FiniteElement<DH::dimension>& nfe,
   const Table<2,DoFTools::Coupling>& couple_cell,
@@ -715,6 +715,9 @@ DoFTools::compute_row_length_vector(
   std::vector<Table<2, Coupling> > couple_face;
   convert_couplings_to_blocks(dofs, couplings, couple_cell);
   convert_couplings_to_blocks(dofs, flux_couplings, couple_face);
+
+  Table<2, unsigned int> cell_couplings;
+  Table<2, unsigned int> neighbor_couplings;
   
 				   // We loop over cells and go from
 				   // cells to lower dimensional
@@ -737,104 +740,12 @@ DoFTools::compute_row_length_vector(
       Assert (flux_couplings.n_cols()==fe.n_components(),
 	      ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
       
+      cell_couplings.reinit(fe.dofs_per_cell, fe.n_blocks());
       cell_indices.resize(fe.dofs_per_cell);
       cell->get_dof_indices(cell_indices);
-      unsigned int i = 0;
-				       // First, dofs on
-				       // vertices. We assume that
-				       // each vertex dof couples
-				       // with all dofs on
-				       // adjacent grid cells.
 
-				       // Adding all dofs of the cells
-				       // will add dofs of the faces
-				       // of the cell adjacent to the
-				       // vertex twice. Therefore, we
-				       // subtract these here and add
-				       // them in a loop over the
-				       // faces below.
-
-				       // in 1d, faces and vertices
-				       // are identical. Nevertheless,
-				       // this will only work if
-				       // dofs_per_face is zero and
-				       // dofs_per_vertex is
-				       // arbitrary, not the other way
-				       // round.
-      unsigned int increment;
-      while (i < fe.first_line_index)
-	{
-	  for (unsigned int base=0;base<fe.n_base_elements();++base)
-	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
-	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
-					fe.first_block_of_base(base) + mult) != none)
-		{
-		  increment = fe.base_element(base).dofs_per_cell
-			      - DH::dimension * fe.base_element(base).dofs_per_face;
-		  row_lengths[cell_indices[i]] += increment;
-		}
-	  ++i;
-	}
-				       // From now on, if an object is
-				       // a cell, its dofs only couple
-				       // inside the cell. Since the
-				       // faces are handled below, we
-				       // have to subtract ALL faces
-				       // in this case.
-      
-				       // In all other cases we
-				       // subtract adjacent faces to be
-				       // added in the loop below.
-      while (i < fe.first_quad_index)
-	{
-	  for (unsigned int base=0;base<fe.n_base_elements();++base)
-	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
-	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
-					fe.first_block_of_base(base) + mult) != none)
-		{
-		  increment = fe.base_element(base).dofs_per_cell
-			      - ((DH::dimension>1)
-				 ? (DH::dimension-1)
-				 : GeometryInfo<DH::dimension>::faces_per_cell)
-			      * fe.base_element(base).dofs_per_face;
-		row_lengths[cell_indices[i]] += increment;
-		}
-	  ++i;
-	}
-      
-				       // Now quads in 2D and 3D
-      while (i < fe.first_hex_index)
-	{
-	  for (unsigned int base=0;base<fe.n_base_elements();++base)
-	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
-	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
-					fe.first_block_of_base(base) + mult) != none)
-		{
-		  increment = fe.base_element(base).dofs_per_cell
-			      - ((DH::dimension>2)
-				 ? (DH::dimension-2)
-				 : GeometryInfo<DH::dimension>::faces_per_cell)
-			      * fe.base_element(base).dofs_per_face;
-		row_lengths[cell_indices[i]] += increment;
-	      }
-	  ++i;
-	}
-      
-				       // Finally, cells in 3D
-      while (i < fe.dofs_per_cell)
-	{
-	  for (unsigned int base=0;base<fe.n_base_elements();++base)
-	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
-	      if (couple_cell[fe_index](fe.system_to_block_index(i).first,
-					fe.first_block_of_base(base) + mult) != none)
-		{
-		  increment = fe.base_element(base).dofs_per_cell
-			      - GeometryInfo<DH::dimension>::faces_per_cell
-			      * fe.base_element(base).dofs_per_face;
-		  row_lengths[cell_indices[i]] += increment;
-		}
-	  ++i;
-	}
+      compute_cell_row_length_matrix<DH, typename DH::active_cell_iterator>(
+	cell_couplings, cell, fe, couple_cell[fe_index], couple_face[fe_index]);
       
 				   // At this point, we have
 				   // counted all dofs
@@ -849,79 +760,147 @@ DoFTools::compute_row_length_vector(
 				   // flux contributions.
       for (unsigned int iface=0;iface<GeometryInfo<DH::dimension>::faces_per_cell;++iface)
 	{
-	  if (cell->at_boundary(iface))
-	    {
-	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
-		row_lengths[cell_indices[i]] += fe.dofs_per_face;
-	      continue;
-	    }
-	  
 	  const typename DH::cell_iterator neighbor = cell->neighbor(iface);
 	  const FiniteElement<DH::dimension>& nfe = neighbor->get_fe();
 	  typename DH::face_iterator face = cell->face(iface);
-	  
-					   // Flux couplings are
-					   // computed from both sides
-					   // for simplicity.
-	  
-					   // The dofs on the common face
-					   // will be handled below,
-					   // therefore, we subtract them
-					   // here.
-	  for (unsigned int base=0;base<nfe.n_base_elements();++base)
-	    for (unsigned int mult=0;mult<nfe.element_multiplicity(base);++mult)
-	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
-		if (couple_face[fe_index](fe.system_to_block_index(i).first,
-					  nfe.first_block_of_base(base) + mult) != none)
-		{
-		  unsigned int increment = nfe.base_element(base).dofs_per_cell
-					   - nfe.base_element(base).dofs_per_face;
-		  row_lengths[cell_indices[i]] += increment;
-		}
-	  
 					   // Do this only once per
 					   // face and not on the
 					   // hanging faces.
 	  if (face->user_flag_set() || neighbor->has_children())
 	    continue;
-	  face->set_user_flag();
-					   // At this point, we assume
-					   // that each cell added its
-					   // dofs minus the face to
-					   // the couplings of the
-					   // face dofs. Since we
-					   // subtracted two faces, we
-					   // have to re-add one.
-	  
-					   // If one side of the face
-					   // is refined, all the fine
-					   // face dofs couple with
-					   // the coarse one.
-	  
-					   // Wolfgang, do they couple
-					   // with each other by
-					   // constraints?
+	  face->set_user_flag();	  
 
-					   // This will not work with
-					   // different couplings on
-					   // different cells.
+	  neighbor_couplings.reinit(nfe.dofs_per_cell, nfe.n_blocks());
 	  neighbor_indices.resize(nfe.dofs_per_cell);
 	  neighbor->get_dof_indices(neighbor_indices);
-	  for (unsigned int base=0;base<nfe.n_base_elements();++base)
-	    for (unsigned int mult=0;mult<nfe.element_multiplicity(base);++mult)
-	      for (unsigned int i=0;i<fe.dofs_per_cell;++i)
-		if (couple_cell[fe_index](fe.system_to_component_index(i).first,
-					  nfe.first_block_of_base(base) + mult) != none)
-		  row_lengths[cell_indices[i]]
-		    += nfe.base_element(base).dofs_per_face;
-	  for (unsigned int base=0;base<fe.n_base_elements();++base)
-	    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
-	      for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
-		if (couple_cell[fe_index](nfe.system_to_component_index(i).first,
-					  fe.first_block_of_base(base) + mult) != none)
-		  row_lengths[neighbor_indices[i]]
-		    += fe.base_element(base).dofs_per_face;
+
+	  compute_face_row_length_matrix<DH>(
+	    cell_couplings, neighbor_couplings,// face, cell, neighbor,
+	    fe, nfe, couple_cell[fe_index], couple_face[fe_index]);
+	  
+	  for (unsigned int i=0;i<neighbor_indices.size();++i)
+	    for (unsigned int j=0;j<neighbor_couplings.size(1);++j)
+	      row_lengths[neighbor_indices[i]] += neighbor_couplings(i,j);
+
 	}
+      for (unsigned int i=0;i<cell_indices.size();++i)
+	for (unsigned int j=0;j<cell_couplings.size(1);++j)
+	  row_lengths[cell_indices[i]] += cell_couplings(i,j);
+    }
+  user_flags_triangulation.load_user_flags(old_flags);
+}
+
+// This is the template for 2D and 3D. See version for 1D above
+template <class DH>
+void
+DoFTools::compute_row_length_vector(
+  const DH& dofs,
+  std::vector<std::vector<unsigned int> >& row_lengths,
+  const Table<2,Coupling>& couplings,
+  const Table<2,Coupling>& flux_couplings)
+{
+  Assert (row_lengths.size() == dofs.n_dofs(),
+	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+  
+				   // Function starts here by
+				   // resetting the counters.
+  std::fill(row_lengths.begin(), row_lengths.end(), 0);
+				   // We need the user flags, so we
+				   // save them for later restoration
+  std::vector<bool> old_flags;
+				   // We need a non-constant
+				   // triangulation for the user
+				   // flags. Since we restore them in
+				   // the end, this cast is safe.
+  Triangulation<DH::dimension>& user_flags_triangulation =
+    const_cast<Triangulation<DH::dimension>&> (dofs.get_tria());
+  user_flags_triangulation.save_user_flags(old_flags);
+  user_flags_triangulation.clear_user_flags();
+  
+  const typename DH::cell_iterator end = dofs.end();
+  typename DH::active_cell_iterator cell;
+  std::vector<unsigned int> cell_indices;
+  std::vector<unsigned int> neighbor_indices;
+  
+				   // We have to translate the
+				   // couplings from components to
+				   // blocks, so this works for
+				   // nonprimitive elements as well.
+  std::vector<Table<2, Coupling> > couple_cell;
+  std::vector<Table<2, Coupling> > couple_face;
+  convert_couplings_to_blocks(dofs, couplings, couple_cell);
+  convert_couplings_to_blocks(dofs, flux_couplings, couple_face);
+
+  Table<2, unsigned int> cell_couplings;
+  Table<2, unsigned int> neighbor_couplings;
+  
+				   // We loop over cells and go from
+				   // cells to lower dimensional
+				   // objects. This is the only way to
+				   // cope withthe fact, that an
+				   // unknown number of cells may
+				   // share an object of dimension
+				   // smaller than dim-1.
+  for (cell = dofs.begin_active(); cell != end; ++cell)
+    {
+      const FiniteElement<DH::dimension>& fe = cell->get_fe();
+      const unsigned int fe_index = cell->active_fe_index();
+      
+      Assert (couplings.n_rows()==fe.n_components(),
+	      ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
+      Assert (couplings.n_cols()==fe.n_components(),
+	      ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
+      Assert (flux_couplings.n_rows()==fe.n_components(),
+	      ExcDimensionMismatch(flux_couplings.n_rows(), fe.n_components()));
+      Assert (flux_couplings.n_cols()==fe.n_components(),
+	      ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
+      
+      cell_couplings.reinit(fe.dofs_per_cell, fe.n_blocks());
+      cell_indices.resize(fe.dofs_per_cell);
+      cell->get_dof_indices(cell_indices);
+
+      compute_cell_row_length_matrix<DH, typename DH::active_cell_iterator>(
+	cell_couplings, cell, fe, couple_cell[fe_index], couple_face[fe_index]);
+      
+				   // At this point, we have
+				   // counted all dofs
+				   // contributiong from cells
+				   // coupled topologically to the
+				   // adjacent cells, but we
+				   // subtracted some faces.
+  
+				   // Now, let's go by the faces
+				   // and add the missing
+				   // contribution as well as the
+				   // flux contributions.
+      for (unsigned int iface=0;iface<GeometryInfo<DH::dimension>::faces_per_cell;++iface)
+	{
+	  const typename DH::cell_iterator neighbor = cell->neighbor(iface);
+	  const FiniteElement<DH::dimension>& nfe = neighbor->get_fe();
+	  typename DH::face_iterator face = cell->face(iface);
+					   // Do this only once per
+					   // face and not on the
+					   // hanging faces.
+	  if (face->user_flag_set() || neighbor->has_children())
+	    continue;
+	  face->set_user_flag();	  
+
+	  neighbor_couplings.reinit(nfe.dofs_per_cell, nfe.n_blocks());
+	  neighbor_indices.resize(nfe.dofs_per_cell);
+	  neighbor->get_dof_indices(neighbor_indices);
+
+	  compute_face_row_length_matrix<DH>(
+	    cell_couplings, neighbor_couplings,// face, cell, neighbor,
+	    fe, nfe, couple_cell[fe_index], couple_face[fe_index]);
+	  
+	  for (unsigned int i=0;i<neighbor_indices.size();++i)
+	    for (unsigned int j=0;j<neighbor_couplings.size(1);++j)
+	      row_lengths[j][neighbor_indices[i]] += neighbor_couplings(i,j);
+
+	}
+      for (unsigned int i=0;i<cell_indices.size();++i)
+	for (unsigned int j=0;j<cell_couplings.size(1);++j)
+	  row_lengths[j][cell_indices[i]] += cell_couplings(i,j);
     }
   user_flags_triangulation.load_user_flags(old_flags);
 }

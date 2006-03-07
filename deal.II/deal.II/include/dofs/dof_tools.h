@@ -273,16 +273,31 @@ class DoFTools
 				      * couplings. Here, couplings due
 				      * to flux operators on faces are
 				      * considered. See #Coupling.
-				      *
-				      * @todo This function is only
-				      * implemented for primitive
-				      * elements.
-				     */
+				      */
     template<class DH>
     static
     void compute_row_length_vector(
       const DH& dofs,
       std::vector<unsigned int>& row_lengths,
+      const Table<2,Coupling>& couplings,
+      const Table<2,Coupling>& flux_couplings);
+
+				     /**
+				      * Same as the other function,
+				      * but separates the blocks for a
+				      * block system of equations.
+				      *
+				      * The result vector
+				      * <tt>row_lengths</tt> contains
+				      * FiniteElementData::n_blocks()
+				      * vectors of length
+				      * DH::n_dofs().
+				      */
+    template<class DH>
+    static
+    void compute_row_length_vector(
+      const DH& dofs,
+      std::vector<std::vector<unsigned int> >& row_lengths,
       const Table<2,Coupling>& couplings,
       const Table<2,Coupling>& flux_couplings);
     
