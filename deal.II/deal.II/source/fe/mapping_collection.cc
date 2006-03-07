@@ -76,10 +76,16 @@ namespace hp
 //---------------------------------------------------------------------------
 
 
+
+  template <int dim>
+  MappingQ1<dim>
+  StaticMappingQ1<dim>::mapping_q1;
+  
+
   template <int dim>
   MappingCollection<dim>
   StaticMappingQ1<dim>::mapping_collection
-  = MappingCollection<dim>(::StaticMappingQ1<dim>::mapping);
+  = MappingCollection<dim>(mapping_q1);
 
 // explicit instantiations
   template class MappingCollection<deal_II_dimension>;

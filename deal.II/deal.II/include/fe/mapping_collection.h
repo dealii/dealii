@@ -134,12 +134,32 @@ namespace hp
 /**
  * In order to avoid creation of static MappingQ1 objects at several
  * places in the library (in particular in backward compatibility
- * functions), we define a static MappingQ1 objects once and for all
- * places where it is needed.
+ * functions), we define a static collection of mappings with a single
+ * MappingQ1 mapping object once and for all places where it is
+ * needed.
  */
   template <int dim>
   struct StaticMappingQ1
   {
+    private:
+                                       /**
+                                        * A static MappingQ1
+                                        * object. We can't use the one
+                                        * in ::StaticMappingQ1 since
+                                        * we can't make sure that the
+                                        * constructor for that object
+                                        * is run before the
+                                        * constructor for the present
+                                        * static object.
+                                        */
+      static MappingQ1<dim> mapping_q1;
+      
+    public:
+                                       /**
+                                        * The publicly available
+                                        * static Q1 mapping collection
+                                        * object.
+                                        */
       static MappingCollection<dim> mapping_collection;
   };
 
