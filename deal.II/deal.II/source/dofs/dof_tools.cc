@@ -243,6 +243,273 @@ DoFTools::compute_row_length_vector(
 
 #else
 
+template <class DH>
+static
+void
+compute_cell_row_length_matrix(
+  Table<2, unsigned int>& matrix,
+  const typename DH::cell_iterator& cell,
+  const FiniteElement<DH::dimension>& fe,
+  const Table<2,DoFTools::Coupling>& couple_cell,
+  const Table<2,DoFTools::Coupling>& couple_face)
+{
+				   // First, dofs on
+				   // vertices. We assume that
+				   // each vertex dof couples
+				   // with all dofs on
+				   // adjacent grid cells.
+
+				   // Adding all dofs of the cells
+				   // will add dofs of the faces
+				   // of the cell adjacent to the
+				   // vertex twice. Therefore, we
+				   // subtract these here and add
+				   // them in a loop over the
+				   // faces below.
+
+				   // in 1d, faces and vertices
+				   // are identical. Nevertheless,
+				   // this will only work if
+				   // dofs_per_face is zero and
+				   // dofs_per_vertex is
+				   // arbitrary, not the other way
+				   // round.
+  unsigned int increment;
+  unsigned int i=0;
+  while (i < fe.first_line_index)
+    {
+      const unsigned int iblock = fe.system_to_block_index(i).first;
+      for (unsigned int base=0;base<fe.n_base_elements();++base)
+	{
+	  increment = fe.base_element(base).dofs_per_cell
+		      - DH::dimension * fe.base_element(base).dofs_per_face;
+	      
+	  for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	    {
+	      const unsigned int jblock = fe.first_block_of_base(base) + mult;
+	      if (couple_cell(iblock, jblock) != DoFTools::none)
+		{
+		  matrix(i, jblock) += increment;
+		}
+	    }
+	}
+      ++i;
+    }
+				   // From now on, if an object is
+				   // a cell, its dofs only couple
+				   // inside the cell. Since the
+				   // faces are handled below, we
+				   // have to subtract ALL faces
+				   // in this case.
+      
+				   // In all other cases we
+				   // subtract adjacent faces to be
+				   // added in the loop below.
+  while (i < fe.first_quad_index)
+    {
+      const unsigned int iblock = fe.system_to_block_index(i).first;
+      for (unsigned int base=0;base<fe.n_base_elements();++base)
+	{
+	  increment = fe.base_element(base).dofs_per_cell
+		      - ((DH::dimension>1)
+			 ? (DH::dimension-1)
+			 : GeometryInfo<DH::dimension>::faces_per_cell)
+		      * fe.base_element(base).dofs_per_face;
+	      
+	  for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	    {
+	      const unsigned int jblock = fe.first_block_of_base(base) + mult;
+		  
+	      if (couple_cell(iblock, jblock) != DoFTools::none)
+		{
+		  matrix(i, jblock) += increment;
+		}
+	    }
+	}
+      ++i;
+    }
+      
+				   // Now quads in 2D and 3D
+  while (i < fe.first_hex_index)
+    {
+      const unsigned int iblock = fe.system_to_block_index(i).first;
+      for (unsigned int base=0;base<fe.n_base_elements();++base)
+	{
+	  increment = fe.base_element(base).dofs_per_cell
+		      - ((DH::dimension>2)
+			 ? (DH::dimension-2)
+			 : GeometryInfo<DH::dimension>::faces_per_cell)
+		      * fe.base_element(base).dofs_per_face;
+	      
+	  for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	    {
+	      const unsigned int jblock = fe.first_block_of_base(base) + mult;
+	      if (couple_cell(iblock, jblock) != DoFTools::none)
+		{
+		  matrix(i, jblock) += increment;
+		}
+	    }
+	}
+      ++i;
+    }
+      
+				   // Finally, cells in 3D
+  while (i < fe.dofs_per_cell)
+    {
+      const unsigned int iblock = fe.system_to_block_index(i).first;
+      for (unsigned int base=0;base<fe.n_base_elements();++base)
+	{
+	  increment = fe.base_element(base).dofs_per_cell
+		      - GeometryInfo<DH::dimension>::faces_per_cell
+		      * fe.base_element(base).dofs_per_face;
+	      
+	  for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	    {
+	      const unsigned int jblock = fe.first_block_of_base(base) + mult;
+	      if (couple_cell(iblock, jblock) != DoFTools::none)
+		{
+		  matrix(i, jblock) += increment;
+		}
+	    }
+	}
+      ++i;
+    }
+      
+				   // At this point, we have
+				   // counted all dofs
+				   // contributiong from cells
+				   // coupled topologically to the
+				   // adjacent cells, but we
+				   // subtracted some faces.
+  
+				   // Now, let's go by the faces
+				   // and add the missing
+				   // contribution as well as the
+				   // flux contributions.
+  for (unsigned int iface=0;iface<GeometryInfo<DH::dimension>::faces_per_cell;++iface)
+    {
+      if (cell->at_boundary(iface))
+	{
+	  for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+	    {
+	      const unsigned int iblock = fe.system_to_block_index(i).first;
+	      for (unsigned int base=0;base<fe.n_base_elements();++base)
+		{
+		  increment = fe.base_element(base).dofs_per_face;
+		      
+		  for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+		    {
+		      const unsigned int jblock = fe.first_block_of_base(base) + mult;
+		      if (couple_cell(iblock, jblock) != DoFTools::none)
+			{
+			  matrix(i, jblock) += increment;
+			}
+		    }
+		}
+	    }
+	}
+    }
+}
+
+template <class DH>
+static
+void
+compute_face_row_length_matrix(
+  Table<2, unsigned int>& matrix,
+  Table<2, unsigned int>& nmatrix,
+  const typename DH::face_iterator& face,
+  const typename DH::cell_iterator& cell,
+  const typename DH::cell_iterator& neighbor,
+  const FiniteElement<DH::dimension>& fe,
+  const FiniteElement<DH::dimension>& nfe,
+  const Table<2,DoFTools::Coupling>& couple_cell,
+  const Table<2,DoFTools::Coupling>& couple_face)
+{
+				   // This function will be called
+				   // once per face, at the refinement
+				   // edge from a refined cell.
+  
+				   // The dofs on the common face
+				   // will be handled below,
+				   // therefore, we subtract them
+				   // here.
+  for (unsigned int base=0;base<nfe.n_base_elements();++base)
+    {
+      const unsigned int increment = nfe.base_element(base).dofs_per_cell
+				     - nfe.base_element(base).dofs_per_face;
+      
+      for (unsigned int mult=0;mult<nfe.element_multiplicity(base);++mult)
+	{
+	  const unsigned int jblock = nfe.first_block_of_base(base) + mult;
+	  for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+	    if (couple_face(fe.system_to_block_index(i).first, jblock)
+		!= DoFTools::none)
+	      {
+		matrix(i,jblock) += increment;
+	      }
+	}
+    }
+  
+  for (unsigned int base=0;base<fe.n_base_elements();++base)
+    {
+      const unsigned int increment = fe.base_element(base).dofs_per_cell
+				     - fe.base_element(base).dofs_per_face;
+      
+      for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	{
+	  const unsigned int jblock = fe.first_block_of_base(base) + mult;
+	  for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
+	    if (couple_face(nfe.system_to_block_index(i).first, jblock)
+		!= DoFTools::none)
+	      {
+		nmatrix(i,jblock) += increment;
+	      }
+	}
+    }
+				   // At this point, we assume
+				   // that each cell added its
+				   // dofs minus the face to
+				   // the couplings of the
+				   // face dofs. Since we
+				   // subtracted two faces, we
+				   // have to re-add one.
+  
+				   // If one side of the face
+				   // is refined, all the fine
+				   // face dofs couple with
+				   // the coarse one.
+  
+				   // Wolfgang, do they couple
+				   // with each other by
+				   // constraints?
+  
+				   // This will not work with
+				   // different couplings on
+				   // different cells.
+  for (unsigned int base=0;base<nfe.n_base_elements();++base)
+    for (unsigned int mult=0;mult<nfe.element_multiplicity(base);++mult)
+      {
+	const unsigned int jblock = nfe.first_block_of_base(base) + mult;
+	for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+	  if (couple_cell(fe.system_to_component_index(i).first,
+			  jblock) != DoFTools::none)
+	    matrix(i, jblock)
+	      += nfe.base_element(base).dofs_per_face;
+      }
+  
+  for (unsigned int base=0;base<fe.n_base_elements();++base)
+    for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+      {
+	const unsigned int jblock = fe.first_block_of_base(base) + mult;
+	for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
+	  if (couple_cell(nfe.system_to_component_index(i).first,
+			  jblock) != DoFTools::none)
+	    nmatrix(i, jblock)
+	      += fe.base_element(base).dofs_per_face;
+      }
+}
+
+
 // Template for 2D and 3D. For 1D see specialization above
 template <class DH>
 void
