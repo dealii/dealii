@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,7 @@
 
 #include <base/thread_management.h>
 #include <base/subscriptor.h>
+#include <base/logstream.h>
 
 #include <typeinfo>
 #include <string>
@@ -133,4 +134,18 @@ void Subscriptor::unsubscribe (const char* id) const
 unsigned int Subscriptor::n_subscriptions () const
 {
   return counter;
+}
+
+
+void Subscriptor::list_subscribers () const
+{
+#if DEAL_USE_MT == 0
+  for (map_iterator it = counter_map.begin();
+  it != counter_map.end(); ++it)
+    deallog << it->second << '/'
+	    << counter << " subscriptions from \""
+	    << it->first << '\"' << std::endl;
+#else
+  deallog << "No subscriber listing with multithreading" << std::endl;
+#endif
 }
