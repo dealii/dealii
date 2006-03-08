@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -60,7 +60,7 @@
  * functions $v_j$ will not fulfil the interpolation condition
  * $N_i(v_j) = \delta_{ij}$.
  *
- * The use of the membaer data #inverse_node_matrix allows to compute
+ * The use of the member data #inverse_node_matrix allows to compute
  * the basis $v_j$ automatically, after the node values
  * for ech original basis function of the polynomial space have been
  * computed.
