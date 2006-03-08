@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -134,29 +134,29 @@ template <int dim> class MappingQ;
  * in deal.II, yielding the following shape functions in 2d:
  *
  *   @verbatim
- *          2
- *      *--->---*
- *      |       |
- *     3^       ^1
- *      |       |
- *      *--->---*
- *          0
+ *       3
+ *    2-->--3
+ *    |     |
+ *   0^     ^1
+ *    |     |
+ *    0-->--1
+ *       2
  *   @endverbatim
  *
  * For the 3d case, the ordering follows the same scheme: the lines
  * are numbered as described in the documentation of the
  * Triangulation class, i.e.
  *   @verbatim
- *         *---6---*        *---6---*
- *        /|       |       /       /|
- *      11 |       5      11     10 5
- *      /  7       |     /       /  |
- *     *   |       |    *---2---*   |
- *     |   *---4---*    |       |   *
- *     |  /       /     |       1  /
- *     3 8       9      3       | 9
- *     |/       /       |       |/
- *     *---0---*        *---0---*
+ *       *---7---*        *---7---*
+ *      /|       |       /       /|
+ *     4 |       11     4       5 11
+ *    /  10      |     /       /  |
+ *   *   |       |    *---6---*   |
+ *   |   *---3---*    |       |   *
+ *   |  /       /     |       9  /
+ *   8 0       1      8       | 1
+ *   |/       /       |       |/
+ *   *---2---*        *---2---*
  *   @endverbatim
  * and their directions are as follows:
  *   @verbatim
