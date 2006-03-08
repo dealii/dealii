@@ -258,6 +258,14 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+
+  <li> <p> Improved: The function <code class="class">Subscriptor</code>::<code
+  class="member">list_subscribers</code> logs all current subscribers of an
+  object to <tt>deallog</tt>.
+  <br>
+  (GK 2006/03/08)
+  </p>
+
   <li> <p>Fixed: Writing a denormal "NaN" through <code
        class="class">LogStream</code> objects such as 
        <code class="member">deallog</code> erroneously printed zero, rather
@@ -266,19 +274,19 @@ inconvenience this causes.
        (Luca Heltai, WB 2006/03/07)
        </p>
 
-  <li> <p>Improved: The <code class="member">TableBase</code> base class of all
-       the <code class="member">Table</code> classes had an
-       <code>operator()</code> that takes a <code>TableIndices</code> object
+  <li> <p>Improved: The <code class="class">TableBase</code> base class of all
+       the <code class="class">Table</code> classes had an
+       <code class="member">>operator()</code> that takes a <code>TableIndices</code> object
        that represents the entire set of indices at once. However, due to C++
        name lookup rules, this operator wasn't accessible through the
-       <code>Table</code> class without explicitly specifying the base class
+       <code class="class">Table</code> class without explicitly specifying the base class
        name. This is now fixed by also providing a similar
-       <code>operator()</code> in the derived classes.
+       <code class="member">>operator()</code> in the derived classes.
        <br>
        (WB 2006/02/21)
        </p>
 
-  <li> <p>Fixed: The <code class="member">QGauss</code> constructor
+  <li> <p>Fixed: The <code class="class">QGauss</code> constructor
        hangs on x86 linux systems when deal.II is run from inside
        MATLAB. The reason is that while the processor offers long
        double accuracy, MATLAB switches off support for that inside
