@@ -27,8 +27,8 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  double rn = std::numeric_limits<double>::quiet_NaN();
-  deallog << rn << std::endl;
+  deallog << std::numeric_limits<double>::quiet_NaN() << std::endl;
+  deallog << std::numeric_limits<double>::signaling_NaN() << std::endl;
 
   return 0;
 }
