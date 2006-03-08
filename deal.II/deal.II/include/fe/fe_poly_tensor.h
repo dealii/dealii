@@ -62,7 +62,7 @@
  *
  * The use of the member data #inverse_node_matrix allows to compute
  * the basis $v_j$ automatically, after the node values
- * for ech original basis function of the polynomial space have been
+ * for each original basis function of the polynomial space have been
  * computed.
  *
  * Therefore, the constructor of a derived class should have a
