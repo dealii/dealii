@@ -258,6 +258,14 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p>Fixed: Writing a denormal "NaN" through <code
+       class="class">LogStream</code> objects such as 
+       <code class="member">deallog</code> erroneously printed zero, rather
+       than "nan". This is now fixed.
+       <br>
+       (Luca Heltai, WB 2006/03/07)
+       </p>
+
   <li> <p>Improved: The <code class="member">TableBase</code> base class of all
        the <code class="member">Table</code> classes had an
        <code>operator()</code> that takes a <code>TableIndices</code> object

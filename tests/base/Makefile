@@ -23,6 +23,7 @@ threads.cc : threads.pl
 	@$(PERL) $^ > $@
 
 tests_x =  logtest \
+	   log_nan \
 	   reference \
 	   quadrature_* qprojector \
 	   path_search \

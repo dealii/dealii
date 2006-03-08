@@ -416,7 +416,7 @@ LogStream &
 LogStream::operator<< (const T& t)
 {
 				   // do the work that is common to
-				   // the two operator<< functions
+				   // the operator<< functions
   print (t);
   return *this;
 }
@@ -427,9 +427,25 @@ inline
 LogStream &
 LogStream::operator<< (const double t)
 {
-				   // do the work that is common to
-				   // the two operator<< functions
-  if (std::fabs(t) > double_threshold)
+				   // for doubles, we want to make
+				   // sure that if a number is smaller
+				   // than a given threshold, then we
+				   // simply print zero (the default
+				   // threshold is zero, but can be
+				   // changed for automated testsuite
+				   // runs)
+                                   //
+                                   // we have to make sure that we
+                                   // don't catch NaN's and +-Inf's
+                                   // with the test, because for these
+                                   // denormals all comparisons are
+                                   // always false. thus, for a NaN,
+                                   // both t<=0 and t>=0 are false at
+                                   // the same time, which can't be
+                                   // said for any other number
+  if ((std::fabs(t) > double_threshold)
+      ||
+      (! (t<=0) && !(t>=0)))
     print (t);
   else
     print('0');
@@ -444,7 +460,7 @@ LogStream &
 LogStream::operator<< (std::ostream& (*p) (std::ostream&))
 {
 				   // do the work that is common to
-				   // the two operator<< functions
+				   // the operator<< functions
   print (p);
 
 				   // next check whether this is the
