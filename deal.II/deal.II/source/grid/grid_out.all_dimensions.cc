@@ -34,12 +34,12 @@ namespace GridOutFlags
     param.declare_entry("Write cells", "true", Patterns::Bool(),
 			"Write the mesh connectivity as DX grid cells");
     param.declare_entry("Write faces", "false", Patterns::Bool(),
-			"Write faces of cells. These may be boundary faces\n"
-			"or all faces between mesh cells, according to\n"
+			"Write faces of cells. These may be boundary faces "
+			"or all faces between mesh cells, according to "
 			"\"Write all faces\"");
     param.declare_entry("Write diameter", "false", Patterns::Bool(),
 			"If cells are written, additionally write their"
-			" diameter\nas data for visualization");
+			" diameter as data for visualization");
     param.declare_entry("Write measure", "false", Patterns::Bool(),
 			"Write the volume of each cell as data");
     param.declare_entry("Write all faces", "true", Patterns::Bool(),
@@ -136,7 +136,7 @@ namespace GridOutFlags
     param.declare_entry("Size by", "width",
 			    Patterns::Selection("width|height"),
 			"Depending on this parameter, either the"
-			"width or height\n"
+			"width or height "
 			"of the eps is scaled to \"Size\"");
     param.declare_entry("Size", "300", Patterns::Integer(),
 			"Size of the output in points");
@@ -145,7 +145,7 @@ namespace GridOutFlags
     param.declare_entry("Color by flag", "false", Patterns::Bool(),
 			"Draw lines with user flag set in different color");
     param.declare_entry("Boundary points", "2", Patterns::Integer(),
-			"Number of points on boundary edges.\n"
+			"Number of points on boundary edges. "
 			"Increase this beyond 2 to see curved boundaries.");
     param.declare_entry("Color by level", "false", Patterns::Bool(),
 			"Draw different colors according to grid level.");
@@ -253,7 +253,7 @@ namespace GridOutFlags
   void Eps<3>::declare_parameters (ParameterHandler& param)
   {
     param.declare_entry("Azimuth", "30", Patterns::Double(),
-			"Azimuth of the viw point, that is, the angle\n"
+			"Azimuth of the viw point, that is, the angle "
 			"in the plane from the x-axis.");
     param.declare_entry("Elevation", "30", Patterns::Double(),
 			"Elevation of the view point above the xy-plane.");    
@@ -264,7 +264,7 @@ namespace GridOutFlags
   {
     EpsFlagsBase::parse_parameters(param);
     azimut_angle = 90- param.get_double("Elevation");
-    turn_angle = param.get_double("Turn angle");
+    turn_angle = param.get_double("Azimuth");
   }
 
   
