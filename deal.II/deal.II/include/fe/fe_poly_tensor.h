@@ -57,7 +57,7 @@
  * <h4>Determining the correct basis</h4>
  *
  * In most cases, the set of desired node values $N_i$ and the basis
- * functions $v_j$ will not fulfil the interpolation condition
+ * functions $v_j$ will not fulfill the interpolation condition
  * $N_i(v_j) = \delta_{ij}$.
  *
  * The use of the member data #inverse_node_matrix allows to compute
