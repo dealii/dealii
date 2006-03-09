@@ -1903,7 +1903,7 @@ namespace QuasiStaticElasticity
 	    return old_cell;
 	}
       
-      private:
+    private:
       const unsigned int subdomain_id;
   };
 
