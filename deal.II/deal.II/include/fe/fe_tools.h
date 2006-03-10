@@ -58,6 +58,10 @@ class FETools
 {
   public:
 				     /**
+				      * @warning In most cases, you
+				      * will probably want to use
+				      * compute_base_renumbering().
+				      *
 				      * Compute the vector required to
 				      * renumber the dofs of a cell by
 				      * component. Furthermore,
@@ -84,6 +88,23 @@ class FETools
       std::vector<unsigned int>&               renumbering,
       std::vector<std::vector<unsigned int> >& start_indices);
 
+				     /**
+				      * Compute the vector required to
+				      * renumber the dofs of a cell by
+				      * block. Furthermore,
+				      * compute the vector storing the
+				      * start indices of each local block
+				      * vector.
+				      *
+				      * @todo Which way does this
+				      * vector map the numbers?
+				      */
+    template<int dim>
+    static void compute_block_renumbering (
+      const FiniteElement<dim>&  fe,
+      std::vector<unsigned int>& renumbering,
+      std::vector<unsigned int>& start_indices);
+    
 				     /**
 				      * @name Generation of local matrices
 				      * @{

@@ -198,6 +198,40 @@ void FETools::compute_component_wise(
 
 
 
+template<int dim>
+void FETools::compute_block_renumbering (
+  const FiniteElement<dim>& element,
+  std::vector<unsigned int>& renumbering,
+  std::vector<unsigned int>& start_indices)
+{
+  Assert(renumbering.size() == element.dofs_per_cell,
+	 ExcDimensionMismatch(renumbering.size(),
+			      element.dofs_per_cell));
+  Assert(start_indices.size() == element.n_blocks(),
+	 ExcDimensionMismatch(start_indices.size(),
+			      element.n_blocks()));
+  
+  unsigned int k=0;
+  unsigned int i=0;
+  for (unsigned int b=0;b<element.n_base_elements();++b)
+    for (unsigned int m=0;m<element.element_multiplicity(b);++m)
+      {
+	start_indices[i++] = k;
+	k += element.base_element(k).n_dofs_per_cell();
+      }
+  Assert (i == element.n_blocks(), ExcInternalError());
+  
+  for (unsigned int i=0;i<element.dofs_per_cell;++i)
+    {
+      std::pair<unsigned int, unsigned int>
+	indices = element.system_to_block_index(i);
+      renumbering[i] = start_indices[indices.first]
+		       +indices.second;
+    }
+}
+
+
+
 template <int dim, typename number>
 void FETools::get_interpolation_matrix (const FiniteElement<dim> &fe1,
                                         const FiniteElement<dim> &fe2,
