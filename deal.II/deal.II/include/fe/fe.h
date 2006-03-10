@@ -1209,7 +1209,16 @@ class FiniteElement : public Subscriptor,
 				      */
     std::pair<unsigned int,unsigned int>
     component_to_base (const unsigned int component) const;
-
+    
+    
+				     /**
+				      * Return the base element for
+				      * this block and the number of
+				      * the copy of the base element.
+				      */
+    std::pair<unsigned int,unsigned int>
+    block_to_base (const unsigned int block) const;
+    
 				     /**
 				      * The vector block and the index
 				      * inside the block for this
@@ -2310,6 +2319,23 @@ FiniteElement<dim>::component_to_base (const unsigned int index) const
 	 ExcIndexRange(index, 0, component_to_base_table.size()));
 
   return component_to_base_table[index];
+}
+
+
+template <int dim>  
+inline
+std::pair<unsigned int,unsigned int>
+FiniteElement<dim>::block_to_base (const unsigned int index) const
+{
+  Assert(index < this->n_blocks(),
+	 ExcIndexRange(index, 0, this->n_blocks()));
+  
+  for (int i=first_block_of_base_table.size()-1; i>=0; --i)
+    if (first_block_of_base_table[i] <= index)
+      return std::pair<unsigned int, unsigned int>((unsigned int) i,
+						   index - first_block_of_base_table[i]);
+  return std::make_pair(deal_II_numbers::invalid_unsigned_int,
+			deal_II_numbers::invalid_unsigned_int);
 }
 
 
