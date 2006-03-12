@@ -1,0 +1,46 @@
+*** stl_vector.h	2005-10-17 18:15:32.000000000 +0200
+--- stl_vector.orig.h	2005-10-10 21:30:22.000000000 +0200
+***************
+*** 492,503 ****
+         */
+        reference
+        operator[](size_type __n)
+!       {
+! #ifdef STL_DEBUG
+! 	if (__n >= this->size()) abort();
+! #endif
+! 	return *(begin() + __n);
+!       }
+  
+        /**
+         *  @brief  Subscript access to the data contained in the %vector.
+--- 492,498 ----
+         */
+        reference
+        operator[](size_type __n)
+!       { return *(begin() + __n); }
+  
+        /**
+         *  @brief  Subscript access to the data contained in the %vector.
+***************
+*** 512,523 ****
+         */
+        const_reference
+        operator[](size_type __n) const
+!       {
+! #ifdef STL_DEBUG
+! 	if (__n >= this->size()) abort();
+! #endif
+! 	return *(begin() + __n);
+!       }
+  
+      protected:
+        /// @if maint Safety check used only from at().  @endif
+--- 507,513 ----
+         */
+        const_reference
+        operator[](size_type __n) const
+!       { return *(begin() + __n); }
+  
+      protected:
+        /// @if maint Safety check used only from at().  @endif
