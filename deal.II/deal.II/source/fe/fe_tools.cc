@@ -217,7 +217,7 @@ void FETools::compute_block_renumbering (
     for (unsigned int m=0;m<element.element_multiplicity(b);++m)
       {
 	start_indices[i++] = k;
-	k += element.base_element(k).n_dofs_per_cell();
+	k += element.base_element(b).n_dofs_per_cell();
       }
   Assert (i == element.n_blocks(), ExcInternalError());
   
@@ -1838,6 +1838,10 @@ template
 void FETools::compute_component_wise(
   const FiniteElement<deal_II_dimension>& element,
   std::vector<unsigned int>&, std::vector<std::vector<unsigned int> >&);
+template
+void FETools::compute_block_renumbering (
+  const FiniteElement<deal_II_dimension>& element,
+  std::vector<unsigned int>&, std::vector<unsigned int>&_indices);
 template
 void FETools::get_interpolation_matrix<deal_II_dimension>
 (const FiniteElement<deal_II_dimension> &,
