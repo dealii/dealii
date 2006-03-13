@@ -84,15 +84,6 @@ Triangulation<dim>::~Triangulation ()
 template <int dim>
 void Triangulation<dim>::clear () 
 {
-//TODO:[WB] Why this assertion?
-// If we allow refinement with depending objects, we should also
-// allow changing the mesh completely.
-  
-				   // only allow this operation if
-				   // there are no subscribers any
-				   // more
-//  Assert (n_subscriptions() == 0, ExcInternalError());
-  
   clear_despite_subscriptions();
 }
 
