@@ -13,6 +13,7 @@
 
 #include <base/parameter_handler.h>
 #include <base/logstream.h>
+#include <base/path_search.h>
 #include <base/memory_consumption.h>
 #include <base/utilities.h>
 #include <fstream>
@@ -542,24 +543,36 @@ bool ParameterHandler::read_input (std::istream &input)
 
 
 
-bool ParameterHandler::read_input (const std::string &filename)
+bool ParameterHandler::read_input (const std::string &filename,
+				   bool optional,
+				   bool write_compact)
 {
-  std::ifstream input (filename.c_str());
-  if (!input) 
+  PathSearch search("PARAMETERS");
+  
+  try
+    {
+      std::string openname = search.find(filename);
+      std::ifstream input (openname.c_str());
+      if (!input) 
+	{
+	  AssertThrow(false, ExcInternalError());
+	}
+      return read_input (input);
+    }
+  catch (...)
     {
       std::cerr << "ParameterHandler::read_input: could not open file <"
-		<< filename << "> for reading." << std::endl
-		<< "Trying to make file <"
-		<< filename << "> with default values for you." << std::endl;
-
-      std::ofstream output (filename.c_str());
-      if (output)
-        print_parameters (output, Text);
-      
-      return false;
+		<< filename << "> for reading." << std::endl;
+      if (!optional)
+	{
+	  std:: cerr << "Trying to make file <"
+		     << filename << "> with default values for you." << std::endl;
+	  std::ofstream output (filename.c_str());
+	  if (output)
+	    print_parameters (output, (write_compact ? ShortText : Text));
+	}
     }
-  
-  return read_input (input);
+  return false;
 }
 
 
@@ -844,10 +857,6 @@ std::ostream &
 ParameterHandler::print_parameters (std::ostream     &out,
                                     const OutputStyle style)
 {
-				   // assert that only known formats are
-				   // given as "style"
-  Assert ((style == Text) || (style == LaTeX), ExcNotImplemented());
-
   AssertThrow (out, ExcIO());
   
   switch (style) 
@@ -862,6 +871,8 @@ ParameterHandler::print_parameters (std::ostream     &out,
 	    out << "\\begin{itemize}"
 	        << std::endl;
 	    break;
+      case ShortText:
+	break;
       default:
 	    Assert (false, ExcNotImplemented());
     };
@@ -872,6 +883,7 @@ ParameterHandler::print_parameters (std::ostream     &out,
   switch (style) 
     {
       case Text:
+      case ShortText:
 	    break;
       case LaTeX:
 	    out << "\\end{itemize}" << std::endl;
@@ -884,15 +896,16 @@ ParameterHandler::print_parameters (std::ostream     &out,
 }
 
 
+// Print a section in the desired style. The styles are separated into
+// several verbosity classes depending on the higher bits.
+//
+// If bit 7 (128) is set, comments are not printed.
+// If bit 6 (64) is set, default values after change are not printed.
 void
 ParameterHandler::print_parameters_section (std::ostream      &out,
                                             const OutputStyle  style,
                                             const unsigned int indent_level)
 {
-				   // assert that only known formats are
-				   // given as "style"
-  Assert ((style == Text) || (style == LaTeX), ExcNotImplemented());
-
   AssertThrow (out, ExcIO());
 
   Section *pd = get_present_defaults_subsection ();
@@ -904,10 +917,11 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
   switch (style) 
     {
       case Text:
-      {
-                                         // first find out the longest
-                                         // entry name to be able to
-                                         // align the equal signs
+      case ShortText:
+    {
+				       // first find out the longest
+				       // entry name to be able to
+				       // align the equal signs
         unsigned int longest_name = 0;
         for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
           if (ptr->first.length() > longest_name)
@@ -956,7 +970,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                                              // chunks such that the whole
                                              // thing is at most 78 characters
                                              // wide
-            if (pd->entries[ptr->first].has_documentation())
+            if ((!style & 128) && pd->entries[ptr->first].has_documentation())
               {
                 if (ptr != pd->entries.begin())
                   out << std::endl;
@@ -987,7 +1001,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                                              // default value, but
                                              // only if it differs
                                              // from the actual value
-            if (value != pd->entries[ptr->first].value)
+            if ((!style & 64) && value != pd->entries[ptr->first].value)
               {
                 out << std::setw(longest_value-value.length()+1) << " "
                     << "# ";
@@ -1041,7 +1055,9 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                                    // subsection; also make sure that the
                                    // subsections will be printed at all
                                    // (i.e. at least one of them is non-empty)
-  if ((pd->entries.size() != 0)
+  if ((!style & 128)
+      &&
+      (pd->entries.size() != 0)
       &&
       (pd->subsections.size() != 0)
       &&
@@ -1060,6 +1076,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
         switch (style) 
           {
             case Text:
+	    case ShortText:
                   out << std::setw(indent_level*2) << ""
                       << "subsection " << ptrss->first << std::endl;
                   break;
@@ -1082,21 +1099,27 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
         leave_subsection ();
         switch (style) 
           {
-            case Text:
-                                                   // write end of
-                                                   // subsection. one
-                                                   // blank line after
-                                                   // each subsection
-                  out << std::setw(indent_level*2) << ""
-                      << "end" << std::endl
-                      << std::endl;
-
-                                                   // if this is a toplevel
-                                                   // subsection, then have two
-                                                   // newlines
-                  if (indent_level == 0)
-                    out << std::endl;
-		
+	    case Text:
+					       // write end of
+					       // subsection. one
+					       // blank line after
+					       // each subsection
+	      out << std::setw(indent_level*2) << ""
+		  << "end" << std::endl
+		  << std::endl;
+	      
+					       // if this is a toplevel
+					       // subsection, then have two
+					       // newlines
+	      if (indent_level == 0)
+		out << std::endl;
+	      
+	      break;
+	    case ShortText:
+					       // write end of
+					       // subsection.
+	      out << std::setw(indent_level*2) << ""
+		  << "end" << std::endl;
                   break;
             case LaTeX:
                   out << "\\end{itemize}"
@@ -1471,9 +1494,11 @@ bool MultipleParameterLoop::read_input (std::istream &input)
 
 
 
-bool MultipleParameterLoop::read_input (const std::string &filename)
+bool MultipleParameterLoop::read_input (const std::string &filename,
+					bool optional,
+					bool write_compact)
 {
-  return ParameterHandler::read_input (filename);
+  return ParameterHandler::read_input (filename, optional, write_compact);
 				   // don't call init_branches, since this read_input
 				   // function calls
 				   // MultipleParameterLoop::Readinput(std::istream &, std::ostream &)

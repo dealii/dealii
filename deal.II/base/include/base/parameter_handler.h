@@ -1228,22 +1228,34 @@ class ParameterHandler : public Subscriptor
 				     /**
 				      * List of possible output
 				      * formats.
+				      *
+				      * The formats down the list with
+				      * prefix <em>Short</em> and bit
+				      * 6 and 7 set reproduce the old
+				      * behavior of not writing
+				      * comments or original values to
+				      * the files.
 				      */
     enum OutputStyle {
 					   /**
-					    * Write human readable output.
+					    * Write human readable
+					    * output suitable to be
+					    * read by ParameterHandler
+					    * again.
 					    */
-	  Text,
+	  Text = 1,
 					   /**
 					    * Write paramteters as a
 					    * LaTeX table.
 					    */
-	  LaTeX,
+	  LaTeX = 2,
 					   /**
-					    * Write parameters as an
-					    * HTML table.
+					    * Write input for
+					    * ParameterHandler without
+					    * comments or changed
+					    * default values.
 					    */
-	  HTML
+	  ShortText = 193
     };
 
 
@@ -1275,18 +1287,26 @@ class ParameterHandler : public Subscriptor
     
     				     /**
 				      * Read input from a file the
-				      * name of which is given.
+				      * name of which is given. The
+				      * PathSearch class "PARAMETERS"
+				      * is used to find the file.
 				      *
 				      * Return whether the read was
 				      * successful.
 				      *
-				      * This function will
-				      * automatically generate the
-				      * requested file with default
-				      * values if the file did not
-				      * exist.
+				      * Unless <tt>optional</tt> is
+				      * <tt>true</tt>, this function
+				      * will automatically generate
+				      * the requested file with
+				      * default values if the file did
+				      * not exist. This file will not
+				      * contain additional comments if
+				      * <tt>write_stripped_file</tt>
+				      * is <tt>true</tt>.
 				      */
-    virtual bool read_input (const std::string &filename);
+    virtual bool read_input (const std::string &filename,
+			     const bool optional = false,
+			     const bool write_stripped_file = false);
     
     				     /**
 				      * Read input from a string in
@@ -2018,17 +2038,10 @@ class MultipleParameterLoop : public ParameterHandler
 				      */
     virtual ~MultipleParameterLoop ();
 
-    				     /**
-				      * Read input from a stream until stream
-				      * returns <tt>eof</tt> condition or error.
-				      */
-    virtual bool read_input (std::istream &Input);
-    
-    				     /**
-				      * Read input from a file the name of which
-				      * is given.
-				      */
-    virtual bool read_input (const std::string &FileName);
+    virtual bool read_input (std::istream &Input);    
+    virtual bool read_input (const std::string &FileName,
+			     const bool optional = false,
+			     const bool write_stripped_file = false);
     
     				     /**
 				      * Read input from a string in memory. The
