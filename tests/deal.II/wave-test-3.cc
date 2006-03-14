@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    std::copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by Wolfgang Bangerth
+//    std::copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by Wolfgang Bangerth
 //
 //    This file is subject to QPL and may not be  distributed
 //    without std::copyright and license information. Please refer
@@ -5756,9 +5756,6 @@ void TimeStep_ErrorEstimation<dim>::estimate_error_dual () {
 			     primal_cell_old, dual_cell_old,
 			     cellwise_error,
 			     fe_values);
-
-      Assert (cellwise_error.next_free_slot == &*cellwise_error.errors.end(),
-	      ::ExcInternalError());
     };
 
   ErrorOnCell total_estimated_error;
