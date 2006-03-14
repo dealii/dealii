@@ -259,12 +259,18 @@ inconvenience this causes.
 
 <ol>
 
+  <li> <p> Improved: If the C++ runtime environment allows it, we now
+       demangle stacktraces generated whenever an exception is thrown.
+       <br>
+       (WB 2006/03/14)
+       </p>
+
   <li> <p> Improved: The function <code class="class">Subscriptor</code>::<code
-  class="member">list_subscribers</code> logs all current subscribers of an
-  object to <tt>deallog</tt>.
-  <br>
-  (GK 2006/03/08)
-  </p>
+       class="member">list_subscribers</code> logs all current subscribers of an
+       object to <tt>deallog</tt>.
+       <br>
+       (GK 2006/03/08)
+       </p>
 
   <li> <p>Fixed: Writing a denormal "NaN" through <code
        class="class">LogStream</code> objects such as 

@@ -22,6 +22,10 @@
 #  include <execinfo.h>
 #endif
 
+#ifdef HAVE_LIBSTDCXX_DEMANGLER
+#  include <cxxabi.h>
+#endif
+
 
 namespace deal_II_exceptions
 {
@@ -154,10 +158,67 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 				    // output the rest
    const unsigned int first_significant_frame = frame;
    for (; frame < n_stacktrace_frames; ++frame)
-     out << '#' << frame - first_significant_frame
-         << "  "
-         << stacktrace[frame]
-         << std::endl;
+     {
+       out << '#' << frame - first_significant_frame
+	   << "  ";
+
+					// the stacktrace frame is
+					// actually of the format
+					// "filename(functionname+offset)
+					// [address]". let's try to
+					// get the mangled
+					// functionname out:
+       std::string stacktrace_entry (stacktrace[frame]);
+       const unsigned int pos_start = stacktrace_entry.find('('),
+			  pos_end   = stacktrace_entry.find('+');
+       std::string functionname = stacktrace_entry.substr (pos_start+1,
+							   pos_end-pos_start-1);
+
+					// demangle, and if successful
+					// replace old mangled string
+					// by unmangled one (skipping
+					// address and offset). treat
+					// "main" differently, since
+					// it is apparently demangled
+					// as "unsigned int" for
+					// unknown reasons :-)
+					// if we can, demangle the
+					// function name
+#ifdef HAVE_LIBSTDCXX_DEMANGLER
+       int     status;
+       char   *realname;
+
+       realname = abi::__cxa_demangle(functionname.c_str(), 0, 0, &status);
+       if ((status == 0) && (functionname != "main"))
+	 stacktrace_entry = stacktrace_entry.substr(0, pos_start)
+			    +
+			    ": "
+			    +
+			    realname;
+       else
+	 stacktrace_entry = stacktrace_entry.substr(0, pos_start)
+			    +
+			    ": "
+			    +
+			    functionname;
+
+					// free memory allocated by
+					// the demangler
+       free (realname);
+
+#else	 
+
+       stacktrace_entry = stacktrace_entry.substr(0, pos_start)
+			  +
+			  ": "
+			  +
+			  functionname;
+#endif
+       
+					// then output what we have
+       out << stacktrace_entry
+	   << std::endl;
+     }
 }
 
 
