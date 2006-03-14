@@ -3057,7 +3057,7 @@ DoFTools::compute_intergrid_constraints (
 		break;
 	    }
 
-	  Assert (col_entry != weights[0].end(), ExcInternalError());
+	  Assert (col_entry != weights[first_used_row].end(), ExcInternalError());
 	    
 	  if ((col_entry->second == 1) &&
 	      (representants[first_used_row] == static_cast<int>(global_dof)))
