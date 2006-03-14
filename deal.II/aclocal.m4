@@ -4171,8 +4171,8 @@ AC_DEFUN(DEAL_II_HAVE_GLIBC_STACKTRACE, dnl
     [
       AC_MSG_RESULT(yes)
       AC_DEFINE(HAVE_GLIBC_STACKTRACE, 1, 
-                [Define if deal.II is linked against the GNU C library,
-                 which provides stacktrace debug information that can be
+                [Define if deal.II is linked against a libc that
+                 provides stacktrace debug information that can be
                  printed out in the exception class])
 
       AC_MSG_CHECKING(whether compiler accepts -rdynamic)
@@ -4188,6 +4188,68 @@ AC_DEFUN(DEAL_II_HAVE_GLIBC_STACKTRACE, dnl
         [
           AC_MSG_RESULT(no)
         ])
+    ],
+    [
+      AC_MSG_RESULT(no)
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Check whether the compiler offers a way to demangle symbols
+dnl from within the program. Used inside the exception stacktrace
+dnl mechanism.
+dnl
+dnl The example code is taken from
+dnl   http://gcc.gnu.org/onlinedocs/libstdc++/18_support/howto.html#6
+dnl
+dnl Usage: DEAL_II_HAVE_DEMANGLER
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_HAVE_DEMANGLER, dnl
+[
+  AC_MSG_CHECKING(for libstdc++ demangler)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_LINK(
+    [
+#include <exception>
+#include <iostream>
+#include <cxxabi.h>
+
+struct empty { };
+
+template <typename T, int N>
+  struct bar { };
+    ],
+    [
+  int     status;
+  char   *realname;
+
+  // exception classes not in <stdexcept>, thrown by the implementation
+  // instead of the user
+  std::bad_exception  e;
+  realname = abi::__cxa_demangle(e.what(), 0, 0, &status);
+  std::cout << e.what() << "\t=> " << realname << "\t: " << status << '\n';
+  free(realname);
+
+
+  // typeid
+  bar<empty,17>          u;
+  const std::type_info  &ti = typeid(u);
+
+  realname = abi::__cxa_demangle(ti.name(), 0, 0, &status);
+  std::cout << ti.name() << "\t=> " << realname << "\t: " << status << '\n';
+  free(realname);
+
+  return 0;
+    ],
+    [
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_LIBSTDCXX_DEMANGLER, 1, 
+                [Define if the std c++ library provides a demangler conforming
+                 to the GCC libstdc++ interface.])
     ],
     [
       AC_MSG_RESULT(no)
