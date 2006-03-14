@@ -218,6 +218,10 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 					// then output what we have
        out << stacktrace_entry
 	   << std::endl;
+
+					// stop if we're in main()
+       if (functionname == "main")
+	 break;
      }
 }
 
