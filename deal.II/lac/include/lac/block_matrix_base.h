@@ -465,20 +465,23 @@ class BlockMatrixBase : public Subscriptor
 				      * Set the element <tt>(i,j)</tt>
 				      * to <tt>value</tt>. Throws an
 				      * error if the entry does not
-				      * exist. Still, it is allowed to
-				      * store zero values in
-				      * non-existent fields.
+				      * exist or if <tt>value</tt> is
+				      * not a finite number. Still, it
+				      * is allowed to store zero
+				      * values in non-existent fields.
 				      */
     void set (const unsigned int i,
 	      const unsigned int j,
 	      const value_type value);
     
 				     /**
-				      * Add <tt>value</tt> to the element
-				      * <tt>(i,j)</tt>.  Throws an error if
-				      * the entry does not
-				      * exist. Still, it is allowed to
-				      * store zero values in
+				      * Add <tt>value</tt> to the
+				      * element <tt>(i,j)</tt>.
+				      * Throws an error if the entry
+				      * does not exist or if
+				      * <tt>value</tt> is not a finite
+				      * number. Still, it is allowed
+				      * to store zero values in
 				      * non-existent fields.
 				      */
     void add (const unsigned int i,
@@ -1569,6 +1572,10 @@ BlockMatrixBase<MatrixType>::set (const unsigned int i,
                                   const unsigned int j,
                                   const value_type value)
 {
+
+  Assert (deal_II_numbers::is_finite(value), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   const std::pair<unsigned int,unsigned int>
     row_index = row_block_indices.global_to_local (i),
     col_index = column_block_indices.global_to_local (j);
@@ -1586,6 +1593,10 @@ BlockMatrixBase<MatrixType>::add (const unsigned int i,
                                   const unsigned int j,
                                   const value_type value)
 {
+
+  Assert (deal_II_numbers::is_finite(value), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
                                    // save some cycles for zero additions, but
                                    // only if it is safe for the matrix we are
                                    // working with

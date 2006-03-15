@@ -338,7 +338,10 @@ namespace PETScWrappers
 					* contrast to the SparseMatrix
 					* class which throws an error
 					* if the entry does not exist.
-                                        */
+					* If <tt>value</tt> is not a
+					* finite number an exception
+					* is thrown.
+					*/
       void set (const unsigned int i,
                 const unsigned int j,
                 const PetscScalar value);
@@ -357,6 +360,9 @@ namespace PETScWrappers
 					* contrast to the SparseMatrix
 					* class which throws an error
 					* if the entry does not exist.
+					* If <tt>value</tt> is not a
+					* finite number an exception
+					* is thrown.
                                         */
       void add (const unsigned int i,
                 const unsigned int j,

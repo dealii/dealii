@@ -1842,6 +1842,10 @@ BlockVectorBase<VectorType>::operator -= (const BlockVectorBase<VectorType>& v)
 template <class VectorType>
 void BlockVectorBase<VectorType>::add (const value_type a)
 {
+
+  Assert (deal_II_numbers::is_finite(a), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   for (unsigned int i=0;i<n_blocks();++i)
     {
       components[i].add(a);
@@ -1868,6 +1872,10 @@ template <class VectorType>
 void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType>& v)
 {
+
+  Assert (deal_II_numbers::is_finite(a), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
@@ -1885,6 +1893,12 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const value_type b,
                                        const BlockVectorBase<VectorType>& w)
 {
+
+  Assert (deal_II_numbers::is_finite(a), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (deal_II_numbers::is_finite(b), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   Assert (n_blocks() == w.n_blocks(),
@@ -1903,6 +1917,10 @@ template <class VectorType>
 void BlockVectorBase<VectorType>::sadd (const value_type x,
                                         const BlockVectorBase<VectorType>& v)
 {
+
+  Assert (deal_II_numbers::is_finite(x), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
@@ -1918,6 +1936,12 @@ template <class VectorType>
 void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType>& v)
 {
+
+  Assert (deal_II_numbers::is_finite(x), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (deal_II_numbers::is_finite(a), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
@@ -1935,6 +1959,14 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const value_type b,
                                         const BlockVectorBase<VectorType>& w)
 {
+
+  Assert (deal_II_numbers::is_finite(x), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (deal_II_numbers::is_finite(a), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (deal_II_numbers::is_finite(b), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   Assert (n_blocks() == w.n_blocks(),
@@ -1956,6 +1988,16 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const value_type c,
                                         const BlockVectorBase<VectorType>& y)
 {
+
+  Assert (deal_II_numbers::is_finite(x), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (deal_II_numbers::is_finite(a), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (deal_II_numbers::is_finite(b), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (deal_II_numbers::is_finite(c), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));  
   Assert (n_blocks() == w.n_blocks(),
@@ -1990,6 +2032,12 @@ void BlockVectorBase<VectorType>::equ (const value_type a,
                                        const value_type b,
                                        const BlockVectorBase<VectorType>& w)
 {
+
+  Assert (deal_II_numbers::is_finite(a), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (deal_II_numbers::is_finite(b), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   Assert (n_blocks() == w.n_blocks(),
@@ -2007,6 +2055,10 @@ template <class BlockVector2>
 void BlockVectorBase<VectorType>::equ (const value_type    a,
                                        const BlockVector2 &v)
 {
+
+  Assert (deal_II_numbers::is_finite(a), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
@@ -2019,6 +2071,10 @@ template <class VectorType>
 BlockVectorBase<VectorType>&
 BlockVectorBase<VectorType>::operator = (const value_type s)
 {
+
+  Assert (deal_II_numbers::is_finite(s), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] = s;
     
@@ -2081,6 +2137,10 @@ inline
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator *= (const value_type factor)
 {
+
+  Assert (deal_II_numbers::is_finite(factor), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] *= factor;
 
@@ -2094,6 +2154,11 @@ inline
 BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator /= (const value_type factor)
 {
+
+  Assert (deal_II_numbers::is_finite(factor), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (factor > 0., ExcZero() );
+
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] /= factor;
 

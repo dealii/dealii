@@ -410,6 +410,16 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: All matrix (and some vector) classes now check whether
+       entries written into them represent finite floating point
+       values. This should catch some bugs earlier where one writes
+       infinite or NaN values into a matrix only to realize later that
+       the linear solver fails.
+       <br>
+       (Stephan Kramer, WB 2006/03/15)
+       </p>  
+
+  <li> <p>
        Changed: There are new <code
        class="class">FullMatrix</code>::<code
        class="member">equ</code> functions which assign <tt>this</tt>

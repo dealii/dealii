@@ -461,6 +461,9 @@ class SparseMatrixEZ : public Subscriptor
 				      * @p value. Allocates the entry,
 				      * if it does not exist and
 				      * @p value is non-zero.
+				      * If <tt>value</tt> is not a
+				      * finite number an exception
+				      * is thrown.
 				      */
     void set (const unsigned int i, const unsigned int j,
 	      const number value);
@@ -470,6 +473,9 @@ class SparseMatrixEZ : public Subscriptor
 				      * <tt>(i,j)</tt>. Allocates the entry
 				      * if it does not exist. Filters
 				      * out zeroes automatically.
+				      * If <tt>value</tt> is not a
+				      * finite number an exception
+				      * is thrown.
 				      */
     void add (const unsigned int i, const unsigned int j,
 	      const number value);
@@ -1474,6 +1480,10 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
 				  const unsigned int j,
 				  const number value)
 {
+
+  Assert (deal_II_numbers::is_finite(value), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
 
@@ -1500,6 +1510,10 @@ void SparseMatrixEZ<number>::add (const unsigned int i,
 				  const unsigned int j,
 				  const number value)
 {
+
+  Assert (deal_II_numbers::is_finite(value), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
 

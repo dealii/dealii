@@ -214,12 +214,13 @@ class BlockSparseMatrixEZ : public Subscriptor
     unsigned int n () const;
 
 				     /**
-				      * Set the element <tt>(i,j)</tt> to
-				      * @p value.  Throws an error if
-				      * the entry does not
-				      * exist. Still, it is allowed to
-				      * store zero values in
-				      * non-existent fields.
+				      * Set the element <tt>(i,j)</tt>
+				      * to @p value.  Throws an error
+				      * if the entry does not exist or
+				      * if <tt>value</tt> is not a
+				      * finite number. Still, it is
+				      * allowed to store zero values
+				      * in non-existent fields.
 				      */
     void set (const unsigned int i,
 	      const unsigned int j,
@@ -227,11 +228,12 @@ class BlockSparseMatrixEZ : public Subscriptor
     
 				     /**
 				      * Add @p value to the element
-				      * <tt>(i,j)</tt>.  Throws an error if
-				      * the entry does not
-				      * exist. Still, it is allowed to
-				      * store zero values in
-				      * non-existent fields.
+				      * <tt>(i,j)</tt>.  Throws an
+				      * error if the entry does not
+				      * exist or if <tt>value</tt> is
+				      * not a finite number. Still, it
+				      * is allowed to store zero
+				      * values in non-existent fields.
 				      */
     void add (const unsigned int i, const unsigned int j,
 	      const Number value);
@@ -415,6 +417,10 @@ BlockSparseMatrixEZ<Number>::set (const unsigned int i,
 				  const unsigned int j,
 				  const Number value)
 {
+
+  Assert (deal_II_numbers::is_finite(value), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   const std::pair<unsigned int,unsigned int>
     row_index = row_indices.global_to_local (i),
     col_index = column_indices.global_to_local (j);
@@ -432,6 +438,10 @@ BlockSparseMatrixEZ<Number>::add (const unsigned int i,
 				  const unsigned int j,
 				  const Number value)
 {
+
+  Assert (deal_II_numbers::is_finite(value), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   const std::pair<unsigned int,unsigned int>
     row_index = row_indices.global_to_local (i),
     col_index = column_indices.global_to_local (j);

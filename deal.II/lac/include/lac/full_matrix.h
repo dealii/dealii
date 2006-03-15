@@ -1258,6 +1258,8 @@ inline
 number
 FullMatrix<number>::Accessor::value() const
 {
+  Assert (deal_II_numbers::is_finite( matrix->el(a_row, a_col) ), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
   return matrix->el(a_row, a_col);
 }
 

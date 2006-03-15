@@ -686,9 +686,10 @@ class SparseMatrix : public virtual Subscriptor
 				      * Set the element (<i>i,j</i>)
 				      * to <tt>value</tt>. Throws an
 				      * error if the entry does not
-				      * exist. Still, it is allowed to
-				      * store zero values in
-				      * non-existent fields.
+				      * exist or if <tt>value</tt> is
+				      * not a finite number. Still, it
+				      * is allowed to store zero
+				      * values in non-existent fields.
 				      */
     void set (const unsigned int i,
               const unsigned int j,
@@ -710,9 +711,10 @@ class SparseMatrix : public virtual Subscriptor
 				      * Add <tt>value</tt> to the
 				      * element (<i>i,j</i>).  Throws
 				      * an error if the entry does not
-				      * exist. Still, it is allowed to
-				      * store zero values in
-				      * non-existent fields.
+				      * exist or if <tt>value</tt> is
+				      * not a finite number. Still, it
+				      * is allowed to store zero
+				      * values in non-existent fields.
 				      */
     void add (const unsigned int i,
               const unsigned int j,
@@ -1746,6 +1748,10 @@ void SparseMatrix<number>::set (const unsigned int i,
 				const unsigned int j,
 				const number value)
 {
+
+  Assert (deal_II_numbers::is_finite(value), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (cols != 0, ExcNotInitialized());
 				   // it is allowed to set elements of
 				   // the matrix that are not part of
@@ -1768,6 +1774,10 @@ void SparseMatrix<number>::add (const unsigned int i,
 				const unsigned int j,
 				const number value)
 {
+
+  Assert (deal_II_numbers::is_finite(value), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   Assert (cols != 0, ExcNotInitialized());
 
   const unsigned int index = cols->operator()(i,j);

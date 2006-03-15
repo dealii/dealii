@@ -842,6 +842,9 @@ template <typename Number>
 inline
 Vector<Number> & Vector<Number>::operator = (const Number s)
 {
+  Assert (deal_II_numbers::is_finite(s), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  
   if (s != 0.)
     Assert (vec_size!=0, ExcEmptyObject());
   if (vec_size!=0)
@@ -924,6 +927,10 @@ template <typename Number>
 inline
 Vector<Number> & Vector<Number>::operator *= (const Number factor)
 {
+
+  Assert (deal_II_numbers::is_finite(factor), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+
   scale (factor);
   return *this;
 }
@@ -934,6 +941,10 @@ template <typename Number>
 inline
 Vector<Number> & Vector<Number>::operator /= (const Number factor)
 {
+  Assert (deal_II_numbers::is_finite(factor), 
+          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (factor > 0., ExcZero() );
+
   *this *= (1./factor);
   return *this;
 }
