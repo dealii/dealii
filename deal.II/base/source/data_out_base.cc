@@ -127,16 +127,25 @@ compute_node(
 // Compute n^dim, where dim is a template parameter
 template<int dim>
 inline
-unsigned int template_power(const unsigned int n)
+unsigned int template_power (const unsigned int n)
 {
   Assert (dim>0, ExcNotImplemented());
-				   // The argument already contains the first power.
-  if (dim==1) return n;
-				   // Else, we must compute.
-  unsigned int result = n;  
-  for (unsigned int d=1;d<dim;++d)
-    result *= n;
-  return result;
+  switch (dim)
+    {
+      case 1:
+	    return n;
+      case 2:
+	    return n*n;
+      case 3:
+	    return n*n*n;
+      case 4:
+	    return n*n*n*n;
+      default:
+	    unsigned int result = n;  
+	    for (unsigned int d=1;d<dim;++d)
+	      result *= n;
+	    return result;
+    }
 }
 
 
