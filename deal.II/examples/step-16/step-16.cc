@@ -306,7 +306,6 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-				   // 
   typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
 					    endc = mg_dof_handler.end();
   for (; cell!=endc; ++cell)
