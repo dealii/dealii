@@ -700,6 +700,8 @@ namespace deal_II_numbers {
 				              */
   bool is_finite (const double x);
 }
+
+#endif
 ])
 
 
