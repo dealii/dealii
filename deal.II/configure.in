@@ -204,6 +204,7 @@ DEAL_II_CHECK_MIN_VECTOR_CAPACITY
 DEAL_II_CHECK_ABORT
 DEAL_II_CHECK_GETRUSAGE
 DEAL_II_CHECK_ISNAN
+DEAL_II_CHECK_ISFINITE
 DEAL_II_CHECK_RAND_R
 DEAL_II_CHECK_QUAD_DEFINE
 DEAL_II_CHECK_ERROR_CODES_DEFINITION
@@ -689,8 +690,16 @@ namespace deal_II_numbers {
                                               * 1/sqrt(2)
                                               */
   static const double  SQRT1_2 = 0.70710678118654752440;
+
+				             /**
+				              * Return @p true if the given
+				              * value is a finite floating point
+				              * number, i.e. is neither plus or
+				              * minus infinity nor NaN (not a
+				              * number).
+				              */
+  bool is_finite (const double x);
 }
-#endif
 ])
 
 

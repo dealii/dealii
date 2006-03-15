@@ -2175,6 +2175,41 @@ AC_DEFUN(DEAL_II_CHECK_ISNAN_FLAG, dnl
 
 
 dnl -------------------------------------------------------------
+dnl See if the isfinite function is available in namespace std
+dnl (this function is C99 and therefore not part of C++98, but
+dnl some implementations provide it nevertheless).
+dnl
+dnl Usage: DEAL_II_CHECK_ISFINITE
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_ISFINITE, dnl
+[
+  AC_MSG_CHECKING(for std::isfinite)
+  AC_LANG(C++)
+  CXXFLAGS=$CXXFLAGSG
+  AC_TRY_COMPILE(
+    [
+#include <cmath>
+    ],
+    [
+	double d=0;
+	std::isfinite (d);
+    ],
+    [
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(DEAL_II_HAVE_ISFINITE, 1,
+                  [Defined if std::isfinite is available])
+    ],
+    [
+        AC_MSG_RESULT(no)
+    ])
+])
+
+
+
+
+
+dnl -------------------------------------------------------------
 dnl rand_r is defined for some compiler flag combinations, but not for
 dnl others. check that. note that since these are C++ flags, we can't
 dnl just use AC_CHECK_FUNCS
