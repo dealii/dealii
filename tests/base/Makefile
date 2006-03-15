@@ -40,7 +40,8 @@ tests_x =  logtest \
            hierarchical \
 	   data_out_base* \
 	   function_parser \
-	   utilities_*
+	   utilities_* \
+	   is_finite
 
 # from above list of regular expressions, generate the real set of
 # tests
