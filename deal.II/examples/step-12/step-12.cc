@@ -549,7 +549,7 @@ void DGTransportEquation<dim>::assemble_face_term2(
 				 // proceed with the main part of this
 				 // program. The main class, here
 				 // called ``DGMethod'' is basically
-				 // the main class of step 6. One of
+				 // the main class of step-6. One of
 				 // the differences is that there's no
 				 // ConstraintMatrix object. This is,
 				 // because there are no hanging node
@@ -1473,13 +1473,13 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 				 // that computes the approximate
 				 // gradients in a way similar to the
 				 // ``GradientEstimation'' described
-				 // in Step 9 of this tutorial. In
+				 // in step-9 of this tutorial. In
 				 // fact, the
 				 // ``DerivativeApproximation'' class
 				 // was developed following the
 				 // ``GradientEstimation'' class of
-				 // Step 9. Relating to the
-				 // discussion in Step 9, here we
+				 // step-9. Relating to the
+				 // discussion in step-9, here we
 				 // consider $h^{1+d/2}|\nabla_h
 				 // u_h|$. Futhermore we note that we
 				 // do not consider approximate second
