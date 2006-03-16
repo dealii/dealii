@@ -118,9 +118,9 @@ namespace QuasiStaticElasticity
                                    // between the stress and the strain in
                                    // elasticity. It is given by a tensor of
                                    // rank 4 that is usually written in the
-                                   // form ``C_{ijkl} = \mu (\delta_{ik}
+                                   // form $C_{ijkl} = \mu (\delta_{ik}
                                    // \delta_{jl} + \delta_{il} \delta_{jk}) +
-                                   // \lambda \delta_{ij} \delta_{kl}''. This
+                                   // \lambda \delta_{ij} \delta_{kl}$. This
                                    // tensor maps symmetric tensor of rank 2
                                    // to symmetric tensors of rank 2. A
                                    // function implementing its creation for
@@ -2166,7 +2166,7 @@ namespace QuasiStaticElasticity
     pcout << "Timestep " << timestep_no << " at time " << present_time
 	  << std::endl;
   
-    for (unsigned int cycle=0; cycle<2; ++cycle)
+    for (unsigned int cycle=0; cycle<3; ++cycle)
       {
 	pcout << "  Cycle " << cycle << ':' << std::endl;
 
