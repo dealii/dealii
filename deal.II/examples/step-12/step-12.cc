@@ -509,7 +509,7 @@ void DGTransportEquation<dim>::assemble_face_term2(
 					   // We additionally assemble
 					   // the term $(\beta\cdot n
 					   // u,\hat v)_{\partial
-					   // \kappa_+},
+					   // \kappa_+}$,
 	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
 	    for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
 	      ui_ve_matrix(k,j) -= beta_n *
