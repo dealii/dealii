@@ -1287,7 +1287,7 @@ namespace LaplaceSolver
                                          // overwriting their
                                          // respective
                                          // work. Previously, we have
-                                         // used the `acquire'' and
+                                         // used the ``acquire'' and
                                          // ``release'' functions of
                                          // the mutex to lock and
                                          // unlock the mutex,
