@@ -17,7 +17,7 @@ all: default
 
 
 # specific targets
-doxygen:
+doxygen: tutorial
 	cd doxygen ; rm -f *.tag ; $(MAKE)
 
 tutorial:
