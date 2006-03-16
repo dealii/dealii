@@ -2166,7 +2166,7 @@ namespace QuasiStaticElasticity
     pcout << "Timestep " << timestep_no << " at time " << present_time
 	  << std::endl;
   
-    for (unsigned int cycle=0; cycle<3; ++cycle)
+    for (unsigned int cycle=0; cycle<2; ++cycle)
       {
 	pcout << "  Cycle " << cycle << ':' << std::endl;
 
