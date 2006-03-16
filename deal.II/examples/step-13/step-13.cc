@@ -1768,7 +1768,7 @@ namespace LaplaceSolver
 				 //
 				 // For this example, let us choose as
 				 // exact solution the function
-				 // u(x,y)=exp(x+sin(10y+5x^2)). In more
+				 // $u(x,y)=exp(x+sin(10y+5x^2))$. In more
 				 // than two dimensions, simply repeat
 				 // the sine-factor with ``y''
 				 // replaced by ``z'' and so on. Given
