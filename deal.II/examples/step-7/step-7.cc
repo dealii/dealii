@@ -523,7 +523,7 @@ class HelmholtzProblem
 				     // ``DoFHandler'', and a base
 				     // class of the ``FiniteElement''
 				     // class are derived from
-				     // ``Subscriptor``. This latter
+				     // ``Subscriptor''. This latter
 				     // class does not offer much
 				     // functionality, but it has a
 				     // built-in counter which we can
