@@ -814,7 +814,7 @@ void DGMethod<dim>::assemble_system1 ()
 				   // `ue and vi terms'. Here we
 				   // recall the convention that `ui'
 				   // is the shortcut for $u_h^+$ and
-				   // `ue' represents $u_h_-$, see the
+				   // `ue' represents $u_h^-$, see the
 				   // introduction.
   FullMatrix<double> ui_vi_matrix (dofs_per_cell, dofs_per_cell);
   FullMatrix<double> ue_vi_matrix (dofs_per_cell, dofs_per_cell);
