@@ -9,7 +9,8 @@ INPUT    = headers/ \
 	../../deal.II/include/fe \
 	../../deal.II/include/grid \
 	../../deal.II/include/multigrid \
-	../../deal.II/include/numerics
+	../../deal.II/include/numerics \
+	../tutorial/chapter-2.step-by-step/doxygen
 
 HTML_OUTPUT      = deal.II
 LATEX_OUTPUT     = LaTeX/deal.II

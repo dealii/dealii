@@ -24,7 +24,8 @@ deal.tag: deal.dox \
 	  $D/base/include/*/*.h \
 	  $D/lac/include/*/*.h \
 	  $D/deal.II/include/*/*.h \
-	  headers/*.h
+	  headers/*.h \
+	  ../tutorial/chapter-2.step-by-step/doxygen/*.h
 	@echo "=== Generating reference documentation. " \
               "This can take several minutes..."
 	@DOXYGEN@ deal.dox > doxygen.log
