@@ -56,7 +56,7 @@ hr {
     margin: 0.2em 0 0.2em 0;
 }
 
-div.head {
+div.fixedhead {
         text-align:center;
         position: fixed;
         bottom:10px;
