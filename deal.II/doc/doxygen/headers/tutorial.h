@@ -31,56 +31,56 @@
  * <tr>
  * <td>
  * 
- * @anchor step_1 <a href="../../tutorial/chapter-2.step-by-step/step-1.html">step-1</a>
+ * @ref step_1 "step-1"
  * 
- * @anchor step_2 <a href="../../tutorial/chapter-2.step-by-step/step-2.html">step-2</a>
+ * @ref step_2 "step-2"
  * 
- * @anchor step_3 <a href="../../tutorial/chapter-2.step-by-step/step-3.html">step-3</a>
+ * @ref step_3 "step-3"
  * 
- * @anchor step_4 <a href="../../tutorial/chapter-2.step-by-step/step-4.html">step-4</a>
+ * @ref step_4 "step-4"
  * 
- * @anchor step_5 <a href="../../tutorial/chapter-2.step-by-step/step-5.html">step-5</a>
+ * @ref step_5 "step-5"
  * 
- * @anchor step_6 <a href="../../tutorial/chapter-2.step-by-step/step-6.html">step-6</a>
- * 
- * </td>
- * <td>
- * 
- * @anchor step_7 <a href="../../tutorial/chapter-2.step-by-step/step-7.html">step-7</a>
- * 
- * @anchor step_8 <a href="../../tutorial/chapter-2.step-by-step/step-8.html">step-8</a>
- * 
- * @anchor step_9 <a href="../../tutorial/chapter-2.step-by-step/step-9.html">step-9</a>
- * 
- * @anchor step_10 <a href="../../tutorial/chapter-2.step-by-step/step-10.html">step-10</a>
- * 
- * @anchor step_11 <a href="../../tutorial/chapter-2.step-by-step/step-11.html">step-11</a>
- * 
- * @anchor step_12 <a href="../../tutorial/chapter-2.step-by-step/step-12.html">step-12</a>
+ * @ref step_6 "step-6"
  * 
  * </td>
  * <td>
  * 
- * @anchor step_13 <a href="../../tutorial/chapter-2.step-by-step/step-13.html">step-13</a>
+ * @ref step_7 "step-7"
  * 
- * @anchor step_14 <a href="../../tutorial/chapter-2.step-by-step/step-14.html">step-14</a>
+ * @ref step_8 "step-8"
  * 
- * @anchor step_15 <a href="../../tutorial/chapter-2.step-by-step/step-15.html">step-15</a>
+ * @ref step_9 "step-9"
  * 
- * @anchor step_16 <a href="../../tutorial/chapter-2.step-by-step/step-16.html">step-16</a>
+ * @ref step_10 "step-10"
  * 
- * @anchor step_17 <a href="../../tutorial/chapter-2.step-by-step/step-17.html">step-17</a>
+ * @ref step_11 "step-11"
  * 
- * @anchor step_18 <a href="../../tutorial/chapter-2.step-by-step/step-18.html">step-18</a>
+ * @ref step_12 "step-12"
  * 
  * </td>
  * <td>
  * 
- * @anchor step_19 <a href="../../tutorial/chapter-2.step-by-step/step-19.html">step-19</a>
+ * @ref step_13 "step-13"
  * 
- * @anchor step_20 <a href="../../tutorial/chapter-2.step-by-step/step-20.html">step-20</a>
+ * @ref step_14 "step-14"
  * 
- * @anchor step_21 <a href="../../tutorial/chapter-2.step-by-step/step-21.html">step-21</a>
+ * @ref step_15 "step-15"
+ * 
+ * @ref step_16 "step-16"
+ * 
+ * @ref step_17 "step-17"
+ * 
+ * @ref step_18 "step-18"
+ * 
+ * </td>
+ * <td>
+ * 
+ * @ref step_19 "step-19"
+ * 
+ * @ref step_20 "step-20"
+ * 
+ * @ref step_21 "step-21"
  * 
  * </td>
  * </tr>
