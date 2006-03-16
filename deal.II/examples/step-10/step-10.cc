@@ -266,8 +266,8 @@ void gnuplot_output()
 				 // of value 1 over the whole
 				 // computational domain, i.e. by
 				 // computing the areas $\int_K 1
-				 // dx=\int_{\hat K} 1\ \text{det}\ J(\hat x)
-				 // d\hat x \approx \sum_i \text{det}\ J(\hat
+				 // dx=\int_{\hat K} 1\ \textrm{det}\ J(\hat x)
+				 // d\hat x \approx \sum_i \textrm{det}\ J(\hat
 				 // x_i)w(\hat x_i)$, where the sum
 				 // extends over all quadrature points
 				 // on all active cells in the
