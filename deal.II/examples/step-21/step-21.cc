@@ -1564,8 +1564,8 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 				 // do not consider approximate second
 				 // derivatives because solutions to
 				 // the linear advection equation are
-				 // in general not in H^2 but in H^1
-				 // (to be more precise, in H^1_\beta)
+				 // in general not in $H^2$ but in $H^1$
+				 // (to be more precise, in $H^1_\beta$)
 				 // only.
 template <int dim>
 void DGMethod<dim>::refine_grid ()
