@@ -491,7 +491,7 @@ void ElasticProblem<dim>::setup_system ()
                                  // to do this first part: instead of
                                  // copying elements by hand into the
                                  // global matrix, we use the
-                                 // `distribute_local_to_global''
+                                 // ``distribute_local_to_global''
                                  // functions below to take care of
                                  // hanging nodes at the same
                                  // time. The second step, elimination
