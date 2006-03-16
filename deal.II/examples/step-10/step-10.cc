@@ -266,14 +266,14 @@ void gnuplot_output()
 				 // of value 1 over the whole
 				 // computational domain, i.e. by
 				 // computing the areas $\int_K 1
-				 // dx=\int_{\hat K} 1 det J(\hat x)
-				 // d\hat x \approx \sum det J(\hat
-				 // xi)w(\hat xi)$, where the sum
+				 // dx=\int_{\hat K} 1\ \text{det}\ J(\hat x)
+				 // d\hat x \approx \sum \text{det}\ J(\hat
+				 // x_i)w(\hat x_i)$, where the sum
 				 // extends over all quadrature points
 				 // on all active cells in the
-				 // triangulation, with $w(xi)$ being
+				 // triangulation, with $w(x_i)$ being
 				 // the weight of quadrature point
-				 // $xi$. The integrals on each cell
+				 // $x_i$. The integrals on each cell
 				 // are approximated by numerical
 				 // quadrature, hence the only
 				 // additional ingredient we need is
