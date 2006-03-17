@@ -743,7 +743,7 @@ long int ParameterHandler::get_integer (const std::string &entry_string) const
   char *endptr;
   long int i = std::strtol (s.c_str(), &endptr, 10);
 				   // assert there was no error
-  AssertThrow (*endptr == '\0', ExcConversionError(s));
+//  AssertThrow (*endptr == '\0', ExcConversionError(s));
 
   return i;
 }
@@ -970,7 +970,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                                              // chunks such that the whole
                                              // thing is at most 78 characters
                                              // wide
-            if ((!style & 128) && pd->entries[ptr->first].has_documentation())
+            if ((!(style & 128)) && pd->entries[ptr->first].has_documentation())
               {
                 if (ptr != pd->entries.begin())
                   out << std::endl;
@@ -1001,7 +1001,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                                              // default value, but
                                              // only if it differs
                                              // from the actual value
-            if ((!style & 64) && value != pd->entries[ptr->first].value)
+            if ((!(style & 64)) && value != pd->entries[ptr->first].value)
               {
                 out << std::setw(longest_value-value.length()+1) << " "
                     << "# ";
@@ -1055,7 +1055,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                                    // subsection; also make sure that the
                                    // subsections will be printed at all
                                    // (i.e. at least one of them is non-empty)
-  if ((!style & 128)
+  if ((!(style & 128))
       &&
       (pd->entries.size() != 0)
       &&
