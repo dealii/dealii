@@ -13,7 +13,6 @@ deal.II Mailinglist
   <HEAD>
     <TITLE>$IDXTITLE$</TITLE>
     <link href="../screen.css" rel="StyleSheet" media="screen">
-    <link href="../print.css" rel="StyleSheet" media="print">
     <meta name="keywords" content="deal.II">
     <meta name="robots" content="nofollow">.
   </HEAD>
@@ -40,7 +39,6 @@ deal.II Mailinglist
   <HEAD>
     <TITLE>$TIDXTITLE$</TITLE>
     <link href="../screen.css" rel="StyleSheet" media="screen">
-    <link href="../print.css" rel="StyleSheet" media="print">
     <meta name="keywords" content="deal.II">
   </HEAD>
   <BODY style="background-image:url(../pictures/title-background.jpg);" lang="en">
@@ -63,7 +61,6 @@ deal.II Mailinglist
   <HEAD>
     <TITLE>$SUBJECTNA:72$</TITLE>
     <link href="../screen.css" rel="StyleSheet" media="screen">
-    <link href="../print.css" rel="StyleSheet" media="print">
   </HEAD>
   <BODY>
 </MsgPgBegin>
