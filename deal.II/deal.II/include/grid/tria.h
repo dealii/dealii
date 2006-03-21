@@ -1172,6 +1172,11 @@ class Triangulation : public Subscriptor
 				      */
     static const StraightBoundary<dim> *straight_boundary;
 
+				     /**
+				      * An internal typedef to make
+				      * the definition of the iterator
+				      * classes simpler.
+				      */
     typedef internal::TriaIteratorSelector<dim> IteratorSelector;
 		      
   public:
@@ -1284,9 +1289,9 @@ class Triangulation : public Subscriptor
     static const unsigned int dimension = dim;
 
 				     /**
-				      *  Create a triangulation and create
-				      *  the first level of the hierarchy.
-				      *  Do not create any cells.
+				      *  Create an empty
+				      *  triangulation. Do not create
+				      *  any cells.
 				      */
     Triangulation (const MeshSmoothing smooth_grid = none);
 
@@ -2199,7 +2204,6 @@ class Triangulation : public Subscriptor
 				     /**
 				      *  Return an iterator pointing to the last
 				      *  line of the level @p level, used or not.
-
 				      */
     raw_line_iterator
     last_raw_line (const unsigned int level) const;
@@ -2269,8 +2273,7 @@ class Triangulation : public Subscriptor
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
 				      */
-    raw_quad_iterator
-    end_quad () const;
+    raw_quad_iterator    end_quad () const;
 
 				     /**
 				      * Return an iterator which is the first
