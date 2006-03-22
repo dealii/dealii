@@ -15,7 +15,6 @@
 
 
 #include <base/config.h>
-#include <base/numbers.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/exceptions.h>
