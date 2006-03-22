@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <base/numbers.h>
 #include <base/table.h>
 #include <base/smartpointer.h>
 #include <lac/block_indices.h>

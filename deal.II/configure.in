@@ -606,22 +606,6 @@ AH_BOTTOM(
 #endif
 
 
-/**
- * Have a namespace into which we declare some numeric constants, such
- * as pi. Unfortunately, these are not always available, on all systems
- * or depending on compiler flags, so we duplicate their declarations
- * here to make them unconditionally available to all other parts of the
- * library.
- *
- * The constants defined here are a subset of the <tt>M_XXX</tt> constants
- * sometimes declared in the system include file <tt>math.h</tt>, but without
- * the prefix <tt>M_</tt>.
- *
- * In addition to that, we declare  <tt>invalid_unsigned_int</tt> to be the
- * largest unsigned integer representable; this value is widely used in
- * the library as a marker for an invalid index, an invalid size of an
- * array, and similar purposes.
- */
 namespace deal_II_numbers {
                                              /**
                                               * Representation of the
@@ -690,15 +674,6 @@ namespace deal_II_numbers {
                                               * 1/sqrt(2)
                                               */
   static const double  SQRT1_2 = 0.70710678118654752440;
-
-				             /**
-				              * Return @p true if the given
-				              * value is a finite floating point
-				              * number, i.e. is neither plus or
-				              * minus infinity nor NaN (not a
-				              * number).
-				              */
-  bool is_finite (const double x);
 }
 
 #endif
