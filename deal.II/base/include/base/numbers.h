@@ -13,11 +13,6 @@
 #ifndef __deal2__numbers_h
 #define __deal2__numbers_h
 
-#include <base/config.h>
-#include <cmath>
-#include <limits>
-
-
 /**
  * Namespace for the declaration of universal constants. Since the
  * availability in <tt>math.h</tt> is not always guaranteed, we put
