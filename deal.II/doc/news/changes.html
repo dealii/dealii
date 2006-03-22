@@ -262,9 +262,11 @@ inconvenience this causes.
   <li> <p> New: The new <code
        class="member">deal_II_numbers::is_finite</code> function can
        be used to check whether a floating point number is finite,
-       i.e. neither plus or minus infinite nor NaN (not a number).
+       i.e. neither plus or minus infinite nor NaN (not a number);
+       it is in the new include file <tt>base/numbers.h</tt>, which will
+       contain non-configured inline functions of this type.
        <br>
-       (WB 2006/03/15)
+       (WB 2006/03/15) (GK 2006/03/22)
        </p>
 
   <li> <p> Improved: If the C++ runtime environment allows it, we now
