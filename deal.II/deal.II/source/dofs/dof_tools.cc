@@ -413,7 +413,8 @@ compute_cell_row_length_matrix(
 		    {
 		      const unsigned int jblock = fe.first_block_of_base(base) + mult;
 		      if (couple_cell(iblock, jblock) != DoFTools::none ||
-			  couple_face(iblock, jblock) != DoFTools::none)
+			  (couple_face.size(0) != 0 &&
+			   couple_face(iblock, jblock) != DoFTools::none))
 			{
 			  matrix(i, jblock) += increment;
 			}
@@ -440,44 +441,46 @@ compute_face_row_length_matrix(
 				   // This function will be called
 				   // once per face, at the refinement
 				   // edge from a refined cell.
+
+				   // Compute contributions due to
+				   // numerical fluxes.
+  if (couple_face.size(0) != 0)
+    for (unsigned int base=0;base<nfe.n_base_elements();++base)
+      {
+	const unsigned int increment = nfe.base_element(base).dofs_per_cell
+				       - nfe.base_element(base).dofs_per_face;
+	
+	for (unsigned int mult=0;mult<nfe.element_multiplicity(base);++mult)
+	  {
+	    const unsigned int jblock = nfe.first_block_of_base(base) + mult;
+	    for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+	      if (couple_face(fe.system_to_block_index(i).first, jblock)
+		  != DoFTools::none)
+		{
+		  matrix(i,jblock) += increment;
+		}
+	  }
+      }
   
-				   // The dofs on the common face
-				   // will be handled below,
-				   // therefore, we subtract them
-				   // here.
-  for (unsigned int base=0;base<nfe.n_base_elements();++base)
-    {
-      const unsigned int increment = nfe.base_element(base).dofs_per_cell
-				     - nfe.base_element(base).dofs_per_face;
-      
-      for (unsigned int mult=0;mult<nfe.element_multiplicity(base);++mult)
-	{
-	  const unsigned int jblock = nfe.first_block_of_base(base) + mult;
-	  for (unsigned int i=0;i<fe.dofs_per_cell;++i)
-	    if (couple_face(fe.system_to_block_index(i).first, jblock)
-		!= DoFTools::none)
-	      {
-		matrix(i,jblock) += increment;
-	      }
-	}
-    }
-  
-  for (unsigned int base=0;base<fe.n_base_elements();++base)
-    {
-      const unsigned int increment = fe.base_element(base).dofs_per_cell
-				     - fe.base_element(base).dofs_per_face;
-      
-      for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
-	{
-	  const unsigned int jblock = fe.first_block_of_base(base) + mult;
-	  for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
-	    if (couple_face(nfe.system_to_block_index(i).first, jblock)
-		!= DoFTools::none)
-	      {
-		nmatrix(i,jblock) += increment;
-	      }
-	}
-    }
+				   // Compute the contributions due to
+				   // numerical fluxes on the neighbor
+				   // cell
+  if (couple_face.size(0) != 0)
+    for (unsigned int base=0;base<fe.n_base_elements();++base)
+      {
+	const unsigned int increment = fe.base_element(base).dofs_per_cell
+				       - fe.base_element(base).dofs_per_face;
+	for (unsigned int mult=0;mult<fe.element_multiplicity(base);++mult)
+	  {
+	    const unsigned int jblock = fe.first_block_of_base(base) + mult;
+	    for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
+	      if (couple_face(nfe.system_to_block_index(i).first, jblock)
+		  != DoFTools::none)
+		{
+		  nmatrix(i,jblock) += increment;
+		}
+	  }
+      }
 				   // At this point, we assume
 				   // that each cell added its
 				   // dofs minus the face to
@@ -723,10 +726,11 @@ DoFTools::compute_row_length_vector(
 				   // couplings from components to
 				   // blocks, so this works for
 				   // nonprimitive elements as well.
-  std::vector<Table<2, Coupling> > couple_cell;
-  std::vector<Table<2, Coupling> > couple_face;
+  std::vector<Table<2, Coupling> > couple_cell(1);
+  std::vector<Table<2, Coupling> > couple_face(1);
   convert_couplings_to_blocks(dofs, couplings, couple_cell);
-  convert_couplings_to_blocks(dofs, flux_couplings, couple_face);
+  if (flux_couplings.size(0) != 0)
+    convert_couplings_to_blocks(dofs, flux_couplings, couple_face);
 
   Table<2, unsigned int> cell_couplings;
   Table<2, unsigned int> neighbor_couplings;
@@ -839,10 +843,11 @@ DoFTools::compute_row_length_vector(
 				   // couplings from components to
 				   // blocks, so this works for
 				   // nonprimitive elements as well.
-  std::vector<Table<2, Coupling> > couple_cell;
-  std::vector<Table<2, Coupling> > couple_face;
+  std::vector<Table<2, Coupling> > couple_cell(1);
+  std::vector<Table<2, Coupling> > couple_face(1);
   convert_couplings_to_blocks(dofs, couplings, couple_cell);
-  convert_couplings_to_blocks(dofs, flux_couplings, couple_face);
+  if (flux_couplings.size(0) != 0)
+    convert_couplings_to_blocks(dofs, flux_couplings, couple_face);
 
   Table<2, unsigned int> cell_couplings;
   Table<2, unsigned int> neighbor_couplings;
@@ -863,10 +868,14 @@ DoFTools::compute_row_length_vector(
 	      ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
       Assert (couplings.n_cols()==fe.n_components(),
 	      ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
-      Assert (flux_couplings.n_rows()==fe.n_components(),
-	      ExcDimensionMismatch(flux_couplings.n_rows(), fe.n_components()));
-      Assert (flux_couplings.n_cols()==fe.n_components(),
-	      ExcDimensionMismatch(flux_couplings.n_cols(), fe.n_components()));
+      if (flux_couplings.n_rows() != 0)
+	Assert (flux_couplings.n_rows()==fe.n_components(),
+		ExcDimensionMismatch(flux_couplings.n_rows(),
+				     fe.n_components()));
+      if (flux_couplings.n_rows() != 0)
+	Assert (flux_couplings.n_cols()==fe.n_components(),
+		ExcDimensionMismatch(flux_couplings.n_cols(),
+				     fe.n_components()));
       
       cell_couplings.reinit(fe.dofs_per_cell, fe.n_blocks());
       cell_indices.resize(fe.dofs_per_cell);
