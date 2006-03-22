@@ -240,6 +240,18 @@ DoFTools::compute_row_length_vector(
     }
 }
 
+template <class DH>
+void
+DoFTools::compute_row_length_vector(
+  const DH& dofs,
+  std::vector<std::vector<unsigned int> >& row_lengths,
+  const Table<2,Coupling>&,
+  const Table<2,Coupling>&)
+{
+  Assert (false, ExcNotImplemented());
+  Assert (row_lengths.size() == dofs.n_dofs(),
+	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+}
 
 #else
 
@@ -804,7 +816,8 @@ DoFTools::compute_row_length_vector(
   
 				   // Function starts here by
 				   // resetting the counters.
-  std::fill(row_lengths.begin(), row_lengths.end(), 0);
+  for (unsigned int i=0;i<row_lengths.size();++i)
+    std::fill(row_lengths[i].begin(), row_lengths[i].end(), 0);
 				   // We need the user flags, so we
 				   // save them for later restoration
   std::vector<bool> old_flags;
@@ -4001,6 +4014,18 @@ DoFTools::compute_row_length_vector(
 template void
 DoFTools::compute_row_length_vector(
   const hp::DoFHandler<deal_II_dimension>& dofs, std::vector<unsigned int>& row_lengths,
+  const Table<2,Coupling>& couplings, const Table<2,Coupling>& flux_couplings);
+
+template void
+DoFTools::compute_row_length_vector(
+  const DoFHandler<deal_II_dimension>&,
+  std::vector<std::vector<unsigned int> >&,
+  const Table<2,Coupling>& couplings, const Table<2,Coupling>& flux_couplings);
+
+template void
+DoFTools::compute_row_length_vector(
+  const hp::DoFHandler<deal_II_dimension>&,
+  std::vector<std::vector<unsigned int> >&,
   const Table<2,Coupling>& couplings, const Table<2,Coupling>& flux_couplings);
 
 template void
