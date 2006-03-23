@@ -155,7 +155,7 @@ include-path-petsc-bmake     = $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)
 include-path-metis           = $(DEAL_II_METIS_DIR)/Lib
 
 INCLUDE = -I$D/base/include -I$D/lac/include -I$D/deal.II/include \
-	  -I$D/contrib/boost/include \
+	  @BOOST_INCLUDE_DIR@ \
 	  @TECPLOT_INCLUDE_DIR@ @NETCDF_INCLUDE_DIR@ \
           @UMFPACK_INCLUDE_DIR@ @HSL_INCLUDE_DIR@ \
 	  -I$D/contrib

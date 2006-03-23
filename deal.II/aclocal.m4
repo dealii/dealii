@@ -3750,7 +3750,7 @@ AC_DEFUN(DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT, dnl
   if test "x$GXX" = "xyes" ; then
     AC_MSG_CHECKING(for boost::shared_ptr assignment operator= template buglet)
     AC_LANG(C++)
-    CXXFLAGS="-Wsynth -Werror -I `pwd`/contrib/boost/include"
+    CXXFLAGS="-Wsynth -Werror"
     AC_TRY_COMPILE(
       [
 #       include <boost/shared_ptr.hpp>
@@ -5078,6 +5078,19 @@ AC_DEFUN(DEAL_II_WITH_BLAS, dnl
   fi
   AC_SUBST(NEEDS_F77LIBS, "yes")
 ])
+
+dnl --------------------------------------------------
+dnl What to do if external boost is selected
+dnl --------------------------------------------------
+AC_DEFUN(DEAL_II_WITH_BOOST, dnl
+[
+  if test "x$1" != "xyes" ; then
+    BOOST_INCLUDE_DIR="-I$1"
+  else
+    BOOST_INCLUDE_DIR=''
+  fi
+])
+
 
 dnl --------------------------------------------------
 dnl Include the LAPACK library

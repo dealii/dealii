@@ -226,6 +226,9 @@
 /* Availability of the MA47 algorithm from HSL */
 #undef HAVE_HSL_MA47
 
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
 /* Define to 1 if you have the `amd' library (-lamd). */
 #undef HAVE_LIBAMD
 
@@ -245,8 +248,17 @@
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ
 
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
 /* Define if you have the rand_r function */
 #undef HAVE_RAND_R
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
 
 /* Define if the compiler provides an <iosfwd> header file */
 #undef HAVE_STD_IOSFWD_HEADER
@@ -266,8 +278,23 @@
    classes (early gcc versions did not) */
 #undef HAVE_STD_STRINGSTREAM
 
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
 /* UMFPACK is $withval */
 #undef HAVE_UMFPACK
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
 
 /* Define if the compiler provides __verbose_terminate_handler */
 #undef HAVE_VERBOSE_TERMINATE
@@ -300,6 +327,9 @@
    concatenate the underscore with another string to form a class name, which
    then of course isn't valid any more. See mails in early Feb 2006. */
 #undef PETSC_SKIP_UNDERSCORE_CHKERR
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
 
 /* If already available, do not define at all. Otherwise, define to __func__
    if that is available. In all other cases, indicate that no information

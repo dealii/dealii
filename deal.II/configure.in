@@ -189,7 +189,6 @@ DEAL_II_CHECK_TEMPL_OP_DISAMBIGUATION_BUG
 DEAL_II_CHECK_ARRAY_CONDITIONAL_DECAY_BUG
 DEAL_II_CHECK_EXPLICIT_CONSTRUCTOR_BUG
 DEAL_II_CHECK_WSYNTH_AND_STD_COMPLEX
-DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT
 DEAL_II_HAVE_PRETTY_FUNCTION
 DEAL_II_HAVE_STD_ITERATOR
 DEAL_II_HAVE_STD_STRINGSTREAM
@@ -211,7 +210,25 @@ DEAL_II_CHECK_ERROR_CODES_DEFINITION
 AC_CHECK_FUNCS(gethostname)
 DEAL_II_CHECK_BROKEN_SOCKETS
 
+dnl Check for boost option and make sure we get all files
+BOOST_INCLUDE_DIR='-I$D/contrib/boost/include'
 
+AC_ARG_WITH(boost,
+  [  --with-boost=/path/to/boost use an installed boost library instead of the
+         contributed one. The optional argument points to the directory containing
+         the boost subdirectory for header files.],
+  DEAL_II_WITH_BOOST($withval))
+
+CPPFLAGS="$BOOST_INCLUDE_DIR $CPPFLAGS"
+AC_CHECK_HEADER(boost/shared_ptr.hpp,,
+  [AC_MSG_ERROR([Your boost installation is incomplete!])])
+AC_CHECK_HEADER(boost/type_traits.hpp,,
+  [AC_MSG_ERROR([Your boost installation is incomplete!])])
+AC_CHECK_HEADER(boost/tuple/tuple.hpp,,
+  [AC_MSG_ERROR([Your boost installation is incomplete!])])
+DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT
+
+AC_SUBST(BOOST_INCLUDE_DIR)
 
 
 dnl -------------------------------------------------------------
@@ -504,7 +521,6 @@ AC_ARG_WITH(zlib,
          and link it with -lzlib (the default is -lz).
          Make sure the library is in the search path of ld.],
   DEAL_II_WITH_ZLIB($withval))
-
 
 dnl -------------------------------------------------------------
 dnl       Optimizations and consistency of compiler flags
