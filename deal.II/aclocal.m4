@@ -3727,6 +3727,27 @@ AC_DEFUN(DEAL_II_CHECK_WSYNTH_AND_STD_COMPLEX, dnl
 ])
 
 
+dnl -------------------------------------------------------------
+dnl Check for boost option and find pre-installed boost
+dnl -------------------------------------------------------------
+
+AC_DEFUN(DEAL_II_CHECK_BOOST, dnl
+[ AC_ARG_WITH(boost,
+   [  --with-boost=/path/to/boost use an installed boost library instead of the
+         contributed one. The optional argument points to the directory containing
+         the boost subdirectory for header files.],
+  DEAL_II_WITH_BOOST($withval))
+
+  AC_MSG_NOTICE("Checking for boost include files in $BOOST_INCLUDE_DIR")
+  CPPFLAGS="$BOOST_INCLUDE_DIR $CPPFLAGS"
+  AC_CHECK_HEADER(boost/shared_ptr.hpp,,
+    [AC_MSG_ERROR([Your boost installation is incomplete!])])
+  AC_CHECK_HEADER(boost/type_traits.hpp,,
+    [AC_MSG_ERROR([Your boost installation is incomplete!])])
+  AC_CHECK_HEADER(boost/tuple/tuple.hpp,,
+    [AC_MSG_ERROR([Your boost installation is incomplete!])])
+  DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT
+])
 
 dnl -------------------------------------------------------------
 dnl The boost::shared_ptr class has a templated assignment operator

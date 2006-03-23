@@ -8,8 +8,8 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl authors: Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann and others 
-dnl          1999, 2000, 2001, 2002, 2003, 2004, 2005
+dnl Copyright: The deal.II authors
+dnl          1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006
 dnl
 
 
@@ -213,21 +213,7 @@ DEAL_II_CHECK_BROKEN_SOCKETS
 dnl Check for boost option and make sure we get all files
 BOOST_INCLUDE_DIR="-I$DEAL_II_PATH/contrib/boost/include"
 
-AC_ARG_WITH(boost,
-  [  --with-boost=/path/to/boost use an installed boost library instead of the
-         contributed one. The optional argument points to the directory containing
-         the boost subdirectory for header files.],
-  DEAL_II_WITH_BOOST($withval))
-
-AC_MSG_NOTICE("Checking for boost include files in $BOOST_INCLUDE_DIR")
-CPPFLAGS="$BOOST_INCLUDE_DIR $CPPFLAGS"
-AC_CHECK_HEADER(boost/shared_ptr.hpp,,
-  [AC_MSG_ERROR([Your boost installation is incomplete!])])
-AC_CHECK_HEADER(boost/type_traits.hpp,,
-  [AC_MSG_ERROR([Your boost installation is incomplete!])])
-AC_CHECK_HEADER(boost/tuple/tuple.hpp,,
-  [AC_MSG_ERROR([Your boost installation is incomplete!])])
-DEAL_II_CHECK_BOOST_SHARED_PTR_ASSIGNMENT
+DEAL_II_CHECK_BOOST
 
 AC_SUBST(BOOST_INCLUDE_DIR)
 
