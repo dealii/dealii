@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,8 +22,8 @@
 /*@{*/
 
 /**
- * Implementation of a scalar Lagrange finite elements @p Qp that
- * yield the finite element space of continuous, piecewise polynomials
+ * Implementation of a scalar Lagrange finite element @p Qp that
+ * yields the finite element space of continuous, piecewise polynomials
  * of degree @p p in each coordinate direction. This class is realized
  * using tensor product polynomials based on equidistant support
  * points.
