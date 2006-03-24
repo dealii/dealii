@@ -3738,7 +3738,7 @@ AC_DEFUN(DEAL_II_CHECK_BOOST, dnl
          the boost subdirectory for header files.],
   DEAL_II_WITH_BOOST($withval))
 
-  AC_MSG_NOTICE("Checking for boost include files in $BOOST_INCLUDE_DIR")
+  AC_MSG_CHECKING("for boost include files in $BOOST_INCLUDE_DIR")
   CPPFLAGS="$BOOST_INCLUDE_DIR $CPPFLAGS"
   AC_CHECK_HEADER(boost/shared_ptr.hpp,,
     [AC_MSG_ERROR([Your boost installation is incomplete!])])
