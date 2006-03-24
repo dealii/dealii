@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -160,6 +160,20 @@ class Tensor<1,dim>
 				      * Assignment operator.
 				      */
     Tensor<1,dim> & operator = (const Tensor<1,dim> &);
+
+    				     /**
+				      * This operator assigns a scalar
+				      * to a tensor. To avoid
+				      * confusion with what exactly it
+				      * means to assign a scalar value
+				      * to a tensor, zero is the only
+				      * value allowed for <tt>d</tt>,
+				      * allowing the intuitive
+				      * notation <tt>t=0</tt> to reset
+				      * all elements of the tensor to
+				      * zero.
+				      */
+    Tensor<1,dim> & operator = (const double d);
 
 				     /**
 				      * Test for equality of two
@@ -511,6 +525,20 @@ Tensor<1,dim> & Tensor<1,dim>::operator = (const Tensor<1,dim> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] = p.values[i];
+  return *this;
+}
+
+
+
+template <int dim>
+inline
+Tensor<1,dim> & Tensor<1,dim>::operator = (const double d)
+{
+  Assert (d==0, ExcMessage ("Only assignment with zero is allowed"));
+  
+  for (unsigned int i=0; i<dim; ++i)
+    values[i] = 0;
+  
   return *this;
 }
 

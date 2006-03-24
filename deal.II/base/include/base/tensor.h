@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -106,7 +106,21 @@ class Tensor
 				      */
     Tensor & operator = (const Tensor<rank_,dim> &);
 
-				     /**
+    				     /**
+				      * This operator assigns a scalar
+				      * to a tensor. To avoid
+				      * confusion with what exactly it
+				      * means to assign a scalar value
+				      * to a tensor, zero is the only
+				      * value allowed for <tt>d</tt>,
+				      * allowing the intuitive
+				      * notation <tt>t=0</tt> to reset
+				      * all elements of the tensor to
+				      * zero.
+				      */
+    Tensor<rank_,dim> & operator = (const double d);
+
+    				     /**
 				      *  Test for equality of two tensors.
 				      */
     bool operator == (const Tensor<rank_,dim> &) const;
@@ -310,6 +324,21 @@ Tensor<rank_,dim>::operator = (const Tensor<rank_,dim> &t)
     subtensor[i] = t.subtensor[i];
   return *this;
 }
+
+
+
+template <int rank_, int dim>
+inline
+Tensor<rank_,dim> &
+Tensor<rank_,dim>::operator = (const double d)
+{
+  Assert (d==0, ExcMessage ("Only assignment with zero is allowed"));
+
+  for (unsigned int i=0; i<dim; ++i)
+    subtensor[i] = 0;
+  return *this;
+}
+
 
 
 template <int rank_, int dim>

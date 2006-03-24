@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -656,6 +656,20 @@ class SymmetricTensor
 				      */
     SymmetricTensor & operator = (const SymmetricTensor &);
 
+    				     /**
+				      * This operator assigns a scalar
+				      * to a tensor. To avoid
+				      * confusion with what exactly it
+				      * means to assign a scalar value
+				      * to a tensor, zero is the only
+				      * value allowed for <tt>d</tt>,
+				      * allowing the intuitive
+				      * notation <tt>t=0</tt> to reset
+				      * all elements of the tensor to
+				      * zero.
+				      */
+    SymmetricTensor & operator = (const double d);
+
                                      /**
                                       * Convert the present symmetric tensor
                                       * into a full tensor with the same
@@ -1015,6 +1029,20 @@ SymmetricTensor<rank,dim> &
 SymmetricTensor<rank,dim>::operator = (const SymmetricTensor<rank,dim> &t)
 {
   data = t.data;
+  return *this;
+}
+
+
+
+template <int rank, int dim>
+inline
+SymmetricTensor<rank,dim> &
+SymmetricTensor<rank,dim>::operator = (const double d)
+{
+  Assert (d==0, ExcMessage ("Only assignment with zero is allowed"));
+
+  data = 0;
+  
   return *this;
 }
 
