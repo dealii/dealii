@@ -261,9 +261,12 @@ class FullMatrix : public Table<2,number>
 				     /**
 				      * This operator assigns a scalar
 				      * to a matrix. To avoid
-				      * confusion with constructors,
-				      * zero is the only value allowed
-				      * for <tt>d</tt>
+				      * confusion with the semantics
+				      * of this function, zero is the
+				      * only value allowed for
+				      * <tt>d</tt>, allowing you to
+				      * clear a matrix in an intuitive
+				      * way.
 				      */
     FullMatrix<number> &
     operator = (const double d);
