@@ -30,6 +30,7 @@ tests_x =  logtest \
 	   slice_vector \
 	   table \
 	   tensor \
+	   tensor_* \
 	   symmetric_tensor_* \
 	   full_tensor_* \
            timer \
