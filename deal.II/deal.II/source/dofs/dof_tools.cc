@@ -223,7 +223,7 @@ DoFTools::compute_row_length_vector(
 	for (unsigned int comp=0;comp<fe.n_components();++comp)
 	  if (couplings(fe.system_to_component_index(i).first,comp) != none)
 	    row_lengths[cell_indices[i]]
-	      += fe.base_element(fe.component_to_base(comp).first).dofs_per_cell;
+	      += fe.base_element(fe.component_to_base_index(comp).first).dofs_per_cell;
       
 				       // If fluxes couple, add
 				       // coupling to neighbor cells
@@ -235,7 +235,7 @@ DoFTools::compute_row_length_vector(
 	    for (unsigned int comp=0;comp<fe.n_components();++comp)
 	      if (flux_couplings(fe.system_to_component_index(i).first,comp) != none)
 		row_lengths[cell_indices[i]]
-		  += nfe.base_element(fe.component_to_base(comp).first).dofs_per_cell;
+		  += nfe.base_element(fe.component_to_base_index(comp).first).dofs_per_cell;
 	}
     }
 }
@@ -3252,7 +3252,7 @@ DoFTools::compute_intergrid_weights_1 (
 				   // the restriction of the fine
 				   // grid:
   const unsigned int coarse_dofs_per_cell_component
-    = coarse_fe.base_element(coarse_fe.component_to_base(coarse_component).first).dofs_per_cell;
+    = coarse_fe.base_element(coarse_fe.component_to_base_index(coarse_component).first).dofs_per_cell;
   
 
 				   // Try to find out whether the
@@ -3278,9 +3278,9 @@ DoFTools::compute_intergrid_weights_1 (
 	  ExcInvalidComponent (fine_component, fine_fe.n_components()));
 				   // check whether respective finite
 				   // elements are equal
-  Assert (coarse_fe.base_element (coarse_fe.component_to_base(coarse_component).first)
+  Assert (coarse_fe.base_element (coarse_fe.component_to_base_index(coarse_component).first)
 	  ==
-	  fine_fe.base_element (fine_fe.component_to_base(fine_component).first),
+	  fine_fe.base_element (fine_fe.component_to_base_index(fine_component).first),
 	  ExcFiniteElementsDontMatch());
 
 #ifdef DEBUG
@@ -3964,10 +3964,10 @@ DoFTools::convert_couplings_to_blocks (
   
   for (unsigned int i=0;i<fe.n_components();++i)
     {
-      const unsigned int ib = fe.component_to_block(i);
+      const unsigned int ib = fe.component_to_block_index(i);
       for (unsigned int j=0;j<fe.n_components();++j)
 	{
-	  const unsigned int jb = fe.component_to_block(j);
+	  const unsigned int jb = fe.component_to_block_index(j);
 	  tables_by_block[0](ib,jb) |= table(i,j);
 	}
     }
@@ -3993,10 +3993,10 @@ DoFTools::convert_couplings_to_blocks (
       tables_by_block[f].fill(none);
       for (unsigned int i=0;i<fe.n_components();++i)
 	{
-	  const unsigned int ib = fe.component_to_block(i);
+	  const unsigned int ib = fe.component_to_block_index(i);
 	  for (unsigned int j=0;j<fe.n_components();++j)
 	    {
-	      const unsigned int jb = fe.component_to_block(j);
+	      const unsigned int jb = fe.component_to_block_index(j);
 	      tables_by_block[f](ib,jb) |= table(i,j);
 	    }
 	}

@@ -317,8 +317,8 @@ FESystem<dim>::shape_value_component (const unsigned int i,
 				   // desired component belongs, and
 				   // which component within this base
 				   // element it is
-  const unsigned int base              = this->component_to_base(component).first;
-  const unsigned int component_in_base = this->component_to_base(component).second;
+  const unsigned int base              = this->component_to_base_index(component).first;
+  const unsigned int component_in_base = this->component_to_base_index(component).second;
 
 				   // then get value from base
 				   // element. note that that will
@@ -369,8 +369,8 @@ FESystem<dim>::shape_grad_component (const unsigned int i,
     				   // desired component belongs, and
     				   // which component within this base
     				   // element it is
-  const unsigned int base              = this->component_to_base(component).first;
-  const unsigned int component_in_base = this->component_to_base(component).second;
+  const unsigned int base              = this->component_to_base_index(component).first;
+  const unsigned int component_in_base = this->component_to_base_index(component).second;
   
 				   // then get value from base
 				   // element. note that that will
@@ -421,8 +421,8 @@ FESystem<dim>::shape_grad_grad_component (const unsigned int i,
 				   // desired component belongs, and
 				   // which component within this base
 				   // element it is
-  const unsigned int base              = this->component_to_base(component).first;
-  const unsigned int component_in_base = this->component_to_base(component).second;
+  const unsigned int base              = this->component_to_base_index(component).first;
+  const unsigned int component_in_base = this->component_to_base_index(component).second;
   
 				   // then get value from base
 				   // element. note that that will

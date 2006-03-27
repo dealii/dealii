@@ -1208,7 +1208,7 @@ class FiniteElement : public Subscriptor,
 				      * zeros.
 				      */
     std::pair<unsigned int,unsigned int>
-    component_to_base (const unsigned int component) const;
+    component_to_base_index (const unsigned int component) const;
     
     
 				     /**
@@ -1217,7 +1217,7 @@ class FiniteElement : public Subscriptor,
 				      * the copy of the base element.
 				      */
     std::pair<unsigned int,unsigned int>
-    block_to_base (const unsigned int block) const;
+    block_to_base_index (const unsigned int block) const;
     
 				     /**
 				      * The vector block and the index
@@ -1232,7 +1232,7 @@ class FiniteElement : public Subscriptor,
 				      * component.
 				      */
     unsigned int
-    component_to_block (const unsigned int component) const;
+    component_to_block_index (const unsigned int component) const;
 
 				     //@}
     
@@ -2313,7 +2313,7 @@ FiniteElement<dim>::first_block_of_base (const unsigned int index) const
 template <int dim>  
 inline
 std::pair<unsigned int,unsigned int>
-FiniteElement<dim>::component_to_base (const unsigned int index) const
+FiniteElement<dim>::component_to_base_index (const unsigned int index) const
 {
   Assert(index < component_to_base_table.size(),
 	 ExcIndexRange(index, 0, component_to_base_table.size()));
@@ -2325,7 +2325,7 @@ FiniteElement<dim>::component_to_base (const unsigned int index) const
 template <int dim>  
 inline
 std::pair<unsigned int,unsigned int>
-FiniteElement<dim>::block_to_base (const unsigned int index) const
+FiniteElement<dim>::block_to_base_index (const unsigned int index) const
 {
   Assert(index < this->n_blocks(),
 	 ExcIndexRange(index, 0, this->n_blocks()));
@@ -2359,7 +2359,7 @@ FiniteElement<dim>::system_to_block_index (const unsigned int index) const
 template <int dim>  
 inline
 unsigned int
-FiniteElement<dim>::component_to_block (const unsigned int index) const
+FiniteElement<dim>::component_to_block_index (const unsigned int index) const
 {
   Assert (index < this->n_components(),
 	  ExcIndexRange(index, 0, this->n_components()));
@@ -2367,7 +2367,7 @@ FiniteElement<dim>::component_to_block (const unsigned int index) const
 				   // first block of this base plus
 				   // the index within the base blocks
   const std::pair<unsigned int, unsigned int>
-    base = component_to_base(index);
+    base = component_to_base_index(index);
   return first_block_of_base(base.first) + base.second;
 }
 
