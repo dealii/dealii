@@ -1426,6 +1426,26 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 ])
 
 
+dnl -------------------------------------------------------------
+dnl
+dnl Check whether we can use -rpath for linking. If so, we can use
+dnl -rpath instead of -L in LDFLAGS below, so the dynamic linker
+dnl finds all libraries.
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_RPATH,
+[ OLD_LDFLAGS=$LDFLAGS
+  LDFLAGS="-Wl,-rpath $DEAL_II_PATH $LDFLAGS"
+  AC_MSG_CHECKING([whether compiler understands option -Wl,-rpath])
+  AC_LINK_IFELSE(
+   [ AC_LANG_PROGRAM([[]],[[]])],
+     dnl Note the 'space' at the end of the string!
+   [ AC_MSG_RESULT(yes)
+     LD_PATH_OPTION="-Wl,-rpath "],
+   [ AC_MSG_RESULT(no)
+     LDFLAGS=$OLD_LDFLAGS
+     LD_PATH_OPTION="-L"])
+])
 
 
 dnl -------------------------------------------------------------
