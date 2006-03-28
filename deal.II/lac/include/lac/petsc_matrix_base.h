@@ -23,6 +23,7 @@
 #include <petscmat.h>
 #include <boost/shared_ptr.hpp>
 #include <vector>
+#include <cmath>
 
 namespace PETScWrappers
 {
