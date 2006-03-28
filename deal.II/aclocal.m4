@@ -3759,6 +3759,8 @@ AC_DEFUN(DEAL_II_CHECK_BOOST, dnl
   DEAL_II_WITH_BOOST($withval))
 
   CPPFLAGS="$BOOST_INCLUDE_DIR $CPPFLAGS"
+  LDFLAGS="$BOOST_LIB_DIR $LDFLAGS"
+
   AC_CHECK_HEADER(boost/shared_ptr.hpp,,
     [AC_MSG_ERROR([Your boost installation is incomplete!])])
   AC_CHECK_HEADER(boost/type_traits.hpp,,
@@ -5065,7 +5067,7 @@ dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 [
   if test "x$1" != "xyes" ; then
-    LDFLAGS="-L$1/UMFPACK/Lib -L$1/AMD/Lib $LDFLAGS"
+    LDFLAGS="$LD_PATH_OPTION$1/UMFPACK/Lib $LD_PATH_OPTION$1/AMD/Lib $LDFLAGS"
     AC_CHECK_LIB(amd, amd_info)
     AC_CHECK_LIB(umfpack, umfpack_di_defaults)
     AC_CHECK_FILE($1/UMFPACK/Include/umfpack.h,
@@ -5126,8 +5128,10 @@ AC_DEFUN(DEAL_II_WITH_BOOST, dnl
 [
   if test "x$1" != "xyes" ; then
     BOOST_INCLUDE_DIR="-I$1"
+    BOOST_LIB_DIR="$LD_PATH_OPTION$1/lib"
   else
     BOOST_INCLUDE_DIR=''
+    BOOST_LIB_DIR=''
   fi
 ])
 
