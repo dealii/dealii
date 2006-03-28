@@ -897,6 +897,8 @@ DoFTools::compute_row_length_vector(
 				   // flux contributions.
       for (unsigned int iface=0;iface<GeometryInfo<DH::dimension>::faces_per_cell;++iface)
 	{
+	  if (cell->at_boundary(iface))
+	    continue;
 	  const typename DH::cell_iterator neighbor = cell->neighbor(iface);
 	  const FiniteElement<DH::dimension>& nfe = neighbor->get_fe();
 	  typename DH::face_iterator face = cell->face(iface);
