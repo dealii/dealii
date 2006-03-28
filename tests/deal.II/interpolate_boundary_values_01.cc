@@ -61,15 +61,13 @@ VectorBoundaryValues<dim>::VectorBoundaryValues () :
 
 template <int dim>
 inline
-void VectorBoundaryValues<dim>::vector_value (const Point<dim> &p,
+void VectorBoundaryValues<dim>::vector_value (const Point<dim> &,
                                               Vector<double>   &values) const
 {
   Assert (values.size() == dim+1,
           ExcDimensionMismatch (values.size(), dim+1));
 
-  for (unsigned int i=0; i<dim; ++i)
-    values(i) = 0;
-  values(dim) = p(0)*p(0);
+  values = 13;
 }
 
 
@@ -171,7 +169,7 @@ void FindBug<dim>::dirichlet_conditions ()
     {
       if (fixed_dofs[i] == true)
         {
-          Assert (dirichlet_dofs[i] == 0, ExcInternalError());
+          Assert (dirichlet_dofs[i] == 13, ExcInternalError());
         }
       else
         {
