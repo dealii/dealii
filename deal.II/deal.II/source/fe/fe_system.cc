@@ -175,6 +175,7 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
   base_elements[0].first->subscribe (typeid(*this).name());
   base_elements[1] = ElementPair(fe2.clone(), n2);
   base_elements[1].first->subscribe (typeid(*this).name());
+  this->first_block_of_base_table.push_back(n1);
   initialize ();
 }
 
@@ -204,6 +205,8 @@ FESystem<dim>::FESystem (const FiniteElement<dim> &fe1,
   base_elements[1].first->subscribe (typeid(*this).name());
   base_elements[2] = ElementPair(fe3.clone(), n3);
   base_elements[2].first->subscribe (typeid(*this).name());
+  this->first_block_of_base_table.push_back(n1);
+  this->first_block_of_base_table.push_back(n2);
   initialize ();
 }
 
