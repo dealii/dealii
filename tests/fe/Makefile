@@ -1,6 +1,6 @@
 ############################################################
 # Makefile,v 1.15 2002/06/13 12:51:13 hartmann Exp
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -32,7 +32,7 @@ tests_x=fe_data_test traits fe_tools fe_tools_test mapping \
 	rtn_* \
 	interpolate_rt interpolate_rtn \
 	dgp_monomial_1 dgp_monomial_2 \
-	system_1 interpolate_system \
+	system_index system_1 interpolate_system \
         non_primitive_* \
         nedelec* \
 	up_and_down \
