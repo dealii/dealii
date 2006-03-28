@@ -946,13 +946,30 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 				             // initialized by the default
 				             // constructor), since we don't
 				             // need them anyway.
+					     //
+					     // As a detour, we must
+					     // make sure we only
+					     // query
+					     // face_system_to_component_index
+					     // if the index
+					     // corresponds to a
+					     // primitive shape
+					     // function. since we
+					     // know that all the
+					     // components we are
+					     // interested in are
+					     // primitive (by the
+					     // above check), we can
+					     // safely put such a
+					     // check in front
 	    if (unit_support_points.size() == 0)
 	      {
 	        unit_support_points.resize (fe.dofs_per_face);
                 for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-                  if (component_mask[fe.face_system_to_component_index(i).first]
-                      == true)
-		    unit_support_points[i] = fe.unit_face_support_point(i);
+		  if (fe.is_primitive (fe.face_to_equivalent_cell_index(i)))
+		    if (component_mask[fe.face_system_to_component_index(i).first]
+			== true)
+		      unit_support_points[i] = fe.unit_face_support_point(i);
               }
 
             Quadrature<dim-1> aux_quad (unit_support_points);
