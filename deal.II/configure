@@ -11206,7 +11206,7 @@ if test "${with_umfpack+set}" = set; then
   withval="$with_umfpack"
 
   if test "x$withval" != "xyes" ; then
-    LDFLAGS="-L$withval/UMFPACK/Lib -L$withval/AMD/Lib $LDFLAGS"
+    LDFLAGS="$LD_PATH_OPTION$withval/UMFPACK/Lib $LD_PATH_OPTION$withval/AMD/Lib $LDFLAGS"
 
 echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
 echo $ECHO_N "checking for amd_info in -lamd... $ECHO_C" >&6
