@@ -2220,52 +2220,7 @@ FiniteElement<dim>::face_system_to_component_index (const unsigned int index) co
                                    //
                                    // in 1d, the face index is equal
                                    // to the cell index
-  Assert (((dim == 1) && is_primitive(index))
-          ||
-                                           // in 2d, construct it like
-                                           // this:
-          ((dim == 2) &&
-           is_primitive (index < (GeometryInfo<2>::vertices_per_face *
-                                  this->dofs_per_vertex)
-                         ?
-                         index
-                         :
-                         GeometryInfo<2>::vertices_per_cell *
-                         this->dofs_per_vertex +
-                         (index -
-                          GeometryInfo<2>::vertices_per_face *
-                          this->dofs_per_vertex)))
-          ||
-                                           // likewise in 3d, but more
-                                           // complicated
-          ((dim == 3) &&
-           is_primitive (index < (GeometryInfo<3>::vertices_per_face *
-                                  this->dofs_per_vertex)
-                         ?
-                         index
-                         :
-                         (index < (GeometryInfo<3>::vertices_per_face *
-                                   this->dofs_per_vertex
-                                   +
-                                   GeometryInfo<3>::lines_per_face *
-                                   this->dofs_per_line)
-                          ?
-                          GeometryInfo<3>::vertices_per_cell *
-                          this->dofs_per_vertex +
-                          (index -
-                           GeometryInfo<3>::vertices_per_face *
-                           this->dofs_per_vertex)
-                          :
-                          GeometryInfo<3>::vertices_per_cell *
-                          this->dofs_per_vertex +
-                          GeometryInfo<3>::lines_per_cell *
-                          this->dofs_per_line +
-                          (index -
-                           GeometryInfo<3>::vertices_per_face *
-                           this->dofs_per_vertex
-                           -
-                           GeometryInfo<3>::lines_per_face *
-                           this->dofs_per_line)))),
+  Assert (is_primitive(this->face_to_equivalent_cell_index(index)),
           typename FiniteElement<dim>::ExcShapeFunctionNotPrimitive(index));
 
   return face_system_to_component_table[index];
