@@ -547,30 +547,6 @@ int main ()
 
   LaplaceProblem<2> laplace_problem_2d;
   laplace_problem_2d.run ();
-
-				   // Finally, we have promised to
-				   // trigger an exception in the
-				   // Coefficient class. For this, we
-				   // have to call its ``value_list''
-				   // function with two arrays of
-				   // different size (the number in
-				   // parentheses behind the name of
-				   // the object). We have commented
-				   // out these lines in order to
-				   // allow the program to exit
-				   // gracefully in normal situations
-				   // (we use the program in
-				   // day-to-day testing of changes to
-				   // the library as well), so you
-				   // will only get the exception by
-				   // un-commenting the following
-				   // lines.
-/*  
-  Coefficient<2>    coefficient;
-  std::vector<Point<2> > points (2);
-  std::vector<double>    coefficient_values (1);
-  coefficient.value_list (points, coefficient_values);
-*/
   
   return 0;
 }
