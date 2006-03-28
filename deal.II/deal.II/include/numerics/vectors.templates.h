@@ -925,7 +925,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 				             // to obtain the quadrature points
 				             // on the real cell's face
             std::vector<Point<dim-1> > 
-		unit_support_points = fe.get_unit_face_support_points();
+	      unit_support_points = fe.get_unit_face_support_points();
   
 				             // check whether there are support
 				             // points on the face. if not, then
@@ -953,7 +953,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
                   if (component_mask[fe.face_system_to_component_index(i).first]
                       == true)
 		    unit_support_points[i] = fe.unit_face_support_point(i);
-              };
+              }
 
             Quadrature<dim-1> aux_quad (unit_support_points);
             FEFaceValues<dim> fe_values (mapping, fe, aux_quad, update_q_points);
