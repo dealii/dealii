@@ -394,6 +394,37 @@ class FiniteElementData
 				      * for.
 				      */
     bool conforms (const Conformity) const;
+
+				     /**
+				      * Given an index in the natural
+				      * ordering of indices on a face,
+				      * return the index of an
+				      * equivalent degree of freedom
+				      * on the cell.
+				      *
+				      * To explain the concept,
+				      * consider the case where we
+				      * would like to know whether a
+				      * degree of freedom on a face is
+				      * primitive. Unfortunately, the
+				      * is_primitive() function in the
+				      * FiniteElement class takes a
+				      * cell index, so we would need
+				      * to find the cell index of the
+				      * shape function that
+				      * corresponds to the present
+				      * face index. This function does
+				      * that.
+				      *
+				      * Code implementing this would
+				      * then look like this:
+				      * @code
+				      * for (i=0; i<dofs_per_face; ++i)
+				      *  if (fe.is_primitive(fe.face_to_equivalent_cell_index(i)))
+				      *   ... do whatever
+				      * @endcode
+				      */
+    unsigned int face_to_equivalent_cell_index (const unsigned int index) const;
     
 				     /**
 				      * Comparison operator.
@@ -493,6 +524,81 @@ bool
 FiniteElementData<dim>::conforms (Conformity space) const
 {
   return ((space & conforming_space) != 0);
+}
+
+
+
+template <>
+inline
+unsigned int
+FiniteElementData<1>::
+face_to_equivalent_cell_index (const unsigned int index) const
+{
+  Assert (index < dofs_per_face,
+	  ExcIndexRange (index, 0, dofs_per_vertex));
+  return index;
+}
+
+
+
+template <>
+inline
+unsigned int
+FiniteElementData<2>::
+face_to_equivalent_cell_index (const unsigned int index) const
+{
+  Assert (index < dofs_per_face,
+	  ExcIndexRange (index, 0, dofs_per_vertex));
+  return (index < (GeometryInfo<2>::vertices_per_face *
+		   this->dofs_per_vertex)
+	  ?
+	  index
+	  :
+	  GeometryInfo<2>::vertices_per_cell *
+	  this->dofs_per_vertex +
+	  (index -
+	   GeometryInfo<2>::vertices_per_face *
+	   this->dofs_per_vertex));
+}
+
+
+
+
+template <>
+inline
+unsigned int
+FiniteElementData<3>::
+face_to_equivalent_cell_index (const unsigned int index) const
+{
+  Assert (index < dofs_per_face,
+	  ExcIndexRange (index, 0, dofs_per_vertex));
+  return (index < (GeometryInfo<3>::vertices_per_face *
+		   this->dofs_per_vertex)
+	  ?
+	  index
+	  :
+	  (index < (GeometryInfo<3>::vertices_per_face *
+		    this->dofs_per_vertex
+		    +
+		    GeometryInfo<3>::lines_per_face *
+		    this->dofs_per_line)
+	   ?
+	   GeometryInfo<3>::vertices_per_cell *
+	   this->dofs_per_vertex +
+	   (index -
+	    GeometryInfo<3>::vertices_per_face *
+	    this->dofs_per_vertex)
+	   :
+	   GeometryInfo<3>::vertices_per_cell *
+	   this->dofs_per_vertex +
+	   GeometryInfo<3>::lines_per_cell *
+	   this->dofs_per_line +
+	   (index -
+	    GeometryInfo<3>::vertices_per_face *
+	    this->dofs_per_vertex
+	    -
+	    GeometryInfo<3>::lines_per_face *
+	    this->dofs_per_line)));
 }
 
 
