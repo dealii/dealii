@@ -449,7 +449,29 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see 
 # the \image command).
 
-IMAGE_PATH             = .
+IMAGE_PATH             = . \
+		         ../tutorial/chapter-2.step-by-step/step-1.data \
+		         ../tutorial/chapter-2.step-by-step/step-2.data \
+		         ../tutorial/chapter-2.step-by-step/step-3.data \
+		         ../tutorial/chapter-2.step-by-step/step-4.data \
+		         ../tutorial/chapter-2.step-by-step/step-5.data \
+		         ../tutorial/chapter-2.step-by-step/step-6.data \
+		         ../tutorial/chapter-2.step-by-step/step-7.data \
+		         ../tutorial/chapter-2.step-by-step/step-8.data \
+		         ../tutorial/chapter-2.step-by-step/step-9.data \
+		         ../tutorial/chapter-2.step-by-step/step-10.data \
+		         ../tutorial/chapter-2.step-by-step/step-11.data \
+		         ../tutorial/chapter-2.step-by-step/step-12.data \
+		         ../tutorial/chapter-2.step-by-step/step-13.data \
+		         ../tutorial/chapter-2.step-by-step/step-14.data \
+		         ../tutorial/chapter-2.step-by-step/step-15.data \
+		         ../tutorial/chapter-2.step-by-step/step-16.data \
+		         ../tutorial/chapter-2.step-by-step/step-17.data \
+		         ../tutorial/chapter-2.step-by-step/step-18.data \
+		         ../tutorial/chapter-2.step-by-step/step-19.data \
+		         ../tutorial/chapter-2.step-by-step/step-20.data \
+		         ../tutorial/chapter-2.step-by-step/step-21.data \
+
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should 
 # invoke to filter for each input file. Doxygen will invoke the filter program 
