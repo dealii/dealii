@@ -50,7 +50,8 @@ tests_x = block_matrices \
 	grid_in_3d \
 	face_orientations_3d \
 	mg_dof_handler \
-	subcelldata	
+	subcelldata \
+	interpolate_boundary_values_*
 
 # from above list of regular expressions, generate the real set of
 # tests
