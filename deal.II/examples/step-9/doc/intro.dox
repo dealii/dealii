@@ -1,0 +1,286 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+
+In this example, our aims are the following:
+<ol>
+  <li> solve the advection equation $\beta \cdot \nabla u = f$;
+  <li> show how we can use multiple threads to get quicker to
+    the desired results if we have a multi-processor machine;
+  <li> develop a simple refinement criterion.
+</ol>
+While the second aim is difficult to describe in general terms without
+reference to the code, we will discuss the other two aims in the
+following. The use of multiple threads will then be detailed at the
+relevant places within the program. Furthermore, there exists a report on this
+subject, which is also available online from the ``Documentation'' section of
+the deal.II homepage.
+
+
+<h3>Discretizing the advection equation</h3>
+
+In the present example program, we shall numerically approximate the
+solution of the advection equation
+@f[
+  \beta \cdot \nabla u = f,
+@f]
+where $\beta$ is a vector field that describes advection direction and
+speed (which may be dependent on the space variables), $f$ is a source
+function, and $u$ is the solution. The physical process that this
+equation describes is that of a given flow field $\beta$, with which
+another substance is transported, the density or concentration of
+which is given by $u$. The equation does not contain diffusion of this
+second species within its carrier substance, but there are source
+terms.
+
+It is obvious that at the inflow, the above equation needs to be
+augmented by boundary conditions:
+@f[
+  u = g \qquad\qquad \mathrm{on}\ \partial\Omega_-,
+@f]
+where $\partial\Omega_-$ describes the inflow portion of the boundary and is
+formally defined by
+@f[
+  \partial\Omega_- 
+  =
+  \{{\mathbf x}\in \partial\Omega: \beta\cdot{\mathbf n}({\mathbf x}) < 0\},
+@f]
+and ${\mathbf n}({\mathbf x})$ being the outward normal to the domain at point
+${\mathbf x}\in\partial\Omega$. This definition is quite intuitive, since
+as ${\mathbf n}$ points outward, the scalar product with $\beta$ can only
+be negative if the transport direction $\beta$ points inward, i.e. at
+the inflow boundary. The mathematical theory states that we must not
+pose any boundary condition on the outflow part of the boundary.
+
+As it is stated, the transport equation is not stably solvable using
+the standard finite element method, however. The problem is that
+solutions to this equation possess only insufficient regularity
+orthogonal to the transport direction: while they are smooth parallel
+to $\beta$, they may be discontinuous perpendicular to this
+direction. These discontinuities lead to numerical instabilities that
+make a stable solution by a straight-forward discretization
+impossible. We will thus use the streamline diffusion stabilized
+formulation, in which we test the equation with test functions $v +
+\delta \beta\cdot\nabla v$ instead of $v$, where $\delta$ is a
+parameter that is chosen in the range of the (local) mesh width $h$;
+good results are usually obtained by setting $\delta=0.1h$. Note that
+the modification in the test function vanishes as the mesh size tends
+to zero. We will not discuss reasons, pros, and cons of the streamline
+diffusion method, but rather use it ``as is'', and refer the
+interested reader to the sufficiently available literature; every
+recent good book on finite elements should have a discussion of that
+topic.
+
+Using the test functions as defined above, the weak formulation of
+our stabilized problem reads: find a discrete function $u_h$ such that
+for all discrete test functions $v_h$ there holds
+@f[
+  (\beta \cdot \nabla u_h, v_h + \delta \beta\cdot\nabla v_h)_\Omega
+  -
+  (\beta\cdot {\mathbf n} u_h, v_h)_{\partial\Omega_-}
+  =
+  (f, v_h + \delta \beta\cdot\nabla v_h)_\Omega
+  -
+  (\beta\cdot {\mathbf n} g, v_h)_{\partial\Omega_-}.
+@f]
+Note that we have included the inflow boundary values into the weak
+form, and that the respective terms to the left hand side operator are
+positive definite due to the fact that $\beta\cdot{\mathbf n}<0$ on the
+inflow boundary. One would think that this leads to a system matrix
+to be inverted of the form
+@f[
+  a_{ij} =
+  (\beta \cdot \nabla \varphi_i,
+   \varphi_j + \delta \beta\cdot\nabla \varphi_j)_\Omega
+  -
+  (\beta\cdot {\mathbf n} \varphi_i, \varphi_j)_{\partial\Omega_-},
+@f]
+with basis functions $\varphi_i,\varphi_j$.  However, this is a
+pitfall that happens to every numerical analyst at least once
+(including the author): we have here expanded the solution
+$u_h = u_i \varphi_i$, but if we do so, we will have to solve the 
+problem 
+@f[
+  {\mathbf u}^T A = {\mathbf f}^T,
+@f]
+where ${\mathbf u}=(u_i)$, i.e. we have to solve the transpose problem of
+what we might have expected naively. In order to obtain the usual form
+of the linear system, it is therefore best to rewrite the weak
+formulation to
+@f[
+  (v_h + \delta \beta\cdot\nabla v_h, \beta \cdot \nabla u_h)_\Omega
+  -
+  (\beta\cdot {\mathbf n} v_h, u_h)_{\partial\Omega_-}
+  =
+  (v_h + \delta \beta\cdot\nabla v_h, f)_\Omega
+  -
+  (\beta\cdot {\mathbf n} v_h, g)_{\partial\Omega_-}
+@f]
+and then to obtain
+@f[
+  a_{ij} =
+  (\varphi_i + \delta \beta \cdot \nabla \varphi_i,
+   \beta\cdot\nabla \varphi_j)_\Omega
+  -
+  (\beta\cdot {\mathbf n} \varphi_i, \varphi_j)_{\partial\Omega_-},
+@f]
+as system matrix. We will assemble this matrix in the program.
+
+There remains the solution of this linear system of equations. As the
+resulting matrix is no more symmetric positive definite, we can't
+employ the usual CG method any more. Suitable for the solution of
+systems as the one at hand is the BiCGStab (bi-conjugate gradients
+stabilized) method, which is also available in deal.II, so we will use
+it.
+
+
+Regarding the exact form of the problem which we will solve, we use
+the following domain and functions (in $d=2$ space dimensions):
+@f{eqnarray*}
+  \Omega &=& [-1,1]^d \\
+  \beta({\mathbf x}) 
+  &=&
+  \left(
+    \begin{array}{c}1 \\ 1+\frac 45 \sin(8\pi x)\end{array} 
+  \right),
+  \\
+  f({\mathbf x})
+  &=&
+  \left\{
+    \begin{array}{ll}
+        \frac 1{10 s^d} & 
+        \mathrm{for}\ |{\mathbf x}-{\mathbf x}_0|<s, \\
+        0 & \mathrm{else},
+    \end{array}
+  \right.
+  \qquad\qquad
+  {\mathbf x}_0 
+  =
+  \left(
+    \begin{array}{c} -\frac 34 \\ -\frac 34\end{array}
+  \right),
+  \\
+  g
+  &=&
+  e^{5(1-|{\mathbf x}|^2)} \sin(16\pi|{\mathbf x}|^2).
+@f}
+For $d>2$, we extend $\beta$ and ${\mathbf x}_0$ by the same as the last
+component. Regarding these functions, we have the following
+annotations:
+<ol>
+<li> The advection field $\beta$ transports the solution roughly in
+diagonal direction from lower left to upper right, but with a wiggle
+structure superimposed.
+<li> The right hand side adds to the field generated by the inflow
+boundary conditions a bulb in the lower left corner, which is then
+transported along.
+<li> The inflow boundary conditions impose a weighted sinusoidal
+structure that is transported along with the flow field. Since 
+$|{\mathbf x}|\ge 1$ on the boundary, the weighting term never gets very large. 
+</ol>
+
+
+<h3>A simple refinement criterion</h3>
+
+In all previous examples with adaptive refinement, we have used an
+error estimator first developed by Kelly et al., which assigns to each
+cell $K$ the following indicator:
+@f[
+  \eta_K =
+  \left(
+    \frac {h_K}{12}
+    \int_{\partial K}
+      [\partial_n u_h]^2 \; d\sigma
+  \right)^{1/2},
+@f]
+where $[\partial n u_h]$ denotes the jump of the normal derivatives
+across a face $\gamma\subset\partial K$ of the cell $K$. It can be
+shown that this error indicator uses a discrete analogue of the second
+derivatives, weighted by a power of the cell size that is adjusted to
+the linear elements assumed to be in use here:
+@f[
+  \eta_K \approx 
+  C h \| \nabla^2 u \|_K,
+@f]
+which itself is related to the error size in the energy norm.
+
+The problem with this error indicator in the present case is that it
+assumes that the exact solution possesses second derivatives. This is
+already questionable for solutions to Laplace's problem in some cases,
+although there most problems allow solutions in $H^2$. If solutions
+are only in $H^1$, then the second derivatives would be singular in
+some parts (of lower dimension) of the domain and the error indicators
+would not reduce there under mesh refinement. Thus, the algorithm
+would continuously refine the cells around these parts, i.e. would
+refine into points or lines (in 2d).
+
+However, for the present case, solutions are usually not even in $H^1$
+(and this missing regularity is not the exceptional case as for
+Laplace's equation), so the error indicator described above is not
+really applicable. We will thus develop an indicator that is based on
+a discrete approximation of the gradient. Although the gradient often
+does not exist, this is the only criterion available to us, at least
+as long as we use continuous elements as in the present
+example. To start with, we note that given two cells $K$, $K'$ of
+which the centers are connected by the vector ${\mathbf y}_{KK'}$, we can
+approximate the directional derivative of a function $u$ as follows:
+@f[
+  \frac{{\mathbf y}_{KK'}^T}{|{\mathbf y}_{KK'}|} \nabla u
+  \approx
+  \frac{u(K') - u(K)}{|{\mathbf y}_{KK'}|},
+@f]
+where $u(K)$ and $u(K')$ denote $u$ evaluated at the centers of the
+respective cells. We now multiply the above approximation by 
+${\mathbf y}_{KK'}/|{\mathbf y}_{KK'}|$ and sum over all neighbors $K'$ of $K$:
+@f[
+  \underbrace{
+    \left(\sum_{K'} \frac{{\mathbf y}_{KK'} {\mathbf y}_{KK'}^T}
+                         {|{\mathbf y}_{KK'}|^2}\right)}_{=:Y}
+  \nabla u
+  \approx
+  \sum_{K'}
+  \frac{{\mathbf y}_{KK'}}{|{\mathbf y}_{KK'}|}
+  \frac{u(K') - u(K)}{|{\mathbf y}_{KK'}|}.
+@f]
+If the vectors ${\mathbf y}_{KK'}$ connecting $K$ with its neighbors span
+the whole space (i.e. roughly: $K$ has neighbors in all directions),
+then the term in parentheses in the left hand side expression forms a
+regular matrix, which we can invert to obtain an approximation of the
+gradient of $u$ on $K$:
+@f[
+  \nabla u
+  \approx
+  Y^{-1}
+  \left(
+    \sum_{K'}
+    \frac{{\mathbf y}_{KK'}}{|{\mathbf y}_{KK'}|}
+    \frac{u(K') - u(K)}{|{\mathbf y}_{KK'}|}
+  \right).
+@f]
+We will denote the approximation on the right hand side by
+$\nabla_h u(K)$, and we will use the following quantity as refinement
+criterion:
+@f[
+  \eta_K = h^{1+d/2} |\nabla_h u_h(K)|,
+@f]
+which is inspired by the following (not rigorous) argument:
+@f{eqnarray*}
+  \|u-u_h\|^2_{L_2} 
+  &\le&
+  C h^2 \|\nabla u\|^2_{L_2}
+\\
+  &\approx&
+  C
+  \sum_K
+  h_K^2 \|\nabla u\|^2_{L_2(K)}
+\\
+  &\le&
+  C
+  \sum_K
+  h_K^2 h_K^d \|\nabla u\|^2_{L_\infty(K)}
+\\
+  &\approx&
+  C
+  \sum_K
+  h_K^{2+d} |\nabla_h u_h(K)|^2
+@f}

@@ -1,0 +1,187 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+<h3>Background and purpose</h3>
+
+
+In this example program, we will not so much be concerned with
+describing new ways how to use deal.II and its facilities, but rather
+with presenting methods of writing modular and extensible finite
+element programs. The main reason for this is the size and complexity
+of modern research software: applications implementing modern error
+estimation concepts and adaptive solution methods tend to become
+rather large. For example, the three largest applications by the main
+authors of deal.II, are at the time of writing of this example
+program:
+<ol>
+<li> a program for solving conservation hyperbolic equations by the
+     Discontinuous Galerkin Finite Element method: 33,775 lines of
+     code; 
+<li> a parameter estimation program: 28,980 lines of code;
+<li> a wave equation solver: 21,020 lines of code.
+</ol>
+(The library proper - without example programs and
+test suite - has slightly more than 150,000 lines of code as of spring 2002.)
+In the opinion of the author of this example program, the sizes of these
+applications are at the edge of what one person, even an experienced
+programmer, can manage. 
+
+
+
+The numbers above make one thing rather clear: monolithic programs that
+are not broken up into smaller, mostly independent pieces have no way
+of surviving, since even the author will quickly lose the overview of
+the various dependencies between different parts of a program. Only
+data encapsulation, for example using object oriented programming
+methods, and modularization by defining small but fixed interfaces can
+help structure data flow and mutual interdependencies. It is also an
+absolute prerequisite if more than one person is developing a program,
+since otherwise confusion will quickly prevail as one developer
+would need to know if another changed something about the internals of
+a different module if they were not cleanly separated.
+
+
+
+In previous examples, you have seen how the library itself is broken
+up into several complexes each building atop the underying ones, but
+relatively independent of the other ones:
+<ol>
+<li>the triangulation class complex, with associated iterator classes;
+<li>the finite element classes;
+<li>the DoFHandler class complex, with associated iterators, built on
+    the triangulation and finite element classes;
+<li>the classes implementing mappings between unit and real cells;
+<li>the FEValues class complex, built atop the finite elements and
+    mappings.
+</ol>
+Besides these, and a large number of smaller classes, there are of
+course the following ``tool'' modules:
+<ol>
+<li>output in various graphical formats;
+<li>linear algebra classes.
+</ol>
+
+
+
+
+The goal of this program is now to give an example of how a relatively
+simple finite element program could be structured such that we end up
+with a set of modules that are as independent of each other as
+possible. This allows to change the program at one end, without having to
+worry that it might break at the other, as long as we do not touch the
+interface through which the two ends communicate. The interface in
+C++, of course, is the declaration of abstract base classes.
+
+
+
+Here, we will implement (again) a Laplace solver, although with a
+number of differences compared to previous example programs:
+<ol>
+<li>The classes that implement the process of numerically solving the
+    equation are no more responsible for driving the process of
+    ``solving-estimating error-refining-solving again'', but we delegate
+    this to external functions. This allows first to use it as a
+    building block in a larger context, where the solution of a
+    Laplace equation might only be one part (for example, in a
+    nonlinear problem, where Laplace equations might have to be solved
+    in each nonlinear step). It would also allow to build a framework
+    around this class that would allow using solvers for other
+    equations (but with the same external interface) instead, in case
+    some techniques shall be evaluated for different types of partial
+    differential equations.
+<li>It splits the process of evaluating the computed solution to a
+    separate set of classes. The reason is that one is usually not
+    interested in the solution of a PDE per se, but rather in certain
+    aspects of it. For example, one might wish to compute the traction
+    at a certain boundary in elastic computations, or in the signal of
+    a seismic wave at a receiver position at a given
+    location. Sometimes, one might have an interest in several of
+    these aspects. Since the evaluation of a solution is something
+    that does not usually affect the process of solution, we split it
+    off into a separate module, to allow for the development of such
+    evaluation filters independently of the development of the solver
+    classes.
+<li>Separate the classes that implement mesh refinement from the
+    classes that compute the solution.
+<li>Separate the description of the test case with which we will
+    present the program, from the rest of the program.
+</ol>
+
+
+
+The things the program does are not new. In fact, this is more like a
+melange of previous programs, cannibalizing various parts and
+functions from earlier examples. It is the way they are arranged in
+this program that should be the focus of the reader, i.e. the software
+design techniques used in the program to achieve the goal of
+implementing the desired mathematical method. However, we must
+stress that software design is in part also a subjective matter:
+different persons have different programming backgrounds and have
+different opinions about the ``right'' style of programming; this
+program therefore expresses only what the author considers useful
+practice, and is not necessarily a style that you have to adopt in
+order to write successful numerical software if you feel uncomfortable
+with the chosen ways. It should serve as a case study, however,
+inspiring the reader with ideas to the desired end.
+
+
+
+Once you have worked through the program, you will remark that it is
+already somewhat complex in its structure. Nevertheless, it
+only has about 850 lines of code, without comments. In real
+applications, there would of course be comments and class
+documentation, which would bring that to maybe 1200 lines. Yet, compared to
+the applications listed above, this is still small, as they are 20 to
+25 times as large. For programs as large, a proper design right from
+the start is thus indispensible. Otherwise, it will have to be
+redesigned at one point in its life, once it becomes too large to be
+manageable.
+
+
+
+Despite of this, all three programs listed above have undergone major
+revisions, or even rewrites. The wave program, for example, was once
+entirely teared to parts when it was still significantly smaller, just
+to assemble it again in a more modular form. By that time, it had
+become impossible to add functionality without affecting older parts
+of the code (the main problem with the code was the data flow: in time
+dependent application, the major concern is when to store data to disk
+and when to reload it again; if this is not done in an organized
+fashion, then you end up with data released too early, loaded too
+late, or not released at all). Although the present example program
+thus draws from sevelar years of experience, it is certainly not
+without flaws in its design, and in particular might not be suited for
+an application where the objective is different. It should serve as an
+inspiration for writing your own application in a modular way, to
+avoid the pitfalls of too closely coupled codes.
+
+
+
+<h3>What the program does</h3>
+
+
+What the program actually does is not even the main point of this
+program, the structure of the program is more important. However, in a
+few words, a description would be: solve the Laplace equation for a
+given right hand side such that the solution is the function 
+$u(x,t)=\exp(x+\sin(10y+5x^2))$. The goal of the
+computation is to get the value of the solution at the point
+$x_0=(0.5,0.5)$, and to compare the accuracy with
+which we resolve this value for two refinement criteria, namely global
+refinement and refinement by the error indicator by Kelly et al. which
+we have already used in previous examples.
+
+
+
+The results will, as usual, be discussed in the respective section of
+this document. In doing so, we will find a slightly irritating
+observation about the relative performance of the two refinement
+criteria. In a later example program, building atop this one, we will
+devise a different method that should hopefully perform better than
+the techniques discussed here.
+
+
+
+So much now for all the theoretical and anecdotal background. The best
+way of learning about a program is to look at it, so here it is:
+

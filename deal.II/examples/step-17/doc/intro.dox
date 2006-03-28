@@ -1,0 +1,73 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+
+This program does not introduce any new mathematical ideas; in fact, all it
+does is to do the exact same computations that @ref step_8 "step-8"
+already does, but it does so in a different manner: instead of using deal.II's
+own linear algebra classes, we build everything on top of classes deal.II
+provides that wrap around the linear algebra implementation of the <a
+href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library. And
+since PETSc allows to distribute matrices and vectors across several computers
+within an MPI network, the resulting code will even be able to solve the
+problem in parallel. If you don't know what PETSc is, then this would be a
+good time to take a quick glimpse at their homepage.
+
+
+
+As a prerequisite of this program, you need to have PETSc installed, and if
+you want to run in parallel on a cluster, you also need <a
+href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
+target="_top">METIS</a> to partition meshes. The installation of deal.II
+together with these two additional libraries is described in the <a
+href="../../readme.html" target="body">README</a> file.
+
+
+
+Now, for the details: as mentioned, the program does not compute anything new,
+so the use of finite element classes etc. is exactly the same as before. The
+difference to previous programs is that we have replaced almost all uses of
+classes <code>Vector</code> and <code>SparseMatrix</code> by their
+near-equivalents <code>PETScWrappers::Vector</code> and
+<code>PETScWrappers::SparseMatrix</code> (for sequential vectors and matrices,
+i.e. objects for which all elements are stored locally on one machine), and
+<code>PETScWrappers::MPI::Vector</code> and
+<code>PETScWrappers::MPI::SparseMatrix</code> for versions of these classes
+where only a part of the matrix or vector is stored on each machine within an
+MPI network. These classes provide an interface that is very similar to that
+of the deal.II linear algebra classes, but instead of implementing this
+functionality themselves, they simply pass on to their corresponding PETSc
+functions. The wrappers are therefore only used to give PETSc a more modern,
+object oriented interface, and to make the use of PETSc and deal.II objects as
+interchangable as possible.
+
+
+
+While the sequential PETSc wrappers classes do not have any advantage over
+their deal.II counterparts, the main point of using PETSc is that it can run
+in parallel. We will make use of this by partitioning the domain into as many
+blocks (``subdomains'') as there are processes in the MPI network. At the same
+time, PETSc provides dummy MPI stubs that allow to run the same program on a
+single machine if so desired, without any changes.
+
+
+
+Note, however, that the only data structures we parallelize are matrices and
+vectors. We do, in particular, not split up the <code>Triangulation</code> and
+<code>DoFHandler</code> classes: each process still has a complete copy of
+these objects, and all processes have exact copies of what the other processes
+have. Parallelizing the data structures used in hierarchic and unstructured
+triangulations is a very hard problem, and we do not attempt to do so at
+present. It also requires that many more aspects of the application program
+have to be changed, since for example loops over all cells can only include
+locally available cells. We thus went for the path of least resistance and
+only parallelized the linear algebra part.
+
+
+
+The techniques this program demonstrates are: how to use the PETSc wrapper
+classes; how to parallelize operations for jobs running on an MPI network; and
+how to partition the domain into subdomains to parallelize up the work. Since
+all this can only be demonstrated using actual code, let us go straight to the
+code without much further ado.
+

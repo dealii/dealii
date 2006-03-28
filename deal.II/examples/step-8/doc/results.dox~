@@ -1,0 +1,50 @@
+<a name="Results"></a>
+<h1>Results</h1>
+
+<p>
+There is not much to be said about the results of this program, apart
+from that they look nice. All images were made using GMV from the
+output files that the program wrote to disk. The first picture shows
+the displacement as a vector field, where one vector is shown at each
+vertex of the grid:
+</p>
+
+<p ALIGN=CENTER>
+<IMG SRC="step-8.data/displacement-vectors.jpg" ALT="displacement-vectors" WIDTH="300">
+</p>
+
+<p>
+You can clearly see the sources of x-displacement around x=0.5 and
+x=-0.5, and of y-displacement at the origin. The next image shows the
+final grid after eight steps of refinement:
+</p>
+
+<p ALIGN=CENTER>
+<IMG SRC="step-8.data/final-grid.jpg" ALT="final-grid" WIDTH="300">
+</p>
+
+<p>
+Finally, the x-displacement and y-displacement are displayed separately:
+</p>
+
+<p>
+<TABLE WIDTH="100%">
+<tr>
+<td>
+<IMG SRC="step-8.data/displacement-x.jpg" ALT="displacement-x" WIDTH="300">
+</td>
+<td>
+<IMG SRC="step-8.data/displacement-y.jpg" ALT="displacement-y" WIDTH="300">
+</td>
+</tr>
+</table>
+</p>
+
+<p>
+It should be noted that intuitively one would have expected the
+solution to be symmetric about the x- and y-axes since the x- and
+y-forces are symmetric with respect to these axes. However, the force
+considered as a vector is not symmetric and consequently neither is
+the solution.
+</p>
+

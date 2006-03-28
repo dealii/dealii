@@ -1,0 +1,322 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+
+In real life, most partial differential equations are really systems
+of equations. Accordingly, the solutions are usually
+vector-valued. The deal.II library supports such problems, and we will show
+that that is mostly rather simple. The only more complicated problems
+are in assembling matrix and right hand side, but these are easily
+understood as well. 
+
+In the example, we will want to solve the elastic equations. They are
+an extension to Laplace's equation with a vector-valued solution that
+describes the displacement in each space direction of a rigid body
+which is subject to a force. Of course, the force is also
+vector-valued, meaning that in each point it has a direction and an
+absolute value. The elastic equations are the following:
+@f[
+  -
+  \partial_j (c_{ijkl} \partial_k u_l)
+  =
+  f_i,
+  \qquad
+  i=1\ldots d,
+@f]
+where the values $c_{ijkl}$ are the stiffness coefficients and
+will usually depend on the space coordinates. In
+many cases, one knows that the material under consideration is
+isotropic, in which case by introduction of the two coefficients
+$\lambda$ and $\mu$ the coefficient tensor reduces to
+@f[
+  c_{ijkl} 
+  =
+  \lambda \delta_{ij} \delta_{kl} + 
+  \mu (\delta_{ik} \delta_{jl} + \delta_{il} \delta_{jk}).
+@f]
+
+The elastic equations can then be rewritten in much simpler a form:
+@f[
+   -
+   \nabla \lambda (\nabla\cdot {\mathbf u})
+   -
+   (\nabla \cdot \mu \nabla) {\mathbf u}
+   -
+   \nabla\cdot \mu (\nabla {\mathbf u})^T
+   =
+   {\mathbf f},
+@f]
+and the respective bilinear form is then
+@f[
+  a({\mathbf u}, {\mathbf v}) =
+  \left(
+    \lambda \nabla\cdot {\mathbf u}, \nabla\cdot {\mathbf v}
+  \right)_\Omega
+  +
+  \sum_{i,j}
+  \left(
+    \mu \partial_i u_j, \partial_i v_j
+  \right)_\Omega,
+  +
+  \sum_{i,j}
+  \left(
+    \mu \partial_i u_j, \partial_j v_i
+  \right)_\Omega,
+@f]
+or also writing the first term a sum over components:
+@f[
+  a({\mathbf u}, {\mathbf v}) =
+  \sum_{i,j}
+  \left(
+    \lambda \partial_l u_l, \partial_k v_k
+  \right)_\Omega
+  +
+  \sum_{k,l}
+  \left(
+    \mu \partial_i u_j, \partial_i v_j
+  \right)_\Omega,
+  +
+  \sum_{i,j}
+  \left(
+    \mu \partial_i u_j, \partial_j v_i
+  \right)_\Omega.
+@f]
+
+
+How do we now assemble the matrix for such an equation? The first thing we
+need is some knowledge about how the shape functions work in the case of
+vector-valued finite elements. Basically, this comes down to the following:
+let $n$ be the number of shape functions for the scalar finite element of
+which we build the vector element (for example, we will use bilinear functions
+for each component of the vector-valued finite element, so the scalar finite
+element is the <code>FE_Q(1)</code> element which we have used in previous examples
+already, and $n=4$ in two space dimensions). Further, let $N$ be the number of
+shape functions for the vector element; in two space dimensions, we need $n$
+shape functions for each component of the vector, so $N=2n$. Then, the $i$th
+shape function of the vector element has the form
+@f[
+  \Phi_i({\mathbf x}) = \varphi_{base(i)}({\mathbf x})\ {\mathbf e}_{comp(i)},
+@f]
+where $e_l$ is the $l$th unit vector, $comp(i)$ is the function that tells
+us which component of $\Phi_i$ is the one that is nonzero (for
+each vector shape function, only one component is nonzero, and all others are
+zero). $\varphi_{base(i)}(x)$ describes the space dependence of the shape
+function, which is taken to be the $base(i)$-th shape function of the scalar
+element. Of course, while $i$ is in the range $0,\ldots,N-1$, the functions
+$comp(i)$ and $base(i)$ have the ranges $0,1$ (in 2D) and $0,\ldots,n-1$,
+respectively. 
+
+For example (though this sequence of shape functions is not
+guaranteed, and you should not rely on it),
+the following layout could be used by the library:
+@f{eqnarray*}
+  \Phi_0({\mathbf x}) &=& 
+  \left(\begin{array}{c}
+    \varphi_0({\mathbf x}) \\ 0
+  \end{array}\right),
+  \\
+  \Phi_1({\mathbf x}) &=& 
+  \left(\begin{array}{c}
+    0 \\ \varphi_0({\mathbf x})
+  \end{array}\right),
+  \\
+  \Phi_2({\mathbf x}) &=& 
+  \left(\begin{array}{c}
+    \varphi_1({\mathbf x}) \\ 0
+  \end{array}\right),
+  \\
+  \Phi_3({\mathbf x}) &=& 
+  \left(\begin{array}{c}
+    0 \\ \varphi_1({\mathbf x})
+  \end{array}\right),
+  \ldots
+@f}
+where here
+@f[
+  comp(0)=0, \quad  comp(1)=1, \quad  comp(2)=0, \quad  comp(3)=1, \quad  \ldots
+@f]
+@f[
+  base(0)=0, \quad  base(1)=0, \quad  base(2)=1, \quad  base(3)=1, \quad  \ldots
+@f]
+
+In all but very rare cases, you will not need to know which shape function
+$\varphi_{base(i)}$ of the scalar element belongs to a shape function $\Phi_i$
+of the vector element. Let us therefore define
+@f[
+  \phi_i = \varphi_{base(i)}
+@f]
+by which we can write the vector shape function as
+@f[
+  \Phi_i({\mathbf x}) = \phi_{i}({\mathbf x})\ {\mathbf e}_{comp(i)}.
+@f]
+You can now safely forget about the function $base(i)$, at least for the rest
+of this example program.
+
+Now using this vector shape functions, we can write the discrete finite
+element solution as
+@f[
+  {\mathbf u}_h({\mathbf x}) = 
+  \sum_i \Phi_i({\mathbf x})\ u_i
+@f]
+with scalar coefficients $u_i$. If we define an analog function ${\mathbf v}_h$ as
+test function, we can write the discrete problem as follows: Find coefficients
+$u_i$ such that
+@f[
+  a({\mathbf u}_h, {\mathbf v}_h) = ({\mathbf f}, {\mathbf v}_h)
+  \qquad
+  \forall {\mathbf v}_h.
+@f]
+
+If we insert the definition of the bilinear form and the representation of
+${\mathbf u}_h$ and ${\mathbf v}_h$ into this formula:
+@f{eqnarray*}
+  \sum_{i,j}
+    u_i v_j
+  \sum_{k,l}
+  \left\{
+  \left(
+    \lambda \partial_l (\Phi_i)_l, \partial_k (\Phi_j)_k
+  \right)_\Omega
+  +
+  \left(
+    \mu \partial_l (\Phi_i)_k, \partial_l (\Phi_j)_k
+  \right)_\Omega  
+  +
+  \left(
+    \mu \partial_l (\Phi_i)_k, \partial_k (\Phi_j)_l
+  \right)_\Omega  
+  \right\}
+\\
+=
+  \sum_j v_j
+  \sum_l
+  \left(
+    f_l,
+    (\Phi_j)_l
+  \right)_\Omega.
+@f}
+We note that here and in the following, the indices $k,l$ run over spatial
+directions, i.e. $0\le k,l < d$, and that indices $i,j$ run over degrees
+of freedoms.
+
+The local stiffness matrix on cell $K$ therefore has the following entries:
+@f[
+  A^K_{ij}
+  =
+  \sum_{k,l}
+  \left\{
+  \left(
+    \lambda \partial_l (\Phi_i)_l, \partial_k (\Phi_j)_k
+  \right)_K
+  +
+  \left(
+    \mu \partial_l (\Phi_i)_k, \partial_l (\Phi_j)_k
+  \right)_K
+  +
+  \left(
+    \mu \partial_l (\Phi_i)_k, \partial_k (\Phi_j)_l
+  \right)_K
+  \right\},
+@f]
+where $i,j$ now are local degrees of freedom and therefore $0\le i,j < N$. 
+In these formulas, we always take some component of the vector shape functions
+$\Phi_i$, which are of course given as follows (see their definition):
+@f[
+  (\Phi_i)_l = \phi_i \delta_{l,comp(i)},
+@f]
+with the Kronecker symbol $\delta_{nm}$. Due to this, we can delete some of
+the sums over $k$ and $l$:
+@f{eqnarray*}
+  A^K_{ij}
+  &=&
+  \sum_{k,l}
+  \Bigl\{
+  \left(
+    \lambda \partial_l \phi_i\ \delta_{l,comp(i)}, 
+            \partial_k \phi_j\ \delta_{k,comp(j)}
+  \right)_K
+\\
+  &\qquad\qquad& +
+  \left(
+    \mu \partial_l \phi_i\ \delta_{k,comp(i)},
+        \partial_l \phi_j\ \delta_{k,comp(j)}
+  \right)_K
+  +
+  \left(
+    \mu \partial_l \phi_i\ \delta_{k,comp(i)},
+        \partial_k \phi_j\ \delta_{l,comp(j)}
+  \right)_K
+  \Bigr\}
+\\
+  &=&
+  \left(
+    \lambda \partial_{comp(i)} \phi_i,
+            \partial_{comp(j)} \phi_j
+  \right)_K
+  +
+  \sum_l
+  \left(
+    \mu \partial_l \phi_i,
+        \partial_l \phi_j
+  \right)_K
+  \ \delta_{comp(i),comp(j)}
+  +
+  \left(
+    \mu \partial_{comp(j)} \phi_i,
+        \partial_{comp(i)} \phi_j
+  \right)_K
+\\
+  &=&
+  \left(
+    \lambda \partial_{comp(i)} \phi_i,
+            \partial_{comp(j)} \phi_j
+  \right)_K
+  +
+  \left(
+    \mu \nabla \phi_i,
+        \nabla \phi_j
+  \right)_K
+  \ \delta_{comp(i),comp(j)}
+  +
+  \left(
+    \mu \partial_{comp(j)} \phi_i,
+        \partial_{comp(i)} \phi_j
+  \right)_K.
+@f}
+
+Likewise, the contribution of cell $K$ to the right hand side vector is
+@f{eqnarray*}
+  f^K_j
+  &=&
+  \sum_l
+  \left(
+    f_l,
+    (\Phi_j)_l
+  \right)_K
+\\
+  &=&
+  \sum_l
+  \left(
+    f_l,
+    \phi_j \delta_{l,comp(j)}
+  \right)_K
+\\
+  &=&
+  \left(
+    f_{comp(j)},
+    \phi_j
+  \right)_K.
+@f}
+
+This is the form in which we will implement the local stiffness matrix and
+right hand side vectors.
+
+As a final note: in the @ref step_17 "step-17" example program, we will revisit the elastic
+problem laid out here, and will show how to solve it in parallel on a cluster
+of computers. The resulting program will thus be able to solve this problem to
+significantly higher accuracy, and more efficiently if this is
+required. In addition, in @ref step_20 "step-20", we will revisit some
+vector-valued problems and show a few techniques that may make it
+simpler to actually go through all the stuff shown above, with
+<code>FiniteElement::system_to_component_index</code> etc.
+

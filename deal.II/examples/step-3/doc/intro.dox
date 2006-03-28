@@ -1,0 +1,16 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+
+This is the first example where we actually use finite elements to compute
+something. We 
+will solve a simple version of Laplace's equation with zero boundary
+values, but a nonzero right hand side. This example is still quite
+simple, but it already shows the basic structure of most finite
+element programs, which are along the following lines:
+<ul>
+  <li> Grid generation;
+  <li> Assembling matrices and vectors of the discrete system;
+  <li> Solving the linear system of equations;
+  <li> Writing results to disk.
+</ul>

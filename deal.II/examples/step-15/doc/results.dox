@@ -1,0 +1,119 @@
+<a name="Results"></a>
+<h1>Results</h1>
+
+
+If run, the program generates output like this:
+
+
+@code
+Realization 0:
+   Energy: 0.00377302
+   Energy: 0.00106138
+   Energy: 0.000514363
+   Energy: 0.000382105
+   Energy: 0.000339017
+   Energy: 0.000327948
+   Energy: 0.000320299
+   Energy: 0.000318016
+   Energy: 0.000316735
+   Energy: 0.000316536
+   Energy: 0.000316463
+   Energy: 0.000316285
+   Energy: 0.000316227
+   Energy: 0.000316221
+   Energy: 0.00031622
+
+Realization 1:
+   Energy: 0.00279316
+   Energy: 0.000896516
+   Energy: 0.000504609
+   Energy: 0.000392703
+   Energy: 0.000317725
+   Energy: 0.000291881
+   Energy: 0.000288243
+   Energy: 0.000283541
+   Energy: 0.000282406
+   Energy: 0.000281842
+   Energy: 0.000281752
+   Energy: 0.000281743
+   Energy: 0.000281743
+
+....
+
+Realization 9:
+   Energy: 0.0103729
+   Energy: 0.0082121
+   Energy: 0.00733742
+   Energy: 0.00728154
+   Energy: 0.00725198
+   Energy: 0.00724302
+   Energy: 0.00724019
+   Energy: 0.00723837
+   Energy: 0.00723783
+   Energy: 0.00723772
+   Energy: 0.00690564
+   Energy: 0.00690562
+@endcode
+
+
+The lowest energy yet seen is in this run (you only get this by increasing the
+number of runs):
+
+@code
+Realization 18:
+   Energy: 0.00200645
+   Energy: 0.000638519
+   Energy: 0.00022749
+   Energy: 9.18962e-05
+   Energy: 5.42442e-05
+   Energy: 3.94415e-05
+   Energy: 3.42307e-05
+   Energy: 3.30727e-05
+   Energy: 3.19998e-05
+   Energy: 3.18104e-05
+   Energy: 2.97091e-05
+   Energy: 3.5011e-05
+@endcode
+
+
+Apparently something went wrong in the last step (the energy increased, which
+it shouldn't - but then this is a strongly nonlinear problem), which is also
+why the program aborted after this iteration. Apart from this, the iterations
+shown above demonstrate that our program indeed is able to reduce the energy
+in the solution in each iteration, as should be.
+
+
+
+Since the program did not really deliver the goal we had originally intended
+for (the computation of the minimal energy of finite element spaces), the
+graphical output is also not very exciting. Here are plots of five of the
+first 10 solutions (clicking on a picture gives the unscaled version of the
+image):
+
+
+@image html step-15.solution-1.png
+
+
+
+And here are the first 100 solutions, where each node in each solution is
+represented as a dot. As can be seen, all the solutions cluster somewhat
+around the $x^{1/3}$ curve, here shown in turquoise:
+
+
+@image html step-15.solution-2.png
+
+
+
+Note that this behavior is mostly independent of the choice of starting data
+(which we have chosen to be close to this curve), which a posteriori justfies
+our choice. Some of the curves actually show a linear behavior of the solution
+close to the origin; this is particularly obvious when the curves are viewed
+in a log-log plot (not shown here, but rather left as an exercise to the
+reader).
+
+
+
+Given the almost complete absence of interesting results of this program, we
+hope that at least its source code provided some information with respect to
+programming with deal.II
+

@@ -1,0 +1,164 @@
+<a name="Results"></a>
+<h1>Results</h1>
+
+
+The output of the program looks as follows:
+<pre><code>
+Cycle 0:
+   Number of active cells:       20
+   Number of degrees of freedom: 89
+Cycle 1:
+   Number of active cells:       44
+   Number of degrees of freedom: 209
+Cycle 2:
+   Number of active cells:       92
+   Number of degrees of freedom: 449
+Cycle 3:
+   Number of active cells:       200
+   Number of degrees of freedom: 961
+Cycle 4:
+   Number of active cells:       440
+   Number of degrees of freedom: 2033
+Cycle 5:
+   Number of active cells:       932
+   Number of degrees of freedom: 4465
+Cycle 6:
+   Number of active cells:       1916
+   Number of degrees of freedom: 9113
+Cycle 7:
+   Number of active cells:       3884
+   Number of degrees of freedom: 18401
+</code></pre>
+
+
+
+As intended, the number of cells roughly doubles in each cycle.  The
+number of degrees is slightly more than four times the number of
+cells; one would expect a factor of exactly four in two spatial
+dimensions on an infinite grid (since the spacing between the degrees
+of freedom is half the cell width: one additional degree of freedom on
+each edge and one in the middle of each cell), but it is larger than
+that factor due to the finite size of the mesh and due to additional
+degrees of freedom which are introduced by hanging nodes and local
+refinement.
+
+
+
+The final solution, as written by the program at the end of the
+<code>run()</code> function, looks as follows:
+
+
+
+@image html step-6.solution.png
+
+
+
+In each cycle, the program furthermore writes the grid in EPS
+format. These are shown in the following:
+
+
+
+<TABLE WIDTH="100%">
+<tr>
+<td>
+  @image html step-6.grid-0.png
+</td>
+<td>
+  @image html step-6.grid-1.png
+</td>
+</tr>
+
+<tr>
+<td>
+  @image html step-6.grid-2.png
+</td>
+<td>
+  @image html step-6.grid-3.png
+</td>
+</tr>
+
+<tr>
+<td>
+  @image html step-6.grid-4.png
+</td>
+<td>
+  @image html step-6.grid-5.png
+</td>
+</tr>
+
+<tr>
+<td>
+  @image html step-6.grid-6.png
+</td>
+<td>
+  @image html step-6.grid-7.png
+</td>
+</tr>
+</table>
+
+
+
+It is clearly visible that the region where the solution has a kink,
+i.e. the circle at radial distance 0.5 from the center, is
+refined most. Furthermore, the central region where the solution is
+very smooth and almost flat, is almost not refined at all, but this
+results from the fact that we did not take into account that the
+coefficient is large there. The region outside is refined rather
+randomly, since the second derivative is constant there and refinement
+is therefore mostly based on the size of the cells and their deviation
+from the optimal square.
+
+
+
+
+For completeness, we show what happens if the code we commented about
+in the destructor of the <code>LaplaceProblem</code> class is omitted
+from this example.
+
+@code
+--------------------------------------------------------
+An error occurred in line <79> of file <source/subscriptor.cc> in function
+    virtual Subscriptor::~Subscriptor()
+The violated condition was: 
+    counter == 0
+The name and call sequence of the exception was:
+    ExcInUse(counter, object_info->name(), infostring)
+Additional Information: 
+Object of class 4FE_QILi2EE is still used by 1 other objects.
+  from Subscriber 10DoFHandlerILi2EE
+
+Stacktrace:
+-----------
+#0  /u/bangerth/p/deal.II/1/deal.II/lib/libbase.g.so: Subscriptor::~Subscriptor()
+#1  /u/bangerth/p/deal.II/1/deal.II/lib/libdeal_II_2d.g.so: FiniteElement<2>::~FiniteElement()
+#2  ./step-6: FE_Poly<TensorProductPolynomials<2>, 2>::~FE_Poly()
+#3  ./step-6: FE_Q<2>::~FE_Q()
+#4  ./step-6: LaplaceProblem<2>::~LaplaceProblem()
+#5  ./step-6: main
+--------------------------------------------------------
+make: *** [run] Aborted
+@endcode
+
+
+
+From the above error message, we conclude that an object of type
+<code>10DoFHandlerILi2EE</code> is still using the object of type
+<code>4FE_QILi2EE</code>. These are of course "mangled" names for
+<code>DoFHandler</code> and <code>FE_Q</code>. The mangling works as
+follows: the first number indicates the number of characters of the
+template class, i.e. 10 for <code>DoFHandler</code> and 4
+for<code>FE_Q</code>; the rest of the text is then template
+arguments. From this we can already glean a little bit who's the
+culprit here, and who the victim.:
+The one object that still uses the finite element is the
+<code>dof_handler</code> object.
+
+
+
+The stacktrace gives an indication of where the problem happened. We
+see that the exception was triggered in the 
+destructor of the <code>FiniteElement</code> class that was called
+through a few more functions from the destructor of the
+<code>LaplaceProblem</code> class, exactly where we have commented out
+the call to <code>DoFHandler::clear()</code>.
+

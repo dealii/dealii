@@ -1,0 +1,21 @@
+<a name="Results"></a>
+<h1>Results</h1>
+
+The program has, after having been run, produced two grids, which look
+like this:
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      @image html step-1.grid-1.png
+    </td>
+
+    <td ALIGN="center">
+      @image html step-1.grid-2.png
+    </td>
+  </tr>
+</table>
+
+The left one, well, is not very exciting. The right one is &mdash; at least
+&mdash; unconventional.
+

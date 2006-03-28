@@ -1,0 +1,61 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+
+This is a rather short example which only shows some aspects of using
+higher order mappings. By <em>mapping</em> we mean the transformation
+between the unit cell (i.e. the unit line, square, or cube) to the
+cells in real space. In all the previous examples, we have implicitly
+used linear or d-linear mappings; you will not have noticed this at
+all, since this is what happens if you do not do anything
+special. However, if your domain has curved boundaries, there are
+cases where the piecewise linear approximation of the boundary
+(i.e. by straight line segments) is not sufficient, and you want that
+your computational domain is an approximation to the real domain using
+curved boundaries as well. If the boundary approximation uses
+piecewise quadratic parabolas to approximate the true boundary, then
+we say that this is a quadratic or $Q_2$ approximation. If we
+use piecewise graphs of cubic polynomials, then this is a $Q_3$
+approximation, and so on.
+
+
+
+For some differential equations, it is known that piecewise linear
+approximations of the boundary, i.e. $Q_1$ mappings, are not
+sufficient if the boundary of the domain is curved. Examples are the
+biharmonic equation using $C^1$ elements, or the Euler
+equation on domains with curved reflective boundaries. In these cases,
+it is necessary to compute the integrals using a higher order
+mapping. The reason, of course, is that if we do not use a higher
+order mapping, the order of approximation of the boundary dominates
+the order of convergence of the entire numerical scheme, irrespective
+of the order of convergence of the discretization in the interior of
+the domain.
+
+
+
+Rather than demonstrating the use of higher order mappings with one of
+these more complicated examples, we do only a brief computation:
+calculating the value of $\pi=3.141592653589793238462643\ldots$ by two
+different methods.
+
+
+
+The first method uses a triangulated approximation of the circle with
+unit radius and integrates the unit function over it. Of course, if
+the domain were the exact unit circle, then the area would be pi, but
+since we only use an approximation by piecewise polynomial segments,
+the value of the area is not exactly pi. However, it is known that as
+we refine the triangulation, a $Q_p$ mapping approximates the boundary
+with an order $h^{p+1}$, where $h$ is the mesh
+width. We will check the values of the computed area of the circle and
+their convergence towards pi under mesh refinement for different
+mappings. We will also find a convergence behavior that is surprising
+at first, but has a good explanation.
+
+
+
+The second method works similarly, but this time does not use the area
+of the triangulated unit circle, but rather its perimeter. Pi is then
+approximated by half of the perimeter, as the radius is equal to one.
+

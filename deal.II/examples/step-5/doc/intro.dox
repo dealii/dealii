@@ -1,0 +1,37 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+
+This example does not show revolutionary new things, but it shows many
+small improvements over the previous examples, and also many small
+things that can usually be found in finite element programs. Among
+them are:
+<ul>
+  <li> Computations on successively refined grids. At least in the
+       mathematical sciences, it is common to compute solutions on
+       a hierarchy of grids, in order to get a feeling for the accuracy
+       of the solution; if you only have one solution on a single grid, you
+       usually can't guess the accuracy of the
+       solution. Furthermore, deal.II is designed to support adaptive
+       algorithms where iterative solution on successively refined
+       grids is at the heart of algorithms. Although adaptive grids
+       are not used in this example, the foundations for them is laid
+       here. 
+  <li> In practical applications, the domains are often subdivided
+       into triangulations by automatic mesh generators. In order to
+       use them, it is important to read coarse grids from a file. In
+       this example, we will read a coarse grid in UCD (unstructured
+       cell data) format as used by AVS Explorer.
+  <li> Finite element programs usually use extensive amounts of
+       computing time, so some optimizations are sometimes
+       necessary. We will show some of them.
+  <li> On the other side, finite element programs tend to be rather
+       complex, so debugging is an important aspect. We support safe
+       programming by using assertions that check the validity of
+       parameters and internal states in a debug mode, but are removed
+       in optimized mode.
+  <li> Regarding the mathematical side, we show how to support a
+       variable coefficient in the elliptic operator and how to use
+       preconditioned iterative solvers for the linear systems of
+       equations.
+</ul>

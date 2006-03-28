@@ -1,0 +1,294 @@
+<a name="Results"></a>
+<h1>Results</h1>
+
+<h3>Output of the program and graphical visualization</h3>
+
+
+If we run the program as is, we get this output:
+@code
+examples/step-20> make run
+============================ Remaking Makefile.dep
+==============debug========= step-20.cc
+============================ Linking step-20
+============================ Running step-20
+Number of active cells: 64
+Total number of cells: 85
+Number of degrees of freedom: 208 (144+64)
+10 CG Schur complement iterations to obtain convergence.
+Errors: ||e_p||_L2 = 0.178055,   ||e_u||_L2 = 0.0433435
+@endcode
+
+The fact that the number of iterations is so small, of course, is due to good
+(but expensive!) preconditioner we have developed. To get confidence in the
+solution, let us take a look at it. The following three images show (from left
+to right) the x-velocity, the y-velocity, and the pressure (click on the images
+for larger versions):
+
+@image html step-20.u.png
+@image html step-20.v.png
+@image html step-20.p.png
+
+
+
+Let us start with the pressure: it is highest at the left and lowest at the
+right, so flow will be from left to right. In addition, though hardly visible
+in the graph, we have chosen the pressure field such that the flow left-right
+flow first channels towards the center and then outward again. Consequently,
+the x-velocity has to increase to get the flow through the narrow part,
+something that can easily be seen in the left image. The middle image
+represents inward flow in y-direction at the left end of the domain, and
+outward flow in y-directino at the right end of the domain.
+
+
+
+As an additional remark, note how the x-velocity in the left image is only
+continuous in x-direction, whereas the y-velocity is continuous in
+y-direction. The flow fields are discontinuous in the other directions. This
+very obviously reflects the continuity properties of the Raviart-Thomas
+elements, which are, in fact, only in the space H(div) and not in the space
+$H^1$. Finally, the pressure field is completely discontinuous, but
+that should not surprise given that we have chosen <code>FE_DGQ(0)</code> as
+the finite element for that solution component.
+
+
+
+<h3>Convergence</h3>
+
+
+The program offers two obvious places where playing and observing convergence
+is in order: the degree of the finite elements used (passed to the constructor
+of the <code>MixedLaplaceProblem</code> class from <code>main()</code>), and
+the refinement level (determined in
+<code>MixedLaplaceProblem::make_grid_and_dofs</code>). What one can do is to
+change these values and observe the errors computed later on in the course of
+the program run.
+
+
+
+If one does this, one finds the following pattern for the $L_2$ error
+in the pressure variable:
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td></td>
+    <td colspan="3" align="center">Finite element order</td>
+  </tr>
+
+  <tr>
+    <td>Refinement level</td>
+    <td>0</td>
+    <td>1</td>
+    <td>2</td>
+  </tr>
+
+  <tr>
+    <td>0</td>  <td>1.45344</td>  <td>0.0831743</td>  <td>0.0235186</td>
+  </tr>
+
+  <tr>
+    <td>1</td>  <td>0.715099</td>  <td>0.0245341</td>  <td>0.00293983</td>
+  </tr>
+
+  <tr>
+    <td>2</td>  <td>0.356383</td>  <td>0.0063458</td>  <td>0.000367478</td>
+  </tr>
+
+  <tr>
+    <td>3</td>  <td>0.178055</td>  <td>0.00159944</td>  <td>4.59349e-05</td>
+  </tr>
+
+  <tr>
+    <td>4</td>  <td>0.0890105</td>  <td>0.000400669</td>  <td>5.74184e-06</td>
+  </tr>
+
+  <tr>
+    <td>5</td>  <td>0.0445032</td>  <td>0.000100218</td>  <td>7.17799e-07</td>
+  </tr>
+
+  <tr>
+    <td>6</td>  <td>0.0222513</td>  <td>2.50576e-05</td>  <td>9.0164e-08</td>
+  </tr>
+
+  <tr>
+    <td></td>  <td>$O(h)$</td>  <td>$O(h^2)$</td>  <td>$O(h^3)$</td>
+  </tr>
+</table>
+
+The theoretically expected convergence orders are very nicely reflected by the
+experimentally observed ones indicated in the last row of the table.
+
+
+
+One can make the same experiment with the $L_2$ error
+in the velocity variables:
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td></td>
+    <td colspan="3" align="center">Finite element order</td>
+  </tr>
+
+  <tr>
+    <td>Refinement level</td>
+    <td>0</td>
+    <td>1</td>
+    <td>2</td>
+  </tr>
+
+  <tr>
+    <td>0</td> <td>0.367423</td> <td>0.127657</td> <td>5.10388e-14</td>
+  </tr>
+
+  <tr>
+    <td>1</td> <td>0.175891</td> <td>0.0319142</td> <td>9.04414e-15</td>
+  </tr>
+
+  <tr>
+    <td>2</td> <td>0.0869402</td> <td>0.00797856</td> <td>1.23723e-14</td>
+  </tr>
+
+  <tr>
+    <td>3</td> <td>0.0433435</td> <td>0.00199464</td> <td>1.86345e-07</td>
+  </tr>
+
+  <tr>
+    <td>4</td> <td>0.0216559</td> <td>0.00049866</td> <td>2.72566e-07</td>
+  </tr>
+
+  <tr>
+    <td>5</td> <td>0.010826</td> <td>0.000124664</td> <td>3.57141e-07</td>
+  </tr>
+
+  <tr>
+    <td>6</td> <td>0.00541274</td> <td>3.1166e-05</td> <td>4.46124e-07</td>
+  </tr>
+
+  <tr>
+    <td></td>  <td>$O(h)$</td>  <td>$O(h^2)$</td>  <td>$O(h^3)$</td>
+  </tr>
+</table>
+The result concerning the convergence order is the same here.
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+
+Realistic flow computations for ground water or oil reservoir simulations will
+not use a constant permeability. Here's a first, rather simple way to change
+this situation: we use a permeability that decays very rapidly away from a
+central flowline until it hits a background value of 0.001. This is to mimick
+the behavior of fluids in sandstone: in most of the domain, the sandstone is
+homogenous and, while permeably to fluids, not overly so; on the other stone,
+the stone has cracked, or faulted, along one line, and the fluids flow much
+easier along this large crask. Here is how we could implement something like
+this: 
+@code
+template <int dim>
+void
+KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
+                           std::vector<Tensor<2,dim> >    &values) const
+{
+  Assert (points.size() == values.size(),
+	  ExcDimensionMismatch (points.size(), values.size()));
+
+  for (unsigned int p=0; p<points.size(); ++p)
+    {
+      values[p].clear ();
+
+      const double distance_to_flowline
+        = std::fabs(points[p][1]-0.2*std::sin(10*points[p][0]));
+      
+      const double permeability = std::max(std::exp(-(distance_to_flowline*
+                                                      distance_to_flowline)
+                                                    / (0.1 * 0.1)),
+                                           0.001);
+      
+      for (unsigned int d=0; d<dim; ++d)
+	values[p][d][d] = 1./permeability;
+    }
+}
+@endcode
+Remember that the function returns the inverse of the permeability tensor.
+
+
+
+With a significantly higher mesh resolution, we can visualize this, here with
+x- and y-velocity: 
+
+
+@image html step-20.u-wiggle.png
+@image html step-20.v-wiggle.png
+
+
+It is obvious how fluids flow essentially only along the middle line, and not
+anywhere else.
+
+
+
+Another possibility would be to use a random permeability field. A simple way
+to achieve this would be to scatter a number of centers around the domain and
+then use a permeability field that is the sum of (negative) exponentials for
+each of these centers. Flow would then try to hop from one center of high
+permeability to the next one. This is an entirely unscientific attempt at
+describing a random medium, but one possibility to implement this behavior
+would look like this:
+@code
+template <int dim>
+class KInverse : public TensorFunction<2,dim>
+{
+  public:
+    KInverse ();
+    
+    virtual void value_list (const std::vector<Point<dim> > &points,
+			     std::vector<Tensor<2,dim> >    &values) const;
+
+  private:
+    std::vector<Point<dim> > centers;
+};
+
+
+template <int dim>
+KInverse<dim>::KInverse () 
+{
+  const unsigned int N = 40;
+  centers.resize (N);
+  for (unsigned int i=0; i<N; ++i)
+    for (unsigned int d=0; d<dim; ++d)
+      centers[i][d] = 2.*rand()/RAND_MAX-1;
+}
+
+
+template <int dim>
+void
+KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
+                           std::vector<Tensor<2,dim> >    &values) const
+{
+  Assert (points.size() == values.size(),
+	  ExcDimensionMismatch (points.size(), values.size()));
+
+  for (unsigned int p=0; p<points.size(); ++p)
+    {
+      values[p].clear ();
+
+      double permeability = 0;
+      for (unsigned int i=0; i<centers.size(); ++i)
+        permeability += std::exp(-(points[p]-centers[i]).square()
+                                 / (0.1 * 0.1));
+      
+      const double normalized_permeability
+        = std::max(permeability, 0.005);
+      
+      for (unsigned int d=0; d<dim; ++d)
+	values[p][d][d] = 1./normalized_permeability;
+    }
+}
+@endcode
+
+
+With a permeability field like this, we would get x-velocities and pressures as
+follows:
+
+
+@image html step-20.u-random.png
+@image html step-20.p-random.png
+

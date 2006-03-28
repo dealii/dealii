@@ -1,0 +1,1538 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+<p>
+[A higher quality version of the introduction is available as a PDF
+file by <a href="step-18.data/intro.pdf">clicking here</a>]
+</p>
+
+
+<P>
+This tutorial program is another one in the series on the elasticity problem
+that we have already started with step-8 and step-17. It extends it into two
+different directions: first, it solves the quasistatic but time dependent
+elasticity problem for large deformations with a Lagrangian mesh movement
+approach. Secondly, it shows some more techniques for solving such problems
+using parallel processing with PETSc's linear algebra. In addition to this, we
+show how to work around the main bottleneck of step-17, namely that we
+generated graphical output from only one process, and that this scaled very
+badly with larger numbers of processes and on large problems. Finally, a good
+number of assorted improvements and techniques are demonstrated that have not
+been shown yet in previous programs.
+
+<P>
+As before in step-17, the program runs just as fine on a single sequential
+machine as long as you have PETSc installed. Information on how to tell
+deal.II about a PETSc installation on your system can be found in the deal.II
+README file, which is linked to from the main documentation page
+<TT>doc/index.html</TT> in your installation of deal.II, or on the deal.II
+webpage <TT>http://www.dealii.org/</TT>.
+
+<P>
+
+<H2><A NAME="SECTION00001000000000000000">
+Quasistatic elastic deformation</A>
+</H2>
+
+<P>
+
+<H3><A NAME="SECTION00001100000000000000">
+Motivation of the model</A>
+</H3>
+
+<P>
+In general, time-dependent small elastic deformations are described by the
+elastic wave equation
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="223" HEIGHT="57" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img1.png"
+ ALT="$\displaystyle \rho \frac{\partial^2 \vec u}{\partial t^2} + c \frac{\partial \vec u}{\partial t} - \div ( C \varepsilon(\vec u)) = \vec f$">&nbsp; &nbsp;in <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img2.png"
+ ALT="$ \Omega$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img3.png"
+ ALT="$\displaystyle ,$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(1)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+where <!-- MATH
+ $\vec u=\vec u (\vec x,t)$
+ -->
+<IMG
+ WIDTH="81" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img4.png"
+ ALT="$ \vec u=\vec u (\vec x,t)$">
+ is the deformation of the body, <IMG
+ WIDTH="13" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img5.png"
+ ALT="$ \rho$">
+
+and <IMG
+ WIDTH="11" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img6.png"
+ ALT="$ c$">
+ the density and attenuation coefficient, and <IMG
+ WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img7.png"
+ ALT="$ \vec f$">
+ external forces.
+In addition, initial conditions
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="102" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img8.png"
+ ALT="$\displaystyle \vec u(\cdot, 0) = \vec u_0(\cdot)$">&nbsp; &nbsp;on <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img2.png"
+ ALT="$ \Omega$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img3.png"
+ ALT="$\displaystyle ,$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(2)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+and Dirichlet (displacement) or Neumann (traction) boundary conditions need
+to be specified for a unique solution:
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="49" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img9.png"
+ ALT="$\displaystyle \vec u(\vec x,t)$"></TD>
+<TD NOWRAP ALIGN="LEFT"><IMG
+ WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img10.png"
+ ALT="$\displaystyle = \vec d(\vec x,t) \qquad$"></TD>
+<TD>&nbsp;</TD>
+<TD NOWRAP ALIGN="LEFT">on <!-- MATH
+ $\Gamma_D\subset\partial\Omega$
+ -->
+<IMG
+ WIDTH="68" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img11.png"
+ ALT="$ \Gamma_D\subset\partial\Omega$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img3.png"
+ ALT="$\displaystyle ,$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(3)</TD></TR>
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="97" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img12.png"
+ ALT="$\displaystyle \vec n \ C \varepsilon(\vec u(\vec x,t))$"></TD>
+<TD NOWRAP ALIGN="LEFT"><IMG
+ WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img13.png"
+ ALT="$\displaystyle = \vec b(\vec x,t) \qquad$"></TD>
+<TD>&nbsp;</TD>
+<TD NOWRAP ALIGN="LEFT">on <!-- MATH
+ $\Gamma_N=\partial\Omega\backslash\Gamma_D$
+ -->
+<IMG
+ WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img14.png"
+ ALT="$ \Gamma_N=\partial\Omega\backslash\Gamma_D$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img15.png"
+ ALT="$\displaystyle .$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(4)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+In above formulation, <!-- MATH
+ $\varepsilon(\vec u)= \tfrac 12 (\nabla \vec u + \nabla
+\vec u^T)$
+ -->
+<IMG
+ WIDTH="155" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img16.png"
+ ALT="$ \varepsilon(\vec u)= \tfrac 12 (\nabla \vec u + \nabla
+\vec u^T)$">
+ is the symmetric gradient of the displacement, also called the
+<I>strain</I>. <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img17.png"
+ ALT="$ C$">
+ is a tensor of rank 4, called the <I>stress-strain
+  tensor</I> that contains knowledge of the elastic strength of the material; its
+symmetry properties make sure that it maps symmetric tensors of rank 2
+(``matrices'' of dimension <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img18.png"
+ ALT="$ d$">
+, where <IMG
+ WIDTH="13" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img18.png"
+ ALT="$ d$">
+ is the spatial dimensionality) onto
+symmetric tensors of the same rank. We will comment on the roles of the strain
+and stress tensors more below. For the moment it suffices to say that we
+interpret the term <!-- MATH
+ $\div ( C \varepsilon(\vec u))$
+ -->
+<IMG
+ WIDTH="87" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img19.png"
+ ALT="$ \div ( C \varepsilon(\vec u))$">
+ as the vector with
+components <!-- MATH
+ $\tfrac \partial{\partial x_j} C_{ijkl} \varepsilon(\vec u)_{kl}$
+ -->
+<IMG
+ WIDTH="105" HEIGHT="36" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img20.png"
+ ALT="$ \tfrac \partial{\partial x_j} C_{ijkl} \varepsilon(\vec u)_{kl}$">
+,
+where summation over indices <IMG
+ WIDTH="39" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img21.png"
+ ALT="$ j,k,l$">
+ is implied.
+
+<P>
+The quasistatic limit of this equation is motivated as follows: each small
+perturbation of the body, for example by changes in boundary condition or the
+forcing function, will result in a corresponding change in the configuration
+of the body. In general, this will be in the form of waves radiating away from
+the location of the disturbance. Due to the presence of the damping term,
+these waves will be attenuated on a time scale of, say, <IMG
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img22.png"
+ ALT="$ \tau$">
+. Now, assume
+that all changes in external forcing happen on times scales that are
+much larger than <IMG
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img22.png"
+ ALT="$ \tau$">
+. In that case, the dynamic nature of the change is
+unimportant: we can consider the body to always be in static equilibrium,
+i.e.&nbsp;we can assume that at all times the body satisfies
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="99" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img23.png"
+ ALT="$\displaystyle - \div ( C \varepsilon(\vec u))$"></TD>
+<TD NOWRAP ALIGN="LEFT"><IMG
+ WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img24.png"
+ ALT="$\displaystyle = \vec f$"></TD>
+<TD>&nbsp;</TD>
+<TD NOWRAP ALIGN="LEFT">in <IMG
+ WIDTH="16" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img2.png"
+ ALT="$ \Omega$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img3.png"
+ ALT="$\displaystyle ,$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(5)</TD></TR>
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="49" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img9.png"
+ ALT="$\displaystyle \vec u(\vec x,t)$"></TD>
+<TD NOWRAP ALIGN="LEFT"><IMG
+ WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img10.png"
+ ALT="$\displaystyle = \vec d(\vec x,t) \qquad$"></TD>
+<TD>&nbsp;</TD>
+<TD NOWRAP ALIGN="LEFT">on <IMG
+ WIDTH="26" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img25.png"
+ ALT="$ \Gamma_D$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img3.png"
+ ALT="$\displaystyle ,$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(6)</TD></TR>
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="97" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img12.png"
+ ALT="$\displaystyle \vec n \ C \varepsilon(\vec u(\vec x,t))$"></TD>
+<TD NOWRAP ALIGN="LEFT"><IMG
+ WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img13.png"
+ ALT="$\displaystyle = \vec b(\vec x,t) \qquad$"></TD>
+<TD>&nbsp;</TD>
+<TD NOWRAP ALIGN="LEFT">on <IMG
+ WIDTH="26" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img26.png"
+ ALT="$ \Gamma_N$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img15.png"
+ ALT="$\displaystyle .$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(7)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Note that the differential equation does not contain any time derivatives any
+more - all time dependence is introduced through boundary conditions and a
+possibly time-varying force function <!-- MATH
+ $\vec f(\vec x,t)$
+ -->
+<IMG
+ WIDTH="47" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img27.png"
+ ALT="$ \vec f(\vec x,t)$">
+. The changes in
+configuration can therefore be considered as being stationary
+instantaneously. An alternative view of this is that <IMG
+ WIDTH="10" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img28.png"
+ ALT="$ t$">
+ is not really a time
+variable, but only a time-like parameter that governs the evolution of the
+problem.
+
+<P>
+While these equations are sufficient to describe small deformations, computing
+large deformations is a little more complicated. To do so, let us first
+introduce a tensorial stress variable <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img29.png"
+ ALT="$ \sigma$">
+, and write the differential
+equations in terms of the stress:
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="54" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img30.png"
+ ALT="$\displaystyle - \div\sigma$"></TD>
+<TD NOWRAP ALIGN="LEFT"><IMG
+ WIDTH="29" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img24.png"
+ ALT="$\displaystyle = \vec f$"></TD>
+<TD>&nbsp;</TD>
+<TD NOWRAP ALIGN="LEFT">in <IMG
+ WIDTH="34" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img31.png"
+ ALT="$ \Omega(t)$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img3.png"
+ ALT="$\displaystyle ,$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(8)</TD></TR>
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="49" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img9.png"
+ ALT="$\displaystyle \vec u(\vec x,t)$"></TD>
+<TD NOWRAP ALIGN="LEFT"><IMG
+ WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img10.png"
+ ALT="$\displaystyle = \vec d(\vec x,t) \qquad$"></TD>
+<TD>&nbsp;</TD>
+<TD NOWRAP ALIGN="LEFT">on <!-- MATH
+ $\Gamma_D\subset\partial\Omega(t)$
+ -->
+<IMG
+ WIDTH="86" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img32.png"
+ ALT="$ \Gamma_D\subset\partial\Omega(t)$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img3.png"
+ ALT="$\displaystyle ,$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(9)</TD></TR>
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="97" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img12.png"
+ ALT="$\displaystyle \vec n \ C \varepsilon(\vec u(\vec x,t))$"></TD>
+<TD NOWRAP ALIGN="LEFT"><IMG
+ WIDTH="98" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img13.png"
+ ALT="$\displaystyle = \vec b(\vec x,t) \qquad$"></TD>
+<TD>&nbsp;</TD>
+<TD NOWRAP ALIGN="LEFT">on <!-- MATH
+ $\Gamma_N=\partial\Omega(t)\backslash\Gamma_D$
+ -->
+<IMG
+ WIDTH="116" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img33.png"
+ ALT="$ \Gamma_N=\partial\Omega(t)\backslash\Gamma_D$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img15.png"
+ ALT="$\displaystyle .$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(10)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+Note that these equations are posed on a domain <IMG
+ WIDTH="34" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img31.png"
+ ALT="$ \Omega(t)$">
+ that
+changes with time, with the boundary moving according to the
+displacements <!-- MATH
+ $\vec u(\vec x,t)$
+ -->
+<IMG
+ WIDTH="49" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img34.png"
+ ALT="$ \vec u(\vec x,t)$">
+ of the points on the boundary. To
+complete this system, we have to specify the incremental relationship between
+the stress and the strain, as follows:
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="82" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img35.png"
+ ALT="$\displaystyle \dot\sigma = C \varepsilon (\dot{\vec u}),$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+<A NAME="eq:stress-strain">(11)</A></TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+where a dot indicates a time derivative. Both the stress <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img29.png"
+ ALT="$ \sigma$">
+ and the
+strain <!-- MATH
+ $\varepsilon(\vec u)$
+ -->
+<IMG
+ WIDTH="34" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img36.png"
+ ALT="$ \varepsilon(\vec u)$">
+ are symmetric tensors of rank 2.
+
+<P>
+
+<H3><A NAME="SECTION00001200000000000000">
+Time discretization</A>
+</H3>
+
+<P>
+Numerically, this system is solved as follows: first, we discretize
+the time component using a backward Euler scheme. This leads to a
+discrete equilibrium of force at time step <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img37.png"
+ ALT="$ n$">
+:
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="106" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img38.png"
+ ALT="$\displaystyle -\div\sigma^n = f^n,$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(12)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+where
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="167" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img39.png"
+ ALT="$\displaystyle \sigma^n = \sigma^{n-1} + C \varepsilon (\Delta \vec u^n),$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(13)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+and <!-- MATH
+ $\Delta \vec u^n$
+ -->
+<IMG
+ WIDTH="37" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img40.png"
+ ALT="$ \Delta \vec u^n$">
+ the incremental displacement for time step
+<IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img37.png"
+ ALT="$ n$">
+. In addition, we have to specify initial data <!-- MATH
+ $\vec u(\cdot,0)=\vec u_0$
+ -->
+<IMG
+ WIDTH="85" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img41.png"
+ ALT="$ \vec u(\cdot,0)=\vec u_0$">
+. 
+This way, if we want to solve for the displacement increment, we
+have to solve the following system:
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="108" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img42.png"
+ ALT="$\displaystyle - \div C \varepsilon(\Delta\vec u^n)$"></TD>
+<TD NOWRAP ALIGN="LEFT"><IMG
+ WIDTH="110" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img43.png"
+ ALT="$\displaystyle = \vec f + \div\sigma^{n-1}$"></TD>
+<TD>&nbsp;</TD>
+<TD NOWRAP ALIGN="LEFT">in <!-- MATH
+ $\Omega(t_{n-1})$
+ -->
+<IMG
+ WIDTH="59" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img44.png"
+ ALT="$ \Omega(t_{n-1})$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img3.png"
+ ALT="$\displaystyle ,$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(14)</TD></TR>
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="71" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img45.png"
+ ALT="$\displaystyle \Delta \vec u^n(\vec x,t)$"></TD>
+<TD NOWRAP ALIGN="LEFT"><IMG
+ WIDTH="196" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img46.png"
+ ALT="$\displaystyle = \vec d(\vec x,t_n) - \vec d(\vec x,t_{n-1}) \qquad$"></TD>
+<TD>&nbsp;</TD>
+<TD NOWRAP ALIGN="LEFT">on <!-- MATH
+ $\Gamma_D\subset\partial\Omega(t_{n-1})$
+ -->
+<IMG
+ WIDTH="111" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img47.png"
+ ALT="$ \Gamma_D\subset\partial\Omega(t_{n-1})$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img3.png"
+ ALT="$\displaystyle ,$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(15)</TD></TR>
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="RIGHT"><IMG
+ WIDTH="119" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img48.png"
+ ALT="$\displaystyle \vec n \ C \varepsilon(\Delta \vec u^n(\vec x,t))$"></TD>
+<TD NOWRAP ALIGN="LEFT"><IMG
+ WIDTH="196" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img49.png"
+ ALT="$\displaystyle = \vec b(\vec x,t_n)-\vec b(\vec x,t_{n-1}) \qquad$"></TD>
+<TD>&nbsp;</TD>
+<TD NOWRAP ALIGN="LEFT">on <!-- MATH
+ $\Gamma_N=\partial\Omega(t_{n-1})\backslash\Gamma_D$
+ -->
+<IMG
+ WIDTH="141" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img50.png"
+ ALT="$ \Gamma_N=\partial\Omega(t_{n-1})\backslash\Gamma_D$">
+<IMG
+ WIDTH="9" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img15.png"
+ ALT="$\displaystyle .$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(16)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+The weak form of this set of equations, which as usual is the basis for the
+finite element formulation, reads as follows: find <!-- MATH
+ $\Delta \vec u^n \in
+\{v\in H^1(\Omega(t_{n-1}))^d: v|_{\Gamma_D}=\vec d(\cdot,t_n) - \vec d(\cdot,t_{n-1})\}$
+ -->
+<IMG
+ WIDTH="394" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img51.png"
+ ALT="$ \Delta \vec u^n \in
+\{v\in H^1(\Omega(t_{n-1}))^d: v\vert _{\Gamma_D}=\vec d(\cdot,t_n) - \vec d(\cdot,t_{n-1})\}$">
+
+such that
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="412" HEIGHT="78" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img52.png"
+ ALT="\begin{gather*}\begin{split}(C \varepsilon(\Delta\vec u^n), \varepsilon(\varphi)...
+...in H^1(\Omega(t_{n-1}))^d: \vec v\vert _{\Gamma_D}=0\}. \end{split}\end{gather*}"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+<A NAME="eq:linear-system">(17)</A></TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+We note that, for simplicity, in the program we will always assume that there
+are no boundary forces, i.e.&nbsp;<!-- MATH
+ $\vec b = 0$
+ -->
+<IMG
+ WIDTH="44" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img53.png"
+ ALT="$ \vec b = 0$">
+, and that the deformation of the
+body is driven by body forces <IMG
+ WIDTH="12" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img7.png"
+ ALT="$ \vec f$">
+ and prescribed boundary displacements
+<IMG
+ WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img54.png"
+ ALT="$ \vec d$">
+ alone. It is also worth noting that when integrating by parts, we
+would get terms of the form <!-- MATH
+ $(C \varepsilon(\Delta\vec u^n), \nabla \varphi
+)_{\Omega(t_{n-1})}$
+ -->
+<IMG
+ WIDTH="158" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img55.png"
+ ALT="$ (C \varepsilon(\Delta\vec u^n), \nabla \varphi
+)_{\Omega(t_{n-1})}$">
+, but that we replace it with the term involving the
+symmetric gradient <!-- MATH
+ $\varepsilon(\varphi)$
+ -->
+<IMG
+ WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img56.png"
+ ALT="$ \varepsilon(\varphi)$">
+ instead of <!-- MATH
+ $\nabla\varphi$
+ -->
+<IMG
+ WIDTH="28" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img57.png"
+ ALT="$ \nabla\varphi$">
+. Due to
+the symmetry of <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img17.png"
+ ALT="$ C$">
+, the two terms are equivalent, but the symmetric version
+avoids a potential for round-off to render the resulting matrix slightly
+non-symmetric.
+
+<P>
+The system at time step <IMG
+ WIDTH="14" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img37.png"
+ ALT="$ n$">
+, to be solved on the old domain
+<!-- MATH
+ $\Omega(t_{n-1})$
+ -->
+<IMG
+ WIDTH="59" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img44.png"
+ ALT="$ \Omega(t_{n-1})$">
+, has exactly the form of a stationary elastic
+problem, and is therefore similar to what we have already implemented
+in previous example programs. We will therefore not comment on the
+space discretization beyond saying that we again use lowest order
+continuous finite elements.
+
+<P>
+There are differences, however:
+
+<OL>
+<LI>We have to move (update) the mesh after each time step, in order to be 
+  able to solve the next time step on a new domain;
+
+<P>
+</LI>
+<LI>We need to know <!-- MATH
+ $\sigma^{n-1}$
+ -->
+<IMG
+ WIDTH="39" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img58.png"
+ ALT="$ \sigma^{n-1}$">
+ to compute the next incremental
+  displacement, i.e.&nbsp;we need to compute it at the end of the time step
+  to make sure it is available for the next time step. Essentially,
+  the stress variable is our window to the history of deformation of
+  the body.
+</LI>
+</OL>
+These two operations are done in the functions <TT>move_mesh</TT> and
+<TT>update_quadrature_point_history</TT> in the program. While moving
+the mesh is only a technicality, updating the stress is a little more
+complicated and will be discussed in the next section.
+
+<P>
+
+<H3><A NAME="SECTION00001300000000000000">
+Updating the stress variable</A>
+</H3>
+
+<P>
+As indicated above, we need to have the stress variable <IMG
+ WIDTH="23" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img59.png"
+ ALT="$ \sigma^n$">
+ available
+when computing time step <IMG
+ WIDTH="41" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img60.png"
+ ALT="$ n+1$">
+, and we can compute it using
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="167" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img61.png"
+ ALT="$\displaystyle \sigma^n = \sigma^{n-1} + C \varepsilon (\Delta \vec u^n).$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+<A NAME="eq:stress-update">(18)</A></TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+There are, despite the apparent simplicity of this equation, two questions
+that we need to discuss. The first concerns the way we store <IMG
+ WIDTH="23" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img59.png"
+ ALT="$ \sigma^n$">
+: even
+if we compute the incremental updates <!-- MATH
+ $\Delta\vec u^n$
+ -->
+<IMG
+ WIDTH="37" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img40.png"
+ ALT="$ \Delta \vec u^n$">
+ using lowest-order
+finite elements, then its symmetric gradient <!-- MATH
+ $\varepsilon(\Delta\vec u^n)$
+ -->
+<IMG
+ WIDTH="56" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img62.png"
+ ALT="$ \varepsilon(\Delta\vec u^n)$">
+ is
+in general still a function that is not easy to describe. In particular, it is
+not a piecewise constant function, and on general meshes (with cells that are
+not rectangles parallel to the coordinate axes) or with non-constant
+stress-strain tensors <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img17.png"
+ ALT="$ C$">
+ it is not even a bi- or trilinear function. Thus, it
+is a priori not clear how to store <IMG
+ WIDTH="23" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img59.png"
+ ALT="$ \sigma^n$">
+ in a computer program.
+
+<P>
+To decide this, we have to see where it is used. The only place where we
+require the stress is in the term
+<!-- MATH
+ $(\sigma^{n-1},\varepsilon(\varphi))_{\Omega(t_{n-1})}$
+ -->
+<IMG
+ WIDTH="135" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img63.png"
+ ALT="$ (\sigma^{n-1},\varepsilon(\varphi))_{\Omega(t_{n-1})}$">
+. In practice, we of
+course replace this term by numerical quadrature:
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="518" HEIGHT="52" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img64.png"
+ ALT="$\displaystyle (\sigma^{n-1},\varepsilon(\varphi))_{\Omega(t_{n-1})} = \sum_{K\s...
+...athbb{T}}} \sum_q w_q \ \sigma^{n-1}(\vec x_q) : \varepsilon(\varphi(\vec x_q),$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(19)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+where <IMG
+ WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img65.png"
+ ALT="$ w_q$">
+ are the quadrature weights and <IMG
+ WIDTH="21" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img66.png"
+ ALT="$ \vec x_q$">
+ the quadrature points on
+cell <IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img67.png"
+ ALT="$ K$">
+. This should make clear that what we really need is not the stress
+<!-- MATH
+ $\sigma^{n-1}$
+ -->
+<IMG
+ WIDTH="39" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img58.png"
+ ALT="$ \sigma^{n-1}$">
+ in itself, but only the values of the stress in the quadrature
+points on all cells. This, however, is a simpler task: we only have to provide
+a data structure that is able to hold one symmetric tensor of rank 2 for each
+quadrature point on all cells (or, since we compute in parallel, all
+quadrature points of all cells that the present MPI process ``owns''). At the
+end of each time step we then only have to evaluate <!-- MATH
+ $\varepsilon(\Delta \vec u^n(\vec x_q))$
+ -->
+<IMG
+ WIDTH="85" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img68.png"
+ ALT="$ \varepsilon(\Delta \vec u^n(\vec x_q))$">
+, multiply it by the stress-strain tensor <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img17.png"
+ ALT="$ C$">
+, and use the
+result to update the stress <!-- MATH
+ $\sigma^n(\vec x_q)$
+ -->
+<IMG
+ WIDTH="52" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img69.png"
+ ALT="$ \sigma^n(\vec x_q)$">
+ at quadrature point <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img70.png"
+ ALT="$ q$">
+.
+
+<P>
+The second complication is not visible in our notation as chosen above. It is
+due to the fact that we compute <!-- MATH
+ $\Delta u^n$
+ -->
+<IMG
+ WIDTH="36" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img71.png"
+ ALT="$ \Delta u^n$">
+ on the domain <!-- MATH
+ $\Omega(t_{n-1})$
+ -->
+<IMG
+ WIDTH="59" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img44.png"
+ ALT="$ \Omega(t_{n-1})$">
+,
+and then use this displacement increment to both update the stress as well as
+move the mesh nodes around to get to <!-- MATH
+ $\Omega(t_n)$
+ -->
+<IMG
+ WIDTH="43" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img72.png"
+ ALT="$ \Omega(t_n)$">
+ on which the next increment
+is computed. What we have to make sure, in this context, is that moving the
+mesh does not only involve moving around the nodes, but also making
+corresponding changes to the stress variable: the updated stress is a variable
+that is defined with respect to the coordinate system of the material in the
+old domain, and has to be transferred to the new domain. The reason for this
+can be understood as follows: locally, the incremental deformation <!-- MATH
+ $\Delta\vec u$
+ -->
+<IMG
+ WIDTH="28" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img73.png"
+ ALT="$ \Delta\vec u$">
+ can be decomposed into three parts, a linear translation (the constant part
+of the displacement increment field in the neighborhood of a point), a
+dilational 
+component (that part of the gradient of the displacement field that has a
+nonzero divergence), and a rotation. A linear translation of the material does
+not affect the stresses that are frozen into it - the stress values are
+simply translated along. The dilational or compressional change produces a
+corresponding stress update. However, the rotational component does not
+necessarily induce a nonzero stress update (think, in 2d, for example of the
+situation where <!-- MATH
+ $\Delta\vec u=(y, -x)^T$
+ -->
+<IMG
+ WIDTH="108" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img74.png"
+ ALT="$ \Delta\vec u=(y, -x)^T$">
+, with which <!-- MATH
+ $\varepsilon(\Delta \vec u)=0$
+ -->
+<IMG
+ WIDTH="77" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img75.png"
+ ALT="$ \varepsilon(\Delta \vec u)=0$">
+). Nevertheless, if the the material was pre-stressed in a certain
+direction, then this direction will be rotated along with the material.  To
+this end, we have to define a rotation matrix <!-- MATH
+ $R(\Delta \vec u^n)$
+ -->
+<IMG
+ WIDTH="61" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img76.png"
+ ALT="$ R(\Delta \vec u^n)$">
+ that
+describes, in each point the rotation due to the displacement increments. It
+is not hard to see that the actual dependence of <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img77.png"
+ ALT="$ R$">
+ on <!-- MATH
+ $\Delta \vec u^n$
+ -->
+<IMG
+ WIDTH="37" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img40.png"
+ ALT="$ \Delta \vec u^n$">
+ can
+only be through the curl of the displacement, rather than the displacement
+itself or its full gradient (as mentioned above, the constant components of
+the increment describe translations, its divergence the dilational modes, and
+the curl the rotational modes). Since the exact form of <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img77.png"
+ ALT="$ R$">
+ is cumbersome, we
+only state it in the program code, and note that the correct updating formula
+for the stress variable is then
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="299" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img78.png"
+ ALT="$\displaystyle \sigma^n = R(\Delta \vec u^n)^T [\sigma^{n-1} + C \varepsilon (\Delta \vec u^n)] R(\Delta \vec u^n).$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+<A NAME="eq:stress-update+rot">(20)</A></TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+
+<P>
+Both stress update and rotation are implemented in the function
+<TT>update_quadrature_point_history</TT> of the example program.
+
+<P>
+
+<H2><A NAME="SECTION00002000000000000000">
+Parallel graphical output</A>
+</H2>
+
+<P>
+In the step-17 example program, the main bottleneck for parallel computations
+was that only the first processor generated output for the entire domain.
+Since generating graphical output is expensive, this did not scale well when
+large numbers of processors were involved. However, no viable ways around this
+problem were implemented in the library at the time, and the problem was
+deferred to a later version.
+
+<P>
+This functionality has been implemented in the meantime, and this is the time
+to explain its use. Basically, what we need to do is let every process
+generate graphical output for that subset of cells that it owns, write them
+into separate files and have a way to merge them later on. At this point, it
+should be noted that none of the graphical output formats known to the author
+of this program allows for a simple way to later re-read it and merge it with
+other files corresponding to the same simulation. What deal.II therefore
+offers is the following: When you call the <TT>DataOut::build_patches</TT>
+function, an intermediate format is generated that contains all the
+information for the data on each cell. Usually, this intermediate format is
+then further processed and converted into one of the graphical formats that we
+can presently write, such as gmv, eps, ucd, gnuplot, or a number of other
+ones. Once written in these formats, there is no way to reconstruct the
+necessary information to merge multiple blocks of output. However, the base
+classes of <TT>DataOut</TT> also allow to simply dump the intermediate format
+to a file, from which it can later be recovered without loss of information.
+
+<P>
+This has two advantages: first, simulations may just dump the intermediate
+format data during run-time, and the user may later decide which particular
+graphics format she wants to have. This way, she does not have to re-run the
+entire simulation if graphical output is requested in a different format. One
+typical case is that one would like to take a quick look at the data with
+gnuplot, and then create high-quality pictures using GMV or OpenDX. Since both
+can be generated out of the intermediate format without problem, there is no
+need to re-run the simulation.
+
+<P>
+In the present context, of more interest is the fact that in contrast to any
+of the other formats, it is simple to merge multiple files of intermediate
+format, if they belong to the same simulation. This is what we will do here:
+we will generate one output file in intermediate format for each processor
+that belongs to this computation (in the sequential case, this will simply be
+a single file). They may then later be read in and merged so that we can
+output a single file in whatever graphical format is requested.
+
+<P>
+The way to do this is to first instruct the <TT>DataOutBase</TT> class to
+write intermediate format rather than in gmv or any other graphical
+format. This is simple: just use
+<TT>data_out.write_deal_II_intermediate</TT>. We will write to a file
+called <TT>solution-TTTT.TTTT.d2</TT> if there is only one processor, or
+files <TT>solution-TTTT.TTTT.NNN.d2</TT> if this is really a parallel
+job. Here, <TT>TTTT.TTTT</TT> denotes the time for which this output has
+been generated, and <TT>NNN</TT> the number of the MPI process that did this.
+
+<P>
+The next step is to convert this file or these files into whatever
+format you like. The program that does this is the step-19 tutorial program:
+for example, for the first time step, call it through
+<DIV ALIGN="CENTER">
+<TT>../step-19/step-19 solution-0001.0000.*.d2 solution-0001.0000.gmv</TT>
+
+</DIV>
+to merge all the intermediate format files into a single file in GMV
+format. More details on the parameters of this program and what it can do for
+you can be found in the documentation of the step-19 tutorial program.
+
+<P>
+
+<H2><A NAME="SECTION00003000000000000000">
+Overall structure of the program</A>
+</H2>
+
+<P>
+The overall structure of the program can be inferred from the <TT>run()</TT>
+function that first calls <TT>do_initial_timestep()</TT> for the first time
+step, and then <TT>do_timestep()</TT> on all subsequent time steps. The
+difference between these functions is only that in the first time step we
+start on a coarse mesh, solve on it, refine the mesh adaptively, and then
+start again with a clean state on that new mesh. This procedure gives us a
+better starting mesh, although we should of course keep adapting the mesh as
+iterations proceed - this isn't done in this program, but commented on below.
+
+<P>
+The common part of the two functions treating time steps is the following
+sequence of operations on the present mesh:
+
+<UL>
+<LI><TT>assemble_system ()</TT> [via <TT>solve_timestep ()</TT>]:
+  This first function is also the most interesting one. It assembles the
+  linear system corresponding to the discretized version of equation
+  (<A HREF="#eq:linear-system"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="step-18.data/intro/file:/home/bangerth/bin/share/lib/latex2html/icons/crossref.png"></A>). This leads to a system matrix <!-- MATH
+ $A_{ij} = \sum_K
+A^K_{ij}$
+ -->
+<IMG
+ WIDTH="105" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img79.png"
+ ALT="$ A_{ij} = \sum_K
+A^K_{ij}$">
+ built up of local contributions on each cell <IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img67.png"
+ ALT="$ K$">
+ with entries
+  <P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="171" HEIGHT="38" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img80.png"
+ ALT="$\displaystyle A^K_{ij} = (C \varepsilon(\varphi_j), \varepsilon(\varphi_i))_K;$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(21)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+In practice, <IMG
+ WIDTH="29" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img81.png"
+ ALT="$ A^K$">
+ is computed using numerical quadrature according to the
+  formula
+  <P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="277" HEIGHT="52" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img82.png"
+ ALT="$\displaystyle A^K_{ij} = \sum_q w_q [\varepsilon(\varphi_i(\vec x_q)) : C : \varepsilon(\varphi_j(\vec x_q))],$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(22)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+with quadrature points <IMG
+ WIDTH="21" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img66.png"
+ ALT="$ \vec x_q$">
+ and weights <IMG
+ WIDTH="23" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img65.png"
+ ALT="$ w_q$">
+. We have built these
+  contributions before, in step-8 and step-17, but in both of these cases we
+  have done so rather clumsily by using knowledge of how the rank-4 tensor <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img17.png"
+ ALT="$ C$">
+
+  is composed, and considering individual elements of the strain tensors
+  <!-- MATH
+ $\varepsilon(\varphi_i),\varepsilon(\varphi_j)$
+ -->
+<IMG
+ WIDTH="84" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img83.png"
+ ALT="$ \varepsilon(\varphi_i),\varepsilon(\varphi_j)$">
+. This is not really
+  convenient, in particular if we want to consider more complicated elasticity
+  models than the isotropic case for which <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img17.png"
+ ALT="$ C$">
+ had the convenient form
+  <!-- MATH
+ $C_{ijkl}  = \lambda \delta_{ij} \delta_{kl} + \mu (\delta_{ik} \delta_{jl}
++ \delta_{il} \delta_{jk})$
+ -->
+<IMG
+ WIDTH="241" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img84.png"
+ ALT="$ C_{ijkl} = \lambda \delta_{ij} \delta_{kl} + \mu (\delta_{ik} \delta_{jl}
++ \delta_{il} \delta_{jk})$">
+. While we in fact do not use a more complicated
+  form than this in the present program, we nevertheless want to write it in a
+  way that would easily allow for this. It is then natural to introduce
+  classes that represent symmetric tensors of rank 2 (for the strains and
+  stresses) and 4 (for the stress-strain tensor <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img17.png"
+ ALT="$ C$">
+). Fortunately, deal.II
+  provides these: the <TT>SymmetricTensor&lt;rank,dim&gt;</TT> class template
+  provides a full-fledged implementation of such tensors of rank <TT>rank</TT>
+  (which needs to be an even number) and dimension <TT>dim</TT>.
+
+<P>
+What we then need is two things: a way to create the stress-strain rank-4
+  tensor <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img17.png"
+ ALT="$ C$">
+ as well as to create a symmetric tensor of rank 2 (the strain
+  tensor) from the gradients of a shape function <IMG
+ WIDTH="20" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img85.png"
+ ALT="$ \varphi_i$">
+ at a quadrature
+  point <IMG
+ WIDTH="21" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img66.png"
+ ALT="$ \vec x_q$">
+ on a given cell. At the top of the implementation of this
+  example program, you will find such functions. The first one,
+  <TT>get_stress_strain_tensor</TT>, takes two arguments corresponding to
+  the Lam&#233; constants <IMG
+ WIDTH="14" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img86.png"
+ ALT="$ \lambda$">
+ and <IMG
+ WIDTH="14" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img87.png"
+ ALT="$ \mu$">
+ and returns the stress-strain tensor
+  for the isotropic case corresponding to these constants (in the program, we
+  will choose constants corresponding to steel); it would be simple to replace
+  this function by one that computes this tensor for the anisotropic case, or
+  taking into account crystal symmetries, for example. The second one,
+  <TT>get_strain</TT> takes an object of type <TT>FEValues</TT> and indices
+  <IMG
+ WIDTH="10" HEIGHT="17" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img88.png"
+ ALT="$ i$">
+ and <IMG
+ WIDTH="12" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img70.png"
+ ALT="$ q$">
+ and returns the symmetric gradient, i.e. the strain,
+  corresponding to shape function <!-- MATH
+ $\varphi_i(\vec x_q)$
+ -->
+<IMG
+ WIDTH="49" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img89.png"
+ ALT="$ \varphi_i(\vec x_q)$">
+, evaluated on the cell
+  on which the <TT>FEValues</TT> object was last reinitialized.
+
+<P>
+Given this, the innermost loop of <TT>assemble_system</TT> computes the
+  local contributions to the matrix in the following elegant way (the variable
+  <TT>stress_strain_tensor</TT>, corresponding to the tensor <IMG
+ WIDTH="17" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img17.png"
+ ALT="$ C$">
+, has
+  previously been initialized with the result of the first function above):
+  <PRE>
+for (unsigned int i=0; i&lt;dofs_per_cell; ++i)
+  for (unsigned int j=0; j&lt;dofs_per_cell; ++j) 
+    for (unsigned int q_point=0; q_point&lt;n_q_points;
+         ++q_point)
+      {
+        const SymmetricTensor&lt;2,dim&gt;
+          eps_phi_i = get_strain (fe_values, i, q_point),
+          eps_phi_j = get_strain (fe_values, j, q_point);
+
+        cell_matrix(i,j) 
+          += (eps_phi_i * stress_strain_tensor * eps_phi_j
+              *
+              fe_values.JxW (q_point));
+      }
+</PRE>
+  It is worth noting the expressive power of this piece of code, and to
+  compare it with the complications we had to go through in previous examples
+  for the elasticity problem. (To be fair, the <TT>SymmetricTensor</TT> class
+  template did not exist when these previous examples were written.) For
+  simplicity, <TT>operator*</TT> provides for the (double summation) product
+  between symmetric tensors of even rank here.
+
+<P>
+Assembling the local contributions 
+  <P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="331" HEIGHT="71" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img90.png"
+ ALT="\begin{gather*}\begin{split}f^K_i &amp;= (\vec f, \varphi_i)_K -(\sigma^{n-1},\varep...
+...gma^{n-1}_q : \varepsilon(\varphi_i(\vec x_q)) \right\} \end{split}\end{gather*}"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(23)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+to the right hand side of (<A HREF="#eq:linear-system"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="step-18.data/intro/file:/home/bangerth/bin/share/lib/latex2html/icons/crossref.png"></A>) is equally
+  straightforward (note that we do not consider any boundary tractions <IMG
+ WIDTH="15" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img91.png"
+ ALT="$ \vec b$">
+ here). Remember that we only had to store the old stress in the
+  quadrature points of cells. In the program, we will provide a variable
+  <TT>local_quadrature_points_data</TT> that allows to access the stress
+  <!-- MATH
+ $\sigma^{n-1}_q$
+ -->
+<IMG
+ WIDTH="39" HEIGHT="34" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img92.png"
+ ALT="$ \sigma^{n-1}_q$">
+ in each quadrature point. With this the code for the right
+  hand side looks as this, again rather elegant:
+  <PRE>
+for (unsigned int i=0; i&lt;dofs_per_cell; ++i)
+  {
+    const unsigned int 
+      component_i = fe.system_to_component_index(i).first;
+
+    for (unsigned int q_point=0; q_point&lt;n_q_points; ++q_point)
+      {
+        const SymmetricTensor&lt;2,dim&gt; &amp;old_stress
+          = local_quadrature_points_data[q_point].old_stress;
+        
+        cell_rhs(i) += (body_force_values[q_point](component_i) *
+                        fe_values.shape_value (i,q_point)
+                        -
+                        old_stress *
+                        get_strain (fe_values,i,q_point))
+                       *
+                       fe_values.JxW (q_point);
+      }
+  }
+</PRE>
+  Note that in the multiplication <!-- MATH
+ $\vec f(\vec x_q) \cdot \varphi_i(\vec x_q)$
+ -->
+<IMG
+ WIDTH="97" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img93.png"
+ ALT="$ \vec f(\vec x_q) \cdot \varphi_i(\vec x_q)$">
+, we have made use of the fact that for the chosen finite element, only
+  one vector component (namely <TT>component_i</TT>) of <IMG
+ WIDTH="20" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img85.png"
+ ALT="$ \varphi_i$">
+ is
+  nonzero, and that we therefore also have to consider only one component of
+  <!-- MATH
+ $\vec f(\vec x_q)$
+ -->
+<IMG
+ WIDTH="41" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img94.png"
+ ALT="$ \vec f(\vec x_q)$">
+.
+
+<P>
+This essentially concludes the new material we present in this function. It
+  later has to deal with boundary conditions as well as hanging node
+  constraints, but this parallels what we had to do previously in other
+  programs already.
+
+<P>
+</LI>
+<LI><TT>solve_linear_problem ()</TT> [via <TT>solve_timestep ()</TT>]:
+  Unlike the previous one, this function is not really interesting, since it
+  does what similar functions have done in all previous tutorial programs -
+  solving the linear system using the CG method, using an incomplete LU
+  decomposition as a preconditioner (in the parallel case, it uses an ILU of
+  each processor's block separately). It is virtually unchanged
+  from step-17.
+
+<P>
+</LI>
+<LI><TT>update_quadrature_point_history ()</TT> [via
+  <TT>solve_timestep ()</TT>]: Based on the displacement field <!-- MATH
+ $\Delta \vec u^n$
+ -->
+<IMG
+ WIDTH="37" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img40.png"
+ ALT="$ \Delta \vec u^n$">
+ computed before, we update the stress values in all quadrature points
+  according to (<A HREF="#eq:stress-update"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="step-18.data/intro/file:/home/bangerth/bin/share/lib/latex2html/icons/crossref.png"></A>) and (<A HREF="#eq:stress-update+rot"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="step-18.data/intro/file:/home/bangerth/bin/share/lib/latex2html/icons/crossref.png"></A>),
+  including the rotation of the coordinate system.
+
+<P>
+</LI>
+<LI><TT>move_mesh ()</TT>: Given the solution computed before, in this
+  function we deform the mesh by moving each vertex by the displacement vector
+  field evaluated at this particular vertex.
+
+<P>
+</LI>
+<LI><TT>output_results ()</TT>: This function simply outputs the solution
+  based on what we have said above, i.e. every processor computes output only
+  for its own portion of the domain, and this can then be later merged by an
+  external program. In addition to the solution, we also compute the norm of
+  the stress averaged over all the quadrature points on each cell.
+</LI>
+</UL>
+
+<P>
+With this general structure of the code, we only have to define what case we
+want to solve. For the present program, we have chosen to simulate the
+quasistatic deformation of a vertical cylinder for which the bottom boundary
+is fixed and the top boundary is pushed down at a prescribed vertical
+velocity. However, the horizontal velocity of the top boundary is left
+unspecified - one can imagine this situation as a well-greased plate pushing
+from the top onto the cylinder, the points on the top boundary of the cylinder
+being allowed to slide horizontally along the surface of the plate, but forced
+to move downward by the plate. The inner and outer boundaries of the cylinder
+are free and not subject to any prescribed deflection or traction. In
+addition, gravity acts on the body.
+
+<P>
+The program text will reveal more about how to implement this situation, and
+the results section will show what displacement pattern comes out of this
+simulation. 
+
+<P>
+
+<H2><A NAME="SECTION00004000000000000000">
+Possible directions for extensions</A>
+</H2>
+
+<P>
+The program as is does not really solve an equation that has many applications
+in practice: quasi-static material deformation based on a purely elastic law
+is almost boring. However, the program may serve as the starting point for
+more interesting experiments, and that indeed was the initial motivation for
+writing it. Here are some suggestions of what the program is missing and in
+what direction it may be extended:
+
+<P>
+
+<H4><A NAME="SECTION00004010000000000000">
+Plasticity models.</A>
+</H4> The most obvious extension is to use a more
+realistic material model for large-scale quasistatic deformation. The natural
+choice for this would be plasticity, in which a nonlinear relationship between
+stress and strain replaces equation (<A HREF="#eq:stress-strain"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="step-18.data/intro/file:/home/bangerth/bin/share/lib/latex2html/icons/crossref.png"></A>). Plasticity
+models are usually rather complicated to program since the stress-strain
+dependence is generally non-smooth. The material can be thought of being able
+to withstand only a maximal stress (the yield stress) after which it starts to
+``flow''. A mathematical description to this can be given in the form of a
+variational inequality, which alternatively can be treated as minimizing the
+elastic energy
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="311" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img95.png"
+ ALT="$\displaystyle E(\vec u) = (\varepsilon(\vec u), C\varepsilon(\vec u))_{\Omega} - (\vec f, \vec u)_{\Omega} - (\vec b, \vec u)_{\Gamma_N},$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(24)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+subject to the constraint
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="88" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img96.png"
+ ALT="$\displaystyle f(\sigma(\vec u)) \le 0$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+(25)</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+on the stress. This extension makes the problem to be solved in each time step
+nonlinear, so we need another loop within each time step.
+
+<P>
+Without going into further details of this model, we refer to the excellent
+book by Simo and Hughes on ``Computational Inelasticity'' for a
+comprehensive overview of computational strategies for solving plastic
+models. Alternatively, a brief but concise description of an algorithm for
+plasticity is given in an article by S. Commend, A. Truty, and Th. Zimmermann,
+titled ``Stabilized finite elements applied to 
+elastoplasticity: I. Mixed displacement-pressure formulation''
+(Computer Methods in Applied Mechanics and Engineering, vol. 193,
+pp. 3559-3586, 2004).
+
+<P>
+
+<H4><A NAME="SECTION00004020000000000000">
+Stabilization issues.</A>
+</H4> The formulation we have chosen, i.e. using
+piecewise (bi-, tri-)linear elements for all components of the displacement
+vector, and treating the stress as a variable dependent on the displacement is
+appropriate for most materials. However, this so-called displacement-based
+formulation becomes unstable and exhibits spurious modes for incompressible or
+nearly-incompressible materials. While fluids are usually not elastic (in most
+cases, the stress depends on velocity gradients, not displacement gradients,
+although there are exceptions such as electro-rheologic fluids), there are a
+few solids that are nearly incompressible, for example rubber. Another case is
+that many plasticity models ultimately let the material become incompressible,
+although this is outside the scope of the present program.
+
+<P>
+Incompressibility is characterized by Poisson's ratio
+<P></P>
+<DIV ALIGN="CENTER"><TABLE CELLPADDING="0" WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE">
+<TD NOWRAP ALIGN="CENTER"><IMG
+ WIDTH="101" HEIGHT="52" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img97.png"
+ ALT="$\displaystyle \nu = \frac{\lambda}{2(\lambda+\mu)},$"></TD>
+<TD NOWRAP WIDTH="10" ALIGN="RIGHT">
+&nbsp;&nbsp;&nbsp;</TD></TR>
+</TABLE></DIV>
+<BR CLEAR="ALL"><P></P>
+where <!-- MATH
+ $\lambda,\mu$
+ -->
+<IMG
+ WIDTH="30" HEIGHT="30" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img98.png"
+ ALT="$ \lambda,\mu$">
+ are the Lam&#233; constants of the material.
+Physical constraints indicate that <!-- MATH
+ $-1\le \nu\le \tfrac 12$
+ -->
+<IMG
+ WIDTH="86" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img99.png"
+ ALT="$ -1\le \nu\le \tfrac 12$">
+ (the condition
+also follows from mathematical stability considerations). If <IMG
+ WIDTH="13" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="step-18.data/intro/img100.png"
+ ALT="$ \nu$">
+
+approaches <IMG
+ WIDTH="15" HEIGHT="35" ALIGN="MIDDLE" BORDER="0"
+ SRC="step-18.data/intro/img101.png"
+ ALT="$ \tfrac 12$">
+, then the material becomes incompressible. In that
+case, pure displacement-based formulations are no longer appropriate for the
+solution of such problems, and stabilization techniques have to be employed
+for a stable and accurate solution. The book and paper cited above give
+indications as to how to do this, but there is also a large volume of
+literature on this subject; a good start to get an overview of the topic can
+be found in the references of the paper by
+H.-Y. Duan and Q. Lin on ``Mixed finite elements of least-squares type for
+elasticity'' (Computer Methods in Applied Mechanics and Engineering, vol. 194,
+pp. 1093-1112, 2005).
+
+<P>
+
+<H4><A NAME="SECTION00004030000000000000">
+Refinement during timesteps.</A>
+</H4> In the present form, the program
+only refines the initial mesh a number of times, but then never again. For any
+kind of realistic simulation, one would want to extend this so that the mesh
+is refined and coarsened every few time steps instead. This is not hard to do,
+in fact, but has been left for future tutorial programs or as an exercise, if
+you wish. The main complication one has to overcome is that one has to
+transfer the data that is stored in the quadrature points of the cells of the
+old mesh to the new mesh, preferably by some sort of projection scheme. This
+is only slightly messy in the sequential case; in fact, the functions
+<TT>FETools</TT> <TT>::</TT> <TT>get_projection_from_quadrature_points_matrix</TT> will do
+the projection, and the <TT>FiniteElement</TT> <TT>::</TT> <TT>get_restriction_matrix</TT> and
+<TT>FiniteElement</TT> <TT>::</TT> <TT>get_prolongation_matrix</TT> functions will do the
+transfer between mother and child cells. However, it becomes complicated
+once we run the program in parallel, since then each process only stores this
+data for the cells it owned on the old mesh, and it may need to know the
+values of the quadrature point data on other cells if the corresponding cells
+on the new mesh are assigned to this process after subdividing the new mesh. A
+global communication of these data elements is therefore necessary, making the
+entire process a little more unpleasant.
+
+<P>
+
+<H4><A NAME="SECTION00004040000000000000">
+Ensuring mesh regularity.</A>
+</H4> At present, the program makes no attempt
+to make sure that a cell, after moving its vertices at the end of the time
+step, still has a valid geometry (i.e. that its Jacobian determinant is
+positive and bounded away from zero everywhere). It is, in fact, not very hard
+to set boundary values and forcing terms in such a way that one gets distorted
+and inverted cells rather quickly. Certainly, in some cases of large
+deformation, this is unavoidable with a mesh of finite mesh size, but in some
+other cases this should be preventable by appropriate mesh refinement and/or a
+reduction of the time step size. The program does not do that, but a more
+sophisticated version definitely should employ some sort of heuristic defining
+what amount of deformation of cells is acceptable, and what isn't.
+
+<P>
+
+<H2><A NAME="SECTION00005000000000000000">
+Compiling the program</A>
+</H2>
+
+<P>
+Finally, just to remind everyone: the program runs in 3d (see the definition
+of the <TT>elastic_problem</TT> variable in <TT>main()</TT>, unlike almost
+all of the other example programs. While the compiler doesn't care what
+dimension it compiles for, the linker has to know which library to link with.
+And as explained in other places, this requires slight changes to the Makefile
+compared to the other tutorial programs. In particular, everywhere where the
+2d versions of libraries are mentioned, one needs to change this to 3d,
+although this is already done in the distributed version of the Makefile.
+Conversely, if you want to run the program in 2d (after making the necessary
+changes to accommodate for a 2d geometry), you have to change the Makefile
+back to allow for 2d.

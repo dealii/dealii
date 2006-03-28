@@ -1,0 +1,58 @@
+<a name="Results"></a>
+<h1>Results</h1>
+
+The program has, after having been run, produced two sparsity
+patterns. We can visualize them using GNUPLOT:
+@code
+examples/step-2> gnuplot
+
+        G N U P L O T
+        Version 3.7 patchlevel 3
+        last modified Thu Dec 12 13:00:00 GMT 2002
+        System: Linux 2.6.11.4-21.10-default
+
+        Copyright(C) 1986 - 1993, 1998 - 2002
+        Thomas Williams, Colin Kelley and many others
+
+        Type `help` to access the on-line reference manual
+        The gnuplot FAQ is available from
+        http://www.gnuplot.info/gnuplot-faq.html
+
+        Send comments and requests for help to <info-gnuplot@dartmouth.edu>
+        Send bugs, suggestions and mods to <bug-gnuplot@dartmouth.edu>
+
+
+Terminal type set to 'x11'
+gnuplot> set data style points
+gnuplot> plot "sparsity_pattern.1"
+@endcode
+
+The results then look like this (every cross denotes an entry which
+might be nonzero; of course the fact whether the entry actually is
+zero or not depends on the equation under consideration, but the
+indicated positions in the matrix tell us which shape functions can
+and which can't couple, if the equation is a local, i.e. differential
+one): 
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      @image html step-2.sparsity-1.png
+    </td>
+
+    <td ALIGN="center">
+      @image html step-2.sparsity-2.png
+    </td>
+  </tr>
+</table>
+
+The different regions in the left picture represent the degrees of
+freedom on the different refinement levels of the triangulation.  As
+can be seen in the right picture, the sparsity pattern is much better
+clustered around the main diagonal of the matrix after
+renumbering. Although this might not be apparent, the number of
+nonzero entries is the same in both pictures, of course.
+
+A common observation is that the more refined the grid is, the better
+the clustering around the diagonal will get.
+
+

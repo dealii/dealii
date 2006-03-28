@@ -1,0 +1,208 @@
+<a name="Results"></a>
+<h1>Results</h1>
+
+
+If the program above is compiled and run on a single processor machine, it
+should generate results that are very similar to those that we already got
+with step-8. However, it becomes more interesting if we run it on a cluster of
+computers. Most clusters have some kind of scheduling system, all of which
+have different calling syntaxes - on my system, I have to use the command
+<code>bsub</code> with a whole host of options to run a job in parallel - so
+that the exact command line syntax varies. If you have found out how to run a
+job on your system, you should get output like this for a job on 8 processors,
+and with a few more refinement cycles than in the code above:
+@code
+Cycle 0:
+   Number of active cells:       64
+   Number of degrees of freedom: 162 (by partition: 22+22+20+20+18+16+20+24)
+   Solver converged in 23 iterations.
+Cycle 1:
+   Number of active cells:       124
+   Number of degrees of freedom: 302 (by partition: 38+42+36+34+44+44+36+28)
+   Solver converged in 35 iterations.
+Cycle 2:
+   Number of active cells:       238
+   Number of degrees of freedom: 570 (by partition: 68+80+66+74+58+68+78+78)
+   Solver converged in 46 iterations.
+Cycle 3:
+   Number of active cells:       454
+   Number of degrees of freedom: 1046 (by partition: 120+134+124+130+154+138+122+124)
+   Solver converged in 55 iterations.
+Cycle 4:
+   Number of active cells:       868
+   Number of degrees of freedom: 1926 (by partition: 232+276+214+248+230+224+234+268)
+   Solver converged in 77 iterations.
+Cycle 5:
+   Number of active cells:       1654
+   Number of degrees of freedom: 3550 (by partition: 418+466+432+470+442+474+424+424)
+   Solver converged in 93 iterations.
+Cycle 6:
+   Number of active cells:       3136
+   Number of degrees of freedom: 6702 (by partition: 838+796+828+892+866+798+878+806)
+   Solver converged in 127 iterations.
+Cycle 7:
+   Number of active cells:       5962
+   Number of degrees of freedom: 12446 (by partition: 1586+1484+1652+1552+1556+1576+1560+1480)
+   Solver converged in 158 iterations.
+Cycle 8:
+   Number of active cells:       11320
+   Number of degrees of freedom: 23586 (by partition: 2988+2924+2890+2868+2864+3042+2932+3078)
+   Solver converged in 225 iterations.
+Cycle 9:
+   Number of active cells:       21424
+   Number of degrees of freedom: 43986 (by partition: 5470+5376+5642+5450+5630+5470+5416+5532)
+   Solver converged in 282 iterations.
+Cycle 10:
+   Number of active cells:       40696
+   Number of degrees of freedom: 83754 (by partition: 10660+10606+10364+10258+10354+10322+10586+10604)
+   Solver converged in 392 iterations.
+Cycle 11:
+   Number of active cells:       76978
+   Number of degrees of freedom: 156490 (by partition: 19516+20148+19390+19390+19336+19450+19730+19530)
+   Solver converged in 509 iterations.
+Cycle 12:
+   Number of active cells:       146206
+   Number of degrees of freedom: 297994 (by partition: 37462+37780+37000+37060+37232+37328+36860+37272)
+   Solver converged in 705 iterations.
+Cycle 13:
+   Number of active cells:       276184
+   Number of degrees of freedom: 558766 (by partition: 69206+69404+69882+71266+70348+69616+69796+69248)
+   Solver converged in 945 iterations.
+Cycle 14:
+   Number of active cells:       523000
+   Number of degrees of freedom: 1060258 (by partition: 132928+132296+131626+132172+132170+133588+132252+133226)
+   Solver converged in 1282 iterations.
+Cycle 15:
+   Number of active cells:       987394
+   Number of degrees of freedom: 1994226 (by partition: 253276+249068+247430+248402+248496+251380+248272+247902)
+   Solver converged in 1760 iterations.
+Cycle 16:
+   Number of active cells:       1867477
+   Number of degrees of freedom: 3771884 (by partition: 468452+474204+470818+470884+469960+
+471186+470686+475694)
+   Solver converged in 2251 iterations.
+@endcode
+
+
+
+As can be seen, we can easily get to almost four million unknowns. In fact, the
+code's runtime with 8 processes was less than 7 minutes up to (and including)
+cycle 14, and 14 minutes including the second to last step. I lost the timing
+information for the last step, though, but you get the idea. All this is if
+the debug flag in the Makefile was changed to "off", i.e. "optimized", and
+with the generation of graphical output switched off for the reasons stated in
+the program comments above. The biggest 2d computations we did had roughly 7.1 
+million unknowns, and were done on 32 processes. It took about 40 minutes.
+Not surprisingly, the limiting factor for how far one can go is how much memory
+one has, since every process has to hold the entire mesh and DoFHandler objects, 
+although matrices and vectors are split up. For the 7.1M computation, the memory
+consumption was about 600 bytes per unknown, which is not bad, but one has to 
+consider that this is for every unknown, whether we store the matrix and vector
+entries locally or not.
+
+
+
+Here is some output generated in the 12th cycle of the program, i.e. with roughly
+300,000 unknowns:
+
+
+@image html step-17.12-ux.png
+@image html step-17.12-uy.png
+
+
+
+As one would hope for, the x- (left) and y-displacements (right) shown here
+closely match what we already saw in step-8. What may be more interesting,
+though, is to look at the mesh and partition at this step (to see the picture
+in its original size, simply click on it):
+
+
+@image html step-17.12-grid.png
+@image html step-17.12-partition.png
+
+
+Again, the mesh (left) shows the same refinement pattern as seen
+previously. The right panel shows the partitioning of the domain across the 8
+processes, each indicated by a different color. The picture shows that the
+subdomains are smaller where mesh cells are small, a fact that needs to be
+expected given that the partitioning algorithm tries to equilibrate the number
+of cells in each subdomain; this equilibration is also easily identified in
+the output shown above, where the number of degrees per subdomain is roughly
+the same.
+
+
+
+It is worth noting that if we ran the same program with a different number of
+processes, that we would likely get slightly different output: a different
+mesh, different number of unknowns and iterations to convergence. The reason
+for this is that while the matrix and right hand side are the same independent
+of the number of processes used, the preconditioner is not: it performs an
+ILU(0) on the chunk of the matrix of <em>each processor separately</em>. Thus,
+it's effectiveness as a preconditioner diminishes as the number of processes
+increases, which makes the number of iterations increase. Since a different
+preconditioner leads to slight changes in the computed solution, this will
+then lead to slightly different mesh cells tagged for refinement, and larger
+differences in subsequent steps. The solution will always look very similar,
+though.
+
+
+
+Finally, here are some results for a 3d simulation. You can repeat these by
+first changing
+@code
+        ElasticProblem<2> elastic_problem;
+@endcode
+to
+@code
+        ElasticProblem<3> elastic_problem;
+@endcode
+in the main function, and then in the Makefile, change the reference to the 2d
+libraries to their 3d counterparts. If you then run the program in parallel,
+you get something similar to this (this is for a job with 16 processes):
+@code
+Cycle 0:
+   Number of active cells:       512
+   Number of degrees of freedom: 2187 (by partition: 114+156+150+114+114+210+105+102+120+120+96+123+141+183+156+183)
+   Solver converged in 27 iterations.
+Cycle 1:
+   Number of active cells:       1604
+   Number of degrees of freedom: 6549 (by partition: 393+291+342+354+414+417+570+366+444+288+543+525+345+387+489+381)
+   Solver converged in 42 iterations.
+Cycle 2:
+   Number of active cells:       4992
+   Number of degrees of freedom: 19167 (by partition: 1428+1266+1095+1005+1455+1257+1410+1041+1320+1380+1080+1050+963+1005+1188+1224)
+   Solver converged in 65 iterations.
+Cycle 3:
+   Number of active cells:       15485
+   Number of degrees of freedom: 56760 (by partition: 3099+3714+3384+3147+4332+3858+3615+3117+3027+3888+3942+3276+4149+3519+3030+3663)
+   Solver converged in 96 iterations.
+Cycle 4:
+   Number of active cells:       48014
+   Number of degrees of freedom: 168762 (by partition: 11043+10752+9846+10752+9918+10584+10545+11433+12393+11289+10488+9885+10056+9771+11031+8976)
+   Solver converged in 132 iterations.
+Cycle 5:
+   Number of active cells:       148828
+   Number of degrees of freedom: 492303 (by partition: 31359+30588+34638+32244+30984+28902+33297+31569+29778+29694+28482+28032+32283+30702+31491+28260)
+   Solver converged in 179 iterations.
+Cycle 6:
+   Number of active cells:       461392
+   Number of degrees of freedom: 1497951 (by partition: 103587+100827+97611+93726+93429+88074+95892+88296+96882+93000+87864+90915+92232+86931+98091+90594)
+   Solver converged in 261 iterations.
+@endcode
+
+
+
+The last step, going up to 1.5 million unknowns, takes about 55 minutes with
+16 processes on 8 dual-processor machines. The graphical output generated by
+this job is rather large (cycle 5 already prints around 82 MB of GMV data), so
+we contend ourselves with showing output from cycle 4 (again, clicking on the
+picture gives a version in original size):
+
+
+@image html step-17.4-3d-partition.png
+@image html step-17.4-3d-ux.png
+
+
+The left picture shows the partitioning of the cube into 16 processes, whereas
+the right one shows the x-displacement along two cutplanes through the cube.
+

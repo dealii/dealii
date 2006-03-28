@@ -1,0 +1,715 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+This program is devoted to two aspects: the use of mixed finite elements -- in
+particular Raviart-Thomas elements -- and using block matrices to define
+solvers, preconditioners, and nested versions of those that use the
+substructure of the system matrix. The equation we are going to solve is again
+the Laplace equation, though with a matrix-valued coefficient:
+@f{eqnarray*}
+  -\nabla \cdot K({\mathbf x}) \nabla p &=& f \qquad {\textrm{in}\ } \Omega, \\
+  p &=& g \qquad {\textrm{on}\ }\partial\Omega.
+@f}
+$K({\mathbf x})$ is assumed to be uniformly positive definite, i.e. there is
+$\alpha>0$ such that the eigenvalues $\lambda_i({\mathbf x})$ of $K(x)$ satisfy
+$\lambda_i({\mathbf x})\ge \alpha$. The use of the symbol $p$ instead of the usual
+$u$ for the solution variable will become clear in the next section.
+
+After discussing the equation and the formulation we are going to use to solve
+it, this introduction will cover the use of block matrices and vectors, the
+definition of solvers and preconditioners, and finally the actual test case we
+are going to solve.
+
+<h3>Formulation, weak form, and discrete problem</h3>
+
+In the form above, the Laplace equation is considered a good model equation
+for fluid flow in porous media. In particular, if flow is so slow that all
+dynamic effects such as the acceleration terms in the Navier-Stokes equation
+become irrelevant, and if the flow pattern is stationary, then the Laplace
+equation models the pressure that drives the flow reasonable well. Because the
+solution variable is a pressure, we here use the name $p$ instead of the
+name $u$ more commonly used for the solution of partial differential equations.
+
+Typical applications of this view of the Laplace equation are then modeling
+groundwater flow, or the flow of hydrocarbons in oil reservoirs. In these
+applications, $K$ is then the permeability tensor, i.e. a measure for how much
+resistance the soil or rock matrix asserts on the fluid flow. In the
+applications just named, a desirable feature is that the numerical scheme is
+locally conservative, i.e. that whatever flows into a cell also flows out of
+it (or the difference is equal to the integral over the source terms over each
+cell, if the sources are nonzero). However, as it turns out, the usual
+discretizations of the Laplace equation do not satisfy this property. On the
+other hand, one can achieve this by choosing a different formulation.
+
+To this end, one first introduces a second variable, called the flux,
+${\mathbf u}=-K\nabla p$. By its definition, the flux is a vector in the
+negative 
+direction of the pressure gradient, multiplied by the permeability tensor. If
+the permeability tensor is proportional to the unit matrix, this equation is
+easy to understand and intuitive: the higher the permeability, the higher the
+flux; and the flux is proportional to the gradient of the pressure, going from
+areas of high pressure to areas of low pressure.
+
+With this second variable, one then finds an alternative version of the
+Laplace equation, called the mixed formulation:
+@f{eqnarray*}
+  K^{-1} {\mathbf u} - \nabla p &=& 0 \qquad {\textrm{in}\ } \Omega, \\
+  -{\textrm{div}}\ {\mathbf u} &=& 0 \qquad {\textrm{in}\ }\Omega, \\
+  p &=& g \qquad {\textrm{on}\ } \partial\Omega.
+@f}
+
+The weak formulation of this problem is found by multiplying the two
+equations with test functions and integrating some terms by parts:
+@f{eqnarray*}
+  A(\{{\mathbf u},p\},\{{\mathbf v},q\}) = F(\{{\mathbf v},q\}),
+@f}
+where
+@f{eqnarray*}
+  A(\{{\mathbf u},p\},\{{\mathbf v},q\})
+  &=&
+  ({\mathbf v}, K^{-1}{\mathbf u})_\Omega - ({\textrm{div}}\ {\mathbf v}, p)_\Omega
+  - (q,{\textrm{div}}\ {\mathbf u})_\Omega
+  \\
+  F(\{{\mathbf v},q\}) &=& -(g,{\mathbf v}\cdot {\mathbf n})_{\partial\Omega} - (f,q)_\Omega.
+@f}
+Here, ${\mathbf n}$ is the outward normal vector at the boundary. Note how in this
+formulation, Dirichlet boundary values of the original problem are
+incorporated in the weak form.
+
+To be well-posed, we have to look for solutions and test functions in the
+space $H({\textrm{div}})=\{{\mathbf w}\in L^2(\Omega)^d:\ {\textrm{div}}\ {\mathbf w}\in L^2\}$
+for $\mathbf u$,$\mathbf v$, and $L^2$ for $p,q$. It is a well-known fact stated in
+almost every book on finite element theory that if one chooses discrete finite
+element spaces for the approximation of ${\mathbf u},p$ inappropriately, then the
+resulting discrete saddle-point problem is instable and the discrete solution
+will not converge to the exact solution.
+
+To overcome this, a number of different finite element pairs for ${\mathbf u},p$
+have been developed that lead to a stable discrete problem. One such pair is
+to use the Raviart-Thomas spaces $RT(k)$ for the velocity ${\mathbf u}$ and
+discontinuous elements of class $DQ(k)$ for the pressure $p$. For details
+about these spaces, we refer in particular to the book on mixed finite element
+methods by Brezzi and Fortin, but many other books on the theory of finite
+elements, for example the classic book by Brenner and Scott, also state the
+relevant results.
+
+
+<h3>Assembling the linear system</h3>
+
+The deal.II library (of course) implements Raviart-Thomas elements $RT(k)$ of
+arbitrary order $k$, as well as discontinuous elements $DG(k)$. If we forget
+about their particular properties for a second, we then have to solve a
+discrete problem
+@f{eqnarray*}
+  A(x_h,w_h) = F(w_h),
+@f}
+with the bilinear form and right hand side as stated above, and $x_h=\{{\mathbf u}_h,p_h\}$, $w_h=\{{\mathbf v}_h,q_h\}$. Both $x_h$ and $w_h$ are from the space
+$X_h=RT(k)\times DQ(k)$, where $RT(k)$ is itself a space of $dim$-dimensional
+functions to accommodate for the fact that the flow velocity is vector-valued.
+The necessary question then is: how do we do this in a program?
+
+Vector-valued elements have already been discussed in previous tutorial
+programs, the first time and in detail in @ref step_8 "step-8". The main difference there
+was that the vector-valued space $V_h$ is uniform in all its components: the
+$dim$ components of the displacement vector are all equal and from the same
+function space. What we could therefore do was to build $V_h$ as the outer
+product of the $dim$ times the usual $Q(1)$ finite element space, and by this
+make sure that all our shape functions have only a single non-zero vector
+component. Instead of dealing with vector-valued shape functions, all we did
+in @ref step_8 "step-8" was therefore to look at the (scalar) only non-zero component and
+use the <code>fe.system_to_component_index(i).first</code> call to figure out
+which component this actually is.
+
+This doesn't work with Raviart-Thomas elements: following from their
+construction to satisfy certain regularity properties of the space
+$H({\textrm{div}})$, the shape functions of $RT(k)$ are usually nonzero in all
+their vector components at once. For this reason, were
+<code>fe.system_to_component_index(i).first</code> applied to determine the only
+nonzero component of shape function $i$, an exception would be generated. What
+we really need to do is to get at <em>all</em> vector components of a shape
+function. In deal.II diction, we call such finite elements
+<em>non-primitive</em>, whereas finite elements that are either scalar or for
+which every vector-valued shape function is nonzero only in a single vector
+component are called <em>primitive</em>.
+
+So what do we have to do for non-primitive elements? To figure this out, let
+us go back in the tutorial programs, almost to the very beginnings. There, we
+learned that we use the <code>FEValues</code> class to determine the values and
+gradients of shape functions at quadrature points. For example, we would call
+<code>fe_values.shape_value(i,q_point)</code> to obtain the value of the
+<code>i</code>th shape function on the quadrature point with number
+<code>q_point</code>. Later, in @ref step_8 "step-8" and other tutorial programs, we learned
+that this function call also works for vector-valued shape functions (of
+primitive finite elements), and that it returned the value of the only
+non-zero component of shape function <code>i</code> at quadrature point
+<code>q_point</code>.
+
+For non-primitive shape functions, this is clearly not going to work: there is
+no single non-zero vector component of shape function <code>i</code>, and the call 
+to <code>fe_values.shape_value(i,q_point)</code> would consequently not make
+much sense. However, deal.II offers a second function call,
+<code>fe_values.shape_value_component(i,q_point,comp)</code> that returns the
+value of the <code>comp</code>th vector component of shape function  <code>i</code> at
+quadrature point <code>q_point</code>, where <code>comp</code> is an index between
+zero and the number of vector components of the present finite element; for
+example, the element we will use to describe velocities and pressures is going
+to have $dim+1$ components. It is worth noting that this function call can
+also be used for primitive shape functions: it will simply return zero for all
+components except one; for non-primitive shape functions, it will in general
+return a non-zero value for more than just one component.
+
+We could now attempt to rewrite the bilinear form above in terms of vector
+components. For example, in 2d, the first term could be rewritten like this
+(note that $u_0=x_0, u_1=x_1, p=x_2$):
+@f{eqnarray*}
+  ({\mathbf u}_h^i, K^{-1}{\mathbf u}_h^j)
+  =
+  &\left((x_h^i)_0, K^{-1}_{00} (x_h^j)_0\right) +
+   \left((x_h^i)_0, K^{-1}_{01} (x_h^j)_1\right) + \\
+  &\left((x_h^i)_1, K^{-1}_{10} (x_h^j)_0\right) +
+   \left((x_h^i)_1, K^{-1}_{11} (x_h^j)_1\right).
+@f}
+If we implemented this, we would get code like this:
+@code
+  for (unsigned int q=0; q<n_q_points; ++q) 
+    for (unsigned int i=0; i<dofs_per_cell; ++i)
+      for (unsigned int j=0; j<dofs_per_cell; ++j)
+        local_matrix(i,j) += (k_inverse_values[q][0][0] *
+                              fe_values.shape_value_component(i,q,0) *
+                              fe_values.shape_value_component(j,q,0) 
+                              +
+                              k_inverse_values[q][0][1] *
+                              fe_values.shape_value_component(i,q,0) *
+                              fe_values.shape_value_component(j,q,1) 
+                              +
+                              k_inverse_values[q][1][0] *
+                              fe_values.shape_value_component(i,q,1) *
+                              fe_values.shape_value_component(j,q,0) 
+                              +
+                              k_inverse_values[q][1][1] *
+                              fe_values.shape_value_component(i,q,1) *
+                              fe_values.shape_value_component(j,q,1) 
+                             )
+                             *
+                             fe_values.JxW(q);
+@endcode
+This is, at best, tedious, error prone, and not dimension independent. There
+are obvious ways to make things dimension independent, but in the end, the
+code is simply not pretty. What would be much nicer is if we could simply
+extract the ${\mathbf u}$ and $p$ components of a shape function $x_h^i$. In the
+program we do that, by writing functions like this one:
+@code
+template <int dim>
+Tensor<1,dim>
+extract_u (const FEValuesBase<dim> &fe_values,
+           const unsigned int i,
+           const unsigned int q)
+{
+  Tensor<1,dim> tmp;
+
+  for (unsigned int d=0; d<dim; ++d)
+    tmp[d] = fe_values.shape_value_component (i,q,d);
+
+  return tmp;
+}
+@endcode
+
+What this function does is, given an <code>fe_values</code> object, to extract
+the values of the first $dim$ components of shape function <code>i</code> at
+quadrature points <code>q</code>, that is the velocity components of that shape
+function. Put differently, if we write shape functions $x_h^i$ as the tuple
+$\{{\mathbf u}_h^i,p_h^i\}$, then the function returns the velocity part of this
+tuple. Note that the velocity is of course a <code>dim</code>-dimensional tensor, and
+that the function returns a corresponding object.
+
+Likewise, we have a function that extracts the pressure component of a shape
+function:
+@code
+template <int dim>
+double extract_p (const FEValuesBase<dim> &fe_values,
+                  const unsigned int i,
+                  const unsigned int q)
+{
+  return fe_values.shape_value_component (i,q,dim);
+}
+@endcode
+Finally, the bilinear form contains terms involving the gradients of the
+velocity component of shape functions. To be more precise, we are not really
+interested in the full gradient, but only the divergence of the velocity
+components, i.e. ${\textrm{div}}\ {\mathbf u}_h^i = \sum_{d=0}^{dim-1}
+\frac{\partial}{\partial x_d} ({\mathbf u}_h^i)_d$. Here's a function that returns
+this quantity:
+@code
+template <int dim>
+double
+extract_div_u (const FEValuesBase<dim> &fe_values,
+               const unsigned int i,
+               const unsigned int q)
+{
+  double divergence = 0;
+  for (unsigned int d=0; d<dim; ++d)
+    divergence += fe_values.shape_grad_component (i,q,d)[d];
+
+  return divergence;
+}
+@endcode
+
+With these three functions, all of which are completely dimension independent
+and will therefore also work in 3d, assembling the local matrix and right hand
+side contributions becomes a charm:
+@code
+for (unsigned int q=0; q<n_q_points; ++q) 
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    {
+      const Tensor<1,dim> phi_i_u = extract_u (fe_values, i, q);
+      const double div_phi_i_u    = extract_div_u (fe_values, i, q);
+      const double phi_i_p        = extract_p (fe_values, i, q);
+           
+      for (unsigned int j=0; j<dofs_per_cell; ++j)
+        {
+          const Tensor<1,dim> phi_j_u = extract_u (fe_values, j, q);
+          const double div_phi_j_u    = extract_div_u (fe_values, j, q);
+          const double phi_j_p        = extract_p (fe_values, j, q);
+               
+          local_matrix(i,j) += (phi_i_u * k_inverse_values[q] * phi_j_u
+                                - div_phi_i_u * phi_j_p
+                                - phi_i_p * div_phi_j_u)
+                               * fe_values.JxW(q);
+        }
+
+      local_rhs(i) += -(phi_i_p *
+                        rhs_values[q] *
+                        fe_values.JxW(q));
+    }
+@endcode
+This very closely resembles the form we have originally written down the
+bilinear form and right hand side.
+
+There is one final term that we have to take care of: the right hand side
+contained the term $(g,{\mathbf v}\cdot {\mathbf n})_{\partial\Omega}$, constituting the
+weak enforcement of pressure boundary conditions. We have already seen in
+@ref step_7 "step-7" how to deal with face integrals: essentially exactly the same as with
+domain integrals, except that we have to use the <code>FEFaceValues</code> class
+instead of <code>FEValues</code>. To compute the boundary term we then simply have
+to loop over all boundary faces and integrate there. If you look closely at
+the definitions of the <code>extract_*</code> functions above, you will realize
+that it isn't even necessary to write new functions that extract the velocity
+and pressure components of shape functions from <code>FEFaceValues</code> objects:
+both <code>FEValues</code> and <code>FEFaceValues</code> are derived from a common
+base class, <code>FEValuesBase</code>, and the extraction functions above can
+therefore deal with both in exactly the same way. Assembling the missing
+boundary term then takes on the following form:
+@code
+for (unsigned int face_no=0;
+     face_no<GeometryInfo<dim>::faces_per_cell;
+     ++face_no)
+  if (cell->at_boundary(face_no))
+    {
+      fe_face_values.reinit (cell, face_no);
+    
+      pressure_boundary_values
+        .value_list (fe_face_values.get_quadrature_points(),
+                     boundary_values);
+
+      for (unsigned int q=0; q<n_face_q_points; ++q) 
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          {
+            const Tensor<1,dim>
+              phi_i_u = extract_u (fe_face_values, i, q);
+                
+            local_rhs(i) += -(phi_i_u *
+                              fe_face_values.normal_vector(q) *
+                              boundary_values[q] *
+                              fe_face_values.JxW(q));
+        }
+  }
+@endcode
+
+You will find the exact same code as above in the sources for the present
+program. We will therefore not comment much on it below.
+
+
+<h3>Linear solvers and preconditioners</h3>
+
+After assembling the linear system we are faced with the task of solving
+it. The problem here is: the matrix has a zero block at the bottom right
+(there is no term in the bilinear form that couples the pressure $p$ with the
+pressure test function $q$), and it is indefinite. At least it is
+symmetric. In other words: the Conjugate Gradient method is not going to
+work. We would have to resort to other iterative solvers instead, such as
+MinRes, SymmLQ, or GMRES, that can deal with indefinite systems. However, then
+the next problem immediately surfaces: due to the zero block, there are zeros
+on the diagonal and none of the usual preconditioners (Jacobi, SSOR) will work
+as they require division by diagonal elements.
+
+
+<h4>Solving using the Schur complement</h4>
+
+In view of this, let us take another look at the matrix. If we sort our
+degrees of freedom so that all velocity come before all pressure variables,
+then we can subdivide the linear system $AX=B$ into the following blocks:
+@f{eqnarray*}
+  \left(\begin{array}{cc}
+    M & B^T \\ B & 0
+  \end{array}\right)
+  \left(\begin{array}{cc}
+    U \\ P
+  \end{array}\right)
+  =
+  \left(\begin{array}{cc}
+    F \\ G
+  \end{array}\right),
+@f}
+where $U,P$ are the values of velocity and pressure degrees of freedom,
+respectively, $M$ is the mass matrix on the velocity space, $B$ corresponds to
+the negative divergence operator, and $B^T$ is its transpose and corresponds
+to the negative gradient.
+
+By block elimination, we can then re-order this system in the following way
+(multiply the first row of the system by $BM^{-1}$ and then subtract the
+second row from it):
+@f{eqnarray*}
+  BM^{-1}B^T P &=& BM^{-1} F - G, \\
+  MU &=& F - B^TP.
+@f}
+Here, the matrix $S=BM^{-1}B^T$ (called the <em>Schur complement</em> of $A$)
+is obviously symmetric and, owing to the positive definiteness of $M$ and the
+fact that $B^T$ has full column rank, $S$ is also positive
+definite. 
+
+Consequently, if we could compute $S$, we could apply the Conjugate Gradient
+method to it. However, computing $S$ is expensive, and $S$ is most
+likely also a full matrix. On the other hand, the CG algorithm doesn't require
+us to actually have a representation of $S$, it is sufficient to form
+matrix-vector products with it. We can do so in steps: to compute $Sv$, we 
+<ol>
+ <li> form $w = B^T v$;
+ <li> solve $My = w$ for $y=M^{-1}w$, using the CG method applied to the
+  positive definite and symmetric mass matrix $M$;
+ <li> form $z=By$ to obtain $Sv=z$.
+</ol>
+We will implement a class that does that in the program. Before showing its
+code, let us first note that we need to multiply with $M^{-1}$ in several
+places here: in multiplying with the Schur complement $S$, forming the right
+hand side of the first equation, and solving in the second equation. From a
+coding viewpoint, it is therefore appropriate to relegate such a recurring
+operation to a class of its own. We call it <code>InverseMatrix</code>. As far as
+linear solvers are concerned, this class will have all operations that solvers
+need, which in fact includes only the ability to perform matrix-vector
+products; we form them by using a CG solve (this of course requires that the
+matrix passed to this class satisfies the requirements of the CG
+solvers). Here are the relevant parts of the code that implements this:
+@code
+class InverseMatrix
+{
+  public:
+    InverseMatrix (const SparseMatrix<double> &m);
+
+    void vmult (Vector<double>       &dst,
+                const Vector<double> &src) const;
+
+  private:
+    const SmartPointer<const SparseMatrix<double> > matrix;
+    // ...
+};
+
+
+void InverseMatrix::vmult (Vector<double>       &dst,
+                           const Vector<double> &src) const
+{
+  SolverControl solver_control (src.size(), 1e-8*src.l2_norm());
+  SolverCG<>    cg (solver_control, vector_memory);
+
+  cg.solve (*matrix, dst, src, PreconditionIdentity());        
+}
+@endcode
+Once created, objects of this class can act as matrices: they perform
+matrix-vector multiplications. How this is actually done is irrelevant to the
+outside world.
+
+Using this class, we can then write a class that implements the Schur
+complement in much the same way: to act as a matrix, it only needs to offer a
+function to perform a matrix-vector multiplication, using the algorithm
+above. Here are again the relevant parts of the code:
+@code
+class SchurComplement 
+{
+  public:
+    SchurComplement (const BlockSparseMatrix<double> &A,
+                     const InverseMatrix             &Minv);
+
+    void vmult (Vector<double>       &dst,
+                const Vector<double> &src) const;
+
+  private:
+    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
+    const SmartPointer<const InverseMatrix>              m_inverse;
+    
+    mutable Vector<double> tmp1, tmp2;
+};
+
+
+void SchurComplement::vmult (Vector<double>       &dst,
+                             const Vector<double> &src) const
+{
+  system_matrix->block(0,1).vmult (tmp1, src);
+  m_inverse->vmult (tmp2, tmp1);
+  system_matrix->block(1,0).vmult (dst, tmp2);
+}
+@endcode
+
+In this code, the constructor takes a reference to a block sparse matrix for
+the entire system, and a reference to an object representing the inverse of
+the mass matrix. It stores these using <code>SmartPointer</code> objects (see
+@ref step_7 "step-7"), and additionally allocates two temporary vectors <code>tmp1</code> and
+<code>tmp2</code> for the vectors labeled $w,y$ in the list above.
+
+In the matrix-vector multiplication function, the product $Sv$ is performed in
+exactly the order outlined above. Note how we access the blocks $B^T$ and $B$
+by calling <code>system_matrix->block(0,1)</code> and
+<code>system_matrix->block(1,0)</code> respectively, thereby picking out
+individual blocks of the block system. Multiplication by $M^{-1}$ happens
+using the object introduced above.
+
+With all this, we can go ahead and write down the solver we are going to
+use. Essentially, all we need to do is form the right hand sides of the two
+equations defining $P$ and $U$, and then solve them with the Schur complement
+matrix and the mass matrix, respectively:
+@code
+template <int dim>
+void MixedLaplaceProblem<dim>::solve () 
+{
+  const InverseMatrix m_inverse (system_matrix.block(0,0));
+  Vector<double> tmp (solution.block(0).size());
+  
+  {
+    Vector<double> schur_rhs (solution.block(1).size());
+
+    m_inverse.vmult (tmp, system_rhs.block(0));
+    system_matrix.block(1,0).vmult (schur_rhs, tmp);
+    schur_rhs -= system_rhs.block(1);
+
+    SolverControl solver_control (system_matrix.block(0,0).m(),
+                                  1e-6*schur_rhs.l2_norm());
+    SolverCG<>    cg (solver_control);
+
+    cg.solve (SchurComplement(system_matrix, m_inverse),
+              solution.block(1),
+              schur_rhs,
+              PreconditionIdentity());
+  }
+  {
+    system_matrix.block(0,1).vmult (tmp, solution.block(1));
+    tmp *= -1;
+    tmp += system_rhs.block(0);
+    
+    m_inverse.vmult (solution.block(0), tmp);
+  }
+}
+@endcode
+
+This code looks more impressive than it actually is. At the beginning, we
+declare an object representing $M^{-1}$ and a temporary vector (of the size of
+the first block of the solution, i.e. with as many entries as there are
+velocity unknowns), and the two blocks surrounded by braces then solve the two
+equations for $P$ and $U$, in this order. Most of the code in each of the two
+blocks is actually devoted to constructing the proper right hand sides. For
+the first equation, this would be $BM^{-1}F-G$, and $-B^TP+G$ for the second
+one. The first hand side is then solved with the Schur complement matrix, and
+the second simply multiplied with $M^{-1}$. The code as shown uses no
+preconditioner (i.e. the identity matrix as preconditioner) for the Schur
+complement.
+
+
+
+<h4>A preconditioner for the Schur complement</h4>
+
+One may ask whether it would help if we had a preconditioner for the Schur
+complement $S=BM^{-1}B^T$. The general answer, as usual, is: of course. The
+problem is only, we don't know anything about this Schur complement matrix. We
+do not know its entries, all we know is its action. On the other hand, we have
+to realize that our solver is expensive since in each iteration we have to do
+one matrix-vector product with the Schur complement, which means that we have
+to do invert the mass matrix once in each iteration.
+
+There are different approaches to preconditioning such a matrix. On the one
+extreme is to use something that is cheap to apply and therefore has no real
+impact on the work done in each iteration. The other extreme is a
+preconditioner that is itself very expensive, but in return really brings down
+the number of iterations required to solve with $S$. 
+
+We will try something along the second approach, as much to improve the
+performance of the program as to demonstrate some techniques. To this end, let
+us recall that the ideal preconditioner is, of course, $S^{-1}$, but that is
+unattainable. However, how about
+@f{eqnarray*}
+  \tilde S^{-1} = [B^T ({\textrm{diag}\ }M)^{-1}B]^{-1}
+@f}
+as a preconditioner? That would mean that every time we have to do one
+preconditioning step, we actually have to solve with $\tilde S$. At first,
+this looks almost as expensive as solving with $S$ right away. However, note
+that in the inner iteration, we do not have to calculate $M^{-1}$, but only
+the inverse of its diagonal, which is cheap.
+
+To implement something like this, let us first generalize the
+<code>InverseMatrix</code> class so that it can work not only with
+<code>SparseMatrix</code> objects, but with any matrix type. This looks like so:
+@code
+template <class Matrix>
+class InverseMatrix
+{
+  public:
+    InverseMatrix (const Matrix &m);
+
+    void vmult (Vector<double>       &dst,
+                const Vector<double> &src) const;
+
+  private:
+    const SmartPointer<const Matrix> matrix;
+
+    //...
+};
+
+
+template <class Matrix>
+void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
+                                   const Vector<double> &src) const
+{
+  SolverControl solver_control (src.size(), 1e-8*src.l2_norm());
+  SolverCG<> cg (solver_control, vector_memory);
+
+  dst = 0;
+  
+  cg.solve (*matrix, dst, src, PreconditionIdentity());        
+}
+@endcode
+Essentially, the only change we have made is the introduction of a template
+argument that generalizes the use of <code>SparseMatrix</code>.
+
+The next step is to define a class that represents the approximate Schur
+complement. This should look very much like the Schur complement class itself,
+except that it doesn't need the object representing $M^{-1}$ any more:
+@code
+class ApproximateSchurComplement : public Subscriptor
+{
+  public:
+    ApproximateSchurComplement (const BlockSparseMatrix<double> &A);
+
+    void vmult (Vector<double>       &dst,
+                const Vector<double> &src) const;
+
+  private:
+    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
+    
+    mutable Vector<double> tmp1, tmp2;
+};
+
+
+void ApproximateSchurComplement::vmult (Vector<double>       &dst,
+                                        const Vector<double> &src) const
+{
+  system_matrix->block(0,1).vmult (tmp1, src);
+  system_matrix->block(0,0).precondition_Jacobi (tmp2, tmp1);
+  system_matrix->block(1,0).vmult (dst, tmp2);
+}
+@endcode
+Note how the <code>vmult</code> function differs in simply doing one Jacobi sweep
+(i.e. multiplying with the inverses of the diagonal) instead of multiplying
+with the full $M^{-1}$.
+
+With all this, we already have the preconditioner: it should be the inverse of
+the approximate Schur complement, i.e. we need code like this:
+@code
+    ApproximateSchurComplement
+      approximate_schur_complement (system_matrix);
+      
+    InverseMatrix<ApproximateSchurComplement>
+      preconditioner (approximate_schur_complement)
+@endcode
+That's all!
+
+Taken together, the first block of our <code>solve()</code> function will then
+look like this:
+@code
+    Vector<double> schur_rhs (solution.block(1).size());
+
+    m_inverse.vmult (tmp, system_rhs.block(0));
+    system_matrix.block(1,0).vmult (schur_rhs, tmp);
+    schur_rhs -= system_rhs.block(1);
+
+    SchurComplement
+      schur_complement (system_matrix, m_inverse);
+    
+    ApproximateSchurComplement
+      approximate_schur_complement (system_matrix);
+      
+    InverseMatrix<ApproximateSchurComplement>
+      preconditioner (approximate_schur_complement);
+    
+    SolverControl solver_control (system_matrix.block(0,0).m(),
+                                  1e-6*schur_rhs.l2_norm());
+    SolverCG<>    cg (solver_control);
+
+    cg.solve (schur_complement, solution.block(1), schur_rhs,
+              preconditioner);
+@endcode
+Note how we pass the so-defined preconditioner to the solver working on the
+Schur complement matrix.
+
+Obviously, applying this inverse of the approximate Schur complement is a very
+expensive preconditioner, almost as expensive as inverting the Schur
+complement itself. We can expect it to significantly reduce the number of
+outer iterations required for the Schur complement. In fact it does: in a
+typical run on 5 times refined meshes using elements of order 0, the number of
+outer iterations drops from 164 to 12. On the other hand, we now have to apply
+a very expensive preconditioner 12 times. A better measure is therefore simply
+the run-time of the program: on my laptop, it drops from 28 to 23 seconds for
+this test case. That doesn't seem too impressive, but the savings become more
+pronounced on finer meshes and with elements of higher order. For example, a
+six times refined mesh and using elements of order 2 yields an improvement of
+318 to 12 outer iterations, at a runtime of 338 seconds to 229 seconds. Not
+earth shattering, but significant.
+
+
+<h4>A remark on similar functionality in deal.II</h4>
+
+As a final remark about solvers and preconditioners, let us note that a
+significant amount of functionality introduced above is actually also present
+in the library itself. It probably even is more powerful and general, but we
+chose to introduce this material here anyway to demonstrate how to work with
+block matrices and to develop solvers and preconditioners, rather than using
+black box components from the library.
+
+For those interested in looking up the corresponding library classes: the
+<code>InverseMatrix</code> is roughly equivalent to the
+<code>PreconditionLACSolver</code> class in the library. Likewise, the Schur
+complement class corresponds to the <code>SchurMatrix</code> class.
+
+
+<h3>Definition of the test case</h3>
+
+In this tutorial program, we will solve the Laplace equation in mixed
+formulation as stated above. Since we want to monitor convergence of the
+solution inside the program, we choose right hand side, boundary conditions,
+and the coefficient so that we recover a solution function known to us. In
+particular, we choose the pressure solution
+@f{eqnarray*}
+  p = -\left(\frac \alpha 2 xy^2 + \beta x - \frac \alpha 6 x^2\right),
+@f}
+and for the coefficient we choose the unit matrix $K_{ij}=\delta_{ij}$ for
+simplicity. Consequently, the exact velocity satisfies
+@f{eqnarray*}
+  {\mathbf u} = 
+  \left(\begin{array}{cc}
+    \frac \alpha 2 y^2 + \beta - \frac \alpha 2 x^2 \\
+    \alpha xy
+  \end{array}\right).
+@f}
+This solution was chosen since it is exactly divergence free, making it a
+realistic test case for incompressible fluid flow. By consequence, the right
+hand side equals $f=0$, and as boundary values we have to choose
+$g=p|_{\partial\Omega}$.
+
+For the computations in this program, we choose $\alpha=0.3,\beta=1$. You can
+find the resulting solution in the ``Results'' section below, after the
+commented program.

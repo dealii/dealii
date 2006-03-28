@@ -1,0 +1,110 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+The problem we will be considering is the solution of Laplace's problem with
+Neumann boundary conditions only:
+@f{eqnarray*}
+  -\Delta u &=& f \qquad \mathrm{in}\ \Omega,
+  \\
+  \partial_n u &=& g \qquad \mathrm{on}\ \partial\Omega.
+@f}
+It is well known that if this problem is to have a solution, then the forces
+need to satisfy the compatibility condition
+@f[
+  \int_\Omega f\; dx + \int_{\partial\Omega} g\; ds = 0.
+@f]
+We will consider the special case that $\Omega$ is the circle of radius 1
+around the origin, and $f=-2$, $g=1$. This choice satisfies the compatibility
+condition.
+
+The compatibility condition allows a solution of the above equation, but it
+nevertheless retains an ambiguity: since only derivatives of the solution
+appear in the equations, the solution is only determined up to a constant. For
+this reason, we have to pose another condition for the numerical solution,
+which fixes this constant. 
+
+For this, there are various possibilities:
+<ol>
+<li> Fix one node of the discretization to zero or any other fixed value.
+  This amounts to an additional condition $u_h(x_0)=0$. Although this is
+  common practice, it is not necessarily a good idea, since we know that the
+  solutions of Laplace's equation are only in $H^1$, which does not allow for
+  the definition of point values because it is not a subset of the continuous
+  functions. Therefore, even though fixing one node is allowed for
+  discretitized functions, it is not for continuous functions, and one can
+  often see this in a resulting error spike at this point in the numerical
+  solution. 
+  
+<li> Fixing the mean value over the domain to zero or any other value. This
+  is allowed on the continuous level, since $H^1(\Omega)\subset L^1(\Omega)$
+  by Sobolev's inequality, and thus also on the discrete level since we
+  there only consider subsets of $H^1$.
+  
+<li> Fixing the mean value over the boundary of the domain to zero or any
+  other value. This is also allowed on the continuous level, since
+  $H^{1/2}(\partial\Omega)\subset L^1(\partial\Omega)$, again by Sobolev's
+  inequality.
+</ol>
+We will choose the last possibility, since we want to demonstrate another
+technique with it.
+
+While this describes the problem to be solved, we still have to figure out how
+to implement it. Basically, except for the additional mean value constraint,
+we have solved this problem several times, using Dirichlet boundary values,
+and we only need to drop the treatment of Dirichlet boundary nodes. The use of
+higher order mappings is also rather trivial and will be explained at the
+various places where we use it; in almost all conceivable cases, you will only
+consider the objects describing mappings as a black box which you need not
+worry about, because their only uses seem to be to be passed to places deep
+inside the library where functions know how to handle them (i.e. in the
+<code>FEValues</code> classes and their descendents).
+
+The tricky point in this program is the use of the mean value
+constraint. Fortunately, there is a class in the library which knows how to
+handle such constraints, and we have used it quite often already, without
+mentioning its generality. Note that if we assume that the boundary nodes are
+spaced equally along the boundary, then the mean value constraint
+@f[
+  \int_{\partial \Omega} u(x) \; ds = 0
+@f]
+can be written as
+@f[
+  \sum_{i\in\partial\Omega_h} u_i = 0,
+@f]
+where the sum shall run over all degree of freedom indices which are located
+on the boundary of the computational domain. Let us denote by $i_0$ that index
+on the boundary with the lowest number (or any other conveniently chosen
+index), then the constraint can also be represented by
+@f[
+  u_{i_0} = \sum_{i\in\partial\Omega_h\backslash i_0} -u_i.
+@f]
+This, luckily, is exactly the form of constraints for which the
+<code>ConstraintMatrix</code> class was designed. Note that we have used this
+class in several previous examples for the representation of hanging nodes
+constraints, which also have this form: there, the middle vertex shall have
+the mean of the values of the adjacent vertices. In general, the
+<code>ConstraintMatrix</code> class is designed to handle homogeneous constraints
+of the form
+@f[
+  CU = 0
+@f]
+where $C$ denotes a matrix, and $U$ the vector of nodal values.
+
+In this example, the mean value along the boundary allows just such a
+representation, with $C$ being a matrix with just one row (i.e. there is only
+one constraint). In the implementation, we will create a
+<code>ConstraintMatrix</code> object, add one constraint (i.e. add another row to
+the matrix) referring to the first boundary node $i_0$, and insert the weights
+with which all the other nodes contribute, which in this example happens to be
+just $-1$.
+
+Later, we will use this object to eliminate the first boundary node from the
+linear system of equations, reducing it to one which has a solution without
+the ambiguity of the constant shift value. One of the problems of the
+implementation will be that the explicit elimination of this node results in a
+number of additional elements in the matrix, of which we do not know in
+advance where they are located and how many additional entries will be in each
+of the rows of the matrix. We will show how we can use an intermediate object
+to work around this problem.
+
+But now on to the implementation of the program solving this problem...

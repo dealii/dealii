@@ -1,0 +1,194 @@
+<a name="Results"></a>
+<h1>Results</h1>
+
+
+The program performs two tasks, the first being to generate a
+visualization of the mapped domain, the second to compute pi by the
+two methods described. Let us first take a look at the generated
+graphics. They are generated in Gnuplot format, and can be viewed with
+the commands
+@code
+set data style lines
+set size 0.721, 1
+set nokey
+plot [-1:1][-1:1] "ball0_mapping_q1.dat"
+@endcode
+or using one of the other filenames. The second line makes sure that
+the aspect ratio of the generated output is actually 1:1, i.e. a
+circle is drawn as a circle on your screen, rather than as an
+ellipse. The third line switches off the key in the graphic, as that
+will only print information (the filename) which is not that important
+right now.
+
+
+
+The following table shows the triangulated computational domain for
+Q1, Q2, and Q3 mappings, for the original coarse grid (left), and a
+once uniformly refined grid (right). If your browser does not display
+these pictures in acceptable quality, view them one by one.
+<table "width=80%" align="center">
+  <tr>
+    <td>
+      @image html step-10.ball_mapping_q1_ref0.png
+    </td>
+    <td>
+      @image html step-10.ball_mapping_q1_ref1.png
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      @image html step-10.ball_mapping_q2_ref0.png
+    </td>
+    <td>
+      @image html step-10.ball_mapping_q2_ref1.png
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      @image html step-10.ball_mapping_q3_ref0.png
+    </td>
+    <td>
+      @image html step-10.ball_mapping_q3_ref1.png
+    </td>
+  </tr>
+</table>
+These pictures show the obvious advantage of higher order mappings:
+they approximate the true boundary quite well also on rather coarse
+meshes. To demonstrate this a little further, the following table
+shows the upper right quarter of the circle of the coarse mesh, and
+with dashed lines the exact circle:
+<table "width=80%" align="center">
+  <tr>
+    <td>
+      @image html step-10.quarter-q1.png
+    </td>
+    <td>
+      @image html step-10.quarter-q2.png
+    </td>
+    <td>
+      @image html step-10.quarter-q3.png
+    </td>
+  </tr>
+</table>
+Obviously the quadratic mapping approximates the boundary quite well,
+while for the cubic mapping the difference between approximated domain
+and true one is hardly visible already for the coarse grid. You can
+also see that the mapping only changes something at the outer
+boundaries of the triangulation. In the interior, all lines are still
+represented by linear functions, resulting in additional computations
+only on cells at the boundary. Higher order mappings are therefore
+usually not noticably slower than lower order ones, because the
+additional computations are only performed on a small subset of all
+cells.
+
+
+
+The second purpose of the program was to compute the value of pi to
+good accuracy. This is the output of this part of the program:
+@code
+Computation of Pi by the area:
+==============================
+Degree = 1
+cells         eval.pi         error                           
+5       1.9999999999999998      1.1416e+00      -
+20      2.8284271247461898      3.1317e-01      1.87
+80      3.0614674589207178      8.0125e-02      1.97
+320     3.1214451522580520      2.0148e-02      1.99
+1280    3.1365484905459389      5.0442e-03      2.00
+5120    3.1403311569547521      1.2615e-03      2.00
+
+Degree = 2
+cells         eval.pi         error                           
+5       3.1045694996615869      3.7023e-02      -
+20      3.1391475703122276      2.4451e-03      3.92
+80      3.1414377167038303      1.5494e-04      3.98
+320     3.1415829366419019      9.7169e-06      4.00
+1280    3.1415920457576907      6.0783e-07      4.00
+5120    3.1415926155921126      3.7998e-08      4.00
+
+Degree = 3
+cells         eval.pi         error                           
+5       3.1465390309173475      4.9464e-03      -
+20      3.1419461263297386      3.5347e-04      3.81
+80      3.1416154689089382      2.2815e-05      3.95
+320     3.1415940909713274      1.4374e-06      3.99
+1280    3.1415927436051230      9.0015e-08      4.00
+5120    3.1415926592185492      5.6288e-09      4.00
+
+Degree = 4
+cells         eval.pi         error                           
+5       3.1418185737113964      2.2592e-04      -
+20      3.1415963919525050      3.7384e-06      5.92
+80      3.1415927128397780      5.9250e-08      5.98
+320     3.1415926545188264      9.2903e-10      5.99
+1280    3.1415926536042722      1.4479e-11      6.00
+5120    3.1415926535899668      1.7343e-13      6.38
+
+
+Computation of Pi by the perimeter:
+===================================
+Degree = 1
+cells         eval.pi         error                           
+5       2.8284271247461903      3.1317e-01      -
+20      3.0614674589207183      8.0125e-02      1.97
+80      3.1214451522580524      2.0148e-02      1.99
+320     3.1365484905459393      5.0442e-03      2.00
+1280    3.1403311569547525      1.2615e-03      2.00
+5120    3.1412772509327729      3.1540e-04      2.00
+
+Degree = 2
+cells         eval.pi         error                           
+5       3.1248930668550599      1.6700e-02      -
+20      3.1404050605605454      1.1876e-03      3.81
+80      3.1415157631807014      7.6890e-05      3.95
+320     3.1415878042798613      4.8493e-06      3.99
+1280    3.1415923498174538      3.0377e-07      4.00
+5120    3.1415926345932004      1.8997e-08      4.00
+
+Degree = 3
+cells         eval.pi         error                           
+5       3.1442603311164286      2.6677e-03      -
+20      3.1417729561193588      1.8030e-04      3.89
+80      3.1416041192612365      1.1466e-05      3.98
+320     3.1415933731961760      7.1961e-07      3.99
+1280    3.1415926986118001      4.5022e-08      4.00
+5120    3.1415926564043946      2.8146e-09      4.00
+
+Degree = 4
+cells         eval.pi         error                           
+5       3.1417078926581086      1.1524e-04      -
+20      3.1415945317216001      1.8781e-06      5.94
+80      3.1415926832497720      2.9660e-08      5.98
+320     3.1415926540544636      4.6467e-10      6.00
+1280    3.1415926535970535      7.2602e-12      6.00
+5120    3.1415926535899010      1.0805e-13      6.07
+@endcode
+
+
+
+One of the immediate observations from the output is that in all cases
+the values converge quickly to the true value of
+$\pi=3.141592653589793238462643$. Note that for the $Q_4$ mapping, the last
+number is correct to 13 digits in both computations, which is already
+quite a lot. However, also note that for the $Q_1$ mapping, even on the
+finest grid the accuracy is significantly worse than on the coarse
+grid for a $Q_4$ mapping!
+
+
+
+The last column of the output shows the convergence order, in powers
+of the mesh width $h$. In the introduction, we had stated that
+the convergence order for a $Q_p$ mapping should be
+$h^{p+1}$. However, in the example shown, the $Q_2$ and $Q_4$
+mappings show a convergence order of $h^{p+2}$! This at
+first surprising fact is readily explained by the particular boundary
+we have chosen in this example. In fact, the circle is described by the function
+$\sqrt{1-x^2}$, which has the series expansion 
+$1-x^2/2-x^4/8-x^6/16+\ldots$
+around $x=0$. Thus, for the quadratic mapping where the
+truncation error of the quadratic approximation should be cubic, there
+is no such term but only a quartic one, which raises the convergence
+order to 4, instead of 3. The same happens for the $Q_4$ mapping.
+

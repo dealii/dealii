@@ -1,0 +1,514 @@
+<a name="Results"></a>
+<h1>Results</h1>
+
+<h2>Point values</h2>
+
+<p>
+This program offers a lot of possibilities to play around. We can thus
+only show a small part of all possible results that can be obtained
+with the help of this program. However, you are encouraged to just try
+it out, by changing the settings in the main program. Here, we start
+by simply letting it run, unmodified:
+<code>
+<pre>
+Refinement cycle: 0
+   Number of degrees of freedom=72
+   Point value=0.03243
+   Estimated error=0.000702385
+Refinement cycle: 1
+   Number of degrees of freedom=67
+   Point value=0.0324827
+   Estimated error=0.000888953
+Refinement cycle: 2
+   Number of degrees of freedom=130
+   Point value=0.0329619
+   Estimated error=0.000454606
+Refinement cycle: 3
+   Number of degrees of freedom=307
+   Point value=0.0331934
+   Estimated error=0.000241254
+Refinement cycle: 4
+   Number of degrees of freedom=718
+   Point value=0.0333675
+   Estimated error=7.4912e-05
+Refinement cycle: 5
+   Number of degrees of freedom=1691
+   Point value=0.0334104
+   Estimated error=3.47976e-05
+Refinement cycle: 6
+   Number of degrees of freedom=4065
+   Point value=0.0334315
+   Estimated error=1.49476e-05
+Refinement cycle: 7
+   Number of degrees of freedom=9113
+   Point value=0.0334407
+   Estimated error=6.23712e-06
+Refinement cycle: 8
+   Number of degrees of freedom=22303
+   Point value=0.0334445
+</pre>
+</code>
+</p>
+
+<p>
+First let's look what the program actually computed. On the fifth
+grid, primal and dual numerical solutions look like this:
+<table align="center">
+  <tr>
+    <td width="50%">
+      <a href="step-14.data/point_value/solution-5.gif"
+      target="_top"><img alt="Primal solution" width="318"
+      src="step-14.data/point_value/solution-5.gif">
+      </img></a>
+    </td>
+
+    <td width="50%">
+      <a href="step-14.data/point_value/solution-5-dual.gif"
+      target="_top"><img alt="Dual solution" width="318"
+      src="step-14.data/point_value/solution-5-dual.gif">
+      </img></a>
+    </td>
+  </tr>
+</table>
+Obviously, the region at the bottom left is so unimportant for the
+point value evaluation at the top right that the grid is left entirely
+unrefined there, even though the solution has singularities there! Due
+to the symmetry in right hand side and domain, the solution should
+actually look like at the top right in all four corners, but the mesh
+refinement criterion involving the dual solution chose to refine them
+differently.
+</p>
+
+<p>
+Looking at the grids that are produced in the course of subsequent
+refinement, these are some of them:
+<table align="center">
+  <tr>
+    <td width="50%">
+      <a href="step-14.data/point_value/grid-0.gif" target="_top">
+      <img alt="Grid 0"
+      src="step-14.data/point_value/grid-0.gif">
+      </img></a>
+    </td>
+
+    <td width="50%">
+      <a href="step-14.data/point_value/grid-2.gif" target="_top">
+      <img alt="Grid 2"
+      src="step-14.data/point_value/grid-2.gif">
+      </img></a>
+    </td>
+  </tr>
+
+  <tr>
+    <td width="50%">
+      <a href="step-14.data/point_value/grid-4.gif" target="_top">
+      <img alt="Grid 4"
+      src="step-14.data/point_value/grid-4.gif">
+      </img></a>
+    </td>
+
+    <td width="50%">
+      <a href="step-14.data/point_value/grid-5.gif" target="_top">
+      <img alt="Grid 5"
+      src="step-14.data/point_value/grid-5.gif">
+      </img></a>
+    </td>
+  </tr>
+
+  <tr>
+    <td width="50%">
+      <a href="step-14.data/point_value/grid-7.gif" target="_top">
+      <img alt="Grid 7"
+      src="step-14.data/point_value/grid-7.gif">
+      </img></a>
+    </td>
+
+    <td width="50%">
+      <a href="step-14.data/point_value/grid-8.gif" target="_top">
+      <img alt="Grid 8"
+      src="step-14.data/point_value/grid-8.gif">
+      </img></a>
+    </td>
+  </tr>
+</table>
+Note the subtle interplay between resolving the corner singularities,
+and resolving around the point of evaluation. It will be rather
+difficult to generate such a mesh by hand, as this would involve to
+judge quantitatively how much which of the four corner singularities
+shall be resolved, and to set the weight compared to the vicinity of
+the evaluation point.
+</p>
+
+<p>
+The program prints the point value and the estimated error in this
+quantity. From extrapolating it, we can guess that the exact value is
+somewhat like 0.0334473, plus or minus 0.0000001 (note that we get
+almost 6 valid digits from only 22,000 (primal) degrees of
+freedom. This number cannot be obtained from the value of the
+functional alone, but I have used the assumption that the error
+estimator is mostly exact, and extrapolated the computed value plus
+the estimated error, to get an approximation of the true
+value. Computing with more degrees of freedom shows that this
+assumption is indeed valid.
+</p>
+
+<p>
+From the computed results, we can generate two graphs: one that shows
+the convergence of the error J(u)-J(u<sub>h</sub>) (taking the
+extrapolated value as correct) in the point value, and the value that
+we get by adding up computed value J(u<sub>h</sub>) and estimated
+error eta (if the error estimator eta were exact, then the value
+J(u<sub>h</sub>)+eta would equal the exact point value, and the error
+in this quantity would always be zero; however, since the error
+estimator is only a - good - approximation to the true error, we can
+by this only reduce the size of the error). In this graph, we also
+indicate the complexity <em>O(1/N)</em> to show that mesh refinement
+acts optimal in this case. The second chart compares
+true and estimated error, and shows that the two are actually very
+close to each other, even for such a complicated quantity as the point
+value:
+</p>
+
+<table align="center">
+  <tr>
+    <td width="50%">
+      <a href="step-14.data/point_value/error.gif" target="_top">
+      <img alt="Error in point value" width="318"
+      src="step-14.data/point_value/error.gif">
+      </img></a>
+    </td>
+
+    <td width="50%">
+      <a href="step-14.data/point_value/error-estimation.gif" target="_top">
+      <img alt="Error in point value" width="318"
+      src="step-14.data/point_value/error-estimation.gif">
+      </img></a>
+    </td>
+  </tr>
+</table>
+
+
+<h2>Comparing refinement criteria</h2>
+
+<p>
+Since we have accepted quite some effort when using the mesh
+refinement driven by the dual weighted error estimator (for solving
+the dual problem, and for evaluating the error representation), it is
+worth while asking whether that effort was successful. To this end, we
+first compare the achieved error levels for different mesh refinement
+criteria. To generate this data, simply change the value of the mesh
+refinement criterion variable in the main program. The results are
+thus (for the weight in the Kelly indicator, we have chosen the
+function <em>1/(r<sup>2</sup>+0.1<sup>2</sup>)</em>, where <em>r</em>
+is the distance to the evaluation point; it can be shown that this is
+the optimal weight if we neglect the effects of boundaries):
+</p>
+<p align="center">
+ <a href="step-14.data/point_value/error-comparison.gif"
+  target="_top"><img alt="Error comparison"
+  src="step-14.data/point_value/error-comparison.gif">
+ </img></a>
+</p>
+
+<p>
+Checking these numbers, we see that for global refinement, the error
+is proportional to <em>O(1/(sqrt(N) log(N)))</em>, and for the dual
+estimator <em>O(1/N)</em>. Generally speaking, we see that the dual
+weighted error estimator is better than the other refinement
+indicators, at least when compared with those that have a similarly
+regular behavior. The Kelly indicator produces smaller errors, but
+jumps about the picture rather irregularly, with the error also
+changing signs sometimes. Therefore, its behavior does not allow to
+extrapolate the results to larger values of N. Furthermore, if we
+trust the error estimates of the dual weighted error estimator, the
+results can be improved by adding the estimated error to the computed
+values. In terms of reliability, the weighted estimator is thus better
+than the Kelly indicator, although the latter sometimes produces
+smaller errors.
+</p>
+
+
+<h2>Evaluation of point stresses</h2>
+
+<p>
+Besides evaluating the values of the solution at a certain point, the
+program also offers the possibility to evaluate the x-derivatives at a
+certain point, and also to tailor mesh refinement for this. To let the
+program compute these quantities, simply replace the two occurences of
+<code>PointValueEvaluation</code> in the main function by
+<code>PointXDerivativeEvaluation</code>, and let the program run:
+<code>
+<pre>
+Refinement cycle: 0
+   Number of degrees of freedom=72
+   Point x-derivative=-0.0719397
+   Estimated error=-0.0126173
+Refinement cycle: 1
+   Number of degrees of freedom=61
+   Point x-derivative=-0.0707956
+   Estimated error=-0.00774316
+Refinement cycle: 2
+   Number of degrees of freedom=131
+   Point x-derivative=-0.0568671
+   Estimated error=-0.00313426
+Refinement cycle: 3
+   Number of degrees of freedom=247
+   Point x-derivative=-0.053033
+   Estimated error=-0.00136114
+Refinement cycle: 4
+   Number of degrees of freedom=541
+   Point x-derivative=-0.0526461
+   Estimated error=-0.000555479
+Refinement cycle: 5
+   Number of degrees of freedom=1286
+   Point x-derivative=-0.0526896
+   Estimated error=-0.0002261
+Refinement cycle: 6
+   Number of degrees of freedom=2924
+   Point x-derivative=-0.0527503
+   Estimated error=-9.38035e-05
+Refinement cycle: 7
+   Number of degrees of freedom=6578
+   Point x-derivative=-0.0527877
+   Estimated error=-3.94139e-05
+Refinement cycle: 8
+   Number of degrees of freedom=14780
+   Point x-derivative=-0.0528047
+   Estimated error=-1.85456e-05
+Refinement cycle: 9
+   Number of degrees of freedom=31438
+   Point x-derivative=-0.0528145
+</pre>
+</code>
+</p>
+
+<p>
+The solution looks roughly the same as before (the exact solution of
+course <em>is</em> the same, only the grid changed a little), but the
+dual solution is now different. A close-up around the point of
+evaluation shows this:
+<table align="center">
+  <tr>
+    <td width="50%">
+      <a href="step-14.data/point_derivative/solution-5-dual.gif"
+       target="_top"><img alt="Dual solution" width="318"
+      src="step-14.data/point_derivative/solution-5-dual.gif">
+      </img></a>
+    </td>
+</table>
+This time, the grids in refinement cycles 0, 5, 6, 7, 8, and 9 look
+like this:
+<table align="center">
+  <tr>
+    <td width="50%">
+      <a href="step-14.data/point_derivative/grid-0.gif" target="_top">
+      <img alt="Grid 0"
+      src="step-14.data/point_derivative/grid-0.gif">
+      </img></a>
+    </td>
+
+    <td width="50%">
+      <a href="step-14.data/point_derivative/grid-5.gif" target="_top">
+      <img alt="Grid 5"
+      src="step-14.data/point_derivative/grid-5.gif">
+      </img></a>
+    </td>
+  </tr>
+
+  <tr>
+    <td width="50%">
+      <a href="step-14.data/point_derivative/grid-6.gif" target="_top">
+      <img alt="Grid 6"
+      src="step-14.data/point_derivative/grid-6.gif">
+      </img></a>
+    </td>
+
+    <td width="50%">
+      <a href="step-14.data/point_derivative/grid-7.gif" target="_top">
+      <img alt="Grid 7"
+      src="step-14.data/point_derivative/grid-7.gif">
+      </img></a>
+    </td>
+  </tr>
+
+  <tr>
+    <td width="50%">
+      <a href="step-14.data/point_derivative/grid-8.gif" target="_top">
+      <img alt="Grid 8"
+      src="step-14.data/point_derivative/grid-8.gif">
+      </img></a>
+    </td>
+
+    <td width="50%">
+      <a href="step-14.data/point_derivative/grid-9.gif" target="_top">
+      <img alt="Grid 9"
+      src="step-14.data/point_derivative/grid-9.gif">
+      </img></a>
+    </td>
+  </tr>
+</table>
+Note the assymetry of the grids compared with those we obtained for
+the point evaluation, which is due to the directionality of the
+x-derivative for which we tailored the refinement criterion.
+</p>
+
+<p>
+Then, it is interesting to compare actually computed values of the
+quantity of interest (i.e. the x-derivative of the solution at one
+point) with a reference value of -0.0528223... plus or minus
+0.0000005. We get this reference value by computing on finer grid after
+some more mesh refinements, with approximately 130,000 cells.
+Recall that if the error is <em>O(1/N)</em> in the optimal case, then
+taking a mesh with ten times more cells gives us one additional digit
+in the result.
+</p>
+
+<p>
+In the left part of the following chart, you again see the convergence
+of the error towards this extrapolated value, while on the right you
+see a comparison of true and estimated error:
+<table align="center">
+  <tr>
+    <td width="50%">
+      <a href="step-14.data/point_derivative/error.gif" target="_top">
+      <img alt="Error in point derivative" width="318"
+      src="step-14.data/point_derivative/error.gif">
+      </img></a>
+    </td>
+
+    <td width="50%">
+      <a href="step-14.data/point_derivative/error-estimation.gif" target="_top">
+      <img alt="Error in point derivative" width="318"
+      src="step-14.data/point_derivative/error-estimation.gif">
+      </img></a>
+    </td>
+  </tr>
+</table>
+After an initial phase where the true error changes its sign, the
+estimated error matches it quite well, again. Also note the dramatic
+improvement in the error when using the estimated error to correct the
+computed value of J(u<sub>h</sub>).
+</p>
+
+
+<h2>Step-13 revisited</h2>
+
+<p>
+If instead of the <code>Exercise_2_3</code> data set, we choose
+<code>CurvedRidges</code> in the main function, we can redo the
+computations of the previous example program, to compare whether the
+results obtained with the help of the dual weighted error estimator
+are better than those we had previously.
+</p>
+
+<p>
+First, the meshes after 9 and 10 adaptive refinement cycles,
+respectively, look like this:
+<table align="center">
+  <tr>
+    <td width="50%">
+      <a href="step-14.data/step-13/grid-9.gif"
+       target="_top"><img alt="Grid 9"
+      src="step-14.data/step-13/grid-9.gif">
+      </img></a>
+    </td>
+
+    <td width="50%">
+      <a href="step-14.data/step-13/grid-10.gif"
+       target="_top"><img alt="Grid 10"
+      src="step-14.data/step-13/grid-10.gif">
+      </img></a>
+    </td>
+  </tr>
+</table>
+The features of the solution can still be seen slightly, but since the
+solution is smooth, the roughness of the dual solution entirely
+dominates the mesh refinement criterion, and leads to strongly
+concentrated meshes. The solution after the seventh refinement step is
+like so:
+<table align="center">
+  <tr>
+    <td width="50%" align="center">
+      <a href="step-14.data/step-13/solution-7.gif"
+       target="_top"><img alt="Solution 7"
+      src="step-14.data/step-13/solution-7.gif">
+      </img></a>
+    </td>
+  </tr>
+</table>
+Obviously, the solution is worse at some places, but the mesh
+refinement process should have taken care that these places are not
+important for computing the point value.
+</p>
+
+
+<p>
+The next point is to compare the new (duality based) mesh refinement
+criterion with the old ones. These are the results:
+</p>
+<p align="center">
+ <a href="step-14.data/step-13/error-comparison.gif"
+  target="_top"><img alt="Error comparison"
+  src="step-14.data/step-13/error-comparison.gif">
+ </img></a>
+</p>
+
+<p>
+The results are, well, somewhat mixed. First, the Kelly indicator
+disqualifies itself by its unsteady behavior, changing the sign of the
+error several times, and with increasing errors under mesh
+refinement. The dual weighted error estimator has a monotone decrease
+in the error, and is better than the weighted Kelly and global
+refinement, but the margin is not as large as expected. This is, here,
+due to the fact the global refinement can exploit the regular
+structure of the meshes around the point of evaluation, which leads to
+a better order of convergence for the point error. However, if we had
+a mesh that is not locally rectangular, for example because we had to
+approximate curved boundaries, or if the coefficients were not
+constant, then this advantage of globally refinement meshes would
+vanish, while the good performance of the duality based estimator
+would remain.
+</p>
+
+
+
+<h2>Conclusions and outlook</h2>
+
+<p>
+The results here are not too clearly indicating the superiority of the
+dual weighted error estimation approach for mesh refinement over other
+mesh refinement criteria, such as the Kelly indicator. This is due to
+the relative simplicity of the shown applications. If you are not
+convinced yet that this approach is indeed superior, you are invited
+to browse through the literature indicated in the introduction, where
+plenty of examples are provided where the dual weighted approach can
+reduce the necessary numerical work by orders of magnitude, making
+this the only way to compute certain quantities to reasonable
+accuracies at all.
+</p>
+
+<p>
+Besides the objections you may raise against its use as a mesh
+refinement criterion, consider that accurate knowledge of the error in
+the quantity one might want to compute is of great use, since we can
+stop computations when we are satisfied with the accuracy. Using more
+traditional approaches, it is very difficult to get accurate estimates
+for arbitrary quantities, except for, maybe, the error in the energy
+norm, and we will then have no guarantee that the result we computed
+satisfies any requirements on its accuracy. Also, as was shown for the
+evaluation of point values and derivatives, the error estimate can be
+used to extrapolate the results, yielding much higher accuracy in the
+quantity we want to know.
+</p>
+
+<p>
+Leaving these mathematical considerations, we tried to write the
+program in a modular way, such that implementing another test case, or
+another evaluation and dual functional is simple. You are encouraged
+to take the program as a basis for your own experiments, and to play a
+little.
+</p>
+
+
+
+
