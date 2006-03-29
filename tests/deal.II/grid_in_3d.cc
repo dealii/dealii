@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,11 +26,6 @@
 #include <grid/grid_out.h>
 #include <grid/grid_in.h>
 #include <grid/grid_generator.h>
-#include <dofs/dof_handler.h>
-#include <lac/vector.h>
-#include <numerics/data_out.h>
-#include <numerics/data_out_faces.h>
-#include <fe/fe_q.h>
 #include <base/logstream.h>
 
 #include <fstream>
@@ -52,7 +47,7 @@ void test (const char *filename)
 
   try
     {
-      gi.read_ucd (in);
+      gi.read_xda (in);
     }
   catch (std::exception &exc)
     {
@@ -71,21 +66,6 @@ void test (const char *filename)
     for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
       hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells()+1);
   deallog << "  hash=" << hash << std::endl;
-
-  FE_Q<dim> fe(1);
-  DoFHandler<dim> dh (tria);
-  dh.distribute_dofs(fe);
-
-  Vector<double> tmp (dh.n_dofs());
-  for (unsigned int i=0; i<tmp.size(); ++i)
-    tmp(i) = i;
-  
-  DataOutFaces<dim> dout;
-  dout.attach_dof_handler (dh);
-  dout.add_data_vector (tmp, "tmp");
-  dout.build_patches();
-  std::ofstream file("input_left.gmv");
-  dout.write_gmv (file);
 }
 
 void test1()
@@ -110,16 +90,16 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test ("grid_in_3d_5.in");
-//   test ("grid_in_3d_2.in");
-//   test ("grid_in_3d_3.in");
-//   test ("grid_in_3d_4.in");
+  test ("grid_in_3d_1.in");
+  test ("grid_in_3d_2.in");
+  test ("grid_in_3d_3.in");
+  test ("grid_in_3d_4.in");
 
-//   test ("grid_in_3d_evil_0.in");
-//   test ("grid_in_3d_evil_1.in");
-//   test ("grid_in_3d_evil_2.in");
-//   test ("grid_in_3d_evil_3.in");
-//   test ("grid_in_3d_evil_4.in");
+  test ("grid_in_3d_evil_0.in");
+  test ("grid_in_3d_evil_1.in");
+  test ("grid_in_3d_evil_2.in");
+  test ("grid_in_3d_evil_3.in");
+  test ("grid_in_3d_evil_4.in");
   
 				   // test1 needs NetCDF
 //    test1 ();
