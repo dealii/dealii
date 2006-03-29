@@ -42,21 +42,7 @@ namespace internal
  * index of the according value in the solution vector and the row and column
  * index in the global matrix or the multigrid matrix for this level. These
  * indices refer to the unconstrained vectors and matrices, where we have not
- * taken account of the constraints introduced by hanging nodes. If more than
- * one value corresponds to one basis function, for example for vector equations
- * where the solution is vector valued and thus has several degrees of freedom
- * for each basis function, we nonetheless store only one index. This can then
- * be viewed as the index into a block vector, where each block contains the
- * different values according to a degree of freedom. It is left to the derived
- * classes, whether the values in a block are stored consecutively or distributed
- * (e.g. if the solution function is $u=(u_1, u_2)$, we could store the values
- * in the solution vector like
- * $\ldots, u_1^m, u_2^m, u_1^{m+1}, u_2^{m+1},\ldots$ with <tt>m</tt>
- * denoting the <tt>m</tt>th basis function, or $\ldots, u_1^m,
- * u_1^{m+1}, u_1^{m+2}, \ldots, u_2^m, u_2^{m+1}, u_2^{m+2}, \ldots$,
- * respectively). Likewise, the constraint matrix returned by
- * DoFHandler::make_hanging_node_constraints() is then to be
- * understood as a block matrix.
+ * taken account of the constraints introduced by hanging nodes.
  *
  * The storage format of the degrees of freedom indices (short: DoF
  * indices) is somewhat like a mirror of the data structures of the
