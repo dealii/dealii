@@ -888,10 +888,9 @@ namespace StandardExceptions
   
 				   /**
 				    * This function requires the
-				    * NetCDF library. Please set the
-				    * environment variable NETCDF_DIR,
-				    * reconfigure and check if it is
-				    * actually included.
+				    * NetCDF library, which is neither
+				    * in your standard path nor
+				    * configured with --with-netcdf.
 				    */
   DeclException0 (ExcNeedsNetCDF);
 				   /**

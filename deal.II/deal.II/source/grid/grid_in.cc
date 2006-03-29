@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <fstream>
 
-#ifdef DEAL_II_HAVE_NETCDF
+#ifdef HAVE_LIBNETCDF
 #include <netcdfcpp.h>
 #endif
 
@@ -756,7 +756,7 @@ void GridIn<1>::read_netcdf (const std::string &)
 template <>
 void GridIn<2>::read_netcdf (const std::string &filename)
 {
-#ifndef DEAL_II_HAVE_NETCDF
+#ifndef HAVE_LIBNETCDF
 				   // do something with unused
 				   // filename
   filename.c_str();
@@ -1013,7 +1013,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 template <>
 void GridIn<3>::read_netcdf (const std::string &filename)
 {
-#ifndef DEAL_II_HAVE_NETCDF
+#ifndef HAVE_LIBNETCDF
                                    // do something with the function argument
                                    // to make sure it at least looks used,
                                    // even if it is not

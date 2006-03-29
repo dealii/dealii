@@ -77,10 +77,6 @@
 /* Defined if std::isfinite is available */
 #undef DEAL_II_HAVE_ISFINITE
 
-/* Flag indicating whether the library shall be compiled to use the NetCDF
-   interface */
-#undef DEAL_II_HAVE_NETCDF
-
 /* Flag indicating whether the library shall be compiled to use the Tecplot
    interface */
 #undef DEAL_II_HAVE_TECPLOT
@@ -237,6 +233,9 @@
 
 /* Define to 1 if you have the `lapack' library (-llapack). */
 #undef HAVE_LIBLAPACK
+
+/* Define to 1 if you have the `netcdf' library (-lnetcdf). */
+#undef HAVE_LIBNETCDF
 
 /* Define if the std c++ library provides a demangler conforming to the GCC
    libstdc++ interface. */

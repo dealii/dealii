@@ -4742,8 +4742,6 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
 [
-  AC_MSG_CHECKING(for NetCDF library directory)
-
   AC_ARG_WITH(netcdf,
   [  --with-netcdf=/path/to/netcdf  Specify the path to the NetCDF installation,
                           of which the include and library directories are
@@ -4758,27 +4756,33 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
   	  DEAL_II_NETCDF_DIR="$NETCDF_DIR"
         else
 	  DEAL_II_NETCDF_DIR=""
-          AC_MSG_RESULT(not found)
         fi
      ])
-
+  
   if test "x$DEAL_II_NETCDF_DIR" != "x" ; then
-    AC_MSG_RESULT($DEAL_II_NETCDF_DIR)
-    AC_CHECK_FILE($DEAL_II_NETCDF_DIR/lib/libnetcdf.a,
-		  NETCDF_LIB=$DEAL_II_NETCDF_DIR/lib/libnetcdf.a)
-    AC_CHECK_FILE($DEAL_II_NETCDF_DIR/lib/libnetcdf_c++.a,
-		  NETCDF_LIB="$DEAL_II_NETCDF_DIR/lib/libnetcdf_c++.a $NETCDF_LIB",
-                  NETCDF_LIB="")
-    AC_CHECK_FILE($DEAL_II_NETCDF_DIR/include/netcdfcpp.h,
-		  NETCDF_INCLUDE_DIR=-I$DEAL_II_NETCDF_DIR/include,
-		  NETCDF_LIB="")
-
-    if (test "x$NETCDF_LIB" != "x") ; then
-      AC_DEFINE(DEAL_II_HAVE_NETCDF, 1,
-	        [Flag indicating whether the library shall be compiled to use the NetCDF interface])
-
-      LIBS="$NETCDF_LIB $LIBS"
+    CPPFLAGS="-I$DEAL_II_NETCDF_DIR/include $CPPFLAGS"
+    LDFLAGS="-L$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
+    if test "$LD_PATH_OPTION" != "no" ; then
+      LDFLAGS="$LD_PATH_OPTION$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
     fi
+  fi
+  
+  dnl Check for header, if found check for C library,
+  dnl if successful, HAVE_LIBNETCDF will be set
+  dnl
+  dnl if the C++ library is missing, the test will fail
+  AC_CHECK_HEADER(netcdfcpp.h, AC_CHECK_LIB(netcdf, nc_open))
+  
+  dnl If the C library was found, but not the C++ library
+  dnl abort configure with an error message
+  if test "x$HAVE_LIBNETCDF" == "x1" ; then
+    LIBS="-lnetcdf_c++ $LIBS"
+    AC_LINK_IFELSE(
+    [  AC_LANG_PROGRAM([[#include <netcdfcpp.h>
+	               ]],
+                       [[NcFile test("test")]])
+    ],,
+    AC_MSG_FAILURE([Your NetCDF installation is incomplete: C++ library missing]))
   fi
 ])
 
