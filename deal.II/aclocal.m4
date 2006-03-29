@@ -1444,7 +1444,7 @@ AC_DEFUN(DEAL_II_CHECK_RPATH,
      LD_PATH_OPTION="-Wl,-rpath "],
    [ AC_MSG_RESULT(no)
      LDFLAGS=$OLD_LDFLAGS
-     LD_PATH_OPTION="-L"])
+     LD_PATH_OPTION="no"])
 ])
 
 
@@ -5067,7 +5067,10 @@ dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
 [
   if test "x$1" != "xyes" ; then
-    LDFLAGS="$LD_PATH_OPTION$1/UMFPACK/Lib $LD_PATH_OPTION$1/AMD/Lib $LDFLAGS"
+    LDFLAGS="-L$1/UMFPACK/Lib -L$1/AMD/Lib $LDFLAGS"
+    if test "$LD_PATH_OPTION" != "no"; then
+      LDFLAGS = "$LD_PATH_OPTION$1/UMFPACK/Lib $LD_PATH_OPTION$1/AMD/Lib $LDFLAGS"
+    fi
     AC_CHECK_LIB(amd, amd_info)
     AC_CHECK_LIB(umfpack, umfpack_di_defaults)
     AC_CHECK_FILE($1/UMFPACK/Include/umfpack.h,

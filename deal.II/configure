@@ -4204,7 +4204,7 @@ sed 's/^/| /' conftest.$ac_ext >&5
  echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
      LDFLAGS=$OLD_LDFLAGS
-     LD_PATH_OPTION="-L"
+     LD_PATH_OPTION="no"
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
@@ -11206,7 +11206,10 @@ if test "${with_umfpack+set}" = set; then
   withval="$with_umfpack"
 
   if test "x$withval" != "xyes" ; then
-    LDFLAGS="$LD_PATH_OPTION$withval/UMFPACK/Lib $LD_PATH_OPTION$withval/AMD/Lib $LDFLAGS"
+    LDFLAGS="-L$withval/UMFPACK/Lib -L$withval/AMD/Lib $LDFLAGS"
+    if test "$LD_PATH_OPTION" != "no"; then
+      LDFLAGS = "$LD_PATH_OPTION$withval/UMFPACK/Lib $LD_PATH_OPTION$withval/AMD/Lib $LDFLAGS"
+    fi
 
 echo "$as_me:$LINENO: checking for amd_info in -lamd" >&5
 echo $ECHO_N "checking for amd_info in -lamd... $ECHO_C" >&6
