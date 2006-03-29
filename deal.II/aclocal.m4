@@ -4775,7 +4775,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
   
   dnl If the C library was found, but not the C++ library
   dnl abort configure with an error message
-  if test "x$HAVE_LIBNETCDF" == "x1" ; then
+  AC_MSG_NOTICE("HAVE_LIBNETCDF = $LIBS)
+  if expr "x$LIBS : netcdf" ; then
     LIBS="-lnetcdf_c++ $LIBS"
     AC_LINK_IFELSE(
     [  AC_LANG_PROGRAM([[#include <netcdfcpp.h>

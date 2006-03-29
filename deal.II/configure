@@ -11268,7 +11268,9 @@ fi
 
 
 
-      if test "x$HAVE_LIBNETCDF" == "x1" ; then
+      { echo "$as_me:$LINENO: \"HAVE_LIBNETCDF = $LIBS" >&5
+echo "$as_me: \"HAVE_LIBNETCDF = $LIBS" >&6;}
+  if expr "x$LIBS : netcdf" ; then
     LIBS="-lnetcdf_c++ $LIBS"
     cat >conftest.$ac_ext <<_ACEOF
   /* confdefs.h.  */
