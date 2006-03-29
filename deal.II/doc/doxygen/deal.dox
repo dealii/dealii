@@ -15,3 +15,26 @@ INPUT    = headers/ \
 HTML_OUTPUT      = deal.II
 LATEX_OUTPUT     = LaTeX/deal.II
 GENERATE_TAGFILE = deal.tag
+
+IMAGE_PATH             = . \
+			 ../../examples/step-10/doc \
+			 ../../examples/step-11/doc \
+                         ../../examples/step-12/doc \
+                         ../../examples/step-13/doc \
+                         ../../examples/step-14/doc \ 
+                         ../../examples/step-15/doc \
+                         ../../examples/step-16/doc \
+                         ../../examples/step-17/doc \
+                         ../../examples/step-18/doc \
+			 ../../examples/step-19/doc \
+			 ../../examples/step-1/doc \
+                         ../../examples/step-20/doc \
+			 ../../examples/step-21/doc \
+			 ../../examples/step-2/doc \ 
+			 ../../examples/step-3/doc \
+                         ../../examples/step-4/doc \
+			 ../../examples/step-5/doc \
+			 ../../examples/step-6/doc \
+			 ../../examples/step-7/doc \
+                         ../../examples/step-8/doc \
+			 ../../examples/step-9/doc
