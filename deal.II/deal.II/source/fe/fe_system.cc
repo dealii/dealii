@@ -989,12 +989,13 @@ FESystem<dim>::build_cell_tables()
 				   // by FiniteElement
   this->system_to_component_table.resize(this->dofs_per_cell);
   this->face_system_to_component_table.resize(this->dofs_per_face);
-
+  
   unsigned total_index = 0;
   for (unsigned int base=0; base < n_base_elements(); ++base)
     for (unsigned int m = 0; m < element_multiplicity(base); ++m)
       for (unsigned int k=0; k<base_element(base).n_components(); ++k)
-	this->component_to_base_table[total_index++] = std::make_pair(base,k);
+	this->component_to_base_table[total_index++]
+	  = std::make_pair(base,k+m*base_element(base).n_components());
   Assert (total_index == this->component_to_base_table.size(),
 	  ExcInternalError());
 
