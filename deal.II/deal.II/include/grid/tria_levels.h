@@ -47,19 +47,18 @@ namespace internal
  * Store all information which belongs to one level of the multilevel
  * hierarchy.
  *
- * In TriaLevel<0> all data is stored which is not
- * dependent on the dimension, e.g. a field to store the
- * refinement flag for the cells (what a cell actually is
- * is declared elsewhere), etc. Actually, it is only cell-based
- * data, like neighborship info or refinement flags. There is another
- * field, which may fit in here, namely the material data (for cells)
- * or the boundary indicators (for faces), but since we need for a line
- * or quad either boundary information or material data, we store them
- * with the lines and quads rather than with the common data. We may,
- * however lose some memory in three dimensions, when we need the
- * material data for cell, boundary data for the quads, but nothing
- * for the lines. Since we only store one byte per line, quad or hex,
- * this is a minor loss and we can live with that.
+ * In TriaLevel<0> all data is stored which is not dependent on the
+ * dimension, e.g. a field to store the refinement flag for the cells
+ * (what a cell actually is is declared elsewhere), etc. Actually, it
+ * is only cell-based data, like neighborship info or refinement
+ * flags. There is another field, which may fit in here, namely the
+ * material data (for cells) or the boundary indicators (for faces),
+ * but since we need for a line or quad either boundary information or
+ * material data, we store them with the lines and quads rather than
+ * with the common data. Likewise, in 3d, we need boundary indicators
+ * for lines and quads (we need to know how to refine a line if the
+ * two adjacent faces have different boundary indicators), and
+ * material data for cells.
  *
  * @ingroup grid
  * @author Wolfgang Bangerth, 1998
