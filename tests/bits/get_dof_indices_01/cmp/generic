@@ -1,0 +1,18 @@
+
+DEAL::Cell = 0.0, DoFs=0 2 
+DEAL::Cell = 1.0, DoFs=0 1 
+DEAL::Cell = 1.1, DoFs=1 2 
+DEAL::Cell = 0.0, DoFs=0 4 6 8 
+DEAL::Cell = 1.0, DoFs=0 1 2 3 
+DEAL::Cell = 1.1, DoFs=1 4 3 5 
+DEAL::Cell = 1.2, DoFs=2 3 6 7 
+DEAL::Cell = 1.3, DoFs=3 5 7 8 
+DEAL::Cell = 0.0, DoFs=0 8 12 16 18 22 24 26 
+DEAL::Cell = 1.0, DoFs=0 1 2 3 4 5 6 7 
+DEAL::Cell = 1.1, DoFs=1 8 3 9 5 10 7 11 
+DEAL::Cell = 1.2, DoFs=2 3 12 13 6 7 14 15 
+DEAL::Cell = 1.3, DoFs=3 9 13 16 7 11 15 17 
+DEAL::Cell = 1.4, DoFs=4 5 6 7 18 19 20 21 
+DEAL::Cell = 1.5, DoFs=5 10 7 11 19 22 21 23 
+DEAL::Cell = 1.6, DoFs=6 7 14 15 20 21 24 25 
+DEAL::Cell = 1.7, DoFs=7 11 15 17 21 23 25 26 
