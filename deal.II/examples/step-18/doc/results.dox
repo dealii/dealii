@@ -1,20 +1,19 @@
 <a name="Results"></a>
 <h1>Results</h1>
 
-<p>
+
 Running the program takes a good while if one doesn't change the flags
 in the Makefile: in debug mode (the default) and on only a single
 machine, it takes about 3h45min on my Athlon XP 2GHz. Fortunately, but
 setting <code>debug-mode = off</code> in the Makefile, this can be
 reduced significantly, to about 23 minutes, a much more reasonable time.
 
-</p>
 
-<p>
+
+
 If run, the program prints the following output, explaining what it is
 doing during all that time:
-<code>
-<pre>
+@code
 examples/step-18> time make run
 ============================ Running step-18
 Timestep 1 at time 1
@@ -85,14 +84,12 @@ Timestep 10 at time 10
     Solver converged in 149 iterations.
     Updating quadrature point data...
     Moving mesh...
-</pre>
-</code>
+@endcode
 In other words, it is computing on 12,000 cells and with some 52,000
 unknowns. Not a whole lot, but enough for a coupled three-dimensional
 problem to keep a computer busy for a while. At the end of the day,
 this is what we have for output:
-<code>
-<pre>
+@code
 examples/step-18> ls -l *.d2
 -rw-r--r--  1 bangerth wheeler 8797414 May 25 09:10 solution-0001.0000.d2
 -rw-r--r--  1 bangerth wheeler 8788500 May 25 09:32 solution-0002.0000.d2
@@ -104,16 +101,13 @@ examples/step-18> ls -l *.d2
 -rw-r--r--  1 bangerth wheeler 8585146 May 25 11:45 solution-0008.0000.d2
 -rw-r--r--  1 bangerth wheeler 8489764 May 25 12:07 solution-0009.0000.d2
 -rw-r--r--  1 bangerth wheeler 8405388 May 25 12:29 solution-0010.0000.d2
-</pre>
-</code>
-</p>
+@endcode
 
-<p>
+
 Let us convert these files in deal.II intermediate format to gmv
-format (this assumes that you have already compiled the <a
-href="step-19.html" target="body">step-19</a> example program):
-<code>
-<pre>
+format (this assumes that you have already compiled the 
+@ref step_19 "step-19" example program):
+@code
 examples/step-18> ../step-19/step-19
 
 Converter from deal.II intermediate format to other graphics formats.
@@ -123,69 +117,56 @@ Usage: ./step-19 [-p parameter_file] list_of_input_files [-x output_format] outp
 examples/step-18> ../step-19/step-19 solution-0001.0000.d2 -x gmv solution-0001.0000.gmv
 examples/step-18> ../step-19/step-19 solution-0002.0000.d2 -x gmv solution-0002.0000.gmv
 [...]
-</pre>
-</code>
+@endcode
 Of course, since we have run the program only in sequential mode, we
 do have only one intermediate file for each time step that we have to
 take as input.
-</p>
 
-<p>
+
+
 If we visualize these files with GMV, we get to see the full picture
 of the disaster our forced compression wreaks on the cylinder (click
 on the images for a larger version; colors in the images encode the
 norm of the stress in the material):
-</p>
+
 
 <table width="100%">
   <tr width="100%">
     <td width="33%">
-      <a href="step-18.data/solution-0002.0000.png" target="_top">
-       <img src="step-18.data/solution-0002.0000.png"
-       width="100%"></a>
+      @image html step-18.sequential-0002.0000.png
        Time = 2
     </td>
 
     <td width="33%">
-      <a href="step-18.data/solution-0005.0000.png" target="_top">
-       <img src="step-18.data/solution-0005.0000.png"
-       width="100%"></a> 
+      @image html step-18.sequential-0005.0000.png
        Time = 5
     </td>
 
     <td width="33%">
-      <a href="step-18.data/solution-0007.0000.png" target="_top">
-       <img src="step-18.data/solution-0007.0000.png"
-       width="100%"></a>
+      @image html step-18.sequential-0007.0000.png
        Time = 7
     </td>
   </tr>
 
   <tr width="100%">
     <td width="33%">
-      <a href="step-18.data/solution-0008.0000.png" target="_top">
-       <img src="step-18.data/solution-0008.0000.png"
-       width="100%"></a>
-       Time = 8
+      @image html step-18.sequential-0008.0000.png
+      Time = 8
     </td>
 
     <td width="33%">
-      <a href="step-18.data/solution-0009.0000.png" target="_top">
-       <img src="step-18.data/solution-0009.0000.png"
-       width="100%"></a> 
-       Time = 9
+      @image html step-18.sequential-0009.0000.png
+      Time = 9
     </td>
 
     <td width="33%">
-      <a href="step-18.data/solution-0010.0000.png" target="_top">
-       <img src="step-18.data/solution-0010.0000.png"
-       width="100%"></a>
-       Time = 10
+      @image html step-18.sequential-0010.0000.png
+      Time = 10
     </td>
   </tr>
 </table>
 
-<p>
+
 As is clearly visible, as we keep compressing the cylinder, it starts
 to buckle and ultimately collapses. Towards the end of the simulation,
 the deflection pattern becomes nonsymmetric (the cylinder top slides
@@ -199,18 +180,17 @@ by an iterative solver could have the same effect. Another typical source for
 asymmetries in adaptive computations is that only a certain fraction of cells
 is refined in each step, which may lead to asymmetric meshes even if the
 original coarse mesh was symmetric.
-</p>
 
 
-<p>
+
+
 Whether the computation is fully converged is a different matter. In order to
 see whether it is, we ran the program again with one more global refinement at
 the beginning and with the time step halved. This would have taken a very long
 time on a single machine, so we used our cluster again and ran it on 16
 processors (8 dual-processor machines) in parallel. The beginning of the output
 now looks like this:
-<code>
-<pre>
+@code
 Timestep 1 at time 0.5
   Cycle 0:
     Number of active cells:       29696 (by partition: 1862+1890+1866+1850+1864+1850+1858+1842+1911+1851+1911+1804+1854+1816+1839+1828)
@@ -251,12 +231,10 @@ Timestep 20 at time 10
     Solver converged in 493 iterations.
     Updating quadrature point data...
     Moving mesh...
-</pre>
-</code>
+@endcode
 That's quite a good number of unknowns, given that we are in 3d. The output of
 this program are 16 files for each time step:
-<code>
-<pre>
+@code
 examples/step-18> ls -l solution-0001.000*
 -rw-r--r--    1 bangerth mfw       4325219 Aug 11 09:44 solution-0001.0000-000.d2
 -rw-r--r--    1 bangerth mfw       4454460 Aug 11 09:44 solution-0001.0000-001.d2
@@ -274,12 +252,10 @@ examples/step-18> ls -l solution-0001.000*
 -rw-r--r--    1 bangerth mfw       4466037 Aug 11 09:43 solution-0001.0000-013.d2
 -rw-r--r--    1 bangerth mfw       4505679 Aug 11 09:44 solution-0001.0000-014.d2
 -rw-r--r--    1 bangerth mfw       4340488 Aug 11 09:44 solution-0001.0000-015.d2
-</pre>
-</code>
+@endcode
 We merge and convert these 16 intermediate files into a single gmv file as
 follows: 
-<code>
-<pre>
+@code
 examples/step-18> time ../step-19/step-19 solution-0001.0000-* -x gmv -o solution-0001.0000.gmv
 
 real    0m45.929s
@@ -287,86 +263,68 @@ user    0m41.290s
 sys     0m0.990s
 examples/step-18> ls -l solution-0001.0000.gmv
 -rw-r--r--    1 bangerth mfw      68925360 Aug 11 17:04 solution-0001.0000.gmv
-</pre>
-</code>
+@endcode
 
-<p>
 Doing so for all time steps, we obtain gmv files that we can visualize (albeit
 with some difficulty, due to their size gmv isn't exactly fast when plotting
 them). Here are first the mesh on which we compute as well as the partitioning
 for the 16 processors:
-</p>
+
 
 <table width="100%">
   <tr width="100%">
     <td width="49%">
-      <a href="step-18.data/parallel/solution-000mesh.png" target="_top">
-       <img src="step-18.data/parallel/solution-000mesh.png"
-       width="100%"></a>
+      @image html step-18.parallel-000mesh.png
     </td>
 
     <td width="49%">
-      <a href="step-18.data/parallel/solution-0002.p.png" target="_top">
-       <img src="step-18.data/parallel/solution-0002.p.png"
-       width="100%"></a> 
+      @image html step-18.parallel-0002.p.png
     </td>
   </tr>
 </table>
 
-<p>
+
 Finally, here is the same output as we have shown before for the much smaller
 sequential case:
-</p>
+
 
 <table width="100%">
   <tr width="100%">
     <td width="33%">
-      <a href="step-18.data/parallel/solution-0002.s.png" target="_top">
-       <img src="step-18.data/parallel/solution-0002.s.png"
-       width="100%"></a>
+      @image html step-18.parallel-0002.s.png
        Time = 2
     </td>
 
     <td width="33%">
-      <a href="step-18.data/parallel/solution-0005.s.png" target="_top">
-       <img src="step-18.data/parallel/solution-0005.s.png"
-       width="100%"></a> 
+      @image html step-18.parallel-0005.s.png
        Time = 5
     </td>
 
     <td width="33%">
-      <a href="step-18.data/parallel/solution-0007.s.png" target="_top">
-       <img src="step-18.data/parallel/solution-0007.s.png"
-       width="100%"></a>
+      @image html step-18.parallel-0007.s.png
        Time = 7
     </td>
   </tr>
 
   <tr width="100%">
     <td width="33%">
-      <a href="step-18.data/parallel/solution-0008.s.png" target="_top">
-       <img src="step-18.data/parallel/solution-0008.s.png"
-       width="100%"></a>
+      @image html step-18.parallel-0008.s.png
        Time = 8
     </td>
 
     <td width="33%">
-      <a href="step-18.data/parallel/solution-0009.s.png" target="_top">
-       <img src="step-18.data/parallel/solution-0009.s.png"
-       width="100%"></a> 
+      @image html step-18.parallel-0009.s.png
        Time = 9
     </td>
 
     <td width="33%">
-      <a href="step-18.data/parallel/solution-0010.s.png" target="_top">
-       <img src="step-18.data/parallel/solution-0010.s.png"
-       width="100%"></a>
+      @image html step-18.parallel-0010.s.png
        Time = 10
     </td>
   </tr>
 </table>
 
-<p>
+
 If one compares this with the previous run, the results are qualitatively
 similar, but quantitatively definitely different. The previous computation was
 therefore certainly not converged, though we can't say for sure anything about
@@ -377,4 +335,4 @@ deformation model we chose completely inadequate, but for a realistic
 simulation we would also need to make sure that the body does not intersects
 itself during deformation. Without such a formulation we cannot expect anything
 that make sense, even if it produces nice pictures!
-</p>
+
