@@ -553,6 +553,16 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: An exception was generated when trying to interpolate
+       boundary values for a primitive component of a composite finite
+       element that also has non-primitive base elements (for example,
+       trying to interpolate boundary values for a the last component
+       of a RT x Q1 element). This is now fixed.
+       <br> 
+       (WB 2006/03/27)
+       </p>
+
+  <li> <p>
        New: There is a new function <code class="class">FiniteElement</code>::<code
        class="member">face_to_equivalent_cell_index</code> that can
        convert a face index of a degree of freedom into a
