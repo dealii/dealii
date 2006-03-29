@@ -34,26 +34,6 @@ namespace internal
  * class, but do not actually use it. Rather, only specializations of
  * this class are used.
  *
- * @ingroup dofs
- * @author Wolfgang Bangerth, 1998
- */
-    template <int N>
-    class DoFLevel
-    {
-      private:
-                                         /**
-                                          * Make the constructor private
-                                          * to avoid that someone uses
-                                          * this class.
-                                          */
-        DoFLevel ();
-    };
-
-
-/**
- * Store the indices of the degrees of freedom which are located on
- * the lines.
- *
  * <h3>Information for all DoFLevel classes</h3>
  *
  * The <tt>DoFLevel<N></tt> classes 
@@ -100,6 +80,26 @@ namespace internal
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
  */
+    template <int N>
+    class DoFLevel
+    {
+      private:
+                                         /**
+                                          * Make the constructor private
+                                          * to avoid that someone uses
+                                          * this class.
+                                          */
+        DoFLevel ();
+    };
+
+
+/**
+ * Store the indices of the degrees of freedom which are located on
+ * the lines. See the general template DoFLevel for more information.
+ *
+ * @ingroup dofs
+ * @author Wolfgang Bangerth, 1998
+ */
     template <>
     class DoFLevel<1>
     {
@@ -124,7 +124,7 @@ namespace internal
 
 /**
  * Store the indices of the degrees of freedom which are located on
- * quads.  See DoFLevel<1> for more information.
+ * quads. See the general template DoFLevel for more information.
  *
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
@@ -153,7 +153,7 @@ namespace internal
 
 /**
  * Store the indices of the degrees of freedom which are located on
- * hexhedra.  See DoFLevel<1> for more information.
+ * hexhedra. See the general template DoFLevel for more information.
  *
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
