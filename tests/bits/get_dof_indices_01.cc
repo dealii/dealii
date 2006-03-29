@@ -43,12 +43,12 @@ template <int dim>
 void test ()
 {
   Triangulation<dim> triangulation;
+  FE_Q<dim> fe(1);
   DoFHandler<dim> dof_handler(triangulation);
   
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (1);
 
-  FE_Q<dim> fe(1);
   dof_handler.distribute_dofs (fe);
 
 				   // loop over all cells, active or
