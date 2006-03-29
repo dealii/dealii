@@ -58,10 +58,9 @@ namespace internal
  * the number of lines on this level. The DoF indices for the @p ith
  * line are at the positions <tt>N*i...(N+1)*i-1</tt>.
  *
- * The DoF indices for vertices are not stored this way, since they
- * need different treatment in multigrid environments. If no multigrid
- * is used, the indices are stored in the @p vertex_dofs array of the
- * DoFHandler class.
+ * Since vertices are not associated with a particular level, the
+ * indices associated with vertices are not stored in the DoFLevel
+ * classes but rather in the DoFHandler::vertex_dofs array.
  *
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998
