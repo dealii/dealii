@@ -469,7 +469,6 @@ DEAL_II_CONFIGURE_TECPLOT
 AC_SUBST(TECPLOT_INCLUDE_DIR)
 
 DEAL_II_CONFIGURE_NETCDF
-AC_SUBST(NETCDF_INCLUDE_DIR)
 
 DEAL_II_CONFIGURE_METIS
 AC_SUBST(USE_CONTRIB_METIS)
@@ -508,6 +507,15 @@ AC_ARG_WITH(zlib,
          and link it with -lzlib (the default is -lz).
          Make sure the library is in the search path of ld.],
   DEAL_II_WITH_ZLIB($withval))
+
+dnl -------------------------------------------------------------
+dnl       set include paths of several libraries
+dnl -------------------------------------------------------------
+
+
+AC_SUBST(CPPFLAGS)
+
+
 
 dnl -------------------------------------------------------------
 dnl       Optimizations and consistency of compiler flags
