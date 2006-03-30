@@ -319,6 +319,23 @@ FiniteElement<dim>::get_prolongation_matrix (const unsigned int child) const
 }
 
 
+template <int dim>  
+unsigned int
+FiniteElement<dim>::component_to_block_index (const unsigned int index) const
+{
+  Assert (index < this->n_components(),
+	  ExcIndexRange(index, 0, this->n_components()));
+				   // The block is computed simply as
+				   // first block of this base plus
+				   // the index within the base blocks
+  const std::pair<unsigned int, unsigned int>
+    base = component_to_base_index(index);
+				   // Integer division used on purpose!
+  const unsigned int block_in_base = base.second / base_element(base.first).n_components();
+  return first_block_of_base(base.first) + block_in_base;
+}
+
+
 template <int dim>
 bool
 FiniteElement<dim>::prolongation_is_implemented () const
