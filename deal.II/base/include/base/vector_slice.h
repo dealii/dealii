@@ -86,6 +86,27 @@ class VectorSlice
 				      * <tt>std::vector</tt>.
 				      */
     typename VECTOR::const_reference operator[] (unsigned int i) const;
+
+				     /**
+				      * STL conforming iterator function.
+				      */
+    typename VECTOR::iterator begin();
+    
+				     /**
+				      * STL conforming iterator function.
+				      */
+    typename VECTOR::const_iterator begin() const;
+    
+				     /**
+				      * STL conforming iterator function.
+				      */
+    typename VECTOR::iterator end();
+    
+				     /**
+				      * STL conforming iterator function.
+				      */
+    typename VECTOR::const_iterator end() const;
+    
   private:
 				     /**
 				      * The vector we extract from.
@@ -188,6 +209,42 @@ VectorSlice<VECTOR>::operator[](unsigned int i) const
   Assert ((i<length), ExcIndexRange(i, 0, length));
   
   return v[start+i];
+}
+
+
+template <class VECTOR>
+inline
+typename VECTOR::const_iterator
+VectorSlice<VECTOR>::begin() const
+{
+  return v.begin()+start;
+}
+
+
+template <class VECTOR>
+inline
+typename VECTOR::iterator
+VectorSlice<VECTOR>::begin()
+{
+  return v.begin()+start;
+}
+
+
+template <class VECTOR>
+inline
+typename VECTOR::const_iterator
+VectorSlice<VECTOR>::end() const
+{
+  return v.begin()+start+length;
+}
+
+
+template <class VECTOR>
+inline
+typename VECTOR::iterator
+VectorSlice<VECTOR>::end()
+{
+  return v.begin()+start+length;
 }
 
 
