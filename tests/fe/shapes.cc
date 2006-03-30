@@ -264,9 +264,12 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
       {
         for (unsigned int c=0; c<fe.n_components(); ++c)
           {
-            const double val1 = fe_values.shape_value_component(i,x,c),
-                         val2 = fe.shape_value_component(i,q.point(x),c);
-            Assert (std::fabs(val1-val2) < 1e-13, ExcInternalError());
+            const double val1 = fe_values.shape_value_component(i,x,c);
+	    const double val2 = fe.shape_value_component(i,q.point(x),c);
+	    const double diff = std::fabs(val1-val2);
+	    if (diff > 1e-13)
+	      deallog << " values differ v" << i << "(x" << x << ") diff " << diff
+		      << std::endl;
           };
 
                                          // test something about the
@@ -319,7 +322,9 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
                 {
                   const double diff=std::fabs(tmp[j][k]);
                   if (diff>max_diff) max_diff=diff;
-                  Assert (std::fabs(tmp[j][k]) < 1e-6, ExcInternalError());
+		  const double tmpabs = std::fabs(tmp[j][k]);
+		  if (tmpabs > 1.e-6)
+		    deallog << "Second derivatives differ " << tmpabs << std::endl;
                 }
           };
 

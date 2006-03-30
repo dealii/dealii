@@ -1184,10 +1184,10 @@ class FiniteElement : public Subscriptor,
     unsigned int first_block_of_base(unsigned int b) const;
     
  				     /**
-				      * Given a vector component,
-				      * return an index which base
+				      * For each vector component,
+				      * return which base
 				      * element implements this
-				      * component, and which vector
+				      * component and which vector
 				      * component in this base element
 				      * this is. This information is
 				      * only of interest for
@@ -1207,7 +1207,7 @@ class FiniteElement : public Subscriptor,
 				      * is always equal to a pair of
 				      * zeros.
 				      */
-    std::pair<unsigned int,unsigned int>
+    std::pair<unsigned int, unsigned int>
     component_to_base_index (const unsigned int component) const;
     
     
@@ -1907,17 +1907,17 @@ class FiniteElement : public Subscriptor,
 				      * The base element establishing
 				      * a component.
 				      *
-				      * This table converts a
-				      * component number to a pair
-				      * consisting of the
-				      * @p base_element number, and
-				      * the component within this base
-				      * element. While component
-				      * information contains
-				      * multiplicity of base elements,
-				      * the result allows access to
-				      * shape functions of the base
-				      * element.
+				      * For each component number
+				      * <tt>c</tt>, the entries have
+				      * the following meaning:
+				      * <dl>
+				      * <dd><tt>table[c].first.first</tt></dd>
+				      * <dt>Number of the base element for <tt>c</tt>.
+				      * <dd><tt>table[c].first.second</tt></dd>
+				      * <dt>Component in the base element for <tt>c</tt>.
+				      * <dd><tt>table[c].second</tt></dd>
+				      * <dt>Multiple of the base element for <tt>c</tt>.
+				      * </dl>
 				      *
 				      * This variable is set to the
 				      * correct size by the
@@ -1930,7 +1930,7 @@ class FiniteElement : public Subscriptor,
 				      * case, the initialization by
 				      * the base class is sufficient.
 				      */
-    std::vector<std::pair<unsigned int, unsigned int> > component_to_base_table;
+    std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int> > component_to_base_table;
     
 				     /**
 				      * Projection matrices are
@@ -2273,7 +2273,7 @@ FiniteElement<dim>::component_to_base_index (const unsigned int index) const
   Assert(index < component_to_base_table.size(),
 	 ExcIndexRange(index, 0, component_to_base_table.size()));
 
-  return component_to_base_table[index];
+  return component_to_base_table[index].first;
 }
 
 

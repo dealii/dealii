@@ -1,4 +1,4 @@
-//----------------------------  system_1.cc  ---------------------------
+//----------------------------------------------------------------------
 //    system_1.cc,v 1.3 2003/06/09 21:55:00 wolf Exp
 //    Version: 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    fuqher information on this license.
 //
-//----------------------------  system_1.cc  ---------------------------
+//----------------------------------------------------------------------
 
 // Test the various index conversion methods
 
@@ -101,7 +101,7 @@ check_fe(const FiniteElement<dim> &fe)
       deallog << std::setw(3) << 'x';
   deallog << std::endl;
 
-  if (fe.is_primitive())
+  if (true || fe.is_primitive())
     {
       deallog << "Next two lines: component_to_base" << std::endl;
       for (unsigned int i=0;i<n_comp;++i)
@@ -150,7 +150,7 @@ main()
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
-//  deallog.depth_console(0);
+  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   check<2>();

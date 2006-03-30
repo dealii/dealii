@@ -116,7 +116,7 @@ FiniteElement<dim>::FiniteElement (
                 system_to_base_table(this->dofs_per_cell),
                 face_system_to_base_table(this->dofs_per_face),		
                 component_to_base_table (this->components,
-                                         std::make_pair(0U, 0U)),
+                                         std::make_pair(std::make_pair(0U, 0U), 0U)),
                 restriction_is_additive_flags(r_i_a_f),
 		nonzero_components (nonzero_c)
 {
@@ -319,20 +319,16 @@ FiniteElement<dim>::get_prolongation_matrix (const unsigned int child) const
 }
 
 
+//TODO:[GK] This is probably not the most efficient way of doing this.
 template <int dim>  
 unsigned int
 FiniteElement<dim>::component_to_block_index (const unsigned int index) const
 {
   Assert (index < this->n_components(),
 	  ExcIndexRange(index, 0, this->n_components()));
-				   // The block is computed simply as
-				   // first block of this base plus
-				   // the index within the base blocks
-  const std::pair<unsigned int, unsigned int>
-    base = component_to_base_index(index);
-				   // Integer division used on purpose!
-  const unsigned int block_in_base = base.second / base_element(base.first).n_components();
-  return first_block_of_base(base.first) + block_in_base;
+
+  return first_block_of_base(component_to_base_table[index].first.first)
+    + component_to_base_table[index].second;
 }
 
 

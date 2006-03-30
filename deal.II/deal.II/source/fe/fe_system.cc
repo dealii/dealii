@@ -995,7 +995,7 @@ FESystem<dim>::build_cell_tables()
     for (unsigned int m = 0; m < element_multiplicity(base); ++m)
       for (unsigned int k=0; k<base_element(base).n_components(); ++k)
 	this->component_to_base_table[total_index++]
-	  = std::make_pair(base,k);
+	  = std::make_pair(std::make_pair(base,k), m);
   Assert (total_index == this->component_to_base_table.size(),
 	  ExcInternalError());
 
