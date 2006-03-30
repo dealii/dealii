@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,6 +25,8 @@
 class SparsityPattern;
 template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
+template <class VECTOR> class VectorSlice;
+
 class CompressedSparsityPattern;
 
 
@@ -485,7 +487,7 @@ class SparsityPattern : public Subscriptor
 				      */
     SparsityPattern (const unsigned int               m,
 		     const unsigned int               n,
-		     const std::vector<unsigned int> &row_lengths,
+		     const std::vector<unsigned int>& row_lengths,
 		     const bool optimize_diagonal = true);
     
 				     /**
@@ -519,7 +521,7 @@ class SparsityPattern : public Subscriptor
 				      * see optimize_diagonal().
 				      */
     SparsityPattern (const unsigned int               m,
-		     const std::vector<unsigned int> &row_lengths,
+		     const std::vector<unsigned int>& row_lengths,
 		     const bool optimize_diagonal = true);
 
 				     /**
@@ -623,6 +625,16 @@ class SparsityPattern : public Subscriptor
 				      * first in each row to allow
 				      * optimized access in relaxation
 				      * methods of SparseMatrix.
+				      */
+    void reinit (const unsigned int               m,
+		 const unsigned int               n,
+		 const VectorSlice<const std::vector<unsigned int> > &row_lengths,
+		 const bool optimize_diagonal = true);
+
+				     /**
+				      * Wrapper since the conversion
+				      * of std::vector to const
+				      * VectorSlice does not work.
 				      */
     void reinit (const unsigned int               m,
 		 const unsigned int               n,

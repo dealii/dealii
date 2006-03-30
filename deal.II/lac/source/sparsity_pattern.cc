@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-
+#include <base/vector_slice.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/full_matrix.h>
 #include <lac/compressed_sparsity_pattern.h>
@@ -84,10 +84,11 @@ SparsityPattern::SparsityPattern (const unsigned int m,
 
 
 
-SparsityPattern::SparsityPattern (const unsigned int               m,
-				  const unsigned int               n,
-				  const std::vector<unsigned int> &row_lengths,
-				  const bool optimize_diag) 
+SparsityPattern::SparsityPattern (
+  const unsigned int m,
+  const unsigned int n,
+  const std::vector<unsigned int>& row_lengths,
+  const bool optimize_diag) 
 		:
                 max_dim(0),
                 max_vec_len(0),
@@ -112,9 +113,10 @@ SparsityPattern::SparsityPattern (const unsigned int n,
 
 
 
-SparsityPattern::SparsityPattern (const unsigned int               m,
-				  const std::vector<unsigned int> &row_lengths,
-				  const bool optimize_diag) 
+SparsityPattern::SparsityPattern (
+  const unsigned int               m,
+  const std::vector<unsigned int>& row_lengths,
+  const bool optimize_diag) 
 		:
                 max_dim(0),
                 max_vec_len(0),
@@ -271,10 +273,11 @@ SparsityPattern::reinit (const unsigned int m,
 
 
 void
-SparsityPattern::reinit (const unsigned int               m,
-			 const unsigned int               n,
-			 const std::vector<unsigned int> &row_lengths,
-			 const bool optimize_diag)
+SparsityPattern::reinit (
+  const unsigned int m,
+  const unsigned int n,
+  const VectorSlice<const std::vector<unsigned int> >&row_lengths,
+  const bool optimize_diag)
 {
   Assert (row_lengths.size() == m, ExcInvalidNumber (m));
 	  
@@ -585,6 +588,17 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix,
 
 				   // finally compress
   compress ();
+}
+
+
+void
+SparsityPattern::reinit (
+  const unsigned int m,
+  const unsigned int n,
+  const std::vector<unsigned int>& row_lengths,
+  const bool optimize_diag)
+{
+  reinit(m, n, make_slice(row_lengths), optimize_diag);
 }
 
 
