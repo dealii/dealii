@@ -4760,7 +4760,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
      ])
   
   if test "x$DEAL_II_NETCDF_DIR" != "x" ; then
-    CPPFLAGS="-I$DEAL_II_NETCDF_DIR/include $CPPFLAGS"
+    CXXFLAGS="-I$DEAL_II_NETCDF_DIR/include $CXXFLAGS"
     LDFLAGS="-L$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
     if test "$LD_PATH_OPTION" != "no" ; then
       LDFLAGS="$LD_PATH_OPTION$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
@@ -4773,13 +4773,11 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
   dnl introduce second variable NETCDF_HEADER_AND_LIB_FOUND
   dnl
   dnl if the C++ library is missing, the test will fail
-  AC_CHECK_HEADER(netcdfcpp.h, AC_CHECK_LIB(netcdf, nc_open,
-	NETCDF_HEADER_AND_LIB_FOUND=1))
-
+  AC_CHECK_HEADER(netcdfcpp.h, AC_CHECK_LIB(netcdf, nc_open))
   dnl If the C library was found, but not the C++ library
   dnl abort configure with an error message
-  if test "x$NETCDF_HEADER_AND_LIB_FOUND" == "x1" ; then
-    LIBS="-lnetcdf_c++ -lnetcdf $LIBS"
+  if perl -e ["exit(1) if (\"$LIBS\" =~ m/netcdf/)"] ; then
+    LIBS="-lnetcdf_c++ $LIBS"
     AC_LINK_IFELSE(
     [  AC_LANG_PROGRAM([[#include <netcdfcpp.h>
 	               ]],
