@@ -234,7 +234,7 @@
 /* Define to 1 if you have the `lapack' library (-llapack). */
 #undef HAVE_LIBLAPACK
 
-/* Define to 1 if you have the `netcdf' library (-lnetcdf). */
+/* Define to 1 if you have the `NetCDF' library (-lnetcdf). */
 #undef HAVE_LIBNETCDF
 
 /* Define if the std c++ library provides a demangler conforming to the GCC

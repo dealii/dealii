@@ -4768,24 +4768,24 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
   fi
   
   dnl Check for header, if found check for C library,
+  dnl if found check for C++ library,
   dnl if successful, HAVE_LIBNETCDF will be set
-  dnl As we cannot ask "x$HAVE_LIBNETCDF"!="x" we must
-  dnl introduce second variable NETCDF_HEADER_AND_LIB_FOUND
-  dnl
-  dnl if the C++ library is missing, the test will fail
-  AC_CHECK_HEADER(netcdfcpp.h, AC_CHECK_LIB(netcdf, nc_open))
-  dnl If the C library was found, but not the C++ library
-  dnl abort configure with an error message
-  if perl -e ["exit(1) if (\"$LIBS\" =~ m/netcdf/)"] ; then
-    LIBS="-lnetcdf_c++ $LIBS"
-    AC_LINK_IFELSE(
-    [  AC_LANG_PROGRAM([[#include <netcdfcpp.h>
+  AC_CHECK_HEADER(netcdfcpp.h, AC_CHECK_LIB(netcdf, nc_open,
+    [ OLD_LIBS=$LIBS
+      LIBS="-lnetcdf_c++ -lnetcdf $LIBS"
+      AC_MSG_CHECKING([for NcFile::NcFile in -lnetcdf_c++])
+      AC_LINK_IFELSE(
+      [  AC_LANG_PROGRAM([[#include <netcdfcpp.h>
 	               ]],
                        [[NcFile test("test")]])
-    ],
-    AC_DEFINE(HAVE_LIBNETCDF),
-    AC_MSG_FAILURE([Your NetCDF installation is incomplete: C++ library missing]))
-  fi
+      ],
+      [ AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_LIBNETCDF,1,[Define to 1 if you have the `NetCDF' library (-lnetcdf).])
+      ],
+      [ AC_MSG_RESULT(no)
+	LIBS=$OLD_LIBS
+      ])
+    ]))
 ])
 
 
