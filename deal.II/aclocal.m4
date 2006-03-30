@@ -4760,6 +4760,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
      ])
   
   if test "x$DEAL_II_NETCDF_DIR" != "x" ; then
+    CPPFLAGS="-I$DEAL_II_NETCDF_DIR/include $CPPFLAGS"
     CXXFLAGS="-I$DEAL_II_NETCDF_DIR/include $CXXFLAGS"
     LDFLAGS="-L$DEAL_II_NETCDF_DIR/lib $LDFLAGS"
     if test "$LD_PATH_OPTION" != "no" ; then
