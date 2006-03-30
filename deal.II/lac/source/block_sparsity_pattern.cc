@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,6 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include <base/vector_slice.h>
 #include <base/memory_consumption.h>
 #include <lac/block_sparsity_pattern.h>
 
@@ -244,7 +245,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::print(std::ostream& out) const
   unsigned int k=0;
   for (unsigned int ib=0;ib<n_block_rows();++ib)
     {
-      for (unsigned int i=0;i<block(ib,ib).n_rows();++i)
+      for (unsigned int i=0;i<block(ib,0).n_rows();++i)
 	{
 	  out << '[' << i+k;
 	  unsigned int l=0;
@@ -258,7 +259,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::print(std::ostream& out) const
 	    }
 	  out << ']' << std::endl;
 	}
-      k += block(ib,ib).n_rows();
+      k += block(ib,0).n_rows();
     }
 }
 
@@ -297,7 +298,31 @@ BlockSparsityPattern::BlockSparsityPattern (const unsigned int n_rows,
 {}
 
 
+void
+BlockSparsityPattern::reinit(
+  const BlockIndices& rows,
+  const BlockIndices& cols,
+  const std::vector<std::vector<unsigned int> >& row_lengths)
+{
+  this->reinit(rows.size(), cols.size());
+  for (unsigned int j=0;j<cols.size();++j)
+    for (unsigned int i=0;i<rows.size();++i)
+      {
+	const unsigned int start = rows.local_to_global(i, 0);
+	const unsigned int length = rows.block_size(i);
+	
+	VectorSlice<const std::vector<unsigned int> >
+	  block_rows(row_lengths[j], start, length);
+	block(i,j).reinit(rows.block_size(i),
+			  cols.block_size(j),
+			  block_rows);
+      }
+  this->collect_sizes();
+  Assert (this->row_indices == rows, ExcInternalError());
+  Assert (this->column_indices == cols, ExcInternalError());  
+}
 
+    
 bool
 BlockSparsityPattern::is_compressed () const
 {

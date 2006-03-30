@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -103,7 +103,7 @@ class BlockSparsityPatternBase : public Subscriptor
 				      */
     BlockSparsityPatternBase (const unsigned int n_block_rows,
 			      const unsigned int n_block_columns);
-
+    
 				     /**
 				      * Copy constructor. This
 				      * constructor is only allowed to
@@ -438,6 +438,26 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 			  const unsigned int n_columns);
 
 				     /**
+				      * Forwarding to
+				      * BlockSparsityPatternBase::reinit().
+				      */
+    void reinit (const unsigned int n_block_rows,
+		 const unsigned int n_block_columns);
+    
+    				     /**
+				      * Initialize the pattern with
+				      * two BlockIndices for the block
+				      * structures of matrix rows and
+				      * columns as well as a row
+				      * length vector in the format
+				      * produced by DoFTools.
+				      */
+    void reinit (const BlockIndices& row_indices,
+		 const BlockIndices& col_indices,
+		 const std::vector<std::vector<unsigned int> >& row_lengths);
+    
+
+				     /**
 				      * Return whether the structure
 				      * is compressed or not,
 				      * i.e. whether all sub-matrices
@@ -612,5 +632,17 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_block_rows () const
 {
   return rows;
 }
+
+
+inline
+void
+BlockSparsityPattern::reinit (
+  const unsigned int n_block_rows,
+  const unsigned int n_block_columns)
+{
+  BlockSparsityPatternBase<SparsityPattern>::reinit (
+    n_block_rows, n_block_columns);
+}
+
 
 #endif
