@@ -22,9 +22,17 @@ namespace internal
   {
     
     unsigned int
+    DoFLevel<0>::memory_consumption () const
+    {
+      return MemoryConsumption::memory_consumption (cell_dof_indices_cache);
+    }
+
+
+    unsigned int
     DoFLevel<1>::memory_consumption () const
     {
-      return MemoryConsumption::memory_consumption (line_dofs);
+      return (DoFLevel<0>::memory_consumption () +
+              MemoryConsumption::memory_consumption (line_dofs));
     }
 
 

@@ -1457,13 +1457,20 @@ void DoFHandler<dim>::distribute_dofs (const FiniteElement<dim> &ff,
 
   used_dofs = next_free_dof;
 
+				   // update the cache used
+				   // for cell dof indices
+  for (cell_iterator cell = begin(); cell != end(); ++cell)
+    cell->update_cell_dof_indices_cache ();
+  
 				   // finally restore the user flags
   const_cast<Triangulation<dim> &>(*tria).load_user_flags(user_flags);
 }
 
 
+
 template <int dim>
-void DoFHandler<dim>::clear () {
+void DoFHandler<dim>::clear ()
+{
 				   // release lock to old fe
   selected_fe = 0;
 
@@ -1682,6 +1689,11 @@ void DoFHandler<1>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 	 i!=levels[level]->line_dofs.end(); ++i)
       if (*i != invalid_dof_index)
 	*i = new_numbers[*i];
+
+				   // finally update the cache used
+				   // for cell dof indices
+  for (cell_iterator cell = begin(); cell != end(); ++cell)
+    cell->update_cell_dof_indices_cache ();
 }
 
 #endif
@@ -1735,7 +1747,12 @@ void DoFHandler<2>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 	   i!=levels[level]->quad_dofs.end(); ++i)
 	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
-    };
+    }
+
+				   // finally update the cache used
+				   // for cell dof indices
+  for (cell_iterator cell = begin(); cell != end(); ++cell)
+    cell->update_cell_dof_indices_cache ();
 }
 
 #endif
@@ -1793,7 +1810,12 @@ void DoFHandler<3>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 	   i!=levels[level]->hex_dofs.end(); ++i)
 	if (*i != invalid_dof_index)
 	  *i = new_numbers[*i];
-    };
+    }
+
+				   // finally update the cache used
+				   // for cell dof indices
+  for (cell_iterator cell = begin(); cell != end(); ++cell)
+    cell->update_cell_dof_indices_cache ();
 }
 
 #endif
@@ -1967,7 +1989,8 @@ DoFHandler<3>::max_couplings_between_boundary_dofs () const
 #if deal_II_dimension == 1
 
 template <>
-void DoFHandler<1>::reserve_space () {
+void DoFHandler<1>::reserve_space ()
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
 
@@ -1984,10 +2007,14 @@ void DoFHandler<1>::reserve_space () {
     {
       levels.push_back (new internal::DoFHandler::DoFLevel<1>);
 
-      levels.back()->line_dofs = std::vector<unsigned int>(tria->n_raw_lines(i) *
-							   selected_fe->dofs_per_line,
-							   invalid_dof_index);
-    };
+      levels.back()->line_dofs.resize (tria->n_raw_lines(i) *
+				       selected_fe->dofs_per_line,
+				       invalid_dof_index);
+
+      levels.back()->cell_dof_indices_cache.resize (tria->n_raw_lines(i) *
+						    selected_fe->dofs_per_cell,
+						    invalid_dof_index);
+    }
 }
 
 
@@ -1997,7 +2024,8 @@ void DoFHandler<1>::reserve_space () {
 #if deal_II_dimension == 2
 
 template <>
-void DoFHandler<2>::reserve_space () {
+void DoFHandler<2>::reserve_space ()
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
   
@@ -2014,13 +2042,17 @@ void DoFHandler<2>::reserve_space () {
     {
       levels.push_back (new internal::DoFHandler::DoFLevel<2>);
 
-      levels.back()->line_dofs = std::vector<unsigned int> (tria->n_raw_lines(i) *
-							    selected_fe->dofs_per_line,
-							    invalid_dof_index);
-      levels.back()->quad_dofs = std::vector<unsigned int> (tria->n_raw_quads(i) *
-							    selected_fe->dofs_per_quad,
-							    invalid_dof_index);
-    };
+      levels.back()->line_dofs.resize (tria->n_raw_lines(i) *
+				       selected_fe->dofs_per_line,
+				       invalid_dof_index);
+      levels.back()->quad_dofs.resize (tria->n_raw_quads(i) *
+				       selected_fe->dofs_per_quad,
+				       invalid_dof_index);
+
+      levels.back()->cell_dof_indices_cache.resize (tria->n_raw_quads(i) *
+						    selected_fe->dofs_per_cell,
+						    invalid_dof_index);
+    }
 }
 
 #endif
@@ -2029,7 +2061,8 @@ void DoFHandler<2>::reserve_space () {
 #if deal_II_dimension == 3
 
 template <>
-void DoFHandler<3>::reserve_space () {
+void DoFHandler<3>::reserve_space ()
+{
   Assert (selected_fe != 0, ExcNoFESelected());
   Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
   
@@ -2055,7 +2088,11 @@ void DoFHandler<3>::reserve_space () {
       levels.back()->hex_dofs = std::vector<unsigned int> (tria->n_raw_hexs(i) *
 							   selected_fe->dofs_per_hex,
 							   invalid_dof_index);
-    };
+
+      levels.back()->cell_dof_indices_cache.resize (tria->n_raw_hexs(i) *
+						    selected_fe->dofs_per_cell,
+						    invalid_dof_index);
+    }
 }
 
 #endif

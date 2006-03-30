@@ -1055,6 +1055,11 @@ class DoFHandler  :  public Subscriptor
 				      * Make accessor objects friends.
 				      */
     template <int dim1, class DH> friend class DoFObjectAccessor;
+
+				     /*
+				      * Same with cell accessor
+				      */
+    template <class DH> friend class DoFCellAccessor;
 };
 
 

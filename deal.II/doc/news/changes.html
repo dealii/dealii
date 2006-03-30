@@ -553,6 +553,15 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: Since calling <code>cell-&gt;get_dof_indices</code> is a
+       fairly frequent operation (called about 7 times per cell in
+       step-14, but much more often in more complicated programs), the
+       results of this function are now cached for faster access.
+       <br> 
+       (WB 2006/03/29)
+       </p>
+
+  <li> <p>
        Fixed: An exception was generated when trying to interpolate
        boundary values for a primitive component of a composite finite
        element that also has non-primitive base elements (for example,

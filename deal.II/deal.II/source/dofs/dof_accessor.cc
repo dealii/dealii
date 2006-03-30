@@ -432,6 +432,68 @@ DoFCellAccessor<DoFHandler<1> >::face (const unsigned int) const
   return TriaIterator<1, DoFObjectAccessor<0,DoFHandler<1> > >();
 }
 
+
+template <>
+void
+DoFCellAccessor<DoFHandler<1> >::update_cell_dof_indices_cache () const
+{
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+  
+  Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
+  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
+
+				   // check as in documentation that
+				   // cell is either active, or dofs
+				   // are only in vertices. otherwise
+				   // simply don't update the cache at
+				   // all. the get_dof_indices
+				   // function will then make sure we
+				   // don't access the invalid data
+  if (this->has_children()
+      &&
+      (this->get_fe().dofs_per_cell !=
+       this->get_fe().dofs_per_vertex * GeometryInfo<1>::vertices_per_cell))
+    return;
+  
+  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->get_fe().dofs_per_line,
+		     dofs_per_cell   = this->get_fe().dofs_per_cell;
+
+				   // make sure the cache is at least
+				   // as big as we need it when
+				   // writing to the last element of
+				   // this cell
+  Assert (this->present_index * dofs_per_cell + dofs_per_cell
+	  <=
+	  this->dof_handler->levels[this->present_level]
+	  ->cell_dof_indices_cache.size(),
+	  ExcInternalError());
+
+  std::vector<unsigned int>::iterator next
+    = (this->dof_handler->levels[this->present_level]
+       ->cell_dof_indices_cache.begin() + this->present_index * dofs_per_cell);
+  
+  for (unsigned int vertex=0; vertex<2; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      *next++ = vertex_dof_index(vertex,d);
+  for (unsigned int d=0; d<dofs_per_line; ++d)
+    *next++ = dof_index(d);
+}
+
+
+
+template <>
+void
+DoFCellAccessor<hp::DoFHandler<1> >::update_cell_dof_indices_cache () const
+{
+				   // not implemented, but should also
+				   // not be called
+  Assert (false, ExcNotImplemented());
+}
+
+
+
 #endif
 
 
@@ -444,6 +506,72 @@ DoFCellAccessor<DoFHandler<2> >::face (const unsigned int i) const
   return this->line(i);
 }
 
+
+
+template <>
+void
+DoFCellAccessor<DoFHandler<2> >::update_cell_dof_indices_cache () const
+{
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+
+  Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
+  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
+
+				   // check as in documentation that
+				   // cell is either active, or dofs
+				   // are only in vertices. otherwise
+				   // simply don't update the cache at
+				   // all. the get_dof_indices
+				   // function will then make sure we
+				   // don't access the invalid data
+  if (this->has_children()
+      &&
+      (this->get_fe().dofs_per_cell !=
+       this->get_fe().dofs_per_vertex * GeometryInfo<2>::vertices_per_cell))
+    return;
+  
+  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->get_fe().dofs_per_line,
+		     dofs_per_quad   = this->get_fe().dofs_per_quad,
+		     dofs_per_cell   = this->get_fe().dofs_per_cell;
+
+				   // make sure the cache is at least
+				   // as big as we need it when
+				   // writing to the last element of
+				   // this cell
+  Assert (this->present_index * dofs_per_cell + dofs_per_cell
+	  <=
+	  this->dof_handler->levels[this->present_level]
+	  ->cell_dof_indices_cache.size(),
+	  ExcInternalError());
+
+  std::vector<unsigned int>::iterator next
+    = (this->dof_handler->levels[this->present_level]
+       ->cell_dof_indices_cache.begin() + this->present_index * dofs_per_cell);
+
+  for (unsigned int vertex=0; vertex<4; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      *next++ = vertex_dof_index(vertex,d);
+  for (unsigned int line=0; line<4; ++line)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
+      *next++ = this->line(line)->dof_index(d);
+  for (unsigned int d=0; d<dofs_per_quad; ++d)
+    *next++ = dof_index(d);
+}
+
+
+
+template <>
+void
+DoFCellAccessor<hp::DoFHandler<2> >::update_cell_dof_indices_cache () const
+{
+				   // not implemented, but should also
+				   // not be called
+  Assert (false, ExcNotImplemented());
+}
+
+
 #endif
 
 
@@ -455,6 +583,75 @@ DoFCellAccessor<DoFHandler<3> >::face (const unsigned int i) const
 {
   return this->quad(i);
 }
+
+
+
+template <>
+void
+DoFCellAccessor<DoFHandler<3> >::update_cell_dof_indices_cache () const
+{
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+
+  Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
+  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
+
+				   // check as in documentation that
+				   // cell is either active, or dofs
+				   // are only in vertices. otherwise
+				   // simply don't update the cache at
+				   // all. the get_dof_indices
+				   // function will then make sure we
+				   // don't access the invalid data
+  if (this->has_children()
+      &&
+      (this->get_fe().dofs_per_cell !=
+       this->get_fe().dofs_per_vertex * GeometryInfo<3>::vertices_per_cell))
+    return;
+  
+  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->get_fe().dofs_per_line,
+		     dofs_per_quad   = this->get_fe().dofs_per_quad,
+		     dofs_per_hex    = this->get_fe().dofs_per_hex,
+		     dofs_per_cell   = this->get_fe().dofs_per_cell;
+
+				   // make sure the cache is at least
+				   // as big as we need it when
+				   // writing to the last element of
+				   // this cell
+  Assert (this->present_index * dofs_per_cell + dofs_per_cell
+	  <=
+	  this->dof_handler->levels[this->present_level]
+	  ->cell_dof_indices_cache.size(),
+	  ExcInternalError());
+
+  std::vector<unsigned int>::iterator next
+    = (this->dof_handler->levels[this->present_level]
+       ->cell_dof_indices_cache.begin() + this->present_index * dofs_per_cell);
+
+  for (unsigned int vertex=0; vertex<8; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      *next++ = vertex_dof_index(vertex,d);
+  for (unsigned int line=0; line<12; ++line)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
+      *next++ = this->line(line)->dof_index(d);
+  for (unsigned int quad=0; quad<6; ++quad)
+    for (unsigned int d=0; d<dofs_per_quad; ++d)
+      *next++ = this->quad(quad)->dof_index(d);
+  for (unsigned int d=0; d<dofs_per_hex; ++d)
+    *next++ = dof_index(d);
+}
+
+
+template <>
+void
+DoFCellAccessor<hp::DoFHandler<3> >::update_cell_dof_indices_cache () const
+{
+				   // not implemented, but should also
+				   // not be called
+  Assert (false, ExcNotImplemented());
+}
+
 
 #endif
 

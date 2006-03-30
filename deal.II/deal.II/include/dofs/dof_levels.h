@@ -46,17 +46,24 @@ namespace internal
  *
  * The storage format of the degrees of freedom indices (short: DoF
  * indices) is somewhat like a mirror of the data structures of the
- * triangulation classes.  There is a hierarchy of
- * DoFLevel<dim> classes for the different dimensions which
- * have objects named @p line_dofs, @p quad_dofs and so on, in which
- * the indices of DoFs located on lines and quads, respectively, are
- * stored. The indices are stored levelwise. The layout in these
- * arrays is as follows: if for a selected finite element (use
- * DoFHandler::distribute_dofs() to select a finite element)
- * the number of DoFs on each line (without those in the vertices) is
- * @p N, then the length of the @p line_dofs array is @p N times
- * the number of lines on this level. The DoF indices for the @p ith
- * line are at the positions <tt>N*i...(N+1)*i-1</tt>.
+ * triangulation classes.  There is a hierarchy of DoFLevel<dim>
+ * classes for the different dimensions which have objects named @p
+ * line_dofs, @p quad_dofs and so on, in which the indices of DoFs
+ * located on lines and quads, respectively, are stored. The indices
+ * are stored levelwise. The layout in these arrays is as follows: if
+ * for a selected finite element (use DoFHandler::distribute_dofs() to
+ * select a finite element) the number of DoFs on each line (without
+ * those in the vertices) is @p N, then the length of the @p line_dofs
+ * array is @p N times the number of lines on this level. The DoF
+ * indices for the @p ith line are at the positions
+ * <tt>N*i...(N+1)*i-1</tt>. It is true that this scheme wastes some
+ * memory since we actually only use the memory so allocated for
+ * active lines, whereas the index entries for line i remain unused if
+ * this line has children. On the other hand, it is easy to see that
+ * at least for dim>1 does not constitute a too big fraction of memory
+ * entries, and we opt for higher memory consumption in return for
+ * less index computations that usually slow down modern processors
+ * due to more complex memory access patterns.
  *
  * Since vertices are not associated with a particular level, the
  * indices associated with vertices are not stored in the DoFLevel
@@ -78,6 +85,43 @@ namespace internal
     };
 
 
+
+/**
+ * Common base class for all the DoFLevel classes. We here store
+ * information that is associated with (logical) cells, rather than
+ * concrete objects such as lines, quads, or hexes.
+ *
+ * At present, all we store are cached values for the DoF indices on
+ * each cell, since this is a frequently requested operation. The
+ * values are set by DoFCellAccessor::update_cell_dof_indices_cache
+ * and are used by DoFCellAccessor::get_dof_indices. Note that for
+ * objects that are not cell, such as lines in 2d and 3d, or quads in
+ * 3d, no caching is done since accessing the degrees of freedom on
+ * these objects is a comparatively rare operation.
+ */
+    template <>
+    class DoFLevel<0>
+    {
+      public:
+					 /**
+					  * Cache for the DoF indices
+					  * on cells. The size of this
+					  * array equals the number of
+					  * cells on a given level
+					  * times
+					  * selected_fe.dofs_per_cell.
+					  */
+	std::vector<unsigned int> cell_dof_indices_cache;
+
+                                         /**
+                                          * Determine an estimate for the
+                                          * memory consumption (in bytes)
+                                          * of this object.
+                                          */
+        unsigned int memory_consumption () const;
+    };
+    
+    
 /**
  * Store the indices of the degrees of freedom which are located on
  * the lines. See the general template DoFLevel for more information.
@@ -86,7 +130,7 @@ namespace internal
  * @author Wolfgang Bangerth, 1998
  */
     template <>
-    class DoFLevel<1>
+    class DoFLevel<1> : public DoFLevel<0>
     {
       public:
                                          /**

@@ -329,6 +329,22 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
 				      * The vector has to have the
 				      * right size before being passed
 				      * to this function.
+				      *
+				      * This function is most often
+				      * used on active objects (edges,
+				      * faces, cells). It can be used
+				      * on non-active objects as well
+				      * (i.e. objects that have
+				      * children), but only if the
+				      * finite element under
+				      * consideration has degrees of
+				      * freedom exclusively on
+				      * vertices. Otherwise, the
+				      * function doesn't make much
+				      * sense, since for example
+				      * inactive edges do not have
+				      * degrees of freedom associated
+				      * with them at all.
 				      */
     void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
@@ -649,6 +665,22 @@ class DoFObjectAccessor<1, DH> :
 				      *
 				      * It is assumed that the vector already
 				      * has the right size beforehand.
+				      *
+				      * This function is most often
+				      * used on active objects (edges,
+				      * faces, cells). It can be used
+				      * on non-active objects as well
+				      * (i.e. objects that have
+				      * children), but only if the
+				      * finite element under
+				      * consideration has degrees of
+				      * freedom exclusively on
+				      * vertices. Otherwise, the
+				      * function doesn't make much
+				      * sense, since for example
+				      * inactive edges do not have
+				      * degrees of freedom associated
+				      * with them at all.
 				      */
     void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
@@ -896,6 +928,22 @@ class DoFObjectAccessor<2, DH> :
 				      *
 				      * It is assumed that the vector already
 				      * has the right size beforehand.
+				      *
+				      * This function is most often
+				      * used on active objects (edges,
+				      * faces, cells). It can be used
+				      * on non-active objects as well
+				      * (i.e. objects that have
+				      * children), but only if the
+				      * finite element under
+				      * consideration has degrees of
+				      * freedom exclusively on
+				      * vertices. Otherwise, the
+				      * function doesn't make much
+				      * sense, since for example
+				      * inactive edges do not have
+				      * degrees of freedom associated
+				      * with them at all.
 				      */
     void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
@@ -1151,6 +1199,22 @@ class DoFObjectAccessor<3, DH> :
 				      *
 				      * It is assumed that the vector already
 				      * has the right size beforehand.
+				      *
+				      * This function is most often
+				      * used on active objects (edges,
+				      * faces, cells). It can be used
+				      * on non-active objects as well
+				      * (i.e. objects that have
+				      * children), but only if the
+				      * finite element under
+				      * consideration has degrees of
+				      * freedom exclusively on
+				      * vertices. Otherwise, the
+				      * function doesn't make much
+				      * sense, since for example
+				      * inactive edges do not have
+				      * degrees of freedom associated
+				      * with them at all.
 				      */
     void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
@@ -1583,7 +1647,69 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
     template <class OutputVector, typename number>
     void set_dof_values_by_interpolation (const Vector<number> &local_values,
 					  OutputVector         &values) const;
+
+    				     /**
+				      * Return the indices of the dofs of this
+				      * quad in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand.
+				      *
+				      * This function reimplements the
+				      * same function in the base
+				      * class. The functions in the
+				      * base classes are available for
+				      * all geometric objects,
+				      * i.e. even in 3d they can be
+				      * used to access the dof indices
+				      * of edges, for example. On the
+				      * other hand, the most common
+				      * case is clearly the use on
+				      * cells, which is why we cache
+				      * the array for each cell, but
+				      * not edge. To retrieve the
+				      * cached values, rather than
+				      * collect the necessary
+				      * information every time, this
+				      * function overwrites the one in
+				      * the base class.
+				      *
+				      * This function is most often
+				      * used on active objects (edges,
+				      * faces, cells). It can be used
+				      * on non-active objects as well
+				      * (i.e. objects that have
+				      * children), but only if the
+				      * finite element under
+				      * consideration has degrees of
+				      * freedom exclusively on
+				      * vertices. Otherwise, the
+				      * function doesn't make much
+				      * sense, since for example
+				      * inactive edges do not have
+				      * degrees of freedom associated
+				      * with them at all.
+				      */
+    void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
     
+  private:
+				     /**
+				      * Update the cache in which we
+				      * store the dof indices of this
+				      * cell.
+				      */
+    void update_cell_dof_indices_cache () const;
+
+				     /**
+				      * Make the DoFHandler class a
+				      * friend so that it can call the
+				      * update_cell_dof_indices_cache()
+				      * function
+				      */
+    template <int> friend class DoFHandler;
 };
 
 
@@ -1675,6 +1801,28 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int
 template <>
 void
 DoFObjectAccessor<3,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i);
+
+
+template <>
+void
+DoFCellAccessor<DoFHandler<1> >::update_cell_dof_indices_cache () const;
+template <>
+void
+DoFCellAccessor<DoFHandler<2> >::update_cell_dof_indices_cache () const;
+template <>
+void
+DoFCellAccessor<DoFHandler<3> >::update_cell_dof_indices_cache () const;
+
+template <>
+void
+DoFCellAccessor<hp::DoFHandler<1> >::update_cell_dof_indices_cache () const;
+template <>
+void
+DoFCellAccessor<hp::DoFHandler<2> >::update_cell_dof_indices_cache () const;
+template <>
+void
+DoFCellAccessor<hp::DoFHandler<3> >::update_cell_dof_indices_cache () const;
+
 
 
 // include more templates
