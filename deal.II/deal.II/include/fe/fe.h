@@ -2311,22 +2311,6 @@ FiniteElement<dim>::system_to_block_index (const unsigned int index) const
 }
 
 
-template <int dim>  
-inline
-unsigned int
-FiniteElement<dim>::component_to_block_index (const unsigned int index) const
-{
-  Assert (index < this->n_components(),
-	  ExcIndexRange(index, 0, this->n_components()));
-				   // The block is computed simply as
-				   // first block of this base plus
-				   // the index within the base blocks
-  const std::pair<unsigned int, unsigned int>
-    base = component_to_base_index(index);
-  return first_block_of_base(base.first) + base.second;
-}
-
-
 template <int dim>
 inline
 bool
