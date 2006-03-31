@@ -606,8 +606,7 @@ DoFTools::compute_row_length_vector(
 				       // added in the loop below.
       increment = (DH::dimension>1)
 		  ? fe.dofs_per_cell - (DH::dimension-1) * fe.dofs_per_face
-		  : fe.dofs_per_cell - GeometryInfo<DH::di,
-				      DoFTools::alwaysmension>::faces_per_cell * fe.dofs_per_face;
+		  : fe.dofs_per_cell - GeometryInfo<DH::dimension>::faces_per_cell * fe.dofs_per_face;
       while (i < fe.first_quad_index)
 	row_lengths[cell_indices[i++]] += increment;
       
