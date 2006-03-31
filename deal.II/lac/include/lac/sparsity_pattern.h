@@ -628,7 +628,7 @@ class SparsityPattern : public Subscriptor
 				      */
     void reinit (const unsigned int               m,
 		 const unsigned int               n,
-		 const const std::vector<unsigned int> &row_lengths,
+		 const std::vector<unsigned int> &row_lengths,
 		 const bool optimize_diagonal = true);
 
 				     /**
