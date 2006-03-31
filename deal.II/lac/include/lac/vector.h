@@ -34,6 +34,10 @@ namespace PETScWrappers
 
 template<typename number> class LAPACKFullMatrix;
 
+template <typename> class BlockVector;
+
+
+
 /*! @addtogroup Vectors
  *@{
  */
@@ -307,6 +311,13 @@ class Vector :
     template <typename Number2>
     Vector<Number> & operator= (const Vector<Number2> &v);
 
+                                     /**
+                                      * Copy operator for assigning a
+                                      * block vector to a regular
+                                      * vector.
+                                      */
+    Vector<Number> & operator= (const BlockVector<Number> &v);
+    
 #ifdef DEAL_II_USE_PETSC
                                      /**
                                       * Another copy operator: copy the values

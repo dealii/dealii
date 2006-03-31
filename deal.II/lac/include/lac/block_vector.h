@@ -187,7 +187,14 @@ class BlockVector : public BlockVectorBase<Vector<Number> >
     BlockVector &
     operator= (const BlockVector<Number2> &V);
 
-    				     /**
+				     /**
+				      * Copy a regular vector into a
+				      * block vector.
+				      */
+    BlockVector &
+    operator= (const Vector<Number> &V);
+
+                                     /**
 				      * Reinitialize the BlockVector to
 				      * contain <tt>num_blocks</tt> blocks of
 				      * size <tt>block_size</tt> each.
@@ -436,6 +443,17 @@ template <typename Number>
 inline
 BlockVector<Number> &
 BlockVector<Number>::operator = (const BlockVector &v)
+{
+  BaseClass::operator = (v);
+  return *this;
+}
+
+
+
+template <typename Number>
+inline
+BlockVector<Number> &
+BlockVector<Number>::operator = (const Vector<Number> &v)
 {
   BaseClass::operator = (v);
   return *this;

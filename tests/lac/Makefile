@@ -24,10 +24,11 @@ tests_x = vector-vector \
 	full_matrix householder tridiagonal_matrix \
 	sparsity_pattern sparse_matrices matrices \
 	block_sparsity_pattern_01 \
-	block_vector block_vector_iterator block_matrices \
+	block_vector block_vector_* block_matrices \
 	matrix_lib matrix_out \
 	solver eigen \
-	sparse_ilu sparse_ilu_t lapack lapack_fill block_minres
+	sparse_ilu sparse_ilu_t lapack lapack_fill block_minres \
+	amg_*
 
 
 # from above list of regular expressions, generate the real set of

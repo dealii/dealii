@@ -807,6 +807,13 @@ class BlockVectorBase
     operator= (const BlockVectorBase<VectorType2> &V);
 
                                      /**
+                                      * Copy operator from non-block
+                                      * vectors to block vectors.
+                                      */
+    BlockVectorBase &
+    operator = (const VectorType &v);
+    
+                                     /**
                                       * Check for equality of two block vector
                                       * types. This operation is only allowed
                                       * if the two vectors already have the
@@ -2067,6 +2074,7 @@ void BlockVectorBase<VectorType>::equ (const value_type    a,
 }
 
 
+
 template <class VectorType>
 BlockVectorBase<VectorType>&
 BlockVectorBase<VectorType>::operator = (const value_type s)
@@ -2090,9 +2098,8 @@ BlockVectorBase<VectorType>::operator = (const BlockVectorBase<VectorType>& v)
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
   
   for (unsigned int i=0;i<n_blocks();++i)
-    {
-      components[i] = v.components[i];
-    }
+    components[i] = v.components[i];
+
   return *this;
 }
 
@@ -2108,6 +2115,23 @@ BlockVectorBase<VectorType>::operator = (const BlockVectorBase<VectorType2> &v)
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] = v.components[i];
   
+  return *this;
+}
+
+
+
+template <class VectorType>
+BlockVectorBase<VectorType>&
+BlockVectorBase<VectorType>::operator = (const VectorType &v)
+{
+  Assert (size() == v.size(),
+	  ExcDimensionMismatch(size(), v.size()));
+
+  unsigned int index_v = 0;
+  for (unsigned int b=0;b<n_blocks();++b)
+    for (unsigned int i=0; i<block(b).size(); ++i, ++index_v)
+      block(b)(i) = v(index_v);
+
   return *this;
 }
 

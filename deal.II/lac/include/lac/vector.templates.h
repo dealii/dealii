@@ -15,6 +15,7 @@
 
 
 #include <lac/vector.h>
+#include <lac/block_vector.h>
 
 #ifdef DEAL_II_USE_PETSC
 #  include <lac/petsc_vector.h>
@@ -672,7 +673,7 @@ void Vector<Number>::ratio (const Vector<Number> &a, const Vector<Number> &b)
 
 
 template <typename Number>
-Vector<Number>&
+Vector<Number> &
 Vector<Number>::operator = (const Vector<Number>& v)
 {
   if (v.vec_size != vec_size)
@@ -687,13 +688,30 @@ Vector<Number>::operator = (const Vector<Number>& v)
 
 template <typename Number>
 template <typename Number2>
-Vector<Number>&
+Vector<Number> &
 Vector<Number>::operator = (const Vector<Number2>& v)
 {
   if (v.size() != vec_size)
     reinit (v.size(), true);
   if (vec_size!=0)
     std::copy (v.begin(), v.end(), begin());
+  
+  return *this;
+}
+
+
+
+template <typename Number>
+Vector<Number> &
+Vector<Number>::operator = (const BlockVector<Number>& v)
+{
+  if (v.size() != vec_size)
+    reinit (v.size(), true);
+
+  unsigned int this_index = 0;
+  for (unsigned int b=0; b<v.n_blocks(); ++b)
+    for (unsigned int i=0; i<v.block(b).size(); ++i, ++this_index)
+      val[this_index] = v.block(b)(i);
   
   return *this;
 }
