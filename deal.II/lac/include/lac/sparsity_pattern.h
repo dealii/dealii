@@ -618,7 +618,7 @@ class SparsityPattern : public Subscriptor
 				      * to save time and to avoid fragmentation
 				      * of the heap.
 				      *
-				      * IF the number of rows equals
+				      * If the number of rows equals
 				      * the number of columns and the
 				      * last parameter is true,
 				      * diagonals elements are stored
