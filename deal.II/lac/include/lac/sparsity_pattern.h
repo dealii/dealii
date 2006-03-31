@@ -621,24 +621,23 @@ class SparsityPattern : public Subscriptor
 				      * If the number of rows equals
 				      * the number of columns and the
 				      * last parameter is true,
-				      * diagonals elements are stored
+				      * diagonal elements are stored
 				      * first in each row to allow
 				      * optimized access in relaxation
 				      * methods of SparseMatrix.
 				      */
     void reinit (const unsigned int               m,
 		 const unsigned int               n,
-		 const VectorSlice<const std::vector<unsigned int> > &row_lengths,
+		 const const std::vector<unsigned int> &row_lengths,
 		 const bool optimize_diagonal = true);
 
 				     /**
-				      * Wrapper since the conversion
-				      * of std::vector to const
-				      * VectorSlice does not work.
+				      * Same as above, but with a
+				      * VectorSlice argument instead.
 				      */
     void reinit (const unsigned int               m,
 		 const unsigned int               n,
-		 const std::vector<unsigned int> &row_lengths,
+		 const VectorSlice<std::vector<unsigned int> > &row_lengths,
 		 const bool optimize_diagonal = true);
     
 				     /**
