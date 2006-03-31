@@ -131,6 +131,8 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 	  *version\ 4.0.1*) GXX_VERSION_DETAILED=gcc4.0.1 ;;
 	  *version\ 4.0.2*) GXX_VERSION_DETAILED=gcc4.0.2 ;;
 	  *version\ 4.0.3*) GXX_VERSION_DETAILED=gcc4.0.3 ;;
+	  *version\ 4.0.4*) GXX_VERSION_DETAILED=gcc4.0.4 ;;
+	  *version\ 4.0.5*) GXX_VERSION_DETAILED=gcc4.0.5 ;;
 	  *)                GXX_VERSION_DETAILED=gcc4.0.x ;;
         esac
   	;;
