@@ -287,22 +287,86 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
       const unsigned int first = data.shape_function_to_row_table[i];
       
       if (flags & update_values)
-	for (unsigned int k=0; k<n_quad; ++k)
-	  for (unsigned int d=0;d<dim;++d)
-	  data.shape_values(first+d,k) = fe_data.shape_values[i][k][d];
+	{
+	  switch(mapping_type)
+	    {
+	      case independent:
+	      case independent_on_cartesian:
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    data.shape_values(first+d,k) = fe_data.shape_values[i][k][d];
+		break;
+	      case covariant:
+	      case contravariant:
+		if (true)
+		  {
+						     // Use auxiliary vector for transformation
+		    std::vector<Tensor<1,dim> > shape_values (n_quad);
+		    if (mapping_type == covariant)
+		      mapping.transform_covariant(fe_data.shape_values[i], 0,
+						  shape_values, mapping_data);
+		    else
+		      mapping.transform_contravariant(fe_data.shape_values[i], 0,
+						      shape_values, mapping_data);
+		    
+						     // then copy over to target:
+		    for (unsigned int k=0; k<n_quad; ++k)
+		      for (unsigned int d=0; d<dim; ++d)
+			data.shape_values(first+d,k) = shape_values[k][d];
+		  }
+		break;
+	      default:
+		Assert(false, ExcNotImplemented());
+	    }
+	}
       
       if (flags & update_gradients)
 	{
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_quad);
-	  mapping.transform_covariant(fe_data.shape_grads[i], 0,
-				      shape_grads1,
-				      mapping_data);
-	  for (unsigned int k=0; k<n_quad; ++k)
-	    for (unsigned int d=0;d<dim;++d)
-	      data.shape_gradients[first+d][k] = shape_grads1[k][d];
+	  std::vector<Tensor<2,dim> > shape_grads2 (n_quad);
+	  switch(mapping_type)
+	    {
+	      case independent:
+	      case independent_on_cartesian:
+		mapping.transform_covariant(fe_data.shape_grads[i], 0,
+					    shape_grads1,
+					    mapping_data);
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		break;
+	      case covariant:
+		mapping.transform_covariant(fe_data.shape_grads[i], 0,
+					    shape_grads1,
+					    mapping_data);
+		for (unsigned int q=0; q<n_quad; ++q)
+		  shape_grads2[q] = transpose(shape_grads1[q]);
+						 // do second transformation
+		mapping.transform_covariant(shape_grads2, 0, shape_grads1,
+					    mapping_data);
+						 // transpose back
+		for (unsigned int q=0; q<n_quad; ++q)
+		  shape_grads2[q] = transpose(shape_grads1[q]);
+		
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		break;
+	      case contravariant:
+		Assert(false, ExcNotImplemented());		
+		mapping.transform_covariant(fe_data.shape_grads[i], 0,
+					    shape_grads1,
+					    mapping_data);
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		break;
+	      default:
+		Assert(false, ExcNotImplemented());
+	    }
 	}
     }
-
+  
   const typename QProjector<dim>::DataSetDescriptor dsd;
   if (flags & update_second_derivatives)
     this->compute_2nd (mapping, cell, dsd.cell(),
@@ -352,21 +416,76 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
       const unsigned int first = data.shape_function_to_row_table[i];
       
       if (flags & update_values)
-        for (unsigned int k=0; k<n_quad; ++k)
-	  for (unsigned int d=0;d<dim;++d)
-	    data.shape_values(first+d,k) = fe_data.shape_values[i][k+offset][d];
+	{
+	  switch(mapping_type)
+	    {
+	      case independent:
+	      case independent_on_cartesian:
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    data.shape_values(first+d,k) = fe_data.shape_values[i][k+offset][d];
+		break;
+	      case covariant:
+	      case contravariant:
+		if (true)
+		  {
+						     // Use auxiliary vector for transformation
+		    std::vector<Tensor<1,dim> > shape_values (n_quad);
+		    if (mapping_type == covariant)
+		      mapping.transform_covariant(fe_data.shape_values[i], offset,
+						  shape_values, mapping_data);
+		    else
+		      mapping.transform_contravariant(fe_data.shape_values[i], offset,
+						      shape_values, mapping_data);
+		    
+						     // then copy over to target:
+		    for (unsigned int k=0; k<n_quad; ++k)
+		      for (unsigned int d=0; d<dim; ++d)
+			data.shape_values(first+d,k) = shape_values[k][d];
+		  }
+		break;
+	      default:
+		Assert(false, ExcNotImplemented());
+	    }
+	}
       
       if (flags & update_gradients)
 	{
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_quad);
-	  mapping.transform_covariant(fe_data.shape_grads[i], offset,
-				      shape_grads1, mapping_data);
-	  for (unsigned int k=0; k<n_quad; ++k)
-	    for (unsigned int d=0;d<dim;++d)
-	      data.shape_gradients[first+d][k] = shape_grads1[k][d];
+	  std::vector<Tensor<2,dim> > shape_grads2 (n_quad);
+	  switch(mapping_type)
+	    {
+	      case independent:
+	      case independent_on_cartesian:
+		mapping.transform_covariant(fe_data.shape_grads[i], offset,
+					    shape_grads1, mapping_data);
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		break;
+	      case covariant:
+		mapping.transform_covariant(fe_data.shape_grads[i], offset,
+					    shape_grads1,
+					    mapping_data);
+		for (unsigned int q=0; q<n_quad; ++q)
+		  shape_grads2[q] = transpose(shape_grads1[q]);
+						 // do second transformation
+		mapping.transform_covariant(shape_grads2, 0, shape_grads1,
+					    mapping_data);
+						 // transpose back
+		for (unsigned int q=0; q<n_quad; ++q)
+		  shape_grads2[q] = transpose(shape_grads1[q]);
+		
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		break;
+	      default:
+		Assert(false, ExcNotImplemented());
+	    }
 	}
     }
-
+  
   if (flags & update_second_derivatives)
     this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
@@ -415,18 +534,73 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
       const unsigned int first = data.shape_function_to_row_table[i];
       
       if (flags & update_values)
-        for (unsigned int k=0; k<n_quad; ++k)
-	  for (unsigned int d=0;d<dim;++d)
-	    data.shape_values(first+d,k) = fe_data.shape_values[i][k+offset][d];
+	{
+	  switch(mapping_type)
+	    {
+	      case independent:
+	      case independent_on_cartesian:
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    data.shape_values(first+d,k) = fe_data.shape_values[i][k+offset][d];
+		break;
+	      case covariant:
+	      case contravariant:
+		if (true)
+		  {
+						     // Use auxiliary vector for transformation
+		    std::vector<Tensor<1,dim> > shape_values (n_quad);
+		    if (mapping_type == covariant)
+		      mapping.transform_covariant(fe_data.shape_values[i], offset,
+						  shape_values, mapping_data);
+		    else
+		      mapping.transform_contravariant(fe_data.shape_values[i], offset,
+						      shape_values, mapping_data);
+		    
+						     // then copy over to target:
+		    for (unsigned int k=0; k<n_quad; ++k)
+		      for (unsigned int d=0; d<dim; ++d)
+			data.shape_values(first+d,k) = shape_values[k][d];
+		  }
+		break;
+	      default:
+		Assert(false, ExcNotImplemented());
+	    }
+	}
       
       if (flags & update_gradients)
 	{
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_quad);
-	  mapping.transform_covariant(fe_data.shape_grads[i], offset,
-				      shape_grads1, mapping_data);
-	  for (unsigned int k=0; k<n_quad; ++k)
-	    for (unsigned int d=0;d<dim;++d)
-	      data.shape_gradients[first+d][k] = shape_grads1[k][d];
+	  std::vector<Tensor<2,dim> > shape_grads2 (n_quad);
+	  switch(mapping_type)
+	    {
+	      case independent:
+	      case independent_on_cartesian:
+		mapping.transform_covariant(fe_data.shape_grads[i], offset,
+					    shape_grads1, mapping_data);
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		break;
+	      case covariant:
+		mapping.transform_covariant(fe_data.shape_grads[i], offset,
+					    shape_grads1,
+					    mapping_data);
+		for (unsigned int q=0; q<n_quad; ++q)
+		  shape_grads2[q] = transpose(shape_grads1[q]);
+						 // do second transformation
+		mapping.transform_covariant(shape_grads2, 0, shape_grads1,
+					    mapping_data);
+						 // transpose back
+		for (unsigned int q=0; q<n_quad; ++q)
+		  shape_grads2[q] = transpose(shape_grads1[q]);
+		
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		break;
+	      default:
+		Assert(false, ExcNotImplemented());
+	    }
 	}
     }
   

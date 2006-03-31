@@ -43,6 +43,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
   
+  this->mapping_type = this->covariant;
 				   // First, initialize the
 				   // generalized support points and
 				   // quadrature weights, since they
