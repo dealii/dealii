@@ -506,7 +506,7 @@ compute_face_row_length_matrix(
       {
 	const unsigned int jblock = nfe.first_block_of_base(base) + mult;
 	for (unsigned int i=0;i<fe.dofs_per_cell;++i)
-	  if (couple_cell(fe.system_to_component_index(i).first,
+	  if (couple_cell(fe.system_to_block_index(i).first,
 			  jblock) != DoFTools::none)
 	    matrix(i, jblock)
 	      += nfe.base_element(base).dofs_per_face;
@@ -517,7 +517,7 @@ compute_face_row_length_matrix(
       {
 	const unsigned int jblock = fe.first_block_of_base(base) + mult;
 	for (unsigned int i=0;i<nfe.dofs_per_cell;++i)
-	  if (couple_cell(nfe.system_to_component_index(i).first,
+	  if (couple_cell(nfe.system_to_block_index(i).first,
 			  jblock) != DoFTools::none)
 	    nmatrix(i, jblock)
 	      += fe.base_element(base).dofs_per_face;
@@ -606,7 +606,8 @@ DoFTools::compute_row_length_vector(
 				       // added in the loop below.
       increment = (DH::dimension>1)
 		  ? fe.dofs_per_cell - (DH::dimension-1) * fe.dofs_per_face
-		  : fe.dofs_per_cell - GeometryInfo<DH::dimension>::faces_per_cell * fe.dofs_per_face;
+		  : fe.dofs_per_cell - GeometryInfo<DH::di,
+				      DoFTools::alwaysmension>::faces_per_cell * fe.dofs_per_face;
       while (i < fe.first_quad_index)
 	row_lengths[cell_indices[i++]] += increment;
       
@@ -815,8 +816,8 @@ DoFTools::compute_row_length_vector(
   const Table<2,Coupling>& couplings,
   const Table<2,Coupling>& flux_couplings)
 {
-  Assert (row_lengths.size() == dofs.n_dofs(),
-	  ExcDimensionMismatch(row_lengths.size(), dofs.n_dofs()));
+  Assert (row_lengths.size() == dofs.get_fe().n_blocks(),
+	  ExcDimensionMismatch(row_lengths.size(), dofs.get_fe().n_blocks()));
   
 				   // Function starts here by
 				   // resetting the counters.
@@ -863,20 +864,6 @@ DoFTools::compute_row_length_vector(
     {
       const FiniteElement<DH::dimension>& fe = cell->get_fe();
       const unsigned int fe_index = cell->active_fe_index();
-      
-      Assert (couplings.n_rows()==fe.n_components(),
-	      ExcDimensionMismatch(couplings.n_rows(), fe.n_components()));
-      Assert (couplings.n_cols()==fe.n_components(),
-	      ExcDimensionMismatch(couplings.n_cols(), fe.n_components()));
-      if (flux_couplings.n_rows() != 0)
-	Assert (flux_couplings.n_rows()==fe.n_components(),
-		ExcDimensionMismatch(flux_couplings.n_rows(),
-				     fe.n_components()));
-      if (flux_couplings.n_rows() != 0)
-	Assert (flux_couplings.n_cols()==fe.n_components(),
-		ExcDimensionMismatch(flux_couplings.n_cols(),
-				     fe.n_components()));
-      
       cell_couplings.reinit(fe.dofs_per_cell, fe.n_blocks());
       cell_indices.resize(fe.dofs_per_cell);
       cell->get_dof_indices(cell_indices);
@@ -4033,11 +4020,11 @@ DoFTools::compute_row_length_vector(
   std::vector<std::vector<unsigned int> >&,
   const Table<2,Coupling>& couplings, const Table<2,Coupling>& flux_couplings);
 
-template void
-DoFTools::compute_row_length_vector(
-  const hp::DoFHandler<deal_II_dimension>&,
-  std::vector<std::vector<unsigned int> >&,
-  const Table<2,Coupling>& couplings, const Table<2,Coupling>& flux_couplings);
+// template void
+// DoFTools::compute_row_length_vector(
+//   const hp::DoFHandler<deal_II_dimension>&,
+//   std::vector<std::vector<unsigned int> >&,
+//   const Table<2,Coupling>& couplings, const Table<2,Coupling>& flux_couplings);
 
 template void
 DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,SparsityPattern>
