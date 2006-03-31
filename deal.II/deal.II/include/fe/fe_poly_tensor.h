@@ -104,7 +104,7 @@
  * this->mapping_type = this->independent_on_cartesian;
  * @endverbatim
  *
- *@see PolynomialsBDM, PolynomialsRaviartThomas
+ * @see PolynomialsBDM, PolynomialsRaviartThomas
  *
  * @author Guido Kanschat, 2005
  **/
