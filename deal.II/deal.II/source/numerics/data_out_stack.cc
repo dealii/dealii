@@ -298,11 +298,21 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions)
       switch (dim)
 	{
 	  case 1:
+						 // use the following
+						 // vertices. it
+						 // probably just
+						 // requires some
+						 // playing around
+						 // with the order of
+						 // vertices to make
+						 // sure the resulting
+						 // output is as
+						 // expected
 		patch->vertices[0] = Point<dim+1>(cell->vertex(0)(0),
 						  parameter-parameter_step);
-		patch->vertices[2] = Point<dim+1>(cell->vertex(0)(0),
+		patch->vertices[1] = Point<dim+1>(cell->vertex(0)(0),
 						  parameter);
-		patch->vertices[1] = Point<dim+1>(cell->vertex(1)(0),
+		patch->vertices[2] = Point<dim+1>(cell->vertex(1)(0),
 						  parameter-parameter_step);
 		patch->vertices[3] = Point<dim+1>(cell->vertex(1)(0),
 						  parameter);
