@@ -57,8 +57,7 @@ void run ()
   data_out_stack.build_patches (1);
   data_out_stack.finish_parameter_value ();
 
-  std::ofstream out ("out.gpl");
-  data_out_stack.write_gnuplot (out);
+  data_out_stack.write_gnuplot (deallog.get_file_stream());
 }
 
 
