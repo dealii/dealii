@@ -1,4 +1,4 @@
-//----------------------------  data_out_stack_01.cc  ---------------------------
+//----------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,9 +9,9 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  data_out_stack_03.cc  ---------------------------
+//----------------------------------------------------------------------
 
-// the order of vertices on 1d cells was confused somewhere somewhen. fix this
+// Output a field constant in time
 
 #include "../tests.h"
 #include <grid/tria.h>
@@ -43,7 +43,8 @@ void run ()
 				   // create a continuous field over
 				   // this DoFHandler
   Vector<double> v(dof_handler.n_dofs());
-  v(v.size()/2) = 1;
+  v = 1.;
+  v(v.size()/2) = 2.;
 
 				   // output this field using
 				   // DataOutStack. the result should
@@ -54,10 +55,10 @@ void run ()
   data_out_stack.new_parameter_value (1,1);
   data_out_stack.attach_dof_handler (dof_handler);
   data_out_stack.add_data_vector (v, "solution");
-  data_out_stack.build_patches (1);
+  data_out_stack.build_patches (2);
   data_out_stack.finish_parameter_value ();
 
-  data_out_stack.write_gnuplot (deallog.get_file_stream());
+  data_out_stack.write_dx (deallog.get_file_stream());
 }
 
 
@@ -70,6 +71,6 @@ int main ()
   deallog.threshold_double(1.e-10);
 
   run<1> ();
-  
+  run<2> ();
   return 0;
 }
