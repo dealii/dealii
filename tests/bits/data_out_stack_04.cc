@@ -41,7 +41,9 @@ void run ()
   dof_handler.distribute_dofs (fe);
 
 				   // create a continuous field over
-				   // this DoFHandler
+				   // this DoFHandler, where all nodes
+				   // are zero, except for a single
+				   // one
   Vector<double> v(dof_handler.n_dofs());
   v(v.size()/2) = 1;
 
