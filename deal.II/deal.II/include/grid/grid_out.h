@@ -761,7 +761,7 @@ class GridOut
 				      */
     template <int dim>
     void write_dx (const Triangulation<dim> &tria,
-		   std::ostream             &out);
+		   std::ostream             &out) const;
 
 				     /**
 				      * Write the triangulation in the
@@ -822,25 +822,10 @@ class GridOut
 				      * documentation of the
 				      * GridOutFlags::Gnuplot() class.
 				      */
-    void write_gnuplot (const Triangulation<3> &tria,
+    template <int dim>
+    void write_gnuplot (const Triangulation<dim> &tria,
 			std::ostream           &out,
-			const Mapping<3>       *mapping=0);
-
-				     /**
-				      * Specialization of above
-				      * function for 2d
-				      */
-    void write_gnuplot (const Triangulation<2> &tria,
-			std::ostream           &out,
-			const Mapping<2>       *mapping=0);
-
-				     /**
-				      * Declaration of the specialization
-				      * of above function for 1d.
-				      */
-    void write_gnuplot (const Triangulation<1> &tria,
-			std::ostream           &out,
-			const Mapping<1>       *mapping=0);
+			const Mapping<dim>       *mapping=0) const;
     
 				     /**
 				      * Write the triangulation in the
@@ -878,7 +863,7 @@ class GridOut
 				      */
     template <int dim>
     void write_msh (const Triangulation<dim> &tria,
-		    std::ostream             &out);
+		    std::ostream             &out) const;
 
 				     /**
 				      * Write the triangulation in the
@@ -917,7 +902,7 @@ class GridOut
 				      */
     template <int dim>
     void write_ucd (const Triangulation<dim> &tria,
-		    std::ostream             &out);
+		    std::ostream             &out) const;
 
 				     /**
 				      * Write the triangulation in the
@@ -978,17 +963,7 @@ class GridOut
     template <int dim>
     void write_eps (const Triangulation<dim> &tria,
 		    std::ostream             &out,
-		    const Mapping<dim>       *mapping=0);
-
-				     /**
-				      * Declaration of the
-				      * specialization of above
-				      * function for 1d. This function
-				      * is presently not implemented.
-				      */
-    void write_eps (const Triangulation<1> &tria,
-		    std::ostream           &out,
-		    const Mapping<1>       *mapping=0);
+		    const Mapping<dim>       *mapping=0) const;
 
 				     /**
 				      * Write two-dimensional XFig-file.
@@ -1017,7 +992,7 @@ class GridOut
     template <int dim>
     void write_xfig (const Triangulation<dim> &tria,
 		    std::ostream             &out,
-		    const Mapping<dim>       *mapping=0);
+		    const Mapping<dim>       *mapping=0) const;
     
 				     /**
 				      * Write grid to @p out according
@@ -1030,7 +1005,7 @@ class GridOut
     void write (const Triangulation<dim> &tria,
 		std::ostream             &out,
 		const OutputFormat        output_format,
-		const Mapping<dim>       *mapping=0);
+		const Mapping<dim>       *mapping=0) const;
     
 				     /**
 				      * Write mesh in default format
@@ -1039,7 +1014,7 @@ class GridOut
     template <int dim>
     void write (const Triangulation<dim> &tria,
 		std::ostream             &out,
-		const Mapping<dim>       *mapping=0);
+		const Mapping<dim>       *mapping=0) const;
     
 				     /**
 				      * Set flags for DX output

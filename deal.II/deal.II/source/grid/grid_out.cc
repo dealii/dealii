@@ -34,7 +34,7 @@
 
 template <int dim>
 void GridOut::write_dx (const Triangulation<dim> &,
-			std::ostream             &)
+			std::ostream             &) const
 {
   Assert (false, ExcNotImplemented());
 }
@@ -44,7 +44,7 @@ void GridOut::write_dx (const Triangulation<dim> &,
 
 template <int dim>
 void GridOut::write_dx (const Triangulation<dim> &tria,
-			std::ostream             &out) 
+			std::ostream             &out) const
 {
 //TODO:[GK] allow for boundary faces only  
   Assert(dx_flags.write_all_faces, ExcNotImplemented());
@@ -266,7 +266,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
 
 template <int dim>
 void GridOut::write_msh (const Triangulation<dim> &tria,
-			 std::ostream             &out) 
+			 std::ostream             &out) const
 {
   AssertThrow (out, ExcIO());
 
@@ -402,9 +402,10 @@ void GridOut::write_msh (const Triangulation<dim> &tria,
   AssertThrow (out, ExcIO());
 }
 
-    template <int dim>
+
+template <int dim>
 void GridOut::write_ucd (const Triangulation<dim> &tria,
-	std::ostream             &out) 
+			 std::ostream             &out) const
 {
     AssertThrow (out, ExcIO());
 
@@ -518,10 +519,11 @@ void GridOut::write_ucd (const Triangulation<dim> &tria,
 
 #if deal_II_dimension != 2
 
-    template <int dim>
-void GridOut::write_xfig (const Triangulation<dim>&,
-	std::ostream&,
-	const Mapping<dim>*)
+template <int dim>
+void GridOut::write_xfig (
+  const Triangulation<dim>&,
+  std::ostream&,
+  const Mapping<dim>*) const
 {
     Assert (false, ExcNotImplemented());
 }
@@ -530,10 +532,11 @@ void GridOut::write_xfig (const Triangulation<dim>&,
 
 //TODO:[GK] Obey parameters
 //TODO:[GK] Flip y-axis?
-    template <int dim>
-void GridOut::write_xfig (const Triangulation<dim>& tria,
-	std::ostream&             out,
-	const Mapping<dim>*       /*mapping*/)
+template <int dim>
+void GridOut::write_xfig (
+  const Triangulation<dim>& tria,
+  std::ostream&             out,
+  const Mapping<dim>*       /*mapping*/) const
 {
     const unsigned int nv = GeometryInfo<dim>::vertices_per_cell;
     const unsigned int nf = GeometryInfo<dim>::faces_per_cell;
@@ -785,14 +788,16 @@ void GridOut::write_ucd_faces (const Triangulation<dim> &tria,
 
 #if deal_II_dimension==1
 
-void GridOut::write_gnuplot (const Triangulation<1> &tria,
-	std::ostream           &out,
-	const Mapping<1>       *) 
+template <int dim>
+void GridOut::write_gnuplot (
+  const Triangulation<dim> &tria,
+  std::ostream             &out,
+  const Mapping<dim>       *) const
 {
     AssertThrow (out, ExcIO());
 
-    Triangulation<1>::active_cell_iterator        cell=tria.begin_active();
-    const Triangulation<1>::active_cell_iterator  endc=tria.end();
+    typename Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
+    const typename Triangulation<dim>::active_cell_iterator  endc=tria.end();
     for (; cell!=endc; ++cell)
     {
 	if (gnuplot_flags.write_cell_numbers)
@@ -820,19 +825,20 @@ void GridOut::write_gnuplot (const Triangulation<1> &tria,
 
 #if deal_II_dimension==2
 
-void GridOut::write_gnuplot (const Triangulation<2> &tria,
-	std::ostream           &out,
-	const Mapping<2>       *mapping) 
+template <int dim>
+void GridOut::write_gnuplot (
+  const Triangulation<dim> &tria,
+  std::ostream           &out,
+  const Mapping<dim>       *mapping) const
 {
     AssertThrow (out, ExcIO());
 
-    const unsigned int dim=2;
     const unsigned int n_additional_points=
 	gnuplot_flags.n_boundary_face_points;
     const unsigned int n_points=2+n_additional_points;
 
-    Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
-    const Triangulation<dim>::active_cell_iterator  endc=tria.end();
+    typename Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
+    const typename Triangulation<dim>::active_cell_iterator  endc=tria.end();
 
     // if we are to treat curved
     // boundaries, then generate a
@@ -840,7 +846,7 @@ void GridOut::write_gnuplot (const Triangulation<2> &tria,
     // used to probe boundary points at
     // curved faces
     Quadrature<dim> *q_projector=0;
-    std::vector<Point<1> > boundary_points;
+    std::vector<Point<dim-1> > boundary_points;
     if (mapping!=0)
     {
 	boundary_points.resize(n_points);
@@ -850,7 +856,7 @@ void GridOut::write_gnuplot (const Triangulation<2> &tria,
 	    boundary_points[i](0)= 1.*i/(n_points-1);
 
 	std::vector<double> dummy_weights(n_points, 1./n_points);
-	Quadrature<1> quadrature(boundary_points, dummy_weights);
+	Quadrature<dim-1> quadrature(boundary_points, dummy_weights);
 
 	q_projector = new Quadrature<dim> (QProjector<dim>::project_to_all_faces(quadrature));
     }
@@ -889,7 +895,7 @@ void GridOut::write_gnuplot (const Triangulation<2> &tria,
 	    for (unsigned int face_no=0;
 		    face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	    {
-		const Triangulation<dim>::face_iterator
+		const typename Triangulation<dim>::face_iterator
 		    face = cell->face(face_no);
 		if (face->at_boundary())
 		{
@@ -946,19 +952,19 @@ void GridOut::write_gnuplot (const Triangulation<2> &tria,
 
 #if deal_II_dimension==3
 
-void GridOut::write_gnuplot (const Triangulation<3> &tria,
+template <int dim>
+void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 	std::ostream           &out,
-	const Mapping<3>       *mapping) 
+	const Mapping<dim>       *mapping) const
 {
     AssertThrow (out, ExcIO());
 
-    const unsigned int dim=3;
     const unsigned int n_additional_points=
 	gnuplot_flags.n_boundary_face_points;
     const unsigned int n_points=2+n_additional_points;
 
-    Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
-    const Triangulation<dim>::active_cell_iterator  endc=tria.end();
+    typename Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
+    const typename Triangulation<dim>::active_cell_iterator  endc=tria.end();
 
     // if we are to treat curved
     // boundaries, then generate a
@@ -1060,7 +1066,7 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
 	{
 	    for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	    {
-		const Triangulation<dim>::face_iterator
+		const typename Triangulation<dim>::face_iterator
 		    face = cell->face(face_no);
 
 		if (face->at_boundary())
@@ -1098,10 +1104,10 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
 		}
 		else
 		{
-		    for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
+		  for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
 		    {
-			const Triangulation<dim>::line_iterator
-			    line=face->line(l);
+		      const typename Triangulation<dim>::line_iterator
+			  line=face->line(l);
 
 			const Point<dim> &v0=line->vertex(0),
 			      &v1=line->vertex(1);
@@ -1111,7 +1117,7 @@ void GridOut::write_gnuplot (const Triangulation<3> &tria,
 			    // could be
 			    // replaced
 			    // by using
-			    // QProjector<3>::project_to_line
+			    // QProjector<dim>::project_to_line
 			    // which is
 			    // not yet
 			    // implemented
@@ -1171,9 +1177,11 @@ struct LineEntry
 
 #if deal_II_dimension==1
 
-void GridOut::write_eps (const Triangulation<1> &,
-	std::ostream &,
-	const Mapping<1> *) 
+template <int dim>
+void GridOut::write_eps (
+  const Triangulation<dim> &,
+  std::ostream &,
+  const Mapping<dim> *) const
 {
     Assert(false, ExcNotImplemented());
 }
@@ -1182,9 +1190,10 @@ void GridOut::write_eps (const Triangulation<1> &,
 #else
 
     template <int dim>
-void GridOut::write_eps (const Triangulation<dim> &tria,
-	std::ostream             &out,
-	const Mapping<dim>       *mapping) 
+void GridOut::write_eps (
+  const Triangulation<dim> &tria,
+  std::ostream             &out,
+  const Mapping<dim>       *mapping) const
 {
 
     typedef std::list<LineEntry> LineList;
@@ -1196,10 +1205,10 @@ void GridOut::write_eps (const Triangulation<dim> &tria,
     // eps_flags_1, eps_flags_2, ...
     const GridOutFlags::EpsFlagsBase
 	&eps_flags_base = (dim==2 ?
-		static_cast<GridOutFlags::EpsFlagsBase&>(eps_flags_2) :
+		static_cast<const GridOutFlags::EpsFlagsBase&>(eps_flags_2) :
 		(dim==3 ?
-		 static_cast<GridOutFlags::EpsFlagsBase&>(eps_flags_3) :
-		 *static_cast<GridOutFlags::EpsFlagsBase*>(0)));
+		 static_cast<const GridOutFlags::EpsFlagsBase&>(eps_flags_3) :
+		 *static_cast<const GridOutFlags::EpsFlagsBase*>(0)));
 
     AssertThrow (out, ExcIO());
     const unsigned int n_points = eps_flags_base.n_boundary_face_points;
@@ -1618,7 +1627,7 @@ void GridOut::write (
   const Triangulation<dim> &tria,
   std::ostream             &out,
   const OutputFormat        output_format,
-  const Mapping<dim>       *mapping)
+  const Mapping<dim>       *mapping) const
 {
   switch (output_format)
     {
@@ -1658,25 +1667,40 @@ template <int dim>
 void GridOut::write (
   const Triangulation<dim> &tria,
   std::ostream             &out,
-  const Mapping<dim>       *mapping)
+  const Mapping<dim>       *mapping) const
 {
   write(tria, out, default_format, mapping);
 }
 
+
+//TODO: Should all write functions be instantiated?
+
 // explicit instantiations
+template void GridOut::write_dx
+(const Triangulation<deal_II_dimension>&,
+ std::ostream&) const;
+template void GridOut::write_msh
+(const Triangulation<deal_II_dimension>&,
+ std::ostream&) const;
+template void GridOut::write_xfig
+(const Triangulation<deal_II_dimension>&,
+ std::ostream&,
+ const Mapping<deal_II_dimension>*) const;
+template void GridOut::write_gnuplot
+(const Triangulation<deal_II_dimension>&,
+ std::ostream&,
+ const Mapping<deal_II_dimension>*) const;
 template void GridOut::write_ucd<deal_II_dimension>
 (const Triangulation<deal_II_dimension> &,
- std::ostream &);
-#if deal_II_dimension != 1
+ std::ostream &) const;
 template void GridOut::write_eps<deal_II_dimension>
 (const Triangulation<deal_II_dimension> &,
  std::ostream &,
- const Mapping<deal_II_dimension> *);
-#endif
+ const Mapping<deal_II_dimension> *) const;
 template void GridOut::write<deal_II_dimension>
 (const Triangulation<deal_II_dimension> &,
  std::ostream &, const OutputFormat,
- const Mapping<deal_II_dimension> *);
+ const Mapping<deal_II_dimension> *) const;
 template void GridOut::write<deal_II_dimension>
 (const Triangulation<deal_II_dimension> &,
- std::ostream &, const Mapping<deal_II_dimension> *);
+ std::ostream &, const Mapping<deal_II_dimension> *) const;
