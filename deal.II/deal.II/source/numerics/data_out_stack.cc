@@ -295,72 +295,28 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions)
       Assert (patch != patches.end(), ExcInternalError());
 
 				       // first fill in the vertices of the patch
+
+				       // Patches are organized such
+				       // that the parameter direction
+				       // is the last
+				       // coordinate. Thus, vertices
+				       // are two copies of the space
+				       // patch, one at parameter-step
+				       // and one at parameter.
       switch (dim)
 	{
 	  case 1:
-						 // use the following
-						 // vertices. it
-						 // probably just
-						 // requires some
-						 // playing around
-						 // with the order of
-						 // vertices to make
-						 // sure the resulting
-						 // output is as
-						 // expected
 		patch->vertices[0] = Point<dim+1>(cell->vertex(0)(0),
 						  parameter-parameter_step);
-		patch->vertices[1] = Point<dim+1>(cell->vertex(0)(0),
-						  parameter);
-		patch->vertices[2] = Point<dim+1>(cell->vertex(1)(0),
+		patch->vertices[1] = Point<dim+1>(cell->vertex(1)(0),
 						  parameter-parameter_step);
+		patch->vertices[2] = Point<dim+1>(cell->vertex(0)(0),
+						  parameter);
 		patch->vertices[3] = Point<dim+1>(cell->vertex(1)(0),
 						  parameter);
 		break;
 		
           case 2:
-                                                 // below, when we fill the
-                                                 // data, we want to make sure
-                                                 // that the parameter
-                                                 // direction is in the
-                                                 // z-direction in the local
-                                                 // coordinate direction of
-                                                 // cells.
-                                                 //
-                                                 // we do so by some index
-                                                 // juggling: for the 3d unit
-                                                 // cell
-                                                 //
-                                                 //         7-------6        7-------6
-                                                 //        /|       |       /       /|
-                                                 //       / |       |      /       / |
-                                                 //      /  |       |     /       /  |
-                                                 //     3   |       |    3-------2   |
-                                                 //     |   4-------5    |       |   5
-                                                 //     |  /       /     |       |  /
-                                                 //     | /       /      |       | /
-                                                 //     |/       /       |       |/
-                                                 //     0-------1        0-------1
-                                                 //
-                                                 //
-                                                 // with the z-direction
-                                                 // running in direction from
-                                                 // vertex 0 to 3, we have to
-                                                 // map to this the 2d unit
-                                                 // cell to both the bottom
-                                                 // and top surfaces:
-                                                 //
-                                                 //         2-------3
-                                                 //        /       / 
-                                                 //       /       /  
-                                                 //      /       /   
-                                                 //     0-------1    
-                                                 //
-                                                 // i.e. the 3d vertex indices
-                                                 // 0, 1, ..., 7 are mapped to
-                                                 // the 2d indices 0, 1, 1, 0,
-                                                 // 2, 3, 3, 2, but with
-                                                 // different z-coordinates
 		patch->vertices[0] = Point<dim+1>(cell->vertex(0)(0),
 		    				  cell->vertex(0)(1),
 						  parameter-parameter_step);
@@ -411,9 +367,9 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions)
 		{
 		  fe_patch_values.get_function_values (dof_data[dataset].data,
 						       patch_values);
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    for (unsigned int i=0; i<n_subdivisions+1; ++i)
-		      patch->data(dataset,q*(n_subdivisions+1)+i) = patch_values[q];
+		  for (unsigned int i=0; i<n_subdivisions+1; ++i)
+		    for (unsigned int q=0; q<n_q_points; ++q)
+		      patch->data(dataset,q+n_q_points*i) = patch_values[q];
 		}
 	      else
 						 // system of components
@@ -421,10 +377,10 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions)
 		  fe_patch_values.get_function_values (dof_data[dataset].data,
 						       patch_values_system);
 		  for (unsigned int component=0; component<n_components; ++component)
-		    for (unsigned int q=0; q<n_q_points; ++q)
-		      for (unsigned int i=0; i<n_subdivisions+1; ++i)
+		    for (unsigned int i=0; i<n_subdivisions+1; ++i)
+		      for (unsigned int q=0; q<n_q_points; ++q)
 			patch->data(dataset*n_components+component,
-				    q*(n_subdivisions+1)+i)
+				    q+n_q_points*i)
 			  = patch_values_system[q](component);
 		}
 	    }
