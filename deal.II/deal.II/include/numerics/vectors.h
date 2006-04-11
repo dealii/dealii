@@ -225,11 +225,12 @@ class ConstraintMatrix;
  *   present purpose.
  *
  * <li> Computing errors:
- *   The function @p integrate_difference performs the calculation of the error
- *   between the finite element solution and a given (continuous) reference
- *   function in different norms. The integration is performed using a given
- *   quadrature formulae and assumes that the given finite element objects equals
- *   that used for the computation of the solution.
+ *   The function @p integrate_difference performs the calculation of
+ *   the error between a given (continuous) reference function and the
+ *   finite element solution in different norms. The integration is
+ *   performed using a given quadrature formulae and assumes that the
+ *   given finite element objects equals that used for the computation
+ *   of the solution.
  *
  *   The result is stored in a vector (named @p difference), where each entry
  *   equals the given norm of the difference on a cell. The order of entries
@@ -835,10 +836,10 @@ class VectorTools
 				      * Compute the error of the
 				      * finite element solution.
 				      * Integrate the difference
-				      * between a finite element
-				      * function and a reference
-				      * function, which is given as a
-				      * continuous function object.
+				      * between a reference function
+				      * which is given as a continuous
+				      * function object, and a finite
+				      * element function.
 				      *
 				      * The value of @p exponent is
 				      * used for computing $L^p$-norms
