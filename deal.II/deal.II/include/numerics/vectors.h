@@ -228,7 +228,7 @@ class ConstraintMatrix;
  *   The function @p integrate_difference performs the calculation of
  *   the error between a given (continuous) reference function and the
  *   finite element solution in different norms. The integration is
- *   performed using a given quadrature formulae and assumes that the
+ *   performed using a given quadrature formula and assumes that the
  *   given finite element objects equals that used for the computation
  *   of the solution.
  *
