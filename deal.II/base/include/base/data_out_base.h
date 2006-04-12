@@ -1246,7 +1246,15 @@ class DataOutBase
 				      * formats.
 				      */
     enum OutputFormat {
+					   /**
+					    * Use the format already
+					    * stored in the object.
+					    */
 	  default_format,
+					   /**
+					    * Do not write any output.
+					    */
+	  none,
 					   /**
 					    * Output for @ref SoftwareOpenDX.
 					    */

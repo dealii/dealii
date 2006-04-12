@@ -746,6 +746,9 @@ DataOutBase::OutputFormat
 DataOutBase::
 parse_output_format (const std::string &format_name)
 {
+  if (format_name == "none")
+    return none;
+
   if (format_name == "dx")
     return dx;
 
@@ -789,7 +792,7 @@ parse_output_format (const std::string &format_name)
 std::string
 DataOutBase::get_output_format_names ()
 {
-  return "dx|ucd|gnuplot|povray|eps|gmv|tecplot|tecplot_binary|vtk|deal.II intermediate";
+  return "none|dx|ucd|gnuplot|povray|eps|gmv|tecplot|tecplot_binary|vtk|deal.II intermediate";
 }
 
 
@@ -800,39 +803,31 @@ default_suffix (const OutputFormat output_format)
 {
   switch (output_format) 
     {
+      case none:
+	return "";
       case dx:
-	    return ".dx";
-	    
+	return ".dx";
       case ucd:
-	    return ".inp";
-	    
+	return ".inp"; 
       case gnuplot: 
-	    return ".gnuplot";
-	    
+	return ".gnuplot";
       case povray: 
-	    return ".pov";
-	    
+	return ".pov";
       case eps: 
-	    return ".eps";
-
+	return ".eps";
       case gmv:
-	    return ".gmv";
-
+	return ".gmv";
       case tecplot:
-	    return ".dat";
-	    
+	return ".dat";
       case tecplot_binary:
-	    return ".plt";
-	    
+	return ".plt";
       case vtk:
-	    return ".vtk";
-	    
+	return ".vtk"; 
       case deal_II_intermediate:
-	    return ".d2";
-	    
+	return ".d2";
       default: 
-	    Assert (false, ExcNotImplemented()); 
-	    return "";
+	Assert (false, ExcNotImplemented()); 
+	return "";
     }
 }
 
@@ -3611,48 +3606,51 @@ DataOutInterface<dim,spacedim>::write (std::ostream &out,
   
   switch (output_format) 
     {
+      case none:
+	break;
+	
       case dx:
-	    write_dx (out);
-	    break;
+	write_dx (out);
+	break;
 	    
       case ucd:
-	    write_ucd (out);
-	    break;
+	write_ucd (out);
+	break;
 	    
       case gnuplot:
-	    write_gnuplot (out);
-	    break;
+	write_gnuplot (out);
+	break;
 	    
       case povray:
-	    write_povray (out);
-	    break;
+	write_povray (out);
+	break;
 	    
       case eps:
-	    write_eps(out);
-	    break;
+	write_eps(out);
+	break;
 	    
       case gmv:
-	    write_gmv (out);
-	    break;
+	write_gmv (out);
+	break;
 	    
       case tecplot:
-	    write_tecplot (out);
-	    break;
+	write_tecplot (out);
+	break;
 	    
       case tecplot_binary:
-	    write_tecplot_binary (out);
-	    break;
+	write_tecplot_binary (out);
+	break;
 	    
       case vtk:
-	    write_vtk (out);
-	    break;
+	write_vtk (out);
+	break;
 
       case deal_II_intermediate:
-	    write_deal_II_intermediate (out);
-	    break;
+	write_deal_II_intermediate (out);
+	break;
 	    
       default:
-	    Assert (false, ExcNotImplemented());
+	Assert (false, ExcNotImplemented());
     }
 }
 
