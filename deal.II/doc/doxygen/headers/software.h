@@ -37,7 +37,7 @@
  * Express user manual. See http://www.avs.com/ for more details on
  * this software.
  *
- * *subsubsection SoftwareGMV GMV
+ * @subsubsection SoftwareGMV GMV
  *
  * Output for the General Mesh Viewer can be produced. See
  * http://www-xdiv.lanl.gov/XCM/gmv/GMVHome.html for details on GMV
