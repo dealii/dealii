@@ -63,11 +63,11 @@
  * valid keys. For example, the mapping for the mother cell of cells 1 and 2
  * on the first grid will point to cell 1 on the second grid.
  *
- * The implementation of this class is such that not only cell iterators
- * into triangulations can be mapped, but also iterators into objects of
- * type DoFHandler and MGDoFHandler. The extension to other classes
- * offering iterator functions and some minor additional requirements is
- * simple.
+ * The implementation of this class is such that not only cell
+ * iterators into triangulations can be mapped, but also iterators
+ * into objects of type DoFHandler, hp::DoFHandler and
+ * MGDoFHandler. The extension to other classes offering iterator
+ * functions and some minor additional requirements is simple.
  *
  * Note that this class could in principle be based on the C++ <tt>map<Key,Value></tt>
  * data type. Instead, it uses another data format which is more effective both
