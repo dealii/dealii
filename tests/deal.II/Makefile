@@ -46,7 +46,7 @@ tests_x = block_matrices \
 	grid_tools \
 	subdomain_ids \
 	filtered_iterator \
-	grid_in \
+	grid_in* \
 	grid_in_3d \
 	face_orientations_3d \
 	mg_dof_handler \
