@@ -75,11 +75,11 @@
  * written in many different graphics formats. See http://www.xfig.org/
  *
  *
- * @subsubsection SoftwareVTK Visualization Toolkit (VTK)
+ * @subsubsection SoftwareVTK VTK
  *
- * VTK is an open format supported by a number of visualization
- * projects such as ParaView, VisIt, or MayaVi. See
- * http://public.kitware.com/VTK/
+ * The Visualisation Toolkit VTK is an open format supported by a
+ * number of visualization projects such as ParaView, VisIt, or
+ * MayaVi. See http://public.kitware.com/VTK/
  *
  *
  * 
