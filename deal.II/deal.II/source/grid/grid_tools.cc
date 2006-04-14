@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -595,6 +595,11 @@ GridTools::find_active_cell_around_point (const Triangulation<deal_II_dimension>
 template
 DoFHandler<deal_II_dimension>::active_cell_iterator
 GridTools::find_active_cell_around_point (const DoFHandler<deal_II_dimension> &,
+                                          const Point<deal_II_dimension> &p);
+
+template
+hp::DoFHandler<deal_II_dimension>::active_cell_iterator
+GridTools::find_active_cell_around_point (const hp::DoFHandler<deal_II_dimension> &,
                                           const Point<deal_II_dimension> &p);
 
 template
