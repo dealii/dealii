@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,6 +19,7 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 
+#include <list>
 
 
 
@@ -199,7 +200,7 @@ class GridTools
                                       * type of the first parameter
                                       * may be either
                                       * Triangulation,
-                                      * DoFHandler, or
+                                      * DoFHandler, hp::DoFHandler, or
                                       * MGDoFHandler, i.e. we
                                       * can find the cell around a
                                       * point for iterators into each
@@ -349,6 +350,108 @@ class GridTools
     count_cells_with_subdomain_association (const Triangulation<dim> &triangulation,
                                             const unsigned int        subdomain);
 
+                                     /**
+                                      * Given two mesh containers
+                                      * (i.e. objects of type
+                                      * Triangulation, DoFHandler,
+                                      * hp::DoFHandler, or
+                                      * MGDoFHandler) that are based
+                                      * on the same coarse mesh, this
+                                      * function figures out a set of
+                                      * cells that are matched between
+                                      * the two meshes and where at
+                                      * most one of the meshes is more
+                                      * refined on this cell. In other
+                                      * words, it finds the smallest
+                                      * cells that are common to both
+                                      * meshes, and that together
+                                      * completely cover the domain.
+                                      *
+                                      * This function is useful, for
+                                      * example, in time-dependent or
+                                      * nonlinear application, where
+                                      * one has to integrate a
+                                      * solution defined on one mesh
+                                      * (e.g., the one from the
+                                      * previous time step or
+                                      * nonlinear iteration) against
+                                      * the shape functions of another
+                                      * mesh (the next time step, the
+                                      * next nonlinear iteration). If,
+                                      * for example, the new mesh is
+                                      * finer, then one has to obtain
+                                      * the solution on the coarse
+                                      * mesh (mesh_1) and interpolate
+                                      * it to the children of the
+                                      * corresponding cell of
+                                      * mesh_2. Conversely, if the new
+                                      * mesh is coarser, one has to
+                                      * express the coarse cell shape
+                                      * function by a linear
+                                      * combination of fine cell shape
+                                      * functions. In either case, one
+                                      * needs to loop over the finest
+                                      * cells that are common to both
+                                      * triangulations. This function
+                                      * returns a list of pairs of
+                                      * matching iterators to cells in
+                                      * the two meshes that can be
+                                      * used to this end.
+                                      *
+                                      * Note that the list of these
+                                      * iterators is not necessarily
+                                      * order, and does also not
+                                      * necessarily coincide with the
+                                      * order in which cells are
+                                      * traversed in one, or both, of
+                                      * the meshes given as arguments.
+                                      */
+    template <typename Container>
+    static
+    std::list<std::pair<typename Container::cell_iterator,
+                        typename Container::cell_iterator> >
+    get_finest_common_cells (const Container &mesh_1,
+                             const Container &mesh_2);
+
+                                     /**
+                                      * Return true if the two
+                                      * triangulations are based on
+                                      * the same coarse mesh. This is
+                                      * determined by checking whether
+                                      * they have the same number of
+                                      * cells on the coarsest level,
+                                      * and then checking that they
+                                      * have the same vertices.
+                                      *
+                                      * The two meshes may have
+                                      * different refinement histories
+                                      * beyond the coarse mesh.
+                                      */
+    template <int dim>
+    static
+    bool
+    have_same_coarse_mesh (const Triangulation<dim> &mesh_1,
+                           const Triangulation<dim> &mesh_2);
+
+                                     /**
+                                      * The same function as above,
+                                      * but working on arguments of
+                                      * type DoFHandler,
+                                      * hp::DoFHandler, or
+                                      * MGDoFHandler. This function is
+                                      * provided to allow calling
+                                      * have_same_coarse_mesh for all
+                                      * types of containers
+                                      * representing triangulations or
+                                      * the classes built on
+                                      * triangulations.
+                                      */
+    template <typename Container>
+    static
+    bool
+    have_same_coarse_mesh (const Container &mesh_1,
+                           const Container &mesh_2);
+      
                                      /**
                                       * Exception
                                       */

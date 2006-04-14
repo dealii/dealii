@@ -584,6 +584,25 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: The function <code>GridTools::get_finest_common_cells</code> can be
+       used to find those cells that are shared by two triangulations that are
+       based on the same coarse mesh. This is useful, for example, when having
+       to integrate the solution on one mesh against the shape functions on
+       another mesh, a situation that frequently happens in time-dependent but
+       also in nonlinear problems.
+       <br> 
+       (WB 2006/04/14)
+       </p>
+
+  <li> <p>
+       New: The function <code>GridTools::have_same_coarse_mesh</code> figures
+       out whether two triangulations, two DoFHandlers, etc, are built on the
+       same coarse mesh.
+       <br> 
+       (WB 2006/04/14)
+       </p>
+
+  <li> <p>
        New: Since calling <code>cell-&gt;get_dof_indices</code> is a
        fairly frequent operation (called about 7 times per cell in
        step-14, but much more often in more complicated programs), the

@@ -28,6 +28,7 @@
 
 #include <cmath>
 
+
 #if deal_II_dimension != 1
 
 template <int dim>
@@ -568,6 +569,141 @@ count_cells_with_subdomain_association (const Triangulation<dim> &triangulation,
 
 
 
+template <typename Container>
+std::list<std::pair<typename Container::cell_iterator,
+                    typename Container::cell_iterator> >
+GridTools::get_finest_common_cells (const Container &mesh_1,
+                                    const Container &mesh_2)
+{
+  Assert (have_same_coarse_mesh (mesh_1, mesh_2),
+          ExcMessage ("The two containers must be represent triangulations that "
+                      "have the same coarse meshes"));
+
+  const unsigned int dim = Container::dimension;
+
+                                   // the algorithm goes as follows:
+                                   // first, we fill a list with pairs
+                                   // of iterators common to the two
+                                   // meshes on the coarsest
+                                   // level. then we traverse the
+                                   // list; each time, we find a pair
+                                   // of iterators for which both
+                                   // correspond to non-active cells,
+                                   // we delete this item and push the
+                                   // pairs of iterators to their
+                                   // children to the back. if these
+                                   // again both correspond to
+                                   // non-active cells, we will get to
+                                   // the later on for further
+                                   // consideration
+  typedef
+    std::list<std::pair<typename Container::cell_iterator,
+                        typename Container::cell_iterator> >
+    CellList;
+  
+  CellList cell_list;
+
+                                   // first push the coarse level cells
+  typename Container::cell_iterator
+    cell_1 = mesh_1.begin(0),
+    cell_2 = mesh_2.begin(0);
+  for (; cell_1 != mesh_1.end(0); ++cell_1, ++cell_2)
+    cell_list.push_back (std::make_pair (cell_1, cell_2));
+
+                                   // then traverse list as described
+                                   // above
+  typename CellList::iterator cell_pair = cell_list.begin();
+  while (cell_pair != cell_list.end())
+    {
+                                       // if both cells in this pair
+                                       // have children, then erase
+                                       // this element and push their
+                                       // children instead
+      if (cell_pair->first->has_children()
+          &&
+          cell_pair->second->has_children())
+        {
+          for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+            cell_list.push_back (std::make_pair (cell_pair->first->child(c),
+                                                 cell_pair->second->child(c)));
+
+                                           // erasing an iterator
+                                           // keeps other iterators
+                                           // valid, so already
+                                           // advance the present
+                                           // iterator by one and then
+                                           // delete the element we've
+                                           // visited before
+          const typename CellList::iterator previous_cell_pair = cell_pair;
+          ++cell_pair;
+
+          cell_list.erase (previous_cell_pair);
+        }
+      else
+                                         // both cells are active, do
+                                         // nothing
+        ++cell_pair;
+    }
+
+                                   // just to make sure everything is
+                                   // ok, validate that all pairs have
+                                   // at least one active iterator
+  for (cell_pair = cell_list.begin(); cell_pair != cell_list.end(); ++cell_pair)
+    Assert (!cell_pair->first->has_children()
+            ||
+            !cell_pair->second->has_children(),
+            ExcInternalError());
+
+  return cell_list;
+}
+
+
+
+template <int dim>
+bool
+GridTools::have_same_coarse_mesh (const Triangulation<dim> &mesh_1,
+                                  const Triangulation<dim> &mesh_2)
+{
+                                   // make sure the two meshes have
+                                   // the same number of coarse cells
+  if (mesh_1.n_cells (0) != mesh_2.n_cells (0))
+    return false;
+
+                                   // if so, also make sure they have
+                                   // the same vertices on the cells
+                                   // of the coarse mesh
+  typename Triangulation<dim>::cell_iterator
+    cell_1 = mesh_1.begin(0),
+    cell_2 = mesh_2.begin(0),
+    endc   = mesh_1.end(0);
+  for (; cell_1!=endc; ++cell_1, ++cell_2)
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      if (cell_1->vertex(v) != cell_2->vertex(v))
+        return false;
+
+                                   // if we've gotten through all
+                                   // this, then the meshes really
+                                   // seem to have a common coarse
+                                   // mesh
+  return true;
+}
+
+
+
+template <typename Container>
+bool
+GridTools::have_same_coarse_mesh (const Container &mesh_1,
+                                  const Container &mesh_2)
+{
+  return have_same_coarse_mesh (mesh_1.get_tria(),
+                                mesh_2.get_tria());
+}
+
+
+
+
+// explicit instantiations
+
 #if deal_II_dimension != 1
 template
 double
@@ -624,3 +760,52 @@ GridTools::
 count_cells_with_subdomain_association (const Triangulation<deal_II_dimension> &,
                                         const unsigned int        );
 
+
+template
+std::list<std::pair<Triangulation<deal_II_dimension>::cell_iterator,
+                    Triangulation<deal_II_dimension>::cell_iterator> >
+GridTools::
+get_finest_common_cells (const Triangulation<deal_II_dimension> &mesh_1,
+                         const Triangulation<deal_II_dimension> &mesh_2);
+
+template
+std::list<std::pair<DoFHandler<deal_II_dimension>::cell_iterator,
+                    DoFHandler<deal_II_dimension>::cell_iterator> >
+GridTools::
+get_finest_common_cells (const DoFHandler<deal_II_dimension> &mesh_1,
+                         const DoFHandler<deal_II_dimension> &mesh_2);
+
+template
+std::list<std::pair<hp::DoFHandler<deal_II_dimension>::cell_iterator,
+                    hp::DoFHandler<deal_II_dimension>::cell_iterator> >
+GridTools::
+get_finest_common_cells (const hp::DoFHandler<deal_II_dimension> &mesh_1,
+                         const hp::DoFHandler<deal_II_dimension> &mesh_2);
+
+template
+std::list<std::pair<MGDoFHandler<deal_II_dimension>::cell_iterator,
+                    MGDoFHandler<deal_II_dimension>::cell_iterator> >
+GridTools::
+get_finest_common_cells (const MGDoFHandler<deal_II_dimension> &mesh_1,
+                         const MGDoFHandler<deal_II_dimension> &mesh_2);
+
+
+template
+bool
+GridTools::have_same_coarse_mesh (const Triangulation<deal_II_dimension> &mesh_1,
+                                  const Triangulation<deal_II_dimension> &mesh_2);
+
+template
+bool
+GridTools::have_same_coarse_mesh (const DoFHandler<deal_II_dimension> &mesh_1,
+                                  const DoFHandler<deal_II_dimension> &mesh_2);
+
+template
+bool
+GridTools::have_same_coarse_mesh (const hp::DoFHandler<deal_II_dimension> &mesh_1,
+                                  const hp::DoFHandler<deal_II_dimension> &mesh_2);
+
+template
+bool
+GridTools::have_same_coarse_mesh (const MGDoFHandler<deal_II_dimension> &mesh_1,
+                                  const MGDoFHandler<deal_II_dimension> &mesh_2);
