@@ -383,7 +383,7 @@ class DataOutBase
 
     				     /**
 				      * Flags controlling the details of
-				      * output in OpenDX format.
+				      * output in @ref SoftwareOpenDX format.
 				      *
 				      * @ingroup output
 				      */
@@ -586,7 +586,7 @@ class DataOutBase
 
     				     /**
 				      * Flags controlling the details
-				      * of output in Povray
+				      * of output in @ref SoftwarePovray
 				      * format. Several flags are
 				      * implemented, see their
 				      * respective documentation.
@@ -997,9 +997,10 @@ class DataOutBase
     };
 
     				     /**
-				      * Flags controlling the details of
-				      * output in gmv format. At
-				      * present no flags are implemented.
+				      * Flags controlling the details
+				      * of output in @ref SoftwareGMV
+				      * format. At present no flags
+				      * are implemented.
 				      *
 				      * @ingroup output
 				      */
@@ -1121,9 +1122,9 @@ class DataOutBase
 
     				     /**
 				      * Flags controlling the details
-				      * of output in VTK format. At
-				      * present no flags are
-				      * implemented. See @ref SoftwareVTK.
+				      * of output in @ref SoftwareVTK
+				      * format. At present no flags
+				      * are implemented.
 				      *
 				      * @ingroup output
 				      */
@@ -1281,7 +1282,7 @@ class DataOutBase
 					    */
 	  eps,
 					   /**
-					    * Output for GMV.
+					    * Output for @ref SoftwareGMV.
 					    */
 	  gmv,
 					   /**
@@ -1301,8 +1302,8 @@ class DataOutBase
 	  tecplot_binary,
           
 					   /**
-					    * Output in VTK format.
-					    * @ref SoftwareVTK
+					    * Output in @ref
+					    * SoftwareVTK format.
 					    */
 	  vtk,
           
@@ -1315,7 +1316,8 @@ class DataOutBase
     
 				     /**
 				      * Class for writing basic
-				      * entities in OpenDX format,
+				      * entities in @ref
+				      * SoftwareOpenDX format,
 				      * depending on the flags.
 				      */
     class DXStream
@@ -1386,8 +1388,9 @@ class DataOutBase
     
 				     /**
 				      * Class for writing basic
-				      * entities in GMV format,
-				      * depending on the flags.
+				      * entities in @ref SoftwareGMV
+				      * format, depending on the
+				      * flags.
 				      */
     class GmvStream
     {
@@ -1557,8 +1560,9 @@ class DataOutBase
     
 				     /**
 				      * Class for writing basic
-				      * entities in UCD format,
-				      * depending on the flags.
+				      * entities in UCD format for
+				      * @ref SotwareAVS, depending on
+				      * the flags.
 				      */
     class UcdStream
     {
@@ -1632,8 +1636,9 @@ class DataOutBase
     
 				     /**
 				      * Class for writing basic
-				      * entities in VTK format,
-				      * depending on the flags.
+				      * entities in @ref SoftwareVTK
+				      * format, depending on the
+				      * flags.
 				      */
     class VtkStream
     {
@@ -1767,13 +1772,8 @@ class DataOutBase
 			   std::ostream                            &out);
 
 /**
- * Write the given list of patches to the output stream in gmv format.
- *
- * The write_gmv() function writes the data in a format understood by
- * the GMV (general mesh viewer) program. This program is able to
- * generate 2d and 3d plots of almost arbitrarily many data sets,
- * along with shading, cuts through data sets and many other nifty
- * features.
+ * Write the given list of patches to the output stream in @ref
+ * SoftwareGMV format.
  *
  * Data is written in the following format: nodes are considered the
  * points of the patches. In spatial dimensions less than three,
@@ -1854,8 +1854,8 @@ class DataOutBase
 			       std::ostream                            &out);
 
 /**
- * Write the given list of patches to the output stream for the <a
- * href="http://www.povray.org">povray</a> raytracer.
+ * Write the given list of patches to the output stream for the @ref
+ * SoftwarePovray raytracer.
  *
  * Output in this format creates a povray source file, include
  * standard camera and light source definition for rendering with
@@ -1969,10 +1969,10 @@ class DataOutBase
 			   std::ostream                            &out);
 
 /**
- * Write the given list of patches to the output stream in vtk format.
+ * Write the given list of patches to the output stream in @ref
+ * SoftwareVTK format.
  *
- * This is the file format used by the Visualization Toolkit <a
- * href="http://public.kitware.com/VTK/">VTK</a>, as described in
+ * This is the file format used by @ref SoftwareVTK, as described in
  * their manual, section 14.3. It is similar to write_gmv().
  */
     template <int dim, int spacedim>
