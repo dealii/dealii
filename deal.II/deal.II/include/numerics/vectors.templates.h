@@ -273,22 +273,25 @@ VectorTools::interpolate (const DoFHandler<dim>           &dof_1,
 
 #if deal_II_dimension == 1
 
+template <class VECTOR>
 void VectorTools::project (const Mapping<1>       &,
 			   const DoFHandler<1>    &,
 			   const ConstraintMatrix &,
 			   const Quadrature<1>    &,
 			   const Function<1>      &,
-			   Vector<double>         &,
+			   VECTOR                 &,
 			   const bool              ,
 			   const Quadrature<0>    &,
 			   const bool              )
 {
-				   // this function should easily be implemented
-				   // using the template below. However some
-				   // changes have to be made since faces don't
-				   // exist in 1D. Maybe integrate the creation of
-				   // zero boundary values into the
-				   // project_boundary_values function?
+				   // this function should easily be
+				   // implemented using the template
+				   // below. However some changes have
+				   // to be made since faces don't
+				   // exist in 1D. Maybe integrate the
+				   // creation of zero boundary values
+				   // into the project_boundary_values
+				   // function?
   Assert (false, ExcNotImplemented());
 }
 
@@ -296,19 +299,22 @@ void VectorTools::project (const Mapping<1>       &,
 #endif
 
 
-template <int dim>
+template <int dim, class VECTOR>
 void VectorTools::project (const Mapping<dim>       &mapping,
 			   const DoFHandler<dim>    &dof,
 			   const ConstraintMatrix   &constraints,
 			   const Quadrature<dim>    &quadrature,
 			   const Function<dim>      &function,
-			   Vector<double>           &vec,
+			   VECTOR                   &vec_result,
 			   const bool                enforce_zero_boundary,
 			   const Quadrature<dim-1>  &q_boundary,
 			   const bool                project_to_boundary_first)
 {
   Assert (dof.get_fe().n_components() == function.n_components,
 	  ExcInvalidFE());
+
+  Assert (vec_result.size() == dof.n_dofs(),
+          ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
   
   const FiniteElement<dim> &fe = dof.get_fe();
 
@@ -377,7 +383,7 @@ void VectorTools::project (const Mapping<dim>       &mapping,
 
 
 				   // set up mass matrix and right hand side
-  vec.reinit (dof.n_dofs());
+  Vector<double> vec (dof.n_dofs());
   SparsityPattern sparsity(dof.n_dofs(),
 			   dof.n_dofs(),
 			   dof.max_couplings_between_dofs());
@@ -409,15 +415,24 @@ void VectorTools::project (const Mapping<dim>       &mapping,
   
 				   // distribute solution
   constraints.distribute (vec);
+
+                                   // copy vec into vec_result. we
+                                   // can't use ve_result itself
+                                   // above, since it may be of
+                                   // another type than Vector<double>
+                                   // and that wouldn't necessarily go
+                                   // together with the matrix and
+                                   // other functions
+  std::copy (vec.begin(), vec.end(), vec_result.begin());
 }
 
 
-template <int dim>
+template <int dim, class VECTOR>
 void VectorTools::project (const DoFHandler<dim>    &dof,
 			   const ConstraintMatrix   &constraints,
 			   const Quadrature<dim>    &quadrature,
 			   const Function<dim>      &function,
-			   Vector<double>           &vec,
+			   VECTOR                   &vec,
 			   const bool                enforce_zero_boundary,
 			   const Quadrature<dim-1>  &q_boundary,
 			   const bool                project_to_boundary_first)

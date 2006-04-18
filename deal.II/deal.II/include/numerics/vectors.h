@@ -25,7 +25,7 @@ template <int dim> class Point;
 template <int dim> class Function;
 template <int dim> class FunctionMap;
 template <int dim> class Quadrature;
-template <int dim> class QGauss2;
+template <int dim> class QGauss;
 
 template <typename number> class Vector;
 template <typename number> class FullMatrix;
@@ -491,15 +491,15 @@ class VectorTools
 				      * See the general documentation of this
 				      * class for further information.
 				      */
-    template <int dim>
+    template <int dim, class VECTOR>
     static void project (const Mapping<dim>       &mapping,
 			 const DoFHandler<dim>    &dof,
 			 const ConstraintMatrix   &constraints,
 			 const Quadrature<dim>    &quadrature,
 			 const Function<dim>      &function,
-			 Vector<double>           &vec,
+			 VECTOR                   &vec,
 			 const bool                enforce_zero_boundary = false,
-			 const Quadrature<dim-1>  &q_boundary = QGauss2<dim-1>(),
+			 const Quadrature<dim-1>  &q_boundary = QGauss<dim-1>(2),
 			 const bool                project_to_boundary_first = false);
 
 				     /**
@@ -512,12 +512,13 @@ class VectorTools
 				      * quadrature formula is an invalid
 				      * object since it makes no sense in 1d.
 				      */
+    template <class VECTOR>
     static void project (const Mapping<1>         &mapping,
 			 const DoFHandler<1>      &dof,
 			 const ConstraintMatrix   &constraints,
 			 const Quadrature<1>      &quadrature,
 			 const Function<1>        &function,
-			 Vector<double>           &vec,
+			 VECTOR                   &vec,
 			 const bool                enforce_zero_boundary = false,
 			 const Quadrature<0>      &q_boundary = *invalid_face_quadrature,
 			 const bool                project_to_boundary_first = false);
@@ -527,14 +528,14 @@ class VectorTools
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
-    template <int dim>
+    template <int dim, class VECTOR>
     static void project (const DoFHandler<dim>    &dof,
 			 const ConstraintMatrix   &constraints,
 			 const Quadrature<dim>    &quadrature,
 			 const Function<dim>      &function,
-			 Vector<double>           &vec,
+			 VECTOR                   &vec,
 			 const bool                enforce_zero_boundary = false,
-			 const Quadrature<dim-1>  &q_boundary = QGauss2<dim-1>(),
+			 const Quadrature<dim-1>  &q_boundary = QGauss<dim-1>(2),
 			 const bool                project_to_boundary_first = false);
 
 				     /**

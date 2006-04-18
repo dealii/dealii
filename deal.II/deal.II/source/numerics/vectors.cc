@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -88,16 +88,6 @@ namespace
 #include "vectors.instance.h"
 #undef VEC
 
-template
-void VectorTools::project<deal_II_dimension>
-(const DoFHandler<deal_II_dimension>   &,
- const ConstraintMatrix                &,
- const Quadrature<deal_II_dimension>   &,
- const Function<deal_II_dimension>     &,
- Vector<double>                        &,
- const bool,
- const Quadrature<deal_II_dimension-1> &,
- const bool);
 
 template
 void VectorTools::create_right_hand_side<deal_II_dimension>
@@ -193,17 +183,6 @@ void VectorTools::interpolate_boundary_values<deal_II_dimension>
  std::map<unsigned int,double>       &,
  const std::vector<bool>    &);
 
-template
-void VectorTools::project<deal_II_dimension>
-(const Mapping<deal_II_dimension>      &,
- const DoFHandler<deal_II_dimension>   &,
- const ConstraintMatrix                &,
- const Quadrature<deal_II_dimension>   &,
- const Function<deal_II_dimension>     &,
- Vector<double>                        &,
- const bool,
- const Quadrature<deal_II_dimension-1> &,
- const bool);
 #endif
 
 

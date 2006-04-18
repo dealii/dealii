@@ -53,7 +53,8 @@ tests_x = block_matrices \
 	subcelldata \
 	interpolate_boundary_values_* \
 	have_same_coarse_mesh_* \
-	get_finest_common_cells_* 
+	get_finest_common_cells_* \
+	project_*
 
 # from above list of regular expressions, generate the real set of
 # tests

@@ -114,3 +114,26 @@ double VectorTools::compute_mean_value<deal_II_dimension>
  const Quadrature<deal_II_dimension>&,
  const VEC&,
  const unsigned int);
+
+template
+void VectorTools::project
+(const Mapping<deal_II_dimension>      &,
+ const DoFHandler<deal_II_dimension>   &,
+ const ConstraintMatrix                &,
+ const Quadrature<deal_II_dimension>   &,
+ const Function<deal_II_dimension>     &,
+ VEC                                   &,
+ const bool,
+ const Quadrature<deal_II_dimension-1> &,
+ const bool);
+
+template
+void VectorTools::project
+(const DoFHandler<deal_II_dimension>   &,
+ const ConstraintMatrix                &,
+ const Quadrature<deal_II_dimension>   &,
+ const Function<deal_II_dimension>     &,
+ VEC                                   &,
+ const bool,
+ const Quadrature<deal_II_dimension-1> &,
+ const bool);
