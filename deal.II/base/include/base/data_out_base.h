@@ -1561,7 +1561,7 @@ class DataOutBase
 				     /**
 				      * Class for writing basic
 				      * entities in UCD format for
-				      * @ref SotwareAVS, depending on
+				      * @ref SoftwareAVS, depending on
 				      * the flags.
 				      */
     class UcdStream
