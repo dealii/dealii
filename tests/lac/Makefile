@@ -27,7 +27,8 @@ tests_x = vector-vector \
 	block_vector block_vector_* block_matrices \
 	matrix_lib matrix_out \
 	solver eigen \
-	sparse_ilu sparse_ilu_t lapack lapack_fill block_minres
+	sparse_ilu sparse_ilu_t lapack lapack_fill block_minres \
+	identity_matrix*
 
 
 # from above list of regular expressions, generate the real set of
