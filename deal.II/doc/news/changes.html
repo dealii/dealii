@@ -442,6 +442,19 @@ inconvenience this causes.
 
 <ol>
   
+  <li> <p> New: There is a new class <code
+       class="class">IdentityMatrix</code> that represents an
+       efficient version of the matrix with ones on the diagonal and
+       zeros everywhere else. The main usefulness of this matrix lies
+       in the fact that most other important matrix classes have
+       assignment operators and copy constructors that allow to
+       conveniently fill a (sparse, full) matrix with the identity
+       matrix.
+       <br> 
+       (WB 2006/04/24)
+       </p>
+
+  
   <li> <p> New: There are now assignment operators from <code
        class="class">BlockVector</code> to <code
        class="class">Vector</code> and back.
