@@ -31,7 +31,20 @@ template <typename number> class SparseMatrix;
  * No preconditioning.  This class helps you, if you want to use a
  * linear solver without preconditioning. All solvers in LAC require a
  * preconditioner. Therefore, you must use the identity provided here
- * to avoid preconditioning.
+ * to avoid preconditioning. It can be used in the following way:
+ *
+ @verbatim
+  SolverControl           solver_control (1000, 1e-12);
+  SolverCG<>              cg (solver_control);
+  cg.solve (system_matrix, solution, system_rhs,
+	    PreconditionIdentity());
+ @endverbatim
+ *
+ * See the @ref step_3 "step-3" tutorial program for an example and
+ * additional explanations.
+ *
+ * Alternatively, the IdentityMatrix class can be used to precondition
+ * in this way.
  *
  * @author Guido Kanschat, 1999
  */
