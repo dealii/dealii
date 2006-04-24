@@ -589,8 +589,23 @@ class SparseMatrix : public virtual Subscriptor
     virtual ~SparseMatrix ();
 
 				     /** 
-				      * Pseudo operator only copying
-				      * empty objects.
+				      * Copy operator. Since copying
+				      * entire sparse matrices is a
+				      * very expensive operation, we
+				      * disallow doing so except for
+				      * the special case of empty
+				      * matrices of size zero. This
+				      * doesn't seem particularly
+				      * useful, but is exactly what
+				      * one needs if one wanted to
+				      * have a
+				      * <code>std::vector@<SparseMatrix@<double@>
+				      * @></code>: in that case, one
+				      * can create a vector (which
+				      * needs the ability to copy
+				      * objects) of empty matrices
+				      * that are then later filled
+				      * with something useful.
 				      */
     SparseMatrix<number>& operator = (const SparseMatrix<number> &);
 
