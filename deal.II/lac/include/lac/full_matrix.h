@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/table.h>
 #include <lac/exceptions.h>
+#include <lac/identity_matrix.h>
 
 #include <vector>
 
@@ -246,6 +247,20 @@ class FullMatrix : public Table<2,number>
 		const number* entries);
 
 				     /**
+				      * Construct a full matrix that
+				      * equals the identity matrix of
+				      * the size of the
+				      * argument. Using this
+				      * constructor, one can easily
+				      * create an identity matrix of
+				      * size <code>n</code> by saying
+				      * @verbatim
+				      * FullMatrix<double> M(IdentityMatrix(n));
+				      * @endverbatim
+				      */
+    explicit FullMatrix (const IdentityMatrix &id);
+    
+				     /**
 				      * Assignment operator.
 				      */
     FullMatrix<number> &
@@ -271,6 +286,20 @@ class FullMatrix : public Table<2,number>
     FullMatrix<number> &
     operator = (const double d);
 
+				     /**
+				      * Copy operator to create a full
+				      * matrix that equals the
+				      * identity matrix of the size of
+				      * the argument. This way, one can easily
+				      * create an identity matrix of
+				      * size <code>n</code> by saying
+				      * @verbatim
+				      *   M = IdentityMatrix(n);
+				      * @endverbatim
+				      */
+    FullMatrix<number> &
+    operator = (const IdentityMatrix &id);
+    
                                      /**
 				      * Assignment from different
 				      * matrix classes. This

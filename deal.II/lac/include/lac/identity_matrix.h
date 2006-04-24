@@ -42,9 +42,10 @@
  @endverbatim
  *
  * This creates a $10\times 10$ matrix with ones on the diagonal and
- * zeros everywhere else. All matrix types have conversion
- * constructors and can therefore be filled rather easily with
- * identity matrices.
+ * zeros everywhere else. Most matrix types, in particular FullMatrix
+ * and SparseMatrix, have conversion constructors and assignment
+ * operators for IdentityMatrix, and can therefore be filled rather
+ * easily with identity matrices.
  *
  *
  * <h4>Preconditioning</h4>

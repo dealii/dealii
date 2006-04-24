@@ -94,6 +94,24 @@ SparseMatrix<number>::SparseMatrix (const SparsityPattern &c)
 
 
 template <typename number>
+SparseMatrix<number>::SparseMatrix (const SparsityPattern &c,
+				    const IdentityMatrix  &id)
+                :
+		cols(0),
+		val(0),
+		max_len(0)
+{
+  Assert (c.n_rows() == id.m(), ExcDimensionMismatch (c.n_rows(), id.m()));
+  Assert (c.n_cols() == id.n(), ExcDimensionMismatch (c.n_cols(), id.n()));
+
+  reinit (c);
+  for (unsigned int i=0; i<n(); ++i)
+    this->set(i,i,1.);
+}
+
+
+
+template <typename number>
 SparseMatrix<number>::~SparseMatrix ()
 {
   cols = 0;
@@ -115,6 +133,24 @@ SparseMatrix<number>::operator = (const double d)
 
   if (val)
     std::fill_n (&val[0], cols->n_nonzero_elements(), 0.);
+
+  return *this;
+}
+
+
+
+template <typename number>
+SparseMatrix<number> &
+SparseMatrix<number>::operator= (const IdentityMatrix  &id)
+{
+  Assert (cols->n_rows() == id.m(),
+	  ExcDimensionMismatch (cols->n_rows(), id.m()));
+  Assert (cols->n_cols() == id.n(),
+	  ExcDimensionMismatch (cols->n_cols(), id.n()));
+
+  *this = 0;
+  for (unsigned int i=0; i<n(); ++i)
+    this->set(i,i,1.);
 
   return *this;
 }

@@ -18,6 +18,7 @@
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
 #include <lac/sparsity_pattern.h>
+#include <lac/identity_matrix.h>
 #include <lac/exceptions.h>
 
 template<typename number> class Vector;
@@ -564,6 +565,21 @@ class SparseMatrix : public virtual Subscriptor
 				      * generated then.
 				      */
     explicit SparseMatrix (const SparsityPattern &sparsity);
+
+				     /**
+				      * Copy constructor: initialize
+				      * the matrix with the identity
+				      * matrix. This constructor will
+				      * throw an exception if the
+				      * sizes of the sparsity pattern
+				      * and the identity matrix do not
+				      * coincide, or if the sparsity
+				      * pattern does not provide for
+				      * nonzero entries on the entire
+				      * diagonal.
+				      */
+    SparseMatrix (const SparsityPattern &sparsity,
+		  const IdentityMatrix  &id);
     
 				     /**
 				      * Destructor. Free all memory, but do not
@@ -578,6 +594,21 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     SparseMatrix<number>& operator = (const SparseMatrix<number> &);
 
+				     /**
+				      * Copy operator: initialize
+				      * the matrix with the identity
+				      * matrix. This operator will
+				      * throw an exception if the
+				      * sizes of the sparsity pattern
+				      * and the identity matrix do not
+				      * coincide, or if the sparsity
+				      * pattern does not provide for
+				      * nonzero entries on the entire
+				      * diagonal.
+				      */
+    SparseMatrix<number> &
+    operator= (const IdentityMatrix  &id);
+    
                                      /**
                                       * This operator assigns a scalar to
                                       * a matrix. Since this does usually

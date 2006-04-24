@@ -57,6 +57,19 @@ FullMatrix<number>::FullMatrix (const FullMatrix &m)
 {}
 
 
+
+template <typename number>
+FullMatrix<number>::FullMatrix (const IdentityMatrix &id)
+                :
+		Table<2,number> (id.m(), id.n())
+{
+  for (unsigned int i=0; i<id.m(); ++i)
+    (*this)(i,i) = 1;
+}
+
+
+
+
 template <typename number>
 FullMatrix<number>&
 FullMatrix<number>::operator = (const FullMatrix<number>& M)
@@ -74,6 +87,20 @@ FullMatrix<number>::operator = (const FullMatrix<number2>& M)
   TableBase<2,number>::operator=(M);
   return *this;
 }
+
+
+
+template <typename number>
+FullMatrix<number>&
+FullMatrix<number>::operator = (const IdentityMatrix &id)
+{
+  reinit (id.m(), id.n());
+  for (unsigned int i=0; i<id.m(); ++i)
+    (*this)(i,i) = 1.;
+
+  return *this;
+}
+
 
 
 template <typename number>
