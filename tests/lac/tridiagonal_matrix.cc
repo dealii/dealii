@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -70,4 +70,5 @@ int main()
   deallog.threshold_double(1.e-10);
   
   check_vmult<double>();
+  check_vmult<float>();
 }
