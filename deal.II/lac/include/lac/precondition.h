@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,6 +53,7 @@ class PreconditionIdentity : public Subscriptor
 				      */
     template<class VECTOR>
     void Tvmult (VECTOR&, const VECTOR&) const;
+
 				     /**
 				      * Apply preconditioner, adding to the previous value.
 				      */
