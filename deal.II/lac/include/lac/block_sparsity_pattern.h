@@ -294,6 +294,14 @@ class BlockSparsityPatternBase : public Subscriptor
 				      * position may be non-zero.
 				      */
     bool exists (const unsigned int i, const unsigned int j) const;
+
+				     /**
+				      * Number of entries in a
+				      * specific row, added up over
+				      * all the blocks that form this
+				      * row.
+				      */
+    unsigned int row_length (const unsigned int row) const;
     
 				     /**
 				      * Return the number of nonzero
@@ -611,6 +619,25 @@ BlockSparsityPatternBase<SparsityPatternBase>::exists (const unsigned int i,
     col_index = column_indices.global_to_local (j);
   return sub_objects[row_index.first][col_index.first]->exists (row_index.second,
 								col_index.second);
+}
+
+
+
+template <class SparsityPatternBase>
+inline
+unsigned int
+BlockSparsityPatternBase<SparsityPatternBase>::
+row_length (const unsigned int row) const
+{
+  const std::pair<unsigned int,unsigned int>
+    row_index = row_indices.global_to_local (row);
+
+  unsigned int c = 0;
+  
+  for (unsigned int b=0; b<rows; ++b)
+    c += sub_objects[row_index.first][b]->row_length (row_index.second);
+
+  return c;
 }
 
 
