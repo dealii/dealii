@@ -1,4 +1,4 @@
-//----------------------------  find_cell_4.cc  ---------------------------
+//----------------------------  find_cell_5.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,11 +9,12 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  find_cell_4.cc  ---------------------------
+//----------------------------  find_cell_5.cc  ---------------------------
 
 
 // take a 3d mesh and check that we can find an arbitrary point's cell
-// in it
+// in it. this fails at the time of writing this test, since the point
+// is sitting right on the interface between cells...
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -48,7 +49,7 @@ void check (Triangulation<3> &tria)
 
 int main () 
 {
-  std::ofstream logfile("find_cell_4/output");
+  std::ofstream logfile("find_cell_5/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
