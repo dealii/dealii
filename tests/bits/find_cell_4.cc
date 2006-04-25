@@ -1,4 +1,4 @@
-//----------------------------  find_cell_1.cc  ---------------------------
+//----------------------------  find_cell_4.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  find_cell_1.cc  ---------------------------
+//----------------------------  find_cell_4.cc  ---------------------------
 
 
 // take a 3d mesh and check that we can find an arbitrary point's cell
@@ -48,15 +48,23 @@ void check (Triangulation<3> &tria)
 
 int main () 
 {
-  std::ofstream logfile("find_cell_1/output");
+  std::ofstream logfile("find_cell_4/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  Triangulation<3> coarse_grid;
-  GridGenerator::hyper_cube (coarse_grid);
-  coarse_grid.refine_global (3);
-  check (coarse_grid);
+  try
+    {
+      Triangulation<3> coarse_grid;
+      GridGenerator::hyper_cube (coarse_grid);
+      coarse_grid.refine_global (3);
+      check (coarse_grid);
+    }
+  catch (...)
+    {
+				       // we shouldn't get here...
+      deallog << "Caught an error..." << std::endl;
+    }
 }
 
   
