@@ -13,7 +13,8 @@
 
 
 // take a 3d mesh and check that we can find an arbitrary point's cell
-// in it
+// in it. this presently fails since the point sits right on the edge
+// of the domain, but for different reasons that find_cell_5
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -60,10 +61,11 @@ int main ()
       coarse_grid.refine_global (3);
       check (coarse_grid);
     }
-  catch (...)
+  catch (const std::exception &exc)
     {
 				       // we shouldn't get here...
       deallog << "Caught an error..." << std::endl;
+      deallog << exc.what() << std::endl;
     }
 }
 
