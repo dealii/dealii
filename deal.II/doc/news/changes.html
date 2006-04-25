@@ -442,6 +442,14 @@ inconvenience this causes.
 
 <ol>
   
+  <li> <p> Improved: The <code
+       class="class">SparseDirectUMFPACK</code> solver can now also be
+       used with sparse matrices with elements of type float, as well
+       as with block matrices with types float and double.
+       <br> 
+       (WB 2006/04/25)
+       </p>
+
   <li> <p> New: The function <code
        class="member">BlockSparsityPattern::row_length</code> adds up
        the row lengths of the individual blocks of a block matrix for
@@ -449,7 +457,6 @@ inconvenience this causes.
        <br> 
        (WB 2006/04/25)
        </p>
-
   
   <li> <p> New: There is a new class <code
        class="class">IdentityMatrix</code> that represents an

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 #include <base/memory_consumption.h>
 #include <base/thread_management.h>
 #include <lac/sparse_matrix.h>
+#include <lac/block_sparse_matrix.h>
 #include <lac/vector.h>
 
 #include <iostream>
@@ -1679,9 +1680,10 @@ SparseDirectUMFPACK::clear ()
 
 
 
+template <class Matrix>
 void
 SparseDirectUMFPACK::
-factorize (const SparseMatrix<double> &matrix)
+factorize (const Matrix &matrix)
 {
   Assert (matrix.m() == matrix.n(), ExcNotQuadratic())
   
@@ -1729,16 +1731,37 @@ factorize (const SparseMatrix<double> &matrix)
   Assert (static_cast<unsigned int>(Ap.back()) == Ai.size(),
           ExcInternalError());
   
-                                   // then copy over matrix elements
+                                   // then copy over matrix
+                                   // elements. note that for sparse
+                                   // matrices, iterators are sorted
+                                   // so that they traverse each row
+                                   // from start to end before moving
+                                   // on to the next row. however,
+                                   // this isn't true for block
+                                   // matrices, so we have to do a bit
+                                   // of book keeping
   {
-    unsigned int index = 0;
-    for (SparseMatrix<double>::const_iterator p=matrix.begin();
-         p!=matrix.end(); ++p, ++index)
+				     // have an array that for each
+				     // row points to the first entry
+				     // not yet written to
+    std::vector<int> row_pointers = Ap;
+    
+    for (typename Matrix::const_iterator p=matrix.begin();
+         p!=matrix.end(); ++p)
       {
-        Ai[index] = p->column();
-        Ax[index] = p->value();
+					 // write entry into the first
+					 // free one for this row
+        Ai[row_pointers[p->row()]] = p->column();
+        Ax[row_pointers[p->row()]] = p->value();
+
+					 // then move pointer ahead
+	++row_pointers[p->row()];
       }
-    Assert (index == Ai.size(), ExcInternalError());
+
+				     // at the end, we should have
+				     // written all rows completely
+    for (unsigned int i=0; i<Ap.size()-1; ++i)
+      Assert (row_pointers[i] == Ap[i+1], ExcInternalError());
   }
 
                                    // finally do the copying around of entries
@@ -1784,8 +1807,6 @@ factorize (const SparseMatrix<double> &matrix)
           }
       }
   }
-  
-  
         
   int status;
 
@@ -1835,9 +1856,10 @@ SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution) const
 
 
 
+template <class Matrix>
 void
-SparseDirectUMFPACK::solve (const SparseMatrix<double> &matrix,
-                            Vector<double>             &rhs_and_solution)
+SparseDirectUMFPACK::solve (const Matrix   &matrix,
+                            Vector<double> &rhs_and_solution)
 {
   factorize (matrix);
   solve (rhs_and_solution);
@@ -1860,7 +1882,8 @@ SparseDirectUMFPACK::clear ()
 {}
 
 
-void SparseDirectUMFPACK::factorize (const SparseMatrix<double> &)
+template <class Matrix>
+void SparseDirectUMFPACK::factorize (const Matrix &)
 {
   Assert(false, ExcNeedsUMFPACK());
 }
@@ -1873,9 +1896,10 @@ SparseDirectUMFPACK::solve (Vector<double> &) const
 }
 
 
+template <class Matrix>
 void
-SparseDirectUMFPACK::solve (const SparseMatrix<double> &,
-                            Vector<double>             &)
+SparseDirectUMFPACK::solve (const Matrix   &,
+                            Vector<double> &)
 {
   Assert(false, ExcNeedsUMFPACK());
 }
@@ -1884,8 +1908,9 @@ SparseDirectUMFPACK::solve (const SparseMatrix<double> &,
 #endif
 
 
+template <class Matrix>
 void
-SparseDirectUMFPACK::initialize (const SparseMatrix<double>& M,
+SparseDirectUMFPACK::initialize (const Matrix        &M,
 				 const AdditionalData)
 {
   this->factorize(M);
@@ -1929,22 +1954,34 @@ SparseDirectUMFPACK::Tvmult_add (
 }
 
 
-// explicit instantiations
+// explicit instantiations for SparseMatrixMA27 
 template
-void
-SparseDirectMA27::factorize (const SparseMatrix<double> &matrix);
+void SparseDirectMA27::factorize (const SparseMatrix<double> &matrix);
 
 template
-void
-SparseDirectMA27::factorize (const SparseMatrix<float> &matrix);
+void SparseDirectMA27::factorize (const SparseMatrix<float> &matrix);
 
 template
-void
-SparseDirectMA27::solve (const SparseMatrix<double> &matrix,
+void SparseDirectMA27::solve (const SparseMatrix<double> &matrix,
 			 Vector<double>             &rhs_and_solution);
 
 template
-void
-SparseDirectMA27::solve (const SparseMatrix<float>  &matrix,
-			 Vector<double>             &rhs_and_solution);
+void SparseDirectMA27::solve (const SparseMatrix<float>  &matrix,
+			      Vector<double>             &rhs_and_solution);
 
+
+// explicit instantiations for SparseMatrixUMFPACK
+#define InstantiateUMFPACK(MATRIX) \
+  template    \
+  void SparseDirectUMFPACK::factorize (const MATRIX &);    \
+  template    \
+  void SparseDirectUMFPACK::solve (const MATRIX   &,    \
+	  			   Vector<double> &);    \
+  template    \
+  void SparseDirectUMFPACK::initialize (const MATRIX &,    \
+				        const AdditionalData)
+
+InstantiateUMFPACK(SparseMatrix<double>);
+InstantiateUMFPACK(SparseMatrix<float>);
+InstantiateUMFPACK(BlockSparseMatrix<double>);
+InstantiateUMFPACK(BlockSparseMatrix<float>);

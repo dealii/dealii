@@ -1027,7 +1027,13 @@ class SparseDirectMA47 : public Subscriptor
  * from the deal.II ReadMe file. UMFPACK is included courtesy of its author,
  * <a href="http://www.cise.ufl.edu/~davis/">Timothy A. Davis</a>.
  *
- * 
+ *
+ * <h4>Instantiations</h4>
+ *
+ * There are instantiations of this class for SparseMatrix<double>,
+ * SparseMatrix<float>, BlockSparseMatrix<double>, and
+ * BlockSparseMatrix<float>.
+ *
  * @ingroup Solvers Preconditioners
  * @see @ref SoftwareUMFPACK
  *
@@ -1093,14 +1099,16 @@ class SparseDirectUMFPACK : public Subscriptor
 				      * this operation, even if subsequent
 				      * solves are required.
 				      */
-    void factorize (const SparseMatrix<double> &matrix);
+    template <class Matrix>
+    void factorize (const Matrix &matrix);
 
 				     /**
 				      * Initialize memory and call
 				      * SparseDirectUMFPACK::factorize.
 				      */
-    void initialize(const SparseMatrix<double> &matrix,
-		    const AdditionalData = AdditionalData());
+    template <class Matrix>
+    void initialize(const Matrix &matrix,
+		    const AdditionalData additional_data = AdditionalData());
     
 				     /**
 				      * Preconditioner interface
@@ -1168,8 +1176,9 @@ class SparseDirectUMFPACK : public Subscriptor
 				      * in place of the right hand
 				      * side vector.
 				      */
-    void solve (const SparseMatrix<double> &matrix,
-		Vector<double>             &rhs_and_solution);
+    template <class Matrix>
+    void solve (const Matrix   &matrix,
+		Vector<double> &rhs_and_solution);
 
                                      /**
                                       * One of the UMFPack routines
