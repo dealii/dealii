@@ -222,10 +222,12 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * Common template for access to the data on a line, quad, hex. Note
  * that this class is only here for documentation purposes, the actual
  * implementation of functions is in classes with specialized template
- * parameters. In this class here, we only collect all functions which
- * are in the specialized classes for simpler reference. Some
- * functions, however, might be missing in the specialized classes,
- * such as @p quad in the accessors for lines and quads, etc.
+ * parameters (see @ref DoFObjectAccessor<1,DH>, @ref
+ * DoFObjectAccessor<2,DH>, @ref DoFObjectAccessor<3,DH>). In this
+ * class here, we only collect all functions which are in the
+ * specialized classes for simpler reference. Some functions, however,
+ * might be missing in the specialized classes, such as @p quad in the
+ * accessors for lines and quads, etc.
  *
  * This class follows mainly the route laid out by the accessor library
  * declared in the triangulation library (TriaAccessor). It enables
@@ -250,7 +252,7 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * documentation directory.
  *
  * @ingroup dofs
- * @ingroup Accessors 
+ * @ingroup Accessors
  * @author Wolfgang Bangerth, 1998; Guido Kanschat, 1999
  */
 template <int celldim, class DH>
@@ -497,6 +499,7 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
 /**
  * Closure class.
  * @ingroup dofs
+ * @ingroup Accessors
  */
 template <class DH>
 class DoFObjectAccessor<0, DH> : public DoFAccessor<DH>,
@@ -552,6 +555,7 @@ class DoFObjectAccessor<0, DH> : public DoFAccessor<DH>,
  * like an ordinary line in all other cases.
  *
  * @ingroup dofs
+ * @ingroup Accessors
  * @author Wolfgang Bangerth, 1998
  */
 template <class DH>
@@ -782,6 +786,7 @@ class DoFObjectAccessor<1, DH> :
  * Grant access to the degrees of freedom located on quads.
  *
  * @ingroup dofs
+ * @ingroup Accessors
  */
 template <class DH>
 class DoFObjectAccessor<2, DH> :
@@ -1020,6 +1025,7 @@ class DoFObjectAccessor<2, DH> :
  * Grant access to the degrees of freedom located on hexes.
  *
  * @ingroup dofs
+ * @ingroup Accessors
  */
 template <class DH>
 class DoFObjectAccessor<3, DH> :
@@ -1278,6 +1284,7 @@ class DoFObjectAccessor<3, DH> :
  * DoFCellAccessor class as well.
  *
  * @ingroup dofs
+ * @ingroup Accessors
  * @author Wolfgang Bangerth, 1998
  */
 template <class DH>
