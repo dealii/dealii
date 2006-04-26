@@ -1000,8 +1000,27 @@ namespace hp
                                         * Array to store the indices
                                         * for degrees of freedom
                                         * located at vertices.
+					*
+					* The format used here, in the
+					* form of a linked list, is
+					* the same as used for the
+					* arrays used in the
+					* hp::DoFLevel
+					* hierarchy. Starting indices
+					* into this array are provided
+					* by the vertex_dofs_offsets
+					* field.
                                         */
       std::vector<unsigned int>      vertex_dofs;
+
+				       /**
+					* For each vertex in the
+					* triangulation, store the
+					* offset within the
+					* vertex_dofs array where the
+					* dofs for this vertex start.
+					*/
+      std::vector<unsigned int>      vertex_dofs_offsets;
 
                                        /**
                                         * Array to store the
