@@ -1096,6 +1096,10 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::dof_index (const unsigned int i) const
   Assert (i<this->get_fe().dofs_per_line,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
 
+				   // for lines in 1d, we only have to
+				   // take care of the offset, no
+				   // linked lists or whatever (see
+				   // hp::DoFLevels)
   const unsigned int offset = this->dof_handler->levels[this->present_level]
       ->dof_line_index_offset[this->present_index];
   Assert (offset != this->dof_handler->invalid_dof_index,
@@ -1106,6 +1110,7 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::dof_index (const unsigned int i) const
   
   return this->dof_handler->levels[this->present_level]->line_dofs[offset+i];
 }
+
 
 
 template <>
@@ -1143,6 +1148,7 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::dof_index (const unsigned int i) const
 
   return this->dof_handler->levels[this->present_level]->line_dofs[offset+i];
 }
+
 
 
 template <>
@@ -1202,6 +1208,10 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_index (const unsigned int i,
   Assert (i<this->get_fe().dofs_per_line,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
 
+				   // for lines in 1d, we only have to
+				   // take care of the offset, no
+				   // linked lists or whatever (see
+				   // hp::DoFLevels)
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_line_index_offset[this->present_index];
   Assert (offset != this->dof_handler->invalid_dof_index,
@@ -1212,6 +1222,7 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_index (const unsigned int i,
 
   this->dof_handler->levels[this->present_level]->line_dofs[offset+i] = index;
 }
+
 
 
 template <>
@@ -1247,6 +1258,7 @@ DoFObjectAccessor<1, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
 
   this->dof_handler->levels[this->present_level]->line_dofs[offset+i] = index;
 }
+
 
 
 template <>
@@ -1297,7 +1309,10 @@ inline
 const FiniteElement<2> &
 DoFObjectAccessor<1,hp::DoFHandler<2> >::get_fe () const
 {
-  return (*dof_handler->finite_elements)[active_fe_index ()];
+  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
+			     "associated with active_fe_indices and corresponding "
+			     "finite element objects"));
+  return (*dof_handler->finite_elements)[0];
 }
 
 
@@ -1307,7 +1322,10 @@ inline
 const FiniteElement<3> &
 DoFObjectAccessor<1,hp::DoFHandler<3> >::get_fe () const
 {
-  return (*dof_handler->finite_elements)[active_fe_index ()];
+  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
+			     "associated with active_fe_indices and corresponding "
+			     "finite element objects"));
+  return (*dof_handler->finite_elements)[0];
 }
 
 
@@ -1334,14 +1352,10 @@ inline
 unsigned int
 DoFObjectAccessor<1,hp::DoFHandler<2> >::active_fe_index () const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return this->dof_handler->levels[this->present_level]
-      ->active_fe_indices[this->present_index];
+  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
+			     "associated with active_fe_indices and corresponding "
+			     "finite element objects"));
+  return 0;
 }
 
 
@@ -1351,14 +1365,10 @@ inline
 unsigned int
 DoFObjectAccessor<1,hp::DoFHandler<3> >::active_fe_index () const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return this->dof_handler->levels[this->present_level]
-      ->active_fe_indices[this->present_index];
+  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
+			     "associated with active_fe_indices and corresponding "
+			     "finite element objects"));
+  return 0;
 }
 
 
@@ -1387,20 +1397,11 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::set_active_fe_index (const unsigned int
 template <>
 inline
 void
-DoFObjectAccessor<1,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<1,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int)
 {
-  Assert (this->dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  Assert (i < this->dof_handler->finite_elements->size (),
-          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
-
-  this->dof_handler->levels[this->present_level]
-      ->active_fe_indices[this->present_index] = i;
+  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
+			     "associated with active_fe_indices and corresponding "
+			     "finite element objects"));
 }
 
 
@@ -1408,20 +1409,11 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int
 template <>
 inline
 void
-DoFObjectAccessor<1,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<1,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int)
 {
-  Assert (this->dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  Assert (i < this->dof_handler->finite_elements->size (),
-          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
-
-  this->dof_handler->levels[this->present_level]
-      ->active_fe_indices[this->present_index] = i;
+  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
+			     "associated with active_fe_indices and corresponding "
+			     "finite element objects"));
 }
 
 
@@ -1444,6 +1436,10 @@ unsigned int DoFObjectAccessor<2,hp::DoFHandler<2> >::dof_index (const unsigned 
   Assert (i<this->get_fe().dofs_per_quad,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
 
+				   // for quads in 2d, we only have to
+				   // take care of the offset, no
+				   // linked lists or whatever (see
+				   // hp::DoFLevels)
   const unsigned int offset = this->dof_handler->levels[this->present_level]
       ->dof_quad_index_offset[this->present_index];
   Assert (offset != this->dof_handler->invalid_dof_index,
@@ -1506,6 +1502,10 @@ DoFObjectAccessor<2, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
   Assert (i<this->get_fe().dofs_per_quad,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
 
+				   // for quads in 2d, we only have to
+				   // take care of the offset, no
+				   // linked lists or whatever (see
+				   // hp::DoFLevels)
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_quad_index_offset[this->present_index];
   Assert (offset != this->dof_handler->invalid_dof_index,
@@ -1523,7 +1523,7 @@ template <>
 inline
 void
 DoFObjectAccessor<2, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
-                                                      const unsigned int index) const
+							 const unsigned int index) const
 {
   typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
 
@@ -1566,8 +1566,12 @@ inline
 const FiniteElement<3> &
 DoFObjectAccessor<2,hp::DoFHandler<3> >::get_fe () const
 {
-  return (*dof_handler->finite_elements)[active_fe_index ()];
+  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
+			     "associated with active_fe_indices and corresponding "
+			     "finite element objects"));
+  return (*dof_handler->finite_elements)[0];
 }
+
 
 
 
@@ -1588,20 +1592,18 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::active_fe_index () const
 
 
 
+
 template <>
 inline
 unsigned int
 DoFObjectAccessor<2,hp::DoFHandler<3> >::active_fe_index () const
 {
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return this->dof_handler->levels[this->present_level]
-      ->active_fe_indices[this->present_index];
+  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
+			     "associated with active_fe_indices and corresponding "
+			     "finite element objects"));
+  return 0;
 }
+
 
 
 template <>
@@ -1630,20 +1632,11 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int
 template <>
 inline
 void
-DoFObjectAccessor<2,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i)
+DoFObjectAccessor<2,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int)
 {
-  Assert (this->dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  Assert (i < this->dof_handler->finite_elements->size (),
-          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
-
-  this->dof_handler->levels[this->present_level]
-      ->active_fe_indices[this->present_index] = i;
+  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
+			     "associated with active_fe_indices and corresponding "
+			     "finite element objects"));
 }
 
 
@@ -1667,6 +1660,10 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::dof_index (const unsigned int i) const
   Assert (i<this->get_fe().dofs_per_hex,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_hex));
 
+				   // for hexes in 3d, we only have to
+				   // take care of the offset, no
+				   // linked lists or whatever (see
+				   // hp::DoFLevels)
   const unsigned int offset = this->dof_handler->levels[this->present_level]
       ->dof_hex_index_offset[this->present_index];
   Assert (offset != this->dof_handler->invalid_dof_index,
@@ -1679,11 +1676,12 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::dof_index (const unsigned int i) const
 }
 
 
+
 template <>
 inline
 void
 DoFObjectAccessor<3, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
-                                                      const unsigned int index) const
+							 const unsigned int index) const
 {
   typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
     
@@ -1698,6 +1696,10 @@ DoFObjectAccessor<3, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
   Assert (i<this->get_fe().dofs_per_hex,
 	  ExcIndexRange (i, 0, this->get_fe().dofs_per_hex));
 
+				   // for hexes in 3d, we only have to
+				   // take care of the offset, no
+				   // linked lists or whatever (see
+				   // hp::DoFLevels)
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_hex_index_offset[this->present_index];
   Assert (offset != this->dof_handler->invalid_dof_index,
