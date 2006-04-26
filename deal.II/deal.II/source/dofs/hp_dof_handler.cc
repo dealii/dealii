@@ -2199,13 +2199,15 @@ namespace hp
              cell!=end_active(level); ++cell)
           if (!cell->has_children())
           {
-            levels[level]->dof_quad_index_offset[cell->index()] = next_free_quad_dof;
-            next_free_quad_dof +=
-              (*finite_elements)[cell->active_fe_index()].dofs_per_quad;
+            levels[level]->dof_quad_index_offset[cell->index()]
+              = next_free_quad_dof;
+            next_free_quad_dof
+              += (*finite_elements)[cell->active_fe_index()].dofs_per_quad;
           }
 
-        levels[level]->quad_dofs = std::vector<unsigned int> (next_free_quad_dof,
-                                                              invalid_dof_index);
+        levels[level]->quad_dofs
+          = std::vector<unsigned int> (next_free_quad_dof,
+                                       invalid_dof_index);
       }
 
 
@@ -2226,7 +2228,8 @@ namespace hp
             n_quad_dofs +=
               (*finite_elements)[cell->active_fe_index()].dofs_per_quad;
         
-        Assert (levels[level]->quad_dofs.size() == n_quad_dofs, ExcInternalError());
+        Assert (levels[level]->quad_dofs.size() == n_quad_dofs,
+                ExcInternalError());
         Assert (static_cast<unsigned int>
                 (std::count (levels[level]->dof_quad_index_offset.begin(),
                              levels[level]->dof_quad_index_offset.end(),
