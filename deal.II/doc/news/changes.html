@@ -45,6 +45,19 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: The <code
+       class="member">distribute_local_to_global</code> functions have
+       been moved from the classes implementing accessors to arbitrary
+       objects in the triangulation to the cell accessors, to
+       facilitate the implementation of hp methods. That means
+       that you can't call these functions for face or edge iterators
+       any more, but only cells. Since this is what is usually
+       desired, this should not be too severe a restriction.
+       <br> 
+       (WB 2006/04/26)
+       </p>
+
+  <li> <p>
        Changed: The template argument of the <code
        class="class">InterGridMap</code> class has been changed. Code
        like e.g. <code

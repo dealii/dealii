@@ -466,41 +466,6 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
 				      * access to the DoF data.
 				      */
     TriaIterator<dim,DoFObjectAccessor<celldim, DH> > child (const unsigned int) const;
-
-				     /**
-				      * Distribute a local (cell
-				      * based) vector to a global one
-				      * by mapping the local numbering
-				      * of the degrees of freedom to
-				      * the global one and entering
-				      * the local values into the
-				      * global vector.
-				      *
-				      * The elements are
-				      * <em>added</em> up to the
-				      * elements in the global vector,
-				      * rather than just set, since
-				      * this is usually what one
-				      * wants.
-				      */
-    template <typename number, typename OutputVector>
-    void
-    distribute_local_to_global (const Vector<number> &local_source,
-                                OutputVector         &global_destination) const;
-
-				     /**
-				      * This function does much the same as
-				      * the
-				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
-				      * function, but operates on matrices
-				      * instead of vectors. The sparse matrix
-				      * is supposed to have non-zero entry
-				      * slots where required.
-				      */
-    template <typename number, typename OutputMatrix>
-    void
-    distribute_local_to_global (const FullMatrix<number> &local_source,
-                                OutputMatrix             &global_destination) const;
     
 				     /**
 				      * Implement the copy operator needed
@@ -785,39 +750,6 @@ class DoFObjectAccessor<1, DH> :
 				      * access to the DoF data.
 				      */
     TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> > child (const unsigned int) const;
-
-				     /**
-				      * Distribute a local (cell based) vector
-				      * to a global one by mapping the local
-				      * numbering of the degrees of freedom to
-				      * the global one and entering the local
-				      * values into the global vector.
-				      *
-				      * The elements are
-				      * <em>added</em> up to the
-				      * elements in the global vector,
-				      * rather than just set, since
-				      * this is usually what one
-				      * wants.
-				      */
-    template <typename number, typename OutputVector>
-    void
-    distribute_local_to_global (const Vector<number> &local_source,
-                                OutputVector         &global_destination) const;
-
-				     /**
-				      * This function does much the same as
-				      * the
-				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
-				      * function, but operates on matrices
-				      * instead of vectors. The sparse matrix
-				      * is supposed to have non-zero entry
-				      * slots where required.
-				      */
-    template <typename number, typename OutputMatrix>
-    void
-    distribute_local_to_global (const FullMatrix<number> &local_source,
-                                OutputMatrix             &global_destination) const;
     
 				     /**
 				      * Implement the copy operator needed
@@ -1056,39 +988,6 @@ class DoFObjectAccessor<2, DH> :
 				      */
     TriaIterator<DH::dimension,DoFObjectAccessor<2, DH> >
     child (const unsigned int) const;
-
-				     /**
-				      * Distribute a local (cell based) vector
-				      * to a global one by mapping the local
-				      * numbering of the degrees of freedom to
-				      * the global one and entering the local
-				      * values into the global vector.
-				      *
-				      * The elements are
-				      * <em>added</em> up to the
-				      * elements in the global vector,
-				      * rather than just set, since
-				      * this is usually what one
-				      * wants.
-				      */
-    template <typename number, typename OutputVector>
-    void
-    distribute_local_to_global (const Vector<number> &local_source,
-                                OutputVector         &global_destination) const;
-
-				     /**
-				      * This function does much the same as
-				      * the
-				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
-				      * function, but operates on matrices
-				      * instead of vectors. The sparse matrix
-				      * is supposed to have non-zero entry
-				      * slots where required.
-				      */
-    template <typename number, typename OutputMatrix>
-    void
-    distribute_local_to_global (const FullMatrix<number> &local_source,
-                                OutputMatrix             &global_destination) const;
     
 				     /**
 				      * Implement the copy operator needed
@@ -1333,41 +1232,6 @@ class DoFObjectAccessor<3, DH> :
 				      * access to the DoF data.
 				      */
     TriaIterator<DH::dimension,DoFObjectAccessor<3, DH> > child (const unsigned int) const;
-
-				     /**
-				      * Distribute a local (cell
-				      * based) vector to a global one
-				      * by mapping the local numbering
-				      * of the degrees of freedom to
-				      * the global one and entering
-				      * the local values into the
-				      * global vector.
-				      *
-				      * The elements are
-				      * <em>added</em> up to the
-				      * elements in the global vector,
-				      * rather than just set, since
-				      * this is usually what one
-				      * wants.
-				      */
-    template <typename number, typename OutputVector>
-    void
-    distribute_local_to_global (const Vector<number> &local_source,
-                                OutputVector         &global_destination) const;
-
-				     /**
-				      * This function does much the same as
-				      * the
-				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
-				      * function, but operates on matrices
-				      * instead of vectors. The sparse matrix
-				      * is supposed to have non-zero entry
-				      * slots where required.
-				      */
-    template <typename number, typename OutputMatrix>
-    void
-    distribute_local_to_global (const FullMatrix<number> &local_source,
-                                OutputMatrix             &global_destination) const;
     
 				     /**
 				      * Implement the copy operator needed
@@ -1694,6 +1558,43 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * with them at all.
 				      */
     void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
+
+				     /**
+				      * Distribute a local (cell
+				      * based) vector to a global one
+				      * by mapping the local numbering
+				      * of the degrees of freedom to
+				      * the global one and entering
+				      * the local values into the
+				      * global vector.
+				      *
+				      * The elements are
+				      * <em>added</em> up to the
+				      * elements in the global vector,
+				      * rather than just set, since
+				      * this is usually what one
+				      * wants.
+				      */
+    template <typename number, typename OutputVector>
+    void
+    distribute_local_to_global (const Vector<number> &local_source,
+                                OutputVector         &global_destination) const;
+
+				     /**
+				      * This function does much the
+				      * same as the
+				      * <tt>distribute_local_to_global(Vector,Vector)</tt>
+				      * function, but operates on
+				      * matrices instead of
+				      * vectors. If the matrix type is
+				      * a sparse matrix then it is
+				      * supposed to have non-zero
+				      * entry slots where required.
+				      */
+    template <typename number, typename OutputMatrix>
+    void
+    distribute_local_to_global (const FullMatrix<number> &local_source,
+                                OutputMatrix             &global_destination) const;
     
   private:
 				     /**
