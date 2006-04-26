@@ -14,6 +14,7 @@
 #include <base/qprojector.h>
 #include <base/polynomials_bdm.h>
 #include <base/polynomials_raviart_thomas.h>
+#include <base/polynomials_abf.h>
 #include <fe/fe_poly_tensor.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_cartesian.h>
@@ -675,3 +676,4 @@ FE_PolyTensor<POLY,dim>::update_each (const UpdateFlags flags) const
 
 
 template class FE_PolyTensor<PolynomialsRaviartThomas<deal_II_dimension>,deal_II_dimension>;
+template class FE_PolyTensor<PolynomialsABF<deal_II_dimension>,deal_II_dimension>;
