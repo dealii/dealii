@@ -2212,7 +2212,36 @@ namespace hp
                                        invalid_dof_index);
       }
 
+                                     // safety check: make sure that
+                                     // the number of DoFs we
+                                     // allocated is actually correct
+                                     // (above we have also set the
+                                     // dof_*_index_offset field, so
+                                     // we couldn't use this simpler
+                                     // algorithm)
+#ifdef DEBUG
+    for (unsigned int level=0; level<tria->n_levels(); ++level)
+      {
+        unsigned int n_quad_dofs = 0;
+        for (cell_iterator cell=begin_active(level);
+             cell!=end_active(level); ++cell)
+          if (!cell->has_children())
+            n_quad_dofs +=
+              (*finite_elements)[cell->active_fe_index()].dofs_per_quad;
+        
+        Assert (levels[level]->quad_dofs.size() == n_quad_dofs,
+                ExcInternalError());
+        Assert (static_cast<unsigned int>
+                (std::count (levels[level]->dof_quad_index_offset.begin(),
+                             levels[level]->dof_quad_index_offset.end(),
+                             invalid_dof_index))
+                ==
+                tria->n_raw_quads(level) - tria->n_active_quads(level),
+                ExcInternalError());
+      }
+#endif
 
+    
                                      // LINE DOFS
                                      //
                                      // same here: count line dofs,
@@ -2468,36 +2497,106 @@ namespace hp
     }
     
 
-//TODO: allocate space for vertex dofs
+				     // VERTEX DOFS
     
-                                     // safety check: make sure that
-                                     // the number of DoFs we
-                                     // allocated is actually correct
-                                     // (above we have also set the
-                                     // dof_*_index_offset field, so
-                                     // we couldn't use this simpler
-                                     // algorithm)
+				     // The final step is to allocate
+				     // vertex dof information. since
+				     // vertices are sequentially
+				     // numbered, what we do first is
+				     // to set up an array in which we
+				     // record whether a vertex is
+				     // associated with any of the
+				     // given fe's, by setting a
+				     // bit. in a later step, we then
+				     // actually allocate memory for
+				     // the required dofs
+    {
+      std::vector<std::vector<bool> >
+	vertex_fe_association (finite_elements->size(),
+			       std::vector<bool> (tria->n_vertices(), false));
+      
+      for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
+	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	  vertex_fe_association[cell->active_fe_index()][cell->vertex_index(v)]
+	    = true;
+      
+				       // in debug mode, make sure
+				       // that each vertex is
+				       // associated with at least one
+				       // fe (note that except for
+				       // unused vertices, all
+				       // vertices are actually
+				       // active)
 #ifdef DEBUG
-    for (unsigned int level=0; level<tria->n_levels(); ++level)
-      {
-        unsigned int n_quad_dofs = 0;
-        for (cell_iterator cell=begin_active(level);
-             cell!=end_active(level); ++cell)
-          if (!cell->has_children())
-            n_quad_dofs +=
-              (*finite_elements)[cell->active_fe_index()].dofs_per_quad;
-        
-        Assert (levels[level]->quad_dofs.size() == n_quad_dofs,
-                ExcInternalError());
-        Assert (static_cast<unsigned int>
-                (std::count (levels[level]->dof_quad_index_offset.begin(),
-                             levels[level]->dof_quad_index_offset.end(),
-                             invalid_dof_index))
-                ==
-                tria->n_raw_quads(level) - tria->n_active_quads(level),
-                ExcInternalError());
-      }
+      for (unsigned int v=0; v<tria->n_vertices(); ++v)
+	if (tria->vertex_used(v) == true)
+	  {
+	    unsigned int fe=0;
+	    for (; fe<finite_elements->size(); ++fe)
+	      if (vertex_fe_association[fe][v] == true)
+		break;
+	    Assert (fe != finite_elements->size(), ExcInternalError());
+	  }
 #endif
+
+				       // next count how much memory
+				       // we actually need. for each
+				       // vertex, we need one slot per
+				       // fe to store the fe_index,
+				       // plus dofs_per_vertex for
+				       // this fe. in addition, we
+				       // need one slot as the end
+				       // marker for the
+				       // fe_indices. at the same time
+				       // already fill the
+				       // vertex_dofs_offsets field
+      vertex_dofs_offsets.resize (tria->n_vertices(),
+				  deal_II_numbers::invalid_unsigned_int);
+      
+      unsigned int vertex_slots_needed = 0;
+      for (unsigned int v=0; v<tria->n_vertices(); ++v)
+	if (tria->vertex_used(v) == true)
+	  {
+	    vertex_dofs_offsets[v] = vertex_slots_needed;
+	    
+	    for (unsigned int fe=0; fe<finite_elements->size(); ++fe)
+	      if (vertex_fe_association[fe][v] == true)
+		vertex_slots_needed += (*finite_elements)[fe].dofs_per_vertex + 1;
+	    ++vertex_slots_needed;
+	  }
+
+				       // now allocate the space we
+				       // have determined we need, and
+				       // set up the linked lists for
+				       // each of the vertices
+      vertex_dofs.resize (vertex_slots_needed, invalid_dof_index);
+      for (unsigned int v=0; v<tria->n_vertices(); ++v)
+	if (tria->vertex_used(v) == true)
+	  {
+	    unsigned int pointer = vertex_dofs_offsets[v];
+	    for (unsigned int fe=0; fe<finite_elements->size(); ++fe)
+	      if (vertex_fe_association[fe][v] == true)
+		{
+						   // if this vertex
+						   // uses this fe,
+						   // then set the
+						   // fe_index and
+						   // move the pointer
+						   // ahead
+		  vertex_dofs[pointer] = fe;
+		  pointer += (*finite_elements)[fe].dofs_per_vertex + 1;
+		}
+					     // finally place the end
+					     // marker
+	    vertex_dofs[pointer] = deal_II_numbers::invalid_unsigned_int;
+	    ++pointer;
+
+	    Assert ((v==tria->n_vertices()-1) ||
+		    (pointer == vertex_dofs_offsets[v+1]),
+		    ExcInternalError());
+	  }
+    }
+    
   }
 
 #endif
@@ -2820,8 +2919,15 @@ namespace hp
       delete levels[i];
     levels.resize (0);
 
-    std::vector<unsigned int> tmp;
-    std::swap (vertex_dofs, tmp);
+    {
+      std::vector<unsigned int> tmp;
+      std::swap (vertex_dofs, tmp);
+    }
+    
+    {
+      std::vector<unsigned int> tmp;
+      std::swap (vertex_dofs_offsets, tmp);
+    }
   }
 
 
