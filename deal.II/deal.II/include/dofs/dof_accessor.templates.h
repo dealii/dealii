@@ -192,6 +192,7 @@ DoFObjectAccessor<1,DH>::vertex_dof_index (const unsigned int vertex,
 }
 
 
+
 template <class DH>
 inline
 void
@@ -273,6 +274,7 @@ DoFObjectAccessor<1,DH>::get_fe () const
 }
 
 
+
 template <class DH>
 inline
 unsigned int
@@ -280,6 +282,7 @@ DoFObjectAccessor<1,DH>::active_fe_index () const
 {
     return 0;
 }
+
 
 
 template <class DH>
@@ -290,6 +293,7 @@ DoFObjectAccessor<1,DH>::set_active_fe_index (const unsigned int i)
   typedef DoFAccessor<DH> BaseClass;
   Assert (i == 0, typename BaseClass::ExcInvalidObject());
 }
+
 
 
 template <class DH>
@@ -458,11 +462,12 @@ DoFObjectAccessor<2,DH>::dof_index (const unsigned int i) const
 }
 
 
+
 template <class DH>
 inline
 unsigned int
 DoFObjectAccessor<2,DH>::vertex_dof_index (const unsigned int vertex,
-					       const unsigned int i) const
+					   const unsigned int i) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
@@ -481,6 +486,7 @@ DoFObjectAccessor<2,DH>::vertex_dof_index (const unsigned int vertex,
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
+
 
 
 template <class DH>
@@ -528,6 +534,7 @@ DoFObjectAccessor<2,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
   for (unsigned int d=0; d<dofs_per_quad; ++d)
     *next++ = dof_index(d);
 }
+
 
 
 template <class DH>
@@ -783,7 +790,7 @@ template <class DH>
 inline
 unsigned int
 DoFObjectAccessor<3,DH>::vertex_dof_index (const unsigned int vertex,
-					       const unsigned int i) const
+					   const unsigned int i) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
@@ -802,6 +809,7 @@ DoFObjectAccessor<3,DH>::vertex_dof_index (const unsigned int vertex,
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
+
 
 
 template <class DH>
@@ -918,6 +926,7 @@ DoFObjectAccessor<3,DH>::get_fe () const
 }
 
 
+
 template <class DH>
 inline
 unsigned int
@@ -925,6 +934,7 @@ DoFObjectAccessor<3,DH>::active_fe_index () const
 {
     return 0;
 }
+
 
 
 template <class DH>
@@ -935,6 +945,7 @@ DoFObjectAccessor<3,DH>::set_active_fe_index (const unsigned int i)
   typedef DoFAccessor<DH> BaseClass;
   Assert (i == 0, typename BaseClass::ExcInvalidObject());
 }
+
 
 
 template <class DH>
