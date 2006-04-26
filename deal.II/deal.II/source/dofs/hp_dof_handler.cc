@@ -2151,14 +2151,12 @@ namespace hp
   template <>
   void DoFHandler<2>::reserve_space ()
   {
+    const unsigned int dim = 2;
+    
     Assert (finite_elements != 0, ExcNoFESelected());
     Assert (finite_elements->size() > 0, ExcNoFESelected());
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
     Assert (tria->n_levels() == levels.size (), ExcInternalError ());
-
-    Assert (finite_elements->max_dofs_per_face() == 0,
-            ExcMessage ("hp finite elements are presently only supported "
-                        "for discontinuous elements"));
 
                                      // Release all space except the
                                      // active_fe_indices field which
@@ -2177,12 +2175,16 @@ namespace hp
       for (unsigned int level=0; level<tria->n_levels(); ++level) 
         {
           levels.push_back (new internal::hp::DoFLevel<2>);
-          std::swap (active_fe_backup[level], levels[level]->active_fe_indices);
+          std::swap (active_fe_backup[level],
+                     levels[level]->active_fe_indices);
         }
     }
 
+                                     // QUAD (CELL) DOFs
+                                     //
                                      // count how much space we need
-                                     // on each level and set the
+                                     // on each level for the quad
+                                     // dofs and set the
                                      // dof_*_index_offset
                                      // data. initially set the latter
                                      // to an invalid index, and only
@@ -2211,6 +2213,263 @@ namespace hp
       }
 
 
+                                     // LINE DOFS
+                                     //
+                                     // same here: count line dofs,
+                                     // then allocate as much space as
+                                     // we need and prime the linked
+                                     // list for lines (see the
+                                     // description in hp::DoFLevels)
+                                     // with the indices we will
+                                     // need. note that our task is
+                                     // more complicated since two
+                                     // adjacent cells may have
+                                     // different active_fe_indices,
+                                     // in which case we need to
+                                     // allocate *two* sets of line
+                                     // dofs for the same line
+                                     //
+                                     // the way we do things is that
+                                     // we loop over all active cells
+                                     // (these are the ones that have
+                                     // DoFs only anyway) and all
+                                     // their faces. We note in the
+                                     // user flags whether we have
+                                     // previously visited a face and
+                                     // if so skip it (consequently,
+                                     // we have to save and later
+                                     // restore the line flags)
+    {
+      std::vector<bool> saved_line_user_flags;
+      const_cast<Triangulation<dim>&>(*tria)
+        .save_user_flags_line (saved_line_user_flags);
+      const_cast<Triangulation<dim>&>(*tria).clear_user_flags_line ();
+
+                                       // an array to hold how many
+                                       // slots (see the hp::DoFLevel
+                                       // class) we will have to store
+                                       // on each level
+      std::vector<unsigned int> n_line_slots (tria->n_levels(), 0);
+    
+      for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
+        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+          if (! cell->face(face)->user_flag_set())
+            {
+                                               // ok, face has not been
+                                               // visited. so we need to
+                                               // allocate space for
+                                               // it. let's see how much
+                                               // we need: we need one
+                                               // set if a) there is no
+                                               // neighbor behind this
+                                               // face, or b) the
+                                               // neighbor is not on the
+                                               // same level or further
+                                               // refined, or c) the
+                                               // neighbor is on the
+                                               // same level, but
+                                               // happens to have the
+                                               // same active_fe_index:
+              if (cell->at_boundary(face)
+                  ||
+                  (cell->neighbor(face)->level() < cell->level())
+                  ||
+                  cell->neighbor(face)->has_children()
+                  ||
+                  ((cell->neighbor(face)->level() == cell->level())
+                   &&
+                   !cell->neighbor(face)->has_children()
+                   &&
+                   (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
+                                                 // ok, one set of
+                                                 // dofs. that makes
+                                                 // one index, 1 times
+                                                 // dofs_per_line
+                                                 // dofs, and one stop
+                                                 // index
+                n_line_slots[cell->level()]
+                  += (*finite_elements)[cell->active_fe_index()].dofs_per_line + 2;
+
+                                               // otherwise we do
+                                               // indeed need two
+                                               // sets, i.e. two
+                                               // indices, two sets of
+                                               // dofs, and one stop
+                                               // index:
+              else
+                n_line_slots[cell->level()]
+                  += ((*finite_elements)[cell->active_fe_index()].dofs_per_line
+                      +
+                      (*finite_elements)[cell->neighbor(face)->active_fe_index()]
+                      .dofs_per_line
+                      +
+                      3);
+            
+                                               // mark this face as
+                                               // visited
+              cell->face(face)->set_user_flag ();
+            }
+
+                                       // now that we know how many
+                                       // line dofs we will have to
+                                       // have on each level, allocate
+                                       // the memory. note that we
+                                       // allocate offsets for all
+                                       // lines, though only the
+                                       // active ones will have a
+                                       // non-invalid value later on
+      for (unsigned int level=0; level<tria->n_levels(); ++level) 
+        {
+          levels[level]->dof_line_index_offset
+            = std::vector<unsigned int> (tria->n_raw_lines(level),
+                                         invalid_dof_index);
+          levels[level]->line_dofs
+            = std::vector<unsigned int> (n_line_slots[level],
+                                         invalid_dof_index);        
+        }
+
+                                       // with the memory now
+                                       // allocated, loop over the
+                                       // cells again and prime the
+                                       // _offset values as well as
+                                       // the fe_index fields
+      const_cast<Triangulation<dim>&>(*tria).clear_user_flags_line ();
+
+      std::vector<unsigned int> next_free_line_slot (tria->n_levels(), 0);
+      
+      for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
+        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+          if (! cell->face(face)->user_flag_set())
+            {
+                                               // same decision tree
+                                               // as before
+              if (cell->at_boundary(face)
+                  ||
+                  (cell->neighbor(face)->level() < cell->level())
+                  ||
+                  cell->neighbor(face)->has_children()
+                  ||
+                  ((cell->neighbor(face)->level() == cell->level())
+                   &&
+                   !cell->neighbor(face)->has_children()
+                   &&
+                   (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
+                {
+                  levels[cell->level()]
+                    ->dof_line_index_offset[cell->face(face)->index()]
+                    = next_free_line_slot[cell->level()];
+
+                                                   // set first slot
+                                                   // for this line to
+                                                   // active_fe_index
+                                                   // of this face
+                  levels[cell->level()]
+                    ->line_dofs[next_free_line_slot[cell->level()]]
+                    = cell->active_fe_index();
+
+                                                   // the next
+                                                   // dofs_per_line
+                                                   // indices remain
+                                                   // unset for the
+                                                   // moment (i.e. at
+                                                   // invalid_dof_index).
+                                                   // following this
+                                                   // comes the stop
+                                                   // index, which
+                                                   // also is
+                                                   // invalid_dof_index
+                                                   // and therefore
+                                                   // does not have to
+                                                   // be explicitly
+                                                   // set
+                  
+                                                   // finally, mark
+                                                   // those slots as
+                                                   // used
+                  next_free_line_slot[cell->level()]
+                    += (*finite_elements)[cell->active_fe_index()].dofs_per_line + 2;
+                }
+              else
+                {
+                  levels[cell->level()]
+                    ->dof_line_index_offset[cell->face(face)->index()]
+                    = next_free_line_slot[cell->level()];
+
+                                                   // set first slot
+                                                   // for this line to
+                                                   // active_fe_index
+                                                   // of this face
+                  levels[cell->level()]
+                    ->line_dofs[next_free_line_slot[cell->level()]]
+                    = cell->active_fe_index();
+
+                                                   // the next
+                                                   // dofs_per_line
+                                                   // indices remain
+                                                   // unset for the
+                                                   // moment (i.e. at
+                                                   // invalid_dof_index).
+                                                   // 
+                                                   // then comes the
+                                                   // fe_index for the
+                                                   // neighboring
+                                                   // cell:
+                  levels[cell->level()]
+                    ->line_dofs[next_free_line_slot[cell->level()]
+                                +
+                                (*finite_elements)[cell->active_fe_index()].dofs_per_line
+                                +
+                                1]
+                    = cell->neighbor(face)->active_fe_index();
+                                                   // then again a set
+                                                   // of dofs that we
+                                                   // need not set
+                                                   // right now
+                                                   // 
+                                                   // following this
+                                                   // comes the stop
+                                                   // index, which
+                                                   // also is
+                                                   // invalid_dof_index
+                                                   // and therefore
+                                                   // does not have to
+                                                   // be explicitly
+                                                   // set
+                  
+                                                   // finally, mark
+                                                   // those slots as
+                                                   // used
+                  next_free_line_slot[cell->level()]
+                    += ((*finite_elements)[cell->active_fe_index()].dofs_per_line
+                        +
+                        (*finite_elements)[cell->neighbor(face)->active_fe_index()]
+                        .dofs_per_line
+                        +
+                        3);
+                }
+              
+                                               // mark this face as
+                                               // visited
+              cell->face(face)->set_user_flag ();
+            }
+
+                                       // we should have moved the
+                                       // cursor for each level to the
+                                       // total number of dofs on that
+                                       // level. check that
+      for (unsigned int level=0; level<tria->n_levels(); ++level)
+        Assert (next_free_line_slot[level] == n_line_slots[level],
+                ExcInternalError());
+      
+                                       // at the end, restore the user
+                                       // flags for the lines
+      const_cast<Triangulation<dim>&>(*tria)
+        .load_user_flags_line (saved_line_user_flags);
+    }
+    
+
+//TODO: allocate space for vertex dofs
+    
                                      // safety check: make sure that
                                      // the number of DoFs we
                                      // allocated is actually correct
