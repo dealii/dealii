@@ -1980,11 +1980,20 @@ void Triangulation<1>::clear_user_pointers ()
 template <>
 void Triangulation<1>::clear_user_flags ()
 {
-  cell_iterator cell = begin(),
-		endc = end();
-  for (; cell!=endc; ++cell)
-    cell->clear_user_flag ();
+  clear_user_flags_line();
 }
+
+
+
+template <>
+void Triangulation<1>::clear_user_flags_quad ()
+{}
+
+
+template <>
+void Triangulation<1>::clear_user_flags_hex ()
+{}
+
 
 #endif
 
@@ -2010,16 +2019,15 @@ void Triangulation<2>::clear_user_pointers ()
 template <>
 void Triangulation<2>::clear_user_flags ()
 {
-  line_iterator line = begin_line(),
-		endl = end_line();
-  for (; line!=endl; ++line)
-    line->clear_user_flag ();
-
-  cell_iterator cell = begin(),
-		endc = end();
-  for (; cell!=endc; ++cell)
-    cell->clear_user_flag ();
+  clear_user_flags_line ();
+  clear_user_flags_quad ();  
 }
+
+
+
+template <>
+void Triangulation<2>::clear_user_flags_hex ()
+{}
 
 
 #endif
@@ -2051,24 +2059,47 @@ void Triangulation<3>::clear_user_pointers ()
 template <>
 void Triangulation<3>::clear_user_flags ()
 {
+  clear_user_flags_line ();
+  clear_user_flags_quad ();
+  clear_user_flags_hex ();
+}
+
+
+
+#endif
+
+
+template <int dim>
+void Triangulation<dim>::clear_user_flags_line ()
+{
   line_iterator line = begin_line(),
 		endl = end_line();
   for (; line!=endl; ++line)
     line->clear_user_flag ();
+}
 
+
+
+template <int dim>
+void Triangulation<dim>::clear_user_flags_quad ()
+{
   quad_iterator quad = begin_quad(),
 		endq = end_quad();
   for (; quad!=endq; ++quad)
     quad->clear_user_flag ();
-
-  cell_iterator cell = begin(),
-		endc = end();
-  for (; cell!=endc; ++cell)
-    cell->clear_user_flag ();
 }
 
 
-#endif
+
+template <int dim>
+void Triangulation<dim>::clear_user_flags_hex ()
+{
+  hex_iterator hex  = begin_hex(),
+               endh = end_hex();
+  for (; hex!=endh; ++hex)
+    hex->clear_user_flag ();
+}
+
 
 
 template <int dim>

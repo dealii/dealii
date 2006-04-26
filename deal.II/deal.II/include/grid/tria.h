@@ -1753,7 +1753,12 @@ class Triangulation : public Subscriptor
 				      */
     void load_user_flags (const std::vector<bool> &v);
 
-				     /**
+    				     /**
+				      *  Clear all user flags on lines.
+				      */
+    void clear_user_flags_line ();
+
+    				     /**
 				      * Save the user flags on lines.
 				      */
     void save_user_flags_line (std::ostream &out) const;
@@ -1775,6 +1780,11 @@ class Triangulation : public Subscriptor
 				      * Load the user flags located on lines.
 				      */
     void load_user_flags_line (const std::vector<bool> &v);
+
+    				     /**
+				      *  Clear all user flags on quads.
+				      */
+    void clear_user_flags_quad ();
 
     				     /**
 				      * Save the user flags on quads.
@@ -1799,7 +1809,13 @@ class Triangulation : public Subscriptor
 				      */
     void load_user_flags_quad (const std::vector<bool> &v);
 
-				     /**
+
+    				     /**
+				      *  Clear all user flags on quads.
+				      */
+    void clear_user_flags_hex ();
+
+    				     /**
 				      * Save the user flags on hexs.
 				      */
     void save_user_flags_hex (std::ostream &out) const;
@@ -3155,14 +3171,17 @@ template <> void Triangulation<2>::clear_user_pointers ();
 template <> void Triangulation<2>::clear_user_flags ();
 template <> void Triangulation<3>::clear_user_pointers ();
 template <> void Triangulation<3>::clear_user_flags ();
+template <> void Triangulation<1>::clear_user_flags_quad ();
 template <> void Triangulation<1>::save_user_flags_quad (std::ostream &) const;
 template <> void Triangulation<1>::save_user_flags_quad (std::vector<bool> &) const;
 template <> void Triangulation<1>::load_user_flags_quad (std::istream &);
 template <> void Triangulation<1>::load_user_flags_quad (const std::vector<bool> &);
+template <> void Triangulation<1>::clear_user_flags_hex ();
 template <> void Triangulation<1>::save_user_flags_hex (std::ostream &) const;
 template <> void Triangulation<1>::save_user_flags_hex (std::vector<bool> &) const;
 template <> void Triangulation<1>::load_user_flags_hex (std::istream &);
 template <> void Triangulation<1>::load_user_flags_hex (const std::vector<bool> &);
+template <> void Triangulation<2>::clear_user_flags_hex ();
 template <> void Triangulation<2>::save_user_flags_hex (std::ostream &) const;
 template <> void Triangulation<2>::save_user_flags_hex (std::vector<bool> &) const;
 template <> void Triangulation<2>::load_user_flags_hex (std::istream &);
