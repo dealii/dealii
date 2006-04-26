@@ -25,7 +25,8 @@ tests_x = hp_dof_handler \
 	  crash_* \
 	  q_collection_* \
 	  mapping_collection_* \
-	  fe_collection_*
+	  fe_collection_* \
+	  continuous_2d_*
 
 # from above list of regular expressions, generate the real set of
 # tests
