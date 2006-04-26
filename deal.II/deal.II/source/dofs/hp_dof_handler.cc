@@ -2590,10 +2590,6 @@ namespace hp
 					     // marker
 	    vertex_dofs[pointer] = deal_II_numbers::invalid_unsigned_int;
 	    ++pointer;
-
-	    Assert ((v==tria->n_vertices()-1) ||
-		    (pointer == vertex_dofs_offsets[v+1]),
-		    ExcInternalError());
 	  }
     }
     
