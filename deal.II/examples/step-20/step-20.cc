@@ -226,7 +226,7 @@ ExactSolution<dim>::vector_value (const Point<dim> &p,
 
 
 
-				 // @sect3{The inverse permability tensor}
+				 // @sect3{The inverse permeability tensor}
 
                                  // In addition to the other equation
                                  // data, we also want to use a
