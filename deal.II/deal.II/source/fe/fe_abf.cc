@@ -62,7 +62,8 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
   FullMatrix<double> M(n_dofs, n_dofs);
   FETools::compute_node_matrix(M, *this);
 
-  M.print (std::cout);
+  //TODO: Remove debugging output
+  //  M.print (std::cout);
 
   this->inverse_node_matrix.reinit(n_dofs, n_dofs);
   this->inverse_node_matrix.invert(M);
@@ -79,13 +80,14 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
     }
 
   FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
-  //  initialize_restriction ();
+  initialize_restriction ();
 
-  // TODO
   std::vector<FullMatrix<double> >
     face_embeddings(1<<(dim-1), FullMatrix<double>(this->dofs_per_face,
 						   this->dofs_per_face));
-  //FETools::compute_face_embedding_matrices(*this, &face_embeddings[0], 0, 0);
+  // TODO: Something goes wrong there. The error of the least squares fit
+  // is to large ...
+  // FETools::compute_face_embedding_matrices(*this, &face_embeddings[0], 0, 0);
   this->interface_constraints.reinit((1<<(dim-1)) * this->dofs_per_face,
 				     this->dofs_per_face);
   unsigned int target_row=0;
@@ -328,6 +330,149 @@ FE_ABF<dim>::initialize_support_points (const unsigned int deg)
 
 #if deal_II_dimension == 1
 
+template <int dim>
+void
+FE_ABF<dim>::initialize_restriction()
+{
+  for (unsigned int i=0;i<GeometryInfo<dim>::children_per_cell;++i)
+    this->restriction[i].reinit(0,0);
+}
+
+#else
+
+// This function is the same Raviart-Thomas interpolation performed by
+// interpolate. Still, we cannot use interpolate, since it was written
+// for smooth functions. Thefunctions interpolated here are not
+// smooth, maybe even not continuous. Therefore, we must double the
+// number of quadrature points in each direction in order to integrate
+// only smooth functions.
+
+// Then again, the interpolated function is chosen such that the
+// moments coincide with the function to be interpolated.
+
+template <int dim>
+void
+FE_ABF<dim>::initialize_restriction()
+{
+  QGauss<dim-1> q_base (rt_order+1);
+  const unsigned int n_face_points = q_base.n_quadrature_points;
+				   // First, compute interpolation on
+				   // subfaces
+  for (unsigned int face=0;face<GeometryInfo<dim>::faces_per_cell;++face)
+    {
+				       // The shape functions of the
+				       // child cell are evaluated
+				       // in the quadrature points
+				       // of a full face.
+      Quadrature<dim> q_face
+	= QProjector<dim>::project_to_face(q_base, face);
+				       // Store shape values, since the
+				       // evaluation suffers if not
+				       // ordered by point
+      Table<2,double> cached_values(this->dofs_per_cell, q_face.n_quadrature_points);
+      for (unsigned int k=0;k<q_face.n_quadrature_points;++k)
+	for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+	  cached_values(i,k)
+	    = this->shape_value_component(i, q_face.point(k),
+					  GeometryInfo<dim>::unit_normal_direction[face]);
+
+      for (unsigned int sub=0;sub<GeometryInfo<dim>::subfaces_per_face;++sub)
+	{
+					   // The weight fuctions for
+					   // the coarse face are
+					   // evaluated on the subface
+					   // only.
+	  Quadrature<dim> q_sub
+	    = QProjector<dim>::project_to_subface(q_base, face, sub);
+	  const unsigned int child
+	    = GeometryInfo<dim>::child_cell_on_face(face, sub);
+	  
+					   // On a certain face, we must
+					   // compute the moments of ALL
+					   // fine level functions with
+					   // the coarse level weight
+					   // functions belonging to
+					   // that face. Due to the
+					   // orthogonalization process
+					   // when building the shape
+					   // functions, these weights
+					   // are equal to the
+					   // corresponding shpe
+					   // functions.
+	  for (unsigned int k=0;k<n_face_points;++k)
+	    for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
+	      for (unsigned int i_face = 0; i_face < this->dofs_per_face; ++i_face)
+		{
+						   // The quadrature
+						   // weights on the
+						   // subcell are NOT
+						   // transformed, so we
+						   // have to do it here.
+		  this->restriction[child](face*this->dofs_per_face+i_face,
+				     i_child)
+		    += std::pow(.5, dim-1.) * q_sub.weight(k)
+		    * cached_values(i_child, k)
+		    * this->shape_value_component(face*this->dofs_per_face+i_face,
+						  q_sub.point(k),
+						  GeometryInfo<dim>::unit_normal_direction[face]);
+		}
+	}
+    }
+  
+  if (rt_order==0) return;
+  
+				   // Create Legendre basis for the
+				   // space D_xi Q_k. Here, we cannot
+				   // use the shape functions
+  std::vector<AnisotropicPolynomials<dim>* > polynomials(dim);
+  for (unsigned int dd=0;dd<dim;++dd)
+    {
+      std::vector<std::vector<Polynomials::Polynomial<double> > > poly(dim);
+      for (unsigned int d=0;d<dim;++d)
+	poly[d] = Polynomials::Legendre::generate_complete_basis(rt_order);
+      poly[dd] = Polynomials::Legendre::generate_complete_basis(rt_order-1);
+
+      polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
+    }
+  
+  QGauss<dim> q_cell(rt_order+1);
+  const unsigned int start_cell_dofs
+    = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
+
+				   // Store shape values, since the
+				   // evaluation suffers if not
+				   // ordered by point
+  Table<3,double> cached_values(this->dofs_per_cell, q_cell.n_quadrature_points, dim);
+  for (unsigned int k=0;k<q_cell.n_quadrature_points;++k)
+    for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+      for (unsigned int d=0;d<dim;++d)
+	cached_values(i,k,d) = this->shape_value_component(i, q_cell.point(k), d);
+  
+  for (unsigned int child=0;child<GeometryInfo<dim>::children_per_cell;++child)
+    {
+      Quadrature<dim> q_sub = QProjector<dim>::project_to_child(q_cell, child);
+      
+      for (unsigned int k=0;k<q_sub.n_quadrature_points;++k)
+	for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
+	  for (unsigned int d=0;d<dim;++d)
+	    for (unsigned int i_weight=0;i_weight<polynomials[d]->n();++i_weight)
+	      {
+		this->restriction[child](start_cell_dofs+i_weight*dim+d,
+				   i_child)
+		  += q_sub.weight(k)
+		  * cached_values(i_child, k, d)
+		  * polynomials[d]->compute_value(i_weight, q_sub.point(k));
+	      }
+    }
+  
+  for (unsigned int d=0;d<dim;++d)
+    delete polynomials[d];
+}
+
+#endif
+
+#if deal_II_dimension == 1
+
 template <>
 std::vector<unsigned int>
 FE_ABF<1>::get_dpo_vector (const unsigned int)
@@ -523,9 +668,33 @@ FE_ABF<dim>::interpolate(
       for (unsigned int d=0;d<dim;++d)
 	local_dofs[start_cell_dofs+i*dim+d] += interior_weights(k,i,d) * values[k+start_cell_points](d+offset);
 
-  //TODO: Insert missing code for ABF elements. (cf. other interpolate method)
-}
+  const unsigned start_abf_dofs = start_cell_dofs + interior_weights.size(1) * dim;
 
+  // Cell integral of ABF terms
+  for (unsigned int k=0;k<interior_weights_abf.size(0);++k)
+    for (unsigned int i=0;i<interior_weights_abf.size(1);++i)
+      for (unsigned int d=0;d<dim;++d)
+	local_dofs[start_abf_dofs+i] += interior_weights_abf(k,i,d) * values[k+start_cell_points](d+offset);
+
+  // Face integral of ABF terms
+  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+    {
+      double n_orient = (double) GeometryInfo<dim>::unit_normal_orientation[face];
+      for (unsigned int fp=0; fp < n_face_points; ++fp)
+	{
+	  // TODO: Check what the face_orientation has to be in 3D
+	  unsigned int k = QProjector<dim>::DataSetDescriptor::face (face, false, n_face_points);
+	  for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
+	    local_dofs[start_abf_dofs+i] += n_orient * boundary_weights_abf(k + fp, i) 
+	      * values[k + fp](GeometryInfo<dim>::unit_normal_direction[face]+offset);
+	}
+    }
+
+  // TODO: Check if this "correction" can be removed.
+  for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
+    if (fabs (local_dofs[start_abf_dofs+i]) < 1.0e-16)
+      local_dofs[start_abf_dofs+i] = 0.0;
+}
 
 template <int dim>
 void
