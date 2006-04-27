@@ -1137,21 +1137,22 @@ DoFTools::make_boundary_sparsity_pattern (
 				   // boundaries of dimension dim-2,
 				   // and so every boundary line is
 				   // also part of a boundary face.
-  typename DH::active_face_iterator face = dof.begin_active_face(),
-				    endf = dof.end_face();
-  for (; face!=endf; ++face)
-    if (face->at_boundary())
-      {
-        const unsigned int dofs_per_face = face->get_fe().dofs_per_face;
-        dofs_on_this_face.resize (dofs_per_face);
-	face->get_dof_indices (dofs_on_this_face);
-
-					 // make sparsity pattern for this cell
-	for (unsigned int i=0; i<dofs_per_face; ++i)
-	  for (unsigned int j=0; j<dofs_per_face; ++j) 
-	    sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
-			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
-      };
+  typename DH::active_cell_iterator cell = dof.begin_active(),
+				    endc = dof.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
+      if (cell->at_boundary(f))
+        {
+          const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+          dofs_on_this_face.resize (dofs_per_face);
+          cell->face(f)->get_dof_indices (dofs_on_this_face);
+          
+                                           // make sparsity pattern for this cell
+          for (unsigned int i=0; i<dofs_per_face; ++i)
+            for (unsigned int j=0; j<dofs_per_face; ++j) 
+              sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
+                            dof_to_boundary_mapping[dofs_on_this_face[j]]);
+      }
 }
 
 
@@ -1188,22 +1189,23 @@ void DoFTools::make_boundary_sparsity_pattern (
 
   std::vector<unsigned int> dofs_on_this_face;
   dofs_on_this_face.reserve (max_dofs_per_face(dof));
-  typename DH::active_face_iterator face = dof.begin_active_face(),
-				    endf = dof.end_face();
-  for (; face!=endf; ++face)
-    if (boundary_indicators.find(face->boundary_indicator()) !=
-	boundary_indicators.end())
-      {
-        const unsigned int dofs_per_face = face->get_fe().dofs_per_face;
-        dofs_on_this_face.resize (dofs_per_face);
-	face->get_dof_indices (dofs_on_this_face);
+  typename DH::active_cell_iterator cell = dof.begin_active(),
+				    endc = dof.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
+      if (boundary_indicators.find(cell->face(f)->boundary_indicator()) !=
+          boundary_indicators.end())
+        {
+          const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+          dofs_on_this_face.resize (dofs_per_face);
+          cell->face(f)->get_dof_indices (dofs_on_this_face);
 
-					 // make sparsity pattern for this cell
-	for (unsigned int i=0; i<dofs_per_face; ++i)
-	  for (unsigned int j=0; j<dofs_per_face; ++j)
-	    sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
-			  dof_to_boundary_mapping[dofs_on_this_face[j]]);
-      };
+                                           // make sparsity pattern for this cell
+          for (unsigned int i=0; i<dofs_per_face; ++i)
+            for (unsigned int j=0; j<dofs_per_face; ++j)
+              sparsity.add (dof_to_boundary_mapping[dofs_on_this_face[i]],
+                            dof_to_boundary_mapping[dofs_on_this_face[j]]);
+        }
 }
 
 #endif
@@ -3769,18 +3771,19 @@ DoFTools::map_dof_to_boundary_indices (const DH                  &dof_handler,
 				   // line is also part of a boundary
 				   // face which we will be visiting
 				   // sooner or later
-  typename DH::active_face_iterator face = dof_handler.begin_active_face(),
-				    endf = dof_handler.end_face();
-  for (; face!=endf; ++face)
-    if (face->at_boundary()) 
-      {
-        const unsigned int dofs_per_face = face->get_fe().dofs_per_face;
-        dofs_on_face.resize (dofs_per_face);
-	face->get_dof_indices (dofs_on_face);
-	for (unsigned int i=0; i<dofs_per_face; ++i)
-	  if (mapping[dofs_on_face[i]] == DH::invalid_dof_index)
-	    mapping[dofs_on_face[i]] = next_boundary_index++;
-      };
+  typename DH::active_cell_iterator cell = dof_handler.begin_active(),
+				    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
+      if (cell->at_boundary(f)) 
+        {
+          const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+          dofs_on_face.resize (dofs_per_face);
+          cell->face(f)->get_dof_indices (dofs_on_face);
+          for (unsigned int i=0; i<dofs_per_face; ++i)
+            if (mapping[dofs_on_face[i]] == DH::invalid_dof_index)
+              mapping[dofs_on_face[i]] = next_boundary_index++;
+        }
 
   Assert (next_boundary_index == dof_handler.n_boundary_dofs(),
 	  ExcInternalError());
@@ -3810,19 +3813,20 @@ void DoFTools::map_dof_to_boundary_indices (
   dofs_on_face.reserve (max_dofs_per_face(dof_handler));
   unsigned int next_boundary_index = 0;
   
-  typename DH::active_face_iterator face = dof_handler.begin_active_face(),
-				    endf = dof_handler.end_face();
-  for (; face!=endf; ++face)
-    if (boundary_indicators.find (face->boundary_indicator()) !=
-	boundary_indicators.end())
+  typename DH::active_cell_iterator cell = dof_handler.begin_active(),
+				    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
+      if (boundary_indicators.find (cell->face(f)->boundary_indicator()) !=
+          boundary_indicators.end())
       {
-        const unsigned int dofs_per_face = face->get_fe().dofs_per_face;
+        const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
         dofs_on_face.resize (dofs_per_face);
-	face->get_dof_indices (dofs_on_face);
+	cell->face(f)->get_dof_indices (dofs_on_face);
 	for (unsigned int i=0; i<dofs_per_face; ++i)
 	  if (mapping[dofs_on_face[i]] == DH::invalid_dof_index)
 	    mapping[dofs_on_face[i]] = next_boundary_index++;
-      };
+      }
 
   Assert (next_boundary_index == dof_handler.n_boundary_dofs (boundary_indicators),
 	  ExcInternalError());
