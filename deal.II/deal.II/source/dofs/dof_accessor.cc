@@ -36,7 +36,7 @@
 
 template <class DH>
 void DoFObjectAccessor<1, DH>::set_dof_index (const unsigned int i,
-						   const unsigned int index) const
+                                              const unsigned int index) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
@@ -44,21 +44,24 @@ void DoFObjectAccessor<1, DH>::set_dof_index (const unsigned int i,
 	  typename BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+  Assert (i<this->dof_handler->get_fe().dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_line));
 
   this->dof_handler->levels[this->present_level]
-    ->line_dofs[this->present_index*this->get_fe().dofs_per_line+i] = index;
+    ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i]
+    = index;
 }
+
+
 
 
 
 template <class DH>
 void DoFObjectAccessor<1, DH>::set_vertex_dof_index (const unsigned int vertex,
-							  const unsigned int i,
-							  const unsigned int index) const
+                                                     const unsigned int i,
+                                                     const unsigned int index) const
 
 {
 				   // since the exception classes are
@@ -74,14 +77,14 @@ void DoFObjectAccessor<1, DH>::set_vertex_dof_index (const unsigned int vertex,
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe().dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
 }
@@ -92,24 +95,24 @@ template <class DH>
 template <class InputVector, typename number>
 void
 DoFObjectAccessor<1,DH>::get_dof_values (const InputVector &values,
-					     Vector<number>    &local_values) const
+                                         Vector<number>    &local_values) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
   Assert (dim==1, ExcInternalError());
   
   Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (local_values.size() == this->get_fe().dofs_per_cell,
+  Assert (local_values.size() == this->dof_handler->get_fe().dofs_per_cell,
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (values.size() == this->dof_handler->n_dofs(),
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (this->has_children() == false,
 	  typename BaseClass::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line;
   typename Vector<number>::iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -127,24 +130,24 @@ template <class DH>
 template <class OutputVector, typename number>
 void
 DoFObjectAccessor<1,DH>::set_dof_values (const Vector<number> &local_values,
-					     OutputVector         &values) const
+                                         OutputVector         &values) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
   Assert (dim==1, ExcInternalError());
   
   Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (local_values.size() == this->get_fe().dofs_per_cell,
+  Assert (local_values.size() == this->dof_handler->get_fe().dofs_per_cell,
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (values.size() == this->dof_handler->n_dofs(),
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (this->has_children() == false,
 	  typename BaseClass::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line;
   typename Vector<number>::const_iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -157,12 +160,13 @@ DoFObjectAccessor<1,DH>::set_dof_values (const Vector<number> &local_values,
 }
 
 
+
 /*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
 
 
 template <class DH>
 void DoFObjectAccessor<2, DH>::set_dof_index (const unsigned int i,
-						   const unsigned int index) const
+                                              const unsigned int index) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
@@ -170,13 +174,13 @@ void DoFObjectAccessor<2, DH>::set_dof_index (const unsigned int i,
 	  typename BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_quad,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
+  Assert (i<this->dof_handler->get_fe().dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_quad));
 
   this->dof_handler->levels[this->present_level]
-    ->quad_dofs[this->present_index*this->get_fe().dofs_per_quad+i] = index;
+    ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i] = index;
 }
 
 
@@ -184,21 +188,21 @@ void DoFObjectAccessor<2, DH>::set_dof_index (const unsigned int i,
 template <class DH>
 void
 DoFObjectAccessor<2, DH>::set_vertex_dof_index (const unsigned int vertex,
-						     const unsigned int i,
-						     const unsigned int index) const
+                                                const unsigned int i,
+                                                const unsigned int index) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe().dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
 }
@@ -209,7 +213,7 @@ template <class DH>
 template <class InputVector, typename number>
 void
 DoFObjectAccessor<2,DH>::get_dof_values (const InputVector &values,
-					     Vector<number>    &local_values) const
+                                         Vector<number>    &local_values) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
@@ -217,18 +221,18 @@ DoFObjectAccessor<2,DH>::get_dof_values (const InputVector &values,
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (local_values.size() == this->get_fe().dofs_per_cell,
+  Assert (local_values.size() == this->dof_handler->get_fe().dofs_per_cell,
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (values.size() == this->dof_handler->n_dofs(),
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (this->has_children() == false,
 	  typename BaseClass::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad;
   typename Vector<number>::iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -249,7 +253,7 @@ template <class DH>
 template <class OutputVector, typename number>
 void
 DoFObjectAccessor<2,DH>::set_dof_values (const Vector<number> &local_values,
-					     OutputVector         &values) const
+                                         OutputVector         &values) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
@@ -257,18 +261,18 @@ DoFObjectAccessor<2,DH>::set_dof_values (const Vector<number> &local_values,
   
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (local_values.size() == this->get_fe().dofs_per_cell,
+  Assert (local_values.size() == this->dof_handler->get_fe().dofs_per_cell,
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (values.size() == this->dof_handler->n_dofs(),
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (this->has_children() == false,
 	  typename BaseClass::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad;
   typename Vector<number>::const_iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -289,7 +293,7 @@ DoFObjectAccessor<2,DH>::set_dof_values (const Vector<number> &local_values,
 
 template <class DH>
 void DoFObjectAccessor<3, DH>::set_dof_index (const unsigned int i,
-						   const unsigned int index) const
+                                              const unsigned int index) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
@@ -297,35 +301,35 @@ void DoFObjectAccessor<3, DH>::set_dof_index (const unsigned int i,
 	  typename BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_hex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_hex));
+  Assert (i<this->dof_handler->get_fe().dofs_per_hex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_hex));
 
   this->dof_handler->levels[this->present_level]
-    ->hex_dofs[this->present_index*this->get_fe().dofs_per_hex+i] = index;
+    ->hex_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_hex+i] = index;
 }
 
 
 
 template <class DH>
 void DoFObjectAccessor<3, DH>::set_vertex_dof_index (const unsigned int vertex,
-							  const unsigned int i,
-							  const unsigned int index) const
+                                                     const unsigned int i,
+                                                     const unsigned int index) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (vertex<8,
 	  ExcIndexRange (i,0,8));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe().dofs_per_vertex +
 				   i);
   this->dof_handler->vertex_dofs[dof_number] = index;
 }
@@ -336,7 +340,7 @@ template <class DH>
 template <class InputVector, typename number>
 void
 DoFObjectAccessor<3,DH>::get_dof_values (const InputVector &values,
-					     Vector<number>    &local_values) const
+                                         Vector<number>    &local_values) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
@@ -344,19 +348,19 @@ DoFObjectAccessor<3,DH>::get_dof_values (const InputVector &values,
 
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, 
+  Assert (&this->dof_handler->get_fe() != 0, 
 	  typename BaseClass::ExcInvalidObject());
-  Assert (local_values.size() == this->get_fe().dofs_per_cell,
+  Assert (local_values.size() == this->dof_handler->get_fe().dofs_per_cell,
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (values.size() == this->dof_handler->n_dofs(),
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (this->has_children() == false,
 	  typename BaseClass::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad,
-		     dofs_per_hex    = this->get_fe().dofs_per_hex;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = this->dof_handler->get_fe().dofs_per_hex;
   typename Vector<number>::iterator next_local_value = local_values.begin();
   for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -380,7 +384,7 @@ template <class DH>
 template <class OutputVector, typename number>
 void
 DoFObjectAccessor<3,DH>::set_dof_values (const Vector<number> &local_values,
-					     OutputVector         &values) const
+                                         OutputVector         &values) const
 {
   typedef DoFAccessor<DH> BaseClass;
 
@@ -388,19 +392,19 @@ DoFObjectAccessor<3,DH>::set_dof_values (const Vector<number> &local_values,
 
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (local_values.size() == this->get_fe().dofs_per_cell,
+  Assert (local_values.size() == this->dof_handler->get_fe().dofs_per_cell,
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (values.size() == this->dof_handler->n_dofs(),
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (this->has_children() == false,
 	  typename BaseClass::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad,
-		     dofs_per_hex    = this->get_fe().dofs_per_hex;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = this->dof_handler->get_fe().dofs_per_hex;
   typename Vector<number>::const_iterator next_local_value=local_values.begin();
   for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -417,6 +421,184 @@ DoFObjectAccessor<3,DH>::set_dof_values (const Vector<number> &local_values,
   Assert (next_local_value == local_values.end(),
 	  ExcInternalError());
 }
+
+
+
+// --------------- hp::DoFHandler specializations for 1d objects -----------
+
+
+template <>
+void DoFObjectAccessor<1, hp::DoFHandler<1> >::set_vertex_dof_index (const unsigned int /*vertex*/,
+                                                                     const unsigned int /*i*/,
+                                                                     const unsigned int /*index*/) const
+{
+  Assert (false, ExcInternalError());
+}
+
+template <>
+void DoFObjectAccessor<1, hp::DoFHandler<2> >::set_vertex_dof_index (const unsigned int /*vertex*/,
+                                                                     const unsigned int /*i*/,
+                                                                     const unsigned int /*index*/) const
+{
+  Assert (false, ExcInternalError());
+}
+
+template <>
+void DoFObjectAccessor<1, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int /*vertex*/,
+                                                                     const unsigned int /*i*/,
+                                                                     const unsigned int /*index*/) const
+{
+  Assert (false, ExcInternalError());
+}
+
+
+template <>
+template <class InputVector, typename number>
+void
+DoFObjectAccessor<1,hp::DoFHandler<1> >::get_dof_values (const InputVector &/*values*/,
+                                                         Vector<number>    &/*local_values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+template <>
+template <class InputVector, typename number>
+void
+DoFObjectAccessor<1,hp::DoFHandler<2> >::get_dof_values (const InputVector &/*values*/,
+                                                         Vector<number>    &/*local_values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+template <>
+template <class InputVector, typename number>
+void
+DoFObjectAccessor<1,hp::DoFHandler<3> >::get_dof_values (const InputVector &/*values*/,
+                                                         Vector<number>    &/*local_values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+template <>
+template <class OutputVector, typename number>
+void
+DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_values (const Vector<number> &/*local_values*/,
+                                                         OutputVector         &/*values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+template <>
+template <class OutputVector, typename number>
+void
+DoFObjectAccessor<1,hp::DoFHandler<2> >::set_dof_values (const Vector<number> &/*local_values*/,
+                                                         OutputVector         &/*values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+template <>
+template <class OutputVector, typename number>
+void
+DoFObjectAccessor<1,hp::DoFHandler<3> >::set_dof_values (const Vector<number> &/*local_values*/,
+                                                         OutputVector         &/*values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+
+// --------------- hp::DoFHandler specializations for 2d objects -----------
+
+
+template <>
+void DoFObjectAccessor<2, hp::DoFHandler<2> >::set_vertex_dof_index (const unsigned int /*vertex*/,
+                                                                     const unsigned int /*i*/,
+                                                                     const unsigned int /*index*/) const
+{
+  Assert (false, ExcInternalError());
+}
+
+template <>
+void DoFObjectAccessor<2, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int /*vertex*/,
+                                                                     const unsigned int /*i*/,
+                                                                     const unsigned int /*index*/) const
+{
+  Assert (false, ExcInternalError());
+}
+
+
+template <>
+template <class InputVector, typename number>
+void
+DoFObjectAccessor<2,hp::DoFHandler<2> >::get_dof_values (const InputVector &/*values*/,
+                                                         Vector<number>    &/*local_values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+template <>
+template <class InputVector, typename number>
+void
+DoFObjectAccessor<2,hp::DoFHandler<3> >::get_dof_values (const InputVector &/*values*/,
+                                                         Vector<number>    &/*local_values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+template <>
+template <class OutputVector, typename number>
+void
+DoFObjectAccessor<2,hp::DoFHandler<2> >::set_dof_values (const Vector<number> &/*local_values*/,
+                                                         OutputVector         &/*values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+template <>
+template <class OutputVector, typename number>
+void
+DoFObjectAccessor<2,hp::DoFHandler<3> >::set_dof_values (const Vector<number> &/*local_values*/,
+                                                         OutputVector         &/*values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+
+// --------------- hp::DoFHandler specializations for 3d objects -----------
+
+
+template <>
+void DoFObjectAccessor<3, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int /*vertex*/,
+                                                                     const unsigned int /*i*/,
+                                                                     const unsigned int /*index*/) const
+{
+  Assert (false, ExcInternalError());
+}
+
+template <>
+template <class InputVector, typename number>
+void
+DoFObjectAccessor<3,hp::DoFHandler<3> >::get_dof_values (const InputVector &/*values*/,
+                                                         Vector<number>    &/*local_values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+template <>
+template <class OutputVector, typename number>
+void
+DoFObjectAccessor<3,hp::DoFHandler<3> >::set_dof_values (const Vector<number> &/*local_values*/,
+                                                         OutputVector         &/*values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
 
 
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
@@ -785,8 +967,8 @@ get_interpolated_dof_values (const InputVector &values,
             else
               if (tmp2(i) != 0)
                 interpolated_values(i) = tmp2(i);
-	};
-    };
+	}
+    }
 }
 
 
@@ -827,8 +1009,8 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
 	  this->get_fe().get_prolongation_matrix(child)
             .vmult (tmp, local_values);
 	  this->child(child)->set_dof_values_by_interpolation (tmp, values);
-	};
-    };
+	}
+    }
 }
 
 

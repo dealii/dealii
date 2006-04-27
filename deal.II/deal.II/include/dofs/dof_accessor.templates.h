@@ -152,37 +152,6 @@ DoFObjectAccessor<1,DH>::child (const unsigned int i) const
 
 template <class DH>
 inline
-const FiniteElement<DH::dimension> &
-DoFObjectAccessor<1,DH>::get_fe () const
-{
-  return *this->dof_handler->selected_fe;
-}
-
-
-
-template <class DH>
-inline
-unsigned int
-DoFObjectAccessor<1,DH>::active_fe_index () const
-{
-  return 0;
-}
-
-
-
-template <class DH>
-inline
-void
-DoFObjectAccessor<1,DH>::set_active_fe_index (const unsigned int i)
-{
-  typedef DoFAccessor<DH> BaseClass;
-  Assert (i == 0, typename BaseClass::ExcInvalidObject());
-}
-
-
-
-template <class DH>
-inline
 void
 DoFObjectAccessor<1,DH>::copy_from (const DoFObjectAccessor<1,DH> &a)
 {
@@ -269,37 +238,6 @@ DoFObjectAccessor<2,DH>::child (const unsigned int i) const
     Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
 #endif
   return q;
-}
-
-
-
-template <class DH>
-inline
-const FiniteElement<DH::dimension> &
-DoFObjectAccessor<2,DH>::get_fe () const
-{
-  return *this->dof_handler->selected_fe;
-}
-
-
-
-template <class DH>
-inline
-unsigned int
-DoFObjectAccessor<2,DH>::active_fe_index () const
-{
-  return 0;
-}
-
-
-
-template <class DH>
-inline
-void
-DoFObjectAccessor<2,DH>::set_active_fe_index (const unsigned int i)
-{
-  typedef DoFAccessor<DH> BaseClass;
-  Assert (i == 0, typename BaseClass::ExcInvalidObject());
 }
 
 
@@ -408,37 +346,6 @@ DoFObjectAccessor<3,DH>::child (const unsigned int i) const
 
 
 template <class DH>
-inline
-const FiniteElement<DH::dimension> &
-DoFObjectAccessor<3,DH>::get_fe () const
-{
-  return *this->dof_handler->selected_fe;
-}
-
-
-
-template <class DH>
-inline
-unsigned int
-DoFObjectAccessor<3,DH>::active_fe_index () const
-{
-  return 0;
-}
-
-
-
-template <class DH>
-inline
-void
-DoFObjectAccessor<3,DH>::set_active_fe_index (const unsigned int i)
-{
-  typedef DoFAccessor<DH> BaseClass;
-  Assert (i == 0, typename BaseClass::ExcInvalidObject());
-}
-
-
-
-template <class DH>
 void DoFObjectAccessor<3,DH>::copy_from (const DoFObjectAccessor<3,DH> &a)
 {
   BaseClass::copy_from (a);
@@ -483,12 +390,12 @@ DoFObjectAccessor<1,DoFHandler<1> >::dof_index (const unsigned int i) const
   Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
+  Assert (i<this->dof_handler->get_fe().dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_line));
 
   return this->dof_handler->levels[this->present_level]
-    ->line_dofs[this->present_index*this->get_fe().dofs_per_line+i];
+    ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
 }
 
 
@@ -503,13 +410,13 @@ DoFObjectAccessor<1,DoFHandler<1> >::vertex_dof_index (const unsigned int vertex
           ExcMessage ("DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe().dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -525,9 +432,9 @@ DoFObjectAccessor<1,DoFHandler<1> >::get_dof_indices (std::vector<unsigned int> 
           ExcMessage ("DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->get_fe().dofs_per_vertex +
-				 this->get_fe().dofs_per_line),
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
+  Assert (dof_indices.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
+				 this->dof_handler->get_fe().dofs_per_line),
 	  DoFAccessor<DoFHandler<1> >::ExcVectorDoesNotMatch());
 
 				   // this function really only makes
@@ -539,12 +446,12 @@ DoFObjectAccessor<1,DoFHandler<1> >::get_dof_indices (std::vector<unsigned int> 
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   2*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe().dofs_per_cell ==
+	   2*this->dof_handler->get_fe().dofs_per_vertex),
 	  DoFAccessor<DoFHandler<1> >::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -566,12 +473,12 @@ DoFObjectAccessor<1,DoFHandler<2> >::dof_index (const unsigned int i) const
   Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
+  Assert (i<this->dof_handler->get_fe().dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_line));
 
   return this->dof_handler->levels[this->present_level]
-    ->line_dofs[this->present_index*this->get_fe().dofs_per_line+i];
+    ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
 }
 
 
@@ -586,13 +493,13 @@ DoFObjectAccessor<1,DoFHandler<2> >::vertex_dof_index (const unsigned int vertex
           ExcMessage ("DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe().dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -608,9 +515,9 @@ DoFObjectAccessor<1,DoFHandler<2> >::get_dof_indices (std::vector<unsigned int> 
           ExcMessage ("DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->get_fe().dofs_per_vertex +
-				 this->get_fe().dofs_per_line),
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
+  Assert (dof_indices.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
+				 this->dof_handler->get_fe().dofs_per_line),
 	  DoFAccessor<DoFHandler<2> >::ExcVectorDoesNotMatch());
 
 				   // this function really only makes
@@ -622,12 +529,12 @@ DoFObjectAccessor<1,DoFHandler<2> >::get_dof_indices (std::vector<unsigned int> 
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   2*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe().dofs_per_cell ==
+	   2*this->dof_handler->get_fe().dofs_per_vertex),
 	  DoFAccessor<DoFHandler<2> >::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -649,12 +556,12 @@ DoFObjectAccessor<1,DoFHandler<3> >::dof_index (const unsigned int i) const
   Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
+  Assert (i<this->dof_handler->get_fe().dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_line));
 
   return this->dof_handler->levels[this->present_level]
-    ->line_dofs[this->present_index*this->get_fe().dofs_per_line+i];
+    ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
 }
 
 
@@ -669,13 +576,13 @@ DoFObjectAccessor<1,DoFHandler<3> >::vertex_dof_index (const unsigned int vertex
           ExcMessage ("DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe().dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -691,9 +598,9 @@ DoFObjectAccessor<1,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> 
           ExcMessage ("DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->get_fe().dofs_per_vertex +
-				 this->get_fe().dofs_per_line),
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
+  Assert (dof_indices.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
+				 this->dof_handler->get_fe().dofs_per_line),
 	  DoFAccessor<DoFHandler<3> >::ExcVectorDoesNotMatch());
 
 				   // this function really only makes
@@ -705,12 +612,12 @@ DoFObjectAccessor<1,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> 
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   2*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe().dofs_per_cell ==
+	   2*this->dof_handler->get_fe().dofs_per_vertex),
 	  DoFAccessor<DoFHandler<3> >::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -732,15 +639,15 @@ DoFObjectAccessor<2,DoFHandler<2> >::dof_index (const unsigned int i) const
 	  DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_quad,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
+  Assert (i<this->dof_handler->get_fe().dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_quad));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
   return this->dof_handler->levels[this->present_level]
-    ->quad_dofs[this->present_index*this->get_fe().dofs_per_quad+i];
+    ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i];
 }
 
 
@@ -753,16 +660,16 @@ DoFObjectAccessor<2,DoFHandler<2> >::vertex_dof_index (const unsigned int vertex
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe().dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -776,11 +683,11 @@ DoFObjectAccessor<2,DoFHandler<2> >::get_dof_indices (std::vector<unsigned int> 
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (4*this->get_fe().dofs_per_vertex +
-				 4*this->get_fe().dofs_per_line +
-				 this->get_fe().dofs_per_quad),
+  Assert (dof_indices.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
+				 4*this->dof_handler->get_fe().dofs_per_line +
+				 this->dof_handler->get_fe().dofs_per_quad),
 	  DoFAccessor<DoFHandler<2> >::ExcVectorDoesNotMatch());
 
 				   // this function really only makes
@@ -792,16 +699,16 @@ DoFObjectAccessor<2,DoFHandler<2> >::get_dof_indices (std::vector<unsigned int> 
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   4*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe().dofs_per_cell ==
+	   4*this->dof_handler->get_fe().dofs_per_vertex),
 	  DoFAccessor<DoFHandler<2> >::ExcNotActive());
   
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -824,15 +731,15 @@ DoFObjectAccessor<2,DoFHandler<3> >::dof_index (const unsigned int i) const
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_quad,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
+  Assert (i<this->dof_handler->get_fe().dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_quad));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
   return this->dof_handler->levels[this->present_level]
-    ->quad_dofs[this->present_index*this->get_fe().dofs_per_quad+i];
+    ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i];
 }
 
 
@@ -845,16 +752,16 @@ DoFObjectAccessor<2,DoFHandler<3> >::vertex_dof_index (const unsigned int vertex
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe().dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -868,11 +775,11 @@ DoFObjectAccessor<2,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> 
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (4*this->get_fe().dofs_per_vertex +
-				 4*this->get_fe().dofs_per_line +
-				 this->get_fe().dofs_per_quad),
+  Assert (dof_indices.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
+				 4*this->dof_handler->get_fe().dofs_per_line +
+				 this->dof_handler->get_fe().dofs_per_quad),
 	  DoFAccessor<DoFHandler<3> >::ExcVectorDoesNotMatch());
 
 				   // this function really only makes
@@ -884,16 +791,16 @@ DoFObjectAccessor<2,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> 
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   4*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe().dofs_per_cell ==
+	   4*this->dof_handler->get_fe().dofs_per_vertex),
 	  DoFAccessor<DoFHandler<3> >::ExcNotActive());
   
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -921,15 +828,15 @@ DoFObjectAccessor<3,DoFHandler<3> >::dof_index (const unsigned int i) const
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_hex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_hex));
+  Assert (i<this->dof_handler->get_fe().dofs_per_hex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_hex));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
   return this->dof_handler->levels[this->present_level]
-    ->hex_dofs[this->present_index*this->get_fe().dofs_per_hex+i];
+    ->hex_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_hex+i];
 }
 
 
@@ -942,16 +849,16 @@ DoFObjectAccessor<3,DoFHandler<3> >::vertex_dof_index (const unsigned int vertex
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
   Assert (vertex<8, ExcIndexRange (i,0,8));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe().dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -965,12 +872,12 @@ DoFObjectAccessor<3,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> 
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (8*this->get_fe().dofs_per_vertex +
-				 12*this->get_fe().dofs_per_line +
-				 6*this->get_fe().dofs_per_quad +
-				 this->get_fe().dofs_per_hex),
+  Assert (dof_indices.size() == (8*this->dof_handler->get_fe().dofs_per_vertex +
+				 12*this->dof_handler->get_fe().dofs_per_line +
+				 6*this->dof_handler->get_fe().dofs_per_quad +
+				 this->dof_handler->get_fe().dofs_per_hex),
 	  DoFAccessor<DoFHandler<3> >::ExcVectorDoesNotMatch());
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
@@ -984,16 +891,16 @@ DoFObjectAccessor<3,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> 
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   8*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe().dofs_per_cell ==
+	   8*this->dof_handler->get_fe().dofs_per_vertex),
 	  DoFAccessor<DoFHandler<3> >::ExcNotActive());
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad,
-		     dofs_per_hex    = this->get_fe().dofs_per_hex;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad,
+		     dofs_per_hex    = this->dof_handler->get_fe().dofs_per_hex;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -1022,13 +929,13 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::vertex_dof_index (const unsigned int ve
           ExcMessage ("hp::DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<1> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<hp::DoFHandler<1> >::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<1> >::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe()[0].dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -1045,13 +952,13 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int ve
           ExcMessage ("hp::DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe()[0].dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -1067,13 +974,13 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
           ExcMessage ("hp::DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe()[0].dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -1087,16 +994,16 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int ve
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe()[0].dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -1111,16 +1018,16 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe()[0].dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -1135,16 +1042,16 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
   const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->get_fe().dofs_per_vertex +
+				   this->dof_handler->get_fe()[0].dofs_per_vertex +
 				   i);
   return this->dof_handler->vertex_dofs[dof_number];
 }
@@ -1173,9 +1080,9 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::dof_index (const unsigned int i) const
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
 
 				   // for lines in 1d, we only have to
 				   // take care of the offset, no
@@ -1203,9 +1110,9 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::get_dof_indices (std::vector<unsigned i
           ExcMessage ("DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<1> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<hp::DoFHandler<1> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->get_fe().dofs_per_vertex +
-				 this->get_fe().dofs_per_line),
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<1> >::ExcInvalidObject());
+  Assert (dof_indices.size() == (2*this->dof_handler->get_fe()[0].dofs_per_vertex +
+				 this->dof_handler->get_fe()[0].dofs_per_line),
 	  DoFAccessor<hp::DoFHandler<1> >::ExcVectorDoesNotMatch());
 
 				   // this function really only makes
@@ -1217,12 +1124,12 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::get_dof_indices (std::vector<unsigned i
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   2*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe()[0].dofs_per_cell ==
+	   2*this->dof_handler->get_fe()[0].dofs_per_vertex),
 	  DoFAccessor<hp::DoFHandler<1> >::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[0].dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe()[0].dofs_per_line;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -1254,9 +1161,9 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::dof_index (const unsigned int i) const
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
 			      ->dof_line_index_offset[this->present_index];
@@ -1280,9 +1187,9 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::get_dof_indices (std::vector<unsigned i
           ExcMessage ("DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->get_fe().dofs_per_vertex +
-				 this->get_fe().dofs_per_line),
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
+  Assert (dof_indices.size() == (2*this->dof_handler->get_fe()[0].dofs_per_vertex +
+				 this->dof_handler->get_fe()[0].dofs_per_line),
 	  DoFAccessor<hp::DoFHandler<2> >::ExcVectorDoesNotMatch());
 
 				   // this function really only makes
@@ -1294,12 +1201,12 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::get_dof_indices (std::vector<unsigned i
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   2*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe()[0].dofs_per_cell ==
+	   2*this->dof_handler->get_fe()[0].dofs_per_vertex),
 	  DoFAccessor<hp::DoFHandler<2> >::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[0].dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe()[0].dofs_per_line;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -1331,9 +1238,9 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::dof_index (const unsigned int i) const
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
 			      ->dof_line_index_offset[this->present_index];
@@ -1357,9 +1264,9 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned i
           ExcMessage ("DoFHandler not initialized"));
 
   Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->get_fe().dofs_per_vertex +
-				 this->get_fe().dofs_per_line),
+  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
+  Assert (dof_indices.size() == (2*this->dof_handler->get_fe()[0].dofs_per_vertex +
+				 this->dof_handler->get_fe()[0].dofs_per_line),
 	  DoFAccessor<hp::DoFHandler<3> >::ExcVectorDoesNotMatch());
 
 				   // this function really only makes
@@ -1371,12 +1278,12 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned i
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   2*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe()[0].dofs_per_cell ==
+	   2*this->dof_handler->get_fe()[0].dofs_per_vertex),
 	  DoFAccessor<hp::DoFHandler<3> >::ExcNotActive());
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[0].dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe()[0].dofs_per_line;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -1401,10 +1308,10 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_index (const unsigned int i,
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
 
 				   // for lines in 1d, we only have to
 				   // take care of the offset, no
@@ -1437,10 +1344,10 @@ DoFObjectAccessor<1, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
 
 //TODO:[?] In two dimension it could happen that we have different active_fe_indices
 // on a line between to cells. Hence we have to differentiate between these two cases.
@@ -1473,10 +1380,10 @@ DoFObjectAccessor<1, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_line));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_line_index_offset[this->present_index];
@@ -1490,129 +1397,6 @@ DoFObjectAccessor<1, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 }
 
 
-
-
-template <>
-inline
-const FiniteElement<1> &
-DoFObjectAccessor<1,hp::DoFHandler<1> >::get_fe () const
-{
-  return (*dof_handler->finite_elements)[active_fe_index ()];
-}
-
-
-
-template <>
-inline
-const FiniteElement<2> &
-DoFObjectAccessor<1,hp::DoFHandler<2> >::get_fe () const
-{
-  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
-			     "associated with active_fe_indices and corresponding "
-			     "finite element objects"));
-  return (*dof_handler->finite_elements)[0];
-}
-
-
-
-template <>
-inline
-const FiniteElement<3> &
-DoFObjectAccessor<1,hp::DoFHandler<3> >::get_fe () const
-{
-  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
-			     "associated with active_fe_indices and corresponding "
-			     "finite element objects"));
-  return (*dof_handler->finite_elements)[0];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<1> >::active_fe_index () const
-{
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return this->dof_handler->levels[this->present_level]
-    ->active_fe_indices[this->present_index];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<2> >::active_fe_index () const
-{
-  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
-			     "associated with active_fe_indices and corresponding "
-			     "finite element objects"));
-  return 0;
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<3> >::active_fe_index () const
-{
-  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
-			     "associated with active_fe_indices and corresponding "
-			     "finite element objects"));
-  return 0;
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<1,hp::DoFHandler<1> >::set_active_fe_index (const unsigned int i)
-{
-  Assert (this->dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) <
-          this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  Assert (i < this->dof_handler->finite_elements->size (),
-          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
-  this->dof_handler->levels[this->present_level]
-    ->active_fe_indices[this->present_index] = i;
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<1,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int)
-{
-  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
-			     "associated with active_fe_indices and corresponding "
-			     "finite element objects"));
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<1,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int)
-{
-  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
-			     "associated with active_fe_indices and corresponding "
-			     "finite element objects"));
-}
 
 
 /*------------- Functions: DoFObjectAccessor<2,hp::DoFHandler> -------------*/
@@ -1629,10 +1413,10 @@ unsigned int DoFObjectAccessor<2,hp::DoFHandler<2> >::dof_index (const unsigned 
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_quad,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_quad));
 
 				   // for quads in 2d, we only have to
 				   // take care of the offset, no
@@ -1663,10 +1447,10 @@ unsigned int DoFObjectAccessor<2,hp::DoFHandler<3> >::dof_index (const unsigned 
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_quad,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_quad));
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
 			      ->dof_quad_index_offset[this->present_index];
@@ -1695,10 +1479,10 @@ DoFObjectAccessor<2, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_quad,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_quad));
 
 				   // for quads in 2d, we only have to
 				   // take care of the offset, no
@@ -1731,10 +1515,10 @@ DoFObjectAccessor<2, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_quad,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_quad));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_quad));
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_quad_index_offset[this->present_index];
@@ -1756,11 +1540,11 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::get_dof_indices (std::vector<unsigned i
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (4*this->get_fe().dofs_per_vertex +
-				 4*this->get_fe().dofs_per_line +
-				 this->get_fe().dofs_per_quad),
+  Assert (dof_indices.size() == (4*this->dof_handler->get_fe()[0].dofs_per_vertex +
+				 4*this->dof_handler->get_fe()[0].dofs_per_line +
+				 this->dof_handler->get_fe()[0].dofs_per_quad),
 	  DoFAccessor<hp::DoFHandler<2> >::ExcVectorDoesNotMatch());
 
 				   // this function really only makes
@@ -1772,16 +1556,16 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::get_dof_indices (std::vector<unsigned i
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   4*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe()[0].dofs_per_cell ==
+	   4*this->dof_handler->get_fe()[0].dofs_per_vertex),
 	  DoFAccessor<hp::DoFHandler<2> >::ExcNotActive());
   
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[0].dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe()[0].dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe()[0].dofs_per_quad;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -1802,11 +1586,11 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned i
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (4*this->get_fe().dofs_per_vertex +
-				 4*this->get_fe().dofs_per_line +
-				 this->get_fe().dofs_per_quad),
+  Assert (dof_indices.size() == (4*this->dof_handler->get_fe()[0].dofs_per_vertex +
+				 4*this->dof_handler->get_fe()[0].dofs_per_line +
+				 this->dof_handler->get_fe()[0].dofs_per_quad),
 	  DoFAccessor<hp::DoFHandler<3> >::ExcVectorDoesNotMatch());
 
 				   // this function really only makes
@@ -1818,16 +1602,16 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned i
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   4*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe()[0].dofs_per_cell ==
+	   4*this->dof_handler->get_fe()[0].dofs_per_vertex),
 	  DoFAccessor<hp::DoFHandler<3> >::ExcNotActive());
   
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[0].dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe()[0].dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe()[0].dofs_per_quad;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -1841,93 +1625,6 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned i
 
 
 
-template <>
-inline
-const FiniteElement<2> &
-DoFObjectAccessor<2,hp::DoFHandler<2> >::get_fe () const
-{
-  return (*dof_handler->finite_elements)[active_fe_index ()];
-}
-
-
-
-template <>
-inline
-const FiniteElement<3> &
-DoFObjectAccessor<2,hp::DoFHandler<3> >::get_fe () const
-{
-  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
-			     "associated with active_fe_indices and corresponding "
-			     "finite element objects"));
-  return (*dof_handler->finite_elements)[0];
-}
-
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<2,hp::DoFHandler<2> >::active_fe_index () const
-{
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return this->dof_handler->levels[this->present_level]
-    ->active_fe_indices[this->present_index];
-}
-
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<2,hp::DoFHandler<3> >::active_fe_index () const
-{
-  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
-			     "associated with active_fe_indices and corresponding "
-			     "finite element objects"));
-  return 0;
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<2,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i)
-{
-  Assert (this->dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  Assert (i < this->dof_handler->finite_elements->size (),
-          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
-
-  this->dof_handler->levels[this->present_level]
-    ->active_fe_indices[this->present_index] = i;
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<2,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int)
-{
-  Assert (false, ExcMessage ("Only cells, not lower-dimensional objects, are "
-			     "associated with active_fe_indices and corresponding "
-			     "finite element objects"));
-}
 
 
 /*------------- Functions: DoFObjectAccessor<3,hp::DoFHandler> -------------*/
@@ -1945,10 +1642,10 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::dof_index (const unsigned int i) const
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_hex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_hex));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_hex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_hex));
 
 				   // for hexes in 3d, we only have to
 				   // take care of the offset, no
@@ -1981,10 +1678,10 @@ DoFObjectAccessor<3, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
           ExcMessage ("DoFHandler not initialized"));
 				   // make sure a FE has been selected
 				   // and enough room was reserved
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->get_fe().dofs_per_hex,
-	  ExcIndexRange (i, 0, this->get_fe().dofs_per_hex));
+  Assert (i<this->dof_handler->get_fe()[0].dofs_per_hex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_hex));
 
 				   // for hexes in 3d, we only have to
 				   // take care of the offset, no
@@ -2010,12 +1707,12 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned i
 {
   Assert (this->dof_handler != 0,
 	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0,
+  Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (dof_indices.size() == (8*this->get_fe().dofs_per_vertex +
-				 12*this->get_fe().dofs_per_line +
-				 6*this->get_fe().dofs_per_quad +
-				 this->get_fe().dofs_per_hex),
+  Assert (dof_indices.size() == (8*this->dof_handler->get_fe()[0].dofs_per_vertex +
+				 12*this->dof_handler->get_fe()[0].dofs_per_line +
+				 6*this->dof_handler->get_fe()[0].dofs_per_quad +
+				 this->dof_handler->get_fe()[0].dofs_per_hex),
 	  DoFAccessor<hp::DoFHandler<3> >::ExcVectorDoesNotMatch());
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
@@ -2029,16 +1726,16 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned i
 				   // not allocated for this
 				   // non-active thing
   Assert (!this->has_children() ||
-	  (this->get_fe().dofs_per_cell ==
-	   8*this->get_fe().dofs_per_vertex),
+	  (this->dof_handler->get_fe()[0].dofs_per_cell ==
+	   8*this->dof_handler->get_fe()[0].dofs_per_vertex),
 	  DoFAccessor<hp::DoFHandler<3> >::ExcNotActive());
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
   
-  const unsigned int dofs_per_vertex = this->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->get_fe().dofs_per_quad,
-		     dofs_per_hex    = this->get_fe().dofs_per_hex;
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[0].dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe()[0].dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe()[0].dofs_per_quad,
+		     dofs_per_hex    = this->dof_handler->get_fe()[0].dofs_per_hex;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
@@ -2053,53 +1750,6 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned i
     *next++ = dof_index(d);
 }
 
-
-
-template <>
-inline
-const FiniteElement<3> &
-DoFObjectAccessor<3,hp::DoFHandler<3> >::get_fe () const
-{
-  return (*dof_handler->finite_elements)[active_fe_index ()];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<3,hp::DoFHandler<3> >::active_fe_index () const
-{
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  return this->dof_handler->levels[this->present_level]
-    ->active_fe_indices[this->present_index];
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<3,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i)
-{
-  Assert (this->dof_handler != 0, ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
-	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
-	  ExcIndexRange (this->present_index, 0,
-			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  Assert (i < this->dof_handler->finite_elements->size (),
-          ExcIndexRange(i, 0, this->dof_handler->finite_elements->size ()));
-
-  this->dof_handler->levels[this->present_level]
-    ->active_fe_indices[this->present_index] = i;
-}
 
 
 
@@ -2288,6 +1938,185 @@ get_dof_indices (std::vector<unsigned int> &dof_indices) const
 
 
 
+template <class DH>
+inline
+const FiniteElement<DH::dimension> &
+DoFCellAccessor<DH>::get_fe () const
+{
+  return this->dof_handler->get_fe();
+}
+
+
+
+template <class DH>
+inline
+unsigned int
+DoFCellAccessor<DH>::active_fe_index () const
+{
+  return 0;
+}
+
+
+
+template <class DH>
+inline
+void
+DoFCellAccessor<DH>::set_active_fe_index (const unsigned int i)
+{
+  Assert (i == 0, typename DoFAccessor<DH>::ExcInvalidObject());
+}
+
+
+
+
+
+template <>
+inline
+const FiniteElement<1> &
+DoFCellAccessor<hp::DoFHandler<1> >::get_fe () const
+{
+  return this->dof_handler->get_fe()[active_fe_index ()];
+}
+
+
+
+template <>
+inline
+const FiniteElement<2> &
+DoFCellAccessor<hp::DoFHandler<2> >::get_fe () const
+{
+  return this->dof_handler->get_fe()[active_fe_index ()];
+}
+
+
+
+template <>
+inline
+const FiniteElement<3> &
+DoFCellAccessor<hp::DoFHandler<3> >::get_fe () const
+{
+  return this->dof_handler->get_fe()[active_fe_index ()];
+}
+
+
+
+template <>
+inline
+unsigned int
+DoFCellAccessor<hp::DoFHandler<1> >::active_fe_index () const
+{
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  ExcIndexRange (this->present_index, 0,
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  return this->dof_handler->levels[this->present_level]
+    ->active_fe_indices[this->present_index];
+}
+
+
+
+template <>
+inline
+unsigned int
+DoFCellAccessor<hp::DoFHandler<2> >::active_fe_index () const
+{
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  ExcIndexRange (this->present_index, 0,
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  return this->dof_handler->levels[this->present_level]
+    ->active_fe_indices[this->present_index];
+}
+
+
+
+template <>
+inline
+unsigned int
+DoFCellAccessor<hp::DoFHandler<3> >::active_fe_index () const
+{
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  ExcIndexRange (this->present_index, 0,
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  return this->dof_handler->levels[this->present_level]
+    ->active_fe_indices[this->present_index];
+}
+
+
+
+template <>
+inline
+void
+DoFCellAccessor<hp::DoFHandler<1> >::set_active_fe_index (const unsigned int i)
+{
+  Assert (this->dof_handler != 0,
+          DoFAccessor<hp::DoFHandler<1> >::ExcInvalidObject());
+  Assert (static_cast<unsigned int>(this->present_level) <
+          this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  ExcIndexRange (this->present_index, 0,
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  Assert (i < this->dof_handler->get_fe().size (),
+          ExcIndexRange(i, 0, this->dof_handler->get_fe().size ()));
+  this->dof_handler->levels[this->present_level]
+    ->active_fe_indices[this->present_index] = i;
+}
+
+
+
+template <>
+inline
+void
+DoFCellAccessor<hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i)
+{
+  Assert (this->dof_handler != 0,
+          DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
+  Assert (static_cast<unsigned int>(this->present_level) <
+          this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  ExcIndexRange (this->present_index, 0,
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  Assert (i < this->dof_handler->get_fe().size (),
+          ExcIndexRange(i, 0, this->dof_handler->get_fe().size ()));
+  this->dof_handler->levels[this->present_level]
+    ->active_fe_indices[this->present_index] = i;
+}
+
+
+
+template <>
+inline
+void
+DoFCellAccessor<hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i)
+{
+  Assert (this->dof_handler != 0,
+          DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
+  Assert (static_cast<unsigned int>(this->present_level) <
+          this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+  Assert (static_cast<std::vector<unsigned int>::size_type>(this->present_index) <
+	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
+	  ExcIndexRange (this->present_index, 0,
+			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
+  Assert (i < this->dof_handler->get_fe().size (),
+          ExcIndexRange(i, 0, this->dof_handler->get_fe().size ()));
+  this->dof_handler->levels[this->present_level]
+    ->active_fe_indices[this->present_index] = i;
+}
+
+
+
 template <>
 inline
 void
@@ -2323,8 +2152,7 @@ distribute_local_to_global (const Vector<number> &local_source,
 	  typename BaseClass::ExcInvalidObject());
   Assert (&this->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (local_source.size() == (2*this->get_fe().dofs_per_vertex +
-				  this->get_fe().dofs_per_line),
+  Assert (local_source.size() == this->get_fe().dofs_per_cell,
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (this->dof_handler->n_dofs() == global_destination.size(),
 	  typename BaseClass::ExcVectorDoesNotMatch());
@@ -2367,8 +2195,7 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 	  typename BaseClass::ExcInvalidObject());
   Assert (&this->get_fe() != 0,
 	  typename BaseClass::ExcInvalidObject());
-  Assert (local_source.m() == (2*this->get_fe().dofs_per_vertex +
-                               this->get_fe().dofs_per_line),
+  Assert (local_source.m() == this->get_fe().dofs_per_cell,
 	  typename BaseClass::ExcVectorDoesNotMatch());
   Assert (local_source.m() == local_source.n(),
 	  typename BaseClass::ExcMatrixDoesNotMatch());

@@ -417,35 +417,6 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
     void set_dof_values (const Vector<number> &local_values,
 			 OutputVector         &values) const;
                          
-
-                                     /**
-                                      * Return the finite element that
-                                      * is used on the cell pointed to
-                                      * by this iterator. For non-hp
-                                      * DoF handlers, this is of
-                                      * course always the same
-                                      * element, independent of the
-                                      * cell we are presently on, but
-                                      * for hp DoF handlers, this may
-                                      * change from cell to cell.
-                                      */
-    const FiniteElement<dim> &
-    get_fe () const;
-    
-                                     /**
-				      *  Returns the index inside the
-				      *  hp::FECollection of the FiniteElement
-				      *  used for this cell.
-				      */
-    unsigned int active_fe_index () const;
-
-                                     /**
-				      *  Sets the index of the FiniteElement used for
-				      *  this cell.
-				      */
-    void set_active_fe_index (const unsigned int i);
-
-
     				     /**
 				      *  Pointer to the <i>i</i>th line
 				      *  bounding this Object.
@@ -718,34 +689,6 @@ class DoFObjectAccessor<1, DH> :
     void set_dof_values (const Vector<number> &local_values,
 			 OutputVector         &values) const;
 
-
-                                     /**
-                                      * Return the finite element that
-                                      * is used on the cell pointed to
-                                      * by this iterator. For non-hp
-                                      * DoF handlers, this is of
-                                      * course always the same
-                                      * element, independent of the
-                                      * cell we are presently on, but
-                                      * for hp DoF handlers, this may
-                                      * change from cell to cell.
-                                      */
-    const FiniteElement<DH::dimension> &
-    get_fe () const;
-    
-                                     /**
-				      *  Returns the index inside the
-				      *  hp::FECollection of the FiniteElement
-				      *  used for this cell.
-				      */
-    unsigned int active_fe_index () const;
-
-                                     /**
-				      *  Sets the index of the FiniteElement used for
-				      *  this cell.
-				      */
-    void set_active_fe_index (const unsigned int i);
-
 				     /**
 				      * Return the @p ith child as a DoF line
 				      * iterator. This function is needed since
@@ -948,34 +891,6 @@ class DoFObjectAccessor<2, DH> :
     template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
 			 OutputVector         &values) const;
-
-
-                                     /**
-                                      * Return the finite element that
-                                      * is used on the cell pointed to
-                                      * by this iterator. For non-hp
-                                      * DoF handlers, this is of
-                                      * course always the same
-                                      * element, independent of the
-                                      * cell we are presently on, but
-                                      * for hp DoF handlers, this may
-                                      * change from cell to cell.
-                                      */
-    const FiniteElement<DH::dimension> &
-    get_fe () const;
-    
-                                     /**
-				      *  Returns the index inside the
-				      *  hp::FECollection of the FiniteElement
-				      *  used for this cell.
-				      */
-    unsigned int active_fe_index () const;
-
-                                     /**
-				      *  Sets the index of the FiniteElement used for
-				      *  this cell.
-				      */
-    void set_active_fe_index (const unsigned int i);
 
     				     /**
 				      *  Return a pointer to the @p ith line
@@ -1187,34 +1102,6 @@ class DoFObjectAccessor<3, DH> :
     template <class OutputVector, typename number>
     void set_dof_values (const Vector<number> &local_values,
 			 OutputVector         &values) const;
-
-
-                                     /**
-                                      * Return the finite element that
-                                      * is used on the cell pointed to
-                                      * by this iterator. For non-hp
-                                      * DoF handlers, this is of
-                                      * course always the same
-                                      * element, independent of the
-                                      * cell we are presently on, but
-                                      * for hp DoF handlers, this may
-                                      * change from cell to cell.
-                                      */
-    const FiniteElement<DH::dimension> &
-    get_fe () const;
-
-                                     /**
-				      *  Returns the index inside the
-				      *  hp::FECollection of the FiniteElement
-				      *  used for this cell.
-				      */
-    unsigned int active_fe_index () const;
-
-                                     /**
-				      *  Sets the index of the FiniteElement used for
-				      *  this cell.
-				      */
-    void set_active_fe_index (const unsigned int i);
 
     				     /**
 				      *  Return a pointer to the @p ith line
@@ -1566,6 +1453,33 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      */
     void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
+                                     /**
+                                      * Return the finite element that
+                                      * is used on the cell pointed to
+                                      * by this iterator. For non-hp
+                                      * DoF handlers, this is of
+                                      * course always the same
+                                      * element, independent of the
+                                      * cell we are presently on, but
+                                      * for hp DoF handlers, this may
+                                      * change from cell to cell.
+                                      */
+    const FiniteElement<DH::dimension> &
+    get_fe () const;
+
+                                     /**
+				      *  Returns the index inside the
+				      *  hp::FECollection of the FiniteElement
+				      *  used for this cell.
+				      */
+    unsigned int active_fe_index () const;
+
+                                     /**
+				      *  Sets the index of the FiniteElement used for
+				      *  this cell.
+				      */
+    void set_active_fe_index (const unsigned int i);
+
 				     /**
 				      * Distribute a local (cell
 				      * based) vector to a global one
@@ -1634,25 +1548,6 @@ TriaIterator<3, DoFObjectAccessor<2,DoFHandler<3> > >
 DoFCellAccessor<DoFHandler<3> >::face (const unsigned int i) const;
 
 template <>
-const FiniteElement<1> &
-DoFObjectAccessor<1,hp::DoFHandler<1> >::get_fe () const;
-template <>
-const FiniteElement<2> &
-DoFObjectAccessor<1,hp::DoFHandler<2> >::get_fe () const;
-template <>
-const FiniteElement<3> &
-DoFObjectAccessor<1,hp::DoFHandler<3> >::get_fe () const;
-template <>
-const FiniteElement<2> &
-DoFObjectAccessor<2,hp::DoFHandler<2> >::get_fe () const;
-template <>
-const FiniteElement<3> &
-DoFObjectAccessor<2,hp::DoFHandler<3> >::get_fe () const;
-template <>
-const FiniteElement<3> &
-DoFObjectAccessor<3,hp::DoFHandler<3> >::get_fe () const;
-
-template <>
 void DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_index (const unsigned int,
 							     const unsigned int) const;
 template <>
@@ -1673,43 +1568,34 @@ void DoFObjectAccessor<3,hp::DoFHandler<3> >::set_dof_index (const unsigned int,
 
 
 template <>
-unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<1> >::active_fe_index () const;
+const FiniteElement<1> &
+DoFCellAccessor<hp::DoFHandler<1> >::get_fe () const;
+template <>
+const FiniteElement<2> &
+DoFCellAccessor<hp::DoFHandler<2> >::get_fe () const;
+template <>
+const FiniteElement<3> &
+DoFCellAccessor<hp::DoFHandler<3> >::get_fe () const;
+
 template <>
 unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<2> >::active_fe_index () const;
+DoFCellAccessor<hp::DoFHandler<1> >::active_fe_index () const;
 template <>
 unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<3> >::active_fe_index () const;
+DoFCellAccessor<hp::DoFHandler<2> >::active_fe_index () const;
 template <>
 unsigned int
-DoFObjectAccessor<2,hp::DoFHandler<2> >::active_fe_index () const;
-template <>
-unsigned int
-DoFObjectAccessor<2,hp::DoFHandler<3> >::active_fe_index () const;
-template <>
-unsigned int
-DoFObjectAccessor<3,hp::DoFHandler<3> >::active_fe_index () const;
+DoFCellAccessor<hp::DoFHandler<3> >::active_fe_index () const;
 
 template <>
 void
-DoFObjectAccessor<1,hp::DoFHandler<1> >::set_active_fe_index (const unsigned int i);
+DoFCellAccessor<hp::DoFHandler<1> >::set_active_fe_index (const unsigned int i);
 template <>
 void
-DoFObjectAccessor<1,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i);
+DoFCellAccessor<hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i);
 template <>
 void
-DoFObjectAccessor<1,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i);
-template <>
-void
-DoFObjectAccessor<2,hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i);
-template <>
-void
-DoFObjectAccessor<2,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i);
-template <>
-void
-DoFObjectAccessor<3,hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i);
-
+DoFCellAccessor<hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i);
 
 template <>
 void

@@ -1042,6 +1042,11 @@ namespace hp
                                         * Make accessor objects friends.
                                         */
       template <int dim1, class DH> friend class ::DoFObjectAccessor;
+
+                                       /**
+                                        * Make accessor objects friends.
+                                        */
+      template <class DH> friend class ::DoFCellAccessor;
   };
 
 
