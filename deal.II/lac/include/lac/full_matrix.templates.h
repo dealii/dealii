@@ -94,7 +94,7 @@ template <typename number>
 FullMatrix<number>&
 FullMatrix<number>::operator = (const IdentityMatrix &id)
 {
-  reinit (id.m(), id.n());
+  this->reinit (id.m(), id.n());
   for (unsigned int i=0; i<id.m(); ++i)
     (*this)(i,i) = 1.;
 
