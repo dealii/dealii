@@ -296,30 +296,159 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
 				     /**
 				      * Index of the <i>i</i>th degree
 				      * of freedom of this object.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
-    unsigned int dof_index (const unsigned int i) const;
+    unsigned int dof_index (const unsigned int i,
+			    const unsigned int fe_index = DH::default_fe_index) const;
 
     				     /**
-				      * Set the index of the <i>i</i>th degree
-				      * of freedom of this object to @p index.
+				      * Set the index of the
+				      * <i>i</i>th degree of freedom
+				      * of this object to @p index.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     void set_dof_index (const unsigned int i,
-			const int index) const;
+			const unsigned int index,
+			const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
 				      * Index of the <i>i</i> degree
 				      * on the @p vertexth vertex.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     unsigned int vertex_dof_index (const unsigned int vertex,
-				   const unsigned int i) const;
+				   const unsigned int i,
+				   const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
 				      * Set the index of the <i>i</i> degree
 				      * on the @p vertexth vertex to @p index.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
-			       const unsigned int index) const;
+			       const unsigned int index,
+			       const unsigned int fe_index = DH::default_fe_index) const;
 
     				     /**
 				      * Return the indices of the dofs of this
@@ -570,32 +699,161 @@ class DoFObjectAccessor<1, DH> :
 		       const AccessorData       *local_data);
     
 				     /**
-				      * Return the index of the @p ith degree
-				      * of freedom of this line.
+				      * Index of the <i>i</i>th degree
+				      * of freedom of this object.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
-    unsigned int dof_index (const unsigned int i) const;
+    unsigned int dof_index (const unsigned int i,
+			    const unsigned int fe_index = DH::default_fe_index) const;
 
     				     /**
-				      * Set the index of the @p ith degree
-				      * of freedom of this line to @p index.
+				      * Set the index of the
+				      * <i>i</i>th degree of freedom
+				      * of this object to @p index.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     void set_dof_index (const unsigned int i,
-			const unsigned int index) const;
+			const unsigned int index,
+			const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
-				      * Return the index of the @p ith degree
+				      * Index of the <i>i</i> degree
 				      * on the @p vertexth vertex.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     unsigned int vertex_dof_index (const unsigned int vertex,
-				   const unsigned int i) const;
+				   const unsigned int i,
+				   const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
-				      * Set the index of the @p ith degree
+				      * Set the index of the <i>i</i> degree
 				      * on the @p vertexth vertex to @p index.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
-			       const unsigned int index) const;
+			       const unsigned int index,
+			       const unsigned int fe_index = DH::default_fe_index) const;
 
     				     /**
 				      * Return the indices of the dofs of this
@@ -772,32 +1030,161 @@ class DoFObjectAccessor<2, DH> :
 		       const AccessorData       *local_data);
     
 				     /**
-				      * Return the index of the @p ith degree
-				      * of freedom of this quad.
+				      * Index of the <i>i</i>th degree
+				      * of freedom of this object.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
-    unsigned int dof_index (const unsigned int i) const;
+    unsigned int dof_index (const unsigned int i,
+			    const unsigned int fe_index = DH::default_fe_index) const;
 
     				     /**
-				      * Set the index of the @p ith degree
-				      * of freedom of this quad to @p index.
+				      * Set the index of the
+				      * <i>i</i>th degree of freedom
+				      * of this object to @p index.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     void set_dof_index (const unsigned int i,
-			const unsigned int index) const;
+			const unsigned int index,
+			const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
-				      * Return the index of the @p ith degree
+				      * Index of the <i>i</i> degree
 				      * on the @p vertexth vertex.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     unsigned int vertex_dof_index (const unsigned int vertex,
-				   const unsigned int i) const;
+				   const unsigned int i,
+				   const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
-				      * Set the index of the @p ith degree
+				      * Set the index of the <i>i</i> degree
 				      * on the @p vertexth vertex to @p index.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
-			       const unsigned int index) const;
+			       const unsigned int index,
+			       const unsigned int fe_index = DH::default_fe_index) const;
 
     				     /**
 				      * Return the indices of the dofs of this
@@ -982,33 +1369,163 @@ class DoFObjectAccessor<3, DH> :
 		       const int                 index,
 		       const AccessorData       *local_data);
     
+
 				     /**
-				      * Return the index of the @p ith degree
-				      * of freedom of this hex.
+				      * Index of the <i>i</i>th degree
+				      * of freedom of this object.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
-    unsigned int dof_index (const unsigned int i) const;
+    unsigned int dof_index (const unsigned int i,
+			    const unsigned int fe_index = DH::default_fe_index) const;
 
     				     /**
-				      * Set the index of the @p ith degree
-				      * of freedom of this hex to @p index.
+				      * Set the index of the
+				      * <i>i</i>th degree of freedom
+				      * of this object to @p index.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     void set_dof_index (const unsigned int i,
-			const unsigned int index) const;
+			const unsigned int index,
+			const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
-				      * Return the index of the @p ith degree
+				      * Index of the <i>i</i> degree
 				      * on the @p vertexth vertex.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     unsigned int vertex_dof_index (const unsigned int vertex,
-				   const unsigned int i) const;
+				   const unsigned int i,
+				   const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
-				      * Set the index of the @p ith degree
+				      * Set the index of the <i>i</i> degree
 				      * on the @p vertexth vertex to @p index.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
 				      */
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
-			       const unsigned int index) const;
+			       const unsigned int index,
+			       const unsigned int fe_index = DH::default_fe_index) const;
 
     				     /**
 				      * Return the indices of the dofs of this
@@ -1549,21 +2066,27 @@ DoFCellAccessor<DoFHandler<3> >::face (const unsigned int i) const;
 
 template <>
 void DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_index (const unsigned int,
+							     const unsigned int,
 							     const unsigned int) const;
 template <>
 void DoFObjectAccessor<1,hp::DoFHandler<2> >::set_dof_index (const unsigned int,
+							     const unsigned int,
 							     const unsigned int) const;
 template <>
 void DoFObjectAccessor<1,hp::DoFHandler<3> >::set_dof_index (const unsigned int,
+							     const unsigned int,
 							     const unsigned int) const;
 template <>
 void DoFObjectAccessor<2,hp::DoFHandler<2> >::set_dof_index (const unsigned int,
+							     const unsigned int,
 							     const unsigned int) const;
 template <>
 void DoFObjectAccessor<2,hp::DoFHandler<3> >::set_dof_index (const unsigned int,
+							     const unsigned int,
 							     const unsigned int) const;
 template <>
 void DoFObjectAccessor<3,hp::DoFHandler<3> >::set_dof_index (const unsigned int,
+							     const unsigned int,
 							     const unsigned int) const;
 
 
