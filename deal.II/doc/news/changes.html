@@ -45,6 +45,16 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: In order to facilitate the implementation of hp finite
+       elements, the ordering of boundary DoFs returned by <code 
+       class="member">DoFTools::map_dof_to_boundary_indices</code> has been
+       changed. Fortunately, this is a rarely used function so that the effect
+       should be limited to only a few programs.
+       <br> 
+       (WB 2006/04/26)
+       </p>
+
+  <li> <p>
        Changed: The <code
        class="member">distribute_local_to_global</code> functions have
        been moved from the classes implementing accessors to arbitrary
