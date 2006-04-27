@@ -154,6 +154,28 @@ class DoFHandler  :  public Subscriptor
 				      * its symbolic name.
 				      */
     static const unsigned int invalid_dof_index = deal_II_numbers::invalid_unsigned_int;
+
+				     /**
+				      * The default index of the
+				      * finite element to be used on a
+				      * given cell. Since the present
+				      * class only supports the same
+				      * finite element to be used on
+				      * all cells, the index of the
+				      * finite element needs to be the
+				      * same on all cells anyway, and
+				      * by convention we pick zero for
+				      * this value. The situation is
+				      * different for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class) where different finite
+				      * element indices may be used on
+				      * different cells, and the
+				      * default index there
+				      * corresponds to an invalid
+				      * value.
+				      */
+    static const unsigned int default_fe_index = 0;
     
 				     /**
 				      * Constructor. Take @p tria as the
