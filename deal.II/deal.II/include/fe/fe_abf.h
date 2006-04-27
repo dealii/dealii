@@ -202,6 +202,19 @@ class FE_ABF
     void initialize_support_points (const unsigned int rt_degree);
 
 				     /**
+				      * Initialize the interpolation
+				      * from functions on refined mesh
+				      * cells onto the father
+				      * cell. According to the
+				      * philosophy of the
+				      * Raviart-Thomas element, this
+				      * restriction operator preserves
+				      * the divergence of a function
+				      * weakly.
+				      */
+    void initialize_restriction ();
+    
+				     /**
 				      * Given a set of flags indicating
 				      * what quantities are requested
 				      * from a @p FEValues object,
