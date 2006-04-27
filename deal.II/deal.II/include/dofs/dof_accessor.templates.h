@@ -24,6 +24,58 @@
 #include <vector>
 
 
+
+namespace 
+{
+  template <int dim>
+  inline
+  void
+  set_hp_vertex_dof_index (const hp::FECollection<dim> &fe,
+			   const unsigned int           fe_index,
+			   const unsigned int          *start_of_list,
+			   const unsigned int           local_index,
+			   const unsigned int           global_index)
+  {
+    Assert (fe_index != hp::DoFHandler<1>::default_fe_index,
+	    ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
+    abort ();
+  }
+
+
+  template <int dim>
+  inline
+  unsigned int
+  get_hp_vertex_dof_index (const hp::FECollection<dim> &fe,
+			   const unsigned int           fe_index,
+			   const unsigned int          *start_of_list,
+			   const unsigned int           local_index)
+  {
+    Assert (fe_index != hp::DoFHandler<1>::default_fe_index,
+	    ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
+    Assert (local_index < fe[fe_index].dofs_per_vertex,
+	    ExcIndexRange(local_index, 0, fe[fe_index].dofs_per_vertex));
+				     // hop along the list of index
+				     // sets until we find the one
+				     // with the correct fe_index, and
+				     // then poke into that
+				     // part. trigger an exception if
+				     // we can't find a set for this
+				     // particular fe_index
+    const unsigned int *pointer = start_of_list;
+    while (true)
+      {
+	Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		ExcInternalError());
+	if (*pointer == fe_index)
+	  return *(pointer + 1 + local_index);
+	else
+	  pointer += fe[*pointer].dofs_per_vertex;
+      }
+  }  
+}
+
+  
+
 /*------------------------- Functions: DoFAccessor ---------------------------*/
 
 
@@ -971,13 +1023,16 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::vertex_dof_index (const unsigned int ve
   Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<1> >::ExcInvalidObject());
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<1> >::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
 
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe()[0].dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
+  const unsigned int starting_offset
+    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
+  
+  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+				  fe_index,
+				  &this->dof_handler->vertex_dofs[starting_offset],
+				  i);
 }
 
 
@@ -997,13 +1052,16 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int ve
   Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
 
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe()[0].dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
+  const unsigned int starting_offset
+    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
+  
+  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+				  fe_index,
+				  &this->dof_handler->vertex_dofs[starting_offset],
+				  i);
 }
 
 
@@ -1022,13 +1080,16 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
   Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
   Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
   Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
 
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe()[0].dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
+  const unsigned int starting_offset
+    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
+  
+  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+				  fe_index,
+				  &this->dof_handler->vertex_dofs[starting_offset],
+				  i);
 }
 
 
@@ -1046,15 +1107,18 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int ve
   Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe()[0].dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
+  const unsigned int starting_offset
+    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
+  
+  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+				  fe_index,
+				  &this->dof_handler->vertex_dofs[starting_offset],
+				  i);
 }
 
 
@@ -1073,15 +1137,18 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
   Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe()[0].dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
+  const unsigned int starting_offset
+    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
+  
+  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+				  fe_index,
+				  &this->dof_handler->vertex_dofs[starting_offset],
+				  i);
 }
 
 
@@ -1100,15 +1167,18 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
   Assert (&this->dof_handler->get_fe() != 0,
 	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
   Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_vertex));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("hp::DoFHandler not initialized"));
 
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe()[0].dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
+  const unsigned int starting_offset
+    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
+  
+  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+				  fe_index,
+				  &this->dof_handler->vertex_dofs[starting_offset],
+				  i);
 }
 
 
@@ -1140,8 +1210,8 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::dof_index (const unsigned int i,
 				   // make sure a FE has been selected
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
 
 				   // for lines in 1d, we only have to
 				   // take care of the offset, no
@@ -1224,8 +1294,8 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::dof_index (const unsigned int i,
 				   // make sure a FE has been selected
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
 			      ->dof_line_index_offset[this->present_index];
@@ -1304,8 +1374,8 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::dof_index (const unsigned int i,
 				   // make sure a FE has been selected
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
 			      ->dof_line_index_offset[this->present_index];
@@ -1378,8 +1448,8 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
 
 				   // for lines in 1d, we only have to
 				   // take care of the offset, no
@@ -1417,8 +1487,8 @@ DoFObjectAccessor<1, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
 
 //TODO:[?] In two dimension it could happen that we have different active_fe_indices
 // on a line between to cells. Hence we have to differentiate between these two cases.
@@ -1456,8 +1526,8 @@ DoFObjectAccessor<1, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_line));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_line_index_offset[this->present_index];
@@ -1492,8 +1562,8 @@ unsigned int DoFObjectAccessor<2,hp::DoFHandler<2> >::dof_index (const unsigned 
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_quad,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_quad));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_quad));
 
 				   // for quads in 2d, we only have to
 				   // take care of the offset, no
@@ -1529,8 +1599,8 @@ unsigned int DoFObjectAccessor<2,hp::DoFHandler<3> >::dof_index (const unsigned 
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_quad,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_quad));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_quad));
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
 			      ->dof_quad_index_offset[this->present_index];
@@ -1564,8 +1634,8 @@ DoFObjectAccessor<2, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_quad,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_quad));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_quad));
 
 				   // for quads in 2d, we only have to
 				   // take care of the offset, no
@@ -1603,8 +1673,8 @@ DoFObjectAccessor<2, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_quad,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_quad));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_quad,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_quad));
 
   const unsigned int offset = this->dof_handler->levels[this->present_level]
                               ->dof_quad_index_offset[this->present_index];
@@ -1733,8 +1803,8 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_hex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_hex));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_hex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_hex));
 
 				   // for hexes in 3d, we only have to
 				   // take care of the offset, no
@@ -1772,8 +1842,8 @@ DoFObjectAccessor<3, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 				   // and enough room was reserved
   Assert (&this->dof_handler->get_fe() != 0,
 	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[0].dofs_per_hex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[0].dofs_per_hex));
+  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_hex,
+	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_hex));
 
 				   // for hexes in 3d, we only have to
 				   // take care of the offset, no
