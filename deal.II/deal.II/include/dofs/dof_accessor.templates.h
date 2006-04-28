@@ -24,56 +24,6 @@
 #include <vector>
 
 
-
-namespace 
-{
-  template <int dim>
-  inline
-  void
-  set_hp_vertex_dof_index (const hp::FECollection<dim> &fe,
-			   const unsigned int           fe_index,
-			   const unsigned int          *start_of_list,
-			   const unsigned int           local_index,
-			   const unsigned int           global_index)
-  {
-    Assert (fe_index != hp::DoFHandler<1>::default_fe_index,
-	    ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-    abort ();
-  }
-
-
-  template <int dim>
-  inline
-  unsigned int
-  get_hp_vertex_dof_index (const hp::FECollection<dim> &fe,
-			   const unsigned int           fe_index,
-			   const unsigned int          *start_of_list,
-			   const unsigned int           local_index)
-  {
-    Assert (fe_index != hp::DoFHandler<1>::default_fe_index,
-	    ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-    Assert (local_index < fe[fe_index].dofs_per_vertex,
-	    ExcIndexRange(local_index, 0, fe[fe_index].dofs_per_vertex));
-				     // hop along the list of index
-				     // sets until we find the one
-				     // with the correct fe_index, and
-				     // then poke into that
-				     // part. trigger an exception if
-				     // we can't find a set for this
-				     // particular fe_index
-    const unsigned int *pointer = start_of_list;
-    while (true)
-      {
-	Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
-		ExcInternalError());
-	if (*pointer == fe_index)
-	  return *(pointer + 1 + local_index);
-	else
-	  pointer += fe[*pointer].dofs_per_vertex;
-      }
-  }  
-}
-
   
 
 /*------------------------- Functions: DoFAccessor ---------------------------*/
@@ -1029,10 +979,11 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::vertex_dof_index (const unsigned int ve
   const unsigned int starting_offset
     = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
   
-  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
-				  fe_index,
-				  &this->dof_handler->vertex_dofs[starting_offset],
-				  i);
+  return internal::hp::DoFLevel<0>::
+    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+                             fe_index,
+                             &this->dof_handler->vertex_dofs[starting_offset],
+                             i);
 }
 
 
@@ -1058,10 +1009,11 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int ve
   const unsigned int starting_offset
     = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
   
-  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
-				  fe_index,
-				  &this->dof_handler->vertex_dofs[starting_offset],
-				  i);
+  return internal::hp::DoFLevel<0>::
+    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+                             fe_index,
+                             &this->dof_handler->vertex_dofs[starting_offset],
+                             i);
 }
 
 
@@ -1086,10 +1038,11 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
   const unsigned int starting_offset
     = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
   
-  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
-				  fe_index,
-				  &this->dof_handler->vertex_dofs[starting_offset],
-				  i);
+  return internal::hp::DoFLevel<0>::
+    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+                             fe_index,
+                             &this->dof_handler->vertex_dofs[starting_offset],
+                             i);
 }
 
 
@@ -1115,10 +1068,11 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int ve
   const unsigned int starting_offset
     = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
   
-  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
-				  fe_index,
-				  &this->dof_handler->vertex_dofs[starting_offset],
-				  i);
+  return internal::hp::DoFLevel<0>::
+    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+                             fe_index,
+                             &this->dof_handler->vertex_dofs[starting_offset],
+                             i);
 }
 
 
@@ -1145,10 +1099,11 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
   const unsigned int starting_offset
     = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
   
-  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
-				  fe_index,
-				  &this->dof_handler->vertex_dofs[starting_offset],
-				  i);
+  return internal::hp::DoFLevel<0>::
+    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+                             fe_index,
+                             &this->dof_handler->vertex_dofs[starting_offset],
+                             i);
 }
 
 
@@ -1175,10 +1130,11 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
   const unsigned int starting_offset
     = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
   
-  return get_hp_vertex_dof_index (this->dof_handler->get_fe(),
-				  fe_index,
-				  &this->dof_handler->vertex_dofs[starting_offset],
-				  i);
+  return internal::hp::DoFLevel<0>::
+    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+                             fe_index,
+                             &this->dof_handler->vertex_dofs[starting_offset],
+                             i);
 }
 
 

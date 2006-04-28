@@ -15,7 +15,16 @@
 
 
 #include <base/config.h>
+#include <fe/fe_collection.h>
+
 #include <vector>
+
+
+namespace hp
+{
+  template <int dim>
+  class FECollection;
+}
 
 
 namespace internal
@@ -76,6 +85,23 @@ namespace internal
                                           */
 
         std::vector<unsigned int> active_fe_indices;
+
+        template <int dim>
+        static
+        unsigned int
+        get_hp_vertex_dof_index (const ::hp::FECollection<dim> &fe,
+                                 const unsigned int           fe_index,
+                                 const unsigned int          *start_of_list,
+                                 const unsigned int           local_index);
+
+        template <int dim>
+        static
+        void
+        set_hp_vertex_dof_index (const ::hp::FECollection<dim> &fe,
+                                 const unsigned int           fe_index,
+                                 const unsigned int          *start_of_list,
+                                 const unsigned int           local_index,
+                                 const unsigned int           global_index);
     };
 
 
@@ -235,7 +261,12 @@ namespace internal
                                           */
         unsigned int memory_consumption () const;
     };
-  
+
+
+// ------------------ inline and template functions
+
+
+    
   } // namespace hp
   
 } // namespace internal
