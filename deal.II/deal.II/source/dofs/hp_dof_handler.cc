@@ -37,6 +37,9 @@ namespace hp
   template <int dim>
   const unsigned int DoFHandler<dim>::invalid_dof_index;
 
+  template <int dim>
+  const unsigned int DoFHandler<dim>::default_fe_index;
+  
 
 
   template <int dim>
