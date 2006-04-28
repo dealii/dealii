@@ -14,6 +14,7 @@ unnecessary diffs in the archives.
 
 The function is intended as a part of the cc-mode-startup-fun hook."
 
+  (setq c-echo-semantic-information-p t)
   (setq c-basic-offset 2)
   (c-set-offset 'string                0)
   (c-set-offset 'defun-open            0)
@@ -39,8 +40,8 @@ The function is intended as a part of the cc-mode-startup-fun hook."
   (c-set-offset 'statement             'c-lineup-runin-statements)
   (c-set-offset 'statement-cont        'c-lineup-math)
   (c-set-offset 'statement-block-intro '+)
-  (c-set-offset 'statement-case-intro  '+)
-  (c-set-offset 'statement-case-open   '-)
+  (c-set-offset 'statement-case-intro  6)
+  (c-set-offset 'statement-case-open   0)
   (c-set-offset 'substatement          '+)
   (c-set-offset 'substatement-open     '+)
   (c-set-offset 'case-label            '+)
@@ -65,6 +66,10 @@ The function is intended as a part of the cc-mode-startup-fun hook."
   (c-set-offset 'objc-method-call-cont 'c-lineup-ObjC-method-call)
 	
   (setq c-comment-only-line-offset 33)
+  (setq c-hanging-comment-ender-p   nil)
+  (setq c-hanging-comment-starter-p nil)
+
+  (setq c-tab-always-indent t)
 )
 
 (defun deal-newline ()
@@ -89,6 +94,7 @@ and after semicolon or braces, like it is done in the deal.II coding style."
 			 defun-close-semi
 			 list-close-comma
 			 scope-operator))
+  (setq c-default-macroize-column 65)
 )
 
 (provide 'dealmacros)
