@@ -32,6 +32,10 @@ namespace internal
   namespace hp
   {
     template <int> class DoFLevel;
+    template <> class DoFLevel<0>;
+    template <> class DoFLevel<1>;
+    template <> class DoFLevel<2>;
+    template <> class DoFLevel<3>;
   }
 }
 
@@ -1071,6 +1075,15 @@ namespace hp
                                         * Make accessor objects friends.
                                         */
       template <class DH> friend class ::DoFCellAccessor;
+
+                                       /**
+                                        * Likewise for DoFLevel<0>
+                                        * objects since they need to
+                                        * access the vertex dofs in
+                                        * the functions that set and
+                                        * retrieve vertex dof indices.
+                                        */
+      template <int> friend class internal::hp::DoFLevel;
   };
 
 

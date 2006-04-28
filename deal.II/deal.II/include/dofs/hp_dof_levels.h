@@ -88,20 +88,20 @@ namespace internal
 
         template <int dim>
         static
-        unsigned int
-        get_hp_vertex_dof_index (const ::hp::FECollection<dim> &fe,
+        void
+        set_hp_vertex_dof_index (::hp::DoFHandler<dim> &dof_handler,
+                                 const unsigned int           vertex_index,
                                  const unsigned int           fe_index,
-                                 const unsigned int          *start_of_list,
-                                 const unsigned int           local_index);
+                                 const unsigned int           local_index,
+                                 const unsigned int           global_index);
 
         template <int dim>
         static
-        void
-        set_hp_vertex_dof_index (const ::hp::FECollection<dim> &fe,
+        unsigned int
+        get_hp_vertex_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+                                 const unsigned int           vertex_index,
                                  const unsigned int           fe_index,
-                                 const unsigned int          *start_of_list,
-                                 const unsigned int           local_index,
-                                 const unsigned int           global_index);
+                                 const unsigned int           local_index);
     };
 
 

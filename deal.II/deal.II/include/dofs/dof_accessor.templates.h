@@ -965,24 +965,10 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<1>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("hp::DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<1> >::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<1> >::ExcInvalidObject());
-  Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
-
-  const unsigned int starting_offset
-    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
-  
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+    get_hp_vertex_dof_index (*this->dof_handler,
+                             this->vertex_index(vertex),
                              fe_index,
-                             &this->dof_handler->vertex_dofs[starting_offset],
                              i);
 }
 
@@ -995,24 +981,10 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<2>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("hp::DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
-  Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
-
-  const unsigned int starting_offset
-    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
-  
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+    get_hp_vertex_dof_index (*this->dof_handler,
+                             this->vertex_index(vertex),
                              fe_index,
-                             &this->dof_handler->vertex_dofs[starting_offset],
                              i);
 }
 
@@ -1024,24 +996,10 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("hp::DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
-
-  const unsigned int starting_offset
-    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
-  
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+    get_hp_vertex_dof_index (*this->dof_handler,
+                             this->vertex_index(vertex),
                              fe_index,
-                             &this->dof_handler->vertex_dofs[starting_offset],
                              i);
 }
 
@@ -1053,25 +1011,10 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<2>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (this->dof_handler != 0,
-	  DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  DoFAccessor<hp::DoFHandler<2> >::ExcInvalidObject());
-  Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("hp::DoFHandler not initialized"));
-
-  const unsigned int starting_offset
-    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
-  
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+    get_hp_vertex_dof_index (*this->dof_handler,
+                             this->vertex_index(vertex),
                              fe_index,
-                             &this->dof_handler->vertex_dofs[starting_offset],
                              i);
 }
 
@@ -1084,25 +1027,10 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (this->dof_handler != 0,
-	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("hp::DoFHandler not initialized"));
-
-  const unsigned int starting_offset
-    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
-  
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+    get_hp_vertex_dof_index (*this->dof_handler,
+                             this->vertex_index(vertex),
                              fe_index,
-                             &this->dof_handler->vertex_dofs[starting_offset],
                              i);
 }
 
@@ -1115,25 +1043,10 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (this->dof_handler != 0,
-	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  DoFAccessor<hp::DoFHandler<3> >::ExcInvalidObject());
-  Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_vertex));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("hp::DoFHandler not initialized"));
-
-  const unsigned int starting_offset
-    = this->dof_handler->vertex_dofs_offsets[this->vertex_index(vertex)];
-  
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (this->dof_handler->get_fe(),
+    get_hp_vertex_dof_index (*this->dof_handler,
+                             this->vertex_index(vertex),
                              fe_index,
-                             &this->dof_handler->vertex_dofs[starting_offset],
                              i);
 }
 
