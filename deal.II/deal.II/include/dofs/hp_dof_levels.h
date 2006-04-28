@@ -89,19 +89,19 @@ namespace internal
         template <int dim>
         static
         void
-        set_hp_vertex_dof_index (::hp::DoFHandler<dim> &dof_handler,
-                                 const unsigned int           vertex_index,
-                                 const unsigned int           fe_index,
-                                 const unsigned int           local_index,
-                                 const unsigned int           global_index);
+        set_vertex_dof_index (::hp::DoFHandler<dim> &dof_handler,
+                              const unsigned int     vertex_index,
+                              const unsigned int     fe_index,
+                              const unsigned int     local_index,
+                              const unsigned int     global_index);
 
         template <int dim>
         static
         unsigned int
-        get_hp_vertex_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
-                                 const unsigned int           vertex_index,
-                                 const unsigned int           fe_index,
-                                 const unsigned int           local_index);
+        get_vertex_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+                              const unsigned int           vertex_index,
+                              const unsigned int           fe_index,
+                              const unsigned int           local_index);
     };
 
 
@@ -179,6 +179,21 @@ namespace internal
                                           */
         std::vector<unsigned int> line_dofs;
 
+        template <int dim>
+        void
+        set_line_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+                            const unsigned int           line_index,
+                            const unsigned int           fe_index,
+                            const unsigned int           local_index,
+                            const unsigned int           global_index);
+
+        template <int dim>
+        unsigned int
+        get_line_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+                            const unsigned int           line_index,
+                            const unsigned int           fe_index,
+                            const unsigned int           local_index) const;
+
                                          /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
@@ -215,6 +230,21 @@ namespace internal
                                           * information.
                                           */
         std::vector<unsigned int> quad_dofs;
+
+        template <int dim>
+        void
+        set_quad_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+                            const unsigned int           quad_index,
+                            const unsigned int           fe_index,
+                            const unsigned int           local_index,
+                            const unsigned int           global_index);
+
+        template <int dim>
+        unsigned int
+        get_quad_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+                            const unsigned int           quad_index,
+                            const unsigned int           fe_index,
+                            const unsigned int           local_index) const;
 
                                          /**
                                           * Determine an estimate for the
@@ -253,6 +283,21 @@ namespace internal
                                           * information.
                                           */
         std::vector<unsigned int> hex_dofs;
+
+        template <int dim>
+        void
+        set_hex_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+                           const unsigned int           hex_index,
+                           const unsigned int           fe_index,
+                           const unsigned int           local_index,
+                           const unsigned int           global_index);
+
+        template <int dim>
+        unsigned int
+        get_hex_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+                           const unsigned int           hex_index,
+                           const unsigned int           fe_index,
+                           const unsigned int           local_index) const;
 
                                          /**
                                           * Determine an estimate for the

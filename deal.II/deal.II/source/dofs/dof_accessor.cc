@@ -65,7 +65,7 @@ template <class DH>
 void DoFObjectAccessor<1, DH>::set_vertex_dof_index (const unsigned int vertex,
                                                      const unsigned int i,
                                                      const unsigned int index,
-					      const unsigned int fe_index) const
+                                                     const unsigned int fe_index) const
 
 {
   Assert (fe_index == DoFHandler<1>::default_fe_index,
@@ -199,7 +199,7 @@ void
 DoFObjectAccessor<2, DH>::set_vertex_dof_index (const unsigned int vertex,
                                                 const unsigned int i,
                                                 const unsigned int index,
-					      const unsigned int fe_index) const
+                                                const unsigned int fe_index) const
 {
   Assert (fe_index == DoFHandler<1>::default_fe_index,
 	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
@@ -331,7 +331,7 @@ template <class DH>
 void DoFObjectAccessor<3, DH>::set_vertex_dof_index (const unsigned int vertex,
                                                      const unsigned int i,
                                                      const unsigned int index,
-					      const unsigned int fe_index) const
+                                                     const unsigned int fe_index) const
 {
   Assert (fe_index == DoFHandler<1>::default_fe_index,
 	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
@@ -448,14 +448,16 @@ DoFObjectAccessor<3,DH>::set_dof_values (const Vector<number> &local_values,
 #if deal_II_dimension == 1
 
 template <>
-void DoFObjectAccessor<1, hp::DoFHandler<1> >::set_vertex_dof_index (const unsigned int /*vertex*/,
-                                                                     const unsigned int /*i*/,
-                                                                     const unsigned int /*index*/,
-					      const unsigned int fe_index) const
+void DoFObjectAccessor<1, hp::DoFHandler<1> >::set_vertex_dof_index (const unsigned int vertex,
+                                                                     const unsigned int i,
+                                                                     const unsigned int index,
+                                                                     const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<1>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (false, ExcInternalError());
+  internal::hp::DoFLevel<0>::set_vertex_dof_index (*this->dof_handler,
+                                                   this->vertex_index(vertex),
+                                                   fe_index,
+                                                   i,
+                                                   index);
 }
 
 template <>
@@ -488,25 +490,29 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_values (const Vector<number> &/
 #if deal_II_dimension == 2
 
 template <>
-void DoFObjectAccessor<1, hp::DoFHandler<2> >::set_vertex_dof_index (const unsigned int /*vertex*/,
-                                                                     const unsigned int /*i*/,
-                                                                     const unsigned int /*index*/,
-					      const unsigned int fe_index) const
+void DoFObjectAccessor<1, hp::DoFHandler<2> >::set_vertex_dof_index (const unsigned int vertex,
+                                                                     const unsigned int i,
+                                                                     const unsigned int index,
+                                                                     const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<2>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (false, ExcInternalError());
+  internal::hp::DoFLevel<0>::set_vertex_dof_index (*this->dof_handler,
+                                                   this->vertex_index(vertex),
+                                                   fe_index,
+                                                   i,
+                                                   index);
 }
 
 template <>
-void DoFObjectAccessor<2, hp::DoFHandler<2> >::set_vertex_dof_index (const unsigned int /*vertex*/,
-                                                                     const unsigned int /*i*/,
-                                                                     const unsigned int /*index*/,
-					      const unsigned int fe_index) const
+void DoFObjectAccessor<2, hp::DoFHandler<2> >::set_vertex_dof_index (const unsigned int vertex,
+                                                                     const unsigned int i,
+                                                                     const unsigned int index,
+                                                                     const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<2>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (false, ExcInternalError());
+  internal::hp::DoFLevel<0>::set_vertex_dof_index (*this->dof_handler,
+                                                   this->vertex_index(vertex),
+                                                   fe_index,
+                                                   i,
+                                                   index);
 }
 
 template <>
@@ -555,37 +561,43 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::set_dof_values (const Vector<number> &/
 #if deal_II_dimension == 3
 
 template <>
-void DoFObjectAccessor<1, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int /*vertex*/,
-                                                                     const unsigned int /*i*/,
-                                                                     const unsigned int /*index*/,
-					      const unsigned int fe_index) const
+void DoFObjectAccessor<1, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int vertex,
+                                                                     const unsigned int i,
+                                                                     const unsigned int index,
+                                                                     const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (false, ExcInternalError());
+  internal::hp::DoFLevel<0>::set_vertex_dof_index (*this->dof_handler,
+                                                   this->vertex_index(vertex),
+                                                   fe_index,
+                                                   i,
+                                                   index);
 }
 
 template <>
-void DoFObjectAccessor<2, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int /*vertex*/,
-                                                                     const unsigned int /*i*/,
-                                                                     const unsigned int /*index*/,
-					      const unsigned int fe_index) const
+void DoFObjectAccessor<2, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int vertex,
+                                                                     const unsigned int i,
+                                                                     const unsigned int index,
+                                                                     const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (false, ExcInternalError());
+  internal::hp::DoFLevel<0>::set_vertex_dof_index (*this->dof_handler,
+                                                   this->vertex_index(vertex),
+                                                   fe_index,
+                                                   i,
+                                                   index);
 }
 
 
 template <>
-void DoFObjectAccessor<3, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int /*vertex*/,
-                                                                     const unsigned int /*i*/,
-                                                                     const unsigned int /*index*/,
-					      const unsigned int fe_index) const
+void DoFObjectAccessor<3, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int vertex,
+                                                                     const unsigned int i,
+                                                                     const unsigned int index,
+                                                                     const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (false, ExcInternalError());
+  internal::hp::DoFLevel<0>::set_vertex_dof_index (*this->dof_handler,
+                                                   this->vertex_index(vertex),
+                                                   fe_index,
+                                                   i,
+                                                   index);
 }
 
 

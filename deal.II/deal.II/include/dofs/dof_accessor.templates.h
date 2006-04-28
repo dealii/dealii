@@ -218,7 +218,7 @@ DoFObjectAccessor<2,DH>::line (const unsigned int i) const
       this->present_level,
       this->line_index (i),
       this->dof_handler
-    );
+      );
 }
 
 
@@ -309,7 +309,7 @@ DoFObjectAccessor<3,DH>::line (const unsigned int i) const
       this->present_level,
       l->index(),
       this->dof_handler
-    );
+      );
 }
 
 
@@ -326,7 +326,7 @@ DoFObjectAccessor<3,DH>::quad (const unsigned int i) const
       this->present_level,
       this->quad_index (i),
       this->dof_handler
-    );
+      );
 }
 
 
@@ -966,10 +966,10 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int fe_index) const
 {
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (*this->dof_handler,
-                             this->vertex_index(vertex),
-                             fe_index,
-                             i);
+    get_vertex_dof_index (*this->dof_handler,
+                          this->vertex_index(vertex),
+                          fe_index,
+                          i);
 }
 
 
@@ -982,10 +982,10 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int fe_index) const
 {
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (*this->dof_handler,
-                             this->vertex_index(vertex),
-                             fe_index,
-                             i);
+    get_vertex_dof_index (*this->dof_handler,
+                          this->vertex_index(vertex),
+                          fe_index,
+                          i);
 }
 
 
@@ -997,10 +997,10 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int fe_index) const
 {
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (*this->dof_handler,
-                             this->vertex_index(vertex),
-                             fe_index,
-                             i);
+    get_vertex_dof_index (*this->dof_handler,
+                          this->vertex_index(vertex),
+                          fe_index,
+                          i);
 }
 
 
@@ -1012,10 +1012,10 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int fe_index) const
 {
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (*this->dof_handler,
-                             this->vertex_index(vertex),
-                             fe_index,
-                             i);
+    get_vertex_dof_index (*this->dof_handler,
+                          this->vertex_index(vertex),
+                          fe_index,
+                          i);
 }
 
 
@@ -1028,10 +1028,10 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int fe_index) const
 {
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (*this->dof_handler,
-                             this->vertex_index(vertex),
-                             fe_index,
-                             i);
+    get_vertex_dof_index (*this->dof_handler,
+                          this->vertex_index(vertex),
+                          fe_index,
+                          i);
 }
 
 
@@ -1044,10 +1044,10 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int ve
 							   const unsigned int fe_index) const
 {
   return internal::hp::DoFLevel<0>::
-    get_hp_vertex_dof_index (*this->dof_handler,
-                             this->vertex_index(vertex),
-                             fe_index,
-                             i);
+    get_vertex_dof_index (*this->dof_handler,
+                          this->vertex_index(vertex),
+                          fe_index,
+                          i);
 }
 
 
@@ -1059,42 +1059,11 @@ unsigned int
 DoFObjectAccessor<1,hp::DoFHandler<1> >::dof_index (const unsigned int i,
 						    const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<1>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-
-				   // since the exception classes are
-				   // from a template dependent base
-				   // class, we have to fully qualify
-				   // them. to work around more
-				   // trouble, typedef the template
-				   // dependent base class to a
-				   // non-template dependent name and
-				   // use that to specify the
-				   // qualified exception names
-  typedef DoFAccessor<hp::DoFHandler<1> > BaseClass;
-  
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
-
-				   // for lines in 1d, we only have to
-				   // take care of the offset, no
-				   // linked lists or whatever (see
-				   // hp::DoFLevels)
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-			      ->dof_line_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->line_dofs.size(),
-          ExcInternalError());
-  
-  return this->dof_handler->levels[this->present_level]->line_dofs[offset+i];
+  return this->dof_handler->levels[this->present_level]
+    ->get_line_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i);
 }
 
 
@@ -1144,37 +1113,11 @@ unsigned int
 DoFObjectAccessor<1,hp::DoFHandler<2> >::dof_index (const unsigned int i,
 						    const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<2>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-				   // since the exception classes are
-				   // from a template dependent base
-				   // class, we have to fully qualify
-				   // them. to work around more
-				   // trouble, typedef the template
-				   // dependent base class to a
-				   // non-template dependent name and
-				   // use that to specify the
-				   // qualified exception names
-  typedef DoFAccessor<hp::DoFHandler<2> > BaseClass;
-  
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
-
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-			      ->dof_line_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->line_dofs.size(),
-          ExcInternalError());
-
-  return this->dof_handler->levels[this->present_level]->line_dofs[offset+i];
+  return this->dof_handler->levels[this->present_level]
+    ->get_line_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i);
 }
 
 
@@ -1224,37 +1167,11 @@ unsigned int
 DoFObjectAccessor<1,hp::DoFHandler<3> >::dof_index (const unsigned int i,
 						    const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-				   // since the exception classes are
-				   // from a template dependent base
-				   // class, we have to fully qualify
-				   // them. to work around more
-				   // trouble, typedef the template
-				   // dependent base class to a
-				   // non-template dependent name and
-				   // use that to specify the
-				   // qualified exception names
-  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
-  
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
-
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-			      ->dof_line_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->line_dofs.size(),
-          ExcInternalError());
-
-  return this->dof_handler->levels[this->present_level]->line_dofs[offset+i];
+  return this->dof_handler->levels[this->present_level]
+    ->get_line_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i);
 }
 
 
@@ -1305,34 +1222,12 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_index (const unsigned int i,
 							const unsigned int index,
 							const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<1>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  typedef DoFAccessor<hp::DoFHandler<1> > BaseClass;
-
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
-
-				   // for lines in 1d, we only have to
-				   // take care of the offset, no
-				   // linked lists or whatever (see
-				   // hp::DoFLevels)
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-                              ->dof_line_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->line_dofs.size(),
-          ExcInternalError());
-
-  this->dof_handler->levels[this->present_level]->line_dofs[offset+i] = index;
+  this->dof_handler->levels[this->present_level]
+    ->set_line_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i,
+                          index);
 }
 
 
@@ -1344,34 +1239,12 @@ DoFObjectAccessor<1, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
 							 const unsigned int index,
 							 const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<2>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  typedef DoFAccessor<hp::DoFHandler<2> > BaseClass;
-
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
-
-//TODO:[?] In two dimension it could happen that we have different active_fe_indices
-// on a line between to cells. Hence we have to differentiate between these two cases.
-// Unfortunately, this requires more information then available now.
-
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-                              ->dof_line_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->line_dofs.size(),
-          ExcInternalError());
-
-  this->dof_handler->levels[this->present_level]->line_dofs[offset+i] = index;
+  this->dof_handler->levels[this->present_level]
+    ->set_line_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i,
+                          index);
 }
 
 
@@ -1383,30 +1256,12 @@ DoFObjectAccessor<1, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 							 const unsigned int index,
 							 const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
-
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_line));
-
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-                              ->dof_line_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->line_dofs.size(),
-          ExcInternalError());
-
-  this->dof_handler->levels[this->present_level]->line_dofs[offset+i] = index;
+  this->dof_handler->levels[this->present_level]
+    ->set_line_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i,
+                          index);
 }
 
 
@@ -1419,34 +1274,11 @@ inline
 unsigned int DoFObjectAccessor<2,hp::DoFHandler<2> >::dof_index (const unsigned int i,
 								 const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<2>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  typedef DoFAccessor<hp::DoFHandler<2> > BaseClass;
-
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_quad,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_quad));
-
-				   // for quads in 2d, we only have to
-				   // take care of the offset, no
-				   // linked lists or whatever (see
-				   // hp::DoFLevels)
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-			      ->dof_quad_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->quad_dofs.size(),
-          ExcInternalError());
-
-  return this->dof_handler->levels[this->present_level]->quad_dofs[offset+i];
+  return this->dof_handler->levels[this->present_level]
+    ->get_quad_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i);
 }
 
 
@@ -1456,30 +1288,11 @@ inline
 unsigned int DoFObjectAccessor<2,hp::DoFHandler<3> >::dof_index (const unsigned int i,
 								 const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
-
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_quad,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_quad));
-
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-			      ->dof_quad_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->quad_dofs.size(),
-          ExcInternalError());
-
-  return this->dof_handler->levels[this->present_level]->quad_dofs[offset+i];
+  return this->dof_handler->levels[this->present_level]
+    ->get_quad_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i);
 }
 
 
@@ -1491,34 +1304,12 @@ DoFObjectAccessor<2, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
 							 const unsigned int index,
 							 const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<2>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  typedef DoFAccessor<hp::DoFHandler<2> > BaseClass;
-
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_quad,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_quad));
-
-				   // for quads in 2d, we only have to
-				   // take care of the offset, no
-				   // linked lists or whatever (see
-				   // hp::DoFLevels)
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-                              ->dof_quad_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->quad_dofs.size(),
-          ExcInternalError());
-
-  this->dof_handler->levels[this->present_level]->quad_dofs[offset+i] = index;
+  this->dof_handler->levels[this->present_level]
+    ->set_quad_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i,
+                          index);
 }
 
 
@@ -1530,30 +1321,12 @@ DoFObjectAccessor<2, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 							 const unsigned int index,
 							 const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
-
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_quad,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_quad));
-
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-                              ->dof_quad_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->quad_dofs.size(),
-          ExcInternalError());
-
-  this->dof_handler->levels[this->present_level]->quad_dofs[offset+i] = index;
+  this->dof_handler->levels[this->present_level]
+    ->set_quad_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i,
+                          index);
 }
 
 
@@ -1660,34 +1433,11 @@ unsigned int
 DoFObjectAccessor<3,hp::DoFHandler<3> >::dof_index (const unsigned int i,
 						    const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
-
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_hex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_hex));
-
-				   // for hexes in 3d, we only have to
-				   // take care of the offset, no
-				   // linked lists or whatever (see
-				   // hp::DoFLevels)
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-			      ->dof_hex_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->hex_dofs.size(),
-          ExcInternalError());
-
-  return this->dof_handler->levels[this->present_level]->hex_dofs[offset+i];
+  return this->dof_handler->levels[this->present_level]
+    ->get_hex_dof_index (*this->dof_handler,
+                         this->present_index,
+                         fe_index,
+                         i);
 }
 
 
@@ -1699,34 +1449,12 @@ DoFObjectAccessor<3, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 							 const unsigned int index,
 							 const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  typedef DoFAccessor<hp::DoFHandler<3> > BaseClass;
-    
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe()[fe_index].dofs_per_hex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe()[fe_index].dofs_per_hex));
-
-				   // for hexes in 3d, we only have to
-				   // take care of the offset, no
-				   // linked lists or whatever (see
-				   // hp::DoFLevels)
-  const unsigned int offset = this->dof_handler->levels[this->present_level]
-                              ->dof_hex_index_offset[this->present_index];
-  Assert (offset != this->dof_handler->invalid_dof_index,
-          ExcInternalError());
-  Assert (offset+i <
-          this->dof_handler->levels[this->present_level]->hex_dofs.size(),
-          ExcInternalError());
-
-  this->dof_handler->levels[this->present_level]->hex_dofs[offset+i] = index;
+  this->dof_handler->levels[this->present_level]
+    ->set_hex_dof_index (*this->dof_handler,
+                         this->present_index,
+                         fe_index,
+                         i,
+                         index);
 }
 
 
