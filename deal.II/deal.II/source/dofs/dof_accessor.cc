@@ -445,6 +445,8 @@ DoFObjectAccessor<3,DH>::set_dof_values (const Vector<number> &local_values,
 // --------------- hp::DoFHandler specializations for 1d objects -----------
 
 
+#if deal_II_dimension == 1
+
 template <>
 void DoFObjectAccessor<1, hp::DoFHandler<1> >::set_vertex_dof_index (const unsigned int /*vertex*/,
                                                                      const unsigned int /*i*/,
@@ -455,6 +457,35 @@ void DoFObjectAccessor<1, hp::DoFHandler<1> >::set_vertex_dof_index (const unsig
 	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
   Assert (false, ExcInternalError());
 }
+
+template <>
+template <class InputVector, typename number>
+void
+DoFObjectAccessor<1,hp::DoFHandler<1> >::get_dof_values (const InputVector &/*values*/,
+                                                         Vector<number>    &/*local_values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+template <>
+template <class OutputVector, typename number>
+void
+DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_values (const Vector<number> &/*local_values*/,
+                                                         OutputVector         &/*values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#endif
+
+
+
+
+// --------------- hp::DoFHandler specializations for 2d objects -----------
+
+
+
+#if deal_II_dimension == 2
 
 template <>
 void DoFObjectAccessor<1, hp::DoFHandler<2> >::set_vertex_dof_index (const unsigned int /*vertex*/,
@@ -468,24 +499,14 @@ void DoFObjectAccessor<1, hp::DoFHandler<2> >::set_vertex_dof_index (const unsig
 }
 
 template <>
-void DoFObjectAccessor<1, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int /*vertex*/,
+void DoFObjectAccessor<2, hp::DoFHandler<2> >::set_vertex_dof_index (const unsigned int /*vertex*/,
                                                                      const unsigned int /*i*/,
                                                                      const unsigned int /*index*/,
 					      const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
+  Assert (fe_index != hp::DoFHandler<2>::default_fe_index,
 	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
   Assert (false, ExcInternalError());
-}
-
-
-template <>
-template <class InputVector, typename number>
-void
-DoFObjectAccessor<1,hp::DoFHandler<1> >::get_dof_values (const InputVector &/*values*/,
-                                                         Vector<number>    &/*local_values*/) const
-{
-  Assert (false, ExcNotImplemented());
 }
 
 template <>
@@ -500,18 +521,8 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::get_dof_values (const InputVector &/*va
 template <>
 template <class InputVector, typename number>
 void
-DoFObjectAccessor<1,hp::DoFHandler<3> >::get_dof_values (const InputVector &/*values*/,
+DoFObjectAccessor<2,hp::DoFHandler<2> >::get_dof_values (const InputVector &/*values*/,
                                                          Vector<number>    &/*local_values*/) const
-{
-  Assert (false, ExcNotImplemented());
-}
-
-
-template <>
-template <class OutputVector, typename number>
-void
-DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_values (const Vector<number> &/*local_values*/,
-                                                         OutputVector         &/*values*/) const
 {
   Assert (false, ExcNotImplemented());
 }
@@ -525,28 +536,31 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::set_dof_values (const Vector<number> &/
   Assert (false, ExcNotImplemented());
 }
 
+
 template <>
 template <class OutputVector, typename number>
 void
-DoFObjectAccessor<1,hp::DoFHandler<3> >::set_dof_values (const Vector<number> &/*local_values*/,
+DoFObjectAccessor<2,hp::DoFHandler<2> >::set_dof_values (const Vector<number> &/*local_values*/,
                                                          OutputVector         &/*values*/) const
 {
   Assert (false, ExcNotImplemented());
 }
 
+#endif
 
 
 
-// --------------- hp::DoFHandler specializations for 2d objects -----------
+// --------------- hp::DoFHandler specializations for 3d objects -----------
 
+#if deal_II_dimension == 3
 
 template <>
-void DoFObjectAccessor<2, hp::DoFHandler<2> >::set_vertex_dof_index (const unsigned int /*vertex*/,
+void DoFObjectAccessor<1, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int /*vertex*/,
                                                                      const unsigned int /*i*/,
                                                                      const unsigned int /*index*/,
 					      const unsigned int fe_index) const
 {
-  Assert (fe_index != hp::DoFHandler<2>::default_fe_index,
+  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
 	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
   Assert (false, ExcInternalError());
 }
@@ -564,9 +578,21 @@ void DoFObjectAccessor<2, hp::DoFHandler<3> >::set_vertex_dof_index (const unsig
 
 
 template <>
+void DoFObjectAccessor<3, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int /*vertex*/,
+                                                                     const unsigned int /*i*/,
+                                                                     const unsigned int /*index*/,
+					      const unsigned int fe_index) const
+{
+  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
+	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
+  Assert (false, ExcInternalError());
+}
+
+
+template <>
 template <class InputVector, typename number>
 void
-DoFObjectAccessor<2,hp::DoFHandler<2> >::get_dof_values (const InputVector &/*values*/,
+DoFObjectAccessor<1,hp::DoFHandler<3> >::get_dof_values (const InputVector &/*values*/,
                                                          Vector<number>    &/*local_values*/) const
 {
   Assert (false, ExcNotImplemented());
@@ -583,9 +609,19 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::get_dof_values (const InputVector &/*va
 
 
 template <>
+template <class InputVector, typename number>
+void
+DoFObjectAccessor<3,hp::DoFHandler<3> >::get_dof_values (const InputVector &/*values*/,
+                                                         Vector<number>    &/*local_values*/) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+template <>
 template <class OutputVector, typename number>
 void
-DoFObjectAccessor<2,hp::DoFHandler<2> >::set_dof_values (const Vector<number> &/*local_values*/,
+DoFObjectAccessor<1,hp::DoFHandler<3> >::set_dof_values (const Vector<number> &/*local_values*/,
                                                          OutputVector         &/*values*/) const
 {
   Assert (false, ExcNotImplemented());
@@ -600,32 +636,6 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::set_dof_values (const Vector<number> &/
   Assert (false, ExcNotImplemented());
 }
 
-
-
-
-// --------------- hp::DoFHandler specializations for 3d objects -----------
-
-
-template <>
-void DoFObjectAccessor<3, hp::DoFHandler<3> >::set_vertex_dof_index (const unsigned int /*vertex*/,
-                                                                     const unsigned int /*i*/,
-                                                                     const unsigned int /*index*/,
-					      const unsigned int fe_index) const
-{
-  Assert (fe_index != hp::DoFHandler<3>::default_fe_index,
-	  ExcMessage ("You need to specify a FE index when working with hp DoFHandlers"));
-  Assert (false, ExcInternalError());
-}
-
-template <>
-template <class InputVector, typename number>
-void
-DoFObjectAccessor<3,hp::DoFHandler<3> >::get_dof_values (const InputVector &/*values*/,
-                                                         Vector<number>    &/*local_values*/) const
-{
-  Assert (false, ExcNotImplemented());
-}
-
 template <>
 template <class OutputVector, typename number>
 void
@@ -635,6 +645,8 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::set_dof_values (const Vector<number> &/
   Assert (false, ExcNotImplemented());
 }
 
+
+#endif
 
 
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
