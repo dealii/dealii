@@ -684,15 +684,14 @@ FiniteElement<dim>::memory_consumption () const
 
 template <int dim>
 void
-FiniteElement<dim>::
-compute_2nd (const Mapping<dim>                   &mapping,
-	     const typename Triangulation<dim>::cell_iterator &cell,
-	     const unsigned int,
-	     typename Mapping<dim>::InternalDataBase &mapping_internal,
-	     InternalDataBase                     &fe_internal,
-	     FEValuesData<dim>                    &data) const
+FiniteElement<dim>::compute_2nd (
+  const Mapping<dim>                   &mapping,
+  const typename Triangulation<dim>::cell_iterator &cell,
+  const unsigned int offset,
+  typename Mapping<dim>::InternalDataBase &mapping_internal,
+  InternalDataBase                     &fe_internal,
+  FEValuesData<dim>                    &data) const
 {
-//TODO[GK]: This function presently has a flaw: it ignores the offset parameter. This means that if it is called for faces or subfaces, it computes the data for _all_ faces or subfaces, even though we only need to have this for one of them. given that computing second derivatives is expensive, this is significant. What should be done is to honor the offset parameter and of course only compute what we actually need
   Assert ((fe_internal.update_each | fe_internal.update_once)
 	  & update_second_derivatives,
 	  ExcInternalError());
@@ -713,6 +712,9 @@ compute_2nd (const Mapping<dim>                   &mapping,
     {
       fe_internal.differences[d]->reinit(cell);
       fe_internal.differences[d+dim]->reinit(cell);
+      Assert(offset <= fe_internal.differences[d]->n_quadrature_points - n_q_points,
+	     ExcIndexRange(offset, 0, fe_internal.differences[d]->n_quadrature_points
+			   - n_q_points));
     }
 
 				   // collection of difference
@@ -752,8 +754,8 @@ compute_2nd (const Mapping<dim>                   &mapping,
               Tensor<1,dim> right, left;
               if (is_primitive(shape_index))
                 {
-                  right = fe_internal.differences[d1]->shape_grad(shape_index, q);
-                  left  = fe_internal.differences[d1+dim]->shape_grad(shape_index, q);
+                  right = fe_internal.differences[d1]->shape_grad(shape_index, q+offset);
+                  left  = fe_internal.differences[d1+dim]->shape_grad(shape_index, q+offset);
                 }
               else
                 {
@@ -789,9 +791,9 @@ compute_2nd (const Mapping<dim>                   &mapping,
                           ExcInternalError());
 
                   right = fe_internal.differences[d1]
-                          ->shape_grad_component(shape_index, q, component);
+                          ->shape_grad_component(shape_index, q+offset, component);
                   left  = fe_internal.differences[d1+dim]
-                          ->shape_grad_component(shape_index, q, component);
+                          ->shape_grad_component(shape_index, q+offset, component);
                 };
               
                                                // compute the second
