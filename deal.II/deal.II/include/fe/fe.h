@@ -428,6 +428,51 @@ class FiniteElement : public Subscriptor,
     virtual std::string get_name () const = 0;
 
 				     /**
+				      * This operator returns a
+				      * reference to the present
+				      * object if the argument given
+				      * equals to zero. While this
+				      * does not seem particularly
+				      * useful, it is helpful in
+				      * writing code that works with
+				      * both ::DoFHandler and the hp
+				      * version hp::DoFHandler, since
+				      * one can then write code like
+				      * this:
+				      * @verbatim
+				      *   dofs_per_cell
+				      *     = dof_handler->get_fe()[cell->active_fe_index()].dofs_per_cell;
+				      * @endverbatim
+				      *
+				      * This code doesn't work in both
+				      * situations without the present
+				      * operator because
+				      * DoFHandler::get_fe() returns a
+				      * finite element, whereas
+				      * hp::DoFHandler::get_fe()
+				      * returns a collection of finite
+				      * elements that doesn't offer a
+				      * <code>dofs_per_cell</code>
+				      * member variable: one first has
+				      * to select which finite element
+				      * to work on, which is done
+				      * using the
+				      * operator[]. Fortunately,
+				      * <code>cell-@>active_fe_index()</code>
+				      * also works for non-hp classes
+				      * and simply returns zero in
+				      * that case. The present
+				      * operator[] accepts this zero
+				      * argument, by returning the
+				      * finite element with index zero
+				      * within its collection (that,
+				      * of course, consists only of
+				      * the present finite element
+				      * anyway).
+				      */
+    const FiniteElement<dim> & operator[] (const unsigned int fe_index) const;
+    
+				     /**
 				      * @name Shape function access
 				      * @{
 				      */
@@ -2171,6 +2216,19 @@ class FiniteElement : public Subscriptor,
 
 //----------------------------------------------------------------------//
 
+
+template <int dim>
+inline
+const FiniteElement<dim> &
+FiniteElement<dim>::operator[] (const unsigned int fe_index) const
+{
+  Assert (fe_index == 0,
+	  ExcMessage ("A fe_index of zero is the only index allowed here"));
+  return *this;
+}
+
+
+
 template <int dim>  
 inline
 std::pair<unsigned int,unsigned int>
@@ -2182,6 +2240,8 @@ FiniteElement<dim>::system_to_component_index (const unsigned int index) const
 	  typename FiniteElement<dim>::ExcShapeFunctionNotPrimitive(index));
   return system_to_component_table[index];
 }
+
+
 
 template <int dim>  
 inline
@@ -2265,6 +2325,7 @@ FiniteElement<dim>::first_block_of_base (const unsigned int index) const
 }
 
 
+
 template <int dim>  
 inline
 std::pair<unsigned int,unsigned int>
@@ -2275,6 +2336,7 @@ FiniteElement<dim>::component_to_base_index (const unsigned int index) const
 
   return component_to_base_table[index].first;
 }
+
 
 
 template <int dim>  
@@ -2294,6 +2356,7 @@ FiniteElement<dim>::block_to_base_index (const unsigned int index) const
 }
 
 
+
 template <int dim>  
 inline
 std::pair<unsigned int,unsigned int>
@@ -2311,6 +2374,7 @@ FiniteElement<dim>::system_to_block_index (const unsigned int index) const
 }
 
 
+
 template <int dim>
 inline
 bool
@@ -2320,6 +2384,7 @@ FiniteElement<dim>::restriction_is_additive (const unsigned int index) const
 	 ExcIndexRange(index, 0, this->dofs_per_cell));
   return restriction_is_additive_flags[index];
 }
+
 
 
 template <int dim>
@@ -2362,6 +2427,7 @@ FiniteElement<dim>::is_primitive (const unsigned int i) const
 				   // just comparing against 1
   return (n_nonzero_components_table[i] == 1);
 }
+
 
 
 template <int dim>
