@@ -40,8 +40,6 @@ MGDoFObjectAccessor<1, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria
 template <int dim>
 unsigned int MGDoFObjectAccessor<1, dim>::mg_dof_index (const unsigned int i) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -62,8 +60,6 @@ template <int dim>
 void MGDoFObjectAccessor<1, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -84,8 +80,6 @@ template <int dim>
 unsigned int MGDoFObjectAccessor<1, dim>::mg_vertex_dof_index (const unsigned int vertex,
 							       const unsigned int i) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -106,8 +100,6 @@ void MGDoFObjectAccessor<1, dim>::set_mg_vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int index) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -127,8 +119,6 @@ template <int dim>
 void
 MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -159,8 +149,6 @@ void
 MGDoFObjectAccessor<1,dim>::get_mg_dof_values (const Vector<number> &values,
 					       Vector<number>       &dof_values) const
 {
-  typedef DoFAccessor<DoFHandler<1> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -227,8 +215,6 @@ MGDoFObjectAccessor<2, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria
 template <int dim>
 unsigned int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -249,8 +235,6 @@ template <int dim>
 void MGDoFObjectAccessor<2, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -271,8 +255,6 @@ template <int dim>
 unsigned int MGDoFObjectAccessor<2, dim>::mg_vertex_dof_index (const unsigned int vertex,
 							       const unsigned int i) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -293,8 +275,6 @@ void MGDoFObjectAccessor<2, dim>::set_mg_vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int index) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -314,9 +294,6 @@ template <int dim>
 void
 MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-  typedef DoFAccessor<DoFHandler<2> > BaseClass2D;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -326,7 +303,7 @@ MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   Assert (dof_indices.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
 				 4*this->dof_handler->get_fe().dofs_per_line +
 				 this->dof_handler->get_fe().dofs_per_quad),
-	  typename BaseClass2D::ExcVectorDoesNotMatch());
+	  typename BaseClass::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
@@ -352,8 +329,6 @@ void
 MGDoFObjectAccessor<2,dim>::get_mg_dof_values (const Vector<number> &values,
 					       Vector<number>       &dof_values) const
 {
-  typedef DoFAccessor<DoFHandler<2> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -440,8 +415,6 @@ MGDoFObjectAccessor<3, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria
 template <int dim>
 unsigned int MGDoFObjectAccessor<3, dim>::mg_dof_index (const unsigned int i) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -462,8 +435,6 @@ template <int dim>
 void MGDoFObjectAccessor<3, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -484,8 +455,6 @@ template <int dim>
 unsigned int MGDoFObjectAccessor<3, dim>::mg_vertex_dof_index (const unsigned int vertex,
 							       const unsigned int i) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -506,8 +475,6 @@ void MGDoFObjectAccessor<3, dim>::set_mg_vertex_dof_index (const unsigned int ve
 							   const unsigned int i,
 							   const unsigned int index) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -527,9 +494,6 @@ template <int dim>
 void
 MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
-  typedef DoFAccessor<DoFHandler<dim> > BaseClass;
-  typedef DoFAccessor<DoFHandler<3> > BaseClass3D;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,
@@ -540,7 +504,7 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
 				 12*this->dof_handler->get_fe().dofs_per_line +
 				 6*this->dof_handler->get_fe().dofs_per_quad +
 				 this->dof_handler->get_fe().dofs_per_hex),
-	  typename BaseClass3D::ExcVectorDoesNotMatch());
+	  typename BaseClass::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
@@ -570,8 +534,6 @@ void
 MGDoFObjectAccessor<3,dim>::get_mg_dof_values (const Vector<number> &values,
 					       Vector<number>       &dof_values) const
 {
-  typedef DoFAccessor<DoFHandler<3> > BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (this->mg_dof_handler != 0,

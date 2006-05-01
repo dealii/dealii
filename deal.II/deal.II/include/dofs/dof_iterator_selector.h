@@ -13,7 +13,7 @@
 #ifndef __deal2__dof_iterator_selector_h
 #define __deal2__dof_iterator_selector_h
 
-template <class DH> class DoFAccessor;
+template <int structdim, class DH> class DoFAccessor;
 template <class DH> class DoFCellAccessor;
 template <int celldim, class DH> class DoFObjectAccessor;
 template <int dim> class FiniteElement;

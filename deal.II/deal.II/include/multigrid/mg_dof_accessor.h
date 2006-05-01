@@ -80,7 +80,7 @@ class MGDoFAccessor {
 				      * Reset the DoF handler pointer.
 				      */
     void set_mg_dof_handler (MGDoFHandler<dim> *dh) {
-	typedef DoFAccessor<DoFHandler<dim> > BaseClass;
+	typedef DoFAccessor<dim,DoFHandler<dim> > BaseClass;
       Assert (dh != 0, typename BaseClass::ExcInvalidObject());
       mg_dof_handler = dh;
     };
@@ -236,6 +236,16 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<dim>,
 {
   public:
 				     /**
+				      * Declare a typedef to the base
+				      * class to make accessing some
+				      * of the exception classes
+				      * simpler.
+				      */    
+    typedef
+    typename MGDoFObjectAccessor_Inheritance<1, dim>::BaseClass
+    BaseClass;
+
+				     /**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the
 				      * iterator classes.
@@ -351,6 +361,16 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<dim>,
 				     public MGDoFObjectAccessor_Inheritance<2, dim>::BaseClass
 {
   public:
+				     /**
+				      * Declare a typedef to the base
+				      * class to make accessing some
+				      * of the exception classes
+				      * simpler.
+				      */    
+    typedef
+    typename MGDoFObjectAccessor_Inheritance<2, dim>::BaseClass
+    BaseClass;
+
 				     /**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the
@@ -476,6 +496,17 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<dim>,
 				     public MGDoFObjectAccessor_Inheritance<3, dim>::BaseClass
 {
   public:
+				     /**
+				      * Declare a typedef to the base
+				      * class to make accessing some
+				      * of the exception classes
+				      * simpler.
+				      */    
+    typedef
+    typename MGDoFObjectAccessor_Inheritance<3, dim>::BaseClass
+    BaseClass;
+
+    
 				     /**
 				      * Declare the data type that this accessor
 				      * class expects to get passed from the

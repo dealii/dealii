@@ -1071,7 +1071,7 @@ class DoFHandler  :  public Subscriptor
 				     /*
 				      * Make accessor objects friends.
 				      */
-    template <class DH> friend class DoFAccessor;
+    template <int structdim, class DH> friend class DoFAccessor;
 
 				     /*
 				      * Make accessor objects friends.

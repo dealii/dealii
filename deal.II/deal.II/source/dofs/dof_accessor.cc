@@ -41,8 +41,6 @@ void DoFObjectAccessor<1, DH>::set_dof_index (const unsigned int i,
 {
   Assert (fe_index == DoFHandler<1>::default_fe_index,
 	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  typedef DoFAccessor<DH> BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -70,17 +68,6 @@ void DoFObjectAccessor<1, DH>::set_vertex_dof_index (const unsigned int vertex,
 {
   Assert (fe_index == DoFHandler<1>::default_fe_index,
 	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-				   // since the exception classes are
-				   // from a template dependent base
-				   // class, we have to fully qualify
-				   // them. to work around more
-				   // trouble, typedef the template
-				   // dependent base class to a
-				   // non-template dependent name and
-				   // use that to specify the
-				   // qualified exception names
-  typedef DoFAccessor<DH> BaseClass;
-  
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (&this->dof_handler->get_fe() != 0,
@@ -107,8 +94,6 @@ void DoFObjectAccessor<2, DH>::set_dof_index (const unsigned int i,
 {
   Assert (fe_index == DoFHandler<1>::default_fe_index,
 	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  typedef DoFAccessor<DH> BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -133,8 +118,6 @@ DoFObjectAccessor<2, DH>::set_vertex_dof_index (const unsigned int vertex,
 {
   Assert (fe_index == DoFHandler<1>::default_fe_index,
 	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  typedef DoFAccessor<DH> BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (&this->dof_handler->get_fe() != 0,
@@ -161,8 +144,6 @@ void DoFObjectAccessor<3, DH>::set_dof_index (const unsigned int i,
 {
   Assert (fe_index == DoFHandler<1>::default_fe_index,
 	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  typedef DoFAccessor<DH> BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
 				   // make sure a FE has been selected
@@ -186,8 +167,6 @@ void DoFObjectAccessor<3, DH>::set_vertex_dof_index (const unsigned int vertex,
 {
   Assert (fe_index == DoFHandler<1>::default_fe_index,
 	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  typedef DoFAccessor<DH> BaseClass;
-
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (&this->dof_handler->get_fe() != 0,
@@ -336,8 +315,8 @@ DoFCellAccessor<DoFHandler<1> >::update_cell_dof_indices_cache () const
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
   
-  Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<1> >::ExcInvalidObject());
+  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
+  Assert (&this->get_fe() != 0, BaseClass::ExcInvalidObject());
 
 				   // check as in documentation that
 				   // cell is either active, or dofs
@@ -413,8 +392,8 @@ DoFCellAccessor<DoFHandler<2> >::update_cell_dof_indices_cache () const
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
-  Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<2> >::ExcInvalidObject());
+  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
+  Assert (&this->get_fe() != 0, BaseClass::ExcInvalidObject());
 
 				   // check as in documentation that
 				   // cell is either active, or dofs
@@ -493,8 +472,8 @@ DoFCellAccessor<DoFHandler<3> >::update_cell_dof_indices_cache () const
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
-  Assert (this->dof_handler != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
-  Assert (&this->get_fe() != 0, DoFAccessor<DoFHandler<3> >::ExcInvalidObject());
+  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
+  Assert (&this->get_fe() != 0, BaseClass::ExcInvalidObject());
 
 				   // check as in documentation that
 				   // cell is either active, or dofs
@@ -622,8 +601,6 @@ get_interpolated_dof_values (const InputVector &values,
   const FiniteElement<dim> &fe            = this->get_fe();
   const unsigned int        dofs_per_cell = fe.dofs_per_cell;
   
-  typedef DoFAccessor<DH> BaseClass;
-  
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (&fe != 0,
@@ -740,8 +717,7 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
 				 OutputVector         &values) const
 {
   const unsigned int dofs_per_cell = this->get_fe().dofs_per_cell;
-  typedef DoFAccessor<DH> BaseClass;
-  
+
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (&this->get_fe() != 0,
@@ -1026,13 +1002,15 @@ set_dof_values_by_interpolation<PETScWrappers::BlockVector,float>
 #endif
 
 
-template class DoFAccessor<DoFHandler<deal_II_dimension> >;
-
 #if deal_II_dimension == 1
+template class DoFAccessor<1, DoFHandler<1> >;
 template class DoFObjectAccessor<1, DoFHandler<1> >;
 #endif
 
 #if deal_II_dimension == 2
+template class DoFAccessor<1, DoFHandler<2> >;
+template class DoFAccessor<2, DoFHandler<2> >;
+
 template class DoFObjectAccessor<1, DoFHandler<2> >;
 template class DoFObjectAccessor<2, DoFHandler<2> >;
 
@@ -1042,6 +1020,10 @@ template class TriaActiveIterator<2,DoFObjectAccessor<1, DoFHandler<2> > >;
 #endif
 
 #if deal_II_dimension == 3
+template class DoFAccessor<1, DoFHandler<3> >;
+template class DoFAccessor<2, DoFHandler<3> >;
+template class DoFAccessor<3, DoFHandler<3> >;
+
 template class DoFObjectAccessor<1, DoFHandler<3> >;
 template class DoFObjectAccessor<2, DoFHandler<3> >;
 template class DoFObjectAccessor<3, DoFHandler<3> >;
@@ -1311,13 +1293,15 @@ set_dof_values_by_interpolation<PETScWrappers::BlockVector,float>
 #endif
 
 
-template class DoFAccessor<hp::DoFHandler<deal_II_dimension> >;
-
 #if deal_II_dimension == 1
+template class DoFAccessor<1, hp::DoFHandler<1> >;
 template class DoFObjectAccessor<1, hp::DoFHandler<1> >;
 #endif
 
 #if deal_II_dimension == 2
+template class DoFAccessor<1, hp::DoFHandler<2> >;
+template class DoFAccessor<2, hp::DoFHandler<2> >;
+
 template class DoFObjectAccessor<1, hp::DoFHandler<2> >;
 template class DoFObjectAccessor<2, hp::DoFHandler<2> >;
 
@@ -1328,6 +1312,10 @@ template class TriaActiveIterator<2,DoFObjectAccessor<1, hp::DoFHandler<2> > >;
 
 
 #if deal_II_dimension == 3
+template class DoFAccessor<1, hp::DoFHandler<3> >;
+template class DoFAccessor<2, hp::DoFHandler<3> >;
+template class DoFAccessor<3, hp::DoFHandler<3> >;
+
 template class DoFObjectAccessor<1, hp::DoFHandler<3> >;
 template class DoFObjectAccessor<2, hp::DoFHandler<3> >;
 template class DoFObjectAccessor<3, hp::DoFHandler<3> >;

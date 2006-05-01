@@ -44,122 +44,6 @@ template <int dim, typename Accessor> class TriaRawIterator;
 
 
 /**
- * Define the base class for accessors to the degrees of
- * freedom. Accessors are used to, well, access the data that pertains
- * to edges, faces, and cells of a triangulation. The concept is
- * explained in more detail in connection to @ref Iterators.
- *
- * The template argument of this class refers to the type of DoF
- * handler we should work on. It can either be ::DoFHandler<dim> or
- * hp::DoFHandler<dim>. The space dimension of the object we are to
- * work on is automatically extracted from the DH template argument.
- *
- * @ingroup dofs
- * @ingroup Accessors 
- * @author Wolfgang Bangerth, 1998
- */
-template <class DH>
-class DoFAccessor
-{
-  public:
-				     /**
-				      * Constructor
-				      */
-    DoFAccessor ();
-
-				     /**
-				      * This should be the default constructor.
-				      * We cast away the constness of the
-				      * pointer which clearly is EVIL but
-				      * we can't help without making all
-				      * functions which could somehow use
-				      * iterators (directly or indirectly) make
-				      * non-const, even if they preserve
-				      * constness.
-				      */
-    DoFAccessor (const DH *dof_handler);
-
-				     /**
-				      * Reset the DoF handler pointer.
-				      */
-    void set_dof_handler (DH *dh);
-
-				     /**
-				      * Return a handle on the
-				      * DoFHandler object which we
-				      * are using.
-				      */
-    const DH &
-    get_dof_handler () const;
-
-				     /**
-				      * Copy operator.
-				      */
-    DoFAccessor<DH> &
-    operator = (const DoFAccessor<DH> &da);
-
-				     /**
-				      * Exception for child classes
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcInvalidObject);
-				     /**
-				      * Exception
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcVectorNotEmpty);
-				     /**
-				      * Exception
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcVectorDoesNotMatch);
-				     /**
-				      * Exception
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcMatrixDoesNotMatch);
-				     /**
-				      * A function has been called for
-				      * a cell which should be active,
-				      * but is refined. @ref GlossActive
-				      *
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcNotActive);
-				     /**
-				      * Exception
-				      * 
-				      * @ingroup Exceptions
-				      */
-    DeclException0 (ExcCantCompareIterators);
-
-  protected:    
-				     /**
-				      *  Compare for equality.            
-				      */
-    bool operator == (const DoFAccessor &) const;
-	
-				     /**
-				      * Compare for inequality.
-				      */
-    bool operator != (const DoFAccessor &) const;
-
-  protected:
-				     /**
-				      * Store the address of the DoFHandler object
-				      * to be accessed.
-				      */
-    DH *dof_handler;  
-};
-
-
-/* -------------------------------------------------------------------------- */
-
-/**
  * This is a switch class which only declares a @p typedef. It is meant to
  * determine which class a DoFObjectAccessor class is to be derived
  * from. By default, <tt>DoFObjectAccessor<celldim,dim></tt> derives from
@@ -218,6 +102,160 @@ class DoFObjectAccessor_Inheritance<dim,dim>
 /* -------------------------------------------------------------------------- */
 
 
+
+/**
+ * Define the base class for accessors to the degrees of
+ * freedom. Accessors are used to, well, access the data that pertains
+ * to edges, faces, and cells of a triangulation. The concept is
+ * explained in more detail in connection to @ref Iterators.
+ *
+ * The first template argument of this class refers to the structural
+ * dimension of the thing accessed: it is 1 for lines, 2 for quads, or
+ * 3 for hexes. The second argument denotes the type of DoF handler we
+ * should work on. It can either be ::DoFHandler<dim> or
+ * hp::DoFHandler<dim>. The space dimension of the object we are to
+ * work on is automatically extracted from the DH template argument.
+ *
+ * Depending on whether the structural dimension of the object
+ * accessed equals the space dimension on which the DoF handler object
+ * operates, this class is derived from CellAccessor or
+ * TriaObjectAccessor. This means that, for example accessors to quads
+ * in 2d have access to all the mesh aspects of cells, whereas
+ * accessors to quads in 3d can only access things that make sense for
+ * faces.
+ * 
+ * @ingroup dofs
+ * @ingroup Accessors 
+ * @author Wolfgang Bangerth, 1998
+ */
+template <int structdim, class DH>
+class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimension>::BaseClass
+{
+  public:
+				     /**
+				      * Declare a typedef to the base
+				      * class to make accessing some
+				      * of the exception classes
+				      * simpler.
+				      */
+    typedef
+    typename DoFObjectAccessor_Inheritance<structdim, DH::dimension>::BaseClass
+    BaseClass;
+
+				     /**
+				      * Data type passed by the iterator class.
+				      */
+    typedef DH AccessorData;
+
+				     /**
+				      * Default constructor. Provides
+				      * an accessor that can't be
+				      * used.
+				      */
+    DoFAccessor ();
+    
+				     /**
+				      * Constructor
+				      */
+    DoFAccessor (const Triangulation<DH::dimension> *tria,
+		 const int                 level,
+		 const int                 index,
+		 const DH                 *local_data);
+
+				     /**
+				      * Reset the DoF handler pointer.
+				      */
+    void set_dof_handler (DH *dh);
+
+				     /**
+				      * Return a handle on the
+				      * DoFHandler object which we
+				      * are using.
+				      */
+    const DH &
+    get_dof_handler () const;
+
+				     /**
+				      * Copy operator.
+				      */
+    DoFAccessor<structdim,DH> &
+    operator = (const DoFAccessor<structdim,DH> &da);
+    
+				     /**
+				      * Implement the copy operator needed
+				      * for the iterator classes.
+				      */
+    void copy_from (const DoFAccessor<structdim, DH> &a);
+
+				     /**
+				      * Exception for child classes
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcInvalidObject);
+				     /**
+				      * Exception
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcVectorNotEmpty);
+				     /**
+				      * Exception
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcVectorDoesNotMatch);
+				     /**
+				      * Exception
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcMatrixDoesNotMatch);
+				     /**
+				      * A function has been called for
+				      * a cell which should be active,
+				      * but is refined. @ref GlossActive
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcNotActive);
+				     /**
+				      * Exception
+				      * 
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcCantCompareIterators);
+
+  protected:    
+
+				     /**
+				      * Store the address of the DoFHandler object
+				      * to be accessed.
+				      */
+    DH *dof_handler;
+
+				     /**
+				      *  Compare for equality.            
+				      */
+    bool operator == (const DoFAccessor &) const;
+	
+				     /**
+				      * Compare for inequality.
+				      */
+    bool operator != (const DoFAccessor &) const;
+
+                                     /**
+                                      * Iterator classes need to be friends
+                                      * because they need to access operator==
+                                      * and operator!=.
+                                      */
+    template <int, typename> friend class TriaRawIterator;
+};
+
+
+/* -------------------------------------------------------------------------- */
+
+
 /**
  * Common template for access to the data on a line, quad, hex. Note
  * that this class is only here for documentation purposes, the actual
@@ -256,8 +294,7 @@ class DoFObjectAccessor_Inheritance<dim,dim>
  * @author Wolfgang Bangerth, 1998; Guido Kanschat, 1999
  */
 template <int celldim, class DH>
-class DoFObjectAccessor : public DoFAccessor<DH>,
-			  public TriaObjectAccessor<celldim, DH::dimension>
+class DoFObjectAccessor : public DoFAccessor<celldim, DH>
 {
   public:
 				     /**
@@ -546,31 +583,6 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
 				      * access to the DoF data.
 				      */
     TriaIterator<dim,DoFObjectAccessor<celldim, DH> > child (const unsigned int) const;
-    
-				     /**
-				      * Implement the copy operator needed
-				      * for the iterator classes.
-				      */
-    void copy_from (const DoFObjectAccessor<celldim, DH> &a);
-
-  protected:    
-				     /**
-				      *  Compare for equality.            
-				      */
-    bool operator == (const DoFObjectAccessor &) const;
-	
-				     /**
-				      * Compare for inequality.
-				      */
-    bool operator != (const DoFObjectAccessor &) const;
-
-
-                                     /**
-                                      * Iterator classes need to be friends
-                                      * because they need to access operator==
-                                      * and operator!=.
-                                      */
-    template <int, typename> friend class TriaRawIterator;
 };
 
 
@@ -580,8 +592,7 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
  * @ingroup Accessors
  */
 template <class DH>
-class DoFObjectAccessor<0, DH> : public DoFAccessor<DH>,
-				 public DoFObjectAccessor_Inheritance<0,DH::dimension>::BaseClass
+class DoFObjectAccessor<0, DH> : public DoFAccessor<0, DH>
 {
   public:
     				     /**
@@ -637,9 +648,7 @@ class DoFObjectAccessor<0, DH> : public DoFAccessor<DH>,
  * @author Wolfgang Bangerth, 1998
  */
 template <class DH>
-class DoFObjectAccessor<1, DH> :
-  public DoFAccessor<DH>,
-  public DoFObjectAccessor_Inheritance<1,DH::dimension>::BaseClass
+class DoFObjectAccessor<1, DH> : public DoFAccessor<1,DH>
 {
   public:
 				     /**
@@ -658,7 +667,7 @@ class DoFObjectAccessor<1, DH> :
 				      * Declare base class as a local typedef
 				      * for simpler access.
 				      */
-    typedef typename DoFObjectAccessor_Inheritance<1,dim>::BaseClass BaseClass;
+    typedef DoFAccessor<1,DH> BaseClass;
 
 				     /**
 				      * Default constructor, unused thus
@@ -915,31 +924,6 @@ class DoFObjectAccessor<1, DH> :
 				      * access to the DoF data.
 				      */
     TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> > child (const unsigned int) const;
-    
-				     /**
-				      * Implement the copy operator needed
-				      * for the iterator classes.
-				      */
-    void copy_from (const DoFObjectAccessor<1,DH> &a);
-
-  protected:    
-				     /**
-				      *  Compare for equality.            
-				      */
-    bool operator == (const DoFObjectAccessor<1,DH> &) const;
-	
-				     /**
-				      * Compare for inequality.
-				      */
-    bool operator != (const DoFObjectAccessor<1,DH> &) const;
-
-
-                                     /**
-                                      * Iterator classes need to be friends
-                                      * because they need to access operator==
-                                      * and operator!=.
-                                      */
-    template <int, typename> friend class TriaRawIterator;
 };
 
 
@@ -950,9 +934,7 @@ class DoFObjectAccessor<1, DH> :
  * @ingroup Accessors
  */
 template <class DH>
-class DoFObjectAccessor<2, DH> :
-  public DoFAccessor<DH>,
-  public DoFObjectAccessor_Inheritance<2,DH::dimension>::BaseClass
+class DoFObjectAccessor<2, DH> : public DoFAccessor<2,DH>
 {
   public:
 				     /**
@@ -971,7 +953,7 @@ class DoFObjectAccessor<2, DH> :
 				      * Declare base class as a local typedef
 				      * for simpler access.
 				      */
-    typedef typename DoFObjectAccessor_Inheritance<2,dim>::BaseClass BaseClass;
+    typedef DoFAccessor<2,DH> BaseClass;
     
 				     /**
 				      * Default constructor, unused thus
@@ -1236,31 +1218,6 @@ class DoFObjectAccessor<2, DH> :
 				      */
     TriaIterator<DH::dimension,DoFObjectAccessor<2, DH> >
     child (const unsigned int) const;
-    
-				     /**
-				      * Implement the copy operator needed
-				      * for the iterator classes.
-				      */
-    void copy_from (const DoFObjectAccessor<2, DH> &a);
-
-  protected:    
-				     /**
-				      *  Compare for equality.            
-				      */
-    bool operator == (const DoFObjectAccessor<2,DH> &) const;
-	
-				     /**
-				      * Compare for inequality.
-				      */
-    bool operator != (const DoFObjectAccessor<2,DH> &) const;
-
-
-                                     /**
-                                      * Iterator classes need to be friends
-                                      * because they need to access operator==
-                                      * and operator!=.
-                                      */
-    template <int, typename> friend class TriaRawIterator;
 };
 
 
@@ -1271,9 +1228,7 @@ class DoFObjectAccessor<2, DH> :
  * @ingroup Accessors
  */
 template <class DH>
-class DoFObjectAccessor<3, DH> :
-  public DoFAccessor<DH>,
-  public DoFObjectAccessor_Inheritance<3,DH::dimension>::BaseClass
+class DoFObjectAccessor<3, DH> : public DoFAccessor<3,DH>
 {
   public:
 				     /**
@@ -1292,7 +1247,7 @@ class DoFObjectAccessor<3, DH> :
 				      * Declare base class as a local typedef
 				      * for simpler access.
 				      */
-    typedef typename DoFObjectAccessor_Inheritance<3,dim>::BaseClass BaseClass;
+    typedef DoFAccessor<1,DH> BaseClass;
     
 				     /**
 				      * Default constructor, unused thus
@@ -1564,31 +1519,6 @@ class DoFObjectAccessor<3, DH> :
 				      * access to the DoF data.
 				      */
     TriaIterator<DH::dimension,DoFObjectAccessor<3, DH> > child (const unsigned int) const;
-    
-				     /**
-				      * Implement the copy operator needed
-				      * for the iterator classes.
-				      */
-    void copy_from (const DoFObjectAccessor<3, DH> &a);
-
-  protected:    
-				     /**
-				      *  Compare for equality.            
-				      */
-    bool operator == (const DoFObjectAccessor<3,DH> &) const;
-	
-				     /**
-				      * Compare for inequality.
-				      */
-    bool operator != (const DoFObjectAccessor<3,DH> &) const;
-
-
-                                     /**
-                                      * Iterator classes need to be friends
-                                      * because they need to access operator==
-                                      * and operator!=.
-                                      */
-    template <int, typename> friend class TriaRawIterator;
 };
 
 
@@ -1629,6 +1559,14 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
 				      * classes.
 				      */
     typedef typename DoFObjectAccessor<DH::dimension,DH>::AccessorData AccessorData;
+
+				     /**
+				      * Declare a typedef to the base
+				      * class to make accessing some
+				      * of the exception classes
+				      * simpler.
+				      */
+    typedef DoFObjectAccessor<DH::dimension,DH> BaseClass;
     
     				     /**
 				      * Constructor
