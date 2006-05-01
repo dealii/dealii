@@ -635,12 +635,28 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       Changed: The <code>DoFObjectAccessor::get_dof_values</code> and
+       <code>DoFObjectAccessor::set_dof_values</code> were part of the
+       accessors for lines, quads, and hexes. However, they could not
+       be called for these objects unless the object was actually a
+       cell, i.e. one could never call this function for a line or
+       face in 3d, for example. The functions have therefore been
+       moved to the <code>DoFCellAccessor</code> class that provides
+       access to cells (i.e. lines in 1d, quads in 2d, and hexes in
+       3d) for which this operation is actually useful.
+       <br> 
+       (WB 2006/05/01)
+       </p>
   
   <li> <p> Fixed: second derivatives where not computed correctly in <code
-  class="class">FEFaceValuesBase</code>.
-  <br>
-  (GK 2006/04/28)
-  </p>
+       class="class">FEFaceValuesBase</code>, i.e. when evaluating
+       second derivatives on faces of cells. This is now fixed. Using
+       second derivatives evaluated at quadrature points within a cell
+       was not affected by this problem.
+       <br>
+       (GK 2006/04/28)
+       </p>
 
   <li> <p>
        New: The functions <code>Triangulation::clear_user_flags_line</code>,

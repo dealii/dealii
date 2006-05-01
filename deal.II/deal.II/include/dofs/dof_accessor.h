@@ -452,7 +452,7 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
 
     				     /**
 				      * Return the indices of the dofs of this
-				      * quad in the standard ordering: dofs
+				      * object in the standard ordering: dofs
 				      * on vertex 0, dofs on vertex 1, etc,
 				      * dofs on line 0, dofs on line 1, etc,
 				      * dofs on quad 0, etc.
@@ -476,76 +476,54 @@ class DoFObjectAccessor : public DoFAccessor<DH>,
 				      * inactive edges do not have
 				      * degrees of freedom associated
 				      * with them at all.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
+				      *
+				      * For cells, there is only a
+				      * single possible finite element
+				      * index (namely the one for that
+				      * cell, returned by
+				      * <code>cell-@>active_fe_index</code>. Consequently,
+				      * the derived DoFCellAccessor
+				      * class has an overloaded
+				      * version of this function that
+				      * calls the present function
+				      * with
+				      * <code>cell-@>active_fe_index</code>
+				      * as last argument.
 				      */
-    void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
+    void get_dof_indices (std::vector<unsigned int> &dof_indices,
+			  const unsigned int fe_index = DH::default_fe_index) const;
 
-    				     /**
-				      * Return the values of the given vector
-				      * restricted to the dofs of this
-				      * cell in the standard ordering: dofs
-				      * on vertex 0, dofs on vertex 1, etc,
-				      * dofs on line 0, dofs on line 1, etc,
-				      * dofs on quad 0, etc.
-				      *
-				      * The vector has to have the
-				      * right size before being passed
-				      * to this function. This
-				      * function is only callable for
-				      * active cells.
-				      *
-				      * The input vector may be either a
-				      * <tt>Vector<float></tt>,
-				      * Vector<double>, or a
-				      * BlockVector<double>, or a
-				      * PETSc vector if deal.II is compiled to
-				      * support PETSc. It is in the
-				      * responsibility of the caller to assure
-				      * that the types of the numbers stored
-				      * in input and output vectors are
-				      * compatible and with similar accuracy.
-				      */
-    template <class InputVector, typename number>
-    void get_dof_values (const InputVector &values,
-			 Vector<number>    &local_values) const;
-
-				     /**
-				      * This function is the counterpart to
-				      * get_dof_values(): it takes a vector
-				      * of values for the degrees of freedom
-				      * of the cell pointed to by this iterator
-				      * and writes these values into the global
-				      * data vector @p values. This function
-				      * is only callable for active cells.
-				      *
-				      * Note that for continuous finite
-				      * elements, calling this function affects
-				      * the dof values on neighboring cells as
-				      * well. It may also violate continuity
-				      * requirements for hanging nodes, if
-				      * neighboring cells are less refined than
-				      * the present one. These requirements
-				      * are not taken care of and must be
-				      * enforced by the user afterwards.
-				      *
-				      * The vector has to have the
-				      * right size before being passed
-				      * to this function.
-				      *
-				      * The output vector may be either a
-				      * Vector<float>,
-				      * Vector<double>, or a
-				      * BlockVector<double>, or a
-				      * PETSc vector if deal.II is compiled to
-				      * support PETSc. It is in the
-				      * responsibility of the caller to assure
-				      * that the types of the numbers stored
-				      * in input and output vectors are
-				      * compatible and with similar accuracy.
-				      */
-    template <class OutputVector, typename number>
-    void set_dof_values (const Vector<number> &local_values,
-			 OutputVector         &values) const;
-                         
     				     /**
 				      *  Pointer to the <i>i</i>th line
 				      *  bounding this Object.
@@ -857,12 +835,14 @@ class DoFObjectAccessor<1, DH> :
 
     				     /**
 				      * Return the indices of the dofs of this
-				      * line in the standard ordering: dofs
-				      * on vertex 0, dofs on vertex 1, 
-				      * dofs on line.
+				      * object in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
 				      *
-				      * It is assumed that the vector already
-				      * has the right size beforehand.
+				      * The vector has to have the
+				      * right size before being passed
+				      * to this function.
 				      *
 				      * This function is most often
 				      * used on active objects (edges,
@@ -879,73 +859,53 @@ class DoFObjectAccessor<1, DH> :
 				      * inactive edges do not have
 				      * degrees of freedom associated
 				      * with them at all.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
+				      *
+				      * For cells, there is only a
+				      * single possible finite element
+				      * index (namely the one for that
+				      * cell, returned by
+				      * <code>cell-@>active_fe_index</code>. Consequently,
+				      * the derived DoFCellAccessor
+				      * class has an overloaded
+				      * version of this function that
+				      * calls the present function
+				      * with
+				      * <code>cell-@>active_fe_index</code>
+				      * as last argument.
 				      */
-    void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
-
-    				     /**
-				      * Return the values of the given vector
-				      * restricted to the dofs of this
-				      * cell in the standard ordering: dofs
-				      * on vertex 0, dofs on vertex 1, etc,
-				      * dofs on line 0, dofs on line 1, etc,
-				      * dofs on quad 0, etc.
-				      *
-				      * It is assumed that the vector already
-				      * has the right size beforehand. This
-				      * function is only callable for active
-				      * cells.
-				      *
-				      * The input vector may be either a
-				      * Vector<float>,
-				      * Vector<double>, or a
-				      * BlockVector<double>, or a
-				      * PETSc vector if deal.II is compiled to
-				      * support PETSc. It is in the
-				      * responsibility of the caller to assure
-				      * that the types of the numbers stored
-				      * in input and output vectors are
-				      * compatible and with similar accuracy.
-				      */
-    template <class InputVector, typename number>
-    void get_dof_values (const InputVector &values,
-			 Vector<number>    &local_values) const;
-
-				     /**
-				      * This function is the counterpart to
-				      * get_dof_values(): it takes a vector
-				      * of values for the degrees of freedom
-				      * of the cell pointed to by this iterator
-				      * and writes these values into the global
-				      * data vector @p values. This function
-				      * is only callable for active cells.
-				      *
-				      * Note that for continuous finite
-				      * elements, calling this function affects
-				      * the dof values on neighboring cells as
-				      * well. It may also violate continuity
-				      * requirements for hanging nodes, if
-				      * neighboring cells are less refined than
-				      * the present one. These requirements
-				      * are not taken care of and must be
-				      * enforced by the user afterwards.
-				      *
-				      * It is assumed that both vectors already
-				      * have the right size beforehand.
-				      *
-				      * The output vector may be either a
-				      * Vector<float>,
-				      * Vector<double>, or a
-				      * BlockVector<double>, or a
-				      * PETSc vector if deal.II is compiled to
-				      * support PETSc. It is in the
-				      * responsibility of the caller to assure
-				      * that the types of the numbers stored
-				      * in input and output vectors are
-				      * compatible and with similar accuracy.
-				      */
-    template <class OutputVector, typename number>
-    void set_dof_values (const Vector<number> &local_values,
-			 OutputVector         &values) const;
+    void get_dof_indices (std::vector<unsigned int> &dof_indices,
+			  const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
 				      * Return the @p ith child as a DoF line
@@ -1188,13 +1148,14 @@ class DoFObjectAccessor<2, DH> :
 
     				     /**
 				      * Return the indices of the dofs of this
-				      * quad in the standard ordering: dofs
+				      * object in the standard ordering: dofs
 				      * on vertex 0, dofs on vertex 1, etc,
 				      * dofs on line 0, dofs on line 1, etc,
 				      * dofs on quad 0, etc.
 				      *
-				      * It is assumed that the vector already
-				      * has the right size beforehand.
+				      * The vector has to have the
+				      * right size before being passed
+				      * to this function.
 				      *
 				      * This function is most often
 				      * used on active objects (edges,
@@ -1211,73 +1172,53 @@ class DoFObjectAccessor<2, DH> :
 				      * inactive edges do not have
 				      * degrees of freedom associated
 				      * with them at all.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
+				      *
+				      * For cells, there is only a
+				      * single possible finite element
+				      * index (namely the one for that
+				      * cell, returned by
+				      * <code>cell-@>active_fe_index</code>. Consequently,
+				      * the derived DoFCellAccessor
+				      * class has an overloaded
+				      * version of this function that
+				      * calls the present function
+				      * with
+				      * <code>cell-@>active_fe_index</code>
+				      * as last argument.
 				      */
-    void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
-
-    				     /**
-				      * Return the values of the given vector
-				      * restricted to the dofs of this
-				      * cell in the standard ordering: dofs
-				      * on vertex 0, dofs on vertex 1, etc,
-				      * dofs on line 0, dofs on line 1, etc,
-				      * dofs on quad 0, etc.
-				      *
-				      * It is assumed that the vector already
-				      * has the right size beforehand. This
-				      * function is only callable for active
-				      * cells.
-				      *
-				      * The input vector may be either a
-				      * Vector<float>,
-				      * Vector<double>, or a
-				      * BlockVector<double>, or a
-				      * PETSc vector if deal.II is compiled to
-				      * support PETSc. It is in the
-				      * responsibility of the caller to assure
-				      * that the types of the numbers stored
-				      * in input and output vectors are
-				      * compatible and with similar accuracy.
-				      */
-    template <class InputVector, typename number>
-    void get_dof_values (const InputVector &values,
-			 Vector<number>    &local_values) const;
-
-				     /**
-				      * This function is the counterpart to
-				      * get_dof_values(): it takes a vector
-				      * of values for the degrees of freedom
-				      * of the cell pointed to by this iterator
-				      * and writes these values into the global
-				      * data vector @p values. This function
-				      * is only callable for active cells.
-				      *
-				      * Note that for continuous finite
-				      * elements, calling this function affects
-				      * the dof values on neighboring cells as
-				      * well. It may also violate continuity
-				      * requirements for hanging nodes, if
-				      * neighboring cells are less refined than
-				      * the present one. These requirements
-				      * are not taken care of and must be
-				      * enforced by the user afterwards.
-				      *
-				      * It is assumed that both vectors already
-				      * have the right size beforehand.
-				      *
-				      * The output vector may be either a
-				      * Vector<float>,
-				      * Vector<double>, or a
-				      * BlockVector<double>, or a
-				      * PETSc vector if deal.II is compiled to
-				      * support PETSc. It is in the
-				      * responsibility of the caller to assure
-				      * that the types of the numbers stored
-				      * in input and output vectors are
-				      * compatible and with similar accuracy.
-				      */
-    template <class OutputVector, typename number>
-    void set_dof_values (const Vector<number> &local_values,
-			 OutputVector         &values) const;
+    void get_dof_indices (std::vector<unsigned int> &dof_indices,
+			  const unsigned int fe_index = DH::default_fe_index) const;
 
     				     /**
 				      *  Return a pointer to the @p ith line
@@ -1529,13 +1470,14 @@ class DoFObjectAccessor<3, DH> :
 
     				     /**
 				      * Return the indices of the dofs of this
-				      * hex in the standard ordering: dofs
+				      * object in the standard ordering: dofs
 				      * on vertex 0, dofs on vertex 1, etc,
 				      * dofs on line 0, dofs on line 1, etc,
 				      * dofs on quad 0, etc.
 				      *
-				      * It is assumed that the vector already
-				      * has the right size beforehand.
+				      * The vector has to have the
+				      * right size before being passed
+				      * to this function.
 				      *
 				      * This function is most often
 				      * used on active objects (edges,
@@ -1552,73 +1494,53 @@ class DoFObjectAccessor<3, DH> :
 				      * inactive edges do not have
 				      * degrees of freedom associated
 				      * with them at all.
+				      *
+				      * The last argument denotes the
+				      * finite element index. For the
+				      * standard ::DoFHandler class,
+				      * this value must be equal to
+				      * its default value since that
+				      * class only supports the same
+				      * finite element on all cells
+				      * anyway.
+				      *
+				      * However, for hp objects
+				      * (i.e. the hp::DoFHandler
+				      * class), different finite
+				      * element objects may be used on
+				      * different cells. On faces
+				      * between two cells, as well as
+				      * vertices, there may therefore
+				      * be two sets of degrees of
+				      * freedom, one for each of the
+				      * finite elements used on the
+				      * adjacent cells. In order to
+				      * specify which set of degrees
+				      * of freedom to work on, the
+				      * last argument is used to
+				      * disambiguate. Finally, if this
+				      * function is called for a cell
+				      * object, there can only be a
+				      * single set of degrees of
+				      * freedom, and fe_index has to
+				      * match the result of
+				      * active_fe_index().
+				      *
+				      * For cells, there is only a
+				      * single possible finite element
+				      * index (namely the one for that
+				      * cell, returned by
+				      * <code>cell-@>active_fe_index</code>. Consequently,
+				      * the derived DoFCellAccessor
+				      * class has an overloaded
+				      * version of this function that
+				      * calls the present function
+				      * with
+				      * <code>cell-@>active_fe_index</code>
+				      * as last argument.
 				      */
-    void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
-
-    				     /**
-				      * Return the values of the given vector
-				      * restricted to the dofs of this
-				      * cell in the standard ordering: dofs
-				      * on vertex 0, dofs on vertex 1, etc,
-				      * dofs on line 0, dofs on line 1, etc,
-				      * dofs on quad 0, etc.
-				      *
-				      * It is assumed that the vector already
-				      * has the right size beforehand. This
-				      * function is only callable for active
-				      * cells.
-				      *
-				      * The input vector may be either a
-				      * Vector<float>,
-				      * Vector<double>, or a
-				      * BlockVector<double>, or a
-				      * PETSc vector if deal.II is compiled to
-				      * support PETSc. It is in the
-				      * responsibility of the caller to assure
-				      * that the types of the numbers stored
-				      * in input and output vectors are
-				      * compatible and with similar accuracy.
-				      */
-    template <class InputVector, typename number>
-    void get_dof_values (const InputVector &values,
-			 Vector<number>    &local_values) const;
-
-				     /**
-				      * This function is the counterpart to
-				      * get_dof_values(): it takes a vector
-				      * of values for the degrees of freedom
-				      * of the cell pointed to by this iterator
-				      * and writes these values into the global
-				      * data vector @p values. This function
-				      * is only callable for active cells.
-				      *
-				      * Note that for continuous finite
-				      * elements, calling this function affects
-				      * the dof values on neighboring cells as
-				      * well. It may also violate continuity
-				      * requirements for hanging nodes, if
-				      * neighboring cells are less refined than
-				      * the present one. These requirements
-				      * are not taken care of and must be
-				      * enforced by the user afterwards.
-				      *
-				      * It is assumed that both vectors already
-				      * have the right size beforehand.
-				      *
-				      * The output vector may be either a
-				      * Vector<float>,
-				      * Vector<double>, or a
-				      * BlockVector<double>, or a
-				      * PETSc vector if deal.II is compiled to
-				      * support PETSc. It is in the
-				      * responsibility of the caller to assure
-				      * that the types of the numbers stored
-				      * in input and output vectors are
-				      * compatible and with similar accuracy.
-				      */
-    template <class OutputVector, typename number>
-    void set_dof_values (const Vector<number> &local_values,
-			 OutputVector         &values) const;
+    void get_dof_indices (std::vector<unsigned int> &dof_indices,
+			  const unsigned int fe_index = DH::default_fe_index) const;
 
     				     /**
 				      *  Return a pointer to the @p ith line
@@ -1766,6 +1688,73 @@ class DoFCellAccessor :  public DoFObjectAccessor<DH::dimension,DH>
     neighbor_child_on_subface (const unsigned int face_no,
                                const unsigned int subface_no) const;
 
+    				     /**
+				      * Return the values of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * The vector has to have the
+				      * right size before being passed
+				      * to this function. This
+				      * function is only callable for
+				      * active cells.
+				      *
+				      * The input vector may be either a
+				      * <tt>Vector<float></tt>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
+				      * PETSc vector if deal.II is compiled to
+				      * support PETSc. It is in the
+				      * responsibility of the caller to assure
+				      * that the types of the numbers stored
+				      * in input and output vectors are
+				      * compatible and with similar accuracy.
+				      */
+    template <class InputVector, typename number>
+    void get_dof_values (const InputVector &values,
+			 Vector<number>    &local_values) const;
+
+				     /**
+				      * This function is the counterpart to
+				      * get_dof_values(): it takes a vector
+				      * of values for the degrees of freedom
+				      * of the cell pointed to by this iterator
+				      * and writes these values into the global
+				      * data vector @p values. This function
+				      * is only callable for active cells.
+				      *
+				      * Note that for continuous finite
+				      * elements, calling this function affects
+				      * the dof values on neighboring cells as
+				      * well. It may also violate continuity
+				      * requirements for hanging nodes, if
+				      * neighboring cells are less refined than
+				      * the present one. These requirements
+				      * are not taken care of and must be
+				      * enforced by the user afterwards.
+				      *
+				      * The vector has to have the
+				      * right size before being passed
+				      * to this function.
+				      *
+				      * The output vector may be either a
+				      * Vector<float>,
+				      * Vector<double>, or a
+				      * BlockVector<double>, or a
+				      * PETSc vector if deal.II is compiled to
+				      * support PETSc. It is in the
+				      * responsibility of the caller to assure
+				      * that the types of the numbers stored
+				      * in input and output vectors are
+				      * compatible and with similar accuracy.
+				      */
+    template <class OutputVector, typename number>
+    void set_dof_values (const Vector<number> &local_values,
+			 OutputVector         &values) const;
+    
                                      /**
 				      * Return the interpolation of
 				      * the given finite element
