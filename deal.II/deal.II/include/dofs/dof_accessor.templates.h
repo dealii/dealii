@@ -192,6 +192,38 @@ DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
 
 template <class DH>
 inline
+unsigned int
+DoFObjectAccessor<1,DH>::dof_index (const unsigned int i,
+				    const unsigned int fe_index) const
+{
+  return this->dof_handler->levels[this->present_level]
+    ->get_line_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i);
+}
+
+
+
+template <class DH>
+inline
+void
+DoFObjectAccessor<1,DH>::set_dof_index (const unsigned int i,
+					const unsigned int index,
+					const unsigned int fe_index) const
+{
+  this->dof_handler->levels[this->present_level]
+    ->set_line_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i,
+                          index);
+}
+
+
+
+template <class DH>
+inline
 void
 DoFObjectAccessor<1,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices,
 					  const unsigned int         fe_index) const
@@ -262,6 +294,38 @@ DoFObjectAccessor<2,DH>::line (const unsigned int i) const
       this->line_index (i),
       this->dof_handler
     );
+}
+
+
+
+template <class DH>
+inline
+unsigned int
+DoFObjectAccessor<2,DH>::dof_index (const unsigned int i,
+				    const unsigned int fe_index) const
+{
+  return this->dof_handler->levels[this->present_level]
+    ->get_quad_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i);
+}
+
+
+
+template <class DH>
+inline
+void
+DoFObjectAccessor<2,DH>::set_dof_index (const unsigned int i,
+					const unsigned int index,
+					const unsigned int fe_index) const
+{
+  this->dof_handler->levels[this->present_level]
+    ->set_quad_dof_index (*this->dof_handler,
+                          this->present_index,
+                          fe_index,
+                          i,
+                          index);
 }
 
 
@@ -364,6 +428,38 @@ DoFObjectAccessor<3,DH>::quad (const unsigned int i) const
 
 template <class DH>
 inline
+unsigned int
+DoFObjectAccessor<3,DH>::dof_index (const unsigned int i,
+				    const unsigned int fe_index) const
+{
+  return this->dof_handler->levels[this->present_level]
+    ->get_hex_dof_index (*this->dof_handler,
+			 this->present_index,
+			 fe_index,
+			 i);
+}
+
+
+
+template <class DH>
+inline
+void
+DoFObjectAccessor<3,DH>::set_dof_index (const unsigned int i,
+					const unsigned int index,
+					const unsigned int fe_index) const
+{
+  this->dof_handler->levels[this->present_level]
+    ->set_hex_dof_index (*this->dof_handler,
+			 this->present_index,
+			 fe_index,
+			 i,
+			 index);
+}
+
+
+
+template <class DH>
+inline
 void
 DoFObjectAccessor<3,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices,
 					  const unsigned int         fe_index) const
@@ -414,363 +510,6 @@ DoFObjectAccessor<3,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
 }
 
 
-
-
-/*--------------- Functions: DoFObjectAccessor<1,DoFHandler> -----------*/
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,DoFHandler<1> >::dof_index (const unsigned int i,
-						const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<1>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_line));
-
-  return this->dof_handler->levels[this->present_level]
-    ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,DoFHandler<2> >::dof_index (const unsigned int i,
-						const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<2>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_line));
-
-  return this->dof_handler->levels[this->present_level]
-    ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,DoFHandler<3> >::dof_index (const unsigned int i,
-						const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<3>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe().dofs_per_line,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_line));
-
-  return this->dof_handler->levels[this->present_level]
-    ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
-}
-
-
-
-/*--------------- Functions: DoFObjectAccessor<2,DoFHandler> -----------*/
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<2,DoFHandler<2> >::dof_index (const unsigned int i,
-						const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<2>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe().dofs_per_quad,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_quad));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  return this->dof_handler->levels[this->present_level]
-    ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<2,DoFHandler<3> >::dof_index (const unsigned int i,
-						const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<3>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe().dofs_per_quad,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_quad));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  return this->dof_handler->levels[this->present_level]
-    ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i];
-}
-
-
-
-/*--------------- Functions: DoFObjectAccessor<3,DoFHandler> -----------*/
-
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<3,DoFHandler<3> >::dof_index (const unsigned int i,
-						const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<3>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-				   // make sure a FE has been selected
-				   // and enough room was reserved
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (i<this->dof_handler->get_fe().dofs_per_hex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_hex));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  return this->dof_handler->levels[this->present_level]
-    ->hex_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_hex+i];
-}
-
-
-
-/* -------------- hp vertex dofs stuff ------------------------------------ */
-
-
-/*--------------- Functions: DoFObjectAccessor<1,hp::DoFHandler> -----------*/
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<1> >::dof_index (const unsigned int i,
-						    const unsigned int fe_index) const
-{
-  return this->dof_handler->levels[this->present_level]
-    ->get_line_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i);
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<2> >::dof_index (const unsigned int i,
-						    const unsigned int fe_index) const
-{
-  return this->dof_handler->levels[this->present_level]
-    ->get_line_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i);
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<3> >::dof_index (const unsigned int i,
-						    const unsigned int fe_index) const
-{
-  return this->dof_handler->levels[this->present_level]
-    ->get_line_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i);
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<1,hp::DoFHandler<1> >::set_dof_index (const unsigned int i,
-							const unsigned int index,
-							const unsigned int fe_index) const
-{
-  this->dof_handler->levels[this->present_level]
-    ->set_line_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i,
-                          index);
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<1, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
-							 const unsigned int index,
-							 const unsigned int fe_index) const
-{
-  this->dof_handler->levels[this->present_level]
-    ->set_line_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i,
-                          index);
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<1, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
-							 const unsigned int index,
-							 const unsigned int fe_index) const
-{
-  this->dof_handler->levels[this->present_level]
-    ->set_line_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i,
-                          index);
-}
-
-
-
-
-/*------------- Functions: DoFObjectAccessor<2,hp::DoFHandler> -------------*/
-
-template <>
-inline
-unsigned int DoFObjectAccessor<2,hp::DoFHandler<2> >::dof_index (const unsigned int i,
-								 const unsigned int fe_index) const
-{
-  return this->dof_handler->levels[this->present_level]
-    ->get_quad_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i);
-}
-
-
-
-template <>
-inline
-unsigned int DoFObjectAccessor<2,hp::DoFHandler<3> >::dof_index (const unsigned int i,
-								 const unsigned int fe_index) const
-{
-  return this->dof_handler->levels[this->present_level]
-    ->get_quad_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i);
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<2, hp::DoFHandler<2> >::set_dof_index (const unsigned int i,
-							 const unsigned int index,
-							 const unsigned int fe_index) const
-{
-  this->dof_handler->levels[this->present_level]
-    ->set_quad_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i,
-                          index);
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<2, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
-							 const unsigned int index,
-							 const unsigned int fe_index) const
-{
-  this->dof_handler->levels[this->present_level]
-    ->set_quad_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i,
-                          index);
-}
-
-
-
-
-/*------------- Functions: DoFObjectAccessor<3,hp::DoFHandler> -------------*/
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<3,hp::DoFHandler<3> >::dof_index (const unsigned int i,
-						    const unsigned int fe_index) const
-{
-  return this->dof_handler->levels[this->present_level]
-    ->get_hex_dof_index (*this->dof_handler,
-                         this->present_index,
-                         fe_index,
-                         i);
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<3, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
-							 const unsigned int index,
-							 const unsigned int fe_index) const
-{
-  this->dof_handler->levels[this->present_level]
-    ->set_hex_dof_index (*this->dof_handler,
-                         this->present_index,
-                         fe_index,
-                         i,
-                         index);
-}
 
 
 
