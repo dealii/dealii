@@ -383,6 +383,8 @@ template <>
 void
 DoFCellAccessor<hp::DoFHandler<1> >::update_cell_dof_indices_cache () const
 {
+//TODO[WB]: should implement a dof indices cache for hp as well
+  
 				   // not implemented, but should also
 				   // not be called
   Assert (false, ExcNotImplemented());
@@ -462,6 +464,8 @@ template <>
 void
 DoFCellAccessor<hp::DoFHandler<2> >::update_cell_dof_indices_cache () const
 {
+//TODO[WB]: should implement a dof indices cache for hp as well
+  
 				   // not implemented, but should also
 				   // not be called
   Assert (false, ExcNotImplemented());
@@ -543,6 +547,8 @@ template <>
 void
 DoFCellAccessor<hp::DoFHandler<3> >::update_cell_dof_indices_cache () const
 {
+//TODO[WB]: should implement a dof indices cache for hp as well
+  
 				   // not implemented, but should also
 				   // not be called
   Assert (false, ExcNotImplemented());
