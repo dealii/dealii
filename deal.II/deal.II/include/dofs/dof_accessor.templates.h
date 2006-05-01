@@ -118,6 +118,61 @@ DoFAccessor<structdim,DH>::operator != (const DoFAccessor<structdim,DH> &a) cons
 
 
 
+template <int structdim, class DH>
+inline
+TriaIterator<DH::dimension,DoFObjectAccessor<structdim,DH> >
+DoFAccessor<structdim,DH>::child (const unsigned int i) const
+{
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+
+  TriaIterator<DH::dimension,DoFObjectAccessor<structdim,DH> > q (this->tria,
+								  this->present_level+1,
+								  this->child_index (i),
+								  this->dof_handler);
+
+				   // make sure that we either created
+				   // a past-the-end iterator or one
+				   // pointing to a used cell
+  Assert ((q.state() == IteratorState::past_the_end)
+	  ||
+	  q->used(),
+	  typename TriaAccessor<DH::dimension>::ExcUnusedCellAsChild());
+
+  return q;
+}
+
+
+
+template <int structdim, class DH>
+inline
+unsigned int
+DoFAccessor<structdim, DH>::vertex_dof_index (const unsigned int vertex,
+					      const unsigned int i,
+					      const unsigned int fe_index) const
+{
+  return this->dof_handler->get_vertex_dof_index (this->vertex_index(vertex),
+						  fe_index,
+						  i);
+}
+
+
+
+template <int structdim, class DH>
+void DoFAccessor<structdim, DH>::set_vertex_dof_index (const unsigned int vertex,
+						       const unsigned int i,
+						       const unsigned int index,
+						       const unsigned int fe_index) const
+{
+  this->dof_handler->set_vertex_dof_index (this->vertex_index(vertex),
+					   fe_index,
+					   i,
+					   index);
+}
+
+
+
+
 
 /*------------------------- Functions: DoFObjectAccessor<1,dim> -----------------------*/
 
@@ -133,27 +188,6 @@ DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
                 DoFAccessor<1,DH> (tria, level, index, local_data)
 {}
 
-
-
-template <class DH>
-inline
-TriaIterator<DH::dimension,DoFObjectAccessor<1,DH> >
-DoFObjectAccessor<1,DH>::child (const unsigned int i) const
-{
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  TriaIterator<dim,DoFObjectAccessor<1,DH> > q (this->tria,
-						this->present_level+1,
-						this->child_index (i),
-						this->dof_handler);
-  
-#ifdef DEBUG
-  if (q.state() != IteratorState::past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
-#endif
-  return q;
-}
 
 
 
@@ -188,28 +222,6 @@ DoFObjectAccessor<2,DH>::line (const unsigned int i) const
       this->line_index (i),
       this->dof_handler
     );
-}
-
-
-
-template <class DH>
-inline
-TriaIterator<DH::dimension,DoFObjectAccessor<2,DH> >
-DoFObjectAccessor<2,DH>::child (const unsigned int i) const
-{
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  TriaIterator<dim,DoFObjectAccessor<2,DH> > q (this->tria,
-						this->present_level+1,
-						this->child_index (i),
-						this->dof_handler);
-  
-#ifdef DEBUG
-  if (q.state() != IteratorState::past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
-#endif
-  return q;
 }
 
 
@@ -262,24 +274,6 @@ DoFObjectAccessor<3,DH>::quad (const unsigned int i) const
 }
 
 
-template <class DH>
-inline
-TriaIterator<DH::dimension,DoFObjectAccessor<3,DH> >
-DoFObjectAccessor<3,DH>::child (const unsigned int i) const
-{
-  TriaIterator<dim,DoFObjectAccessor<3,DH> > q (this->tria,
-						this->present_level+1,
-						this->child_index (i),
-						this->dof_handler);
-  
-#ifdef DEBUG
-  if (q.state() != IteratorState::past_the_end)
-    Assert (q->used(), typename TriaAccessor<dim>::ExcUnusedCellAsChild());
-#endif
-  return q;
-}
-
-
 /*--------------- Functions: DoFObjectAccessor<1,DoFHandler> -----------*/
 
 
@@ -303,32 +297,6 @@ DoFObjectAccessor<1,DoFHandler<1> >::dof_index (const unsigned int i,
 
   return this->dof_handler->levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,DoFHandler<1> >::vertex_dof_index (const unsigned int vertex,
-						       const unsigned int i,
-						       const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<1>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
-
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe().dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
 }
 
 
@@ -368,7 +336,7 @@ DoFObjectAccessor<1,DoFHandler<1> >::get_dof_indices (std::vector<unsigned int> 
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d);
+      *next++ = this->vertex_dof_index(vertex,d);
   for (unsigned int d=0; d<dofs_per_line; ++d)
     *next++ = dof_index(d);
 }
@@ -395,32 +363,6 @@ DoFObjectAccessor<1,DoFHandler<2> >::dof_index (const unsigned int i,
 
   return this->dof_handler->levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,DoFHandler<2> >::vertex_dof_index (const unsigned int vertex,
-						       const unsigned int i,
-						       const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<2>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
-
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe().dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
 }
 
 
@@ -460,7 +402,7 @@ DoFObjectAccessor<1,DoFHandler<2> >::get_dof_indices (std::vector<unsigned int> 
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d);
+      *next++ = this->vertex_dof_index(vertex,d);
   for (unsigned int d=0; d<dofs_per_line; ++d)
     *next++ = dof_index(d);
 }
@@ -487,32 +429,6 @@ DoFObjectAccessor<1,DoFHandler<3> >::dof_index (const unsigned int i,
 
   return this->dof_handler->levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,DoFHandler<3> >::vertex_dof_index (const unsigned int vertex,
-						       const unsigned int i,
-						       const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<3>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (vertex<2, ExcIndexRange (i,0,2));
-  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
-
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe().dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
 }
 
 
@@ -552,7 +468,7 @@ DoFObjectAccessor<1,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> 
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d);
+      *next++ = this->vertex_dof_index(vertex,d);
   for (unsigned int d=0; d<dofs_per_line; ++d)
     *next++ = dof_index(d);
 }
@@ -582,33 +498,6 @@ DoFObjectAccessor<2,DoFHandler<2> >::dof_index (const unsigned int i,
 
   return this->dof_handler->levels[this->present_level]
     ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<2,DoFHandler<2> >::vertex_dof_index (const unsigned int vertex,
-						       const unsigned int i,
-						       const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<2>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe().dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
 }
 
 
@@ -652,7 +541,7 @@ DoFObjectAccessor<2,DoFHandler<2> >::get_dof_indices (std::vector<unsigned int> 
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d);
+      *next++ = this->vertex_dof_index(vertex,d);
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->dof_index(d);
@@ -683,33 +572,6 @@ DoFObjectAccessor<2,DoFHandler<3> >::dof_index (const unsigned int i,
 
   return this->dof_handler->levels[this->present_level]
     ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<2,DoFHandler<3> >::vertex_dof_index (const unsigned int vertex,
-						       const unsigned int i,
-						       const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<3>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (vertex<4, ExcIndexRange (i,0,4));
-  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe().dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
 }
 
 
@@ -753,7 +615,7 @@ DoFObjectAccessor<2,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> 
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d);
+      *next++ = this->vertex_dof_index(vertex,d);
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->dof_index(d);
@@ -789,33 +651,6 @@ DoFObjectAccessor<3,DoFHandler<3> >::dof_index (const unsigned int i,
 
   return this->dof_handler->levels[this->present_level]
     ->hex_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_hex+i];
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<3,DoFHandler<3> >::vertex_dof_index (const unsigned int vertex,
-						       const unsigned int i,
-						       const unsigned int fe_index) const
-{
-  Assert (fe_index == DoFHandler<3>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (vertex<8, ExcIndexRange (i,0,8));
-  Assert (i<this->dof_handler->get_fe().dofs_per_vertex,
-	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  const unsigned int dof_number = (this->vertex_index(vertex) *
-				   this->dof_handler->get_fe().dofs_per_vertex +
-				   i);
-  return this->dof_handler->vertex_dofs[dof_number];
 }
 
 
@@ -862,7 +697,7 @@ DoFObjectAccessor<3,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> 
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d);
+      *next++ = this->vertex_dof_index(vertex,d);
   for (unsigned int line=0; line<12; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->dof_index(d);
@@ -876,98 +711,6 @@ DoFObjectAccessor<3,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> 
 
 
 /* -------------- hp vertex dofs stuff ------------------------------------ */
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<1> >::vertex_dof_index (const unsigned int vertex,
-							   const unsigned int i,
-							   const unsigned int fe_index) const
-{
-  return internal::hp::DoFLevel<0>::
-    get_vertex_dof_index (*this->dof_handler,
-                          this->vertex_index(vertex),
-                          fe_index,
-                          i);
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int vertex,
-							   const unsigned int i,
-							   const unsigned int fe_index) const
-{
-  return internal::hp::DoFLevel<0>::
-    get_vertex_dof_index (*this->dof_handler,
-                          this->vertex_index(vertex),
-                          fe_index,
-                          i);
-}
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<1,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int vertex,
-							   const unsigned int i,
-							   const unsigned int fe_index) const
-{
-  return internal::hp::DoFLevel<0>::
-    get_vertex_dof_index (*this->dof_handler,
-                          this->vertex_index(vertex),
-                          fe_index,
-                          i);
-}
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<2,hp::DoFHandler<2> >::vertex_dof_index (const unsigned int vertex,
-							   const unsigned int i,
-							   const unsigned int fe_index) const
-{
-  return internal::hp::DoFLevel<0>::
-    get_vertex_dof_index (*this->dof_handler,
-                          this->vertex_index(vertex),
-                          fe_index,
-                          i);
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<2,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int vertex,
-							   const unsigned int i,
-							   const unsigned int fe_index) const
-{
-  return internal::hp::DoFLevel<0>::
-    get_vertex_dof_index (*this->dof_handler,
-                          this->vertex_index(vertex),
-                          fe_index,
-                          i);
-}
-
-
-
-template <>
-inline
-unsigned int
-DoFObjectAccessor<3,hp::DoFHandler<3> >::vertex_dof_index (const unsigned int vertex,
-							   const unsigned int i,
-							   const unsigned int fe_index) const
-{
-  return internal::hp::DoFLevel<0>::
-    get_vertex_dof_index (*this->dof_handler,
-                          this->vertex_index(vertex),
-                          fe_index,
-                          i);
-}
 
 
 /*--------------- Functions: DoFObjectAccessor<1,hp::DoFHandler> -----------*/
@@ -1020,7 +763,7 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::get_dof_indices (std::vector<unsigned i
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d,fe_index);
+      *next++ = this->vertex_dof_index(vertex,d,fe_index);
   for (unsigned int d=0; d<dofs_per_line; ++d)
     *next++ = dof_index(d,fe_index);
 }
@@ -1075,7 +818,7 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::get_dof_indices (std::vector<unsigned i
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d,fe_index);
+      *next++ = this->vertex_dof_index(vertex,d,fe_index);
   for (unsigned int d=0; d<dofs_per_line; ++d)
     *next++ = dof_index(d,fe_index);
 }
@@ -1130,7 +873,7 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned i
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d,fe_index);
+      *next++ = this->vertex_dof_index(vertex,d,fe_index);
   for (unsigned int d=0; d<dofs_per_line; ++d)
     *next++ = dof_index(d,fe_index);
 }
@@ -1290,7 +1033,7 @@ DoFObjectAccessor<2,hp::DoFHandler<2> >::get_dof_indices (std::vector<unsigned i
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d,fe_index);
+      *next++ = this->vertex_dof_index(vertex,d,fe_index);
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->dof_index(d,fe_index);
@@ -1337,7 +1080,7 @@ DoFObjectAccessor<2,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned i
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d,fe_index);
+      *next++ = this->vertex_dof_index(vertex,d,fe_index);
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->dof_index(d,fe_index);
@@ -1423,7 +1166,7 @@ DoFObjectAccessor<3,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned i
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = vertex_dof_index(vertex,d,fe_index);
+      *next++ = this->vertex_dof_index(vertex,d,fe_index);
   for (unsigned int line=0; line<12; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->dof_index(d,fe_index);

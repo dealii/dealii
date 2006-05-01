@@ -1049,6 +1049,77 @@ class DoFHandler  :  public Subscriptor
 					  unsigned int next_free_dof);
 
 				     /**
+				      * Set the @p local_index-th
+				      * degree of freedom
+				      * corresponding to the finite
+				      * element specified by @p
+				      * fe_index on the vertex with
+				      * global number @p
+				      * vertex_index to @p
+				      * global_index.
+				      *
+				      * This function is needed by
+				      * DoFAccessor::set_vertex_dof_index
+				      * when distributing degrees of
+				      * freedom on a mesh.
+				      *
+				      * Since here we are dealing
+				      * with a non-hp finite element
+				      * DoF handler, the only
+				      * reasonable choice for
+				      * fe_index is
+				      * default_fe_index. All other
+				      * values will be ignored. The
+				      * parameter to this function
+				      * exists nevertheless to make
+				      * sure that the accessor
+				      * classes can be templatized
+				      * on the type of the DoF
+				      * handler.
+				      */
+    void
+    set_vertex_dof_index (const unsigned int vertex_index,
+			  const unsigned int fe_index,
+			  const unsigned int local_index,
+			  const unsigned int global_index);
+
+				     /**
+				      * Get the @p local_index-th
+				      * degree of freedom
+				      * corresponding to the finite
+				      * element specified by @p
+				      * fe_index on the vertex with
+				      * global number @p
+				      * vertex_index to @p
+				      * global_index.
+				      *
+				      * This function is needed by
+				      * DoFAccessor::vertex_dof_index,
+				      * which in turn is called for
+				      * example when doing things
+				      * like
+				      * <code>cell-@>get_dof_indices()</code>.
+				      *
+				      * Since here we are dealing
+				      * with a non-hp finite element
+				      * DoF handler, the only
+				      * reasonable choice for
+				      * fe_index is
+				      * default_fe_index. All other
+				      * values will be ignored. The
+				      * parameter to this function
+				      * exists nevertheless to make
+				      * sure that the accessor
+				      * classes can be templatized
+				      * on the type of the DoF
+				      * handler.
+				      */
+    unsigned int
+    get_vertex_dof_index (const unsigned int vertex_index,
+			  const unsigned int fe_index,
+			  const unsigned int local_index) const;
+
+				     /**
 				      * Space to store the DoF numbers for the
 				      * different levels. Analogous to the
 				      * <tt>levels[]</tt> tree of the Triangulation
@@ -1238,6 +1309,51 @@ DoFHandler<dim>::get_tria () const
 {
   return *tria;
 }
+
+
+
+template <int dim>
+inline
+unsigned int
+DoFHandler<dim>::
+get_vertex_dof_index (const unsigned int vertex_index,
+		      const unsigned int fe_index,
+		      const unsigned int local_index) const
+{
+  Assert (fe_index == DoFHandler<dim>::default_fe_index,
+	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
+  Assert (selected_fe != 0,
+	  ExcMessage ("No finite element collection is associated with "
+		      "this DoFHandler"));
+  Assert (local_index < selected_fe->dofs_per_vertex,
+	  ExcIndexRange(local_index, 0,
+			selected_fe->dofs_per_vertex));
+
+  return vertex_dofs[vertex_index * selected_fe->dofs_per_vertex + local_index];
+}  
+
+
+
+template <int dim>
+inline
+void
+DoFHandler<dim>::
+set_vertex_dof_index (const unsigned int vertex_index,
+		      const unsigned int fe_index,
+		      const unsigned int local_index,
+		      const unsigned int global_index)
+{
+  Assert (fe_index == DoFHandler<dim>::default_fe_index,
+	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
+  Assert (selected_fe != 0,
+	  ExcMessage ("No finite element collection is associated with "
+		      "this DoFHandler"));
+  Assert (local_index < selected_fe->dofs_per_vertex,
+	  ExcIndexRange(local_index, 0,
+			selected_fe->dofs_per_vertex));
+
+  vertex_dofs[vertex_index * selected_fe->dofs_per_vertex + local_index] = global_index;
+}  
 
 
 #endif // DOXYGEN

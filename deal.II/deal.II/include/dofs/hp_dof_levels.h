@@ -85,23 +85,6 @@ namespace internal
                                           */
 
         std::vector<unsigned int> active_fe_indices;
-
-        template <int dim>
-        static
-        void
-        set_vertex_dof_index (::hp::DoFHandler<dim> &dof_handler,
-                              const unsigned int     vertex_index,
-                              const unsigned int     fe_index,
-                              const unsigned int     local_index,
-                              const unsigned int     global_index);
-
-        template <int dim>
-        static
-        unsigned int
-        get_vertex_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
-                              const unsigned int           vertex_index,
-                              const unsigned int           fe_index,
-                              const unsigned int           local_index);
     };
 
 

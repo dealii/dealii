@@ -48,99 +48,7 @@ namespace internal
               MemoryConsumption::memory_consumption (hex_dofs) +
               MemoryConsumption::memory_consumption (dof_hex_index_offset));
     }
-
-
-
     
-    template <int dim>
-    unsigned int
-    DoFLevel<0>::
-    get_vertex_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
-                          const unsigned int           vertex_index,
-                          const unsigned int           fe_index,
-                          const unsigned int           local_index)
-    {
-      Assert (fe_index != ::hp::DoFHandler<dim>::default_fe_index,
-              ExcMessage ("You need to specify a FE index when working "
-                          "with hp DoFHandlers"));
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
-      Assert (local_index < dof_handler.get_fe()[fe_index].dofs_per_vertex,
-              ExcIndexRange(local_index, 0,
-                            dof_handler.get_fe()[fe_index].dofs_per_vertex));
-
-                                       // hop along the list of index
-                                       // sets until we find the one
-                                       // with the correct fe_index, and
-                                       // then poke into that
-                                       // part. trigger an exception if
-                                       // we can't find a set for this
-                                       // particular fe_index
-      const unsigned int starting_offset
-        = dof_handler.vertex_dofs_offsets[vertex_index];
-      const unsigned int *pointer
-        = &dof_handler.vertex_dofs[starting_offset];
-      while (true)
-        {
-          Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
-                  ExcInternalError());
-          if (*pointer == fe_index)
-            return *(pointer + 1 + local_index);
-          else
-            pointer += dof_handler.get_fe()[*pointer].dofs_per_vertex;
-        }
-    }  
-
-
-
-    template <int dim>
-    void
-    DoFLevel<0>::
-    set_vertex_dof_index (::hp::DoFHandler<dim> &dof_handler,
-                          const unsigned int           vertex_index,
-                          const unsigned int           fe_index,
-                          const unsigned int           local_index,
-                          const unsigned int           global_index)
-    {
-      Assert (fe_index != ::hp::DoFHandler<dim>::default_fe_index,
-              ExcMessage ("You need to specify a FE index when working "
-                          "with hp DoFHandlers"));
-      Assert (&dof_handler != 0,
-              ExcMessage ("No DoFHandler is specified for this iterator"));
-      Assert (&dof_handler.get_fe() != 0,
-              ExcMessage ("No finite element collection is associated with "
-                          "this DoFHandler"));
-      Assert (local_index < dof_handler.get_fe()[fe_index].dofs_per_vertex,
-              ExcIndexRange(local_index, 0,
-                            dof_handler.get_fe()[fe_index].dofs_per_vertex));
-
-                                       // hop along the list of index
-                                       // sets until we find the one
-                                       // with the correct fe_index, and
-                                       // then poke into that
-                                       // part. trigger an exception if
-                                       // we can't find a set for this
-                                       // particular fe_index
-      const unsigned int starting_offset
-        = dof_handler.vertex_dofs_offsets[vertex_index];
-      unsigned int *pointer
-        = &dof_handler.vertex_dofs[starting_offset];
-      while (true)
-        {
-          Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
-                  ExcInternalError());
-          if (*pointer == fe_index)
-            {
-              *(pointer + 1 + local_index) = global_index;
-              return;
-            }
-          else
-            pointer += dof_handler.get_fe()[*pointer].dofs_per_vertex;
-        }
-    }  
 
 
 
@@ -539,23 +447,6 @@ namespace internal
     
 
 // explicit instantiations
-    template
-    unsigned int
-    DoFLevel<0>::
-    get_vertex_dof_index (const ::hp::DoFHandler<deal_II_dimension> &dof_handler,
-                          const unsigned int           vertex_index,
-                          const unsigned int           fe_index,
-                          const unsigned int           local_index);
-    
-    template
-    void
-    DoFLevel<0>::
-    set_vertex_dof_index (::hp::DoFHandler<deal_II_dimension> &dof_handler,
-                          const unsigned int           vertex_index,
-                          const unsigned int           fe_index,
-                          const unsigned int           local_index,
-                          const unsigned int           global_index);
-
     template
     unsigned int
     DoFLevel<1>::

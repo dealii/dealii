@@ -1004,10 +1004,51 @@ namespace hp
                                         *  active_fe_fields during the
                                         *  spatial refinement.
                                         */
-
       virtual void pre_refinement_notification (const Triangulation<dim> &tria);
       virtual void post_refinement_notification (const Triangulation<dim> &tria);
 
+				       /**
+					* Set the @p local_index-th
+					* degree of freedom
+					* corresponding to the finite
+					* element specified by @p
+					* fe_index on the vertex with
+					* global number @p
+					* vertex_index to @p
+					* global_index.
+					*
+					* This function is needed by
+					* DoFAccessor::set_vertex_dof_index
+					* when distributing degrees of
+					* freedom on a mesh.
+					*/
+      void
+      set_vertex_dof_index (const unsigned int vertex_index,
+			    const unsigned int fe_index,
+			    const unsigned int local_index,
+			    const unsigned int global_index);
+
+				       /**
+					* Get the @p local_index-th
+					* degree of freedom
+					* corresponding to the finite
+					* element specified by @p
+					* fe_index on the vertex with
+					* global number @p
+					* vertex_index to @p
+					* global_index.
+					*
+					* This function is needed by
+					* DoFAccessor::vertex_dof_index,
+					* which in turn is called for
+					* example when doing things
+					* like
+					* <code>cell-@>get_dof_indices()</code>.
+					*/
+      unsigned int
+      get_vertex_dof_index (const unsigned int vertex_index,
+			    const unsigned int fe_index,
+			    const unsigned int local_index) const;
 
                                        /**
                                         * Space to store the DoF
@@ -1239,6 +1280,90 @@ namespace hp
     return *tria;
   }
 
+
+
+  template <int dim>
+  inline
+  unsigned int
+  DoFHandler<dim>::
+  get_vertex_dof_index (const unsigned int vertex_index,
+			const unsigned int fe_index,
+			const unsigned int local_index) const
+  {
+    Assert (fe_index != ::hp::DoFHandler<dim>::default_fe_index,
+	    ExcMessage ("You need to specify a FE index when working "
+			"with hp DoFHandlers"));
+    Assert (finite_elements != 0,
+	    ExcMessage ("No finite element collection is associated with "
+			"this DoFHandler"));
+    Assert (local_index < (*finite_elements)[fe_index].dofs_per_vertex,
+	    ExcIndexRange(local_index, 0,
+			  (*finite_elements)[fe_index].dofs_per_vertex));
+
+				     // hop along the list of index
+				     // sets until we find the one
+				     // with the correct fe_index, and
+				     // then poke into that
+				     // part. trigger an exception if
+				     // we can't find a set for this
+				     // particular fe_index
+    const unsigned int starting_offset = vertex_dofs_offsets[vertex_index];
+    const unsigned int *pointer        = &vertex_dofs[starting_offset];
+    while (true)
+      {
+	Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		ExcInternalError());
+	if (*pointer == fe_index)
+	  return *(pointer + 1 + local_index);
+	else
+	  pointer += (*finite_elements)[*pointer].dofs_per_vertex;
+      }
+  }  
+
+
+
+  template <int dim>
+  inline
+  void
+  DoFHandler<dim>::
+  set_vertex_dof_index (const unsigned int vertex_index,
+			const unsigned int fe_index,
+			const unsigned int local_index,
+			const unsigned int global_index)
+  {
+    Assert (fe_index != ::hp::DoFHandler<dim>::default_fe_index,
+	    ExcMessage ("You need to specify a FE index when working "
+			"with hp DoFHandlers"));
+    Assert (finite_elements != 0,
+	    ExcMessage ("No finite element collection is associated with "
+			"this DoFHandler"));
+    Assert (local_index < (*finite_elements)[fe_index].dofs_per_vertex,
+	    ExcIndexRange(local_index, 0,
+			  (*finite_elements)[fe_index].dofs_per_vertex));
+
+				     // hop along the list of index
+				     // sets until we find the one
+				     // with the correct fe_index, and
+				     // then poke into that
+				     // part. trigger an exception if
+				     // we can't find a set for this
+				     // particular fe_index
+    const unsigned int starting_offset = vertex_dofs_offsets[vertex_index];
+    unsigned int *pointer              = &vertex_dofs[starting_offset];
+    while (true)
+      {
+	Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		ExcInternalError());
+	if (*pointer == fe_index)
+	  {
+	    *(pointer + 1 + local_index) = global_index;
+	    return;
+	  }
+	else
+	  pointer += (*finite_elements)[*pointer].dofs_per_vertex;
+      }
+  }  
+  
 #endif
     
 }
