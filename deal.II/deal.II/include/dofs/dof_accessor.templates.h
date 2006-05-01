@@ -190,6 +190,46 @@ DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
 
 
 
+template <class DH>
+inline
+void
+DoFObjectAccessor<1,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices,
+					  const unsigned int         fe_index) const
+{
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+
+  Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0, typename BaseClass::ExcInvalidObject());
+  Assert (dof_indices.size() == (2*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
+				 this->dof_handler->get_fe()[fe_index].dofs_per_line),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+
+				   // this function really only makes
+				   // sense on non-active objects if
+				   // all degrees of freedom are
+				   // located on vertices, since
+				   // otherwise there are degrees of
+				   // freedom on sub-objects which are
+				   // not allocated for this
+				   // non-active thing
+  Assert (!this->has_children() ||
+	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
+	   2*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
+	  typename BaseClass::ExcNotActive());
+  
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe()[fe_index].dofs_per_line;
+  std::vector<unsigned int>::iterator next = dof_indices.begin();
+  for (unsigned int vertex=0; vertex<2; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      *next++ = this->vertex_dof_index(vertex,d,fe_index);
+  for (unsigned int d=0; d<dofs_per_line; ++d)
+    *next++ = dof_index(d,fe_index);
+}
+
+
+
 
 
 /*------------------------- Functions: DoFObjectAccessor<2,dim> -----------------------*/
@@ -222,6 +262,53 @@ DoFObjectAccessor<2,DH>::line (const unsigned int i) const
       this->line_index (i),
       this->dof_handler
     );
+}
+
+
+
+template <class DH>
+inline
+void
+DoFObjectAccessor<2,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices,
+					  const unsigned int         fe_index) const
+{
+  Assert (this->dof_handler != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (dof_indices.size() == (4*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
+				 4*this->dof_handler->get_fe()[fe_index].dofs_per_line +
+				 this->dof_handler->get_fe()[fe_index].dofs_per_quad),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+
+				   // this function really only makes
+				   // sense on non-active objects if
+				   // all degrees of freedom are
+				   // located on vertices, since
+				   // otherwise there are degrees of
+				   // freedom on sub-objects which are
+				   // not allocated for this
+				   // non-active thing
+  Assert (!this->has_children() ||
+	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
+	   4*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
+	  typename BaseClass::ExcNotActive());
+  
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+  
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe()[fe_index].dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe()[fe_index].dofs_per_quad;
+  std::vector<unsigned int>::iterator next = dof_indices.begin();
+  for (unsigned int vertex=0; vertex<4; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      *next++ = this->vertex_dof_index(vertex,d,fe_index);
+  for (unsigned int line=0; line<4; ++line)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
+      *next++ = this->line(line)->dof_index(d,fe_index);
+  for (unsigned int d=0; d<dofs_per_quad; ++d)
+    *next++ = dof_index(d,fe_index);
 }
 
 
@@ -274,6 +361,61 @@ DoFObjectAccessor<3,DH>::quad (const unsigned int i) const
 }
 
 
+
+template <class DH>
+inline
+void
+DoFObjectAccessor<3,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices,
+					  const unsigned int         fe_index) const
+{
+  Assert (this->dof_handler != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (&this->dof_handler->get_fe() != 0,
+	  typename BaseClass::ExcInvalidObject());
+  Assert (dof_indices.size() == (8*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
+				 12*this->dof_handler->get_fe()[fe_index].dofs_per_line +
+				 6*this->dof_handler->get_fe()[fe_index].dofs_per_quad +
+				 this->dof_handler->get_fe()[fe_index].dofs_per_hex),
+	  typename BaseClass::ExcVectorDoesNotMatch());
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+
+				   // this function really only makes
+				   // sense on non-active objects if
+				   // all degrees of freedom are
+				   // located on vertices, since
+				   // otherwise there are degrees of
+				   // freedom on sub-objects which are
+				   // not allocated for this
+				   // non-active thing
+  Assert (!this->has_children() ||
+	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
+	   8*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
+	  typename BaseClass::ExcNotActive());
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+  
+  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
+		     dofs_per_line   = this->dof_handler->get_fe()[fe_index].dofs_per_line,
+		     dofs_per_quad   = this->dof_handler->get_fe()[fe_index].dofs_per_quad,
+		     dofs_per_hex    = this->dof_handler->get_fe()[fe_index].dofs_per_hex;
+  std::vector<unsigned int>::iterator next = dof_indices.begin();
+  for (unsigned int vertex=0; vertex<8; ++vertex)
+    for (unsigned int d=0; d<dofs_per_vertex; ++d)
+      *next++ = this->vertex_dof_index(vertex,d,fe_index);
+  for (unsigned int line=0; line<12; ++line)
+    for (unsigned int d=0; d<dofs_per_line; ++d)
+      *next++ = this->line(line)->dof_index(d,fe_index);
+  for (unsigned int quad=0; quad<6; ++quad)
+    for (unsigned int d=0; d<dofs_per_quad; ++d)
+      *next++ = this->quad(quad)->dof_index(d,fe_index);
+  for (unsigned int d=0; d<dofs_per_hex; ++d)
+    *next++ = dof_index(d,fe_index);
+}
+
+
+
+
 /*--------------- Functions: DoFObjectAccessor<1,DoFHandler> -----------*/
 
 
@@ -297,48 +439,6 @@ DoFObjectAccessor<1,DoFHandler<1> >::dof_index (const unsigned int i,
 
   return this->dof_handler->levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<1,DoFHandler<1> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-						      const unsigned int         fe_index) const
-{
-  Assert (fe_index == DoFHandler<1>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
-				 this->dof_handler->get_fe().dofs_per_line),
-	  BaseClass::ExcVectorDoesNotMatch());
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe().dofs_per_cell ==
-	   2*this->dof_handler->get_fe().dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d);
-  for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next++ = dof_index(d);
 }
 
 
@@ -369,48 +469,6 @@ DoFObjectAccessor<1,DoFHandler<2> >::dof_index (const unsigned int i,
 
 template <>
 inline
-void
-DoFObjectAccessor<1,DoFHandler<2> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-						      const unsigned int         fe_index) const
-{
-  Assert (fe_index == DoFHandler<2>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
-				 this->dof_handler->get_fe().dofs_per_line),
-	  BaseClass::ExcVectorDoesNotMatch());
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe().dofs_per_cell ==
-	   2*this->dof_handler->get_fe().dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d);
-  for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next++ = dof_index(d);
-}
-
-
-
-template <>
-inline
 unsigned int
 DoFObjectAccessor<1,DoFHandler<3> >::dof_index (const unsigned int i,
 						const unsigned int fe_index) const
@@ -429,48 +487,6 @@ DoFObjectAccessor<1,DoFHandler<3> >::dof_index (const unsigned int i,
 
   return this->dof_handler->levels[this->present_level]
     ->line_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_line+i];
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<1,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-						      const unsigned int         fe_index) const
-{
-  Assert (fe_index == DoFHandler<3>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->dof_handler->get_fe().dofs_per_vertex +
-				 this->dof_handler->get_fe().dofs_per_line),
-	  BaseClass::ExcVectorDoesNotMatch());
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe().dofs_per_cell ==
-	   2*this->dof_handler->get_fe().dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d);
-  for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next++ = dof_index(d);
 }
 
 
@@ -504,55 +520,6 @@ DoFObjectAccessor<2,DoFHandler<2> >::dof_index (const unsigned int i,
 
 template <>
 inline
-void
-DoFObjectAccessor<2,DoFHandler<2> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-						      const unsigned int         fe_index) const
-{
-  Assert (fe_index == DoFHandler<2>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
-				 4*this->dof_handler->get_fe().dofs_per_line +
-				 this->dof_handler->get_fe().dofs_per_quad),
-	  BaseClass::ExcVectorDoesNotMatch());
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe().dofs_per_cell ==
-	   4*this->dof_handler->get_fe().dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<4; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d);
-  for (unsigned int line=0; line<4; ++line)
-    for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next++ = this->line(line)->dof_index(d);
-  for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next++ = dof_index(d);
-}
-
-
-
-template <>
-inline
 unsigned int
 DoFObjectAccessor<2,DoFHandler<3> >::dof_index (const unsigned int i,
 						const unsigned int fe_index) const
@@ -572,55 +539,6 @@ DoFObjectAccessor<2,DoFHandler<3> >::dof_index (const unsigned int i,
 
   return this->dof_handler->levels[this->present_level]
     ->quad_dofs[this->present_index*this->dof_handler->get_fe().dofs_per_quad+i];
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<2,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-						      const unsigned int         fe_index) const
-{
-  Assert (fe_index == DoFHandler<3>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (4*this->dof_handler->get_fe().dofs_per_vertex +
-				 4*this->dof_handler->get_fe().dofs_per_line +
-				 this->dof_handler->get_fe().dofs_per_quad),
-	  BaseClass::ExcVectorDoesNotMatch());
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe().dofs_per_cell ==
-	   4*this->dof_handler->get_fe().dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<4; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d);
-  for (unsigned int line=0; line<4; ++line)
-    for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next++ = this->line(line)->dof_index(d);
-  for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next++ = dof_index(d);
 }
 
 
@@ -655,61 +573,6 @@ DoFObjectAccessor<3,DoFHandler<3> >::dof_index (const unsigned int i,
 
 
 
-template <>
-inline
-void
-DoFObjectAccessor<3,DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-						      const unsigned int         fe_index) const
-{
-  Assert (fe_index == DoFHandler<3>::default_fe_index,
-	  ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (8*this->dof_handler->get_fe().dofs_per_vertex +
-				 12*this->dof_handler->get_fe().dofs_per_line +
-				 6*this->dof_handler->get_fe().dofs_per_quad +
-				 this->dof_handler->get_fe().dofs_per_hex),
-	  BaseClass::ExcVectorDoesNotMatch());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe().dofs_per_cell ==
-	   8*this->dof_handler->get_fe().dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe().dofs_per_line,
-		     dofs_per_quad   = this->dof_handler->get_fe().dofs_per_quad,
-		     dofs_per_hex    = this->dof_handler->get_fe().dofs_per_hex;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<8; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d);
-  for (unsigned int line=0; line<12; ++line)
-    for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next++ = this->line(line)->dof_index(d);
-  for (unsigned int quad=0; quad<6; ++quad)
-    for (unsigned int d=0; d<dofs_per_quad; ++d)
-      *next++ = this->quad(quad)->dof_index(d);
-  for (unsigned int d=0; d<dofs_per_hex; ++d)
-    *next++ = dof_index(d);
-}
-
-
-
 /* -------------- hp vertex dofs stuff ------------------------------------ */
 
 
@@ -732,46 +595,6 @@ DoFObjectAccessor<1,hp::DoFHandler<1> >::dof_index (const unsigned int i,
 
 template <>
 inline
-void
-DoFObjectAccessor<1,hp::DoFHandler<1> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-							  const unsigned int         fe_index) const
-{
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
-				 this->dof_handler->get_fe()[fe_index].dofs_per_line),
-	  BaseClass::ExcVectorDoesNotMatch());
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
-	   2*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe()[fe_index].dofs_per_line;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d,fe_index);
-  for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next++ = dof_index(d,fe_index);
-}
-
-
-
-template <>
-inline
 unsigned int
 DoFObjectAccessor<1,hp::DoFHandler<2> >::dof_index (const unsigned int i,
 						    const unsigned int fe_index) const
@@ -787,46 +610,6 @@ DoFObjectAccessor<1,hp::DoFHandler<2> >::dof_index (const unsigned int i,
 
 template <>
 inline
-void
-DoFObjectAccessor<1,hp::DoFHandler<2> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-							  const unsigned int         fe_index) const
-{
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
-				 this->dof_handler->get_fe()[fe_index].dofs_per_line),
-	  BaseClass::ExcVectorDoesNotMatch());
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
-	   2*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe()[fe_index].dofs_per_line;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d,fe_index);
-  for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next++ = dof_index(d,fe_index);
-}
-
-
-
-template <>
-inline
 unsigned int
 DoFObjectAccessor<1,hp::DoFHandler<3> >::dof_index (const unsigned int i,
 						    const unsigned int fe_index) const
@@ -836,46 +619,6 @@ DoFObjectAccessor<1,hp::DoFHandler<3> >::dof_index (const unsigned int i,
                           this->present_index,
                           fe_index,
                           i);
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<1,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-							  const unsigned int         fe_index) const
-{
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-  Assert (this->dof_handler != 0, BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0, BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (2*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
-				 this->dof_handler->get_fe()[fe_index].dofs_per_line),
-	  BaseClass::ExcVectorDoesNotMatch());
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
-	   2*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe()[fe_index].dofs_per_line;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<2; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d,fe_index);
-  for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next++ = dof_index(d,fe_index);
 }
 
 
@@ -996,101 +739,6 @@ DoFObjectAccessor<2, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
 
 
 
-template <>
-inline
-void
-DoFObjectAccessor<2,hp::DoFHandler<2> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-							  const unsigned int         fe_index) const
-{
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (4*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
-				 4*this->dof_handler->get_fe()[fe_index].dofs_per_line +
-				 this->dof_handler->get_fe()[fe_index].dofs_per_quad),
-	  BaseClass::ExcVectorDoesNotMatch());
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
-	   4*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe()[fe_index].dofs_per_line,
-		     dofs_per_quad   = this->dof_handler->get_fe()[fe_index].dofs_per_quad;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<4; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d,fe_index);
-  for (unsigned int line=0; line<4; ++line)
-    for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next++ = this->line(line)->dof_index(d,fe_index);
-  for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next++ = dof_index(d,fe_index);
-}
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<2,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-							  const unsigned int         fe_index) const
-{
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (4*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
-				 4*this->dof_handler->get_fe()[fe_index].dofs_per_line +
-				 this->dof_handler->get_fe()[fe_index].dofs_per_quad),
-	  BaseClass::ExcVectorDoesNotMatch());
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
-	   4*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe()[fe_index].dofs_per_line,
-		     dofs_per_quad   = this->dof_handler->get_fe()[fe_index].dofs_per_quad;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<4; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d,fe_index);
-  for (unsigned int line=0; line<4; ++line)
-    for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next++ = this->line(line)->dof_index(d,fe_index);
-  for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next++ = dof_index(d,fe_index);
-}
-
-
-
-
 
 /*------------- Functions: DoFObjectAccessor<3,hp::DoFHandler> -------------*/
 
@@ -1123,60 +771,6 @@ DoFObjectAccessor<3, hp::DoFHandler<3> >::set_dof_index (const unsigned int i,
                          i,
                          index);
 }
-
-
-
-template <>
-inline
-void
-DoFObjectAccessor<3,hp::DoFHandler<3> >::get_dof_indices (std::vector<unsigned int> &dof_indices,
-							  const unsigned int         fe_index) const
-{
-  Assert (this->dof_handler != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (&this->dof_handler->get_fe() != 0,
-	  BaseClass::ExcInvalidObject());
-  Assert (dof_indices.size() == (8*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
-				 12*this->dof_handler->get_fe()[fe_index].dofs_per_line +
-				 6*this->dof_handler->get_fe()[fe_index].dofs_per_quad +
-				 this->dof_handler->get_fe()[fe_index].dofs_per_hex),
-	  BaseClass::ExcVectorDoesNotMatch());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-
-				   // this function really only makes
-				   // sense on non-active objects if
-				   // all degrees of freedom are
-				   // located on vertices, since
-				   // otherwise there are degrees of
-				   // freedom on sub-objects which are
-				   // not allocated for this
-				   // non-active thing
-  Assert (!this->has_children() ||
-	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
-	   8*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
-	  BaseClass::ExcNotActive());
-  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
-  
-  const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
-		     dofs_per_line   = this->dof_handler->get_fe()[fe_index].dofs_per_line,
-		     dofs_per_quad   = this->dof_handler->get_fe()[fe_index].dofs_per_quad,
-		     dofs_per_hex    = this->dof_handler->get_fe()[fe_index].dofs_per_hex;
-  std::vector<unsigned int>::iterator next = dof_indices.begin();
-  for (unsigned int vertex=0; vertex<8; ++vertex)
-    for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->vertex_dof_index(vertex,d,fe_index);
-  for (unsigned int line=0; line<12; ++line)
-    for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next++ = this->line(line)->dof_index(d,fe_index);
-  for (unsigned int quad=0; quad<6; ++quad)
-    for (unsigned int d=0; d<dofs_per_quad; ++d)
-      *next++ = this->quad(quad)->dof_index(d,fe_index);
-  for (unsigned int d=0; d<dofs_per_hex; ++d)
-    *next++ = dof_index(d,fe_index);
-}
-
 
 
 
