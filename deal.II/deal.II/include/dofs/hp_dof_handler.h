@@ -953,6 +953,15 @@ namespace hp
                                         */
       void reserve_space ();
 
+				       /**
+					* Do that part of reserving
+					* space that pertains to
+					* vertices, since this is the
+					* same in all space
+					* dimensions.
+					*/
+      void reserve_space_vertices ();
+      
                                        /**
                                         * Free all used memory.
                                         */
