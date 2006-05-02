@@ -58,6 +58,7 @@ DoFAccessor<structdim,DH>::DoFAccessor (const Triangulation<DH::dimension> *tria
 
 
 template <int structdim, class DH>
+inline
 void
 DoFAccessor<structdim,DH>::set_dof_handler (DH *dh)
 {
@@ -88,6 +89,7 @@ DoFAccessor<structdim,DH>::operator = (const DoFAccessor<structdim,DH> &da)
 
 
 template <int structdim, class DH>
+inline
 void
 DoFAccessor<structdim,DH>::copy_from (const DoFAccessor<structdim,DH> &a)
 {
@@ -105,6 +107,7 @@ DoFAccessor<structdim,DH>::operator == (const DoFAccessor<structdim,DH> &a) cons
   Assert (this->dof_handler == a.dof_handler, ExcCantCompareIterators());
   return (BaseClass::operator == (a));
 }
+
 
 
 template <int structdim, class DH>
@@ -159,10 +162,12 @@ DoFAccessor<structdim, DH>::vertex_dof_index (const unsigned int vertex,
 
 
 template <int structdim, class DH>
-void DoFAccessor<structdim, DH>::set_vertex_dof_index (const unsigned int vertex,
-						       const unsigned int i,
-						       const unsigned int index,
-						       const unsigned int fe_index) const
+inline
+void
+DoFAccessor<structdim, DH>::set_vertex_dof_index (const unsigned int vertex,
+						  const unsigned int i,
+						  const unsigned int index,
+						  const unsigned int fe_index) const
 {
   this->dof_handler->set_vertex_dof_index (this->vertex_index(vertex),
 					   fe_index,
@@ -170,6 +175,51 @@ void DoFAccessor<structdim, DH>::set_vertex_dof_index (const unsigned int vertex
 					   index);
 }
 
+
+
+template <int dim, class DH>
+inline
+unsigned int
+DoFAccessor<dim,DH>::dof_index (const unsigned int i,
+				const unsigned int fe_index) const
+{
+				   // access the respective DoF. the
+				   // last argument disambiguates
+				   // between the functions of same
+				   // name in the DoFLevel hierarchy,
+				   // to make sure we get at lines,
+				   // quads, or hexes
+  return this->dof_handler->levels[this->present_level]
+    ->get_dof_index (*this->dof_handler,
+		     this->present_index,
+		     fe_index,
+		     i,
+		     internal::StructuralDimension<dim>());
+}
+
+
+
+template <int dim, class DH>
+inline
+void
+DoFAccessor<dim,DH>::set_dof_index (const unsigned int i,
+				    const unsigned int index,
+				    const unsigned int fe_index) const
+{
+				   // access the respective DoF. the
+				   // last argument disambiguates
+				   // between the functions of same
+				   // name in the DoFLevel hierarchy,
+				   // to make sure we get at lines,
+				   // quads, or hexes
+  this->dof_handler->levels[this->present_level]
+    ->set_dof_index (*this->dof_handler,
+		     this->present_index,
+		     fe_index,
+		     i,
+		     index,
+		     internal::StructuralDimension<dim>());
+}
 
 
 
@@ -188,37 +238,6 @@ DoFObjectAccessor (const Triangulation<DH::dimension> *tria,
                 DoFAccessor<1,DH> (tria, level, index, local_data)
 {}
 
-
-
-template <class DH>
-inline
-unsigned int
-DoFObjectAccessor<1,DH>::dof_index (const unsigned int i,
-				    const unsigned int fe_index) const
-{
-  return this->dof_handler->levels[this->present_level]
-    ->get_line_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i);
-}
-
-
-
-template <class DH>
-inline
-void
-DoFObjectAccessor<1,DH>::set_dof_index (const unsigned int i,
-					const unsigned int index,
-					const unsigned int fe_index) const
-{
-  this->dof_handler->levels[this->present_level]
-    ->set_line_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i,
-                          index);
-}
 
 
 
@@ -294,38 +313,6 @@ DoFObjectAccessor<2,DH>::line (const unsigned int i) const
       this->line_index (i),
       this->dof_handler
     );
-}
-
-
-
-template <class DH>
-inline
-unsigned int
-DoFObjectAccessor<2,DH>::dof_index (const unsigned int i,
-				    const unsigned int fe_index) const
-{
-  return this->dof_handler->levels[this->present_level]
-    ->get_quad_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i);
-}
-
-
-
-template <class DH>
-inline
-void
-DoFObjectAccessor<2,DH>::set_dof_index (const unsigned int i,
-					const unsigned int index,
-					const unsigned int fe_index) const
-{
-  this->dof_handler->levels[this->present_level]
-    ->set_quad_dof_index (*this->dof_handler,
-                          this->present_index,
-                          fe_index,
-                          i,
-                          index);
 }
 
 
@@ -422,38 +409,6 @@ DoFObjectAccessor<3,DH>::quad (const unsigned int i) const
       this->quad_index (i),
       this->dof_handler
     );
-}
-
-
-
-template <class DH>
-inline
-unsigned int
-DoFObjectAccessor<3,DH>::dof_index (const unsigned int i,
-				    const unsigned int fe_index) const
-{
-  return this->dof_handler->levels[this->present_level]
-    ->get_hex_dof_index (*this->dof_handler,
-			 this->present_index,
-			 fe_index,
-			 i);
-}
-
-
-
-template <class DH>
-inline
-void
-DoFObjectAccessor<3,DH>::set_dof_index (const unsigned int i,
-					const unsigned int index,
-					const unsigned int fe_index) const
-{
-  this->dof_handler->levels[this->present_level]
-    ->set_hex_dof_index (*this->dof_handler,
-			 this->present_index,
-			 fe_index,
-			 i,
-			 index);
 }
 
 

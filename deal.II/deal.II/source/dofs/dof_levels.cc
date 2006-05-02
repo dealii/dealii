@@ -26,10 +26,11 @@ namespace internal
     template <int dim>
     unsigned int
     DoFLevel<1>::
-    get_line_dof_index (const ::DoFHandler<dim> &dof_handler,
-                        const unsigned int       line_index,
-                        const unsigned int       fe_index,
-                        const unsigned int       local_index) const
+    get_dof_index (const ::DoFHandler<dim> &dof_handler,
+		   const unsigned int       line_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   internal::StructuralDimension<1> /*dummy*/) const
     {
       Assert (fe_index == ::DoFHandler<dim>::default_fe_index,
 	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
@@ -48,11 +49,12 @@ namespace internal
     template <int dim>
     void
     DoFLevel<1>::
-    set_line_dof_index (const ::DoFHandler<dim> &dof_handler,
-                        const unsigned int       line_index,
-                        const unsigned int       fe_index,
-                        const unsigned int       local_index,
-                        const unsigned int       global_index)
+    set_dof_index (const ::DoFHandler<dim> &dof_handler,
+		   const unsigned int       line_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   const unsigned int       global_index,
+		   internal::StructuralDimension<1> /*dummy*/)
     {
       Assert (fe_index == ::DoFHandler<dim>::default_fe_index,
 	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
@@ -71,10 +73,11 @@ namespace internal
     template <int dim>
     unsigned int
     DoFLevel<2>::
-    get_quad_dof_index (const ::DoFHandler<dim> &dof_handler,
-                        const unsigned int       quad_index,
-                        const unsigned int       fe_index,
-                        const unsigned int       local_index) const
+    get_dof_index (const ::DoFHandler<dim> &dof_handler,
+		   const unsigned int       quad_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   internal::StructuralDimension<2> /*dummy*/) const
     {
       Assert (fe_index == ::DoFHandler<dim>::default_fe_index,
 	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
@@ -93,11 +96,12 @@ namespace internal
     template <int dim>
     void
     DoFLevel<2>::
-    set_quad_dof_index (const ::DoFHandler<dim> &dof_handler,
-                        const unsigned int       quad_index,
-                        const unsigned int       fe_index,
-                        const unsigned int       local_index,
-                        const unsigned int       global_index)
+    set_dof_index (const ::DoFHandler<dim> &dof_handler,
+		   const unsigned int       quad_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   const unsigned int       global_index,
+		   internal::StructuralDimension<2> /*dummy*/)
     {
       Assert (fe_index == ::DoFHandler<dim>::default_fe_index,
 	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
@@ -116,10 +120,11 @@ namespace internal
     template <int dim>
     unsigned int
     DoFLevel<3>::
-    get_hex_dof_index (const ::DoFHandler<dim> &dof_handler,
-                       const unsigned int       hex_index,
-                       const unsigned int       fe_index,
-                       const unsigned int       local_index) const
+    get_dof_index (const ::DoFHandler<dim> &dof_handler,
+		   const unsigned int       hex_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   internal::StructuralDimension<3> /*dummy*/) const
     {
       Assert (fe_index == ::DoFHandler<dim>::default_fe_index,
 	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
@@ -138,11 +143,12 @@ namespace internal
     template <int dim>
     void
     DoFLevel<3>::
-    set_hex_dof_index (const ::DoFHandler<dim> &dof_handler,
-                       const unsigned int       hex_index,
-                       const unsigned int       fe_index,
-                       const unsigned int       local_index,
-                       const unsigned int       global_index)
+    set_dof_index (const ::DoFHandler<dim> &dof_handler,
+		   const unsigned int       hex_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   const unsigned int       global_index,
+		   internal::StructuralDimension<3> /*dummy*/)
     {
       Assert (fe_index == ::DoFHandler<dim>::default_fe_index,
 	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
@@ -162,38 +168,42 @@ namespace internal
     template
     unsigned int
     DoFLevel<1>::
-    get_line_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
-                        const unsigned int       line_index,
-                        const unsigned int       fe_index,
-                        const unsigned int       local_index) const;
+    get_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
+		   const unsigned int       line_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   internal::StructuralDimension<1> dummy) const;
     
     template
     void
     DoFLevel<1>::
-    set_line_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
-                        const unsigned int       line_index,
-                        const unsigned int       fe_index,
-                        const unsigned int       local_index,
-                        const unsigned int       global_index);
+    set_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
+		   const unsigned int       line_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   const unsigned int       global_index,
+		   internal::StructuralDimension<1> dummy);
 
 #if deal_II_dimension >= 2
 
     template
     unsigned int
     DoFLevel<2>::
-    get_quad_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
-                        const unsigned int       quad_index,
-                        const unsigned int       fe_index,
-                        const unsigned int       local_index) const;
+    get_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
+		   const unsigned int       quad_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   internal::StructuralDimension<2> dummy) const;
     
     template
     void
     DoFLevel<2>::
-    set_quad_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
-                        const unsigned int       quad_index,
-                        const unsigned int       fe_index,
-                        const unsigned int       local_index,
-                        const unsigned int       global_index);
+    set_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
+		   const unsigned int       quad_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   const unsigned int       global_index,
+		   internal::StructuralDimension<2> dummy);
 
 #endif
 
@@ -202,19 +212,21 @@ namespace internal
     template
     unsigned int
     DoFLevel<3>::
-    get_hex_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
-                       const unsigned int       hex_index,
-                       const unsigned int       fe_index,
-                       const unsigned int       local_index) const;
+    get_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
+		   const unsigned int       hex_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   internal::StructuralDimension<3> dummy) const;
     
     template
     void
     DoFLevel<3>::
-    set_hex_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
-                       const unsigned int       hex_index,
-                       const unsigned int       fe_index,
-                       const unsigned int       local_index,
-                       const unsigned int       global_index);
+    set_dof_index (const ::DoFHandler<deal_II_dimension> &dof_handler,
+		   const unsigned int       hex_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   const unsigned int       global_index,
+		   internal::StructuralDimension<3> dummy);
 
 #endif
     

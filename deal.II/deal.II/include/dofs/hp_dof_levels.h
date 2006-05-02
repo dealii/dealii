@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <dofs/dof_levels.h>
 #include <fe/fe_collection.h>
 
 #include <vector>
@@ -40,13 +41,13 @@ namespace internal
  *
  * The things we store here is very similar to what is stored in the
  * internal::DoFHandler::DoFLevel class hierarchy (see there for more
- * information, in particular on the layout of the class
- * hierarchy). There are two main differences, discussed in the
- * following subsections. In addition to the data already stored by
- * the internal::DoFHandler::DoFLevel classes, we also have to store
- * which finite element each cell uses. This is done in the
- * DoFLevel<0> class, where for each cell we have an entry within the
- * active_fe_indices field for each cell.
+ * information, in particular on the layout of the class hierarchy,
+ * and the use of file names and dummy arguments). There are two main
+ * differences, discussed in the following subsections. In addition to
+ * the data already stored by the internal::DoFHandler::DoFLevel
+ * classes, we also have to store which finite element each cell
+ * uses. This is done in the DoFLevel<0> class, where for each cell we
+ * have an entry within the active_fe_indices field for each cell.
  *
  * 
  * <h4>Offset computations</h4>
@@ -207,14 +208,22 @@ namespace internal
                                           * the internal::hp::DoFLevel
                                           * class template for more
                                           * information.
+					  *
+					  * For the meaning of the
+					  * last argument, see the
+					  * general documentation of
+					  * the
+					  * internal::DoFHandler::DoFLevel
+					  * class.
                                           */
         template <int dim>
         void
-        set_line_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
-                            const unsigned int           line_index,
-                            const unsigned int           fe_index,
-                            const unsigned int           local_index,
-                            const unsigned int           global_index);
+        set_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+		       const unsigned int           line_index,
+		       const unsigned int           fe_index,
+		       const unsigned int           local_index,
+		       const unsigned int           global_index,
+		       internal::StructuralDimension<1> dummy);
 
                                          /**
                                           * Return the global index of
@@ -238,13 +247,21 @@ namespace internal
                                           * the internal::hp::DoFLevel
                                           * class template for more
                                           * information.
+					  *
+					  * For the meaning of the
+					  * last argument, see the
+					  * general documentation of
+					  * the
+					  * internal::DoFHandler::DoFLevel
+					  * class.
                                           */
         template <int dim>
         unsigned int
-        get_line_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
-                            const unsigned int           line_index,
-                            const unsigned int           fe_index,
-                            const unsigned int           local_index) const;
+        get_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+		       const unsigned int           line_index,
+		       const unsigned int           fe_index,
+		       const unsigned int           local_index,
+		       internal::StructuralDimension<1> dummy) const;
 
                                          /**
                                           * Determine an estimate for the
@@ -316,14 +333,22 @@ namespace internal
                                           * the internal::hp::DoFLevel
                                           * class template for more
                                           * information.
+					  *
+					  * For the meaning of the
+					  * last argument, see the
+					  * general documentation of
+					  * the
+					  * internal::DoFHandler::DoFLevel
+					  * class.
                                           */
         template <int dim>
         void
-        set_quad_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
-                            const unsigned int           quad_index,
-                            const unsigned int           fe_index,
-                            const unsigned int           local_index,
-                            const unsigned int           global_index);
+        set_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+		       const unsigned int           quad_index,
+		       const unsigned int           fe_index,
+		       const unsigned int           local_index,
+		       const unsigned int           global_index,
+		       internal::StructuralDimension<2> dummy);
 
                                          /**
                                           * Return the global index of
@@ -347,14 +372,30 @@ namespace internal
                                           * the internal::hp::DoFLevel
                                           * class template for more
                                           * information.
-                                          */
+ 					  *
+					  * For the meaning of the
+					  * last argument, see the
+					  * general documentation of
+					  * the
+					  * internal::DoFHandler::DoFLevel
+					  * class.
+                                         */
         template <int dim>
         unsigned int
-        get_quad_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
-                            const unsigned int           quad_index,
-                            const unsigned int           fe_index,
-                            const unsigned int           local_index) const;
+        get_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+		       const unsigned int           quad_index,
+		       const unsigned int           fe_index,
+		       const unsigned int           local_index,
+		       internal::StructuralDimension<2> dummy) const;
 
+					 /**
+					  * Import the respective
+					  * functions from the base
+					  * class.
+					  */
+	using DoFLevel<1>::set_dof_index;
+	using DoFLevel<1>::get_dof_index;
+	
                                          /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
@@ -426,14 +467,22 @@ namespace internal
                                           * the internal::hp::DoFLevel
                                           * class template for more
                                           * information.
+					  *
+					  * For the meaning of the
+					  * last argument, see the
+					  * general documentation of
+					  * the
+					  * internal::DoFHandler::DoFLevel
+					  * class.
                                           */
         template <int dim>
         void
-        set_hex_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
-                           const unsigned int           hex_index,
-                           const unsigned int           fe_index,
-                           const unsigned int           local_index,
-                           const unsigned int           global_index);
+        set_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+		       const unsigned int           hex_index,
+		       const unsigned int           fe_index,
+		       const unsigned int           local_index,
+		       const unsigned int           global_index,
+		       internal::StructuralDimension<3> dummy);
 
                                          /**
                                           * Return the global index of
@@ -457,13 +506,29 @@ namespace internal
                                           * the internal::hp::DoFLevel
                                           * class template for more
                                           * information.
-                                          */
+ 					  *
+					  * For the meaning of the
+					  * last argument, see the
+					  * general documentation of
+					  * the
+					  * internal::DoFHandler::DoFLevel
+					  * class.
+					  */
         template <int dim>
         unsigned int
-        get_hex_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
-                           const unsigned int           hex_index,
-                           const unsigned int           fe_index,
-                           const unsigned int           local_index) const;
+        get_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
+		       const unsigned int           hex_index,
+		       const unsigned int           fe_index,
+		       const unsigned int           local_index,
+		       internal::StructuralDimension<3> dummy) const;
+
+					 /**
+					  * Import the respective
+					  * functions from the base
+					  * classes.
+					  */
+	using DoFLevel<2>::set_dof_index;
+	using DoFLevel<2>::get_dof_index;
 
                                          /**
                                           * Determine an estimate for the

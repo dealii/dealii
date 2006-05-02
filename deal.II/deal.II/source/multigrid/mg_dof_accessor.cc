@@ -41,10 +41,11 @@ template <int dim>
 unsigned int MGDoFObjectAccessor<1, dim>::mg_dof_index (const unsigned int i) const
 {
   return this->mg_dof_handler->mg_levels[this->present_level]
-    ->get_line_dof_index(*this->dof_handler,
-                         this->present_index,
-                         0,
-                         i);
+    ->get_dof_index(*this->dof_handler,
+		    this->present_index,
+		    0,
+		    i,
+		    internal::StructuralDimension<1>());
 }
 
 
@@ -53,11 +54,12 @@ void MGDoFObjectAccessor<1, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
   this->mg_dof_handler->mg_levels[this->present_level]
-    ->set_line_dof_index(*this->dof_handler,
-                         this->present_index,
-                         0,
-                         i,
-                         index);
+    ->set_dof_index(*this->dof_handler,
+		    this->present_index,
+		    0,
+		    i,
+		    index,
+		    internal::StructuralDimension<1>());
 }
 
 
@@ -201,10 +203,11 @@ template <int dim>
 unsigned int MGDoFObjectAccessor<2, dim>::mg_dof_index (const unsigned int i) const
 {
   return this->mg_dof_handler->mg_levels[this->present_level]
-    ->get_quad_dof_index(*this->dof_handler,
-                         this->present_index,
-                         0,
-                         i);
+    ->get_dof_index(*this->dof_handler,
+		    this->present_index,
+		    0,
+		    i,
+		    internal::StructuralDimension<2>());
 }
 
 
@@ -213,11 +216,12 @@ void MGDoFObjectAccessor<2, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
   this->mg_dof_handler->mg_levels[this->present_level]
-    ->set_quad_dof_index(*this->dof_handler,
-                         this->present_index,
-                         0,
-                         i,
-                         index);
+    ->set_dof_index(*this->dof_handler,
+		    this->present_index,
+		    0,
+		    i,
+		    index,
+		    internal::StructuralDimension<2>());
 }
 
 
@@ -386,10 +390,11 @@ template <int dim>
 unsigned int MGDoFObjectAccessor<3, dim>::mg_dof_index (const unsigned int i) const
 {
   return this->mg_dof_handler->mg_levels[this->present_level]
-    ->get_hex_dof_index(*this->dof_handler,
-                         this->present_index,
-                         0,
-                         i);
+    ->get_dof_index(*this->dof_handler,
+		    this->present_index,
+		    0,
+		    i,
+		    internal::StructuralDimension<3>());
 }
 
 
@@ -398,11 +403,12 @@ void MGDoFObjectAccessor<3, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
   this->mg_dof_handler->mg_levels[this->present_level]
-    ->set_hex_dof_index(*this->dof_handler,
-                         this->present_index,
-                         0,
-                         i,
-                         index);
+    ->set_dof_index(*this->dof_handler,
+		    this->present_index,
+		    0,
+		    i,
+		    index,
+		    internal::StructuralDimension<3>());
 }
 
 
