@@ -18,6 +18,7 @@
 #include <vector>
 
 template <int> class DoFHandler;
+template <int> class MGDoFHandler;
 
 
 namespace internal
@@ -259,12 +260,14 @@ namespace internal
         unsigned int memory_consumption () const;
 
                                          /**
-                                          * Make the DoFHandler class
-                                          * a friend, so that it can
+                                          * Make the DoFHandler and
+                                          * MGDoFHandler classes a
+                                          * friend, so that it can
                                           * resize arrays as
                                           * necessary.
                                           */
         template <int> friend class ::DoFHandler;
+        template <int> friend class ::MGDoFHandler;
     };
 
 
@@ -364,12 +367,14 @@ namespace internal
         unsigned int memory_consumption () const;
 
                                          /**
-                                          * Make the DoFHandler class
-                                          * a friend, so that it can
+                                          * Make the DoFHandler and
+                                          * MGDoFHandler classes a
+                                          * friend, so that it can
                                           * resize arrays as
                                           * necessary.
                                           */
         template <int> friend class ::DoFHandler;
+        template <int> friend class ::MGDoFHandler;
     };
 
 
@@ -469,12 +474,14 @@ namespace internal
         unsigned int memory_consumption () const;
 
                                          /**
-                                          * Make the DoFHandler class
-                                          * a friend, so that it can
+                                          * Make the DoFHandler and
+                                          * MGDoFHandler classes a
+                                          * friend, so that it can
                                           * resize arrays as
                                           * necessary.
                                           */
         template <int> friend class ::DoFHandler;
+        template <int> friend class ::MGDoFHandler;
     };
     
   }
