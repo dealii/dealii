@@ -995,7 +995,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 					     // boundary values of dofs on this
 					     // face
             face_dofs.resize (fe.dofs_per_face);
-	    face->get_dof_indices (face_dofs);
+	    face->get_dof_indices (face_dofs, cell->active_fe_index());
 	    fe_values.reinit(cell, face_no);
 	    const std::vector<Point<dim> > &dof_locations
               = fe_values.get_quadrature_points ();
