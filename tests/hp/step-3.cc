@@ -195,8 +195,7 @@ void LaplaceProblem::output_results () const
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
 
-  std::ofstream output ("solution.gpl");
-  data_out.write_gnuplot (output);
+  data_out.write_gnuplot (deallog.get_file_stream());
 }
 
 
