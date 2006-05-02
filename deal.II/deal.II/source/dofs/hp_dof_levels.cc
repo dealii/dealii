@@ -22,36 +22,6 @@ namespace internal
 {
   namespace hp
   {
-    unsigned int
-    DoFLevel<1>::memory_consumption () const
-    {
-      return (MemoryConsumption::memory_consumption (line_dofs) +
-              MemoryConsumption::memory_consumption (dof_line_index_offset));
-    }
-
-
-
-    unsigned int
-    DoFLevel<2>::memory_consumption () const
-    {
-      return (DoFLevel<1>::memory_consumption () +
-              MemoryConsumption::memory_consumption (quad_dofs) +
-              MemoryConsumption::memory_consumption (dof_quad_index_offset));
-    }
-
-
-
-    unsigned int
-    DoFLevel<3>::memory_consumption () const
-    {
-      return (DoFLevel<2>::memory_consumption () +
-              MemoryConsumption::memory_consumption (hex_dofs) +
-              MemoryConsumption::memory_consumption (dof_hex_index_offset));
-    }
-    
-
-
-
     template <int dim>
     unsigned int
     DoFLevel<1>::
