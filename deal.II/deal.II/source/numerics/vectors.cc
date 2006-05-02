@@ -123,9 +123,18 @@ VectorTools::create_boundary_right_hand_side<deal_II_dimension>
  const Function<deal_II_dimension>   &,
  Vector<double>                      &,
  const std::set<unsigned char> &);
+
 template
 void VectorTools::interpolate_boundary_values<deal_II_dimension> (
   const DoFHandler<deal_II_dimension> &,
+  const unsigned char,
+  const Function<deal_II_dimension>   &,
+  std::map<unsigned int,double>       &,
+  const std::vector<bool>    &);
+
+template
+void VectorTools::interpolate_boundary_values<deal_II_dimension> (
+  const hp::DoFHandler<deal_II_dimension> &,
   const unsigned char,
   const Function<deal_II_dimension>   &,
   std::map<unsigned int,double>       &,
