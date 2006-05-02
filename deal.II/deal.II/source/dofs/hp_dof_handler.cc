@@ -1523,7 +1523,17 @@ namespace hp
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
 
     finite_elements = &ff;
-  
+
+				     // up front make sure that the fe
+				     // collection is large enough to
+				     // cover all fe indices presently
+				     // in use on the mesh
+    for (active_cell_iterator cell = begin_active(); cell != end(); ++cell) 
+      Assert (cell->active_fe_index() < finite_elements->size(),
+	      ExcInvalidFEIndex (cell->active_fe_index(),
+				 finite_elements->size()));
+
+    
                                      // This call ensures that the
                                      // active_fe_indices vectors are
                                      // initialized correctly.

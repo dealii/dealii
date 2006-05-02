@@ -892,7 +892,15 @@ namespace hp
                       int,
                       << "The given list of new dof indices is not consecutive: "
                       << "the index " << arg1 << " does not exist.");
-
+				       /**
+					* Exception
+					*/
+      DeclException2 (ExcInvalidFEIndex,
+		      int, int,
+		      << "The mesh contains a cell with an active_fe_index of "
+		      << arg1 << ", but the finite element collection only has "
+		      << arg2 << " elements");
+      
     protected:
     
                                        /**

@@ -795,8 +795,6 @@ DoFCellAccessor<hp::DoFHandler<1> >::set_active_fe_index (const unsigned int i)
 	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
 			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  Assert (i < this->dof_handler->get_fe().size (),
-          ExcIndexRange(i, 0, this->dof_handler->get_fe().size ()));
   this->dof_handler->levels[this->present_level]
     ->active_fe_indices[this->present_index] = i;
 }
@@ -817,8 +815,6 @@ DoFCellAccessor<hp::DoFHandler<2> >::set_active_fe_index (const unsigned int i)
 	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
 			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  Assert (i < this->dof_handler->get_fe().size (),
-          ExcIndexRange(i, 0, this->dof_handler->get_fe().size ()));
   this->dof_handler->levels[this->present_level]
     ->active_fe_indices[this->present_index] = i;
 }
@@ -839,8 +835,6 @@ DoFCellAccessor<hp::DoFHandler<3> >::set_active_fe_index (const unsigned int i)
 	  this->dof_handler->levels[this->present_level]->active_fe_indices.size (),
 	  ExcIndexRange (this->present_index, 0,
 			 this->dof_handler->levels[this->present_level]->active_fe_indices.size ()));
-  Assert (i < this->dof_handler->get_fe().size (),
-          ExcIndexRange(i, 0, this->dof_handler->get_fe().size ()));
   this->dof_handler->levels[this->present_level]
     ->active_fe_indices[this->present_index] = i;
 }
