@@ -1557,6 +1557,7 @@ namespace hp
   }
 
 
+  
   template <int dim>
   void DoFHandler<dim>::clear ()
   {
@@ -1575,52 +1576,33 @@ namespace hp
   DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,
 					  unsigned int          next_free_dof)
   {
-//TODO[WB]: this may be completely bogus -- look through it    
-                                     // get the fe for this cell
-    const FiniteElement<1> &fe = cell->get_fe();
-
-                                     // distribute dofs of vertices
-    for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
+    const FiniteElement<2> &fe       = cell->get_fe();
+    const unsigned int      fe_index = cell->active_fe_index ();
+    
+				     // number dofs on vertices. to do
+				     // so, check whether dofs for
+				     // this vertex have been
+				     // distributed and for the
+				     // present fe (only check the
+				     // first dof), and if this isn't
+				     // the case distribute new ones
+				     // there
+    if (fe.dofs_per_vertex > 0)
+      for (unsigned int vertex=0; vertex<GeometryInfo<1>::vertices_per_cell; ++vertex)
+        if (cell->vertex_dof_index(vertex, 0, fe_index) == invalid_dof_index)
+          for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
+            cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
+    
+                                     // finally for the line. this one
+                                     // shouldn't be numbered yet
+    if (fe.dofs_per_line > 0)
       {
-        cell_iterator neighbor = cell->neighbor(v);
-
-        if (neighbor.state() == IteratorState::valid)
-          {
-                                             // find true neighbor; may be its
-                                             // a child of @p{neighbor}
-            while (neighbor->has_children())
-              neighbor = neighbor->child(v==0 ? 1 : 0);
-
-                                             // has neighbor already been processed?
-            if (neighbor->user_flag_set())
-                                               // copy dofs
-              {
-                if (v==0) 
-                  for (unsigned int d=0; d<fe.dofs_per_vertex; ++d)
-                    cell->set_vertex_dof_index (0, d,
-                                                neighbor->vertex_dof_index (1, d),
-						cell->active_fe_index());
-                else
-                  for (unsigned int d=0; d<fe.dofs_per_vertex; ++d)
-                    cell->set_vertex_dof_index (1, d,
-                                                neighbor->vertex_dof_index (0, d),
-						cell->active_fe_index());
-
-                                                 // next neighbor
-                continue;
-              };
-          };
-            
-                                         // otherwise: create dofs newly
-        for (unsigned int d=0; d<fe.dofs_per_vertex; ++d)
-          cell->set_vertex_dof_index (v, d, next_free_dof++,
-				      cell->active_fe_index());
-      };
-  
-                                     // dofs of line
-    for (unsigned int d=0; d<fe.dofs_per_line; ++d)
-      cell->set_dof_index (d, next_free_dof++,
-			   cell->active_fe_index());
+	Assert (cell->dof_index(0, fe_index) == invalid_dof_index,
+		ExcInternalError());
+	
+	for (unsigned int d=0; d<fe.dofs_per_line; ++d, ++next_free_dof)
+	  cell->set_dof_index (d, next_free_dof, fe_index);
+      }
 
                                      // note that this cell has been processed
     cell->set_user_flag ();
@@ -1638,46 +1620,49 @@ namespace hp
   DoFHandler<2>::distribute_dofs_on_cell (active_cell_iterator &cell,
 					  unsigned int          next_free_dof)
   {
-//TODO[WB]: Check for correctness    
-                                     // get the fe for this cell
-    const FiniteElement<2> &fe = cell->get_fe();
-
-    if (fe.dofs_per_vertex > 0)
-                                       // number dofs on vertices
-      for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
-                                         // check whether dofs for this
-                                         // vertex have been distributed
-                                         // (only check the first dof)
-        if (cell->vertex_dof_index(vertex, 0, cell->active_fe_index())
-	    == invalid_dof_index)
-          for (unsigned int d=0; d<fe.dofs_per_vertex; ++d)
-            cell->set_vertex_dof_index (vertex, d, next_free_dof++,
-					cell->active_fe_index());
+    const FiniteElement<2> &fe       = cell->get_fe();
+    const unsigned int      fe_index = cell->active_fe_index ();
     
-                                     // for the four sides
-//TODO[?] Does not work for continuous FEs
+				     // number dofs on vertices. to do
+				     // so, check whether dofs for
+				     // this vertex have been
+				     // distributed and for the
+				     // present fe (only check the
+				     // first dof), and if this isn't
+				     // the case distribute new ones
+				     // there
+    if (fe.dofs_per_vertex > 0)
+      for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
+        if (cell->vertex_dof_index(vertex, 0, fe_index) == invalid_dof_index)
+          for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
+            cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
+    
+                                     // next the sides. do the
+                                     // same as above: check whether
+                                     // the line is already numbered
+                                     // for the present fe_index, and
+                                     // if not do it
     if (fe.dofs_per_line > 0)
-      for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
+      for (unsigned int l=0; l<GeometryInfo<2>::lines_per_cell; ++l)
         {
-          line_iterator line = cell->line(side);
+          line_iterator line = cell->line(l);
 
-                                           // distribute dofs if necessary:
-                                           // check whether line dof is already
-                                           // numbered (check only first dof)
-          if (line->dof_index(0,cell->active_fe_index()) == invalid_dof_index)
-                                             // if not: distribute dofs
-            for (unsigned int d=0; d<fe.dofs_per_line; ++d)
-              line->set_dof_index (d, next_free_dof++,
-				   cell->active_fe_index());
-        };
+          if (line->dof_index(0,fe_index) == invalid_dof_index)
+            for (unsigned int d=0; d<fe.dofs_per_line; ++d, ++next_free_dof)
+              line->set_dof_index (d, next_free_dof, fe_index);
+        }
 
 
-                                     // dofs of quad
+                                     // finally for the quad. this one
+                                     // shouldn't be numbered yet
     if (fe.dofs_per_quad > 0)
-      for (unsigned int d=0; d<fe.dofs_per_quad; ++d)
-        cell->set_dof_index (d, next_free_dof++,
-			     cell->active_fe_index());
-
+      {
+	Assert (cell->dof_index(0, fe_index) == invalid_dof_index,
+		ExcInternalError());
+	
+	for (unsigned int d=0; d<fe.dofs_per_quad; ++d, ++next_free_dof)
+	  cell->set_dof_index (d, next_free_dof, fe_index);
+      }
 
                                      // note that this cell has been processed
     cell->set_user_flag ();
@@ -1695,61 +1680,60 @@ namespace hp
   DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
 					  unsigned int          next_free_dof)
   {
-//TODO[WB]: check for correctness    
-                                     // get the fe for this cell
-    const FiniteElement<3> &fe = cell->get_fe();
-
-    if (fe.dofs_per_vertex > 0)
-                                       // number dofs on vertices
-      for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
-                                         // check whether dofs for this
-                                         // vertex have been distributed
-                                         // (only check the first dof)
-        if (cell->vertex_dof_index(vertex, 0,cell->active_fe_index())
-	    == invalid_dof_index)
-          for (unsigned int d=0; d<fe.dofs_per_vertex; ++d)
-            cell->set_vertex_dof_index (vertex, d, next_free_dof++,
-					cell->active_fe_index());
+    const FiniteElement<2> &fe       = cell->get_fe();
+    const unsigned int      fe_index = cell->active_fe_index ();
     
-                                     // for the lines
+				     // number dofs on vertices. to do
+				     // so, check whether dofs for
+				     // this vertex have been
+				     // distributed and for the
+				     // present fe (only check the
+				     // first dof), and if this isn't
+				     // the case distribute new ones
+				     // there
+    if (fe.dofs_per_vertex > 0)
+      for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
+        if (cell->vertex_dof_index(vertex, 0, fe_index) == invalid_dof_index)
+          for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
+            cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
+    
+                                     // next the four lines. do the
+                                     // same as above: check whether
+                                     // the line is already numbered
+                                     // for the present fe_index, and
+                                     // if not do it
     if (fe.dofs_per_line > 0)
       for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
         {
           line_iterator line = cell->line(l);
-	
-                                           // distribute dofs if necessary:
-                                           // check whether line dof is already
-                                           // numbered (check only first dof)
-          if (line->dof_index(0, cell->active_fe_index()) == invalid_dof_index)
-                                             // if not: distribute dofs
-            for (unsigned int d=0; d<fe.dofs_per_line; ++d)
-              line->set_dof_index (d, next_free_dof++,
-				   cell->active_fe_index());
-        };
 
-                                     // for the quads
+          if (line->dof_index(0,fe_index) == invalid_dof_index)
+            for (unsigned int d=0; d<fe.dofs_per_line; ++d, ++next_free_dof)
+              line->set_dof_index (d, next_free_dof, fe_index);
+        }
+
+				     // same for quads
     if (fe.dofs_per_quad > 0)
       for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
         {
           quad_iterator quad = cell->quad(q);
-	
-                                           // distribute dofs if necessary:
-                                           // check whether quad dof is already
-                                           // numbered (check only first dof)
-          if (quad->dof_index(0, cell->active_fe_index()) == invalid_dof_index)
-                                             // if not: distribute dofs
-            for (unsigned int d=0; d<fe.dofs_per_quad; ++d)
-              quad->set_dof_index (d, next_free_dof++,
-				   cell->active_fe_index());
-        };
+
+          if (quad->dof_index(0,fe_index) == invalid_dof_index)
+            for (unsigned int d=0; d<fe.dofs_per_quad; ++d, ++next_free_dof)
+              quad->set_dof_index (d, next_free_dof, fe_index);
+        }
 
 
-                                     // dofs of hex
+                                     // finally for the hex. this one
+                                     // shouldn't be numbered yet
     if (fe.dofs_per_hex > 0)
-      for (unsigned int d=0; d<fe.dofs_per_hex; ++d)
-        cell->set_dof_index (d, next_free_dof++,
-			     cell->active_fe_index());
-
+      {
+	Assert (cell->dof_index(0, fe_index) == invalid_dof_index,
+		ExcInternalError());
+	
+	for (unsigned int d=0; d<fe.dofs_per_hex; ++d, ++next_free_dof)
+	  cell->set_dof_index (d, next_free_dof, fe_index);
+      }
 
                                      // note that this cell has been processed
     cell->set_user_flag ();
