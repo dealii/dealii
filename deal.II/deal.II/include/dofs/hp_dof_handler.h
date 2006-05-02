@@ -1079,6 +1079,14 @@ namespace hp
 					* into this array are provided
 					* by the vertex_dofs_offsets
 					* field.
+					*
+					* Access to this field is
+					* generally through the
+					* get_vertex_dof_index() and
+					* set_vertex_dof_index()
+					* functions, encapsulating the
+					* actual data format used to
+					* the present class.
                                         */
       std::vector<unsigned int>      vertex_dofs;
 
@@ -1094,6 +1102,14 @@ namespace hp
 					* described in the
 					* documentation of
 					* hp::DoFLevel.
+					*
+					* Access to this field is
+					* generally through the
+					* get_vertex_dof_index() and
+					* set_vertex_dof_index()
+					* functions, encapsulating the
+					* actual data format used to
+					* the present class.
 					*/
       std::vector<unsigned int>      vertex_dofs_offsets;
 
