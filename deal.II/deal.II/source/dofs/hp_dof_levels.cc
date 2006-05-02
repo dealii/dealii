@@ -79,7 +79,7 @@ namespace internal
               if (*pointer == fe_index)
                 return *(pointer + 1 + local_index);
               else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_line;
+                pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
             }
         }
     }
@@ -147,7 +147,7 @@ namespace internal
                   return;
                 }
               else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_line;
+                pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
             }
         }  
     }
@@ -212,7 +212,7 @@ namespace internal
               if (*pointer == fe_index)
                 return *(pointer + 1 + local_index);
               else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_quad;
+                pointer += dof_handler.get_fe()[*pointer].dofs_per_quad + 1;
             }
         }
     }
@@ -281,7 +281,7 @@ namespace internal
                   return;
                 }
               else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_quad;
+                pointer += dof_handler.get_fe()[*pointer].dofs_per_quad + 1;
             }
         }  
     }
@@ -346,7 +346,7 @@ namespace internal
               if (*pointer == fe_index)
                 return *(pointer + 1 + local_index);
               else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_hex;
+                pointer += dof_handler.get_fe()[*pointer].dofs_per_hex + 1;
             }
         }
     }
@@ -415,7 +415,7 @@ namespace internal
                   return;
                 }
               else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_hex;
+                pointer += dof_handler.get_fe()[*pointer].dofs_per_hex + 1;
             }
         }  
     }

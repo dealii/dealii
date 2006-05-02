@@ -1364,7 +1364,7 @@ namespace hp
 	if (this_fe_index == fe_index)
 	  return *(pointer + 1 + local_index);
 	else
-	  pointer += (*finite_elements)[this_fe_index].dofs_per_vertex;
+	  pointer += (*finite_elements)[this_fe_index].dofs_per_vertex + 1;
       }
   }  
 
@@ -1388,6 +1388,8 @@ namespace hp
     Assert (local_index < (*finite_elements)[fe_index].dofs_per_vertex,
 	    ExcIndexRange(local_index, 0,
 			  (*finite_elements)[fe_index].dofs_per_vertex));
+    Assert (fe_index < finite_elements->size(),
+	    ExcInternalError());
 
 				     // hop along the list of index
 				     // sets until we find the one
@@ -1400,15 +1402,22 @@ namespace hp
     unsigned int *pointer              = &vertex_dofs[starting_offset];
     while (true)
       {
-	Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+	Assert (pointer <= &vertex_dofs.back(), ExcInternalError());
+
+	const unsigned int this_fe_index = *pointer;
+	
+	Assert (this_fe_index != deal_II_numbers::invalid_unsigned_int,
 		ExcInternalError());
-	if (*pointer == fe_index)
+	Assert (this_fe_index < finite_elements->size(),
+		ExcInternalError());
+
+	if (this_fe_index == fe_index)
 	  {
 	    *(pointer + 1 + local_index) = global_index;
 	    return;
 	  }
 	else
-	  pointer += (*finite_elements)[*pointer].dofs_per_vertex;
+	  pointer += (*finite_elements)[this_fe_index].dofs_per_vertex + 1;
       }
   }  
   
