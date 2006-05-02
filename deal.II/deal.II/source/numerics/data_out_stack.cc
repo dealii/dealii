@@ -28,7 +28,7 @@
 #include <sstream>
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 unsigned int
 DataOutStack<dim,DH>::DataVector::memory_consumption () const
 {
@@ -38,12 +38,12 @@ DataOutStack<dim,DH>::DataVector::memory_consumption () const
 
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 DataOutStack<dim,DH>::~DataOutStack ()
 {}
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 void DataOutStack<dim,DH>::new_parameter_value (const double p,
 						const double dp)
 {
@@ -67,14 +67,18 @@ void DataOutStack<dim,DH>::new_parameter_value (const double p,
 }
 
 
-template <int dim, template <int> class DH>
-void DataOutStack<dim,DH>::attach_dof_handler (const DH<dim> &dof) 
+template <int dim, class DH>
+void DataOutStack<dim,DH>::attach_dof_handler (const DH& dof) 
 {
+				   // Check consistency of redundant
+				   // template parameter
+  Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
+  
   dof_handler = &dof;
 }
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 void DataOutStack<dim,DH>::declare_data_vector (const std::string &name,
 						const VectorType   vector_type)
 {
@@ -84,7 +88,7 @@ void DataOutStack<dim,DH>::declare_data_vector (const std::string &name,
 }
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 void DataOutStack<dim,DH>::declare_data_vector (const std::vector<std::string> &names,
 						const VectorType    vector_type)
 {
@@ -124,7 +128,7 @@ void DataOutStack<dim,DH>::declare_data_vector (const std::vector<std::string> &
 }
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 template <typename number>
 void DataOutStack<dim,DH>::add_data_vector (const Vector<number> &vec,
 					    const std::string    &name)
@@ -157,7 +161,7 @@ void DataOutStack<dim,DH>::add_data_vector (const Vector<number> &vec,
 }
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 template <typename number>
 void DataOutStack<dim,DH>::add_data_vector (const Vector<number> &vec,
 					    const std::vector<std::string> &names)
@@ -224,7 +228,7 @@ void DataOutStack<dim,DH>::add_data_vector (const Vector<number> &vec,
 }
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions) 
 {
 				   // this is mostly copied from the
@@ -241,7 +245,7 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions)
 				   // create patches of and make sure
 				   // there is enough memory for that
   unsigned int n_patches = 0;
-  for (typename DH<dim>::active_cell_iterator
+  for (typename DH::active_cell_iterator
 	 cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell)
     ++n_patches;
@@ -289,7 +293,7 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions)
   typename std::vector< ::DataOutBase::Patch<dim+1,dim+1> >::iterator
     patch = patches.begin() + (patches.size()-n_patches);
   unsigned int cell_number = 0;
-  for (typename DH<dim>::active_cell_iterator cell=dof_handler->begin_active();
+  for (typename DH::active_cell_iterator cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell, ++patch, ++cell_number)
     {
       Assert (patch != patches.end(), ExcInternalError());
@@ -399,7 +403,7 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions)
 }
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 void DataOutStack<dim,DH>::finish_parameter_value ()
 {
 				   // release lock on dof handler
@@ -415,7 +419,7 @@ void DataOutStack<dim,DH>::finish_parameter_value ()
 
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 unsigned int
 DataOutStack<dim,DH>::memory_consumption () const
 {
@@ -430,7 +434,7 @@ DataOutStack<dim,DH>::memory_consumption () const
 
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 const std::vector< ::DataOutBase::Patch<dim+1,dim+1> > &
 DataOutStack<dim,DH>::get_patches () const
 {
@@ -439,7 +443,7 @@ DataOutStack<dim,DH>::get_patches () const
 
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 std::vector<std::string> DataOutStack<dim,DH>::get_dataset_names () const
 {
   std::vector<std::string> names;
@@ -455,24 +459,20 @@ std::vector<std::string> DataOutStack<dim,DH>::get_dataset_names () const
 
 
 // explicit instantiations
-template class DataOutStack<deal_II_dimension,DoFHandler>;
+template class DataOutStack<deal_II_dimension,DoFHandler<deal_II_dimension> >;
 
-template void DataOutStack<deal_II_dimension,DoFHandler>::
+template void DataOutStack<deal_II_dimension,DoFHandler<deal_II_dimension> >::
 add_data_vector<double> (const Vector<double> &vec,
 			 const std::string    &name);
 
-template void DataOutStack<deal_II_dimension,DoFHandler>::
+template void DataOutStack<deal_II_dimension,DoFHandler<deal_II_dimension> >::
 add_data_vector<float> (const Vector<float>  &vec,
 			const std::string    &name);
 
-template class DataOutStack<deal_II_dimension,hp::DoFHandler>;
-template void DataOutStack<deal_II_dimension,hp::DoFHandler>::
+template class DataOutStack<deal_II_dimension,hp::DoFHandler<deal_II_dimension> >;
+template void DataOutStack<deal_II_dimension,hp::DoFHandler<deal_II_dimension> >::
 add_data_vector<double> (const Vector<double> &vec,
 			 const std::string    &name);
-template void DataOutStack<deal_II_dimension,hp::DoFHandler>::
+template void DataOutStack<deal_II_dimension,hp::DoFHandler<deal_II_dimension> >::
 add_data_vector<float> (const Vector<float>  &vec,
 			const std::string    &name);
-
-template void DataOutStack<deal_II_dimension>::
-add_data_vector<float> (const Vector<float> &vec,
-			 const std::vector<std::string> &names);

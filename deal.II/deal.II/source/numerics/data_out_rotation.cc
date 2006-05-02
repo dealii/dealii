@@ -31,11 +31,14 @@
 //TODO: Update documentation
 //TODO: Unify code for dimensions
 
-template <int dim, template <int> class DH>
+// Not implemented for 3D
+
+#if deal_II_dimension < 3
+template <int dim, class DH>
 void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 {
   QTrapez<1>     q_trapez;
-  QIterated<dim> patch_points (q_trapez, data.n_subdivisions);
+  QIterated<DH::dimension> patch_points (q_trapez, data.n_subdivisions);
 
 				   // create collection objects from
 				   // single quadratures,
@@ -50,10 +53,10 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 				   // transformed using a Q1 mapping,
 				   // we don't support anything else
 				   // as well
-  const hp::QCollection<dim>       q_collection (patch_points);
-  const hp::FECollection<dim>      fe_collection(this->dofs->get_fe());
+  const hp::QCollection<DH::dimension>       q_collection (patch_points);
+  const hp::FECollection<DH::dimension>      fe_collection(this->dofs->get_fe());
   
-  hp::FEValues<dim> x_fe_patch_values (fe_collection, q_collection,
+  hp::FEValues<DH::dimension> x_fe_patch_values (fe_collection, q_collection,
                                        update_values);
 
   const unsigned int n_patches_per_circle = data.n_patches_per_circle;
@@ -72,18 +75,18 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 				   // place. for simplicity add the
 				   // initial direction at the end
 				   // again
-  std::vector<Point<dim+1> > angle_directions (n_patches_per_circle+1);
+  std::vector<Point<DH::dimension+1> > angle_directions (n_patches_per_circle+1);
   for (unsigned int i=0; i<=n_patches_per_circle; ++i)
     {
-      angle_directions[i][dim-1] = std::cos(2*deal_II_numbers::PI *
+      angle_directions[i][DH::dimension-1] = std::cos(2*deal_II_numbers::PI *
                                         i/n_patches_per_circle);
-      angle_directions[i][dim] = std::sin(2*deal_II_numbers::PI *
+      angle_directions[i][DH::dimension] = std::sin(2*deal_II_numbers::PI *
                                         i/n_patches_per_circle);
     };
   
   
   unsigned int cell_number = 0;
-  typename std::vector< ::DataOutBase::Patch<dim+1> >::iterator
+  typename std::vector< ::DataOutBase::Patch<DH::dimension+1> >::iterator
     patch = this->patches.begin();
   cell_iterator cell=first_cell();
 
@@ -111,7 +114,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 					   // from the vertices of the
 					   // cell, which has one
 					   // dimension less, however.
-	  switch (dim)
+	  switch (DH::dimension)
 	    {
 	      case 1:
 	      {
@@ -131,10 +134,10 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 	      case 2:
 	      {
 		for (unsigned int vertex=0;
-		     vertex<GeometryInfo<dim>::vertices_per_cell;
+		     vertex<GeometryInfo<DH::dimension>::vertices_per_cell;
 		     ++vertex)
 		  {
-		    const Point<dim> v = cell->vertex(vertex);
+		    const Point<DH::dimension> v = cell->vertex(vertex);
 		    
 						     // make sure that the
 						     // radial variable does
@@ -147,9 +150,9 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 		    patch->vertices[vertex] = v(0) * angle_directions[angle];
 		    patch->vertices[vertex][0] = v(1);
 		    
-		    patch->vertices[vertex+GeometryInfo<dim>::vertices_per_cell]
+		    patch->vertices[vertex+GeometryInfo<DH::dimension>::vertices_per_cell]
 		      = v(0) * angle_directions[angle+1];
-		    patch->vertices[vertex+GeometryInfo<dim>::vertices_per_cell][0]
+		    patch->vertices[vertex+GeometryInfo<DH::dimension>::vertices_per_cell][0]
 		      = v(1);
 		  };
 		
@@ -165,7 +168,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 	  if (data.n_datasets > 0)
 	    {
 	      x_fe_patch_values.reinit (cell);
-              const FEValues<dim> &fe_patch_values
+              const FEValues<DH::dimension> &fe_patch_values
                 = x_fe_patch_values.get_present_fe_values ();
 
 					       // first fill dof_data
@@ -176,7 +179,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
                       this->dof_data[dataset]->get_function_values (fe_patch_values,
                                                                     data.patch_values);
 		      
-		      switch (dim)
+		      switch (DH::dimension)
 			{
 			  case 1:
 			    for (unsigned int x=0; x<n_points; ++x)
@@ -210,7 +213,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 		      for (unsigned int component=0; component<data.n_components;
 			   ++component)
 			{
-			  switch (dim)
+			  switch (DH::dimension)
 			    {
 			      case 1:
 				    for (unsigned int x=0; x<n_points; ++x)
@@ -243,7 +246,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 		{
 		  const double value
                     = this->cell_data[dataset]->get_cell_data_value (cell_number);
-		  switch (dim)
+		  switch (DH::dimension)
 		    {
 		      case 1:
 			    for (unsigned int x=0; x<n_points; ++x)
@@ -297,10 +300,10 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
 
 
 
-#if deal_II_dimension == 3
+#else
 
-template <>
-void DataOutRotation<3,DoFHandler>::build_some_patches (Data &)
+template <int dim, class DH>
+void DataOutRotation<dim,DH>::build_some_patches (Data&)
 {
 				   // would this function make any
 				   // sense after all? who would want
@@ -313,15 +316,19 @@ void DataOutRotation<3,DoFHandler>::build_some_patches (Data &)
 
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_circle,
 					     const unsigned int n_subdivisions,
 					     const unsigned int n_threads_) 
 {
+				   // Check consistency of redundant
+				   // template parameter
+  Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
+  
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
-  typedef DataOut_DoFData<dim,DH,dim+1> BaseClass;
+  typedef DataOut_DoFData<DH,DH::dimension+1> BaseClass;
   Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
   const unsigned int n_threads = (DEAL_II_USE_MT ? n_threads_ : 1);
@@ -331,7 +338,7 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
 				   // actually has the points on this
 				   // patch
   QTrapez<1>     q_trapez;
-  QIterated<dim> patch_points (q_trapez, n_subdivisions);
+  QIterated<DH::dimension> patch_points (q_trapez, n_subdivisions);
 
   const unsigned int n_q_points     = patch_points.n_quadrature_points;
   const unsigned int n_components   = this->dofs->get_fe().n_components();
@@ -341,7 +348,7 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
 				   // clear the patches array
   if (true)
     {
-      std::vector< ::DataOutBase::Patch<dim+1> > dummy;
+      std::vector< ::DataOutBase::Patch<DH::dimension+1> > dummy;
       this->patches.swap (dummy);
     };
   
@@ -381,7 +388,7 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
 				   // values. note that the evaluation
 				   // points on the cell have to be
 				   // repeated in angular direction
-  ::DataOutBase::Patch<dim+1>  default_patch;
+  ::DataOutBase::Patch<DH::dimension+1>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets,
 			     n_q_points * (n_subdivisions+1));
@@ -404,7 +411,7 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
 
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 typename DataOutRotation<dim,DH>::cell_iterator
 DataOutRotation<dim,DH>::first_cell () 
 {
@@ -412,18 +419,18 @@ DataOutRotation<dim,DH>::first_cell ()
 }
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 typename DataOutRotation<dim,DH>::cell_iterator
 DataOutRotation<dim,DH>::next_cell (const cell_iterator &cell) 
 {
 				   // convert the iterator to an
 				   // active_iterator and advance
 				   // this to the next active cell
-  typename DH<dim>::active_cell_iterator active_cell = cell;
+  typename DH::active_cell_iterator active_cell = cell;
   ++active_cell;
   return active_cell;
 }
 
 
 // explicit instantiations
-template class DataOutRotation<deal_II_dimension,DoFHandler>;
+template class DataOutRotation<deal_II_dimension, DoFHandler<deal_II_dimension> >;

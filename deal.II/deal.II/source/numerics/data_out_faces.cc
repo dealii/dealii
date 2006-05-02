@@ -28,11 +28,15 @@
 
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 {
+				   // Check consistency of redundant
+				   // template parameter
+  Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
+  
   QTrapez<1>        q_trapez;
-  QIterated<dim-1>  patch_points (q_trapez, data.n_subdivisions);
+  QIterated<DH::dimension-1>  patch_points (q_trapez, data.n_subdivisions);
   
 //TODO[?]: This is strange -- Data has a member 'mapping' that should
 //be used here, but it isn't. Rather, up until version 1.94, we were
@@ -49,15 +53,15 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 				   // dof_handler.get_fe() returns a
 				   // collection of which we do a
 				   // shallow copy instead
-  const hp::QCollection<dim-1>     q_collection (patch_points);
-  const hp::FECollection<dim>      fe_collection(this->dofs->get_fe());
+  const hp::QCollection<DH::dimension-1>     q_collection (patch_points);
+  const hp::FECollection<DH::dimension>      fe_collection(this->dofs->get_fe());
   
-  hp::FEFaceValues<dim> x_fe_patch_values (fe_collection, q_collection,
+  hp::FEFaceValues<DH::dimension> x_fe_patch_values (fe_collection, q_collection,
                                            update_values);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
-  typename std::vector< ::DataOutBase::Patch<dim-1,dim> >::iterator patch = this->patches.begin();
+  typename std::vector< ::DataOutBase::Patch<DH::dimension-1,DH::dimension> >::iterator patch = this->patches.begin();
   FaceDescriptor face=first_face();
 
 				   // get first face in this thread
@@ -73,13 +77,13 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
     {
       Assert (patch != this->patches.end(), ExcInternalError());
       
-      for (unsigned int vertex=0; vertex<GeometryInfo<dim-1>::vertices_per_cell; ++vertex)
+      for (unsigned int vertex=0; vertex<GeometryInfo<DH::dimension-1>::vertices_per_cell; ++vertex)
 	patch->vertices[vertex] = face.first->face(face.second)->vertex(vertex);
       
       if (data.n_datasets > 0)
 	{
 	  x_fe_patch_values.reinit (face.first, face.second);
-          const FEFaceValues<dim> &fe_patch_values
+          const FEFaceValues<DH::dimension> &fe_patch_values
             = x_fe_patch_values.get_present_fe_values ();
 	  
 					   // first fill dof_data
@@ -123,7 +127,7 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 	      Assert (face.first->active(), ExcCellNotActiveForCellData());
 	      const unsigned int cell_number
 		= std::distance (this->dofs->begin_active(),
-				 typename DH<dim>::active_cell_iterator(face.first));
+				 typename DH::active_cell_iterator(face.first));
 
               const double value
                 = this->cell_data[dataset]->get_cell_data_value (cell_number);
@@ -145,14 +149,14 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 void DataOutFaces<dim,DH>::build_patches (const unsigned int n_subdivisions,
 					  const unsigned int n_threads_) 
 {
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
-  typedef DataOut_DoFData<dim,DH,dim+1> BaseClass;
+  typedef DataOut_DoFData<DH,DH::dimension+1> BaseClass;
   Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
   const unsigned int n_threads = (DEAL_II_USE_MT ? n_threads_ : 1);
@@ -162,7 +166,7 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int n_subdivisions,
 				   // actually has the points on this
 				   // patch
   QTrapez<1>       q_trapez;
-  QIterated<dim-1> patch_points (q_trapez, n_subdivisions);
+  QIterated<DH::dimension-1> patch_points (q_trapez, n_subdivisions);
 
   const unsigned int n_q_points     = patch_points.n_quadrature_points;
   const unsigned int n_components   = this->dofs->get_fe().n_components();
@@ -172,7 +176,7 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int n_subdivisions,
 				   // clear the patches array
   if (true)
     {
-      std::vector< ::DataOutBase::Patch<dim-1,dim> > dummy;
+      std::vector< ::DataOutBase::Patch<DH::dimension-1,DH::dimension> > dummy;
       this->patches.swap (dummy);
     };
   
@@ -206,7 +210,7 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int n_subdivisions,
 				   // values. note that the evaluation
 				   // points on the face have to be
 				   // repeated in angular direction
-  ::DataOutBase::Patch<dim-1,dim>  default_patch;
+  ::DataOutBase::Patch<DH::dimension-1,DH::dimension>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
   this->patches.insert (this->patches.end(), n_patches, default_patch);
@@ -225,15 +229,15 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int n_subdivisions,
 
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 typename DataOutFaces<dim,DH>::FaceDescriptor
 DataOutFaces<dim,DH>::first_face () 
 {
 				   // simply find first active cell
 				   // with a face on the boundary
-  typename DH<dim>::active_cell_iterator cell = this->dofs->begin_active();
+  typename DH::active_cell_iterator cell = this->dofs->begin_active();
   for (; cell != this->dofs->end(); ++cell)
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+    for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
       if (cell->face(f)->at_boundary())
 	return FaceDescriptor(cell, f);
 
@@ -246,7 +250,7 @@ DataOutFaces<dim,DH>::first_face ()
 
 
 
-template <int dim, template <int> class DH>
+template <int dim, class DH>
 typename DataOutFaces<dim,DH>::FaceDescriptor
 DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 {
@@ -255,7 +259,7 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 				   // first check whether the present
 				   // cell has more faces on the
 				   // boundary
-  for (unsigned int f=face.second+1; f<GeometryInfo<dim>::faces_per_cell; ++f)
+  for (unsigned int f=face.second+1; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
     if (face.first->face(f)->at_boundary())
 				       // yup, that is so, so return it
       {
@@ -270,7 +274,7 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 				   // convert the iterator to an
 				   // active_iterator and advance
 				   // this to the next active cell
-  typename DH<dim>::active_cell_iterator active_cell = face.first;
+  typename DH::active_cell_iterator active_cell = face.first;
 
 				   // increase face pointer by one
   ++active_cell;
@@ -280,7 +284,7 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
     {
 				       // check all the faces of this
 				       // active cell
-      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
 	if (active_cell->face(f)->at_boundary())
 	  {
 	    face.first  = active_cell;
@@ -304,6 +308,6 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 // explicit instantiations
 // don't instantiate anything for the 1d and 2d cases
 #if deal_II_dimension >=2
-template class DataOutFaces<deal_II_dimension,DoFHandler>;
-template class DataOutFaces<deal_II_dimension,hp::DoFHandler>;
+template class DataOutFaces<deal_II_dimension, DoFHandler<deal_II_dimension> >;
+template class DataOutFaces<deal_II_dimension, hp::DoFHandler<deal_II_dimension> >;
 #endif

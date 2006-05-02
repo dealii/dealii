@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 
-template <int dim> class DoFHandler;
 
 
 /**
@@ -78,8 +77,9 @@ template <int dim> class DoFHandler;
  * @ingroup output
  * @author Wolfgang Bangerth, 2000
  */
-template <int dim, template <int> class DH = DoFHandler>
-class DataOutFaces : public DataOut_DoFData<dim,DH,dim-1,dim>
+template <int dim, class DH=DoFHandler<dim> >
+class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
+					    DH::dimension>
 {
   public:
 				     /**
@@ -87,7 +87,8 @@ class DataOutFaces : public DataOut_DoFData<dim,DH,dim-1,dim>
 				      * of the dof handler class under
 				      * consideration.
 				      */
-    typedef typename DataOut_DoFData<dim,DH,dim-1,dim>::cell_iterator cell_iterator;
+    typedef typename DataOut_DoFData<DH,DH::dimension-1,
+				     DH::dimension>::cell_iterator cell_iterator;
 
                                      /**
 				      * This is the central function
