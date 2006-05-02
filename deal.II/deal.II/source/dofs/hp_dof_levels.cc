@@ -52,7 +52,7 @@ namespace internal
         {
           Assert (fe_index == this->active_fe_indices[line_index],
                   ExcMessage ("FE index does not match that of the present cell"));
-          return line_dofs[dof_line_index_offset[line_index]+local_index];
+          return line_dofs[line_dof_offsets[line_index]+local_index];
         }
       else
         {
@@ -69,7 +69,7 @@ namespace internal
                                            // an exception if we can't
                                            // find a set for this
                                            // particular fe_index
-          const unsigned int starting_offset = dof_line_index_offset[line_index];
+          const unsigned int starting_offset = line_dof_offsets[line_index];
           const unsigned int *pointer        = &line_dofs[starting_offset];
           while (true)
             {
@@ -116,7 +116,7 @@ namespace internal
         {
           Assert (fe_index == this->active_fe_indices[line_index],
                   ExcMessage ("FE index does not match that of the present cell"));
-          line_dofs[dof_line_index_offset[line_index]+local_index] = global_index;
+          line_dofs[line_dof_offsets[line_index]+local_index] = global_index;
         }
       else
         {
@@ -133,7 +133,7 @@ namespace internal
                                            // an exception if we can't
                                            // find a set for this
                                            // particular fe_index
-          const unsigned int starting_offset = dof_line_index_offset[line_index];
+          const unsigned int starting_offset = line_dof_offsets[line_index];
           unsigned int      *pointer         = &line_dofs[starting_offset];
           while (true)
             {
@@ -183,7 +183,7 @@ namespace internal
         {
           Assert (fe_index == this->active_fe_indices[quad_index],
                   ExcMessage ("FE index does not match that of the present cell"));
-          return quad_dofs[dof_quad_index_offset[quad_index]+local_index];
+          return quad_dofs[quad_dof_offsets[quad_index]+local_index];
         }
       else
         {
@@ -200,7 +200,7 @@ namespace internal
                                            // an exception if we can't
                                            // find a set for this
                                            // particular fe_index
-          const unsigned int starting_offset = dof_quad_index_offset[quad_index];
+          const unsigned int starting_offset = quad_dof_offsets[quad_index];
           const unsigned int *pointer        = &quad_dofs[starting_offset];
           while (true)
             {
@@ -248,7 +248,7 @@ namespace internal
         {
           Assert (fe_index == this->active_fe_indices[quad_index],
                   ExcMessage ("FE index does not match that of the present cell"));
-          quad_dofs[dof_quad_index_offset[quad_index]+local_index] = global_index;
+          quad_dofs[quad_dof_offsets[quad_index]+local_index] = global_index;
         }
       else
         {
@@ -265,7 +265,7 @@ namespace internal
                                            // an exception if we can't
                                            // find a set for this
                                            // particular fe_index
-          const unsigned int starting_offset = dof_quad_index_offset[quad_index];
+          const unsigned int starting_offset = quad_dof_offsets[quad_index];
           unsigned int      *pointer         = &quad_dofs[starting_offset];
           while (true)
             {
@@ -315,7 +315,7 @@ namespace internal
         {
           Assert (fe_index == this->active_fe_indices[hex_index],
                   ExcMessage ("FE index does not match that of the present cell"));
-          return hex_dofs[dof_hex_index_offset[hex_index]+local_index];
+          return hex_dofs[hex_dof_offsets[hex_index]+local_index];
         }
       else
         {
@@ -332,7 +332,7 @@ namespace internal
                                            // an exception if we can't
                                            // find a set for this
                                            // particular fe_index
-          const unsigned int starting_offset = dof_hex_index_offset[hex_index];
+          const unsigned int starting_offset = hex_dof_offsets[hex_index];
           const unsigned int *pointer        = &hex_dofs[starting_offset];
           while (true)
             {
@@ -380,7 +380,7 @@ namespace internal
         {
           Assert (fe_index == this->active_fe_indices[hex_index],
                   ExcMessage ("FE index does not match that of the present cell"));
-          hex_dofs[dof_hex_index_offset[hex_index]+local_index] = global_index;
+          hex_dofs[hex_dof_offsets[hex_index]+local_index] = global_index;
         }
       else
         {
@@ -397,7 +397,7 @@ namespace internal
                                            // an exception if we can't
                                            // find a set for this
                                            // particular fe_index
-          const unsigned int starting_offset = dof_hex_index_offset[hex_index];
+          const unsigned int starting_offset = hex_dof_offsets[hex_index];
           unsigned int      *pointer         = &hex_dofs[starting_offset];
           while (true)
             {

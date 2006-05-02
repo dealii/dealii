@@ -2090,14 +2090,14 @@ namespace hp
 
                                      // count how much space we need
                                      // on each level and set the
-                                     // dof_*_index_offset
+                                     // dof_*_offsets
                                      // data. initially set the latter
                                      // to an invalid index, and only
                                      // later set it to something
                                      // reasonable for active cells
     for (unsigned int level=0; level<tria->n_levels(); ++level) 
       {
-        levels[level]->dof_line_index_offset
+        levels[level]->line_dof_offsets
           = std::vector<unsigned int> (tria->n_raw_lines(level),
                                        invalid_dof_index);
 
@@ -2106,7 +2106,7 @@ namespace hp
              cell!=end_active(level); ++cell)
           if (!cell->has_children())
           {
-            levels[level]->dof_line_index_offset[cell->index()] = next_free_line_dof;
+            levels[level]->line_dof_offsets[cell->index()] = next_free_line_dof;
             next_free_line_dof +=
               (*finite_elements)[cell->active_fe_index()].dofs_per_line;
           }
@@ -2120,7 +2120,7 @@ namespace hp
                                      // the number of DoFs we
                                      // allocated is actually correct
                                      // (above we have also set the
-                                     // dof_*_index_offset field, so
+                                     // dof_*_offsets field, so
                                      // we couldn't use this simpler
                                      // algorithm)
 #ifdef DEBUG
@@ -2135,8 +2135,8 @@ namespace hp
         
         Assert (levels[level]->line_dofs.size() == n_line_dofs, ExcInternalError());
         Assert (static_cast<unsigned int>
-                (std::count (levels[level]->dof_line_index_offset.begin(),
-                             levels[level]->dof_line_index_offset.end(),
+                (std::count (levels[level]->line_dof_offsets.begin(),
+                             levels[level]->line_dof_offsets.end(),
                              invalid_dof_index))
                 ==
                 tria->n_raw_lines(level) - tria->n_active_lines(level),
@@ -2188,14 +2188,14 @@ namespace hp
                                      // count how much space we need
                                      // on each level for the quad
                                      // dofs and set the
-                                     // dof_*_index_offset
+                                     // dof_*_offsets
                                      // data. initially set the latter
                                      // to an invalid index, and only
                                      // later set it to something
                                      // reasonable for active cells
     for (unsigned int level=0; level<tria->n_levels(); ++level) 
       {
-        levels[level]->dof_quad_index_offset
+        levels[level]->quad_dof_offsets
           = std::vector<unsigned int> (tria->n_raw_quads(level),
                                        invalid_dof_index);
 
@@ -2204,7 +2204,7 @@ namespace hp
              cell!=end_active(level); ++cell)
           if (!cell->has_children())
           {
-            levels[level]->dof_quad_index_offset[cell->index()]
+            levels[level]->quad_dof_offsets[cell->index()]
               = next_free_quad_dof;
             next_free_quad_dof
               += (*finite_elements)[cell->active_fe_index()].dofs_per_quad;
@@ -2219,7 +2219,7 @@ namespace hp
                                      // the number of DoFs we
                                      // allocated is actually correct
                                      // (above we have also set the
-                                     // dof_*_index_offset field, so
+                                     // dof_*_offsets field, so
                                      // we couldn't use this simpler
                                      // algorithm)
 #ifdef DEBUG
@@ -2235,8 +2235,8 @@ namespace hp
         Assert (levels[level]->quad_dofs.size() == n_quad_dofs,
                 ExcInternalError());
         Assert (static_cast<unsigned int>
-                (std::count (levels[level]->dof_quad_index_offset.begin(),
-                             levels[level]->dof_quad_index_offset.end(),
+                (std::count (levels[level]->quad_dof_offsets.begin(),
+                             levels[level]->quad_dof_offsets.end(),
                              invalid_dof_index))
                 ==
                 tria->n_raw_quads(level) - tria->n_active_quads(level),
@@ -2352,7 +2352,7 @@ namespace hp
                                        // non-invalid value later on
       for (unsigned int level=0; level<tria->n_levels(); ++level) 
         {
-          levels[level]->dof_line_index_offset
+          levels[level]->line_dof_offsets
             = std::vector<unsigned int> (tria->n_raw_lines(level),
                                          invalid_dof_index);
           levels[level]->line_dofs
@@ -2388,7 +2388,7 @@ namespace hp
                    (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
                 {
                   levels[cell->level()]
-                    ->dof_line_index_offset[cell->face(face)->index()]
+                    ->line_dof_offsets[cell->face(face)->index()]
                     = next_free_line_slot[cell->level()];
 
                                                    // set first slot
@@ -2424,7 +2424,7 @@ namespace hp
               else
                 {
                   levels[cell->level()]
-                    ->dof_line_index_offset[cell->face(face)->index()]
+                    ->line_dof_offsets[cell->face(face)->index()]
                     = next_free_line_slot[cell->level()];
 
                                                    // set first slot
@@ -2638,14 +2638,14 @@ namespace hp
 
                                      // count how much space we need
                                      // on each level and set the
-                                     // dof_*_index_offset
+                                     // dof_*_offsets
                                      // data. initially set the latter
                                      // to an invalid index, and only
                                      // later set it to something
                                      // reasonable for active cells
     for (unsigned int level=0; level<tria->n_levels(); ++level) 
       {
-        levels[level]->dof_hex_index_offset
+        levels[level]->hex_dof_offsets
           = std::vector<unsigned int> (tria->n_raw_hexs(level),
                                        invalid_dof_index);
 
@@ -2654,7 +2654,7 @@ namespace hp
              cell!=end_active(level); ++cell)
           if (!cell->has_children())
           {
-            levels[level]->dof_hex_index_offset[cell->index()] = next_free_hex_dof;
+            levels[level]->hex_dof_offsets[cell->index()] = next_free_hex_dof;
             next_free_hex_dof +=
               (*finite_elements)[cell->active_fe_index()].dofs_per_hex;
           }
@@ -2668,7 +2668,7 @@ namespace hp
                                      // the number of DoFs we
                                      // allocated is actually correct
                                      // (above we have also set the
-                                     // dof_*_index_offset field, so
+                                     // dof_*_offsets field, so
                                      // we couldn't use this simpler
                                      // algorithm)
 #ifdef DEBUG
@@ -2683,8 +2683,8 @@ namespace hp
         
         Assert (levels[level]->hex_dofs.size() == n_hex_dofs, ExcInternalError());
         Assert (static_cast<unsigned int>
-                (std::count (levels[level]->dof_hex_index_offset.begin(),
-                             levels[level]->dof_hex_index_offset.end(),
+                (std::count (levels[level]->hex_dof_offsets.begin(),
+                             levels[level]->hex_dof_offsets.end(),
                              invalid_dof_index))
                 ==
                 tria->n_raw_hexs(level) - tria->n_active_hexs(level),
