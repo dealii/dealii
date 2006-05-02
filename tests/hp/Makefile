@@ -28,7 +28,8 @@ tests_x = hp_dof_handler \
 	  fe_collection_* \
 	  continuous_* \
 	  n_dofs \
-	  random
+	  random \
+	  step-*
 
 # from above list of regular expressions, generate the real set of
 # tests
