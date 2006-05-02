@@ -34,13 +34,82 @@ namespace internal
 
 /**
  * Store the indices of the degrees of freedom which are located on
- * objects of dimension @p N.  Declare this general template
+ * objects of dimension @p N. We declare this general template
  * class, but do not actually use it. Rather, only specializations of
  * this class are used.
+ *
+ * The things we store here is very similar to what is stored in the
+ * internal::DoFHandler::DoFLevel class hierarchy (see there for more
+ * information, in particular on the layout of the class
+ * hierarchy). There are two main differences, discussed in the
+ * following subsections. In addition to the data already stored by
+ * the internal::DoFHandler::DoFLevel classes, we also have to store
+ * which finite element each cell uses. This is done in the
+ * DoFLevel<0> class, where for each cell we have an entry within the
+ * active_fe_indices field for each cell.
+ *
+ * 
+ * <h4>Offset computations</h4>
+ * 
+ * For hp methods, not all cells may use the same finite element, and
+ * it is consequently more complicated to determine where the DoF
+ * indices for a given line, quad, or hex are stored. As described in
+ * the documentation of the internal::DoFHandler::DoFLevel class, we
+ * can compute the location of the first line DoF, for example, by
+ * calculating the offset as <code>line_index *
+ * dof_handler.get_fe().dofs_per_line</code>. This of course doesn't
+ * work any more if different lines may have different numbers of
+ * degrees of freedom associated with them. Consequently, rather than
+ * using this simple multiplication, each of the line_dofs, quad_dofs,
+ * and hex_dofs arrays has an associated array line_dof_offsets,
+ * quad_dof_offsets, and hex_dof_offsets. The data corresponding to a
+ * line then starts at index <code>line_dof_offsets[line_index]</code>
+ * within the <code>line_dofs</code> array. 
+ *
+ *
+ * <h4>Multiple data sets per object</code>
+ *
+ * If an object corresponds to a cell, the global dof indices of this
+ * cell are stored at the location indicated above in sequential
+ * order.
+ * 
+ * However, if two adjacent cells use different finite elements, then
+ * the face that the share needs to store DoF indices for both
+ * involved finite elements. While faces therefore have to have at
+ * most two sets of DoF indices, it is easy to see that vertices for
+ * example can have as many sets of DoF indices associated with them
+ * as there are adjacent cells, and the same holds for lines in 3d.
+ *
+ * Consequently, for objects that have a lower dimensionality than
+ * cells, we have to store a map from the finite element index to the
+ * set of DoF indices associated. Since real sets are typically very
+ * inefficient to store, and since most of the time we expect the
+ * number of individual keys to be small (frequently, adjacent cells
+ * will have the same finite element, and only a single entry will
+ * exist in the map), what we do is instead to store a linked list. In
+ * this format, the first entry starting at position
+ * <code>line_dofs[line_dof_offsets[line_index]]</code> will denote
+ * the finite element index of the set of DoF indices following; after
+ * this set, we will store the finite element index of the second set
+ * followed by the corresponding DoF indices; and so on. Finally, when
+ * all finite element indices adjacent to this object have been
+ * covered, we write a -1 to indicate the end of the list.
+ *
+ * Access to this kind of data, as well as the distinction between
+ * cells and objects of lower dimensionality are encoded in the
+ * accessor functions, DoFLevel<1>::set_line_dof_index(),
+ * DoFLevel<1>::get_line_dof_index(),
+ * DoFLevel<2>::set_quad_dof_index(),
+ * DoFLevel<2>::get_quad_dof_index(), and
+ * DoFLevel<3>::set_hex_dof_index(),
+ * DoFLevel<3>::get_hex_dof_index(). The are able to traverse this
+ * list and pick out or set a DoF index given the finite element index
+ * and its location within the set of DoFs corresponding to this
+ * finite element.
+ * 
  * 
  * @ingroup hp
- *
- * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
+ * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
  */
     template <int N>
     class DoFLevel
@@ -56,15 +125,12 @@ namespace internal
 
 
 /**
- *  Store all information which belongs to one level of the multilevel
- *  hierarchy.
- *
- *  In @ref{DoFLevel<0>} all data is stored which is not dependent on the
- *  dimension, e.g. a field to store the index referring to the
- *  hp::FECollection class. The data therefore corresponds to cells, rather
- *  than vertices, lines, quads, etc.
+ * Storage for degrees of freedom on cells. See the documentation of
+ * the DoFLevel class template for more complete information on the
+ * purpose and layout of this class.
  * 
  * @ingroup hp
+ * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
  */
     template <>
     class DoFLevel<0>
@@ -90,69 +156,22 @@ namespace internal
 
 /**
  * Store the indices of the degrees of freedom which are located on
- * the lines.
+ * the lines. See the general template DoFLevel for more information.
  *
- * @sect3{Information for all DoFLevel classes}
- *
- * The <tt>DoFLevel<N></tt> classes 
- * store the global indices of the degrees of freedom for each cell on a
- * certain level. The index or number of a degree of freedom is the zero-based
- * index of the according value in the solution vector and the row and column
- * index in the global matrix or the multigrid matrix for this level. These
- * indices refer to the unconstrained vectors and matrices, where we have not
- * taken account of the constraints introduced by hanging nodes. If more than
- * one value corresponds to one basis function, for example for vector equations
- * where the solution is vector valued and thus has several degrees of freedom
- * for each basis function, we nonetheless store only one index. This can then
- * be viewed as the index into a block vector, where each block contains the
- * different values according to a degree of freedom. It is left to the derived
- * classes, whether the values in a block are stored consecutively or distributed
- * (e.g. if the solution function is <tt>u=(u_1, u_2)</tt>, we could store the values
- * in the solution vector like
- * \f[\ldots, u_1^m, u_2^m, u_1^{m+1}, u_2^{m+1},\ldots\f] with <tt>m</tt> denoting the
- * <tt>m</tt>-th basis function, or
- * \f[\ldots, u_1^m, u_1^{m+1}, u_1^{m+2}, \ldots, u_2^m, u_2^{m+1}, u_2^{m+2}, \ldots,\f]
- * respectively). Likewise, the constraint matrix returned by
- * DoFHandler::make_hanging_node_constraints ()
- * is then to be understood as a block matrix.
- *
- * The storage format of the degrees of freedom indices (short: DoF
- * indices) is somewhat like a mirror of the data structures of the
- * triangulation classes.  There is a hierarchy of
- * <tt>DoFLevel<dim></tt> classes for the different dimensions which
- * have objects named @p line_dofs, @p quad_dofs and so on, in which
- * the indices of DoFs located on lines and quads, respectively, are
- * stored. The indices are stored levelwise. 
- *
- * Due to the fact that different elements could have a different number
- * of DoFs on each line, the DoFs on each line are stored in a nested data
- * structure. @p dof_line_index_offset is used to find the start of the
- * DoFs indices inside @p line_dofs. Hence the retrieval of DoF indices
- * for a specific line @p i is a two step process:
- * 1. Determine the index @p j in @p line_dofs, as the @p ith element of
- *    @p dof_line_index_offset
- * 2. Get the DoF indices starting from the @p jth element in @p line_dofs.
- *
- * The DoF indices for vertices are not stored this way, since they
- * need different treatment in multigrid environments. If no multigrid
- * is used, the indices are stored in the @p vertex_dofs array of the
- * DoFHandler class.
- *
- * 
  * @ingroup hp
- * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
+ * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
  */
     template <>
     class DoFLevel<1> : public DoFLevel<0>
     {
-      public:
+      private:
 
                                          /**
                                           * Store the start index for
                                           * the degrees of freedom of each
                                           * line in the @p line_dofs array.
                                           */
-        std::vector<unsigned int> dof_line_index_offset;
+        std::vector<unsigned int> line_dof_offsets;
 
                                          /**
                                           * Store the global indices of
@@ -162,6 +181,33 @@ namespace internal
                                           */
         std::vector<unsigned int> line_dofs;
 
+      public:
+        
+                                         /**
+                                          * Set the global index of
+                                          * the @p local_index-th
+                                          * degree of freedom located
+                                          * on the line with number @p
+                                          * line_index to the value
+                                          * given by the last
+                                          * argument. The @p
+                                          * dof_handler argument is
+                                          * used to access the finite
+                                          * element that is to be used
+                                          * to compute the location
+                                          * where this data is stored.
+                                          *
+                                          * The third argument, @p
+                                          * fe_index, denotes which of
+                                          * the finite elements
+                                          * associated with this
+                                          * object we shall
+                                          * access. Refer to the
+                                          * general documentation of
+                                          * the internal::hp::DoFLevel
+                                          * class template for more
+                                          * information.
+                                          */
         template <int dim>
         void
         set_line_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
@@ -170,6 +216,29 @@ namespace internal
                             const unsigned int           local_index,
                             const unsigned int           global_index);
 
+                                         /**
+                                          * Return the global index of
+                                          * the @p local_index-th
+                                          * degree of freedom located
+                                          * on the line with number @p
+                                          * line_index. The @p
+                                          * dof_handler argument is
+                                          * used to access the finite
+                                          * element that is to be used
+                                          * to compute the location
+                                          * where this data is stored.
+                                          *
+                                          * The third argument, @p
+                                          * fe_index, denotes which of
+                                          * the finite elements
+                                          * associated with this
+                                          * object we shall
+                                          * access. Refer to the
+                                          * general documentation of
+                                          * the internal::hp::DoFLevel
+                                          * class template for more
+                                          * information.
+                                          */
         template <int dim>
         unsigned int
         get_line_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
@@ -183,28 +252,35 @@ namespace internal
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
+
+                                         /**
+                                          * Make the DoFHandler class
+                                          * a friend, so that it can
+                                          * resize arrays as
+                                          * necessary.
+                                          */
+        template <int> friend class ::hp::DoFHandler;
     };
 
 
 /**
  * Store the indices of the degrees of freedom which are located on
- * quads.  See @ref{DoFLevel<1>} for more information.
- * 
- * @ingroup hp
+ * quads. See the general template DoFLevel for more information.
  *
- * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
+ * @ingroup hp
+ * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
  */
     template <>
     class DoFLevel<2> : public DoFLevel<1>
     {
-      public:
+      private:
 
                                          /**
                                           * Store the start index for
                                           * the degrees of freedom of each
                                           * quad in the @p quad_dofs array.
                                           */
-        std::vector<unsigned int> dof_quad_index_offset;
+        std::vector<unsigned int> quad_dof_offsets;
 
                                          /**
                                           * Store the global indices of
@@ -214,6 +290,33 @@ namespace internal
                                           */
         std::vector<unsigned int> quad_dofs;
 
+      public:
+        
+                                         /**
+                                          * Set the global index of
+                                          * the @p local_index-th
+                                          * degree of freedom located
+                                          * on the quad with number @p
+                                          * quad_index to the value
+                                          * given by the last
+                                          * argument. The @p
+                                          * dof_handler argument is
+                                          * used to access the finite
+                                          * element that is to be used
+                                          * to compute the location
+                                          * where this data is stored.
+                                          *
+                                          * The third argument, @p
+                                          * fe_index, denotes which of
+                                          * the finite elements
+                                          * associated with this
+                                          * object we shall
+                                          * access. Refer to the
+                                          * general documentation of
+                                          * the internal::hp::DoFLevel
+                                          * class template for more
+                                          * information.
+                                          */
         template <int dim>
         void
         set_quad_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
@@ -222,6 +325,29 @@ namespace internal
                             const unsigned int           local_index,
                             const unsigned int           global_index);
 
+                                         /**
+                                          * Return the global index of
+                                          * the @p local_index-th
+                                          * degree of freedom located
+                                          * on the quad with number @p
+                                          * quad_index. The @p
+                                          * dof_handler argument is
+                                          * used to access the finite
+                                          * element that is to be used
+                                          * to compute the location
+                                          * where this data is stored.
+                                          *
+                                          * The third argument, @p
+                                          * fe_index, denotes which of
+                                          * the finite elements
+                                          * associated with this
+                                          * object we shall
+                                          * access. Refer to the
+                                          * general documentation of
+                                          * the internal::hp::DoFLevel
+                                          * class template for more
+                                          * information.
+                                          */
         template <int dim>
         unsigned int
         get_quad_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
@@ -235,29 +361,36 @@ namespace internal
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
+
+                                         /**
+                                          * Make the DoFHandler class
+                                          * a friend, so that it can
+                                          * resize arrays as
+                                          * necessary.
+                                          */
+        template <int> friend class ::hp::DoFHandler;
     };
 
 
 
 /**
  * Store the indices of the degrees of freedom which are located on
- * hexhedra.  See @ref{DoFLevel<1>} for more information.
- * 
- * @ingroup hp
+ * hexhedra. See the general template DoFLevel for more information.
  *
- * @author Wolfgang Bangerth, 1998, Oliver Kayser-Herold 2003.
+ * @ingroup hp
+ * @author Wolfgang Bangerth, 1998, 2006, Oliver Kayser-Herold 2003.
  */
     template <>
     class DoFLevel<3> : public DoFLevel<2>
     {
-      public:
+      private:
 
                                          /**
                                           * Store the start index for
                                           * the degrees of freedom of each
                                           * hex in the @p hex_dofs array.
                                           */
-        std::vector<unsigned int> dof_hex_index_offset;
+        std::vector<unsigned int> hex_dof_offsets;
 
                                          /**
                                           * Store the global indices of
@@ -267,6 +400,33 @@ namespace internal
                                           */
         std::vector<unsigned int> hex_dofs;
 
+      public:
+        
+                                         /**
+                                          * Set the global index of
+                                          * the @p local_index-th
+                                          * degree of freedom located
+                                          * on the hex with number @p
+                                          * hex_index to the value
+                                          * given by the last
+                                          * argument. The @p
+                                          * dof_handler argument is
+                                          * used to access the finite
+                                          * element that is to be used
+                                          * to compute the location
+                                          * where this data is stored.
+                                          *
+                                          * The third argument, @p
+                                          * fe_index, denotes which of
+                                          * the finite elements
+                                          * associated with this
+                                          * object we shall
+                                          * access. Refer to the
+                                          * general documentation of
+                                          * the internal::hp::DoFLevel
+                                          * class template for more
+                                          * information.
+                                          */
         template <int dim>
         void
         set_hex_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
@@ -275,6 +435,29 @@ namespace internal
                            const unsigned int           local_index,
                            const unsigned int           global_index);
 
+                                         /**
+                                          * Return the global index of
+                                          * the @p local_index-th
+                                          * degree of freedom located
+                                          * on the hex with number @p
+                                          * hex_index. The @p
+                                          * dof_handler argument is
+                                          * used to access the finite
+                                          * element that is to be used
+                                          * to compute the location
+                                          * where this data is stored.
+                                          *
+                                          * The third argument, @p
+                                          * fe_index, denotes which of
+                                          * the finite elements
+                                          * associated with this
+                                          * object we shall
+                                          * access. Refer to the
+                                          * general documentation of
+                                          * the internal::hp::DoFLevel
+                                          * class template for more
+                                          * information.
+                                          */
         template <int dim>
         unsigned int
         get_hex_dof_index (const ::hp::DoFHandler<dim> &dof_handler,
@@ -288,6 +471,14 @@ namespace internal
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
+
+                                         /**
+                                          * Make the DoFHandler class
+                                          * a friend, so that it can
+                                          * resize arrays as
+                                          * necessary.
+                                          */
+        template <int> friend class ::hp::DoFHandler;
     };
 
 
