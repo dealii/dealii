@@ -23,41 +23,6 @@ namespace internal
 {
   namespace DoFHandler
   {
-    
-    unsigned int
-    DoFLevel<0>::memory_consumption () const
-    {
-      return MemoryConsumption::memory_consumption (cell_dof_indices_cache);
-    }
-
-
-    unsigned int
-    DoFLevel<1>::memory_consumption () const
-    {
-      return (DoFLevel<0>::memory_consumption () +
-              MemoryConsumption::memory_consumption (line_dofs));
-    }
-
-
-
-    unsigned int
-    DoFLevel<2>::memory_consumption () const
-    {
-      return (DoFLevel<1>::memory_consumption () +
-              MemoryConsumption::memory_consumption (quad_dofs));
-    }
-
-
-
-    unsigned int
-    DoFLevel<3>::memory_consumption () const
-    {
-      return (DoFLevel<2>::memory_consumption () +
-              MemoryConsumption::memory_consumption (hex_dofs));
-    }
-
-
-
     template <int dim>
     unsigned int
     DoFLevel<1>::
