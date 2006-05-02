@@ -1,4 +1,4 @@
-//----------------------------  n_dofs_2d.cc  ---------------------------
+//----------------------------  n_dofs.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  n_dofs_2d.cc  ---------------------------
+//----------------------------  n_dofs.cc  ---------------------------
 
 
 // check that even for wickedly complicated finite elements the
@@ -90,7 +90,7 @@ void test (const FiniteElement<dim> &fe)
 
 int main ()
 {
-  std::ofstream logfile("n_dofs_2d/output");
+  std::ofstream logfile("n_dofs/output");
   logfile.precision(2);
   
   deallog.attach(logfile);
