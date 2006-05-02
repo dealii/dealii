@@ -2074,6 +2074,7 @@ namespace hp
   template <>
   void DoFHandler<1>::reserve_space ()
   {
+//TODO[WB]: do the same as for 2d already    
     Assert (finite_elements != 0, ExcNoFESelected());
     Assert (finite_elements->size() > 0, ExcNoFESelected());
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
@@ -2622,6 +2623,7 @@ namespace hp
   template <>
   void DoFHandler<3>::reserve_space ()
   {
+//TODO[WB]: do the same as for 2d already    
     Assert (finite_elements != 0, ExcNoFESelected());
     Assert (finite_elements->size() > 0, ExcNoFESelected());
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
