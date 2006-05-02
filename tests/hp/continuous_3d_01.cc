@@ -12,7 +12,7 @@
 //----------------------------  continuous_3d_01.cc  ---------------------------
 
 
-// check hp::DoFHandler<2>::reserve_space for continuous elements, but
+// check hp::DoFHandler<3>::reserve_space for continuous elements, but
 // where we use the same element on all cells
 
 
