@@ -1660,7 +1660,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
 	    << std::endl << std::endl;
   std::ofstream gnuplot_output (filename.c_str());
   
-  DataOut<dim, hp::DoFHandler> data_out;
+  DataOut<dim, hp::DoFHandler<dim> > data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution2, "u");
   data_out.add_data_vector (active_fe_indices, "fe_index");
