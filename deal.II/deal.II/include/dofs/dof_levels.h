@@ -121,7 +121,7 @@ namespace internal
  * ::DoFHandler class.
  * 
  * @ingroup dofs
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998, 2006
  */
     template <int N>
     class DoFLevel
@@ -170,7 +170,7 @@ namespace internal
  * the lines. See the general template DoFLevel for more information.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998, 2006
  */
     template <>
     class DoFLevel<1> : public DoFLevel<0>
@@ -277,7 +277,7 @@ namespace internal
  * quads. See the general template DoFLevel for more information.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998, 2006
  */
     template <>
     class DoFLevel<2> : public DoFLevel<1>
@@ -384,7 +384,7 @@ namespace internal
  * hexhedra. See the general template DoFLevel for more information.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth, 1998, 2006
  */
     template <>
     class DoFLevel<3> : public DoFLevel<2>
