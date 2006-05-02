@@ -14,6 +14,7 @@
 
 #include <base/exceptions.h>
 #include <base/memory_consumption.h>
+#include <dofs/dof_levels.h>
 
 
 namespace internal
