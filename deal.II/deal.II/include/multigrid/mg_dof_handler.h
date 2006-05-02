@@ -17,12 +17,13 @@
 #include <base/config.h>
 #include <dofs/dof_handler.h>
 
-template <int dim> class MGDoFCellAccessor;
+template <int celldim, int dim> class MGDoFAccessor;
 template <int celldim, int dim> class MGDoFObjectAccessor;
 template <int dim>              class MGDoFObjectAccessor<0, dim>;
 template <int dim>              class MGDoFObjectAccessor<1, dim>;
 template <int dim>              class MGDoFObjectAccessor<2, dim>;
 template <int dim>              class MGDoFObjectAccessor<3, dim>;
+template <int dim> class MGDoFCellAccessor;
 
 /*!@addtogroup mg */
 /*@{*/
@@ -1162,6 +1163,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				     /**
 				      * Make accessor objects friends.
 				      */
+    template <int dim1, int dim2> friend class MGDoFAccessor;
     template <int dim1, int dim2> friend class MGDoFObjectAccessor;
 };
 
