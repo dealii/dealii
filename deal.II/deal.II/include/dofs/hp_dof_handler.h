@@ -1088,6 +1088,12 @@ namespace hp
 					* offset within the
 					* vertex_dofs array where the
 					* dofs for this vertex start.
+					*
+					* As for that array, the
+					* format is the same as
+					* described in the
+					* documentation of
+					* hp::DoFLevel.
 					*/
       std::vector<unsigned int>      vertex_dofs_offsets;
 
