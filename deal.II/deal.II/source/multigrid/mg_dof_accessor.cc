@@ -228,9 +228,9 @@ MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = mg_vertex_dof_index(vertex,d);
+      *next++ = this->mg_vertex_dof_index(vertex,d);
   for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next++ = mg_dof_index(d);
+    *next++ = this->mg_dof_index(d);
   
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
@@ -259,9 +259,9 @@ MGDoFObjectAccessor<1,dim>::get_mg_dof_values (const Vector<number> &values,
   typename Vector<number>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next_dof_value++ = values(mg_vertex_dof_index(vertex,d));
+      *next_dof_value++ = values(this->mg_vertex_dof_index(vertex,d));
   for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next_dof_value++ = values(mg_dof_index(d));
+    *next_dof_value++ = values(this->mg_dof_index(d));
   
   Assert (next_dof_value == dof_values.end(),
 	  ExcInternalError());
@@ -304,12 +304,12 @@ MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = mg_vertex_dof_index(vertex,d);
+      *next++ = this->mg_vertex_dof_index(vertex,d);
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->mg_dof_index(d);
   for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next++ = mg_dof_index(d);
+    *next++ = this->mg_dof_index(d);
   
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
@@ -339,12 +339,12 @@ MGDoFObjectAccessor<2,dim>::get_mg_dof_values (const Vector<number> &values,
   typename Vector<number>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next_dof_value++ = values(mg_vertex_dof_index(vertex,d));
+      *next_dof_value++ = values(this->mg_vertex_dof_index(vertex,d));
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next_dof_value++ = values(this->line(line)->mg_dof_index(d));
   for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next_dof_value++ = values(mg_dof_index(d));
+    *next_dof_value++ = values(this->mg_dof_index(d));
   
   Assert (next_dof_value == dof_values.end(),
 	  ExcInternalError());
@@ -404,7 +404,7 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = mg_vertex_dof_index(vertex,d);
+      *next++ = this->mg_vertex_dof_index(vertex,d);
   for (unsigned int line=0; line<12; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->mg_dof_index(d);
@@ -412,7 +412,7 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
     for (unsigned int d=0; d<dofs_per_quad; ++d)
       *next++ = this->quad(quad)->mg_dof_index(d);
   for (unsigned int d=0; d<dofs_per_hex; ++d)
-    *next++ = mg_dof_index(d);
+    *next++ = this->mg_dof_index(d);
   
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
@@ -443,7 +443,7 @@ MGDoFObjectAccessor<3,dim>::get_mg_dof_values (const Vector<number> &values,
   typename Vector<number>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next_dof_value++ = values(mg_vertex_dof_index(vertex,d));
+      *next_dof_value++ = values(this->mg_vertex_dof_index(vertex,d));
   for (unsigned int line=0; line<12; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next_dof_value++ = values(this->line(line)->mg_dof_index(d));
