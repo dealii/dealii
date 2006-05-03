@@ -256,8 +256,12 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::output_results (const unsigned int) const
+void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
+                                   // reduce output a bit
+  if (cycle >= 2)
+    return;
+  
   DataOut<dim,hp::DoFHandler<dim> > data_out;
 
   data_out.attach_dof_handler (dof_handler);
