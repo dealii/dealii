@@ -1524,6 +1524,11 @@ namespace hp
 
     finite_elements = &ff;
 
+                                     // This call ensures that the
+                                     // active_fe_indices vectors are
+                                     // initialized correctly.
+    create_active_fe_table ();
+
 				     // up front make sure that the fe
 				     // collection is large enough to
 				     // cover all fe indices presently
@@ -1533,12 +1538,9 @@ namespace hp
 	      ExcInvalidFEIndex (cell->active_fe_index(),
 				 finite_elements->size()));
 
-    
-                                     // This call ensures that the
-                                     // active_fe_indices vectors are
-                                     // initialized correctly.
-    create_active_fe_table ();
 
+                                     // then allocate space for all
+                                     // the other tables
     reserve_space ();
 
                                      // Clear user flags because we will
