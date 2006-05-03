@@ -276,7 +276,7 @@ DoFObjectAccessor<1,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
       *next++ = this->vertex_dof_index(vertex,d,fe_index);
   for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next++ = dof_index(d,fe_index);
+    *next++ = this->dof_index(d,fe_index);
 }
 
 
@@ -359,7 +359,7 @@ DoFObjectAccessor<2,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->dof_index(d,fe_index);
   for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next++ = dof_index(d,fe_index);
+    *next++ = this->dof_index(d,fe_index);
 }
 
 
@@ -461,7 +461,7 @@ DoFObjectAccessor<3,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
     for (unsigned int d=0; d<dofs_per_quad; ++d)
       *next++ = this->quad(quad)->dof_index(d,fe_index);
   for (unsigned int d=0; d<dofs_per_hex; ++d)
-    *next++ = dof_index(d,fe_index);
+    *next++ = this->dof_index(d,fe_index);
 }
 
 
