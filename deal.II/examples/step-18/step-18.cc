@@ -1169,7 +1169,7 @@ namespace QuasiStaticElasticity
                                      // already, but for didactic reasons it
                                      // was more appropriate to handle it
                                      // after discussing boundary
-                                     // objects). Boundary indicators in
+                                     // objects). %Boundary indicators in
                                      // deal.II, for mostly historic reasons,
                                      // serve a dual purpose: they describe
                                      // the type of a boundary for other

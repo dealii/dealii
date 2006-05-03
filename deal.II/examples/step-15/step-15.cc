@@ -567,7 +567,7 @@ void MinimizationProblem<dim>::assemble_step ()
   hanging_node_constraints.condense (matrix);
   hanging_node_constraints.condense (residual);
 
-                                   // Boundary values are, too, but with a
+                                   // %Boundary values are, too, but with a
                                    // twist this time: in all previous example
                                    // programs, we have used that by default
                                    // (i.e. unless something else is set), all

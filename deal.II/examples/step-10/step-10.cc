@@ -338,8 +338,8 @@ void compute_pi_by_area ()
       std::cout << "Degree = " << degree << std::endl;
 
 				       // First generate the
-				       // triangulation, the Boundary
-				       // and the Mapping object as
+				       // triangulation, the boundary
+				       // and the mapping object as
 				       // already seen.
       Triangulation<dim> triangulation;
       GridGenerator::hyper_ball (triangulation);
@@ -554,9 +554,9 @@ void compute_pi_by_perimeter ()
   const QGauss<dim-1> quadrature(4);
 
 				   // We loop over all degrees, create
-				   // the Triangulation, the Boundary,
-				   // the Mapping, the dummy
-				   // FiniteElement and the DoFHandler
+				   // the triangulation, the boundary,
+				   // the mapping, the dummy
+				   // finite element and the DoFHandler
 				   // object as seen before.
   for (unsigned int degree=1; degree<5; ++degree)
     {
