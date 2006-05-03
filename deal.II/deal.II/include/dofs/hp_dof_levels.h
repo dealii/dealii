@@ -68,7 +68,7 @@ namespace internal
  * within the <code>line_dofs</code> array. 
  *
  *
- * <h4>Multiple data sets per object</code>
+ * <h4>Multiple data sets per object</h4>
  *
  * If an object corresponds to a cell, the global dof indices of this
  * cell are stored at the location indicated above in sequential
