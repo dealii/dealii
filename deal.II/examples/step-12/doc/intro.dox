@@ -100,7 +100,7 @@ This yields the following <em>discontinuous Galerkin
 <a name="step-12.dg-scheme">@f[
   \sum_\kappa\left\{-({\mathcal F}(u_h),\nabla v_h)_\kappa+({\mathcal H}(u_h^+,u_h^-,{\bf n}), v_h)_{\partial\kappa}\right\}=(f,v_h)_\Omega, \quad\forall v_h\in V_h.
 \qquad\qquad\qquad\mathrm{[dg-scheme]}@f]</a>
-Boundary conditions are realized by replacing $u_h^-$ on the inflow boundary $\Gamma_-$ by the boundary function $g$.
+%Boundary conditions are realized by replacing $u_h^-$ on the inflow boundary $\Gamma_-$ by the boundary function $g$.
 In the special case of the transport equation
 <a href="#step-12.transport-equation">[transport-equation]</a> the numerical flux in its simplest form
 is given by
