@@ -256,7 +256,7 @@ void LaplaceProblem<dim>::solve ()
 
 
 template <int dim>
-void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+void LaplaceProblem<dim>::output_results (const unsigned int) const
 {
   DataOut<dim,hp::DoFHandler<dim> > data_out;
 
