@@ -98,8 +98,17 @@ class Quadrature : public Subscriptor
 
 				     /**
 				      * Constructor.
+				      *
+				      * This constructor is marked as
+				      * explicit to avoid involuntary
+				      * accidents like in
+				      * <code>hp::QCollection@<dim@>
+				      * q_collection(3)</code> where
+				      * <code>hp::QCollection@<dim@>
+				      * q_collection(QGauss@<dim@>(3))</code>
+				      * was meant.
 				      */
-    Quadrature (const unsigned int n_quadrature_points);
+    explicit Quadrature (const unsigned int n_quadrature_points);
 
 				     /**
 				      * Build this quadrature formula
