@@ -196,7 +196,7 @@ void ElasticProblem<dim>::setup_system ()
 template <int dim>
 void ElasticProblem<dim>::assemble_system () 
 {  
-  hp::QCollection<dim>  quadrature_formula(2);
+  hp::QCollection<dim>  quadrature_formula(QGauss<dim>(2));
 
   hp::FEValues<dim> x_fe_values (fe, quadrature_formula, 
 			   update_values   | update_gradients |
@@ -336,7 +336,7 @@ void ElasticProblem<dim>::refine_grid ()
 
   typename FunctionMap<dim>::type neumann_boundary;
   KellyErrorEstimator<dim>::estimate (dof_handler,
-				      hp::QCollection<dim-1>(2),
+				      hp::QCollection<dim-1>(QGauss<dim-1>(2)),
 				      neumann_boundary,
 				      solution,
 				      estimated_error_per_cell);

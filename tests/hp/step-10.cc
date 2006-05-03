@@ -73,12 +73,7 @@ void gnuplot_output()
 	  GridOutFlags::Gnuplot gnuplot_flags(false, 30);
 	  grid_out.set_flags(gnuplot_flags);
   
-	  std::string filename = filename_base+"_mapping_q";
-	  filename += ('0'+degree);
-	  filename += ".dat";
-	  std::ofstream gnuplot_file (filename.c_str());
-
-	  grid_out.write_gnuplot (triangulation, gnuplot_file, &mapping);
+	  grid_out.write_gnuplot (triangulation, deallog.get_file_stream(), &mapping);
 	}
       deallog << std::endl;
     }
@@ -158,7 +153,7 @@ void compute_pi_by_perimeter ()
   deallog << "Computation of Pi by the perimeter:" << std::endl
 	    << "===================================" << std::endl;
 
-  const hp::QCollection<dim-1> quadrature(4);
+  const hp::QCollection<dim-1> quadrature(QGauss<dim-1>(4));
 
   for (unsigned int degree=1; degree<5; ++degree)
     {
