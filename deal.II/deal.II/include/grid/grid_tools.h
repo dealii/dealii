@@ -218,19 +218,19 @@ class GridTools
                                       * total number of cells.
                                       *
                                       * There are cases where this
-                                      * function will not found a
-                                      * given point in space
-                                      * dimensions higher than one,
-                                      * even though it is inside the
-                                      * domain being discretized, or
-                                      * will find a point that is
-                                      * actually outside the
-                                      * domain. The reason for this is
-                                      * that we use piecewise d-linear
-                                      * mappings of the unit cell to
-                                      * real cells. Thus, if a point
-                                      * is close to a convex boundary
-                                      * or on it, it may not be inside
+                                      * function will not find a given
+                                      * point in space dimensions
+                                      * higher than one, even though
+                                      * it is inside the domain being
+                                      * discretized, or will find a
+                                      * point that is actually outside
+                                      * the domain. The reason for
+                                      * this is that we use piecewise
+                                      * (bi-,tri-)linear mappings of
+                                      * the unit cell to real
+                                      * cells. Thus, if a point is
+                                      * close to a convex boundary or
+                                      * on it, it may not be inside
                                       * any of the cells since they
                                       * have straight boundaries that
                                       * lie entirely inside the
@@ -254,7 +254,7 @@ class GridTools
                                       * may be used instead that uses
                                       * a linear search over all
                                       * active cells, rather than
-                                      * first searchin for a coarse
+                                      * first searching for a coarse
                                       * grid cell. Note, however, that
                                       * such an algorithm has a
                                       * significantly higher numerical
@@ -265,7 +265,7 @@ class GridTools
                                       * boundary of two or more cells,
                                       * then the algorithm may return
                                       * with any of these cells. While
-                                      * this is in general not really
+                                      * this is in general not really a
                                       * problem, if may be a nuisance
                                       * if the point lies at the
                                       * boundary of cells with
