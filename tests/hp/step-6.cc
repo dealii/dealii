@@ -190,7 +190,7 @@ void LaplaceProblem<dim>::setup_system ()
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
-  const hp::QCollection<dim>  quadrature_formula(3);
+  const hp::QCollection<dim>  quadrature_formula(QGauss<dim>(3));
 
   hp::FEValues<dim> x_fe_values (fe, quadrature_formula, 
 			   update_values    |  update_gradients |
@@ -288,7 +288,7 @@ void LaplaceProblem<dim>::refine_grid ()
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
   KellyErrorEstimator<dim>::estimate (dof_handler,
-				      QGauss<dim-1>(3),
+				      hp::QCollection<dim-1>(QGauss<dim-1>(3)),
 				      typename FunctionMap<dim>::type(),
 				      solution,
 				      estimated_error_per_cell);

@@ -261,8 +261,8 @@ void HelmholtzProblem<dim>::setup_system ()
 template <int dim>
 void HelmholtzProblem<dim>::assemble_system () 
 {  
-  hp::QCollection<dim>   quadrature_formula(3);
-  hp::QCollection<dim-1> face_quadrature_formula(3);
+  hp::QCollection<dim>   quadrature_formula(QGauss<dim>(3));
+  hp::QCollection<dim-1> face_quadrature_formula(QGauss<dim-1>(3));
 
   const unsigned int n_q_points    = quadrature_formula[0].n_quadrature_points;
   const unsigned int n_face_q_points = face_quadrature_formula[0].n_quadrature_points;
@@ -401,7 +401,7 @@ void HelmholtzProblem<dim>::refine_grid ()
 
 	typename FunctionMap<dim>::type neumann_boundary;
 	KellyErrorEstimator<dim>::estimate (dof_handler,
-					    hp::QCollection<dim-1>(3),
+					    hp::QCollection<dim-1>(QGauss<dim-1>(3)),
 					    neumann_boundary,
 					    solution,
 					    estimated_error_per_cell);
@@ -432,7 +432,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				     solution,
 				     Solution<dim>(),
 				     difference_per_cell,
-				     hp::QCollection<dim>(3),
+				     hp::QCollection<dim>(QGauss<dim>(3)),
 				     VectorTools::L2_norm);
   const double L2_error = difference_per_cell.l2_norm();
 
@@ -440,7 +440,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				     solution,
 				     Solution<dim>(),
 				     difference_per_cell,
-				     hp::QCollection<dim>(3),
+				     hp::QCollection<dim>(QGauss<dim>(3)),
 				     VectorTools::H1_seminorm);
   const double H1_error = difference_per_cell.l2_norm();
 
@@ -450,7 +450,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				     solution,
 				     Solution<dim>(),
 				     difference_per_cell,
-				     q_iterated,
+				     hp::QCollection<dim>(q_iterated),
 				     VectorTools::Linfty_norm);
   const double Linfty_error = difference_per_cell.linfty_norm();
 
@@ -567,7 +567,7 @@ void HelmholtzProblem<dim>::run ()
   convergence_table.set_tex_format("dofs", "r");
 
   deallog << std::endl;
-  convergence_table.write_text(deallog);
+  convergence_table.write_text(deallog.get_file_stream());
   
   std::string error_filename = "error";
   switch (refinement_mode)
@@ -620,7 +620,7 @@ void HelmholtzProblem<dim>::run ()
 	.evaluate_convergence_rates("H1", ConvergenceTable::reduction_rate_log2);
 
       deallog << std::endl;
-      convergence_table.write_text(deallog);
+      convergence_table.write_text(deallog.get_file_stream());
 
       std::string conv_filename = "convergence";
       switch (refinement_mode)
