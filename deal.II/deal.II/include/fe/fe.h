@@ -15,7 +15,6 @@
 
 #include <base/config.h>
 #include <fe/fe_base.h>
-#include <dofs/dof_handler.h>
 
 template <int dim> class FEValuesData;
 template <int dim> class FEValuesBase;
