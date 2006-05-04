@@ -223,6 +223,44 @@ DoFAccessor<dim,DH>::set_dof_index (const unsigned int i,
 
 
 
+template <int dim, class DH>
+inline
+unsigned int
+DoFAccessor<dim,DH>::n_active_fe_indices () const
+{
+				   // access the respective DoF. the
+				   // last argument disambiguates
+				   // between the functions of same
+				   // name in the DoFLevel hierarchy,
+				   // to make sure we get at lines,
+				   // quads, or hexes
+  return this->dof_handler->levels[this->present_level]
+    ->template n_active_fe_indices<DH::dimension> (*this->dof_handler,
+                                                   this->present_index,
+                                                   internal::StructuralDimension<dim>());
+}
+
+
+
+template <int dim, class DH>
+inline
+bool
+DoFAccessor<dim,DH>::fe_index_is_active (const unsigned int fe_index) const
+{
+				   // access the respective DoF. the
+				   // last argument disambiguates
+				   // between the functions of same
+				   // name in the DoFLevel hierarchy,
+				   // to make sure we get at lines,
+				   // quads, or hexes
+  return this->dof_handler->levels[this->present_level]
+    ->template fe_index_is_active<DH::dimension> (*this->dof_handler,
+                                                  this->present_index,
+                                                  fe_index,
+                                                  internal::StructuralDimension<dim>());
+}
+
+
 
 /*------------------------- Functions: DoFObjectAccessor<1,dim> -----------------------*/
 

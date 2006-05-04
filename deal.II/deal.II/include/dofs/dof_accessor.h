@@ -390,7 +390,52 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
 			const unsigned int index,
 			const unsigned int fe_index = DH::default_fe_index) const;
 
-				     /**
+                                     /**
+                                      * Return the number of finite
+                                      * elements that are active on a
+                                      * given object.
+                                      *
+                                      * For non-hp DoFHandler objects,
+                                      * the answer is of course always
+                                      * one. However, for
+                                      * hp::DoFHandler objects, this
+                                      * isn't the case: If this is a
+                                      * cell, the answer is of course
+                                      * one. If it is a face, the
+                                      * answer may be one or two,
+                                      * depending on whether the two
+                                      * adjacent cells use the same
+                                      * finite element or not. If it
+                                      * is an edge in 3d, the possible
+                                      * return value may be one or any
+                                      * other value larger than that.
+                                      */
+    unsigned int
+    n_active_fe_indices () const;
+
+                                     /**
+                                      * Check whether a given finite
+                                      * element index is used on the
+                                      * present object or not.
+                                      *
+                                      * For non-hp DoFHandler objects,
+                                      * only a zero index may be used,
+                                      * since only a single finite
+                                      * element can ever be active,
+                                      * and the answer is then @p
+                                      * true. On the other hand, for
+                                      * hp::DoFHandler objects,
+                                      * several fe indices may be used
+                                      * on the same object (except for
+                                      * a cell, where only a single
+                                      * finite element can be active
+                                      * at any given time).
+                                      */
+    bool
+    fe_index_is_active (const unsigned int fe_index) const;
+
+
+                                     /**
 				      * Exceptions for child classes
 				      *
 				      * @ingroup Exceptions

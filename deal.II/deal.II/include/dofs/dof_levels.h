@@ -174,6 +174,46 @@ namespace internal
 	std::vector<unsigned int> cell_dof_indices_cache;
 
                                          /**
+                                          * Return the value 1. The
+                                          * meaning of this function
+                                          * becomes clear by looking
+                                          * at what the corresponding
+                                          * functions in the classes
+                                          * internal::hp::DoFLevel do.
+                                          * Since we always have to
+                                          * return 1, there is no
+                                          * point in implementing this
+                                          * function multiple times in
+                                          * the derived classes, and
+                                          * we just do it once as a
+                                          * template in the common
+                                          * base class.
+                                          */
+        template <int dim, int structdim>
+        unsigned int
+        n_active_fe_indices (const ::DoFHandler<dim> &dof_handler,
+                             const unsigned int       index,
+                             const StructuralDimension<structdim>) const;
+
+                                         /**
+                                          * Similar to the function
+                                          * above. Assert that the
+                                          * given index is zero, and
+                                          * the return true.
+                                          *
+                                          * See the
+                                          * internal::hp::DoFLevel
+                                          * hierarchy for more
+                                          * information.
+                                          */
+        template <int dim, int structdim>
+        bool
+        fe_index_is_active (const ::DoFHandler<dim> &dof_handler,
+                            const unsigned int       index,
+                            const unsigned int       fe_index,
+                            const StructuralDimension<structdim>) const;
+        
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
@@ -564,6 +604,34 @@ namespace internal
         template <int> friend class ::DoFHandler;
         template <int> friend class ::MGDoFHandler;
     };
+
+
+// ----------- inline functions ---------------------
+
+    template <int dim, int structdim>
+    inline
+    unsigned int
+    DoFLevel<0>::n_active_fe_indices (const ::DoFHandler<dim> &,
+                                      const unsigned int,
+                                      const StructuralDimension<structdim>) const
+    {
+      return 1;
+    }
+
+
+    template <int dim, int structdim>
+    inline
+    bool
+    DoFLevel<0>::fe_index_is_active (const ::DoFHandler<dim> &,
+                                     const unsigned int,
+                                     const unsigned int fe_index,
+                                     const StructuralDimension<structdim>) const
+    {
+      Assert (fe_index == 0,
+              ExcMessage ("Only zero fe_index values are allowed for "
+                          "non-hp DoFHandlers."));
+      return true;
+    }
     
   }
   

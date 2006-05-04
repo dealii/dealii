@@ -264,6 +264,62 @@ namespace internal
 		       internal::StructuralDimension<1> dummy) const;
 
                                          /**
+                                          * Return the number of
+                                          * finite elements that are
+                                          * active on a given
+                                          * object. If this is a cell,
+                                          * the answer is of course
+                                          * one. If it is a face, the
+                                          * answer may be one or two,
+                                          * depending on whether the
+                                          * two adjacent cells use the
+                                          * same finite element or
+                                          * not. If it is an edge in
+                                          * 3d, the possible return
+                                          * value may be one or any
+                                          * other value larger than
+                                          * that.
+                                          *
+                                          * The last argument is used
+                                          * in the same way as for the
+                                          * other functions, i.e. it
+                                          * disambiguates between the
+                                          * different functions in the
+                                          * class hierarchy, whereas
+                                          * the template argument
+                                          * denotes the space
+                                          * dimension we operate in.
+                                          */
+        template <int dim>
+        unsigned int
+        n_active_fe_indices (const ::hp::DoFHandler<dim> &dof_handler,
+                             const unsigned int           line_index,
+                             const StructuralDimension<1>) const;
+
+                                         /**
+                                          * Check whether a given
+                                          * finite element index is
+                                          * used on the present
+                                          * object or not.
+                                          *
+                                          * The last argument is used
+                                          * in the same way as for the
+                                          * other functions, i.e. it
+                                          * disambiguates between the
+                                          * different functions in the
+                                          * class hierarchy, whereas
+                                          * the template argument
+                                          * denotes the space
+                                          * dimension we operate in.
+                                          */
+        template <int dim>
+        bool
+        fe_index_is_active (const ::hp::DoFHandler<dim> &dof_handler,
+                            const unsigned int           line_index,
+                            const unsigned int           fe_index,
+                            const StructuralDimension<1>) const;
+
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
@@ -388,13 +444,71 @@ namespace internal
 		       const unsigned int           local_index,
 		       internal::StructuralDimension<2> dummy) const;
 
-					 /**
+                                         /**
+                                          * Return the number of
+                                          * finite elements that are
+                                          * active on a given
+                                          * object. If this is a cell,
+                                          * the answer is of course
+                                          * one. If it is a face, the
+                                          * answer may be one or two,
+                                          * depending on whether the
+                                          * two adjacent cells use the
+                                          * same finite element or
+                                          * not. If it is an edge in
+                                          * 3d, the possible return
+                                          * value may be one or any
+                                          * other value larger than
+                                          * that.
+                                          *
+                                          * The last argument is used
+                                          * in the same way as for the
+                                          * other functions, i.e. it
+                                          * disambiguates between the
+                                          * different functions in the
+                                          * class hierarchy, whereas
+                                          * the template argument
+                                          * denotes the space
+                                          * dimension we operate in.
+                                          */
+        template <int dim>
+        unsigned int
+        n_active_fe_indices (const ::hp::DoFHandler<dim> &dof_handler,
+                             const unsigned int           quad_index,
+                             const StructuralDimension<2>) const;
+
+                                         /**
+                                          * Check whether a given
+                                          * finite element index is
+                                          * used on the present
+                                          * object or not.
+                                          *
+                                          * The last argument is used
+                                          * in the same way as for the
+                                          * other functions, i.e. it
+                                          * disambiguates between the
+                                          * different functions in the
+                                          * class hierarchy, whereas
+                                          * the template argument
+                                          * denotes the space
+                                          * dimension we operate in.
+                                          */
+        template <int dim>
+        bool
+        fe_index_is_active (const ::hp::DoFHandler<dim> &dof_handler,
+                            const unsigned int           quad_index,
+                            const unsigned int           fe_index,
+                            const StructuralDimension<2>) const;
+
+                                         /**
 					  * Import the respective
 					  * functions from the base
 					  * class.
 					  */
 	using DoFLevel<1>::set_dof_index;
 	using DoFLevel<1>::get_dof_index;
+	using DoFLevel<1>::n_active_fe_indices;
+	using DoFLevel<1>::fe_index_is_active;
 	
                                          /**
                                           * Determine an estimate for the
@@ -522,13 +636,71 @@ namespace internal
 		       const unsigned int           local_index,
 		       internal::StructuralDimension<3> dummy) const;
 
-					 /**
+                                         /**
+                                          * Return the number of
+                                          * finite elements that are
+                                          * active on a given
+                                          * object. If this is a cell,
+                                          * the answer is of course
+                                          * one. If it is a face, the
+                                          * answer may be one or two,
+                                          * depending on whether the
+                                          * two adjacent cells use the
+                                          * same finite element or
+                                          * not. If it is an edge in
+                                          * 3d, the possible return
+                                          * value may be one or any
+                                          * other value larger than
+                                          * that.
+                                          *
+                                          * The last argument is used
+                                          * in the same way as for the
+                                          * other functions, i.e. it
+                                          * disambiguates between the
+                                          * different functions in the
+                                          * class hierarchy, whereas
+                                          * the template argument
+                                          * denotes the space
+                                          * dimension we operate in.
+                                          */
+        template <int dim>
+        unsigned int
+        n_active_fe_indices (const ::hp::DoFHandler<dim> &dof_handler,
+                             const unsigned int           hex_index,
+                             const StructuralDimension<3>) const;
+
+                                         /**
+                                          * Check whether a given
+                                          * finite element index is
+                                          * used on the present
+                                          * object or not.
+                                          *
+                                          * The last argument is used
+                                          * in the same way as for the
+                                          * other functions, i.e. it
+                                          * disambiguates between the
+                                          * different functions in the
+                                          * class hierarchy, whereas
+                                          * the template argument
+                                          * denotes the space
+                                          * dimension we operate in.
+                                          */
+        template <int dim>
+        bool
+        fe_index_is_active (const ::hp::DoFHandler<dim> &dof_handler,
+                            const unsigned int           hex_index,
+                            const unsigned int           fe_index,
+                            const StructuralDimension<3>) const;
+
+                                         /**
 					  * Import the respective
 					  * functions from the base
 					  * classes.
 					  */
 	using DoFLevel<2>::set_dof_index;
 	using DoFLevel<2>::get_dof_index;
+	using DoFLevel<2>::n_active_fe_indices;
+	using DoFLevel<2>::fe_index_is_active;
 
                                          /**
                                           * Determine an estimate for the
