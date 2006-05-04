@@ -1751,8 +1751,8 @@ void DoFTools::make_hanging_node_constraints (
 		constraints.add_entry (dofs_on_children[row],
 				       dofs_on_mother[i],
 				       fe.constraints()(row,i));
-	    };
-	};
+	    }
+	}
 }
 
 
@@ -1902,8 +1902,8 @@ void DoFTools::make_hanging_node_constraints (
 		constraints.add_entry (dofs_on_children[row],
 				       dofs_on_mother[i],
 				       fe.constraints()(row,i));
-	    };
-	};
+	    }
+	}
 }
 
 
