@@ -590,77 +590,63 @@ class DoFTools
 				      */
     
 				     /**
-				      * Make up the constraints which
-				      * is result from the use of hanging
-				      * nodes. The object into which these
-				      * are inserted is later
-				      * used to condensate the global
-				      * system matrices and to prolong
-				      * the solution vectors from the true
+				      * Compute the constraints
+				      * resulting from the presence of
+				      * hanging nodes. The object into
+				      * which these are inserted is
+				      * later used to condense the
+				      * global system matrix and right
+				      * hand side, and to extend the
+				      * solution vectors from the true
 				      * degrees of freedom also to the
-				      * constraint nodes.
+				      * constraint nodes. This
+				      * function is explained in
+				      * detail in the @ref step_6
+				      * "step-6" tutorial program and
+				      * is used in almost all
+				      * following programs as well.
 				      *
-				      * Since this method does not make sense in
-				      * one dimension, the function returns
-				      * immediately. The object is not cleared
-				      * before use, so you should make sure
-				      * it containts only constraints you still
-				      * want; otherwise call the @p clear
-				      * function.
+				      * This function does not clear
+				      * the constraint matrix object
+				      * before use, in order to allow
+				      * adding constraints from
+				      * different sources to the same
+				      * object. You therefore need to
+				      * make sure it contains only
+				      * constraints you still want;
+				      * otherwise call the
+				      * ConstraintMatrix::clear()
+				      * function.  Likewise, this
+				      * function does not close the
+				      * object since you may want to
+				      * enter other constraints later
+				      * on yourself.
 				      *
-				      * To condense a given sparsity pattern,
-				      * use ConstraintMatrix@p ::condense.
-				      * Before doing so, you need to close
-				      * the constraint object, which must be
-				      * done after all constraints are entered.
-				      * This function does not close the object
-				      * since you may want to enter other
-				      * constraints later on yourself.
+				      * In the hp-case, i.e. when the
+				      * argument is of type
+				      * hp::DoFHandler, we consider
+				      * constraints due to different
+				      * finite elements used on two
+				      * sides of a face between cells
+				      * as hanging nodes as well. In
+				      * other words, for hp finite
+				      * elements, this function
+				      * computes all constraints due
+				      * to differing mesh sizes (h) or
+				      * polynomial degrees (p) between
+				      * adjacent cells.
+				      *
+				      * The template argument (and by
+				      * consequence the type of the
+				      * first argument to this
+				      * function) can be either a
+				      * ::DoFHandler, hp::DoFHandler,
+				      * or MGDoFHandler.
 				      */
+    template <class DH>
     static void
-    make_hanging_node_constraints (const DoFHandler<1> &dof_handler,
-				   ConstraintMatrix      &constraints);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      */
-    static void
-    make_hanging_node_constraints (const DoFHandler<2> &dof_handler,
-				   ConstraintMatrix    &constraints);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      */
-    static void
-    make_hanging_node_constraints (const DoFHandler<3> &dof_handler,
-				   ConstraintMatrix    &constraints);
-
-				     /**
-				      * Declaration of same function
-				      * for hp::DoFHandler
-				      */
-    static void
-    make_hanging_node_constraints (const hp::DoFHandler<1> &dof_handler,
-				   ConstraintMatrix      &constraints);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      */
-    static void
-    make_hanging_node_constraints (const hp::DoFHandler<2> &dof_handler,
-				   ConstraintMatrix      &constraints);
-
-				     /**
-				      * Declaration of same function
-				      * for different space dimension.
-				      */
-    static void
-    make_hanging_node_constraints (const hp::DoFHandler<3> &dof_handler,
-				   ConstraintMatrix      &constraints);
-
+    make_hanging_node_constraints (const DH         &dof_handler,
+				   ConstraintMatrix &constraints);
 				     //@}
     
 				     /**
