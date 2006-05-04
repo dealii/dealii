@@ -24,7 +24,13 @@ template <int> class MGDoFHandler;
 
 namespace internal
 {
-
+/**
+ * A class that is used to disambiguate between functions of the same
+ * name but that operate on objects of different structural dimension.
+ * The class is only used in the interface between DoF accessors and
+ * the level information stored in the internal::DoFHandler::DoFLevel
+ * and internal::hp::DoFLevel classes.
+ */
   template <int structdim>
   struct StructuralDimension
   {};
