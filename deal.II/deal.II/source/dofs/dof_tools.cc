@@ -1662,7 +1662,9 @@ void DoFTools::make_hanging_node_constraints (
   const hp::DoFHandler<1> &,
   ConstraintMatrix &)
 {
-				   // nothing to be done here
+                                   // we may have to compute
+                                   // constraints for vertices
+  Assert (false, ExcNotImplemented());
 }
 
 #endif
