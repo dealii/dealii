@@ -41,6 +41,8 @@ namespace internal
       Assert (&dof_handler.get_fe() != 0,
               ExcMessage ("No finite element collection is associated with "
                           "this DoFHandler"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
       Assert (local_index < dof_handler.get_fe()[fe_index].dofs_per_line,
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_line));
@@ -116,6 +118,8 @@ namespace internal
       Assert (&dof_handler.get_fe() != 0,
               ExcMessage ("No finite element collection is associated with "
                           "this DoFHandler"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
       Assert (local_index < dof_handler.get_fe()[fe_index].dofs_per_line,
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_line));
@@ -259,6 +263,8 @@ namespace internal
       Assert (fe_index != ::hp::DoFHandler<dim>::default_fe_index,
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
 
                                        // make sure we are on an
                                        // object for which DoFs have
@@ -329,6 +335,8 @@ namespace internal
       Assert (&dof_handler.get_fe() != 0,
               ExcMessage ("No finite element collection is associated with "
                           "this DoFHandler"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
       Assert (local_index < dof_handler.get_fe()[fe_index].dofs_per_quad,
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_quad));
@@ -405,6 +413,8 @@ namespace internal
       Assert (&dof_handler.get_fe() != 0,
               ExcMessage ("No finite element collection is associated with "
                           "this DoFHandler"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
       Assert (local_index < dof_handler.get_fe()[fe_index].dofs_per_quad,
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_quad));
@@ -548,6 +558,8 @@ namespace internal
       Assert (fe_index != ::hp::DoFHandler<dim>::default_fe_index,
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
 
                                        // make sure we are on an
                                        // object for which DoFs have
@@ -618,6 +630,8 @@ namespace internal
       Assert (&dof_handler.get_fe() != 0,
               ExcMessage ("No finite element collection is associated with "
                           "this DoFHandler"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
       Assert (local_index < dof_handler.get_fe()[fe_index].dofs_per_hex,
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_hex));
@@ -694,6 +708,8 @@ namespace internal
       Assert (&dof_handler.get_fe() != 0,
               ExcMessage ("No finite element collection is associated with "
                           "this DoFHandler"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
       Assert (local_index < dof_handler.get_fe()[fe_index].dofs_per_hex,
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_hex));
@@ -837,6 +853,8 @@ namespace internal
       Assert (fe_index != ::hp::DoFHandler<dim>::default_fe_index,
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
 
                                        // make sure we are on an
                                        // object for which DoFs have
