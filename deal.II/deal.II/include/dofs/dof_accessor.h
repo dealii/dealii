@@ -20,16 +20,19 @@
 #include <dofs/hp_dof_handler.h>
 #include <vector>
 
+
 template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
 template <typename number> class Vector;
 
-template <int dim> class DoFHandler;
-namespace hp
-{
-  template <int dim> class DoFHandler;
-}
-template <int dim> class FiniteElement;
+//TODO: Find a way to avoid the specializations in the end and get rid of dof_handler include files.
+
+// template <int dim> class DoFHandler;
+// namespace hp
+// {
+//   template <int dim> class DoFHandler;
+// }
+// template <int dim> class FiniteElement;
 
 template <int celldim, class DH> class DoFObjectAccessor;
 
