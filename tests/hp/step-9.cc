@@ -508,22 +508,15 @@ void AdvectionProblem<dim>::refine_grid ()
 template <int dim>
 void AdvectionProblem<dim>::output_results (const unsigned int cycle) const
 {
-  std::string filename = "grid-";
-  filename += ('0' + cycle);
-  Assert (cycle < 10, ExcInternalError());
-  
-  filename += ".eps";
-  std::ofstream output (filename.c_str());
-
   GridOut grid_out;
-  grid_out.write_eps (triangulation, output);
+  grid_out.write_eps (triangulation, deallog.get_file_stream());
 }
 
 
 template <int dim>
 void AdvectionProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<6; ++cycle)
+  for (unsigned int cycle=0; cycle<3; ++cycle)
     {
       deallog << "Cycle " << cycle << ':' << std::endl;
 
@@ -558,8 +551,7 @@ void AdvectionProblem<dim>::run ()
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
   
-  std::ofstream output ("final-solution.gmv");
-  data_out.write_gmv (output);
+  data_out.write_gmv (deallog.get_file_stream());
 }
 
 
