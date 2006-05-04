@@ -17,6 +17,8 @@
 #include <dofs/hp_dof_handler.h>
 #include <fe/fe_collection.h>
 
+//TODO[WB]: make a few of these functions inline
+
 
 namespace internal
 {

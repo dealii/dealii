@@ -19,6 +19,8 @@
 #include <fe/fe.h>
 
 
+//TODO[WB]: make a few of these functions inline
+
 namespace internal
 {
   namespace DoFHandler
