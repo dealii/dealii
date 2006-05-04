@@ -45,6 +45,14 @@ namespace internal
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_line));
 
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (line_dof_offsets[line_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+      
                                        // if we are in 1d, then the
                                        // only set of indices we store
                                        // is the one for the cell,
@@ -109,6 +117,14 @@ namespace internal
       Assert (local_index < dof_handler.get_fe()[fe_index].dofs_per_line,
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_line));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (line_dof_offsets[line_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
 
                                        // if we are in 1d, then the
                                        // only set of indices we store
@@ -178,6 +194,14 @@ namespace internal
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_quad));
 
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (quad_dof_offsets[quad_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
                                        // if we are in 1d, then the
                                        // only set of indices we store
                                        // is the one for the cell,
@@ -243,6 +267,14 @@ namespace internal
       Assert (local_index < dof_handler.get_fe()[fe_index].dofs_per_quad,
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_quad));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (quad_dof_offsets[quad_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
 
                                        // if we are in 1d, then the
                                        // only set of indices we store
@@ -312,6 +344,14 @@ namespace internal
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_hex));
 
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (hex_dof_offsets[hex_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
                                        // if we are in 1d, then the
                                        // only set of indices we store
                                        // is the one for the cell,
@@ -377,6 +417,14 @@ namespace internal
       Assert (local_index < dof_handler.get_fe()[fe_index].dofs_per_hex,
               ExcIndexRange(local_index, 0,
                             dof_handler.get_fe()[fe_index].dofs_per_hex));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (hex_dof_offsets[hex_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
 
                                        // if we are in 1d, then the
                                        // only set of indices we store
