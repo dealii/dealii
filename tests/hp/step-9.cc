@@ -506,7 +506,7 @@ void AdvectionProblem<dim>::refine_grid ()
 
 
 template <int dim>
-void AdvectionProblem<dim>::output_results (const unsigned int cycle) const
+void AdvectionProblem<dim>::output_results (const unsigned int) const
 {
   GridOut grid_out;
   grid_out.write_eps (triangulation, deallog.get_file_stream());
