@@ -112,6 +112,21 @@ namespace hp
       unsigned int size () const;
     
                                        /**
+                                        * Return the maximum number of
+                                        * quadrature points over all
+                                        * the elements of the
+                                        * collection. This is mostly
+                                        * useful to initialize arrays
+                                        * to allocate the maxmimum
+                                        * amount of memory that may be
+                                        * used when re-sizing later on
+                                        * to a articular quadrature
+                                        * formula from within this
+                                        * collection.
+                                        */
+      unsigned int max_n_quadrature_points () const;
+      
+                                       /**
                                         * Determine an estimate for the
                                         * memory consumption (in bytes)
                                         * of this object.
@@ -142,6 +157,24 @@ namespace hp
   QCollection<dim>::size () const 
   {
     return quadratures.size();
+  }
+
+
+
+  template <int dim>
+  inline
+  unsigned int
+  QCollection<dim>::max_n_quadrature_points () const 
+  {
+    Assert (quadratures.size() > 0,
+            ExcMessage ("You can't call this function for an empty collection"));
+    
+    unsigned int m = 0;
+    for (unsigned int i=0; i<quadratures.size(); ++i)
+      if (quadratures[i]->n_quadrature_points > m)
+        m = quadratures[i]->n_quadrature_points;
+    
+    return m;
   }
 
 
