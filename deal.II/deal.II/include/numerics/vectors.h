@@ -34,6 +34,8 @@ template <int dim> class DoFHandler;
 namespace hp
 {
   template <int dim> class DoFHandler;
+  template <int dim> class MappingCollection;
+  template <int dim> class QCollection;
 }
 class ConstraintMatrix;
 
@@ -925,6 +927,32 @@ class VectorTools
 				      const Function<dim>   *weight=0,
 				      const double exponent = 2.);
 
+    template <int dim, class InVector, class OutVector>
+    static void integrate_difference (const hp::MappingCollection<dim>    &mapping,
+				      const hp::DoFHandler<dim> &dof,
+				      const InVector        &fe_function,
+				      const Function<dim>   &exact_solution,
+				      OutVector             &difference,
+				      const hp::QCollection<dim> &q,
+				      const NormType        &norm,
+				      const Function<dim>   *weight=0,
+				      const double exponent = 2.);
+
+				     /**
+				      * Calls the @p integrate_difference
+				      * function, see above, with
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
+				      */
+    template <int dim, class InVector, class OutVector>
+    static void integrate_difference (const hp::DoFHandler<dim> &dof,
+				      const InVector        &fe_function,
+				      const Function<dim>   &exact_solution,
+				      OutVector             &difference,
+				      const hp::QCollection<dim> &q,
+				      const NormType        &norm,
+				      const Function<dim>   *weight=0,
+				      const double exponent = 2.);
+    
 				     /**
 				      * Point error evaluation. Find
 				      * the first cell containing the

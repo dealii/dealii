@@ -81,6 +81,49 @@ void VectorTools::integrate_difference<deal_II_dimension>
  const double);
 
 template
+void VectorTools::integrate_difference<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const VEC&,
+ const Function<deal_II_dimension>&,
+ Vector<double>&,
+ const hp::QCollection<deal_II_dimension>&,
+ const NormType&,
+ const Function<deal_II_dimension>*,
+ const double);
+template
+void VectorTools::integrate_difference<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const VEC&,
+ const Function<deal_II_dimension>&,
+ Vector<float>&,
+ const hp::QCollection<deal_II_dimension>&,
+ const NormType&,
+ const Function<deal_II_dimension>*,
+ const double);
+template
+void VectorTools::integrate_difference<deal_II_dimension>
+(const hp::MappingCollection<deal_II_dimension>&,
+ const hp::DoFHandler<deal_II_dimension>&,
+ const VEC&,
+ const Function<deal_II_dimension>&,
+ Vector<double>&,
+ const hp::QCollection<deal_II_dimension>&,
+ const NormType&,
+ const Function<deal_II_dimension>*,
+ const double);
+template
+void VectorTools::integrate_difference<deal_II_dimension>
+(const hp::MappingCollection<deal_II_dimension>&,
+ const hp::DoFHandler<deal_II_dimension>&,
+ const VEC&,
+ const Function<deal_II_dimension>&,
+ Vector<float>&,
+ const hp::QCollection<deal_II_dimension>&,
+ const NormType&,
+ const Function<deal_II_dimension>*,
+ const double);
+
+template
 void VectorTools::point_difference<deal_II_dimension> (
   const DoFHandler<deal_II_dimension>&,
   const VEC&,
