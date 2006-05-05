@@ -104,7 +104,7 @@ namespace internal
 template <int dim>
 class DoFHandler  :  public Subscriptor
 {
-    typedef internal::DoFIteratorSelector<DoFHandler<dim> > IteratorSelector;
+    typedef DoFIterators<DoFHandler<dim> > IteratorSelector;
   public:
     typedef typename IteratorSelector::raw_line_iterator    raw_line_iterator;
     typedef typename IteratorSelector::line_iterator        line_iterator;
