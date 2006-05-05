@@ -1657,6 +1657,7 @@ namespace internal
 
 
 #if deal_II_dimension == 1
+    static
     void
     do_make_hanging_node_constraints (const ::DoFHandler<1> &,
 				      ConstraintMatrix    &,
@@ -1667,6 +1668,7 @@ namespace internal
     }
 
 
+    static
     void
     do_make_hanging_node_constraints (const ::hp::DoFHandler<1> &/*dof_handler*/,
 				      ConstraintMatrix        &/*constraints*/,
@@ -1683,6 +1685,7 @@ namespace internal
 
 #if deal_II_dimension == 2
     template <class DH>
+    static
     void
     do_make_hanging_node_constraints (const DH         &dof_handler,
 				      ConstraintMatrix &constraints,
@@ -1829,6 +1832,7 @@ namespace internal
 
 #if deal_II_dimension == 3
     template <class DH>
+    static
     void
     do_make_hanging_node_constraints (const DH         &dof_handler,
 				      ConstraintMatrix &constraints,
