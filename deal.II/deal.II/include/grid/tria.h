@@ -375,7 +375,7 @@ namespace internal
  *  
  *  The Triangulation class provides iterator which enable looping over all
  *  lines, cells, etc without knowing the exact representation used to
- *  describe them. Their names are typedefs imported from the IteratorSelector
+ *  describe them. Their names are typedefs imported from the Iterators
  *  class (thus making them local types to this class) and are as follows:
  *
  *  <ul>
@@ -1177,7 +1177,7 @@ class Triangulation : public Subscriptor
 				      * the definition of the iterator
 				      * classes simpler.
 				      */
-    typedef internal::TriaIteratorSelector<dim> IteratorSelector;
+    typedef internal::TriaIterators<dim> IteratorSelector;
 		      
   public:
     
