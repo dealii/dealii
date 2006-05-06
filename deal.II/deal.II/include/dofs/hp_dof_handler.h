@@ -60,7 +60,7 @@ namespace hp
   class DoFHandler : public Subscriptor,
                      protected Triangulation<dim>::RefinementListener
   {
-      typedef internal::DoFIterators<DoFHandler<dim> > IteratorSelector;
+      typedef internal::DoFHandler::Iterators<DoFHandler<dim> > IteratorSelector;
     public:
       typedef typename IteratorSelector::raw_line_iterator raw_line_iterator;
       typedef typename IteratorSelector::line_iterator line_iterator;

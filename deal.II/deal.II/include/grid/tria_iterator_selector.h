@@ -28,7 +28,8 @@ template <int dim, typename Accessor> class TriaActiveIterator;
 
 namespace internal 
 {
-
+  namespace Triangulation
+  {
 /**
  * Definition of the iterator types of the Triangulation.
  *
@@ -39,44 +40,44 @@ namespace internal
  *
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 2006
  */
-  template <int dim>
-  struct TriaIterators
-  {
-				       /// Iterate on raw lines
-      typedef TriaRawIterator<dim,TriaObjectAccessor<1, dim> > raw_line_iterator;
-				       /// Iterate on raw lines
-      typedef TriaIterator<dim,TriaObjectAccessor<1, dim> > line_iterator;
-				       /// Iterate on raw lines
-      typedef TriaActiveIterator<dim,TriaObjectAccessor<1, dim> > active_line_iterator;
+    template <int dim>
+    struct Iterators
+    {
+                                         /// Iterate on raw lines
+        typedef TriaRawIterator<dim,TriaObjectAccessor<1, dim> > raw_line_iterator;
+                                         /// Iterate on raw lines
+        typedef TriaIterator<dim,TriaObjectAccessor<1, dim> > line_iterator;
+                                         /// Iterate on raw lines
+        typedef TriaActiveIterator<dim,TriaObjectAccessor<1, dim> > active_line_iterator;
     
-				       /// Iterate on raw quadrilaterals
-      typedef TriaRawIterator<dim,TriaObjectAccessor<2, dim> > raw_quad_iterator;
-				       /// Iterate on quadrilaterals
-      typedef TriaIterator<dim,TriaObjectAccessor<2, dim> > quad_iterator;
-				       /// Iterate on active quadrilaterals
-      typedef TriaActiveIterator<dim,TriaObjectAccessor<2, dim> > active_quad_iterator;
+                                         /// Iterate on raw quadrilaterals
+        typedef TriaRawIterator<dim,TriaObjectAccessor<2, dim> > raw_quad_iterator;
+                                         /// Iterate on quadrilaterals
+        typedef TriaIterator<dim,TriaObjectAccessor<2, dim> > quad_iterator;
+                                         /// Iterate on active quadrilaterals
+        typedef TriaActiveIterator<dim,TriaObjectAccessor<2, dim> > active_quad_iterator;
 
-				       /// Iterate on raw hexahedra
-      typedef TriaRawIterator<dim,TriaObjectAccessor<3, dim> > raw_hex_iterator;
-				       /// Iterate on hexahedra
-      typedef TriaIterator<dim,TriaObjectAccessor<3, dim> > hex_iterator;
-				       /// Iterate on active hexahedra
-      typedef TriaActiveIterator<dim,TriaObjectAccessor<3, dim> > active_hex_iterator;
+                                         /// Iterate on raw hexahedra
+        typedef TriaRawIterator<dim,TriaObjectAccessor<3, dim> > raw_hex_iterator;
+                                         /// Iterate on hexahedra
+        typedef TriaIterator<dim,TriaObjectAccessor<3, dim> > hex_iterator;
+                                         /// Iterate on active hexahedra
+        typedef TriaActiveIterator<dim,TriaObjectAccessor<3, dim> > active_hex_iterator;
 
-				       /// Iterate on raw cells
-      typedef TriaRawIterator<dim,CellAccessor<dim> > raw_cell_iterator;
-				       /// Iterate on cells
-      typedef TriaIterator<dim,CellAccessor<dim> > cell_iterator;
-				       /// Iterate on active cells
-      typedef TriaActiveIterator<dim,CellAccessor<dim> > active_cell_iterator;
+                                         /// Iterate on raw cells
+        typedef TriaRawIterator<dim,CellAccessor<dim> > raw_cell_iterator;
+                                         /// Iterate on cells
+        typedef TriaIterator<dim,CellAccessor<dim> > cell_iterator;
+                                         /// Iterate on active cells
+        typedef TriaActiveIterator<dim,CellAccessor<dim> > active_cell_iterator;
 
-				       /// Iterate on raw faces
-      typedef TriaRawIterator<dim,TriaObjectAccessor<dim-1, dim> > raw_face_iterator;
-				       /// Iterate on faces
-      typedef TriaIterator<dim,TriaObjectAccessor<dim-1, dim> > face_iterator;
-				       /// Iterate on active faces
-      typedef TriaActiveIterator<dim,TriaObjectAccessor<dim-1, dim> > active_face_iterator;
-  };
+                                         /// Iterate on raw faces
+        typedef TriaRawIterator<dim,TriaObjectAccessor<dim-1, dim> > raw_face_iterator;
+                                         /// Iterate on faces
+        typedef TriaIterator<dim,TriaObjectAccessor<dim-1, dim> > face_iterator;
+                                         /// Iterate on active faces
+        typedef TriaActiveIterator<dim,TriaObjectAccessor<dim-1, dim> > active_face_iterator;
+    };
 
 
 
@@ -108,29 +109,29 @@ namespace internal
  *
  * @author Wolfgang Bangerth, 1998
  */
-  template <>
-  struct TriaIterators<1>
-  {
-      typedef TriaRawIterator<1,CellAccessor<1> >    raw_line_iterator;
-      typedef TriaIterator<1,CellAccessor<1> >       line_iterator;
-      typedef TriaActiveIterator<1,CellAccessor<1> > active_line_iterator;
+    template <>
+    struct Iterators<1>
+    {
+        typedef TriaRawIterator<1,CellAccessor<1> >    raw_line_iterator;
+        typedef TriaIterator<1,CellAccessor<1> >       line_iterator;
+        typedef TriaActiveIterator<1,CellAccessor<1> > active_line_iterator;
 
-      typedef void * raw_quad_iterator;
-      typedef void * quad_iterator;
-      typedef void * active_quad_iterator;
+        typedef void * raw_quad_iterator;
+        typedef void * quad_iterator;
+        typedef void * active_quad_iterator;
 
-      typedef void * raw_hex_iterator;
-      typedef void * hex_iterator;
-      typedef void * active_hex_iterator;
+        typedef void * raw_hex_iterator;
+        typedef void * hex_iterator;
+        typedef void * active_hex_iterator;
 
-      typedef raw_line_iterator    raw_cell_iterator;
-      typedef line_iterator        cell_iterator;
-      typedef active_line_iterator active_cell_iterator;
+        typedef raw_line_iterator    raw_cell_iterator;
+        typedef line_iterator        cell_iterator;
+        typedef active_line_iterator active_cell_iterator;
 
-      typedef void * raw_face_iterator;
-      typedef void * face_iterator;
-      typedef void * active_face_iterator;
-  };
+        typedef void * raw_face_iterator;
+        typedef void * face_iterator;
+        typedef void * active_face_iterator;
+    };
 
 
 
@@ -168,29 +169,29 @@ namespace internal
  *
  * @author Wolfgang Bangerth, 1998
  */
-  template <>
-  struct TriaIterators<2>
-  {
-      typedef TriaRawIterator<2,TriaObjectAccessor<1, 2> >    raw_line_iterator;
-      typedef TriaIterator<2,TriaObjectAccessor<1, 2> >       line_iterator;
-      typedef TriaActiveIterator<2,TriaObjectAccessor<1, 2> > active_line_iterator;
+    template <>
+    struct Iterators<2>
+    {
+        typedef TriaRawIterator<2,TriaObjectAccessor<1, 2> >    raw_line_iterator;
+        typedef TriaIterator<2,TriaObjectAccessor<1, 2> >       line_iterator;
+        typedef TriaActiveIterator<2,TriaObjectAccessor<1, 2> > active_line_iterator;
     
-      typedef TriaRawIterator<2,CellAccessor<2> >    raw_quad_iterator;
-      typedef TriaIterator<2,CellAccessor<2> >       quad_iterator;
-      typedef TriaActiveIterator<2,CellAccessor<2> > active_quad_iterator;
+        typedef TriaRawIterator<2,CellAccessor<2> >    raw_quad_iterator;
+        typedef TriaIterator<2,CellAccessor<2> >       quad_iterator;
+        typedef TriaActiveIterator<2,CellAccessor<2> > active_quad_iterator;
 
-      typedef void * raw_hex_iterator;
-      typedef void * hex_iterator;
-      typedef void * active_hex_iterator;
+        typedef void * raw_hex_iterator;
+        typedef void * hex_iterator;
+        typedef void * active_hex_iterator;
 
-      typedef raw_quad_iterator    raw_cell_iterator;
-      typedef quad_iterator        cell_iterator;
-      typedef active_quad_iterator active_cell_iterator;
+        typedef raw_quad_iterator    raw_cell_iterator;
+        typedef quad_iterator        cell_iterator;
+        typedef active_quad_iterator active_cell_iterator;
 
-      typedef raw_line_iterator    raw_face_iterator;
-      typedef line_iterator        face_iterator;
-      typedef active_line_iterator active_face_iterator;    
-  };
+        typedef raw_line_iterator    raw_face_iterator;
+        typedef line_iterator        face_iterator;
+        typedef active_line_iterator active_face_iterator;    
+    };
 
 
 
@@ -199,7 +200,7 @@ namespace internal
  *  These are the declararions for the 3D case only.
  *
  *  For the declarations of the data types, more or less the same holds
- *  as for lower dimensions (see <tt>TriaIterators<[12]></tt>). The
+ *  as for lower dimensions (see <tt>Iterators<[12]></tt>). The
  *  dimension specific data types are here, since we are in three dimensions:
  *  @verbatim
  *    typedef raw_hex_iterator    raw_cell_iterator;
@@ -213,30 +214,31 @@ namespace internal
  *
  * @author Wolfgang Bangerth, 1998
  */
-  template <>
-  struct TriaIterators<3>
-  {
-      typedef TriaRawIterator<3,TriaObjectAccessor<1, 3> >    raw_line_iterator;
-      typedef TriaIterator<3,TriaObjectAccessor<1, 3> >       line_iterator;
-      typedef TriaActiveIterator<3,TriaObjectAccessor<1, 3> > active_line_iterator;
+    template <>
+    struct Iterators<3>
+    {
+        typedef TriaRawIterator<3,TriaObjectAccessor<1, 3> >    raw_line_iterator;
+        typedef TriaIterator<3,TriaObjectAccessor<1, 3> >       line_iterator;
+        typedef TriaActiveIterator<3,TriaObjectAccessor<1, 3> > active_line_iterator;
     
-      typedef TriaRawIterator<3,TriaObjectAccessor<2, 3> >    raw_quad_iterator;
-      typedef TriaIterator<3,TriaObjectAccessor<2, 3> >       quad_iterator;
-      typedef TriaActiveIterator<3,TriaObjectAccessor<2, 3> > active_quad_iterator;
+        typedef TriaRawIterator<3,TriaObjectAccessor<2, 3> >    raw_quad_iterator;
+        typedef TriaIterator<3,TriaObjectAccessor<2, 3> >       quad_iterator;
+        typedef TriaActiveIterator<3,TriaObjectAccessor<2, 3> > active_quad_iterator;
 
-      typedef TriaRawIterator<3,CellAccessor<3> >    raw_hex_iterator;
-      typedef TriaIterator<3,CellAccessor<3> >       hex_iterator;
-      typedef TriaActiveIterator<3,CellAccessor<3> > active_hex_iterator;
+        typedef TriaRawIterator<3,CellAccessor<3> >    raw_hex_iterator;
+        typedef TriaIterator<3,CellAccessor<3> >       hex_iterator;
+        typedef TriaActiveIterator<3,CellAccessor<3> > active_hex_iterator;
 
-      typedef raw_hex_iterator    raw_cell_iterator;
-      typedef hex_iterator        cell_iterator;
-      typedef active_hex_iterator active_cell_iterator;
+        typedef raw_hex_iterator    raw_cell_iterator;
+        typedef hex_iterator        cell_iterator;
+        typedef active_hex_iterator active_cell_iterator;
 
-      typedef raw_quad_iterator    raw_face_iterator;
-      typedef quad_iterator        face_iterator;
-      typedef active_quad_iterator active_face_iterator;    
-  };
-
+        typedef raw_quad_iterator    raw_face_iterator;
+        typedef quad_iterator        face_iterator;
+        typedef active_quad_iterator active_face_iterator;    
+    };
+  
+  }
   
 }
 

@@ -1177,7 +1177,7 @@ class Triangulation : public Subscriptor
 				      * the definition of the iterator
 				      * classes simpler.
 				      */
-    typedef internal::TriaIterators<dim> IteratorSelector;
+    typedef internal::Triangulation::Iterators<dim> IteratorSelector;
 		      
   public:
     
