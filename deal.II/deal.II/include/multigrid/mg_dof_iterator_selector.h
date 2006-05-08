@@ -24,6 +24,10 @@ template <int dim>              class MGDoFObjectAccessor<2, dim>;
 template <int dim>              class MGDoFObjectAccessor<3, dim>;
 template <int dim> class MGDoFCellAccessor;
 
+template <int dim, typename Accessor> class TriaRawIterator;
+template <int dim, typename Accessor> class TriaIterator;
+template <int dim, typename Accessor> class TriaActiveIterator;
+
 
 namespace internal
 {
