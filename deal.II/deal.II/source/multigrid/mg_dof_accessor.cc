@@ -33,8 +33,8 @@ template <int structdim, int dim>
 MGDoFAccessor<structdim, dim>::MGDoFAccessor ()
 		:
 		BaseClass (0,
-			   deal_II_numbers::invalid_unsigned_int,
-			   deal_II_numbers::invalid_unsigned_int,
+			   static_cast<int>(deal_II_numbers::invalid_unsigned_int),
+			   static_cast<int>(deal_II_numbers::invalid_unsigned_int),
 			   0),
 		mg_dof_handler(0)
 {
