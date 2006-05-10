@@ -45,7 +45,7 @@ namespace
    {
       return container.get_tria();
    }
-};
+}
 
 #if deal_II_dimension != 1
 
