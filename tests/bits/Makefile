@@ -51,6 +51,8 @@ tests_x = geometry_info_* \
 	  mapping_cartesian_1 \
 	  mapping_q4_3d \
 	  q_points \
+	  find_closest_vertex_* \
+	  find_cells_adjacent_to_vertex_* \
           find_cell_* \
           sparsity_pattern_* \
           sparse_matrix_* \

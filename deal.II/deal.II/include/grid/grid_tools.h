@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <fe/mapping.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
@@ -194,9 +195,51 @@ class GridTools
 		Triangulation<dim> &triangulation);
 
                                      /**
+                                      * Find and return the number of
+                                      * the used vertex in a given
+                                      * Container that is located closest
+                                      * to a given point @p p. The
+                                      * type of the first parameter
+                                      * may be either Triangulation,
+                                      * DoFHandler, hp::DoFHandler, or
+                                      * MGDoFHandler.
+                                      *
+                                      * @author Ralf B. Schulz, 2006
+                                      */
+    template <int dim, template <int> class Container>
+    static
+    unsigned int
+    find_closest_vertex (const Container<dim> &container,
+                         const Point<dim>     &p);
+
+                                     /**
+                                      * Find and return a vector of
+                                      * iterators to active cells that
+                                      * surround a given vertex @p vertex.
+                                      * The type of the first parameter
+                                      * may be either Triangulation,
+                                      * DoFHandler, hp::DoFHandler, or
+                                      * MGDoFHandler.
+                                      *
+                                      * For locally refined grids, the
+                                      * vertex itself might not be a vertex
+                                      * of all adjacent cells, but will
+                                      * always be located on a face or an
+                                      * edge of the adjacent cells returned.
+                                      *
+                                      * @author Ralf B. Schulz,
+                                      * Wolfgang Bangert, 2006
+                                      */
+   template<int dim, template<int dim> class Container>
+   static
+   std::vector<typename Container<dim>::active_cell_iterator>
+   find_cells_adjacent_to_vertex(const Container<dim> &container,
+                                 const unsigned int    vertex);
+
+                                     /**
                                       * Find and return an iterator to
                                       * the active cell that surrounds
-                                      * a given point @p ref. The
+                                      * a given point @p p. The
                                       * type of the first parameter
                                       * may be either
                                       * Triangulation,
@@ -282,6 +325,69 @@ class GridTools
     typename Container::active_cell_iterator
     find_active_cell_around_point (const Container  &container,
                                    const Point<dim> &p);
+
+                                     /**
+                                      * Find and return an iterator to
+                                      * the active cell that surrounds
+                                      * a given point @p p. The
+                                      * type of the first parameter
+                                      * may be either
+                                      * Triangulation,
+                                      * DoFHandler, hp::DoFHandler, or
+                                      * MGDoFHandler, i.e. we
+                                      * can find the cell around a
+                                      * point for iterators into each
+                                      * of these classes.
+                                      *
+                                      * This function works with
+                                      * arbitrary boundary mappings,
+                                      * using a different algorithm than
+                                      * the version of this function above.
+                                      * The algorithm used in this
+                                      * function proceeds by first
+                                      * looking for the vertex that is
+                                      * closest to the given point,
+                                      * using find_closest_vertex().
+                                      * Then, only in adjacent cells
+                                      * to this vertex it is checked
+                                      * whether or not the point is
+                                      * inside a given cell.
+                                      *
+                                      * The function returns an iterator
+                                      * to the cell, as well as the local
+                                      * position of the point inside
+                                      * the unit cell. This local position
+                                      * might be located slightly outside
+                                      * an actual unit cell.
+                                      *
+                                      * If a point lies on the
+                                      * boundary of two or more cells,
+                                      * then the algorithm returns
+                                      * the cell (A) in which the local
+                                      * coordinate is exactly within the
+                                      * unit cell (however, for most
+                                      * cases, on the boundary the unit
+                                      * cell position will be located
+                                      * slightly outside the unit cell)
+                                      * or (B) the cell of highest
+                                      * refinement level; and if there
+                                      * are several cells of the same
+                                      * refinement level, then it returns
+                                      * (C) the one with the lowest distance
+                                      * to the actual unit cell.
+                                      *
+                                      * However, if you are trying
+                                      * to locate a vertex, and if the vertex
+                                      * can be matched exactly to a cell,
+                                      * it is not guaranteed that the most
+                                      * refined cell will be returned.
+                                      */
+    template <int dim, template<int> class Container>
+    static
+    std::pair<typename Container<dim>::active_cell_iterator, Point<dim> >
+    find_active_cell_around_point (const Mapping<dim>   &mapping,
+                                   const Container<dim> &container,
+                                   const Point<dim>     &p);
 
                                      /**
                                       * Use the METIS partitioner to generate
@@ -494,6 +600,11 @@ class GridTools
 		    << "The point <" << arg1
                     << "> could not be found inside any of the "
                     << "subcells of a coarse grid cell.");
+
+    DeclException1 (ExcVertexNotUsed,
+		    unsigned int,
+		    << "The given vertex " << arg1
+		    << " is not used in the given triangulation");
 };
 
 

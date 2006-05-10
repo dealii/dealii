@@ -290,6 +290,17 @@ inconvenience this causes.
 
 <ol>
 
+  <li> <p> New: <code class="class">GeometryInfo</code> offers several new functions,
+  <code>is_inside_unit_cell</code> with an epsilon parameter to specify allowable
+  offsets from the actual unit cell, <code>distance_to_unit_cell</code> returning the
+  infinity norm of the distance of a given point to the unit cell, and
+  <code>project_to_unit_cell</code> returning the projection of a point onto the unit
+  cell. Also, a new member <code>vertex_to_face</code> allow to determine to which
+  faces of a cell a vertex belongs.
+  <br>
+  (Ralf B. Schulz 2006/05/10)
+  </p>
+
   <li> <p> Improved: <code class="class">DataOutBase</code>::<code
   class="member">OutputFormat</code> has a new value <tt>none</tt>, writing no
   output at all. This way, the writing of output files can be controlled more
@@ -635,6 +646,21 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p>
+       New: In <code>GridTools</code>, several functions have been added.
+       <code>GridTools::find_closest_vertex</code> searches for the vertex
+       located at closest distance to a given point. <code>
+       GridTools::find_cells_adjacent_to_vertex</code> allows to determine
+       all cells adjacent to a given vertex. And finally, a new version of
+       <code>find_active_cell_around_point</code>, which takes additionally
+       a mapping as parameter, implements a new and faster algorithm to
+       determine the active cell in which a given point is located. For
+       points located on boundaries and edges, it is in most cases also able
+       to give the finest cell.
+       <br> 
+       (Ralf B. Schulz 2006/05/10)
+       </p>
+
   <li> <p>
        Changed: The <code>DoFObjectAccessor::get_dof_values</code> and
        <code>DoFObjectAccessor::set_dof_values</code> were part of the

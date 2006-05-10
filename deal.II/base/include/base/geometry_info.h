@@ -656,8 +656,21 @@ struct GeometryInfo
 				      * \end{verbatim}
 				      */
     static const unsigned int dx_to_deal[vertices_per_cell];
-    
-				     /**
+
+
+                                     /**
+				      * This field stores for each vertex
+                                      * to which faces it belongs. In any
+                                      * given dimension, the number of
+                                      * faces is equal to the dimension.
+                                      * The first index in this 2D-array
+                                      * runs over all vertices, the second
+                                      * index over @p dim faces to which
+                                      * the vertex belongs
+                                      */
+    static const unsigned int vertex_to_face[vertices_per_cell][dim];
+   
+                                     /**
 				      * This field stores which child
 				      * cells are adjacent to a
 				      * certain face of the mother
@@ -855,6 +868,37 @@ struct GeometryInfo
     static bool is_inside_unit_cell (const Point<dim> &p);
     
 				     /**
+				      * Return true if the given point
+				      * is inside the unit cell of the
+				      * present space dimension. This
+                                      * function accepts an additional
+                                      * parameter which specifies how
+                                      * much the point position may
+                                      * actually deviate from a true
+                                      * unit cell (may be less than zero)
+				      */
+    static bool is_inside_unit_cell (const Point<dim> &p,
+                                     const double eps);
+
+				     /**
+				      * Projects a given point onto the
+                                      * unit cell, i.e. each coordinate
+                                      * outside [0..1] is modified
+                                      * to lie within that interval
+				      */
+    static void project_to_unit_cell (Point<dim> &p);
+
+                                     /**
+                                      * Returns the infinity norm of
+                                      * the vector between a given point @p p
+                                      * outside the unit cell to the closest
+                                      * unit cell boundary.
+                                      * For points inside the cell, this is
+                                      * defined as zero.
+                                      */
+    static double distance_to_unit_cell(Point<dim> &p);
+
+                                     /**
 				      * For each face of the reference
 				      * cell, this field stores the
 				      * coordinate direction in which
@@ -1129,6 +1173,39 @@ GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p)
   return (p[0] >= 0.) && (p[0] <= 1.) &&
 	 (p[1] >= 0.) && (p[1] <= 1.) &&
 	 (p[2] >= 0.) && (p[2] <= 1.);
+}
+
+template <>
+inline
+bool
+GeometryInfo<1>::is_inside_unit_cell (const Point<1> &p, const double eps)
+{
+  return (p[0] >= -eps) && (p[0] <= 1.+eps);
+}
+
+
+
+template <>
+inline
+bool
+GeometryInfo<2>::is_inside_unit_cell (const Point<2> &p, const double eps)
+{
+  const double l = -eps, u = 1+eps;
+  return (p[0] >= l) && (p[0] <= u) &&
+	 (p[1] >= l) && (p[1] <= u);
+}
+
+
+
+template <>
+inline
+bool
+GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p, const double eps)
+{
+  const double l = -eps, u = 1.0+eps;
+  return (p[0] >= l) && (p[0] <= u) &&
+	 (p[1] >= l) && (p[1] <= u) &&
+	 (p[2] >= l) && (p[2] <= u);
 }
 
 #endif // DOXYGEN

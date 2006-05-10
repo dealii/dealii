@@ -29,6 +29,24 @@
 #include <cmath>
 
 
+// This anonymous namespace contains utility functions to extract the
+// triangulation from any container such as DoFHandler, MGDoFHandler,
+// and the like
+namespace
+{
+   template<int dim>
+   const Triangulation<dim> &get_tria(const Triangulation<dim> &tria)
+   {
+      return tria;
+   }
+
+   template<int dim, template<int> class Container>
+   const Triangulation<dim> &get_tria(const Container<dim> &container)
+   {
+      return container.get_tria();
+   }
+};
+
 #if deal_II_dimension != 1
 
 template <int dim>
@@ -400,6 +418,122 @@ GridTools::scale (const double        scaling_factor,
 }
 
 
+template <int dim, template <int> class Container>
+unsigned int
+GridTools::find_closest_vertex (const Container<dim> &container,
+                                const Point<dim> &p)
+{
+                                   // first get the underlying
+                                   // triangulation from the
+                                   // container and determine vertices
+                                   // and used vertices
+   const Triangulation<dim> &tria = get_tria(container);
+
+   const std::vector< Point<dim> > &vertices = tria.get_vertices();
+   const std::vector< bool       > &used     = tria.get_used_vertices();
+
+                                   // At the beginning, the first
+                                   // used vertex is the closest one
+   std::vector<bool>::const_iterator first =
+      std::find(used.begin(), used.end(), true);
+
+                                   // Assert that at least one vertex
+                                   // is actually used
+   Assert(first != used.end(), ExcInternalError());
+   
+   unsigned int best_vertex = std::distance(used.begin(), first);
+   double       best_dist   = (p - vertices[best_vertex]).square();
+
+                                   // For all remaining vertices, test
+                                   // whether they are any closer
+   for(unsigned int j = best_vertex+1; j < vertices.size(); j++)
+      if(used[j])
+         {
+            double dist = (p - vertices[j]).square();
+            if(dist < best_dist)
+               {
+                  best_vertex = j;
+                  best_dist   = dist;
+               }
+         }
+
+   return best_vertex;
+}
+
+
+template<int dim, template<int> class Container>
+std::vector<typename Container<dim>::active_cell_iterator>
+GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
+                                         const unsigned int    vertex)
+{
+                                   // make sure that the given vertex is
+                                   // an active vertex of the underlying
+                                   // triangulation
+   Assert(vertex < get_tria(container).n_vertices(),
+          ExcIndexRange(0,get_tria(container).n_vertices(),vertex));
+   Assert(get_tria(container).get_used_vertices()[vertex],
+          ExcVertexNotUsed(vertex));
+
+   std::vector<typename Container<dim>::active_cell_iterator> adjacent_cells;
+   
+   typename Container<dim>::active_cell_iterator
+      cell = container.begin_active(),
+      endc = container.end();
+   
+                                   // go through all active cells and look
+                                   // if the vertex is part of that cell
+   for(; cell != endc; ++cell)
+      for(unsigned v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
+         if(cell->vertex_index(v) == (int)vertex)
+            {
+                                   // OK, we found a cell that contains
+                                   // the particular vertex. We add it
+                                   // to the list.
+               adjacent_cells.push_back(cell);
+
+                                   // Now we need to make sure that the
+                                   // vertex is not a locally refined
+                                   // vertex not being part of the
+                                   // neighboring cells. So we loop over
+                                   // all faces to which this vortex
+                                   // belongs, check the level of
+                                   // the neighbor, and if it is coarser,
+                                   // then check whether the vortex is
+                                   // part of that neighbor or not.
+               for(unsigned vface = 0; vface < dim; vface++)
+                  {
+                     const unsigned face =
+                        GeometryInfo<dim>::vertex_to_face[v][vface];
+                     if(!cell->at_boundary(face)) {
+                        typename Container<dim>::cell_iterator
+                           nb = cell->neighbor(face);
+                        
+                                   // Here we check whether the neighbor
+                                   // is coarser. If it is, we search for
+                                   // the vertex in this coarser cell and
+                                   // only if not found we will add the
+                                   // coarser cell itself
+                           if(nb->level() < cell->level()) {
+                              bool found = false;
+                              for(unsigned v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
+                                 if(cell->vertex_index(v) == (int)vertex) {
+                                    found = true;
+                                    break;
+                                 }
+                              if(!found)
+                                 adjacent_cells.push_back(nb);
+                           }
+                     }
+                  }
+               
+               break;
+            }
+
+   Assert(adjacent_cells.size() > 0, ExcInternalError());
+   
+   return adjacent_cells;
+}  
+
 
 template <int dim, typename Container>
 typename Container::active_cell_iterator
@@ -447,6 +581,66 @@ GridTools::find_active_cell_around_point (const Container  &container,
   return cell;
 }
 
+
+template <int dim, template <int> class Container>
+std::pair<typename Container<dim>::active_cell_iterator, Point<dim> >
+GridTools::find_active_cell_around_point (const Mapping<dim>   &mapping,
+                                          const Container<dim> &container,
+                                          const Point<dim>     &p)
+{
+   typedef typename Container<dim>::active_cell_iterator cell_iterator;
+
+   double best_distance = -1.;
+   std::pair<cell_iterator, Point<dim> > best_cell;
+
+                                   // Find closest vertex and determine
+                                   // all adjacent cells
+   unsigned int vertex = find_closest_vertex(container, p);
+   
+   std::vector<cell_iterator> adjacent_cells =
+      find_cells_adjacent_to_vertex(container, vertex);
+
+   typename std::vector<cell_iterator>::const_iterator
+      cell = adjacent_cells.begin(),
+      endc = adjacent_cells.end();
+
+   for(; cell != endc; ++cell)
+      {
+         Point<dim> p_cell = mapping.transform_real_to_unit_cell(*cell, p);
+
+                                   // calculate the infinity norm of
+                                   // the distance vector to the unit cell.
+         double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+
+                                   // If the point is strictly inside the
+                                   // unit cell, the cell can be directly
+                                   // returned.
+         if(dist == 0.0)
+            return std::make_pair(*cell, p_cell);
+         
+                                   // Otherwise, we will compare the new
+                                   // cell with a previously found one;
+                                   // If there is not a previous one, take
+                                   // the current one directly; if there is,
+                                   // only replace it if we have found a more
+                                   // refined cell or if we have found a cell
+                                   // of the same level, but the distance to
+                                   // the unit cell is smaller
+         else if( best_cell.first.state() != IteratorState::valid ||
+                  best_cell.first->level() < (*cell)->level() ||
+                  ( best_cell.first->level() == (*cell)->level() &&
+                    best_distance > dist )  )
+            {
+               best_distance = dist;
+               best_cell     = std::make_pair(*cell, p_cell);
+            }
+      }
+
+   Assert(best_cell.first.state() == IteratorState::valid, ExcInternalError());
+   Assert(best_distance > 0.0, ExcInternalError());
+
+   return best_cell;
+}
 
 
 template <int dim>
@@ -724,6 +918,46 @@ void GridTools::scale<deal_II_dimension> (const double,
 					  Triangulation<deal_II_dimension> &);
 
 template
+unsigned int
+GridTools::find_closest_vertex (const Triangulation<deal_II_dimension> &,
+                                const Point<deal_II_dimension> &);
+
+template
+unsigned int
+GridTools::find_closest_vertex (const DoFHandler<deal_II_dimension> &,
+                                const Point<deal_II_dimension> &);
+
+template
+unsigned int
+GridTools::find_closest_vertex (const hp::DoFHandler<deal_II_dimension> &,
+                                const Point<deal_II_dimension> &);
+
+template
+unsigned int
+GridTools::find_closest_vertex (const MGDoFHandler<deal_II_dimension> &,
+                                const Point<deal_II_dimension> &);
+
+template
+std::vector<Triangulation<deal_II_dimension>::active_cell_iterator>
+GridTools::find_cells_adjacent_to_vertex(const Triangulation<deal_II_dimension> &,
+                                         const unsigned int);
+
+template
+std::vector<DoFHandler<deal_II_dimension>::active_cell_iterator>
+GridTools::find_cells_adjacent_to_vertex(const DoFHandler<deal_II_dimension> &,
+                                         const unsigned int);
+
+template
+std::vector<hp::DoFHandler<deal_II_dimension>::active_cell_iterator>
+GridTools::find_cells_adjacent_to_vertex(const hp::DoFHandler<deal_II_dimension> &,
+                                         const unsigned int);
+
+template
+std::vector<MGDoFHandler<deal_II_dimension>::active_cell_iterator>
+GridTools::find_cells_adjacent_to_vertex(const MGDoFHandler<deal_II_dimension> &,
+                                         const unsigned int);
+
+template
 Triangulation<deal_II_dimension>::active_cell_iterator
 GridTools::find_active_cell_around_point (const Triangulation<deal_II_dimension> &,
                                           const Point<deal_II_dimension> &p);
@@ -742,6 +976,30 @@ template
 MGDoFHandler<deal_II_dimension>::active_cell_iterator
 GridTools::find_active_cell_around_point (const MGDoFHandler<deal_II_dimension> &,
                                           const Point<deal_II_dimension> &p);
+
+template
+std::pair<Triangulation<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
+GridTools::find_active_cell_around_point (const Mapping<deal_II_dimension> &,
+                                          const Triangulation<deal_II_dimension> &,
+                                          const Point<deal_II_dimension> &);
+
+template
+std::pair<DoFHandler<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
+GridTools::find_active_cell_around_point (const Mapping<deal_II_dimension> &,
+                                          const DoFHandler<deal_II_dimension> &,
+                                          const Point<deal_II_dimension> &);
+
+template
+std::pair<MGDoFHandler<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
+GridTools::find_active_cell_around_point (const Mapping<deal_II_dimension> &,
+                                          const MGDoFHandler<deal_II_dimension> &,
+                                          const Point<deal_II_dimension> &);
+
+template
+std::pair<hp::DoFHandler<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
+GridTools::find_active_cell_around_point (const Mapping<deal_II_dimension> &,
+                                          const hp::DoFHandler<deal_II_dimension> &,
+                                          const Point<deal_II_dimension> &);
 
 template
 void

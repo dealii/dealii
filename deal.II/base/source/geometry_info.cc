@@ -178,6 +178,51 @@ const unsigned int GeometryInfo<4>::dx_to_deal[GeometryInfo<4>::vertices_per_cel
        invalid_unsigned_int,
        invalid_unsigned_int};
 
+template <>
+const unsigned int GeometryInfo<1>::vertex_to_face
+          [GeometryInfo<1>::vertices_per_cell][1]
+= { { 0 },
+    { 1 } };
+
+template <>
+const unsigned int GeometryInfo<2>::vertex_to_face
+          [GeometryInfo<2>::vertices_per_cell][2]
+= { { 0, 2 },
+    { 1, 2 },
+    { 0, 3 },
+    { 1, 3 } };
+
+template <>
+const unsigned int GeometryInfo<3>::vertex_to_face
+          [GeometryInfo<3>::vertices_per_cell][3]
+= { { 0, 2, 4 },
+    { 1, 2, 4 },
+    { 0, 3, 4 },
+    { 1, 3, 4 },
+    { 0, 2, 5 },
+    { 1, 2, 5 },
+    { 0, 3, 5 },
+    { 1, 3, 5 } };
+
+template <>
+const unsigned int GeometryInfo<4>::vertex_to_face
+          [GeometryInfo<4>::vertices_per_cell][4]
+= { { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
+    { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int }};
 
 template <>
 unsigned int
@@ -381,8 +426,29 @@ GeometryInfo<dim>::face_to_cell_vertices (const unsigned int face,
   return child_cell_on_face(face, vertex, face_orientation);
 }
 
+template <int dim>
+void
+GeometryInfo<dim>::project_to_unit_cell (Point<dim> &p)
+{
+   for(unsigned i=0; i<dim; i++)
+      if      (p[i] < 0.)  p[i] = 0.;
+      else if (p[i] > 1.)  p[i] = 1.;
+}
 
+template <int dim>
+double
+GeometryInfo<dim>::distance_to_unit_cell (Point<dim> &p)
+{
+   double result = 0.0;
+   
+   for(unsigned i=0; i<dim; i++)
+      if ((-p[i]) > result)
+         result = -p[i];
+      else if ((p[i]-1.) > result)
+         result = (p[i] - 1.);
 
+   return result;
+}
 
 template class GeometryInfo<1>;
 template class GeometryInfo<2>;
