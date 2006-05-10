@@ -437,7 +437,7 @@ GeometryInfo<dim>::project_to_unit_cell (Point<dim> &p)
 
 template <int dim>
 double
-GeometryInfo<dim>::distance_to_unit_cell (Point<dim> &p)
+GeometryInfo<dim>::distance_to_unit_cell (const Point<dim> &p)
 {
    double result = 0.0;
    

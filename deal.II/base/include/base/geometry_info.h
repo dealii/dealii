@@ -908,7 +908,7 @@ struct GeometryInfo
                                       * For points inside the cell, this is
                                       * defined as zero.
                                       */
-    static double distance_to_unit_cell(Point<dim> &p);
+    static double distance_to_unit_cell (const Point<dim> &p);
 
                                      /**
 				      * For each face of the reference
