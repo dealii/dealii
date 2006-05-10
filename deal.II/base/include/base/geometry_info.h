@@ -871,11 +871,23 @@ struct GeometryInfo
 				      * Return true if the given point
 				      * is inside the unit cell of the
 				      * present space dimension. This
-                                      * function accepts an additional
-                                      * parameter which specifies how
-                                      * much the point position may
-                                      * actually deviate from a true
-                                      * unit cell (may be less than zero)
+				      * * function accepts an
+				      * additional * parameter which
+				      * specifies how * much the point
+				      * position may * actually be
+				      * outside the true * unit
+				      * cell. This is useful because
+				      * in practice we may often not
+				      * be able to compute the
+				      * coordinates of a point in
+				      * reference coordinates exactly,
+				      * but only up to numerical
+				      * roundoff.
+				      *
+				      * The tolerance parameter may be
+				      * less than zero, indicating
+				      * that the point should be
+				      * safely inside the cell.
 				      */
     static bool is_inside_unit_cell (const Point<dim> &p,
                                      const double eps);
@@ -1178,7 +1190,8 @@ GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p)
 template <>
 inline
 bool
-GeometryInfo<1>::is_inside_unit_cell (const Point<1> &p, const double eps)
+GeometryInfo<1>::is_inside_unit_cell (const Point<1> &p,
+				      const double eps)
 {
   return (p[0] >= -eps) && (p[0] <= 1.+eps);
 }
@@ -1188,7 +1201,8 @@ GeometryInfo<1>::is_inside_unit_cell (const Point<1> &p, const double eps)
 template <>
 inline
 bool
-GeometryInfo<2>::is_inside_unit_cell (const Point<2> &p, const double eps)
+GeometryInfo<2>::is_inside_unit_cell (const Point<2> &p,
+				      const double eps)
 {
   const double l = -eps, u = 1+eps;
   return (p[0] >= l) && (p[0] <= u) &&
@@ -1200,7 +1214,8 @@ GeometryInfo<2>::is_inside_unit_cell (const Point<2> &p, const double eps)
 template <>
 inline
 bool
-GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p, const double eps)
+GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p,
+				      const double eps)
 {
   const double l = -eps, u = 1.0+eps;
   return (p[0] >= l) && (p[0] <= u) &&
