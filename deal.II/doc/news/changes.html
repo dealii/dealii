@@ -647,6 +647,15 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Improved: The functions <code class="class">VectorTools</code>::<code
+       class="member">point_value</code> and <code class="class">VectorTools</code>::<code
+       class="member">point_difference</code> now can also use arbitrary
+       mappings, using the new <code class="class">GridTools</code>::<code
+       class="member">find_active_cell_around_point</code> algorithm.
+       <br> 
+       (Ralf B. Schulz, 2006/05/11)
+       </p>
+  <li> <p>
        New: In <code>GridTools</code>, several functions have been added.
        <code>GridTools::find_closest_vertex</code> searches for the vertex
        located at closest distance to a given point. <code>

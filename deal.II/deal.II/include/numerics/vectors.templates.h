@@ -1810,6 +1810,48 @@ VectorTools::point_difference (const DoFHandler<dim> &dof,
 
 template <int dim, class InVector>
 void
+VectorTools::point_difference (const Mapping<dim>    &mapping,
+                               const DoFHandler<dim> &dof,
+			       const InVector        &fe_function,
+			       const Function<dim>   &exact_function,
+			       Vector<double>        &difference,
+			       const Point<dim>      &point)
+{
+  const FiniteElement<dim>& fe = dof.get_fe();
+
+  Assert(difference.size() == fe.n_components(),
+	 ExcDimensionMismatch(difference.size(), fe.n_components()));
+
+                                   // first find the cell in which this point
+                                   // is, initialize a quadrature rule with
+                                   // it, and then a FEValues object
+  std::pair<typename DoFHandler<dim>::active_cell_iterator, Point<dim> >
+    cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
+
+  Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10, ExcInternalError());
+  GeometryInfo<dim>::project_to_unit_cell(cell_point.second);
+  
+  const Quadrature<dim> quadrature (cell_point.second);
+  FEValues<dim> fe_values(mapping, fe, quadrature, update_values);
+  fe_values.reinit(cell_point.first);
+
+                                   // then use this to get at the values of
+                                   // the given fe_function at this point
+  std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
+  fe_values.get_function_values(fe_function, u_value);
+
+  if (fe.n_components() == 1)
+    difference(0) = exact_function.value(point);
+  else
+    exact_function.vector_value(point, difference);
+    
+  for (unsigned int i=0; i<difference.size(); ++i)
+    difference(i) -= u_value[0](i);
+}
+
+
+template <int dim, class InVector>
+void
 VectorTools::point_value (const DoFHandler<dim> &dof,
 			  const InVector        &fe_function,
 			  const Point<dim>      &point,
@@ -1881,6 +1923,76 @@ VectorTools::point_value (const DoFHandler<dim> &dof,
   return u_value[0];
 }
 
+template <int dim, class InVector>
+void
+VectorTools::point_value (const Mapping<dim>    &mapping,
+                          const DoFHandler<dim> &dof,
+			  const InVector        &fe_function,
+			  const Point<dim>      &point,
+			  Vector<double>        &value)
+{
+  const FiniteElement<dim>& fe = dof.get_fe();
+
+  Assert(value.size() == fe.n_components(),
+	 ExcDimensionMismatch(value.size(), fe.n_components()));
+
+                                   // first find the cell in which this point
+                                   // is, initialize a quadrature rule with
+                                   // it, and then a FEValues object
+  std::pair<typename DoFHandler<dim>::active_cell_iterator, Point<dim> >
+    cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
+
+  Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10, ExcInternalError());
+
+  GeometryInfo<dim>::project_to_unit_cell(cell_point.second);
+  
+  const Quadrature<dim> quadrature (cell_point.second);
+  FEValues<dim> fe_values(mapping, fe, quadrature, update_values);
+  fe_values.reinit(cell_point.first);
+
+                                   // then use this to get at the values of
+                                   // the given fe_function at this point
+  std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
+  fe_values.get_function_values(fe_function, u_value);
+
+  value = u_value[0];
+}
+
+
+
+template <int dim, class InVector>
+double
+VectorTools::point_value (const Mapping<dim>    &mapping,
+                          const DoFHandler<dim> &dof,
+			  const InVector        &fe_function,
+			  const Point<dim>      &point)
+{
+  const FiniteElement<dim>& fe = dof.get_fe();
+
+  Assert(fe.n_components() == 1,
+	 ExcMessage ("Finite element is not scalar as is necessary for this function"));
+
+                                   // first find the cell in which this point
+                                   // is, initialize a quadrature rule with
+                                   // it, and then a FEValues object
+  std::pair<typename DoFHandler<dim>::active_cell_iterator, Point<dim> >
+    cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
+
+  Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10, ExcInternalError());
+
+  GeometryInfo<dim>::project_to_unit_cell(cell_point.second);
+  
+  const Quadrature<dim> quadrature (cell_point.second);
+  FEValues<dim> fe_values(mapping, fe, quadrature, update_values);
+  fe_values.reinit(cell_point.first);
+
+                                   // then use this to get at the values of
+                                   // the given fe_function at this point
+  std::vector<double> u_value(1);
+  fe_values.get_function_values(fe_function, u_value);
+
+  return u_value[0];
+}
 
 
 template <int dim, class InVector>

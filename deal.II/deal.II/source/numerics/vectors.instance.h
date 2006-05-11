@@ -132,6 +132,15 @@ void VectorTools::point_difference<deal_II_dimension> (
   const Point<deal_II_dimension>&);
 
 template
+void VectorTools::point_difference<deal_II_dimension> (
+  const Mapping<deal_II_dimension>&,
+  const DoFHandler<deal_II_dimension>&,
+  const VEC&,
+  const Function<deal_II_dimension>&,
+  Vector<double>&,
+  const Point<deal_II_dimension>&);
+
+template
 void VectorTools::point_value<deal_II_dimension> (
   const DoFHandler<deal_II_dimension>&,
   const VEC&,
@@ -140,6 +149,21 @@ void VectorTools::point_value<deal_II_dimension> (
 
 template
 double VectorTools::point_value<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension>&,
+  const VEC&,
+  const Point<deal_II_dimension>&);
+
+template
+void VectorTools::point_value<deal_II_dimension> (
+  const Mapping<deal_II_dimension>&,
+  const DoFHandler<deal_II_dimension>&,
+  const VEC&,
+  const Point<deal_II_dimension>&,
+  Vector<double>&);
+
+template
+double VectorTools::point_value<deal_II_dimension> (
+  const Mapping<deal_II_dimension>&,
   const DoFHandler<deal_II_dimension>&,
   const VEC&,
   const Point<deal_II_dimension>&);

@@ -978,6 +978,31 @@ class VectorTools
 				  const Point<dim>&      point);
 
 				     /**
+				      * Point error evaluation. Find
+				      * the first cell containing the
+				      * given point and compute the
+				      * difference of a (possibly
+				      * vector-valued) finite element
+				      * function and a continuous
+				      * function (with as many vector
+				      * components as the finite
+				      * element) at this point.
+				      *
+                                      * This function additionally
+                                      * expects a mapping and uses
+                                      * a different algorithm to
+                                      * determine the cell surrounding
+                                      * the given point.
+				      */
+    template <int dim, class InVector>
+    static void point_difference (const Mapping<dim>    &mapping,
+                                  const DoFHandler<dim>& dof,
+				  const InVector&        fe_function,
+				  const Function<dim>&   exact_solution,
+				  Vector<double>&        difference,
+				  const Point<dim>&      point);
+
+                                     /**
 				      * Evaluate a possibly
 				      * vector-valued finite element
 				      * function defined by the given
@@ -1011,6 +1036,49 @@ class VectorTools
 		 const Point<dim>      &point);
     
 				     /**
+				      * Evaluate a possibly
+				      * vector-valued finite element
+				      * function defined by the given
+				      * DoFHandler and nodal vector at
+				      * the given point, and return
+				      * the (vector) value of this
+				      * function through the last
+				      * argument. This function expects
+                                      * additionally a mapping, and
+                                      * uses a different algorithm to
+                                      * determine the location of the
+                                      * point (see GridTools::find_active_cell_around_point).
+				      */
+    template <int dim, class InVector>
+    static
+    void
+    point_value (const Mapping<dim>    &mapping,
+                 const DoFHandler<dim> &dof,
+		 const InVector        &fe_function,
+		 const Point<dim>      &point,
+		 Vector<double>        &value);
+
+				     /**
+				      * Evaluate a scalar finite
+				      * element function defined by
+				      * the given DoFHandler and nodal
+				      * vector at the given point, and
+				      * return the value of this
+				      * function. This function expects
+                                      * additionally a mapping, and
+                                      * uses a different algorithm to
+                                      * determine the location of the
+                                      * point (see GridTools::find_active_cell_around_point).
+				      */
+    template <int dim, class InVector>
+    static
+    double
+    point_value (const Mapping<dim>    &mapping,
+                 const DoFHandler<dim> &dof,
+		 const InVector        &fe_function,
+		 const Point<dim>      &point);
+
+                                     /**
 				      * Subtract the (algebraic) mean value
 				      * from a vector. This function is most
 				      * frequently used as a mean-value filter
