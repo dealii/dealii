@@ -426,14 +426,21 @@ GeometryInfo<dim>::face_to_cell_vertices (const unsigned int face,
   return child_cell_on_face(face, vertex, face_orientation);
 }
 
+
+
 template <int dim>
-void
-GeometryInfo<dim>::project_to_unit_cell (Point<dim> &p)
+Point<dim>
+GeometryInfo<dim>::project_to_unit_cell (const Point<dim> &q)
 {
-   for(unsigned i=0; i<dim; i++)
-      if      (p[i] < 0.)  p[i] = 0.;
-      else if (p[i] > 1.)  p[i] = 1.;
+  Point<dim> p = q;
+  for(unsigned i=0; i<dim; i++)
+    if      (p[i] < 0.)  p[i] = 0.;
+    else if (p[i] > 1.)  p[i] = 1.;
+
+  return p;
 }
+
+
 
 template <int dim>
 double

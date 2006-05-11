@@ -896,9 +896,9 @@ struct GeometryInfo
 				      * Projects a given point onto the
                                       * unit cell, i.e. each coordinate
                                       * outside [0..1] is modified
-                                      * to lie within that interval
+                                      * to lie within that interval.
 				      */
-    static void project_to_unit_cell (Point<dim> &p);
+    static Point<dim> project_to_unit_cell (const Point<dim> &p);
 
                                      /**
                                       * Returns the infinity norm of
