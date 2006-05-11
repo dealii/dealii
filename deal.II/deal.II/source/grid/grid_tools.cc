@@ -482,9 +482,9 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
    
                                    // go through all active cells and look
                                    // if the vertex is part of that cell
-   for(; cell != endc; ++cell)
-      for(unsigned v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
-         if(cell->vertex_index(v) == (int)vertex)
+   for (; cell != endc; ++cell)
+      for (unsigned v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
+         if (cell->vertex_index(v) == (int)vertex)
             {
                                    // OK, we found a cell that contains
                                    // the particular vertex. We add it
@@ -495,35 +495,54 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
                                    // vertex is not a locally refined
                                    // vertex not being part of the
                                    // neighboring cells. So we loop over
-                                   // all faces to which this vortex
+                                   // all faces to which this vertex
                                    // belongs, check the level of
                                    // the neighbor, and if it is coarser,
                                    // then check whether the vortex is
                                    // part of that neighbor or not.
-               for(unsigned vface = 0; vface < dim; vface++)
+               for (unsigned vface = 0; vface < dim; vface++)
                   {
                      const unsigned face =
                         GeometryInfo<dim>::vertex_to_face[v][vface];
-                     if(!cell->at_boundary(face)) {
-                        typename Container<dim>::cell_iterator
+                     if (!cell->at_boundary(face))
+		       {
+			 typename Container<dim>::cell_iterator
                            nb = cell->neighbor(face);
                         
-                                   // Here we check whether the neighbor
-                                   // is coarser. If it is, we search for
-                                   // the vertex in this coarser cell and
-                                   // only if not found we will add the
-                                   // coarser cell itself
-                           if(nb->level() < cell->level()) {
-                              bool found = false;
-                              for(unsigned v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
-                                 if(cell->vertex_index(v) == (int)vertex) {
-                                    found = true;
-                                    break;
-                                 }
-                              if(!found)
+							  // Here we
+							  // check
+							  // whether
+							  // the
+							  // neighbor
+							  // is
+							  // coarser. If
+							  // it is, we
+							  // search
+							  // for the
+							  // vertex in
+							  // this
+							  // coarser
+							  // cell and
+							  // only if
+							  // not found
+							  // we will
+							  // add the
+							  // coarser
+							  // cell
+							  // itself
+                           if (nb->level() < cell->level())
+			     {
+			       bool found = false;
+			       for (unsigned v=0; v<GeometryInfo<dim>::vertices_per_cell; v++)
+                                 if (cell->vertex_index(v) == (int)vertex)
+				   {
+				     found = true;
+				     break;
+				   }
+			       if (!found)
                                  adjacent_cells.push_back(nb);
-                           }
-                     }
+			     }
+		       }
                   }
                
                break;
