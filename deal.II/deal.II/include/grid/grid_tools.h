@@ -353,12 +353,14 @@ class GridTools
                                       * whether or not the point is
                                       * inside a given cell.
                                       *
-                                      * The function returns an iterator
-                                      * to the cell, as well as the local
-                                      * position of the point inside
-                                      * the unit cell. This local position
-                                      * might be located slightly outside
-                                      * an actual unit cell.
+                                      * The function returns an
+                                      * iterator to the cell, as well
+                                      * as the local position of the
+                                      * point inside the unit
+                                      * cell. This local position
+                                      * might be located slightly
+                                      * outside an actual unit cell,
+                                      * due to numerical roundoff.
                                       *
                                       * If a point lies on the
                                       * boundary of two or more cells,
