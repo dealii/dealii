@@ -228,7 +228,7 @@ class GridTools
                                       * edge of the adjacent cells returned.
                                       *
                                       * @author Ralf B. Schulz,
-                                      * Wolfgang Bangert, 2006
+                                      * Wolfgang Bangerth, 2006
                                       */
    template<int dim, template<int dim> class Container>
    static
