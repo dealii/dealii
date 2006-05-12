@@ -647,6 +647,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: The old version of <code class="class">GridTools</code>::<code
+       class="member">find_active_cell_around_point</code> has been replaced
+       by a wrapper function for backward compatibility. The wrapper calls the
+       new version of this function, and it is highly recommended to use the new
+       version as it automatically delivers also the local coordinate of the
+       point (so it can save some computation time in most cases as you don't have
+       to calculate that again).
+       <br> 
+       (Ralf B. Schulz, 2006/05/12)
+       </p>
+  <li> <p>
        Improved: The functions <code class="class">VectorTools</code>::<code
        class="member">point_value</code> and <code class="class">VectorTools</code>::<code
        class="member">point_difference</code> now can also use arbitrary

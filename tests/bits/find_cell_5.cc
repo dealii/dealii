@@ -42,7 +42,7 @@ void check (Triangulation<3> &tria)
     deallog << "<" << cell->vertex(v) << "> ";
   deallog << std::endl;
 
-  Assert (p.distance (cell->center()) < cell->diameter()/2,
+  Assert (p.distance (cell->center()) < cell->diameter()/2+1e-10,
 	  ExcInternalError());
 }
 

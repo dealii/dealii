@@ -49,7 +49,9 @@ void check (Triangulation<2> &tria)
             deallog << "<" << cell.first->vertex(v) << "> ";
          deallog << "[ " << cell.second << "] ";
 
-         deallog << std::endl;
+         // Now transform back and check distance
+         Point<2> pp = map.transform_unit_to_real_cell(cell.first, GeometryInfo<2>::project_to_unit_cell(cell.second));
+         deallog << (pp-p).square() << std::endl;
 
          Assert (GeometryInfo<2>::distance_to_unit_cell(cell.second) < 1e-10,
                  ExcInternalError());

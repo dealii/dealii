@@ -554,53 +554,6 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
 }  
 
 
-template <int dim, typename Container>
-typename Container::active_cell_iterator
-GridTools::find_active_cell_around_point (const Container  &container,
-                                          const Point<dim> &p)
-{
-                                   // first find the coarse grid cell
-                                   // that contains the point. we can
-                                   // only do this by a linear search
-  typename Container::cell_iterator cell = container.begin(0);
-  for (; cell!=container.end(0); ++cell)
-    if (cell->point_inside (p))
-      break;
-
-                                   // make sure that we found a cell
-                                   // in the coarse grid that contains
-                                   // this point. for cases where this
-                                   // might happen unexpectedly, see
-                                   // the documentation of this
-                                   // function
-  AssertThrow (cell != container.end(0),
-               ExcPointNotFoundInCoarseGrid<dim> (p));
-
-                                   // now do the logarithmic part of
-                                   // the algorithm: go from child to
-                                   // grandchild
-  while (cell->has_children())
-    {
-      const unsigned int n_children=cell->n_children();
-      unsigned int c=0;
-      for (; c<n_children; ++c)
-        if (cell->child(c)->point_inside (p))
-          break;
-
-                                       // make sure we found a child
-                                       // cell
-      AssertThrow (c != n_children, ExcPointNotFound<dim> (p));
-
-                                       // then reset cell to the child
-      cell = cell->child(c);
-    }
-
-                                   // now that we have a terminal
-                                   // cell, return it
-  return cell;
-}
-
-
 template <int dim, template <int> class Container>
 std::pair<typename Container<dim>::active_cell_iterator, Point<dim> >
 GridTools::find_active_cell_around_point (const Mapping<dim>   &mapping,
@@ -609,7 +562,12 @@ GridTools::find_active_cell_around_point (const Mapping<dim>   &mapping,
 {
    typedef typename Container<dim>::active_cell_iterator cell_iterator;
 
-   double best_distance = -1.;
+                                   // The best distance is set to the
+                                   // maximum allowable distance from
+                                   // the unit cell; we assume a
+                                   // max. deviation of 1e-10
+   double best_distance = 1e-10;
+   int    best_level = -1;
    std::pair<cell_iterator, Point<dim> > best_cell;
 
                                    // Find closest vertex and determine
@@ -631,32 +589,20 @@ GridTools::find_active_cell_around_point (const Mapping<dim>   &mapping,
                                    // the distance vector to the unit cell.
          double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
 
-                                   // If the point is strictly inside the
-                                   // unit cell, the cell can be directly
-                                   // returned.
-         if(dist == 0.0)
-            return std::make_pair(*cell, p_cell);
-         
-                                   // Otherwise, we will compare the new
-                                   // cell with a previously found one;
-                                   // If there is not a previous one, take
-                                   // the current one directly; if there is,
-                                   // only replace it if we have found a more
-                                   // refined cell or if we have found a cell
-                                   // of the same level, but the distance to
-                                   // the unit cell is smaller
-         else if( best_cell.first.state() != IteratorState::valid ||
-                  best_cell.first->level() < (*cell)->level() ||
-                  ( best_cell.first->level() == (*cell)->level() &&
-                    best_distance > dist )  )
+                                   // We compare if the point is inside the
+                                   // unit cell (or at least not too far
+                                   // outside). If it is, it is also checked
+                                   // that the cell has a more refined state
+         if(dist <= best_distance
+            && (*cell)->level() > best_level)
             {
                best_distance = dist;
+               best_level    = (*cell)->level();
                best_cell     = std::make_pair(*cell, p_cell);
             }
       }
 
-   Assert(best_cell.first.state() == IteratorState::valid, ExcInternalError());
-   Assert(best_distance > 0.0, ExcInternalError());
+   Assert(best_cell.first.state() == IteratorState::valid, ExcPointNotFound<dim>(p));
 
    return best_cell;
 }
