@@ -37,12 +37,24 @@ void check (Triangulation<3> &tria)
     = GridTools::find_active_cell_around_point (tria, p);
 
   deallog << cell << std::endl;
-  for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+  for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
     deallog << "<" << cell->vertex(v) << "> ";
   deallog << std::endl;
 
-  Assert (p.distance (cell->center()) < cell->diameter()/2+1e-10,
-	  ExcInternalError());
+  // Transform back and forth
+  Point<3> pp =
+     StaticMappingQ1<3>::mapping.transform_unit_to_real_cell
+     ( cell,
+       GeometryInfo<3>::project_to_unit_cell
+       (
+         StaticMappingQ1<3>::mapping.transform_real_to_unit_cell
+         ( cell,
+           p
+           )
+         )
+       );
+                                                                       
+  Assert (p.distance (pp) < 1e-15,  ExcInternalError());
 }
 
 

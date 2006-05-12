@@ -39,13 +39,16 @@ void check (Triangulation<3> &tria)
     = GridTools::find_active_cell_around_point (map, tria, p);
 
   deallog << cell.first << std::endl;
-  for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+  for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
     deallog << "<" << cell.first->vertex(v) << "> ";
   deallog << "[ " << cell.second << "] ";
   deallog << std::endl;
 
-  Assert (GeometryInfo<3>::distance_to_unit_cell(cell.second) < 1e-10,
-	  ExcInternalError());
+  // Now transform back and check distance
+  Point<3> pp = map.transform_unit_to_real_cell(cell.first, GeometryInfo<3>::project_to_unit_cell(cell.second));
+  deallog << pp.distance(p) << std::endl;
+  Assert (pp.distance(p) < 1e-13,
+          ExcInternalError());
 }
 
 

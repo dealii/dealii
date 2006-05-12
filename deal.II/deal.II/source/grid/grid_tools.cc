@@ -593,8 +593,8 @@ GridTools::find_active_cell_around_point (const Mapping<dim>   &mapping,
                                    // unit cell (or at least not too far
                                    // outside). If it is, it is also checked
                                    // that the cell has a more refined state
-         if(dist <= best_distance
-            && (*cell)->level() > best_level)
+         if(dist < best_distance ||
+            (dist == best_distance && (*cell)->level() > best_level))
             {
                best_distance = dist;
                best_level    = (*cell)->level();

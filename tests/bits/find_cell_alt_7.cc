@@ -29,8 +29,6 @@
 #include <fstream>
 
 
-
-
 void check (Triangulation<2> &tria)
 {
    MappingQ<2> map(5);
@@ -51,9 +49,8 @@ void check (Triangulation<2> &tria)
 
          // Now transform back and check distance
          Point<2> pp = map.transform_unit_to_real_cell(cell.first, GeometryInfo<2>::project_to_unit_cell(cell.second));
-         deallog << (pp-p).square() << std::endl;
-
-         Assert (GeometryInfo<2>::distance_to_unit_cell(cell.second) < 1e-10,
+         deallog << pp.distance(p) << std::endl;
+         Assert (pp.distance(p) < 1e-13,
                  ExcInternalError());
       }
   
