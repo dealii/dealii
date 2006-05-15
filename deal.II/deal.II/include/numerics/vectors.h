@@ -964,11 +964,9 @@ class VectorTools
 				      * components as the finite
 				      * element) at this point.
 				      *
-				      * Since the function uses a
-				      * simple test for checking
-				      * whether a point is in a cell,
-				      * it is only implemented for
-				      * Q1-mapping at this time.
+				      * This is a wrapper function 
+                                      * using a Q1-mapping for cell
+                                      * boundaries.
 				      */
     template <int dim, class InVector>
     static void point_difference (const DoFHandler<dim>& dof,
@@ -988,11 +986,8 @@ class VectorTools
 				      * components as the finite
 				      * element) at this point.
 				      *
-                                      * This function additionally
-                                      * expects a mapping and uses
-                                      * a different algorithm to
-                                      * determine the cell surrounding
-                                      * the given point.
+                                      * This function uses an arbitrary
+                                      * mapping to evaluate the difference.
 				      */
     template <int dim, class InVector>
     static void point_difference (const Mapping<dim>    &mapping,
@@ -1011,6 +1006,9 @@ class VectorTools
 				      * the (vector) value of this
 				      * function through the last
 				      * argument.
+                                      *
+                                      * This is a wrapper function using
+                                      * a Q1-mapping for cells.
 				      */
     template <int dim, class InVector>
     static
@@ -1027,6 +1025,9 @@ class VectorTools
 				      * vector at the given point, and
 				      * return the value of this
 				      * function.
+                                      *
+                                      * This is a wrapper function using
+                                      * a Q1-mapping for cells.
 				      */
     template <int dim, class InVector>
     static
@@ -1043,11 +1044,10 @@ class VectorTools
 				      * the given point, and return
 				      * the (vector) value of this
 				      * function through the last
-				      * argument. This function expects
-                                      * additionally a mapping, and
-                                      * uses a different algorithm to
-                                      * determine the location of the
-                                      * point (see GridTools::find_active_cell_around_point).
+				      * argument.
+                                      *
+                                      * This function uses an arbitrary
+                                      * mapping to evaluate the difference.
 				      */
     template <int dim, class InVector>
     static
@@ -1064,11 +1064,10 @@ class VectorTools
 				      * the given DoFHandler and nodal
 				      * vector at the given point, and
 				      * return the value of this
-				      * function. This function expects
-                                      * additionally a mapping, and
-                                      * uses a different algorithm to
-                                      * determine the location of the
-                                      * point (see GridTools::find_active_cell_around_point).
+				      * function.
+                                      *
+                                      * This function uses an arbitrary
+                                      * mapping to evaluate the difference.
 				      */
     template <int dim, class InVector>
     static

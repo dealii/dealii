@@ -16,7 +16,6 @@
 
 #include <base/config.h>
 #include <fe/mapping.h>
-#include <fe/mapping_q1.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
@@ -585,15 +584,6 @@ void GridTools::transform (const Predicate    &predicate,
 	};
 }
 
-
-template <int dim, typename Container>
-inline
-typename Container::active_cell_iterator
-GridTools::find_active_cell_around_point (const Container  &container,
-                                          const Point<dim> &p)
-{
-   return find_active_cell_around_point(StaticMappingQ1<dim>::mapping, container, p).first;
-}
 
 
 /*----------------------------   grid_tools.h     ---------------------------*/

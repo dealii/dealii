@@ -647,6 +647,15 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: Functions <code class="class">VectorTools</code>::<code
+       class="member">point_value</code> and <code class="class">VectorTools</code>::<code
+       class="member">point_difference</code> using the old interface without
+       boundary mapping were replaced by wrapper functions calling the new
+       versions.
+       <br> 
+       (Ralf B. Schulz, 2006/05/15)
+       </p>
+  <li> <p>
        Changed: The old version of <code class="class">GridTools</code>::<code
        class="member">find_active_cell_around_point</code> has been replaced
        by a wrapper function for backward compatibility. The wrapper calls the

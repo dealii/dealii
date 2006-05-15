@@ -23,6 +23,7 @@
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_dgq.h>
+#include <fe/mapping_q1.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 
@@ -552,6 +553,15 @@ GridTools::find_cells_adjacent_to_vertex(const Container<dim> &container,
    
    return adjacent_cells;
 }  
+
+
+template <int dim, typename Container>
+typename Container::active_cell_iterator
+GridTools::find_active_cell_around_point (const Container  &container,
+                                          const Point<dim> &p)
+{
+   return find_active_cell_around_point(StaticMappingQ1<dim>::mapping, container, p).first;
+}
 
 
 template <int dim, template <int> class Container>
