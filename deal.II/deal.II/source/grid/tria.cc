@@ -5598,8 +5598,8 @@ Triangulation<3>::execute_refinement ()
 				       // count number of used cells on
 				       // the next higher level
       const unsigned int used_cells
-	= std::count_if (levels[level+1]->quads.used.begin(),
-			 levels[level+1]->quads.used.end(),
+	= std::count_if (levels[level+1]->hexes.used.begin(),
+			 levels[level+1]->hexes.used.end(),
 			 std::bind2nd (std::equal_to<bool>(), true));
 
 
@@ -6101,7 +6101,7 @@ Triangulation<3>::execute_refinement ()
 					      7./192.;
 					     // finally add centers of
 					     // faces. note that
-					     // vertex 2 is an
+					     // vertex 3 is an
 					     // invariant with respect
 					     // to the face
 					     // orientation
@@ -6822,27 +6822,18 @@ Triangulation<3>::execute_refinement ()
 							 // face is
 							 // swapped
                                                          //
-                                                         // (?? I
-                                                         // actually
-                                                         // don't
-                                                         // understand
-                                                         // why we
-                                                         // need to
-                                                         // ask the
-                                                         // present
-                                                         // face as
-                                                         // well, but
-                                                         // it fixes
-                                                         // the
-                                                         // mesh_3d_7
-                                                         // and
-                                                         // mesh_3d_11
-                                                         // testcases,
-                                                         // so it
-                                                         // can't be
-                                                         // all
-                                                         // wrong...)
-                        const bool orient
+                                                         // We have to ask both cells for
+                                                         // the face orientation, as the
+                                                         // relevant check is, wether they
+                                                         // disagree or not. However, we
+                                                         // should never run into a face
+                                                         // which has non-standard
+                                                         // orientation in both adjacent
+                                                         // cells, therefore it is enough to
+                                                         // ask, whether the
+                                                         // face-orientation is non-standard
+                                                         // in one of the cases.
+			const bool orient
                           = (neighbor->face_orientation(nb_nb)
                              &&
                              hex->face_orientation(face));
@@ -7019,35 +7010,16 @@ Triangulation<3>::execute_refinement ()
 		    Assert (face<GeometryInfo<dim>::faces_per_cell,
 			    ExcInternalError());
 
-                                                     // then figure
-                                                     // out which of
-                                                     // the new cells
-                                                     // points to this
-                                                     // neighbor. this
-                                                     // could
-                                                     // presumably be
-                                                     // made faster
-                                                     // with only one
-                                                     // loop, but is
-                                                     // notoriously
-                                                     // tricky to get
-                                                     // right in view
-                                                     // of
-                                                     // mis-oriented
-                                                     // faces :-(
-                    for (unsigned int c=0;
-                         c<GeometryInfo<dim>::children_per_cell; ++c)
-                      for (unsigned int f=0;
-                           f<GeometryInfo<dim>::faces_per_cell; ++f)
-                        if (new_hexes[c]->neighbor(f) == neighbor)
-                          {
-                            neighbor->set_neighbor(face, new_hexes[c]);
-                            goto found;
-                          }
-                    Assert (false, ExcInternalError());
-
-                    found:
-                    ;
+                                                     // then figure out which of the new
+                                                     // cells points to this neighbor.
+						     //
+                                                     // As we have considered
+                                                     // face-orientation issues already in
+                                                     // the construction of the
+                                                     // neighbor_cells array, this can easily
+                                                     // be achieved here.
+		    int c = GeometryInfo<dim>::child_cell_on_face(nb,subface,true);
+		    neighbor->set_neighbor(face,new_hexes[c]);
 		  }
 
 
