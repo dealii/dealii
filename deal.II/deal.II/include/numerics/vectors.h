@@ -964,9 +964,10 @@ class VectorTools
 				      * components as the finite
 				      * element) at this point.
 				      *
-				      * This is a wrapper function 
+				      * This is a wrapper function
                                       * using a Q1-mapping for cell
-                                      * boundaries.
+                                      * boundaries to call the other
+                                      * point_difference() function.
 				      */
     template <int dim, class InVector>
     static void point_difference (const DoFHandler<dim>& dof,
@@ -986,8 +987,11 @@ class VectorTools
 				      * components as the finite
 				      * element) at this point.
 				      *
-                                      * This function uses an arbitrary
-                                      * mapping to evaluate the difference.
+                                      * Compared with the other
+                                      * function of the same name,
+                                      * this function uses an
+                                      * arbitrary mapping to evaluate
+                                      * the difference.
 				      */
     template <int dim, class InVector>
     static void point_difference (const Mapping<dim>    &mapping,
@@ -1007,8 +1011,10 @@ class VectorTools
 				      * function through the last
 				      * argument.
                                       *
-                                      * This is a wrapper function using
-                                      * a Q1-mapping for cells.
+                                      * This is a wrapper function
+                                      * using a Q1-mapping for cell
+                                      * boundaries to call the other
+                                      * point_difference() function.
 				      */
     template <int dim, class InVector>
     static
@@ -1026,7 +1032,9 @@ class VectorTools
 				      * return the value of this
 				      * function.
                                       *
-                                      * This is a wrapper function using
+                                      * Compared with the other
+                                      * function of the same name,
+                                      * this is a wrapper function using
                                       * a Q1-mapping for cells.
 				      */
     template <int dim, class InVector>
@@ -1046,7 +1054,9 @@ class VectorTools
 				      * function through the last
 				      * argument.
                                       *
-                                      * This function uses an arbitrary
+                                      * Compared with the other
+                                      * function of the same name,
+                                      * this function uses an arbitrary
                                       * mapping to evaluate the difference.
 				      */
     template <int dim, class InVector>
@@ -1066,7 +1076,9 @@ class VectorTools
 				      * return the value of this
 				      * function.
                                       *
-                                      * This function uses an arbitrary
+                                      * Compared with the other
+                                      * function of the same name,
+                                      * this function uses an arbitrary
                                       * mapping to evaluate the difference.
 				      */
     template <int dim, class InVector>
