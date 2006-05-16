@@ -5,14 +5,20 @@ my $short = 0;
 my $cvs_args = '';
 my $process_cvs_args = 0;
 my $debug = 0;
+my $revision = 0;
 
+# Command line switches
 foreach (@ARGV)
 {
     if ($process_cvs_args)
     {
 	$cvs_args .= " $_";
     }
+# If true, do not show up to date files without sticky tag
     $compress = 1 if (m/-c/);
+# Show current revision number
+    $revision = 1 if (m/-r/);
+# Abbreviate repository path
     $short = 1 if (m/-s/);
     $debug = 1 if (m/-d/);
     $process_cvs_args = 1 if (m/^--$/);
@@ -49,6 +55,7 @@ while(<CVS>)
 	if ($status eq 'Up-to-date')
 	{
 	    $status = 'OK ';
+	    $status .= "$work " if ($revision);
 	} elsif ($status eq 'Needs Patch')
 	{
 	    $status = "P $work<-$rep ";
@@ -69,7 +76,7 @@ while(<CVS>)
 	$status .= $stick;
 	printf "%-40s %-30s %s\n", $file, $status,
 	(($short) ? '' : $rep_file)
-	    unless ($compress && ($status eq 'OK '));
+	    unless ($compress && ($status =~ m/OK (\d+\.\d+(\.\d+\.\d+)? )?$/));
     }
     else
     {
