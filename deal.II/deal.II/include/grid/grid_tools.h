@@ -266,7 +266,7 @@ class GridTools
                                       * without additional computational cost.
                                       */
     template <int dim, typename Container>
-    inline static
+    static
     typename Container::active_cell_iterator
     find_active_cell_around_point (const Container  &container,
                                    const Point<dim> &p);
