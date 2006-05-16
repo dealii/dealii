@@ -161,9 +161,31 @@ LAPACKFullMatrix<number>::compute_eigenvalues()
   wi.resize(nn);
   number* values = const_cast<number*> (this->data());
   
-  int info;
-  int lwork = -1;
+  int info  = 0;
+  int lwork = 1;
+				   // Optimal workspace query:
+
+				   // The LAPACK routine DGEEV requires
+				   // a sufficient large workspace variable,
+				   // minimum requirement is
+				   //    work.size>=4*nn.
+				   // However, to improve performance, a
+				   // somewhat larger workspace may be needed.
+  
+				   // SOME implementations of the LAPACK routine
+				   // provide a workspace query call,
+				   //   info:=0, lwork:=-1
+				   // which returns an optimal value for the
+				   // size of the workspace array
+				   // (the PETSc 2.3.0 implementation does NOT
+				   // provide this functionality!).
+
+				   // define the HAVE_LIBLAPACK_NOQUERYMODE flag to
+				   // disable the workspace query.
+#ifndef HAVE_LIBLAPACK_NOQUERYMODE
+  lwork = -1;
   work.resize(1);
+      
   geev(&N, &N, &nn, values, &nn,
        &wr[0], &wi[0],
        0, &one, 0, &one,
@@ -174,11 +196,15 @@ LAPACKFullMatrix<number>::compute_eigenvalues()
 				   // everything else would not be
 				   // acceptable.
   Assert (info == 0, ExcInternalError());
-
 				   // Allocate working array according
 				   // to suggestion.
   lwork = (int) (work[0]+.1);
+#else
+  lwork = 4*nn;                    // no query mode
+#endif
+				   // resize workspace array
   work.resize((unsigned int) lwork);
+
 				   // Finally compute the eigenvalues.
   geev(&N, &N, &nn, values, &nn,
        &wr[0], &wi[0],
@@ -187,6 +213,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues()
 				   // Negative return value implies a
 				   // wrong argument. This should be
 				   // internal.
+
   Assert (info >=0, ExcInternalError());
 //TODO:[GK] What if the QR method fails?
   if (info != 0)
