@@ -1798,13 +1798,14 @@ VectorTools::point_difference (const Mapping<dim>    &mapping,
                                    // first find the cell in which this point
                                    // is, initialize a quadrature rule with
                                    // it, and then a FEValues object
-  std::pair<typename DoFHandler<dim>::active_cell_iterator, Point<dim> >
+  const std::pair<typename DoFHandler<dim>::active_cell_iterator, Point<dim> >
     cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
 
-  Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10, ExcInternalError());
-  GeometryInfo<dim>::project_to_unit_cell(cell_point.second);
+  Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
+         ExcInternalError());
   
-  const Quadrature<dim> quadrature (cell_point.second);
+  const Quadrature<dim>
+    quadrature (GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
   FEValues<dim> fe_values(mapping, fe, quadrature, update_values);
   fe_values.reinit(cell_point.first);
 
@@ -1867,14 +1868,16 @@ VectorTools::point_value (const Mapping<dim>    &mapping,
                                    // first find the cell in which this point
                                    // is, initialize a quadrature rule with
                                    // it, and then a FEValues object
-  std::pair<typename DoFHandler<dim>::active_cell_iterator, Point<dim> >
-    cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
+  const std::pair<typename DoFHandler<dim>::active_cell_iterator, Point<dim> >
+    cell_point
+    = GridTools::find_active_cell_around_point (mapping, dof, point);
 
-  Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10, ExcInternalError());
+  Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
+         ExcInternalError());
 
-  GeometryInfo<dim>::project_to_unit_cell(cell_point.second);
-  
-  const Quadrature<dim> quadrature (cell_point.second);
+  const Quadrature<dim>
+    quadrature (GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+
   FEValues<dim> fe_values(mapping, fe, quadrature, update_values);
   fe_values.reinit(cell_point.first);
 
@@ -1903,14 +1906,14 @@ VectorTools::point_value (const Mapping<dim>    &mapping,
                                    // first find the cell in which this point
                                    // is, initialize a quadrature rule with
                                    // it, and then a FEValues object
-  std::pair<typename DoFHandler<dim>::active_cell_iterator, Point<dim> >
+  const std::pair<typename DoFHandler<dim>::active_cell_iterator, Point<dim> >
     cell_point = GridTools::find_active_cell_around_point (mapping, dof, point);
 
-  Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10, ExcInternalError());
-
-  GeometryInfo<dim>::project_to_unit_cell(cell_point.second);
+  Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
+         ExcInternalError());
   
-  const Quadrature<dim> quadrature (cell_point.second);
+  const Quadrature<dim>
+    quadrature (GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
   FEValues<dim> fe_values(mapping, fe, quadrature, update_values);
   fe_values.reinit(cell_point.first);
 
