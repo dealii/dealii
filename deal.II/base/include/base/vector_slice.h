@@ -31,7 +31,7 @@
  * @code
  *   void f(const std::vector<int>& v)
  *   {
- *     const VectorSlice slice(v,...);
+ *     const VectorSlice<const std::vector<int> > slice(v,...);
  *     ...
  *   }
  * @endcode
