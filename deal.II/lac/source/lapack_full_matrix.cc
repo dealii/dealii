@@ -180,9 +180,9 @@ LAPACKFullMatrix<number>::compute_eigenvalues()
 				   // (the PETSc 2.3.0 implementation does NOT
 				   // provide this functionality!).
 
-				   // define the HAVE_LIBLAPACK_NOQUERYMODE flag to
+				   // define the DEAL_II_LIBLAPACK_NOQUERYMODE flag to
 				   // disable the workspace query.
-#ifndef HAVE_LIBLAPACK_NOQUERYMODE
+#ifndef DEAL_II_LIBLAPACK_NOQUERYMODE
   lwork = -1;
   work.resize(1);
       
