@@ -141,7 +141,7 @@ class SolutionBase
 				 // First we assign values to the centers for
 				 // the 1d case, where we place the centers
 				 // equidistantly at -1/3, 0, and 1/3. The
-				 // ``template <>'' header for this definition
+				 // ``template @<@>'' header for this definition
 				 // indicates an explicit specialization. This
 				 // means, that the variable belongs to a
 				 // template, but that instead of providing
@@ -193,7 +193,7 @@ const double SolutionBase<dim>::width = 1./3.;
 				 // the classes representing these
 				 // two. They both represent
 				 // continuous functions, so they are
-				 // derived from the ``Function<dim>''
+				 // derived from the ``Function@<dim@>''
 				 // base class, and they also inherit
 				 // the characteristics defined in the
 				 // ``SolutionBase'' class.
@@ -249,10 +249,10 @@ class Solution : public Function<dim>,
 				 // elements of a base class that is
 				 // template dependent (in this case
 				 // the elements of
-				 // ``SolutionBase<dim>''), then the
+				 // ``SolutionBase@<dim@>''), then the
 				 // C++ language forces us to write
-				 // ``this->n_source_centers'' (for
-				 // example). Note that the ``this->''
+				 // ``this-@>n_source_centers'' (for
+				 // example). Note that the ``this-@>''
 				 // qualification is not necessary if
 				 // the base class is not template
 				 // dependent, and also that the gcc
@@ -293,13 +293,13 @@ double Solution<dim>::value (const Point<dim>   &p,
                                  // initialization.
                                  //
                                  // Note that we could as well have taken the
-                                 // type of the object to be ``Point<dim>''
-                                 // instead of ``Tensor<1,dim>''. Tensors of
+                                 // type of the object to be ``Point@<dim@>''
+                                 // instead of ``Tensor@<1,dim@>''. Tensors of
                                  // rank 1 and points are almost exchangeable,
                                  // and have only very slightly different
                                  // mathematical meanings. In fact, the
-                                 // ``Point<dim>'' class is derived from the
-                                 // ``Tensor<1,dim>'' class, which makes up
+                                 // ``Point@<dim@>'' class is derived from the
+                                 // ``Tensor@<1,dim@>'' class, which makes up
                                  // for their mutual exchange ability. Their
                                  // main difference is in what they logically
                                  // mean: points are points in space, such as
@@ -625,7 +625,7 @@ class HelmholtzProblem
 				     // the finite element object; since the
 				     // finite element object is actually
 				     // never changed in our computations, we
-				     // pass a ``const FiniteElement<dim>'' as
+				     // pass a ``const FiniteElement@<dim@>'' as
 				     // template argument to the
 				     // ``SmartPointer'' class. Note that the
 				     // pointer so declared is assigned at
@@ -1308,7 +1308,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // maximum value over all cell-wise
 				   // entries, an operation that is
 				   // conveniently done using the
-				   // ``Vector<float>::linfty'' function:
+				   // ``Vector@<float@>::linfty'' function:
   const QTrapez<1>     q_trapez;
   const QIterated<dim> q_iterated (q_trapez, 5);
   VectorTools::integrate_difference (dof_handler,

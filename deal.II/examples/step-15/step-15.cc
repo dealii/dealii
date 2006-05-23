@@ -52,9 +52,9 @@
 
 
                                  // The first thing we have here is a helper
-                                 // function that computes an even power |v|^n
-                                 // of a vector ``v'', by evaluating
-                                 // (v*v)^(n/2). We need this in the
+                                 // function that computes an even power $|v|^n$
+                                 // of a vector $v$, by evaluating
+                                 // $(v\cdot v)^{n/2}. We need this in the
                                  // computations below where we do not want to
                                  // dwell on the fact that the gradient of the
                                  // solution is actually a scalar in the 1d
@@ -106,7 +106,7 @@ double gradient_power (const Tensor<1,dim> &v,
                                  // i.e. it has a member operator that returns
                                  // for a given point the value of the
                                  // function. The value we return is a random
-                                 // perturbation of the ``x^1/3'' function
+                                 // perturbation of the $x^{1/3}$ function
                                  // which we know is the optimal solution in a
                                  // larger function space. To make things a
                                  // little simpler on the optimizer, we return
@@ -130,7 +130,7 @@ class InitializationValues : public Function<1>
 
                                  // So here comes the function that implements
                                  // the function object. The ``base'' value is
-                                 // ``x^1/3'', while ``random'' is a random
+                                 // $x^{1/3}$, while ``random'' is a random
                                  // number between -1 and 1 (note that
                                  // ``rand()'' returns a random integer value
                                  // between zero and ``RAND_MAX''; to convert
@@ -395,7 +395,7 @@ void MinimizationProblem<dim>::assemble_step ()
                                    // quadrature point. In addition, we need
                                    // to have the coordinate values of each
                                    // quadrature point in real space for the
-                                   // ``x-u^3'' terms; to get these from the
+                                   // $x-u^3$ terms; to get these from the
                                    // ``FEValues'' object, we need to pass it
                                    // the ``update_q_points'' flag.
                                    //
@@ -492,7 +492,7 @@ void MinimizationProblem<dim>::assemble_step ()
                                            // quadrature point, as well as the
                                            // location in real space of this
                                            // quadrature point, and of the
-                                           // expression (x-u^3), since it
+                                           // expression $x-u^3$, since it
                                            // appears so often:
           const double u = local_solution_values[q_point],
                        x = fe_values.quadrature_point(q_point)(0);
@@ -1148,7 +1148,7 @@ void MinimizationProblem<1>::refine_grid ()
                                    // situations, the library will silently
                                    // also have to refine the neighbor cell
                                    // once. It does so by calling the
-                                   // ``Triangulation<dim>::prepare_coarsening_and_refinement''
+                                   // ``Triangulation@<dim@>::prepare_coarsening_and_refinement''
                                    // function before actually doing the
                                    // refinement and coarsening. This function
                                    // flags a set of additional cells for

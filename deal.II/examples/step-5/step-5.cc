@@ -606,7 +606,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // class takes a template argument
 				 // denoting the matrix type it is
 				 // supposed to work on. The default
-				 // value is ``SparseMatrix<double>'',
+				 // value is ``SparseMatrix@<double@>'',
 				 // which is exactly what we need
 				 // here, so we simply stick with the
 				 // default and do not specify

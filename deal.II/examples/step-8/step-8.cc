@@ -336,7 +336,7 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 				   //
 				   // We can prevent this situation by
 				   // calling
-				   // ``RightHandSide<dim>::vector_valued''
+				   // ``RightHandSide@<dim@>::vector_valued''
 				   // on each point in the input
 				   // list. Note that by giving the
 				   // full name of the function,
@@ -582,7 +582,7 @@ void ElasticProblem<dim>::assemble_system ()
 				   // ``rhs_values'' array is
 				   // changed. We initialize it by
 				   // ``n_q_points'' elements, each of
-				   // which is a ``Vector<double>''
+				   // which is a ``Vector@<double@>''
 				   // with ``dim'' elements.
   RightHandSide<dim>      right_hand_side;
   std::vector<Vector<double> > rhs_values (n_q_points,
@@ -636,8 +636,8 @@ void ElasticProblem<dim>::assemble_system ()
 				       // that there is more in
 				       // it. In fact, the
 				       // function returns a
-				       // ``std::pair<unsigned int,
-				       // unsigned int>'', of
+				       // ``std::pair@<unsigned int,
+				       // unsigned int@>'', of
 				       // which the first element
 				       // is ``comp(i)'' and the
 				       // second is the value

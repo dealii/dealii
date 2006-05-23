@@ -140,7 +140,7 @@ class MixedLaplaceProblem
 				 // one, and ``dim+1'' components,
 				 // respectively, and that we pass the
 				 // number of components down to the
-				 // ``Function<dim>'' base class. For
+				 // ``Function@<dim@>'' base class. For
 				 // the exact solution, we only
 				 // declare the function that actually
 				 // returns the entire solution vector
@@ -417,7 +417,7 @@ double extract_p (const FEValuesBase<dim> &fe_values,
                                  // its base elements, with the way we
                                  // have done so in step-8: there, we
                                  // have built it as ``fe
-                                 // (FE_Q<dim>(1), dim)'', i.e. we
+                                 // (FE_Q@<dim@>(1), dim)'', i.e. we
                                  // have simply used ``dim'' copies of
                                  // the ``FE_Q(1)'' element, one copy
                                  // for the displacement in each
@@ -1007,7 +1007,7 @@ void SchurComplement::vmult (Vector<double>       &dst,
                                  // and preconditioner system is the
                                  // class that approximates the Schur
                                  // complement so we can form a
-                                 // ``InverseMatrix<ApproximateSchurComplement>''
+                                 // ``InverseMatrix@<ApproximateSchurComplement@>''
                                  // object that approximates the
                                  // inverse of the Schur
                                  // complement. It follows the same
@@ -1227,7 +1227,7 @@ void MixedLaplaceProblem<dim>::compute_errors () const
                                    // quadrature. This actually
                                    // presents a slight twist here: if
                                    // we naively chose an object of
-                                   // type ``QGauss<dim>(degree+1)''
+                                   // type ``QGauss@<dim@>(degree+1)''
                                    // as one may be inclined to do
                                    // (this is what we used for
                                    // integrating the linear system),

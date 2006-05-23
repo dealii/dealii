@@ -268,10 +268,10 @@ void LaplaceProblem<dim>::assemble_system ()
     };
 
 				   // Again use zero boundary values:
-//   std::map<unsigned int,double> boundary_values;
+//   std::map@<unsigned int,double@> boundary_values;
 //   VectorTools::interpolate_boundary_values (mg_dof_handler,
 // 					    0,
-// 					    ZeroFunction<dim>(),
+// 					    ZeroFunction@<dim@>(),
 // 					    boundary_values);
 //   MatrixTools::apply_boundary_values (boundary_values,
 // 				      system_matrix,
@@ -357,10 +357,10 @@ void LaplaceProblem<dim>::assemble_multigrid ()
     };
 
 				   // Again use zero boundary values:
-//   std::map<unsigned int,double> boundary_values;
+//   std::map@<unsigned int,double@> boundary_values;
 //   VectorTools::interpolate_boundary_values (mg_dof_handler,
 // 					    0,
-// 					    ZeroFunction<dim>(),
+// 					    ZeroFunction@<dim@>(),
 // 					    boundary_values);
 //   MatrixTools::apply_boundary_values (boundary_values,
 // 				      system_matrix,

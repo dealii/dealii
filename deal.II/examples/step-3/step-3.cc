@@ -558,7 +558,7 @@ void LaplaceProblem::assemble_system ()
 				       // fe_values.shape_grad(i,q_point);
 				       // this gradient is a 2-dimensional
 				       // vector (in fact it is of type
-				       // Tensor<1,dim>, with here dim=2) and
+				       // Tensor@<1,dim@>, with here dim=2) and
 				       // the product of two such vectors is
 				       // the scalar product, i.e. the product
 				       // of the two shape_grad function calls
@@ -771,8 +771,8 @@ void LaplaceProblem::solve ()
 				   // of the vectors, but the empty angle
 				   // brackets indicate that we simply take
 				   // the default arguments (which are
-				   // ``SparseMatrix<double>'' and
-				   // ``Vector<double>''):
+				   // ``SparseMatrix@<double@>'' and
+				   // ``Vector@<double@>''):
   SolverCG<>              cg (solver_control);
 
 				   // Now solve the system of equations. The

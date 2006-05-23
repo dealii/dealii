@@ -442,7 +442,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // of Gauss-r is 2r, and the order
 				   // of the boundary approximation
 				   // using polynomials of degree p is
-				   // p+1, we know that 2r>=p+1. Since
+				   // p+1, we know that 2r@>=p+1. Since
 				   // r has to be an integer and (as
 				   // mentioned above) has to be at
 				   // least 2, this makes up for the
@@ -662,7 +662,7 @@ int main ()
 				       // mappings of linear through
 				       // cubic mappings. Note that
 				       // since we need the object of
-				       // type ``LaplaceProblem<2>''
+				       // type ``LaplaceProblem@<2@>''
 				       // only once, we do not even
 				       // name it, but create an
 				       // unnamed such object and call

@@ -172,8 +172,8 @@ class BoundaryValues : public Function<dim>
 
 
 				 // For this example, we choose as right hand
-				 // side function to function 4*(x^4+y^4) in
-				 // 2D, or 4*(x^4+y^4+z^4) in 3D. We could
+				 // side function to function $4(x^4+y^4)$ in
+				 // 2D, or $4(x^4+y^4+z^4)$ in 3D. We could
 				 // write this distinction using an
 				 // if-statement on the space dimension, but
 				 // here is a simple way that also allows us
@@ -185,7 +185,7 @@ class BoundaryValues : public Function<dim>
 				 // the template, the compiler doesn't know
 				 // the value of ``dim'', but when it later
 				 // encounters a statement or declaration
-				 // ``RightHandSide<2>'', it will take the
+				 // ``RightHandSide@<2@>'', it will take the
 				 // template, replace all occurrences of dim
 				 // by 2 and compile the resulting function);
 				 // in other words, at the time of compiling
@@ -197,7 +197,7 @@ class BoundaryValues : public Function<dim>
 				 // above right away.
 				 //
 				 // The last thing to note is that a
-				 // ``Point<dim>'' denotes a point in
+				 // ``Point@<dim@>'' denotes a point in
 				 // dim-dimensionsal space, and its individual
 				 // components (i.e. `x', `y',
 				 // ... coordinates) can be accessed using the
@@ -241,26 +241,26 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
                                  // ``dim'' that we assume unknown at the time
                                  // we define the template functions. Only
                                  // later, the compiler will find a
-                                 // declaration of ``LaplaceProblem<2>'' (in
+                                 // declaration of ``LaplaceProblem@<2@>'' (in
                                  // the ``main'' function, actually) and
                                  // compile the entire class with ``dim''
                                  // replaced by 2, a process referred to as
                                  // `instantiation of a template'. When doing
                                  // so, it will also replace instances of
-                                 // ``RightHandSide<dim>'' by
-                                 // ``RightHandSide<2>'' and instantiate the
+                                 // ``RightHandSide@<dim@>'' by
+                                 // ``RightHandSide@<2@>'' and instantiate the
                                  // latter class from the class template.
                                  //
                                  // In fact, the compiler will also find a
-                                 // declaration ``LaplaceProblem<3>'' in
+                                 // declaration ``LaplaceProblem@<3@>'' in
                                  // ``main()''. This will cause it to again go
                                  // back to the general
-                                 // ``LaplaceProblem<dim>'' template, replace
+                                 // ``LaplaceProblem@<dim@>'' template, replace
                                  // all occurrences of ``dim'', this time by
                                  // 3, and compile the class a second
                                  // time. Note that the two instantiations
-                                 // ``LaplaceProblem<2>'' and
-                                 // ``LaplaceProblem<3>'' are completely
+                                 // ``LaplaceProblem@<2@>'' and
+                                 // ``LaplaceProblem@<3@>'' are completely
                                  // independent classes; their only common
                                  // feature is that they are both instantiated
                                  // from the same general template, but they
@@ -494,7 +494,7 @@ void LaplaceProblem<dim>::assemble_system ()
                                        // ``fe_values.shape_grad(i,q_point)''
                                        // returns a ``dim'' dimensional
                                        // vector, represented by a
-                                       // ``Tensor<1,dim>'' object, and the
+                                       // ``Tensor@<1,dim@>'' object, and the
                                        // operator* that multiplies it with
                                        // the result of
                                        // ``fe_values.shape_grad(j,q_point)''
@@ -653,7 +653,7 @@ void LaplaceProblem<dim>::run ()
 				 // looks mostly like in step-3, but if you
 				 // look at the code below, note how we first
 				 // create a variable of type
-				 // ``LaplaceProblem<2>'' (forcing the
+				 // ``LaplaceProblem@<2@>'' (forcing the
 				 // compiler to compile the class template
 				 // with ``dim'' replaced by ``2'') and run a
 				 // 2d simulation, and then we do the whole

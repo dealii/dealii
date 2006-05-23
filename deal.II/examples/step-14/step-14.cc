@@ -789,7 +789,7 @@ namespace LaplaceSolver
 				   // of freedom of the primal solver,
 				   // we would have to indicate this
 				   // like so:
-				   // ``PrimalSolver<dim>::n_dofs()''.
+				   // ``PrimalSolver@<dim@>::n_dofs()''.
 				   // However, the compiler does not
 				   // accept this since the ``n_dofs''
 				   // function is actually from a base
@@ -1251,7 +1251,7 @@ namespace LaplaceSolver
 				 // get all that characterizes the
 				 // curved ridge solution, we would
 				 // simply generate an instance of
-				 // ``Data::SetUp<Data::CurvedRidge>'',
+				 // ``Data::SetUp@<Data::CurvedRidge@>'',
 				 // and everything we need to know
 				 // about the solution would be static
 				 // member variables and functions of
@@ -1737,10 +1737,10 @@ namespace Data
 				 // is a worthwhile strategy. Other
 				 // possibilities for special cases
 				 // are to derive from
-				 // ``Data::SetUp<SomeSetUp>'' where
+				 // ``Data::SetUp@<SomeSetUp@>'' where
 				 // ``SomeSetUp'' denotes a class, or
 				 // even to explicitly specialize
-				 // ``Data::SetUp<SomeSetUp>''. The
+				 // ``Data::SetUp@<SomeSetUp@>''. The
 				 // latter allows to transparently use
 				 // the way the ``SetUp'' class is
 				 // used for other set-ups, but with
@@ -3975,7 +3975,7 @@ int main ()
 				       // take here the description of
 				       // ``Exercise_2_3'', but you
 				       // can also use
-				       // ``CurvedRidges<dim>'':
+				       // ``CurvedRidges@<dim@>'':
       descriptor.data = new Data::SetUp<Data::Exercise_2_3<dim>,dim> ();
       
 				       // Next set first a dual

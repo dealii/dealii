@@ -382,7 +382,7 @@ namespace Evaluation
 					     // by a statement like
 					     // ``Assert
 					     // (dof_handler.get_fe().dofs_per_vertex
-					     // > 0,
+					     // @> 0,
 					     // ExcNotImplemented())'',
 					     // which should make it
 					     // quite clear what is
@@ -395,7 +395,7 @@ namespace Evaluation
 					     // that that does not
 					     // hurt here, since the
 					     // statement
-					     // ``cell->vertex_dof_index(vertex,0)''
+					     // ``cell-@>vertex_dof_index(vertex,0)''
 					     // would fail if we asked
 					     // it to give us the DoF
 					     // index of a vertex if
@@ -652,7 +652,7 @@ namespace Evaluation
 				   // passed as second argument.
 				   //
 				   // Also note that we have to prefix
-				   // ``this->'' to access a member
+				   // ``this-@>'' to access a member
 				   // variable of the template
 				   // dependent base class. The reason
 				   // here, and further down in the
@@ -1625,7 +1625,7 @@ namespace LaplaceSolver
 				   // The first, doing global
 				   // refinement, is rather simple:
 				   // its main function just calls
-				   // ``triangulation->refine_global
+				   // ``triangulation-@>refine_global
 				   // (1);'', which does all the work.
 				   //
 				   // Note that since the ``Base''

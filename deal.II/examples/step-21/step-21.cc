@@ -135,7 +135,7 @@ class BoundaryValues:  public Function<dim>
 				 // class as we prefer to get function
 				 // values of type ``Point'' rather
 				 // than of type
-				 // ``Vector<double>''. This, because
+				 // ``Vector@<double@>''. This, because
 				 // there exist scalar products
 				 // between ``Point'' and ``Point'' as
 				 // well as between ``Point'' and
@@ -969,7 +969,7 @@ void DGMethod<dim>::assemble_system1 ()
 						   // neighbors of the
 						   // neighboring
 						   // cell. Hence,
-						   // neighbor->neighbor(neighbor2)
+						   // neighbor-@>neighbor(neighbor2)
 						   // equals the
 						   // current cell
 						   // ``cell''.
@@ -1090,7 +1090,7 @@ void DGMethod<dim>::assemble_system1 ()
 					    un_v_matrix(i,k));
 		    }
 						   // End of ``if
-						   // (face->has_children())''
+						   // (face-@>has_children())''
 		}
 	      else
 		{
@@ -1143,9 +1143,9 @@ void DGMethod<dim>::assemble_system1 ()
 					     u_v_matrix,
 					     un_v_matrix);
 						       // End of ``if
-						       // (neighbor->level()
+						       // (neighbor-@>level()
 						       // ==
-						       // cell->level())''
+						       // cell-@>level())''
 		    }
 		  else
 		    {

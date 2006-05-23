@@ -790,7 +790,7 @@ void LaplaceProblem<dim>::solve ()
 				 // corresponding Neumann values. This
 				 // information is represented by an
 				 // object of type
-				 // ``FunctionMap<dim>::type'' that is
+				 // ``FunctionMap@<dim@>::type'' that is
 				 // essentially a map from boundary
 				 // indicators to function objects
 				 // describing Neumann boundary values

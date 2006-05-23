@@ -52,14 +52,14 @@ void first_grid ()
                                    // two-dimensional domain:
   Triangulation<2> triangulation;
 				   // Here and in many following
-                                   // cases, the string "<2>" after a
+                                   // cases, the string "@<2@>" after a
                                    // class name indicates that this
                                    // is an object that shall work in
                                    // two space dimensions. Likewise,
                                    // there are versions of the
                                    // triangulation class that are
-                                   // working in one ("<1>") and three
-                                   // ("<3>") space dimensions. The
+                                   // working in one ("@<1@>") and three
+                                   // ("@<3@>") space dimensions. The
                                    // way this works is through some
                                    // template magic that we will
                                    // investigate in some more detail
@@ -218,8 +218,8 @@ void second_grid ()
                                          // time getting the program
                                          // to also run in 3d: we only
                                          // have to change all
-                                         // occurrences of ``<2>'' to
-                                         // ``<3>'', and do not have
+                                         // occurrences of ``@<2@>'' to
+                                         // ``@<3@>'', and do not have
                                          // to audit our code for the
                                          // hidden appearance of magic
                                          // numbers like a 4 that

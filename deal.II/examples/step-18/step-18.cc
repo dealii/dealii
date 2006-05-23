@@ -2323,7 +2323,7 @@ namespace QuasiStaticElasticity
                                    // function. First, how we get the
                                    // displacement field at a given vertex
                                    // using the
-                                   // ``cell->vertex_dof_index(v,d)'' function
+                                   // ``cell-@>vertex_dof_index(v,d)'' function
                                    // that returns the index of the ``d''th
                                    // degree of freedom at vertex ``v'' of the
                                    // given cell. In the present case,
@@ -2410,9 +2410,9 @@ namespace QuasiStaticElasticity
                                    // the number of a vertex once it has come
                                    // into existence, even if vertices with
                                    // lower number go away. Secondly, the
-                                   // location returned by ``cell->vertex(v)''
+                                   // location returned by ``cell-@>vertex(v)''
                                    // is not only a read-only object of type
-                                   // ``Point<dim>'', but in fact a reference
+                                   // ``Point@<dim@>'', but in fact a reference
                                    // that can be written to. This allows to
                                    // move around the nodes of a mesh with
                                    // relative ease, but it is worth pointing

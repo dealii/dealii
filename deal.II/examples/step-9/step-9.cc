@@ -280,7 +280,7 @@ class AdvectionField : public TensorFunction<1,dim>
 				     // output directives that will be
 				     // piped into the ``std::cerr''
 				     // object, thus the strange
-				     // format with the leading ``<<''
+				     // format with the leading ``@<@<''
 				     // operator and the like. Note
 				     // that we can access the
 				     // parameters which are passed to
@@ -806,7 +806,7 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // only for a range of cell
 				   // iterators, but for iterators in
 				   // general, so you could use it for
-				   // ``std::vector<T>::iterator'' or
+				   // ``std::vector@<T@>::iterator'' or
 				   // usual pointers as well.
 				   //
 				   // The function returns a vector of
