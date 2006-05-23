@@ -42,8 +42,8 @@
                                  // need particularly for this example
                                  // program and that weren't in
                                  // step-8. First, we replace the
-                                 // standard output ``std::cout'' by a
-                                 // new stream ``pcout'' which is used
+                                 // standard output <code>std::cout</code> by a
+                                 // new stream <code>pcout</code> which is used
                                  // in parallel computations for
                                  // generating output only on one of
                                  // the MPI processes.
@@ -83,9 +83,9 @@
                                  // for partitioning our meshes so that they
                                  // can be efficiently distributed across an
                                  // MPI network. The partitioning algorithm is
-                                 // implemented in the ``GridTools'' class,
+                                 // implemented in the <code>GridTools</code> class,
                                  // and we need an additional include file for
-                                 // a function in ``DoFRenumbering'' that
+                                 // a function in <code>DoFRenumbering</code> that
                                  // allows to sort the indices associated with
                                  // degrees of freedom so that they are
                                  // numbered according to the subdomain they
@@ -106,12 +106,12 @@
                                  // copied verbatim from step-8, so we only
                                  // comment on the few things that are
                                  // different. There is one (cosmetic) change
-                                 // in that we let ``solve'' return a value,
+                                 // in that we let <code>solve</code> return a value,
                                  // namely the number of iterations it took to
                                  // converge, so that we can output this to
                                  // the screen at the appropriate place. In
                                  // addition, we introduce a stream-like
-                                 // variable ``pcout'', explained below:
+                                 // variable <code>pcout</code>, explained below:
 template <int dim>
 class ElasticProblem 
 {
@@ -135,12 +135,12 @@ class ElasticProblem
                                      // to only have one process output
                                      // everything once, for example the one
                                      // with process number
-                                     // zero. ``ConditionalOStream'' does
+                                     // zero. <code>ConditionalOStream</code> does
                                      // exactly this: it acts as if it were a
                                      // stream, but only forwards to a real,
                                      // underlying stream if a flag is set. By
                                      // setting this condition to
-                                     // ``this_mpi_process==0'', we make sure
+                                     // <code>this_mpi_process==0</code>, we make sure
                                      // that output is only generated from the
                                      // first process and that we don't get
                                      // the same lines of output over and over
@@ -148,8 +148,8 @@ class ElasticProblem
                                      //
                                      // With this simple trick, we make sure
                                      // that we don't have to guard each and
-                                     // every write to ``std::cout'' by a
-                                     // prefixed ``if(this_mpi_process==0)''.
+                                     // every write to <code>std::cout</code> by a
+                                     // prefixed <code>if(this_mpi_process==0)</code>.
     ConditionalOStream pcout;
 
                                      // The next few variables are taken
@@ -171,10 +171,10 @@ class ElasticProblem
                                      // fact that we use the parallel versions
                                      // is denoted the fact that we use the
                                      // classes from the
-                                     // ``PETScWrappers::MPI'' namespace;
+                                     // <code>PETScWrappers::MPI</code> namespace;
                                      // sequential versions of these classes
-                                     // are in the ``PETScWrappers''
-                                     // namespace, i.e. without the ``MPI''
+                                     // are in the <code>PETScWrappers</code>
+                                     // namespace, i.e. without the <code>MPI</code>
                                      // part). Note also that we do not use a
                                      // separate sparsity pattern, since PETSc
                                      // manages that as part of its matrix
@@ -191,7 +191,7 @@ class ElasticProblem
                                      // computations. Note that if this is a
                                      // sequential job without support by MPI,
                                      // then PETSc provides some dummy type
-                                     // for ``MPI_Comm'', so we do not have to
+                                     // for <code>MPI_Comm</code>, so we do not have to
                                      // care here whether the job is really a
                                      // parallel one:
     MPI_Comm mpi_communicator;
@@ -199,19 +199,19 @@ class ElasticProblem
                                      // Then we have two variables that tell
                                      // us where in the parallel world we
                                      // are. The first of the following
-                                     // variables, ``n_mpi_processes'' tells
+                                     // variables, <code>n_mpi_processes</code> tells
                                      // us how many MPI processes there exist
                                      // in total, while the second one,
-                                     // ``this_mpi_process'', indicates which
+                                     // <code>this_mpi_process</code>, indicates which
                                      // is the number of the present process
                                      // within this space of processes. The
                                      // latter variable will have a unique
                                      // value for each process between zero
                                      // and (less than)
-                                     // ``n_mpi_processes''. If this program
+                                     // <code>n_mpi_processes</code>. If this program
                                      // is run on a single machine without MPI
-                                     // support, then their values are ``1''
-                                     // and ``0'', respectively.
+                                     // support, then their values are <code>1</code>
+                                     // and <code>0</code>, respectively.
     const unsigned int n_mpi_processes;
     const unsigned int this_mpi_process;
 };
@@ -335,9 +335,9 @@ void ElasticProblem<dim>::setup_system ()
                                    // system, there is one thing to do for a
                                    // parallel program: we need to assign
                                    // cells to each of the processes. We do
-                                   // this by splitting (``partitioning'') the
+                                   // this by splitting (<code>partitioning</code>) the
                                    // mesh cells into as many chunks
-                                   // (``subdomains'') as there are processes
+                                   // (<code>subdomains</code>) as there are processes
                                    // in this MPI job (if this is a sequential
                                    // job, then there is only one job and all
                                    // cells will get a zero as subdomain
@@ -393,13 +393,13 @@ void ElasticProblem<dim>::setup_system ()
                                    // to the number of degrees of freedom),
                                    // and also how many rows out of this
                                    // global size are to be stored locally
-                                   // (``n_local_dofs''). In addition, PETSc
+                                   // (<code>n_local_dofs</code>). In addition, PETSc
                                    // needs to know how to partition the
                                    // columns in the chunk of the matrix that
                                    // is stored locally; for square matrices,
                                    // the columns should be partitioned in the
                                    // same way as the rows (indicated by the
-                                   // second ``n_local_dofs'' in the call) but
+                                   // second <code>n_local_dofs</code> in the call) but
                                    // in the case of rectangular matrices one
                                    // has to partition the columns in the same
                                    // way as vectors are partitioned with
@@ -445,7 +445,7 @@ void ElasticProblem<dim>::setup_system ()
                                  // freedom are split in a way such that all
                                  // DoFs in the interior of cells and between
                                  // cells belonging to the same subdomain
-                                 // belong to the process that ``owns'' the
+                                 // belong to the process that <code>owns</code> the
                                  // cell. However, even then we sometimes need
                                  // to assemble on a cell with a neighbor that
                                  // belongs to a different process, and in
@@ -457,7 +457,7 @@ void ElasticProblem<dim>::setup_system ()
                                  // this by hand, PETSc does all this for us
                                  // by caching these elements locally, and
                                  // sending them to the other processes as
-                                 // necessary when we call the ``compress()''
+                                 // necessary when we call the <code>compress()</code>
                                  // functions on the matrix and vector at the
                                  // end of this function.
                                  //
@@ -491,7 +491,7 @@ void ElasticProblem<dim>::setup_system ()
                                  // to do this first part: instead of
                                  // copying elements by hand into the
                                  // global matrix, we use the
-                                 // ``distribute_local_to_global''
+                                 // <code>distribute_local_to_global</code>
                                  // functions below to take care of
                                  // hanging nodes at the same
                                  // time. The second step, elimination
@@ -547,12 +547,12 @@ void ElasticProblem<dim>::assemble_system ()
                                    // generality, the subdomain id is used to
                                    // split a domain into several parts (we do
                                    // this above, at the beginning of
-                                   // ``setup_system''), and which allows to
+                                   // <code>setup_system</code>), and which allows to
                                    // identify which subdomain a cell is
                                    // living on. In this application, we have
                                    // each process handle exactly one
                                    // subdomain, so we identify the terms
-                                   // ``subdomain'' and ``MPI process'' with
+                                   // <code>subdomain</code> and <code>MPI process</code> with
                                    // each other.
                                    //
                                    // Apart from this, assembling the local
@@ -691,7 +691,7 @@ void ElasticProblem<dim>::assemble_system ()
                                    // whether we should also delete the
                                    // column corresponding to a boundary
                                    // node, or keep it (and passing
-                                   // ``true'' as above means: yes, do
+                                   // <code>true</code> as above means: yes, do
                                    // eliminate the column). If we do,
                                    // then the resulting matrix will be
                                    // symmetric again if it was before;
@@ -1067,7 +1067,7 @@ void ElasticProblem<dim>::refine_grid ()
                                    // Now all processes have computed error
                                    // indicators for their own cells and
                                    // stored them in the respective elements
-                                   // of the ``local_error_per_cell''
+                                   // of the <code>local_error_per_cell</code>
                                    // vector. The elements of this vector for
                                    // cells not on the present process are
                                    // zero. However, since all processes have
@@ -1109,7 +1109,7 @@ void ElasticProblem<dim>::refine_grid ()
                                    // process. They will subsequently have to
                                    // be copied into another process's memory
                                    // space then, an operation that PETSc does
-                                   // for us when we call the ``compress''
+                                   // for us when we call the <code>compress</code>
                                    // function. This inefficiency could be
                                    // avoided with some more code, but we
                                    // refrain from it since it is not a major
@@ -1158,8 +1158,8 @@ void ElasticProblem<dim>::refine_grid ()
 
                                  // Lastly, here is the driver function. It is
                                  // almost unchanged from step-8, with the
-                                 // exception that we replace ``std::cout'' by
-                                 // the ``pcout'' stream. Apart from this, the
+                                 // exception that we replace <code>std::cout</code> by
+                                 // the <code>pcout</code> stream. Apart from this, the
                                  // only other cosmetic change is that we
                                  // output how many degrees of freedom there
                                  // are per process, and how many iterations
@@ -1206,10 +1206,10 @@ void ElasticProblem<dim>::run ()
 }
 
 
-                                 // So that's it, almost. ``main()'' works the
+                                 // So that's it, almost. <code>main()</code> works the
                                  // same way as most of the main functions in
                                  // the other example programs, i.e. it
-                                 // delegates work to the ``run'' function of
+                                 // delegates work to the <code>run</code> function of
                                  // a master object, and only wraps everything
                                  // into some code to catch exceptions:
 int main (int argc, char **argv) 
@@ -1220,17 +1220,17 @@ int main (int argc, char **argv)
                                        // PETSc requires that we initialize it
                                        // at the beginning of the program, and
                                        // un-initialize it at the end. So we
-                                       // call ``PetscInitialize'' and
-                                       // ``PetscFinalize''. The original code
+                                       // call <code>PetscInitialize</code> and
+                                       // <code>PetscFinalize</code>. The original code
                                        // sits in between, enclosed in braces
                                        // to make sure that the
-                                       // ``elastic_problem'' variable goes
+                                       // <code>elastic_problem</code> variable goes
                                        // out of scope (and is destroyed)
                                        // before we call
-                                       // ``PetscFinalize''. (If we wouldn't
+                                       // <code>PetscFinalize</code>. (If we wouldn't
                                        // use braces, the destructor of
-                                       // ``elastic_problem'' would run after
-                                       // ``PetscFinalize''; since the
+                                       // <code>elastic_problem</code> would run after
+                                       // <code>PetscFinalize</code>; since the
                                        // destructor involves calls to PETSc
                                        // functions, we would get strange
                                        // error messages from PETSc.)

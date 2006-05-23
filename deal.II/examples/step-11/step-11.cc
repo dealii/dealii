@@ -40,7 +40,7 @@
 
 				 // Just this one is new: it declares
 				 // a class
-				 // ``CompressedSparsityPattern'',
+				 // <code>CompressedSparsityPattern</code>,
 				 // which we will use and explain
 				 // further down below.
 #include <lac/compressed_sparsity_pattern.h>
@@ -63,9 +63,9 @@
 				 // class looks rather the same, with
 				 // the sole structural difference
 				 // that the functions
-				 // ``assemble_system'' now calls
-				 // ``solve'' itself, and is thus
-				 // called ``assemble_and_solve'', and
+				 // <code>assemble_system</code> now calls
+				 // <code>solve</code> itself, and is thus
+				 // called <code>assemble_and_solve</code>, and
 				 // that the output function was
 				 // dropped since the solution
 				 // function is so boring that it is
@@ -114,7 +114,7 @@ class LaplaceProblem
 				 // Construct such an object, by
 				 // initializing the variables. Here,
 				 // we use linear finite elements (the
-				 // argument to the ``fe'' variable
+				 // argument to the <code>fe</code> variable
 				 // denotes the polynomial degree),
 				 // and mappings of given order. Print
 				 // to screen what we are about to do.
@@ -135,7 +135,7 @@ LaplaceProblem<dim>::LaplaceProblem (const unsigned int mapping_degree) :
 				 // The first task is to set up the
 				 // variables for this problem. This
 				 // includes generating a valid
-				 // ``DoFHandler'' object, as well as
+				 // <code>DoFHandler</code> object, as well as
 				 // the sparsity patterns for the
 				 // matrix, and the object
 				 // representing the constraints that
@@ -162,9 +162,9 @@ void LaplaceProblem<dim>::setup_system ()
 				   // this, we first want a list of
 				   // those nodes which are actually
 				   // at the boundary. The
-				   // ``DoFTools'' class has a
+				   // <code>DoFTools</code> class has a
 				   // function that returns an array
-				   // of boolean values where ``true''
+				   // of boolean values where <code>true</code>
 				   // indicates that the node is at
 				   // the boundary. The second
 				   // argument denotes a mask
@@ -174,7 +174,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // have a scalar finite element
 				   // anyway, this mask consists of
 				   // only one entry, and its value
-				   // must be ``true''.
+				   // must be <code>true</code>.
   std::vector<bool> boundary_dofs (dof_handler.n_dofs(), false);
   DoFTools::extract_boundary_dofs (dof_handler, std::vector<bool>(1,true),
 				   boundary_dofs);
@@ -188,8 +188,8 @@ void LaplaceProblem<dim>::setup_system ()
 				   // first pick out the first
 				   // boundary node from this list. We
 				   // do that by searching for the
-				   // first ``true'' value in the
-				   // array (note that ``std::find''
+				   // first <code>true</code> value in the
+				   // array (note that <code>std::find</code>
 				   // returns an iterator to this
 				   // element), and computing its
 				   // distance to the overall first
@@ -209,7 +209,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // computation on a once coarser
 				   // grid), then add this one line
 				   // constraining the
-				   // ``first_boundary_dof'' to the
+				   // <code>first_boundary_dof</code> to the
 				   // sum of other boundary DoFs each
 				   // with weight -1. Finally, close
 				   // the constraints object, i.e. do
@@ -228,7 +228,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // sparsity pattern. This is indeed
 				   // a tricky task here. Usually, we
 				   // just call
-				   // ``DoFTools::make_sparsity_pattern''
+				   // <code>DoFTools::make_sparsity_pattern</code>
 				   // and condense the result using
 				   // the hanging node constraints. We
 				   // have no hanging node constraints
@@ -237,7 +237,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // we have this global constraint
 				   // on the boundary. This poses one
 				   // severe problem in this context:
-				   // the ``SparsityPattern'' class
+				   // the <code>SparsityPattern</code> class
 				   // wants us to state beforehand the
 				   // maximal number of entries per
 				   // row, either for all rows or for
@@ -246,7 +246,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // can tell you this number in case
 				   // you just have hanging node
 				   // constraints (namely
-				   // ``DoFHandler::max_coupling_between_dofs''),
+				   // <code>DoFHandler::max_coupling_between_dofs</code>),
 				   // but how is this for the present
 				   // case? The difficulty arises
 				   // because the elimination of the
@@ -264,7 +264,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // given that allows allocation of
 				   // only a reasonable amount of
 				   // memory, there is a class
-				   // ``CompressedSparsityPattern'',
+				   // <code>CompressedSparsityPattern</code>,
 				   // that can help us out here. It
 				   // does not require that we know in
 				   // advance how many entries rows
@@ -285,7 +285,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // initializing it with the
 				   // dimensions of the matrix and
 				   // calling another function
-				   // ``DoFTools::make_sparsity_pattern''
+				   // <code>DoFTools::make_sparsity_pattern</code>
 				   // to get the sparsity pattern due
 				   // to the differential operator,
 				   // then condense it with the
@@ -302,34 +302,34 @@ void LaplaceProblem<dim>::setup_system ()
 				   // Finally, once we have the full
 				   // pattern, we can initialize an
 				   // object of type
-				   // ``SparsityPattern'' from it and
+				   // <code>SparsityPattern</code> from it and
 				   // in turn initialize the matrix
 				   // with it. Note that this is
 				   // actually necessary, since the
-				   // ``CompressedSparsityPattern'' is
+				   // <code>CompressedSparsityPattern</code> is
 				   // so inefficient compared to the
-				   // ``SparsityPattern'' class due to
+				   // <code>SparsityPattern</code> class due to
 				   // the more flexible data
 				   // structures it has to use, that
 				   // we can impossibly base the
 				   // sparse matrix class on it, but
 				   // rather need an object of type
-				   // ``SparsityPattern'', which we
+				   // <code>SparsityPattern</code>, which we
 				   // generate by copying from the
 				   // intermediate object.
 				   //
 				   // As a further sidenote, you will
 				   // notice that we do not explicitly
-				   // have to ``compress'' the
+				   // have to <code>compress</code> the
 				   // sparsity pattern here. This, of
 				   // course, is due to the fact that
-				   // the ``copy_from'' function
+				   // the <code>copy_from</code> function
 				   // generates a compressed object
 				   // right from the start, to which
 				   // you cannot add new entries
-				   // anymore. The ``compress'' call
+				   // anymore. The <code>compress</code> call
 				   // is therefore implicit in the
-				   // ``copy_from'' call.
+				   // <code>copy_from</code> call.
   sparsity_pattern.copy_from (csp);
   system_matrix.reinit (sparsity_pattern);
 }
@@ -378,7 +378,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // of a right hand side vector from
 				   // body or boundary forces. They
 				   // take the mapping object, the
-				   // ``DoFHandler'' object
+				   // <code>DoFHandler</code> object
 				   // representing the degrees of
 				   // freedom and the finite element
 				   // in use, a quadrature formula to
@@ -418,8 +418,8 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // operator. For this reason, there
 				   // are quite a large number of
 				   // variants of these functions in
-				   // the ``MatrixCreator'' and
-				   // ``MatrixTools''
+				   // the <code>MatrixCreator</code> and
+				   // <code>MatrixTools</code>
 				   // classes. Whenever you need a
 				   // slightly different version of
 				   // these functions than the ones
@@ -447,7 +447,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // mentioned above) has to be at
 				   // least 2, this makes up for the
 				   // formula above computing
-				   // ``gauss_degree''.
+				   // <code>gauss_degree</code>.
 				   //
 				   // Since the generation of the body
 				   // force contributions to the right
@@ -479,9 +479,9 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // later add them together. The
 				   // reason we had to do so is that
 				   // the
-				   // ``VectorTools::create_right_hand_side''
+				   // <code>VectorTools::create_right_hand_side</code>
 				   // and
-				   // ``VectorTools::create_boundary_right_hand_side''
+				   // <code>VectorTools::create_boundary_right_hand_side</code>
 				   // functions first clear the output
 				   // vector, rather than adding up
 				   // their results to previous
@@ -521,7 +521,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // a function in the library that
 				   // does this, although in a
 				   // slightly non-obvious way: the
-				   // ``VectorTools::integrate_difference''
+				   // <code>VectorTools::integrate_difference</code>
 				   // function integrates the norm of
 				   // the difference between a finite
 				   // element function and a
@@ -537,7 +537,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				   // (which we make us of here), and
 				   // the one which we have used in
 				   // previous examples which
-				   // implicitly uses ``MappingQ1''.
+				   // implicitly uses <code>MappingQ1</code>.
 				   // Also note that we take a
 				   // quadrature formula of one degree
 				   // higher, in order to avoid
@@ -662,11 +662,11 @@ int main ()
 				       // mappings of linear through
 				       // cubic mappings. Note that
 				       // since we need the object of
-				       // type ``LaplaceProblem@<2@>''
+				       // type <code>LaplaceProblem@<2@></code>
 				       // only once, we do not even
 				       // name it, but create an
 				       // unnamed such object and call
-				       // the ``run'' function of it,
+				       // the <code>run</code> function of it,
 				       // subsequent to which it is
 				       // immediately destroyed again.
       for (unsigned int mapping_degree=1; mapping_degree<=3; ++mapping_degree)

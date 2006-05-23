@@ -29,7 +29,7 @@
 #include <fe/fe_values.h>
 
 				 // This is the only new one: in it,
-				 // we declare the ``MappingQ'' class
+				 // we declare the <code>MappingQ</code> class
 				 // which we will use for polynomial
 				 // mappings of arbitrary order:
 #include <fe/mapping_q.h>
@@ -52,7 +52,7 @@
 				 // range of the number of digits
 				 // which a double variable can hold,
 				 // we rather declare the reference
-				 // value as a ``long double'' and
+				 // value as a <code>long double</code> and
 				 // give it a number of extra digits:
 const long double pi = 3.141592653589793238462643;
 
@@ -78,7 +78,7 @@ const long double pi = 3.141592653589793238462643;
 				 // generates a triangulation of a
 				 // circle (hyperball) and outputs the
 				 // Qp mapping of its cells for
-				 // different values of ``p''. Then,
+				 // different values of <code>p</code>. Then,
 				 // we refine the grid once and do so
 				 // again.
 template <int dim>
@@ -129,14 +129,14 @@ void gnuplot_output()
 				       // reasonable character sets
 				       // nowadays), but also assumes
 				       // that the increment
-				       // ``refinement'' is less than
+				       // <code>refinement</code> is less than
 				       // ten. This is therefore more
 				       // a quick hack if we know
 				       // exactly the values which the
 				       // increment can assume. A
 				       // better implementation would
 				       // use the
-				       // ``std::istringstream''
+				       // <code>std::istringstream</code>
 				       // class to generate a name.
       std::string filename_base = "ball";
       filename_base += '0'+refinement;
@@ -150,7 +150,7 @@ void gnuplot_output()
 					   // For this, first set up
 					   // an object describing the
 					   // mapping. This is done
-					   // using the ``MappingQ''
+					   // using the <code>MappingQ</code>
 					   // class, which takes as
 					   // argument to the
 					   // constructor the
@@ -161,20 +161,20 @@ void gnuplot_output()
 					   // fact: if you want a
 					   // piecewise linear
 					   // mapping, then you could
-					   // give a value of ``1'' to
+					   // give a value of <code>1</code> to
 					   // the
 					   // constructor. However,
 					   // for linear mappings, so
 					   // many things can be
 					   // generated simpler that
 					   // there is another class,
-					   // called ``MappingQ1''
+					   // called <code>MappingQ1</code>
 					   // which does exactly the
 					   // same is if you gave an
-					   // degree of ``1'' to the
-					   // ``MappingQ'' class, but
+					   // degree of <code>1</code> to the
+					   // <code>MappingQ</code> class, but
 					   // does so significantly
-					   // faster. ``MappingQ1'' is
+					   // faster. <code>MappingQ1</code> is
 					   // also the class that is
 					   // implicitly used
 					   // throughout the library
@@ -240,7 +240,7 @@ void gnuplot_output()
 					   // object. This argument
 					   // has a default value, and
 					   // if no value is given a
-					   // simple ``MappingQ1''
+					   // simple <code>MappingQ1</code>
 					   // object is taken, which
 					   // we briefly described
 					   // above. This would then
@@ -281,8 +281,8 @@ void gnuplot_output()
 				 // provides the corresponding `JxW'
 				 // values of each cell. (Note that
 				 // `JxW' is meant to abbreviate
-				 // ``Jacobian determinant times
-				 // weight''; since in numerical
+				 // <code>Jacobian determinant times
+				 // weight</code>; since in numerical
 				 // quadrature the two factors always
 				 // occur at the same places, we only
 				 // offer the combined quantity,
@@ -391,7 +391,7 @@ void compute_pi_by_area ()
 				       // tells the FEValues object
 				       // that it needs not compute
 				       // other quantities upon
-				       // calling the ``reinit''
+				       // calling the <code>reinit</code>
 				       // function, thus saving
 				       // computation time.
 				       //
@@ -489,12 +489,12 @@ void compute_pi_by_area ()
 					   // long double) function
 					   // implemented. Note that
 	                                   // this also concerns the
-	                                   // second call as the ``fabs''
-	                                   // function in the ``std''
+	                                   // second call as the <code>fabs</code>
+	                                   // function in the <code>std</code>
 	                                   // namespace is overloaded on
 	                                   // its argument types, so there
 	                                   // exists a version taking
-	                                   // and returning a ``long double'',
+	                                   // and returning a <code>long double</code>,
 	                                   // in contrast to the global
 	                                   // namespace where only one such
 	                                   // function is declared (which

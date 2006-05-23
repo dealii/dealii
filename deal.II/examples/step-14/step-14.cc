@@ -175,7 +175,7 @@ namespace Evaluation
 				   // from all adjacent cells.
 				   //
 				   // Given the interface of the
-				   // ``PointValueEvaluation'' class,
+				   // <code>PointValueEvaluation</code> class,
 				   // the declaration of this class
 				   // provides little surprise, and
 				   // neither does the constructor:
@@ -264,10 +264,10 @@ namespace Evaluation
 					     // element fields at
 					     // certain points is done
 					     // through the
-					     // ``FEValues'' class, so
+					     // <code>FEValues</code> class, so
 					     // we use that. The
 					     // question is: the
-					     // ``FEValues'' object
+					     // <code>FEValues</code> object
 					     // needs to be a given a
 					     // quadrature formula and
 					     // can then compute the
@@ -293,7 +293,7 @@ namespace Evaluation
 					     // above.
 					     //
 					     // Thus: initialize the
-					     // ``FEValues'' object on
+					     // <code>FEValues</code> object on
 					     // this cell,
 	    fe_values.reinit (cell);
 					     // and extract the
@@ -385,7 +385,7 @@ namespace Evaluation
 				   // the grids generated. This again
 				   // can be done with one such
 				   // class. Its structure is analog
-				   // to the ``SolutionOutput'' class
+				   // to the <code>SolutionOutput</code> class
 				   // of the previous example program,
 				   // so we do not discuss it here in
 				   // more detail. Furthermore,
@@ -453,11 +453,11 @@ namespace LaplaceSolver
 				   // This class is almost unchanged,
 				   // with the exception that it
 				   // declares two more functions:
-				   // ``output_solution'' will be used
+				   // <code>output_solution</code> will be used
 				   // to generate output files from
 				   // the actual solutions computed by
 				   // derived classes, and the
-				   // ``set_refinement_cycle''
+				   // <code>set_refinement_cycle</code>
 				   // function by which the testing
 				   // framework sets the number of the
 				   // refinement cycle to a local
@@ -511,7 +511,7 @@ namespace LaplaceSolver
 
 				   // @sect4{The Laplace Solver class}
 
-				   // Likewise, the ``Solver'' class
+				   // Likewise, the <code>Solver</code> class
 				   // is entirely unchanged and will
 				   // thus not be discussed.
   template <int dim>
@@ -761,13 +761,13 @@ namespace LaplaceSolver
 
 				   // @sect4{The PrimalSolver class}
 
-				   // The ``PrimalSolver'' class is
+				   // The <code>PrimalSolver</code> class is
 				   // also mostly unchanged except for
 				   // overloading the functions
-				   // ``solve_problem'', ``n_dofs'',
-				   // and ``postprocess'' of the base
+				   // <code>solve_problem</code>, <code>n_dofs</code>,
+				   // and <code>postprocess</code> of the base
 				   // class, and implementing the
-				   // ``output_solution''
+				   // <code>output_solution</code>
 				   // function. These overloaded
 				   // functions do nothing particular
 				   // besides calling the functions of
@@ -777,33 +777,33 @@ namespace LaplaceSolver
 				   // requires us to write such
 				   // functions for the following
 				   // scenario: Besides the
-				   // ``PrimalSolver'' class, we will
-				   // have a ``DualSolver'', both
-				   // derived from ``Solver''. We will
+				   // <code>PrimalSolver</code> class, we will
+				   // have a <code>DualSolver</code>, both
+				   // derived from <code>Solver</code>. We will
 				   // then have a final classes which
 				   // derived from these two, which
 				   // will then have two instances of
-				   // the ``Solver'' class as its base
+				   // the <code>Solver</code> class as its base
 				   // classes. If we want, for
 				   // example, the number of degrees
 				   // of freedom of the primal solver,
 				   // we would have to indicate this
 				   // like so:
-				   // ``PrimalSolver@<dim@>::n_dofs()''.
+				   // <code>PrimalSolver@<dim@>::n_dofs()</code>.
 				   // However, the compiler does not
-				   // accept this since the ``n_dofs''
+				   // accept this since the <code>n_dofs</code>
 				   // function is actually from a base
-				   // class of the ``PrimalSolver''
+				   // class of the <code>PrimalSolver</code>
 				   // class, so we have to inject the
 				   // name from the base to the
 				   // derived class using these
 				   // additional functions.
 				   //
 				   // Regarding the implementation of
-				   // the ``output_solution''
+				   // the <code>output_solution</code>
 				   // function, we keep the
-				   // ``GlobalRefinement'' and
-				   // ``RefinementKelly'' classes in
+				   // <code>GlobalRefinement</code> and
+				   // <code>RefinementKelly</code> classes in
 				   // this program, and they can then
 				   // rely on the default
 				   // implementation of this function
@@ -1205,10 +1205,10 @@ namespace LaplaceSolver
 				 // everything that describes a test
 				 // case: here, these are two
 				 // subclasses, one called
-				 // ``BoundaryValues'' for the
+				 // <code>BoundaryValues</code> for the
 				 // boundary values of the exact
 				 // solution, and one called
-				 // ``RightHandSide'', and then a way
+				 // <code>RightHandSide</code>, and then a way
 				 // to generate the coarse grid. Since
 				 // the solution of the previous
 				 // example program looked like curved
@@ -1245,13 +1245,13 @@ namespace LaplaceSolver
 				 // right hand side by simply giving
 				 // the name of the outer class as a
 				 // template argument to a class which
-				 // we call here ``Data::SetUp'', and
+				 // we call here <code>Data::SetUp</code>, and
 				 // it then creates objects for the
 				 // inner classes. In this case, to
 				 // get all that characterizes the
 				 // curved ridge solution, we would
 				 // simply generate an instance of
-				 // ``Data::SetUp@<Data::CurvedRidge@>'',
+				 // <code>Data::SetUp@<Data::CurvedRidge@></code>,
 				 // and everything we need to know
 				 // about the solution would be static
 				 // member variables and functions of
@@ -1266,15 +1266,15 @@ namespace LaplaceSolver
 				 // addition by material properties,
 				 // Neumann values, different boundary
 				 // descriptors, etc. In that case,
-				 // the ``SetUp'' class might consist
+				 // the <code>SetUp</code> class might consist
 				 // of a dozen or more objects, and
 				 // each descriptor class (like the
-				 // ``CurvedRidges'' class below)
+				 // <code>CurvedRidges</code> class below)
 				 // would have to provide them. Then,
 				 // you will be happy to be able to
 				 // change from one set of data to
 				 // another by only changing the
-				 // template argument to the ``SetUp''
+				 // template argument to the <code>SetUp</code>
 				 // class at one place, rather than at
 				 // many.
 				 //
@@ -1290,7 +1290,7 @@ namespace LaplaceSolver
 				 // obvious way, see below, with
 				 // virtual abstract functions. It
 				 // forces us to introduce a second
-				 // template parameter ``dim'' which
+				 // template parameter <code>dim</code> which
 				 // we need for the base class (which
 				 // could be avoided using some
 				 // template magic, but we omit that),
@@ -1300,17 +1300,17 @@ namespace LaplaceSolver
 				 // simple, you don't have to touch
 				 // the framework classes, only a
 				 // structure like the
-				 // ``CurvedRidges'' one is needed.
+				 // <code>CurvedRidges</code> one is needed.
 namespace Data
 {
 				   // @sect4{The SetUpBase and SetUp classes}
   
 				   // Based on the above description,
-				   // the ``SetUpBase'' class then
+				   // the <code>SetUpBase</code> class then
 				   // looks as follows. To allow using
-				   // the ``SmartPointer'' class with
+				   // the <code>SmartPointer</code> class with
 				   // this class, we derived from the
-				   // ``Subscriptor'' class.
+				   // <code>Subscriptor</code> class.
   template <int dim>
   struct SetUpBase : public Subscriptor
   {
@@ -1397,8 +1397,8 @@ namespace Data
 
 				   // The class that is used to
 				   // describe the boundary values and
-				   // right hand side of the ``curved
-				   // ridge'' problem already used in
+				   // right hand side of the <code>curved
+				   // ridge</code> problem already used in
 				   // the step-13 example program is
 				   // then like so:
   template <int dim>
@@ -1699,19 +1699,19 @@ namespace Data
 				 // why we have not chosen to
 				 // implement the classes implementing
 				 // a certain setup (like the
-				 // ``CurvedRidges'' class) directly
+				 // <code>CurvedRidges</code> class) directly
 				 // as classes derived from
-				 // ``Data::SetUpBase''. Indeed, we
+				 // <code>Data::SetUpBase</code>. Indeed, we
 				 // could have done very well so. The
 				 // only reason is that then we would
 				 // have to have member variables for
 				 // the solution and right hand side
-				 // classes in the ``CurvedRidges''
+				 // classes in the <code>CurvedRidges</code>
 				 // class, as well as member functions
 				 // overloading the abstract functions
 				 // of the base class giving access to
 				 // these member variables. The
-				 // ``SetUp'' class has the sole
+				 // <code>SetUp</code> class has the sole
 				 // reason to relieve us from the need
 				 // to reiterate these member
 				 // variables and functions that would
@@ -1728,21 +1728,21 @@ namespace Data
 				 // However, there might be good
 				 // reasons to actually implement
 				 // classes derived from
-				 // ``Data::SetUpBase'', for example
+				 // <code>Data::SetUpBase</code>, for example
 				 // if the solution or right hand side
 				 // classes require constructors that
 				 // take arguments, which the
-				 // ``Data::SetUpBase'' class cannot
+				 // <code>Data::SetUpBase</code> class cannot
 				 // provide. In that case, subclassing
 				 // is a worthwhile strategy. Other
 				 // possibilities for special cases
 				 // are to derive from
-				 // ``Data::SetUp@<SomeSetUp@>'' where
-				 // ``SomeSetUp'' denotes a class, or
+				 // <code>Data::SetUp@<SomeSetUp@></code> where
+				 // <code>SomeSetUp</code> denotes a class, or
 				 // even to explicitly specialize
-				 // ``Data::SetUp@<SomeSetUp@>''. The
+				 // <code>Data::SetUp@<SomeSetUp@></code>. The
 				 // latter allows to transparently use
-				 // the way the ``SetUp'' class is
+				 // the way the <code>SetUp</code> class is
 				 // used for other set-ups, but with
 				 // special actions taken for special
 				 // arguments.
@@ -1757,11 +1757,11 @@ namespace Data
 				 // here) was small, and the number of
 				 // test cases was small as well. One
 				 // then starts out by handcoding them
-				 // into a number of ``switch''
+				 // into a number of <code>switch</code>
 				 // statements. Over time, projects
 				 // grow, and so does the number of
 				 // test cases. The number of
-				 // ``switch'' statements grows with
+				 // <code>switch</code> statements grows with
 				 // that, and their length as well,
 				 // and one starts to find ways to
 				 // consider impossible examples where
@@ -1993,7 +1993,7 @@ namespace DualFunctional
 				   // average over all cells that
 				   // surround this point. The
 				   // question which cells
-				   // ``surrounds'' the evaluation
+				   // <code>surrounds</code> the evaluation
 				   // point is made dependent on the
 				   // mesh width by including those
 				   // cells for which the distance of
@@ -2021,7 +2021,7 @@ namespace DualFunctional
 				     // to zero:
     rhs.reinit (dof_handler.n_dofs());
 
-				     // Initialize a ``FEValues''
+				     // Initialize a <code>FEValues</code>
 				     // object with a quadrature
 				     // formula, have abbreviations
 				     // for the number of quadrature
@@ -2065,7 +2065,7 @@ namespace DualFunctional
 	{
 					   // If we have found such a
 					   // cell, then initialize
-					   // the ``FEValues'' object
+					   // the <code>FEValues</code> object
 					   // and integrate the
 					   // x-component of the
 					   // gradient of each shape
@@ -2125,15 +2125,15 @@ namespace LaplaceSolver
 				   // @sect4{The DualSolver class}
 
 				   // In the same way as the
-				   // ``PrimalSolver'' class above, we
+				   // <code>PrimalSolver</code> class above, we
 				   // now implement a
-				   // ``DualSolver''. It has all the
+				   // <code>DualSolver</code>. It has all the
 				   // same features, the only
 				   // difference is that it does not
 				   // take a function object denoting
 				   // a right hand side object, but
 				   // now takes a
-				   // ``DualFunctionalBase'' object
+				   // <code>DualFunctionalBase</code> object
 				   // that will assemble the right
 				   // hand side vector of the dual
 				   // problem. The rest of the class
@@ -2144,12 +2144,12 @@ namespace LaplaceSolver
 				   // triangulation, but different
 				   // discretizations, it now becomes
 				   // clear why we have made the
-				   // ``Base'' class a virtual one:
+				   // <code>Base</code> class a virtual one:
 				   // since the final class will be
 				   // derived from both
-				   // ``PrimalSolver'' as well as
-				   // ``DualSolver'', it would have
-				   // two ``Base'' instances, would we
+				   // <code>PrimalSolver</code> as well as
+				   // <code>DualSolver</code>, it would have
+				   // two <code>Base</code> instances, would we
 				   // not have marked the inheritance
 				   // as virtual. Since in many
 				   // applications the base class
@@ -2303,11 +2303,11 @@ namespace LaplaceSolver
 				       // In the private section, we
 				       // have two functions that are
 				       // used to call the
-				       // ``solve_problem'' functions
+				       // <code>solve_problem</code> functions
 				       // of the primal and dual base
 				       // classes. These two functions
 				       // will be called in parallel
-				       // by the ``solve_problem''
+				       // by the <code>solve_problem</code>
 				       // function of this class.
       void solve_primal_problem ();
       void solve_dual_problem ();
@@ -2354,8 +2354,8 @@ namespace LaplaceSolver
 				       // error estimates on cells and
 				       // faces, we need a number of
 				       // helper objects, such as
-				       // ``FEValues'' and
-				       // ``FEFaceValues'' functions,
+				       // <code>FEValues</code> and
+				       // <code>FEFaceValues</code> functions,
 				       // but also temporary objects
 				       // storing the values and
 				       // gradients of primal and dual
@@ -2526,9 +2526,9 @@ namespace LaplaceSolver
 
 				   // In the implementation of this
 				   // class, we first have the
-				   // constructors of the ``CellData''
-				   // and ``FaceData'' member classes,
-				   // and the ``WeightedResidual''
+				   // constructors of the <code>CellData</code>
+				   // and <code>FaceData</code> member classes,
+				   // and the <code>WeightedResidual</code>
 				   // constructor. They only
 				   // initialize fields to their
 				   // correct lengths, so we do not
@@ -2662,7 +2662,7 @@ namespace LaplaceSolver
 
 
 				   // Now, it is becoming more
-				   // interesting: the ``refine_grid''
+				   // interesting: the <code>refine_grid</code>
 				   // function asks the error
 				   // estimator to compute the
 				   // cell-wise error indicators, then
@@ -2708,13 +2708,13 @@ namespace LaplaceSolver
 
 				   // Since we want to output both the
 				   // primal and the dual solution, we
-				   // overload the ``output_solution''
+				   // overload the <code>output_solution</code>
 				   // function. The only interesting
 				   // feature of this function is that
 				   // the primal and dual solutions
 				   // are defined on different finite
 				   // element spaces, which is not the
-				   // format the ``DataOut'' class
+				   // format the <code>DataOut</code> class
 				   // expects. Thus, we have to
 				   // transfer them to a common finite
 				   // element space. Since we want the
@@ -2725,7 +2725,7 @@ namespace LaplaceSolver
 				   // primal space. For the
 				   // interpolation, there is a
 				   // library function, that takes a
-				   // ``ConstraintMatrix'' object
+				   // <code>ConstraintMatrix</code> object
 				   // including the hanging node
 				   // constraints. The rest is
 				   // standard.
@@ -2734,17 +2734,17 @@ namespace LaplaceSolver
 				   // work-around worth mentioning: in
 				   // this function, as in a couple of
 				   // following ones, we have to
-				   // access the ``DoFHandler''
+				   // access the <code>DoFHandler</code>
 				   // objects and solutions of both
 				   // the primal as well as of the
 				   // dual solver. Since these are
-				   // members of the ``Solver'' base
+				   // members of the <code>Solver</code> base
 				   // class which exists twice in the
 				   // class hierarchy leading to the
 				   // present class (once as base
-				   // class of the ``PrimalSolver''
+				   // class of the <code>PrimalSolver</code>
 				   // class, once as base class of the
-				   // ``DualSolver'' class), we have
+				   // <code>DualSolver</code> class), we have
 				   // to disambiguate accesses to them
 				   // by telling the compiler a member
 				   // of which of these two instances
@@ -2754,11 +2754,11 @@ namespace LaplaceSolver
 				   // through the class hierarchy
 				   // which disambiguates the base
 				   // class, for example writing
-				   // ``PrimalSolver::dof_handler'' to
+				   // <code>PrimalSolver::dof_handler</code> to
 				   // denote the member variable
-				   // ``dof_handler'' from the
-				   // ``Solver'' base class of the
-				   // ``PrimalSolver''
+				   // <code>dof_handler</code> from the
+				   // <code>Solver</code> base class of the
+				   // <code>PrimalSolver</code>
 				   // class. Unfortunately, this
 				   // confuses gcc's version 2.96 (a
 				   // version that was intended as a
@@ -2771,21 +2771,21 @@ namespace LaplaceSolver
 				   // Thus, we have to work around
 				   // this problem. We do this by
 				   // introducing references to the
-				   // ``PrimalSolver'' and
-				   // ``DualSolver'' components of the
-				   // ``WeightedResidual'' object at
+				   // <code>PrimalSolver</code> and
+				   // <code>DualSolver</code> components of the
+				   // <code>WeightedResidual</code> object at
 				   // the beginning of the
 				   // function. Since each of these
 				   // has an unambiguous base class
-				   // ``Solver'', we can access the
+				   // <code>Solver</code>, we can access the
 				   // member variables we want through
 				   // these references. However, we
 				   // are now accessing protected
 				   // member variables of these
 				   // classes through a pointer other
-				   // than the ``this'' pointer (in
+				   // than the <code>this</code> pointer (in
 				   // fact, this is of course the
-				   // ``this'' pointer, but not
+				   // <code>this</code> pointer, but not
 				   // explicitly). This finally is the
 				   // reason why we had to declare the
 				   // present class a friend of the
@@ -2813,7 +2813,7 @@ namespace LaplaceSolver
 
 				     // Add the data vectors for which
 				     // we want output. Add them both,
-				     // the ``DataOut'' functions can
+				     // the <code>DataOut</code> functions can
 				     // handle as many data vectors as
 				     // you wish to write to output:
     data_out.add_data_vector (primal_solver.solution,
@@ -2881,7 +2881,7 @@ namespace LaplaceSolver
 				     // the finite element space in
 				     // which we have solved the dual
 				     // problem: But, again as in the
-				     // ``WeightedResidual::output_solution''
+				     // <code>WeightedResidual::output_solution</code>
 				     // function we first need to
 				     // create a ConstraintMatrix
 				     // including the hanging node
@@ -2905,7 +2905,7 @@ namespace LaplaceSolver
 				     // element space of the primal
 				     // solution and subtracting it
 				     // from z: use the
-				     // ``interpolate_difference''
+				     // <code>interpolate_difference</code>
 				     // function, that gives (z-I_hz)
 				     // in the element space of the
 				     // dual solution.
@@ -3125,7 +3125,7 @@ namespace LaplaceSolver
 					 // residual contributions of
 					 // this cell, and put them
 					 // into the
-					 // ``error_indicators''
+					 // <code>error_indicators</code>
 					 // variable:
 	integrate_over_cell (cell, cell_index,
 			     primal_solution,
@@ -3340,7 +3340,7 @@ namespace LaplaceSolver
 				     // finite element field on the
 				     // present cell. For this,
 				     // initialize the
-				     // ``FEFaceValues'' object
+				     // <code>FEFaceValues</code> object
 				     // corresponding to this side of
 				     // the face, and extract the
 				     // gradients using that
@@ -3371,19 +3371,19 @@ namespace LaplaceSolver
 				     // to find out with which face of
 				     // the neighboring cell we have
 				     // to work, i.e. the
-				     // ``home-many''the neighbor the
+				     // <code>home-many</code>the neighbor the
 				     // present cell is of the cell
 				     // behind the present face. For
 				     // this, there is a function, and
 				     // we put the result into a
 				     // variable with the name
-				     // ``neighbor_neighbor'':
+				     // <code>neighbor_neighbor</code>:
     const unsigned int
       neighbor_neighbor = cell->neighbor_of_neighbor (face_no);
 				     // Then define an abbreviation
 				     // for the neigbor cell,
 				     // initialize the
-				     // ``FEFaceValues'' object on
+				     // <code>FEFaceValues</code> object on
 				     // that cell, and extract the
 				     // gradients on that cell:
     const active_cell_iterator neighbor = cell->neighbor(face_no);
@@ -3509,7 +3509,7 @@ namespace LaplaceSolver
 					 // were not the case, then
 					 // there would be either a
 					 // bug in the
-					 // ``neighbor_neighbor''
+					 // <code>neighbor_neighbor</code>
 					 // function called above, or
 					 // -- worse -- some function
 					 // in the library did not
@@ -3702,7 +3702,7 @@ struct Framework
 					 // values, and subsequently a
 					 // variable of that type. It
 					 // will default to
-					 // ``dual_weighted_error_estimator''.
+					 // <code>dual_weighted_error_estimator</code>.
 	enum RefinementCriterion {
 	      dual_weighted_error_estimator,
 	      global_refinement,
@@ -3731,13 +3731,13 @@ struct Framework
 					 // Next to last, a function
 					 // that is used as a weight
 					 // to the
-					 // ``RefinementWeightedKelly''
+					 // <code>RefinementWeightedKelly</code>
 					 // class. The default value
 					 // of this pointer is zero,
 					 // but you have to set it to
 					 // some other value if you
 					 // want to use the
-					 // ``weighted_kelly_indicator''
+					 // <code>weighted_kelly_indicator</code>
 					 // refinement criterion.
 	SmartPointer<const Function<dim> > kelly_weight;
 
@@ -3948,9 +3948,9 @@ int main ()
       descriptor.refinement_criterion
 	= Framework<dim>::ProblemDescription::dual_weighted_error_estimator;
 				       // Here, we could as well have
-				       // used ``global_refinement''
+				       // used <code>global_refinement</code>
 				       // or
-				       // ``weighted_kelly_indicator''. Note
+				       // <code>weighted_kelly_indicator</code>. Note
 				       // that the information given
 				       // about dual finite elements,
 				       // dual functional, etc is only
@@ -3973,9 +3973,9 @@ int main ()
 				       // hand side. These are
 				       // prepackaged in classes. We
 				       // take here the description of
-				       // ``Exercise_2_3'', but you
+				       // <code>Exercise_2_3</code>, but you
 				       // can also use
-				       // ``CurvedRidges@<dim@>'':
+				       // <code>CurvedRidges@<dim@></code>:
       descriptor.data = new Data::SetUp<Data::Exercise_2_3<dim>,dim> ();
       
 				       // Next set first a dual
@@ -3986,12 +3986,12 @@ int main ()
 				       // value at an
 				       // evaluation point,
 				       // represented by the classes
-				       // ``PointValueEvaluation''
+				       // <code>PointValueEvaluation</code>
 				       // in the namespaces of
 				       // evaluation and dual
 				       // functional classes. You can
 				       // also set the
-				       // ``PointXDerivativeEvaluation''
+				       // <code>PointXDerivativeEvaluation</code>
 				       // classes for the x-derivative
 				       // instead of the value
 				       // at the evaluation point.

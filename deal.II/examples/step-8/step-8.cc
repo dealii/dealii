@@ -56,19 +56,19 @@
 #include <iostream>
 
 
-                                 // @sect3{The ``ElasticProblem'' class template}
+                                 // @sect3{The <code>ElasticProblem</code> class template}
 
 				 // The main class is, except for its
 				 // name, almost unchanged with
 				 // respect to the step-6 example.
 				 //
 				 // The only change is the use of a
-				 // different class for the ``fe''
+				 // different class for the <code>fe</code>
 				 // variable: Instead of a concrete
 				 // finite element class such as
-				 // ``FE_Q'', we now use a more
-				 // generic one, ``FESystem''. In
-				 // fact, ``FESystem'' is not really a
+				 // <code>FE_Q</code>, we now use a more
+				 // generic one, <code>FESystem</code>. In
+				 // fact, <code>FESystem</code> is not really a
 				 // finite element itself in that it
 				 // does not implement shape functions
 				 // of its own.  Rather, it is a class
@@ -77,7 +77,7 @@
 				 // one vector-valued finite
 				 // element. In our case, we will
 				 // compose the vector-valued element
-				 // of ``FE_Q(1)'' objects, as shown
+				 // of <code>FE_Q(1)</code> objects, as shown
 				 // below in the constructor of this
 				 // class.
 template <int dim>
@@ -142,9 +142,9 @@ class RightHandSide :  public Function<dim>
     
 				     // The next change is that we
 				     // want a replacement for the
-				     // ``value'' function of the
+				     // <code>value</code> function of the
 				     // previous examples. There, a
-				     // second parameter ``component''
+				     // second parameter <code>component</code>
 				     // was given, which denoted which
 				     // component was requested. Here,
 				     // we implement a function that
@@ -153,12 +153,12 @@ class RightHandSide :  public Function<dim>
 				     // once, in the second argument
 				     // of the function. The obvious
 				     // name for such a replacement
-				     // function is ``vector_value''.
+				     // function is <code>vector_value</code>.
 				     //
 				     // Secondly, in analogy to the
-				     // ``value_list'' function, there
+				     // <code>value_list</code> function, there
 				     // is a function
-				     // ``vector_value_list'', which
+				     // <code>vector_value_list</code>, which
 				     // returns the values of the
 				     // vector-valued function at
 				     // several points at once:
@@ -174,9 +174,9 @@ class RightHandSide :  public Function<dim>
 				 // right hand side class. As said
 				 // above, it only passes down to the
 				 // base class the number of
-				 // components, which is ``dim'' in
+				 // components, which is <code>dim</code> in
 				 // the present case (one force
-				 // component in each of the ``dim''
+				 // component in each of the <code>dim</code>
 				 // space directions).
 				 //
 				 // Some people would have moved the
@@ -201,7 +201,7 @@ RightHandSide<dim>::RightHandSide ()
 
 				 // Next the function that returns
 				 // the whole vector of values at the
-				 // point ``p'' at once.
+				 // point <code>p</code> at once.
 				 //
 				 // To prevent cases where the return
 				 // vector has not previously been set
@@ -228,7 +228,7 @@ RightHandSide<dim>::RightHandSide ()
 				 // not be removed if we can't rely on
 				 // the assumption that the vector
 				 // already has the correct size; this
-				 // is in contract to the ``Assert''
+				 // is in contract to the <code>Assert</code>
 				 // call that is completely removed if
 				 // the program is compiled in
 				 // optimized mode.
@@ -268,13 +268,13 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
 				   // two objects that denote the
 				   // centers of these areas. Note
 				   // that upon construction of the
-				   // ``Point'' objects, all
+				   // <code>Point</code> objects, all
 				   // components are set to zero.
   Point<dim> point_1, point_2;
   point_1(0) = 0.5;
   point_2(0) = -0.5;
   
-				   // If now the point ``p'' is in a
+				   // If now the point <code>p</code> is in a
 				   // circle (sphere) of radius 0.2
 				   // around one of these points, then
 				   // set the force in x-direction to
@@ -285,7 +285,7 @@ void RightHandSide<dim>::vector_value (const Point<dim> &p,
   else
     values(0) = 0;
   
-				   // Likewise, if ``p'' is in the
+				   // Likewise, if <code>p</code> is in the
 				   // vicinity of the origin, then set
 				   // the y-force to 1, otherwise to
 				   // zero:
@@ -323,7 +323,7 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 				   // points. In one of the previous
 				   // examples, we have explained why
 				   // the
-				   // ``value_list''/``vector_value_list''
+				   // <code>value_list</code>/<code>vector_value_list</code>
 				   // function had been introduced: to
 				   // prevent us from calling virtual
 				   // functions too frequently. On the
@@ -336,7 +336,7 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 				   //
 				   // We can prevent this situation by
 				   // calling
-				   // ``RightHandSide@<dim@>::vector_valued''
+				   // <code>RightHandSide@<dim@>::vector_valued</code>
 				   // on each point in the input
 				   // list. Note that by giving the
 				   // full name of the function,
@@ -346,7 +346,7 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 				   // and not to use the virtual
 				   // function call mechanism that
 				   // would be used if we had just
-				   // called ``vector_value''. This is
+				   // called <code>vector_value</code>. This is
 				   // important, since the compiler
 				   // generally can't make any
 				   // assumptions which function is
@@ -363,8 +363,8 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 				   // inline above function into the
 				   // present location. (Note that we
 				   // have declared the
-				   // ``vector_value'' function above
-				   // ``inline'', though modern
+				   // <code>vector_value</code> function above
+				   // <code>inline</code>, though modern
 				   // compilers are also able to
 				   // inline functions even if they
 				   // have not been declared as
@@ -382,9 +382,9 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 				   // functions in the same way. Using
 				   // this forwarding mechanism, we
 				   // only have to change a single
-				   // place (the ``vector_value''
+				   // place (the <code>vector_value</code>
 				   // function), and the second place
-				   // (the ``vector_value_list''
+				   // (the <code>vector_value_list</code>
 				   // function) will always be
 				   // consistent with it. At the same
 				   // time, using virtual function
@@ -399,7 +399,7 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 
 
 
-                                 // @sect3{The ``ElasticProblem'' class implementation}
+                                 // @sect3{The <code>ElasticProblem</code> class implementation}
 
                                  // @sect4{ElasticProblem::ElasticProblem}
 
@@ -417,9 +417,9 @@ void RightHandSide<dim>::vector_value_list (const std::vector<Point<dim> > &poin
 				 // would like to stack together
 				 // equals the number of components
 				 // the solution function has, which
-				 // is ``dim'' since we consider
+				 // is <code>dim</code> since we consider
 				 // displacement in each space
-				 // direction. The ``FESystem'' class
+				 // direction. The <code>FESystem</code> class
 				 // can handle this: we pass it the
 				 // finite element of which we would
 				 // like to compose the system of, and
@@ -431,7 +431,7 @@ ElasticProblem<dim>::ElasticProblem ()
 		dof_handler (triangulation),
 		fe (FE_Q<dim>(1), dim)
 {}
-				 // In fact, the ``FESystem'' class
+				 // In fact, the <code>FESystem</code> class
 				 // has several more constructors
 				 // which can perform more complex
 				 // operations than just stacking
@@ -458,7 +458,7 @@ ElasticProblem<dim>::~ElasticProblem ()
 				 // Setting up the system of equations
 				 // is identitical to the function
 				 // used in the step-6 example. The
-				 // ``DoFHandler'' class and all other
+				 // <code>DoFHandler</code> class and all other
 				 // classes used here are fully aware
 				 // that the finite element we want to
 				 // use is vector-valued, and take
@@ -514,19 +514,19 @@ void ElasticProblem<dim>::setup_system ()
 				 // are the same as before, however:
 				 // setting up a suitable quadrature
 				 // formula, initializing an
-				 // ``FEValues'' object for the
+				 // <code>FEValues</code> object for the
 				 // (vector-valued) finite element we
 				 // use as well as the quadrature
 				 // object, and declaring a number of
 				 // auxiliary arrays. In addition, we
 				 // declare the ever same two
-				 // abbreviations: ``n_q_points'' and
-				 // ``dofs_per_cell''. The number of
+				 // abbreviations: <code>n_q_points</code> and
+				 // <code>dofs_per_cell</code>. The number of
 				 // degrees of freedom per cell we now
 				 // obviously ask from the composed
 				 // finite element rather than from
 				 // the underlying scalar Q1
-				 // element. Here, it is ``dim'' times
+				 // element. Here, it is <code>dim</code> times
 				 // the number of degrees of freedom
 				 // per cell of the Q1 element, though
 				 // this is not explicit knowledge we
@@ -579,11 +579,11 @@ void ElasticProblem<dim>::assemble_system ()
 				   // we now have a vector-valued
 				   // right hand side, which is why
 				   // the data type of the
-				   // ``rhs_values'' array is
+				   // <code>rhs_values</code> array is
 				   // changed. We initialize it by
-				   // ``n_q_points'' elements, each of
-				   // which is a ``Vector@<double@>''
-				   // with ``dim'' elements.
+				   // <code>n_q_points</code> elements, each of
+				   // which is a <code>Vector@<double@></code>
+				   // with <code>dim</code> elements.
   RightHandSide<dim>      right_hand_side;
   std::vector<Vector<double> > rhs_values (n_q_points,
 					   Vector<double>(dim));
@@ -620,35 +620,35 @@ void ElasticProblem<dim>::assemble_system ()
 				       // example.  One of the few
 				       // comments in place is that we
 				       // can compute the number
-				       // ``comp(i)'', i.e. the index
+				       // <code>comp(i)</code>, i.e. the index
 				       // of the only nonzero vector
 				       // component of shape function
-				       // ``i'' using the
-				       // ``fe.system_to_component_index(i).first''
+				       // <code>i</code> using the
+				       // <code>fe.system_to_component_index(i).first</code>
 				       // function call below.
 				       //
 				       // (By accessing the
-				       // ``first'' variable of
+				       // <code>first</code> variable of
 				       // the return value of the
-				       // ``system_to_component_index''
+				       // <code>system_to_component_index</code>
 				       // function, you might
 				       // already have guessed
 				       // that there is more in
 				       // it. In fact, the
 				       // function returns a
-				       // ``std::pair@<unsigned int,
-				       // unsigned int@>'', of
+				       // <code>std::pair@<unsigned int,
+				       // unsigned int@></code>, of
 				       // which the first element
-				       // is ``comp(i)'' and the
+				       // is <code>comp(i)</code> and the
 				       // second is the value
-				       // ``base(i)'' also noted
+				       // <code>base(i)</code> also noted
 				       // in the introduction, i.e.
 				       // the index
 				       // of this shape function
 				       // within all the shape
 				       // functions that are nonzero
 				       // in this component,
-				       // i.e. ``base(i)'' in the
+				       // i.e. <code>base(i)</code> in the
 				       // diction of the
 				       // introduction. This is not a
 				       // number that we are usually
@@ -678,7 +678,7 @@ void ElasticProblem<dim>::assemble_system ()
 						     // + (mu d_i u_j,
 						     // d_j v_i).
 						     // Note that
-						     // ``shape_grad(i,q_point)''
+						     // <code>shape_grad(i,q_point)</code>
 						     // returns the
 						     // gradient of
 						     // the only
@@ -690,7 +690,7 @@ void ElasticProblem<dim>::assemble_system ()
 						     // point
 						     // q_point. The
 						     // component
-						     // ``comp(i)'' of
+						     // <code>comp(i)</code> of
 						     // the gradient,
 						     // which is the
 						     // derivative of
@@ -813,7 +813,7 @@ void ElasticProblem<dim>::assemble_system ()
 				   // modification: since the solution
 				   // function is vector-valued, so
 				   // need to be the boundary
-				   // values. The ``ZeroFunction''
+				   // values. The <code>ZeroFunction</code>
 				   // constructor accepts a parameter
 				   // that tells it that it shall
 				   // represent a vector valued,
@@ -821,11 +821,11 @@ void ElasticProblem<dim>::assemble_system ()
 				   // many components. By default,
 				   // this parameter is equal to one,
 				   // in which case the
-				   // ``ZeroFunction'' object would
+				   // <code>ZeroFunction</code> object would
 				   // represent a scalar
 				   // function. Since the solution
-				   // vector has ``dim'' components,
-				   // we need to pass ``dim'' as
+				   // vector has <code>dim</code> components,
+				   // we need to pass <code>dim</code> as
 				   // number of components to the zero
 				   // function as well.
   std::map<unsigned int,double> boundary_values;
@@ -919,7 +919,7 @@ void ElasticProblem<dim>::refine_grid ()
 				 // been shown in previous examples
 				 // already. The only difference is
 				 // that the solution function is
-				 // vector valued. The ``DataOut''
+				 // vector valued. The <code>DataOut</code>
 				 // class takes care of this
 				 // automatically, but we have to give
 				 // each component of the solution
@@ -948,7 +948,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 				   // number of components is the same
 				   // as the number of dimensions we
 				   // are working in, the following
-				   // ``switch'' statement is used.
+				   // <code>switch</code> statement is used.
 				   //
 				   // We note that some graphics
 				   // programs have restriction as to
@@ -971,11 +971,11 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 				   // the program die if we run upon a
 				   // case which we did not
 				   // consider. Remember that the
-				   // ``Assert'' macro generates an
+				   // <code>Assert</code> macro generates an
 				   // exception if the condition in
 				   // the first parameter is not
 				   // satisfied. Of course, the
-				   // condition ``false'' can never be
+				   // condition <code>false</code> can never be
 				   // satisfied, so the program will
 				   // always abort whenever it gets to
 				   // the default statement:
@@ -1025,7 +1025,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 
                                  // @sect4{ElasticProblem::run}
 
-				 // The ``run'' function does the same
+				 // The <code>run</code> function does the same
 				 // things as in step-6, for
 				 // example. This time, we use the
 				 // square [-1,1]^d as domain, and we
@@ -1033,7 +1033,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 				 // starting the first iteration.
 				 //
 				 // The reason is the following: we
-				 // use the ``Gauss'' quadrature
+				 // use the <code>Gauss</code> quadrature
 				 // formula with two points in each
 				 // direction for integration of the
 				 // right hand side; that means that
@@ -1063,11 +1063,11 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 				 // The unfortunate thing is that if
 				 // the discrete solution is constant,
 				 // then the error indicators computed
-				 // by the ``KellyErrorEstimator''
+				 // by the <code>KellyErrorEstimator</code>
 				 // class are zero for each cell as
 				 // well, and the call to
-				 // ``refine_and_coarsen_fixed_number''
-				 // on the ``triangulation'' object
+				 // <code>refine_and_coarsen_fixed_number</code>
+				 // on the <code>triangulation</code> object
 				 // will not flag any cells for
 				 // refinement (why should it if the
 				 // indicated error is zero for each
@@ -1087,10 +1087,10 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 				 // needs to be able to see the right
 				 // hand side. Thus, we refine twice
 				 // globally. (Note that the
-				 // ``refine_global'' function is not
-				 // part of the ``GridRefinement''
+				 // <code>refine_global</code> function is not
+				 // part of the <code>GridRefinement</code>
 				 // class in which
-				 // ``refine_and_coarsen_fixed_number''
+				 // <code>refine_and_coarsen_fixed_number</code>
 				 // is declared, for example. The
 				 // reason is first that it is not an
 				 // algorithm that computed refinement
@@ -1098,7 +1098,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 				 // importantly that it actually
 				 // performs the refinement, in
 				 // contrast to the functions in
-				 // ``GridRefinement'' that only flag
+				 // <code>GridRefinement</code> that only flag
 				 // cells without actually refining
 				 // the grid.)
 template <int dim>
@@ -1132,7 +1132,7 @@ void ElasticProblem<dim>::run ()
     }
 }
 
-                                 // @sect3{The ``main'' function}
+                                 // @sect3{The <code>main</code> function}
 
 				 // The main function is again exactly
 				 // like in step-6 (apart from the

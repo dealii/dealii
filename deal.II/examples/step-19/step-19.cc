@@ -66,7 +66,7 @@ std::string              output_format;
                                  // prints a general message, and then goes on
                                  // to list the parameters that are allowed in
                                  // the parameter file (the
-                                 // ``ParameterHandler'' class has a function
+                                 // <code>ParameterHandler</code> class has a function
                                  // to do exactly this; see the results
                                  // section for what it prints):
 void
@@ -105,7 +105,7 @@ print_usage_message ()
                                  // format, we nevertheless want to show how
                                  // to work with parameter files.
                                  //
-                                 // In short, the ``ParameterHandler'' class
+                                 // In short, the <code>ParameterHandler</code> class
                                  // works as follows: one declares the entries
                                  // of parameters that can be given in input
                                  // files together, and later on one can read
@@ -115,11 +115,11 @@ print_usage_message ()
                                  // value specified in the declaration of that
                                  // parameter is used. After that, the program
                                  // can query the values assigned to certain
-                                 // parameters from the ``ParameterHandler''
+                                 // parameters from the <code>ParameterHandler</code>
                                  // object.
                                  //
                                  // Declaring parameters can be done using the
-                                 // ``ParameterHandler::declare_entry''
+                                 // <code>ParameterHandler::declare_entry</code>
                                  // function. It's arguments are the name of a
                                  // parameter, a default value (given as a
                                  // string, even if the parameter is numeric
@@ -127,26 +127,26 @@ print_usage_message ()
                                  // describes constraints on values that may
                                  // be passed to this parameter. In the
                                  // example below, we use an object of type
-                                 // ``Patterns::Anything'' to denote that
+                                 // <code>Patterns::Anything</code> to denote that
                                  // there are no constraints on file names
                                  // (this is, of course, not true -- the
                                  // operating system does have constraints,
                                  // but from an application standpoint, almost
                                  // all names are valid). In other cases, one
                                  // may, for example, use
-                                 // ``Patterns::Integer'' to make sure that
+                                 // <code>Patterns::Integer</code> to make sure that
                                  // only parameters are accepted that can be
                                  // interpreted as integer values (it is also
                                  // possible to specify bounds for integer
                                  // values, and all values outside this range
-                                 // are rejected), ``Patterns::Double'' for
+                                 // are rejected), <code>Patterns::Double</code> for
                                  // floating point values, classes that make
                                  // sure that the given parameter value is a
                                  // comma separated list of things, etc. Take
-                                 // a look at the ``Patterns'' namespace to
+                                 // a look at the <code>Patterns</code> namespace to
                                  // see what is possible.
                                  //
-                                 // The fourth argument to ``declare_entry''
+                                 // The fourth argument to <code>declare_entry</code>
                                  // is a help string that can be printed to
                                  // document what this parameter is meant to
                                  // be used for and other information you may
@@ -155,7 +155,7 @@ print_usage_message ()
                                  // fourth argument is the empty string.
                                  //
                                  // I always wanted to have an example program
-                                 // describing the ``ParameterHandler'' class,
+                                 // describing the <code>ParameterHandler</code> class,
                                  // because it is so particularly useful. It
                                  // would have been useful in a number of
                                  // previous example programs (for example, in
@@ -174,13 +174,13 @@ print_usage_message ()
                                  // out: declaring and querying these
                                  // parameters was already done centralized in
                                  // one place of the libray, namely the
-                                 // ``DataOutInterface'' class that handles
+                                 // <code>DataOutInterface</code> class that handles
                                  // exactly this -- managing parameters for
                                  // input and output.
                                  //
                                  // So the second function call in this
                                  // function is to let the
-                                 // ``DataOutInterface'' declare a good number
+                                 // <code>DataOutInterface</code> declare a good number
                                  // of parameters that control everything from
                                  // the output format to what kind of output
                                  // should be generated if output is written
@@ -194,14 +194,14 @@ print_usage_message ()
                                  // options up front, when output is
                                  // generated, rather than playing around with
                                  // them later on. The call to
-                                 // ``DataOutInterface::declare_parameters''
+                                 // <code>DataOutInterface::declare_parameters</code>
                                  // declares entries that allow to specify
                                  // them in the parameter input file during
                                  // run-time. If the parameter file does not
                                  // contain entries for them, defaults are
                                  // taken.
                                  //
-                                 // As a final note: ``DataOutInterface'' is a
+                                 // As a final note: <code>DataOutInterface</code> is a
                                  // template, because it is usually used to
                                  // write output for a specific space
                                  // dimension. However, this program is
@@ -212,7 +212,7 @@ print_usage_message ()
                                  // parameter. Fortunately, declaring
                                  // parameters is something that is space
                                  // dimension independent, so we can just pick
-                                 // one arbitrarily. We pick ``1'', but it
+                                 // one arbitrarily. We pick <code>1</code>, but it
                                  // could have been any other number as well.
 void declare_parameters ()
 {
@@ -301,7 +301,7 @@ void declare_parameters ()
                                  // the list of input files can't, so at least
                                  // one parameter needs to be there. Together
                                  // with the name of the program (the zeroth
-                                 // parameter), ``argc'' must therefore be at
+                                 // parameter), <code>argc</code> must therefore be at
                                  // least 2. If this is not the case, we print
                                  // an error message and exit:
 void
@@ -316,7 +316,7 @@ parse_command_line (const int     argc,
 
                                    // Next, collect all parameters in a list
                                    // that will be somewhat simpler to handle
-                                   // than the ``argc''/``argv'' mechanism. We
+                                   // than the <code>argc</code>/<code>argv</code> mechanism. We
                                    // omit the name of the executable at the
                                    // zeroth index:
   std::list<std::string> args;
@@ -325,12 +325,12 @@ parse_command_line (const int     argc,
 
                                    // Then process all these
                                    // parameters. If the parameter is
-                                   // ``-p'', then there must be a
+                                   // <code>-p</code>, then there must be a
                                    // parameter file following (which
                                    // we should then read), in case of
-                                   // ``-x'' it is the name of an
+                                   // <code>-x</code> it is the name of an
                                    // output format. Finally, for
-                                   // ``-o'' it is the name of the
+                                   // <code>-o</code> it is the name of the
                                    // output file. In all cases, once
                                    // we've treated a parameter, we
                                    // remove it from the list of
@@ -378,10 +378,10 @@ parse_command_line (const int     argc,
                                            // the dummy subsection, we would
                                            // write something like this to
                                            // extract the value of the boolean
-                                           // flag (the ``prm.get'' function
+                                           // flag (the <code>prm.get</code> function
                                            // returns the value of a parameter
                                            // as a string, whereas the
-                                           // ``prm.get_X'' functions return a
+                                           // <code>prm.get_X</code> functions return a
                                            // value already converted to a
                                            // different type):
           prm.enter_subsection ("Dummy subsection");
@@ -467,11 +467,11 @@ parse_command_line (const int     argc,
                                  // from all the input file, and read in the
                                  // first file through a stream. Note that
                                  // every time we open a file, we use the
-                                 // ``AssertThrow'' macro to check whether the
+                                 // <code>AssertThrow</code> macro to check whether the
                                  // file is really readable -- if it isn't
                                  // then this will trigger an exception and
                                  // corresponding output will be generated
-                                 // from the exception handler in ``main()'':
+                                 // from the exception handler in <code>main()</code>:
 template <int dim, int spacedim>
 void do_convert ()
 {
@@ -502,7 +502,7 @@ void do_convert ()
                                    // stream, and parse what we got as the
                                    // name of the output format into an
                                    // identifier. Fortunately, the
-                                   // ``DataOutBase'' class has a function
+                                   // <code>DataOutBase</code> class has a function
                                    // that does this parsing for us, i.e. it
                                    // knows about all the presently supported
                                    // output formats and makes sure that they
@@ -548,16 +548,16 @@ void do_convert ()
                                  //
                                  // So here is what we do: from the first
                                  // input file, we determine (using a function
-                                 // in ``DataOutBase'' that exists for this
+                                 // in <code>DataOutBase</code> that exists for this
                                  // purpose) these dimensions. We then have a
                                  // series of switches that dispatch,
-                                 // statically, to the ``do_convert''
+                                 // statically, to the <code>do_convert</code>
                                  // functions with different template
                                  // arguments. Not pretty, but works. Apart
                                  // from this, the function does nothing --
                                  // except making sure that it covered the
                                  // dimensions for which it was called, using
-                                 // the ``AssertThrow'' macro at places in the
+                                 // the <code>AssertThrow</code> macro at places in the
                                  // code that shouldn't be reached:
 void convert ()
 {

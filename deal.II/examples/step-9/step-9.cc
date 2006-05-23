@@ -47,11 +47,11 @@
 				 // functions are declared which we
 				 // need to start new threads and to
 				 // wait for threads to return
-				 // (i.e. the ``Thread'' class
-				 // and the ``spawn'' functions). The
+				 // (i.e. the <code>Thread</code> class
+				 // and the <code>spawn</code> functions). The
 				 // second file has a class
-				 // ``MultithreadInfo'' (and a global
-				 // object ``multithread_info'' of
+				 // <code>MultithreadInfo</code> (and a global
+				 // object <code>multithread_info</code> of
 				 // that type) which can be used to
 				 // query the number of processors in
 				 // your system, which is often useful
@@ -61,8 +61,8 @@
 #include <base/multithread_info.h>
 
 				 // The next new include file declares
-				 // a base class ``TensorFunction''
-				 // not unlike the ``Function'' class,
+				 // a base class <code>TensorFunction</code>
+				 // not unlike the <code>Function</code> class,
 				 // but with the difference that the
 				 // return value is tensor-valued
 				 // rather than scalar of
@@ -159,7 +159,7 @@ class AdvectionProblem
 				     // local contributions of a cell
 				     // to the global matrix at the
 				     // same time. This is done using
-				     // a ``Mutex'', which is an
+				     // a <code>Mutex</code>, which is an
 				     // object that can be owned by
 				     // only one thread at a time. If
 				     // a thread wants to write to the
@@ -172,12 +172,12 @@ class AdvectionProblem
 				     // was not compiled to support
 				     // multithreading (which you have
 				     // to specify at the time you
-				     // call the ``./configure''
+				     // call the <code>./configure</code>
 				     // script in the top-level
 				     // directory), then a dummy the
 				     // actual data type of the
 				     // typedef
-				     // ``Threads::ThreadMutex'' is a
+				     // <code>Threads::ThreadMutex</code> is a
 				     // class that provides all the
 				     // functions needed for a mutex,
 				     // but does nothing when they are
@@ -200,14 +200,14 @@ class AdvectionProblem
 				 // vector field with as many compents
 				 // as there are space dimensions. One
 				 // could now use a class derived from
-				 // the ``Function'' base class, as we
+				 // the <code>Function</code> base class, as we
 				 // have done for boundary values and
 				 // coefficients in previous examples,
 				 // but there is another possibility
 				 // in the library, namely a base
 				 // class that describes tensor valued
 				 // functions. In contrast to the
-				 // usual ``Function'' objects, we
+				 // usual <code>Function</code> objects, we
 				 // provide the compiler with
 				 // knowledge on the size of the
 				 // objects of the return type. This
@@ -216,7 +216,7 @@ class AdvectionProblem
 				 // simple for usual vector-valued
 				 // functions where memory has to be
 				 // allocated on the heap (thus, the
-				 // ``Function::vector_value''
+				 // <code>Function::vector_value</code>
 				 // function has to be given the
 				 // address of an object into which
 				 // the result is to be written, in
@@ -230,9 +230,9 @@ class AdvectionProblem
 				 // applications, to be honest...
 				 //
 				 // The interface of the
-				 // ``TensorFunction'' class is
+				 // <code>TensorFunction</code> class is
 				 // relatively close to that of the
-				 // ``Function'' class, so there is
+				 // <code>Function</code> class, so there is
 				 // probably no need to comment in
 				 // detail the following declaration:
 template <int dim>
@@ -262,8 +262,8 @@ class AdvectionField : public TensorFunction<1,dim>
 				     // reasonable. The format is
 				     // basically as follows: use the
 				     // name of one of the macros
-				     // ``DeclExceptionN'', where
-				     // ``N'' denotes the number of
+				     // <code>DeclExceptionN</code>, where
+				     // <code>N</code> denotes the number of
 				     // additional parameters which
 				     // the exception object shall
 				     // take. In this case, as we want
@@ -271,27 +271,27 @@ class AdvectionField : public TensorFunction<1,dim>
 				     // the sizes of two vectors
 				     // differ, we need two arguments,
 				     // so we use
-				     // ``DeclException2''. The first
+				     // <code>DeclException2</code>. The first
 				     // parameter then describes the
 				     // name of the exception, while
 				     // the following declare the data
 				     // types of the parameters. The
 				     // last argument is a sequence of
 				     // output directives that will be
-				     // piped into the ``std::cerr''
+				     // piped into the <code>std::cerr</code>
 				     // object, thus the strange
-				     // format with the leading ``@<@<''
+				     // format with the leading <code>@<@<</code>
 				     // operator and the like. Note
 				     // that we can access the
 				     // parameters which are passed to
 				     // the exception upon
 				     // construction (i.e. within the
-				     // ``Assert'' call) by using the
-				     // names ``arg1'' through
-				     // ``argN'', where ``N'' is the
+				     // <code>Assert</code> call) by using the
+				     // names <code>arg1</code> through
+				     // <code>argN</code>, where <code>N</code> is the
 				     // number of arguments as defined
 				     // by the use of the respective
-				     // macro ``DeclExceptionN''.
+				     // macro <code>DeclExceptionN</code>.
 				     //
 				     // To learn how the preprocessor
 				     // expands this macro into actual
@@ -359,7 +359,7 @@ AdvectionField<dim>::value_list (const std::vector<Point<dim> > &points,
 
 				 // Besides the advection field, we
 				 // need two functions describing the
-				 // source terms (``right hand side'')
+				 // source terms (<code>right hand side</code>)
 				 // and the boundary values. First for
 				 // the right hand side, which follows
 				 // the same pattern as in previous
@@ -368,7 +368,7 @@ AdvectionField<dim>::value_list (const std::vector<Point<dim> > &points,
 				 // constant function in the vicinity
 				 // of a source point, which we denote
 				 // by the constant static variable
-				 // ``center_point''. We set the
+				 // <code>center_point</code>. We set the
 				 // values of this center using the
 				 // same template tricks as we have
 				 // shown in the step-7 example
@@ -376,7 +376,7 @@ AdvectionField<dim>::value_list (const std::vector<Point<dim> > &points,
 				 // has been shown previously,
 				 // including the way to avoid virtual
 				 // function calls in the
-				 // ``value_list'' function.
+				 // <code>value_list</code> function.
 template <int dim>
 class RightHandSide : public Function<dim>
 {
@@ -408,13 +408,13 @@ const Point<3> RightHandSide<3>::center_point = Point<3> (-0.75, -0.75, -0.75);
 
 				 // The only new thing here is that we
 				 // check for the value of the
-				 // ``component'' parameter. As this
+				 // <code>component</code> parameter. As this
 				 // is a scalar function, it is
 				 // obvious that it only makes sense
 				 // if the desired component has the
 				 // index zero, so we assert that this
 				 // is indeed the
-				 // case. ``ExcIndexRange'' is a
+				 // case. <code>ExcIndexRange</code> is a
 				 // global predefined exception
 				 // (probably the one most often used,
 				 // we therefore made it global
@@ -457,7 +457,7 @@ RightHandSide<dim>::value_list (const std::vector<Point<dim> > &points,
 
 				 // Finally for the boundary values,
 				 // which is just another class
-				 // derived from the ``Function'' base
+				 // derived from the <code>Function</code> base
 				 // class:
 template <int dim>
 class BoundaryValues : public Function<dim>
@@ -513,7 +513,7 @@ BoundaryValues<dim>::value_list (const std::vector<Point<dim> > &points,
 				 // power of the mesh size, as
 				 // described in the introduction.
 				 // This class is a simple version of
-				 // the ``DerivativeApproximation''
+				 // the <code>DerivativeApproximation</code>
 				 // class in the library, that uses
 				 // similar techniques to obtain
 				 // finite difference approximations
@@ -523,7 +523,7 @@ BoundaryValues<dim>::value_list (const std::vector<Point<dim> > &points,
 				 //
 				 // The
 				 // class has one public static
-				 // function ``estimate'' that is
+				 // function <code>estimate</code> that is
 				 // called to compute a vector of
 				 // error indicators, and one private
 				 // function that does the actual work
@@ -568,7 +568,7 @@ BoundaryValues<dim>::value_list (const std::vector<Point<dim> > &points,
 				 // functions or variables, so this is
 				 // not really a class, but rather
 				 // serves the purpose of a
-				 // ``namespace'' in C++. The reason
+				 // <code>namespace</code> in C++. The reason
 				 // that we chose a class over a
 				 // namespace is that this way we can
 				 // declare functions that are
@@ -601,7 +601,7 @@ BoundaryValues<dim>::value_list (const std::vector<Point<dim> > &points,
 				 // argument.
 				 //
 				 // Finally note that the
-				 // ``IndexInterval'' typedef is
+				 // <code>IndexInterval</code> typedef is
 				 // introduced as a convenient
 				 // abbreviation for an otherwise
 				 // lengthy type name.
@@ -637,7 +637,7 @@ class GradientEstimation
 				 // Now for the implementation of the
 				 // main class. Constructor,
 				 // destructor and the function
-				 // ``setup_system'' follow the same
+				 // <code>setup_system</code> follow the same
 				 // pattern that was used previously,
 				 // so we need not comment on these
 				 // three function:
@@ -707,7 +707,7 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // we were to use this information,
 				   // we could use the value of the
 				   // global variable
-				   // ``multithread_info.n_cpus'',
+				   // <code>multithread_info.n_cpus</code>,
 				   // which is determined at start-up
 				   // time of your program
 				   // automatically. (Note that if the
@@ -730,10 +730,10 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // systems assign roughly the same
 				   // CPU ressources to all threads
 				   // presently running. For this
-				   // reason, the ``MultithreadInfo''
+				   // reason, the <code>MultithreadInfo</code>
 				   // class contains a read-write
-				   // variable ``n_default_threads''
-				   // which is set to ``n_cpus'' by
+				   // variable <code>n_default_threads</code>
+				   // which is set to <code>n_cpus</code> by
 				   // default, but can be set to
 				   // another value. This variable is
 				   // also queried by functions inside
@@ -744,29 +744,29 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // capable of keeping track of the
 				   // threads we created, and allows
 				   // us to wait until they all have
-				   // finished (to ``join'' them in
+				   // finished (to <code>join</code> them in
 				   // the language of threads). The
-				   // ``Threads::ThreadGroup'' class
+				   // <code>Threads::ThreadGroup</code> class
 				   // does this, which is basically
 				   // just a container for objects of
-				   // type ``Threads::Thread'' that
+				   // type <code>Threads::Thread</code> that
 				   // represent a single thread;
-				   // ``Threads::Thread'' is what the
-				   // ``spawn'' function below will
+				   // <code>Threads::Thread</code> is what the
+				   // <code>spawn</code> function below will
 				   // return when we start a new
 				   // thread.
 				   //
-				   // Note that both ``ThreadGroup''
-				   // and ``Thread'' have a template
+				   // Note that both <code>ThreadGroup</code>
+				   // and <code>Thread</code> have a template
 				   // argument that represents the
 				   // return type of the function
 				   // being called on a separate
 				   // thread. Since most of the
 				   // functions that we will call on
 				   // different threads have return
-				   // type ``void'', the template
+				   // type <code>void</code>, the template
 				   // argument has a default value
-				   // ``void'', so that in that case
+				   // <code>void</code>, so that in that case
 				   // it can be omitted. (However, you
 				   // still need to write the angle
 				   // brackets, even if they are
@@ -774,16 +774,16 @@ void AdvectionProblem<dim>::assemble_system ()
 				   //
 				   // If you did not configure for
 				   // multi-threading, then the
-				   // ``spawn'' function that is
+				   // <code>spawn</code> function that is
 				   // supposed to start a new thread
 				   // in parallel only executes the
 				   // function which should be run in
 				   // parallel, waits for it to return
 				   // (i.e. the function is executed
 				   // sequentially), and puts the
-				   // return value into the ``Thread''
+				   // return value into the <code>Thread</code>
 				   // object. Likewise, the function
-				   // ``join'' that is supposed to
+				   // <code>join</code> that is supposed to
 				   // wait for all spawned threads to
 				   // return, returns immediately, as
 				   // there can't be threads running.
@@ -800,13 +800,13 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // splitting a range of cells is a
 				   // rather common task when using
 				   // multi-threading, there is a
-				   // function in the ``Threads''
+				   // function in the <code>Threads</code>
 				   // namespace that does exactly
 				   // this. In fact, it does this not
 				   // only for a range of cell
 				   // iterators, but for iterators in
 				   // general, so you could use it for
-				   // ``std::vector@<T@>::iterator'' or
+				   // <code>std::vector@<T@>::iterator</code> or
 				   // usual pointers as well.
 				   //
 				   // The function returns a vector of
@@ -828,10 +828,10 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // present case, however, the data
 				   // types of the two first
 				   // parameters differ
-				   // (``begin_active'' returns an
-				   // ``active_iterator'', while
-				   // ``end'' returns a
-				   // ``raw_iterator''), and in this
+				   // (<code>begin_active</code> returns an
+				   // <code>active_iterator</code>, while
+				   // <code>end</code> returns a
+				   // <code>raw_iterator</code>), and in this
 				   // case the C++ language requires
 				   // us to specify the template type
 				   // explicitely. For brevity, we
@@ -863,21 +863,21 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // which is available online as
 				   // well. Suffice it to say that we
 				   // spawn a new thread that calls
-				   // the ``assemble_system_interval''
+				   // the <code>assemble_system_interval</code>
 				   // function on the present object
-				   // (the ``this'' pointer), with the
+				   // (the <code>this</code> pointer), with the
 				   // arguments following in the
 				   // second set of parentheses passed
-				   // as parameters. The ``spawn''
+				   // as parameters. The <code>spawn</code>
 				   // function return an object of
-				   // type ``Threads::Thread'', which
-				   // we put into the ``threads''
+				   // type <code>Threads::Thread</code>, which
+				   // we put into the <code>threads</code>
 				   // container. If a thread exits,
 				   // the return value of the function
 				   // being called is put into a place
 				   // such that the thread objects can
 				   // access it using their
-				   // ``return_value'' function; since
+				   // <code>return_value</code> function; since
 				   // the function we call doesn't
 				   // have a return value, this does
 				   // not apply here. Note that you
@@ -895,10 +895,10 @@ void AdvectionProblem<dim>::assemble_system ()
 				   // right hand side are
 				   // assemblesd. Waiting for all the
 				   // threads to finish can be done
-				   // using the ``joint_all'' function
-				   // in the ``ThreadGroup''
+				   // using the <code>joint_all</code> function
+				   // in the <code>ThreadGroup</code>
 				   // container, which just calls
-				   // ``join'' on each of the thread
+				   // <code>join</code> on each of the thread
 				   // objects it stores.
 				   //
 				   // Again, if the library was not
@@ -933,7 +933,7 @@ void AdvectionProblem<dim>::assemble_system ()
 				 // Now, this is the function that
 				 // does the actual work. It is not
 				 // very different from the
-				 // ``assemble_system'' functions of
+				 // <code>assemble_system</code> functions of
 				 // previous example programs, so we
 				 // will again only comment on the
 				 // differences. The mathematical
@@ -972,8 +972,8 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
   QGauss<dim-1> face_quadrature_formula(2);
   
 				   // Finally, we need objects of type
-				   // ``FEValues'' and
-				   // ``FEFaceValues''. For the cell
+				   // <code>FEValues</code> and
+				   // <code>FEFaceValues</code>. For the cell
 				   // terms we need the values and
 				   // gradients of the shape
 				   // functions, the quadrature points
@@ -1034,7 +1034,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
       cell_rhs = 0;
 
 				       // ... then initialize
-				       // the ``FEValues'' object...
+				       // the <code>FEValues</code> object...
       fe_values.reinit (cell);
 
 				       // ... obtain the values of
@@ -1090,7 +1090,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				       // as well. Of course, the
 				       // bilinear form only contains
 				       // contributions from the
-				       // ``inflow'' part of the
+				       // <code>inflow</code> part of the
 				       // boundary, but to find out
 				       // whether a certain part of a
 				       // face of the present cell is
@@ -1239,9 +1239,9 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				       // thread operates on these
 				       // objects at a time, we have
 				       // to lock it. This is done
-				       // using a ``Mutex'', which is
-				       // short for ``mutually
-				       // exclusive'': a thread that
+				       // using a <code>Mutex</code>, which is
+				       // short for <code>mutually
+				       // exclusive</code>: a thread that
 				       // wants to write to the global
 				       // objects acquires this lock,
 				       // but has to wait if it is
@@ -1282,7 +1282,7 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				       // can't be parallel threads
 				       // and there is no need to
 				       // synchronize. Thus, the
-				       // ``lock'' and ``release''
+				       // <code>lock</code> and <code>release</code>
 				       // functions are no-ops,
 				       // i.e. they return without
 				       // doing anything.
@@ -1301,9 +1301,9 @@ assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &
 				       // all threads execute member
 				       // functions of the same
 				       // object, they have the same
-				       // ``this'' pointer and
+				       // <code>this</code> pointer and
 				       // therefore also operate on
-				       // the same ``lock''.
+				       // the same <code>lock</code>.
     };
 }
 
@@ -1342,7 +1342,7 @@ void AdvectionProblem<dim>::solve ()
 				 // described in the introduction. The
 				 // respective computations are made
 				 // in the class
-				 // ``GradientEstimation''. The only
+				 // <code>GradientEstimation</code>. The only
 				 // difference to previous examples is
 				 // that we refine a little more
 				 // aggressively (0.5 instead of 0.3
@@ -1432,7 +1432,7 @@ void AdvectionProblem<dim>::run ()
 				 // @sect3{GradientEstimation class implementation}
 
 				 // Now for the implementation of the
-				 // ``GradientEstimation'' class. The
+				 // <code>GradientEstimation</code> class. The
 				 // first function does not much
 				 // except for delegating work to the
 				 // other function:
@@ -1465,7 +1465,7 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 				   // cells into chunks of equal
 				   // size. Just as we have used the
 				   // function
-				   // ``Threads::split_range'' when
+				   // <code>Threads::split_range</code> when
 				   // assembling above, there is a
 				   // function that computes intervals
 				   // of roughly equal size from a
@@ -1477,15 +1477,15 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 			       n_threads);
 
 				   // In the same way as before, we
-				   // use a ``Threads::ThreadGroup''
+				   // use a <code>Threads::ThreadGroup</code>
 				   // object to collect the descriptor
 				   // objects of different
 				   // threads. Note that as the
 				   // function called is not a member
 				   // function, but rather a static
 				   // function, we need not (and can
-				   // not) pass a ``this'' pointer to
-				   // the ``spawn'' function in this
+				   // not) pass a <code>this</code> pointer to
+				   // the <code>spawn</code> function in this
 				   // case.
 				   //
 				   // Taking pointers to templated
@@ -1498,11 +1498,11 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 				   // quite frequently that we can't
 				   // directly insert taking the
 				   // address of a function in the
-				   // call to ``encapsulate'' for one
+				   // call to <code>encapsulate</code> for one
 				   // or the other compiler, but have
 				   // to take a temporary variable for
 				   // that purpose. Here, in this
-				   // case, Compaq's ``cxx'' compiler
+				   // case, Compaq's <code>cxx</code> compiler
 				   // choked on the code so we use
 				   // this workaround with the
 				   // function pointer:
@@ -1522,13 +1522,13 @@ GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
   threads.join_all ();
 				   // Note that if the value of the
 				   // variable
-				   // ``multithread_info.n_default_threads''
+				   // <code>multithread_info.n_default_threads</code>
 				   // was one, or if the library was
 				   // not configured to use threads,
 				   // then the sequence of commands
 				   // above reduced to a complicated
 				   // way to simply call the
-				   // ``estimate_interval'' function
+				   // <code>estimate_interval</code> function
 				   // with the whole range of cells to
 				   // work on. However, using the way
 				   // above, we are able to write the
@@ -1580,24 +1580,24 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				   // of the cells. As usual with
 				   // values of finite element
 				   // functions, we use an object of
-				   // type ``FEValues'', and we use
+				   // type <code>FEValues</code>, and we use
 				   // (or mis-use in this case) the
 				   // midpoint quadrature rule to get
 				   // at the values at the
 				   // center. Note that the
-				   // ``FEValues'' object only needs
+				   // <code>FEValues</code> object only needs
 				   // to compute the values at the
 				   // centers, and the location of the
 				   // quadrature points in real space
 				   // in order to get at the vectors
-				   // ``y''.
+				   // <code>y</code>.
   QMidpoint<dim> midpoint_rule;
   FEValues<dim>  fe_midpoint_value (dof_handler.get_fe(),
 				    midpoint_rule,
 				    update_values | update_q_points);
   
 				   // Then we need space foe the
-				   // tensor ``Y'', which is the sum
+				   // tensor <code>Y</code>, which is the sum
 				   // of outer products of the
 				   // y-vectors.
   Tensor<2,dim> Y;
@@ -1612,7 +1612,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				   // cell and advancing them using
 				   // the given start and end
 				   // index. Note that we can use the
-				   // ``advance'' function of the
+				   // <code>advance</code> function of the
 				   // standard C++ library, but that
 				   // we have to cast the distance by
 				   // which the iterator is to be
@@ -1658,8 +1658,8 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
   for (; cell!=endc; ++cell, ++error_on_this_cell)
     {
 				       // First initialize the
-				       // ``FEValues'' object, as well
-				       // as the ``Y'' tensor:
+				       // <code>FEValues</code> object, as well
+				       // as the <code>Y</code> tensor:
       fe_midpoint_value.reinit (cell);
       Y.clear ();
 
@@ -1806,8 +1806,8 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 						     // to
 						     // involuntarily
 						     // exchange
-						     // ``n==1'' for
-						     // ``n==0'' or
+						     // <code>n==1</code> for
+						     // <code>n==0</code> or
 						     // the like) and
 						     // in the library
 						     // (the
@@ -1908,7 +1908,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				       // Now loop over all active neighbors
 				       // and collect the data we
 				       // need. Allocate a vector just like
-				       // ``this_midpoint_value'' which we
+				       // <code>this_midpoint_value</code> which we
 				       // will use to store the value of the
 				       // solution in the midpoint of the
 				       // neighbor cell. We allocate it here
@@ -1936,7 +1936,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 					   // thereon. Note that for
 					   // this information we
 					   // have to reinitialize the
-					   // ``FEValues'' object for
+					   // <code>FEValues</code> object for
 					   // the neighbor cell.
 	  fe_midpoint_value.reinit (neighbor);
 	  const Point<dim> neighbor_center = fe_midpoint_value.quadrature_point(0);
@@ -1944,12 +1944,12 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 	  fe_midpoint_value.get_function_values (solution,
                                                  neighbor_midpoint_value);
 
-					   // Compute the vector ``y''
+					   // Compute the vector <code>y</code>
 					   // connecting the centers
 					   // of the two cells. Note
 					   // that as opposed to the
 					   // introduction, we denote
-					   // by ``y'' the normalized
+					   // by <code>y</code> the normalized
 					   // difference vector, as
 					   // this is the quantity
 					   // used everywhere in the
@@ -1979,7 +1979,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				       // an approximation of the
 				       // gradient for the present
 				       // cell, then we need to have
-				       // passed over vectors ``y''
+				       // passed over vectors <code>y</code>
 				       // which span the whole space,
 				       // otherwise we would not have
 				       // all components of the
@@ -2003,17 +2003,17 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				       // reasonable to try to catch
 				       // this error also in optimized
 				       // mode. For this case, there
-				       // is the ``AssertThrow''
+				       // is the <code>AssertThrow</code>
 				       // macro: it checks the
 				       // condition like the
-				       // ``Assert'' macro, but not
+				       // <code>Assert</code> macro, but not
 				       // only in debug mode; it then
 				       // outputs an error message,
 				       // but instead of terminating
 				       // the program as in the case
-				       // of the ``Assert'' macro, the
+				       // of the <code>Assert</code> macro, the
 				       // exception is thrown using
-				       // the ``throw'' command of
+				       // the <code>throw</code> command of
 				       // C++. This way, one has the
 				       // possibility to catch this
 				       // error and take reasonable
@@ -2050,7 +2050,7 @@ GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 
 				 // @sect3{Main function}
 
-				 // The ``main'' function is exactly
+				 // The <code>main</code> function is exactly
 				 // like in previous examples, with
 				 // the only difference in the name of
 				 // the main class that actually does

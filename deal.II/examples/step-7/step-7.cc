@@ -42,7 +42,7 @@
 
 				 // In this example, we will not use the
 				 // numeration scheme which is used per
-				 // default by the ``DoFHandler'' class, but
+				 // default by the <code>DoFHandler</code> class, but
 				 // will renumber them using the Cuthill-McKee
 				 // algorithm. As has already been explained
 				 // in step-2, the necessary functions are
@@ -52,23 +52,23 @@
 				 // how we can make sure that objects
 				 // are not deleted while they are
 				 // still in use. For this purpose,
-				 // deal.II has the ``SmartPointer''
+				 // deal.II has the <code>SmartPointer</code>
 				 // helper class, which is declared in
 				 // this file:
 #include <base/smartpointer.h>
 				 // Next, we will want to use the
-				 // ``integrate_difference'' function
+				 // <code>integrate_difference</code> function
 				 // mentioned in the introduction, and we are
-				 // going to use a ``ConvergenceTable'' that
+				 // going to use a <code>ConvergenceTable</code> that
 				 // collects all important data during a run
 				 // and prints it at the end as a table. These
 				 // comes from the following two files:
 #include <numerics/vectors.h>
 #include <base/convergence_table.h>
 				 // And finally, we need to use the
-				 // ``FEFaceValues'' class, which is
+				 // <code>FEFaceValues</code> class, which is
 				 // declared in the same file as the
-				 // ``FEValues'' class:
+				 // <code>FEValues</code> class:
 #include <fe/fe_values.h>
 
 				 // We need one more include from standard
@@ -141,20 +141,20 @@ class SolutionBase
 				 // First we assign values to the centers for
 				 // the 1d case, where we place the centers
 				 // equidistantly at -1/3, 0, and 1/3. The
-				 // ``template @<@>'' header for this definition
+				 // <code>template @<@></code> header for this definition
 				 // indicates an explicit specialization. This
 				 // means, that the variable belongs to a
 				 // template, but that instead of providing
 				 // the compiler with a template from which it
 				 // can specialize a concrete variable by
-				 // substituting ``dim'' with some concrete
+				 // substituting <code>dim</code> with some concrete
 				 // value, we provide a specialization
-				 // ourselves, in this case for ``dim=1''. If
+				 // ourselves, in this case for <code>dim=1</code>. If
 				 // the compiler then sees a reference to this
 				 // variable in a place where the template
 				 // argument equals one, it knows that it
 				 // doesn't have to generate the variable from
-				 // a template by substituting ``dim'', but
+				 // a template by substituting <code>dim</code>, but
 				 // can immediately use the following
 				 // definition:
 template <>
@@ -165,7 +165,7 @@ SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers]
     Point<1>(+1.0 / 3.0)   };
 
 				 // Likewise, we can provide an explicit
-				 // specialization for ``dim=2''. We place the
+				 // specialization for <code>dim=2</code>. We place the
 				 // centers for the 2d case as follows:
 template <>
 const Point<2>
@@ -180,7 +180,7 @@ SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers]
 				 // dimensions. In this case, we simply
 				 // provide the compiler with a template from
 				 // which it can generate a concrete
-				 // instantiation by substituting ``dim'' with
+				 // instantiation by substituting <code>dim</code> with
 				 // a concrete value:
 template <int dim>
 const double SolutionBase<dim>::width = 1./3.;
@@ -193,10 +193,10 @@ const double SolutionBase<dim>::width = 1./3.;
 				 // the classes representing these
 				 // two. They both represent
 				 // continuous functions, so they are
-				 // derived from the ``Function@<dim@>''
+				 // derived from the <code>Function@<dim@></code>
 				 // base class, and they also inherit
 				 // the characteristics defined in the
-				 // ``SolutionBase'' class.
+				 // <code>SolutionBase</code> class.
 				 //
 				 // The actual classes are declared in the
 				 // following. Note that in order to compute
@@ -207,15 +207,15 @@ const double SolutionBase<dim>::width = 1./3.;
 				 // more than we have done in previous
 				 // examples, where all we provided was the
 				 // value at one or a list of
-				 // points. Fortunately, the ``Function''
+				 // points. Fortunately, the <code>Function</code>
 				 // class also has virtual functions for the
 				 // gradient, so we can simply overload the
 				 // respective virtual member functions in the
-				 // ``Function'' base class. Note that the
-				 // gradient of a function in ``dim'' space
-				 // dimensions is a vector of size ``dim'',
+				 // <code>Function</code> base class. Note that the
+				 // gradient of a function in <code>dim</code> space
+				 // dimensions is a vector of size <code>dim</code>,
 				 // i.e. a tensor of rank 1 and dimension
-				 // ``dim''. As for so many other things, the
+				 // <code>dim</code>. As for so many other things, the
 				 // library provides a suitable class for
 				 // this.
 				 //
@@ -249,10 +249,10 @@ class Solution : public Function<dim>,
 				 // elements of a base class that is
 				 // template dependent (in this case
 				 // the elements of
-				 // ``SolutionBase@<dim@>''), then the
+				 // <code>SolutionBase@<dim@></code>), then the
 				 // C++ language forces us to write
-				 // ``this-@>n_source_centers'' (for
-				 // example). Note that the ``this-@>''
+				 // <code>this-@>n_source_centers</code> (for
+				 // example). Note that the <code>this-@></code>
 				 // qualification is not necessary if
 				 // the base class is not template
 				 // dependent, and also that the gcc
@@ -262,8 +262,8 @@ class Solution : public Function<dim>,
 				 // is necessary is complicated; some
 				 // books on C++ may explain it, so if
 				 // you are interested you can look it
-				 // up under the phrase ``two-stage
-				 // (name) lookup''.
+				 // up under the phrase <code>two-stage
+				 // (name) lookup</code>.
 template <int dim>
 double Solution<dim>::value (const Point<dim>   &p,
 			     const unsigned int) const
@@ -284,22 +284,22 @@ double Solution<dim>::value (const Point<dim>   &p,
                                  // gradient of the solution.  In order to
                                  // accumulate the gradient from the
                                  // contributions of the exponentials, we
-                                 // allocate an object ``return_value'' that
+                                 // allocate an object <code>return_value</code> that
                                  // denotes the mathematical quantity of a
-                                 // tensor of rank ``1'' and dimension
-                                 // ``dim''. Its default constructor sets it
+                                 // tensor of rank <code>1</code> and dimension
+                                 // <code>dim</code>. Its default constructor sets it
                                  // to the vector containing only zeroes, so
                                  // we need not explicitly care for its
                                  // initialization.
                                  //
                                  // Note that we could as well have taken the
-                                 // type of the object to be ``Point@<dim@>''
-                                 // instead of ``Tensor@<1,dim@>''. Tensors of
+                                 // type of the object to be <code>Point@<dim@></code>
+                                 // instead of <code>Tensor@<1,dim@></code>. Tensors of
                                  // rank 1 and points are almost exchangeable,
                                  // and have only very slightly different
                                  // mathematical meanings. In fact, the
-                                 // ``Point@<dim@>'' class is derived from the
-                                 // ``Tensor@<1,dim@>'' class, which makes up
+                                 // <code>Point@<dim@></code> class is derived from the
+                                 // <code>Tensor@<1,dim@></code> class, which makes up
                                  // for their mutual exchange ability. Their
                                  // main difference is in what they logically
                                  // mean: points are points in space, such as
@@ -420,7 +420,7 @@ double RightHandSide<dim>::value (const Point<dim>   &p,
                                  // mode as arguments.
                                  //
                                  // The rest of the member functions are as
-                                 // before except for the ``process_solution''
+                                 // before except for the <code>process_solution</code>
                                  // function: After the solution has been
                                  // computed, we perform some analysis on it,
                                  // such as computing the error in various
@@ -476,7 +476,7 @@ class HelmholtzProblem
 				     // a triangulation object, and we
 				     // have a finite element object,
 				     // and we also have an object of
-				     // type ``DoFHandler'' that uses
+				     // type <code>DoFHandler</code> that uses
 				     // both of the first two. These
 				     // three objects all have a
 				     // lifetime that is rather long
@@ -487,10 +487,10 @@ class HelmholtzProblem
 				     // they are destroyed at the very
 				     // end. The question is: can we
 				     // guarantee that the two objects
-				     // which the ``DoFHandler'' uses,
+				     // which the <code>DoFHandler</code> uses,
 				     // live at least as long as they
 				     // are in use? This means that
-				     // the ``DoFHandler'' must have some
+				     // the <code>DoFHandler</code> must have some
 				     // kind of lock on the
 				     // destruction of the other
 				     // objects, and it can only
@@ -518,12 +518,12 @@ class HelmholtzProblem
 				     // to such potentially dangerous
 				     // pointers are derived from a
 				     // class called
-				     // ``Subscriptor''. For example,
-				     // the ``Triangulation'',
-				     // ``DoFHandler'', and a base
-				     // class of the ``FiniteElement''
+				     // <code>Subscriptor</code>. For example,
+				     // the <code>Triangulation</code>,
+				     // <code>DoFHandler</code>, and a base
+				     // class of the <code>FiniteElement</code>
 				     // class are derived from
-				     // ``Subscriptor''. This latter
+				     // <code>Subscriptor</code>. This latter
 				     // class does not offer much
 				     // functionality, but it has a
 				     // built-in counter which we can
@@ -541,9 +541,9 @@ class HelmholtzProblem
 				     //
 				     // On the other hand, if an object of a
 				     // class that is derived from the
-				     // ``Subscriptor'' class is destroyed, it
+				     // <code>Subscriptor</code> class is destroyed, it
 				     // also has to call the destructor of the
-				     // ``Subscriptor'' class. In this
+				     // <code>Subscriptor</code> class. In this
 				     // destructor, there
 				     // will then be a check whether the
 				     // counter is really zero. If
@@ -608,32 +608,32 @@ class HelmholtzProblem
 				     // for the programmer to do so
 				     // herself. The class that
 				     // actually does all this is
-				     // called ``SmartPointer'' and
+				     // called <code>SmartPointer</code> and
 				     // takes as template parameter
 				     // the data type of the object
 				     // which it shall point to. The
 				     // latter type may be any class,
 				     // as long as it is derived from
-				     // the ``Subscriptor'' class.
+				     // the <code>Subscriptor</code> class.
 				     //
 				     // In the present example program, we
 				     // want to protect the finite element
 				     // object from the situation that for
 				     // some reason the finite element pointed
 				     // to is destroyed while still in use. We
-				     // therefore use a ``SmartPointer'' to
+				     // therefore use a <code>SmartPointer</code> to
 				     // the finite element object; since the
 				     // finite element object is actually
 				     // never changed in our computations, we
-				     // pass a ``const FiniteElement@<dim@>'' as
+				     // pass a <code>const FiniteElement@<dim@></code> as
 				     // template argument to the
-				     // ``SmartPointer'' class. Note that the
+				     // <code>SmartPointer</code> class. Note that the
 				     // pointer so declared is assigned at
 				     // construction time of the solve object,
 				     // and destroyed upon destruction, so the
 				     // lock on the destruction of the finite
 				     // element object extends throughout the
-				     // lifetime of this ``HelmholtzProblem''
+				     // lifetime of this <code>HelmholtzProblem</code>
 				     // object.
     Triangulation<dim>                      triangulation;
     DoFHandler<dim>                         dof_handler;
@@ -665,20 +665,20 @@ class HelmholtzProblem
 				     // (like the number of cells, or the L2
 				     // error of the numerical solution) will
 				     // be generated and later printed. The
-				     // ``TableHandler'' can be used to
+				     // <code>TableHandler</code> can be used to
 				     // collect all this data and to output it
 				     // at the end of the run as a table in a
 				     // simple text or in LaTeX
 				     // format. Here we don't only use the
-				     // ``TableHandler'' but we use the
-				     // derived class ``ConvergenceTable''
+				     // <code>TableHandler</code> but we use the
+				     // derived class <code>ConvergenceTable</code>
 				     // that additionally evaluates rates of
 				     // convergence:
     ConvergenceTable                        convergence_table;
 };
 
 
-                                 // @sect3{The ``HelmholtzProblem'' class implementation}
+                                 // @sect3{The <code>HelmholtzProblem</code> class implementation}
 
                                  // @sect4{HelmholtzProblem::HelmholtzProblem}
 
@@ -798,7 +798,7 @@ void HelmholtzProblem<dim>::setup_system ()
                                  // bi-quadratic elements and therefore have
                                  // to use sufficiently accurate quadrature
                                  // formula. In addition, we need to compute
-                                 // integrals over faces, i.e. ``dim-1''
+                                 // integrals over faces, i.e. <code>dim-1</code>
                                  // dimensional objects. The declaration of a
                                  // face quadrature formula is then
                                  // straightforward:
@@ -850,7 +850,7 @@ void HelmholtzProblem<dim>::assemble_system ()
 				   // cell) to evaluate the right hand
 				   // side function. The object we use
 				   // to get at this information is
-				   // the ``FEValues'' class discussed
+				   // the <code>FEValues</code> class discussed
 				   // previously.
                                    //
 				   // For the face integrals, we only
@@ -863,7 +863,7 @@ void HelmholtzProblem<dim>::assemble_system ()
 				   // from the exact solution object
 				   // (see below). The class that gives
 				   // us this information is called
-				   // ``FEFaceValues'':
+				   // <code>FEFaceValues</code>:
   FEValues<dim>  fe_values (*fe, quadrature_formula, 
 			    update_values   | update_gradients |
                             update_q_points | update_JxW_values);
@@ -886,7 +886,7 @@ void HelmholtzProblem<dim>::assemble_system ()
                                    // the right hand side object are only
                                    // querying data, never changing the
                                    // object. We can therefore declare it
-                                   // ``const'':
+                                   // <code>const</code>:
   const RightHandSide<dim> right_hand_side;
   std::vector<double>  rhs_values (n_q_points);
 
@@ -958,17 +958,17 @@ void HelmholtzProblem<dim>::assemble_system ()
 				       // nonzero. To this end, we
 				       // loop over all faces and
 				       // check whether its boundary
-				       // indicator equals ``1'',
+				       // indicator equals <code>1</code>,
 				       // which is the value that we
 				       // have assigned to that
 				       // portions of the boundary
 				       // composing Gamma2 in the 
-				       // ``run()'' function further
+				       // <code>run()</code> function further
 				       // below. (The
 				       // default value of boundary
-				       // indicators is ``0'', so faces
+				       // indicators is <code>0</code>, so faces
 				       // can only have an indicator
-				       // equal to ``1'' if we have
+				       // equal to <code>1</code> if we have
 				       // explicitly set it.)
       for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	if (cell->face(face)->at_boundary()
@@ -988,9 +988,9 @@ void HelmholtzProblem<dim>::assemble_system ()
 					     // computation of the
 					     // contour integral. This
 					     // is done using the
-					     // ``reinit'' function
+					     // <code>reinit</code> function
 					     // which we already know
-					     // from the ``FEValue''
+					     // from the <code>FEValue</code>
 					     // class:
 	    fe_face_values.reinit (cell, face);
 
@@ -1008,7 +1008,7 @@ void HelmholtzProblem<dim>::assemble_system ()
                                              // vector to the face at the
                                              // present quadrature point
                                              // obtained from the
-                                             // ``fe_face_values''
+                                             // <code>fe_face_values</code>
                                              // object. This is then used to
                                              // compute the additional
                                              // contribution of this face to
@@ -1053,7 +1053,7 @@ void HelmholtzProblem<dim>::assemble_system ()
 				   // we interpolate boundary values
 				   // (denoted by the second parameter
 				   // to
-				   // ``interpolate_boundary_values'')
+				   // <code>interpolate_boundary_values</code>)
 				   // does not represent the whole
 				   // boundary any more. Rather, it is
 				   // that portion of the boundary
@@ -1135,8 +1135,8 @@ void HelmholtzProblem<dim>::solve ()
                                  //
                                  // At the end of the switch, we have a
                                  // default case that looks slightly strange:
-                                 // an ``Assert'' statement with a ``false''
-                                 // condition. Since the ``Assert'' macro
+                                 // an <code>Assert</code> statement with a <code>false</code>
+                                 // condition. Since the <code>Assert</code> macro
                                  // raises an error whenever the condition is
                                  // false, this means that whenever we hit
                                  // this statement the program will be
@@ -1217,7 +1217,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // the difference between computed
 				   // numerical solution and the
 				   // continuous solution (described
-				   // by the ``Solution'' class
+				   // by the <code>Solution</code> class
 				   // defined at the top of this
 				   // file), we first need a vector
 				   // that will hold the norm of the
@@ -1225,8 +1225,8 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // accuracy with 16 digits is not
 				   // so important for these
 				   // quantities, we save some memory
-				   // by using ``float'' instead of
-				   // ``double'' values.
+				   // by using <code>float</code> instead of
+				   // <code>double</code> values.
                                    //
 				   // The next step is to use a function
 				   // from the library which computes the
@@ -1253,7 +1253,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // cell, and taking the square root
 				   // of that value. This is
 				   // equivalent to taking the l2
-				   // (lower case ``l'') norm of the
+				   // (lower case <code>l</code>) norm of the
 				   // vector of norms on each cell:  
   Vector<float> difference_per_cell (triangulation.n_active_cells());
   VectorTools::integrate_difference (dof_handler,
@@ -1266,9 +1266,9 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 
 				   // By same procedure we get the H1
 				   // semi-norm. We re-use the
-				   // ``difference_per_cell'' vector since it
+				   // <code>difference_per_cell</code> vector since it
 				   // is no longer used after computing the
-				   // ``L2_error'' variable above.
+				   // <code>L2_error</code> variable above.
   VectorTools::integrate_difference (dof_handler,
 				     solution,
 				     Solution<dim>(),
@@ -1292,7 +1292,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // by iterating the trapezoidal
 				   // rule five times in each space
 				   // direction. Note that the
-				   // constructor of the ``QIterated''
+				   // constructor of the <code>QIterated</code>
 				   // class takes a one-dimensional
 				   // quadrature rule and a number
 				   // that tells it how often it shall
@@ -1308,7 +1308,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // maximum value over all cell-wise
 				   // entries, an operation that is
 				   // conveniently done using the
-				   // ``Vector@<float@>::linfty'' function:
+				   // <code>Vector@<float@>::linfty</code> function:
   const QTrapez<1>     q_trapez;
   const QIterated<dim> q_iterated (q_trapez, 5);
   VectorTools::integrate_difference (dof_handler,
@@ -1323,7 +1323,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				   // computed, we finally write some
 				   // output. In addition, we add the
 				   // important data to the
-				   // ``TableHandler'' by specifying
+				   // <code>TableHandler</code> by specifying
 				   // the key of the column and the value.
 				   // Note that it is not necessary to
 				   // define column keys beforehand -- it is
@@ -1356,7 +1356,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
                                  // @sect4{HelmholtzProblem::run}
 
 				 // As in previous example programs,
-				 // the ``run'' function controls the
+				 // the <code>run</code> function controls the
 				 // flow of execution. The basic
 				 // layout is as in previous examples:
 				 // an outer loop over successively
@@ -1376,10 +1376,10 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
                                  // For this, we will use the
                                  // following convention: Faces
                                  // belonging to Gamma1 will have the
-                                 // boundary indicator ``0'' (which is
+                                 // boundary indicator <code>0</code> (which is
                                  // the default, so we don't have to
                                  // set it explicitely), and faces
-                                 // belonging to Gamma2 will use ``1''
+                                 // belonging to Gamma2 will use <code>1</code>
                                  // as boundary indicator.  To set
                                  // these values, we loop over all
                                  // cells, then over all faces of a
@@ -1387,7 +1387,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
                                  // part of the boundary that we want
                                  // to denote by Gamma2, and if so set
                                  // its boundary indicator to
-                                 // ``1''. For the present program, we
+                                 // <code>1</code>. For the present program, we
                                  // consider the left and bottom
                                  // boundaries as Gamma2. We determine
                                  // whether a face is part of that
@@ -1476,7 +1476,7 @@ void HelmholtzProblem<dim>::run ()
 				   // statements which we have already
 				   // discussed in previous examples. The
 				   // first step is to generate a suitable
-				   // filename (called ``gmv_filename'' here,
+				   // filename (called <code>gmv_filename</code> here,
 				   // since we want to output data in GMV
 				   // format; we add the prefix to distinguish
 				   // the filename from that used for other
@@ -1506,18 +1506,18 @@ void HelmholtzProblem<dim>::run ()
 				   // end, the finite element base class
 				   // stores the maximal polynomial degree of
 				   // shape functions in each coordinate
-				   // variable as a variable ``degree'', and
+				   // variable as a variable <code>degree</code>, and
 				   // we use for the switch statement (note
 				   // that the polynomial degree of bilinear
 				   // shape functions is really 2, since they
-				   // contain the term ``x*y''; however, the
+				   // contain the term <code>x*y</code>; however, the
 				   // polynomial degree in each coordinate
 				   // variable is still only 1). We again use
 				   // the same defensive programming technique
 				   // to safeguard against the case that the
 				   // polynomial degree has an unexpected
-				   // value, using the ``Assert (false,
-				   // ExcNotImplemented())'' idiom in the
+				   // value, using the <code>Assert (false,
+				   // ExcNotImplemented())</code> idiom in the
 				   // default branch of the switch statement:
   switch (fe->degree)
     {
@@ -1578,9 +1578,9 @@ void HelmholtzProblem<dim>::run ()
 				   //
 				   // In order to allow writing more
 				   // than one sub-cell per actual
-				   // cell, the ``build_patches''
+				   // cell, the <code>build_patches</code>
 				   // function accepts a parameter
-				   // (the default is ``1'', which is
+				   // (the default is <code>1</code>, which is
 				   // why you haven't seen this
 				   // parameter in previous
 				   // examples). This parameter
@@ -1588,15 +1588,15 @@ void HelmholtzProblem<dim>::run ()
 				   // per space direction each cell
 				   // shall be subdivided for
 				   // output. For example, if you give
-				   // ``2'', this leads to 4 cells in
+				   // <code>2</code>, this leads to 4 cells in
 				   // 2D and 8 cells in 3D. For
 				   // quadratic elements, two
 				   // sub-cells per space direction is
 				   // obviously the right choice, so
 				   // this is what we choose. In
 				   // general, for elements of
-				   // polynomial order ``q'', we use
-				   // ``q'' subdivisions, and the
+				   // polynomial order <code>q</code>, we use
+				   // <code>q</code> subdivisions, and the
 				   // order of the elements is
 				   // determined in the same way as
 				   // above.
@@ -1613,7 +1613,7 @@ void HelmholtzProblem<dim>::run ()
                                    // After graphical output, we would also
                                    // like to generate tables from the error
                                    // computations we have done in
-                                   // ``process_solution''. There, we have
+                                   // <code>process_solution</code>. There, we have
                                    // filled a table object with the number of
                                    // cells for each refinement step as well
                                    // as the errors in different norms.
@@ -1627,8 +1627,8 @@ void HelmholtzProblem<dim>::run ()
 				   // fixed point notation. However, for
 				   // columns one would like to see in
 				   // scientific notation another function
-				   // call sets the ``scientific_flag'' to
-				   // ``true'', leading to floating point
+				   // call sets the <code>scientific_flag</code> to
+				   // <code>true</code>, leading to floating point
 				   // representation of numbers.
   convergence_table.set_precision("L2", 3);
   convergence_table.set_precision("H1", 3);
@@ -1641,7 +1641,7 @@ void HelmholtzProblem<dim>::run ()
   				   // For the output of a table into a LaTeX
 				   // file, the default captions of the
 				   // columns are the keys given as argument
-				   // to the ``add_value'' functions. To have
+				   // to the <code>add_value</code> functions. To have
 				   // TeX captions that differ from the
 				   // default ones you can specify them by the
 				   // following function calls.
@@ -1665,7 +1665,7 @@ void HelmholtzProblem<dim>::run ()
 
   				   // After this, we can finally write the
 				   // table to the standard output stream
-				   // ``std::cout'' (after one extra empty
+				   // <code>std::cout</code> (after one extra empty
 				   // line, to make things look
 				   // prettier). Note, that the output in text
 				   // format is quite simple and that
@@ -1722,9 +1722,9 @@ void HelmholtzProblem<dim>::run ()
 				   // output the convergence
 				   // rates. This may be done by the
 				   // functionality the
-				   // ``ConvergenceTable'' offers over
+				   // <code>ConvergenceTable</code> offers over
 				   // the regular
-				   // ``TableHandler''. However, we do
+				   // <code>TableHandler</code>. However, we do
 				   // it only for global refinement,
 				   // since for adaptive refinement
 				   // the determination of something
@@ -1767,14 +1767,14 @@ void HelmholtzProblem<dim>::run ()
       convergence_table.set_column_order (new_order);
 
 				       // For everything that happened
-				       // to the ``ConvergenceTable''
+				       // to the <code>ConvergenceTable</code>
 				       // until this point, it would
 				       // have been sufficient to use
 				       // a simple
-				       // ``TableHandler''. Indeed, the
-				       // ``ConvergenceTable'' is
+				       // <code>TableHandler</code>. Indeed, the
+				       // <code>ConvergenceTable</code> is
 				       // derived from the
-				       // ``TableHandler'' but it offers
+				       // <code>TableHandler</code> but it offers
 				       // the additional functionality
 				       // of automatically evaluating
 				       // convergence rates. For
@@ -1873,7 +1873,7 @@ int main ()
 				       // order to destroy the
 				       // respective objects (i.e. the
 				       // finite element and the
-				       // ``HelmholtzProblem'' object)
+				       // <code>HelmholtzProblem</code> object)
 				       // at the end of the block and
 				       // before we go to the next
 				       // run. This avoids conflicts
@@ -1882,7 +1882,7 @@ int main ()
 				       // is released immediately
 				       // after one of the three runs
 				       // has finished, and not only
-				       // at the end of the ``try''
+				       // at the end of the <code>try</code>
 				       // block.
       {
 	std::cout << "Solving with Q1 elements, adaptive refinement" << std::endl

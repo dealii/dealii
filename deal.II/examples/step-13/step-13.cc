@@ -16,8 +16,8 @@
 				 // a list of include files from the
 				 // library, and as usual they are in
 				 // the standard order which is
-				 // ``base'' -- ``lac'' -- ``grid'' --
-				 // ``dofs'' -- ``fe'' -- ``numerics''
+				 // <code>base</code> -- <code>lac</code> -- <code>grid</code> --
+				 // <code>dofs</code> -- <code>fe</code> -- <code>numerics</code>
 				 // (as each of these categories
 				 // roughly builds upon previous
 				 // ones), then C++ standard headers:
@@ -62,7 +62,7 @@
 				 // equation. In fact, they can
 				 // evaluate every kind of solution,
 				 // as long as it is described by a
-				 // ``DoFHandler'' object, and a
+				 // <code>DoFHandler</code> object, and a
 				 // solution vector. We define them
 				 // here first, even before the
 				 // classes that actually generate the
@@ -74,16 +74,16 @@
 				 // From an abstract point of view, we
 				 // declare a pure base class
 				 // that provides an evaluation
-				 // operator ``operator()'' which will
+				 // operator <code>operator()</code> which will
 				 // do the evaluation of the solution
 				 // (whatever derived classes might
-				 // consider an ``evaluation''). Since
+				 // consider an <code>evaluation</code>). Since
 				 // this is the only real function of
 				 // this base class (except for some
 				 // bookkeeping machinery), one
 				 // usually terms such a class that
-				 // only has an ``operator()'' a
-				 // ``functor'' in C++ terminology,
+				 // only has an <code>operator()</code> a
+				 // <code>functor</code> in C++ terminology,
 				 // since it is used just like a
 				 // function object.
 				 //
@@ -147,8 +147,8 @@ namespace Evaluation
 				   // Now for the abstract base class
 				   // of evaluation classes: its main
 				   // purpose is to declare a pure
-				   // virtual function ``operator()''
-				   // taking a ``DoFHandler'' object,
+				   // virtual function <code>operator()</code>
+				   // taking a <code>DoFHandler</code> object,
 				   // and the solution vector. In
 				   // order to be able to use pointers
 				   // to this base class only, it also
@@ -203,7 +203,7 @@ namespace Evaluation
 				   // like to extract a point value
 				   // from the solution, so the first
 				   // class does this in its
-				   // ``operator()''. The actual point
+				   // <code>operator()</code>. The actual point
 				   // is given to this class through
 				   // the constructor, as well as a
 				   // table object into which it will
@@ -233,7 +233,7 @@ namespace Evaluation
 				   // In the step-9 example program,
 				   // we have already seen how such an
 				   // exception class can be declared,
-				   // using the ``DeclExceptionN''
+				   // using the <code>DeclExceptionN</code>
 				   // macros. We use this mechanism
 				   // here again.
 				   //
@@ -380,10 +380,10 @@ namespace Evaluation
 					     // beginning of the
 					     // function, for example
 					     // by a statement like
-					     // ``Assert
+					     // <code>Assert
 					     // (dof_handler.get_fe().dofs_per_vertex
 					     // @> 0,
-					     // ExcNotImplemented())'',
+					     // ExcNotImplemented())</code>,
 					     // which should make it
 					     // quite clear what is
 					     // going wrong when the
@@ -395,7 +395,7 @@ namespace Evaluation
 					     // that that does not
 					     // hurt here, since the
 					     // statement
-					     // ``cell-@>vertex_dof_index(vertex,0)''
+					     // <code>cell-@>vertex_dof_index(vertex,0)</code>
 					     // would fail if we asked
 					     // it to give us the DoF
 					     // index of a vertex if
@@ -428,7 +428,7 @@ namespace Evaluation
 				     // solution there and the rest of
 				     // the computations were useless
 				     // anyway. So make sure through
-				     // the ``AssertThrow'' macro
+				     // the <code>AssertThrow</code> macro
 				     // already used in the step-9
 				     // program that we have indeed
 				     // found this point. If this is
@@ -436,7 +436,7 @@ namespace Evaluation
 				     // exception of the type that is
 				     // given to it as second
 				     // argument, but compared to a
-				     // straightforward ``throw''
+				     // straightforward <code>throw</code>
 				     // statement, it fills the
 				     // exception object with a set of
 				     // additional information, for
@@ -444,7 +444,7 @@ namespace Evaluation
 				     // line number where the
 				     // exception was generated, and
 				     // the condition that failed. If
-				     // you have a ``catch'' clause in
+				     // you have a <code>catch</code> clause in
 				     // your main function (as this
 				     // program has), you will catch
 				     // all exceptions that are not
@@ -457,10 +457,10 @@ namespace Evaluation
     AssertThrow (evaluation_point_found,
 		 ExcEvaluationPointNotFound(evaluation_point));
 				     // Note that we have used the
-				     // ``Assert'' macro in other
+				     // <code>Assert</code> macro in other
 				     // example programs as well. It
 				     // differed from the
-				     // ``AssertThrow'' macro used
+				     // <code>AssertThrow</code> macro used
 				     // here in that it simply aborts
 				     // the program, rather than
 				     // throwing an exception, and
@@ -485,7 +485,7 @@ namespace Evaluation
 				     // program in debug mode, but
 				     // should be checked always, also
 				     // in production runs. Thus the
-				     // use of the ``AssertThrow''
+				     // use of the <code>AssertThrow</code>
 				     // macro here.
     
 				     // Now, if we are sure that we
@@ -502,12 +502,12 @@ namespace Evaluation
 				   // @sect4{Generating output}
 
 				   // A different, maybe slightly odd
-				   // kind of ``evaluation'' of a
+				   // kind of <code>evaluation</code> of a
 				   // solution is to output it to a
 				   // file in a graphical
 				   // format. Since in the evaluation
 				   // functions we are given a
-				   // ``DoFHandler'' object and the
+				   // <code>DoFHandler</code> object and the
 				   // solution vector, we have all we
 				   // need to do this, so we can do it
 				   // in an evaluation class. The
@@ -532,9 +532,9 @@ namespace Evaluation
 				   //
 				   // Since this class which generates
 				   // the output is derived from the
-				   // common ``EvaluationBase'' base
+				   // common <code>EvaluationBase</code> base
 				   // class, its main interface is the
-				   // ``operator()''
+				   // <code>operator()</code>
 				   // function. Furthermore, it has a
 				   // constructor taking a string that
 				   // will be used as the base part of
@@ -555,21 +555,21 @@ namespace Evaluation
 				   // we write).
 				   //
 				   // Regarding the output format, the
-				   // ``DataOutInterface'' class
+				   // <code>DataOutInterface</code> class
 				   // (which is a base class of
-				   // ``DataOut'' through which we
+				   // <code>DataOut</code> through which we
 				   // will access its fields) provides
 				   // an enumeration field
-				   // ``OutputFormat'', which lists
+				   // <code>OutputFormat</code>, which lists
 				   // names for all supported output
 				   // formats. At the time of writing
 				   // of this program, the supported
 				   // graphics formats are represented
-				   // by the enum values ``ucd'',
-				   // ``gnuplot'', ``povray'',
-				   // ``eps'', ``gmv'', ``tecplot'',
-				   // ``tecplot_binary'', ``dx'', and
-				   // ``vtk'', but this list will
+				   // by the enum values <code>ucd</code>,
+				   // <code>gnuplot</code>, <code>povray</code>,
+				   // <code>eps</code>, <code>gmv</code>, <code>tecplot</code>,
+				   // <code>tecplot_binary</code>, <code>dx</code>, and
+				   // <code>vtk</code>, but this list will
 				   // certainly grow over time. Now,
 				   // within various functions of that
 				   // base class, you can use values
@@ -578,10 +578,10 @@ namespace Evaluation
 				   // (for example the default suffix
 				   // used for files of each format),
 				   // and you can call a generic
-				   // ``write'' function, which then
+				   // <code>write</code> function, which then
 				   // branches to the
-				   // ``write_gnuplot'',
-				   // ``write_ucd'', etc functions
+				   // <code>write_gnuplot</code>,
+				   // <code>write_ucd</code>, etc functions
 				   // which we have used in previous
 				   // examples already, based on the
 				   // value of a second argument given
@@ -636,14 +636,14 @@ namespace Evaluation
 				   // particularly interesting feature
 				   // over previous example programs
 				   // is the use of the
-				   // ``DataOut::default_suffix''
+				   // <code>DataOut::default_suffix</code>
 				   // function, returning the usual
 				   // suffix for files of a given
 				   // format (e.g. ".eps" for
 				   // encapsulated postscript files,
 				   // ".gnuplot" for Gnuplot files),
 				   // and of the generic
-				   // ``DataOut::write'' function with
+				   // <code>DataOut::write</code> function with
 				   // a second argument, which
 				   // branches to the actual output
 				   // functions for the different
@@ -652,14 +652,14 @@ namespace Evaluation
 				   // passed as second argument.
 				   //
 				   // Also note that we have to prefix
-				   // ``this-@>'' to access a member
+				   // <code>this-@></code> to access a member
 				   // variable of the template
 				   // dependent base class. The reason
 				   // here, and further down in the
 				   // program is the same as the one
 				   // described in the step-7 example
-				   // program (look for ``two-stage
-				   // name lookup'' there).
+				   // program (look for <code>two-stage
+				   // name lookup</code> there).
   template <int dim>
   void
   SolutionOutput<dim>::operator () (const DoFHandler<dim> &dof_handler,
@@ -760,7 +760,7 @@ namespace LaplaceSolver
 				   // style used in Smalltalk or Java
 				   // programs, where all classes are
 				   // derived from entirely abstract
-				   // classes ``Object'', even number
+				   // classes <code>Object</code>, even number
 				   // representations. The author
 				   // admits that he does not
 				   // particularly like the use of
@@ -805,7 +805,7 @@ namespace LaplaceSolver
 				   // have to make sure that the
 				   // triangulation exists until the
 				   // destructor exits. We do this by
-				   // keeping a ``SmartPointer'' to
+				   // keeping a <code>SmartPointer</code> to
 				   // this triangulation, which uses a
 				   // counter in the triangulation
 				   // class to denote the fact that
@@ -826,10 +826,10 @@ namespace LaplaceSolver
 				   // by this we allow that derived
 				   // classes refine or coarsen the
 				   // triangulation within the
-				   // ``refine_grid'' function.
+				   // <code>refine_grid</code> function.
 				   //
 				   // Finally, we have a function
-				   // ``n_dofs'' is only a tool for
+				   // <code>n_dofs</code> is only a tool for
 				   // the driver functions to decide
 				   // whether we want to go on with
 				   // mesh refinement or not. It
@@ -876,17 +876,17 @@ namespace LaplaceSolver
 				   // solving it, and calling the
 				   // postprocessor objects on the
 				   // solution. It implements the
-				   // ``solve_problem'' and
-				   // ``postprocess'' functions
+				   // <code>solve_problem</code> and
+				   // <code>postprocess</code> functions
 				   // declared in the base class. It
 				   // does not, however, implement the
-				   // ``refine_grid'' method, as mesh
+				   // <code>refine_grid</code> method, as mesh
 				   // refinement will be implemented
 				   // in a number of derived classes.
 				   //
 				   // It also declares a new abstract
 				   // virtual function,
-				   // ``assemble_rhs'', that needs to
+				   // <code>assemble_rhs</code>, that needs to
 				   // be overloaded in subclasses. The
 				   // reason is that we will implement
 				   // two different classes that will
@@ -921,24 +921,24 @@ namespace LaplaceSolver
 				   // down to the base class's
 				   // constructor, or are stored and
 				   // used to generate a
-				   // ``DoFHandler'' object
+				   // <code>DoFHandler</code> object
 				   // later. Since finite elements and
 				   // quadrature formula should match,
 				   // it is also passed a quadrature
 				   // object.
 				   //
-				   // The ``solve_problem'' sets up
+				   // The <code>solve_problem</code> sets up
 				   // the data structures for the
 				   // actual solution, calls the
 				   // functions to assemble the linear
 				   // system, and solves it.
 				   //
-				   // The ``postprocess'' function
+				   // The <code>postprocess</code> function
 				   // finally takes an evaluation
 				   // object and applies it to the
 				   // computed solution.
 				   //
-				   // The ``n_dofs'' function finally
+				   // The <code>n_dofs</code> function finally
 				   // implements the pure virtual
 				   // function of the base class.
   template <int dim>
@@ -1045,7 +1045,7 @@ namespace LaplaceSolver
 				   // of the class. It does not do
 				   // much except store pointers to
 				   // the objects given, and generate
-				   // ``DoFHandler'' object
+				   // <code>DoFHandler</code> object
 				   // initialized with the given
 				   // pointer to a triangulation. This
 				   // causes the DoF handler to store
@@ -1053,7 +1053,7 @@ namespace LaplaceSolver
 				   // already generate a finite
 				   // element numbering (we only ask
 				   // for that in the
-				   // ``solve_problem'' function).
+				   // <code>solve_problem</code> function).
   template <int dim>
   Solver<dim>::Solver (Triangulation<dim>       &triangulation,
 		       const FiniteElement<dim> &fe,
@@ -1106,7 +1106,7 @@ namespace LaplaceSolver
 
 
 				   // As stated above, the
-				   // ``postprocess'' function takes
+				   // <code>postprocess</code> function takes
 				   // an evaluation object, and
 				   // applies it to the computed
 				   // solution. This function may be
@@ -1122,7 +1122,7 @@ namespace LaplaceSolver
   }
 
 
-				   // The ``n_dofs'' function should
+				   // The <code>n_dofs</code> function should
 				   // be self-explanatory:
   template <int dim>
   unsigned int
@@ -1287,8 +1287,8 @@ namespace LaplaceSolver
                                          // overwriting their
                                          // respective
                                          // work. Previously, we have
-                                         // used the ``acquire'' and
-                                         // ``release'' functions of
+                                         // used the <code>acquire</code> and
+                                         // <code>release</code> functions of
                                          // the mutex to lock and
                                          // unlock the mutex,
                                          // respectively. While this
@@ -1307,7 +1307,7 @@ namespace LaplaceSolver
                                          // in the middle of the
                                          // locked block, and forgets
                                          // that before we call
-                                         // ``return'', we also have
+                                         // <code>return</code>, we also have
                                          // to unlock the mutex. This
                                          // all is not be a problem
                                          // here, but we want to show
@@ -1320,7 +1320,7 @@ namespace LaplaceSolver
                                          // mutex, and on running the
                                          // destructor unlocks it
                                          // again. This is called the
-                                         // ``scoped lock'' pattern
+                                         // <code>scoped lock</code> pattern
                                          // (apparently invented by
                                          // Doug Schmidt originally),
                                          // and it works because
@@ -1328,7 +1328,7 @@ namespace LaplaceSolver
                                          // objects are also run when
                                          // we exit the function
                                          // either through a
-                                         // ``return'' statement, or
+                                         // <code>return</code> statement, or
                                          // when an exception is
                                          // raised. Thus, it is
                                          // guaranteed that the mutex
@@ -1362,7 +1362,7 @@ namespace LaplaceSolver
 				      cell_matrix(i,j));
                                          // Here, at the brace, the
                                          // current scope ends, so the
-                                         // ``lock'' variable goes out
+                                         // <code>lock</code> variable goes out
                                          // of existence and its
                                          // destructor the mutex is
                                          // unlocked.
@@ -1391,7 +1391,7 @@ namespace LaplaceSolver
 				   // and do the second action in the
 				   // main thread. Since only one
 				   // thread is generated, we don't
-				   // use the ``Threads::ThreadGroup''
+				   // use the <code>Threads::ThreadGroup</code>
 				   // class here, but rather use the
 				   // one created thread object
 				   // directly to wait for this
@@ -1399,7 +1399,7 @@ namespace LaplaceSolver
 				   //
 				   // Note that taking up the address
 				   // of the
-				   // ``DoFTools::make_hanging_node_constraints''
+				   // <code>DoFTools::make_hanging_node_constraints</code>
 				   // function is a little tricky,
 				   // since there are actually three
 				   // of them, one for each supported
@@ -1407,7 +1407,7 @@ namespace LaplaceSolver
 				   // addresses of overloaded
 				   // functions is somewhat
 				   // complicated in C++, since the
-				   // address-of operator ``&'' in
+				   // address-of operator <code>&</code> in
 				   // that case returns more like a
 				   // set of values (the addresses of
 				   // all functions with that name),
@@ -1428,9 +1428,9 @@ namespace LaplaceSolver
 				   // would like to have; for this, we
 				   // could use a cast, but for more
 				   // clarity, we assign it to a
-				   // temporary ``mhnc_p'' (short for
-				   // ``pointer to
-				   // make_hanging_node_constraints'')
+				   // temporary <code>mhnc_p</code> (short for
+				   // <code>pointer to
+				   // make_hanging_node_constraints</code>)
 				   // with the right type, and using
 				   // this pointer instead.
   template <int dim>
@@ -1453,7 +1453,7 @@ namespace LaplaceSolver
     DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
 				     // Wait until the
-				     // ``hanging_node_constraints''
+				     // <code>hanging_node_constraints</code>
 				     // object is fully set up, then
 				     // close it and use it to
 				     // condense the sparsity pattern:
@@ -1523,13 +1523,13 @@ namespace LaplaceSolver
 				   // that denotes the right hand side
 				   // of the problem. A pointer to
 				   // this object is stored (again as
-				   // a ``SmartPointer'', in order to
+				   // a <code>SmartPointer</code>, in order to
 				   // make sure that the function
 				   // object is not deleted as long as
 				   // it is still used by this class).
 				   //
 				   // The only functional part of this
-				   // class is the ``assemble_rhs''
+				   // class is the <code>assemble_rhs</code>
 				   // method that does what its name
 				   // suggests.
   template <int dim>
@@ -1566,7 +1566,7 @@ namespace LaplaceSolver
 
 
 
-				   // ... as does the ``assemble_rhs''
+				   // ... as does the <code>assemble_rhs</code>
 				   // function. Since this is
 				   // explained in several of the
 				   // previous example programs, we
@@ -1614,22 +1614,22 @@ namespace LaplaceSolver
 
 				   // By now, all functions of the
 				   // abstract base class except for
-				   // the ``refine_grid'' function
+				   // the <code>refine_grid</code> function
 				   // have been implemented. We will
 				   // now have two classes that
 				   // implement this function for the
-				   // ``PrimalSolver'' class, one
+				   // <code>PrimalSolver</code> class, one
 				   // doing global refinement, one a
 				   // form of local refinement.
 				   //
 				   // The first, doing global
 				   // refinement, is rather simple:
 				   // its main function just calls
-				   // ``triangulation-@>refine_global
-				   // (1);'', which does all the work.
+				   // <code>triangulation-@>refine_global
+				   // (1);</code>, which does all the work.
 				   //
-				   // Note that since the ``Base''
-				   // base class of the ``Solver''
+				   // Note that since the <code>Base</code>
+				   // base class of the <code>Solver</code>
 				   // class is virtual, we have to
 				   // declare a constructor that
 				   // initializes the immediate base
@@ -1770,8 +1770,8 @@ namespace LaplaceSolver
 				 // exact solution the function
 				 // $u(x,y)=exp(x+sin(10y+5x^2))$. In more
 				 // than two dimensions, simply repeat
-				 // the sine-factor with ``y''
-				 // replaced by ``z'' and so on. Given
+				 // the sine-factor with <code>y</code>
+				 // replaced by <code>z</code> and so on. Given
 				 // this, the following two classes
 				 // are probably straightforward from
 				 // the previous examples.
@@ -1887,10 +1887,10 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 				   // your program).
   for (unsigned int step=0; true; ++step)
     {
-				       // Then give the ``alive''
+				       // Then give the <code>alive</code>
 				       // indication for this
 				       // iteration. Note that the
-				       // ``std::flush'' is needed to
+				       // <code>std::flush</code> is needed to
 				       // have the text actually
 				       // appear on the screen, rather
 				       // than only in some buffer

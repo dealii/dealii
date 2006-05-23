@@ -55,7 +55,7 @@
 				 // refinement indicator.
 #include <numerics/derivative_approximation.h>
 				 // Finally we do some time comparison
-				 // using the ``Timer'' class.
+				 // using the <code>Timer</code> class.
 #include <base/timer.h>
 
 				 // And this again is C++:
@@ -100,10 +100,10 @@
 				 //
 				 // First we define the classes
 				 // representing the equation-specific
-				 // functions. Both classes, ``RHS''
-				 // and ``BoundaryValues'', are
-				 // derived from the ``Function''
-				 // class. Only the ``value_list''
+				 // functions. Both classes, <code>RHS</code>
+				 // and <code>BoundaryValues</code>, are
+				 // derived from the <code>Function</code>
+				 // class. Only the <code>value_list</code>
 				 // function are implemented because
 				 // only lists of function values are
 				 // computed rather than single
@@ -128,18 +128,18 @@ class BoundaryValues:  public Function<dim>
 };
 
 
-				 // The class ``Beta'' represents the
+				 // The class <code>Beta</code> represents the
 				 // vector valued flow field of the
 				 // linear transport equation and is
-				 // not derived from the ``Function''
+				 // not derived from the <code>Function</code>
 				 // class as we prefer to get function
-				 // values of type ``Point'' rather
+				 // values of type <code>Point</code> rather
 				 // than of type
-				 // ``Vector@<double@>''. This, because
+				 // <code>Vector@<double@></code>. This, because
 				 // there exist scalar products
-				 // between ``Point'' and ``Point'' as
-				 // well as between ``Point'' and
-				 // ``Tensor'', simplifying terms like
+				 // between <code>Point</code> and <code>Point</code> as
+				 // well as between <code>Point</code> and
+				 // <code>Tensor</code>, simplifying terms like
 				 // $\beta\cdot n$ and
 				 // $\beta\cdot\nabla v$.
                                  //
@@ -161,7 +161,7 @@ class Beta
 
 
 				 // The implementation of the
-				 // ``value_list'' functions of these
+				 // <code>value_list</code> functions of these
 				 // classes are rather simple.  For
 				 // simplicity the right hand side is
 				 // set to be zero but will be
@@ -235,14 +235,14 @@ void BoundaryValues<dim>::value_list(const std::vector<Point<dim> > &points,
 				 // Next we define the
 				 // equation-dependent and
 				 // DG-method-dependent class
-				 // ``DGTransportEquation''. Its
+				 // <code>DGTransportEquation</code>. Its
 				 // member functions were already
 				 // mentioned in the Introduction and
 				 // will be explained
 				 // below. Furthermore it includes
 				 // objects of the previously defined
-				 // ``Beta'', ``RHS'' and
-				 // ``BoundaryValues'' function
+				 // <code>Beta</code>, <code>RHS</code> and
+				 // <code>BoundaryValues</code> function
 				 // classes.
 template <int dim>
 class DGTransportEquation
@@ -287,15 +287,15 @@ DGTransportEquation<dim>::DGTransportEquation ()
 
 				 // @sect4{Function: assemble_cell_term}
 				 //
-				 // The ``assemble_cell_term''
+				 // The <code>assemble_cell_term</code>
 				 // function assembles the cell terms
 				 // of the discretization.
-				 // ``u_v_matrix'' is a cell matrix,
+				 // <code>u_v_matrix</code> is a cell matrix,
 				 // i.e. for a DG method of degree 1,
 				 // it is of size 4 times 4, and
-				 // ``cell_vector'' is of size 4.
+				 // <code>cell_vector</code> is of size 4.
 				 // When this function is invoked,
-				 // ``fe_v'' is already reinit'ed with the
+				 // <code>fe_v</code> is already reinit'ed with the
 				 // current cell before and includes
 				 // all shape values needed.
 template <int dim>
@@ -304,13 +304,13 @@ void DGTransportEquation<dim>::assemble_cell_term(
   FullMatrix<double> &u_v_matrix,
   Vector<double> &cell_vector) const
 {
-				   // First we ask ``fe_v'' for the
+				   // First we ask <code>fe_v</code> for the
 				   // shape gradients, shape values and
 				   // quadrature weights,
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
 
 				   // Then the flow field beta and the
-				   // ``rhs_function'' are evaluated at
+				   // <code>rhs_function</code> are evaluated at
 				   // the quadrature points,
   std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
   std::vector<double> rhs (fe_v.n_quadrature_points);
@@ -337,10 +337,10 @@ void DGTransportEquation<dim>::assemble_cell_term(
 
 				 // @sect4{Function: assemble_boundary_term}
 				 //
-				 // The ``assemble_boundary_term''
+				 // The <code>assemble_boundary_term</code>
 				 // function assembles the face terms
 				 // at boundary faces.  When this
-				 // function is invoked, ``fe_v'' is
+				 // function is invoked, <code>fe_v</code> is
 				 // already reinit'ed with the current
 				 // cell and current face. Hence it
 				 // provides the shape values on that
@@ -352,7 +352,7 @@ void DGTransportEquation<dim>::assemble_boundary_term(
   Vector<double> &cell_vector) const
 {
 				   // Again, as in the previous
-				   // function, we ask the ``FEValues''
+				   // function, we ask the <code>FEValues</code>
 				   // object for the shape values and
 				   // the quadrature weights
   const std::vector<double> &JxW = fe_v.get_JxW_values ();
@@ -400,7 +400,7 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 
 				 // @sect4{Function: assemble_face_term1}
 				 //
-				 // The ``assemble_face_term1''
+				 // The <code>assemble_face_term1</code>
 				 // function assembles the face terms
 				 // corresponding to the first version
 				 // of the DG method, cf. above. For
@@ -409,7 +409,7 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 				 // all cell boundaries.
 				 //
 				 // When this function is invoked,
-				 // ``fe_v'' and ``fe_v_neighbor'' are
+				 // <code>fe_v</code> and <code>fe_v_neighbor</code> are
 				 // already reinit'ed with the current
 				 // cell and the neighoring cell,
 				 // respectively, as well as with the
@@ -418,16 +418,16 @@ void DGTransportEquation<dim>::assemble_boundary_term(
 				 // on the face.
 				 //
 				 // In addition to the cell matrix
-				 // ``u_v_matrix'' this function has
+				 // <code>u_v_matrix</code> this function has
 				 // got a new argument
-				 // ``un_v_matrix'', that stores
+				 // <code>un_v_matrix</code>, that stores
 				 // contributions to the system matrix
 				 // that are based on outer values of
 				 // u, see $\hat u_h$ in the
 				 // introduction, and inner values of
 				 // v, see $v_h$. Here we note that
-				 // ``un'' is the short notation for
-				 // ``u_neighbor'' and represents
+				 // <code>un</code> is the short notation for
+				 // <code>u_neighbor</code> and represents
 				 // $\hat u_h$.
 template <int dim>
 void DGTransportEquation<dim>::assemble_face_term1(
@@ -484,7 +484,7 @@ void DGTransportEquation<dim>::assemble_face_term1(
 				 // @sect4{Function: assemble_face_term2}
 				 //
 				 // Now we look at the
-				 // ``assemble_face_term2'' function
+				 // <code>assemble_face_term2</code> function
 				 // that assembles the face terms
 				 // corresponding to the second
 				 // version of the DG method,
@@ -492,8 +492,8 @@ void DGTransportEquation<dim>::assemble_face_term1(
 				 // terms are given as a sum of
 				 // integrals over all faces.  Here we
 				 // need two additional cell matrices
-				 // ``u_vn_matrix'' and
-				 // ``un_vn_matrix'' that will store
+				 // <code>u_vn_matrix</code> and
+				 // <code>un_vn_matrix</code> that will store
 				 // contributions due to terms
 				 // involving u and vn as well as un
 				 // and vn.
@@ -569,7 +569,7 @@ void DGTransportEquation<dim>::assemble_face_term2(
 				 // After these preparations, we
 				 // proceed with the main part of this
 				 // program. The main class, here
-				 // called ``DGMethod'' is basically
+				 // called <code>DGMethod</code> is basically
 				 // the main class of step 6. One of
 				 // the differences is that there's no
 				 // ConstraintMatrix object. This is,
@@ -628,8 +628,8 @@ class DGMethod
 				     // solutions to the problems
 				     // corresponding to the two
 				     // different assembling routines
-				     // ``assemble_system1'' and
-				     // ``assemble_system2'';
+				     // <code>assemble_system1</code> and
+				     // <code>assemble_system2</code>;
     Vector<double>       solution1;
     Vector<double>       solution2;
     Vector<double>       right_hand_side;
@@ -714,51 +714,51 @@ void DGMethod<dim>::setup_system ()
 				 // @sect4{Function: assemble_system1}
 				 //
 				 // We proceed with the
-				 // ``assemble_system1'' function that
+				 // <code>assemble_system1</code> function that
 				 // implements the DG discretization
 				 // in its first version. This
 				 // function repeatedly calls the
-				 // ``assemble_cell_term'',
-				 // ``assemble_boundary_term'' and
-				 // ``assemble_face_term1'' functions
-				 // of the ``DGTransportEquation''
+				 // <code>assemble_cell_term</code>,
+				 // <code>assemble_boundary_term</code> and
+				 // <code>assemble_face_term1</code> functions
+				 // of the <code>DGTransportEquation</code>
 				 // object.  The
-				 // ``assemble_boundary_term'' covers
+				 // <code>assemble_boundary_term</code> covers
 				 // the first case mentioned in the
 				 // introduction.
 				 //
 				 // 1. face is at boundary
 				 //
 				 // This function takes a
-				 // ``FEFaceValues'' object as
+				 // <code>FEFaceValues</code> object as
 				 // argument.  In contrast to that
-				 // ``assemble_face_term1''
-				 // takes two ``FEFaceValuesBase''
+				 // <code>assemble_face_term1</code>
+				 // takes two <code>FEFaceValuesBase</code>
 				 // objects; one for the shape
 				 // functions on the current cell and
 				 // the other for shape functions on
 				 // the neighboring cell under
 				 // consideration. Both objects are
-				 // either of class ``FEFaceValues''
-				 // or of class ``FESubfaceValues''
+				 // either of class <code>FEFaceValues</code>
+				 // or of class <code>FESubfaceValues</code>
 				 // (both derived from
-				 // ``FEFaceValuesBase'') according to
+				 // <code>FEFaceValuesBase</code>) according to
 				 // the remaining cases mentioned
 				 // in the introduction:
 				 //
 				 // 2. neighboring cell is finer
-				 // (current cell: ``FESubfaceValues'',
-				 // neighboring cell: ``FEFaceValues'');
+				 // (current cell: <code>FESubfaceValues</code>,
+				 // neighboring cell: <code>FEFaceValues</code>);
 				 //
 				 // 3. neighboring cell is of the same
 				 // refinement level (both, current
 				 // and neighboring cell:
-				 // ``FEFaceValues'');
+				 // <code>FEFaceValues</code>);
 				 //
 				 // 4. neighboring cell is coarser
-				 // (current cell: ``FEFaceValues'',
+				 // (current cell: <code>FEFaceValues</code>,
 				 // neighboring cell:
-				 // ``FESubfaceValues'').
+				 // <code>FESubfaceValues</code>).
 				 //
 				 // If we considered globally refined
 				 // meshes then only case 3 would
@@ -771,9 +771,9 @@ template <int dim>
 void DGMethod<dim>::assemble_system1 () 
 {
 				   // First we create the
-				   // ``UpdateFlags'' for the
-				   // ``FEValues'' and the
-				   // ``FEFaceValues'' objects.
+				   // <code>UpdateFlags</code> for the
+				   // <code>FEValues</code> and the
+				   // <code>FEFaceValues</code> objects.
   const UpdateFlags update_flags = update_values
                                    | update_gradients
                                    | update_q_points
@@ -797,7 +797,7 @@ void DGMethod<dim>::assemble_system1 ()
 				   // vectors of the current cell.
   const UpdateFlags neighbor_face_update_flags = update_values;
    
-				   // Then we create the ``FEValues''
+				   // Then we create the <code>FEValues</code>
 				   // object. Here, we use the default
 				   // MappingQ1. different mapping
 				   // create a MappingCollection first
@@ -806,8 +806,8 @@ void DGMethod<dim>::assemble_system1 ()
   hp::FEValues<dim> fe_v_x (fe_collection, quadratures, update_flags);
   
 				   // Similarly we create the
-				   // ``FEFaceValues'' and
-				   // ``FESubfaceValues'' objects for
+				   // <code>FEFaceValues</code> and
+				   // <code>FESubfaceValues</code> objects for
 				   // both, the current and the
 				   // neighboring cell. Within the
 				   // following nested loop over all
@@ -828,7 +828,7 @@ void DGMethod<dim>::assemble_system1 ()
 				   // and vectors. Here we need two
 				   // cell matrices, both for face
 				   // terms that include test
-				   // functions ``v'' (shape functions
+				   // functions <code>v</code> (shape functions
 				   // of the current cell). To be more
 				   // precise, the first matrix will
 				   // include the `u and v terms' and
@@ -859,26 +859,26 @@ void DGMethod<dim>::assemble_system1 ()
       std::vector<unsigned int> dofs_neighbor;
 
 				       // In the
-				       // ``assemble_face_term1''
+				       // <code>assemble_face_term1</code>
 				       // function contributions to
 				       // the cell matrices and the
 				       // cell vector are only
 				       // ADDED. Therefore on each
 				       // cell we need to reset the
-				       // ``u_v_matrix'' and
-				       // ``cell_vector'' to zero,
+				       // <code>u_v_matrix</code> and
+				       // <code>cell_vector</code> to zero,
 				       // before assembling the cell terms.
       u_v_matrix = 0;
       cell_vector = 0;
       
-				       // Now we reinit the ``FEValues''
+				       // Now we reinit the <code>FEValues</code>
 				       // object for the current cell
       fe_v_x.reinit (cell);
 
 				       // and call the function
 				       // that assembles the cell
 				       // terms. The first argument is
-				       // the ``FEValues'' that was
+				       // the <code>FEValues</code> that was
 				       // previously reinit'ed on the
 				       // current cell.
       dg.assemble_cell_term(fe_v_x.get_present_fe_values (),
@@ -900,7 +900,7 @@ void DGMethod<dim>::assemble_system1 ()
 	  typename hp::DoFHandler<dim>::face_iterator face=cell->face(face_no);
 	  
 					   // and clear the
-					   // ``un_v_matrix'' on each
+					   // <code>un_v_matrix</code> on each
 					   // face.
 	  un_v_matrix = 0;
 
@@ -913,7 +913,7 @@ void DGMethod<dim>::assemble_system1 ()
 	  if (face->at_boundary())
 	    {
 					       // We reinit the
-					       // ``FEFaceValues''
+					       // <code>FEFaceValues</code>
 					       // object to the
 					       // current face
 	      fe_v_face_x.reinit (cell, face_no);
@@ -959,7 +959,7 @@ void DGMethod<dim>::assemble_system1 ()
 					       // note that the
 					       // following part of
 					       // code will not work
-					       // for ``dim==1''.
+					       // for <code>dim==1</code>.
 	      if (face->has_children())
 		{
 						   // First we store
@@ -972,7 +972,7 @@ void DGMethod<dim>::assemble_system1 ()
 						   // neighbor-@>neighbor(neighbor2)
 						   // equals the
 						   // current cell
-						   // ``cell''.
+						   // <code>cell</code>.
 		  const unsigned int neighbor2=
 		    cell->neighbor_of_neighbor(face_no);
 		  
@@ -985,7 +985,7 @@ void DGMethod<dim>::assemble_system1 ()
 						       // and set the
 						       // cell
 						       // iterator
-						       // ``neighbor_child''
+						       // <code>neighbor_child</code>
 						       // to the cell
 						       // placed
 						       // `behind' the
@@ -1029,12 +1029,12 @@ void DGMethod<dim>::assemble_system1 ()
 
 						       // We need to
 						       // reset the
-						       // ``un_v_matrix''
+						       // <code>un_v_matrix</code>
 						       // on each
 						       // subface
 						       // because on
 						       // each subface
-						       // the ``un''
+						       // the <code>un</code>
 						       // belong to
 						       // different
 						       // neighboring
@@ -1048,7 +1048,7 @@ void DGMethod<dim>::assemble_system1 ()
 						       // case (case
 						       // 2) we employ
 						       // the
-						       // ``FESubfaceValues''
+						       // <code>FESubfaceValues</code>
 						       // of the
 						       // current
 						       // cell (here
@@ -1081,7 +1081,7 @@ void DGMethod<dim>::assemble_system1 ()
 		      						
 						       // and
 						       // distribute
-						       // ``un_v_matrix''
+						       // <code>un_v_matrix</code>
 						       // to the
 						       // system_matrix
 		      for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
@@ -1089,8 +1089,8 @@ void DGMethod<dim>::assemble_system1 ()
 			  system_matrix.add(dofs[i], dofs_neighbor[k],
 					    un_v_matrix(i,k));
 		    }
-						   // End of ``if
-						   // (face-@>has_children())''
+						   // End of <code>if
+						   // (face-@>has_children())</code>
 		}
 	      else
 		{
@@ -1125,7 +1125,7 @@ void DGMethod<dim>::assemble_system1 ()
 
 						       // We reinit
 						       // the
-						       // ``FEFaceValues''
+						       // <code>FEFaceValues</code>
 						       // of the
 						       // current and
 						       // neighboring
@@ -1142,10 +1142,10 @@ void DGMethod<dim>::assemble_system1 ()
 					     fe_v_face_neighbor_x.get_present_fe_values (),
 					     u_v_matrix,
 					     un_v_matrix);
-						       // End of ``if
+						       // End of <code>if
 						       // (neighbor-@>level()
 						       // ==
-						       // cell-@>level())''
+						       // cell-@>level())</code>
 		    }
 		  else
 		    {
@@ -1194,7 +1194,7 @@ void DGMethod<dim>::assemble_system1 ()
 
 						       // Reinit the
 						       // appropriate
-						       // ``FEFaceValues''
+						       // <code>FEFaceValues</code>
 						       // and assemble
 						       // the face
 						       // terms.
@@ -1211,25 +1211,25 @@ void DGMethod<dim>::assemble_system1 ()
 						   // Now we get the
 						   // dof indices of
 						   // the
-						   // ``neighbor_child''
+						   // <code>neighbor_child</code>
 						   // cell,
 		  dofs_neighbor.resize (neighbor->get_fe().dofs_per_cell);
 		  neighbor->get_dof_indices (dofs_neighbor);
 
 						   // and distribute the
-						   // ``un_v_matrix''.
+						   // <code>un_v_matrix</code>.
 		  for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
 		    for (unsigned int k=0; k<neighbor->get_fe().dofs_per_cell; ++k)
 		      system_matrix.add(dofs[i], dofs_neighbor[k],
 					un_v_matrix(i,k));
 		}
-					       // End of ``face not at boundary'':
+					       // End of <code>face not at boundary</code>:
 	    }
 					   // End of loop over all faces:
 	}
       
 				       // Finally we distribute the
-				       // ``u_v_matrix''
+				       // <code>u_v_matrix</code>
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  system_matrix.add(dofs[i], dofs[j], u_v_matrix(i,j));
@@ -1244,16 +1244,16 @@ void DGMethod<dim>::assemble_system1 ()
 				 // @sect4{Function: assemble_system2}
 				 //
 				 // We proceed with the
-				 // ``assemble_system2'' function that
+				 // <code>assemble_system2</code> function that
 				 // implements the DG discretization
 				 // in its second version. This
 				 // function is very similar to the
-				 // ``assemble_system1''
+				 // <code>assemble_system1</code>
 				 // function. Therefore, here we only
 				 // discuss the differences between
 				 // the two functions. This function
 				 // repeatedly calls the
-				 // ``assemble_face_term2'' function
+				 // <code>assemble_face_term2</code> function
 				 // of the DGTransportEquation object,
 				 // that assembles the face terms
 				 // written as a sum of integrals over
@@ -1293,7 +1293,7 @@ void DGMethod<dim>::assemble_system2 ()
   const UpdateFlags neighbor_face_update_flags = update_values;
 
 				   // Here we do not need
-				   // ``fe_v_face_neighbor'' as case 4
+				   // <code>fe_v_face_neighbor</code> as case 4
 				   // does not occur.
   hp::FEValues<dim> fe_v_x (
     fe_collection, quadratures, update_flags);
@@ -1312,7 +1312,7 @@ void DGMethod<dim>::assemble_system2 ()
 				   // Additionally we need the
 				   // following two cell matrices,
 				   // both for face term that include
-				   // test function ``vn'' (shape
+				   // test function <code>vn</code> (shape
 				   // functions of the neighboring
 				   // cell). To be more precise, the
 				   // first matrix will include the `u
@@ -1548,15 +1548,15 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 				 // difference quotients including the
 				 // cell under consideration and its
 				 // neighbors. This is done by the
-				 // ``DerivativeApproximation'' class
+				 // <code>DerivativeApproximation</code> class
 				 // that computes the approximate
 				 // gradients in a way similar to the
-				 // ``GradientEstimation'' described
+				 // <code>GradientEstimation</code> described
 				 // in Step 9 of this tutorial. In
 				 // fact, the
-				 // ``DerivativeApproximation'' class
+				 // <code>DerivativeApproximation</code> class
 				 // was developed following the
-				 // ``GradientEstimation'' class of
+				 // <code>GradientEstimation</code> class of
 				 // Step 9. Relating to the
 				 // discussion in Step 9, here we
 				 // consider $h^{1+d/2}|\nabla_h
@@ -1570,7 +1570,7 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 template <int dim>
 void DGMethod<dim>::refine_grid ()
 {
-				   // The ``DerivativeApproximation''
+				   // The <code>DerivativeApproximation</code>
 				   // class computes the gradients to
 				   // float precision. This is
 				   // sufficient as they are
@@ -1672,14 +1672,14 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
 }
 
 
-				 // The following ``run'' function is
+				 // The following <code>run</code> function is
 				 // similar to previous examples. The
 				 // only difference is that the
 				 // problem is assembled and solved
 				 // twice on each refinement step;
-				 // first by ``assemble_system1'' that
+				 // first by <code>assemble_system1</code> that
 				 // implements the first version and
-				 // then by ``assemble_system2'' that
+				 // then by <code>assemble_system2</code> that
 				 // implements the second version of
 				 // writing the DG
 				 // discretization. Furthermore the
@@ -1767,7 +1767,7 @@ void DGMethod<dim>::run ()
     }
 }
 
-				 // The following ``main'' function is
+				 // The following <code>main</code> function is
 				 // similar to previous examples and
 				 // need not to be commented on.
 int main () 

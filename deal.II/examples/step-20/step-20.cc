@@ -59,12 +59,12 @@
 				 // spatial dependence, we consider it
 				 // a tensor-valued function. The
 				 // following include file provides
-				 // the ``TensorFunction'' class that
+				 // the <code>TensorFunction</code> class that
 				 // offers such functionality:
 #include <base/tensor_function.h>
 
 
-                                 // @sect3{The ``MixedLaplaceProblem'' class template}
+                                 // @sect3{The <code>MixedLaplaceProblem</code> class template}
 
 				 // Again, since this is an adaptation
 				 // of step-6, the main class is
@@ -77,7 +77,7 @@
 				 // argument (and that there is a
 				 // corresponding member variable to
 				 // store this value) and the addition
-				 // of the ``compute_error'' function
+				 // of the <code>compute_error</code> function
 				 // in which, no surprise, we will
 				 // compute the difference between the
 				 // exact and the numerical solution
@@ -137,10 +137,10 @@ class MixedLaplaceProblem
 				 // exact solution for later
 				 // computations of the error. Note
 				 // that these functions have one,
-				 // one, and ``dim+1'' components,
+				 // one, and <code>dim+1</code> components,
 				 // respectively, and that we pass the
 				 // number of components down to the
-				 // ``Function@<dim@>'' base class. For
+				 // <code>Function@<dim@></code> base class. For
 				 // the exact solution, we only
 				 // declare the function that actually
 				 // returns the entire solution vector
@@ -234,7 +234,7 @@ ExactSolution<dim>::vector_value (const Point<dim> &p,
                                  // because this is all that appears
                                  // in the weak form -- the inverse of
                                  // the permeability tensor,
-                                 // ``KInverse''. For the purpose of
+                                 // <code>KInverse</code>. For the purpose of
                                  // verifying the exactness of the
                                  // solution and determining
                                  // convergence orders, this tensor is
@@ -253,22 +253,22 @@ ExactSolution<dim>::vector_value (const Point<dim> &p,
                                  // Possibly unsurprising, deal.II
                                  // also has a base class not only for
                                  // scalar and generally vector-valued
-                                 // functions (the ``Function'' base
+                                 // functions (the <code>Function</code> base
                                  // class) but also for functions that
                                  // return tensors of fixed dimension
-                                 // and rank, the ``TensorFunction''
+                                 // and rank, the <code>TensorFunction</code>
                                  // template. Here, the function under
                                  // consideration returns a dim-by-dim
                                  // matrix, i.e. a tensor of rank 2
-                                 // and dimension ``dim''. We then
+                                 // and dimension <code>dim</code>. We then
                                  // choose the template arguments of
                                  // the base class appropriately.
                                  //
                                  // The interface that the
-                                 // ``TensorFunction'' class provides
+                                 // <code>TensorFunction</code> class provides
                                  // is essentially equivalent to the
-                                 // ``Function'' class. In particular,
-                                 // there exists a ``value_list''
+                                 // <code>Function</code> class. In particular,
+                                 // there exists a <code>value_list</code>
                                  // function that takes a list of
                                  // points at which to evaluate the
                                  // function, and returns the values
@@ -384,8 +384,8 @@ double extract_p (const FEValuesBase<dim> &fe_values,
                                  //
                                  // The only thing worth describing
                                  // here is the constructor call of
-                                 // the ``fe'' variable. The
-                                 // ``FESystem'' class to which this
+                                 // the <code>fe</code> variable. The
+                                 // <code>FESystem</code> class to which this
                                  // variable belongs has a number of
                                  // different constructors that all
                                  // refer to binding simpler elements
@@ -394,20 +394,20 @@ double extract_p (const FEValuesBase<dim> &fe_values,
                                  // want to couple a single RT(degree)
                                  // element with a single DQ(degree)
                                  // element. The constructor to
-                                 // ``FESystem'' that does this
+                                 // <code>FESystem</code> that does this
                                  // requires us to specity first the
                                  // first base element (the
-                                 // ``FE_RaviartThomas'' object of
+                                 // <code>FE_RaviartThomas</code> object of
                                  // given degree) and then the number
                                  // of copies for this base element,
                                  // and then similarly the kind and
-                                 // number of ``FE_DGQ''
+                                 // number of <code>FE_DGQ</code>
                                  // elements. Note that the Raviart
-                                 // Thomas element already has ``dim''
+                                 // Thomas element already has <code>dim</code>
                                  // vector components, so that the
                                  // coupled element will have
-                                 // ``dim+1'' vector components, the
-                                 // first ``dim'' of which correspond
+                                 // <code>dim+1</code> vector components, the
+                                 // first <code>dim</code> of which correspond
                                  // to the velocity variable whereas the
                                  // last one corresponds to the
                                  // pressure.
@@ -416,10 +416,10 @@ double extract_p (const FEValuesBase<dim> &fe_values,
                                  // we constructed this element from
                                  // its base elements, with the way we
                                  // have done so in step-8: there, we
-                                 // have built it as ``fe
-                                 // (FE_Q@<dim@>(1), dim)'', i.e. we
-                                 // have simply used ``dim'' copies of
-                                 // the ``FE_Q(1)'' element, one copy
+                                 // have built it as <code>fe
+                                 // (FE_Q@<dim@>(1), dim)</code>, i.e. we
+                                 // have simply used <code>dim</code> copies of
+                                 // the <code>FE_Q(1)</code> element, one copy
                                  // for the displacement in each
                                  // coordinate direction.
 template <int dim>
@@ -475,11 +475,11 @@ void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
                                    // blocks, so that we can allocate
                                    // an appropriate amount of
                                    // space. To this end, we call the
-                                   // ``DoFTools::count_dofs_per_component''
+                                   // <code>DoFTools::count_dofs_per_component</code>
                                    // function that counts how many
                                    // shape functions are non-zero for
                                    // a particular vector
-                                   // component. We have ``dim+1''
+                                   // component. We have <code>dim+1</code>
                                    // vector components, and we have
                                    // to use the knowledge that for
                                    // Raviart-Thomas elements all
@@ -527,8 +527,8 @@ void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
                                    // step, we allocate a 2x2 block
                                    // pattern and then reinitialize
                                    // each of the blocks to its
-                                   // correct size using the ``n_u''
-                                   // and ``n_p'' variables defined
+                                   // correct size using the <code>n_u</code>
+                                   // and <code>n_p</code> variables defined
                                    // above that hold the number of
                                    // velocity and pressure
                                    // variables. In this second step,
@@ -540,7 +540,7 @@ void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
                                    // its knowledge about the sizes of
                                    // the blocks it manages; this
                                    // happens with the
-                                   // ``sparsity_pattern.collect_sizes()''
+                                   // <code>sparsity_pattern.collect_sizes()</code>
                                    // call:
   const unsigned int
     n_couplings = dof_handler.max_couplings_between_dofs();
@@ -589,7 +589,7 @@ void MixedLaplaceProblem<dim>::make_grid_and_dofs ()
                                  // are all the usual steps, with the
                                  // addition that we do not only
                                  // allocate quadrature and
-                                 // ``FEValues'' objects for the cell
+                                 // <code>FEValues</code> objects for the cell
                                  // terms, but also for face
                                  // terms. After that, we define the
                                  // usual abbreviations for variables,
@@ -753,13 +753,13 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                                  // rather only comment on
                                  // implementational aspects.
 
-                                 // @sect4{The ``InverseMatrix'' class template}
+                                 // @sect4{The <code>InverseMatrix</code> class template}
 
                                  // The first component of our linear
                                  // solver scheme was the creation of
                                  // a class that acts like the inverse
                                  // of a matrix, i.e. which has a
-                                 // ``vmult'' function that multiplies
+                                 // <code>vmult</code> function that multiplies
                                  // a vector with an inverse matrix by
                                  // solving a linear system.
                                  //
@@ -768,19 +768,19 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                                  // purpose of this class, two
                                  // comments are in order. First, the
                                  // class is derived from the
-                                 // ``Subscriptor'' class so that we
-                                 // can use the ``SmartPointer'' class
+                                 // <code>Subscriptor</code> class so that we
+                                 // can use the <code>SmartPointer</code> class
                                  // with inverse matrix objects. The
-                                 // use of the ``Subscriptor'' class
+                                 // use of the <code>Subscriptor</code> class
                                  // has been explained before in
                                  // step-7 and step-20. The present
                                  // class also sits on the receiving
                                  // end of this
-                                 // ``Subscriptor''/``SmartPointer''
+                                 // <code>Subscriptor</code>/<code>SmartPointer</code>
                                  // pair: it holds its pointer to the
                                  // matrix it is supposed to be the
                                  // inverse of through a
-                                 // ``SmartPointer'' to make sure that
+                                 // <code>SmartPointer</code> to make sure that
                                  // this matrix is not destroyed while
                                  // we still have a pointer to it.
                                  //
@@ -795,7 +795,7 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                                  // vectors that it will release again
                                  // at the end of its operation. What
                                  // this means is that through
-                                 // repeated calls to the ``vmult''
+                                 // repeated calls to the <code>vmult</code>
                                  // function of this class we have to
                                  // allocate and release vectors over
                                  // and over again.
@@ -806,20 +806,20 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                                  // only once? In fact, deal.II offers
                                  // a way to do exactly this. What all
                                  // the linear solvers do is not to
-                                 // allocate memory using ``new'' and
-                                 // ``delete'', but rather to allocate
+                                 // allocate memory using <code>new</code> and
+                                 // <code>delete</code>, but rather to allocate
                                  // them from an object derived from
-                                 // the ``VectorMemory'' class (see
+                                 // the <code>VectorMemory</code> class (see
                                  // the module on Vector memory
                                  // management in the API reference
                                  // manual). By default, the linear
                                  // solvers use a derived class
-                                 // ``PrimitiveVectorMemory'' that,
+                                 // <code>PrimitiveVectorMemory</code> that,
                                  // ever time a vector is requested,
-                                 // allocates one using ``new'', and
-                                 // calls ``delete'' on it again once
+                                 // allocates one using <code>new</code>, and
+                                 // calls <code>delete</code> on it again once
                                  // the solver returns it to the
-                                 // ``PrimitiveVectorMemory''
+                                 // <code>PrimitiveVectorMemory</code>
                                  // object. This is the appropriate
                                  // thing to do if we do not
                                  // anticipate that the vectors may be
@@ -834,7 +834,7 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                                  // vector memory object holds on to
                                  // them for later requests by linear
                                  // solvers. The
-                                 // ``GrowingVectorMemory'' class does
+                                 // <code>GrowingVectorMemory</code> class does
                                  // exactly this: when asked by a
                                  // linear solver for a vector, it
                                  // first looks whether it has unused
@@ -843,19 +843,19 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                                  // simply grows its pool. Vectors are
                                  // only returned to the C++ runtime
                                  // memory system once the
-                                 // ``GrowingVectorMemory'' object is
+                                 // <code>GrowingVectorMemory</code> object is
                                  // destroyed itself.
                                  //
                                  // What we therefore need to do is
                                  // have the present matrix have an
                                  // object of type
-                                 // ``GrowingVectorMemory'' as a
+                                 // <code>GrowingVectorMemory</code> as a
                                  // member variable and use it
                                  // whenever we create a linear solver
                                  // object. There is a slight
                                  // complication here: Since the
-                                 // ``vmult'' function is marked as
-                                 // ``const'' (it doesn't change the
+                                 // <code>vmult</code> function is marked as
+                                 // <code>const</code> (it doesn't change the
                                  // state of the object, after all,
                                  // and simply operates on its
                                  // arguments), it can only pass an
@@ -869,10 +869,10 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                                  // such attempt as an error, if we
                                  // didn't make use of a rarely used
                                  // feature of C++: we mark the
-                                 // variable as ``mutable''. What this
+                                 // variable as <code>mutable</code>. What this
                                  // does is to allow us to change a
                                  // member variable even from a
-                                 // ``const'' member function.
+                                 // <code>const</code> member function.
 template <class Matrix>
 class InverseMatrix : public Subscriptor
 {
@@ -922,7 +922,7 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
 }
 
 
-                                 // @sect4{The ``SchurComplement'' class template}
+                                 // @sect4{The <code>SchurComplement</code> class template}
 
                                  // The next class is the Schur
                                  // complement class. Its rationale
@@ -930,26 +930,26 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
                                  // in the introduction. The only
                                  // things we would like to note is
                                  // that the class, too, is derived
-                                 // from the ``Subscriptor'' class and
+                                 // from the <code>Subscriptor</code> class and
                                  // that as mentioned above it stores
                                  // pointers to the entire block
                                  // matrix and the inverse of the mass
                                  // matrix block using
-                                 // ``SmartPointer'' objects.
+                                 // <code>SmartPointer</code> objects.
                                  //
-                                 // The ``vmult'' function requires
+                                 // The <code>vmult</code> function requires
                                  // two temporary vectors that we do
                                  // not want to re-allocate and free
                                  // every time we call this
                                  // function. Since here, we have full
                                  // control over the use of these
                                  // vectors (unlike above, where a
-                                 // class called by the ``vmult''
+                                 // class called by the <code>vmult</code>
                                  // function required these vectors,
-                                 // not the ``vmult'' function
+                                 // not the <code>vmult</code> function
                                  // itself), we allocate them
                                  // directly, rather than going
-                                 // through the ``VectorMemory''
+                                 // through the <code>VectorMemory</code>
                                  // mechanism. However, again, these
                                  // member variables do not carry any
                                  // state between successive calls to
@@ -957,14 +957,14 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
                                  // (i.e., we never care what values
                                  // they were set to the last time a
                                  // member function was called), we
-                                 // mark these vectors as ``mutable''.
+                                 // mark these vectors as <code>mutable</code>.
                                  //
                                  // The rest of the (short)
                                  // implementation of this class is
                                  // straightforward if you know the
                                  // order of matrix-vector
                                  // multiplications performed by the
-                                 // ``vmult'' function:
+                                 // <code>vmult</code> function:
 class SchurComplement : public Subscriptor
 {
   public:
@@ -1001,20 +1001,20 @@ void SchurComplement::vmult (Vector<double>       &dst,
 }
 
 
-                                 // @sect4{The ``ApproximateSchurComplement'' class template}
+                                 // @sect4{The <code>ApproximateSchurComplement</code> class template}
 
                                  // The third component of our solver
                                  // and preconditioner system is the
                                  // class that approximates the Schur
                                  // complement so we can form a
-                                 // ``InverseMatrix@<ApproximateSchurComplement@>''
+                                 // <code>InverseMatrix@<ApproximateSchurComplement@></code>
                                  // object that approximates the
                                  // inverse of the Schur
                                  // complement. It follows the same
                                  // pattern as the Schur complement
                                  // class, with the only exception
                                  // that we do not multiply with the
-                                 // inverse mass matrix in ``vmult'',
+                                 // inverse mass matrix in <code>vmult</code>,
                                  // but rather just do a single Jacobi
                                  // step. Consequently, the class also
                                  // does not have to store a pointer
@@ -1153,7 +1153,7 @@ void MixedLaplaceProblem<dim>::solve ()
                                  //
                                  // To compute errors in the solution,
                                  // we have already introduced the
-                                 // ``VectorTools::integrate_difference''
+                                 // <code>VectorTools::integrate_difference</code>
                                  // function in step-7 and
                                  // step-11. However, there we only
                                  // dealt with scalar solutions,
@@ -1170,7 +1170,7 @@ void MixedLaplaceProblem<dim>::solve ()
                                  // have to do is to `mask' the
                                  // components that we are interested
                                  // in. This is easily done: the
-                                 // ``VectorTools::integrate_difference''
+                                 // <code>VectorTools::integrate_difference</code>
                                  // function takes as its last
                                  // argument a pointer to a weight
                                  // function (the parameter defaults
@@ -1184,19 +1184,19 @@ void MixedLaplaceProblem<dim>::solve ()
                                  // should pass a function that
                                  // represents the constant vector
                                  // with a unit value in component
-                                 // ``dim'', whereas for the velocity
+                                 // <code>dim</code>, whereas for the velocity
                                  // the constant vector should be one
-                                 // in the first ``dim'' components,
+                                 // in the first <code>dim</code> components,
                                  // and zero in the location of the
                                  // pressure.
                                  //
                                  // In deal.II, the
-                                 // ``ComponentSelectFunction'' does
+                                 // <code>ComponentSelectFunction</code> does
                                  // exactly this: it wants to know how
                                  // many vector components the
                                  // function it is to represent should
                                  // have (in our case this would be
-                                 // ``dim+1'', for the joint
+                                 // <code>dim+1</code>, for the joint
                                  // velocity-pressure space) and which
                                  // individual or range of components
                                  // should be equal to one. We
@@ -1207,7 +1207,7 @@ void MixedLaplaceProblem<dim>::solve ()
                                  // and a vector in which we will
                                  // store the cellwise errors as
                                  // computed by
-                                 // ``integrate_difference'':
+                                 // <code>integrate_difference</code>:
 template <int dim>
 void MixedLaplaceProblem<dim>::compute_errors () const
 {
@@ -1227,7 +1227,7 @@ void MixedLaplaceProblem<dim>::compute_errors () const
                                    // quadrature. This actually
                                    // presents a slight twist here: if
                                    // we naively chose an object of
-                                   // type ``QGauss@<dim@>(degree+1)''
+                                   // type <code>QGauss@<dim@>(degree+1)</code>
                                    // as one may be inclined to do
                                    // (this is what we used for
                                    // integrating the linear system),
@@ -1247,7 +1247,7 @@ void MixedLaplaceProblem<dim>::compute_errors () const
                                    // ingration. To avoid this
                                    // problem, we simply use a
                                    // trapezoidal rule and iterate it
-                                   // ``degree+2'' times in each
+                                   // <code>degree+2</code> times in each
                                    // coordinate direction (again as
                                    // explained in step-7):
   QTrapez<1>     q_trapez;
@@ -1349,7 +1349,7 @@ void MixedLaplaceProblem<dim>::run ()
 }
 
     
-                                 // @sect3{The ``main'' function}
+                                 // @sect3{The <code>main</code> function}
 
 				 // The main function we stole from
 				 // step-6 instead of step-4. It is

@@ -54,7 +54,7 @@
                                  // The first thing we have here is a helper
                                  // function that computes an even power $|v|^n$
                                  // of a vector $v$, by evaluating
-                                 // $(v\cdot v)^{n/2}. We need this in the
+                                 // $(v\cdot v)^{n/2}$. We need this in the
                                  // computations below where we do not want to
                                  // dwell on the fact that the gradient of the
                                  // solution is actually a scalar in the 1d
@@ -69,10 +69,10 @@
                                  // is obvious, note the assertion at the
                                  // beginning of the function body, which
                                  // makes sure that the exponent is indeed an
-                                 // even number (here, we use that ``n/2'' is
+                                 // even number (here, we use that <code>n/2</code> is
                                  // computed in integer arithmetic, i.e. any
                                  // remainder of the division is
-                                 // lost). ``ExcMessage'' is a pre-defined
+                                 // lost). <code>ExcMessage</code> is a pre-defined
                                  // exception class that takes a string
                                  // argument explaining what goes wrong. It is
                                  // a simpler way to declare exceptions than
@@ -82,7 +82,7 @@
                                  // exception class, we lose the ability to
                                  // attach additional information at run-time
                                  // to the exception message, such as the
-                                 // value of the variable ``n''. By following
+                                 // value of the variable <code>n</code>. By following
                                  // the way explained in above example
                                  // programs, adding this feature is simple,
                                  // though.
@@ -129,13 +129,13 @@ class InitializationValues : public Function<1>
 
 
                                  // So here comes the function that implements
-                                 // the function object. The ``base'' value is
-                                 // $x^{1/3}$, while ``random'' is a random
+                                 // the function object. The <code>base</code> value is
+                                 // $x^{1/3}$, while <code>random</code> is a random
                                  // number between -1 and 1 (note that
-                                 // ``rand()'' returns a random integer value
-                                 // between zero and ``RAND_MAX''; to convert
+                                 // <code>rand()</code> returns a random integer value
+                                 // between zero and <code>RAND_MAX</code>; to convert
                                  // it to a floating point value between 0 and
-                                 // 2, we have to divide by ``RAND_MAX'' and
+                                 // 2, we have to divide by <code>RAND_MAX</code> and
                                  // multiply by two -- note that the first
                                  // multiplication has to happen in floating
                                  // point arithmetic, so that the division is
@@ -161,7 +161,7 @@ double InitializationValues::value (const Point<1> &p,
                                  // class. As in most of the previous example
                                  // programs, the public interface of the
                                  // class consists only of a constructor and a
-                                 // ``run'' function that does the actual
+                                 // <code>run</code> function that does the actual
                                  // work. The constructor takes an additional
                                  // argument that indicates the number of the
                                  // run we are presently performing. This
@@ -174,13 +174,13 @@ double InitializationValues::value (const Point<1> &p,
                                  // the computations, doing one nonlinear
                                  // step, refineming the mesh, doing a line
                                  // search for step length computations,
-                                 // etc. The ``energy'' function computes the
+                                 // etc. The <code>energy</code> function computes the
                                  // value of the optimization functional on an
                                  // arbitrary finite element function with
-                                 // nodal values given on the ``DoFHandler''
+                                 // nodal values given on the <code>DoFHandler</code>
                                  // given as an argument. Since it does not
                                  // depend on the state of this object, we
-                                 // declare this function as ``static''.
+                                 // declare this function as <code>static</code>.
                                  //
                                  // The member variables of this class are
                                  // what we have seen before, and the
@@ -262,7 +262,7 @@ void MinimizationProblem<1>::initialize_solution ()
                                    // size to the vector, and use library
                                    // function that takes a function object,
                                    // and interpolates the given vector living
-                                   // on a ``DoFHandler'' to this function
+                                   // on a <code>DoFHandler</code> to this function
                                    // object:
   present_solution.reinit (dof_handler.n_dofs());
   VectorTools::interpolate (dof_handler,
@@ -272,7 +272,7 @@ void MinimizationProblem<1>::initialize_solution ()
                                    // Then we still have to make sure that we
                                    // get the boundary values right. This
                                    // could have been done inside the
-                                   // ``InitializationValues'' class, but it
+                                   // <code>InitializationValues</code> class, but it
                                    // is instructive to see how it can also be
                                    // done, in particular since it is so
                                    // simple in 1d. First, start out with an
@@ -305,7 +305,7 @@ void MinimizationProblem<1>::initialize_solution ()
                                    // cell to zero. Note that the zeroth
                                    // vertex is the left one, and that zero is
                                    // the only valid second argument to the
-                                   // call to ``vertex_dof_index'', since we
+                                   // call to <code>vertex_dof_index</code>, since we
                                    // have a scalar finite element; thus,
                                    // there is only a single component.
   present_solution(cell->vertex_dof_index(0,0)) = 0;
@@ -377,7 +377,7 @@ void MinimizationProblem<dim>::assemble_step ()
   matrix.reinit (sparsity_pattern);
   residual.reinit (dof_handler.n_dofs());
 
-                                   // Then we initialize a ``FEValues'' object
+                                   // Then we initialize a <code>FEValues</code> object
                                    // with a 4-point Gauss quadrature
                                    // formula. This object will be used to
                                    // compute the values and gradients of the
@@ -387,17 +387,17 @@ void MinimizationProblem<dim>::assemble_step ()
                                    // nonlinear step as outlined in the
                                    // introduction to this example program. In
                                    // order to compute values and gradients,
-                                   // we need to pass the ``update_values''
-                                   // and ``update_gradients'' flags to the
+                                   // we need to pass the <code>update_values</code>
+                                   // and <code>update_gradients</code> flags to the
                                    // constructor, and the
-                                   // ``update_JxW_values'' flag for the
+                                   // <code>update_JxW_values</code> flag for the
                                    // Jacobian times the weight at a
                                    // quadrature point. In addition, we need
                                    // to have the coordinate values of each
                                    // quadrature point in real space for the
                                    // $x-u^3$ terms; to get these from the
-                                   // ``FEValues'' object, we need to pass it
-                                   // the ``update_q_points'' flag.
+                                   // <code>FEValues</code> object, we need to pass it
+                                   // the <code>update_q_points</code> flag.
                                    //
                                    // It is a simple calculation to figure out
                                    // that for linear elements, the integrals
@@ -439,7 +439,7 @@ void MinimizationProblem<dim>::assemble_step ()
                                    // therefore need to have the values and
                                    // gradients of the previous solution at
                                    // the quadrature points. We will get them
-                                   // from the ``FEValues'' object above, and
+                                   // from the <code>FEValues</code> object above, and
                                    // will put them into the following two
                                    // variables:
   std::vector<double>         local_solution_values (n_q_points);
@@ -467,13 +467,13 @@ void MinimizationProblem<dim>::assemble_step ()
                                        // the previous solution at the
                                        // quadrature points. To get them, we
                                        // don't actually have to do much,
-                                       // except for giving the ``FEValues''
+                                       // except for giving the <code>FEValues</code>
                                        // object the global node vector from
                                        // which to compute this data, and a
                                        // reference to the objects into which
                                        // to put them. After the calls, the
-                                       // ``local_solution_values'' and
-                                       // ``local_solution_values'' variables
+                                       // <code>local_solution_values</code> and
+                                       // <code>local_solution_values</code> variables
                                        // will contain values and gradients
                                        // for each of the quadrature points on
                                        // this cell.
@@ -605,7 +605,7 @@ void MinimizationProblem<dim>::assemble_step ()
                                    // this program is ever going to be run in
                                    // higher dimensions, then we should only
                                    // evaluate for indicator zero, which is
-                                   // why we have placed the ``if'' statement
+                                   // why we have placed the <code>if</code> statement
                                    // in front of the second function call.
                                    //
                                    // Note that we need zero boundary
@@ -690,17 +690,17 @@ MinimizationProblem<dim>::line_search (const Vector<double> &update) const
   for (unsigned int step=0; step<5; ++step)
     {
                                        // At the present location, which is
-                                       // ``present_solution+alpha*update'',
+                                       // <code>present_solution+alpha*update</code>,
                                        // evaluate the energy
       tmp = present_solution;
       tmp.add (alpha, update);
       const double f_a = energy (dof_handler, tmp);
 
                                        // Then determine a finite difference
-                                       // step length ``dalpha'', and also
+                                       // step length <code>dalpha</code>, and also
                                        // evaluate the energy functional at
-                                       // positions ``alpha+dalpha'' and
-                                       // ``alpha-dalpha'' along the search
+                                       // positions <code>alpha+dalpha</code> and
+                                       // <code>alpha-dalpha</code> along the search
                                        // direction:
       const double dalpha = (alpha != 0 ? alpha/100 : 0.01);
       
@@ -847,7 +847,7 @@ MinimizationProblem<dim>::output_results () const
                                  // works in 1d. However, to make later
                                  // extension to higher space dimensions
                                  // simpler, we define a constant integer
-                                 // ``dim'' at the beginning of the function;
+                                 // <code>dim</code> at the beginning of the function;
                                  // by using this constant as template
                                  // argument in all places, we are actually
                                  // able to write most of the code as if it
@@ -886,7 +886,7 @@ void MinimizationProblem<1>::refine_grid ()
                                    // need to evaluate the gradient on the
                                    // neighbor cells. To avoid some of the
                                    // work needed to reinitialize a
-                                   // ``FEValues'' object on a cell, we define
+                                   // <code>FEValues</code> object on a cell, we define
                                    // another such object here that we will
                                    // only use for the neighbor cells. The
                                    // data we need from the side of the
@@ -908,14 +908,14 @@ void MinimizationProblem<1>::refine_grid ()
                                    // over all cells. Since we need to write
                                    // the result for each cell into
                                    // consecutive elements of a vector, we
-                                   // also keep a running index ``cell_index''
+                                   // also keep a running index <code>cell_index</code>
                                    // that we increase with each cell treated.
   DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active (),
     endc = dof_handler.end ();
   for (unsigned int cell_index = 0; cell!=endc; ++cell, ++cell_index)
     {
-                                       // After initializing the ``FEValues''
+                                       // After initializing the <code>FEValues</code>
                                        // object on each cell, use it to
                                        // evaluate solution and first and
                                        // second derivatives of it at the
@@ -962,7 +962,7 @@ void MinimizationProblem<1>::refine_grid ()
                                        // The next step is to evaluate the
                                        // jump terms. To make computations
                                        // somewhat simpler (and to free up the
-                                       // ``local_*'' variables for use on
+                                       // <code>local_*</code> variables for use on
                                        // neighboring elements), we define
                                        // some convenience variables for the
                                        // positions of the left and right cell
@@ -981,7 +981,7 @@ void MinimizationProblem<1>::refine_grid ()
                                        // actually check for this. If this
                                        // would not be the case, an exception
                                        // of the (predefined) class
-                                       // ``ExcInternalError'' would be
+                                       // <code>ExcInternalError</code> would be
                                        // thrown. Of course, this does not
                                        // happen in this program, but it shows
                                        // a way of defensive coding: if you
@@ -991,7 +991,7 @@ void MinimizationProblem<1>::refine_grid ()
                                        // the library: the quadrature classes
                                        // do not promise any particular order
                                        // of their quadrature points, so the
-                                       // ``QTrapez'' class could in principle
+                                       // <code>QTrapez</code> class could in principle
                                        // change the order of its two
                                        // evaluation points. In that case,
                                        // your code would tell you that
@@ -1007,12 +1007,12 @@ void MinimizationProblem<1>::refine_grid ()
                                        // really does what it is hoped to do.)
                                        //
                                        // Given that we are now sure that
-                                       // ``x_left'' and ``x_right'',
+                                       // <code>x_left</code> and <code>x_right</code>,
                                        // extracted from the zeroth and first
                                        // quadrature point, are indeed the
                                        // left and right vertex of the cell,
                                        // we can also be sure that the values
-                                       // we extract for ``u_left'' et al. are
+                                       // we extract for <code>u_left</code> et al. are
                                        // the ones we expect them to be, since
                                        // the order of these values must of
                                        // course match the order of the
@@ -1064,25 +1064,25 @@ void MinimizationProblem<1>::refine_grid ()
                                            // cells may have totally
                                            // independent refinement
                                            // levels. Thus, we really need the
-                                           // ``while'' loop, not only an
-                                           // ``if'' clause.
+                                           // <code>while</code> loop, not only an
+                                           // <code>if</code> clause.
           DoFHandler<dim>::cell_iterator left_neighbor = cell->neighbor(0);
           while (left_neighbor->has_children())
             left_neighbor = left_neighbor->child(1);
 
                                            // With the so-found neighbor,
                                            // initialize the second
-                                           // ``FEValues'' object to it,
+                                           // <code>FEValues</code> object to it,
                                            // extract the gradients of the
                                            // solution there, and from this
                                            // get the gradient at the
                                            // interface (this is the first
-                                           // element of ``local_gradients'',
+                                           // element of <code>local_gradients</code>,
                                            // since the right end point of the
                                            // neighbor cell has index 1) as a
                                            // scalar value (this is the zeroth
                                            // component of
-                                           // ``local_gradients[1]''.
+                                           // <code>local_gradients[1]</code>.
           neighbor_fe_values.reinit (left_neighbor);
           neighbor_fe_values.get_function_grads (present_solution, local_gradients);
 
@@ -1126,7 +1126,7 @@ void MinimizationProblem<1>::refine_grid ()
                                    // examples, however, we would like to
                                    // transfer the solution vector from the
                                    // old to the new grid. This is what the
-                                   // ``SolutionTransfer'' class is good for,
+                                   // <code>SolutionTransfer</code> class is good for,
                                    // but it requires some preliminary
                                    // work. First, we need to tag the cells
                                    // that we want to refine or coarsen, as
@@ -1148,7 +1148,7 @@ void MinimizationProblem<1>::refine_grid ()
                                    // situations, the library will silently
                                    // also have to refine the neighbor cell
                                    // once. It does so by calling the
-                                   // ``Triangulation@<dim@>::prepare_coarsening_and_refinement''
+                                   // <code>Triangulation@<dim@>::prepare_coarsening_and_refinement</code>
                                    // function before actually doing the
                                    // refinement and coarsening. This function
                                    // flags a set of additional cells for
@@ -1159,15 +1159,15 @@ void MinimizationProblem<1>::refine_grid ()
                                    // this function are exactly the ones that
                                    // will actually be refined or
                                    // coarsened. Since the
-                                   // ``SolutionTransfer'' class needs this
+                                   // <code>SolutionTransfer</code> class needs this
                                    // information in order to store the data
                                    // from the old mesh and transfer to the
                                    // new one.
   triangulation.prepare_coarsening_and_refinement();
 
                                    // With this out of the way, we initialize
-                                   // a ``SolutionTransfer'' object with the
-                                   // present ``DoFHandler'' and attach the
+                                   // a <code>SolutionTransfer</code> object with the
+                                   // present <code>DoFHandler</code> and attach the
                                    // solution vector to it:
   SolutionTransfer<dim,double> solution_transfer(dof_handler);
   solution_transfer.prepare_for_coarsening_and_refinement (present_solution);
@@ -1180,7 +1180,7 @@ void MinimizationProblem<1>::refine_grid ()
 
                                    // Finally, we retrieve the old solution
                                    // interpolated to the new mesh. Since the
-                                   // ``SolutionTransfer'' function does not
+                                   // <code>SolutionTransfer</code> function does not
                                    // actually store the values of the old
                                    // solution, but rather indices, we need to
                                    // preserve the old solution vector until
@@ -1197,7 +1197,7 @@ void MinimizationProblem<1>::refine_grid ()
                                    // actually unnecessary in 1d, but
                                    // necessary for higher space dimensions,
                                    // so we show it anyway: the result of what
-                                   // the ``SolutionTransfer'' class provides
+                                   // the <code>SolutionTransfer</code> class provides
                                    // is a vector that is interpolated from
                                    // the old to the new mesh. Unfortunately,
                                    // it does not necessarily have the right
@@ -1211,9 +1211,9 @@ void MinimizationProblem<1>::refine_grid ()
   hanging_node_constraints.close ();  
   hanging_node_constraints.distribute (present_solution);
                                    // This is wasteful, since we create a
-                                   // ``ConstraintMatrix'' object that will be
+                                   // <code>ConstraintMatrix</code> object that will be
                                    // recreated again in the next call to
-                                   // ``setup_system_on_mesh'' immediately
+                                   // <code>setup_system_on_mesh</code> immediately
                                    // afterwards. A more efficient
                                    // implementation would make sure that it
                                    // is created only once. We don't care so
@@ -1232,7 +1232,7 @@ void MinimizationProblem<1>::refine_grid ()
                                  // computes the energy of a nodal vector in
                                  // the functional considered in this example
                                  // program. Its idea is simple: take a nodal
-                                 // vector and the ``DoFHandler'' object it is
+                                 // vector and the <code>DoFHandler</code> object it is
                                  // living on, then loop over all cells and
                                  // add up the local contributions to the
                                  // energy:
@@ -1242,7 +1242,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
                                   const Vector<double>  &function)
 {
                                    // First define the quadrature formula and
-                                   // a ``FEValues'' object with which to
+                                   // a <code>FEValues</code> object with which to
                                    // compute the values of the input function
                                    // at the quadrature points. Note again
                                    // that the integrand is a polynomial of
@@ -1273,7 +1273,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
   for (; cell!=endc; ++cell)
     {
                                        // On each cell, initialize the
-                                       // ``FEValues'' object, and extract
+                                       // <code>FEValues</code> object, and extract
                                        // values and gradients of the given
                                        // function:
       fe_values.reinit (cell);
@@ -1302,7 +1302,7 @@ MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
 
 
                                  // So here is the driver function,
-                                 // ``run()''. It generate a coarse mesh,
+                                 // <code>run()</code>. It generate a coarse mesh,
                                  // refines it a couple of times, and
                                  // initializes the starting values. It then
                                  // goes into a loop in which we first set up
@@ -1350,7 +1350,7 @@ void MinimizationProblem<dim>::run ()
 }
 
 
-                                 // Finally: ``main()''. This function does
+                                 // Finally: <code>main()</code>. This function does
                                  // what all its counterparts in previous
                                  // examples already did, i.e. create an
                                  // object of the main class, and hand off

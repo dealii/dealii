@@ -141,7 +141,7 @@ void make_grid (Triangulation<2> &triangulation)
 				 // field on the triangulation.
                                  //
                                  // This function shows how to do this. The
-                                 // object to consider is the ``DoFHandler''
+                                 // object to consider is the <code>DoFHandler</code>
                                  // class template.  Before we do so, however,
                                  // we first need something that describes how
                                  // many degrees of freedom are to be
@@ -150,7 +150,7 @@ void make_grid (Triangulation<2> &triangulation)
                                  // finite element space, the finite element
                                  // base class stores this information. In the
                                  // present context, we therefore create an
-                                 // object of the derived class ``FE_Q'' that
+                                 // object of the derived class <code>FE_Q</code> that
                                  // describes Lagrange elements. Its
                                  // constructor takes one argument that states
                                  // the polynomial degree of the element,
@@ -162,7 +162,7 @@ void make_grid (Triangulation<2> &triangulation)
                                  // given to the constructor would instead
                                  // give us a bi-cubic element with one degree
                                  // of freedom per vertex, two per line, and
-                                 // four inside the cell. In general, ``FE_Q''
+                                 // four inside the cell. In general, <code>FE_Q</code>
                                  // denotes the family of continuous elements
                                  // with complete polynomials
                                  // (i.e. tensor-product polynomials) up to
@@ -170,14 +170,14 @@ void make_grid (Triangulation<2> &triangulation)
                                  //
                                  // We first need to create an object of this
                                  // class and then pass it on to the
-                                 // ``DoFHandler'' object to allocate storage
+                                 // <code>DoFHandler</code> object to allocate storage
                                  // for the degrees of freedom (in deal.II
-                                 // lingo: we ``distribute degrees of
-                                 // freedom''). Note that the DoFHandler
+                                 // lingo: we <code>distribute degrees of
+                                 // freedom</code>). Note that the DoFHandler
                                  // object will store a reference to this
                                  // finite element object, so we need have to
                                  // make sure its lifetime is at least as long
-                                 // as that of the ``DoFHandler''; one way to
+                                 // as that of the <code>DoFHandler</code>; one way to
                                  // make sure this is so is to make it static
                                  // as well, in order to prevent its
                                  // preemptive destruction. (However, the
@@ -273,18 +273,18 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
   sparsity_pattern.compress ();
                                    // What actually happens in this call is
                                    // the following: upon creation of a
-                                   // ``SparsityPattern'' object, memory is
+                                   // <code>SparsityPattern</code> object, memory is
                                    // allocated for a maximum number of
                                    // entries per row (20 in our case). The
                                    // call to
-                                   // ``DoFTools::make_sparsity_pattern'' then
+                                   // <code>DoFTools::make_sparsity_pattern</code> then
                                    // actually allocates entries as necessary,
                                    // but the number of nonzero entries in any
                                    // given row may be less than the 20 we
                                    // have allocated memory for. To save
                                    // memory and to simplify some other
                                    // operations, one then needs to
-                                   // ``compress'' the sparsity pattern before
+                                   // <code>compress</code> the sparsity pattern before
                                    // anything else.
 
 				   // With this, we can now write the results
@@ -301,7 +301,7 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // the sparsity pattern is symmetric. This
 				   // should not come as a surprise, since we
 				   // have not given the
-				   // ``DoFTools::make_sparsity_pattern'' any
+				   // <code>DoFTools::make_sparsity_pattern</code> any
 				   // information that would indicate that our
 				   // bilinear form may couple shape functions
 				   // in a non-symmetric way. You will also
@@ -363,7 +363,7 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				 // sparsity pattern is more localized around
 				 // the diagonal. The only interesting part of
 				 // the function is the first call to
-				 // ``DoFRenumbering::Cuthill_McKee'', the
+				 // <code>DoFRenumbering::Cuthill_McKee</code>, the
 				 // rest is essentially as before:
 void renumber_dofs (DoFHandler<2> &dof_handler) 
 {
@@ -390,7 +390,7 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
                                  // 100,000s).
 
                                  // It is worth noting that the
-                                 // ``DoFRenumbering'' class offers a number
+                                 // <code>DoFRenumbering</code> class offers a number
                                  // of other algorithms as well to renumber
                                  // degrees of freedom. For example, it would
                                  // of course be ideal if all couplings were
@@ -404,7 +404,7 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
                                  // possible by enumerating degrees of freedom
                                  // from the inflow boundary along streamlines
                                  // to the outflow boundary. Not surprisingly,
-                                 // ``DoFRenumbering'' also has algorithms for
+                                 // <code>DoFRenumbering</code> also has algorithms for
                                  // this.
 
 
@@ -413,7 +413,7 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 				 // Finally, this is the main program. The
 				 // only thing it does is to allocate and
 				 // create the triangulation, then create a
-				 // ``DoFHandler'' object and associate it to
+				 // <code>DoFHandler</code> object and associate it to
 				 // the triangulation, and finally call above
 				 // two functions on it:
 int main () 

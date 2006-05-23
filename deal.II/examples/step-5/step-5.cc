@@ -52,21 +52,21 @@
 				 // ... and this is too: We will
 				 // convert integers to strings using
 				 // the C++ stringstream class
-				 // ``ostringstream'':
+				 // <code>ostringstream</code>:
 #include <sstream>
 
 
-                                 // @sect3{The ``LaplaceProblem'' class template}
+                                 // @sect3{The <code>LaplaceProblem</code> class template}
 
 				 // The main class is mostly as in the
 				 // previous example. The most visible
 				 // change is that the function
-				 // ``make_grid_and_dofs'' has been
+				 // <code>make_grid_and_dofs</code> has been
 				 // removed, since creating the grid
-				 // is now done in the ``run''
+				 // is now done in the <code>run</code>
 				 // function and the rest of its
 				 // functionality is now in
-				 // ``setup_system''. Apart from this,
+				 // <code>setup_system</code>. Apart from this,
 				 // everything is as before.
 template <int dim>
 class LaplaceProblem 
@@ -93,7 +93,7 @@ class LaplaceProblem
 };
 
 
-                                 // @sect3{Nonconstant coefficients, using ``Assert''}
+                                 // @sect3{Nonconstant coefficients, using <code>Assert</code>}
 
 				 // In step-4, we showed how to use
 				 // non-constant boundary values and
@@ -101,18 +101,18 @@ class LaplaceProblem
 				 // we want to use a variable
 				 // coefficient in the elliptic
 				 // operator instead. Of course, the
-				 // suitable object is a ``Function'',
+				 // suitable object is a <code>Function</code>,
 				 // as we have used for the right hand
 				 // side and boundary values in the
 				 // last example. We will use it
 				 // again, but we implement another
-				 // function ``value_list'' which
+				 // function <code>value_list</code> which
 				 // takes a list of points and returns
 				 // the values of the function at
 				 // these points as a list. The reason
 				 // why such a function is reasonable
 				 // although we can get all the
-				 // information from the ``value''
+				 // information from the <code>value</code>
 				 // function as well will be explained
 				 // below when assembling the matrix.
 				 //
@@ -166,7 +166,7 @@ double Coefficient<dim>::value (const Point<dim> &p,
 				 // points at once. Of course, we need
 				 // to make sure that the values are
 				 // the same as if we would ask the
-				 // ``value'' function for each point
+				 // <code>value</code> function for each point
 				 // individually.
 				 //
 				 // This method takes three
@@ -177,9 +177,9 @@ double Coefficient<dim>::value (const Point<dim> &p,
 				 // component that should be zero here
 				 // since we only have a single scalar
 				 // function.  Now, of course the size
-				 // of the output array (``values'')
+				 // of the output array (<code>values</code>)
 				 // must be the same as that of the
-				 // input array (``points''), and we
+				 // input array (<code>points</code>), and we
 				 // could simply assume that. However,
 				 // in practice, it turns out that
 				 // more than 90 per cent of
@@ -188,7 +188,7 @@ double Coefficient<dim>::value (const Point<dim> &p,
 				 // invalid array sizes, etc, so we
 				 // should try to make sure that the
 				 // parameters are valid. For this,
-				 // the ``Assert'' macro is a good means,
+				 // the <code>Assert</code> macro is a good means,
 				 // since it makes sure that the
 				 // condition which is given as first
 				 // argument is valid, and if not
@@ -209,7 +209,7 @@ double Coefficient<dim>::value (const Point<dim> &p,
 				 // should not slow down the program
 				 // too much if you want to do large
 				 // computations. To this end, the
-				 // ``Assert'' macro is only used in
+				 // <code>Assert</code> macro is only used in
 				 // debug mode and expands to nothing
 				 // if in optimized mode. Therefore,
 				 // while you test your program on
@@ -240,10 +240,10 @@ double Coefficient<dim>::value (const Point<dim> &p,
 				 // mode to optimized mode is to go
 				 // edit the Makefile in this
 				 // directory. It should have a line
-				 // ``debug-mode = on''; simply
-				 // replace it by ``debug-mode = off''
+				 // <code>debug-mode = on</code>; simply
+				 // replace it by <code>debug-mode = off</code>
 				 // and recompile your program. The
-				 // output of the ``make'' program
+				 // output of the <code>make</code> program
 				 // should already indicate to you
 				 // that the program is now compiled
 				 // in optimized mode, and it will
@@ -259,7 +259,7 @@ double Coefficient<dim>::value (const Point<dim> &p,
 				 // two arrays is one of the most
 				 // frequent checks, which is why
 				 // there is already an exception
-				 // class ``ExcDimensionMismatch''
+				 // class <code>ExcDimensionMismatch</code>
 				 // that takes the sizes of two
 				 // vectors and prints some output in
 				 // case the condition is violated:
@@ -277,7 +277,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   // trigger this exception at the
 				   // end of the main program, and
 				   // what output results from this
-				   // (see the ``Results'' section of
+				   // (see the <code>Results</code> section of
 				   // this example program). You will
 				   // certainly notice that the output
 				   // is quite well suited to quickly
@@ -295,7 +295,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   // While we're at it, we can do
 				   // another check: the coefficient
 				   // is a scalar, but the
-				   // ``Function'' class also
+				   // <code>Function</code> class also
 				   // represents vector-valued
 				   // function. A scalar function must
 				   // therefore be considered as a
@@ -305,9 +305,9 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   // ask is zero (we always count
 				   // from zero). The following
 				   // assertion checks this. If the
-				   // condition in the ``Assert'' call
+				   // condition in the <code>Assert</code> call
 				   // is violated, an exception of
-				   // type ``ExcRange'' will be
+				   // type <code>ExcRange</code> will be
 				   // triggered; that class takes the
 				   // violating index as first
 				   // argument, and the second and
@@ -320,11 +320,11 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				   // zero, of course. (The interval
 				   // is half open since we also want
 				   // to write exceptions like
-				   // ``ExcRange(i,0,v.size())'',
+				   // <code>ExcRange(i,0,v.size())</code>,
 				   // where an index must be between
 				   // zero but less than the size of
 				   // an array. To save us the effort
-				   // of writing ``v.size()-1'' in
+				   // of writing <code>v.size()-1</code> in
 				   // many places, the range is
 				   // defined as half-open.)
   Assert (component == 0, 
@@ -332,7 +332,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 
 				   // The rest of the function is
 				   // uneventful: we define
-				   // ``n_q_points'' as an
+				   // <code>n_q_points</code> as an
 				   // abbreviation for the number of
 				   // points for which function values
 				   // are requested, and then simply
@@ -349,7 +349,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 }
 
 
-                                 // @sect3{The ``LaplaceProblem'' class implementation}
+                                 // @sect3{The <code>LaplaceProblem</code> class implementation}
 
                                  // @sect4{LaplaceProblem::LaplaceProblem}
 
@@ -365,7 +365,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
                                  // @sect4{LaplaceProblem::setup_system}
 
 				 // This is the function
-				 // ``make_grid_and_dofs'' from the
+				 // <code>make_grid_and_dofs</code> from the
 				 // previous example, minus the
 				 // generation of the grid. Everything
 				 // else is unchanged:
@@ -455,7 +455,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // here.
 				   //
 				   // Then, below, we will ask the
-				   // ``coefficient'' function object
+				   // <code>coefficient</code> function object
 				   // to compute the values of the
 				   // coefficient at all quadrature
 				   // points on one cell at once. The
@@ -513,7 +513,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // use it in the computation of the
 				   // local contributions. This is
 				   // what we do in the call to
-				   // ``coefficient.value_list'' in
+				   // <code>coefficient.value_list</code> in
 				   // the fourth line of the loop.
 				   //
 				   // The second change is how we make
@@ -593,7 +593,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // (symmetric successive
 				 // overrelaxation), with a relaxation
 				 // factor of 1.2. For this purpose,
-				 // the ``SparseMatrix'' class has a
+				 // the <code>SparseMatrix</code> class has a
 				 // function which does one SSOR step,
 				 // and we need to package the address
 				 // of this function together with the
@@ -601,12 +601,12 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // (which is the matrix to be
 				 // inverted) and the relaxation
 				 // factor into one object. The
-				 // ``PreconditionSSOR'' class does
-				 // this for us. (``PreconditionSSOR''
+				 // <code>PreconditionSSOR</code> class does
+				 // this for us. (<code>PreconditionSSOR</code>
 				 // class takes a template argument
 				 // denoting the matrix type it is
 				 // supposed to work on. The default
-				 // value is ``SparseMatrix@<double@>'',
+				 // value is <code>SparseMatrix@<double@></code>,
 				 // which is exactly what we need
 				 // here, so we simply stick with the
 				 // default and do not specify
@@ -614,7 +614,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 //
 				 // With this, the rest of the
 				 // function is trivial: instead of
-				 // the ``PreconditionIdentity''
+				 // the <code>PreconditionIdentity</code>
 				 // object we have created before, we
 				 // now use the preconditioner we have
 				 // declared, and the CG solver will
@@ -738,12 +738,12 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // which the results are to be
 				   // written. We would like to have
 				   // it of the form
-				   // ``solution-N.eps'', where N is
+				   // <code>solution-N.eps</code>, where N is
 				   // the number of the refinement
 				   // cycle. Thus, we have to convert
 				   // an integer to a part of a
 				   // string; this can be done using
-				   // the ``sprintf'' function, but in
+				   // the <code>sprintf</code> function, but in
 				   // C++ there is a more elegant way:
 				   // write everything into a special
 				   // stream (just like writing into a
@@ -753,7 +753,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				   // conversions from integer to
 				   // strings, and one could as well
 				   // use stream modifiers such as
-				   // ``setw'', ``setprecision'', and
+				   // <code>setw</code>, <code>setprecision</code>, and
 				   // so on. In C++, you can do this
 				   // by using the so-called stringstream
 				   // classes:
@@ -770,9 +770,9 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 	   << ".eps";
 
                                    // We can get whatever we wrote to the
-				   // stream using the ``str()'' function. The
+				   // stream using the <code>str()</code> function. The
 				   // result is a string which we have to
-				   // convert to a char* using the ``c_str()''
+				   // convert to a char* using the <code>c_str()</code>
 				   // function. Use that as filename for the
 				   // output stream and then write the data to
 				   // the file:
@@ -787,7 +787,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
 				 // The second to last thing in this
 				 // program is the definition of the
-				 // ``run()'' function. In contrast to
+				 // <code>run()</code> function. In contrast to
 				 // the previous programs, we will
 				 // compute on a sequence of meshes
 				 // that after each iteration is
@@ -819,7 +819,7 @@ void LaplaceProblem<dim>::run ()
 					   // previous examples, we
 					   // have already used some
 					   // of the functions from
-					   // the ``GridGenerator''
+					   // the <code>GridGenerator</code>
 					   // class. Here we would
 					   // like to read a grid from
 					   // a file where the cells
@@ -872,7 +872,7 @@ void LaplaceProblem<dim>::run ()
 					   // particular in this case
 					   // one would of course try
 					   // to do something else if
-					   // ``dim'' is not equal to
+					   // <code>dim</code> is not equal to
 					   // two, e.g. create a grid
 					   // using library
 					   // functions. Aborting a
@@ -900,8 +900,8 @@ void LaplaceProblem<dim>::run ()
 					   // grid. It is in UCD
 					   // (unstructured cell data)
 					   // format (but the ending
-					   // of the ``UCD''-file is
-					   // ``inp''), as supported
+					   // of the <code>UCD</code>-file is
+					   // <code>inp</code>), as supported
 					   // as input format by the
 					   // AVS Explorer (a
 					   // visualization program),
@@ -910,10 +910,10 @@ void LaplaceProblem<dim>::run ()
                                            // If you like to use
                                            // another input format,
                                            // you have to use an other
-                                           // ``grid_in.read_xxx''
+                                           // <code>grid_in.read_xxx</code>
                                            // function. (See the
                                            // documentation of the
-                                           // ``GridIn'' class to find
+                                           // <code>GridIn</code> class to find
                                            // out what input formats
                                            // are presently
                                            // supported.)
@@ -963,7 +963,7 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-                                 // @sect3{The ``main'' function}
+                                 // @sect3{The <code>main</code> function}
 
 				 // The main function looks mostly
 				 // like the one in the previous
@@ -978,10 +978,10 @@ int main ()
 
 				   // Finally, we have promised to
 				   // trigger an exception in the
-				   // ``Coefficient'' class through
-				   // the ``Assert'' macro we have
+				   // <code>Coefficient</code> class through
+				   // the <code>Assert</code> macro we have
 				   // introduced there. For this, we
-				   // have to call its ``value_list''
+				   // have to call its <code>value_list</code>
 				   // function with two arrays of
 				   // different size (the number in
 				   // parentheses behind the

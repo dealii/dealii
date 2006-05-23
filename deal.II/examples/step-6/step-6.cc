@@ -45,7 +45,7 @@
 				 // will import the declaration of
 				 // H1-conforming finite element shape
 				 // functions. This family of finite
-				 // elements is called ``FE_Q'', and
+				 // elements is called <code>FE_Q</code>, and
 				 // was used in all examples before
 				 // already to define the usual bi- or
 				 // tri-linear elements, but we will
@@ -60,13 +60,13 @@
 				 // refined grids (just the grid, not
 				 // the solution) in each step, so we
 				 // need the following include file
-				 // instead of ``grid_in.h'':
+				 // instead of <code>grid_in.h</code>:
 #include <grid/grid_out.h>
 
 
 				 // When using locally refined grids,
-				 // we will get so-called ``hanging
-				 // nodes''. However, the standard
+				 // we will get so-called <code>hanging
+				 // nodes</code>. However, the standard
 				 // finite element methods assumes
 				 // that the discrete solution spaces
 				 // be continuous, so we need to make
@@ -102,12 +102,12 @@
 
 
 
-                                 // @sect3{The ``LaplaceProblem'' class template}
+                                 // @sect3{The <code>LaplaceProblem</code> class template}
 
 				 // The main class is again almost
 				 // unchanged. Two additions, however,
 				 // are made: we have added the
-				 // ``refine_grid'' function, which is
+				 // <code>refine_grid</code> function, which is
 				 // used to adaptively refine the grid
 				 // (instead of the global refinement
 				 // in the previous examples), and a
@@ -211,7 +211,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 }
 
 
-                                 // @sect3{The ``LaplaceProblem'' class implementation}
+                                 // @sect3{The <code>LaplaceProblem</code> class implementation}
 
                                  // @sect4{LaplaceProblem::LaplaceProblem}
 
@@ -221,9 +221,9 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				 // quadratic element. To do so, we
 				 // only have to replace the
 				 // constructor argument (which was
-				 // ``1'' in all previous examples) by
+				 // <code>1</code> in all previous examples) by
 				 // the desired polynomial degree
-				 // (here ``2''):
+				 // (here <code>2</code>):
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
 		dof_handler (triangulation),
@@ -238,9 +238,9 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // to add it is a subtle change in
 				 // the order of data elements in the
 				 // class as compared to all previous
-				 // examples: the ``dof_handler''
+				 // examples: the <code>dof_handler</code>
 				 // object was defined before and not
-				 // after the ``fe'' object. Of course
+				 // after the <code>fe</code> object. Of course
 				 // we could have left this order
 				 // unchanged, but we would like to
 				 // show what happens if the order is
@@ -254,25 +254,25 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // following: when we distribute the
 				 // degrees of freedom using the
 				 // function call
-				 // ``dof_handler.distribute_dofs()'',
-				 // the ``dof_handler'' also stores a
+				 // <code>dof_handler.distribute_dofs()</code>,
+				 // the <code>dof_handler</code> also stores a
 				 // pointer to the finite element in
 				 // use. Since this pointer is used
 				 // every now and then until either
 				 // the degrees of freedom are
 				 // re-distributed using another
 				 // finite element object or until the
-				 // ``dof_handler'' object is
+				 // <code>dof_handler</code> object is
 				 // destroyed, it would be unwise if
 				 // we would allow the finite element
 				 // object to be deleted before the
-				 // ``dof_handler'' object. To
+				 // <code>dof_handler</code> object. To
 				 // disallow this, the DoF handler
 				 // increases a counter inside the
 				 // finite element object which counts
 				 // how many objects use that finite
 				 // element (this is what the
-				 // ``Subscriptor''/``SmartPointer''
+				 // <code>Subscriptor</code>/<code>SmartPointer</code>
 				 // class pair is used for, in case
 				 // you want something like this for
 				 // your own programs; see step-7 for
@@ -321,7 +321,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // exactly the behavior sketched
 				 // above. The reason is that member
 				 // variables of the
-				 // ``LaplaceProblem'' class are
+				 // <code>LaplaceProblem</code> class are
 				 // destructed bottom-up (i.e. in
 				 // reverse order of their declaration
 				 // in the class), as always in
@@ -331,19 +331,19 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // declaration is below the one of
 				 // the DoF handler. This triggers the
 				 // situation above, and an exception
-				 // will be raised when the ``fe''
+				 // will be raised when the <code>fe</code>
 				 // object is destructed. What needs
 				 // to be done is to tell the
-				 // ``dof_handler'' object to release
+				 // <code>dof_handler</code> object to release
 				 // its lock to the finite element. Of
-				 // course, the ``dof_handler'' will
+				 // course, the <code>dof_handler</code> will
 				 // only release its lock if it really
 				 // does not need the finite element
 				 // any more, i.e. when all finite
 				 // element related data is deleted
 				 // from it. For this purpose, the
-				 // ``DoFHandler'' class has a
-				 // function ``clear'' which deletes
+				 // <code>DoFHandler</code> class has a
+				 // function <code>clear</code> which deletes
 				 // all degrees of freedom, and
 				 // releases its lock to the finite
 				 // element. After this, you can
@@ -398,7 +398,7 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 				 // there are now 9 degrees of freedom
 				 // per cell, not only four, that can
 				 // couple with each other. The
-				 // ``dof_Handler.max_couplings_between_dofs()''
+				 // <code>dof_Handler.max_couplings_between_dofs()</code>
 				 // call will take care of this,
 				 // however:
 template <int dim>
@@ -423,7 +423,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // hanging nodes. In the class
 				   // desclaration, we have already
 				   // allocated space for an object
-				   // ``hanging_node_constraints''
+				   // <code>hanging_node_constraints</code>
 				   // that will hold a list of these
 				   // constraints (they form a matrix,
 				   // which is reflected in the name
@@ -441,17 +441,17 @@ void LaplaceProblem<dim>::setup_system ()
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
 
-				   // The next step is ``closing''
+				   // The next step is <code>closing</code>
 				   // this object. For this note that,
 				   // in principle, the
-				   // ``ConstraintMatrix'' class can
+				   // <code>ConstraintMatrix</code> class can
 				   // hold other constraints as well,
 				   // i.e. constraints that do not
 				   // stem from hanging
 				   // nodes. Sometimes, it is useful
 				   // to use such constraints, in
 				   // which case they may be added to
-				   // the ``ConstraintMatrix'' object
+				   // the <code>ConstraintMatrix</code> object
 				   // after the hanging node
 				   // constraints were computed. After
 				   // all constraints have been added,
@@ -459,7 +459,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // rearranged to perform some
 				   // actions more efficiently. This
 				   // postprocessing is done using the
-				   // ``close()'' function, after which
+				   // <code>close()</code> function, after which
 				   // no further constraints may be
 				   // added any more:
   hanging_node_constraints.close ();
@@ -474,9 +474,9 @@ void LaplaceProblem<dim>::setup_system ()
 				   // some space for them here. Since
 				   // the process of elimination of
 				   // these constrained nodes is
-				   // called ``condensation'', the
+				   // called <code>condensation</code>, the
 				   // functions that eliminate them
-				   // are called ``condense'' for both
+				   // are called <code>condense</code> for both
 				   // the system matrix and right hand
 				   // side, as well as for the
 				   // sparsity pattern.
@@ -510,7 +510,7 @@ void LaplaceProblem<dim>::setup_system ()
 				 // polynomial degree in the finite
 				 // element shape functions. This is
 				 // easy to change: the constructor of
-				 // the ``QGauss'' class takes the
+				 // the <code>QGauss</code> class takes the
 				 // number of quadrature points in
 				 // each space direction. Previously,
 				 // we had two points for bilinear
@@ -524,15 +524,15 @@ void LaplaceProblem<dim>::setup_system ()
 				 // worth noting, however, that under
 				 // the hood several things are
 				 // different than before. First, the
-				 // variables ``dofs_per_cell'' and
-				 // ``n_q_points'' now are 9 each,
+				 // variables <code>dofs_per_cell</code> and
+				 // <code>n_q_points</code> now are 9 each,
 				 // where they were 4
 				 // before. Introducing such variables
 				 // as abbreviations is a good
 				 // strategy to make code work with
 				 // different elements without having
 				 // to change too much code. Secondly,
-				 // the ``fe_values'' object of course
+				 // the <code>fe_values</code> object of course
 				 // needs to do other things as well,
 				 // since the shape functions are now
 				 // quadratic, rather than linear, in
@@ -620,7 +620,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // of the matrix and all other
 				   // entries for this line are set to
 				   // zero) but the computed values
-				   // are invalid (the ``condense''
+				   // are invalid (the <code>condense</code>
 				   // function modifies the system so
 				   // that the values in the solution
 				   // corresponding to constrained
@@ -628,7 +628,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // system still has a well-defined
 				   // solution; we compute the correct
 				   // values for these nodes at the
-				   // end of the ``solve'' function).
+				   // end of the <code>solve</code> function).
 
 				   // As almost all the stuff before,
 				   // the interpolation of boundary
@@ -676,7 +676,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // have to do is to use the
 				 // constraints to assign to them the
 				 // values that they should have. This
-				 // process, called ``distributing''
+				 // process, called <code>distributing</code>
 				 // hanging nodes, computes the values
 				 // of constrained nodes from the
 				 // values of the unconstrained ones,
@@ -705,7 +705,7 @@ void LaplaceProblem<dim>::solve ()
 				 // Instead of global refinement, we
 				 // now use a slightly more elaborate
 				 // scheme. We will use the
-				 // ``KellyErrorEstimator'' class
+				 // <code>KellyErrorEstimator</code> class
 				 // which implements an error
 				 // estimator for the Laplace
 				 // equation; it can in principle
@@ -745,7 +745,7 @@ void LaplaceProblem<dim>::solve ()
 				 // way to test an adaptive program.
 				 //
 				 // The way the estimator works is to
-				 // take a ``DoFHandler'' object
+				 // take a <code>DoFHandler</code> object
 				 // describing the degrees of freedom
 				 // and a vector of values for each
 				 // degree of freedom as input and
@@ -753,12 +753,12 @@ void LaplaceProblem<dim>::solve ()
 				 // for each active cell of the
 				 // triangulation (i.e. one value for
 				 // each of the
-				 // ``triangulation.n_active_cells()''
+				 // <code>triangulation.n_active_cells()</code>
 				 // cells). To do so, it needs two
 				 // additional pieces of information:
 				 // a quadrature formula on the faces
 				 // (i.e. quadrature formula on
-				 // ``dim-1'' dimensional objects. We
+				 // <code>dim-1</code> dimensional objects. We
 				 // use a 3-point Gauss rule again, a
 				 // pick that is consistent and
 				 // appropriate with the choice
@@ -790,7 +790,7 @@ void LaplaceProblem<dim>::solve ()
 				 // corresponding Neumann values. This
 				 // information is represented by an
 				 // object of type
-				 // ``FunctionMap@<dim@>::type'' that is
+				 // <code>FunctionMap@<dim@>::type</code> that is
 				 // essentially a map from boundary
 				 // indicators to function objects
 				 // describing Neumann boundary values
@@ -829,7 +829,7 @@ void LaplaceProblem<dim>::refine_grid ()
 				   // The above function returned one
 				   // error indicator value for each
 				   // cell in the
-				   // ``estimated_error_per_cell''
+				   // <code>estimated_error_per_cell</code>
 				   // array. Refinement is now done as
 				   // follows: refine those 30 per
 				   // cent of the cells with the
@@ -948,9 +948,9 @@ void LaplaceProblem<dim>::refine_grid ()
 				 // hack with an explicit assertion at
 				 // the beginning of the function. If
 				 // this assertion is triggered,
-				 // i.e. when ``cycle'' is larger than
+				 // i.e. when <code>cycle</code> is larger than
 				 // or equal to 10, an exception of
-				 // type ``ExcNotImplemented'' is
+				 // type <code>ExcNotImplemented</code> is
 				 // raised, indicating that some
 				 // functionality is not implemented
 				 // for this case (the functionality
@@ -977,8 +977,8 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
                                  // @sect4{LaplaceProblem::run}
 
 				 // The final function before
-				 // ``main()'' is again the main
-				 // driver of the class, ``run()''. It
+				 // <code>main()</code> is again the main
+				 // driver of the class, <code>run()</code>. It
 				 // is similar to the one of step-5,
 				 // except that we generate a file in
 				 // the program again instead of
@@ -1087,7 +1087,7 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-                                 // @sect3{The ``main'' function}
+                                 // @sect3{The <code>main</code> function}
 
 				 // The main function is unaltered in
 				 // its functionality from the
@@ -1107,11 +1107,11 @@ void LaplaceProblem<dim>::run ()
 				 // for all, this kind of exceptions
 				 // is not switched off in optimized
 				 // mode, in contrast to the
-				 // ``Assert'' macro which we have
+				 // <code>Assert</code> macro which we have
 				 // used to test against programming
 				 // errors. If uncaught, these
 				 // exceptions propagate the call tree
-				 // up to the ``main'' function, and
+				 // up to the <code>main</code> function, and
 				 // if they are not caught there
 				 // either, the program is aborted. In
 				 // many cases, like if there is not
@@ -1124,7 +1124,7 @@ void LaplaceProblem<dim>::run ()
 				 // useful to write any larger program
 				 // in this way, and you can do so by
 				 // more or less copying this function
-				 // except for the ``try'' block that
+				 // except for the <code>try</code> block that
 				 // actually encodes the functionality
 				 // particular to the present
 				 // application.
@@ -1148,8 +1148,8 @@ int main ()
 				   // exception that was thrown is an
 				   // object of a class that is
 				   // derived from the C++ standard
-				   // class ``exception'', then we can
-				   // use the ``what'' member function
+				   // class <code>exception</code>, then we can
+				   // use the <code>what</code> member function
 				   // to get a string which describes
 				   // the reason why the exception was
 				   // thrown. 
@@ -1157,12 +1157,12 @@ int main ()
 				   // The deal.II exception classes
 				   // are all derived from the
 				   // standard class, and in
-				   // particular, the ``exc.what()''
+				   // particular, the <code>exc.what()</code>
 				   // function will return
 				   // approximately the same string as
 				   // would be generated if the
 				   // exception was thrown using the
-				   // ``Assert'' macro. You have seen
+				   // <code>Assert</code> macro. You have seen
 				   // the output of such an exception
 				   // in the previous example, and you
 				   // then know that it contains the
@@ -1176,7 +1176,7 @@ int main ()
 				   // much that we can do except
 				   // exiting the program with an
 				   // error code (this is what the
-				   // ``return 1;'' does):
+				   // <code>return 1;</code> does):
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
@@ -1193,7 +1193,7 @@ int main ()
 				   // If the exception that was thrown
 				   // somewhere was not an object of a
 				   // class derived from the standard
-				   // ``exception'' class, then we
+				   // <code>exception</code> class, then we
 				   // can't do anything at all. We
 				   // then simply print an error
 				   // message and exit.

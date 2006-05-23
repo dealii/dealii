@@ -91,7 +91,7 @@
 #include <iostream>
 
 
-                                 // @sect3{The ``LaplaceProblem'' class}
+                                 // @sect3{The <code>LaplaceProblem</code> class}
 
 				 // Instead of the procedural programming of
 				 // previous examples, we encapsulate
@@ -238,7 +238,7 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // freedom. This is done by using the
 				   // distribute_dofs function, as we have
 				   // seen in the step-2 example. Since we use
-				   // the ``FE_Q'' class with a polynomial
+				   // the <code>FE_Q</code> class with a polynomial
 				   // degree of 1, i.e. bilinear elements,
 				   // this associates one degree of freedom
 				   // with each vertex. While we're at
@@ -262,7 +262,7 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // instead of giving a magically obtained
 				   // maximal number of nonzero entries per
 				   // row, we now use a function in the
-				   // ``DoFHandler'' class that can compute
+				   // <code>DoFHandler</code> class that can compute
 				   // this number for us:
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
@@ -357,7 +357,7 @@ void LaplaceProblem::make_grid_and_dofs ()
 				 // objects. That's too much, so there is one
 				 // type of class that orchestrates
 				 // information exchange between these three:
-				 // the ``FEValues'' class. If given one
+				 // the <code>FEValues</code> class. If given one
 				 // instance of each three of these objects,
 				 // it will be able to provide you with
 				 // information about values and gradients of
@@ -405,22 +405,22 @@ void LaplaceProblem::assemble_system ()
 				   // actually need is given as a bitwise
 				   // connection of flags as the third
 				   // argument to the constructor of
-				   // ``FEValues''. Since these values have to
+				   // <code>FEValues</code>. Since these values have to
 				   // be recomputed, or updated, every time we
 				   // go to a new cell, all of these flags
-				   // start with the prefix ``update_'' and
+				   // start with the prefix <code>update_</code> and
 				   // then indicate what it actually is that
 				   // we want updated. The flag to give if we
 				   // want the values of the shape functions
-				   // computed is ``update_values''; for the
+				   // computed is <code>update_values</code>; for the
 				   // gradients it is
-				   // ``update_gradients''. The determinants
+				   // <code>update_gradients</code>. The determinants
 				   // of the Jacobians and the quadrature
 				   // weights are always used together, so
 				   // only the products (Jacobians times
-				   // weights, or short ``JxW'') are computed;
+				   // weights, or short <code>JxW</code>) are computed;
 				   // since we need them, we have to list
-				   // ``update_JxW_values'' as well:
+				   // <code>update_JxW_values</code> as well:
   FEValues<2> fe_values (fe, quadrature_formula, 
 			 update_values | update_gradients | update_JxW_values);
                                    // The advantage of this proceeding is that
@@ -567,7 +567,7 @@ void LaplaceProblem::assemble_system ()
 				       // determinant and the quadrature point
 				       // weight (that one gets together by
 				       // the call to
-				       // ``fe_values.JxW''). Finally, this is
+				       // <code>fe_values.JxW</code>). Finally, this is
 				       // repeated for all shape functions
 				       // phi_i and phi_j:
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -656,7 +656,7 @@ void LaplaceProblem::assemble_system ()
 				   // rather than projecting it onto the
 				   // boundary. There is a function in the
 				   // library which does exactly this:
-				   // ``VectorTools::interpolate_boundary_values''. Its
+				   // <code>VectorTools::interpolate_boundary_values</code>. Its
 				   // parameters are (omitting parameters for
 				   // which default values exist and that we
 				   // don't care about): the DoFHandler object
@@ -694,9 +694,9 @@ void LaplaceProblem::assemble_system ()
 				   // the boundary.
 				   //
 				   // The function describing the boundary
-				   // values is an object of type ``Function''
+				   // values is an object of type <code>Function</code>
 				   // or of a derived class. One of the
-				   // derived classes is ``ZeroFunction'',
+				   // derived classes is <code>ZeroFunction</code>,
 				   // which describes (not unexpectedly) a
 				   // function which is zero everywhere. We
 				   // create such an object in-place and pass
@@ -712,7 +712,7 @@ void LaplaceProblem::assemble_system ()
 				   // here for all entries). This
 				   // mapping of DoF numbers to
 				   // boundary values is done by the
-				   // ``std::map'' class.
+				   // <code>std::map</code> class.
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -755,7 +755,7 @@ void LaplaceProblem::solve ()
 				   // First, we need to have an object that
 				   // knows how to tell the CG algorithm when
 				   // to stop. This is done by using a
-				   // ``SolverControl'' object, and as
+				   // <code>SolverControl</code> object, and as
 				   // stopping criterion we say: stop after a
 				   // maximum of 1000 iterations (which is far
 				   // more than is needed for 1089 variables;
@@ -766,13 +766,13 @@ void LaplaceProblem::solve ()
 				   // the one which stops the iteration:
   SolverControl           solver_control (1000, 1e-12);
 				   // Then we need the solver itself. The
-				   // template parameters to the ``SolverCG''
+				   // template parameters to the <code>SolverCG</code>
 				   // class are the matrix type and the type
 				   // of the vectors, but the empty angle
 				   // brackets indicate that we simply take
 				   // the default arguments (which are
-				   // ``SparseMatrix@<double@>'' and
-				   // ``Vector@<double@>''):
+				   // <code>SparseMatrix@<double@></code> and
+				   // <code>Vector@<double@></code>):
   SolverCG<>              cg (solver_control);
 
 				   // Now solve the system of equations. The
@@ -807,13 +807,13 @@ void LaplaceProblem::output_results () const
 				   // To write the output to a file,
 				   // we need an object which knows
 				   // about output formats and the
-				   // like. This is the ``DataOut'' class,
+				   // like. This is the <code>DataOut</code> class,
 				   // and we need an object of that
 				   // type:
   DataOut<2> data_out;
 				   // Now we have to tell it where to take the
 				   // values from which it shall write. We
-				   // tell it which ``DoFHandler'' object to
+				   // tell it which <code>DoFHandler</code> object to
 				   // use, and the solution vector (and
 				   // the name by which the solution variable
 				   // shall appear in the output file). If
@@ -830,7 +830,7 @@ void LaplaceProblem::output_results () const
 				   // handle. The reason is that we
 				   // have separated the frontend
 				   // (which knows about how to treat
-				   // ``DoFHandler'' objects and data
+				   // <code>DoFHandler</code> objects and data
 				   // vectors) from the back end (which
 				   // knows many different output formats)
 				   // and use an intermediate data
@@ -857,7 +857,7 @@ void LaplaceProblem::output_results () const
 
 				 // Finally, the last function of this class
 				 // is the main function which calls all the
-				 // other functions of the ``LaplaceProblem''
+				 // other functions of the <code>LaplaceProblem</code>
 				 // class. The order in which this is done
 				 // resembles the order in which most finite
 				 // element programs work. Since the names are
@@ -872,7 +872,7 @@ void LaplaceProblem::run ()
 }
 
 
-                                 // @sect3{The ``main'' function}
+                                 // @sect3{The <code>main</code> function}
 
 				 // This is the main function of the
 				 // program. Since the concept of a

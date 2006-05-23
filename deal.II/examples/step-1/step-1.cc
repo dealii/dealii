@@ -12,7 +12,7 @@
 				 // @sect3{Include files}
 
                                  // The most fundamental class in the
-                                 // library is the ``Triangulation''
+                                 // library is the <code>Triangulation</code>
                                  // class, which is declared here:
 #include <grid/tria.h>
                                  // We need the following two includes
@@ -79,7 +79,7 @@ void first_grid ()
 
                                    // Now we want to write a graphical
                                    // representation of the mesh to an
-                                   // output file. The ``GridOut''
+                                   // output file. The <code>GridOut</code>
                                    // class of deal.II can do that in
                                    // a number of different output
                                    // formats; here, we choose
@@ -183,11 +183,11 @@ void second_grid ()
                                        // marked for further
                                        // refinement, obviously). By
                                        // convention, we almost always
-                                       // use the names ``cell'' and
-                                       // ``endc'' for the iterator
+                                       // use the names <code>cell</code> and
+                                       // <code>endc</code> for the iterator
                                        // pointing to the present cell
                                        // and to the
-                                       // ``one-past-the-end''
+                                       // <code>one-past-the-end</code>
                                        // iterator:
       Triangulation<2>::active_cell_iterator
 	cell = triangulation.begin_active(),
@@ -213,13 +213,13 @@ void second_grid ()
                                          // by which we find out about
                                          // the number of vertices of
                                          // a cell. Using the
-                                         // ``GeometryInfo'' class, we
+                                         // <code>GeometryInfo</code> class, we
                                          // will later have an easier
                                          // time getting the program
                                          // to also run in 3d: we only
                                          // have to change all
-                                         // occurrences of ``@<2@>'' to
-                                         // ``@<3@>'', and do not have
+                                         // occurrences of <code>@<2@></code> to
+                                         // <code>@<3@></code>, and do not have
                                          // to audit our code for the
                                          // hidden appearance of magic
                                          // numbers like a 4 that

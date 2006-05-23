@@ -77,7 +77,7 @@
 namespace QuasiStaticElasticity
 {
 
-				   // @sect3{The ``PointHistory'' class}
+				   // @sect3{The <code>PointHistory</code> class}
 
 				   // As was mentioned in the introduction, we
 				   // have to store the old stress in
@@ -101,8 +101,8 @@ namespace QuasiStaticElasticity
 				   // constructors, destructors, or other
 				   // member functions. In such cases of
 				   // `dumb' classes, we usually opt to
-				   // declare them as ``struct'' rather than
-				   // ``class'', to indicate that they are
+				   // declare them as <code>struct</code> rather than
+				   // <code>class</code>, to indicate that they are
 				   // closer to C-style structures than
 				   // C++-style classes.
   template <int dim>
@@ -177,12 +177,12 @@ namespace QuasiStaticElasticity
 				   // need as tools. These are small
 				   // functions that are called in
 				   // inner loops, so we mark them as
-				   // ``inline''.
+				   // <code>inline</code>.
 				   //
 				   // The first one computes the
 				   // symmetric strain tensor for
-				   // shape function ``shape_func'' at
-				   // quadrature point ``q_point'' by
+				   // shape function <code>shape_func</code> at
+				   // quadrature point <code>q_point</code> by
 				   // forming the symmetric gradient
 				   // of this shape function. We need
 				   // that when we want to form the
@@ -198,12 +198,12 @@ namespace QuasiStaticElasticity
 				   // avoided to compute any terms
 				   // that we could prove were zero
 				   // anyway. For this, we used the
-				   // ``fe.system_to_component_index''
+				   // <code>fe.system_to_component_index</code>
 				   // function that returns in which
 				   // component a shape function was
 				   // zero, and also that the
-				   // ``fe_values.shape_value'' and
-				   // ``fe_values.shape_grad''
+				   // <code>fe_values.shape_value</code> and
+				   // <code>fe_values.shape_grad</code>
 				   // functions only returned the
 				   // value and gradient of the single
 				   // non-zero component of a shape
@@ -214,27 +214,27 @@ namespace QuasiStaticElasticity
 				   // it isn't terribly time critical,
 				   // we can get away with a simpler
 				   // technique: just ask the
-				   // ``fe_values'' for the value or
+				   // <code>fe_values</code> for the value or
 				   // gradient of a given component of
 				   // a given shape function at a
 				   // given quadrature point. This is
 				   // what the
-				   // ``fe_values.shape_grad_component(shape_func,q_point,i)''
+				   // <code>fe_values.shape_grad_component(shape_func,q_point,i)</code>
 				   // call does: return the full
-				   // gradient of the ``i''th
+				   // gradient of the <code>i</code>th
 				   // component of shape function
-				   // ``shape_func'' at quadrature
-				   // point ``q_point''. If a certain
+				   // <code>shape_func</code> at quadrature
+				   // point <code>q_point</code>. If a certain
 				   // component of a certain shape
 				   // function is always zero, then
 				   // this will simply always return
 				   // zero.
 				   //
 				   // As mentioned, using
-				   // ``fe_values.shape_grad_component''
+				   // <code>fe_values.shape_grad_component</code>
 				   // instead of the combination of
-				   // ``fe.system_to_component_index''
-				   // and ``fe_values.shape_grad'' may
+				   // <code>fe.system_to_component_index</code>
+				   // and <code>fe_values.shape_grad</code> may
 				   // be less efficient, but its
 				   // implementation is optimized for
 				   // such cases and shouldn't be a
@@ -255,8 +255,8 @@ namespace QuasiStaticElasticity
 
 				     // First, fill diagonal terms
 				     // which are simply the
-				     // derivatives in direction ``i''
-				     // of the ``i'' component of the
+				     // derivatives in direction <code>i</code>
+				     // of the <code>i</code> component of the
 				     // vector-valued shape
 				     // function:
     for (unsigned int i=0; i<dim; ++i)
@@ -269,7 +269,7 @@ namespace QuasiStaticElasticity
 				     // (here: the upper right corner)
 				     // of the off-diagonal elements,
 				     // and the implementation of the
-				     // ``SymmetricTensor'' class
+				     // <code>SymmetricTensor</code> class
 				     // makes sure that at least to
 				     // the outside the symmetric
 				     // entries are also filled (in
@@ -297,7 +297,7 @@ namespace QuasiStaticElasticity
 				   // of a vector-valued field. If you
 				   // already have a solution field,
 				   // the
-				   // ``fe_values.get_function_grads''
+				   // <code>fe_values.get_function_grads</code>
 				   // function allows you to extract
 				   // the gradients of each component
 				   // of your solution field at a
@@ -315,7 +315,7 @@ namespace QuasiStaticElasticity
 				   // by filling first the diagonal
 				   // and then only one half of the
 				   // symmetric tensor (the
-				   // ``SymmetricTensor'' class makes
+				   // <code>SymmetricTensor</code> class makes
 				   // sure that it is sufficient to
 				   // write only one of the two
 				   // symmetric components).
@@ -323,11 +323,11 @@ namespace QuasiStaticElasticity
 				   // Before we do this, though, we
 				   // make sure that the input has the
 				   // kind of structure we expect:
-				   // that is that there are ``dim''
+				   // that is that there are <code>dim</code>
 				   // vector components, i.e. one
 				   // displacement component for each
 				   // coordinate direction. We test
-				   // this with the ``Assert'' macro
+				   // this with the <code>Assert</code> macro
 				   // that will simply abort our
 				   // program if the condition is not
 				   // met.
@@ -430,7 +430,7 @@ namespace QuasiStaticElasticity
                                      //
                                      // The reason why we stress that is that
                                      // in this case we have that
-                                     // ``tan_angle==0''. Further down, we
+                                     // <code>tan_angle==0</code>. Further down, we
                                      // need to divide by that number in the
                                      // computation of the axis of rotation,
                                      // and we would get into trouble when
@@ -477,7 +477,7 @@ namespace QuasiStaticElasticity
   
 
 
-				   // @sect3{The ``TopLevel'' class}
+				   // @sect3{The <code>TopLevel</code> class}
   
 				   // This is the main class of the
 				   // program. Since the namespace already
@@ -498,7 +498,7 @@ namespace QuasiStaticElasticity
                                    // The external interface of the class,
                                    // however, is unchanged: it has a public
                                    // constructor and desctructor, and it has
-                                   // a ``run'' function that initiated all
+                                   // a <code>run</code> function that initiated all
                                    // the work.
   template <int dim>
   class TopLevel 
@@ -633,9 +633,9 @@ namespace QuasiStaticElasticity
       std::vector<PointHistory<dim> > quadrature_point_history;
 
                                        // The way this object is accessed is
-                                       // through a ``user pointer'' that each
+                                       // through a <code>user pointer</code> that each
                                        // cell, face, or edge holds: it is a
-                                       // ``void*'' pointer that can be used
+                                       // <code>void*</code> pointer that can be used
                                        // by application programs to associate
                                        // arbitrary data to cells, faces, or
                                        // edges. What the program actually
@@ -690,10 +690,10 @@ namespace QuasiStaticElasticity
                                        // for all, and instead get rid of the
                                        // distributed copy immediately. Thus,
                                        // note that the declaration of
-                                       // ``inremental_displacement'' does not
+                                       // <code>inremental_displacement</code> does not
                                        // denote a distribute vector as would
                                        // be indicated by the middle namespace
-                                       // ``MPI'':
+                                       // <code>MPI</code>:
       PETScWrappers::MPI::SparseMatrix system_matrix;
 
       PETScWrappers::MPI::Vector       system_rhs;
@@ -742,7 +742,7 @@ namespace QuasiStaticElasticity
 				       // Next, how many degrees of freedom
 				       // the present processor stores. This
 				       // is, of course, an abbreviation to
-				       // ``local_dofs_per_process[this_mpi_process]''.
+				       // <code>local_dofs_per_process[this_mpi_process]</code>.
       unsigned int         n_local_dofs;
 
 				       // In the same direction, also
@@ -753,7 +753,7 @@ namespace QuasiStaticElasticity
 				       // necessarily contiguously
 				       // numbered (when iterating
 				       // over them using
-				       // ``active_cell_iterator'').
+				       // <code>active_cell_iterator</code>).
       unsigned int         n_local_cells;
 
 				       // Finally, we have a
@@ -773,7 +773,7 @@ namespace QuasiStaticElasticity
   };
 
 
-                                   // @sect3{The ``BodyForce'' class}
+                                   // @sect3{The <code>BodyForce</code> class}
   
 				   // Before we go on to the main
 				   // functionality of this program, we have
@@ -796,11 +796,11 @@ namespace QuasiStaticElasticity
 				   // not electrically conducting or that
 				   // there are no significant electromagnetic
 				   // fields around. In that case, the body
-				   // forces are simply ``rho g'', where
-				   // ``rho'' is the material density and
-				   // ``g'' is a vector in negative
+				   // forces are simply <code>rho g</code>, where
+				   // <code>rho</code> is the material density and
+				   // <code>g</code> is a vector in negative
 				   // z-direction with magnitude 9.81 m/s^2.
-				   // Both the density and ``g'' are defined
+				   // Both the density and <code>g</code> are defined
 				   // in the function, and we take as the
 				   // density 7700 kg/m^3, a value commonly
 				   // assumed for steel.
@@ -808,10 +808,10 @@ namespace QuasiStaticElasticity
                                    // To be a little more general and to be
                                    // able to do computations in 2d as well,
                                    // we realize that the body force is always
-                                   // a function returning a ``dim''
+                                   // a function returning a <code>dim</code>
                                    // dimensional vector. We assume that
                                    // gravity acts along the negative
-                                   // direction of the last, i.e. ``dim-1''th
+                                   // direction of the last, i.e. <code>dim-1</code>th
                                    // coordinate. The rest of the
                                    // implementation of this function should
                                    // be mostly self-explanatory given similar
@@ -821,7 +821,7 @@ namespace QuasiStaticElasticity
                                    // compiler warnings about unused function
                                    // arguments, we therefore comment out the
                                    // name of the first argument of the
-                                   // ``vector_value'' function:
+                                   // <code>vector_value</code> function:
   template <int dim>
   class BodyForce :  public Function<dim> 
   {
@@ -882,7 +882,7 @@ namespace QuasiStaticElasticity
 
 
 
-                                   // @sect3{The ``IncrementalBoundaryValue'' class}
+                                   // @sect3{The <code>IncrementalBoundaryValue</code> class}
 
                                    // In addition to body forces, movement can
                                    // be induced by boundary forces and forced
@@ -923,7 +923,7 @@ namespace QuasiStaticElasticity
                                    // rest of the boundary is either
                                    // going to be fixed (and is then
                                    // described using an object of
-                                   // type ``ZeroFunction'') or free
+                                   // type <code>ZeroFunction</code>) or free
                                    // (Neumann-type, in which case
                                    // nothing special has to be done).
                                    // The implementation of the
@@ -1001,7 +1001,7 @@ namespace QuasiStaticElasticity
 
 
 
-                                   // @sect3{Implementation of the ``TopLevel'' class}
+                                   // @sect3{Implementation of the <code>TopLevel</code> class}
 
                                    // Now for the implementation of the main
                                    // class. First, we initialize the
@@ -1024,7 +1024,7 @@ namespace QuasiStaticElasticity
 				   // constructors and descructors. There are
 				   // no surprises here: we choose linear and
 				   // continuous finite elements for each of
-				   // the ``dim'' vector components of the
+				   // the <code>dim</code> vector components of the
 				   // solution, and a Gaussian quadrature
 				   // formula with 2 points in each coordinate
 				   // direction. The destructor should be
@@ -1053,7 +1053,7 @@ namespace QuasiStaticElasticity
 
                                    // The last of the public functions is the
                                    // one that directs all the work,
-                                   // ``run()''. It initializes the variables
+                                   // <code>run()</code>. It initializes the variables
                                    // that describe where in time we presently
                                    // are, then runs the first time step, then
                                    // loops over all the other time
@@ -1266,8 +1266,8 @@ namespace QuasiStaticElasticity
 				   // this happens is mostly a matter
 				   // of taste; here, we chose to do
 				   // it when grids are created since
-				   // in the ``do_initial_timestep''
-				   // and ``do_timestep'' functions we
+				   // in the <code>do_initial_timestep</code>
+				   // and <code>do_timestep</code> functions we
 				   // want to output the number of
 				   // cells on each processor at a
 				   // point where we haven't called
@@ -1344,17 +1344,17 @@ namespace QuasiStaticElasticity
     DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
     hanging_node_constraints.condense (sparsity_pattern);
                                      // Note that we have used the
-                                     // ``CompressedSparsityPattern'' class
+                                     // <code>CompressedSparsityPattern</code> class
                                      // here that was already introduced in
                                      // step-11, rather than the
-                                     // ``SparsityPattern'' class that we have
+                                     // <code>SparsityPattern</code> class that we have
                                      // used in all other cases. The reason
                                      // for this is that for the latter class
                                      // to work we have to give an initial
                                      // upper bound for the number of entries
                                      // in each row, a task that is
                                      // traditionally done by
-                                     // ``DoFHandler::max_couplings_between_dofs()''. However,
+                                     // <code>DoFHandler::max_couplings_between_dofs()</code>. However,
                                      // this function suffers from a serious
                                      // problem: it has to compute an upper
                                      // bound to the number of nonzero entries
@@ -1363,11 +1363,11 @@ namespace QuasiStaticElasticity
                                      // 3d. In effect, while it is quite
                                      // accurate in 2d, it often comes up with
                                      // much too large a number in 3d, and in
-                                     // that case the ``SparsityPattern''
+                                     // that case the <code>SparsityPattern</code>
                                      // allocates much too much memory at
                                      // first, often several 100 MBs. This is
                                      // later corrected when
-                                     // ``DoFTools::make_sparsity_pattern'' is
+                                     // <code>DoFTools::make_sparsity_pattern</code> is
                                      // called and we realize that we don't
                                      // need all that much memory, but at time
                                      // it is already too late: for large
@@ -1376,7 +1376,7 @@ namespace QuasiStaticElasticity
                                      // out-of-memory situations.
                                      //
                                      // In order to avoid this, we resort to
-                                     // the ``CompressedSparsityPattern''
+                                     // the <code>CompressedSparsityPattern</code>
                                      // class that is slower but does not
                                      // require any up-front estimate on the
                                      // number of nonzero entries per row. It
@@ -1423,7 +1423,7 @@ namespace QuasiStaticElasticity
                                      // After this point, no further explicit
                                      // knowledge of the sparsity pattern is
                                      // required any more and we can let the
-                                     // ``sparsity_pattern'' variable go out
+                                     // <code>sparsity_pattern</code> variable go out
                                      // of scope without any problem.
                                      
                                      // The last task in this function
@@ -1458,7 +1458,7 @@ namespace QuasiStaticElasticity
                                    // stresses. In addition,
                                    // assembling the matrix is made
                                    // significantly more transparent
-                                   // by using the ``SymmetricTensor''
+                                   // by using the <code>SymmetricTensor</code>
                                    // class: note the elegance of
                                    // forming the scalar products of
                                    // symmetric tensors of rank 2 and
@@ -1514,10 +1514,10 @@ namespace QuasiStaticElasticity
                                            // symmetric gradients (strains) of
                                            // the shape functions at a given
                                            // quadrature point from the
-                                           // ``FEValues'' object, and the
+                                           // <code>FEValues</code> object, and the
                                            // elegance with which we form the
-                                           // triple contraction ``eps_phi_i :
-                                           // C : eps_phi_j''; the latter
+                                           // triple contraction <code>eps_phi_i :
+                                           // C : eps_phi_j</code>; the latter
                                            // needs to be compared to the
                                            // clumsy computations needed in
                                            // step-17, both in the
@@ -1608,7 +1608,7 @@ namespace QuasiStaticElasticity
 				     // already did in previous
 				     // programs. A slight
 				     // complication is that the
-				     // ``apply_boundary_values''
+				     // <code>apply_boundary_values</code>
 				     // function wants to have a
 				     // solution vector compatible
 				     // with the matrix and right hand
@@ -1674,10 +1674,10 @@ namespace QuasiStaticElasticity
 				     // direction. For the boundary
 				     // with indicator 1 (top
 				     // surface), we use the
-				     // ``IncrementalBoundaryValues''
+				     // <code>IncrementalBoundaryValues</code>
 				     // class, but we specify an
 				     // additional argument to the
-				     // ``VectorTools::interpolate_boundary_values''
+				     // <code>VectorTools::interpolate_boundary_values</code>
 				     // function denoting which vector
 				     // components it should apply to;
 				     // this is a vector of bools for
@@ -1754,9 +1754,9 @@ namespace QuasiStaticElasticity
                                    // vector and initialize it with
                                    // the contents of the local
                                    // variable (remember that the
-                                   // ``apply_boundary_values''
+                                   // <code>apply_boundary_values</code>
                                    // function called in
-                                   // ``assemble_system'' preset the
+                                   // <code>assemble_system</code> preset the
                                    // values of boundary nodes in this
                                    // vector), solve with it, and at
                                    // the end of the function copy it
@@ -1810,25 +1810,25 @@ namespace QuasiStaticElasticity
 				   // the introduction.
                                    //
                                    // The crucial part of this function is to
-                                   // give the ``DataOut'' class a way to only
+                                   // give the <code>DataOut</code> class a way to only
                                    // work on the cells that the present
                                    // process owns. This class is already
                                    // well-equipped for that: it has two
-                                   // virtual functions ``first_cell'' and
-                                   // ``next_cell'' that return the first cell
+                                   // virtual functions <code>first_cell</code> and
+                                   // <code>next_cell</code> that return the first cell
                                    // to be worked on, and given one cell
                                    // return the next cell to be worked on. By
                                    // default, these functions return the
                                    // first active cell (i.e. the first one
                                    // that has no children) and the next
                                    // active cell. What we have to do here is
-                                   // derive a class from ``DataOut'' that
+                                   // derive a class from <code>DataOut</code> that
                                    // overloads these two functions to only
                                    // iterate over those cells with the right
                                    // subdomain indicator.
                                    //
                                    // We do this at the beginning of this
-                                   // function. The ``first_cell'' function
+                                   // function. The <code>first_cell</code> function
                                    // just starts with the first active cell,
                                    // and then iterates to the next cells
                                    // while the cell presently under
@@ -1838,7 +1838,7 @@ namespace QuasiStaticElasticity
                                    // we don't try to keep iterating when we
                                    // have hit the end iterator.
                                    //
-                                   // The ``next_cell'' function could be
+                                   // The <code>next_cell</code> function could be
                                    // implemented in a similar way. However,
                                    // we use this occasion as a pretext to
                                    // introduce one more thing that the
@@ -1965,7 +1965,7 @@ namespace QuasiStaticElasticity
                                      // other words, it seems as if we can't
                                      // compute the average stresses for all
                                      // cells. However, remember that our
-                                     // class derived from ``DataOut'' only
+                                     // class derived from <code>DataOut</code> only
                                      // iterates over those cells that
                                      // actually do belong to the present
                                      // processor, i.e. we don't have to
@@ -2053,7 +2053,7 @@ namespace QuasiStaticElasticity
 				     // determine the name of the file
 				     // we will want to write it
 				     // to. We compose it of the
-				     // prefix ``solution-'', followed
+				     // prefix <code>solution-</code>, followed
 				     // by a representation of the
 				     // present time written as a
 				     // fixed point number so that
@@ -2082,8 +2082,8 @@ namespace QuasiStaticElasticity
 				     // would overflow if there were
 				     // 1000 processes or more. Note
 				     // that we choose to use
-				     // ``AssertThrow'' rather than
-				     // ``Assert'' since the number of
+				     // <code>AssertThrow</code> rather than
+				     // <code>Assert</code> since the number of
 				     // processes is a variable that
 				     // depends on input files or the
 				     // way the process is started,
@@ -2091,7 +2091,7 @@ namespace QuasiStaticElasticity
 				     // in the program
 				     // code. Therefore, it is
 				     // inappropriate to use
-				     // ``Assert'' that is optimized
+				     // <code>Assert</code> that is optimized
 				     // away in optimized mode,
 				     // whereas here we actually can
 				     // assume that users will run the
@@ -2152,7 +2152,7 @@ namespace QuasiStaticElasticity
                                    // output to the console to update the
                                    // person watching the screen on what is
                                    // going on. As in step-17, the use of
-                                   // ``pcout'' instead of ``std::cout'' makes
+                                   // <code>pcout</code> instead of <code>std::cout</code> makes
                                    // sure that only one of the parallel
                                    // processes is actually writing to the
                                    // console, without having to explicitly
@@ -2323,9 +2323,9 @@ namespace QuasiStaticElasticity
                                    // function. First, how we get the
                                    // displacement field at a given vertex
                                    // using the
-                                   // ``cell-@>vertex_dof_index(v,d)'' function
-                                   // that returns the index of the ``d''th
-                                   // degree of freedom at vertex ``v'' of the
+                                   // <code>cell-@>vertex_dof_index(v,d)</code> function
+                                   // that returns the index of the <code>d</code>th
+                                   // degree of freedom at vertex <code>v</code> of the
                                    // given cell. In the present case,
                                    // displacement in the k-th coordinate
                                    // direction corresonds to the kth
@@ -2333,7 +2333,7 @@ namespace QuasiStaticElasticity
                                    // function like this bears a certain risk,
                                    // because it uses knowledge of the order
                                    // of elements that we have taken together
-                                   // for this program in the ``FESystem''
+                                   // for this program in the <code>FESystem</code>
                                    // element. If we decided to add an
                                    // additional variable, for example a
                                    // pressure variable for stabilization, and
@@ -2347,7 +2347,7 @@ namespace QuasiStaticElasticity
                                    // associated with vertices. This is indeed
                                    // the case for the present Q1 element, as
                                    // would be for all Qp elements of
-                                   // polynomial order ``p''. However, it
+                                   // polynomial order <code>p</code>. However, it
                                    // would not hold for discontinuous
                                    // elements, or elements for mixed
                                    // formulations. Secondly, it also rests on
@@ -2371,23 +2371,23 @@ namespace QuasiStaticElasticity
                                    // be. For general finite elements, the way
                                    // to go would be to take a quadrature
                                    // formula with the quadrature points in
-                                   // the vertices of a cell. The ``QTrapez''
+                                   // the vertices of a cell. The <code>QTrapez</code>
                                    // formula for the trapezoidal rule does
                                    // exactly this. With this quadrature
                                    // formula, we would then initialize an
-                                   // ``FEValues'' object in each cell, and
+                                   // <code>FEValues</code> object in each cell, and
                                    // use the
-                                   // ``FEValues::get_function_values''
+                                   // <code>FEValues::get_function_values</code>
                                    // function to obtain the values of the
                                    // solution function in the quadrature
                                    // points, i.e. the vertices of the
                                    // cell. These are the only values that we
                                    // really need, i.e. we are not at all
                                    // interested in the weights (or the
-                                   // ``JxW'' values) associated with this
+                                   // <code>JxW</code> values) associated with this
                                    // particular quadrature formula, and this
                                    // can be specified as the last argument in
-                                   // the constructor to ``FEValues''. The
+                                   // the constructor to <code>FEValues</code>. The
                                    // only point of minor inconvenience in
                                    // this scheme is that we have to figure
                                    // out which quadrature point corresponds
@@ -2399,7 +2399,7 @@ namespace QuasiStaticElasticity
                                    // this short function is the way in which
                                    // the triangulation class exports
                                    // information about its vertices: through
-                                   // the ``Triangulation::n_vertices''
+                                   // the <code>Triangulation::n_vertices</code>
                                    // function, it advertises how many
                                    // vertices there are in the
                                    // triangulation. Not all of them are
@@ -2410,9 +2410,9 @@ namespace QuasiStaticElasticity
                                    // the number of a vertex once it has come
                                    // into existence, even if vertices with
                                    // lower number go away. Secondly, the
-                                   // location returned by ``cell-@>vertex(v)''
+                                   // location returned by <code>cell-@>vertex(v)</code>
                                    // is not only a read-only object of type
-                                   // ``Point@<dim@>'', but in fact a reference
+                                   // <code>Point@<dim@></code>, but in fact a reference
                                    // that can be written to. This allows to
                                    // move around the nodes of a mesh with
                                    // relative ease, but it is worth pointing
@@ -2460,7 +2460,7 @@ namespace QuasiStaticElasticity
                                    // history variables, such as the existing
                                    // stresses in the material, that we store
                                    // in each quadrature point. As mentioned
-                                   // above, we use the ``user_pointer'' for
+                                   // above, we use the <code>user_pointer</code> for
                                    // this that is available in each cell.
                                    //
                                    // To put this into larger perspective, we
@@ -2513,7 +2513,7 @@ namespace QuasiStaticElasticity
 
 				     // Next, allocate as many quadrature
 				     // objects as we need. Since the
-				     // ``resize'' function does not actually
+				     // <code>resize</code> function does not actually
 				     // shrink the amount of allocated memory
 				     // if the requested new size is smaller
 				     // than the old size, we resort to a
@@ -2523,7 +2523,7 @@ namespace QuasiStaticElasticity
 				     // and then swap the contents of the old
 				     // vector and this temporary
 				     // variable. This makes sure that the
-				     // ``quadrature_point_history'' is now
+				     // <code>quadrature_point_history</code> is now
 				     // really empty, and we can let the
 				     // temporary variable that now holds the
 				     // previous contents of the vector go out
@@ -2531,7 +2531,7 @@ namespace QuasiStaticElasticity
 				     // step. we can then re-allocate as many
 				     // elements as we need, with the vector
 				     // default-initializing the
-				     // ``PointHistory'' objects, which
+				     // <code>PointHistory</code> objects, which
 				     // includes setting the stress variables
 				     // to zero.
     {
@@ -2569,7 +2569,7 @@ namespace QuasiStaticElasticity
                                      // this function that forget to update
                                      // all uses of a variable at the same
                                      // time. Recall that constructs using the
-                                     // ``Assert'' macro are optimized away in
+                                     // <code>Assert</code> macro are optimized away in
                                      // optimized mode, so do not affect the
                                      // run time of optimized runs:
     Assert (history_index == quadrature_point_history.size(),
@@ -2674,7 +2674,7 @@ namespace QuasiStaticElasticity
   template <int dim>
   void TopLevel<dim>::update_quadrature_point_history ()
   {
-                                     // First, set up an ``FEValues'' object
+                                     // First, set up an <code>FEValues</code> object
                                      // by which we will evaluate the
                                      // incremental displacements and the
                                      // gradients thereof at the quadrature
@@ -2709,7 +2709,7 @@ namespace QuasiStaticElasticity
                   &quadrature_point_history.back(),
 		  ExcInternalError());
 
-                                           // Then initialize the ``FEValues''
+                                           // Then initialize the <code>FEValues</code>
                                            // object on the present cell, and
                                            // extract the gradients of the
                                            // displacement at the quadrature
@@ -2762,7 +2762,7 @@ namespace QuasiStaticElasticity
                                                // tensor by contraction from
                                                // the left and right, after we
                                                // expand the symmetric tensor
-                                               // ``new_stress'' into a full
+                                               // <code>new_stress</code> into a full
                                                // tensor:
               const SymmetricTensor<2,dim> rotated_new_stress
                 = symmetrize(transpose(rotation) *
@@ -2783,7 +2783,7 @@ namespace QuasiStaticElasticity
 					       // result. When
 					       // assigning the result
 					       // to a
-					       // ``SymmetricTensor'',
+					       // <code>SymmetricTensor</code>,
 					       // the constuctor of
 					       // that class checks
 					       // the symmetry and
@@ -2809,9 +2809,9 @@ namespace QuasiStaticElasticity
 
 				   // This ends the project specific
 				   // namespace
-				   // ``QuasiStaticElasticity''. The
+				   // <code>QuasiStaticElasticity</code>. The
 				   // rest is as usual and as already
-				   // shown in step-17: A ``main()''
+				   // shown in step-17: A <code>main()</code>
 				   // function that initializes and
 				   // terminates PETSc, calls the
 				   // classes that do the actual work,

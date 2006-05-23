@@ -50,10 +50,10 @@
 #include <base/logstream.h>
 
 
-                                 // @sect3{The ``LaplaceProblem'' class template}
+                                 // @sect3{The <code>LaplaceProblem</code> class template}
 
 				 // This is again the same
-				 // ``LaplaceProblem'' class as in the
+				 // <code>LaplaceProblem</code> class as in the
 				 // previous example. The only
 				 // difference is that we have now
 				 // declared it as a class with a
@@ -183,9 +183,9 @@ class BoundaryValues : public Function<dim>
 				 // knows the size of the loop at compile time
 				 // (remember that at the time when you define
 				 // the template, the compiler doesn't know
-				 // the value of ``dim'', but when it later
+				 // the value of <code>dim</code>, but when it later
 				 // encounters a statement or declaration
-				 // ``RightHandSide@<2@>'', it will take the
+				 // <code>RightHandSide@<2@></code>, it will take the
 				 // template, replace all occurrences of dim
 				 // by 2 and compile the resulting function);
 				 // in other words, at the time of compiling
@@ -197,7 +197,7 @@ class BoundaryValues : public Function<dim>
 				 // above right away.
 				 //
 				 // The last thing to note is that a
-				 // ``Point@<dim@>'' denotes a point in
+				 // <code>Point@<dim@></code> denotes a point in
 				 // dim-dimensionsal space, and its individual
 				 // components (i.e. `x', `y',
 				 // ... coordinates) can be accessed using the
@@ -232,35 +232,35 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 
 
 
-                                 // @sect3{Implementation of the ``LaplaceProblem'' class}
+                                 // @sect3{Implementation of the <code>LaplaceProblem</code> class}
 
                                  // Next for the implementation of the class
                                  // template that makes use of the functions
                                  // above. As before, we will write everything
                                  // as templates that have a formal parameter
-                                 // ``dim'' that we assume unknown at the time
+                                 // <code>dim</code> that we assume unknown at the time
                                  // we define the template functions. Only
                                  // later, the compiler will find a
-                                 // declaration of ``LaplaceProblem@<2@>'' (in
-                                 // the ``main'' function, actually) and
-                                 // compile the entire class with ``dim''
+                                 // declaration of <code>LaplaceProblem@<2@></code> (in
+                                 // the <code>main</code> function, actually) and
+                                 // compile the entire class with <code>dim</code>
                                  // replaced by 2, a process referred to as
                                  // `instantiation of a template'. When doing
                                  // so, it will also replace instances of
-                                 // ``RightHandSide@<dim@>'' by
-                                 // ``RightHandSide@<2@>'' and instantiate the
+                                 // <code>RightHandSide@<dim@></code> by
+                                 // <code>RightHandSide@<2@></code> and instantiate the
                                  // latter class from the class template.
                                  //
                                  // In fact, the compiler will also find a
-                                 // declaration ``LaplaceProblem@<3@>'' in
-                                 // ``main()''. This will cause it to again go
+                                 // declaration <code>LaplaceProblem@<3@></code> in
+                                 // <code>main()</code>. This will cause it to again go
                                  // back to the general
-                                 // ``LaplaceProblem@<dim@>'' template, replace
-                                 // all occurrences of ``dim'', this time by
+                                 // <code>LaplaceProblem@<dim@></code> template, replace
+                                 // all occurrences of <code>dim</code>, this time by
                                  // 3, and compile the class a second
                                  // time. Note that the two instantiations
-                                 // ``LaplaceProblem@<2@>'' and
-                                 // ``LaplaceProblem@<3@>'' are completely
+                                 // <code>LaplaceProblem@<2@></code> and
+                                 // <code>LaplaceProblem@<3@></code> are completely
                                  // independent classes; their only common
                                  // feature is that they are both instantiated
                                  // from the same general template, but they
@@ -273,7 +273,7 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
                                  // @sect4{LaplaceProblem::LaplaceProblem}
 
 				 // After this introduction, here is the
-				 // constructor of the ``LaplaceProblem''
+				 // constructor of the <code>LaplaceProblem</code>
 				 // class. It specifies the desired polynomial
 				 // degree of the finite elements and
 				 // associates the DoFHandler to the
@@ -298,7 +298,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // square [-1,1]x[-1,1] in 2D, or on
 				 // the cube [-1,1]x[-1,1]x[-1,1] in
 				 // 3D; both can be termed
-				 // ``hyper_cube'', so we may use the
+				 // <code>hyper_cube</code>, so we may use the
 				 // same function in whatever
 				 // dimension we are. Of course, the
 				 // functions that create a hypercube
@@ -315,7 +315,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // either. This function therefore looks
 				 // exactly like in the previous example,
 				 // although it performs actions that in their
-				 // details are quite different if ``dim''
+				 // details are quite different if <code>dim</code>
 				 // happens to be 3. The only significant
 				 // difference from a user's perspective is
 				 // the number of cells resulting, which is
@@ -405,11 +405,11 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // quadrature points on the cell we are
 				   // presently on (previously, we only
 				   // required values and gradients of the
-				   // shape function from the ``FEValues''
+				   // shape function from the <code>FEValues</code>
 				   // object, as well as the quadrature
-				   // weights, ``JxW''). We can tell the
-				   // ``FEValues'' object to do for us by also
-				   // giving it the ``update_q_points'' flag:
+				   // weights, <code>JxW</code>). We can tell the
+				   // <code>FEValues</code> object to do for us by also
+				   // giving it the <code>update_q_points</code> flag:
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   update_values   | update_gradients |
                            update_q_points | update_JxW_values);
@@ -435,7 +435,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // Note, that a cell is a quadrilateral in
 				   // two space dimensions, but a hexahedron
 				   // in 3D. In fact, the
-				   // ``active_cell_iterator'' data type is
+				   // <code>active_cell_iterator</code> data type is
 				   // something different, depending on the
 				   // dimension we are in, but to the outside
 				   // world they look alike and you will
@@ -491,22 +491,22 @@ void LaplaceProblem<dim>::assemble_system ()
                                        // and j at point q_point and multiply
                                        // it with the scalar weights JxW. This
                                        // is actually what happens:
-                                       // ``fe_values.shape_grad(i,q_point)''
-                                       // returns a ``dim'' dimensional
+                                       // <code>fe_values.shape_grad(i,q_point)</code>
+                                       // returns a <code>dim</code> dimensional
                                        // vector, represented by a
-                                       // ``Tensor@<1,dim@>'' object, and the
+                                       // <code>Tensor@<1,dim@></code> object, and the
                                        // operator* that multiplies it with
                                        // the result of
-                                       // ``fe_values.shape_grad(j,q_point)''
-                                       // makes sure that the ``dim''
+                                       // <code>fe_values.shape_grad(j,q_point)</code>
+                                       // makes sure that the <code>dim</code>
                                        // components of the two vectors are
                                        // properly contracted, and the result
                                        // is a scalar floating point number
                                        // that then is multiplied with the
                                        // weights. Internally, this operator*
                                        // makes sure that this happens
-                                       // correctly for all ``dim'' components
-                                       // of the vectors, whether ``dim'' be
+                                       // correctly for all <code>dim</code> components
+                                       // of the vectors, whether <code>dim</code> be
                                        // 2, 3, or any other space dimension;
                                        // from a user's perspective, this is
                                        // not something worth bothering with,
@@ -537,10 +537,10 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // values in this example, contrary to the
 				   // one before. This is a simple task, we
 				   // only have to replace the
-				   // ``ZeroFunction'' used there by an object
+				   // <code>ZeroFunction</code> used there by an object
 				   // of the class which describes the
 				   // boundary values we would like to use
-				   // (i.e. the ``BoundaryValues'' class
+				   // (i.e. the <code>BoundaryValues</code> class
 				   // declared above):
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
@@ -599,8 +599,8 @@ void LaplaceProblem<dim>::solve ()
                                  // obtain it see the ReadMe file of
                                  // deal.II). To write data in this format, we
                                  // simply replace the
-                                 // ``data_out.write_gnuplot'' call by
-                                 // ``data_out.write_gmv''.
+                                 // <code>data_out.write_gnuplot</code> call by
+                                 // <code>data_out.write_gmv</code>.
                                  //
                                  // Since the program will run both 2d and 3d
                                  // versions of the laplace solver, we use the
@@ -647,15 +647,15 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-                                 // @sect3{The ``main'' function}
+                                 // @sect3{The <code>main</code> function}
 
 				 // And this is the main function. It also
 				 // looks mostly like in step-3, but if you
 				 // look at the code below, note how we first
 				 // create a variable of type
-				 // ``LaplaceProblem@<2@>'' (forcing the
+				 // <code>LaplaceProblem@<2@></code> (forcing the
 				 // compiler to compile the class template
-				 // with ``dim'' replaced by ``2'') and run a
+				 // with <code>dim</code> replaced by <code>2</code>) and run a
 				 // 2d simulation, and then we do the whole
 				 // thing over in 3d.
 				 //
@@ -680,12 +680,12 @@ void LaplaceProblem<dim>::run ()
 				 //
 				 // Each of the two blocks is enclosed in
 				 // braces to make sure that the
-				 // ``laplace_problem_2d'' variable goes out
+				 // <code>laplace_problem_2d</code> variable goes out
 				 // of scope (and releases the memory it
 				 // holds) before we move on to allocate
 				 // memory for the 3d case. Without the
 				 // additional braces, the
-				 // ``laplace_problem_2d'' variable would only
+				 // <code>laplace_problem_2d</code> variable would only
 				 // be destroyed at the end of the function,
 				 // i.e. after running the 3d problem, and
 				 // would needlessly hog memory while the 3d
@@ -698,7 +698,7 @@ void LaplaceProblem<dim>::run ()
                                  // starting residual and the number of the
                                  // iteration where convergence was
                                  // detected. This can be suppressed through
-                                 // the ``deallog.depth_console(0)'' call.
+                                 // the <code>deallog.depth_console(0)</code> call.
                                  //
                                  // The rationale here is the following: the
                                  // deallog (i.e. deal-log, not de-allog)
