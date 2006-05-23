@@ -165,6 +165,10 @@ class ConstraintMatrix;
  *   <tt>MatrixCreator::create_*</tt> functions which take a right hand side do,
  *   but without assembling a matrix.
  *
+ * <li> Creation of right hand side vectors for point sources:
+ *   The @p create_point_source_vector function computes the vector
+ *   $f_i = \int_\Omega \delta_0(x-x_0) \phi_i(x) dx$. 
+ *
  * <li> Creation of boundary right hand side vectors: The
  *   @p create_boundary_right_hand_side function computes the vector
  *   $f_i = \int_{\partial\Omega} g(x) \phi_i(x) dx$. This is the
@@ -568,6 +572,32 @@ class VectorTools
 					Vector<double>        &rhs_vector);
 
 				     /**
+				      * Create a right hand side
+				      * vector for a point source at point @p p.
+                                      * Prior content of the
+				      * given @p rhs_vector vector is
+				      * deleted.
+				      *
+				      * See the general documentation of this
+				      * class for further information.
+				      */
+    template <int dim>
+    static void create_point_source_vector(const Mapping<dim>    &mapping,
+                                           const DoFHandler<dim> &dof,
+                                           const Point<dim>      &p,
+                                           Vector<double>        &rhs_vector);
+
+				     /**
+				      * Calls the @p create_point_source_vector
+				      * function, see above, with
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
+				      */
+    template <int dim>
+    static void create_point_source_vector(const DoFHandler<dim> &dof,
+                                           const Point<dim>      &p,
+                                           Vector<double>        &rhs_vector);
+
+                                     /**
 				      * Create a right hand side
 				      * vector from boundary
 				      * forces. Prior content of the

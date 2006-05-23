@@ -572,12 +572,48 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
 					  Vector<double>           &rhs_vector)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  create_right_hand_side(mapping, dof_handler, quadrature,
+  create_right_hand_side(StaticMappingQ1<dim>::mapping, dof_handler, quadrature,
 			 rhs_function, rhs_vector);
 }
 
 
+template <int dim>
+void VectorTools::create_point_source_vector (const Mapping<dim>       &mapping,
+                                              const DoFHandler<dim>    &dof_handler,
+                                              const Point<dim>         &p,
+                                              Vector<double>           &rhs_vector)
+{
+   Assert (rhs_vector.size() == dof_handler.n_dofs(),
+           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+   rhs_vector = 0;
+
+   std::pair<typename DoFHandler<dim>::active_cell_iterator, Point<dim> >
+      cell_point =
+      GridTools::find_active_cell_around_point (mapping, dof_handler, p);
+
+   Quadrature<dim> q(GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+
+   FEValues<dim> fe_values(dof_handler.get_fe(), q, UpdateFlags(update_values));
+   fe_values.reinit(cell_point.first);
+
+   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+
+   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+   cell_point.first->get_dof_indices (local_dof_indices);
+
+   for(unsigned int i=0; i<dofs_per_cell; i++)
+      rhs_vector(local_dof_indices[i]) =  fe_values.shape_value(i,0);
+}
+
+template <int dim>
+void VectorTools::create_point_source_vector (const DoFHandler<dim>    &dof_handler,
+                                              const Point<dim>         &p,
+                                              Vector<double>           &rhs_vector)
+{
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+  create_point_source_vector(StaticMappingQ1<dim>::mapping, dof_handler,
+                             p, rhs_vector);
+}
 
 #if deal_II_dimension != 1
 

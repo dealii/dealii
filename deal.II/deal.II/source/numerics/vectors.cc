@@ -102,6 +102,17 @@ void VectorTools::create_right_hand_side<deal_II_dimension>
  const Quadrature<deal_II_dimension> &,
  const Function<deal_II_dimension>   &,
  Vector<double>                      &);
+template
+void VectorTools::create_point_source_vector<deal_II_dimension>
+(const Mapping<deal_II_dimension>    &,
+ const DoFHandler<deal_II_dimension> &,
+ const Point<deal_II_dimension>      &,
+ Vector<double>                      &);
+template
+void VectorTools::create_point_source_vector<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &,
+ const Point<deal_II_dimension>      &,
+ Vector<double>                      &);
 
 #if deal_II_dimension != 1
 template
