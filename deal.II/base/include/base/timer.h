@@ -79,7 +79,7 @@ class Timer
     double stop ();
 
 				     /**
-				      * Stop the timer if neccessary and reset
+				      * Stop the timer if necessary and reset
 				      * the elapsed time to zero.
 				      */
     void reset ();
