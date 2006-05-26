@@ -240,6 +240,11 @@ class GridGenerator
 				      * @note The triangulation needs to be
 				      * void upon calling this
 				      * function.
+				      *
+				      * @note For an example of the
+				      * use of this function see the
+				      * @ref step_22 "step-22"
+				      * tutorial program.
 				      */
     template <int dim>
     static

@@ -2678,12 +2678,20 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				     /**
 				      * Return the material id of this
 				      * cell.
+				      *
+				      * For a typical use of this
+				      * function, see the @ref step_22
+				      * "step-22" tutorial program.
 				      */
     unsigned char material_id () const;
 
 				     /**
 				      * Set the material id of this
 				      * cell.
+				      *
+				      * For a typical use of this
+				      * function, see the @ref step_22
+				      * "step-22" tutorial program.
 				      */
     void set_material_id (const unsigned char new_material_id) const;
 
