@@ -589,37 +589,6 @@ namespace internal
  *        between the grids.
  *   </ul>
  *
- *   The material id for each cell must be specified upon construction of
- *   a triangulation. (There is a special section on material identifier and
- *   boundary indicators. See there for more information.)
- *   The standard region functions (for hypercube, hyper-ball,
- *   etc.) denote all cells the material id zero. You may change that afterwards,
- *   but you should not use the material id 255. When reading a triangulation,
- *   the material id must be specified in the input file (UCD format) or is
- *   otherwise set to zero. When creating explicitly, the material id must
- *   be given to the creation function.
- *
- *   Regarding the boundary indicator for lines in two dimensions and quads
- *   in three (subsumed by the word "faces"), all interior faces are denoted
- *   the value 255. Trying to give an interior face another value results in
- *   an error if in debug mode. Faces at the boundary of the domain are preset
- *   with the boundary indicator zero, but you can give a list of faces with
- *   different boundary indicators to the triangulation creation function.
- *   The standard domain functions assume all faces to have boundary indicator
- *   zero, which you may change manually afterwards. When reading from a file,
- *   you have to give boundary indicators other than zero explicitly, e.g. in
- *   UCD format by giving a list of lines with material id in the input file.
- *
- *   Lines in two dimensions and quads in three dimensions inherit their
- *   boundary indicator to their children upon refinement. You should therefore
- *   make sure that if you have different boundary parts, the different parts
- *   are separated by a vertex (in 2D) or a line (in 3D) such that each boundary
- *   line or quad has a unique boundary indicator.
- *
- *   Likewise, material data is inherited from mother to child cells. Place your
- *   coarse level cells so, that the interface between cells is also the
- *   interface between regions of different materials.
- *
  *   Finally, there is a special function for folks who like bad grids:
  *   <tt>Triangulation<dim>::distort_random</tt>. It moves all the vertices in the
  *   grid a bit around by a random value, leaving behind a distorted mesh.
@@ -847,18 +816,28 @@ namespace internal
  *   <h3>Material and boundary information</h3>
  *
  *   Each line, quad, etc stores one byte of information denoting the
- *   material of a cell or the part of the boundary, a lower
- *   dimensional object belongs to. The material of a cell may be used
+ *   material or the part of the boundary that an object
+ *   belongs to. The material of a cell may be used
  *   during matrix generation in order to implement different
  *   coefficients in different parts of the domain. It is not used by
  *   functions of the grid and dof handling libraries.
+ *
+ *   This material_id may be set upon construction of a
+ *   triangulation (through the CellData data structure), or later
+ *   through use of cell iterators. For a typical use of this
+ *   functionality, see the @ref step_22 "step-22" tutorial
+ *   program. The functions of the GridGenerator namespace typically
+ *   set the material ID of all cells to zero. When reading a
+ *   triangulation, the material id must be specified in the input
+ *   file (UCD format) or is otherwise set to zero. Material IDs are
+ *   inherited by child cells from their parent upon mesh refinement.
  *
  *   Boundary indicators on lower dimensional objects (these have no
  *   material id) indicate the number of a boundary component. These
  *   are used for two purposes: First, they specify a boundary
  *   curve. When a cell is refined, a function can be used to place
  *   new vertices on this curve. See the section on boundary
- *   approximation below. Furthermore, the the weak formulation of the
+ *   approximation below. Furthermore, the weak formulation of the
  *   partial differential equation may have different boundary
  *   conditions on different parts of the boundary. The boundary
  *   indicator can be used in creating the matrix or the right hand
@@ -871,6 +850,12 @@ namespace internal
  *   boundary or material indicator. This way, a program can easily
  *   determine, whether such an object is at the boundary or not.
  *
+ *   Lines in two dimensions and quads in three dimensions inherit their
+ *   boundary indicator to their children upon refinement. You should therefore
+ *   make sure that if you have different boundary parts, the different parts
+ *   are separated by a vertex (in 2D) or a line (in 3D) such that each boundary
+ *   line or quad has a unique boundary indicator.
+ *
  *   Since in one dimension, no substructures of lower dimension exist to
  *   cells (of course apart from vertices, but these are handled
  *   in another way than the structures and substructures with dimension one
@@ -881,6 +866,7 @@ namespace internal
  *   are at one of the endpoints. Only the handling of boundary values gets
  *   a bit more complicated, but this seems to be the price to be paid for
  *   the different handling of vertices from lines and quads.
+ *
  *
  *
  *   <h3>History of a triangulation</h3>
