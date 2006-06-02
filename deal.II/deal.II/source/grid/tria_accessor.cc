@@ -2040,7 +2040,7 @@ CellAccessor<dim>::neighbor_of_coarser_neighbor (const unsigned int neighbor) co
     =neighbor_cell->face(face_no_guess);
   
   if (face_guess->has_children())
-    for (unsigned int subface_no=0; face_guess->n_children(); ++subface_no)
+    for (unsigned int subface_no=0; subface_no<face_guess->n_children(); ++subface_no)
       if (face_guess->child(subface_no)==this_face)
 	return std::make_pair (face_no_guess, subface_no);
 
