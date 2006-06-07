@@ -1600,9 +1600,10 @@ class SparseMatrix : public virtual Subscriptor
 				      * checking is performed which
 				      * will recognize the bluntest
 				      * attempts to interpret some
-				      * data as a vector stored
-				      * bitwise to a file, but not
-				      * more.
+				      * data as a matrix stored
+				      * bitwise to a file that wasn't
+				      * actually created that way, but
+				      * not more.
 				      */
     void block_read (std::istream &in);
 
