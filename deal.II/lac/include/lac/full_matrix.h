@@ -20,6 +20,7 @@
 #include <lac/identity_matrix.h>
 
 #include <vector>
+#include <iomanip>
 
 // forward declarations
 template<typename number> class Vector;
