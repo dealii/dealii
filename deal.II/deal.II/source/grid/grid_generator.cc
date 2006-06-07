@@ -1037,12 +1037,60 @@ GridGenerator::half_hyper_shell (Triangulation<dim>   &tria,
 
 // Implementation for 3D only
 template <int dim>
-void GridGenerator::hyper_cube_slit (Triangulation<dim> &,
-				     const double,
-				     const double,
-				     const bool)
+void GridGenerator::hyper_cube_slit (Triangulation<dim>& tria,
+				     const double left,
+				     const double right,
+				     const bool colorize)
 {
-  Assert (false, ExcNotImplemented());
+  const double rl2=(right+left)/2;
+  const double len = (right-left)/2.;
+  
+  const Point<dim> vertices[20] = {
+	Point<dim>(left, left , -len/2.),
+	Point<dim>(rl2,  left , -len/2.),
+	Point<dim>(rl2,  rl2  , -len/2.),
+	Point<dim>(left, rl2  , -len/2.),
+	Point<dim>(right,left , -len/2.),
+	Point<dim>(right,rl2  , -len/2.),
+	Point<dim>(rl2,  right, -len/2.),
+	Point<dim>(left, right, -len/2.),
+	Point<dim>(right,right, -len/2.),
+	Point<dim>(rl2,  left , -len/2.),
+	Point<dim>(left, left , len/2.),
+	Point<dim>(rl2,  left , len/2.),
+	Point<dim>(rl2,  rl2  , len/2.),
+	Point<dim>(left, rl2  , len/2.),
+	Point<dim>(right,left , len/2.),
+	Point<dim>(right,rl2  , len/2.),
+	Point<dim>(rl2,  right, len/2.),
+	Point<dim>(left, right, len/2.),
+	Point<dim>(right,right, len/2.),
+	Point<dim>(rl2,  left , len/2.)
+  };
+  const int cell_vertices[4][8] = { { 0,1,3,2, 10, 11, 13, 12 },
+				    { 9,4,2,5, 19,14, 12, 15 },
+				    { 3,2,7,6,13,12,17,16 },
+				    { 2,5,6,8,12,15,16,18 } };
+  std::vector<CellData<dim> > cells (4, CellData<dim>());
+  for (unsigned int i=0; i<4; ++i)
+    {
+      for (unsigned int j=0; j<8; ++j)
+	cells[i].vertices[j] = cell_vertices[i][j];
+      cells[i].material_id = 0;
+    };
+  tria.create_triangulation (
+    std::vector<Point<dim> >(&vertices[0], &vertices[20]),
+    cells,
+    SubCellData());       // no boundary information
+
+  if (colorize)
+    {
+      Assert(false, ExcNotImplemented());
+      typename Triangulation<dim>::cell_iterator cell = tria.begin();
+      cell->face(1)->set_boundary_indicator(1);
+      ++cell;
+      cell->face(3)->set_boundary_indicator(2);
+    }
 }
 
 

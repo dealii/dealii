@@ -421,16 +421,17 @@ class GridGenerator
 				      * the square at
 				      * <tt>x=y=(left+right)/2</tt>.
 				      *
-				      * The triangulation needs to be
-				      * void upon calling this
-				      * function.
-				      *
+				      * In 3d, the 2d domain is just
+				      * extended in the
+				      * <i>z</i>-direction, such that
+				      * a plane cuts the lower half of
+				      * a rectangle in two.
+				      
 				      * This function is declared to
 				      * exist for triangulations of
 				      * all space dimensions, but
 				      * throws an error if called in
-				      * 1d. It is also presently not
-				      * implemented in 3d.
+				      * 1d.
 				      *
 				      * @note The triangulation needs to be
 				      * void upon calling this

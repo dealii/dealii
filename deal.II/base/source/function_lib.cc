@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -891,10 +891,11 @@ namespace Functions
   
 //////////////////////////////////////////////////////////////////////
   
-  
+  template <int dim>
   double
-  SlitSingularityFunction::value (const Point<2>   &p,
-				  const unsigned int) const
+  SlitSingularityFunction<dim>::value (
+    const Point<dim>   &p,
+    const unsigned int) const
   {
     double x = p(0);
     double y = p(1);
@@ -906,10 +907,12 @@ namespace Functions
   }
   
   
+  template <int dim>
   void
-  SlitSingularityFunction::value_list (const std::vector<Point<2> > &points,
-				       std::vector<double>            &values,
-				       const unsigned int) const
+  SlitSingularityFunction<dim>::value_list (
+    const std::vector<Point<dim> > &points,
+    std::vector<double>            &values,
+    const unsigned int) const
   {
     Assert (values.size() == points.size(),
 	    ExcDimensionMismatch(values.size(), points.size()));
@@ -927,18 +930,21 @@ namespace Functions
   }
   
   
+  template <int dim>
   double
-  SlitSingularityFunction::laplacian (const Point<2>   &,
+  SlitSingularityFunction<dim>::laplacian (const Point<dim>   &,
 				      const unsigned int) const
   {
     return 0.;
   }
   
   
+  template <int dim>
   void
-  SlitSingularityFunction::laplacian_list (const std::vector<Point<2> > &points,
-					   std::vector<double>            &values,
-					   const unsigned int) const
+  SlitSingularityFunction<dim>::laplacian_list (
+    const std::vector<Point<dim> > &points,
+    std::vector<double>            &values,
+    const unsigned int) const
   {
     Assert (values.size() == points.size(),
 	    ExcDimensionMismatch(values.size(), points.size()));
@@ -948,8 +954,9 @@ namespace Functions
   }
   
   
-  Tensor<1,2>
-  SlitSingularityFunction::gradient (const Point<2>   &p,
+  template <int dim>
+  Tensor<1,dim>
+  SlitSingularityFunction<dim>::gradient (const Point<dim>   &p,
 				     const unsigned int) const
   {
     double x = p(0);
@@ -957,17 +964,17 @@ namespace Functions
     double phi = std::atan2(x,y)+M_PI;
     double r64 = std::pow(x*x+y*y,3./4.);
     
-    
-    Tensor<1,2> result;
+    Tensor<1,dim> result;
     result[0] = 1./2.*(std::sin(1./2.*phi)*x + std::cos(1./2.*phi)*y)/r64;
     result[1] = 1./2.*(std::sin(1./2.*phi)*y - std::cos(1./2.*phi)*x)/r64;
     return result;
   }
   
   
+  template <int dim>
   void
-  SlitSingularityFunction::gradient_list (const std::vector<Point<2> > &points,
-					  std::vector<Tensor<1,2> >    &gradients,
+  SlitSingularityFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
+					  std::vector<Tensor<1,dim> >    &gradients,
 					  const unsigned int) const
   {
     Assert (gradients.size() == points.size(),
@@ -975,7 +982,7 @@ namespace Functions
     
     for (unsigned int i=0;i<points.size();++i)
       {
-	const Point<2>& p = points[i];
+	const Point<dim>& p = points[i];
 	double x = p(0);
 	double y = p(1);
 	double phi = std::atan2(x,y)+M_PI;
@@ -983,6 +990,8 @@ namespace Functions
 	
 	gradients[i][0] = 1./2.*(std::sin(1./2.*phi)*x + std::cos(1./2.*phi)*y)/r64;
 	gradients[i][1] = 1./2.*(std::sin(1./2.*phi)*y - std::cos(1./2.*phi)*x)/r64;
+	for (unsigned int d=2;d<dim;++d)
+	  gradients[i][d] = 0.;
       }
   }
   
@@ -1491,4 +1500,6 @@ namespace Functions
   template class FourierSineSum<1>;
   template class FourierSineSum<2>;
   template class FourierSineSum<3>;
+  template class SlitSingularityFunction<2>;
+  template class SlitSingularityFunction<3>;
 }
