@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,11 +45,22 @@ class QGauss : public Quadrature<dim>
 
 
 /**
- * Gauss quadrature rule using the Gauss-Lobatto points.
+ * The Gauss-Lobatto quadrature rule.
+ *
+ * This modification of the Gauss quadrature uses the two interval end
+ * points as well. Being exact for polynomials of degree <i>2n-2</i>,
+ * this formula is suboptimal by one degree.
+ *
+ * The quadrature points are interval end points plus the zeroes of
+ * the derivative of the Legendre polynomial <i>P<sub>n-1</sub></i> of
+ * degree <i>n-1</i>. The quadrature weights are
+ * <i>2/(n(n-1)(P<sub>n-1</sub>(x<sub>i</sub>)<sup>2</sup>)</i>.
  *
  * @note The quadrature weights are not implemented yet.
  *
- * @author Guido Kanschat, 2005
+ * @sa http://en.wikipedia.org/wiki/Handbook_of_Mathematical_Functions
+ *
+ * @author Guido Kanschat, 2005, 2006
  */
 template<int dim>
 class QGaussLobatto : public Quadrature<dim>
