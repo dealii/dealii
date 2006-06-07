@@ -22,7 +22,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
-#include <iomanip>
 #include <algorithm>
 
 template <typename number>
