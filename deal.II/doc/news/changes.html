@@ -486,6 +486,17 @@ inconvenience this causes.
 
 <ol>
   
+  <li> <p>Fixed: The <code
+       class="class">FullMatrix::print</code> would yield a link error
+       when used with <code>std::ofstream</code> since an explicit
+       instantiation was missing. The function has now been moved to
+       the header file and made inline so that it is always visible,
+       whatever the type of the output stream is.
+       <br> 
+       (WB 2006/06/07)
+       </p>
+
+  
   <li> <p> Improved: The <code
        class="class">SparseDirectUMFPACK</code> solver can now also be
        used with sparse matrices with elements of type float, as well

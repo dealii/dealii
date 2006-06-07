@@ -1423,6 +1423,28 @@ FullMatrix<number>::end (const unsigned int r) const
   return const_iterator(this, r+1, 0);
 }
 
+
+
+template <typename number>
+template <class STREAM>
+inline
+void
+FullMatrix<number>::print (STREAM             &s,
+			   const unsigned int  w,
+			   const unsigned int  p) const
+{
+  Assert (!this->empty(), ExcEmptyMatrix());
+  
+  for (unsigned int i=0; i<this->m(); ++i)
+    {
+      for (unsigned int j=0; j<this->n(); ++j)
+	s << std::setw(w) << std::setprecision(p) << this->el(i,j);
+      s << std::endl;
+    }
+}
+
+
+
 #endif // DOXYGEN
 
 #endif

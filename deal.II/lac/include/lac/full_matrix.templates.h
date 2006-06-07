@@ -1032,6 +1032,7 @@ number FullMatrix<number>::l1_norm () const
 }
 
 
+
 template <typename number>
 number FullMatrix<number>::linfty_norm () const
 {
@@ -1051,23 +1052,6 @@ number FullMatrix<number>::linfty_norm () const
   return max;
 }
 
-
-template <typename number>
-template <class STREAM>
-void
-FullMatrix<number>::print (STREAM             &s,
-			   const unsigned int  w,
-			   const unsigned int  p) const
-{
-  Assert (!this->empty(), ExcEmptyMatrix());
-  
-  for (unsigned int i=0; i<this->m(); ++i)
-    {
-      for (unsigned int j=0; j<this->n(); ++j)
-	s << std::setw(w) << std::setprecision(p) << this->el(i,j);
-      s << std::endl;
-    }
-}
 
 
 template <typename number>
