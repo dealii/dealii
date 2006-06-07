@@ -143,12 +143,12 @@ int main()
   check_select (fe1, 1, 1, v1, v1);
   check_select (fe1, 1, 2, v1, v1);
   check_select (fe1, 2, 1, v1, v1);
-//   check_select (fe1, 0, 0, v2, v2);
-//   check_select (fe1, 0, 0, v3, v3);
-//   check_select (fe1, 1, 1, v3, v3);
-//   check_select (fe1, 0, 0, v1, v3);
-//   check_select (fe1, 1, 1, v1, v3);
-//   check_select (fe1, 2, 1, v1, v3);
-//   check_select (fe1, 0, 1, v1, v3);
-//   check_select (fe1, 0, 0, v1, v2);
+  check_select (fe1, 0, 0, v2, v2);
+  check_select (fe1, 0, 0, v3, v3);
+  check_select (fe1, 1, 1, v3, v3);
+  check_select (fe1, 0, 0, v1, v3);
+  check_select (fe1, 1, 1, v1, v3);
+  check_select (fe1, 2, 1, v1, v3);
+  check_select (fe1, 0, 1, v1, v3);
+  check_select (fe1, 0, 0, v1, v2);
 }

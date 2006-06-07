@@ -135,37 +135,37 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   
-//   std::vector<unsigned int> v1(4);
-//   std::vector<unsigned int> v2(4);
-//   std::vector<unsigned int> v3(4);
-//   for (unsigned int i=0;i<4;++i)
-//     {
-//       v1[i] = i;
-//       v2[i] = 0;
-//       v3[i] = i;
-//     }
-//   v3[0] = 0;
-//   v3[1] = 1;
-//   v3[2] = 1;
-//   v3[3] = 2;
+  std::vector<unsigned int> v1(4);
+  std::vector<unsigned int> v2(4);
+  std::vector<unsigned int> v3(4);
+  for (unsigned int i=0;i<4;++i)
+    {
+      v1[i] = i;
+      v2[i] = 0;
+      v3[i] = i;
+    }
+  v3[0] = 0;
+  v3[1] = 1;
+  v3[2] = 1;
+  v3[3] = 2;
 
-//   std::vector<double> factors;
+  std::vector<double> factors;
   
-//   FESystem<2> fe1(FE_DGQ<2>(1), 4);
+  FESystem<2> fe1(FE_DGQ<2>(1), 4);
   
-//   vector<bool> s1(4, true);
+  vector<bool> s1(4, true);
   
-//   deallog << "s1 s1 v1 v1" << std::endl;
-//   check_block(fe1, s1, s1, factors, v1, v1);
-// //   deallog << "s1 s1 v1 v2" << std::endl;
-// //   check_block(fe1, s1, s1, factors, v1, v2);
-// //   deallog << "s1 s1 v1 v3" << std::endl;
-// //   check_block(fe1, s1, s1, factors, v1, v3);
+  deallog << "s1 s1 v1 v1" << std::endl;
+  check_block(fe1, s1, s1, factors, v1, v1);
+//   deallog << "s1 s1 v1 v2" << std::endl;
+//   check_block(fe1, s1, s1, factors, v1, v2);
+//   deallog << "s1 s1 v1 v3" << std::endl;
+//   check_block(fe1, s1, s1, factors, v1, v3);
   
-//   factors.resize(4, 1.);
-//   factors[1] = 2.;
-//   deallog << "s1 s1 v1 v1" << std::endl;
-//   check_block(fe1, s1, s1, factors, v1, v1);  
-// //   deallog << "s1 s1 v1 v3" << std::endl;
-// //   check_block(fe1, s1, s1, factors, v1, v3);  
+  factors.resize(4, 1.);
+  factors[1] = 2.;
+  deallog << "s1 s1 v1 v1" << std::endl;
+  check_block(fe1, s1, s1, factors, v1, v1);  
+//   deallog << "s1 s1 v1 v3" << std::endl;
+//   check_block(fe1, s1, s1, factors, v1, v3);  
 }
