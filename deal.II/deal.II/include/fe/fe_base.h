@@ -398,6 +398,25 @@ class FiniteElementData
 				     /**
 				      * Given an index in the natural
 				      * ordering of indices on a face,
+				      * return the index of the same
+				      * degree of freedom on the cell.
+				      * 
+				      */
+    unsigned int face_to_cell_index(unsigned int face_index,
+				    unsigned int face,
+				    bool orientation = true) const;
+    
+				     /**
+				      * @deprecated This function is
+				      * just a special version of
+				      * face_to_cell_index for the face
+				      * zero. It is therefore of
+				      * limited use in aplications and
+				      * most of the time, the other
+				      * function is what is required.
+				      *
+				      * Given an index in the natural
+				      * ordering of indices on a face,
 				      * return the index of an
 				      * equivalent degree of freedom
 				      * on the cell.
@@ -423,6 +442,7 @@ class FiniteElementData
 				      *  if (fe.is_primitive(fe.face_to_equivalent_cell_index(i)))
 				      *   ... do whatever
 				      * @endcode
+				      *
 				      */
     unsigned int face_to_equivalent_cell_index (const unsigned int index) const;
     
@@ -535,7 +555,7 @@ FiniteElementData<1>::
 face_to_equivalent_cell_index (const unsigned int index) const
 {
   Assert (index < dofs_per_face,
-	  ExcIndexRange (index, 0, dofs_per_vertex));
+	  ExcIndexRange (index, 0, dofs_per_face));
   return index;
 }
 
@@ -548,17 +568,11 @@ FiniteElementData<2>::
 face_to_equivalent_cell_index (const unsigned int index) const
 {
   Assert (index < dofs_per_face,
-	  ExcIndexRange (index, 0, dofs_per_vertex));
-  return (index < (GeometryInfo<2>::vertices_per_face *
-		   this->dofs_per_vertex)
-	  ?
-	  index
-	  :
-	  GeometryInfo<2>::vertices_per_cell *
-	  this->dofs_per_vertex +
-	  (index -
-	   GeometryInfo<2>::vertices_per_face *
-	   this->dofs_per_vertex));
+	  ExcIndexRange (index, 0, dofs_per_face));
+  return (index < (this->first_face_line_index)
+	  ? index
+	  : this->first_line_index +
+	  (index - this->first_face_line_index));
 }
 
 
@@ -571,34 +585,15 @@ FiniteElementData<3>::
 face_to_equivalent_cell_index (const unsigned int index) const
 {
   Assert (index < dofs_per_face,
-	  ExcIndexRange (index, 0, dofs_per_vertex));
+	  ExcIndexRange (index, 0, dofs_per_face));
   return (index < (GeometryInfo<3>::vertices_per_face *
 		   this->dofs_per_vertex)
-	  ?
-	  index
-	  :
-	  (index < (GeometryInfo<3>::vertices_per_face *
-		    this->dofs_per_vertex
-		    +
-		    GeometryInfo<3>::lines_per_face *
-		    this->dofs_per_line)
-	   ?
-	   GeometryInfo<3>::vertices_per_cell *
-	   this->dofs_per_vertex +
-	   (index -
-	    GeometryInfo<3>::vertices_per_face *
-	    this->dofs_per_vertex)
-	   :
-	   GeometryInfo<3>::vertices_per_cell *
-	   this->dofs_per_vertex +
-	   GeometryInfo<3>::lines_per_cell *
-	   this->dofs_per_line +
-	   (index -
-	    GeometryInfo<3>::vertices_per_face *
-	    this->dofs_per_vertex
-	    -
-	    GeometryInfo<3>::lines_per_face *
-	    this->dofs_per_line)));
+	  ? index
+	  : (index < (this->first_face_quad_index)
+	     ? this->first_line_index +
+	     (index - this->first_face_line_index)
+	     : this->first_quad_index +
+	   (index - this->first_face_quad_index)));
 }
 
 
