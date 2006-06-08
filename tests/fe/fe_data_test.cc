@@ -153,7 +153,7 @@ void test_fe_datas()
       deallog << "generalized_face_support_points=" << fe_data->get_generalized_face_support_points().size()
 	      << std::endl;
       
-      dealog << "face_to_equivalent_cell_index:";
+      deallog << "face_to_equivalent_cell_index:";
       for (unsigned int i=0;i<fe_data->dofs_per_face;++i)
 	deallog << ' ' << fe_data->face_to_equivalent_cell_index(i);
       deallog << std::endl;
