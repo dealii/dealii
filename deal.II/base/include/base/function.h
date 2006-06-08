@@ -202,11 +202,6 @@ class Function : public FunctionTime,
 				      * vector-valued function at a
 				      * given point.
 				      *
-				      * Be default, this function
-				      * repeatedly calls value() for
-				      * each component separately, to
-				      * fill the output array.
-				      *
 				      * <tt>values</tt> shall have the right
 				      * size beforehand,
 				      * i.e. #n_components.
@@ -222,6 +217,11 @@ class Function : public FunctionTime,
 				      * that <tt>values</tt> already has the
 				      * right size, i.e.  the same
 				      * size as the <tt>points</tt> array.
+				      *
+				      * Be default, this function
+				      * repeatedly calls value() for
+				      * each point separately, to
+				      * fill the output array.
 				      */
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<double>            &values,
@@ -237,6 +237,11 @@ class Function : public FunctionTime,
 				      * all elements be vectors with
 				      * the same number of components
 				      * as this function has.
+				      *
+				      * Be default, this function
+				      * repeatedly calls vector_value() for
+				      * each point separately, to
+				      * fill the output array.
 				      */
     virtual void vector_value_list (const std::vector<Point<dim> > &points,
 				    std::vector<Vector<double> >   &values) const;
