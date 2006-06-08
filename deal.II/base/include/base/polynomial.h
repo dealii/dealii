@@ -42,7 +42,7 @@ namespace Polynomials
  * happens through the Horner scheme which provides both numerical
  * stability and a minimal number of numerical operations.
  *
- * @author Ralf Hartmann, Guido Kanschat, 2000
+ * @author Ralf Hartmann, Guido Kanschat, 2000, 2006
  */
   template <typename number>
   class Polynomial : public Subscriptor
@@ -159,10 +159,18 @@ namespace Polynomials
       void shift (const number2 offset);
 
 				       /**
-					* Compute the derivative of
-					* the polynomial.
+					* Compute the derivative of a
+					* polynomial.
 					*/
       Polynomial<number> derivative () const;
+
+				       /**
+					* Compute the primitive of a
+					* polynomial. the coefficient
+					* of the zero order term of
+					* the polynomial is zero.
+					*/
+      Polynomial<number> primitive () const;
 
 				       /**
 					* Multiply with a scalar.
