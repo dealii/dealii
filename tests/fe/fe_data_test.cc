@@ -2,7 +2,7 @@
 //    fe_data_test.cc,v 1.14 2003/11/28 11:52:35 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -152,6 +152,11 @@ void test_fe_datas()
 	      << std::endl;
       deallog << "generalized_face_support_points=" << fe_data->get_generalized_face_support_points().size()
 	      << std::endl;
+      
+      dealog << "face_to_equivalent_cell_index:";
+      for (unsigned int i=0;i<fe_data->dofs_per_face;++i)
+	deallog << ' ' << fe_data->face_to_equivalent_cell_index(i);
+      deallog << std::endl;
       
       for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
 	{
