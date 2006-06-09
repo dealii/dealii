@@ -157,6 +157,13 @@ void test_fe_datas()
       for (unsigned int i=0;i<fe_data->dofs_per_face;++i)
 	deallog << ' ' << fe_data->face_to_equivalent_cell_index(i);
       deallog << std::endl;
+      for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+	{
+	  deallog << "face_to_cell_index:";
+	  for (unsigned int i=0;i<fe_data->dofs_per_face;++i)
+	    deallog << ' ' << fe_data->face_to_cell_index(i, f);
+	  deallog << std::endl;
+	}
       
       for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
 	{
