@@ -23,7 +23,7 @@ default: run-tests
 
 tests_x=fe_data_test traits fe_tools fe_tools_test mapping \
         mapping_c1 shapes derivatives function numbering mapping_q1_eulerian \
-        transfer internals \
+        transfer internals derivatives_face \
 	dgq_1 \
 	q_* \
 	interpolate_q1 \
