@@ -231,7 +231,8 @@ GeometryInfo<1>::child_cell_on_face (const unsigned int face,
 				     const bool)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
-  Assert (subface==subfaces_per_face, ExcIndexRange(subface, 0, 1));
+  Assert (subface<subfaces_per_face,
+	  ExcIndexRange(subface, 0, subfaces_per_face));
 
   return face;
 }
