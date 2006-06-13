@@ -98,7 +98,7 @@ main()
   logfile.precision (2);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
-  deallog.depth_console(10);
+  deallog.depth_console(0);
   
   deallog.push ("2d");
   plot_FE_Q_shape_functions<2>();
