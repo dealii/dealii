@@ -318,9 +318,9 @@ class TriaRawIterator :
 				      *  explicitly for the different
 				      *  @p Pointees, to allow an
 				      *  <tt>iterator<1,TriangulationLevel<1>::LinesData></tt>
-				      *  to point to <tt>tria->lines.lines[index]</tt> while
+				      *  to point to <tt>tria->lines.cells[index]</tt> while
 				      *  for one dimension higher it has
-				      *  to point to <tt>tria->quads.quads[index]</tt>.
+				      *  to point to <tt>tria->quads.cells[index]</tt>.
 				      *
 				      *  You must not dereference invalid or
 				      *  past the end iterators.
@@ -396,7 +396,9 @@ class TriaRawIterator :
 				      *  level if there are more. If the
 				      *  present element is the last on
 				      *  this level, the first on the
-				      *  next level is accessed.
+				      *  next level is accessed. This is only
+				      *  valid for iterators pointing to cells,
+				      *  faces have no level.
 				      */
     TriaRawIterator & operator ++ ();
     
@@ -429,7 +431,9 @@ class TriaRawIterator :
 				      *  this level if <tt>index>0</tt>. If the
 				      *  present element is the first on
 				      *  this level, the last on the
-				      *  previous level is accessed.
+				      *  previous level is accessed. This is only
+				      *  valid for iterators pointing to cells,
+				      *  faces have no level.
 				      */
     TriaRawIterator & operator -- ();
     
@@ -1052,7 +1056,7 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
 #ifdef DEBUG
 				   // do this like this, because:
 				   // if we write
-				   // "Assert (IteratorState::past_the_end || used)"
+				   // "Assert (IteratorState::past_the_end || !has_children())"
 				   // has_children() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!

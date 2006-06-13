@@ -232,7 +232,7 @@ class MGDoFObjectAccessor<0, dim>
 
 /**
  * Grant access to those aspects of multilevel degrees of freedom located on
- * hexes that are dimension specific. See the MGDoFAccessor class for
+ * lines that are dimension specific. See the MGDoFAccessor class for
  * more information.
  *
  * @ingroup mg

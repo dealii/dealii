@@ -129,8 +129,14 @@ DoFAccessor<structdim,DH>::child (const unsigned int i) const
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
 
+  int next_level;
+  if (DH::dimension==structdim)
+    next_level = this->present_level+1;
+  else
+    next_level = 0;
+  
   TriaIterator<DH::dimension,DoFObjectAccessor<structdim,DH> > q (this->tria,
-								  this->present_level+1,
+								  next_level,
 								  this->child_index (i),
 								  this->dof_handler);
 
@@ -183,18 +189,12 @@ unsigned int
 DoFAccessor<dim,DH>::dof_index (const unsigned int i,
 				const unsigned int fe_index) const
 {
-				   // access the respective DoF. the
-				   // last argument disambiguates
-				   // between the functions of same
-				   // name in the DoFLevel hierarchy,
-				   // to make sure we get at lines,
-				   // quads, or hexes
-  return this->dof_handler->levels[this->present_level]
-    ->get_dof_index (*this->dof_handler,
-		     this->present_index,
-		     fe_index,
-		     i,
-		     internal::StructuralDimension<dim>());
+				   // access the respective DoF 
+  return this->dof_handler
+    ->template get_dof_index<dim> (this->present_level,
+				   this->present_index,
+				   fe_index,
+				   i);
 }
 
 
@@ -206,19 +206,13 @@ DoFAccessor<dim,DH>::set_dof_index (const unsigned int i,
 				    const unsigned int index,
 				    const unsigned int fe_index) const
 {
-				   // access the respective DoF. the
-				   // last argument disambiguates
-				   // between the functions of same
-				   // name in the DoFLevel hierarchy,
-				   // to make sure we get at lines,
-				   // quads, or hexes
-  this->dof_handler->levels[this->present_level]
-    ->set_dof_index (*this->dof_handler,
-		     this->present_index,
-		     fe_index,
-		     i,
-		     index,
-		     internal::StructuralDimension<dim>());
+				   // access the respective DoF
+  this->dof_handler
+    ->template set_dof_index<dim> (this->present_level,
+				   this->present_index,
+				   fe_index,
+				   i,
+				   index);
 }
 
 
@@ -228,16 +222,10 @@ inline
 unsigned int
 DoFAccessor<dim,DH>::n_active_fe_indices () const
 {
-				   // access the respective DoF. the
-				   // last argument disambiguates
-				   // between the functions of same
-				   // name in the DoFLevel hierarchy,
-				   // to make sure we get at lines,
-				   // quads, or hexes
-  return this->dof_handler->levels[this->present_level]
-    ->template n_active_fe_indices<DH::dimension> (*this->dof_handler,
-                                                   this->present_index,
-                                                   internal::StructuralDimension<dim>());
+				   // access the respective DoF
+  return this->dof_handler
+    ->template n_active_fe_indices<dim> (this->present_level,
+					 this->present_index);
 }
 
 
@@ -247,17 +235,11 @@ inline
 bool
 DoFAccessor<dim,DH>::fe_index_is_active (const unsigned int fe_index) const
 {
-				   // access the respective DoF. the
-				   // last argument disambiguates
-				   // between the functions of same
-				   // name in the DoFLevel hierarchy,
-				   // to make sure we get at lines,
-				   // quads, or hexes
-  return this->dof_handler->levels[this->present_level]
-    ->template fe_index_is_active<DH::dimension> (*this->dof_handler,
-                                                  this->present_index,
-                                                  fe_index,
-                                                  internal::StructuralDimension<dim>());
+				   // access the respective DoF
+  return this->dof_handler
+    ->template fe_index_is_active<dim> (this->present_level,
+					this->present_index,
+					fe_index);
 }
 
 
@@ -347,7 +329,7 @@ DoFObjectAccessor<2,DH>::line (const unsigned int i) const
   return TriaIterator<dim,DoFObjectAccessor<1,DH> >
     (
       this->tria,
-      this->present_level,
+      0,
       this->line_index (i),
       this->dof_handler
     );
@@ -426,7 +408,7 @@ DoFObjectAccessor<3,DH>::line (const unsigned int i) const
   return TriaIterator<dim,DoFObjectAccessor<1,DH> >
     (
       this->tria,
-      this->present_level,
+      0,
       l->index(),
       this->dof_handler
     );
@@ -443,7 +425,7 @@ DoFObjectAccessor<3,DH>::quad (const unsigned int i) const
   return TriaIterator<dim,DoFObjectAccessor<2,DH> >
     (
       this->tria,
-      this->present_level,
+      0,
       this->quad_index (i),
       this->dof_handler
     );

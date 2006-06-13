@@ -30,6 +30,7 @@ namespace internal
   namespace DoFHandler
   {
     template <int dim> class DoFLevel;
+    template <int dim> class DoFFaces;
   }
 }
 
@@ -313,7 +314,7 @@ class DoFHandler  :  public Subscriptor
 				      * dimension less.
 				      */
     unsigned int max_couplings_between_boundary_dofs () const;
-
+				     
 				     /**
 				      *  @name Cell iterator functions
 				      */
@@ -452,7 +453,7 @@ class DoFHandler  :  public Subscriptor
 				      *  This function calls @p begin_raw_line
 				      *  in 2D and @p begin_raw_quad in 3D.
 				      */
-    raw_face_iterator    begin_raw_face   (const unsigned int level = 0) const;
+    raw_face_iterator    begin_raw_face   () const;
 
 				     /**
 				      *  Iterator to the first used face
@@ -461,7 +462,7 @@ class DoFHandler  :  public Subscriptor
 				      *  This function calls @p begin_line
 				      *  in 2D and @p begin_quad in 3D.
 				      */
-    face_iterator        begin_face       (const unsigned int level = 0) const;
+    face_iterator        begin_face       () const;
 
 				     /**
 				      *  Iterator to the first active
@@ -470,7 +471,7 @@ class DoFHandler  :  public Subscriptor
 				      *  This function calls @p begin_active_line
 				      *  in 2D and @p begin_active_quad in 3D.
 				      */
-    active_face_iterator begin_active_face(const unsigned int level = 0) const;
+    active_face_iterator begin_active_face() const;
 
 				     /**
 				      *  Iterator past the end; this
@@ -484,20 +485,12 @@ class DoFHandler  :  public Subscriptor
     raw_face_iterator    end_face () const;
 
 				     /**
-				      * Return an iterator which is the first
-				      * iterator not on level. If @p level is
-				      * the last level, then this returns
-				      * <tt>end()</tt>.
-				      */
-    face_iterator        end_face (const unsigned int level) const;
-    
-				     /**
 				      * Return a raw iterator which is the first
 				      * iterator not on level. If @p level is
 				      * the last level, then this returns
 				      * <tt>end()</tt>.
 				      */
-    raw_face_iterator    end_raw_face (const unsigned int level) const;
+    raw_face_iterator    end_raw_face () const;
 
     				     /**
 				      * Return an active iterator which is the
@@ -505,7 +498,7 @@ class DoFHandler  :  public Subscriptor
 				      * is the last level, then this returns
 				      * <tt>end()</tt>.
 				      */
-    active_face_iterator end_active_face (const unsigned int level) const;
+    active_face_iterator end_active_face () const;
 
 				     /**
 				      *  Return an iterator pointing to the
@@ -515,15 +508,6 @@ class DoFHandler  :  public Subscriptor
 				      *  in 2D and @p last_raw_quad in 3D.
 				      */
     raw_face_iterator    last_raw_face () const;
-
-				     /**
-				      *  Return an iterator pointing to the last
-				      *  face of the level @p level, used or not.
-				      *
-				      *  This function calls @p last_raw_line
-				      *  in 2D and @p last_raw_quad in 3D.
-				      */
-    raw_face_iterator    last_raw_face (const unsigned int level) const;
 
 				     /**
 				      *  Return an iterator pointing to the last
@@ -552,14 +536,6 @@ class DoFHandler  :  public Subscriptor
 				      */
     active_face_iterator last_active_face () const;
 
-				     /**
-				      *  Return an iterator pointing to the last
-				      *  active face on level @p level.
-				      *
-				      *  This function calls @p last_active_line
-				      *  in 2D and @p last_active_quad in 3D.
-				      */
-    active_face_iterator last_active_face (const unsigned int level) const;
 				     //@}
 
 
@@ -1120,6 +1096,41 @@ class DoFHandler  :  public Subscriptor
 			  const unsigned int local_index) const;
 
 				     /**
+				      *  Return the @p i-th dof-index. This function calls
+				      *  the respective function of DoFObjects.
+				      */
+    template <int structdim>
+    unsigned int get_dof_index (const unsigned int       obj_level,
+				const unsigned int       obj_index,
+				const unsigned int       fe_index,
+				const unsigned int       local_index) const;
+				     /**
+				      *  Set the @p i-th dof-index. This function calls
+				      *  the respective function of DoFObjects.
+				      */
+    template <int structdim>
+    void set_dof_index (const unsigned int       obj_level,
+			const unsigned int       obj_index,
+			const unsigned int       fe_index,
+			const unsigned int       local_index,
+			const unsigned int       global_index) const;
+				       /**
+					* number of active fe-indices, calls the respective
+					* function in DoFObjects
+					*/
+    template <int structdim>
+    unsigned int n_active_fe_indices (const unsigned int obj_level,
+				      const unsigned int obj_index) const;
+				     /**
+				      * return, wether fe-index is an active fe, calls the
+				      * respective function in DoFObjects
+				      */
+    template <int structdim>
+    bool fe_index_is_active (const unsigned int obj_level,
+			     const unsigned int obj_index,
+			     const unsigned int fe_index) const;
+           
+				     /**
 				      * Space to store the DoF numbers for the
 				      * different levels. Analogous to the
 				      * <tt>levels[]</tt> tree of the Triangulation
@@ -1127,6 +1138,7 @@ class DoFHandler  :  public Subscriptor
 				      */
     std::vector<internal::DoFHandler::DoFLevel<dim>*>    levels;
 
+    internal::DoFHandler::DoFFaces<dim> * faces;
 				     /**
 				      * Store the number of dofs created last
 				      * time.
@@ -1182,16 +1194,13 @@ template <> DoFHandler<1>::cell_iterator DoFHandler<1>::last () const;
 template <> DoFHandler<1>::cell_iterator DoFHandler<1>::last (const unsigned int level) const;
 template <> DoFHandler<1>::active_cell_iterator DoFHandler<1>::last_active () const;
 template <> DoFHandler<1>::active_cell_iterator DoFHandler<1>::last_active (const unsigned int level) const;
-template <> DoFHandler<1>::raw_face_iterator DoFHandler<1>::begin_raw_face (const unsigned int) const;
-template <> DoFHandler<1>::face_iterator DoFHandler<1>::begin_face (const unsigned int) const;
-template <> DoFHandler<1>::active_face_iterator DoFHandler<1>::begin_active_face (const unsigned int) const;
+template <> DoFHandler<1>::raw_face_iterator DoFHandler<1>::begin_raw_face () const;
+template <> DoFHandler<1>::face_iterator DoFHandler<1>::begin_face () const;
+template <> DoFHandler<1>::active_face_iterator DoFHandler<1>::begin_active_face () const;
 template <> DoFHandler<1>::raw_face_iterator DoFHandler<1>::end_face () const;
 template <> DoFHandler<1>::raw_face_iterator DoFHandler<1>::last_raw_face () const;
-template <> DoFHandler<1>::raw_face_iterator DoFHandler<1>::last_raw_face (const unsigned int) const;
 template <> DoFHandler<1>::face_iterator DoFHandler<1>::last_face () const;
-template <> DoFHandler<1>::face_iterator DoFHandler<1>::last_face (const unsigned int) const;
 template <> DoFHandler<1>::active_face_iterator DoFHandler<1>::last_active_face () const;
-template <> DoFHandler<1>::active_face_iterator DoFHandler<1>::last_active_face (const unsigned int) const;
 template <> DoFHandler<1>::raw_quad_iterator DoFHandler<1>::begin_raw_quad (const unsigned int) const;
 template <> DoFHandler<1>::quad_iterator DoFHandler<1>::begin_quad (const unsigned int) const;
 template <> DoFHandler<1>::active_quad_iterator DoFHandler<1>::begin_active_quad (const unsigned int) const;
@@ -1222,16 +1231,13 @@ template <> DoFHandler<2>::cell_iterator DoFHandler<2>::last () const;
 template <> DoFHandler<2>::cell_iterator DoFHandler<2>::last (const unsigned int level) const;
 template <> DoFHandler<2>::active_cell_iterator DoFHandler<2>::last_active () const;
 template <> DoFHandler<2>::active_cell_iterator DoFHandler<2>::last_active (const unsigned int level) const;
-template <> DoFHandler<2>::raw_face_iterator DoFHandler<2>::begin_raw_face (const unsigned int level) const;
-template <> DoFHandler<2>::face_iterator DoFHandler<2>::begin_face (const unsigned int level) const;
-template <> DoFHandler<2>::active_face_iterator DoFHandler<2>::begin_active_face (const unsigned int level) const;
+template <> DoFHandler<2>::raw_face_iterator DoFHandler<2>::begin_raw_face () const;
+template <> DoFHandler<2>::face_iterator DoFHandler<2>::begin_face () const;
+template <> DoFHandler<2>::active_face_iterator DoFHandler<2>::begin_active_face () const;
 template <> DoFHandler<2>::raw_face_iterator DoFHandler<2>::end_face () const;
 template <> DoFHandler<2>::raw_face_iterator DoFHandler<2>::last_raw_face () const;
-template <> DoFHandler<2>::raw_face_iterator DoFHandler<2>::last_raw_face (const unsigned int level) const;
 template <> DoFHandler<2>::face_iterator DoFHandler<2>::last_face () const;
-template <> DoFHandler<2>::face_iterator DoFHandler<2>::last_face (const unsigned int level) const;
 template <> DoFHandler<2>::active_face_iterator DoFHandler<2>::last_active_face () const;
-template <> DoFHandler<2>::active_face_iterator DoFHandler<2>::last_active_face (const unsigned int level) const;
 template <> DoFHandler<2>::raw_hex_iterator DoFHandler<2>::begin_raw_hex (const unsigned int) const;
 template <> DoFHandler<2>::hex_iterator DoFHandler<2>::begin_hex (const unsigned int) const;
 template <> DoFHandler<2>::active_hex_iterator DoFHandler<2>::begin_active_hex (const unsigned int) const;
@@ -1252,16 +1258,13 @@ template <> DoFHandler<3>::cell_iterator DoFHandler<3>::last () const;
 template <> DoFHandler<3>::cell_iterator DoFHandler<3>::last (const unsigned int level) const;
 template <> DoFHandler<3>::active_cell_iterator DoFHandler<3>::last_active () const;
 template <> DoFHandler<3>::active_cell_iterator DoFHandler<3>::last_active (const unsigned int level) const;
-template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::begin_raw_face (const unsigned int level) const;
-template <> DoFHandler<3>::face_iterator DoFHandler<3>::begin_face (const unsigned int level) const;
-template <> DoFHandler<3>::active_face_iterator DoFHandler<3>::begin_active_face (const unsigned int level) const;
+template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::begin_raw_face () const;
+template <> DoFHandler<3>::face_iterator DoFHandler<3>::begin_face () const;
+template <> DoFHandler<3>::active_face_iterator DoFHandler<3>::begin_active_face () const;
 template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::end_face () const;
 template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::last_raw_face () const;
-template <> DoFHandler<3>::raw_face_iterator DoFHandler<3>::last_raw_face (const unsigned int level) const;
 template <> DoFHandler<3>::face_iterator DoFHandler<3>::last_face () const;
-template <> DoFHandler<3>::face_iterator DoFHandler<3>::last_face (const unsigned int level) const;
 template <> DoFHandler<3>::active_face_iterator DoFHandler<3>::last_active_face () const;
-template <> DoFHandler<3>::active_face_iterator DoFHandler<3>::last_active_face (const unsigned int level) const;
 
 template <>
 unsigned int DoFHandler<1>::distribute_dofs_on_cell (active_cell_iterator &cell,

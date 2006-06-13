@@ -11,10 +11,10 @@
 //
 //---------------------------------------------------------------------------
 
-
 #include <base/memory_consumption.h>
 #include <grid/tria.h>
 #include <grid/tria_levels.h>
+#include <grid/tria_faces.h>
 #include <grid/tria_boundary.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
@@ -51,6 +51,7 @@ Triangulation<dim>::dimension;
 template <int dim>
 Triangulation<dim>::Triangulation (const MeshSmoothing smooth_grid) :
 		Subscriptor (),
+		faces(NULL),
 		smooth_grid(smooth_grid)
 {
 				   // set default boundary for all
@@ -78,6 +79,7 @@ Triangulation<dim>::~Triangulation ()
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
   levels.clear ();
+  delete faces;
 }
 
 
@@ -174,6 +176,17 @@ Triangulation<1>::end () const
   return end_line ();
 }
 
+template <>
+Triangulation<1>::raw_line_iterator
+Triangulation<1>::begin_raw_line (const unsigned int level) const;
+
+template <>
+Triangulation<1>::raw_line_iterator
+Triangulation<1>::last_raw_line (const unsigned int level) const;
+
+template <>
+unsigned int
+Triangulation<1>::n_raw_lines (const unsigned int level) const;
 #endif
 
 
@@ -194,6 +207,17 @@ Triangulation<2>::end () const
   return end_quad ();
 }
 
+template <>
+Triangulation<2>::raw_quad_iterator
+Triangulation<2>::begin_raw_quad (const unsigned int level) const;
+
+template <>
+Triangulation<2>::raw_quad_iterator
+Triangulation<2>::last_raw_quad (const unsigned int level) const;
+
+template <>
+unsigned int
+Triangulation<2>::n_raw_quads (const unsigned int level) const;
 #endif
 
 
@@ -225,14 +249,19 @@ void Triangulation<dim>::copy_triangulation (const Triangulation<dim> &old_tria)
 {
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (levels.size () == 0, ExcTriangulationNotEmpty());
+  Assert (faces == NULL, ExcTriangulationNotEmpty());
 
   Assert (old_tria.levels.size() != 0, ExcInternalError());
   Assert (old_tria.vertices.size() != 0, ExcInternalError());
+  Assert (dim == 1 || old_tria.faces != NULL, ExcInternalError());
+  
   
 				   // copy normal elements
   vertices      = old_tria.vertices;
   vertices_used = old_tria.vertices_used;
   smooth_grid   = old_tria.smooth_grid;
+  
+  faces         = new internal::Triangulation::TriaFaces<dim>(*old_tria.faces);
 
   for (unsigned i=0;i<255;++i)
     boundary[i] = old_tria.boundary[i];
@@ -277,6 +306,8 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
   
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (levels.size() == 0, ExcTriangulationNotEmpty());
+  Assert (faces == NULL, ExcTriangulationNotEmpty());
+  
 				   // check that no forbidden arrays
 				   // are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
@@ -294,8 +325,7 @@ void Triangulation<1>::create_triangulation (const std::vector<Point<1> >    &v,
   levels.push_back (new internal::Triangulation::TriaLevel<dim>);
   levels[0]->internal::Triangulation::TriaLevel<0>
     ::reserve_space (cells.size(), dim);
-  levels[0]->internal::Triangulation::TriaLevel<1>
-    ::reserve_space (cells.size());
+  levels[0]->lines.reserve_space (cells.size());
   
 				   // make up cells
   raw_line_iterator next_free_line = begin_raw_line ();
@@ -445,6 +475,7 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (levels.size() == 0, ExcTriangulationNotEmpty());
+  Assert (faces == NULL, ExcTriangulationNotEmpty());
 				   // check that no forbidden arrays
 				   // are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
@@ -577,12 +608,11 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
 	
   				   // reserve enough space
   levels.push_back (new internal::Triangulation::TriaLevel<dim>);
+  faces = new internal::Triangulation::TriaFaces<dim>;
   levels[0]->internal::Triangulation::TriaLevel<0>
     ::reserve_space (cells.size(), dim);
-  levels[0]->internal::Triangulation::TriaLevel<1>
-    ::reserve_space (needed_lines.size());
-  levels[0]->internal::Triangulation::TriaLevel<2>
-    ::reserve_space (cells.size());
+  faces->lines.reserve_space (needed_lines.size());
+  levels[0]->quads.reserve_space (cells.size());
 
 				   // make up lines
   if (true) 
@@ -868,6 +898,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (levels.size() == 0, ExcTriangulationNotEmpty());
+  Assert (faces == NULL, ExcTriangulationNotEmpty());
 				   // check that no forbidden arrays
 				   // are used
   Assert (subcelldata.check_consistency(dim), ExcInternalError());
@@ -1006,10 +1037,10 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // for the lines
   				   // reserve enough space
   levels.push_back (new internal::Triangulation::TriaLevel<dim>);
+  faces = new internal::Triangulation::TriaFaces<dim>;
   levels[0]->internal::Triangulation::TriaLevel<0>
     ::reserve_space (cells.size(), dim);
-  levels[0]->internal::Triangulation::TriaLevel<1>
-    ::reserve_space (needed_lines.size());
+  faces->lines.reserve_space (needed_lines.size());
 
 				   // make up lines
   if (true) 
@@ -1144,8 +1175,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				   // the arrays of the Triangulation
 				   //
 				   // first reserve enough space
-  levels[0]->internal::Triangulation::TriaLevel<2>
-    ::reserve_space (needed_quads.size());
+  faces->quads.reserve_space (needed_quads.size());
   
   if (true) 
     {
@@ -1167,8 +1197,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 
 				   /////////////////////////////////
 				   // finally create the cells
-  levels[0]->internal::Triangulation::TriaLevel<3>
-    ::reserve_space (cells.size());  
+  levels[0]->hexes.reserve_space (cells.size());  
 
 				   // store for each quad index the
 				   // adjacent cells
@@ -2739,7 +2768,7 @@ Triangulation<1>::last_active (const unsigned int level) const
 
 template <>
 Triangulation<1>::raw_face_iterator
-Triangulation<1>::begin_raw_face (const unsigned int) const
+Triangulation<1>::begin_raw_face () const
 {
   Assert (false, ExcImpossibleInDim(1));
   return 0;
@@ -2749,7 +2778,7 @@ Triangulation<1>::begin_raw_face (const unsigned int) const
 
 template <>
 Triangulation<1>::face_iterator
-Triangulation<1>::begin_face (const unsigned int) const
+Triangulation<1>::begin_face () const
 {
   Assert (false, ExcImpossibleInDim(1));
   return 0;
@@ -2759,7 +2788,7 @@ Triangulation<1>::begin_face (const unsigned int) const
 
 template <>
 Triangulation<1>::active_face_iterator
-Triangulation<1>::begin_active_face (const unsigned int) const
+Triangulation<1>::begin_active_face () const
 {
   Assert (false, ExcImpossibleInDim(1));
   return 0;
@@ -2788,16 +2817,6 @@ Triangulation<1>::last_raw_face () const
 
 
 template <>
-Triangulation<1>::raw_face_iterator
-Triangulation<1>::last_raw_face (const unsigned int) const
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return 0;
-}
-
-
-
-template <>
 Triangulation<1>::face_iterator
 Triangulation<1>::last_face () const
 {
@@ -2808,28 +2827,8 @@ Triangulation<1>::last_face () const
 
 
 template <>
-Triangulation<1>::face_iterator
-Triangulation<1>::last_face (const unsigned int) const
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return 0;
-}
-
-
-
-template <>
 Triangulation<1>::active_face_iterator
 Triangulation<1>::last_active_face () const
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return 0;
-}
-
-
-
-template <>
-Triangulation<1>::active_face_iterator
-Triangulation<1>::last_active_face (const unsigned int) const
 {
   Assert (false, ExcImpossibleInDim(1));
   return 0;
@@ -3114,27 +3113,27 @@ Triangulation<2>::last_active (const unsigned int level) const
 
 template <>
 Triangulation<2>::raw_face_iterator
-Triangulation<2>::begin_raw_face (const unsigned int level) const
+Triangulation<2>::begin_raw_face () const
 {
-  return begin_raw_line (level);
+  return begin_raw_line ();
 }
 
 
 
 template <>
 Triangulation<2>::face_iterator
-Triangulation<2>::begin_face (const unsigned int level) const
+Triangulation<2>::begin_face () const
 {
-  return begin_line (level);
+  return begin_line ();
 }
 
 
 
 template <>
 Triangulation<2>::active_face_iterator
-Triangulation<2>::begin_active_face (const unsigned int level) const
+Triangulation<2>::begin_active_face () const
 {
-  return begin_active_line (level);
+  return begin_active_line ();
 }
 
 
@@ -3158,15 +3157,6 @@ Triangulation<2>::last_raw_face () const
 
 
 template <>
-Triangulation<2>::raw_face_iterator
-Triangulation<2>::last_raw_face (const unsigned int level) const
-{
-  return last_raw_line (level);
-}
-
-
-
-template <>
 Triangulation<2>::face_iterator
 Triangulation<2>::last_face () const
 {
@@ -3176,28 +3166,10 @@ Triangulation<2>::last_face () const
 
 
 template <>
-Triangulation<2>::face_iterator
-Triangulation<2>::last_face (const unsigned int level) const
-{
-  return last_line (level);
-}
-
-
-
-template <>
 Triangulation<2>::active_face_iterator
 Triangulation<2>::last_active_face () const
 {
   return last_active_line ();
-}
-
-
-
-template <>
-Triangulation<2>::active_face_iterator
-Triangulation<2>::last_active_face (const unsigned int level) const
-{
-  return last_active_line (level);
 }
 
 
@@ -3379,27 +3351,27 @@ Triangulation<3>::last_active (const unsigned int level) const
 
 template <>
 Triangulation<3>::raw_face_iterator
-Triangulation<3>::begin_raw_face (const unsigned int level) const
+Triangulation<3>::begin_raw_face () const
 {
-  return begin_raw_quad (level);
+  return begin_raw_quad ();
 }
 
 
 
 template <>
 Triangulation<3>::face_iterator
-Triangulation<3>::begin_face (const unsigned int level) const
+Triangulation<3>::begin_face () const
 {
-  return begin_quad (level);
+  return begin_quad ();
 }
 
 
 
 template <>
 Triangulation<3>::active_face_iterator
-Triangulation<3>::begin_active_face (const unsigned int level) const
+Triangulation<3>::begin_active_face () const
 {
-  return begin_active_quad (level);
+  return begin_active_quad ();
 }
 
 
@@ -3423,28 +3395,10 @@ Triangulation<3>::last_raw_face () const
 
 
 template <>
-Triangulation<3>::raw_face_iterator
-Triangulation<3>::last_raw_face (const unsigned int level) const
-{
-  return last_raw_quad (level);
-}
-
-
-
-template <>
 Triangulation<3>::face_iterator
 Triangulation<3>::last_face () const
 {
   return last_quad ();
-}
-
-
-
-template <>
-Triangulation<3>::face_iterator
-Triangulation<3>::last_face (const unsigned int level) const
-{
-  return last_quad (level);
 }
 
 
@@ -3457,15 +3411,6 @@ Triangulation<3>::last_active_face () const
 }
 
 
-
-template <>
-Triangulation<3>::active_face_iterator
-Triangulation<3>::last_active_face (const unsigned int level) const
-{
-  return last_active_quad (level);
-}
-
-
 #endif
 
 
@@ -3473,12 +3418,24 @@ template <int dim>
 typename Triangulation<dim>::raw_line_iterator
 Triangulation<dim>::begin_raw_line (const unsigned int level) const
 {
-  Assert (level<levels.size(), ExcInvalidLevel(level));
-  
-  if (levels[level]->lines.lines.size() == 0)
-    return end_line ();
-  
+  Assert (level == 0, ExcFacesHaveNoLevel());
   return raw_line_iterator (const_cast<Triangulation<dim>*>(this),
+			    0,
+			    0);
+}
+
+
+
+template <>
+Triangulation<1>::raw_line_iterator
+Triangulation<1>::begin_raw_line (const unsigned int level) const
+{
+  Assert (level<levels.size(), ExcInvalidLevel(level));
+
+  if (levels[level]->lines.cells.size() == 0)
+    return end_line ();
+
+  return raw_line_iterator (const_cast<Triangulation<1>*>(this),
 			    level,
 			    0);
 }
@@ -3489,12 +3446,26 @@ template <int dim>
 typename Triangulation<dim>::raw_quad_iterator
 Triangulation<dim>::begin_raw_quad (const unsigned int level) const
 {
+  Assert (dim>=2,ExcImpossibleInDim(dim));
+  Assert (dim<3 || level == 0, ExcFacesHaveNoLevel())
+
+  return raw_quad_iterator (const_cast<Triangulation<dim>*>(this),
+			    0,
+			    0);
+}
+
+
+
+template <>
+Triangulation<2>::raw_quad_iterator
+Triangulation<2>::begin_raw_quad (const unsigned int level) const
+{
   Assert (level<levels.size(), ExcInvalidLevel(level));
 
-  if (levels[level]->quads.quads.size() == 0)
+  if (levels[level]->quads.cells.size() == 0)
     return end_quad();
   
-  return raw_quad_iterator (const_cast<Triangulation<dim>*>(this),
+  return raw_quad_iterator (const_cast<Triangulation<2>*>(this),
 			    level,
 			    0);
 }
@@ -3507,7 +3478,7 @@ Triangulation<dim>::begin_raw_hex (const unsigned int level) const
 {
   Assert (level<levels.size(), ExcInvalidLevel(level));
 
-  if (levels[level]->hexes.hexes.size() == 0)
+  if (levels[level]->hexes.cells.size() == 0)
     return end_hex();
   
   return raw_hex_iterator (const_cast<Triangulation<dim>*>(this),
@@ -3650,13 +3621,26 @@ template <int dim>
 typename Triangulation<dim>::raw_line_iterator
 Triangulation<dim>::last_raw_line (const unsigned int level) const
 {
-  Assert (level<levels.size(), ExcInvalidLevel(level));
-  Assert (levels[level]->lines.lines.size() != 0,
-	  ExcEmptyLevel (level));
-  
+  Assert (level == 0, ExcFacesHaveNoLevel());
+
   return raw_line_iterator (const_cast<Triangulation<dim>*>(this),
+			    0,
+			    faces->lines.cells.size()-1);
+  
+}
+
+
+template <>
+Triangulation<1>::raw_line_iterator
+Triangulation<1>::last_raw_line (const unsigned int level) const
+{
+  Assert (level<levels.size(), ExcInvalidLevel(level));
+  Assert (levels[level]->lines.cells.size() != 0,
+	  ExcEmptyLevel (level));
+
+  return raw_line_iterator (const_cast<Triangulation<1>*>(this),
 			    level,
-			    levels[level]->lines.lines.size()-1);
+			    levels[level]->lines.cells.size()-1);
 }
 
 
@@ -3664,14 +3648,24 @@ template <int dim>
 typename Triangulation<dim>::raw_quad_iterator
 Triangulation<dim>::last_raw_quad (const unsigned int level) const
 {
+  Assert (level == 0, ExcFacesHaveNoLevel());
+  return raw_quad_iterator (const_cast<Triangulation<dim>*>(this),
+			    0,
+			    faces->quads.cells.size()-1);
+}
+
+
+template <>
+Triangulation<2>::raw_quad_iterator
+Triangulation<2>::last_raw_quad (const unsigned int level) const
+{
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
-  Assert (levels[level]->quads.quads.size() != 0,
+  Assert (levels[level]->quads.cells.size() != 0,
 	  ExcEmptyLevel (level));
-
-  return raw_quad_iterator (const_cast<Triangulation<dim>*>(this),
+  return raw_quad_iterator (const_cast<Triangulation<2>*>(this),
 			    level,
-			    levels[level]->quads.quads.size()-1);
+			    levels[level]->quads.cells.size()-1);
 }
 
 
@@ -3681,12 +3675,12 @@ Triangulation<dim>::last_raw_hex (const unsigned int level) const
 {
   Assert (level<levels.size(),
 	  ExcInvalidLevel(level));
-  Assert (levels[level]->hexes.hexes.size() != 0,
+  Assert (levels[level]->hexes.cells.size() != 0,
 	  ExcEmptyLevel (level));
 
   return raw_hex_iterator (const_cast<Triangulation<dim>*>(this),
 			   level,
-			   levels[level]->hexes.hexes.size()-1);
+			   levels[level]->hexes.cells.size()-1);
 }
 
 
@@ -3694,7 +3688,10 @@ template <int dim>
 typename Triangulation<dim>::raw_line_iterator
 Triangulation<dim>::last_raw_line () const
 {
-  return last_raw_line (levels.size()-1);
+  if (dim == 1)
+    return last_raw_line (levels.size()-1);
+  else
+    return last_raw_line (0);
 }
 
 
@@ -3702,7 +3699,10 @@ template <int dim>
 typename Triangulation<dim>::raw_quad_iterator
 Triangulation<dim>::last_raw_quad () const
 {
-  return last_raw_quad (levels.size()-1);
+  if (dim == 2)
+    return last_raw_quad (levels.size()-1);
+  else
+    return last_raw_quad (0);
 }
 
 
@@ -3718,7 +3718,7 @@ template <int dim>
 typename Triangulation<dim>::line_iterator
 Triangulation<dim>::last_line (const unsigned int level) const
 {
-  				   // level is checked in begin_raw
+  				   // level is checked in last_raw
   raw_line_iterator ri = last_raw_line(level);
   if (ri->used()==true)
     return ri;
@@ -3733,7 +3733,7 @@ template <int dim>
 typename Triangulation<dim>::quad_iterator
 Triangulation<dim>::last_quad (const unsigned int level) const
 {
-  				   // level is checked in begin_raw
+  				   // level is checked in last_raw
   raw_quad_iterator ri = last_raw_quad(level);
   if (ri->used()==true)
     return ri;
@@ -3748,7 +3748,7 @@ template <int dim>
 typename Triangulation<dim>::hex_iterator
 Triangulation<dim>::last_hex (const unsigned int level) const
 {
-  				   // level is checked in begin_raw
+  				   // level is checked in last_raw
   raw_hex_iterator ri = last_raw_hex(level);
   if (ri->used()==true)
     return ri;
@@ -3763,7 +3763,10 @@ template <int dim>
 typename Triangulation<dim>::line_iterator
 Triangulation<dim>::last_line () const
 {
-  return last_line (levels.size()-1);
+  if (dim == 1)
+    return last_line (levels.size()-1);
+  else
+    return last_line (0);
 }
 
 
@@ -3771,7 +3774,10 @@ template <int dim>
 typename Triangulation<dim>::quad_iterator
 Triangulation<dim>::last_quad () const
 {
-  return last_quad (levels.size()-1);
+  if (dim == 2)
+    return last_quad (levels.size()-1);
+  else
+    return last_quad (0);
 }
 
 
@@ -3787,7 +3793,7 @@ template <int dim>
 typename Triangulation<dim>::active_line_iterator
 Triangulation<dim>::last_active_line (const unsigned int level) const
 {
-				   // level is checked in begin_raw
+				   // level is checked in last_raw
   line_iterator i = last_line(level);
   if (i->has_children()==false)
     return i;
@@ -3802,7 +3808,7 @@ template <int dim>
 typename Triangulation<dim>::active_quad_iterator
 Triangulation<dim>::last_active_quad (const unsigned int level) const
 {
-				   // level is checked in begin_raw
+				   // level is checked in last_raw
   quad_iterator i = last_quad(level);
   if (i->has_children()==false)
     return i;
@@ -3817,7 +3823,7 @@ template <int dim>
 typename Triangulation<dim>::active_hex_iterator
 Triangulation<dim>::last_active_hex (const unsigned int level) const
 {
-				   // level is checked in begin_raw
+				   // level is checked in last_raw
   hex_iterator i = last_hex(level);
   if (i->has_children()==false)
     return i;
@@ -3832,7 +3838,10 @@ template <int dim>
 typename Triangulation<dim>::active_line_iterator
 Triangulation<dim>::last_active_line () const
 {
-  return last_active_line (levels.size()-1);
+  if (dim == 1)
+    return last_active_line (levels.size()-1);
+  else
+    return last_active_line (0);
 }
 
 
@@ -3840,7 +3849,10 @@ template <int dim>
 typename Triangulation<dim>::active_quad_iterator
 Triangulation<dim>::last_active_quad () const
 {
-  return last_active_quad (levels.size()-1);
+  if (dim == 2)
+    return last_active_quad (levels.size()-1);
+  else
+    return last_active_quad (0);
 }
 
 
@@ -3884,31 +3896,17 @@ Triangulation<dim>::end_active (const unsigned int level) const
 
 template <int dim>
 typename Triangulation<dim>::raw_face_iterator
-Triangulation<dim>::end_raw_face (const unsigned int level) const
+Triangulation<dim>::end_raw_face () const
 {
-  return (level == levels.size()-1 ?
-	  end_face() :
-	  begin_raw_face (level+1));
-}
-
-
-template <int dim>
-typename Triangulation<dim>::face_iterator
-Triangulation<dim>::end_face (const unsigned int level) const
-{
-  return (level == levels.size()-1 ?
-	  face_iterator(end_face()) :
-	  begin_face (level+1));
+  return end_face();
 }
 
 
 template <int dim>
 typename Triangulation<dim>::active_face_iterator
-Triangulation<dim>::end_active_face (const unsigned int level) const
+Triangulation<dim>::end_active_face () const
 {
-  return (level == levels.size()-1 ?
-	  active_face_iterator(end_face()) :
-	  begin_active_face (level+1));
+  return active_face_iterator(end_face());
 }
 
 
@@ -3916,9 +3914,13 @@ template <int dim>
 typename Triangulation<dim>::raw_line_iterator
 Triangulation<dim>::end_raw_line (const unsigned int level) const
 {
-  return (level == levels.size()-1 ?
-	  end_line() :
-	  begin_raw_line (level+1));
+  Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
+  if (dim == 1)
+    return (level == levels.size()-1 ?
+	    end_line() :
+	    begin_raw_line (level+1));
+  else
+    return end_line();
 }
 
 
@@ -3926,9 +3928,13 @@ template <int dim>
 typename Triangulation<dim>::line_iterator
 Triangulation<dim>::end_line (const unsigned int level) const
 {
-  return (level == levels.size()-1 ?
-	  line_iterator(end_line()) :
-	  begin_line (level+1));
+  Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
+  if (dim == 1)
+    return (level == levels.size()-1 ?
+	    line_iterator(end_line()) :
+	    begin_line (level+1));
+  else
+    return line_iterator(end_line());
 }
 
 
@@ -3936,9 +3942,13 @@ template <int dim>
 typename Triangulation<dim>::active_line_iterator
 Triangulation<dim>::end_active_line (const unsigned int level) const
 {
-  return (level == levels.size()-1 ?
-	  active_line_iterator(end_line()) :
-	  begin_active_line (level+1));
+  Assert (dim == 1 || level == 0, ExcFacesHaveNoLevel());
+  if (dim == 1)
+    return (level == levels.size()-1 ?
+	    active_line_iterator(end_line()) :
+	    begin_active_line (level+1));
+  else
+    return active_line_iterator(end_line());
 }
 
 
@@ -3946,9 +3956,13 @@ template <int dim>
 typename Triangulation<dim>::raw_quad_iterator
 Triangulation<dim>::end_raw_quad (const unsigned int level) const
 {
-  return (level == levels.size()-1 ?
-	  end_quad() :
-	  begin_raw_quad (level+1));
+  Assert (dim == 2 || level == 0, ExcFacesHaveNoLevel());
+  if (dim == 2)
+    return (level == levels.size()-1 ?
+	    end_quad() :
+	    begin_raw_quad (level+1));
+  else
+    return end_quad();
 }
 
 
@@ -3956,9 +3970,14 @@ template <int dim>
 typename Triangulation<dim>::quad_iterator
 Triangulation<dim>::end_quad (const unsigned int level) const
 {
-  return (level == levels.size()-1 ?
-	  quad_iterator(end_quad()) :
-	  begin_quad (level+1));
+  Assert (dim == 2 || level == 0, ExcFacesHaveNoLevel());
+  if (dim == 2)
+    return (level == levels.size()-1 ?
+	    quad_iterator(end_quad()) :
+	    begin_quad (level+1));
+  else
+    return quad_iterator(end_quad());
+  
 }
 
 
@@ -3966,9 +3985,13 @@ template <int dim>
 typename Triangulation<dim>::active_quad_iterator
 Triangulation<dim>::end_active_quad (const unsigned int level) const
 {
-  return (level == levels.size()-1 ?
-	  active_quad_iterator(end_quad()) :
-	  begin_active_quad (level+1));
+  Assert(dim == 2 || level == 0, ExcFacesHaveNoLevel());
+  if (dim == 2)
+    return (level == levels.size()-1 ?
+	    active_quad_iterator(end_quad()) :
+	    begin_active_quad (level+1));
+  else
+    return active_quad_iterator(end_quad());
 }
 
 
@@ -4025,42 +4048,19 @@ unsigned int Triangulation<dim>::n_active_cells () const
 template <int dim>
 unsigned int Triangulation<dim>::n_faces () const
 {
-  unsigned int n=0;
-  for (unsigned int l=0; l<levels.size(); ++l)
-    n += n_faces (l);
-  return n;
+  Assert (dim<=3, ExcNotImplemented());
+  if (dim==2) return n_lines();
+  if (dim==3) return n_quads();
+  return 0;
 }
 
 
 template <int dim>
 unsigned int Triangulation<dim>::n_active_faces () const
 {
-  unsigned int n=0;
-  for (unsigned int l=0; l<levels.size(); ++l)
-    n += n_active_faces (l);
-  return n;
-}
-
-
-template <int dim>
-unsigned int
-Triangulation<dim>::n_faces(unsigned int l) const
-{
   Assert (dim<=3, ExcNotImplemented());
-  if (dim==2) return n_lines(l);
-  if (dim==3) return n_quads(l);
-  return 0;
-}
-
-
-
-template <int dim>
-unsigned int
-Triangulation<dim>::n_active_faces(unsigned int l) const
-{
-  Assert (dim<=3, ExcNotImplemented());
-  if (dim==2) return n_active_lines(l);
-  if (dim==3) return n_active_quads(l);
+  if (dim==2) return n_active_lines();
+  if (dim==3) return n_active_quads();
   return 0;
 }
 
@@ -4150,11 +4150,38 @@ unsigned int Triangulation<dim>::n_lines () const
 }
 
 
-template <int dim>
-unsigned int Triangulation<dim>::n_raw_lines (const unsigned int level) const
+#if deal_II_dimension == 1
+
+template <>
+unsigned int Triangulation<1>::n_raw_lines (const unsigned int level) const
 {
   Assert(level < n_levels(), ExcIndexRange(level,0,n_levels()));
-  return levels[level]->lines.lines.size();
+  return levels[level]->lines.cells.size();
+}
+
+
+template <>
+unsigned int Triangulation<1>::n_raw_lines () const
+{
+  Assert(false, ExcNotImplemented());
+  return 0;
+}
+
+#endif
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_raw_lines (const unsigned int) const
+{
+  Assert(false, ExcFacesHaveNoLevel());
+  return 0;
+}
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_raw_lines () const
+{
+  return faces->lines.cells.size();
 }
 
 
@@ -4163,7 +4190,7 @@ unsigned int Triangulation<dim>::n_lines (const unsigned int level) const
 {
   Assert (level < number_cache.n_lines_level.size(),
 	  ExcIndexRange (level, 0, number_cache.n_lines_level.size()));
-  
+  Assert (dim == 1, ExcFacesHaveNoLevel());
   return number_cache.n_lines_level[level];
 }
 
@@ -4180,6 +4207,7 @@ unsigned int Triangulation<dim>::n_active_lines (const unsigned int level) const
 {
   Assert (level < number_cache.n_lines_level.size(),
 	  ExcIndexRange (level, 0, number_cache.n_lines_level.size()));
+  Assert (dim == 1, ExcFacesHaveNoLevel());
   
   return number_cache.n_active_lines_level[level];
 }
@@ -4244,17 +4272,46 @@ unsigned int Triangulation<dim>::n_quads (const unsigned int level) const
 {
   Assert (level < number_cache.n_quads_level.size(),
 	  ExcIndexRange (level, 0, number_cache.n_quads_level.size()));
+  Assert (dim == 2, ExcFacesHaveNoLevel());
   
   return number_cache.n_quads_level[level];
 }
 
 
 template <int dim>
-unsigned int Triangulation<dim>::n_raw_quads (const unsigned int level) const
+unsigned int Triangulation<dim>::n_raw_quads (const unsigned int) const
+{
+  Assert (dim <3, ExcFacesHaveNoLevel());
+  Assert (dim >2, ExcImpossibleInDim(dim));
+  if (dim>2)
+    return n_raw_quads();
+  else
+    return 0;
+}
+
+#if deal_II_dimension == 2
+template <>
+unsigned int Triangulation<2>::n_raw_quads (const unsigned int level) const
 {
   Assert(level < n_levels(), ExcIndexRange(level,0,n_levels()));
-  return levels[level]->quads.quads.size();
+  return levels[level]->quads.cells.size();
 }
+#endif
+
+template <>
+unsigned int Triangulation<3>::n_raw_quads () const
+{
+  return faces->quads.cells.size();
+}
+
+
+template <int dim>
+unsigned int Triangulation<dim>::n_raw_quads () const
+{
+  Assert (false, ExcNotImplemented());
+  return 0;
+}
+
 
 
 template <int dim>
@@ -4269,6 +4326,7 @@ unsigned int Triangulation<dim>::n_active_quads (const unsigned int level) const
 {
   Assert (level < number_cache.n_quads_level.size(),
 	  ExcIndexRange (level, 0, number_cache.n_quads_level.size()));
+  Assert (dim == 2, ExcFacesHaveNoLevel());
   
   return number_cache.n_active_quads_level[level];
 }
@@ -4340,7 +4398,7 @@ template <int dim>
 unsigned int Triangulation<dim>::n_raw_hexs (const unsigned int level) const
 {
   Assert(level < n_levels(), ExcIndexRange(level,0,n_levels()));
-  return levels[level]->hexes.hexes.size();
+  return levels[level]->hexes.cells.size();
 }
 
 
@@ -4506,6 +4564,9 @@ Triangulation<dim>::clear_despite_subscriptions()
     delete levels[i];
   levels.clear ();
   
+  delete faces;
+  faces = NULL;
+
   vertices.clear ();
   vertices_used.clear ();
   
@@ -4585,9 +4646,8 @@ Triangulation<1>::execute_refinement ()
 				       // reserve space for
 				       // 2*flagged_cells new lines on
 				       // the next higher level
-      levels[level+1]->
-	internal::Triangulation::TriaLevel<1>
-        ::reserve_space (GeometryInfo<1>::children_per_cell*flagged_cells);
+      levels[level+1]->lines.
+	reserve_space (GeometryInfo<1>::children_per_cell*flagged_cells);
       
       needed_vertices += flagged_cells;
     }
@@ -4758,7 +4818,7 @@ Triangulation<1>::execute_refinement ()
   
 #ifdef DEBUG
   for (unsigned int level=0; level<levels.size(); ++level) 
-    levels[level]->monitor_memory (1);
+    levels[level]->lines.monitor_memory (1);
 
 				   // check whether really all
 				   // refinement flags are reset (also
@@ -4822,6 +4882,7 @@ Triangulation<2>::execute_refinement ()
 				   // - there are, but prepare_refinement
 				   //   added another empty level
   unsigned int needed_vertices = 0;
+  unsigned int needed_lines  = 0;
   for (int level=levels.size()-2; level>=0; --level)
     {
       				       // count number of flagged
@@ -4830,7 +4891,6 @@ Triangulation<2>::execute_refinement ()
       				       // vertices and new lines will
       				       // be needed
       unsigned int flagged_cells = 0;
-      unsigned int needed_lines  = 0;
       active_cell_iterator cell = begin_active(level),
 			   endc = begin_active(level+1);
       for (; cell!=endc; ++cell) 
@@ -4867,15 +4927,6 @@ Triangulation<2>::execute_refinement ()
 	      }
 	  }
 
-				       // now count the lines which
-				       // were flagged for refinement
-      for (line_iterator line=begin_line(level); line!=end_line(level); ++line)
-	if (line->user_flag_set())
-	  {
-	    Assert (line->has_children() == false, ExcInternalError());
-	    needed_lines    += 2;
-	    needed_vertices += 1;
-	  }
       
       
       				       // count number of used cells
@@ -4895,20 +4946,30 @@ Triangulation<2>::execute_refinement ()
       levels[level+1]->
 	internal::Triangulation::TriaLevel<0>
         ::reserve_space (used_cells+4*flagged_cells, 2);
-				       // reserve space for
-				       // needed_lines new lines
-      levels[level+1]->
-	internal::Triangulation::TriaLevel<1>
-        ::reserve_space (needed_lines);
+
       				       // reserve space for
       				       // 4*flagged_cells
 				       // new quads on the next higher
 				       // level
-      levels[level+1]->
-	internal::Triangulation::TriaLevel<2>
-        ::reserve_space (4*flagged_cells);
+      levels[level+1]->quads.
+	reserve_space (4*flagged_cells);
     }
 
+				   // now count the lines which
+				   // were flagged for refinement
+  for (line_iterator line=begin_line(); line!=end_line(); ++line)
+    if (line->user_flag_set())
+      {
+	Assert (line->has_children() == false, ExcInternalError());
+	needed_lines    += 2;
+	needed_vertices += 1;
+      }
+
+				   // reserve space for
+				   // needed_lines new lines
+  faces->lines.
+    reserve_space (needed_lines);
+  
 				   // add to needed vertices how many
 				   // vertices are already in use
   needed_vertices += std::count_if (vertices_used.begin(), vertices_used.end(),
@@ -4934,17 +4995,15 @@ Triangulation<2>::execute_refinement ()
   unsigned int next_unused_vertex = 0;
 
 				   // first for lines
-  for (unsigned int level=0; level!=levels.size()-1; ++level)
+				   //
+				   // only active objects can be
+				   // refined further
+  if (true)
     {
-				       // only active objects can be
-				       // refined further; remember
-				       // that we won't operate on the
-				       // finest level, so
-				       // begin_*(level+1) is allowed
-      active_line_iterator line = begin_active_line(level),
-			   endl = begin_active_line(level+1);
-      raw_line_iterator next_unused_line = begin_raw_line (level+1);
-
+      active_line_iterator line = begin_active_line(),
+			   endl = end_line();
+      raw_line_iterator next_unused_line = begin_raw_line ();
+      
       for (; line!=endl; ++line)
 	if (line->user_flag_set())
 	  {
@@ -5028,7 +5087,7 @@ Triangulation<2>::execute_refinement ()
       active_cell_iterator cell = begin_active(level),
 			   endc = begin_active(level+1);
       
-      raw_line_iterator next_unused_line = begin_raw_line (level+1);
+      raw_line_iterator next_unused_line = begin_raw_line ();
       raw_cell_iterator next_unused_cell = begin_raw (level+1);
 
       for (; cell!=endc; ++cell) 
@@ -5445,7 +5504,7 @@ Triangulation<2>::execute_refinement ()
 
 #ifdef DEBUG
   for (unsigned int level=0; level<levels.size(); ++level) 
-    levels[level]->monitor_memory (2);
+    levels[level]->quads.monitor_memory (2);
 
 				   // check whether really all
 				   // refinement flags are reset (also
@@ -5519,7 +5578,10 @@ Triangulation<3>::execute_refinement ()
 				   //   added another empty level which
 				   //   then is the highest level
   unsigned int needed_vertices = 0;
-  for (int level=levels.size()-2; level>=0; --level)
+  unsigned int needed_lines    = 0;
+  unsigned int needed_quads    = 0;
+  int level;
+  for (level=levels.size()-2; level>=0; --level)
     {
       				       // count number of flagged
       				       // cells on this level and
@@ -5527,8 +5589,7 @@ Triangulation<3>::execute_refinement ()
       				       // vertices and new lines will
       				       // be needed
       unsigned int flagged_cells = 0;
-      unsigned int needed_lines  = 0;
-      unsigned int needed_quads  = 0;
+
       
       active_cell_iterator acell = begin_active(level),
 			   aendc = begin_active(level+1);
@@ -5574,27 +5635,6 @@ Triangulation<3>::execute_refinement ()
 	      }
 	  }
 
-				       // now count the quads and
-				       // lines which were flagged for
-				       // refinement
-      for (quad_iterator quad=begin_quad(level); quad!=end_quad(level); ++quad)
-	if (quad->user_flag_set())
-	  {
-	    Assert (quad->has_children() == false, ExcInternalError());
-	    needed_quads    += 4;
-	    needed_lines    += 4;
-	    needed_vertices += 1;
-	  }
-
-      for (line_iterator line=begin_line(level); line!=end_line(level); ++line)
-	if (line->user_flag_set())
-	  {
-	    Assert (line->has_children() == false, ExcInternalError());
-	    needed_lines += 2;
-	    needed_vertices += 1;
-	  }
-
-
 				       // count number of used cells on
 				       // the next higher level
       const unsigned int used_cells
@@ -5612,24 +5652,42 @@ Triangulation<3>::execute_refinement ()
       levels[level+1]->
 	internal::Triangulation::TriaLevel<0>
         ::reserve_space (used_cells+8*flagged_cells, 3);
-				       // reserve space for
-				       // needed_lines new lines
-      levels[level+1]->
-	internal::Triangulation::TriaLevel<1>
-        ::reserve_space (needed_lines);
-				       // reserve space for
-				       // needed_quads new quads
-      levels[level+1]->
-	internal::Triangulation::TriaLevel<2>
-        ::reserve_space (needed_quads);
       				       // reserve space for
       				       // 8*flagged_cells
 				       // new hexes on the next higher
 				       // level
-      levels[level+1]->
-	internal::Triangulation::TriaLevel<3>
-        ::reserve_space (8*flagged_cells);
+      levels[level+1]->hexes.
+	reserve_space (8*flagged_cells);
     }
+
+				   // now count the quads and
+				   // lines which were flagged for
+				   // refinement
+  for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
+    if (quad->user_flag_set())
+      {
+	Assert (quad->has_children() == false, ExcInternalError());
+	needed_quads    += 4;
+	needed_lines    += 4;
+	needed_vertices += 1;
+      }
+  
+  for (line_iterator line=begin_line(); line!=end_line(); ++line)
+    if (line->user_flag_set())
+      {
+	Assert (line->has_children() == false, ExcInternalError());
+	needed_lines += 2;
+	needed_vertices += 1;
+      }
+
+				   // reserve space for
+				   // needed_lines new lines
+  faces->lines.
+    reserve_space (needed_lines);
+				   // reserve space for
+				   // needed_quads new quads
+  faces->quads.
+    reserve_space (needed_quads);
 
 				   // add to needed vertices how many
 				   // vertices are already in use
@@ -5688,16 +5746,14 @@ Triangulation<3>::execute_refinement ()
   unsigned int next_unused_vertex = 0;
 
 				   // first for lines
-  for (unsigned int level=0; level!=levels.size()-1; ++level)
+				   // only active objects can be
+				   // refined further;
+  if (true)
     {
-				       // only active objects can be
-				       // refined further; remember
-				       // that we won't operate on the
-				       // finest level, so
-				       // begin_*(level+1) is allowed
-      active_line_iterator line = begin_active_line(level),
-			   endl = begin_active_line(level+1);
-      raw_line_iterator next_unused_line = begin_raw_line (level+1);
+      active_line_iterator line = begin_active_line(),
+			   endl = end_line();
+      raw_line_iterator next_unused_line = begin_raw_line ();
+  
 
       for (; line!=endl; ++line)
 	if (line->user_flag_set())
@@ -5779,18 +5835,16 @@ Triangulation<3>::execute_refinement ()
 				   ///////////////////////////////////////
 				   // now refine marked quads
 				   ///////////////////////////////////////
-  for (unsigned int level=0; level!=levels.size()-1; ++level)
+				   //
+				   // only active objects can be
+				   // refined further;
+  if (true)
     {
-				       // only active objects can be
-				       // refined further; remember
-				       // that we won't operate on the
-				       // finest level, so
-				       // begin_*(level+1) is allowed
-      active_quad_iterator quad = begin_active_quad(level),
-			   endq = begin_active_quad(level+1);
-      raw_line_iterator next_unused_line = begin_raw_line (level+1);
-      raw_quad_iterator next_unused_quad = begin_raw_quad (level+1);
-
+      active_quad_iterator quad = begin_active_quad(),
+			   endq = end_quad();
+      raw_line_iterator next_unused_line = begin_raw_line ();
+      raw_quad_iterator next_unused_quad = begin_raw_quad ();
+      
       for (; quad!=endq; ++quad)
 	if (quad->user_flag_set())
 	  {
@@ -6033,8 +6087,8 @@ Triangulation<3>::execute_refinement ()
 				       // begin_*(level+1) is allowed
       active_hex_iterator hex  = begin_active_hex(level),
 			  endh = begin_active_hex(level+1);
-      raw_line_iterator next_unused_line = begin_raw_line (level+1);
-      raw_quad_iterator next_unused_quad = begin_raw_quad (level+1);
+      raw_line_iterator next_unused_line = begin_raw_line ();
+      raw_quad_iterator next_unused_quad = begin_raw_quad ();
       raw_hex_iterator  next_unused_hex  = begin_raw_hex (level+1);
 
       for (; hex!=endh; ++hex)
@@ -7037,7 +7091,7 @@ Triangulation<3>::execute_refinement ()
 
 #ifdef DEBUG
   for (unsigned int level=0; level<levels.size(); ++level) 
-    levels[level]->monitor_memory (3);
+    levels[level]->hexes.monitor_memory (3);
 
 				   // check whether really all
 				   // refinement flags are reset (also
@@ -8876,6 +8930,8 @@ Triangulation<dim>::memory_consumption () const
   mem += sizeof(boundary);
   mem += sizeof(smooth_grid);
   mem += MemoryConsumption::memory_consumption (number_cache);
+  mem += MemoryConsumption::memory_consumption (faces);
+  mem += MemoryConsumption::memory_consumption (*faces);  
 
   return mem;
 }
@@ -8883,8 +8939,8 @@ Triangulation<dim>::memory_consumption () const
   
 
 
-template <int dim>
-void Triangulation<dim>::update_number_cache_lines () 
+template <>
+void Triangulation<1>::update_number_cache_lines () 
 {
 				   ///////////////////////////////////
 				   // update the number of lines
@@ -8896,7 +8952,7 @@ void Triangulation<dim>::update_number_cache_lines ()
     {
 				       // count lines on this level
       number_cache.n_lines_level[level] = 0;
-      if (levels[level]->lines.lines.size() != 0) 
+      if (levels[level]->lines.cells.size() != 0) 
 	{
 	  line_iterator line = begin_line (level),
 			endc = (level == levels.size()-1 ?
@@ -8918,7 +8974,7 @@ void Triangulation<dim>::update_number_cache_lines ()
     {
 				       // count lines on this level
       number_cache.n_active_lines_level[level] = 0;
-      if (levels[level]->lines.lines.size() != 0) 
+      if (levels[level]->lines.cells.size() != 0) 
 	{
 	  active_line_iterator line = begin_active_line (level),
 			       endc = end_active_line (level);
@@ -8928,6 +8984,34 @@ void Triangulation<dim>::update_number_cache_lines ()
       
 				       // update total number of lines
       number_cache.n_active_lines += number_cache.n_active_lines_level[level];
+    }
+}
+
+
+template <int dim>
+void Triangulation<dim>::update_number_cache_lines () 
+{
+				   ///////////////////////////////////
+				   // update the number of lines
+				   // as @p dim>1, there are no levels
+				   // here to take care of.
+  number_cache.n_lines = 0;
+  if (faces->lines.cells.size() != 0) 
+    {
+      line_iterator line = begin_line (),
+		    endc = end_line();
+      for (; line!=endc; ++line)
+	++number_cache.n_lines;
+    }
+				   // do the update for the number of
+				   // active lines as well
+  number_cache.n_active_lines = 0;
+  if (faces->lines.cells.size() != 0) 
+    {
+      active_line_iterator line = begin_active_line (),
+			   endc = end_line ();
+      for (; line!=endc; ++line)
+	++number_cache.n_active_lines;
     }
 }
 
@@ -8942,10 +9026,10 @@ void Triangulation<1>::update_number_cache_quads ()
 
 #endif
 
-#if deal_II_dimension >= 2
+#if deal_II_dimension == 2
 
-template <int dim>
-void Triangulation<dim>::update_number_cache_quads () 
+template <>
+void Triangulation<2>::update_number_cache_quads () 
 {
   				   ///////////////////////////////////
 				   // update the number of quads
@@ -8957,7 +9041,7 @@ void Triangulation<dim>::update_number_cache_quads ()
     {
 				       // count quads on this level
       number_cache.n_quads_level[level] = 0;
-      if (levels[level]->quads.quads.size() != 0) 
+      if (levels[level]->quads.cells.size() != 0) 
 	{
 	  quad_iterator quad = begin_quad (level),
 			endc = (level == levels.size()-1 ?
@@ -8979,7 +9063,7 @@ void Triangulation<dim>::update_number_cache_quads ()
     {
 				       // count quads on this level
       number_cache.n_active_quads_level[level] = 0;
-      if (levels[level]->quads.quads.size() != 0) 
+      if (levels[level]->quads.cells.size() != 0) 
 	{
 	  active_quad_iterator quad = begin_active_quad (level),
 			       endc = end_active_quad (level);
@@ -8989,6 +9073,40 @@ void Triangulation<dim>::update_number_cache_quads ()
       
 				       // update total number of quads
       number_cache.n_active_quads += number_cache.n_active_quads_level[level];
+    }
+}
+
+#endif
+
+
+#if deal_II_dimension > 2
+
+template <int dim>
+void Triangulation<dim>::update_number_cache_quads () 
+{
+  				   ///////////////////////////////////
+				   // update the number of quads
+				   // as @p dim>2, there are no levels
+				   // here to take care of.
+  number_cache.n_quads = 0;
+  if (faces->quads.cells.size() != 0) 
+    {
+      quad_iterator quad = begin_quad (),
+		    endc = end_quad();
+      for (; quad!=endc; ++quad)
+	++number_cache.n_quads;
+    }
+  
+				   // do the update for the number
+				   // of active quads as well
+  number_cache.n_active_quads = 0;
+  
+  if (faces->quads.cells.size() != 0) 
+    {
+      active_quad_iterator quad = begin_active_quad (),
+			   endc = end_quad ();
+      for (; quad!=endc; ++quad)
+	++number_cache.n_active_quads;
     }
 }
 
@@ -9016,7 +9134,7 @@ void Triangulation<2>::update_number_cache_hexes ()
 
 #endif
 
-#if deal_II_dimension >= 3
+#if deal_II_dimension == 3
 
 template <int dim>
 void Triangulation<dim>::update_number_cache_hexes () 
@@ -9031,7 +9149,7 @@ void Triangulation<dim>::update_number_cache_hexes ()
     {
 				       // count hexes on this level
       number_cache.n_hexes_level[level] = 0;
-      if (levels[level]->hexes.hexes.size() != 0) 
+      if (levels[level]->hexes.cells.size() != 0) 
 	{
 	  hex_iterator hex = begin_hex (level),
 		      endc = (level == levels.size()-1 ?
@@ -9053,7 +9171,7 @@ void Triangulation<dim>::update_number_cache_hexes ()
     {
 				       // count hexes on this level
       number_cache.n_active_hexes_level[level] = 0;
-      if (levels[level]->hexes.hexes.size() != 0) 
+      if (levels[level]->hexes.cells.size() != 0) 
 	{
 	  active_hex_iterator hex = begin_active_hex (level),
 			     endc = end_active_hex (level);

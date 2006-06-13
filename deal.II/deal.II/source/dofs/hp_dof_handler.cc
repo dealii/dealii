@@ -14,7 +14,9 @@
 
 #include <base/memory_consumption.h>
 #include <dofs/hp_dof_handler.h>
+#include <dofs/hp_dof_objects.h>
 #include <dofs/hp_dof_levels.h>
+#include <dofs/hp_dof_faces.h>
 #include <dofs/dof_accessor.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
@@ -46,6 +48,7 @@ namespace hp
   DoFHandler<dim>::DoFHandler (const Triangulation<dim> &tria)
                   :
                   tria(&tria),
+		  faces (NULL),
                   used_dofs (0)
   {
     create_active_fe_table ();
@@ -63,7 +66,6 @@ namespace hp
                                      // ...and release allocated memory
     clear ();
   }
-
 
 #if deal_II_dimension == 1
 
@@ -149,27 +151,27 @@ namespace hp
 
   template <>
   DoFHandler<1>::raw_face_iterator
-  DoFHandler<1>::begin_raw_face (const unsigned int) const
+  DoFHandler<1>::begin_raw_face () const
   {
-    Assert (false, ExcFunctionNotUseful());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
 
   template <>
   DoFHandler<1>::face_iterator
-  DoFHandler<1>::begin_face (const unsigned int) const
+  DoFHandler<1>::begin_face () const
   {
-    Assert (false, ExcFunctionNotUseful());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
 
   template <>
   DoFHandler<1>::active_face_iterator
-  DoFHandler<1>::begin_active_face (const unsigned int) const
+  DoFHandler<1>::begin_active_face () const
   {
-    Assert (false, ExcFunctionNotUseful());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -178,25 +180,34 @@ namespace hp
   DoFHandler<1>::raw_face_iterator
   DoFHandler<1>::end_face () const
   {
-    Assert (false, ExcFunctionNotUseful());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
 
   template <>
   DoFHandler<1>::raw_face_iterator
-  DoFHandler<1>::last_raw_face () const
+  DoFHandler<1>::end_raw_face () const
   {
-    Assert (false, ExcFunctionNotUseful());
+    Assert (false, ExcImpossibleInDim(1));
+    return 0;
+  }
+
+
+  template <>
+  DoFHandler<1>::active_face_iterator
+  DoFHandler<1>::end_active_face () const
+  {
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
 
   template <>
   DoFHandler<1>::raw_face_iterator
-  DoFHandler<1>::last_raw_face (const unsigned int) const
+  DoFHandler<1>::last_raw_face () const 
   {
-    Assert (false, ExcFunctionNotUseful());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -205,16 +216,7 @@ namespace hp
   DoFHandler<1>::face_iterator
   DoFHandler<1>::last_face () const
   {
-    Assert (false, ExcFunctionNotUseful());
-    return 0;
-  }
-
-
-  template <>
-  DoFHandler<1>::face_iterator
-  DoFHandler<1>::last_face (const unsigned int) const
-  {
-    Assert (false, ExcFunctionNotUseful());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -223,16 +225,7 @@ namespace hp
   DoFHandler<1>::active_face_iterator
   DoFHandler<1>::last_active_face () const
   {
-    Assert (false, ExcFunctionNotUseful());
-    return 0;
-  }
-
-
-  template <>
-  DoFHandler<1>::active_face_iterator
-  DoFHandler<1>::last_active_face (const unsigned int) const
-  {
-    Assert (false, ExcFunctionNotUseful());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -241,7 +234,7 @@ namespace hp
   DoFHandler<1>::raw_quad_iterator
   DoFHandler<1>::begin_raw_quad (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -250,7 +243,7 @@ namespace hp
   DoFHandler<1>::quad_iterator
   DoFHandler<1>::begin_quad (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -259,7 +252,7 @@ namespace hp
   DoFHandler<1>::active_quad_iterator
   DoFHandler<1>::begin_active_quad (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -268,7 +261,34 @@ namespace hp
   DoFHandler<1>::raw_quad_iterator
   DoFHandler<1>::end_quad () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
+    return 0;
+  }
+
+
+  template <>
+  DoFHandler<1>::quad_iterator
+  DoFHandler<1>::end_quad (const unsigned int) const
+  {
+    Assert (false, ExcImpossibleInDim(1));
+    return 0;
+  }
+
+
+  template <>
+  DoFHandler<1>::raw_quad_iterator
+  DoFHandler<1>::end_raw_quad (const unsigned int) const
+  {
+    Assert (false, ExcImpossibleInDim(1));
+    return 0;
+  }
+
+
+  template <>
+  DoFHandler<1>::active_quad_iterator
+  DoFHandler<1>::end_active_quad (const unsigned int) const
+  {
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -277,7 +297,7 @@ namespace hp
   DoFHandler<1>::raw_quad_iterator
   DoFHandler<1>::last_raw_quad (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -286,7 +306,7 @@ namespace hp
   DoFHandler<1>::quad_iterator
   DoFHandler<1>::last_quad (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -295,7 +315,7 @@ namespace hp
   DoFHandler<1>::active_quad_iterator
   DoFHandler<1>::last_active_quad (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -304,7 +324,7 @@ namespace hp
   DoFHandler<1>::raw_quad_iterator
   DoFHandler<1>::last_raw_quad () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -313,7 +333,7 @@ namespace hp
   DoFHandler<1>::quad_iterator
   DoFHandler<1>::last_quad () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -322,7 +342,7 @@ namespace hp
   DoFHandler<1>::active_quad_iterator
   DoFHandler<1>::last_active_quad () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -331,7 +351,7 @@ namespace hp
   DoFHandler<1>::raw_hex_iterator
   DoFHandler<1>::begin_raw_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -340,7 +360,7 @@ namespace hp
   DoFHandler<1>::hex_iterator
   DoFHandler<1>::begin_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -349,7 +369,7 @@ namespace hp
   DoFHandler<1>::active_hex_iterator
   DoFHandler<1>::begin_active_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -358,7 +378,34 @@ namespace hp
   DoFHandler<1>::raw_hex_iterator
   DoFHandler<1>::end_hex () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
+    return 0;
+  }
+
+
+  template <>
+  DoFHandler<1>::hex_iterator
+  DoFHandler<1>::end_hex (const unsigned int) const
+  {
+    Assert (false, ExcImpossibleInDim(1));
+    return 0;
+  }
+
+
+  template <>
+  DoFHandler<1>::raw_hex_iterator
+  DoFHandler<1>::end_raw_hex (const unsigned int) const
+  {
+    Assert (false, ExcImpossibleInDim(1));
+    return 0;
+  }
+
+
+  template <>
+  DoFHandler<1>::active_hex_iterator
+  DoFHandler<1>::end_active_hex (const unsigned int) const
+  {
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -367,7 +414,7 @@ namespace hp
   DoFHandler<1>::raw_hex_iterator
   DoFHandler<1>::last_raw_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -376,7 +423,7 @@ namespace hp
   DoFHandler<1>::raw_hex_iterator
   DoFHandler<1>::last_raw_hex () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -385,7 +432,7 @@ namespace hp
   DoFHandler<1>::hex_iterator
   DoFHandler<1>::last_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -394,7 +441,7 @@ namespace hp
   DoFHandler<1>::hex_iterator
   DoFHandler<1>::last_hex () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -403,7 +450,7 @@ namespace hp
   DoFHandler<1>::active_hex_iterator
   DoFHandler<1>::last_active_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -412,7 +459,7 @@ namespace hp
   DoFHandler<1>::active_hex_iterator
   DoFHandler<1>::last_active_hex () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(1));
     return 0;
   }
 
@@ -503,31 +550,47 @@ namespace hp
 
   template <>
   DoFHandler<2>::raw_face_iterator
-  DoFHandler<2>::begin_raw_face (const unsigned int level) const
+  DoFHandler<2>::begin_raw_face () const
   {
-    return begin_raw_line (level);
+    return begin_raw_line ();
   }
 
 
   template <>
   DoFHandler<2>::face_iterator
-  DoFHandler<2>::begin_face (const unsigned int level) const
+  DoFHandler<2>::begin_face () const
   {
-    return begin_line (level);
+    return begin_line ();
   }
 
 
   template <>
   DoFHandler<2>::active_face_iterator
-  DoFHandler<2>::begin_active_face (const unsigned int level) const
+  DoFHandler<2>::begin_active_face () const
   {
-    return begin_active_line (level);
+    return begin_active_line ();
   }
 
 
   template <>
   DoFHandler<2>::raw_face_iterator
   DoFHandler<2>::end_face () const
+  {
+    return end_line ();
+  }
+
+
+  template <>
+  DoFHandler<2>::raw_face_iterator
+  DoFHandler<2>::end_raw_face () const
+  {
+    return end_line ();
+  }
+
+
+  template <>
+  DoFHandler<2>::active_face_iterator
+  DoFHandler<2>::end_active_face () const
   {
     return end_line ();
   }
@@ -542,26 +605,10 @@ namespace hp
 
 
   template <>
-  DoFHandler<2>::raw_face_iterator
-  DoFHandler<2>::last_raw_face (const unsigned int level) const
-  {
-    return last_raw_line (level);
-  }
-
-
-  template <>
   DoFHandler<2>::face_iterator
   DoFHandler<2>::last_face () const
   {
     return last_line ();
-  }
-
-
-  template <>
-  DoFHandler<2>::face_iterator
-  DoFHandler<2>::last_face (const unsigned int level) const
-  {
-    return last_line (level);
   }
 
 
@@ -574,18 +621,10 @@ namespace hp
 
 
   template <>
-  DoFHandler<2>::active_face_iterator
-  DoFHandler<2>::last_active_face (const unsigned int level) const
-  {
-    return last_active_line (level);
-  }
-
-
-  template <>
   DoFHandler<2>::raw_hex_iterator
   DoFHandler<2>::begin_raw_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(2));
     return 0;
   }
 
@@ -594,7 +633,7 @@ namespace hp
   DoFHandler<2>::hex_iterator
   DoFHandler<2>::begin_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(2));
     return 0;
   }
 
@@ -603,7 +642,7 @@ namespace hp
   DoFHandler<2>::active_hex_iterator
   DoFHandler<2>::begin_active_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(2));
     return 0;
   }
 
@@ -612,7 +651,34 @@ namespace hp
   DoFHandler<2>::raw_hex_iterator
   DoFHandler<2>::end_hex () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(2));
+    return 0;
+  }
+
+
+  template <>
+  DoFHandler<2>::hex_iterator
+  DoFHandler<2>::end_hex (const unsigned int) const
+  {
+    Assert (false, ExcImpossibleInDim(2));
+    return 0;
+  }
+
+
+  template <>
+  DoFHandler<2>::raw_hex_iterator
+  DoFHandler<2>::end_raw_hex (const unsigned int) const
+  {
+    Assert (false, ExcImpossibleInDim(2));
+    return 0;
+  }
+
+
+  template <>
+  DoFHandler<2>::active_hex_iterator
+  DoFHandler<2>::end_active_hex (const unsigned int) const
+  {
+    Assert (false, ExcImpossibleInDim(2));
     return 0;
   }
 
@@ -621,7 +687,7 @@ namespace hp
   DoFHandler<2>::raw_hex_iterator
   DoFHandler<2>::last_raw_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(2));
     return 0;
   }
 
@@ -630,7 +696,7 @@ namespace hp
   DoFHandler<2>::raw_hex_iterator
   DoFHandler<2>::last_raw_hex () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(2));
     return 0;
   }
 
@@ -639,7 +705,7 @@ namespace hp
   DoFHandler<2>::hex_iterator
   DoFHandler<2>::last_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(2));
     return 0;
   }
 
@@ -648,7 +714,7 @@ namespace hp
   DoFHandler<2>::hex_iterator
   DoFHandler<2>::last_hex () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(2));
     return 0;
   }
 
@@ -657,7 +723,7 @@ namespace hp
   DoFHandler<2>::active_hex_iterator
   DoFHandler<2>::last_active_hex (const unsigned int) const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(2));
     return 0;
   }
 
@@ -666,7 +732,7 @@ namespace hp
   DoFHandler<2>::active_hex_iterator
   DoFHandler<2>::last_active_hex () const
   {
-    Assert (false, ExcNotImplemented());
+    Assert (false, ExcImpossibleInDim(2));
     return 0;
   }
 
@@ -758,31 +824,47 @@ namespace hp
 
   template <>
   DoFHandler<3>::raw_face_iterator
-  DoFHandler<3>::begin_raw_face (const unsigned int level) const
+  DoFHandler<3>::begin_raw_face () const
   {
-    return begin_raw_quad (level);
+    return begin_raw_quad ();
   }
 
 
   template <>
   DoFHandler<3>::face_iterator
-  DoFHandler<3>::begin_face (const unsigned int level) const
+  DoFHandler<3>::begin_face () const
   {
-    return begin_quad (level);
+    return begin_quad ();
   }
 
 
   template <>
   DoFHandler<3>::active_face_iterator
-  DoFHandler<3>::begin_active_face (const unsigned int level) const
+  DoFHandler<3>::begin_active_face () const
   {
-    return begin_active_quad (level);
+    return begin_active_quad ();
   }
 
 
   template <>
   DoFHandler<3>::raw_face_iterator
   DoFHandler<3>::end_face () const
+  {
+    return end_quad ();
+  }
+
+
+  template <>
+  DoFHandler<3>::raw_face_iterator
+  DoFHandler<3>::end_raw_face () const
+  {
+    return end_quad ();
+  }
+
+
+  template <>
+  DoFHandler<3>::active_face_iterator
+  DoFHandler<3>::end_active_face () const
   {
     return end_quad ();
   }
@@ -797,14 +879,6 @@ namespace hp
 
 
   template <>
-  DoFHandler<3>::raw_face_iterator
-  DoFHandler<3>::last_raw_face (const unsigned int level) const
-  {
-    return last_raw_quad (level);
-  }
-
-
-  template <>
   DoFHandler<3>::face_iterator
   DoFHandler<3>::last_face () const
   {
@@ -813,26 +887,10 @@ namespace hp
 
 
   template <>
-  DoFHandler<3>::face_iterator
-  DoFHandler<3>::last_face (const unsigned int level) const
-  {
-    return last_quad (level);
-  }
-
-
-  template <>
   DoFHandler<3>::active_face_iterator
   DoFHandler<3>::last_active_face () const
   {
     return last_active_quad ();
-  }
-
-
-  template <>
-  DoFHandler<3>::active_face_iterator
-  DoFHandler<3>::last_active_face (const unsigned int level) const
-  {
-    return last_active_quad (level);
   }
 
 
@@ -938,6 +996,12 @@ namespace hp
   }
 
 
+				   // We can't ask the respective tria->-function here, as
+				   // that would include dereferencing a past-the-end
+				   // iterator which is not allowed. Therefore we have to
+				   // repeat the code from tria.cc This is valid for all
+				   // functions whisch return past the end iterators, namely
+				   // all functions end_*()
   template <int dim>
   typename DoFHandler<dim>::raw_line_iterator
   DoFHandler<dim>::end_line () const
@@ -993,42 +1057,13 @@ namespace hp
 
 
   template <int dim>
-  typename DoFHandler<dim>::raw_face_iterator
-  DoFHandler<dim>::end_raw_face (const unsigned int level) const
-  {
-    return (level == levels.size()-1 ?
-            end_face() :
-            begin_raw_face (level+1));
-  }
-
-
-  template <int dim>
-  typename DoFHandler<dim>::face_iterator
-  DoFHandler<dim>::end_face (const unsigned int level) const
-  {
-    return (level == levels.size()-1 ?
-            face_iterator(end_face()) :
-            begin_face (level+1));
-  }
-
-
-  template <int dim>
-  typename DoFHandler<dim>::active_face_iterator
-  DoFHandler<dim>::end_active_face (const unsigned int level) const
-  {
-    return (level == levels.size()-1 ?
-            active_face_iterator(end_face()) :
-            begin_active_face (level+1));
-  }
-
-
-  template <int dim>
   typename DoFHandler<dim>::raw_line_iterator
   DoFHandler<dim>::end_raw_line (const unsigned int level) const
   {
-    return (level == levels.size()-1 ?
-            end_line() :
-            begin_raw_line (level+1));
+    return raw_line_iterator(tria,
+			     tria->end_raw_line(level)->level(),
+			     tria->end_raw_line(level)->index(),
+			     this);
   }
 
 
@@ -1036,9 +1071,10 @@ namespace hp
   typename DoFHandler<dim>::line_iterator
   DoFHandler<dim>::end_line (const unsigned int level) const
   {
-    return (level == levels.size()-1 ?
-            line_iterator(end_line()) :
-            begin_line (level+1));
+    return line_iterator(tria,
+			 tria->end_line(level)->level(),
+			 tria->end_line(level)->index(),
+			 this);
   }
 
 
@@ -1046,9 +1082,10 @@ namespace hp
   typename DoFHandler<dim>::active_line_iterator
   DoFHandler<dim>::end_active_line (const unsigned int level) const
   {
-    return (level == levels.size()-1 ?
-            active_line_iterator(end_line()) :
-            begin_active_line (level+1));
+    return active_line_iterator(tria,
+				tria->end_active_line(level)->level(),
+				tria->end_active_line(level)->index(),
+				this);
   }
 
 
@@ -1056,9 +1093,10 @@ namespace hp
   typename DoFHandler<dim>::raw_quad_iterator
   DoFHandler<dim>::end_raw_quad (const unsigned int level) const
   {
-    return (level == levels.size()-1 ?
-            end_quad() :
-            begin_raw_quad (level+1));
+    return raw_quad_iterator(tria,
+			     tria->end_raw_quad(level)->level(),
+			     tria->end_raw_quad(level)->index(),
+			     this);
   }
 
 
@@ -1066,9 +1104,10 @@ namespace hp
   typename DoFHandler<dim>::quad_iterator
   DoFHandler<dim>::end_quad (const unsigned int level) const
   {
-    return (level == levels.size()-1 ?
-            quad_iterator(end_quad()) :
-            begin_quad (level+1));
+    return quad_iterator(tria,
+			 tria->end_quad(level)->level(),
+			 tria->end_quad(level)->index(),
+			 this);
   }
 
 
@@ -1076,9 +1115,10 @@ namespace hp
   typename DoFHandler<dim>::active_quad_iterator
   DoFHandler<dim>::end_active_quad (const unsigned int level) const
   {
-    return (level == levels.size()-1 ?
-            active_quad_iterator(end_quad()) :
-            begin_active_quad (level+1));
+    return active_quad_iterator(tria,
+				tria->end_active_quad(level)->level(),
+				tria->end_active_quad(level)->index(),
+				this);
   }
 
 
@@ -1086,9 +1126,10 @@ namespace hp
   typename DoFHandler<dim>::raw_hex_iterator
   DoFHandler<dim>::end_raw_hex (const unsigned int level) const
   {
-    return (level == levels.size()-1 ?
-            end_hex() :
-            begin_raw_hex (level+1));
+    return raw_hex_iterator(tria,
+			    tria->end_raw_hex(level)->level(),
+			    tria->end_raw_hex(level)->index(),
+			    this);
   }
 
 
@@ -1096,9 +1137,10 @@ namespace hp
   typename DoFHandler<dim>::hex_iterator
   DoFHandler<dim>::end_hex (const unsigned int level) const
   {
-    return (level == levels.size()-1 ?
-            hex_iterator(end_hex()) :
-            begin_hex (level+1));
+    return hex_iterator(tria,
+			tria->end_hex(level)->level(),
+			tria->end_hex(level)->index(),
+			this);
   }
 
 
@@ -1106,9 +1148,10 @@ namespace hp
   typename DoFHandler<dim>::active_hex_iterator
   DoFHandler<dim>::end_active_hex (const unsigned int level) const
   {
-    return (level == levels.size()-1 ?
-            active_hex_iterator(end_hex()) :
-            begin_active_hex (level+1));
+    return active_hex_iterator(tria,
+			       tria->end_active_hex(level)->level(),
+			       tria->end_active_hex(level)->index(),
+			       this);
   }
 
 
@@ -1215,7 +1258,10 @@ namespace hp
   typename DoFHandler<dim>::raw_line_iterator
   DoFHandler<dim>::last_raw_line () const
   {
-    return last_raw_line (levels.size()-1);
+    return raw_line_iterator (tria,
+			      tria->last_raw_line()->level(),
+			      tria->last_raw_line()->index(),
+			      this);
   }
 
 
@@ -1223,7 +1269,10 @@ namespace hp
   typename DoFHandler<dim>::raw_quad_iterator
   DoFHandler<dim>::last_raw_quad () const
   {
-    return last_raw_quad (levels.size()-1);
+    return raw_quad_iterator (tria,
+			      tria->last_raw_quad()->level(),
+			      tria->last_raw_quad()->index(),
+			      this);
   }
 
 
@@ -1231,7 +1280,10 @@ namespace hp
   typename DoFHandler<dim>::raw_hex_iterator
   DoFHandler<dim>::last_raw_hex () const
   {
-    return last_raw_hex (levels.size()-1);
+    return raw_hex_iterator (tria,
+			     tria->last_raw_hex()->level(),
+			     tria->last_raw_hex()->index(),
+			     this);
   }
 
 
@@ -1239,7 +1291,10 @@ namespace hp
   typename DoFHandler<dim>::line_iterator
   DoFHandler<dim>::last_line () const
   {
-    return last_line (levels.size()-1);
+    return line_iterator (tria,
+			  tria->last_line()->level(),
+			  tria->last_line()->index(),
+			  this);
   }
 
 
@@ -1247,7 +1302,10 @@ namespace hp
   typename DoFHandler<dim>::quad_iterator
   DoFHandler<dim>::last_quad () const
   {
-    return last_quad (levels.size()-1);
+    return quad_iterator (tria,
+			  tria->last_quad()->level(),
+			  tria->last_quad()->index(),
+			  this);
   }
 
 
@@ -1255,7 +1313,10 @@ namespace hp
   typename DoFHandler<dim>::hex_iterator
   DoFHandler<dim>::last_hex () const
   {
-    return last_hex (levels.size()-1);
+    return hex_iterator (tria,
+			 tria->last_hex()->level(),
+			 tria->last_hex()->index(),
+			 this);
   }
 
 
@@ -1263,7 +1324,10 @@ namespace hp
   typename DoFHandler<dim>::active_line_iterator
   DoFHandler<dim>::last_active_line () const
   {
-    return last_active_line (levels.size()-1);
+    return active_line_iterator (tria,
+				 tria->last_active_line()->level(),
+				 tria->last_active_line()->index(),
+				 this);
   }
 
 
@@ -1271,7 +1335,10 @@ namespace hp
   typename DoFHandler<dim>::active_quad_iterator
   DoFHandler<dim>::last_active_quad () const
   {
-    return last_active_quad (levels.size()-1);
+    return active_quad_iterator (tria,
+				 tria->last_active_quad()->level(),
+				 tria->last_active_quad()->index(),
+				 this);
   }
 
 
@@ -1279,11 +1346,388 @@ namespace hp
   typename DoFHandler<dim>::active_hex_iterator
   DoFHandler<dim>::last_active_hex () const
   {
-    return last_active_hex (levels.size()-1);
+    return active_hex_iterator (tria,
+				tria->last_active_hex()->level(),
+				tria->last_active_hex()->index(),
+				this);
   }
 
 
 //------------------------------------------------------------------
+#if deal_II_dimension == 1 
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<1>::get_dof_index<1> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index) const
+  {
+    return this->levels[obj_level]->lines.
+      get_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     obj_level);
+  }
+
+
+  template <>
+  template <>
+  void
+  DoFHandler<1>::set_dof_index<1> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index,
+				   const unsigned int       global_index) const
+  {
+    this->levels[obj_level]->lines.
+      set_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     global_index,
+		     obj_level);
+  }
+
+
+  template <>
+  template <>
+  bool
+  DoFHandler<1>::fe_index_is_active<1> (const unsigned int obj_level,
+					const unsigned int obj_index,
+					const unsigned int fe_index) const
+  {
+    return this->levels[obj_level]->lines.fe_index_is_active(*this,
+							     obj_index,
+							     fe_index,
+							     obj_level);
+  }
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<1>::n_active_fe_indices<1> (const unsigned int obj_level,
+					 const unsigned int obj_index) const
+  {
+    return this->levels[obj_level]->lines.n_active_fe_indices (*this,
+							       obj_index);
+  }
+#endif
+
+
+#if deal_II_dimension == 2
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<2>::get_dof_index<1> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index) const
+  {
+    return this->faces->lines.
+      get_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     obj_level);
+  }
+
+
+  template <>
+  template <>
+  void
+  DoFHandler<2>::set_dof_index<1> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index,
+				   const unsigned int       global_index) const
+  {
+    this->faces->lines.
+      set_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     global_index,
+		     obj_level);
+  
+  }
+
+
+  template <>
+  template <>
+  bool
+  DoFHandler<2>::fe_index_is_active<1> (const unsigned int obj_level,
+					const unsigned int obj_index,
+					const unsigned int fe_index) const
+  {
+    return this->faces->lines.fe_index_is_active(*this,
+						 obj_index,
+						 fe_index,
+						 obj_level);
+  }
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<2>::n_active_fe_indices<1> (const unsigned int ,
+					 const unsigned int obj_index) const
+  {
+    return this->faces->lines.n_active_fe_indices (*this,
+						   obj_index);
+  }
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<2>::get_dof_index<2> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index) const
+  {
+    return this->levels[obj_level]->quads.
+      get_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     obj_level);
+  }
+
+
+  template <>
+  template <>
+  void
+  DoFHandler<2>::set_dof_index<2> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index,
+				   const unsigned int       global_index) const
+  {
+    this->levels[obj_level]->quads.
+      set_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     global_index,
+		     obj_level);
+  
+  }
+
+
+  template <>
+  template <>
+  bool
+  DoFHandler<2>::fe_index_is_active<2> (const unsigned int obj_level,
+					const unsigned int obj_index,
+					const unsigned int fe_index) const
+  {
+    return this->levels[obj_level]->quads.fe_index_is_active(*this,
+							     obj_index,
+							     fe_index,
+							     obj_level);
+  }
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<2>::n_active_fe_indices<2> (const unsigned int obj_level,
+					 const unsigned int obj_index) const
+  {
+    return this->levels[obj_level]->quads.n_active_fe_indices (*this,
+							       obj_index);
+  }
+#endif
+
+#if deal_II_dimension == 3
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<3>::get_dof_index<1> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index) const
+  {
+    return this->faces->lines.
+      get_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     obj_level);
+  }
+
+
+  template <>
+  template <>
+  void
+  DoFHandler<3>::set_dof_index<1> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index,
+				   const unsigned int       global_index) const
+  {
+    this->faces->lines.
+      set_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     global_index,
+		     obj_level);
+  
+  }
+
+
+  template <>
+  template <>
+  bool
+  DoFHandler<3>::fe_index_is_active<1> (const unsigned int obj_level,
+					const unsigned int obj_index,
+					const unsigned int fe_index) const
+  {
+    return this->faces->lines.fe_index_is_active(*this,
+						 obj_index,
+						 fe_index,
+						 obj_level);
+  }
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<3>::n_active_fe_indices<1> (const unsigned int,
+					 const unsigned int obj_index) const
+  {
+    return this->faces->lines.n_active_fe_indices (*this,
+						   obj_index);
+  }
+
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<3>::get_dof_index<2> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index) const
+  {
+    return this->faces->quads.
+      get_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     obj_level);
+  }
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<3>::get_dof_index<3> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index) const
+  {
+    return this->levels[obj_level]->hexes.
+      get_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     obj_level);
+  }
+
+
+  template <>
+  template <>
+  void
+  DoFHandler<3>::set_dof_index<2> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index,
+				   const unsigned int       global_index) const
+  {
+    this->faces->quads.
+      set_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     global_index,
+		     obj_level);
+  
+  }
+
+
+  template <>
+  template <>
+  void
+  DoFHandler<3>::set_dof_index<3> (const unsigned int       obj_level,
+				   const unsigned int       obj_index,
+				   const unsigned int       fe_index,
+				   const unsigned int       local_index,
+				   const unsigned int       global_index) const
+  {
+    this->levels[obj_level]->hexes.
+      set_dof_index (*this,
+		     obj_index,
+		     fe_index,
+		     local_index,
+		     global_index,
+		     obj_level);
+  
+  }
+
+
+  template <>
+  template <>
+  bool
+  DoFHandler<3>::fe_index_is_active<2> (const unsigned int obj_level,
+					const unsigned int obj_index,
+					const unsigned int fe_index) const
+  {
+    return this->faces->quads.fe_index_is_active(*this,
+						 obj_index,
+						 fe_index,
+						 obj_level);
+  }
+
+  template <>
+  template <>
+  bool
+  DoFHandler<3>::fe_index_is_active<3> (const unsigned int obj_level,
+					const unsigned int obj_index,
+					const unsigned int fe_index) const
+  {
+    return this->levels[obj_level]->hexes.fe_index_is_active(*this,
+							     obj_index,
+							     fe_index,
+							     obj_level);
+  }
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<3>::n_active_fe_indices<2> (const unsigned int ,
+					 const unsigned int obj_index) const
+  {
+    return this->faces->quads.n_active_fe_indices (*this,
+						   obj_index);
+  }
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<3>::n_active_fe_indices<3> (const unsigned int obj_level,
+					 const unsigned int obj_index) const
+  {
+    return this->levels[obj_level]->hexes.n_active_fe_indices (*this,
+							       obj_index);
+  }
+#endif
+
 
 
 
@@ -1507,10 +1951,12 @@ namespace hp
                         MemoryConsumption::memory_consumption (finite_elements) +
                         MemoryConsumption::memory_consumption (tria) +
                         MemoryConsumption::memory_consumption (levels) +
+                        MemoryConsumption::memory_consumption (faces) +
                         MemoryConsumption::memory_consumption (used_dofs) +
                         MemoryConsumption::memory_consumption (vertex_dofs));
     for (unsigned int i=0; i<levels.size(); ++i)
       mem += MemoryConsumption::memory_consumption (*levels[i]);
+    mem += MemoryConsumption::memory_consumption (*faces);
   
     return mem;
   }
@@ -1789,8 +2235,8 @@ namespace hp
         *i = new_numbers[*i];
   
     for (unsigned int level=0; level<levels.size(); ++level) 
-      for (std::vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
-           i!=levels[level]->line_dofs.end(); ++i)
+      for (std::vector<unsigned int>::iterator i=levels[level]->lines.dofs.begin();
+           i!=levels[level]->lines.dofs.end(); ++i)
         if (*i != invalid_dof_index)
           *i = new_numbers[*i];
   }
@@ -1832,15 +2278,16 @@ namespace hp
   
     for (unsigned int level=0; level<levels.size(); ++level) 
       {
-        for (std::vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
-             i!=levels[level]->line_dofs.end(); ++i)
+        for (std::vector<unsigned int>::iterator i=levels[level]->quads.dofs.begin();
+             i!=levels[level]->quads.dofs.end(); ++i)
           if (*i != invalid_dof_index)
             *i = new_numbers[*i];
-        for (std::vector<unsigned int>::iterator i=levels[level]->quad_dofs.begin();
-             i!=levels[level]->quad_dofs.end(); ++i)
-          if (*i != invalid_dof_index)
-            *i = new_numbers[*i];
-      };
+      }
+    for (std::vector<unsigned int>::iterator i=faces->lines.dofs.begin();
+	 i!=faces->lines.dofs.end(); ++i)
+      if (*i != invalid_dof_index)
+	*i = new_numbers[*i];
+
   }
 
 #endif
@@ -1880,19 +2327,20 @@ namespace hp
   
     for (unsigned int level=0; level<levels.size(); ++level) 
       {
-        for (std::vector<unsigned int>::iterator i=levels[level]->line_dofs.begin();
-             i!=levels[level]->line_dofs.end(); ++i)
+        for (std::vector<unsigned int>::iterator i=levels[level]->hexes.dofs.begin();
+             i!=levels[level]->hexes.dofs.end(); ++i)
           if (*i != invalid_dof_index)
             *i = new_numbers[*i];
-        for (std::vector<unsigned int>::iterator i=levels[level]->quad_dofs.begin();
-             i!=levels[level]->quad_dofs.end(); ++i)
-          if (*i != invalid_dof_index)
-            *i = new_numbers[*i];
-        for (std::vector<unsigned int>::iterator i=levels[level]->hex_dofs.begin();
-             i!=levels[level]->hex_dofs.end(); ++i)
-          if (*i != invalid_dof_index)
-            *i = new_numbers[*i];
-      };
+      }
+    for (std::vector<unsigned int>::iterator i=faces->lines.dofs.begin();
+	 i!=faces->lines.dofs.end(); ++i)
+      if (*i != invalid_dof_index)
+	*i = new_numbers[*i];
+    for (std::vector<unsigned int>::iterator i=faces->quads.dofs.begin();
+	 i!=faces->quads.dofs.end(); ++i)
+      if (*i != invalid_dof_index)
+	*i = new_numbers[*i];
+    
   }
 
 #endif
@@ -2117,7 +2565,7 @@ namespace hp
 				     // finite element is used for it
     for (unsigned int level=0; level<tria->n_levels(); ++level) 
       {
-        levels[level]->line_dof_offsets
+        levels[level]->lines.dof_offsets
           = std::vector<unsigned int> (tria->n_raw_lines(level),
                                        invalid_dof_index);
 
@@ -2126,11 +2574,11 @@ namespace hp
              cell!=end_active(level); ++cell)
           if (!cell->has_children())
 	    {
-	      levels[level]->line_dof_offsets[cell->index()] = next_free_dof;
+	      levels[level]->lines.dof_offsets[cell->index()] = next_free_dof;
 	      next_free_dof += cell->get_fe().dofs_per_line;
 	    }
 
-        levels[level]->line_dofs
+        levels[level]->lines.dofs
           = std::vector<unsigned int> (next_free_dof, invalid_dof_index);
       }
 
@@ -2150,10 +2598,10 @@ namespace hp
           if (!cell->has_children())
             counter += cell->get_fe().dofs_per_line;
         
-        Assert (levels[level]->line_dofs.size() == counter, ExcInternalError());
+        Assert (levels[level]->lines.dofs.size() == counter, ExcInternalError());
         Assert (static_cast<unsigned int>
-                (std::count (levels[level]->line_dof_offsets.begin(),
-                             levels[level]->line_dof_offsets.end(),
+                (std::count (levels[level]->lines.dof_offsets.begin(),
+                             levels[level]->lines.dof_offsets.end(),
                              invalid_dof_index))
                 ==
                 tria->n_raw_lines(level) - tria->n_active_lines(level),
@@ -2201,6 +2649,7 @@ namespace hp
           std::swap (active_fe_backup[level],
                      levels[level]->active_fe_indices);
         }
+      faces = new internal::hp::DoFFaces<2>;
     }
 
     
@@ -2222,7 +2671,7 @@ namespace hp
 				     // finite element is used for it
     for (unsigned int level=0; level<tria->n_levels(); ++level) 
       {
-        levels[level]->quad_dof_offsets
+        levels[level]->quads.dof_offsets
           = std::vector<unsigned int> (tria->n_raw_quads(level),
                                        invalid_dof_index);
 
@@ -2231,11 +2680,11 @@ namespace hp
              cell!=end_active(level); ++cell)
           if (!cell->has_children())
 	    {
-	      levels[level]->quad_dof_offsets[cell->index()] = next_free_dof;
+	      levels[level]->quads.dof_offsets[cell->index()] = next_free_dof;
 	      next_free_dof += cell->get_fe().dofs_per_quad;
 	    }
 
-        levels[level]->quad_dofs
+        levels[level]->quads.dofs
           = std::vector<unsigned int> (next_free_dof, invalid_dof_index);
       }
 
@@ -2255,10 +2704,10 @@ namespace hp
           if (!cell->has_children())
             counter += cell->get_fe().dofs_per_quad;
         
-        Assert (levels[level]->quad_dofs.size() == counter, ExcInternalError());
+        Assert (levels[level]->quads.dofs.size() == counter, ExcInternalError());
         Assert (static_cast<unsigned int>
-                (std::count (levels[level]->quad_dof_offsets.begin(),
-                             levels[level]->quad_dof_offsets.end(),
+                (std::count (levels[level]->quads.dof_offsets.begin(),
+                             levels[level]->quads.dof_offsets.end(),
                              invalid_dof_index))
                 ==
                 tria->n_raw_quads(level) - tria->n_active_quads(level),
@@ -2303,7 +2752,7 @@ namespace hp
                                        // slots (see the hp::DoFLevel
                                        // class) we will have to store
                                        // on each level
-      std::vector<unsigned int> n_line_slots (tria->n_levels(), 0);
+      unsigned int n_line_slots = 0;
     
       for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -2341,7 +2790,7 @@ namespace hp
                                                  // dofs_per_line
                                                  // dofs, and one stop
                                                  // index
-                n_line_slots[cell->level()]
+                n_line_slots
                   += (*finite_elements)[cell->active_fe_index()].dofs_per_line + 2;
 
                                                // otherwise we do
@@ -2351,7 +2800,7 @@ namespace hp
                                                // dofs, and one stop
                                                // index:
               else
-                n_line_slots[cell->level()]
+                n_line_slots
                   += ((*finite_elements)[cell->active_fe_index()].dofs_per_line
                       +
                       (*finite_elements)[cell->neighbor(face)->active_fe_index()]
@@ -2372,16 +2821,13 @@ namespace hp
                                        // lines, though only the
                                        // active ones will have a
                                        // non-invalid value later on
-      for (unsigned int level=0; level<tria->n_levels(); ++level) 
-        {
-          levels[level]->line_dof_offsets
-            = std::vector<unsigned int> (tria->n_raw_lines(level),
-                                         invalid_dof_index);
-          levels[level]->line_dofs
-            = std::vector<unsigned int> (n_line_slots[level],
-                                         invalid_dof_index);        
-        }
-
+      faces->lines.dof_offsets
+	= std::vector<unsigned int> (tria->n_raw_lines(),
+				     invalid_dof_index);
+      faces->lines.dofs
+	= std::vector<unsigned int> (n_line_slots,
+				     invalid_dof_index);
+      
                                        // with the memory now
                                        // allocated, loop over the
                                        // cells again and prime the
@@ -2389,7 +2835,7 @@ namespace hp
                                        // the fe_index fields
       const_cast<Triangulation<dim>&>(*tria).clear_user_flags_line ();
 
-      std::vector<unsigned int> next_free_line_slot (tria->n_levels(), 0);
+      unsigned int next_free_line_slot = 0;
       
       for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -2409,16 +2855,16 @@ namespace hp
                    &&
                    (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
                 {
-                  levels[cell->level()]
-                    ->line_dof_offsets[cell->face(face)->index()]
-                    = next_free_line_slot[cell->level()];
+                  faces
+                    ->lines.dof_offsets[cell->face(face)->index()]
+                    = next_free_line_slot;
 
                                                    // set first slot
                                                    // for this line to
                                                    // active_fe_index
                                                    // of this face
-                  levels[cell->level()]
-                    ->line_dofs[next_free_line_slot[cell->level()]]
+                  faces
+                    ->lines.dofs[next_free_line_slot]
                     = cell->active_fe_index();
 
                                                    // the next
@@ -2440,21 +2886,21 @@ namespace hp
                                                    // finally, mark
                                                    // those slots as
                                                    // used
-                  next_free_line_slot[cell->level()]
+                  next_free_line_slot
                     += (*finite_elements)[cell->active_fe_index()].dofs_per_line + 2;
                 }
               else
                 {
-                  levels[cell->level()]
-                    ->line_dof_offsets[cell->face(face)->index()]
-                    = next_free_line_slot[cell->level()];
+                  faces
+                    ->lines.dof_offsets[cell->face(face)->index()]
+                    = next_free_line_slot;
 
                                                    // set first slot
                                                    // for this line to
                                                    // active_fe_index
                                                    // of this face
-                  levels[cell->level()]
-                    ->line_dofs[next_free_line_slot[cell->level()]]
+                  faces
+                    ->lines.dofs[next_free_line_slot]
                     = cell->active_fe_index();
 
                                                    // the next
@@ -2468,57 +2914,56 @@ namespace hp
                                                    // fe_index for the
                                                    // neighboring
                                                    // cell:
-                  levels[cell->level()]
-                    ->line_dofs[next_free_line_slot[cell->level()]
-                                +
-                                (*finite_elements)[cell->active_fe_index()].dofs_per_line
-                                +
-                                1]
-                    = cell->neighbor(face)->active_fe_index();
-                                                   // then again a set
-                                                   // of dofs that we
-                                                   // need not set
-                                                   // right now
-                                                   // 
-                                                   // following this
-                                                   // comes the stop
-                                                   // index, which
-                                                   // also is
-                                                   // invalid_dof_index
-                                                   // and therefore
-                                                   // does not have to
-                                                   // be explicitly
-                                                   // set
+                  faces
+                    ->lines.dofs[next_free_line_slot
+		    +
+		    (*finite_elements)[cell->active_fe_index()].dofs_per_line
+		    +
+		    1]
+		  = cell->neighbor(face)->active_fe_index();
+						   // then again a set
+						   // of dofs that we
+						   // need not set
+						   // right now
+						   // 
+						   // following this
+						   // comes the stop
+						   // index, which
+						   // also is
+						   // invalid_dof_index
+						   // and therefore
+						   // does not have to
+						   // be explicitly
+						   // set
                   
-                                                   // finally, mark
-                                                   // those slots as
-                                                   // used
-                  next_free_line_slot[cell->level()]
-                    += ((*finite_elements)[cell->active_fe_index()].dofs_per_line
-                        +
-                        (*finite_elements)[cell->neighbor(face)->active_fe_index()]
-                        .dofs_per_line
-                        +
-                        3);
-                }
+						   // finally, mark
+						   // those slots as
+						   // used
+		  next_free_line_slot
+		    += ((*finite_elements)[cell->active_fe_index()].dofs_per_line
+			+
+			(*finite_elements)[cell->neighbor(face)->active_fe_index()]
+			.dofs_per_line
+			+
+			3);
+		}
               
-                                               // mark this face as
-                                               // visited
-              cell->face(face)->set_user_flag ();
-            }
-
-                                       // we should have moved the
-                                       // cursor for each level to the
-                                       // total number of dofs on that
-                                       // level. check that
-      for (unsigned int level=0; level<tria->n_levels(); ++level)
-        Assert (next_free_line_slot[level] == n_line_slots[level],
-                ExcInternalError());
+					       // mark this face as
+					       // visited
+	      cell->face(face)->set_user_flag ();
+	    }
       
-                                       // at the end, restore the user
-                                       // flags for the lines
+				       // we should have moved the
+				       // cursor for each level to the
+				       // total number of dofs on that
+				       // level. check that
+      Assert (next_free_line_slot == n_line_slots,
+	      ExcInternalError());
+      
+				       // at the end, restore the user
+				       // flags for the lines
       const_cast<Triangulation<dim>&>(*tria)
-        .load_user_flags_line (saved_line_user_flags);
+	.load_user_flags_line (saved_line_user_flags);
     }
     
 
@@ -2561,6 +3006,7 @@ namespace hp
           std::swap (active_fe_backup[level],
                      levels[level]->active_fe_indices);
         }
+      faces = new internal::hp::DoFFaces<3>;
     }
 
     
@@ -2582,7 +3028,7 @@ namespace hp
 				     // finite element is used for it
     for (unsigned int level=0; level<tria->n_levels(); ++level) 
       {
-        levels[level]->hex_dof_offsets
+        levels[level]->hexes.dof_offsets
           = std::vector<unsigned int> (tria->n_raw_hexs(level),
                                        invalid_dof_index);
 
@@ -2591,11 +3037,11 @@ namespace hp
              cell!=end_active(level); ++cell)
           if (!cell->has_children())
 	    {
-	      levels[level]->hex_dof_offsets[cell->index()] = next_free_dof;
+	      levels[level]->hexes.dof_offsets[cell->index()] = next_free_dof;
 	      next_free_dof += cell->get_fe().dofs_per_hex;
 	    }
 
-        levels[level]->hex_dofs
+        levels[level]->hexes.dofs
           = std::vector<unsigned int> (next_free_dof, invalid_dof_index);
       }
 
@@ -2615,10 +3061,10 @@ namespace hp
           if (!cell->has_children())
             counter += cell->get_fe().dofs_per_hex;
         
-        Assert (levels[level]->hex_dofs.size() == counter, ExcInternalError());
+        Assert (levels[level]->hexes.dofs.size() == counter, ExcInternalError());
         Assert (static_cast<unsigned int>
-                (std::count (levels[level]->hex_dof_offsets.begin(),
-                             levels[level]->hex_dof_offsets.end(),
+                (std::count (levels[level]->hexes.dof_offsets.begin(),
+                             levels[level]->hexes.dof_offsets.end(),
                              invalid_dof_index))
                 ==
                 tria->n_raw_hexs(level) - tria->n_active_hexs(level),
@@ -2659,16 +3105,15 @@ namespace hp
         .save_user_flags_quad (saved_quad_user_flags);
       const_cast<Triangulation<dim>&>(*tria).clear_user_flags_quad ();
 
-                                       // an array to hold how many
-                                       // slots (see the hp::DoFLevel
-                                       // class) we will have to store
-                                       // on each level
-      std::vector<unsigned int> n_quad_slots (tria->n_levels(), 0);
+				       // examine, how how many
+				       // slots (see the hp::DoFLevel
+				       // class) we will have to store
+      unsigned int n_quad_slots = 0;
     
       for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
-        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-          if (! cell->face(face)->user_flag_set())
-            {
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  if (! cell->face(face)->user_flag_set())
+	    {
                                                // ok, face has not been
                                                // visited. so we need to
                                                // allocate space for
@@ -2701,7 +3146,7 @@ namespace hp
                                                  // dofs_per_quad
                                                  // dofs, and one stop
                                                  // index
-                n_quad_slots[cell->level()]
+                n_quad_slots
                   += (*finite_elements)[cell->active_fe_index()].dofs_per_quad + 2;
 
                                                // otherwise we do
@@ -2711,7 +3156,7 @@ namespace hp
                                                // dofs, and one stop
                                                // index:
               else
-                n_quad_slots[cell->level()]
+                n_quad_slots
                   += ((*finite_elements)[cell->active_fe_index()].dofs_per_quad
                       +
                       (*finite_elements)[cell->neighbor(face)->active_fe_index()]
@@ -2726,19 +3171,19 @@ namespace hp
 
                                        // now that we know how many
                                        // quad dofs we will have to
-                                       // have on each level, allocate
+                                       // have,  allocate
                                        // the memory. note that we
                                        // allocate offsets for all
                                        // quads, though only the
                                        // active ones will have a
                                        // non-invalid value later on
-      for (unsigned int level=0; level<tria->n_levels(); ++level) 
+      if (true) 
         {
-          levels[level]->quad_dof_offsets
-            = std::vector<unsigned int> (tria->n_raw_quads(level),
+          faces->quads.dof_offsets
+            = std::vector<unsigned int> (tria->n_raw_quads(),
                                          invalid_dof_index);
-          levels[level]->quad_dofs
-            = std::vector<unsigned int> (n_quad_slots[level],
+          faces->quads.dofs
+            = std::vector<unsigned int> (n_quad_slots,
                                          invalid_dof_index);        
         }
 
@@ -2749,7 +3194,7 @@ namespace hp
                                        // the fe_index fields
       const_cast<Triangulation<dim>&>(*tria).clear_user_flags_quad ();
 
-      std::vector<unsigned int> next_free_quad_slot (tria->n_levels(), 0);
+      unsigned int next_free_quad_slot = 0;
       
       for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -2769,16 +3214,16 @@ namespace hp
                    &&
                    (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
                 {
-                  levels[cell->level()]
-                    ->quad_dof_offsets[cell->face(face)->index()]
-                    = next_free_quad_slot[cell->level()];
+                  faces
+                    ->quads.dof_offsets[cell->face(face)->index()]
+                    = next_free_quad_slot;
 
                                                    // set first slot
                                                    // for this quad to
                                                    // active_fe_index
                                                    // of this face
-                  levels[cell->level()]
-                    ->quad_dofs[next_free_quad_slot[cell->level()]]
+                  faces
+                    ->quads.dofs[next_free_quad_slot]
                     = cell->active_fe_index();
 
                                                    // the next
@@ -2800,21 +3245,21 @@ namespace hp
                                                    // finally, mark
                                                    // those slots as
                                                    // used
-                  next_free_quad_slot[cell->level()]
+                  next_free_quad_slot
                     += (*finite_elements)[cell->active_fe_index()].dofs_per_quad + 2;
                 }
               else
                 {
-                  levels[cell->level()]
-                    ->quad_dof_offsets[cell->face(face)->index()]
-                    = next_free_quad_slot[cell->level()];
+                  faces
+                    ->quads.dof_offsets[cell->face(face)->index()]
+                    = next_free_quad_slot;
 
                                                    // set first slot
                                                    // for this quad to
                                                    // active_fe_index
                                                    // of this face
-                  levels[cell->level()]
-                    ->quad_dofs[next_free_quad_slot[cell->level()]]
+                  faces
+                    ->quads.dofs[next_free_quad_slot]
                     = cell->active_fe_index();
 
                                                    // the next
@@ -2828,8 +3273,8 @@ namespace hp
                                                    // fe_index for the
                                                    // neighboring
                                                    // cell:
-                  levels[cell->level()]
-                    ->quad_dofs[next_free_quad_slot[cell->level()]
+                  faces
+                    ->quads.dofs[next_free_quad_slot
                                 +
                                 (*finite_elements)[cell->active_fe_index()].dofs_per_quad
                                 +
@@ -2853,7 +3298,7 @@ namespace hp
                                                    // finally, mark
                                                    // those slots as
                                                    // used
-                  next_free_quad_slot[cell->level()]
+                  next_free_quad_slot
                     += ((*finite_elements)[cell->active_fe_index()].dofs_per_quad
                         +
                         (*finite_elements)[cell->neighbor(face)->active_fe_index()]
@@ -2868,12 +3313,10 @@ namespace hp
             }
 
                                        // we should have moved the
-                                       // cursor for each level to the
-                                       // total number of dofs on that
-                                       // level. check that
-      for (unsigned int level=0; level<tria->n_levels(); ++level)
-        Assert (next_free_quad_slot[level] == n_quad_slots[level],
-                ExcInternalError());
+                                       // cursor to the total number
+                                       // of dofs. check that
+      Assert (next_free_quad_slot == n_quad_slots,
+	      ExcInternalError());
       
                                        // at the end, restore the user
                                        // flags for the quads
@@ -2888,18 +3331,12 @@ namespace hp
 				     // much like with vertices: there
 				     // can be an arbitrary number of
 				     // finite elements associated
-				     // with each line. the situation
-				     // is more complicated, however,
-				     // since lines have no global
-				     // ordering, but are rather
-				     // organized into levels.
+				     // with each line. 
 				     //
 				     // the algorithm we use is
 				     // somewhat similar to what we do
-				     // in reserve_space_vertices(),
-				     // except that we have to to
-				     // separate work for all levels
-    for (unsigned int level=0; level<tria->n_levels(); ++level)
+				     // in reserve_space_vertices()
+    if (true)
       {
 					 // what we do first is to set up
 					 // an array in which we record
@@ -2911,11 +3348,11 @@ namespace hp
 					 // required dofs
 	std::vector<std::vector<bool> >
 	  line_fe_association (finite_elements->size(),
-			       std::vector<bool> (tria->n_raw_lines(level),
+			       std::vector<bool> (tria->n_raw_lines(),
 						  false));
       
-	for (active_cell_iterator cell=begin_active(level);
-	     cell!=end_active(level); ++cell)
+	for (active_cell_iterator cell=begin_active();
+	     cell!=end(); ++cell)
 	  for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
 	    line_fe_association[cell->active_fe_index()][cell->line_index(l)]
 	      = true;
@@ -2929,8 +3366,8 @@ namespace hp
 					 // case we do not have to
 					 // allocate any memory at
 					 // all
-	std::vector<bool> line_is_used (tria->n_raw_lines(level), false);
-	for (unsigned int line=0; line<tria->n_raw_lines(level); ++line)
+	std::vector<bool> line_is_used (tria->n_raw_lines(), false);
+	for (unsigned int line=0; line<tria->n_raw_lines(); ++line)
 	  for (unsigned int fe=0; fe<finite_elements->size(); ++fe)
 	    if (line_fe_association[fe][line] == true)
 	      {
@@ -2949,15 +3386,15 @@ namespace hp
 					 // fe_indices. at the same
 					 // time already fill the
 					 // line_dofs_offsets field
-	levels[level]->line_dof_offsets
-	  .resize (tria->n_raw_lines(level),
+	faces->lines.dof_offsets
+	  .resize (tria->n_raw_lines(),
 		   deal_II_numbers::invalid_unsigned_int);
 	
 	unsigned int line_slots_needed = 0;
-	for (unsigned int line=0; line<tria->n_raw_lines(level); ++line)
+	for (unsigned int line=0; line<tria->n_raw_lines(); ++line)
 	  if (line_is_used[line] == true)
 	    {
-	      levels[level]->line_dof_offsets[line] = line_slots_needed;
+	      faces->lines.dof_offsets[line] = line_slots_needed;
 	    
 	      for (unsigned int fe=0; fe<finite_elements->size(); ++fe)
 		if (line_fe_association[fe][line] == true)
@@ -2969,11 +3406,11 @@ namespace hp
 					 // have determined we need, and
 					 // set up the linked lists for
 					 // each of the lines
-	levels[level]->line_dofs.resize (line_slots_needed, invalid_dof_index);
-	for (unsigned int line=0; line<tria->n_raw_lines(level); ++line)
+	faces->lines.dofs.resize (line_slots_needed, invalid_dof_index);
+	for (unsigned int line=0; line<tria->n_raw_lines(); ++line)
 	  if (line_is_used[line] == true)
 	    {
-	      unsigned int pointer = levels[level]->line_dof_offsets[line];
+	      unsigned int pointer = faces->lines.dof_offsets[line];
 	      for (unsigned int fe=0; fe<finite_elements->size(); ++fe)
 		if (line_fe_association[fe][line] == true)
 		  {
@@ -2983,14 +3420,15 @@ namespace hp
 						     // fe_index and
 						     // move the
 						     // pointer ahead
-		    levels[level]->line_dofs[pointer] = fe;
+		    faces->lines.dofs[pointer] = fe;
 		    pointer += (*finite_elements)[fe].dofs_per_line + 1;
 		  }
 					       // finally place the end
 					       // marker
-	      levels[level]->line_dofs[pointer] = deal_II_numbers::invalid_unsigned_int;
+	      faces->lines.dofs[pointer] = deal_II_numbers::invalid_unsigned_int;
 	    }
       }
+
     
 
 				     // VERTEX DOFS
@@ -3321,6 +3759,8 @@ namespace hp
     for (unsigned int i=0; i<levels.size(); ++i)
       delete levels[i];
     levels.resize (0);
+    delete faces;
+    faces = NULL;
 
     {
       std::vector<unsigned int> tmp;

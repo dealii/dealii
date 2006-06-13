@@ -1,0 +1,43 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2006 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+#include <base/memory_consumption.h>
+#include <grid/tria_faces.h>
+
+
+namespace internal
+{
+  namespace Triangulation
+  {
+    unsigned int
+    TriaFaces<1>::memory_consumption () const
+    {
+      return 0;
+    }
+
+
+    unsigned int
+    TriaFaces<2>::memory_consumption () const
+    {
+      return MemoryConsumption::memory_consumption (lines);
+    }
+
+
+    unsigned int
+    TriaFaces<3>::memory_consumption () const
+    {
+      return (MemoryConsumption::memory_consumption (quads) +
+	      MemoryConsumption::memory_consumption (lines) );
+    }
+  }
+}

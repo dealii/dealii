@@ -260,7 +260,7 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaRawIterator<dim,
 #ifdef DEBUG
 				   // do this like this, because:
 				   // if we write
-				   // "Assert (IteratorState::past_the_end || used)"
+				   // "Assert (IteratorState::past_the_end || !has_children())"
 				   // has_children() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
@@ -279,7 +279,7 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const TriaIterator<dim,Acc
 #ifdef DEBUG
 				   // do this like this, because:
 				   // if we write
-				   // "Assert (IteratorState::past_the_end || used)"
+				   // "Assert (IteratorState::past_the_end || !has_children())"
 				   // has_children() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
@@ -301,7 +301,7 @@ TriaActiveIterator<dim,Accessor>::TriaActiveIterator (const Triangulation<dim> *
 #ifdef DEBUG
 				   // do this like this, because:
 				   // if we write
-				   // "Assert (IteratorState::past_the_end || used)"
+				   // "Assert (IteratorState::past_the_end || !has_children())"
 				   // has_children() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
@@ -329,7 +329,7 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaRawIterator<dim,Accessor
 #ifdef DEBUG
 				   // do this like this, because:
 				   // if we write
-				   // "Assert (IteratorState::past_the_end || used)"
+				   // "Assert (IteratorState::past_the_end || !has_children())"
 				   // has_chidlren() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!
@@ -349,7 +349,7 @@ TriaActiveIterator<dim,Accessor>::operator = (const TriaIterator<dim,Accessor> &
 #ifdef DEBUG
 				   // do this like this, because:
 				   // if we write
-				   // "Assert (IteratorState::past_the_end || used)"
+				   // "Assert (IteratorState::past_the_end || !has_children())"
 				   // has_children() is called anyway, even if
 				   // state==IteratorState::past_the_end, and will then
 				   // throw the exception!

@@ -126,12 +126,11 @@ template <int structdim, int dim>
 unsigned int
 MGDoFAccessor<structdim, dim>::mg_dof_index (const unsigned int i) const
 {
-  return this->mg_dof_handler->mg_levels[this->present_level]
-    ->get_dof_index(*this->dof_handler,
-		    this->present_index,
-		    0,
-		    i,
-		    internal::StructuralDimension<structdim>());
+  return this->mg_dof_handler
+    ->template get_dof_index<structdim>(this->present_level,
+					this->present_index,
+					0,
+					i);
 }
 
 
@@ -139,13 +138,12 @@ template <int structdim, int dim>
 void MGDoFAccessor<structdim, dim>::set_mg_dof_index (const unsigned int i,
 						    const unsigned int index) const
 {
-  this->mg_dof_handler->mg_levels[this->present_level]
-    ->set_dof_index(*this->dof_handler,
-		    this->present_index,
-		    0,
-		    i,
-		    index,
-		    internal::StructuralDimension<structdim>());
+  this->mg_dof_handler
+    ->template set_dof_index<structdim>(this->present_level,
+					this->present_index,
+					0,
+					i,
+					index);
 }
 
 
@@ -154,8 +152,14 @@ template <int structdim, int dim>
 TriaIterator<dim,MGDoFObjectAccessor<structdim, dim> >
 MGDoFAccessor<structdim, dim>::child (const unsigned int i) const
 {
+  int next_level;
+  if (structdim==dim)
+    next_level=this->present_level+1;
+  else
+    next_level=0;
+  
   TriaIterator<dim,MGDoFObjectAccessor<structdim, dim> > q (this->tria,
-							    this->present_level+1,
+							    next_level,
 							    this->child_index (i),
 							    this->mg_dof_handler);
   
@@ -360,7 +364,7 @@ MGDoFObjectAccessor<2, dim>::line (const unsigned int i) const
   return TriaIterator<dim,MGDoFObjectAccessor<1, dim> >
     (
       this->tria,
-      this->present_level,
+      0,
       this->line_index (i),
       this->mg_dof_handler
     );
@@ -467,7 +471,7 @@ MGDoFObjectAccessor<3, dim>::line (const unsigned int i) const
   return TriaIterator<dim,MGDoFObjectAccessor<1, dim> >
     (
       this->tria,
-      this->present_level,
+      0,
       this->line_index (i),
       this->mg_dof_handler
     );
@@ -478,12 +482,12 @@ template <int dim>
 TriaIterator<dim,MGDoFObjectAccessor<2, dim> >
 MGDoFObjectAccessor<3, dim>::quad (const unsigned int i) const
 {
-  Assert (i<12, ExcIndexRange (i, 0, 6));
+  Assert (i<6, ExcIndexRange (i, 0, 6));
 
   return TriaIterator<dim,MGDoFObjectAccessor<2, dim> >
     (
       this->tria,
-      this->present_level,
+      0,
       this->quad_index (i),
       this->mg_dof_handler
     );

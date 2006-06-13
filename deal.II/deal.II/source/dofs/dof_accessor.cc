@@ -19,7 +19,6 @@
 #include <lac/sparse_matrix.h>
 
 #include <dofs/dof_accessor.h>
-#include <dofs/dof_accessor.templates.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_levels.h>
 #include <dofs/hp_dof_handler.h>

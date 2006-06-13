@@ -275,37 +275,34 @@ class MGDoFHandler : public DoFHandler<dim>
 				     /*@{*/
 				     /**
 				      * Iterator to the first face,
-				      * used or not, on level
-				      * @p level. If a level has no
-				      * faces, a past-the-end iterator
-				      * is returned.
+				      * used or not.
 				      *
 				      * This function calls
 				      * @p begin_raw_line in 2D and
 				      * @p begin_raw_quad in 3D.
 				      */
-    raw_face_iterator    begin_raw_face   (const unsigned int level = 0) const;
+    raw_face_iterator    begin_raw_face   () const;
 
 				     /**
 				      * Iterator to the first used
-				      * face on level @p level.
+				      * face.
 				      *
 				      * This function calls
 				      * @p begin_line in 2D and
 				      * @p begin_quad in 3D.
 				      */
-    face_iterator        begin_face       (const unsigned int level = 0) const;
+    face_iterator        begin_face       () const;
 
 				     /**
 				      * Iterator to the first active
-				      * face on level @p level.
+				      * face.
 				      *
 				      * This function calls
 				      * @p begin_active_line in 2D
 				      * and @p begin_active_quad in
 				      * 3D.
 				      */
-    active_face_iterator begin_active_face(const unsigned int level = 0) const;
+    active_face_iterator begin_active_face() const;
 
 				     /**
 				      * Iterator past the end; this
@@ -321,31 +318,28 @@ class MGDoFHandler : public DoFHandler<dim>
     raw_face_iterator    end_face () const;
 
 				     /**
-				      * Return an iterator which is
-				      * the first iterator not on
-				      * level. If @p level is the
-				      * last level, then this returns
-				      * <tt>end()</tt>.
+				      * Iterator past the end; this
+				      * iterator serves for
+				      * comparisons of iterators with
+				      * past-the-end or
+				      * before-the-beginning states.
+				      *
+				      * This is the same as 
+				      * <tt>end_face()</tt>.
 				      */
-    face_iterator        end_face (const unsigned int level) const;
-    
-				     /**
-				      * Return a raw iterator which is
-				      * the first iterator not on
-				      * level. If @p level is the
-				      * last level, then this returns
-				      * <tt>end()</tt>.
-				      */
-    raw_face_iterator    end_raw_face (const unsigned int level) const;
+    raw_face_iterator    end_raw_face () const;
 
-    				     /**
-				      * Return an active iterator
-				      * which is the first iterator
-				      * not on level. If @p level is
-				      * the last level, then this
-				      * returns <tt>end()</tt>.
+				     /**
+				      * Iterator past the end; this
+				      * iterator serves for
+				      * comparisons of iterators with
+				      * past-the-end or
+				      * before-the-beginning states.
+				      *
+				      * This is the same as 
+				      * <tt>end_face()</tt>.
 				      */
-    active_face_iterator end_active_face (const unsigned int level) const;
+    active_face_iterator end_active_face () const;
 
 				     /**
 				      * Return an iterator pointing to
@@ -359,17 +353,6 @@ class MGDoFHandler : public DoFHandler<dim>
 
 				     /**
 				      * Return an iterator pointing to
-				      * the last face of the level
-				      * @p level, used or not.
-				      *
-				      * This function calls
-				      * @p last_raw_line in 2D and
-				      * @p last_raw_quad in 3D.
-				      */
-    raw_face_iterator    last_raw_face (const unsigned int level) const;
-
-				     /**
-				      * Return an iterator pointing to
 				      * the last used face.
 				      *
 				      * This function calls
@@ -377,17 +360,6 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * @p last_quad in 3D.
 				      */
     face_iterator        last_face () const;
-
-				     /**
-				      * Return an iterator pointing to
-				      * the last used face on level
-				      * @p level.
-				      *
-				      * This function calls
-				      * @p last_line in 2D and
-				      * @p last_quad in 3D.
-				      */
-    face_iterator        last_face (const unsigned int level) const;
 
     				     /**
 				      * Return an iterator pointing to
@@ -398,21 +370,10 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * @p last_active_quad in 3D.
 				      */
     active_face_iterator last_active_face () const;
-
-				     /**
-				      * Return an iterator pointing to
-				      * the last active face on level
-				      * @p level.
-				      *
-				      * This function calls
-				      * @p last_active_line in 2D and
-				      * @p last_active_quad in 3D.
-				      */
-    active_face_iterator last_active_face (const unsigned int level) const;
 				     //@}
 
 
-/*---------------------------------------*/
+				     /*---------------------------------------*/
 
 				     /**
 				      * @name Line iterator functions
@@ -723,7 +684,7 @@ class MGDoFHandler : public DoFHandler<dim>
 				      */
     active_hex_iterator last_active_hex (const unsigned int level) const;
 				     /*@}*/
-    
+
 				     /*---------------------------------------*/
 
     
@@ -945,6 +906,26 @@ class MGDoFHandler : public DoFHandler<dim>
 				      */
     unsigned int distribute_dofs_on_cell (cell_iterator &cell,
 					  unsigned int   next_free_dof);
+				     /**
+				      *  Return the @p i-th dof-index. This function calls
+				      *  the respective function of DoFObjects.
+				      */
+    template <int structdim>
+    unsigned int get_dof_index (const unsigned int       obj_level,
+				const unsigned int       obj_index,
+				const unsigned int       fe_index,
+				const unsigned int       local_index) const;
+				     /**
+				      *  Set the @p i-th dof-index. This function calls
+				      *  the respective function of DoFObjects.
+				      */
+    template <int structdim>
+    void set_dof_index (const unsigned int       obj_level,
+			const unsigned int       obj_index,
+			const unsigned int       fe_index,
+			const unsigned int       local_index,
+			const unsigned int       global_index) const;
+    
     
 				     /**
 				      * Reserve enough space for the
@@ -969,6 +950,12 @@ class MGDoFHandler : public DoFHandler<dim>
 				      * zero on each level.
 				      */
     std::vector<internal::DoFHandler::DoFLevel<dim>*>    mg_levels;
+    
+				     /**
+				      * Space to store the DoF numbers
+				      * for the faces.
+				      */
+    internal::DoFHandler::DoFFaces<dim> *                mg_faces;
 
 				     /**
 				      * For each vertex there is a
@@ -1077,13 +1064,13 @@ MGDoFHandler<1>::active_cell_iterator
 MGDoFHandler<1>::last_active (const unsigned int level) const;
 template <>
 internal::MGDoFHandler::Iterators<1>::raw_face_iterator
-MGDoFHandler<1>::begin_raw_face (const unsigned int) const;
+MGDoFHandler<1>::begin_raw_face () const;
 template <>
 internal::MGDoFHandler::Iterators<1>::face_iterator
-MGDoFHandler<1>::begin_face (const unsigned int) const;
+MGDoFHandler<1>::begin_face () const;
 template <>
 internal::MGDoFHandler::Iterators<1>::active_face_iterator
-MGDoFHandler<1>::begin_active_face (const unsigned int) const;
+MGDoFHandler<1>::begin_active_face () const;
 template <>
 internal::MGDoFHandler::Iterators<1>::raw_face_iterator
 MGDoFHandler<1>::end_face () const;
@@ -1091,20 +1078,11 @@ template <>
 internal::MGDoFHandler::Iterators<1>::raw_face_iterator
 MGDoFHandler<1>::last_raw_face () const;
 template <>
-internal::MGDoFHandler::Iterators<1>::raw_face_iterator
-MGDoFHandler<1>::last_raw_face (const unsigned int) const;
-template <>
 internal::MGDoFHandler::Iterators<1>::face_iterator
 MGDoFHandler<1>::last_face () const;
 template <>
-internal::MGDoFHandler::Iterators<1>::face_iterator
-MGDoFHandler<1>::last_face (const unsigned int) const;
-template <>
 internal::MGDoFHandler::Iterators<1>::active_face_iterator
 MGDoFHandler<1>::last_active_face () const;
-template <>
-internal::MGDoFHandler::Iterators<1>::active_face_iterator
-MGDoFHandler<1>::last_active_face (const unsigned int) const;
 template <>
 MGDoFHandler<1>::raw_quad_iterator
 MGDoFHandler<1>::begin_raw_quad (const unsigned int) const;
@@ -1198,13 +1176,13 @@ MGDoFHandler<2>::active_cell_iterator
 MGDoFHandler<2>::last_active (const unsigned int level) const;
 template <>
 internal::MGDoFHandler::Iterators<2>::raw_face_iterator
-MGDoFHandler<2>::begin_raw_face (const unsigned int) const;
+MGDoFHandler<2>::begin_raw_face () const;
 template <>
 internal::MGDoFHandler::Iterators<2>::face_iterator
-MGDoFHandler<2>::begin_face (const unsigned int) const;
+MGDoFHandler<2>::begin_face () const;
 template <>
 internal::MGDoFHandler::Iterators<2>::active_face_iterator
-MGDoFHandler<2>::begin_active_face (const unsigned int) const;
+MGDoFHandler<2>::begin_active_face () const;
 template <>
 internal::MGDoFHandler::Iterators<2>::raw_face_iterator
 MGDoFHandler<2>::end_face () const;
@@ -1212,20 +1190,11 @@ template <>
 internal::MGDoFHandler::Iterators<2>::raw_face_iterator
 MGDoFHandler<2>::last_raw_face () const;
 template <>
-internal::MGDoFHandler::Iterators<2>::raw_face_iterator
-MGDoFHandler<2>::last_raw_face (const unsigned int) const;
-template <>
 internal::MGDoFHandler::Iterators<2>::face_iterator
 MGDoFHandler<2>::last_face () const;
 template <>
-internal::MGDoFHandler::Iterators<2>::face_iterator
-MGDoFHandler<2>::last_face (const unsigned int) const;
-template <>
 internal::MGDoFHandler::Iterators<2>::active_face_iterator
 MGDoFHandler<2>::last_active_face () const;
-template <>
-internal::MGDoFHandler::Iterators<2>::active_face_iterator
-MGDoFHandler<2>::last_active_face (const unsigned int) const;
 template <>
 MGDoFHandler<2>::raw_hex_iterator
 MGDoFHandler<2>::begin_raw_hex (const unsigned int) const;
@@ -1289,13 +1258,13 @@ MGDoFHandler<3>::active_cell_iterator
 MGDoFHandler<3>::last_active (const unsigned int level) const;
 template <>
 internal::MGDoFHandler::Iterators<3>::raw_face_iterator
-MGDoFHandler<3>::begin_raw_face (const unsigned int) const;
+MGDoFHandler<3>::begin_raw_face () const;
 template <>
 internal::MGDoFHandler::Iterators<3>::face_iterator
-MGDoFHandler<3>::begin_face (const unsigned int) const;
+MGDoFHandler<3>::begin_face () const;
 template <>
 internal::MGDoFHandler::Iterators<3>::active_face_iterator
-MGDoFHandler<3>::begin_active_face (const unsigned int) const;
+MGDoFHandler<3>::begin_active_face () const;
 template <>
 internal::MGDoFHandler::Iterators<3>::raw_face_iterator
 MGDoFHandler<3>::end_face () const;
@@ -1303,20 +1272,11 @@ template <>
 internal::MGDoFHandler::Iterators<3>::raw_face_iterator
 MGDoFHandler<3>::last_raw_face () const;
 template <>
-internal::MGDoFHandler::Iterators<3>::raw_face_iterator
-MGDoFHandler<3>::last_raw_face (const unsigned int) const;
-template <>
 internal::MGDoFHandler::Iterators<3>::face_iterator
 MGDoFHandler<3>::last_face () const;
 template <>
-internal::MGDoFHandler::Iterators<3>::face_iterator
-MGDoFHandler<3>::last_face (const unsigned int) const;
-template <>
 internal::MGDoFHandler::Iterators<3>::active_face_iterator
 MGDoFHandler<3>::last_active_face () const;
-template <>
-internal::MGDoFHandler::Iterators<3>::active_face_iterator
-MGDoFHandler<3>::last_active_face (const unsigned int) const;
 
 
 template <>

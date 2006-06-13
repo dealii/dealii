@@ -31,6 +31,7 @@ namespace internal
   namespace Triangulation
   {
     template <int dim> class TriaLevel;
+    template <int dim> class TriaFaces;
   }
 }
 template <int dim> class DoFHandler;
@@ -2016,32 +2017,30 @@ class Triangulation : public Subscriptor
 				     /*@{*/
 				     /**
 				      *  Iterator to the first face, used
-				      *  or not, on level @p level. If a level
-				      *  has no faces, a past-the-end iterator
-				      *  is returned.
+				      *  or not. As faces have no level,
+				      *  no argument can be given. 
 				      *
 				      *  This function calls @p begin_raw_line
 				      *  in 2D and @p begin_raw_quad in 3D.
 				      */
-    raw_face_iterator    begin_raw_face   (const unsigned int level = 0) const;
+    raw_face_iterator    begin_raw_face   () const;
 
 				     /**
-				      *  Iterator to the first used face
-				      *  on level @p level.
+				      *  Iterator to the first used face.
 				      *
 				      *  This function calls @p begin_line
 				      *  in 2D and @p begin_quad in 3D.
 				      */
-    face_iterator        begin_face       (const unsigned int level = 0) const;
+    face_iterator        begin_face       () const;
 
 				     /**
 				      *  Iterator to the first active
-				      *  face on level @p level.
+				      *  face.
 				      *
 				      *  This function calls @p begin_active_line
 				      *  in 2D and @p begin_active_quad in 3D.
 				      */
-    active_face_iterator begin_active_face(const unsigned int level = 0) const;
+    active_face_iterator begin_active_face() const;
 
 				     /**
 				      *  Iterator past the end; this
@@ -2055,28 +2054,18 @@ class Triangulation : public Subscriptor
     raw_face_iterator    end_face () const;
 
 				     /**
-				      * Return an iterator which is the first
-				      * iterator not on level. If @p level is
-				      * the last level, then this returns
-				      * <tt>end()</tt>.
+				      * Return a raw iterator which is past the end.
+				      * This is the same as <tt>end()</tt> and is
+				      * only for combatibility with older versions.
 				      */
-    face_iterator        end_face (const unsigned int level) const;
-    
-				     /**
-				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p level is
-				      * the last level, then this returns
-				      * <tt>end()</tt>.
-				      */
-    raw_face_iterator    end_raw_face (const unsigned int level) const;
+    raw_face_iterator    end_raw_face () const;
 
     				     /**
-				      * Return an active iterator which is the
-				      * first iterator not on level. If @p level
-				      * is the last level, then this returns
-				      * <tt>end()</tt>.
+				      * Return an active iterator which is past the end.
+				      * This is the same as <tt>end()</tt> and is
+				      * only for combatibility with older versions.
 				      */
-    active_face_iterator end_active_face (const unsigned int level) const;
+    active_face_iterator end_active_face () const;
 
 				     /**
 				      *  Return an iterator pointing to the
@@ -2089,30 +2078,12 @@ class Triangulation : public Subscriptor
 
 				     /**
 				      *  Return an iterator pointing to the last
-				      *  face of the level @p level, used or not.
-				      *
-				      *  This function calls @p last_raw_line
-				      *  in 2D and @p last_raw_quad in 3D.
-				      */
-    raw_face_iterator    last_raw_face (const unsigned int level) const;
-
-				     /**
-				      *  Return an iterator pointing to the last
 				      *  used face.
 				      *
 				      *  This function calls @p last_line
 				      *  in 2D and @p last_quad in 3D.
 				      */
     face_iterator        last_face () const;
-
-				     /**
-				      *  Return an iterator pointing to the last
-				      *  used face on level @p level.
-				      *
-				      *  This function calls @p last_line
-				      *  in 2D and @p last_quad in 3D.
-				      */
-    face_iterator        last_face (const unsigned int level) const;
 
     				     /**
 				      *  Return an iterator pointing to the last
@@ -2123,14 +2094,6 @@ class Triangulation : public Subscriptor
 				      */
     active_face_iterator last_active_face () const;
 
-				     /**
-				      *  Return an iterator pointing to the last
-				      *  active face on level @p level.
-				      *
-				      *  This function calls @p last_active_line
-				      *  in 2D and @p last_active_quad in 3D.
-				      */
-    active_face_iterator last_active_face (const unsigned int level) const;
 				     /*@}*/
 
 
@@ -2145,6 +2108,10 @@ class Triangulation : public Subscriptor
 				      *  or not, on level @p level. If a level
 				      *  has no lines, a past-the-end iterator
 				      *  is returned.
+				      *  If lines are no cells, i.e. for @p dim>1
+				      *  no @p level argument must be given.
+				      *  The same applies for all the other functions
+				      *  above, of course. 
 				      */
     raw_line_iterator
     begin_raw_line   (const unsigned int level = 0) const;
@@ -2251,6 +2218,9 @@ class Triangulation : public Subscriptor
 				      *  or not, on level @p level. If a level
 				      *  has no quads, a past-the-end iterator
 				      *  is returned.
+				      *  If quads are no cells, i.e. for @p dim>2
+				      *  no #level argument must be given.
+				     
 				      */
     raw_quad_iterator
     begin_raw_quad   (const unsigned int level = 0) const;
@@ -2460,6 +2430,23 @@ class Triangulation : public Subscriptor
 				     /*@{*/
 
 				     /**
+				      * In the following, most functions are provided in two
+				      * versions, with and without an argument describing
+				      * the level. The versions with this argument are only
+				      * applicable for objects descibing the cells of the
+				      * present triangulation. For example: in 2d
+				      * <tt>n_lines(level)</tt> cannot be called, only
+				      * <tt>n_lines()</tt>, as lines are faces in 2d and
+				      * therefore have no level.
+				      */
+    
+				     /**
+				      * Total Number of lines, used or
+				      * unused.
+				      */
+    unsigned int n_raw_lines () const;
+
+				     /**
 				      * Number of lines, used or
 				      * unused, on the given level.
 				      */
@@ -2488,6 +2475,12 @@ class Triangulation : public Subscriptor
 				      */
     unsigned int n_active_lines (const unsigned int level) const;
     
+				     /**
+				      * Total number of quads, used or
+				      * unused.
+				      */
+    unsigned int n_raw_quads () const;
+
 				     /**
 				      * Number of quads, used or
 				      * unused, on the given level.
@@ -2518,6 +2511,12 @@ class Triangulation : public Subscriptor
 				      */
     unsigned int n_active_quads (const unsigned int level) const;
     
+				     /**
+				      * Total number of hexs, used or
+				      * unused.
+				      */
+    unsigned int n_raw_hexs () const;
+
 				     /**
 				      * Number of hexs, used or
 				      * unused, on the given level.
@@ -2594,27 +2593,11 @@ class Triangulation : public Subscriptor
     unsigned int n_faces () const;
 
     				     /**
-				      *  Return total number of used faces,
-				      *  active or not, on level @p level.
-				      *  Maps to <tt>n_lines(level)</tt> in two space
-				      *  dimensions and so on.
-				      */
-    unsigned int n_faces (const unsigned int level) const;
-
-    				     /**
 				      *  Return total number of active faces.
 				      *  Maps to <tt>n_active_lines()</tt> in two space
 				      *  dimensions and so on.
 				      */
     unsigned int n_active_faces () const;
-
-    				     /**
-				      * Return total number of active faces
-				      * on level @p level.
-				      * Maps to <tt>n_active_lines(level)</tt> in two
-				      * space dimensions and so on.
-				      */
-    unsigned int n_active_faces (const unsigned int level) const;
 
 				     /**
 				      * Return number of levels in use. This
@@ -2735,7 +2718,7 @@ class Triangulation : public Subscriptor
 				     /*@{*/
 				     /**
 				      *  Exception
-	* @ingroup Exceptions
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcInvalidLevel,
 		    int,
@@ -2743,17 +2726,17 @@ class Triangulation : public Subscriptor
 		    << " is not in the valid range!");
 				     /**
 				      *  Exception
-	* @ingroup Exceptions
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcCellShouldBeUnused);
 				     /**
 				      *  Exception
-	* @ingroup Exceptions
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcTooFewVerticesAllocated);
 				     /**
 				      *  Exception
-	* @ingroup Exceptions
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcUncaughtState);
 				     /**
@@ -2854,6 +2837,11 @@ class Triangulation : public Subscriptor
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcInteriorQuadCantBeBoundary);
+				     /**
+				      * Exception
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcFacesHaveNoLevel);
     				     /**
 				      * Exception
 				      * @ingroup Exceptions
@@ -3031,10 +3019,20 @@ class Triangulation : public Subscriptor
 
 				     /**
 				      *  Array of pointers pointing to the
-				      *  objects storing the data on the
+				      *  objects storing the cell data on the
 				      *  different levels.
 				      */
     std::vector<internal::Triangulation::TriaLevel<dim>*> levels;
+
+				     /**
+				      *  Pointer to the faces of the triangulation. In 1d
+				      *  this contains nothing, in 2d it contains data
+				      *  concerning lines and in 3d quads and lines.  All of
+				      *  these have no level and are therefore treated
+				      *  seperately.
+				      */
+    internal::Triangulation::TriaFaces<dim> * faces;
+
 
 				     /**
 				      *  Array of the vertices of this
@@ -3114,6 +3112,7 @@ class Triangulation : public Subscriptor
     friend class TriaRawIterator<3,CellAccessor<3> >;
     
     friend class hp::DoFHandler<dim>;
+    
 };
 
 
@@ -3180,16 +3179,13 @@ template <> Triangulation<1>::cell_iterator Triangulation<1>::last () const;
 template <> Triangulation<1>::cell_iterator Triangulation<1>::last (const unsigned int level) const;
 template <> Triangulation<1>::active_cell_iterator Triangulation<1>::last_active () const;
 template <> Triangulation<1>::active_cell_iterator Triangulation<1>::last_active (const unsigned int level) const;
-template <> Triangulation<1>::raw_face_iterator Triangulation<1>::begin_raw_face (const unsigned int) const;
-template <> Triangulation<1>::face_iterator Triangulation<1>::begin_face (const unsigned int) const;
-template <> Triangulation<1>::active_face_iterator Triangulation<1>::begin_active_face (const unsigned int) const;
+template <> Triangulation<1>::raw_face_iterator Triangulation<1>::begin_raw_face () const;
+template <> Triangulation<1>::face_iterator Triangulation<1>::begin_face () const;
+template <> Triangulation<1>::active_face_iterator Triangulation<1>::begin_active_face () const;
 template <> Triangulation<1>::raw_face_iterator Triangulation<1>::end_face () const;
 template <> Triangulation<1>::raw_face_iterator Triangulation<1>::last_raw_face () const;
-template <> Triangulation<1>::raw_face_iterator Triangulation<1>::last_raw_face (const unsigned int) const;
 template <> Triangulation<1>::face_iterator Triangulation<1>::last_face () const;
-template <> Triangulation<1>::face_iterator Triangulation<1>::last_face (const unsigned int) const;
 template <> Triangulation<1>::active_face_iterator Triangulation<1>::last_active_face () const;
-template <> Triangulation<1>::active_face_iterator Triangulation<1>::last_active_face (const unsigned int) const;
 template <> Triangulation<1>::raw_quad_iterator Triangulation<1>::begin_raw_quad (const unsigned int) const;
 template <> Triangulation<1>::quad_iterator Triangulation<1>::begin_quad (const unsigned int) const;
 template <> Triangulation<1>::active_quad_iterator Triangulation<1>::begin_active_quad (const unsigned int) const;
@@ -3218,16 +3214,13 @@ template <> Triangulation<2>::cell_iterator Triangulation<2>::last () const;
 template <> Triangulation<2>::cell_iterator Triangulation<2>::last (const unsigned int level) const;
 template <> Triangulation<2>::active_cell_iterator Triangulation<2>::last_active () const;
 template <> Triangulation<2>::active_cell_iterator Triangulation<2>::last_active (const unsigned int level) const;
-template <> Triangulation<2>::raw_face_iterator Triangulation<2>::begin_raw_face (const unsigned int level) const;
-template <> Triangulation<2>::face_iterator Triangulation<2>::begin_face (const unsigned int level) const;
-template <> Triangulation<2>::active_face_iterator Triangulation<2>::begin_active_face (const unsigned int level) const;
+template <> Triangulation<2>::raw_face_iterator Triangulation<2>::begin_raw_face () const;
+template <> Triangulation<2>::face_iterator Triangulation<2>::begin_face () const;
+template <> Triangulation<2>::active_face_iterator Triangulation<2>::begin_active_face () const;
 template <> Triangulation<2>::raw_face_iterator Triangulation<2>::end_face () const;
 template <> Triangulation<2>::raw_face_iterator Triangulation<2>::last_raw_face () const;
-template <> Triangulation<2>::raw_face_iterator Triangulation<2>::last_raw_face (const unsigned int level) const;
 template <> Triangulation<2>::face_iterator Triangulation<2>::last_face () const;
-template <> Triangulation<2>::face_iterator Triangulation<2>::last_face (const unsigned int level) const;
 template <> Triangulation<2>::active_face_iterator Triangulation<2>::last_active_face () const;
-template <> Triangulation<2>::active_face_iterator Triangulation<2>::last_active_face (const unsigned int level) const;
 template <> Triangulation<2>::raw_hex_iterator Triangulation<2>::begin_raw_hex (const unsigned int) const;
 template <> Triangulation<2>::hex_iterator Triangulation<2>::begin_hex (const unsigned int) const;
 template <> Triangulation<2>::active_hex_iterator Triangulation<2>::begin_active_hex (const unsigned int) const;
@@ -3246,17 +3239,13 @@ template <> Triangulation<3>::cell_iterator Triangulation<3>::last () const;
 template <> Triangulation<3>::cell_iterator Triangulation<3>::last (const unsigned int level) const;
 template <> Triangulation<3>::active_cell_iterator Triangulation<3>::last_active () const;
 template <> Triangulation<3>::active_cell_iterator Triangulation<3>::last_active (const unsigned int level) const;
-template <> Triangulation<3>::raw_face_iterator Triangulation<3>::begin_raw_face (const unsigned int level) const;
-template <> Triangulation<3>::face_iterator Triangulation<3>::begin_face (const unsigned int level) const;
-template <> Triangulation<3>::active_face_iterator Triangulation<3>::begin_active_face (const unsigned int level) const;
+template <> Triangulation<3>::raw_face_iterator Triangulation<3>::begin_raw_face () const;
+template <> Triangulation<3>::face_iterator Triangulation<3>::begin_face () const;
+template <> Triangulation<3>::active_face_iterator Triangulation<3>::begin_active_face () const;
 template <> Triangulation<3>::raw_face_iterator Triangulation<3>::end_face () const;
 template <> Triangulation<3>::raw_face_iterator Triangulation<3>::last_raw_face () const;
-template <> Triangulation<3>::raw_face_iterator Triangulation<3>::last_raw_face (const unsigned int level) const;
 template <> Triangulation<3>::face_iterator Triangulation<3>::last_face () const;
-template <> Triangulation<3>::face_iterator Triangulation<3>::last_face (const unsigned int level) const;
 template <> Triangulation<3>::active_face_iterator Triangulation<3>::last_active_face () const;
-template <> Triangulation<3>::active_face_iterator Triangulation<3>::last_active_face (const unsigned int level) const;
-
 template <> unsigned int Triangulation<1>::n_raw_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<1>::n_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<1>::n_active_cells (const unsigned int level) const;

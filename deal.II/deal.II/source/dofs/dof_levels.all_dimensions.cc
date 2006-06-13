@@ -28,31 +28,38 @@ namespace internal
       return MemoryConsumption::memory_consumption (cell_dof_indices_cache);
     }
 
+#if deal_II_dimension == 1
 
     unsigned int
     DoFLevel<1>::memory_consumption () const
     {
       return (DoFLevel<0>::memory_consumption () +
-              MemoryConsumption::memory_consumption (line_dofs));
+              MemoryConsumption::memory_consumption (lines));
     }
 
+#endif
 
-
+#if deal_II_dimension == 2
+    
     unsigned int
     DoFLevel<2>::memory_consumption () const
     {
-      return (DoFLevel<1>::memory_consumption () +
-              MemoryConsumption::memory_consumption (quad_dofs));
+      return (DoFLevel<0>::memory_consumption () +
+              MemoryConsumption::memory_consumption (quads));
     }
 
+#endif
 
+#if deal_II_dimension == 3
 
     unsigned int
     DoFLevel<3>::memory_consumption () const
     {
-      return (DoFLevel<2>::memory_consumption () +
-              MemoryConsumption::memory_consumption (hex_dofs));
+      return (DoFLevel<0>::memory_consumption () +
+              MemoryConsumption::memory_consumption (hexes));
     }
+
+#endif
   }
   
 }

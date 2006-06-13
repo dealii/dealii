@@ -104,6 +104,13 @@ namespace std
  * "invalid" which increases the chance that somehwen earlier than for
  * past-the-end iterators an exception is raised.
  *
+ * Cells are stored based on a hierachical structure of levels, therefore
+ * the above mentioned structure is useful. Faces however are not organized
+ * in levels, therefore the #present_level variable is ignored in that
+ * cases and is set to 0 for all faces. Several Accessor- and Iterator-
+ * functions check for that value, if the object accessed is not a cell
+ * but a face in the current triangulation.
+ *
  * @ingroup grid
  * @ingroup Accessors
  * @author Wolfgang Bangerth, 1998
@@ -198,6 +205,7 @@ class TriaAccessor
 				     /**
 				      *  Return the level the element
 				      *  pointed to belongs to.
+				      *  This is only valid for cells.
 				      */
     int level () const;
     
@@ -282,12 +290,18 @@ class TriaAccessor
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcNeighborIsNotCoarser);
+				     /**
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcFacesHaveNoLevel);
 				     /*@}*/
 	
   protected:
 				     /**
 				      *  Used to store the level
-				      *  presently pointed to.
+				      *  presently pointed to. For
+				      *  faces this should always be
+				      *  0.
 				      */
     int present_level;
     
@@ -565,9 +579,11 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  Index of the @p ith child.
 				      *  The level of the child is one
 				      *  higher than that of the
-				      *  present cell.  If the child
-				      *  does not exist, -1 is
-				      *  returned.
+				      *  present cell, if the children
+				      *  of a cell are accessed. The
+				      *  children of faces have no level.
+				      *  If the child does not exist, -1
+				      *  is returned.
 				      */
     int child_index (const unsigned int i) const;
 
@@ -797,6 +813,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  This operator advances the
 				      *  iterator to the next element.
 				      *
+				      *  For cells only:
 				      *  The next element is next on
 				      *  this level if there are
 				      *  more. If the present element
@@ -811,6 +828,7 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  iterator to the previous
 				      *  element.
 				      *
+				      *  For cells only:
 				      *  The previous element is
 				      *  previous on this level if
 				      *  <tt>index>0</tt>. If the present
@@ -1054,8 +1072,11 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  Return the index of the
 				      *  @p ith child.  The level of
 				      *  the child is one higher than
-				      *  that of the present cell.  If
-				      *  the child does not exist, -1
+				      *  that of the present cell if
+				      *  @p dim=1 and lines are cells.
+				      *  Otherwise the line and its children
+				      *  have no level.
+				      *  If the child does not exist, -1
 				      *  is returned.
 				      */
     int child_index (const unsigned int i) const;
@@ -1069,7 +1090,10 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  given. The level of the child
 				      *  is one level up of the level
 				      *  of the cell to which this
-				      *  iterator points.
+				      *  iterator points if
+				      *  @p dim=1 and lines are cells.
+				      *  Otherwise the line and its children
+				      *  have no level.
 				      */
     void set_children (const int index) const;
 	
@@ -1295,6 +1319,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  This operator advances the
 				      *  iterator to the next element.
 				      *
+				      *  For @p dim=1 only:
 				      *  The next element is next on
 				      *  this level if there are
 				      *  more. If the present element
@@ -1309,6 +1334,7 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  iterator to the previous
 				      *  element.
 				      *
+				      *  For @p dim=1 only:
 				      *  The previous element is
 				      *  previous on this level if
 				      *  <tt>index>0</tt>. If the present
@@ -1397,8 +1423,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				     /**
 				      * Return the line index of the
 				      * @p ith side (a line). The
-				      * level is naturally the same as
-				      * that of the quad.
+				      * line has no level.
 				      */
     unsigned int line_index (const unsigned int i) const;
     
@@ -1545,8 +1570,11 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *  Return the index of the
 				      *  @p ith child.  The level of
 				      *  the child is one higher than
-				      *  that of the present cell.  If
-				      *  the child does not exist, -1
+				      *  that of the present cell if
+				      *  @p dim=2 and quads are cells.
+				      *  Otherwise the quad and its children
+				      *  have no level.
+				      *  If the child does not exist, -1
 				      *  is returned.
 				      */
     int child_index (const unsigned int i) const;
@@ -1812,6 +1840,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *  This operator advances the
 				      *  iterator to the next element.
 				      *
+				      *  For @p dim=2 only:
 				      *  The next element is next on
 				      *  this level if there are
 				      *  more. If the present element
@@ -1826,6 +1855,7 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *  iterator to the previous
 				      *  element.
 				      *
+				      *  For @p dim=2 only:
 				      *  The previous element is
 				      *  previous on this level if
 				      *  <tt>index>0</tt>. If the present
@@ -1912,9 +1942,8 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 
 				     /**
 				      * Return the line index of the
-				      * @p ith line. The level is
-				      * naturally the same as that of
-				      * the hex.
+				      * @p ith line. The line has no
+				      * level.
 				      */
     unsigned int line_index (const unsigned int i) const;
     
@@ -1928,9 +1957,8 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 
 				     /**
 				      * Return the quad index of the
-				      * @p ith side (a quad). The
-				      * level is naturally the same as
-				      * that of the hex.
+				      * @p ith side (a quad). The quad
+				      * has no level.
 				      */
     unsigned int quad_index (const unsigned int i) const;
 
