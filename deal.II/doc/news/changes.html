@@ -668,6 +668,34 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: Lower dimensional objects have been removed from the hierachical structure
+		 of levels in <code class="class">TriaLevel</code>. Faces, i.e. lines in 2D and lines
+		 and quads in 3D, have no associated level anymore. Therefore the arguments of some 
+		 iterator-functions have changed. <code class="class">Triangulation</code>::
+		 <code class="member">begin_raw_face</code> does not accept a <code>level</code>
+       argument anymore, but can only be called without any argument. The same applies for
+       all functions with similar intentions, i.e. for <code
+       class="member">begin_face</code>, <code class="member">begin_active_face</code> and for
+       all functions which return <code class="member">last_*_face</code> or
+       <code class="member">end_*_face</code>, no matter wether raw, used or active. Furthermore, the same is 
+		 true, if you want to use the more
+       direct iterator functions which are related to faces like <code class="member">begin_line</code> in
+       2D and 3D or <code class="member">begin_quad</code> in 3D. Again, the same applies
+       for <code class="member">last_*</code> and <code class="member">end_*</code>. 
+		 <br>
+		 All these functions are similarly
+       implemented in the <code class="class">DoFHandler</code>, <code
+       class="class">hp::DoFHandler</code> and <code class="class">MGDoFHandler</code> classes. In
+       these classes, the same restrictions apply. All these changes have been necessary in
+       order to enable the oncoming feature of anisotropic refinement.
+		 <br>
+		 Nested loops with an outer loop over all levels and an inner
+       loop over all faces on that level have to be changed to a single loop over all
+       faces. In most cases, the necessary changes should be internal to the library.
+		 <br>
+		 (Tobias Leicht, 2006/06/13)
+		 </p>
+  <li> <p>
        New: Function <code class="class">VectorTools</code>::<code
        class="class">create_point_source_vector</code> to calculate the projection
        of a Dirac pulse on the base functions. This models a point source as
