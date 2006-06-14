@@ -22,12 +22,17 @@ namespace internal
   namespace DoFHandler
   {
     
+#if deal_II_dimension == 1
+
     unsigned int
     DoFFaces<1>::memory_consumption () const
     {
       return 0;
     }
 
+#endif
+
+#if deal_II_dimension == 2
     
     unsigned int
     DoFFaces<2>::memory_consumption () const
@@ -35,6 +40,9 @@ namespace internal
       return MemoryConsumption::memory_consumption (lines);
     }
 
+#endif
+
+#if deal_II_dimension == 3
     
     unsigned int
     DoFFaces<3>::memory_consumption () const
@@ -42,6 +50,8 @@ namespace internal
       return (MemoryConsumption::memory_consumption (quads) +
 	      MemoryConsumption::memory_consumption (lines) );
     }
+
+#endif
     
   }
 }
