@@ -505,7 +505,34 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
  * templated name of the base class. For information on the interface
  * of this class refer to the base class.
  *
- * @author Wolfgang Bangerth, 2000, 2001
+ * <h3>Example</h3>
+ * Usage of this class is very similar to CompressedSparsityPattern,
+ * but since the use of block indices causes some additional
+ * complications, we give a short example.
+ *
+ * @dontinclude compressed_block_sparsity_pattern.cc
+ *
+ * After the the DoFHandler <tt>dof</tt> and the ConstraintMatrix
+ * <tt>constraints</tt> have been set up with a system element, we
+ * must count the degrees of freedom in each matrix block:
+ *
+ * @skipline dofs_per_block
+ * @until count
+ *
+ * Now, we are ready to set up the CompressedBlockSparsityPattern.
+ *
+ * @until collect
+ *
+ * It is filled as if it were a normal pattern
+ *
+ * @until condense
+ *
+ * In the end, it is copied to a normal BlockSparsityPattern for later
+ * use.
+ *
+ * @until copy
+ *
+ * @author Wolfgang Bangerth, 2000, 2001, example by Guido Kanschat, 2006
  */
 class CompressedBlockSparsityPattern : public BlockSparsityPatternBase<CompressedSparsityPattern>
 {
