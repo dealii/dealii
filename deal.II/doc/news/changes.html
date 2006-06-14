@@ -520,8 +520,15 @@ inconvenience this causes.
 
 <ol>
   
-  <li> <p>Fixed: The <code
-       class="class">FullMatrix::print</code> would yield a link error
+  <li> <p>Improved: <code class="class">PointerMatrixAux</code> now has a
+  default constructor and a function for setting the <code
+  class="class">VectorMemory</code> object.
+  <br>
+  (GK 2006/06/14)
+  </p>
+  
+  <li> <p>Fixed: <code
+       class="member">FullMatrix::print</code> would yield a link error
        when used with <code>std::ofstream</code> since an explicit
        instantiation was missing. The function has now been moved to
        the header file and made inline so that it is always visible,

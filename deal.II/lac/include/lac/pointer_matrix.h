@@ -264,7 +264,7 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 				      * If <tt>M</tt> is zero, no
 				      * matrix is stored.
 				      */
-    PointerMatrixAux (VectorMemory<VECTOR>* mem,
+    PointerMatrixAux (VectorMemory<VECTOR>* mem = 0,
 		      const MATRIX* M=0);
 
 				     /**
@@ -296,6 +296,12 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 				      * empty. 
 				      */
     bool empty () const;
+
+				     /**
+				      * Assign a new VectorMemory
+				     object for getting auxiliary vectors.
+				      */
+    void set_memory(VectorMemory<VECTOR>* mem);
     
 				     /**
 				      * Assign a new matrix
@@ -585,6 +591,14 @@ PointerMatrixAux<MATRIX, VECTOR>::operator= (const MATRIX* M)
 
 
 template<class MATRIX, class VECTOR>
+inline void
+PointerMatrixAux<MATRIX, VECTOR>::set_memory(VectorMemory<VECTOR>* M)
+{
+  mem = M;
+}
+
+
+template<class MATRIX, class VECTOR>
 inline bool
 PointerMatrixAux<MATRIX, VECTOR>::empty () const
 {
@@ -598,6 +612,7 @@ inline void
 PointerMatrixAux<MATRIX, VECTOR>::vmult (VECTOR& dst,
 				      const VECTOR& src) const
 {
+  Assert (mem != 0, ExcNotInitialized());
   Assert (m != 0, ExcNotInitialized());
   m->vmult (dst, src);
 }
@@ -608,6 +623,7 @@ inline void
 PointerMatrixAux<MATRIX, VECTOR>::Tvmult (VECTOR& dst,
 				       const VECTOR& src) const
 {
+  Assert (mem != 0, ExcNotInitialized());
   Assert (m != 0, ExcNotInitialized());
   m->Tvmult (dst, src);
 }
@@ -618,6 +634,7 @@ inline void
 PointerMatrixAux<MATRIX, VECTOR>::vmult_add (VECTOR& dst,
 					  const VECTOR& src) const
 {
+  Assert (mem != 0, ExcNotInitialized());
   Assert (m != 0, ExcNotInitialized());
   VECTOR* v = mem->alloc();
   v->reinit(dst);
@@ -632,6 +649,7 @@ inline void
 PointerMatrixAux<MATRIX, VECTOR>::Tvmult_add (VECTOR& dst,
 					      const VECTOR& src) const
 {
+  Assert (mem != 0, ExcNotInitialized());
   Assert (m != 0, ExcNotInitialized());
   VECTOR* v = mem->alloc();
   v->reinit(dst);
