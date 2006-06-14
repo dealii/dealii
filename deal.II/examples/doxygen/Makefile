@@ -2,7 +2,7 @@
 #    $Id$
 #    Version: $Name$
 #
-#    Copyright (C) 1998 - 2005 by the deal.II authors
+#    Copyright (C) 1998 - 2006 by the deal.II authors
 #
 #    This file is subject to QPL and may not be  distributed
 #    without copyright and license information. Please refer
@@ -12,7 +12,8 @@
 ###########################################################################
 include ../../common/Make.global_options
 
-all: product_matrix$(EXEEXT) block_matrix_array$(EXEEXT)
+all: product_matrix$(EXEEXT) block_matrix_array$(EXEEXT) \
+     compressed_block_sparsity_pattern$(EXEEXT)
 
 ######################################################################
 # Compilation of source code
@@ -31,6 +32,10 @@ block_matrix_array$(EXEEXT): block_matrix_array.$(OBJEXT) $(lib-lac.g) $(lib-bas
 	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 product_matrix$(EXEEXT): product_matrix.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
+	@echo =====linking====$(MT)== $<
+	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+compressed_block_sparsity_pattern$(EXEEXT): compressed_block_sparsity_pattern.$(OBJEXT) $(lib-deal2-2d.g) $(lib-lac.g) $(lib-base.g)
 	@echo =====linking====$(MT)== $<
 	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
 
