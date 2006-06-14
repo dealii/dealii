@@ -22,6 +22,7 @@
 #include <fe/fe_system.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_constraints.h>
+#include <dofs/dof_renumbering.h>
 #include <dofs/dof_tools.h>
 
 #include <iostream>
@@ -39,6 +40,9 @@ int main()
   
   DoFHandler<2> dof(tr);
   dof.distribute_dofs(fe);
+  DoFRenumbering::Cuthill_McKee(dof);
+  DoFRenumbering::component_wise(dof);
+  
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
@@ -57,15 +61,18 @@ int main()
 
   BlockSparsityPattern sparsity;
   sparsity.copy_from(c_sparsity);
-  
-//   for (unsigned int i=0;i<fe.n_blocks();++i)
-//     for (unsigned int j=0;j<fe.n_blocks();++j)
-//       {
-// 	std::cout << "   Block " << i << ' ' << j << std::endl;
-// 	sparsity.block(i,j).print(std::cout);
-//       }
-  for (unsigned int i=0; i<sparsity.n_rows(); ++i)
-    for (unsigned int j=0; j<sparsity.n_cols(); ++j)
-      if (sparsity.exists(i,j))
-	std::cout << i << ' ' << j << std::endl;
+
+  unsigned int ig = 0;
+  for (unsigned int ib=0;ib<fe.n_blocks();++ib)
+    for (unsigned int i=0;i<dofs_per_block[ib];++i,++ig)
+      {
+	unsigned int jg = 0;
+	for (unsigned int jb=0;jb<fe.n_blocks();++jb)
+	  for (unsigned int j=0;j<dofs_per_block[jb];++j,++jg)
+	    {
+	      if (sparsity.exists(ig,jg))
+		std::cout << ig << ' ' << jg
+			  << '\t' << ib << jb << std::endl;
+	    }
+      }
 }
