@@ -58,10 +58,14 @@ int main()
   BlockSparsityPattern sparsity;
   sparsity.copy_from(c_sparsity);
   
-  for (unsigned int i=0;i<fe.n_blocks();++i)
-    for (unsigned int j=0;j<fe.n_blocks();++j)
-      {
-	std::cout << "   Block " << i << ' ' << j << std::endl;
-	sparsity.block(i,j).print(std::cout);
-      }
+//   for (unsigned int i=0;i<fe.n_blocks();++i)
+//     for (unsigned int j=0;j<fe.n_blocks();++j)
+//       {
+// 	std::cout << "   Block " << i << ' ' << j << std::endl;
+// 	sparsity.block(i,j).print(std::cout);
+//       }
+  for (unsigned int i=0; i<sparsity.n_rows(); ++i)
+    for (unsigned int j=0; j<sparsity.n_cols(); ++j)
+      if (sparsity.exists(i,j))
+	std::cout << i << ' ' << j << std::endl;
 }
