@@ -709,20 +709,39 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: There are now new internal <code
+       class="class">TriaObjectAccessor&lt;1,dim&gt;</code>::<code
+       class="member">lines()</code> and <code
+       class="class">TriaObjectAccessor&lt;2,dim&gt;</code>::<code
+       class="member">quads()</code> functions. By using these
+       functions, 30 function specializations could have been removed,
+       significantly reducing code duplication.
+       <br>
+       (RH 2006/06/13)
+       </p>
+
+  <li> <p>
        New: Function <code class="class">VectorTools</code>::<code
-       class="class">create_point_source_vector</code> to calculate the projection
+       class="member">create_point_source_vector</code> to calculate the projection
        of a Dirac pulse on the base functions. This models a point source as
        used in the calculations of Green's functions and can also be used to
        extract the value of a finite element solution in a single point.
-  <li> <p>
-       Changed: Functions <code class="class">VectorTools</code>::<code
-       class="member">point_value</code> and <code class="class">VectorTools</code>::<code
-       class="member">point_difference</code> using the old interface without
-       boundary mapping were replaced by wrapper functions calling the new
-       versions.
        <br> 
        (Ralf B. Schulz, 2006/05/15)
        </p>
+
+  <li> <p>
+       Changed: Functions <code
+       class="class">VectorTools</code>::<code
+       class="member">point_value</code> and <code
+       class="class">VectorTools</code>::<code
+       class="member">point_difference</code> using the old interface
+       without boundary mapping were replaced by wrapper functions
+       calling the new versions.
+       <br> 
+       (Ralf B. Schulz, 2006/05/15)
+       </p>
+
   <li> <p>
        Changed: The old version of <code class="class">GridTools</code>::<code
        class="member">find_active_cell_around_point</code> has been replaced
@@ -734,6 +753,7 @@ inconvenience this causes.
        <br> 
        (Ralf B. Schulz, 2006/05/12)
        </p>
+
   <li> <p>
        Improved: The functions <code class="class">VectorTools</code>::<code
        class="member">point_value</code> and <code class="class">VectorTools</code>::<code
@@ -743,6 +763,7 @@ inconvenience this causes.
        <br> 
        (Ralf B. Schulz, 2006/05/11)
        </p>
+
   <li> <p>
        New: In <code>GridTools</code>, several functions have been added.
        <code>GridTools::find_closest_vertex</code> searches for the vertex
