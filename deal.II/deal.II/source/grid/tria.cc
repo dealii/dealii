@@ -197,14 +197,6 @@ Triangulation<2>::end () const
   return end_quad ();
 }
 
-template <>
-Triangulation<2>::raw_quad_iterator
-Triangulation<2>::begin_raw_quad (const unsigned int level) const;
-
-template <>
-Triangulation<2>::raw_quad_iterator
-Triangulation<2>::last_raw_quad (const unsigned int level) const;
-
 #endif
 
 
