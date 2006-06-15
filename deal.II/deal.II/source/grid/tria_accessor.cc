@@ -30,8 +30,7 @@
 
 template <int dim>
 void
-TriaObjectAccessor<1, dim>::
-set (const internal::Triangulation::Line &line) const
+TriaObjectAccessor<1, dim>::set (const internal::Triangulation::Line &line) const
 {
   this->tria->faces->lines.cells[this->present_index] = line;
 }
@@ -41,16 +40,11 @@ set (const internal::Triangulation::Line &line) const
 
 template <>
 void
-TriaObjectAccessor<1, 1>::
-set (const internal::Triangulation::Line &line) const
+TriaObjectAccessor<1, 1>::set (const internal::Triangulation::Line &line) const
 {
   this->tria->levels[this->present_level]
     ->lines.cells[this->present_index] = line;
 }
-
-#endif
-
-#if deal_II_dimension == 1
 
 template <>
 int TriaObjectAccessor<1, 1>::vertex_index (const unsigned int i) const
@@ -59,10 +53,7 @@ int TriaObjectAccessor<1, 1>::vertex_index (const unsigned int i) const
   return this->tria->levels[this->present_level]->lines.cells[this->present_index].vertex (i);
 }
 
-#endif
-
-
-#if deal_II_dimension != 1
+#else
 
 template <int dim>
 int TriaObjectAccessor<1, dim>::vertex_index (const unsigned int i) const
@@ -378,8 +369,7 @@ unsigned int TriaObjectAccessor<1, dim>::number_of_children () const
 
 template <int dim>
 void
-TriaObjectAccessor<2, dim>::
-set (const internal::Triangulation::Quad &quad) const
+TriaObjectAccessor<2, dim>::set (const internal::Triangulation::Quad &quad) const
 {
   this->tria->faces->quads.cells[this->present_index] = quad;
 }
@@ -389,8 +379,7 @@ set (const internal::Triangulation::Quad &quad) const
 
 template <>
 void
-TriaObjectAccessor<2, 2>::
-set (const internal::Triangulation::Quad &quad) const
+TriaObjectAccessor<2, 2>::set (const internal::Triangulation::Quad &quad) const
 {
   this->tria->levels[this->present_level]
     ->quads.cells[this->present_index] = quad;
@@ -903,8 +892,7 @@ unsigned int TriaObjectAccessor<2, dim>::number_of_children () const
 
 template <>
 void
-TriaObjectAccessor<3, 3>::
-set (const internal::Triangulation::Hexahedron &hex) const
+TriaObjectAccessor<3, 3>::set (const internal::Triangulation::Hexahedron &hex) const
 {
   this->tria->levels[this->present_level]
     ->hexes.cells[this->present_index] = hex;
