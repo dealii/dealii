@@ -2817,6 +2817,16 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 template <> Point<2> TriaObjectAccessor<2, 2>::barycenter () const;
 template <> Point<3> TriaObjectAccessor<2, 3>::barycenter () const;
 template <> Point<3> TriaObjectAccessor<3, 3>::barycenter () const;
+template <> void TriaObjectAccessor<1, 1>::set (const internal::Triangulation::Line &line) const;
+template <> int TriaObjectAccessor<1, 1>::vertex_index (const unsigned int i) const;
+template <> void TriaObjectAccessor<1, 1>::set_used_flag () const;
+template <> void TriaObjectAccessor<1, 1>::clear_used_flag () const;
+template <> void TriaObjectAccessor<1, 1>::set_user_pointer (void *p) const;
+template <> void TriaObjectAccessor<1, 1>::clear_user_pointer () const;
+template <> void * TriaObjectAccessor<1, 1>::user_pointer () const;
+template <> void TriaObjectAccessor<1, 1>::set_children (const int index) const;
+template <> unsigned char TriaObjectAccessor<1, 1>::boundary_indicator () const;
+template <> void TriaObjectAccessor<1, 1>::set_boundary_indicator (const unsigned char) const;
 template <> bool CellAccessor<1>::at_boundary () const;
 template <> unsigned char CellAccessor<1>::material_id () const;
 template <> void CellAccessor<1>::set_material_id (const unsigned char mat_id) const;
