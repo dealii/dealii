@@ -32,6 +32,7 @@ namespace internal
     class Line;
     class Quad;
     class Hexahedron;
+    template <typename G> class TriaObjects;
   }
 }
 template <int celldim, int dim> class TriaObjectAccessor;
@@ -1310,7 +1311,6 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      */
     void operator = (const TriaObjectAccessor<1, dim> &);
 
-
   protected:
     
 				     /**@name Advancement of iterators*/
@@ -1343,6 +1343,21 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  previous level is accessed.
 				      */
     void operator -- ();
+
+				     /**
+				      * Access to the lines of a
+				      * Triangulation. This function
+				      * is specialized for dim==1
+				      * because lines are stored in
+				      * TriaLevel<1> for dim==1 but in
+				      * TriaFace<dim> for dim!=1. All
+				      * accessor functions using this
+				      * function can be implemented
+				      * for all dim without
+				      * specialization.
+				      */
+    internal::Triangulation::TriaObjects<internal::Triangulation::Line> & lines() const;
+
 				     /*@}*/
 
 				     /**
@@ -1864,6 +1879,20 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *  previous level is accessed.
 				      */
     void operator -- ();
+
+				     /**
+				      * Access to the quads of a
+				      * Triangulation. This function
+				      * is specialized for dim==2 and
+				      * dim==3 because quads are
+				      * stored in TriaLevel<2> for
+				      * dim==2 but in TriaFace<3> for
+				      * dim==3. All accessor functions
+				      * using this function can be
+				      * implemented for all dimensions
+				      * without specialization.
+				      */
+    internal::Triangulation::TriaObjects<internal::Triangulation::Quad> & quads() const;
 				     /*@}*/
 
 				     /**
@@ -2817,16 +2846,8 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 template <> Point<2> TriaObjectAccessor<2, 2>::barycenter () const;
 template <> Point<3> TriaObjectAccessor<2, 3>::barycenter () const;
 template <> Point<3> TriaObjectAccessor<3, 3>::barycenter () const;
-template <> void TriaObjectAccessor<1, 1>::set (const internal::Triangulation::Line &line) const;
-template <> int TriaObjectAccessor<1, 1>::vertex_index (const unsigned int i) const;
-template <> void TriaObjectAccessor<1, 1>::set_used_flag () const;
-template <> void TriaObjectAccessor<1, 1>::clear_used_flag () const;
-template <> void TriaObjectAccessor<1, 1>::set_user_pointer (void *p) const;
-template <> void TriaObjectAccessor<1, 1>::clear_user_pointer () const;
-template <> void * TriaObjectAccessor<1, 1>::user_pointer () const;
-template <> void TriaObjectAccessor<1, 1>::set_children (const int index) const;
-template <> unsigned char TriaObjectAccessor<1, 1>::boundary_indicator () const;
-template <> void TriaObjectAccessor<1, 1>::set_boundary_indicator (const unsigned char) const;
+template <> internal::Triangulation::TriaObjects<internal::Triangulation::Line> &TriaObjectAccessor<1, 1>::lines() const;
+template <> internal::Triangulation::TriaObjects<internal::Triangulation::Quad> &TriaObjectAccessor<2, 2>::quads() const;
 template <> bool CellAccessor<1>::at_boundary () const;
 template <> unsigned char CellAccessor<1>::material_id () const;
 template <> void CellAccessor<1>::set_material_id (const unsigned char mat_id) const;
