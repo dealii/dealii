@@ -569,7 +569,6 @@ DoFCellAccessor<hp::DoFHandler<3> >::face (const unsigned int i) const
 }
 
 
-#if deal_II_dimension == 1 
 
 template <>
 inline
@@ -607,8 +606,6 @@ get_dof_indices (std::vector<unsigned int> &dof_indices) const
   DoFObjectAccessor<dim,hp::DoFHandler<dim> >::get_dof_indices (dof_indices,
 								this->active_fe_index());
 }
-
-#endif
 
 
 template <>
