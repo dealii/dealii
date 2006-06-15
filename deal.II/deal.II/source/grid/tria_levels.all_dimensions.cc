@@ -22,7 +22,7 @@ namespace internal
         
     void
     TriaLevel<0>::reserve_space (const unsigned int total_cells,
-                                          const unsigned int dimension)
+				 const unsigned int dimension)
     {
                                        // we need space for total_cells
                                        // cells. Maybe we have more already
