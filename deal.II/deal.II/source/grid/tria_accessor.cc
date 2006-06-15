@@ -37,6 +37,7 @@ set (const internal::Triangulation::Line &line) const
 }
 
 
+#if deal_II_dimension == 1
 
 template <>
 void
@@ -47,16 +48,9 @@ set (const internal::Triangulation::Line &line) const
     ->lines.cells[this->present_index] = line;
 }
 
+#endif
 
-
-template <int dim>
-int TriaObjectAccessor<1, dim>::vertex_index (const unsigned int i) const
-{
-  Assert (i<2, ExcIndexRange(i,0,2));
-  return this->tria->faces->lines.cells[this->present_index].vertex (i);
-}
-
-
+#if deal_II_dimension == 1
 
 template <>
 int TriaObjectAccessor<1, 1>::vertex_index (const unsigned int i) const
@@ -65,7 +59,19 @@ int TriaObjectAccessor<1, 1>::vertex_index (const unsigned int i) const
   return this->tria->levels[this->present_level]->lines.cells[this->present_index].vertex (i);
 }
 
+#endif
 
+
+#if deal_II_dimension != 1
+
+template <int dim>
+int TriaObjectAccessor<1, dim>::vertex_index (const unsigned int i) const
+{
+  Assert (i<2, ExcIndexRange(i,0,2));
+  return this->tria->faces->lines.cells[this->present_index].vertex (i);
+}
+
+#endif
 
 template <int dim>
 Point<dim> &
@@ -85,6 +91,7 @@ void TriaObjectAccessor<1, dim>::set_used_flag () const
 }
 
 
+#if deal_II_dimension == 1
 
 template <>
 void TriaObjectAccessor<1, 1>::set_used_flag () const
@@ -94,7 +101,7 @@ void TriaObjectAccessor<1, 1>::set_used_flag () const
   this->tria->levels[this->present_level]->lines.used[this->present_index] = true;
 }
 
-
+#endif
 
 template <int dim>
 void TriaObjectAccessor<1, dim>::clear_used_flag () const
@@ -105,6 +112,7 @@ void TriaObjectAccessor<1, dim>::clear_used_flag () const
 }
 
 
+#if deal_II_dimension == 1
 
 template <>
 void TriaObjectAccessor<1, 1>::clear_used_flag () const
@@ -115,7 +123,7 @@ void TriaObjectAccessor<1, 1>::clear_used_flag () const
   this->tria->levels[this->present_level]->lines.used[this->present_index] = false;
 }
 
-
+#endif
 
 template <int dim>
 void TriaObjectAccessor<1, dim>::recursively_set_user_flag () const
@@ -149,6 +157,7 @@ void TriaObjectAccessor<1, dim>::set_user_pointer (void *p) const
 }
 
 
+#if deal_II_dimension == 1
 
 template <>
 void TriaObjectAccessor<1, 1>::set_user_pointer (void *p) const
@@ -158,7 +167,7 @@ void TriaObjectAccessor<1, 1>::set_user_pointer (void *p) const
   this->tria->levels[this->present_level]->lines.user_pointers[this->present_index] = p;
 }
 
-
+#endif
 
 template <int dim>
 void TriaObjectAccessor<1, dim>::clear_user_pointer () const
@@ -168,6 +177,7 @@ void TriaObjectAccessor<1, dim>::clear_user_pointer () const
 }
 
 
+#if deal_II_dimension == 1
 
 template <>
 void TriaObjectAccessor<1, 1>::clear_user_pointer () const
@@ -177,6 +187,7 @@ void TriaObjectAccessor<1, 1>::clear_user_pointer () const
   this->tria->levels[this->present_level]->lines.user_pointers[this->present_index] = 0;
 }
 
+#endif
 
 
 template <int dim>
@@ -187,6 +198,7 @@ void * TriaObjectAccessor<1, dim>::user_pointer () const
 }
 
 
+#if deal_II_dimension == 1
 
 template <>
 void * TriaObjectAccessor<1, 1>::user_pointer () const
@@ -196,6 +208,7 @@ void * TriaObjectAccessor<1, 1>::user_pointer () const
   return this->tria->levels[this->present_level]->lines.user_pointers[this->present_index];
 }
 
+#endif
 
 
 template <int dim>
@@ -236,6 +249,7 @@ void TriaObjectAccessor<1, dim>::set_children (const int index) const
 }
 
 
+#if deal_II_dimension == 1
 
 template <>
 void TriaObjectAccessor<1, 1>::set_children (const int index) const
@@ -249,7 +263,7 @@ void TriaObjectAccessor<1, 1>::set_children (const int index) const
   this->tria->levels[this->present_level]->lines.children[this->present_index] = index;
 }
 
-
+#endif
 
 template <int dim>
 void TriaObjectAccessor<1, dim>::clear_children () const
@@ -269,6 +283,7 @@ unsigned char TriaObjectAccessor<1, dim>::boundary_indicator () const
 }
 
 
+#if deal_II_dimension == 1
 
 template <>
 unsigned char TriaObjectAccessor<1, 1>::boundary_indicator () const
@@ -277,6 +292,7 @@ unsigned char TriaObjectAccessor<1, 1>::boundary_indicator () const
   return 0;
 }
 
+#endif
 
 
 template <int dim>
@@ -289,6 +305,7 @@ void TriaObjectAccessor<1, dim>::set_boundary_indicator (const unsigned char bou
 }
 
 
+#if deal_II_dimension == 1
 
 template <>
 void TriaObjectAccessor<1, 1>::set_boundary_indicator (const unsigned char) const
@@ -296,7 +313,7 @@ void TriaObjectAccessor<1, 1>::set_boundary_indicator (const unsigned char) cons
   Assert (false, ExcImpossibleInDim(1));
 }
 
-
+#endif
 
 
 template <int dim>
@@ -368,6 +385,7 @@ set (const internal::Triangulation::Quad &quad) const
 }
 
 
+#if deal_II_dimension == 2
 
 template <>
 void
@@ -378,6 +396,7 @@ set (const internal::Triangulation::Quad &quad) const
     ->quads.cells[this->present_index] = quad;
 }
 
+#endif
 
 
 template <int dim>
@@ -409,6 +428,7 @@ TriaObjectAccessor<2, dim>::set_used_flag () const
 }
 
 
+#if deal_II_dimension == 2
 
 template <>
 void
@@ -420,6 +440,7 @@ TriaObjectAccessor<2, 2>::set_used_flag () const
   this->tria->levels[this->present_level]->quads.used[this->present_index] = true;
 }
 
+#endif
 
 
 template <int dim>
@@ -431,6 +452,7 @@ void TriaObjectAccessor<2, dim>::clear_used_flag () const
 }
 
 
+#if deal_II_dimension == 2
 
 template <>
 void TriaObjectAccessor<2, 2>::clear_used_flag () const
@@ -441,7 +463,7 @@ void TriaObjectAccessor<2, 2>::clear_used_flag () const
   this->tria->levels[this->present_level]->quads.used[this->present_index] = false;
 }
 
-
+#endif
 
 template <int dim>
 void TriaObjectAccessor<2, dim>::recursively_set_user_flag () const
@@ -475,6 +497,7 @@ void TriaObjectAccessor<2, dim>::set_user_pointer (void *p) const
 }
 
 
+#if deal_II_dimension == 2
 
 template <>
 void TriaObjectAccessor<2, 2>::set_user_pointer (void *p) const
@@ -484,6 +507,7 @@ void TriaObjectAccessor<2, 2>::set_user_pointer (void *p) const
   this->tria->levels[this->present_level]->quads.user_pointers[this->present_index] = p;
 }
 
+#endif
 
 
 template <int dim>
@@ -494,6 +518,7 @@ void TriaObjectAccessor<2, dim>::clear_user_pointer () const
 }
 
 
+#if deal_II_dimension == 2
 
 template <>
 void TriaObjectAccessor<2, 2>::clear_user_pointer () const
@@ -503,6 +528,7 @@ void TriaObjectAccessor<2, 2>::clear_user_pointer () const
   this->tria->levels[this->present_level]->quads.user_pointers[this->present_index] = 0;
 }
 
+#endif
 
 
 template <int dim>
@@ -513,6 +539,7 @@ void * TriaObjectAccessor<2, dim>::user_pointer () const
 }
 
 
+#if deal_II_dimension == 2
 
 template <>
 void * TriaObjectAccessor<2, 2>::user_pointer () const
@@ -522,6 +549,7 @@ void * TriaObjectAccessor<2, 2>::user_pointer () const
   return this->tria->levels[this->present_level]->quads.user_pointers[this->present_index];
 }
 
+#endif
 
 
 template <int dim>
@@ -563,6 +591,7 @@ void TriaObjectAccessor<2, dim>::set_children (const int index) const
 }
 
 
+#if deal_II_dimension == 2
 
 template <>
 void TriaObjectAccessor<2, 2>::set_children (const int index) const
@@ -577,6 +606,7 @@ void TriaObjectAccessor<2, 2>::set_children (const int index) const
   this->tria->levels[this->present_level]->quads.children[this->present_index] = index;
 }
 
+#endif
 
 
 template <int dim>
@@ -595,6 +625,7 @@ unsigned char TriaObjectAccessor<2, dim>::boundary_indicator () const
 }
 
 
+#if deal_II_dimension == 3
 
 template <>
 unsigned char TriaObjectAccessor<2, 3>::boundary_indicator () const
@@ -604,6 +635,7 @@ unsigned char TriaObjectAccessor<2, 3>::boundary_indicator () const
   return this->tria->faces->quads.material_id[this->present_index];
 }
 
+#endif
 
 
 template <int dim>
@@ -613,6 +645,7 @@ void TriaObjectAccessor<2, dim>::set_boundary_indicator (const unsigned char) co
 }
 
 
+#if deal_II_dimension == 3
 
 template <>
 void TriaObjectAccessor<2, 3>::set_boundary_indicator (const unsigned char boundary_ind) const
@@ -622,6 +655,7 @@ void TriaObjectAccessor<2, 3>::set_boundary_indicator (const unsigned char bound
   this->tria->faces->quads.material_id[this->present_index] = boundary_ind;
 }
 
+#endif
 
 
 template <int dim>
@@ -865,6 +899,8 @@ unsigned int TriaObjectAccessor<2, dim>::number_of_children () const
 
 /*------------------------ Functions: TriaObjectAccessor ---------------------------*/
 
+#if deal_II_dimension == 3
+
 template <>
 void
 TriaObjectAccessor<3, 3>::
@@ -874,6 +910,7 @@ set (const internal::Triangulation::Hexahedron &hex) const
     ->hexes.cells[this->present_index] = hex;
 }
 
+#endif
 
 
 template <int dim>
@@ -917,6 +954,7 @@ TriaObjectAccessor<3, dim>::vertex (const unsigned int i) const
 }
 
 
+#if deal_II_dimension == 3
 
 template <>
 void TriaObjectAccessor<3, 3>::set_used_flag () const
@@ -928,7 +966,6 @@ void TriaObjectAccessor<3, 3>::set_used_flag () const
 }
 
 
-
 template <>
 void TriaObjectAccessor<3, 3>::clear_used_flag () const
 {
@@ -938,6 +975,7 @@ void TriaObjectAccessor<3, 3>::clear_used_flag () const
   this->tria->levels[this->present_level]->hexes.used[this->present_index] = false;
 }
 
+#endif
 
 
 template <int dim>
@@ -963,6 +1001,7 @@ void TriaObjectAccessor<3, dim>::recursively_clear_user_flag () const
 }
 
 
+#if deal_II_dimension == 3
 
 template <>
 void TriaObjectAccessor<3, 3>::set_user_pointer (void *p) const
@@ -971,7 +1010,6 @@ void TriaObjectAccessor<3, 3>::set_user_pointer (void *p) const
   Assert (used(), TriaAccessor<dim>::ExcCellNotUsed());
   this->tria->levels[this->present_level]->hexes.user_pointers[this->present_index] = p;
 }
-
 
 
 template <>
@@ -983,7 +1021,6 @@ void TriaObjectAccessor<3, 3>::clear_user_pointer () const
 }
 
 
-
 template <>
 void * TriaObjectAccessor<3, 3>::user_pointer () const
 {
@@ -992,6 +1029,7 @@ void * TriaObjectAccessor<3, 3>::user_pointer () const
   return this->tria->levels[this->present_level]->hexes.user_pointers[this->present_index];
 }
 
+#endif
 
 
 template <int dim>
@@ -1019,6 +1057,7 @@ TriaObjectAccessor<3, dim>::recursively_clear_user_pointer () const
 }
 
 
+#if deal_II_dimension == 3
 
 template <>
 void TriaObjectAccessor<3, 3>::set_children (const int index) const
@@ -1032,6 +1071,7 @@ void TriaObjectAccessor<3, 3>::set_children (const int index) const
   this->tria->levels[this->present_level]->hexes.children[this->present_index] = index;
 }
 
+#endif
 
 
 template <int dim>
@@ -1799,6 +1839,7 @@ unsigned int TriaObjectAccessor<3, dim>::number_of_children () const
 }
 
 
+#if deal_II_dimension == 3 
 
 template <>
 void
@@ -1822,7 +1863,7 @@ set_face_orientation (const unsigned int face,
                               face]  = orientation;
 }
 
-
+#endif
 // Remark: The following explicit instantiations needed to be moved to
 // this place here to work around a problem with gcc3.3 on Apple MacOSX.
 // The reason is that some of the functions instantiated here are used

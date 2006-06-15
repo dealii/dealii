@@ -3186,6 +3186,8 @@ template <> Triangulation<1>::raw_face_iterator Triangulation<1>::end_face () co
 template <> Triangulation<1>::raw_face_iterator Triangulation<1>::last_raw_face () const;
 template <> Triangulation<1>::face_iterator Triangulation<1>::last_face () const;
 template <> Triangulation<1>::active_face_iterator Triangulation<1>::last_active_face () const;
+template <> Triangulation<1>::raw_line_iterator Triangulation<1>::begin_raw_line (const unsigned int level) const;
+template <> Triangulation<1>::raw_line_iterator Triangulation<1>::last_raw_line (const unsigned int level) const;
 template <> Triangulation<1>::raw_quad_iterator Triangulation<1>::begin_raw_quad (const unsigned int) const;
 template <> Triangulation<1>::quad_iterator Triangulation<1>::begin_quad (const unsigned int) const;
 template <> Triangulation<1>::active_quad_iterator Triangulation<1>::begin_active_quad (const unsigned int) const;
@@ -3255,9 +3257,12 @@ template <> unsigned int Triangulation<2>::n_active_cells (const unsigned int le
 template <> unsigned int Triangulation<3>::n_raw_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<3>::n_cells (const unsigned int level) const;
 template <> unsigned int Triangulation<3>::n_active_cells (const unsigned int level) const;
+template <> unsigned int Triangulation<1>::n_raw_lines (const unsigned int level) const;
 template <> unsigned int Triangulation<1>::n_quads () const;
 template <> unsigned int Triangulation<1>::n_quads (const unsigned int) const;
 template <> unsigned int Triangulation<1>::n_raw_quads (const unsigned int) const;
+template <> unsigned int Triangulation<2>::n_raw_quads (const unsigned int) const;
+template <> unsigned int Triangulation<1>::n_raw_quads () const;
 template <> unsigned int Triangulation<1>::n_raw_hexs (const unsigned int) const;
 template <> unsigned int Triangulation<1>::n_active_quads (const unsigned int) const;
 template <> unsigned int Triangulation<1>::n_active_quads () const;

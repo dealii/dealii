@@ -161,6 +161,7 @@ Triangulation<dim>::get_boundary_indicators () const
   --------- explicit specialization, which is not allowed.                */
 
 #if deal_II_dimension == 1
+
 template <>
 Triangulation<1>::cell_iterator
 Triangulation<1>::begin (const unsigned int level) const
@@ -176,17 +177,6 @@ Triangulation<1>::end () const
   return end_line ();
 }
 
-template <>
-Triangulation<1>::raw_line_iterator
-Triangulation<1>::begin_raw_line (const unsigned int level) const;
-
-template <>
-Triangulation<1>::raw_line_iterator
-Triangulation<1>::last_raw_line (const unsigned int level) const;
-
-template <>
-unsigned int
-Triangulation<1>::n_raw_lines (const unsigned int level) const;
 #endif
 
 
@@ -215,9 +205,6 @@ template <>
 Triangulation<2>::raw_quad_iterator
 Triangulation<2>::last_raw_quad (const unsigned int level) const;
 
-template <>
-unsigned int
-Triangulation<2>::n_raw_quads (const unsigned int level) const;
 #endif
 
 
@@ -3424,7 +3411,7 @@ Triangulation<dim>::begin_raw_line (const unsigned int level) const
 			    0);
 }
 
-
+#if deal_II_dimension == 1
 
 template <>
 Triangulation<1>::raw_line_iterator
@@ -3440,21 +3427,25 @@ Triangulation<1>::begin_raw_line (const unsigned int level) const
 			    0);
 }
 
+#endif
 
+#if deal_II_dimension == 3
 
+// TODO: why does specialization not work?!
 template <int dim>
 typename Triangulation<dim>::raw_quad_iterator
 Triangulation<dim>::begin_raw_quad (const unsigned int level) const
 {
-  Assert (dim>=2,ExcImpossibleInDim(dim));
-  Assert (dim<3 || level == 0, ExcFacesHaveNoLevel())
+  Assert (level == 0, ExcFacesHaveNoLevel())
 
   return raw_quad_iterator (const_cast<Triangulation<dim>*>(this),
 			    0,
 			    0);
 }
 
+#endif
 
+#if deal_II_dimension == 2
 
 template <>
 Triangulation<2>::raw_quad_iterator
@@ -3470,6 +3461,7 @@ Triangulation<2>::begin_raw_quad (const unsigned int level) const
 			    0);
 }
 
+#endif
 
 
 template <int dim>
@@ -3630,6 +3622,8 @@ Triangulation<dim>::last_raw_line (const unsigned int level) const
 }
 
 
+#if deal_II_dimension == 1
+
 template <>
 Triangulation<1>::raw_line_iterator
 Triangulation<1>::last_raw_line (const unsigned int level) const
@@ -3643,6 +3637,8 @@ Triangulation<1>::last_raw_line (const unsigned int level) const
 			    levels[level]->lines.cells.size()-1);
 }
 
+#endif
+
 
 template <int dim>
 typename Triangulation<dim>::raw_quad_iterator
@@ -3654,6 +3650,8 @@ Triangulation<dim>::last_raw_quad (const unsigned int level) const
 			    faces->quads.cells.size()-1);
 }
 
+
+#if deal_II_dimension == 2
 
 template <>
 Triangulation<2>::raw_quad_iterator
@@ -3667,6 +3665,8 @@ Triangulation<2>::last_raw_quad (const unsigned int level) const
 			    level,
 			    levels[level]->quads.cells.size()-1);
 }
+
+#endif
 
 
 template <int dim>
@@ -4270,39 +4270,36 @@ unsigned int Triangulation<dim>::n_quads () const
 template <int dim>
 unsigned int Triangulation<dim>::n_quads (const unsigned int level) const
 {
-  Assert (level < number_cache.n_quads_level.size(),
-	  ExcIndexRange (level, 0, number_cache.n_quads_level.size()));
   Assert (dim == 2, ExcFacesHaveNoLevel());
-  
+  Assert (level < number_cache.n_quads_level.size(),
+	  ExcIndexRange (level, 0, number_cache.n_quads_level.size()));  
   return number_cache.n_quads_level[level];
 }
 
-
-template <int dim>
-unsigned int Triangulation<dim>::n_raw_quads (const unsigned int) const
-{
-  Assert (dim <3, ExcFacesHaveNoLevel());
-  Assert (dim >2, ExcImpossibleInDim(dim));
-  if (dim>2)
-    return n_raw_quads();
-  else
-    return 0;
-}
-
 #if deal_II_dimension == 2
+
+
 template <>
 unsigned int Triangulation<2>::n_raw_quads (const unsigned int level) const
 {
   Assert(level < n_levels(), ExcIndexRange(level,0,n_levels()));
   return levels[level]->quads.cells.size();
 }
+
 #endif
 
+#if deal_II_dimension == 3
+
 template <>
-unsigned int Triangulation<3>::n_raw_quads () const
+unsigned int Triangulation<3>::n_raw_quads (const unsigned int) const
 {
-  return faces->quads.cells.size();
+  Assert(false, ExcFacesHaveNoLevel());
+  return 0;
 }
+
+#endif
+
+
 
 
 template <int dim>
@@ -4313,6 +4310,15 @@ unsigned int Triangulation<dim>::n_raw_quads () const
 }
 
 
+#if deal_II_dimension == 3
+
+template <>
+unsigned int Triangulation<3>::n_raw_quads () const
+{
+  return faces->quads.cells.size();
+}
+
+#endif
 
 template <int dim>
 unsigned int Triangulation<dim>::n_active_quads () const
@@ -8937,7 +8943,7 @@ Triangulation<dim>::memory_consumption () const
 }
 
   
-
+#if deal_II_dimension == 1
 
 template <>
 void Triangulation<1>::update_number_cache_lines () 
@@ -8986,6 +8992,8 @@ void Triangulation<1>::update_number_cache_lines ()
       number_cache.n_active_lines += number_cache.n_active_lines_level[level];
     }
 }
+
+#endif
 
 
 template <int dim>
