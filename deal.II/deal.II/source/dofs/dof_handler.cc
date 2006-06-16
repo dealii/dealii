@@ -38,6 +38,17 @@ template <int dim>
 const unsigned int DoFHandler<dim>::default_fe_index;
 
 
+// reference the invalid_dof_index variable explicitely to work around
+// a bug in the icc8 compiler
+namespace internal
+{
+  const unsigned int * dummy ()
+  {
+    return &::DoFHandler<deal_II_dimension>::invalid_dof_index;
+  }
+}
+
+
 
 template <int dim>
 DoFHandler<dim>::DoFHandler (const Triangulation<dim> &tria) :
