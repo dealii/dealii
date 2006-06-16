@@ -42,10 +42,13 @@ const unsigned int DoFHandler<dim>::default_fe_index;
 // a bug in the icc8 compiler
 namespace internal
 {
+  template <int dim>
   const unsigned int * dummy ()
   {
-    return &::DoFHandler<deal_II_dimension>::invalid_dof_index;
+    return &::DoFHandler<dim>::invalid_dof_index;
   }
+
+  template const unsigned int * dummy<deal_II_dimension> ();
 }
 
 
