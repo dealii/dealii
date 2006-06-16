@@ -31,10 +31,9 @@ namespace internal
 
     template <int dim>
     template <int spacedim>
-    inline
     unsigned int
     DoFObjects<dim>::n_active_fe_indices (const ::DoFHandler<spacedim> &,
-						    const unsigned) const
+					  const unsigned) const
     {
       return 1;
     }
@@ -42,11 +41,10 @@ namespace internal
 
     template <int dim>
     template <int spacedim>
-    inline
     bool
     DoFObjects<dim>::fe_index_is_active (const ::DoFHandler<spacedim> &,
-						   const unsigned int,
-						   const unsigned int fe_index) const
+					 const unsigned int,
+					 const unsigned int fe_index) const
     {
       Assert (fe_index == 0,
               ExcMessage ("Only zero fe_index values are allowed for "
@@ -125,11 +123,8 @@ namespace internal
     }
 
 // explicit instantiations
-    template
-    unsigned int
-    DoFObjects<1>::
-    memory_consumption () const;
-    
+
+    template class DoFObjects<1>;
 
     template
     unsigned int
@@ -163,11 +158,7 @@ namespace internal
 
 #if deal_II_dimension >= 2
 
-    template
-    unsigned int
-    DoFObjects<2>::
-    memory_consumption () const;
-    
+    template class DoFObjects<2>;
 
     template
     unsigned int
@@ -203,11 +194,7 @@ namespace internal
 
 #if deal_II_dimension >= 3
     
-    template
-    unsigned int
-    DoFObjects<3>::
-    memory_consumption () const;
-    
+    template class DoFObjects<3>;
 
     template
     unsigned int
