@@ -511,6 +511,16 @@ class FullMatrix : public Table<2,number>
     double determinant () const;
 
 				     /**
+				      * Return the trace of the matrix,
+				      * i.e. the sum of the diagonal values
+				      * (which happens to also equal the sum
+				      * of the eigenvalues of a matrix).
+                                      * Obviously, the matrix needs to
+                                      * be quadratic for this function.
+                                      */
+    double trace () const;
+    
+				     /**
 				      * Output of the matrix in
 				      * user-defined format.
 				      */

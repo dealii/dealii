@@ -1920,6 +1920,25 @@ FullMatrix<number>::determinant () const
 }
 
 
+
+template <typename number>
+double
+FullMatrix<number>::trace () const
+{
+  Assert (!this->empty(), ExcEmptyMatrix());
+  
+  Assert (this->n_cols() == this->n_rows(),
+	  ExcDimensionMismatch(this->n_cols(), this->n_rows()));
+
+  double tr = 0;
+  for (unsigned int i=0; i<this->n_rows(); ++i)
+    tr += this->el(i,i);
+
+  return tr;
+}
+
+
+
 template <typename number>
 number
 FullMatrix<number>::frobenius_norm () const
