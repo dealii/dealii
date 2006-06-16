@@ -13,6 +13,7 @@
 
 #include <base/qprojector.h>
 #include <fe/fe_values.h>
+#include <fe/fe_poly.h>
 
 template <class POLY, int dim>
 FE_Poly<POLY,dim>::FE_Poly (const POLY& poly_space,
