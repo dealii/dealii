@@ -80,8 +80,8 @@ else
 endif
 
 # add search path for libraries to make dependencies
-vpath %@static_lib_suffix@ $(libdir)
-vpath %@shared_lib_suffix@ $(libdir)
+vpath %@static_lib_suffix@ $(LIBDIR)
+vpath %@shared_lib_suffix@ $(LIBDIR)
 
 OBJEXT     = @OBJEXT@
 EXEEXT     = @EXEEXT@
