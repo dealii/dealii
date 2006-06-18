@@ -317,13 +317,18 @@ void DataOutRotation<dim,DH>::build_some_patches (Data&)
 
 
 template <int dim, class DH>
-void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_circle,
-					     const unsigned int n_subdivisions,
-					     const unsigned int n_threads_) 
+void DataOutRotation<dim,DH>::build_patches (
+  const unsigned int n_patches_per_circle,
+  const unsigned int nnnn_subdivisions,
+  const unsigned int n_threads_) 
 {
 				   // Check consistency of redundant
 				   // template parameter
   Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
+  
+  unsigned int n_subdivisions = (nnnn_subdivisions != 0)
+				? nnnn_subdivisions
+				: this->default_subdivisions;
   
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));

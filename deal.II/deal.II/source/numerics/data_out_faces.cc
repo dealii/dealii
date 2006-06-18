@@ -150,9 +150,13 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 
 
 template <int dim, class DH>
-void DataOutFaces<dim,DH>::build_patches (const unsigned int n_subdivisions,
+void DataOutFaces<dim,DH>::build_patches (const unsigned int nnnn_subdivisions,
 					  const unsigned int n_threads_) 
 {
+  unsigned int n_subdivisions = (nnnn_subdivisions != 0)
+				? nnnn_subdivisions
+				: this->default_subdivisions;
+  
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 

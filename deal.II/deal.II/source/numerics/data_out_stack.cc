@@ -229,10 +229,14 @@ void DataOutStack<dim,DH>::add_data_vector (const Vector<number> &vec,
 
 
 template <int dim, class DH>
-void DataOutStack<dim,DH>::build_patches (const unsigned int n_subdivisions) 
+void DataOutStack<dim,DH>::build_patches (const unsigned int nnnn_subdivisions) 
 {
 				   // this is mostly copied from the
 				   // DataOut class
+  unsigned int n_subdivisions = (nnnn_subdivisions != 0)
+				? nnnn_subdivisions
+				: this->default_subdivisions;
+  
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));  
   Assert (dof_handler != 0, ExcNoDoFHandlerSelected());

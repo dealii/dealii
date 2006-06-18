@@ -3498,6 +3498,12 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
 
 
 template <int dim, int spacedim>
+DataOutInterface<dim,spacedim>::DataOutInterface ()
+		: default_subdivisions(1)
+{}
+
+
+template <int dim, int spacedim>
 DataOutInterface<dim,spacedim>::~DataOutInterface ()
 {}
 
@@ -3767,6 +3773,8 @@ DataOutInterface<dim,spacedim>::declare_parameters (ParameterHandler &prm)
   prm.declare_entry ("Output format", "gnuplot",
 		     Patterns::Selection (get_output_format_names ()),
                      "A name for the output format to be used");
+  prm.declare_entry("Subdivisions", "1", Patterns::Integer(),
+		    "Number of subdivisions of each mesh cell");
 
   prm.enter_subsection ("DX output parameters");
   DXFlags::declare_parameters (prm);
@@ -3814,7 +3822,8 @@ DataOutInterface<dim,spacedim>::parse_parameters (ParameterHandler &prm)
 {
   const std::string& output_name = prm.get ("Output format");
   default_fmt = parse_output_format (output_name);
-
+  default_subdivisions = prm.get_integer ("Subdivisions");
+  
   prm.enter_subsection ("DX output parameters");
   dx_flags.parse_parameters (prm);
   prm.leave_subsection ();

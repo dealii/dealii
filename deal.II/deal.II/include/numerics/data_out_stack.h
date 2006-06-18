@@ -265,7 +265,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * is always the same as the one is space
 				      * direction for technical reasons.
 				      */
-    void build_patches (const unsigned int n_subdivisions = 1);
+    void build_patches (const unsigned int n_subdivisions = 0);
 
 				     /**
 				      * Release all data that is no

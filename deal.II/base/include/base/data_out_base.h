@@ -2388,6 +2388,11 @@ class DataOutInterface : private DataOutBase
     using DataOutBase::deal_II_intermediate;
     using DataOutBase::parse_output_format;
     using DataOutBase::get_output_format_names;
+
+				     /**
+				      * Constructor.
+				      */
+    DataOutInterface ();
     
                                      /**
                                       * Destructor. Does nothing, but is
@@ -2657,6 +2662,16 @@ class DataOutInterface : private DataOutBase
 				      * class.
 				      */
     virtual std::vector<std::string> get_dataset_names () const = 0;
+
+				     /**
+				      * The default number of
+				      * subdivisions for patches. This
+				      * is filled by parse_parameters()
+				      * and should be obeyed by
+				      * build_patches() in derived
+				      * classes.
+				      */
+    unsigned int default_subdivisions;
 
   private:
 				     /**

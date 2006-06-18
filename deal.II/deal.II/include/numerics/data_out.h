@@ -883,6 +883,13 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      * documentation of this class
 				      * for further information.
 				      *
+				      * The default value <tt>0</tt>
+				      * of <tt>n_subdivisions</tt>
+				      * indicates that the value
+				      * stored in
+				      * DataOutInterface::default_subdivisions
+				      * is to be used.
+				      *
 				      * The function supports
 				      * multithreading, if deal.II is
 				      * compiled in multithreading
@@ -891,7 +898,7 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      * the patches is set to
 				      * <tt>multithread_info.n_default_threads</tt>.
 				      */
-    virtual void build_patches (const unsigned int n_subdivisions = 1,
+    virtual void build_patches (const unsigned int n_subdivisions = 0,
 				const unsigned int n_threads      = multithread_info.n_default_threads);
 
 				     /**
@@ -930,7 +937,7 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      * deformation of each vertex.
 				      */
     virtual void build_patches (const Mapping<DH::dimension> &mapping,
-				const unsigned int n_subdivisions = 1,
+				const unsigned int n_subdivisions = 0,
 				const unsigned int n_threads      = multithread_info.n_default_threads);
     
 				     /**

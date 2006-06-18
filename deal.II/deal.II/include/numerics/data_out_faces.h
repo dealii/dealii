@@ -109,7 +109,7 @@ class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
 				      * <tt>multithread_info.n_default_threads</tt>.
 				      */
     virtual void
-    build_patches (const unsigned int n_subdivisions = 1,
+    build_patches (const unsigned int n_subdivisions = 0,
 		   const unsigned int n_threads      = multithread_info.n_default_threads);
 
 				     /**
