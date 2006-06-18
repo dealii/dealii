@@ -1439,7 +1439,7 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_RPATH,
 [ OLD_LDFLAGS=$LDFLAGS
-  LDFLAGS="-Wl,-rpath $DEAL_II_PATH $LDFLAGS"
+  LDFLAGS="-Wl,-rpath,$DEAL_II_PATH/lib $LDFLAGS"
   AC_MSG_CHECKING([whether compiler understands option -Wl,-rpath])
   AC_LINK_IFELSE(
    [ AC_LANG_PROGRAM([[]],[[]])],

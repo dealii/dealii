@@ -4158,7 +4158,7 @@ echo "${ECHO_T}Unknown C compiler - using generic options" >&6
 
 
  OLD_LDFLAGS=$LDFLAGS
-  LDFLAGS="-Wl,-rpath $DEAL_II_PATH $LDFLAGS"
+  LDFLAGS="-Wl,-rpath,$DEAL_II_PATH/lib $LDFLAGS"
   echo "$as_me:$LINENO: checking whether compiler understands option -Wl,-rpath" >&5
 echo $ECHO_N "checking whether compiler understands option -Wl,-rpath... $ECHO_C" >&6
   cat >conftest.$ac_ext <<_ACEOF
