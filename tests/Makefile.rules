@@ -93,38 +93,25 @@ endif
 
 
 %/OK : %/output
-	@echo '=====Checking======' $<
+	@echo -n '=====Checking======' $<
 	@$(PERL) -pi $(normalize)  $<
-	@for i in $(PLATFORM-HIERARCHY) ; do \
-	    testname=$(<:%/output=%) ; \
-	    if test -f $$testname/cmp/$$i ; then \
-		cmpfile_found=yes ; \
-		if test "x$(verbose)" = "xon" ; then \
-			cmd="diff $(DIFFOPT) -w $< $$testname/cmp/$$i" ; \
-		 else \
-			cmd="diff -w $< $$testname/cmp/$$i > /dev/null" ; \
-		 fi ; \
-		 if eval $$cmd ; then \
-			echo '=====OK============' $@ ; \
-			touch $@ ; \
-		 else \
-			if test "x$(verbose)" = "xon" ; then \
-				echo '+++++Error+++++++++' $@ " ($$testname/cmp/$$i)" ; \
-			else \
-				echo '+++++Error+++++++++' $@ "($$testname/cmp/$$i) Use make verbose=on for the diffs" ; \
-			fi ; \
-			if test "x$(stop_on_error)" = "xon" ; then \
-				exit 1 ; \
-			fi ; \
-		 fi ; \
-		 break ; \
-	    fi ; \
-	  done && \
-	  if test "x$$cmpfile_found" != "xyes" ; then \
-		echo "*** No suitable file in $$testname/cmp found! ***" ; \
-		false ; \
-	  fi
-
+	@if test "x$(verbose)" = "xon" ; then \
+	  cmd="$D/common/scripts/diffsearch $(<:%/output=%) -v" ; \
+	else \
+	  cmd="$D/common/scripts/diffsearch $(<:%/output=%)" ; \
+	fi ; \
+	if eval $$cmd ; then \
+	  echo '=====OK============' $@ ; \
+	else \
+	  if test "x$(verbose)" = "xon" ; then \
+	    echo '+++++Error+++++++++' $@ ; \
+	  else \
+	    echo '+++++Error+++++++++' $@ " Use make verbose=on for the diffs" ; \
+	  fi ; \
+	  if test "x$(stop_on_error)" = "xon" ; then \
+	    exit 1 ; \
+	  fi ; \
+	fi
 
 ############################################################
 # Generate a report for the present date, in which the
