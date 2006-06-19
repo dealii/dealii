@@ -32,7 +32,7 @@ done
 if test -r $1/OK; then
   okname=`cat $1/OK`
   if test "x$okname" != "x" ; then
-    result="$resul $okname"
+    result=" $result $okname"
     if diff $diffopt $1/output $1/cmp/$okname > $diffout ; then
       touch $1/OK
       echo $result
@@ -46,7 +46,7 @@ fi
 
 for file in `cd $1/cmp ; ls` ; do
   if test -f $1/cmp/$file ; then
-    result="$result $file"
+    result=" $result $file"
     if diff $diffopt $1/output $1/cmp/$file > $diffout ; then
       echo $file > $1/OK
       echo $result
