@@ -18,6 +18,7 @@
 
 diffout="/dev/null"
 diffopt=""
+result=" "
 
 for arg in $* ; do
   if test "x$arg" = "x-v" ; then
@@ -31,10 +32,10 @@ done
 if test -r $1/OK; then
   okname=`cat $1/OK`
   if test "x$okname" != "x" ; then
-    echo -n " $okname"
+    result="$resul $okname"
     if diff $diffopt $1/output $1/cmp/$okname > $diffout ; then
       touch $1/OK
-      echo
+      echo $result
       exit 0 ;
     fi
   fi
@@ -45,10 +46,10 @@ fi
 
 for file in `cd $1/cmp ; ls` ; do
   if test -f $1/cmp/$file ; then
-    echo -n " $file"
+    result="$result $file"
     if diff $diffopt $1/output $1/cmp/$file > $diffout ; then
       echo $file > $1/OK
-      echo
+      echo $result
       exit 0 ;
     fi
   fi
@@ -56,6 +57,6 @@ done
 
 # All files failed
 
-echo
+echo $result
 exit 1
 
