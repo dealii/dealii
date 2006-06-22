@@ -726,6 +726,20 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: <code 
+		 class="member">Triangulation&lt;dim&gt;::fix_coarsen_flags</code>
+       has been modified to allow coarsening in all possible cases. Up
+       to now, coarsening was forbidden, if the neighbor cell was not refined
+       but had the <code>refine_flag</code> set, whereas it was allowed, if
+       the neighbor cell already was refined. Now, in both cases coarsening is
+       allowed (if all children are flagged for coarsening). This leeds to
+       triangulations with a slightly reduced number of cells. In some cases
+       older references will have to be updated.
+       <br> 
+       (Tobias Leicht 2006/06/22)
+       </p>
+
+  <li> <p>
        New: There are now new internal <code
        class="class">TriaObjectAccessor&lt;1,dim&gt;</code>::<code
        class="member">lines()</code> and <code
