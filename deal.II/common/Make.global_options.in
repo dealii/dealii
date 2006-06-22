@@ -86,24 +86,24 @@ vpath %@shared_lib_suffix@ $(LIBDIR)
 OBJEXT     = @OBJEXT@
 EXEEXT     = @EXEEXT@
 
-lib-base.o     = -lbase
-lib-base.g     = -lbase.g
+lib-base.o     = $(LIBDIR)/libbase$(lib-suffix)
+lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix)
 
-lib-lac.o      = -llac
-lib-lac.g      = -llac.g
+lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix)
+lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix)
 
 ifeq ($(USE_CONTRIB_HSL),yes)
-  lib-lac.o += -lhsl
-  lib-lac.g += -lhsl
+  lib-lac.o += $(LIBDIR)/libhsl$(lib-suffix) 
+  lib-lac.g += $(LIBDIR)/libhsl$(lib-suffix) 
 endif
 
-lib-deal2-1d.o = -ldeal_II_1d
-lib-deal2-2d.o = -ldeal_II_2d
-lib-deal2-3d.o = -ldeal_II_3d
+lib-deal2-1d.o = $(LIBDIR)/libdeal_II_1d$(lib-suffix)
+lib-deal2-2d.o = $(LIBDIR)/libdeal_II_2d$(lib-suffix)
+lib-deal2-3d.o = $(LIBDIR)/libdeal_II_3d$(lib-suffix)
 
-lib-deal2-1d.g = -ldeal_II_1d.g
-lib-deal2-2d.g = -ldeal_II_2d.g
-lib-deal2-3d.g = -ldeal_II_3d.g
+lib-deal2-1d.g = $(LIBDIR)/libdeal_II_1d.g$(lib-suffix)
+lib-deal2-2d.g = $(LIBDIR)/libdeal_II_2d.g$(lib-suffix)
+lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
 
 # since the PETSc libs are called the same for both debug and
 # optimized mode, we have to have a trick to let the executable
