@@ -7453,7 +7453,8 @@ void Triangulation<dim>::fix_coarsen_flags ()
 						     // refined. maybe someone
 						     // else will want to do this
 						     // some time
-		    child_neighbor->refine_flag_set())
+		    (child_neighbor->refine_flag_set() &&
+		     (child_neighbor->level()==cell->level()+1)))
 		  coarsening_allowed = false;
 	    }
 	
