@@ -1907,7 +1907,7 @@ void Triangulation<dim>::load_refine_flags (std::istream &in)
 template <int dim>
 void Triangulation<dim>::load_refine_flags (const std::vector<bool> &v)
 {
-  Assert (v.size() == n_active_cells(), ExcGridReadError());
+  AssertThrow (v.size() == n_active_cells(), ExcGridReadError());
   
   active_cell_iterator cell = begin_active(),
 		       endc = end();
