@@ -14,60 +14,6 @@
 #include <dofs/dof_handler.h>
 #include <dofs/hp_dof_handler.h>
 
-namespace 
-{
-  // Functions for the DoFHandler
-  template <int dim>
-  unsigned int
-  max_dofs_per_cell (const DoFHandler<dim> &dh)
-  {
-    return dh.get_fe().dofs_per_cell;
-  }
-
-
-  template <int dim>
-  unsigned int
-  max_dofs_per_face (const DoFHandler<dim> &dh) 
-  {
-    return dh.get_fe().dofs_per_face;
-  }
-
-
-  template <int dim>
-  unsigned int
-  get_n_components (const DoFHandler<dim> &dh) 
-  {
-    return dh.get_fe().n_components();
-  }
-
-
-  // Functions for the hp::DoFHandler
-  template <int dim>
-  unsigned int
-  max_dofs_per_cell (const hp::DoFHandler<dim> &dh) 
-  {
-    return dh.get_fe().max_dofs_per_cell ();
-  }
-
-
-  template <int dim>
-  unsigned int
-  max_dofs_per_face (const hp::DoFHandler<dim> &dh) 
-  {
-    return dh.get_fe().max_dofs_per_face ();
-  }
-
-
-
-  template <int dim>
-  unsigned int
-  get_n_components (const hp::DoFHandler<dim> &dh) 
-  {
-    return dh.get_fe().n_components();
-  }
-}
-
-
 #include<numerics/vectors.templates.h>
 
 // explicit instantiations

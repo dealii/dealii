@@ -196,6 +196,110 @@ class DoFTools
                                             */
 	  nonzero
     };
+    
+				     /**
+				      * @name Auxiliary functions
+				      * @{
+				      */
+				     /**
+				      * Maximal number of degrees of
+				      * freedom on a cell. This is
+				      * just
+				      * FiniteElementData::dofs_per_cell,
+				      * but allows for a common
+				      * interface with hp::DoFHandler.
+				      */
+    template <int dim>
+    static unsigned int
+    max_dofs_per_cell (const DoFHandler<dim> &dh);
+    
+    
+				     /**
+				      * Maximal number of degrees of
+				      * freedom on a face. This is
+				      * just
+				      * FiniteElementData::dofs_per_face,
+				      * but allows for a common
+				      * interface with hp::DoFHandler.
+				      */
+    template <int dim>
+    static unsigned int
+    max_dofs_per_face (const DoFHandler<dim> &dh);
+
+				     /**
+				      * Maximal number of degrees of
+				      * freedom on a vertex. This is
+				      * just
+				      * FiniteElementData::dofs_per_vertex,
+				      * but allows for a common
+				      * interface with hp::DoFHandler.
+				      */
+    template <int dim>
+    static unsigned int
+    max_dofs_per_vertex (const DoFHandler<dim> &dh);
+    
+				     /**
+				      * Number of components in an
+				      * hp-conforming way.
+				      */
+    template <int dim>
+    static unsigned int
+    n_components (const DoFHandler<dim> &dh);
+    
+				     /**
+				      * Find out if a FiniteElement is
+				      * primitive in an hp-conforming
+				      * way.
+				      */
+    template <int dim>
+    static unsigned int
+    fe_is_primitive (const DoFHandler<dim> &dh);
+    
+				     /**
+				      * Maximal number of degrees of
+				      * freedom on a cell in an hp hierarchy.
+				      */
+    template <int dim>
+    static unsigned int
+    max_dofs_per_cell (const hp::DoFHandler<dim> &dh);
+    
+				     /**
+				      * Maximal number of degrees of
+				      * freedom on a face in an hp hierarchy.
+				      */
+    template <int dim>
+    static unsigned int
+    max_dofs_per_face (const hp::DoFHandler<dim> &dh);
+    
+				     /**
+				      *Maximal number of degrees of
+				      * freedom on a vertex in an hp hierarchy.
+				      */
+    template <int dim>
+    static unsigned int
+    max_dofs_per_vertex (const hp::DoFHandler<dim> &dh);
+    
+				     /**
+				      * Number of components in an
+				      * hp-conforming way.
+				      */
+    template <int dim>
+    static unsigned int
+    n_components (const hp::DoFHandler<dim> &dh);
+    
+				     /**
+				      * Find out if an hp::FECollection is
+				      * primitive in an hp-conforming
+				      * way.
+				      */
+    template <int dim>
+    static unsigned int
+    fe_is_primitive (const hp::DoFHandler<dim> &dh);
+    
+				     /**
+				      * @}
+				      */
+    
 				     /**
 				      * @name Sparsity Pattern Generation
 				      * @{
@@ -1643,6 +1747,87 @@ DoFTools::Coupling operator | (const DoFTools::Coupling c1,
 
 
 // ---------------------- inline and template functions --------------------
+
+template <int dim>
+inline unsigned int
+DoFTools::max_dofs_per_cell (const DoFHandler<dim> &dh)
+{
+  return dh.get_fe().dofs_per_cell;
+}
+
+
+template <int dim>
+inline unsigned int
+DoFTools::max_dofs_per_face (const DoFHandler<dim> &dh) 
+{
+  return dh.get_fe().dofs_per_face;
+}
+
+
+template <int dim>
+inline unsigned int
+DoFTools::max_dofs_per_vertex (const DoFHandler<dim> &dh) 
+{
+  return dh.get_fe().dofs_per_vertex;
+}
+
+
+template <int dim>
+inline unsigned int
+DoFTools::n_components (const DoFHandler<dim> &dh) 
+{
+  return dh.get_fe().n_components();
+}
+
+
+
+template <int dim>
+inline unsigned int
+DoFTools::fe_is_primitive (const DoFHandler<dim> &dh) 
+{
+  return dh.get_fe().is_primitive();
+}
+
+
+template <int dim>
+inline unsigned int
+DoFTools::max_dofs_per_cell (const hp::DoFHandler<dim> &dh) 
+{
+  return dh.get_fe().max_dofs_per_cell ();
+}
+
+
+template <int dim>
+inline unsigned int
+DoFTools::max_dofs_per_face (const hp::DoFHandler<dim> &dh) 
+{
+  return dh.get_fe().max_dofs_per_face ();
+}
+
+
+template <int dim>
+inline unsigned int
+DoFTools::max_dofs_per_vertex (const hp::DoFHandler<dim> &dh) 
+{
+  return dh.get_fe().max_dofs_per_vertex ();
+}
+
+
+template <int dim>
+inline unsigned int
+DoFTools::n_components (const hp::DoFHandler<dim> &dh) 
+{
+  return dh.get_fe()[0].n_components();
+}
+
+
+template <int dim>
+inline unsigned int
+DoFTools::fe_is_primitive (const hp::DoFHandler<dim> &dh) 
+{
+  return dh.get_fe()[0].is_primitive();
+}
+
 
 template <class DH, class SparsityPattern>
 inline

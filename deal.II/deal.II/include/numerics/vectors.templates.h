@@ -896,7 +896,7 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
   Assert (function_map.find(255) == function_map.end(),
 	  ExcInvalidBoundaryIndicator());
 
-  const unsigned int        n_components = get_n_components(dof);
+  const unsigned int        n_components = DoFTools::n_components(dof);
   const bool                fe_is_system = (n_components != 1);
 
   for (typename FunctionMap<dim>::type::const_iterator i=function_map.begin();
@@ -915,11 +915,11 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 
 				   // field to store the indices
   std::vector<unsigned int> face_dofs;
-  face_dofs.reserve (max_dofs_per_face(dof));
+  face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
   std::fill (face_dofs.begin (), face_dofs.end (), DoFHandler<dim>::invalid_dof_index);
 
   std::vector<Point<dim> >  dof_locations;
-  dof_locations.reserve (max_dofs_per_face(dof));
+  dof_locations.reserve (DoFTools::max_dofs_per_face(dof));
   std::fill (dof_locations.begin(), dof_locations.end (), Point<dim>());
 
 				   // array to store the values of
@@ -930,8 +930,8 @@ interpolate_boundary_values (const Mapping<dim>            &mapping,
 				   // respectively
   std::vector<double>          dof_values_scalar;
   std::vector<Vector<double> > dof_values_system;
-  dof_values_scalar.reserve (max_dofs_per_face (dof));
-  dof_values_system.reserve (max_dofs_per_face (dof));
+  dof_values_scalar.reserve (DoFTools::max_dofs_per_face (dof));
+  dof_values_system.reserve (DoFTools::max_dofs_per_face (dof));
 
   typename DH<dim>::active_cell_iterator cell = dof.begin_active(),
 					 endc = dof.end();
