@@ -25,7 +25,8 @@ template <class Object> class MGLevelObject;
 template <int dim> class MGDoFHandler;
 template <typename number> class Vector;
 template <typename number> class BlockVector;
-template <class number> class FullMatrix;
+template <typename number> class FullMatrix;
+template <typename number> class BlockSparseMatrix;
 
 /*!@addtogroup mg */
 /*@{*/
@@ -166,6 +167,22 @@ class MGTools
 				     const Table<2,DoFTools::Coupling> &flux_mask);
 
 				     /**
+				      * Count the dofs block-wise
+				      * on each level.
+				      *
+				      * Result is a vector containing
+				      * for each level a vector
+				      * containing the number of dofs
+				      * for each block (access is
+				      * <tt>result[level][block]</tt>).
+				      */
+    template <int dim>
+      static void count_dofs_per_block (
+	const MGDoFHandler<dim> &mg_dof,
+	std::vector<std::vector<unsigned int> > &result,
+	std::vector<unsigned int> target_block = std::vector<unsigned int>());
+
+				     /**
 				      * Count the dofs component-wise
 				      * on each level.
 				      *
@@ -192,8 +209,46 @@ class MGTools
 	const MGDoFHandler<dim> &mg_dof,
 	std::vector<std::vector<unsigned int> > &result,
 	std::vector<unsigned int> target_component);
+
+				     /**
+				      * Generate a list of those
+				      * degrees of freedom at the
+				      * boundary which should be
+				      * eliminated from the matrix.
+				      *
+				      * This is the multilevel
+				      * equivalent of
+				      * VectorTools::interpolate_boundary_values,
+				      * but since the multilevel
+				      * method does not have its own
+				      * right hand side, the function
+				      * values are igneored.
+				      *
+				      * @arg <tt>boundary_indices</tt>
+				      * is a vector which contains
+				      * for each level all indices of
+				      * boundary constraint degrees of
+				      * freedom.
+				      */
+    template <int dim>
+    static void make_boundary_list(
+      const MGDoFHandler<dim>& mg_dof,
+      const typename FunctionMap<dim>::type& function_map,
+      std::vector<std::vector<unsigned int> >& boundary_indices,
+      const std::vector<bool>& component_mask = std::vector<bool>());
+
+    template <typename number>
+    static void apply_boundary_values (
+      const std::vector<unsigned int> &boundary_values,
+      SparseMatrix<number>& matrix,
+      const bool preserve_symmetry);
     
-    
+    template <typename number>
+    static void apply_boundary_values (
+      const std::vector<unsigned int>& boundary_values,
+      BlockSparseMatrix<number>& matrix,
+      const bool preserve_symmetry);
+
 				     /**
 				      * Ajust vectors on all levels to
 				      * correct size.  Here, we just
