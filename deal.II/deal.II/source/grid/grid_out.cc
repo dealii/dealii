@@ -1236,38 +1236,55 @@ void GridOut::write_eps (
       
       case 2:
       {
-	typename Triangulation<dim>::active_line_iterator
-	  line   =tria.begin_active_line (),
-	  endline=tria.end_line ();
-	
-					 // first treat all interior
-					 // lines and make up a list
-					 // of them. if curved lines
-					 // shall not be supported
-					 // (i.e. no mapping is
-					 // provided), then also treat
-					 // all other lines
-	for (; line!=endline; ++line)
-	  if (mapping==0 || !line->at_boundary())
-					     // one would expect
-					     // make_pair(line->vertex(0),
-					     //           line->vertex(1))
-					     // here, but that is not
-					     // dimension independent, since
-					     // vertex(i) is Point<dim>,
-					     // but we want a Point<2>.
-					     // in fact, whenever we're here,
-					     // the vertex is a Point<dim>,
-					     // but the compiler does not
-					     // know this. hopefully, the
-					     // compiler will optimize away
-					     // this little kludge
-	    line_list.push_back (LineEntry(Point<2>(line->vertex(0)(0),
-						    line->vertex(0)(1)),
-					   Point<2>(line->vertex(1)(0),
-						    line->vertex(1)(1)),
-					   line->user_flag_set(),
-					   line->level()));
+	typename Triangulation<dim>::active_cell_iterator
+	  cell=tria.begin_active(),
+	  endc=tria.end();
+
+	for (; cell!=endc; ++cell)
+	  for (unsigned int line_no=0;
+	       line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
+	    {
+	      typename Triangulation<dim>::line_iterator
+		line=cell->line(line_no);
+
+					       // first treat all
+					       // interior lines and
+					       // make up a list of
+					       // them. if curved
+					       // lines shall not be
+					       // supported (i.e. no
+					       // mapping is
+					       // provided), then also
+					       // treat all other
+					       // lines
+	      if (!line->has_children() &&
+		  (mapping==0 || !line->at_boundary()))	
+						 // one would expect
+						 // make_pair(line->vertex(0),
+						 //           line->vertex(1))		
+						 // here, but that is
+						 // not dimension
+						 // independent, since
+						 // vertex(i) is
+						 // Point<dim>, but we
+						 // want a Point<2>.
+						 // in fact, whenever
+						 // we're here, the
+						 // vertex is a
+						 // Point<dim>, but
+						 // the compiler does
+						 // not know
+						 // this. hopefully,
+						 // the compiler will
+						 // optimize away this
+						 // little kludge
+		line_list.push_back (LineEntry(Point<2>(line->vertex(0)(0),
+							line->vertex(0)(1)),
+					       Point<2>(line->vertex(1)(0),
+							line->vertex(1)(1)),
+					       line->user_flag_set(),
+					       cell->level()));
+	    }
 	
 					 // next if we are to treat
 					 // curved boundaries
@@ -1321,7 +1338,7 @@ void GridOut::write_eps (
 
 			  line_list.push_back (LineEntry(p0, p1,
 							 face->user_flag_set(),
-							 face->level() ));
+							 cell->level() ));
 			  p0=p1;
 			}
 
@@ -1330,7 +1347,7 @@ void GridOut::write_eps (
 		      const Point<2>   p1     (p1_dim(0), p1_dim(1));
 		      line_list.push_back (LineEntry(p0, p1,
 						     face->user_flag_set(),
-						     face->level()));
+						     cell->level()));
 		    };
 		};
 	  };
@@ -1345,9 +1362,9 @@ void GridOut::write_eps (
 					 //TODO:[RH] curved boundaries in eps for 3d	
 	Assert (mapping == 0, ExcNotImplemented());
 
-	typename Triangulation<dim>::active_line_iterator
-	  line   =tria.begin_active_line (),
-	  endline=tria.end_line ();
+	typename Triangulation<dim>::active_cell_iterator
+	  cell=tria.begin_active(),
+	  endc=tria.end();
 
 					 // loop over all lines and compute their
 					 // projection on the plane perpendicular
@@ -1391,20 +1408,27 @@ void GridOut::write_eps (
 	     - ((Point<dim>(1,0,0) * unit_vector1)   * unit_vector1));
 	const Point<dim> unit_vector2 = vector2 / std::sqrt(vector2.square());
 
-	for (; line!=endline; ++line) 
-	  line_list.push_back (LineEntry(Point<2>(line->vertex(0) * unit_vector2,
-						  line->vertex(0) * unit_vector1),
-					 Point<2>(line->vertex(1) * unit_vector2,
-						  line->vertex(1) * unit_vector1),
-					 line->user_flag_set(),
-					 line->level()));
 
+	for (; cell!=endc; ++cell)
+	  for (unsigned int line_no=0;
+	       line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
+	    {
+	      typename Triangulation<dim>::line_iterator
+		line=cell->line(line_no);
+	      line_list.push_back (LineEntry(Point<2>(line->vertex(0) * unit_vector2,
+						      line->vertex(0) * unit_vector1),
+					     Point<2>(line->vertex(1) * unit_vector2,
+						      line->vertex(1) * unit_vector1),
+					     line->user_flag_set(),
+					     cell->level()));
+	    }
+	
 	break;
-      };
+      }
 
       default:
 	    Assert (false, ExcNotImplemented());
-    };
+    }
 
 
 
