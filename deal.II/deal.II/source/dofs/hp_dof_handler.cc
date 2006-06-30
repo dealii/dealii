@@ -901,8 +901,10 @@ namespace hp
   typename DoFHandler<dim>::raw_line_iterator
   DoFHandler<dim>::begin_raw_line (const unsigned int level) const
   {
+    Assert (dim==1 || level == 0,
+	    typename Triangulation<dim>::ExcFacesHaveNoLevel());
     return raw_line_iterator (tria,
-                              tria->begin_raw_line(level)->level(),
+                              dim==1 ? tria->begin_raw_line(level)->level() : 0,
                               tria->begin_raw_line(level)->index(),
                               this);
   }
@@ -912,8 +914,10 @@ namespace hp
   typename DoFHandler<dim>::line_iterator
   DoFHandler<dim>::begin_line (const unsigned int level) const
   {
+    Assert (dim==1 || level == 0,
+	    typename Triangulation<dim>::ExcFacesHaveNoLevel());
     return line_iterator (tria,
-                          tria->begin_line(level)->level(),
+                          dim==1 ? tria->begin_line(level)->level() : 0,
                           tria->begin_line(level)->index(),
                           this);
   }
@@ -923,8 +927,10 @@ namespace hp
   typename DoFHandler<dim>::active_line_iterator
   DoFHandler<dim>::begin_active_line (const unsigned int level) const
   {
+    Assert (dim==1 || level == 0,
+	    typename Triangulation<dim>::ExcFacesHaveNoLevel());
     return active_line_iterator (tria,
-                                 tria->begin_active_line(level)->level(),
+                                 dim==1 ? tria->begin_active_line(level)->level() : 0,
                                  tria->begin_active_line(level)->index(),
                                  this);
   }
@@ -934,8 +940,10 @@ namespace hp
   typename DoFHandler<dim>::raw_quad_iterator
   DoFHandler<dim>::begin_raw_quad (const unsigned int level) const
   {
+    Assert (dim==2 || level == 0,
+	    typename Triangulation<dim>::ExcFacesHaveNoLevel());  
     return raw_quad_iterator (tria,
-                              tria->begin_raw_quad(level)->level(),
+                              dim==2 ? tria->begin_raw_quad(level)->level() : 0,
                               tria->begin_raw_quad(level)->index(),
                               this);
   }
@@ -945,8 +953,10 @@ namespace hp
   typename DoFHandler<dim>::quad_iterator
   DoFHandler<dim>::begin_quad (const unsigned int level) const
   {
+    Assert (dim==2 || level == 0,
+	    typename Triangulation<dim>::ExcFacesHaveNoLevel());  
     return quad_iterator (tria,
-                          tria->begin_quad(level)->level(),
+                          dim==2 ? tria->begin_quad(level)->level() : 0,
                           tria->begin_quad(level)->index(),
                           this);
   }
@@ -956,8 +966,10 @@ namespace hp
   typename DoFHandler<dim>::active_quad_iterator
   DoFHandler<dim>::begin_active_quad (const unsigned int level) const
   {
+    Assert (dim==2 || level == 0,
+	    typename Triangulation<dim>::ExcFacesHaveNoLevel());  
     return active_quad_iterator (tria,
-                                 tria->begin_active_quad(level)->level(),
+                                 dim==2 ? tria->begin_active_quad(level)->level() : 0,
                                  tria->begin_active_quad(level)->index(),
                                  this);
   }

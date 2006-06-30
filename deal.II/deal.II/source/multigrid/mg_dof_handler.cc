@@ -956,8 +956,10 @@ template <int dim>
 typename MGDoFHandler<dim>::raw_line_iterator
 MGDoFHandler<dim>::begin_raw_line (const unsigned int level) const
 {
+  Assert (dim==1 || level == 0,
+	  typename Triangulation<dim>::ExcFacesHaveNoLevel());
   return raw_line_iterator (this->tria,
-			    this->tria->begin_raw_line(level)->level(),
+			    dim==1 ? this->tria->begin_raw_line(level)->level() : 0,
 			    this->tria->begin_raw_line(level)->index(),
 			    this);
 }
@@ -967,8 +969,10 @@ template <int dim>
 typename MGDoFHandler<dim>::line_iterator
 MGDoFHandler<dim>::begin_line (const unsigned int level) const
 {
+  Assert (dim==1 || level == 0,
+	  typename Triangulation<dim>::ExcFacesHaveNoLevel());
   return line_iterator (this->tria,
-			this->tria->begin_line(level)->level(),
+			dim==1 ? this->tria->begin_line(level)->level() : 0,
 			this->tria->begin_line(level)->index(),
 			this);
 }
@@ -978,8 +982,10 @@ template <int dim>
 typename MGDoFHandler<dim>::active_line_iterator
 MGDoFHandler<dim>::begin_active_line (const unsigned int level) const
 {
+  Assert (dim==1 || level == 0,
+	  typename Triangulation<dim>::ExcFacesHaveNoLevel());
   return active_line_iterator (this->tria,
-			       this->tria->begin_active_line(level)->level(),
+			       dim==1 ? this->tria->begin_active_line(level)->level() : 0,
 			       this->tria->begin_active_line(level)->index(),
 			       this);
 }
@@ -989,8 +995,10 @@ template <int dim>
 typename MGDoFHandler<dim>::raw_quad_iterator
 MGDoFHandler<dim>::begin_raw_quad (const unsigned int level) const
 {
+  Assert (dim==2 || level == 0,
+	  typename Triangulation<dim>::ExcFacesHaveNoLevel());  
   return raw_quad_iterator (this->tria,
-			    this->tria->begin_raw_quad(level)->level(),
+			    dim==2 ? this->tria->begin_raw_quad(level)->level() : 0,
 			    this->tria->begin_raw_quad(level)->index(),
 			    this);
 }
@@ -1000,8 +1008,10 @@ template <int dim>
 typename MGDoFHandler<dim>::quad_iterator
 MGDoFHandler<dim>::begin_quad (const unsigned int level) const
 {
+  Assert (dim==2 || level == 0,
+	  typename Triangulation<dim>::ExcFacesHaveNoLevel());  
   return quad_iterator (this->tria,
-			this->tria->begin_quad(level)->level(),
+			dim==2 ? this->tria->begin_quad(level)->level() : 0,
 			this->tria->begin_quad(level)->index(),
 			this);
 }
@@ -1011,8 +1021,10 @@ template <int dim>
 typename MGDoFHandler<dim>::active_quad_iterator
 MGDoFHandler<dim>::begin_active_quad (const unsigned int level) const
 {
+  Assert (dim==2 || level == 0,
+	  typename Triangulation<dim>::ExcFacesHaveNoLevel());  
   return active_quad_iterator (this->tria,
-			       this->tria->begin_active_quad(level)->level(),
+			       dim==2 ? this->tria->begin_active_quad(level)->level() : 0,
 			       this->tria->begin_active_quad(level)->index(),
 			       this);
 }
