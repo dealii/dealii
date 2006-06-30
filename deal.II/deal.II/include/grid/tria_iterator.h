@@ -1037,10 +1037,7 @@ inline
 void
 TriaRawIterator<dim,Accessor>::print (std::ostream &out) const
 {
-  if (Accessor::objectdim==dim)
-    out << accessor.level() << "." << accessor.index();
-  else
-    out << accessor.index();
+  out << accessor.level() << "." << accessor.index();
 }
 
 
