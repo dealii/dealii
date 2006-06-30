@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -480,14 +480,31 @@ class TriaRawIterator :
 				     /**@name Exceptions*/
 				     /*@{*/
 				     /**
-				      *  Exception
+				      *  Exception for TriaObjects with
+				      *  level, i.e. cells.
+				      */
+    DeclException1 (ExcDereferenceInvalidCell,
+		    Accessor,
+		    << "You tried to dereference a cell iterator for which this "
+		    << "is not possible. More information on this iterator: "
+		    << "level=" << arg1.level()
+		    << ", index=" << arg1.index()
+		    << ", state="
+		    << (arg1.state() == IteratorState::valid ? "valid" :
+			(arg1.state() == IteratorState::past_the_end ?
+			 "past_the_end" : "invalid")));
+
+				     /**
+				      *  Exception for
+				      *  lower-dimensional TriaObjects
+				      *  without level, i.e. objects
+				      *  faces are constructed with.
 				      */
     DeclException1 (ExcDereferenceInvalidObject,
 		    Accessor,
 		    << "You tried to dereference an iterator for which this "
 		    << "is not possible. More information on this iterator: "
-		    << "level=" << arg1.level()
-		    << ", index=" << arg1.index()
+		    << "index=" << arg1.index()
 		    << ", state="
 		    << (arg1.state() == IteratorState::valid ? "valid" :
 			(arg1.state() == IteratorState::past_the_end ?
@@ -891,8 +908,13 @@ inline
 const Accessor &
 TriaRawIterator<dim,Accessor>::operator * () const
 {
-  Assert (state() == IteratorState::valid,
+  Assert (Accessor::objectdim!=dim ||
+	  state() == IteratorState::valid,
+	  ExcDereferenceInvalidCell(accessor));
+  Assert (Accessor::objectdim==dim ||
+	  state() == IteratorState::valid,
 	  ExcDereferenceInvalidObject(accessor));
+  
   return accessor;
 }
 
@@ -903,8 +925,13 @@ inline
 Accessor &
 TriaRawIterator<dim,Accessor>::operator * ()
 {
-  Assert (state() == IteratorState::valid,
+  Assert (Accessor::objectdim!=dim ||
+	  state() == IteratorState::valid,
+	  ExcDereferenceInvalidCell(accessor));
+  Assert (Accessor::objectdim==dim ||
+	  state() == IteratorState::valid,
 	  ExcDereferenceInvalidObject(accessor));
+
   return accessor;
 }
 
@@ -945,20 +972,37 @@ inline
 bool
 TriaRawIterator<dim,Accessor>::operator < (const TriaRawIterator &i) const
 {
-  Assert (state() != IteratorState::invalid,
+  Assert (Accessor::objectdim!=dim ||
+	  state() != IteratorState::invalid,
+	  ExcDereferenceInvalidCell(accessor));
+  Assert (Accessor::objectdim==dim ||
+	  state() != IteratorState::invalid,
 	  ExcDereferenceInvalidObject(accessor));
-  Assert (i.state() != IteratorState::invalid,
+
+  Assert (Accessor::objectdim!=dim ||
+	  i.state() != IteratorState::invalid,
+	  ExcDereferenceInvalidCell(i.accessor));
+  Assert (Accessor::objectdim==dim ||
+	  i.state() != IteratorState::invalid,
 	  ExcDereferenceInvalidObject(i.accessor));
+
   Assert (&accessor.get_triangulation() == &i.accessor.get_triangulation(),
 	  ExcInvalidComparison());
-  
-  return ((((accessor.level() < i.accessor.level()) ||
-	    ((accessor.level() == i.accessor.level()) &&
-	     (accessor.index() < i.accessor.index()))        ) &&
-	   (state()==IteratorState::valid)                     &&
-	   (i.state()==IteratorState::valid)                 ) ||
-	  ((state()==IteratorState::valid) &&
-	   (i.state()==IteratorState::past_the_end)));
+
+  if (Accessor::objectdim==dim)
+    return ((((accessor.level() < i.accessor.level()) ||
+	      ((accessor.level() == i.accessor.level()) &&
+	       (accessor.index() < i.accessor.index()))        ) &&
+	     (state()==IteratorState::valid)                     &&
+	     (i.state()==IteratorState::valid)                 ) ||
+	    ((state()==IteratorState::valid) &&
+	     (i.state()==IteratorState::past_the_end)));
+  else
+    return ((((accessor.index() < i.accessor.index())          ) &&
+	     (state()==IteratorState::valid)                     &&
+	     (i.state()==IteratorState::valid)                 ) ||
+	    ((state()==IteratorState::valid) &&
+	     (i.state()==IteratorState::past_the_end)));
 }
 
 
@@ -993,7 +1037,10 @@ inline
 void
 TriaRawIterator<dim,Accessor>::print (std::ostream &out) const
 {
-  out << accessor.level() << "." << accessor.index();
+  if (Accessor::objectdim==dim)
+    out << accessor.level() << "." << accessor.index();
+  else
+    out << accessor.index();
 }
 
 

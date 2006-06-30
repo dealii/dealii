@@ -162,6 +162,16 @@ TriaObjectAccessor<1,dim>::lines() const
 
 template <int dim>
 inline
+int
+TriaObjectAccessor<1,dim>::level () const
+{
+  return TriaAccessor<dim>::level();
+}
+
+
+
+template <int dim>
+inline
 bool
 TriaObjectAccessor<1,dim>::used () const
 {
@@ -405,6 +415,16 @@ internal::Triangulation::TriaObjects<internal::Triangulation::Quad> &
 TriaObjectAccessor<2,dim>::quads() const
 {
   return this->tria->faces->quads;
+}
+
+
+
+template <int dim>
+inline
+int
+TriaObjectAccessor<2,dim>::level () const
+{
+  return TriaAccessor<dim>::level();
 }
 
 

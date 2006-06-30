@@ -25,8 +25,15 @@
 #include <cmath>
 
 
+template <int dim>
+const unsigned int TriaAccessor<dim>::objectdim;
+
 
 /*------------------------ Functions: LineAccessor ---------------------------*/
+
+template <int dim>
+const unsigned int TriaObjectAccessor<1, dim>::objectdim;
+
 
 template <int dim>
 void
@@ -254,6 +261,10 @@ unsigned int TriaObjectAccessor<1, dim>::number_of_children () const
 
 
 /*------------------------ Functions: QuadAccessor ---------------------------*/
+
+template <int dim>
+const unsigned int TriaObjectAccessor<2, dim>::objectdim;
+
 
 template <int dim>
 void
@@ -665,6 +676,11 @@ unsigned int TriaObjectAccessor<2, dim>::number_of_children () const
 
 
 /*------------------------ Functions: TriaObjectAccessor ---------------------------*/
+
+
+template <int dim>
+const unsigned int TriaObjectAccessor<3, dim>::objectdim;
+
 
 #if deal_II_dimension == 3
 

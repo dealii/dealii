@@ -320,6 +320,14 @@ class TriaAccessor
 				      */
     const Triangulation<dim> *tria;
 
+  private:
+    
+				     /**
+				      * Dimension of the TriaObject
+				      * this accessor gives access to.
+				      */
+    static const unsigned int objectdim = dim;
+
     template <int anydim, typename Accessor> friend class TriaRawIterator;
     template <int anydim, typename Accessor> friend class TriaIterator;
     template <int anydim, typename Accessor> friend class TriaActiveIterator;
@@ -380,6 +388,13 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      * <tt>celldim==3</tt>.
 				      */
     void set (const internal::Triangulation::Hexahedron&) const;
+
+				     /**
+				      *  Return the level the element
+				      *  pointed to belongs to.
+				      *  This is only valid for cells.
+				      */
+    int level () const;
     
 				     /**
 				      *  Index of vertex. The
@@ -838,6 +853,14 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
 				      *  previous level is accessed.
 				      */
     void operator -- ();
+
+  private:
+    
+				     /**
+				      * Dimension of the TriaObject
+				      * this accessor gives access to.
+				      */
+    static const unsigned int objectdim = celldim;
 				     /*@}*/
 
 				     /**
@@ -915,6 +938,13 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      *  line.
 				      */
     void set (const internal::Triangulation::Line &l) const;
+
+				     /**
+				      *  Return the level the element
+				      *  pointed to belongs to.
+				      *  This is only valid for cells.
+				      */
+    int level () const;
 
 				     /**
 				      *  Return the index of vertex
@@ -1358,6 +1388,14 @@ class TriaObjectAccessor<1, dim> :  public TriaAccessor<dim>
 				      */
     internal::Triangulation::TriaObjects<internal::Triangulation::Line> & lines() const;
 
+  private:
+    
+				     /**
+				      * Dimension of the TriaObject
+				      * this accessor gives access to.
+				      */
+    static const unsigned int objectdim = 1;
+
 				     /*@}*/
 
 				     /**
@@ -1400,6 +1438,13 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      *  Copy the data of the given quad.
 				      */
     void set (const internal::Triangulation::Quad &q) const;
+
+				     /**
+				      *  Return the level the element
+				      *  pointed to belongs to.
+				      *  This is only valid for cells.
+				      */
+    int level () const;
     
 				     /**
 				      * Return index of a vertex of a
@@ -1893,6 +1938,14 @@ class TriaObjectAccessor<2, dim> :  public TriaAccessor<dim>
 				      * without specialization.
 				      */
     internal::Triangulation::TriaObjects<internal::Triangulation::Quad> & quads() const;
+
+  private:
+    
+				     /**
+				      * Dimension of the TriaObject
+				      * this accessor gives access to.
+				      */
+    static const unsigned int objectdim = 2;
 				     /*@}*/
 
 				     /**
@@ -2428,6 +2481,14 @@ class TriaObjectAccessor<3, dim> :  public TriaAccessor<dim>
 				      *  previous level is accessed.
 				      */
     void operator -- ();
+
+  private:
+    
+				     /**
+				      * Dimension of the TriaObject
+				      * this accessor gives access to.
+				      */
+    static const unsigned int objectdim = 3;
 				     /*@}*/
 
 				     /**
@@ -2814,6 +2875,7 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
     DeclException0 (ExcCellFlaggedForCoarsening);
     
   private:
+    
     				     /**
 				      *  Copy operator. This is
 				      *  normally used in a context
