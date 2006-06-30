@@ -331,10 +331,6 @@ namespace internal
 				     // explicit instantiations
 
     template class TriaObjects<Line>;
-
-#if deal_II_dimension >=2
     template class TriaObjects<Quad>;
-#endif
-    
   }
 }
