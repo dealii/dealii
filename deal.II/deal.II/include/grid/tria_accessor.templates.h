@@ -165,6 +165,7 @@ inline
 int
 TriaObjectAccessor<1,dim>::level () const
 {
+  Assert(dim==1, typename TriaAccessor<dim>::ExcFacesHaveNoLevel());
   return TriaAccessor<dim>::level();
 }
 
@@ -424,6 +425,7 @@ inline
 int
 TriaObjectAccessor<2,dim>::level () const
 {
+  Assert(dim==2, typename TriaAccessor<dim>::ExcFacesHaveNoLevel());
   return TriaAccessor<dim>::level();
 }
 
