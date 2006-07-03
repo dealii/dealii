@@ -725,6 +725,11 @@ int main ()
 {
   deallog.depth_console (0);
   {
+    LaplaceProblem<1> laplace_problem_1d;
+    laplace_problem_1d.run ();
+  }
+  
+  {
     LaplaceProblem<2> laplace_problem_2d;
     laplace_problem_2d.run ();
   }
