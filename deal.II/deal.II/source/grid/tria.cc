@@ -3423,14 +3423,13 @@ Triangulation<1>::begin_raw_line (const unsigned int level) const
 
 #if deal_II_dimension == 3
 
-// TODO: why does specialization not work?!
-template <int dim>
-typename Triangulation<dim>::raw_quad_iterator
-Triangulation<dim>::begin_raw_quad (const unsigned int level) const
+template <>
+Triangulation<3>::raw_quad_iterator
+Triangulation<3>::begin_raw_quad (const unsigned int level) const
 {
   Assert (level == 0, ExcFacesHaveNoLevel())
 
-  return raw_quad_iterator (const_cast<Triangulation<dim>*>(this),
+  return raw_quad_iterator (const_cast<Triangulation<3>*>(this),
 			    0,
 			    0);
 }
