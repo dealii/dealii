@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,17 +38,22 @@ check_this (const DoFHandler<dim> &dof_handler)
   
                                    // create sparsity pattern
   const unsigned int n_components = dof_handler.get_fe().n_components();
-  BlockSparsityPattern sp (n_components,
-                           n_components);
-  std::vector<unsigned int> dofs_per_component(n_components);
-  DoFTools::count_dofs_per_component (dof_handler,
-                                      dofs_per_component);
-  for (unsigned int i=0; i<n_components; ++i)
-    for (unsigned int j=0; j<n_components; ++j)
-      sp.block(i,j).reinit(dofs_per_component[i],
-                           dofs_per_component[j],
-                           dof_handler.max_couplings_between_dofs());
-  sp.collect_sizes ();
+  const unsigned int n_blocks = dof_handler.get_fe().n_blocks();
+  
+  BlockSparsityPattern sp (n_blocks,
+                           n_blocks);
+  std::vector<unsigned int> dofs_per_component(n_blocks);
+  DoFTools::count_dofs_per_block (dof_handler,
+				  dofs_per_component);
+  BlockIndices block_indices(dofs_per_component);
+  
+  std::vector<std::vector<unsigned int> >
+    row_length(n_blocks, std::vector<unsigned int>(dof_handler.n_dofs()));
+  Table<2,DoFTools::Coupling> couplings(n_components, n_components);
+  couplings.fill(DoFTools::always);
+  DoFTools::compute_row_length_vector(dof_handler, row_length,
+				      couplings, couplings);
+  sp.reinit(block_indices, block_indices, row_length);
   
   DoFTools::make_sparsity_pattern (dof_handler, sp);
   sp.compress ();

@@ -1,6 +1,6 @@
 ############################################################
-# $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+# Makefile,v 1.15 2002/06/13 12:51:13 hartmann Exp
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -17,13 +17,31 @@ libraries = $(lib-deal2-1d.g) \
             $(lib-lac.g)  \
             $(lib-base.g)
 
-default: run-tests 
+default: run-tests
 
 ############################################################
 
-tests_x = cycles count_* boundary_* renumbering_* \
-	transfer transfer_select transfer_block \
-	smoother_block
+tests_x = row_length_*
+
+# tests for the hp branch:
+#	  fe_collection_*
+
+ifeq ($(USE_CONTRIB_PETSC),yes)
+  tests_x += petsc_*
+endif
+
+ifeq ($(USE_CONTRIB_METIS),yes)
+  tests_x += metis_*
+endif
+
+ifeq ($(USE_CONTRIB_HSL),yes)
+  tests_x += hsl_*
+endif
+
+ifeq ($(USE_CONTRIB_UMFPACK),yes)
+  tests_x += umfpack_*
+endif
+
 
 # from above list of regular expressions, generate the real set of
 # tests
@@ -37,3 +55,5 @@ tests = $(call expand,$(tests_x))
 include ../Makefile.rules
 include Makefile.depend
 include Makefile.tests
+
+.PHONY: default
