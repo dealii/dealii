@@ -122,8 +122,8 @@ else
   lib-contrib-petsc-path.g = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
   lib-contrib-petsc-path.o = $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)
 endif
-lib-contrib-petsc.g = $(LIBDIR)/libpetsc.g$(lib-suffix)
-lib-contrib-petsc.o = $(LIBDIR)/libpetsc$(lib-suffix)
+lib-contrib-petsc.g = $(LIBDIR)/libpetscall.g$(lib-suffix)
+lib-contrib-petsc.o = $(LIBDIR)/libpetscall$(lib-suffix)
 
 # same for metis, except that there is only one library in that case
 lib-contrib-metis = $(DEAL_II_METIS_DIR)/libmetis.a

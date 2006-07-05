@@ -57,50 +57,50 @@ endif
 
 ifeq ($(enable-shared),yes)
 
-  external-links-petsc: libpetsc.g$(shared-lib-suffix) libpetsc$(shared-lib-suffix)
+  external-links-petsc: libpetscall.g$(shared-lib-suffix) libpetscall$(shared-lib-suffix)
 
-  libpetsc.g$(shared-lib-suffix): $(xlib.g)
-	@echo "======================debug============= Linking library:   libpetsc.g$(shared-lib-suffix)"
-	@$(CXX) -shared -o libpetsc.g$(shared-lib-suffix) \
+  libpetscall.g$(shared-lib-suffix): $(xlib.g)
+	@echo "======================debug============= Linking library:   libpetscall.g$(shared-lib-suffix)"
+	@$(CXX) -shared -o libpetscall.g$(shared-lib-suffix) \
 		-Wl,-rpath,$(lib-contrib-petsc-path.g) $(xlib.g)
 
-  libpetsc$(shared-lib-suffix): $(xlib.o)
-	@echo "======================optimized========= Linking library:   libpetsc$(shared-lib-suffix)"
-	@$(CXX) -shared -o libpetsc$(shared-lib-suffix) \
+  libpetscall$(shared-lib-suffix): $(xlib.o)
+	@echo "======================optimized========= Linking library:   libpetscall$(shared-lib-suffix)"
+	@$(CXX) -shared -o libpetscall$(shared-lib-suffix) \
 		-Wl,-rpath,$(lib-contrib-petsc-path.o) $(xlib.o)
 
 else
 
-  external-links-petsc: libpetsc.g$(static-lib-suffix) libpetsc$(static-lib-suffix)
+  external-links-petsc: libpetscall.g$(static-lib-suffix) libpetscall$(static-lib-suffix)
 
   # As I don't know how to merge archives, here's a workaround: Extract each of
   # the archives and append the object files to the libpetsc archive. Do the
   # same for debug and optimized mode.
-  libpetsc.g$(static-lib-suffix): $(xlib.g)
-	@echo "======================debug============= Linking library:   libpetsc.g$(static-lib-suffix)"
+  libpetscall.g$(static-lib-suffix): $(xlib.g)
+	@echo "======================debug============= Linking library:   libpetscall.g$(static-lib-suffix)"
 	@rm -rf .ar_tmp
 	@mkdir .ar_tmp; cd .ar_tmp; \
 	 for arfile in $(xlib.g) ; do \
 	   $(AR) x $$arfile; \
-           $(AR) q ../libpetsc.g$(static-lib-suffix) *; \
+           $(AR) q ../libpetscall.g$(static-lib-suffix) *; \
            rm *; \
 	 done
 	@cd ..
 	@rm -r .ar_tmp
-	@$(RANLIB) libpetsc.g$(static-lib-suffix)
+	@$(RANLIB) libpetscall.g$(static-lib-suffix)
 
-  libpetsc$(static-lib-suffix): $(xlib.o)
-	@echo "======================optimized========= Linking library:   libpetsc$(static-lib-suffix)"
+  libpetscall$(static-lib-suffix): $(xlib.o)
+	@echo "======================optimized========= Linking library:   libpetscall$(static-lib-suffix)"
 	@rm -rf .ar_tmp
 	@mkdir .ar_tmp; cd .ar_tmp; \
 	 for arfile in $(xlib.o) ; do \
 	   $(AR) x $$arfile; \
-           $(AR) q ../libpetsc$(static-lib-suffix) *; \
+           $(AR) q ../libpetscall$(static-lib-suffix) *; \
            rm *; \
 	 done
 	@cd ..
 	@rm -r .ar_tmp
-	@$(RANLIB) libpetsc$(static-lib-suffix)
+	@$(RANLIB) libpetscall$(static-lib-suffix)
 endif
 
 
