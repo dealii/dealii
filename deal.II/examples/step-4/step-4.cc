@@ -620,10 +620,9 @@ void LaplaceProblem<dim>::output_results () const
 
   data_out.build_patches ();
 
-  std::ofstream output (dim == 1 ? "solution-1d.gmv"
-			: (dim == 2 ?
+  std::ofstream output (dim == 2 ?
 			"solution-2d.gmv" :
-			"solution-3d.gmv"));
+			"solution-3d.gmv");
   data_out.write_gmv (output);
 }
 
@@ -651,12 +650,14 @@ void LaplaceProblem<dim>::run ()
                                  // @sect3{The <code>main</code> function}
 
 				 // And this is the main function. It also
-				 // looks mostly like in step-3, we first
+				 // looks mostly like in step-3, but if you
+				 // look at the code below, note how we first
 				 // create a variable of type
-				 // <code>LaplaceProblem@<1@></code> compiling the class template
-				 // with <code>dim</code> replaced by <code>1</code>) and run a
-                                 // 1d simulation. Then, we do the whole
-				 // thing over in 2d and 3d.
+				 // <code>LaplaceProblem@<2@></code> (forcing the
+				 // compiler to compile the class template
+				 // with <code>dim</code> replaced by <code>2</code>) and run a
+				 // 2d simulation, and then we do the whole
+				 // thing over in 3d.
 				 //
 				 // In practice, this is probably not what you
 				 // would do very frequently (you probably
@@ -723,11 +724,6 @@ void LaplaceProblem<dim>::run ()
 int main () 
 {
   deallog.depth_console (0);
-  {
-    LaplaceProblem<1> laplace_problem_1d;
-    laplace_problem_1d.run ();
-  }
-  
   {
     LaplaceProblem<2> laplace_problem_2d;
     laplace_problem_2d.run ();
