@@ -7,6 +7,11 @@ may vary by one or two, depending on your computer, since this is
 often dependent on the round-off accuracy of floating point
 operations, which differs between processors):
 @code
+Solving problem in 1 space dimensions.
+   Number of active cells: 16
+   Total number of cells: 31
+   Number of degrees of freedom: 17
+   16 CG iterations needed to obtain convergence.
 Solving problem in 2 space dimensions.
    Number of active cells: 256
    Total number of cells: 341
@@ -18,18 +23,22 @@ Solving problem in 3 space dimensions.
    Number of degrees of freedom: 4913
    30 CG iterations needed to obtain convergence.
 @endcode
-It is obvious that in three spatial dimensions the number of cells and
-therefore also the number of degrees of freedom is
-much higher. What cannot be seen here, is that besides this higher
+It is obvious that the number of cells and
+therefore also the number of degrees of freedom increases exponentially with
+the space dimension. What cannot be seen here, is that besides this increase in
 number of rows and columns in the matrix, there are also significantly
-more entries per row of the matrix in three space
+more entries per row of the matrix in higher space
 dimensions. Together, this leads to a much higher numerical effort for
 solving the system of equation, which you can feel when you actually
-run the program.
+run the program. Therefore, it is really helful to develop a program in two dimensions
+and transfer it to three dimensions by the mechanism studied in this step. By the way,
+one dimensional examples are usually not sufficiently general to serve as a basis for
+three dimensions.
 
 
 
-The program produces two files: <code>solution-2d.gmv</code> and
+The program produces three files: <code>solution-1d.gmv</code>,
+ <code>solution-2d.gmv</code> and
 <code>solution-3d.gmv</code>, which can be viewed using the program
 GMV (in case you do not have that program, you can easily change the
 output format in the program to something which you can view more
@@ -97,6 +106,20 @@ The right picture shows the three dimensional grid, colorized by the
 solutions values. 3D grids are difficult to visualize, which can be
 seen here already, even though the grid is not even locally refined.
 
+
+For completeness, we add the graphical output of the one dimensional run:
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      @image html step-4.solution-1d.png
+    </td>
+
+    <td ALIGN="center">
+      @image html step-4.grid-1d.png
+    </td>
+  </tr>
+</table>
 
 
 
