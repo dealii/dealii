@@ -50,11 +50,11 @@ void dofs(const MGDoFHandler<dim>& dof)
     {
       indices.resize(cell->get_fe().dofs_per_face);
       
-      deallog << "Level " << cell->level();
+      deallog << "Level " << cell->level() << std::endl;
       for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
 	{
 	  typename MGDoFHandler<dim>::face_iterator face = cell->face(f);
-	  face->get_mg_dof_indices(indices);
+	  face->get_mg_dof_indices(cell->level(), indices);
 	  
 	  for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_face;++i)
 	    deallog << " v" << face->vertex(i);
