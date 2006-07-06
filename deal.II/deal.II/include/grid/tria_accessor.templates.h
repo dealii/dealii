@@ -135,7 +135,10 @@ TriaObjectAccessor (const Triangulation<dim> *parent,
                     const AccessorData       *local_data)
                 :
                 TriaAccessor<dim> (parent, level, index, local_data)
-{}
+{
+  if (dim!=1)
+    Assert(level <= 0, ExcInternalError());
+}
 
 
 // first implement the lines functions as they are used by many
@@ -394,7 +397,10 @@ TriaObjectAccessor (const Triangulation<dim> *parent,
                     const AccessorData       *local_data)
                 :
                 TriaAccessor<dim> (parent, level, index, local_data)
-{}
+{
+  if (dim!=2)
+    Assert(level <= 0, ExcInternalError());
+}
 
 
 
@@ -681,7 +687,10 @@ TriaObjectAccessor (const Triangulation<dim> *parent,
                     const AccessorData       *local_data)
                 :
                 TriaAccessor<dim> (parent, level, index, local_data)
-{}
+{
+  if (dim!=3)
+    Assert(level <= 0, ExcInternalError());
+}
 
 
 
