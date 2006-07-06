@@ -3431,7 +3431,7 @@ AC_DEFUN(DEAL_II_CHECK_WEAK_LINKAGE_BUG, dnl
 [
   DARWIN_GCC_WEAK_LINKAGE_BUG="no"
   case "$target" in
-    powerpc-apple-darwin* )
+    *-apple-darwin* )
 
     AC_MSG_CHECKING(for weak linkage bug (Apple gcc.3.3) )
 

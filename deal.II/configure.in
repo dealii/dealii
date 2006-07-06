@@ -296,7 +296,7 @@ esac
 dnl TODO Maybe the major version number should be inserted before .dylib 
 dnl (.5.dylib for example).
 case "$target" in
-   powerpc-apple-darwin* )
+   *-apple-darwin* )
            shared_lib_suffix=".dylib"
            darwin_shared_lib="yes"
            ;;
@@ -312,7 +312,7 @@ if test "x$enableshared" = "xyes" ; then
   SHLIBFLAGS="-shared"
 
   case "$target" in
-    powerpc-apple-darwin* )
+    *-apple-darwin* )
        SHLIBFLAGS="-dynamiclib"
 	   ;;
   esac
@@ -323,7 +323,7 @@ dnl other compilers do not like this flag we should introduce a
 dnl LDFLAGSSTATIC variable and check -static through AC_TRY_LINK.
   LDFLAGSSTATIC="-static"
   case "$target" in
-    powerpc-apple-darwin* )
+    *-apple-darwin* )
        LDFLAGSSTATIC=""
 	   ;;
   esac
