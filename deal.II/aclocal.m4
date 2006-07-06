@@ -1439,7 +1439,13 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_RPATH,
 [ OLD_LDFLAGS=$LDFLAGS
-  LDFLAGS="-Wl,-rpath,$DEAL_II_PATH/lib $LDFLAGS"
+
+  dnl ??? The following path is bogus -- it should be $DEAL_II_PATH/lib
+  dnl instead of just $DEAL_II_PATH. However, if we make that change (as
+  dnl in CVS version 1.319), then we can't link with PETSc any more.
+  dnl Strange strange...
+
+  LDFLAGS="-Wl,-rpath $DEAL_II_PATH $LDFLAGS"
   AC_MSG_CHECKING([whether compiler understands option -Wl,-rpath])
   AC_LINK_IFELSE(
    [ AC_LANG_PROGRAM([[]],[[]])],
