@@ -91,7 +91,7 @@ MGSmootherContinuous<VECTOR>::MGSmootherContinuous (
 	       == level-1))
 	    {
 					       // get indices of this face
-	      cell->face(face)->get_mg_dof_indices (dofs_on_face);
+	      cell->face(face)->get_mg_dof_indices (level, dofs_on_face);
 					       // append them to the levelwise
 					       // list
 	      boundary_dofs.insert (boundary_dofs.end(),

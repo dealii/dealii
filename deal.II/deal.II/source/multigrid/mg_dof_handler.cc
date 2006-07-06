@@ -1733,12 +1733,12 @@ MGDoFHandler<1>::distribute_dofs_on_cell (cell_iterator &cell,
 	      {
 		if (v==0) 
 		  for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-		    cell->set_mg_vertex_dof_index (0, d,
-						   neighbor->mg_vertex_dof_index (1, d));
+		    cell->set_mg_vertex_dof_index (cell->level(), 0, d,
+						   neighbor->mg_vertex_dof_index (cell->level(), 1, d));
 		else
 		  for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-		    cell->set_mg_vertex_dof_index (1, d,
-						   neighbor->mg_vertex_dof_index (0, d));
+		    cell->set_mg_vertex_dof_index (cell->level(), 1, d,
+						   neighbor->mg_vertex_dof_index (cell->level(), 0, d));
 		
 						 // next neighbor
 		continue;
@@ -1747,13 +1747,13 @@ MGDoFHandler<1>::distribute_dofs_on_cell (cell_iterator &cell,
 	
 					 // otherwise: create dofs newly
 	for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-	  cell->set_mg_vertex_dof_index (v, d, next_free_dof++);
+	  cell->set_mg_vertex_dof_index (cell->level(), v, d, next_free_dof++);
       };
   
 				   // dofs of line
   if (this->selected_fe->dofs_per_line > 0)
     for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
-      cell->set_mg_dof_index (d, next_free_dof++);
+      cell->set_mg_dof_index (cell->level(), d, next_free_dof++);
 
 				   // note that this cell has been processed
   cell->set_user_flag ();
@@ -1776,9 +1776,9 @@ MGDoFHandler<2>::distribute_dofs_on_cell (cell_iterator &cell,
 				       // check whether dofs for this
 				       // vertex have been distributed
 				       // (only check the first dof)
-      if (cell->mg_vertex_dof_index(vertex, 0) == DoFHandler<2>::invalid_dof_index)
+      if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == DoFHandler<2>::invalid_dof_index)
 	for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-	  cell->set_mg_vertex_dof_index (vertex, d, next_free_dof++);
+	  cell->set_mg_vertex_dof_index (cell->level(), vertex, d, next_free_dof++);
     
   				   // for the four sides
   if (this->selected_fe->dofs_per_line > 0)
@@ -1789,17 +1789,17 @@ MGDoFHandler<2>::distribute_dofs_on_cell (cell_iterator &cell,
 					 // distribute dofs if necessary:
 					 // check whether line dof is already
 					 // numbered (check only first dof)
-	if (line->mg_dof_index(0) == DoFHandler<2>::invalid_dof_index)
+	if (line->mg_dof_index(cell->level(), 0) == DoFHandler<2>::invalid_dof_index)
 					   // if not: distribute dofs
 	  for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
-	    line->set_mg_dof_index (d, next_free_dof++);	    
+	    line->set_mg_dof_index (cell->level(), d, next_free_dof++);	    
       };
 
 
 				   // dofs of quad
   if (this->selected_fe->dofs_per_quad > 0)
     for (unsigned int d=0; d<this->selected_fe->dofs_per_quad; ++d)
-      cell->set_mg_dof_index (d, next_free_dof++);
+      cell->set_mg_dof_index (cell->level(), d, next_free_dof++);
 
 
 				   // note that this cell has been processed
@@ -1823,9 +1823,9 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 				       // check whether dofs for this
 				       // vertex have been distributed
 				       // (only check the first dof)
-      if (cell->mg_vertex_dof_index(vertex, 0) == DoFHandler<3>::invalid_dof_index)
+      if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == DoFHandler<3>::invalid_dof_index)
 	for (unsigned int d=0; d<this->selected_fe->dofs_per_vertex; ++d)
-	  cell->set_mg_vertex_dof_index (vertex, d, next_free_dof++);
+	  cell->set_mg_vertex_dof_index (cell->level(), vertex, d, next_free_dof++);
     
   				   // for the lines
   if (this->selected_fe->dofs_per_line > 0)
@@ -1836,10 +1836,10 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 					 // distribute dofs if necessary:
 					 // check whether line dof is already
 					 // numbered (check only first dof)
-	if (line->mg_dof_index(0) == DoFHandler<3>::invalid_dof_index)
+	if (line->mg_dof_index(cell->level(), 0) == DoFHandler<3>::invalid_dof_index)
 					   // if not: distribute dofs
 	  for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
-	    line->set_mg_dof_index (d, next_free_dof++);	    
+	    line->set_mg_dof_index (cell->level(), d, next_free_dof++);	    
       };
 
   				   // for the quads
@@ -1851,17 +1851,17 @@ MGDoFHandler<3>::distribute_dofs_on_cell (cell_iterator &cell,
 					 // distribute dofs if necessary:
 					 // check whether line dof is already
 					 // numbered (check only first dof)
-	if (quad->mg_dof_index(0) == DoFHandler<3>::invalid_dof_index)
+	if (quad->mg_dof_index(cell->level(), 0) == DoFHandler<3>::invalid_dof_index)
 					   // if not: distribute dofs
 	  for (unsigned int d=0; d<this->selected_fe->dofs_per_quad; ++d)
-	    quad->set_mg_dof_index (d, next_free_dof++);	    
+	    quad->set_mg_dof_index (cell->level(), d, next_free_dof++);	    
       };
 
 
 				   // dofs of cell
   if (this->selected_fe->dofs_per_hex > 0)
     for (unsigned int d=0; d<this->selected_fe->dofs_per_hex; ++d)
-      cell->set_mg_dof_index (d, next_free_dof++);
+      cell->set_mg_dof_index (cell->level(), d, next_free_dof++);
 
 
 				   // note that this cell has been processed
@@ -1975,7 +1975,7 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
 	if (line->user_flag_set())
 	  {
 	    for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
-	      line->set_mg_dof_index (d, new_numbers[line->mg_dof_index(d)]);
+	      line->set_mg_dof_index (level, d, new_numbers[line->mg_dof_index(level, d)]);
 	    line->clear_user_flag();
 	  }
 				       // finally, restore user flags
@@ -2042,7 +2042,7 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
 	if (line->user_flag_set())
 	  {
 	    for (unsigned int d=0; d<this->selected_fe->dofs_per_line; ++d)
-	      line->set_mg_dof_index (d, new_numbers[line->mg_dof_index(d)]);
+	      line->set_mg_dof_index (level, d, new_numbers[line->mg_dof_index(level, d)]);
 	    line->clear_user_flag();
 	  }
 				       // finally, restore user flags
@@ -2074,7 +2074,7 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
 	if (quad->user_flag_set())
 	  {
 	    for (unsigned int d=0; d<this->selected_fe->dofs_per_quad; ++d)
-	      quad->set_mg_dof_index (d, new_numbers[quad->mg_dof_index(d)]);
+	      quad->set_mg_dof_index (level, d, new_numbers[quad->mg_dof_index(level, d)]);
 	    quad->clear_user_flag();
 	  }
 				       // finally, restore user flags

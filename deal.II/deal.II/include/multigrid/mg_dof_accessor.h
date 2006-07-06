@@ -153,7 +153,8 @@ class MGDoFAccessor : public MGDoFObjectAccessor_Inheritance<structdim, dim>::Ba
 				      * vertex for the level this
 				      * object lives on.
 				      */
-    unsigned int mg_vertex_dof_index (const unsigned int vertex,
+    unsigned int mg_vertex_dof_index (const int level,
+				      const unsigned int vertex,
 				      const unsigned int i) const;
 
 				     /**
@@ -161,7 +162,8 @@ class MGDoFAccessor : public MGDoFObjectAccessor_Inheritance<structdim, dim>::Ba
 				      * on the @p vertexth vertex to @p index
 				      * for the level this object lives on.
 				      */
-    void set_mg_vertex_dof_index (const unsigned int vertex,
+    void set_mg_vertex_dof_index (const int level,
+				  const unsigned int vertex,
 				  const unsigned int i,
 				  const unsigned int index) const;
 
@@ -171,14 +173,16 @@ class MGDoFAccessor : public MGDoFObjectAccessor_Inheritance<structdim, dim>::Ba
 				      * on the level this line lives
 				      * on.
 				      */
-    unsigned int mg_dof_index (const unsigned int i) const;
+    unsigned int mg_dof_index (const int level,
+			       const unsigned int i) const;
 
     				     /**
 				      * Set the index of the @p ith degree
 				      * of freedom of this line on the
 				      * level this line lives on to @p index.
 				      */
-    void set_mg_dof_index (const unsigned int i,
+    void set_mg_dof_index (const int level,
+			   const unsigned int i,
 			   const unsigned int index) const;
 
 				     /**
@@ -287,7 +291,8 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<1,dim>
 				      * indices refer to the local numbering
 				      * for the level this line lives on.
 				      */
-    void get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const;
+    void get_mg_dof_indices (const int level,
+			     std::vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the value of the given vector
@@ -307,7 +312,8 @@ class MGDoFObjectAccessor<1, dim> :  public MGDoFAccessor<1,dim>
 				      * freedom on this level.
 				      */
     template <typename number>
-    void get_mg_dof_values (const Vector<number> &values,
+    void get_mg_dof_values (const int level,
+			    const Vector<number> &values,
 			    Vector<number>       &dof_values) const;
 };
 
@@ -370,7 +376,8 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<2,dim>
 				      * indices refer to the local numbering
 				      * for the level this quad lives on.
 				      */
-    void get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const;
+    void get_mg_dof_indices (const int level,
+			     std::vector<unsigned int> &dof_indices) const;
  
     				     /**
 				      * Return the value of the given vector
@@ -390,7 +397,8 @@ class MGDoFObjectAccessor<2, dim> :  public MGDoFAccessor<2,dim>
 				      * freedom on this level.
 				      */
     template <typename number>
-    void get_mg_dof_values (const Vector<number> &values,
+    void get_mg_dof_values (const int level,
+			    const Vector<number> &values,
 			    Vector<number>       &dof_values) const;
 
    				     /**
@@ -461,7 +469,8 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<3,dim>
 				      * indices refer to the local numbering
 				      * for the level this hex lives on.
 				      */
-    void get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const;
+    void get_mg_dof_indices (const int level,
+			     std::vector<unsigned int> &dof_indices) const;
 
     				     /**
 				      * Return the value of the given vector
@@ -481,7 +490,8 @@ class MGDoFObjectAccessor<3, dim> :  public MGDoFAccessor<3,dim>
 				      * freedom on this level.
 				      */
     template <typename number>
-    void get_mg_dof_values (const Vector<number> &values,
+    void get_mg_dof_values (const int level,
+			    const Vector<number> &values,
 			    Vector<number>       &dof_values) const;
 
     				     /**
@@ -539,6 +549,41 @@ class MGDoFCellAccessor :  public MGDoFObjectAccessor<dim, dim>
 		       const int                 level,
 		       const int                 index,
 		       const AccessorData       *local_data);
+
+    				     /**
+				      * Return the indices of the dofs of this
+				      * hex in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand. The
+				      * indices refer to the local numbering
+				      * for the level this hex lives on.
+				      */
+    void get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const;
+
+    				     /**
+				      * Return the value of the given vector
+				      * restricted to the dofs of this
+				      * cell in the standard ordering: dofs
+				      * on vertex 0, dofs on vertex 1, etc,
+				      * dofs on line 0, dofs on line 1, etc,
+				      * dofs on quad 0, etc.
+				      *
+				      * It is assumed that the vector already
+				      * has the right size beforehand. The
+				      * indices refer to the multilevel
+				      * numbering local to the present
+				      * level of this cell. The vector shall
+				      * therefore have the same number of
+				      * entries as there are degrees of
+				      * freedom on this level.
+				      */
+    template <typename number>
+    void get_mg_dof_values (const Vector<number> &values,
+			    Vector<number>       &dof_values) const;
 
 				     /**
 				      * Return the @p ith neighbor as a MGDoF cell

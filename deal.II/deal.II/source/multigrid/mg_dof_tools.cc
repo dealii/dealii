@@ -1111,7 +1111,7 @@ MGTools::make_boundary_list(
                                              // boundary values of dofs on this
                                              // face
             face_dofs.resize (fe.dofs_per_face);
-            face->get_mg_dof_indices (face_dofs);
+            face->get_mg_dof_indices (level, face_dofs);
             if (fe_is_system)
               {
                                                  // enter those dofs

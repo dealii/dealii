@@ -80,7 +80,8 @@ MGDoFAccessor<structdim, dim>::operator = (const MGDoFAccessor &da)
 
 template <int structdim,int dim>
 unsigned int
-MGDoFAccessor<structdim, dim>::mg_vertex_dof_index (const unsigned int vertex,
+MGDoFAccessor<structdim, dim>::mg_vertex_dof_index (const int level,
+						    const unsigned int vertex,
 						    const unsigned int i) const
 {
   Assert (this->dof_handler != 0,
@@ -95,13 +96,14 @@ MGDoFAccessor<structdim, dim>::mg_vertex_dof_index (const unsigned int vertex,
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   return (this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
-	  .get_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex));
+	  .get_index (level, i, this->dof_handler->get_fe().dofs_per_vertex));
 }
 
 
 template <int structdim, int dim>
 void
-MGDoFAccessor<structdim, dim>::set_mg_vertex_dof_index (const unsigned int vertex,
+MGDoFAccessor<structdim, dim>::set_mg_vertex_dof_index (const int level,
+							const unsigned int vertex,
 							const unsigned int i,
 							const unsigned int index) const
 {
@@ -117,17 +119,18 @@ MGDoFAccessor<structdim, dim>::set_mg_vertex_dof_index (const unsigned int verte
 	  ExcIndexRange (i, 0, this->dof_handler->get_fe().dofs_per_vertex));
 
   this->mg_dof_handler->mg_vertex_dofs[this->vertex_index(vertex)]
-    .set_index (this->present_level, i, this->dof_handler->get_fe().dofs_per_vertex, index);
+    .set_index (level, i, this->dof_handler->get_fe().dofs_per_vertex, index);
 }
 
 
 
 template <int structdim, int dim>
 unsigned int
-MGDoFAccessor<structdim, dim>::mg_dof_index (const unsigned int i) const
+MGDoFAccessor<structdim, dim>::mg_dof_index (const int level,
+					     const unsigned int i) const
 {
   return this->mg_dof_handler
-    ->template get_dof_index<structdim>(this->present_level,
+    ->template get_dof_index<structdim>(level,
 					this->present_index,
 					0,
 					i);
@@ -135,11 +138,12 @@ MGDoFAccessor<structdim, dim>::mg_dof_index (const unsigned int i) const
 
 
 template <int structdim, int dim>
-void MGDoFAccessor<structdim, dim>::set_mg_dof_index (const unsigned int i,
-						    const unsigned int index) const
+void MGDoFAccessor<structdim, dim>::set_mg_dof_index (const int level,
+						      const unsigned int i,
+						      const unsigned int index) const
 {
   this->mg_dof_handler
-    ->template set_dof_index<structdim>(this->present_level,
+    ->template set_dof_index<structdim>(level,
 					this->present_index,
 					0,
 					i,
@@ -215,7 +219,8 @@ MGDoFObjectAccessor<1, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria
 
 template <int dim>
 void
-MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
+MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (const int level,
+						 std::vector<unsigned int> &dof_indices) const
 {
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -232,9 +237,9 @@ MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->mg_vertex_dof_index(vertex,d);
+      *next++ = this->mg_vertex_dof_index(level,vertex,d);
   for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next++ = this->mg_dof_index(d);
+    *next++ = this->mg_dof_index(level,d);
   
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
@@ -244,7 +249,8 @@ MGDoFObjectAccessor<1, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
 template <int dim>
 template <typename number>
 void
-MGDoFObjectAccessor<1,dim>::get_mg_dof_values (const Vector<number> &values,
+MGDoFObjectAccessor<1,dim>::get_mg_dof_values (const int level,
+					       const Vector<number> &values,
 					       Vector<number>       &dof_values) const
 {
   Assert (this->dof_handler != 0,
@@ -263,9 +269,9 @@ MGDoFObjectAccessor<1,dim>::get_mg_dof_values (const Vector<number> &values,
   typename Vector<number>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<2; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next_dof_value++ = values(this->mg_vertex_dof_index(vertex,d));
+      *next_dof_value++ = values(this->mg_vertex_dof_index(level,vertex,d));
   for (unsigned int d=0; d<dofs_per_line; ++d)
-    *next_dof_value++ = values(this->mg_dof_index(d));
+    *next_dof_value++ = values(this->mg_dof_index(level,d));
   
   Assert (next_dof_value == dof_values.end(),
 	  ExcInternalError());
@@ -289,7 +295,8 @@ MGDoFObjectAccessor<2, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria
 
 template <int dim>
 void
-MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
+MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (const int level,
+						 std::vector<unsigned int> &dof_indices) const
 {
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -308,12 +315,12 @@ MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->mg_vertex_dof_index(vertex,d);
+      *next++ = this->mg_vertex_dof_index(level,vertex,d);
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next++ = this->line(line)->mg_dof_index(d);
+      *next++ = this->line(line)->mg_dof_index(level,d);
   for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next++ = this->mg_dof_index(d);
+    *next++ = this->mg_dof_index(level,d);
   
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
@@ -323,7 +330,8 @@ MGDoFObjectAccessor<2, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
 template <int dim>
 template <typename number>
 void
-MGDoFObjectAccessor<2,dim>::get_mg_dof_values (const Vector<number> &values,
+MGDoFObjectAccessor<2,dim>::get_mg_dof_values (const int level,
+					       const Vector<number> &values,
 					       Vector<number>       &dof_values) const
 {
   Assert (this->dof_handler != 0,
@@ -334,7 +342,7 @@ MGDoFObjectAccessor<2,dim>::get_mg_dof_values (const Vector<number> &values,
 	  typename BaseClass::ExcInvalidObject());
   Assert (dof_values.size() == this->dof_handler->get_fe().dofs_per_cell,
 	  typename BaseClass::ExcVectorDoesNotMatch());
-  Assert (values.size() == this->mg_dof_handler->n_dofs(this->present_level),
+  Assert (values.size() == this->mg_dof_handler->n_dofs(level),
 	  typename BaseClass::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
@@ -343,12 +351,12 @@ MGDoFObjectAccessor<2,dim>::get_mg_dof_values (const Vector<number> &values,
   typename Vector<number>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<4; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next_dof_value++ = values(this->mg_vertex_dof_index(vertex,d));
+      *next_dof_value++ = values(this->mg_vertex_dof_index(level,vertex,d));
   for (unsigned int line=0; line<4; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next_dof_value++ = values(this->line(line)->mg_dof_index(d));
+      *next_dof_value++ = values(this->line(line)->mg_dof_index(level,d));
   for (unsigned int d=0; d<dofs_per_quad; ++d)
-    *next_dof_value++ = values(this->mg_dof_index(d));
+    *next_dof_value++ = values(this->mg_dof_index(level,d));
   
   Assert (next_dof_value == dof_values.end(),
 	  ExcInternalError());
@@ -387,7 +395,8 @@ MGDoFObjectAccessor<3, dim>::MGDoFObjectAccessor (const Triangulation<dim> *tria
 
 template <int dim>
 void
-MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
+MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (const int level,
+						 std::vector<unsigned int> &dof_indices) const
 {
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
@@ -408,15 +417,15 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
   std::vector<unsigned int>::iterator next = dof_indices.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next++ = this->mg_vertex_dof_index(vertex,d);
+      *next++ = this->mg_vertex_dof_index(level,vertex,d);
   for (unsigned int line=0; line<12; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next++ = this->line(line)->mg_dof_index(d);
+      *next++ = this->line(line)->mg_dof_index(level,d);
   for (unsigned int quad=0; quad<6; ++quad)
     for (unsigned int d=0; d<dofs_per_quad; ++d)
-      *next++ = this->quad(quad)->mg_dof_index(d);
+      *next++ = this->quad(quad)->mg_dof_index(level,d);
   for (unsigned int d=0; d<dofs_per_hex; ++d)
-    *next++ = this->mg_dof_index(d);
+    *next++ = this->mg_dof_index(level,d);
   
   Assert (next == dof_indices.end(),
 	  ExcInternalError());
@@ -426,7 +435,8 @@ MGDoFObjectAccessor<3, dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_
 template <int dim>
 template <typename number>
 void
-MGDoFObjectAccessor<3,dim>::get_mg_dof_values (const Vector<number> &values,
+MGDoFObjectAccessor<3,dim>::get_mg_dof_values (const int level,
+					       const Vector<number> &values,
 					       Vector<number>       &dof_values) const
 {
   Assert (this->dof_handler != 0,
@@ -437,7 +447,7 @@ MGDoFObjectAccessor<3,dim>::get_mg_dof_values (const Vector<number> &values,
 	  typename BaseClass::ExcInvalidObject());
   Assert (dof_values.size() == this->dof_handler->get_fe().dofs_per_cell,
 	  typename BaseClass::ExcVectorDoesNotMatch());
-  Assert (values.size() == this->mg_dof_handler->n_dofs(this->present_level),
+  Assert (values.size() == this->mg_dof_handler->n_dofs(level),
 	  typename BaseClass::ExcVectorDoesNotMatch());
 
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe().dofs_per_vertex,
@@ -447,13 +457,13 @@ MGDoFObjectAccessor<3,dim>::get_mg_dof_values (const Vector<number> &values,
   typename Vector<number>::iterator next_dof_value=dof_values.begin();
   for (unsigned int vertex=0; vertex<8; ++vertex)
     for (unsigned int d=0; d<dofs_per_vertex; ++d)
-      *next_dof_value++ = values(this->mg_vertex_dof_index(vertex,d));
+      *next_dof_value++ = values(this->mg_vertex_dof_index(level,vertex,d));
   for (unsigned int line=0; line<12; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
-      *next_dof_value++ = values(this->line(line)->mg_dof_index(d));
+      *next_dof_value++ = values(this->line(line)->mg_dof_index(level,d));
   for (unsigned int quad=0; quad<6; ++quad)
     for (unsigned int d=0; d<dofs_per_quad; ++d)
-      *next_dof_value++ = values(this->quad(quad)->mg_dof_index(d));
+      *next_dof_value++ = values(this->quad(quad)->mg_dof_index(level,d));
   for (unsigned int d=0; d<dofs_per_hex; ++d)
     *next_dof_value++ = values(this->dof_index(d));
   
@@ -505,6 +515,25 @@ MGDoFCellAccessor<dim>::MGDoFCellAccessor (const Triangulation<dim> *tria,
 		:
 		MGDoFObjectAccessor<dim, dim> (tria,level,index,local_data)
 {}
+
+
+template <int dim>
+void
+MGDoFCellAccessor<dim>::get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
+{
+  MGDoFObjectAccessor<dim, dim>::get_mg_dof_indices (this->level(), dof_indices);
+}
+
+
+template <int dim>
+template <typename number>
+void
+MGDoFCellAccessor<dim>::get_mg_dof_values (const Vector<number> &values,
+					   Vector<number>       &dof_values) const
+{
+  MGDoFObjectAccessor<dim, dim>::get_mg_dof_values (this->level(), values, dof_values);
+}
+
 
 
 template <int dim>
@@ -601,13 +630,15 @@ neighbor_child_on_subface (const unsigned int face,
 template
 void
 MGDoFObjectAccessor<1,deal_II_dimension>::
-get_mg_dof_values (const Vector<double> &values,
+get_mg_dof_values (const int level,
+		   const Vector<double> &values,
 		   Vector<double>       &dof_values) const;
 
 template
 void
 MGDoFObjectAccessor<1,deal_II_dimension>::
-get_mg_dof_values (const Vector<float> &values,
+get_mg_dof_values (const int level,
+		   const Vector<float> &values,
 		   Vector<float>       &dof_values) const;
 
 
@@ -616,13 +647,15 @@ get_mg_dof_values (const Vector<float> &values,
 template
 void
 MGDoFObjectAccessor<2,deal_II_dimension>::
-get_mg_dof_values (const Vector<double> &values,
+get_mg_dof_values (const int level,
+		   const Vector<double> &values,
 		   Vector<double>       &dof_values) const;
 
 template
 void
 MGDoFObjectAccessor<2,deal_II_dimension>::
-get_mg_dof_values (const Vector<float> &values,
+get_mg_dof_values (const int level,
+		   const Vector<float> &values,
 		   Vector<float>       &dof_values) const;
 
 #endif
@@ -633,16 +666,30 @@ get_mg_dof_values (const Vector<float> &values,
 template
 void
 MGDoFObjectAccessor<3,deal_II_dimension>::
-get_mg_dof_values (const Vector<double> &values,
+get_mg_dof_values (const int level,
+		   const Vector<double> &values,
 		   Vector<double>       &dof_values) const;
 
 template
 void
 MGDoFObjectAccessor<3,deal_II_dimension>::
-get_mg_dof_values (const Vector<float> &values,
+get_mg_dof_values (const int level,
+		   const Vector<float> &values,
 		   Vector<float>       &dof_values) const;
 
 #endif
+template
+void
+MGDoFCellAccessor<deal_II_dimension>::
+get_mg_dof_values (const Vector<double> &values,
+		   Vector<double>       &dof_values) const;
+
+template
+void
+MGDoFCellAccessor<deal_II_dimension>::
+get_mg_dof_values (const Vector<float> &values,
+		   Vector<float>       &dof_values) const;
+
 
 
 #if deal_II_dimension == 1
