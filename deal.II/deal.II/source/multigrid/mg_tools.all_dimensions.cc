@@ -28,13 +28,13 @@
 template <typename number>
 void
 MGTools::apply_boundary_values (
-  const std::vector<unsigned int> &boundary_values,
+  const std::set<unsigned int> &boundary_dofs,
   SparseMatrix<number>& matrix,
   const bool preserve_symmetry)
 {
 				   // if no boundary values are to be applied
 				   // simply return
-  if (boundary_values.size() == 0)
+  if (boundary_dofs.size() == 0)
     return;
 
 
@@ -55,8 +55,8 @@ MGTools::apply_boundary_values (
       }
 
   
-  std::vector<unsigned int>::const_iterator dof  = boundary_values.begin(),
-					    endd = boundary_values.end();
+  std::set<unsigned int>::const_iterator dof  = boundary_dofs.begin(),
+					 endd = boundary_dofs.end();
   const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
   const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
   const unsigned int *sparsity_colnums  = sparsity.get_column_numbers();
@@ -163,7 +163,7 @@ MGTools::apply_boundary_values (
 template <typename number>
 void
 MGTools::apply_boundary_values (
-  const std::vector<unsigned int>& boundary_values,
+  const std::set<unsigned int>& boundary_dofs,
   BlockSparseMatrix<number>& matrix,
   const bool preserve_symmetry)
 {
@@ -182,7 +182,7 @@ MGTools::apply_boundary_values (
   
 				   // if no boundary values are to be applied
 				   // simply return
-  if (boundary_values.size() == 0)
+  if (boundary_dofs.size() == 0)
     return;
 
 
@@ -216,8 +216,8 @@ MGTools::apply_boundary_values (
     first_nonzero_diagonal_entry = 1;
   
 
-  std::vector<unsigned int>::const_iterator dof  = boundary_values.begin(),
-					    endd = boundary_values.end();
+  std::set<unsigned int>::const_iterator dof  = boundary_dofs.begin(),
+					 endd = boundary_dofs.end();
   const BlockSparsityPattern &
     sparsity_pattern = matrix.get_sparsity_pattern();
   
@@ -428,18 +428,14 @@ MGTools::apply_boundary_values (
 
 
 template void MGTools::apply_boundary_values (
-  const std::vector<unsigned int>& boundary_values,
-  SparseMatrix<float>& matrix,
-  const bool preserve_symmetry);
+  const std::set<unsigned int>&,
+  SparseMatrix<float>&, const bool);
 template void MGTools::apply_boundary_values (
-  const std::vector<unsigned int>& boundary_values,
-  SparseMatrix<double>& matrix,
-  const bool preserve_symmetry);
+  const std::set<unsigned int>&,
+  SparseMatrix<double>&, const bool);
 template void MGTools::apply_boundary_values (
-  const std::vector<unsigned int>& boundary_values,
-  BlockSparseMatrix<float>& matrix,
-  const bool preserve_symmetry);
+  const std::set<unsigned int>&,
+  BlockSparseMatrix<float>&, const bool);
 template void MGTools::apply_boundary_values (
-  const std::vector<unsigned int>& boundary_values,
-  BlockSparseMatrix<double>& matrix,
-  const bool preserve_symmetry);
+  const std::set<unsigned int>&,
+  BlockSparseMatrix<double>&, const bool);

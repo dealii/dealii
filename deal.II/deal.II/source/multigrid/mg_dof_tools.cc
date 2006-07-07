@@ -1024,7 +1024,7 @@ void
 MGTools::make_boundary_list(
   const MGDoFHandler<dim>&,
   const typename FunctionMap<dim>::type&,
-  std::vector<std::vector<unsigned int> >&,
+  std::vector<std::set<unsigned int> >&,
   const std::vector<bool>&)
 {
   Assert(false, ExcNotImplemented());
@@ -1038,7 +1038,7 @@ void
 MGTools::make_boundary_list(
   const MGDoFHandler<dim>& dof,
   const typename FunctionMap<dim>::type& function_map,
-  std::vector<std::vector<unsigned int> >& boundary_indices,
+  std::vector<std::set<unsigned int> >& boundary_indices,
   const std::vector<bool>& component_mask_)
 {
                                    // if for whatever reason we were
@@ -1202,12 +1202,12 @@ MGTools::make_boundary_list(
                       }
 
                     if (component_mask[component] == true)
-                      boundary_indices[level].push_back(face_dofs[i]);
+                      boundary_indices[level].insert(face_dofs[i]);
                   }
               }
             else
 	      for (unsigned int i=0; i<face_dofs.size(); ++i)
-		boundary_indices[level].push_back(face_dofs[i]);
+		boundary_indices[level].insert(face_dofs[i]);
           }
       }
 }
@@ -1420,5 +1420,5 @@ template void MGTools::count_dofs_per_component<deal_II_dimension> (
 template void MGTools::make_boundary_list(
   const MGDoFHandler<deal_II_dimension>&,
   const FunctionMap<deal_II_dimension>::type&,
-  std::vector<std::vector<unsigned int> >&,
+  std::vector<std::set<unsigned int> >&,
   const std::vector<bool>&);

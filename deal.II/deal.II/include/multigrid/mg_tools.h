@@ -20,6 +20,7 @@
 #include <multigrid/mg_dof_handler.h>
 
 #include <vector>
+#include <set>
 
 template <class Object> class MGLevelObject;
 template <int dim> class MGDoFHandler;
@@ -236,18 +237,18 @@ class MGTools
     static void make_boundary_list(
       const MGDoFHandler<dim>& mg_dof,
       const typename FunctionMap<dim>::type& function_map,
-      std::vector<std::vector<unsigned int> >& boundary_indices,
+      std::vector<std::set<unsigned int> >& boundary_indices,
       const std::vector<bool>& component_mask = std::vector<bool>());
 
     template <typename number>
     static void apply_boundary_values (
-      const std::vector<unsigned int> &boundary_values,
+      const std::set<unsigned int> &boundary_dofs,
       SparseMatrix<number>& matrix,
       const bool preserve_symmetry);
     
     template <typename number>
     static void apply_boundary_values (
-      const std::vector<unsigned int>& boundary_values,
+      const std::set<unsigned int>& boundary_dofs,
       BlockSparseMatrix<number>& matrix,
       const bool preserve_symmetry);
 

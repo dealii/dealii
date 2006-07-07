@@ -37,30 +37,14 @@
 
 using namespace std;
 
-void log_vector (const std::vector<std::vector<unsigned int> >& count)
+void log_vector (const std::vector<std::set<unsigned int> >& count)
 {
   for (unsigned int l=0;l<count.size();++l)
     {
-      deallog << "Level " << l;
-      for (unsigned int c=0;c<count[l].size();++c)
-	deallog << '\t' << count[l][c];
-      deallog << std::endl;
-    }
-}
-
-
-template <int dim>
-void face_levels(const MGDoFHandler<dim>& dof)
-{
-  typename MGDoFHandler<dim>::face_iterator face;
-  const typename MGDoFHandler<dim>::face_iterator end = dof.end_face();
-  
-  for (face = dof.begin_face(); face != end; ++face)
-    {
-      deallog << "Face " << face->level();
-      for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_face;++i)
-	deallog << " v" << face->vertex(i);
-      deallog << " dofs ";
+      deallog << "Level " << l << ':';
+      for (std::set<unsigned int>::const_iterator c=count[l].begin();
+	   c != count[l].end();++c)
+	deallog << ' ' << *c;
       deallog << std::endl;
     }
 }
@@ -80,9 +64,8 @@ void check_fe(FiniteElement<dim>& fe)
   
   MGDoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
-  face_levels(mgdof);
   
-  std::vector<std::vector<unsigned int> > boundary_indices(tr.n_levels());
+  std::vector<std::set<unsigned int> > boundary_indices(tr.n_levels());
   MGTools::make_boundary_list(mgdof, fmap, boundary_indices);
   log_vector(boundary_indices);
 }
