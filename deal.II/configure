@@ -10754,7 +10754,9 @@ fi
 
 if test "x$with_petsc" != "x" ; then
   if test "x$enableshared" = "xno" ; then
-    with_blas="yes"
+    if test "x$with_blas" = "x" ; then
+      with_blas="yes"
+    fi
   fi
 fi
 
