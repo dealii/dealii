@@ -32,7 +32,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   
   for (unsigned int i=0;i<dof_handler.n_dofs();++i)
     {
-      deallog << "  " << row_length[i];
+      deallog << "  " << i << '\t' << row_length[i];
       deallog << std::endl;
     }
 }
