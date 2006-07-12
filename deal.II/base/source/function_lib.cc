@@ -15,6 +15,7 @@
 #include <base/tensor.h>
 #include <base/point.h>
 #include <base/function_lib.h>
+#include <lac/vector.h>
 
 #include <cmath>
 
@@ -826,6 +827,34 @@ namespace Functions
 	    double r2 = x*x+y*y;
 	    
 	    values[i] = std::pow(r2,1./3.) * std::sin(2./3.*phi);
+	  }
+      }
+  }
+  
+  
+  void
+  LSingularityFunction::vector_value_list (
+    const std::vector<Point<2> >& points,
+    std::vector<Vector<double> >& values) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      {
+	Assert (values[i].size() == 1,
+		ExcDimensionMismatch(values[i].size(), 1));
+	double x = points[i](0);
+	double y = points[i](1);
+	
+	if ((x>=0) && (y>=0))
+	  values[i](0) = 0.;
+	else
+	  {
+	    double phi = std::atan2(y,-x)+M_PI;
+	    double r2 = x*x+y*y;
+	    
+	    values[i](0) = std::pow(r2,1./3.) * std::sin(2./3.*phi);
 	  }
       }
   }

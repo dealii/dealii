@@ -341,41 +341,26 @@ namespace Functions
   class LSingularityFunction : public Function<2>
   {
     public:
-				       /**
-					* The value at a single point.
-					*/
       virtual double value (const Point<2>   &p,
 			    const unsigned int  component = 0) const;
       
-				       /**
-					* Values at multiple points.
-					*/
       virtual void value_list (const std::vector<Point<2> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
+
+      virtual void vector_value_list (const std::vector<Point<2> >& points,
+				      std::vector<Vector<double> >& values) const;
       
-				       /**
-					* Gradient at a single point.
-					*/
       virtual Tensor<1,2> gradient (const Point<2>     &p,
 				    const unsigned int  component = 0) const;
       
-				       /**
-					* Gradients at multiple points.
-					*/
       virtual void gradient_list (const std::vector<Point<2> > &points,
 				  std::vector<Tensor<1,2> >    &gradients,
 				  const unsigned int            component = 0) const;
       
-				       /**
-					* Laplacian at a single point.
-					*/
       virtual double laplacian (const Point<2>   &p,
 				const unsigned int  component = 0) const;
       
-				       /**
-					* Laplacian at multiple points.
-					*/
       virtual void laplacian_list (const std::vector<Point<2> > &points,
 				   std::vector<double>          &values,
 				   const unsigned int            component = 0) const;
