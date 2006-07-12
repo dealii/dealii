@@ -27,13 +27,13 @@ all: product_matrix$(EXEEXT) block_matrix_array$(EXEEXT) \
 # Specific targets
 ######################################################################
 
-block_matrix_array$(EXEEXT): block_matrix_array.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
+block_matrix_array$(EXEEXT): block_matrix_array.$(OBJEXT) $(lib-lac.g) $(lib-base.g) $(LIBS)
 	@echo =====linking====$(MT)== $<
-	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
+	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ 
 
-product_matrix$(EXEEXT): product_matrix.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
+product_matrix$(EXEEXT): product_matrix.$(OBJEXT) $(lib-lac.g) $(lib-base.g) $(LIBS)
 	@echo =====linking====$(MT)== $<
-	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^ $(LIBS)
+	@$(CXX) $(CXXFLAGS.g) $(LDFLAGS) -o $@ $^
 
 compressed_block_sparsity_pattern$(EXEEXT): compressed_block_sparsity_pattern.$(OBJEXT) $(lib-deal2-2d.g) $(lib-lac.g) $(lib-base.g)
 	@echo =====linking====$(MT)== $<
