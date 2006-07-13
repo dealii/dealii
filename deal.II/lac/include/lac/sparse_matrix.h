@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
+//    Version: $Name:  $
 //
 //    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
@@ -742,18 +742,6 @@ class SparseMatrix : public virtual Subscriptor
 	      const number value);
     
 				     /**
-				      * Multiply the entire matrix by a
-				      * fixed factor.
-				      */
-    SparseMatrix & operator *= (const number factor);
-    
-				     /**
-				      * Divide the entire matrix by a
-				      * fixed factor.
-				      */
-    SparseMatrix & operator /= (const number factor);
-    
-				     /**
 				      * Add <tt>value</tt> to the
 				      * element (<i>i,j</i>).  Throws
 				      * an error if the entry does not
@@ -766,6 +754,18 @@ class SparseMatrix : public virtual Subscriptor
               const unsigned int j,
 	      const number value);
 
+				     /**
+				      * Multiply the entire matrix by a
+				      * fixed factor.
+				      */
+    SparseMatrix & operator *= (const number factor);
+    
+				     /**
+				      * Divide the entire matrix by a
+				      * fixed factor.
+				      */
+    SparseMatrix & operator /= (const number factor);
+    
 				     /**
 				      * Symmetrize the matrix by
 				      * forming the mean value between
