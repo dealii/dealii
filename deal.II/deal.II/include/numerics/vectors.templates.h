@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
+//    Version: $Name:  $
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors
 //
@@ -1471,7 +1471,7 @@ namespace internal
                                            // initialize for this cell
           x_fe_values.reinit (cell);
 
-          const FEValues<dim> &fe_values  = x_fe_values.get_present_fe_values ();
+          const ::FEValues<dim> &fe_values  = x_fe_values.get_present_fe_values ();
           const unsigned int   n_q_points = fe_values.n_quadrature_points;
           
                                            // resize all out scratch
