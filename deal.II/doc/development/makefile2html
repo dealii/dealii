@@ -1,4 +1,4 @@
-# Copyright (C) 1999, 2000, 2002, 2005 by the deal.II group
+# Copyright (C) 1999, 2000, 2002, 2005, 2006 by the deal.II group
 # $Id$
 
 print <<'EOT'
@@ -29,7 +29,7 @@ $state =  $comment_mode;
 print "<p>\n";
 
 while (<>) {
-    # ignore cvs tag
+    # ignore subversion tag
     next if m!^#\*\s*\$Id:!;
 
     # substitute special characters
