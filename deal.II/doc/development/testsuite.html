@@ -5,7 +5,7 @@
   <link href="../screen.css" rel="StyleSheet">
   <title>The deal.II Testsuite</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="svn_id" content="$Id$">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
@@ -43,7 +43,7 @@
 
     cd dealtest
     make clean
-    cvs update -d -P
+    svn update
     make build-test BUILDTESTFLAGS='-with-umfpack -with-lapack'
     mail build-tests@dealii.org < build-test-log
 
@@ -73,7 +73,7 @@
 
     cd dealtest
     make clean
-    cvs update -d -P
+    svn update
     make build-test BUILDTESTFLAGS='CC=mycc CXX=myCC'
     mail build-tests@dealii.org < build-test-log
 
@@ -85,7 +85,7 @@
     <p>
     Most of our tests are built in dedicated directories, i.e. work on copies
     of deal.II that we don't usually use to work on every day. We do this,
-    because we want to see if the version in the CVS repository can be
+    because we want to see if the version in the subversion repository can be
     compiled, not the version that we have made changes in.
     </p>
 
@@ -98,9 +98,9 @@
     export PATH=/my/compiler/path:$PATH
     export CXX=myCC
 
-    cvs checkout deal.II
+    svn co http://wolfgang.math.tamu.edu/svn/public/deal.II/trunk/deal.II
     cd deal.II
-    cvs update -d -P
+    svn update
     make build-test BUILDTEST=yes BUILDTESTFLAGS='CC=mycc CXX=myCC'
     mail build-tests@dealii.org < build-test-log
     cd ..
@@ -122,7 +122,7 @@
     deal.II has a testsuite that, at the time this article is written,
     has some 490 small programs that we run every time we make a
     change to make sure that no existing functionality is broken. The
-    expected output is also stored in our CVS archive, and when you
+    expected output is also stored in our subversion archive, and when you
     run a test you are notified if a test fails. These days, every
     time we add a significant piece of functionality, we add at least
     one new test to the testsuite, and we also do so if we fix a bug,
@@ -144,11 +144,11 @@
     <h3>Running it</h3>
 
     <p>
-    To run the testsuite, you first need CVS access to our source
+    To run the testsuite, you first need subversion access to our source
     repository. If you have that, do the following steps:
     <pre>
        cd /path/to/deal.II
-       cvs checkout tests
+       subversion checkout tests
     </pre>
     This should generate a <code>tests/</code> directory parallel to
     the <code>base/</code>, <code>lac/</code>, etc directories. Then
@@ -169,7 +169,7 @@
     Once you have done this, you may simply type
     <code>make</code>. This runs all the tests there are, but stops at
     the first one that fails to either execute properly or for which
-    the output does not match the expected output found in the CVS
+    the output does not match the expected output found in the subversion
     archive. This is helpful if you want to figure out if any test is
     failing at all. Typical output looks like this:
     <pre>
@@ -278,7 +278,7 @@
     test's name.) If this produces errors or triggers assertions, then you will
     want to use a debugger on the executable to figure out what happens. On
     the other hand, if you are sure that this also worked, you will
-    want to compare the output with the stored output from CVS:
+    want to compare the output with the stored output from subversion:
     <pre>
       make hierarchical/OK
     </pre>
@@ -521,18 +521,18 @@ testname/cmp/generic
     <p>
     Tests are a way to make sure everything keeps working. If they
     aren't automated, they are no good. We are therefore very
-    interested in getting new tests. If you have CVS write access
+    interested in getting new tests. If you have subversion write access
     already, you have to add the new test and the expected output
     file, and to commit them together with the changed Makefile, like
     so:
     <pre>
-      cvs add bits/my_new_test.cc 
-      cvs add bits/my_new_test
-      cvs add bits/my_new_test/cmp
-      cvs add bits/my_new_test/cmp/generic
-      cvs commit -m "New test" bits/my_new_test* bits/Makefile
+      subversion add bits/my_new_test.cc 
+      subversion add bits/my_new_test
+      subversion add bits/my_new_test/cmp
+      subversion add bits/my_new_test/cmp/generic
+      subversion commit -m "New test" bits/my_new_test* bits/Makefile
     </pre>
-    If you don't have CVS write access, talk to us on the mailing
+    If you don't have subversion write access, talk to us on the mailing
     list; writing testcases is a worthy and laudable task, and we would
     like to encourage it by giving people the opportunity to
     contribute!
