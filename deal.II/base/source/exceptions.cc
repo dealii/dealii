@@ -400,6 +400,8 @@ namespace deal_II_exceptions
 	}
       else if(deal_II_exceptions::abort_on_exception == true)
          std::abort ();
+      else
+	--n_treated_exceptions;
     }
 
 
