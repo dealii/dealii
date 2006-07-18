@@ -15,24 +15,6 @@ DEAL:1d::subdivided_hyper_rectangle
 2.00000 0 0
 2.50000 0 0
 
-DEAL:1d::enclosed_hyper_cube
-DEAL:1d::Abort!!!
-DEAL:1d::hyper_ball
-DEAL:1d::Abort!!!
-DEAL:1d::cylinder
-DEAL:1d::Abort!!!
-DEAL:1d::hyper_L
-DEAL:1d::Abort!!!
-DEAL:1d::hyper_cube_slit
-DEAL:1d::Abort!!!
-DEAL:1d::hyper_shell
-DEAL:1d::Abort!!!
-DEAL:1d::cylinder_shell
-DEAL:1d::Abort!!!
-DEAL:1d::half_hyper_ball
-DEAL:1d::Abort!!!
-DEAL:1d::half_hyper_shell
-DEAL:1d::Abort!!!
 DEAL:2d::hyper_cube
 #FIG 3.2
 Landscape
@@ -819,8 +801,6 @@ Single
 2 1 0 3 1 -1 800 0 -1 0.0  0 0 -1 0 0 2
 	6834	-3036
 	7200	-1200
-DEAL:2d::cylinder_shell
-DEAL:2d::Abort!!!
 DEAL:2d::half_hyper_ball
 #FIG 3.2
 Landscape
@@ -1571,10 +1551,6 @@ component "level" value "level"
 object "grid data" class group
 member "cells" value "cell data"
 end
-DEAL:3d::hyper_cube_slit
-DEAL:3d::Abort!!!
-DEAL:3d::hyper_shell
-DEAL:3d::Abort!!!
 DEAL:3d::cylinder_shell
 object "vertices" class array type float rank 1 shape 3 items 280 data follows
 	6.00000 0.00000 0.00000
@@ -2034,5 +2010,3 @@ component "level" value "level"
 object "grid data" class group
 member "cells" value "cell data"
 end
-DEAL:3d::half_hyper_shell
-DEAL:3d::Abort!!!

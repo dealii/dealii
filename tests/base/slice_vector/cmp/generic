@@ -11,7 +11,6 @@ The name and call sequence of the exception was:
 Additional Information: 
 Index 5 is not in [0,5[
 --------------------------------------------------------
-DEAL::Abort!!!
 --------------------------------------------------------
 An error occurred in file <vector_slice.h> in function
     typename VECTOR::reference VectorSlice<VECTOR>::operator[](unsigned int) [with VECTOR = std::vector<int, std::allocator<int> >]
@@ -22,4 +21,3 @@ The name and call sequence of the exception was:
 Additional Information: 
 Index 4 is not in [0,4[
 --------------------------------------------------------
-DEAL::Abort!!!

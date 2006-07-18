@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -99,7 +99,7 @@ void test(std::ostream& out)
       if (tr.n_cells() > 0)
 	go.write(tr, out, format);
     }
-  if (true)
+  if (dim>1)
     {
       deallog << "enclosed_hyper_cube" << std::endl;
       Triangulation<dim> tr;
@@ -107,7 +107,7 @@ void test(std::ostream& out)
       if (tr.n_cells() > 0)
 	go.write(tr, out, format);
     }
-  if (true)
+  if (dim>1)
     {
       deallog << "hyper_ball" << std::endl;
       Triangulation<dim> tr;
@@ -115,7 +115,7 @@ void test(std::ostream& out)
       if (tr.n_cells() > 0)
 	go.write(tr, out, format);
     }  
-  if (true)
+  if (dim>1)
     {
       deallog << "cylinder" << std::endl;
       Triangulation<dim> tr;
@@ -123,7 +123,7 @@ void test(std::ostream& out)
       if (tr.n_cells() > 0)
 	go.write(tr, out, format);
     }  
-  if (true)
+  if (dim>1)
     {
       deallog << "hyper_L" << std::endl;
       Triangulation<dim> tr;
@@ -131,7 +131,7 @@ void test(std::ostream& out)
       if (tr.n_cells() > 0)
 	go.write(tr, out, format);
     }  
-  if (true)
+  if (dim==2)
     {
       deallog << "hyper_cube_slit" << std::endl;
       Triangulation<dim> tr;
@@ -139,7 +139,7 @@ void test(std::ostream& out)
       if (tr.n_cells() > 0)
 	go.write(tr, out, format);
     }  
-  if (true)
+  if (dim==2)
     {
       deallog << "hyper_shell" << std::endl;
       Triangulation<dim> tr;
@@ -147,7 +147,7 @@ void test(std::ostream& out)
       if (tr.n_cells() > 0)
 	go.write(tr, out, format);
     }  
-  if (true)
+  if (dim>2)
     {
       deallog << "cylinder_shell" << std::endl;
       Triangulation<dim> tr;
@@ -155,7 +155,7 @@ void test(std::ostream& out)
       if (tr.n_cells() > 0)
 	go.write(tr, out, format);
     }  
-  if (true)
+  if (dim>1)
     {
       deallog << "half_hyper_ball" << std::endl;
       Triangulation<dim> tr;
@@ -163,7 +163,7 @@ void test(std::ostream& out)
       if (tr.n_cells() > 0)
 	go.write(tr, out, format);
     }  
-  if (true)
+  if (dim==2)
     {
       deallog << "half_hyper_shell" << std::endl;
       Triangulation<dim> tr;

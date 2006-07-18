@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,6 +33,7 @@ void f(const std::vector<int>& v)
 
 int main()
 {
+  deal_II_exceptions::disable_abort_on_exception();
   std::ofstream logfile("slice_vector/output");
   deallog.attach(logfile);
   deallog.depth_console(0);

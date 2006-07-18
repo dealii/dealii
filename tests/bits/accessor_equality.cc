@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -96,6 +96,7 @@ void test ()
 
 int main ()
 {
+  deal_II_exceptions::disable_abort_on_exception();
   std::ofstream logfile("accessor_equality/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
