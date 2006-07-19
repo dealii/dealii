@@ -13,6 +13,7 @@
 
 
 #include <base/exceptions.h>
+#include <base/logstream.h>
 #include <string>
 #include <cstdlib>
 #include <iostream>
@@ -237,6 +238,10 @@ void ExceptionBase::print_exc_data (std::ostream &out) const
       << "The name and call sequence of the exception was:" << std::endl
       << "    " << exc  << std::endl
       << "Additional Information: " << std::endl;
+				   // Additionally, leave a trace in
+				   // deallog if we do not stop here
+  if (deal_II_exceptions::abort_on_exception == false)
+    deallog << exc << std::endl;
 }
 
 
