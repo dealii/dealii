@@ -1,7 +1,10 @@
 
 DEAL::1d
 DEAL::1.0
+DEAL::ExcCantCompareIterators()
 DEAL::2d
 DEAL::1.0
+DEAL::ExcCantCompareIterators()
 DEAL::3d
 DEAL::1.0
+DEAL::ExcCantCompareIterators()

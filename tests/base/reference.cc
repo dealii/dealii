@@ -43,31 +43,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-
-                                   // we do something rather weird in
-                                   // this file: bind the buffer of
-                                   // cerr to the log file, so that
-                                   // the output of the Assert* macros
-                                   // that are written to std::cerr
-                                   // end up in the logfiles.
-                                   //
-                                   // so make sure we store a pointer
-                                   // to the old buffer, switch to the
-                                   // buffer of the logfile, and at
-                                   // the end of main() switch
-                                   // back. note that if we don't
-                                   // switch back, we get a segfault
-                                   // later on in the destruction of
-                                   // std::cerr, since it tries to do
-                                   // something with its buffer, but
-                                   // that is already gone by then
-#if __GNUC__ != 2
-  std::basic_streambuf<char> *old_cerr_buf = std::cerr.rdbuf();
-#else
-  streambuf *old_cerr_buf = std::cerr.rdbuf();
-#endif
-  std::cerr.rdbuf(logfile.rdbuf());
-
+  
   if (true)
     {
       Test a("A");
@@ -99,6 +75,5 @@ int main()
       Test d("D");
       r = &d;
     }
-  std::cerr.rdbuf(old_cerr_buf);
 }
 

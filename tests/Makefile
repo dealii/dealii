@@ -4,34 +4,34 @@
 
 all: base lac fe deal.II multigrid bits
 
-base: abort.o
+base:
 	cd base ; $(MAKE)
 
-lac: abort.o
+lac:
 	cd lac ; $(MAKE)
 
-fe: abort.o
+fe:
 	cd fe ; $(MAKE)
 
-bits: abort.o
+bits:
 	cd bits ; $(MAKE)
 
-deal.II: abort.o
+deal.II:
 	cd deal.II ; $(MAKE)
 
-multigrid: abort.o
+multigrid:
 	cd multigrid ; $(MAKE)
 
-hp: abort.o
+hp:
 	cd hp ; $(MAKE)
 
-report: abort.o
+report:
 	@for i in base lac fe deal.II multigrid bits hp all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
 
-report+mail: abort.o
+report+mail:
 	@for i in base lac fe deal.II multigrid bits hp all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report+mail ; cd .. ; \
@@ -42,25 +42,25 @@ report+mail: abort.o
 
 build: build-base build-lac build-fe build-deal.II build-multigrid build-bits build-hp
 
-build-base: abort.o
+build-base:
 	cd base ; $(MAKE) build
 
-build-lac: abort.o
+build-lac:
 	cd lac ; $(MAKE) build
 
-build-fe: abort.o
+build-fe:
 	cd fe ; $(MAKE) build
 
-build-bits: abort.o
+build-bits:
 	cd bits ; $(MAKE) build
 
-build-deal.II: abort.o
+build-deal.II:
 	cd deal.II ; $(MAKE) build
 
-build-multigrid: abort.o
+build-multigrid:
 	cd multigrid ; $(MAKE) build
 
-build-hp: abort.o
+build-hp:
 	cd hp ; $(MAKE) build
 
 
@@ -69,25 +69,25 @@ build-hp: abort.o
 
 output: output-base output-lac output-fe output-deal.II output-bits output-hp
 
-output-base: abort.o
+output-base:
 	cd base ; $(MAKE) output
 
-output-lac: abort.o
+output-lac:
 	cd lac ; $(MAKE) output
 
-output-fe: abort.o
+output-fe:
 	cd fe ; $(MAKE) output
 
-output-bits: abort.o
+output-bits:
 	cd bits ; $(MAKE) output
 
-output-deal.II: abort.o
+output-deal.II:
 	cd deal.II ; $(MAKE) output
 
-output-multigrid: abort.o
+output-multigrid:
 	cd multigrid ; $(MAKE) output
 
-output-hp: abort.o
+output-hp:
 	cd hp ; $(MAKE) output
 
 
@@ -96,25 +96,25 @@ output-hp: abort.o
 
 refs: refs-base refs-lac refs-fe refs-deal.II refs-bits refs-hp
 
-refs-base: abort.o
+refs-base:
 	cd base ; $(MAKE) refs
 
-refs-lac: abort.o
+refs-lac:
 	cd lac ; $(MAKE) refs
 
-refs-fe: abort.o
+refs-fe:
 	cd fe ; $(MAKE) refs
 
-refs-bits: abort.o
+refs-bits:
 	cd bits ; $(MAKE) refs
 
-refs-deal.II: abort.o
+refs-deal.II:
 	cd deal.II ; $(MAKE) refs
 
-refs-multigrid: abort.o
+refs-multigrid:
 	cd multigrid ; $(MAKE) refs
 
-refs-hp: abort.o
+refs-hp:
 	cd hp ; $(MAKE) refs
 
 
@@ -123,10 +123,8 @@ resultname:
 	@echo $(TARGET)+$(GXX-VERSION)
 
 clean: clean-base clean-lac clean-deal.II clean-fe clean-bits clean-hp
-	-rm -f abort.o
 
 distclean: distclean-base distclean-lac distclean-deal.II distclean-fe distclean-bits distclean-hp
-	-rm -f abort.o
 
 clean-base:
 	cd base ; $(MAKE) clean
@@ -169,10 +167,6 @@ clean-hp:
 
 distclean-hp:
 	cd hp ; $(MAKE) distclean
-
-
-abort.o: abort.cc
-	 @$(CXX) $(CXXFLAGS.g) -o $@ -c $<
 
 .PHONY : all base lac fe deal.II multigrid bits \
 	clean clean-base clean-lac clean-fe \
