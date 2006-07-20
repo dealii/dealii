@@ -206,7 +206,8 @@ distclean: clean
 # whole thing over to the server
 build-test:
 	echo AUTOMATED DEAL.II BUILD TEST          | tee    build-test-log
-	echo BEGIN HEADER `date -u '+%Y-%m-%d %T'`                | tee -a build-test-log
+	echo SUBVERSION INFO `svn info . | grep Revision` | tee -a build-test-log
+	echo BEGIN HEADER `date -u '+%Y-%m-%d %T'`        | tee -a build-test-log
 	echo USER=$(USER)                          | tee -a build-test-log
 	echo HOST=`hostname`                       | tee -a build-test-log
 	echo BUILDTESTFLAGS=$(BUILDTESTFLAGS)      | tee -a build-test-log
