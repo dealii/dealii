@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,9 +22,6 @@
 
 
 
-				 /**
-				  * @cond internal
-				  */
 namespace internal
 {
 /**
@@ -837,9 +834,6 @@ namespace internal
     };    
   }  // namespace GridReordering3d
 }  // namespace internal
-				 /**
-				  * @endcond
-				  */
 
 
 #endif

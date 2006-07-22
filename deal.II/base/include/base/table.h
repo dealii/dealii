@@ -34,9 +34,6 @@ template <typename T> class Table<6,T>;
 
 
 
-                                   /**
-                                    * @cond internal
-                                    */
 namespace internal
 {
 
@@ -393,9 +390,6 @@ namespace internal
   }
   
 } // namespace internal
-                                 /**
-                                  * @endcond
-                                  */
 
 
 

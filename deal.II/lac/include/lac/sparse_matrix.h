@@ -28,9 +28,6 @@ template<typename number> class FullMatrix;
  *@{
  */
 
-				 /**
-				  * @cond internal
-				  */
 namespace internals
 {
   namespace SparseMatrixIterators
@@ -431,9 +428,6 @@ namespace internals
     
   }
 }
-				 /**
-				  * @endcond
-				  */
 
 
 //TODO: Add multithreading to the other vmult functions.

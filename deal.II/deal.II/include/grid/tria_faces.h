@@ -21,10 +21,6 @@
 
 namespace internal
 {
-				 /**
-				  * A namespace for classes internal to the
-				  * triangulation classes and helpers.
-				  */  
   namespace Triangulation
   {
 /**

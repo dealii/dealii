@@ -32,9 +32,6 @@ template <int dim> double
 determinant (const SymmetricTensor<2,dim> &);
 
 
-                                   /**
-                                    * @cond internal
-                                    */
 namespace internal
 {
                                    /**
@@ -530,9 +527,6 @@ namespace internal
     };
   }
 }
-                                 /**
-                                  * @endcond
-                                  */
           
 
 

@@ -29,9 +29,6 @@
 /*!@addtogroup Solvers */
 /*@{*/
 
-				 /**
-				  * @cond internal
-				  */
 namespace internal
 {
 				   /**
@@ -113,9 +110,6 @@ namespace internal
     };    
   }
 }
-                                   /**
-                                    * @endcond
-                                    */
 
 /**
  * Implementation of the Restarted Preconditioned Direct Generalized

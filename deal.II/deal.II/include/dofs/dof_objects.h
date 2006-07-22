@@ -22,11 +22,6 @@ template <int> class DoFHandler;
 
 namespace internal
 {
-/**
- * A namespace for internal data structures of the DoFHandler group of classes.
- *
- * @ingroup dofs
- */
   namespace DoFHandler
   {
     template <int> class DoFLevel;

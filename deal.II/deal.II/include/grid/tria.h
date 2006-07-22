@@ -2215,7 +2215,7 @@ class Triangulation : public Subscriptor
 				      */
     				     /**
 				      *  Iterator to the first quad, used
-				      *  or not, on level @p level. If a level
+				      *  or not, on the given level. If a level
 				      *  has no quads, a past-the-end iterator
 				      *  is returned.
 				      *  If quads are no cells, i.e. for @p dim>2

@@ -30,9 +30,6 @@
  *@{
  */
 
-				 /**
-				  * @cond internal
-				  */
 namespace internal
 {
 
@@ -611,9 +608,6 @@ namespace internal
     };
   }  // namespace BlockVectorIterators
 }  // namespace internal
-                                   /**
-                                    * @endcond
-                                    */
 
 
 /**

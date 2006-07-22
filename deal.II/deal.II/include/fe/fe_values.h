@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
+//    Version: $Name:  $
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
@@ -41,6 +41,22 @@
 #include <memory>
 
 template <int dim> class Quadrature;
+
+
+namespace internal
+{
+  namespace FEValues
+  {
+  }
+}
+
+template <int C> struct FEComponent 
+{};
+
+template <int C, int R> struct FEComponentRange
+{};
+
+
 
 //TODO: Add access to mapping values to FEValuesBase
 //TODO: Several FEValuesBase of a system should share Mapping
