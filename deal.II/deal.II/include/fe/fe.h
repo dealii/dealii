@@ -1955,12 +1955,12 @@ class FiniteElement : public Subscriptor,
 				      * <tt>c</tt>, the entries have
 				      * the following meaning:
 				      * <dl>
-				      * <dd><tt>table[c].first.first</tt></dd>
-				      * <dt>Number of the base element for <tt>c</tt>.
-				      * <dd><tt>table[c].first.second</tt></dd>
-				      * <dt>Component in the base element for <tt>c</tt>.
-				      * <dd><tt>table[c].second</tt></dd>
-				      * <dt>Multiple of the base element for <tt>c</tt>.
+				      * <dt><tt>table[c].first.first</tt></dt>
+				      * <dd>Number of the base element for <tt>c</tt>.</dd>
+				      * <dt><tt>table[c].first.second</tt></dt>
+				      * <dd>Component in the base element for <tt>c</tt>.</dd>
+				      * <dt><tt>table[c].second</tt></dt>
+				      * <dd>Multiple of the base element for <tt>c</tt>.</dd>
 				      * </dl>
 				      *
 				      * This variable is set to the
