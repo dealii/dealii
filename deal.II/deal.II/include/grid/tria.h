@@ -2218,8 +2218,8 @@ class Triangulation : public Subscriptor
 				      *  or not, on the given level. If a level
 				      *  has no quads, a past-the-end iterator
 				      *  is returned.
-				      *  If quads are no cells, i.e. for @p dim>2
-				      *  no #level argument must be given.
+				      *  If quads are no cells, i.e. for $dim>2$
+				      *  no level argument must be given.
 				     
 				      */
     raw_quad_iterator
