@@ -42,22 +42,6 @@
 
 template <int dim> class Quadrature;
 
-
-namespace internal
-{
-  namespace FEValues
-  {
-  }
-}
-
-template <int C> struct FEComponent 
-{};
-
-template <int C, int R> struct FEComponentRange
-{};
-
-
-
 //TODO: Add access to mapping values to FEValuesBase
 //TODO: Several FEValuesBase of a system should share Mapping
 
