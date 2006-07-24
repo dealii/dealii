@@ -19,7 +19,7 @@
  * in). It consists of a collection of small programs, each more or
  * less built atop of the previous ones, which demonstrate various
  * aspects of the library. A more detailed overview can be found <a
- * href="../../tutorial/chapter-2.step-by-step/index.html">on this
+ * href="../tutorial/index.html">on this
  * page</a> that also includes short summaries of what each of the
  * tutorial programs are supposed to demonstrate.
  *

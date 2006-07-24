@@ -26,7 +26,7 @@ deal.II deal.tag: tutorial \
 	  $D/lac/include/*/*.h \
 	  $D/deal.II/include/*/*.h \
 	  headers/*.h \
-	  tutorial/doxygen/*.h
+	  $(shell ls tutorial/doxygen/)
 	@echo "=== Generating reference documentation. " \
               "This can take several minutes..."
 	@DOXYGEN@ deal.dox > doxygen.log
