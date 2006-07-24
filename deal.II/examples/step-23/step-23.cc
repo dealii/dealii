@@ -219,8 +219,8 @@ void WaveEquationProblem<dim>::solve_u ()
   cg.solve (system_matrix, solution_u, system_rhs,
 	    PreconditionIdentity());
 
-  std::cout << "   " << solver_control.last_step()
-	    << " CG iterations needed to obtain convergence."
+  std::cout << "   u-equation: " << solver_control.last_step()
+	    << " CG iterations."
 	    << std::endl;
 }
 
@@ -233,8 +233,8 @@ void WaveEquationProblem<dim>::solve_v ()
   cg.solve (mass_matrix, solution_v, system_rhs,
 	    PreconditionIdentity());
 
-  std::cout << "   " << solver_control.last_step()
-	    << " CG iterations needed to obtain convergence."
+  std::cout << "   v-equation: " << solver_control.last_step()
+	    << " CG iterations."
 	    << std::endl;
 }
 
@@ -253,7 +253,8 @@ void WaveEquationProblem<dim>::output_results (const unsigned int timestep_numbe
 
   std::ostringstream filename;
   filename << "solution-"
-	   << timestep_number;
+	   << timestep_number
+	   << ".gnuplot";
   std::ofstream output (filename.str().c_str());
   data_out.write_gnuplot (output);
 }
@@ -281,6 +282,10 @@ void WaveEquationProblem<dim>::run ()
   unsigned int timestep_number = 1;
   for (double time = time_step; time<=5; time+=time_step, ++timestep_number)
     {
+      std::cout << "Time step " << timestep_number
+		<< " at t=" << time
+		<< std::endl;
+      
       Vector<double> tmp (solution_u.size());
 
       mass_matrix.vmult (system_rhs, old_solution_u);
