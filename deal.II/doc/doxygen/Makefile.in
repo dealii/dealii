@@ -20,17 +20,22 @@ private:
 # generate documentation. write the output to a file so as not to hide the
 # important message to impatient observers that this process can take quite
 # a while
-deal.tag: deal.dox \
+deal.II deal.tag: tutorial \
+          deal.dox \
 	  $D/base/include/*/*.h \
 	  $D/lac/include/*/*.h \
 	  $D/deal.II/include/*/*.h \
 	  headers/*.h \
-	  ../tutorial/chapter-2.step-by-step/doxygen/*.h
+	  tutorial/doxygen/*.h
 	@echo "=== Generating reference documentation. " \
               "This can take several minutes..."
 	@DOXYGEN@ deal.dox > doxygen.log
 
-deal.II: deal.tag
+
+tutorial:
+	@cd tutorial ; $(MAKE)
+
+
 
 # validate cross references. there are so many html files in these
 # directories that we can just call
@@ -49,6 +54,8 @@ validate-xrefs:
 clean:
 	-for i in deal.II/* ; do rm $$i ; done
 	-rm *.tag
+	@cd tutorial ; $(MAKE) clean
 
-.PHONY: html private deal.II \
+
+.PHONY: html tutorial private deal.II \
 	validate-xrefs clean

@@ -1,0 +1,33 @@
+# Copyright (C) 1999, 2000, 2001, 2002, 2006 by Wolfgang Bangerth, University of Heidelberg
+
+print "<p>\n";
+print "<pre><code>\n";
+
+
+while (<>) {
+    # ignore comment lines
+    if ( ! m!^\s*//! ) {
+	# substitute special characters
+	s/&/&amp;/g; 
+	s/</&lt;/g;	 
+	s/>/&gt;/g;
+	s/\t/        /g;
+
+	print "  $_";
+    } else {
+	# second, replace section headers, and generate addressable
+	# anchor
+	if ( /\@sect/ ) {
+	   m!\@sect(\d)\{(.*)\}\s*$!;
+	   $sect_name = $2;
+
+	   # for the anchor, use the name of the section but discard
+	   # everything except for letters, numbers, and underscores
+	   $sect_name =~ s/[^a-zA-Z0-9_]//g;
+
+	   print "\n<a name=\"plain-$sect_name\"></a>\n";
+	}
+    }	
+}
+
+print "</code></pre>\n</p>\n\n";

@@ -1,0 +1,31 @@
+# Copyright (C) 2006 by Wolfgang Bangerth, Texas A&M University
+
+print "\n";
+
+
+while (<>) {
+    # simply print non-comment lines and let doxygen do all the work.
+    # the only thing we have to make sure is that if we copy /*...*/
+    # comments that doxygen doesn't get confused; do so by simply
+    # adding a space
+    if ( ! m!^\s*//! ) {
+        s!/\*!/ \*!g;
+        s!\*/!\* /!g;
+	print " * $_";
+    } else {
+	# for comments, all we do is replace section headers, and
+	# generate addressable anchors
+	if ( /\@sect/ ) {
+	   m!\@sect(\d)\{(.*)\}\s*$!;
+	   $sect_name = $2;
+
+	   # for the anchor, use the name of the section but discard
+	   # everything except for letters, numbers, and underscores
+	   $sect_name =~ s/[^a-zA-Z0-9_]//g;
+
+	   print "\@endcode\n";
+	   print " <a name=\"plain-$sect_name\"></a>\n";
+	   print "\@code\n";
+	}
+    }	
+}

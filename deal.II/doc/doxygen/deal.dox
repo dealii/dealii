@@ -10,7 +10,7 @@ INPUT    = headers/ \
 	../../deal.II/include/grid \
 	../../deal.II/include/multigrid \
 	../../deal.II/include/numerics \
-	../tutorial/chapter-2.step-by-step/doxygen
+	tutorial/doxygen
 
 HTML_OUTPUT      = deal.II
 LATEX_OUTPUT     = LaTeX/deal.II
