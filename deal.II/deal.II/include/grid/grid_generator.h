@@ -30,13 +30,24 @@ template <typename number> class SparseMatrix;
  * hyperball and the like. Following is a list of domains that can be generated
  * by the functions of this class:
  * <ul>
+ *    <li> Hypercube:
+ *       the GridGenerator::hyper_cube function produces the unit line
+ *       segment, unit square, or unit cube:
+ *
+ *      @image html hyper_cubes.png
+ * 
  *    <li> Generalized L-shape domain:
  *      using the GridGenerator::hyper_L (tria, a,b) function produces
  *      the hypercube with the interval $[a,b]$ without the hypercube
  *      made out of the interval $[(a+b)/2,b]$. Let, for example, be $a=-1$
  *      and $b=1$, then the hpyer-L in two dimensions is the region
  *      $[-1,1]^2 - [0,1]^2$. To create a hyper-L in one dimension results in
- *      an error. The function is also implemented for three space dimensions.
+ *      an error. The function is also implemented for three space dimensions
+ *      and produces the following domain (not completely to scale, the
+ *      cut-out part should have exactly half the edge length of the entire
+ *      cube):
+ *
+ *      @image html hyper_l.png
  *
  *    <li> Hyper ball:
  *      You get the circle or ball (or generalized: hyperball) around
