@@ -5151,7 +5151,7 @@ AC_DEFUN(DEAL_II_WITH_BOOST, dnl
 
 
 dnl --------------------------------------------------
-dnl Include the LAPACK library
+dnl Include the libz library
 dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_ZLIB, dnl
 [
