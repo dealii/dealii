@@ -694,9 +694,25 @@ class DoFTools
 				      */
     
 				     /**
-				      * Compute the constraints
-				      * resulting from the presence of
-				      * hanging nodes. The object into
+				      * Compute the constraints resulting from
+				      * the presence of hanging nodes. Hanging
+				      * nodes are best explained using a small
+				      * picture:
+				      *
+				      * @image html hanging_nodes.png
+				      *
+				      * In order to make a finite element
+				      * function globally continuous, we have
+				      * to make sure that the dark red nodes
+				      * have values that are compatible with
+				      * the adjacent yellow nodes, so that the
+				      * function has no jump when coming from
+				      * the small cells to the large one at
+				      * the top right. We therefore have to
+				      * add conditions that constrain those
+				      * "hanging nodes".
+				      *
+				      * The object into
 				      * which these are inserted is
 				      * later used to condense the
 				      * global system matrix and right

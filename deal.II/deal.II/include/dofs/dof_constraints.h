@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,24 +34,26 @@ class BlockIndices;
 
 /**
  * This class implements linear homogeneous constraints on degrees of
- * freedom. In particular, it handles constraints of the form
- * $x_{i_1} = \sum_{j=2}^M a_{i_j} x_{i_j}$. Each "line" in objects of this
- * class corresponds to one such constraint, with the number of the
- * line being $i1$, and the entries in this line being pairs
- * $(i_j,a_{i_j})$. Note that the constraints are linear in the $x_i$,
- * and that there is not constant (non-homogeneous) term in the
- * constraint. However, this is exactly the form we need for hanging
- * node and certain other constraints, where we need to constrain one
- * degree of freedom in terms of others. The name of the class stems
- * from the fact that these constraints can be represented in matrix
- * form as $X x = 0$, and this object then describes the matrix $X$.
+ * freedom. In particular, it handles constraints of the form $x_{i_1} =
+ * \sum_{j=2}^M a_{i_j} x_{i_j}$. Each "line" in objects of this class
+ * corresponds to one such constraint, with the number of the line being $i1$,
+ * and the entries in this line being pairs $(i_j,a_{i_j})$. Note that the
+ * constraints are linear in the $x_i$, and that there is not constant
+ * (non-homogeneous) term in the constraint. However, this is exactly the form
+ * we need for hanging node and certain other constraints, where we need to
+ * constrain one degree of freedom in terms of others. The name of the class
+ * stems from the fact that these constraints can be represented in matrix
+ * form as $X x = 0$, and this object then describes the matrix $X$. The most
+ * frequent way to create/fill objects of this type is using the
+ * DoFTools::make_hanging_node_constraints() function. The use of these
+ * objects is first explained in @ref step_6 "step-6".
  *
- * The matrix is organized in lines (rows), but only those lines are stored
- * where constraints are present. New constraints are added by adding new
- * lines using the add_line() function, and then populating it using the
- * add_entry() function to a given line, or add_entries() to add more
- * than one entry at a time. After all constraints have been added, you need
- * to call close(), which compresses the storage format and sorts the
+ * Matrices of the present type are organized in lines (rows), but only those
+ * lines are stored where constraints are present. New constraints are added
+ * by adding new lines using the add_line() function, and then populating it
+ * using the add_entry() function to a given line, or add_entries() to add
+ * more than one entry at a time. After all constraints have been added, you
+ * need to call close(), which compresses the storage format and sorts the
  * entries.
  *
  * Constraint matrices are used to handle hanging nodes and other constrained
