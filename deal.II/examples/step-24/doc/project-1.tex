@@ -1,0 +1,91 @@
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{geometry}
+\geometry{verbose,letterpaper,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+\usepackage{amsmath}
+
+\makeatletter
+\usepackage{babel}
+\makeatother
+\begin{document}
+
+\section{FEM model}
+
+\begin{quote}
+The problem is
+
+\begin{align*}
+\Delta\bar{p}-\frac{1}{c_{0}^{2}}\frac{\partial^{2}\bar{p}}{\partial^{2}t} & =f\end{align*}
+
+
+with initial condition 
+
+\begin{eqnarray*}
+\bar{p}(0,\mathbf{r}) & = & b(r)\end{eqnarray*}
+
+
+Let 
+
+\begin{eqnarray*}
+v & = & \frac{\partial\bar{p}}{\partial t}\end{eqnarray*}
+
+
+then we have
+
+\begin{alignat*}{1}
+\bar{p}_{t}-v & =0\\
+\Delta\bar{p}-\frac{1}{c_{0}^{2}}\, v_{t} & =f\end{alignat*}
+
+
+and absorbing boundary condition 
+
+\begin{eqnarray*}
+\frac{\partial\bar{p}}{\partial\mathbf{n}} & =- & \frac{1}{c_{0}}\frac{\partial\bar{p}}{\partial t}\end{eqnarray*}
+
+
+$\frac{\partial\bar{p}}{\partial\mathbf{n}}$ is the normal derivative
+at the boundary. This is a the time-varying FEM model. by discretizing
+according to $t$, we have
+
+\begin{eqnarray*}
+(\frac{\bar{p}^{n}-\bar{p}^{n-1}}{\delta t},\phi)_{\Omega}-\,(\theta v^{n}+(1-\theta)v^{n-1},\phi)_{\Omega} & = & 0\\
+-(\Delta((\theta\bar{p}^{n}+(1-\theta)\bar{p}^{n-1}),\bigtriangledown\phi)_{\Omega}-\frac{1}{c_{0}}(\frac{\bar{p}^{n}-\bar{p}^{n-1}}{\delta t},\phi)_{\partial\Omega}-\frac{1}{c_{0}^{2}}(\frac{v^{n}-v^{n-1}}{\delta t},\phi)_{\Omega} & = & (\theta f^{n}+(1-\theta)f^{n-1},\phi)_{\Omega}\end{eqnarray*}
+
+
+we obtain
+
+\begin{eqnarray*}
+M\bar{p}^{n}-(\delta t\,\theta)Mv^{n} & = & M\bar{p}^{n-1}+\delta t\,(1-\theta)\, M\, v^{n-1}\\
+(-c_{0}^{2}\,\delta t\,\theta A-c_{0}\, B)\bar{p}^{n}-Mv^{n} & = & (c_{0}^{2}\,\delta t\,(1-\theta)A-c_{0}B)\bar{p}^{n-1}-M\, v^{n-1}+c_{0}^{2}\delta t(\theta F^{n}+(1-\theta)F^{n-1})\end{eqnarray*}
+
+
+Write the above two equations as a matrix form
+
+\begin{eqnarray*}
+\left(\begin{array}{cc}
+M & -(\delta t\,\theta)M\\
+c_{0}^{2}\,\delta t\,\theta A+c_{0}\, B & M\end{array}\right)\left(\begin{array}{c}
+\bar{p}^{n}\\
+v^{n}\end{array}\right) & = & \left(\begin{array}{c}
+G_{1}\\
+G_{2}\end{array}\right)\end{eqnarray*}
+
+
+where 
+
+\begin{center}$\left(\begin{array}{c}
+G_{1}\\
+G_{2}\end{array}\right)=\left(\begin{array}{c}
+M\bar{p}^{n-1}+\delta t\,(1-\theta)Mv^{n-1}\\
+(-c_{0}^{2}\,\delta t\,(1-\theta)A+c_{0}B)\bar{p}^{n-1}+M\, v^{n-1}-c_{0}^{2}\delta t(\theta F^{n}+(1-\theta)F^{n-1})\end{array}\right)$\end{center}
+
+From the above matrix, we can obtain
+
+\begin{eqnarray*}
+(M+(\delta t\,\theta\, c_{0})^{2}A+c_{0}\,\delta t\,\theta\, B)\bar{p}^{n} & = & G_{1}+(\delta t\,\theta)G_{2}\\
+Mv^{n} & = & -(c_{0}^{2}\,\delta t\,\theta\, A+c_{0}B)\bar{p}^{n}+G_{2}\end{eqnarray*}
+
+\end{quote}
+
+\end{document}
