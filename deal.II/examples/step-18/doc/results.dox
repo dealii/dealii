@@ -125,9 +125,8 @@ take as input.
 
 
 If we visualize these files with GMV, we get to see the full picture
-of the disaster our forced compression wreaks on the cylinder (click
-on the images for a larger version; colors in the images encode the
-norm of the stress in the material):
+of the disaster our forced compression wreaks on the cylinder (colors in the
+images encode the norm of the stress in the material):
 
 
 <table width="100%">
@@ -329,8 +328,8 @@ If one compares this with the previous run, the results are qualitatively
 similar, but quantitatively definitely different. The previous computation was
 therefore certainly not converged, though we can't say for sure anything about
 the present one. One would need an even finer computation to find out. However,
-the point may be moot: looking at the last picture in detail (click on it to
-see it in larger), it is pretty obvious that not only is the linear small
+the point may be moot: looking at the last picture in detail, it is pretty
+obvious that not only is the linear small
 deformation model we chose completely inadequate, but for a realistic
 simulation we would also need to make sure that the body does not intersects
 itself during deformation. Without such a formulation we cannot expect anything

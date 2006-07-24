@@ -87,8 +87,7 @@ in the solution in each iteration, as should be.
 Since the program did not really deliver the goal we had originally intended
 for (the computation of the minimal energy of finite element spaces), the
 graphical output is also not very exciting. Here are plots of five of the
-first 10 solutions (clicking on a picture gives the unscaled version of the
-image):
+first 10 solutions:
 
 
 @image html step-15.solution-1.png

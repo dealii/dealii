@@ -21,8 +21,7 @@ Errors: ||e_p||_L2 = 0.178055,   ||e_u||_L2 = 0.0433435
 The fact that the number of iterations is so small, of course, is due to good
 (but expensive!) preconditioner we have developed. To get confidence in the
 solution, let us take a look at it. The following three images show (from left
-to right) the x-velocity, the y-velocity, and the pressure (click on the images
-for larger versions):
+to right) the x-velocity, the y-velocity, and the pressure:
 
 @image html step-20.u.png
 @image html step-20.v.png
