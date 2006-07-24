@@ -17,6 +17,15 @@ LATEX_OUTPUT     = LaTeX/deal.II
 GENERATE_TAGFILE = deal.tag
 
 IMAGE_PATH             = images \
+			 ../../examples/step-1/doc \
+			 ../../examples/step-2/doc \ 
+			 ../../examples/step-3/doc \
+                         ../../examples/step-4/doc \
+			 ../../examples/step-5/doc \
+			 ../../examples/step-6/doc \
+			 ../../examples/step-7/doc \
+                         ../../examples/step-8/doc \
+			 ../../examples/step-9/doc \
 			 ../../examples/step-10/doc \
 			 ../../examples/step-11/doc \
                          ../../examples/step-12/doc \
@@ -27,14 +36,8 @@ IMAGE_PATH             = images \
                          ../../examples/step-17/doc \
                          ../../examples/step-18/doc \
 			 ../../examples/step-19/doc \
-			 ../../examples/step-1/doc \
                          ../../examples/step-20/doc \
 			 ../../examples/step-21/doc \
-			 ../../examples/step-2/doc \ 
-			 ../../examples/step-3/doc \
-                         ../../examples/step-4/doc \
-			 ../../examples/step-5/doc \
-			 ../../examples/step-6/doc \
-			 ../../examples/step-7/doc \
-                         ../../examples/step-8/doc \
-			 ../../examples/step-9/doc
+			 ../../examples/step-23/doc \
+			 ../../examples/step-24/doc \
+			 ../../examples/step-25/doc 
