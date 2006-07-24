@@ -16,7 +16,7 @@ HTML_OUTPUT      = deal.II
 LATEX_OUTPUT     = LaTeX/deal.II
 GENERATE_TAGFILE = deal.tag
 
-IMAGE_PATH             = . \
+IMAGE_PATH             = images \
 			 ../../examples/step-10/doc \
 			 ../../examples/step-11/doc \
                          ../../examples/step-12/doc \
