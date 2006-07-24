@@ -26,7 +26,7 @@ deal.II deal.tag: tutorial \
 	  $D/lac/include/*/*.h \
 	  $D/deal.II/include/*/*.h \
 	  headers/*.h \
-	  $(shell ls tutorial/doxygen/)
+	  $(addprefix tutorial/doxygen/, $(shell ls tutorial/doxygen/))
 	@echo "=== Generating reference documentation. " \
               "This can take several minutes..."
 	@DOXYGEN@ deal.dox > doxygen.log
@@ -58,4 +58,4 @@ clean:
 
 
 .PHONY: html tutorial private deal.II \
-	validate-xrefs clean
+	validate-xrefs clean tutorial
