@@ -1332,7 +1332,10 @@ namespace hp
 			  (*finite_elements)[fe_index].dofs_per_vertex));
     Assert (vertex_index < vertex_dofs_offsets.size(),
 	    ExcIndexRange (vertex_index, 0, vertex_dofs_offsets.size()));
-    
+    Assert (vertex_dofs_offsets[vertex_index] !=
+	    deal_II_numbers::invalid_unsigned_int,
+	    ExcMessage ("This vertex is unused and has no DoFs associated with it"));
+
 				     // hop along the list of index
 				     // sets until we find the one
 				     // with the correct fe_index, and
@@ -1382,6 +1385,9 @@ namespace hp
 			  (*finite_elements)[fe_index].dofs_per_vertex));
     Assert (fe_index < finite_elements->size(),
 	    ExcInternalError());
+    Assert (vertex_dofs_offsets[vertex_index] !=
+	    deal_II_numbers::invalid_unsigned_int,
+	    ExcMessage ("This vertex is unused and has no DoFs associated with it"));
 
 				     // hop along the list of index
 				     // sets until we find the one
