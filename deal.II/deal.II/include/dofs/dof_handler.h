@@ -608,7 +608,7 @@ class DoFHandler  :  public Subscriptor
 				      *  Return an iterator pointing to the last
 				      *  line of the level @p level, used or not.
 
-				      */
+				     */
     raw_line_iterator    last_raw_line (const unsigned int level) const;
 
 				     /**
@@ -705,7 +705,7 @@ class DoFHandler  :  public Subscriptor
 				      *  Return an iterator pointing to the last
 				      *  quad of the level @p level, used or not.
 
-				      */
+				     */
     raw_quad_iterator    last_raw_quad (const unsigned int level) const;
 
 				     /**
@@ -806,7 +806,7 @@ class DoFHandler  :  public Subscriptor
 				      *  Return an iterator pointing to the last
 				      *  hex of the level @p level, used or not.
 
-				      */
+				     */
     raw_hex_iterator
     last_raw_hex (const unsigned int level) const;
 
@@ -1096,17 +1096,22 @@ class DoFHandler  :  public Subscriptor
 			  const unsigned int local_index) const;
 
 				     /**
-				      *  Return the @p i-th dof-index. This function calls
-				      *  the respective function of DoFObjects.
+				      *  Return the @p i-th
+				      *  dof-index. This function
+				      *  calls the respective function
+				      *  of DoFObjects.
 				      */
     template <int structdim>
     unsigned int get_dof_index (const unsigned int       obj_level,
 				const unsigned int       obj_index,
 				const unsigned int       fe_index,
 				const unsigned int       local_index) const;
+
 				     /**
-				      *  Set the @p i-th dof-index. This function calls
-				      *  the respective function of DoFObjects.
+				      *  Set the @p i-th
+				      *  dof-index. This function
+				      *  calls the respective function
+				      *  of DoFObjects.
 				      */
     template <int structdim>
     void set_dof_index (const unsigned int       obj_level,
@@ -1114,16 +1119,21 @@ class DoFHandler  :  public Subscriptor
 			const unsigned int       fe_index,
 			const unsigned int       local_index,
 			const unsigned int       global_index) const;
-				       /**
-					* number of active fe-indices, calls the respective
-					* function in DoFObjects
-					*/
+    
+				     /**
+				      * Number of active fe-indices,
+				      * calls the respective
+				      * function in DoFObjects
+				      */
     template <int structdim>
     unsigned int n_active_fe_indices (const unsigned int obj_level,
 				      const unsigned int obj_index) const;
+    
 				     /**
-				      * return, wether fe-index is an active fe, calls the
-				      * respective function in DoFObjects
+				      * Return, wether fe-index is an
+				      * active fe, calls the
+				      * respective function in
+				      * DoFObjects
 				      */
     template <int structdim>
     bool fe_index_is_active (const unsigned int obj_level,
@@ -1131,26 +1141,38 @@ class DoFHandler  :  public Subscriptor
 			     const unsigned int fe_index) const;
            
 				     /**
-				      * Space to store the DoF numbers for the
-				      * different levels. Analogous to the
-				      * <tt>levels[]</tt> tree of the Triangulation
-				      * objects.
+				      * Space to store the DoF numbers
+				      * for the different
+				      * levels. Analogous to the
+				      * <tt>levels[]</tt> tree of the
+				      * Triangulation objects.
 				      */
     std::vector<internal::DoFHandler::DoFLevel<dim>*>    levels;
 
-    internal::DoFHandler::DoFFaces<dim> * faces;
 				     /**
-				      * Store the number of dofs created last
-				      * time.
+				      * Space to store DoF numbers of
+				      * faces. They are not stored in
+				      * <tt>levels</tt> since faces
+				      * are not organized
+				      * hierarchically, but in a flat
+				      * array.
+				      */
+    internal::DoFHandler::DoFFaces<dim> * faces;
+
+				     /**
+				      * Store the number of dofs
+				      * created last time.
 				      */
     unsigned int              used_dofs;
 
 				     /**
-				      * Array to store the indices for degrees
-				      * of freedom located at vertices.
+				      * Array to store the indices for
+				      * degrees of freedom located at
+				      * vertices.
 				      */
     std::vector<unsigned int>      vertex_dofs;
 
+    
 				     /*
 				      * Make accessor objects friends.
 				      */
