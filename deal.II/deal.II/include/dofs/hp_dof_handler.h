@@ -1086,6 +1086,16 @@ namespace hp
 					const unsigned int obj_index) const;
       
 				       /**
+					* Return the fe index of the
+					* n-th active finite element on
+					* this object.
+					*/
+      template <int structdim>
+      unsigned int nth_active_fe_index (const unsigned int obj_level,
+					const unsigned int obj_index,
+					const unsigned int n) const;
+
+				       /**
 					* Return whether fe-index is
 					* an active fe, calls the
 					* respective function in

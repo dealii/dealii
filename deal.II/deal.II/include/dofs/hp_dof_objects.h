@@ -201,6 +201,18 @@ namespace internal
         n_active_fe_indices (const ::hp::DoFHandler<spacedim> &dof_handler,
                              const unsigned int               obj_index) const;
 
+					 /**
+					  * Return the fe_index of the
+					  * n-th active finite element
+					  * on this object.
+					  */
+        template <int spacedim>
+        unsigned int
+        nth_active_fe_index (const ::hp::DoFHandler<spacedim> &dof_handler,
+			     const unsigned int               obj_level,
+                             const unsigned int               obj_index,
+			     const unsigned int               n) const;
+
                                          /**
                                           * Check whether a given
                                           * finite element index is

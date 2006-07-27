@@ -18,6 +18,8 @@
 #include <dofs/hp_dof_handler.h>
 
 
+//TODO: Several of the functions in this file are identical. some template trickery should make it possible to merge them
+
 namespace internal
 {
   namespace hp
@@ -156,6 +158,40 @@ namespace internal
                                        // is the one for the cell,
                                        // which is unique
       return 1;
+    }
+
+
+
+    template <>
+    template <>
+    unsigned int
+    DoFObjects<1>::
+    nth_active_fe_index<1> (const ::hp::DoFHandler<1> &dof_handler,
+			    const unsigned int         obj_level,
+			    const unsigned int         obj_index,
+			    const unsigned int         n) const
+    {
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+      
+                                       // this is a cell, so there is
+                                       // only a single fe_index
+      Assert (n == 0, ExcIndexRange (n, 0, 1));
+      
+      return dof_handler.levels[obj_level]->active_fe_indices[obj_index];
     }
 
 
@@ -387,6 +423,66 @@ namespace internal
 
     template <>
     template <>
+    unsigned int
+    DoFObjects<1>::
+    nth_active_fe_index<2> (const ::hp::DoFHandler<2> &dof_handler,
+			    const unsigned int         ,
+			    const unsigned int         obj_index,
+			    const unsigned int         n) const
+    {
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      Assert (n < n_active_fe_indices(dof_handler, obj_index),
+	      ExcIndexRange (n, 0,
+			     n_active_fe_indices(dof_handler, obj_index)));
+      
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      unsigned int counter = 0;
+      while (true)
+	{
+	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		  ExcInternalError());
+
+	  if (counter == n)
+	    return *pointer;
+	  
+	  ++counter;
+	  pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	}
+    }
+    
+
+
+    template <>
+    template <>
     bool
     DoFObjects<1>::
     fe_index_is_active<2> (const ::hp::DoFHandler<2> &dof_handler,
@@ -629,6 +725,66 @@ namespace internal
 
     template <>
     template <>
+    unsigned int
+    DoFObjects<1>::
+    nth_active_fe_index<3> (const ::hp::DoFHandler<3> &dof_handler,
+			    const unsigned int         ,
+			    const unsigned int         obj_index,
+			    const unsigned int         n) const
+    {
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      Assert (n < n_active_fe_indices(dof_handler, obj_index),
+	      ExcIndexRange (n, 0,
+			     n_active_fe_indices(dof_handler, obj_index)));
+      
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      unsigned int counter = 0;
+      while (true)
+	{
+	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		  ExcInternalError());
+
+	  if (counter == n)
+	    return *pointer;
+	  
+	  ++counter;
+	  pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	}
+    }
+
+
+
+    template <>
+    template <>
     bool
     DoFObjects<1>::
     fe_index_is_active<3> (const ::hp::DoFHandler<3> &dof_handler,
@@ -811,6 +967,40 @@ namespace internal
                                        // is the one for the cell,
                                        // which is unique
       return 1;
+    }
+
+
+
+    template <>
+    template <>
+    unsigned int
+    DoFObjects<2>::
+    nth_active_fe_index<2> (const ::hp::DoFHandler<2> &dof_handler,
+			    const unsigned int         obj_level,
+			    const unsigned int         obj_index,
+			    const unsigned int         n) const
+    {
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+      
+                                       // this is a cell, so there is
+                                       // only a single fe_index
+      Assert (n == 0, ExcIndexRange (n, 0, 1));
+      
+      return dof_handler.levels[obj_level]->active_fe_indices[obj_index];
     }
 
 
@@ -1040,6 +1230,66 @@ namespace internal
 
     template <>
     template <>
+    unsigned int
+    DoFObjects<2>::
+    nth_active_fe_index<3> (const ::hp::DoFHandler<3> &dof_handler,
+			    const unsigned int         ,
+			    const unsigned int         obj_index,
+			    const unsigned int         n) const
+    {
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      Assert (n < n_active_fe_indices(dof_handler, obj_index),
+	      ExcIndexRange (n, 0,
+			     n_active_fe_indices(dof_handler, obj_index)));
+      
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      unsigned int counter = 0;
+      while (true)
+	{
+	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		  ExcInternalError());
+
+	  if (counter == n)
+	    return *pointer;
+	  
+	  ++counter;
+	  pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	}
+    }
+
+
+
+    template <>
+    template <>
     bool
     DoFObjects<2>::
     fe_index_is_active<3> (const ::hp::DoFHandler<3> &dof_handler,
@@ -1223,6 +1473,40 @@ namespace internal
       return 1;
     }
     
+
+
+    template <>
+    template <>
+    unsigned int
+    DoFObjects<3>::
+    nth_active_fe_index<3> (const ::hp::DoFHandler<3> &dof_handler,
+			    const unsigned int         obj_level,
+			    const unsigned int         obj_index,
+			    const unsigned int         n) const
+    {
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+      
+                                       // this is a cell, so there is
+                                       // only a single fe_index
+      Assert (n == 0, ExcIndexRange (n, 0, 1));
+      
+      return dof_handler.levels[obj_level]->active_fe_indices[obj_index];
+    }
+
 
 
     template <>

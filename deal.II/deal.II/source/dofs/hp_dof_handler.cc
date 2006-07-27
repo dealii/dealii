@@ -1426,6 +1426,21 @@ namespace hp
     return this->levels[obj_level]->lines.n_active_fe_indices (*this,
 							       obj_index);
   }
+
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<1>::nth_active_fe_index<1> (const unsigned int obj_level,
+					 const unsigned int obj_index,
+					 const unsigned int n) const
+  {
+    return this->levels[obj_level]->lines.nth_active_fe_index (*this,
+							       obj_level,
+							       obj_index,
+							       n);
+  }
 #endif
 
 
@@ -1495,6 +1510,21 @@ namespace hp
   template <>
   template <>
   unsigned int
+  DoFHandler<2>::nth_active_fe_index<1> (const unsigned int obj_level,
+					 const unsigned int obj_index,
+					 const unsigned int n) const
+  {
+    return this->faces->lines.nth_active_fe_index (*this,
+						   obj_level,
+						   obj_index,
+						   n);
+  }
+
+  
+
+  template <>
+  template <>
+  unsigned int
   DoFHandler<2>::get_dof_index<2> (const unsigned int       obj_level,
 				   const unsigned int       obj_index,
 				   const unsigned int       fe_index,
@@ -1551,6 +1581,21 @@ namespace hp
   {
     return this->levels[obj_level]->quads.n_active_fe_indices (*this,
 							       obj_index);
+  }
+
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<2>::nth_active_fe_index<2> (const unsigned int obj_level,
+					 const unsigned int obj_index,
+					 const unsigned int n) const
+  {
+    return this->levels[obj_level]->quads.nth_active_fe_index (*this,
+							       obj_level,
+							       obj_index,
+							       n);
   }
 #endif
 
@@ -1614,6 +1659,21 @@ namespace hp
   {
     return this->faces->lines.n_active_fe_indices (*this,
 						   obj_index);
+  }
+
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<3>::nth_active_fe_index<1> (const unsigned int obj_level,
+					 const unsigned int obj_index,
+					 const unsigned int n) const
+  {
+    return this->faces->lines.nth_active_fe_index (*this,
+						   obj_level,
+						   obj_index,
+						   n);
   }
 
 
@@ -1729,6 +1789,23 @@ namespace hp
 						   obj_index);
   }
 
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<3>::nth_active_fe_index<2> (const unsigned int obj_level,
+					 const unsigned int obj_index,
+					 const unsigned int n) const
+  {
+    return this->faces->quads.nth_active_fe_index (*this,
+						   obj_level,
+						   obj_index,
+						   n);
+  }
+
+
+
   template <>
   template <>
   unsigned int
@@ -1737,6 +1814,21 @@ namespace hp
   {
     return this->levels[obj_level]->hexes.n_active_fe_indices (*this,
 							       obj_index);
+  }
+
+
+
+  template <>
+  template <>
+  unsigned int
+  DoFHandler<3>::nth_active_fe_index<3> (const unsigned int obj_level,
+					 const unsigned int obj_index,
+					 const unsigned int n) const
+  {
+    return this->levels[obj_level]->hexes.nth_active_fe_index (*this,
+							       obj_level,
+							       obj_index,
+							       n);
   }
 #endif
 
