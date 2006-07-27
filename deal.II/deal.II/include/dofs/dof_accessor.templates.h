@@ -232,6 +232,20 @@ DoFAccessor<dim,DH>::n_active_fe_indices () const
 
 template <int dim, class DH>
 inline
+unsigned int
+DoFAccessor<dim,DH>::nth_active_fe_index (const unsigned int n) const
+{
+				   // access the respective DoF
+  return this->dof_handler
+    ->template nth_active_fe_index<dim> (this->present_level,
+					 this->present_index,
+					 n);
+}
+
+
+
+template <int dim, class DH>
+inline
 bool
 DoFAccessor<dim,DH>::fe_index_is_active (const unsigned int fe_index) const
 {
@@ -241,7 +255,6 @@ DoFAccessor<dim,DH>::fe_index_is_active (const unsigned int fe_index) const
 					this->present_index,
 					fe_index);
 }
-
 
 
 /*------------------------- Functions: DoFObjectAccessor<1,dim> -----------------------*/

@@ -270,7 +270,7 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
 
 				     /**
 				      * Set the index of the <i>i</i> degree
-				      * on the @p vertexth vertex to @p index.
+				      * on the @p vertex-th vertex to @p index.
 				      *
 				      * The last argument denotes the
 				      * finite element index. For the
@@ -409,27 +409,42 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
     unsigned int
     n_active_fe_indices () const;
 
-                                     /**
-                                      * Check whether a given finite
-                                      * element index is used on the
-                                      * present object or not.
-                                      *
-                                      * For non-hp DoFHandler objects,
-                                      * only a zero index may be used,
-                                      * since only a single finite
-                                      * element can ever be active,
-                                      * and the answer is then @p
-                                      * true. On the other hand, for
-                                      * hp::DoFHandler objects,
-                                      * several fe indices may be used
-                                      * on the same object (except for
-                                      * a cell, where only a single
-                                      * finite element can be active
-                                      * at any given time).
-                                      */
+				     /**
+				      * Return the @p n-th active fe
+				      * index on this object. For
+				      * cells and all non-hp objects,
+				      * there is only a single active
+				      * fe index, so the argument must
+				      * be equal to zero. For
+				      * lower-dimensional hp objects,
+				      * there are
+				      * n_active_fe_indices() active
+				      * finite elements, and this
+				      * function can be queried for
+				      * their indices.
+				      */
+    unsigned int
+    nth_active_fe_index (const unsigned int n) const;
+    
+				     /**
+				      * Return true if the finite
+				      * element with given index is
+				      * active on the present
+				      * object. For non-hp DoF
+				      * accessors, this is of course
+				      * the case only if @p fe_index
+				      * equals zero. For cells, it is
+				      * the case if @p fe_index equals
+				      * active_fe_index() of this
+				      * cell. For faces and other
+				      * lower-dimensional objects,
+				      * there may be more than one @p
+				      * fe_index that are active on
+				      * any given object (see
+				      * n_active_fe_indices()).
+				      */
     bool
     fe_index_is_active (const unsigned int fe_index) const;
-
 
                                      /**
 				      * Exceptions for child classes
