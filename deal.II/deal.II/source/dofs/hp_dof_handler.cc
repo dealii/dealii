@@ -2036,7 +2036,8 @@ namespace hp
 				     // if the finite element tells us
 				     // that they should have the same
 				     // value
-    std::vector<unsigned int> new_dof_indices (used_dofs);
+    std::vector<unsigned int> new_dof_indices (used_dofs,
+					       deal_II_numbers::invalid_unsigned_int);
 
 				     // Step 2a: do so for vertices
     {
@@ -2044,7 +2045,8 @@ namespace hp
 	std::vector<std::pair<unsigned int, unsigned int> > Identities;
       
       Table<2,boost::shared_ptr<Identities> >
-	vertex_dof_identities;
+	vertex_dof_identities (finite_elements->size(),
+			       finite_elements->size());
 
 				       // loop over all vertices and
 				       // see which one we need to
@@ -2094,32 +2096,41 @@ namespace hp
 						   // constrained to
 						   // anything else,
 						   // except for to
-						   // each other
+						   // each other. use
+						   // the rule that we
+						   // will always
+						   // constrain the
+						   // dof with the
+						   // higher fe
+						   // index to the
+						   // one with the
+						   // lower, to avoid
+						   // circular
+						   // reasoning.
 		  Identities &identities
 		    = *vertex_dof_identities[first_fe_index][other_fe_index];
 		  for (unsigned int i=0; i<identities.size(); ++i)
 		    {
-		      const unsigned int first_fe_dof_index
+		      const unsigned int lower_dof_index
 			= get_vertex_dof_index (vertex_index,
 						first_fe_index,
 						identities[i].first);
-		      const unsigned int other_fe_dof_index
+		      const unsigned int higher_dof_index
 			= get_vertex_dof_index (vertex_index,
 						other_fe_index,
 						identities[i].second);
 
-		      Assert ((new_dof_indices[first_fe_dof_index] ==
+		      Assert ((new_dof_indices[higher_dof_index] ==
 			       deal_II_numbers::invalid_unsigned_int)
 			      ||
-			      (new_dof_indices[first_fe_dof_index] ==
-			       other_fe_index),
+			      (new_dof_indices[higher_dof_index] ==
+			       lower_dof_index),
 			      ExcInternalError());
 		      
-		      new_dof_indices[first_fe_dof_index] = other_fe_dof_index;
+		      new_dof_indices[higher_dof_index] = lower_dof_index;
 		    }
 		}
 	    }
-	  
 	}
     }
     
