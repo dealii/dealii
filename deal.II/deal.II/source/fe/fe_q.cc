@@ -559,10 +559,7 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 {
 				   // we can presently only compute
 				   // these identities if both FEs are
-				   // FE_Qs. in that case, there
-				   // should be exactly one single DoF
-				   // of each FE at a vertex, and they
-				   // should have identical value
+				   // FE_Qs
   const FE_Q<dim> *fe_q_other = dynamic_cast<const FE_Q<dim>*>(&fe_other);
   if (fe_q_other != 0)
     {
@@ -602,10 +599,45 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_Q<dim>::
-hp_quad_dof_identities (const FiniteElement<dim>        &/*fe_other*/) const
+hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
 {
-  Assert (false, ExcNotImplemented());
-  return std::vector<std::pair<unsigned int, unsigned int> > ();
+				   // we can presently only compute
+				   // these identities if both FEs are
+				   // FE_Qs
+  const FE_Q<dim> *fe_q_other = dynamic_cast<const FE_Q<dim>*>(&fe_other);
+  if (fe_q_other != 0)
+    {
+				       // this works exactly like the line
+				       // case above, except that now we
+				       // have to have two indices i1, i2
+				       // and j1, j2 to characterize the
+				       // dofs on the face of each of the
+				       // finite elements. since they are
+				       // ordered in lexicographic order,
+				       // the rest is rather
+				       // straightforward
+      const unsigned int p = this->degree;
+      const unsigned int q = fe_q_other->degree;
+      
+      std::vector<std::pair<unsigned int, unsigned int> > identities;
+
+      for (unsigned int i1=0; i1<p-1; ++i1)
+	for (unsigned int i2=0; i2<p-1; ++i2)
+	  for (unsigned int j1=0; j1<q-1; ++j1)
+	    for (unsigned int j2=0; j2<q-1; ++j2)
+	      if (((i1+1)*q == (j1+1)*p)
+		  &&
+		  ((i2+1)*q == (j2+1)*p))
+		identities.push_back (std::make_pair(i1*(p-1)+i2,
+						     j1*(q-1)+j2));
+      
+      return identities;
+    }
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
 }
 
 
