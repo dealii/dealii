@@ -2130,13 +2130,12 @@ namespace hp
 				     // value
     std::vector<unsigned int> new_dof_indices (used_dofs,
 					       deal_II_numbers::invalid_unsigned_int);
+    typedef
+      std::vector<std::pair<unsigned int, unsigned int> > DoFIdentities;
 
 				     // Step 2a: do so for vertices
     {
-      typedef
-	std::vector<std::pair<unsigned int, unsigned int> > Identities;
-      
-      Table<2,boost::shared_ptr<Identities> >
+      Table<2,boost::shared_ptr<DoFIdentities> >
 	vertex_dof_identities (finite_elements->size(),
 			       finite_elements->size());
 
@@ -2170,10 +2169,10 @@ namespace hp
 		  if (vertex_dof_identities[first_fe_index][other_fe_index] == 0)
 		    vertex_dof_identities[first_fe_index][other_fe_index]
 		      =
-		      boost::shared_ptr<Identities>
-		      (new Identities((*finite_elements)[first_fe_index]
-				      .hp_vertex_dof_identities
-				      ((*finite_elements)[other_fe_index])));
+		      boost::shared_ptr<DoFIdentities>
+		      (new DoFIdentities((*finite_elements)[first_fe_index]
+					 .hp_vertex_dof_identities
+					 ((*finite_elements)[other_fe_index])));
 
 						   // then loop
 						   // through the
@@ -2199,7 +2198,7 @@ namespace hp
 						   // lower, to avoid
 						   // circular
 						   // reasoning.
-		  Identities &identities
+		  DoFIdentities &identities
 		    = *vertex_dof_identities[first_fe_index][other_fe_index];
 		  for (unsigned int i=0; i<identities.size(); ++i)
 		    {
@@ -2225,6 +2224,61 @@ namespace hp
 	    }
 	}
     }
+
+				     // step 2b: eliminate dofs on
+				     // lines. this is only pertinent
+				     // in 2d and higher. the code's
+				     // logic is essentially as for
+				     // vertices, so comments are
+				     // omitted
+    if (dim > 1)
+      {
+	Table<2,boost::shared_ptr<DoFIdentities> >
+	  line_dof_identities (finite_elements->size(),
+			       finite_elements->size());
+	
+	for (line_iterator line=begin_line(); line!=end_line(); ++line)
+	  if (line->n_active_fe_indices() > 1)
+	    {
+	      const unsigned int n_active_fe_indices
+		= line->n_active_fe_indices ();
+	      const unsigned int
+		first_fe_index = line->nth_active_fe_index (0);
+
+	      for (unsigned int f=1; f<n_active_fe_indices; ++f)
+		{
+		  const unsigned int
+		    other_fe_index = line->nth_active_fe_index (f);
+
+		  if (line_dof_identities[first_fe_index][other_fe_index] == 0)
+		    line_dof_identities[first_fe_index][other_fe_index]
+		      =
+		      boost::shared_ptr<DoFIdentities>
+		      (new DoFIdentities((*finite_elements)[first_fe_index]
+					 .hp_line_dof_identities
+					 ((*finite_elements)[other_fe_index])));
+
+		  DoFIdentities &identities
+		    = *line_dof_identities[first_fe_index][other_fe_index];
+		  for (unsigned int i=0; i<identities.size(); ++i)
+		    {
+		      const unsigned int lower_dof_index
+			= line->dof_index (identities[i].first, first_fe_index);
+		      const unsigned int higher_dof_index
+			= line->dof_index (identities[i].second, other_fe_index);
+
+		      Assert ((new_dof_indices[higher_dof_index] ==
+			       deal_II_numbers::invalid_unsigned_int)
+			      ||
+			      (new_dof_indices[higher_dof_index] ==
+			       lower_dof_index),
+			      ExcInternalError());
+		      
+		      new_dof_indices[higher_dof_index] = lower_dof_index;
+		    }
+		}
+	    }
+      }
     
     
                                      // finally restore the user flags
