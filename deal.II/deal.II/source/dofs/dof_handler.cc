@@ -1415,8 +1415,8 @@ DoFHandler<1>::fe_index_is_active<1> (const unsigned int obj_level,
 				      const unsigned int fe_index) const
 {
   return this->levels[obj_level]->lines.fe_index_is_active(*this,
-							  obj_index,
-							  fe_index);
+							   obj_index,
+							   fe_index);
 }
 
 
@@ -1427,7 +1427,7 @@ DoFHandler<1>::n_active_fe_indices<1> (const unsigned int obj_level,
 				       const unsigned int obj_index) const
 {
   return this->levels[obj_level]->lines.n_active_fe_indices (*this,
-							    obj_index);
+							     obj_index);
 }
 #endif
 
@@ -1436,9 +1436,9 @@ template <>
 template <>
 unsigned int
 DoFHandler<2>::get_dof_index<1> (const unsigned int       ,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
+				 const unsigned int       obj_index,
+				 const unsigned int       fe_index,
+				 const unsigned int       local_index) const
 {
   return this->faces->lines.
     get_dof_index (*this,
@@ -1452,10 +1452,10 @@ template <>
 template <>
 void
 DoFHandler<2>::set_dof_index<1> (const unsigned int       ,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
+				 const unsigned int       obj_index,
+				 const unsigned int       fe_index,
+				 const unsigned int       local_index,
+				 const unsigned int       global_index) const
 {
   this->faces->lines.
     set_dof_index (*this,
@@ -1471,8 +1471,8 @@ template <>
 template <>
 bool
 DoFHandler<2>::fe_index_is_active<1> (const unsigned int ,
-					const unsigned int obj_index,
-					const unsigned int fe_index) const
+				      const unsigned int obj_index,
+				      const unsigned int fe_index) const
 {
   return this->faces->lines.fe_index_is_active(*this,
 					       obj_index,
@@ -1484,7 +1484,7 @@ template <>
 template <>
 unsigned int
 DoFHandler<2>::n_active_fe_indices<1> (const unsigned int ,
-					 const unsigned int obj_index) const
+				       const unsigned int obj_index) const
 {
   return this->faces->lines.n_active_fe_indices (*this,
 						 obj_index);
@@ -1534,8 +1534,8 @@ DoFHandler<2>::fe_index_is_active<2> (const unsigned int obj_level,
 				      const unsigned int fe_index) const
 {
   return this->levels[obj_level]->quads.fe_index_is_active(*this,
-							  obj_index,
-							  fe_index);
+							   obj_index,
+							   fe_index);
 }
 
 
@@ -1546,7 +1546,7 @@ DoFHandler<2>::n_active_fe_indices<2> (const unsigned int obj_level,
 				       const unsigned int obj_index) const
 {
   return this->levels[obj_level]->quads.n_active_fe_indices (*this,
-							    obj_index);
+							     obj_index);
 }
 #endif
 
@@ -1555,9 +1555,9 @@ template <>
 template <>
 unsigned int
 DoFHandler<3>::get_dof_index<1> (const unsigned int       ,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index) const
+				 const unsigned int       obj_index,
+				 const unsigned int       fe_index,
+				 const unsigned int       local_index) const
 {
   return this->faces->lines.
     get_dof_index (*this,
@@ -1571,10 +1571,10 @@ template <>
 template <>
 void
 DoFHandler<3>::set_dof_index<1> (const unsigned int       ,
-				   const unsigned int       obj_index,
-				   const unsigned int       fe_index,
-				   const unsigned int       local_index,
-				   const unsigned int       global_index) const
+				 const unsigned int       obj_index,
+				 const unsigned int       fe_index,
+				 const unsigned int       local_index,
+				 const unsigned int       global_index) const
 {
   this->faces->lines.
     set_dof_index (*this,
@@ -1590,8 +1590,8 @@ template <>
 template <>
 bool
 DoFHandler<3>::fe_index_is_active<1> (const unsigned int ,
-					const unsigned int obj_index,
-					const unsigned int fe_index) const
+				      const unsigned int obj_index,
+				      const unsigned int fe_index) const
 {
   return this->faces->lines.fe_index_is_active(*this,
 					       obj_index,
@@ -1603,7 +1603,7 @@ template <>
 template <>
 unsigned int
 DoFHandler<3>::n_active_fe_indices<1> (const unsigned int ,
-					 const unsigned int obj_index) const
+				       const unsigned int obj_index) const
 {
   return this->faces->lines.n_active_fe_indices (*this,
 						 obj_index);
@@ -1699,8 +1699,8 @@ DoFHandler<3>::fe_index_is_active<3> (const unsigned int obj_level,
 				      const unsigned int fe_index) const
 {
   return this->levels[obj_level]->hexes.fe_index_is_active(*this,
-							  obj_index,
-							  fe_index);
+							   obj_index,
+							   fe_index);
 }
 
 
@@ -1721,7 +1721,7 @@ DoFHandler<3>::n_active_fe_indices<3> (const unsigned int obj_level,
 				       const unsigned int obj_index) const
 {
   return this->levels[obj_level]->hexes.n_active_fe_indices (*this,
-							    obj_index);
+							     obj_index);
 }
 #endif
 
@@ -2138,7 +2138,7 @@ void DoFHandler<1>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 				       // if index is invalid_dof_index: check if this one
 				       // really is unused
       Assert (tria->vertex_used((i-vertex_dofs.begin()) /
-				 selected_fe->dofs_per_vertex) == false,
+				selected_fe->dofs_per_vertex) == false,
 	      ExcInternalError ());
   
   for (unsigned int level=0; level<levels.size(); ++level) 
@@ -2191,7 +2191,7 @@ void DoFHandler<2>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 				       // if index is invalid_dof_index: check if this one
 				       // really is unused
       Assert (tria->vertex_used((i-vertex_dofs.begin()) /
-				 selected_fe->dofs_per_vertex) == false,
+				selected_fe->dofs_per_vertex) == false,
 	      ExcInternalError ());
   
   for (std::vector<unsigned int>::iterator i=faces->lines.dofs.begin();
@@ -2251,7 +2251,7 @@ void DoFHandler<3>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 				       // if index is invalid_dof_index: check if this one
 				       // really is unused
       Assert (tria->vertex_used((i-vertex_dofs.begin()) /
-				 selected_fe->dofs_per_vertex) == false,
+				selected_fe->dofs_per_vertex) == false,
 	      ExcInternalError ());
   
   for (std::vector<unsigned int>::iterator i=faces->lines.dofs.begin();
