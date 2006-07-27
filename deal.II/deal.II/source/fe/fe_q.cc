@@ -324,6 +324,52 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 }
 
 
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Q<dim>::
+hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
+{
+				   // we can presently only compute
+				   // these identities if both FEs are
+				   // FE_Qs. in that case, there
+				   // should be exactly one single DoF
+				   // of each FE at a vertex, and they
+				   // should have identical value
+  const FE_Q<dim> *fe_q_other = dynamic_cast<const FE_Q<dim>*>(&fe_other);
+  if (fe_q_other != 0)
+    return
+      std::vector<std::pair<unsigned int, unsigned int> > (1, std::make_pair (0U, 0U));
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+}
+
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Q<dim>::
+hp_line_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
+{
+  Assert (false, ExcNotImplemented());
+  return std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Q<dim>::
+hp_quad_dof_identities (const FiniteElement<dim>        &/*fe_other*/) const
+{
+  Assert (false, ExcNotImplemented());
+  return std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
+
 //---------------------------------------------------------------------------
 // Auxiliary functions
 //---------------------------------------------------------------------------

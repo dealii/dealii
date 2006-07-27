@@ -440,7 +440,39 @@ get_interpolation_matrix (const FiniteElement<dim> &,
                ExcInterpolationNotImplemented());
 }
 
-                                   
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FiniteElement<dim>::
+hp_vertex_dof_identities (const FiniteElement<dim> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FiniteElement<dim>::
+hp_line_dof_identities (const FiniteElement<dim> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FiniteElement<dim>::
+hp_quad_dof_identities (const FiniteElement<dim> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
 
 
 template <int dim>
