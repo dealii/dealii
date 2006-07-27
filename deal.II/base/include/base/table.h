@@ -200,7 +200,7 @@ namespace internal
                                           * the wrong one.
                                           */
         DeclException3 (ExcIndexRange, int, int, int,
-                        << "The " << N-P+1 << "th index has a value of "
+                        << "Index " << N-P+1 << "has a value of "
                         << arg1 << " but needs to be in the range ["
                         << arg2 << "," << arg3 << "[");
       private:
