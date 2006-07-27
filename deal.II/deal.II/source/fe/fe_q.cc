@@ -20,7 +20,6 @@
 
 #include <sstream>
 
-
 // namespace for some functions that are used in this file. they are
 // specific to numbering conventions used for the FE_Q element, and
 // are thus not very interesting to the outside world. we'd like to
@@ -513,10 +512,46 @@ hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_Q<dim>::
-hp_line_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
+hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 {
-  Assert (false, ExcNotImplemented());
-  return std::vector<std::pair<unsigned int, unsigned int> > ();
+				   // we can presently only compute
+				   // these identities if both FEs are
+				   // FE_Qs. in that case, there
+				   // should be exactly one single DoF
+				   // of each FE at a vertex, and they
+				   // should have identical value
+  const FE_Q<dim> *fe_q_other = dynamic_cast<const FE_Q<dim>*>(&fe_other);
+  if (fe_q_other != 0)
+    {
+				       // dofs are located along
+				       // lines, so two dofs are
+				       // identical if they are
+				       // located at identical
+				       // positions. note that for
+				       // elements of orders p and q,
+				       // nodes are located on edges
+				       // at locations (i+1)/p and
+				       // (j+1)/q, so we need to find
+				       // those combinations i,j for
+				       // which (i+1)/p == (j+1)/q,
+				       // i.e. (i+1)*q == (j+1)*p
+      const unsigned int p = this->degree;
+      const unsigned int q = fe_q_other->degree;
+      
+      std::vector<std::pair<unsigned int, unsigned int> > identities;
+
+      for (unsigned int i=0; i<p-1; ++i)
+	for (unsigned int j=0; j<q-1; ++j)
+	  if ((i+1)*q == (j+1)*p)
+	    identities.push_back (std::make_pair(i,j));
+      
+      return identities;
+    }
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
 }
 
 
