@@ -31,7 +31,8 @@ tests_x = hp_dof_handler \
 	  random \
 	  step-* \
 	  n_active_fe_indices \
-	  integrate_difference
+	  integrate_difference \
+	  hp_*_dof_identities_*
 
 # from above list of regular expressions, generate the real set of
 # tests
