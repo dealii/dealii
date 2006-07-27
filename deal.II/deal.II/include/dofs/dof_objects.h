@@ -55,7 +55,8 @@ namespace internal
  * @author Tobias Leicht, 2006
  */
     template <int dim>
-    class DoFObjects{
+    class DoFObjects
+    {
       public:
                                          /**
                                           * Store the global indices of
@@ -124,12 +125,13 @@ namespace internal
                                           * class hierarchy between hp
                                           * and non-hp classes.
                                           */
-	template<int spacedim>
+	template <int spacedim>
 	unsigned int
         get_dof_index (const ::DoFHandler<spacedim> &dof_handler,
 		       const unsigned int       obj_index,
 		       const unsigned int       fe_index,
 		       const unsigned int       local_index) const;
+
                                          /**
                                           * Return the value 1. The
                                           * meaning of this function
@@ -147,14 +149,13 @@ namespace internal
                                           * Similar to the function
                                           * above. Assert that the
                                           * given index is zero, and
-                                          * the return true.
+                                          * then return true.
                                           */
         template <int spacedim>
         bool
         fe_index_is_active (const ::DoFHandler<spacedim> &dof_handler,
                             const unsigned int       index,
                             const unsigned int       fe_index) const;
-	
 
                                          /**
                                           * Determine an estimate for the

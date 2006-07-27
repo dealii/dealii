@@ -130,7 +130,7 @@ namespace internal
     {
       private:
                                          /**
-                                          * the object containing dof-indices
+                                          * The object containing dof-indices
 					  * and related access-functions
 					  */
 	DoFObjects<1> lines;
@@ -167,7 +167,7 @@ namespace internal
     {
       private:
                                          /**
-                                          * the object containing dof-indices
+                                          * The object containing dof-indices
 					  * and related access-functions
 					  */
 	internal::DoFHandler::DoFObjects<2> quads;
@@ -204,7 +204,7 @@ namespace internal
     {
       private:
                                          /**
-                                          * the object containing dof-indices
+                                          * The object containing dof-indices
 					  * and related access-functions
 					  */
 	internal::DoFHandler::DoFObjects<3> hexes;
