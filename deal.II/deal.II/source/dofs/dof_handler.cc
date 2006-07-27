@@ -28,6 +28,8 @@
 #include <algorithm>
 
 
+//TODO[WB]: do not use a plain pointer for faces, but rather an auto_ptr or some such thing
+
 template <int dim>
 const unsigned int DoFHandler<dim>::dimension;
 
@@ -2555,14 +2557,14 @@ void DoFHandler<3>::reserve_space ()
   faces->quads.dofs.resize (tria->n_raw_quads() *
 			    selected_fe->dofs_per_quad,
 			    invalid_dof_index);
-  
 }
 
 #endif
 
 
 template <int dim>
-void DoFHandler<dim>::clear_space () {
+void DoFHandler<dim>::clear_space ()
+{
   for (unsigned int i=0; i<levels.size(); ++i)
     delete levels[i];
   levels.resize (0);
