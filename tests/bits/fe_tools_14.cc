@@ -1,4 +1,4 @@
-//    $Id: fe_tools_13.cc 12738 2006-03-28 23:25:03Z wolf $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors
@@ -8,7 +8,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  fe_tools_13.cc  ---------------------------
+//----------------------------  fe_tools_14.cc  ---------------------------
 
 #include "../tests.h"
 #include "fe_tools_common.cc"
@@ -36,11 +36,15 @@ check_this (const FiniteElement<dim> &fe1,
 	  fe1.face_to_cell_index (i, 0))
 	ok = false;
 
+    }
+
+  for (unsigned int i = 0; i < fe2.dofs_per_face; ++i)
+    {
       if (fe2.face_to_equivalent_cell_index (i) !=
 	  fe2.face_to_cell_index (i, 0))
 	ok = false;
     }
-
+  
   ok ? deallog << "OK" << std::endl :
     deallog << "Error!" << std::endl;
 }
