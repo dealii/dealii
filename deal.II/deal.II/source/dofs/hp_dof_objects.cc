@@ -148,10 +148,8 @@ namespace internal
                                        // make sure we are on an
                                        // object for which DoFs have
                                        // been allocated at all
-      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
-              ExcMessage ("You are trying to access degree of freedom "
-                          "information for an object on which no such "
-                          "information is available"));
+      if (dof_offsets[obj_index] == deal_II_numbers::invalid_unsigned_int)
+	return 0;
       
                                        // if we are in 1d, then the
                                        // only set of indices we store
@@ -385,10 +383,8 @@ namespace internal
                                        // make sure we are on an
                                        // object for which DoFs have
                                        // been allocated at all
-      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
-              ExcMessage ("You are trying to access degree of freedom "
-                          "information for an object on which no such "
-                          "information is available"));
+      if (dof_offsets[obj_index] == deal_II_numbers::invalid_unsigned_int)
+	return 0;
       
 				       // we are in higher space
 				       // dimensions, so there may
@@ -687,10 +683,8 @@ namespace internal
                                        // make sure we are on an
                                        // object for which DoFs have
                                        // been allocated at all
-      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
-              ExcMessage ("You are trying to access degree of freedom "
-                          "information for an object on which no such "
-                          "information is available"));
+      if (dof_offsets[obj_index] == deal_II_numbers::invalid_unsigned_int)
+	return 0;
       
 				       // we are in higher space
 				       // dimensions, so there may
@@ -1192,10 +1186,8 @@ namespace internal
                                        // make sure we are on an
                                        // object for which DoFs have
                                        // been allocated at all
-      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
-              ExcMessage ("You are trying to access degree of freedom "
-                          "information for an object on which no such "
-                          "information is available"));
+      if (dof_offsets[obj_index] == deal_II_numbers::invalid_unsigned_int)
+	return 0;
       
 				       // we are in higher space
 				       // dimensions, so there may
