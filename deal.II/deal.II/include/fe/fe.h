@@ -896,7 +896,7 @@ class FiniteElement : public Subscriptor,
 				      */
     virtual void
     get_interpolation_matrix (const FiniteElement<dim> &source,
-			      FullMatrix<double>           &matrix) const;
+			      FullMatrix<double>       &matrix) const;
 				     //@}
 
 				     /**
@@ -904,6 +904,62 @@ class FiniteElement : public Subscriptor,
 				      * @{
 				      */
     
+
+				     /**
+				      * Return the matrix
+				      * interpolating from a face of
+				      * of one element to the face of
+				      * the neighboring element. 
+				      * The size of the matrix is
+				      * then @p dofs_per_face times
+				      * <tt>source.dofs_per_face</tt>.
+				      *
+				      * Derived elements will have to
+				      * implement this function. They
+				      * may only provide interpolation
+				      * matrices for certain source
+				      * finite elements, for example
+				      * those from the same family. If
+				      * they don't implement
+				      * interpolation from a given
+				      * element, then they must throw
+				      * an exception of type
+				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      */
+    virtual void
+    get_face_interpolation_matrix (const FiniteElement<dim> &source,
+				   FullMatrix<double>       &matrix) const;
+				     //@}
+    
+
+				     /**
+				      * Return the matrix
+				      * interpolating from a face of
+				      * of one element to the subface of
+				      * the neighboring element. 
+				      * The size of the matrix is
+				      * then @p dofs_per_face times
+				      * <tt>source.dofs_per_face</tt>.
+				      *
+				      * Derived elements will have to
+				      * implement this function. They
+				      * may only provide interpolation
+				      * matrices for certain source
+				      * finite elements, for example
+				      * those from the same family. If
+				      * they don't implement
+				      * interpolation from a given
+				      * element, then they must throw
+				      * an exception of type
+				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      */
+    virtual void
+    get_subface_interpolation_matrix (const FiniteElement<dim> &source,
+				      const unsigned int        subface,
+				      FullMatrix<double>       &matrix) const;
+				     //@}
+    
+
 				     /**
 				      * If, on a vertex, several
 				      * finite elements are active,

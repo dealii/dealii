@@ -560,7 +560,9 @@ face_to_equivalent_cell_index (const unsigned int index) const
 }
 
 
-
+//TODO: This method produces results, that differ from those which
+// are returned bz "face_to_cell_index (index, 0)". This has to be
+// verified.
 template <>
 inline
 unsigned int

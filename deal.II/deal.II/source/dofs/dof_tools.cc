@@ -1704,6 +1704,8 @@ namespace internal
 		    = this_face->child(child)->dof_index(dof, fe_index);
 	      Assert (next_index == dofs_on_children.size(),
 		      ExcInternalError());
+
+// TODO[OKH]: FE::get_subface_interpolation_matrix ()
 	  
 					       // for each row in the constraint
 					       // matrix for this line:
@@ -1729,6 +1731,8 @@ namespace internal
 	      Assert (cell->face(face)
 		      ->fe_index_is_active(cell->active_fe_index()) == true,
 		      ExcInternalError());
+
+// TODO[OKH]: FE::get_face_interpolation_matrix ()
 	    } 
     }
 #endif

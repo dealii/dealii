@@ -443,6 +443,39 @@ get_interpolation_matrix (const FiniteElement<dim> &,
 
 
 template <int dim>
+void
+FiniteElement<dim>::
+get_face_interpolation_matrix (const FiniteElement<dim> &,
+			       FullMatrix<double>           &) const
+{
+				   // by default, no interpolation
+				   // implemented. so throw exception,
+				   // as documentation says
+  AssertThrow (false,
+               typename FiniteElement<dim>::
+               ExcInterpolationNotImplemented());
+}
+                                   
+
+                                   
+template <int dim>
+void
+FiniteElement<dim>::
+get_subface_interpolation_matrix (const FiniteElement<dim> &,
+				  const unsigned int,
+				  FullMatrix<double>           &) const
+{
+				   // by default, no interpolation
+				   // implemented. so throw exception,
+				   // as documentation says
+  AssertThrow (false,
+               typename FiniteElement<dim>::
+               ExcInterpolationNotImplemented());
+}
+                                   
+
+
+template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FiniteElement<dim>::
 hp_vertex_dof_identities (const FiniteElement<dim> &) const

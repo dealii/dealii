@@ -324,6 +324,167 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 }
 
 
+template <int dim>
+void
+FE_Q<dim>::
+get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+			       FullMatrix<double>       &interpolation_matrix) const
+{
+				   // this is only implemented, if the
+				   // source FE is also a
+				   // Q element
+  AssertThrow ((x_source_fe.get_name().find ("FE_Q<") == 0)
+               ||
+               (dynamic_cast<const FE_Q<dim>*>(&x_source_fe) != 0),
+               typename FiniteElement<dim>::
+               ExcInterpolationNotImplemented());
+  
+				   // ok, source is a Q element, so
+				   // we will be able to do the work
+  const FE_Q<dim> &source_fe
+    = dynamic_cast<const FE_Q<dim>&>(x_source_fe);
+
+  Assert (interpolation_matrix.m() == this->dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				this->dofs_per_face));
+  Assert (interpolation_matrix.n() == source_fe.dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				source_fe.dofs_per_face));
+
+  const std::vector<unsigned int> &index_map=
+    this->poly_space.get_numbering();
+  
+
+                                       // generate a point on this
+                                       // cell and evaluate the
+                                       // shape functions there
+  Quadrature<dim-1> quad_face_support (source_fe.get_unit_face_support_points ());
+
+
+				   // compute the interpolation
+				   // matrix by simply taking the
+                                   // value at the support points.
+  for (unsigned int i=0; i<source_fe.dofs_per_face; ++i)
+    {
+      //TODO: Verify that all faces are the same with respect to
+      // these support points. Furthermore, check if something has to
+      // be done for the face orientation flag in 3D.
+      Point<dim> p = QProjector<dim>::project_to_face (quad_face_support, 0).point (i);
+
+      for (unsigned int j=0; j<this->dofs_per_face; ++j)
+	interpolation_matrix(j,i) = this->shape_value (this->face_to_cell_index(j, 0), p);
+    }
+
+                                   // cut off very small values
+  for (unsigned int i=0; i<this->dofs_per_face; ++i)
+    for (unsigned int j=0; j<source_fe.dofs_per_face; ++j)
+      if (std::fabs(interpolation_matrix(i,j)) < 1e-15)
+        interpolation_matrix(i,j) = 0.;
+
+				   // make sure that the column sum of
+				   // each of the matrices is 1 at
+				   // this point. this must be so
+				   // since the shape functions sum up
+				   // to 1
+  for (unsigned int j=0; j<source_fe.dofs_per_face; ++j)
+    {
+      double sum = 0.;
+
+      for (unsigned int i=0; i<this->dofs_per_face; ++i)
+        sum += interpolation_matrix(i,j);
+
+      Assert (std::fabs(sum-1) < 2e-14*this->degree*(dim-1),
+              ExcInternalError());
+    }
+}
+
+
+template <int dim>
+void
+FE_Q<dim>::
+get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+				  const unsigned int subface,
+				  FullMatrix<double>           &interpolation_matrix) const
+{
+				   // this is only implemented, if the
+				   // source FE is also a
+				   // Q element
+  AssertThrow ((x_source_fe.get_name().find ("FE_Q<") == 0)
+               ||
+               (dynamic_cast<const FE_Q<dim>*>(&x_source_fe) != 0),
+               typename FiniteElement<dim>::
+               ExcInterpolationNotImplemented());
+  
+				   // ok, source is a Q element, so
+				   // we will be able to do the work
+  const FE_Q<dim> &source_fe
+    = dynamic_cast<const FE_Q<dim>&>(x_source_fe);
+
+  Assert (interpolation_matrix.m() == this->dofs_per_cell,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				this->dofs_per_cell));
+  Assert (interpolation_matrix.n() == source_fe.dofs_per_cell,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				source_fe.dofs_per_cell));
+
+  const std::vector<unsigned int> &index_map=
+    this->poly_space.get_numbering();
+  
+				   // compute the interpolation
+				   // matrices in much the same way as
+				   // we do for the embedding matrices
+				   // from mother to child.
+  FullMatrix<double> cell_interpolation (this->dofs_per_cell,
+					 this->dofs_per_cell);
+  FullMatrix<double> source_interpolation (this->dofs_per_cell,
+					   source_fe.dofs_per_cell);
+  FullMatrix<double> tmp (this->dofs_per_cell,
+			  source_fe.dofs_per_cell);
+  for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+    {
+                                       // generate a point on this
+                                       // cell and evaluate the
+                                       // shape functions there
+      const Point<dim>
+	p = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
+					      FE_Q_Helper::int2type<dim>());
+      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+        cell_interpolation(j,i) = this->poly_space.compute_value (i, p);
+
+      for (unsigned int i=0; i<source_fe.dofs_per_cell; ++i)
+        source_interpolation(j,i) = source_fe.poly_space.compute_value (i, p);
+    }
+
+                                   // then compute the
+                                   // interpolation matrix matrix
+                                   // for this coordinate
+                                   // direction
+  cell_interpolation.gauss_jordan ();
+  cell_interpolation.mmult (interpolation_matrix,
+                            source_interpolation);
+
+                                   // cut off very small values
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
+      if (std::fabs(interpolation_matrix(i,j)) < 1e-15)
+        interpolation_matrix(i,j) = 0.;
+
+				   // make sure that the row sum of
+				   // each of the matrices is 1 at
+				   // this point. this must be so
+				   // since the shape functions sum up
+				   // to 1
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    {
+      double sum = 0.;
+      for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
+        sum += interpolation_matrix(i,j);
+
+      Assert (std::fabs(sum-1) < 2e-14*this->degree*dim,
+              ExcInternalError());
+    }
+}
+
 
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
