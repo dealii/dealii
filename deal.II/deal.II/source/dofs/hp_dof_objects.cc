@@ -119,9 +119,9 @@ namespace internal
                                        // which is unique. then
                                        // fe_index must be
                                        // active_fe_index
-          Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
-                  ExcMessage ("FE index does not match that of the present cell"));
-          dofs[dof_offsets[obj_index]+local_index] = global_index;
+      Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
+	      ExcMessage ("FE index does not match that of the present cell"));
+      dofs[dof_offsets[obj_index]+local_index] = global_index;
     }
 
 
@@ -155,7 +155,7 @@ namespace internal
                                        // only set of indices we store
                                        // is the one for the cell,
                                        // which is unique
-         return 1;
+      return 1;
     }
 
 
@@ -194,9 +194,9 @@ namespace internal
                                        // only set of indices we store
                                        // is the one for the cell,
                                        // which is unique
-          Assert (obj_index < dof_handler.levels[obj_level]->active_fe_indices.size(),
-                  ExcInternalError());
-          return (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index]);
+      Assert (obj_index < dof_handler.levels[obj_level]->active_fe_indices.size(),
+	      ExcInternalError());
+      return (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index]);
     }
 #endif
 #if deal_II_dimension == 2    
@@ -235,30 +235,30 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
       
-                                            // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object. hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
-          while (true)
-            {
-              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
-                      ExcInternalError());
-              if (*pointer == fe_index)
-                return *(pointer + 1 + local_index);
-              else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      while (true)
+	{
+	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		  ExcInternalError());
+	  if (*pointer == fe_index)
+	    return *(pointer + 1 + local_index);
+	  else
+	    pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	}
     }
 
 
@@ -298,33 +298,33 @@ namespace internal
                           "information is available"));
 
     
-                                           // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object.  hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          unsigned int      *pointer         = &dofs[starting_offset];
-          while (true)
-            {
-              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
-                      ExcInternalError());
-              if (*pointer == fe_index)
-                {
-                  *(pointer + 1 + local_index) = global_index;
-                  return;
-                }
-              else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object.  hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      unsigned int      *pointer         = &dofs[starting_offset];
+      while (true)
+	{
+	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		  ExcInternalError());
+	  if (*pointer == fe_index)
+	    {
+	      *(pointer + 1 + local_index) = global_index;
+	      return;
+	    }
+	  else
+	    pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	}
     }
 
 
@@ -354,33 +354,33 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
       
-                                            // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object. hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
-          unsigned int counter = 0;
-          while (true)
-            {
-              if (*pointer == deal_II_numbers::invalid_unsigned_int)
-                                                 // end of list reached
-                return counter;
-              else
-                {
-                  ++counter;
-                  pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
-                }
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      unsigned int counter = 0;
+      while (true)
+	{
+	  if (*pointer == deal_II_numbers::invalid_unsigned_int)
+					     // end of list reached
+	    return counter;
+	  else
+	    {
+	      ++counter;
+	      pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	    }
+	}
     }
 
 
@@ -415,32 +415,32 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
       
-                                           // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object. hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
-          while (true)
-            {
-              if (*pointer == deal_II_numbers::invalid_unsigned_int)
-                                                 // end of list reached
-                return false;
-              else
-                if (*pointer == fe_index)
-                  return true;
-                else
-                  pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      while (true)
+	{
+	  if (*pointer == deal_II_numbers::invalid_unsigned_int)
+					     // end of list reached
+	    return false;
+	  else
+	    if (*pointer == fe_index)
+	      return true;
+	    else
+	      pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	}
     }
 #endif
 #if deal_II_dimension == 3    
@@ -479,30 +479,30 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
       
-                                           // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object. hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
-          while (true)
-            {
-              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
-                      ExcInternalError());
-              if (*pointer == fe_index)
-                return *(pointer + 1 + local_index);
-              else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      while (true)
+	{
+	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		  ExcInternalError());
+	  if (*pointer == fe_index)
+	    return *(pointer + 1 + local_index);
+	  else
+	    pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	}
     }
 
 
@@ -542,33 +542,33 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-                                            // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object.  hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          unsigned int      *pointer         = &dofs[starting_offset];
-          while (true)
-            {
-              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
-                      ExcInternalError());
-              if (*pointer == fe_index)
-                {
-                  *(pointer + 1 + local_index) = global_index;
-                  return;
-                }
-              else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object.  hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      unsigned int      *pointer         = &dofs[starting_offset];
+      while (true)
+	{
+	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		  ExcInternalError());
+	  if (*pointer == fe_index)
+	    {
+	      *(pointer + 1 + local_index) = global_index;
+	      return;
+	    }
+	  else
+	    pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	}
     }
 
 
@@ -596,33 +596,33 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
       
-                                            // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object. hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
-          unsigned int counter = 0;
-          while (true)
-            {
-              if (*pointer == deal_II_numbers::invalid_unsigned_int)
-                                                 // end of list reached
-                return counter;
-              else
-                {
-                  ++counter;
-                  pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
-                }
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      unsigned int counter = 0;
+      while (true)
+	{
+	  if (*pointer == deal_II_numbers::invalid_unsigned_int)
+					     // end of list reached
+	    return counter;
+	  else
+	    {
+	      ++counter;
+	      pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	    }
+	}
     }
 
 
@@ -657,32 +657,32 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
       
-                                         // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object. hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
-          while (true)
-            {
-              if (*pointer == deal_II_numbers::invalid_unsigned_int)
-                                                 // end of list reached
-                return false;
-              else
-                if (*pointer == fe_index)
-                  return true;
-                else
-                  pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      while (true)
+	{
+	  if (*pointer == deal_II_numbers::invalid_unsigned_int)
+					     // end of list reached
+	    return false;
+	  else
+	    if (*pointer == fe_index)
+	      return true;
+	    else
+	      pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	}
     }
     
 #endif
@@ -728,9 +728,9 @@ namespace internal
                                        // which is unique. then
                                        // fe_index must be
                                        // active_fe_index
-          Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
-                  ExcMessage ("FE index does not match that of the present cell"));
-          return dofs[dof_offsets[obj_index]+local_index];
+      Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
+	      ExcMessage ("FE index does not match that of the present cell"));
+      return dofs[dof_offsets[obj_index]+local_index];
     }
 
 
@@ -777,8 +777,8 @@ namespace internal
                                        // fe_index must be
                                        // active_fe_index
       Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
-                  ExcMessage ("FE index does not match that of the present cell"));
-          dofs[dof_offsets[obj_index]+local_index] = global_index;
+	      ExcMessage ("FE index does not match that of the present cell"));
+      dofs[dof_offsets[obj_index]+local_index] = global_index;
     }
 
 
@@ -810,7 +810,7 @@ namespace internal
                                        // only set of indices we store
                                        // is the one for the cell,
                                        // which is unique
-          return 1;
+      return 1;
     }
 
 
@@ -849,9 +849,9 @@ namespace internal
                                        // only set of indices we store
                                        // is the one for the cell,
                                        // which is unique
-          Assert (obj_index < dof_handler.levels[obj_level]->active_fe_indices.size(),
-                  ExcInternalError());
-          return (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index]);
+      Assert (obj_index < dof_handler.levels[obj_level]->active_fe_indices.size(),
+	      ExcInternalError());
+      return (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index]);
     }
 #endif
     
@@ -890,30 +890,30 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-                                          // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object. hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
-          while (true)
-            {
-              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
-                      ExcInternalError());
-              if (*pointer == fe_index)
-                return *(pointer + 1 + local_index);
-              else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_quad + 1;
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      while (true)
+	{
+	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		  ExcInternalError());
+	  if (*pointer == fe_index)
+	    return *(pointer + 1 + local_index);
+	  else
+	    pointer += dof_handler.get_fe()[*pointer].dofs_per_quad + 1;
+	}
     }
 
 
@@ -953,33 +953,33 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
 
-                                           // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object.  hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          unsigned int      *pointer         = &dofs[starting_offset];
-          while (true)
-            {
-              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
-                      ExcInternalError());
-              if (*pointer == fe_index)
-                {
-                  *(pointer + 1 + local_index) = global_index;
-                  return;
-                }
-              else
-                pointer += dof_handler.get_fe()[*pointer].dofs_per_quad + 1;
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object.  hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      unsigned int      *pointer         = &dofs[starting_offset];
+      while (true)
+	{
+	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+		  ExcInternalError());
+	  if (*pointer == fe_index)
+	    {
+	      *(pointer + 1 + local_index) = global_index;
+	      return;
+	    }
+	  else
+	    pointer += dof_handler.get_fe()[*pointer].dofs_per_quad + 1;
+	}
     }
 
 
@@ -1007,33 +1007,33 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
       
-                                          // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object. hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
-          unsigned int counter = 0;
-          while (true)
-            {
-              if (*pointer == deal_II_numbers::invalid_unsigned_int)
-                                                 // end of list reached
-                return counter;
-              else
-                {
-                  ++counter;
-                  pointer += dof_handler.get_fe()[*pointer].dofs_per_quad + 1;
-                }
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      unsigned int counter = 0;
+      while (true)
+	{
+	  if (*pointer == deal_II_numbers::invalid_unsigned_int)
+					     // end of list reached
+	    return counter;
+	  else
+	    {
+	      ++counter;
+	      pointer += dof_handler.get_fe()[*pointer].dofs_per_quad + 1;
+	    }
+	}
     }
 
 
@@ -1068,32 +1068,32 @@ namespace internal
                           "information for an object on which no such "
                           "information is available"));
       
-                                            // we are in higher space
-                                           // dimensions, so there may
-                                           // be multiple finite
-                                           // elements associated with
-                                           // this object. hop along
-                                           // the list of index sets
-                                           // until we find the one
-                                           // with the correct
-                                           // fe_index, and then poke
-                                           // into that part. trigger
-                                           // an exception if we can't
-                                           // find a set for this
-                                           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
-          while (true)
-            {
-              if (*pointer == deal_II_numbers::invalid_unsigned_int)
-                                                 // end of list reached
-                return false;
-              else
-                if (*pointer == fe_index)
-                  return true;
-                else
-                  pointer += dof_handler.get_fe()[*pointer].dofs_per_quad + 1;
-            }
+				       // we are in higher space
+				       // dimensions, so there may
+				       // be multiple finite
+				       // elements associated with
+				       // this object. hop along
+				       // the list of index sets
+				       // until we find the one
+				       // with the correct
+				       // fe_index, and then poke
+				       // into that part. trigger
+				       // an exception if we can't
+				       // find a set for this
+				       // particular fe_index
+      const unsigned int starting_offset = dof_offsets[obj_index];
+      const unsigned int *pointer        = &dofs[starting_offset];
+      while (true)
+	{
+	  if (*pointer == deal_II_numbers::invalid_unsigned_int)
+					     // end of list reached
+	    return false;
+	  else
+	    if (*pointer == fe_index)
+	      return true;
+	    else
+	      pointer += dof_handler.get_fe()[*pointer].dofs_per_quad + 1;
+	}
     }
 
 
@@ -1138,9 +1138,9 @@ namespace internal
                                        // which is unique. then
                                        // fe_index must be
                                        // active_fe_index
-           Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
-                  ExcMessage ("FE index does not match that of the present cell"));
-          return dofs[dof_offsets[obj_index]+local_index];
+      Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
+	      ExcMessage ("FE index does not match that of the present cell"));
+      return dofs[dof_offsets[obj_index]+local_index];
     }
 
 
@@ -1186,9 +1186,9 @@ namespace internal
                                        // which is unique. then
                                        // fe_index must be
                                        // active_fe_index
-          Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
-                  ExcMessage ("FE index does not match that of the present cell"));
-          dofs[dof_offsets[obj_index]+local_index] = global_index;
+      Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
+	      ExcMessage ("FE index does not match that of the present cell"));
+      dofs[dof_offsets[obj_index]+local_index] = global_index;
     }
 
 
@@ -1220,7 +1220,7 @@ namespace internal
                                        // only set of indices we store
                                        // is the one for the cell,
                                        // which is unique
-           return 1;
+      return 1;
     }
     
 
@@ -1259,9 +1259,9 @@ namespace internal
                                        // only set of indices we store
                                        // is the one for the cell,
                                        // which is unique
-          Assert (obj_index < dof_handler.levels[obj_level]->active_fe_indices.size(),
-                  ExcInternalError());
-          return (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index]);
+      Assert (obj_index < dof_handler.levels[obj_level]->active_fe_indices.size(),
+	      ExcInternalError());
+      return (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index]);
     }
 #endif
 
