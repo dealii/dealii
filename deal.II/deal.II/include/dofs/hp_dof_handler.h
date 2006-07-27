@@ -1022,18 +1022,52 @@ namespace hp
       get_vertex_dof_index (const unsigned int vertex_index,
 			    const unsigned int fe_index,
 			    const unsigned int local_index) const;
+
 				       /**
-					*  Return the @p i-th dof-index. This function calls
-					*  the respective function of DoFObjects.
+					* Return the number of
+					* different finite elements
+					* that are active on a given
+					* vertex.
+					*/
+      unsigned int
+      n_active_vertex_fe_indices (const unsigned int vertex_index) const;
+
+				       /**
+					* Return the fe index of the
+					* n-th finite element active
+					* on a given vertex.
+					*/
+      unsigned int
+      nth_active_vertex_fe_index (const unsigned int vertex_index,
+				  const unsigned int n) const;
+      
+				       /**
+					* Return whether a particular
+					* finite element index is
+					* active on the specified
+					* vertex.
+					*/
+      bool
+      fe_is_active_on_vertex (const unsigned int vertex_index,
+			      const unsigned int fe_index) const;
+      
+				       /**
+					*  Return the @p i-th
+					*  dof-index. This function
+					*  calls the respective
+					*  function of DoFObjects.
 					*/
       template <int structdim>
       unsigned int get_dof_index (const unsigned int       obj_level,
 				  const unsigned int       obj_index,
 				  const unsigned int       fe_index,
 				  const unsigned int       local_index) const;
+      
 				       /**
-					*  Set the @p i-th dof-index. This function calls
-					*  the respective function of DoFObjects.
+					*  Set the @p i-th
+					*  dof-index. This function
+					*  calls the respective
+					*  function of DoFObjects.
 					*/
       template <int structdim>
       void set_dof_index (const unsigned int       obj_level,
@@ -1041,16 +1075,21 @@ namespace hp
 			  const unsigned int       fe_index,
 			  const unsigned int       local_index,
 			  const unsigned int       global_index) const;
+      
 				       /**
-					* number of active fe-indices, calls the respective
+					* Number of active fe-indices,
+					* calls the respective
 					* function in DoFObjects
 					*/
       template <int structdim>
       unsigned int n_active_fe_indices (const unsigned int obj_level,
 					const unsigned int obj_index) const;
+      
 				       /**
-					* return, wether fe-index is an active fe, calls the
-					* respective function in DoFObjects
+					* Return whether fe-index is
+					* an active fe, calls the
+					* respective function in
+					* DoFObjects
 					*/
       template <int structdim>
       bool fe_index_is_active (const unsigned int obj_level,
@@ -1418,6 +1457,151 @@ namespace hp
 	  pointer += (*finite_elements)[this_fe_index].dofs_per_vertex + 1;
       }
   }  
+
+
+
+  template <int dim>
+  inline
+  unsigned int
+  DoFHandler<dim>::
+  n_active_vertex_fe_indices (const unsigned int vertex_index) const
+  {
+    Assert (finite_elements != 0,
+	    ExcMessage ("No finite element collection is associated with "
+			"this DoFHandler"));
+
+				     // if this vertex is unused, return 0
+    if (vertex_dofs_offsets[vertex_index] == deal_II_numbers::invalid_unsigned_int)
+      return 0;
+
+				     // hop along the list of index
+				     // sets and count the number of
+				     // hops
+    const unsigned int starting_offset = vertex_dofs_offsets[vertex_index];
+    const unsigned int *pointer        = &vertex_dofs[starting_offset];
+
+    Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+	    ExcInternalError());
+    
+    unsigned int counter = 0;
+    while (true)
+      {
+	Assert (pointer <= &vertex_dofs.back(), ExcInternalError());
+
+	const unsigned int this_fe_index = *pointer;
+	
+	if (this_fe_index == deal_II_numbers::invalid_unsigned_int)
+	  return counter;
+	else
+	  {
+	    pointer += (*finite_elements)[this_fe_index].dofs_per_vertex + 1;
+	    ++counter;
+	  }
+      }
+  }
+
+
+
+  template <int dim>
+  inline
+  unsigned int
+  DoFHandler<dim>::
+  nth_active_vertex_fe_index (const unsigned int vertex_index,
+			      const unsigned int n) const
+  {
+    Assert (finite_elements != 0,
+	    ExcMessage ("No finite element collection is associated with "
+			"this DoFHandler"));
+    Assert (n < n_active_vertex_fe_indices(vertex_index),
+	    ExcIndexRange (n, 0, n_active_vertex_fe_indices(vertex_index)));
+				     // make sure we don't ask on
+				     // unused vertices
+    Assert (vertex_dofs_offsets[vertex_index] !=
+	    deal_II_numbers::invalid_unsigned_int,
+	    ExcInternalError());
+
+				     // hop along the list of index
+				     // sets and count the number of
+				     // hops
+    const unsigned int starting_offset = vertex_dofs_offsets[vertex_index];
+    const unsigned int *pointer        = &vertex_dofs[starting_offset];
+
+    Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+	    ExcInternalError());
+    
+    unsigned int counter = 0;
+    while (true)
+      {
+	Assert (pointer <= &vertex_dofs.back(), ExcInternalError());
+
+	const unsigned int this_fe_index = *pointer;
+	
+	Assert (this_fe_index < finite_elements->size(),
+		ExcInternalError());
+
+	if (counter == n)
+	  return this_fe_index;
+
+	Assert (this_fe_index != deal_II_numbers::invalid_unsigned_int,
+		ExcInternalError());
+	
+	pointer += (*finite_elements)[this_fe_index].dofs_per_vertex + 1;
+	++counter;	
+      }
+  }
+  
+
+
+  template <int dim>
+  inline
+  bool
+  DoFHandler<dim>::
+  fe_is_active_on_vertex (const unsigned int vertex_index,
+			  const unsigned int fe_index) const
+  {
+    Assert (fe_index != ::hp::DoFHandler<dim>::default_fe_index,
+	    ExcMessage ("You need to specify a FE index when working "
+			"with hp DoFHandlers"));
+    Assert (finite_elements != 0,
+	    ExcMessage ("No finite element collection is associated with "
+			"this DoFHandler"));
+    Assert (fe_index < finite_elements->size(),
+	    ExcInternalError());
+
+				     // make sure we don't ask on
+				     // unused vertices
+    Assert (vertex_dofs_offsets[vertex_index] !=
+	    deal_II_numbers::invalid_unsigned_int,
+	    ExcInternalError());
+
+				     // hop along the list of index
+				     // sets and see whether we find
+				     // the given index
+    const unsigned int starting_offset = vertex_dofs_offsets[vertex_index];
+    const unsigned int *pointer        = &vertex_dofs[starting_offset];
+
+    Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+	    ExcInternalError());
+    
+    while (true)
+      {
+	Assert (pointer <= &vertex_dofs.back(), ExcInternalError());
+
+	const unsigned int this_fe_index = *pointer;
+	
+	Assert (this_fe_index < finite_elements->size(),
+		ExcInternalError());
+
+	if (this_fe_index == deal_II_numbers::invalid_unsigned_int)
+	  return false;
+	else
+	  if (this_fe_index == fe_index)
+	    return true;
+	  else
+	    pointer += (*finite_elements)[this_fe_index].dofs_per_vertex + 1;
+      }
+  }
+  
   
 #endif
     
