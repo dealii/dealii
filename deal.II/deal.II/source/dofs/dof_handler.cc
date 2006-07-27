@@ -1405,30 +1405,6 @@ DoFHandler<1>::set_dof_index<1> (const unsigned int       obj_level,
 		   global_index);
   
 }
-
-
-template <>
-template <>
-bool
-DoFHandler<1>::fe_index_is_active<1> (const unsigned int obj_level,
-				      const unsigned int obj_index,
-				      const unsigned int fe_index) const
-{
-  return this->levels[obj_level]->lines.fe_index_is_active(*this,
-							   obj_index,
-							   fe_index);
-}
-
-
-template <>
-template <>
-unsigned int
-DoFHandler<1>::n_active_fe_indices<1> (const unsigned int obj_level,
-				       const unsigned int obj_index) const
-{
-  return this->levels[obj_level]->lines.n_active_fe_indices (*this,
-							     obj_index);
-}
 #endif
 
 #if deal_II_dimension == 2
@@ -1467,29 +1443,6 @@ DoFHandler<2>::set_dof_index<1> (const unsigned int       ,
 }
 
 
-template <>
-template <>
-bool
-DoFHandler<2>::fe_index_is_active<1> (const unsigned int ,
-				      const unsigned int obj_index,
-				      const unsigned int fe_index) const
-{
-  return this->faces->lines.fe_index_is_active(*this,
-					       obj_index,
-					       fe_index);
-}
-
-
-template <>
-template <>
-unsigned int
-DoFHandler<2>::n_active_fe_indices<1> (const unsigned int ,
-				       const unsigned int obj_index) const
-{
-  return this->faces->lines.n_active_fe_indices (*this,
-						 obj_index);
-}
-
 
 template <>
 template <>
@@ -1523,30 +1476,6 @@ DoFHandler<2>::set_dof_index<2> (const unsigned int       obj_level,
 		   local_index,
 		   global_index);
   
-}
-
-
-template <>
-template <>
-bool
-DoFHandler<2>::fe_index_is_active<2> (const unsigned int obj_level,
-				      const unsigned int obj_index,
-				      const unsigned int fe_index) const
-{
-  return this->levels[obj_level]->quads.fe_index_is_active(*this,
-							   obj_index,
-							   fe_index);
-}
-
-
-template <>
-template <>
-unsigned int
-DoFHandler<2>::n_active_fe_indices<2> (const unsigned int obj_level,
-				       const unsigned int obj_index) const
-{
-  return this->levels[obj_level]->quads.n_active_fe_indices (*this,
-							     obj_index);
 }
 #endif
 
@@ -1586,28 +1515,6 @@ DoFHandler<3>::set_dof_index<1> (const unsigned int       ,
 }
 
 
-template <>
-template <>
-bool
-DoFHandler<3>::fe_index_is_active<1> (const unsigned int ,
-				      const unsigned int obj_index,
-				      const unsigned int fe_index) const
-{
-  return this->faces->lines.fe_index_is_active(*this,
-					       obj_index,
-					       fe_index);
-}
-
-
-template <>
-template <>
-unsigned int
-DoFHandler<3>::n_active_fe_indices<1> (const unsigned int ,
-				       const unsigned int obj_index) const
-{
-  return this->faces->lines.n_active_fe_indices (*this,
-						 obj_index);
-}
 
 template <>
 template <>
@@ -1625,6 +1532,7 @@ DoFHandler<3>::get_dof_index<2> (const unsigned int       ,
 }
 
 
+
 template <>
 template <>
 unsigned int
@@ -1639,6 +1547,7 @@ DoFHandler<3>::get_dof_index<3> (const unsigned int       obj_level,
 		   fe_index,
 		   local_index);
 }
+
 
 
 template <>
@@ -1660,6 +1569,7 @@ DoFHandler<3>::set_dof_index<2> (const unsigned int       ,
 }
 
 
+
 template <>
 template <>
 void
@@ -1676,52 +1586,6 @@ DoFHandler<3>::set_dof_index<3> (const unsigned int       obj_level,
 		   local_index,
 		   global_index);
   
-}
-
-
-template <>
-template <>
-bool
-DoFHandler<3>::fe_index_is_active<2> (const unsigned int ,
-				      const unsigned int obj_index,
-				      const unsigned int fe_index) const
-{
-  return this->faces->quads.fe_index_is_active(*this,
-					       obj_index,
-					       fe_index);
-}
-
-template <>
-template <>
-bool
-DoFHandler<3>::fe_index_is_active<3> (const unsigned int obj_level,
-				      const unsigned int obj_index,
-				      const unsigned int fe_index) const
-{
-  return this->levels[obj_level]->hexes.fe_index_is_active(*this,
-							   obj_index,
-							   fe_index);
-}
-
-
-template <>
-template <>
-unsigned int
-DoFHandler<3>::n_active_fe_indices<2> (const unsigned int ,
-				       const unsigned int obj_index) const
-{
-  return this->faces->quads.n_active_fe_indices (*this,
-						 obj_index);
-}
-
-template <>
-template <>
-unsigned int
-DoFHandler<3>::n_active_fe_indices<3> (const unsigned int obj_level,
-				       const unsigned int obj_index) const
-{
-  return this->levels[obj_level]->hexes.n_active_fe_indices (*this,
-							     obj_index);
 }
 #endif
 

@@ -1121,13 +1121,30 @@ class DoFHandler  :  public Subscriptor
 			const unsigned int       global_index) const;
     
 				     /**
-				      * Number of active fe-indices,
-				      * calls the respective
-				      * function in DoFObjects
+				      * Return the number of active
+				      * fe-indices on the given
+				      * object. Since we have a non-hp
+				      * handler here, this function
+				      * always returns 1.
 				      */
     template <int structdim>
     unsigned int n_active_fe_indices (const unsigned int obj_level,
 				      const unsigned int obj_index) const;
+
+				     /**
+				      * Return the fe index of the
+				      * n-th active finite element on
+				      * this object. Since this is a
+				      * non-hp object, there is
+				      * exactly one active fe index;
+				      * the function therefore asserts
+				      * that @p n equals zero, and the
+				      * returns default_fe_index.
+				      */
+    template <int structdim>
+    unsigned int nth_active_fe_index (const unsigned int obj_level,
+				      const unsigned int obj_index,
+				      const unsigned int n) const;
     
 				     /**
 				      * Return, wether fe-index is an
@@ -1379,6 +1396,46 @@ set_vertex_dof_index (const unsigned int vertex_index,
 
   vertex_dofs[vertex_index * selected_fe->dofs_per_vertex + local_index] = global_index;
 }  
+
+
+
+template <int dim>
+template <int structdim>
+inline
+bool
+DoFHandler<dim>::fe_index_is_active (const unsigned int,
+				     const unsigned int,
+				     const unsigned int fe_index) const
+{
+  return (fe_index == 0);
+}
+
+
+
+template <int dim>
+template <int structdim>
+inline
+unsigned int
+DoFHandler<dim>::n_active_fe_indices (const unsigned int,
+				      const unsigned int) const
+{
+  return 1;
+}
+
+
+
+template <int dim>
+template <int structdim>
+inline
+unsigned int
+DoFHandler<dim>::nth_active_fe_index (const unsigned int,
+				      const unsigned int,
+				      const unsigned int n) const
+{
+  Assert (n == 0, ExcIndexRange (n, 0, 1));
+  
+  return default_fe_index;
+}
 
 
 #endif // DOXYGEN
