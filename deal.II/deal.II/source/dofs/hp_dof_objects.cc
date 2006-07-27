@@ -467,11 +467,16 @@ namespace internal
 	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
 		  ExcInternalError());
 
+	  const unsigned int fe_index = *pointer;
+
+	  Assert (fe_index < dof_handler.get_fe().size(),
+		  ExcInternalError());
+	  
 	  if (counter == n)
-	    return *pointer;
+	    return fe_index;
 	  
 	  ++counter;
-	  pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	  pointer += dof_handler.get_fe()[fe_index].dofs_per_line + 1;
 	}
     }
     
@@ -767,11 +772,16 @@ namespace internal
 	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
 		  ExcInternalError());
 
+	  const unsigned int fe_index = *pointer;
+
+	  Assert (fe_index < dof_handler.get_fe().size(),
+		  ExcInternalError());
+	  
 	  if (counter == n)
-	    return *pointer;
+	    return fe_index;
 	  
 	  ++counter;
-	  pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	  pointer += dof_handler.get_fe()[fe_index].dofs_per_line + 1;
 	}
     }
 
@@ -1270,11 +1280,16 @@ namespace internal
 	  Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
 		  ExcInternalError());
 
+	  const unsigned int fe_index = *pointer;
+
+	  Assert (fe_index < dof_handler.get_fe().size(),
+		  ExcInternalError());
+	  
 	  if (counter == n)
-	    return *pointer;
+	    return fe_index;
 	  
 	  ++counter;
-	  pointer += dof_handler.get_fe()[*pointer].dofs_per_line + 1;
+	  pointer += dof_handler.get_fe()[fe_index].dofs_per_quad + 1;
 	}
     }
 
