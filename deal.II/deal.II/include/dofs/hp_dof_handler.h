@@ -1105,6 +1105,33 @@ namespace hp
       bool fe_index_is_active (const unsigned int obj_level,
 			       const unsigned int obj_index,
 			       const unsigned int fe_index) const;
+
+				       /**
+					* Compute identities between
+					* DoFs located on
+					* vertices. Called from
+					* distribute_dofs().
+					*/
+      void
+      compute_vertex_dof_identities (std::vector<unsigned int> &new_dof_indices) const;
+
+				       /**
+					* Compute identities between
+					* DoFs located on
+					* lines. Called from
+					* distribute_dofs().
+					*/
+      void
+      compute_line_dof_identities (std::vector<unsigned int> &new_dof_indices) const;
+
+				       /**
+					* Compute identities between
+					* DoFs located on
+					* quads. Called from
+					* distribute_dofs().
+					*/
+      void
+      compute_quad_dof_identities (std::vector<unsigned int> &new_dof_indices) const;
       
                                        /**
                                         * Space to store the DoF

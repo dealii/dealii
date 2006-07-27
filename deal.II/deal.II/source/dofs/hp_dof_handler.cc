@@ -30,6 +30,108 @@
 #include <functional>
 
 
+
+namespace internal
+{
+  namespace hp
+  {
+    typedef
+      std::vector<std::pair<unsigned int, unsigned int> > DoFIdentities;
+
+
+				     /**
+				      * Make sure that the given @p
+				      * identities pointer points to a
+				      * valid array. If the pointer is
+				      * zero beforehand, create an
+				      * entry with the correct
+				      * data. If it is nonzero, don't
+				      * touch it.
+				      *
+				      * @p structdim denotes the
+				      * dimension of the objects on
+				      * which identities are to be
+				      * represented, i.e. zero for
+				      * vertices, one for lines, etc.
+				      */
+    template <int dim, int structdim>
+    void
+    assert_existence_of_dof_identities (const FiniteElement<dim> &fe1,
+					const FiniteElement<dim> &fe2,
+					boost::shared_ptr<DoFIdentities> &identities)
+    {
+				       // see if we need to fill this
+				       // entry, or whether it already
+				       // exists
+      if (identities == 0)
+	{
+	  switch (structdim)
+	    {
+	      case 0:
+	      {
+		identities =
+		  boost::shared_ptr<DoFIdentities>
+		  (new DoFIdentities(fe1.hp_vertex_dof_identities(fe2)));
+		break;
+	      }
+	      
+	      case 1:
+	      {
+		identities =
+		  boost::shared_ptr<DoFIdentities>
+		  (new DoFIdentities(fe1.hp_line_dof_identities(fe2)));
+		break;
+	      }
+	      
+	      case 2:
+	      {
+		identities =
+		  boost::shared_ptr<DoFIdentities>
+		  (new DoFIdentities(fe1.hp_quad_dof_identities(fe2)));
+		break;
+	      }
+	      
+	      default:
+		    Assert (false, ExcNotImplemented());
+	    }
+
+					   // double check whether the
+					   // newly created entries
+					   // make any sense at all
+	  for (unsigned int i=0; i<identities->size(); ++i)
+	    switch (structdim)
+	      {
+		case 0:
+		      Assert ((*identities)[i].first < fe1.dofs_per_vertex,
+			      ExcInternalError());
+		      Assert ((*identities)[i].second < fe2.dofs_per_vertex,
+			      ExcInternalError());
+		      break;
+
+		case 1:
+		      Assert ((*identities)[i].first < fe1.dofs_per_line,
+			      ExcInternalError());
+		      Assert ((*identities)[i].second < fe2.dofs_per_line,
+			      ExcInternalError());
+		      break;
+
+		case 2:
+		      Assert ((*identities)[i].first < fe1.dofs_per_quad,
+			      ExcInternalError());
+		      Assert ((*identities)[i].second < fe2.dofs_per_quad,
+			      ExcInternalError());
+		      break;
+
+		default:
+		      Assert (false, ExcNotImplemented());
+	      }      
+	}
+    }
+  }
+}
+
+  
+
 namespace hp
 {
   
@@ -2068,6 +2170,238 @@ namespace hp
 
 
   template <int dim>
+  void
+  DoFHandler<dim>::
+  compute_vertex_dof_identities (std::vector<unsigned int> &new_dof_indices) const
+  {
+    Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
+      vertex_dof_identities (get_fe().size(),
+			     get_fe().size());
+
+				     // loop over all vertices and
+				     // see which one we need to
+				     // work on
+    for (unsigned int vertex_index=0; vertex_index<get_tria().n_vertices();
+	 ++vertex_index)
+      {
+	const unsigned int n_active_fe_indices
+	  = n_active_vertex_fe_indices (vertex_index);
+	if (n_active_fe_indices > 1)
+	  {
+	    const unsigned int
+	      first_fe_index = nth_active_vertex_fe_index (vertex_index, 0);
+
+					     // loop over all the
+					     // other FEs with which
+					     // we want to identify
+					     // the DoF indices of
+					     // the first FE of
+	    for (unsigned int f=1; f<n_active_fe_indices; ++f)
+	      {
+		const unsigned int
+		  other_fe_index = nth_active_vertex_fe_index (vertex_index, f);
+
+						 // make sure the
+						 // entry in the
+						 // equivalence
+						 // table exists
+		internal::hp::assert_existence_of_dof_identities<dim,0>
+		  (get_fe()[first_fe_index],
+		   get_fe()[other_fe_index],
+		   vertex_dof_identities[first_fe_index][other_fe_index]);
+
+						 // then loop
+						 // through the
+						 // identities we
+						 // have. first get
+						 // the global
+						 // numbers of the
+						 // dofs we want to
+						 // identify and
+						 // make sure they
+						 // are not yet
+						 // constrained to
+						 // anything else,
+						 // except for to
+						 // each other. use
+						 // the rule that we
+						 // will always
+						 // constrain the
+						 // dof with the
+						 // higher fe
+						 // index to the
+						 // one with the
+						 // lower, to avoid
+						 // circular
+						 // reasoning.
+		internal::hp::DoFIdentities &identities
+		  = *vertex_dof_identities[first_fe_index][other_fe_index];
+		for (unsigned int i=0; i<identities.size(); ++i)
+		  {
+		    const unsigned int lower_dof_index
+		      = get_vertex_dof_index (vertex_index,
+					      first_fe_index,
+					      identities[i].first);
+		    const unsigned int higher_dof_index
+		      = get_vertex_dof_index (vertex_index,
+					      other_fe_index,
+					      identities[i].second);
+
+		    Assert ((new_dof_indices[higher_dof_index] ==
+			     deal_II_numbers::invalid_unsigned_int)
+			    ||
+			    (new_dof_indices[higher_dof_index] ==
+			     lower_dof_index),
+			    ExcInternalError());
+		      
+		    new_dof_indices[higher_dof_index] = lower_dof_index;
+		  }
+	      }
+	  }
+      }
+  }
+
+
+#if deal_II_dimension == 1
+
+  template <>
+  void
+  DoFHandler<1>::
+  compute_line_dof_identities (std::vector<unsigned int> &) const
+  {}
+
+#endif
+
+  template <int dim>
+  void
+  DoFHandler<dim>::
+  compute_line_dof_identities (std::vector<unsigned int> &new_dof_indices) const
+  {
+				     // the algorithm is equivalent to
+				     // the one used for vertices, so
+				     // no comments here...
+    Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
+      line_dof_identities (finite_elements->size(),
+			   finite_elements->size());
+	
+    for (line_iterator line=begin_line(); line!=end_line(); ++line)
+      if (line->n_active_fe_indices() > 1)
+	{
+	  const unsigned int n_active_fe_indices
+	    = line->n_active_fe_indices ();
+	  const unsigned int
+	    first_fe_index = line->nth_active_fe_index (0);
+
+	  for (unsigned int f=1; f<n_active_fe_indices; ++f)
+	    {
+	      const unsigned int
+		other_fe_index = line->nth_active_fe_index (f);
+
+	      internal::hp::assert_existence_of_dof_identities<dim,1>
+		((*finite_elements)[first_fe_index],
+		 (*finite_elements)[other_fe_index],
+		 line_dof_identities[first_fe_index][other_fe_index]);
+
+	      internal::hp::DoFIdentities &identities
+		= *line_dof_identities[first_fe_index][other_fe_index];
+	      for (unsigned int i=0; i<identities.size(); ++i)
+		{
+		  const unsigned int lower_dof_index
+		    = line->dof_index (identities[i].first, first_fe_index);
+		  const unsigned int higher_dof_index
+		    = line->dof_index (identities[i].second, other_fe_index);
+
+		  Assert ((new_dof_indices[higher_dof_index] ==
+			   deal_II_numbers::invalid_unsigned_int)
+			  ||
+			  (new_dof_indices[higher_dof_index] ==
+			   lower_dof_index),
+			  ExcInternalError());
+		      
+		  new_dof_indices[higher_dof_index] = lower_dof_index;
+		}
+	    }
+	}
+  }
+
+#if deal_II_dimension == 1
+
+  template <>
+  void
+  DoFHandler<1>::
+  compute_quad_dof_identities (std::vector<unsigned int> &) const
+  {}
+
+#endif
+
+
+#if deal_II_dimension == 2
+
+  template <>
+  void
+  DoFHandler<2>::
+  compute_quad_dof_identities (std::vector<unsigned int> &) const
+  {}
+
+#endif
+
+  
+  template <int dim>
+  void
+  DoFHandler<dim>::
+  compute_quad_dof_identities (std::vector<unsigned int> &new_dof_indices) const
+  {
+				     // the algorithm is equivalent to
+				     // the one used for vertices, so
+				     // no comments here...
+    Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
+      quad_dof_identities (finite_elements->size(),
+			   finite_elements->size());
+	
+    for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
+      if (quad->n_active_fe_indices() > 1)
+	{
+	  const unsigned int n_active_fe_indices
+	    = quad->n_active_fe_indices ();
+	  const unsigned int
+	    first_fe_index = quad->nth_active_fe_index (0);
+
+	  for (unsigned int f=1; f<n_active_fe_indices; ++f)
+	    {
+	      const unsigned int
+		other_fe_index = quad->nth_active_fe_index (f);
+
+	      internal::hp::assert_existence_of_dof_identities<dim,2>
+		((*finite_elements)[first_fe_index],
+		 (*finite_elements)[other_fe_index],
+		 quad_dof_identities[first_fe_index][other_fe_index]);
+
+	      internal::hp::DoFIdentities &identities
+		= *quad_dof_identities[first_fe_index][other_fe_index];
+	      for (unsigned int i=0; i<identities.size(); ++i)
+		{
+		  const unsigned int lower_dof_index
+		    = quad->dof_index (identities[i].first, first_fe_index);
+		  const unsigned int higher_dof_index
+		    = quad->dof_index (identities[i].second, other_fe_index);
+
+		  Assert ((new_dof_indices[higher_dof_index] ==
+			   deal_II_numbers::invalid_unsigned_int)
+			  ||
+			  (new_dof_indices[higher_dof_index] ==
+			   lower_dof_index),
+			  ExcInternalError());
+		      
+		  new_dof_indices[higher_dof_index] = lower_dof_index;
+		}
+	    }
+	}
+  }
+  
+  
+
+  
+  template <int dim>
   void DoFHandler<dim>::distribute_dofs (const hp::FECollection<dim> &ff)
   {
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
@@ -2127,166 +2461,22 @@ namespace hp
 				     // Step 2: identify certain dofs
 				     // if the finite element tells us
 				     // that they should have the same
-				     // value
+				     // value. only pertinent for
+				     // faces and other
+				     // lower-dimensional objects
+				     // where elements come together
     std::vector<unsigned int> new_dof_indices (used_dofs,
 					       deal_II_numbers::invalid_unsigned_int);
-    typedef
-      std::vector<std::pair<unsigned int, unsigned int> > DoFIdentities;
-
-				     // Step 2a: do so for vertices
-    {
-      Table<2,boost::shared_ptr<DoFIdentities> >
-	vertex_dof_identities (finite_elements->size(),
-			       finite_elements->size());
-
-				       // loop over all vertices and
-				       // see which one we need to
-				       // work on
-      for (unsigned int vertex_index=0; vertex_index<vertex_dofs_offsets.size();
-	   ++vertex_index)
-	{
-	  const unsigned int n_active_fe_indices
-	    = n_active_vertex_fe_indices (vertex_index);
-	  if (n_active_fe_indices > 1)
-	    {
-	      const unsigned int
-		first_fe_index = nth_active_vertex_fe_index (vertex_index, 0);
-
-					       // loop over all the
-					       // other FEs with which
-					       // we want to identify
-					       // the DoF indices of
-					       // the first FE of
-	      for (unsigned int f=1; f<n_active_fe_indices; ++f)
-		{
-		  const unsigned int
-		    other_fe_index = nth_active_vertex_fe_index (vertex_index, f);
-
-						   // make sure the
-						   // entry in the
-						   // equivalence
-						   // table exists
-		  if (vertex_dof_identities[first_fe_index][other_fe_index] == 0)
-		    vertex_dof_identities[first_fe_index][other_fe_index]
-		      =
-		      boost::shared_ptr<DoFIdentities>
-		      (new DoFIdentities((*finite_elements)[first_fe_index]
-					 .hp_vertex_dof_identities
-					 ((*finite_elements)[other_fe_index])));
-
-						   // then loop
-						   // through the
-						   // identities we
-						   // have. first get
-						   // the global
-						   // numbers of the
-						   // dofs we want to
-						   // identify and
-						   // make sure they
-						   // are not yet
-						   // constrained to
-						   // anything else,
-						   // except for to
-						   // each other. use
-						   // the rule that we
-						   // will always
-						   // constrain the
-						   // dof with the
-						   // higher fe
-						   // index to the
-						   // one with the
-						   // lower, to avoid
-						   // circular
-						   // reasoning.
-		  DoFIdentities &identities
-		    = *vertex_dof_identities[first_fe_index][other_fe_index];
-		  for (unsigned int i=0; i<identities.size(); ++i)
-		    {
-		      const unsigned int lower_dof_index
-			= get_vertex_dof_index (vertex_index,
-						first_fe_index,
-						identities[i].first);
-		      const unsigned int higher_dof_index
-			= get_vertex_dof_index (vertex_index,
-						other_fe_index,
-						identities[i].second);
-
-		      Assert ((new_dof_indices[higher_dof_index] ==
-			       deal_II_numbers::invalid_unsigned_int)
-			      ||
-			      (new_dof_indices[higher_dof_index] ==
-			       lower_dof_index),
-			      ExcInternalError());
-		      
-		      new_dof_indices[higher_dof_index] = lower_dof_index;
-		    }
-		}
-	    }
-	}
-    }
-
-				     // step 2b: eliminate dofs on
-				     // lines. this is only pertinent
-				     // in 2d and higher. the code's
-				     // logic is essentially as for
-				     // vertices, so comments are
-				     // omitted
-    if (dim > 1)
-      {
-	Table<2,boost::shared_ptr<DoFIdentities> >
-	  line_dof_identities (finite_elements->size(),
-			       finite_elements->size());
-	
-	for (line_iterator line=begin_line(); line!=end_line(); ++line)
-	  if (line->n_active_fe_indices() > 1)
-	    {
-	      const unsigned int n_active_fe_indices
-		= line->n_active_fe_indices ();
-	      const unsigned int
-		first_fe_index = line->nth_active_fe_index (0);
-
-	      for (unsigned int f=1; f<n_active_fe_indices; ++f)
-		{
-		  const unsigned int
-		    other_fe_index = line->nth_active_fe_index (f);
-
-		  if (line_dof_identities[first_fe_index][other_fe_index] == 0)
-		    line_dof_identities[first_fe_index][other_fe_index]
-		      =
-		      boost::shared_ptr<DoFIdentities>
-		      (new DoFIdentities((*finite_elements)[first_fe_index]
-					 .hp_line_dof_identities
-					 ((*finite_elements)[other_fe_index])));
-
-		  DoFIdentities &identities
-		    = *line_dof_identities[first_fe_index][other_fe_index];
-		  for (unsigned int i=0; i<identities.size(); ++i)
-		    {
-		      const unsigned int lower_dof_index
-			= line->dof_index (identities[i].first, first_fe_index);
-		      const unsigned int higher_dof_index
-			= line->dof_index (identities[i].second, other_fe_index);
-
-		      Assert ((new_dof_indices[higher_dof_index] ==
-			       deal_II_numbers::invalid_unsigned_int)
-			      ||
-			      (new_dof_indices[higher_dof_index] ==
-			       lower_dof_index),
-			      ExcInternalError());
-		      
-		      new_dof_indices[higher_dof_index] = lower_dof_index;
-		    }
-		}
-	    }
-      }
-    
+    compute_vertex_dof_identities (new_dof_indices);
+    compute_line_dof_identities (new_dof_indices);
+//    compute_quad_dof_identities (new_dof_indices);
     
                                      // finally restore the user flags
     const_cast<Triangulation<dim> &>(*tria).load_user_flags(user_flags);
   }
 
 
-  
+
   template <int dim>
   void DoFHandler<dim>::clear ()
   {
@@ -2603,6 +2793,7 @@ namespace hp
           if (*i != invalid_dof_index)
             *i = new_numbers[*i];
       }
+    
     for (std::vector<unsigned int>::iterator i=faces->lines.dofs.begin();
 	 i!=faces->lines.dofs.end(); ++i)
       if (*i != invalid_dof_index)
@@ -2610,8 +2801,7 @@ namespace hp
     for (std::vector<unsigned int>::iterator i=faces->quads.dofs.begin();
 	 i!=faces->quads.dofs.end(); ++i)
       if (*i != invalid_dof_index)
-	*i = new_numbers[*i];
-    
+	*i = new_numbers[*i];    
   }
 
 #endif
