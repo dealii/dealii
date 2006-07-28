@@ -12,7 +12,7 @@
 //----------------------------  step-3a.cc  ---------------------------
 
 
-// a variant of the hp-ified version of step-3a where we assign
+// a variant of the hp-ified version of step-3 where we assign
 // different fe_indices in a symmetric way. the solution should be
 // symmetric as well, and in fact is
 
