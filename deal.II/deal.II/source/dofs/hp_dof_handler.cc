@@ -2450,8 +2450,6 @@ namespace hp
     compute_line_dof_identities (constrained_indices);
     compute_quad_dof_identities (constrained_indices);
 
-    const unsigned int used_dofs_before = used_dofs;
-
 				     // loop over all dofs and assign
 				     // new numbers to those which are
 				     // not constrained
