@@ -336,7 +336,7 @@ void ElasticProblem<dim>::refine_grid ()
 
   typename FunctionMap<dim>::type neumann_boundary;
   KellyErrorEstimator<dim>::estimate (dof_handler,
-				      hp::QCollection<dim-1>(QGauss<dim-1>(2)),
+				      QGauss<dim-1>(2),
 				      neumann_boundary,
 				      solution,
 				      estimated_error_per_cell);
@@ -358,7 +358,6 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
   Assert (cycle < 10, ExcInternalError());
   
   filename += ".gmv";
-  std::ofstream output (filename.c_str());
 
   DataOut<dim,hp::DoFHandler<dim> > data_out;
   data_out.attach_dof_handler (dof_handler);
@@ -386,7 +385,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
 	     
   data_out.add_data_vector (solution, solution_names);
   data_out.build_patches ();
-  data_out.write_gmv (output);
+  data_out.write_gmv (deallog.get_file_stream());
 }
 
 

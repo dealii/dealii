@@ -288,7 +288,7 @@ void LaplaceProblem<dim>::refine_grid ()
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
   KellyErrorEstimator<dim>::estimate (dof_handler,
-				      hp::QCollection<dim-1>(QGauss<dim-1>(3)),
+				      QGauss<dim-1>(3),
 				      typename FunctionMap<dim>::type(),
 				      solution,
 				      estimated_error_per_cell);
@@ -305,16 +305,17 @@ void LaplaceProblem<dim>::refine_grid ()
 template <int dim>
 void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
+  if (cycle%3 != 0)
+    return;
+  
   Assert (cycle < 10, ExcNotImplemented());
 
   std::string filename = "grid-";
   filename += ('0' + cycle);
   filename += ".eps";
   
-  std::ofstream output (filename.c_str());
-
   GridOut grid_out;
-  grid_out.write_eps (triangulation, output);
+  grid_out.write_eps (triangulation, deallog.get_file_stream());
 }
 
 
@@ -365,8 +366,7 @@ void LaplaceProblem<dim>::run ()
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
   
-  std::ofstream output ("final-solution.eps");
-  data_out.write_eps (output);
+  data_out.write_eps (deallog.get_file_stream());
 }
 
 

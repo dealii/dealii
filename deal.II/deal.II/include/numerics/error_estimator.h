@@ -18,12 +18,14 @@
 #include <base/exceptions.h>
 #include <base/function.h>
 #include <base/multithread_info.h>
-#include <dofs/dof_handler.h>
 #include <map>
 
 
+template <int> class DoFHandler;
+
 namespace hp
 {
+  template <int> class DoFHandler;
   template <int> class QCollection;
   template <int> class MappingCollection;
   template <int dim> class FEFaceValues;
@@ -302,9 +304,9 @@ class KellyErrorEstimator
 				      * cells with this particular material
 				      * id.
 				      */
-    template <typename InputVector>
+    template <typename InputVector, class DH>
     static void estimate (const Mapping<dim>      &mapping,
-			  const DoFHandler<dim>   &dof,
+			  const DH                &dof,
 			  const Quadrature<dim-1> &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
 			  const InputVector       &solution,
@@ -320,8 +322,8 @@ class KellyErrorEstimator
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */    
-    template <typename InputVector>
-    static void estimate (const DoFHandler<dim>   &dof,
+    template <typename InputVector, class DH>
+    static void estimate (const DH                &dof,
 			  const Quadrature<dim-1> &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
 			  const InputVector       &solution,
@@ -359,9 +361,9 @@ class KellyErrorEstimator
 				      * references, so we had to use a
 				      * vector of pointers.)
 				      */
-    template <typename InputVector>
+    template <typename InputVector, class DH>
     static void estimate (const Mapping<dim>          &mapping,
-			  const DoFHandler<dim>       &dof,
+			  const DH                    &dof,
 			  const Quadrature<dim-1>     &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
 			  const std::vector<const InputVector *> &solutions,
@@ -377,8 +379,8 @@ class KellyErrorEstimator
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
-    template <typename InputVector>
-    static void estimate (const DoFHandler<dim>       &dof,
+    template <typename InputVector, class DH>
+    static void estimate (const DH                    &dof,
 			  const Quadrature<dim-1>     &quadrature,
 			  const typename FunctionMap<dim>::type &neumann_bc,
 			  const std::vector<const InputVector *> &solutions,
@@ -434,19 +436,14 @@ class KellyErrorEstimator
 				      * general documentation of this
 				      * class for more information.
 				      */
-    typedef
-    typename std::map<typename DoFHandler<dim>::face_iterator,std::vector<double> >
-    FaceIntegrals;
-
-
-				     /**
-				      * Redeclare an active cell iterator.
-				      * This is simply for convenience.
-				      */
-    typedef
-    typename DoFHandler<dim>::active_cell_iterator
-    active_cell_iterator;
-
+    template <class DH>
+    struct FaceIntegrals 
+    {
+      typedef
+      std::map<typename DH::face_iterator,std::vector<double> >
+      type;
+    };
+    
 
 				     /**
 				      * All small temporary data
@@ -598,16 +595,16 @@ class KellyErrorEstimator
 				      * dimension is implemented
 				      * seperatly.
 				      */
-    template <typename InputVector>
+    template <typename InputVector, class DH>
     static void estimate_some (const hp::MappingCollection<dim>    &mapping,
-                               const DoFHandler<dim>               &dof_handler,
+                               const DH                            &dof_handler,
                                const hp::QCollection<dim-1>         &quadrature,
                                const typename FunctionMap<dim>::type &neumann_bc,
                                const std::vector<const InputVector *> &solutions,
                                const std::vector<bool>                  &component_mask,
                                const Function<dim>                 *coefficients,
                                const std::pair<unsigned int, unsigned int> this_thread,
-                               FaceIntegrals                       &face_integrals,
+                               typename FaceIntegrals<DH>::type    &face_integrals,
                                PerThreadData                       &per_thread_data);
     				
 				     /**
@@ -630,18 +627,18 @@ class KellyErrorEstimator
 				      * ending up with a function of
 				      * 500 lines of code.
 				      */
-    template <typename InputVector>
+    template <typename InputVector, class DH>
     static
     void
-    integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
+    integrate_over_regular_face (const DH                             &dof_handler,
                                  const hp::QCollection<dim-1>         &quadrature,
                                  const typename FunctionMap<dim>::type &neumann_bc,
                                  const std::vector<const InputVector *> &solutions,
                                  const std::vector<bool>                  &component_mask,
                                  const Function<dim>                 *coefficients,
-                                 FaceIntegrals                       &face_integrals,
+                                 typename FaceIntegrals<DH>::type    &face_integrals,
                                  PerThreadData              &per_thread_data,
-                                 const active_cell_iterator &cell,
+                                 const typename DH::active_cell_iterator &cell,
                                  const unsigned int          face_no,
                                  hp::FEFaceValues<dim>          &fe_face_values_cell,
                                  hp::FEFaceValues<dim>          &fe_face_values_neighbor);
@@ -657,17 +654,17 @@ class KellyErrorEstimator
 				      * integration is a bit more
 				      * complex.
 				      */
-    template <typename InputVector>
+    template <typename InputVector, class DH>
     static
     void
-    integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
+    integrate_over_irregular_face (const DH                             &dof_handler,
                                    const hp::QCollection<dim-1>         &quadrature,
                                    const std::vector<const InputVector *> &solutions,
                                    const std::vector<bool>                  &component_mask,
                                    const Function<dim>                 *coefficients,
-                                   FaceIntegrals                       &face_integrals,
+                                   typename FaceIntegrals<DH>::type    &face_integrals,
                                    PerThreadData              &per_thread_data,
-                                   const active_cell_iterator &cell,
+                                   const typename DH::active_cell_iterator &cell,
                                    const unsigned int          face_no,
                                    hp::FEFaceValues<dim>          &fe_face_values,
                                    hp::FESubfaceValues<dim>       &fe_subface_values);
@@ -752,9 +749,9 @@ class KellyErrorEstimator<1>
 				      * with the function signature in the
 				      * general case.
 				      */
-    template <typename InputVector>
+    template <typename InputVector, class DH>
     static void estimate (const Mapping<1>      &mapping,
-			  const DoFHandler<1>   &dof,
+			  const DH   &dof,
 			  const Quadrature<0> &quadrature,
 			  const FunctionMap<1>::type &neumann_bc,
 			  const InputVector       &solution,
@@ -770,8 +767,8 @@ class KellyErrorEstimator<1>
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1<1>()</tt>.
 				      */    
-    template <typename InputVector>
-    static void estimate (const DoFHandler<1>   &dof,
+    template <typename InputVector, class DH>
+    static void estimate (const DH   &dof,
 			  const Quadrature<0> &quadrature,
 			  const FunctionMap<1>::type &neumann_bc,
 			  const InputVector       &solution,
@@ -809,9 +806,9 @@ class KellyErrorEstimator<1>
 				      * references, so we had to use a
 				      * vector of pointers.)
 				      */
-    template <typename InputVector>
+    template <typename InputVector, class DH>
     static void estimate (const Mapping<1>          &mapping,
-			  const DoFHandler<1>       &dof,
+			  const DH       &dof,
 			  const Quadrature<0>     &quadrature,
 			  const FunctionMap<1>::type &neumann_bc,
 			  const std::vector<const InputVector *> &solutions,
@@ -827,8 +824,8 @@ class KellyErrorEstimator<1>
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1<1>()</tt>.
 				      */
-    template <typename InputVector>
-    static void estimate (const DoFHandler<1>       &dof,
+    template <typename InputVector, class DH>
+    static void estimate (const DH       &dof,
 			  const Quadrature<0>     &quadrature,
 			  const FunctionMap<1>::type &neumann_bc,
 			  const std::vector<const InputVector *> &solutions,

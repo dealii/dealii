@@ -67,11 +67,11 @@ void advance_by_n (CellIterator &cell,
 #if deal_II_dimension == 1
 
 
-template <typename InputVector>
+template <typename InputVector, class DH>
 void
 KellyErrorEstimator<1>::
 estimate (const Mapping<1>      &mapping,
-          const DoFHandler<1>   &dof_handler,
+          const DH   &dof_handler,
           const Quadrature<0> &quadrature,
           const FunctionMap<1>::type &neumann_bc,
           const InputVector       &solution,
@@ -90,10 +90,10 @@ estimate (const Mapping<1>      &mapping,
 }
 
 
-template <typename InputVector>
+template <typename InputVector, class DH>
 void
 KellyErrorEstimator<1>::
-estimate (const DoFHandler<1>   &dof_handler,
+estimate (const DH   &dof_handler,
           const Quadrature<0> &quadrature,
           const FunctionMap<1>::type &neumann_bc,
           const InputVector       &solution,
@@ -111,10 +111,10 @@ estimate (const DoFHandler<1>   &dof_handler,
 
 
 
-template <typename InputVector>
+template <typename InputVector, class DH>
 void
 KellyErrorEstimator<1>::
-estimate (const DoFHandler<1>   &dof_handler,
+estimate (const DH   &dof_handler,
           const Quadrature<0> &quadrature,
           const FunctionMap<1>::type &neumann_bc,
           const std::vector<const InputVector*> &solutions,
@@ -132,10 +132,10 @@ estimate (const DoFHandler<1>   &dof_handler,
 
 
 
-template <typename InputVector>
+template <typename InputVector, class DH>
 void KellyErrorEstimator<1>::
 estimate (const Mapping<1>                    &mapping,
-          const DoFHandler<1>                 &dof_handler,
+          const DH                 &dof_handler,
           const Quadrature<0>                 &,
           const FunctionMap<1>::type          &neumann_bc,
           const std::vector<const InputVector *> &solutions,
@@ -225,16 +225,23 @@ estimate (const Mapping<1>                    &mapping,
     for (unsigned int c=0; c<n_components; ++c)
       coefficient_values(c) = 1;
   
-  QTrapez<1> quadrature;
-  FEValues<1> fe_values (mapping, dof_handler.get_fe(), quadrature,
-                         update_gradients);
+  const QTrapez<1> quadrature;
+  const hp::QCollection<1> q_collection(quadrature);
+
+  const hp::FECollection<1> fe (dof_handler.get_fe());
+
+  hp::MappingCollection<1> mapping_collection;
+  mapping_collection.push_back (mapping);
+  
+  hp::FEValues<1> fe_values (mapping_collection, fe, q_collection,
+			     update_gradients);
   
 				   // loop over all cells and do something on
 				   // the cells which we're told to work
 				   // on. note that the error indicator is
 				   // only a sum over the two contributions
 				   // from the two vertices of each cell.
-  DoFHandler<1>::active_cell_iterator cell = dof_handler.begin_active();
+  typename DH::active_cell_iterator cell = dof_handler.begin_active();
   for (unsigned int cell_index=0; cell != dof_handler.end();
        ++cell, ++cell_index)
     if (((subdomain_id == deal_II_numbers::invalid_unsigned_int)
@@ -255,7 +262,7 @@ estimate (const Mapping<1>                    &mapping,
           {
                                              // find left or right active
                                              // neighbor
-            DoFHandler<1>::cell_iterator neighbor = cell->neighbor(n);
+            typename DH::cell_iterator neighbor = cell->neighbor(n);
             if (neighbor.state() == IteratorState::valid)
               while (neighbor->has_children())
                 neighbor = neighbor->child(n==0 ? 1 : 0);
@@ -265,15 +272,17 @@ estimate (const Mapping<1>                    &mapping,
             fe_values.reinit (cell);
 
             for (unsigned int s=0; s<n_solution_vectors; ++s)
-              fe_values.get_function_grads (*solutions[s], gradients_here[s]);
+              fe_values.get_present_fe_values()
+		.get_function_grads (*solutions[s], gradients_here[s]);
 
             if (neighbor.state() == IteratorState::valid)
               {
                 fe_values.reinit (neighbor);
 
                 for (unsigned int s=0; s<n_solution_vectors; ++s)
-                  fe_values.get_function_grads (*solutions[s],
-                                                gradients_neighbor[s]);
+                  fe_values.get_present_fe_values()
+		    .get_function_grads (*solutions[s],
+					 gradients_neighbor[s]);
 
                                                  // extract the
                                                  // gradients of all the
@@ -408,11 +417,11 @@ PerThreadData (const unsigned int n_solution_vectors,
 // the following function is still independent of dimension, but it
 // calls dimension dependent functions
 template <int dim>
-template <typename InputVector>
+template <typename InputVector, class DH>
 void
 KellyErrorEstimator<dim>::
 estimate (const Mapping<dim>      &mapping,
-          const DoFHandler<dim>   &dof_handler,
+          const DH                &dof_handler,
           const Quadrature<dim-1> &quadrature,
           const typename FunctionMap<dim>::type &neumann_bc,
           const InputVector       &solution,
@@ -432,10 +441,10 @@ estimate (const Mapping<dim>      &mapping,
 
 
 template <int dim>
-template <typename InputVector>
+template <typename InputVector, class DH>
 void
 KellyErrorEstimator<dim>::
-estimate (const DoFHandler<dim>   &dof_handler,
+estimate (const DH                &dof_handler,
           const Quadrature<dim-1> &quadrature,
           const typename FunctionMap<dim>::type &neumann_bc,
           const InputVector       &solution,
@@ -456,17 +465,17 @@ estimate (const DoFHandler<dim>   &dof_handler,
 
 
 template <int dim>
-template <typename InputVector>
+template <typename InputVector, class DH>
 void KellyErrorEstimator<dim>::
 estimate_some (const hp::MappingCollection<dim>                  &mapping,
-               const DoFHandler<dim>               &dof_handler,
+               const DH                                 &dof_handler,
                const hp::QCollection<dim-1>             &quadrature,
                const typename FunctionMap<dim>::type &neumann_bc,
                const std::vector<const InputVector *> &solutions,
                const std::vector<bool>                  &component_mask,
                const Function<dim>                 *coefficients,
                const std::pair<unsigned int, unsigned int> this_thread,
-               FaceIntegrals                       &face_integrals,
+               typename FaceIntegrals<DH>::type                       &face_integrals,
                PerThreadData                       &per_thread_data)
 {
   const unsigned int n_solution_vectors = solutions.size();
@@ -513,7 +522,7 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
 					      update_gradients);
 
 
-  active_cell_iterator cell = dof_handler.begin_active();
+  typename DH::active_cell_iterator cell = dof_handler.begin_active();
 
 				   // calculate the start cell for
 				   // this thread. note that this way
@@ -545,7 +554,7 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
       for (unsigned int face_no=0;
            face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	{
-	  const typename DoFHandler<dim>::face_iterator
+	  const typename DH::face_iterator
 	    face=cell->face(face_no);
 
 					   // make sure we do work
@@ -710,11 +719,11 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
 
 
 template <int dim>
-template <typename InputVector>
+template <typename InputVector, class DH>
 void
 KellyErrorEstimator<dim>::
 estimate (const Mapping<dim>                  &mapping,
-          const DoFHandler<dim>               &dof_handler,
+          const DH                            &dof_handler,
           const Quadrature<dim-1>             &quadrature,
           const typename FunctionMap<dim>::type &neumann_bc,
           const std::vector<const InputVector *> &solutions,
@@ -790,8 +799,8 @@ estimate (const Mapping<dim>                  &mapping,
   const double invalid_double = -10e20;
   std::vector<double> default_face_integrals (n_solution_vectors,
                                               invalid_double);
-  FaceIntegrals face_integrals;
-  for (active_cell_iterator cell=dof_handler.begin_active();
+  typename FaceIntegrals<DH>::type face_integrals;
+  for (typename DH::active_cell_iterator cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)
     for (unsigned int face_no=0;
          face_no<GeometryInfo<dim>::faces_per_cell;
@@ -823,16 +832,16 @@ estimate (const Mapping<dim>                  &mapping,
 				   // icc7
   Threads::ThreadGroup<> threads;
   void (*estimate_some_ptr) (const hp::MappingCollection<dim>                  &,
-			     const DoFHandler<dim>               &,
+			     const DH               &,
 			     const hp::QCollection<dim-1>             &,
 			     const typename FunctionMap<dim>::type &,
 			     const std::vector<const InputVector *> &,
 			     const std::vector<bool>               &,
 			     const Function<dim>                 *,
 			     const std::pair<unsigned int, unsigned int>,
-			     FaceIntegrals                       &,
+			     typename FaceIntegrals<DH>::type                       &,
 			     PerThreadData                       &)
-    = &KellyErrorEstimator<dim>::template estimate_some<InputVector>;
+    = &KellyErrorEstimator<dim>::template estimate_some<InputVector,DH>;
 
   hp::MappingCollection<dim> mapping_collection;
   mapping_collection.push_back (mapping);
@@ -879,7 +888,7 @@ estimate (const Mapping<dim>                  &mapping,
                                    // information from the faces. only do
                                    // something if this is a cell we care for
                                    // based on the subdomain id
-  for (active_cell_iterator cell=dof_handler.begin_active();
+  for (typename DH::active_cell_iterator cell=dof_handler.begin_active();
        cell!=dof_handler.end();
        ++cell, ++present_cell)
     if ( ((subdomain_id == deal_II_numbers::invalid_unsigned_int)
@@ -919,8 +928,8 @@ estimate (const Mapping<dim>                  &mapping,
 
 
 template <int dim>
-template <typename InputVector>
-void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &dof_handler,
+template <typename InputVector, class DH>
+void KellyErrorEstimator<dim>::estimate (const DH                            &dof_handler,
 					 const Quadrature<dim-1>             &quadrature,
 					 const typename FunctionMap<dim>::type &neumann_bc,
 					 const std::vector<const InputVector *> &solutions,
@@ -940,22 +949,22 @@ void KellyErrorEstimator<dim>::estimate (const DoFHandler<dim>               &do
 
 
 template <int dim>
-template <typename InputVector>
+template <typename InputVector, class DH>
 void KellyErrorEstimator<dim>::
-integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
+integrate_over_regular_face (const DH                                 &dof_handler,
                              const hp::QCollection<dim-1>             &quadrature,
                              const typename FunctionMap<dim>::type &neumann_bc,
                              const std::vector<const InputVector *> &solutions,
                              const std::vector<bool>                  &component_mask,
                              const Function<dim>                 *coefficients,
-                             FaceIntegrals                       &face_integrals,
+                             typename FaceIntegrals<DH>::type                       &face_integrals,
                              PerThreadData              &per_thread_data,
-			     const active_cell_iterator &cell,
+			     const typename DH::active_cell_iterator &cell,
 			     const unsigned int          face_no,
 			     hp::FEFaceValues<dim>          &fe_face_values_cell,
 			     hp::FEFaceValues<dim>          &fe_face_values_neighbor)
 {
-  const typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
+  const typename DH::face_iterator face = cell->face(face_no);
   const unsigned int n_q_points         = quadrature[cell->active_fe_index()].n_quadrature_points,
 		     n_components       = dof_handler.get_fe().n_components(),
 		     n_solution_vectors = solutions.size();
@@ -980,7 +989,7 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
       Assert (cell->neighbor(face_no).state() == IteratorState::valid,
 	      ExcInternalError());      
       
-      const active_cell_iterator neighbor = cell->neighbor(face_no);
+      const typename DH::active_cell_iterator neighbor = cell->neighbor(face_no);
       
 				       // find which number the
 				       // current face has relative to
@@ -1142,25 +1151,25 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
 
 
 template <int dim>
-template <typename InputVector>
+template <typename InputVector, class DH>
 void KellyErrorEstimator<dim>::
-integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
+integrate_over_irregular_face (const DH                                 &dof_handler,
                                const hp::QCollection<dim-1>             &quadrature,
                                const std::vector<const InputVector *> &solutions,
                                const std::vector<bool>                  &component_mask,
                                const Function<dim>                 *coefficients,
-                               FaceIntegrals                       &face_integrals,
+                               typename FaceIntegrals<DH>::type                       &face_integrals,
                                PerThreadData              &per_thread_data,
-			       const active_cell_iterator &cell,
+			       const typename DH::active_cell_iterator &cell,
 			       const unsigned int          face_no,
 			       hp::FEFaceValues<dim>          &fe_face_values,
 			       hp::FESubfaceValues<dim>       &fe_subface_values)
 {
-  const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
+  const typename DH::cell_iterator neighbor = cell->neighbor(face_no);
   const unsigned int n_q_points         = quadrature[cell->active_fe_index()].n_quadrature_points,
 		     n_components       = dof_handler.get_fe().n_components(),
 		     n_solution_vectors = solutions.size();
-  const typename DoFHandler<dim>::face_iterator
+  const typename DH::face_iterator
     face=cell->face(face_no);
 
   Assert (neighbor.state() == IteratorState::valid, ExcInternalError());
@@ -1190,7 +1199,7 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
     {
 				       // get an iterator pointing to the
 				       // cell behind the present subface
-      const active_cell_iterator neighbor_child
+      const typename DH::active_cell_iterator neighbor_child
         = cell->neighbor_child_on_subface (face_no, subface_no);
       Assert (!neighbor_child->has_children(),
 	      ExcInternalError());
@@ -1345,12 +1354,12 @@ template class KellyErrorEstimator<deal_II_dimension>;
 // variable VectorType/MatrixType. note that we need a space between
 // "VectorType" and ">" to disambiguate ">>" when VectorType trails in an
 // angle bracket
-#define INSTANTIATE(InputVector) \
+#define INSTANTIATE(InputVector,DH) \
 template    \
 void    \
 KellyErrorEstimator<deal_II_dimension>::    \
-estimate<InputVector > (const Mapping<deal_II_dimension>      &,    \
-          const DoFHandler<deal_II_dimension>   &,    \
+estimate<InputVector,DH > (const Mapping<deal_II_dimension>      &,    \
+          const DH   &,    \
           const Quadrature<deal_II_dimension-1> &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
           const InputVector       &,    \
@@ -1364,7 +1373,7 @@ estimate<InputVector > (const Mapping<deal_II_dimension>      &,    \
 template    \
 void    \
 KellyErrorEstimator<deal_II_dimension>::    \
-estimate<InputVector > (const DoFHandler<deal_II_dimension>   &,    \
+estimate<InputVector,DH > (const DH   &,    \
           const Quadrature<deal_II_dimension-1> &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
           const InputVector       &,    \
@@ -1378,8 +1387,8 @@ estimate<InputVector > (const DoFHandler<deal_II_dimension>   &,    \
 template    \
 void    \
 KellyErrorEstimator<deal_II_dimension>::    \
-estimate<InputVector > (const Mapping<deal_II_dimension>          &,    \
-          const DoFHandler<deal_II_dimension>       &,    \
+estimate<InputVector,DH > (const Mapping<deal_II_dimension>          &,    \
+          const DH       &,    \
           const Quadrature<deal_II_dimension-1>     &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
           const std::vector<const InputVector *> &,    \
@@ -1393,7 +1402,7 @@ estimate<InputVector > (const Mapping<deal_II_dimension>          &,    \
 template    \
 void    \
 KellyErrorEstimator<deal_II_dimension>::    \
-estimate<InputVector > (const DoFHandler<deal_II_dimension>       &,    \
+estimate<InputVector,DH > (const DH       &,    \
           const Quadrature<deal_II_dimension-1>     &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
           const std::vector<const InputVector *> &,    \
@@ -1404,12 +1413,20 @@ estimate<InputVector > (const DoFHandler<deal_II_dimension>       &,    \
           const unsigned int           , \
           const unsigned int)
 
-INSTANTIATE(Vector<double>);
-INSTANTIATE(Vector<float>);
-INSTANTIATE(BlockVector<double>);
-INSTANTIATE(BlockVector<float>);
+INSTANTIATE(Vector<double>,DoFHandler<deal_II_dimension>);
+INSTANTIATE(Vector<float>,DoFHandler<deal_II_dimension>);
+INSTANTIATE(BlockVector<double>,DoFHandler<deal_II_dimension>);
+INSTANTIATE(BlockVector<float>,DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(Vector<double>,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(Vector<float>,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(BlockVector<double>,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(BlockVector<float>,hp::DoFHandler<deal_II_dimension>);
 
 #ifdef DEAL_II_USE_PETSC
-INSTANTIATE(PETScWrappers::Vector);
-INSTANTIATE(PETScWrappers::BlockVector);
+INSTANTIATE(PETScWrappers::Vector,DoFHandler<deal_II_dimension>);
+INSTANTIATE(PETScWrappers::BlockVector,DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(PETScWrappers::Vector,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(PETScWrappers::BlockVector,hp::DoFHandler<deal_II_dimension>);
 #endif

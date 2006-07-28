@@ -401,7 +401,7 @@ void HelmholtzProblem<dim>::refine_grid ()
 
 	typename FunctionMap<dim>::type neumann_boundary;
 	KellyErrorEstimator<dim>::estimate (dof_handler,
-					    hp::QCollection<dim-1>(QGauss<dim-1>(3)),
+					    QGauss<dim-1>(3),
 					    neumann_boundary,
 					    solution,
 					    estimated_error_per_cell);
@@ -510,43 +510,45 @@ void HelmholtzProblem<dim>::run ()
       process_solution (cycle);
     }
   
+
+  if (refinement_mode == adaptive_refinement)
+    {
+      std::string gmv_filename;
+      switch (refinement_mode)
+	{
+	  case global_refinement:
+		gmv_filename = "solution-global";
+		break;
+	  case adaptive_refinement:
+		gmv_filename = "solution-adaptive";
+		break;
+	  default:
+		Assert (false, ExcNotImplemented());
+	}
+
+      switch ((*fe)[0].degree)
+	{
+	  case 1:
+		gmv_filename += "-q1";
+		break;
+	  case 2:
+		gmv_filename += "-q2";
+		break;
+
+	  default:
+		Assert (false, ExcNotImplemented());
+	}
+
+      gmv_filename += ".gmv";
+
+      DataOut<dim,hp::DoFHandler<dim> > data_out;
+      data_out.attach_dof_handler (dof_handler);
+      data_out.add_data_vector (solution, "solution");
+
+      data_out.build_patches ((*fe)[0].degree);
+      data_out.write_gmv (deallog.get_file_stream());
+    }
   
-  std::string gmv_filename;
-  switch (refinement_mode)
-    {
-      case global_refinement:
-	    gmv_filename = "solution-global";
-	    break;
-      case adaptive_refinement:
-	    gmv_filename = "solution-adaptive";
-	    break;
-      default:
-	    Assert (false, ExcNotImplemented());
-    }
-
-  switch ((*fe)[0].degree)
-    {
-      case 1:
-	    gmv_filename += "-q1";
-	    break;
-      case 2:
-	    gmv_filename += "-q2";
-	    break;
-
-      default:
-	    Assert (false, ExcNotImplemented());
-    }
-
-  gmv_filename += ".gmv";    
-  std::ofstream output (gmv_filename.c_str());
-
-  DataOut<dim,hp::DoFHandler<dim> > data_out;
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, "solution");
-
-  data_out.build_patches ((*fe)[0].degree);
-  data_out.write_gmv (output);
-
   
   
   convergence_table.set_precision("L2", 3);
@@ -595,9 +597,8 @@ void HelmholtzProblem<dim>::run ()
     }
   
   error_filename += ".tex";
-  std::ofstream error_table_file(error_filename.c_str());
   
-  convergence_table.write_tex(error_table_file);
+  convergence_table.write_tex(deallog.get_file_stream());
 
   
 
@@ -647,8 +648,7 @@ void HelmholtzProblem<dim>::run ()
 	}
       conv_filename += ".tex";
 
-      std::ofstream table_file(conv_filename.c_str());
-      convergence_table.write_tex(table_file);
+      convergence_table.write_tex(deallog.get_file_stream());
     }
 }
 
