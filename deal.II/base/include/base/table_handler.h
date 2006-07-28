@@ -339,7 +339,7 @@ class TableHandler
                                       * file using a command like
                                       * "\input{table_file}".
                                       */
-    void write_tex (std::ofstream &file, const bool with_header=true) const;
+    void write_tex (std::ostream &file, const bool with_header=true) const;
 
     				     /** @addtogroup Exceptions
 				      * @{ */

@@ -337,7 +337,7 @@ void TableHandler::write_text(std::ostream &out) const
 }
 
 
-void TableHandler::write_tex (std::ofstream &out, const bool with_header) const
+void TableHandler::write_tex (std::ostream &out, const bool with_header) const
 {
   AssertThrow (out, ExcIO());
   if (with_header)
