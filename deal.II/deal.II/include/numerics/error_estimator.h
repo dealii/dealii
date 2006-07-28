@@ -18,14 +18,17 @@
 #include <base/exceptions.h>
 #include <base/function.h>
 #include <base/multithread_info.h>
-#include <base/quadrature.h>
 #include <dofs/dof_handler.h>
-#include <fe/mapping.h>
 #include <map>
 
 
-template <int dim> class FEFaceValues;
-template <int dim> class FESubfaceValues;
+namespace hp
+{
+  template <int> class QCollection;
+  template <int> class MappingCollection;
+  template <int dim> class FEFaceValues;
+  template <int dim> class FESubfaceValues;
+}
 
 
 
@@ -332,7 +335,7 @@ class KellyErrorEstimator
 				     /**
 				      * Same function as above, but
 				      * accepts more than one solution
-				      * vectors and returns one error
+				      * vector and returns one error
 				      * vector for each solution
 				      * vector. For the reason of
 				      * existence of this function,
@@ -431,14 +434,18 @@ class KellyErrorEstimator
 				      * general documentation of this
 				      * class for more information.
 				      */
-    typedef typename std::map<typename DoFHandler<dim>::face_iterator,std::vector<double> > FaceIntegrals;
+    typedef
+    typename std::map<typename DoFHandler<dim>::face_iterator,std::vector<double> >
+    FaceIntegrals;
 
 
 				     /**
 				      * Redeclare an active cell iterator.
 				      * This is simply for convenience.
 				      */
-    typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+    typedef
+    typename DoFHandler<dim>::active_cell_iterator
+    active_cell_iterator;
 
 
 				     /**
@@ -592,9 +599,9 @@ class KellyErrorEstimator
 				      * seperatly.
 				      */
     template <typename InputVector>
-    static void estimate_some (const Mapping<dim>                  &mapping,
+    static void estimate_some (const hp::MappingCollection<dim>    &mapping,
                                const DoFHandler<dim>               &dof_handler,
-                               const Quadrature<dim-1>             &quadrature,
+                               const hp::QCollection<dim-1>         &quadrature,
                                const typename FunctionMap<dim>::type &neumann_bc,
                                const std::vector<const InputVector *> &solutions,
                                const std::vector<bool>                  &component_mask,
@@ -627,7 +634,7 @@ class KellyErrorEstimator
     static
     void
     integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
-                                 const Quadrature<dim-1>             &quadrature,
+                                 const hp::QCollection<dim-1>         &quadrature,
                                  const typename FunctionMap<dim>::type &neumann_bc,
                                  const std::vector<const InputVector *> &solutions,
                                  const std::vector<bool>                  &component_mask,
@@ -636,8 +643,8 @@ class KellyErrorEstimator
                                  PerThreadData              &per_thread_data,
                                  const active_cell_iterator &cell,
                                  const unsigned int          face_no,
-                                 FEFaceValues<dim>          &fe_face_values_cell,
-                                 FEFaceValues<dim>          &fe_face_values_neighbor);
+                                 hp::FEFaceValues<dim>          &fe_face_values_cell,
+                                 hp::FEFaceValues<dim>          &fe_face_values_neighbor);
 
 
 				     /**
@@ -654,7 +661,7 @@ class KellyErrorEstimator
     static
     void
     integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
-                                   const Quadrature<dim-1>             &quadrature,
+                                   const hp::QCollection<dim-1>         &quadrature,
                                    const std::vector<const InputVector *> &solutions,
                                    const std::vector<bool>                  &component_mask,
                                    const Function<dim>                 *coefficients,
@@ -662,8 +669,8 @@ class KellyErrorEstimator
                                    PerThreadData              &per_thread_data,
                                    const active_cell_iterator &cell,
                                    const unsigned int          face_no,
-                                   FEFaceValues<dim>          &fe_face_values,
-                                   FESubfaceValues<dim>       &fe_subface_values);
+                                   hp::FEFaceValues<dim>          &fe_face_values,
+                                   hp::FESubfaceValues<dim>       &fe_subface_values);
 
 				     /** 
 				      * By the resolution of Defect

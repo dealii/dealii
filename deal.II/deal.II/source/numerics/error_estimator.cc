@@ -25,8 +25,11 @@
 #include <dofs/dof_accessor.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/hp_fe_values.h>
 #include <fe/fe_update_flags.h>
 #include <fe/mapping_q1.h>
+#include <fe/q_collection.h>
+#include <fe/mapping_collection.h>
 #include <numerics/error_estimator.h>
 
 #include <numeric>
@@ -455,9 +458,9 @@ estimate (const DoFHandler<dim>   &dof_handler,
 template <int dim>
 template <typename InputVector>
 void KellyErrorEstimator<dim>::
-estimate_some (const Mapping<dim>                  &mapping,
+estimate_some (const hp::MappingCollection<dim>                  &mapping,
                const DoFHandler<dim>               &dof_handler,
-               const Quadrature<dim-1>             &quadrature,
+               const hp::QCollection<dim-1>             &quadrature,
                const typename FunctionMap<dim>::type &neumann_bc,
                const std::vector<const InputVector *> &solutions,
                const std::vector<bool>                  &component_mask,
@@ -470,6 +473,8 @@ estimate_some (const Mapping<dim>                  &mapping,
 
   const unsigned int subdomain_id = per_thread_data.subdomain_id;
   const unsigned int material_id  = per_thread_data.material_id;
+
+  const hp::FECollection<dim> fe (dof_handler.get_fe());
   
 				   // make up a fe face values object
 				   // for the restriction of the
@@ -488,24 +493,24 @@ estimate_some (const Mapping<dim>                  &mapping,
                                    // in debug mode, make sure that
                                    // some data matches, so compute
                                    // quadrature points always
-  FEFaceValues<dim> fe_face_values_cell (mapping,
-					 dof_handler.get_fe(),
-					 quadrature,
-                                         UpdateFlags(
-                                           update_gradients      |
-                                           update_JxW_values     |
-                                           ((!neumann_bc.empty() ||
-                                             (coefficients != 0))  ?
-                                            update_q_points : 0) |
-                                           update_normal_vectors));
-  FEFaceValues<dim> fe_face_values_neighbor (mapping,
-					     dof_handler.get_fe(),
+  hp::FEFaceValues<dim> fe_face_values_cell (mapping,
+					     fe,
+					     quadrature,
+					     UpdateFlags(
+					       update_gradients      |
+					       update_JxW_values     |
+					       ((!neumann_bc.empty() ||
+						 (coefficients != 0))  ?
+						update_q_points : 0) |
+					       update_normal_vectors));
+  hp::FEFaceValues<dim> fe_face_values_neighbor (mapping,
+					     fe,
 					     quadrature,
 					     update_gradients);
-  FESubfaceValues<dim> fe_subface_values (mapping,
-					  dof_handler.get_fe(),
-					  quadrature,
-                                          update_gradients);
+  hp::FESubfaceValues<dim> fe_subface_values (mapping,
+					      fe,
+					      quadrature,
+					      update_gradients);
 
 
   active_cell_iterator cell = dof_handler.begin_active();
@@ -817,9 +822,9 @@ estimate (const Mapping<dim>                  &mapping,
 				   // work around another nasty bug in
 				   // icc7
   Threads::ThreadGroup<> threads;
-  void (*estimate_some_ptr) (const Mapping<dim>                  &,
+  void (*estimate_some_ptr) (const hp::MappingCollection<dim>                  &,
 			     const DoFHandler<dim>               &,
-			     const Quadrature<dim-1>             &,
+			     const hp::QCollection<dim-1>             &,
 			     const typename FunctionMap<dim>::type &,
 			     const std::vector<const InputVector *> &,
 			     const std::vector<bool>               &,
@@ -828,11 +833,17 @@ estimate (const Mapping<dim>                  &mapping,
 			     FaceIntegrals                       &,
 			     PerThreadData                       &)
     = &KellyErrorEstimator<dim>::template estimate_some<InputVector>;
+
+  hp::MappingCollection<dim> mapping_collection;
+  mapping_collection.push_back (mapping);
+  
+  hp::QCollection<dim-1> face_quadratures;
+  face_quadratures.push_back (quadrature);
   
   for (unsigned int i=0; i<n_threads; ++i)
     threads += Threads::spawn (estimate_some_ptr)
-               (mapping, dof_handler,
-                quadrature, neumann_bc, solutions,
+               (mapping_collection, dof_handler,
+                face_quadratures, neumann_bc, solutions,
                 component_mask, coefficients,
                 std::make_pair(i, n_threads),
                 face_integrals,
@@ -932,7 +943,7 @@ template <int dim>
 template <typename InputVector>
 void KellyErrorEstimator<dim>::
 integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
-                             const Quadrature<dim-1>             &quadrature,
+                             const hp::QCollection<dim-1>             &quadrature,
                              const typename FunctionMap<dim>::type &neumann_bc,
                              const std::vector<const InputVector *> &solutions,
                              const std::vector<bool>                  &component_mask,
@@ -941,11 +952,11 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
                              PerThreadData              &per_thread_data,
 			     const active_cell_iterator &cell,
 			     const unsigned int          face_no,
-			     FEFaceValues<dim>          &fe_face_values_cell,
-			     FEFaceValues<dim>          &fe_face_values_neighbor)
+			     hp::FEFaceValues<dim>          &fe_face_values_cell,
+			     hp::FEFaceValues<dim>          &fe_face_values_neighbor)
 {
   const typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
-  const unsigned int n_q_points         = quadrature.n_quadrature_points,
+  const unsigned int n_q_points         = quadrature[cell->active_fe_index()].n_quadrature_points,
 		     n_components       = dof_handler.get_fe().n_components(),
 		     n_solution_vectors = solutions.size();
   
@@ -957,7 +968,8 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
 				   // get gradients of the finite element
 				   // function on this cell
   for (unsigned int n=0; n<n_solution_vectors; ++n)
-    fe_face_values_cell.get_function_grads (*solutions[n], per_thread_data.psi[n]);
+    fe_face_values_cell.get_present_fe_values()
+      .get_function_grads (*solutions[n], per_thread_data.psi[n]);
   
 				   // now compute over the other side of
 				   // the face
@@ -986,15 +998,16 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
 				       // get gradients on neighbor cell
       for (unsigned int n=0; n<n_solution_vectors; ++n)
 	{
-	  fe_face_values_neighbor.get_function_grads (*solutions[n],
-						      per_thread_data.neighbor_psi[n]);
+	  fe_face_values_neighbor.get_present_fe_values()
+	    .get_function_grads (*solutions[n],
+				 per_thread_data.neighbor_psi[n]);
       
 					   // compute the jump in the gradients
 	  for (unsigned int component=0; component<n_components; ++component)
 	    for (unsigned int p=0; p<n_q_points; ++p)
 	      per_thread_data.psi[n][p][component] -= per_thread_data.neighbor_psi[n][p][component];
-	};
-    };
+	}
+    }
 
 
 				   // now psi contains the following:
@@ -1014,13 +1027,15 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
 				   // would only change the sign. We take
 				   // the outward normal.
   
-  per_thread_data.normal_vectors=fe_face_values_cell.get_normal_vectors();
+  per_thread_data.normal_vectors =
+    fe_face_values_cell.get_present_fe_values().get_normal_vectors();
   
   for (unsigned int n=0; n<n_solution_vectors; ++n)
     for (unsigned int component=0; component<n_components; ++component)
       for (unsigned int point=0; point<n_q_points; ++point)
-	per_thread_data.phi[n][point][component] = per_thread_data.psi[n][point][component]*
-					per_thread_data.normal_vectors[point];
+	per_thread_data.phi[n][point][component]
+	  = (per_thread_data.psi[n][point][component] *
+	     per_thread_data.normal_vectors[point]);
   
 				   // if a coefficient was given: use that
 				   // to scale the jump in the gradient
@@ -1030,7 +1045,8 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
       if (coefficients->n_components == 1)
 	{
 	  
-	  coefficients->value_list (fe_face_values_cell.get_quadrature_points(),
+	  coefficients->value_list (fe_face_values_cell.get_present_fe_values()
+				    .get_quadrature_points(),
                                     per_thread_data.coefficient_values1);
 	  for (unsigned int n=0; n<n_solution_vectors; ++n)
 	    for (unsigned int component=0; component<n_components; ++component)
@@ -1041,7 +1057,8 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
       else
 					   // vector-valued coefficient
 	{
-	  coefficients->vector_value_list (fe_face_values_cell.get_quadrature_points(),
+	  coefficients->vector_value_list (fe_face_values_cell.get_present_fe_values()
+					   .get_quadrature_points(),
                                            per_thread_data.coefficient_values);
 	  for (unsigned int n=0; n<n_solution_vectors; ++n)
 	    for (unsigned int component=0; component<n_components; ++component)
@@ -1068,7 +1085,8 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
 	{
 	  std::vector<double> g(n_q_points);
 	  neumann_bc.find(boundary_indicator)->second
-	    ->value_list (fe_face_values_cell.get_quadrature_points(), g);
+	    ->value_list (fe_face_values_cell.get_present_fe_values()
+			  .get_quadrature_points(), g);
 	  
 	  for (unsigned int n=0; n<n_solution_vectors; ++n)
 	    for (unsigned int point=0; point<n_q_points; ++point)
@@ -1078,7 +1096,8 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
 	{
 	  std::vector<Vector<double> > g(n_q_points, Vector<double>(n_components));
 	  neumann_bc.find(boundary_indicator)->second
-	    ->vector_value_list (fe_face_values_cell.get_quadrature_points(),
+	    ->vector_value_list (fe_face_values_cell.get_present_fe_values()
+				 .get_quadrature_points(),
 				 g);
 	  
 	  for (unsigned int n=0; n<n_solution_vectors; ++n)
@@ -1097,7 +1116,8 @@ integrate_over_regular_face (const DoFHandler<dim>               &dof_handler,
 				   // mentioned value at one of the
 				   // quadrature points
 
-  per_thread_data.JxW_values = fe_face_values_cell.get_JxW_values();
+  per_thread_data.JxW_values
+    = fe_face_values_cell.get_present_fe_values().get_JxW_values();
   
 				   // take the square of the phi[i]
 				   // for integration, and sum up
@@ -1125,7 +1145,7 @@ template <int dim>
 template <typename InputVector>
 void KellyErrorEstimator<dim>::
 integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
-                               const Quadrature<dim-1>             &quadrature,
+                               const hp::QCollection<dim-1>             &quadrature,
                                const std::vector<const InputVector *> &solutions,
                                const std::vector<bool>                  &component_mask,
                                const Function<dim>                 *coefficients,
@@ -1133,11 +1153,11 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
                                PerThreadData              &per_thread_data,
 			       const active_cell_iterator &cell,
 			       const unsigned int          face_no,
-			       FEFaceValues<dim>          &fe_face_values,
-			       FESubfaceValues<dim>       &fe_subface_values)
+			       hp::FEFaceValues<dim>          &fe_face_values,
+			       hp::FESubfaceValues<dim>       &fe_subface_values)
 {
   const typename DoFHandler<dim>::cell_iterator neighbor = cell->neighbor(face_no);
-  const unsigned int n_q_points         = quadrature.n_quadrature_points,
+  const unsigned int n_q_points         = quadrature[cell->active_fe_index()].n_quadrature_points,
 		     n_components       = dof_handler.get_fe().n_components(),
 		     n_solution_vectors = solutions.size();
   const typename DoFHandler<dim>::face_iterator
@@ -1188,13 +1208,15 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
                                        // store the gradient of the
 				       // solution in psi
       for (unsigned int n=0; n<n_solution_vectors; ++n)
-	fe_subface_values.get_function_grads (*solutions[n], per_thread_data.psi[n]);
+	fe_subface_values.get_present_fe_values()
+	  .get_function_grads (*solutions[n], per_thread_data.psi[n]);
 
                                        // store the gradient from the
 				       // neighbor's side in
 				       // @p{neighbor_psi}
       for (unsigned int n=0; n<n_solution_vectors; ++n)
-	fe_face_values.get_function_grads (*solutions[n], per_thread_data.neighbor_psi[n]);
+	fe_face_values.get_present_fe_values()
+	  .get_function_grads (*solutions[n], per_thread_data.neighbor_psi[n]);
       
 				       // compute the jump in the gradients
       for (unsigned int n=0; n<n_solution_vectors; ++n)
@@ -1222,7 +1244,8 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
 				       //
 				       // let phi be the name of the integrand
      
-      per_thread_data.normal_vectors=fe_face_values.get_normal_vectors();
+      per_thread_data.normal_vectors
+	= fe_face_values.get_present_fe_values().get_normal_vectors();
 
 
       for (unsigned int n=0; n<n_solution_vectors; ++n)
@@ -1238,7 +1261,8 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
 					   // scalar coefficient
 	  if (coefficients->n_components == 1)
 	    {
-	      coefficients->value_list (fe_face_values.get_quadrature_points(),
+	      coefficients->value_list (fe_face_values.get_present_fe_values()
+					.get_quadrature_points(),
                                         per_thread_data.coefficient_values1);
 	      for (unsigned int n=0; n<n_solution_vectors; ++n)
 		for (unsigned int component=0; component<n_components; ++component)
@@ -1249,7 +1273,8 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
 	  else
 					     // vector-valued coefficient
 	    {
-	      coefficients->vector_value_list (fe_face_values.get_quadrature_points(),
+	      coefficients->vector_value_list (fe_face_values.get_present_fe_values()
+					       .get_quadrature_points(),
 						    per_thread_data.coefficient_values);
 	      for (unsigned int n=0; n<n_solution_vectors; ++n)
 		for (unsigned int component=0; component<n_components; ++component)
@@ -1269,7 +1294,8 @@ integrate_over_irregular_face (const DoFHandler<dim>               &dof_handler,
 				       // neighbor cell, while the
 				       // latter is on the refined
 				       // face of the big cell here
-      per_thread_data.JxW_values = fe_face_values.get_JxW_values();
+      per_thread_data.JxW_values
+	= fe_face_values.get_present_fe_values().get_JxW_values();
       
 				       // take the square of the phi[i]
 				       // for integration, and sum up
