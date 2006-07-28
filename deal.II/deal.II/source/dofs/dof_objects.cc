@@ -40,29 +40,16 @@ namespace internal
 		   const unsigned int       fe_index,
 		   const unsigned int       local_index) const
     {
-      unsigned int dofs_per_obj;
-      switch (dim)
-	{
-	  case 1 :
-		dofs_per_obj = dof_handler.get_fe().dofs_per_line;
-		break;
-	  case 2 :
-		dofs_per_obj = dof_handler.get_fe().dofs_per_quad;
-		break;
-	  case 3 :
-		dofs_per_obj = dof_handler.get_fe().dofs_per_hex;
-	}
-
       Assert (fe_index == ::DoFHandler<spacedim>::default_fe_index,
 	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-      Assert (local_index<dofs_per_obj,
-	      ExcIndexRange (local_index, 0, dofs_per_obj));
-      Assert (obj_index * dofs_per_obj+local_index
+      Assert (local_index<dof_handler.get_fe().template n_dofs_per_object<dim>(),
+	      ExcIndexRange (local_index, 0, dof_handler.get_fe().template n_dofs_per_object<dim>()));
+      Assert (obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>()+local_index
 	      <
 	      dofs.size(),
 	      ExcInternalError());
       
-      return dofs[obj_index * dofs_per_obj + local_index];
+      return dofs[obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>() + local_index];
     }
 
     
@@ -77,29 +64,16 @@ namespace internal
 		   const unsigned int       local_index,
 		   const unsigned int       global_index)
     {
-      unsigned int dofs_per_obj;
-      switch (dim)
-	{
-	  case 1 :
-		dofs_per_obj = dof_handler.get_fe().dofs_per_line;
-		break;
-	  case 2 :
-		dofs_per_obj = dof_handler.get_fe().dofs_per_quad;
-		break;
-	  case 3 :
-		dofs_per_obj = dof_handler.get_fe().dofs_per_hex;
-	}
-            
       Assert (fe_index == ::DoFHandler<spacedim>::default_fe_index,
 	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-      Assert (local_index<dofs_per_obj,
-	      ExcIndexRange (local_index, 0, dof_handler.get_fe().dofs_per_line));
-      Assert (obj_index * dofs_per_obj+local_index
+      Assert (local_index<dof_handler.get_fe().template n_dofs_per_object<dim>(),
+	      ExcIndexRange (local_index, 0, dof_handler.get_fe().template n_dofs_per_object<dim>()));
+      Assert (obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>()+local_index
 	      <
 	      dofs.size(),
 	      ExcInternalError());
 
-      dofs[obj_index * dofs_per_obj + local_index] = global_index;
+      dofs[obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>() + local_index] = global_index;
     }
 
 // explicit instantiations
