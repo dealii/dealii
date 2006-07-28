@@ -1560,63 +1560,66 @@ namespace internal
     template <int> class int2type 
     {};
 
-
-    static
-    void
-    filter_constraints (const std::vector<unsigned int> &dofs_mother,
-			const std::vector<unsigned int> &dofs_child,
-			const FullMatrix<double> &face_constraints,
-			ConstraintMatrix &constraints)
+    namespace 
     {
-				       // This method removes zero constraints
-				       // and those, which constrain a DoF which
-				       // was already eliminated in one of the
-				       // previous steps of the hp hanging node
-				       // procedure.
-
-      Assert (face_constraints.m () == dofs_mother.size (),
-	      ExcDimensionMismatch(dofs_mother.size (),
-				   face_constraints.n()));
-      Assert (face_constraints.n () == dofs_child.size (),
-	      ExcDimensionMismatch(dofs_child.size (),
-				   face_constraints.m()));
-
-      const unsigned int n_dofs_mother = dofs_mother.size ();
-      const unsigned int n_dofs_child = dofs_child.size ();      
-
-      Assert (n_dofs_mother <= n_dofs_child,
-	      ExcInternalError ());
       
-      for (unsigned int col=0; col!=n_dofs_child; ++col) 
-	{
-	  bool constrain = true;
+      void
+      filter_constraints (const std::vector<unsigned int> &dofs_mother,
+			  const std::vector<unsigned int> &dofs_child,
+			  const FullMatrix<double> &face_constraints,
+			  ConstraintMatrix &constraints)
+      {
+					 // This method removes zero constraints
+					 // and those, which constrain a DoF which
+					 // was already eliminated in one of the
+					 // previous steps of the hp hanging node
+					 // procedure.
 
-					   // Check if we have a constraint,
-					   // which is already satisfied.
-	  for (unsigned int i=0; i!=n_dofs_mother; ++i)
-	    {
-					       // Check for a value of almost exactly
-					       // 1.0
-	      if (fabs (face_constraints (i,col) - 1.0) < 1.0e-15)
-		constrain = (dofs_mother[i] != dofs_child[col]);  
-	    }
+	Assert (face_constraints.m () == dofs_mother.size (),
+		ExcDimensionMismatch(dofs_mother.size (),
+				     face_constraints.n()));
+	Assert (face_constraints.n () == dofs_child.size (),
+		ExcDimensionMismatch(dofs_child.size (),
+				     face_constraints.m()));
 
-					   // If this constraint is not
-					   // automatically satisfied by
-					   // the previous step of removing
-					   // equivalent DoFs, add this
-					   // constraint.
-	  if (constrain)
-	    { 
-	      constraints.add_line (dofs_child[col]);
-	      for (unsigned int i=0; i!=n_dofs_mother; ++i)
-		constraints.add_entry (dofs_child[col],
-				       dofs_mother[i],
-				       face_constraints (i,col));
-	    }  
-	}      
+	const unsigned int n_dofs_mother = dofs_mother.size ();
+	const unsigned int n_dofs_child = dofs_child.size ();      
+
+	Assert (n_dofs_mother <= n_dofs_child,
+		ExcInternalError ());
+      
+	for (unsigned int col=0; col!=n_dofs_child; ++col) 
+	  {
+	    bool constrain = true;
+
+					     // Check if we have a constraint,
+					     // which is already satisfied.
+	    for (unsigned int i=0; i!=n_dofs_mother; ++i)
+	      {
+						 // Check for a value of almost exactly
+						 // 1.0
+		if (fabs (face_constraints (i,col) - 1.0) < 1.0e-15)
+		  constrain = (dofs_mother[i] != dofs_child[col]);  
+	      }
+
+					     // If this constraint is not
+					     // automatically satisfied by
+					     // the previous step of removing
+					     // equivalent DoFs, add this
+					     // constraint.
+	    if (constrain)
+	      { 
+		constraints.add_line (dofs_child[col]);
+		for (unsigned int i=0; i!=n_dofs_mother; ++i)
+		  constraints.add_entry (dofs_child[col],
+					 dofs_mother[i],
+					 face_constraints (i,col));
+	      }  
+	  }      
+      }
+
     }
-
+    
     
 #if deal_II_dimension == 1
     static
