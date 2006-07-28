@@ -1817,7 +1817,7 @@ namespace internal
       
       std::vector<unsigned int> dofs_on_mother;
       std::vector<unsigned int> dofs_on_children;
-
+      
 				       // loop over all lines; only on
 				       // lines there can be constraints.
 				       // We do so by looping over all
