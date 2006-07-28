@@ -29,28 +29,7 @@ namespace internal
       return (MemoryConsumption::memory_consumption (dofs));
     }
 
-    template <int dim>
-    template <int spacedim>
-    unsigned int
-    DoFObjects<dim>::n_active_fe_indices (const ::DoFHandler<spacedim> &,
-					  const unsigned) const
-    {
-      return 1;
-    }
-    
 
-    template <int dim>
-    template <int spacedim>
-    bool
-    DoFObjects<dim>::fe_index_is_active (const ::DoFHandler<spacedim> &,
-					 const unsigned int,
-					 const unsigned int fe_index) const
-    {
-      Assert (fe_index == 0,
-              ExcMessage ("Only zero fe_index values are allowed for "
-                          "non-hp DoFHandlers."));
-      return true;
-    }
 
     template <int dim>
     template <int spacedim>
@@ -86,6 +65,7 @@ namespace internal
       return dofs[obj_index * dofs_per_obj + local_index];
     }
 
+    
 
     template <int dim>
     template <int spacedim>
@@ -143,19 +123,6 @@ namespace internal
 		   const unsigned int       local_index,
 		   const unsigned int       global_index);
 
-    template 
-    unsigned int
-    DoFObjects<1>::
-    n_active_fe_indices (const ::DoFHandler<deal_II_dimension> &,
-			 const unsigned) const;
-
-    template
-    bool
-    DoFObjects<1>::
-    fe_index_is_active (const ::DoFHandler<deal_II_dimension> &,
-			const unsigned int,
-			const unsigned int fe_index) const;
-
 #if deal_II_dimension >= 2
 
     template class DoFObjects<2>;
@@ -177,19 +144,6 @@ namespace internal
 		   const unsigned int       local_index,
 		   const unsigned int       global_index);
 
-    template 
-    unsigned int
-    DoFObjects<2>::
-    n_active_fe_indices (const ::DoFHandler<deal_II_dimension> &,
-			 const unsigned) const;
-
-    template
-    bool
-    DoFObjects<2>::
-    fe_index_is_active (const ::DoFHandler<deal_II_dimension> &,
-			const unsigned int,
-			const unsigned int fe_index) const;
-    
 #endif
 
 #if deal_II_dimension >= 3
@@ -212,19 +166,6 @@ namespace internal
 		   const unsigned int       fe_index,
 		   const unsigned int       local_index,
 		   const unsigned int       global_index);
-
-    template 
-    unsigned int
-    DoFObjects<3>::
-    n_active_fe_indices (const ::DoFHandler<deal_II_dimension> &,
-			 const unsigned) const;
-
-    template
-    bool
-    DoFObjects<3>::
-    fe_index_is_active (const ::DoFHandler<deal_II_dimension> &,
-			const unsigned int,
-			const unsigned int fe_index) const;
 
 #endif
 

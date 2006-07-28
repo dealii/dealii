@@ -175,6 +175,36 @@ namespace internal
 	template <int> friend class DoFFaces;	
     };
 
+
+// --------------------- template and inline functions ------------------
+
+    template <int dim>
+    template <int spacedim>
+    inline
+    unsigned int
+    DoFObjects<dim>::n_active_fe_indices (const ::DoFHandler<spacedim> &,
+					  const unsigned) const
+    {
+      return 1;
+    }
+    
+
+    
+    template <int dim>
+    template <int spacedim>
+    inline
+    bool
+    DoFObjects<dim>::fe_index_is_active (const ::DoFHandler<spacedim> &,
+					 const unsigned int,
+					 const unsigned int fe_index) const
+    {
+      Assert (fe_index == 0,
+              ExcMessage ("Only zero fe_index values are allowed for "
+                          "non-hp DoFHandlers."));
+      return true;
+    }
+
+    
   }
 }
 #endif
