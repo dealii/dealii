@@ -231,25 +231,37 @@ class DoFHandler  :  public Subscriptor
 				      */
     virtual void clear ();
     
-				     /**
-				      * Actually do the renumbering based on
-				      * a list of new dof numbers for all the
-				      * dofs.
-				      *
-				      * @p new_numbers is an array of integers
-				      * with size equal to the number of dofs
-				      * on the present grid. It stores the new
-				      * indices after renumbering in the
-				      * order of the old indices.
-				      *
-				      * This function is called by the
-				      * @p renumber_dofs function after computing
-				      * the ordering of the degrees of freedom.
-				      * However, you can call this function
-				      * yourself, which is necessary if a user
-				      * wants to implement an ordering scheme
-				      * herself, for example downwind numbering.
-				      */
+                                       /**
+                                        * Renumber degrees of freedom based on
+                                        * a list of new dof numbers for all the
+                                        * dofs.
+                                        *
+                                        * @p new_numbers is an array of integers
+                                        * with size equal to the number of dofs
+                                        * on the present grid. It stores the new
+                                        * indices after renumbering in the
+                                        * order of the old indices.
+                                        *
+                                        * This function is called by
+                                        * the functions in
+                                        * DoFRenumbering function
+                                        * after computing the ordering
+                                        * of the degrees of freedom.
+                                        * However, you can call this
+                                        * function yourself, which is
+                                        * necessary if a user wants to
+                                        * implement an ordering scheme
+                                        * herself, for example
+                                        * downwind numbering.
+					*
+					* The @p new_number array must
+					* have a size equal to the
+					* number of degrees of
+					* freedom. Each entry must
+					* state the new global DoF
+					* number of the degree of
+					* freedom referenced.
+                                        */
     void renumber_dofs (const std::vector<unsigned int> &new_numbers);
 
 				     /**
