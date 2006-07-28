@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -141,6 +141,72 @@ struct PointerComparison
     static bool equal (const T*, const U*);    
 };
 
+
+
+namespace internal
+{
+/**
+ * A type that is sometimes used for template tricks. For example, in
+ * some situations one would like to do this:
+ *
+ * @verbatim
+ *   template <int dim>
+ *   class X {
+ *     // do something on subdim-dimensional sub-objects of the big
+ *     // dim-dimensional thing (for example on vertices/lines/quads of
+ *     // cells):
+ *     template <int subdim> void f();
+ *   };
+ *
+ *   template <int dim>
+ *   template <>
+ *   void X<dim>::f<0> () { ...operate on the vertices of a cell... }
+ *
+ *   template <int dim, int subdim> void f(X<dim> &x) {
+ *     x.f<subdim> ();
+ *   }
+ * @endverbatim
+ *
+ * The problem is: the language doesn't allow us to specialize
+ * <code>X::f()</code> without specializing the outer class first. One
+ * of the common tricks is therefore to use something like this:
+ *
+ * @verbatim
+ *   template <int N> struct int2type {};
+ *
+ *   template <int dim>
+ *   class X {
+ *     // do something on subdim-dimensional sub-objects of the big
+ *     // dim-dimensional thing (for example on vertices/lines/quads of
+ *     // cells):
+ *     void f(int2type<0>);
+ *     void f(int2type<1>);
+ *     void f(int2type<2>);
+ *     void f(int2type<3>);
+ *   };
+ *
+ *   template <int dim>
+ *   void X<dim>::f (int2type<0>) { ...operate on the vertices of a cell... }
+ *
+ *   template <int dim>
+ *   void X<dim>::f (int2type<1>) { ...operate on the lines of a cell... }
+ *
+ *   template <int dim, int subdim> void f(X<dim> &x) {
+ *     x.f (int2type<subdim>());
+ *   }
+ * @endverbatim
+ *
+ * Note that we have replaced specialization of <code>X::f()</code> by
+ * overloading, but that from inside the function <code>g()</code>, we
+ * can still select which of the different <code>X::f()</code> we want
+ * based on the <code>subdim</code> template argument.
+ *
+ * @author Wolfgang Bangerth, 2006
+ */
+  template <int N>
+  struct int2type 
+  {};
+}
 
 
 // --------------- inline functions -----------------
