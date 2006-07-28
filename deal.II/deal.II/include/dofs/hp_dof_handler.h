@@ -17,6 +17,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/template_constraints.h>
 #include <base/smartpointer.h>
 #include <dofs/function_map.h>
 #include <dofs/dof_iterator_selector.h>
@@ -175,7 +176,7 @@ namespace hp
       virtual void clear ();
     
                                        /**
-                                        * Actually do the renumbering based on
+                                        * Renumber degrees of freedom based on
                                         * a list of new dof numbers for all the
                                         * dofs.
                                         *
@@ -185,13 +186,25 @@ namespace hp
                                         * indices after renumbering in the
                                         * order of the old indices.
                                         *
-                                        * This function is called by the
-                                        * @p renumber_dofs function after computing
-                                        * the ordering of the degrees of freedom.
-                                        * However, you can call this function
-                                        * yourself, which is necessary if a user
-                                        * wants to implement an ordering scheme
-                                        * herself, for example downwind numbering.
+                                        * This function is called by
+                                        * the functions in
+                                        * DoFRenumbering function
+                                        * after computing the ordering
+                                        * of the degrees of freedom.
+                                        * However, you can call this
+                                        * function yourself, which is
+                                        * necessary if a user wants to
+                                        * implement an ordering scheme
+                                        * herself, for example
+                                        * downwind numbering.
+					*
+					* The @p new_number array must
+					* have a size equal to the
+					* number of degrees of
+					* freedom. Each entry must
+					* state the new global DoF
+					* number of the degree of
+					* freedom referenced.
                                         */
       void renumber_dofs (const std::vector<unsigned int> &new_numbers);
 
@@ -1132,7 +1145,44 @@ namespace hp
 					*/
       void
       compute_quad_dof_identities (std::vector<unsigned int> &new_dof_indices) const;
-      
+
+				       /**
+					* Renumber the objects with
+					* the given and all lower
+					* structural dimensions,
+					* i.e. renumber vertices by
+					* giving a template argument
+					* of zero to the int2type
+					* argument, lines and vertices
+					* with one, etc.
+					*
+					* Note that in contrast to the
+					* public renumber_dofs()
+					* function, these internal
+					* functions do not ensure that
+					* the new DoFs are
+					* contiguously numbered. The
+					* function may therefore also
+					* be used to assign different
+					* DoFs the same number, for
+					* example to unify hp DoFs
+					* corresponding to different
+					* finite elements but
+					* co-located on the same
+					* entity.
+					*/
+      void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+				   internal::int2type<0>);
+
+      void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+				   internal::int2type<1>);
+
+      void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+				   internal::int2type<2>);
+
+      void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+				   internal::int2type<3>);
+
                                        /**
                                         * Space to store the DoF
                                         * numbers for the different
@@ -1351,9 +1401,6 @@ namespace hp
   template <>
   unsigned int DoFHandler<3>::distribute_dofs_on_cell (active_cell_iterator &cell,
                                                          unsigned int          next_free_dof);
-  template <> void DoFHandler<1>::renumber_dofs (const std::vector<unsigned int> &new_numbers);
-  template <> void DoFHandler<2>::renumber_dofs (const std::vector<unsigned int> &new_numbers);
-  template <> void DoFHandler<3>::renumber_dofs (const std::vector<unsigned int> &new_numbers);
   template <> void DoFHandler<1>::reserve_space ();
   template <> void DoFHandler<2>::reserve_space ();
   template <> void DoFHandler<3>::reserve_space ();

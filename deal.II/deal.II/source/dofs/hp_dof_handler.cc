@@ -2444,22 +2444,54 @@ namespace hp
 				     // faces and other
 				     // lower-dimensional objects
 				     // where elements come together
-    std::vector<unsigned int> new_dof_indices (used_dofs,
-					       deal_II_numbers::invalid_unsigned_int);
-    compute_vertex_dof_identities (new_dof_indices);
-    compute_line_dof_identities (new_dof_indices);
-    compute_quad_dof_identities (new_dof_indices);
+    std::vector<unsigned int>
+      constrained_indices (used_dofs, deal_II_numbers::invalid_unsigned_int);
+    compute_vertex_dof_identities (constrained_indices);
+    compute_line_dof_identities (constrained_indices);
+    compute_quad_dof_identities (constrained_indices);
+
+    const unsigned int used_dofs_before = used_dofs;
+
+				     // loop over all dofs and assign
+				     // new numbers to those which are
+				     // not constrained
+    std::vector<unsigned int>
+      new_dof_indices (used_dofs, deal_II_numbers::invalid_unsigned_int);
+    unsigned int next_free_dof = 0;
+    for (unsigned int i=0; i<used_dofs; ++i)
+      if (constrained_indices[i] == deal_II_numbers::invalid_unsigned_int)
+	{
+	  new_dof_indices[i] = next_free_dof;
+	  ++next_free_dof;
+	}
     
-//     if (new_dof_indices.size() -
-// 	std::count (new_dof_indices.begin(),
-// 		    new_dof_indices.end(), deal_II_numbers::invalid_unsigned_int)
-// 	!= 0)
-//       std::cout << "ELIMINATING "
-// 		<< (new_dof_indices.size() -
-// 		    std::count (new_dof_indices.begin(),
-// 				new_dof_indices.end(), deal_II_numbers::invalid_unsigned_int))
-// 		<< " DOFS"
-// 		<< std::endl;
+				     // then loop over all those that
+				     // are constrained and record the
+				     // new dof number for those:
+    for (unsigned int i=0; i<used_dofs; ++i)
+      if (constrained_indices[i] != deal_II_numbers::invalid_unsigned_int)
+	{
+	  Assert (new_dof_indices[constrained_indices[i]] !=
+		  deal_II_numbers::invalid_unsigned_int,
+		  ExcInternalError());
+	  
+	  new_dof_indices[i] = new_dof_indices[constrained_indices[i]];
+	}
+
+    for (unsigned int i=0; i<used_dofs; ++i)
+      {
+	Assert (new_dof_indices[i] != deal_II_numbers::invalid_unsigned_int,
+		ExcInternalError());
+	Assert (new_dof_indices[i] < next_free_dof,
+		ExcInternalError());
+      }
+    
+				     // finally, do the renumbering
+				     // and set the number of actually
+				     // used dof indices
+    renumber_dofs_internal (new_dof_indices, internal::int2type<dim>());
+
+    used_dofs = next_free_dof;
     
     
                                      // finally restore the user flags
@@ -2654,10 +2686,8 @@ namespace hp
 #endif
 
 
-#if deal_II_dimension == 1
-
-  template <>
-  void DoFHandler<1>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
+  template <int dim>
+  void DoFHandler<dim>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
   {
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 #ifdef DEBUG
@@ -2671,128 +2701,135 @@ namespace hp
         unsigned int                         i = 0;
         for (; p!=tmp.end(); ++p, ++i)
           Assert (*p == i, ExcNewNumbersNotConsecutive(i));
-      };
+      }
 #endif
 
-                                     // note that we can not use cell iterators
-                                     // in this function since then we would
-                                     // renumber the dofs on the interface of
-                                     // two cells more than once. Anyway, this
-                                     // way it's not only more correct but also
-                                     // faster; note, however, that dof numbers
-                                     // may be invalid_dof_index, namely when the appropriate
-                                     // vertex/line/etc is unused
-    for (std::vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
-      if (*i != invalid_dof_index)
-        *i = new_numbers[*i];
-  
-    for (unsigned int level=0; level<levels.size(); ++level) 
-      for (std::vector<unsigned int>::iterator i=levels[level]->lines.dofs.begin();
-           i!=levels[level]->lines.dofs.end(); ++i)
-        if (*i != invalid_dof_index)
-          *i = new_numbers[*i];
+    renumber_dofs_internal (new_numbers, internal::int2type<dim>());
   }
 
-#endif
 
 
-#if deal_II_dimension == 2
-
-  template <>
-  void DoFHandler<2>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
+  template <int dim>
+  void
+  DoFHandler<dim>::
+  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+			  internal::int2type<0>)
   {
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
-#ifdef DEBUG
-                                     // assert that the new indices are
-                                     // consecutively numbered
-    if (true)
-      {
-        std::vector<unsigned int> tmp(new_numbers);
-        std::sort (tmp.begin(), tmp.end());
-        std::vector<unsigned int>::const_iterator p = tmp.begin();
-        unsigned int                         i = 0;
-        for (; p!=tmp.end(); ++p, ++i)
-          Assert (*p == i, ExcNewNumbersNotConsecutive(i));
-      };
-#endif
 
-                                     // note that we can not use cell iterators
-                                     // in this function since then we would
-                                     // renumber the dofs on the interface of
-                                     // two cells more than once. Anyway, this
-                                     // way it's not only more correct but also
-                                     // faster; note, however, that dof numbers
-                                     // may be invalid_dof_index, namely when the appropriate
-                                     // vertex/line/etc is unused
-    for (std::vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
-      if (*i != invalid_dof_index)
-        *i = new_numbers[*i];
-  
-    for (unsigned int level=0; level<levels.size(); ++level) 
+    for (unsigned int vertex_index=0; vertex_index<get_tria().n_vertices();
+	 ++vertex_index)
       {
-        for (std::vector<unsigned int>::iterator i=levels[level]->quads.dofs.begin();
-             i!=levels[level]->quads.dofs.end(); ++i)
-          if (*i != invalid_dof_index)
-            *i = new_numbers[*i];
+	const unsigned int n_active_fe_indices
+	  = n_active_vertex_fe_indices (vertex_index);
+
+	for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	  {
+	    const unsigned int fe_index
+	      = nth_active_vertex_fe_index (vertex_index, f);
+
+	    for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_vertex; ++d)
+	      set_vertex_dof_index (vertex_index,
+				    fe_index,
+				    d,
+				    new_numbers[get_vertex_dof_index(vertex_index,
+								     fe_index,
+								     d)]);
+	  }
       }
-    for (std::vector<unsigned int>::iterator i=faces->lines.dofs.begin();
-	 i!=faces->lines.dofs.end(); ++i)
-      if (*i != invalid_dof_index)
-	*i = new_numbers[*i];
-
   }
 
-#endif
 
 
-#if deal_II_dimension == 3
-
-  template <>
-  void DoFHandler<3>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
+  template <int dim>
+  void
+  DoFHandler<dim>::
+  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+			  internal::int2type<1>)
   {
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
-#ifdef DEBUG
-                                     // assert that the new indices are
-                                     // consecutively numbered
-    if (true)
-      {
-        std::vector<unsigned int> tmp(new_numbers);
-        std::sort (tmp.begin(), tmp.end());
-        std::vector<unsigned int>::const_iterator p = tmp.begin();
-        unsigned int                              i = 0;
-        for (; p!=tmp.end(); ++p, ++i)
-          Assert (*p == i, ExcNewNumbersNotConsecutive(i));
-      };
-#endif
 
-                                     // note that we can not use cell iterators
-                                     // in this function since then we would
-                                     // renumber the dofs on the interface of
-                                     // two cells more than once. Anyway, this
-                                     // way it's not only more correct but also
-                                     // faster; note, however, that dof numbers
-                                     // may be invalid_dof_index, namely when the appropriate
-                                     // vertex/line/etc is unused
-    for (std::vector<unsigned int>::iterator i=vertex_dofs.begin(); i!=vertex_dofs.end(); ++i)
-      if (*i != invalid_dof_index)
-        *i = new_numbers[*i];
-  
-    for (unsigned int level=0; level<levels.size(); ++level) 
-      {
-        for (std::vector<unsigned int>::iterator i=levels[level]->hexes.dofs.begin();
-             i!=levels[level]->hexes.dofs.end(); ++i)
-          if (*i != invalid_dof_index)
-            *i = new_numbers[*i];
-      }
+    renumber_dofs_internal (new_numbers, internal::int2type<0>());
     
-    for (std::vector<unsigned int>::iterator i=faces->lines.dofs.begin();
-	 i!=faces->lines.dofs.end(); ++i)
-      if (*i != invalid_dof_index)
-	*i = new_numbers[*i];
-    for (std::vector<unsigned int>::iterator i=faces->quads.dofs.begin();
-	 i!=faces->quads.dofs.end(); ++i)
-      if (*i != invalid_dof_index)
-	*i = new_numbers[*i];    
+    for (line_iterator line=begin_line(); line!=end_line(); ++line)
+      {
+	const unsigned int n_active_fe_indices
+	  = line->n_active_fe_indices ();
+
+	for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	  {
+	    const unsigned int fe_index
+	      = line->nth_active_fe_index (f);
+
+	    for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_line; ++d)
+	      line->set_dof_index (d,
+				   new_numbers[line->dof_index(d,fe_index)],
+				   fe_index);
+	  }
+      }
+  }
+
+
+#if deal_II_dimension >= 2
+
+  template <int dim>
+  void
+  DoFHandler<dim>::
+  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+			  internal::int2type<2>)
+  {
+    Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
+
+    renumber_dofs_internal (new_numbers, internal::int2type<1>());
+    
+    for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
+      {
+	const unsigned int n_active_fe_indices
+	  = quad->n_active_fe_indices ();
+
+	for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	  {
+	    const unsigned int fe_index
+	      = quad->nth_active_fe_index (f);
+
+	    for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
+	      quad->set_dof_index (d,
+				   new_numbers[quad->dof_index(d,fe_index)],
+				   fe_index);
+	  }
+      }
+  }
+
+#endif
+
+#if deal_II_dimension >= 3
+
+  template <int dim>
+  void
+  DoFHandler<dim>::
+  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+			  internal::int2type<3>)
+  {
+    Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
+
+    renumber_dofs_internal (new_numbers, internal::int2type<2>());
+    
+    for (hex_iterator hex=begin_hex(); hex!=end_hex(); ++hex)
+      {
+	const unsigned int n_active_fe_indices
+	  = hex->n_active_fe_indices ();
+
+	for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	  {
+	    const unsigned int fe_index
+	      = hex->nth_active_fe_index (f);
+
+	    for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_hex; ++d)
+	      hex->set_dof_index (d,
+				  new_numbers[hex->dof_index(d,fe_index)],
+				  fe_index);
+	  }
+      }
   }
 
 #endif
