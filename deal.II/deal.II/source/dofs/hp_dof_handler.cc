@@ -30,7 +30,6 @@
 #include <functional>
 
 
-
 namespace internal
 {
   namespace hp
@@ -99,32 +98,12 @@ namespace internal
 					   // newly created entries
 					   // make any sense at all
 	  for (unsigned int i=0; i<identities->size(); ++i)
-	    switch (structdim)
-	      {
-		case 0:
-		      Assert ((*identities)[i].first < fe1.dofs_per_vertex,
-			      ExcInternalError());
-		      Assert ((*identities)[i].second < fe2.dofs_per_vertex,
-			      ExcInternalError());
-		      break;
-
-		case 1:
-		      Assert ((*identities)[i].first < fe1.dofs_per_line,
-			      ExcInternalError());
-		      Assert ((*identities)[i].second < fe2.dofs_per_line,
-			      ExcInternalError());
-		      break;
-
-		case 2:
-		      Assert ((*identities)[i].first < fe1.dofs_per_quad,
-			      ExcInternalError());
-		      Assert ((*identities)[i].second < fe2.dofs_per_quad,
-			      ExcInternalError());
-		      break;
-
-		default:
-		      Assert (false, ExcNotImplemented());
-	      }      
+	    {
+	      Assert ((*identities)[i].first < fe1.template n_dofs_per_object<structdim>(),
+		      ExcInternalError());
+	      Assert ((*identities)[i].second < fe2.template n_dofs_per_object<structdim>(),
+		      ExcInternalError());
+	    }
 	}
     }
   }
@@ -2469,7 +2448,19 @@ namespace hp
 					       deal_II_numbers::invalid_unsigned_int);
     compute_vertex_dof_identities (new_dof_indices);
     compute_line_dof_identities (new_dof_indices);
-//    compute_quad_dof_identities (new_dof_indices);
+    compute_quad_dof_identities (new_dof_indices);
+    
+//     if (new_dof_indices.size() -
+// 	std::count (new_dof_indices.begin(),
+// 		    new_dof_indices.end(), deal_II_numbers::invalid_unsigned_int)
+// 	!= 0)
+//       std::cout << "ELIMINATING "
+// 		<< (new_dof_indices.size() -
+// 		    std::count (new_dof_indices.begin(),
+// 				new_dof_indices.end(), deal_II_numbers::invalid_unsigned_int))
+// 		<< " DOFS"
+// 		<< std::endl;
+    
     
                                      // finally restore the user flags
     const_cast<Triangulation<dim> &>(*tria).load_user_flags(user_flags);
