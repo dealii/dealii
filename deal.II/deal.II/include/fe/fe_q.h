@@ -327,8 +327,24 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      const unsigned int        subface,
 				      FullMatrix<double>       &matrix) const;
 				     //@}
-    
 
+    
+                                     /**
+                                      * Return whether this element
+                                      * implements its hanging node
+                                      * constraints in the new way,
+				      * which has to be used to make
+				      * elements "hp compatible".
+                                      *
+				      * For the FE_Q class the
+				      * result is always true, as
+				      * it implements the complete
+				      * set of functions necessary
+				      * for hp capability.
+                                      */
+    virtual bool hp_constraints_are_implemented () const;
+
+    
 				     /**
 				      * Check for non-zero values on a face.
 				      *

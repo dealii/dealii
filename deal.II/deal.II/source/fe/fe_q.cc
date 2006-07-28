@@ -528,6 +528,15 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 
 #endif
 
+
+template <int dim>
+bool
+FE_Q<dim>::hp_constraints_are_implemented () const
+{
+  return true;
+}
+
+
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_Q<dim>::

@@ -874,6 +874,47 @@ class FiniteElement : public Subscriptor,
                                       */
     bool constraints_are_implemented () const;
 
+
+                                     /**
+                                      * Return whether this element
+                                      * implements its hanging node
+                                      * constraints in the new way,
+				      * which has to be used to make
+				      * elements "hp compatible".
+				      * That means, the element properly
+				      * implements the
+				      * get_face_interpolation_matrix
+				      * and get_subface_interpolation_matrix
+				      * methods. Therefore the return
+				      * value also indicates whether a call
+                                      * to the @p get_face_interpolation_matrix
+				      * method and the @p get_subface_interpolation_matrix
+				      * method will generate an error or not.
+                                      *
+				      * Currently the main purpose
+				      * of this function is to
+				      * allow the make_hanging_node_constraints
+				      * method to decide wheter the
+				      * new procedures, which are supposed
+				      * to work in the hp framework
+				      * can be used, or if the old
+				      * well verified but not hp capable
+				      * functions should be used.
+				      * Once, the transition to the new
+				      * scheme for computing the
+				      * interface constraints is completed,
+				      * this function will probably mostly
+				      * superfluous.
+				      *
+				      * Derived classes should implement
+				      * this function accordingly. The
+				      * default assumption is that a
+				      * finite element does not provide
+				      * hp capable face interpolation.
+                                      */
+    virtual bool hp_constraints_are_implemented () const;
+
+
 				     /**
 				      * Return the matrix
 				      * interpolating from the given
@@ -929,7 +970,6 @@ class FiniteElement : public Subscriptor,
     virtual void
     get_face_interpolation_matrix (const FiniteElement<dim> &source,
 				   FullMatrix<double>       &matrix) const;
-				     //@}
     
 
 				     /**

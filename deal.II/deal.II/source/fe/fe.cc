@@ -384,6 +384,15 @@ FiniteElement<dim>::constraints_are_implemented () const
 
 
 template <int dim>
+bool
+FiniteElement<dim>::hp_constraints_are_implemented () const
+{
+  return (this->dofs_per_face  == 0);
+}
+
+
+
+template <int dim>
 const FullMatrix<double> &
 FiniteElement<dim>::constraints () const
 {
