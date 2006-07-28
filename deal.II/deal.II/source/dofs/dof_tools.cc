@@ -1561,6 +1561,63 @@ namespace internal
     {};
 
 
+    static
+    void
+    filter_constraints (const std::vector<unsigned int> &dofs_mother,
+			const std::vector<unsigned int> &dofs_child,
+			const FullMatrix<double> &face_constraints,
+			ConstraintMatrix &constraints)
+    {
+				       // This method removes zero constraints
+				       // and those, which constrain a DoF which
+				       // was already eliminated in one of the
+				       // previous steps of the hp hanging node
+				       // procedure.
+
+      Assert (face_constraints.m () == dofs_mother.size (),
+	      ExcDimensionMismatch(dofs_mother.size (),
+				   face_constraints.n()));
+      Assert (face_constraints.n () == dofs_child.size (),
+	      ExcDimensionMismatch(dofs_child.size (),
+				   face_constraints.m()));
+
+      const unsigned int n_dofs_mother = dofs_mother.size ();
+      const unsigned int n_dofs_child = dofs_child.size ();      
+
+      Assert (n_dofs_mother <= n_dofs_child,
+	      ExcInternalError ());
+      
+      for (unsigned int col=0; col!=n_dofs_child; ++col) 
+	{
+	  bool constrain = true;
+
+					   // Check if we have a constraint,
+					   // which is already satisfied.
+	  for (unsigned int i=0; i!=n_dofs_mother; ++i)
+	    {
+					       // Check for a value of almost exactly
+					       // 1.0
+	      if (fabs (face_constraints (i,col) - 1.0) < 1.0e-15)
+		constrain = (dofs_mother[i] != dofs_child[col]);  
+	    }
+
+					   // If this constraint is not
+					   // automatically satisfied by
+					   // the previous step of removing
+					   // equivalent DoFs, add this
+					   // constraint.
+	  if (constrain)
+	    { 
+	      constraints.add_line (dofs_child[col]);
+	      for (unsigned int i=0; i!=n_dofs_mother; ++i)
+		constraints.add_entry (dofs_child[col],
+				       dofs_mother[i],
+				       face_constraints (i,col));
+	    }  
+	}      
+    }
+
+    
 #if deal_II_dimension == 1
     static
     void
@@ -1596,6 +1653,22 @@ namespace internal
 				      ConstraintMatrix &constraints,
 				      int2type<2>)
     {
+				       // Decide whether to use the
+				       // new or old make_hanging_node_constraints
+				       // function. If all the FiniteElement
+				       // or all elements in a FECollection support
+				       // the new face constraint matrix, the
+				       // new code will be used.
+				       // Otherwise, the old implementation is used
+				       // for the moment.
+      if (dof_handler.get_fe().hp_constraints_are_implemented ())
+	{
+	  do_make_hp_hanging_node_constraints (dof_handler,
+					       constraints,
+					       internal::DoFTools::int2type<DH::dimension>());
+	  return;	  
+	}      
+	  
       const unsigned int dim = 2;
   
       std::vector<unsigned int> dofs_on_mother;
@@ -1704,8 +1777,6 @@ namespace internal
 		    = this_face->child(child)->dof_index(dof, fe_index);
 	      Assert (next_index == dofs_on_children.size(),
 		      ExcInternalError());
-
-// TODO[OKH]: FE::get_subface_interpolation_matrix ()
 	  
 					       // for each row in the constraint
 					       // matrix for this line:
@@ -1731,8 +1802,247 @@ namespace internal
 	      Assert (cell->face(face)
 		      ->fe_index_is_active(cell->active_fe_index()) == true,
 		      ExcInternalError());
+	    } 
+    }
 
-// TODO[OKH]: FE::get_face_interpolation_matrix ()
+
+    template <class DH>
+    static
+    void
+    do_make_hp_hanging_node_constraints (const DH         &dof_handler,
+					 ConstraintMatrix &constraints,
+					 int2type<2>)
+    {
+      const unsigned int dim = 2;
+      
+      std::vector<unsigned int> dofs_on_mother;
+      std::vector<unsigned int> dofs_on_children;
+
+				       // loop over all lines; only on
+				       // lines there can be constraints.
+				       // We do so by looping over all
+				       // active cells and checking
+				       // whether any of the faces are
+				       // refined which can only be from
+				       // the neighboring cell because
+				       // this one is active. In that
+				       // case, the face is subject to
+				       // constraints
+				       //
+				       // note that even though we may
+				       // visit a face twice if the
+				       // neighboring cells are equally
+				       // refined, we can only visit each
+				       // face with hanging nodes once
+      typename DH::active_cell_iterator cell = dof_handler.begin_active(),
+					endc = dof_handler.end();
+      for (; cell!=endc; ++cell)
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  if (cell->face(face)->has_children()) 
+	    {
+					       // so now we've found a
+					       // face of an active
+					       // cell that has
+					       // children. that means
+					       // that there are
+					       // hanging nodes here.
+
+					       // in any case, faces
+					       // can have at most two
+					       // active fe indices,
+					       // but here the face
+					       // can have only one
+					       // (namely the same as
+					       // that from the cell
+					       // we're sitting on),
+					       // and each of the
+					       // children can have
+					       // only one as
+					       // well. check this
+	      Assert (cell->face(face)->n_active_fe_indices() == 1,
+		      ExcInternalError());
+	      Assert (cell->face(face)->fe_index_is_active(cell->active_fe_index())
+		      == true,
+		      ExcInternalError());
+	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+		Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
+			ExcInternalError());
+			
+					       // Store minimum degree element.
+					       // For FE_Q it is the one with the
+					       // lowest number of DoFs on the face.
+	      unsigned int min_dofs_per_face = cell->get_fe ().dofs_per_face;
+	      int min_subface = -1;	      
+	      
+	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+		{
+		  typename DH::active_cell_iterator
+		    neighbor_child
+		    = cell->neighbor_child_on_subface (face, c);
+		  
+						   // Check if the element on one
+						   // of the subfaces has a lower
+						   // polynomial degree than the
+						   // one of the other elements.
+		  if (neighbor_child->get_fe ().dofs_per_face < min_dofs_per_face)
+		    {
+		      min_dofs_per_face = neighbor_child->get_fe ().dofs_per_face;
+		      min_subface = c;		      
+		    }
+		}
+					       // Case 1: The coarse element has
+					       // the lowest polynomial degree.
+					       // Therefore it will play the role
+					       // of the master elements, to which
+					       // the other elements will be constrained.
+	      if (min_subface < 0)
+		{
+		  const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
+		  dofs_on_mother.resize (n_dofs_on_mother);
+
+						   // face->get_dof_indices does not
+						   // work, as we don't have an active_fe_index
+						   // on a face. Therefore we implement
+						   // this functionality at this place.
+//		  cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
+		  const unsigned int n_dofs_on_mother_cell = cell->get_fe().dofs_per_cell;
+		  std::vector<unsigned int> dofs_on_mother_cell (n_dofs_on_mother_cell);
+
+		  cell->get_dof_indices (dofs_on_mother_cell);
+		  for (unsigned int i = 0; i < n_dofs_on_mother; ++i)
+		    dofs_on_mother[i] = dofs_on_mother_cell[cell->get_fe().face_to_cell_index (i, face)];
+		    
+						   // Now create constraint matrix for
+						   // the subfaces and assemble it.
+		  for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+		    {
+		      typename DH::active_cell_iterator neighbor_child
+			= cell->neighbor_child_on_subface (face, c);
+		      const unsigned int n_dofs_on_children = neighbor_child->get_fe().dofs_per_face;
+		      dofs_on_children.resize (n_dofs_on_children);
+
+						       // Find face number on the finer
+						       // neighboring cell, which is
+						       // shared the face with the
+						       // face of the coarser cell.
+		      const unsigned int neighbor2=
+			cell->neighbor_of_neighbor(face);
+		      Assert (neighbor_child->face(neighbor2) == cell->face(face)->child(c),
+			      ExcInternalError());
+		      
+						       // Same procedure as for the
+						       // mother cell. Extract the face
+						       // DoFs from the cell DoFs.
+		      neighbor_child->face(neighbor2)->get_dof_indices (dofs_on_children,
+									neighbor_child->active_fe_index ());
+		      
+					      
+						       // Now create the element
+						       // constraint for this subface.
+		      FullMatrix<double> face_constraint (n_dofs_on_mother,
+							  n_dofs_on_children);
+		      cell->get_fe().get_subface_interpolation_matrix (neighbor_child->get_fe (),
+								       c, face_constraint);
+
+						       // Add constraints to global constraint
+						       // matrix.
+		      filter_constraints (dofs_on_mother,
+					  dofs_on_children,
+					  face_constraint,
+					  constraints);		      
+		    }
+		}
+	      else
+						 // Case 2: One of the finer elements
+						 // has the lowest polynomial degree.
+						 // First the coarse element will be
+						 // constrained to that element. After
+						 // that the other fine elements will
+						 // be constrained to the coarse element.
+		{
+		  Assert (false, ExcNotImplemented ());		  
+
+// TODO: That's the difficult one.
+		}	      
+	    }
+	  else
+	    {
+					       // this face has no
+					       // children, but it
+					       // could still be that
+					       // it is shared by two
+					       // cells that use a
+					       // different fe index
+	      Assert (cell->face(face)
+		      ->fe_index_is_active(cell->active_fe_index()) == true,
+		      ExcInternalError());
+
+					       // The face may not lie at
+					       // the boundary. This would
+					       // cause problems.
+	      if (!cell->face(face)->at_boundary ())
+		{		  
+						   // We ensured that the face is not
+						   // part of the boundary.
+						   // Hence a neighbor has to exist.
+		  typename DH::cell_iterator neighbor = cell->neighbor (face);
+
+						   // Only if the active_fe_index
+						   // differs, some action has to
+						   // be taken.
+		  if (neighbor->active_fe_index () != cell->active_fe_index ())
+		    {
+						       // We only consider the case,
+						       // where the neighbor has more
+						       // degrees of freedom on the face
+						       // and hence also a higher polynomial
+						       // degree. Then the element
+						       // with the higher polynomial
+						       // degree (i.e. the neighbor)
+						       // is constrained.
+		      if (neighbor->get_fe ().dofs_per_face >
+			  cell->get_fe ().dofs_per_face)
+			{
+							   // Get DoFs on mother face.
+							   // (i.e. the one with lower
+							   // polynomial degree)
+			  const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
+			  dofs_on_mother.resize (n_dofs_on_mother);
+			  cell->face(face)->get_dof_indices (dofs_on_mother,
+							     cell->active_fe_index ());			  
+			    
+							   // Get DoFs on child face.
+							   // (i.e. the one with the
+							   // higher polynomial degree)
+			  const unsigned int n_dofs_on_children = neighbor->get_fe().dofs_per_face;
+			  dofs_on_children.resize (n_dofs_on_children);
+
+							   // Find face number on the finer
+							   // neighboring cell, which is
+							   // shared the face with the
+							   // face of the coarser cell.
+			  const unsigned int neighbor2=
+			    cell->neighbor_of_neighbor(face);
+			  neighbor->face(neighbor2)->get_dof_indices (dofs_on_children,
+								      neighbor->active_fe_index ());
+			  
+						  
+							   // Now create the element
+							   // constraint for this subface.
+			  FullMatrix<double> face_constraint (n_dofs_on_mother,
+							      n_dofs_on_children);
+			  cell->get_fe().get_face_interpolation_matrix (neighbor->get_fe (),
+									face_constraint);
+
+							   // Add constraints to global constraint
+							   // matrix.
+			  filter_constraints (dofs_on_mother,
+					      dofs_on_children,
+					      face_constraint,
+					      constraints);
+			}
+		    }		  
+		}
 	    } 
     }
 #endif

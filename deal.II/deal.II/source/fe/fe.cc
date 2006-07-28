@@ -387,7 +387,7 @@ template <int dim>
 bool
 FiniteElement<dim>::hp_constraints_are_implemented () const
 {
-  return (this->dofs_per_face  == 0);
+  return false;
 }
 
 

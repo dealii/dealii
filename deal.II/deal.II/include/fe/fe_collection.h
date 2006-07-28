@@ -164,6 +164,43 @@ namespace hp
                                         */
       unsigned int memory_consumption () const;
 
+
+                                       /**
+					* Return whether all elements
+					* in this collection
+					* implement the hanging node
+					* constraints in the new way,
+					* which has to be used to make
+					* elements "hp compatible".
+					* If this is not the case,
+					* the function returns false,
+					* which implies, that at least
+					* one element in the FECollection
+					* does not support the new face
+					* interface constraints.
+					* On the other hand, if this
+					* method does return
+					* true, this does not imply
+					* that the hp method will work!
+					*
+					* This behaviour is related to
+					* the fact, that FiniteElement
+					* classes, which provide the
+					* new style hanging node constraints
+					* might still not provide
+					* them for all possible cases.
+					* If FE_Q and FE_RaviartThomas
+					* elements are included in the
+					* FECollection and both properly implement
+					* the get_face_interpolation_matrix
+					* method, this method will return
+					* true. But the get_face_interpolation_matrix
+					* might still fail to find an interpolation
+					* matrix between these two elements.
+                                        */
+      bool hp_constraints_are_implemented () const;
+
+
                                        /**
                                         * Exception
                                         */
@@ -306,6 +343,22 @@ namespace hp
     return max;
   }
   
+
+  template <int dim>
+  bool
+  FECollection<dim>::hp_constraints_are_implemented () const 
+  {
+    Assert (finite_elements.size() > 0, ExcNoFiniteElements());
+  
+    bool hp_constraints = true;
+    for (unsigned int i=0; i<finite_elements.size(); ++i)
+      hp_constraints = hp_constraints &&
+		       finite_elements[i]->hp_constraints_are_implemented();
+    
+    return hp_constraints;
+  }
+  
+
 } // namespace hp
 
   
