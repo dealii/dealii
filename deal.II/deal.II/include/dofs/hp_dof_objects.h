@@ -195,6 +195,12 @@ namespace internal
                                           * value may be one or any
                                           * other value larger than
                                           * that.
+					  *
+					  * If the object is not part
+					  * of an active cell, then no
+					  * degrtees of freedom have
+					  * been distributed and zero
+					  * is returned.
                                           */
         template <int spacedim>
         unsigned int
