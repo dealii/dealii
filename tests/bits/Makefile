@@ -76,7 +76,8 @@ tests_x = geometry_info_* \
 	  christian_* \
 	  oliver_* \
 	  accessor_equality* \
-	  get_dof_indices_*
+	  get_dof_indices_* \
+	  n_dofs_per_object
 
 # tests for the hp branch:
 #	  fe_collection_*
