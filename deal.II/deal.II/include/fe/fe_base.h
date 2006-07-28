@@ -361,6 +361,25 @@ class FiniteElementData
 				      */
     unsigned int n_dofs_per_cell () const;
 
+				     /**
+				      * Return the number of degrees
+				      * per structdim-dimensional
+				      * object. For structdim==0, the
+				      * function therefore returns
+				      * dofs_per_vertex, for
+				      * structdim==1 dofs_per_line,
+				      * etc. This function is mostly
+				      * used to allow some template
+				      * trickery for functions that
+				      * should work on all sorts of
+				      * objects without wanting to use
+				      * the different names (vertex,
+				      * line, ...) associated with
+				      * these objects.
+				      */
+    template <int structdim>
+    unsigned int n_dofs_per_object () const;
+    
     				     /**
 				      * Number of components.
 				      */
@@ -506,6 +525,30 @@ unsigned int
 FiniteElementData<dim>::n_dofs_per_cell () const
 {
   return dofs_per_cell;
+}
+
+
+
+template <int dim>
+template <int structdim>
+inline
+unsigned int
+FiniteElementData<dim>::n_dofs_per_object () const
+{
+  switch (structdim)
+    {
+      case 0:
+	    return dofs_per_vertex;
+      case 1:
+	    return dofs_per_line;
+      case 2:
+	    return dofs_per_quad;
+      case 3:
+	    return dofs_per_hex;
+      default:
+	    Assert (false, ExcInternalError());
+    }
+  return deal_II_numbers::invalid_unsigned_int;
 }
 
 

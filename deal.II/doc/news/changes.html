@@ -734,7 +734,18 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
-       Changed: <code 
+       New: The new function <code class="class">FiniteElementBase</code>::<code
+       class="member">n_dofs_per_object</code> returns either
+       <code>dofs_per_vertex</code>, <code>dofs_per_line</code>,
+       <code>dofs_per_quad</code>, ..., depending on the explicitly
+       specified function template argument. This is often useful for
+       template trickery.
+       <br> 
+       (WB, 2006/07/28)
+       </p>
+
+  <li> <p>
+       Fixed: <code 
 		 class="member">Triangulation&lt;dim&gt;::fix_coarsen_flags</code>
        has been modified to allow coarsening in all possible cases. Up
        to now, coarsening was forbidden, if the neighbor cell was not refined
@@ -753,7 +764,7 @@ inconvenience this causes.
        class="member">lines()</code> and <code
        class="class">TriaObjectAccessor&lt;2,dim&gt;</code>::<code
        class="member">quads()</code> functions. By using these
-       functions, 30 function specializations could have been removed,
+       functions, 30 function specializations could be removed,
        significantly reducing code duplication.
        <br>
        (RH 2006/06/13)
