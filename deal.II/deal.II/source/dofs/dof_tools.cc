@@ -1878,6 +1878,7 @@ namespace internal
 					       // For FE_Q it is the one with the
 					       // lowest number of DoFs on the face.
 	      unsigned int min_dofs_per_face = cell->get_fe ().dofs_per_face;
+	      unsigned int min_degree_subface = 0;
               bool mother_face_is_master = true;
 	      
 	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
@@ -1893,6 +1894,7 @@ namespace internal
 		  if (neighbor_child->get_fe ().dofs_per_face < min_dofs_per_face)
 		    {
 		      min_dofs_per_face = neighbor_child->get_fe ().dofs_per_face;
+		      min_degree_subface = c;
 		      mother_face_is_master = false;
 		    }
 		}
@@ -1907,7 +1909,7 @@ namespace internal
 		  dofs_on_mother.resize (n_dofs_on_mother);
 
 		  cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
-		    
+		  
 						   // Now create constraint matrix for
 						   // the subfaces and assemble it.
 		  for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
@@ -1958,12 +1960,84 @@ namespace internal
 		{
 		  Assert (false, ExcNotImplemented ());		  
 
-// TODO: That's the difficult one.
-// Sketch of how this has to be done:
-// The coarse element is constrained to a lower order element with
-// the degree of the lowest order element.
-// Afterwards the two finer elements are constrained to the this
-// constrained element.		  
+		  typename DH::active_cell_iterator neighbor_child
+		    = cell->neighbor_child_on_subface (face, min_degree_subface);
+		  const unsigned int n_dofs_on_children = neighbor_child->get_fe().dofs_per_face;
+		  dofs_on_children.resize (n_dofs_on_children);
+
+						   // The idea is to introduce
+						   // a "virtual" intermediate coarse
+						   // level face with the lowest
+						   // polynomial degree. Then it is
+						   // easy to constrain each of the
+						   // connected faces to this intermediate
+						   // coarse level face. As the DoFs on
+						   // this intermediate coarse level face
+						   // do not exist, they have to determined
+						   // through the inverse of the constraint matrix
+						   // from the lowest order subface to
+						   // this intermediate coarse level face.
+						   //
+						   // Considering the following case:
+						   // +---+----+
+						   // |   | Q3 |
+						   // |Q3 +----+
+						   // |   | Q2 |
+						   // +---+----+
+						   //
+						   // The intermediate layer would be
+						   // of order 2:
+						   // +------+  *  +---------+
+						   // +      |  |  | F_1, Q3 |
+						   // +Q3, C |  *  +---------+
+						   // +      |  |  | F_2, Q2 |
+						   // +------+  *  +---------+
+						   //
+						   // In this case, there are 3 DoFs on the
+						   // intermediate layer. Assuming for the
+						   // moment that these do exist, all DoFs
+						   // on the connected faces can be
+						   // expressed in terms of these DoFs. We
+						   // have:
+						   // C = A_1 * I
+						   // F_1 = A_2 * I
+						   // F_2 = A_3 * I
+						   // where C, F_1, F_2 denote the DoFs
+						   // on the faces of the elements and
+						   // I denotes the DoFs on the intermediate
+						   // face. A_1 to A_3 denote the corresponding
+						   // face or subface interpolation matrices,
+						   // describing the DoFs on one of the faces
+						   // in terms of the DoFs on the intermediate
+						   // layer.
+						   //
+						   // As the DoFs in I are only "virtual"
+						   // they have to be expressed in terms
+						   // of existing DoFs. In this case only
+						   // A_3 is invertible. Therefore all
+						   // other DoFs have to be constrained
+						   // to the DoFs in F_2.
+						   // This leads to
+						   // I = A_3^-1 F_2
+						   // and
+						   // C = A_1 * A_3^-1 F_2
+		                                   // F_1 = A_2 * A_3^-1 F_2
+						   //
+						   // Therefore the constraint matrices
+						   // in this case are:
+						   // A_1 * A_3^-1
+						   // A_2 * A_3^-1
+						   // In 3D and for other configurations,
+						   // the basic scheme is completely identical.
+		  
+						   // Now create the element
+						   // constraint for this subface.
+		  FullMatrix<double> face_constraints_m (n_dofs_on_children,
+							 n_dofs_on_children);
+		  neighbor_child->get_fe().get_subface_interpolation_matrix (neighbor_child->get_fe (),
+									     min_degree_subface,
+									     face_constraints_m);
+//TODO: Continue ...
 		}
 	    }
 	  else
@@ -1981,13 +2055,17 @@ namespace internal
 						   // Only if there is
 						   // a neighbor with
 						   // a different
-						   // active_fe_index,
+						   // active_fe_index
+					           // and the same h-level,
 						   // some action has
 						   // to be taken.
 	      if (!cell->face(face)->at_boundary ()
                   &&
                   (cell->neighbor(face)->active_fe_index () !=
-                   cell->active_fe_index ()))
+                   cell->active_fe_index ())
+		  &&
+		  (cell->neighbor(face)->level () ==
+		   cell->level ()))
 		{		  
 		  typename DH::cell_iterator neighbor = cell->neighbor (face);
 
