@@ -53,7 +53,7 @@ to be specified for a unique solution:
   \\
   \mathbf{n} \ C \varepsilon(\mathbf{u}(\mathbf{x},t)) &=& \mathbf{b}(\mathbf{x},t)
   \qquad
-  \text{on}\ \Gamma_N=\partial\Omega\backslash\Gamma_D.
+  \textrm{on}\ \Gamma_N=\partial\Omega\backslash\Gamma_D.
 @f}
 In above formulation, $\varepsilon(\mathbf{u})= \frac 12 (\nabla \mathbf{u} + \nabla
 \mathbf{u}^T)$ is the symmetric gradient of the displacement, also called the
@@ -238,10 +238,10 @@ course replace this term by numerical quadrature:
 @f[
   (\sigma^{n-1},\varepsilon(\varphi))_{\Omega(t_{n-1})}
   =
-  \sum_{K\subset {\mathbb{T}}}
+  \sum_{K\subset {T}}
   (\sigma^{n-1},\varepsilon(\varphi))_K
   \approx
-  \sum_{K\subset {\mathbb{T}}}
+  \sum_{K\subset {T}}
   \sum_q
   w_q \ \sigma^{n-1}(\mathbf{x}_q) : \varepsilon(\varphi(\mathbf{x}_q),
 @f]
