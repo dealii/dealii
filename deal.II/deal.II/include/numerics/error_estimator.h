@@ -18,10 +18,13 @@
 #include <base/exceptions.h>
 #include <base/function.h>
 #include <base/multithread_info.h>
+#include <dofs/function_map.h>
 #include <map>
 
 
 template <int> class DoFHandler;
+template <int> class Mapping;
+template <int> class Quadrature;
 
 namespace hp
 {
