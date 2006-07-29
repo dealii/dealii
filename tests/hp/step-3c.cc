@@ -13,7 +13,7 @@
 
 
 // a tiny variation of step-3b (using up to q6, instead of only up to
-// q5), but this one crashes at the moment
+// q5), but this one crashed at one time before even calling the solver
 
 
 #include <base/logstream.h>
@@ -215,7 +215,7 @@ void LaplaceProblem::assemble_system ()
 
 void LaplaceProblem::solve () 
 {
-  SolverControl           solver_control (1000, 1e-12);
+  SolverControl           solver_control (1000, 1e-6);
   SolverCG<>              cg (solver_control);
 
   cg.solve (system_matrix, solution, system_rhs,
