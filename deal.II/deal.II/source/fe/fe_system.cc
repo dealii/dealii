@@ -821,6 +821,19 @@ compute_fill (const Mapping<dim>                   &mapping,
 	  FEValuesData<dim> &
             base_data    = fe_data.get_fe_values_data(base_no);
 
+					   //TODO: Think about a smarter alternative
+					   // Copy quadrature points. These
+					   // are required for computing the
+					   // determinant in the FEPolyTensor
+					   // class. The determinant is
+					   // one ingredient of the Piola
+					   // transformation, which is applied
+					   // to correctly map the RT space from
+					   // the reference element to the global
+					   // coordinate system.
+	  base_data.JxW_values = data.JxW_values;
+
+
                                            // Make sure that in the
                                            // case of fill_fe_values
                                            // the data is only copied

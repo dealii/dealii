@@ -43,7 +43,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
   
-  this->mapping_type = this->covariant;
+  this->mapping_type = this->contravariant;
 				   // First, initialize the
 				   // generalized support points and
 				   // quadrature weights, since they
@@ -449,11 +449,17 @@ FE_RaviartThomas<dim>::update_each (const UpdateFlags flags) const
   UpdateFlags out = update_default;
 
   if (flags & update_values)
-    out |= update_values             | update_covariant_transformation;
+    out |= update_values             | update_covariant_transformation
+                                     | update_contravariant_transformation 
+                                     | update_JxW_values;
   if (flags & update_gradients)
-    out |= update_gradients          | update_covariant_transformation;
+    out |= update_gradients          | update_covariant_transformation 
+                                     | update_contravariant_transformation
+                                     | update_JxW_values;
+  //TODO: Set update flags appropriately and figure out, how the second
+  // derivatives for the RT elements can be computed correctly.
   if (flags & update_second_derivatives)
-    out |= update_second_derivatives | update_covariant_transformation;
+    out |= update_second_derivatives | update_contravariant_transformation;
 
   return out;
 }

@@ -282,6 +282,39 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 	 ExcDimensionMismatch(fe_data.shape_values.size(), n_dofs));
   Assert(!(flags & update_values) || fe_data.shape_values[0].size() == n_quad,
 	 ExcDimensionMismatch(fe_data.shape_values[0].size(), n_quad));
+
+  // Create table with sign changes, due to the special structure of the RT elements.
+  // TODO: Preliminary hack to demonstrate the overall prinicple!
+
+  // Compute eventual sign changes depending on the neighborhood
+  // between two faces.
+  std::vector<double> sign_change (n_dofs, 1.0);
+  
+#if deal_II_dimension > 1
+  const unsigned int dofs_per_face = this->dofs_per_face;
+
+  if (dim == 2)
+    {
+      for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2; 
+	   f < GeometryInfo<dim>::faces_per_cell; ++f)
+	{
+	  typename Triangulation<dim>::face_iterator face = cell->face (f);
+	  if (!face->at_boundary ())
+	    {
+	      unsigned int nn = cell->neighbor_of_neighbor (f);
+	      if (nn < GeometryInfo<dim>::faces_per_cell / 2)
+		{
+		  for (unsigned int j = 0; j < dofs_per_face; ++j)
+		    sign_change[f * dofs_per_face + j] = -1.0;
+		}
+	    }
+	}
+    }
+  else
+    {
+      // TODO: Think about 3D!.
+    }
+#endif
   
   for (unsigned int i=0; i<n_dofs; ++i)
     {
@@ -312,8 +345,15 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 		    
 						     // then copy over to target:
 		    for (unsigned int k=0; k<n_quad; ++k)
-		      for (unsigned int d=0; d<dim; ++d)
-			data.shape_values(first+d,k) = shape_values[k][d];
+		      {
+			// Recompute determinant
+			double J = 1.0;
+			if (mapping_type == contravariant)
+			  J = data.JxW_values[k] / quadrature.weight(k);
+
+			for (unsigned int d=0; d<dim; ++d)
+			  data.shape_values(first+d,k) = sign_change[i] * (shape_values[k][d] / J);
+		      }
 		  }
 		break;
 	      default:
@@ -351,16 +391,25 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 		
 		for (unsigned int k=0; k<n_quad; ++k)
 		  for (unsigned int d=0;d<dim;++d)
-		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		    data.shape_gradients[first+d][k] = shape_grads2[k][d];
 		break;
 	      case contravariant:
-		Assert(false, ExcNotImplemented());		
 		mapping.transform_covariant(fe_data.shape_grads[i], 0,
 					    shape_grads1,
 					    mapping_data);
+
+		mapping.transform_contravariant(shape_grads1, 0,
+						shape_grads2,
+						mapping_data);
+
 		for (unsigned int k=0; k<n_quad; ++k)
 		  for (unsigned int d=0;d<dim;++d)
-		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
+		    {
+		      // Recompute determinant
+		      double J = data.JxW_values[k] / quadrature.weight(k);
+		      data.shape_gradients[first+d][k] = sign_change[i] * 
+			shape_grads2[k][d] / J;
+		    }
 		break;
 	      default:
 		Assert(false, ExcNotImplemented());
@@ -411,6 +460,38 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 // 	      && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
 // 	 ExcNotImplemented());
 //TODO: Size assertions
+
+  // Create table with sign changes, due to the special structure of the RT elements.
+  // TODO: Preliminary hack to demonstrate the overall prinicple!
+
+  // Compute eventual sign changes depending on the neighborhood
+  // between two faces.
+  std::vector<double> sign_change (n_dofs, 1.0);
+#if deal_II_dimension > 1
+  const unsigned int dofs_per_face = this->dofs_per_face;
+  
+  if (dim == 2)
+    {
+      for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2; 
+	   f < GeometryInfo<dim>::faces_per_cell; ++f)
+	{
+	  typename Triangulation<dim>::face_iterator face = cell->face (f);
+	  if (!face->at_boundary ())
+	    {
+	      unsigned int nn = cell->neighbor_of_neighbor (f);
+	      if (nn < GeometryInfo<dim>::faces_per_cell / 2)
+		{
+		  for (unsigned int j = 0; j < dofs_per_face; ++j)
+		    sign_change[f * dofs_per_face + j] = -1.0;
+		}
+	    }
+	}
+    }
+  else
+    {
+      // TODO: Think about 3D!.
+    }
+#endif
   
   for (unsigned int i=0; i<n_dofs; ++i)
     {
@@ -441,8 +522,15 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 		    
 						     // then copy over to target:
 		    for (unsigned int k=0; k<n_quad; ++k)
-		      for (unsigned int d=0; d<dim; ++d)
-			data.shape_values(first+d,k) = shape_values[k][d];
+		      {
+			// Recompute determinant
+			double J = 1.0;
+			if (mapping_type == contravariant)
+			  J = data.JxW_values[k] / quadrature.weight(k);
+
+			for (unsigned int d=0; d<dim; ++d)
+			  data.shape_values(first+d,k) = sign_change[i] * (shape_values[k][d] / J);
+		      }
 		  }
 		break;
 	      default:
@@ -481,6 +569,26 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 		  for (unsigned int d=0;d<dim;++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
+
+	      case contravariant:
+		mapping.transform_covariant(fe_data.shape_grads[i], offset,
+					    shape_grads1,
+					    mapping_data);
+
+		mapping.transform_contravariant(shape_grads1, 0,
+						shape_grads2,
+						mapping_data);
+
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    {
+		      // Recompute determinant
+		      double J = data.JxW_values[k] / quadrature.weight(k);
+		      data.shape_gradients[first+d][k] = sign_change[i] * 
+			shape_grads2[k][d] / J;
+		    }
+		break;
+		
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
