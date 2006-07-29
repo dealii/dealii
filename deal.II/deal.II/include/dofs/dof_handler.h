@@ -1431,6 +1431,7 @@ unsigned int
 DoFHandler<dim>::n_active_fe_indices (const unsigned int,
 				      const unsigned int) const
 {
+//TODO[WB]: this isn't true -- the function should return zero if the object is inactive  
   return 1;
 }
 
@@ -1444,6 +1445,7 @@ DoFHandler<dim>::nth_active_fe_index (const unsigned int,
 				      const unsigned int,
 				      const unsigned int n) const
 {
+//TODO[WB]: this isn't true -- we should error out unconditionally if the object is inactive  
   Assert (n == 0, ExcIndexRange (n, 0, 1));
   
   return default_fe_index;
