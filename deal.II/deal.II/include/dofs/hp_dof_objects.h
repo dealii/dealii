@@ -578,7 +578,7 @@ namespace internal
                           "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
-      Assert (fe_index != ::hp::DoFHandler<1>::default_fe_index,
+      Assert (fe_index != ::hp::DoFHandler<spacedim>::default_fe_index,
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
       Assert (fe_index < dof_handler.get_fe().size(),
