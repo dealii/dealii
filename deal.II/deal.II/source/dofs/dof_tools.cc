@@ -16,6 +16,7 @@
 #include <base/thread_management.h>
 #include <base/quadrature_lib.h>
 #include <base/table.h>
+#include <base/template_constraints.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <grid/intergrid_map.h>
@@ -1557,12 +1558,8 @@ namespace internal
 {
   namespace DoFTools
   {
-    template <int> class int2type 
-    {};
-
     namespace 
     {
-      
       void
       filter_constraints (const std::vector<unsigned int> &dofs_mother,
 			  const std::vector<unsigned int> &dofs_child,
@@ -1598,6 +1595,7 @@ namespace internal
 	      {
 						 // Check for a value of almost exactly
 						 // 1.0
+//TODO: move this check into the FE classes and let them reset the values to exactly 1.0. similarly, let them make sure that very small values are exactly 0.0
 		if (fabs (face_constraints (i,col) - 1.0) < 1.0e-15)
 		  constrain = (dofs_mother[i] != dofs_child[col]);  
 	      }
@@ -1611,9 +1609,10 @@ namespace internal
 	      { 
 		constraints.add_line (dofs_child[col]);
 		for (unsigned int i=0; i!=n_dofs_mother; ++i)
-		  constraints.add_entry (dofs_child[col],
-					 dofs_mother[i],
-					 face_constraints (i,col));
+                  if (face_constraints(i,col) != 0)
+                    constraints.add_entry (dofs_child[col],
+                                           dofs_mother[i],
+                                           face_constraints (i,col));
 	      }  
 	  }      
       }
@@ -1626,7 +1625,7 @@ namespace internal
     void
     do_make_hanging_node_constraints (const ::DoFHandler<1> &,
 				      ConstraintMatrix    &,
-				      int2type<1>)
+				      ::internal::int2type<1>)
     {
 				       // nothing to do for regular
 				       // dof handlers in 1d
@@ -1637,7 +1636,7 @@ namespace internal
     void
     do_make_hanging_node_constraints (const ::hp::DoFHandler<1> &/*dof_handler*/,
 				      ConstraintMatrix        &/*constraints*/,
-				      int2type<1>)
+				      ::internal::int2type<1>)
     {
 				       // we may have to compute
 				       // constraints for
@@ -1654,7 +1653,7 @@ namespace internal
     void
     do_make_hanging_node_constraints (const DH         &dof_handler,
 				      ConstraintMatrix &constraints,
-				      int2type<2>)
+				      ::internal::int2type<2>)
     {
 				       // Decide whether to use the
 				       // new or old make_hanging_node_constraints
@@ -1668,7 +1667,7 @@ namespace internal
 	{
 	  do_make_hp_hanging_node_constraints (dof_handler,
 					       constraints,
-					       internal::DoFTools::int2type<DH::dimension>());
+					       ::internal::int2type<DH::dimension>());
 	  return;	  
 	}      
 	  
@@ -1814,7 +1813,7 @@ namespace internal
     void
     do_make_hp_hanging_node_constraints (const DH         &dof_handler,
 					 ConstraintMatrix &constraints,
-					 int2type<2>)
+					 ::internal::int2type<2>)
     {
       const unsigned int dim = 2;
       
@@ -1852,15 +1851,15 @@ namespace internal
 
 					       // in any case, faces
 					       // can have at most two
-					       // active fe indices,
-					       // but here the face
-					       // can have only one
-					       // (namely the same as
-					       // that from the cell
-					       // we're sitting on),
-					       // and each of the
-					       // children can have
-					       // only one as
+					       // sets of active fe
+					       // indices, but here
+					       // the face can have
+					       // only one (namely the
+					       // same as that from
+					       // the cell we're
+					       // sitting on), and
+					       // each of the children
+					       // can have only one as
 					       // well. check this
 	      Assert (cell->face(face)->n_active_fe_indices() == 1,
 		      ExcInternalError());
@@ -1870,12 +1869,18 @@ namespace internal
 	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
 		Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
 			ExcInternalError());
-			
+
+
+//TODO: The proper way would be to ask the elements themselves which
+//among them should be the master element. Have a poor-man's
+//implementation here that simply decides this based on the number of
+//DoFs per face
+              
 					       // Store minimum degree element.
 					       // For FE_Q it is the one with the
 					       // lowest number of DoFs on the face.
 	      unsigned int min_dofs_per_face = cell->get_fe ().dofs_per_face;
-	      int min_subface = -1;	      
+              bool mother_face_is_master = true;
 	      
 	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
 		{
@@ -1890,7 +1895,7 @@ namespace internal
 		  if (neighbor_child->get_fe ().dofs_per_face < min_dofs_per_face)
 		    {
 		      min_dofs_per_face = neighbor_child->get_fe ().dofs_per_face;
-		      min_subface = c;		      
+		      mother_face_is_master = false;
 		    }
 		}
 					       // Case 1: The coarse element has
@@ -1898,22 +1903,12 @@ namespace internal
 					       // Therefore it will play the role
 					       // of the master elements, to which
 					       // the other elements will be constrained.
-	      if (min_subface < 0)
+	      if (mother_face_is_master == true)
 		{
 		  const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
 		  dofs_on_mother.resize (n_dofs_on_mother);
 
-						   // face->get_dof_indices does not
-						   // work, as we don't have an active_fe_index
-						   // on a face. Therefore we implement
-						   // this functionality at this place.
-//		  cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
-		  const unsigned int n_dofs_on_mother_cell = cell->get_fe().dofs_per_cell;
-		  std::vector<unsigned int> dofs_on_mother_cell (n_dofs_on_mother_cell);
-
-		  cell->get_dof_indices (dofs_on_mother_cell);
-		  for (unsigned int i = 0; i < n_dofs_on_mother; ++i)
-		    dofs_on_mother[i] = dofs_on_mother_cell[cell->get_fe().face_to_cell_index (i, face)];
+		  cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
 		    
 						   // Now create constraint matrix for
 						   // the subfaces and assemble it.
@@ -1942,16 +1937,16 @@ namespace internal
 					      
 						       // Now create the element
 						       // constraint for this subface.
-		      FullMatrix<double> face_constraint (n_dofs_on_mother,
-							  n_dofs_on_children);
+		      FullMatrix<double> face_constraints (n_dofs_on_mother,
+                                                           n_dofs_on_children);
 		      cell->get_fe().get_subface_interpolation_matrix (neighbor_child->get_fe (),
-								       c, face_constraint);
+								       c, face_constraints);
 
 						       // Add constraints to global constraint
 						       // matrix.
 		      filter_constraints (dofs_on_mother,
 					  dofs_on_children,
-					  face_constraint,
+					  face_constraints,
 					  constraints);		      
 		    }
 		}
@@ -1980,73 +1975,88 @@ namespace internal
 		      ->fe_index_is_active(cell->active_fe_index()) == true,
 		      ExcInternalError());
 
-					       // The face may not lie at
-					       // the boundary. This would
-					       // cause problems.
-	      if (!cell->face(face)->at_boundary ())
+						   // Only if there is
+						   // a neighbor with
+						   // a different
+						   // active_fe_index,
+						   // some action has
+						   // to be taken.
+	      if (!cell->face(face)->at_boundary ()
+                  &&
+                  (cell->neighbor(face)->active_fe_index () !=
+                   cell->active_fe_index ()))
 		{		  
-						   // We ensured that the face is not
-						   // part of the boundary.
-						   // Hence a neighbor has to exist.
 		  typename DH::cell_iterator neighbor = cell->neighbor (face);
 
-						   // Only if the active_fe_index
-						   // differs, some action has to
-						   // be taken.
-		  if (neighbor->active_fe_index () != cell->active_fe_index ())
-		    {
-						       // We only consider the case,
-						       // where the neighbor has more
-						       // degrees of freedom on the face
-						       // and hence also a higher polynomial
-						       // degree. Then the element
-						       // with the higher polynomial
-						       // degree (i.e. the neighbor)
-						       // is constrained.
-		      if (neighbor->get_fe ().dofs_per_face >
-			  cell->get_fe ().dofs_per_face)
-			{
-							   // Get DoFs on mother face.
-							   // (i.e. the one with lower
-							   // polynomial degree)
-			  const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
-			  dofs_on_mother.resize (n_dofs_on_mother);
-			  cell->face(face)->get_dof_indices (dofs_on_mother,
-							     cell->active_fe_index ());			  
-			    
-							   // Get DoFs on child face.
-							   // (i.e. the one with the
-							   // higher polynomial degree)
-			  const unsigned int n_dofs_on_children = neighbor->get_fe().dofs_per_face;
-			  dofs_on_children.resize (n_dofs_on_children);
+                                                   // We only consider
+                                                   // the case, where
+                                                   // the neighbor has
+                                                   // more degrees of
+                                                   // freedom on the
+                                                   // face and hence
+                                                   // also a higher
+                                                   // polynomial
+                                                   // degree. Then the
+                                                   // element with the
+                                                   // higher
+                                                   // polynomial
+                                                   // degree (i.e. the
+                                                   // neighbor) is
+                                                   // constrained. note
+                                                   // that if that
+                                                   // isn't the case,
+                                                   // then we will
+                                                   // re-visit this
+                                                   // face at a
+                                                   // different time
+                                                   // from the other
+                                                   // side again and
+                                                   // this time the
+                                                   // if() will
+                                                   // trigger
+                  if (neighbor->get_fe ().dofs_per_face >
+                      cell->get_fe ().dofs_per_face)
+                    {
+                                                       // Get DoFs on mother face.
+                                                       // (i.e. the one with lower
+                                                       // polynomial degree)
+                      const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
+                      dofs_on_mother.resize (n_dofs_on_mother);
+                      cell->face(face)->get_dof_indices (dofs_on_mother,
+                                                         cell->active_fe_index ());
+                          
+                                                       // Get DoFs on child face.
+                                                       // (i.e. the one with the
+                                                       // higher polynomial degree)
+                      const unsigned int n_dofs_on_children = neighbor->get_fe().dofs_per_face;
+                      dofs_on_children.resize (n_dofs_on_children);
 
-							   // Find face number on the finer
-							   // neighboring cell, which is
-							   // shared the face with the
-							   // face of the coarser cell.
-			  const unsigned int neighbor2=
-			    cell->neighbor_of_neighbor(face);
-			  neighbor->face(neighbor2)->get_dof_indices (dofs_on_children,
-								      neighbor->active_fe_index ());
+                                                       // Find face number on the finer
+                                                       // neighboring cell, which is
+                                                       // shared the face with the
+                                                       // face of the coarser cell.
+                      const unsigned int neighbor2=
+                        cell->neighbor_of_neighbor(face);
+                      neighbor->face(neighbor2)->get_dof_indices (dofs_on_children,
+                                                                  neighbor->active_fe_index ());
 			  
 						  
-							   // Now create the element
-							   // constraint for this subface.
-			  FullMatrix<double> face_constraint (n_dofs_on_mother,
-							      n_dofs_on_children);
-			  cell->get_fe().get_face_interpolation_matrix (neighbor->get_fe (),
-									face_constraint);
+                                                       // Now create the element
+                                                       // constraint for this subface.
+                      FullMatrix<double> face_constraints (n_dofs_on_mother,
+                                                           n_dofs_on_children);
+                      cell->get_fe().get_face_interpolation_matrix (neighbor->get_fe (),
+                                                                    face_constraints);
 
-							   // Add constraints to global constraint
-							   // matrix.
-			  filter_constraints (dofs_on_mother,
-					      dofs_on_children,
-					      face_constraint,
-					      constraints);
-			}
-		    }		  
-		}
-	    } 
+                                                       // Add constraints to global constraint
+                                                       // matrix.
+                      filter_constraints (dofs_on_mother,
+                                          dofs_on_children,
+                                          face_constraints,
+                                          constraints);
+                    }
+                }		  
+            }
     }
 #endif
 
@@ -2058,7 +2068,7 @@ namespace internal
     void
     do_make_hanging_node_constraints (const DH         &dof_handler,
 				      ConstraintMatrix &constraints,
-				      int2type<3>)
+				      ::internal::int2type<3>)
     {
       const unsigned int dim = 3;
   
@@ -2287,9 +2297,10 @@ DoFTools::make_hanging_node_constraints (const DH &dof_handler,
 				   // distribute this one template
 				   // function to the appropriate
 				   // functions in 1d, 2d, and 3d
-  do_make_hanging_node_constraints (dof_handler,
-				    constraints,
-				    internal::DoFTools::int2type<DH::dimension>());
+  internal::DoFTools
+    ::do_make_hanging_node_constraints (dof_handler,
+                                        constraints,
+                                        ::internal::int2type<DH::dimension>());
 }
 
 
