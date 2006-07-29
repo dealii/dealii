@@ -91,7 +91,7 @@ namespace internal
  * @author Tobias Leicht, 2006
  */
 
-    template<int dim>
+    template <int dim>
     class DoFObjects
     {
 
@@ -247,6 +247,393 @@ namespace internal
                                           */
         template <int> friend class ::hp::DoFHandler;
     };
+
+
+// --------------------- inline and template functions ------------------
+
+    template <int dim>
+    template <int spacedim>
+    inline
+    unsigned int
+    DoFObjects<dim>::
+    get_dof_index (const ::hp::DoFHandler<spacedim> &dof_handler,
+                   const unsigned int                obj_index,
+                   const unsigned int                fe_index,
+                   const unsigned int                local_index,
+                   const unsigned int                obj_level) const
+    {
+      Assert (fe_index != ::hp::DoFHandler<spacedim>::default_fe_index,
+              ExcMessage ("You need to specify a FE index when working "
+                          "with hp DoFHandlers"));
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
+      Assert (local_index <
+              dof_handler.get_fe()[fe_index].template n_dofs_per_object<dim>(),
+              ExcIndexRange(local_index, 0,
+                            dof_handler.get_fe()[fe_index]
+                            .template n_dofs_per_object<dim>()));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      if (dim == spacedim)
+        {
+                                           // if we are on a cell, then
+                                           // the only set of indices we
+                                           // store is the one for the
+                                           // cell, which is unique. then
+                                           // fe_index must be
+                                           // active_fe_index
+          Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
+                  ExcMessage ("FE index does not match that of the present cell"));
+          return dofs[dof_offsets[obj_index]+local_index];
+        }
+      else
+        {
+                                           // we are in higher space
+                                           // dimensions, so there may
+                                           // be multiple finite
+                                           // elements associated with
+                                           // this object. hop along
+                                           // the list of index sets
+                                           // until we find the one
+                                           // with the correct
+                                           // fe_index, and then poke
+                                           // into that part. trigger
+                                           // an exception if we can't
+                                           // find a set for this
+                                           // particular fe_index
+          const unsigned int starting_offset = dof_offsets[obj_index];
+          const unsigned int *pointer        = &dofs[starting_offset];
+          while (true)
+            {
+              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+                      ExcInternalError());
+              if (*pointer == fe_index)
+                return *(pointer + 1 + local_index);
+              else
+                pointer += dof_handler.get_fe()[*pointer]
+                           .template n_dofs_per_object<dim>() + 1;
+            }
+        }
+    }
+
+
+
+    template <int dim>
+    template <int spacedim>
+    inline
+    void
+    DoFObjects<dim>::
+    set_dof_index (const ::hp::DoFHandler<spacedim> &dof_handler,
+                   const unsigned int                obj_index,
+                   const unsigned int                fe_index,
+                   const unsigned int                local_index,
+                   const unsigned int                global_index,
+                   const unsigned int                obj_level)
+    {
+      Assert (fe_index != ::hp::DoFHandler<spacedim>::default_fe_index,
+              ExcMessage ("You need to specify a FE index when working "
+                          "with hp DoFHandlers"));
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
+      Assert (local_index <
+              dof_handler.get_fe()[fe_index].template n_dofs_per_object<dim>(),
+              ExcIndexRange(local_index, 0,
+                            dof_handler.get_fe()[fe_index]
+                            .template n_dofs_per_object<dim>()));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      if (dim == spacedim)
+        {
+                                           // if we are on a cell, then
+                                           // the only set of indices we
+                                           // store is the one for the
+                                           // cell, which is unique. then
+                                           // fe_index must be
+                                           // active_fe_index
+          Assert (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index],
+                  ExcMessage ("FE index does not match that of the present cell"));
+          dofs[dof_offsets[obj_index]+local_index] = global_index;
+        }
+      else
+        {
+                                           // we are in higher space
+                                           // dimensions, so there may
+                                           // be multiple finite
+                                           // elements associated with
+                                           // this object.  hop along
+                                           // the list of index sets
+                                           // until we find the one
+                                           // with the correct
+                                           // fe_index, and then poke
+                                           // into that part. trigger
+                                           // an exception if we can't
+                                           // find a set for this
+                                           // particular fe_index
+          const unsigned int starting_offset = dof_offsets[obj_index];
+          unsigned int      *pointer         = &dofs[starting_offset];
+          while (true)
+            {
+              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+                      ExcInternalError());
+              if (*pointer == fe_index)
+                {
+                  *(pointer + 1 + local_index) = global_index;
+                  return;
+                }
+              else
+                pointer += dof_handler.get_fe()[*pointer]
+                           .template n_dofs_per_object<dim>() + 1;
+            }
+        }
+    }
+
+
+
+    template <int dim>
+    template <int spacedim>
+    inline
+    unsigned int
+    DoFObjects<dim>::
+    n_active_fe_indices (const ::hp::DoFHandler<spacedim> &dof_handler,
+                         const unsigned int                obj_index) const
+    {
+      Assert (dim <= spacedim, ExcInternalError());
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      if (dof_offsets[obj_index] == deal_II_numbers::invalid_unsigned_int)
+	return 0;
+      
+                                       // if we are on a cell, then the
+                                       // only set of indices we store
+                                       // is the one for the cell,
+                                       // which is unique
+      if (dim == spacedim)
+        return 1;
+      else
+        {
+                                           // otherwise, there may be
+                                           // multiple finite elements
+                                           // associated with this
+                                           // object. hop along the
+                                           // list of index sets until
+                                           // we find the one with the
+                                           // correct fe_index, and
+                                           // then poke into that
+                                           // part. trigger an
+                                           // exception if we can't
+                                           // find a set for this
+                                           // particular fe_index
+          const unsigned int starting_offset = dof_offsets[obj_index];
+          const unsigned int *pointer        = &dofs[starting_offset];
+          unsigned int counter = 0;
+          while (true)
+            {
+              if (*pointer == deal_II_numbers::invalid_unsigned_int)
+                                                 // end of list reached
+                return counter;
+              else
+                {
+                  ++counter;
+                  pointer += dof_handler.get_fe()[*pointer]
+                             .template n_dofs_per_object<dim>() + 1;
+                }
+            }
+        }
+    }
+
+
+
+    template <int dim>
+    template <int spacedim>
+    inline
+    unsigned int
+    DoFObjects<dim>::
+    nth_active_fe_index (const ::hp::DoFHandler<spacedim> &dof_handler,
+                         const unsigned int                obj_level,
+                         const unsigned int                obj_index,
+                         const unsigned int                n) const
+    {
+      Assert (dim <= spacedim, ExcInternalError());
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      if (dim == spacedim)
+        {
+                                           // this is a cell, so there
+                                           // is only a single
+                                           // fe_index
+          Assert (n == 0, ExcIndexRange (n, 0, 1));
+      
+          return dof_handler.levels[obj_level]->active_fe_indices[obj_index];
+        }
+      else
+        {
+          Assert (n < n_active_fe_indices(dof_handler, obj_index),
+                  ExcIndexRange (n, 0,
+                                 n_active_fe_indices(dof_handler, obj_index)));
+      
+                                           // we are in higher space
+                                           // dimensions, so there may
+                                           // be multiple finite
+                                           // elements associated with
+                                           // this object. hop along
+                                           // the list of index sets
+                                           // until we find the one
+                                           // with the correct
+                                           // fe_index, and then poke
+                                           // into that part. trigger
+                                           // an exception if we can't
+                                           // find a set for this
+                                           // particular fe_index
+          const unsigned int starting_offset = dof_offsets[obj_index];
+          const unsigned int *pointer        = &dofs[starting_offset];
+          unsigned int counter = 0;
+          while (true)
+            {
+              Assert (*pointer != deal_II_numbers::invalid_unsigned_int,
+                      ExcInternalError());
+
+              const unsigned int fe_index = *pointer;
+
+              Assert (fe_index < dof_handler.get_fe().size(),
+                      ExcInternalError());
+	  
+              if (counter == n)
+                return fe_index;
+	  
+              ++counter;
+              pointer += dof_handler.get_fe()[fe_index]
+                         .template n_dofs_per_object<dim>() + 1;
+            }
+        }
+    }
+
+
+
+    template <int dim>
+    template <int spacedim>
+    inline
+    bool
+    DoFObjects<dim>::
+    fe_index_is_active (const ::hp::DoFHandler<spacedim> &dof_handler,
+                        const unsigned int                obj_index,
+                        const unsigned int                fe_index,
+                        const unsigned int                obj_level) const
+    {
+      Assert (&dof_handler != 0,
+              ExcMessage ("No DoFHandler is specified for this iterator"));
+      Assert (&dof_handler.get_fe() != 0,
+              ExcMessage ("No finite element collection is associated with "
+                          "this DoFHandler"));
+      Assert (obj_index < dof_offsets.size(),
+              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+      Assert (fe_index != ::hp::DoFHandler<1>::default_fe_index,
+              ExcMessage ("You need to specify a FE index when working "
+                          "with hp DoFHandlers"));
+      Assert (fe_index < dof_handler.get_fe().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
+
+                                       // make sure we are on an
+                                       // object for which DoFs have
+                                       // been allocated at all
+      Assert (dof_offsets[obj_index] != deal_II_numbers::invalid_unsigned_int,
+              ExcMessage ("You are trying to access degree of freedom "
+                          "information for an object on which no such "
+                          "information is available"));
+
+      if (dim == spacedim)
+        {
+                                           // if we are on a cell,
+                                           // then the only set of
+                                           // indices we store is the
+                                           // one for the cell, which
+                                           // is unique
+          Assert (obj_index < dof_handler.levels[obj_level]->active_fe_indices.size(),
+                  ExcInternalError());
+          return (fe_index == dof_handler.levels[obj_level]->active_fe_indices[obj_index]);
+        }
+      else
+        {
+                                           // we are in higher space
+                                           // dimensions, so there may
+                                           // be multiple finite
+                                           // elements associated with
+                                           // this object. hop along
+                                           // the list of index sets
+                                           // until we find the one
+                                           // with the correct
+                                           // fe_index, and then poke
+                                           // into that part. trigger
+                                           // an exception if we can't
+                                           // find a set for this
+                                           // particular fe_index
+          const unsigned int starting_offset = dof_offsets[obj_index];
+          const unsigned int *pointer        = &dofs[starting_offset];
+          while (true)
+            {
+              if (*pointer == deal_II_numbers::invalid_unsigned_int)
+                                                 // end of list reached
+                return false;
+              else
+                if (*pointer == fe_index)
+                  return true;
+                else
+                  pointer += dof_handler.get_fe()[*pointer]
+                             .template n_dofs_per_object<dim>() + 1;
+            }
+        }
+    }
+    
   }
 }
 

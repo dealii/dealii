@@ -205,6 +205,30 @@ namespace internal
     }
 
     
+
+    template <int dim>
+    template <int spacedim>
+    inline
+    unsigned int
+    DoFObjects<dim>::
+    get_dof_index (const ::DoFHandler<spacedim> &dof_handler,
+		   const unsigned int       obj_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index) const
+    {
+      Assert (fe_index == ::DoFHandler<spacedim>::default_fe_index,
+	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
+      Assert (local_index<dof_handler.get_fe().template n_dofs_per_object<dim>(),
+	      ExcIndexRange (local_index, 0, dof_handler.get_fe().template n_dofs_per_object<dim>()));
+      Assert (obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>()+local_index
+	      <
+	      dofs.size(),
+	      ExcInternalError());
+      
+      return dofs[obj_index * dof_handler.get_fe()
+                  .template n_dofs_per_object<dim>() + local_index];
+    }    
+
   }
 }
 #endif
