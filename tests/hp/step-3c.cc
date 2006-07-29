@@ -144,12 +144,15 @@ void LaplaceProblem::make_grid_and_dofs ()
 
 void LaplaceProblem::assemble_system () 
 {
-  hp::QCollection<2>  quadrature_formula(QGauss<2>(6));
+  hp::QCollection<2>  quadrature_formula;
+
+  for (unsigned int p = 0; p < fe.size (); ++p)
+    quadrature_formula.push_back (QGauss<2> (p + 2));
+
   hp::FEValues<2> x_fe_values (fe, quadrature_formula, 
 			       update_values | update_gradients | update_JxW_values);
   
   const unsigned int   max_dofs_per_cell = fe.max_dofs_per_cell ();
-  const unsigned int   n_q_points    = quadrature_formula[0].n_quadrature_points;
 
   FullMatrix<double>   cell_matrix (max_dofs_per_cell, max_dofs_per_cell);
   Vector<double>       cell_rhs (max_dofs_per_cell);
@@ -169,7 +172,7 @@ void LaplaceProblem::assemble_system ()
       cell_rhs = 0;
 
       const unsigned int dofs_per_cell = cell->get_fe ().dofs_per_cell;
-      
+      const unsigned int   n_q_points    = quadrature_formula[cell->active_fe_index ()].n_quadrature_points;
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
