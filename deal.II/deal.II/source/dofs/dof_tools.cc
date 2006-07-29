@@ -1584,7 +1584,7 @@ namespace internal
 
 	Assert (n_dofs_mother <= n_dofs_child,
 		ExcInternalError ());
-      
+
 	for (unsigned int col=0; col!=n_dofs_child; ++col) 
 	  {
 	    bool constrain = true;
@@ -1593,11 +1593,10 @@ namespace internal
 					     // which is already satisfied.
 	    for (unsigned int i=0; i!=n_dofs_mother; ++i)
 	      {
-						 // Check for a value of almost exactly
+						 // Check for a value of
 						 // 1.0
-//TODO: move this check into the FE classes and let them reset the values to exactly 1.0. similarly, let them make sure that very small values are exactly 0.0
-		if (fabs (face_constraints (i,col) - 1.0) < 1.0e-15)
-		  constrain = (dofs_mother[i] != dofs_child[col]);  
+		if (face_constraints (i,col) == 1.0)
+		  constrain = (dofs_mother[i] != dofs_child[col]);
 	      }
 
 					     // If this constraint is not
@@ -1666,10 +1665,9 @@ namespace internal
       if (dof_handler.get_fe().hp_constraints_are_implemented ())
 	{
 	  do_make_hp_hanging_node_constraints (dof_handler,
-					       constraints,
-					       ::internal::int2type<DH::dimension>());
-	  return;	  
-	}      
+					       constraints);
+	  return;
+	}
 	  
       const unsigned int dim = 2;
   
@@ -1806,16 +1804,16 @@ namespace internal
 		      ExcInternalError());
 	    } 
     }
+#endif
 
-
+#if deal_II_dimension > 1
     template <class DH>
     static
     void
     do_make_hp_hanging_node_constraints (const DH         &dof_handler,
-					 ConstraintMatrix &constraints,
-					 ::internal::int2type<2>)
+					 ConstraintMatrix &constraints)
     {
-      const unsigned int dim = 2;
+      const unsigned int dim = DH::dimension;
       
       std::vector<unsigned int> dofs_on_mother;
       std::vector<unsigned int> dofs_on_children;
@@ -1961,7 +1959,12 @@ namespace internal
 		  Assert (false, ExcNotImplemented ());		  
 
 // TODO: That's the difficult one.
-		}	      
+// Sketch of how this has to be done:
+// The coarse element is constrained to a lower order element with
+// the degree of the lowest order element.
+// Afterwards the two finer elements are constrained to the this
+// constrained element.		  
+		}
 	    }
 	  else
 	    {
@@ -2070,6 +2073,21 @@ namespace internal
 				      ConstraintMatrix &constraints,
 				      ::internal::int2type<3>)
     {
+				       // Decide whether to use the
+				       // new or old make_hanging_node_constraints
+				       // function. If all the FiniteElement
+				       // or all elements in a FECollection support
+				       // the new face constraint matrix, the
+				       // new code will be used.
+				       // Otherwise, the old implementation is used
+				       // for the moment.
+      if (dof_handler.get_fe().hp_constraints_are_implemented ())
+	{
+	  do_make_hp_hanging_node_constraints (dof_handler,
+					       constraints);
+	  return;
+	}      
+	  
       const unsigned int dim = 3;
   
       std::vector<unsigned int> dofs_on_mother;

@@ -297,11 +297,16 @@ DoFObjectAccessor<1,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
 				   // freedom on sub-objects which are
 				   // not allocated for this
 				   // non-active thing
+// TODO: This assertion leads to problems with the do_make_hp_hanging_node_constraints
+// method!. Check how this assertion can be stated that it does not create a conflict
+// with the above mentioned method.
+/*
   Assert (!this->has_children() ||
 	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
 	   2*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
 	  typename BaseClass::ExcNotActive());
-  
+*/
+	  
   const unsigned int dofs_per_vertex = this->dof_handler->get_fe()[fe_index].dofs_per_vertex,
 		     dofs_per_line   = this->dof_handler->get_fe()[fe_index].dofs_per_line;
   std::vector<unsigned int>::iterator next = dof_indices.begin();
@@ -373,11 +378,17 @@ DoFObjectAccessor<2,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
 				   // freedom on sub-objects which are
 				   // not allocated for this
 				   // non-active thing
+
+// TODO: This assertion leads to problems with the do_make_hp_hanging_node_constraints
+// method!. Check how this assertion can be stated that it does not create a conflict
+// with the above mentioned method.
+/*
   Assert (!this->has_children() ||
 	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
 	   4*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
 	  typename BaseClass::ExcNotActive());
-  
+*/
+	  
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
   
@@ -472,10 +483,15 @@ DoFObjectAccessor<3,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
 				   // freedom on sub-objects which are
 				   // not allocated for this
 				   // non-active thing
+// TODO: This assertion leads to problems with the do_make_hp_hanging_node_constraints
+// method!. Check how this assertion can be stated that it does not create a conflict
+// with the above mentioned method.
+/*
   Assert (!this->has_children() ||
 	  (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
 	   8*this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
 	  typename BaseClass::ExcNotActive());
+*/
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
   

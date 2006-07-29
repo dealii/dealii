@@ -400,8 +400,14 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 				   // which returns the support
                                    // points on the face.
   Quadrature<dim-1> quad_face_support (source_fe.get_unit_face_support_points ());
-
-
+  
+				   // Rule of thumb for FP accuracy,
+				   // that can be expected for a
+				   // given polynomial degree.
+				   // This value is used to cut
+				   // off values close to zero.
+  double eps = 2e-14*this->degree*(dim-1);
+  
 				   // compute the interpolation
 				   // matrix by simply taking the
                                    // value at the support points.
@@ -413,14 +419,23 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
       Point<dim> p = QProjector<dim>::project_to_face (quad_face_support, 0).point (i);
 
       for (unsigned int j=0; j<this->dofs_per_face; ++j)
-	interpolation_matrix(j,i) = this->shape_value (this->face_to_cell_index(j, 0), p);
-    }
+	{ 
+	  double matrix_entry = this->shape_value (this->face_to_cell_index(j, 0), p);
 
-                                   // cut off very small values
-  for (unsigned int i=0; i<this->dofs_per_face; ++i)
-    for (unsigned int j=0; j<source_fe.dofs_per_face; ++j)
-      if (std::fabs(interpolation_matrix(i,j)) < 1e-15)
-        interpolation_matrix(i,j) = 0.;
+					   // Correct the interpolated
+					   // value. I.e. if it is close
+					   // to 1 or 0, make it exactly
+					   // 1 or 0. Unfortunately, this
+					   // is required to avoid problems
+					   // with higher order elements.
+	  if (fabs (matrix_entry - 1.0) < eps)
+	    matrix_entry = 1.0;
+	  if (fabs (matrix_entry) < eps)
+	    matrix_entry = 0.0;
+
+	  interpolation_matrix(j,i) = matrix_entry;
+	}  
+    }
 
 				   // make sure that the column sum of
 				   // each of the matrices is 1 at

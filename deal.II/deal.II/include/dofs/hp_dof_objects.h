@@ -15,6 +15,7 @@
 
 #include <base/config.h>
 #include <fe/fe_collection.h>
+#include <dofs/hp_dof_handler.h>
 
 #include <vector>
 
