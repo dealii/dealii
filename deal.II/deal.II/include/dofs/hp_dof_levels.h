@@ -15,18 +15,9 @@
 
 
 #include <base/config.h>
-#include <dofs/dof_levels.h>
 #include <dofs/hp_dof_objects.h>
-#include <fe/fe_collection.h>
 
 #include <vector>
-
-
-namespace hp
-{
-  template <int dim>
-  class FECollection;
-}
 
 
 namespace internal
