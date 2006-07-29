@@ -10,11 +10,11 @@ u_{\mathrm{breather}}(x,t) = -4\arctan \left(\frac{m}{\sqrt{1-m^2}} \frac{\sin\l
 \f]
 where $c_1$, $c_2$ and $m<1$ are constants. In the simulation below, we have chosen $c_1=0$, $c_2=0$, $m=0.5$. Moreover, it is know that the period of oscillation of the breather is $2\pi\sqrt{1-m^2}$, hence we have chosen $t_0=-5.4414$ and $t_f=2.7207$ so that we can observe three oscillations of the solution. Then, taking $u_0(x) = u_{\mathrm{breather}}(x,t_0)$, $\theta=0$ and $k=h/10$, the program computed the following solution.
 
-\image html christov.1d-breather.gif "Animation of the 1D stationary breather." width=5cm
+\image html step-25.1d-breather.gif "Animation of the 1D stationary breather." width=5cm
 
 Another way to visualize the (1+1)D solution is to use the output from the DataOutStack object to produce the space-time plot below instead of the animation above.
 
-\image html christov.1d-breather_stp.png "A space-time plot of the 1D stationary breather." width=5cm
+\image html step-25.1d-breather_stp.png "A space-time plot of the 1D stationary breather." width=5cm
 
 Furthermore, since the breather is an analytical solution of the sine-Gordon equation, we can use it to validate our code, at least in 1D. For the simulation shown in the two images above, the $L^2$ norm of the error in the finite element solution at each time step remained on the order of $10^{-2}$. Hence, we can conclude that the numerical method has been implemented correctly in the program.
 
@@ -27,13 +27,13 @@ where $a_0$, $\vartheta$ and $\lambda$ are constants. In the simulation below we
 
 The simulation shown below was performed with $u_0(x) = u_{\mathrm{kink}}(x,t_0)$, $\theta=\frac{1}{2}$, $k=20h$, $t_0=1$ and $t_f=500$. The $L^2$ norm of the error of the finite element solution at each time step remained on the order of $10^{-2}$, showing that the program is working correctly in 2D, as well as 1D. Unfortunately, the solution is not very interesting, nonetheless we have included a snapshot of it below for completeness. 
 
-\image html christov.2d-kink.png "Stationary 2D kink." width=5cm
+\image html step-25.2d-kink.png "Stationary 2D kink." width=5cm
 
 Now that we have validated the code in 1D and 2D, we move to a problem where an analytical solution is unknown. 
 
 To this end, we can rotate the kink solution discussed above about the $z$ axis, e.g. let  $\vartheta=\frac{\pi}{4}$. The latter results in a solitary wave that is not aligned with the grid, so reflections occur at the boundaries of the domain immediately. For the simulation shown below, we have taken $u_0(x)=u_{\mathrm{kink}}(x,t_0)$, $\theta=\frac{2}{3}$, $k=20h$, $t_0=0$ and $t_f=20$. Moreover, we had to pick $\theta=\frac{2}{3}$ because for any $\theta\le\frac{1}{2}$ oscillations arose at the boundary, which are likely due to the scheme and not the equation, thus picking a value of $\theta$ a good bit into the "exponentially damped" spectrum of the time stepping schemes assures these oscillations are not created. 
 
-\image html christov.2d-angled_kink.gif "Animation of a moving 2D kink, at 45 degrees to the axis of the grid, showing boundary effects." width=5cm
+\image html step-25.2d-angled_kink.gif "Animation of a moving 2D kink, at 45 degrees to the axis of the grid, showing boundary effects." width=5cm
 
 Another interesting solution to the sine-Gordon equation (which cannot be obtained analytically) can be produced by using two 1D breathers to construct the following separable 2D initial condition:
 \f[
@@ -41,7 +41,7 @@ u_0(x) = u_{\mathrm{pseudobreather}}(x,t_0) = 16\arctan \left(\frac{m}{\sqrt{1-m
 \f]
 where $x=(x_1,x_2)\in{R}^2$, $m=0.5(<1)$ as in the 1D case we discussed above. For the simulation shown below, we have chosen $\theta=\frac{1}{2}$, $k=10h$, $t_0=-5.4414$ and $t_f=2.7207$. The solution is pretty interesting --- it acts like a breather (as far as the pictures are concerned); however, it appears to break up and reassemble, rather than just oscillate. Naturally, the are things in the animation that can not be explained in a few words due to the fact that this initial condition is not an analytical solution to the sine-Gordon equation.
 
-\image html christov.2d-pseudobreather.gif "Animation of a 2D pseudobreather." width=5cm
+\image html step-25.2d-pseudobreather.gif "Animation of a 2D pseudobreather." width=5cm
 
 <h3>Future work</h3>
 Time-adaptive grids would likely be useful when solving a problem like this one (especially in the case of a traveling wave). However, due to the complexity of their implementation they are better left for another day.
