@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <base/quadrature.h>
+#include <base/template_constraints.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_tools.h>
 
@@ -26,13 +27,6 @@
 // are thus not very interesting to the outside world
 namespace
 {
-				   // auxiliary type to allow for some
-				   // kind of explicit template
-				   // specialization of the following
-				   // functions
-  template <int dim> struct int2type {};
-
-
 				   // given an integer N, compute its
 				   // integer square root (if it
 				   // exists, otherwise give up)
@@ -65,7 +59,7 @@ namespace
   inline Point<1>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
-		       const int2type<1>  )
+		       const ::internal::int2type<1>  )
   {
     Assert (i<N, ExcInternalError());
     if (N==1)
@@ -84,7 +78,7 @@ namespace
   inline Point<2>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
-		       const int2type<2>  )
+		       const ::internal::int2type<2>  )
   {
     Assert (i<N, ExcInternalError());
     
@@ -110,7 +104,7 @@ namespace
   inline Point<3>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
-		       const int2type<3>  )
+		       const ::internal::int2type<3>  )
   {
     Assert (i<N, ExcInternalError());
     if (N==1)
@@ -390,7 +384,7 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                                        // cell and evaluate the
                                        // shape functions there
       const Point<dim> p = generate_unit_point (j, this->dofs_per_cell,
-                                                int2type<dim>());
+                                                ::internal::int2type<dim>());
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
         cell_interpolation(j,i)
           = this->poly_space.compute_value (i, p);

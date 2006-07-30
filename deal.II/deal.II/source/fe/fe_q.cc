@@ -13,6 +13,7 @@
 
 #include <base/quadrature.h>
 #include <base/qprojector.h>
+#include <base/template_constraints.h>
 #include <fe/fe_q.h>
 #include <fe/fe_tools.h>
 
@@ -48,12 +49,6 @@ namespace FE_Q_Helper
 {
   namespace
   {
-				     // auxiliary type to allow for some
-				     // kind of explicit template
-				     // specialization of the following
-				     // functions
-    template <int dim> struct int2type {};
-
 				     // given a permutation array,
 				     // compute and return the inverse
 				     // permutation
@@ -115,7 +110,7 @@ namespace FE_Q_Helper
     Point<1>
     generate_unit_point (const unsigned int i,
 			 const unsigned int N,
-			 const int2type<1>  )
+			 const ::internal::int2type<1>  )
     {
       Assert (i<N, ExcInternalError());
       const double h = 1./(N-1);
@@ -133,7 +128,7 @@ namespace FE_Q_Helper
     Point<2>
     generate_unit_point (const unsigned int i,
 			 const unsigned int N,
-			 const int2type<2>  )
+			 const ::internal::int2type<2>  )
     {
       Assert (i<N, ExcInternalError());
       Assert (N>=4, ExcInternalError());
@@ -157,7 +152,7 @@ namespace FE_Q_Helper
     Point<3>
     generate_unit_point (const unsigned int i,
 			 const unsigned int N,
-			 const int2type<3>  )
+			 const ::internal::int2type<3>  )
     {
       Assert (i<N, ExcInternalError());
       Assert (N>=8, ExcInternalError());
@@ -284,7 +279,7 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                                    // shape functions there
       const Point<dim>
 	p = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
-					      FE_Q_Helper::int2type<dim>());
+					      ::internal::int2type<dim>());
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
         cell_interpolation(j,i) = this->poly_space.compute_value (i, p);
 
@@ -1170,7 +1165,7 @@ FE_Q<dim>::initialize_embedding ()
 					   // functions there
 	  const Point<dim> p_subcell
 	    = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
-						FE_Q_Helper::int2type<dim>());
+						::internal::int2type<dim>());
 	  const Point<dim> p_cell =
 	    GeometryInfo<dim>::child_to_cell_coordinates (p_subcell, child);
 
@@ -1335,7 +1330,7 @@ FE_Q<dim>::initialize_restriction ()
     {
       const Point<dim> p_cell
 	= FE_Q_Helper::generate_unit_point (i, this->dofs_per_cell,
-					    FE_Q_Helper::int2type<dim>());
+					    ::internal::int2type<dim>());
       unsigned int mother_dof = 0;
       for (; mother_dof<this->dofs_per_cell; ++mother_dof)
         {
