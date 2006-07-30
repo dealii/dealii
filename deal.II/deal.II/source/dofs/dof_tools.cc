@@ -1560,6 +1560,9 @@ namespace internal
   {
     namespace 
     {
+#ifdef DEAL_II_ANON_NAMESPACE_BUG
+      static
+#endif      
       void
       filter_constraints (const std::vector<unsigned int> &dofs_mother,
 			  const std::vector<unsigned int> &dofs_child,
