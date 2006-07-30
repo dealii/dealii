@@ -1,5 +1,5 @@
-//    $Id$
-//    Version: $Name$ 
+//    $Id: $
+//    Version: $Name: $ 
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors
 //
@@ -30,9 +30,15 @@ check_this (const DoFHandler<dim> &dof_handler)
   const FiniteElement<dim> &fe = dof_handler.get_fe();
   
   for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
-    Assert (fe.face_to_equivalent_cell_index (i) ==
-	    fe.face_to_cell_index (i, 0),
-	    ExcInternalError());
+    {
+      deallog << fe.face_to_equivalent_cell_index (i)
+	      << ' '
+	      << fe.face_to_cell_index (i, 0)
+	      << std::endl;
+      Assert (fe.face_to_equivalent_cell_index (i) ==
+	      fe.face_to_cell_index (i, 0),
+	      ExcInternalError());
+    }
   
   deallog << "OK" << std::endl;
 }
