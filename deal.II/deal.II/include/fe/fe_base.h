@@ -612,10 +612,17 @@ face_to_equivalent_cell_index (const unsigned int index) const
 {
   Assert (index < dofs_per_face,
 	  ExcIndexRange (index, 0, dofs_per_face));
-  return (index < (this->first_face_line_index)
-	  ? index
-	  : this->first_line_index +
-	  (index - this->first_face_line_index));
+
+				   // on face 0, the vertices are 0 and 2
+  if (index < this->dofs_per_vertex)
+    return index;
+  else if (index < 2*this->dofs_per_vertex)
+    return index + this->dofs_per_vertex;
+  else
+				     // this is a dof on line 0, so on the
+				     // cell there are now 4 vertices instead
+				     // of only 2 ahead of this one
+    return index + 2*this->dofs_per_vertex;
 }
 
 
@@ -627,16 +634,10 @@ unsigned int
 FiniteElementData<3>::
 face_to_equivalent_cell_index (const unsigned int index) const
 {
-  Assert (index < dofs_per_face,
-	  ExcIndexRange (index, 0, dofs_per_face));
-  return (index < (GeometryInfo<3>::vertices_per_face *
-		   this->dofs_per_vertex)
-	  ? index
-	  : (index < (this->first_face_quad_index)
-	     ? this->first_line_index +
-	     (index - this->first_face_line_index)
-	     : this->first_quad_index +
-	   (index - this->first_face_quad_index)));
+				   // this case is just way too
+				   // complicated. fall back to
+				   // face_to_cell_index
+  return face_to_cell_index(index, 0, true);
 }
 
 
