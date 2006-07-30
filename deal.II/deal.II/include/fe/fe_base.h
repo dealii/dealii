@@ -421,9 +421,9 @@ class FiniteElementData
 				      * degree of freedom on the cell.
 				      * 
 				      */
-    unsigned int face_to_cell_index(unsigned int face_index,
-				    unsigned int face,
-				    bool orientation = true) const;
+    unsigned int face_to_cell_index (const unsigned int face_index,
+				     const unsigned int face,
+				     const bool orientation = true) const;
     
 				     /**
 				      * @deprecated This function is
@@ -603,9 +603,7 @@ face_to_equivalent_cell_index (const unsigned int index) const
 }
 
 
-//TODO: This method produces results, that differ from those which
-// are returned bz "face_to_cell_index (index, 0)". This has to be
-// verified.
+
 template <>
 inline
 unsigned int

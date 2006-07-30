@@ -99,15 +99,15 @@ bool FiniteElementData<dim>::operator== (const FiniteElementData<dim> &f) const
 
 template<int dim>
 unsigned int
-FiniteElementData<dim>::face_to_cell_index(
-  unsigned int face_index,
-  unsigned int face,
-  bool orientation) const
+FiniteElementData<dim>::
+face_to_cell_index (const unsigned int face_index,
+		    const unsigned int face,
+		    const bool orientation) const
 {
-  Assert(face_index < this->dofs_per_face,
-	 ExcIndexRange(face_index, 0, this->dofs_per_face));
-  Assert(face < GeometryInfo<dim>::faces_per_cell,
-	 ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
+  Assert (face_index < this->dofs_per_face,
+	  ExcIndexRange(face_index, 0, this->dofs_per_face));
+  Assert (face < GeometryInfo<dim>::faces_per_cell,
+	  ExcIndexRange(face, 0, GeometryInfo<dim>::faces_per_cell));
   
 				   // DoF on a vertex
   if (face_index < this->first_face_line_index)
