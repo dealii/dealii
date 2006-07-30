@@ -20,7 +20,7 @@
 // According to the documentation they should be the same!
 
 
-std::string output_file_name = "fe_tools_14/output";
+std::string output_file_name = "fe_face_to_cell_index/output";
 
 
 template <int dim>

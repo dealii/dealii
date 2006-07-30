@@ -34,6 +34,7 @@ tests_x = grid_generator_?? \
 	  dof_tools_row_[0-9] \
 	  fe_tools_[0-9]* \
 	  fe_tools_cpfqpm* \
+	  fe_face_to_cell_index \
           anna_? \
 	  gerold_1 \
 	  roy_1 \
