@@ -22,7 +22,8 @@ threads.cc : threads.pl
 	@echo =====regenerating== $@
 	@$(PERL) $^ > $@
 
-tests_x =  logtest \
+tests_x =  geometry_info_* \
+	   logtest \
 	   log_* \
 	   reference \
 	   quadrature_* qprojector \
