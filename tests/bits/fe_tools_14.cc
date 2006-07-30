@@ -11,7 +11,7 @@
 //----------------------------  fe_tools_14.cc  ---------------------------
 
 #include "../tests.h"
-#include "fe_tools_common.cc"
+#include "dof_tools_common.cc"
 
 // comparison of the results of
 //   FE::face_to_equivalent_cell_index (i)
@@ -25,27 +25,15 @@ std::string output_file_name = "fe_tools_14/output";
 
 template <int dim>
 void
-check_this (const FiniteElement<dim> &fe1,
-            const FiniteElement<dim> &fe2)
+check_this (const DoFHandler<dim> &dof_handler)
 {
-  bool ok = true;
+  const FiniteElement<dim> &fe = dof_handler.get_fe();
   
-  for (unsigned int i = 0; i < fe1.dofs_per_face; ++i)
-    {
-      if (fe1.face_to_equivalent_cell_index (i) !=
-	  fe1.face_to_cell_index (i, 0))
-	ok = false;
-
-    }
-
-  for (unsigned int i = 0; i < fe2.dofs_per_face; ++i)
-    {
-      if (fe2.face_to_equivalent_cell_index (i) !=
-	  fe2.face_to_cell_index (i, 0))
-	ok = false;
-    }
+  for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
+    Assert (fe.face_to_equivalent_cell_index (i) ==
+	    fe.face_to_cell_index (i, 0),
+	    ExcInternalError());
   
-  ok ? deallog << "OK" << std::endl :
-    deallog << "Error!" << std::endl;
+  deallog << "OK" << std::endl;
 }
 
