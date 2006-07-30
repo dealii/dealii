@@ -169,7 +169,7 @@ template <int dim>
 void LaplaceProblem<dim>::make_grid_and_dofs (const bool random_p)
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (3);
+  triangulation.refine_global (5-dim);
   deallog << "Number of active cells: "
 	    << triangulation.n_active_cells()
 	    << std::endl;
