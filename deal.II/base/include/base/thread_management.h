@@ -2925,6 +2925,13 @@ namespace Threads
                                           * more than once.
                                           */
         void join () const;
+
+					 /**
+					  * Exception
+					  */
+	DeclException1 (ExcThreadCreationError,
+			int,
+			<< "pthread_create return code is " << arg1);
     };
 
 #  else       // some other threading model
