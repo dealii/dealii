@@ -824,9 +824,6 @@ void DGMethod<dim>::run ()
 
       Timer assemble_timer;
       assemble_system1 ();
-      deallog << "Time of assemble_system1: "
-		<< assemble_timer()
-		<< std::endl;
       solve (solution1);
 
       system_matrix = 0;
@@ -835,9 +832,6 @@ void DGMethod<dim>::run ()
 
       assemble_timer.start();
       assemble_system2 ();
-      deallog << "Time of assemble_system2: "
-		<< assemble_timer()
-		<< std::endl;
       solve (solution2);
 
       solution1-=solution2;

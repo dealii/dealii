@@ -2,8 +2,6 @@
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       64
 DEAL::   Number of degrees of freedom: 256
-DEAL::Time of assemble_system1: 0.040
-DEAL::Time of assemble_system2: 0.036
 DEAL::solution1 and solution2 coincide.
 DEAL::Writing grid to <grid-0.eps>...
 %!PS-Adobe-2.0 EPSF-1.2
@@ -735,8 +733,6 @@ DEAL::
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       112
 DEAL::   Number of degrees of freedom: 448
-DEAL::Time of assemble_system1: 0.072
-DEAL::Time of assemble_system2: 0.060
 DEAL::solution1 and solution2 coincide.
 DEAL::Writing grid to <grid-1.eps>...
 %!PS-Adobe-2.0 EPSF-1.2
@@ -1977,8 +1973,6 @@ DEAL::
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       214
 DEAL::   Number of degrees of freedom: 856
-DEAL::Time of assemble_system1: 0.14
-DEAL::Time of assemble_system2: 0.12
 DEAL::solution1 and solution2 coincide.
 DEAL::Writing grid to <grid-2.eps>...
 %!PS-Adobe-2.0 EPSF-1.2
@@ -4309,8 +4303,6 @@ DEAL::
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       415
 DEAL::   Number of degrees of freedom: 1660
-DEAL::Time of assemble_system1: 0.26
-DEAL::Time of assemble_system2: 0.22
 DEAL::solution1 and solution2 coincide.
 DEAL::Writing grid to <grid-3.eps>...
 %!PS-Adobe-2.0 EPSF-1.2
@@ -8788,8 +8780,6 @@ DEAL::
 DEAL::Cycle 4:
 DEAL::   Number of active cells:       796
 DEAL::   Number of degrees of freedom: 3184
-DEAL::Time of assemble_system1: 0.51
-DEAL::Time of assemble_system2: 0.44
 DEAL::solution1 and solution2 coincide.
 DEAL::Writing grid to <grid-4.eps>...
 %!PS-Adobe-2.0 EPSF-1.2
@@ -17329,8 +17319,6 @@ DEAL::
 DEAL::Cycle 5:
 DEAL::   Number of active cells:       1561
 DEAL::   Number of degrees of freedom: 6244
-DEAL::Time of assemble_system1: 1.0
-DEAL::Time of assemble_system2: 0.86
 DEAL::solution1 and solution2 coincide.
 DEAL::Writing grid to <grid-5.eps>...
 %!PS-Adobe-2.0 EPSF-1.2
