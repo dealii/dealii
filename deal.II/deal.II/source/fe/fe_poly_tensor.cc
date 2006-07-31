@@ -524,6 +524,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 		    for (unsigned int k=0; k<n_quad; ++k)
 		      {
 			// Recompute determinant
+//TODO: Note that the Jacobian we compute here is that of the transformation from the reference FACE to the real FACE. However, what we need is the Jacobian of the transformation of the reference to the real CELL, which differs by one power of h. Consequently, the tests fe/rt_{11,13,14,15} presently compute the wrong results
 			double J = 1.0;
 			if (mapping_type == contravariant)
 			  J = data.JxW_values[k] / quadrature.weight(k);
@@ -583,6 +584,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 		  for (unsigned int d=0;d<dim;++d)
 		    {
 		      // Recompute determinant
+//TODO: Note that the Jacobian we compute here is that of the transformation from the reference FACE to the real FACE. However, what we need is the Jacobian of the transformation of the reference to the real CELL, which differs by one power of h. Consequently, the tests fe/rt_{11,13,14,15} presently compute the wrong results
 		      double J = data.JxW_values[k] / quadrature.weight(k);
 		      data.shape_gradients[first+d][k] = sign_change[i] * 
 			shape_grads2[k][d] / J;
