@@ -1,5 +1,5 @@
-//----------------------------  rt_12.cc  ---------------------------
-//    rt_12.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
+//----------------------------  rt_14.cc  ---------------------------
+//    rt_14.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
 //    Copyright (C) 2003, 2005, 2006 by the deal.II authors
@@ -9,9 +9,9 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  rt_12.cc  ---------------------------
+//----------------------------  rt_14.cc  ---------------------------
 
-// Like rt_10, but check gradients instead of values
+// like rt_11, but use FESubfaceValues
 
 #include "../tests.h"
 #include <base/quadrature_lib.h>
@@ -37,7 +37,7 @@
 #define PRECISION 2
 
 
-std::ofstream logfile ("rt_12/output");
+std::ofstream logfile ("rt_14/output");
 
 template<int dim>
 void
@@ -59,10 +59,10 @@ test (const unsigned int degree)
       DoFHandler<dim> dof(tr);
       dof.distribute_dofs(fe_rt);
 
-      QTrapez<dim> quadrature;
+      QTrapez<dim-1> quadrature;
 
-      FEValues<dim> fe_values (fe_rt, quadrature, update_gradients);
-      fe_values.reinit (dof.begin_active());
+      FESubfaceValues<dim> fe_values (fe_rt, quadrature, update_values);
+      fe_values.reinit (dof.begin_active(), 0, 0);
       for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
 	{
 	  deallog << "    Quadrature point " << q << ": ";
@@ -70,7 +70,7 @@ test (const unsigned int degree)
 	    {
 	      deallog << '[';
 	      for (unsigned int c=0; c<fe_rt.n_components(); ++c)
-		deallog << fe_values.shape_grad_component(i,q,c) << ' ';
+		deallog << fe_values.shape_value_component(i,q,c) << ' ';
 	      deallog << ']';
 	    }
 	  deallog << std::endl;

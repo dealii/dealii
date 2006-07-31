@@ -1,5 +1,5 @@
-//----------------------------  rt_13.cc  ---------------------------
-//    rt_13.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
+//----------------------------  rt_15.cc  ---------------------------
+//    rt_15.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
 //    Copyright (C) 2003, 2005, 2006 by the deal.II authors
@@ -9,9 +9,9 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  rt_13.cc  ---------------------------
+//----------------------------  rt_15.cc  ---------------------------
 
-// Like rt_11, but for gradients (just as rt_12 is to rt_10)
+// Like rt_15, but use FESubfaceValues
 
 #include "../tests.h"
 #include <base/quadrature_lib.h>
@@ -37,7 +37,7 @@
 #define PRECISION 2
 
 
-std::ofstream logfile ("rt_13/output");
+std::ofstream logfile ("rt_15/output");
 
 template<int dim>
 void
@@ -61,8 +61,8 @@ test (const unsigned int degree)
 
       QTrapez<dim-1> quadrature;
 
-      FEFaceValues<dim> fe_values (fe_rt, quadrature, update_gradients);
-      fe_values.reinit (dof.begin_active(), 0);
+      FESubfaceValues<dim> fe_values (fe_rt, quadrature, update_gradients);
+      fe_values.reinit (dof.begin_active(), 0, 0);
       for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
 	{
 	  deallog << "    Quadrature point " << q << ": ";
