@@ -38,7 +38,8 @@ std::ofstream logfile("step-15/output");
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>
-#include <fe/fe_values.h>
+#include <fe/hp_fe_values.h>
+#include <fe/q_collection.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
@@ -101,7 +102,7 @@ class MinimizationProblem
     void output_results () const;
     void refine_grid ();
 
-    static double energy (const DoFHandler<dim> &dof_handler,
+    static double energy (const hp::DoFHandler<dim> &dof_handler,
                           const Vector<double>  &function);
  
 
@@ -109,8 +110,8 @@ class MinimizationProblem
     
     Triangulation<dim>   triangulation;
 
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
+    hp::FECollection<dim>            fe;
+    hp::DoFHandler<dim>      dof_handler;
 
     ConstraintMatrix     hanging_node_constraints;
     
@@ -127,7 +128,7 @@ template <int dim>
 MinimizationProblem<dim>::MinimizationProblem (const unsigned int run_number)
                 :
                 run_number (run_number),
-                fe (1),
+                fe (FE_Q<dim>(1)),
 		dof_handler (triangulation)
 {}
 
@@ -140,7 +141,7 @@ void MinimizationProblem<1>::initialize_solution ()
                             InitializationValues(),
                             present_solution);
 
-  DoFHandler<1>::cell_iterator cell;
+  hp::DoFHandler<1>::cell_iterator cell;
   cell = dof_handler.begin(0);
   while (cell->at_boundary(0) == false)
     cell = cell->neighbor(0);
@@ -183,13 +184,13 @@ void MinimizationProblem<dim>::assemble_step ()
   matrix.reinit (sparsity_pattern);
   residual.reinit (dof_handler.n_dofs());
 
-  QGauss<dim>  quadrature_formula(4);
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  hp::QCollection<dim>  quadrature_formula(QGauss<dim>(4));
+  hp::FEValues<dim> fe_values (fe, quadrature_formula, 
 			   update_values   | update_gradients |
                            update_q_points | update_JxW_values);
 
-  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int dofs_per_cell = fe[0].dofs_per_cell;
+  const unsigned int n_q_points    = quadrature_formula[0].n_quadrature_points;
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
@@ -199,7 +200,7 @@ void MinimizationProblem<dim>::assemble_step ()
   std::vector<double>         local_solution_values (n_q_points);
   std::vector<Tensor<1,dim> > local_solution_grads (n_q_points);
 
-  typename DoFHandler<dim>::active_cell_iterator
+  typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -209,44 +210,44 @@ void MinimizationProblem<dim>::assemble_step ()
 
       fe_values.reinit (cell);
 
-      fe_values.get_function_values (present_solution,
+      fe_values.get_present_fe_values().get_function_values (present_solution,
                                      local_solution_values);
-      fe_values.get_function_grads (present_solution,
+      fe_values.get_present_fe_values().get_function_grads (present_solution,
                                     local_solution_grads);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
         {
           const double u = local_solution_values[q_point],
-                       x = fe_values.quadrature_point(q_point)(0);
+                       x = fe_values.get_present_fe_values().quadrature_point(q_point)(0);
           const double x_minus_u3 = (x-std::pow(u,3));
           const Tensor<1,dim> u_prime = local_solution_grads[q_point];
 
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             for (unsigned int j=0; j<dofs_per_cell; ++j)
               cell_matrix(i,j)
-                += (fe_values.shape_grad(i,q_point) *
-                    fe_values.shape_grad(j,q_point) *
+                += (fe_values.get_present_fe_values().shape_grad(i,q_point) *
+                    fe_values.get_present_fe_values().shape_grad(j,q_point) *
                     cell->diameter() *
                     cell->diameter()
                     +
-                    fe_values.shape_value(i,q_point) *
-                    fe_values.shape_value(j,q_point)) *
-                fe_values.JxW(q_point);
+                    fe_values.get_present_fe_values().shape_value(i,q_point) *
+                    fe_values.get_present_fe_values().shape_value(j,q_point)) *
+                fe_values.get_present_fe_values().JxW(q_point);
 
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             cell_rhs(i) += -((6. * x_minus_u3 *
                               gradient_power (u_prime, 4) *
-                              fe_values.shape_value(i,q_point)
+                              fe_values.get_present_fe_values().shape_value(i,q_point)
                               *
                               (x_minus_u3 *
                                (u_prime * 
-                                fe_values.shape_grad(i,q_point))
+                                fe_values.get_present_fe_values().shape_grad(i,q_point))
                                -
                                (u_prime*u_prime) * u * u *
-                               fe_values.shape_value(i,q_point))
+                               fe_values.get_present_fe_values().shape_value(i,q_point))
                               )
                              *
-                             fe_values.JxW(q_point));
+                             fe_values.get_present_fe_values().JxW(q_point));
         }
       
       cell->get_dof_indices (local_dof_indices);
@@ -366,7 +367,7 @@ template <int dim>
 void
 MinimizationProblem<dim>::output_results () const
 {
-  DataOut<dim> data_out;
+  DataOut<dim,hp::DoFHandler<dim> > data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (present_solution, "solution");
   data_out.build_patches ();
@@ -389,33 +390,34 @@ void MinimizationProblem<1>::refine_grid ()
   
   Vector<float> error_indicators (triangulation.n_active_cells());
 
-  QTrapez<dim> quadrature;
-  FEValues<dim> fe_values (fe, quadrature,
+  QTrapez<dim> q;
+  hp::QCollection<dim> quadrature(q);
+  hp::FEValues<dim> fe_values (fe, quadrature,
                            update_values   | update_gradients |
                            update_second_derivatives |
                            update_q_points | update_JxW_values);
 
-  FEValues<dim> neighbor_fe_values (fe, quadrature,
+  hp::FEValues<dim> neighbor_fe_values (fe, quadrature,
                                     update_gradients);
 
-  std::vector<double> local_values (quadrature.n_quadrature_points);
-  std::vector<Tensor<1,dim> > local_gradients (quadrature.n_quadrature_points);
-  std::vector<Tensor<2,dim> > local_2nd_derivs (quadrature.n_quadrature_points);
+  std::vector<double> local_values (quadrature[0].n_quadrature_points);
+  std::vector<Tensor<1,dim> > local_gradients (quadrature[0].n_quadrature_points);
+  std::vector<Tensor<2,dim> > local_2nd_derivs (quadrature[0].n_quadrature_points);
 
-  DoFHandler<dim>::active_cell_iterator
+  hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active (),
     endc = dof_handler.end ();
   for (unsigned int cell_index = 0; cell!=endc; ++cell, ++cell_index)
     {
       fe_values.reinit (cell);
-      fe_values.get_function_values (present_solution, local_values);
-      fe_values.get_function_grads (present_solution, local_gradients);
-      fe_values.get_function_2nd_derivatives (present_solution, local_2nd_derivs);
+      fe_values.get_present_fe_values().get_function_values (present_solution, local_values);
+      fe_values.get_present_fe_values().get_function_grads (present_solution, local_gradients);
+      fe_values.get_present_fe_values().get_function_2nd_derivatives (present_solution, local_2nd_derivs);
 
       double cell_residual_norm = 0;
-      for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+      for (unsigned int q=0; q<quadrature[0].n_quadrature_points; ++q)
         {
-          const double x             = fe_values.quadrature_point(q)[0];
+          const double x             = fe_values.get_present_fe_values().quadrature_point(q)[0];
           const double u             = local_values[q];
           const double u_prime       = local_gradients[q][0];
           const double u_doubleprime = local_2nd_derivs[q][0][0];
@@ -428,13 +430,13 @@ void MinimizationProblem<1>::refine_grid ()
                 2*u_prime*(1-3*u*u*u_prime)));
           
           cell_residual_norm += (local_residual_value * local_residual_value *
-                                 fe_values.JxW(q));
+                                 fe_values.get_present_fe_values().JxW(q));
         }
       error_indicators(cell_index) = cell_residual_norm *
                                      cell->diameter() * cell->diameter();
 
-      const double x_left  = fe_values.quadrature_point(0)[0];
-      const double x_right = fe_values.quadrature_point(1)[0];
+      const double x_left  = fe_values.get_present_fe_values().quadrature_point(0)[0];
+      const double x_right = fe_values.get_present_fe_values().quadrature_point(1)[0];
 
       Assert (x_left  == cell->vertex(0)[0], ExcInternalError());
       Assert (x_right == cell->vertex(1)[0], ExcInternalError());
@@ -447,12 +449,12 @@ void MinimizationProblem<1>::refine_grid ()
 
       if (cell->at_boundary(0) == false)
         {
-          DoFHandler<dim>::cell_iterator left_neighbor = cell->neighbor(0);
+          hp::DoFHandler<dim>::cell_iterator left_neighbor = cell->neighbor(0);
           while (left_neighbor->has_children())
             left_neighbor = left_neighbor->child(1);
 
           neighbor_fe_values.reinit (left_neighbor);
-          neighbor_fe_values.get_function_grads (present_solution, local_gradients);
+          neighbor_fe_values.get_present_fe_values().get_function_grads (present_solution, local_gradients);
 
           const double neighbor_u_prime_left = local_gradients[1][0];
 
@@ -465,12 +467,12 @@ void MinimizationProblem<1>::refine_grid ()
 
       if (cell->at_boundary(1) == false)
         {
-          DoFHandler<dim>::cell_iterator right_neighbor = cell->neighbor(1);
+          hp::DoFHandler<dim>::cell_iterator right_neighbor = cell->neighbor(1);
           while (right_neighbor->has_children())
             right_neighbor = right_neighbor->child(0);
           
           neighbor_fe_values.reinit (right_neighbor);
-          neighbor_fe_values.get_function_grads (present_solution, local_gradients);
+          neighbor_fe_values.get_present_fe_values().get_function_grads (present_solution, local_gradients);
 
           const double neighbor_u_prime_right = local_gradients[0][0];
 
@@ -508,39 +510,39 @@ void MinimizationProblem<1>::refine_grid ()
 
 template <int dim>
 double
-MinimizationProblem<dim>::energy (const DoFHandler<dim> &dof_handler,
+MinimizationProblem<dim>::energy (const hp::DoFHandler<dim> &dof_handler,
                                   const Vector<double>  &function)
 {
-  QGauss<dim>  quadrature_formula(4);
-  FEValues<dim> fe_values (dof_handler.get_fe(), quadrature_formula, 
+  hp::QCollection<dim>  quadrature_formula(QGauss<dim>(4));
+  hp::FEValues<dim> fe_values (dof_handler.get_fe(), quadrature_formula, 
 			   update_values   | update_gradients |
                            update_q_points | update_JxW_values);
 
-  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int   n_q_points    = quadrature_formula[0].n_quadrature_points;
 
   std::vector<double>         local_solution_values (n_q_points);
   std::vector<Tensor<1,dim> > local_solution_grads (n_q_points);
 
   double energy = 0.;
 
-  typename DoFHandler<dim>::active_cell_iterator
+  typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);
-      fe_values.get_function_values (function,
+      fe_values.get_present_fe_values().get_function_values (function,
                                      local_solution_values);
-      fe_values.get_function_grads (function,
+      fe_values.get_present_fe_values().get_function_grads (function,
                                     local_solution_grads);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-        energy += (std::pow (fe_values.quadrature_point(q_point)(0)
+        energy += (std::pow (fe_values.get_present_fe_values().quadrature_point(q_point)(0)
                              -
                              std::pow (local_solution_values[q_point], 3),
                              2) *
                    gradient_power (local_solution_grads[q_point], 6) *
-                   fe_values.JxW (q_point));
+                   fe_values.get_present_fe_values().JxW (q_point));
     }
 
   return energy;

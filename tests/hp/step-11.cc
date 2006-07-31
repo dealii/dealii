@@ -37,7 +37,7 @@ std::ofstream logfile("step-11/output");
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_q.h>
-#include <fe/fe_values.h>
+#include <fe/hp_fe_values.h>
 #include <fe/mapping_q.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
@@ -63,9 +63,9 @@ class LaplaceProblem
     void solve ();
 
     Triangulation<dim>   triangulation;
-    FE_Q<dim>            fe;
-    DoFHandler<dim>      dof_handler;
-    MappingQ<dim>        mapping;
+    hp::FECollection<dim>            fe;
+    hp::DoFHandler<dim>      dof_handler;
+    hp::MappingCollection<dim>        mapping;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -81,9 +81,9 @@ class LaplaceProblem
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem (const unsigned int mapping_degree) :
-                fe (1),
+                fe (FE_Q<dim>(1)),
 		dof_handler (triangulation),
-		mapping (mapping_degree)
+		mapping (MappingQ<dim>(mapping_degree))
 {
   deallog << "Using mapping with degree " << mapping_degree << ":"
 	    << std::endl
@@ -134,7 +134,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 {
 
   const unsigned int gauss_degree
-    = std::max (static_cast<unsigned int>(std::ceil(1.*(mapping.get_degree()+1)/2)),
+    = std::max (static_cast<unsigned int>(std::ceil(1.*(static_cast<const MappingQ<dim>&>(mapping[0]).get_degree()+1)/2)),
 		2U);
   MatrixTools::create_laplace_matrix (mapping, dof_handler,
 				      QGauss<dim>(gauss_degree),

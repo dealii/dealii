@@ -29,7 +29,7 @@ std::ofstream logfile("step-12/output");
 #include <grid/grid_refinement.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
-#include <fe/fe_values.h>
+#include <fe/hp_fe_values.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
@@ -132,21 +132,23 @@ class DGTransportEquation
   public:
     DGTransportEquation();
 
-    void assemble_cell_term(const FEValues<dim>& fe_v,
+    void assemble_cell_term(const hp::FEValues<dim>& fe_v,
 			    FullMatrix<double> &ui_vi_matrix,
 			    Vector<double> &cell_vector) const;
     
-    void assemble_boundary_term(const FEFaceValues<dim>& fe_v,
+    void assemble_boundary_term(const hp::FEFaceValues<dim>& fe_v,
 				FullMatrix<double> &ui_vi_matrix,
 				Vector<double> &cell_vector) const;
-    
-    void assemble_face_term1(const FEFaceValuesBase<dim>& fe_v,
-			     const FEFaceValuesBase<dim>& fe_v_neighbor,
+
+    template <class X, class Y>
+    void assemble_face_term1(const X& fe_v,
+			     const Y& fe_v_neighbor,
 			     FullMatrix<double> &ui_vi_matrix,
 			     FullMatrix<double> &ue_vi_matrix) const;
 
-    void assemble_face_term2(const FEFaceValuesBase<dim>& fe_v,
-			     const FEFaceValuesBase<dim>& fe_v_neighbor,
+    template <class X, class Y>
+    void assemble_face_term2(const X& fe_v,
+			     const Y& fe_v_neighbor,
 			     FullMatrix<double> &ui_vi_matrix,
 			     FullMatrix<double> &ue_vi_matrix,
 			     FullMatrix<double> &ui_ve_matrix,
@@ -169,149 +171,151 @@ DGTransportEquation<dim>::DGTransportEquation ()
 
 template <int dim>
 void DGTransportEquation<dim>::assemble_cell_term(
-  const FEValues<dim> &fe_v,
+  const hp::FEValues<dim> &fe_v,
   FullMatrix<double> &ui_vi_matrix,
   Vector<double> &cell_vector) const
 {
-  const std::vector<double> &JxW = fe_v.get_JxW_values ();
+  const std::vector<double> &JxW = fe_v.get_present_fe_values().get_JxW_values ();
 
-  std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
-  std::vector<double> rhs (fe_v.n_quadrature_points);
+  std::vector<Point<dim> > beta (fe_v.get_present_fe_values().n_quadrature_points);
+  std::vector<double> rhs (fe_v.get_present_fe_values().n_quadrature_points);
   
-  beta_function.value_list (fe_v.get_quadrature_points(), beta);
-  rhs_function.value_list (fe_v.get_quadrature_points(), rhs);
+  beta_function.value_list (fe_v.get_present_fe_values().get_quadrature_points(), beta);
+  rhs_function.value_list (fe_v.get_present_fe_values().get_quadrature_points(), rhs);
   
-  for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
-    for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i) 
+  for (unsigned int point=0; point<fe_v.get_present_fe_values().n_quadrature_points; ++point)
+    for (unsigned int i=0; i<fe_v.get_present_fe_values().dofs_per_cell; ++i) 
       {
-	for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-	  ui_vi_matrix(i,j) -= beta[point]*fe_v.shape_grad(i,point)*
-			      fe_v.shape_value(j,point) *
+	for (unsigned int j=0; j<fe_v.get_present_fe_values().dofs_per_cell; ++j)
+	  ui_vi_matrix(i,j) -= beta[point]*fe_v.get_present_fe_values().shape_grad(i,point)*
+			      fe_v.get_present_fe_values().shape_value(j,point) *
 			      JxW[point];
 	
-	cell_vector(i) += rhs[point] * fe_v.shape_value(i,point) * JxW[point];
+	cell_vector(i) += rhs[point] * fe_v.get_present_fe_values().shape_value(i,point) * JxW[point];
       }
 }
 
 
 template <int dim>
 void DGTransportEquation<dim>::assemble_boundary_term(
-  const FEFaceValues<dim>& fe_v,    
+  const hp::FEFaceValues<dim>& fe_v,    
   FullMatrix<double> &ui_vi_matrix,
   Vector<double> &cell_vector) const
 {
-  const std::vector<double> &JxW = fe_v.get_JxW_values ();
-  const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
+  const std::vector<double> &JxW = fe_v.get_present_fe_values().get_JxW_values ();
+  const std::vector<Point<dim> > &normals = fe_v.get_present_fe_values().get_normal_vectors ();
 
-  std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
-  std::vector<double> g(fe_v.n_quadrature_points);
+  std::vector<Point<dim> > beta (fe_v.get_present_fe_values().n_quadrature_points);
+  std::vector<double> g(fe_v.get_present_fe_values().n_quadrature_points);
   
-  beta_function.value_list (fe_v.get_quadrature_points(), beta);
-  boundary_function.value_list (fe_v.get_quadrature_points(), g);
+  beta_function.value_list (fe_v.get_present_fe_values().get_quadrature_points(), beta);
+  boundary_function.value_list (fe_v.get_present_fe_values().get_quadrature_points(), g);
 
-  for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
+  for (unsigned int point=0; point<fe_v.get_present_fe_values().n_quadrature_points; ++point)
     {
       const double beta_n=beta[point] * normals[point];      
       if (beta_n>0)
-	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
+	for (unsigned int i=0; i<fe_v.get_present_fe_values().dofs_per_cell; ++i)
+	  for (unsigned int j=0; j<fe_v.get_present_fe_values().dofs_per_cell; ++j)
 	    ui_vi_matrix(i,j) += beta_n *
-			       fe_v.shape_value(j,point) *
-			       fe_v.shape_value(i,point) *
+			       fe_v.get_present_fe_values().shape_value(j,point) *
+			       fe_v.get_present_fe_values().shape_value(i,point) *
 			       JxW[point];
       else
-	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
+	for (unsigned int i=0; i<fe_v.get_present_fe_values().dofs_per_cell; ++i)
 	  cell_vector(i) -= beta_n *
 			    g[point] *
-			    fe_v.shape_value(i,point) *
+			    fe_v.get_present_fe_values().shape_value(i,point) *
 			    JxW[point];
     }
 }
 
 
 template <int dim>
+template <class X, class Y>
 void DGTransportEquation<dim>::assemble_face_term1(
-  const FEFaceValuesBase<dim>& fe_v,
-  const FEFaceValuesBase<dim>& fe_v_neighbor,      
+  const X& fe_v,
+  const Y& fe_v_neighbor,      
   FullMatrix<double> &ui_vi_matrix,
   FullMatrix<double> &ue_vi_matrix) const
 {
-  const std::vector<double> &JxW = fe_v.get_JxW_values ();
-  const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
+  const std::vector<double> &JxW = fe_v.get_present_fe_values().get_JxW_values ();
+  const std::vector<Point<dim> > &normals = fe_v.get_present_fe_values().get_normal_vectors ();
 
-  std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
-  beta_function.value_list (fe_v.get_quadrature_points(), beta);
+  std::vector<Point<dim> > beta (fe_v.get_present_fe_values().n_quadrature_points);
+  beta_function.value_list (fe_v.get_present_fe_values().get_quadrature_points(), beta);
 
-  for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
+  for (unsigned int point=0; point<fe_v.get_present_fe_values().n_quadrature_points; ++point)
     {
       const double beta_n=beta[point] * normals[point];
       if (beta_n>0)
-	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
+	for (unsigned int i=0; i<fe_v.get_present_fe_values().dofs_per_cell; ++i)
+	  for (unsigned int j=0; j<fe_v.get_present_fe_values().dofs_per_cell; ++j)
 	    ui_vi_matrix(i,j) += beta_n *
-			       fe_v.shape_value(j,point) *
-			       fe_v.shape_value(i,point) *
+			       fe_v.get_present_fe_values().shape_value(j,point) *
+			       fe_v.get_present_fe_values().shape_value(i,point) *
 			       JxW[point];
       else
-	for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
+	for (unsigned int i=0; i<fe_v.get_present_fe_values().dofs_per_cell; ++i)
+	  for (unsigned int k=0; k<fe_v_neighbor.get_present_fe_values().dofs_per_cell; ++k)
 	    ue_vi_matrix(i,k) += beta_n *
-				fe_v_neighbor.shape_value(k,point) *
-				fe_v.shape_value(i,point) *
+				fe_v_neighbor.get_present_fe_values().shape_value(k,point) *
+				fe_v.get_present_fe_values().shape_value(i,point) *
 				JxW[point];
     }
 }
 
 
 template <int dim>
+template <class X, class Y>
 void DGTransportEquation<dim>::assemble_face_term2(
-  const FEFaceValuesBase<dim>& fe_v,
-  const FEFaceValuesBase<dim>& fe_v_neighbor,      
+  const X& fe_v,
+  const Y& fe_v_neighbor,      
   FullMatrix<double> &ui_vi_matrix,
   FullMatrix<double> &ue_vi_matrix,
   FullMatrix<double> &ui_ve_matrix,
   FullMatrix<double> &ue_ve_matrix) const
 {
-  const std::vector<double> &JxW = fe_v.get_JxW_values ();
-  const std::vector<Point<dim> > &normals = fe_v.get_normal_vectors ();
+  const std::vector<double> &JxW = fe_v.get_present_fe_values().get_JxW_values ();
+  const std::vector<Point<dim> > &normals = fe_v.get_present_fe_values().get_normal_vectors ();
 
-  std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
+  std::vector<Point<dim> > beta (fe_v.get_present_fe_values().n_quadrature_points);
   
-  beta_function.value_list (fe_v.get_quadrature_points(), beta);
+  beta_function.value_list (fe_v.get_present_fe_values().get_quadrature_points(), beta);
 
-  for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
+  for (unsigned int point=0; point<fe_v.get_present_fe_values().n_quadrature_points; ++point)
     {
       const double beta_n=beta[point] * normals[point];
       if (beta_n>0)
 	{
-	  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-	    for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
+	  for (unsigned int i=0; i<fe_v.get_present_fe_values().dofs_per_cell; ++i)
+	    for (unsigned int j=0; j<fe_v.get_present_fe_values().dofs_per_cell; ++j)
 	      ui_vi_matrix(i,j) += beta_n *
-				 fe_v.shape_value(j,point) *
-				 fe_v.shape_value(i,point) *
+				 fe_v.get_present_fe_values().shape_value(j,point) *
+				 fe_v.get_present_fe_values().shape_value(i,point) *
 				 JxW[point];
 
-	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
-	    for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
+	  for (unsigned int k=0; k<fe_v_neighbor.get_present_fe_values().dofs_per_cell; ++k)
+	    for (unsigned int j=0; j<fe_v.get_present_fe_values().dofs_per_cell; ++j)
 	      ui_ve_matrix(k,j) -= beta_n *
-				  fe_v.shape_value(j,point) *
-				  fe_v_neighbor.shape_value(k,point) *
+				  fe_v.get_present_fe_values().shape_value(j,point) *
+				  fe_v_neighbor.get_present_fe_values().shape_value(k,point) *
 				  JxW[point];
 	}
       else
 	{
-	  for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-	    for (unsigned int l=0; l<fe_v_neighbor.dofs_per_cell; ++l)
+	  for (unsigned int i=0; i<fe_v.get_present_fe_values().dofs_per_cell; ++i)
+	    for (unsigned int l=0; l<fe_v_neighbor.get_present_fe_values().dofs_per_cell; ++l)
 	      ue_vi_matrix(i,l) += beta_n *
-				  fe_v_neighbor.shape_value(l,point) *
-				  fe_v.shape_value(i,point) *
+				  fe_v_neighbor.get_present_fe_values().shape_value(l,point) *
+				  fe_v.get_present_fe_values().shape_value(i,point) *
 				  JxW[point];
 
-	  for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
-	    for (unsigned int l=0; l<fe_v_neighbor.dofs_per_cell; ++l)
+	  for (unsigned int k=0; k<fe_v_neighbor.get_present_fe_values().dofs_per_cell; ++k)
+	    for (unsigned int l=0; l<fe_v_neighbor.get_present_fe_values().dofs_per_cell; ++l)
 	      ue_ve_matrix(k,l) -= beta_n *
-				   fe_v_neighbor.shape_value(l,point) *
-				   fe_v_neighbor.shape_value(k,point) *
+				   fe_v_neighbor.get_present_fe_values().shape_value(l,point) *
+				   fe_v_neighbor.get_present_fe_values().shape_value(k,point) *
 				   JxW[point];
 	}
     }
@@ -336,16 +340,16 @@ class DGMethod
     void output_results (const unsigned int cycle) const;
     
     Triangulation<dim>   triangulation;
-    const MappingQ1<dim> mapping;
+    const hp::MappingCollection<dim> mapping;
     
-    FE_DGQ<dim>          fe;
-    DoFHandler<dim>      dof_handler;
+    hp::FECollection<dim>          fe;
+    hp::DoFHandler<dim>      dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
 
-    const QGauss<dim>   quadrature;
-    const QGauss<dim-1> face_quadrature;
+    const hp::QCollection<dim>   quadrature;
+    const hp::QCollection<dim-1> face_quadrature;
     
     Vector<double>       solution1;
     Vector<double>       solution2;
@@ -358,11 +362,11 @@ class DGMethod
 template <int dim>
 DGMethod<dim>::DGMethod ()
 		:
-		mapping (),
-                fe (1),
+		mapping (MappingQ1<dim>()),
+                fe (FE_DGQ<dim>(1)),
 		dof_handler (triangulation),
-		quadrature (4),
-		face_quadrature (4),
+		quadrature (QGauss<dim>(4)),
+		face_quadrature (QGauss<dim-1>(4)),
 		dg ()
 {}
 
@@ -382,7 +386,7 @@ void DGMethod<dim>::setup_system ()
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
 			   (GeometryInfo<dim>::faces_per_cell
-			    *GeometryInfo<dim>::subfaces_per_face+1)*fe.dofs_per_cell);
+			    *GeometryInfo<dim>::subfaces_per_face+1)*fe[0].dofs_per_cell);
   
   DoFTools::make_flux_sparsity_pattern (dof_handler, sparsity_pattern);
   
@@ -399,7 +403,7 @@ void DGMethod<dim>::setup_system ()
 template <int dim>
 void DGMethod<dim>::assemble_system1 () 
 {
-  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+  const unsigned int dofs_per_cell = dof_handler.get_fe()[0].dofs_per_cell;
   std::vector<unsigned int> dofs (dofs_per_cell);
   std::vector<unsigned int> dofs_neighbor (dofs_per_cell);
 
@@ -415,16 +419,16 @@ void DGMethod<dim>::assemble_system1 ()
   
   const UpdateFlags neighbor_face_update_flags = update_values;
    
-  FEValues<dim> fe_v (
+  hp::FEValues<dim> fe_v (
     mapping, fe, quadrature, update_flags);
   
-  FEFaceValues<dim> fe_v_face (
+  hp::FEFaceValues<dim> fe_v_face (
     mapping, fe, face_quadrature, face_update_flags);
-  FESubfaceValues<dim> fe_v_subface (
+  hp::FESubfaceValues<dim> fe_v_subface (
     mapping, fe, face_quadrature, face_update_flags);
-  FEFaceValues<dim> fe_v_face_neighbor (
+  hp::FEFaceValues<dim> fe_v_face_neighbor (
     mapping, fe, face_quadrature, neighbor_face_update_flags);
-  FESubfaceValues<dim> fe_v_subface_neighbor (
+  hp::FESubfaceValues<dim> fe_v_subface_neighbor (
     mapping, fe, face_quadrature, neighbor_face_update_flags);
 
   FullMatrix<double> ui_vi_matrix (dofs_per_cell, dofs_per_cell);
@@ -432,7 +436,7 @@ void DGMethod<dim>::assemble_system1 ()
 
   Vector<double>  cell_vector (dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator
+  typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
@@ -451,7 +455,7 @@ void DGMethod<dim>::assemble_system1 ()
 
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	{
-	  typename DoFHandler<dim>::face_iterator face=cell->face(face_no);
+	  typename hp::DoFHandler<dim>::face_iterator face=cell->face(face_no);
 	  
 	  ue_vi_matrix = 0;
 		  
@@ -465,7 +469,7 @@ void DGMethod<dim>::assemble_system1 ()
 	    }
 	  else
 	    {
-	      typename DoFHandler<dim>::cell_iterator neighbor=
+	      typename hp::DoFHandler<dim>::cell_iterator neighbor=
 		cell->neighbor(face_no);;
 
 	      if (face->has_children())
@@ -477,7 +481,7 @@ void DGMethod<dim>::assemble_system1 ()
 		  for (unsigned int subface_no=0;
 		       subface_no<face->n_children(); ++subface_no)
 		    {
-		      typename DoFHandler<dim>::active_cell_iterator
+		      typename hp::DoFHandler<dim>::active_cell_iterator
                         neighbor_child
                         = cell->neighbor_child_on_subface (face_no, subface_no);
 		      
@@ -565,7 +569,7 @@ void DGMethod<dim>::assemble_system1 ()
 template <int dim>
 void DGMethod<dim>::assemble_system2 () 
 {
-  const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+  const unsigned int dofs_per_cell = dof_handler.get_fe()[0].dofs_per_cell;
   std::vector<unsigned int> dofs (dofs_per_cell);
   std::vector<unsigned int> dofs_neighbor (dofs_per_cell);
 
@@ -581,13 +585,13 @@ void DGMethod<dim>::assemble_system2 ()
   
   const UpdateFlags neighbor_face_update_flags = update_values;
 
-  FEValues<dim> fe_v (
+  hp::FEValues<dim> fe_v (
     mapping, fe, quadrature, update_flags);
-  FEFaceValues<dim> fe_v_face (
+  hp::FEFaceValues<dim> fe_v_face (
     mapping, fe, face_quadrature, face_update_flags);
-  FESubfaceValues<dim> fe_v_subface (
+  hp::FESubfaceValues<dim> fe_v_subface (
     mapping, fe, face_quadrature, face_update_flags);
-  FEFaceValues<dim> fe_v_face_neighbor (
+  hp::FEFaceValues<dim> fe_v_face_neighbor (
     mapping, fe, face_quadrature, neighbor_face_update_flags);
 
 
@@ -599,7 +603,7 @@ void DGMethod<dim>::assemble_system2 ()
   
   Vector<double>  cell_vector (dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator
+  typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (;cell!=endc; ++cell) 
@@ -617,7 +621,7 @@ void DGMethod<dim>::assemble_system2 ()
 
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	{
-	  typename DoFHandler<dim>::face_iterator face=
+	  typename hp::DoFHandler<dim>::face_iterator face=
 	    cell->face(face_no);
 
 	  if (face->at_boundary())
@@ -632,7 +636,7 @@ void DGMethod<dim>::assemble_system2 ()
 	    {
 	      Assert (cell->neighbor(face_no).state() == IteratorState::valid,
 		      ExcInternalError());
-	      typename DoFHandler<dim>::cell_iterator neighbor=
+	      typename hp::DoFHandler<dim>::cell_iterator neighbor=
 		cell->neighbor(face_no);
 	      if (face->has_children())
 		{
@@ -642,7 +646,7 @@ void DGMethod<dim>::assemble_system2 ()
 		  for (unsigned int subface_no=0;
 		       subface_no<face->n_children(); ++subface_no)
 		    {
-		      typename DoFHandler<dim>::cell_iterator neighbor_child
+		      typename hp::DoFHandler<dim>::cell_iterator neighbor_child
                         = cell->neighbor_child_on_subface (face_no, subface_no);
 		      Assert (neighbor_child->face(neighbor2) == face->child(subface_no),
 			      ExcInternalError());
@@ -733,7 +737,7 @@ void DGMethod<dim>::solve (Vector<double> &solution)
 
   PreconditionBlockSSOR<SparseMatrix<double> > preconditioner;
 
-  preconditioner.initialize(system_matrix, fe.dofs_per_cell);
+  preconditioner.initialize(system_matrix, fe[0].dofs_per_cell);
 
   solver.solve (system_matrix, solution, right_hand_side,
 		preconditioner);
@@ -750,7 +754,7 @@ void DGMethod<dim>::refine_grid ()
 						 solution2,
 						 gradient_indicator);
 
-  typename DoFHandler<dim>::active_cell_iterator
+  typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
@@ -785,7 +789,7 @@ void DGMethod<dim>::output_results (const unsigned int cycle) const
   deallog << "Writing solution to <" << filename << ">..."
 	    << std::endl << std::endl;
   
-  DataOut<dim> data_out;
+  DataOut<dim,hp::DoFHandler<dim> > data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution2, "u");
 
