@@ -179,7 +179,7 @@ class HelmholtzProblem
 	  global_refinement, adaptive_refinement
     };
     
-    HelmholtzProblem (const hp::FECollection<dim> &fe,
+    HelmholtzProblem (const FiniteElement<dim> &fe,
                       const RefinementMode      refinement_mode);
 
     ~HelmholtzProblem ();
@@ -194,9 +194,9 @@ class HelmholtzProblem
     void process_solution (const unsigned int cycle);
 
     Triangulation<dim>                      triangulation;
-    hp::DoFHandler<dim>                         dof_handler;
+    DoFHandler<dim>                         dof_handler;
 
-    SmartPointer<const hp::FECollection<dim> > fe;
+    SmartPointer<const FiniteElement<dim> > fe;
 
     ConstraintMatrix                        hanging_node_constraints;
 
@@ -215,7 +215,7 @@ class HelmholtzProblem
 
 
 template <int dim>
-HelmholtzProblem<dim>::HelmholtzProblem (const hp::FECollection<dim> &fe,
+HelmholtzProblem<dim>::HelmholtzProblem (const FiniteElement<dim> &fe,
                                          const RefinementMode refinement_mode) :
 		dof_handler (triangulation),
 		fe (&fe),
@@ -261,24 +261,24 @@ void HelmholtzProblem<dim>::setup_system ()
 template <int dim>
 void HelmholtzProblem<dim>::assemble_system () 
 {  
-  hp::QCollection<dim>   quadrature_formula(QGauss<dim>(3));
-  hp::QCollection<dim-1> face_quadrature_formula(QGauss<dim-1>(3));
+  QGauss<dim>   quadrature_formula (3);
+  QGauss<dim-1> face_quadrature_formula (3);
 
-  const unsigned int n_q_points    = quadrature_formula[0].n_quadrature_points;
-  const unsigned int n_face_q_points = face_quadrature_formula[0].n_quadrature_points;
+  const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int n_face_q_points = face_quadrature_formula.n_quadrature_points;
 
-  const unsigned int dofs_per_cell = (*fe)[0].dofs_per_cell;
+  const unsigned int dofs_per_cell = (*fe).dofs_per_cell;
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   
-  hp::FEValues<dim>  x_fe_values (*fe, quadrature_formula, 
+  FEValues<dim>  x_fe_values (*fe, quadrature_formula, 
 			    update_values   | update_gradients |
                             update_q_points | update_JxW_values);
 
-  hp::FEFaceValues<dim> x_fe_face_values (*fe, face_quadrature_formula, 
+  FEFaceValues<dim> x_fe_face_values (*fe, face_quadrature_formula, 
 				    update_values         | update_q_points  |
                                     update_normal_vectors | update_JxW_values);
 
@@ -287,7 +287,7 @@ void HelmholtzProblem<dim>::assemble_system ()
 
   const Solution<dim> exact_solution;
   
-  typename hp::DoFHandler<dim>::active_cell_iterator
+  typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -432,7 +432,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				     solution,
 				     Solution<dim>(),
 				     difference_per_cell,
-				     hp::QCollection<dim>(QGauss<dim>(3)),
+				     QGauss<dim>(3),
 				     VectorTools::L2_norm);
   const double L2_error = difference_per_cell.l2_norm();
 
@@ -440,7 +440,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				     solution,
 				     Solution<dim>(),
 				     difference_per_cell,
-				     hp::QCollection<dim>(QGauss<dim>(3)),
+				     QGauss<dim>(3),
 				     VectorTools::H1_seminorm);
   const double H1_error = difference_per_cell.l2_norm();
 
@@ -450,7 +450,7 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
 				     solution,
 				     Solution<dim>(),
 				     difference_per_cell,
-				     hp::QCollection<dim>(q_iterated),
+				     q_iterated,
 				     VectorTools::Linfty_norm);
   const double Linfty_error = difference_per_cell.linfty_norm();
 
@@ -526,7 +526,7 @@ void HelmholtzProblem<dim>::run ()
 		Assert (false, ExcNotImplemented());
 	}
 
-      switch ((*fe)[0].degree)
+      switch ((*fe).degree)
 	{
 	  case 1:
 		gmv_filename += "-q1";
@@ -541,11 +541,11 @@ void HelmholtzProblem<dim>::run ()
 
       gmv_filename += ".gmv";
 
-      DataOut<dim,hp::DoFHandler<dim> > data_out;
+      DataOut<dim,DoFHandler<dim> > data_out;
       data_out.attach_dof_handler (dof_handler);
       data_out.add_data_vector (solution, "solution");
 
-      data_out.build_patches ((*fe)[0].degree);
+      data_out.build_patches ((*fe).degree);
       data_out.write_gmv (deallog.get_file_stream());
     }
   
@@ -584,7 +584,7 @@ void HelmholtzProblem<dim>::run ()
             Assert (false, ExcNotImplemented());
     }
 
-  switch ((*fe)[0].degree)
+  switch ((*fe).degree)
     {
       case 1:
             error_filename += "-q1";
@@ -635,7 +635,7 @@ void HelmholtzProblem<dim>::run ()
 	  default:
 		Assert (false, ExcNotImplemented());
 	}
-      switch ((*fe)[0].degree)
+      switch ((*fe).degree)
 	{
 	  case 1:
 		conv_filename += "-q1";
@@ -673,7 +673,7 @@ int main ()
 		  << "=============================================" << std::endl
 		  << std::endl;
 	
-	hp::FECollection<dim> fe(FE_Q<dim>(1));
+	FE_Q<dim> fe(1);
 	HelmholtzProblem<dim>
 	  helmholtz_problem_2d (fe, HelmholtzProblem<dim>::adaptive_refinement);
 
@@ -687,7 +687,7 @@ int main ()
 		  << "===========================================" << std::endl
 		  << std::endl;
 	
-	hp::FECollection<dim> fe(FE_Q<dim>(1));
+	FE_Q<dim> fe(1);
 	HelmholtzProblem<dim>
 	  helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
 
@@ -701,7 +701,7 @@ int main ()
 		  << "===========================================" << std::endl
 		  << std::endl;
 	
-	hp::FECollection<dim> fe(FE_Q<dim>(2));
+	FE_Q<dim> fe(2);
 	HelmholtzProblem<dim>
 	  helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
 

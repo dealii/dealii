@@ -68,9 +68,9 @@ class ElasticProblem
     void output_results (const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
-    hp::DoFHandler<dim>      dof_handler;
+    DoFHandler<dim>      dof_handler;
 
-    hp::FECollection<dim>        fe;
+    FESystem<dim>        fe;
 
     ConstraintMatrix     hanging_node_constraints;
 
@@ -154,7 +154,7 @@ template <int dim>
 ElasticProblem<dim>::ElasticProblem ()
 		:
 		dof_handler (triangulation),
-		fe (FESystem<dim>(FE_Q<dim>(1), dim))
+		fe (FE_Q<dim>(1), dim)
 {}
 
 
@@ -196,14 +196,14 @@ void ElasticProblem<dim>::setup_system ()
 template <int dim>
 void ElasticProblem<dim>::assemble_system () 
 {  
-  hp::QCollection<dim>  quadrature_formula(QGauss<dim>(2));
+  QGauss<dim>  quadrature_formula (2);
 
-  hp::FEValues<dim> x_fe_values (fe, quadrature_formula, 
+  FEValues<dim> x_fe_values (fe, quadrature_formula, 
 			   update_values   | update_gradients |
                            update_q_points | update_JxW_values);
 
-  const unsigned int   dofs_per_cell = fe[0].dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula[0].n_quadrature_points;
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
@@ -220,7 +220,7 @@ void ElasticProblem<dim>::assemble_system ()
 					   Vector<double>(dim));
 
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
 						 endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
@@ -239,12 +239,12 @@ void ElasticProblem<dim>::assemble_system ()
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
 	  const unsigned int 
-	    component_i = fe[0].system_to_component_index(i).first;
+	    component_i = fe.system_to_component_index(i).first;
 	  
 	  for (unsigned int j=0; j<dofs_per_cell; ++j) 
 	    {
 	      const unsigned int 
-		component_j = fe[0].system_to_component_index(j).first;
+		component_j = fe.system_to_component_index(j).first;
 	      
 	      for (unsigned int q_point=0; q_point<n_q_points;
 		   ++q_point)
@@ -275,7 +275,7 @@ void ElasticProblem<dim>::assemble_system ()
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
 	  const unsigned int 
-	    component_i = fe[0].system_to_component_index(i).first;
+	    component_i = fe.system_to_component_index(i).first;
 	  
 	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	    cell_rhs(i) += fe_values.shape_value(i,q_point) *
@@ -359,7 +359,7 @@ void ElasticProblem<dim>::output_results (const unsigned int cycle) const
   
   filename += ".gmv";
 
-  DataOut<dim,hp::DoFHandler<dim> > data_out;
+  DataOut<dim,DoFHandler<dim> > data_out;
   data_out.attach_dof_handler (dof_handler);
 
  

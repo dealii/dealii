@@ -73,17 +73,17 @@ class AdvectionProblem
   private:
     void setup_system ();
     void assemble_system ();
-    void assemble_system_interval (const typename hp::DoFHandler<dim>::active_cell_iterator &begin,
-			 	   const typename hp::DoFHandler<dim>::active_cell_iterator &end);
+    void assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &begin,
+			 	   const typename DoFHandler<dim>::active_cell_iterator &end);
     
     void solve ();
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
-    hp::DoFHandler<dim>      dof_handler;
+    DoFHandler<dim>      dof_handler;
 
-    hp::FECollection<dim>            fe;
+    FE_Q<dim>            fe;
 
     ConstraintMatrix     hanging_node_constraints;
 
@@ -255,7 +255,7 @@ class GradientEstimation
 {
   public:
     template <int dim>
-    static void estimate (const hp::DoFHandler<dim> &dof,
+    static void estimate (const DoFHandler<dim> &dof,
 			  const Vector<double>  &solution,
 			  Vector<float>         &error_per_cell);
 
@@ -269,7 +269,7 @@ class GradientEstimation
     typedef std::pair<unsigned int,unsigned int> IndexInterval;
 
     template <int dim>
-    static void estimate_interval (const hp::DoFHandler<dim> &dof,
+    static void estimate_interval (const DoFHandler<dim> &dof,
 				   const Vector<double>  &solution,
 				   const IndexInterval   &index_interval,
 				   Vector<float>         &error_per_cell);    
@@ -282,7 +282,7 @@ class GradientEstimation
 template <int dim>
 AdvectionProblem<dim>::AdvectionProblem () :
 		dof_handler (triangulation),
-		fe(FE_Q<dim>(1))
+		fe(1)
 {}
 
 
@@ -328,7 +328,7 @@ void AdvectionProblem<dim>::assemble_system ()
   const unsigned int n_threads = multithread_info.n_default_threads;
   Threads::ThreadGroup<> threads;
 
-  typedef typename hp::DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+  typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
   std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
     thread_ranges 
     = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
@@ -352,26 +352,26 @@ void AdvectionProblem<dim>::assemble_system ()
 template <int dim>
 void
 AdvectionProblem<dim>::
-assemble_system_interval (const typename hp::DoFHandler<dim>::active_cell_iterator &begin,
-			  const typename hp::DoFHandler<dim>::active_cell_iterator &end) 
+assemble_system_interval (const typename DoFHandler<dim>::active_cell_iterator &begin,
+			  const typename DoFHandler<dim>::active_cell_iterator &end) 
 {
   const AdvectionField<dim> advection_field;
   const RightHandSide<dim>  right_hand_side;
   const BoundaryValues<dim> boundary_values;
   
-  hp::QCollection<dim>   quadrature_formula(QGauss<dim>(2));
-  hp::QCollection<dim-1> face_quadrature_formula(QGauss<dim-1>(2));
+  QGauss<dim>   quadrature_formula (2);
+  QGauss<dim-1> face_quadrature_formula (2);
   
-  hp::FEValues<dim> x_fe_values (fe, quadrature_formula, 
+  FEValues<dim> x_fe_values (fe, quadrature_formula, 
 			   update_values   | update_gradients |
                            update_q_points | update_JxW_values);
-  hp::FEFaceValues<dim> x_fe_face_values (fe, face_quadrature_formula,
+  FEFaceValues<dim> x_fe_face_values (fe, face_quadrature_formula,
 				    update_values     | update_q_points   |
                                     update_JxW_values | update_normal_vectors);
 
   const unsigned int   dofs_per_cell   = fe[0].dofs_per_cell;
-  const unsigned int   n_q_points      = quadrature_formula[0].n_quadrature_points;
-  const unsigned int   n_face_q_points = face_quadrature_formula[0].n_quadrature_points;
+  const unsigned int   n_q_points      = quadrature_formula.n_quadrature_points;
+  const unsigned int   n_face_q_points = face_quadrature_formula.n_quadrature_points;
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
@@ -383,7 +383,7 @@ assemble_system_interval (const typename hp::DoFHandler<dim>::active_cell_iterat
   std::vector<double>         face_boundary_values (n_face_q_points);
   std::vector<Tensor<1,dim> > face_advection_directions (n_face_q_points);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell;
+  typename DoFHandler<dim>::active_cell_iterator cell;
   for (cell=begin; cell!=end; ++cell)
     {
       cell_matrix = 0;
@@ -546,7 +546,7 @@ void AdvectionProblem<dim>::run ()
       output_results (cycle);
     };
 
-  DataOut<dim,hp::DoFHandler<dim> > data_out;
+  DataOut<dim,DoFHandler<dim> > data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
@@ -559,7 +559,7 @@ void AdvectionProblem<dim>::run ()
 
 template <int dim>
 void 
-GradientEstimation::estimate (const hp::DoFHandler<dim> &dof_handler,
+GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
 			      const Vector<double>  &solution,
 			      Vector<float>         &error_per_cell)
 {
@@ -573,7 +573,7 @@ GradientEstimation::estimate (const hp::DoFHandler<dim> &dof_handler,
 			       n_threads);
 
   Threads::ThreadGroup<> threads;
-  void (*estimate_interval_ptr) (const hp::DoFHandler<dim> &,
+  void (*estimate_interval_ptr) (const DoFHandler<dim> &,
 				 const Vector<double> &,
 				 const IndexInterval &,
 				 Vector<float> &)
@@ -588,20 +588,19 @@ GradientEstimation::estimate (const hp::DoFHandler<dim> &dof_handler,
 
 template <int dim>
 void 
-GradientEstimation::estimate_interval (const hp::DoFHandler<dim> &dof_handler,
+GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
 				       const Vector<double>  &solution,
 				       const IndexInterval   &index_interval,
 				       Vector<float>         &error_per_cell)
 {
-  QMidpoint<dim> xmidpoint;
-  hp::QCollection<dim> midpoint_rule (xmidpoint);
-  hp::FEValues<dim>  x_fe_midpoint_value (dof_handler.get_fe(),
+  QMidpoint<dim> midpoint_rule;
+  FEValues<dim>  x_fe_midpoint_value (dof_handler.get_fe(),
 				    midpoint_rule,
 				    update_values | update_q_points);
   
   Tensor<2,dim> Y;
 
-  typename hp::DoFHandler<dim>::active_cell_iterator cell, endc;
+  typename DoFHandler<dim>::active_cell_iterator cell, endc;
 
   cell = dof_handler.begin_active();
   advance (cell, static_cast<signed int>(index_interval.first));
@@ -613,7 +612,7 @@ GradientEstimation::estimate_interval (const hp::DoFHandler<dim> &dof_handler,
     error_on_this_cell = error_per_cell.begin() + index_interval.first;
   
 
-  std::vector<typename hp::DoFHandler<dim>::active_cell_iterator> active_neighbors;
+  std::vector<typename DoFHandler<dim>::active_cell_iterator> active_neighbors;
   active_neighbors.reserve (GeometryInfo<dim>::faces_per_cell *
 			    GeometryInfo<dim>::subfaces_per_face);
 
@@ -631,9 +630,9 @@ GradientEstimation::estimate_interval (const hp::DoFHandler<dim> &dof_handler,
       for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	if (! cell->at_boundary(face_no))
 	  {
-	    const typename hp::DoFHandler<dim>::face_iterator 
+	    const typename DoFHandler<dim>::face_iterator 
 	      face = cell->face(face_no);
-	    const typename hp::DoFHandler<dim>::cell_iterator 
+	    const typename DoFHandler<dim>::cell_iterator 
 	      neighbor = cell->neighbor(face_no);
 
 	    if (neighbor->active())
@@ -642,7 +641,7 @@ GradientEstimation::estimate_interval (const hp::DoFHandler<dim> &dof_handler,
 	      {
 		if (dim == 1)
 		  {
-		    typename hp::DoFHandler<dim>::cell_iterator
+		    typename DoFHandler<dim>::cell_iterator
 		      neighbor_child = neighbor;
 		    while (neighbor_child->has_children())
 		      neighbor_child = neighbor_child->child (face_no==0 ? 1 : 0);
@@ -666,11 +665,11 @@ GradientEstimation::estimate_interval (const hp::DoFHandler<dim> &dof_handler,
 		
 
       std::vector<double> neighbor_midpoint_value(1);
-      typename std::vector<typename hp::DoFHandler<dim>::active_cell_iterator>::const_iterator
+      typename std::vector<typename DoFHandler<dim>::active_cell_iterator>::const_iterator
 	neighbor_ptr = active_neighbors.begin();
       for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
 	{
-	  const typename hp::DoFHandler<dim>::active_cell_iterator
+	  const typename DoFHandler<dim>::active_cell_iterator
 	    neighbor = *neighbor_ptr;
 	    
 	  x_fe_midpoint_value.reinit (neighbor);

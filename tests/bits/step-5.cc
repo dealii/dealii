@@ -63,8 +63,8 @@ class LaplaceProblem
     void output_results (const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
-    hp::FECollection<dim>            fe;
-    hp::DoFHandler<dim>      dof_handler;
+    FE_Q<dim>            fe;
+    DoFHandler<dim>      dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -131,7 +131,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
-                fe (FE_Q<dim>(1)),
+                fe (1),
 		dof_handler (triangulation)
 {}
 
@@ -165,14 +165,14 @@ void LaplaceProblem<dim>::setup_system ()
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
-  hp::QCollection<dim>  quadrature_formula(QGauss<dim>(2));
+  QGauss<dim>  quadrature_formula (2);
 
-  hp::FEValues<dim> x_fe_values (fe, quadrature_formula, 
+  FEValues<dim> x_fe_values (fe, quadrature_formula, 
 			   update_values    |  update_gradients |
 			   update_q_points  |  update_JxW_values);
 
-  const unsigned int   dofs_per_cell = fe[0].dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula[0].n_quadrature_points;
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
@@ -182,7 +182,7 @@ void LaplaceProblem<dim>::assemble_system ()
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values (n_q_points);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator
+  typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -262,7 +262,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   if (cycle >= 2)
     return;
   
-  DataOut<dim,hp::DoFHandler<dim> > data_out;
+  DataOut<dim,DoFHandler<dim> > data_out;
 
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");

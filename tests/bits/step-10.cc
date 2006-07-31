@@ -85,7 +85,7 @@ void compute_pi_by_area ()
   deallog << "Computation of Pi by the area:" << std::endl
 	    << "==============================" << std::endl;
 
-  const hp::QCollection<dim> quadrature(QGauss<dim>(4));
+  const QGauss<dim> quadrature (4);
 
   for (unsigned int degree=1; degree<5; ++degree)
     {
@@ -97,14 +97,13 @@ void compute_pi_by_area ()
       static const HyperBallBoundary<dim> boundary;
       triangulation.set_boundary (0, boundary);
 
-      MappingQ<dim> m(degree);
-      const hp::MappingCollection<dim> mapping (m);
+      MappingQ<dim> mapping(degree);
 
-      const hp::FECollection<dim>     dummy_fe (FE_Q<dim>(1));
+      const FE_Q<dim>     dummy_fe (1);
 
-      hp::DoFHandler<dim> dof_handler (triangulation);
+      DoFHandler<dim> dof_handler (triangulation);
 
-      hp::FEValues<dim> x_fe_values (mapping, dummy_fe, quadrature,
+      FEValues<dim> x_fe_values (mapping, dummy_fe, quadrature,
                                update_JxW_values);
 
       ConvergenceTable table;
@@ -118,7 +117,7 @@ void compute_pi_by_area ()
 
 	  long double area = 0;
 
-	  typename hp::DoFHandler<dim>::active_cell_iterator
+	  typename DoFHandler<dim>::active_cell_iterator
 	    cell = dof_handler.begin_active(),
 	    endc = dof_handler.end();
 	  for (; cell!=endc; ++cell)
@@ -153,7 +152,7 @@ void compute_pi_by_perimeter ()
   deallog << "Computation of Pi by the perimeter:" << std::endl
 	    << "===================================" << std::endl;
 
-  const hp::QCollection<dim-1> quadrature(QGauss<dim-1>(4));
+  const QGauss<dim-1> quadrature (4);
 
   for (unsigned int degree=1; degree<5; ++degree)
     {
@@ -164,13 +163,12 @@ void compute_pi_by_perimeter ()
       static const HyperBallBoundary<dim> boundary;
       triangulation.set_boundary (0, boundary);
 
-      const MappingQ<dim> m (degree);
-      const hp::MappingCollection<dim> mapping(m);
-      const hp::FECollection<dim>     fe (FE_Q<dim>(1));
+      const MappingQ<dim> mapping (degree);
+      const FE_Q<dim>     fe (1);
 
-      hp::DoFHandler<dim> dof_handler (triangulation);
+      DoFHandler<dim> dof_handler (triangulation);
 
-      hp::FEFaceValues<dim> x_fe_face_values (mapping, fe, quadrature,
+      FEFaceValues<dim> x_fe_face_values (mapping, fe, quadrature,
                                         update_JxW_values);
       ConvergenceTable table;
 
@@ -181,7 +179,7 @@ void compute_pi_by_perimeter ()
 
 	  dof_handler.distribute_dofs (fe);
 
-	  typename hp::DoFHandler<dim>::active_cell_iterator
+	  typename DoFHandler<dim>::active_cell_iterator
 	    cell = dof_handler.begin_active(),
 	    endc = dof_handler.end();
 	  long double perimeter = 0;

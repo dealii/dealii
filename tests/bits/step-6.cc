@@ -75,8 +75,8 @@ class LaplaceProblem
 
     Triangulation<dim>   triangulation;
 
-    hp::DoFHandler<dim>      dof_handler;
-    hp::FECollection<dim>            fe;
+    DoFHandler<dim>      dof_handler;
+    FE_Q<dim>            fe;
 
     ConstraintMatrix     hanging_node_constraints;
 
@@ -146,7 +146,7 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
 		dof_handler (triangulation),
-                fe (FE_Q<dim>(2))
+                fe (2)
 {}
 
 
@@ -190,14 +190,14 @@ void LaplaceProblem<dim>::setup_system ()
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
 {  
-  const hp::QCollection<dim>  quadrature_formula(QGauss<dim>(3));
+  const QGauss<dim>  quadrature_formula (3);
 
-  hp::FEValues<dim> x_fe_values (fe, quadrature_formula, 
+  FEValues<dim> x_fe_values (fe, quadrature_formula, 
 			   update_values    |  update_gradients |
 			   update_q_points  |  update_JxW_values);
 
-  const unsigned int   dofs_per_cell = fe[0].dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula[0].n_quadrature_points;
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
@@ -207,7 +207,7 @@ void LaplaceProblem<dim>::assemble_system ()
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values (n_q_points);
 
-  typename hp::DoFHandler<dim>::active_cell_iterator
+  typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -359,7 +359,7 @@ void LaplaceProblem<dim>::run ()
   DataOutBase::EpsFlags eps_flags;
   eps_flags.z_scaling = 4;
   
-  DataOut<dim,hp::DoFHandler<dim> > data_out;
+  DataOut<dim,DoFHandler<dim> > data_out;
   data_out.set_flags (eps_flags);
 
   data_out.attach_dof_handler (dof_handler);

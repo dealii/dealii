@@ -67,7 +67,7 @@ class LaplaceProblem
 
     Triangulation<2>     triangulation;
     hp::FECollection<2>              fe;
-    hp::DoFHandler<2>        dof_handler;
+    DoFHandler<2>        dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -99,7 +99,7 @@ void LaplaceProblem::make_grid_and_dofs ()
 	  << triangulation.n_cells()
 	  << std::endl;
 
-  hp::DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active (),
+  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active (),
 					  endc = dof_handler.end ();
   
   unsigned int cell_no = 0;
@@ -146,7 +146,7 @@ void LaplaceProblem::make_grid_and_dofs ()
 void LaplaceProblem::assemble_system () 
 {
   hp::QCollection<2>  quadrature_formula(QGauss<2>(6));
-  hp::FEValues<2> x_fe_values (fe, quadrature_formula, 
+  FEValues<2> x_fe_values (fe, quadrature_formula, 
 			       update_values | update_gradients | update_JxW_values);
   
   const unsigned int   max_dofs_per_cell = fe.max_dofs_per_cell ();
@@ -157,7 +157,7 @@ void LaplaceProblem::assemble_system ()
 
   std::vector<unsigned int> local_dof_indices (max_dofs_per_cell);
 
-  hp::DoFHandler<2>::active_cell_iterator
+  DoFHandler<2>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -231,7 +231,7 @@ void LaplaceProblem::solve ()
 
 void LaplaceProblem::output_results () const
 {
-  DataOut<2,hp::DoFHandler<2> > data_out;
+  DataOut<2,DoFHandler<2> > data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();

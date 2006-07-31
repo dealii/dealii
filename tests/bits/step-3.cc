@@ -64,8 +64,8 @@ class LaplaceProblem
     void output_results () const;
 
     Triangulation<2>     triangulation;
-    hp::FECollection<2>              fe;
-    hp::DoFHandler<2>        dof_handler;
+    FE_Q<2>              fe;
+    DoFHandler<2>        dof_handler;
 
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
@@ -76,7 +76,7 @@ class LaplaceProblem
 
 
 LaplaceProblem::LaplaceProblem () :
-                fe (FE_Q<2>(1)),
+                fe (1),
 		dof_handler (triangulation)
 {}
 
@@ -114,19 +114,19 @@ void LaplaceProblem::make_grid_and_dofs ()
 
 void LaplaceProblem::assemble_system () 
 {
-  hp::QCollection<2>  quadrature_formula(QGauss<2>(2));
-  hp::FEValues<2> x_fe_values (fe, quadrature_formula, 
+  QGauss<2>  quadrature_formula(2);
+  FEValues<2> x_fe_values (fe, quadrature_formula, 
 			 update_values | update_gradients | update_JxW_values);
   
-  const unsigned int   dofs_per_cell = fe[0].dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula[0].n_quadrature_points;
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-  hp::DoFHandler<2>::active_cell_iterator
+  DoFHandler<2>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
@@ -190,7 +190,7 @@ void LaplaceProblem::solve ()
 
 void LaplaceProblem::output_results () const
 {
-  DataOut<2,hp::DoFHandler<2> > data_out;
+  DataOut<2,DoFHandler<2> > data_out;
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
