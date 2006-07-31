@@ -1,0 +1,67 @@
+
+DEAL::Using mapping with degree 1:
+DEAL::============================
+DEAL:cg::Starting value 1.1
+DEAL:cg::Convergence step 7 value 0
+DEAL:cg::Starting value 0.98
+DEAL:cg::Convergence step 18 value 0
+DEAL:cg::Starting value 0.65
+DEAL:cg::Convergence step 29 value 0
+DEAL:cg::Starting value 0.37
+DEAL:cg::Convergence step 53 value 0
+DEAL:cg::Starting value 0.19
+DEAL:cg::Convergence step 108 value 0
+DEAL:cg::Starting value 0.10
+DEAL:cg::Convergence step 238 value 0
+cells  |u|_1    error   
+5     0.680402 0.572912 
+20    1.085518 0.167796 
+80    1.208981 0.044334 
+320   1.242041 0.011273 
+1280  1.250482 0.002832 
+5120  1.252605 0.000709 
+DEAL::
+DEAL::Using mapping with degree 2:
+DEAL::============================
+DEAL:cg::Starting value 1.338917
+DEAL:cg::Convergence step 7 value 0
+DEAL:cg::Starting value 1.028493
+DEAL:cg::Convergence step 17 value 0
+DEAL:cg::Starting value 0.654097
+DEAL:cg::Convergence step 29 value 0
+DEAL:cg::Starting value 0.368099
+DEAL:cg::Convergence step 53 value 0
+DEAL:cg::Starting value 0.194917
+DEAL:cg::Convergence step 108 value 0
+DEAL:cg::Starting value 0.100213
+DEAL:cg::Convergence step 238 value 0
+cells  |u|_1    error   
+5     1.050963 0.202351 
+20    1.199642 0.053672 
+80    1.239913 0.013401 
+320   1.249987 0.003327 
+1280  1.252486 0.000828 
+5120  1.253108 0.000206 
+DEAL::
+DEAL::Using mapping with degree 3:
+DEAL::============================
+DEAL:cg::Starting value 1.358459
+DEAL:cg::Convergence step 7 value 0
+DEAL:cg::Starting value 1.030204
+DEAL:cg::Convergence step 17 value 0
+DEAL:cg::Starting value 0.654234
+DEAL:cg::Convergence step 29 value 0
+DEAL:cg::Starting value 0.368109
+DEAL:cg::Convergence step 53 value 0
+DEAL:cg::Starting value 0.194918
+DEAL:cg::Convergence step 108 value 0
+DEAL:cg::Starting value 0.100213
+DEAL:cg::Convergence step 238 value 0
+cells  |u|_1    error   
+5     1.086161 0.167153 
+20    1.204349 0.048965 
+80    1.240502 0.012812 
+320   1.250059 0.003255 
+1280  1.252495 0.000819 
+5120  1.253109 0.000205 
+DEAL::
