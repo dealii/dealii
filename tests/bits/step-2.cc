@@ -12,7 +12,7 @@
 //----------------------------  step-2.cc  ---------------------------
 
 
-// a hp-ified version of step-2
+// a un-hp-ified version of hp/step-2
 
 #include <base/logstream.h>
 #include <grid/tria.h>

@@ -12,7 +12,7 @@
 //----------------------------  step-10.cc  ---------------------------
 
 
-// a hp-ified version of step-10
+// a un-hp-ified version of hp/step-10
 
 
 #include <base/logstream.h>
