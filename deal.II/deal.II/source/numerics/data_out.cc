@@ -557,7 +557,8 @@ template <int dim, class DH>
 void DataOut<dim,DH>::build_patches (const unsigned int n_subdivisions,
 				     const unsigned int n_threads_) 
 {
-  build_patches (StaticMappingQ1<DH::dimension>::mapping, n_subdivisions, n_threads_);
+  build_patches (StaticMappingQ1<DH::dimension>::mapping,
+		 n_subdivisions, n_threads_);
 }
 
 
@@ -576,6 +577,9 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
   typedef DataOut_DoFData<DH, DH::dimension> BaseClass;
   Assert (this->dofs != 0, typename BaseClass::ExcNoDoFHandlerSelected());
 
+  Assert (!DEAL_II_USE_MT || (n_threads_ >= 1),
+	  ExcMessage ("Must run with at least one thread!"));
+  
   const unsigned int n_threads = (DEAL_II_USE_MT ? n_threads_ : 1);
 
  				   // before we start the loop:

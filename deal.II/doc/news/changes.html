@@ -742,6 +742,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: The <code 
+		 class="member">DataOut::build_patches</code> and similar
+       functions in the related <code>DataOut*</code> classes allowed to pass
+       zero as the second argument (denoting the number of threads to use if
+       multithreading is enabled). This led to no output being created at
+       all. This is now fixed by throwing an exception in this case.
+       <br> 
+       (WB 2006/07/31)
+       </p>
+
+  <li> <p>
        New: The new function <code class="class">FiniteElementBase</code>::<code
        class="member">n_dofs_per_object</code> returns either
        <code>dofs_per_vertex</code>, <code>dofs_per_line</code>,
