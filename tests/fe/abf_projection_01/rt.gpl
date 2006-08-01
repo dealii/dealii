@@ -1,0 +1,184 @@
+#!/usr/bin/gnuplot -persist
+#
+#    
+#    	G N U P L O T
+#    	Version 4.0 patchlevel 0
+#    	last modified Thu Apr 15 14:44:22 CEST 2004
+#    	System: Linux 2.6.11.4-21.11-smp
+#    
+#    	Copyright (C) 1986 - 1993, 1998, 2004, 2006
+#    	Thomas Williams, Colin Kelley and many others
+#    
+#    	This is gnuplot version 4.0.  Please refer to the documentation
+#    	for command syntax changes.  The old syntax will be accepted
+#    	throughout the 4.0 series, but all save files use the new syntax.
+#    
+#    	Type `help` to access the on-line reference manual.
+#    	The gnuplot FAQ is available from
+#    		http://www.gnuplot.info/faq/
+#    
+#    	Send comments and requests for help to
+#    		<gnuplot-info@lists.sourceforge.net>
+#    	Send bugs, suggestions and mods to
+#    		<gnuplot-bugs@lists.sourceforge.net>
+#    
+set terminal postscript eps color solid enhanced 20
+# set output
+unset clip points
+set clip one
+unset clip two
+set bar 1.000000
+set border 31 lt -1 lw 1.000
+set xdata
+set ydata
+set zdata
+set x2data
+set y2data
+set timefmt x "%d/%m/%y,%H:%M"
+set timefmt y "%d/%m/%y,%H:%M"
+set timefmt z "%d/%m/%y,%H:%M"
+set timefmt x2 "%d/%m/%y,%H:%M"
+set timefmt y2 "%d/%m/%y,%H:%M"
+set timefmt cb "%d/%m/%y,%H:%M"
+set boxwidth
+set style fill empty border
+set dummy x,y
+set format x "% g"
+set format y "% g"
+set format x2 "% g"
+set format y2 "% g"
+set format z "% g"
+set format cb "% g"
+set angles radians
+unset grid
+set key title ""
+set key right top Right noreverse enhanced box linetype -2 linewidth 1.000 samplen 4 spacing 1 width 0 height 0 autotitles
+unset label
+unset arrow
+unset style line
+unset style arrow
+unset logscale
+set offsets 0, 0, 0, 0
+set pointsize 1
+set encoding default
+unset polar
+unset parametric
+unset decimalsign
+set view 60, 20, 1, 1
+set samples 100, 100
+set isosamples 10, 10
+set surface
+unset contour
+set clabel '%8.3g'
+set mapping cartesian
+set datafile separator whitespace
+set hidden3d offset 1 trianglepattern 3 undefined 1 altdiagonal bentover
+set cntrparam order 4
+set cntrparam linear
+set cntrparam levels auto 5
+set cntrparam points 5
+set size ratio 0 1,1
+set origin 0,0
+set style data lines
+set style function lines
+set xzeroaxis lt -2 lw 1.000
+set yzeroaxis lt -2 lw 1.000
+set x2zeroaxis lt -2 lw 1.000
+set y2zeroaxis lt -2 lw 1.000
+set tics in
+set ticslevel 0.5
+set ticscale 1 0.5
+set mxtics default
+set mytics default
+set mztics default
+set mx2tics default
+set my2tics default
+set mcbtics default
+set xtics border mirror norotate autofreq 
+set ytics border mirror norotate autofreq 
+set ztics border nomirror norotate autofreq 
+set nox2tics
+set noy2tics
+set cbtics border mirror norotate autofreq 
+set title "" 0.000000,0.000000  font ""
+set timestamp "" bottom norotate 0.000000,0.000000  ""
+set rrange [ * : * ] noreverse nowriteback  # (currently [0.00000:10.0000] )
+set trange [ * : * ] noreverse nowriteback  # (currently [-5.00000:5.00000] )
+set urange [ * : * ] noreverse nowriteback  # (currently [-5.00000:5.00000] )
+set vrange [ * : * ] noreverse nowriteback  # (currently [-5.00000:5.00000] )
+set xlabel "x" 0.000000,0.000000  font ""
+set x2label "" 0.000000,0.000000  font ""
+set xrange [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
+set x2range [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
+set ylabel "y" 0.000000,0.000000  font ""
+set y2label "" 0.000000,0.000000  font ""
+set yrange [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
+set y2range [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
+set zlabel "" 0.000000,0.000000  font ""
+set zrange [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
+set cblabel "" 0.000000,0.000000  font ""
+set cbrange [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
+set zero 1e-08
+set lmargin -1
+set bmargin -1
+set rmargin -1
+set tmargin -1
+set locale "C"
+set pm3d scansautomatic flush begin noftriangles nohidden3d implicit corners2color mean
+unset pm3d
+set palette positive nops_allcF maxcolors 0 gamma 1.5 color model RGB 
+set palette rgbformulae 7, 5, 15
+set colorbox default
+set colorbox vertical origin 0.9,0.2 size 0.1,0.63 bdefault
+set loadpath 
+set fontpath 
+set fit noerrorvariables
+set output "RT1_00_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:3 title "v0_x"
+set output "RT1_00_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:4 title "v0_y"
+set output "RT1_01_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:5 title "v1_x"
+set output "RT1_01_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:6 title "v1_y"
+set output "RT1_02_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:7 title "v2_x"
+set output "RT1_02_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:8 title "v2_y"
+set output "RT1_03_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:9 title "v3_x"
+set output "RT1_03_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:10 title "v3_y"
+set output "RT1_04_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:11 title "v4_x"
+set output "RT1_04_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:12 title "v4_y"
+set output "RT1_05_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:13 title "v5_x"
+set output "RT1_05_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:14 title "v5_y"
+set output "RT1_06_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:15 title "v6_x"
+set output "RT1_06_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:16 title "v6_y"
+set output "RT1_07_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:17 title "v7_x"
+set output "RT1_07_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:18 title "v7_y"
+set output "RT1_08_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:19 title "v8_x"
+set output "RT1_08_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:20 title "v8_y"
+set output "RT1_09_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:21 title "v9_x"
+set output "RT1_09_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:22 title "v9_y"
+set output "RT1_10_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:23 title "v10_x"
+set output "RT1_10_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:24 title "v10_y"
+set output "RT1_11_x.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:25 title "v11_x"
+set output "RT1_11_y.eps"
+splot "< perl -ne \'print if s/DEAL:RT<2>.1.::value//;\' output" using 1:2:26 title "v11_y"
+#    EOF
