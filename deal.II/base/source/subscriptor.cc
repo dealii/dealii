@@ -73,10 +73,50 @@ Subscriptor::~Subscriptor ()
 	infostring += std::string("\n  from Subscriber ")
 		      + std::string(it->first);
     }
-  
-  Assert (counter == 0, ExcInUse(counter,
-				 object_info->name(),
-				 infostring));
+
+				   // if there are still active pointers, show
+				   // a message and kill the program. However,
+				   // under some circumstances, this is not so
+				   // desirable. For example, in code like this
+				   //
+				   // Triangulation tria;
+				   // DoFHandler *dh = new DoFHandler(tria);
+				   // ...some function that throws an exception
+				   //
+				   // the exception will lead to the
+				   // destruction of the triangulation, but
+				   // since the dof_handler is on the heap it
+				   // will not be destroyed. This will trigger
+				   // an assertion in the triangulation. If we
+				   // kill the program at this point, we will
+				   // never be able to learn what caused the
+				   // problem. In this situation, just display
+				   // a message and continue the program.
+  if (counter != 0)
+    {
+      if (std::uncaught_exception() == false)
+	{
+	  Assert (counter == 0,
+		  ExcInUse (counter, object_info->name(), infostring));
+	}
+      else
+	{
+	  std::cerr << "---------------------------------------------------------"
+		    << std::endl
+		    << "An object pointed to by a SmartPointer is being destroyed."
+		    << std::endl
+		    << "Under normal circumstances, this would abort the program."
+		    << std::endl
+		    << "However, another exception is being processed at the"
+		    << std::endl
+		    << "moment, so the program will continue to run to allow"
+		    << std::endl
+		    << "this exception to be processed."
+		    << std::endl
+		    << "---------------------------------------------------------"
+		    << std::endl;
+	}
+    }
 #endif
 }
 

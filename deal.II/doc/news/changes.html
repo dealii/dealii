@@ -343,6 +343,38 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p> Changed: When there is still a <code>SmartPointer</code> object
+       pointing to another object at the time it is destroyed, this would cause
+       the program to be aborted. However, there are cases where this is not
+       desirable, for example here:
+       <pre>
+       <code>
+          void f() 
+          {
+	    Triangulation tria;
+	    DoFHandler *dh = new DoFHandler(tria);
+	    ...some function that throws an exception
+          }
+       </code>
+       </pre>
+       When the exception is thrown but not caught, the two local objects are
+       destroyed in reverse order of their construction, i.e. first the pointer
+       then the triangulation. However, only the pointer, not the
+       <code>DoFHandler</code> pointed to is destroyed, triggering the abort in
+       the triangulation since there is still the <code>DoFHandler</code>
+       object pointing to it at the time of destruction of the
+       triangulation. In such cases, one would not want to see the program
+       aborted, since then one would never learn about the actual exception
+       being thrown.
+       <br>
+       The behavior of the <code>Subscriptor</code> class as therefore been
+       changed to not abort the program any more if an exception is being
+       handled at the moment. Rather, only an error message is shown on
+       <code>std::cerr</code>.
+       <br>
+       (WB 2006/08/01)
+       </p>
+
   <li> <p> Fixed: The <code>TableHandler::write_tex</code>
        accidentally took a parameter of type
        <code>std::ofstream</code> instead of <code>std::ostream</code>
@@ -352,31 +384,32 @@ inconvenience this causes.
        (WB 2006/07/28)
        </p>
 
-  <li> <p> New: <code class="class">GeometryInfo</code> offers several new functions,
-  <code>is_inside_unit_cell</code> with an epsilon parameter to specify allowable
-  offsets from the actual unit cell, <code>distance_to_unit_cell</code> returning the
-  infinity norm of the distance of a given point to the unit cell, and
-  <code>project_to_unit_cell</code> returning the projection of a point onto the unit
-  cell. Also, a new member <code>vertex_to_face</code> allow to determine to which
-  faces of a cell a vertex belongs.
-  <br>
-  (Ralf B. Schulz 2006/05/10)
-  </p>
+  <li> <p> New: <code class="class">GeometryInfo</code> offers several new
+       functions, <code>is_inside_unit_cell</code> with an epsilon parameter to
+       specify allowable offsets from the actual unit cell,
+       <code>distance_to_unit_cell</code> returning the infinity norm of the
+       distance of a given point to the unit cell, and
+       <code>project_to_unit_cell</code> returning the projection of a point
+       onto the unit cell. Also, a new member <code>vertex_to_face</code> allow
+       to determine to which faces of a cell a vertex belongs. 
+       <br>
+       (Ralf B. Schulz 2006/05/10)
+       </p>
 
   <li> <p> Improved: <code class="class">DataOutBase</code>::<code
-  class="member">OutputFormat</code> has a new value <tt>none</tt>, writing no
-  output at all. This way, the writing of output files can be controlled more
-  easily from parameter files.
-  <br>
-  (GK 2006/04/14)
-  </p>
+       class="member">OutputFormat</code> has a new value <tt>none</tt>,
+       writing no output at all. This way, the writing of output files can be
+       controlled more easily from parameter files.
+       <br>
+       (GK 2006/04/14)
+       </p>
 
   <li> <p> Improved: <code class="class">VectorSlice</code> has new functions
-  <code class="member">begin()</code> and <code class="member">end()</code>,
-  returning the corresponding vector iterators.
-  <br>
-  (GK 2006/03/31)
-  </p>
+       <code class="member">begin()</code> and <code class="member">end()</code>,
+       returning the corresponding vector iterators.
+       <br>
+       (GK 2006/03/31)
+       </p>
 
   <li> <p> New: The various tensor classes can now effectively be reset to zero
        by simply writing <code>t=0;</code> as has long been allowed for
