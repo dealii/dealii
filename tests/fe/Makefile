@@ -29,6 +29,7 @@ tests_x=fe_data_test traits fe_tools fe_tools_test mapping \
 	interpolate_q1 \
 	rt_* \
 	abf_* \
+	fe_sys_* \
 	rtdiff \
 	rtn_* \
 	interpolate_rt interpolate_rtn \
