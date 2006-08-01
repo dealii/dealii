@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -167,6 +167,20 @@ namespace PETScWrappers
                    const unsigned int n_block_columns);
       
                                        /**
+                                        * This function collects the
+                                        * sizes of the sub-objects and
+                                        * stores them in internal
+                                        * arrays, in order to be able to
+                                        * relay global indices into the
+                                        * matrix to indices into the
+                                        * subobjects. You *must* call
+                                        * this function each time after
+                                        * you have changed the size of
+                                        * the sub-objects.
+                                        */
+      void collect_sizes ();
+
+                                       /**
                                         * Matrix-vector multiplication:
                                         * let $dst = M*src$ with $M$
                                         * being this matrix.
@@ -244,20 +258,6 @@ namespace PETScWrappers
                                         */
       void Tvmult (Vector       &dst,
                    const Vector &src) const;    
-
-                                       /**
-                                        * This function collects the
-                                        * sizes of the sub-objects and
-                                        * stores them in internal
-                                        * arrays, in order to be able to
-                                        * relay global indices into the
-                                        * matrix to indices into the
-                                        * subobjects. You *must* call
-                                        * this function each time after
-                                        * you have changed the size of
-                                        * the sub-objects.
-                                        */
-      void collect_sizes ();
 
                                        /**
                                         * Make the clear() function in the
