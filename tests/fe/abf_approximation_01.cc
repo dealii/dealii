@@ -441,8 +441,8 @@ int main ()
 				   //  tria_test.refine_global (1);
 				   //  tria_test.distort_random (0.4);
 
-				   // Create a DoFHandler for the RT space
-  FE_RaviartThomas<2> fe (1);
+				   // Create a DoFHandler for the ABF space
+  FE_ABF<2> fe (0);
   dof_handler = new DoFHandler<2> (tria_test);
   dof_handler->distribute_dofs (fe);
 
