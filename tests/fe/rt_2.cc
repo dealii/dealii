@@ -2,7 +2,7 @@
 //    rt_2.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -106,6 +106,11 @@ plot_shape_functions(const unsigned int degree)
       
       transform_grid (tr, transform);
 
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	deallog << "Vertex " << v << ": "
+		<< tr.begin_active()->vertex(v)
+		<< std::endl;
+      
       DoFHandler<dim> dof(tr);
       typename DoFHandler<dim>::cell_iterator c = dof.begin();
       dof.distribute_dofs(fe_rt);
