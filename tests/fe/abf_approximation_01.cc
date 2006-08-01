@@ -1,5 +1,5 @@
-//----------------------------  rt_approximation_01.cc  ---------------------------
-//    rt_approximation_01.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
+//----------------------------  abf_approximation_01.cc  ---------------------------
+//    abf_approximation_01.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
 //    Copyright (C) 2003, 2005, 2006 by the deal.II authors
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  rt_approximation_01.cc  ---------------------------
+//----------------------------  abf_approximation_01.cc  ---------------------------
 
 /*
  * Little snippet, which tests, to what degree the RT/ABF elements
@@ -25,7 +25,7 @@
 
 #include <fstream>
 
-std::ofstream logfile ("rt_approximation_01/output");
+std::ofstream logfile ("abf_approximation_01/output");
 
 char buf[1000];
 
