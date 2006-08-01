@@ -12,8 +12,8 @@
 //----------------------------  abf_projection_01.cc  ---------------------------
 
 /*
- * Little snippet, which tests, to what degree the RT/ABF elements
- * can approximate a polynomial exactly on deformed geometries.
+ * Project the function [1,1] onto a deformed grid and see whether the ABF
+ * elements can represent it exactly.
  */
 
 
