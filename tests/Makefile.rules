@@ -83,7 +83,7 @@ endif
 # the failed one.
 #
 # if, however, the flag `stop_on_error=on' was given, the
-# check command fails whenever teh output differs from the
+# check command fails whenever the output differs from the
 # precomputed file.
 #
 # as to finding which output file to compare with: we simply
@@ -135,11 +135,13 @@ endif
 ############################################################
 report:
 	@for test in $(sort $(tests)) ; do \
+	      if (($(MAKE) $$test/output 2>&1) > /dev/null); then \
 		if (($(MAKE) $$test/OK stop_on_error=on 2>&1) > /dev/null); then \
 			echo `date -u +"%Y-%m-%d %H:%M"` "  +  $(WORKDIR)/$$test" ; \
 		else \
 			echo `date -u +"%Y-%m-%d %H:%M"` " 0   $(WORKDIR)/$$test" ; \
 		fi ; \
+	      fi ; \
 	done
 
 
