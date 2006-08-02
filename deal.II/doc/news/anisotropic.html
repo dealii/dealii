@@ -197,6 +197,21 @@ refinement.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> New: There is now a new <code
+		 class="class">Triangulation&lt;dim&gt;</code>::<code
+		 class="member">prevent_distorted_boundary_cell</code> function which is
+		 only useful in case of anisotropic refinement. At the boundary of the
+		 domain, the new point on the face may be far inside the current cell, if
+		 the boundary has a strong curvature. If we allow anistropic refinement
+		 here, the resulting cell may be strongly distorted, especially if it is
+		 refined again later on. To prevent this problem, this function flags such
+		 cells for isotropic refinement. It is called automatically from <code
+		 class="member">prepare_coarsening_and_refinement</code>. Therefore this
+		 should have no effect on user codes.
+		 <br> 
+		 (Tobias Leicht 2006/08/02)
+       </p>
+
   <li> <p>
 		 New: There is now a new <code
        class="class">Triangulation&lt;dim&gt;</code>::<code
