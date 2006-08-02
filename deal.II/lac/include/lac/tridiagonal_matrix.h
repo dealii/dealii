@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,6 +18,7 @@
 #include <base/smartpointer.h>
 
 #include <vector>
+#include <iomanip>
 
 // forward declarations
 template<typename number> class Vector;
@@ -256,52 +257,11 @@ class TridiagonalMatrix
 				      * Output of the matrix in
 				      * user-defined format.
 				      */
-    void print (std::ostream       &s,
+    template <class OUT>
+    void print (OUT& s,
 		const unsigned int  width=5,
 		const unsigned int  precision=2) const;
 
-				     /**
-				      * Print the matrix in the usual
-				      * format, i.e. as a matrix and
-				      * not as a list of nonzero
-				      * elements. For better
-				      * readability, elements not in
-				      * the matrix are displayed as
-				      * empty space, while matrix
-				      * elements which are explicitly
-				      * set to zero are displayed as
-				      * such.
-				      *
-				      * The parameters allow for a
-				      * flexible setting of the output
-				      * format: <tt>precision</tt> and
-				      * <tt>scientific</tt> are used to
-				      * determine the number format,
-				      * where <tt>scientific</tt> = <tt>false</tt>
-				      * means fixed point notation.  A
-				      * zero entry for <tt>width</tt> makes
-				      * the function compute a width,
-				      * but it may be changed to a
-				      * positive value, if output is
-				      * crude.
-				      *
-				      * Additionally, a character for
-				      * an empty value may be
-				      * specified.
-				      *
-				      * Finally, the whole matrix can
-				      * be multiplied with a common
-				      * denominator to produce more
-				      * readable output, even
-				      * integers.
-				      */
-    void print_formatted (std::ostream       &out,
-			  const unsigned int  presicion=3,
-			  const bool          scientific  = true,
-			  const unsigned int  width       = 0,
-			  const char         *zero_string = " ",
-			  const double        denominator = 1.) const;
-    
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -398,6 +358,31 @@ TridiagonalMatrix<number>::operator()(unsigned int i, unsigned int j)
     return right[i];
   AssertThrow(false, ExcInternalError());
   return diagonal[0];
+}
+
+
+template <typename number>
+template <class OUT>
+void
+TridiagonalMatrix<number>::print (
+  OUT& s,
+  const unsigned int width,
+  const unsigned int) const
+{
+  for (unsigned int i=0;i<n();++i)
+    {
+      if (i>0)
+	s << std::setw(width) << (*this)(i,i-1);
+      else
+	s << std::setw(width) << "";
+
+      s << ' ' << (*this)(i,i) << ' ';
+      
+      if (i<n()-1)
+	s << std::setw(width) << (*this)(i,i+1);
+
+      s << std::endl;
+    }
 }
 
 
