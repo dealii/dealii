@@ -1,9 +1,106 @@
 
-DEAL:: 9. 12. 13. 7.
-DEAL:: 18. 24. 26. 14.
-DEAL:: -1. 2. 3. 22.
-DEAL:: -2. 4. 6. 44.
-DEAL:: 9. 12. 13. 7.
-DEAL:: 18. 24. 26. 14.
-DEAL:: -1. 2. 3. 22.
-DEAL:: -2. 4. 6. 44.
+DEAL::Matrix [-1,2,-1]
+DEAL::        2. -1.    
+DEAL::-1.     2. -1.    
+DEAL::-1.     2. -1.    
+DEAL::-1.     2. -1.    
+DEAL::-1.     2. 
+DEAL:: 1.     2.     4.     8.     16.   
+DEAL:: 0      -1.    -2.    -4.    24.   
+DEAL:: 0      -2.    -4.    -8.    48.   
+DEAL:: 0      -1.    -2.    -4.    24.   
+DEAL:: 0      -2.    -4.    -8.    48.   
+DEAL::Matrix [-1,2,-3]
+DEAL::        2. -3.    
+DEAL::-1.     2. -3.    
+DEAL::-1.     2. -3.    
+DEAL::-1.     2. -3.    
+DEAL::-1.     2. 
+DEAL:: 1.     2.     4.     8.     16.   
+DEAL:: -4.    -9.    -18.   -36.   24.   
+DEAL:: -8.    -18.   -36.   -72.   48.   
+DEAL:: 0      -3.    -6.    -12.   8.    
+DEAL:: 0      -6.    -12.   -24.   16.   
+DEAL::Matrix increasing symmetric rows
+DEAL::        2. -1.    
+DEAL::-2.     3. -2.    
+DEAL::-3.     4. -3.    
+DEAL::-4.     5. -4.    
+DEAL::-5.     6. 
+DEAL:: 1.     2.     4.     8.     16.   
+DEAL:: 0      -4.    -14.   -40.   56.   
+DEAL:: 0      -8.    -28.   -80.   112.  
+DEAL:: -2.    -7.    -20.   -52.   64.   
+DEAL:: -4.    -14.   -40.   -104.  128.  
+DEAL::Matrix increasing symmetric
+DEAL::        2. -1.    
+DEAL::-1.     3. -2.    
+DEAL::-2.     4. -3.    
+DEAL::-3.     5. -4.    
+DEAL::-4.     6. 
+DEAL:: 1.     2.     4.     8.     16.   
+DEAL:: 0      -3.    -12.   -36.   64.   
+DEAL:: 0      -6.    -24.   -72.   128.  
+DEAL:: 0      -3.    -12.   -36.   64.   
+DEAL:: 0      -6.    -24.   -72.   128.  
+DEAL::Matrix increasing nonsymmetric
+DEAL::        2. 5.     
+DEAL::-2.     3. 3.     
+DEAL::-3.     4. 1.     
+DEAL::-4.     5. -1.    
+DEAL::-5.     6. 
+DEAL:: 1.     2.     4.     8.     16.   
+DEAL:: 12.    16.    18.    8.     56.   
+DEAL:: 24.    32.    36.    16.    112.  
+DEAL:: -2.    -1.    -10.   -36.   88.   
+DEAL:: -4.    -2.    -20.   -72.   176.  
+DEAL::Matrix [-1,2,-1]
+DEAL::        2. -1.    
+DEAL::-1.     2. -1.    
+DEAL::-1.     2. -1.    
+DEAL::-1.     2. 
+DEAL:: 1.     2.     4.     8.    
+DEAL:: 0.     -1.    -2.    12.   
+DEAL:: 0.     -2.    -4.    24.   
+DEAL:: 0.     -1.    -2.    12.   
+DEAL:: 0.     -2.    -4.    24.   
+DEAL::Matrix [-1,2,-3]
+DEAL::        2. -3.    
+DEAL::-1.     2. -3.    
+DEAL::-1.     2. -3.    
+DEAL::-1.     2. 
+DEAL:: 1.     2.     4.     8.    
+DEAL:: -4.    -9.    -18.   12.   
+DEAL:: -8.    -18.   -36.   24.   
+DEAL:: 0.     -3.    -6.    4.    
+DEAL:: 0.     -6.    -12.   8.    
+DEAL::Matrix increasing symmetric rows
+DEAL::        2. -1.    
+DEAL::-2.     3. -2.    
+DEAL::-3.     4. -3.    
+DEAL::-4.     5. 
+DEAL:: 1.     2.     4.     8.    
+DEAL:: 0.     -4.    -14.   24.   
+DEAL:: 0.     -8.    -28.   48.   
+DEAL:: -2.    -7.    -20.   28.   
+DEAL:: -4.    -14.   -40.   56.   
+DEAL::Matrix increasing symmetric
+DEAL::        2. -1.    
+DEAL::-1.     3. -2.    
+DEAL::-2.     4. -3.    
+DEAL::-3.     5. 
+DEAL:: 1.     2.     4.     8.    
+DEAL:: 0.     -3.    -12.   28.   
+DEAL:: 0.     -6.    -24.   56.   
+DEAL:: 0.     -3.    -12.   28.   
+DEAL:: 0.     -6.    -24.   56.   
+DEAL::Matrix increasing nonsymmetric
+DEAL::        2. 5.     
+DEAL::-2.     3. 3.     
+DEAL::-3.     4. 1.     
+DEAL::-4.     5. 
+DEAL:: 1.     2.     4.     8.    
+DEAL:: 12.    16.    18.    24.   
+DEAL:: 24.    32.    36.    48.   
+DEAL:: -2.    -1.    -10.   44.   
+DEAL:: -4.    -2.    -20.   88.   
