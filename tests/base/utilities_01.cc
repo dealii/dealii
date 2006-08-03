@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,6 +25,7 @@
 void test () 
 {
   deallog << Utilities::int_to_string (42,4) << std::endl;
+  deallog << Utilities::int_to_string (42) << std::endl;
   deallog << Utilities::needed_digits (424) << std::endl;
   deallog << Utilities::string_to_int (" 413 ") << std::endl;
 

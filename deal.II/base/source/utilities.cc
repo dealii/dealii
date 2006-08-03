@@ -54,6 +54,12 @@ namespace Utilities
   int_to_string (const unsigned int i,
 		 const unsigned int digits)
   {
+				     // if second argument is invalid, then do
+				     // not pad the resulting string at all
+    if (digits == deal_II_numbers::invalid_unsigned_int)
+      return int_to_string (i, needed_digits(i));
+    
+    
     AssertThrow ( ! ((digits==1 && i>=10)   ||
 		     (digits==2 && i>=100)  ||
 		     (digits==3 && i>=1000) ||

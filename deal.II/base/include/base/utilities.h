@@ -43,7 +43,7 @@ namespace Utilities
                                     */
   std::string
   int_to_string (const unsigned int i,
-		 const unsigned int digits);
+		 const unsigned int digits = deal_II_numbers::invalid_unsigned_int);
 
                                    /**
                                     * Determine how many digits are needed to

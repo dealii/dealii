@@ -343,6 +343,12 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p> New: The second argument to <code>Utilities::int_to_string</code>
+       can now be omitted, leading to a string that isn't zero padded at all.
+       <br>
+       (WB 2006/08/02)
+       </p>
+
   <li> <p> Changed: When there is still a <code>SmartPointer</code> object
        pointing to another object at the time it is destroyed, this would cause
        the program to be aborted. However, there are cases where this is not
