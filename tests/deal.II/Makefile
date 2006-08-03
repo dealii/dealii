@@ -24,7 +24,7 @@ default: run-tests
 tests_x = block_matrices \
 	constraints \
 	data_out \
-	derivative_approximation \
+	derivative_* \
 	derivatives \
 	dof_test \
 	dof_renumbering \
