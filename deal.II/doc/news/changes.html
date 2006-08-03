@@ -781,6 +781,36 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Extended: <code 
+		 class="class">DerivativeApproximation</code> now offers access to the
+       full tensor of derivatives of orders one, two and three. This
+       information can be requested for a single cell by means of the <code 
+		 class="class">DerivativeApproximation</code><code
+       class="member">::approximate_derivative_tensor</code> function. If the
+       norm of this tensor is required later on, the new <code 
+		 class="class">DerivativeApproximation</code><code
+       class="member">::derivative_norm</code> function can be used. Note, that
+       for second order derivatives, this returns the largest eigenvalue
+       instead of the Frobenius norm, which is returned by the <code 
+		 class="class">Tensor&lt;rank_,dim&gt;</code><code
+       class="member">::norm</code> function.
+       <br> 
+       (Tobias Leicht 2006/08/03)
+       </p>
+
+  <li> <p>
+       Fixed: <code 
+		 class="class">DerivativeApproximation</code> offers approximated
+       derivatives of a discrete function. The symmetrization of the derivative
+       tensor is now done at the right place, i.e. the derivative itself is
+       symmetrized instead of an intermediate tensor. This should improve the
+       results slightly, but cause no problems otherwise, as this is completely
+       internal to the class.
+       <br> 
+       (Tobias Leicht 2006/08/03)
+       </p>
+
+  <li> <p>
        Fixed: The <code 
 		 class="member">DataOut::build_patches</code> and similar
        functions in the related <code>DataOut*</code> classes allowed to pass
