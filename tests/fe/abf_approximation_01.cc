@@ -12,8 +12,11 @@
 //----------------------------  abf_approximation_01.cc  ---------------------------
 
 /*
- * Little snippet, which tests, to what degree the RT/ABF elements
- * can approximate a polynomial exactly on deformed geometries.
+ * check the projection error for a given polynomial. results should
+ * be within rounding error if the polynomial is of low-enough order
+ * to be represented by the ansatz space
+ *
+ * Like rt_approximation_01, but for ABF elements
  */
 
 
