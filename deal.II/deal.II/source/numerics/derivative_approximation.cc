@@ -748,14 +748,14 @@ DerivativeApproximation::approximate (const Mapping<dim>    &mapping,
       AssertThrow (determinant(Y) != 0,
 		   ExcInsufficientDirections());
       
-				       // first symmetrize g
-      DerivativeDescription::symmetrize (projected_derivative);
-      
                                        // compute Y^-1 g
       const Tensor<2,dim> Y_inverse = invert(Y);
       
       typename DerivativeDescription::Derivative derivative;
       contract (derivative, Y_inverse, projected_derivative);
+      
+				       // finally symmetrize the derivative
+      DerivativeDescription::symmetrize (derivative);
 
       *derivative_norm_on_this_cell
 	= DerivativeDescription::derivative_norm (derivative);
