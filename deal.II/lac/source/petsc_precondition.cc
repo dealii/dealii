@@ -218,7 +218,11 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // then set flags
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR == 1)
+    PCFactorSetLevels (pc, additional_data.levels);
+#else
     PCICCSetLevels (pc, additional_data.levels);
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
@@ -251,7 +255,11 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // then set flags
-    PCILUSetLevels (pc, additional_data.levels);
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR == 1)
+    PCFactorSetLevels (pc, additional_data.levels);
+#else
+    PCILUSetLevels (pc, additional_data.levels);  
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
@@ -288,7 +296,11 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                      // set flags as given
+#if (PETSC_VERSION_MAJOR == 2) && (PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR == 1)
+    ierr = PCFactorSetPivoting (pc, additional_data.pivoting);
+#else
     ierr = PCLUSetPivoting (pc, additional_data.pivoting);
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
