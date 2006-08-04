@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,7 @@
 #include "../tests.h"
 #include "dof_tools_common.cc"
 #include <dofs/dof_constraints.h>
+#include <lac/vector.h>
 
 // check
 //   DoFTools::
@@ -47,5 +48,17 @@ check_this (const DoFHandler<dim> &dof_handler)
   deallog << cm.n_constraints () << std::endl;
   for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
     deallog << (cm.is_identity_constrained(i) ? '0' : '1');
-  deallog << std::endl;  
+  deallog << std::endl;
+
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    if (cm.is_constrained(i))
+      {
+	deallog << "not identity constrained: " << i << std::endl;
+	Vector<double> v (dof_handler.n_dofs());
+	v(i) = 1;
+	cm.condense (v);
+	for (unsigned int j=0; j<dof_handler.n_dofs(); ++j)
+	  if (v(j) != 0)
+	    deallog << "  line " << j << ": " << v(j) << std::endl;
+      }
 }
