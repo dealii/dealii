@@ -1,3 +1,4 @@
+
 //---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
@@ -266,6 +267,53 @@ class DerivativeApproximation
 				   const unsigned int     component = 0);
 
 				     /**
+				      * This function calculates the
+				      * <tt>order</tt>-th order approximate
+				      * derivative and returns the full tensor
+				      * for a single cell.
+				      *
+				      * The last parameter denotes the
+				      * solution component, for which
+				      * the gradient is to be
+				      * computed. It defaults to the
+				      * first component. For
+				      * scalar elements, this is the only
+				      * valid choice; for vector-valued ones,
+				      * any component between zero and the
+				      * number of vector components can be
+				      * given here.
+				      */
+
+    template <int dim, template <int> class DH, class InputVector, int order>
+    static void
+    approximate_derivative_tensor (const Mapping<dim>                           &mapping,
+				   const DH<dim>                                &dof,
+				   const InputVector                            &solution,
+				   const typename DH<dim>::active_cell_iterator &cell,
+				   Tensor<order,dim>                            &derivative,
+				   const unsigned int                            component = 0);
+
+				     /**
+				      * Same as above, with
+				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
+				      */
+
+    template <int dim, template <int> class DH, class InputVector, int order>
+    static void
+    approximate_derivative_tensor (const DH<dim>                                &dof,
+				   const InputVector                            &solution,
+				   const typename DH<dim>::active_cell_iterator &cell,
+				   Tensor<order,dim>                            &derivative,
+				   const unsigned int                            component = 0);
+
+				     /**
+				      * Return the norm of the derivative.
+				      */
+    template <int dim, int order>
+    static double
+    derivative_norm(const Tensor<order,dim> &derivative);
+    
+				     /**
 				      * Exception
 				      */
     DeclException2 (ExcInvalidVectorLength,
@@ -449,6 +497,130 @@ class DerivativeApproximation
 					  */
 	static void symmetrize (Derivative &derivative_tensor);
     };
+
+    template <int dim>
+    class ThirdDerivative
+    {
+      public:
+					 /**
+					  * Declare which data fields have
+					  * to be updated for the function
+					  * @p get_projected_derivative
+					  * to work.
+					  */
+	static const UpdateFlags update_flags;
+
+					 /**
+					  * Declare the data type which
+					  * holds the derivative described
+					  * by this class.
+					  */
+	typedef Tensor<3,dim> Derivative;
+
+					 /**
+					  * Likewise declare the data type
+					  * that holds the derivative
+					  * projected to a certain
+					  * directions.
+					  */
+	typedef Tensor<2,dim> ProjectedDerivative;
+
+					 /**
+					  * Given an FEValues object
+					  * initialized to a cell, and a
+					  * solution vector, extract the
+					  * desired derivative at the
+					  * first quadrature point (which
+					  * is the only one, as we only
+					  * evaluate the finite element
+					  * field at the center of each
+					  * cell).
+					  */
+	template <class InputVector>
+	static ProjectedDerivative
+	get_projected_derivative (const FEValues<dim>  &fe_values,
+				  const InputVector    &solution,
+				  const unsigned int    component);
+	
+					 /**
+					  * Return the norm of the
+					  * derivative object. Here, for
+					  * the (symmetric) tensor of
+					  * second derivatives, we choose
+					  * the absolute value of the
+					  * largest eigenvalue, which is
+					  * the matrix norm associated to
+					  * the $l_2$ norm of vectors. It
+					  * is also the largest value of
+					  * the curvature of the solution.
+					  */
+	static double derivative_norm (const Derivative &d);
+
+					 /**
+					  * If for the present derivative
+					  * order, symmetrization of the
+					  * derivative tensor is
+					  * necessary, then do so on the
+					  * argument.
+					  *
+					  * For the second derivatives,
+					  * each entry of the tensor is
+					  * set to the mean of its value
+					  * and the value of the transpose
+					  * element.
+					  *
+					  * Note that this function
+					  * actually modifies its
+					  * argument.
+					  */
+	static void symmetrize (Derivative &derivative_tensor);
+    };
+    
+    template <int order, int dim>
+    class DerivativeSelector
+    {
+      public:
+					 /**
+					  * typedef to select the
+					  * DerivativeDescription corresponding
+					  * to the <tt>order</tt>th
+					  * derivative. In this general template
+					  * we set an unvalid typedef to void,
+					  * the real typedefs have to be
+					  * specialized.
+					  */
+	typedef void DerivDescr;
+	
+    };
+
+    template <int dim>
+    class DerivativeSelector<1,dim>
+    {
+      public:
+
+	typedef Gradient<dim> DerivDescr;
+    };
+    
+    template <int dim>
+    class DerivativeSelector<2,dim>
+    {
+      public:
+	
+	typedef SecondDerivative<dim> DerivDescr;
+    };
+    
+    template <int dim>
+    class DerivativeSelector<3,dim>
+    {
+      public:
+	
+	typedef ThirdDerivative<dim> DerivDescr;
+    };
+    
+    
+    
+    
+  private:
     
 				     /**
 				      * Convenience typedef denoting
@@ -491,6 +663,9 @@ class DerivativeApproximation
 				      * approximation on the cells in
 				      * the range given by the third
 				      * parameter.
+				      * Fill the @p derivative_norm vector with
+				      * the norm of the computed derivative
+				      * tensors on each cell.
 				      */
     template <class DerivativeDescription, int dim,
               template <int> class DH, class InputVector>
@@ -501,6 +676,21 @@ class DerivativeApproximation
 		 const unsigned int     component,
 		 const IndexInterval   &index_interval,
 		 Vector<float>         &derivative_norm);    
+
+				     /**
+				      * Compute the derivative approximation on
+				      * one cell. This computes the full
+				      * derivative tensor.
+				      */
+    template <class DerivativeDescription, int dim,
+              template <int> class DH, class InputVector>
+    static void
+    approximate_cell (const Mapping<dim>                            &mapping,
+		      const DH<dim>                                 &dof,
+		      const InputVector                             &solution,
+		      const unsigned int                             component,
+		      const typename DH<dim>::active_cell_iterator  &cell,
+		      typename DerivativeDescription::Derivative    &derivative);    
 };
 
 
