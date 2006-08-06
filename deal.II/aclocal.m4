@@ -1371,9 +1371,19 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 	        F77FLAGSPIC="-fPIC"
                 ;;
         esac
-
-        F77LIBS="$F77LIBS -lg2c"
-  
+        
+	case "$F77$" in
+	   *gfortran* )
+		F77LIBS="$F77LIBS -lgfortran"
+		;;
+	   *g77* )
+		F77LIBS="$F77LIBS -lg2c"
+		;;
+           * )
+		AC_MSG_ERROR([Error in configure script, please report a bug]) 
+		;;
+	esac
+	
 	;;
 
     AIXF77)
