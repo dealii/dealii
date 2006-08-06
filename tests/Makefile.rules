@@ -209,7 +209,7 @@ Makefile.depend: $(shell echo *.cc)
 		|| (rm -f $@ ; false)
 	@$(PERL) -pi -e 's#\.((g\.)?$(OBJEXT):)#/obj.\1#g;' $@
 
-Makefile.tests: $(shell echo *.cc)
+Makefile.tests: Makefile $(shell echo *.cc)
 	@echo =====Targets======= $@
 	@for i in $(tests) ; do \
 		echo "$$i/exe : $$i/obj.g.\$$(OBJEXT) \$$(libraries)"; \
