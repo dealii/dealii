@@ -33,9 +33,13 @@ template<typename number> class Vector;
  * A quadratic tridiagonal matrix. That is, a matrix where all entries
  * are zero, except the diagonal and the entries left and right of it.
  *
- * @note Only data management and entry functions are implemented
- * directly. All more complex functions require LAPACK support.
- */
+ * The matrix has an additional symmetric mode, in which case only the
+ * upper triangle of the matrix is stored and mirrored to the lower
+ * one for matrix vector operations.
+ *
+ * @ingroup Matrix1
+ * @author Guido Kanschat, 2005, 2006
+*/
 template<typename number>
 class TridiagonalMatrix
 {
@@ -48,7 +52,18 @@ class TridiagonalMatrix
 				      * empty matrix of dimension
 				      * <tt>n</tt>.
 				      */
-    TridiagonalMatrix(unsigned int n = 0);
+    TridiagonalMatrix(unsigned int n = 0,
+		      bool symmetric = false);
+
+				     /**
+				      * Reinitialize the matrix to a
+				      * new size and reset all entries
+				      * to zero. The symmetry
+				      * properties may be set as well.
+				      */
+    void reinit(unsigned int n,
+		bool symmetric = false);
+    
 
 //@}
 ///@name Non-modifying operators
@@ -98,6 +113,15 @@ class TridiagonalMatrix
 				      * value. This is restricted to
 				      * the case where <i>|i-j| <=
 				      * 1</i>.
+				      *
+				      * @note In case of symmetric
+				      * storage technique, the entries
+				      * <i>(i,j)</i> and <i>(j,i)</i>
+				      * are identified and <b>both</b>
+				      * exist. This must be taken into
+				      * account if adding up is used
+				      * for matrix assembling in order
+				      * not to obtain doubled entries.
 				      */
     number& operator()(unsigned int i, unsigned int j);
     
@@ -251,8 +275,22 @@ class TridiagonalMatrix
 				      */
     number relative_symmetry_norm2 () const;
 //@}
+///@name LAPACK operations
+//@{
+				     /**
+				      * Return the eigenvalues of the
+				      * matrix in the vector provided.
+				      *
+				      * @note This function requires
+				      * configuration of deal.II with
+				      * LAPACK support. Additionally,
+				      * the matrix must use symmetric
+				      * storage technique.
+				      */
+    void eigenvalues(Vector<number>& eigenvalues) const;
+//@}
 ///@name Miscellanea
-//@{    
+//@{
 				     /**
 				      * Output of the matrix in
 				      * user-defined format.
@@ -283,6 +321,12 @@ class TridiagonalMatrix
 				      * the diagonal. Therefore, the
 				      * length of this vector is the
 				      * same as that of #diagonal.
+				      *
+				      * The length of this vector is
+				      * zero for symmetric storage. In
+				      * this case, the second element
+				      * of #left is identified with
+				      * the first element of #right.
 				      */
     std::vector<number> left;
 				     /**
@@ -295,6 +339,14 @@ class TridiagonalMatrix
 				      * same as that of #diagonal.
 				      */
     std::vector<number> right;
+
+				     /**
+				      * If this flag is true, only the
+				      * entries to the right of the
+				      * diagonal are stored and the
+				      * matrix is assumed symmetric.
+				      */
+    bool is_symmetric;
 };
 
 /**@}*/
@@ -332,7 +384,10 @@ TridiagonalMatrix<number>::operator()(unsigned int i, unsigned int j) const
   if (j==i)
     return diagonal[i];
   if (j==i-1)
-    return left[i];
+    if (is_symmetric)
+      return right[i-1];
+    else
+      return left[i];
   if (j==i+1)
     return right[i];
   AssertThrow(false, ExcInternalError());
@@ -353,7 +408,10 @@ TridiagonalMatrix<number>::operator()(unsigned int i, unsigned int j)
   if (j==i)
     return diagonal[i];
   if (j==i-1)
-    return left[i];
+    if (is_symmetric)
+      return right[i-1];
+    else
+      return left[i];
   if (j==i+1)
     return right[i];
   AssertThrow(false, ExcInternalError());

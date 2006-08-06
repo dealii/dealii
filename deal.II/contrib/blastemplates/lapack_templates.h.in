@@ -33,3 +33,10 @@ void dgesvd_ (int* jobu, int* jobvt,
 	      double* work, const int* lwork,
 	      int* info);
 
+
+// Symmetric tridiagonal matrix
+void dstev_ (const char* jobz, const int* n,
+	     double* d, double* e, double* z,
+	     const int* ldz, double* work,
+	     int* info);
+
