@@ -11,6 +11,9 @@
 //
 //---------------------------------------------------------------------------
 
+// Test for symmetric tridiagonal matrices;
+// copies part of the tests in tridiagonal_matrix.cc
+
 // Tests TridiagonalMatrix::all_zero
 // Tests TridiagonalMatrix::matrix_scalar_product
 // Tests TridiagonalMatrix::vmult
@@ -40,38 +43,10 @@ matrix1(TridiagonalMatrix<number>& M)
   for (unsigned int i=0;i<n;++i)
     {
       M(i,i) = 2.;
+				       // Set both diagonals, one will
+				       // override other.
       if (i>0) M(i,i-1) = -1.;
       if (i<n-1) M(i,i+1) = -1.;
-    }
-}
-
-
-// Nonsymmetric matrix with constant diagonals [-1,2,-3]
-template<typename number>
-void
-matrix2(TridiagonalMatrix<number>& M)
-{
-  const unsigned int n = M.n();
-  for (unsigned int i=0;i<n;++i)
-    {
-      M(i,i) = 2.;
-      if (i>0) M(i,i-1) = -1.;
-      if (i<n-1) M(i,i+1) = -3.;
-    }
-}
-
-
-// Matrix with increasing diagonals and symmetric rows
-template<typename number>
-void
-matrix3(TridiagonalMatrix<number>& M)
-{
-  const unsigned int n = M.n();
-  for (unsigned int i=0;i<n;++i)
-    {
-      M(i,i) = 2.+i;
-      if (i>0) M(i,i-1) = -1.-i;
-      if (i<n-1) M(i,i+1) = -1.-i;
     }
 }
 
@@ -87,21 +62,6 @@ matrix4(TridiagonalMatrix<number>& M)
       M(i,i) = 2.+i;
       if (i>0) M(i,i-1) = 0.-i;
       if (i<n-1) M(i,i+1) = -1.-i;
-    }
-}
-
-
-// Nonsymmetric matrix with increasing diagonals
-template<typename number>
-void
-matrix5(TridiagonalMatrix<number>& M)
-{
-  const unsigned int n = M.n();
-  for (unsigned int i=0;i<n;++i)
-    {
-      M(i,i) = 2.+i;
-      if (i>0) M(i,i-1) = -1.-i;
-      if (i<n-1) M(i,i+1) = 5.-2.*i;
     }
 }
 
@@ -165,34 +125,22 @@ template<typename number>
 void
 check(unsigned int size)
 {
-  TridiagonalMatrix<number>M(size);
+  TridiagonalMatrix<number>M(size, true);
   deallog << "all_zero " << M.all_zero();
   matrix1(M);
   deallog << " " << M.all_zero() << std::endl;
   deallog << "Matrix [-1,2,-1]" << std::endl;
   M.print(deallog, 7, 0);
   check_vmult(M);
-  matrix2(M);
-  deallog << "Matrix [-1,2,-3]" << std::endl;
-  M.print(deallog, 7, 0);
-  check_vmult(M);
-  matrix3(M);
-  deallog << "Matrix increasing symmetric rows" << std::endl;
-  M.print(deallog, 7, 0);
-  check_vmult(M);
   matrix4(M);
   deallog << "Matrix increasing symmetric" << std::endl;
-  M.print(deallog, 7, 0);
-  check_vmult(M);
-  matrix5(M);
-  deallog << "Matrix increasing nonsymmetric" << std::endl;
   M.print(deallog, 7, 0);
   check_vmult(M);
 }
 
 int main()
 {
-  std::ofstream logfile("tridiagonal_matrix/output");
+  std::ofstream logfile("tridiagonal_matrix_sym/output");
   logfile.setf(std::ios::fixed);
   logfile.precision(0);
   deallog.attach(logfile);
