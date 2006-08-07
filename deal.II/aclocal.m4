@@ -1376,6 +1376,9 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 	   *gfortran* )
 		F77LIBS="$F77LIBS -lgfortran"
 		;;
+	   *f77* )
+		F77LIBS="$F77LIBS -lg2c"
+		;;
 	   *g77* )
 		F77LIBS="$F77LIBS -lg2c"
 		;;
