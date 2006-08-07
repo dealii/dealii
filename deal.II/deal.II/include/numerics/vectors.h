@@ -545,6 +545,26 @@ class VectorTools
 			 const bool                project_to_boundary_first = false);
 
 				     /**
+				      * Declaration of specialization
+				      * of the previous function for
+				      * 1d. At present, it is not
+				      * implemented.
+				      *
+				      * The default value of the boundary
+				      * quadrature formula is an invalid
+				      * object since it makes no sense in 1d.
+				      */
+    template <class VECTOR>
+    static void project (const DoFHandler<1>      &dof,
+			 const ConstraintMatrix   &constraints,
+			 const Quadrature<1>      &quadrature,
+			 const Function<1>        &function,
+			 VECTOR                   &vec,
+			 const bool                enforce_zero_boundary = false,
+			 const Quadrature<0>      &q_boundary = *invalid_face_quadrature,
+			 const bool                project_to_boundary_first = false);
+    
+				     /**
 				      * Create a right hand side
 				      * vector. Prior content of the
 				      * given @p rhs_vector vector is

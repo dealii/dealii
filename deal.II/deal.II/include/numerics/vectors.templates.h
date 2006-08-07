@@ -41,6 +41,9 @@
 #include <vector>
 #include <cmath>
 
+
+//TODO[RH]: Use StaticQ1Mapping where appropriate
+
 template <int dim>
 inline double sqr_point (const Tensor<1,dim> &p)
 {
@@ -295,6 +298,23 @@ void VectorTools::project (const Mapping<1>       &,
 				   // into the project_boundary_values
 				   // function?
   Assert (false, ExcNotImplemented());
+}
+
+
+template <class VECTOR>
+void VectorTools::project (const DoFHandler<1>    &dof_handler,
+			   const ConstraintMatrix &constraints,
+			   const Quadrature<1>    &quadrature,
+			   const Function<1>      &function,
+			   VECTOR                 &vec_result,
+			   const bool              enforce_zero_boundary,
+			   const Quadrature<0>    &q_boundary,
+			   const bool              project_to_boundary_first)
+{
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+  static const MappingQ1<1> mapping;
+  project (mapping, dof_handler, constraints, quadrature, function, vec_result,
+	   enforce_zero_boundary, q_boundary, project_to_boundary_first);
 }
 
 
