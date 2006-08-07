@@ -206,7 +206,7 @@ TridiagonalMatrix<number>::matrix_norm_square(
 
 template<typename number>
 void
-TridiagonalMatrix<number>::eigenvalues(Vector<double>& lambda) const
+TridiagonalMatrix<number>::eigenvalues(Vector<number>&) const
 {
   Assert(false, ExcNotImplemented());
 }
