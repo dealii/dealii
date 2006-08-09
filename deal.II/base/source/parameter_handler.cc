@@ -872,7 +872,7 @@ ParameterHandler::print_parameters (std::ostream     &out,
 	        << std::endl;
 	    break;
       case ShortText:
-	break;
+	    break;
       default:
 	    Assert (false, ExcNotImplemented());
     };
