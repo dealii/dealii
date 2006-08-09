@@ -40,36 +40,8 @@ help:
 	@echo "========================================================================"
 
 
-
-baseg: contrib-functionparser
-	cd $D/base && $(MAKE) $(MAKEOPTIONS) libg
-
-baseo: contrib-functionparser
-	cd $D/base && $(MAKE) $(MAKEOPTIONS) libo
-
-lacg: baseg contrib
-	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libg
-
-laco: baseo contrib
-	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libo
-
-1dg: baseg lacg
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 1dg
-
-2dg: baseg lacg
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 2dg
-
-3dg: baseg lacg
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 3dg
-
-1do:baseo laco
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 1d
-
-2do:baseo laco
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 2d
-
-3do: baseo laco
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 3d
+common/scripts/make_dependencies:
+	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS)
 
 deps: common/scripts/make_dependencies
 	cd $D/base && $(MAKE) $(MAKEOPTIONS) Makefile.dep
@@ -77,8 +49,36 @@ deps: common/scripts/make_dependencies
 	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/lib && $(MAKE) $(MAKEOPTIONS) external-links
 
-common/scripts/make_dependencies:
-	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS)
+baseg: deps contrib-functionparser
+	cd $D/base && $(MAKE) $(MAKEOPTIONS) libg
+
+baseo: deps contrib-functionparser
+	cd $D/base && $(MAKE) $(MAKEOPTIONS) libo
+
+lacg: deps baseg contrib
+	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libg
+
+laco: deps baseo contrib
+	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libo
+
+1dg: deps baseg lacg
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 1dg
+
+2dg: deps baseg lacg
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 2dg
+
+3dg: deps baseg lacg
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 3dg
+
+1do: deps baseo laco
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 1d
+
+2do: deps baseo laco
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 2d
+
+3do: deps baseo laco
+	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 3d
+
 
 base: baseg baseo
 lac: lacg laco
@@ -91,14 +91,10 @@ $(LIBDIR):
 
 baseg baseo base lacg laco lac 1dg 1do 1d 2dg 2do 2d 3dg 3do 3d all debug contrib -functionparser : $(LIBDIR) deps
 
-all: deps
-	$(MAKE) $(MAKEOPTIONS) contrib base lac 2d 1d 3d
+all: debug optimized
+debug: contrib baseg lacg 2dg 1dg 3dg
+optimized: contrib baseo laco 2do 1do 3do
 
-debug: deps
-	$(MAKE) $(MAKEOPTIONS) contrib baseg lacg 2dg 1dg 3dg
-
-optimized: deps
-	$(MAKE) $(MAKEOPTIONS) contrib baseo laco 2do 1do 3do
 
 # when HSL functions are used, we also compile the detached_ma27
 # program which itself uses the optimized base library; so add this to
