@@ -1,4 +1,4 @@
-//----------------------------  dof_tools_19.cc  ---------------------------
+//----------------------------  rt_crash_01.cc  ---------------------------
 //    $Id: dof_tools_03.cc 11749 2005-11-09 19:11:20Z wolf $
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  dof_tools_19.cc  ---------------------------
+//----------------------------  rt_crash_01.cc  ---------------------------
 
 #include "../tests.h"
 #include "dof_tools_common.cc"
@@ -20,22 +20,11 @@
 #include <lac/vector.h>
 #include <dofs/dof_tools.h>
 
-// check
-//   DoFTools::
-//   make_hanging_node_constraints (const DoFHandler<dim> &,
-//	                            ConstraintMatrix      &);
-//
-// As the results of dof_tools_03 seem unclear, this test aims
-// at verifying the constraints by projecting a constant function
-// onto the FE space and afterwards evaluating the L_2 error.
-// This should reveal errors in the constraint matrix.
+// check an abort in FEPolyTensor when used with RaviartThomas
+// elements, when computing some sort of edge directions. This is the
+// case left over from dof_tools_19
 
-// as a side effect, this test used to crash because a)
-// VectorTools::project instantiated QGauss<0>(6) when in 1d, and b)
-// because VectorTools::project wasn't implemented at all in 1d. It
-// required fixing both bugs to get to the actual point of this test.
-
-std::string output_file_name = "dof_tools_19/output";
+std::string output_file_name = "rt_crash_01/output";
 
 
 template <int dim>
@@ -43,11 +32,11 @@ void
 check_this (const DoFHandler<dim> &dof_handler)
 {
                                    // there's presently a crash in the
-                                   // Raviart-Thomas element. don't
-                                   // check this element for that
-                                   // reason. this case is covered in
-                                   // rt_crash_01, however
-  if (dof_handler.get_fe().get_name().find ("RaviartThomas") !=
+                                   // Raviart-Thomas element. only
+                                   // check for these elements,
+                                   // everything else is handled in
+                                   // dof_tools_19
+  if (dof_handler.get_fe().get_name().find ("RaviartThomas") ==
       std::string::npos)
     return;
   
