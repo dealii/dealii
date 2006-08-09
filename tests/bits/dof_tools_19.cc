@@ -2,7 +2,7 @@
 //    $Id: dof_tools_03.cc 11749 2005-11-09 19:11:20Z wolf $
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,6 +30,11 @@
 // onto the FE space and afterwards evaluating the L_2 error.
 // This should reveal errors in the constraint matrix.
 
+// as a side effect, this test used to crash because a)
+// VectorTools::project instantiated QGauss<0>(6) when in 1d, and b)
+// because VectorTools::project wasn't implemented at all in 1d. It
+// required fixing both bugs to get to the actual point of this test.
+
 std::string output_file_name = "dof_tools_19/output";
 
 
@@ -37,6 +42,15 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
+                                   // there's presently a crash in the
+                                   // Raviart-Thomas element. don't
+                                   // check this element for that
+                                   // reason. this case is covered in
+                                   // rt_3, however
+  if (dof_handler.get_fe().get_name().find ("RaviartThomas") !=
+      std::string::npos)
+    return;
+  
   ConstantFunction<dim> test_func (1, dof_handler.get_fe().n_components ()); 
 
                                    // don't run this test if hanging
@@ -67,5 +81,7 @@ check_this (const DoFHandler<dim> &dof_handler)
                                      VectorTools::L2_norm);
   const double p_l2_error = cellwise_errors.l2_norm();
 
+  Assert (p_l2_error < 1e-14, ExcInternalError());
+  
   deallog << "L2_Error : " << p_l2_error << std::endl;
 }
