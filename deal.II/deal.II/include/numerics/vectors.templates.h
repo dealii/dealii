@@ -276,79 +276,41 @@ VectorTools::interpolate (const DoFHandler<dim>           &dof_1,
 }
 
 
+namespace internal
+{
+  namespace VectorTools
+  {
 #if deal_II_dimension == 1
 
-template <class VECTOR>
-void VectorTools::project (const Mapping<1>       &,
-			   const DoFHandler<1>    &,
-			   const ConstraintMatrix &,
-			   const Quadrature<1>    &,
-			   const Function<1>      &,
-			   VECTOR                 &,
-			   const bool              ,
-			   const Quadrature<0>    &,
-			   const bool              )
-{
-				   // this function should easily be
-				   // implemented using the template
-				   // below. However some changes have
-				   // to be made since faces don't
-				   // exist in 1D. Maybe integrate the
-				   // creation of zero boundary values
-				   // into the project_boundary_values
-				   // function?
-  Assert (false, ExcNotImplemented());
-}
-
-
-template <class VECTOR>
-void VectorTools::project (const DoFHandler<1>    &dof_handler,
-			   const ConstraintMatrix &constraints,
-			   const Quadrature<1>    &quadrature,
-			   const Function<1>      &function,
-			   VECTOR                 &vec_result,
-			   const bool              enforce_zero_boundary,
-			   const Quadrature<0>    &q_boundary,
-			   const bool              project_to_boundary_first)
-{
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<1> mapping;
-  project (mapping, dof_handler, constraints, quadrature, function, vec_result,
-	   enforce_zero_boundary, q_boundary, project_to_boundary_first);
-}
-
-
-#endif
-
-
-template <int dim, class VECTOR>
-void VectorTools::project (const Mapping<dim>       &mapping,
-			   const DoFHandler<dim>    &dof,
-			   const ConstraintMatrix   &constraints,
-			   const Quadrature<dim>    &quadrature,
-			   const Function<dim>      &function,
-			   VECTOR                   &vec_result,
-			   const bool                enforce_zero_boundary,
-			   const Quadrature<dim-1>  &q_boundary,
-			   const bool                project_to_boundary_first)
-{
-  Assert (dof.get_fe().n_components() == function.n_components,
-	  ExcInvalidFE());
-
-  Assert (vec_result.size() == dof.n_dofs(),
-          ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
-  
-  const FiniteElement<dim> &fe = dof.get_fe();
-
-				   // make up boundary values
-  std::map<unsigned int,double> boundary_values;
-
-  if (enforce_zero_boundary == true) 
-				     // no need to project boundary
-				     // values, but enforce
-				     // homogeneous boundary values
-				     // anyway
+    void
+    interpolate_zero_boundary_values (const ::DoFHandler<1>         &dof_handler,
+                                      std::map<unsigned int,double> &boundary_values)
     {
+                                       // we only need to find the
+                                       // left-most and right-most
+                                       // vertex and query its vertex
+                                       // dof indices. that's easy :-)
+      for (unsigned direction=0; direction<2; ++direction)
+        {
+          ::DoFHandler<1>::cell_iterator
+              cell = dof_handler.begin(0);
+          while (!cell->at_boundary(direction))
+            cell = cell->neighbor(direction);
+
+          for (unsigned int i=0; i<dof_handler.get_fe().dofs_per_vertex; ++i)
+            boundary_values[cell->vertex_dof_index (direction, i)] = 0.;
+        }
+    }
+
+#else
+    
+    template <int dim>
+    void
+    interpolate_zero_boundary_values (const ::DoFHandler<dim>       &dof_handler,
+                                      std::map<unsigned int,double> &boundary_values)
+    {
+      const FiniteElement<dim> &fe = dof_handler.get_fe();
+
 				       // loop over all boundary faces
 				       // to get all dof indices of
 				       // dofs on the boundary. note
@@ -370,8 +332,9 @@ void VectorTools::project (const Mapping<dim>       &mapping,
 				       // that is actually wholly on
 				       // the boundary, not only by
 				       // one line or one vertex
-      typename DoFHandler<dim>::active_face_iterator face = dof.begin_active_face(),
-						     endf = dof.end_face();
+      typename ::DoFHandler<dim>::active_face_iterator
+        face = dof_handler.begin_active_face(),
+        endf = dof_handler.end_face();
       std::vector<unsigned int> face_dof_indices (fe.dofs_per_face);
       for (; face!=endf; ++face)
 	if (face->at_boundary())
@@ -385,24 +348,60 @@ void VectorTools::project (const Mapping<dim>       &mapping,
 					       // vector valued elements here,
 					       // since we set all components
 	      boundary_values[face_dof_indices[i]] = 0.;
-	  };
+	  }
     }
+    
+#endif
+  }
+}
+
+
+
+template <int dim, class VECTOR>
+void VectorTools::project (const Mapping<dim>       &mapping,
+			   const DoFHandler<dim>    &dof,
+			   const ConstraintMatrix   &constraints,
+			   const Quadrature<dim>    &quadrature,
+			   const Function<dim>      &function,
+			   VECTOR                   &vec_result,
+			   const bool                enforce_zero_boundary,
+			   const Quadrature<dim-1>  &q_boundary,
+			   const bool                project_to_boundary_first)
+{
+  Assert (dof.get_fe().n_components() == function.n_components,
+	  ExcInvalidFE());
+
+  Assert (vec_result.size() == dof.n_dofs(),
+          ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
+  
+				   // make up boundary values
+  std::map<unsigned int,double> boundary_values;
+  
+  if (enforce_zero_boundary == true) 
+				     // no need to project boundary
+				     // values, but enforce
+				     // homogeneous boundary values
+				     // anyway
+    internal::VectorTools::
+      interpolate_zero_boundary_values (dof, boundary_values);
+  
   else
 				     // no homogeneous boundary values
     if (project_to_boundary_first == true)
 				       // boundary projection required
       {
-					 // set up a list of boundary functions for
-					 // the different boundary parts. We want the
-					 // @p{function} to hold on all parts of the
-					 // boundary
+					 // set up a list of boundary
+					 // functions for the
+					 // different boundary
+					 // parts. We want the
+					 // @p{function} to hold on
+					 // all parts of the boundary
 	typename FunctionMap<dim>::type boundary_functions;
 	for (unsigned char c=0; c<255; ++c)
 	  boundary_functions[c] = &function;
 	project_boundary_values (dof, boundary_functions, q_boundary,
 				 boundary_values);
-      };
-
+      }
 
 				   // set up mass matrix and right hand side
   Vector<double> vec (dof.n_dofs());

@@ -496,6 +496,13 @@ class VectorTools
 				      *
 				      * See the general documentation of this
 				      * class for further information.
+				      * 
+				      * In 1d, the default value of
+				      * the boundary quadrature
+				      * formula is an invalid object
+				      * since integration on the
+				      * boundary doesn't happen in
+				      * 1d.
 				      */
     template <int dim, class VECTOR>
     static void project (const Mapping<dim>       &mapping,
@@ -505,28 +512,9 @@ class VectorTools
 			 const Function<dim>      &function,
 			 VECTOR                   &vec,
 			 const bool                enforce_zero_boundary = false,
-			 const Quadrature<dim-1>  &q_boundary = QGauss<dim-1>(2),
-			 const bool                project_to_boundary_first = false);
-
-				     /**
-				      * Declaration of specialization
-				      * of the previous function for
-				      * 1d. At present, it is not
-				      * implemented.
-				      *
-				      * The default value of the boundary
-				      * quadrature formula is an invalid
-				      * object since it makes no sense in 1d.
-				      */
-    template <class VECTOR>
-    static void project (const Mapping<1>         &mapping,
-			 const DoFHandler<1>      &dof,
-			 const ConstraintMatrix   &constraints,
-			 const Quadrature<1>      &quadrature,
-			 const Function<1>        &function,
-			 VECTOR                   &vec,
-			 const bool                enforce_zero_boundary = false,
-			 const Quadrature<0>      &q_boundary = *invalid_face_quadrature,
+			 const Quadrature<dim-1>  &q_boundary = (dim > 1 ?
+                                                                 QGauss<dim-1>(2) :
+                                                                 Quadrature<dim-1>(0)),
 			 const bool                project_to_boundary_first = false);
 
 				     /**
@@ -541,29 +529,11 @@ class VectorTools
 			 const Function<dim>      &function,
 			 VECTOR                   &vec,
 			 const bool                enforce_zero_boundary = false,
-			 const Quadrature<dim-1>  &q_boundary = QGauss<dim-1>(2),
+			 const Quadrature<dim-1>  &q_boundary = (dim > 1 ?
+                                                                 QGauss<dim-1>(2) :
+                                                                 Quadrature<dim-1>(0)),
 			 const bool                project_to_boundary_first = false);
 
-				     /**
-				      * Declaration of specialization
-				      * of the previous function for
-				      * 1d. At present, it is not
-				      * implemented.
-				      *
-				      * The default value of the boundary
-				      * quadrature formula is an invalid
-				      * object since it makes no sense in 1d.
-				      */
-    template <class VECTOR>
-    static void project (const DoFHandler<1>      &dof,
-			 const ConstraintMatrix   &constraints,
-			 const Quadrature<1>      &quadrature,
-			 const Function<1>        &function,
-			 VECTOR                   &vec,
-			 const bool                enforce_zero_boundary = false,
-			 const Quadrature<0>      &q_boundary = *invalid_face_quadrature,
-			 const bool                project_to_boundary_first = false);
-    
 				     /**
 				      * Create a right hand side
 				      * vector. Prior content of the
@@ -1243,14 +1213,6 @@ class VectorTools
                                       * Exception
                                       */
     DeclException0 (ExcNoComponentSelected);
-
-  private:
-				     /**
-				      * Null pointer used to
-				      * denote invalid face
-				      * quadrature formulas in 1d.
- 				      */
-    static const Quadrature<0> * const invalid_face_quadrature;
 };
 
 
