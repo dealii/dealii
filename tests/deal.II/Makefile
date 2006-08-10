@@ -51,7 +51,7 @@ tests_x = block_matrices \
 	face_orientations_3d \
 	mg_dof_handler \
 	subcelldata \
-	interpolate_boundary_values_* \
+	interpolate_* \
 	have_same_coarse_mesh_* \
 	get_finest_common_cells_* \
 	project_*
