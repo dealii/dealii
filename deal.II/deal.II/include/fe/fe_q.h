@@ -297,9 +297,7 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     virtual void
     get_face_interpolation_matrix (const FiniteElement<dim> &source,
-				   FullMatrix<double>       &matrix) const;
-				     //@}
-    
+				   FullMatrix<double>       &matrix) const;    
 
 				     /**
 				      * Return the matrix
@@ -326,23 +324,6 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
     get_subface_interpolation_matrix (const FiniteElement<dim> &source,
 				      const unsigned int        subface,
 				      FullMatrix<double>       &matrix) const;
-				     //@}
-
-    
-                                     /**
-                                      * Return whether this element
-                                      * implements its hanging node
-                                      * constraints in the new way,
-				      * which has to be used to make
-				      * elements "hp compatible".
-                                      *
-				      * For the FE_Q class the result is
-				      * always true (independent of the degree
-				      * of the element), as it implements the
-				      * complete set of functions necessary
-				      * for hp capability.
-                                      */
-    virtual bool hp_constraints_are_implemented () const;
     
 				     /**
 				      * Check for non-zero values on a face.
@@ -364,6 +345,21 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * @name Functions to support hp 
 				      * @{
 				      */
+    
+                                     /**
+                                      * Return whether this element
+                                      * implements its hanging node
+                                      * constraints in the new way,
+				      * which has to be used to make
+				      * elements "hp compatible".
+                                      *
+				      * For the FE_Q class the result is
+				      * always true (independent of the degree
+				      * of the element), as it implements the
+				      * complete set of functions necessary
+				      * for hp capability.
+                                      */
+    virtual bool hp_constraints_are_implemented () const;
     
 				     /**
 				      * If, on a vertex, several
