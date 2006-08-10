@@ -749,7 +749,7 @@ void DGMethod<dim>::refine_grid ()
 {
   Vector<float> gradient_indicator (triangulation.n_active_cells());
 
-  DerivativeApproximation::approximate_gradient (mapping,
+  DerivativeApproximation::approximate_gradient (mapping[0],
 						 dof_handler,
 						 solution2,
 						 gradient_indicator);
