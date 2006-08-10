@@ -1,4 +1,4 @@
-JobId unknown Thu Aug 10 15:46:38 2006
+
 DEAL::Checking Q1 against Q1 in 1d:
 DEAL::true
 DEAL::true
@@ -108,365 +108,365 @@ DEAL::Checking Q3 against Q3 in 3d:
 DEAL::true
 DEAL::true
 DEAL::Checking DGQ0 against DGQ0 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ0 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ0 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ0 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ1 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ0 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ1 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ1 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ0 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ0 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ0 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ4 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ4 against DGQ0 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ4 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ4 against DGQ0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ0 against DGQ4 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ4 against DGQ0 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ1 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ1 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ1 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ1 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ1 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ1 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ3 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ3 against DGQ1 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ3 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ3 against DGQ1 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ1 against DGQ3 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ3 against DGQ1 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ4 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ4 against DGQ2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ4 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ4 against DGQ2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ2 against DGQ4 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ4 against DGQ2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ3 against DGQ3 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ3 against DGQ3 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ3 against DGQ3 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ3 against DGQ3 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ3 against DGQ3 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGQ3 against DGQ3 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP0 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP0 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP0 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP0 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP1 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP0 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP1 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP1 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP0 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP0 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP0 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP4 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP4 against DGP0 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP4 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP4 against DGP0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP0 against DGP4 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP4 against DGP0 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP1 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP1 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP1 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP1 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP1 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP1 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP3 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP3 against DGP1 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP3 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP3 against DGP1 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP1 against DGP3 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP3 against DGP1 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP4 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP4 against DGP2 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP4 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP4 against DGP2 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP2 against DGP4 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP4 against DGP2 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP3 against DGP3 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP3 against DGP3 in 1d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP3 against DGP3 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP3 against DGP3 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP3 against DGP3 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking DGP3 against DGP3 in 3d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking Nedelec1 against Nedelec1 in 2d:
 DEAL::false
 DEAL::false
