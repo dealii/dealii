@@ -336,14 +336,13 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * which has to be used to make
 				      * elements "hp compatible".
                                       *
-				      * For the FE_Q class the
-				      * result is always true, as
-				      * it implements the complete
-				      * set of functions necessary
+				      * For the FE_Q class the result is
+				      * always true (independent of the degree
+				      * of the element), as it implements the
+				      * complete set of functions necessary
 				      * for hp capability.
                                       */
     virtual bool hp_constraints_are_implemented () const;
-
     
 				     /**
 				      * Check for non-zero values on a face.

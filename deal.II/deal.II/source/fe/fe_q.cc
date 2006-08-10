@@ -562,6 +562,8 @@ FE_Q<dim>::hp_constraints_are_implemented () const
 }
 
 
+
+
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_Q<dim>::
