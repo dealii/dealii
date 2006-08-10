@@ -192,6 +192,14 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+  <li> <p>Fixed: when building the library in parallel, using <code>make
+        -jN</code> (most often with rather large values of <code>N</code>, for
+	example 8), it could sometimes happen that the same file is compiled
+	twice at exactly the same time. This leads to invalid object files and
+	libraries that would contain illegal instructions. This is now fixed.
+	<br>
+	(WB 2006/08/09)
+	</p> 
 
   <li> <p> Changed: The default number of subdivisions in the <code
        class="member">build_patches</code> functions of the DataOut classes is
