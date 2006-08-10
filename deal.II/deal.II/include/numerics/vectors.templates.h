@@ -44,13 +44,6 @@
 
 //TODO[RH]: Use StaticQ1Mapping where appropriate
 
-template <int dim>
-inline double sqr_point (const Tensor<1,dim> &p)
-{
-  return p * p;
-}
-
-
 template <int dim, class VECTOR>
 void VectorTools::interpolate (const Mapping<dim>    &mapping,
 			       const DoFHandler<dim> &dof,
@@ -1678,7 +1671,7 @@ namespace internal
                     std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
                     for (unsigned int k=0; k<n_components; ++k)
                       for (unsigned int q=0; q<n_q_points; ++q)
-                        psi_scalar[q] += std::pow(sqr_point(psi_grads[q][k]),
+                        psi_scalar[q] += std::pow(psi_grads[q][k] * psi_grads[q][k],
                                                   exponent/2.)
                                          * weight_vectors[q](k);
 	    
@@ -1693,7 +1686,7 @@ namespace internal
                     std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
                     for (unsigned int k=0; k<n_components; ++k)
                       for (unsigned int q=0; q<n_q_points; ++q)
-                        psi_scalar[q] += sqr_point(psi_grads[q][k])
+                        psi_scalar[q] += (psi_grads[q][k] * psi_grads[q][k])
                                          * weight_vectors[q](k);
 
                                                      // add seminorm to L_2 norm or
