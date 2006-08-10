@@ -88,6 +88,73 @@ FE_DGP<dim>::get_dpo_vector (const unsigned int deg)
 }
 
 
+
+template <int dim>
+void
+FE_DGP<dim>::
+get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+			       FullMatrix<double>       &interpolation_matrix) const
+{
+				   // this is only implemented, if the source
+				   // FE is also a DGP element. in that case,
+				   // both elements have no dofs on their
+				   // faces and the face interpolation matrix
+				   // is necessarily empty -- i.e. there isn't
+				   // much we need to do here.
+  AssertThrow ((x_source_fe.get_name().find ("FE_DGP<") == 0)
+               ||
+               (dynamic_cast<const FE_DGP<dim>*>(&x_source_fe) != 0),
+               typename FiniteElement<dim>::
+               ExcInterpolationNotImplemented());
+  
+  Assert (interpolation_matrix.m() == 0,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				0));
+  Assert (interpolation_matrix.n() == 0,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				0));
+}
+
+
+
+template <int dim>
+void
+FE_DGP<dim>::
+get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
+				  const unsigned int ,
+				  FullMatrix<double>           &interpolation_matrix) const
+{
+				   // this is only implemented, if the source
+				   // FE is also a DGP element. in that case,
+				   // both elements have no dofs on their
+				   // faces and the face interpolation matrix
+				   // is necessarily empty -- i.e. there isn't
+				   // much we need to do here.
+  AssertThrow ((x_source_fe.get_name().find ("FE_DGP<") == 0)
+               ||
+               (dynamic_cast<const FE_DGP<dim>*>(&x_source_fe) != 0),
+               typename FiniteElement<dim>::
+               ExcInterpolationNotImplemented());
+  
+  Assert (interpolation_matrix.m() == 0,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				0));
+  Assert (interpolation_matrix.n() == 0,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				0));
+}
+
+
+
+template <int dim>
+bool
+FE_DGP<dim>::hp_constraints_are_implemented () const
+{
+  return true;
+}
+
+
+
 template <int dim>
 bool
 FE_DGP<dim>::has_support_on_face (const unsigned int,

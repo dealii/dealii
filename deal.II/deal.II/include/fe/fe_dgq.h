@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -122,6 +122,71 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
     get_interpolation_matrix (const FiniteElement<dim> &source,
 			      FullMatrix<double>           &matrix) const;
     
+				     /**
+				      * Return the matrix
+				      * interpolating from a face of
+				      * of one element to the face of
+				      * the neighboring element. 
+				      * The size of the matrix is
+				      * then @p dofs_per_face times
+				      * <tt>source.dofs_per_face</tt>.
+				      *
+				      * Derived elements will have to
+				      * implement this function. They
+				      * may only provide interpolation
+				      * matrices for certain source
+				      * finite elements, for example
+				      * those from the same family. If
+				      * they don't implement
+				      * interpolation from a given
+				      * element, then they must throw
+				      * an exception of type
+				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      */
+    virtual void
+    get_face_interpolation_matrix (const FiniteElement<dim> &source,
+				   FullMatrix<double>       &matrix) const;    
+
+				     /**
+				      * Return the matrix
+				      * interpolating from a face of
+				      * of one element to the face of
+				      * the neighboring element. 
+				      * The size of the matrix is
+				      * then @p dofs_per_face times
+				      * <tt>source.dofs_per_face</tt>.
+				      *
+				      * Derived elements will have to
+				      * implement this function. They
+				      * may only provide interpolation
+				      * matrices for certain source
+				      * finite elements, for example
+				      * those from the same family. If
+				      * they don't implement
+				      * interpolation from a given
+				      * element, then they must throw
+				      * an exception of type
+				      * FiniteElement<dim>::ExcInterpolationNotImplemented.
+				      */
+    virtual void
+    get_subface_interpolation_matrix (const FiniteElement<dim> &source,
+				      const unsigned int        subface,
+				      FullMatrix<double>       &matrix) const;
+
+                                     /**
+                                      * Return whether this element
+                                      * implements its hanging node
+                                      * constraints in the new way,
+				      * which has to be used to make
+				      * elements "hp compatible".
+                                      *
+				      * For the FE_DGQ class the result is
+				      * always true (independent of the degree
+				      * of the element), as it has no hanging
+				      * nodes (being a discontinuous element).
+                                      */
+    virtual bool hp_constraints_are_implemented () const;
+
 				     /**
 				      * Check for non-zero values on a face.
 				      *
