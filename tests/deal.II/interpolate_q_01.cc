@@ -12,7 +12,7 @@
 //----------------------------  interpolate_q_01.cc  ---------------------------
 
 
-// check that VectorTools::interpolate works for FE_DGQ(p) elements correctly on
+// check that VectorTools::interpolate works for FE_Q(p) elements correctly on
 // a uniformly refined mesh for functions of degree q
 
 #include "../tests.h"

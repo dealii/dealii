@@ -1,5 +1,5 @@
-//----------------------------  interpolate_dgq_01.cc  ---------------------------
-//    $Id: interpolate_dgq_01.cc 12732 2006-03-28 23:15:45Z wolf $
+//----------------------------  interpolate_q_system_01.cc  ---------------------------
+//    $Id: interpolate_q_system_01.cc 12732 2006-03-28 23:15:45Z wolf $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006 by the deal.II authors
@@ -9,10 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  interpolate_dgq_01.cc  ---------------------------
+//----------------------------  interpolate_q_system_01.cc  ---------------------------
 
 
-// check that VectorTools::interpolate works for FE_DGQ(p) elements correctly on
+// check that VectorTools::interpolate works for FE_System(FE_Q(p)) elements correctly on
 // a uniformly refined mesh for functions of degree q
 
 #include "../tests.h"
@@ -31,7 +31,8 @@
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <numerics/vectors.h>
-#include <fe/fe_dgq.h>
+#include <fe/fe_q.h>
+#include <fe/fe_system.h>
 
 #include <fstream>
 #include <vector>
@@ -41,16 +42,18 @@ template <int dim>
 class F :  public Function<dim>
 {
   public:
-    F (const unsigned int q) : q(q) {}
+    F (const unsigned int q) : Function<dim>(3), q(q) {}
     
-    virtual double value (const Point<dim> &p,
-			  const unsigned int) const
+    virtual void vector_value (const Point<dim> &p,
+			       Vector<double>   &v) const
       {
-	double v=0;
-	for (unsigned int d=0; d<dim; ++d)
-	  for (unsigned int i=0; i<=q; ++i)
-	    v += (d+1)*(i+1)*std::pow (p[d], 1.*i);
-	return v;
+	for (unsigned int c=0; c<v.size(); ++c)
+	  {
+	    v(c) = 0;
+	    for (unsigned int d=0; d<dim; ++d)
+	      for (unsigned int i=0; i<=q; ++i)
+		v(c) += (d+1)*(i+1)*std::pow (p[d], 1.*i)+c;
+	  }
       }
 
   private:
@@ -66,9 +69,10 @@ void test ()
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (3);
 
-  for (unsigned int p=1; p<7-dim; ++p)
+  for (unsigned int p=1; p<6-dim; ++p)
     {
-      FE_DGQ<dim>              fe(p);
+      FESystem<dim>              fe(FE_Q<dim>(p), 2,
+				    FE_Q<dim>(p+1), 1);
       DoFHandler<dim>        dof_handler(triangulation);
       dof_handler.distribute_dofs (fe);
 
@@ -103,7 +107,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("interpolate_dgq_01/output");
+  std::ofstream logfile("interpolate_q_system_01/output");
   logfile.precision (3);
   
   deallog.attach(logfile);
