@@ -1,5 +1,5 @@
-//----------------------------  interpolate_q_01.cc  ---------------------------
-//    $Id: interpolate_q_01.cc 12732 2006-03-28 23:15:45Z wolf $
+//----------------------------  interpolate_dgq_01.cc  ---------------------------
+//    $Id: interpolate_dgq_01.cc 12732 2006-03-28 23:15:45Z wolf $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006 by the deal.II authors
@@ -9,10 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  interpolate_q_01.cc  ---------------------------
+//----------------------------  interpolate_dgq_01.cc  ---------------------------
 
 
-// check that VectorTools::interpolate works for FE_DGQ(p) elements correctly on
+// check that VectorTools::interpolate works for FE_Q(p) elements correctly on
 // a uniformly refined mesh for functions of degree q
 
 #include "../tests.h"
@@ -31,7 +31,7 @@
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <numerics/vectors.h>
-#include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
 
 #include <fstream>
 #include <vector>
@@ -68,7 +68,7 @@ void test ()
 
   for (unsigned int p=1; p<7-dim; ++p)
     {
-      FE_Q<dim>              fe(p);
+      FE_DGQ<dim>              fe(p);
       DoFHandler<dim>        dof_handler(triangulation);
       dof_handler.distribute_dofs (fe);
 
@@ -103,7 +103,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("interpolate_q_01/output");
+  std::ofstream logfile("interpolate_dgq_01/output");
   logfile.precision (3);
   
   deallog.attach(logfile);
