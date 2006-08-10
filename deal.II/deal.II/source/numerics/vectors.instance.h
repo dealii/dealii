@@ -27,6 +27,18 @@ void VectorTools::interpolate<deal_II_dimension>
  const Function<deal_II_dimension>&,
  VEC&);
 
+template
+void VectorTools::interpolate<deal_II_dimension>
+(const Mapping<deal_II_dimension>&,
+ const hp::DoFHandler<deal_II_dimension>&,
+ const Function<deal_II_dimension>&,
+ VEC&);
+template
+void VectorTools::interpolate<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const Function<deal_II_dimension>&,
+ VEC&);
+
 // Should these be instantiated for every combination of two types?
 template
 void VectorTools::interpolate<deal_II_dimension>

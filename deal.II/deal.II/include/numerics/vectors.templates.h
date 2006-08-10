@@ -44,37 +44,45 @@
 
 //TODO[RH]: Use StaticQ1Mapping where appropriate
 
-template <int dim, class VECTOR>
+template <int dim, class VECTOR, class DH>
 void VectorTools::interpolate (const Mapping<dim>    &mapping,
-			       const DoFHandler<dim> &dof,
+			       const DH              &dof,
 			       const Function<dim>   &function,
 			       VECTOR                &vec)
 {
   Assert (dof.get_fe().n_components() == function.n_components,
 	  ExcComponentMismatch());
   
-  const FiniteElement<dim> &fe           = dof.get_fe();
-  const unsigned int        n_components = fe.n_components();
-  const bool                fe_is_system = (n_components != 1);
+  const hp::FECollection<dim> fe (dof.get_fe());
+  const unsigned int          n_components = fe.n_components();
+  const bool                  fe_is_system = (n_components != 1);
   
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-						 endc = dof.end();
+  typename DH::active_cell_iterator cell = dof.begin_active(),
+				    endc = dof.end();
 
 				   // For FESystems many of the
-				   // unit_support_points will
-				   // appear multiply, as a point
-				   // may be unit_support_point
-				   // for several of the components
-				   // of the system.
-				   // The following is rather
-				   // complicated as it is
-				   // avoided to evaluate
-				   // the vectorfunction multiply at
-				   // the same point on a cell.
-  const std::vector<Point<dim> > &
-    unit_support_points = fe.get_unit_support_points();
-  Assert (unit_support_points.size() != 0,
-	  ExcNonInterpolatingFE());
+				   // unit_support_points will appear
+				   // multiply, as a point may be
+				   // unit_support_point for several of the
+				   // components of the system.  The following
+				   // is rather complicated, but at least
+				   // attempts to avoid evaluating the
+				   // vectorfunction multiple times at the
+				   // same point on a cell.
+				   //
+				   // note that we have to set up all of the
+				   // following arrays for each of the
+				   // elements in the FECollection (which
+				   // means only once if this is for a regular
+				   // DoFHandler)
+  std::vector<std::vector<Point<dim> > > unit_support_points (fe.size());
+  for (unsigned int fe_index=0; fe_index<fe.size(); ++fe_index)
+    {
+      unit_support_points[fe_index] = fe[fe_index].get_unit_support_points();
+      Assert (unit_support_points[fe_index].size() != 0,
+	      ExcNonInterpolatingFE());
+    }
+  
 
 				   // Find the support points 
 				   // on a cell that
@@ -95,77 +103,95 @@ void VectorTools::interpolate (const Mapping<dim>    &mapping,
 				   // the following vector collects all rep dofs.
 				   // the position of a rep dof within this vector
 				   // is called rep index.
-  std::vector<unsigned int> dofs_of_rep_points;
+  std::vector<std::vector<unsigned int> > dofs_of_rep_points(fe.size());
 				   // the following table converts a dof i
 				   // to the rep index.
-  std::vector<unsigned int> dof_to_rep_index_table;
-  unsigned int n_rep_points=0;
-  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+  std::vector<std::vector<unsigned int> > dof_to_rep_index_table(fe.size());
+
+  std::vector<unsigned int> n_rep_points (fe.size(), 0);
+  
+  for (unsigned int fe_index=0; fe_index<fe.size(); ++fe_index)
     {
-      bool representative=true;
-				       // the following loop is looped
-				       // the other way round to get
-				       // the minimal effort of
-				       // O(fe.dofs_per_cell) for multiple
-				       // support points that are placed
-				       // one after the other.
-      for (unsigned int j=dofs_of_rep_points.size(); j>0; --j)
-	if (unit_support_points[i] 
-	    == unit_support_points[dofs_of_rep_points[j-1]])
-	  {
-	    dof_to_rep_index_table.push_back(j-1);
-	    representative=false;
-	    break;
-	  }
-      
-      if (representative)
+      for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
 	{
-					   // rep_index=dofs_of_rep_points.size()
-	  dof_to_rep_index_table.push_back(dofs_of_rep_points.size());
-					   // dofs_of_rep_points[rep_index]=i
-	  dofs_of_rep_points.push_back(i);
-	  ++n_rep_points;
+	  bool representative=true;
+					   // the following loop is looped
+					   // the other way round to get
+					   // the minimal effort of
+					   // O(fe.dofs_per_cell) for multiple
+					   // support points that are placed
+					   // one after the other.
+	  for (unsigned int j=dofs_of_rep_points[fe_index].size(); j>0; --j)
+	    if (unit_support_points[fe_index][i] 
+		== unit_support_points[fe_index][dofs_of_rep_points[fe_index][j-1]])
+	      {
+		dof_to_rep_index_table[fe_index].push_back(j-1);
+		representative=false;
+		break;
+	      }
+      
+	  if (representative)
+	    {
+					       // rep_index=dofs_of_rep_points.size()
+	      dof_to_rep_index_table[fe_index].push_back(dofs_of_rep_points[fe_index].size());
+					       // dofs_of_rep_points[rep_index]=i
+	      dofs_of_rep_points[fe_index].push_back(i);
+	      ++n_rep_points[fe_index];
+	    }
 	}
+
+      Assert(dofs_of_rep_points[fe_index].size()==n_rep_points[fe_index],
+	     ExcInternalError());
+      Assert(dof_to_rep_index_table[fe_index].size()==fe[fe_index].dofs_per_cell,
+	     ExcInternalError());
     }
-  Assert(dofs_of_rep_points.size()==n_rep_points, ExcInternalError());
-  Assert(dof_to_rep_index_table.size()==fe.dofs_per_cell, ExcInternalError());
-
-  std::vector<unsigned int> dofs_on_cell (fe.dofs_per_cell);
-  std::vector<Point<dim> >  rep_points (n_rep_points);
-
+  
+  const unsigned int max_rep_points = *std::max_element (n_rep_points.begin(),
+							 n_rep_points.end());
+  std::vector<unsigned int> dofs_on_cell (fe.max_dofs_per_cell());
+  std::vector<Point<dim> >  rep_points (max_rep_points);
+  
 				   // get space for the values of the
 				   // function at the rep support points.
 				   //
 				   // have two versions, one for system fe
 				   // and one for scalar ones, to take the
 				   // more efficient one respectively
-  std::vector<double>          function_values_scalar (n_rep_points);
-  std::vector<Vector<double> > function_values_system (n_rep_points,
-						  Vector<double>(fe.n_components()));
+  std::vector<std::vector<double> >         function_values_scalar(fe.size());
+  std::vector<std::vector<Vector<double> > > function_values_system(fe.size());
 
 				   // Make a quadrature rule from support points
 				   // to feed it into FEValues
-  Quadrature<dim> support_quadrature(unit_support_points);
+  hp::QCollection<dim> support_quadrature;
+  for (unsigned int fe_index=0; fe_index<fe.size(); ++fe_index)
+    support_quadrature.push_back (Quadrature<dim>(unit_support_points[fe_index]));
 
 				   // Transformed support points are computed by
 				   // FEValues
-  FEValues<dim> fe_values (mapping, fe, support_quadrature, update_q_points);
+  hp::MappingCollection<dim> mapping_collection (mapping);
+  
+  hp::FEValues<dim> fe_values (mapping_collection,
+			       fe, support_quadrature, update_q_points);
   
   for (; cell!=endc; ++cell)
     {
+      const unsigned int fe_index = cell->active_fe_index();
+      
 				       // for each cell:
 				       // get location of finite element
 				       // support_points
       fe_values.reinit(cell);
       const std::vector<Point<dim> >& support_points =
-	fe_values.get_quadrature_points();
+	fe_values.get_present_fe_values().get_quadrature_points();
       
 				       // pick out the representative
 				       // support points
-      for (unsigned int j=0; j<dofs_of_rep_points.size(); ++j)
-	rep_points[j]=support_points[dofs_of_rep_points[j]];
+      rep_points.resize (dofs_of_rep_points[fe_index].size());
+      for (unsigned int j=0; j<dofs_of_rep_points[fe_index].size(); ++j)
+	rep_points[j] = support_points[dofs_of_rep_points[fe_index][j]];
 
 				       // get indices of the dofs on this cell
+      dofs_on_cell.resize (fe[fe_index].dofs_per_cell);      
       cell->get_dof_indices (dofs_on_cell);
 
 
@@ -174,39 +200,45 @@ void VectorTools::interpolate (const Mapping<dim>    &mapping,
 					   // get function values at
 					   // these points. Here: get
 					   // all components
-	  function.vector_value_list (rep_points, function_values_system);
+	  function_values_system[fe_index]
+	    .resize (n_rep_points[fe_index],
+		     Vector<double> (fe[fe_index].n_components()));
+	  function.vector_value_list (rep_points,
+				      function_values_system[fe_index]);
 					   // distribute the function
 					   // values to the global
 					   // vector
-	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	  for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
 	    {
 	      const unsigned int component
-		= fe.system_to_component_index(i).first;
-	      const unsigned int rep_dof=dof_to_rep_index_table[i];
+		= fe[fe_index].system_to_component_index(i).first;
+	      const unsigned int rep_dof=dof_to_rep_index_table[fe_index][i];
 	      vec(dofs_on_cell[i])
-		= function_values_system[rep_dof](component);
-	    };
+		= function_values_system[fe_index][rep_dof](component);
+	    }
 	}
-      
       else
 	{
 					   // get first component only,
 					   // which is the only component
 					   // in the function anyway
-	  function.value_list (rep_points, function_values_scalar, 0);
+	  function_values_scalar[fe_index].resize (n_rep_points[fe_index]);
+	  function.value_list (rep_points,
+			       function_values_scalar[fe_index],
+			       0);
 					   // distribute the function
 					   // values to the global
 					   // vector
-	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	  for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
 	    vec(dofs_on_cell[i]) 
-	      = function_values_scalar[dof_to_rep_index_table[i]];
-	};
+	      = function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]];
+	}
     }
 }
 
 
-template <int dim, class VECTOR>
-void VectorTools::interpolate (const DoFHandler<dim> &dof,
+template <int dim, class VECTOR, class DH>
+void VectorTools::interpolate (const DH              &dof,
 			       const Function<dim>   &function,
 			       VECTOR                &vec)
 {

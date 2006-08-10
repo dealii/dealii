@@ -411,13 +411,17 @@ class VectorTools
 				      * make the result continuous
 				      * again.
 				      *
+				      * The template argument <code>DH</code>
+				      * may either be of type DoFHandler or
+				      * hp::DoFHandler.
+				      *
 				      * See the general documentation
 				      * of this class for further
 				      * information.
 				      */
-    template <int dim, class VECTOR>
+    template <int dim, class VECTOR, class DH>
     static void interpolate (const Mapping<dim>    &mapping,
-			     const DoFHandler<dim> &dof,
+			     const DH              &dof,
 			     const Function<dim>   &function,
 			     VECTOR                &vec);
 
@@ -426,11 +430,11 @@ class VectorTools
 				      * function above with
 				      * <tt>mapping=MappingQ1@<dim>@()</tt>.
 				      */
-    template <int dim, class VECTOR>
-    static void interpolate (const DoFHandler<dim> &dof,
+    template <int dim, class VECTOR, class DH>
+    static void interpolate (const DH              &dof,
 			     const Function<dim>   &function,
 			     VECTOR                &vec);
-
+    
 				     /**
 				      * Interpolate different finite
 				      * element spaces. The
