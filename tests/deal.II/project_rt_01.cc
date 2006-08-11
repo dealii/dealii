@@ -25,6 +25,6 @@ template <int dim>
 void test ()
 {
   if (dim != 1)
-    for (unsigned int p=0; p<6-dim; ++p)
+    for (unsigned int p=0; p<3; ++p)
       test_no_hanging_nodes (FE_RaviartThomas<dim>(p), p+1, 1);
 }
