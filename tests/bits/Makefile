@@ -80,7 +80,8 @@ tests_x = grid_generator_?? \
 	  n_dofs_per_object \
 	  step-* \
 	  hp_constraints* \
-	  face_interpolation
+	  face_interpolation \
+	  subface_interpolation
 
 # tests for the hp branch:
 #	  fe_collection_*
