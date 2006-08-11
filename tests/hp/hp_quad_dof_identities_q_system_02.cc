@@ -1,5 +1,5 @@
-//----------------------------  hp_vertex_dof_identities_q_system_01.cc  ---------------------------
-//    $Id: hp_vertex_dof_identities_q_system_01.cc 12464 2006-02-23 01:13:17Z wolf $
+//----------------------------  hp_quad_dof_identities_q_system_02.cc  ---------------------------
+//    $Id: hp_quad_dof_identities_q_system_02.cc 12464 2006-02-23 01:13:17Z wolf $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors
@@ -9,10 +9,11 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  hp_vertex_dof_identities_q_system_01.cc  ---------------------------
+//----------------------------  hp_quad_dof_identities_q_system_02.cc  ---------------------------
 
 
-// check FESystem(FE_Q)::hp_vertex_dof_identities
+// check FESystem(FE_Q)::hp_quad_dof_identities, but with a different
+// arrangement of base elements and multiplicities than in the _01 test
 
 
 #include <base/logstream.h>
@@ -28,13 +29,22 @@ void test ()
 {
   hp::FECollection<dim> fe_collection;
   for (unsigned int i=1; i<8-dim; ++i)
-    fe_collection.push_back (FESystem<dim>(FE_Q<dim>(i),3));
+    {
+				       // add the system three times, with
+				       // different numbers of base elements
+				       // and multiplicities
+      fe_collection.push_back (FESystem<dim>(FE_Q<dim>(i),3));
+      fe_collection.push_back (FESystem<dim>(FE_Q<dim>(i),2,
+					     FE_Q<dim>(i),1));
+      fe_collection.push_back (FESystem<dim>(FE_Q<dim>(i),1,
+					     FE_Q<dim>(i),2));
+    }
 
   for (unsigned int i=0; i<fe_collection.size(); ++i)
     for (unsigned int j=0; j<fe_collection.size(); ++j)
       {
 	const std::vector<std::pair<unsigned int, unsigned int> >
-	  identities = fe_collection[i].hp_vertex_dof_identities (fe_collection[j]);
+	  identities = fe_collection[i].hp_quad_dof_identities (fe_collection[j]);
 
 	deallog << "Identities for "
 		<< fe_collection[i].get_name() << " and "
@@ -44,9 +54,9 @@ void test ()
 	
 	for (unsigned int k=0; k<identities.size(); ++k)
 	  {
-	    Assert (identities[k].first < fe_collection[i].dofs_per_vertex,
+	    Assert (identities[k].first < fe_collection[i].dofs_per_quad,
 		    ExcInternalError());
-	    Assert (identities[k].second < fe_collection[j].dofs_per_vertex,
+	    Assert (identities[k].second < fe_collection[j].dofs_per_quad,
 		    ExcInternalError());
 	    
 	    deallog << identities[k].first << ' '
@@ -60,14 +70,13 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_vertex_dof_identities_q_system_01/output");
+  std::ofstream logfile("hp_quad_dof_identities_q_system_02/output");
   logfile.precision(2);
   
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   
-  test<1> ();
   test<2> ();
   test<3> ();
   

@@ -1,5 +1,5 @@
-//----------------------------  hp_vertex_dof_identities_q_system_01.cc  ---------------------------
-//    $Id: hp_vertex_dof_identities_q_system_01.cc 12464 2006-02-23 01:13:17Z wolf $
+//----------------------------  hp_vertex_dof_identities_q_system_02.cc  ---------------------------
+//    $Id: hp_vertex_dof_identities_q_system_02.cc 12464 2006-02-23 01:13:17Z wolf $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors
@@ -9,10 +9,11 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  hp_vertex_dof_identities_q_system_01.cc  ---------------------------
+//----------------------------  hp_vertex_dof_identities_q_system_02.cc  ---------------------------
 
 
-// check FESystem(FE_Q)::hp_vertex_dof_identities
+// check FESystem(FE_Q)::hp_vertex_dof_identities, but with a different
+// arrangement of base elements and multiplicities than in the _01 test
 
 
 #include <base/logstream.h>
@@ -28,8 +29,17 @@ void test ()
 {
   hp::FECollection<dim> fe_collection;
   for (unsigned int i=1; i<8-dim; ++i)
-    fe_collection.push_back (FESystem<dim>(FE_Q<dim>(i),3));
-
+    {
+				       // add the system three times, with
+				       // different numbers of base elements
+				       // and multiplicities
+      fe_collection.push_back (FESystem<dim>(FE_Q<dim>(i),3));
+      fe_collection.push_back (FESystem<dim>(FE_Q<dim>(i),2,
+					     FE_Q<dim>(i),1));
+      fe_collection.push_back (FESystem<dim>(FE_Q<dim>(i),1,
+					     FE_Q<dim>(i),2));
+    }
+  
   for (unsigned int i=0; i<fe_collection.size(); ++i)
     for (unsigned int j=0; j<fe_collection.size(); ++j)
       {
@@ -60,7 +70,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_vertex_dof_identities_q_system_01/output");
+  std::ofstream logfile("hp_vertex_dof_identities_q_system_02/output");
   logfile.precision(2);
   
   deallog.attach(logfile);

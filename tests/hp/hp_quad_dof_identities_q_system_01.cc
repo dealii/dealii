@@ -1,5 +1,5 @@
-//----------------------------  hp_quad_dof_identities_q_system.cc  ---------------------------
-//    $Id: hp_quad_dof_identities_q_system.cc 12464 2006-02-23 01:13:17Z wolf $
+//----------------------------  hp_quad_dof_identities_q_system_01.cc  ---------------------------
+//    $Id: hp_quad_dof_identities_q_system_01.cc 12464 2006-02-23 01:13:17Z wolf $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  hp_quad_dof_identities_q_system.cc  ---------------------------
+//----------------------------  hp_quad_dof_identities_q_system_01.cc  ---------------------------
 
 
 // check FESystem(FE_Q)::hp_quad_dof_identities
@@ -60,7 +60,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_quad_dof_identities_q_system/output");
+  std::ofstream logfile("hp_quad_dof_identities_q_system_01/output");
   logfile.precision(2);
   
   deallog.attach(logfile);
