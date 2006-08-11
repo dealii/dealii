@@ -1,5 +1,5 @@
-//----------------------------  interpolate_rt_01.cc  ---------------------------
-//    $Id: interpolate_rt_01.cc 12732 2006-03-28 23:15:45Z wolf $
+//----------------------------  project_rt_01.cc  ---------------------------
+//    $Id: project_rt_01.cc 12732 2006-03-28 23:15:45Z wolf $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006 by the deal.II authors
@@ -9,10 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  interpolate_rt_01.cc  ---------------------------
+//----------------------------  project_rt_01.cc  ---------------------------
 
 
-// check that VectorTools::interpolate works for RT elements correctly on
+// check that VectorTools::project works for RT elements correctly on
 // a uniformly refined mesh for functions of degree q
 
 #include "../tests.h"
@@ -90,7 +90,7 @@ void test ()
       Vector<float>  error (triangulation.n_active_cells());
       for (unsigned int q=0; q<=p+2; ++q)
 	{
-					   // interpolate the function
+					   // project the function
 	  VectorTools::project (dof_handler,
 				constraints,
 				QGauss<dim>(p+2),
@@ -119,7 +119,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("interpolate_rt_01/output");
+  std::ofstream logfile("project_rt_01/output");
   logfile.precision (3);
   
   deallog.attach(logfile);
