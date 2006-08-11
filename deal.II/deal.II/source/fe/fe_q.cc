@@ -247,17 +247,17 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
   
+  Assert (interpolation_matrix.m() == this->dofs_per_cell,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				this->dofs_per_cell));
+  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_cell,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				x_source_fe.dofs_per_cell));
+
 				   // ok, source is a Q element, so
 				   // we will be able to do the work
   const FE_Q<dim> &source_fe
     = dynamic_cast<const FE_Q<dim>&>(x_source_fe);
-
-  Assert (interpolation_matrix.m() == this->dofs_per_cell,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
-				this->dofs_per_cell));
-  Assert (interpolation_matrix.n() == source_fe.dofs_per_cell,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
-				source_fe.dofs_per_cell));
 
   const std::vector<unsigned int> &index_map=
     this->poly_space.get_numbering();
@@ -339,6 +339,9 @@ get_subface_interpolation_matrix (const FiniteElement<1> &/*x_source_fe*/,
 				  const unsigned int      /*subface*/,
 				  FullMatrix<double>     &/*interpolation_matrix*/) const
 {
+  Assert (false,
+	  FiniteElement<1>::
+	  ExcInterpolationNotImplemented ());
 }
 
 #endif
@@ -361,6 +364,13 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
   
+  Assert (interpolation_matrix.m() == this->dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				this->dofs_per_face));
+  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				x_source_fe.dofs_per_face));
+
 				   // ok, source is a Q element, so
 				   // we will be able to do the work
   const FE_Q<dim> &source_fe
@@ -381,13 +391,6 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	  typename FiniteElement<dim>::
 	  ExcInterpolationNotImplemented ());
   
-  Assert (interpolation_matrix.m() == this->dofs_per_face,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
-				this->dofs_per_face));
-  Assert (interpolation_matrix.n() == source_fe.dofs_per_face,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
-				source_fe.dofs_per_face));
-
                                    // generate a quadrature
                                    // with the unit support points.
                                    // This is later based as a
@@ -466,6 +469,13 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
   
+  Assert (interpolation_matrix.m() == this->dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				this->dofs_per_face));
+  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.m(),
+				x_source_fe.dofs_per_face));
+
 				   // ok, source is a Q element, so
 				   // we will be able to do the work
   const FE_Q<dim> &source_fe
@@ -485,13 +495,6 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   Assert (this->dofs_per_face <= source_fe.dofs_per_face,
 	  typename FiniteElement<dim>::
 	  ExcInterpolationNotImplemented ());
-  
-  Assert (interpolation_matrix.m() == this->dofs_per_face,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
-				this->dofs_per_face));
-  Assert (interpolation_matrix.n() == source_fe.dofs_per_face,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
-				source_fe.dofs_per_face));
   
                                    // generate a point on this
                                    // cell and evaluate the
