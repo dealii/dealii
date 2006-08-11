@@ -1851,6 +1851,8 @@ bool
 FESystem<dim>::
 hp_constraints_are_implemented () const
 {
+  return false;
+
   for (unsigned int b=0; b<n_base_elements(); ++b)
     if (base_element(b).hp_constraints_are_implemented() == false)
       return false;
