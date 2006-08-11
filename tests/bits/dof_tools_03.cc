@@ -29,6 +29,7 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
+  deallog.get_file_stream().precision (5);
                                    // don't run this test if hanging
                                    // nodes are not implemented
   if (dof_handler.get_fe().constraints_are_implemented() == false)
