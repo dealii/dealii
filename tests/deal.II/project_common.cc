@@ -93,9 +93,14 @@ class F :  public Function<dim>
 
 
 
+// check the given element of polynomial order p. the last parameter, if
+// given, denotes a gap in convergence order; for example, the Nedelec element
+// of polynomial degree p has normal components of degree p-1 and therefore
+// can only represent polynomials of degree p-1 exactly. the gap is then 1.
 template <int dim>
 void test_no_hanging_nodes (const FiniteElement<dim> &fe,
-			    const unsigned int        p)
+			    const unsigned int        p,
+			    const unsigned int        order_difference = 0)
 {
   Triangulation<dim>     triangulation;
   GridGenerator::hyper_cube (triangulation);
@@ -132,7 +137,7 @@ void test_no_hanging_nodes (const FiniteElement<dim> &fe,
 	      << ", rel. error=" << error.l2_norm() / projection.l2_norm()
 	      << std::endl;
 	  
-      if (q<=p)
+      if (q<=p-order_difference)
 	Assert (error.l2_norm() <= 1e-12*projection.l2_norm(),
 		ExcInternalError());
     }

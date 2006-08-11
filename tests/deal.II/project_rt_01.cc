@@ -26,5 +26,5 @@ void test ()
 {
   if (dim != 1)
     for (unsigned int p=0; p<6-dim; ++p)
-      test_no_hanging_nodes (FE_RaviartThomas<dim>(p), p);
+      test_no_hanging_nodes (FE_RaviartThomas<dim>(p), p+1, 1);
 }
