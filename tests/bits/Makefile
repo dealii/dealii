@@ -79,7 +79,8 @@ tests_x = grid_generator_?? \
 	  get_dof_indices_* \
 	  n_dofs_per_object \
 	  step-* \
-	  hp_constraints*
+	  hp_constraints* \
+	  face_interpolation
 
 # tests for the hp branch:
 #	  fe_collection_*
