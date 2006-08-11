@@ -2103,6 +2103,7 @@ class FiniteElement : public Subscriptor,
 				      */
     std::vector<std::pair<std::pair<unsigned int,unsigned int>,unsigned int> >
     face_system_to_base_table;
+
 				     /**
 				      * For each base element, store
 				      * the first block in a block
@@ -2137,7 +2138,8 @@ class FiniteElement : public Subscriptor,
 				      * case, the initialization by
 				      * the base class is sufficient.
 				      */
-    std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int> > component_to_base_table;
+    std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int> >
+    component_to_base_table;
     
 				     /**
 				      * Projection matrices are
