@@ -1861,8 +1861,9 @@ hp_constraints_are_implemented () const
 
 
 template <int dim>
+template <int structdim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FESystem<dim>::hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
+FESystem<dim>::hp_object_dof_identities (const FiniteElement<dim> &fe_other) const
 {
 				   // since dofs on each subobject (vertex,
 				   // line, ...) are ordered such that first
@@ -1915,8 +1916,21 @@ FESystem<dim>::hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) con
 					   // returned by the base elements to
 					   // the indices of this system
 					   // element
-	  const std::vector<std::pair<unsigned int, unsigned int> >
-	    base_identities = base.hp_vertex_dof_identities (base_other);
+	  std::vector<std::pair<unsigned int, unsigned int> > base_identities;
+	  switch (structdim)
+	    {
+	      case 0:
+		    base_identities = base.hp_vertex_dof_identities (base_other);
+		    break;
+	      case 1:
+		    base_identities = base.hp_line_dof_identities (base_other);
+		    break;
+	      case 2:
+		    base_identities = base.hp_quad_dof_identities (base_other);
+		    break;
+	      default:
+		    Assert (false, ExcNotImplemented());
+	    }    
 
 	  for (unsigned int i=0; i<base_identities.size(); ++i)
 	    identities.push_back
@@ -1925,8 +1939,8 @@ FESystem<dim>::hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) con
 
 					   // record the dofs treated above as
 					   // already taken care of
-	  dof_offset       += base.dofs_per_vertex;
-	  dof_offset_other += base_other.dofs_per_vertex;
+	  dof_offset       += base.template n_dofs_per_object<structdim>();
+	  dof_offset_other += base_other.template n_dofs_per_object<structdim>();
 	  
 					   // advance to the next base element
 					   // for this and the other
@@ -1980,118 +1994,16 @@ FESystem<dim>::hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) con
 
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
+FESystem<dim>::hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
+{
+  return hp_object_dof_identities<0> (fe_other);
+}
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
 FESystem<dim>::hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 {
-				   // since dofs on each subobject (vertex,
-				   // line, ...) are ordered such that first
-				   // come all from the first base element all
-				   // multiplicities, then second base element
-				   // all multiplicities, etc., we simply have
-				   // to stack all the identities after each
-				   // other
-				   //
-				   // the problem is that we have to work with
-				   // two FEs (this and fe_other). only deal
-				   // with the case that both are FESystems
-				   // and that they both have the same number
-				   // of bases (counting multiplicity) each of
-				   // which match in their number of
-				   // components. this covers
-				   // FESystem(FE_Q(p),1,FE_Q(q),2) vs
-				   // FESystem(FE_Q(r),2,FE_Q(s),1), but not
-				   // FESystem(FE_Q(p),1,FE_Q(q),2) vs
-				   // FESystem(FESystem(FE_Q(r),2),1,FE_Q(s),1)
-  if (const FESystem<dim> *fe_other_system
-      = dynamic_cast<const FESystem<dim>*>(&fe_other))
-    {
-				       // loop over all the base elements of
-				       // this and the other element, counting
-				       // their multiplicities
-      unsigned int base_index       = 0,
-		   base_index_other = 0;
-      unsigned int multiplicity       = 0,
-		   multiplicity_other = 0;
-
-				       // we also need to keep track of the
-				       // number of dofs already treated for
-				       // each of the elements
-      unsigned int dof_offset       = 0,
-		   dof_offset_other = 0;
-
-      std::vector<std::pair<unsigned int, unsigned int> > identities;
-      
-      while (true)
-	{
-	  const FiniteElement<dim>
-	    &base       = base_element(base_index),
-	    &base_other = fe_other_system->base_element(base_index_other);
-
-	  Assert (base.n_components() == base_other.n_components(),
-		  ExcNotImplemented());
-
-					   // now translate the identities
-					   // returned by the base elements to
-					   // the indices of this system
-					   // element
-	  const std::vector<std::pair<unsigned int, unsigned int> >
-	    base_identities = base.hp_line_dof_identities (base_other);
-
-	  for (unsigned int i=0; i<base_identities.size(); ++i)
-	    identities.push_back
-	      (std::make_pair (base_identities[i].first + dof_offset,
-			       base_identities[i].second + dof_offset_other));
-
-					   // record the dofs treated above as
-					   // already taken care of
-	  dof_offset       += base.dofs_per_line;
-	  dof_offset_other += base_other.dofs_per_line;
-	  
-					   // advance to the next base element
-					   // for this and the other
-					   // fe_system; see if we can simply
-					   // advance the multiplicity by one,
-					   // or if have to move on to the
-					   // next base element
-	  ++multiplicity;
-	  if (multiplicity == element_multiplicity(base_index))
-	    {
-	      multiplicity = 0;
-	      ++base_index;
-	    }
-	  ++multiplicity_other;
-	  if (multiplicity_other ==
-	      fe_other_system->element_multiplicity(base_index_other))
-	    {
-	      multiplicity_other = 0;
-	      ++base_index_other;
-	    }
-
-					   // see if we have reached the end
-					   // of the present element. if so,
-					   // we should have reached the end
-					   // of the other one as well
-	  if (base_index == n_base_elements())
-	    {
-	      Assert (base_index_other == fe_other_system->n_base_elements(),
-		      ExcInternalError());
-	      break;
-	    }
-
-					   // if we haven't reached the end of
-					   // this element, we shouldn't have
-					   // reached the end of the other one
-					   // either
-	  Assert (base_index_other != fe_other_system->n_base_elements(),
-		  ExcInternalError());
-	}
-
-      return identities;
-    }
-  else
-    {
-      Assert (false, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int> >();
-    }
+  return hp_object_dof_identities<1> (fe_other);
 }
 
 
@@ -2100,116 +2012,7 @@ template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FESystem<dim>::hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const
 {
-				   // since dofs on each subobject (vertex,
-				   // line, ...) are ordered such that first
-				   // come all from the first base element all
-				   // multiplicities, then second base element
-				   // all multiplicities, etc., we simply have
-				   // to stack all the identities after each
-				   // other
-				   //
-				   // the problem is that we have to work with
-				   // two FEs (this and fe_other). only deal
-				   // with the case that both are FESystems
-				   // and that they both have the same number
-				   // of bases (counting multiplicity) each of
-				   // which match in their number of
-				   // components. this covers
-				   // FESystem(FE_Q(p),1,FE_Q(q),2) vs
-				   // FESystem(FE_Q(r),2,FE_Q(s),1), but not
-				   // FESystem(FE_Q(p),1,FE_Q(q),2) vs
-				   // FESystem(FESystem(FE_Q(r),2),1,FE_Q(s),1)
-  if (const FESystem<dim> *fe_other_system
-      = dynamic_cast<const FESystem<dim>*>(&fe_other))
-    {
-				       // loop over all the base elements of
-				       // this and the other element, counting
-				       // their multiplicities
-      unsigned int base_index       = 0,
-		   base_index_other = 0;
-      unsigned int multiplicity       = 0,
-		   multiplicity_other = 0;
-
-				       // we also need to keep track of the
-				       // number of dofs already treated for
-				       // each of the elements
-      unsigned int dof_offset       = 0,
-		   dof_offset_other = 0;
-
-      std::vector<std::pair<unsigned int, unsigned int> > identities;
-      
-      while (true)
-	{
-	  const FiniteElement<dim>
-	    &base       = base_element(base_index),
-	    &base_other = fe_other_system->base_element(base_index_other);
-
-	  Assert (base.n_components() == base_other.n_components(),
-		  ExcNotImplemented());
-
-					   // now translate the identities
-					   // returned by the base elements to
-					   // the indices of this system
-					   // element
-	  const std::vector<std::pair<unsigned int, unsigned int> >
-	    base_identities = base.hp_quad_dof_identities (base_other);
-
-	  for (unsigned int i=0; i<base_identities.size(); ++i)
-	    identities.push_back
-	      (std::make_pair (base_identities[i].first + dof_offset,
-			       base_identities[i].second + dof_offset_other));
-
-					   // record the dofs treated above as
-					   // already taken care of
-	  dof_offset       += base.dofs_per_quad;
-	  dof_offset_other += base_other.dofs_per_quad;
-	  
-					   // advance to the next base element
-					   // for this and the other
-					   // fe_system; see if we can simply
-					   // advance the multiplicity by one,
-					   // or if have to move on to the
-					   // next base element
-	  ++multiplicity;
-	  if (multiplicity == element_multiplicity(base_index))
-	    {
-	      multiplicity = 0;
-	      ++base_index;
-	    }
-	  ++multiplicity_other;
-	  if (multiplicity_other ==
-	      fe_other_system->element_multiplicity(base_index_other))
-	    {
-	      multiplicity_other = 0;
-	      ++base_index_other;
-	    }
-
-					   // see if we have reached the end
-					   // of the present element. if so,
-					   // we should have reached the end
-					   // of the other one as well
-	  if (base_index == n_base_elements())
-	    {
-	      Assert (base_index_other == fe_other_system->n_base_elements(),
-		      ExcInternalError());
-	      break;
-	    }
-
-					   // if we haven't reached the end of
-					   // this element, we shouldn't have
-					   // reached the end of the other one
-					   // either
-	  Assert (base_index_other != fe_other_system->n_base_elements(),
-		  ExcInternalError());
-	}
-
-      return identities;
-    }
-  else
-    {
-      Assert (false, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int> >();
-    }
+  return hp_object_dof_identities<2> (fe_other);
 }
 
 

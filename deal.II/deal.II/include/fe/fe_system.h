@@ -815,6 +815,17 @@ class FESystem : public FiniteElement<dim>
     void build_interface_constraints ();
 
 				     /**
+				      * A function that computes the
+				      * hp_vertex_dof_identities(),
+				      * hp_line_dof_identities(), or
+				      * hp_quad_dof_identities(), depending on
+				      * the value of the template parameter.
+				      */
+    template <int structdim>
+    std::vector<std::pair<unsigned int, unsigned int> >
+    hp_object_dof_identities (const FiniteElement<dim> &fe_other) const;
+    
+				     /**
 				      * Usually: Fields of
 				      * cell-independent data.
 				      *
