@@ -2,7 +2,7 @@
 # Makefile,v 1.14 2002/09/19 13:53:47 wolf Exp
 # Common Makefile for all test directories
 
-all: base lac fe deal.II multigrid bits
+all: base lac fe deal.II multigrid bits hp
 
 base:
 	cd base ; $(MAKE)
