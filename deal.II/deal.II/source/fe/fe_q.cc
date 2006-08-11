@@ -575,8 +575,7 @@ hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
 				   // should be exactly one single DoF
 				   // of each FE at a vertex, and they
 				   // should have identical value
-  const FE_Q<dim> *fe_q_other = dynamic_cast<const FE_Q<dim>*>(&fe_other);
-  if (fe_q_other != 0)
+  if (dynamic_cast<const FE_Q<dim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > (1, std::make_pair (0U, 0U));
   else
@@ -596,8 +595,7 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 				   // we can presently only compute
 				   // these identities if both FEs are
 				   // FE_Qs
-  const FE_Q<dim> *fe_q_other = dynamic_cast<const FE_Q<dim>*>(&fe_other);
-  if (fe_q_other != 0)
+  if (const FE_Q<dim> *fe_q_other = dynamic_cast<const FE_Q<dim>*>(&fe_other))
     {
 				       // dofs are located along
 				       // lines, so two dofs are
@@ -640,8 +638,7 @@ hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
 				   // we can presently only compute
 				   // these identities if both FEs are
 				   // FE_Qs
-  const FE_Q<dim> *fe_q_other = dynamic_cast<const FE_Q<dim>*>(&fe_other);
-  if (fe_q_other != 0)
+  if (const FE_Q<dim> *fe_q_other = dynamic_cast<const FE_Q<dim>*>(&fe_other))
     {
 				       // this works exactly like the line
 				       // case above, except that now we
