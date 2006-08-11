@@ -117,7 +117,7 @@ void test_no_hanging_nodes (const FiniteElement<dim> &fe,
 
   Vector<double> projection (dof_handler.n_dofs());
   Vector<float>  error (triangulation.n_active_cells());
-  for (unsigned int q=0; q<=p+2; ++q)
+  for (unsigned int q=0; q<=p+2-order_difference; ++q)
     {
 				       // project the function
       VectorTools::project (dof_handler,
