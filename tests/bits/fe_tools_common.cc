@@ -56,6 +56,12 @@ extern std::string output_file_name;
 void
 output_matrix (const FullMatrix<double> &m)
 {
+  if ((m.m() == 0) || (m.n() == 0))
+    {
+      deallog << "(Empty matrix)" << std::endl;
+      return;
+    }
+  
   deallog << m.l1_norm() << ' ' << m.linfty_norm()
           << std::endl;
   if (m.m() == m.n())
