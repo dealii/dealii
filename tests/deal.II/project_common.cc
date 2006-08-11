@@ -110,7 +110,7 @@ void test_no_hanging_nodes (const FiniteElement<dim> &fe,
   ConstraintMatrix constraints;
   constraints.close ();
 
-  Vector<double> interpolant (dof_handler.n_dofs());
+  Vector<double> projection (dof_handler.n_dofs());
   Vector<float>  error (triangulation.n_active_cells());
   for (unsigned int q=0; q<=p+2; ++q)
     {
@@ -119,21 +119,21 @@ void test_no_hanging_nodes (const FiniteElement<dim> &fe,
 			    constraints,
 			    QGauss<dim>(p+2),
 			    F<dim> (q, fe.n_components()),
-			    interpolant);
+			    projection);
       
 				       // then compute the interpolation error
       VectorTools::integrate_difference (dof_handler,
-					 interpolant,
+					 projection,
 					 F<dim> (q, fe.n_components()),
 					 error,
 					 QGauss<dim>(std::max(p,q)+1),
 					 VectorTools::L2_norm);
       deallog << fe.get_name() << ", P_" << q
-	      << ", rel. error=" << error.l2_norm() / interpolant.l2_norm()
+	      << ", rel. error=" << error.l2_norm() / projection.l2_norm()
 	      << std::endl;
 	  
       if (q<=p)
-	Assert (error.l2_norm() < 1e-12*interpolant.l2_norm(),
+	Assert (error.l2_norm() <= 1e-12*projection.l2_norm(),
 		ExcInternalError());
     }
 }
