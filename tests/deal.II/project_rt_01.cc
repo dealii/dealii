@@ -12,7 +12,7 @@
 //----------------------------  project_rt_01.cc  ---------------------------
 
 
-// check that VectorTools::project works for Q elements correctly on
+// check that VectorTools::project works for RT elements correctly on
 // a uniformly refined mesh for functions of degree q
 
 char logname[] = "project_rt_01/output";

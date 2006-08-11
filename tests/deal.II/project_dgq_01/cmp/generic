@@ -1,0 +1,178 @@
+
+DEAL::n_dofs=8
+DEAL:cg::Starting value 0.354
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGQ<1>(0), P_0, rel. error=0
+DEAL:cg::Starting value 0.736
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGQ<1>(0), P_1, rel. error=0.0123
+DEAL:cg::Starting value 1.18
+DEAL:cg::Convergence step 2 value 0
+DEAL::FE_DGQ<1>(0), P_2, rel. error=0.0203
+DEAL::n_dofs=16
+DEAL:cg::Starting value 0.250
+DEAL:cg::Convergence step 2 value 0
+DEAL::FE_DGQ<1>(1), P_0, rel. error=0
+DEAL:cg::Starting value 0.520
+DEAL:cg::Convergence step 2 value 0
+DEAL::FE_DGQ<1>(1), P_1, rel. error=0
+DEAL:cg::Starting value 0.833
+DEAL:cg::Convergence step 2 value 0
+DEAL::FE_DGQ<1>(1), P_2, rel. error=0.000261
+DEAL:cg::Starting value 1.19
+DEAL:cg::Convergence step 2 value 0
+DEAL::FE_DGQ<1>(1), P_3, rel. error=0.000586
+DEAL::n_dofs=24
+DEAL:cg::Starting value 0.250
+DEAL:cg::Convergence step 3 value 0
+DEAL::FE_DGQ<1>(2), P_0, rel. error=0
+DEAL:cg::Starting value 0.520
+DEAL:cg::Convergence step 3 value 0
+DEAL::FE_DGQ<1>(2), P_1, rel. error=0
+DEAL:cg::Starting value 0.833
+DEAL:cg::Convergence step 3 value 0
+DEAL::FE_DGQ<1>(2), P_2, rel. error=0
+DEAL:cg::Starting value 1.19
+DEAL:cg::Convergence step 3 value 0
+DEAL::FE_DGQ<1>(2), P_3, rel. error=6.30e-06
+DEAL:cg::Starting value 1.57
+DEAL:cg::Convergence step 3 value 0
+DEAL::FE_DGQ<1>(2), P_4, rel. error=1.78e-05
+DEAL::n_dofs=32
+DEAL:cg::Starting value 0.198
+DEAL:cg::Convergence step 4 value 0
+DEAL::FE_DGQ<1>(3), P_0, rel. error=0
+DEAL:cg::Starting value 0.411
+DEAL:cg::Convergence step 4 value 0
+DEAL::FE_DGQ<1>(3), P_1, rel. error=0
+DEAL:cg::Starting value 0.659
+DEAL:cg::Convergence step 4 value 0
+DEAL::FE_DGQ<1>(3), P_2, rel. error=0
+DEAL:cg::Starting value 0.940
+DEAL:cg::Convergence step 4 value 0
+DEAL::FE_DGQ<1>(3), P_3, rel. error=0
+DEAL:cg::Starting value 1.25
+DEAL:cg::Convergence step 4 value 0
+DEAL::FE_DGQ<1>(3), P_4, rel. error=1.61e-07
+DEAL:cg::Starting value 1.59
+DEAL:cg::Convergence step 4 value 0
+DEAL::FE_DGQ<1>(3), P_5, rel. error=5.51e-07
+DEAL::n_dofs=40
+DEAL:cg::Starting value 0.188
+DEAL:cg::Convergence step 5 value 0
+DEAL::FE_DGQ<1>(4), P_0, rel. error=0
+DEAL:cg::Starting value 0.391
+DEAL:cg::Convergence step 5 value 0
+DEAL::FE_DGQ<1>(4), P_1, rel. error=0
+DEAL:cg::Starting value 0.627
+DEAL:cg::Convergence step 5 value 0
+DEAL::FE_DGQ<1>(4), P_2, rel. error=0
+DEAL:cg::Starting value 0.894
+DEAL:cg::Convergence step 5 value 0
+DEAL::FE_DGQ<1>(4), P_3, rel. error=0
+DEAL:cg::Starting value 1.19
+DEAL:cg::Convergence step 5 value 0
+DEAL::FE_DGQ<1>(4), P_4, rel. error=0
+DEAL:cg::Starting value 1.51
+DEAL:cg::Convergence step 5 value 0
+DEAL::FE_DGQ<1>(4), P_5, rel. error=4.28e-09
+DEAL:cg::Starting value 1.85
+DEAL:cg::Convergence step 5 value 0
+DEAL::FE_DGQ<1>(4), P_6, rel. error=1.71e-08
+DEAL::n_dofs=64
+DEAL:cg::Starting value 0.375
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGQ<2>(0), P_0, rel. error=0
+DEAL:cg::Starting value 0.767
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGQ<2>(0), P_1, rel. error=0.00329
+DEAL:cg::Starting value 1.20
+DEAL:cg::Convergence step 2 value 0
+DEAL::FE_DGQ<2>(0), P_2, rel. error=0.00558
+DEAL::n_dofs=256
+DEAL:cg::Starting value 0.188
+DEAL:cg::Convergence step 4 value 0
+DEAL::FE_DGQ<2>(1), P_0, rel. error=0
+DEAL:cg::Starting value 0.383
+DEAL:cg::Convergence step 4 value 0
+DEAL::FE_DGQ<2>(1), P_1, rel. error=0
+DEAL:cg::Starting value 0.598
+DEAL:cg::Convergence step 4 value 0
+DEAL::FE_DGQ<2>(1), P_2, rel. error=5.09e-05
+DEAL:cg::Starting value 0.831
+DEAL:cg::Convergence step 4 value 0
+DEAL::FE_DGQ<2>(1), P_3, rel. error=0.000117
+DEAL::n_dofs=576
+DEAL:cg::Starting value 0.187
+DEAL:cg::Convergence step 9 value 0
+DEAL::FE_DGQ<2>(2), P_0, rel. error=0
+DEAL:cg::Starting value 0.383
+DEAL:cg::Convergence step 9 value 0
+DEAL::FE_DGQ<2>(2), P_1, rel. error=0
+DEAL:cg::Starting value 0.598
+DEAL:cg::Convergence step 9 value 0
+DEAL::FE_DGQ<2>(2), P_2, rel. error=0
+DEAL:cg::Starting value 0.830
+DEAL:cg::Convergence step 9 value 0
+DEAL::FE_DGQ<2>(2), P_3, rel. error=1.03e-06
+DEAL:cg::Starting value 1.08
+DEAL:cg::Convergence step 9 value 0
+DEAL::FE_DGQ<2>(2), P_4, rel. error=2.98e-06
+DEAL::n_dofs=1024
+DEAL:cg::Starting value 0.117
+DEAL:cg::Convergence step 14 value 0
+DEAL::FE_DGQ<2>(3), P_0, rel. error=0
+DEAL:cg::Starting value 0.240
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_DGQ<2>(3), P_1, rel. error=0
+DEAL:cg::Starting value 0.374
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_DGQ<2>(3), P_2, rel. error=0
+DEAL:cg::Starting value 0.520
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_DGQ<2>(3), P_3, rel. error=0
+DEAL:cg::Starting value 0.676
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_DGQ<2>(3), P_4, rel. error=2.33e-08
+DEAL:cg::Starting value 0.843
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_DGQ<2>(3), P_5, rel. error=8.12e-08
+DEAL::n_dofs=512
+DEAL:cg::Starting value 0.265
+DEAL:cg::Convergence step 2 value 0
+DEAL::FE_DGQ<3>(0), P_0, rel. error=0
+DEAL:cg::Starting value 0.539
+DEAL:cg::Convergence step 2 value 0
+DEAL::FE_DGQ<3>(0), P_1, rel. error=0.000979
+DEAL:cg::Starting value 0.831
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGQ<3>(0), P_2, rel. error=0.00168
+DEAL::n_dofs=4096
+DEAL:cg::Starting value 0.0938
+DEAL:cg::Convergence step 8 value 0
+DEAL::FE_DGQ<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 0.190
+DEAL:cg::Convergence step 8 value 0
+DEAL::FE_DGQ<3>(1), P_1, rel. error=0
+DEAL:cg::Starting value 0.294
+DEAL:cg::Convergence step 8 value 0
+DEAL::FE_DGQ<3>(1), P_2, rel. error=1.08e-05
+DEAL:cg::Starting value 0.404
+DEAL:cg::Convergence step 8 value 0
+DEAL::FE_DGQ<3>(1), P_3, rel. error=2.53e-05
+DEAL::n_dofs=13824
+DEAL:cg::Starting value 0.0938
+DEAL:cg::Convergence step 18 value 0
+DEAL::FE_DGQ<3>(2), P_0, rel. error=0
+DEAL:cg::Starting value 0.190
+DEAL:cg::Convergence step 18 value 0
+DEAL::FE_DGQ<3>(2), P_1, rel. error=0
+DEAL:cg::Starting value 0.294
+DEAL:cg::Convergence step 18 value 0
+DEAL::FE_DGQ<3>(2), P_2, rel. error=0
+DEAL:cg::Starting value 0.403
+DEAL:cg::Convergence step 18 value 0
+DEAL::FE_DGQ<3>(2), P_3, rel. error=1.81e-07
+DEAL:cg::Starting value 0.519
+DEAL:cg::Convergence step 18 value 0
+DEAL::FE_DGQ<3>(2), P_4, rel. error=5.29e-07
