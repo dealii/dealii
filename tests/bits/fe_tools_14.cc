@@ -16,6 +16,8 @@
 
 // check
 //   FE::hp_constraints_are_implemented ()
+// a bit like hp_constraints_are_implemented, but with a different
+// set of elements
 
 
 std::string output_file_name = "fe_tools_14/output";
