@@ -1,0 +1,87 @@
+//----------------------------  face_orientation_crash.cc  ---------------------------
+//    $Id$
+//    Version: $Name$ 
+//
+//    Copyright (C) 2006 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  face_orientation_crash.cc  ---------------------------
+
+// trip up the new code handling hanging node constraints with a face in 3d
+// that has face_orientation==false
+
+
+
+#include "../tests.h"
+#include <base/logstream.h>
+#include <base/function_lib.h>
+#include <base/quadrature_lib.h>
+#include <lac/vector.h>
+#include <grid/tria.h>
+#include <grid/tria_iterator.h>
+#include <grid/tria_accessor.h>
+#include <grid/grid_generator.h>
+#include <dofs/dof_handler.h>
+#include <dofs/dof_tools.h>
+#include <dofs/dof_constraints.h>
+#include <fe/fe_q.h>
+#include <fe/mapping_q.h>
+#include <numerics/vectors.h>
+#include <numerics/error_estimator.h>
+
+#include <fstream>
+
+
+template <int dim>
+void
+check ()
+{
+				   // create a mesh with at least one cell
+				   // that has a face with
+				   // face_orientation==false. refine each of
+				   // the 7 cells in turn, to make sure we
+				   // have a face with hanging nodes that has
+				   // face_orientation==false at least once
+  for (unsigned int i=0; i<7; ++i)
+    {
+      Triangulation<dim> tria;
+      GridGenerator::hyper_ball(tria);
+
+      typename Triangulation<dim>::active_cell_iterator
+	cell = tria.begin_active();
+      std::advance(cell,i);
+      cell->set_refine_flag();
+      tria.execute_coarsening_and_refinement ();
+
+				       // attach a DoFHandler
+      FE_Q<dim> element(1);
+      DoFHandler<dim> dof(tria);
+      dof.distribute_dofs(element);
+
+				       // then build hanging node
+				       // constraints. this should trip the
+				       // new code using the hp constraints,
+				       // added in late July 2006
+      ConstraintMatrix constraints;
+      DoFTools::make_hanging_node_constraints (dof,
+					       constraints);
+    }
+  
+  deallog << "OK" << std::endl;
+}
+
+
+int main ()
+{
+  std::ofstream logfile ("face_orientation_crash/output");
+  logfile.precision (2);
+  logfile.setf(std::ios::fixed);  
+  deallog.attach(logfile);
+  deallog.depth_console (0);
+
+  check<3> ();
+}
