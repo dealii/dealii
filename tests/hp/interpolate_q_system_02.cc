@@ -78,8 +78,10 @@ void test ()
 
   for (unsigned int p=1; p<6-dim; ++p)
     {
-      FESystem<dim>              fe(FE_Q<dim>(p), 2,
-				    FE_Q<dim>(p+1), 1);
+      FE_Q<dim> fe_p(p);
+      FE_Q<dim> fe_p1(p+1);
+      FESystem<dim>              fe(fe_p, 2,
+				    fe_p1, 1);
       hp::FECollection<dim> hp_fe (fe);
       hp::DoFHandler<dim>        dof_handler(triangulation);
       dof_handler.distribute_dofs (hp_fe);
