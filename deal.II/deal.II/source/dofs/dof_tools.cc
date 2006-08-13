@@ -2076,6 +2076,8 @@ namespace internal
       
       std::vector<unsigned int> dofs_on_mother;
       std::vector<unsigned int> dofs_on_children;
+
+      FullMatrix<double> face_constraints;
       
 				       // loop over all lines; only on
 				       // lines there can be constraints.
@@ -2175,31 +2177,55 @@ namespace internal
 		    {
 		      typename DH::active_cell_iterator neighbor_child
 			= cell->neighbor_child_on_subface (face, c);
-		      const unsigned int n_dofs_on_children = neighbor_child->get_fe().dofs_per_face;
+
+		      const unsigned int n_dofs_on_children
+			= neighbor_child->get_fe().dofs_per_face;
 		      dofs_on_children.resize (n_dofs_on_children);
 
-						       // Find face number on the finer
-						       // neighboring cell, which is
-						       // shared the face with the
-						       // face of the coarser cell.
-		      const unsigned int neighbor2=
-			cell->neighbor_of_neighbor(face);
-		      Assert (neighbor_child->face(neighbor2) == cell->face(face)->child(c),
+		      const unsigned int subface_fe_index
+			= neighbor_child->active_fe_index();
+
+						       // some sanity checks
+						       // -- particularly
+						       // useful if you start
+						       // to think about faces
+						       // with
+						       // face_orientation==false
+						       // and whether we
+						       // really really have
+						       // the right face...
+		      Assert (neighbor_child->n_active_fe_indices() == 1,
+			      ExcInternalError());
+		      Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
+			      ExcInternalError());
+		      Assert (cell->face(face)->child(c)->fe_index_is_active(subface_fe_index)
+			      == true,
 			      ExcInternalError());
 		      
 						       // Same procedure as for the
 						       // mother cell. Extract the face
 						       // DoFs from the cell DoFs.
-		      neighbor_child->face(neighbor2)->get_dof_indices (dofs_on_children,
-									neighbor_child->active_fe_index ());
-		      
+		      cell->face(face)->child(c)
+			->get_dof_indices (dofs_on_children,
+					   subface_fe_index);
 					      
 						       // Now create the element
 						       // constraint for this subface.
-		      FullMatrix<double> face_constraints (n_dofs_on_mother,
-                                                           n_dofs_on_children);
-		      cell->get_fe().get_subface_interpolation_matrix (neighbor_child->get_fe (),
-								       c, face_constraints);
+		      
+//TODO: Think about this a bit more: neighbor_child is computed correctly,
+//taking into account face_orientation. however, we don't care about this
+//here, when we ask for subface_interpolation on subface c. do we have to
+//translate things here?
+//
+//btw, this is checked in the deal.II/project_*_03 tests, that verify that the
+//approximation order of finite elements on meshes with constraints and at
+//least one face_orientation==false is as expected
+		      face_constraints.reinit (n_dofs_on_mother,
+					       n_dofs_on_children);
+		      cell->get_fe()
+			.get_subface_interpolation_matrix (cell->get_dof_handler()
+							   .get_fe()[subface_fe_index],
+							   c, face_constraints);
 
 						       // Add constraints to global constraint
 						       // matrix.
