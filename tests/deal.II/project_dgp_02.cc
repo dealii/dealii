@@ -12,8 +12,7 @@
 //----------------------------  project_dgp_02.cc  ---------------------------
 
 
-// check that VectorTools::project works for DGP elements correctly on
-// a uniformly refined mesh for functions of degree q
+// check that VectorTools::project works for DGP elements correctly
 
 char logname[] = "project_dgp_02/output";
 

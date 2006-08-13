@@ -12,8 +12,7 @@
 //----------------------------  project_abf_03.cc  ---------------------------
 
 
-// check that VectorTools::project works for ABF elements correctly on
-// a uniformly refined mesh for functions of degree q
+// check that VectorTools::project works for ABF elements correctly
 
 char logname[] = "project_abf_03/output";
 

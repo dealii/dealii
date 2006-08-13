@@ -12,8 +12,7 @@
 //----------------------------  project_q_hierarchical_03.cc  ---------------------------
 
 
-// check that VectorTools::project works for QHierarchical elements correctly on
-// a uniformly refined mesh for functions of degree q
+// check that VectorTools::project works for QHierarchical elements correctly
 
 char logname[] = "project_q_hierarchical_03/output";
 

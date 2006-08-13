@@ -12,8 +12,7 @@
 //----------------------------  project_dgq_03.cc  ---------------------------
 
 
-// check that VectorTools::project works for DGQ elements correctly on
-// a uniformly refined mesh for functions of degree q
+// check that VectorTools::project works for DGQ elements correctly
 
 char logname[] = "project_dgq_03/output";
 

@@ -12,8 +12,7 @@
 //----------------------------  project_nedelec_03.cc  ---------------------------
 
 
-// check that VectorTools::project works for Nedelec elements correctly on
-// a uniformly refined mesh for functions of degree q
+// check that VectorTools::project works for Nedelec elements correctly
 
 char logname[] = "project_nedelec_03/output";
 
