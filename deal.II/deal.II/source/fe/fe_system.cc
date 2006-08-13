@@ -1851,13 +1851,6 @@ bool
 FESystem<dim>::
 hp_constraints_are_implemented () const
 {
-				   // for the time being, disable this again
-				   // to make sure we don't use the new
-				   // hanging node constraint code in 3d for
-				   // the parameter estimation problem (see
-				   // bits/face_orientation_crash)
-  return false;
-  
   for (unsigned int b=0; b<n_base_elements(); ++b)
     if (base_element(b).hp_constraints_are_implemented() == false)
       return false;
