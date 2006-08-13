@@ -1,0 +1,92 @@
+
+DEAL::n_dofs=413
+DEAL:cg::Starting value 3.06
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_0, rel. error=0
+DEAL:cg::Starting value 3.62
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_1, rel. error=0
+DEAL:cg::Starting value 4.93
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_2, rel. error=0.00269
+DEAL:cg::Starting value 5.50
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_3, rel. error=0.00261
+DEAL::n_dofs=413
+DEAL:cg::Starting value 2.93
+DEAL:cg::Convergence step 26 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_0, rel. error=0
+DEAL:cg::Starting value 3.53
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_1, rel. error=0
+DEAL:cg::Starting value 4.77
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_2, rel. error=0.00273
+DEAL:cg::Starting value 5.33
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_3, rel. error=0.00270
+DEAL::n_dofs=413
+DEAL:cg::Starting value 2.93
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_0, rel. error=0
+DEAL:cg::Starting value 3.42
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_1, rel. error=0
+DEAL:cg::Starting value 4.67
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_2, rel. error=0.00220
+DEAL:cg::Starting value 5.19
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_3, rel. error=0.00223
+DEAL::n_dofs=413
+DEAL:cg::Starting value 2.93
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_0, rel. error=0
+DEAL:cg::Starting value 3.34
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_1, rel. error=0
+DEAL:cg::Starting value 4.57
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_2, rel. error=0.00238
+DEAL:cg::Starting value 5.04
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_3, rel. error=0.00226
+DEAL::n_dofs=413
+DEAL:cg::Starting value 2.93
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_0, rel. error=0
+DEAL:cg::Starting value 3.48
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_1, rel. error=0
+DEAL:cg::Starting value 4.74
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_2, rel. error=0.00230
+DEAL:cg::Starting value 5.28
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_3, rel. error=0.00228
+DEAL::n_dofs=413
+DEAL:cg::Starting value 2.93
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_0, rel. error=0
+DEAL:cg::Starting value 3.51
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_1, rel. error=0
+DEAL:cg::Starting value 4.75
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_2, rel. error=0.00263
+DEAL:cg::Starting value 5.31
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_3, rel. error=0.00255
+DEAL::n_dofs=413
+DEAL:cg::Starting value 2.93
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_0, rel. error=0
+DEAL:cg::Starting value 3.38
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_1, rel. error=0
+DEAL:cg::Starting value 4.62
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_2, rel. error=0.00239
+DEAL:cg::Starting value 5.12
+DEAL:cg::Convergence step 27 value 0
+DEAL::FESystem<3>[FE_Q<3>(1)-FE_DGQ<3>(2)], P_3, rel. error=0.00234

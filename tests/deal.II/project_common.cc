@@ -184,22 +184,31 @@ void test_with_hanging_nodes (const FiniteElement<dim> &fe,
 // crash when computing hanging node constraints on such faces (see
 // bits/face_orientation_crash), and it triggers all sorts of other
 // assumptions that may be hidden in places
+//
+// the mesh we use is the 7 cells of the hyperball mesh in 3d, with each of
+// the cells refined in turn. that then makes 7 meshes with 14 active cells
+// each. this also cycles through all possibilities of coarser or finer cell
+// having face_orientation==false
 template <int dim>
 void test_with_wrong_face_orientation (const FiniteElement<dim> &fe,
 				       const unsigned int        p,
 				       const unsigned int        order_difference = 0)
 {
-  if (dim < 3)
+  if (dim != 3)
     return;
   
-  Triangulation<dim>     triangulation;
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (1);
-  triangulation.begin_active()->set_refine_flag ();
-  triangulation.execute_coarsening_and_refinement ();
-  triangulation.refine_global (1);
+  for (unsigned int i=0; i<7; ++i)
+    {
+      Triangulation<dim>     triangulation;
+      GridGenerator::hyper_ball (triangulation);
+      typename Triangulation<dim>::active_cell_iterator
+	cell = triangulation.begin_active();
+      std::advance (cell, i);
+      cell->set_refine_flag ();
+      triangulation.execute_coarsening_and_refinement ();
   
-  do_project (triangulation, fe, p, order_difference);
+      do_project (triangulation, fe, p, order_difference);
+    }
 }
 
 
