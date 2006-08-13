@@ -100,7 +100,7 @@ DEAL:cg::Convergence step 114 value 0
 DEAL::FE_Q_Hierarchical<2>(2), P_4, rel. error=1.22e-05
 DEAL::n_dofs=625
 DEAL:cg::Starting value 0.518
-DEAL:cg::Convergence step 115 value 0
+DEAL:cg::Convergence step 116 value 0
 DEAL::FE_Q_Hierarchical<2>(3), P_0, rel. error=0
 DEAL:cg::Starting value 1.06
 DEAL:cg::Convergence step 117 value 0
@@ -109,7 +109,7 @@ DEAL:cg::Starting value 1.64
 DEAL:cg::Convergence step 118 value 0
 DEAL::FE_Q_Hierarchical<2>(3), P_2, rel. error=0
 DEAL:cg::Starting value 2.25
-DEAL:cg::Convergence step 119 value 0
+DEAL:cg::Convergence step 118 value 0
 DEAL::FE_Q_Hierarchical<2>(3), P_3, rel. error=0
 DEAL:cg::Starting value 2.90
 DEAL:cg::Convergence step 119 value 0

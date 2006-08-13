@@ -93,26 +93,20 @@ class F :  public Function<dim>
 
 
 
-// check the given element of polynomial order p. the last parameter, if
-// given, denotes a gap in convergence order; for example, the Nedelec element
-// of polynomial degree p has normal components of degree p-1 and therefore
-// can only represent polynomials of degree p-1 exactly. the gap is then 1.
 template <int dim>
-void test_no_hanging_nodes (const FiniteElement<dim> &fe,
-			    const unsigned int        p,
-			    const unsigned int        order_difference = 0)
-{
-  Triangulation<dim>     triangulation;
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (3);
-
+void do_project (const Triangulation<dim> &triangulation,
+		 const FiniteElement<dim> &fe,
+		 const unsigned int        p,
+		 const unsigned int        order_difference)
+{  
   DoFHandler<dim>        dof_handler(triangulation);
   dof_handler.distribute_dofs (fe);
 
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
-				   // there are no constraints here
   ConstraintMatrix constraints;
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   constraints);
   constraints.close ();
 
   Vector<double> projection (dof_handler.n_dofs());
@@ -125,6 +119,10 @@ void test_no_hanging_nodes (const FiniteElement<dim> &fe,
 			    QGauss<dim>(p+2),
 			    F<dim> (q, fe.n_components()),
 			    projection);
+				       // just to make sure it doesn't get
+				       // forgotten: handle hanging node
+				       // constraints
+      constraints.distribute (projection);
       
 				       // then compute the interpolation error
       VectorTools::integrate_difference (dof_handler,
@@ -141,6 +139,67 @@ void test_no_hanging_nodes (const FiniteElement<dim> &fe,
 	Assert (error.l2_norm() <= 1e-12*projection.l2_norm(),
 		ExcInternalError());
     }
+}
+
+
+
+// check the given element of polynomial order p. the last parameter, if
+// given, denotes a gap in convergence order; for example, the Nedelec element
+// of polynomial degree p has normal components of degree p-1 and therefore
+// can only represent polynomials of degree p-1 exactly. the gap is then 1.
+template <int dim>
+void test_no_hanging_nodes (const FiniteElement<dim> &fe,
+			    const unsigned int        p,
+			    const unsigned int        order_difference = 0)
+{
+  Triangulation<dim>     triangulation;
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (3);
+
+  do_project (triangulation, fe, p, order_difference);
+}
+
+
+
+// same test as above, but this time with a mesh that has hanging nodes
+template <int dim>
+void test_with_hanging_nodes (const FiniteElement<dim> &fe,
+			      const unsigned int        p,
+			      const unsigned int        order_difference = 0)
+{
+  Triangulation<dim>     triangulation;
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (1);
+  triangulation.begin_active()->set_refine_flag ();
+  triangulation.execute_coarsening_and_refinement ();
+  triangulation.refine_global (1);
+  
+  do_project (triangulation, fe, p, order_difference);
+}
+
+
+
+// test with a 3d grid that has cells with face_orientation==false and hanging
+// nodes. this trips up all sorts of pieces of code, for example there was a
+// crash when computing hanging node constraints on such faces (see
+// bits/face_orientation_crash), and it triggers all sorts of other
+// assumptions that may be hidden in places
+template <int dim>
+void test_with_wrong_face_orientation (const FiniteElement<dim> &fe,
+				       const unsigned int        p,
+				       const unsigned int        order_difference = 0)
+{
+  if (dim < 3)
+    return;
+  
+  Triangulation<dim>     triangulation;
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (1);
+  triangulation.begin_active()->set_refine_flag ();
+  triangulation.execute_coarsening_and_refinement ();
+  triangulation.refine_global (1);
+  
+  do_project (triangulation, fe, p, order_difference);
 }
 
 
