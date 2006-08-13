@@ -2209,17 +2209,60 @@ namespace internal
 			->get_dof_indices (dofs_on_children,
 					   subface_fe_index);
 					      
-						       // Now create the element
-						       // constraint for this subface.
-		      
-//TODO: Think about this a bit more: neighbor_child is computed correctly,
-//taking into account face_orientation. however, we don't care about this
-//here, when we ask for subface_interpolation on subface c. do we have to
-//translate things here?
-//
-//btw, this is checked in the deal.II/project_*_03 tests, that verify that the
-//approximation order of finite elements on meshes with constraints and at
-//least one face_orientation==false is as expected
+						       // Now create the
+						       // element constraint
+						       // for this subface.
+						       //
+						       // As a side remark,
+						       // one may wonder the
+						       // following:
+						       // neighbor_child is
+						       // clearly computed
+						       // correctly,
+						       // i.e. taking into
+						       // account
+						       // face_orientation
+						       // (just look at the
+						       // implementation of
+						       // that
+						       // function). however,
+						       // we don't care about
+						       // this here, when we
+						       // ask for
+						       // subface_interpolation
+						       // on subface c. the
+						       // question rather is:
+						       // do we have to
+						       // translate 'c' here
+						       // as well?
+						       //
+						       // the answer is in
+						       // fact 'no'. if one
+						       // does that, results
+						       // are wrong:
+						       // constraints are
+						       // added twice for the
+						       // same pair of nodes
+						       // but with differing
+						       // weights. in
+						       // addition, one can
+						       // look at the
+						       // deal.II/project_*_03
+						       // tests that look at
+						       // exactly this case:
+						       // there, we have a
+						       // mesh with at least
+						       // one
+						       // face_orientation==false
+						       // and hanging nodes,
+						       // and the results of
+						       // those tests show
+						       // that the result of
+						       // projection verifies
+						       // the approximation
+						       // properties of a
+						       // finite element onto
+						       // that mesh
 		      face_constraints.reinit (n_dofs_on_mother,
 					       n_dofs_on_children);
 		      cell->get_fe()
