@@ -264,15 +264,16 @@ class FETools
 				      * class for which we compute the
 				      * embedding matrices.
 				      * @param matrices A pointer to
-				      * <i>2<sup>dim</sup></i> FullMatrix
+				      * <i>GeometryInfo::children_per_cell=2<sup>dim</sup></i> FullMatrix
 				      * objects. This is the format
 				      * used in FiniteElement,
 				      * where we want to use ths
 				      * function mostly.
 				      */
     template <int dim, typename number>
-    static void compute_embedding_matrices(const FiniteElement<dim> &fe,
-					   FullMatrix<number>* matrices);
+    static void
+    compute_embedding_matrices(const FiniteElement<dim> &fe,
+			       FullMatrix<number> (&matrices)[GeometryInfo<dim>::children_per_cell]);
 
 				     /**
 				      * Compute the embedding matrices
@@ -281,17 +282,18 @@ class FETools
 				      *
 				      * @param fe The finite element
 				      * for which to compute these
-				      * matrices.
-				      * @param matrices An array of
-				      * <i>2<sup>dim-1</sup></i> FullMatrix
-				      * objects,holding the embedding
-				      * matrix for each subface.
-				      * @param face_coarse The number
-				      * of the face on the coarse side
-				      * of the face for which this is
-				      * computed.
-				      * @param face_fine The number
-				      * of the face on the refined side
+				      * matrices.  @param matrices An
+				      * array of
+				      * <i>GeometryInfo<dim>::subfaces_per_face
+				      * = 2<sup>dim-1</sup></i>
+				      * FullMatrix objects,holding the
+				      * embedding matrix for each
+				      * subface.  @param face_coarse
+				      * The number of the face on the
+				      * coarse side of the face for
+				      * which this is computed.
+				      * @param face_fine The number of
+				      * the face on the refined side
 				      * of the face for which this is
 				      * computed.
 				      *
@@ -301,10 +303,11 @@ class FETools
 				      * sufficiently tested yet.
 				     */
     template<int dim, typename number>
-    static void compute_face_embedding_matrices(const FiniteElement<dim>& fe,
-						FullMatrix<number>* matrices,
-						unsigned int face_coarse,
-						unsigned int face_fine);
+    static void
+    compute_face_embedding_matrices(const FiniteElement<dim>& fe,
+				    FullMatrix<number> (&matrices)[GeometryInfo<dim>::subfaces_per_face],
+				    const unsigned int face_coarse,
+				    const unsigned int face_fine);
 
 				     /**
 				      * Compute the
@@ -321,8 +324,9 @@ class FETools
 				      * want to use this function mostly.
 				      */
     template <int dim, typename number>
-    static void compute_projection_matrices(const FiniteElement<dim> &fe,
-					    FullMatrix<number>* matrices);
+    static void
+    compute_projection_matrices(const FiniteElement<dim> &fe,
+				FullMatrix<number> (&matrices)[GeometryInfo<dim>::children_per_cell]);
 
 //TODO:[WB] Replace this documentation by something comprehensible
     

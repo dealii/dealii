@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -79,7 +79,7 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
       this->restriction[i].reinit (n_dofs, n_dofs);
     }
 
-  FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
+  FETools::compute_embedding_matrices (*this, this->prolongation);
   initialize_restriction ();
 
   std::vector<FullMatrix<double> >

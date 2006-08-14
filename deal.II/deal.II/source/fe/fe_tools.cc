@@ -477,7 +477,7 @@ FETools::compute_node_matrix(
 template<int dim, typename number>
 void
 FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
-				    FullMatrix<number>* matrices)
+				    FullMatrix<number> (&matrices)[GeometryInfo<dim>::children_per_cell])
 {
   const unsigned int nc = GeometryInfo<dim>::children_per_cell;
   const unsigned int n  = fe.dofs_per_cell;
@@ -592,9 +592,9 @@ FETools::compute_embedding_matrices(const FiniteElement<dim>& fe,
 template<int dim, typename number>
 void
 FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
-					 FullMatrix<number>* matrices,
-					 unsigned int face_coarse,
-					 unsigned int face_fine)
+					 FullMatrix<number> (&matrices)[GeometryInfo<dim>::subfaces_per_face],
+					 const unsigned int face_coarse,
+					 const unsigned int face_fine)
 {
   const unsigned int nc = GeometryInfo<dim>::subfaces_per_face;
   const unsigned int n  = fe.dofs_per_face;
@@ -607,7 +607,7 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
       Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(),n));
     }
   
-                                   // Set up a meshes, one with a single
+                                   // Set up meshes, one with a single
                                    // reference cell and refine it once
   Triangulation<dim> tria;
   GridGenerator::hyper_cube (tria, 0, 1);
@@ -711,7 +711,7 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
       
       typename Triangulation<dim>::active_cell_iterator fine_cell
 	= tria.begin(0)->child(GeometryInfo<dim>::child_cell_on_face(face_coarse,
-								    cell_number));
+								     cell_number));
       fine.reinit(fine_cell);
       coarse.reinit(tria.begin(0));
       
@@ -758,7 +758,7 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim>& fe,
 template<int dim, typename number>
 void
 FETools::compute_projection_matrices(const FiniteElement<dim>& fe,
-				     FullMatrix<number>* matrices)
+				     FullMatrix<number> (&matrices)[GeometryInfo<dim>::children_per_cell])
 {
   const unsigned int nc = GeometryInfo<dim>::children_per_cell;
   const unsigned int n  = fe.dofs_per_cell;
@@ -1881,16 +1881,16 @@ void FETools::get_projection_matrix<deal_II_dimension>
 
 template
 void FETools::compute_embedding_matrices<deal_II_dimension>
-(const FiniteElement<deal_II_dimension> &, FullMatrix<double>*);
+(const FiniteElement<deal_II_dimension> &, FullMatrix<double> (&)[GeometryInfo<deal_II_dimension>::children_per_cell]);
 
 template
 void FETools::compute_face_embedding_matrices<deal_II_dimension>
-(const FiniteElement<deal_II_dimension> &, FullMatrix<double>*,
+(const FiniteElement<deal_II_dimension> &, FullMatrix<double> (&matrices)[GeometryInfo<deal_II_dimension>::subfaces_per_face],
  unsigned int, unsigned int);
 
 template
 void FETools::compute_projection_matrices<deal_II_dimension>
-(const FiniteElement<deal_II_dimension> &, FullMatrix<double>*);
+(const FiniteElement<deal_II_dimension> &, FullMatrix<double> (&)[GeometryInfo<deal_II_dimension>::children_per_cell]);
 
 template
 void FETools::interpolate<deal_II_dimension>

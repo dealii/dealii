@@ -68,16 +68,16 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     this->prolongation[i].reinit (this->dofs_per_cell,
 				  this->dofs_per_cell);
-  FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
+  FETools::compute_embedding_matrices (*this, this->prolongation);
   
-  std::vector<FullMatrix<double> >
-    face_embeddings(1<<(dim-1), FullMatrix<double>(this->dofs_per_face,
-						   this->dofs_per_face));
-  FETools::compute_face_embedding_matrices(*this, &face_embeddings[0], 0, 0);
+  FullMatrix<double> face_embeddings[GeometryInfo<dim>::subfaces_per_face];
+  for (unsigned int i=0; i<GeometryInfo<dim>::subfaces_per_face; ++i)
+    face_embeddings[i].reinit (this->dofs_per_face, this->dofs_per_face);
+  FETools::compute_face_embedding_matrices(*this, face_embeddings, 0, 0);
   this->interface_constraints.reinit((1<<(dim-1)) * this->dofs_per_face,
 				     this->dofs_per_face);
   unsigned int target_row=0;
-  for (unsigned int d=0;d<face_embeddings.size();++d)
+  for (unsigned int d=0;d<GeometryInfo<dim>::subfaces_per_face;++d)
     for (unsigned int i=0;i<face_embeddings[d].m();++i)
       {
 	for (unsigned int j=0;j<face_embeddings[d].n();++j)

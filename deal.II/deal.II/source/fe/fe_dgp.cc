@@ -30,12 +30,12 @@ FE_DGP<dim>::FE_DGP (const unsigned int degree)
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     this->prolongation[i].reinit (this->dofs_per_cell,
 				  this->dofs_per_cell);
-  FETools::compute_embedding_matrices (*this, &this->prolongation[0]);
+  FETools::compute_embedding_matrices (*this, this->prolongation);
 				   // Fill restriction matrices with L2-projection
   for (unsigned int i=0; i<GeometryInfo<dim>::children_per_cell; ++i)
     this->restriction[i].reinit (this->dofs_per_cell,
 				  this->dofs_per_cell);
-  FETools::compute_projection_matrices (*this, &this->restriction[0]);
+  FETools::compute_projection_matrices (*this, this->restriction);
 }
 
 

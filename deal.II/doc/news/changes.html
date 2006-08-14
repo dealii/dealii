@@ -795,6 +795,23 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: The functions <code
+       class="member">FETools::compute_embedding_matrices</code>,
+       <code
+       class="member">FETools::compute_face_embedding_matrices</code>, and
+       <code
+       class="member">FETools::compute_projection_matrices</code>
+       (mostly used in internal computations in setting up finite
+       element objects) previously took pointers to the first element
+       of an array of matrices as arguments. This isn't type-safe, and
+       in particular did not allow to check for the number of matrices
+       in the array. The functions now take a reference to an array of
+       the correct length.
+       <br> 
+       (WB 2006/08/14)
+       </p>
+
+  <li> <p>
        Extended: The <code class="member">VectorTools::project</code> functions
        are now also implemented for 1d.
        <br> 
