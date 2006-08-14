@@ -48,6 +48,8 @@ check ()
 				   // face_orientation==false at least once
   for (unsigned int i=0; i<7; ++i)
     {
+      deallog << "Check " << i << std::endl;
+      
       Triangulation<dim> tria;
       GridGenerator::hyper_ball(tria);
 
@@ -69,6 +71,10 @@ check ()
       ConstraintMatrix constraints;
       DoFTools::make_hanging_node_constraints (dof,
 					       constraints);
+
+      for (unsigned int j=0; j<dof.n_dofs(); ++j)
+	if (constraints.is_constrained (j))
+	  deallog << j << std::endl;
     }
   
   deallog << "OK" << std::endl;
