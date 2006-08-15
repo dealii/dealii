@@ -17,6 +17,7 @@
 
 #include <base/config.h>
 #include <base/exceptions.h>
+#include <base/geometry_info.h>
 
 #include <vector>
 
