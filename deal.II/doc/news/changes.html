@@ -351,6 +351,15 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p> Improved: Stack backtraces in multithreaded mode were often
+       very long and almost unreadable because the functions in
+       namespace <code>Threads</code> that are used to set up new
+       threads have long and awkward signatures. The output is now
+       filtered to make these backtraces easier to read.
+       <br>
+       (WB 2006/08/15)
+       </p>
+
   <li> <p> New: The second argument to <code>Utilities::int_to_string</code>
        can now be omitted, leading to a string that isn't zero padded at all.
        <br>

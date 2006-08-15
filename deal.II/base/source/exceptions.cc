@@ -186,16 +186,37 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 					// if we can, demangle the
 					// function name
 #ifdef HAVE_LIBSTDCXX_DEMANGLER
-       int     status;
-       char   *realname;
-
-       realname = abi::__cxa_demangle(functionname.c_str(), 0, 0, &status);
+       int         status;
+       char *p = abi::__cxa_demangle(functionname.c_str(), 0, 0, &status);
+       
        if ((status == 0) && (functionname != "main"))
-	 stacktrace_entry = stacktrace_entry.substr(0, pos_start)
-			    +
-			    ": "
-			    +
-			    realname;
+	 {
+	   std::string realname(p);
+					    // in MT mode, one often
+					    // gets backtraces
+					    // spanning several lines
+					    // because we have so many
+					    // boost::tuple arguments
+					    // in the MT calling
+					    // functions. most of the
+					    // trailing arguments of
+					    // these tuples are
+					    // actually unused
+					    // boost::tuples::null_type,
+					    // so we should split them
+					    // off if they are
+					    // trailing a template
+					    // argument list
+	   while (realname.find (", boost::tuples::null_type>") != std::string::npos)
+	     realname.erase (realname.find (", boost::tuples::null_type>"),
+			     std::string (", boost::tuples::null_type").size());
+	   
+	   stacktrace_entry = stacktrace_entry.substr(0, pos_start)
+			      +
+			      ": "
+			      +
+			      realname;
+	 }
        else
 	 stacktrace_entry = stacktrace_entry.substr(0, pos_start)
 			    +
@@ -203,10 +224,8 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 			    +
 			    functionname;
 
-					// free memory allocated by
-					// the demangler
-       free (realname);
-
+       free (p);
+       
 #else	 
 
        stacktrace_entry = stacktrace_entry.substr(0, pos_start)
