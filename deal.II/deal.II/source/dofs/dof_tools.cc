@@ -2072,6 +2072,7 @@ namespace internal
     make_hp_hanging_node_constraints (const DH         &dof_handler,
 				      ConstraintMatrix &constraints)
     {
+//TODO[WB]: we should call get_{sub,}face_interpolation_matrix only once per pair of finite elements -- since they return only stuff that counts in local dof numbers, their results are always the same. we should then just store the result in a lazy table
       const unsigned int dim = DH::dimension;
       
       std::vector<unsigned int> dofs_on_mother;
