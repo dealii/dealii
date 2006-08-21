@@ -97,6 +97,14 @@ void VectorTools::interpolate_boundary_values<deal_II_dimension> (
   std::map<unsigned int,double>       &,
   const std::vector<bool>    &);
 
+template
+void VectorTools::interpolate_boundary_values<deal_II_dimension> (
+  const MGDoFHandler<deal_II_dimension> &,
+  const unsigned char,
+  const Function<deal_II_dimension>   &,
+  std::map<unsigned int,double>       &,
+  const std::vector<bool>    &);
+
 #if deal_II_dimension != 1
 template
 void VectorTools::project_boundary_values<deal_II_dimension>
