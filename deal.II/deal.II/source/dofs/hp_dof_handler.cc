@@ -2170,6 +2170,8 @@ namespace hp
 	    const unsigned int
 	      first_fe_index = nth_active_vertex_fe_index (vertex_index, 0);
 
+//TODO: we here only compare identities of fe[n] with fe[0] for n>=1, not all against all. think about whether this would bring any additional benefits (it would for example if we had Q2, Q4, and Q8 elements coming together at an edge in 3d)
+	    
 					     // loop over all the
 					     // other FEs with which
 					     // we want to identify
@@ -2271,6 +2273,7 @@ namespace hp
 	  const unsigned int
 	    first_fe_index = line->nth_active_fe_index (0);
 
+//TODO: we here only compare identities of fe[n] with fe[0] for n>=1, not all against all. think about whether this would bring any additional benefits (it would for example if we had Q2, Q4, and Q8 elements coming together at an edge in 3d)
 	  for (unsigned int f=1; f<n_active_fe_indices; ++f)
 	    {
 	      const unsigned int
@@ -2345,6 +2348,7 @@ namespace hp
 	  const unsigned int
 	    first_fe_index = quad->nth_active_fe_index (0);
 
+//TODO: we here only compare identities of fe[n] with fe[0] for n>=1, not all against all. think about whether this would bring any additional benefits (it would for example if we had Q2, Q4, and Q8 elements coming together at an edge in 3d)
 	  for (unsigned int f=1; f<n_active_fe_indices; ++f)
 	    {
 	      const unsigned int
