@@ -1371,22 +1371,11 @@ AC_DEFUN(DEAL_II_SET_F77_FLAGS, dnl
 	        F77FLAGSPIC="-fPIC"
                 ;;
         esac
-        
-	case "$F77$" in
-	   *gfortran* )
-		F77LIBS="$F77LIBS -lgfortran"
-		;;
-	   *f77* )
-		F77LIBS="$F77LIBS -lg2c"
-		;;
-	   *g77* )
-		F77LIBS="$F77LIBS -lg2c"
-		;;
-           * )
-		AC_MSG_ERROR([Error in configure script, please report a bug]) 
-		;;
-	esac
-	
+
+	dnl Make sure we link both possible libraries here. Shame on gfortran!
+	AC_CHECK_LIB(g2c, e_wsfe, [ F77LIBS="$F77LIBS -lg2c" ])
+	dnl TODO: Replace _gfortran_allocate by something really needed
+	AC_CHECK_LIB(gfortran, _gfortran_allocate, [ F77LIBS="$F77LIBS -lgfortran" ])
 	;;
 
     AIXF77)

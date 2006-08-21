@@ -10121,22 +10121,141 @@ echo "${ECHO_T}F77 compiler is unkown. no flags set!" >&6
                 ;;
         esac
 
-	case "$F77$" in
-	   *gfortran* )
-		F77LIBS="$F77LIBS -lgfortran"
-		;;
-	   *f77* )
-		F77LIBS="$F77LIBS -lg2c"
-		;;
-	   *g77* )
-		F77LIBS="$F77LIBS -lg2c"
-		;;
-           * )
-		{ { echo "$as_me:$LINENO: error: Error in configure script, please report a bug" >&5
-echo "$as_me: error: Error in configure script, please report a bug" >&2;}
-   { (exit 1); exit 1; }; }
-		;;
-	esac
+		echo "$as_me:$LINENO: checking for e_wsfe in -lg2c" >&5
+echo $ECHO_N "checking for e_wsfe in -lg2c... $ECHO_C" >&6
+if test "${ac_cv_lib_g2c_e_wsfe+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lg2c  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char e_wsfe ();
+int
+main ()
+{
+e_wsfe ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_g2c_e_wsfe=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_g2c_e_wsfe=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_g2c_e_wsfe" >&5
+echo "${ECHO_T}$ac_cv_lib_g2c_e_wsfe" >&6
+if test $ac_cv_lib_g2c_e_wsfe = yes; then
+   F77LIBS="$F77LIBS -lg2c"
+fi
+
+		echo "$as_me:$LINENO: checking for _gfortran_allocate in -lgfortran" >&5
+echo $ECHO_N "checking for _gfortran_allocate in -lgfortran... $ECHO_C" >&6
+if test "${ac_cv_lib_gfortran__gfortran_allocate+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgfortran  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char _gfortran_allocate ();
+int
+main ()
+{
+_gfortran_allocate ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_gfortran__gfortran_allocate=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_gfortran__gfortran_allocate=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_gfortran__gfortran_allocate" >&5
+echo "${ECHO_T}$ac_cv_lib_gfortran__gfortran_allocate" >&6
+if test $ac_cv_lib_gfortran__gfortran_allocate = yes; then
+   F77LIBS="$F77LIBS -lgfortran"
+fi
 
 	;;
 
