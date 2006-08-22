@@ -2538,6 +2538,11 @@ class CellAccessor :  public TriaObjectAccessor<dim,dim>
 				      *  @p ith neighbor.  If the
 				      *  neighbor does not exist, an
 				      *  invalid iterator is returned.
+				      *  
+				      *  <bf>Note</bf> (cf. TriaLevel<0>):
+				      *  The neighbor of a cell has at most the
+				      *  same level as this cell, i.e. it may
+				      *  or may not be refined.
 				      */
     TriaIterator<dim,CellAccessor<dim> >
     neighbor (const unsigned int i) const;

@@ -199,7 +199,19 @@ enum UpdateFlags
 					* transformation defined by
 					* the Mapping.
 					*/
-      update_transformation_gradients     = 0x1000
+      update_transformation_gradients     = 0x1000,
+
+				       /**
+					* Compute the JxW values
+					* on faces for the cell mapping
+					* and not the face mapping!
+					* This functionality is required
+					* for the Piola mapping which
+					* is used in conjunction with
+					* H_div subspaces like RT and ABF.
+					*/
+      update_cell_JxW_values              = 0x2000
+
 };
 
 

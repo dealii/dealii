@@ -62,9 +62,6 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
   FullMatrix<double> M(n_dofs, n_dofs);
   FETools::compute_node_matrix(M, *this);
 
-  //TODO: Remove debugging output
-  //  M.print (std::cout);
-
   this->inverse_node_matrix.reinit(n_dofs, n_dofs);
   this->inverse_node_matrix.invert(M);
 				   // From now on, the shape functions
@@ -532,10 +529,12 @@ FE_ABF<dim>::update_each (const UpdateFlags flags) const
   if (flags & update_values)
     out |= update_values             | update_covariant_transformation
                                      | update_contravariant_transformation 
+                                     | update_cell_JxW_values
                                      | update_JxW_values;
   if (flags & update_gradients)
     out |= update_gradients          | update_covariant_transformation 
                                      | update_contravariant_transformation
+                                     | update_cell_JxW_values
                                      | update_JxW_values;
   //TODO: Set update flags appropriately and figure out, how the second
   // derivatives for the RT elements can be computed correctly.

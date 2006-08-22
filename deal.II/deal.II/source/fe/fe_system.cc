@@ -832,6 +832,7 @@ compute_fill (const Mapping<dim>                   &mapping,
 					   // the reference element to the global
 					   // coordinate system.
 	  base_data.JxW_values = data.JxW_values;
+	  base_data.cell_JxW_values = data.cell_JxW_values;
 
 
                                            // Make sure that in the

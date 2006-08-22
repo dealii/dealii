@@ -397,7 +397,8 @@ class MappingQ1 : public Mapping<dim>
 			 typename std::vector<Point<dim> >        &quadrature_points,
 			 std::vector<double>             &JxW_values,
 			 typename std::vector<Tensor<1,dim> >        &boundary_form,
-			 typename std::vector<Point<dim> >        &normal_vectors) const ;
+			 typename std::vector<Point<dim> >        &normal_vectors,
+			 std::vector<double>             &cell_JxW_values) const ;
 
 				     /**
 				      * Implementation of the interface in
@@ -412,7 +413,8 @@ class MappingQ1 : public Mapping<dim>
 			    typename std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
 			    typename std::vector<Tensor<1,dim> >        &boundary_form,
-			    typename std::vector<Point<dim> >        &normal_vectors) const ;
+			    typename std::vector<Point<dim> >        &normal_vectors,
+			    std::vector<double>             &cell_JxW_values) const ;
     
 				     /**
 				      * Compute shape values and/or
@@ -483,7 +485,8 @@ class MappingQ1 : public Mapping<dim>
 			    std::vector<Point<dim> >    &quadrature_points,
 			    std::vector<double>         &JxW_values,
 			    std::vector<Tensor<1,dim> > &boundary_form,
-			    std::vector<Point<dim> > &normal_vectors) const;
+			    std::vector<Point<dim> > &normal_vectors,
+			    std::vector<double>         &cell_JxW_values) const;
     
 				     /**
 				      * Compute shape values and/or
@@ -712,7 +715,8 @@ template <> void MappingQ1<1>::compute_fill_face (
   std::vector<Point<1> > &,
   std::vector<double> &,
   std::vector<Tensor<1,1> > &,
-  std::vector<Point<1> > &) const;
+  std::vector<Point<1> > &,
+  std::vector<double> &) const;
 
 template <> void MappingQ1<1>::fill_fe_face_values (
   const Triangulation<1>::cell_iterator &,
@@ -722,7 +726,8 @@ template <> void MappingQ1<1>::fill_fe_face_values (
   std::vector<Point<1> >&,
   std::vector<double>&,
   std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&) const;
+  std::vector<Point<1> >&,
+  std::vector<double>&) const;
 
 template <> void MappingQ1<1>::fill_fe_subface_values (
   const Triangulation<1>::cell_iterator &,
@@ -733,7 +738,8 @@ template <> void MappingQ1<1>::fill_fe_subface_values (
   std::vector<Point<1> >&,
   std::vector<double>&,
   std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&) const;
+  std::vector<Point<1> >&,
+  std::vector<double>&) const;
 
 #endif // DOXYGEN
 

@@ -2287,12 +2287,28 @@ namespace internal
 						 // that the other fine elements will
 						 // be constrained to the coarse element.
 		{
-		  Assert (false, ExcNotImplemented ());		  
+		  //		  Assert (false, ExcNotImplemented ());
 
 		  typename DH::active_cell_iterator neighbor_child
 		    = cell->neighbor_child_on_subface (face, min_degree_subface);
 		  const unsigned int n_dofs_on_children = neighbor_child->get_fe().dofs_per_face;
 		  dofs_on_children.resize (n_dofs_on_children);
+
+
+						       // Get DoFs on child cell with
+						       // lowest polynomial degree.
+                                                       // All other DoFs will be constrained
+                                                       // to the DoFs of this face.		   
+		  const unsigned int subface_fe_index
+		    = neighbor_child->active_fe_index();
+		      
+						       // Same procedure as for the
+						       // mother cell. Extract the face
+						       // DoFs from the cell DoFs.
+		  cell->face(face)->child(min_degree_subface)
+		    ->get_dof_indices (dofs_on_children,
+				       subface_fe_index);
+
 
 						   // The idea is to introduce
 						   // a "virtual" intermediate coarse
@@ -2361,12 +2377,88 @@ namespace internal
 		  
 						   // Now create the element
 						   // constraint for this subface.
-		  FullMatrix<double> face_constraints_m (n_dofs_on_children,
-							 n_dofs_on_children);
+		  FullMatrix<double> fc_sface_ipol (n_dofs_on_children,
+						    n_dofs_on_children);
+		  FullMatrix<double> fc_ipol_sface (n_dofs_on_children,
+						    n_dofs_on_children);
 		  neighbor_child->get_fe().get_subface_interpolation_matrix (neighbor_child->get_fe (),
 									     min_degree_subface,
-									     face_constraints_m);
-//TODO: Continue ...
+									     fc_sface_ipol); 
+		  // Invert it, to get a mapping from the DoFs of the
+		  // "Master-subface" to the intermediate layer.
+		  fc_ipol_sface.invert (fc_sface_ipol);
+
+		  // Create constraint matrix for the mother face.
+		  const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
+		  dofs_on_mother.resize (n_dofs_on_mother);
+		  cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
+
+		  FullMatrix<double> fc_mother_ipol (n_dofs_on_children,
+						     n_dofs_on_mother);
+		  FullMatrix<double> fc_mother_sface (n_dofs_on_children,
+						      n_dofs_on_mother);
+		  neighbor_child->get_fe ().get_face_interpolation_matrix (cell->get_fe(),
+									   fc_mother_ipol);
+		  fc_ipol_sface.mmult (fc_mother_sface, fc_mother_ipol);
+
+		  // Add constraints to global constraint
+		  // matrix.
+		  filter_constraints (dofs_on_children,
+				      dofs_on_mother,
+				      fc_mother_sface,
+				      constraints);
+
+						   // Now create constraint matrices for
+						   // the subfaces and assemble them
+		  for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+		    {
+		      // As the "Master-subface" does not need constraints, skip it.
+		      if (c != min_degree_subface)
+			{
+			  typename DH::active_cell_iterator neighbor_child_slave
+			    = cell->neighbor_child_on_subface (face, c);
+			  const unsigned int n_dofs_on_mother = neighbor_child_slave->get_fe().dofs_per_face;
+			  dofs_on_mother.resize (n_dofs_on_mother);
+
+						       // Find face number on the finer
+						       // neighboring cell, which is
+						       // shared the face with the
+						       // face of the coarser cell.
+			  const unsigned int neighbor2=
+			    cell->neighbor_of_neighbor(face);
+			  Assert (neighbor_child_slave->face(neighbor2) == cell->face(face)->child(c),
+				  ExcInternalError());
+		      
+						       // Same procedure as for the
+						       // mother cell. Extract the face
+						       // DoFs from the cell DoFs.
+			  const unsigned int subface_fe_index
+			    = neighbor_child_slave->active_fe_index();
+		      
+			  cell->face(face)->child(c)
+			    ->get_dof_indices (dofs_on_mother,
+					       subface_fe_index);		      
+					      
+						       // Now create the element
+						       // constraint for this subface.
+			  FullMatrix<double> fc_child_sface_ipol (n_dofs_on_children,
+								  n_dofs_on_mother);
+			  FullMatrix<double> fc_child_sface_sface (n_dofs_on_children,
+								   n_dofs_on_mother);
+			  neighbor_child->get_fe ().get_subface_interpolation_matrix 
+			    (neighbor_child_slave->get_fe(),
+			     c, fc_child_sface_ipol);
+
+			  fc_ipol_sface.mmult (fc_child_sface_sface, fc_child_sface_ipol);
+
+						       // Add constraints to global constraint
+						       // matrix.
+			  filter_constraints (dofs_on_children,
+					      dofs_on_mother,
+					      fc_child_sface_sface,
+					      constraints);
+			}
+		    }
 		}
 	    }
 	  else

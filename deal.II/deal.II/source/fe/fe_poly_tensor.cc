@@ -155,6 +155,76 @@ FE_PolyTensor<POLY,dim>::shape_grad_grad_component (
 
 
 //---------------------------------------------------------------------------
+// Utility method, which is used to determine the change of sign for
+// the DoFs on the faces of the given cell.
+//---------------------------------------------------------------------------
+
+template <class POLY, int dim>
+void
+FE_PolyTensor<POLY,dim>::get_face_sign_change (
+     const typename Triangulation<dim>::cell_iterator &cell,
+     std::vector<double> &face_sign) const
+{
+  Assert (face_sign.size () == this->dofs_per_cell,
+	  ExcDimensionMismatch (face_sign.size (), this->dofs_per_cell));
+
+  // Default is no sign change. I.e. multiply by one.
+  std::fill (face_sign.begin (), face_sign.end (), 1.0);
+
+#if deal_II_dimension > 1
+  const unsigned int dofs_per_face = this->dofs_per_face;
+
+  if (dim == 2)
+    {
+      for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2; 
+	   f < GeometryInfo<dim>::faces_per_cell; ++f)
+	{
+	  typename Triangulation<dim>::face_iterator face = cell->face (f);
+	  if (!face->at_boundary ())
+	    {
+	      const unsigned int neighbor_level = cell->neighbor (f)->level ();
+	      const unsigned int cell_level = cell->level ();
+
+	      unsigned int nn = (unsigned int) -1;
+
+	      // Same level, the easy case.
+	      if (neighbor_level == cell_level)
+		nn = cell->neighbor_of_neighbor (f);
+	      else
+		{
+		  // Neighbor is more refined (due to the internal restrictions,
+		  // this case should never be encountered!
+		  if (neighbor_level > cell_level)
+		    {
+		      Assert (false, 
+			      ExcMessage ("neighbor_level is larger than cell level!"));
+		    }
+		  // Neighbor is less refined
+		  else
+		    nn = cell->neighbor_of_coarser_neighbor (f).first;
+		}
+	      
+	      Assert (nn != (unsigned int) -1,
+		      ExcInternalError ());		      
+	      
+	      if (nn < GeometryInfo<dim>::faces_per_cell / 2)
+		{
+		  for (unsigned int j = 0; j < dofs_per_face; ++j)
+		    face_sign[f * dofs_per_face + j] = -1.0;
+		}
+	    }
+	}
+    }
+  else
+    {
+      // TODO: Think about 3D!.
+    }
+#endif
+
+}  
+
+
+//---------------------------------------------------------------------------
 // Data field initialization
 //---------------------------------------------------------------------------
 
@@ -289,32 +359,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
   // Compute eventual sign changes depending on the neighborhood
   // between two faces.
   std::vector<double> sign_change (n_dofs, 1.0);
-  
-#if deal_II_dimension > 1
-  const unsigned int dofs_per_face = this->dofs_per_face;
-
-  if (dim == 2)
-    {
-      for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2; 
-	   f < GeometryInfo<dim>::faces_per_cell; ++f)
-	{
-	  typename Triangulation<dim>::face_iterator face = cell->face (f);
-	  if (!face->at_boundary ())
-	    {
-	      unsigned int nn = cell->neighbor_of_neighbor (f);
-	      if (nn < GeometryInfo<dim>::faces_per_cell / 2)
-		{
-		  for (unsigned int j = 0; j < dofs_per_face; ++j)
-		    sign_change[f * dofs_per_face + j] = -1.0;
-		}
-	    }
-	}
-    }
-  else
-    {
-      // TODO: Think about 3D!.
-    }
-#endif
+  get_face_sign_change (cell, sign_change);
   
   for (unsigned int i=0; i<n_dofs; ++i)
     {
@@ -467,31 +512,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
   // Compute eventual sign changes depending on the neighborhood
   // between two faces.
   std::vector<double> sign_change (n_dofs, 1.0);
-#if deal_II_dimension > 1
-  const unsigned int dofs_per_face = this->dofs_per_face;
-  
-  if (dim == 2)
-    {
-      for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2; 
-	   f < GeometryInfo<dim>::faces_per_cell; ++f)
-	{
-	  typename Triangulation<dim>::face_iterator face = cell->face (f);
-	  if (!face->at_boundary ())
-	    {
-	      unsigned int nn = cell->neighbor_of_neighbor (f);
-	      if (nn < GeometryInfo<dim>::faces_per_cell / 2)
-		{
-		  for (unsigned int j = 0; j < dofs_per_face; ++j)
-		    sign_change[f * dofs_per_face + j] = -1.0;
-		}
-	    }
-	}
-    }
-  else
-    {
-      // TODO: Think about 3D!.
-    }
-#endif
+  get_face_sign_change (cell, sign_change);
   
   for (unsigned int i=0; i<n_dofs; ++i)
     {
@@ -527,7 +548,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 //TODO: Note that the Jacobian we compute here is that of the transformation from the reference FACE to the real FACE. However, what we need is the Jacobian of the transformation of the reference to the real CELL, which differs by one power of h. Consequently, the tests fe/rt_{11,13,14,15} presently compute the wrong results
 			double J = 1.0;
 			if (mapping_type == contravariant)
-			  J = data.JxW_values[k] / quadrature.weight(k);
+			  J = data.cell_JxW_values[k] / quadrature.weight(k);
 
 			for (unsigned int d=0; d<dim; ++d)
 			  data.shape_values(first+d,k) = sign_change[i] * (shape_values[k][d] / J);
@@ -585,7 +606,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 		    {
 		      // Recompute determinant
 //TODO: Note that the Jacobian we compute here is that of the transformation from the reference FACE to the real FACE. However, what we need is the Jacobian of the transformation of the reference to the real CELL, which differs by one power of h. Consequently, the tests fe/rt_{11,13,14,15} presently compute the wrong results
-		      double J = data.JxW_values[k] / quadrature.weight(k);
+
+		      double J = data.cell_JxW_values[k] / quadrature.weight(k);
 		      data.shape_gradients[first+d][k] = sign_change[i] * 
 			shape_grads2[k][d] / J;
 		    }
@@ -639,6 +661,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 // 	      && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
 // 	 ExcNotImplemented());
 //TODO: Size assertions
+
+//TODO: Sign change for the face DoFs!
   
   for (unsigned int i=0; i<n_dofs; ++i)
     {

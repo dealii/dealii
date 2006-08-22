@@ -249,6 +249,7 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 				      | update_covariant_transformation
 				      | update_contravariant_transformation
 				      | update_JxW_values
+				      | update_cell_JxW_values
 				      | update_boundary_forms
 				      | update_normal_vectors));
 
@@ -270,6 +271,15 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 	     | update_boundary_forms
 	     | update_normal_vectors))
     out |= update_contravariant_transformation;
+
+				   // The contravariant transformation
+				   // is a Piola transformation, which
+                                   // requires the determinant of the
+                                   // Jacobi matrix of the transformation.
+                                   // Therefore these values have to
+                                   // updated for each cell.
+  if (out & update_contravariant_transformation)
+    out |= update_JxW_values | update_cell_JxW_values;
 
   return out;
 }
@@ -582,7 +592,8 @@ MappingQ1<dim>::compute_fill_face (const typename Triangulation<dim>::cell_itera
 				   std::vector<Point<dim> >    &quadrature_points,
 				   std::vector<double>         &JxW_values,
 				   std::vector<Tensor<1,dim> > &boundary_forms,
-				   std::vector<Point<dim> >    &normal_vectors) const
+				   std::vector<Point<dim> >    &normal_vectors,
+				   std::vector<double>         &cell_JxW_values) const
 {
   compute_fill (cell, n_q_points, data_set, data, quadrature_points);
 
@@ -658,6 +669,23 @@ MappingQ1<dim>::compute_fill_face (const typename Triangulation<dim>::cell_itera
               normal_vectors[i] = boundary_forms[i] / f;
 	  }
     }
+
+  // If the Piola transformation is to be used, the
+  // new flag, update_cell_JxW_values has to be set.
+  // It triggers the creation of values for the determinant
+  // of the mapping function on 
+  if (update_flags & update_cell_JxW_values)
+    {      
+      Assert (cell_JxW_values.size() == n_q_points,
+	      ExcDimensionMismatch(cell_JxW_values.size(), n_q_points));
+      Assert (data.contravariant.size() == n_q_points,
+	      ExcDimensionMismatch(data.contravariant.size(), n_q_points));
+      Assert (weights.size() == n_q_points,
+	      ExcDimensionMismatch(weights.size(), n_q_points));
+      for (unsigned int point=0; point<n_q_points; ++point)
+	cell_JxW_values[point]
+	  = determinant(data.contravariant[point])*weights[point];
+    }
 }
 
 
@@ -670,7 +698,8 @@ MappingQ1<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_ite
 				     std::vector<Point<dim> >     &quadrature_points,
 				     std::vector<double>          &JxW_values,
 				     std::vector<Tensor<1,dim> >  &boundary_forms,
-				     std::vector<Point<dim> >     &normal_vectors) const
+				     std::vector<Point<dim> >     &normal_vectors,
+				     std::vector<double>          &cell_JxW_values) const
 {
   InternalData *data_ptr = dynamic_cast<InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
@@ -688,7 +717,8 @@ MappingQ1<dim>::fill_fe_face_values (const typename Triangulation<dim>::cell_ite
 		     quadrature_points,
 		     JxW_values,
 		     boundary_forms,
-		     normal_vectors);
+		     normal_vectors,
+		     cell_JxW_values);
 }
 
 
@@ -702,7 +732,8 @@ MappingQ1<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_
 					std::vector<Point<dim> >     &quadrature_points,
 					std::vector<double>          &JxW_values,
 					std::vector<Tensor<1,dim> >  &boundary_forms,
-					std::vector<Point<dim> >     &normal_vectors) const
+					std::vector<Point<dim> >     &normal_vectors,
+					std::vector<double>          &cell_JxW_values) const
 {
   InternalData *data_ptr = dynamic_cast<InternalData *> (&mapping_data);
   Assert(data_ptr!=0, ExcInternalError());
@@ -720,7 +751,8 @@ MappingQ1<dim>::fill_fe_subface_values (const typename Triangulation<dim>::cell_
 		     quadrature_points,
 		     JxW_values,
 		     boundary_forms,
-		     normal_vectors);
+		     normal_vectors,
+		     cell_JxW_values);
 }
 
 
@@ -738,7 +770,8 @@ MappingQ1<1>::compute_fill_face (const Triangulation<1>::cell_iterator &,
 				 std::vector<Point<1> > &,
 				 std::vector<double> &,
 				 std::vector<Tensor<1,1> > &,
-				 std::vector<Point<1> > &) const
+				 std::vector<Point<1> > &,
+				 std::vector<double>          &/*cell_JxW_values*/) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -753,7 +786,8 @@ MappingQ1<1>::fill_fe_face_values (const Triangulation<1>::cell_iterator &,
 				   std::vector<Point<1> >&,
 				   std::vector<double>&,
 				   std::vector<Tensor<1,1> >&,
-				   std::vector<Point<1> >&) const
+				   std::vector<Point<1> >&,
+				   std::vector<double>          &/*cell_JxW_values*/) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -769,7 +803,8 @@ MappingQ1<1>::fill_fe_subface_values (const Triangulation<1>::cell_iterator &,
 				      std::vector<Point<1> >&,
 				      std::vector<double>&,
 				      std::vector<Tensor<1,1> >&,
-				      std::vector<Point<1> >&) const
+				      std::vector<Point<1> >&,
+				      std::vector<double>          &/*cell_JxW_values*/) const
 {
   Assert(false, ExcNotImplemented());
 }

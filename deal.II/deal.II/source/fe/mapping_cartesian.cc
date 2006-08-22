@@ -322,7 +322,8 @@ MappingCartesian<dim>::fill_fe_face_values (const typename Triangulation<dim>::c
 					    std::vector<Point<dim> >     &quadrature_points,
 					    std::vector<double>          &JxW_values,
 					    std::vector<Tensor<1,dim> >  &boundary_forms,
-					    std::vector<Point<dim> >     &normal_vectors) const
+					    std::vector<Point<dim> >     &normal_vectors,
+					    std::vector<double>          &/*cell_JxW_values*/) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -351,6 +352,8 @@ MappingCartesian<dim>::fill_fe_face_values (const typename Triangulation<dim>::c
   if (data.current_update_flags() & update_boundary_forms)
     for (unsigned int i=0; i<boundary_forms.size();++i)
       boundary_forms[i] = J * normal_vectors[i];
+
+  //TODO: Implement cell_JxW_values
 }
 
 
@@ -365,7 +368,8 @@ MappingCartesian<dim>::fill_fe_subface_values (const typename Triangulation<dim>
 					       std::vector<Point<dim> >     &quadrature_points,
 					       std::vector<double>          &JxW_values,
 					       std::vector<Tensor<1,dim> >  &boundary_forms,
-					       std::vector<Point<dim> >     &normal_vectors) const
+					       std::vector<Point<dim> >     &normal_vectors,
+					       std::vector<double>          &/*cell_JxW_values*/) const
 {
 				   // convert data object to internal
 				   // data for this class. fails with
@@ -394,6 +398,8 @@ MappingCartesian<dim>::fill_fe_subface_values (const typename Triangulation<dim>
   if (data.current_update_flags() & update_boundary_forms)
     for (unsigned int i=0; i<boundary_forms.size();++i)
       boundary_forms[i] = J * normal_vectors[i];
+
+  //TODO: Implement cell_JxW_values
 }
 
 
@@ -408,7 +414,8 @@ MappingCartesian<1>::fill_fe_face_values (const Triangulation<1>::cell_iterator 
 					  std::vector<Point<1> >&,
 					  std::vector<double>&,
 					  std::vector<Tensor<1,1> >&,
-					  std::vector<Point<1> >&) const
+					  std::vector<Point<1> >&,
+					  std::vector<double>          &/*cell_JxW_values*/) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -424,7 +431,8 @@ MappingCartesian<1>::fill_fe_subface_values (const Triangulation<1>::cell_iterat
 					     std::vector<Point<1> >&,
 					     std::vector<double>&,
 					     std::vector<Tensor<1,1> >&,
-					     std::vector<Point<1> >&) const
+					     std::vector<Point<1> >&,
+					     std::vector<double>          &/*cell_JxW_values*/) const
 {
   Assert(false, ExcNotImplemented());
 }

@@ -220,7 +220,8 @@ class MappingQ : public MappingQ1<dim>
 			 typename std::vector<Point<dim> >        &quadrature_points,
 			 std::vector<double>             &JxW_values,
 			 typename std::vector<Tensor<1,dim> >        &exterior_form,
-			 typename std::vector<Point<dim> >        &normal_vectors) const ;
+			 typename std::vector<Point<dim> >        &normal_vectors,
+			 std::vector<double>             &cell_JxW_values) const ;
 
 				     /**
 				      * Implementation of the interface in
@@ -235,7 +236,8 @@ class MappingQ : public MappingQ1<dim>
 			    typename std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
 			    typename std::vector<Tensor<1,dim> >        &exterior_form,
-			    typename std::vector<Point<dim> >        &normal_vectors) const ;
+			    typename std::vector<Point<dim> >        &normal_vectors,
+			    std::vector<double>             &cell_JxW_values) const ;
 
 				     /**
 				      * For <tt>dim=2,3</tt>. Append the

@@ -68,7 +68,8 @@ class MappingCartesian : public Mapping<dim>
 			 std::vector<Point<dim> >        &quadrature_points,
 			 std::vector<double>             &JxW_values,
 			 std::vector<Tensor<1,dim> >        &boundary_form,
-			 std::vector<Point<dim> >        &normal_vectors) const ;
+			 std::vector<Point<dim> >        &normal_vectors,
+			 std::vector<double>             &cell_JxW_values) const ;
     virtual void
     fill_fe_subface_values (const typename Triangulation<dim>::cell_iterator &cell,
 			    const unsigned int face_no,
@@ -78,7 +79,8 @@ class MappingCartesian : public Mapping<dim>
 			    std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
 			    std::vector<Tensor<1,dim> >        &boundary_form,
-			    std::vector<Point<dim> >        &normal_vectors) const ;
+			    std::vector<Point<dim> >        &normal_vectors,
+			    std::vector<double>             &cell_JxW_values) const ;
 
 				     /**
 				      * Implementation of the
@@ -232,7 +234,8 @@ template <> void MappingCartesian<1>::fill_fe_face_values (
   std::vector<Point<1> >&,
   std::vector<double>&,
   std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&) const;
+  std::vector<Point<1> >&,
+  std::vector<double>&) const;
 
 template <> void MappingCartesian<1>::fill_fe_subface_values (
   const Triangulation<1>::cell_iterator &,
@@ -243,7 +246,8 @@ template <> void MappingCartesian<1>::fill_fe_subface_values (
   std::vector<Point<1> >&,
   std::vector<double>&,
   std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&) const;
+  std::vector<Point<1> >&,
+  std::vector<double>&) const;
 
 #endif // DOXYGEN  
 

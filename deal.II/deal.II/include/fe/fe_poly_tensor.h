@@ -261,6 +261,22 @@ class FE_PolyTensor : public FiniteElement<dim>
 	  contravariant
     };
 
+
+
+				     /**
+				      * On noncartesian grids, the
+				      * sign of the DoFs associated with
+				      * the faces of the elements has
+				      * to be changed in some cases.
+				      * This procedure implements an
+				      * algorithm, which determines
+				      * the DoFs, which need this
+				      * sign change for a given cell.
+				      */
+    void get_face_sign_change (const typename Triangulation<dim>::cell_iterator &cell,
+			       std::vector<double> &face_sign) const;
+
+
 				     /**
 				      * The mapping type to be used to
 				      * map shape functions from the
