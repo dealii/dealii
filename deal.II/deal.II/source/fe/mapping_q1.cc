@@ -253,34 +253,46 @@ MappingQ1<dim>::update_each (const UpdateFlags in) const
 				      | update_boundary_forms
 				      | update_normal_vectors));
 
-				   // The following is a little incorrect:
-				   // If not applied on a face,
-				   // update_boundary_forms does not
-				   // make sense. On the other hand,
-				   // it is necessary on a
-				   // face. Currently,
-				   // update_boundary_forms is simply
-				   // ignored for the interior of a
-				   // cell.
-  if (out & (update_JxW_values
-	     |update_normal_vectors))
-    out |= update_boundary_forms;
+				   // add a few flags. note that some
+				   // flags appear in both conditions
+				   // and in subsequents set
+				   // operations. this leads to some
+				   // circular logic. the only way to
+				   // treat this is to iterate. since
+				   // there are 3 if-clauses in the
+				   // loop, it will take at most 3
+				   // iterations to converge. do them:
+  for (unsigned int i=0; i<3; ++i)
+    {
+				       // The following is a little incorrect:
+				       // If not applied on a face,
+				       // update_boundary_forms does not
+				       // make sense. On the other hand,
+				       // it is necessary on a
+				       // face. Currently,
+				       // update_boundary_forms is simply
+				       // ignored for the interior of a
+				       // cell.
+      if (out & (update_JxW_values
+		 | update_normal_vectors))
+	out |= update_boundary_forms;
   
-  if (out & (update_covariant_transformation
-	     | update_JxW_values
-	     | update_boundary_forms
-	     | update_normal_vectors))
-    out |= update_contravariant_transformation;
+      if (out & (update_covariant_transformation
+		 | update_JxW_values
+		 | update_boundary_forms
+		 | update_normal_vectors))
+	out |= update_contravariant_transformation;
 
-				   // The contravariant transformation
-				   // is a Piola transformation, which
-                                   // requires the determinant of the
-                                   // Jacobi matrix of the transformation.
-                                   // Therefore these values have to
-                                   // updated for each cell.
-  if (out & update_contravariant_transformation)
-    out |= update_JxW_values | update_cell_JxW_values;
-
+				       // The contravariant transformation
+				       // is a Piola transformation, which
+				       // requires the determinant of the
+				       // Jacobi matrix of the transformation.
+				       // Therefore these values have to
+				       // updated for each cell.
+      if (out & update_contravariant_transformation)
+	out |= update_JxW_values | update_cell_JxW_values;
+    }
+  
   return out;
 }
 
