@@ -15,7 +15,7 @@
 // cell smaller and smaller. Evaluate the values with FEFaceValues, to
 // make sure the values scale as in rt_10 where we used FEValues
 //
-// the test presently fails because of the issue with computing the
+// the test used to fail because of the issue with computing the
 // normals using FEFaceValue, where FEFaceValue by accident uses the
 // *face* mapping, not the *cell* mapping to compute the Piola
 // transform (leading to a missing power of h in the determinant)
