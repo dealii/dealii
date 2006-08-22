@@ -143,7 +143,7 @@ void do_project (const Triangulation<dim> &triangulation,
 	      << std::endl;
 	  
       if (q<=p-order_difference)
-	Assert (error.l2_norm() <= 1e-12*projection.l2_norm(),
+	Assert (error.l2_norm() <= 1e-10*projection.l2_norm(),
 		ExcFailedProjection(error.l2_norm() / projection.l2_norm()));
     }
 }

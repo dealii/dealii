@@ -450,7 +450,7 @@ void VectorTools::project (const Mapping<dim>       &mapping,
 					mass_matrix, vec, tmp,
 					true);
 
-  SolverControl           control(1000,1e-16);
+  SolverControl           control(tmp.size(), 1e-12*tmp.l2_norm());
   PrimitiveVectorMemory<> memory;
   SolverCG<>              cg(control,memory);
 
@@ -1371,7 +1371,7 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 
   Vector<double> boundary_projection (rhs.size());
 
-  SolverControl           control(1000, 1e-16);
+  SolverControl           control(rhs.size(), 1e-12*rhs.l2_norm());
   PrimitiveVectorMemory<> memory;
   SolverCG<>              cg(control,memory);
 

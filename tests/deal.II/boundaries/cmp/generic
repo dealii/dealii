@@ -39,7 +39,7 @@ DEAL:2d::120 84.15
 DEAL:2d::126 84.15
 DEAL:2d::Projected boundary values
 DEAL:2d:cg::Starting value 383.47
-DEAL:2d:cg::Convergence step 15 value 0.00
+DEAL:2d:cg::Convergence step 10 value 0.00
 DEAL:2d::0 84.19
 DEAL:2d::1 168.32
 DEAL:2d::2 84.20

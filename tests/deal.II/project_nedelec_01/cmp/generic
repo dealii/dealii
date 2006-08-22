@@ -11,11 +11,11 @@ DEAL:cg::Convergence step 8 value 0
 DEAL::FE_Nedelec<2>(1), P_2, rel. error=0.0220
 DEAL::n_dofs=1944
 DEAL:cg::Starting value 5.35
-DEAL:cg::Convergence step 17 value 0
+DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Nedelec<3>(1), P_0, rel. error=0
 DEAL:cg::Starting value 10.8
-DEAL:cg::Convergence step 17 value 0
+DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Nedelec<3>(1), P_1, rel. error=0.00261
 DEAL:cg::Starting value 16.3
-DEAL:cg::Convergence step 18 value 0
+DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.00450
