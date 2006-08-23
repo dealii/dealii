@@ -4,7 +4,7 @@ DEAL::---------
 DEAL::  Primal problem: time=0, step=0, sweep=0. 256 cells, 289 dofsStarting value 0
 DEAL:cg::Convergence step 0 value 0
 DEAL:cg::Starting value 0.01
-DEAL:cg::Convergence step 14 value 0
+DEAL:cg::Convergence step 12 value 0
 DEAL:cg::Starting value 0
 DEAL:cg::Convergence step 0 value 0
 DEAL:cg::Starting value 0
@@ -1421,7 +1421,7 @@ DEAL::---------
 DEAL::  Primal problem: time=0, step=0, sweep=1. 157 cells, 194 dofsStarting value 0
 DEAL:cg::Convergence step 0 value 0
 DEAL:cg::Starting value 0.00
-DEAL:cg::Convergence step 15 value 0
+DEAL:cg::Convergence step 13 value 0
 DEAL:cg::Starting value 0
 DEAL:cg::Convergence step 0 value 0
 DEAL:cg::Starting value 0
@@ -2358,7 +2358,7 @@ DEAL::---------
 DEAL::  Primal problem: time=0, step=0, sweep=2. 157 cells, 198 dofsStarting value 0
 DEAL:cg::Convergence step 0 value 0
 DEAL:cg::Starting value 0.00
-DEAL:cg::Convergence step 16 value 0
+DEAL:cg::Convergence step 14 value 0
 DEAL:cg::Starting value 0
 DEAL:cg::Convergence step 0 value 0
 DEAL:cg::Starting value 0
