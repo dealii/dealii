@@ -21,12 +21,95 @@
 
 #include <base/logstream.h>
 
+
+namespace
+{
+//---------------------------------------------------------------------------
+// Utility method, which is used to determine the change of sign for
+// the DoFs on the faces of the given cell.
+//---------------------------------------------------------------------------
+
+/**
+ * On noncartesian grids, the sign of the DoFs associated with the faces of
+ * the elements has to be changed in some cases.  This procedure implements an
+ * algorithm, which determines the DoFs, which need this sign change for a
+ * given cell.
+ */
+  void
+  get_face_sign_change (const Triangulation<1>::cell_iterator &,
+			const unsigned int                     ,
+			std::vector<double>                   &face_sign)
+  {
+				     // nothing to do in 1d
+    std::fill (face_sign.begin (), face_sign.end (), 1.0);
+  }
+  
+
+  void
+  get_face_sign_change (const Triangulation<2>::cell_iterator &cell,
+			const unsigned int                     dofs_per_face,
+			std::vector<double>                   &face_sign)
+  {
+    const unsigned int dim = 2;
+    
+				     // Default is no sign
+				     // change. I.e. multiply by one.
+    std::fill (face_sign.begin (), face_sign.end (), 1.0);
+    
+    for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2; 
+	 f < GeometryInfo<dim>::faces_per_cell; ++f)
+      {
+	Triangulation<dim>::face_iterator face = cell->face (f);
+	if (!face->at_boundary ())
+	  {
+	    const unsigned int neighbor_level = cell->neighbor (f)->level ();
+	    const unsigned int cell_level = cell->level ();
+
+					     // check of neighbor is more
+					     // refined (this case should
+					     // never be encountered)
+	    Assert (neighbor_level <= cell_level,
+		    ExcMessage ("neighbor_level is larger than cell level!"));
+
+	    const unsigned int nn = (neighbor_level == cell_level
+				     ?
+				     cell->neighbor_of_neighbor (f)
+				     :
+				     cell->neighbor_of_coarser_neighbor (f).first);
+	      
+	    if (nn < GeometryInfo<dim>::faces_per_cell / 2)
+	      for (unsigned int j = 0; j < dofs_per_face; ++j)
+		{
+		  Assert (f * dofs_per_face + j < face_sign.size(),
+			  ExcInternalError());
+
+//TODO: This is probably only going to work for those elements for which all dofs are face dofs
+		  face_sign[f * dofs_per_face + j] = -1.0;
+		}
+	  }
+      }
+  }
+
+
+
+  void
+  get_face_sign_change (const Triangulation<3>::cell_iterator &/*cell*/,
+			const unsigned int                     /*dofs_per_face*/,
+			std::vector<double>                   &face_sign)
+  {
+    std::fill (face_sign.begin (), face_sign.end (), 1.0);
+//TODO: think about what it would take here    
+  }
+}
+
+
+
 template <class POLY, int dim>
-FE_PolyTensor<POLY,dim>::FE_PolyTensor (
-  unsigned int degree,
-  const FiniteElementData<dim> &fe_data,
-  const std::vector<bool> &restriction_is_additive_flags,
-  const std::vector<std::vector<bool> > &nonzero_components):
+FE_PolyTensor<POLY,dim>::FE_PolyTensor (const unsigned int degree,
+					const FiniteElementData<dim> &fe_data,
+					const std::vector<bool> &restriction_is_additive_flags,
+					const std::vector<std::vector<bool> > &nonzero_components)
+		:
 		FiniteElement<dim> (fe_data,
 				    restriction_is_additive_flags,
 				    nonzero_components),
@@ -36,22 +119,22 @@ FE_PolyTensor<POLY,dim>::FE_PolyTensor (
 }
 
 
+
 template <class POLY, int dim>
 double
-FE_PolyTensor<POLY,dim>::shape_value (
-  const unsigned int, const Point<dim> &) const
+FE_PolyTensor<POLY,dim>::shape_value (const unsigned int, const Point<dim> &) const
 {
   Assert(false, typename FiniteElement<dim>::ExcFENotPrimitive());
   return 0.;
 }
 
 
+
 template <class POLY, int dim>
 double
-FE_PolyTensor<POLY,dim>::shape_value_component (
-  const unsigned int i,
-  const Point<dim> &p,
-  const unsigned int component) const
+FE_PolyTensor<POLY,dim>::shape_value_component (const unsigned int i,
+						const Point<dim> &p,
+						const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
@@ -76,8 +159,8 @@ FE_PolyTensor<POLY,dim>::shape_value_component (
 
 template <class POLY, int dim>
 Tensor<1,dim>
-FE_PolyTensor<POLY,dim>::shape_grad (
-  const unsigned int, const Point<dim> &) const
+FE_PolyTensor<POLY,dim>::shape_grad (const unsigned int,
+				     const Point<dim> &) const
 {
   Assert(false, typename FiniteElement<dim>::ExcFENotPrimitive());
   return Tensor<1,dim>();
@@ -87,10 +170,9 @@ FE_PolyTensor<POLY,dim>::shape_grad (
 
 template <class POLY, int dim>
 Tensor<1,dim>
-FE_PolyTensor<POLY,dim>::shape_grad_component (
-  const unsigned int i,
-  const Point<dim> &p,
-  const unsigned int component) const
+FE_PolyTensor<POLY,dim>::shape_grad_component (const unsigned int i,
+					       const Point<dim> &p,
+					       const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
@@ -116,8 +198,7 @@ FE_PolyTensor<POLY,dim>::shape_grad_component (
 
 template <class POLY, int dim>
 Tensor<2,dim>
-FE_PolyTensor<POLY,dim>::shape_grad_grad (
-  const unsigned int, const Point<dim> &) const
+FE_PolyTensor<POLY,dim>::shape_grad_grad (const unsigned int, const Point<dim> &) const
 {
   Assert(false, typename FiniteElement<dim>::ExcFENotPrimitive());
   return Tensor<2,dim>();
@@ -127,10 +208,9 @@ FE_PolyTensor<POLY,dim>::shape_grad_grad (
 
 template <class POLY, int dim>
 Tensor<2,dim>
-FE_PolyTensor<POLY,dim>::shape_grad_grad_component (
-  const unsigned int i,
-  const Point<dim> &p,
-  const unsigned int component) const
+FE_PolyTensor<POLY,dim>::shape_grad_grad_component (const unsigned int i,
+						    const Point<dim> &p,
+						    const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
@@ -152,76 +232,6 @@ FE_PolyTensor<POLY,dim>::shape_grad_grad_component (
   return s;
 }
 
-
-
-//---------------------------------------------------------------------------
-// Utility method, which is used to determine the change of sign for
-// the DoFs on the faces of the given cell.
-//---------------------------------------------------------------------------
-
-template <class POLY, int dim>
-void
-FE_PolyTensor<POLY,dim>::get_face_sign_change (
-     const typename Triangulation<dim>::cell_iterator &cell,
-     std::vector<double> &face_sign) const
-{
-  Assert (face_sign.size () == this->dofs_per_cell,
-	  ExcDimensionMismatch (face_sign.size (), this->dofs_per_cell));
-
-  // Default is no sign change. I.e. multiply by one.
-  std::fill (face_sign.begin (), face_sign.end (), 1.0);
-
-#if deal_II_dimension > 1
-  const unsigned int dofs_per_face = this->dofs_per_face;
-
-  if (dim == 2)
-    {
-      for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2; 
-	   f < GeometryInfo<dim>::faces_per_cell; ++f)
-	{
-	  typename Triangulation<dim>::face_iterator face = cell->face (f);
-	  if (!face->at_boundary ())
-	    {
-	      const unsigned int neighbor_level = cell->neighbor (f)->level ();
-	      const unsigned int cell_level = cell->level ();
-
-	      unsigned int nn = (unsigned int) -1;
-
-	      // Same level, the easy case.
-	      if (neighbor_level == cell_level)
-		nn = cell->neighbor_of_neighbor (f);
-	      else
-		{
-		  // Neighbor is more refined (due to the internal restrictions,
-		  // this case should never be encountered!
-		  if (neighbor_level > cell_level)
-		    {
-		      Assert (false, 
-			      ExcMessage ("neighbor_level is larger than cell level!"));
-		    }
-		  // Neighbor is less refined
-		  else
-		    nn = cell->neighbor_of_coarser_neighbor (f).first;
-		}
-	      
-	      Assert (nn != (unsigned int) -1,
-		      ExcInternalError ());		      
-	      
-	      if (nn < GeometryInfo<dim>::faces_per_cell / 2)
-		{
-		  for (unsigned int j = 0; j < dofs_per_face; ++j)
-		    face_sign[f * dofs_per_face + j] = -1.0;
-		}
-	    }
-	}
-    }
-  else
-    {
-      // TODO: Think about 3D!.
-    }
-#endif
-
-}  
 
 
 //---------------------------------------------------------------------------
@@ -359,7 +369,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
   // Compute eventual sign changes depending on the neighborhood
   // between two faces.
   std::vector<double> sign_change (n_dofs, 1.0);
-  get_face_sign_change (cell, sign_change);
+  get_face_sign_change (cell, this->dofs_per_face, sign_change);
   
   for (unsigned int i=0; i<n_dofs; ++i)
     {
@@ -367,40 +377,47 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
       
       if (flags & update_values)
 	{
-	  switch(mapping_type)
+	  switch (mapping_type)
 	    {
 	      case independent:
 	      case independent_on_cartesian:
+	      {
 		for (unsigned int k=0; k<n_quad; ++k)
 		  for (unsigned int d=0;d<dim;++d)
 		    data.shape_values(first+d,k) = fe_data.shape_values[i][k][d];
 		break;
+	      }
+	      
 	      case covariant:
 	      case contravariant:
-		if (true)
-		  {
-						     // Use auxiliary vector for transformation
-		    std::vector<Tensor<1,dim> > shape_values (n_quad);
-		    if (mapping_type == covariant)
-		      mapping.transform_covariant(fe_data.shape_values[i], 0,
+	      {
+						 // Use auxiliary vector for
+						 // transformation
+		std::vector<Tensor<1,dim> > shape_values (n_quad);
+		if (mapping_type == covariant)
+		  mapping.transform_covariant(fe_data.shape_values[i], 0,
+					      shape_values, mapping_data);
+		else
+		  mapping.transform_contravariant(fe_data.shape_values[i], 0,
 						  shape_values, mapping_data);
-		    else
-		      mapping.transform_contravariant(fe_data.shape_values[i], 0,
-						      shape_values, mapping_data);
 		    
-						     // then copy over to target:
-		    for (unsigned int k=0; k<n_quad; ++k)
-		      {
-			// Recompute determinant
-			double J = 1.0;
-			if (mapping_type == contravariant)
-			  J = data.JxW_values[k] / quadrature.weight(k);
+						 // then copy over to target:
+		for (unsigned int k=0; k<n_quad; ++k)
+		  {
+						     // Recompute determinant
+		    const double
+		      J = (mapping_type == contravariant ?
+			   data.cell_JxW_values[k] / quadrature.weight(k)
+			   :
+			   1.0);
 
-			for (unsigned int d=0; d<dim; ++d)
-			  data.shape_values(first+d,k) = sign_change[i] * (shape_values[k][d] / J);
-		      }
+		    for (unsigned int d=0; d<dim; ++d)
+		      data.shape_values(first+d,k)
+			= sign_change[i] * (shape_values[k][d] / J);
 		  }
 		break;
+	      }
+	      
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
@@ -410,10 +427,12 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 	{
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_quad);
 	  std::vector<Tensor<2,dim> > shape_grads2 (n_quad);
-	  switch(mapping_type)
+
+	  switch (mapping_type)
 	    {
 	      case independent:
 	      case independent_on_cartesian:
+	      {
 		mapping.transform_covariant(fe_data.shape_grads[i], 0,
 					    shape_grads1,
 					    mapping_data);
@@ -421,7 +440,10 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 		  for (unsigned int d=0;d<dim;++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
+	      }
+	      
 	      case covariant:
+	      {
 		mapping.transform_covariant(fe_data.shape_grads[i], 0,
 					    shape_grads1,
 					    mapping_data);
@@ -437,8 +459,12 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 		for (unsigned int k=0; k<n_quad; ++k)
 		  for (unsigned int d=0;d<dim;++d)
 		    data.shape_gradients[first+d][k] = shape_grads2[k][d];
+
 		break;
+	      }
+	      
 	      case contravariant:
+	      {
 		mapping.transform_covariant(fe_data.shape_grads[i], 0,
 					    shape_grads1,
 					    mapping_data);
@@ -450,12 +476,20 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 		for (unsigned int k=0; k<n_quad; ++k)
 		  for (unsigned int d=0;d<dim;++d)
 		    {
-		      // Recompute determinant
+						       // Recompute determinant
+		      const double
+			J = (mapping_type == contravariant ?
+			     data.cell_JxW_values[k] / quadrature.weight(k)
+			     :
+			     1.0);
 		      double J = data.JxW_values[k] / quadrature.weight(k);
 		      data.shape_gradients[first+d][k] = sign_change[i] * 
 			shape_grads2[k][d] / J;
 		    }
+		
 		break;
+	      }
+	      
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
@@ -512,7 +546,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 				   // Compute eventual sign changes depending
 				   // on the neighborhood between two faces.
   std::vector<double> sign_change (n_dofs, 1.0);
-  get_face_sign_change (cell, sign_change);
+  get_face_sign_change (cell, this->dofs_per_face, sign_change);
   
   for (unsigned int i=0; i<n_dofs; ++i)
     {
@@ -520,7 +554,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
       
       if (flags & update_values)
 	{
-	  switch(mapping_type)
+	  switch (mapping_type)
 	    {
 	      case independent:
 	      case independent_on_cartesian:
@@ -582,7 +616,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_quad);
 	  std::vector<Tensor<2,dim> > shape_grads2 (n_quad);
 
-	  switch(mapping_type)
+	  switch (mapping_type)
 	    {
 	      case independent:
 	      case independent_on_cartesian:
@@ -696,7 +730,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
       
       if (flags & update_values)
 	{
-	  switch(mapping_type)
+	  switch (mapping_type)
 	    {
 	      case independent:
 	      case independent_on_cartesian:
@@ -758,7 +792,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_quad);
 	  std::vector<Tensor<2,dim> > shape_grads2 (n_quad);
 
-	  switch(mapping_type)
+	  switch (mapping_type)
 	    {
 	      case independent:
 	      case independent_on_cartesian:
