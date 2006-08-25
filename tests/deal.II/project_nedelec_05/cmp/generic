@@ -1,0 +1,71 @@
+
+DEAL::n_dofs=86
+DEAL:cg::Starting value 10.6
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 15.1
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_1, rel. error=0.0356
+DEAL:cg::Starting value 21.3
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.0328
+DEAL::n_dofs=86
+DEAL:cg::Starting value 10.8
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 15.4
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_1, rel. error=0.0345
+DEAL:cg::Starting value 21.8
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.0312
+DEAL::n_dofs=86
+DEAL:cg::Starting value 10.6
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 14.9
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_1, rel. error=0.0279
+DEAL:cg::Starting value 21.0
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.0256
+DEAL::n_dofs=86
+DEAL:cg::Starting value 10.8
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 15.3
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_1, rel. error=0.0316
+DEAL:cg::Starting value 21.7
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.0293
+DEAL::n_dofs=86
+DEAL:cg::Starting value 10.6
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 15.0
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_1, rel. error=0.0294
+DEAL:cg::Starting value 21.1
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.0272
+DEAL::n_dofs=86
+DEAL:cg::Starting value 10.7
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 15.2
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_1, rel. error=0.0323
+DEAL:cg::Starting value 21.4
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.0291
+DEAL::n_dofs=86
+DEAL:cg::Starting value 10.7
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 15.0
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_1, rel. error=0.0299
+DEAL:cg::Starting value 21.2
+DEAL:cg::Convergence step 17 value 0
+DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.0277

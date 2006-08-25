@@ -220,6 +220,126 @@ void test_with_wrong_face_orientation (const FiniteElement<dim> &fe,
 
 
 
+
+// test with a 2d mesh that forms a square but subdivides it into 3
+// elements. this tests the case of the sign_change thingy in
+// fe_poly_tensor.cc
+template <int dim>
+void test_with_2d_deformed_mesh (const FiniteElement<dim> &fe,
+				 const unsigned int        p,
+				 const unsigned int        order_difference = 0)
+{
+  if (dim != 2)
+    return;
+  
+  std::vector<Point<dim> > points_glob;
+  std::vector<Point<dim> > points;
+
+  points_glob.push_back (Point<dim> (0.0, 0.0));
+  points_glob.push_back (Point<dim> (1.0, 0.0));
+  points_glob.push_back (Point<dim> (1.0, 0.5));
+  points_glob.push_back (Point<dim> (1.0, 1.0));
+  points_glob.push_back (Point<dim> (0.6, 0.5));
+  points_glob.push_back (Point<dim> (0.5, 1.0));
+  points_glob.push_back (Point<dim> (0.0, 1.0));
+
+  				   // Prepare cell data
+  std::vector<CellData<dim> > cells (3);
+
+  cells[0].vertices[0] = 0;
+  cells[0].vertices[1] = 1;
+  cells[0].vertices[2] = 4;
+  cells[0].vertices[3] = 2;
+  cells[0].material_id = 0;
+
+  cells[1].vertices[0] = 4;
+  cells[1].vertices[1] = 2;
+  cells[1].vertices[2] = 5;
+  cells[1].vertices[3] = 3;
+  cells[1].material_id = 0;
+
+  cells[2].vertices[0] = 0;
+  cells[2].vertices[1] = 4;
+  cells[2].vertices[2] = 6;
+  cells[2].vertices[3] = 5;
+  cells[2].material_id = 0;
+
+  Triangulation<dim>     triangulation;
+  triangulation.create_triangulation (points_glob, cells, SubCellData());
+  
+  do_project (triangulation, fe, p, order_difference);
+}
+
+
+
+// same as test_with_2d_deformed_mesh, but refine each element in turn. this
+// makes sure we also check the sign_change thingy for refined cells
+template <int dim>
+void test_with_2d_deformed_refined_mesh (const FiniteElement<dim> &fe,
+					 const unsigned int        p,
+					 const unsigned int        order_difference = 0)
+{
+  if (dim != 2)
+    return;
+
+  for (unsigned int i=0; i<3; ++i)
+    {
+      std::vector<Point<dim> > points_glob;
+      std::vector<Point<dim> > points;
+
+      points_glob.push_back (Point<dim> (0.0, 0.0));
+      points_glob.push_back (Point<dim> (1.0, 0.0));
+      points_glob.push_back (Point<dim> (1.0, 0.5));
+      points_glob.push_back (Point<dim> (1.0, 1.0));
+      points_glob.push_back (Point<dim> (0.6, 0.5));
+      points_glob.push_back (Point<dim> (0.5, 1.0));
+      points_glob.push_back (Point<dim> (0.0, 1.0));
+
+				       // Prepare cell data
+      std::vector<CellData<dim> > cells (3);
+
+      cells[0].vertices[0] = 0;
+      cells[0].vertices[1] = 1;
+      cells[0].vertices[2] = 4;
+      cells[0].vertices[3] = 2;
+      cells[0].material_id = 0;
+
+      cells[1].vertices[0] = 4;
+      cells[1].vertices[1] = 2;
+      cells[1].vertices[2] = 5;
+      cells[1].vertices[3] = 3;
+      cells[1].material_id = 0;
+
+      cells[2].vertices[0] = 0;
+      cells[2].vertices[1] = 4;
+      cells[2].vertices[2] = 6;
+      cells[2].vertices[3] = 5;
+      cells[2].material_id = 0;
+
+      Triangulation<dim>     triangulation;
+      triangulation.create_triangulation (points_glob, cells, SubCellData());
+
+      switch (i)
+	{
+	  case 0:
+		triangulation.begin_active()->set_refine_flag();
+		break;
+	  case 1:
+		(++(triangulation.begin_active()))->set_refine_flag();
+		break;
+	  case 2:
+		(++(++(triangulation.begin_active())))->set_refine_flag();
+		break;
+	  default:
+		Assert (false, ExcNotImplemented());
+	}
+      
+      do_project (triangulation, fe, p, order_difference);
+    }
+}
+
+
+
 int main ()
 {
   std::ofstream logfile(logname);
