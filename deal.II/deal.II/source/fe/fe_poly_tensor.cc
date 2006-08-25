@@ -407,7 +407,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 						     // Recompute determinant
 		    const double
 		      J = (mapping_type == contravariant ?
-			   data.cell_JxW_values[k] / quadrature.weight(k)
+			   data.JxW_values[k] / quadrature.weight(k)
 			   :
 			   1.0);
 
@@ -479,10 +479,9 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 						       // Recompute determinant
 		      const double
 			J = (mapping_type == contravariant ?
-			     data.cell_JxW_values[k] / quadrature.weight(k)
+			     data.JxW_values[k] / quadrature.weight(k)
 			     :
 			     1.0);
-		      double J = data.JxW_values[k] / quadrature.weight(k);
 		      data.shape_gradients[first+d][k] = sign_change[i] * 
 			shape_grads2[k][d] / J;
 		    }
@@ -496,9 +495,9 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 	}
     }
   
-  const typename QProjector<dim>::DataSetDescriptor dsd;
   if (flags & update_second_derivatives)
-    this->compute_2nd (mapping, cell, dsd.cell(),
+    this->compute_2nd (mapping, cell,
+		       typename QProjector<dim>::DataSetDescriptor().cell(),
 		       mapping_data, fe_data, data);
 }
 
