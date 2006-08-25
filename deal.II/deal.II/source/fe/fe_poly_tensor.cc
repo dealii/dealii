@@ -354,24 +354,23 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 // 	      && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
 // 	 ExcNotImplemented());
 
-  const unsigned int n_dofs = this->dofs_per_cell;
-  const unsigned int n_quad = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.n_quadrature_points;
   const UpdateFlags flags(fe_data.current_update_flags());
   
-  Assert(!(flags & update_values) || fe_data.shape_values.size() == n_dofs,
-	 ExcDimensionMismatch(fe_data.shape_values.size(), n_dofs));
-  Assert(!(flags & update_values) || fe_data.shape_values[0].size() == n_quad,
-	 ExcDimensionMismatch(fe_data.shape_values[0].size(), n_quad));
+  Assert(!(flags & update_values) || fe_data.shape_values.size() == this->dofs_per_cell,
+	 ExcDimensionMismatch(fe_data.shape_values.size(), this->dofs_per_cell));
+  Assert(!(flags & update_values) || fe_data.shape_values[0].size() == n_q_points,
+	 ExcDimensionMismatch(fe_data.shape_values[0].size(), n_q_points));
 
   // Create table with sign changes, due to the special structure of the RT elements.
   // TODO: Preliminary hack to demonstrate the overall prinicple!
 
   // Compute eventual sign changes depending on the neighborhood
   // between two faces.
-  std::vector<double> sign_change (n_dofs, 1.0);
+  std::vector<double> sign_change (this->dofs_per_cell, 1.0);
   get_face_sign_change (cell, this->dofs_per_face, sign_change);
   
-  for (unsigned int i=0; i<n_dofs; ++i)
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const unsigned int first = data.shape_function_to_row_table[i];
       
@@ -382,8 +381,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 	      case independent:
 	      case independent_on_cartesian:
 	      {
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_values(first+d,k) = fe_data.shape_values[i][k][d];
 		break;
 	      }
@@ -393,7 +392,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 	      {
 						 // Use auxiliary vector for
 						 // transformation
-		std::vector<Tensor<1,dim> > shape_values (n_quad);
+		std::vector<Tensor<1,dim> > shape_values (n_q_points);
 		if (mapping_type == covariant)
 		  mapping.transform_covariant(fe_data.shape_values[i], 0,
 					      shape_values, mapping_data);
@@ -402,7 +401,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 						  shape_values, mapping_data);
 		    
 						 // then copy over to target:
-		for (unsigned int k=0; k<n_quad; ++k)
+		for (unsigned int k=0; k<n_q_points; ++k)
 		  {
 						     // Recompute determinant
 		    const double
@@ -425,8 +424,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
       
       if (flags & update_gradients)
 	{
-	  std::vector<Tensor<2,dim> > shape_grads1 (n_quad);
-	  std::vector<Tensor<2,dim> > shape_grads2 (n_quad);
+	  std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
+	  std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
 
 	  switch (mapping_type)
 	    {
@@ -436,8 +435,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 		mapping.transform_covariant(fe_data.shape_grads[i], 0,
 					    shape_grads1,
 					    mapping_data);
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
@@ -447,17 +446,17 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 		mapping.transform_covariant(fe_data.shape_grads[i], 0,
 					    shape_grads1,
 					    mapping_data);
-		for (unsigned int q=0; q<n_quad; ++q)
+		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
 						 // do second transformation
 		mapping.transform_covariant(shape_grads2, 0, shape_grads1,
 					    mapping_data);
 						 // transpose back
-		for (unsigned int q=0; q<n_quad; ++q)
+		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
 		
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads2[k][d];
 
 		break;
@@ -473,8 +472,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_values (
 						shape_grads2,
 						mapping_data);
 
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    {
 						       // Recompute determinant
 		      const double
@@ -520,8 +519,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 				   // possible
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
 
-  const unsigned int n_dofs = this->dofs_per_cell;
-  const unsigned int n_quad = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.n_quadrature_points;
 				   // offset determines which data set
 				   // to take (all data sets for all
 				   // faces are stored contiguously)
@@ -529,7 +527,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
   const typename QProjector<dim>::DataSetDescriptor dsd;
   const typename QProjector<dim>::DataSetDescriptor offset
     = dsd.face (face, cell->face_orientation(face),
-		n_quad);
+		n_q_points);
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
@@ -544,10 +542,10 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 
 				   // Compute eventual sign changes depending
 				   // on the neighborhood between two faces.
-  std::vector<double> sign_change (n_dofs, 1.0);
+  std::vector<double> sign_change (this->dofs_per_cell, 1.0);
   get_face_sign_change (cell, this->dofs_per_face, sign_change);
   
-  for (unsigned int i=0; i<n_dofs; ++i)
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const unsigned int first = data.shape_function_to_row_table[i];
       
@@ -558,8 +556,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 	      case independent:
 	      case independent_on_cartesian:
 	      {
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_values(first+d,k) = fe_data.shape_values[i][k+offset][d];
 		break;
 	      }
@@ -569,7 +567,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 	      {
 						 // Use auxiliary vector
 						 // for transformation
-		std::vector<Tensor<1,dim> > shape_values (n_quad);
+		std::vector<Tensor<1,dim> > shape_values (n_q_points);
 		if (mapping_type == covariant)
 		  mapping.transform_covariant(fe_data.shape_values[i], offset,
 					      shape_values, mapping_data);
@@ -578,7 +576,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 						  shape_values, mapping_data);
 		
 						 // then copy over to target:
-		for (unsigned int k=0; k<n_quad; ++k)
+		for (unsigned int k=0; k<n_q_points; ++k)
 		  {
 						     // recompute
 						     // determinant. note that
@@ -612,8 +610,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
       
       if (flags & update_gradients)
 	{
-	  std::vector<Tensor<2,dim> > shape_grads1 (n_quad);
-	  std::vector<Tensor<2,dim> > shape_grads2 (n_quad);
+	  std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
+	  std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
 
 	  switch (mapping_type)
 	    {
@@ -622,8 +620,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 	      {
 		mapping.transform_covariant(fe_data.shape_grads[i], offset,
 					    shape_grads1, mapping_data);
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
@@ -633,17 +631,17 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 		mapping.transform_covariant(fe_data.shape_grads[i], offset,
 					    shape_grads1,
 					    mapping_data);
-		for (unsigned int q=0; q<n_quad; ++q)
+		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
 						 // do second transformation
 		mapping.transform_covariant(shape_grads2, 0, shape_grads1,
 					    mapping_data);
 						 // transpose back
-		for (unsigned int q=0; q<n_quad; ++q)
+		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
 		
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
@@ -658,8 +656,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 						shape_grads2,
 						mapping_data);
 
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    {
 						       // recompute
 						       // determinant in the
@@ -702,8 +700,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 				   // possible
   InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
 
-  const unsigned int n_dofs = this->dofs_per_cell;
-  const unsigned int n_quad = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.n_quadrature_points;
 				   // offset determines which data set
 				   // to take (all data sets for all
 				 // sub-faces are stored contiguously)
@@ -711,7 +708,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
   const typename QProjector<dim>::DataSetDescriptor dsd;
   const typename QProjector<dim>::DataSetDescriptor offset
     = dsd.subface (face, subface, cell->face_orientation(face),
-		    n_quad);
+		    n_q_points);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
@@ -722,8 +719,13 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 //TODO: Size assertions
 
 //TODO: Sign change for the face DoFs!
+
+				   // Compute eventual sign changes depending
+				   // on the neighborhood between two faces.
+  std::vector<double> sign_change (this->dofs_per_cell, 1.0);
+  get_face_sign_change (cell, this->dofs_per_face, sign_change);
   
-  for (unsigned int i=0; i<n_dofs; ++i)
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const unsigned int first = data.shape_function_to_row_table[i];
       
@@ -734,8 +736,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 	      case independent:
 	      case independent_on_cartesian:
 	      {
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_values(first+d,k) = fe_data.shape_values[i][k+offset][d];
 		break;
 	      }
@@ -745,7 +747,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 	      {
 						 // Use auxiliary vector for
 						 // transformation
-		std::vector<Tensor<1,dim> > shape_values (n_quad);
+		std::vector<Tensor<1,dim> > shape_values (n_q_points);
 		if (mapping_type == covariant)
 		  mapping.transform_covariant(fe_data.shape_values[i], offset,
 					      shape_values, mapping_data);
@@ -754,7 +756,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 						  shape_values, mapping_data);
 		    
 						 // then copy over to target:
-		for (unsigned int k=0; k<n_quad; ++k)
+		for (unsigned int k=0; k<n_q_points; ++k)
 		  {
 						     // recompute
 						     // determinant. note that
@@ -775,7 +777,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 		    
 		    for (unsigned int d=0; d<dim; ++d)
 		      data.shape_values(first+d,k)
-			= /* sign_change[i] * */ (shape_values[k][d] / J);
+			= sign_change[i] * (shape_values[k][d] / J);
 		  }
 
 		break;
@@ -788,8 +790,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
       
       if (flags & update_gradients)
 	{
-	  std::vector<Tensor<2,dim> > shape_grads1 (n_quad);
-	  std::vector<Tensor<2,dim> > shape_grads2 (n_quad);
+	  std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
+	  std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
 
 	  switch (mapping_type)
 	    {
@@ -798,8 +800,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 	      {
 		mapping.transform_covariant(fe_data.shape_grads[i], offset,
 					    shape_grads1, mapping_data);
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
@@ -809,17 +811,17 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 		mapping.transform_covariant(fe_data.shape_grads[i], offset,
 					    shape_grads1,
 					    mapping_data);
-		for (unsigned int q=0; q<n_quad; ++q)
+		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
 						 // do second transformation
 		mapping.transform_covariant(shape_grads2, 0, shape_grads1,
 					    mapping_data);
 						 // transpose back
-		for (unsigned int q=0; q<n_quad; ++q)
+		for (unsigned int q=0; q<n_q_points; ++q)
 		  shape_grads2[q] = transpose(shape_grads1[q]);
 		
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
@@ -834,8 +836,8 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 						shape_grads2,
 						mapping_data);
 
-		for (unsigned int k=0; k<n_quad; ++k)
-		  for (unsigned int d=0;d<dim;++d)
+		for (unsigned int k=0; k<n_q_points; ++k)
+		  for (unsigned int d=0; d<dim; ++d)
 		    {
 						       // recompute
 						       // determinant in the
@@ -843,7 +845,7 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 		      const double
 			J = data.cell_JxW_values[k] / quadrature.weight(k);
 		      data.shape_gradients[first+d][k]
-			= /* sign_change[i] * */ shape_grads2[k][d] / J;
+			= sign_change[i] * shape_grads2[k][d] / J;
 		    }
 		break;
 	      }
