@@ -13,7 +13,7 @@
 
 // like rt_11, but use FESubfaceValues
 //
-// the test presently fails because of the issue with computing the
+// the test used to fail because of the issue with computing the
 // normals using FEFaceValue, where FEFaceValue by accident uses the
 // *face* mapping, not the *cell* mapping to compute the Piola
 // transform (leading to a missing power of h in the determinant)

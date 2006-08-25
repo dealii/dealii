@@ -506,11 +506,11 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 // 	 ExcNotImplemented());
 //TODO: Size assertions
 
-  // Create table with sign changes, due to the special structure of the RT elements.
-  // TODO: Preliminary hack to demonstrate the overall prinicple!
+// Create table with sign changes, due to the special structure of the RT elements.
+// TODO: Preliminary hack to demonstrate the overall prinicple!
 
-  // Compute eventual sign changes depending on the neighborhood
-  // between two faces.
+				   // Compute eventual sign changes depending
+				   // on the neighborhood between two faces.
   std::vector<double> sign_change (n_dofs, 1.0);
   get_face_sign_change (cell, sign_change);
   
@@ -524,37 +524,54 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 	    {
 	      case independent:
 	      case independent_on_cartesian:
+	      {
 		for (unsigned int k=0; k<n_quad; ++k)
 		  for (unsigned int d=0;d<dim;++d)
 		    data.shape_values(first+d,k) = fe_data.shape_values[i][k+offset][d];
 		break;
+	      }
+	      
 	      case covariant:
 	      case contravariant:
-		if (true)
-		  {
-						     // Use auxiliary vector for transformation
-		    std::vector<Tensor<1,dim> > shape_values (n_quad);
-		    if (mapping_type == covariant)
-		      mapping.transform_covariant(fe_data.shape_values[i], offset,
+	      {
+						 // Use auxiliary vector
+						 // for transformation
+		std::vector<Tensor<1,dim> > shape_values (n_quad);
+		if (mapping_type == covariant)
+		  mapping.transform_covariant(fe_data.shape_values[i], offset,
+					      shape_values, mapping_data);
+		else
+		  mapping.transform_contravariant(fe_data.shape_values[i], offset,
 						  shape_values, mapping_data);
-		    else
-		      mapping.transform_contravariant(fe_data.shape_values[i], offset,
-						      shape_values, mapping_data);
+		
+						 // then copy over to target:
+		for (unsigned int k=0; k<n_quad; ++k)
+		  {
+						     // recompute
+						     // determinant. note that
+						     // we have to take the
+						     // *cell* transformation
+						     // (cell_JxW_values)
+						     // because the usual
+						     // JxW_values field
+						     // contains the
+						     // transformation of the
+						     // face in
+						     // fill_fe_face_values
+		    const double
+		      J = (mapping_type == contravariant ?
+			   data.cell_JxW_values[k] / quadrature.weight(k)
+			   :
+			   1.0);
 		    
-						     // then copy over to target:
-		    for (unsigned int k=0; k<n_quad; ++k)
-		      {
-			// Recompute determinant
-//TODO: Note that the Jacobian we compute here is that of the transformation from the reference FACE to the real FACE. However, what we need is the Jacobian of the transformation of the reference to the real CELL, which differs by one power of h. Consequently, the tests fe/rt_{11,13,14,15} presently compute the wrong results
-			double J = 1.0;
-			if (mapping_type == contravariant)
-			  J = data.cell_JxW_values[k] / quadrature.weight(k);
-
-			for (unsigned int d=0; d<dim; ++d)
-			  data.shape_values(first+d,k) = sign_change[i] * (shape_values[k][d] / J);
-		      }
+		    for (unsigned int d=0; d<dim; ++d)
+		      data.shape_values(first+d,k)
+			= sign_change[i] * (shape_values[k][d] / J);
 		  }
+		
 		break;
+	      }
+	      
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
@@ -564,17 +581,22 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 	{
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_quad);
 	  std::vector<Tensor<2,dim> > shape_grads2 (n_quad);
+
 	  switch(mapping_type)
 	    {
 	      case independent:
 	      case independent_on_cartesian:
+	      {
 		mapping.transform_covariant(fe_data.shape_grads[i], offset,
 					    shape_grads1, mapping_data);
 		for (unsigned int k=0; k<n_quad; ++k)
 		  for (unsigned int d=0;d<dim;++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
+	      }
+	      
 	      case covariant:
+	      {
 		mapping.transform_covariant(fe_data.shape_grads[i], offset,
 					    shape_grads1,
 					    mapping_data);
@@ -591,8 +613,10 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 		  for (unsigned int d=0;d<dim;++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
-
+	      }
+	      
 	      case contravariant:
+	      {
 		mapping.transform_covariant(fe_data.shape_grads[i], offset,
 					    shape_grads1,
 					    mapping_data);
@@ -604,15 +628,17 @@ FE_PolyTensor<POLY,dim>::fill_fe_face_values (
 		for (unsigned int k=0; k<n_quad; ++k)
 		  for (unsigned int d=0;d<dim;++d)
 		    {
-		      // Recompute determinant
-//TODO: Note that the Jacobian we compute here is that of the transformation from the reference FACE to the real FACE. However, what we need is the Jacobian of the transformation of the reference to the real CELL, which differs by one power of h. Consequently, the tests fe/rt_{11,13,14,15} presently compute the wrong results
-
-		      double J = data.cell_JxW_values[k] / quadrature.weight(k);
-		      data.shape_gradients[first+d][k] = sign_change[i] * 
-			shape_grads2[k][d] / J;
+						       // recompute
+						       // determinant in the
+						       // same way as above
+		      const double
+			J = data.cell_JxW_values[k] / quadrature.weight(k);
+		      data.shape_gradients[first+d][k]
+			= sign_change[i] * shape_grads2[k][d] / J;
 		    }
 		break;
-		
+	      }
+	      
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
@@ -674,29 +700,54 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 	    {
 	      case independent:
 	      case independent_on_cartesian:
+	      {
 		for (unsigned int k=0; k<n_quad; ++k)
 		  for (unsigned int d=0;d<dim;++d)
 		    data.shape_values(first+d,k) = fe_data.shape_values[i][k+offset][d];
 		break;
+	      }
+	      
 	      case covariant:
 	      case contravariant:
-		if (true)
-		  {
-						     // Use auxiliary vector for transformation
-		    std::vector<Tensor<1,dim> > shape_values (n_quad);
-		    if (mapping_type == covariant)
-		      mapping.transform_covariant(fe_data.shape_values[i], offset,
+	      {
+						 // Use auxiliary vector for
+						 // transformation
+		std::vector<Tensor<1,dim> > shape_values (n_quad);
+		if (mapping_type == covariant)
+		  mapping.transform_covariant(fe_data.shape_values[i], offset,
+					      shape_values, mapping_data);
+		else
+		  mapping.transform_contravariant(fe_data.shape_values[i], offset,
 						  shape_values, mapping_data);
-		    else
-		      mapping.transform_contravariant(fe_data.shape_values[i], offset,
-						      shape_values, mapping_data);
 		    
-						     // then copy over to target:
-		    for (unsigned int k=0; k<n_quad; ++k)
-		      for (unsigned int d=0; d<dim; ++d)
-			data.shape_values(first+d,k) = shape_values[k][d];
+						 // then copy over to target:
+		for (unsigned int k=0; k<n_quad; ++k)
+		  {
+						     // recompute
+						     // determinant. note that
+						     // we have to take the
+						     // *cell* transformation
+						     // (cell_JxW_values)
+						     // because the usual
+						     // JxW_values field
+						     // contains the
+						     // transformation of the
+						     // face in
+						     // fill_fe_face_values
+		    const double
+		      J = (mapping_type == contravariant ?
+			   data.cell_JxW_values[k] / quadrature.weight(k)
+			   :
+			   1.0);
+		    
+		    for (unsigned int d=0; d<dim; ++d)
+		      data.shape_values(first+d,k)
+			= /* sign_change[i] * */ (shape_values[k][d] / J);
 		  }
+
 		break;
+	      }
+	      
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
@@ -706,17 +757,22 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 	{
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_quad);
 	  std::vector<Tensor<2,dim> > shape_grads2 (n_quad);
+
 	  switch(mapping_type)
 	    {
 	      case independent:
 	      case independent_on_cartesian:
+	      {
 		mapping.transform_covariant(fe_data.shape_grads[i], offset,
 					    shape_grads1, mapping_data);
 		for (unsigned int k=0; k<n_quad; ++k)
 		  for (unsigned int d=0;d<dim;++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
+	      }
+	      
 	      case covariant:
+	      {
 		mapping.transform_covariant(fe_data.shape_grads[i], offset,
 					    shape_grads1,
 					    mapping_data);
@@ -733,6 +789,32 @@ FE_PolyTensor<POLY,dim>::fill_fe_subface_values (
 		  for (unsigned int d=0;d<dim;++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
+	      }
+	      
+	      case contravariant:
+	      {
+		mapping.transform_covariant(fe_data.shape_grads[i], offset,
+					    shape_grads1,
+					    mapping_data);
+
+		mapping.transform_contravariant(shape_grads1, 0,
+						shape_grads2,
+						mapping_data);
+
+		for (unsigned int k=0; k<n_quad; ++k)
+		  for (unsigned int d=0;d<dim;++d)
+		    {
+						       // recompute
+						       // determinant in the
+						       // same way as above
+		      const double
+			J = data.cell_JxW_values[k] / quadrature.weight(k);
+		      data.shape_gradients[first+d][k]
+			= /* sign_change[i] * */ shape_grads2[k][d] / J;
+		    }
+		break;
+	      }
+
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
