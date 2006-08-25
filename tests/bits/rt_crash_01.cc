@@ -19,6 +19,7 @@
 #include <numerics/vectors.h>
 #include <lac/vector.h>
 #include <dofs/dof_tools.h>
+#include <numerics/data_out.h>
 
 // check an abort in FEPolyTensor when used with RaviartThomas
 // elements, when computing some sort of edge directions. This is the
@@ -63,6 +64,13 @@ check_this (const DoFHandler<dim> &dof_handler)
 			solution);
   cm.distribute (solution);
 
+				   // all values of the projected solution
+				   // should be close around 1 (the value of
+				   // the original function)
+  for (unsigned int i=0; i<solution.size(); ++i)
+    Assert (std::fabs (solution(i)-1) < 1e-6,
+	    ExcInternalError());
+  
   // Evaluate error
   Vector<double> cellwise_errors (dof_handler.get_tria ().n_active_cells());
   VectorTools::integrate_difference (dof_handler, solution, test_func,
@@ -70,7 +78,15 @@ check_this (const DoFHandler<dim> &dof_handler)
                                      VectorTools::L2_norm);
   const double p_l2_error = cellwise_errors.l2_norm();
 
-  Assert (p_l2_error < 1e-14, ExcInternalError());
-  
   deallog << "L2_Error : " << p_l2_error << std::endl;
+  
+  {
+    DataOut<dim> data_out;
+    data_out.attach_dof_handler (dof_handler);
+    data_out.add_data_vector (solution, "u");
+    data_out.build_patches ();
+    data_out.write_gnuplot (deallog.get_file_stream());
+  }
+  
+  Assert (p_l2_error < 1e-12, ExcInternalError());  
 }
