@@ -677,8 +677,6 @@ int plot_shapes (DoFHandler<2> &dof_handler)
 
       solution (dof) = 0.0;
     }
-
-  return (0);
 }
 
 
@@ -715,8 +713,7 @@ void check (const FiniteElement<2> &fe)
       deallog << "Dofs total " << dof_handler->n_dofs () << std::endl;
 
 				       // Alloc some DoFs
-      Vector<double> solution;
-      solution.reinit (dof_handler->n_dofs ());
+      Vector<double> solution(dof_handler->n_dofs ());
 
 				       // Project solution onto FE field
       ConstraintMatrix     hn_constraints;
