@@ -1,204 +1,49 @@
 
-DEAL::n_dofs=35
-DEAL:cg::Starting value 2.36
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_0, rel. error=0
-DEAL:cg::Starting value 2.47
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_1, rel. error=0
-DEAL:cg::Starting value 3.28
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_2, rel. error=0.0200
-DEAL:cg::Starting value 3.36
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_3, rel. error=0.0213
-DEAL::n_dofs=35
-DEAL:cg::Starting value 2.29
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_0, rel. error=0
-DEAL:cg::Starting value 2.45
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_1, rel. error=0
-DEAL:cg::Starting value 3.23
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_2, rel. error=0.0210
-DEAL:cg::Starting value 3.33
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_3, rel. error=0.0229
-DEAL::n_dofs=35
-DEAL:cg::Starting value 2.29
-DEAL:cg::Convergence step 14 value 0
-DEAL::FE_Q<3>(1), P_0, rel. error=0
-DEAL:cg::Starting value 2.39
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_1, rel. error=0
-DEAL:cg::Starting value 3.18
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_2, rel. error=0.0147
-DEAL:cg::Starting value 3.25
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_3, rel. error=0.0160
-DEAL::n_dofs=35
-DEAL:cg::Starting value 2.29
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_0, rel. error=0
-DEAL:cg::Starting value 2.35
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_1, rel. error=0
-DEAL:cg::Starting value 3.13
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_2, rel. error=0.0154
-DEAL:cg::Starting value 3.18
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_3, rel. error=0.0156
-DEAL::n_dofs=35
-DEAL:cg::Starting value 2.29
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_0, rel. error=0
-DEAL:cg::Starting value 2.42
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_1, rel. error=0
-DEAL:cg::Starting value 3.21
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_2, rel. error=0.0162
-DEAL:cg::Starting value 3.30
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_3, rel. error=0.0175
-DEAL::n_dofs=35
-DEAL:cg::Starting value 2.29
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_0, rel. error=0
-DEAL:cg::Starting value 2.44
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_1, rel. error=0
-DEAL:cg::Starting value 3.22
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_2, rel. error=0.0193
-DEAL:cg::Starting value 3.31
-DEAL:cg::Convergence step 15 value 0
-DEAL::FE_Q<3>(1), P_3, rel. error=0.0206
-DEAL::n_dofs=35
-DEAL:cg::Starting value 2.29
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_0, rel. error=0
-DEAL:cg::Starting value 2.37
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_1, rel. error=0
-DEAL:cg::Starting value 3.16
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_2, rel. error=0.0158
-DEAL:cg::Starting value 3.22
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(1), P_3, rel. error=0.0165
-DEAL::n_dofs=195
-DEAL:cg::Starting value 1.44
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_0, rel. error=0
-DEAL:cg::Starting value 1.54
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_1, rel. error=0
-DEAL:cg::Starting value 1.99
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_2, rel. error=0
-DEAL:cg::Starting value 2.06
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_3, rel. error=0.00312
-DEAL:cg::Starting value 2.20
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_4, rel. error=0.00305
-DEAL::n_dofs=194
-DEAL:cg::Starting value 1.35
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(2), P_0, rel. error=0
-DEAL:cg::Starting value 1.52
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(2), P_1, rel. error=0
-DEAL:cg::Starting value 1.93
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(2), P_2, rel. error=0
-DEAL:cg::Starting value 2.02
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(2), P_3, rel. error=0.00316
-DEAL:cg::Starting value 2.16
-DEAL:cg::Convergence step 16 value 0
-DEAL::FE_Q<3>(2), P_4, rel. error=0.00295
-DEAL::n_dofs=194
-DEAL:cg::Starting value 1.35
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_0, rel. error=0
-DEAL:cg::Starting value 1.42
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_1, rel. error=0
-DEAL:cg::Starting value 1.85
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_2, rel. error=0
-DEAL:cg::Starting value 1.91
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_3, rel. error=0.00234
-DEAL:cg::Starting value 2.05
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_4, rel. error=0.00227
-DEAL::n_dofs=194
-DEAL:cg::Starting value 1.35
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_0, rel. error=0
-DEAL:cg::Starting value 1.34
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_1, rel. error=0
-DEAL:cg::Starting value 1.74
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_2, rel. error=0
-DEAL:cg::Starting value 1.76
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_3, rel. error=0.00211
-DEAL:cg::Starting value 1.89
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_4, rel. error=0.00204
-DEAL::n_dofs=194
-DEAL:cg::Starting value 1.35
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_0, rel. error=0
-DEAL:cg::Starting value 1.48
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_1, rel. error=0
-DEAL:cg::Starting value 1.90
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_2, rel. error=0
-DEAL:cg::Starting value 1.99
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_3, rel. error=0.00267
-DEAL:cg::Starting value 2.13
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_4, rel. error=0.00253
-DEAL::n_dofs=194
-DEAL:cg::Starting value 1.35
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_0, rel. error=0
-DEAL:cg::Starting value 1.50
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_1, rel. error=0
-DEAL:cg::Starting value 1.92
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_2, rel. error=0
-DEAL:cg::Starting value 2.01
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_3, rel. error=0.00288
-DEAL:cg::Starting value 2.14
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_4, rel. error=0.00270
-DEAL::n_dofs=194
-DEAL:cg::Starting value 1.35
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_0, rel. error=0
-DEAL:cg::Starting value 1.38
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_1, rel. error=0
-DEAL:cg::Starting value 1.80
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_2, rel. error=0
+DEAL::n_dofs=7
+DEAL:cg::Starting value 1.22
+DEAL:cg::Convergence step 7 value 0
+DEAL::FE_Q<2>(1), P_0, rel. error=0
+DEAL:cg::Starting value 2.41
+DEAL:cg::Convergence step 7 value 0
+DEAL::FE_Q<2>(1), P_1, rel. error=0
+DEAL:cg::Starting value 3.59
+DEAL:cg::Convergence step 7 value 0
+DEAL::FE_Q<2>(1), P_2, rel. error=0.00849
+DEAL:cg::Starting value 4.78
+DEAL:cg::Convergence step 7 value 0
+DEAL::FE_Q<2>(1), P_3, rel. error=0.0178
+DEAL::n_dofs=19
+DEAL:cg::Starting value 0.936
+DEAL:cg::Convergence step 13 value 0
+DEAL::FE_Q<2>(2), P_0, rel. error=0
 DEAL:cg::Starting value 1.84
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_3, rel. error=0.00221
-DEAL:cg::Starting value 1.98
-DEAL:cg::Convergence step 17 value 0
-DEAL::FE_Q<3>(2), P_4, rel. error=0.00214
+DEAL:cg::Convergence step 13 value 0
+DEAL::FE_Q<2>(2), P_1, rel. error=0
+DEAL:cg::Starting value 2.74
+DEAL:cg::Convergence step 13 value 0
+DEAL::FE_Q<2>(2), P_2, rel. error=0
+DEAL:cg::Starting value 3.64
+DEAL:cg::Convergence step 13 value 0
+DEAL::FE_Q<2>(2), P_3, rel. error=0.000954
+DEAL:cg::Starting value 4.55
+DEAL:cg::Convergence step 13 value 0
+DEAL::FE_Q<2>(2), P_4, rel. error=0.00254
+DEAL::n_dofs=37
+DEAL:cg::Starting value 0.592
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_Q<2>(3), P_0, rel. error=0
+DEAL:cg::Starting value 1.16
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_Q<2>(3), P_1, rel. error=0
+DEAL:cg::Starting value 1.75
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_Q<2>(3), P_2, rel. error=0
+DEAL:cg::Starting value 2.37
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_Q<2>(3), P_3, rel. error=0
+DEAL:cg::Starting value 3.02
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_Q<2>(3), P_4, rel. error=0.000137
+DEAL:cg::Starting value 3.70
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_Q<2>(3), P_5, rel. error=0.000443

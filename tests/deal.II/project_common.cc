@@ -333,6 +333,7 @@ void test_with_2d_deformed_refined_mesh (const FiniteElement<dim> &fe,
 	  default:
 		Assert (false, ExcNotImplemented());
 	}
+      triangulation.execute_coarsening_and_refinement ();
       
       do_project (triangulation, fe, p, order_difference);
     }
