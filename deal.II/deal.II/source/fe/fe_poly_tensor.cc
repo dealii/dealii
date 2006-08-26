@@ -35,6 +35,7 @@ namespace
  * algorithm, which determines the DoFs, which need this sign change for a
  * given cell.
  */
+#if deal_II_dimension == 1
   void
   get_face_sign_change (const Triangulation<1>::cell_iterator &,
 			const unsigned int                     ,
@@ -43,8 +44,9 @@ namespace
 				     // nothing to do in 1d
     std::fill (face_sign.begin (), face_sign.end (), 1.0);
   }
-  
+#endif  
 
+#if deal_II_dimension == 2
   void
   get_face_sign_change (const Triangulation<2>::cell_iterator &cell,
 			const unsigned int                     dofs_per_face,
@@ -89,9 +91,10 @@ namespace
 	  }
       }
   }
+#endif
 
 
-
+#if deal_II_dimension == 3
   void
   get_face_sign_change (const Triangulation<3>::cell_iterator &/*cell*/,
 			const unsigned int                     /*dofs_per_face*/,
@@ -100,6 +103,7 @@ namespace
     std::fill (face_sign.begin (), face_sign.end (), 1.0);
 //TODO: think about what it would take here    
   }
+#endif
 }
 
 
