@@ -19,7 +19,7 @@
 
 
 
-char logname[] = "abf_projection_01/output";
+char logname[] = "fe_sys_projection_01/output";
 #include "deformed_projection.h"
 
 
