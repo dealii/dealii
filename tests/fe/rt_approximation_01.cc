@@ -15,6 +15,8 @@
  * check the projection error for a given polynomial. results should
  * be within rounding error if the polynomial is of low-enough order
  * to be represented by the ansatz space
+ *
+ * mostly like deal.II/project_rt_*
  */
 
 
@@ -405,8 +407,11 @@ double TestProjection (Mapping<2> &mapping,
 	    }
 	}
 
-      sprintf (buf, "Deg %i  ErrU %e  ErrV %e\n", deg, err_u, err_v);
-      deallog << buf;
+      deallog << dof_handler->get_fe().get_name()
+	      << ", testfun(" << deg
+	      << "), error_u=" << err_u
+	      << ", error_v=" << err_v
+	      << std::endl;
     }
 
 
@@ -448,12 +453,15 @@ int main ()
   dof_handler->distribute_dofs (fe);
 
   QGauss6<2> quad_temp;
-  sprintf (buf, "DoFs per Quad: %i per Line %i per Vert %i\n", fe.dofs_per_quad, fe.dofs_per_line, fe.dofs_per_vertex);
-  deallog << buf;
-  sprintf (buf, "QPoints %i\n", quad_temp.n_quadrature_points);
-  deallog << buf;
+  deallog << "DoFs per quad: " << fe.dofs_per_quad
+	  << ", dofs per line: " << fe.dofs_per_line
+	  << ", dofs per vertex: " <<  fe.dofs_per_vertex
+	  << std::endl;
+  deallog << "n_q_points=" << quad_temp.n_quadrature_points
+	  << std::endl;
 
-				   // Create an deformation object for the Eulerian mapping
+				   // Create an deformation object for
+				   // the Eulerian mapping
   FESystem<2> fe_def (FE_Q<2>(1), 2);
   dof_handler_def = new DoFHandler<2> (tria_test);
   dof_handler_def->distribute_dofs (fe_def);
@@ -482,8 +490,7 @@ int main ()
 	VectorTools::project (*dof_handler_def, hn_constraints_def,
 			      QGauss6<2> (), TestDef1<2>(2, rotat),
 			      deformation);
-	sprintf (buf, "phi = %e\n", rotat);
-	deallog << buf;
+	deallog << "phi = " << rotat << std::endl;
 	TestProjection (mapping_euler, dof_handler);
       }
 
@@ -493,8 +500,7 @@ int main ()
 	VectorTools::project (*dof_handler_def, hn_constraints_def,
 			      QGauss6<2> (), TestDef2<2>(2, scale),
 			      deformation);
-	sprintf (buf, "Scale = %e\n", scale);
-	deallog << buf;
+	deallog << "scale = " << scale << std::endl;
 	TestProjection (mapping_euler, dof_handler);
       }
 
@@ -504,8 +510,7 @@ int main ()
 	VectorTools::project (*dof_handler_def, hn_constraints_def,
 			      QGauss6<2> (), TestDef3<2>(2, scale),
 			      deformation);
-	sprintf (buf, "Scale = %e\n", scale);
-	deallog << buf;
+	deallog << "scale = " << scale << std::endl;
 	TestProjection (mapping_euler, dof_handler);
       }
 
@@ -516,8 +521,7 @@ int main ()
 	deformation (i) = 0.35 * (c - 0.5);
       }
 
-    sprintf (buf, "Arbitrary\n");
-    deallog << buf;
+    deallog << "Arbitrary\n" << std::endl;
     TestProjection (mapping_euler, dof_handler);
   }
   
