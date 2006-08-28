@@ -246,7 +246,7 @@ double point_value (const DoFHandler<dim> &dof,
 {                              
                             // Define a map that maps the unit cell to a 
                             // a general grid cell with straight lines in 
-                            // <dim> dimension
+                            // dim dimensions
   static const MappingQ1<dim> mapping;
   const FiniteElement<dim>& fe = dof.get_fe();
 
