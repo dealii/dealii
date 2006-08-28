@@ -224,18 +224,6 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * @p FiniteElementData.
 				      */
     static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
-    
-				     /**
-				      * Allow access from other dimensions.
-				      */
-    template <int dim1> friend class FE_DGP;
-
-				     /**
-				      * Allows @p MappingQ class
-				      * access to build_renumbering
-				      * function.
-				      */
-    friend class MappingQ<dim>;
 };
 
 /* @} */

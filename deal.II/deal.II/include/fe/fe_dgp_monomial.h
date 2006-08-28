@@ -231,13 +231,6 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
 				      * constructor.
 				      */
     void initialize_restriction ();
-
-				     /**
-				      * Allows @p MappingQ class
-				      * access to build_renumbering
-				      * function.
-				      */
-    friend class MappingQ<dim>;
 };
 
 /*@}*/
