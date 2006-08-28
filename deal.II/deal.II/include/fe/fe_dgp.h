@@ -26,15 +26,34 @@ template <int dim> class MappingQ;
  * Discontinuous finite elements based on Legendre polynomials.
  *
  * This finite element implements complete polynomial spaces, that is,
- * dim-dimensional polynomials of degree p. The underlying
- * polynomials form a Legendre basis on the unit square. Thus, the
- * mass matrix is diagonal, if the grid cells are parallelograms.
+ * dim-dimensional polynomials of degree p. For example, in 2d the
+ * element FE_DGP(1) would represent the span of the functions
+ * $\{1,\hat x,\hat y\}$, which is in contrast to the element FE_DGQ(1)
+ * that is formed by the span of $\{1,\hat x,\hat y,\hat x\hat y\}$. Since the
+ * DGP space has only three unknowns for each quadrilateral, it is
+ * immediately clear that this element can not be continuous.
+ *
+ * The basis functions for this element are chosen to form a Legendre
+ * basis on the unit square. Thus, the mass matrix is diagonal, if the
+ * grid cells are parallelograms. Note that this is in contrast to the
+ * FE_DGPMonomial class that actually uses the monomial basis listed
+ * above as basis functions.
  *
  * The shape functions are defined in the class PolynomialSpace. The
  * polynomials used inside PolynomialSpace are Polynomials::Legendre
  * up to degree <tt>p</tt> given in FE_DGP. For the ordering of the
  * basis functions, refer to PolynomialSpace, remebering that the
  * Legendre polynomials are ordered by ascending degree.
+ *
+ *
+ * <h3>Transformation properties</h3>
+ *
+ * It is worth noting that under a (bi-, tri-)linear mapping, the
+ * space described by this element does not contain $P(k)$, even if we
+ * use a basis of polynomials of degree $k$. Consequently, for
+ * example, on meshes with non-affine cells, a linear function can not
+ * be exactly represented by elements of type FE_DGP(1) or
+ * FE_DGPMonomial(1).
  *
  * @author Guido Kanschat, 2001, 2002, Ralf Hartmann 2004
  */

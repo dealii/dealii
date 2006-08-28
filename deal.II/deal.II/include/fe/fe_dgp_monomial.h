@@ -24,14 +24,37 @@ template <int dim> class MappingQ;
 /*@{*/
 
 /**
- * Discontinuous finite elements based on monomials of degree up to
- * <tt>p</tt>.
+ * Discontinuous finite elements based on monomials.
  *
- * This finite element makes use of the PolynomialsP class which
- * implements <tt>dim</tt>-dimensional polynomials of degree
- * <tt>p</tt> based the Polynomials::Polynomial and the
- * PolynomialSpace classes.
+ * This finite element implements complete polynomial spaces, that is,
+ * dim-dimensional polynomials of degree p. For example, in 2d the
+ * element FE_DGP(1) would represent the span of the functions
+ * $\{1,\hat x,\hat y\}$, which is in contrast to the element FE_DGQ(1)
+ * that is formed by the span of $\{1,\hat x,\hat y,\hat x\hat y\}$. Since the
+ * DGP space has only three unknowns for each quadrilateral, it is
+ * immediately clear that this element can not be continuous.
  *
+ * The basis functions for this element are chosen to be the monomials
+ * listed above. Note that this is the main difference to the FE_DGP
+ * class that uses a set of polynomials of complete degree
+ * <code>p</code> that form a Legendre basis on the unit square. Thus,
+ * there, the mass matrix is diagonal, if the grid cells are
+ * parallelograms. The basis here does not have this property;
+ * however, it is simpler to compute. On the other hand, this element
+ * has the additional disadvantage that the local cell matrices
+ * usually have a worse condition number than the ones originating
+ * from the FE_DGP element.
+ *
+ *
+ * <h3>Transformation properties</h3>
+ *
+ * It is worth noting that under a (bi-, tri-)linear mapping, the
+ * space described by this element does not contain $P(k)$, even if we
+ * use a basis of polynomials of degree $k$. Consequently, for
+ * example, on meshes with non-affine cells, a linear function can not
+ * be exactly represented by elements of type FE_DGP(1) or
+ * FE_DGPMonomial(1).
+ * 
  * @author Ralf Hartmann, 2004
  */
 template <int dim>
