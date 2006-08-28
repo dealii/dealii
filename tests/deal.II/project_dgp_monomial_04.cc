@@ -14,6 +14,11 @@
 
 // check that VectorTools::project works for DGP_Monomial elements correctly
 
+// note that for mapped DGP(k) spaces, P(k) is not in the range of the
+// mapping. However, P(k/2) is. Therefore, we have a gap for
+// convergence, which we have to specify in the last argument to the
+// call below
+
 char logname[] = "project_dgp_monomial_04/output";
 
 
