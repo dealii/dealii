@@ -8,6 +8,9 @@
 # Upon success, store the name of the successful file in $1/cmp
 # in the file $1/OK
 #
+#
+# This is a possible replacement of the hardcoded hierarchies in the
+# tests directory.
 ######################################################################
 
 # Process command line arguments.
@@ -18,7 +21,7 @@
 
 diffout="/dev/null"
 diffopt=""
-result=" "
+result=""
 
 for arg in $* ; do
   if test "x$arg" = "x-v" ; then
@@ -32,24 +35,26 @@ done
 if test -r $1/OK; then
   okname=`cat $1/OK`
   if test "x$okname" != "x" ; then
-    result=" $result $okname"
+    result=" $okname"
     if diff $diffopt $1/output $1/cmp/$okname > $diffout ; then
       touch $1/OK
-      echo $result
+      echo "$result"
       exit 0 ;
     fi
   fi
 fi
+
+rm -f $1/OK
 
 # If this round failed, check all files in this directory
 # If successful, write the name into $1/OK
 
 for file in `cd $1/cmp ; ls` ; do
   if test -f $1/cmp/$file ; then
-    result=" $result $file"
+    result="$result $file"
     if diff $diffopt $1/output $1/cmp/$file > $diffout ; then
       echo $file > $1/OK
-      echo $result
+      echo "$result"
       exit 0 ;
     fi
   fi
@@ -57,6 +62,6 @@ done
 
 # All files failed
 
-echo $result
+echo "$result"
 exit 1
 
