@@ -76,9 +76,10 @@ void test ()
 
   for (unsigned int p=1; p<6-dim; ++p)
     {
-      FESystem<dim>              fe(FE_Q<dim>(p), 2,
-				    FE_Q<dim>(p+1), 1);
-      DoFHandler<dim>        dof_handler(triangulation);
+      FE_Q<dim> fe1(p);
+      FE_Q<dim> fe2(p+1);
+      FESystem<dim> fe(fe1, 2, fe2 , 1);
+      DoFHandler<dim> dof_handler(triangulation);
       dof_handler.distribute_dofs (fe);
 
       ConstraintMatrix constraints;
