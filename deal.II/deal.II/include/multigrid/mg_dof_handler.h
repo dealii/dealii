@@ -19,6 +19,9 @@
 #include <multigrid/mg_dof_iterator_selector.h>
 
 
+/*!@addtogroup mg */
+/*@{*/
+
 
 /**
  * This class manages degrees of freedom for a multilevel hierarchy of
