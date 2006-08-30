@@ -54,6 +54,29 @@ template <int dim> class MappingQ;
  * example, on meshes with non-affine cells, a linear function can not
  * be exactly represented by elements of type FE_DGP(1) or
  * FE_DGPMonomial(1).
+ *
+ * This can be understood by the following 2-d example: consider the
+ * cell with vertices at $(0,0),(1,0),(0,1),(s,s)$:
+ * @image html dgp_doesnt_contain_p.png
+ * 
+ * For this cell, a bilinear transformation $F$ produces the relations
+ * $x=\hat x+\hat x\hat y$ and $y=\hat y+\hat x\hat y$ that correlate
+ * reference coordinates $\hat x,\hat y$ and coordinates in real space
+ * $x,y$. Under this mapping, the constant function is clearly mapped
+ * onto itself, but the two other shape functions of the $P_1$ space,
+ * namely $\phi_1(\hat x,\hat y)=\hat x$ and $\phi_2(\hat x,\hat
+ * y)=\hat y$ are mapped onto
+ * $\phi_1(x,y)=\frac{x-t}{t(s-1)},\phi_2(x,y)=t$ where
+ * $t=\frac{y}{s-x+sx+y-sy}$.
+ *
+ * For the simple case that $s=1$, i.e. if the real cell is the unit
+ * square, the expressions can be simplified to $t=y$ and
+ * $\phi_1(x,y)=x,\phi_2(x,y)=y$. However, for all other cases, the
+ * functions $\phi_1(x,y),\phi_2(x,y)$ are not linear any more, and
+ * neither is any linear combincation of them. Consequently, the
+ * linear functions are not within the range of the mapped $P_1$
+ * polynomials.
+ *
  * 
  * @author Ralf Hartmann, 2004
  */
