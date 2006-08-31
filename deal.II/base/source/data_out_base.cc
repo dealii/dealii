@@ -3412,6 +3412,8 @@ write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
 			    const Deal_II_IntermediateFlags         &/*flags*/,
 			    std::ostream                            &out) 
 {
+  AssertThrow (out, ExcIO());
+
                                    // first write tokens indicating the
                                    // template parameters. we need this in
                                    // here because we may want to read in data
