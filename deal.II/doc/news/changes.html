@@ -351,6 +351,16 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p> Fixed: The
+       <code>DataOutBase::write_deal_II_intermediate</code> function
+       did not check whether it can actually write to the stream
+       given. It would therefore silently do nothing if the file could
+       not be written to. This is now fixed: an exception is generated
+       in that case, as for all the other output functions in that class.
+       <br>
+       (WB 2006/08/31)
+       </p>
+
   <li> <p> Improved: Stack backtraces in multithreaded mode were often
        very long and almost unreadable because the functions in
        namespace <code>Threads</code> that are used to set up new
