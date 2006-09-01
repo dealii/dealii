@@ -597,6 +597,17 @@ namespace FiniteElementDomination
   Domination operator & (const Domination d1,
 			 const Domination d2)
   {
+				     // go through the entire list of
+				     // possibilities. note that if we were
+				     // into speed, obfuscation and cared
+				     // enough, we could implement this
+				     // operator by doing a bitwise & (and) if
+				     // we gave these values to the enum
+				     // values: neither_element_dominates=0,
+				     // this_element_dominates=1,
+				     // other_element_dominates=2,
+				     // either_element_can_dominate=3
+				     // =this_element_dominates|other_element_dominates
     switch (d1)
       {
 	case this_element_dominates:
