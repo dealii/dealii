@@ -2144,10 +2144,14 @@ namespace internal
 	      switch (mother_face_dominates)
 		{
 		  case FiniteElementDomination::this_element_dominates:
+		  case FiniteElementDomination::either_element_can_dominate:
 		  {
-						     // Case 1 (the simple case):
-						     // The coarse element dominates
-						     // the elements on the subfaces
+						     // Case 1 (the simple
+						     // case): The coarse
+						     // element dominates the
+						     // elements on the
+						     // subfaces (or they are
+						     // all the same)
 		    const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
 		    dofs_on_mother.resize (n_dofs_on_mother);
 
@@ -2492,19 +2496,6 @@ namespace internal
 		    break;
 		  }
 
-		  case FiniteElementDomination::either_element_can_dominate:
-		  {
-						     // hm, it isn't quite
-						     // clear what exactly we
-						     // would have to do
-						     // here. sit tight until
-						     // someone trips over the
-						     // following statement
-						     // and see what exactly
-						     // is going on
-		    Assert (false, ExcNotImplemented());
-		  }
-
 		  default:
 							 // we shouldn't get here
 			Assert (false, ExcInternalError());
@@ -2595,6 +2586,16 @@ namespace internal
 						       // neither element has
 						       // any constraints on
 						       // its neighbor.
+						       //
+						       // the only case we know
+						       // for sure how to deal
+						       // with is if neither
+						       // element has any DoFs
+						       // on faces at all
+		      Assert (cell->get_fe().dofs_per_face == 0, ExcNotImplemented());
+		      Assert (cell->neighbor(face)->get_fe().dofs_per_face == 0,
+			      ExcNotImplemented());
+		      
 		      break;
 		    }
 		    
