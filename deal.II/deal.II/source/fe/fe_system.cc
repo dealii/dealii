@@ -2273,6 +2273,136 @@ FESystem<dim>::hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const
 
 
 template <int dim>
+typename FiniteElementData<dim>::Domination
+FESystem<dim>::
+compare_for_domination (const FiniteElement<dim> &fe_other) const
+{
+				   // at present all we can do is to compare
+				   // with other FESystems that have the same
+				   // number of components and bases
+  if (const FESystem<dim> *fe_sys_other
+      = dynamic_cast<const FESystem<dim>*>(&fe_other))
+    {
+      Assert (this->n_components() == fe_sys_other->n_components(),
+	      ExcNotImplemented());
+      Assert (this->n_base_elements() == fe_sys_other->n_base_elements(),
+	      ExcNotImplemented());
+
+      typename FiniteElementData<dim>::Domination
+	domination = FiniteElementData<dim>::either_element_can_dominate;
+
+				       // loop over all base elements and do
+				       // some sanity checks
+      for (unsigned int b=0; b<this->n_base_elements(); ++b)
+	{
+	  Assert (this->base_element(b).n_components() ==
+		  fe_sys_other->base_element(b).n_components(),
+		  ExcNotImplemented());
+	  Assert (this->element_multiplicity(b) ==
+		  fe_sys_other->element_multiplicity(b),
+		  ExcNotImplemented());
+
+					   // for this pair of base elements,
+					   // check who dominates
+	  const typename FiniteElementData<dim>::Domination
+	    base_domination
+	    = (this->base_element(b)
+	       .compare_for_domination (fe_sys_other->base_element(b)));
+
+					   // now see what that means with
+					   // regard to the previous state
+	  switch (domination)
+	    {
+	      case FiniteElementData<dim>::either_element_can_dominate:
+	      {
+						 // we haven't made a decision
+						 // yet, simply copy what this
+						 // pair of bases have to say
+		domination = base_domination;
+		break;
+	      }
+	      
+	      case FiniteElementData<dim>::this_element_dominates:
+	      {
+						 // the present element
+						 // previously dominated. this
+						 // will still be the case if
+						 // either the present base
+						 // dominates or if the two
+						 // bases don't
+						 // care. otherwise, there is
+						 // a tie which we will not be
+						 // able to escape from no
+						 // matter what the other
+						 // pairs of bases are going
+						 // to say
+		switch (base_domination)
+		  {
+		    case FiniteElementData<dim>::either_element_can_dominate:
+		    case FiniteElementData<dim>::this_element_dominates:
+		    {
+		      break;
+		    }
+		    
+		    case FiniteElementData<dim>::other_element_dominates:
+		    case FiniteElementData<dim>::neither_element_dominates:
+		    {
+		      return FiniteElementData<dim>::neither_element_dominates;
+		    }
+
+		    default:
+							   // shouldn't get
+							   // here
+			  Assert (false, ExcInternalError());
+		  }
+		break;
+	      }
+
+	      case FiniteElementData<dim>::other_element_dominates:
+	      {
+						 // the  opposite case
+		switch (base_domination)
+		  {
+		    case FiniteElementData<dim>::either_element_can_dominate:
+		    case FiniteElementData<dim>::other_element_dominates:
+		    {
+		      break;
+		    }
+		    
+		    case FiniteElementData<dim>::this_element_dominates:
+		    case FiniteElementData<dim>::neither_element_dominates:
+		    {
+		      return FiniteElementData<dim>::neither_element_dominates;
+		    }
+
+		    default:
+			  Assert (false, ExcInternalError());
+		  }
+		break;
+	      }
+	      
+	      default:
+		    Assert (false, ExcInternalError());
+	    }
+	}
+
+				       // if we've gotten here, then we've
+				       // either found a winner or either
+				       // element is fine being dominated
+      Assert (domination !=
+	      FiniteElementData<dim>::neither_element_dominates,
+	      ExcInternalError());
+
+      return domination;
+    }
+  
+  Assert (false, ExcNotImplemented());
+  return FiniteElementData<dim>::neither_element_dominates;
+}
+
+
+
+template <int dim>
 FiniteElementData<dim>
 FESystem<dim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 				     const unsigned int            N1,

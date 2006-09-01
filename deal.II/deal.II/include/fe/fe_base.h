@@ -155,6 +155,81 @@ class FiniteElementData
 					    */
 	  H2 = 0x0e
     };
+
+				     /**
+				      * An enum that describes the
+				      * outcome of comparing two elements for
+				      * mutual domination. If one element
+				      * dominates another, then the
+				      * restriction of the space described by
+				      * the dominated element to a face of the
+				      * cell is strictly larger than that of
+				      * the dominating element. For example,
+				      * in 2-d Q(2) elements dominate Q(4)
+				      * elements, because the traces of Q(4)
+				      * elements are quartic polynomials which
+				      * is a space strictly larger than the
+				      * quadratic polynomials (the restriction
+				      * of the Q(2) element). In general, Q(k)
+				      * dominates Q(k') if $k\le k'$.
+				      *
+				      * This enum is used in the
+				      * FiniteElement::compare_fe_for_domination()
+				      * function that is used in the context
+				      * of hp finite element methods when
+				      * determining what to do at faces where
+				      * two different finite elements meet
+				      * (see the hp paper for a more detailed
+				      * description of the following). In that
+				      * case, the degrees of freedom of one
+				      * side need to be constrained to those
+				      * on the other side. The determination
+				      * which side is which is based on the
+				      * outcome of a comparison for mutual
+				      * domination: the dominated side is
+				      * constrained to the dominating one.
+				      *
+				      * Note that there are situations where
+				      * neither side dominates. The hp paper
+				      * lists two case, with the simpler one
+				      * being that a $Q_2\times Q_1$
+				      * vector-valued element (i.e. a
+				      * <code>FESystem(FE_Q(2),1,FE_Q(1),1)</code>)
+				      * meets a $Q_1\times Q_2$ element: here,
+				      * for each of the two vector-components,
+				      * we can define a domination
+				      * relationship, but it is different for
+				      * the two components.
+				      *
+				      * It is clear that the concept of
+				      * domination doesn't matter for
+				      * discontinuous elements. However,
+				      * discontinuous elements may be part of
+				      * vector-valued elements and may
+				      * therefore be compared against each
+				      * other for domination. They should
+				      * return
+				      * <code>either_element_can_dominate</code>
+				      * in that case. Likewise, when comparing
+				      * two identical finite elements, they
+				      * should return this code; the reason is
+				      * that we can not decide which element
+				      * will dominate at the time we look at
+				      * the first component of, for example,
+				      * two $Q_2\times Q_1$ and $Q_2\times
+				      * Q_2$ elements, and have to keep our
+				      * options open until we get to the
+				      * second base element.
+				      */
+    enum Domination
+    {
+	  this_element_dominates,
+	  other_element_dominates,
+	  neither_element_dominates,
+	  either_element_can_dominate
+    };
+    
+
     
 				     /**
 				      * Number of degrees of freedom on
@@ -472,6 +547,7 @@ class FiniteElementData
 };
 
 
+
 // --------- inline and template functions ---------------
 
 template <int dim>
@@ -483,6 +559,7 @@ FiniteElementData<dim>::n_dofs_per_vertex () const
 }
 
 
+
 template <int dim>
 inline
 unsigned int 
@@ -490,6 +567,7 @@ FiniteElementData<dim>::n_dofs_per_line () const
 {
   return dofs_per_line;
 }
+
 
 
 template <int dim>
@@ -501,6 +579,7 @@ FiniteElementData<dim>::n_dofs_per_quad () const
 }
 
 
+
 template <int dim>
 inline
 unsigned int 
@@ -510,6 +589,7 @@ FiniteElementData<dim>::n_dofs_per_hex () const
 }
 
 
+
 template <int dim>
 inline
 unsigned int 
@@ -517,6 +597,7 @@ FiniteElementData<dim>::n_dofs_per_face () const
 {
   return dofs_per_face;
 }
+
 
 
 template <int dim>
@@ -550,6 +631,7 @@ FiniteElementData<dim>::n_dofs_per_object () const
     }
   return deal_II_numbers::invalid_unsigned_int;
 }
+
 
 
 template <int dim>

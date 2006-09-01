@@ -116,6 +116,21 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
     virtual bool hp_constraints_are_implemented () const;
 
 				     /**
+				      * Return whether this element dominates
+				      * the one given as argument, whether it
+				      * is the other way around, whether
+				      * neither dominates, or if either could
+				      * dominate.
+				      *
+				      * For a definition of domination, see
+				      * FiniteElementBase::Domination and in
+				      * particular the hp paper.
+				      */
+    virtual
+    typename FiniteElementData<dim>::Domination
+    compare_for_domination (const FiniteElement<dim> &fe_other) const;
+    
+				     /**
 				      * Return the matrix
 				      * interpolating from a face of
 				      * of one element to the face of

@@ -156,6 +156,23 @@ FE_DGP<dim>::hp_constraints_are_implemented () const
 
 
 template <int dim>
+typename FiniteElementData<dim>::Domination
+FE_DGP<dim>::compare_for_domination (const FiniteElement<dim> &fe_other) const
+{
+				   // check whether both are discontinuous
+				   // elements and both could dominate, see
+				   // the description of
+				   // FiniteElementData<dim>::Domination
+  if (dynamic_cast<const FE_DGP<dim>*>(&fe_other) != 0)
+    return FiniteElementData<dim>::either_element_can_dominate;
+
+  Assert (false, ExcNotImplemented());
+  return FiniteElementData<dim>::neither_element_dominates;
+}
+
+
+
+template <int dim>
 bool
 FE_DGP<dim>::has_support_on_face (const unsigned int,
 				  const unsigned int) const

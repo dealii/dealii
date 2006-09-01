@@ -421,6 +421,20 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
     std::vector<std::pair<unsigned int, unsigned int> >
     hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const;
     
+				     /**
+				      * Return whether this element dominates
+				      * the one given as argument, whether it
+				      * is the other way around, whether
+				      * neither dominates, or if either could
+				      * dominate.
+				      *
+				      * For a definition of domination, see
+				      * FiniteElementBase::Domination and in
+				      * particular the hp paper.
+				      */
+    virtual
+    typename FiniteElementData<dim>::Domination
+    compare_for_domination (const FiniteElement<dim> &fe_other) const;
 				     //@}
 
 				     /**

@@ -332,6 +332,7 @@ FiniteElement<dim>::component_to_block_index (const unsigned int index) const
 }
 
 
+
 template <int dim>
 bool
 FiniteElement<dim>::prolongation_is_implemented () const
@@ -513,6 +514,17 @@ hp_quad_dof_identities (const FiniteElement<dim> &) const
 {
   Assert (false, ExcNotImplemented());
   return std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
+
+
+template <int dim>
+typename FiniteElementData<dim>::Domination
+FiniteElement<dim>::
+compare_for_domination (const FiniteElement<dim> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return FiniteElementData<dim>::neither_element_dominates;
 }
 
 
