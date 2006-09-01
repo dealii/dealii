@@ -21,7 +21,6 @@
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
 
-#include <iostream>
 #include <sstream>
 
 
@@ -2315,7 +2314,7 @@ compare_for_domination (const FiniteElement<dim> &fe_other) const
       Assert (domination !=
 	      FiniteElementDomination::neither_element_dominates,
 	      ExcInternalError());
-
+      
       return domination;
     }
   
