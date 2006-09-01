@@ -1388,7 +1388,7 @@ class FiniteElement : public Subscriptor,
 				      * return the first block of a
 				      * BlockVector it would generate.
 				      */
-    unsigned int first_block_of_base(unsigned int b) const;
+    unsigned int first_block_of_base (const unsigned int b) const;
     
  				     /**
 				      * For each vector component,
@@ -2513,7 +2513,7 @@ FiniteElement<dim>::block_to_base_index (const unsigned int index) const
   
   for (int i=first_block_of_base_table.size()-1; i>=0; --i)
     if (first_block_of_base_table[i] <= index)
-      return std::pair<unsigned int, unsigned int>((unsigned int) i,
+      return std::pair<unsigned int, unsigned int>(static_cast<unsigned int> (i),
 						   index - first_block_of_base_table[i]);
   return std::make_pair(deal_II_numbers::invalid_unsigned_int,
 			deal_II_numbers::invalid_unsigned_int);
