@@ -2585,16 +2585,31 @@ namespace internal
 						       // it appears as if
 						       // neither element has
 						       // any constraints on
-						       // its neighbor.
-						       //
-						       // the only case we know
-						       // for sure how to deal
-						       // with is if neither
-						       // element has any DoFs
-						       // on faces at all
-		      Assert (cell->get_fe().dofs_per_face == 0, ExcNotImplemented());
-		      Assert (cell->neighbor(face)->get_fe().dofs_per_face == 0,
-			      ExcNotImplemented());
+						       // its neighbor. this
+						       // may be because
+						       // neither element has
+						       // any DoFs on faces at
+						       // all. or that the two
+						       // elements are
+						       // actually the same,
+						       // although they happen
+						       // to run under
+						       // different fe_indices
+						       // (this is what
+						       // happens in
+						       // hp/hp_hanging_nodes_01
+						       // for example); check
+						       // the latter somewhat
+						       // crudely by comparing
+						       // fe names
+		      if (cell->get_fe().get_name() !=
+			  cell->neighbor(face)->get_fe().get_name())
+			{
+			  Assert (cell->get_fe().dofs_per_face == 0,
+				  ExcNotImplemented());
+			  Assert (cell->neighbor(face)->get_fe().dofs_per_face == 0,
+				  ExcNotImplemented());
+			}
 		      
 		      break;
 		    }
