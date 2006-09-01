@@ -2486,65 +2486,32 @@ namespace internal
 		  (cell->neighbor(face)->level () ==
 		   cell->level ()))
 		{		  
-		  typename DH::cell_iterator neighbor = cell->neighbor (face);
+		  const typename DH::cell_iterator neighbor = cell->neighbor (face);
 
-                                                   // We only consider
-                                                   // the case, where
-                                                   // the neighbor has
-                                                   // more degrees of
-                                                   // freedom on the
-                                                   // face and hence
-                                                   // also a higher
-                                                   // polynomial
-                                                   // degree. Then the
-                                                   // element with the
-                                                   // higher
-                                                   // polynomial
-                                                   // degree (i.e. the
-                                                   // neighbor) is
-                                                   // constrained. note
-                                                   // that if that
-                                                   // isn't the case,
-                                                   // then we will
-                                                   // re-visit this
-                                                   // face at a
-                                                   // different time
-                                                   // from the other
-                                                   // side again and
-                                                   // this time the
-                                                   // if() will
-                                                   // trigger
-                  if (neighbor->get_fe ().dofs_per_face >
-                      cell->get_fe ().dofs_per_face)
-                    {
-                                                       // Get DoFs on mother face.
-                                                       // (i.e. the one with lower
-                                                       // polynomial degree)
-                      const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
-                      dofs_on_mother.resize (n_dofs_on_mother);
+						   // see which side of the
+						   // face we have to
+						   // constrain
+		  switch (cell->get_fe().compare_for_domination (neighbor->get_fe ()))
+		  {
+		    case FiniteElementData<dim>::this_element_dominates:
+		    {
+                                                       // Get DoFs on
+                                                       // dominating and
+                                                       // dominated side of
+                                                       // the face
+                      dofs_on_mother.resize (cell->get_fe().dofs_per_face);
                       cell->face(face)->get_dof_indices (dofs_on_mother,
                                                          cell->active_fe_index ());
                           
-                                                       // Get DoFs on child face.
-                                                       // (i.e. the one with the
-                                                       // higher polynomial degree)
-                      const unsigned int n_dofs_on_children = neighbor->get_fe().dofs_per_face;
-                      dofs_on_children.resize (n_dofs_on_children);
-
-                                                       // Find face number on the finer
-                                                       // neighboring cell, which is
-                                                       // shared the face with the
-                                                       // face of the coarser cell.
-                      const unsigned int neighbor2=
-                        cell->neighbor_of_neighbor(face);
-                      neighbor->face(neighbor2)->get_dof_indices (dofs_on_children,
-                                                                  neighbor->active_fe_index ());
+                      dofs_on_children.resize (neighbor->get_fe().dofs_per_face);
+                      cell->face(face)->get_dof_indices (dofs_on_children,
+							 neighbor->active_fe_index ());
 			  
 						  
                                                        // Now create the element
                                                        // constraint for this subface.
-                      FullMatrix<double> face_constraints (n_dofs_on_mother,
-                                                           n_dofs_on_children);
+                      FullMatrix<double> face_constraints (dofs_on_mother.size(),
+                                                           dofs_on_children.size());
                       cell->get_fe().get_face_interpolation_matrix (neighbor->get_fe (),
                                                                     face_constraints);
 
@@ -2554,9 +2521,48 @@ namespace internal
                                           dofs_on_children,
                                           face_constraints,
                                           constraints);
+
+		      break;
                     }
-                }		  
-            }
+
+		    case FiniteElementData<dim>::other_element_dominates:
+		    {
+						       // we don't do anything
+						       // here since we will
+						       // come back to this
+						       // face from the other
+						       // cell, at which time
+						       // we will fall into
+						       // the first case
+						       // clause above
+		      break;
+		    }
+
+		    case FiniteElementData<dim>::either_element_can_dominate:
+		    {
+						       // it appears as if
+						       // neither element has
+						       // any constraints on
+						       // its neighbor
+		      break;
+		    }
+		    
+		    case FiniteElementData<dim>::neither_element_dominates:
+		    {
+						       // we don't presently
+						       // know what exactly to
+						       // do here
+		      Assert (false, ExcNotImplemented());
+		      break;
+		    }
+
+		    default:
+							   // we shouldn't get
+							   // here
+			  Assert (false, ExcInternalError());
+		  }
+		}
+	    }
     }
   }
 }
