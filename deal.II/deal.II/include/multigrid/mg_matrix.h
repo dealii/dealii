@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,31 +55,35 @@ class MGMatrix : public MGMatrixBase<VECTOR>
 				      * Matrix-vector-multiplication on
 				      * a certain level.
 				      */
-    virtual void vmult(unsigned int level, VECTOR& dst,
-		       const VECTOR& src) const;
+    virtual void vmult (const unsigned int level,
+			VECTOR& dst,
+			const VECTOR& src) const;
     
-				   /**
-				    * Adding matrix-vector-multiplication on
-				    * a certain level.
-				    */
-  virtual void vmult_add(unsigned int level, VECTOR& dst,
-		     const VECTOR& src) const;
+				     /**
+				      * Adding matrix-vector-multiplication on
+				      * a certain level.
+				      */
+    virtual void vmult_add (const unsigned int level,
+			    VECTOR& dst,
+			    const VECTOR& src) const;
 
-				   /**
-				    * Transpose
-				    * matrix-vector-multiplication on
-				    * a certain level.
-				    */
-  virtual void Tvmult(unsigned int level, VECTOR& dst,
-		     const VECTOR& src) const;
+				     /**
+				      * Transpose
+				      * matrix-vector-multiplication on
+				      * a certain level.
+				      */
+    virtual void Tvmult (const unsigned int level,
+			 VECTOR& dst,
+			 const VECTOR& src) const;
 
-				   /**
-				    * Adding transpose
-				    * matrix-vector-multiplication on
-				    * a certain level.
-				    */
-  virtual void Tvmult_add(unsigned int level, VECTOR& dst,
-		     const VECTOR& src) const;
+				     /**
+				      * Adding transpose
+				      * matrix-vector-multiplication on
+				      * a certain level.
+				      */
+    virtual void Tvmult_add (const unsigned int level,
+			     VECTOR& dst,
+			     const VECTOR& src) const;
     
 				     /**
 				      * Memory used by this object.
@@ -87,11 +91,11 @@ class MGMatrix : public MGMatrixBase<VECTOR>
     unsigned int memory_consumption () const;
     
 
-private:
-  /**
-   * Pointer to the matrix objects on each level.
-   */
-  SmartPointer<MGLevelObject<MATRIX> > matrix;
+  private:
+				     /**
+				      * Pointer to the matrix objects on each level.
+				      */
+    SmartPointer<MGLevelObject<MATRIX> > matrix;
 };
 
 
@@ -141,37 +145,41 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >
 				      * Matrix-vector-multiplication on
 				      * a certain level.
 				      */
-    virtual void vmult(unsigned int level, Vector<number>& dst,
-		       const Vector<number>& src) const;
+    virtual void vmult (const unsigned int level,
+			Vector<number>& dst,
+			const Vector<number>& src) const;
     
-				   /**
-				    * Adding matrix-vector-multiplication on
-				    * a certain level.
-				    */
-  virtual void vmult_add(unsigned int level, Vector<number>& dst,
+				     /**
+				      * Adding matrix-vector-multiplication on
+				      * a certain level.
+				      */
+    virtual void vmult_add (const unsigned int level,
+			    Vector<number>& dst,
+			    const Vector<number>& src) const;
+
+				     /**
+				      * Transpose
+				      * matrix-vector-multiplication on
+				      * a certain level.
+				      */
+    virtual void Tvmult (const unsigned int level,
+			 Vector<number>& dst,
 			 const Vector<number>& src) const;
 
-				   /**
-				    * Transpose
-				    * matrix-vector-multiplication on
-				    * a certain level.
-				    */
-  virtual void Tvmult(unsigned int level, Vector<number>& dst,
-		      const Vector<number>& src) const;
-
-				   /**
-				    * Adding transpose
-				    * matrix-vector-multiplication on
-				    * a certain level.
-				    */
-  virtual void Tvmult_add(unsigned int level, Vector<number>& dst,
-			  const Vector<number>& src) const;    
+				     /**
+				      * Adding transpose
+				      * matrix-vector-multiplication on
+				      * a certain level.
+				      */
+    virtual void Tvmult_add (const unsigned int level,
+			     Vector<number>& dst,
+			     const Vector<number>& src) const;    
 
   private:
-  /**
-   * Pointer to the matrix objects on each level.
-   */
-  SmartPointer<MGLevelObject<MATRIX> > matrix;
+				     /**
+				      * Pointer to the matrix objects on each level.
+				      */
+    SmartPointer<MGLevelObject<MATRIX> > matrix;
 				     /**
 				      * Row coordinate of selected block.
 				      */
@@ -204,9 +212,9 @@ MGMatrix<MATRIX, VECTOR>::set_matrix (MGLevelObject<MATRIX>* p)
 
 template <class MATRIX, class VECTOR>
 void
-MGMatrix<MATRIX, VECTOR>::vmult (unsigned int level,
-				 VECTOR& dst,
-				 const VECTOR& src) const
+MGMatrix<MATRIX, VECTOR>::vmult  (const unsigned int level,
+				  VECTOR& dst,
+				  const VECTOR& src) const
 {
   Assert(matrix != 0, ExcNotInitialized());
   
@@ -217,9 +225,9 @@ MGMatrix<MATRIX, VECTOR>::vmult (unsigned int level,
 
 template <class MATRIX, class VECTOR>
 void
-MGMatrix<MATRIX, VECTOR>::vmult_add (unsigned int level,
-				 VECTOR& dst,
-				 const VECTOR& src) const
+MGMatrix<MATRIX, VECTOR>::vmult_add  (const unsigned int level,
+				      VECTOR& dst,
+				      const VECTOR& src) const
 {
   Assert(matrix != 0, ExcNotInitialized());
   
@@ -230,9 +238,9 @@ MGMatrix<MATRIX, VECTOR>::vmult_add (unsigned int level,
 
 template <class MATRIX, class VECTOR>
 void
-MGMatrix<MATRIX, VECTOR>::Tvmult (unsigned int level,
-				 VECTOR& dst,
-				 const VECTOR& src) const
+MGMatrix<MATRIX, VECTOR>::Tvmult  (const unsigned int level,
+				   VECTOR& dst,
+				   const VECTOR& src) const
 {
   Assert(matrix != 0, ExcNotInitialized());
   
@@ -243,9 +251,9 @@ MGMatrix<MATRIX, VECTOR>::Tvmult (unsigned int level,
 
 template <class MATRIX, class VECTOR>
 void
-MGMatrix<MATRIX, VECTOR>::Tvmult_add (unsigned int level,
-				 VECTOR& dst,
-				 const VECTOR& src) const
+MGMatrix<MATRIX, VECTOR>::Tvmult_add  (const unsigned int level,
+				       VECTOR& dst,
+				       const VECTOR& src) const
 {
   Assert(matrix != 0, ExcNotInitialized());
   
@@ -268,10 +276,10 @@ MGMatrixSelect<MATRIX, number>::
 MGMatrixSelect (const unsigned int row,
 		const unsigned int col,
 		MGLevelObject<MATRIX>* p)
-  :
-  matrix (p, typeid(*this).name()),
-  row(row),
-  col(col)
+		:
+		matrix (p, typeid(*this).name()),
+		row(row),
+		col(col)
 {}
 
 
@@ -298,9 +306,9 @@ select_block (const unsigned int brow,
 template <class MATRIX, typename number>
 void
 MGMatrixSelect<MATRIX, number>::
-vmult (unsigned int level,
-       Vector<number>& dst,
-       const Vector<number>& src) const
+vmult  (const unsigned int level,
+	Vector<number>& dst,
+	const Vector<number>& src) const
 {
   Assert(matrix != 0, ExcNotInitialized());
   
@@ -312,9 +320,9 @@ vmult (unsigned int level,
 template <class MATRIX, typename number>
 void
 MGMatrixSelect<MATRIX, number>::
-vmult_add (unsigned int level,
-	   Vector<number>& dst,
-	   const Vector<number>& src) const
+vmult_add  (const unsigned int level,
+	    Vector<number>& dst,
+	    const Vector<number>& src) const
 {
   Assert(matrix != 0, ExcNotInitialized());
   
@@ -326,9 +334,9 @@ vmult_add (unsigned int level,
 template <class MATRIX, typename number>
 void
 MGMatrixSelect<MATRIX, number>::
-Tvmult (unsigned int level,
-	Vector<number>& dst,
-	const Vector<number>& src) const
+Tvmult  (const unsigned int level,
+	 Vector<number>& dst,
+	 const Vector<number>& src) const
 {
   Assert(matrix != 0, ExcNotInitialized());
   
@@ -340,9 +348,9 @@ Tvmult (unsigned int level,
 template <class MATRIX, typename number>
 void
 MGMatrixSelect<MATRIX, number>::
-Tvmult_add (unsigned int level,
-	    Vector<number>& dst,
-	    const Vector<number>& src) const
+Tvmult_add  (const unsigned int level,
+	     Vector<number>& dst,
+	     const Vector<number>& src) const
 {
   Assert(matrix != 0, ExcNotInitialized());
   

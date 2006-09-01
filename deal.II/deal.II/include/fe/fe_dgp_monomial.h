@@ -239,7 +239,7 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
 				      * be passed to the constructor of
 				      * @p FiniteElementData.
 				      */
-    static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
+    static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
 
 				     /**
 				      * Initialize the embedding

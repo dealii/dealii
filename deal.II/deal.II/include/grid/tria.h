@@ -2659,7 +2659,7 @@ class Triangulation : public Subscriptor
 				      * Return @p true if the vertex
 				      * with this @p index is used.
 				      */
-    bool vertex_used (unsigned int index) const;
+    bool vertex_used (const unsigned int index) const;
     
 				     /**
 				      * Return a constant reference to

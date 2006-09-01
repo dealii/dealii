@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -250,7 +250,7 @@ class Multigrid : public Subscriptor
 				      * smaller than the current
 				      * #minlevel.
 				      */
-    void set_maxlevel(unsigned int);
+    void set_maxlevel (const unsigned int);
 
 				     /**
 				      * Set the coarse level for which
@@ -277,8 +277,8 @@ class Multigrid : public Subscriptor
 				      * to adjust your coarse grid
 				      * solver!
 				      */
-    void set_minlevel(unsigned int level,
-		      bool relative = false);
+    void set_minlevel (const unsigned int level,
+		       bool relative = false);
 
 				     /**
 				      * Chance #cycle_type used in cycle().
@@ -291,7 +291,7 @@ class Multigrid : public Subscriptor
 				      * debugging output during the
 				      * multigrid cycles.
 				      */
-    void set_debug(unsigned int);
+    void set_debug (const unsigned int);
     
   private:
     

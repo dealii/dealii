@@ -237,13 +237,13 @@ FE_DGPMonomial<dim>::initialize_restriction ()
 
 template <int dim>
 std::vector<unsigned int>
-FE_DGPMonomial<dim>::get_dpo_vector(unsigned int deg)
+FE_DGPMonomial<dim>::get_dpo_vector (const unsigned int deg)
 {
   std::vector<unsigned int> dpo(dim+1, 0U);
-  dpo[dim] = ++deg;
+  dpo[dim] = deg+1;
   for (unsigned int i=1;i<dim;++i)
     {
-      dpo[dim] *= deg+i;
+      dpo[dim] *= deg+1+i;
       dpo[dim] /= i+1;
     }
   return dpo;

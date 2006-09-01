@@ -424,7 +424,7 @@ class FE_DGPNonparametric : public FiniteElement<dim>
 				      * be passed to the constructor of
 				      * @p FiniteElementData.
 				      */
-    static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
+    static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
     
 				     /**
 				      * Given a set of flags indicating

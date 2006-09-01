@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,31 +51,35 @@ class MGMatrixBase : public Subscriptor
 				    * Matrix-vector-multiplication on
 				    * a certain level.
 				    */
-  virtual void vmult(unsigned int level, VECTOR& dst,
-		     const VECTOR& src) const = 0;
+  virtual void vmult (const unsigned int level,
+		      VECTOR& dst,
+		      const VECTOR& src) const = 0;
 
 				   /**
 				    * Adding matrix-vector-multiplication on
 				    * a certain level.
 				    */
-  virtual void vmult_add(unsigned int level, VECTOR& dst,
-		     const VECTOR& src) const = 0;
+  virtual void vmult_add (const unsigned int level,
+			  VECTOR& dst,
+			  const VECTOR& src) const = 0;
 
 				   /**
 				    * Transpose
 				    * matrix-vector-multiplication on
 				    * a certain level.
 				    */
-  virtual void Tvmult(unsigned int level, VECTOR& dst,
-		     const VECTOR& src) const = 0;
+  virtual void Tvmult (const unsigned int level,
+		       VECTOR& dst,
+		       const VECTOR& src) const = 0;
 
 				   /**
 				    * Adding transpose
 				    * matrix-vector-multiplication on
 				    * a certain level.
 				    */
-  virtual void Tvmult_add(unsigned int level, VECTOR& dst,
-		     const VECTOR& src) const = 0;
+  virtual void Tvmult_add (const unsigned int level,
+			   VECTOR& dst,
+			   const VECTOR& src) const = 0;
 };
 
 

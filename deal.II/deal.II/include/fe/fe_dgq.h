@@ -239,7 +239,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * be passed to the constructor of
 				      * @p FiniteElementData.
 				      */
-    static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
+    static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
   
 				     /**
 				      * Compute renumbering for rotation

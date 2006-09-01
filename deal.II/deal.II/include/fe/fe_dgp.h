@@ -246,7 +246,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * be passed to the constructor of
 				      * @p FiniteElementData.
 				      */
-    static std::vector<unsigned int> get_dpo_vector(unsigned int degree);
+    static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
 };
 
 /* @} */

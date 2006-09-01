@@ -120,7 +120,7 @@ class FE_PolyTensor : public FiniteElement<dim>
 				      * different from @p
 				      * fe_data.degree.
 				      */
-    FE_PolyTensor (unsigned int degree,
+    FE_PolyTensor (const unsigned int degree,
 		   const FiniteElementData<dim> &fe_data,
 		   const std::vector<bool> &restriction_is_additive_flags,
 		   const std::vector<std::vector<bool> > &nonzero_components);

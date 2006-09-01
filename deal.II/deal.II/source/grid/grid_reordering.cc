@@ -2,7 +2,7 @@
 //   grid_reordering.cc,v 1.27 2002/05/28 07:43:22 wolf Exp
 //   Version: 
 //
-//   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //   This file is subject to QPL and may not be  distributed
 //   without copyright and license information. Please refer
@@ -368,14 +368,14 @@ namespace internal
 				       // do what the comment in the
 				       // class declaration says
       unsigned int qnum = 0;
-      while(get_unoriented_quad(qnum))
+      while (get_unoriented_quad(qnum))
 	{
 	  unsigned int lsn = 0;
-	  while(get_unoriented_side(qnum,lsn))
+	  while (get_unoriented_side(qnum,lsn))
 	    {
 	      orient_side(qnum,lsn);
 	      unsigned int qqnum = qnum;
-	      while(side_hop(qqnum,lsn))
+	      while (side_hop(qqnum,lsn))
 		{
 						   // switch this face
 		  lsn = (lsn+2)%4;

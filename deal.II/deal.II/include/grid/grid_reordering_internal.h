@@ -360,16 +360,6 @@ namespace internal
 					  */
 	bool side_hop (unsigned int &qnum,
 		       unsigned int &lsn) const;
-  
-					 /**
-					  * Sets lsn so that it points
-					  * to the opposite side of
-					  * the current quad (qnum)
-					  * that it was originally
-					  * pointing to.
-					  */
-	bool switch_faces (unsigned int &qnum,
-			   unsigned int &lsn) const;
 
 					 /**
 					  * A list of enriched

@@ -69,7 +69,7 @@ Multigrid<VECTOR>::reinit(const unsigned int min_level,
 
 template <class VECTOR>
 void
-Multigrid<VECTOR>::set_maxlevel(unsigned int l)
+Multigrid<VECTOR>::set_maxlevel (const unsigned int l)
 {
   Assert (l <= maxlevel, ExcIndexRange(l,minlevel,maxlevel+1));
   Assert (l >= minlevel, ExcIndexRange(l,minlevel,maxlevel+1));
@@ -79,8 +79,8 @@ Multigrid<VECTOR>::set_maxlevel(unsigned int l)
 
 template <class VECTOR>
 void
-Multigrid<VECTOR>::set_minlevel(unsigned int l,
-				bool relative)
+Multigrid<VECTOR>::set_minlevel (const unsigned int l,
+				 const bool relative)
 {
   Assert (l <= maxlevel, ExcIndexRange(l,minlevel,maxlevel+1));
   minlevel = (relative)
@@ -99,7 +99,7 @@ Multigrid<VECTOR>::set_cycle(typename Multigrid<VECTOR>::Cycle c)
 
 template <class VECTOR>
 void
-Multigrid<VECTOR>::set_debug(unsigned int d)
+Multigrid<VECTOR>::set_debug (const unsigned int d)
 {
   debug = d;
 }
