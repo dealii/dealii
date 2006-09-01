@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -269,7 +269,7 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 	   e!=line->entries.end(); ++e)
 	  AssertThrow (this_dofs.find (e->first) == this_dofs.end(),
 		       ExcDoFIsConstrainedToConstrainedDoF (e->first));
-    };
+    }
 
 				   // store the previous state with
 				   // respect to sorting
