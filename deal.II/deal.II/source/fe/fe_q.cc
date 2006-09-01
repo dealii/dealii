@@ -688,7 +688,7 @@ compare_for_domination (const FiniteElement<dim> &fe_other) const
     {
       if (this->degree < fe_q_other->degree)
 	return FiniteElementDomination::this_element_dominates;
-      else if (this->degree < fe_q_other->degree)
+      else if (this->degree == fe_q_other->degree)
 	return FiniteElementDomination::either_element_can_dominate;
       else
 	return FiniteElementDomination::other_element_dominates;
