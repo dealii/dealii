@@ -2137,7 +2137,7 @@ namespace internal
 	      FiniteElementDomination::Domination
 		mother_face_dominates = FiniteElementDomination::either_element_can_dominate;
 	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
-		mother_face_dominates = mother_face_dominates |
+		mother_face_dominates = mother_face_dominates &
 					(cell->get_fe().compare_for_domination
 					 (cell->neighbor_child_on_subface (face, c)->get_fe()));
 
@@ -2296,7 +2296,7 @@ namespace internal
 			  domination = FiniteElementDomination::either_element_can_dominate;
 			for (unsigned int sf=0; sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
 			  if (sf != dominating_subface_no)
-			    domination = domination |
+			    domination = domination &
 					 cell->neighbor_child_on_subface (face, dominating_subface_no)
 					 ->get_fe().compare_for_domination
 					 (cell->neighbor_child_on_subface (face, sf)->get_fe());

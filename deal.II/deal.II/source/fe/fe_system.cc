@@ -2305,7 +2305,7 @@ compare_for_domination (const FiniteElement<dim> &fe_other) const
 					   // for this pair of base elements,
 					   // check who dominates and combine
 					   // with previous result
-	  domination = domination | (this->base_element(b)
+	  domination = domination & (this->base_element(b)
 				     .compare_for_domination (fe_sys_other->base_element(b)));
 	}
 

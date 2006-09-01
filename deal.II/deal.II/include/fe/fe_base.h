@@ -113,7 +113,7 @@ namespace FiniteElementDomination
 
 				   /**
 				    * A generalization of the binary
-				    * <code>or</code> operator to a comparison
+				    * <code>and</code> operator to a comparison
 				    * relationship. The way this works is
 				    * pretty much as when you would want to
 				    * define a comparison relationship for
@@ -139,7 +139,7 @@ namespace FiniteElementDomination
 				    * then the returned value is
 				    * <code>neither_element_dominates</code>.
 				    */
-  Domination operator | (const Domination d1,
+  Domination operator & (const Domination d1,
 			 const Domination d2);
 }
 
@@ -594,7 +594,7 @@ class FiniteElementData
 namespace FiniteElementDomination
 {
   inline
-  Domination operator | (const Domination d1,
+  Domination operator & (const Domination d1,
 			 const Domination d2)
   {
     switch (d1)
