@@ -1590,24 +1590,22 @@ namespace internal
 
 	for (unsigned int col=0; col!=n_dofs_child; ++col) 
 	  {
-	    bool constrain = true;
+	    bool constraint_already_satisfied = false;
 
-					     // Check if we have a constraint,
-					     // which is already satisfied.
-	    for (unsigned int i=0; i!=n_dofs_mother; ++i)
-	      {
-						 // Check for a value of
-						 // 1.0
-		if (face_constraints (i,col) == 1.0)
-		  constrain = (dofs_mother[i] != dofs_child[col]);
-	      }
+					     // Check if we have an identity
+					     // constraint, which is already
+					     // satisfied by unification of
+					     // the corresponding global dof
+					     // indices
+	    for (unsigned int i=0; i<n_dofs_mother; ++i)
+	      if (face_constraints (i,col) == 1.0)
+		if (dofs_mother[i] == dofs_child[col])
+		  {
+		    constraint_already_satisfied = true;
+		    break;
+		  }
 
-					     // If this constraint is not
-					     // automatically satisfied by
-					     // the previous step of removing
-					     // equivalent DoFs, add this
-					     // constraint.
-	    if (constrain)
+	    if (constraint_already_satisfied == false)
 	      { 
 		constraints.add_line (dofs_child[col]);
 		for (unsigned int i=0; i!=n_dofs_mother; ++i)
