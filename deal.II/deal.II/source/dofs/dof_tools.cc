@@ -2078,8 +2078,8 @@ namespace internal
 
       FullMatrix<double> face_constraints;
       
-				       // loop over all lines; only on
-				       // lines there can be constraints.
+				       // loop over all faces; only on
+				       // face there can be constraints.
 				       // We do so by looping over all
 				       // active cells and checking
 				       // whether any of the faces are
@@ -2128,335 +2128,386 @@ namespace internal
 		Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
 			ExcInternalError());
 
-
-//TODO: The proper way would be to ask the elements themselves which
-//among them should be the master element. Have a poor-man's
-//implementation here that simply decides this based on the number of
-//DoFs per face
-              
-					       // Store minimum degree element.
-					       // For FE_Q it is the one with the
-					       // lowest number of DoFs on the face.
-	      unsigned int min_dofs_per_face = cell->get_fe ().dofs_per_face;
-	      unsigned int min_degree_subface = 0;
-              bool mother_face_is_master = true;
-	      
+					       // first find out whether we
+					       // can constrain each of the
+					       // subfaces to the mother
+					       // face. in the lingo of the hp
+					       // paper, this would be the
+					       // simple case
+	      FiniteElementDomination::Domination
+		mother_face_dominates = FiniteElementDomination::either_element_can_dominate;
 	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+		mother_face_dominates = mother_face_dominates |
+					(cell->get_fe().compare_for_domination
+					 (cell->neighbor_child_on_subface (face, c)->get_fe()));
+
+	      switch (mother_face_dominates)
 		{
-		  typename DH::active_cell_iterator
-		    neighbor_child
-		    = cell->neighbor_child_on_subface (face, c);
+		  case FiniteElementDomination::this_element_dominates:
+		  {
+						     // Case 1 (the simple case):
+						     // The coarse element dominates
+						     // the elements on the subfaces
+		    const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
+		    dofs_on_mother.resize (n_dofs_on_mother);
+
+		    cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
 		  
-						   // Check if the element on one
-						   // of the subfaces has a lower
-						   // polynomial degree than the
-						   // one of the other elements.
-		  if (neighbor_child->get_fe ().dofs_per_face < min_dofs_per_face)
-		    {
-		      min_dofs_per_face = neighbor_child->get_fe ().dofs_per_face;
-		      min_degree_subface = c;
-		      mother_face_is_master = false;
-		    }
-		}
-					       // Case 1: The coarse element has
-					       // the lowest polynomial degree.
-					       // Therefore it will play the role
-					       // of the master elements, to which
-					       // the other elements will be constrained.
-	      if (mother_face_is_master == true)
-		{
-		  const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
-		  dofs_on_mother.resize (n_dofs_on_mother);
+						     // Now create constraint matrix for
+						     // the subfaces and assemble it.
+		    for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+		      {
+			typename DH::active_cell_iterator neighbor_child
+			  = cell->neighbor_child_on_subface (face, c);
 
-		  cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
-		  
-						   // Now create constraint matrix for
-						   // the subfaces and assemble it.
-		  for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
-		    {
-		      typename DH::active_cell_iterator neighbor_child
-			= cell->neighbor_child_on_subface (face, c);
+			const unsigned int n_dofs_on_children
+			  = neighbor_child->get_fe().dofs_per_face;
+			dofs_on_children.resize (n_dofs_on_children);
 
-		      const unsigned int n_dofs_on_children
-			= neighbor_child->get_fe().dofs_per_face;
-		      dofs_on_children.resize (n_dofs_on_children);
+			const unsigned int subface_fe_index
+			  = neighbor_child->active_fe_index();
 
-		      const unsigned int subface_fe_index
-			= neighbor_child->active_fe_index();
-
-						       // some sanity checks
-						       // -- particularly
-						       // useful if you start
-						       // to think about faces
-						       // with
-						       // face_orientation==false
-						       // and whether we
-						       // really really have
-						       // the right face...
-		      Assert (neighbor_child->n_active_fe_indices() == 1,
-			      ExcInternalError());
-		      Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
-			      ExcInternalError());
-		      Assert (cell->face(face)->child(c)->fe_index_is_active(subface_fe_index)
-			      == true,
-			      ExcInternalError());
+							 // some sanity checks
+							 // -- particularly
+							 // useful if you start
+							 // to think about faces
+							 // with
+							 // face_orientation==false
+							 // and whether we
+							 // really really have
+							 // the right face...
+			Assert (neighbor_child->n_active_fe_indices() == 1,
+				ExcInternalError());
+			Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
+				ExcInternalError());
+			Assert (cell->face(face)->child(c)->fe_index_is_active(subface_fe_index)
+				== true,
+				ExcInternalError());
 		      
-						       // Same procedure as for the
-						       // mother cell. Extract the face
-						       // DoFs from the cell DoFs.
-		      cell->face(face)->child(c)
-			->get_dof_indices (dofs_on_children,
-					   subface_fe_index);
+							 // Same procedure as for the
+							 // mother cell. Extract the face
+							 // DoFs from the cell DoFs.
+			cell->face(face)->child(c)
+			  ->get_dof_indices (dofs_on_children,
+					     subface_fe_index);
 					      
-						       // Now create the
-						       // element constraint
-						       // for this subface.
-						       //
-						       // As a side remark,
-						       // one may wonder the
-						       // following:
-						       // neighbor_child is
-						       // clearly computed
-						       // correctly,
-						       // i.e. taking into
-						       // account
-						       // face_orientation
-						       // (just look at the
-						       // implementation of
-						       // that
-						       // function). however,
-						       // we don't care about
-						       // this here, when we
-						       // ask for
-						       // subface_interpolation
-						       // on subface c. the
-						       // question rather is:
-						       // do we have to
-						       // translate 'c' here
-						       // as well?
-						       //
-						       // the answer is in
-						       // fact 'no'. if one
-						       // does that, results
-						       // are wrong:
-						       // constraints are
-						       // added twice for the
-						       // same pair of nodes
-						       // but with differing
-						       // weights. in
-						       // addition, one can
-						       // look at the
-						       // deal.II/project_*_03
-						       // tests that look at
-						       // exactly this case:
-						       // there, we have a
-						       // mesh with at least
-						       // one
-						       // face_orientation==false
-						       // and hanging nodes,
-						       // and the results of
-						       // those tests show
-						       // that the result of
-						       // projection verifies
-						       // the approximation
-						       // properties of a
-						       // finite element onto
-						       // that mesh
-		      face_constraints.reinit (n_dofs_on_mother,
-					       n_dofs_on_children);
-		      cell->get_fe()
-			.get_subface_interpolation_matrix (cell->get_dof_handler()
-							   .get_fe()[subface_fe_index],
-							   c, face_constraints);
+							 // Now create the
+							 // element constraint
+							 // for this subface.
+							 //
+							 // As a side remark,
+							 // one may wonder the
+							 // following:
+							 // neighbor_child is
+							 // clearly computed
+							 // correctly,
+							 // i.e. taking into
+							 // account
+							 // face_orientation
+							 // (just look at the
+							 // implementation of
+							 // that
+							 // function). however,
+							 // we don't care about
+							 // this here, when we
+							 // ask for
+							 // subface_interpolation
+							 // on subface c. the
+							 // question rather is:
+							 // do we have to
+							 // translate 'c' here
+							 // as well?
+							 //
+							 // the answer is in
+							 // fact 'no'. if one
+							 // does that, results
+							 // are wrong:
+							 // constraints are
+							 // added twice for the
+							 // same pair of nodes
+							 // but with differing
+							 // weights. in
+							 // addition, one can
+							 // look at the
+							 // deal.II/project_*_03
+							 // tests that look at
+							 // exactly this case:
+							 // there, we have a
+							 // mesh with at least
+							 // one
+							 // face_orientation==false
+							 // and hanging nodes,
+							 // and the results of
+							 // those tests show
+							 // that the result of
+							 // projection verifies
+							 // the approximation
+							 // properties of a
+							 // finite element onto
+							 // that mesh
+			face_constraints.reinit (n_dofs_on_mother,
+						 n_dofs_on_children);
+			cell->get_fe()
+			  .get_subface_interpolation_matrix (cell->get_dof_handler()
+							     .get_fe()[subface_fe_index],
+							     c, face_constraints);
 
-						       // Add constraints to global constraint
-						       // matrix.
-		      filter_constraints (dofs_on_mother,
-					  dofs_on_children,
-					  face_constraints,
-					  constraints);		      
-		    }
-		}
-	      else
-						 // Case 2: One of the finer elements
-						 // has the lowest polynomial degree.
-						 // First the coarse element will be
-						 // constrained to that element. After
-						 // that the other fine elements will
-						 // be constrained to the coarse element.
-		{
-		  //		  Assert (false, ExcNotImplemented ());
+							 // Add constraints to global constraint
+							 // matrix.
+			filter_constraints (dofs_on_mother,
+					    dofs_on_children,
+					    face_constraints,
+					    constraints);		      
+		      }
+		    
+		    break;
+		  }
 
-		  typename DH::active_cell_iterator neighbor_child
-		    = cell->neighbor_child_on_subface (face, min_degree_subface);
-		  const unsigned int n_dofs_on_children = neighbor_child->get_fe().dofs_per_face;
-		  dofs_on_children.resize (n_dofs_on_children);
+		  case FiniteElementDomination::other_element_dominates:
+		  case FiniteElementDomination::neither_element_dominates:
+		  {
+						     // Case 2 (the "complex"
+						     // case): at least one
+						     // (the neither_... case)
+						     // of the finer elements
+						     // or all of them (the
+						     // other_... case) is
+						     // dominating.  First the
+						     // coarse element will be
+						     // constrained to that
+						     // element. After that
+						     // the other fine
+						     // elements will be
+						     // constrained to the
+						     // coarse element.
+
+						     // we first have to find
+						     // one of the children for
+						     // which the finite element
+						     // is able to generate a
+						     // space that all the other
+						     // ones can be constrained
+						     // to
+		    unsigned int dominating_subface_no = 0;
+		    for (; dominating_subface_no<GeometryInfo<dim>::subfaces_per_face;
+			 ++dominating_subface_no)
+		      {
+			FiniteElementDomination::Domination
+			  domination = FiniteElementDomination::either_element_can_dominate;
+			for (unsigned int sf=0; sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
+			  if (sf != dominating_subface_no)
+			    domination = domination |
+					 cell->neighbor_child_on_subface (face, dominating_subface_no)
+					 ->get_fe().compare_for_domination
+					 (cell->neighbor_child_on_subface (face, sf)->get_fe());
+			
+							 // see if the element
+							 // on this subface is
+							 // able to dominate
+							 // the ones on all
+							 // other subfaces,
+							 // and if so take it
+			if ((domination == FiniteElementDomination::this_element_dominates)
+			    ||
+			    (domination == FiniteElementDomination::either_element_can_dominate))
+			  break;
+		      }
+
+						     // check that we have
+						     // found one such subface
+		    Assert (dominating_subface_no != GeometryInfo<dim>::subfaces_per_face,
+			    ExcNotImplemented());
+		    
+		    const typename DH::active_cell_iterator neighbor_child
+		      = cell->neighbor_child_on_subface (face, dominating_subface_no);
+		    const unsigned int n_dofs_on_children = neighbor_child->get_fe().dofs_per_face;
+		    dofs_on_children.resize (n_dofs_on_children);
 
 
-						       // Get DoFs on child cell with
-						       // lowest polynomial degree.
-                                                       // All other DoFs will be constrained
-                                                       // to the DoFs of this face.		   
-		  const unsigned int subface_fe_index
-		    = neighbor_child->active_fe_index();
+						     // Get DoFs on child cell with
+						     // lowest polynomial degree.
+						     // All other DoFs will be constrained
+						     // to the DoFs of this face.		   
+		    const unsigned int subface_fe_index
+		      = neighbor_child->active_fe_index();
 		      
-						       // Same procedure as for the
-						       // mother cell. Extract the face
-						       // DoFs from the cell DoFs.
-		  cell->face(face)->child(min_degree_subface)
-		    ->get_dof_indices (dofs_on_children,
-				       subface_fe_index);
+						     // Same procedure as for the
+						     // mother cell. Extract the face
+						     // DoFs from the cell DoFs.
+		    cell->face(face)->child(dominating_subface_no)
+		      ->get_dof_indices (dofs_on_children,
+					 subface_fe_index);
 
 
-						   // The idea is to introduce
-						   // a "virtual" intermediate coarse
-						   // level face with the lowest
-						   // polynomial degree. Then it is
-						   // easy to constrain each of the
-						   // connected faces to this intermediate
-						   // coarse level face. As the DoFs on
-						   // this intermediate coarse level face
-						   // do not exist, they have to determined
-						   // through the inverse of the constraint matrix
-						   // from the lowest order subface to
-						   // this intermediate coarse level face.
-						   //
-						   // Considering the following case:
-						   // +---+----+
-						   // |   | Q3 |
-						   // |Q3 +----+
-						   // |   | Q2 |
-						   // +---+----+
-						   //
-						   // The intermediate layer would be
-						   // of order 2:
-						   // +------+  *  +---------+
-						   // +      |  |  | F_1, Q3 |
-						   // +Q3, C |  *  +---------+
-						   // +      |  |  | F_2, Q2 |
-						   // +------+  *  +---------+
-						   //
-						   // In this case, there are 3 DoFs on the
-						   // intermediate layer. Assuming for the
-						   // moment that these do exist, all DoFs
-						   // on the connected faces can be
-						   // expressed in terms of these DoFs. We
-						   // have:
-						   // C = A_1 * I
-						   // F_1 = A_2 * I
-						   // F_2 = A_3 * I
-						   // where C, F_1, F_2 denote the DoFs
-						   // on the faces of the elements and
-						   // I denotes the DoFs on the intermediate
-						   // face. A_1 to A_3 denote the corresponding
-						   // face or subface interpolation matrices,
-						   // describing the DoFs on one of the faces
-						   // in terms of the DoFs on the intermediate
-						   // layer.
-						   //
-						   // As the DoFs in I are only "virtual"
-						   // they have to be expressed in terms
-						   // of existing DoFs. In this case only
-						   // A_3 is invertible. Therefore all
-						   // other DoFs have to be constrained
-						   // to the DoFs in F_2.
-						   // This leads to
-						   // I = A_3^-1 F_2
-						   // and
-						   // C = A_1 * A_3^-1 F_2
-		                                   // F_1 = A_2 * A_3^-1 F_2
-						   //
-						   // Therefore the constraint matrices
-						   // in this case are:
-						   // A_1 * A_3^-1
-						   // A_2 * A_3^-1
-						   // In 3D and for other configurations,
-						   // the basic scheme is completely identical.
+						     // The idea is to introduce
+						     // a "virtual" intermediate coarse
+						     // level face with the lowest
+						     // polynomial degree. Then it is
+						     // easy to constrain each of the
+						     // connected faces to this intermediate
+						     // coarse level face. As the DoFs on
+						     // this intermediate coarse level face
+						     // do not exist, they have to determined
+						     // through the inverse of the constraint matrix
+						     // from the lowest order subface to
+						     // this intermediate coarse level face.
+						     //
+						     // Considering the following case:
+						     // +---+----+
+						     // |   | Q3 |
+						     // |Q3 +----+
+						     // |   | Q2 |
+						     // +---+----+
+						     //
+						     // The intermediate layer would be
+						     // of order 2:
+						     // +------+  *  +---------+
+						     // +      |  |  | F_1, Q3 |
+						     // +Q3, C |  *  +---------+
+						     // +      |  |  | F_2, Q2 |
+						     // +------+  *  +---------+
+						     //
+						     // In this case, there are 3 DoFs on the
+						     // intermediate layer. Assuming for the
+						     // moment that these do exist, all DoFs
+						     // on the connected faces can be
+						     // expressed in terms of these DoFs. We
+						     // have:
+						     // C = A_1 * I
+						     // F_1 = A_2 * I
+						     // F_2 = A_3 * I
+						     // where C, F_1, F_2 denote the DoFs
+						     // on the faces of the elements and
+						     // I denotes the DoFs on the intermediate
+						     // face. A_1 to A_3 denote the corresponding
+						     // face or subface interpolation matrices,
+						     // describing the DoFs on one of the faces
+						     // in terms of the DoFs on the intermediate
+						     // layer.
+						     //
+						     // As the DoFs in I are only "virtual"
+						     // they have to be expressed in terms
+						     // of existing DoFs. In this case only
+						     // A_3 is invertible. Therefore all
+						     // other DoFs have to be constrained
+						     // to the DoFs in F_2.
+						     // This leads to
+						     // I = A_3^-1 F_2
+						     // and
+						     // C = A_1 * A_3^-1 F_2
+						     // F_1 = A_2 * A_3^-1 F_2
+						     //
+						     // Therefore the constraint matrices
+						     // in this case are:
+						     // A_1 * A_3^-1
+						     // A_2 * A_3^-1
+						     // In 3D and for other configurations,
+						     // the basic scheme is completely identical.
 		  
-						   // Now create the element
-						   // constraint for this subface.
-		  FullMatrix<double> fc_sface_ipol (n_dofs_on_children,
-						    n_dofs_on_children);
-		  FullMatrix<double> fc_ipol_sface (n_dofs_on_children,
-						    n_dofs_on_children);
-		  neighbor_child->get_fe().get_subface_interpolation_matrix (neighbor_child->get_fe (),
-									     min_degree_subface,
-									     fc_sface_ipol); 
-		  // Invert it, to get a mapping from the DoFs of the
-		  // "Master-subface" to the intermediate layer.
-		  fc_ipol_sface.invert (fc_sface_ipol);
+						     // Now create the element
+						     // constraint for this subface.
+		    FullMatrix<double> fc_sface_ipol (n_dofs_on_children,
+						      n_dofs_on_children);
+		    FullMatrix<double> fc_ipol_sface (n_dofs_on_children,
+						      n_dofs_on_children);
+		    neighbor_child->get_fe().get_subface_interpolation_matrix (neighbor_child->get_fe (),
+									       dominating_subface_no,
+									       fc_sface_ipol); 
+						     // Invert it, to get a mapping from the DoFs of the
+						     // "Master-subface" to the intermediate layer.
+		    fc_ipol_sface.invert (fc_sface_ipol);
 
-		  // Create constraint matrix for the mother face.
-		  const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
-		  dofs_on_mother.resize (n_dofs_on_mother);
-		  cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
+						     // Create constraint matrix for the mother face.
+		    const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
+		    dofs_on_mother.resize (n_dofs_on_mother);
+		    cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
 
-		  FullMatrix<double> fc_mother_ipol (n_dofs_on_children,
-						     n_dofs_on_mother);
-		  FullMatrix<double> fc_mother_sface (n_dofs_on_children,
-						      n_dofs_on_mother);
-		  neighbor_child->get_fe ().get_face_interpolation_matrix (cell->get_fe(),
-									   fc_mother_ipol);
-		  fc_ipol_sface.mmult (fc_mother_sface, fc_mother_ipol);
+		    FullMatrix<double> fc_mother_ipol (n_dofs_on_children,
+						       n_dofs_on_mother);
+		    FullMatrix<double> fc_mother_sface (n_dofs_on_children,
+							n_dofs_on_mother);
+		    neighbor_child->get_fe ().get_face_interpolation_matrix (cell->get_fe(),
+									     fc_mother_ipol);
+		    fc_ipol_sface.mmult (fc_mother_sface, fc_mother_ipol);
 
-		  // Add constraints to global constraint
-		  // matrix.
-		  filter_constraints (dofs_on_children,
-				      dofs_on_mother,
-				      fc_mother_sface,
-				      constraints);
+						     // Add constraints to global constraint
+						     // matrix.
+		    filter_constraints (dofs_on_children,
+					dofs_on_mother,
+					fc_mother_sface,
+					constraints);
 
-						   // Now create constraint matrices for
-						   // the subfaces and assemble them
-		  for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
-		    {
-		      // As the "Master-subface" does not need constraints, skip it.
-		      if (c != min_degree_subface)
-			{
-			  typename DH::active_cell_iterator neighbor_child_slave
-			    = cell->neighbor_child_on_subface (face, c);
-			  const unsigned int n_dofs_on_mother = neighbor_child_slave->get_fe().dofs_per_face;
-			  dofs_on_mother.resize (n_dofs_on_mother);
+						     // Now create constraint matrices for
+						     // the subfaces and assemble them
+		    for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+		      {
+							 // As the "Master-subface" does not need constraints, skip it.
+			if (c != dominating_subface_no)
+			  {
+			    typename DH::active_cell_iterator neighbor_child_slave
+			      = cell->neighbor_child_on_subface (face, c);
+			    const unsigned int n_dofs_on_mother = neighbor_child_slave->get_fe().dofs_per_face;
+			    dofs_on_mother.resize (n_dofs_on_mother);
 
-						       // Find face number on the finer
-						       // neighboring cell, which is
-						       // shared the face with the
-						       // face of the coarser cell.
-			  const unsigned int neighbor2=
-			    cell->neighbor_of_neighbor(face);
-			  Assert (neighbor_child_slave->face(neighbor2) == cell->face(face)->child(c),
-				  ExcInternalError());
+							     // Find face number on the finer
+							     // neighboring cell, which is
+							     // shared the face with the
+							     // face of the coarser cell.
+			    const unsigned int neighbor2=
+			      cell->neighbor_of_neighbor(face);
+			    Assert (neighbor_child_slave->face(neighbor2) == cell->face(face)->child(c),
+				    ExcInternalError());
 		      
-						       // Same procedure as for the
-						       // mother cell. Extract the face
-						       // DoFs from the cell DoFs.
-			  const unsigned int subface_fe_index
-			    = neighbor_child_slave->active_fe_index();
+							     // Same procedure as for the
+							     // mother cell. Extract the face
+							     // DoFs from the cell DoFs.
+			    const unsigned int subface_fe_index
+			      = neighbor_child_slave->active_fe_index();
 		      
-			  cell->face(face)->child(c)
-			    ->get_dof_indices (dofs_on_mother,
-					       subface_fe_index);		      
+			    cell->face(face)->child(c)
+			      ->get_dof_indices (dofs_on_mother,
+						 subface_fe_index);		      
 					      
-						       // Now create the element
-						       // constraint for this subface.
-			  FullMatrix<double> fc_child_sface_ipol (n_dofs_on_children,
-								  n_dofs_on_mother);
-			  FullMatrix<double> fc_child_sface_sface (n_dofs_on_children,
-								   n_dofs_on_mother);
-			  neighbor_child->get_fe ().get_subface_interpolation_matrix 
-			    (neighbor_child_slave->get_fe(),
-			     c, fc_child_sface_ipol);
+							     // Now create the element
+							     // constraint for this subface.
+			    FullMatrix<double> fc_child_sface_ipol (n_dofs_on_children,
+								    n_dofs_on_mother);
+			    FullMatrix<double> fc_child_sface_sface (n_dofs_on_children,
+								     n_dofs_on_mother);
+			    neighbor_child->get_fe ().get_subface_interpolation_matrix 
+			      (neighbor_child_slave->get_fe(),
+			       c, fc_child_sface_ipol);
 
-			  fc_ipol_sface.mmult (fc_child_sface_sface, fc_child_sface_ipol);
+			    fc_ipol_sface.mmult (fc_child_sface_sface, fc_child_sface_ipol);
 
-						       // Add constraints to global constraint
-						       // matrix.
-			  filter_constraints (dofs_on_children,
-					      dofs_on_mother,
-					      fc_child_sface_sface,
-					      constraints);
-			}
-		    }
+							     // Add constraints to global constraint
+							     // matrix.
+			    filter_constraints (dofs_on_children,
+						dofs_on_mother,
+						fc_child_sface_sface,
+						constraints);
+			  }
+		      }
+
+		    break;
+		  }
+
+		  case FiniteElementDomination::either_element_can_dominate:
+		  {
+						     // hm, it isn't quite
+						     // clear what exactly we
+						     // would have to do
+						     // here. sit tight until
+						     // someone trips over the
+						     // following statement
+						     // and see what exactly
+						     // is going on
+		    Assert (false, ExcNotImplemented());
+		  }
+
+		  default:
+							 // we shouldn't get here
+			Assert (false, ExcInternalError());
 		}
 	    }
 	  else
@@ -2493,7 +2544,7 @@ namespace internal
 						   // constrain
 		  switch (cell->get_fe().compare_for_domination (neighbor->get_fe ()))
 		  {
-		    case FiniteElementData<dim>::this_element_dominates:
+		    case FiniteElementDomination::this_element_dominates:
 		    {
                                                        // Get DoFs on
                                                        // dominating and
@@ -2525,7 +2576,7 @@ namespace internal
 		      break;
                     }
 
-		    case FiniteElementData<dim>::other_element_dominates:
+		    case FiniteElementDomination::other_element_dominates:
 		    {
 						       // we don't do anything
 						       // here since we will
@@ -2538,20 +2589,27 @@ namespace internal
 		      break;
 		    }
 
-		    case FiniteElementData<dim>::either_element_can_dominate:
+		    case FiniteElementDomination::either_element_can_dominate:
 		    {
 						       // it appears as if
 						       // neither element has
 						       // any constraints on
-						       // its neighbor
+						       // its neighbor.
 		      break;
 		    }
 		    
-		    case FiniteElementData<dim>::neither_element_dominates:
+		    case FiniteElementDomination::neither_element_dominates:
 		    {
 						       // we don't presently
 						       // know what exactly to
-						       // do here
+						       // do here. it isn't quite
+						       // clear what exactly we
+						       // would have to do
+						       // here. sit tight until
+						       // someone trips over the
+						       // following statement
+						       // and see what exactly
+						       // is going on
 		      Assert (false, ExcNotImplemented());
 		      break;
 		    }

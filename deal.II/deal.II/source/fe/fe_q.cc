@@ -679,7 +679,7 @@ hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
 
 
 template <int dim>
-typename FiniteElementData<dim>::Domination
+FiniteElementDomination::Domination
 FE_Q<dim>::
 compare_for_domination (const FiniteElement<dim> &fe_other) const
 {
@@ -687,15 +687,15 @@ compare_for_domination (const FiniteElement<dim> &fe_other) const
       = dynamic_cast<const FE_Q<dim>*>(&fe_other))
     {
       if (this->degree < fe_q_other->degree)
-	return FiniteElementData<dim>::this_element_dominates;
+	return FiniteElementDomination::this_element_dominates;
       else if (this->degree < fe_q_other->degree)
-	return FiniteElementData<dim>::either_element_can_dominate;
+	return FiniteElementDomination::either_element_can_dominate;
       else
-	return FiniteElementData<dim>::other_element_dominates;
+	return FiniteElementDomination::other_element_dominates;
     }
   
   Assert (false, ExcNotImplemented());
-  return FiniteElementData<dim>::neither_element_dominates;
+  return FiniteElementDomination::neither_element_dominates;
 }
 
 

@@ -519,12 +519,12 @@ hp_quad_dof_identities (const FiniteElement<dim> &) const
 
 
 template <int dim>
-typename FiniteElementData<dim>::Domination
+FiniteElementDomination::Domination
 FiniteElement<dim>::
 compare_for_domination (const FiniteElement<dim> &) const
 {
   Assert (false, ExcNotImplemented());
-  return FiniteElementData<dim>::neither_element_dominates;
+  return FiniteElementDomination::neither_element_dominates;
 }
 
 

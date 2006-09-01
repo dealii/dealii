@@ -199,7 +199,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * particular the hp paper.
 				      */
     virtual
-    typename FiniteElementData<dim>::Domination
+    FiniteElementDomination::Domination
     compare_for_domination (const FiniteElement<dim> &fe_other) const;
 
 				     /**

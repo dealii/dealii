@@ -2273,7 +2273,7 @@ FESystem<dim>::hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const
 
 
 template <int dim>
-typename FiniteElementData<dim>::Domination
+FiniteElementDomination::Domination
 FESystem<dim>::
 compare_for_domination (const FiniteElement<dim> &fe_other) const
 {
@@ -2288,8 +2288,8 @@ compare_for_domination (const FiniteElement<dim> &fe_other) const
       Assert (this->n_base_elements() == fe_sys_other->n_base_elements(),
 	      ExcNotImplemented());
 
-      typename FiniteElementData<dim>::Domination
-	domination = FiniteElementData<dim>::either_element_can_dominate;
+      FiniteElementDomination::Domination
+	domination = FiniteElementDomination::either_element_can_dominate;
 
 				       // loop over all base elements and do
 				       // some sanity checks
@@ -2303,101 +2303,24 @@ compare_for_domination (const FiniteElement<dim> &fe_other) const
 		  ExcNotImplemented());
 
 					   // for this pair of base elements,
-					   // check who dominates
-	  const typename FiniteElementData<dim>::Domination
-	    base_domination
-	    = (this->base_element(b)
-	       .compare_for_domination (fe_sys_other->base_element(b)));
-
-					   // now see what that means with
-					   // regard to the previous state
-	  switch (domination)
-	    {
-	      case FiniteElementData<dim>::either_element_can_dominate:
-	      {
-						 // we haven't made a decision
-						 // yet, simply copy what this
-						 // pair of bases have to say
-		domination = base_domination;
-		break;
-	      }
-	      
-	      case FiniteElementData<dim>::this_element_dominates:
-	      {
-						 // the present element
-						 // previously dominated. this
-						 // will still be the case if
-						 // either the present base
-						 // dominates or if the two
-						 // bases don't
-						 // care. otherwise, there is
-						 // a tie which we will not be
-						 // able to escape from no
-						 // matter what the other
-						 // pairs of bases are going
-						 // to say
-		switch (base_domination)
-		  {
-		    case FiniteElementData<dim>::either_element_can_dominate:
-		    case FiniteElementData<dim>::this_element_dominates:
-		    {
-		      break;
-		    }
-		    
-		    case FiniteElementData<dim>::other_element_dominates:
-		    case FiniteElementData<dim>::neither_element_dominates:
-		    {
-		      return FiniteElementData<dim>::neither_element_dominates;
-		    }
-
-		    default:
-							   // shouldn't get
-							   // here
-			  Assert (false, ExcInternalError());
-		  }
-		break;
-	      }
-
-	      case FiniteElementData<dim>::other_element_dominates:
-	      {
-						 // the  opposite case
-		switch (base_domination)
-		  {
-		    case FiniteElementData<dim>::either_element_can_dominate:
-		    case FiniteElementData<dim>::other_element_dominates:
-		    {
-		      break;
-		    }
-		    
-		    case FiniteElementData<dim>::this_element_dominates:
-		    case FiniteElementData<dim>::neither_element_dominates:
-		    {
-		      return FiniteElementData<dim>::neither_element_dominates;
-		    }
-
-		    default:
-			  Assert (false, ExcInternalError());
-		  }
-		break;
-	      }
-	      
-	      default:
-		    Assert (false, ExcInternalError());
-	    }
+					   // check who dominates and combine
+					   // with previous result
+	  domination = domination | (this->base_element(b)
+				     .compare_for_domination (fe_sys_other->base_element(b)));
 	}
 
 				       // if we've gotten here, then we've
 				       // either found a winner or either
 				       // element is fine being dominated
       Assert (domination !=
-	      FiniteElementData<dim>::neither_element_dominates,
+	      FiniteElementDomination::neither_element_dominates,
 	      ExcInternalError());
 
       return domination;
     }
   
   Assert (false, ExcNotImplemented());
-  return FiniteElementData<dim>::neither_element_dominates;
+  return FiniteElementDomination::neither_element_dominates;
 }
 
 

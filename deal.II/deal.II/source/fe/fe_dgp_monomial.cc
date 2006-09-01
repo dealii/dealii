@@ -317,19 +317,19 @@ FE_DGPMonomial<dim>::hp_constraints_are_implemented () const
 
 
 template <int dim>
-typename FiniteElementData<dim>::Domination
+FiniteElementDomination::Domination
 FE_DGPMonomial<dim>::
 compare_for_domination (const FiniteElement<dim> &fe_other) const
 {
 				   // check whether both are discontinuous
 				   // elements and both could dominate, see
 				   // the description of
-				   // FiniteElementData<dim>::Domination
+				   // FiniteElementDomination::Domination
   if (dynamic_cast<const FE_DGPMonomial<dim>*>(&fe_other) != 0)
-    return FiniteElementData<dim>::either_element_can_dominate;
+    return FiniteElementDomination::either_element_can_dominate;
 
   Assert (false, ExcNotImplemented());
-  return FiniteElementData<dim>::neither_element_dominates;
+  return FiniteElementDomination::neither_element_dominates;
 }
 
 

@@ -127,7 +127,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * particular the hp paper.
 				      */
     virtual
-    typename FiniteElementData<dim>::Domination
+    FiniteElementDomination::Domination
     compare_for_domination (const FiniteElement<dim> &fe_other) const;
     
 				     /**
