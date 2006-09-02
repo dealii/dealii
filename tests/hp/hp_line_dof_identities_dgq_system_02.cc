@@ -1,5 +1,5 @@
-//----------------------------  hp_line_dof_identities_q_system_02.cc  ---------------------------
-//    $Id: hp_line_dof_identities_q_system_02.cc 12464 2006-02-23 01:13:17Z wolf $
+//----------------------------  hp_line_dof_identities_dgq_system_02.cc  ---------------------------
+//    $Id: hp_line_dof_identities_dgq_system_02.cc 12464 2006-02-23 01:13:17Z wolf $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  hp_line_dof_identities_q_system_02.cc  ---------------------------
+//----------------------------  hp_line_dof_identities_dgq_system_02.cc  ---------------------------
 
 
 // check FESystem(FE_DGQ)::hp_line_dof_identities, but with a different
@@ -81,7 +81,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_line_dof_identities_q_system_02/output");
+  std::ofstream logfile("hp_line_dof_identities_dgq_system_02/output");
   logfile.precision(2);
   
   deallog.attach(logfile);
