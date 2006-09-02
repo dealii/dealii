@@ -12,7 +12,7 @@
 //----------------------------  hp_quad_dof_identities_q.cc  ---------------------------
 
 
-// check FE_Q::hp_quad_dof_identities
+// check FE_DGQ::hp_quad_dof_identities
 
 
 #include <base/logstream.h>
@@ -27,7 +27,7 @@ void test ()
 {
   hp::FECollection<dim> fe_collection;
   for (unsigned int i=1; i<8-dim; ++i)
-    fe_collection.push_back (FE_Q<dim>(i));
+    fe_collection.push_back (FE_DGQ<dim>(i));
 
   for (unsigned int i=0; i<fe_collection.size(); ++i)
     for (unsigned int j=0; j<fe_collection.size(); ++j)

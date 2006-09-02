@@ -1,5 +1,5 @@
-//----------------------------  hp_vertex_dof_identities_q.cc  ---------------------------
-//    $Id: hp_vertex_dof_identities_q.cc 12464 2006-02-23 01:13:17Z wolf $
+//----------------------------  hp_vertex_dof_identities_q_system_01.cc  ---------------------------
+//    $Id: hp_vertex_dof_identities_q_system_01.cc 12464 2006-02-23 01:13:17Z wolf $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors
@@ -9,15 +9,16 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  hp_vertex_dof_identities_q.cc  ---------------------------
+//----------------------------  hp_vertex_dof_identities_q_system_01.cc  ---------------------------
 
 
-// check FE_DGQ::hp_vertex_dof_identities
+// check FESystem(FE_DGQ)::hp_vertex_dof_identities
 
 
 #include <base/logstream.h>
 #include <fe/fe_collection.h>
-#include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
+#include <fe/fe_system.h>
 
 #include <fstream>
 
@@ -27,7 +28,7 @@ void test ()
 {
   hp::FECollection<dim> fe_collection;
   for (unsigned int i=1; i<8-dim; ++i)
-    fe_collection.push_back (FE_DGQ<dim>(i));
+    fe_collection.push_back (FESystem<dim>(FE_DGQ<dim>(i),3));
 
   for (unsigned int i=0; i<fe_collection.size(); ++i)
     for (unsigned int j=0; j<fe_collection.size(); ++j)
@@ -59,7 +60,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_vertex_dof_identities_q/output");
+  std::ofstream logfile("hp_vertex_dof_identities_q_system_01/output");
   logfile.precision(2);
   
   deallog.attach(logfile);

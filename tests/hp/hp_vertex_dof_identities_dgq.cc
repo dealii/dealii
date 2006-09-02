@@ -17,7 +17,7 @@
 
 #include <base/logstream.h>
 #include <fe/fe_collection.h>
-#include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
 
 #include <fstream>
 

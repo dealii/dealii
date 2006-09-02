@@ -1,5 +1,5 @@
-//----------------------------  hp_vertex_dof_identities_q.cc  ---------------------------
-//    $Id: hp_vertex_dof_identities_q.cc 12464 2006-02-23 01:13:17Z wolf $
+//----------------------------  hp_line_dof_identities_q.cc  ---------------------------
+//    $Id: hp_line_dof_identities_q.cc 12464 2006-02-23 01:13:17Z wolf $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors
@@ -9,15 +9,15 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  hp_vertex_dof_identities_q.cc  ---------------------------
+//----------------------------  hp_line_dof_identities_q.cc  ---------------------------
 
 
-// check FE_DGQ::hp_vertex_dof_identities
+// check FE_DGQ::hp_line_dof_identities
 
 
 #include <base/logstream.h>
 #include <fe/fe_collection.h>
-#include <fe/fe_q.h>
+#include <fe/fe_dgq.h>
 
 #include <fstream>
 
@@ -33,7 +33,7 @@ void test ()
     for (unsigned int j=0; j<fe_collection.size(); ++j)
       {
 	const std::vector<std::pair<unsigned int, unsigned int> >
-	  identities = fe_collection[i].hp_vertex_dof_identities (fe_collection[j]);
+	  identities = fe_collection[i].hp_line_dof_identities (fe_collection[j]);
 
 	deallog << "Identities for "
 		<< fe_collection[i].get_name() << " and "
@@ -43,9 +43,9 @@ void test ()
 	
 	for (unsigned int k=0; k<identities.size(); ++k)
 	  {
-	    Assert (identities[k].first < fe_collection[i].dofs_per_vertex,
+	    Assert (identities[k].first < fe_collection[i].dofs_per_line,
 		    ExcInternalError());
-	    Assert (identities[k].second < fe_collection[j].dofs_per_vertex,
+	    Assert (identities[k].second < fe_collection[j].dofs_per_line,
 		    ExcInternalError());
 	    
 	    deallog << identities[k].first << ' '
@@ -59,7 +59,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("hp_vertex_dof_identities_q/output");
+  std::ofstream logfile("hp_line_dof_identities_q/output");
   logfile.precision(2);
   
   deallog.attach(logfile);
