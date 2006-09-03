@@ -156,6 +156,63 @@ FE_DGP<dim>::hp_constraints_are_implemented () const
 
 
 template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_DGP<dim>::
+hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
+{
+				   // there are no such constraints for DGP
+				   // elements at all
+  if (dynamic_cast<const FE_DGP<dim>*>(&fe_other) != 0)
+    return
+      std::vector<std::pair<unsigned int, unsigned int> > ();
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+}
+
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_DGP<dim>::
+hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
+{
+				   // there are no such constraints for DGP
+				   // elements at all
+  if (dynamic_cast<const FE_DGP<dim>*>(&fe_other) != 0)
+    return
+      std::vector<std::pair<unsigned int, unsigned int> > ();
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+}
+
+
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_DGP<dim>::
+hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
+{
+				   // there are no such constraints for DGP
+				   // elements at all
+  if (dynamic_cast<const FE_DGP<dim>*>(&fe_other) != 0)
+    return
+      std::vector<std::pair<unsigned int, unsigned int> > ();
+  else
+    {
+      Assert (false, ExcNotImplemented());
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
+}
+
+
+
+template <int dim>
 FiniteElementDomination::Domination
 FE_DGP<dim>::compare_for_domination (const FiniteElement<dim> &fe_other) const
 {
