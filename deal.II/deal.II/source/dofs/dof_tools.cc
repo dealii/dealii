@@ -2161,39 +2161,23 @@ namespace internal
 						     // the subfaces and assemble it.
 		    for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
 		      {
-			typename DH::active_cell_iterator neighbor_child
-			  = cell->neighbor_child_on_subface (face, c);
+			const typename DH::active_face_iterator
+			  subface = cell->face(face)->child(c);
+
+			Assert (subface->n_active_fe_indices() == 1,
+				ExcInternalError());
+
+			const unsigned int
+			  subface_fe_index = subface->nth_active_fe_index(0);
 
 			const unsigned int n_dofs_on_children
-			  = neighbor_child->get_fe().dofs_per_face;
-			dofs_on_children.resize (n_dofs_on_children);
-
-			const unsigned int subface_fe_index
-			  = neighbor_child->active_fe_index();
-
-							 // some sanity checks
-							 // -- particularly
-							 // useful if you start
-							 // to think about faces
-							 // with
-							 // face_orientation==false
-							 // and whether we
-							 // really really have
-							 // the right face...
-			Assert (neighbor_child->n_active_fe_indices() == 1,
-				ExcInternalError());
-			Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
-				ExcInternalError());
-			Assert (cell->face(face)->child(c)->fe_index_is_active(subface_fe_index)
-				== true,
-				ExcInternalError());
-		      
+			  = subface->get_fe(subface_fe_index).dofs_per_face;
+			dofs_on_children.resize (n_dofs_on_children);		      
 							 // Same procedure as for the
 							 // mother cell. Extract the face
 							 // DoFs from the cell DoFs.
-			cell->face(face)->child(c)
-			  ->get_dof_indices (dofs_on_children,
-					     subface_fe_index);
+			subface->get_dof_indices (dofs_on_children,
+						  subface_fe_index);
 					      
 							 // Now create the
 							 // element constraint
@@ -2252,8 +2236,7 @@ namespace internal
 			face_constraints.reinit (n_dofs_on_mother,
 						 n_dofs_on_children);
 			cell->get_fe()
-			  .get_subface_interpolation_matrix (cell->get_dof_handler()
-							     .get_fe()[subface_fe_index],
+			  .get_subface_interpolation_matrix (subface->get_fe(subface_fe_index),
 							     c, face_constraints);
 
 							 // Add constraints to global constraint
