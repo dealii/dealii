@@ -2279,14 +2279,37 @@ namespace internal
 		    for (; dominating_subface_no<GeometryInfo<dim>::subfaces_per_face;
 			 ++dominating_subface_no)
 		      {
+							 // each of the
+							 // subfaces can have
+							 // only a single
+							 // fe_index
+							 // associated with
+							 // them, since there
+							 // is no cell on the
+							 // other side
+			Assert (cell->face(face)->child(dominating_subface_no)
+				->n_active_fe_indices()
+				== 1,
+				ExcInternalError());
+			
+			const FiniteElement<dim> &
+			  this_subface_fe = (cell->face(face)->child(dominating_subface_no)
+					     ->get_fe (cell->face(face)->child(dominating_subface_no)
+						       ->nth_active_fe_index(0)));
+			
 			FiniteElementDomination::Domination
 			  domination = FiniteElementDomination::either_element_can_dominate;
 			for (unsigned int sf=0; sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
 			  if (sf != dominating_subface_no)
-			    domination = domination &
-					 cell->neighbor_child_on_subface (face, dominating_subface_no)
-					 ->get_fe().compare_for_domination
-					 (cell->neighbor_child_on_subface (face, sf)->get_fe());
+			    {
+			      const FiniteElement<dim> &
+				that_subface_fe = (cell->face(face)->child(sf)
+						   ->get_fe (cell->face(face)->child(sf)
+							     ->nth_active_fe_index(0)));
+			      
+			      domination = domination &
+					   this_subface_fe.compare_for_domination(that_subface_fe);
+			    }
 			
 							 // see if the element
 							 // on this subface is
@@ -2304,26 +2327,37 @@ namespace internal
 						     // found one such subface
 		    Assert (dominating_subface_no != GeometryInfo<dim>::subfaces_per_face,
 			    ExcNotImplemented());
+
+		    const typename DH::active_face_iterator dominating_subface
+		      = cell->face(face)->child (dominating_subface_no);
+
+		    const unsigned int dominating_fe_index
+		      = dominating_subface->nth_active_fe_index(0);
+
+		    const FiniteElement<dim> &dominating_fe
+		      = dominating_subface->get_fe (dominating_fe_index);
 		    
-		    const typename DH::active_cell_iterator neighbor_child
-		      = cell->neighbor_child_on_subface (face, dominating_subface_no);
-		    const unsigned int n_dofs_on_children = neighbor_child->get_fe().dofs_per_face;
+						     // check also that it is
+						     // able to constrain the
+						     // mother face
+		    Assert ((dominating_fe.compare_for_domination
+			     (cell->face(face)->get_fe(cell->face(face)->nth_active_fe_index(0)))
+			     == FiniteElementDomination::this_element_dominates)
+			    ||
+			    (dominating_fe.compare_for_domination
+			     (cell->face(face)->get_fe(cell->face(face)->nth_active_fe_index(0)))
+			     == FiniteElementDomination::either_element_can_dominate),
+			    ExcInternalError());
+		    
+		    const unsigned int n_dofs_on_children = dominating_fe.dofs_per_face;
 		    dofs_on_children.resize (n_dofs_on_children);
 
 
-						     // Get DoFs on child cell with
-						     // lowest polynomial degree.
-						     // All other DoFs will be constrained
-						     // to the DoFs of this face.		   
-		    const unsigned int subface_fe_index
-		      = neighbor_child->active_fe_index();
-		      
 						     // Same procedure as for the
 						     // mother cell. Extract the face
 						     // DoFs from the cell DoFs.
-		    cell->face(face)->child(dominating_subface_no)
-		      ->get_dof_indices (dofs_on_children,
-					 subface_fe_index);
+		    dominating_subface->get_dof_indices (dofs_on_children,
+							 dominating_fe_index);
 
 
 						     // The idea is to introduce
@@ -2334,7 +2368,7 @@ namespace internal
 						     // connected faces to this intermediate
 						     // coarse level face. As the DoFs on
 						     // this intermediate coarse level face
-						     // do not exist, they have to determined
+						     // do not exist, they have to be determined
 						     // through the inverse of the constraint matrix
 						     // from the lowest order subface to
 						     // this intermediate coarse level face.
@@ -2372,17 +2406,32 @@ namespace internal
 						     // in terms of the DoFs on the intermediate
 						     // layer.
 						     //
-						     // As the DoFs in I are only "virtual"
-						     // they have to be expressed in terms
-						     // of existing DoFs. In this case only
-						     // A_3 is invertible. Therefore all
-						     // other DoFs have to be constrained
-						     // to the DoFs in F_2.
-						     // This leads to
-						     // I = A_3^-1 F_2
-						     // and
-						     // C = A_1 * A_3^-1 F_2
-						     // F_1 = A_2 * A_3^-1 F_2
+						     // As the DoFs in I are
+						     // only "virtual" they
+						     // have to be expressed
+						     // in terms of existing
+						     // DoFs. In this case
+						     // only A_3 is invertible
+						     // (it would be the
+						     // identity matrix if we
+						     // interpolated from face
+						     // to face, since it is
+						     // the same element from
+						     // and to which we
+						     // interpolate; however,
+						     // we interpolate from
+						     // subface to face, and
+						     // consequently the
+						     // matrix is invertible
+						     // but not the identity
+						     // matrix). Therefore all
+						     // other DoFs have to be
+						     // constrained to the
+						     // DoFs in F_2.  This
+						     // leads to I = A_3^-1
+						     // F_2 and C = A_1 *
+						     // A_3^-1 F_2, F_1 = A_2 *
+						     // A_3^-1 F_2
 						     //
 						     // Therefore the constraint matrices
 						     // in this case are:
@@ -2397,9 +2446,9 @@ namespace internal
 						      n_dofs_on_children);
 		    FullMatrix<double> fc_ipol_sface (n_dofs_on_children,
 						      n_dofs_on_children);
-		    neighbor_child->get_fe().get_subface_interpolation_matrix (neighbor_child->get_fe (),
-									       dominating_subface_no,
-									       fc_sface_ipol); 
+		    dominating_fe.get_subface_interpolation_matrix (dominating_fe,
+								    dominating_subface_no,
+								    fc_sface_ipol); 
 						     // Invert it, to get a mapping from the DoFs of the
 						     // "Master-subface" to the intermediate layer.
 		    fc_ipol_sface.invert (fc_sface_ipol);
@@ -2413,8 +2462,8 @@ namespace internal
 						       n_dofs_on_mother);
 		    FullMatrix<double> fc_mother_sface (n_dofs_on_children,
 							n_dofs_on_mother);
-		    neighbor_child->get_fe ().get_face_interpolation_matrix (cell->get_fe(),
-									     fc_mother_ipol);
+		    dominating_fe.get_face_interpolation_matrix (cell->get_fe(),
+								 fc_mother_ipol);
 		    fc_ipol_sface.mmult (fc_mother_sface, fc_mother_ipol);
 
 						     // Add constraints to global constraint
@@ -2427,54 +2476,48 @@ namespace internal
 						     // Now create constraint matrices for
 						     // the subfaces and assemble them
 		    for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
-		      {
-							 // As the "Master-subface" does not need constraints, skip it.
-			if (c != dominating_subface_no)
-			  {
-			    typename DH::active_cell_iterator neighbor_child_slave
-			      = cell->neighbor_child_on_subface (face, c);
-			    const unsigned int n_dofs_on_mother = neighbor_child_slave->get_fe().dofs_per_face;
-			    dofs_on_mother.resize (n_dofs_on_mother);
+						       // As the
+						       // "Master-subface"
+						       // does not need
+						       // constraints, skip
+						       // it.
+		      if (c != dominating_subface_no)
+			{
+			  const typename DH::active_face_iterator subface
+			    = cell->face(face)->child(c);
 
-							     // Find face number on the finer
-							     // neighboring cell, which is
-							     // shared the face with the
-							     // face of the coarser cell.
-			    const unsigned int neighbor2=
-			      cell->neighbor_of_neighbor(face);
-			    Assert (neighbor_child_slave->face(neighbor2) == cell->face(face)->child(c),
-				    ExcInternalError());
+			  Assert (subface->n_active_fe_indices() == 1,
+				  ExcInternalError());
+			  
+			  const unsigned int subface_fe_index
+			    = subface->nth_active_fe_index(0);
+
+			  const unsigned int n_dofs_on_mother
+			    = subface->get_fe(subface_fe_index).dofs_per_face;
+			  dofs_on_mother.resize (n_dofs_on_mother);
 		      
-							     // Same procedure as for the
-							     // mother cell. Extract the face
-							     // DoFs from the cell DoFs.
-			    const unsigned int subface_fe_index
-			      = neighbor_child_slave->active_fe_index();
-		      
-			    cell->face(face)->child(c)
-			      ->get_dof_indices (dofs_on_mother,
-						 subface_fe_index);		      
+			  subface->get_dof_indices (dofs_on_mother,
+						    subface_fe_index);		      
 					      
-							     // Now create the element
-							     // constraint for this subface.
-			    FullMatrix<double> fc_child_sface_ipol (n_dofs_on_children,
-								    n_dofs_on_mother);
-			    FullMatrix<double> fc_child_sface_sface (n_dofs_on_children,
-								     n_dofs_on_mother);
-			    neighbor_child->get_fe ().get_subface_interpolation_matrix 
-			      (neighbor_child_slave->get_fe(),
-			       c, fc_child_sface_ipol);
+							   // Now create the element
+							   // constraint for this subface.
+			  FullMatrix<double> fc_child_sface_ipol (n_dofs_on_children,
+								  n_dofs_on_mother);
+			  FullMatrix<double> fc_child_sface_sface (n_dofs_on_children,
+								   n_dofs_on_mother);
+			  dominating_fe.get_subface_interpolation_matrix 
+			    (subface->get_fe(subface_fe_index),
+			     c, fc_child_sface_ipol);
 
-			    fc_ipol_sface.mmult (fc_child_sface_sface, fc_child_sface_ipol);
+			  fc_ipol_sface.mmult (fc_child_sface_sface, fc_child_sface_ipol);
 
-							     // Add constraints to global constraint
-							     // matrix.
-			    filter_constraints (dofs_on_children,
-						dofs_on_mother,
-						fc_child_sface_sface,
-						constraints);
-			  }
-		      }
+							   // Add constraints to global constraint
+							   // matrix.
+			  filter_constraints (dofs_on_children,
+					      dofs_on_mother,
+					      fc_child_sface_sface,
+					      constraints);
+			}
 
 		    break;
 		  }
