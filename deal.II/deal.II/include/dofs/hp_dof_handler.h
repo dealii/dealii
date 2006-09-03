@@ -1412,6 +1412,9 @@ namespace hp
   unsigned int
   DoFHandler<dim>::n_dofs () const
   {
+    Assert (finite_elements != 0,
+	    ExcMessage ("No finite element collection is associated with "
+			"this DoFHandler"));
     return used_dofs;
   }
 
@@ -1422,6 +1425,9 @@ namespace hp
   const hp::FECollection<dim> &
   DoFHandler<dim>::get_fe () const
   {
+    Assert (finite_elements != 0,
+	    ExcMessage ("No finite element collection is associated with "
+			"this DoFHandler"));
     return *finite_elements;
   }
 
