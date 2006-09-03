@@ -34,7 +34,8 @@ tests_x = hp_dof_handler \
 	  integrate_difference \
 	  hp_*_dof_identities_* \
 	  hp_hanging_nodes_* \
-	  interpolate_*
+	  interpolate_* \
+	  hp_constraints_*
 
 # from above list of regular expressions, generate the real set of
 # tests

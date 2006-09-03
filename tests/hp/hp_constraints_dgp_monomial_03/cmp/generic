@@ -1,0 +1,232 @@
+
+DEAL::n_dofs=14
+DEAL:cg::Starting value 3.59
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_0, rel. error=0
+DEAL:cg::Starting value 3.77
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_1, rel. error=0.0872
+DEAL:cg::Starting value 4.97
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_2, rel. error=0.0871
+DEAL::n_dofs=14
+DEAL:cg::Starting value 3.35
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_0, rel. error=0
+DEAL:cg::Starting value 3.72
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_1, rel. error=0.101
+DEAL:cg::Starting value 4.82
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_2, rel. error=0.0883
+DEAL::n_dofs=14
+DEAL:cg::Starting value 3.35
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_0, rel. error=0
+DEAL:cg::Starting value 3.47
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_1, rel. error=0.0745
+DEAL:cg::Starting value 4.61
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_2, rel. error=0.0716
+DEAL::n_dofs=14
+DEAL:cg::Starting value 3.35
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_0, rel. error=0
+DEAL:cg::Starting value 3.26
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_1, rel. error=0.0697
+DEAL:cg::Starting value 4.32
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_2, rel. error=0.0632
+DEAL::n_dofs=14
+DEAL:cg::Starting value 3.35
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_0, rel. error=0
+DEAL:cg::Starting value 3.62
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_1, rel. error=0.0844
+DEAL:cg::Starting value 4.76
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_2, rel. error=0.0797
+DEAL::n_dofs=14
+DEAL:cg::Starting value 3.35
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_0, rel. error=0
+DEAL:cg::Starting value 3.68
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_1, rel. error=0.0917
+DEAL:cg::Starting value 4.79
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_2, rel. error=0.0834
+DEAL::n_dofs=14
+DEAL:cg::Starting value 3.35
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_0, rel. error=0
+DEAL:cg::Starting value 3.37
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_1, rel. error=0.0716
+DEAL:cg::Starting value 4.48
+DEAL:cg::Convergence step 1 value 0
+DEAL::FE_DGPMonomial<3>(0), P_2, rel. error=0.0670
+DEAL::n_dofs=56
+DEAL:cg::Starting value 4.58
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_DGPMonomial<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 4.94
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_DGPMonomial<3>(1), P_1, rel. error=0.0179
+DEAL:cg::Starting value 6.45
+DEAL:cg::Convergence step 15 value 0
+DEAL::FE_DGPMonomial<3>(1), P_2, rel. error=0.0319
+DEAL::n_dofs=56
+DEAL:cg::Starting value 4.28
+DEAL:cg::Convergence step 18 value 0
+DEAL::FE_DGPMonomial<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 4.87
+DEAL:cg::Convergence step 18 value 0
+DEAL::FE_DGPMonomial<3>(1), P_1, rel. error=0.0199
+DEAL:cg::Starting value 6.25
+DEAL:cg::Convergence step 18 value 0
+DEAL::FE_DGPMonomial<3>(1), P_2, rel. error=0.0306
+DEAL::n_dofs=56
+DEAL:cg::Starting value 4.28
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 4.54
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_1, rel. error=0.0149
+DEAL:cg::Starting value 5.98
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_2, rel. error=0.0246
+DEAL::n_dofs=56
+DEAL:cg::Starting value 4.28
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 4.30
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_1, rel. error=0.0137
+DEAL:cg::Starting value 5.64
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_2, rel. error=0.0220
+DEAL::n_dofs=56
+DEAL:cg::Starting value 4.28
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 4.74
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_1, rel. error=0.0168
+DEAL:cg::Starting value 6.17
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_2, rel. error=0.0273
+DEAL::n_dofs=56
+DEAL:cg::Starting value 4.28
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 4.81
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_1, rel. error=0.0180
+DEAL:cg::Starting value 6.21
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_2, rel. error=0.0285
+DEAL::n_dofs=56
+DEAL:cg::Starting value 4.28
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_0, rel. error=0
+DEAL:cg::Starting value 4.43
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_1, rel. error=0.0142
+DEAL:cg::Starting value 5.82
+DEAL:cg::Convergence step 21 value 0
+DEAL::FE_DGPMonomial<3>(1), P_2, rel. error=0.0231
+DEAL::n_dofs=140
+DEAL:cg::Starting value 5.09
+DEAL:cg::Convergence step 49 value 0
+DEAL::FE_DGPMonomial<3>(2), P_0, rel. error=0
+DEAL:cg::Starting value 5.59
+DEAL:cg::Convergence step 49 value 0
+DEAL::FE_DGPMonomial<3>(2), P_1, rel. error=0
+DEAL:cg::Starting value 7.26
+DEAL:cg::Convergence step 49 value 0
+DEAL::FE_DGPMonomial<3>(2), P_2, rel. error=0.00820
+DEAL:cg::Starting value 7.52
+DEAL:cg::Convergence step 51 value 0
+DEAL::FE_DGPMonomial<3>(2), P_3, rel. error=0.0101
+DEAL::n_dofs=140
+DEAL:cg::Starting value 4.77
+DEAL:cg::Convergence step 64 value 0
+DEAL::FE_DGPMonomial<3>(2), P_0, rel. error=0
+DEAL:cg::Starting value 5.51
+DEAL:cg::Convergence step 64 value 0
+DEAL::FE_DGPMonomial<3>(2), P_1, rel. error=0
+DEAL:cg::Starting value 7.04
+DEAL:cg::Convergence step 64 value 0
+DEAL::FE_DGPMonomial<3>(2), P_2, rel. error=0.00789
+DEAL:cg::Starting value 7.39
+DEAL:cg::Convergence step 64 value 0
+DEAL::FE_DGPMonomial<3>(2), P_3, rel. error=0.0101
+DEAL::n_dofs=140
+DEAL:cg::Starting value 4.77
+DEAL:cg::Convergence step 73 value 0
+DEAL::FE_DGPMonomial<3>(2), P_0, rel. error=0
+DEAL:cg::Starting value 5.14
+DEAL:cg::Convergence step 77 value 0
+DEAL::FE_DGPMonomial<3>(2), P_1, rel. error=0
+DEAL:cg::Starting value 6.73
+DEAL:cg::Convergence step 77 value 0
+DEAL::FE_DGPMonomial<3>(2), P_2, rel. error=0.00661
+DEAL:cg::Starting value 6.95
+DEAL:cg::Convergence step 77 value 0
+DEAL::FE_DGPMonomial<3>(2), P_3, rel. error=0.00839
+DEAL::n_dofs=140
+DEAL:cg::Starting value 4.77
+DEAL:cg::Convergence step 73 value 0
+DEAL::FE_DGPMonomial<3>(2), P_0, rel. error=0
+DEAL:cg::Starting value 4.88
+DEAL:cg::Convergence step 78 value 0
+DEAL::FE_DGPMonomial<3>(2), P_1, rel. error=0
+DEAL:cg::Starting value 6.36
+DEAL:cg::Convergence step 77 value 0
+DEAL::FE_DGPMonomial<3>(2), P_2, rel. error=0.00615
+DEAL:cg::Starting value 6.44
+DEAL:cg::Convergence step 77 value 0
+DEAL::FE_DGPMonomial<3>(2), P_3, rel. error=0.00764
+DEAL::n_dofs=140
+DEAL:cg::Starting value 4.77
+DEAL:cg::Convergence step 73 value 0
+DEAL::FE_DGPMonomial<3>(2), P_0, rel. error=0
+DEAL:cg::Starting value 5.35
+DEAL:cg::Convergence step 77 value 0
+DEAL::FE_DGPMonomial<3>(2), P_1, rel. error=0
+DEAL:cg::Starting value 6.94
+DEAL:cg::Convergence step 77 value 0
+DEAL::FE_DGPMonomial<3>(2), P_2, rel. error=0.00712
+DEAL:cg::Starting value 7.23
+DEAL:cg::Convergence step 77 value 0
+DEAL::FE_DGPMonomial<3>(2), P_3, rel. error=0.00906
+DEAL::n_dofs=140
+DEAL:cg::Starting value 4.77
+DEAL:cg::Convergence step 74 value 0
+DEAL::FE_DGPMonomial<3>(2), P_0, rel. error=0
+DEAL:cg::Starting value 5.44
+DEAL:cg::Convergence step 76 value 0
+DEAL::FE_DGPMonomial<3>(2), P_1, rel. error=0
+DEAL:cg::Starting value 6.99
+DEAL:cg::Convergence step 78 value 0
+DEAL::FE_DGPMonomial<3>(2), P_2, rel. error=0.00742
+DEAL:cg::Starting value 7.32
+DEAL:cg::Convergence step 73 value 0
+DEAL::FE_DGPMonomial<3>(2), P_3, rel. error=0.00947
+DEAL::n_dofs=140
+DEAL:cg::Starting value 4.77
+DEAL:cg::Convergence step 73 value 0
+DEAL::FE_DGPMonomial<3>(2), P_0, rel. error=0
+DEAL:cg::Starting value 5.02
+DEAL:cg::Convergence step 77 value 0
+DEAL::FE_DGPMonomial<3>(2), P_1, rel. error=0
+DEAL:cg::Starting value 6.56
+DEAL:cg::Convergence step 77 value 0
+DEAL::FE_DGPMonomial<3>(2), P_2, rel. error=0.00633
+DEAL:cg::Starting value 6.72
+DEAL:cg::Convergence step 77 value 0
+DEAL::FE_DGPMonomial<3>(2), P_3, rel. error=0.00797
