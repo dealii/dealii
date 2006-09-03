@@ -257,6 +257,90 @@ DoFAccessor<dim,DH>::fe_index_is_active (const unsigned int fe_index) const
 }
 
 
+
+template <int dim, class DH>
+inline
+const FiniteElement<DH::dimension> &
+DoFAccessor<dim,DH>::get_fe (const unsigned int fe_index) const
+{
+  Assert (fe_index_is_active (fe_index) == true,
+	  ExcMessage ("This message can only be called for active fe indices"));
+  
+  return this->dof_handler->get_fe()[fe_index];
+}
+
+
+
+template <>
+inline
+const FiniteElement<1> &
+DoFAccessor<1,::DoFHandler<1> >::get_fe (const unsigned int fe_index) const
+{
+  Assert (fe_index_is_active (fe_index) == true,
+	  ExcMessage ("This message can only be called for active fe indices"));  
+  return this->dof_handler->get_fe();
+}
+
+
+
+template <>
+inline
+const FiniteElement<2> &
+DoFAccessor<1,::DoFHandler<2> >::get_fe (const unsigned int fe_index) const
+{
+  Assert (fe_index_is_active (fe_index) == true,
+	  ExcMessage ("This message can only be called for active fe indices"));  
+  return this->dof_handler->get_fe();
+}
+
+
+
+template <>
+inline
+const FiniteElement<3> &
+DoFAccessor<1,::DoFHandler<3> >::get_fe (const unsigned int fe_index) const
+{
+  Assert (fe_index_is_active (fe_index) == true,
+	  ExcMessage ("This message can only be called for active fe indices"));  
+  return this->dof_handler->get_fe();
+}
+
+
+
+template <>
+inline
+const FiniteElement<2> &
+DoFAccessor<2,::DoFHandler<2> >::get_fe (const unsigned int fe_index) const
+{
+  Assert (fe_index_is_active (fe_index) == true,
+	  ExcMessage ("This message can only be called for active fe indices"));  
+  return this->dof_handler->get_fe();
+}
+
+
+
+template <>
+inline
+const FiniteElement<3> &
+DoFAccessor<2,::DoFHandler<3> >::get_fe (const unsigned int fe_index) const
+{
+  Assert (fe_index_is_active (fe_index) == true,
+	  ExcMessage ("This message can only be called for active fe indices"));  
+  return this->dof_handler->get_fe();
+}
+
+
+
+template <>
+inline
+const FiniteElement<3> &
+DoFAccessor<3,::DoFHandler<3> >::get_fe (const unsigned int fe_index) const
+{
+  Assert (fe_index_is_active (fe_index) == true,
+	  ExcMessage ("This message can only be called for active fe indices"));  
+  return this->dof_handler->get_fe();
+}
+
 /*------------------------- Functions: DoFObjectAccessor<1,dim> -----------------------*/
 
 

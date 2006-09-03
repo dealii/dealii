@@ -446,6 +446,17 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
     bool
     fe_index_is_active (const unsigned int fe_index) const;
 
+				     /**
+				      * Return a reference to the finite
+				      * element used on this object with the
+				      * given @p fe_index. @p fe_index must be
+				      * used on this object,
+				      * i.e. <code>fe_index_is_active(fe_index)</code>
+				      * must return true.
+				      */
+    const FiniteElement<DH::dimension> &
+    get_fe (const unsigned int fe_index) const;
+    
                                      /**
 				      * Exceptions for child classes
 				      *
