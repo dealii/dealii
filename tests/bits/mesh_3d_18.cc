@@ -47,36 +47,49 @@ void test_with_wrong_face_orientation ()
   ++cell;
   ++cell;
 
-  deallog << "Cell=" << cell << std::endl;
-  deallog << "Neighbor=" << cell->neighbor(3) << std::endl;
+  deallog << "cell=" << cell << std::endl;
+  deallog << "cell->neighbor(3)=" << cell->neighbor(3) << std::endl;
+  deallog << "cell->face_orientation(3)="
+	  << (cell->face_orientation(3) ? "true" : "false")
+	  << std::endl;
   
   const Triangulation<3>::active_cell_iterator neighbor_child
     = cell->neighbor_child_on_subface (3, 1);
 
-  deallog << "Neighbor_child(3,1)=" << neighbor_child << std::endl;
+  deallog << "cell->neighbor_child_on_subface(3,1)=" << neighbor_child << std::endl;
+  deallog << "cell->neighbor_child_on_subface(3,1)->neighbor(5)="
+	  << neighbor_child->neighbor(5) << std::endl;
+
+  deallog << "cell->neighbor_child_on_subface(3,1)->face_orientation(5)="
+	  << (neighbor_child->face_orientation(5) ? "true" : "false")
+	  << std::endl;
+  
+  deallog << "cell->face(3)=" << cell->face(3) << std::endl;
+  for (unsigned int i=0; i<4; ++i)
+    deallog << "cell->face(3)->child(" << i << ")="
+	    << cell->face(3)->child(i) << std::endl;
+  
   for (unsigned int i=0; i<6; ++i)
-    {
-      deallog << "Neighbor_child neighbors=";
-      if (neighbor_child->at_boundary(i))
-	deallog << "(at boundary)";
-      else
-	deallog << neighbor_child->neighbor(i);
-      deallog << std::endl;
-    }
+    deallog << "cell->neighbor(3)->face(" << i << ")="
+	    << cell->neighbor(3)->face(i) << std::endl;
 
-  deallog << "Neighbor_of_neighbor=" << cell->neighbor_of_neighbor(3) << std::endl;
+  for (unsigned int i=0; i<6; ++i)
+    deallog << "cell->neighbor_child_on_subface(3,1)->face(" << i << ")="
+	    << cell->neighbor_child_on_subface(3,1)->face(i) << std::endl;
 
-  deallog << "Face=" << cell->face(3) << std::endl;
-  for (unsigned int i=0; i<4; ++i)
-    deallog << "Face_child=" << cell->face(3)->child(i) << std::endl;
-  
-  for (unsigned int i=0; i<4; ++i)
-    deallog << "Neighbor_face=" << cell->neighbor(3)->face(i) << std::endl;
-
-  for (unsigned int i=0; i<4; ++i)
-    deallog << "Neighbor_child_face=" << neighbor_child->face(i) << std::endl;
-  
-  Assert (cell->face(3)->child(1) ==
+				   // The following assertion was originally
+				   // in make_hanging_node_constraints with an
+				   // equality sign and triggered for the mesh
+				   // and cell here at hand. however, if one
+				   // carefully reads the comment for
+				   // CellAccessor::neighbor_child_on_subface,
+				   // one realizes that it isn't true if
+				   // cell->face_orientation()==false for the
+				   // face we are presently considering. the
+				   // original assertion therefore
+				   // failed. let's make sure we get the
+				   // status we expect.
+  Assert (cell->face(3)->child(1) !=
 	  neighbor_child->face(cell->neighbor_of_neighbor(3)),
 	  ExcInternalError());
 }
