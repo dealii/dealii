@@ -106,6 +106,27 @@ int main ()
 
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
+  for (hp::DoFHandler<2>::active_cell_iterator
+	 cell = dof_handler.begin_active();
+       cell != dof_handler.end(); ++cell)
+    {
+      deallog << "Cell=" << cell << std::endl;
+      deallog << "    vertices="
+	      << cell->vertex_index(0) << ' '
+	      << cell->vertex_index(1) << ' '
+	      << cell->vertex_index(2) << ' '
+	      << cell->vertex_index(3) << std::endl;
+      deallog << "    active_fe_index=" << cell->active_fe_index() << std::endl;
+
+      deallog << "    dofs=";
+      std::vector<unsigned int> local_dofs (fe[cell->active_fe_index()].dofs_per_cell);
+      cell->get_dof_indices (local_dofs);
+      for (unsigned int i=0; i<fe[cell->active_fe_index()].dofs_per_cell; ++i)
+	deallog << local_dofs[i] << ' ';
+      deallog << std::endl;
+    }
+
+  
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   constraints);
