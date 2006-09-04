@@ -101,7 +101,8 @@ int main ()
   for (hp::DoFHandler<2>::active_cell_iterator
 	 cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell, ++cell_no)
-    cell->set_active_fe_index (cell_no % fe.size());
+    cell->set_active_fe_index (0);
+  (++dof_handler.begin_active())->set_active_fe_index (1);
   dof_handler.distribute_dofs (fe);
 
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
