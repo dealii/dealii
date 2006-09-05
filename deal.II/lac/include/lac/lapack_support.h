@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,6 +35,26 @@ namespace LAPACKSupport
 	unusable = 0x8000
   };
   
+				   /**
+				    * Function printing the name of a State.
+				    */
+  inline const char* state_name(State s)
+  {
+    switch (s)
+      {
+	case matrix:
+	      return "matrix";
+	case lu:
+	      return "lu decomposition";
+	case eigenvalues:
+	      return "eigenvalues";
+	case unusable:
+	      return "unusable";
+	default:
+	      return "unknown";
+      }
+    return "internal error";
+  }
   
 /**
  * A matrix can have certain features allowing for optimization, but
@@ -76,6 +96,20 @@ namespace LAPACKSupport
 				    * Integer constant.
 				    */
   static const int one = 1;
+
+				   /**
+				    * Exception thrown when a matrix
+				    * is not in a suitable state for
+				    * an operation. For instance, a
+				    * LAPACK routine may have left the
+				    * matrix in an unusable state,
+				    * then vmult does not make sense
+				    * anymore.
+				    */
+  DeclException1(ExcState, State,
+		 << "The function cannot be called while the matrix is in state "
+		 << state_name(arg1));
+  
 }
 
 

@@ -16,6 +16,7 @@
 #include <base/config.h>
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
+#include <lac/lapack_support.h>
 
 #include <vector>
 #include <iomanip>
@@ -278,8 +279,8 @@ class TridiagonalMatrix
 ///@name LAPACK operations
 //@{
 				     /**
-				      * Return the eigenvalues of the
-				      * matrix in the vector provided.
+				      * Compute the eigenvalues of the
+				      * symmetric tridiagonal matrix.
 				      *
 				      * @note This function requires
 				      * configuration of deal.II with
@@ -287,7 +288,13 @@ class TridiagonalMatrix
 				      * the matrix must use symmetric
 				      * storage technique.
 				      */
-    void eigenvalues(Vector<number>& eigenvalues) const;
+    void compute_eigenvalues();
+				     /**
+				      * After calling
+				      * compute_eigenvalues(), you can
+				      * access each eigenvalue here.
+				      */
+    number eigenvalue(const unsigned i) const;
 //@}
 ///@name Miscellanea
 //@{
@@ -347,6 +354,19 @@ class TridiagonalMatrix
 				      * matrix is assumed symmetric.
 				      */
     bool is_symmetric;
+    
+				     /**
+				      * The state of the
+				      * matrix. Normally, the state is
+				      * LAPACKSupport::matrix,
+				      * indicating that the object can
+				      * be used for regular matrix
+				      * operations.
+				      *
+				      * See explanation of this data
+				      * type for details.
+				      */
+    LAPACKSupport::State state;
 };
 
 /**@}*/

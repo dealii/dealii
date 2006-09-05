@@ -13,6 +13,9 @@
 
 #include <lac/tridiagonal_matrix.h>
 #include <lac/vector.h>
+#include <lac/lapack_templates.h>
+
+using namespace LAPACKSupport;
 
 template<typename number>
 TridiagonalMatrix<number>::TridiagonalMatrix(
@@ -22,7 +25,8 @@ TridiagonalMatrix<number>::TridiagonalMatrix(
 		diagonal(size, 0.),
 		left((symmetric ? 0 : size), 0.),
 		right(size, 0.),
-		is_symmetric(symmetric)
+		is_symmetric(symmetric),
+		state(matrix)
 {}
 
 
@@ -36,6 +40,7 @@ TridiagonalMatrix<number>::reinit(
   diagonal.resize(size);
   right.resize(size);
   left.resize(symmetric ? 0 : size);
+  state = matrix;
 }
 
 
@@ -43,6 +48,8 @@ template<typename number>
 bool
 TridiagonalMatrix<number>::all_zero() const
 {
+  Assert(state == matrix, ExcState(state));
+  
   typename std::vector<number>::const_iterator i;
   typename std::vector<number>::const_iterator e;
 
@@ -68,6 +75,8 @@ TridiagonalMatrix<number>::vmult (
   const Vector<number> &v,
   const bool            adding) const
 {
+  Assert(state == matrix, ExcState(state));
+  
   Assert(w.size() == n(), ExcDimensionMismatch(w.size(), n()));
   Assert(v.size() == n(), ExcDimensionMismatch(v.size(), n()));
 
@@ -128,6 +137,8 @@ TridiagonalMatrix<number>::Tvmult (
   const Vector<number> &v,
   const bool            adding) const
 {
+  Assert(state == matrix, ExcState(state));
+  
   Assert(w.size() == n(), ExcDimensionMismatch(w.size(), n()));
   Assert(v.size() == n(), ExcDimensionMismatch(v.size(), n()));
 
@@ -177,6 +188,8 @@ TridiagonalMatrix<number>::matrix_scalar_product(
   const Vector<number>& w,
   const Vector<number>& v) const
 {
+  Assert(state == matrix, ExcState(state));
+  
   const unsigned int e=n()-1;
   typename std::vector<number>::const_iterator d = diagonal.begin();
   typename std::vector<number>::const_iterator r = right.begin();
@@ -206,10 +219,33 @@ TridiagonalMatrix<number>::matrix_norm_square(
 
 template<typename number>
 void
-TridiagonalMatrix<number>::eigenvalues(Vector<number>&) const
+TridiagonalMatrix<number>::compute_eigenvalues()
 {
-  Assert(false, ExcNotImplemented());
+#ifdef HAVE_LIBLAPACK
+  Assert(state == matrix, ExcState(state));
+  Assert(is_symmetric, ExcNotImplemented());
+  
+  const int nn = n();
+  int info;
+  stev (&N, &nn, &*diagonal.begin(), &*right.begin(), 0, &one, 0, &info);
+  Assert(info == 0, ExcInternalError());
+  
+  state = eigenvalues;
+#else
+  Assert(false, ExcNeedsLAPACK());
+#endif
 }
+
+
+template<typename number>
+number
+TridiagonalMatrix<number>::eigenvalue(const unsigned int i) const
+{
+  Assert(state == eigenvalues, ExcState(state));
+  Assert(i<n(), ExcIndexRange(i,0,n()));
+  return diagonal[i];
+}
+
 
 /*
 template<typename number>
