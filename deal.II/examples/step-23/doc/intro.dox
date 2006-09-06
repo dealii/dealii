@@ -294,7 +294,11 @@ It is worth noting that if we choose the same mesh on each time step
 (as we will in fact do in the program below), then we have the same
 shape functions on time step $n$ and $n-1$,
 i.e. $\phi^n_i=\phi_i^{n-1}=\phi_i$. Consequently, we get
-$M^n=M^{n,n-1}=M$ and $A^n=A^{n,n-1}=A$.
+$M^n=M^{n,n-1}=M$ and $A^n=A^{n,n-1}=A$. On the other hand, if we had
+used different shape functions, then we would have to compute
+integrals that contain shape functions defined on two meshes. This is a
+somewhat messy process that we omit here, but that is treated in some
+detail in @ref step_22 "step-22".
 
 As a final note, we remember that we have posed boundary values for
 $u$, but not $v$. In practice that means that we have to apply
