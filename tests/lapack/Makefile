@@ -20,7 +20,7 @@ default: run-tests
 
 ############################################################
 
-tests_x = tridiagonal_ev1
+tests_x = tridiagonal_ev1 full_matrix
 
 
 # from above list of regular expressions, generate the real set of

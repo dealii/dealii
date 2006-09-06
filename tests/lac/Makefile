@@ -28,7 +28,7 @@ tests_x = vector-vector \
 	block_vector block_vector_* block_matrices \
 	matrix_lib matrix_out pointer_matrix \
 	solver eigen \
-	sparse_ilu sparse_ilu_t lapack lapack_fill block_minres \
+	sparse_ilu sparse_ilu_t lapack_fill block_minres \
 	identity_matrix* trace
 
 

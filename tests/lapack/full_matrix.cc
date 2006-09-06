@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -47,13 +47,12 @@ const double rect[] =
 
 int main()
 {
-  std::ofstream logfile("lapack/output");
+  std::ofstream logfile("full_matrix/output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-#ifdef HAVE_LIBLAPACK
   FullMatrix<double> A(3,4,rect);
   LAPACKFullMatrix<double> LA(3,4);
   LA = A;
@@ -114,23 +113,5 @@ int main()
     }
   
   v1.reinit(4);
-  v2.reinit(4);
-  
-#else
-			// If lapack is not available, this
-				   // test will not complain.
-  deallog.push("Rect");
-  deallog << "operator= (const FullMatrix<number>&) ok" << std::endl;
-  deallog << "vmult ok" << std::endl;
-  deallog << "vmult_add ok" << std::endl;
-  deallog << "Tvmult ok" << std::endl;
-  deallog << "Tvmult_add ok" << std::endl;
-  deallog.pop();
-  
-  deallog << "Eigenvalues 5\t0" << std::endl;
-  deallog << "Eigenvalues 1\t0" << std::endl;
-  deallog << "Eigenvalues 5\t0" << std::endl;
-  deallog << "Eigenvalues 5\t0" << std::endl;
-  deallog.pop();
-#endif
+  v2.reinit(4);  
 }
