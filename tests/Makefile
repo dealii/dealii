@@ -3,6 +3,9 @@
 # Common Makefile for all test directories
 
 all: base lac fe deal.II multigrid bits hp
+	@if grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
+		cd lapack ; $(MAKE) ; cd .. ; \
+	fi
 
 base:
 	cd base ; $(MAKE)
@@ -30,17 +33,28 @@ report:
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
+	@if grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
+		echo =======Report: lapack ======= ; \
+		cd lapack ; $(MAKE) report ; cd .. ; \
+	fi
 
 report+mail:
 	@for i in base lac fe deal.II multigrid bits hp all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report+mail ; cd .. ; \
 	 done
+	@if grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
+		echo =======Report: lapack ======= ; \
+		cd lapack ; $(MAKE) report+mail ; cd .. ; \
+	fi
 
 
 # compilation of tests only, no execution of tests
 
 build: build-base build-lac build-fe build-deal.II build-multigrid build-bits build-hp
+	@if grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
+		cd lapack ; $(MAKE) build ; cd .. ; \
+	fi
 
 build-base:
 	cd base ; $(MAKE) build
@@ -68,6 +82,9 @@ build-hp:
 # reference values
 
 output: output-base output-lac output-fe output-deal.II output-bits output-hp
+	@if grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
+		cd lapack ; $(MAKE) output ; cd .. ; \
+	fi
 
 output-base:
 	cd base ; $(MAKE) output
@@ -95,6 +112,9 @@ output-hp:
 # update/generate references
 
 refs: refs-base refs-lac refs-fe refs-deal.II refs-bits refs-hp
+	@if grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
+		cd lapack ; $(MAKE) refs ; cd .. ; \
+	fi
 
 refs-base:
 	cd base ; $(MAKE) refs
@@ -122,9 +142,9 @@ refs-hp:
 resultname:
 	@echo $(TARGET)+$(GXX-VERSION)
 
-clean: clean-base clean-lac clean-deal.II clean-fe clean-bits clean-hp
+clean: clean-base clean-lac clean-deal.II clean-fe clean-bits clean-hp clean-lapack
 
-distclean: distclean-base distclean-lac distclean-deal.II distclean-fe distclean-bits distclean-hp
+distclean: distclean-base distclean-lac distclean-deal.II distclean-fe distclean-bits distclean-hp distclean-lapack
 
 clean-base:
 	cd base ; $(MAKE) clean
@@ -167,6 +187,12 @@ clean-hp:
 
 distclean-hp:
 	cd hp ; $(MAKE) distclean
+
+clean-lapack:
+	cd lapack ; $(MAKE) clean
+
+distclean-lapack:
+	cd lapack ; $(MAKE) distclean
 
 .PHONY : all base lac fe deal.II multigrid bits \
 	clean clean-base clean-lac clean-fe \

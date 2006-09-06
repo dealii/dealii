@@ -22,20 +22,22 @@
 #include <iostream>
 
 
+// Build the one dimensional discrete Laplacian for n intervals
 template <typename number>
 void test_laplacian(unsigned int n)
 {
-  TridiagonalMatrix<number> M(n, true);
-  for (unsigned int i=0;i<n-1;++i)
+  TridiagonalMatrix<number> M(n-1, true);
+  for (unsigned int i=0;i<n-2;++i)
     {
       M(i,i) = 2.;
       M(i,i+1) = -1.;
     }
-  M(n-1,n-1) = 2.;
+  M(n-2,n-2) = 2.;
 
   M.compute_eigenvalues();
-  for (unsigned int i=0;i<n;++i)
-    deallog << i << '\t' << M.eigenvalue(i);
+  for (unsigned int i=0;i<5;++i)
+    deallog << '\t' << M.eigenvalue(i)*n*n;
+  deallog << "\t cond " << M.eigenvalue(n-2)/M.eigenvalue(0) << std::endl;
 }
 
 
@@ -46,5 +48,8 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test_laplacian<double>(50);
+  test_laplacian<double>(10);
+  test_laplacian<double>(20);
+  test_laplacian<double>(40);
+  test_laplacian<double>(80);
 }
