@@ -604,6 +604,20 @@ inconvenience this causes.
 
 <ol>
 
+  <li> <p>Improved: The class <code class="class">SolverCG</code> can
+  now estimate the condition number of the linear system using <code
+  class="class">TridiagonalMatrix</code> and LAPACK.
+  <br>
+  (GK 2006/09/06)
+  </p>  
+
+  <li> <p>New: the class <code class="class">TridiagonalMatrix</code>
+  has been introduced together with its basic methods, including an
+  eigenvalue solver for the symmetric case (LAPACK).
+  <br>
+  (GK 2006/09/06)
+  </p>
+
   <li> <p> Improved: PETSc 2.3.1 (<i>build 16</i>) is now supported by the
        linear preconditioner classes. The new PETSc functions 
        <code class="member">PCFactorSetXXX</code> are used.<br>       
