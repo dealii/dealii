@@ -1,2 +1,312 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
+
+This is the first of a number of tutorial programs that will finally
+cover time-dependent problems. In particular, this program introduces
+the wave equation in a bounded domain. Later, @ref step_24 "step-24"
+will consider an example of absorbing boundary conditions, and @ref
+step_25 "step-25" a kind of nonlinear wave equation producing
+solutions called solitons.
+
+The wave equation in its prototypical form reads as follows: find
+$u(x,t), x\in\Omega, t\in[0,T]$ that satisfies
+@f{eqnarray*}
+	\frac{\partial^2 u}{\partial t^2}
+	-
+	\Delta u &=& f
+	\qquad 
+	\textrm{in}\ \Omega\times [0,T],
+\\
+	u(x,t) &=& g
+	\qquad 
+	\textrm{on}\ \partial\Omega\times [0,T],
+\\
+	u(x,0) &=& u_0(x)
+	\qquad 
+	\textrm{in}\ \Omega,
+\\
+	\frac{\partial u(x,0)}{\partial t} &=& u_1(x)
+	\qquad 
+	\textrm{in}\ \Omega.
+@f}
+Note that since this is an equation with second-order time
+derivatives, we need to pose two initial conditions, one for the value
+and one for the time derivative of the solution.
+
+Physically, the equation describes the motion of an elastic medium. In
+2-d, one can think of how a membrane moves if subjected to a
+force. The Dirichlet boundary conditions above indicate that the
+membrane is clamped at the boundary at a height $g(x,t)$ (this height
+might be moving as well -- think of people holding a blanket and
+shaking it up and down). The first initial condition equals the
+initial deflection of the membrane, whereas the second one gives its
+velocity. For example, one could think of pushing the membrane down
+with a finger and then letting it go at $t=0$ (nonzero deflection but
+zero initial velocity), or hitting it with a hammer at $t=0$ (zero
+deflection but nonzero velocity). Both cases would induce motion in
+the membrane.
+
+
+<h3>Time discretization</h3>
+
+<h4>Method of lines or Rothe's method?</h4>
+There is a long-standing debate in the numerical analysis community
+over whether a discretization of time dependent equations should
+involve first discretizing the time variable leading to a stationary
+PDE at each time step that is then solved using standard finite
+element techniques (this is called the Rothe method), or whether 
+one should first discretize the spatial variables, leading to a large
+system of ordinary differential equations that can then be handled by
+one of the usual ODE solvers (this is called the method of lines).
+
+Both of these methods have advantages and disadvantages.
+Traditionally, people have preferred the method of lines, since it
+allows to use the very well developed machinery of high-order ODE
+solvers avaiable for the rather stiff ODEs resulting from this
+approach, including step length control and estimation of the temporal
+error.
+
+On the other hand, Rothe's method becomes awkward when using
+higher-order time stepping method, since one then has to write down a
+PDE that couples the solution of the present time step not only with
+that at the previous time step, but possibly also even earlier
+solutions, leading to a significant number of terms.
+
+For these reasons, the method of lines was the method of choice for a
+long time. However, it has one big drawback: if we discretize the
+spatial variable first, leading to a large ODE system, we have to
+choose a mesh once and for all. If we are willing to do this, then
+this is a legitimate and probably superior approach.
+
+If, on the other hand, we are looking at the wave equation and many
+other time dependent problems, we find that the character of a
+solution changes as time progresses. For example, for the wave
+equation, we may have a single wave travelling through the domain,
+where the solution is smooth or even constant in front of and behind
+the wave -- adaptivity would be really useful for such cases, but the
+key is that the area where we need to refine the mesh changes from
+time step to time step!
+
+If we intend to go that way, i.e. choose a different mesh for each
+time step (or set of time steps), then the method of lines is not
+appropriate any more: instead of getting one ODE system with a number
+of variables equal to the number of unknowns in the finite element
+mesh, our number of unknowns now changes all the time, a fact that
+standard ODE solvers are certainly not prepared to deal with at
+all. On the other hand, for the Rothe method, we just get a PDE for
+each time step that we may choose to discretize independently of the
+mesh used for the previous time step; this approach is not without
+perils and difficulties, but at least it a sensible and well-defined
+procedure. 
+
+For all these reasons, for the present program, we choose to use the
+Rothe method for discretization, i.e. we first discretize in time and
+then in space. We will not actually use adaptive meshes at all, since
+this involves a large amount of additional code, but we will comment
+at the appropriate places what it would involve to add this feature.
+
+
+<h4>Rothe's method!</h4>
+
+Given these considerations, here is how we will proceed: let us first
+define a simple time stepping method for this second order problem,
+and then in a second step do the spatial discretization, i.e. we will
+follow Rothe's approach.
+
+For the first step, let us take a little detour first: in order to
+discretize a second time derivative, we can either discretize it
+directly, or we can introduce an additional variable and transform the
+system into a first order system. In many cases, this turns out to be
+equivalent, but dealing with first order systems is often simpler. To
+this end, let us introduce
+@f[
+	v = \frac{\partial u}{\partial t},
+@f]
+and call this variable the <i>velocity</i> for obvious reasons. We can
+then reformulate the original wave equation as follows:
+@f{eqnarray*}
+	\frac{\partial u}{\partial t}
+	-
+	v
+	&=& 0
+	\qquad 
+	\textrm{in}\ \Omega\times [0,T],
+\\
+	\frac{\partial v}{\partial t}
+	-
+	\Delta u &=& f
+	\qquad 
+	\textrm{in}\ \Omega\times [0,T],
+\\
+	u(x,t) &=& g
+	\qquad 
+	\textrm{on}\ \partial\Omega\times [0,T],
+\\
+	u(x,0) &=& u_0(x)
+	\qquad 
+	\textrm{in}\ \Omega,
+\\
+	v(x,0) &=& u_1(x)
+	\qquad 
+	\textrm{in}\ \Omega.
+@f}
+The advantage of this formulation is that it now only contains first
+time derivatives for both variables, for which it is simple to write
+down time stepping schemes. Note that we do not have boundary
+conditions for $v$, a fact that is surprising at first as one would
+think that we could enforce $v=\frac{\partial g}{\partial t}$ on the
+boundary; however, it turns out that this leads to really bad
+approximations to the solution, as simple numerical experiments can
+show. 
+
+With this formulation, let us introduce the following time
+discretization where a superscript $n$ indicates the number of a time
+step and $k=t_n-t_{n-1}$ is the length of the present time step: 
+\f{eqnarray*}
+  \frac{u^n - u^{n-1}}{k} 
+  - \left[\theta v^n + (1-\theta) v^{n-1}\right] &=& 0,
+  \\
+  \frac{v^n - v^{n-1}}{k} 
+  - \Delta\left[\theta u^n + (1-\theta) u^{n-1}\right]
+  &=& \theta f^n + (1-\theta) f^{n-1}.
+\f}
+Note how we introduced a parameter $\theta$ here. If we chose
+$\theta=0$, for example, the first equation would reduce to
+$\frac{u^n - u^{n-1}}{k}  - v^{n-1} = 0$, which is well-known as the
+forward or explicit Euler method. On the other hand, if we set
+$\theta=1$, then we would get 
+$\frac{u^n - u^{n-1}}{k}  - v^n = 0$, which corresponds to the
+backward or implicit Euler method. Both these methods are first order
+accurate methods. They are simply to implement, but they are not
+really very accurate.
+
+The third case would be to choose $\theta=\frac 12$. The first of the
+equations above would then read $\frac{u^n - u^{n-1}}{k} 
+- \frac 12 \left[v^n + v^{n-1}\right] = 0$. This method is known as
+the Crank-Nicolson method and has the advantage that it is second
+order accurate. In addition, it has the nice property that it
+preserves the energy in the solution (physically, the energy is the
+sum of the kinetic energy of the particles in the membrane plus the
+potential energy present due to the fact that it is locally stretched;
+this quantity is a conserved one in the continuous equation, but most
+time stepping schemes do not conserve it after time
+discretization). Since $v^n$ also appears in the equation for $u^n$,
+the Crank-Nicolson scheme is also implicit.
+
+The equations above (called the <i>semidiscretized</i> equations
+because we have only discretized the time, but not space), can be
+simplified a bit by eliminating $v^n$ from the first equation and
+rearranging terms. We then get
+\f{eqnarray*}
+  \left[ 1-k^2\theta^2\Delta \right] u^n &=&
+  	 \left[ 1+k^2\theta(1-\theta)\Delta\right] u^{n-1} + k v^{n-1} 
+   	 - k^2\theta\left[\theta f^n + (1-\theta) f^{n-1}\right],\\
+   v^n &=& v^{n-1} + k\Delta\left[ \theta u^n + (1-\theta) u^{n-1}\right].
+\f}
+In this form, we see that if we are given the solution
+$u^{n-1},v^{n-1}$ of the previous timestep, that we can the solve for
+the variables $u^n,v^n$ separately, i.e. one at a time. This is
+convenient. In addition, we recognize that the operator in the first
+equation is positive definite, and the second equation looks
+particularly simple.
+
+
+<h3>Space discretization</h3>
+
+We have now derived equations that relate the approximate
+(semi-discrete) solution $u^n(x)$ and its time derivative $v^n(x)$ at
+time $t_n$ with the solutions $u^{n-1}(x),v^{n-1}(x)$ of the previous
+time step at $t_{n-1}$. The next step is to also discretize the
+spatial variable using the usual finite element methodology. To this
+end, we multiply each equation with a test function, integrate over
+the entire domain, and integrate by parts where necessary. This leads
+to
+\f{eqnarray*}
+  (u^n,\varphi) + k^2\theta^2(\nabla u^n,\nabla \varphi) &=&
+  (u^{n-1},\varphi) - k^2\theta^2(\nabla u^{n-1},\nabla \varphi)
+  +
+  k(v^{n-1},\varphi)
+  - k^2\theta
+  \left[
+  \theta (f^n,\varphi) + (1-\theta) (f^{n-1},\varphi)
+  \right],
+  \\
+  (v^n,\varphi)
+   &=& 
+   (v^{n-1},\varphi)
+    - 
+    k\left[ \theta (\nabla u^n,\nabla\varphi) + 
+    (1-\theta) (\nabla u^{n-1},\nabla \varphi)\right].
+\f}
+
+It is then customary to approximate $u^n(x) \approx u^n_h(x) = \sum_i
+U_i^n\phi_i^n(x)$, where $\phi_i^n(x)$ are the shape functions used
+for the discretization of the $n$-th time step and $U_i^n$ are the
+unknown nodal values of the solution. Similarly, $v^n(x) \approx
+v^n_h(x) = \sum_i V_i^n\phi_i^n(x)$. Finally, we have the solutions of
+the previous time step, $u^{n-1}(x) \approx u^{n-1}_h(x) = \sum_i
+U_i^{n-1}\phi_i^{n-1}(x)$ and $v^{n-1}(x) \approx v^{n-1}_h(x) = \sum_i
+V_i^{n-1}\phi_i^{n-1}(x)$. Note that since the solution of the previous
+time step has already been computed by the time we get to time step
+$n$, $U^{n-1},V^{n-1}$ are known. Furthermore, note that the solutions
+of the previous step may have been computed on a different mesh, so
+use shape functions $\phi^{n-1}_i(x)$.
+
+If we plug these expansions into above equations and test with the
+test functions from the present mesh, we get the following linear
+system: 
+\f{eqnarray*}
+  M^nU^n + k^2\theta^2 A^nU^n &=&
+  M^{n,n-1}U^{n-1} - k^2\theta^2 A^{n,n-1}U^{n-1}
+  +
+  kM^{n,n-1}V^{n-1}
+  - k^2\theta
+  \left[
+  \theta F^n + (1-\theta) F^{n-1}
+  \right],
+  \\
+  M^nV^n
+   &=& 
+   M^{n,n-1}V^{n-1}
+    - 
+    k\left[ \theta A^n U^n +
+    (1-\theta) A^{n,n-1} U^{n-1}\right],
+\f}
+where
+@f{eqnarray*}
+	M^n_{ij} &=& (\phi_i^n, \phi_j^n), 
+	\\
+	A^n_{ij} &=& (\nabla\phi_i^n, \nabla\phi_j^n), 
+	\\
+	M^{n,n-1}_{ij} &=& (\phi_i^n, \phi_j^{n-1}), 
+	\\
+	A^{n,n-1}_{ij} &=& (\nabla\phi_i^n, \nabla\phi_j^{n-1}),
+	\\
+	F^n_{ij} &=& (f^n,\phi_i^n),
+	\\
+	F^{n-1}_{ij} &=& (f^{n-1},\phi_i^n).
+@f}
+
+If we solve these two equations, we can move the solution one step
+forward and go on to the next time step.
+
+It is worth noting that if we choose the same mesh on each time step
+(as we will in fact do in the program below), then we have the same
+shape functions on time step $n$ and $n-1$,
+i.e. $\phi^n_i=\phi_i^{n-1}=\phi_i$. Consequently, we get
+$M^n=M^{n,n-1}=M$ and $A^n=A^{n,n-1}=A$.
+
+As a final note, we remember that we have posed boundary values for
+$u$, but not $v$. In practice that means that we have to apply
+boundary values for the first equation above (i.e. the one for $U^n$),
+whereas we do not have to do that for the second one.
+
+
+<h3>How the program works</h3>
+
+Given the above formulation, ....
+
+
+<h3>The testcase</h3>
+
+...
