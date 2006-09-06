@@ -29,11 +29,11 @@ ifeq ($(findstring gcc,$(GXX_VERSION)),gcc)
 flags += -Wno-missing-noreturn
 endif
 
-%/obj.g.$(OBJEXT) : %.cc Makefile
+%/obj.g.$(OBJEXT) : %.cc
 	@echo =====debug========= $<
 	@$(CXX) $(flags) -c $< -o $@
 
-%/obj.$(OBJEXT) : %.cc Makefile
+%/obj.$(OBJEXT) : %.cc
 	@echo =====optimized===== $<
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
@@ -134,14 +134,13 @@ endif
 # anywhere anytime
 ############################################################
 report:
+	@-$(MAKE) -k run-tests
 	@for test in $(sort $(tests)) ; do \
-	      if (($(MAKE) $$test/exe 2>&1) > /dev/null); then \
-		if (($(MAKE) $$test/OK stop_on_error=on 2>&1) > /dev/null); then \
+		if $(MAKE) -q $$test/OK ; then \
 			echo `date -u +"%Y-%m-%d %H:%M"` "  +  $(WORKDIR)/$$test" ; \
 		else \
 			echo `date -u +"%Y-%m-%d %H:%M"` " 0   $(WORKDIR)/$$test" ; \
 		fi ; \
-	      fi ; \
 	done
 
 
