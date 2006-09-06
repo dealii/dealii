@@ -78,7 +78,8 @@ much larger than $\tau$. In that case, the dynamic nature of the change is
 unimportant: we can consider the body to always be in static equilibrium,
 i.e. we can assume that at all times the body satisfies
 @f{eqnarray*}
-  - \textrm{div}\  ( C \varepsilon(\mathbf{u})) &=& \mathbf{f}
+  - \textrm{div}\  ( C \varepsilon(\mathbf{u})) &=& \mathbf{f}(\mathbf{x},t)
+  \qquad
   \textrm{in}\ \Omega,
   \\
   \mathbf{u}(\mathbf{x},t) &=& \mathbf{d}(\mathbf{x},t)
@@ -102,7 +103,8 @@ large deformations is a little more complicated. To do so, let us first
 introduce a tensorial stress variable $\sigma$, and write the differential
 equations in terms of the stress:
 @f{eqnarray*}
-  - \textrm{div}\  \sigma &=& \mathbf{f}
+  - \textrm{div}\  \sigma &=& \mathbf{f}(\mathbf{x},t)
+  \qquad
   \textrm{in}\ \Omega(t),
   \\
   \mathbf{u}(\mathbf{x},t) &=& \mathbf{d}(\mathbf{x},t)
@@ -147,6 +149,7 @@ This way, if we want to solve for the displacement increment, we
 have to solve the following system:
 @f{eqnarray*}
   - \textrm{div}\   C \varepsilon(\Delta\mathbf{u}^n) &=& \mathbf{f} + \textrm{div}\  \sigma^{n-1}
+  \qquad
   \textrm{in}\ \Omega(t_{n-1}),
   \\
   \Delta \mathbf{u}^n(\mathbf{x},t) &=& \mathbf{d}(\mathbf{x},t_n) - \mathbf{d}(\mathbf{x},t_{n-1})
