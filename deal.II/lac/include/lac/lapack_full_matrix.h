@@ -13,6 +13,8 @@
 #ifndef __deal2__lapack_full_matrix_h
 #define __deal2__lapack_full_matrix_h
 
+
+#include <base/config.h>
 #include <base/table.h>
 #include <lac/lapack_support.h>
 
