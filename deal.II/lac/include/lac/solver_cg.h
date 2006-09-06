@@ -397,7 +397,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 
 	if (additional_data.compute_all_condition_numbers)
 	  {
-	    TridiagonalMatrix<double> T(diagonal.size());
+	    TridiagonalMatrix<double> T(diagonal.size(), true);
 	    for (unsigned int i=0;i<diagonal.size();++i)
 	      {
 		T(i,i) = diagonal[i];
@@ -421,7 +421,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 				   // Write eigenvalues or condition number
   if (do_eigenvalues)
 	  {
-	    TridiagonalMatrix<double> T(diagonal.size());
+	    TridiagonalMatrix<double> T(diagonal.size(), true);
 	    for (unsigned int i=0;i<diagonal.size();++i)
 	      {
 		T(i,i) = diagonal[i];
