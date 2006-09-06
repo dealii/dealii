@@ -15,6 +15,7 @@
 
 
 #include <base/config.h>
+#include <lac/tridiagonal_matrix.h>
 #include <lac/solver.h>
 #include <lac/solver_control.h>
 #include <base/exceptions.h>
@@ -81,13 +82,40 @@ class SolverCG : public Solver<VECTOR>
                                           * eigenvalue estimates.
                                           */
         bool log_coefficients;
-
+					 /**
+					  * Compute the condition
+					  * number of the projected
+					  * matrix.
+					  *
+					  * @note Requires LAPACK support.
+					  */
+	bool compute_condition_number;
+					 /**
+					  * Compute the condition
+					  * number of the projected
+					  * matrix in each step.
+					  *
+					  * @note Requires LAPACK support.
+					  */
+	bool compute_all_condition_numbers;
+	
+					 /**
+					  * Compute all eigenvalues of
+					  * the projected matrix.
+					  *
+					  * @note Requires LAPACK support.
+					  */
+	bool compute_eigenvalues;
+	
                                          /**
                                           * Constructor. Initialize data
                                           * fields.  Confer the description of
                                           * those.
                                           */
-        AdditionalData (const bool log_coefficients = false);
+        AdditionalData (const bool log_coefficients = false,
+			const bool compute_condition_number = false,
+			const bool compute_all_condition_numbers = false,
+			const bool compute_eigenvalues = false);
     };
 
 				     /**
@@ -185,9 +213,15 @@ class SolverCG : public Solver<VECTOR>
 template <class VECTOR>
 inline
 SolverCG<VECTOR>::AdditionalData::
-AdditionalData (const bool log_coefficients)
+AdditionalData (const bool log_coefficients,
+		const bool compute_condition_number,
+		const bool compute_all_condition_numbers,
+		const bool compute_eigenvalues)
                 :
-                log_coefficients (log_coefficients)
+                log_coefficients (log_coefficients),
+		compute_condition_number(compute_condition_number),
+		compute_all_condition_numbers(compute_all_condition_numbers),
+		compute_eigenvalues(compute_eigenvalues)
 {}
     
 
@@ -268,7 +302,18 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   Vp  = this->memory.alloc();
   Vz  = this->memory.alloc();
   VAp = this->memory.alloc();
-
+				   // Should we build the matrix for
+				   // eigenvalue computations?
+  bool do_eigenvalues = additional_data.compute_condition_number
+			| additional_data.compute_all_condition_numbers
+			| additional_data.compute_eigenvalues;
+  double eigen_beta_alpha = 0;
+  
+				   // vectors used for eigenvalue
+				   // computations
+  std::vector<double> diagonal;
+  std::vector<double> offdiagonal;
+  
   try {
 				     // define some aliases for simpler access
     VECTOR& g  = *Vr; 
@@ -339,6 +384,30 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 	
 	if (additional_data.log_coefficients)
 	  deallog << "alpha-beta:" << alpha << '\t' << beta << std::endl;
+					 // set up the vectors
+					 // containing the diagonal
+					 // and the off diagonal of
+					 // the projected matrix.
+	if (do_eigenvalues)
+	  {
+	    diagonal.push_back(1./alpha + eigen_beta_alpha);
+	    eigen_beta_alpha = beta/alpha;
+	    offdiagonal.push_back(std::sqrt(beta)/alpha);
+	  }
+
+	if (additional_data.compute_all_condition_numbers)
+	  {
+	    TridiagonalMatrix<double> T(diagonal.size());
+	    for (unsigned int i=0;i<diagonal.size();++i)
+	      {
+		T(i,i) = diagonal[i];
+		if (i< diagonal.size()-1)
+		  T(i,i+1) = offdiagonal[i];
+	      }
+	    T.compute_eigenvalues();
+	    deallog << "Condition number estimate: " <<
+	      T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
+	  }
 	
 	d.sadd(beta,-1.,h);
       }
@@ -348,6 +417,30 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
       cleanup();
       throw;
     }
+
+				   // Write eigenvalues or condition number
+  if (do_eigenvalues)
+	  {
+	    TridiagonalMatrix<double> T(diagonal.size());
+	    for (unsigned int i=0;i<diagonal.size();++i)
+	      {
+		T(i,i) = diagonal[i];
+		if (i< diagonal.size()-1)
+		  T(i,i+1) = offdiagonal[i];
+	      }
+	    T.compute_eigenvalues();
+	    if (additional_data.compute_condition_number
+		& ! additional_data.compute_all_condition_numbers)
+	      deallog << "Condition number estimate: " <<
+		T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
+	    if (additional_data.compute_eigenvalues)
+	      {
+		for (unsigned int i=0;i<T.n();++i)
+		  deallog << ' ' << T.eigenvalue(i);
+		deallog << std::endl;
+	      }
+	  }
+
 				   // Deallocate Memory
   cleanup();
 				   // in case of failure: throw
