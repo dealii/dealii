@@ -91,19 +91,19 @@ class ConstraintMatrix;
  *   given function may be, taking into account that a virtual function has
  *   to be called.
  *
- * <li> Projection: compute the <i>L<sup>2</sup></i>-projection of the given
- *   function onto the finite element space, i.e. if <i>f</i> is the function
- *   to be projected, compute <i>f<sub>h</sub></i> in <i>L<sup>2</sup></i> such
- *   that <i>(f<sub>h</sub>,v<sub>h</sub>)=(f,v<sub>h</sub>)</i> for all discrete
- *   test functions <i>v<sub>h</sub></i>. This is done through the solution of the
- *   linear system of equations $M v = f$ where $M$ is the mass matrix
- *   $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$ and
- *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. The solution vector $v$ then is
- *   the nodal representation of the projection <i>f<sub>h</sub></i>.
+ * <li> Projection: compute the $L^2$-projection of the given function
+ *   onto the finite element space, i.e. if $f$ is the function to be
+ *   projected, compute $f_h\in V_h$ such that $(f_h,v_h)=(f,v_h)$ for
+ *   all discrete test functions $v_h$. This is done through the
+ *   solution of the linear system of equations $M v = f$ where $M$ is
+ *   the mass matrix $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$ and
+ *   $f_i = \int_\Omega f(x) \phi_i(x) dx$. The solution vector $v$ then
+ *   is the nodal representation of the projection $f_h$. The project()
+ *   functions are used in the @ref step_23 "step-23" tutorial program.
  *
  *   In order to get proper results, it be may necessary to treat
  *   boundary conditions right. Below are listed some cases where this
- *   may be needed.  If needed, this is done by <i>L<sup>2</sup></i>-projection of
+ *   may be needed.  If needed, this is done by $L^2$-projection of
  *   the trace of the given function onto the finite element space
  *   restricted to the boundary of the domain, then taking this
  *   information and using it to eliminate the boundary nodes from the
@@ -133,10 +133,10 @@ class ConstraintMatrix;
  *
  *   Obviously, the results of the two schemes for projection are
  *   different.  Usually, when projecting to the boundary first, the
- *   <i>L<sup>2</sup></i>-norm of the difference between original
+ *   $L^2$-norm of the difference between original
  *   function and projection over the whole domain will be larger
  *   (factors of five have been observed) while the
- *   <i>L<sup>2</sup></i>-norm of the error integrated over the
+ *   $L^2$-norm of the error integrated over the
  *   boundary should of course be less. The reverse should also hold
  *   if no projection to the boundary is performed.
  *
@@ -217,7 +217,7 @@ class ConstraintMatrix;
  *   The @p project_boundary_values function acts similar to the
  *   @p interpolate_boundary_values function, apart from the fact that it does
  *   not get the nodal values of boundary nodes by interpolation but rather
- *   through the <i>L<sup>2</sup></i>-projection of the trace of the function to the boundary.
+ *   through the $L^2$-projection of the trace of the function to the boundary.
  *
  *   The projection takes place on all boundary parts with boundary
  *   indicators listed in the map (FunctioMap@p ::FunctionMap)
@@ -275,14 +275,14 @@ class ConstraintMatrix;
  *   use of the wrong quadrature formula may show a significantly wrong result
  *   and care should be taken to chose the right formula.
  *
- *   The <i>H<sup>1</sup></i> seminorm is the <i>L<sup>2</sup></i>
+ *   The $H^1$ seminorm is the $L^2$
  *   norm of the gradient of the difference. The square of the full
- *   <i>H<sup>1</sup></i> norm is the sum of the square of seminorm
- *   and the square of the <i>L<sup>2</sup></i> norm.
+ *   $H^1$ norm is the sum of the square of seminorm
+ *   and the square of the $L^2$ norm.
  *
  *   To get the global <i>L<sup>1</sup></i> error, you have to sum up the
  *   entries in @p difference, e.g. using
- *   <tt>Vector<double>::l1_norm</tt> function.  For the global <i>L<sup>2</sup></i>
+ *   <tt>Vector<double>::l1_norm</tt> function.  For the global $L^2$
  *   difference, you have to sum up the squares of the entries and
  *   take the root of the sum, e.g. using
  *   <tt>Vector<double>::l2_norm</tt>.  These two operations
@@ -294,8 +294,8 @@ class ConstraintMatrix;
  *   To get the $L_\infty$ norm, take the maximum of the vector elements, e.g.
  *   using the <tt>Vector<double>::linfty_norm</tt> function.
  *
- *   For the global <i>H<sup>1</sup></i> norm and seminorm, the same rule applies as for the
- *   <i>L<sup>2</sup></i> norm: compute the $l_2$ norm of the cell error vector.
+ *   For the global $H^1$ norm and seminorm, the same rule applies as for the
+ *   $L^2$ norm: compute the $l_2$ norm of the cell error vector.
  * </ul>
  *
  * All functions use the finite element given to the DoFHandler object the last
