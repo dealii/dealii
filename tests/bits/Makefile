@@ -87,10 +87,6 @@ tests_x = grid_generator_?? \
 # tests for the hp branch:
 #	  fe_collection_*
 
-ifeq ($(USE_CONTRIB_PETSC),yes)
-  tests_x += petsc_*
-endif
-
 ifeq ($(USE_CONTRIB_METIS),yes)
   tests_x += metis_*
 endif
