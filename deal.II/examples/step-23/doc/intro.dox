@@ -193,6 +193,10 @@ time stepping schemes do not conserve it after time
 discretization). Since $v^n$ also appears in the equation for $u^n$,
 the Crank-Nicolson scheme is also implicit.
 
+In the program, we will leave $\theta$ as a parameter, so that it will
+be easy to play with it. The results section will show some numerical
+evidence comparing the different schemes.
+
 The equations above (called the <i>semidiscretized</i> equations
 because we have only discretized the time, but not space), can be
 simplified a bit by eliminating $v^n$ from the first equation and
@@ -305,6 +309,10 @@ $u$, but not $v$. In practice that means that we have to apply
 boundary values for the first equation above (i.e. the one for $U^n$),
 whereas we do not have to do that for the second one.
 
+
+<h3>Who are Courant, Friedrichs, and Levy?<h3>
+
+CFL condition
 
 <h3>How the program works</h3>
 
