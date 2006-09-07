@@ -127,6 +127,7 @@ class PointerMatrixBase : public Subscriptor
     virtual void Tvmult_add (VECTOR& dst,
 			     const VECTOR& src) const = 0;
 
+  private:
 				     /**
 				      * Get the pointer for comparison.
 				      */
