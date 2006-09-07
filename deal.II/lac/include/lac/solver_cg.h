@@ -82,7 +82,8 @@ class SolverCG : public Solver<VECTOR>
                                           * eigenvalue estimates.
                                           */
         bool log_coefficients;
-					 /**
+
+                                         /**
 					  * Compute the condition
 					  * number of the projected
 					  * matrix.
@@ -90,7 +91,8 @@ class SolverCG : public Solver<VECTOR>
 					  * @note Requires LAPACK support.
 					  */
 	bool compute_condition_number;
-					 /**
+
+                                         /**
 					  * Compute the condition
 					  * number of the projected
 					  * matrix in each step.
@@ -420,26 +422,26 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 
 				   // Write eigenvalues or condition number
   if (do_eigenvalues)
-	  {
-	    TridiagonalMatrix<double> T(diagonal.size(), true);
-	    for (unsigned int i=0;i<diagonal.size();++i)
-	      {
-		T(i,i) = diagonal[i];
-		if (i< diagonal.size()-1)
-		  T(i,i+1) = offdiagonal[i];
-	      }
-	    T.compute_eigenvalues();
-	    if (additional_data.compute_condition_number
-		& ! additional_data.compute_all_condition_numbers)
-	      deallog << "Condition number estimate: " <<
-		T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
-	    if (additional_data.compute_eigenvalues)
-	      {
-		for (unsigned int i=0;i<T.n();++i)
-		  deallog << ' ' << T.eigenvalue(i);
-		deallog << std::endl;
-	      }
-	  }
+    {
+      TridiagonalMatrix<double> T(diagonal.size(), true);
+      for (unsigned int i=0;i<diagonal.size();++i)
+        {
+          T(i,i) = diagonal[i];
+          if (i< diagonal.size()-1)
+            T(i,i+1) = offdiagonal[i];
+        }
+      T.compute_eigenvalues();
+      if (additional_data.compute_condition_number
+          & ! additional_data.compute_all_condition_numbers)
+        deallog << "Condition number estimate: " <<
+          T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
+      if (additional_data.compute_eigenvalues)
+        {
+          for (unsigned int i=0;i<T.n();++i)
+            deallog << ' ' << T.eigenvalue(i);
+          deallog << std::endl;
+        }
+    }
 
 				   // Deallocate Memory
   cleanup();
