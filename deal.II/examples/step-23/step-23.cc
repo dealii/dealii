@@ -372,9 +372,6 @@ void WaveEquation<dim>::setup_system ()
   
   std::cout << "Number of active cells: "
 	    << triangulation.n_active_cells()
-	    << std::endl
-	    << "Total number of cells: "
-	    << triangulation.n_cells()
   	    << std::endl;
 
   dof_handler.distribute_dofs (fe);
@@ -729,7 +726,7 @@ void WaveEquation<dim>::run ()
 				       // vector and several lines of code:
       output_results ();
 
-      std::cout << "  Total energy: "
+      std::cout << "   Total energy: "
 		<< (mass_matrix.matrix_norm_square (solution_v) +
 		    laplace_matrix.matrix_norm_square (solution_u)) / 2
 		<< std::endl;

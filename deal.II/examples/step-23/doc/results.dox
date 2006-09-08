@@ -1,5 +1,85 @@
 <a name="Results"></a>
 <h1>Results</h1>
 
+When the program is run, it produces the following output:
+<pre>
+<code>
+Number of active cells: 16384
+Number of degrees of freedom: 16641
+
+Time step 1 at t=0.015625
+   u-equation: 8 CG iterations.
+   v-equation: 22 CG iterations.
+   Total energy: 0.982265
+Time step 2 at t=0.03125
+   u-equation: 8 CG iterations.
+   v-equation: 23 CG iterations.
+   Total energy: 4.10195
+Time step 3 at t=0.046875
+   u-equation: 8 CG iterations.
+   v-equation: 20 CG iterations.
+   Total energy: 6.95484
+Time step 4 at t=0.0625
+   u-equation: 8 CG iterations.
+   v-equation: 21 CG iterations.
+   Total energy: 7.92609
+Time step 5 at t=0.078125
+   u-equation: 7 CG iterations.
+   v-equation: 22 CG iterations.
+   Total energy: 8.9877
+Time step 6 at t=0.09375
+   u-equation: 8 CG iterations.
+   v-equation: 21 CG iterations.
+   Total energy: 10.1318
+
+...
+
+Time step 31 at t=0.484375
+   u-equation: 7 CG iterations.
+   v-equation: 21 CG iterations.
+   Total energy: 21.6306
+Time step 32 at t=0.5
+   u-equation: 7 CG iterations.
+   v-equation: 21 CG iterations.
+   Total energy: 23.417
+Time step 33 at t=0.515625
+   u-equation: 7 CG iterations.
+   v-equation: 21 CG iterations.
+   Total energy: 23.2328
+
+...
+
+Time step 319 at t=4.98438
+   u-equation: 7 CG iterations.
+   v-equation: 21 CG iterations.
+  Total energy: 23.2328
+Time step 320 at t=5
+   u-equation: 7 CG iterations.
+   v-equation: 21 CG iterations.
+  Total energy: 23.2328
+</code>
+</pre>
+
+What we see immediately is that the energy is a constant at least after
+$t=\frac 12$ (until which the boundary source term $g$ is nonzero, injecting
+energy into the system).
+
+In addition to the screen output, the program writes the solution of each time
+step to an output file. If we process them adequately and paste them into a
+movie, we get the following:
 
 @image html step-23.movie.gif "Animation of the solution of step-23."
+
+The movie shows the generated wave nice traveling through the domain and back,
+being reflected at the clamped boundary. Some numerical noise is trailing the
+wave, an artifact of a too-large mesh size that can be reduced by reducing the
+mesh width and the time step.
+
+One of the things we can investigate is what happens if we chose another value
+for the parameter $\theta$ that controls the time stepping behavior of the
+program. In the run above, it was set to $\theta=\frac 12$, which corresponds
+to the Crank-Nicolson scheme that was seen to conserve energy. On the other
+hand, we could choose $\theta=0$ to get the explicit (forward) Euler time
+stepping scheme, and $\theta=1$ for the implicit (backward) Euler scheme. If
+we process the output of all three cases to show the energy in the solution as
+a function of the time, we get the following graph:
