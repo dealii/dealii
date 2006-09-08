@@ -11890,7 +11890,7 @@ echo "${ECHO_T}using included version" >&6
   fi
 
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_UMFPACK 1
+#define HAVE_LIBUMFPACK 1
 _ACEOF
 
 

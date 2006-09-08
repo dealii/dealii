@@ -241,7 +241,7 @@
    libstdc++ interface. */
 #undef HAVE_LIBSTDCXX_DEMANGLER
 
-/* Define to 1 if you have the `umfpack' library (-lumfpack). */
+/* UMFPACK is $withval */
 #undef HAVE_LIBUMFPACK
 
 /* Define to 1 if you have the `z' library (-lz). */
@@ -288,9 +288,6 @@
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
-
-/* UMFPACK is $withval */
-#undef HAVE_UMFPACK
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H

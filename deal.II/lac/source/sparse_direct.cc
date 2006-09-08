@@ -60,7 +60,7 @@
 #endif
 
 // include UMFPACK file.
-#ifdef HAVE_UMFPACK
+#ifdef HAVE_LIBUMFPACK
 extern "C" {
 #  include <umfpack.h>
 }
@@ -1630,7 +1630,7 @@ initialize (const SparsityPattern &)
 {}
 
 
-#ifdef HAVE_UMFPACK
+#ifdef HAVE_LIBUMFPACK
 
 SparseDirectUMFPACK::SparseDirectUMFPACK ()
                 :
