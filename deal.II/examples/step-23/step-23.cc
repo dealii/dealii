@@ -286,11 +286,11 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 {
   Assert (component == 0, ExcInternalError());
 
-  if ((this->get_time() <= 1) &&
-      (p[0] < 1) &&
+  if ((this->get_time() <= 0.5) &&
+      (p[0] < 0) &&
       (p[1] < 1./3) &&
       (p[1] > -1./3))
-    return std::sin (this->get_time() * 2 * deal_II_numbers::PI);
+    return std::sin (this->get_time() * 4 * deal_II_numbers::PI);
   else
     return 0;
 }
@@ -300,7 +300,19 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 
 				 // @sect3{Implementation of the <code>WaveEquation</code> class}
 
-
+				 // The implementation of the actual logic is
+				 // actually fairly short, since we relegate
+				 // things like assembling the matrices and
+				 // right hand side vectors to the
+				 // library. The rest boils down to not much
+				 // more than 130 lines of actual code, a
+				 // significant fraction of which is
+				 // boilerplate code that can be taken from
+				 // previous example programs (e.g. the
+				 // functions that solve linear systems, or
+				 // that generate output).
+				 //
+				 // Let's start with the constructor:
 template <int dim>
 WaveEquation<dim>::WaveEquation () :
                 fe (1),
@@ -310,7 +322,14 @@ WaveEquation<dim>::WaveEquation () :
 {}
 
 
+				 // @sect4{WaveEquation::setup_system}
 
+				 // The next function is the one that sets up
+				 // the mesh, DoFHandler, and matrices and
+				 // vectors at the beginning of the program,
+				 // i.e. before the first time step. The first
+				 // few lines are pretty much standard if
+				 // you've read at least to step-6:
 template <int dim>
 void WaveEquation<dim>::setup_system ()
 {
@@ -337,6 +356,44 @@ void WaveEquation<dim>::setup_system ()
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress();
 
+				   // Then comes a block where we have to
+				   // initialize the 3 matrices we need in the
+				   // course of the program: the mass matrix,
+				   // the laplace matrix, and the matrix
+				   // $M+k^2\theta^2A$ used when solving for
+				   // $U^n$ in each time step.
+				   //
+				   // When setting up these matrices, note
+				   // that they all make use of the same
+				   // sparsity pattern object. Finally, the
+				   // reason why matrices and sparsity
+				   // patterns are separate objects in deal.II
+				   // (unlike in many other finite element or
+				   // linear algebra classes) becomes clear:
+				   // in a significant fraction of
+				   // applications, one has to hold several
+				   // matrices that happen to have the same
+				   // sparsity pattern, and there is no reason
+				   // for them not to share this information,
+				   // rather than re-building and wasting
+				   // memory on it several times.
+				   //
+				   // After initializing all of these
+				   // matrices, we call library functions that
+				   // build the Laplace and mass matrices. All
+				   // they need is a DoFHandler object and a
+				   // quadrature formula object that is to be
+				   // used for numerical integration. Note
+				   // that in many respect these functions are
+				   // better than what we would usually do in
+				   // application programs, as these functions
+				   // for example automatically parallelize
+				   // building the matrices if multiple
+				   // processors are available in a
+				   // machine. When we have both of these
+				   // matrices, we form the third one by
+				   // copying and adding the first two in
+				   // appropriate multiples:
   system_matrix.reinit (sparsity_pattern);
   mass_matrix.reinit (sparsity_pattern);
   laplace_matrix.reinit (sparsity_pattern);
@@ -348,7 +405,18 @@ void WaveEquation<dim>::setup_system ()
   
   system_matrix.copy_from (mass_matrix);
   system_matrix.add (theta * theta * time_step * time_step, laplace_matrix);
-  
+
+				   // The rest of the function is spent on
+				   // setting vector sizes to the correct
+				   // value. The final line closes the hanging
+				   // node constraints object. Since we work
+				   // on a uniformly refined mesh, no
+				   // constraints exist or have been computed
+				   // (i.e. there was no need to call
+				   // DoFTools::make_hanging_nod_constraints
+				   // as in other programs), but we need a
+				   // constraints object in one place further
+				   // down below anyway.
   solution_u.reinit (dof_handler.n_dofs());
   solution_v.reinit (dof_handler.n_dofs());
   old_solution_u.reinit (dof_handler.n_dofs());
@@ -359,12 +427,32 @@ void WaveEquation<dim>::setup_system ()
 }
 
 
+				 // @sect4{WaveEquation::solve_u and WaveEquation::solve_u}
 
+				 // The next two functions deal with solving
+				 // the linear systems associated with the
+				 // equations for $U^n$ and $V^n$. Both are
+				 // not particularly interesting as they
+				 // pretty much follow the scheme used in all
+				 // the previous tutorial programs.
+				 //
+				 // One can make little experiments with
+				 // preconditioners for the two matrices we
+				 // have to invert. As it turns out, however,
+				 // for the matrices at hand here, using
+				 // Jacobi or SSOR preconditioners reduces the
+				 // number of iterations necessary to solve
+				 // the linear system slightly, but due to the
+				 // cost of applying the preconditioner it is
+				 // no win in terms of run-time. It is not
+				 // much of a loss either, but let's keep it
+				 // simple and just do without:
 template <int dim>
 void WaveEquation<dim>::solve_u () 
 {
   SolverControl           solver_control (1000, 1e-8*system_rhs.l2_norm());
   SolverCG<>              cg (solver_control);
+
   cg.solve (system_matrix, solution_u, system_rhs,
 	    PreconditionIdentity());
 
@@ -379,6 +467,7 @@ void WaveEquation<dim>::solve_v ()
 {
   SolverControl           solver_control (1000, 1e-8*system_rhs.l2_norm());
   SolverCG<>              cg (solver_control);
+
   cg.solve (mass_matrix, solution_v, system_rhs,
 	    PreconditionIdentity());
 
@@ -389,6 +478,16 @@ void WaveEquation<dim>::solve_v ()
 
 
 
+				 // @sect4{WaveEquation::output_results}
+
+				 // Likewise, the following function is pretty
+				 // much what we've done before. The only
+				 // thing worth mentioning is how here we
+				 // generate a string representation of the
+				 // time step number padded with leading zeros
+				 // to 3 character length using the
+				 // Utilities::int_to_string function's second
+				 // argument.
 template <int dim>
 void WaveEquation<dim>::output_results () const
 {
@@ -411,6 +510,22 @@ void WaveEquation<dim>::output_results () const
 
 
 
+				 // @sect4{WaveEquation::run}
+
+				 // The following is really the only
+				 // interesting function of the program. It
+				 // contains the loop over all time steps, but
+				 // before we get to that we have to set up
+				 // the grid, DoFHandler, and matrices. In
+				 // addition, we have to somehow get started
+				 // with initial values. To this end, we use
+				 // the VectorTools::project function that
+				 // takes an object that describes a
+				 // continuous function and computes the $L^2$
+				 // projection of this function onto the
+				 // finite element space described by the
+				 // DoFHandler object. Can't be any simpler
+				 // than that:
 template <int dim>
 void WaveEquation<dim>::run () 
 {
@@ -422,15 +537,56 @@ void WaveEquation<dim>::run ()
   VectorTools::project (dof_handler, constraints, QGauss<dim>(3),
 			InitialValuesV<dim>(),
 			old_solution_v);
+
+				   // The next thing is to loop over all the
+				   // time steps until we reach the end time
+				   // ($T=5$ in this case). In each time step,
+				   // we first have to solve for $U^n$, using
+				   // the equation $(M^n + k^2\theta^2 A^n)U^n
+				   // = M^{n,n-1}U^{n-1} - k^2\theta^2
+				   // A^{n,n-1}U^{n-1} + kM^{n,n-1}V^{n-1} -
+				   // k^2\theta \left[ \theta F^n + (1-\theta)
+				   // F^{n-1} \right]$. Note that we use the
+				   // same mesh for all time steps, so that
+				   // $M^n=M^{n,n-1}=M$ and
+				   // $A^n=A^{n,n-1}=A$. What we therefore
+				   // have to do first is to add up $MU^{n-1}
+				   // - k^2\theta^2 AU^{n-1} + kMV^{n-1}$ and
+				   // put the result into the
+				   // <code>system_rhs</code> vector. (For
+				   // these additions, we need a temporary
+				   // vector that we declare before the loop
+				   // to avoid repeated memory allocations in
+				   // each time step.)
+				   //
+				   // The one thing to realize here is how we
+				   // communicate the time variable to the
+				   // object describing the right hand side:
+				   // each object derived from the Function
+				   // class has a time field that can be set
+				   // using the Function::set_time and read by
+				   // Function::get_time. In essence, using
+				   // this mechanism, all functions of space
+				   // and time are therefore considered
+				   // functions of space evaluated at a
+				   // particular time. This matches well what
+				   // we typically need in finite element
+				   // programs, where we almost always work on
+				   // a single time step at a time, and where
+				   // it never happens that, for example, one
+				   // would like to evaluate a space-time
+				   // function for all times at any given
+				   // spatial location.
+  Vector<double> tmp (solution_u.size());
   
-  for (timestep_number=1, time=time_step; time<=5; time+=time_step, ++timestep_number)
+  for (timestep_number=1, time=time_step;
+       time<=5;
+       time+=time_step, ++timestep_number)
     {
       std::cout << "Time step " << timestep_number
 		<< " at t=" << time
 		<< std::endl;
       
-      Vector<double> tmp (solution_u.size());
-
       mass_matrix.vmult (system_rhs, old_solution_u);
 
       mass_matrix.vmult (tmp, old_solution_v);
@@ -450,7 +606,18 @@ void WaveEquation<dim>::run ()
 					   rhs_function, tmp);
       system_rhs.add (theta * (1-theta) * time_step * time_step, tmp);
 
-
+				       // After so constructing the right hand
+				       // side vector of the first equation,
+				       // all we have to do is apply the
+				       // correct boundary values. As for the
+				       // right hand side, this is a
+				       // space-time function evaluated at a
+				       // particular time, which we
+				       // interpolate at boundary nodes and
+				       // then use the result to apply
+				       // boundary values as we usually
+				       // do. The result is then handed off to
+				       // the solve_u() function:
       BoundaryValues<dim> boundary_values_function;
       boundary_values_function.set_time (time);
       
@@ -466,6 +633,14 @@ void WaveEquation<dim>::run ()
       solve_u ();
 
 
+				       // The second step -- solving for $V^n$
+				       // works similarly, except that this
+				       // time the matrix on the left is the
+				       // mass matrix, the right hand side is
+				       // $MV^{n-1} - k\left[ \theta A U^n +
+				       // (1-\theta) AU^{n-1}\right]$, and
+				       // there are no boundary values to be
+				       // applied.
       laplace_matrix.vmult (system_rhs, solution_u);
       system_rhs *= -theta * time_step;
 
@@ -487,6 +662,13 @@ void WaveEquation<dim>::run ()
 
       solve_v ();
 
+				       // Finally, after both solution
+				       // components have been computed, we
+				       // output the result, and go on to the
+				       // next time step after shifting the
+				       // present solution into the vectors
+				       // that hold the solution at the
+				       // previous time step:
       output_results ();
 
       old_solution_u = solution_u;
@@ -495,14 +677,51 @@ void WaveEquation<dim>::run ()
 }
 
 
+				 // @sect3{The <code>main</code> function}
 
+				 // What remains is the main function of the
+				 // program. There is nothing here that hasn't
+				 // been shown in several of the previous
+				 // programs:
 int main () 
 {
-  deallog.depth_console (0);
-  {
-    WaveEquation<2> wave_equation_solver;
-    wave_equation_solver.run ();
-  }
+  try
+    {
+      deallog.depth_console (0);
+      WaveEquation<2> wave_equation_solver;
+      wave_equation_solver.run ();
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+
+      return 1;
+    }
+				   // If the exception that was thrown
+				   // somewhere was not an object of a
+				   // class derived from the standard
+				   // <code>exception</code> class, then we
+				   // can't do anything at all. We
+				   // then simply print an error
+				   // message and exit.
+  catch (...) 
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      return 1;
+    }
   
   return 0;
 }
