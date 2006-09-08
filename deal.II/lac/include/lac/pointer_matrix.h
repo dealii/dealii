@@ -15,6 +15,7 @@
 
 #include <base/subscriptor.h>
 #include <base/smartpointer.h>
+#include <lac/vector.h>
 
 template<class VECTOR> class VectorMemory;
 
@@ -358,6 +359,116 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 };
 
 
+
+/**
+ * Implement matrix multiplications for a vector using the
+ * PointerMatrixBase functionality. Objects of this
+ * class can be used in block matrices.
+ *
+ * Implements a matrix with image dimension 1 by using the scalar
+ * product (#vmult()) and scalar multiplication (#Tvmult()) functions
+ * of the Vector class.
+ *
+ * @author Guidl Kanschat, 2006
+ */
+template <typename number>
+PointerMatrixVector : public PointerMatrixBase<Vector<number> >
+{
+  public:
+				     /**
+				      * Constructor.  The pointer in the
+				      * argument is stored in this
+				      * class. As usual, the lifetime of
+				      * <tt>*M</tt> must be longer than the
+				      * one of the PointerMatrix.
+				      *
+				      * If <tt>M</tt> is zero, no
+				      * matrix is stored.
+				      */
+    PointerMatrix (const Vector<number>* M=0);
+
+				     /**
+				      * Constructor. The name argument
+				      * is used to identify the
+				      * SmartPointer for this object.
+				      */
+    PointerMatrix(const char* name);
+    
+				     /**
+				      * Constructor. <tt>M</tt> points
+				      * to a matrix which must live
+				      * longer than the
+				      * PointerMatrix. The name
+				      * argument is used to identify
+				      * the SmartPointer for this
+				      * object.
+				      */
+    PointerMatrix(const Vector<number>* M,
+		  const char* name);
+
+				     // Use doc from base class
+    virtual void clear();
+    
+				     /**
+				      * Return whether the object is
+				      * empty. 
+				      */
+    bool empty () const;
+    
+				     /**
+				      * Assign a new matrix
+				      * pointer. Deletes the old pointer
+				      * and releases its matrix.
+				      * @see SmartPointer
+				      */
+    const PointerMatrix& operator= (const Vector<number>* M);
+    
+				     /**
+				      * Matrix-vector product,
+				      * actually the scalar product of
+				      * <tt>src</tt> and #m.
+				      */
+    virtual void vmult (Vector<number>& dst,
+			const Vector<number>& src) const;
+    
+				     /**
+				      * Tranposed matrix-vector
+				      * product, actually the
+				      * multiplication of #m with
+				      * <tt>src(0)</tt>.
+				      */
+    virtual void Tvmult (Vector<number>& dst,
+			 const Vector<number>& src) const;
+    
+				     /**
+				      * Matrix-vector product, adding to
+				      * <tt>dst</tt>.
+				      */
+    virtual void vmult_add (Vector<number>& dst,
+			    const Vector<number>& src) const;
+    
+				     /**
+				      * Tranposed matrix-vector product,
+				      * adding to <tt>dst</tt>.
+				      */
+    virtual void Tvmult_add (Vector<number>& dst,
+			     const Vector<number>& src) const;
+    
+  private:
+				     /**
+				      * Return the address of the
+				      * matrix for comparison.
+				      */
+    virtual const void* get() const;
+
+				     /**
+				      * The pointer to the actual matrix.
+				      */
+    SmartPointer<const Vector<number> > m;
+};
+
+
+
 /**
  * This function helps you creating a PointerMatrixBase object if you
  * do not want to provide the full template arguments of
@@ -666,6 +777,116 @@ PointerMatrixAux<MATRIX, VECTOR>::get () const
 {
   return m;
 }
+
+
+//----------------------------------------------------------------------//
+
+
+template<typename number>
+PointerMatrixVector<Vector<number> >::PointerMatrix (const MATRIX* M)
+  : m(M, typeid(*this).name())
+{}
+
+
+template<typename number>
+PointerMatrixVector<Vector<number> >::PointerMatrix (const char* name)
+  : m(0, name)
+{}
+
+
+template<typename number>
+PointerMatrixVector<Vector<number> >::PointerMatrix (
+  const MATRIX* M,
+  const char* name)
+  : m(M, name)
+{}
+
+
+template<typename number>
+inline void
+PointerMatrixVector<Vector<number> >::clear ()
+{
+  m = 0;
+}
+
+
+template<typename number>
+inline const PointerMatrixVector<Vector<number> >&
+PointerMatrixVector<Vector<number> >::operator= (const MATRIX* M)
+{
+  m = M;
+  return *this;
+}
+
+
+template<typename number>
+inline bool
+PointerMatrixVector<Vector<number> >::empty () const
+{
+  if (m == 0)
+    return true;
+  return m->empty();
+}
+
+template<typename number>
+inline void
+PointerMatrixVector<Vector<number> >::vmult (
+  Vector<number>& dst,
+  const Vector<number>& src) const
+{
+  Assert (m != 0, ExcNotInitialized());
+  Assert (dst.size() == 1, ExcDimensionMismatch(dst.size(), 1));
+  
+  dst(0) = *m * src;
+}
+
+
+template<typename number>
+inline void
+PointerMatrixVector<Vector<number> >::Tvmult (
+  Vector<number>& dst,
+  const Vector<number>& src) const
+{
+  Assert (m != 0, ExcNotInitialized());
+  Assert(src.size() == 1, ExcDimensionMismatch(src.size(), 1));
+  
+  dst.equ (src(0), *m);
+}
+
+
+template<typename number>
+inline void
+PointerMatrixVector<Vector<number> >::vmult_add (
+  Vector<number>& dst,
+  const Vector<number>& src) const
+{
+  Assert (m != 0, ExcNotInitialized());
+  Assert (dst.size() == 1, ExcDimensionMismatch(dst.size(), 1));
+  
+  dst(0) += *m * src;
+}
+
+
+template<typename number>
+inline void
+PointerMatrixVector<Vector<number> >::Tvmult_add (
+  Vector<number>& dst,
+  const Vector<number>& src) const
+{
+  Assert (m != 0, ExcNotInitialized());
+  Assert(src.size() == 1, ExcDimensionMismatch(src.size(), 1));
+  
+  dst.add (src(0), *m);
+}
+
+
+template<typename number>
+inline const void*
+PointerMatrixVector<Vector<number> >::get () const
+{
+  return m;
+}
+
 
 
 #endif
