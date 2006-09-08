@@ -75,11 +75,39 @@ being reflected at the clamped boundary. Some numerical noise is trailing the
 wave, an artifact of a too-large mesh size that can be reduced by reducing the
 mesh width and the time step.
 
-One of the things we can investigate is what happens if we chose another value
-for the parameter $\theta$ that controls the time stepping behavior of the
-program. In the run above, it was set to $\theta=\frac 12$, which corresponds
-to the Crank-Nicolson scheme that was seen to conserve energy. On the other
-hand, we could choose $\theta=0$ to get the explicit (forward) Euler time
-stepping scheme, and $\theta=1$ for the implicit (backward) Euler scheme. If
-we process the output of all three cases to show the energy in the solution as
-a function of the time, we get the following graph:
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+If you want to explore a bit, try out some of the following things:
+<ul>
+  <li>Varying $\theta$. This gives different time stepping schemes, some of
+  which are stable while others are not. Take a look at how the energy
+  evolves. 
+
+  <li>Different initial and boundary conditions, right hand sides.
+
+  <li>More complicated domains or more refined meshes. Remember that the time
+  step needs to be bounded by the mesh width, so changing the mesh should
+  always involve also changing the time step.
+
+  <li>Variable coefficients: In real media, the wave speed is often
+  variable. In particular, the "real" wave equation in realistic media would
+  read 
+  @f[
+     \rho(x) \frac{\partial^2 u}{\partial t^2}
+     -
+     \nabla \cdot
+     a(x) \nabla u = f,
+  @f]
+  where $\rho(x)$ is the density of the material, and $a(x)$ related to the
+  stiffness coefficient. The wave speed is then $c=\sqrt{a/\rho}.
+
+  To make such a change, we would have to compute the mass and Laplace
+  matrices with a variable coefficient. Fortunately, this isn't too hard: the
+  functions MatrixTools::create_laplace_matrix and
+  MatrixTools::create_vector_tools have additional default parameters that can
+  be used to pass non-constant coefficient functions to them. The required
+  changes are therefore relatively small. On the other hand, care must be
+  taken again to make sure the time step is within the allowed range.
+</ul>
