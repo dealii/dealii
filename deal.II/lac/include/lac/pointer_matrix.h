@@ -372,7 +372,7 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
  * @author Guidl Kanschat, 2006
  */
 template <typename number>
-PointerMatrixVector : public PointerMatrixBase<Vector<number> >
+class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 {
   public:
 				     /**
