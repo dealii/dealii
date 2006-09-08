@@ -385,14 +385,14 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				      * If <tt>M</tt> is zero, no
 				      * matrix is stored.
 				      */
-    PointerMatrix (const Vector<number>* M=0);
+    PointerMatrixVector (const Vector<number>* M=0);
 
 				     /**
 				      * Constructor. The name argument
 				      * is used to identify the
 				      * SmartPointer for this object.
 				      */
-    PointerMatrix(const char* name);
+    PointerMatrixVector (const char* name);
     
 				     /**
 				      * Constructor. <tt>M</tt> points
@@ -403,8 +403,8 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				      * the SmartPointer for this
 				      * object.
 				      */
-    PointerMatrix(const Vector<number>* M,
-		  const char* name);
+    PointerMatrixVector (const Vector<number>* M,
+			 const char* name);
 
 				     // Use doc from base class
     virtual void clear();
@@ -421,7 +421,7 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				      * and releases its matrix.
 				      * @see SmartPointer
 				      */
-    const PointerMatrix& operator= (const Vector<number>* M);
+    const PointerMatrixVector& operator= (const Vector<number>* M);
     
 				     /**
 				      * Matrix-vector product,
@@ -783,20 +783,20 @@ PointerMatrixAux<MATRIX, VECTOR>::get () const
 
 
 template<typename number>
-PointerMatrixVector<Vector<number> >::PointerMatrix (const MATRIX* M)
+PointerMatrixVector<number>::PointerMatrixVector (const Vector<number>* M)
   : m(M, typeid(*this).name())
 {}
 
 
 template<typename number>
-PointerMatrixVector<Vector<number> >::PointerMatrix (const char* name)
+PointerMatrixVector<number>::PointerMatrixVector (const char* name)
   : m(0, name)
 {}
 
 
 template<typename number>
-PointerMatrixVector<Vector<number> >::PointerMatrix (
-  const MATRIX* M,
+PointerMatrixVector<number>::PointerMatrixVector (
+  const Vector<number>* M,
   const char* name)
   : m(M, name)
 {}
@@ -804,15 +804,15 @@ PointerMatrixVector<Vector<number> >::PointerMatrix (
 
 template<typename number>
 inline void
-PointerMatrixVector<Vector<number> >::clear ()
+PointerMatrixVector<number>::clear ()
 {
   m = 0;
 }
 
 
 template<typename number>
-inline const PointerMatrixVector<Vector<number> >&
-PointerMatrixVector<Vector<number> >::operator= (const MATRIX* M)
+inline const PointerMatrixVector<number>&
+PointerMatrixVector<number>::operator= (const Vector<number>* M)
 {
   m = M;
   return *this;
@@ -821,7 +821,7 @@ PointerMatrixVector<Vector<number> >::operator= (const MATRIX* M)
 
 template<typename number>
 inline bool
-PointerMatrixVector<Vector<number> >::empty () const
+PointerMatrixVector<number>::empty () const
 {
   if (m == 0)
     return true;
@@ -830,7 +830,7 @@ PointerMatrixVector<Vector<number> >::empty () const
 
 template<typename number>
 inline void
-PointerMatrixVector<Vector<number> >::vmult (
+PointerMatrixVector<number>::vmult (
   Vector<number>& dst,
   const Vector<number>& src) const
 {
@@ -843,7 +843,7 @@ PointerMatrixVector<Vector<number> >::vmult (
 
 template<typename number>
 inline void
-PointerMatrixVector<Vector<number> >::Tvmult (
+PointerMatrixVector<number>::Tvmult (
   Vector<number>& dst,
   const Vector<number>& src) const
 {
@@ -856,7 +856,7 @@ PointerMatrixVector<Vector<number> >::Tvmult (
 
 template<typename number>
 inline void
-PointerMatrixVector<Vector<number> >::vmult_add (
+PointerMatrixVector<number>::vmult_add (
   Vector<number>& dst,
   const Vector<number>& src) const
 {
@@ -869,7 +869,7 @@ PointerMatrixVector<Vector<number> >::vmult_add (
 
 template<typename number>
 inline void
-PointerMatrixVector<Vector<number> >::Tvmult_add (
+PointerMatrixVector<number>::Tvmult_add (
   Vector<number>& dst,
   const Vector<number>& src) const
 {
@@ -882,7 +882,7 @@ PointerMatrixVector<Vector<number> >::Tvmult_add (
 
 template<typename number>
 inline const void*
-PointerMatrixVector<Vector<number> >::get () const
+PointerMatrixVector<number>::get () const
 {
   return m;
 }
