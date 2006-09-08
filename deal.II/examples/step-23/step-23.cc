@@ -180,17 +180,16 @@ class WaveEquation
 
 				 // @sect3{Equation data}
 
-				 // Before we go on filling in the
-				 // details of the main class, let us
-				 // define the equation data
-				 // corresponding to the problem,
-				 // i.e. initial and boundary values
-				 // as well as a right hand side
-				 // class. We do so using classes
-				 // derived from the Function class
-				 // template that has been used many
-				 // times before, so the following
-				 // should not be a surprise.
+				 // Before we go on filling in the details of
+				 // the main class, let us define the equation
+				 // data corresponding to the problem,
+				 // i.e. initial and boundary values for both
+				 // the solution $u$ as well as its time
+				 // derivative $v$, as well as a right hand
+				 // side class. We do so using classes derived
+				 // from the Function class template that has
+				 // been used many times before, so the
+				 // following should not be a surprise.
 				 //
 				 // Let's start with initial values
 				 // and choose zero for both the value
@@ -264,14 +263,15 @@ double RightHandSide<dim>::value (const Point<dim>  &/*p*/,
 
 
 
-				 // Finally, we have boundary
-				 // values. They are as described in
-				 // the introduction:
+				 // Finally, we have boundary values for $u$
+				 // and $v$. They are as described in the
+				 // introduction, one being the time
+				 // derivative of the other:
 template <int dim>
-class BoundaryValues : public Function<dim> 
+class BoundaryValuesU : public Function<dim> 
 {
   public:
-    BoundaryValues () : Function<dim>() {};
+    BoundaryValuesU () : Function<dim>() {};
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -281,8 +281,21 @@ class BoundaryValues : public Function<dim>
 
 
 template <int dim>
-double BoundaryValues<dim>::value (const Point<dim> &p,
-				   const unsigned int component) const 
+class BoundaryValuesV : public Function<dim> 
+{
+  public:
+    BoundaryValuesV () : Function<dim>() {};
+    
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
+};
+
+
+
+
+template <int dim>
+double BoundaryValuesU<dim>::value (const Point<dim> &p,
+				    const unsigned int component) const 
 {
   Assert (component == 0, ExcInternalError());
 
@@ -291,6 +304,24 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
       (p[1] < 1./3) &&
       (p[1] > -1./3))
     return std::sin (this->get_time() * 4 * deal_II_numbers::PI);
+  else
+    return 0;
+}
+
+
+
+template <int dim>
+double BoundaryValuesV<dim>::value (const Point<dim> &p,
+				    const unsigned int component) const 
+{
+  Assert (component == 0, ExcInternalError());
+
+  if ((this->get_time() <= 0.5) &&
+      (p[0] < 0) &&
+      (p[1] < 1./3) &&
+      (p[1] > -1./3))
+    return (std::cos (this->get_time() * 4 * deal_II_numbers::PI) *
+	    4 * deal_II_numbers::PI);
   else
     return 0;
 }
@@ -312,7 +343,10 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 				 // functions that solve linear systems, or
 				 // that generate output).
 				 //
-				 // Let's start with the constructor:
+				 // Let's start with the constructor (for an
+				 // explanation of the choice of time step,
+				 // see the section on Courant, Friedrichs,
+				 // and Levy in the introduction):
 template <int dim>
 WaveEquation<dim>::WaveEquation () :
                 fe (1),
@@ -341,13 +375,13 @@ void WaveEquation<dim>::setup_system ()
 	    << std::endl
 	    << "Total number of cells: "
 	    << triangulation.n_cells()
-	    << std::endl
   	    << std::endl;
 
   dof_handler.distribute_dofs (fe);
 
-  std::cout << "   Number of degrees of freedom: "
+  std::cout << "Number of degrees of freedom: "
 	    << dof_handler.n_dofs()
+	    << std::endl
 	    << std::endl;
 
   sparsity_pattern.reinit (dof_handler.n_dofs(),
@@ -543,21 +577,21 @@ void WaveEquation<dim>::run ()
 				   // ($T=5$ in this case). In each time step,
 				   // we first have to solve for $U^n$, using
 				   // the equation $(M^n + k^2\theta^2 A^n)U^n
-				   // = M^{n,n-1}U^{n-1} - k^2\theta^2
-				   // A^{n,n-1}U^{n-1} + kM^{n,n-1}V^{n-1} -
-				   // k^2\theta \left[ \theta F^n + (1-\theta)
+				   // =$ $(M^{n,n-1} - k^2\theta(1-\theta)
+				   // A^{n,n-1})U^{n-1} + kM^{n,n-1}V^{n-1} +$
+				   // $k\theta \left[k \theta F^n + k(1-\theta)
 				   // F^{n-1} \right]$. Note that we use the
 				   // same mesh for all time steps, so that
 				   // $M^n=M^{n,n-1}=M$ and
 				   // $A^n=A^{n,n-1}=A$. What we therefore
 				   // have to do first is to add up $MU^{n-1}
-				   // - k^2\theta^2 AU^{n-1} + kMV^{n-1}$ and
-				   // put the result into the
-				   // <code>system_rhs</code> vector. (For
-				   // these additions, we need a temporary
-				   // vector that we declare before the loop
-				   // to avoid repeated memory allocations in
-				   // each time step.)
+				   // - k^2\theta(1-\theta) AU^{n-1} + kMV^{n-1}$ and
+				   // the forcing terms, and put the result
+				   // into the <code>system_rhs</code>
+				   // vector. (For these additions, we need a
+				   // temporary vector that we declare before
+				   // the loop to avoid repeated memory
+				   // allocations in each time step.)
 				   //
 				   // The one thing to realize here is how we
 				   // communicate the time variable to the
@@ -578,6 +612,7 @@ void WaveEquation<dim>::run ()
 				   // function for all times at any given
 				   // spatial location.
   Vector<double> tmp (solution_u.size());
+  Vector<double> forcing_terms (solution_u.size());
   
   for (timestep_number=1, time=time_step;
        time<=5;
@@ -599,12 +634,17 @@ void WaveEquation<dim>::run ()
       rhs_function.set_time (time);
       VectorTools::create_right_hand_side (dof_handler, QGauss<dim>(2),
 					   rhs_function, tmp);
-      system_rhs.add (theta * theta * time_step * time_step, tmp);
+      forcing_terms = tmp;
+      forcing_terms *= theta * time_step;
+      
+      system_rhs.add (theta * time_step, forcing_terms);
 
       rhs_function.set_time (time-time_step);
       VectorTools::create_right_hand_side (dof_handler, QGauss<dim>(2),
 					   rhs_function, tmp);
-      system_rhs.add (theta * (1-theta) * time_step * time_step, tmp);
+
+      forcing_terms.add ((1-theta) * time_step, tmp);
+      system_rhs.add (theta * time_step, forcing_terms);
 
 				       // After so constructing the right hand
 				       // side vector of the first equation,
@@ -618,29 +658,33 @@ void WaveEquation<dim>::run ()
 				       // boundary values as we usually
 				       // do. The result is then handed off to
 				       // the solve_u() function:
-      BoundaryValues<dim> boundary_values_function;
-      boundary_values_function.set_time (time);
+      {
+	BoundaryValuesU<dim> boundary_values_u_function;
+	boundary_values_u_function.set_time (time);
       
-      std::map<unsigned int,double> boundary_values;
-      VectorTools::interpolate_boundary_values (dof_handler,
-						0,
-						boundary_values_function,
-						boundary_values);
-      MatrixTools::apply_boundary_values (boundary_values,
-					  system_matrix,
-					  solution_u,
-					  system_rhs);
+	std::map<unsigned int,double> boundary_values;
+	VectorTools::interpolate_boundary_values (dof_handler,
+						  0,
+						  boundary_values_u_function,
+						  boundary_values);
+	MatrixTools::apply_boundary_values (boundary_values,
+					    system_matrix,
+					    solution_u,
+					    system_rhs);
+      }
       solve_u ();
 
 
-				       // The second step -- solving for $V^n$
-				       // works similarly, except that this
-				       // time the matrix on the left is the
-				       // mass matrix, the right hand side is
-				       // $MV^{n-1} - k\left[ \theta A U^n +
-				       // (1-\theta) AU^{n-1}\right]$, and
-				       // there are no boundary values to be
-				       // applied.
+				       // The second step, i.e. solving for
+				       // $V^n$, works similarly, except that
+				       // this time the matrix on the left is
+				       // the mass matrix, the right hand side
+				       // is $MV^{n-1} - k\left[ \theta A U^n
+				       // + (1-\theta) AU^{n-1}\right]$ plus
+				       // forcing terms. Boundary values are
+				       // applied in the same way as before,
+				       // except that now we have to use the
+				       // BoundaryValuesV class:
       laplace_matrix.vmult (system_rhs, solution_u);
       system_rhs *= -theta * time_step;
 
@@ -650,27 +694,46 @@ void WaveEquation<dim>::run ()
       laplace_matrix.vmult (tmp, old_solution_u);
       system_rhs.add (-time_step * (1-theta), tmp);
 
-      rhs_function.set_time (time);
-      VectorTools::create_right_hand_side (dof_handler, QGauss<dim>(2),
-					   rhs_function, tmp);
-      system_rhs.add (theta * time_step, tmp);
+      system_rhs += forcing_terms;
 
-      rhs_function.set_time (time-time_step);
-      VectorTools::create_right_hand_side (dof_handler, QGauss<dim>(2),
-					   rhs_function, tmp);
-      system_rhs.add ((1-theta) * time_step, tmp);
-
+      {
+	BoundaryValuesV<dim> boundary_values_v_function;
+	boundary_values_v_function.set_time (time);
+      
+	std::map<unsigned int,double> boundary_values;
+	VectorTools::interpolate_boundary_values (dof_handler,
+						  0,
+						  boundary_values_v_function,
+						  boundary_values);
+	MatrixTools::apply_boundary_values (boundary_values,
+					    mass_matrix,
+					    solution_v,
+					    system_rhs);
+      }
       solve_v ();
 
 				       // Finally, after both solution
 				       // components have been computed, we
-				       // output the result, and go on to the
-				       // next time step after shifting the
-				       // present solution into the vectors
-				       // that hold the solution at the
-				       // previous time step:
+				       // output the result, compute the
+				       // energy in the solution, and go on to
+				       // the next time step after shifting
+				       // the present solution into the
+				       // vectors that hold the solution at
+				       // the previous time step. Note the
+				       // function
+				       // SparseMatrix::matrix_norm_square
+				       // that can compute
+				       // $\left<V^n,MV^n\right>$ and
+				       // $\left<U^n,AU^n\right>$ in one step,
+				       // saving us the expense of a temporary
+				       // vector and several lines of code:
       output_results ();
 
+      std::cout << "  Total energy: "
+		<< (mass_matrix.matrix_norm_square (solution_v) +
+		    laplace_matrix.matrix_norm_square (solution_u)) / 2
+		<< std::endl;
+      
       old_solution_u = solution_u;
       old_solution_v = solution_v;
     }

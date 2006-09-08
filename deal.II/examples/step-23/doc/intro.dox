@@ -153,11 +153,11 @@ then reformulate the original wave equation as follows:
 The advantage of this formulation is that it now only contains first
 time derivatives for both variables, for which it is simple to write
 down time stepping schemes. Note that we do not have boundary
-conditions for $v$, a fact that is surprising at first as one would
-think that we could enforce $v=\frac{\partial g}{\partial t}$ on the
-boundary; however, it turns out that this leads to really bad
-approximations to the solution, as simple numerical experiments can
-show. 
+conditions for $v$ at first. However, we could enforce $v=\frac{\partial
+g}{\partial t}$ on the boundary. It turns out in numerical examples that this
+as actually necessary: without doing so the solution doesn't look particularly
+wrong, but the Crank-Nicolson scheme does not conserve energy if one doesn't
+enforce these boundary conditions. 
 
 With this formulation, let us introduce the following time
 discretization where a superscript $n$ indicates the number of a time
@@ -204,8 +204,9 @@ rearranging terms. We then get
 \f{eqnarray*}
   \left[ 1-k^2\theta^2\Delta \right] u^n &=&
   	 \left[ 1+k^2\theta(1-\theta)\Delta\right] u^{n-1} + k v^{n-1} 
-   	 - k^2\theta\left[\theta f^n + (1-\theta) f^{n-1}\right],\\
-   v^n &=& v^{n-1} + k\Delta\left[ \theta u^n + (1-\theta) u^{n-1}\right].
+   	 + k^2\theta\left[\theta f^n + (1-\theta) f^{n-1}\right],\\
+   v^n &=& v^{n-1} + k\Delta\left[ \theta u^n + (1-\theta) u^{n-1}\right]
+   + k\left[\theta f^n + (1-\theta) f^{n-1}\right].
 \f}
 In this form, we see that if we are given the solution
 $u^{n-1},v^{n-1}$ of the previous timestep, that we can the solve for
@@ -227,10 +228,10 @@ the entire domain, and integrate by parts where necessary. This leads
 to
 \f{eqnarray*}
   (u^n,\varphi) + k^2\theta^2(\nabla u^n,\nabla \varphi) &=&
-  (u^{n-1},\varphi) - k^2\theta^2(\nabla u^{n-1},\nabla \varphi)
+  (u^{n-1},\varphi) - k^2\theta(1-\theta)(\nabla u^{n-1},\nabla \varphi)
   +
   k(v^{n-1},\varphi)
-  - k^2\theta
+  + k^2\theta
   \left[
   \theta (f^n,\varphi) + (1-\theta) (f^{n-1},\varphi)
   \right],
@@ -240,7 +241,11 @@ to
    (v^{n-1},\varphi)
     - 
     k\left[ \theta (\nabla u^n,\nabla\varphi) + 
-    (1-\theta) (\nabla u^{n-1},\nabla \varphi)\right].
+    (1-\theta) (\nabla u^{n-1},\nabla \varphi)\right]
+  + k
+  \left[
+  \theta (f^n,\varphi) + (1-\theta) (f^{n-1},\varphi)
+  \right].
 \f}
 
 It is then customary to approximate $u^n(x) \approx u^n_h(x) = \sum_i
@@ -260,11 +265,11 @@ If we plug these expansions into above equations and test with the
 test functions from the present mesh, we get the following linear
 system: 
 \f{eqnarray*}
-  M^nU^n + k^2\theta^2 A^nU^n &=&
-  M^{n,n-1}U^{n-1} - k^2\theta^2 A^{n,n-1}U^{n-1}
+  (M^n + k^2\theta^2 A^n)U^n &=&
+  M^{n,n-1}U^{n-1} - k^2\theta(1-\theta) A^{n,n-1}U^{n-1}
   +
   kM^{n,n-1}V^{n-1}
-  - k^2\theta
+  + k^2\theta
   \left[
   \theta F^n + (1-\theta) F^{n-1}
   \right],
@@ -274,7 +279,11 @@ system:
    M^{n,n-1}V^{n-1}
     - 
     k\left[ \theta A^n U^n +
-    (1-\theta) A^{n,n-1} U^{n-1}\right],
+    (1-\theta) A^{n,n-1} U^{n-1}\right]
+   + k
+  \left[
+  \theta F^n + (1-\theta) F^{n-1}
+  \right],
 \f}
 where
 @f{eqnarray*}
@@ -304,23 +313,86 @@ integrals that contain shape functions defined on two meshes. This is a
 somewhat messy process that we omit here, but that is treated in some
 detail in @ref step_22 "step-22".
 
-As a final note, we remember that we have posed boundary values for
-$u$, but not $v$. In practice that means that we have to apply
-boundary values for the first equation above (i.e. the one for $U^n$),
-whereas we do not have to do that for the second one.
+
+<h3>Energy conservation</h3>
+
+One way to compare the quality of a time stepping scheme is to see whether the
+numerical approximation preserves conservation properties of the continuous
+equation. For the wave equation, the natural quantity to look at is the
+energy. By multiplying the wave equation by $u_t$, integrating over $\Omega$,
+and integrating by parts where necessary, we find that
+@f[
+	\frac{\partial}{\partial t}
+	\left[\frac 12 \int_\Omega \left(\frac{\partial u}{\partial
+	t}\right)^2 + (\nabla u)^2 \; dx\right]
+	=
+	\int_\Omega f \; dx
+	+
+	\int_{\partial\Omega} n\cdot\nabla u
+	\frac{\partial g}{\partial t} \; dx.
+@f]
+By consequence, in absence of body forces and constant boundary values, we get
+that
+@f[
+	E(t) = \frac 12 \int_\Omega \left(\frac{\partial u}{\partial
+	t}\right)^2 + (\nabla u)^2 \; dx
+@f]
+is a conserved quantity. We will compute this quantity after each time
+step. It is straightforward to see that if we replace $u$ by its finite
+element approximation, and $\frac{\partial u}{\partial t}$ by the finite
+element approximation of the velocity $v$, then
+@f[
+	E(t_n) = \frac 12 \left<V^n, M^n V^n\right>
+	+
+	\frac 12 \left<U^n, A^n U^n\right>.
+@f]
+As we will see in the results section, the Crank-Nicolson scheme does indeed
+conserve the energy, whereas neither the forward nor the backward Euler scheme
+do. 
 
 
-<h3>Who are Courant, Friedrichs, and Levy?<h3>
+<h3>Who are Courant, Friedrichs, and Levy?</h3>
 
-CFL condition
+One of the reasons why the wave equation is nasty to solve numerically is that
+explicit time discretizations are only stable if the time step is small
+enough. In particular, it is coupled to the spatial mesh width $h$. For the
+lowest order discretization we use here, the relationship reads
+@f[
+	k\le \frac ch
+@f]
+where $c$ is the wave speed, which in our formulation of the wave equation has
+been normalized to one. Consequently, unless we use the implicit schemes with
+$\theta>0$, our solutions will not be numerically stable if we violate this
+restriction. Implicit schemes do not have this restriction for stability, but
+they become inaccurate if the time step is too large.
 
-Energy conservation
-
-<h3>How the program works</h3>
-
-Given the above formulation, ....
+This condition was first recognized by Courant, Friedrichs, and Levy &mdash; in
+1943, long before computers become available for numerical computations! In
+the program, we will refine a square $[-1,1]$ seven times uniformly, giving a
+mesh size of $h=\frac 1{64}$, which is what we set the time step to. The fact
+that we set the time step and mesh size individually in two different places
+is error prone: it is too easy to refine the mesh once more but forget to also
+adjust the time step. @ref step_24 "step-24" shows a better way how to keep
+these things in synch.
 
 
 <h3>The testcase</h3>
 
-...
+Although the program has all the hooks to deal with nonzero initial and
+boundary conditions and body forces, we take a simple case where the domain is
+a square $[-1,1]^2$ and
+@f{eqnarray*}
+	f &=& 0,
+	\\
+	u_0 &=& 0,
+	\\
+	u_1 &=& 0,
+	\\
+	g &=& \left\{{\sin (4\pi t) \atop 0} 
+	\qquad {\textrm{for}\ t\le \frac 12, x=-1, -\frac 13<y<\frac 13 
+	\atop \textrm{otherwise}}
+	\right.
+@f}
+This corresponds to a membrane initially at rest and clamped all around, where
+someone is waving a part of the clamped boundary once up and down, thereby
+shooting a wave into the domain. 
