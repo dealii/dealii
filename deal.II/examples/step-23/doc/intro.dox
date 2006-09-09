@@ -366,14 +366,15 @@ $\theta>0$, our solutions will not be numerically stable if we violate this
 restriction. Implicit schemes do not have this restriction for stability, but
 they become inaccurate if the time step is too large.
 
-This condition was first recognized by Courant, Friedrichs, and Levy &mdash; in
-1943, long before computers become available for numerical computations! In
-the program, we will refine a square $[-1,1]$ seven times uniformly, giving a
-mesh size of $h=\frac 1{64}$, which is what we set the time step to. The fact
-that we set the time step and mesh size individually in two different places
-is error prone: it is too easy to refine the mesh once more but forget to also
-adjust the time step. @ref step_24 "step-24" shows a better way how to keep
-these things in synch.
+This condition was first recognized by Courant, Friedrichs, and Levy &mdash;
+in 1943, long before computers become available for numerical computations!
+Consequently, the condition on the time step is most frequently just referred
+to as the <i>CFL</i> condition. In the program, we will refine a square
+$[-1,1]$ seven times uniformly, giving a mesh size of $h=\frac 1{64}$, which
+is what we set the time step to. The fact that we set the time step and mesh
+size individually in two different places is error prone: it is too easy to
+refine the mesh once more but forget to also adjust the time step. @ref
+step_24 "step-24" shows a better way how to keep these things in synch.
 
 
 <h3>The testcase</h3>
