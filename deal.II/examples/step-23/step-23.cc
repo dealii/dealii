@@ -458,7 +458,7 @@ void WaveEquation<dim>::setup_system ()
 }
 
 
-				 // @sect4{WaveEquation::solve_u and WaveEquation::solve_u}
+				 // @sect4{WaveEquation::solve_u and WaveEquation::solve_v}
 
 				 // The next two functions deal with solving
 				 // the linear systems associated with the
