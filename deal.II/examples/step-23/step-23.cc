@@ -764,13 +764,6 @@ int main ()
 
       return 1;
     }
-				   // If the exception that was thrown
-				   // somewhere was not an object of a
-				   // class derived from the standard
-				   // <code>exception</code> class, then we
-				   // can't do anything at all. We
-				   // then simply print an error
-				   // message and exit.
   catch (...) 
     {
       std::cerr << std::endl << std::endl
