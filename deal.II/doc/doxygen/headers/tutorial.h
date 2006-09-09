@@ -84,6 +84,8 @@
  * 
  * @ref step_23 "step-23"
  * 
+ * @ref step_24 "step-24"
+ * 
  * </td>
  * </tr>
  */
