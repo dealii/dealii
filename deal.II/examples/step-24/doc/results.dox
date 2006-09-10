@@ -106,7 +106,7 @@ figures:
 Note that in the experimental data, the first signal (i.e. the left-most dark
 line) results from absorption at the tissue boundary, and therefore reaches
 the detectors first and before any of the signals from the interior. This
-signal is also faintly visible at the end of the traces, around 30 $\my s$,
+signal is also faintly visible at the end of the traces, around 30 $\mu s$,
 which indicates that the signal travelled through the entire tissue to reach
 detectors at the other side, after all the signals originating from the
 interior have reached them.
