@@ -55,7 +55,7 @@ namespace FiniteElementDomination
 				    * dominates Q(k') if $k\le k'$.
 				    *
 				    * This enum is used in the
-				    * FiniteElement::compare_fe_for_domination()
+				    * FiniteElement::compare_for_face_domination()
 				    * function that is used in the context
 				    * of hp finite element methods when
 				    * determining what to do at faces where
@@ -69,6 +69,14 @@ namespace FiniteElementDomination
 				    * outcome of a comparison for mutual
 				    * domination: the dominated side is
 				    * constrained to the dominating one.
+				    *
+				    * A similar situation happens in 3d, where
+				    * we have to consider different elements
+				    * meeting at only an edge, not an entire
+				    * face. Such comparisons are then
+				    * implemented in the
+				    * FiniteElement::compare_for_line_domination()
+				    * function.
 				    *
 				    * Note that there are situations where
 				    * neither side dominates. The hp paper

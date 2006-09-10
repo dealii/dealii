@@ -376,7 +376,7 @@ hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
 template <int dim>
 FiniteElementDomination::Domination
 FE_DGPMonomial<dim>::
-compare_for_domination (const FiniteElement<dim> &fe_other) const
+compare_for_face_domination (const FiniteElement<dim> &fe_other) const
 {
 				   // check whether both are discontinuous
 				   // elements and both could dominate, see

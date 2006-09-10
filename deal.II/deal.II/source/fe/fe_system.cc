@@ -2274,7 +2274,7 @@ FESystem<dim>::hp_quad_dof_identities (const FiniteElement<dim> &fe_other) const
 template <int dim>
 FiniteElementDomination::Domination
 FESystem<dim>::
-compare_for_domination (const FiniteElement<dim> &fe_other) const
+compare_for_face_domination (const FiniteElement<dim> &fe_other) const
 {
 				   // at present all we can do is to compare
 				   // with other FESystems that have the same
@@ -2305,7 +2305,7 @@ compare_for_domination (const FiniteElement<dim> &fe_other) const
 					   // check who dominates and combine
 					   // with previous result
 	  domination = domination & (this->base_element(b)
-				     .compare_for_domination (fe_sys_other->base_element(b)));
+				     .compare_for_face_domination (fe_sys_other->base_element(b)));
 	}
 
 				       // if we've gotten here, then we've

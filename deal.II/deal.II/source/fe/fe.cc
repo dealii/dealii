@@ -521,7 +521,7 @@ hp_quad_dof_identities (const FiniteElement<dim> &) const
 template <int dim>
 FiniteElementDomination::Domination
 FiniteElement<dim>::
-compare_for_domination (const FiniteElement<dim> &) const
+compare_for_face_domination (const FiniteElement<dim> &) const
 {
   Assert (false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;

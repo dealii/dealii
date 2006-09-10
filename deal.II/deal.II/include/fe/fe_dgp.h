@@ -194,10 +194,11 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 
 				     /**
 				      * Return whether this element dominates
-				      * the one given as argument, whether it
-				      * is the other way around, whether
-				      * neither dominates, or if either could
-				      * dominate.
+				      * the one given as argument when they
+				      * meet at a common face,
+				      * whether it is the other way around,
+				      * whether neither dominates, or if
+				      * either could dominate.
 				      *
 				      * For a definition of domination, see
 				      * FiniteElementBase::Domination and in
@@ -205,7 +206,7 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      */
     virtual
     FiniteElementDomination::Domination
-    compare_for_domination (const FiniteElement<dim> &fe_other) const;
+    compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
     
 				     /**
 				      * @}

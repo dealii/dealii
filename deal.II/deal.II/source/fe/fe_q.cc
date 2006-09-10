@@ -681,7 +681,7 @@ hp_quad_dof_identities (const FiniteElement<dim>        &fe_other) const
 template <int dim>
 FiniteElementDomination::Domination
 FE_Q<dim>::
-compare_for_domination (const FiniteElement<dim> &fe_other) const
+compare_for_face_domination (const FiniteElement<dim> &fe_other) const
 {
   if (const FE_Q<dim> *fe_q_other
       = dynamic_cast<const FE_Q<dim>*>(&fe_other))
