@@ -537,10 +537,28 @@ void TATForwardProblem<dim>::output_results () const
 }
 
 
-//XXX
-                                 // This is the main function
+
+				 // @sect4{TATForwardProblem::run}
+
+                                 // This function that does most of the work
+                                 // is pretty much again like in step-23,
+                                 // though we make things a bit clearer by
+                                 // using the vectors G1 and G2 mentioned in
+                                 // the introduction. Compared to the overall
+                                 // memory consumption of the program, the
+                                 // introduction of a few temporary vectors
+                                 // isn't doing much harm.
                                  // 
-                                      
+				 // The only changes to this function are:
+				 // First, that we do not have to project
+				 // initial values for the velocity $v$, since
+				 // we know that it is zero. And second that
+				 // we evaluate the solution at the detector
+				 // locations computed in the
+				 // constructor. This is done using the
+				 // VectorTools::point_value function. These
+				 // values are then written to a file that we
+				 // open at the beginning of the function.
 template <int dim>
 void TATForwardProblem<dim>::run () 
 {
@@ -549,121 +567,64 @@ void TATForwardProblem<dim>::run ()
   VectorTools::project (dof_handler,constraints, 
 			QGauss<dim>(3), InitialValuesP<dim>(),
 			old_solution_p);
-
   old_solution_v = 0;
 
 
-  timestep_number = 1;
-  unsigned int n_steps;
-  unsigned int n_detectors;
+  std::ofstream detector_data("detectors.dat");  
 
-				   // Number of time steps is defined as the
-				   // ratio of the total time to the time step
-  
-  const double end_time = 0.7;
-  n_steps=static_cast<unsigned int>(std::floor(end_time/time_step));     
-  
-
-				   // Define a vector to hold the value obtained
-				   // by the detector
-  Vector<double> project_dat (n_steps * n_detectors +1);
-
-  std::cout<< "Total number of time steps = "<< n_steps <<std::endl;
-  std::cout<< "Total number of detectors = "<< n_detectors << std::endl;
-
-				   // Open a file to write the data
-				   // obtained by the detectors 
-                         
-  std::ofstream proj_out;
-  proj_out.open("proj.dat");
-  
-
-  Vector<double> tmp1 (solution_p.size());
-  Vector<double> tmp2 (solution_v.size());
+  Vector<double> tmp (solution_p.size());
   Vector<double> G1 (solution_p.size());
   Vector<double> G2 (solution_v.size());
-  
-  for (double time = time_step; time<=end_time; time+=time_step, ++timestep_number)
+
+  const double end_time = 0.7;
+  for (timestep_number=1, time=time_step;
+       time<=end_time;
+       time+=time_step, ++timestep_number)
     {
       std::cout << std::endl;                                       
       std::cout<< "time_step " << timestep_number << " @ t=" << time << std::endl;
 
-				       // Calculate G1 as defined in the
-				       // introduction section
-      mass_matrix.vmult (tmp1, old_solution_p); 
-      mass_matrix.vmult (tmp2, old_solution_v); 
-      G1 = tmp1;
-      G1.add(time_step * (1-theta), tmp2);
+      mass_matrix.vmult (G1, old_solution_p); 
+      mass_matrix.vmult (tmp, old_solution_v); 
+      G1.add(time_step * (1-theta), tmp);
       
-				       // Calculate G2 as defined in the
-				       // introduction section
-      mass_matrix.vmult (tmp1, old_solution_v);
-      laplace_matrix.vmult (tmp2, old_solution_p); 
-      G2 = tmp1;
-      G2.add(-wave_speed*wave_speed*time_step*(1-theta), tmp2);
-      tmp1=0;
-      boundary_matrix.vmult (tmp1,old_solution_p);
-      G2.add(wave_speed,tmp1);
-      
-				       // Compute the pressure potential p, the formula
-				       // has been presented in the introduction section
+      mass_matrix.vmult (G2, old_solution_v);
+      laplace_matrix.vmult (tmp, old_solution_p); 
+      G2.add (-wave_speed * wave_speed * time_step * (1-theta), tmp);
 
+      boundary_matrix.vmult (tmp, old_solution_p);
+      G2.add (wave_speed, tmp);
+      
       system_rhs_p = G1; 
       system_rhs_p.add(time_step * theta , G2);
 
       solve_p ();
 
-				       // Compute the derivative potential pressure.
-				       // The formula has been presented in the introduction
-				       // section. The potential derivative is calculated 
-				       // after the potential pressure because the calculation
-				       // depends on the current value of the potential 
-				       // pressure
 
       system_rhs_v = G2;
-      tmp1 = 0;
-      laplace_matrix.vmult (tmp1, solution_p);
-      system_rhs_v.add(-time_step * theta*wave_speed*wave_speed, tmp1);
-      tmp1 = 0;
-      boundary_matrix.vmult(tmp1, solution_p);
-      system_rhs_v.add(-wave_speed,tmp1);
+      laplace_matrix.vmult (tmp, solution_p);
+      system_rhs_v.add (-time_step * theta * wave_speed * wave_speed, tmp);
+
+      boundary_matrix.vmult (tmp, solution_p);
+      system_rhs_v.add (-wave_speed, tmp);
       
       solve_v ();
-				       // Compute the energy in the system.By checking
-				       // energy change in the system, we can verify
-				       // the correctness of the code. 
-
-      double energy = (mass_matrix.matrix_scalar_product(solution_v,solution_v)+
-		       wave_speed * wave_speed * laplace_matrix.matrix_scalar_product(solution_p,solution_p))/2;        
-                                                                         
-      std::cout << "energy= " << energy << std::endl;
 
       output_results ();
       
-				       //  Evaluate the value at specific locations. 
-				       //  For 2-D, it is on a circle. For 1-D, 
-				       //  it is a point detector.
 
-      proj_out << time ;
-
+      detector_data << time;
       for (unsigned i=0 ; i<=detector_locations.size(); ++i)
-	{
-	  project_dat((timestep_number-1)*n_detectors+i)
-	    = VectorTools::point_value (dof_handler,
-					solution_p, 
-					detector_locations[i]);
-	  proj_out << " "<< project_dat((timestep_number-1)*n_detectors+i)<<" " ;
-	}
+	detector_data << " "
+		      << VectorTools::point_value (dof_handler,
+						   solution_p, 
+						   detector_locations[i])
+		      << " ";
+      detector_data << std::endl;
 
-      proj_out<<std::endl;
-          
-				       // Update the values for the pressure potential 
-				       // and its derivative. 
-         
+      
       old_solution_p = solution_p;
-      solution_p = 0;
       old_solution_v = solution_v;      
-      solution_v = 0;
     }
 }
 
