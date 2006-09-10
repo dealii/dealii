@@ -397,12 +397,10 @@ class TriaObjectAccessor :  public TriaAccessor<dim>
     int level () const;
     
 				     /**
-				      *  Index of vertex. The
-				      *  convention regarding the
-				      *  numbering of vertices is laid
-				      *  down in the documentation of
-				      *  the Triangulation
-				      *  class.
+				      *  Index of vertex. The convention
+				      *  regarding the numbering of vertices
+				      *  is laid down in the documentation of
+				      *  the GeometryInfo class.
 				      *
 				      *  Note that the returned value is only
 				      *  the index of the geometrical
