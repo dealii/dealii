@@ -152,51 +152,60 @@ double ExactSolution<dim>::value (const Point<dim> &p,
 {
   double t = this->get_time ();
 
-  if (dim==1)
+  switch (dim)
     {
-      double m = 0.5;
+      case 1:
+      {
+	double m = 0.5;
 //      double beta = std::sqrt(m*m-1.)/m;
-      double c1 = 0.;
-      double c2 = 0.;
+	double c1 = 0.;
+	double c2 = 0.;
 //       double s1 = 1.;
 //       double s2 = -1.;
 
-      /* one kink (m>1) */
-      /* return 4.*std::atan(std::exp(s1*(p[0]+s2*beta*t)/std::sqrt(1.-beta*beta))); */
+					 /* one kink (m>1) */
+					 /* return 4.*std::atan(std::exp(s1*(p[0]+s2*beta*t)/std::sqrt(1.-beta*beta))); */
 
-      /* two kinks (m>1) */
-      /* return 4.*std::atan(beta*std::sinh(beta*m*p[0])/std::cosh(beta*m*t)); */
+					 /* two kinks (m>1) */
+					 /* return 4.*std::atan(beta*std::sinh(beta*m*p[0])/std::cosh(beta*m*t)); */
 
-      /* kink-antikink (m>1) */
-      /* return -4.*std::atan(m/std::sqrt(m*m-1)*std::sinh(std::sqrt(m*m-1.)*t+c2)/
-	 std::cosh(m*p[0]+c1)); */
+					 /* kink-antikink (m>1) */
+					 /* return -4.*std::atan(m/std::sqrt(m*m-1)*std::sinh(std::sqrt(m*m-1.)*t+c2)/
+					    std::cosh(m*p[0]+c1)); */
 
-      /* stationary breather (m<1), period = 2.*pi*sqrt(1.-m*m) 
-	 for m=0.5, -5.4414 <= t <= 2.7207 is a good time interval */
-      return -4.*std::atan(m/std::sqrt(1.-m*m)*std::sin(std::sqrt(1.-m*m)*t+c2)
-			   /std::cosh(m*p[0]+c1));
-    }
-  else if (dim==2)
-    {
-      double th  = deal_II_numbers::PI/4.;
-      double ld  = 1.;
-      double a0  = 1.;
-      double s   = 1.;
-      double arg = 0.;
-      arg = p[0]*std::cos(th) + std::sin(th)*(p[1]*std::cosh(ld)+t*std::sinh(ld));
-      return 4.*std::atan(a0*std::exp(s*arg));
-    }
-  else if (dim==3)
-    {
-      double th  = deal_II_numbers::PI;
-      double phi = deal_II_numbers::PI;
-      double tau = 1.;
-      double c0  = 1.;
-      double s   = 1.;
-      double arg = 0.;
-      arg = (p[0]*std::cos(th) + p[1]*std::sin(th)*std::cos(phi)
-	     + std::sin(th)*std::sin(phi)*(p[2]*std::cosh(tau)+t*std::sinh(tau)));
-      return 4.*std::atan(c0*std::exp(s*arg));
+					 /* stationary breather (m<1), period = 2.*pi*sqrt(1.-m*m) 
+					    for m=0.5, -5.4414 <= t <= 2.7207 is a good time interval */
+	return -4.*std::atan(m/std::sqrt(1.-m*m)*std::sin(std::sqrt(1.-m*m)*t+c2)
+			     /std::cosh(m*p[0]+c1));
+      }
+
+      case 2:
+      {
+	double th  = deal_II_numbers::PI/4.;
+	double ld  = 1.;
+	double a0  = 1.;
+	double s   = 1.;
+	double arg = 0.;
+	arg = p[0]*std::cos(th) + std::sin(th)*(p[1]*std::cosh(ld)+t*std::sinh(ld));
+	return 4.*std::atan(a0*std::exp(s*arg));
+      }
+
+      case 3:
+      {
+	double th  = deal_II_numbers::PI;
+	double phi = deal_II_numbers::PI;
+	double tau = 1.;
+	double c0  = 1.;
+	double s   = 1.;
+	double arg = 0.;
+	arg = (p[0]*std::cos(th) + p[1]*std::sin(th)*std::cos(phi)
+	       + std::sin(th)*std::sin(phi)*(p[2]*std::cosh(tau)+t*std::sinh(tau)));
+	return 4.*std::atan(c0*std::exp(s*arg));
+      }
+
+      default:
+	    Assert (false, ExcNotImplemented());
+	    return -1e8;
     }
 }
 
