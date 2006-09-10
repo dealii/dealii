@@ -47,16 +47,18 @@
 #include <iostream>
 #include <sstream>
 
+				 // This is the only new one: We will need a
+				 // library function defined in a class
+				 // GridTools that computes the minimal cell
+				 // diameter.
+#include <grid/grid_tools.h>
+
 
 				 // @sect3{The "forward problem" class template}
 
-				 // The main class is similar to the wave
-				 // equation.  The difference is that we add
-				 // an absorbing boundary condition. Because
-				 // we are only interested in values at
-				 // specific locations, we define some
-				 // parameters to obtain the coordinates of
-				 // those locations.
+				 // The first part of the main class is
+				 // exactly as in @ref step_23 "step-23"
+				 // (except for the name):
 template <int dim>
 class TATForwardProblem
 {
@@ -89,20 +91,26 @@ class TATForwardProblem
     unsigned int timestep_number;
     const double theta;
 
-				     //
+				     //  Here's what's new: first, we need
+				     //  that boundary mass matrix $B$ that
+				     //  came out of the absorbing boundary
+				     //  condition. Likewise, since this time
+				     //  we consider a realistic medium, we
+				     //  must have a measure of the wave speed
+				     //  $c_0$ that will enter all the
+				     //  formulas with the Laplace matrix
+				     //  (which we still define as $(\nabla
+				     //  \phi_i,\nabla \phi_j)$):
     SparseMatrix<double> boundary_matrix;
-				     // Number of refinement
-    const unsigned int n_refinements;
-				     // The acoustic speed in the medium $c_0$
-    const double acoustic_speed;
+    const double wave_speed;
 
-				     // The detector circullarly scan the target region.
-				     // The step size of the detector is in angles
-    const double step_angle;
-				     // The scanning radius
-    const double radius;
-
-    const double end_time;
+				     // The last thing we have to take care of
+				     // is that we wanted to evaluate the
+				     // solution at a certain number of
+				     // detector locations. We need an array
+				     // to hold these locations, declared here
+				     // and filled in the constructor:
+    std::vector<Point<dim> > detector_locations;
 };
 
 
@@ -176,33 +184,63 @@ double InitialValuesP<dim>::value (const Point<dim> &p,
 }
 
 
-				 // @sect4{Initialize the problem}
-				 // Acoustic_speed here is the acoustic speed 
-				 // in the medium. Specifically we use acoustic speed
-				 // in mineral oil. We use Crank-Nicolson scheme
-				 // for our time-dependent problem, therefore theta is
-				 // set to be 0.5.  The step size of the detector
-				 // is 2.25 degree, which means we need 160 steps 
-				 // in order to finish a circular scan. The radius of the
-				 // scanning circle is select to be half way between  
-				 // the center and the boundary to avoid the reflections 
-				 // from the the boundary, so as to miminize the 
-				 // interference brought by the inperfect absorbing 
-				 // boundary condition. The time step is selected 
-				 // to satisfy $k = h/c$                           
+				 // @sect3{Implementation of the <code>TATForwardProblem</code> class}
+
+				 // Let's start again with the
+				 // constructor. Setting the member variables
+				 // is straightforward. We use the acoustic
+				 // wave speed of mineral oil (in millimeters
+				 // per microsecond, a common unit in
+				 // experimental biomedical imaging) since
+				 // this is where many of the experiments we
+				 // want to compare the output with are made
+				 // in. The Crank-Nicolson scheme is used
+				 // again, i.e. theta is set to 0.5. The time
+				 // step is later selected to satisfy $k =
+				 // \frac h/c$
 template <int dim>
-TATForwardProblem<dim>::TATForwardProblem () :
+TATForwardProblem<dim>::TATForwardProblem ()
+		:
                 fe (1),
 		dof_handler (triangulation),
-		n_refinements (7),
-                acoustic_speed (1.437),
                 theta (0.5),
-	        end_time (0.7),
- 		time_step (0.5/std::pow(2.,1.0*n_refinements)/acoustic_speed),  
-                step_angle (2.25),  
-                radius (0.5)
-
-{}   
+                wave_speed (1.437)
+{
+				   // The second task in the constructor is to
+				   // initialize the array that holds the
+				   // detector locations. The results of this
+				   // program were compared with experiments
+				   // in which the step size of the detector
+				   // spacing is 2.25 degree, corresponding to
+				   // 160 detector locations. The radius of
+				   // the scanning circle is selected to be
+				   // half way between the center and the
+				   // boundary to avoid that the remaining
+				   // reflections from the imperfect boundary
+				   // condition spoils our numerical results.
+				   //
+				   // The locations of the detectors are then
+				   // calculated in clockwise order. Note that
+				   // the following of course only works if we
+				   // are computing in 2d, a condition that we
+				   // guard with an assertion. If we later
+				   // wanted to run the same program in 3d, we
+				   // would have to add code here for the
+				   // initialization of detector locations in
+				   // 3d. Due to the assertion, there is no
+				   // way we can forget to do this.
+  Assert (dim == 2, ExcNotImplemented());
+  
+  const double detector_step_angle = 2.25;
+  const double detector_radius = 0.5;
+  
+  for (double detector_angle = 2*deal_II_numbers::PI;
+       detector_angle >= 0;
+       detector_angle -= detector_step_angle/360*2*deal_II_numbers::PI)
+    detector_locations.push_back (Point<dim> (std::cos(detector_angle),
+					      std::sin(detector_angle)) *
+				  detector_radius);
+}
 
 
 
@@ -222,13 +260,48 @@ TATForwardProblem<dim>::TATForwardProblem () :
 				 // triangulation needs to know where new
 				 // boundary points lie when a cell is
 				 // refined. Following this, the mesh is
-				 // refined <code>n_refinements</code> times
-				 // &mdash; this variable was introduced to
-				 // make sure the time step size is always
-				 // compatible with the cell size, and
-				 // therefore satisfies the CFL condition that
-				 // was talked about in the introduction of
-				 // @ref step_23 "step-23".
+				 // refined a number of times.
+				 //
+				 // One thing we had to make sure is that the
+				 // time step satisfies the CFL condition
+				 // discussed in the introduction of @ref
+				 // step_23 "step-23". Back in that program,
+				 // we ensured this by hand by setting a
+				 // timestep that matches the mesh width, but
+				 // that was error prone because if we refined
+				 // the mesh once more we would also have to
+				 // make sure the time step is changed. Here,
+				 // we do that automatically: we ask a library
+				 // function for the minimal diameter of any
+				 // cell. Then we set $k=\frac h{c_0}$. The
+				 // only problem is: what exactly is $h$? The
+				 // point is that there is really no good
+				 // theory on this question for the wave
+				 // equation. It is known that for uniformly
+				 // refined meshes consisting of rectangles,
+				 // $h$ is the minimal edge length. But for
+				 // meshes on general quadrilaterals, the
+				 // exact relationship appears to be unknown,
+				 // i.e. it is unknown what properties of
+				 // cells are relevant for the CFL
+				 // condition. The problem is that the CFL
+				 // condition follows from knowledge of the
+				 // smallest eigenvalue of the Laplace matrix,
+				 // and that can only be computed analytically
+				 // for simply structured meshes.
+				 //
+				 // The upshot of all this is that we're not
+				 // quite sure what exactly we should take for
+				 // $h$. The function
+				 // GridTools::minimal_cell_diameter computes
+				 // the minimal diameter of all cells. If the
+				 // cells were all squares or cubes, then the
+				 // minimal edge length would be the minimal
+				 // diameter divided by
+				 // <code>std::sqrt(dim)</code>. We simply
+				 // generalize this, without theoretical
+				 // justification, to the case of non-uniform
+				 // meshes.
 				 //
 				 // The only other significant change is that
 				 // we need to build the boundary mass
@@ -240,8 +313,12 @@ void TATForwardProblem<dim>::setup_system ()
   GridGenerator::hyper_ball (triangulation, Point<dim>(), 1.);
   static const HyperBallBoundary<dim> boundary_description (Point<dim>(), 1.);
   triangulation.set_boundary (0,boundary_description);
-  triangulation.refine_global (n_refinements);
+  triangulation.refine_global (7);
 
+  time_step = GridTools::minimal_cell_diameter(triangulation) /
+	      wave_speed /
+	      std::sqrt (1.*dim);
+  
   std::cout << "Number of active cells: "
 	    << triangulation.n_active_cells()
   	    << std::endl;
@@ -380,9 +457,9 @@ void TATForwardProblem<dim>::setup_system ()
 
   system_matrix.copy_from (mass_matrix);
   system_matrix.add (time_step * time_step * theta * theta *
-		     acoustic_speed * acoustic_speed,
+		     wave_speed * wave_speed,
 		     laplace_matrix);
-  system_matrix.add (acoustic_speed * theta * time_step, boundary_matrix);
+  system_matrix.add (wave_speed * theta * time_step, boundary_matrix);
   
 
   solution_p.reinit (dof_handler.n_dofs());
@@ -479,38 +556,17 @@ void TATForwardProblem<dim>::run ()
   timestep_number = 1;
   unsigned int n_steps;
   unsigned int n_detectors;
-  double scanning_angle;
 
 				   // Number of time steps is defined as the
 				   // ratio of the total time to the time step
+  
+  const double end_time = 0.7;
   n_steps=static_cast<unsigned int>(std::floor(end_time/time_step));     
-				   // Number of detector positions is defined          
-				   // as the ratio of 360 degrees to the step
-				   // angle
-  n_detectors=static_cast<unsigned int>(std::ceil(360/step_angle));
-				   // Define two vectors to hold the coordinates
-				   // of the detectors in the scanning
-				   // geometry
-  Vector<double> detector_x (n_detectors+1);
-  Vector<double> detector_y (n_detectors+1);
+  
+
 				   // Define a vector to hold the value obtained
 				   // by the detector
   Vector<double> project_dat (n_steps * n_detectors +1);
-				   // Get the coordinates of the detector on the 
-				   // different locations of the circle.
-				   // Scanning angle is viewing angle at 
-				   // current position. The coordinates of
-				   // the detectors are calculated from the radius
-				   // and scanning angle.
-  scanning_angle=0;
-  for (unsigned int i=1; i<=n_detectors;  i++){
-				     // Scanning clockwisely. We need to change the angles
-				     // into radians because std::cos and std:sin accept
-				     // values in radian only
-    scanning_angle -= step_angle/180 * 3.14159265;   
-    detector_x(i) = radius * std::cos(scanning_angle);
-    detector_y(i) = radius * std::sin(scanning_angle);
-  }
 
   std::cout<< "Total number of time steps = "<< n_steps <<std::endl;
   std::cout<< "Total number of detectors = "<< n_detectors << std::endl;
@@ -544,10 +600,10 @@ void TATForwardProblem<dim>::run ()
       mass_matrix.vmult (tmp1, old_solution_v);
       laplace_matrix.vmult (tmp2, old_solution_p); 
       G2 = tmp1;
-      G2.add(-acoustic_speed*acoustic_speed*time_step*(1-theta), tmp2);
+      G2.add(-wave_speed*wave_speed*time_step*(1-theta), tmp2);
       tmp1=0;
       boundary_matrix.vmult (tmp1,old_solution_p);
-      G2.add(acoustic_speed,tmp1);
+      G2.add(wave_speed,tmp1);
       
 				       // Compute the pressure potential p, the formula
 				       // has been presented in the introduction section
@@ -567,10 +623,10 @@ void TATForwardProblem<dim>::run ()
       system_rhs_v = G2;
       tmp1 = 0;
       laplace_matrix.vmult (tmp1, solution_p);
-      system_rhs_v.add(-time_step * theta*acoustic_speed*acoustic_speed, tmp1);
+      system_rhs_v.add(-time_step * theta*wave_speed*wave_speed, tmp1);
       tmp1 = 0;
       boundary_matrix.vmult(tmp1, solution_p);
-      system_rhs_v.add(-acoustic_speed,tmp1);
+      system_rhs_v.add(-wave_speed,tmp1);
       
       solve_v ();
 				       // Compute the energy in the system.By checking
@@ -578,7 +634,7 @@ void TATForwardProblem<dim>::run ()
 				       // the correctness of the code. 
 
       double energy = (mass_matrix.matrix_scalar_product(solution_v,solution_v)+
-		       acoustic_speed*acoustic_speed*laplace_matrix.matrix_scalar_product(solution_p,solution_p))/2;        
+		       wave_speed * wave_speed * laplace_matrix.matrix_scalar_product(solution_p,solution_p))/2;        
                                                                          
       std::cout << "energy= " << energy << std::endl;
 
@@ -590,12 +646,14 @@ void TATForwardProblem<dim>::run ()
 
       proj_out << time ;
 
-      for (unsigned i=1 ; i<=n_detectors; i++){
-        project_dat((timestep_number-1)*n_detectors+i)
-	  = VectorTools::point_value (dof_handler,solution_p, 
-				      Point<2>(detector_x(i),detector_y(i)));
-        proj_out << " "<< project_dat((timestep_number-1)*n_detectors+i)<<" " ;
-      }
+      for (unsigned i=0 ; i<=detector_locations.size(); ++i)
+	{
+	  project_dat((timestep_number-1)*n_detectors+i)
+	    = VectorTools::point_value (dof_handler,
+					solution_p, 
+					detector_locations[i]);
+	  proj_out << " "<< project_dat((timestep_number-1)*n_detectors+i)<<" " ;
+	}
 
       proj_out<<std::endl;
           
