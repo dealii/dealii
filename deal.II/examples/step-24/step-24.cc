@@ -57,7 +57,7 @@
 				 // @sect3{The "forward problem" class template}
 
 				 // The first part of the main class is
-				 // exactly as in @ref step_23 "step-23"
+				 // exactly as in step-23
 				 // (except for the name):
 template <int dim>
 class TATForwardProblem
@@ -122,8 +122,8 @@ class TATForwardProblem
 				 // bit simpler this time: we are to consider
 				 // a problem that is driven by initial
 				 // conditions, so there is no right hand side
-				 // function (though you could look up in @ref
-				 // step_23 "step-23" to see how this can be
+				 // function (though you could look up in
+				 // step-23 to see how this can be
 				 // done. Secondly, there are no boundary
 				 // conditions: the entire boundary of the
 				 // domain consists of absorbing boundary
@@ -247,14 +247,14 @@ TATForwardProblem<dim>::TATForwardProblem ()
 				 // @sect4{TATForwardProblem::setup_system}
 
 				 // The following system is pretty much what
-				 // we've already done in @ref step_23
-				 // "step-23", but with two important
+				 // we've already done in
+				 // step-23, but with two important
 				 // differences. First, we have to create a
 				 // circular (or spherical) mesh around the
 				 // origin, with a radius of 1. This nothing
-				 // new: we've done so before in @ref step_6
-				 // "step-6", @ref step_10 "step-10", and @ref
-				 // step_11 "step-11", where we also explain
+				 // new: we've done so before in
+				 // step-6, step-10, and
+				 // step-11, where we also explain
 				 // how to attach a boundary object to a
 				 // triangulation to be used whenever the
 				 // triangulation needs to know where new
@@ -264,8 +264,8 @@ TATForwardProblem<dim>::TATForwardProblem ()
 				 //
 				 // One thing we had to make sure is that the
 				 // time step satisfies the CFL condition
-				 // discussed in the introduction of @ref
-				 // step_23 "step-23". Back in that program,
+				 // discussed in the introduction of
+				 // step-23. Back in that program,
 				 // we ensured this by hand by setting a
 				 // timestep that matches the mesh width, but
 				 // that was error prone because if we refined
@@ -346,7 +346,7 @@ void TATForwardProblem<dim>::setup_system ()
 					laplace_matrix);
 
 				   // The second difference, as mentioned, to
-				   // @ref step_23 "step-23" is that we need
+				   // step-23 is that we need
 				   // to build the boundary mass matrix that
 				   // grew out of the absorbing boundary
 				   // conditions.
@@ -481,7 +481,7 @@ void TATForwardProblem<dim>::setup_system ()
 				 // velocity variable, are taken pretty much
 				 // verbatim (with the exception of the change
 				 // of name from $u$ to $p$ of the primary
-				 // variable) from @ref step_23 "step-23":
+				 // variable) from step-23:
 template <int dim>
 void TATForwardProblem<dim>::solve_p () 
 {
@@ -516,7 +516,7 @@ void TATForwardProblem<dim>::solve_v ()
 				 // @sect4{TATForwardProblem::output_results}
 
 				 // The same holds here: the function is from
-				 // @ref step_23 "step-23".
+				 // step-23.
 template <int dim>
 void TATForwardProblem<dim>::output_results () const
 {
