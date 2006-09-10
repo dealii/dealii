@@ -109,6 +109,9 @@ namespace FiniteElementDomination
 				    * Q_2$ elements, and have to keep our
 				    * options open until we get to the
 				    * second base element.
+				    *
+				    * More details on domination can be found
+				    * in the hp paper.
 				    */
   enum Domination
   {
