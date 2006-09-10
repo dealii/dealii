@@ -105,33 +105,40 @@ class TATForwardProblem
     const double end_time;
 };
 
- 
-				 // Declare a class template for the right hand side
-				 // of the pressure potential 
-template <int dim>
-class RightHandSideP : public Function<dim> 
-{
-  public:
-    RightHandSideP () : Function<dim>() {};
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component = 0) const;
-};
 
-				 // Declare a class template for the right hand side
-				 // of the derivative of the pressure potential                  
-template <int dim>
-class RightHandSideV : public Function<dim> 
-{
-  public:
-    RightHandSideV () : Function<dim>() {};
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component = 0) const;
-};
+				 // @sect3{Equation data}
 
-				 // Declare a class template for the initial values
-				 // of the pressure potential
+				 // As usual, we have to define our initial
+				 // values, boundary conditions, and right
+				 // hand side functions. Except things are a
+				 // bit simpler this time: we are to consider
+				 // a problem that is driven by initial
+				 // conditions, so there is no right hand side
+				 // function (though you could look up in @ref
+				 // step_23 "step-23" to see how this can be
+				 // done. Secondly, there are no boundary
+				 // conditions: the entire boundary of the
+				 // domain consists of absorbing boundary
+				 // conditions. That only leaves initial
+				 // conditions, and there things are simple
+				 // too since the application only needs
+				 // initial conditions for the pressure, not
+				 // for the velocity.
+				 //
+				 // So this is all we need: a class that
+				 // specifies initial conditions for the
+				 // pressure. In the physical setting
+				 // considered in this program, these are
+				 // small absorbers, which we model as a
+				 // series of little circles where we assume
+				 // that the pressure surplus is one, whereas
+				 // no absorption and therefore no pressure
+				 // surplus is anywhere else. This is how we
+				 // do things (note that if we wanted to
+				 // expand this program to not only compile
+				 // but also to run, we would have to
+				 // initialize the sources with
+				 // three-dimensional source locations):
 template <int dim>
 class InitialValuesP : public Function<dim> 
 {
@@ -140,75 +147,31 @@ class InitialValuesP : public Function<dim>
     
     virtual double value (const Point<dim> &p,
 			  const unsigned int  component = 0) const;
+
+  private:
+    struct Source
+    {
+	const Point<dim> location;
+	const double     radius;
+    };
 };
 
-				 // Declare a class template for the initial values
-				 // of the derivative of the pressure potential
-template <int dim>
-class InitialValuesV : public Function<dim> 
-{
-  public:
-    InitialValuesV () : Function<dim>() {};
-    
-    virtual double value (const Point<dim> &p, 
-			  const unsigned int  component = 0) const;
-};
-
-				 // Here is the function to set the right hand side
-				 // values to be zero for pressure potential
-template <int dim>
-double RightHandSideP<dim>::value (const Point<dim> &/*p*/,
-				    const unsigned int /*component*/) const 
-{
-  return 0;
-}
-				 // Similarly we set the right-hand size of the 
-				 // derivative of the pressure potential to be 
-				 // zero
-template <int dim>
-double RightHandSideV<dim>::value (const Point<dim> &/*p*/,
-				    const unsigned int /*component*/) const 
-{
-  return 0;
-}
-
-
-				 // The sources of the thermoacoustic waves 
-				 // are small absorbers. We will compare the 
-				 // simulation results with the experimental
-				 // data.
 
 template <int dim>
 double InitialValuesP<dim>::value (const Point<dim> &p,
 				    const unsigned int /*component*/) const       
 {
-                          
-  if (std::sqrt(p.square())< 0.025 )
-    return 1;
-				   // The "distance" function is used to compute
-				   // the Euclidian distance between two points.
-                                    
-  if (p.distance(Point<dim>(-0.135,0))<0.05)
-    return 1;
-                           
-  if (p.distance(Point<dim>(0.17,0))<0.03)
-    return 1;
+  static const Source sources[] = {{ Point<dim> (0, 0),         0.025 },
+				   { Point<dim> (-0.135, 0),    0.05 },
+				   { Point<dim> (0.17, 0),      0.03 },
+				   { Point<dim> (-0.25, 0),     0.02 },
+				   { Point<dim> (-0.05, -0.15), 0.015 }};
+  static const unsigned int n_sources = sizeof(sources)/sizeof(sources[0]);
+  
+  for (unsigned int i=0; i<n_sources; ++i)
+    if (p.distance(sources[i].location) < sources[i].radius)
+      return 1;
 
-  if (p.distance(Point<dim>(-0.25,0))<0.02)
-    return 1;
-
-  if (p.distance(Point<dim>(-0.05,-0.15))<0.015)
-    return 1;
-
-  return 0;
-}
-				 // Initial value for the derivative of
-				 // pressure potential is set to zero
-template <int dim>   
-double InitialValuesV<dim>::value (const Point<dim> &/*p*/,
-				    const unsigned int /*component*/) const 
-{
- 
   return 0;
 }
 
@@ -275,7 +238,7 @@ template <int dim>
 void TATForwardProblem<dim>::setup_system ()
 {
   GridGenerator::hyper_ball (triangulation, Point<dim>(), 1.);
-  static const HyperBallBoundary<dim> boundary_description(center);
+  static const HyperBallBoundary<dim> boundary_description (Point<dim>(), 1.);
   triangulation.set_boundary (0,boundary_description);
   triangulation.refine_global (n_refinements);
 
@@ -509,9 +472,8 @@ void TATForwardProblem<dim>::run ()
   VectorTools::project (dof_handler,constraints, 
 			QGauss<dim>(3), InitialValuesP<dim>(),
 			old_solution_p);
-  VectorTools::project (dof_handler,constraints, 
-			QGauss<dim>(3), InitialValuesV<dim>(),
-			old_solution_v);
+
+  old_solution_v = 0;
 
 
   timestep_number = 1;
@@ -520,7 +482,7 @@ void TATForwardProblem<dim>::run ()
   double scanning_angle;
 
 				   // Number of time steps is defined as the
-				   // ratio of the total time to the time step                                 
+				   // ratio of the total time to the time step
   n_steps=static_cast<unsigned int>(std::floor(end_time/time_step));     
 				   // Number of detector positions is defined          
 				   // as the ratio of 360 degrees to the step
@@ -560,51 +522,38 @@ void TATForwardProblem<dim>::run ()
   proj_out.open("proj.dat");
   
 
+  Vector<double> tmp1 (solution_p.size());
+  Vector<double> tmp2 (solution_v.size());
+  Vector<double> G1 (solution_p.size());
+  Vector<double> G2 (solution_v.size());
+  
   for (double time = time_step; time<=end_time; time+=time_step, ++timestep_number)
     {
       std::cout << std::endl;                                       
       std::cout<< "time_step " << timestep_number << " @ t=" << time << std::endl;
 
-      Vector<double> tmp1 (solution_p.size());
-      Vector<double> tmp2 (solution_v.size());
-      Vector<double> F1 (solution_p.size());
-      Vector<double> F2 (solution_v.size());
-				       // Calculate G1 as defined in the introduction section
-                         
+				       // Calculate G1 as defined in the
+				       // introduction section
       mass_matrix.vmult (tmp1, old_solution_p); 
       mass_matrix.vmult (tmp2, old_solution_v); 
-      F1 = tmp1;
-      F1.add(time_step * (1-theta), tmp2); 
-				       // Calculate G2 as defined in the introduction section
+      G1 = tmp1;
+      G1.add(time_step * (1-theta), tmp2);
+      
+				       // Calculate G2 as defined in the
+				       // introduction section
       mass_matrix.vmult (tmp1, old_solution_v);
       laplace_matrix.vmult (tmp2, old_solution_p); 
-      F2 = tmp1;
-      F2.add(-acoustic_speed*acoustic_speed*time_step*(1-theta), tmp2);
+      G2 = tmp1;
+      G2.add(-acoustic_speed*acoustic_speed*time_step*(1-theta), tmp2);
       tmp1=0;
       boundary_matrix.vmult (tmp1,old_solution_p);
-      F2.add(acoustic_speed,tmp1);
+      G2.add(acoustic_speed,tmp1);
       
 				       // Compute the pressure potential p, the formula
 				       // has been presented in the introduction section
 
-      system_rhs_p = F1; 
-      system_rhs_p.add(time_step * theta , F2);
-
-      RightHandSideP<dim> rhs_function_p;
-      rhs_function_p.set_time (time);
-
-      tmp1=0;
-      VectorTools::create_right_hand_side (dof_handler, QGauss<dim>(2),
-                                           rhs_function_p, tmp1);
-    
-      system_rhs_p.add(-theta * theta * time_step * time_step*acoustic_speed*acoustic_speed,tmp1); 
-      rhs_function_p.set_time (time-time_step);
-      tmp1=0;
-      VectorTools::create_right_hand_side (dof_handler, QGauss<dim>(2),
-                                           rhs_function_p, tmp1);
-      
- 
-      system_rhs_p.add(-theta * (1-theta) * time_step * time_step*acoustic_speed*acoustic_speed,tmp1); 
+      system_rhs_p = G1; 
+      system_rhs_p.add(time_step * theta , G2);
 
       solve_p ();
 
@@ -615,28 +564,13 @@ void TATForwardProblem<dim>::run ()
 				       // depends on the current value of the potential 
 				       // pressure
 
-      system_rhs_v = F2;
+      system_rhs_v = G2;
       tmp1 = 0;
       laplace_matrix.vmult (tmp1, solution_p);
       system_rhs_v.add(-time_step * theta*acoustic_speed*acoustic_speed, tmp1);
       tmp1 = 0;
       boundary_matrix.vmult(tmp1, solution_p);
       system_rhs_v.add(-acoustic_speed,tmp1);
-      
-      RightHandSideV<dim> rhs_function_v;
-      rhs_function_v.set_time (time); 
-
-      tmp2 = 0;
-      VectorTools::create_right_hand_side (dof_handler, QGauss<dim>(2),
-                                           rhs_function_v, tmp2);
-
-      system_rhs_p.add(-theta * time_step*acoustic_speed*acoustic_speed,tmp2); 
-
-      rhs_function_v.set_time (time-time_step);
-      tmp2 = 0;
-      VectorTools::create_right_hand_side (dof_handler, QGauss<dim>(2),
-                                           rhs_function_v, tmp2);
-      system_rhs_p.add(-(1-theta)*time_step*acoustic_speed*acoustic_speed,tmp2);
       
       solve_v ();
 				       // Compute the energy in the system.By checking
