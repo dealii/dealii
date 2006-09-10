@@ -59,16 +59,25 @@ class GridTools
     double diameter (const Triangulation<1> &tria);
 
 				     /**
-				      * Return the measure of a cell
-				      * represented by a subset of
-				      * vertices in @p all_vertices
-				      * which is specified by @p
-				      * vertex_indices.
+				      * Given a list of vertices (typically
+				      * obtained using
+				      * Triangulation::get_vertices) as the
+				      * first, and a list of vertex indices
+				      * that characterize a single cell as the
+				      * second argument, return the measure
+				      * (area, volume) of this cell. If this
+				      * is a real cell, then you can get the
+				      * same result using
+				      * <code>cell-@>measure()</code>, but
+				      * this function also works for cells
+				      * that do not exist except that you make
+				      * it up by naming its vertices from the
+				      * list.
 				      */
     template <int dim>
     static
-    double cell_measure(const std::vector<Point<dim> > &all_vertices,
-			const int vertex_indices[GeometryInfo<dim>::vertices_per_cell]);
+    double cell_measure (const std::vector<Point<dim> > &all_vertices,
+			 const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
 
 				     /**
 				      * Remove vertices that are not

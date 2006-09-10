@@ -126,8 +126,8 @@ GridTools::diameter (const Triangulation<1> &tria)
 
 template <>
 double
-GridTools::cell_measure(const std::vector<Point<3> > &all_vertices,
-			const int vertex_indices[GeometryInfo<3>::vertices_per_cell])
+GridTools::cell_measure (const std::vector<Point<3> > &all_vertices,
+			 const unsigned int (&vertex_indices)[GeometryInfo<3>::vertices_per_cell])
 {
 				   // note that this is the
 				   // cell_measure based on the new
@@ -247,7 +247,7 @@ GridTools::cell_measure(const std::vector<Point<3> > &all_vertices,
 template <int dim>
 double
 GridTools::cell_measure(const std::vector<Point<dim> > &all_vertices,
-			const int [GeometryInfo<dim>::vertices_per_cell])
+			const unsigned int (&) [GeometryInfo<dim>::vertices_per_cell])
 {
   Assert(false, ExcNotImplemented());
   return 0.;
