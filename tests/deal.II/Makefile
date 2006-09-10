@@ -54,7 +54,9 @@ tests_x = block_matrices \
 	interpolate_* \
 	have_same_coarse_mesh_* \
 	get_finest_common_cells_* \
-	project_*[0-9]
+	project_*[0-9] \
+	minimal_cell_diameter \
+	maximal_cell_diameter
 
 # from above list of regular expressions, generate the real set of
 # tests
