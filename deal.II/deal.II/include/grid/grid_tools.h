@@ -509,7 +509,27 @@ class GridTools
     bool
     have_same_coarse_mesh (const Container &mesh_1,
                            const Container &mesh_2);
-      
+
+				     /**
+				      * Return the diamater of the smallest
+				      * active cell of a triangulation. See
+				      * @ref step_24 "step-24" for an example
+				      * of use of this function.
+				      */
+    template <int dim>
+    static
+    double
+    minimal_cell_diameter (const Triangulation<dim> &triangulation);
+
+				     /**
+				      * Return the diamater of the largest
+				      * active cell of a triangulation.
+				      */
+    template <int dim>
+    static
+    double
+    maximal_cell_diameter (const Triangulation<dim> &triangulation);
+    
                                      /**
                                       * Exception
                                       */

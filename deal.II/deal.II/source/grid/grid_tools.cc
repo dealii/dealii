@@ -870,6 +870,36 @@ GridTools::have_same_coarse_mesh (const Container &mesh_1,
 
 
 
+template <int dim>
+double
+GridTools::minimal_cell_diameter (const Triangulation<dim> &triangulation)
+{
+  double min_diameter = triangulation.begin_active()->diameter();
+  for (typename Triangulation<dim>::active_cell_iterator
+	 cell = triangulation.begin_active(); cell != triangulation.end();
+       ++cell)
+    min_diameter = std::min (min_diameter,
+			     cell->diameter());
+  return min_diameter;
+}
+
+
+
+template <int dim>
+double
+GridTools::maximal_cell_diameter (const Triangulation<dim> &triangulation)
+{
+  double max_diameter = triangulation.begin_active()->diameter();
+  for (typename Triangulation<dim>::active_cell_iterator
+	 cell = triangulation.begin_active(); cell != triangulation.end();
+       ++cell)
+    max_diameter = std::max (max_diameter,
+			     cell->diameter());
+  return max_diameter;
+}
+
+
+
 
 // explicit instantiations
 
@@ -1042,3 +1072,11 @@ template
 bool
 GridTools::have_same_coarse_mesh (const MGDoFHandler<deal_II_dimension> &mesh_1,
                                   const MGDoFHandler<deal_II_dimension> &mesh_2);
+
+template
+double
+GridTools::minimal_cell_diameter (const Triangulation<deal_II_dimension> &triangulation);
+
+template
+double
+GridTools::maximal_cell_diameter (const Triangulation<deal_II_dimension> &triangulation);
