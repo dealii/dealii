@@ -310,8 +310,9 @@ TATForwardProblem<dim>::TATForwardProblem ()
 template <int dim>
 void TATForwardProblem<dim>::setup_system ()
 {
-  GridGenerator::hyper_ball (triangulation, Point<dim>(), 1.);
-  static const HyperBallBoundary<dim> boundary_description (Point<dim>(), 1.);
+  const Point<dim> center;
+  GridGenerator::hyper_ball (triangulation, center, 1.);
+  static const HyperBallBoundary<dim> boundary_description (center, 1.);
   triangulation.set_boundary (0,boundary_description);
   triangulation.refine_global (7);
 
