@@ -103,6 +103,14 @@ figures:
 </tr>
 </table>
 
+Note that in the experimental data, the first signal (i.e. the left-most dark
+line) results from absorption at the tissue boundary, and therefore reaches
+the detectors first and before any of the signals from the interior. This
+signal is also faintly visible at the end of the traces, around 30 $\my s$,
+which indicates that the signal travelled through the entire tissue to reach
+detectors at the other side, after all the signals originating from the
+interior have reached them.
+
 As before, the numerical result better matches experimental ones by applying a
 bandwidth filter that matches the actual behavior of detectors (left) and by
 choosing a finer mesh (right):
@@ -118,7 +126,19 @@ choosing a finer mesh (right):
 </tr>
 </table>
 
-
+One of the important differences between the left and the right figure is that
+the curves look much less "angular" at the right. The angularity comes from
+the fact that while waves in the continuous equation travel equally fast in
+all directions, this isn't the case after discretization: there, waves that
+travel diagonal to cells move at slightly different speeds to those that move
+parallel to mesh lines. This anisotropy leads to wave fronts that aren't
+perfectly circular (and would produce sinusoidal signals in the stacked
+plots), but are bulged out in certain directions. To make things worse, the
+circular mesh we use (see for example @ref step_6 "step-6" for a view of the
+coarse mesh) is not isotropic either. The net result is that the signal fronts
+are not sinusoidal unless the mesh is sufficiently fine. The right image is a
+lot better in this respect, though artificts in the form of trailing spurious
+waves can still be seen.
 
 
 

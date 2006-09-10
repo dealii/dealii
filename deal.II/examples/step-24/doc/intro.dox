@@ -186,3 +186,13 @@ G_{1}+(k\, \theta)G_{2}-(c_0k)^2\theta (\theta F^{n}+(1-\theta)F^{n-1}) \\
 Mv^n & = & -(c_0^2\,k\, \theta\, A+c_0B)\bar{p}^{n}+ G_2 - 
 c_0^2k(\theta F^{n}+(1-\theta)F^{n-1}) 
 @f}
+
+
+<h3>What the program does</h3>
+
+Compared to @ref step_23 "step-23", this programs adds the treatment of a
+simple absorbing boundary conditions. In addition, it deals with data obtained
+from actual experimental measurements. To this end, we need to evaluate the
+solution at points at which the experiment also evaluates a real pressure
+field. We will see how to do that using the VectorTools::point_value function
+further down below.
