@@ -44,6 +44,14 @@ inconvenience this causes.
 
 
 <ol>
+  <li> <p>
+       Changed: Indices, such as vertex indices, are usually represented by
+       unsigned integers in deal.II. One place where we didn't do this was in
+       the <code>CellData</code> structure that can be used to describe cells
+       when building a triangulation. This has now been rectified. 
+       <br> 
+       (WB 2006/09/06)
+       </p>
 
   <li> <p>
        Changed: Lower dimensional objects have been removed from the

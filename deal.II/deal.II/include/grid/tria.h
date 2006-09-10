@@ -58,7 +58,7 @@ struct CellData
 				      * Indices of the vertices of
 				      * this cell.
 				      */
-    int           vertices[GeometryInfo<dim>::vertices_per_cell];
+    unsigned int vertices[GeometryInfo<dim>::vertices_per_cell];
 
 				     /**
 				      * Material indicator of this

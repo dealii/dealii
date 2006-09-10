@@ -1595,7 +1595,7 @@ Point<3> TriaObjectAccessor<3, 3>::barycenter () const
 template <>
 double TriaObjectAccessor<3, 3>::measure () const
 {
-  static int vertex_indices[GeometryInfo<3>::vertices_per_cell];
+  static unsigned int vertex_indices[GeometryInfo<3>::vertices_per_cell];
   for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
     vertex_indices[i]=vertex_index(i);
 

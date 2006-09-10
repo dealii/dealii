@@ -126,7 +126,7 @@ void GridIn<dim>::read_ucd (std::istream &in)
 	      {
 						 // no such vertex index
 		AssertThrow (false, ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
-		cells.back().vertices[i] = -1;
+		cells.back().vertices[i] = deal_II_numbers::invalid_unsigned_int;
 	      };
 	}
       else
@@ -152,7 +152,8 @@ void GridIn<dim>::read_ucd (std::istream &in)
 		  AssertThrow (false,
 			       ExcInvalidVertexIndex(cell,
 						     subcelldata.boundary_lines.back().vertices[i]));
-		  subcelldata.boundary_lines.back().vertices[i] = -1;
+		  subcelldata.boundary_lines.back().vertices[i]
+		    = deal_II_numbers::invalid_unsigned_int;
 		};
 	  }
 	else
@@ -181,7 +182,8 @@ void GridIn<dim>::read_ucd (std::istream &in)
  	            Assert (false,
  		            ExcInvalidVertexIndex(cell,
  			                          subcelldata.boundary_quads.back().vertices[i]));
- 		    subcelldata.boundary_quads.back().vertices[i] = -1;
+ 		    subcelldata.boundary_quads.back().vertices[i] =
+		      deal_II_numbers::invalid_unsigned_int;
  		  };
 	      
 	    }
@@ -660,7 +662,7 @@ void GridIn<dim>::read_msh (std::istream &in)
 	      {
 						 // no such vertex index
 		AssertThrow (false, ExcInvalidVertexIndex(cell, cells.back().vertices[i]));
-		cells.back().vertices[i] = -1;
+		cells.back().vertices[i] = deal_II_numbers::invalid_unsigned_int;
 	      };
 	}
       else
@@ -686,7 +688,8 @@ void GridIn<dim>::read_msh (std::istream &in)
 		  AssertThrow (false,
 			       ExcInvalidVertexIndex(cell,
 						     subcelldata.boundary_lines.back().vertices[i]));
-		  subcelldata.boundary_lines.back().vertices[i] = -1;
+		  subcelldata.boundary_lines.back().vertices[i] =
+		    deal_II_numbers::invalid_unsigned_int;
 		};
 	  }
 	else
@@ -715,7 +718,8 @@ void GridIn<dim>::read_msh (std::istream &in)
  	            Assert (false,
  		            ExcInvalidVertexIndex(cell,
  			                          subcelldata.boundary_quads.back().vertices[i]));
- 		    subcelldata.boundary_quads.back().vertices[i] = -1;
+ 		    subcelldata.boundary_quads.back().vertices[i] =
+		      deal_II_numbers::invalid_unsigned_int;
  		  };
 	      
 	    }

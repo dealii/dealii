@@ -480,8 +480,7 @@ void Triangulation<2>::create_triangulation (const std::vector<Point<2> >    &v,
   for (unsigned int cell=0; cell<cells.size(); ++cell)
     {
       for (unsigned int vertex=0; vertex<4; ++vertex)
-	if ( ! ((0<=cells[cell].vertices[vertex]) &&
-		(cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size()))))
+	if ( ! (cells[cell].vertices[vertex]<vertices.size()))
 	  {
                                              // store the number of
                                              // vertices, as this
@@ -926,8 +925,7 @@ Triangulation<3>::create_triangulation (const std::vector<Point<3> >    &v,
 				       // check whether vertex indices
 				       // are valid ones
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-	if (! ((0<=cells[cell].vertices[vertex]) &&
-	       (cells[cell].vertices[vertex]<static_cast<signed int>(vertices.size()))))
+	if (! (cells[cell].vertices[vertex] < vertices.size()))
 	  {
                                              // store the number of
                                              // vertices, as this

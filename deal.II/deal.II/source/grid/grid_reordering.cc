@@ -1451,7 +1451,7 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
   const std::vector<Point<3> > &all_vertices,
   std::vector<CellData<3> > &cells)
 {
-  int vertices_lex[GeometryInfo<3>::vertices_per_cell];
+  unsigned int vertices_lex[GeometryInfo<3>::vertices_per_cell];
   unsigned int n_negative_cells=0;
   for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
     {
