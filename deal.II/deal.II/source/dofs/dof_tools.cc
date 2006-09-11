@@ -2138,7 +2138,7 @@ namespace internal
 		mother_face_dominates = FiniteElementDomination::either_element_can_dominate;
 	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
 		mother_face_dominates = mother_face_dominates &
-					(cell->get_fe().compare_for_domination
+					(cell->get_fe().compare_for_face_domination
 					 (cell->neighbor_child_on_subface (face, c)->get_fe()));
 
 	      switch (mother_face_dominates)
@@ -2308,7 +2308,7 @@ namespace internal
 							     ->nth_active_fe_index(0)));
 			      
 			      domination = domination &
-					   this_subface_fe.compare_for_domination(that_subface_fe);
+					   this_subface_fe.compare_for_face_domination(that_subface_fe);
 			    }
 			
 							 // see if the element
@@ -2340,11 +2340,11 @@ namespace internal
 						     // check also that it is
 						     // able to constrain the
 						     // mother face
-		    Assert ((dominating_fe.compare_for_domination
+		    Assert ((dominating_fe.compare_for_face_domination
 			     (cell->face(face)->get_fe(cell->face(face)->nth_active_fe_index(0)))
 			     == FiniteElementDomination::this_element_dominates)
 			    ||
-			    (dominating_fe.compare_for_domination
+			    (dominating_fe.compare_for_face_domination
 			     (cell->face(face)->get_fe(cell->face(face)->nth_active_fe_index(0)))
 			     == FiniteElementDomination::either_element_can_dominate),
 			    ExcInternalError());
@@ -2559,7 +2559,7 @@ namespace internal
 						   // see which side of the
 						   // face we have to
 						   // constrain
-		  switch (cell->get_fe().compare_for_domination (neighbor->get_fe ()))
+		  switch (cell->get_fe().compare_for_face_domination (neighbor->get_fe ()))
 		  {
 		    case FiniteElementDomination::this_element_dominates:
 		    {
