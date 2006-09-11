@@ -366,7 +366,7 @@ $\theta>0$, our solutions will not be numerically stable if we violate this
 restriction. Implicit schemes do not have this restriction for stability, but
 they become inaccurate if the time step is too large.
 
-This condition was first recognized by Courant, Friedrichs, and Levy &mdash;
+This condition was first recognized by Courant, Friedrichs, and Lewy &mdash;
 in 1928, long before computers become available for numerical
 computations! (This result appeared in R. Courant, K. Friedrichs and
 H. Lewy: <i>&Uuml;ber die partiellen Differenzengleichungen der
