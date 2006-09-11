@@ -217,9 +217,9 @@ TridiagonalMatrix<number>::matrix_norm_square(
 }
 
 
-template<typename number>
+template<>
 void
-TridiagonalMatrix<number>::compute_eigenvalues()
+TridiagonalMatrix<double>::compute_eigenvalues()
 {
 #ifdef HAVE_LIBLAPACK
   Assert(state == matrix, ExcState(state));
@@ -234,6 +234,16 @@ TridiagonalMatrix<number>::compute_eigenvalues()
 #else
   Assert(false, ExcNeedsLAPACK());
 #endif
+}
+
+
+template<>
+void
+TridiagonalMatrix<float>::compute_eigenvalues()
+{
+// stev for float matrices should only be called if configure found
+// sstev_ being included into liblapack
+  Assert(false, ExcNotImplemented());
 }
 
 
