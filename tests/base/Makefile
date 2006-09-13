@@ -35,7 +35,6 @@ tests_x =  geometry_info_* \
 	   symmetric_tensor_* \
 	   full_tensor_* \
            timer \
-	   threads \
 	   polynomial* \
 	   auto_derivative_function \
 	   anisotropic_* \
@@ -44,6 +43,10 @@ tests_x =  geometry_info_* \
 	   function_parser \
 	   utilities_* \
 	   is_finite
+
+ifeq ($(enable-multithreading),no)
+  tests_x += threads
+endif
 
 # from above list of regular expressions, generate the real set of
 # tests
