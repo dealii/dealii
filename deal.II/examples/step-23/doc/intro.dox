@@ -374,7 +374,11 @@ R. Courant, K. Friedrichs and H. Lewy: <i>&Uuml;ber die partiellen
 Differenzengleichungen der mathematischen Physik</i>, Mathematische
 Annalen, vol. 100, no. 1, pages 32-74, 1928.)
 This condition on the time step is most frequently just referred
-to as the <i>CFL</i> condition. In the program, we will refine a square
+to as the <i>CFL</i> condition. Intuitively, the CFL condition says
+that the time step must not be larger than the time it takes a wave to
+cross a single cell.
+
+In the program, we will refine a square
 $[-1,1]$ seven times uniformly, giving a mesh size of $h=\frac 1{64}$, which
 is what we set the time step to. The fact that we set the time step and mesh
 size individually in two different places is error prone: it is too easy to
