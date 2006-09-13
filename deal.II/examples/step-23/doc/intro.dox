@@ -37,7 +37,7 @@ Physically, the equation describes the motion of an elastic medium. In
 2-d, one can think of how a membrane moves if subjected to a
 force. The Dirichlet boundary conditions above indicate that the
 membrane is clamped at the boundary at a height $g(x,t)$ (this height
-might be moving as well -- think of people holding a blanket and
+might be moving as well &mdash; think of people holding a blanket and
 shaking it up and down). The first initial condition equals the
 initial deflection of the membrane, whereas the second one gives its
 velocity. For example, one could think of pushing the membrane down
@@ -83,7 +83,7 @@ other time dependent problems, we find that the character of a
 solution changes as time progresses. For example, for the wave
 equation, we may have a single wave travelling through the domain,
 where the solution is smooth or even constant in front of and behind
-the wave -- adaptivity would be really useful for such cases, but the
+the wave &mdash& adaptivity would be really useful for such cases, but the
 key is that the area where we need to refine the mesh changes from
 time step to time step!
 
@@ -96,7 +96,7 @@ standard ODE solvers are certainly not prepared to deal with at
 all. On the other hand, for the Rothe method, we just get a PDE for
 each time step that we may choose to discretize independently of the
 mesh used for the previous time step; this approach is not without
-perils and difficulties, but at least it a sensible and well-defined
+perils and difficulties, but at least is a sensible and well-defined
 procedure. 
 
 For all these reasons, for the present program, we choose to use the
@@ -177,7 +177,7 @@ forward or explicit Euler method. On the other hand, if we set
 $\theta=1$, then we would get 
 $\frac{u^n - u^{n-1}}{k}  - v^n = 0$, which corresponds to the
 backward or implicit Euler method. Both these methods are first order
-accurate methods. They are simply to implement, but they are not
+accurate methods. They are simple to implement, but they are not
 really very accurate.
 
 The third case would be to choose $\theta=\frac 12$. The first of the
@@ -209,7 +209,7 @@ rearranging terms. We then get
    + k\left[\theta f^n + (1-\theta) f^{n-1}\right].
 \f}
 In this form, we see that if we are given the solution
-$u^{n-1},v^{n-1}$ of the previous timestep, that we can the solve for
+$u^{n-1},v^{n-1}$ of the previous timestep, that we can then solve for
 the variables $u^n,v^n$ separately, i.e. one at a time. This is
 convenient. In addition, we recognize that the operator in the first
 equation is positive definite, and the second equation looks
@@ -259,7 +259,7 @@ V_i^{n-1}\phi_i^{n-1}(x)$. Note that since the solution of the previous
 time step has already been computed by the time we get to time step
 $n$, $U^{n-1},V^{n-1}$ are known. Furthermore, note that the solutions
 of the previous step may have been computed on a different mesh, so
-use shape functions $\phi^{n-1}_i(x)$.
+we have to use shape functions $\phi^{n-1}_i(x)$.
 
 If we plug these expansions into above equations and test with the
 test functions from the present mesh, we get the following linear
@@ -322,7 +322,7 @@ equation. For the wave equation, the natural quantity to look at is the
 energy. By multiplying the wave equation by $u_t$, integrating over $\Omega$,
 and integrating by parts where necessary, we find that
 @f[
-	\frac{\partial}{\partial t}
+	\frac{d}{d t}
 	\left[\frac 12 \int_\Omega \left(\frac{\partial u}{\partial
 	t}\right)^2 + (\nabla u)^2 \; dx\right]
 	=
@@ -337,7 +337,8 @@ that
 	E(t) = \frac 12 \int_\Omega \left(\frac{\partial u}{\partial
 	t}\right)^2 + (\nabla u)^2 \; dx
 @f]
-is a conserved quantity. We will compute this quantity after each time
+is a conserved quantity, i.e. one that doesn't change with time. We
+will compute this quantity after each time 
 step. It is straightforward to see that if we replace $u$ by its finite
 element approximation, and $\frac{\partial u}{\partial t}$ by the finite
 element approximation of the velocity $v$, then
@@ -358,7 +359,7 @@ explicit time discretizations are only stable if the time step is small
 enough. In particular, it is coupled to the spatial mesh width $h$. For the
 lowest order discretization we use here, the relationship reads
 @f[
-	k\le \frac ch
+	k\le \frac hc
 @f]
 where $c$ is the wave speed, which in our formulation of the wave equation has
 been normalized to one. Consequently, unless we use the implicit schemes with
@@ -368,11 +369,11 @@ they become inaccurate if the time step is too large.
 
 This condition was first recognized by Courant, Friedrichs, and Lewy &mdash;
 in 1928, long before computers become available for numerical
-computations! (This result appeared in R. Courant, K. Friedrichs and
-H. Lewy: <i>&Uuml;ber die partiellen Differenzengleichungen der
-mathematischen Physik</i>, Mathematische Annalen, vol. 100, no. 1,
-pages 32-74, 1928.)
-Consequently, the condition on the time step is most frequently just referred
+computations! (This result appeared in the German language article
+R. Courant, K. Friedrichs and H. Lewy: <i>&Uuml;ber die partiellen
+Differenzengleichungen der mathematischen Physik</i>, Mathematische
+Annalen, vol. 100, no. 1, pages 32-74, 1928.)
+This condition on the time step is most frequently just referred
 to as the <i>CFL</i> condition. In the program, we will refine a square
 $[-1,1]$ seven times uniformly, giving a mesh size of $h=\frac 1{64}$, which
 is what we set the time step to. The fact that we set the time step and mesh
