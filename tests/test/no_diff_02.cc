@@ -17,8 +17,6 @@
 #include <cstdlib>
 #include <fstream>
 
-#include "phony.h"
-
 int main()
 {
 }

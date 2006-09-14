@@ -11,7 +11,7 @@
 //
 //----------------------------------------------------------------------
 
-// A test program runs, but won't produce results
+// A test program that produces wrong results
 
 
 #include <cstdlib>
@@ -21,4 +21,6 @@
 
 int main()
 {
+  std::ofstream out("no_diff_04/output");
+  out << "My output" << std::endl;
 }
