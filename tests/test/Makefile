@@ -35,6 +35,10 @@ tests = $(call expand,$(tests_x))
 phony.h:
 	touch phony.h
 
+### Make sure even numbers are are always recompiled
+
+no_*_?[02468]/obj.g.o:     phony.h
+
 
 include ../Makefile.rules
 include Makefile.depend

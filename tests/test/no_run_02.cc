@@ -11,12 +11,14 @@
 //
 //----------------------------------------------------------------------
 
-// A test program runs, but won't produce results
+// A test program that won't run and does not produce results
 
 
 #include <cstdlib>
-#include <fstream>
+
+#include "phony.h"
 
 int main()
 {
+  exit(1);
 }

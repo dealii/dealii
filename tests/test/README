@@ -1,1 +1,15 @@
 This directory tests the testsuite, not the deal.II library!
+
+Things that should be checked for when changing the implementation of
+the test suite:
+
+1. After make clean, first and second run should produce same results
+2. Tests with even number should produce same results as previous odd number
+3. Tests should produce results as indicated by their name
+
+
+
+Remarks on the implementation
+
+The file phony.h is used to make sure compilation is started in EVERY
+run of make for targets with even numbers.

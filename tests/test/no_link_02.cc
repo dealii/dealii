@@ -11,12 +11,13 @@
 //
 //----------------------------------------------------------------------
 
-// A test program runs, but won't produce results
+// A test program that won't link
 
+#include "phony.h"
 
-#include <cstdlib>
-#include <fstream>
+void not_implemented();
 
 int main()
 {
+  not_implemented();
 }

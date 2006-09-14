@@ -11,12 +11,18 @@
 //
 //----------------------------------------------------------------------
 
-// A test program runs, but won't produce results
+// A test program that won't run, but produces results
 
 
 #include <cstdlib>
 #include <fstream>
 
+#include "phony.h"
+
 int main()
 {
+  std::ofstream out("no_run_04/output");
+  out << "My output" << std::endl;
+  
+  exit(1);
 }
