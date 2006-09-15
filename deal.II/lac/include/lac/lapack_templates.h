@@ -121,7 +121,7 @@ gemv (const char* trans, const int* m, const int* n, const float* alpha, const f
 }
 #else
 inline void
-gemv (const char*, const int*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, double*, const int*)
+gemv (const char*, const int*, const int*, const float*, const float*, const int*, const float*, const int*, const float*, float*, const int*)
 {
   LAPACKSupport::ExcMissing("sgemv");
 }
@@ -151,7 +151,7 @@ geev (const char* jobvl, const char* jobvr, const int* n, float* A, const int* l
 }
 #else
 inline void
-geev (const char*, const char*, const int*, double*, const int*, double*, double*, double*, const int*, double*, const int*, double*, const int*, int*)
+geev (const char*, const char*, const int*, float*, const int*, float*, float*, float*, const int*, float*, const int*, float*, const int*, int*)
 {
   LAPACKSupport::ExcMissing("sgeev");
 }
@@ -181,7 +181,7 @@ geevx (const char* balanc, const char* jobvl, const char* jobvr, const char* sen
 }
 #else
 inline void
-geevx (const char*, const char*, const char*, const char*, const int*, double*, const int*, double*, double*, double*, const int*, double*, const int*, int*, int*, double*, double*, double*, double*, double*, const int*, int*, int*)
+geevx (const char*, const char*, const char*, const char*, const int*, float*, const int*, float*, float*, float*, const int*, float*, const int*, int*, int*, float*, float*, float*, float*, float*, const int*, int*, int*)
 {
   LAPACKSupport::ExcMissing("sgeevx");
 }
@@ -211,7 +211,7 @@ gesvd (int* jobu, int* jobvt, const int* n, const int* m, float* A, const int* l
 }
 #else
 inline void
-gesvd (int*, int*, const int*, const int*, double*, const int*, double*, double*, const int*, double*, const int*, double*, const int*, int*)
+gesvd (int*, int*, const int*, const int*, float*, const int*, float*, float*, const int*, float*, const int*, float*, const int*, int*)
 {
   LAPACKSupport::ExcMissing("sgesvd");
 }
@@ -241,7 +241,7 @@ stev (const char* jobz, const int* n, float* d, float* e, float* z, const int* l
 }
 #else
 inline void
-stev (const char*, const int*, double*, double*, double*, const int*, double*, int*)
+stev (const char*, const int*, float*, float*, float*, const int*, float*, int*)
 {
   LAPACKSupport::ExcMissing("sstev");
 }
