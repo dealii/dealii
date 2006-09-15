@@ -510,6 +510,7 @@ AC_ARG_WITH(lapack,
                           argument is given, use -llapack. Default is not to
                           use -llapack.],
   DEAL_II_WITH_LAPACK($withval))
+AC_CHECK_FUNCS([dgemv_ sgemv_ dgeev_ sgeev_ dgeevx_ sgeevx_ dgesvd_ sgesvd_ dstev_ sstev_])
 
 dnl -------------------------------------------------------------
 dnl       set include paths of several libraries

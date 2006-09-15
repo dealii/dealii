@@ -237,16 +237,6 @@ TridiagonalMatrix<double>::compute_eigenvalues()
 }
 
 
-template<>
-void
-TridiagonalMatrix<float>::compute_eigenvalues()
-{
-// stev for float matrices should only be called if configure found
-// sstev_ being included into liblapack
-  Assert(false, ExcNotImplemented());
-}
-
-
 template<typename number>
 number
 TridiagonalMatrix<number>::eigenvalue(const unsigned int i) const

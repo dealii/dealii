@@ -114,7 +114,17 @@ namespace LAPACKSupport
   DeclException1(ExcState, State,
 		 << "The function cannot be called while the matrix is in state "
 		 << state_name(arg1));
-  
+
+				   /**
+				    * This exception is thrown if a
+				    * certain function is not
+				    * implemented in your LAPACK
+				    * version.
+				    */
+  DeclException1(ExcMissing, char*,
+		 << "The function "
+		 << arg1
+		 << " required here is missing in your LAPACK installation");
 }
 
 
