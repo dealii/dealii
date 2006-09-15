@@ -1610,9 +1610,17 @@ namespace internal
 		constraints.add_line (dofs_child[col]);
 		for (unsigned int i=0; i!=n_dofs_mother; ++i)
                   if (face_constraints(i,col) != 0)
-                    constraints.add_entry (dofs_child[col],
-                                           dofs_mother[i],
-                                           face_constraints (i,col));
+		    {
+#ifdef WOLFGANG
+		      std::cout << "   " << dofs_child[col]
+				<< " -> " << face_constraints (i,col) << " * "
+				<< dofs_mother[i]
+				<< std::endl;
+#endif
+		      constraints.add_entry (dofs_child[col],
+					     dofs_mother[i],
+					     face_constraints (i,col));
+		    }
 	      }  
 	  }      
       }
@@ -2241,6 +2249,13 @@ namespace internal
 
 							 // Add constraints to global constraint
 							 // matrix.
+#ifdef WOLFGANG
+			std::cout << "Constraints for cell=" << cell
+				  << ", face=" << face
+				  << ", subface=" << c
+				  << std::endl;
+#endif
+			
 			filter_constraints (dofs_on_mother,
 					    dofs_on_children,
 					    face_constraints,
@@ -2468,6 +2483,12 @@ namespace internal
 
 						     // Add constraints to global constraint
 						     // matrix.
+#ifdef WOLFGANG
+		    std::cout << "Constraints for cell=" << cell
+			      << ", face=" << face
+			      << " (complicated case, mother)"
+			      << std::endl;
+#endif
 		    filter_constraints (dofs_on_children,
 					dofs_on_mother,
 					fc_mother_sface,
@@ -2513,6 +2534,13 @@ namespace internal
 
 							   // Add constraints to global constraint
 							   // matrix.
+#ifdef WOLFGANG
+			  std::cout << "Constraints for cell=" << cell
+				    << ", face=" << face
+				    << ", subface=" << c
+				    << " (complicated case, children)"
+				    << std::endl;
+#endif
 			  filter_constraints (dofs_on_children,
 					      dofs_on_mother,
 					      fc_child_sface_sface,
@@ -2585,6 +2613,10 @@ namespace internal
 
                                                        // Add constraints to global constraint
                                                        // matrix.
+#ifdef WOLFGANG		      
+		      std::cout << "p-constraints for cell=" << cell
+				<< ", face=" << face << std::endl;
+#endif
                       filter_constraints (dofs_on_mother,
                                           dofs_on_children,
                                           face_constraints,
