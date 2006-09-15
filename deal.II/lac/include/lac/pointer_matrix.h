@@ -426,7 +426,14 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				     /**
 				      * Matrix-vector product,
 				      * actually the scalar product of
-				      * <tt>src</tt> and #m.
+				      * <tt>src</tt> and the vector
+				      * representing this matrix.
+				      *
+				      * The dimension of <tt>dst</tt>
+				      * is 1, while that of
+				      * <tt>src</tt> is the size of
+				      * the vector representing this
+				      * matrix.
 				      */
     virtual void vmult (Vector<number>& dst,
 			const Vector<number>& src) const;
@@ -434,8 +441,15 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				     /**
 				      * Tranposed matrix-vector
 				      * product, actually the
-				      * multiplication of #m with
+				      * multiplication of the vector
+				      * representing this matrix with
 				      * <tt>src(0)</tt>.
+				      *
+				      * The dimension of <tt>drc</tt>
+				      * is 1, while that of
+				      * <tt>dst</tt> is the size of
+				      * the vector representing this
+				      * matrix.
 				      */
     virtual void Tvmult (Vector<number>& dst,
 			 const Vector<number>& src) const;
@@ -443,6 +457,12 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				     /**
 				      * Matrix-vector product, adding to
 				      * <tt>dst</tt>.
+				      *
+				      * The dimension of <tt>dst</tt>
+				      * is 1, while that of
+				      * <tt>src</tt> is the size of
+				      * the vector representing this
+				      * matrix.
 				      */
     virtual void vmult_add (Vector<number>& dst,
 			    const Vector<number>& src) const;
@@ -450,6 +470,12 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				     /**
 				      * Tranposed matrix-vector product,
 				      * adding to <tt>dst</tt>.
+				      *
+				      * The dimension of <tt>src</tt>
+				      * is 1, while that of
+				      * <tt>dst</tt> is the size of
+				      * the vector representing this
+				      * matrix.
 				      */
     virtual void Tvmult_add (Vector<number>& dst,
 			     const Vector<number>& src) const;
