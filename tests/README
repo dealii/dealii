@@ -9,8 +9,7 @@ should be tested here.
 
 Run 
     make 
-in this directory to do all tests. This is required before any commit
-to the CVS repository of any changes to the library. 
+in this directory to do all tests.
 
 
 How to interpret the output?
@@ -20,21 +19,21 @@ Apart from several messages containing compiling and linking
 information, the output of make will contain lines like
 
 =====debug========== heavy.cc
-=====linking======== heavy.exe
-=====Running======== heavy.exe
-=====Checking======= heavy.output
-=====OK============= heavy.OK
+=====linking======== heavy/exe
+=====Running======== heavy/exe
+=====Checking======= heavy/output
+=====OK============= heavy/OK
 
 If the second line doesn't read like this and instead has an error
 marker, then this test failed. This may be either due an assertion
 that was triggered, or because the output differed from what has been
-stored as the output that is stored in CVS and considered correct. To
+stored as the output that is stored in SVN and considered correct. To
 see the diffs between what you got and what is stored, call
-    make testname.OK verbose=on
+    make testname/OK verbose=on
 in the appropriate subdirectory, where testname is the name of the
 respective testcase without the .cc extension.
 
-To get a better overview of all the tests, you can instead run
+To get an overview of all the tests, you can instead run
     make report
 which prints a one-line summary of all tests instead of the five lines
 above. Furthermore, it doesn't stop when it finds that one test
@@ -50,41 +49,11 @@ Finally, if you intend to run all tests with
 you can instead as well run
     make report+mail
 which in addition to running all tests and generating one-line
-summaries sends the results to a mail address in Heidelberg. There, an
+summaries sends the results to a mail address at dealii.org. There, an
 agent munches these mails every half hour or so, and presents them on
 the deal.II web page so that everyone can always see which tests
 presently failed. Using report+mail is only useful, though, if you are
-working with an up-to-date CVS tree; otherwise you may report test
-failures that are already fixed in the present CVS version and this is
+working with the up-to-date SVN trunk; otherwise you may report test
+failures that are already fixed in the present SVN version and this is
 certain to confuse the one who fixed the bug.
 
-
-
-Running the tests on a new platform
------------------------------------
-
-Run
-
-make new-platform
-
-if you understand what's going on there. Else, do it by hand:
-
-1) Link the subdirectory in results, matching your platform most closely
-   to a directory ./compare.
-2) Run the tests and check the results.
-3) Run 'make resultname' and remember the output $TARGET_COMPILER
-4a) if all results are good edit results/Makefile and create an alias
-   linking the existing directory to $TARGET_COMPILER. Edit
-   .cvsignore accordingly.
-4b) else, create a directory in results named $TARGET_COMPILER and
-   add it to cvs. 
-4c) if all results in a subdirectory are ok, do the link thing in 4a
-    for the subdir.
-4d) else continue with 5
-5) Run make output in the subdirectories necessary.
-6) Create subdirectories in results/$TARGET_COMPILER named as in tests
-   and copy the output files there. Add them to cvs. Consider links
-   for large coinciding files.
-7) Check in. Remove the link compare and the results subdirectory.
-8) cvs update -d
-9) Run the tests to see if everything works.
