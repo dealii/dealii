@@ -1575,10 +1575,10 @@ namespace internal
 					 // previous steps of the hp hanging node
 					 // procedure.
 
-	Assert (face_constraints.m () == dofs_mother.size (),
+	Assert (face_constraints.n () == dofs_mother.size (),
 		ExcDimensionMismatch(dofs_mother.size (),
 				     face_constraints.n()));
-	Assert (face_constraints.n () == dofs_child.size (),
+	Assert (face_constraints.m () == dofs_child.size (),
 		ExcDimensionMismatch(dofs_child.size (),
 				     face_constraints.m()));
 
@@ -1588,7 +1588,7 @@ namespace internal
 	Assert (n_dofs_mother <= n_dofs_child,
 		ExcInternalError ());
 
-	for (unsigned int col=0; col!=n_dofs_child; ++col) 
+	for (unsigned int row=0; row!=n_dofs_child; ++row) 
 	  {
 	    bool constraint_already_satisfied = false;
 
@@ -1598,8 +1598,8 @@ namespace internal
 					     // the corresponding global dof
 					     // indices
 	    for (unsigned int i=0; i<n_dofs_mother; ++i)
-	      if (face_constraints (i,col) == 1.0)
-		if (dofs_mother[i] == dofs_child[col])
+	      if (face_constraints (row,i) == 1.0)
+		if (dofs_mother[i] == dofs_child[row])
 		  {
 		    constraint_already_satisfied = true;
 		    break;
@@ -1607,19 +1607,19 @@ namespace internal
 
 	    if (constraint_already_satisfied == false)
 	      { 
-		constraints.add_line (dofs_child[col]);
+		constraints.add_line (dofs_child[row]);
 		for (unsigned int i=0; i!=n_dofs_mother; ++i)
-                  if (face_constraints(i,col) != 0)
+                  if (face_constraints(row,i) != 0)
 		    {
 #ifdef WOLFGANG
-		      std::cout << "   " << dofs_child[col]
-				<< " -> " << face_constraints (i,col) << " * "
+		      std::cout << "   " << dofs_child[row]
+				<< " -> " << face_constraints (row,i) << " * "
 				<< dofs_mother[i]
 				<< std::endl;
 #endif
-		      constraints.add_entry (dofs_child[col],
+		      constraints.add_entry (dofs_child[row],
 					     dofs_mother[i],
-					     face_constraints (i,col));
+					     face_constraints (row,i));
 		    }
 	      }  
 	  }      
@@ -2241,8 +2241,8 @@ namespace internal
 							 // properties of a
 							 // finite element onto
 							 // that mesh
-			face_constraints.reinit (n_dofs_on_mother,
-						 n_dofs_on_children);
+			face_constraints.reinit (n_dofs_on_children,
+						 n_dofs_on_mother);
 			cell->get_fe()
 			  .get_subface_interpolation_matrix (subface->get_fe(subface_fe_index),
 							     c, face_constraints);
@@ -2473,13 +2473,13 @@ namespace internal
 		    dofs_on_mother.resize (n_dofs_on_mother);
 		    cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
 
-		    FullMatrix<double> fc_mother_ipol (n_dofs_on_children,
-						       n_dofs_on_mother);
-		    FullMatrix<double> fc_mother_sface (n_dofs_on_children,
-							n_dofs_on_mother);
+		    FullMatrix<double> fc_mother_ipol (n_dofs_on_mother,
+						       n_dofs_on_children);
+		    FullMatrix<double> fc_mother_sface (n_dofs_on_mother,
+							n_dofs_on_children);
 		    dominating_fe.get_face_interpolation_matrix (cell->get_fe(),
 								 fc_mother_ipol);
-		    fc_ipol_sface.mmult (fc_mother_sface, fc_mother_ipol);
+		    fc_mother_ipol.mmult (fc_mother_sface, fc_ipol_sface);
 
 						     // Add constraints to global constraint
 						     // matrix.
@@ -2522,15 +2522,15 @@ namespace internal
 					      
 							   // Now create the element
 							   // constraint for this subface.
-			  FullMatrix<double> fc_child_sface_ipol (n_dofs_on_children,
-								  n_dofs_on_mother);
-			  FullMatrix<double> fc_child_sface_sface (n_dofs_on_children,
-								   n_dofs_on_mother);
+			  FullMatrix<double> fc_child_sface_ipol (n_dofs_on_mother,
+								  n_dofs_on_children);
+			  FullMatrix<double> fc_child_sface_sface (n_dofs_on_mother,
+								   n_dofs_on_children);
 			  dominating_fe.get_subface_interpolation_matrix 
 			    (subface->get_fe(subface_fe_index),
 			     c, fc_child_sface_ipol);
 
-			  fc_ipol_sface.mmult (fc_child_sface_sface, fc_child_sface_ipol);
+			  fc_child_sface_ipol.mmult (fc_child_sface_sface, fc_ipol_sface);
 
 							   // Add constraints to global constraint
 							   // matrix.
@@ -2606,8 +2606,8 @@ namespace internal
 						  
                                                        // Now create the element
                                                        // constraint for this subface.
-                      FullMatrix<double> face_constraints (dofs_on_mother.size(),
-                                                           dofs_on_children.size());
+                      FullMatrix<double> face_constraints (dofs_on_children.size(),
+                                                           dofs_on_mother.size());
                       cell->get_fe().get_face_interpolation_matrix (neighbor->get_fe (),
                                                                     face_constraints);
 

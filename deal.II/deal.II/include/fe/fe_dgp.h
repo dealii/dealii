@@ -218,8 +218,8 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * of one element to the face of
 				      * the neighboring element. 
 				      * The size of the matrix is
-				      * then @p dofs_per_face times
-				      * <tt>source.dofs_per_face</tt>.
+				      * then <tt>source.dofs_per_face</tt> times
+				      * <tt>this->dofs_per_face</tt>.
 				      *
 				      * Derived elements will have to
 				      * implement this function. They
@@ -243,8 +243,8 @@ class FE_DGP : public FE_Poly<PolynomialSpace<dim>,dim>
 				      * of one element to the face of
 				      * the neighboring element. 
 				      * The size of the matrix is
-				      * then @p dofs_per_face times
-				      * <tt>source.dofs_per_face</tt>.
+				      * then <tt>source.dofs_per_face</tt> times
+				      * <tt>this->dofs_per_face</tt>.
 				      *
 				      * Derived elements will have to
 				      * implement this function. They

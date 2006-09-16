@@ -1872,10 +1872,10 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	       typename FiniteElement<dim>::
 	       ExcInterpolationNotImplemented());
 
-  Assert (interpolation_matrix.m() == this->dofs_per_face,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
+  Assert (interpolation_matrix.n() == this->dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.n(),
 				this->dofs_per_face));
-  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_face,
+  Assert (interpolation_matrix.m() == x_source_fe.dofs_per_face,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				x_source_fe.dofs_per_face));
 
@@ -1922,8 +1922,8 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	      ExcNotImplemented());
 
 				       // get the interpolation from the bases
-      base_to_base_interpolation.reinit (base.dofs_per_face,
-					 base_other.dofs_per_face);
+      base_to_base_interpolation.reinit (base_other.dofs_per_face,
+					 base.dofs_per_face);
       base.get_face_interpolation_matrix (base_other,
 					  base_to_base_interpolation);
       
@@ -1940,9 +1940,9 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	    if (fe_other_system->face_system_to_base_index(j).first
 		==
 		std::make_pair (base_index_other, multiplicity_other))
-	      interpolation_matrix(i, j)
-		= base_to_base_interpolation(this->face_system_to_base_index(i).second,
-					     fe_other_system->face_system_to_base_index(j).second);
+	      interpolation_matrix(j, i)
+		= base_to_base_interpolation(fe_other_system->face_system_to_base_index(j).second,
+					     this->face_system_to_base_index(i).second);
 	  
 				       // advance to the next base element
 				       // for this and the other
@@ -1999,10 +1999,10 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	       typename FiniteElement<dim>::
 	       ExcInterpolationNotImplemented());
 
-  Assert (interpolation_matrix.m() == this->dofs_per_face,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
+  Assert (interpolation_matrix.n() == this->dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.n(),
 				this->dofs_per_face));
-  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_face,
+  Assert (interpolation_matrix.m() == x_source_fe.dofs_per_face,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				x_source_fe.dofs_per_face));
 
@@ -2049,8 +2049,8 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	      ExcNotImplemented());
 
 				       // get the interpolation from the bases
-      base_to_base_interpolation.reinit (base.dofs_per_face,
-					 base_other.dofs_per_face);
+      base_to_base_interpolation.reinit (base_other.dofs_per_face,
+					 base.dofs_per_face);
       base.get_subface_interpolation_matrix (base_other,
 					     subface,
 					     base_to_base_interpolation);
@@ -2068,9 +2068,9 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	    if (fe_other_system->face_system_to_base_index(j).first
 		==
 		std::make_pair (base_index_other, multiplicity_other))
-	      interpolation_matrix(i, j)
-		= base_to_base_interpolation(this->face_system_to_base_index(i).second,
-					     fe_other_system->face_system_to_base_index(j).second);
+	      interpolation_matrix(j, i)
+		= base_to_base_interpolation(fe_other_system->face_system_to_base_index(j).second,
+					     this->face_system_to_base_index(i).second);
 	  
 				       // advance to the next base element
 				       // for this and the other

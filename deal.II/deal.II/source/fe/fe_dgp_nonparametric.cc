@@ -441,7 +441,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				0));
   Assert (interpolation_matrix.n() == 0,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
+	  ExcDimensionMismatch (interpolation_matrix.n(),
 				0));
 }
 
@@ -470,7 +470,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				0));
   Assert (interpolation_matrix.n() == 0,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
+	  ExcDimensionMismatch (interpolation_matrix.n(),
 				0));
 }
 

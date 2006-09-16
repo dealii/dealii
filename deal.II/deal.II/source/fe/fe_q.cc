@@ -364,10 +364,10 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
   
-  Assert (interpolation_matrix.m() == this->dofs_per_face,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
+  Assert (interpolation_matrix.n() == this->dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.n(),
 				this->dofs_per_face));
-  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_face,
+  Assert (interpolation_matrix.m() == x_source_fe.dofs_per_face,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				x_source_fe.dofs_per_face));
 
@@ -431,11 +431,11 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	  if (fabs (matrix_entry) < eps)
 	    matrix_entry = 0.0;
 
-	  interpolation_matrix(j,i) = matrix_entry;
+	  interpolation_matrix(i,j) = matrix_entry;
 	}  
     }
 
-				   // make sure that the column sum of
+				   // make sure that the row sum of
 				   // each of the matrices is 1 at
 				   // this point. this must be so
 				   // since the shape functions sum up
@@ -445,7 +445,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
       double sum = 0.;
 
       for (unsigned int i=0; i<this->dofs_per_face; ++i)
-        sum += interpolation_matrix(i,j);
+        sum += interpolation_matrix(j,i);
 
       Assert (std::fabs(sum-1) < 2e-14*this->degree*(dim-1),
               ExcInternalError());
@@ -469,10 +469,10 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
   
-  Assert (interpolation_matrix.m() == this->dofs_per_face,
-	  ExcDimensionMismatch (interpolation_matrix.m(),
+  Assert (interpolation_matrix.n() == this->dofs_per_face,
+	  ExcDimensionMismatch (interpolation_matrix.n(),
 				this->dofs_per_face));
-  Assert (interpolation_matrix.n() == x_source_fe.dofs_per_face,
+  Assert (interpolation_matrix.m() == x_source_fe.dofs_per_face,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				x_source_fe.dofs_per_face));
 
@@ -533,11 +533,11 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
 	  if (fabs (matrix_entry) < eps)
 	    matrix_entry = 0.0;
 
-	  interpolation_matrix(j,i) = matrix_entry;
+	  interpolation_matrix(i,j) = matrix_entry;
 	}
     }
 
-				   // make sure that the column sum of
+				   // make sure that the row sum of
 				   // each of the matrices is 1 at
 				   // this point. this must be so
 				   // since the shape functions sum up
@@ -547,7 +547,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
       double sum = 0.;
 
       for (unsigned int i=0; i<this->dofs_per_face; ++i)
-        sum += interpolation_matrix(i,j);
+        sum += interpolation_matrix(j,i);
 
       Assert (std::fabs(sum-1) < 2e-14*this->degree*(dim-1),
               ExcInternalError());

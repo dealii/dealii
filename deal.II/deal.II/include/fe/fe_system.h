@@ -415,8 +415,8 @@ class FESystem : public FiniteElement<dim>
 				      * of one element to the face of
 				      * the neighboring element. 
 				      * The size of the matrix is
-				      * then @p dofs_per_face times
-				      * <tt>source.dofs_per_face</tt>.
+				      * then <tt>source.dofs_per_face</tt> times
+				      * <tt>this->dofs_per_face</tt>.
 				      *
 				      * Base elements of this element will
 				      * have to implement this function. They
@@ -442,8 +442,8 @@ class FESystem : public FiniteElement<dim>
 				      * of one element to the subface of
 				      * the neighboring element. 
 				      * The size of the matrix is
-				      * then @p dofs_per_face times
-				      * <tt>source.dofs_per_face</tt>.
+				      * then <tt>source.dofs_per_face</tt> times
+				      * <tt>this->dofs_per_face</tt>.
 				      *
 				      * Base elements of this element will
 				      * have to implement this function. They
