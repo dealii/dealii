@@ -67,8 +67,8 @@ check_this (const FiniteElement<dim> &fe1,
   if (fe1.dofs_per_face <= fe2.dofs_per_face)
     try
       {
-	face_constraints.reinit (fe1.dofs_per_face,
-				 fe2.dofs_per_face);
+	face_constraints.reinit (fe2.dofs_per_face,
+				 fe1.dofs_per_face);
 	fe1.get_face_interpolation_matrix (fe2, face_constraints);
 
 	deallog << fe1.get_name()
@@ -84,8 +84,8 @@ check_this (const FiniteElement<dim> &fe1,
   if (fe2.dofs_per_face <= fe1.dofs_per_face)
     try
       {
-	face_constraints.reinit (fe2.dofs_per_face,
-				 fe1.dofs_per_face);
+	face_constraints.reinit (fe1.dofs_per_face,
+				 fe2.dofs_per_face);
 	fe2.get_face_interpolation_matrix (fe1, face_constraints);
 
 	deallog << fe2.get_name()
