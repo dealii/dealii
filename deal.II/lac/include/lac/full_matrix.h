@@ -895,16 +895,14 @@ class FullMatrix : public Table<2,number>
     void gauss_jordan ();
 
 				     /**
-				      * Assign the inverse of the
-				      * given matrix to
-				      * <tt>*this</tt>. This function is
-				      * hardcoded for quadratic matrices
-				      * of dimension one to four,
-				      * since the amount of code
-				      * needed grows quickly.  For
-				      * larger matrices, the method
-				      * gauss_jordan() is invoked
-				      * implicitly.
+				      * Assign the inverse of the given matrix
+				      * to <tt>*this</tt>. This function is
+				      * hardcoded for quadratic matrices of
+				      * dimension one to four. However, since
+				      * the amount of code needed grows
+				      * quickly, the method gauss_jordan() is
+				      * invoked implicitly if the dimension is
+				      * larger.
 				      */
     template <typename number2>
     void invert (const FullMatrix<number2> &M);
