@@ -1068,6 +1068,8 @@ ConstraintMatrix::add_entry (const unsigned int line,
                              const double       value)
 {
   Assert (sorted==false, ExcMatrixIsClosed());
+  Assert (line != column,
+	  ExcMessage ("Can't constrain a degree of freedom to itself"));
 
   std::vector<ConstraintLine>::iterator line_ptr;
   const std::vector<ConstraintLine>::const_iterator start=lines.begin();
