@@ -141,58 +141,191 @@ void ConstraintMatrix::close ()
 {
   if (sorted == true)
     return;
-  
-				   // sort the entries in the different lines
-				   // and strip zero entries
-  std::vector<ConstraintLine>::iterator line = lines.begin(),
-					endl = lines.end();
-  for (; line!=endl; ++line)
-    {
-				       // first remove zero
-				       // entries. that would mean
-				       // that in the linear
-				       // constraint for a node,
-				       // x_i = ax_1 + bx_2 + ...,
-				       // another node times 0
-				       // appears. obviously,
-				       // 0*something can be omitted
-      line->entries.erase (std::remove_if (line->entries.begin(),
-                                           line->entries.end(),
-                                           &check_zero_weight),
-                           line->entries.end());
 
-				       // now sort the remainder
-      std::sort (line->entries.begin(), line->entries.end());
-
-                                       // finally do the following check: if
-                                       // the sum of weights for the
-                                       // constraints is close to one, but not
-                                       // exactly one, then rescale all the
-                                       // weights so that they sum up to
-                                       // 1. this adds a little numerical
-                                       // stability and avoids all sorts of
-                                       // problems where the actual value is
-                                       // close to, but not quite what we
-                                       // expected
-                                       //
-                                       // the case where the weights don't
-                                       // quite sum up happens when we compute
-                                       // the interpolation weights "on the
-                                       // fly", i.e. not from precomputed
-                                       // tables. in this case, the
-                                       // interpolation weights are also
-                                       // subject to round-off
-      double sum = 0;
-      for (unsigned int i=0; i<line->entries.size(); ++i)
-        sum += line->entries[i].second;
-      if ((sum != 1.0) && (std::fabs (sum-1.) < 1.e-13))
-        for (unsigned int i=0; i<line->entries.size(); ++i)
-          line->entries[i].second /= sum;
-    };
-  
 				   // sort the lines
   std::sort (lines.begin(), lines.end());
 
+				   // first, strip zero entries, as we
+				   // have to do that only once
+  for (std::vector<ConstraintLine>::iterator line = lines.begin();
+       line!=lines.end(); ++line)
+				     // first remove zero
+				     // entries. that would mean that
+				     // in the linear constraint for a
+				     // node, x_i = ax_1 + bx_2 + ...,
+				     // another node times 0
+				     // appears. obviously,
+				     // 0*something can be omitted
+    line->entries.erase (std::remove_if (line->entries.begin(),
+					 line->entries.end(),
+					 &check_zero_weight),
+			 line->entries.end());
+  
+				   // replace references to dofs that
+				   // are themselves constrained. note
+				   // that because we may replace
+				   // references to other dofs that
+				   // may themselves be constrained to
+				   // third ones, we have to iterate
+				   // over all this until we replace
+				   // no chains of constraints any
+				   // more
+  unsigned int iteration = 0;
+  while (true)
+    {
+      bool chained_constraint_replaced = false;
+
+      for (std::vector<ConstraintLine>::iterator line = lines.begin();
+	   line!=lines.end(); ++line)
+	{
+					   // loop over all entries of
+					   // this line (including
+					   // ones that we have
+					   // appended in this go
+					   // around)
+	  unsigned int entry = 0;
+	  while (entry < line->entries.size())
+	    if (is_constrained (line->entries[entry].first))
+	      {
+						 // ok, this entry is
+						 // further
+						 // constrained:
+		chained_constraint_replaced = true;
+		
+						 // replace
+						 // it by its
+						 // expansion; we do
+						 // that by
+						 // overwriting the
+						 // entry by the first
+						 // entry of the
+						 // expansion and
+						 // adding the
+						 // remaining ones to
+						 // the end, where we
+						 // will later process
+						 // them once more
+		const unsigned int dof_index = line->entries[entry].first;
+		const double       weight = line->entries[entry].second;
+
+		Assert (dof_index != line->line,
+			ExcMessage ("Cycle in constraints detected!"));
+		
+						 // find the line
+						 // corresponding to
+						 // this entry. note
+						 // that we have
+						 // already sorted
+						 // them to make this
+						 // process faster
+		ConstraintLine test_line;
+		test_line.line = dof_index;
+		const std::vector<ConstraintLine>::const_iterator
+		  constrained_line = std::lower_bound (lines.begin(),
+						       lines.end(),
+						       test_line);
+		Assert (constrained_line->entries.size() > 0,
+			ExcInternalError());
+
+		for (unsigned int i=0; i<constrained_line->entries.size(); ++i)
+		  Assert (dof_index != constrained_line->entries[i].first,
+			  ExcMessage ("Cycle in constraints detected!"));
+
+						 // replace first
+						 // entry, then tack
+						 // the rest to the
+						 // end of the list
+		line->entries[entry] =
+		  std::make_pair (constrained_line->entries[0].first,
+				  constrained_line->entries[0].second *
+				  weight);
+		
+		line->entries.reserve (line->entries.size() +
+				       constrained_line->entries.size() - 1);
+		for (unsigned int i=1; i<constrained_line->entries.size(); ++i)
+		  line->entries
+		    .push_back (std::make_pair (constrained_line->entries[i].first,
+						constrained_line->entries[i].second *
+						weight));
+
+						 // now that we're
+						 // here, do not
+						 // increase index by
+						 // one but rather
+						 // make another pass
+						 // for the present
+						 // entry because we
+						 // have replaced the
+						 // present entry by
+						 // another one
+	      }
+	    else
+					       // entry not further
+					       // constrained. just
+					       // move ahead by one
+	      ++entry;
+	}
+
+				       // if we didn't do anything in
+				       // this round, then quit the
+				       // loop
+      if (chained_constraint_replaced == false)
+	break;
+
+				       // increase iteration
+				       // count. note that we should
+				       // not iterate more times than
+				       // there are constraints, since
+				       // this puts a natural upper
+				       // bound on the length of
+				       // constraint chains
+      ++iteration;
+      Assert (iteration <= lines.size(),
+	      ExcInternalError());
+    }
+
+				   // finally sort the entries and
+				   // re-scale them if necessary
+  for (std::vector<ConstraintLine>::iterator line = lines.begin();
+       line!=lines.end(); ++line)
+    {
+				       // now sort the remainder
+      std::sort (line->entries.begin(), line->entries.end());
+
+				       // finally do the following
+				       // check: if the sum of
+				       // weights for the
+				       // constraints is close to
+				       // one, but not exactly
+				       // one, then rescale all
+				       // the weights so that they
+				       // sum up to 1. this adds a
+				       // little numerical
+				       // stability and avoids all
+				       // sorts of problems where
+				       // the actual value is
+				       // close to, but not quite
+				       // what we expected
+				       //
+				       // the case where the
+				       // weights don't quite sum
+				       // up happens when we
+				       // compute the
+				       // interpolation weights
+				       // "on the fly", i.e. not
+				       // from precomputed
+				       // tables. in this case,
+				       // the interpolation
+				       // weights are also subject
+				       // to round-off
+      double sum = 0;
+      for (unsigned int i=0; i<line->entries.size(); ++i)
+	sum += line->entries[i].second;
+      if ((sum != 1.0) && (std::fabs (sum-1.) < 1.e-13))
+	for (unsigned int i=0; i<line->entries.size(); ++i)
+	  line->entries[i].second /= sum;
+    }
+  
 #ifdef DEBUG
 				   // if in debug mode: check that no
 				   // dof is constraint to another dof
