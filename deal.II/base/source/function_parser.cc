@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -165,7 +165,7 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
   if (dim != n_vars)
     vars[dim] = this->get_time();
   
-  double my_value = fp[component].Eval(vars);
+  double my_value = fp[component].Eval((double*)vars);
   
   AssertThrow (fp[component].EvalError() == 0,
 	       ExcMessage(fp[component].ErrorMsg()));
@@ -201,7 +201,7 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
   for(unsigned int component = 0; component < this->n_components;
       ++component)
     {
-      values(component) = fp[component].Eval(vars);
+      values(component) = fp[component].Eval((double*)vars);
       AssertThrow(fp[component].EvalError() == 0,
 		  ExcMessage(fp[component].ErrorMsg()));
     } 
