@@ -239,11 +239,11 @@ class GridTools
                                       * @author Ralf B. Schulz,
                                       * Wolfgang Bangerth, 2006
                                       */
-   template<int dim, template<int dim> class Container>
+   template<int dim, template <int> class Container>
    static
    std::vector<typename Container<dim>::active_cell_iterator>
-   find_cells_adjacent_to_vertex(const Container<dim> &container,
-                                 const unsigned int    vertex);
+   find_cells_adjacent_to_vertex (const Container<dim> &container,
+				  const unsigned int    vertex);
 
 
                                      /**
