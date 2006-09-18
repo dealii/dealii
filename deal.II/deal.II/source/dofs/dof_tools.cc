@@ -38,6 +38,7 @@
 #include <numeric>
 
 
+
 #if  deal_II_dimension == 1
 
 // Specialization for 1D
@@ -1564,8 +1565,8 @@ namespace internal
       static
 #endif      
       void
-      filter_constraints (const std::vector<unsigned int> &dofs_mother,
-			  const std::vector<unsigned int> &dofs_child,
+      filter_constraints (const std::vector<unsigned int> &master_dofs,
+			  const std::vector<unsigned int> &slave_dofs,
 			  const FullMatrix<double> &face_constraints,
 			  ConstraintMatrix &constraints)
       {
@@ -1575,20 +1576,17 @@ namespace internal
 					 // previous steps of the hp hanging node
 					 // procedure.
 
-	Assert (face_constraints.n () == dofs_mother.size (),
-		ExcDimensionMismatch(dofs_mother.size (),
+	Assert (face_constraints.n () == master_dofs.size (),
+		ExcDimensionMismatch(master_dofs.size (),
 				     face_constraints.n()));
-	Assert (face_constraints.m () == dofs_child.size (),
-		ExcDimensionMismatch(dofs_child.size (),
+	Assert (face_constraints.m () == slave_dofs.size (),
+		ExcDimensionMismatch(slave_dofs.size (),
 				     face_constraints.m()));
 
-	const unsigned int n_dofs_mother = dofs_mother.size ();
-	const unsigned int n_dofs_child = dofs_child.size ();      
+	const unsigned int n_master_dofs = master_dofs.size ();
+	const unsigned int n_slave_dofs = slave_dofs.size ();      
 
-	Assert (n_dofs_mother <= n_dofs_child,
-		ExcInternalError ());
-
-	for (unsigned int row=0; row!=n_dofs_child; ++row) 
+	for (unsigned int row=0; row!=n_slave_dofs; ++row) 
 	  {
 	    bool constraint_already_satisfied = false;
 
@@ -1597,9 +1595,9 @@ namespace internal
 					     // satisfied by unification of
 					     // the corresponding global dof
 					     // indices
-	    for (unsigned int i=0; i<n_dofs_mother; ++i)
+	    for (unsigned int i=0; i<n_master_dofs; ++i)
 	      if (face_constraints (row,i) == 1.0)
-		if (dofs_mother[i] == dofs_child[row])
+		if (master_dofs[i] == slave_dofs[row])
 		  {
 		    constraint_already_satisfied = true;
 		    break;
@@ -1607,18 +1605,18 @@ namespace internal
 
 	    if (constraint_already_satisfied == false)
 	      { 
-		constraints.add_line (dofs_child[row]);
-		for (unsigned int i=0; i!=n_dofs_mother; ++i)
+		constraints.add_line (slave_dofs[row]);
+		for (unsigned int i=0; i<n_master_dofs; ++i)
                   if (face_constraints(row,i) != 0)
 		    {
 #ifdef WOLFGANG
-		      std::cout << "   " << dofs_child[row]
+		      std::cout << "   " << slave_dofs[row]
 				<< " -> " << face_constraints (row,i) << " * "
-				<< dofs_mother[i]
+				<< master_dofs[i]
 				<< std::endl;
 #endif
-		      constraints.add_entry (dofs_child[row],
-					     dofs_mother[i],
+		      constraints.add_entry (slave_dofs[row],
+					     master_dofs[i],
 					     face_constraints (row,i));
 		    }
 	      }  
@@ -2259,7 +2257,7 @@ namespace internal
 			filter_constraints (dofs_on_mother,
 					    dofs_on_children,
 					    face_constraints,
-					    constraints);		      
+					    constraints);
 		      }
 		    
 		    break;
@@ -2274,22 +2272,18 @@ namespace internal
 						     // of the finer elements
 						     // or all of them (the
 						     // other_... case) is
-						     // dominating.  First the
-						     // coarse element will be
-						     // constrained to that
-						     // element. After that
-						     // the other fine
-						     // elements will be
-						     // constrained to the
-						     // coarse element.
-
+						     // dominating. See the hp
+						     // paper for a way how to
+						     // deal with this
+						     // situation
+						     //
 						     // we first have to find
-						     // one of the children for
-						     // which the finite element
-						     // is able to generate a
-						     // space that all the other
-						     // ones can be constrained
-						     // to
+						     // one of the children
+						     // for which the finite
+						     // element is able to
+						     // generate a space that
+						     // all the other ones can
+						     // be constrained to
 		    unsigned int dominating_subface_no = 0;
 		    for (; dominating_subface_no<GeometryInfo<dim>::subfaces_per_face;
 			 ++dominating_subface_no)
@@ -2343,14 +2337,11 @@ namespace internal
 		    Assert (dominating_subface_no != GeometryInfo<dim>::subfaces_per_face,
 			    ExcNotImplemented());
 
-		    const typename DH::active_face_iterator dominating_subface
-		      = cell->face(face)->child (dominating_subface_no);
-
 		    const unsigned int dominating_fe_index
-		      = dominating_subface->nth_active_fe_index(0);
+		      = cell->face(face)->child (dominating_subface_no)->nth_active_fe_index(0);
 
 		    const FiniteElement<dim> &dominating_fe
-		      = dominating_subface->get_fe (dominating_fe_index);
+		      = cell->face(face)->child (dominating_subface_no)->get_fe (dominating_fe_index);
 		    
 						     // check also that it is
 						     // able to constrain the
@@ -2363,190 +2354,140 @@ namespace internal
 			     (cell->face(face)->get_fe(cell->face(face)->nth_active_fe_index(0)))
 			     == FiniteElementDomination::either_element_can_dominate),
 			    ExcInternalError());
+
 		    
-		    const unsigned int n_dofs_on_children = dominating_fe.dofs_per_face;
-		    dofs_on_children.resize (n_dofs_on_children);
-
-
-						     // Same procedure as for the
-						     // mother cell. Extract the face
-						     // DoFs from the cell DoFs.
-		    dominating_subface->get_dof_indices (dofs_on_children,
-							 dominating_fe_index);
-
-
-						     // The idea is to introduce
-						     // a "virtual" intermediate coarse
-						     // level face with the lowest
-						     // polynomial degree. Then it is
-						     // easy to constrain each of the
-						     // connected faces to this intermediate
-						     // coarse level face. As the DoFs on
-						     // this intermediate coarse level face
-						     // do not exist, they have to be determined
-						     // through the inverse of the constraint matrix
-						     // from the lowest order subface to
-						     // this intermediate coarse level face.
-						     //
-						     // Considering the following case:
-						     // +---+----+
-						     // |   | Q3 |
-						     // |Q3 +----+
-						     // |   | Q2 |
-						     // +---+----+
-						     //
-						     // The intermediate layer would be
-						     // of order 2:
-						     // +------+  *  +---------+
-						     // +      |  |  | F_1, Q3 |
-						     // +Q3, C |  *  +---------+
-						     // +      |  |  | F_2, Q2 |
-						     // +------+  *  +---------+
-						     //
-						     // In this case, there are 3 DoFs on the
-						     // intermediate layer. Assuming for the
-						     // moment that these do exist, all DoFs
-						     // on the connected faces can be
-						     // expressed in terms of these DoFs. We
-						     // have:
-						     // C = A_1 * I
-						     // F_1 = A_2 * I
-						     // F_2 = A_3 * I
-						     // where C, F_1, F_2 denote the DoFs
-						     // on the faces of the elements and
-						     // I denotes the DoFs on the intermediate
-						     // face. A_1 to A_3 denote the corresponding
-						     // face or subface interpolation matrices,
-						     // describing the DoFs on one of the faces
-						     // in terms of the DoFs on the intermediate
-						     // layer.
-						     //
-						     // As the DoFs in I are
-						     // only "virtual" they
-						     // have to be expressed
-						     // in terms of existing
-						     // DoFs. In this case
-						     // only A_3 is invertible
-						     // (it would be the
-						     // identity matrix if we
-						     // interpolated from face
-						     // to face, since it is
-						     // the same element from
-						     // and to which we
-						     // interpolate; however,
-						     // we interpolate from
-						     // subface to face, and
-						     // consequently the
-						     // matrix is invertible
-						     // but not the identity
-						     // matrix). Therefore all
-						     // other DoFs have to be
-						     // constrained to the
-						     // DoFs in F_2.  This
-						     // leads to I = A_3^-1
-						     // F_2 and C = A_1 *
-						     // A_3^-1 F_2, F_1 = A_2 *
-						     // A_3^-1 F_2
-						     //
-						     // Therefore the constraint matrices
-						     // in this case are:
-						     // A_1 * A_3^-1
-						     // A_2 * A_3^-1
-						     // In 3D and for other configurations,
-						     // the basic scheme is completely identical.
-		  
-						     // Now create the element
-						     // constraint for this subface.
-		    FullMatrix<double> fc_sface_ipol (n_dofs_on_children,
-						      n_dofs_on_children);
-		    FullMatrix<double> fc_ipol_sface (n_dofs_on_children,
-						      n_dofs_on_children);
-		    dominating_fe.get_subface_interpolation_matrix (dominating_fe,
-								    dominating_subface_no,
-								    fc_sface_ipol); 
-						     // Invert it, to get a mapping from the DoFs of the
-						     // "Master-subface" to the intermediate layer.
-		    fc_ipol_sface.invert (fc_sface_ipol);
-
-						     // Create constraint matrix for the mother face.
-		    const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
-		    dofs_on_mother.resize (n_dofs_on_mother);
-		    cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
-
-		    FullMatrix<double> fc_mother_ipol (n_dofs_on_mother,
-						       n_dofs_on_children);
-		    FullMatrix<double> fc_mother_sface (n_dofs_on_mother,
-							n_dofs_on_children);
+						     // first get the
+						     // interpolation matrix
+						     // from the mother to the
+						     // virtual dofs
+		    Assert (dominating_fe.dofs_per_face <=
+			    cell->get_fe().dofs_per_face,
+			    ExcInternalError());
+		    FullMatrix<double> restrict_mother_to_virtual (cell->get_fe().dofs_per_face,
+								   dominating_fe.dofs_per_face);
 		    dominating_fe.get_face_interpolation_matrix (cell->get_fe(),
-								 fc_mother_ipol);
-		    fc_mother_ipol.mmult (fc_mother_sface, fc_ipol_sface);
+								 restrict_mother_to_virtual);
 
-						     // Add constraints to global constraint
-						     // matrix.
+						     // split this matrix into
+						     // master and slave
+						     // components. invert the
+						     // master component
+		    FullMatrix<double>
+		      restrict_mother_to_virtual_master_inv (dominating_fe.dofs_per_face,
+							     dominating_fe.dofs_per_face);
+		    for (unsigned int i=0; i<dominating_fe.dofs_per_face; ++i)
+		      for (unsigned int j=0; j<dominating_fe.dofs_per_face; ++j)
+			restrict_mother_to_virtual_master_inv(i,j)
+			  = restrict_mother_to_virtual(i,j);
+		    restrict_mother_to_virtual_master_inv.gauss_jordan ();
+		    
+		    FullMatrix<double>
+		      restrict_mother_to_virtual_slave (cell->get_fe().dofs_per_face -
+							dominating_fe.dofs_per_face,
+							dominating_fe.dofs_per_face);
+		    for (unsigned int i=0;
+			 i<cell->get_fe().dofs_per_face-dominating_fe.dofs_per_face; ++i)
+		      for (unsigned int j=0; j<dominating_fe.dofs_per_face; ++j)
+			restrict_mother_to_virtual_slave(i,j)
+			  = restrict_mother_to_virtual(i+dominating_fe.dofs_per_face,j);
+		    
+		    FullMatrix<double> face_constraints (cell->get_fe().dofs_per_face -
+							 dominating_fe.dofs_per_face,
+							 dominating_fe.dofs_per_face);
+		    restrict_mother_to_virtual_slave
+		      .mmult (face_constraints,
+			      restrict_mother_to_virtual_master_inv);
+
+		    std::vector<unsigned int> face_dofs (cell->get_fe().dofs_per_face);
+		    cell->face(face)->get_dof_indices (face_dofs, cell->active_fe_index ());
+
+		    std::vector<unsigned int> master_dofs (dominating_fe.dofs_per_face,
+							   deal_II_numbers::invalid_unsigned_int);
+		    std::vector<unsigned int> slave_dofs (cell->get_fe().dofs_per_face -
+							  dominating_fe.dofs_per_face,
+							   deal_II_numbers::invalid_unsigned_int);
+		    for (unsigned int i=0; i<dominating_fe.dofs_per_face; ++i)
+		      master_dofs[i] = face_dofs[i];
+		    
+		    for (unsigned int i=0;
+			 i<cell->get_fe().dofs_per_face - dominating_fe.dofs_per_face; ++i)
+		      slave_dofs[i] = face_dofs[i + dominating_fe.dofs_per_face];
+
+		    for (unsigned int i=0; i<master_dofs.size(); ++i)
+		      Assert (master_dofs[i] < dof_handler.n_dofs(),
+			      ExcInternalError());
+		    for (unsigned int i=0; i<slave_dofs.size(); ++i)
+		      Assert (slave_dofs[i] < dof_handler.n_dofs(),
+			      ExcInternalError());
+		    
+		    
 #ifdef WOLFGANG
 		    std::cout << "Constraints for cell=" << cell
 			      << ", face=" << face
 			      << " (complicated case, mother)"
 			      << std::endl;
 #endif
-		    filter_constraints (dofs_on_children,
-					dofs_on_mother,
-					fc_mother_sface,
-					constraints);
+		    filter_constraints (master_dofs,
+					slave_dofs,
+					face_constraints,
+					constraints);		      
 
-						     // Now create constraint matrices for
-						     // the subfaces and assemble them
-		    for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
-						       // As the
-						       // "Master-subface"
-						       // does not need
-						       // constraints, skip
-						       // it.
-		      if (c != dominating_subface_no)
-			{
-			  const typename DH::active_face_iterator subface
-			    = cell->face(face)->child(c);
 
-			  Assert (subface->n_active_fe_indices() == 1,
-				  ExcInternalError());
-			  
-			  const unsigned int subface_fe_index
-			    = subface->nth_active_fe_index(0);
 
-			  const unsigned int n_dofs_on_mother
-			    = subface->get_fe(subface_fe_index).dofs_per_face;
-			  dofs_on_mother.resize (n_dofs_on_mother);
-		      
-			  subface->get_dof_indices (dofs_on_mother,
-						    subface_fe_index);		      
-					      
-							   // Now create the element
-							   // constraint for this subface.
-			  FullMatrix<double> fc_child_sface_ipol (n_dofs_on_mother,
-								  n_dofs_on_children);
-			  FullMatrix<double> fc_child_sface_sface (n_dofs_on_mother,
-								   n_dofs_on_children);
-			  dominating_fe.get_subface_interpolation_matrix 
-			    (subface->get_fe(subface_fe_index),
-			     c, fc_child_sface_ipol);
+						     // next we have to
+						     // deal with the
+						     // subfaces. do as
+						     // discussed in the
+						     // paper
+		    for (unsigned int sf=0;
+			 sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
+		      {
+			Assert (cell->face(face)->child(sf)
+				->n_active_fe_indices() == 1,
+				ExcInternalError());
 
-			  fc_child_sface_ipol.mmult (fc_child_sface_sface, fc_ipol_sface);
+			const unsigned int subface_fe_index
+			  = cell->face(face)->child(sf)->nth_active_fe_index(0);
+			const FiniteElement<dim> &subface_fe
+			  = cell->face(face)->child(sf)->get_fe(subface_fe_index);
+			    
+							 // first get the
+							 // interpolation
+							 // matrix from the
+							 // subface to the
+							 // virtual dofs
+			Assert (dominating_fe.dofs_per_face <=
+				subface_fe.dofs_per_face,
+				ExcInternalError());
+			FullMatrix<double> restrict_subface_to_virtual (subface_fe.dofs_per_face,
+									dominating_fe.dofs_per_face);
+			dominating_fe.get_subface_interpolation_matrix (subface_fe,
+									sf,
+									restrict_subface_to_virtual);
+			FullMatrix<double> subface_constraints (subface_fe.dofs_per_face,
+								dominating_fe.dofs_per_face);
+			
+			restrict_subface_to_virtual
+			  .mmult (subface_constraints,
+				  restrict_mother_to_virtual_master_inv);
+			
+			std::vector<unsigned int> subface_dofs (subface_fe.dofs_per_face);
+			cell->face(face)->child(sf)->get_dof_indices (subface_dofs,
+								      subface_fe_index);
 
-							   // Add constraints to global constraint
-							   // matrix.
 #ifdef WOLFGANG
-			  std::cout << "Constraints for cell=" << cell
-				    << ", face=" << face
-				    << ", subface=" << c
-				    << " (complicated case, children)"
-				    << std::endl;
+			std::cout << "Constraints for cell=" << cell
+				  << ", face=" << face
+				  << ", subface=" << sf
+				  << " (complicated case, children)"
+				  << std::endl;
 #endif
-			  filter_constraints (dofs_on_children,
-					      dofs_on_mother,
-					      fc_child_sface_sface,
-					      constraints);
-			}
-
+			filter_constraints (master_dofs,
+					    subface_dofs,
+					    subface_constraints,
+					    constraints);
+		      }
+			
 		    break;
 		  }
 
