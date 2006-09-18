@@ -212,7 +212,8 @@ class ConstraintMatrix : public Subscriptor
 				      * Add a new line to the
 				      * matrix. If the line already
 				      * exists, then the function
-				      * simply returns.
+				      * simply returns without doing
+				      * anything.
 				      */
     void add_line (const unsigned int line);
 
@@ -247,7 +248,7 @@ class ConstraintMatrix : public Subscriptor
 				      * indices and values, to a line
 				      * of constraints. This function
 				      * is equivalent to calling the
-				      * preceeding function more
+				      * preceeding function
 				      * several times, but is faster.
 				      */
     void add_entries (const unsigned int                                  line,
@@ -274,6 +275,23 @@ class ConstraintMatrix : public Subscriptor
 				      * are accepted. If the object
 				      * was already closed, then this
 				      * function returns immediately.
+				      *
+				      * This function also resolves
+				      * chains of constraints. For
+				      * example, degree of freedom 13
+				      * may be constrained to
+				      * $u_{13}=u_3/2+u_7/2$ while
+				      * degree of freedom 7 is itself
+				      * constrained as
+				      * $u_7=u_2/2+u_4/2$. Then, the
+				      * resolution will be that
+				      * $u_{13}=u_3/2+u_2/4+u_4/4$. Note,
+				      * however, that cycles in this
+				      * graph of constraints are not
+				      * allowed, i.e. for example
+				      * $u_4$ may not be constrained,
+				      * directly or indirectly, to
+				      * $u_{13}$ again.
 				      */
     void close ();
 
@@ -285,7 +303,7 @@ class ConstraintMatrix : public Subscriptor
 				      * this object. Both objects may
 				      * or may not be closed (by
 				      * having their function
-				      * @p close called before), if
+				      * @p close called before). If
 				      * this object was closed before,
 				      * then it will be closed
 				      * afterwards as well. Note,
