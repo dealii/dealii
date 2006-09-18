@@ -26,7 +26,7 @@ tests_x = vector-vector \
 	sparsity_pattern sparse_matrices matrices \
 	block_sparsity_pattern_01 \
 	block_vector block_vector_* block_matrices \
-	matrix_lib matrix_out pointer_matrix \
+	matrix_lib matrix_out pointer_matrix pointer_matrix_vector \
 	solver eigen \
 	sparse_ilu sparse_ilu_t lapack_fill block_minres \
 	identity_matrix* trace
