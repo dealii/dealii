@@ -37,6 +37,7 @@
 #include <algorithm>
 #include <numeric>
 
+#define WOLFGANG
 
 
 #if  deal_II_dimension == 1
@@ -2077,6 +2078,7 @@ namespace internal
 				      ConstraintMatrix &constraints)
     {
 //TODO[WB]: we should call get_{sub,}face_interpolation_matrix only once per pair of finite elements -- since they return only stuff that counts in local dof numbers, their results are always the same. we should then just store the result in a lazy table
+//TODO[WB]: we should short-circuit some of the more expensive things dealing with domination of finite elements for non-hp DoFHandlers.
       const unsigned int dim = DH::dimension;
       
       std::vector<unsigned int> dofs_on_mother;
