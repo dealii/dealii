@@ -1612,6 +1612,52 @@ namespace internal
       }
 
 
+				       /**
+					* Given the face interpolation
+					* matrix between two elements,
+					* split it into its master and
+					* slave parts and invert the
+					* master part as explained in
+					* the hp paper.
+					*/
+#ifdef DEAL_II_ANON_NAMESPACE_BUG
+      static
+#endif      
+      void
+      ensure_existence_of_split_face_matrix (const FullMatrix<double> &face_interpolation_matrix,
+					     boost::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > > &split_matrix)
+      {
+        if (split_matrix == 0)
+          {
+            split_matrix
+	      = boost::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > >
+	      (new std::pair<FullMatrix<double>,FullMatrix<double> >());
+
+	    const unsigned int n_master_dofs = face_interpolation_matrix.n();
+	    const unsigned int n_dofs        = face_interpolation_matrix.m();
+
+	    Assert (n_master_dofs <= n_dofs, ExcInternalError());
+
+					     // copy and invert the
+					     // master component
+	    split_matrix->first.reinit (n_master_dofs, n_master_dofs);
+	    for (unsigned int i=0; i<n_master_dofs; ++i)
+	      for (unsigned int j=0; j<n_master_dofs; ++j)
+		split_matrix->first(i,j)
+		  = face_interpolation_matrix(i,j);
+	    split_matrix->first.gauss_jordan ();
+
+					     // copy the slave component
+	    split_matrix->second.reinit (n_dofs-n_master_dofs, n_master_dofs);
+	    for (unsigned int i=0;
+		 i<n_dofs-n_master_dofs; ++i)
+	      for (unsigned int j=0; j<n_master_dofs; ++j)
+		split_matrix->second(i,j)
+		  = face_interpolation_matrix(i+n_master_dofs,j);
+          }
+      }
+      
+
                                        // a template that can
                                        // determine statically whether
                                        // a given DoFHandler class
@@ -2248,18 +2294,32 @@ namespace internal
     make_hp_hanging_node_constraints (const DH         &dof_handler,
 				      ConstraintMatrix &constraints)
     {
-//TODO[WB]: in the complex case, we should also store the inverses of the matrices in a cache table
+				       // note: this function is going
+				       // to be hard to understand if
+				       // you haven't read the hp
+				       // paper. however, we try to
+				       // follow the notation laid out
+				       // there, so go read the paper
+				       // before you try to understand
+				       // what is going on here
       const unsigned int dim = DH::dimension;
-      
-      std::vector<unsigned int> dofs_on_mother;
-      std::vector<unsigned int> dofs_on_children;
 
+      
                                        // a matrix to be used for
                                        // constraints below. declared
                                        // here and simply resized down
                                        // below to avoid permanent
                                        // re-allocation of memory
       FullMatrix<double> constraint_matrix;
+
+				       // similarly have arrays that
+				       // will hold master and slave
+				       // dof numbers, as well as a
+				       // scratch array needed for the
+				       // complicated case below
+      std::vector<unsigned int> master_dofs;
+      std::vector<unsigned int> slave_dofs;
+      std::vector<unsigned int> scratch_dofs;
       
                                        // caches for the face and
                                        // subface interpolation
@@ -2276,17 +2336,22 @@ namespace internal
         subface_interpolation_matrices (n_finite_elements (dof_handler),
                                         n_finite_elements (dof_handler),
                                         GeometryInfo<dim>::subfaces_per_face);
+
+				       // similarly have a cache for
+				       // the matrices that are split
+				       // into their master and slave
+				       // parts, and for which the
+				       // master part is
+				       // inverted. these two matrices
+				       // are derived from the face
+				       // interpolation matrix as
+				       // described in the hp paper
+      Table<2,boost::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > > >
+        split_face_interpolation_matrices (n_finite_elements (dof_handler),
+					   n_finite_elements (dof_handler));
+
       
-				       // loop over all faces; only on
-				       // face there can be constraints.
-				       // We do so by looping over all
-				       // active cells and checking
-				       // whether any of the faces are
-				       // refined which can only be from
-				       // the neighboring cell because
-				       // this one is active. In that
-				       // case, the face is subject to
-				       // constraints
+				       // loop over all faces
 				       //
 				       // note that even though we may
 				       // visit a face twice if the
@@ -2368,10 +2433,9 @@ namespace internal
 						     // the subfaces
 						     // (or they are
 						     // all the same)
-		    const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
-		    dofs_on_mother.resize (n_dofs_on_mother);
+		    master_dofs.resize (cell->get_fe().dofs_per_face);
 
-		    cell->face(face)->get_dof_indices (dofs_on_mother,
+		    cell->face(face)->get_dof_indices (master_dofs,
                                                        cell->active_fe_index ());
 		  
 						     // Now create constraint matrix for
@@ -2387,14 +2451,12 @@ namespace internal
 			const unsigned int
 			  subface_fe_index = subface->nth_active_fe_index(0);
 
-			const unsigned int n_dofs_on_children
-			  = subface->get_fe(subface_fe_index).dofs_per_face;
-			dofs_on_children.resize (n_dofs_on_children);		      
 							 // Same procedure as for the
 							 // mother cell. Extract the face
 							 // DoFs from the cell DoFs.
-			subface->get_dof_indices (dofs_on_children,
-						  subface_fe_index);
+			slave_dofs.resize (subface->get_fe(subface_fe_index)
+					   .dofs_per_face);
+			subface->get_dof_indices (slave_dofs, subface_fe_index);
 					      
 							 // Now create the
 							 // element constraint
@@ -2466,8 +2528,8 @@ namespace internal
 				  << std::endl;
 #endif
 			
-			filter_constraints (dofs_on_mother,
-					    dofs_on_children,
+			filter_constraints (master_dofs,
+					    slave_dofs,
 					    *(subface_interpolation_matrices
                                               [cell->active_fe_index()][subface_fe_index][c]),
 					    constraints);
@@ -2551,33 +2613,32 @@ namespace internal
                        face_interpolation_matrices
                        [dominating_fe_index][cell->active_fe_index()]);
                     
-		    const FullMatrix<double> &restrict_mother_to_virtual
-                      = *(face_interpolation_matrices
-                          [dominating_fe_index][cell->active_fe_index()]);
-
 						     // split this matrix into
 						     // master and slave
 						     // components. invert the
 						     // master component
-		    FullMatrix<double>
-		      restrict_mother_to_virtual_master_inv (dominating_fe.dofs_per_face,
-							     dominating_fe.dofs_per_face);
-		    for (unsigned int i=0; i<dominating_fe.dofs_per_face; ++i)
-		      for (unsigned int j=0; j<dominating_fe.dofs_per_face; ++j)
-			restrict_mother_to_virtual_master_inv(i,j)
-			  = restrict_mother_to_virtual(i,j);
-		    restrict_mother_to_virtual_master_inv.gauss_jordan ();
+		    ensure_existence_of_split_face_matrix
+		      (*face_interpolation_matrices
+                       [dominating_fe_index][cell->active_fe_index()],
+		       split_face_interpolation_matrices
+                       [dominating_fe_index][cell->active_fe_index()]);
 		    
-		    FullMatrix<double>
-		      restrict_mother_to_virtual_slave (cell->get_fe().dofs_per_face -
-							dominating_fe.dofs_per_face,
-							dominating_fe.dofs_per_face);
-		    for (unsigned int i=0;
-			 i<cell->get_fe().dofs_per_face-dominating_fe.dofs_per_face; ++i)
-		      for (unsigned int j=0; j<dominating_fe.dofs_per_face; ++j)
-			restrict_mother_to_virtual_slave(i,j)
-			  = restrict_mother_to_virtual(i+dominating_fe.dofs_per_face,j);
-		    
+		    const FullMatrix<double> &restrict_mother_to_virtual_master_inv
+		      = (split_face_interpolation_matrices
+			 [dominating_fe_index][cell->active_fe_index()]->first);
+
+		    const FullMatrix<double> &restrict_mother_to_virtual_slave
+		      = (split_face_interpolation_matrices
+			 [dominating_fe_index][cell->active_fe_index()]->second);
+
+						     // now compute
+						     // the constraint
+						     // matrix as the
+						     // product
+						     // between the
+						     // inverse matrix
+						     // and the slave
+						     // part
 		    constraint_matrix.reinit (cell->get_fe().dofs_per_face -
                                               dominating_fe.dofs_per_face,
                                               dominating_fe.dofs_per_face);
@@ -2585,20 +2646,31 @@ namespace internal
 		      .mmult (constraint_matrix,
 			      restrict_mother_to_virtual_master_inv);
 
-		    std::vector<unsigned int> face_dofs (cell->get_fe().dofs_per_face);
-		    cell->face(face)->get_dof_indices (face_dofs, cell->active_fe_index ());
+						     // then figure
+						     // out the global
+						     // numbers of
+						     // master and
+						     // slave dofs and
+						     // apply
+						     // constraints
+		    scratch_dofs.resize (cell->get_fe().dofs_per_face);
+		    cell->face(face)->get_dof_indices (scratch_dofs, cell->active_fe_index ());
 
-		    std::vector<unsigned int> master_dofs (dominating_fe.dofs_per_face,
-							   deal_II_numbers::invalid_unsigned_int);
-		    std::vector<unsigned int> slave_dofs (cell->get_fe().dofs_per_face -
-							  dominating_fe.dofs_per_face,
-							   deal_II_numbers::invalid_unsigned_int);
-		    for (unsigned int i=0; i<dominating_fe.dofs_per_face; ++i)
-		      master_dofs[i] = face_dofs[i];
+		    master_dofs.clear ();
+		    master_dofs.insert (master_dofs.begin(),
+					scratch_dofs.begin(),
+					scratch_dofs.begin() + dominating_fe.dofs_per_face);
+
+		    slave_dofs.clear ();
+		    slave_dofs.insert (slave_dofs.begin(),
+				       scratch_dofs.begin() + dominating_fe.dofs_per_face,
+				       scratch_dofs.end());
 		    
-		    for (unsigned int i=0;
-			 i<cell->get_fe().dofs_per_face - dominating_fe.dofs_per_face; ++i)
-		      slave_dofs[i] = face_dofs[i + dominating_fe.dofs_per_face];
+		    Assert (master_dofs.size() == dominating_fe.dofs_per_face,
+			    ExcInternalError());
+		    Assert (slave_dofs.size() ==
+			    cell->get_fe().dofs_per_face - dominating_fe.dofs_per_face,
+			    ExcInternalError());
 		    
 #ifdef WOLFGANG
 		    std::cout << "Constraints for cell=" << cell
@@ -2656,8 +2728,8 @@ namespace internal
 			  .mmult (constraint_matrix,
 				  restrict_mother_to_virtual_master_inv);
 			
-			std::vector<unsigned int> subface_dofs (subface_fe.dofs_per_face);
-			cell->face(face)->child(sf)->get_dof_indices (subface_dofs,
+			slave_dofs.resize (subface_fe.dofs_per_face);
+			cell->face(face)->child(sf)->get_dof_indices (slave_dofs,
 								      subface_fe_index);
 
 #ifdef WOLFGANG
@@ -2668,7 +2740,7 @@ namespace internal
 				  << std::endl;
 #endif
 			filter_constraints (master_dofs,
-					    subface_dofs,
+					    slave_dofs,
 					    constraint_matrix,
 					    constraints);
 		      }
@@ -2723,12 +2795,12 @@ namespace internal
                                                        // dominating and
                                                        // dominated side of
                                                        // the face
-                      dofs_on_mother.resize (cell->get_fe().dofs_per_face);
-                      cell->face(face)->get_dof_indices (dofs_on_mother,
+                      master_dofs.resize (cell->get_fe().dofs_per_face);
+                      cell->face(face)->get_dof_indices (master_dofs,
                                                          cell->active_fe_index ());
                           
-                      dofs_on_children.resize (neighbor->get_fe().dofs_per_face);
-                      cell->face(face)->get_dof_indices (dofs_on_children,
+                      slave_dofs.resize (neighbor->get_fe().dofs_per_face);
+                      cell->face(face)->get_dof_indices (slave_dofs,
 							 neighbor->active_fe_index ());
 			  
 						  
@@ -2750,8 +2822,8 @@ namespace internal
 		      std::cout << "p-constraints for cell=" << cell
 				<< ", face=" << face << std::endl;
 #endif
-                      filter_constraints (dofs_on_mother,
-                                          dofs_on_children,
+                      filter_constraints (master_dofs,
+                                          slave_dofs,
                                           *(face_interpolation_matrices
                                             [cell->active_fe_index()]
                                             [neighbor->active_fe_index()]),
