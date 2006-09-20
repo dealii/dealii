@@ -1579,8 +1579,9 @@ namespace internal
       {
         if (matrix == 0)
           {
-            matrix = new FullMatrix<double> (fe2.dofs_per_face,
-                                             fe1.dofs_per_face);
+            matrix = boost::shared_ptr<FullMatrix<double> >
+                     (new FullMatrix<double> (fe2.dofs_per_face,
+                                              fe1.dofs_per_face));
             fe1.get_face_interpolation_matrix (fe2,
                                                *matrix);
           }
@@ -1601,8 +1602,9 @@ namespace internal
       {
         if (matrix == 0)
           {
-            matrix = new FullMatrix<double> (fe2.dofs_per_face,
-                                             fe1.dofs_per_face);
+            matrix = boost::shared_ptr<FullMatrix<double> >
+                     (new FullMatrix<double> (fe2.dofs_per_face,
+                                              fe1.dofs_per_face));
             fe1.get_subface_interpolation_matrix (fe2,
                                                   subface,
                                                   *matrix);
@@ -1631,6 +1633,31 @@ namespace internal
       {
           static const bool value = false;
       };
+
+
+                                       /**
+                                        * A function that returns how
+                                        * many different finite
+                                        * elements a dof handler
+                                        * uses. This is one for non-hp
+                                        * DoFHandlers and
+                                        * dof_handler.get_fe().size()
+                                        * for the hp-versions.
+                                        */
+      template <int dim>
+      unsigned int
+      n_finite_elements (const ::hp::DoFHandler<dim> &dof_handler)
+      {
+        return dof_handler.get_fe().size();
+      }
+
+
+      template <class DH>
+      unsigned int
+      n_finite_elements (const DH &)
+      {
+        return 1;
+      }
       
 
       
@@ -2156,7 +2183,21 @@ namespace internal
       std::vector<unsigned int> dofs_on_mother;
       std::vector<unsigned int> dofs_on_children;
 
-      FullMatrix<double> constraint_matrix;
+                                       // caches for the face and
+                                       // subface interpolation
+                                       // matrices between different
+                                       // (or the same) finite
+                                       // elements. we compute them
+                                       // only once, namely the first
+                                       // time they are needed, and
+                                       // then just reuse them
+      Table<2,boost::shared_ptr<FullMatrix<double> > >
+        face_interpolation_matrices (n_finite_elements (dof_handler),
+                                     n_finite_elements (dof_handler));
+      Table<3,boost::shared_ptr<FullMatrix<double> > >
+        subface_interpolation_matrices (n_finite_elements (dof_handler),
+                                        n_finite_elements (dof_handler),
+                                        GeometryInfo<dim>::subfaces_per_face);
       
 				       // loop over all faces; only on
 				       // face there can be constraints.
@@ -2331,11 +2372,12 @@ namespace internal
 							 // properties of a
 							 // finite element onto
 							 // that mesh
-			constraint_matrix.reinit (n_dofs_on_children,
-                                                  n_dofs_on_mother);
-			cell->get_fe()
-			  .get_subface_interpolation_matrix (subface->get_fe(subface_fe_index),
-							     c, constraint_matrix);
+                        assert_existence_of_subface_matrix
+                          (cell->get_fe(),
+                           subface->get_fe(subface_fe_index),
+                           c,
+                           subface_interpolation_matrices
+                           [cell->active_fe_index()][subface_fe_index][c]);
 
 							 // Add constraints to global constraint
 							 // matrix.
@@ -2348,7 +2390,8 @@ namespace internal
 			
 			filter_constraints (dofs_on_mother,
 					    dofs_on_children,
-					    constraint_matrix,
+					    *(subface_interpolation_matrices
+                                              [cell->active_fe_index()][subface_fe_index][c]),
 					    constraints);
 		      }
 		    
