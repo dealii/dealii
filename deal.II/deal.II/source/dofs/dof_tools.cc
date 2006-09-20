@@ -1658,6 +1658,78 @@ namespace internal
       {
         return 1;
       }
+
+
+                                       /**
+                                        * For a given face belonging
+                                        * to an active cell that
+                                        * borders to a more refined
+                                        * cell, return the fe_index of
+                                        * the most dominating finite
+                                        * element used on any of the
+                                        * face's subfaces.
+                                        */
+      template <int dim, typename face_iterator>
+      unsigned int
+      get_most_dominating_subface_fe_index (const face_iterator &face)
+      {
+        unsigned int dominating_subface_no = 0;
+        for (; dominating_subface_no<GeometryInfo<dim>::subfaces_per_face;
+             ++dominating_subface_no)
+          {
+                                             // each of the subfaces
+                                             // can have only a single
+                                             // fe_index associated
+                                             // with them, since there
+                                             // is no cell on the
+                                             // other side
+            Assert (face->child(dominating_subface_no)
+                    ->n_active_fe_indices()
+                    == 1,
+                    ExcInternalError());
+			
+            const FiniteElement<dim> &
+              this_subface_fe = (face->child(dominating_subface_no)
+                                 ->get_fe (face->child(dominating_subface_no)
+                                           ->nth_active_fe_index(0)));
+			
+            FiniteElementDomination::Domination
+              domination = FiniteElementDomination::either_element_can_dominate;
+            for (unsigned int sf=0; sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
+              if (sf != dominating_subface_no)
+                {
+                  const FiniteElement<dim> &
+                    that_subface_fe = (face->child(sf)
+                                       ->get_fe (face->child(sf)
+                                                 ->nth_active_fe_index(0)));
+			      
+                  domination = domination &
+                               this_subface_fe.compare_for_face_domination(that_subface_fe);
+                }
+			
+                                             // see if the element
+                                             // on this subface is
+                                             // able to dominate
+                                             // the ones on all
+                                             // other subfaces,
+                                             // and if so take it
+            if ((domination == FiniteElementDomination::this_element_dominates)
+                ||
+                (domination == FiniteElementDomination::either_element_can_dominate))
+              break;
+          }
+
+                                         // check that we have
+                                         // found one such subface
+        Assert (dominating_subface_no != GeometryInfo<dim>::subfaces_per_face,
+                ExcNotImplemented());
+
+                                         // return the finite element
+                                         // index used on it. note
+                                         // that only a single fe can
+                                         // be active on such subfaces
+        return face->child (dominating_subface_no)->nth_active_fe_index(0);
+      }
       
 
       
@@ -2176,13 +2248,19 @@ namespace internal
     make_hp_hanging_node_constraints (const DH         &dof_handler,
 				      ConstraintMatrix &constraints)
     {
-//TODO[WB]: we should call get_{sub,}face_interpolation_matrix only once per pair of finite elements -- since they return only stuff that counts in local dof numbers, their results are always the same. we should then just store the result in a lazy table
-//TODO[WB]: we should short-circuit some of the more expensive things dealing with domination of finite elements for non-hp DoFHandlers.
+//TODO[WB]: in the complex case, we should also store the inverses of the matrices in a cache table
       const unsigned int dim = DH::dimension;
       
       std::vector<unsigned int> dofs_on_mother;
       std::vector<unsigned int> dofs_on_children;
 
+                                       // a matrix to be used for
+                                       // constraints below. declared
+                                       // here and simply resized down
+                                       // below to avoid permanent
+                                       // re-allocation of memory
+      FullMatrix<double> constraint_matrix;
+      
                                        // caches for the face and
                                        // subface interpolation
                                        // matrices between different
@@ -2422,75 +2500,33 @@ namespace internal
                     Assert (DoFHandlerSupportsDifferentP<DH>::value == true,
                             ExcInternalError());
 
-						     // we first have to find
-						     // one of the children
-						     // for which the finite
-						     // element is able to
-						     // generate a space that
-						     // all the other ones can
-						     // be constrained to                    
-		    unsigned int dominating_subface_no = 0;
-		    for (; dominating_subface_no<GeometryInfo<dim>::subfaces_per_face;
-			 ++dominating_subface_no)
-		      {
-							 // each of the
-							 // subfaces can have
-							 // only a single
-							 // fe_index
-							 // associated with
-							 // them, since there
-							 // is no cell on the
-							 // other side
-			Assert (cell->face(face)->child(dominating_subface_no)
-				->n_active_fe_indices()
-				== 1,
-				ExcInternalError());
-			
-			const FiniteElement<dim> &
-			  this_subface_fe = (cell->face(face)->child(dominating_subface_no)
-					     ->get_fe (cell->face(face)->child(dominating_subface_no)
-						       ->nth_active_fe_index(0)));
-			
-			FiniteElementDomination::Domination
-			  domination = FiniteElementDomination::either_element_can_dominate;
-			for (unsigned int sf=0; sf<GeometryInfo<dim>::subfaces_per_face; ++sf)
-			  if (sf != dominating_subface_no)
-			    {
-			      const FiniteElement<dim> &
-				that_subface_fe = (cell->face(face)->child(sf)
-						   ->get_fe (cell->face(face)->child(sf)
-							     ->nth_active_fe_index(0)));
-			      
-			      domination = domination &
-					   this_subface_fe.compare_for_face_domination(that_subface_fe);
-			    }
-			
-							 // see if the element
-							 // on this subface is
-							 // able to dominate
-							 // the ones on all
-							 // other subfaces,
-							 // and if so take it
-			if ((domination == FiniteElementDomination::this_element_dominates)
-			    ||
-			    (domination == FiniteElementDomination::either_element_can_dominate))
-			  break;
-		      }
-
-						     // check that we have
-						     // found one such subface
-		    Assert (dominating_subface_no != GeometryInfo<dim>::subfaces_per_face,
-			    ExcNotImplemented());
-
-		    const unsigned int dominating_fe_index
-		      = cell->face(face)->child (dominating_subface_no)->nth_active_fe_index(0);
-
+						     // we first have
+						     // to find the
+						     // finite element
+						     // that is able
+						     // to generate a
+						     // space that all
+						     // the other ones
+						     // can be
+						     // constrained to
+                    const unsigned int dominating_fe_index
+                      = get_most_dominating_subface_fe_index<dim> (cell->face(face));
+                    
 		    const FiniteElement<dim> &dominating_fe
-		      = cell->face(face)->child (dominating_subface_no)->get_fe (dominating_fe_index);
+		      = dof_handler.get_fe()[dominating_fe_index];
 		    
-						     // check also that it is
-						     // able to constrain the
-						     // mother face
+						     // check also
+						     // that it is
+						     // able to
+						     // constrain the
+						     // mother
+						     // face. it
+						     // should be, or
+						     // we wouldn't
+						     // have gotten
+						     // into the
+						     // branch for the
+						     // 'complex' case
 		    Assert ((dominating_fe.compare_for_face_domination
 			     (cell->face(face)->get_fe(cell->face(face)->nth_active_fe_index(0)))
 			     == FiniteElementDomination::this_element_dominates)
@@ -2508,10 +2544,16 @@ namespace internal
 		    Assert (dominating_fe.dofs_per_face <=
 			    cell->get_fe().dofs_per_face,
 			    ExcInternalError());
-		    FullMatrix<double> restrict_mother_to_virtual (cell->get_fe().dofs_per_face,
-								   dominating_fe.dofs_per_face);
-		    dominating_fe.get_face_interpolation_matrix (cell->get_fe(),
-								 restrict_mother_to_virtual);
+
+                    assert_existence_of_face_matrix
+                      (dominating_fe,
+                       cell->get_fe(),
+                       face_interpolation_matrices
+                       [dominating_fe_index][cell->active_fe_index()]);
+                    
+		    const FullMatrix<double> &restrict_mother_to_virtual
+                      = *(face_interpolation_matrices
+                          [dominating_fe_index][cell->active_fe_index()]);
 
 						     // split this matrix into
 						     // master and slave
@@ -2536,11 +2578,11 @@ namespace internal
 			restrict_mother_to_virtual_slave(i,j)
 			  = restrict_mother_to_virtual(i+dominating_fe.dofs_per_face,j);
 		    
-		    FullMatrix<double> face_constraints (cell->get_fe().dofs_per_face -
-							 dominating_fe.dofs_per_face,
-							 dominating_fe.dofs_per_face);
+		    constraint_matrix.reinit (cell->get_fe().dofs_per_face -
+                                              dominating_fe.dofs_per_face,
+                                              dominating_fe.dofs_per_face);
 		    restrict_mother_to_virtual_slave
-		      .mmult (face_constraints,
+		      .mmult (constraint_matrix,
 			      restrict_mother_to_virtual_master_inv);
 
 		    std::vector<unsigned int> face_dofs (cell->get_fe().dofs_per_face);
@@ -2557,14 +2599,6 @@ namespace internal
 		    for (unsigned int i=0;
 			 i<cell->get_fe().dofs_per_face - dominating_fe.dofs_per_face; ++i)
 		      slave_dofs[i] = face_dofs[i + dominating_fe.dofs_per_face];
-
-		    for (unsigned int i=0; i<master_dofs.size(); ++i)
-		      Assert (master_dofs[i] < dof_handler.n_dofs(),
-			      ExcInternalError());
-		    for (unsigned int i=0; i<slave_dofs.size(); ++i)
-		      Assert (slave_dofs[i] < dof_handler.n_dofs(),
-			      ExcInternalError());
-		    
 		    
 #ifdef WOLFGANG
 		    std::cout << "Constraints for cell=" << cell
@@ -2574,8 +2608,8 @@ namespace internal
 #endif
 		    filter_constraints (master_dofs,
 					slave_dofs,
-					face_constraints,
-					constraints);		      
+					constraint_matrix,
+					constraints);
 
 
 
@@ -2594,7 +2628,7 @@ namespace internal
 			const unsigned int subface_fe_index
 			  = cell->face(face)->child(sf)->nth_active_fe_index(0);
 			const FiniteElement<dim> &subface_fe
-			  = cell->face(face)->child(sf)->get_fe(subface_fe_index);
+			  = dof_handler.get_fe()[subface_fe_index];
 			    
 							 // first get the
 							 // interpolation
@@ -2604,16 +2638,22 @@ namespace internal
 			Assert (dominating_fe.dofs_per_face <=
 				subface_fe.dofs_per_face,
 				ExcInternalError());
-			FullMatrix<double> restrict_subface_to_virtual (subface_fe.dofs_per_face,
-									dominating_fe.dofs_per_face);
-			dominating_fe.get_subface_interpolation_matrix (subface_fe,
-									sf,
-									restrict_subface_to_virtual);
-			FullMatrix<double> subface_constraints (subface_fe.dofs_per_face,
-								dominating_fe.dofs_per_face);
+                        assert_existence_of_subface_matrix
+                          (dominating_fe,
+                           subface_fe,
+                           sf,
+                           subface_interpolation_matrices
+                           [dominating_fe_index][subface_fe_index][sf]);
+                    
+                        const FullMatrix<double> &restrict_subface_to_virtual
+                          = *(subface_interpolation_matrices
+                              [dominating_fe_index][subface_fe_index][sf]);
+
+                        constraint_matrix.reinit (subface_fe.dofs_per_face,
+                                                  dominating_fe.dofs_per_face);
 			
 			restrict_subface_to_virtual
-			  .mmult (subface_constraints,
+			  .mmult (constraint_matrix,
 				  restrict_mother_to_virtual_master_inv);
 			
 			std::vector<unsigned int> subface_dofs (subface_fe.dofs_per_face);
@@ -2629,7 +2669,7 @@ namespace internal
 #endif
 			filter_constraints (master_dofs,
 					    subface_dofs,
-					    subface_constraints,
+					    constraint_matrix,
 					    constraints);
 		      }
 			
@@ -2660,7 +2700,9 @@ namespace internal
 					           // and the same h-level,
 						   // some action has
 						   // to be taken.
-	      if (!cell->face(face)->at_boundary ()
+	      if ((DoFHandlerSupportsDifferentP<DH>::value == true)
+                  &&
+                  !cell->face(face)->at_boundary ()
                   &&
                   (cell->neighbor(face)->active_fe_index () !=
                    cell->active_fe_index ())
@@ -2690,12 +2732,17 @@ namespace internal
 							 neighbor->active_fe_index ());
 			  
 						  
-                                                       // Now create the element
-                                                       // constraint for this subface.
-                      FullMatrix<double> face_constraints (dofs_on_children.size(),
-                                                           dofs_on_mother.size());
-                      cell->get_fe().get_face_interpolation_matrix (neighbor->get_fe (),
-                                                                    face_constraints);
+                                                       // make sure
+                                                       // the element
+                                                       // constraints
+                                                       // for this
+                                                       // face are
+                                                       // available
+                      assert_existence_of_face_matrix
+                        (cell->get_fe(),
+                         neighbor->get_fe(),
+                         face_interpolation_matrices
+                         [cell->active_fe_index()][neighbor->active_fe_index()]);
 
                                                        // Add constraints to global constraint
                                                        // matrix.
@@ -2705,7 +2752,9 @@ namespace internal
 #endif
                       filter_constraints (dofs_on_mother,
                                           dofs_on_children,
-                                          face_constraints,
+                                          *(face_interpolation_matrices
+                                            [cell->active_fe_index()]
+                                            [neighbor->active_fe_index()]),
                                           constraints);
 
 		      break;
