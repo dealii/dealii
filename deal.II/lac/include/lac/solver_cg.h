@@ -397,7 +397,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 	    offdiagonal.push_back(std::sqrt(beta)/alpha);
 	  }
 
-	if (additional_data.compute_all_condition_numbers)
+	if (additional_data.compute_all_condition_numbers && (diagonal.size()>1))
 	  {
 	    TridiagonalMatrix<double> T(diagonal.size(), true);
 	    for (unsigned int i=0;i<diagonal.size();++i)
@@ -432,7 +432,8 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
         }
       T.compute_eigenvalues();
       if (additional_data.compute_condition_number
-          & ! additional_data.compute_all_condition_numbers)
+          && ! additional_data.compute_all_condition_numbers
+	  && (diagonal.size() > 1))
         deallog << "Condition number estimate: " <<
           T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
       if (additional_data.compute_eigenvalues)
