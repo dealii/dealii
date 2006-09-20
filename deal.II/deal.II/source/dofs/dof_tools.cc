@@ -37,7 +37,7 @@
 #include <algorithm>
 #include <numeric>
 
-#define WOLFGANG
+//#define WOLFGANG
 
 
 #if  deal_II_dimension == 1
@@ -1562,6 +1562,78 @@ namespace internal
   {
     namespace 
     {
+                                       /**
+                                        * Make sure that the given @p
+                                        * face_interpolation_matrix
+                                        * pointer points to a valid
+                                        * matrix. If the pointer is zero
+                                        * beforehand, create an entry
+                                        * with the correct data. If it
+                                        * is nonzero, don't touch it.
+                                        */
+      template <int dim>
+      void
+      assert_existence_of_face_matrix (const FiniteElement<dim> &fe1,
+                                       const FiniteElement<dim> &fe2,
+                                       boost::shared_ptr<FullMatrix<double> > &matrix)
+      {
+        if (matrix == 0)
+          {
+            matrix = new FullMatrix<double> (fe2.dofs_per_face,
+                                             fe1.dofs_per_face);
+            fe1.get_face_interpolation_matrix (fe2,
+                                               *matrix);
+          }
+      }
+
+
+
+				     /**
+				      * Same, but for subface
+				      * interpolation matrices.
+				      */
+      template <int dim>
+      void
+      assert_existence_of_subface_matrix (const FiniteElement<dim> &fe1,
+                                          const FiniteElement<dim> &fe2,
+                                          const unsigned int        subface,
+                                          boost::shared_ptr<FullMatrix<double> > &matrix)
+      {
+        if (matrix == 0)
+          {
+            matrix = new FullMatrix<double> (fe2.dofs_per_face,
+                                             fe1.dofs_per_face);
+            fe1.get_subface_interpolation_matrix (fe2,
+                                                  subface,
+                                                  *matrix);
+          }
+      }
+
+
+                                       // a template that can
+                                       // determine statically whether
+                                       // a given DoFHandler class
+                                       // supports different finite
+                                       // element elements
+      template <typename> struct DoFHandlerSupportsDifferentP
+      {
+          static const bool value = true;
+      };
+
+
+      template <int dim> struct DoFHandlerSupportsDifferentP< ::DoFHandler<dim> >
+      {
+          static const bool value = false;
+      };
+
+
+      template <int dim> struct DoFHandlerSupportsDifferentP< ::MGDoFHandler<dim> >
+      {
+          static const bool value = false;
+      };
+      
+
+      
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
       static
 #endif      
@@ -2084,7 +2156,7 @@ namespace internal
       std::vector<unsigned int> dofs_on_mother;
       std::vector<unsigned int> dofs_on_children;
 
-      FullMatrix<double> face_constraints;
+      FullMatrix<double> constraint_matrix;
       
 				       // loop over all faces; only on
 				       // face there can be constraints.
@@ -2136,34 +2208,52 @@ namespace internal
 		Assert (cell->face(face)->child(c)->n_active_fe_indices() == 1,
 			ExcInternalError());
 
-					       // first find out whether we
-					       // can constrain each of the
-					       // subfaces to the mother
-					       // face. in the lingo of the hp
-					       // paper, this would be the
-					       // simple case
+					       // first find out
+					       // whether we can
+					       // constrain each of
+					       // the subfaces to the
+					       // mother face. in the
+					       // lingo of the hp
+					       // paper, this would be
+					       // the simple
+					       // case. note that we
+					       // can short-circuit
+					       // this decision if the
+					       // dof_handler doesn't
+					       // support hp at all
 	      FiniteElementDomination::Domination
 		mother_face_dominates = FiniteElementDomination::either_element_can_dominate;
-	      for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
-		mother_face_dominates = mother_face_dominates &
-					(cell->get_fe().compare_for_face_domination
-					 (cell->neighbor_child_on_subface (face, c)->get_fe()));
+
+              if (DoFHandlerSupportsDifferentP<DH>::value == true)
+                for (unsigned int c=0; c<GeometryInfo<dim>::subfaces_per_face; ++c)
+                  mother_face_dominates = mother_face_dominates &
+                                          (cell->get_fe().compare_for_face_domination
+                                           (cell->neighbor_child_on_subface (face, c)->get_fe()));
 
 	      switch (mother_face_dominates)
 		{
 		  case FiniteElementDomination::this_element_dominates:
 		  case FiniteElementDomination::either_element_can_dominate:
 		  {
-						     // Case 1 (the simple
-						     // case): The coarse
-						     // element dominates the
-						     // elements on the
-						     // subfaces (or they are
+						     // Case 1 (the
+						     // simple case
+						     // and the only
+						     // case that can
+						     // happen for
+						     // non-hp
+						     // DoFHandlers):
+						     // The coarse
+						     // element
+						     // dominates the
+						     // elements on
+						     // the subfaces
+						     // (or they are
 						     // all the same)
 		    const unsigned int n_dofs_on_mother = cell->get_fe().dofs_per_face;
 		    dofs_on_mother.resize (n_dofs_on_mother);
 
-		    cell->face(face)->get_dof_indices (dofs_on_mother, cell->active_fe_index ());
+		    cell->face(face)->get_dof_indices (dofs_on_mother,
+                                                       cell->active_fe_index ());
 		  
 						     // Now create constraint matrix for
 						     // the subfaces and assemble it.
@@ -2241,11 +2331,11 @@ namespace internal
 							 // properties of a
 							 // finite element onto
 							 // that mesh
-			face_constraints.reinit (n_dofs_on_children,
-						 n_dofs_on_mother);
+			constraint_matrix.reinit (n_dofs_on_children,
+                                                  n_dofs_on_mother);
 			cell->get_fe()
 			  .get_subface_interpolation_matrix (subface->get_fe(subface_fe_index),
-							     c, face_constraints);
+							     c, constraint_matrix);
 
 							 // Add constraints to global constraint
 							 // matrix.
@@ -2258,7 +2348,7 @@ namespace internal
 			
 			filter_constraints (dofs_on_mother,
 					    dofs_on_children,
-					    face_constraints,
+					    constraint_matrix,
 					    constraints);
 		      }
 		    
@@ -2279,13 +2369,23 @@ namespace internal
 						     // deal with this
 						     // situation
 						     //
+                                                     // since this is
+                                                     // something that
+                                                     // can only
+                                                     // happen for hp
+                                                     // dof handlers,
+                                                     // add a check
+                                                     // here...
+                    Assert (DoFHandlerSupportsDifferentP<DH>::value == true,
+                            ExcInternalError());
+
 						     // we first have to find
 						     // one of the children
 						     // for which the finite
 						     // element is able to
 						     // generate a space that
 						     // all the other ones can
-						     // be constrained to
+						     // be constrained to                    
 		    unsigned int dominating_subface_no = 0;
 		    for (; dominating_subface_no<GeometryInfo<dim>::subfaces_per_face;
 			 ++dominating_subface_no)
