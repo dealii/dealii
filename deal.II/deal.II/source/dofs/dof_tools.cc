@@ -1573,7 +1573,7 @@ namespace internal
                                         */
       template <int dim>
       void
-      assert_existence_of_face_matrix (const FiniteElement<dim> &fe1,
+      ensure_existence_of_face_matrix (const FiniteElement<dim> &fe1,
                                        const FiniteElement<dim> &fe2,
                                        boost::shared_ptr<FullMatrix<double> > &matrix)
       {
@@ -1595,7 +1595,7 @@ namespace internal
 				      */
       template <int dim>
       void
-      assert_existence_of_subface_matrix (const FiniteElement<dim> &fe1,
+      ensure_existence_of_subface_matrix (const FiniteElement<dim> &fe1,
                                           const FiniteElement<dim> &fe2,
                                           const unsigned int        subface,
                                           boost::shared_ptr<FullMatrix<double> > &matrix)
@@ -2450,7 +2450,7 @@ namespace internal
 							 // properties of a
 							 // finite element onto
 							 // that mesh
-                        assert_existence_of_subface_matrix
+                        ensure_existence_of_subface_matrix
                           (cell->get_fe(),
                            subface->get_fe(subface_fe_index),
                            c,
@@ -2545,7 +2545,7 @@ namespace internal
 			    cell->get_fe().dofs_per_face,
 			    ExcInternalError());
 
-                    assert_existence_of_face_matrix
+                    ensure_existence_of_face_matrix
                       (dominating_fe,
                        cell->get_fe(),
                        face_interpolation_matrices
@@ -2638,7 +2638,7 @@ namespace internal
 			Assert (dominating_fe.dofs_per_face <=
 				subface_fe.dofs_per_face,
 				ExcInternalError());
-                        assert_existence_of_subface_matrix
+                        ensure_existence_of_subface_matrix
                           (dominating_fe,
                            subface_fe,
                            sf,
@@ -2738,7 +2738,7 @@ namespace internal
                                                        // for this
                                                        // face are
                                                        // available
-                      assert_existence_of_face_matrix
+                      ensure_existence_of_face_matrix
                         (cell->get_fe(),
                          neighbor->get_fe(),
                          face_interpolation_matrices

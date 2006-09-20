@@ -55,7 +55,7 @@ namespace internal
 				      */
     template <int dim, int structdim>
     void
-    assert_existence_of_dof_identities (const FiniteElement<dim> &fe1,
+    ensure_existence_of_dof_identities (const FiniteElement<dim> &fe1,
 					const FiniteElement<dim> &fe2,
 					boost::shared_ptr<DoFIdentities> &identities)
     {
@@ -2186,7 +2186,7 @@ namespace hp
 						 // entry in the
 						 // equivalence
 						 // table exists
-		internal::hp::assert_existence_of_dof_identities<dim,0>
+		internal::hp::ensure_existence_of_dof_identities<dim,0>
 		  (get_fe()[first_fe_index],
 		   get_fe()[other_fe_index],
 		   vertex_dof_identities[first_fe_index][other_fe_index]);
@@ -2279,7 +2279,7 @@ namespace hp
 	      const unsigned int
 		other_fe_index = line->nth_active_fe_index (f);
 
-	      internal::hp::assert_existence_of_dof_identities<dim,1>
+	      internal::hp::ensure_existence_of_dof_identities<dim,1>
 		((*finite_elements)[first_fe_index],
 		 (*finite_elements)[other_fe_index],
 		 line_dof_identities[first_fe_index][other_fe_index]);
@@ -2354,7 +2354,7 @@ namespace hp
 	      const unsigned int
 		other_fe_index = quad->nth_active_fe_index (f);
 
-	      internal::hp::assert_existence_of_dof_identities<dim,2>
+	      internal::hp::ensure_existence_of_dof_identities<dim,2>
 		((*finite_elements)[first_fe_index],
 		 (*finite_elements)[other_fe_index],
 		 quad_dof_identities[first_fe_index][other_fe_index]);
