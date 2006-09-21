@@ -845,6 +845,18 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       New: The <code class="class">ConstraintMatrix</code> class did not
+       allow that one degree of freedom was constrained against another DoF
+       that was itself constrained. However, this is necessary for the
+       implementation of hp methods and is now allowed. Arbitrarily long chains
+       of constraints are resolved at the time the
+       <code>ConstraintMatrix::close()</code> function is called. The only
+       thing that is not allowed are cycles in such constraints.
+       <br> 
+       (WB 2006/09/19)
+       </p>
+
+  <li> <p>
        New: There are new functions <code
        class="member">GridTools::minimal_cell_diameter</code> and <code
        class="member">GridTools::maximal_cell_diameter</code>, with obvious
