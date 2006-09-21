@@ -170,6 +170,22 @@ void ConstraintMatrix::close ()
 				   // over all this until we replace
 				   // no chains of constraints any
 				   // more
+                                   //
+                                   // the iteration replaces
+                                   // references to constrained
+                                   // degrees of freedom by
+                                   // second-order references. for
+                                   // example if x3=x0/2+x2/2 and
+                                   // x2=x0/2+x1/2, then the new list
+                                   // will be x3=x0/2+x0/4+x1/4. note
+                                   // that x0 appear twice. we will
+                                   // throw this duplicate out in the
+                                   // following step, where we sort
+                                   // the list so that throwing out
+                                   // duplicates becomes much more
+                                   // efficient. also, we have to do
+                                   // it only once, rather than in
+                                   // each iteration
   unsigned int iteration = 0;
   while (true)
     {
@@ -285,13 +301,82 @@ void ConstraintMatrix::close ()
     }
 
 				   // finally sort the entries and
-				   // re-scale them if necessary
+				   // re-scale them if necessary. in
+				   // this step, we also throw out
+				   // duplicates as mentioned above
   for (std::vector<ConstraintLine>::iterator line = lines.begin();
        line!=lines.end(); ++line)
     {
-				       // now sort the remainder
       std::sort (line->entries.begin(), line->entries.end());
 
+                                       // loop over the now sorted
+                                       // list and see whether any of
+                                       // the entries references the
+                                       // same dofs more than once
+      for (unsigned int i=1; i<line->entries.size(); ++i)
+        if (line->entries[i].first == line->entries[i-1].first)
+          {
+                                             // ok, we've found a
+                                             // duplicate. go on to
+                                             // count how many
+                                             // duplicates there are
+                                             // so that we can
+                                             // allocate the right
+                                             // amount of memory
+            unsigned int duplicates = 1;
+            for (unsigned int j=i+1; j<line->entries.size(); ++j)
+              if (line->entries[j].first == line->entries[j-1].first)
+                ++duplicates;
+
+            std::vector<std::pair<unsigned int, double> > new_entries;
+            new_entries.reserve (line->entries.size() - duplicates);
+
+                                             // now copy all entries
+                                             // with unique keys. copy
+                                             // verbatim the entries
+                                             // at the front for which
+                                             // we have already
+                                             // determined that they
+                                             // have no duplicate
+                                             // copies
+            new_entries.insert (new_entries.begin(),
+                                line->entries.begin(),
+                                line->entries.begin()+i);
+                                             // now for the rest
+            for (unsigned int j=i; j<line->entries.size(); ++j)
+              if (line->entries[j].first == line->entries[j-1].first)
+                {
+                  Assert (new_entries.back().first == line->entries[j].first,
+                          ExcInternalError());
+                  new_entries.back().second += line->entries[j].second;
+                }
+              else
+                new_entries.push_back (line->entries[j]);
+            
+            Assert (new_entries.size() == line->entries.size() - duplicates,
+                    ExcInternalError());
+
+                                             // make sure there are
+                                             // really no duplicates
+                                             // left and that the list
+                                             // is still sorted
+            for (unsigned int j=1; j<new_entries.size(); ++j)
+              {
+                Assert (new_entries[j].first != new_entries[j-1].first,
+                        ExcInternalError());
+                Assert (new_entries[j].first > new_entries[j-1].first,
+                        ExcInternalError());
+              }
+
+            
+                                             // replace old list of
+                                             // constraints for this
+                                             // dof by the new one and
+                                             // quit loop
+            line->entries.swap (new_entries);
+            break;
+          }
+      
 				       // finally do the following
 				       // check: if the sum of
 				       // weights for the
