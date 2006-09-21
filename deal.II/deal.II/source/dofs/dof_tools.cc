@@ -1779,6 +1779,14 @@ namespace internal
       
 
       
+                                       /**
+                                        * This method removes zero
+                                        * constraints and those, which
+                                        * constrain a DoF which was
+                                        * already eliminated in one of
+                                        * the previous steps of the hp
+                                        * hanging node procedure.
+                                        */
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
       static
 #endif      
@@ -1788,12 +1796,6 @@ namespace internal
 			  const FullMatrix<double> &face_constraints,
 			  ConstraintMatrix &constraints)
       {
-					 // This method removes zero constraints
-					 // and those, which constrain a DoF which
-					 // was already eliminated in one of the
-					 // previous steps of the hp hanging node
-					 // procedure.
-
 	Assert (face_constraints.n () == master_dofs.size (),
 		ExcDimensionMismatch(master_dofs.size (),
 				     face_constraints.n()));
@@ -1804,41 +1806,42 @@ namespace internal
 	const unsigned int n_master_dofs = master_dofs.size ();
 	const unsigned int n_slave_dofs = slave_dofs.size ();      
 
-	for (unsigned int row=0; row!=n_slave_dofs; ++row) 
-	  {
-	    bool constraint_already_satisfied = false;
+	for (unsigned int row=0; row!=n_slave_dofs; ++row)
+          if (constraints.is_constrained (slave_dofs[row]) == false)
+            {
+              bool constraint_already_satisfied = false;
 
-					     // Check if we have an identity
-					     // constraint, which is already
-					     // satisfied by unification of
-					     // the corresponding global dof
-					     // indices
-	    for (unsigned int i=0; i<n_master_dofs; ++i)
-	      if (face_constraints (row,i) == 1.0)
-		if (master_dofs[i] == slave_dofs[row])
-		  {
-		    constraint_already_satisfied = true;
-		    break;
-		  }
+                                               // Check if we have an identity
+                                               // constraint, which is already
+                                               // satisfied by unification of
+                                               // the corresponding global dof
+                                               // indices
+              for (unsigned int i=0; i<n_master_dofs; ++i)
+                if (face_constraints (row,i) == 1.0)
+                  if (master_dofs[i] == slave_dofs[row])
+                    {
+                      constraint_already_satisfied = true;
+                      break;
+                    }
 
-	    if (constraint_already_satisfied == false)
-	      { 
-		constraints.add_line (slave_dofs[row]);
-		for (unsigned int i=0; i<n_master_dofs; ++i)
-                  if (face_constraints(row,i) != 0)
-		    {
+              if (constraint_already_satisfied == false)
+                { 
+                  constraints.add_line (slave_dofs[row]);
+                  for (unsigned int i=0; i<n_master_dofs; ++i)
+                    if (face_constraints(row,i) != 0)
+                      {
 #ifdef WOLFGANG
-		      std::cout << "   " << slave_dofs[row]
-				<< " -> " << face_constraints (row,i) << " * "
-				<< master_dofs[i]
-				<< std::endl;
+                        std::cout << "   " << slave_dofs[row]
+                                  << " -> " << face_constraints (row,i) << " * "
+                                  << master_dofs[i]
+                                  << std::endl;
 #endif
-		      constraints.add_entry (slave_dofs[row],
-					     master_dofs[i],
-					     face_constraints (row,i));
-		    }
-	      }  
-	  }      
+                        constraints.add_entry (slave_dofs[row],
+                                               master_dofs[i],
+                                               face_constraints (row,i));
+                      }
+                }
+            }      
       }
 
     }
@@ -2349,7 +2352,6 @@ namespace internal
       Table<2,boost::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > > >
         split_face_interpolation_matrices (n_finite_elements (dof_handler),
 					   n_finite_elements (dof_handler));
-
       
 				       // loop over all faces
 				       //
