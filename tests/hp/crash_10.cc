@@ -29,22 +29,7 @@
 
 #include <dofs/dof_tools.h>
 
-#include <fe/hp_fe_values.h>
-#include <base/quadrature_lib.h>
-
-#include <base/function.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
-
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
-
-#include <numerics/data_out.h>
 #include <fstream>
-#include <iostream>
 
 std::ofstream logfile("crash_10/output");
 
