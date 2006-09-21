@@ -69,6 +69,22 @@ void test ()
     cell->set_active_fe_index (random() % fe.size());
   
   dof_handler.distribute_dofs (fe);
+
+  cell = dof_handler.begin_active ();
+  for (; cell != endc; ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      {
+	deallog << "cell=" << cell << ", face=" << f
+		<< ", fe_index=" << cell->active_fe_index()
+		<< ", dofs=";
+	std::vector<unsigned int> dofs (fe[cell->active_fe_index()].dofs_per_face);
+	cell->face(f)->get_dof_indices (dofs,
+					cell->active_fe_index());
+	for (unsigned int i=0; i<dofs.size(); ++i)
+	  deallog << dofs[i] << ' ';
+	deallog << std::endl;
+      }
+  
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
 
