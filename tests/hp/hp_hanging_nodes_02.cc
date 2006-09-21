@@ -1,4 +1,4 @@
-//----------------------------  step-3.cc  ---------------------------
+//----------------------------  hp_hanging_node_constraints_02.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  step-3.cc  ---------------------------
+//----------------------------  hp_hanging_node_constraints_02.cc  ---------------------------
 
 
 // modified step-3 to be a L_2 projection. This function
