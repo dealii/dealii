@@ -52,7 +52,7 @@ void test ()
   
   
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (5-dim);
+  triangulation.refine_global (2);
   deallog << "Number of active cells: "
 	    << triangulation.n_active_cells()
 	    << std::endl;
@@ -66,7 +66,7 @@ void test ()
   typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active (),
 						     endc = dof_handler.end ();
   for (; cell != endc; ++cell)
-    cell->set_active_fe_index (random() % 4);
+    cell->set_active_fe_index (random() % fe.size());
   
   dof_handler.distribute_dofs (fe);
   DoFTools::make_hanging_node_constraints (dof_handler,
