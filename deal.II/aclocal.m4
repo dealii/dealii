@@ -3949,29 +3949,36 @@ dnl gcc compilers. This can be used to hint the compiler's branch
 dnl prediction unit in some cases. We use it in the AssertThrow
 dnl macros.
 dnl
+dnl Annoyingly, the Portland Group compiler compiles code with
+dnl __builtin_expect just fine, but then doesn't want to link it,
+dnl saying it doesn't know this function. So simply not test for
+dnl __builtin_expect with that compiler.
+dnl
 dnl Usage: DEAL_II_HAVE_BUILTIN_EXPECT
 dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_HAVE_BUILTIN_EXPECT, dnl
 [
-  AC_MSG_CHECKING(for __builtin_expect)
-  AC_LANG(C++)
-  CXXFLAGS="$CXXFLAGSG"
-  AC_TRY_COMPILE(
-    [
-	bool f();
-    ],
-    [
-	if (__builtin_expect(f(),false));
-    ],
-    [
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_BUILTIN_EXPECT, 1, 
-                [Define if the compiler provides __builtin_expect])
-    ],
-    [
-      AC_MSG_RESULT(no)
-    ])
+  if test ! "x$GXX_VERSION" = "xportland_group" ; then
+    AC_MSG_CHECKING(for __builtin_expect)
+    AC_LANG(C++)
+    CXXFLAGS="$CXXFLAGSG"
+    AC_TRY_COMPILE(
+      [
+	  bool f();
+      ],
+      [
+	  if (__builtin_expect(f(),false));
+      ],
+      [
+        AC_MSG_RESULT(yes)
+        AC_DEFINE(HAVE_BUILTIN_EXPECT, 1, 
+                  [Define if the compiler provides __builtin_expect])
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ])
+  fi
 ])
 
 
