@@ -106,6 +106,62 @@ namespace internal
 	    }
 	}
     }
+
+
+
+                                     /**
+                                      * For an object, such as a line
+                                      * or a quad iterator, determine
+                                      * the fe_index of the most
+                                      * dominating finite element that
+                                      * lives on this object.
+                                      */
+    template <int dim, typename iterator>
+    unsigned int
+    get_most_dominating_fe_index (const iterator &object)
+    {
+      unsigned int dominating_fe_index = 0;
+      for (; dominating_fe_index<object->n_active_fe_indices();
+           ++dominating_fe_index)
+        {
+          const FiniteElement<dim> &this_fe
+            = object->get_fe (object->nth_active_fe_index(dominating_fe_index));
+			
+          FiniteElementDomination::Domination
+            domination = FiniteElementDomination::either_element_can_dominate;
+          for (unsigned int other_fe_index=0;
+               other_fe_index<object->n_active_fe_indices();
+               ++other_fe_index)
+            if (other_fe_index != dominating_fe_index)
+              {
+                const FiniteElement<dim> &that_fe
+                  = object->get_fe (object->nth_active_fe_index(other_fe_index));
+			      
+                domination = domination &
+                             this_fe.compare_for_face_domination(that_fe);
+              }
+			
+                                           // see if this element is
+                                           // able to dominate all the
+                                           // other ones, and if so
+                                           // take it
+          if ((domination == FiniteElementDomination::this_element_dominates)
+              ||
+              (domination == FiniteElementDomination::either_element_can_dominate))
+            break;
+        }
+
+                                       // check that we have
+                                       // found one such fe
+      Assert (dominating_fe_index != object->n_active_fe_indices(),
+              ExcNotImplemented());
+
+                                       // return the finite element
+                                       // index used on it. note
+                                       // that only a single fe can
+                                       // be active on such subfaces
+      return object->nth_active_fe_index(dominating_fe_index);
+    }
   }
 }
 
@@ -2153,6 +2209,17 @@ namespace hp
   DoFHandler<dim>::
   compute_vertex_dof_identities (std::vector<unsigned int> &new_dof_indices) const
   {
+                                     // Note: we may wish to have
+                                     // something here similar to what
+                                     // we do for lines and quads,
+                                     // namely that we only identify
+                                     // dofs for any fe towards the
+                                     // most dominating one. however,
+                                     // it is not clear whether this
+                                     // is actually necessary for
+                                     // vertices at all, I can't think
+                                     // of a finite element that would
+                                     // make that necessary...
     Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
       vertex_dof_identities (get_fe().size(),
 			     get_fe().size());
@@ -2170,8 +2237,6 @@ namespace hp
 	    const unsigned int
 	      first_fe_index = nth_active_vertex_fe_index (vertex_index, 0);
 
-//TODO: we here only compare identities of fe[n] with fe[0] for n>=1, not all against all. think about whether this would bring any additional benefits (it would for example if we had Q2, Q4, and Q8 elements coming together at an edge in 3d)
-	    
 					     // loop over all the
 					     // other FEs with which
 					     // we want to identify
@@ -2258,9 +2323,12 @@ namespace hp
   DoFHandler<dim>::
   compute_line_dof_identities (std::vector<unsigned int> &new_dof_indices) const
   {
-				     // the algorithm is equivalent to
-				     // the one used for vertices, so
-				     // no comments here...
+                                     // An implementation of the
+                                     // algorithm described in the hp
+                                     // paper, including the
+                                     // modification mentioned later
+                                     // in the "complications in 3-d"
+                                     // subsections
     Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
       line_dof_identities (finite_elements->size(),
 			   finite_elements->size());
@@ -2268,39 +2336,51 @@ namespace hp
     for (line_iterator line=begin_line(); line!=end_line(); ++line)
       if (line->n_active_fe_indices() > 1)
 	{
+                                           // find out which is the
+                                           // most dominating finite
+                                           // element of the ones that
+                                           // are used on this line
+          const unsigned int most_dominating_fe_index
+            = internal::hp::get_most_dominating_fe_index<dim> (line);
+
 	  const unsigned int n_active_fe_indices
 	    = line->n_active_fe_indices ();
-	  const unsigned int
-	    first_fe_index = line->nth_active_fe_index (0);
 
-//TODO: we here only compare identities of fe[n] with fe[0] for n>=1, not all against all. think about whether this would bring any additional benefits (it would for example if we had Q2, Q4, and Q8 elements coming together at an edge in 3d)
-	  for (unsigned int f=1; f<n_active_fe_indices; ++f)
-	    {
-	      const unsigned int
-		other_fe_index = line->nth_active_fe_index (f);
+                                           // loop over the indices of
+                                           // all the finite elements
+                                           // that are not dominating,
+                                           // and identify their dofs
+                                           // to the most dominating
+                                           // one
+          for (unsigned int f=0; f<n_active_fe_indices; ++f)
+            if (line->nth_active_fe_index (f) !=
+                most_dominating_fe_index)
+              {
+                const unsigned int
+                  other_fe_index = line->nth_active_fe_index (f);
 
-	      internal::hp::ensure_existence_of_dof_identities<dim,1>
-		((*finite_elements)[first_fe_index],
-		 (*finite_elements)[other_fe_index],
-		 line_dof_identities[first_fe_index][other_fe_index]);
+                internal::hp::ensure_existence_of_dof_identities<dim,1>
+                  ((*finite_elements)[most_dominating_fe_index],
+                   (*finite_elements)[other_fe_index],
+                   line_dof_identities[most_dominating_fe_index][other_fe_index]);
 
-	      internal::hp::DoFIdentities &identities
-		= *line_dof_identities[first_fe_index][other_fe_index];
-	      for (unsigned int i=0; i<identities.size(); ++i)
-		{
-		  const unsigned int lower_dof_index
-		    = line->dof_index (identities[i].first, first_fe_index);
-		  const unsigned int higher_dof_index
-		    = line->dof_index (identities[i].second, other_fe_index);
+                internal::hp::DoFIdentities &identities
+                  = *line_dof_identities[most_dominating_fe_index][other_fe_index];
+                for (unsigned int i=0; i<identities.size(); ++i)
+                  {
+                    const unsigned int master_dof_index
+                      = line->dof_index (identities[i].first, most_dominating_fe_index);
+                    const unsigned int slave_dof_index
+                      = line->dof_index (identities[i].second, other_fe_index);
 
-		  Assert ((new_dof_indices[higher_dof_index] ==
-			   deal_II_numbers::invalid_unsigned_int)
-			  ||
-			  (new_dof_indices[higher_dof_index] ==
-			   lower_dof_index),
-			  ExcInternalError());
+                    Assert ((new_dof_indices[master_dof_index] ==
+                             deal_II_numbers::invalid_unsigned_int)
+                            ||
+                            (new_dof_indices[slave_dof_index] ==
+                             master_dof_index),
+                            ExcInternalError());
 		      
-		  new_dof_indices[higher_dof_index] = lower_dof_index;
+                    new_dof_indices[slave_dof_index] = master_dof_index;
 		}
 	    }
 	}
@@ -2333,9 +2413,12 @@ namespace hp
   DoFHandler<dim>::
   compute_quad_dof_identities (std::vector<unsigned int> &new_dof_indices) const
   {
-				     // the algorithm is equivalent to
-				     // the one used for vertices, so
-				     // no comments here...
+                                     // An implementation of the
+                                     // algorithm described in the hp
+                                     // paper, including the
+                                     // modification mentioned later
+                                     // in the "complications in 3-d"
+                                     // subsections
     Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
       quad_dof_identities (finite_elements->size(),
 			   finite_elements->size());
@@ -2343,39 +2426,51 @@ namespace hp
     for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
       if (quad->n_active_fe_indices() > 1)
 	{
+                                           // find out which is the
+                                           // most dominating finite
+                                           // element of the ones that
+                                           // are used on this quad
+          const unsigned int most_dominating_fe_index
+            = internal::hp::get_most_dominating_fe_index<dim> (quad);
+
 	  const unsigned int n_active_fe_indices
 	    = quad->n_active_fe_indices ();
-	  const unsigned int
-	    first_fe_index = quad->nth_active_fe_index (0);
 
-//TODO: we here only compare identities of fe[n] with fe[0] for n>=1, not all against all. think about whether this would bring any additional benefits (it would for example if we had Q2, Q4, and Q8 elements coming together at an edge in 3d)
-	  for (unsigned int f=1; f<n_active_fe_indices; ++f)
-	    {
-	      const unsigned int
-		other_fe_index = quad->nth_active_fe_index (f);
+                                           // loop over the indices of
+                                           // all the finite elements
+                                           // that are not dominating,
+                                           // and identify their dofs
+                                           // to the most dominating
+                                           // one
+          for (unsigned int f=0; f<n_active_fe_indices; ++f)
+            if (quad->nth_active_fe_index (f) !=
+                most_dominating_fe_index)
+              {
+                const unsigned int
+                  other_fe_index = quad->nth_active_fe_index (f);
 
-	      internal::hp::ensure_existence_of_dof_identities<dim,2>
-		((*finite_elements)[first_fe_index],
-		 (*finite_elements)[other_fe_index],
-		 quad_dof_identities[first_fe_index][other_fe_index]);
+                internal::hp::ensure_existence_of_dof_identities<dim,2>
+                  ((*finite_elements)[most_dominating_fe_index],
+                   (*finite_elements)[other_fe_index],
+                   quad_dof_identities[most_dominating_fe_index][other_fe_index]);
 
-	      internal::hp::DoFIdentities &identities
-		= *quad_dof_identities[first_fe_index][other_fe_index];
-	      for (unsigned int i=0; i<identities.size(); ++i)
-		{
-		  const unsigned int lower_dof_index
-		    = quad->dof_index (identities[i].first, first_fe_index);
-		  const unsigned int higher_dof_index
-		    = quad->dof_index (identities[i].second, other_fe_index);
+                internal::hp::DoFIdentities &identities
+                  = *quad_dof_identities[most_dominating_fe_index][other_fe_index];
+                for (unsigned int i=0; i<identities.size(); ++i)
+                  {
+                    const unsigned int master_dof_index
+                      = quad->dof_index (identities[i].first, most_dominating_fe_index);
+                    const unsigned int slave_dof_index
+                      = quad->dof_index (identities[i].second, other_fe_index);
 
-		  Assert ((new_dof_indices[higher_dof_index] ==
-			   deal_II_numbers::invalid_unsigned_int)
-			  ||
-			  (new_dof_indices[higher_dof_index] ==
-			   lower_dof_index),
-			  ExcInternalError());
+                    Assert ((new_dof_indices[master_dof_index] ==
+                             deal_II_numbers::invalid_unsigned_int)
+                            ||
+                            (new_dof_indices[slave_dof_index] ==
+                             master_dof_index),
+                            ExcInternalError());
 		      
-		  new_dof_indices[higher_dof_index] = lower_dof_index;
+                    new_dof_indices[slave_dof_index] = master_dof_index;
 		}
 	    }
 	}
