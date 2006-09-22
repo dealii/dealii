@@ -304,7 +304,7 @@ void LaplaceProblem<dim>::assemble_system (const Function<dim> &f_test)
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
-  SolverControl           solver_control (1000, 1e-12);
+  SolverControl           solver_control (system_rhs.size(), 1e-6);
   SolverCG<>              cg (solver_control);
 
   cg.solve (system_matrix, solution, system_rhs,
