@@ -2144,7 +2144,7 @@ namespace hp
             cell->face(f)->get_dof_indices (dofs_on_face);
             for (unsigned int i=0; i<dofs_per_face; ++i)
               boundary_dofs.insert(dofs_on_face[i]);
-          };
+          }
     return boundary_dofs.size();
   }
 
@@ -2329,12 +2329,26 @@ namespace hp
                                      // modification mentioned later
                                      // in the "complications in 3-d"
                                      // subsections
+                                     //
+                                     // as explained there, we do
+                                     // something only if there are
+                                     // exactly 2 finite elements
+                                     // associated with an object. if
+                                     // there is only one, then there
+                                     // is nothing to do anyway, and
+                                     // if there are 3 or more, then
+                                     // we can get into trouble. note
+                                     // that this only happens for
+                                     // lines in 3d and higher, and
+                                     // for quads only in 4d and
+                                     // higher, so this isn't a
+                                     // particularly frequent case
     Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
       line_dof_identities (finite_elements->size(),
 			   finite_elements->size());
 	
     for (line_iterator line=begin_line(); line!=end_line(); ++line)
-      if (line->n_active_fe_indices() > 1)
+      if (line->n_active_fe_indices() == 2)
 	{
                                            // find out which is the
                                            // most dominating finite
@@ -2419,12 +2433,26 @@ namespace hp
                                      // modification mentioned later
                                      // in the "complications in 3-d"
                                      // subsections
+                                     //
+                                     // as explained there, we do
+                                     // something only if there are
+                                     // exactly 2 finite elements
+                                     // associated with an object. if
+                                     // there is only one, then there
+                                     // is nothing to do anyway, and
+                                     // if there are 3 or more, then
+                                     // we can get into trouble. note
+                                     // that this only happens for
+                                     // lines in 3d and higher, and
+                                     // for quads only in 4d and
+                                     // higher, so this isn't a
+                                     // particularly frequent case
     Table<2,boost::shared_ptr<internal::hp::DoFIdentities> >
       quad_dof_identities (finite_elements->size(),
 			   finite_elements->size());
 	
     for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
-      if (quad->n_active_fe_indices() > 1)
+      if (quad->n_active_fe_indices() == 2)
 	{
                                            // find out which is the
                                            // most dominating finite
