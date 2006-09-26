@@ -11,7 +11,7 @@
 //
 //--------------------------------------------------------------------
 
-// Tests all aspects of LAPACKFullMatrix
+// Tests all aspects of LAPACKFullMatrix except eigenvectors
 
 #include "../tests.h"
 #include <base/logstream.h>
