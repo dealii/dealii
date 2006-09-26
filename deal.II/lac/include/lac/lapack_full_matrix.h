@@ -218,10 +218,15 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * LAPACKSupport::unusable after
 				      * this operation.
 				      *
+				      * The optional arguments allow
+				      * to compute left and right
+				      * eigenvectors as well.
+				      *
 				      * @note Calls the LAPACK
 				      * function Xgeev.
 				      */
-    void compute_eigenvalues ();
+    void compute_eigenvalues (const bool right_eigenvectors = false,
+			      const bool left_eigenvectors = false);
 
 				     /**
 				      * Retrieve eigenvalue after
@@ -234,7 +239,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				     /**
 				      * Print the matrix and allow
 				      * formatting of entries.
-				     *
+				      *
 				      * The parameters allow for a
 				      * flexible setting of the output
 				      * format:
@@ -302,6 +307,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * some LAPACK functions.
 				      */
     mutable std::vector<number> work;
+    
 				     /**
 				      * Real parts of
 				      * eigenvalues. Filled by
@@ -316,6 +322,17 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      */
     std::vector<number> wi;
     
+				     /**
+				      * Space where left eigenvectors
+				      * can be stored.
+				      */
+    std::vector<number> vl;
+    
+				     /**
+				      * Space where right eigenvectors
+				      * can be stored.
+				      */
+    std::vector<number> vr;
 };
 
 /**@}*/

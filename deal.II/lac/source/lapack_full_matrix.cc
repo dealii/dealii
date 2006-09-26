@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -154,15 +154,23 @@ LAPACKFullMatrix<number>::Tvmult (
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::compute_eigenvalues()
+LAPACKFullMatrix<number>::compute_eigenvalues(
+  const bool right,
+  const bool left)
 {
   const int nn = this->n_cols();
   wr.resize(nn);
   wi.resize(nn);
+  if (right) vr.resize(nn*nn);
+  if (left)  vl.resize(nn*nn);
+  
   number* values = const_cast<number*> (this->data());
   
   int info  = 0;
   int lwork = 1;
+  const char * const jobvr = (right) ? (&V) : (&N);
+  const char * const jobvl = (left)  ? (&V) : (&N);
+  
 				   // Optimal workspace query:
 
 				   // The LAPACK routine DGEEV requires
@@ -186,9 +194,9 @@ LAPACKFullMatrix<number>::compute_eigenvalues()
   lwork = -1;
   work.resize(1);
       
-  geev(&N, &N, &nn, values, &nn,
+  geev(jobvl, jobvr, &nn, values, &nn,
        &wr[0], &wi[0],
-       0, &one, 0, &one,
+       &vl[0], &nn, &vr[0], &nn,
        &work[0], &lwork, &info);
 				   // geev returns info=0 on
 				   // success. Since we only queried
@@ -206,9 +214,9 @@ LAPACKFullMatrix<number>::compute_eigenvalues()
   work.resize((unsigned int) lwork);
 
 				   // Finally compute the eigenvalues.
-  geev(&N, &N, &nn, values, &nn,
+  geev(jobvl, jobvr, &nn, values, &nn,
        &wr[0], &wi[0],
-       0, &one, 0, &one,
+       &vl[0], &nn, &vr[0], &nn,
        &work[0], &lwork, &info);
 				   // Negative return value implies a
 				   // wrong argument. This should be
