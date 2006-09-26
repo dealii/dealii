@@ -234,7 +234,8 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::compute_eigenvalues()
+LAPACKFullMatrix<number>::compute_eigenvalues(const bool /*right*/,
+					      const bool /*left*/)
 {
   Assert(false, ExcNeedsLAPACK());
 }
