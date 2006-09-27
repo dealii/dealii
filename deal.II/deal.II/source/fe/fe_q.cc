@@ -21,6 +21,15 @@
 
 #include <sstream>
 
+
+//TODO: we should have a copy constructor for this class. In hp methods, we often do things like
+//      fe_collection.push_back(FE_Q<dim>(7))
+//      which becomes really expensive in 3d because we here have to create all the embedding and
+//      other matrices twice. for example, hp/hp_hanging_nodes_02 spends about 70% of its total
+//      running time in FullMatrix::Tmmult, which is only called from the matrix creation functions
+//      of this class...
+
+
 // namespace for some functions that are used in this file. they are
 // specific to numbering conventions used for the FE_Q element, and
 // are thus not very interesting to the outside world. we'd like to
