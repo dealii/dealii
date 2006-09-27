@@ -256,8 +256,6 @@ void ConstraintMatrix::close ()
 				  constrained_line->entries[0].second *
 				  weight);
 		
-		line->entries.reserve (line->entries.size() +
-				       constrained_line->entries.size() - 1);
 		for (unsigned int i=1; i<constrained_line->entries.size(); ++i)
 		  line->entries
 		    .push_back (std::make_pair (constrained_line->entries[i].first,
