@@ -222,6 +222,25 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * to compute left and right
 				      * eigenvectors as well.
 				      *
+				      * Note that the function does
+				      * not return the computed
+				      * eigenvalues right away since
+				      * that involves copying data
+				      * around between the output
+				      * arrays of the LAPACK functions
+				      * and any return array. This is
+				      * often unnecessary since one
+				      * may not be interested in all
+				      * eigenvalues at once, but for
+				      * example only the extreme
+				      * ones. In that case, it is
+				      * cheaper to just have this
+				      * function compute the
+				      * eigenvalues and have a
+				      * separate function that returns
+				      * whatever eigenvalue is
+				      * requested.
+				      * 
 				      * @note Calls the LAPACK
 				      * function Xgeev.
 				      */
@@ -234,7 +253,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * called.
 				      */
     std::complex<number>
-    eigenvalue (unsigned int i) const;
+    eigenvalue (const unsigned int i) const;
     
 				     /**
 				      * Print the matrix and allow
@@ -382,7 +401,7 @@ LAPACKFullMatrix<number>::fill (
 
 template <typename number>
 std::complex<number>
-LAPACKFullMatrix<number>::eigenvalue (unsigned int i) const
+LAPACKFullMatrix<number>::eigenvalue (const unsigned int i) const
 {
   Assert (state & LAPACKSupport::eigenvalues, ExcInvalidState());
   Assert (wr.size() == this->n_rows(), ExcInternalError());
