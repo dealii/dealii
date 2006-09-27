@@ -881,6 +881,106 @@ void contract (Tensor<3,dim>       &dest,
 
 
 /**
+ * Contract a tensor of rank 3 with a tensor of rank 2. The
+ * contraction is performed over index <tt>index1</tt> of the first tensor,
+ * and <tt>index2</tt> of the second tensor. Thus, if <tt>index1==3</tt>,
+ * <tt>index2==1</tt>, the result is the usual contraction, but if for
+ * example <tt>index1==1</tt>, <tt>index2==2</tt>, then the result is
+ * <tt>dest[i][j][k] = sum_l src1[l][i][j] src2[k][l]</tt>.
+ *
+ * Note that the number of the index is counted from 1 on, not from
+ * zero as usual.
+ *
+ * @relates Tensor
+ */
+template <int dim>
+inline
+void contract (Tensor<3,dim>       &dest,
+	       const Tensor<3,dim> &src1, const unsigned int index1,
+	       const Tensor<2,dim> &src2, const unsigned int index2)
+{
+  dest.clear ();
+
+  switch (index1)
+    {
+      case 1:
+	    switch (index2)
+	      {
+		case 1:
+		      for (unsigned int i=0; i<dim; ++i)
+			for (unsigned int j=0; j<dim; ++j)
+			  for (unsigned int k=0; k<dim; ++k)
+			    for (unsigned int l=0; l<dim; ++l)
+			      dest[i][j][k] += src1[l][i][j] * src2[l][k];
+		      break;
+		case 2:
+		      for (unsigned int i=0; i<dim; ++i)
+			for (unsigned int j=0; j<dim; ++j)
+			  for (unsigned int k=0; k<dim; ++k)
+			    for (unsigned int l=0; l<dim; ++l)
+			      dest[i][j][k] += src1[l][i][j] * src2[k][l];
+		      break;
+		default:
+		      Assert (false,
+			      (typename Tensor<2,dim>::ExcInvalidTensorIndex (index2)));
+	      }
+	    
+	    break;
+      case 2:
+	    switch (index2)
+	      {
+		case 1:
+		      for (unsigned int i=0; i<dim; ++i)
+			for (unsigned int j=0; j<dim; ++j)
+			  for (unsigned int k=0; k<dim; ++k)
+			    for (unsigned int l=0; l<dim; ++l)
+			      dest[i][j][k] += src1[i][l][j] * src2[l][k];
+		      break;
+		case 2:
+		      for (unsigned int i=0; i<dim; ++i)
+			for (unsigned int j=0; j<dim; ++j)
+			  for (unsigned int k=0; k<dim; ++k)
+			    for (unsigned int l=0; l<dim; ++l)
+			      dest[i][j][k] += src1[i][l][j] * src2[k][l];
+		      break;
+		default:
+		      Assert (false,
+			      (typename Tensor<2,dim>::ExcInvalidTensorIndex (index2)));
+	      }
+	    
+	    break;
+      case 3:
+	    switch (index2)
+	      {
+		case 1:
+		      for (unsigned int i=0; i<dim; ++i)
+			for (unsigned int j=0; j<dim; ++j)
+			  for (unsigned int k=0; k<dim; ++k)
+			    for (unsigned int l=0; l<dim; ++l)
+			      dest[i][j][k] += src1[i][j][l] * src2[l][k];
+		      break;
+		case 2:
+		      for (unsigned int i=0; i<dim; ++i)
+			for (unsigned int j=0; j<dim; ++j)
+			  for (unsigned int k=0; k<dim; ++k)
+			    for (unsigned int l=0; l<dim; ++l)
+			      dest[i][j][k] += src1[i][j][l] * src2[k][l];
+		      break;
+		default:
+		      Assert (false,
+			      (typename Tensor<2,dim>::ExcInvalidTensorIndex (index2)));
+	      }
+	    
+	    break;
+      default:
+	    Assert (false,
+		    (typename Tensor<3,dim>::ExcInvalidTensorIndex (index1)));
+    }
+}
+
+
+   
+/**
  * Multiplication operator performing a contraction of the last index
  * of the first argument and the first index of the second
  * argument. This function therefore does the same as the
