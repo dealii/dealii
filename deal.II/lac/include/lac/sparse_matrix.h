@@ -501,6 +501,10 @@ class SparseMatrix : public virtual Subscriptor
         static const bool zero_addition_can_be_elided = true;
     };
     
+/**
+ * @name Constructors and initalization.
+ */
+//@{
 				     /**
 				      * Constructor; initializes the matrix to
 				      * be empty, without any structure, i.e.
@@ -671,7 +675,11 @@ class SparseMatrix : public virtual Subscriptor
 				      * previously tied to.
 				      */
     virtual void clear ();
-    
+//@}    
+/**
+ * @name Information on the matrix
+ */
+//@{
 				     /**
 				      * Return whether the object is
 				      * empty. It is empty if either
@@ -722,6 +730,33 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     unsigned int n_actually_nonzero_elements () const;
     
+				     /**
+				      * Return a (constant) reference
+				      * to the underlying sparsity
+				      * pattern of this matrix.
+				      *
+				      * Though the return value is
+				      * declared <tt>const</tt>, you
+				      * should be aware that it may
+				      * change if you call any
+				      * nonconstant function of
+				      * objects which operate on it.
+				      */
+    const SparsityPattern & get_sparsity_pattern () const;
+
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object. See
+				      * MemoryConsumption.
+				      */
+    unsigned int memory_consumption () const;
+    
+//@}
+/**
+ * @name Modifying entries
+ */
+//@{
 				     /**
 				      * Set the element (<i>i,j</i>)
 				      * to <tt>value</tt>. Throws an
@@ -907,6 +942,11 @@ class SparseMatrix : public virtual Subscriptor
     template <typename somenumber>
     void add_scaled (const number factor,
 		     const SparseMatrix<somenumber> &matrix);
+//@}
+/**
+ * @name Entry Access
+ */
+//@{
     
 				     /**
 				      * Return the value of the entry
@@ -1040,6 +1080,11 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     number & global_entry (const unsigned int i);
 
+//@}
+/**
+ * @name Matrix vector multiplications
+ */
+//@{
 				     /**
 				      * Matrix-vector multiplication:
 				      * let <i>dst = M*src</i> with
@@ -1178,6 +1223,31 @@ class SparseMatrix : public virtual Subscriptor
     template <typename somenumber>
     somenumber matrix_scalar_product (const Vector<somenumber> &u,
 				      const Vector<somenumber> &v) const;
+				     /**
+				      * Compute the residual of an
+				      * equation <i>Mx=b</i>, where
+				      * the residual is defined to be
+				      * <i>r=b-Mx</i>. Write the
+				      * residual into
+				      * <tt>dst</tt>. The
+				      * <i>l<sub>2</sub></i> norm of
+				      * the residual vector is
+				      * returned.
+                                      *
+                                      * Source <i>x</i> and destination
+                                      * <i>dst</i> must not be the same
+                                      * vector.
+				      */
+    template <typename somenumber>
+    somenumber residual (Vector<somenumber>       &dst,
+			 const Vector<somenumber> &x,
+			 const Vector<somenumber> &b) const;
+    
+//@}
+/**
+ * @name Matrix norms
+ */
+//@{
     
     				     /**
 				      * Return the l1-norm of the matrix, that is
@@ -1213,26 +1283,11 @@ class SparseMatrix : public virtual Subscriptor
                                       * matrix.
                                       */
     number frobenius_norm () const;
-    
-				     /**
-				      * Compute the residual of an
-				      * equation <i>Mx=b</i>, where
-				      * the residual is defined to be
-				      * <i>r=b-Mx</i>. Write the
-				      * residual into
-				      * <tt>dst</tt>. The
-				      * <i>l<sub>2</sub></i> norm of
-				      * the residual vector is
-				      * returned.
-                                      *
-                                      * Source <i>x</i> and destination
-                                      * <i>dst</i> must not be the same
-                                      * vector.
-				      */
-    template <typename somenumber>
-    somenumber residual (Vector<somenumber>       &dst,
-			 const Vector<somenumber> &x,
-			 const Vector<somenumber> &b) const;
+//@}
+/**
+ * @name Preconditioning methods
+ */
+//@{
     
 				     /**
 				      * Apply the Jacobi
@@ -1390,20 +1445,11 @@ class SparseMatrix : public virtual Subscriptor
     void SSOR_step (Vector<somenumber> &v,
 		    const Vector<somenumber> &b,
 		    const number        om = 1.) const;
-
-				     /**
-				      * Return a (constant) reference
-				      * to the underlying sparsity
-				      * pattern of this matrix.
-				      *
-				      * Though the return value is
-				      * declared <tt>const</tt>, you
-				      * should be aware that it may
-				      * change if you call any
-				      * nonconstant function of
-				      * objects which operate on it.
-				      */
-    const SparsityPattern & get_sparsity_pattern () const;
+//@}
+/**
+ * @name Iterators
+ */
+//@{
 
 				     /**
 				      * STL-like iterator with the first entry
@@ -1488,7 +1534,12 @@ class SparseMatrix : public virtual Subscriptor
 				      * iterator for the last row of a matrix.
 				      */
     iterator end (const unsigned int r);
-    
+//@}
+/**
+ * @name Input/Output
+ */
+//@{
+
 				     /**
 				      * Print the matrix to the given
 				      * stream, using the format
@@ -1600,15 +1651,7 @@ class SparseMatrix : public virtual Subscriptor
 				      * not more.
 				      */
     void block_read (std::istream &in);
-
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object. See
-				      * MemoryConsumption.
-				      */
-    unsigned int memory_consumption () const;
-    
+//@}
     				     /** @addtogroup Exceptions
 				      * @{ */
 

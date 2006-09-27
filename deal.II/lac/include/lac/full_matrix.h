@@ -187,7 +187,7 @@ class FullMatrix : public Table<2,number>
         Accessor accessor;
     };
 /**
- * @name Constructors Constructors and initalization.
+ * @name Constructors and initalization.
  * See also the base class Table.
  */
 //@{
