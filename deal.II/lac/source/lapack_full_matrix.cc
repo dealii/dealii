@@ -327,3 +327,9 @@ template LAPACKFullMatrix<double> &
 LAPACKFullMatrix<double>::operator = (const FullMatrix<double>& M);
 template LAPACKFullMatrix<double> &
 LAPACKFullMatrix<double>::operator = (const FullMatrix<float>& M);
+
+template class LAPACKFullMatrix<float>;
+template LAPACKFullMatrix<float> &
+LAPACKFullMatrix<float>::operator = (const FullMatrix<double>& M);
+template LAPACKFullMatrix<float> &
+LAPACKFullMatrix<float>::operator = (const FullMatrix<float>& M);
