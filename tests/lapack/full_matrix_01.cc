@@ -11,7 +11,7 @@
 //
 //--------------------------------------------------------------------
 
-// Tests all aspects of LAPACKFullMatrix except eigenvectors
+// Tests vector multiplication and eigenvalues of LAPACKFullMatrix
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -47,7 +47,7 @@ const double rect[] =
 
 int main()
 {
-  std::ofstream logfile("full_matrix/output");
+  std::ofstream logfile("full_matrix_01/output");
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
