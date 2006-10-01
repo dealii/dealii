@@ -78,7 +78,7 @@ int main()
   std::ofstream logfile("full_matrix_02/output");
   logfile.precision(3);
   deallog.attach(logfile);
-  deallog.depth_console(10);
+  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   test(4, false);
