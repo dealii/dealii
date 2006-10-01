@@ -25,7 +25,8 @@ using namespace LAPACKSupport;
 template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix(const unsigned int n)
 		:
-		TransposeTable<number> (n,n)
+		TransposeTable<number> (n,n),
+		state(matrix)
 {}
 
 
@@ -34,17 +35,17 @@ LAPACKFullMatrix<number>::LAPACKFullMatrix(
   const unsigned int m,
   const unsigned int n)
 		:
-		TransposeTable<number> (m,n)
+		TransposeTable<number> (m,n),
+		state(matrix)
 {}
 
 
 template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix(const LAPACKFullMatrix &M)
 		:
-		TransposeTable<number> (M)
-{
-  state = LAPACKSupport::matrix;
-}
+		TransposeTable<number> (M),
+		state(matrix)
+{}
 
 
 template <typename number>
@@ -95,7 +96,7 @@ LAPACKFullMatrix<number>::vmult (
   const Vector<number> &v,
   const bool            adding) const
 {
-  Assert (state == matrix, ExcInvalidState());
+  Assert (state == matrix, ExcState(state));
   
   const int mm = this->n_rows();
   const int nn = this->n_cols();
@@ -113,7 +114,7 @@ LAPACKFullMatrix<number>::Tvmult (
   const Vector<number> &v,
   const bool            adding) const
 {
-  Assert (state == matrix, ExcInvalidState());
+  Assert (state == matrix, ExcState(state));
   
   const int mm = this->n_rows();
   const int nn = this->n_cols();
@@ -154,10 +155,51 @@ LAPACKFullMatrix<number>::Tvmult (
 
 template <typename number>
 void
+LAPACKFullMatrix<number>::compute_lu_factorization()
+{
+  Assert(state == matrix, ExcState(state));
+  const int mm = this->n_rows();
+  const int nn = this->n_cols();
+  number* values = const_cast<number*> (this->data());
+  ipiv.resize(mm);
+  int info;
+  getrf(&mm, &nn, values, &mm, &ipiv[0], &info);
+
+  Assert(info >= 0, ExcInternalError());
+  Assert(info == 0, LACExceptions::ExcSingular());
+  
+  state = lu;
+}
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number>& v,
+						 const bool transposed) const
+{
+  Assert(state == lu, ExcState(state));
+  Assert(this->n_rows() == this->n_cols(),
+	 LACExceptions::ExcNotQuadratic());
+  
+  const char* trans = transposed ? &T : &N;
+  const int nn = this->n_cols();
+  const number* values = this->data();
+  int info;
+
+  getrs(trans, &nn, &one, values, &nn, &ipiv[0],
+	v.begin(), &nn, &info);
+
+  Assert(info == 0, ExcInternalError());
+}
+
+
+template <typename number>
+void
 LAPACKFullMatrix<number>::compute_eigenvalues(
   const bool right,
   const bool left)
 {
+  Assert(state == matrix, ExcState(state));
   const int nn = this->n_cols();
   wr.resize(nn);
   wi.resize(nn);
@@ -233,6 +275,21 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
 #else
 
 template <typename number>
+LAPACKFullMatrix<number>::compute_lu_factorization()
+{
+Assert(false, ExcNeedsLAPACK());
+  
+}
+
+
+template <typename number>
+LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number>&, bool)
+{
+  Assert(false, ExcNeedsLAPACK());
+}
+
+
+template <typename number>
 void
 LAPACKFullMatrix<number>::compute_eigenvalues(const bool /*right*/,
 					      const bool /*left*/)
@@ -242,6 +299,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool /*right*/,
 
 
 #endif
+
 
 // template <typename number>
 // LAPACKFullMatrix<number>::()

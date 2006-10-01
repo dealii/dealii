@@ -31,6 +31,18 @@ void sgemv_ (const char* trans, const int* m, const int* n,
 	     const float* alpha, const float* A, const int* lda,
 	     const float* x, const int* incx,
 	     const float* b, float* y, const int* incy);
+// Compute LU factorization
+void dgetrf_ (const int* m, const int* n, double* A,
+	      const int* lda, int* ipiv, int* info);
+void sgetrf_ (const int* m, const int* n, float* A,
+	      const int* lda, int* ipiv, int* info);
+// Apply forward/backward substitution to LU factorization
+void dgetrs_ (const char* trans, const int* n, const int* nrhs,
+	      const double* A, const int* lda, const int* ipiv,
+	      double* b, const int* ldb, int* info);
+void sgetrs_ (const char* trans, const int* n, const int* nrhs,
+	      const float* A, const int* lda, const int* ipiv,
+	      float* b, const int* ldb, int* info);
 // Compute eigenvalues and vectors
 void dgeev_ (const char* jobvl, const char* jobvr,
 	     const int* n, double* A, const int* lda,
@@ -121,9 +133,69 @@ gemv (const char* trans, const int* m, const int* n, const float* alpha, const f
 }
 #else
 inline void
-gemv (const char*, const int*, const int*, const float*, const float*, const int*, const float*, const int*, const float*, float*, const int*)
+gemv (const char*, const int*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, double*, const int*)
 {
   LAPACKSupport::ExcMissing("sgemv");
+}
+#endif
+
+
+#ifdef HAVE_DGETRF_
+inline void
+getrf (const int* m, const int* n, double* A, const int* lda, int* ipiv, int* info)
+{
+  dgetrf_ (m,n,A,lda,ipiv,info);
+}
+#else
+inline void
+getrf (const int*, const int*, double*, const int*, int*, int*)
+{
+  LAPACKSupport::ExcMissing("dgetrf");
+}
+#endif
+
+
+#ifdef HAVE_SGETRF_
+inline void
+getrf (const int* m, const int* n, float* A, const int* lda, int* ipiv, int* info)
+{
+  sgetrf_ (m,n,A,lda,ipiv,info);
+}
+#else
+inline void
+getrf (const int*, const int*, double*, const int*, int*, int*)
+{
+  LAPACKSupport::ExcMissing("sgetrf");
+}
+#endif
+
+
+#ifdef HAVE_DGETRS_
+inline void
+getrs (const char* trans, const int* n, const int* nrhs, const double* A, const int* lda, const int* ipiv, double* b, const int* ldb, int* info)
+{
+  dgetrs_ (trans,n,nrhs,A,lda,ipiv,b,ldb,info);
+}
+#else
+inline void
+getrs (const char*, const int*, const int*, const double*, const int*, const int*, double*, const int*, int*)
+{
+  LAPACKSupport::ExcMissing("dgetrs");
+}
+#endif
+
+
+#ifdef HAVE_SGETRS_
+inline void
+getrs (const char* trans, const int* n, const int* nrhs, const float* A, const int* lda, const int* ipiv, float* b, const int* ldb, int* info)
+{
+  sgetrs_ (trans,n,nrhs,A,lda,ipiv,b,ldb,info);
+}
+#else
+inline void
+getrs (const char*, const int*, const int*, const double*, const int*, const int*, double*, const int*, int*)
+{
+  LAPACKSupport::ExcMissing("sgetrs");
 }
 #endif
 
@@ -151,7 +223,7 @@ geev (const char* jobvl, const char* jobvr, const int* n, float* A, const int* l
 }
 #else
 inline void
-geev (const char*, const char*, const int*, float*, const int*, float*, float*, float*, const int*, float*, const int*, float*, const int*, int*)
+geev (const char*, const char*, const int*, double*, const int*, double*, double*, double*, const int*, double*, const int*, double*, const int*, int*)
 {
   LAPACKSupport::ExcMissing("sgeev");
 }
@@ -181,7 +253,7 @@ geevx (const char* balanc, const char* jobvl, const char* jobvr, const char* sen
 }
 #else
 inline void
-geevx (const char*, const char*, const char*, const char*, const int*, float*, const int*, float*, float*, float*, const int*, float*, const int*, int*, int*, float*, float*, float*, float*, float*, const int*, int*, int*)
+geevx (const char*, const char*, const char*, const char*, const int*, double*, const int*, double*, double*, double*, const int*, double*, const int*, int*, int*, double*, double*, double*, double*, double*, const int*, int*, int*)
 {
   LAPACKSupport::ExcMissing("sgeevx");
 }
@@ -211,7 +283,7 @@ gesvd (int* jobu, int* jobvt, const int* n, const int* m, float* A, const int* l
 }
 #else
 inline void
-gesvd (int*, int*, const int*, const int*, float*, const int*, float*, float*, const int*, float*, const int*, float*, const int*, int*)
+gesvd (int*, int*, const int*, const int*, double*, const int*, double*, double*, const int*, double*, const int*, double*, const int*, int*)
 {
   LAPACKSupport::ExcMissing("sgesvd");
 }
@@ -241,7 +313,7 @@ stev (const char* jobz, const int* n, float* d, float* e, float* z, const int* l
 }
 #else
 inline void
-stev (const char*, const int*, float*, float*, float*, const int*, float*, int*)
+stev (const char*, const int*, double*, double*, double*, const int*, double*, int*)
 {
   LAPACKSupport::ExcMissing("sstev");
 }

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,10 +29,16 @@ namespace LACExceptions
   DeclException0 (ExcNotQuadratic);
 
 				   /**
+				    * The operation cannot be finished
+				    * since the matrix is singular.
+				    */
+  DeclException0 (ExcSingular);
+  
+				   /**
 				    * Block indices of two block
 				    * objects are different.
 				    */
-  DeclException0(ExcDifferentBlockIndices);
+  DeclException0 (ExcDifferentBlockIndices);
   
 				   /**
 				    * An error of a PETSc function was

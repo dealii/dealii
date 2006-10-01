@@ -221,6 +221,12 @@
 /* Define to 1 if you have the `dgesvd_' function. */
 #undef HAVE_DGESVD_
 
+/* Define to 1 if you have the `dgetrf_' function. */
+#undef HAVE_DGETRF_
+
+/* Define to 1 if you have the `dgetrs_' function. */
+#undef HAVE_DGETRS_
+
 /* Define to 1 if you have the `dstev_' function. */
 #undef HAVE_DSTEV_
 
@@ -279,6 +285,12 @@
 
 /* Define to 1 if you have the `sgesvd_' function. */
 #undef HAVE_SGESVD_
+
+/* Define to 1 if you have the `sgetrf_' function. */
+#undef HAVE_SGETRF_
+
+/* Define to 1 if you have the `sgetrs_' function. */
+#undef HAVE_SGETRS_
 
 /* Define to 1 if you have the `sstev_' function. */
 #undef HAVE_SSTEV_

@@ -4,6 +4,15 @@ void dgemv_ (const char* trans, const int* m, const int* n,
 	     const double* alpha, const double* A, const int* lda,
 	     const double* x, const int* incx,
 	     const double* b, double* y, const int* incy);
+
+// Compute LU factorization
+void dgetrf_ (const int* m, const int* n, double* A,
+	      const int* lda, int* ipiv, int* info);
+// Apply forward/backward substitution to LU factorization
+void dgetrs_ (const char* trans, const int* n, const int* nrhs,
+	      const double* A, const int* lda, const int* ipiv,
+	      double* b, const int* ldb, int* info);
+
 // Compute eigenvalues and vectors
 void dgeev_ (const char* jobvl, const char* jobvr,
 	     const int* n, double* A, const int* lda,

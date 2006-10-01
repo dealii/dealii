@@ -15,24 +15,33 @@
 
 
 #include <base/config.h>
+#include <base/smartpointer.h>
 #include <base/table.h>
 #include <lac/lapack_support.h>
+#include <lac/vector_memory.h>
 
 #include <vector>
 #include <complex>
 
 // forward declarations
 template<typename number> class Vector;
+template<typename number> class BlockVector;
 template<typename number> class FullMatrix;
-
-/*! @addtogroup Matrix1
- *@{
- */
+template<class VECTOR> class VectorMemory;
 
 
 /**
- * A variant of FullMatrix using LAPACK functions whereever possible.
+ * A variant of FullMatrix using LAPACK functions whereever
+ * possible. In order to do this, the matrix is stored in transposed
+ * order. The element access functions hide this fact by reverting the
+ * transposition.
  *
+ * @note In order to perform LAPACK functions, the class contains a lot of
+ * auxiliary data in the private section. The names of these data
+ * vectors are usually the names chosen for the arguments in the
+ * LAPACK documentation.
+ *
+ * @ingroup Matrix1
  * @author Guido Kanschat, 2005
  */
 template <typename number>
@@ -136,13 +145,19 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * maximum size possible,
 				      * determined either by the size
 				      * of <tt>this</tt> or <tt>src</tt>.
+				      *
+				      * The final two arguments allow
+				      * to enter a multiple of the
+				      * source or its transpose.
 				      */
     template<class MATRIX>
     void fill (const MATRIX &src,
 	       const unsigned int dst_offset_i = 0,
 	       const unsigned int dst_offset_j = 0,
 	       const unsigned int src_offset_i = 0,
-	       const unsigned int src_offset_j = 0);
+	       const unsigned int src_offset_j = 0,
+	       const number factor = 1.,
+	       const bool transpose = false);
     
 				     /**
 				      * Matrix-vector-multiplication.
@@ -208,6 +223,25 @@ class LAPACKFullMatrix : public TransposeTable<number>
     void Tvmult_add (Vector<number>       &w,
 		     const Vector<number> &v) const;
 
+				     /**
+				      * Compute the LU factorization
+				      * of the matrix using LAPACK
+				      * function Xgetrf.
+				      */
+    void compute_lu_factorization ();
+
+				     /**
+				      * Solve the linear system with
+				      * right hand side given by
+				      * applying forward/backward
+				      * substitution to the previously
+				      * computed LU
+				      * factorization. Uses LAPACK
+				      * function Xgetrs.
+				      */
+    void apply_lu_factorization (Vector<number>& v,
+				 const bool transposed) const;
+    
 				     /**
 				      * Compute eigenvalues of the
 				      * matrix. After this routine has
@@ -326,6 +360,14 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * some LAPACK functions.
 				      */
     mutable std::vector<number> work;
+
+				     /**
+				      * The vector storing the
+				      * permutations applied for
+				      * pivoting in the
+				      * LU-factorization.
+				      */
+    std::vector<int> ipiv;
     
 				     /**
 				      * Real parts of
@@ -354,7 +396,35 @@ class LAPACKFullMatrix : public TransposeTable<number>
     std::vector<number> vr;
 };
 
-/**@}*/
+
+
+/**
+ * A preconditioner based on the LU-factorization of LAPACKFullMatrix.
+ *
+ * @ingroup Preconditioners
+ * @author Guido Kanschat, 2006
+ */
+template <typename number>
+class LUPrecondition
+  :
+  public Subscriptor
+{
+  public:
+    void initialize(const LAPACKFullMatrix<number>&);
+    void initialize(const LAPACKFullMatrix<number>&,
+		    VectorMemory<Vector<number> >&);
+    void vmult(Vector<number>&, const Vector<number>&) const;
+    void Tvmult(Vector<number>&, const Vector<number>&) const;
+    void vmult(BlockVector<number>&,
+	       const BlockVector<number>&) const;
+    void Tvmult(BlockVector<number>&,
+		const BlockVector<number>&) const;
+  private:
+//    SmartPointer<const LAPACKFullMatrix<number> > matrix;
+//    SmartPointer<VectorMemory<Vector<number> > mem;
+};
+
+
 
 template <typename number>
 template <class MATRIX>
@@ -380,19 +450,21 @@ LAPACKFullMatrix<number>::fill (
   const unsigned int dst_offset_i,
   const unsigned int dst_offset_j,
   const unsigned int src_offset_i,
-  const unsigned int src_offset_j)
+  const unsigned int src_offset_j,
+  const number factor,
+  const bool transpose)
 {
   const typename MATRIX::const_iterator end = M.end();
   for (typename MATRIX::const_iterator entry = M.begin(src_offset_i);
        entry != end; ++entry)
     {
-      const unsigned int i = entry->row();
-      const unsigned int j = entry->column();
-
+      const unsigned int i = transpose ? entry->column() : entry->row();
+      const unsigned int j = transpose ? entry->row() : entry->column();
+      
       const unsigned int dst_i=dst_offset_i+i-src_offset_i;
       const unsigned int dst_j=dst_offset_j+j-src_offset_j;
       if (dst_i<this->n_rows() && dst_j<this->n_cols())
-	(*this)(dst_i, dst_j) = entry->value();
+	(*this)(dst_i, dst_j) = factor * entry->value();
     }
   
   state = LAPACKSupport::matrix;
