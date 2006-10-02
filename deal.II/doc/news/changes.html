@@ -621,6 +621,14 @@ inconvenience this causes.
 
 <ol>
 
+  <li> <p>Improved: The class <code
+  class="class">LAPACKFullMatrix</code> now also uses LU factorization
+  of LAPACK. The new wrapper <code class="class">PreconditionLU</code>
+  allows us to use this as a preconditioner.
+  <br>
+  (GK 2006/10/02)
+  </p>
+
   <li> <p>New: The class <code
   class="class">PointerMatrixVector</code> implements the functions
   <code class="member">vmult</code> and <code
