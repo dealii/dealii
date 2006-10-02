@@ -16,6 +16,7 @@
 #include <lac/lapack_support.h>
 #include <lac/full_matrix.h>
 #include <lac/vector.h>
+#include <lac/block_vector.h>
 
 #include <iostream>
 #include <iomanip>
@@ -275,6 +276,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
 #else
 
 template <typename number>
+void
 LAPACKFullMatrix<number>::compute_lu_factorization()
 {
 Assert(false, ExcNeedsLAPACK());
@@ -283,6 +285,7 @@ Assert(false, ExcNeedsLAPACK());
 
 
 template <typename number>
+void
 LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number>&, bool)
 {
   Assert(false, ExcNeedsLAPACK());
@@ -380,6 +383,74 @@ LAPACKFullMatrix<number>::print_formatted (
 }
 
 
+//----------------------------------------------------------------------//
+
+template <typename number>
+void
+PreconditionLU<number>::initialize(const LAPACKFullMatrix<number>& M)
+{
+  matrix = &M;
+  mem = 0;
+}
+
+
+template <typename number>
+void
+PreconditionLU<number>::initialize(const LAPACKFullMatrix<number>& M,
+				    VectorMemory<Vector<number> >& V)
+{
+  matrix = &M;
+  mem = &V;
+}
+
+
+template <typename number>
+void
+PreconditionLU<number>::vmult(Vector<number>& dst,
+			       const Vector<number>& src) const
+{
+  dst = src;
+  matrix->apply_lu_factorization(dst, false);
+}
+
+
+template <typename number>
+void
+PreconditionLU<number>::Tvmult(Vector<number>& dst,
+				const Vector<number>& src) const
+{
+  dst = src;
+  matrix->apply_lu_factorization(dst, true);
+}
+
+
+template <typename number>
+void
+PreconditionLU<number>::vmult(BlockVector<number>& dst,
+			       const BlockVector<number>& src) const
+{
+  Assert(mem != 0, ExcNotInitialized());
+  Vector<number>* aux = mem->alloc();
+  *aux = src;
+  matrix->apply_lu_factorization(*aux, false);
+  dst = *aux;
+}
+
+
+template <typename number>
+void
+PreconditionLU<number>::Tvmult(BlockVector<number>& dst,
+				const BlockVector<number>& src) const
+{
+  Assert(mem != 0, ExcNotInitialized());
+  Vector<number>* aux = mem->alloc();
+  *aux = src;
+  matrix->apply_lu_factorization(*aux, true);
+  dst = *aux;
+}
+
+
+
 template class LAPACKFullMatrix<double>;
 template LAPACKFullMatrix<double> &
 LAPACKFullMatrix<double>::operator = (const FullMatrix<double>& M);
@@ -391,3 +462,6 @@ template LAPACKFullMatrix<float> &
 LAPACKFullMatrix<float>::operator = (const FullMatrix<double>& M);
 template LAPACKFullMatrix<float> &
 LAPACKFullMatrix<float>::operator = (const FullMatrix<float>& M);
+
+template class PreconditionLU<double>;
+template class PreconditionLU<float>;

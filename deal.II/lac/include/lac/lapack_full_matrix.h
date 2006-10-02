@@ -27,7 +27,6 @@
 template<typename number> class Vector;
 template<typename number> class BlockVector;
 template<typename number> class FullMatrix;
-template<class VECTOR> class VectorMemory;
 
 
 /**
@@ -405,7 +404,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
  * @author Guido Kanschat, 2006
  */
 template <typename number>
-class LUPrecondition
+class PreconditionLU
   :
   public Subscriptor
 {
@@ -420,8 +419,8 @@ class LUPrecondition
     void Tvmult(BlockVector<number>&,
 		const BlockVector<number>&) const;
   private:
-//    SmartPointer<const LAPACKFullMatrix<number> > matrix;
-//    SmartPointer<VectorMemory<Vector<number> > mem;
+    SmartPointer<const LAPACKFullMatrix<number> > matrix;
+    SmartPointer<VectorMemory<Vector<number> > > mem;
 };
 
 
