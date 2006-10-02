@@ -92,6 +92,7 @@ while(<>)
 	$templates .= "{\n  LAPACKSupport::ExcMissing(\"d$name\");\n}\n#endif\n";
 	
 	$args =~ s/double/float/g;
+	$args0 =~ s/double/float/g;
 	$type =~ s/double/float/g;
 	$templates .= "\n\n#ifdef HAVE_S$capname\_";
 	$templates .= "\ninline $type\n$name ($args)\n{\n  s$name\_ ($args2);\n}\n";

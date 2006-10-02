@@ -286,7 +286,7 @@ Assert(false, ExcNeedsLAPACK());
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number>&, bool)
+LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number>&, bool) const
 {
   Assert(false, ExcNeedsLAPACK());
 }
