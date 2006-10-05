@@ -352,7 +352,7 @@ conserve the energy, whereas neither the forward nor the backward Euler scheme
 do. 
 
 
-<h3>Who are Courant, Friedrichs, and Levy?</h3>
+<h3>Who are Courant, Friedrichs, and Lewy?</h3>
 
 One of the reasons why the wave equation is nasty to solve numerically is that
 explicit time discretizations are only stable if the time step is small

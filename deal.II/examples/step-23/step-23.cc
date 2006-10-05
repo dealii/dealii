@@ -131,18 +131,19 @@
 				 // <code>system_rhs</code> will be
 				 // used for whatever right hand side
 				 // vector we have when solving one of
-				 // the two linear systems we have to
-				 // solve in each time step. These
-				 // will be solved in the two
-				 // functions <code>solve_u</code> and
+				 // the two linear systems in each
+				 // time step. These will be solved in
+				 // the two functions
+				 // <code>solve_u</code> and
 				 // <code>solve_v</code>.
 				 //
 				 // Finally, the variable
 				 // <code>theta</code> is used to
 				 // indicate the parameter $\theta$
 				 // that is used to define which time
-				 // stepping scheme to use. The rest
-				 // is self-explanatory.
+				 // stepping scheme to use, as
+				 // explained in the introduction. The
+				 // rest is self-explanatory.
 template <int dim>
 class WaveEquation 
 {
@@ -180,16 +181,19 @@ class WaveEquation
 
 				 // @sect3{Equation data}
 
-				 // Before we go on filling in the details of
-				 // the main class, let us define the equation
-				 // data corresponding to the problem,
-				 // i.e. initial and boundary values for both
-				 // the solution $u$ as well as its time
-				 // derivative $v$, as well as a right hand
-				 // side class. We do so using classes derived
-				 // from the Function class template that has
-				 // been used many times before, so the
-				 // following should not be a surprise.
+				 // Before we go on filling in the
+				 // details of the main class, let us
+				 // define the equation data
+				 // corresponding to the problem,
+				 // i.e. initial and boundary values
+				 // for both the solution $u$ and its
+				 // time derivative $v$, as well as a
+				 // right hand side class. We do so
+				 // using classes derived from the
+				 // Function class template that has
+				 // been used many times before, so
+				 // the following should not be a
+				 // surprise.
 				 //
 				 // Let's start with initial values
 				 // and choose zero for both the value
@@ -346,7 +350,7 @@ double BoundaryValuesV<dim>::value (const Point<dim> &p,
 				 // Let's start with the constructor (for an
 				 // explanation of the choice of time step,
 				 // see the section on Courant, Friedrichs,
-				 // and Levy in the introduction):
+				 // and Lewy in the introduction):
 template <int dim>
 WaveEquation<dim>::WaveEquation () :
                 fe (1),
@@ -358,12 +362,15 @@ WaveEquation<dim>::WaveEquation () :
 
 				 // @sect4{WaveEquation::setup_system}
 
-				 // The next function is the one that sets up
-				 // the mesh, DoFHandler, and matrices and
-				 // vectors at the beginning of the program,
-				 // i.e. before the first time step. The first
-				 // few lines are pretty much standard if
-				 // you've read at least to step-6:
+				 // The next function is the one that
+				 // sets up the mesh, DoFHandler, and
+				 // matrices and vectors at the
+				 // beginning of the program,
+				 // i.e. before the first time
+				 // step. The first few lines are
+				 // pretty much standard if you've
+				 // read through the tutorial programs
+				 // at least up to step-6:
 template <int dim>
 void WaveEquation<dim>::setup_system ()
 {
@@ -372,7 +379,7 @@ void WaveEquation<dim>::setup_system ()
   
   std::cout << "Number of active cells: "
 	    << triangulation.n_active_cells()
-  	    << std::endl;
+            << std::endl;
 
   dof_handler.distribute_dofs (fe);
 
@@ -410,20 +417,24 @@ void WaveEquation<dim>::setup_system ()
 				   // memory on it several times.
 				   //
 				   // After initializing all of these
-				   // matrices, we call library functions that
-				   // build the Laplace and mass matrices. All
-				   // they need is a DoFHandler object and a
-				   // quadrature formula object that is to be
-				   // used for numerical integration. Note
-				   // that in many respect these functions are
-				   // better than what we would usually do in
-				   // application programs, as these functions
-				   // for example automatically parallelize
-				   // building the matrices if multiple
-				   // processors are available in a
-				   // machine. When we have both of these
-				   // matrices, we form the third one by
-				   // copying and adding the first two in
+				   // matrices, we call library
+				   // functions that build the Laplace
+				   // and mass matrices. All they need
+				   // is a DoFHandler object and a
+				   // quadrature formula object that
+				   // is to be used for numerical
+				   // integration. Note that in many
+				   // respects these functions are
+				   // better than what we would
+				   // usually do in application
+				   // programs, for example because
+				   // they automatically parallelize
+				   // building the matrices if
+				   // multiple processors are
+				   // available in a machine. When we
+				   // have both of these matrices, we
+				   // form the third one by copying
+				   // and adding the first two in
 				   // appropriate multiples:
   system_matrix.reinit (sparsity_pattern);
   mass_matrix.reinit (sparsity_pattern);
@@ -672,15 +683,19 @@ void WaveEquation<dim>::run ()
       solve_u ();
 
 
-				       // The second step, i.e. solving for
-				       // $V^n$, works similarly, except that
-				       // this time the matrix on the left is
-				       // the mass matrix, the right hand side
-				       // is $MV^{n-1} - k\left[ \theta A U^n
-				       // + (1-\theta) AU^{n-1}\right]$ plus
-				       // forcing terms. Boundary values are
-				       // applied in the same way as before,
-				       // except that now we have to use the
+				       // The second step,
+				       // i.e. solving for $V^n$,
+				       // works similarly, except that
+				       // this time the matrix on the
+				       // left is the mass matrix, and
+				       // the right hand side is
+				       // $MV^{n-1} - k\left[ \theta A
+				       // U^n + (1-\theta)
+				       // AU^{n-1}\right]$ plus
+				       // forcing terms. %Boundary
+				       // values are applied in the
+				       // same way as before, except
+				       // that now we have to use the
 				       // BoundaryValuesV class:
       laplace_matrix.vmult (system_rhs, solution_u);
       system_rhs *= -theta * time_step;
