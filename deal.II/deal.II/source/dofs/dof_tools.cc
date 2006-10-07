@@ -1562,6 +1562,84 @@ namespace internal
   {
     namespace 
     {
+				       /**
+					* When restricting, on a face, the
+					* degrees of freedom of fe1 to the
+					* space described by fe2 (for example
+					* for the complex case described in
+					* the hp paper), we have to select
+					* fe2.dofs_per_face out of the
+					* fe1.dofs_per_face face DoFs as the
+					* master DoFs, and the rest become
+					* slave dofs. This function selects
+					* which ones will be masters, and
+					* which ones will be slaves.
+					*
+					* The function assumes that
+					* master_dofs already has size
+					* fe1.dofs_per_face. After the
+					* function, exactly fe2.dofs_per_face
+					* entries will be true.
+					*/
+      template <int dim>
+      void
+      select_master_dofs_for_face_restriction (const FiniteElement<dim> &fe1,
+					       const FiniteElement<dim> &fe2,
+					       std::vector<bool>        &master_dof_mask)
+      {
+	Assert (fe1.dofs_per_face >= fe2.dofs_per_face,
+		ExcInternalError());
+	Assert (master_dof_mask.size() == fe1.dofs_per_face,
+		ExcInternalError());
+
+	Assert (fe2.dofs_per_vertex <= fe1.dofs_per_vertex,
+		ExcInternalError());
+	Assert (fe2.dofs_per_line <= fe1.dofs_per_line,
+		ExcInternalError());
+	Assert (fe2.dofs_per_quad <= fe1.dofs_per_quad,
+		ExcInternalError());
+
+					 // initialize all with false
+	std::fill (master_dof_mask.begin(), master_dof_mask.end(), false);
+	
+					 // the idea here is to designate as
+					 // many DoFs in fe1 per object
+					 // (vertex, line, quad) as master as
+					 // there are such dofs in fe2
+					 // (indices are int, because we want
+					 // to avoid the 'unsigned int < 0 is
+					 // always false warning for the cases
+					 // at the bottom in 1d and 2d)
+	unsigned int index = 0;
+	for (int v=0; v<static_cast<signed int>(GeometryInfo<dim>::vertices_per_face); ++v)
+	  {
+	    for (unsigned int i=0; i<fe2.dofs_per_vertex; ++i)
+	      master_dof_mask[index+i] = true;
+	    index += fe1.dofs_per_vertex;
+	  }
+
+	for (int l=0; l<static_cast<signed int>(GeometryInfo<dim>::lines_per_face); ++l)
+	  {
+	    for (unsigned int i=0; i<fe2.dofs_per_line; ++i)
+	      master_dof_mask[index+i] = true;
+	    index += fe1.dofs_per_line;
+	  }
+	
+	for (int q=0; q<static_cast<signed int>(GeometryInfo<dim>::quads_per_face); ++q)
+	  {
+	    for (unsigned int i=0; i<fe2.dofs_per_quad; ++i)
+	      master_dof_mask[index+i] = true;
+	    index += fe1.dofs_per_quad;
+	  }
+
+	Assert (index == fe1.dofs_per_face, ExcInternalError());
+	Assert (std::count (master_dof_mask.begin(), master_dof_mask.end(), true)
+		==
+		static_cast<signed int>(fe2.dofs_per_face),
+		ExcInternalError());
+      }
+
+      
                                        /**
                                         * Make sure that the given @p
                                         * face_interpolation_matrix
@@ -1625,8 +1703,15 @@ namespace internal
 #endif      
       void
       ensure_existence_of_split_face_matrix (const FullMatrix<double> &face_interpolation_matrix,
+					     const std::vector<bool> &master_dof_mask,
 					     boost::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > > &split_matrix)
       {
+	Assert (master_dof_mask.size() == face_interpolation_matrix.m(),
+		ExcInternalError());
+	Assert (std::count (master_dof_mask.begin(), master_dof_mask.end(), true) ==
+		static_cast<signed int>(face_interpolation_matrix.n()),
+		ExcInternalError());
+	
         if (split_matrix == 0)
           {
             split_matrix
@@ -1638,23 +1723,36 @@ namespace internal
 
 	    Assert (n_master_dofs <= n_dofs, ExcInternalError());
 
-					     // copy and invert the
-					     // master component
+					     // copy and invert the master
+					     // component, copy the slave
+					     // component
 	    split_matrix->first.reinit (n_master_dofs, n_master_dofs);
-	    for (unsigned int i=0; i<n_master_dofs; ++i)
-	      for (unsigned int j=0; j<n_master_dofs; ++j)
-		split_matrix->first(i,j)
-		  = face_interpolation_matrix(i,j);
-	    split_matrix->first.gauss_jordan ();
-
-					     // copy the slave component
 	    split_matrix->second.reinit (n_dofs-n_master_dofs, n_master_dofs);
-	    for (unsigned int i=0;
-		 i<n_dofs-n_master_dofs; ++i)
-	      for (unsigned int j=0; j<n_master_dofs; ++j)
-		split_matrix->second(i,j)
-		  = face_interpolation_matrix(i+n_master_dofs,j);
-          }
+
+	    unsigned int nth_master_dof = 0,
+			 nth_slave_dof  = 0;
+	    
+	    for (unsigned int i=0; i<n_dofs; ++i)
+	      if (master_dof_mask[i] == true)
+		{
+		  for (unsigned int j=0; j<n_master_dofs; ++j)
+		    split_matrix->first(nth_master_dof,j)
+		      = face_interpolation_matrix(i,j);
+		  ++nth_master_dof;
+		}
+	      else
+		{
+		  for (unsigned int j=0; j<n_master_dofs; ++j)
+		    split_matrix->second(nth_slave_dof,j)
+		      = face_interpolation_matrix(i,j);
+		  ++nth_slave_dof;
+		}
+
+	    Assert (nth_master_dof == n_master_dofs, ExcInternalError());
+	    Assert (nth_slave_dof == n_dofs-n_master_dofs, ExcInternalError());	    
+		  
+	    split_matrix->first.gauss_jordan ();
+	  }
       }
       
 
@@ -2619,9 +2717,15 @@ namespace internal
 						     // master and slave
 						     // components. invert the
 						     // master component
+		    std::vector<bool> master_dof_mask (cell->get_fe().dofs_per_face);
+		    select_master_dofs_for_face_restriction (cell->get_fe(),
+							     dominating_fe,
+							     master_dof_mask);
+		    
 		    ensure_existence_of_split_face_matrix
 		      (*face_interpolation_matrices
                        [dominating_fe_index][cell->active_fe_index()],
+		       master_dof_mask,
 		       split_face_interpolation_matrices
                        [dominating_fe_index][cell->active_fe_index()]);
 		    
@@ -2658,15 +2762,15 @@ namespace internal
 		    scratch_dofs.resize (cell->get_fe().dofs_per_face);
 		    cell->face(face)->get_dof_indices (scratch_dofs, cell->active_fe_index ());
 
+						     // split dofs into master
+						     // and slave components
 		    master_dofs.clear ();
-		    master_dofs.insert (master_dofs.begin(),
-					scratch_dofs.begin(),
-					scratch_dofs.begin() + dominating_fe.dofs_per_face);
-
 		    slave_dofs.clear ();
-		    slave_dofs.insert (slave_dofs.begin(),
-				       scratch_dofs.begin() + dominating_fe.dofs_per_face,
-				       scratch_dofs.end());
+		    for (unsigned int i=0; i<cell->get_fe().dofs_per_face; ++i)
+		      if (master_dof_mask[i] == true)
+			master_dofs.push_back (scratch_dofs[i]);
+		      else
+			slave_dofs.push_back (scratch_dofs[i]);
 		    
 		    Assert (master_dofs.size() == dominating_fe.dofs_per_face,
 			    ExcInternalError());
