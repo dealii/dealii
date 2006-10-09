@@ -1750,7 +1750,8 @@ namespace internal
 
 	    Assert (nth_master_dof == n_master_dofs, ExcInternalError());
 	    Assert (nth_slave_dof == n_dofs-n_master_dofs, ExcInternalError());	    
-		  
+
+//TODO[WB]: We should make sure very small entries are removed after inversion
 	    split_matrix->first.gauss_jordan ();
 	  }
       }
