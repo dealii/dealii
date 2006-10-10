@@ -6,7 +6,7 @@
 echo Running `pwd`/minimize_boost
 
 # path of the (original) boost library, e.g.
-O=/home/rhartman/boost/boost_1_31_0
+O=/home/rhartman/boost/boost_1_33_1
 # directory of the deal.II library
 Dtmp=`pwd`/../..
 cd $Dtmp && \
@@ -151,6 +151,11 @@ while test -s $B/diff.txt; do
 done
 rm $B/dirs.old.txt $B/dirs.txt $B/diff.txt
 
+#copy version information
+cd $B && cp $O/boost/version.hpp boost
+#copy whole config directory
+cd $B && cp -r $O/boost/config boost
+
 echo "The $B/boost directory is now complete"
 
 # Take inventory of new boost directory
@@ -163,7 +168,6 @@ if test -d boost._bak; then
   cd $B && rm -rf boost; mv boost._bak boost
   cd $B && tar xf boost._tar
   cd $B && rm boost._tar
-  cd $B && cp $O/boost/version.hpp boost
 fi
 
 # output of diffs
