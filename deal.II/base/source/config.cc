@@ -27,7 +27,7 @@ namespace deal_II_numbers
 				     // check against infinities. not
 				     // that if x is a NaN, then both
 				     // comparisons will be false
-    return ((x >= std::numeric_limits<double>::min())
+    return ((x >= -std::numeric_limits<double>::max())
 	    &&
 	    (x <= std::numeric_limits<double>::max()));
 #endif
