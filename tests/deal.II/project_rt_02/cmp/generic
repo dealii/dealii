@@ -1,50 +1,20 @@
 
 DEAL::n_dofs=72
-DEAL:cg::Starting value 5.43
-DEAL:cg::Convergence step 9 value 0
 DEAL::FE_RaviartThomas<2>(0), P_0, rel. error=0
-DEAL:cg::Starting value 11.0
-DEAL:cg::Convergence step 9 value 0
 DEAL::FE_RaviartThomas<2>(0), P_1, rel. error=0.0216
-DEAL:cg::Starting value 16.7
-DEAL:cg::Convergence step 9 value 0
 DEAL::FE_RaviartThomas<2>(0), P_2, rel. error=0.0389
 DEAL::n_dofs=256
-DEAL:cg::Starting value 5.83
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_RaviartThomas<2>(1), P_0, rel. error=0
-DEAL:cg::Starting value 11.8
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_RaviartThomas<2>(1), P_1, rel. error=0
-DEAL:cg::Starting value 18.1
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_RaviartThomas<2>(1), P_2, rel. error=0.000989
-DEAL:cg::Starting value 24.6
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_RaviartThomas<2>(1), P_3, rel. error=0.00249
 DEAL::n_dofs=552
-DEAL:cg::Starting value 5.83
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_RaviartThomas<2>(2), P_0, rel. error=0
-DEAL:cg::Starting value 11.8
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_RaviartThomas<2>(2), P_1, rel. error=0
-DEAL:cg::Starting value 18.1
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_RaviartThomas<2>(2), P_2, rel. error=0
-DEAL:cg::Starting value 24.7
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_RaviartThomas<2>(2), P_3, rel. error=5.99e-05
-DEAL:cg::Starting value 31.5
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_RaviartThomas<2>(2), P_4, rel. error=0.000190
 DEAL::n_dofs=456
-DEAL:cg::Starting value 31.9
-DEAL:cg::Convergence step 9 value 0
 DEAL::FE_RaviartThomas<3>(0), P_0, rel. error=0
-DEAL:cg::Starting value 63.1
-DEAL:cg::Convergence step 9 value 0
 DEAL::FE_RaviartThomas<3>(0), P_1, rel. error=0.0405
-DEAL:cg::Starting value 94.5
-DEAL:cg::Convergence step 9 value 0
 DEAL::FE_RaviartThomas<3>(0), P_2, rel. error=0.0714

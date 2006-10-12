@@ -1,148 +1,56 @@
 
 DEAL::n_dofs=7
-DEAL:cg::Starting value 0.405
-DEAL:cg::Convergence step 7 value 0
 DEAL::FE_Q_Hierarchical<1>(1), P_0, rel. error=0
-DEAL:cg::Starting value 0.884
-DEAL:cg::Convergence step 7 value 0
 DEAL::FE_Q_Hierarchical<1>(1), P_1, rel. error=0
-DEAL:cg::Starting value 1.42
-DEAL:cg::Convergence step 7 value 0
 DEAL::FE_Q_Hierarchical<1>(1), P_2, rel. error=0.00129
-DEAL:cg::Starting value 2.00
-DEAL:cg::Convergence step 7 value 0
 DEAL::FE_Q_Hierarchical<1>(1), P_3, rel. error=0.00343
 DEAL::n_dofs=13
-DEAL:cg::Starting value 0.497
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Q_Hierarchical<1>(2), P_0, rel. error=0
-DEAL:cg::Starting value 1.09
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Q_Hierarchical<1>(2), P_1, rel. error=0
-DEAL:cg::Starting value 1.78
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Q_Hierarchical<1>(2), P_2, rel. error=0
-DEAL:cg::Starting value 2.52
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Q_Hierarchical<1>(2), P_3, rel. error=9.74e-05
-DEAL:cg::Starting value 3.31
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Q_Hierarchical<1>(2), P_4, rel. error=0.000324
 DEAL::n_dofs=19
-DEAL:cg::Starting value 0.497
-DEAL:cg::Convergence step 13 value 0
 DEAL::FE_Q_Hierarchical<1>(3), P_0, rel. error=0
-DEAL:cg::Starting value 1.09
-DEAL:cg::Convergence step 13 value 0
 DEAL::FE_Q_Hierarchical<1>(3), P_1, rel. error=0
-DEAL:cg::Starting value 1.78
-DEAL:cg::Convergence step 14 value 0
 DEAL::FE_Q_Hierarchical<1>(3), P_2, rel. error=0
-DEAL:cg::Starting value 2.52
-DEAL:cg::Convergence step 14 value 0
 DEAL::FE_Q_Hierarchical<1>(3), P_3, rel. error=0
-DEAL:cg::Starting value 3.31
-DEAL:cg::Convergence step 14 value 0
 DEAL::FE_Q_Hierarchical<1>(3), P_4, rel. error=3.92e-06
-DEAL:cg::Starting value 4.13
-DEAL:cg::Convergence step 14 value 0
 DEAL::FE_Q_Hierarchical<1>(3), P_5, rel. error=1.61e-05
 DEAL::n_dofs=25
-DEAL:cg::Starting value 0.606
-DEAL:cg::Convergence step 24 value 0
 DEAL::FE_Q_Hierarchical<1>(4), P_0, rel. error=0
-DEAL:cg::Starting value 1.34
-DEAL:cg::Convergence step 24 value 0
 DEAL::FE_Q_Hierarchical<1>(4), P_1, rel. error=0
-DEAL:cg::Starting value 2.19
-DEAL:cg::Convergence step 24 value 0
 DEAL::FE_Q_Hierarchical<1>(4), P_2, rel. error=0
-DEAL:cg::Starting value 3.12
-DEAL:cg::Convergence step 24 value 0
 DEAL::FE_Q_Hierarchical<1>(4), P_3, rel. error=0
-DEAL:cg::Starting value 4.11
-DEAL:cg::Convergence step 24 value 0
 DEAL::FE_Q_Hierarchical<1>(4), P_4, rel. error=0
-DEAL:cg::Starting value 5.15
-DEAL:cg::Convergence step 24 value 0
 DEAL::FE_Q_Hierarchical<1>(4), P_5, rel. error=2.64e-07
-DEAL:cg::Starting value 6.23
-DEAL:cg::Convergence step 24 value 0
 DEAL::FE_Q_Hierarchical<1>(4), P_6, rel. error=1.27e-06
 DEAL::n_dofs=41
-DEAL:cg::Starting value 0.597
-DEAL:cg::Convergence step 13 value 0
 DEAL::FE_Q_Hierarchical<2>(1), P_0, rel. error=0
-DEAL:cg::Starting value 1.26
-DEAL:cg::Convergence step 13 value 0
 DEAL::FE_Q_Hierarchical<2>(1), P_1, rel. error=0
-DEAL:cg::Starting value 1.97
-DEAL:cg::Convergence step 13 value 0
 DEAL::FE_Q_Hierarchical<2>(1), P_2, rel. error=0.000512
-DEAL:cg::Starting value 2.69
-DEAL:cg::Convergence step 13 value 0
 DEAL::FE_Q_Hierarchical<2>(1), P_3, rel. error=0.00127
 DEAL::n_dofs=141
-DEAL:cg::Starting value 0.897
-DEAL:cg::Convergence step 78 value 0
 DEAL::FE_Q_Hierarchical<2>(2), P_0, rel. error=0
-DEAL:cg::Starting value 1.91
-DEAL:cg::Convergence step 78 value 0
 DEAL::FE_Q_Hierarchical<2>(2), P_1, rel. error=0
-DEAL:cg::Starting value 2.99
-DEAL:cg::Convergence step 79 value 0
 DEAL::FE_Q_Hierarchical<2>(2), P_2, rel. error=0
-DEAL:cg::Starting value 4.13
-DEAL:cg::Convergence step 78 value 0
 DEAL::FE_Q_Hierarchical<2>(2), P_3, rel. error=4.50e-05
-DEAL:cg::Starting value 5.30
-DEAL:cg::Convergence step 78 value 0
 DEAL::FE_Q_Hierarchical<2>(2), P_4, rel. error=0.000132
 DEAL::n_dofs=297
-DEAL:cg::Starting value 0.897
-DEAL:cg::Convergence step 87 value 0
 DEAL::FE_Q_Hierarchical<2>(3), P_0, rel. error=0
-DEAL:cg::Starting value 1.91
-DEAL:cg::Convergence step 87 value 0
 DEAL::FE_Q_Hierarchical<2>(3), P_1, rel. error=0
-DEAL:cg::Starting value 2.99
-DEAL:cg::Convergence step 87 value 0
 DEAL::FE_Q_Hierarchical<2>(3), P_2, rel. error=0
-DEAL:cg::Starting value 4.13
-DEAL:cg::Convergence step 87 value 0
 DEAL::FE_Q_Hierarchical<2>(3), P_3, rel. error=0
-DEAL:cg::Starting value 5.31
-DEAL:cg::Convergence step 86 value 0
 DEAL::FE_Q_Hierarchical<2>(3), P_4, rel. error=1.72e-06
-DEAL:cg::Starting value 6.51
-DEAL:cg::Convergence step 86 value 0
 DEAL::FE_Q_Hierarchical<2>(3), P_5, rel. error=6.29e-06
 DEAL::n_dofs=223
-DEAL:cg::Starting value 0.585
-DEAL:cg::Convergence step 17 value 0
 DEAL::FE_Q_Hierarchical<3>(1), P_0, rel. error=0
-DEAL:cg::Starting value 1.21
-DEAL:cg::Convergence step 17 value 0
 DEAL::FE_Q_Hierarchical<3>(1), P_1, rel. error=0
-DEAL:cg::Starting value 1.85
-DEAL:cg::Convergence step 17 value 0
 DEAL::FE_Q_Hierarchical<3>(1), P_2, rel. error=0.000203
-DEAL:cg::Starting value 2.49
-DEAL:cg::Convergence step 17 value 0
 DEAL::FE_Q_Hierarchical<3>(1), P_3, rel. error=0.000493
 DEAL::n_dofs=1375
-DEAL:cg::Starting value 1.08
-DEAL:cg::Convergence step 288 value 0
 DEAL::FE_Q_Hierarchical<3>(2), P_0, rel. error=0
-DEAL:cg::Starting value 2.24
-DEAL:cg::Convergence step 288 value 0
 DEAL::FE_Q_Hierarchical<3>(2), P_1, rel. error=0
-DEAL:cg::Starting value 3.44
-DEAL:cg::Convergence step 288 value 0
 DEAL::FE_Q_Hierarchical<3>(2), P_2, rel. error=0
-DEAL:cg::Starting value 4.67
-DEAL:cg::Convergence step 288 value 0
 DEAL::FE_Q_Hierarchical<3>(2), P_3, rel. error=1.89e-05
-DEAL:cg::Starting value 5.93
-DEAL:cg::Convergence step 290 value 0
 DEAL::FE_Q_Hierarchical<3>(2), P_4, rel. error=5.39e-05

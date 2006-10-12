@@ -1,11 +1,5 @@
 
 DEAL::n_dofs=9
-DEAL:cg::Starting value 4.68
-DEAL:cg::Convergence step 9 value 0
 DEAL::FE_Nedelec<2>(1), P_0, rel. error=0
-DEAL:cg::Starting value 9.45
-DEAL:cg::Convergence step 9 value 0
 DEAL::FE_Nedelec<2>(1), P_1, rel. error=0.0617
-DEAL:cg::Starting value 14.3
-DEAL:cg::Convergence step 9 value 0
 DEAL::FE_Nedelec<2>(1), P_2, rel. error=0.0968

@@ -1,31 +1,13 @@
 
 DEAL::n_dofs=19
-DEAL:cg::Starting value 4.77
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Nedelec<2>(1), P_0, rel. error=0
-DEAL:cg::Starting value 9.59
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Nedelec<2>(1), P_1, rel. error=0.0531
-DEAL:cg::Starting value 14.6
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Nedelec<2>(1), P_2, rel. error=0.0863
 DEAL::n_dofs=19
-DEAL:cg::Starting value 4.73
-DEAL:cg::Convergence step 11 value 0
 DEAL::FE_Nedelec<2>(1), P_0, rel. error=0
-DEAL:cg::Starting value 9.64
-DEAL:cg::Convergence step 11 value 0
 DEAL::FE_Nedelec<2>(1), P_1, rel. error=0.0597
-DEAL:cg::Starting value 14.8
-DEAL:cg::Convergence step 11 value 0
 DEAL::FE_Nedelec<2>(1), P_2, rel. error=0.0930
 DEAL::n_dofs=19
-DEAL:cg::Starting value 4.54
-DEAL:cg::Convergence step 11 value 0
 DEAL::FE_Nedelec<2>(1), P_0, rel. error=0
-DEAL:cg::Starting value 9.21
-DEAL:cg::Convergence step 11 value 0
 DEAL::FE_Nedelec<2>(1), P_1, rel. error=0.0498
-DEAL:cg::Starting value 14.1
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_Nedelec<2>(1), P_2, rel. error=0.0767

@@ -1,59 +1,23 @@
 
 DEAL::n_dofs=3
-DEAL:cg::Starting value 1.78
-DEAL:cg::Convergence step 1 value 0
 DEAL::FE_DGQ<2>(0), P_0, rel. error=0
-DEAL:cg::Starting value 3.52
-DEAL:cg::Convergence step 1 value 0
 DEAL::FE_DGQ<2>(0), P_1, rel. error=0.0833
-DEAL:cg::Starting value 5.27
-DEAL:cg::Convergence step 1 value 0
 DEAL::FE_DGQ<2>(0), P_2, rel. error=0.136
 DEAL::n_dofs=12
-DEAL:cg::Starting value 0.898
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_DGQ<2>(1), P_0, rel. error=0
-DEAL:cg::Starting value 1.76
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_DGQ<2>(1), P_1, rel. error=0
-DEAL:cg::Starting value 2.66
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_DGQ<2>(1), P_2, rel. error=0.00653
-DEAL:cg::Starting value 3.58
-DEAL:cg::Convergence step 10 value 0
 DEAL::FE_DGQ<2>(1), P_3, rel. error=0.0142
 DEAL::n_dofs=27
-DEAL:cg::Starting value 0.898
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_DGQ<2>(2), P_0, rel. error=0
-DEAL:cg::Starting value 1.77
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_DGQ<2>(2), P_1, rel. error=0
-DEAL:cg::Starting value 2.65
-DEAL:cg::Convergence step 12 value 0
 DEAL::FE_DGQ<2>(2), P_2, rel. error=0
-DEAL:cg::Starting value 3.54
-DEAL:cg::Convergence step 13 value 0
 DEAL::FE_DGQ<2>(2), P_3, rel. error=0.000791
-DEAL:cg::Starting value 4.43
-DEAL:cg::Convergence step 13 value 0
 DEAL::FE_DGQ<2>(2), P_4, rel. error=0.00215
 DEAL::n_dofs=48
-DEAL:cg::Starting value 0.570
-DEAL:cg::Convergence step 15 value 0
 DEAL::FE_DGQ<2>(3), P_0, rel. error=0
-DEAL:cg::Starting value 1.12
-DEAL:cg::Convergence step 15 value 0
 DEAL::FE_DGQ<2>(3), P_1, rel. error=0
-DEAL:cg::Starting value 1.69
-DEAL:cg::Convergence step 15 value 0
 DEAL::FE_DGQ<2>(3), P_2, rel. error=0
-DEAL:cg::Starting value 2.30
-DEAL:cg::Convergence step 15 value 0
 DEAL::FE_DGQ<2>(3), P_3, rel. error=0
-DEAL:cg::Starting value 2.94
-DEAL:cg::Convergence step 15 value 0
 DEAL::FE_DGQ<2>(3), P_4, rel. error=0.000122
-DEAL:cg::Starting value 3.60
-DEAL:cg::Convergence step 15 value 0
 DEAL::FE_DGQ<2>(3), P_5, rel. error=0.000400
