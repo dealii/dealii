@@ -180,13 +180,14 @@ namespace Utilities
 
   std::vector<std::string>
   break_text_into_lines (const std::string &original_text,
-                         const unsigned int width)
+                         const unsigned int width,
+                         const char delimiter)
   {
     std::string              text = original_text;
     std::vector<std::string> lines;
 
                                      // remove trailing spaces
-    while ((text.length() != 0) && (text[text.length()-1] == ' '))
+    while ((text.length() != 0) && (text[text.length()-1] == delimiter))
       text.erase(text.length()-1,1);
   
                                      // then split the text into lines
@@ -194,7 +195,7 @@ namespace Utilities
       {
                                          // in each iteration, first remove
                                          // leading spaces
-        while ((text.length() != 0) && (text[0] == ' '))
+        while ((text.length() != 0) && (text[0] == delimiter))
           text.erase(0, 1);
 
                                          // if we can fit everything into one
@@ -212,7 +213,7 @@ namespace Utilities
                                              // that we can break around there
             int location = std::min<int>(width,text.length()-1);
             for (; location>=0; --location)
-              if (text[location] == ' ')
+              if (text[location] == delimiter)
                 break;
           
                                              // if there are no spaces, then try if
@@ -221,7 +222,7 @@ namespace Utilities
               for (location = std::min<int>(width,text.length()-1);
                    location<static_cast<int>(text.length());
                    ++location)
-                if (text[location] == ' ')
+                if (text[location] == delimiter)
                   break;
           
                                              // now take the text up to the found

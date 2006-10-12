@@ -89,14 +89,16 @@ namespace Utilities
                                     * something, and try to break it into
                                     * individual lines of text at most @p
                                     * width characters wide, by breaking at
-                                    * spaces in the text. If this is not
-                                    * possible, return the shortest lines than
-                                    * are longer than @p width.
+                                    * positions marked by @p delimiter in the text.
+                                    * If this is not possible, return the shortest
+                                    * lines than are longer than @p width.
+                                    * The default value of the delimiter is a
+                                    * space character.
                                     */
   std::vector<std::string>
   break_text_into_lines (const std::string &original_text,
-                         const unsigned int width);
-
+                         const unsigned int width,
+                         const char delimiter = ' ');
 
 				   /**
 				    * Teturn true if the given pattern
