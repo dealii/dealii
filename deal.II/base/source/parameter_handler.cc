@@ -871,6 +871,9 @@ ParameterHandler::print_parameters (std::ostream     &out,
 	    out << "\\begin{itemize}"
 	        << std::endl;
 	    break;
+      case Description:
+	    out << "Listing of Parameters:" << std::endl << std::endl;
+	    break;
       case ShortText:
 	    break;
       default:
@@ -883,6 +886,7 @@ ParameterHandler::print_parameters (std::ostream     &out,
   switch (style) 
     {
       case Text:
+      case Description:
       case ShortText:
 	    break;
       case LaTeX:
@@ -1044,6 +1048,50 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
         break;
       }
       
+      case Description:
+      {
+					 // first find out the longest
+					 // entry name to be able to
+					 // align the equal signs
+        unsigned int longest_name = 0;
+        for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
+          if (ptr->first.length() > longest_name)
+            longest_name = ptr->first.length();
+	
+                                         // print entries one by one
+        for (ptr = pd->entries.begin(); ptr != pd->entries.end(); ++ptr)
+          {
+                                             // print name and value
+            out << std::setw(indent_level*2) << ""
+		<< "set "
+		<< ptr->first
+		<< std::setw(longest_name-ptr->first.length()+1) << " "
+		<< " = ";
+
+					     // print possible values:
+	    const std::vector<std::string> description_str
+	      = Utilities::break_text_into_lines (pd->entries[ptr->first].pattern->description(),
+						  78 - indent_level*2 - 2, '|');
+	    if (description_str.size() > 1) 
+	      {
+		out << std::endl;
+		for (unsigned int i=0; i<description_str.size(); ++i)
+		  out << std::setw(indent_level*2+6) << ""
+		      << description_str[i] << std::endl;
+	      } // if
+	    else
+	      out << "  " << description_str[0] << std::endl;
+
+					     // if there is a
+                                             // documenting string,
+                                             // print it as well
+            if (pd->entries[ptr->first].documentation.length() != 0)
+              out << std::setw(indent_level*2 + longest_name + 10) << ""
+		  << "(" << pd->entries[ptr->first].documentation << ")" << std::endl;
+          }
+        break;
+      }
+      
       default:
             Assert (false, ExcNotImplemented());
     }
@@ -1055,7 +1103,9 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                                    // subsection; also make sure that the
                                    // subsections will be printed at all
                                    // (i.e. at least one of them is non-empty)
-  if ((!(style & 128))
+  if ((style != Description)
+      &&
+      (!(style & 128))
       &&
       (pd->entries.size() != 0)
       &&
@@ -1076,6 +1126,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
         switch (style) 
           {
             case Text:
+	    case Description:
 	    case ShortText:
                   out << std::setw(indent_level*2) << ""
                       << "subsection " << ptrss->first << std::endl;
@@ -1115,6 +1166,8 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 		out << std::endl;
 	      
 	      break;
+	    case Description:
+		  break;
 	    case ShortText:
 					       // write end of
 					       // subsection.

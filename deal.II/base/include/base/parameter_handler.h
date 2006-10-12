@@ -1251,6 +1251,12 @@ class ParameterHandler : public Subscriptor
 					    */
 	  LaTeX = 2,
 					   /**
+					    * Write out declared parameters
+					    * with description and possible
+					    * values.
+					    */
+	  Description = 3,
+					   /**
 					    * Write input for
 					    * ParameterHandler without
 					    * comments or changed
