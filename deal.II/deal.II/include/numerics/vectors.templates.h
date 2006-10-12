@@ -449,8 +449,13 @@ void VectorTools::project (const Mapping<dim>       &mapping,
     MatrixTools::apply_boundary_values (boundary_values,
 					mass_matrix, vec, tmp,
 					true);
-
-  SolverControl           control(tmp.size(), 1e-12*tmp.l2_norm());
+				   // Allow for a maximum of 5*n
+				   // steps to reduce the residual by
+				   // 10^-12. n steps may not be
+				   // sufficient, since roundoff
+				   // errors may accumulate for badly
+				   // conditioned matrices
+  ReductionControl        control(5*tmp.size(), 0., 1e-12, false, false);
   PrimitiveVectorMemory<> memory;
   SolverCG<>              cg(control,memory);
 
@@ -1371,7 +1376,13 @@ VectorTools::project_boundary_values (const Mapping<dim>       &mapping,
 
   Vector<double> boundary_projection (rhs.size());
 
-  SolverControl           control(rhs.size(), 1e-12*rhs.l2_norm());
+				   // Allow for a maximum of 5*n
+				   // steps to reduce the residual by
+				   // 10^-12. n steps may not be
+				   // sufficient, since roundoff
+				   // errors may accumulate for badly
+				   // conditioned matrices
+  ReductionControl        control(5*rhs.size(), 0., 1.e-12, false, false);
   PrimitiveVectorMemory<> memory;
   SolverCG<>              cg(control,memory);
 
