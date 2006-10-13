@@ -3,14 +3,13 @@
 # Common Makefile for all test directories
 
 all: base lac fe deal.II multigrid bits hp
-	@-if grep 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
+	@-if grep -q 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
 		cd umfpack ; $(MAKE) ; cd .. ; \
 	fi
-	@-if grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
+	@-if grep -q 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
 		cd lapack ; $(MAKE) ; cd .. ; \
 	fi
 	@-if grep -q 'define DEAL_II_USE_PETSC' $D/base/include/base/config.h ; then \
-		echo =======Report: petsc ======= ; \
 		cd petsc ; $(MAKE) ; cd .. ; \
 	fi
 
@@ -40,11 +39,11 @@ report:
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
-	@if grep 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
+	@if grep -q 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
 		echo =======Report: umfpack ======= ; \
 		cd umfpack ; $(MAKE) report ; cd .. ; \
 	fi
-	@if grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
+	@if grep -q 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
 		echo =======Report: lapack ======= ; \
 		cd lapack ; $(MAKE) report ; cd .. ; \
 	fi
@@ -74,14 +73,13 @@ report+mail:
 # compilation of tests only, no execution of tests
 
 build: build-base build-lac build-fe build-deal.II build-multigrid build-bits build-hp
-	@if grep 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
+	@if grep -q 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
 		cd umfpack ; $(MAKE) build ; cd .. ; \
 	fi
-	@if grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
+	@if grep -q 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
 		cd lapack ; $(MAKE) build ; cd .. ; \
 	fi
 	@if grep -q 'define DEAL_II_USE_PETSC' $D/base/include/base/config.h ; then \
-		echo =======Report: petsc ======= ; \
 		cd petsc ; $(MAKE) build ; cd .. ; \
 	fi
 
@@ -111,10 +109,10 @@ build-hp:
 # reference values
 
 output: output-base output-lac output-fe output-deal.II output-bits output-hp
-	@if grep 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
+	@if grep -q 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
 		cd umfpack ; $(MAKE) output ; cd .. ; \
 	fi
-	@if grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
+	@if grep -q 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
 		cd lapack ; $(MAKE) output ; cd .. ; \
 	fi
 	@if grep -q 'define DEAL_II_USE_PETSC' $D/base/include/base/config.h ; then \
@@ -148,10 +146,10 @@ output-hp:
 # update/generate references
 
 refs: refs-base refs-lac refs-fe refs-deal.II refs-bits refs-hp
-	@if grep 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
+	@if grep -q 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
 		cd umfpack ; $(MAKE) refs ; cd .. ; \
 	fi
-	@if grep 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
+	@if grep -q 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ; then \
 		cd lapack ; $(MAKE) refs ; cd .. ; \
 	fi
 	@if grep -q 'define DEAL_II_USE_PETSC' $D/base/include/base/config.h ; then \
