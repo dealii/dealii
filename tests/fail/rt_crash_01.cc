@@ -12,7 +12,7 @@
 //----------------------------  rt_crash_01.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "../bits/dof_tools_common.cc"
 #include <dofs/dof_constraints.h>
 #include <base/function.h>
 #include <base/quadrature_lib.h>

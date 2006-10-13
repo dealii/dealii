@@ -17,7 +17,7 @@
 char logname[] = "project_rt_03/output";
 
 
-#include "project_common.cc"
+#include "../deal.II/project_common.cc"
 
 
 template <int dim>
