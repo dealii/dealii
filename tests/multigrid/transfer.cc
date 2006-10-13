@@ -2,7 +2,7 @@
 //    transfer.cc,v 1.13 2005/12/30 16:07:03 guido Exp
 //    Version: 
 //
-//    Copyright (C) 2000 - 2005 by the deal.II authors
+//    Copyright (C) 2000 - 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,6 +11,7 @@
 //
 //----------------------------------------------------------------------------
 
+//TODO:[GK] Add checks for RT again!
 
 #include <base/logstream.h>
 #include <lac/vector.h>
@@ -109,8 +110,8 @@ int main()
   check_simple (FESystem<2>(FE_DGQ<2>(1), 2));
   check_simple (FESystem<2>(FE_DGP<2>(1), 2, FE_DGQ<2>(1), 3));
 
-  check_simple (FE_RaviartThomas<2>(2));
-  check_simple (FESystem<2>(FE_RaviartThomas<2>(1),1,FE_DGQ<2>(0),2));
+//  check_simple (FE_RaviartThomas<2>(2));
+//  check_simple (FESystem<2>(FE_RaviartThomas<2>(1),1,FE_DGQ<2>(0),2));
   
   check_simple (FE_DGQ<3>(1));
   check_simple (FE_Q<3>(2));
