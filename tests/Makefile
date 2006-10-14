@@ -2,7 +2,7 @@
 # Makefile,v 1.14 2002/09/19 13:53:47 wolf Exp
 # Common Makefile for all test directories
 
-all: base lac fe deal.II multigrid bits hp
+all: base lac fe deal.II multigrid bits hp fail
 	@-if grep -q 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
 		cd umfpack ; $(MAKE) ; cd .. ; \
 	fi
@@ -34,8 +34,11 @@ multigrid:
 hp:
 	cd hp ; $(MAKE)
 
+fail:
+	cd fail ; $(MAKE)
+
 report:
-	@for i in base lac fe deal.II multigrid bits hp all-headers ; do \
+	@for i in base lac fe deal.II multigrid bits hp fail all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report ; cd .. ; \
 	 done
@@ -53,7 +56,7 @@ report:
 	fi
 
 report+mail:
-	@for i in base lac fe deal.II multigrid bits hp all-headers ; do \
+	@for i in base lac fe deal.II multigrid bits hp fail all-headers ; do \
 		echo =======Report: $$i ======= ; \
 		cd $$i ; $(MAKE) report+mail ; cd .. ; \
 	 done
@@ -72,7 +75,7 @@ report+mail:
 
 # compilation of tests only, no execution of tests
 
-build: build-base build-lac build-fe build-deal.II build-multigrid build-bits build-hp
+build: build-base build-lac build-fe build-deal.II build-multigrid build-bits build-hp build-fail
 	@if grep -q 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
 		cd umfpack ; $(MAKE) build ; cd .. ; \
 	fi
@@ -104,11 +107,14 @@ build-multigrid:
 build-hp:
 	cd hp ; $(MAKE) build
 
+build-fail:
+	cd fail ; $(MAKE) build
+
 
 # compilation and execution of tests only, no comparison with
 # reference values
 
-output: output-base output-lac output-fe output-deal.II output-bits output-hp
+output: output-base output-lac output-fe output-deal.II output-bits output-hp output-fail
 	@if grep -q 'define HAVE_LIBUMFPACK' $D/base/include/base/config.h ; then \
 		cd umfpack ; $(MAKE) output ; cd .. ; \
 	fi
@@ -140,6 +146,9 @@ output-multigrid:
 
 output-hp:
 	cd hp ; $(MAKE) output
+
+output-fail:
+	cd fail ; $(MAKE) output
 
 
 
@@ -183,10 +192,10 @@ refs-hp:
 resultname:
 	@echo $(TARGET)+$(GXX-VERSION)
 
-clean: clean-base clean-lac clean-deal.II clean-fe clean-bits clean-hp \
+clean: clean-base clean-lac clean-deal.II clean-fe clean-bits clean-hp clean-fail \
 	clean-umfpack clean-lapack clean-petsc
 
-distclean: distclean-base distclean-lac distclean-deal.II distclean-fe distclean-bits distclean-hp \
+distclean: distclean-base distclean-lac distclean-deal.II distclean-fe distclean-bits distclean-hp distclean-fail \
 	distclean-umfpack distclean-lapack distclean-petsc
 
 clean-base:
@@ -231,6 +240,12 @@ clean-hp:
 distclean-hp:
 	cd hp ; $(MAKE) distclean
 
+clean-fail:
+	cd fail ; $(MAKE) clean
+
+distclean-fail:
+	cd fail ; $(MAKE) distclean
+
 clean-umfpack:
 	cd umfpack ; $(MAKE) clean
 
@@ -251,9 +266,9 @@ distclean-petsc:
 
 .PHONY : all base lac fe deal.II multigrid bits \
 	clean clean-base clean-lac clean-fe \
-	clean-deal.II clean-multigrid clean-bits clean-hp \
+	clean-deal.II clean-multigrid clean-bits clean-hp clean-fail \
 	distclean distclean-base distclean-lac distclean-fe \
-	distclean-deal.II distclean-multigrid distclean-bits distclean-hp
+	distclean-deal.II distclean-multigrid distclean-bits distclean-hp distclean-fail
 
 include Makefile.paths
 include $D/common/Make.global_options
