@@ -844,7 +844,7 @@ void LaplaceProblem<dim>::run ()
 					   // data in the file:
 	  GridIn<dim> grid_in;
 	  grid_in.attach_triangulation (triangulation);
-	  std::ifstream input_file("circle-grid.inp");
+	  std::ifstream input_file("pig.inp");
 					   // We would now like to
 					   // read the file. However,
 					   // the input file is only
@@ -860,7 +860,7 @@ void LaplaceProblem<dim>::run ()
 					   // dimensions, but rather
 					   // kill the whole program
 					   // if we are not in 2D:
-	  Assert (dim==2, ExcInternalError());
+//	  Assert (dim==2, ExcInternalError());
 					   // ExcInternalError is a
 					   // globally defined
 					   // exception, which may be
@@ -907,40 +907,6 @@ void LaplaceProblem<dim>::run ()
 					   // visualization program),
 					   // for example:
 	  grid_in.read_ucd (input_file);
-                                           // If you like to use
-                                           // another input format,
-                                           // you have to use an other
-                                           // <code>grid_in.read_xxx</code>
-                                           // function. (See the
-                                           // documentation of the
-                                           // <code>GridIn</code> class to find
-                                           // out what input formats
-                                           // are presently
-                                           // supported.)
-
-					   // The grid in the file
-					   // describes a
-					   // circle. Therefore we
-					   // have to use a boundary
-					   // object which tells the
-					   // triangulation where to
-					   // put new points on the
-					   // boundary when the grid
-					   // is refined. This works
-					   // in the same way as in
-					   // the first example. Note
-					   // that the
-					   // HyperBallBoundary
-					   // constructor takes two
-					   // parameters, the center
-					   // of the ball and the
-					   // radius, but that their
-					   // default (the origin and
-					   // 1.0) are the ones which
-					   // we would like to use
-					   // here.
-	  static const HyperBallBoundary<dim> boundary;
-	  triangulation.set_boundary (0, boundary);
 	}
 
 				       // Now that we have a mesh for
@@ -955,9 +921,9 @@ void LaplaceProblem<dim>::run ()
 		<< triangulation.n_cells()
 		<< std::endl;
 
-      setup_system ();
-      assemble_system ();
-      solve ();
+//       setup_system ();
+//       assemble_system ();
+//       solve ();
       output_results (cycle);
     }
 }
@@ -973,8 +939,8 @@ int main ()
 {
   deallog.depth_console (0);
 
-  LaplaceProblem<2> laplace_problem_2d;
-  laplace_problem_2d.run ();
+  LaplaceProblem<3> laplace_problem_3d;
+  laplace_problem_3d.run ();
 
 				   // Finally, we have promised to
 				   // trigger an exception in the
