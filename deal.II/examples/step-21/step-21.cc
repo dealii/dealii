@@ -1,4 +1,4 @@
-                                  // {Include files}
+                                  // @sect3{Include files}
 
 				 // This program is an daptation of step-20
 				 // and includes some technique of DG method from step-12
@@ -49,7 +49,7 @@
 #include <base/tensor_function.h>
 
 
-                                 // {The ``TwoPhaseFlowProblem'' class template}
+                                 // @sect3{The ``TwoPhaseFlowProblem'' class template}
                                  
 
 template <int dim>
@@ -225,8 +225,7 @@ InitialValues<dim>::vector_value (const Point<dim> &p,
 
 
 
-				 // {The inverse permeability tensor, 
-                                      Coefficient and inverse mobility scalar}
+				 // @sect3{The inverse permeability tensor, Coefficient and inverse mobility scalar}
 
                                 
                                  //For the inverse  permeability tensor,
@@ -257,10 +256,13 @@ InitialValues<dim>::vector_value (const Point<dim> &p,
                                  // of the function in the second
                                  // argument, a list of tensors:
 template <int dim>
-class KInverse : public TensorFunction<2,dim>
+class KInverse //: public TensorFunction<2,dim>
 {
   public:
-    virtual void value_list (const std::vector<Point<dim> > &points,
+    KInverse () 
+      {}
+    
+    /*virtual*/ void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<Tensor<2,dim> >    &values,
                              const double epsilon) const;
 };
@@ -320,7 +322,7 @@ double Coefficient<dim>::value (const Point<dim>  &/*p*/,
 
 
 
-                                 // {extract_u and friends}
+                                 // @sect4{extract_u and friends}
 
                                  // The next five functions are
                                  // needed for matrix and right hand
@@ -388,9 +390,9 @@ extract_grad_s(const FEValuesBase<dim> &fe_values,
 
 
 
-                                 // {TwoPhaseFlowProblem class implementation}
+                                 // @sect3{TwoPhaseFlowProblem class implementation}
 
-                                 // {TwoPhaseFlowProblem::TwoPhaseFlowProblem}
+                                 // @sect4{TwoPhaseFlowProblem::TwoPhaseFlowProblem}
                                  //  we use RT(k) X DG(k),DG(k) spaces.
                                  // time_step is small enough to make the solution 
                                  // converges stably. 
@@ -414,7 +416,7 @@ TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem (const unsigned int degree)
 
 
 
-                                 // {TwoPhaseFlowProblem::make_grid_and_dofs}
+                                 // @sect4{TwoPhaseFlowProblem::make_grid_and_dofs}
 
                                  // This next function starts out with
                                  // well-known functions calls that
@@ -504,7 +506,7 @@ void TwoPhaseFlowProblem<dim>::make_grid_and_dofs ()
 }
 
 
-                                 // {TwoPhaseFlowProblem::assemble_system}
+                                 // @sect4{TwoPhaseFlowProblem::assemble_system}
                                  // The function that
                                  // assembles the linear system has
                                  // mostly been discussed already in
@@ -691,9 +693,9 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
 }
 
 
-                                 // {Linear solvers and preconditioners}
+                                 // @sect3{Linear solvers and preconditioners}
 
-                                 // {The ``InverseMatrix'' class template}
+                                 // @sect4{The ``InverseMatrix'' class template}
                                  
                                 // Everything here is completely same with step-20
                                  
@@ -736,7 +738,7 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
 }
 
 
-                                 // {The ``SchurComplement'' class template}
+                                 // @sect4{The ``SchurComplement'' class template}
                                                                  
  
 class SchurComplement : public Subscriptor
@@ -775,7 +777,7 @@ void SchurComplement::vmult (Vector<double>       &dst,
 }
 
 
-                                 // {The ``ApproximateSchurComplement'' class template}
+                                 // @sect4{The ``ApproximateSchurComplement'' class template}
 
 class ApproximateSchurComplement : public Subscriptor
 {
@@ -810,7 +812,7 @@ void ApproximateSchurComplement::vmult (Vector<double>       &dst,
 
 
 
-                                 // {TwoPhaseFlowProblem::solve}
+                                 // @sect4{TwoPhaseFlowProblem::solve}
 
                                  // After all these preparations,
                                  // we finally solves the linear
@@ -1057,7 +1059,7 @@ void TwoPhaseFlowProblem<dim>::solve ()
   
 }
                                  
-                                 // {TwoPhaseFlow::compute_errors}
+                                 // @sect4{TwoPhaseFlow::compute_errors}
 
                                  // After we have dealt with the
                                  // linear solver and preconditioners,
@@ -1139,7 +1141,7 @@ void TwoPhaseFlowProblem<dim>::compute_errors () const
       }
 }
 
-                                 // {TwoPhaseFlowProblem::output_results}
+                                 // @sect4{TwoPhaseFlowProblem::output_results}
 
                                  // The output_results function is
                                  // the one in which we generate
@@ -1187,7 +1189,7 @@ void TwoPhaseFlowProblem<dim>::output_results
 }
 
 
-                                 // {TwoPhaseFlowProblem::run}
+                                 // @sect4{TwoPhaseFlowProblem::run}
 
                                  // This is the final function of our
                                  // main class. It's only job is to
@@ -1235,7 +1237,7 @@ void TwoPhaseFlowProblem<dim>::run ()
 }
 
     
-                                 // {The ``main'' function}
+                                 // @sect3{The ``main'' function}
 
 				 // In the main function, we pass the
 				 // degree of the finite element space
