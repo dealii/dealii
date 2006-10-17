@@ -29,6 +29,8 @@
   <li> <a href="#compiler">How do I change the compiler?</a>
   <li> <a href="#gcc296">I cannot compile <acronym>deal.II</acronym>
        with gcc version 2.96!</a>
+  <li> <a href="#gfortran">I cannot link with BLAS or LAPACK even if the
+       libraries exist</a>
   <li> <a href="#windows">Can I use <acronym>deal.II</acronym> on a
        Windows platform?</a>       
   <li> <a href="#parallel">Does <acronym>deal.II</acronym> support parallel
@@ -51,9 +53,10 @@
   </ol>
 
 
-  <a name="nodata"></a>
-  <h3>I tried to install <acronym>deal.II</acronym>
-       on system X and it does not work.</h3>
+  
+  <h3><a name="nodata">
+  I tried to install deal.II on system X and it does not work.
+  </a></h3>
 
   <p>
   Even if people reading this list and especially people managing this list
@@ -125,7 +128,7 @@
   <code>
     <pre>
       template &lt;int dim&gt; struct Function {};
-      template &lt;int dim&gt; struct RHS : Function<dim> { RHS() {}; };
+      template &lt;int dim&gt; struct RHS : Function&lt;dim&gt; { RHS() {}; };
 
       template &lt;int dim&gt; void f () {
         const RHS&lt;dim&gt; rhs;
@@ -159,9 +162,23 @@
   </p>
 
 
-  <a name="windows">
-  <h3>Can I use <acronym>deal.II</acronym> on a
-  Windows platform?</a></h3>
+  
+  <h3><a name="gfortran">
+  I cannot link with BLAS or LAPACK even if the libraries exist
+  </a></h3>
+  
+  <p>This is probably due to the introduction of the new GNU FORTRAN
+  Compiler <tt>gfortran</tt>. If those libraries were compiled with
+  <tt>gfortran</tt> and you have the old <tt>g77</tt> installed, then
+  the library <tt>-lgfortran</tt> is missing. Or vice versa
+  <tt>-lg2c</tt> might be missing. Check <tt>config.log</tt> for the
+  test for BLAS to see if it complains about missing symbols
+  indicating such a thing. If so, install the missing compiler.
+  </p>
+  
+  <h3><a name="windows">
+  Can I use <acronym>deal.II</acronym> on a Windows platform?
+  </a></h3>
 
   <p>
   First the good news: yes, you can. Still, this answer needs to be
@@ -212,8 +229,10 @@
   </p>
 
 
-  <a name="perl-bug">
-  <h3>I can't build the online documentation under Cygwin!</a></h3>
+  
+  <h3><a name="perl-bug">
+  I can't build the online documentation under Cygwin!
+  </a></h3>
 
   <p>
   The Perl utility from Cygwin distribution (up to version 5.6.1-2)
@@ -230,10 +249,12 @@
   patch to the source code of the perl utility and recompile.
   </p>
 
-  <a name="cygwin-shared">
-  <h3>My program compiles and links under Cygwin, but it issues a 
+  
+  <h3><a name="cygwin-shared">
+  My program compiles and links under Cygwin, but it issues a 
   run-time error saying that <code>libXXX.DLL</code> cannot 
-  be found!</a></h3>
+  be found!
+  </a></h3>
 
   <p>
   With Version 5.1.0, <acronym>deal.II</acronym> creates and uses shared 
@@ -257,8 +278,10 @@
   </p>
 
 
-  <a name="parallel">
-  <h3>Does <acronym>deal.II</acronym> support parallel computing?</a></h3>
+  
+  <h3><a name="parallel">
+  Does <acronym>deal.II</acronym> support parallel computing?
+  </a></h3>
 
   <p>
   Yes. If you use the <code>--with-multithreading
