@@ -55,13 +55,12 @@
 #include <grid/tria_boundary.h>
 
 
-class PointCloudSurface : public StraightBoundary<3>
+class PointDefinedSurface : public StraightBoundary<3>
 {
   public:
-				     /**
-				      * Constructor.
-				      */
-    PointCloudSurface (const std::string &filename);
+    PointDefinedSurface (const std::string &filename);
+
+    Point<3> closest_point (const Point<3> &p) const;
     
 				     /**
 				      * Let the new point be the
@@ -126,23 +125,12 @@ class PointCloudSurface : public StraightBoundary<3>
     virtual void
     get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
 				     std::vector<Point<3> > &points) const;
-
-				     /**
-				      * A function that, given a point @p p,
-				      * returns the closest point on the
-				      * surface defined by the input file. For
-				      * the time being, we simply return the
-				      * closest point in the point cloud,
-				      * rather than doing any sort of
-				      * interpolation.
-				      */
-    Point<3> closest_point (const Point<3> &p) const;    
   private:
     std::vector<Point<3> > point_list;
 };
 
 
-PointCloudSurface::PointCloudSurface (const std::string &filename)
+PointDefinedSurface::PointDefinedSurface (const std::string &filename)
 {
 				   // first read in all the points
   {
@@ -249,7 +237,7 @@ PointCloudSurface::PointCloudSurface (const std::string &filename)
 
 
 Point<3>
-PointCloudSurface::closest_point (const Point<3> &p) const
+PointDefinedSurface::closest_point (const Point<3> &p) const
 {
   double distance = p.distance (point_list[0]);
   Point<3> point = point_list[0];
@@ -270,7 +258,7 @@ PointCloudSurface::closest_point (const Point<3> &p) const
 
   
 Point<3>
-PointCloudSurface::
+PointDefinedSurface::
 get_new_point_on_line (const Triangulation<3>::line_iterator &line) const
 {
   return closest_point (StraightBoundary<3>::get_new_point_on_line (line));
@@ -279,7 +267,7 @@ get_new_point_on_line (const Triangulation<3>::line_iterator &line) const
 
 
 Point<3>
-PointCloudSurface::
+PointDefinedSurface::
 get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 {
   return closest_point (StraightBoundary<3>::get_new_point_on_quad (quad));
@@ -288,7 +276,7 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 
 
 void
-PointCloudSurface::
+PointDefinedSurface::
 get_intermediate_points_on_line (const Triangulation<3>::line_iterator &line,
 				 std::vector<Point<3> > &points) const
 {
@@ -301,7 +289,7 @@ get_intermediate_points_on_line (const Triangulation<3>::line_iterator &line,
 
 
 void
-PointCloudSurface::
+PointDefinedSurface::
 get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
 				 std::vector<Point<3> > &points) const
 {
@@ -313,7 +301,7 @@ get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
 
 
 
-PointCloudSurface pds("surface-points");
+PointDefinedSurface pds("surface-points");
 
 
 
@@ -504,7 +492,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 				      triangulation.begin()->vertex(v)[1],
 				      0));
 	
-  for (unsigned int i=0; i<4; ++i)
+  for (unsigned int i=0; i<7; ++i)
     {
       for (typename Triangulation<dim>::active_cell_iterator
 	     cell = triangulation.begin_active();
@@ -609,9 +597,7 @@ void LaplaceProblem<dim>::assemble_system ()
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
-				   // NEW
-  SolverControl           solver_control (dof_handler.n_dofs(),
-					  1e-12*system_rhs.l2_norm());
+  SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
 
   PreconditionSSOR<> preconditioner;

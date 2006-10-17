@@ -50,266 +50,6 @@
 #include <base/logstream.h>
 
 
-#include <algorithm>
-#include <numeric>
-#include <grid/tria_boundary.h>
-
-
-class PointDefinedSurface : public StraightBoundary<3>
-{
-  public:
-    PointDefinedSurface (const std::string &filename);
-
-    Point<3> closest_point (const Point<3> &p) const;
-    
-				     /**
-				      * Let the new point be the
-				      * arithmetic mean of the two
-				      * vertices of the line.
-				      *
-				      * Refer to the general
-				      * documentation of this class
-				      * and the documentation of the
-				      * base class for more
-				      * information.
-				      */
-    virtual Point<3>
-    get_new_point_on_line (const Triangulation<3>::line_iterator &line) const;
-
-				     /**
-				      * Let the new point be the
-				      * arithmetic mean of the four
-				      * vertices of this quad and the
-				      * four midpoints of the lines,
-				      * which are already created at
-				      * the time of calling this
-				      * function.
-				      *
-				      * Refer to the general
-				      * documentation of this class
-				      * and the documentation of the
-				      * base class for more
-				      * information.
-				      */
-    virtual Point<3>
-    get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const;
-
-				     /**
-				      * Gives <tt>n=points.size()</tt>
-				      * points that splits the
-				      * p{StraightBoundary} line into
-				      * p{n+1} partitions of equal
-				      * lengths.
-				      *
-				      * Refer to the general
-				      * documentation of this class
-				      * and the documentation of the
-				      * base class.
-				      */
-    virtual void
-    get_intermediate_points_on_line (const Triangulation<3>::line_iterator &line,
-				     std::vector<Point<3> > &points) const;
-
-				     /**
-				      * Gives <tt>n=points.size()=m*m</tt>
-				      * points that splits the
-				      * p{StraightBoundary} quad into
-				      * <tt>(m+1)(m+1)</tt> subquads of equal
-				      * size.
-				      *
-				      * Refer to the general
-				      * documentation of this class
-				      * and the documentation of the
-				      * base class.
-				      */
-    virtual void
-    get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
-				     std::vector<Point<3> > &points) const;
-  private:
-    std::vector<Point<3> > point_list;
-};
-
-
-PointDefinedSurface::PointDefinedSurface (const std::string &filename)
-{
-				   // first read in all the points
-  {
-    std::ifstream in (filename.c_str());
-    AssertThrow (in, ExcIO());
-    
-    while (in)
-      {
-	Point<3> p;
-	in >> p;
-	point_list.push_back (p);
-      }
-
-    AssertThrow (point_list.size() > 1, ExcIO());
-  }
-  
-				   // next fit a linear model through the data
-				   // cloud to rectify it in a local
-				   // coordinate system
-				   //
-				   // the first step is to move the center of
-				   // mass of the points to the origin
-  {
-    const Point<3> c_o_m = std::accumulate (point_list.begin(),
-					    point_list.end(),
-					    Point<3>()) /
-			     point_list.size();
-    for (unsigned int i=0; i<point_list.size(); ++i)
-      point_list[i] -= c_o_m;
-  }
-
-				   // next do a least squares fit to the
-				   // function ax+by. this leads to the
-				   // following equations:
-  
-				   // min f(a,b) = sum_i (zi-a xi - b yi)^2 / 2
-				   //
-				   // f_a = sum_i (zi - a xi - b yi) xi = 0
-				   // f_b = sum_i (zi - a xi - b yi) yi = 0
-				   //
-				   // f_a = (sum_i zi xi) - (sum xi^2) a - (sum xi yi) b = 0
-				   // f_a = (sum_i zi yi) - (sum xi yi) a - (sum yi^2) b = 0
-  {
-    double A[2][2] = {{0,0},{0,0}};
-    double B[2] = {0,0};
-
-    for (unsigned int i=0; i<point_list.size(); ++i)
-      {
-	A[0][0] += point_list[i][0] * point_list[i][0];
-	A[0][1] += point_list[i][0] * point_list[i][1];
-	A[1][1] += point_list[i][1] * point_list[i][1];
-
-	B[0] += point_list[i][0] * point_list[i][2];
-	B[1] += point_list[i][1] * point_list[i][2];
-      }
-
-    const double det = A[0][0]*A[1][1]-2*A[0][1];
-    const double a = (A[1][1] * B[0] - A[0][1] * B[1]) / det;
-    const double b = (A[0][0] * B[1] - A[0][1] * B[0]) / det;
-
-
-				     // with this information, we can rotate
-				     // the points so that the corresponding
-				     // least-squares fit would be the x-y
-				     // plane
-    const Point<2> gradient_direction
-      = Point<2>(a,b) / std::sqrt(a*a+b*b);
-    const Point<2> orthogonal_direction
-      = Point<2>(-b,a) / std::sqrt(a*a+b*b);
-
-    const double stretch_factor = std::sqrt(1.+a*a+b*b);
-    
-    for (unsigned int i=0; i<point_list.size(); ++i)
-      {
-					 // we can do that by, for each point,
-					 // first subtract the points in the
-					 // plane:
-	point_list[i][2] -= a*point_list[i][0] + b*point_list[i][1];
-
-				       // we made a mistake here, though:
-				       // we've shrunk the plan in the
-				       // direction parallel to the
-				       // gradient. we will have to correct
-				       // for this:
-	const Point<2> xy (point_list[i][0],
-			   point_list[i][1]);
-	const double grad_distance = xy * gradient_direction;
-	const double orth_distance = xy * orthogonal_direction;
-
-					 // we then have to stretch the points
-					 // in the gradient direction. the
-					 // stretch factor is defined above
-					 // (zero if the original plane was
-					 // already the xy plane, infinity if
-					 // it was vertical)
-	const Point<2> new_xy
-	  = (grad_distance * stretch_factor * gradient_direction +
-	     orth_distance * orthogonal_direction);
-	point_list[i][0] = new_xy[0];
-	point_list[i][1] = new_xy[1];	
-      }
-  }
-}
-
-
-Point<3>
-PointDefinedSurface::closest_point (const Point<3> &p) const
-{
-  double distance = p.distance (point_list[0]);
-  Point<3> point = point_list[0];
-  
-  for (std::vector<Point<3> >::const_iterator i=point_list.begin();
-       i != point_list.end(); ++i)
-    {
-      const double d = p.distance (*i);
-      if (d < distance)
-	{
-	  distance = d;
-	  point = *i;
-	}
-    }
-
-  return point;
-}
-
-  
-Point<3>
-PointDefinedSurface::
-get_new_point_on_line (const Triangulation<3>::line_iterator &line) const
-{
-  return closest_point (StraightBoundary<3>::get_new_point_on_line (line));
-}
-
-
-
-Point<3>
-PointDefinedSurface::
-get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
-{
-  return closest_point (StraightBoundary<3>::get_new_point_on_quad (quad));
-}
-
-
-
-void
-PointDefinedSurface::
-get_intermediate_points_on_line (const Triangulation<3>::line_iterator &line,
-				 std::vector<Point<3> > &points) const
-{
-  StraightBoundary<3>::get_intermediate_points_on_line (line,
-							points);
-  for (unsigned int i=0; i<points.size(); ++i)
-    points[i] = closest_point(points[i]);
-}
-
-
-
-void
-PointDefinedSurface::
-get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
-				 std::vector<Point<3> > &points) const
-{
-  StraightBoundary<3>::get_intermediate_points_on_quad (quad,
-							points);
-  for (unsigned int i=0; i<points.size(); ++i)
-    points[i] = closest_point(points[i]);
-}
-
-
-
-PointDefinedSurface pds("unique-points");
-
-
-
-
-
-
-
-
                                  // @sect3{The <code>LaplaceProblem</code> class template}
 
 				 // This is again the same
@@ -584,48 +324,16 @@ LaplaceProblem<dim>::LaplaceProblem () :
 template <int dim>
 void LaplaceProblem<dim>::make_grid_and_dofs ()
 {
-  GridGenerator::hyper_cube (triangulation, -30, 30);
+  GridGenerator::hyper_cube (triangulation, -1, 1);
+  triangulation.refine_global (4);
+  
+  std::cout << "   Number of active cells: "
+	    << triangulation.n_active_cells()
+	    << std::endl
+	    << "   Total number of cells: "
+	    << triangulation.n_cells()
+	    << std::endl;
 
-  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-    if (triangulation.begin()->face(f)->center()[2] > 15)
-      {
-	triangulation.begin()->face(f)->set_boundary_indicator (1);
-	for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_face; ++i)
-	  triangulation.begin()->face(f)->line(i)->set_boundary_indicator (1);
-	break;
-      }
-  triangulation.set_boundary (1, pds);
-  
-  
-  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-    if (triangulation.begin()->vertex(v)[2] > 0)
-      triangulation.begin()->vertex(v)
-	= pds.closest_point (Point<3>(triangulation.begin()->vertex(v)[0],
-				      triangulation.begin()->vertex(v)[1],
-				      0));
-	
-  for (unsigned int i=0; i<7; ++i)
-    {
-      for (typename Triangulation<dim>::active_cell_iterator
-	     cell = triangulation.begin_active();
-	   cell != triangulation.end(); ++cell)
-	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	  if (cell->face(f)->boundary_indicator() == 1)
-	    cell->set_refine_flag ();
-      
-      triangulation.execute_coarsening_and_refinement ();
-
-      std::cout << i << std::endl
-		<< "   Number of active cells: "
-		<< triangulation.n_active_cells()
-		<< std::endl
-		<< "   Total number of cells: "
-		<< triangulation.n_cells()
-		<< std::endl;
-
-    }
-  
-  
   dof_handler.distribute_dofs (fe);
 
   std::cout << "   Number of degrees of freedom: "
@@ -858,14 +566,19 @@ void LaplaceProblem<dim>::assemble_system ()
 template <int dim>
 void LaplaceProblem<dim>::solve () 
 {
-//   SolverControl           solver_control (1000, 1e-12);
-//   SolverCG<>              cg (solver_control);
+  SolverControl           solver_control (1000, 1e-12);
+  SolverCG<>              cg (solver_control);
+  cg.solve (system_matrix, solution, system_rhs,
+	    PreconditionIdentity());
 
-//   PreconditionSSOR<> preconditioner;
-//   preconditioner.initialize(system_matrix, 1.2);
-
-//   cg.solve (system_matrix, solution, system_rhs,
-// 	    preconditioner);
+				   // We have made one addition,
+				   // though: since we suppress output
+				   // from the linear solvers, we have
+				   // to print the number of
+				   // iterations by hand.
+  std::cout << "   " << solver_control.last_step()
+	    << " CG iterations needed to obtain convergence."
+	    << std::endl;
 }
 
 
@@ -1011,6 +724,11 @@ void LaplaceProblem<dim>::run ()
 int main () 
 {
   deallog.depth_console (0);
+  {
+    LaplaceProblem<2> laplace_problem_2d;
+    laplace_problem_2d.run ();
+  }
+  
   {
     LaplaceProblem<3> laplace_problem_3d;
     laplace_problem_3d.run ();
