@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,8 +15,6 @@
 #include <base/quadrature_lib.h>
 #include <iostream>
 #include <iomanip>
-using namespace std;
-using namespace Polynomials;
 
 
 template <int dim>
@@ -30,7 +28,7 @@ PolynomialsBDM<dim>::PolynomialsBDM (const unsigned int k)
 		p_grad_grads(polynomial_space.n())
 {
   Assert (dim == 2, ExcNotImplemented());
-  monomials[0] = Monomial<double> (k+1);
+  monomials[0] = Polynomials::Monomial<double> (k+1);
 }
 
 
