@@ -60,8 +60,7 @@ template <typename> class BlockVector;
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template <typename Number>
-class Vector :
-  public Subscriptor
+class Vector : public Subscriptor
 {
   public:
 				     /**
