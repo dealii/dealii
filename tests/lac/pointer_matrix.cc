@@ -13,6 +13,7 @@
 
 // Test vmult and Tvmult of PointerMatrix and TransposeMatrix
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/pointer_matrix.h>
 #include <lac/transpose_matrix.h>
