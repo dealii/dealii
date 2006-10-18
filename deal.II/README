@@ -4,3 +4,7 @@ please see
 which you can also reach through the main page
   ./doc/index.html
 
+
+For the very impatient: just type
+  ./configure
+  make all
