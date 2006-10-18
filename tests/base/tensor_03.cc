@@ -13,6 +13,7 @@
 
 // check Tensor<1,dim>::operator= (double)
 
+#include "../tests.h"
 #include <base/tensor.h>
 #include <base/logstream.h>
 #include <lac/vector.h>

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,7 @@
 // make sure the tensor t_ijkl=delta_ik delta_jl + delta_il delta_jk
 // actually maps a rank-2 tensor onto twice itself
 
+#include "../tests.h"
 #include <base/symmetric_tensor.h>
 #include <base/logstream.h>
 #include <fstream>

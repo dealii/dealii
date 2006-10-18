@@ -13,6 +13,7 @@
 
 // check SymmetricTensor<2,dim>::operator= (double)
 
+#include "../tests.h"
 #include <base/symmetric_tensor.h>
 #include <base/logstream.h>
 #include <lac/vector.h>
