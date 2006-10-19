@@ -15,6 +15,7 @@
 // a version of hp_hanging_node_02 that crashed at the time
 // of writing the time
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
