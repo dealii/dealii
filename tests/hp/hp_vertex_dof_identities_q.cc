@@ -15,6 +15,7 @@
 // check FE_Q::hp_vertex_dof_identities
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_collection.h>
 #include <fe/fe_q.h>

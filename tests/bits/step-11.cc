@@ -15,12 +15,14 @@
 // a un-hp-ified version of hp/step-11
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fstream>
 std::ofstream logfile("step-11/output");
 
 #include <base/quadrature_lib.h>
 #include <base/function.h>
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/table_handler.h>
 #include <lac/vector.h>

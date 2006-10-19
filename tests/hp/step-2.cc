@@ -14,6 +14,7 @@
 
 // a hp-ified version of step-2
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>

@@ -15,6 +15,7 @@
 // a hp-ified version of step-4
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fstream>
 std::ofstream logfile("step-4/output");

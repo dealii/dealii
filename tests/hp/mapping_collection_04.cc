@@ -16,6 +16,7 @@
 // the fact that MappingQ has a dysfunctional copy constructor...
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/mapping_collection.h>
 #include <fe/mapping_q.h>

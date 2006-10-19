@@ -17,6 +17,7 @@
 // tests the interface constraints between elements with different Q
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>

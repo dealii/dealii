@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 // AdditionalData structures of the solvers const. This test simply
 // instantiates that class, to make sure it still compiles
 
+#include "../tests.h"
 #include <lac/solver_selector.h>
 #include <fstream>
 

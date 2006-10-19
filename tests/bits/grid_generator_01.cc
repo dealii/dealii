@@ -14,6 +14,7 @@
 
 // Test grid generation functions  in GridGenerator.
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/tensor.h>
 #include <grid/tria.h>

@@ -15,6 +15,7 @@
 // trigger a problem in DerivativeApproximation with memory handling
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/vector.h>
 #include <grid/tria.h>

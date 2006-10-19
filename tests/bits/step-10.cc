@@ -15,6 +15,7 @@
 // a un-hp-ified version of hp/step-10
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fstream>
 std::ofstream logfile("step-10/output");

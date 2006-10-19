@@ -16,6 +16,7 @@
 // q5), but this one crashed at one time before even calling the solver
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>

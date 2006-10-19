@@ -16,6 +16,7 @@
 // same random way as in hp/random
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/function_lib.h>
 #include <base/quadrature_lib.h>

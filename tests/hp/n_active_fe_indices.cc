@@ -16,6 +16,7 @@
 // edges, as well as fe_index_is_active
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>

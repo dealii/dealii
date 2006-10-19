@@ -16,6 +16,7 @@
 // arrangement of base elements and multiplicities than in the _01 test
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_collection.h>
 #include <fe/fe_dgp.h>

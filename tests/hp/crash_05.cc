@@ -15,6 +15,7 @@
 // a crash when using different fe's on different cells
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>

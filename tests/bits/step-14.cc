@@ -15,6 +15,7 @@
 // a un-hp-ified version of hp/step-14
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fstream>
 std::ofstream logfile("step-14/output");
@@ -22,6 +23,7 @@ std::ofstream logfile("step-14/output");
 
 #include <base/quadrature_lib.h>
 #include <base/function.h>
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/thread_management.h>
 #include <lac/vector.h>

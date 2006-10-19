@@ -17,6 +17,7 @@
 // symmetric as well, and in fact is
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>

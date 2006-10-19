@@ -16,6 +16,7 @@
 // randomly across the domain
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>

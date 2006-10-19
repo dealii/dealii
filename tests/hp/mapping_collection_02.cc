@@ -16,6 +16,7 @@
 // mapping_collection_01 in a really simple way
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/mapping_collection.h>
 #include <fe/mapping_q.h>

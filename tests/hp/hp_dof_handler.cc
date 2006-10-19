@@ -15,6 +15,7 @@
 /* Author: Ralf Hartmann, 2005, O. Kayser-Herold, simply modified
   the mg_dof_handler.cc test for the hp::DoFHandler. */
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>

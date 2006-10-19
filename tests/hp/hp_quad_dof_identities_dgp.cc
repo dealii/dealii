@@ -15,6 +15,7 @@
 // check FE_DGP::hp_quad_dof_identities
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_collection.h>
 #include <fe/fe_dgp.h>

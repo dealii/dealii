@@ -9,6 +9,7 @@
 /*    further information on this license.                        */
 
 
+#include "../tests.h"
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>
 #include <dofs/hp_dof_handler.h>

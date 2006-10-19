@@ -17,6 +17,7 @@
 // object
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <fe/q_collection.h>

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 // This tests the construction of a BlockMatrixArray and outputs the
 // entered blocks using print_latex.
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/block_matrix_array.h>
 #include <lac/full_matrix.h>

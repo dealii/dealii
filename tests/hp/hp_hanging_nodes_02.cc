@@ -16,6 +16,7 @@
 // we do in ConstraintMatrix::close()) for some grids with and without
 // random distribution of FEs
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>

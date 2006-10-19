@@ -17,6 +17,7 @@
 // ::DoFHandler, as long as the same element is used on all cells
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>

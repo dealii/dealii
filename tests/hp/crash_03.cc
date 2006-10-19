@@ -15,6 +15,7 @@
 // trigger an error in hp::DoFHandler::create_active_fe_table
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>

@@ -15,6 +15,7 @@
 // check FESystem(FE_Q)::hp_quad_dof_identities
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_collection.h>
 #include <fe/fe_q.h>

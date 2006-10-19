@@ -15,6 +15,7 @@
 // check a crash in hp::DoFHandler<2>::reserve_space found 2/13/2006
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>

@@ -15,6 +15,7 @@
 // a hp-ified version of step-3
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <dofs/dof_handler.h>

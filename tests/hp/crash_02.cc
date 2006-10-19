@@ -17,6 +17,7 @@
 // attaching to a triangulation
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>

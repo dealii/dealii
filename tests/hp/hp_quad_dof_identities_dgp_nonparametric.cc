@@ -15,6 +15,7 @@
 // check FE_DGPNonparametric::hp_quad_dof_identities
 
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <fe/fe_collection.h>
 #include <fe/fe_dgp_nonparametric.h>
