@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,8 +53,7 @@ check_cells (std::vector<Quadrature<dim>*>& quadratures)
       const std::vector<Point<dim> > &points=quadrature.get_points();
       const std::vector<double> &weights=quadrature.get_weights();
 
-      deallog << "Quadrature no." << n
-	      << " (" << typeid(*quadratures[n]).name() << ")";
+      deallog << "Quadrature no." << n;
 
       unsigned int i=0;
       double quadrature_int=0;
@@ -127,8 +126,7 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
       const std::vector<Point<dim> > &points=quadrature.get_points();
       const std::vector<double> &weights=quadrature.get_weights();
 
-      deallog << "Quadrature no." << n
-	      << " (" << typeid(*quadratures[n]).name() << ")";
+      deallog << "Quadrature no." << n;
 
       unsigned int i=0;
       double quadrature_int=0;
