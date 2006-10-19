@@ -4,61 +4,125 @@ This program grew out of a student project by Yan Li at Texas A&amp;M
 University. Most of the work for this program is by her.
 
 In this project, we propose a numerical simulation for two phase
-flow problem in porous media. The two phase flow system includes one
-elliptic equation and one nonlinear transport equation. We apply
-mixed finite element method and Discontinuous Galerkin method for
-this system. Some numerical results for two dimensional case are
-given by $RT_{0}\times DQ_{0}\times DQ_{0}$.
+flow problems in porous media. This problem includes one
+elliptic equation and one nonlinear, time dependent transport
+equation. This is therefore also the first time-dependent tutorial
+program (besides the somewhat strange time-dependence of step-18). 
 
-The numerical computation is based on $dealII$. We use vector shape
-functions from step9, DG method from step12, mixed method and Schur
-complement from step20 and many many useful tools from the library.
 
-<h2>Two Phase Flow Problem</h2>
+<h2>The two phase flow problem</h2>
 
-The modeling of two phase flow in porous media is important for both
-environmental rededication and the management of petroleum
-reservoirs. Practical situations involving two phase flow include
-the dispersal of a nonaqueous phase liquid in an aquifer or the
-displacement of a non-aqueous heterogeneity on the flow and
-transport. Simulation models, if they are to provide realistic
+Modeling of two phase flow in porous media is important for both
+environmental remediation and the management of petroleum
+reservoirs. Practical situations involving two phase flow include the
+dispersal of a nonaqueous phase liquid in an aquifer, or the joint
+movement of a mixture of fluids such as oil and water in a
+reservoir. Simulation models, if they are to provide realistic
 predictions, must accurately account for these effects.
 
-In our project,we consider a kind of periodic permeability,our
-numerical result shows that the heterogeneity effects are simulated
-accurately.
+To derive the governing equations, consider two phase flow in a
+reservoir $\Omega$ under the assumption that the movement of fluids is
+dominated by viscous effects; i.e. we neglect the effects of gravity,
+compressibility, and capillary pressure. Porosity will be considered
+to be constant. We will denote variables refering to either of the two
+phases using subscripts $w$ and $o$, short for water and oil. The
+derivation of the equations holds for other pairs of fluids as well,
+however. 
 
-Consider two phase flow in a reservoir $\Omega$ under the assumption
-that the displacement is dominated by viscous effects; i.e. we
-neglect the effects of gravity, compressibility, and capillary
-pressure. Porosity will be considered to be constant. The two phase
-will be referred to as water and oil, designated by subscripts $w$
-and $o$, respectively. We write Darcy's for each phase as follows:
+The velocity with which molecules of each of the two phases move is
+determined by Darcy's law that states that the velocity is
+proportional to the pressure gradient:
 @f{eqnarray*}
-\mathbf{u}_{j} = \frac{k_{rj}(S)}{\mu_{j}} \mathbf{K} \cdot \nabla p
+  \mathbf{u}_{j} 
+  = 
+  -\frac{k_{rj}(S)}{\mu_{j}} \mathbf{K} \cdot \nabla p 
 @f}
- where, $\mathbf{u}_{j}$ is the phase velocity, $K$ is the
-permeability tensor, $k_{rj}$ is the relative permeability to phase
-$j$($j=o,w$),$S$ is the water saturation(volume fraction), $P$ is
-pressure and $\mu_{j}$ is the viscosity of phase $j$($j=o,w$).
+where $\mathbf{u}_{j}$ is the velocity of phase $j=o,w$, $K$ is the
+permeability tensor, $k_{rj}$ is the relative permeability of phase
+$j$, $p$ is the
+pressure and $\mu_{j}$ is the viscosity of phase $j$. Finally, $S$ is
+the saturation (volume fraction), i.e. a function with values between
+0 and 1 indicating the composition of the mixture of fluids. In
+general, the coefficients $K, k_{rj}, \mu$ may be spatially dependent
+variables, and we will always treat them as non-constant functions in
+the following.
 
-Combining Darcy's law with a statement of conservation of mass
-allows us to express the governing equations in terms of the
-so-called pressure and saturation equations:
+We combine Darcy's law with the statement of conservation of mass for
+each phase,
+@f[
+  \textrm{div}\ \mathbf{u}_{j} = q_j,
+@f]
+with a source term for each phase. By summing over the two phases, 
+we can express the governing equations in terms of the
+so-called pressure equation:
 @f{eqnarray*}
-\nabla \cdot (\mathbf{K}(x,y)\lambda(S) \nabla p)= q(x,y) && \forall(x,y)\in\Omega\\
- S_{t} + \mathbf{u} \cdot \nabla F(S) = 0&& \forall(x,y)\in\Omega
+- \nabla \cdot (\mathbf{K}\lambda(S) \nabla p)= q.
 @f}
+Here, $q$ is th sum source term, and
+@f[
+  \lambda(S) = \frac{k_{rw}(S)}{\mu_{w}}+\frac{k_{ro}(S)}{\mu_{o}}
+@f]
+is the total mobility.
 
+So far, this looks like an ordinary stationary, Poisson-like equation
+that we can solve right away with the techniques of the first few
+tutorial programs (take a look at step-6, for example, for something
+very similar). However, we have not said anything yet about the
+saturation, which of course is going to change as the fluids move around.
 
- where, $\lambda$ is the total mobility, f is the fractional
-flow of water, $q$ is a source term and $\mathbf{u}$ is the total
-velocity, which are respectively given by:
+The second part of the equations is a therefore description of the
+dynamics of the saturation. We model this as an advected quantity:
+@f{eqnarray*}
+  S_{t} + \mathbf{u} \cdot \nabla F(S) = 0.
+@f}
+where $\mathbf u$ is the total velocity
 @f[\mathbf{u} =
-\mathbf{u}_{o} + \mathbf{u}_{w} = -\lambda(S) \mathbf{K}\cdot\nabla
-p@f]
-@f[\lambda(S) = \frac{k_{rw}(S)}{\mu_{w}}+\frac{k_{ro}(S)}{\mu_{o}}@f]
-@f[F(S) = \frac{k_{rw}(S)/\mu_{w}}{k_{rw}(S)/\mu_{w} + k_{ro}(S)/\mu_{o}}@f]
+  \mathbf{u}_{o} + \mathbf{u}_{w} = -\lambda(S) \mathbf{K}\cdot\nabla p.
+@f]
+In addition, 
+@f[
+  F(S) 
+  = 
+  \frac{k_{rw}(S)/\mu_{w}}{k_{rw}(S)/\mu_{w} + k_{ro}(S)/\mu_{o}}
+@f]
+
+In summary, what we get are the following two equations:
+@f{eqnarray*}
+  - \nabla \cdot (\mathbf{K}\lambda(S) \nabla p) &=& q
+  \qquad \textrm{in}\ \Omega\times[0,T],
+  \\
+  S_{t} + \mathbf{u} \cdot \nabla F(S) &=& 0
+  \qquad \textrm{in}\ \Omega\times[0,T].
+@f}
+Here, $p=p(\mathbf x, t), S=S(\mathbf x, t)$ are now time dependent
+functions: while at every time instant the flow field is in
+equilibrium with the pressure (i.e. we neglect dynamic
+accellerations), the saturation is transported along with the flow and
+therefore changes over time, in turn affected the flow field again
+through the dependence of the first equation on $S$.
+
+This set of equations has a peculiar character: one of the two
+equations has a time derivative, the other one doesn't. This
+corresponds to the character that the pressure and velocities are
+coupled through an instantaneous constraint, whereas the saturation
+evolves over finite time scales.
+
+Such systems of equations are called Differential Algebraic Equations
+(DAEs), since one of the equations is a differential equation, the
+other is not (at least not with respect to the time variable) and is
+therefore an "algebraic" equation. (The notation comes from the field
+of ordinary differential equations, where everything that does not
+have derivatives with respect to the time variable is necessarily an
+algebraic equation.) This class of equations contains pretty
+well-known cases: for example, the time dependent Stokes and
+Navier-Stokes equations (where the algebraic constraint is that the
+divergence of the flow field, $\textrm{div}\ \mathbf u$, must be zero)
+as well as the time dependent Maxwell equations (here, the algebraic
+constraint is that the divergence of the electric displacement field
+equals the charge density, $\textrm{div}\ \mathbf D = \rho$ and that the
+divergence of the magnetic flux density is zero: $\textrm{div}\ \mathbf
+B = 0$). We will see that the different character of the two equations
+will inform our discretization strategy for the two equations.
 
 
 <h2>Discretization</h2>
