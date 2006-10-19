@@ -24,11 +24,13 @@
 // for all lower dimensions as well. That is why in this file the check
 // is for deal_II_dimension >= any_number and not for ==
 
-
-template <typename number>
-number abs (const number a)
+namespace
 {
-  return ((a>0) ? a : -a);
+  template <typename number>
+  number abs (const number a)
+  {
+    return ((a>0) ? a : -a);
+  }
 }
 
 

@@ -21,15 +21,21 @@
 #include <iterator>
 
 
-// Integer to the power of dim
-template <int dim>
-inline unsigned int dimpow (unsigned int n)
+namespace
 {
-  unsigned int result = n;
-  for (unsigned int i=1;i<dim;++i)
-    result *= n;
-  return result;
+/**
+ * Integer to the power of dim
+ */
+  template <int dim>
+  inline unsigned int dimpow (unsigned int n)
+  {
+    unsigned int result = n;
+    for (unsigned int i=1;i<dim;++i)
+      result *= n;
+    return result;
+  }
 }
+
 
 
 template <>
