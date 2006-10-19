@@ -13,6 +13,7 @@
 
 // check MGDoFAccessor::get_mg_dof_indices
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/function.h>
 #include <lac/vector.h>

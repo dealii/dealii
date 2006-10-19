@@ -17,6 +17,7 @@
 // MGDoFHandler::renumbering function could not handle coarsened grids
 // (unused vertices, unused faces). Check that all this works now.
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>

@@ -15,6 +15,7 @@
 // MGDoFHandler::renumbering function could not handle coarsened grids
 // (unused cells). Check that this works now.
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>

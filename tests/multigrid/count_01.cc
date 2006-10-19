@@ -13,6 +13,7 @@
 
 // check MGTools::count_dofs_per_component
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>

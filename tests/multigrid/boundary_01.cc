@@ -13,6 +13,7 @@
 
 // check MGTools::make_boundary_list
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/function.h>
 #include <lac/vector.h>

@@ -13,6 +13,7 @@
 
 // check MGDoFAccessor::get_mg_dof_indices for faces
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <base/function.h>
 #include <lac/vector.h>
