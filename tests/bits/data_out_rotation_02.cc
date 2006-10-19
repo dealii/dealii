@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,7 +25,7 @@ std::string output_file_name = "data_out_rotation_02/output";
 
 
 void
-check_this (const DoFHandler<3>   &,
+my_check_this (const DoFHandler<3>   &,
             const Vector<double>  &,
             const Vector<double>  &)
 {
@@ -35,7 +35,7 @@ check_this (const DoFHandler<3>   &,
 
 template <int dim>
 void
-check_this (const DoFHandler<dim> &dof_handler,
+my_check_this (const DoFHandler<dim> &dof_handler,
             const Vector<double>  &v_node_x,
             const Vector<double>  &v_cell_x)
 {
@@ -67,3 +67,19 @@ check_this (const DoFHandler<dim> &dof_handler,
 }
 
 
+template <int dim>
+void
+check_this (const DoFHandler<dim> &dof_handler,
+            const Vector<double>  &v_node,
+            const Vector<double>  &v_cell)
+{
+				   // since we can't forward declare
+				   // check_this in this file (it is forward
+				   // declared in data_out_common.cc), we
+				   // also can't make the driver file aware of
+				   // the overload for 1d. to avoid linker
+				   // errors, we can consequently not overload
+				   // check_this, and need this forwarder
+				   // function
+  my_check_this (dof_handler, v_node, v_cell);
+}
