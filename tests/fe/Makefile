@@ -21,7 +21,7 @@ default: run-tests
 
 ############################################################
 
-tests_x=fe_data_test traits fe_tools fe_tools_test mapping \
+tests_x=fe_data_test traits fe_tools fe_tools_* mapping \
         mapping_c1 shapes derivatives function numbering mapping_q1_eulerian \
         transfer internals derivatives_face \
 	dgq_1 \
