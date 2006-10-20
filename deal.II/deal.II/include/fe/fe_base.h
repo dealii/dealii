@@ -280,6 +280,13 @@ class FiniteElementData
 					    */
 	  H2 = 0x0e
     };
+
+				     /**
+				      * The dimension of the finite
+				      * element, which is the template
+				      * parameter <tt>dim</tt>
+				      */
+    static const unsigned int dimension = dim;
     
 				     /**
 				      * Number of degrees of freedom on

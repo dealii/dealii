@@ -11,6 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include <iostream>
 
 #include <base/quadrature_lib.h>
 #include <base/qprojector.h>
@@ -29,6 +30,7 @@
 #include <fe/fe_q_hierarchical.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_dgp.h>
+#include <fe/fe_dgp_monomial.h>
 #include <fe/fe_dgp_nonparametric.h>
 #include <fe/fe_nedelec.h>
 #include <fe/fe_raviart_thomas.h>
@@ -41,6 +43,16 @@
 
 #include <boost/shared_ptr.hpp>
 
+
+// This is the map used by FETools::get_fe_from_name and
+// FETools::add_fe_name. Since FEFactoryBase has a template parameter
+// dim, it could not be a member variable of FETools. On the other
+// hand, it is only accessed by functions in this file, so it is safe
+// to make it a static variable here. It must be static so that we can
+// link several dimensions together.
+static std::map<const std::string,
+		boost::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> > >
+fe_name_map;
 
 
 namespace 
@@ -154,6 +166,10 @@ namespace
   }
 }
 
+
+template <int dim>
+FETools::FEFactoryBase<dim>::~FEFactoryBase()
+{}
 
 
 template<int dim>
@@ -1369,283 +1385,188 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
 }
 
 
+template <int dim>
+void
+FETools::add_fe_name(const std::string& parameter_name,
+		     boost::shared_ptr<const FEFactoryBase<dim> > factory)
+{
+				   // Erase everything after the
+				   // actual class name
+  std::string name = parameter_name;
+  unsigned int name_end =
+    name.find_first_not_of(std::string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
+  if (name_end < name.size())
+    name.erase(name_end);
+				   // Insert the normalized name into
+				   // the map
+  fe_name_map.insert(std::make_pair(name, factory));
+}
+
 
 template <int dim>
 FiniteElement<dim> *
-FETools::get_fe_from_name (const std::string &name)
+FETools::get_fe_from_name (const std::string &parameter_name)
 {
-				   // get the finite element that
-				   // would be created from the given
-				   // string at the first position, as
-				   // well as how many characters of
-				   // the string were eaten
-  const std::pair<FiniteElement<dim>*, unsigned int>
-    tmp = get_fe_from_name_aux<dim> (name);
-				   // make sure that we took all
-				   // characters in the name,
-				   // i.e. that there is not some junk
-				   // left over at the end of which we
-				   // didn't know what to do
-				   // with. make sure we don't create
-				   // a memory leak here
-  if (tmp.second != name.size())
+				   // First, make sure that the
+				   // standard map from names to
+				   // element factories has been
+				   // filled by checking for one of
+				   // the elements.
+//TODO: Make this threadsafe
+  if (fe_name_map.find(std::string("FE_Q_Hierarchical"))
+      == fe_name_map.end())
     {
-      delete tmp.first;
-      AssertThrow (false, ExcInvalidFEName (name));
+      add_fe_name (std::string("FE_Q_Hierarchical"),
+		   boost::shared_ptr<const FEFactoryBase<dim> >
+		   (new FEFactory<FE_Q_Hierarchical<dim> >()));
+      add_fe_name (std::string("FE_ABF"),
+		   boost::shared_ptr<const FEFactoryBase<dim> >
+		   (new FEFactory<FE_RaviartThomas<dim> >()));
+      add_fe_name (std::string("FE_RaviartThomas"),
+		   boost::shared_ptr<const FEFactoryBase<dim> >
+		   (new FEFactory<FE_RaviartThomas<dim> >()));
+      add_fe_name (std::string("FE_RaviartThomasNodal"),
+		   boost::shared_ptr<const FEFactoryBase<dim> >
+		   (new FEFactory<FE_RaviartThomasNodal<dim> >()));
+      add_fe_name (std::string("FE_Nedelec"),
+		   boost::shared_ptr<const FEFactoryBase<dim> >
+		   (new FEFactory<FE_Nedelec<dim> >()));
+      add_fe_name (std::string("FE_DGPNonparametric"),
+		   boost::shared_ptr<const FEFactoryBase<dim> >
+		   (new FEFactory<FE_DGPNonparametric<dim> >()));
+      add_fe_name (std::string("FE_DGP"),
+		   boost::shared_ptr<const FEFactoryBase<dim> >
+		   (new FEFactory<FE_DGP<dim> >()));
+      add_fe_name (std::string("FE_DGPMonomial"),
+		   boost::shared_ptr<const FEFactoryBase<dim> >
+		   (new FEFactory<FE_DGPMonomial<dim> >()));
+      add_fe_name (std::string("FE_DGQ"),
+		   boost::shared_ptr<const FEFactoryBase<dim> >
+		   (new FEFactory<FE_DGQ<dim> >()));
+      add_fe_name (std::string("FE_Q<2>(4)"),
+		   boost::shared_ptr<const FEFactoryBase<dim> >
+		   (new FEFactory<FE_Q<dim> >()));
     }
-
-				   // otherwise, return the just
-				   // created pointer
-  return tmp.first;
+  
+				   // Create a version of the name
+				   // string where all template
+				   // parameters are eliminated.
+  std::string name = parameter_name;
+  for (unsigned int pos1 = name.find('<');
+       pos1 < name.size();
+       pos1 = name.find('<'))
+    {
+      
+      const unsigned int pos2 = name.find('>');
+				       // If there is only a single
+				       // character between those two,
+				       // it should be 'd' or the number
+				       // representing the dimension.
+      if (pos2-pos1 == 2)
+	{
+	  const char dimchar = '0' + dim;
+//TODO: Write a more explicit exception here!
+	  if (name.at(pos1+1) != 'd')
+	    Assert (name.at(pos1+1) == dimchar,
+		    ExcInvalidFEName(name));
+	} else
+	  Assert(pos2-pos1 == 4, ExcInvalidFEName(name));
+      
+				       // If pos1==pos2, then we are
+				       // probably at the end of the
+				       // string
+      if (pos2 != pos1)
+	name.erase(pos1, pos2-pos1+1);
+    }
+				   // Replace all occurences of "^dim"
+				   // by "^d" to be handled by the
+				   // next loop
+  for (unsigned int pos = name.find("^dim");
+       pos < name.size();
+       pos = name.find("^dim"))
+    {
+      name.erase(pos+2, 2);
+    }
+  
+				   // Replace all occurences of "^d"
+				   // by using the actual dimension
+  for (unsigned int pos = name.find("^d");
+       pos < name.size();
+       pos = name.find("^d"))
+    {
+      name.at(pos+1) = '0' + dim;
+    }
+  FiniteElement<dim>* fe = get_fe_from_name_aux<dim> (name);
+				   // Make sure the auxiliary function
+				   // ate up all characters of the name.
+  AssertThrow (name.size() == 0, ExcInvalidFEName(parameter_name));
+  return fe;
 }
 
 
 
 template <int dim>
-std::pair<FiniteElement<dim> *, unsigned int>
-FETools::get_fe_from_name_aux (const std::string &name)
-{  
-				   // so, let's see what's at position
-				   // 0 of this string, and create a
-				   // respective finite element
-				   //
-				   // start with the longest names, to
-				   // make sure we don't match FE_Q
-				   // when it's actually a
-				   // FE_Q_Hierarchic
-  if (Utilities::match_at_string_start (name, std::string("FE_Q_Hierarchical")))
-    {
-      unsigned int position = std::string("FE_Q_Hierarchical").size();
-				       // as described in the
-				       // documentation, at this point
-				       // we may have either a) no
-				       // dimension specification, b)
-				       // the correct dimension (like
-				       // <2>), or c) a generic
-				       // <dim>. check how many of
-				       // these characters match, and
-				       // advance the cursor by the
-				       // respective amount
-      position += match_dimension<dim> (name, position);
-      
-				       // make sure the next character
-				       // is an opening parenthesis
-      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
-      ++position;
-				       // next thing is to parse the
-				       // degree of the finite element
-      const std::pair<int,unsigned int> tmp
-	= Utilities::get_integer_at_position (name, position);
-      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
-      position += tmp.second;
-
-				       // make sure the next character
-				       // is an closing parenthesis
-      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
-      ++position;
-
-				       // ok, everything seems
-				       // good. so create finite
-				       // element and return position
-				       // count
-      return std::make_pair (static_cast<FiniteElement<dim>*>
-			     (new FE_Q_Hierarchical<dim>(tmp.first)),
-			     position);
-    }
-				   // check other possibilities in
-				   // exactly the same way
-  else if (Utilities::match_at_string_start (name, std::string("FE_RaviartThomas")))
-    {
-      unsigned int position = std::string("FE_RaviartThomas").size();
-      position += match_dimension<dim> (name, position);
-      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
-      ++position;
-
-      const std::pair<int,unsigned int> tmp
-	= Utilities::get_integer_at_position (name, position);
-
-      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
-      position += tmp.second;
-      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
-      ++position;
-      return std::make_pair (static_cast<FiniteElement<dim>*>
-			     (new FE_RaviartThomas<dim>(tmp.first)),
-			     position);
-    }
-				   // check other possibilities in
-				   // exactly the same way
-  else if (Utilities::match_at_string_start (name, std::string("FE_RaviartThomasNodal")))
-    {
-      unsigned int position = std::string("FE_RaviartThomasNodal").size();
-      position += match_dimension<dim> (name, position);
-      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
-      ++position;
-
-      const std::pair<int,unsigned int> tmp
-	= Utilities::get_integer_at_position (name, position);
-
-      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
-      position += tmp.second;
-      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
-      ++position;
-      return std::make_pair (static_cast<FiniteElement<dim>*>
-			     (new FE_RaviartThomasNodal<dim>(tmp.first)),
-			     position);
-    }
-  else if (Utilities::match_at_string_start (name, std::string("FE_Nedelec")))
-    {
-      unsigned int position = std::string("FE_Nedelec").size();
-      position += match_dimension<dim> (name, position);
-      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
-      ++position;
-
-      const std::pair<int,unsigned int> tmp
-	= Utilities::get_integer_at_position (name, position);
-      
-      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
-      position += tmp.second;
-      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
-      ++position;
-      return std::make_pair (static_cast<FiniteElement<dim>*>
-			     (new FE_Nedelec<dim>(tmp.first)),
-			     position);
-    }
-  else if (Utilities::match_at_string_start (name, std::string("FE_DGPNonparametric")))
-    {
-      unsigned int position = std::string("FE_DGPNonparametric").size();
-      position += match_dimension<dim> (name, position);
-      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
-      ++position;
-
-      const std::pair<int,unsigned int> tmp
-	= Utilities::get_integer_at_position (name, position);
-      
-      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
-      position += tmp.second;
-      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
-      ++position;
-      return std::make_pair (static_cast<FiniteElement<dim>*>
-			     (new FE_DGPNonparametric<dim>(tmp.first)),
-			     position);
-    }
-  else if (Utilities::match_at_string_start (name, std::string("FE_DGP")))
-    {
-      unsigned int position = std::string("FE_DGP").size();
-      position += match_dimension<dim> (name, position);
-      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
-      ++position;
-
-      const std::pair<int,unsigned int> tmp
-	= Utilities::get_integer_at_position (name, position);
-      
-      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
-      position += tmp.second;
-      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
-      ++position;
-      return std::make_pair (static_cast<FiniteElement<dim>*>(new FE_DGP<dim>(tmp.first)),
-			     position);
-    }
-  else if (Utilities::match_at_string_start (name, std::string("FE_DGQ")))
-    {
-      unsigned int position = std::string("FE_DGQ").size();
-      position += match_dimension<dim> (name, position);
-      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
-      ++position;
-
-      const std::pair<int,unsigned int> tmp
-	= Utilities::get_integer_at_position (name, position);
-      
-      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
-      position += tmp.second;
-      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
-      ++position;
-      return std::make_pair (static_cast<FiniteElement<dim>*> (new FE_DGQ<dim>(tmp.first)),
-			     position);
-    }
-  else if (Utilities::match_at_string_start (name, std::string("FE_Q")))
-    {
-      unsigned int position = std::string("FE_Q").size();
-      position += match_dimension<dim> (name, position);
-      AssertThrow (name[position] == '(', ExcInvalidFEName(name));
-      ++position;
-
-      const std::pair<int,unsigned int> tmp
-	= Utilities::get_integer_at_position (name, position);
-      
-      AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
-      position += tmp.second;
-      AssertThrow (name[position] == ')', ExcInvalidFEName(name));
-      ++position;
-      return std::make_pair (static_cast<FiniteElement<dim>*>(new FE_Q<dim>(tmp.first)),
-			     position);
-    }
+FiniteElement<dim>*
+FETools::get_fe_from_name_aux (std::string &name)
+{
+				   // Extract the name of the
+				   // finite element class, which only
+				   // contains characters, numbers and
+				   // underscores.
+  unsigned int name_end =
+    name.find_first_not_of(std::string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
+  const std::string name_part(name, 0, name_end);
+  name.erase(0, name_part.size());
   
-  else
-				     // now things get a little more
-				     // complicated: FESystem. it's
-				     // more complicated, since we
-				     // have to figure out what the
-				     // base elements are. this can
-				     // only be done recursively
-    if (Utilities::match_at_string_start (name, std::string("FESystem")))
-      {
-	unsigned int position = std::string("FESystem").size();
-	position += match_dimension<dim> (name, position);
-
-					 // FESystem puts the names of
-					 // the basis elements into
-					 // square brackets
-	AssertThrow (name[position] == '[', ExcInvalidFEName(name));
-	++position;
-
-					 // next we have to get at the
-					 // base elements. start with
-					 // the first. wrap the whole
-					 // block into try-catch to
-					 // make sure we destroy the
-					 // pointers we got from
-					 // recursive calls if one of
-					 // these calls should throw
-					 // an exception
-	std::vector<FiniteElement<dim>*> base_fes;
-	std::vector<unsigned int>        base_multiplicities;
-	try
-	  {
-	    do
-	      {
-						 // first get the
-						 // element at this
-						 // position of the
-						 // string, i.e. of
-						 // the substring
-						 // ranging from the
-						 // present position
-						 // to the end
-		const std::pair<FiniteElement<dim> *, unsigned int> tmp_x
-		  = get_fe_from_name_aux<dim> (std::string(name.begin()+position,
-							   name.end()));
-		base_fes.push_back (tmp_x.first);
-		position += tmp_x.second;
-		
-						 // next check whether
-						 // FESystem placed a
-						 // multiplicity after
-						 // the element name
-		if (name[position] == '^')
-		  {
-						     // yes. this is
-						     // the case. move
-						     // the cursor
-						     // beyond the '^'
-						     // and read this
-						     // multiplicity
-		    ++position;
-
-		    const std::pair<int,unsigned int> tmp
-		      = Utilities::get_integer_at_position (name, position);
-		    
-		    AssertThrow (tmp.first>=0, ExcInvalidFEName(name));
-		    position += tmp.second;
+				   // now things get a little more
+				   // complicated: FESystem. it's
+				   // more complicated, since we
+				   // have to figure out what the
+				   // base elements are. this can
+				   // only be done recursively
+  if (name_part == "FESystem")
+    {
+				       // next we have to get at the
+				       // base elements. start with
+				       // the first. wrap the whole
+				       // block into try-catch to
+				       // make sure we destroy the
+				       // pointers we got from
+				       // recursive calls if one of
+				       // these calls should throw
+				       // an exception
+      std::vector<FiniteElement<dim>*> base_fes;
+      std::vector<unsigned int>        base_multiplicities;
+      try
+	{
+					   // Now, just the [...]
+					   // part should be left.
+	  AssertThrow(name.at(0) == '[', ExcInvalidFECharacter(name));
+	  do
+	    {
+					       // Erase the
+					       // leading '[' or '-'
+	      name.erase(0,1);
+					       // Now, the name of the
+					       // first base element is
+					       // first... Let's get it
+	      base_fes.push_back (get_fe_from_name_aux<dim> (name));
+					       // next check whether
+					       // FESystem placed a
+					       // multiplicity after
+					       // the element name
+	      if (name[0] == '^')
+		{
+						   // yes. Delete the '^'
+						   // and read this
+						   // multiplicity
+		  name.erase(0,1);
+		  
+		  const std::pair<int,unsigned int> tmp
+		    = Utilities::get_integer_at_position (name, 0);
+		    name.erase(0, tmp.second);
+						     // add to length,
+						     // including the '^'
 		    base_multiplicities.push_back (tmp.first);
 		  }
 		else
@@ -1664,16 +1585,16 @@ FETools::get_fe_from_name_aux (const std::string &name)
 						 // so loop while the
 						 // next character is
 						 // '-'
-	      }
-	    while (name[position++] == '-');
+		}
+	    while (name[0] == '-');
 
 					     // so we got to the end
 					     // of the '-' separated
 					     // list. make sure that
 					     // we actually had a ']'
 					     // there
-	    AssertThrow (name[position-1] == ']', ExcInvalidFEName(name));
-
+	    AssertThrow (name.at(0) == ']', ExcInvalidFECharacter(name));
+	    name.erase(0,1);
 					     // just one more sanity check
 	    Assert ((base_fes.size() == base_multiplicities.size())
 		    &&
@@ -1715,7 +1636,7 @@ FETools::get_fe_from_name_aux (const std::string &name)
 		}
 
 		default:
-		      Assert (false, ExcNotImplemented());
+		      AssertThrow (false, ExcNotImplemented());
 	      }
 
 					     // now we don't need the
@@ -1724,8 +1645,12 @@ FETools::get_fe_from_name_aux (const std::string &name)
 	    for (unsigned int i=0; i<base_fes.size(); ++i)
 	      delete base_fes[i];
 	    
-					     // finally return our findings
-	    return std::make_pair (system_element, position);
+					     // finally return our
+					     // findings
+					     // Add the closing ']' to
+					     // the length
+	    return system_element;
+	    
 	  }
 	catch (...)
 	  {
@@ -1749,6 +1674,21 @@ FETools::get_fe_from_name_aux (const std::string &name)
 					 // never get here
 	Assert (false, ExcInternalError());
       }
+    else
+      {
+	typename std::map<const std::string,
+	  boost::shared_ptr<const FETools::FEFactoryBase<dim> > >::const_iterator
+	  entry = fe_name_map.find(name_part);
+	AssertThrow (entry != fe_name_map.end(), ExcInvalidFEName(name));
+					 // Now, just the (degree)
+					 // part should be left.
+	AssertThrow(name.at(0) == '(', ExcInvalidFECharacter(name));
+	name.erase(0,1);
+	const std::pair<int,unsigned int> tmp
+	  = Utilities::get_integer_at_position (name, 0);
+	name.erase(0, tmp.second+1);
+	return entry->second->get(tmp.first);
+      }
   
     
 				   // hm, if we have come thus far, we
@@ -1760,7 +1700,7 @@ FETools::get_fe_from_name_aux (const std::string &name)
 				   // make some compilers happy that
 				   // do not realize that we can't get
 				   // here after throwing
-  return std::pair<FiniteElement<dim> *, unsigned int> (0,0);
+  return 0;
 }
 
 
@@ -1828,6 +1768,8 @@ compute_interpolation_to_quadrature_points_matrix (const FiniteElement<dim> &fe,
 
 /*-------------- Explicit Instantiations -------------------------------*/
 
+
+template class FETools::FEFactoryBase<deal_II_dimension>;
 
 template
 void FETools::compute_node_matrix(
@@ -2085,10 +2027,13 @@ void FETools::extrapolate<deal_II_dimension>
  const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
  Vector<float> &);
 
-template
-FiniteElement<deal_II_dimension> *
+template FiniteElement<deal_II_dimension> *
 FETools::get_fe_from_name<deal_II_dimension> (const std::string &);
-
+template void
+FETools::add_fe_name<deal_II_dimension>(
+  const std::string& name,
+  boost::shared_ptr<const FEFactoryBase<deal_II_dimension> > factory);
+  
 template
 void
 FETools::

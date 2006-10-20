@@ -21,6 +21,8 @@
 
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
 template <typename number> class FullMatrix;
 template <typename number> class Vector;
 template <int dim> class Quadrature;
@@ -53,11 +55,56 @@ class ConstraintMatrix;
  * $id-I_h$ that is needed for evaluating $(id-I_h)z$ for e.g. the
  * dual solution $z$.
  *
- * @author Ralf Hartmann, 2000; Wolfgang Bangerth, 2003, 2005, Guido Kanschat, 2000, 2004
+ * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat;
+ * 2000, 2003, 2004, 2005, 2006
  */
 class FETools
 {
   public:
+				     /**
+				      * The base for factory objects
+				      * creating finite elements of a
+				      * given degree.
+				      *
+				      * @author Guido Kanschat, 2006
+				      */
+    template <int dim>
+    class FEFactoryBase
+    {
+      public:
+					 /**
+					  * Create a FiniteElement and
+					  * return a pointer to it.
+					  */
+	virtual FiniteElement<dim>*
+	get (const unsigned int degree) const = 0;
+					 /**
+					  * Virtual destructor doing
+					  * nothing but making the
+					  * compiler happy.
+					  */
+	virtual ~FEFactoryBase();
+    };
+    
+				     /**
+				      * The base for factory objects
+				      * creating finite elements of a
+				      * given degree.
+				      *
+				      * @author Guido Kanschat, 2006
+				      */
+    template <class FE>
+    class FEFactory : public FEFactoryBase<FE::dimension>
+    {
+      public:
+					 /**
+					  * Create a FiniteElement and
+					  * return a pointer to it.
+					  */
+	virtual FiniteElement<FE::dimension>*
+	get (const unsigned int degree) const;
+    };
+    
 				     /**
 				      * @warning In most cases, you
 				      * will probably want to use
@@ -909,53 +956,38 @@ class FETools
 					   std::vector<unsigned int>    &l2h);
 
 				     /**
-				      * Given a name in the form which
+				      * Parse the name of a finite
+				      * element and generate a finite
+				      * element object accordingly.
+				      *
+				      * The name must be in the form which
 				      * is returned by the
 				      * @p FiniteElement::get_name
-				      * function, regenerate such a
-				      * finite element.
+				      * function, where a few
+				      * modifications are allowed:
 				      *
-				      * This function is useful to
-				      * convert the name given in an
-				      * input file to an actual finite
-				      * element, without having to
-				      * parse the name yourself.
+				      * <ul><li> Dimension template
+				      * parameters &lt;2&gt; etc. can
+				      * be omitted. Alternatively, the
+				      * explicit number can be
+				      * replaced by <tt>dim</tt> or
+				      * <tt>d</tt>. If a number is
+				      * given, it <b>must</b> match
+				      * the template parameter of this
+				      * function.
 				      *
-				      * Note that the given name must
-				      * match exactly what one would
-				      * get from the finite element to
-				      * be created, since otherwise
-				      * the parsing would fail. If no
-				      * finite element can be
+				      * <li> The powers used for
+				      * FESystem may either be numbers
+				      * or can be
+				      * replaced by <tt>dim</tt> or
+				      * <tt>d</tt>.
+				      * </ul>
+				      *
+				      * If no finite element can be
 				      * reconstructed from this
 				      * string, an exception of type
 				      * @p FETools::ExcInvalidFEName
 				      * is thrown.
-				      *
-				      * There is one exception,
-				      * however, where the names must
-				      * not match exactly: while the
-				      * finite elements write the
-				      * space dimension in the form of
-				      * a template argument after the
-				      * name of the class (for example
-				      * <tt>FE_Q<2></tt>, you can omit the
-				      * dimension argument altogether,
-				      * or replace it with the string
-				      * <tt>@<dim@></tt>. The reason
-				      * is that the dimension argument
-				      * may be cumbersome if the name
-				      * of a finite element is given
-				      * in an input file that may be
-				      * used to control operation of
-				      * the program in different space
-				      * dimensions. Running the
-				      * program in another space
-				      * dimension would then require
-				      * changing the input file as
-				      * well. With above exception,
-				      * there is a canonical spelling
-				      * that doesn't require this.
 				      *
 				      * The function returns a pointer
 				      * to a newly create finite
@@ -976,21 +1008,56 @@ class FETools
     FiniteElement<dim> *
     get_fe_from_name (const std::string &name);
 
-
 				     /**
-				      * Exception
+				      * Adds the name of a finite
+				      * element to be used by
+				      * get_fe_from_name().
+				      *
+				      * It is safe to use either the
+				      * class name explicitly or to
+				      * use the result of
+				      * FiniteElement::get_name, since
+				      * everything after the first
+				      * non-name character will be
+				      * chopped off.
+				      */
+    template <int dim>
+    static void add_fe_name(const std::string& name,
+			    boost::shared_ptr<const FEFactoryBase<dim> > factory);
+    
+				     /**
+				      * The string used for
+				      * get_fe_from_name() cannot be
+				      * translated to a finite
+				      * element.
+				      *
+				      * Either the string is badly
+				      * formatted or you are using a
+				      * custom element that must be
+				      * added using add_fe_name()
+				      * first.
 				      */
     DeclException1 (ExcInvalidFEName,
 		    std::string,
-		    << "Can't re-generate a finite element from the string <"
-		    << arg1 << ">.");
+		    << "Can't re-generate a finite element from the string '"
+		    << arg1 << "'.");
+    
+				     /**
+				      * Parsing a finite element name,
+				      * an unexpected character showed up.
+				      */
+    DeclException1 (ExcInvalidFECharacter,
+		    std::string,
+		    << "Unexpected character at beginning of '"<< arg1 << "'");
+    
 				     /**
 				      * Exception
 				      */
     DeclException0 (ExcInvalidFE);
 
                                      /**
-                                      * Exception
+                                      * The finite element must be
+				      * @ref GlossPrimitive "primitive".
                                       */
     DeclException0 (ExcFEMustBePrimitive);
 				     /**
@@ -1008,7 +1075,7 @@ class FETools
 		    << "constraints. Use the respective function with "
 		    << "additional ConstraintMatrix argument(s), instead.");
 				     /**
-				      * Exception
+				      * You need at least two grid levels.
 				      */
     DeclException0 (ExcGridNotRefinedAtLeastOnce);
 				     /**
@@ -1019,36 +1086,6 @@ class FETools
 		    << "This is a " << arg1 << "x" << arg2 << " matrix, "
 		    << "but should be a " << arg3 << "x" << arg4 << " matrix.");
 
-  private:
-				     /**
-				      * Return a finite element that
-				      * is created using the
-				      * characters of the input
-				      * parameters. The second part of
-				      * the return value indicates how
-				      * many characters have been used
-				      * up in the creation of the
-				      * finite element, so that the
-				      * calling site can continue
-				      * parsing finite element lists
-				      * (for example for
-				      * FESystem objects) at the
-				      * position after which the
-				      * present element's name ends.
-				      *
-				      * If no finite element could be
-				      * created from the string at the
-				      * beginning of the given string,
-				      * then an exception is thrown,
-				      * just as for the
-				      * get_fe_from_name()
-				      * function.
-				      */
-    template <int dim>
-    static
-    std::pair<FiniteElement<dim> *, unsigned int>
-    get_fe_from_name_aux (const std::string &name);    
-
 				     /**
 				      * Exception thrown if an
 				      * embedding matrix was computed
@@ -1056,7 +1093,30 @@ class FETools
 				      */
     DeclException1(ExcLeastSquaresError, double,
 		   << "Least squares fit leaves a gap of " << arg1);
+  private:
+				     /**
+				      * Return a finite element that
+				      * is created using the beginning
+				      * of <tt>name</tt> and eat away
+				      * the part of <tt>name</tt>
+				      * defining this element.
+				      */
+    template <int dim>
+    static
+    FiniteElement<dim> *
+    get_fe_from_name_aux (std::string &name);
+    
 };
+
+
+template<class FE>
+FiniteElement<FE::dimension>*
+FETools::FEFactory<FE>::get (const unsigned int degree) const
+{
+  return new FE(degree);
+}
+
+
 
 /*@}*/
 
