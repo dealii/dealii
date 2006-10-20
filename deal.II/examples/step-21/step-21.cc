@@ -1,4 +1,4 @@
-                                  // @sect3{Include files}
+				 // @sect3{Include files}
 
 				 // This program is an daptation of step-20
 				 // and includes some technique of DG method from step-12
@@ -24,7 +24,7 @@
 #include <dofs/dof_tools.h>
 #include <dofs/dof_constraints.h>
 #include <fe/fe_q.h>
-                                  //The Discontinuous Galerkin finite element is declared: 
+				 //The Discontinuous Galerkin finite element is declared: 
 #include <fe/fe_dgq.h>
 
 #include <fe/fe_system.h>
@@ -36,7 +36,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-				  // The Raviart-Thomas finite element is declared:
+				 // The Raviart-Thomas finite element is declared:
 #include <fe/fe_raviart_thomas.h>
 
 				 // In this program, we use a tensorial
@@ -81,7 +81,6 @@ class TwoPhaseFlowProblem
     const unsigned int n_refinement_steps;
     
     double time_step;
-    double epsilon;
     double vis;    
     double vfs_out;
     double v_out;
@@ -96,7 +95,7 @@ class TwoPhaseFlowProblem
 
 				 //{Right hand side, boundary values and initial values}
                                 
-                                  // we define the template for pressure right-hand side(source function)
+				 // we define the template for pressure right-hand side(source function)
                                  //and boundary values for pressure and saturation
                                  // initial values for saturation.
 
@@ -196,11 +195,11 @@ SaturationBoundaryValues<dim>::vector_value (const Point<dim> &p,
 
 template <int dim>
 double InitialValues<dim>::value (const Point<dim>  &p,
-					   const unsigned int component) const 
+				  const unsigned int component) const 
 {
-    if(component<dim+1)
+  if(component<dim+1)
     return 0;
-    else 
+  else 
     { 
       if(p[0]==0)return 1;
       else return 0;
@@ -232,7 +231,7 @@ InitialValues<dim>::vector_value (const Point<dim> &p,
                                  // ``KInverse''.As in introduction, '
                                  // assume the heterogeneous is isotropic,
                                  // so it is a scalar multipy the identity matrix.
-                                  //DealII has a base class not only for
+				 //DealII has a base class not only for
                                  // scalar and generally vector-valued
                                  // functions (the ``Function'' base
                                  // class) but also for functions that
@@ -256,68 +255,69 @@ InitialValues<dim>::vector_value (const Point<dim> &p,
                                  // of the function in the second
                                  // argument, a list of tensors:
 template <int dim>
-class KInverse //: public TensorFunction<2,dim>
+class KInverse : public TensorFunction<2,dim>
 {
   public:
-    KInverse () 
-      {}
+    KInverse ();
     
-    /*virtual*/ void value_list (const std::vector<Point<dim> > &points,
-			     std::vector<Tensor<2,dim> >    &values,
-                             const double epsilon) const;
+    virtual void value_list (const std::vector<Point<dim> > &points,
+			     std::vector<Tensor<2,dim> >    &values) const;
+
+  private:
+    std::vector<Point<dim> > centers;
 };
 
 
 template <int dim>
-class Coefficient : public Function<dim>
+KInverse<dim>::KInverse () 
 {
-  public:
-    Coefficient () : Function<dim>(1) {};
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component = 0 ) const;
-};
+  const unsigned int N = 40;
+  centers.resize (N);
+  for (unsigned int i=0; i<N; ++i)
+    for (unsigned int d=0; d<dim; ++d)
+      centers[i][d] = 2.*rand()/RAND_MAX-1;
+}
+
 
 
 template <int dim>
 void
 KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
-                           std::vector<Tensor<2,dim> >    &values,
-                           const double epsilon) const
+                           std::vector<Tensor<2,dim> >    &values) const
 {
   Assert (points.size() == values.size(),
 	  ExcDimensionMismatch (points.size(), values.size()));
- 
+
   for (unsigned int p=0; p<points.size(); ++p)
     {
       values[p].clear ();
 
-      const double permeability = 1.0/(2+1.99*sin(2*3.1415926*(2*points[p][0]-1*points[p][1])/epsilon));
+      double permeability = 0;
+      for (unsigned int i=0; i<centers.size(); ++i)
+        permeability += std::exp(-(points[p]-centers[i]).square()
+                                 / (0.1 * 0.1));
+      
+      const double normalized_permeability
+        = std::max(permeability, 0.005);
       
       for (unsigned int d=0; d<dim; ++d)
-	   values[p][d][d]=1.0/permeability;
-
+	values[p][d][d] = 10./normalized_permeability;
     }
 }
 
 
+
 double mobility_inverse (const double S, const double vis)
 { 
-   return 1.0 /(1.0/vis * S * S + (1-S) * (1-S));
+  return 1.0 /(1.0/vis * S * S + (1-S) * (1-S));
 }
 
 double f_saturation(const double S, const double vis)
 {   
 
-   return S*S /( S * S +vis * (1-S) * (1-S));
+  return S*S /( S * S +vis * (1-S) * (1-S));
 }
 
-template <int dim>
-double Coefficient<dim>::value (const Point<dim>  &/*p*/,
-				  const unsigned int /*component*/) const 
-{
-  return 1;
-}
 
 
 
@@ -408,8 +408,7 @@ TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem (const unsigned int degree)
 		    FE_DGQ<dim>(degree), 1),
 		dof_handler (triangulation),
 		n_refinement_steps (5),
-		time_step (1.0/std::pow(2.0, double(n_refinement_steps))/6),
-                epsilon(0.05),
+		time_step (10.0/std::pow(2.0, double(n_refinement_steps))/6),
                 vis (0.2)
                 
 {}
@@ -429,11 +428,11 @@ void TwoPhaseFlowProblem<dim>::make_grid_and_dofs ()
   GridGenerator::hyper_cube (triangulation, 0, 1);
   
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-   { if (triangulation.begin()->face(f)->center()[0] == 0)
+    { if (triangulation.begin()->face(f)->center()[0] == 0)
       triangulation.begin()->face(f)->set_boundary_indicator (1);
-     if (triangulation.begin()->face(f)->center()[0] == 1)
-      triangulation.begin()->face(f)->set_boundary_indicator (2);
-   }
+      if (triangulation.begin()->face(f)->center()[0] == 1)
+	triangulation.begin()->face(f)->set_boundary_indicator (2);
+    }
 
   triangulation.refine_global (n_refinement_steps);
   
@@ -561,13 +560,11 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
   const RightHandSide<dim>          right_hand_side;
   const PressureBoundaryValues<dim> pressure_boundary_values;
   const KInverse<dim>               k_inverse;
-  const Coefficient<dim>            coefficient;
    
   
   std::vector<double>               rhs_values (n_q_points);
   std::vector<double>               boundary_values (n_face_q_points);
   std::vector<Tensor<2,dim> >       k_inverse_values (n_q_points);
-  std::vector<double>               coefficient_values(n_q_points);
   
   std::vector<Vector<double> >      old_solution_values(n_q_points, Vector<double>(dim+2));
   std::vector<std::vector<Tensor<1,dim> > >  old_solution_grads(n_q_points,
@@ -597,10 +594,7 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
       right_hand_side.value_list (fe_values.get_quadrature_points(),
                                   rhs_values);
       k_inverse.value_list (fe_values.get_quadrature_points(),
-                            k_inverse_values,
-                            epsilon);
-      
-      coefficient.value_list (fe_values.get_quadrature_points(), coefficient_values);
+                            k_inverse_values);
       
       for (unsigned int q=0; q<n_q_points; ++q)            
         for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -625,8 +619,8 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
 				      mobility_inverse(old_s,vis) * phi_j_u            
                                       - div_phi_i_u * phi_j_p
                                       - phi_i_p * div_phi_j_u
-				      + coefficient_values[q] * phi_i_s * phi_j_s
-				      )
+				      + phi_i_s * phi_j_s
+		)
                                      * fe_values.JxW(q);     
               }
 
@@ -634,7 +628,7 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
                             fe_values.JxW(q);
           }
       
-                                             //here, we compute the boundary values for pressure 
+				       //here, we compute the boundary values for pressure 
 
       for (unsigned int face_no=0;
 	   face_no<GeometryInfo<dim>::faces_per_cell;
@@ -681,10 +675,10 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
       for (unsigned int i=0; i<dofs_per_cell; ++i)
       
         for (unsigned int j=0; j<dofs_per_cell; ++j)
-      {    system_matrix.add (local_dof_indices[i],
-                             local_dof_indices[j],
-			      local_matrix(i,j));
-       }
+	  {    system_matrix.add (local_dof_indices[i],
+				  local_dof_indices[j],
+				  local_matrix(i,j));
+	  }
       
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         system_rhs(local_dof_indices[i]) += local_rhs(i);	
@@ -697,7 +691,7 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
 
                                  // @sect4{The ``InverseMatrix'' class template}
                                  
-                                // Everything here is completely same with step-20
+				 // Everything here is completely same with step-20
                                  
 
 
@@ -830,7 +824,7 @@ void TwoPhaseFlowProblem<dim>::solve ()
   Vector<double> tmp2 (solution.block(2).size());
   
 
-                                 // this part is for pressure
+				   // this part is for pressure
   {
     m_inverse.vmult (tmp, system_rhs.block(0));
     system_matrix.block(1,0).vmult (schur_rhs, tmp);
@@ -874,176 +868,176 @@ void TwoPhaseFlowProblem<dim>::solve ()
     m_inverse.vmult (solution.block(0), tmp);
   }
 
-                                      //This part is for saturation.
-                                      // Here are many complicated functions
-                                      //which are very similiar with the
-                                      //assemble_system() part.
-                                     // For DG(0), we have to consider the discontinuty
-                                     // of the solution, then as in Introduction,
-                                     // compute numerical flux and judge it is in-flow or out-flow.
-                                     // After assemble Matrixbloc(2,0)
-                                     // , we could compute saturation directly. 
+				   //This part is for saturation.
+				   // Here are many complicated functions
+				   //which are very similiar with the
+				   //assemble_system() part.
+				   // For DG(0), we have to consider the discontinuty
+				   // of the solution, then as in Introduction,
+				   // compute numerical flux and judge it is in-flow or out-flow.
+				   // After assemble Matrixbloc(2,0)
+				   // , we could compute saturation directly. 
  
   { 
-  QGauss<dim>   quadrature_formula(degree+2); 
-  QGauss<dim-1> face_quadrature_formula(degree+2);  
-  FEValues<dim> fe_values (fe, quadrature_formula, 
-			   update_values    | update_gradients |
-                           update_q_points  | update_JxW_values);
-  FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula, 
-				    update_values    | update_normal_vectors |
-				    update_q_points  | update_JxW_values);
-  FEFaceValues<dim> fe_face_values_neighbor (fe, face_quadrature_formula, 
-					     update_values);
+    QGauss<dim>   quadrature_formula(degree+2); 
+    QGauss<dim-1> face_quadrature_formula(degree+2);  
+    FEValues<dim> fe_values (fe, quadrature_formula, 
+			     update_values    | update_gradients |
+			     update_q_points  | update_JxW_values);
+    FEFaceValues<dim> fe_face_values (fe, face_quadrature_formula, 
+				      update_values    | update_normal_vectors |
+				      update_q_points  | update_JxW_values);
+    FEFaceValues<dim> fe_face_values_neighbor (fe, face_quadrature_formula, 
+					       update_values);
   
  
-  const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
-  const unsigned int   n_q_points      = quadrature_formula.n_quadrature_points;
-  const unsigned int   n_face_q_points = face_quadrature_formula.n_quadrature_points;
+    const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+    const unsigned int   n_q_points      = quadrature_formula.n_quadrature_points;
+    const unsigned int   n_face_q_points = face_quadrature_formula.n_quadrature_points;
   
-  vfs_out = 0.0;
-  v_out = 0.0;  
+    vfs_out = 0.0;
+    v_out = 0.0;  
   
-  Vector<double>       local_rhs (dofs_per_cell);
-  std::vector<Vector<double> > old_solution_values(n_q_points, Vector<double>(dim+2));
-  std::vector<Vector<double> > old_solution_values_face(n_face_q_points, Vector<double>(dim+2));
-  std::vector<Vector<double> > old_solution_values_face_neighbor(n_face_q_points, Vector<double>(dim+2));
-  std::vector<Vector<double> > present_solution_values(n_q_points, Vector<double>(dim+2));
-  std::vector<Vector<double> > present_solution_values_face(n_face_q_points, Vector<double>(dim+2));
+    Vector<double>       local_rhs (dofs_per_cell);
+    std::vector<Vector<double> > old_solution_values(n_q_points, Vector<double>(dim+2));
+    std::vector<Vector<double> > old_solution_values_face(n_face_q_points, Vector<double>(dim+2));
+    std::vector<Vector<double> > old_solution_values_face_neighbor(n_face_q_points, Vector<double>(dim+2));
+    std::vector<Vector<double> > present_solution_values(n_q_points, Vector<double>(dim+2));
+    std::vector<Vector<double> > present_solution_values_face(n_face_q_points, Vector<double>(dim+2));
 
-  std::vector<double> neighbor_saturation (n_face_q_points);
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<double> neighbor_saturation (n_face_q_points);
+    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   
-  typename DoFHandler<dim>::active_cell_iterator
-    cell = dof_handler.begin_active(),
-    endc = dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
 
- for (; cell!=endc; ++cell)
- {
-    local_rhs = 0;
-    fe_values.reinit (cell);
+    for (; cell!=endc; ++cell)
+      {
+	local_rhs = 0;
+	fe_values.reinit (cell);
 
-    fe_values.get_function_values (old_solution, old_solution_values);
-    fe_values.get_function_values (solution, present_solution_values);
+	fe_values.get_function_values (old_solution, old_solution_values);
+	fe_values.get_function_values (solution, present_solution_values);
     
-    for (unsigned int q=0; q<n_q_points; ++q) 
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  const double old_s = old_solution_values[q](dim+1);
-          Tensor<1,dim> present_u;
-	  for (unsigned int d=0; d<dim; ++d)
-	      present_u[d] = present_solution_values[q](d);
+	for (unsigned int q=0; q<n_q_points; ++q) 
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    {
+	      const double old_s = old_solution_values[q](dim+1);
+	      Tensor<1,dim> present_u;
+	      for (unsigned int d=0; d<dim; ++d)
+		present_u[d] = present_solution_values[q](d);
 
-	  const double phi_i_s = extract_s(fe_values, i, q);
-	  const Tensor<1,dim> grad_phi_i_s = extract_grad_s(fe_values, i, q);
+	      const double phi_i_s = extract_s(fe_values, i, q);
+	      const Tensor<1,dim> grad_phi_i_s = extract_grad_s(fe_values, i, q);
 	    	     
-	  local_rhs(i) += (
-                           time_step *(f_saturation(old_s,vis) * present_u * grad_phi_i_s)+
-			     old_s * phi_i_s)
-			  * fe_values.JxW(q);
-       	}
-                                       //Here is our numerical flux computation
-                                        // Finding neighbor as step-12
+	      local_rhs(i) += (
+		time_step *(f_saturation(old_s,vis) * present_u * grad_phi_i_s)+
+		old_s * phi_i_s)
+			      * fe_values.JxW(q);
+	    }
+					 //Here is our numerical flux computation
+					 // Finding neighbor as step-12
      		     		  
-    for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;++face_no)
-       {
-	 fe_face_values.reinit (cell, face_no);
+	for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;++face_no)
+	  {
+	    fe_face_values.reinit (cell, face_no);
 
-	 fe_face_values.get_function_values (old_solution, old_solution_values_face);
-	 fe_face_values.get_function_values (solution, present_solution_values_face);
+	    fe_face_values.get_function_values (old_solution, old_solution_values_face);
+	    fe_face_values.get_function_values (solution, present_solution_values_face);
 
-	 if (cell->at_boundary(face_no))
-	   {
-	     if (cell->face(face_no)->boundary_indicator() == 1)
-	       for (unsigned int q=0;q<n_face_q_points;++q)
-		 neighbor_saturation[q] = 1;
-	     else
-	       for (unsigned int q=0;q<n_face_q_points;++q)
-		 neighbor_saturation[q] = 0;	                 
-	   }
-	 else
-					    // there is a neighbor behind this face
-	   {
-	     const typename DoFHandler<dim>::active_cell_iterator
-	       neighbor = cell->neighbor(face_no);
-	     const unsigned int
-	       neighbor_face = cell->neighbor_of_neighbor(face_no);
+	    if (cell->at_boundary(face_no))
+	      {
+		if (cell->face(face_no)->boundary_indicator() == 1)
+		  for (unsigned int q=0;q<n_face_q_points;++q)
+		    neighbor_saturation[q] = 1;
+		else
+		  for (unsigned int q=0;q<n_face_q_points;++q)
+		    neighbor_saturation[q] = 0;	                 
+	      }
+	    else
+					       // there is a neighbor behind this face
+	      {
+		const typename DoFHandler<dim>::active_cell_iterator
+		  neighbor = cell->neighbor(face_no);
+		const unsigned int
+		  neighbor_face = cell->neighbor_of_neighbor(face_no);
 
-	     fe_face_values_neighbor.reinit (neighbor, neighbor_face);
+		fe_face_values_neighbor.reinit (neighbor, neighbor_face);
 	     
-	     fe_face_values_neighbor.get_function_values (old_solution,
-							  old_solution_values_face_neighbor);
+		fe_face_values_neighbor.get_function_values (old_solution,
+							     old_solution_values_face_neighbor);
 	     
-	     for (unsigned int q=0;q<n_face_q_points;++q)
-	       neighbor_saturation[q] = old_solution_values_face_neighbor[q](dim+1);
-	   }
+		for (unsigned int q=0;q<n_face_q_points;++q)
+		  neighbor_saturation[q] = old_solution_values_face_neighbor[q](dim+1);
+	      }
           
 
-         if (cell->at_boundary(face_no))
-	    {	
-              if (cell->face(face_no)->boundary_indicator() ==2 )
-		{for (unsigned int q=0;q<n_face_q_points;++q)
-		  {
-                    vfs_out += present_solution_values_face[q](0)
-                             *f_saturation(present_solution_values_face[q](dim+1),vis)
-                             *fe_face_values.JxW(q);
-                     v_out += present_solution_values_face[q](0)
-                             *fe_face_values.JxW(q);
-                   }     	                     
-		 }
-             }
-	 for (unsigned int q=0;q<n_face_q_points;++q)
-	   {
-	     Tensor<1,dim> present_u_face;
-	     for (unsigned int d=0; d<dim; ++d)
-	      { present_u_face[d] = present_solution_values_face[q](d);
-     }
- 	     const double normal_flux = present_u_face *
- 					fe_face_values.normal_vector(q);
+	    if (cell->at_boundary(face_no))
+	      {	
+		if (cell->face(face_no)->boundary_indicator() ==2 )
+		  {for (unsigned int q=0;q<n_face_q_points;++q)
+		    {
+		      vfs_out += present_solution_values_face[q](0)
+				 *f_saturation(present_solution_values_face[q](dim+1),vis)
+				 *fe_face_values.JxW(q);
+		      v_out += present_solution_values_face[q](0)
+			       *fe_face_values.JxW(q);
+		    }     	                     
+		  }
+	      }
+	    for (unsigned int q=0;q<n_face_q_points;++q)
+	      {
+		Tensor<1,dim> present_u_face;
+		for (unsigned int d=0; d<dim; ++d)
+		  { present_u_face[d] = present_solution_values_face[q](d);
+		  }
+		const double normal_flux = present_u_face *
+					   fe_face_values.normal_vector(q);
 
-	     const bool is_outflow_q_point = (normal_flux >= 0);
+		const bool is_outflow_q_point = (normal_flux >= 0);
             	     	     	     
-	     if (is_outflow_q_point == true)
-	       {
-		 for (unsigned int i=0; i<dofs_per_cell; ++i)
-		 { 
-                   const double outflow = -time_step * normal_flux 
-		                         * f_saturation(old_solution_values_face[q](dim+1),vis)
-		 	                 * extract_s(fe_face_values,i,q)
-		 	                 * fe_face_values.JxW(q);
-                   local_rhs(i) += outflow;
-                } 
-	       }
+		if (is_outflow_q_point == true)
+		  {
+		    for (unsigned int i=0; i<dofs_per_cell; ++i)
+		      { 
+			const double outflow = -time_step * normal_flux 
+					       * f_saturation(old_solution_values_face[q](dim+1),vis)
+					       * extract_s(fe_face_values,i,q)
+					       * fe_face_values.JxW(q);
+			local_rhs(i) += outflow;
+		      } 
+		  }
              
-	     else
-             {
-	        for (unsigned int i=0; i<dofs_per_cell; ++i)
-		 {
-                  const double inflow = -time_step * normal_flux 
-		                        * f_saturation( neighbor_saturation[q],vis)
-		     	                * extract_s(fe_face_values,i,q)
-                                        * fe_face_values.JxW(q);
-        	  local_rhs(i) += inflow;
-		 }
+		else
+		  {
+		    for (unsigned int i=0; i<dofs_per_cell; ++i)
+		      {
+			const double inflow = -time_step * normal_flux 
+					      * f_saturation( neighbor_saturation[q],vis)
+					      * extract_s(fe_face_values,i,q)
+					      * fe_face_values.JxW(q);
+			local_rhs(i) += inflow;
+		      }
                
-	     }
+		  }
        
-	   }
+	      }
 	      
-       }
+	  }
   
-     cell->get_dof_indices (local_dof_indices);
-     for (unsigned int i=0; i<dofs_per_cell; ++i)
-       {
-	  system_rhs(local_dof_indices[i]) += local_rhs(i);
-        }
+	cell->get_dof_indices (local_dof_indices);
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  {
+	    system_rhs(local_dof_indices[i]) += local_rhs(i);
+	  }
         	
-   }	
+      }	
     SolverControl solver_control (system_matrix.block(2,2).m(),
 				  1e-12*system_rhs.block(2).l2_norm());
     SolverCG<>   cg (solver_control);
     cg.solve (system_matrix.block(2,2), solution.block(2), system_rhs.block(2),
-	      	PreconditionIdentity());
+	      PreconditionIdentity());
 		
 	
     std::cout << solver_control.last_step()
@@ -1052,7 +1046,7 @@ void TwoPhaseFlowProblem<dim>::solve ()
   } 
 
    
-    old_solution = solution; 
+  old_solution = solution; 
 
    
  
@@ -1085,9 +1079,9 @@ Vector<double>
 TwoPhaseFlowProblem<dim>::evaluate_solution (const Point<dim> &point) const
 {
   static const MappingQ1<dim> mapping;
-		                     // first find the cell in which this point
-               	                     // is, initialize a quadrature rule with
-		                    // it, and then a FEValues object
+				   // first find the cell in which this point
+				   // is, initialize a quadrature rule with
+				   // it, and then a FEValues object
   const typename DoFHandler<dim>::active_cell_iterator
     cell = GridTools::find_active_cell_around_point (dof_handler, point);
 
@@ -1107,15 +1101,15 @@ TwoPhaseFlowProblem<dim>::evaluate_solution (const Point<dim> &point) const
   return u_value[0];
 }
 
-                                  //{TwoPhaseFlowProblem::compute_errors}
+				 //{TwoPhaseFlowProblem::compute_errors}
 
-                                  // The compute_errors function is to compute
-                                  // error on some euqally spaced fixed points
-                                  // use evaluation function to interpret 
-                                  // solution value at the point
-                                  // then output those fixed points' value
-                                  // For each mesh, we can compare the output
-                                  // to estimate errors.
+				 // The compute_errors function is to compute
+				 // error on some euqally spaced fixed points
+				 // use evaluation function to interpret 
+				 // solution value at the point
+				 // then output those fixed points' value
+				 // For each mesh, we can compare the output
+				 // to estimate errors.
    
 template <int dim>
 void TwoPhaseFlowProblem<dim>::compute_errors () const
@@ -1185,7 +1179,7 @@ void TwoPhaseFlowProblem<dim>::output_results
   std::ofstream output (filename.str().c_str());
   data_out.write_gnuplot (output);
 
-  //data_out.write_vtk (output);
+				   //data_out.write_vtk (output);
 }
 
 
@@ -1214,16 +1208,16 @@ void TwoPhaseFlowProblem<dim>::run ()
   unsigned int timestep_number = 1;
   
   for ( double time = time_step; time <=1; time+=time_step,  timestep_number++)
-  { 
-    std::cout<< "Timestep_number = "<< timestep_number<<std::endl; 
-    assemble_system ();
-    solve ();
-    output_results(timestep_number);
+    { 
+      std::cout<< "Timestep_number = "<< timestep_number<<std::endl; 
+      assemble_system ();
+      solve ();
+      output_results(timestep_number);
 
-    production_time.push_back (time);
-    production_rate.push_back (1.0 - vfs_out/v_out);
-    std::cout<<"production_rate="<<production_rate.back()<<std::endl;       
-  }
+      production_time.push_back (time);
+      production_rate.push_back (1.0 - vfs_out/v_out);
+      std::cout<<"production_rate="<<production_rate.back()<<std::endl;       
+    }
 
   std::ofstream production_history ("production_history");
   std::list<double>::iterator
