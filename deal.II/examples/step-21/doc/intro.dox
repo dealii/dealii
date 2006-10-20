@@ -76,7 +76,8 @@ dynamics of the saturation. We model this as an advected quantity:
   S_{t} + \mathbf{u} \cdot \nabla F(S) = 0.
 @f}
 where $\mathbf u$ is the total velocity
-@f[\mathbf{u} =
+@f[
+  \mathbf{u} =
   \mathbf{u}_{o} + \mathbf{u}_{w} = -\lambda(S) \mathbf{K}\cdot\nabla p.
 @f]
 In addition, 
@@ -85,6 +86,11 @@ In addition,
   = 
   \frac{k_{rw}(S)/\mu_{w}}{k_{rw}(S)/\mu_{w} + k_{ro}(S)/\mu_{o}}
 @f]
+Note that the advection equation contains the term $\mathbf{u} \cdot \nabla
+F(S)$ rather than $\mathbf{u} \cdot \nabla S$ to indicate that the saturation
+is not simply transported along; rather, since the two phases move with
+different velocities, the saturation can actually change even in the advected
+coordinate system.
 
 In summary, what we get are the following two equations:
 @f{eqnarray*}
@@ -125,102 +131,123 @@ B = 0$). We will see that the different character of the two equations
 will inform our discretization strategy for the two equations.
 
 
-<h2>Discretization</h2>
+<h2>Time discretization</h2>
 
- For simplicity, in our project we will assume no
-source $q=0$ and the heterogeneous porous medium is isotropic
-$\mathbf{K}(x,y) =
-k(x,y) \mathbf{I}$.
-
-Our two dimensional numerical simulation will be done on unit cell
-$\Omega = [0,1]\times [0,1]$ for $t\in [0,T]$.
-\f{eqnarray}
-\mathbf{u}(x,y)+\mathbf{K}(x,y)\lambda(S) \nabla p= 0 && \forall(x,y)\in\Omega, \forall t\in [0,T]\\
-\nabla \cdot\mathbf{u}(x,y)= 0 && \forall(x,y)\in\Omega, \forall t \in [0,T] \\
-S_{t} + \mathbf{u} \cdot \nabla F(S) = 0&& \forall(x,y)\in\Omega,
-\forall t \in [0,T]
+In the reservoir simulation community, it is common to solve the equations
+derived above by going back to the first order, mixed formulation. To this
+end, we re-introduce the total velocity $\mathbf u$ and write the equations in
+the following form:
+\f{eqnarray*}
+  \mathbf{u}+\mathbf{K}\lambda(S) \nabla p&=&0 \\
+  \nabla \cdot\mathbf{u} &=& 0 \\
+  S_{t} + \mathbf{u} \cdot \nabla F(S) &=& 0.
 \f}
- Boundary conditions are:
-\f[
-\begin{array}{cr}
-p(x,y)=1 & \forall(x,y)\in \Gamma_{1}:=\{(x,y)\in \partial \Omega: x=0\}\\
-p(x,y)=0 & \forall(x,y)\in  \Gamma_{2}:=\{(x,y)\in \partial \Omega: x=1\}\\
-\mathbf{u}(x,y)\cdot \mathbf{n}=0 & \forall(x,y)\in
-\partial\Omega \setminus(\Gamma_{1}\bigcup \Gamma_{2})
-\end{array}
-\f]
+This formulation has the additional benefit that we do not have to express the
+total velocity $\mathbf u$ appearing in the transport equation as a function
+of the pressure, but can rather take the primary variable for it. Given the
+saddle point structure of the first two equations and their similarity to the
+mixed Laplace formulation we have introduced in step-20, it will come as no
+surprise that we will use a mixed discretization again. 
 
-Initial conditions are:
-\f[
-\begin{array}{cr}
-S(x,y,t=0)= 1& \forall (x,y) \in \Gamma_{1}\\
-S(x,y,t=0) = 0 & \forall(x,y)\in \partial \Omega \setminus
-\Gamma_{1}
-\end{array}
-\f]
+But let's postpone this for a moment. The first business we have with these
+equations is to think about the time discretization. In reservoir simulation,
+there is a rather standard algorithm that we will use here. It first solves
+the pressure using an implicit equation, then the saturation using an explicit
+time stepping scheme. The algorithm is called IMPES for IMplicit Pressure
+Explicit Saturation. In a slightly modified form, this algorithm can be
+written as follows: for each time step, solve
+\f{eqnarray*}
+  \mathbf{u}^{n+1}+\mathbf{K}\lambda(S^n) \nabla p^{n+1}&=&0 \\
+  \nabla \cdot\mathbf{u}^{n+1} &=& 0 \\
+  \frac {S^{n+1}-S^n}{\triangle t} + \mathbf{u}^{n+1} \cdot \nabla F(S^n) &=& 0,
+\f}
+where $\triangle t$ is the length of a time step. Note how we solve the
+implicit pressure-velocity system that only depends on the previously computed
+saturation $S^n$, and then do an explicit time step for $S^{n+1}$ that only
+depends on the previously known $S^n$ and the just computed $\mathbf{u}^{n+1}$.
 
-We apply mixed finite method on velocity and pressure. To be
-well-posed, we choose Raviart-Thomas spaces $RT_{k}$ for
-$\mathbf{u}$ and discontinuous elements of class $DQ_{k}$ for $p$,
-then the mixed
-system is:
+We can then state the problem in weak form as follows, by multiplying each
+equation with test functions $\mathbf v$, $q$, and $\sigma$ and integrating
+terms on each cell $K$ by parts:
+\f{eqnarray*}
+  \sum_K
+  \left((\mathbf{K}\lambda(S^n))^{-1} \mathbf{u}^{n+1},\mathbf v\right)_K -
+  (p^{n+1}, \mathbf v)_K &=& 
+  - (p^{n+1}, \mathbf v)_{\partial\Omega} 
+  \\
+  (\nabla \cdot\mathbf{u}^{n+1}, q)_\Omega &=& 0 
+\f}
+Note that in the first term, we have to prescribe the pressure $p^{n+1}$ on
+the boundary $\partial\Omega$ as boundary values for our problem. $\mathbf n$
+denotes the unit outward normal vector to $\partial K$, as usual.
 
-Find $(\mathbf{u},p)\in RT_{k}\times DQ_{k}$ such that:
+For the saturation equation, we obtain
+\f{eqnarray*}
+  (S^{n+1}, \sigma)_\Omega
+  +
+  \triangle t 
+  \sum_K
+  \left\{
+  \left(F(S^n), \nabla \cdot (\mathbf{u}^{n+1} \sigma)\right)_K
+  -
+  \left(F(S^n) (\mathbf n \cdot \mathbf{u}^{n+1}, \sigma\right)_{\partial K}
+  \right\}
+  &=&
+  (S^n,\sigma)_\Omega.
+\f}
+Using the fact that $\nabla \cdot \mathbf{u}^{n+1}=0$, we can rewrite the cell
+term to get an equation as follows:
+\f{eqnarray*}
+  (S^{n+1}, \sigma)_\Omega
+  +
+  \triangle t 
+  \sum_K
+  \left\{
+  \left(F(S^n) \mathbf{u}^{n+1}, \nabla \sigma)\right)_K
+  -
+  \left(F(S^n) (\mathbf n \cdot \mathbf{u}^{n+1}), \sigma\right)_{\partial K}
+  \right\}
+  &=&
+  (S^n,\sigma)_\Omega.
+\f}
+
+
+
+<h2>Space discretization</h2>
+
+In each time step, we then apply the mixed finite method of step-20 to the
+velocity and pressure. To be well-posed, we choose Raviart-Thomas spaces
+$RT_{k}$ for $\mathbf{u}$ and discontinuous elements of class $DQ_{k}$ for
+$p$. For the saturation, we will also choose $DQ_{k}$ spaces.
+
+Since we have discontinuous spaces, we have to think about how to evaluate
+terms on the interfaces between cells, since discontinuous functions are not
+really defined there. In particular, we have to give a meaning to the last
+term on the left hand side of the saturation equation. To this end, let us
+define that we want to evaluate it in the following sense:
 @f{eqnarray*}
-\sum_{\kappa}\{ \int _{\kappa}(K \lambda)^{-1} \mathbf{u}\cdot
-\mathbf{v} dx - \int_{\kappa} p \nabla \cdot \mathbf{v} dx\}
- =- \int_{\Gamma _{1}} \mathbf{v}\cdot \mathbf{n}&&  \forall\mathbf{v}\in RT_{k}(\Omega)\\
-\sum_{\kappa}\{\int (\nabla \cdot \mathbf{u}) q dx\} = 0 && \forall
-q\in DQ_{k}(\Omega)
+  &&\left(F(S^n) (\mathbf n \cdot \mathbf{u}^{n+1}), \sigma\right)_{\partial K}
+  \\
+  &&\qquad =
+  \left(F(S^n_+) (\mathbf n \cdot \mathbf{u}^{n+1}_+), \sigma\right)_{\partial K_+}
+  +
+  \left(F(S^n_-) (\mathbf n \cdot \mathbf{u}^{n+1}_-), \sigma\right)_{\partial K_-},
 @f}
-For saturation, we also use discontinuous finite element method.
-i.e. Find $S^{n+1} \in DQ_{k}$ such that for all $ \phi \in DQ_{k}$,
-the following formulation holds:
-@f{eqnarray*}
-\sum_{\kappa}\{\int_{\kappa}\frac{S^{n+1}-S^{n}}{\triangle t} \phi
-dx + \int_{\kappa} (\mathbf{u}^{n+1}\cdot \nabla F(S^{n})) \phi
-dx\} =0
-@f}
-Integrating by parts:
-@f{eqnarray*}
-\nonumber
- \sum_{\kappa}\{\int_{\kappa}S^{n+1} \phi dx +\triangle t
-\int_{\partial \kappa}F(S^{n})( \mathbf{u}^{n+1}\cdot \mathbf{n} )
-\phi dx &-\triangle t\int_{\kappa}  F(S^{n})( \mathbf{u^{n+1}}\cdot
-\nabla
-\phi )dx\}\\
-&= \sum_{\kappa}\int_{\kappa} S^{n} \phi dx
-@f}
-where $\mathbf{n}$ denotes the unit outward normal to the
-boundary $\partial \kappa$. And here we can use $u^{n+1}$ instead of
-$u^{n}$ is because that we view $(u^{n+1},p^{n+1},S^{n+1})$ as
-a block vector,$u^{n+1}$ could be implement in the coefficient function for saturation.
-We believe the saturation is computed more accurately in this way.
+where $\partial K_{-}:= \{x\in \partial K, \mathbf{u}(x) \cdot \mathbf{n}<0\}$
+denotes the inflow boundary and $\partial K_{+}:= \{\partial K \setminus
+\partial K_{-}\}$ is the outflow part of the boundary.
+The quantities $S_+,\mathbf{u}_+$ then correspond to the values of these
+variables on the present cell, whereas $S_-,\mathbf{u}_-$ (needed on the
+inflow part of the boundary of $K$) are quantities taken from the neighboring
+cell. Some more context on discontinuous element techniques and evaluation of
+fluxes can also be found in step-12.
 
-Considering the discontinuity of the discrete function $S_h$ on
-interelement faces, the flux $\mathbf{u}^{n+1}\cdot \mathbf{n} $ is
-computed as:
- @f{eqnarray*}
-&&\int_{\partial \kappa}F(S^{n}) (\mathbf{u}^{n+1}\cdot \mathbf{n})
-\phi dx =\\
-\nonumber && \int_{\partial \kappa _{+}}
-F(S^{n,+})(\mathbf{u}^{n+1,+}\cdot \mathbf{n})\phi dx
-+\int_{\partial \kappa _{-}} F(S^{n,-})(\mathbf{u}^{n+1,-}\cdot
-\mathbf{n})\phi dx
-@f}
 
-where, $\partial \kappa _{-}:= \{x\in
-\partial\kappa , \mathbf{u}(x) \cdot \mathbf{n}<0\}$ denotes the inflow boundary
-and$\partial \kappa _{+}:= \{\partial \kappa \setminus \partial
-\kappa_{-}\}$ is the outflow part of the boundary. By the
-discontinuity of$ S_{h}$ , $F(S^{n,-})$ takes the value of
-neighboring cell,$F(S^{n+})$ takes the value of cell $\kappa$.
+<h2>Linear solvers</h2>
 
-<h2>Implementation</h2>
-
-We use
-$dealII$ to implement our mixed and DG system. The main idea is same
-with step-20 but there are some new problems we have to consider:
+The linear solvers used in this program are a straightforward extension of the
+ones used in step-20. Essentially, we simply have to extend everything from
+two to three solution components.
 
  $(1)$ We has the three blocks vector $(u,p,S)$ , in which
 all the functions are dependent on time. i.e. At each time step we
@@ -272,6 +299,32 @@ All the other functions are commented in code, please see next part
 - the commented program.
 
 <h2>Test Case</h2>
+
+ For simplicity, in our project we will assume no
+source $q=0$ and the heterogeneous porous medium is isotropic
+$\mathbf{K}(x,y) =
+k(x,y) \mathbf{I}$.
+
+Our two dimensional numerical simulation will be done on unit cell
+$\Omega = [0,1]\times [0,1]$ for $t\in [0,T]$.
+ Boundary conditions are:
+\f[
+\begin{array}{cr}
+p(x,y)=1 & \forall(x,y)\in \Gamma_{1}:=\{(x,y)\in \partial \Omega: x=0\}\\
+p(x,y)=0 & \forall(x,y)\in  \Gamma_{2}:=\{(x,y)\in \partial \Omega: x=1\}\\
+\mathbf{u}(x,y)\cdot \mathbf{n}=0 & \forall(x,y)\in
+\partial\Omega \setminus(\Gamma_{1}\bigcup \Gamma_{2})
+\end{array}
+\f]
+
+Initial conditions are:
+\f[
+\begin{array}{cr}
+S(x,y,t=0)= 1& \forall (x,y) \in \Gamma_{1}\\
+S(x,y,t=0) = 0 & \forall(x,y)\in \partial \Omega \setminus
+\Gamma_{1}
+\end{array}
+\f]
 
 Our two phase flow are chosen as water and oil. The total mobility
 is : @f[\lambda (S) = \frac{1.0}{\mu} S^2 +(1-S)^2@f] Permeability is
