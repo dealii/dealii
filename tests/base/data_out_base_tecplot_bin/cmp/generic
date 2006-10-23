@@ -1,0 +1,6 @@
+
+DEAL::check_all<1,1> checksum 3099677259
+DEAL::check_all<1,2> checksum 3595456989
+DEAL::check_all<2,2> checksum 3149151781
+DEAL::check_all<2,3> checksum 2579237065
+DEAL::check_all<3,3> checksum 3996659970

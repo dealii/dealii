@@ -18,16 +18,17 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <stdio.h>
+
+#ifdef HAVE_LIBZ
+#  include <zlib.h>
+#endif
 
 #include "patches.h"
 
 // Output data on repetitions of the unit hypercube
-
-// define this as 1 to get output into a separate file for each testcase
-#define SEPARATE_FILES 1
-
 
 template <int dim, int spacedim>
 void check(DataOutBase::TecplotFlags flags,
@@ -50,37 +51,37 @@ void check(DataOutBase::TecplotFlags flags,
 
 
 template<int dim, int spacedim>
-void check_all(std::ostream& log)
+void check_all()
 {
-#if SEPARATE_FILES == 0
-  std::ostream& out = log;
-#else
-  (void)log;
-#endif
+  std::ostringstream out;
   
   char name[100];
   DataOutBase::TecplotFlags flags;
   if (true) {
     sprintf(name, "data_out_base_tecplot_bin/%d%d.tecplot", dim, spacedim);
     flags.tecplot_binary_file_name=name;
-#if SEPARATE_FILES==1
-    std::ofstream out(name, std::ios_base::trunc | std::ios_base::binary);
-#else
-	out << "==============================\n"
-	    << name
-	    << "\n==============================\n";
-#endif
+    
     check<dim,spacedim>(flags, out);
+#ifdef HAVE_LIBZ
+    uLong crc = crc32(0L, Z_NULL, 0);
+    const Bytef* bytes = (const Bytef*) (out.str().c_str());
+    crc = crc32(crc, bytes, out.str().size());
+    deallog << "check_all<" << dim << ',' << spacedim
+	    << "> checksum " << crc << std::endl;
+#else
+    deallog << "zlib missing" << std::endl;
+#endif
   }
 }
 
 int main()
 {
-  std::ofstream logfile("data_out_base_tecplot_bin/output",
-			std::ios_base::trunc | std::ios_base::binary);
-  check_all<1,1>(logfile);
-  check_all<1,2>(logfile);
-  check_all<2,2>(logfile);
-  check_all<2,3>(logfile);
-  check_all<3,3>(logfile);
+  std::ofstream logfile("data_out_base_tecplot_bin/output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  check_all<1,1>();
+  check_all<1,2>();
+  check_all<2,2>();
+  check_all<2,3>();
+  check_all<3,3>();
 }
