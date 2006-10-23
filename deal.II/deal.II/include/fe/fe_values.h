@@ -667,7 +667,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * The actual data type of the input
 				      * vector may be either a Vector&lt;T&gt;,
 				      * BlockVector&lt;T&gt;, or one of the
-				      * PETSc vector wrapper classes. It
+				      * sequential PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * DofHandler object with
@@ -691,7 +691,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * The actual data type of the input
 				      * vector may be either a Vector&lt;T&gt;,
 				      * BlockVector&lt;T&gt;, or one of the
-				      * PETSc vector wrapper classes. It
+				      * sequential PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * DofHandler object with
@@ -855,7 +855,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * The actual data type of the input
 				      * vector may be either a Vector&lt;T&gt;,
 				      * BlockVector&lt;T&gt;, or one of the
-				      * PETSc vector wrapper classes. It
+				      * sequential PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * DofHandler object with
@@ -894,7 +894,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * The actual data type of the input
 				      * vector may be either a Vector&lt;T&gt;,
 				      * BlockVector&lt;T&gt;, or one of the
-				      * PETSc vector wrapper classes. It
+				      * sequential PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * DofHandler object with
@@ -957,7 +957,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * The actual data type of the input
 				      * vector may be either a Vector&lt;T&gt;,
 				      * BlockVector&lt;T&gt;, or one of the
-				      * PETSc vector wrapper classes..It
+				      * sequential PETSc vector wrapper classes..It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * DofHandler object with
@@ -995,7 +995,7 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * The actual data type of the input
 				      * vector may be either a Vector&lt;T&gt;,
 				      * BlockVector&lt;T&gt;, or one of the
-				      * PETSc vector wrapper classes. It
+				      * sequential PETSc vector wrapper classes. It
 				      * represents a global vector of
 				      * DoF values associated with the
 				      * DofHandler object with
