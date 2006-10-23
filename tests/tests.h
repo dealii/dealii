@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,6 +20,12 @@
 #include <base/logstream.h>
 #include <base/exceptions.h>
 #include <cmath>
+
+
+// implicitly use the deal.II namespace everywhere, without us having to say
+// so in each and every testcase
+using namespace dealii;
+
 
 // overload floating point output operators for LogStream so that small
 // numbers below a certain threshold are simply printed as zeros. this removes
