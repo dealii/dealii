@@ -54,6 +54,8 @@
 #include <numeric>
 #include <grid/tria_boundary.h>
 
+				 // The last step is as in all
+				 // previous programs:
 using namespace dealii;
 
 class PointCloudSurface : public StraightBoundary<3>

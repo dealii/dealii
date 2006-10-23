@@ -100,6 +100,8 @@
 				 // problems.
 #include <numerics/error_estimator.h>
 
+				 // Finally, this is as in previous
+				 // programs:
 using namespace dealii;
 
 

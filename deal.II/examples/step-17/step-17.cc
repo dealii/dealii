@@ -98,6 +98,8 @@
 #include <iostream>
 #include <sstream>
 
+				 // The last step is as in all
+				 // previous programs:
 using namespace dealii;
 
                                  // Now, here comes the declaration of the

@@ -55,6 +55,8 @@
 #include <iomanip>
 #include <cmath>
 
+				 // The last step is as in all
+				 // previous programs:
 using namespace dealii;
 
 				 // Then we declare a class which

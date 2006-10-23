@@ -39,6 +39,8 @@
 #include <fstream>
 #include <cmath>
 
+				 // The last step is as in previous
+				 // programs:
 using namespace dealii;
 
 				 // Now, as we want to compute the

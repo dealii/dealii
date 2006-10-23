@@ -76,6 +76,8 @@
 #include <iostream>
 #include <fstream>
 
+				 // The last step is as in all
+				 // previous programs:
 using namespace dealii;
 
 				 // @sect3{Equation data}

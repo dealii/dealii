@@ -38,6 +38,21 @@
 				 // `sqrt' and `fabs' functions:
 #include <cmath>
 
+				 // The final step in importing
+				 // deal.II is this: All deal.II
+				 // functions and classes are in a
+				 // namespace <code>dealii</code>, to
+				 // make sure they don't clash with
+				 // symbols from other libraries you
+				 // may want to use in conjunction
+				 // with deal.II. One could use these
+				 // functions and classes by prefixing
+				 // every use of these names by
+				 // <code>dealii::</code>, but that
+				 // would quickly become cumbersome
+				 // and annoying. Rather, we simply
+				 // import the entire deal.II
+				 // namespace for general use:
 using namespace dealii;
 
 				 // @sect3{Creating the first mesh}

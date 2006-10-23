@@ -49,6 +49,10 @@
 				 // the main() function below for that):
 #include <base/logstream.h>
 
+				 // The final step, as in previous
+				 // programs, is to import all the
+				 // deal.II class and function names
+				 // into the global namespace:
 using namespace dealii;
 
                                  // @sect3{The <code>LaplaceProblem</code> class template}

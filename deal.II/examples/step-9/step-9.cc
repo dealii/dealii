@@ -85,6 +85,8 @@
 #  define	M_PI		3.14159265358979323846
 #endif
 
+				 // The last step is as in previous
+				 // programs:
 using namespace dealii;
 
 				 // @sect3{AdvectionProblem class declaration}

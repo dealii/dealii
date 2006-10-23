@@ -55,6 +55,9 @@
 				 // <code>ostringstream</code>:
 #include <sstream>
 
+				 // Finally, this has been discussed
+				 // in previous tutorial programs
+				 // before:
 using namespace dealii;
 
 

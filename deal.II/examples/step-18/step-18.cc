@@ -67,6 +67,8 @@
 #include <sstream>
 #include <iomanip>
 
+				 // The last step is as in all
+				 // previous programs:
 using namespace dealii;
 
 				 // So much for the header files. As a

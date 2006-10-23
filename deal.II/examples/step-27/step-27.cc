@@ -96,6 +96,8 @@
 #include <lac/compressed_sparsity_pattern.h>
 
 
+				 // The last step is as in all
+				 // previous programs:
 using namespace dealii;
 
 

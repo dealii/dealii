@@ -59,6 +59,9 @@
 				 // And this is again needed for C++ output:
 #include <fstream>
 
+				 // Finally, as in step-1, we import
+				 // the deal.II namespace into the
+				 // global scope:
 using namespace dealii;
 
                                  // @sect3{Mesh generation}

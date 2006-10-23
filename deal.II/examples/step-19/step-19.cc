@@ -27,6 +27,14 @@
 #include <iostream>
 #include <fstream>
 
+				 // As mentioned in the first few
+				 // tutorial programs, all names in
+				 // deal.II are declared in a
+				 // namespace <code>dealii</code>. To
+				 // make using these function and
+				 // class names simpler, we import the
+				 // entire content of that namespace
+				 // into the global scope:
 using namespace dealii;
 
                                  // Before we start with the actual program,

@@ -90,6 +90,9 @@
 #include <fstream>
 #include <iostream>
 
+				 // ...and this is to import the
+				 // deal.II namespace into the global
+				 // scope:
 using namespace dealii;
 
                                  // @sect3{The <code>LaplaceProblem</code> class}

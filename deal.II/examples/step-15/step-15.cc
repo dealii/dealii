@@ -50,6 +50,8 @@
 #include <iostream>
 #include <sstream>
 
+				 // The last step is as in all
+				 // previous programs:
 using namespace dealii;
 
                                  // The first thing we have here is a helper
