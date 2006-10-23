@@ -13,6 +13,9 @@
 #ifndef __deal2__numbers_h
 #define __deal2__numbers_h
 
+
+#include <base/config.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
