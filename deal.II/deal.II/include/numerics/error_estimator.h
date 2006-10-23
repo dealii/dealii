@@ -21,6 +21,8 @@
 #include <dofs/function_map.h>
 #include <map>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <int> class DoFHandler;
 template <int> class Mapping;
@@ -874,5 +876,7 @@ class KellyErrorEstimator<1>
 };
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

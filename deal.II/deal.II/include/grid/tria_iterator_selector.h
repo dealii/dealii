@@ -14,6 +14,8 @@
 #define __deal2__tria_iterator_selector_h
 
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class CellAccessor;
 template <int dim> class TriaAccessor;
 template <int, int> class TriaObjectAccessor;
@@ -24,7 +26,6 @@ template <int dim>  class TriaObjectAccessor<3, dim>;
 template <int dim, typename Accessor> class TriaRawIterator;
 template <int dim, typename Accessor> class TriaIterator;
 template <int dim, typename Accessor> class TriaActiveIterator;
-
 
 namespace internal 
 {
@@ -241,5 +242,7 @@ namespace internal
   }
   
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // __deal2__tria_iterator_selector_h

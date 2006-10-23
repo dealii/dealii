@@ -16,6 +16,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
 /**
  * Filter a range out of any object having a random access <tt>operator[]
  * (unsigned int)</tt> and a function <tt>size() const</tt>.
@@ -247,5 +248,6 @@ VectorSlice<VECTOR>::end()
   return v.begin()+start+length;
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

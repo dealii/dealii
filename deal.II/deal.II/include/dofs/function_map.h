@@ -16,6 +16,8 @@
 #include <base/config.h>
 #include <map>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class Function;
 
 
@@ -50,5 +52,6 @@ struct FunctionMap
     typedef std::map<unsigned char, const Function<dim>*> type;
 };
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

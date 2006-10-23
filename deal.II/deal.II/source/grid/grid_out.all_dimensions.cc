@@ -15,6 +15,9 @@
 #include <grid/grid_out.h>
 #include <base/parameter_handler.h>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 namespace GridOutFlags
 {
   DX::DX (const bool write_cells,
@@ -526,3 +529,5 @@ GridOut::memory_consumption () const
 	  sizeof(eps_flags_3) +
 	  sizeof(xfig_flags));
 }
+
+DEAL_II_NAMESPACE_CLOSE

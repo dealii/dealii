@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,8 @@
 #include <base/tensor.h>
 #include <cmath>
 #include <lac/vector.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 // storage for static variables
@@ -87,3 +89,5 @@ template class Tensor<3, 3>;
 template class Tensor<4, 1>;
 template class Tensor<4, 2>;
 template class Tensor<4, 3>;
+
+DEAL_II_NAMESPACE_CLOSE

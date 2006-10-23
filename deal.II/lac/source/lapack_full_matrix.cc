@@ -21,6 +21,8 @@
 #include <iostream>
 #include <iomanip>
 
+DEAL_II_NAMESPACE_OPEN
+
 using namespace LAPACKSupport;
 
 template <typename number>
@@ -465,3 +467,5 @@ LAPACKFullMatrix<float>::operator = (const FullMatrix<float>& M);
 
 template class PreconditionLU<double>;
 template class PreconditionLU<float>;
+
+DEAL_II_NAMESPACE_CLOSE

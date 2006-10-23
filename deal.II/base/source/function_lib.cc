@@ -19,6 +19,8 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 // in strict ANSI C mode, the following constants are not defined by
 // default, so we do it ourselves
@@ -1532,3 +1534,5 @@ namespace Functions
   template class SlitSingularityFunction<2>;
   template class SlitSingularityFunction<3>;
 }
+
+DEAL_II_NAMESPACE_CLOSE

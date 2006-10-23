@@ -18,6 +18,7 @@
 #include <dofs/dof_handler.h>
 #include <multigrid/mg_dof_iterator_selector.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /*!@addtogroup mg */
 /*@{*/
@@ -1292,8 +1293,9 @@ template <>
 void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
 				     const std::vector<unsigned int>  &new_numbers);
 
+DEAL_II_NAMESPACE_CLOSE
+
 
 /*----------------------------   mg_dof.h     ---------------------------*/
-
 #endif
 /*----------------------------   mg_dof.h     ---------------------------*/

@@ -15,6 +15,7 @@
 
 #include <base/config.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * This is a very simple class which provides information about the time
@@ -141,5 +142,6 @@ class Timer
     bool                running;
 };
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

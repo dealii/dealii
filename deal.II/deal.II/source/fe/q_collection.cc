@@ -14,6 +14,7 @@
 #include <base/memory_consumption.h>
 #include <fe/q_collection.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 namespace hp
@@ -80,3 +81,4 @@ namespace hp
 
   
 }
+DEAL_II_NAMESPACE_CLOSE

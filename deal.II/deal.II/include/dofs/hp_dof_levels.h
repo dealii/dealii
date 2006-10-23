@@ -19,6 +19,7 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
@@ -179,7 +180,7 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class ::hp::DoFHandler;
+        template <int> friend class dealii::hp::DoFHandler;
     };
 
 
@@ -213,7 +214,7 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class ::hp::DoFHandler;
+        template <int> friend class dealii::hp::DoFHandler;
     };
 
 
@@ -248,11 +249,13 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class ::hp::DoFHandler;
+        template <int> friend class dealii::hp::DoFHandler;
     };
 
   } // namespace hp
   
 } // namespace internal
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

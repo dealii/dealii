@@ -26,6 +26,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 
+DEAL_II_NAMESPACE_OPEN
 #if DEAL_II_USE_MT == 1
 #  if defined(DEAL_II_USE_MT_POSIX)
 #    include <pthread.h>
@@ -6691,6 +6692,7 @@ namespace Threads
 
 
 //---------------------------------------------------------------------------
+DEAL_II_NAMESPACE_CLOSE
 // end of #ifndef __deal2__thread_management_h
 #endif
 //---------------------------------------------------------------------------

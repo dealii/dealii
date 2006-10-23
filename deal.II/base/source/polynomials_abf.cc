@@ -17,6 +17,8 @@
 #include <iomanip>
 
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <int dim>
 PolynomialsABF<dim>::PolynomialsABF (const unsigned int k)
@@ -115,3 +117,5 @@ template class PolynomialsABF<1>;
 template class PolynomialsABF<2>;
 template class PolynomialsABF<3>;
 
+
+DEAL_II_NAMESPACE_CLOSE

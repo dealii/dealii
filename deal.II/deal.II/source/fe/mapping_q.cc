@@ -27,6 +27,8 @@
 #include <numeric>
 #include <memory>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <int dim>
 const bool MappingQ<dim>::use_mapping_q_on_all_cells;
@@ -1359,3 +1361,5 @@ MappingQ<dim>::clone () const
   
 // explicit instantiation
 template class MappingQ<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

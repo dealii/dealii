@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 #include <fe/fe.h>
 #include <fe/fe_tools.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
@@ -241,3 +242,5 @@ void
 FETools::lexicographic_to_hierarchic_numbering<3>
 (const FiniteElementData<3> &fe,
  std::vector<unsigned int> &l2h);
+
+DEAL_II_NAMESPACE_CLOSE

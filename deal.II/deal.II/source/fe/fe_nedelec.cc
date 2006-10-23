@@ -24,6 +24,7 @@
 
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 //TODO: Remove doubled degrees
@@ -1488,5 +1489,7 @@ FE_Nedelec<dim>::get_degree () const
 }
 
 
-
 template class FE_Nedelec<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE
+

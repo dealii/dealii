@@ -18,13 +18,14 @@
 #include <base/subscriptor.h>
 #include <lac/exceptions.h>
 
+#include <vector>
+#include <utility>
+
 #ifdef DEAL_II_USE_PETSC
 
 #include <petscvec.h>
 
-#include <vector>
-#include <utility>
-
+DEAL_II_NAMESPACE_OPEN
 
                                  // forward declaration
 template <typename number> class Vector;
@@ -938,6 +939,8 @@ namespace PETScWrappers
 
 #endif // DOXYGEN
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_USE_PETSC
 

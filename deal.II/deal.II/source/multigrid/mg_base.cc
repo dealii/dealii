@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,8 @@
 #include <multigrid/mg_base.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 template <class VECTOR>
@@ -58,3 +60,5 @@ template class MGCoarseGridBase<Vector<double> >;
 template class MGCoarseGridBase<Vector<float> >;
 template class MGCoarseGridBase<BlockVector<double> >;
 template class MGCoarseGridBase<BlockVector<float> >;
+
+DEAL_II_NAMESPACE_CLOSE

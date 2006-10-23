@@ -44,6 +44,9 @@
 #include <boost/shared_ptr.hpp>
 
 
+DEAL_II_NAMESPACE_OPEN
+
+
 // This is the map used by FETools::get_fe_from_name and
 // FETools::add_fe_name. Since FEFactoryBase has a template parameter
 // dim, it could not be a member variable of FETools. On the other
@@ -53,6 +56,7 @@
 static std::map<const std::string,
 		boost::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> > >
 fe_name_map;
+
 
 
 namespace 
@@ -2051,3 +2055,5 @@ compute_interpolation_to_quadrature_points_matrix (const FiniteElement<deal_II_d
 
 
 /*----------------------------   fe_tools.cc     ---------------------------*/
+
+DEAL_II_NAMESPACE_CLOSE

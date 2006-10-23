@@ -43,6 +43,8 @@
 #  include <iostream>
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+
 
 bool
 ConstraintMatrix::check_zero_weight (const std::pair<unsigned int, double> &p)
@@ -1474,3 +1476,5 @@ MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix);
 MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
 MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
 #endif
+
+DEAL_II_NAMESPACE_CLOSE

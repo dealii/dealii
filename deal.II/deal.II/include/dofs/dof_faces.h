@@ -19,6 +19,7 @@
 #include <dofs/dof_objects.h>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <int> class DoFHandler;
 template <int> class MGDoFHandler;
@@ -54,7 +55,7 @@ namespace internal
  * DoFAccessor::dof_index() functions or similar functions of derived classes that in turn
  * access the member variables using the DoFHandler::get_dof_index() and corresponding
  * setter functions. Knowledge of the actual data format is therefore encapsulated to the
- * present hierarchy of classes as well as the ::DoFHandler class.
+ * present hierarchy of classes as well as the dealii::DoFHandler class.
  *
  * @ingroup dofs
  * @author Tobias Leicht, 2006
@@ -120,8 +121,8 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-    	template <int> friend class ::DoFHandler;	
-	template <int> friend class ::MGDoFHandler;
+    	template <int> friend class dealii::DoFHandler;	
+	template <int> friend class dealii::MGDoFHandler;
     };
 
 /**
@@ -158,10 +159,13 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-	template <int> friend class ::DoFHandler;	
-	template <int> friend class ::MGDoFHandler;
+	template <int> friend class dealii::DoFHandler;	
+	template <int> friend class dealii::MGDoFHandler;
     };
 
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
+
 #endif

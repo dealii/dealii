@@ -17,6 +17,8 @@
 #include <lac/full_matrix.h>
 #include <fe/fe.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 /*!@addtogroup febase */
 /*@{*/
 
@@ -407,5 +409,7 @@ class FE_PolyTensor : public FiniteElement<dim>
 };
 
 /*@}*/
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

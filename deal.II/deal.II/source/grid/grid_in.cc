@@ -26,6 +26,8 @@
 #include <netcdfcpp.h>
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <int dim>
 GridIn<dim>::GridIn () :
@@ -1566,3 +1568,5 @@ std::string GridIn<dim>::get_format_names ()
 
 //explicit instantiations
 template class GridIn<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

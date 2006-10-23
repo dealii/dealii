@@ -21,6 +21,8 @@
 #include <lac/identity_matrix.h>
 #include <lac/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template<typename number> class Vector;
 template<typename number> class FullMatrix;
 
@@ -2481,6 +2483,8 @@ SparseMatrix<number>::end (const unsigned int r)
 
 
 /*----------------------------   sparse_matrix.h     ---------------------------*/
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 /*----------------------------   sparse_matrix.h     ---------------------------*/

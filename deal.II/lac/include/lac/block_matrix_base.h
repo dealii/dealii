@@ -23,6 +23,8 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 /*! @addtogroup Matrix1
@@ -2154,5 +2156,7 @@ BlockMatrixBase<MatrixType>::collect_sizes ()
 
 #endif // DOXYGEN
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif    // __deal2__block_matrix_base_h

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,6 +21,8 @@
 #include <base/smartpointer.h>
 #include <lac/block_indices.h>
 #include <lac/sparse_matrix_ez.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 template <typename Number> class BlockVector;
 
@@ -594,5 +596,7 @@ BlockSparseMatrixEZ<number>::print_statistics (STREAM& out, bool full)
       }
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif //__deal2__block_sparse_matrix_ez_h

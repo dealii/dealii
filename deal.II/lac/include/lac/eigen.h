@@ -26,6 +26,9 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 /*!@addtogroup Solvers */
 /*@{*/
 
@@ -418,5 +421,7 @@ EigenInverse<VECTOR>::solve (double       &value,
 					this->control().last_value());
 				   // otherwise exit as normal
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -18,6 +18,8 @@
 #include <lac/sparse_matrix.h>
 
 #include <cmath>
+
+DEAL_II_NAMESPACE_OPEN
 
 /*! @addtogroup Preconditioners
  *@{
@@ -482,5 +484,7 @@ SparseLUDecomposition<number>::AdditionalData::AdditionalData (
 
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // __deal2__sparse_decomposition_h

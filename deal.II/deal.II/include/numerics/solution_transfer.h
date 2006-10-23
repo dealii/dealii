@@ -25,6 +25,7 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * Transfers a discrete FE function (like a solution vector) by interpolation
@@ -476,7 +477,9 @@ class SolutionTransfer
 };
 
 
-/*----------------------------   solutiontransfer.h     ---------------------------*/
+DEAL_II_NAMESPACE_CLOSE
 
+
+/*----------------------------   solutiontransfer.h     ---------------------------*/
 #endif
 /*----------------------------   solutiontransfer.h     ---------------------------*/

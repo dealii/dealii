@@ -17,6 +17,8 @@
 #include <base/polynomial_space.h>
 #include <fe/fe_poly.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class MappingQ;
 
 /*!@addtogroup fe */
@@ -373,4 +375,7 @@ const unsigned int FE_DGP<3>::Matrices::n_projection_matrices;
 #endif
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
+
 #endif

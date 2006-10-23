@@ -25,6 +25,9 @@
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 // helper function to aquire the number of levels within a grid
 template <class GridClass>
 unsigned int
@@ -228,3 +231,6 @@ template class InterGridMap<DoFHandler<deal_II_dimension> >;
 
 template class InterGridMap<hp::DoFHandler<deal_II_dimension> >;
 template class InterGridMap<MGDoFHandler<deal_II_dimension> >;
+
+DEAL_II_NAMESPACE_CLOSE
+

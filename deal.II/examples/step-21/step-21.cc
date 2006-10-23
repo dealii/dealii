@@ -48,6 +48,7 @@
 				 // offers such functionality:
 #include <base/tensor_function.h>
 
+using namespace dealii;
 
                                  // @sect3{The ``TwoPhaseFlowProblem'' class template}
                                  

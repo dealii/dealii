@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,6 +18,7 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 AutoDerivativeFunction<dim>::
@@ -338,3 +339,5 @@ AutoDerivativeFunction<dim>::get_formula_of_order(const unsigned int ord)
 template class AutoDerivativeFunction<1>;
 template class AutoDerivativeFunction<2>;
 template class AutoDerivativeFunction<3>;
+
+DEAL_II_NAMESPACE_CLOSE

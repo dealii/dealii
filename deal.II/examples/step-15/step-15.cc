@@ -50,6 +50,7 @@
 #include <iostream>
 #include <sstream>
 
+using namespace dealii;
 
                                  // The first thing we have here is a helper
                                  // function that computes an even power $|v|^n$

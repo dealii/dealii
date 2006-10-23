@@ -21,6 +21,8 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <typename> class Vector;
 template <typename> class FullMatrix;
 class SparsityPattern;
@@ -1126,5 +1128,6 @@ ConstraintMatrix::is_constrained (const unsigned int index) const
           (constraint_line_exists[index] == true));
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

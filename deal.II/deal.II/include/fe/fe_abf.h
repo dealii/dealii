@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,6 +23,8 @@
 #include <fe/fe_poly_tensor.h>
 
 #include <vector>
+
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class MappingQ;
 
@@ -386,5 +388,7 @@ template <>
 std::vector<unsigned int> FE_ABF<1>::get_dpo_vector (const unsigned int);
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

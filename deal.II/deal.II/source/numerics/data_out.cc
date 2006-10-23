@@ -32,6 +32,7 @@
 
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 template <class DH, int patch_dim, int patch_space_dim>
@@ -349,7 +350,7 @@ get_dataset_names () const
 
 template <class DH,
 	  int patch_dim, int patch_space_dim>
-const std::vector< ::DataOutBase::Patch<patch_dim, patch_space_dim> > &
+const std::vector< dealii::DataOutBase::Patch<patch_dim, patch_space_dim> > &
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_patches () const
 {
   return patches;
@@ -406,7 +407,7 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
-  typename std::vector< ::DataOutBase::Patch<DH::dimension> >::iterator patch = this->patches.begin();
+  typename std::vector< dealii::DataOutBase::Patch<DH::dimension> >::iterator patch = this->patches.begin();
   cell_iterator cell=first_cell();
   
 				   // get first cell in this thread
@@ -529,7 +530,7 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
               ||
               ((*data.cell_to_patch_index_map)[neighbor->level()][neighbor->index()]
                ==
-               ::DataOutBase::Patch<DH::dimension>::no_neighbor))
+               dealii::DataOutBase::Patch<DH::dimension>::no_neighbor))
             continue;
 
                                            // now, there is a
@@ -597,7 +598,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
 				   // clear the patches array
   if (true)
     {
-      std::vector< ::DataOutBase::Patch<DH::dimension> > dummy;
+      std::vector< dealii::DataOutBase::Patch<DH::dimension> > dummy;
       this->patches.swap (dummy);
     };
   
@@ -620,7 +621,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
                                 static_cast<unsigned int>(cell->index()));
       
       cell_to_patch_index_map[l].resize (max_index+1,
-                                         ::DataOutBase::Patch<DH::dimension>::no_neighbor);
+                                         dealii::DataOutBase::Patch<DH::dimension>::no_neighbor);
     };
                                   
   unsigned int n_patches = 0;
@@ -648,7 +649,7 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
                                    //
                                    // then number the patches
                                    // consecutively
-  ::DataOutBase::Patch<DH::dimension>  default_patch;
+  dealii::DataOutBase::Patch<DH::dimension>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
   this->patches.insert (this->patches.end(), n_patches, default_patch);
@@ -764,3 +765,5 @@ INSTANTIATE_VECTORS(hp::DoFHandler<deal_II_dimension>,deal_II_dimension-1,deal_I
 #endif
 
 template class DataOut<deal_II_dimension, hp::DoFHandler<deal_II_dimension> >;
+
+DEAL_II_NAMESPACE_CLOSE

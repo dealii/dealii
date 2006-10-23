@@ -20,6 +20,9 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 // forward declarations
 template<typename number> class Vector;
 
@@ -181,6 +184,8 @@ Householder<number>::least_squares (Vector<number2>& dst,
 
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 

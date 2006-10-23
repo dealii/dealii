@@ -38,6 +38,8 @@
 				 // `sqrt' and `fabs' functions:
 #include <cmath>
 
+using namespace dealii;
+
 				 // @sect3{Creating the first mesh}
 
                                  // In the following, first function, we

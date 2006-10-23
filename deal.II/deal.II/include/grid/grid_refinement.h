@@ -19,6 +19,7 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
 template <int dim> class Triangulation;
@@ -285,5 +286,6 @@ class GridRefinement
 };
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif //__deal2__grid_refinement_h

@@ -21,6 +21,7 @@
 #include <map>
 #include <string>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * Handling of subscriptions.
@@ -240,5 +241,6 @@ Subscriptor::unsubscribe(const char*) const
 {}
 
 #endif
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

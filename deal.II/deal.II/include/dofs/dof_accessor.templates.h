@@ -23,6 +23,7 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
   
 
@@ -274,7 +275,7 @@ DoFAccessor<dim,DH>::get_fe (const unsigned int fe_index) const
 template <>
 inline
 const FiniteElement<1> &
-DoFAccessor<1,::DoFHandler<1> >::get_fe (const unsigned int fe_index) const
+DoFAccessor<1,dealii::DoFHandler<1> >::get_fe (const unsigned int fe_index) const
 {
   Assert (fe_index_is_active (fe_index) == true,
 	  ExcMessage ("This function can only be called for active fe indices"));  
@@ -286,7 +287,7 @@ DoFAccessor<1,::DoFHandler<1> >::get_fe (const unsigned int fe_index) const
 template <>
 inline
 const FiniteElement<2> &
-DoFAccessor<1,::DoFHandler<2> >::get_fe (const unsigned int fe_index) const
+DoFAccessor<1,dealii::DoFHandler<2> >::get_fe (const unsigned int fe_index) const
 {
   Assert (fe_index_is_active (fe_index) == true,
 	  ExcMessage ("This function can only be called for active fe indices"));  
@@ -298,7 +299,7 @@ DoFAccessor<1,::DoFHandler<2> >::get_fe (const unsigned int fe_index) const
 template <>
 inline
 const FiniteElement<3> &
-DoFAccessor<1,::DoFHandler<3> >::get_fe (const unsigned int fe_index) const
+DoFAccessor<1,dealii::DoFHandler<3> >::get_fe (const unsigned int fe_index) const
 {
   Assert (fe_index_is_active (fe_index) == true,
 	  ExcMessage ("This function can only be called for active fe indices"));  
@@ -310,7 +311,7 @@ DoFAccessor<1,::DoFHandler<3> >::get_fe (const unsigned int fe_index) const
 template <>
 inline
 const FiniteElement<2> &
-DoFAccessor<2,::DoFHandler<2> >::get_fe (const unsigned int fe_index) const
+DoFAccessor<2,dealii::DoFHandler<2> >::get_fe (const unsigned int fe_index) const
 {
   Assert (fe_index_is_active (fe_index) == true,
 	  ExcMessage ("This function can only be called for active fe indices"));  
@@ -322,7 +323,7 @@ DoFAccessor<2,::DoFHandler<2> >::get_fe (const unsigned int fe_index) const
 template <>
 inline
 const FiniteElement<3> &
-DoFAccessor<2,::DoFHandler<3> >::get_fe (const unsigned int fe_index) const
+DoFAccessor<2,dealii::DoFHandler<3> >::get_fe (const unsigned int fe_index) const
 {
   Assert (fe_index_is_active (fe_index) == true,
 	  ExcMessage ("This function can only be called for active fe indices"));  
@@ -334,7 +335,7 @@ DoFAccessor<2,::DoFHandler<3> >::get_fe (const unsigned int fe_index) const
 template <>
 inline
 const FiniteElement<3> &
-DoFAccessor<3,::DoFHandler<3> >::get_fe (const unsigned int fe_index) const
+DoFAccessor<3,dealii::DoFHandler<3> >::get_fe (const unsigned int fe_index) const
 {
   Assert (fe_index_is_active (fe_index) == true,
 	  ExcMessage ("This function can only be called for active fe indices"));  
@@ -1037,5 +1038,6 @@ distribute_local_to_global (const FullMatrix<number> &local_source,
 }
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

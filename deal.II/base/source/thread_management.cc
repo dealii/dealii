@@ -25,6 +25,8 @@
 #endif
 #include <sys/errno.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 namespace Threads 
 {
@@ -407,3 +409,5 @@ namespace Threads
 #endif  // (DEAL_II_USE_MT == 1) && defined(DEAL_II_USE_MT_POSIX)
   
 }   // end namespace Thread
+
+DEAL_II_NAMESPACE_CLOSE

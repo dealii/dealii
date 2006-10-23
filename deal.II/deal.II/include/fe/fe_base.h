@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 template<int dim> class FESystem;
 
 
@@ -832,5 +834,6 @@ face_to_equivalent_cell_index (const unsigned int index) const
 
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

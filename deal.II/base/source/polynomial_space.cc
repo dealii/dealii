@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 #include <base/exceptions.h>
 #include <base/table.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
@@ -315,3 +316,5 @@ PolynomialSpace<dim>::compute (const Point<dim>            &p,
 template class PolynomialSpace<1>;
 template class PolynomialSpace<2>;
 template class PolynomialSpace<3>;
+
+DEAL_II_NAMESPACE_CLOSE

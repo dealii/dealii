@@ -28,6 +28,8 @@
 # include <limits>
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 //TODO[WB]: various functions here could be simplified by using namespace Utilities
@@ -1816,3 +1818,5 @@ MultipleParameterLoop::Entry::memory_consumption () const
 	  MemoryConsumption::memory_consumption (different_values) +
 	  sizeof (type));
 }
+
+DEAL_II_NAMESPACE_CLOSE

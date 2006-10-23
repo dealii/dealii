@@ -24,6 +24,8 @@
 #include <algorithm>
 #include <numeric>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <typename number>
 void
@@ -439,3 +441,5 @@ template void MGTools::apply_boundary_values (
 template void MGTools::apply_boundary_values (
   const std::set<unsigned int>&,
   BlockSparseMatrix<double>&, const bool);
+
+DEAL_II_NAMESPACE_CLOSE

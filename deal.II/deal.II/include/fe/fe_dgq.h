@@ -17,6 +17,8 @@
 #include <base/tensor_product_polynomials.h>
 #include <fe/fe_poly.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class MappingQ;
 template <int dim> class Quadrature;
 
@@ -381,5 +383,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 };
 
 /*@}*/
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,7 +18,9 @@
 
 #define TYPEMAT float
 
+DEAL_II_NAMESPACE_OPEN
 template class SparseMatrixEZ<TYPEMAT>;
+DEAL_II_NAMESPACE_CLOSE
 
 #define TYPEVEC float
 #include "sparse_matrix_ez_vector.in.h"

@@ -22,6 +22,8 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class Quadrature;
 template <int dim> class FEValuesData;
 template <int dim> class FEValues;
@@ -540,5 +542,7 @@ Mapping<dim>::InternalDataBase::clear_first_cell ()
   first_cell = false;
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

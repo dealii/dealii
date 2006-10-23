@@ -18,6 +18,8 @@
 #include <base/table.h>
 #include <fe/mapping_q1.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class TensorProductPolynomials;
 
 
@@ -559,5 +561,7 @@ template<> void MappingQ<3>::add_quad_support_points(
   std::vector<Point<3> >                &a) const;
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -20,6 +20,9 @@
 #include <string>
 #include <iostream>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 namespace 
 {
 // create a lock that might be used to control subscription to and
@@ -189,3 +192,5 @@ void Subscriptor::list_subscribers () const
   deallog << "No subscriber listing with multithreading" << std::endl;
 #endif
 }
+
+DEAL_II_NAMESPACE_CLOSE

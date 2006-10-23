@@ -23,6 +23,7 @@
 #include <base/smartpointer.h>
 #include <lac/vector.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /*!@addtogroup mg */
 /*@{*/
@@ -237,5 +238,6 @@ class MGSmootherBase : public Subscriptor
 
 /*@}*/
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

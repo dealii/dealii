@@ -26,6 +26,9 @@
 #include <multigrid/mg_transfer.h>
 #include <multigrid/mg_transfer.templates.h>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 
 template <typename number>
 template <int dim>
@@ -292,3 +295,5 @@ MGTransferPrebuilt<BlockVector<double> >::copy_from_mg_add (
   const MGDoFHandler<deal_II_dimension>&,
   BlockVector<double>&,
   const MGLevelObject<BlockVector<double> >&) const;
+
+DEAL_II_NAMESPACE_CLOSE

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,8 @@
 
 
 #include <lac/vector.templates.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
 template class Vector<long double>;
@@ -46,3 +48,5 @@ template Vector<float>& Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator=
 template float Vector<float>::DEAL_II_MEMBER_OP_TEMPLATE_INST operator *<long double> (const Vector<long double> &) const;
 template void Vector<float>::reinit<long double>(const Vector<long double>&, const bool);
 template void Vector<float>::equ<long double>(const float, const Vector<long double>&);
+
+DEAL_II_NAMESPACE_CLOSE

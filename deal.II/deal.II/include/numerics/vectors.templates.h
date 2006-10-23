@@ -41,6 +41,7 @@
 #include <vector>
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
 
 //TODO[RH]: Use StaticQ1Mapping where appropriate
 
@@ -308,7 +309,7 @@ namespace internal
 #if deal_II_dimension == 1
 
     void
-    interpolate_zero_boundary_values (const ::DoFHandler<1>         &dof_handler,
+    interpolate_zero_boundary_values (const dealii::DoFHandler<1>         &dof_handler,
                                       std::map<unsigned int,double> &boundary_values)
     {
                                        // we only need to find the
@@ -317,7 +318,7 @@ namespace internal
                                        // dof indices. that's easy :-)
       for (unsigned direction=0; direction<2; ++direction)
         {
-          ::DoFHandler<1>::cell_iterator
+          dealii::DoFHandler<1>::cell_iterator
               cell = dof_handler.begin(0);
           while (!cell->at_boundary(direction))
             cell = cell->neighbor(direction);
@@ -331,7 +332,7 @@ namespace internal
     
     template <int dim>
     void
-    interpolate_zero_boundary_values (const ::DoFHandler<dim>       &dof_handler,
+    interpolate_zero_boundary_values (const dealii::DoFHandler<dim>       &dof_handler,
                                       std::map<unsigned int,double> &boundary_values)
     {
       const FiniteElement<dim> &fe = dof_handler.get_fe();
@@ -357,7 +358,7 @@ namespace internal
 				       // that is actually wholly on
 				       // the boundary, not only by
 				       // one line or one vertex
-      typename ::DoFHandler<dim>::active_face_iterator
+      typename dealii::DoFHandler<dim>::active_face_iterator
         face = dof_handler.begin_active_face(),
         endf = dof_handler.end_face();
       std::vector<unsigned int> face_dof_indices (fe.dofs_per_face);
@@ -1426,13 +1427,13 @@ namespace internal
     template <int dim, class InVector, class OutVector, class DH>
     static
     void
-    do_integrate_difference (const ::hp::MappingCollection<dim>    &mapping,
+    do_integrate_difference (const dealii::hp::MappingCollection<dim>    &mapping,
                              const DH              &dof,
                              const InVector        &fe_function,
                              const Function<dim>   &exact_solution,
                              OutVector             &difference,
-                             const ::hp::QCollection<dim> &q,
-                             const ::VectorTools::NormType &norm,
+                             const dealii::hp::QCollection<dim> &q,
+                             const dealii::VectorTools::NormType &norm,
                              const Function<dim>   *weight,
                              const double           exponent_1)
     {
@@ -1458,12 +1459,12 @@ namespace internal
   
       switch (norm)
         {
-          case ::VectorTools::L2_norm:
-          case ::VectorTools::H1_seminorm:
-          case ::VectorTools::H1_norm:
+          case dealii::VectorTools::L2_norm:
+          case dealii::VectorTools::H1_seminorm:
+          case dealii::VectorTools::H1_norm:
                 exponent = 2.;
                 break;
-          case ::VectorTools::L1_norm:
+          case dealii::VectorTools::L1_norm:
                 exponent = 1.;
                 break;
           default:
@@ -1474,14 +1475,14 @@ namespace internal
                                               update_JxW_values);
       switch (norm)
         {
-          case ::VectorTools::H1_seminorm:
-          case ::VectorTools::W1p_seminorm:
-          case ::VectorTools::W1infty_seminorm:
+          case dealii::VectorTools::H1_seminorm:
+          case dealii::VectorTools::W1p_seminorm:
+          case dealii::VectorTools::W1infty_seminorm:
                 update_flags |= UpdateFlags (update_gradients);
                 break;
-          case ::VectorTools::H1_norm:
-          case ::VectorTools::W1p_norm:
-          case ::VectorTools::W1infty_norm:
+          case dealii::VectorTools::H1_norm:
+          case dealii::VectorTools::W1p_norm:
+          case dealii::VectorTools::W1infty_norm:
                 update_flags |= UpdateFlags (update_gradients);
                                                  // no break!
           default:
@@ -1489,8 +1490,8 @@ namespace internal
                 break;
         }  
 
-      ::hp::FECollection<dim> fe_collection (dof.get_fe());
-      ::hp::FEValues<dim> x_fe_values(mapping, fe_collection, q, update_flags);
+      dealii::hp::FECollection<dim> fe_collection (dof.get_fe());
+      dealii::hp::FEValues<dim> x_fe_values(mapping, fe_collection, q, update_flags);
 
       const unsigned int max_n_q_points = q.max_n_quadrature_points ();
       
@@ -1526,7 +1527,7 @@ namespace internal
                                            // initialize for this cell
           x_fe_values.reinit (cell);
 
-          const ::FEValues<dim> &fe_values  = x_fe_values.get_present_fe_values ();
+          const dealii::FEValues<dim> &fe_values  = x_fe_values.get_present_fe_values ();
           const unsigned int   n_q_points = fe_values.n_quadrature_points;
           
                                            // resize all out scratch
@@ -1628,7 +1629,7 @@ namespace internal
       
           switch (norm)
             {
-              case ::VectorTools::mean:
+              case dealii::VectorTools::mean:
                     std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
                                                      // Compute values in
                                                      // quadrature points
@@ -1642,9 +1643,9 @@ namespace internal
                                                fe_values.get_JxW_values().begin(),
                                                0.0);
                     break;
-              case ::VectorTools::Lp_norm:
-              case ::VectorTools::L1_norm:
-              case ::VectorTools::W1p_norm:
+              case dealii::VectorTools::Lp_norm:
+              case dealii::VectorTools::L1_norm:
+              case dealii::VectorTools::W1p_norm:
                     std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
                                                      // Compute values in
                                                      // quadrature points
@@ -1664,8 +1665,8 @@ namespace internal
                     if (!(update_flags & update_gradients))
                       diff = std::pow(diff, 1./exponent);
                     break;
-              case ::VectorTools::L2_norm:
-              case ::VectorTools::H1_norm:
+              case dealii::VectorTools::L2_norm:
+              case dealii::VectorTools::H1_norm:
                     std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
                                                      // Compute values in
                                                      // quadrature points
@@ -1681,11 +1682,11 @@ namespace internal
                                                      // Compute the root only,
                                                      // if no derivative
                                                      // values are added later
-                    if (norm == ::VectorTools::L2_norm)
+                    if (norm == dealii::VectorTools::L2_norm)
                       diff=std::sqrt(diff);
                     break;
-              case ::VectorTools::Linfty_norm:
-              case ::VectorTools::W1infty_norm:
+              case dealii::VectorTools::Linfty_norm:
+              case dealii::VectorTools::W1infty_norm:
                     std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
                     for (unsigned int k=0; k<n_components; ++k)
                       for (unsigned int q=0; q<n_q_points; ++q)
@@ -1698,9 +1699,9 @@ namespace internal
                                                      // Maximum on one cell
                     diff = *std::max_element (psi_scalar.begin(), psi_scalar.end());
                     break;
-              case ::VectorTools::H1_seminorm:
-              case ::VectorTools::W1p_seminorm:
-              case ::VectorTools::W1infty_seminorm:
+              case dealii::VectorTools::H1_seminorm:
+              case dealii::VectorTools::W1p_seminorm:
+              case dealii::VectorTools::W1infty_seminorm:
                     break;
               default:
                     Assert (false, ExcNotImplemented());
@@ -1709,8 +1710,8 @@ namespace internal
 
           switch (norm)
             {
-              case ::VectorTools::W1p_seminorm:
-              case ::VectorTools::W1p_norm:
+              case dealii::VectorTools::W1p_seminorm:
+              case dealii::VectorTools::W1p_norm:
                     std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
                     for (unsigned int k=0; k<n_components; ++k)
                       for (unsigned int q=0; q<n_q_points; ++q)
@@ -1723,8 +1724,8 @@ namespace internal
                                                 0.0);
                     diff = std::pow(diff, 1./exponent);
                     break;
-              case ::VectorTools::H1_seminorm:
-              case ::VectorTools::H1_norm:
+              case dealii::VectorTools::H1_seminorm:
+              case dealii::VectorTools::H1_norm:
                                                      // take square of integrand
                     std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
                     for (unsigned int k=0; k<n_components; ++k)
@@ -1739,8 +1740,8 @@ namespace internal
                                                 0.0);
                     diff = std::sqrt(diff);
                     break;
-              case ::VectorTools::W1infty_seminorm:
-              case ::VectorTools::W1infty_norm:
+              case dealii::VectorTools::W1infty_seminorm:
+              case dealii::VectorTools::W1infty_norm:
                     Assert(false, ExcNotImplemented());
                     std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
                     for (unsigned int k=0; k<n_components; ++k)
@@ -1816,12 +1817,12 @@ VectorTools::integrate_difference (const DoFHandler<dim>    &dof,
 
 template <int dim, class InVector, class OutVector>
 void
-VectorTools::integrate_difference (const ::hp::MappingCollection<dim>    &mapping,
-				   const ::hp::DoFHandler<dim> &dof,
+VectorTools::integrate_difference (const dealii::hp::MappingCollection<dim>    &mapping,
+				   const dealii::hp::DoFHandler<dim> &dof,
 				   const InVector        &fe_function,
 				   const Function<dim>   &exact_solution,
 				   OutVector             &difference,
-				   const ::hp::QCollection<dim> &q,
+				   const dealii::hp::QCollection<dim> &q,
 				   const NormType        &norm,
 				   const Function<dim>   *weight,
 				   const double           exponent)
@@ -1836,11 +1837,11 @@ VectorTools::integrate_difference (const ::hp::MappingCollection<dim>    &mappin
 
 template <int dim, class InVector, class OutVector>
 void
-VectorTools::integrate_difference (const ::hp::DoFHandler<dim>    &dof,
+VectorTools::integrate_difference (const dealii::hp::DoFHandler<dim>    &dof,
 				   const InVector           &fe_function,
 				   const Function<dim>      &exact_solution,
 				   OutVector                &difference,
-				   const ::hp::QCollection<dim>    &q,
+				   const dealii::hp::QCollection<dim>    &q,
 				   const NormType           &norm,
 				   const Function<dim>      *weight,
 				   const double              exponent)
@@ -2065,5 +2066,7 @@ VectorTools::compute_mean_value (const DoFHandler<dim> &dof,
   static const MappingQ1<dim> mapping;
   return compute_mean_value(mapping, dof, quadrature, v, component);
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -16,6 +16,7 @@
 #include <cmath>
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace 
 {
@@ -991,3 +992,5 @@ FE_Q_Hierarchical<dim>::memory_consumption () const
 
 
 template class FE_Q_Hierarchical<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

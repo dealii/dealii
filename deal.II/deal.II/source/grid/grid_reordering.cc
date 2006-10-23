@@ -20,6 +20,8 @@
 #include <iostream>
 #include <fstream>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 #if deal_II_dimension == 1
 
@@ -1495,4 +1497,6 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
 	
 
 #endif // deal_II_dimension == 3
+
+DEAL_II_NAMESPACE_CLOSE
 

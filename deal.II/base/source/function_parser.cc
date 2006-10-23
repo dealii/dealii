@@ -28,6 +28,8 @@ namespace fparser
 
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 template <int dim>
@@ -252,3 +254,5 @@ void FunctionParser<dim>::vector_value (
 template class FunctionParser<1>;
 template class FunctionParser<2>;
 template class FunctionParser<3>;
+
+DEAL_II_NAMESPACE_CLOSE

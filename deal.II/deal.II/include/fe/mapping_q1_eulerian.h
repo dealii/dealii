@@ -17,6 +17,7 @@
 #include <base/smartpointer.h>
 #include <fe/mapping_q1.h> 
 
+DEAL_II_NAMESPACE_OPEN
 
 /*!@addtogroup mapping */
 /*@{*/
@@ -167,5 +168,7 @@ class MappingQ1Eulerian : public MappingQ1<dim>
 };
 
 /*@}*/
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

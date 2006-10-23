@@ -22,6 +22,7 @@
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 /**
@@ -1228,5 +1229,7 @@ class SparseDirectUMFPACK : public Subscriptor
 
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

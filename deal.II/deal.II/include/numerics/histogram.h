@@ -20,6 +20,8 @@
 #include <vector>
 #include <string>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 /**
  * This class provides some facilities to generate 2d and 3d histograms.
@@ -260,5 +262,7 @@ class Histogram
     std::vector<double>            y_values;
 };
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

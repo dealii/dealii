@@ -27,6 +27,8 @@
 
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <int dim, class DH>
 unsigned int
@@ -287,14 +289,14 @@ void DataOutStack<dim,DH>::build_patches (const unsigned int nnnn_subdivisions)
 				   // patch with n_q_points (in the the plane
 				   // of the cells) times n_subdivisions+1 (in
 				   // the time direction) points
-  ::DataOutBase::Patch<dim+1,dim+1>  default_patch;
+  dealii::DataOutBase::Patch<dim+1,dim+1>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points*(n_subdivisions+1));
   patches.insert (patches.end(), n_patches, default_patch);
 
 				   // now loop over all cells and
 				   // actually create the patches
-  typename std::vector< ::DataOutBase::Patch<dim+1,dim+1> >::iterator
+  typename std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> >::iterator
     patch = patches.begin() + (patches.size()-n_patches);
   unsigned int cell_number = 0;
   for (typename DH::active_cell_iterator cell=dof_handler->begin_active();
@@ -439,7 +441,7 @@ DataOutStack<dim,DH>::memory_consumption () const
 
 
 template <int dim, class DH>
-const std::vector< ::DataOutBase::Patch<dim+1,dim+1> > &
+const std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> > &
 DataOutStack<dim,DH>::get_patches () const
 {
   return patches;
@@ -480,3 +482,5 @@ add_data_vector<double> (const Vector<double> &vec,
 template void DataOutStack<deal_II_dimension,hp::DoFHandler<deal_II_dimension> >::
 add_data_vector<float> (const Vector<float>  &vec,
 			const std::string    &name);
+
+DEAL_II_NAMESPACE_CLOSE

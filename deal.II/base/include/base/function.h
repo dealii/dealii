@@ -20,6 +20,7 @@
 #include <base/subscriptor.h>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 template <int dim> class Point;
 template <int rank_, int dim> class Tensor;
 template <int dim> class Tensor<1,dim>;
@@ -688,5 +689,6 @@ class ComponentSelectFunction : public ConstantFunction<dim>
 };
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

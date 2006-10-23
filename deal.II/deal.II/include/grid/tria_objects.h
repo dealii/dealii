@@ -21,6 +21,8 @@
 #include <grid/tria_hex.h>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 namespace internal
 {
   namespace Triangulation
@@ -270,5 +272,7 @@ namespace internal
     };
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -17,6 +17,8 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 				 /**
 				  * STL conforming iterator for constant
 				  * and non-constant matrices.
@@ -233,5 +235,7 @@ operator > (const MatrixIterator& other) const
 {
   return (other < *this);
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

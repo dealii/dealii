@@ -21,6 +21,7 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 template <int dim> class Point;
 
 /**
@@ -562,5 +563,6 @@ namespace Polynomials
     return coefficients.size() - 1;
   }
 }
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -24,6 +24,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <int> class FEValuesBase;
 
@@ -705,7 +706,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * Abbreviate the somewhat lengthy
 				      * name for the Patch class.
 				      */
-    typedef ::DataOutBase::Patch<patch_dim,patch_space_dim> Patch;
+    typedef dealii::DataOutBase::Patch<patch_dim,patch_space_dim> Patch;
 
 				     /**
 				      * Pointer to the dof handler object.
@@ -1076,5 +1077,7 @@ merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
         patches[i].neighbors[n] += old_n_patches;
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

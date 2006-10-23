@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <grid/tria_boundary.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * Boundary object for the hull of a cylinder.  In three dimensions,
@@ -557,5 +558,7 @@ get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 			 Boundary<1>::FaceVertexNormals &) const;
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

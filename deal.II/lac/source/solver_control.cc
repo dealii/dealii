@@ -19,6 +19,8 @@
 #include <cmath>
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
+
 /*----------------------- SolverControl ---------------------------------*/
 
 
@@ -316,3 +318,5 @@ ReductionControl::parse_parameters (ParameterHandler& param)
   SolverControl::parse_parameters (param);
   set_reduction (param.get_double("Reduction"));
 }
+
+DEAL_II_NAMESPACE_CLOSE

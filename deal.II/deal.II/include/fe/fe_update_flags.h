@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /*!@addtogroup feaccess */
 /*@{*/
@@ -284,5 +285,7 @@ operator &= (UpdateFlags &f1, UpdateFlags f2)
 
 
 /*@}*/
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

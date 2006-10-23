@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,8 @@
 #include <lac/block_vector.h>
 #include <lac/petsc_vector.h>
 #include <lac/petsc_block_vector.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 // a few instantiations of static members. Hope that we catch all that
@@ -36,3 +38,5 @@ template class Solver<BlockVector<float> >;
 template class Solver<PETScWrappers::Vector>;
 template class Solver<PETScWrappers::BlockVector>;
 #endif
+
+DEAL_II_NAMESPACE_CLOSE

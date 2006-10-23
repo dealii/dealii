@@ -17,6 +17,8 @@
 #include <base/geometry_info.h>
 #include <fe/fe.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class MappingQ;
 
 
@@ -715,4 +717,7 @@ const unsigned int FE_Nedelec<3>::Matrices::n_constraint_matrices;
 
 #endif
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
+
 #endif

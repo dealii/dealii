@@ -18,14 +18,7 @@
 
 #include "iostream"
 
-using namespace std;
-
-
-
-
-
-
-
+DEAL_II_NAMESPACE_OPEN
 
 
 template <class VECTOR>
@@ -415,5 +408,6 @@ Multigrid<VECTOR>::Tvmult_add(VECTOR&, const VECTOR&) const
   Assert(false, ExcNotImplemented());
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -29,6 +29,8 @@
 
 #include <algorithm>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 template <int dim>
@@ -529,3 +531,5 @@ MGTransferSelect<double>::copy_from_mg_add (
   const MGDoFHandler<deal_II_dimension>&,
   BlockVector<double>&,
   const MGLevelObject<Vector<double> >&) const;
+
+DEAL_II_NAMESPACE_CLOSE

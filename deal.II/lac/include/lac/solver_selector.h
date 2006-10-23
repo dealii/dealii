@@ -27,6 +27,8 @@
 #include <lac/solver_richardson.h>
 #include <lac/precondition.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 /*!@addtogroup Solvers */
 /*@{*/
@@ -325,5 +327,7 @@ void SolverSelector<VECTOR>::set_data(
   bicgstab_data=data; 
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

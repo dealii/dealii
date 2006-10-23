@@ -21,6 +21,8 @@
 #include <cmath>
 #include <base/subscriptor.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 /*!@addtogroup Solvers */
 /*@{*/
 
@@ -383,5 +385,7 @@ SolverMinRes<VECTOR>::solve (const MATRIX         &A,
 }
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

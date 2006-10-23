@@ -17,6 +17,8 @@
 #include <grid/magic_numbers.h>
 #include <iostream>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <int dim>
 const unsigned int
@@ -236,3 +238,6 @@ PersistentTriangulation<dim>::memory_consumption () const
 
 // explicit instantiations
 template class PersistentTriangulation<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE
+

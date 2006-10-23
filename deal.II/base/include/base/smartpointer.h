@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/subscriptor.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * Smart pointers avoid destruction of an object in use. They can be used just
@@ -396,5 +397,6 @@ void swap (T *&t1, SmartPointer<T> &t2)
   t2.swap (t1);
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

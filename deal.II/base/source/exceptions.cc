@@ -27,6 +27,8 @@
 #  include <cxxabi.h>
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+
 
 namespace deal_II_exceptions
 {
@@ -439,6 +441,9 @@ namespace deal_II_exceptions
   }
   
 }
+
+
+DEAL_II_NAMESPACE_CLOSE
 
 
 // from the aclocal file:

@@ -24,6 +24,9 @@
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 //TODO:[GK] Inline simple functions in 1d and 3d
 
 /* ------------------------ MGDoFAccessor --------------------------- */
@@ -743,3 +746,5 @@ template class TriaRawIterator   <3,MGDoFCellAccessor<3> >;
 template class TriaIterator      <3,MGDoFCellAccessor<3> >;
 template class TriaActiveIterator<3,MGDoFCellAccessor<3> >;
 #endif
+
+DEAL_II_NAMESPACE_CLOSE

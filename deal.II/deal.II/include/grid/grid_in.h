@@ -21,6 +21,8 @@
 #include <vector>
 #include <string>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class Point;
 template <int dim> class Triangulation;
 template <int dim> class CellData;
@@ -456,5 +458,7 @@ GridIn<3>::debug_output_grid (const std::vector<CellData<3> > &cells,
 			      std::ostream                    &out);
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

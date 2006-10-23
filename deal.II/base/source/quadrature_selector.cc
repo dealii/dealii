@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,8 @@
 
 #include <base/quadrature_selector.h>
 #include <base/quadrature_lib.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
@@ -81,3 +83,5 @@ QuadratureSelector<dim>::get_quadrature_names()
 template class QuadratureSelector<1>;
 template class QuadratureSelector<2>;
 template class QuadratureSelector<3>;
+
+DEAL_II_NAMESPACE_CLOSE

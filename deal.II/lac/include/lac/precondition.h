@@ -19,6 +19,8 @@
 #include <lac/vector_memory.h>
 #include <base/smartpointer.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <typename number> class Vector;
 template <typename number> class SparseMatrix;
 
@@ -1076,5 +1078,7 @@ PreconditionedMatrix<MATRIX, PRECOND, VECTOR>
   dst.sadd(-1.,1.,rhs);
   return dst.l2_norm ();
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

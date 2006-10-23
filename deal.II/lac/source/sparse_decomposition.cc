@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2005, 2006 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -10,6 +10,8 @@
 //---------------------------------------------------------------------------
 
 #include <lac/sparse_decomposition.templates.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 template class SparseLUDecomposition<double>;
@@ -38,3 +40,5 @@ template void SparseLUDecomposition<float>::decompose<float> (const SparseMatrix
 
 template void SparseLUDecomposition<float>::copy_from<double> (const SparseMatrix<double> &);
 template void SparseLUDecomposition<float>::copy_from<float> (const SparseMatrix<float> &);
+
+DEAL_II_NAMESPACE_CLOSE

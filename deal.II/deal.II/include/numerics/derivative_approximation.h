@@ -20,6 +20,8 @@
 #include <fe/mapping.h>
 #include <utility>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class DoFHandler;
 namespace hp
 {
@@ -708,5 +710,7 @@ template <>
 double
 DerivativeApproximation::SecondDerivative<3>::derivative_norm (const Derivative &d);
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

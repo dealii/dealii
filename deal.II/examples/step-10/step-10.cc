@@ -39,6 +39,8 @@
 #include <fstream>
 #include <cmath>
 
+using namespace dealii;
+
 				 // Now, as we want to compute the
 				 // value of pi, we have to compare to
 				 // somewhat. These are the first few

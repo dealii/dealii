@@ -21,6 +21,7 @@
 #include <base/point.h>
 #include <grid/tria.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class Triangulation;
 
@@ -396,5 +397,7 @@ get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
 				 std::vector<Point<3> > &points) const;
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

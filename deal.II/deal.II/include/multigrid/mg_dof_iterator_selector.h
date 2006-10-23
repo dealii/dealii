@@ -16,6 +16,8 @@
 
 #include <base/config.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int celldim, int dim> class MGDoFAccessor;
 template <int celldim, int dim> class MGDoFObjectAccessor;
 template <int dim>              class MGDoFObjectAccessor<0, dim>;
@@ -202,6 +204,8 @@ namespace internal
   }
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 /*----------------------------   mg_dof_iterator_selector.h     ---------------------------*/

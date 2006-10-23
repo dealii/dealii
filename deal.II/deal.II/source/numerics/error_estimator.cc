@@ -37,6 +37,8 @@
 #include <cmath>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 static
@@ -1135,7 +1137,7 @@ integrate_over_regular_face (const DH                                 &dof_handl
     for (unsigned int component=0; component<n_components; ++component)
       if (component_mask[component] == true)
 	for (unsigned int p=0; p<n_q_points; ++p)
-	  face_integral[n] += ::sqr(per_thread_data.phi[n][p][component]) *
+	  face_integral[n] += dealii::sqr(per_thread_data.phi[n][p][component]) *
 			      per_thread_data.JxW_values[p];
 
 				   // double check that the element
@@ -1313,7 +1315,7 @@ integrate_over_irregular_face (const DH                                 &dof_han
 	for (unsigned int component=0; component<n_components; ++component)
 	  if (component_mask[component] == true)
 	    for (unsigned int p=0; p<n_q_points; ++p)
-	      face_integral[n] += ::sqr(per_thread_data.phi[n][p][component]) *
+	      face_integral[n] += dealii::sqr(per_thread_data.phi[n][p][component]) *
 				  per_thread_data.JxW_values[p];
 
       face_integrals[neighbor_child->face(neighbor_neighbor)] = face_integral;
@@ -1430,3 +1432,5 @@ INSTANTIATE(PETScWrappers::BlockVector,DoFHandler<deal_II_dimension>);
 INSTANTIATE(PETScWrappers::Vector,hp::DoFHandler<deal_II_dimension>);
 INSTANTIATE(PETScWrappers::BlockVector,hp::DoFHandler<deal_II_dimension>);
 #endif
+
+DEAL_II_NAMESPACE_CLOSE

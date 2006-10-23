@@ -21,6 +21,7 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace hp
 {
@@ -97,7 +98,7 @@ namespace internal
                                           */
         unsigned int memory_consumption () const;
 
-	template <int> friend class ::hp::DoFHandler;	
+	template <int> friend class dealii::hp::DoFHandler;	
     };
 
 /**
@@ -120,7 +121,7 @@ namespace internal
                                           */
         unsigned int memory_consumption () const;
 
-	template <int> friend class ::hp::DoFHandler;	
+	template <int> friend class dealii::hp::DoFHandler;	
     };
 
 /**
@@ -144,11 +145,13 @@ namespace internal
                                           */
         unsigned int memory_consumption () const;
 
-	template <int> friend class ::hp::DoFHandler;	
+	template <int> friend class dealii::hp::DoFHandler;	
     };
     
   } // namespace hp
   
 } // namespace internal
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

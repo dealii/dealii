@@ -15,6 +15,8 @@
 #include <lac/full_matrix.templates.h>
 #include <base/logstream.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 #define TYPEMAT double
 
 template class FullMatrix<TYPEMAT>;
@@ -121,3 +123,5 @@ FullMatrix<TYPEMAT>::residual<TYPEVEC,TYPERES>(Vector<TYPEVEC>&,
 					       const Vector<TYPEVEC>&,
 					       const Vector<TYPERES>&) const;
 
+
+DEAL_II_NAMESPACE_CLOSE

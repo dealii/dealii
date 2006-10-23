@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 #include <base/convergence_table.h>
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
 
 ConvergenceTable::ConvergenceTable()
 {}
@@ -183,3 +184,5 @@ ConvergenceTable::evaluate_all_convergence_rates(const RateMode rate_mode)
     if (!col_iter->second.flag)
       evaluate_convergence_rates(col_iter->first, rate_mode);
 }
+
+DEAL_II_NAMESPACE_CLOSE

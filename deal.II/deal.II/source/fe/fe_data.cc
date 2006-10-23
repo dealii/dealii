@@ -15,6 +15,7 @@
 #include <base/geometry_info.h>
 #include <fe/fe.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 template<int dim>
 FiniteElementData<dim>::FiniteElementData ()
@@ -141,3 +142,5 @@ face_to_cell_index (const unsigned int face_index,
 template class FiniteElementData<1>;
 template class FiniteElementData<2>;
 template class FiniteElementData<3>;
+
+DEAL_II_NAMESPACE_CLOSE

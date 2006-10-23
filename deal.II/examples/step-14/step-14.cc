@@ -47,6 +47,8 @@
 #include <numeric>
 #include <sstream>
 
+using namespace dealii;
+
 				 // @sect3{Evaluating the solution}
 
 				 // As mentioned in the introduction,

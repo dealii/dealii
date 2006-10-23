@@ -51,6 +51,8 @@
 #endif
 #include <sys/errno.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 // if we know that at least one of the HSL functions are there,
 // include the respective include file. Otherwise save some CPU cycles
@@ -1985,3 +1987,5 @@ InstantiateUMFPACK(SparseMatrix<double>);
 InstantiateUMFPACK(SparseMatrix<float>);
 InstantiateUMFPACK(BlockSparseMatrix<double>);
 InstantiateUMFPACK(BlockSparseMatrix<float>);
+
+DEAL_II_NAMESPACE_CLOSE

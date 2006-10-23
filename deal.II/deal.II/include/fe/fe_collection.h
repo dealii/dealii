@@ -17,6 +17,7 @@
 #include <boost/shared_ptr.hpp>
 #include <fe/fe.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace hp
 {
@@ -361,5 +362,6 @@ namespace hp
 
 } // namespace hp
 
+DEAL_II_NAMESPACE_CLOSE
   
 #endif

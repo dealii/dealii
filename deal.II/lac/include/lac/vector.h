@@ -20,6 +20,8 @@
 
 #include <cstdio>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 #ifdef DEAL_II_USE_PETSC
 namespace PETScWrappers
@@ -1002,5 +1004,7 @@ void swap (Vector<Number> &u, Vector<Number> &v)
 }
 
 /*@}*/
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

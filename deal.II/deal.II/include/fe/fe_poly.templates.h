@@ -15,6 +15,8 @@
 #include <fe/fe_values.h>
 #include <fe/fe_poly.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <class POLY, int dim>
 FE_Poly<POLY,dim>::FE_Poly (const POLY& poly_space,
 			    const FiniteElementData<dim> &fe_data,
@@ -399,3 +401,4 @@ FE_Poly<POLY,dim>::element_multiplicity (const unsigned int index) const
 }
 
 
+DEAL_II_NAMESPACE_CLOSE

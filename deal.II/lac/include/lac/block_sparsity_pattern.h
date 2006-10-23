@@ -23,6 +23,8 @@
 #include <lac/compressed_sparsity_pattern.h>
 #include <lac/block_indices.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <typename number> class BlockSparseMatrix;
 class BlockSparsityPattern;
@@ -698,5 +700,7 @@ BlockSparsityPattern::reinit (
     n_block_rows, n_block_columns);
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

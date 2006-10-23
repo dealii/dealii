@@ -53,6 +53,7 @@
 #include <list>
 #include <sstream>
 
+using namespace dealii;
 
 				 // @sect3{Evaluation of the solution}
 

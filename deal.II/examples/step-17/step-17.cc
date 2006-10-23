@@ -98,6 +98,7 @@
 #include <iostream>
 #include <sstream>
 
+using namespace dealii;
 
                                  // Now, here comes the declaration of the
                                  // main class and of various other things

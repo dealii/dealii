@@ -24,8 +24,13 @@
 #include <vector>
 #include <list>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class Boundary;
 template <int dim> class StraightBoundary;
+
+template <int, int> class TriaObjectAccessor;
+
 namespace internal
 {
   namespace Triangulation
@@ -3282,5 +3287,7 @@ template <> void Triangulation<1>::update_number_cache_hexes ();
 template <> void Triangulation<2>::update_number_cache_hexes ();
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

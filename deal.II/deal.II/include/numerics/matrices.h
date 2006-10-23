@@ -18,7 +18,10 @@
 #include <base/exceptions.h>
 #include <base/thread_management.h>
 #include <dofs/function_map.h>
+
 #include <map>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 // forward declarations
@@ -905,5 +908,7 @@ class MatrixTools : public MatrixCreator
 };
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

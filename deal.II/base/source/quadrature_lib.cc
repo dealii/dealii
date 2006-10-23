@@ -19,6 +19,8 @@
 #  include <limits>
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+
 
 // please note: for a given dimension, we need the quadrature formulae
 // for all lower dimensions as well. That is why in this file the check
@@ -586,3 +588,5 @@ template class QTrapez<3>;
 template class QSimpson<3>;
 template class QMilne<3>;
 template class QWeddle<3>;
+
+DEAL_II_NAMESPACE_CLOSE

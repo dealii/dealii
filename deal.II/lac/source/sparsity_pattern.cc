@@ -23,6 +23,8 @@
 #include <numeric>
 #include <functional>
 
+DEAL_II_NAMESPACE_OPEN
+
 #ifdef DEAL_II_USE_METIS
 extern "C" {
 #  include <metis.h>
@@ -1045,3 +1047,5 @@ partition (const unsigned int         n_partitions,
 // explicit instantiations
 template void SparsityPattern::copy_from<float> (const FullMatrix<float> &, bool);
 template void SparsityPattern::copy_from<double> (const FullMatrix<double> &, bool);
+
+DEAL_II_NAMESPACE_CLOSE

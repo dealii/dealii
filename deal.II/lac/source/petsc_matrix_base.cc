@@ -20,6 +20,7 @@
 
 #ifdef DEAL_II_USE_PETSC
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
@@ -593,6 +594,8 @@ namespace PETScWrappers
     return matrix;
   }  
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #else
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty

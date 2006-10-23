@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,6 +20,7 @@
 
 #include <string>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class implements the quadrature rule passed to its constructor
@@ -102,5 +103,6 @@ class QuadratureSelector : public Quadrature<dim>
     create_quadrature (const std::string &s,
 		       const unsigned int order);
 };
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

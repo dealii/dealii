@@ -26,8 +26,10 @@
 #include <lac/sparse_matrix.h>
 #include <base/exceptions.h>
 
-
 #include <algorithm>
+
+DEAL_II_NAMESPACE_OPEN
+
 
 
 /* ------------------------ MGVertexDoFs ----------------------------------- */
@@ -2382,3 +2384,5 @@ void MGDoFHandler<dim>::clear_space ()
 
 // explicit instantiations
 template class MGDoFHandler<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

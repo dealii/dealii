@@ -19,6 +19,8 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 class ParameterHandler;
 
 /*!@addtogroup Solvers */
@@ -628,5 +630,7 @@ ReductionControl::set_reduction (const double t)
 }
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

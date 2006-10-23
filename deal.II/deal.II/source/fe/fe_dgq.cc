@@ -20,6 +20,7 @@
 #include <iostream>
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 // namespace for some functions that are used in this file. they are
@@ -59,7 +60,7 @@ namespace
   inline Point<1>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
-		       const ::internal::int2type<1>  )
+		       const dealii::internal::int2type<1>  )
   {
     Assert (i<N, ExcInternalError());
     if (N==1)
@@ -78,7 +79,7 @@ namespace
   inline Point<2>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
-		       const ::internal::int2type<2>  )
+		       const dealii::internal::int2type<2>  )
   {
     Assert (i<N, ExcInternalError());
     
@@ -104,7 +105,7 @@ namespace
   inline Point<3>
   generate_unit_point (const unsigned int i,
 		       const unsigned int N,
-		       const ::internal::int2type<3>  )
+		       const dealii::internal::int2type<3>  )
   {
     Assert (i<N, ExcInternalError());
     if (N==1)
@@ -384,7 +385,7 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                                        // cell and evaluate the
                                        // shape functions there
       const Point<dim> p = generate_unit_point (j, this->dofs_per_cell,
-                                                ::internal::int2type<dim>());
+                                                dealii::internal::int2type<dim>());
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
         cell_interpolation(j,i)
           = this->poly_space.compute_value (i, p);
@@ -650,3 +651,5 @@ FE_DGQ<dim>::memory_consumption () const
 
 
 template class FE_DGQ<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

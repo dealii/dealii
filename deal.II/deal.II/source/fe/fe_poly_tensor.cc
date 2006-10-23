@@ -21,6 +21,7 @@
 
 #include <base/logstream.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
@@ -932,3 +933,5 @@ FE_PolyTensor<POLY,dim>::update_each (const UpdateFlags flags) const
 
 template class FE_PolyTensor<PolynomialsRaviartThomas<deal_II_dimension>,deal_II_dimension>;
 template class FE_PolyTensor<PolynomialsABF<deal_II_dimension>,deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

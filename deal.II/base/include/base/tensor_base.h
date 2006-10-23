@@ -26,6 +26,7 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
 // we only need output streams, but older compilers did not provide
 // them in a separate include file
 #ifdef HAVE_STD_OSTREAM_HEADER
@@ -830,6 +831,7 @@ operator / (const Tensor<1,dim> &t,
     tt[d] = t[d] / factor;
   return tt;
 }
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 

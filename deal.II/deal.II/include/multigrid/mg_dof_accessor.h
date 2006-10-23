@@ -17,6 +17,8 @@
 #include <base/config.h>
 #include <dofs/dof_accessor.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class MGDoFHandler;
 
 template <int celldim, int dim> class MGDoFObjectAccessor;
@@ -641,5 +643,6 @@ MGDoFCellAccessor<2>::face (const unsigned int i) const;
 template<> MGDoFCellAccessor<3>::face_iterator
 MGDoFCellAccessor<3>::face (const unsigned int i) const;
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

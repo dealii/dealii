@@ -15,6 +15,8 @@
 #include <lac/vector.h>
 #include <lac/lapack_templates.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 using namespace LAPACKSupport;
 
 template<typename number>
@@ -258,3 +260,5 @@ TridiagonalMatrix<number>::
 
 template class TridiagonalMatrix<float>;
 template class TridiagonalMatrix<double>;
+
+DEAL_II_NAMESPACE_CLOSE

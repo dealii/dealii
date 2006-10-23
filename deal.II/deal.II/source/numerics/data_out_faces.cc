@@ -26,6 +26,8 @@
 #include <fe/hp_fe_values.h>
 #include <fe/mapping_q1.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 template <int dim, class DH>
@@ -61,7 +63,7 @@ void DataOutFaces<dim,DH>::build_some_patches (Data &data)
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
-  typename std::vector< ::DataOutBase::Patch<DH::dimension-1,DH::dimension> >::iterator patch = this->patches.begin();
+  typename std::vector< dealii::DataOutBase::Patch<DH::dimension-1,DH::dimension> >::iterator patch = this->patches.begin();
   FaceDescriptor face=first_face();
 
 				   // get first face in this thread
@@ -182,7 +184,7 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int nnnn_subdivisions,
 				   // clear the patches array
   if (true)
     {
-      std::vector< ::DataOutBase::Patch<DH::dimension-1,DH::dimension> > dummy;
+      std::vector< dealii::DataOutBase::Patch<DH::dimension-1,DH::dimension> > dummy;
       this->patches.swap (dummy);
     };
   
@@ -216,7 +218,7 @@ void DataOutFaces<dim,DH>::build_patches (const unsigned int nnnn_subdivisions,
 				   // values. note that the evaluation
 				   // points on the face have to be
 				   // repeated in angular direction
-  ::DataOutBase::Patch<DH::dimension-1,DH::dimension>  default_patch;
+  dealii::DataOutBase::Patch<DH::dimension-1,DH::dimension>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets, n_q_points);
   this->patches.insert (this->patches.end(), n_patches, default_patch);
@@ -317,3 +319,5 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 template class DataOutFaces<deal_II_dimension, DoFHandler<deal_II_dimension> >;
 template class DataOutFaces<deal_II_dimension, hp::DoFHandler<deal_II_dimension> >;
 #endif
+
+DEAL_II_NAMESPACE_CLOSE

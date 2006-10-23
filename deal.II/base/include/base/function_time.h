@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
 /**
  *  Support for time dependent functions.
  *  The library was also designed for time dependent problems. For this
@@ -111,5 +112,6 @@ FunctionTime::get_time () const
 }
 
 #endif
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

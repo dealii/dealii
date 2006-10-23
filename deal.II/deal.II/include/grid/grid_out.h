@@ -20,6 +20,8 @@
 #include <base/point.h>
 #include <string>
 
+DEAL_II_NAMESPACE_OPEN
+
 class ParameterHandler;
 template <int dim> class Triangulation;
 template <int dim> class Mapping;
@@ -1309,5 +1311,7 @@ class GridOut
 };
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

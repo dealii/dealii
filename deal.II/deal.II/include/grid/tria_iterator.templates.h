@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,8 @@
 #include <base/config.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 /* Note: This file only contains template definitions and will thus
@@ -405,5 +407,6 @@ TriaActiveIterator<dim,Accessor> TriaActiveIterator<dim,Accessor>::operator -- (
   return tmp;
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

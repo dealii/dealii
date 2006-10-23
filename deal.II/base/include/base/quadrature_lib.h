@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/quadrature.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /*!@addtogroup Quadrature */
 /*@{*/
@@ -261,5 +262,6 @@ template <> QSimpson<1>::QSimpson ();
 template <> QMilne<1>::QMilne ();
 template <> QWeddle<1>::QWeddle ();
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

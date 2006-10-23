@@ -22,6 +22,7 @@
 
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FE_DGPNonparametric<dim>::FE_DGPNonparametric (const unsigned int degree)
@@ -591,3 +592,5 @@ FE_DGPNonparametric<dim>::get_degree () const
 
 
 template class FE_DGPNonparametric<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

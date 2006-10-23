@@ -21,6 +21,8 @@
 #include <vector>
 #include <iomanip>
 
+DEAL_II_NAMESPACE_OPEN
+
 // forward declarations
 template<typename number> class Vector;
 
@@ -465,6 +467,8 @@ TridiagonalMatrix<number>::print (
 
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 

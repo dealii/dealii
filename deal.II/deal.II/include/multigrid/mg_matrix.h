@@ -17,6 +17,8 @@
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_level_object.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 /*!@addtogroup mg */
 /*@{*/
 
@@ -357,5 +359,7 @@ Tvmult_add  (const unsigned int level,
   const MGLevelObject<MATRIX>& m = *matrix;
   m[level].block(row, col).Tvmult_add(dst, src);
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

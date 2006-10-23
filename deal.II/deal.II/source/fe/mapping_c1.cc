@@ -18,6 +18,7 @@
 #include <fe/mapping_c1.h>
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 
@@ -253,3 +254,5 @@ MappingC1<dim>::clone () const
 
 // explicit instantiations
 template class MappingC1<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

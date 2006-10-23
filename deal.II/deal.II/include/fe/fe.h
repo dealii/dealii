@@ -16,6 +16,8 @@
 #include <base/config.h>
 #include <fe/fe_base.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class FEValuesData;
 template <int dim> class FEValuesBase;
 template <int dim> class FEValues;
@@ -2618,5 +2620,7 @@ FiniteElement<dim>::is_primitive () const
   return cached_primitivity;
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

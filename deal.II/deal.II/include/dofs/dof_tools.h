@@ -23,6 +23,8 @@
 #include <set>
 #include <map>
 
+DEAL_II_NAMESPACE_OPEN
+
 template<int dim, class T> class Table;
 class SparsityPattern;
 template <typename number> class Vector;
@@ -1892,5 +1894,6 @@ DoFTools::map_support_points_to_dofs (
 }
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

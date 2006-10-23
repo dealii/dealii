@@ -41,6 +41,7 @@
 #include <base/thread_management.h>
 #include <base/multithread_info.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number>
@@ -1439,5 +1440,7 @@ SparseMatrix<number>::memory_consumption () const
   return sizeof(*this) + max_len*sizeof(number);
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

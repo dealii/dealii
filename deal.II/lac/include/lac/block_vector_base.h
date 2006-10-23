@@ -24,6 +24,7 @@
 #include <iterator>
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 /*! @addtogroup Vectors
@@ -2207,5 +2208,7 @@ BlockVectorBase<VectorType>::operator() (const unsigned int i)
 }
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

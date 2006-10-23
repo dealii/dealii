@@ -24,6 +24,7 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  *  This class is a model for a tensor valued function. The interface
@@ -172,5 +173,6 @@ class TensorFunction : public FunctionTime,
     
 };
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

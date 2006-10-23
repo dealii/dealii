@@ -17,6 +17,8 @@
 #include <base/config.h>
 #include <base/table_handler.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 /**
  * The ConvergenceTable class is an application to the TableHandler
@@ -220,5 +222,7 @@ class ConvergenceTable: public TableHandler
 				     //@}
 };
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

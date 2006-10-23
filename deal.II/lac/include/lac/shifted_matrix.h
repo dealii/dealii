@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,8 @@
 
 #include <base/config.h>
 #include <base/smartpointer.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 /*! @addtogroup Matrix2
  *@{
@@ -257,5 +259,7 @@ ShiftedMatrixGeneralized<MATRIX, MASSMATRIX, VECTOR>::residual (VECTOR& dst,
   return dst.l2_norm ();
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

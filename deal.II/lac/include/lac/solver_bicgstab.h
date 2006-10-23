@@ -21,6 +21,8 @@
 #include <cmath>
 #include <base/subscriptor.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 /*!@addtogroup Solvers */
 /*@{*/
 
@@ -425,5 +427,7 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
 }
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

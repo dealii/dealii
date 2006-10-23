@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,8 @@
 #include <base/tensor_product_polynomials.h>
 #include <base/exceptions.h>
 #include <base/table.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 
@@ -545,3 +547,5 @@ template class TensorProductPolynomials<3>;
 template class AnisotropicPolynomials<1>;
 template class AnisotropicPolynomials<2>;
 template class AnisotropicPolynomials<3>;
+
+DEAL_II_NAMESPACE_CLOSE

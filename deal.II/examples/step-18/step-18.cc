@@ -67,6 +67,8 @@
 #include <sstream>
 #include <iomanip>
 
+using namespace dealii;
+
 				 // So much for the header files. As a
 				 // matter of good practice, I have
 				 // started to put everything that

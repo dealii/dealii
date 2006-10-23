@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,8 @@
 
 #include <lac/matrix_lib.templates.h>
 #include <lac/sparse_matrix.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 MeanValueFilter::MeanValueFilter(unsigned int component)
 		:
@@ -170,3 +172,5 @@ template class InverseMatrixRichardson<Vector<float> >;
 template class InverseMatrixRichardson<Vector<double> >;
 template class InverseMatrixRichardson<BlockVector<float> >;
 template class InverseMatrixRichardson<BlockVector<double> >;
+
+DEAL_II_NAMESPACE_CLOSE

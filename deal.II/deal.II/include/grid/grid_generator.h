@@ -19,6 +19,7 @@
 #include <base/point.h>
 #include <map>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class Triangulation;
 template <typename number> class Vector;
@@ -706,5 +707,7 @@ class GridGenerator
 };
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -27,6 +27,8 @@
 #include <set>
 #include <algorithm>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 //TODO[WB]: do not use a plain pointer for faces, but rather an auto_ptr or some such thing
 
@@ -47,7 +49,7 @@ namespace internal
   template <int dim>
   const unsigned int * dummy ()
   {
-    return &::DoFHandler<dim>::invalid_dof_index;
+    return &dealii::DoFHandler<dim>::invalid_dof_index;
   }
 
   template const unsigned int * dummy<deal_II_dimension> ();
@@ -2443,3 +2445,5 @@ void DoFHandler<dim>::clear_space ()
 
 /*-------------- Explicit Instantiations -------------------------------*/
 template class DoFHandler<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

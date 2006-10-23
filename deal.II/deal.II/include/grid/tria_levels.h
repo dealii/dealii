@@ -22,6 +22,8 @@
 #include <base/point.h>
 #include <grid/tria_objects.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 namespace internal
 {
   namespace Triangulation
@@ -293,5 +295,7 @@ namespace internal
     };
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

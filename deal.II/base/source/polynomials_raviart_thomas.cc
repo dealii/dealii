@@ -16,6 +16,8 @@
 #include <iostream>
 #include <iomanip>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <int dim>
 PolynomialsRaviartThomas<dim>::PolynomialsRaviartThomas (const unsigned int k)
@@ -113,3 +115,5 @@ template class PolynomialsRaviartThomas<1>;
 template class PolynomialsRaviartThomas<2>;
 template class PolynomialsRaviartThomas<3>;
 
+
+DEAL_II_NAMESPACE_CLOSE

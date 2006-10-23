@@ -28,6 +28,9 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 //TODO: Update documentation
 //TODO: Unify code for dimensions
 
@@ -86,7 +89,7 @@ void DataOutRotation<dim,DH>::build_some_patches (Data &data)
   
   
   unsigned int cell_number = 0;
-  typename std::vector< ::DataOutBase::Patch<DH::dimension+1> >::iterator
+  typename std::vector< dealii::DataOutBase::Patch<DH::dimension+1> >::iterator
     patch = this->patches.begin();
   cell_iterator cell=first_cell();
 
@@ -355,7 +358,7 @@ void DataOutRotation<dim,DH>::build_patches (
 				   // clear the patches array
   if (true)
     {
-      std::vector< ::DataOutBase::Patch<DH::dimension+1> > dummy;
+      std::vector< dealii::DataOutBase::Patch<DH::dimension+1> > dummy;
       this->patches.swap (dummy);
     };
   
@@ -395,7 +398,7 @@ void DataOutRotation<dim,DH>::build_patches (
 				   // values. note that the evaluation
 				   // points on the cell have to be
 				   // repeated in angular direction
-  ::DataOutBase::Patch<DH::dimension+1>  default_patch;
+  dealii::DataOutBase::Patch<DH::dimension+1>  default_patch;
   default_patch.n_subdivisions = n_subdivisions;
   default_patch.data.reinit (n_datasets,
 			     n_q_points * (n_subdivisions+1));
@@ -441,3 +444,5 @@ DataOutRotation<dim,DH>::next_cell (const cell_iterator &cell)
 
 // explicit instantiations
 template class DataOutRotation<deal_II_dimension, DoFHandler<deal_II_dimension> >;
+
+DEAL_II_NAMESPACE_CLOSE

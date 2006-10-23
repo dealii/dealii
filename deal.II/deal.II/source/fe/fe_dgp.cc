@@ -16,6 +16,7 @@
 
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FE_DGP<dim>::FE_DGP (const unsigned int degree)
@@ -252,3 +253,5 @@ FE_DGP<dim>::memory_consumption () const
 
 
 template class FE_DGP<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

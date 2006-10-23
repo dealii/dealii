@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <algorithm>
 
+DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
 template <int N, typename T> class TableBase;
@@ -3141,5 +3142,6 @@ Table<7,T>::operator () (const TableIndices<7> &indices)
 
 
 #endif // DOXYGEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

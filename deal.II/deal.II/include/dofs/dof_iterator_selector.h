@@ -21,6 +21,8 @@
 //  2. Can cell_iterator and quad_iterator in 2D be different (or hex
 //     in 3D)?
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int structdim, class DH> class DoFAccessor;
 template <class DH> class DoFCellAccessor;
 template <int celldim, class DH> class DoFObjectAccessor;
@@ -211,5 +213,7 @@ namespace internal
     };
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // __deal2__dof_iterator_selector_h

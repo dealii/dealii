@@ -21,6 +21,7 @@
 
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 //TODO: we should have a copy constructor for this class. In hp methods, we often do things like
 //      fe_collection.push_back(FE_Q<dim>(7))
@@ -119,7 +120,7 @@ namespace FE_Q_Helper
     Point<1>
     generate_unit_point (const unsigned int i,
 			 const unsigned int N,
-			 const ::internal::int2type<1>  )
+			 const dealii::internal::int2type<1>  )
     {
       Assert (i<N, ExcInternalError());
       const double h = 1./(N-1);
@@ -137,7 +138,7 @@ namespace FE_Q_Helper
     Point<2>
     generate_unit_point (const unsigned int i,
 			 const unsigned int N,
-			 const ::internal::int2type<2>  )
+			 const dealii::internal::int2type<2>  )
     {
       Assert (i<N, ExcInternalError());
       Assert (N>=4, ExcInternalError());
@@ -161,7 +162,7 @@ namespace FE_Q_Helper
     Point<3>
     generate_unit_point (const unsigned int i,
 			 const unsigned int N,
-			 const ::internal::int2type<3>  )
+			 const dealii::internal::int2type<3>  )
     {
       Assert (i<N, ExcInternalError());
       Assert (N>=8, ExcInternalError());
@@ -288,7 +289,7 @@ get_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                                    // shape functions there
       const Point<dim>
 	p = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
-					      ::internal::int2type<dim>());
+					      dealii::internal::int2type<dim>());
       for (unsigned int i=0; i<this->dofs_per_cell; ++i)
         cell_interpolation(j,i) = this->poly_space.compute_value (i, p);
 
@@ -1214,7 +1215,7 @@ FE_Q<dim>::initialize_embedding ()
 					   // functions there
 	  const Point<dim> p_subcell
 	    = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
-						::internal::int2type<dim>());
+						dealii::internal::int2type<dim>());
 	  const Point<dim> p_cell =
 	    GeometryInfo<dim>::child_to_cell_coordinates (p_subcell, child);
 
@@ -1379,7 +1380,7 @@ FE_Q<dim>::initialize_restriction ()
     {
       const Point<dim> p_cell
 	= FE_Q_Helper::generate_unit_point (i, this->dofs_per_cell,
-					    ::internal::int2type<dim>());
+					    dealii::internal::int2type<dim>());
       unsigned int mother_dof = 0;
       for (; mother_dof<this->dofs_per_cell; ++mother_dof)
         {
@@ -1605,3 +1606,5 @@ FE_Q<dim>::memory_consumption () const
 
 
 template class FE_Q<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

@@ -18,6 +18,7 @@
 #include <base/exceptions.h>
 #include <base/point.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class GeometryInfo;
 
@@ -1224,5 +1225,6 @@ GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p,
 }
 
 #endif // DOXYGEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

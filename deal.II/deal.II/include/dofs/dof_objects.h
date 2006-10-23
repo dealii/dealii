@@ -18,6 +18,8 @@
 #include <base/exceptions.h>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int> class DoFHandler;
 
 namespace internal
@@ -94,7 +96,7 @@ namespace internal
                                           */
 	template <int spacedim>
         void
-        set_dof_index (const ::DoFHandler<spacedim> &dof_handler,
+        set_dof_index (const dealii::DoFHandler<spacedim> &dof_handler,
 		       const unsigned int       obj_index,
 		       const unsigned int       fe_index,
 		       const unsigned int       local_index,
@@ -127,7 +129,7 @@ namespace internal
                                           */
 	template <int spacedim>
 	unsigned int
-        get_dof_index (const ::DoFHandler<spacedim> &dof_handler,
+        get_dof_index (const dealii::DoFHandler<spacedim> &dof_handler,
 		       const unsigned int       obj_index,
 		       const unsigned int       fe_index,
 		       const unsigned int       local_index) const;
@@ -142,7 +144,7 @@ namespace internal
                                           */
         template <int spacedim>
         unsigned int
-        n_active_fe_indices (const ::DoFHandler<spacedim> &dof_handler,
+        n_active_fe_indices (const dealii::DoFHandler<spacedim> &dof_handler,
                              const unsigned int       index) const;
 
                                          /**
@@ -153,7 +155,7 @@ namespace internal
                                           */
         template <int spacedim>
         bool
-        fe_index_is_active (const ::DoFHandler<spacedim> &dof_handler,
+        fe_index_is_active (const dealii::DoFHandler<spacedim> &dof_handler,
                             const unsigned int       index,
                             const unsigned int       fe_index) const;
 
@@ -182,7 +184,7 @@ namespace internal
     template <int spacedim>
     inline
     unsigned int
-    DoFObjects<dim>::n_active_fe_indices (const ::DoFHandler<spacedim> &,
+    DoFObjects<dim>::n_active_fe_indices (const dealii::DoFHandler<spacedim> &,
 					  const unsigned) const
     {
       return 1;
@@ -194,7 +196,7 @@ namespace internal
     template <int spacedim>
     inline
     bool
-    DoFObjects<dim>::fe_index_is_active (const ::DoFHandler<spacedim> &,
+    DoFObjects<dim>::fe_index_is_active (const dealii::DoFHandler<spacedim> &,
 					 const unsigned int,
 					 const unsigned int fe_index) const
     {
@@ -211,12 +213,12 @@ namespace internal
     inline
     unsigned int
     DoFObjects<dim>::
-    get_dof_index (const ::DoFHandler<spacedim> &dof_handler,
+    get_dof_index (const dealii::DoFHandler<spacedim> &dof_handler,
 		   const unsigned int       obj_index,
 		   const unsigned int       fe_index,
 		   const unsigned int       local_index) const
     {
-      Assert (fe_index == ::DoFHandler<spacedim>::default_fe_index,
+      Assert (fe_index == dealii::DoFHandler<spacedim>::default_fe_index,
 	      ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
       Assert (local_index<dof_handler.get_fe().template n_dofs_per_object<dim>(),
 	      ExcIndexRange (local_index, 0, dof_handler.get_fe().template n_dofs_per_object<dim>()));
@@ -231,4 +233,7 @@ namespace internal
 
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
+
 #endif

@@ -21,6 +21,8 @@
 #include <vector>
 #include <set>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class Point;
 template <int dim> class Function;
 template <int dim> class FunctionMap;
@@ -1220,5 +1222,6 @@ class VectorTools
 };
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -31,6 +31,7 @@
 
 #include <iomanip>
 
+DEAL_II_NAMESPACE_OPEN
 
 /* ---------------- FEValuesBase<dim>::CellIteratorBase --------- */
 
@@ -1807,6 +1808,7 @@ template class FEFaceValues<deal_II_dimension>;
 template class FESubfaceValues<deal_II_dimension>;
 #endif
 
+DEAL_II_NAMESPACE_CLOSE
 
 //---------------------------------------------------------------------------
 
@@ -1838,3 +1840,4 @@ template class FESubfaceValues<deal_II_dimension>;
 #include "fe_values.instance.h"
 #undef IN
 #endif
+

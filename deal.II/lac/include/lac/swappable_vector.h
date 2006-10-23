@@ -19,6 +19,8 @@
 #include <lac/vector.h>
 #include <string>
 
+DEAL_II_NAMESPACE_OPEN
+
 /*! @addtogroup Vectors
  *@{
  */
@@ -305,5 +307,7 @@ class SwappableVector : public Vector<number>
 /*@}*/
 /*----------------------------   swappable_vector.h     ---------------------------*/
 /* end of #ifndef __deal2__swappable_vector_h */
+DEAL_II_NAMESPACE_CLOSE
+
 #endif
 /*----------------------------   swappable_vector.h     ---------------------------*/

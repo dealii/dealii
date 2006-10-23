@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,12 +17,14 @@
 #include <base/config.h>
 #include <lac/exceptions.h>
 
-#ifdef DEAL_II_USE_PETSC
-
 #include <lac/petsc_matrix_base.h>
 #include <lac/block_sparsity_pattern.h>
 
 #include <vector>
+
+#ifdef DEAL_II_USE_PETSC
+
+DEAL_II_NAMESPACE_OPEN
 
 
 
@@ -432,6 +434,8 @@ namespace PETScWrappers
     }
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_USE_PETSC
 

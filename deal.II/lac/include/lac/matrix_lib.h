@@ -18,6 +18,8 @@
 #include <lac/pointer_matrix.h>
 #include <lac/solver_richardson.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template<typename number> class Vector;
 template<typename number> class BlockVector;
 template<typename number> class SparseMatrix;
@@ -614,5 +616,7 @@ InverseMatrixRichardson<VECTOR>::initialize (const MATRIX& m, const PRECONDITION
   precondition = new PointerMatrix<PRECONDITION, VECTOR>(&p);;
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

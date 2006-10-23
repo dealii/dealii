@@ -26,6 +26,7 @@
 #include <memory>
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <typename> class BlockVector;
 template <typename> class Vector;
@@ -794,5 +795,7 @@ BlockTrianglePrecondition<number>::enter_aux (
 
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

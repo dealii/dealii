@@ -15,6 +15,7 @@
 #include <fe/hp_fe_values.h>
 #include <fe/mapping_q1.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
@@ -25,9 +26,9 @@ namespace internal
 
     template <int dim, int q_dim, class FEValues>
     FEValuesBase<dim,q_dim,FEValues>::
-    FEValuesBase (const ::hp::MappingCollection<dim> &mapping_collection,
-                  const ::hp::FECollection<dim>      &fe_collection,
-                  const ::hp::QCollection<q_dim>     &q_collection,
+    FEValuesBase (const dealii::hp::MappingCollection<dim> &mapping_collection,
+                  const dealii::hp::FECollection<dim>      &fe_collection,
+                  const dealii::hp::QCollection<q_dim>     &q_collection,
                   const UpdateFlags                   update_flags)
                     :
                     fe_collection (&fe_collection),
@@ -45,12 +46,12 @@ namespace internal
 
     template <int dim, int q_dim, class FEValues>
     FEValuesBase<dim,q_dim,FEValues>::
-    FEValuesBase (const ::hp::FECollection<dim>      &fe_collection,
-                  const ::hp::QCollection<q_dim> &q_collection,
+    FEValuesBase (const dealii::hp::FECollection<dim>      &fe_collection,
+                  const dealii::hp::QCollection<q_dim> &q_collection,
                   const UpdateFlags         update_flags)
                     :
                     fe_collection (&fe_collection),
-                    mapping_collection (&::hp::StaticMappingQ1<dim>::mapping_collection),
+                    mapping_collection (&dealii::hp::StaticMappingQ1<dim>::mapping_collection),
                     q_collection (q_collection),
                     fe_values_table (fe_collection.size(),
                                      1,
@@ -117,7 +118,7 @@ namespace hp
                            const hp::QCollection<dim>       &q_collection,
                            const UpdateFlags                 update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim,::FEValues<dim> > (mapping,
+                  internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim> > (mapping,
 									fe_collection,
 									q_collection,
 									update_flags)
@@ -129,7 +130,7 @@ namespace hp
                            const hp::QCollection<dim>      &q_collection,
                            const UpdateFlags            update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim,::FEValues<dim> > (fe_collection,
+                  internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim> > (fe_collection,
 									q_collection,
 									update_flags)
   {}
@@ -183,7 +184,7 @@ namespace hp
 
   template <int dim>
   void
-  FEValues<dim>::reinit (const typename ::DoFHandler<dim>::cell_iterator &cell,
+  FEValues<dim>::reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
                          const unsigned int q_index,
                          const unsigned int mapping_index,
                          const unsigned int fe_index)
@@ -309,7 +310,7 @@ namespace hp
                                    const hp::QCollection<dim-1> &q_collection,
                                    const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1,::FEFaceValues<dim> > (mapping,
+                  internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim> > (mapping,
 									      fe_collection,
 									      q_collection,
 									      update_flags)
@@ -321,7 +322,7 @@ namespace hp
                                    const hp::QCollection<dim-1> &q_collection,
                                    const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1,::FEFaceValues<dim> > (fe_collection,
+                  internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim> > (fe_collection,
 									      q_collection,
 									      update_flags)
   {}
@@ -376,7 +377,7 @@ namespace hp
 
   template <int dim>
   void
-  FEFaceValues<dim>::reinit (const typename ::DoFHandler<dim>::cell_iterator &cell,
+  FEFaceValues<dim>::reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
                              const unsigned int face_no,
                              const unsigned int q_index,
                              const unsigned int mapping_index,
@@ -505,7 +506,7 @@ namespace hp
                                          const hp::QCollection<dim-1> &q_collection,
                                          const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1,::FESubfaceValues<dim> > (mapping,
+                  internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim> > (mapping,
 										 fe_collection,
 										 q_collection,
 										 update_flags)
@@ -517,7 +518,7 @@ namespace hp
                                          const hp::QCollection<dim-1> &q_collection,
                                          const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1,::FESubfaceValues<dim> > (fe_collection,
+                  internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim> > (fe_collection,
 										 q_collection,
 										 update_flags)
   {}
@@ -573,7 +574,7 @@ namespace hp
 
   template <int dim>
   void
-  FESubfaceValues<dim>::reinit (const typename ::DoFHandler<dim>::cell_iterator &cell,
+  FESubfaceValues<dim>::reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
                                 const unsigned int face_no,
                                 const unsigned int subface_no,
                                 const unsigned int q_index,
@@ -703,12 +704,12 @@ namespace internal
   namespace hp
   {
     template class FEValuesBase<deal_II_dimension,deal_II_dimension,
-                                ::FEValues<deal_II_dimension> >;
+                                dealii::FEValues<deal_II_dimension> >;
 #if deal_II_dimension >= 2
     template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-                                ::FEFaceValues<deal_II_dimension> >;
+                                dealii::FEFaceValues<deal_II_dimension> >;
     template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-                                ::FESubfaceValues<deal_II_dimension> >;
+                                dealii::FESubfaceValues<deal_II_dimension> >;
 #endif
   }
 }
@@ -721,3 +722,5 @@ namespace hp
   template class FESubfaceValues<deal_II_dimension>;
 #endif
 }
+
+DEAL_II_NAMESPACE_CLOSE

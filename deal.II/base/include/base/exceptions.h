@@ -30,6 +30,8 @@
 #  include <iostream>
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+
 
 /**
  *  This class is the base class for all exception classes. Do not use
@@ -429,7 +431,7 @@ namespace deal_II_exceptions
  * @ingroup Exceptions
  */
 #define DeclException0(Exception0)  \
-class Exception0 :  public ExceptionBase {}
+class Exception0 :  public dealii::ExceptionBase {}
 
 
 
@@ -438,7 +440,7 @@ class Exception0 :  public ExceptionBase {}
   *  one additional parameter.
   */
 #define DeclException1(Exception1, type1, outsequence)                \
-class Exception1 : public ExceptionBase {                             \
+class Exception1 : public dealii::ExceptionBase {                             \
   public:                                                             \
       Exception1 (const type1 a1) : arg1 (a1) {};                     \
       virtual ~Exception1 () throw () {};                             \
@@ -457,7 +459,7 @@ class Exception1 : public ExceptionBase {                             \
  *  @ingroup Exceptions
  */
 #define DeclException2(Exception2, type1, type2, outsequence)         \
-class Exception2 : public ExceptionBase {                             \
+class Exception2 : public dealii::ExceptionBase {                             \
   public:                                                             \
       Exception2 (const type1 a1, const type2 a2) :          \
 	      arg1 (a1), arg2(a2) {};                                 \
@@ -478,7 +480,7 @@ class Exception2 : public ExceptionBase {                             \
  *  @ingroup Exceptions
  */
 #define DeclException3(Exception3, type1, type2, type3, outsequence)  \
-class Exception3 : public ExceptionBase {                             \
+class Exception3 : public dealii::ExceptionBase {                             \
   public:                                                             \
       Exception3 (const type1 a1, const type2 a2, const type3 a3) : \
 	      arg1 (a1), arg2(a2), arg3(a3) {};                       \
@@ -500,7 +502,7 @@ class Exception3 : public ExceptionBase {                             \
  *  @ingroup Exceptions
  */
 #define DeclException4(Exception4, type1, type2, type3, type4, outsequence) \
-class Exception4 : public ExceptionBase {                             \
+class Exception4 : public dealii::ExceptionBase {                             \
   public:                                                             \
       Exception4 (const type1 a1, const type2 a2,                     \
 	    const type3 a3, const type4 a4) :                \
@@ -524,7 +526,7 @@ class Exception4 : public ExceptionBase {                             \
  *  @ingroup Exceptions
  */
 #define DeclException5(Exception5, type1, type2, type3, type4, type5, outsequence) \
-class Exception5 : public ExceptionBase {                             \
+class Exception5 : public dealii::ExceptionBase {                             \
   public:                                                             \
       Exception5 (const type1 a1, const type2 a2, const type3 a3,     \
 	    const type4 a4, const type5 a5) :                \
@@ -945,5 +947,7 @@ namespace StandardExceptions
 
 using namespace StandardExceptions;
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

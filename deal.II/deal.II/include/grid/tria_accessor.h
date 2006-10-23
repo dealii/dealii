@@ -18,6 +18,13 @@
 #include <base/exceptions.h>
 #include <grid/tria_iterator_base.h>
 
+namespace std
+{
+  template<class T1, class T2>
+  struct pair;
+}
+
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class Point;
 
@@ -25,6 +32,8 @@ template <int dim> class Triangulation;
 template <int dim, typename Accessor> class TriaRawIterator;
 template <int dim, typename Accessor> class TriaIterator;
 template <int dim, typename Accessor> class TriaActiveIterator;
+
+
 namespace internal
 {
   namespace Triangulation
@@ -41,12 +50,6 @@ template <int dim>              class TriaObjectAccessor<1, dim>;
 template <int dim>              class TriaObjectAccessor<2, dim>;
 template <int dim>              class TriaObjectAccessor<3, dim>;
 
-
-namespace std
-{
-  template<class T1, class T2>
-  struct pair;
-}
 
 // note: the file tria_accessor.templates.h is included at the end of
 // this file.  this includes a lot of templates. originally, this was
@@ -2949,10 +2952,11 @@ template <> double TriaObjectAccessor<2, 3>::measure () const;
 template <> double TriaObjectAccessor<3, 3>::measure () const;
 
 
+#endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 // include more templates in debug and optimized mode
 #  include "tria_accessor.templates.h"
-
-#endif // DOXYGEN
 
 #endif

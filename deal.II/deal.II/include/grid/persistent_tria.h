@@ -19,6 +19,7 @@
 #include <grid/tria.h>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class handles the history of a triangulation and can rebuild it after
@@ -298,5 +299,7 @@ class PersistentTriangulation : public Triangulation<dim>
     std::vector<std::vector<bool> >   coarsen_flags;
 };
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

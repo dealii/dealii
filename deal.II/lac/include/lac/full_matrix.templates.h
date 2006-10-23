@@ -24,6 +24,9 @@
 #include <cstdio>
 #include <algorithm>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 template <typename number>
 FullMatrix<number>::FullMatrix (const unsigned int n)
                 :
@@ -2382,5 +2385,7 @@ FullMatrix<number>::memory_consumption () const
     + Table<2,number>::memory_consumption();
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

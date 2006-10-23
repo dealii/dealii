@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,6 +18,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class provides information about the system which may be of
@@ -127,6 +128,7 @@ extern MultithreadInfo multithread_info;
 
 
 //---------------------------------------------------------------------------
+DEAL_II_NAMESPACE_CLOSE
 // end of #ifndef __deal2__multithread_info_h
 #endif
 //---------------------------------------------------------------------------

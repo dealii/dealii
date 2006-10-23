@@ -14,6 +14,7 @@
 #include <base/memory_consumption.h>
 #include <fe/fe_collection.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace hp
 {
@@ -89,3 +90,5 @@ namespace hp
   template class FECollection<deal_II_dimension>;
   
 }
+
+DEAL_II_NAMESPACE_CLOSE

@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 /**
@@ -633,5 +634,6 @@ TableIndices<7>::TableIndices (const unsigned int index1,
 
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

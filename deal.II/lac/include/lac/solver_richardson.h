@@ -20,6 +20,8 @@
 #include <lac/solver_control.h>
 #include <base/subscriptor.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 /*!@addtogroup Solvers */
 /*@{*/
 
@@ -370,5 +372,7 @@ SolverRichardson<VECTOR>::set_omega (const double om)
 }
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

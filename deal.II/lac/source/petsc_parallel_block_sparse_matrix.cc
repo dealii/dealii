@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,8 @@
 
 
 #ifdef DEAL_II_USE_PETSC
+
+DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
@@ -106,5 +108,7 @@ namespace PETScWrappers
 }
 
   
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

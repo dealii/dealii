@@ -18,6 +18,7 @@
 #include <base/function.h>
 #include <base/point.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * Namespace implementing some concrete classes derived from the
@@ -1056,5 +1057,6 @@ namespace Functions
 				      const unsigned int  component = 0) const;
   };
 }
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

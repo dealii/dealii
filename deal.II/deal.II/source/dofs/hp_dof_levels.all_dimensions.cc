@@ -15,6 +15,7 @@
 #include <base/memory_consumption.h>
 #include <dofs/hp_dof_levels.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
@@ -29,3 +30,5 @@ namespace internal
     
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE

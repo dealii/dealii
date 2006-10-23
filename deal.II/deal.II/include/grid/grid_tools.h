@@ -22,6 +22,7 @@
 
 #include <list>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 /**
@@ -614,6 +615,7 @@ void GridTools::transform (const Predicate    &predicate,
 }
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 /*----------------------------   grid_tools.h     ---------------------------*/
 /* end of #ifndef __deal2__grid_tools_H */

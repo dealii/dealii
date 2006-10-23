@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <functional>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 namespace internal
 {
@@ -334,3 +336,6 @@ namespace internal
     template class TriaObjects<Quad>;
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
+

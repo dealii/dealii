@@ -17,6 +17,7 @@
 #include <base/subscriptor.h>
 #include <lac/vector_memory.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class Vector;
 class SolverControl;
@@ -241,5 +242,7 @@ Solver<VECTOR>::control() const
 
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

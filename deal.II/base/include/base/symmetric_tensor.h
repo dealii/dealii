@@ -17,6 +17,7 @@
 #include <base/tensor.h>
 #include <base/table_indices.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <int rank, int dim> class SymmetricTensor;
 
@@ -2665,5 +2666,6 @@ double_contract (SymmetricTensor<2,3> &tmp,
 }
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

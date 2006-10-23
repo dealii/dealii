@@ -15,6 +15,8 @@
 
 #include <base/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 namespace LACExceptions 
 {
 				   /**
@@ -56,5 +58,7 @@ namespace LACExceptions
 
 using namespace LACExceptions;
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

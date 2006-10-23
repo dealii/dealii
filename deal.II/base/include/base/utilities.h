@@ -21,9 +21,13 @@
 
 #ifdef DEAL_II_USE_PETSC
 #include <petscvec.h>
+
 #else
 typedef int MPI_Comm;
 #endif
+
+DEAL_II_NAMESPACE_OPEN
+
 
 /**
  * A namespace for utility functions that are not particularly specific to
@@ -204,6 +208,7 @@ namespace Utilities
   }
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 

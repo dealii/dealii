@@ -22,6 +22,7 @@
 #include <vector>
 #include <utility>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class provides an interface to group several elements together
@@ -1063,6 +1064,7 @@ class FESystem : public FiniteElement<dim>
 template <> void FESystem<1>::initialize_unit_face_support_points ();
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 /*----------------------------  fe_system.h  ---------------------------*/
 #endif

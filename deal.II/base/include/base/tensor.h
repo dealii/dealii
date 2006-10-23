@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/tensor_base.h>
 
+DEAL_II_NAMESPACE_OPEN
 template <int rank_, int dim> class Tensor;
 template <int dim> class Tensor<1,dim>;
 
@@ -1599,5 +1600,6 @@ operator / (const Tensor<rank,dim> &t,
   return tt;
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

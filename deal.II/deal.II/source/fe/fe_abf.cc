@@ -31,7 +31,8 @@
 #endif
 
 #include <iostream>
-using namespace std;
+
+DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
@@ -766,3 +767,5 @@ FE_ABF<dim>::memory_consumption () const
 
 
 template class FE_ABF<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

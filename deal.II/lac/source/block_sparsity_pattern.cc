@@ -15,6 +15,8 @@
 #include <base/memory_consumption.h>
 #include <lac/block_sparsity_pattern.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <class SparsityPatternBase>
 BlockSparsityPatternBase<SparsityPatternBase>::BlockSparsityPatternBase ()
@@ -389,3 +391,5 @@ CompressedBlockSparsityPattern (const unsigned int n_rows,
 // to the top of this source file. The reason is a slightly buggy version
 // of the Apple gcc v.3.3.
 // For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
+
+DEAL_II_NAMESPACE_CLOSE

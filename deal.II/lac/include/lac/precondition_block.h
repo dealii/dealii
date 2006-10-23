@@ -21,6 +21,8 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <typename number> class FullMatrix;
 template <typename number> class Vector;
 
@@ -1180,5 +1182,7 @@ PreconditionBlockJacobi<MATRIX, inverse_type>::end (
   Assert (r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
   return const_iterator(this, r+1);
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

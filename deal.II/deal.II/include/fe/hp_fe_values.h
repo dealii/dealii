@@ -23,6 +23,8 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class MappingQ1;
 template <int dim> class FiniteElement;
 
@@ -39,7 +41,7 @@ namespace internal
  * that is common to them. The main task of this class is to provide a
  * table where for every combination of finite element, mapping, and
  * quadrature object from their corresponding collection objects there
- * is a matching ::FEValues, ::FEFaceValues, or ::FESubfaceValues
+ * is a matching dealii::FEValues, dealii::FEFaceValues, or dealii::FESubfaceValues
  * object. To make things more efficient, however, these FE*Values
  * objects are only created once requested (lazy allocation).
  *
@@ -48,8 +50,8 @@ namespace internal
  * i.e. for usual @p hp::FEValues it is equal to the first one, while
  * for face integration it is one less. The third template parameter
  * indicates the type of underlying non-hp FE*Values base type,
- * i.e. it could either be ::FEValues, ::FEFaceValues, or
- * ::FESubfaceValues.
+ * i.e. it could either be dealii::FEValues, dealii::FEFaceValues, or
+ * dealii::FESubfaceValues.
  * 
  * @ingroup hp
  *
@@ -65,9 +67,9 @@ namespace internal
                                           * indicated by the parameters
                                           * to the constructor.
                                           */
-        FEValuesBase (const ::hp::MappingCollection<dim> &mapping_collection,
-                      const ::hp::FECollection<dim>      &fe_collection,
-                      const ::hp::QCollection<q_dim>     &q_collection,
+        FEValuesBase (const dealii::hp::MappingCollection<dim> &mapping_collection,
+                      const dealii::hp::FECollection<dim>      &fe_collection,
+                      const dealii::hp::QCollection<q_dim>     &q_collection,
                       const UpdateFlags             update_flags);
                                          /**
                                           * Constructor. Set the fields
@@ -78,8 +80,8 @@ namespace internal
                                           * object for the mapping
                                           * object.
                                           */
-        FEValuesBase (const ::hp::FECollection<dim> &fe_collection,
-                      const ::hp::QCollection<q_dim> &q_collection,
+        FEValuesBase (const dealii::hp::FECollection<dim> &fe_collection,
+                      const dealii::hp::QCollection<q_dim> &q_collection,
                       const UpdateFlags         update_flags);
         
                                          /**
@@ -123,14 +125,14 @@ namespace internal
                                           * collection of finite
                                           * elements to be used.
                                           */
-        const SmartPointer<const ::hp::FECollection<dim> > fe_collection;
+        const SmartPointer<const dealii::hp::FECollection<dim> > fe_collection;
         
                                          /**
                                           * A pointer to the
                                           * collection of mappings to
                                           * be used.
                                           */
-        const SmartPointer<const ::hp::MappingCollection<dim> > mapping_collection;
+        const SmartPointer<const dealii::hp::MappingCollection<dim> > mapping_collection;
     
                                          /**
                                           * Copy of the quadrature
@@ -138,7 +140,7 @@ namespace internal
                                           * provided to the
                                           * constructor.
                                           */
-        const ::hp::QCollection<q_dim> q_collection;
+        const dealii::hp::QCollection<q_dim> q_collection;
 
       private:
                                          /**
@@ -196,7 +198,7 @@ namespace hp
  * @ingroup hp
  */  
   template <int dim>
-  class FEValues : public internal::hp::FEValuesBase<dim,dim,::FEValues<dim> >
+  class FEValues : public internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim> >
   {
     public:
                                        /**
@@ -219,9 +221,9 @@ namespace hp
                                         * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
-      FEValues (const ::hp::MappingCollection<dim> &mapping_collection,
-                const ::hp::FECollection<dim>  &fe_collection,
-                const ::hp::QCollection<dim>       &q_collection,
+      FEValues (const dealii::hp::MappingCollection<dim> &mapping_collection,
+                const dealii::hp::FECollection<dim>  &fe_collection,
+                const dealii::hp::QCollection<dim>       &q_collection,
                 const UpdateFlags             update_flags);
 
 
@@ -387,7 +389,7 @@ namespace hp
                                         * these last three arguments.
                                         */
       void
-      reinit (const typename ::DoFHandler<dim>::cell_iterator &cell,
+      reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
               const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
               const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
               const unsigned int fe_index = deal_II_numbers::invalid_unsigned_int);
@@ -471,7 +473,7 @@ namespace hp
  * @ingroup hp
  */  
   template <int dim>
-  class FEFaceValues : public internal::hp::FEValuesBase<dim,dim-1,::FEFaceValues<dim> >
+  class FEFaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim> >
   {
     public:
                                        /**
@@ -662,7 +664,7 @@ namespace hp
                                         * these last three arguments.
                                         */
       void
-      reinit (const typename ::DoFHandler<dim>::cell_iterator &cell,
+      reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
               const unsigned int mapping_index = deal_II_numbers::invalid_unsigned_int,
@@ -749,7 +751,7 @@ namespace hp
  * @ingroup hp
  */  
   template <int dim>
-  class FESubfaceValues : public internal::hp::FEValuesBase<dim,dim-1,::FESubfaceValues<dim> >
+  class FESubfaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim> >
   {
     public:
                                        /**
@@ -920,7 +922,7 @@ namespace hp
                                         * these last three arguments.
                                         */
       void
-      reinit (const typename ::DoFHandler<dim>::cell_iterator &cell,
+      reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int subface_no,
               const unsigned int q_index = deal_II_numbers::invalid_unsigned_int,
@@ -1023,5 +1025,6 @@ namespace internal
   
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

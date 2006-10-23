@@ -14,6 +14,7 @@
 
 #include <base/geometry_info.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim> const unsigned int GeometryInfo<dim>::children_per_cell;
@@ -462,3 +463,5 @@ template class GeometryInfo<1>;
 template class GeometryInfo<2>;
 template class GeometryInfo<3>;
 template class GeometryInfo<4>;
+
+DEAL_II_NAMESPACE_CLOSE

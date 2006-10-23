@@ -35,6 +35,8 @@
 #undef VEC
 
 
+DEAL_II_NAMESPACE_OPEN
+
 template
 void VectorTools::create_right_hand_side<deal_II_dimension>
 (const Mapping<deal_II_dimension>    &,
@@ -168,3 +170,5 @@ VectorTools::interpolate_boundary_values<deal_II_dimension>
  std::map<unsigned int,double> &,
  const std::vector<bool>       &);
 
+
+DEAL_II_NAMESPACE_CLOSE

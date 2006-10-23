@@ -17,6 +17,8 @@
 #include <base/tensor_product_polynomials.h>
 #include <fe/fe_poly.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 /*!@addtogroup fe */
 /*@{*/
@@ -568,5 +570,7 @@ void FE_Q<2>::initialize_constraints ();
 template <>
 void FE_Q<3>::initialize_constraints ();
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

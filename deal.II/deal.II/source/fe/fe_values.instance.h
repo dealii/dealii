@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 
 // Definition of vector type macros is in fe_values.cc
 
+DEAL_II_NAMESPACE_OPEN
 
 template
 void FEValuesBase<deal_II_dimension>::get_function_values<IN>
@@ -77,3 +78,5 @@ void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<IN>
 template
 void FEValuesBase<deal_II_dimension>::get_function_2nd_derivatives<IN>
 (const IN&, std::vector<std::vector<Tensor<2,deal_II_dimension> > > &, bool) const;
+
+DEAL_II_NAMESPACE_CLOSE

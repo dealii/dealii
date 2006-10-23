@@ -18,8 +18,10 @@
 #include <grid/tria_accessor.h>
 #include <dofs/dof_handler.h>
 #include <dofs/hp_dof_handler.h>
+
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
@@ -1468,6 +1470,7 @@ void
 DoFCellAccessor<hp::DoFHandler<3> >::update_cell_dof_indices_cache () const;
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 // include more templates
 #include "dof_accessor.templates.h"

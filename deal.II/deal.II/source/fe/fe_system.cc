@@ -23,6 +23,7 @@
 
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 /* ----------------------- FESystem::InternalData ------------------- */
 
@@ -2948,3 +2949,5 @@ FESystem<dim>::memory_consumption () const
 
 // explicit instantiations
 template class FESystem<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

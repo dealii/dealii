@@ -21,6 +21,7 @@
 #include <vector>
 #include <iostream>
 
+DEAL_II_NAMESPACE_OPEN
 
 class SparsityPattern;
 template <typename number> class FullMatrix;
@@ -2102,5 +2103,7 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
 
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

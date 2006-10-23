@@ -13,13 +13,15 @@
 #ifndef __deal2__conditional_ostream_h
 #define __deal2__conditional_ostream_h
 
-
+#include <base/config.h>
 
 #ifdef HAVE_STD_OSTREAM_HEADER
 #  include <ostream>
 #else
 #  include <iostream>
 #endif
+
+DEAL_II_NAMESPACE_OPEN
 
 
 /**
@@ -184,5 +186,7 @@ ConditionalOStream::operator<< (std::ostream& (*p) (std::ostream&)) const
   return *this;
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

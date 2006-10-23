@@ -90,6 +90,7 @@
 #include <fstream>
 #include <iostream>
 
+using namespace dealii;
 
                                  // @sect3{The <code>LaplaceProblem</code> class}
 

@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2005, 2006 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -10,6 +10,8 @@
 //---------------------------------------------------------------------------
 
 #include <lac/sparse_mic.templates.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 // explicit instantiations for double and float matrices
@@ -41,3 +43,5 @@ template void SparseMIC<float>::decompose<float> (const SparseMatrix<float> &,
 template void SparseMIC<float>::vmult<float> (Vector<float> &,
                                               const Vector<float> &) const;
 
+
+DEAL_II_NAMESPACE_CLOSE

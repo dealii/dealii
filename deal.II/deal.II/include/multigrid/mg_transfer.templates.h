@@ -25,6 +25,7 @@
 
 #include <algorithm>
 
+DEAL_II_NAMESPACE_OPEN
 
 /* --------------------- MGTransferPrebuilt -------------- */
 
@@ -681,5 +682,6 @@ MGTransferBlock<number>::copy_from_mg_add (
     }
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

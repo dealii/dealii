@@ -19,6 +19,7 @@
 #include <base/subscriptor.h>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 /*!@addtogroup Quadrature */
 /*@{*/
@@ -370,5 +371,6 @@ template <>
 const std::vector<double> & Quadrature<0>::get_weights () const;
 
 #endif // DOXYGEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

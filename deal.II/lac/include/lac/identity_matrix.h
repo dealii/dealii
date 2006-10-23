@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <lac/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /*! @addtogroup Matrix1
  *@{
@@ -271,6 +272,8 @@ IdentityMatrix::Tvmult_add (VECTOR1       &out,
 #endif
 
 /**@}*/
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 

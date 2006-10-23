@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,8 @@
 
 
 #include <lac/sparse_vanka.templates.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 // explicit instantiations
@@ -32,3 +34,5 @@ template void SparseBlockVanka<double>::vmult<float> (Vector<float>       &dst,
 						      const Vector<float> &src) const;
 template void SparseBlockVanka<double>::vmult<double> (Vector<double>       &dst,
 						       const Vector<double> &src) const;
+
+DEAL_II_NAMESPACE_CLOSE

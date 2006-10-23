@@ -18,6 +18,8 @@
 #include <lac/pointer_matrix.h>
 #include <boost/shared_ptr.hpp>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 /**
  * The transpose of a given matrix.  This auxiliary class swaps the
@@ -224,5 +226,7 @@ TransposeMatrix<MATRIX, VECTOR>::get () const
 }
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

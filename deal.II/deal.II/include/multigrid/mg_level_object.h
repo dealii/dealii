@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,8 +16,10 @@
 #include <base/subscriptor.h>
 #include <vector>
 
-
 #include <boost/shared_ptr.hpp>
+
+DEAL_II_NAMESPACE_OPEN
+
 
 /*!@addtogroup mg */
 /*@{*/
@@ -217,5 +219,6 @@ MGLevelObject<Object>::memory_consumption () const
   return result;
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

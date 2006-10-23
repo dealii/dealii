@@ -16,6 +16,7 @@
 
 #include <base/quadrature.h>
 
+DEAL_II_NAMESPACE_OPEN
 /*!@addtogroup Quadrature */
 /*@{*/
 
@@ -445,5 +446,6 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
 
 
 #endif // DOXYGEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

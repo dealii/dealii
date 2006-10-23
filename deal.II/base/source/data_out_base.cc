@@ -43,6 +43,8 @@
 
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
+
 //TODO: Is it reasonable to have undocumented exceptions?
 
 DeclException2 (ExcUnexpectedInput,
@@ -3892,7 +3894,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
 
 				   // first empty previous content
   {
-    std::vector<typename ::DataOutBase::Patch<dim,spacedim> >
+    std::vector<typename dealii::DataOutBase::Patch<dim,spacedim> >
       tmp;
     tmp.swap (patches);
   }
@@ -3909,7 +3911,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
   {
     std::pair<unsigned int, unsigned int>
       dimension_info
-      = ::DataOutBase::determine_intermediate_format_dimensions (in);
+      = dealii::DataOutBase::determine_intermediate_format_dimensions (in);
     AssertThrow ((dimension_info.first  == dim) &&
                  (dimension_info.second == spacedim),
                  ExcIncompatibleDimensions (dimension_info.first, dim,
@@ -3962,7 +3964,7 @@ void
 DataOutReader<dim,spacedim>::
 merge (const DataOutReader<dim,spacedim> &source) 
 {
-  typedef typename ::DataOutBase::Patch<dim,spacedim> Patch;
+  typedef typename dealii::DataOutBase::Patch<dim,spacedim> Patch;
   
   const std::vector<Patch> source_patches = source.get_patches ();
   Assert (patches.size () != 0,        ExcNoPatches ());
@@ -4002,7 +4004,7 @@ merge (const DataOutReader<dim,spacedim> &source)
 
 
 template <int dim, int spacedim>
-const std::vector<typename ::DataOutBase::Patch<dim,spacedim> > &
+const std::vector<typename dealii::DataOutBase::Patch<dim,spacedim> > &
 DataOutReader<dim,spacedim>::get_patches () const
 {
   return patches;
@@ -4131,3 +4133,5 @@ INSTANTIATE(2,3);
 INSTANTIATE(3,4);
 
 
+
+DEAL_II_NAMESPACE_CLOSE

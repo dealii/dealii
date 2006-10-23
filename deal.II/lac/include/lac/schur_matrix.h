@@ -21,6 +21,7 @@
 #include <lac/block_vector.h>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 /*! @addtogroup Matrix2
@@ -351,5 +352,7 @@ void SchurMatrix<MA_inverse, MB, MDt, MC>
   deallog.pop();
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

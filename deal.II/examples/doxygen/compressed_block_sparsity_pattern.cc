@@ -27,6 +27,8 @@
 
 #include <iostream>
 
+using namespace dealii;
+
 int main()
 {
   Triangulation<2> tr;

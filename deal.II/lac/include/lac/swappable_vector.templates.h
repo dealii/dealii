@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,6 +18,7 @@
 #include <lac/swappable_vector.h>
 #include <fstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number>
@@ -246,5 +247,7 @@ SwappableVector<number>::memory_consumption () const
 
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // __deal2__swappable_vector_templates_h

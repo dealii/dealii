@@ -22,6 +22,7 @@
 #include <lac/vector.h>
 #include <numerics/solution_transfer.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 
@@ -420,3 +421,5 @@ template class SolutionTransfer<deal_II_dimension, float>;
 template class SolutionTransfer<deal_II_dimension, double>;
 
 /*----------------------------   solution_transfer.cc     ----------------------*/
+
+DEAL_II_NAMESPACE_CLOSE

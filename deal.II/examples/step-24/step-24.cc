@@ -53,6 +53,7 @@
 				 // diameter.
 #include <grid/grid_tools.h>
 
+using namespace dealii;
 
 				 // @sect3{The "forward problem" class template}
 

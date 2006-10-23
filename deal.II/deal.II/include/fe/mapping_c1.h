@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <fe/mapping_q.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /*!@addtogroup mapping */
 /*@{*/
@@ -134,5 +135,7 @@ template <> void MappingC1<2>::add_quad_support_points (
 
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

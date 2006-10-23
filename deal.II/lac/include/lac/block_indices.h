@@ -18,6 +18,8 @@
 #include <base/exceptions.h>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 /**
  * Class that manages the conversion of global indices into a block
@@ -332,5 +334,7 @@ void swap (BlockIndices &u, BlockIndices &v)
 
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

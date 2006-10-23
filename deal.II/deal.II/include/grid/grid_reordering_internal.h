@@ -20,6 +20,7 @@
 #include <map>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 namespace internal
@@ -825,5 +826,7 @@ namespace internal
   }  // namespace GridReordering3d
 }  // namespace internal
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

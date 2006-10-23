@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,6 +22,7 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * @addtogroup Polynomials
@@ -562,5 +563,6 @@ AnisotropicPolynomials<3>::compute_index(const unsigned int n,
                                          unsigned int      (&index)[3]) const;
 
 #endif // DOXYGEN
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

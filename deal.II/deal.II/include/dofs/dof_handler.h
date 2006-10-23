@@ -25,6 +25,8 @@
 #include <map>
 #include <set>
 
+DEAL_II_NAMESPACE_OPEN
+
 namespace internal
 {
   namespace DoFHandler
@@ -131,7 +133,7 @@ class DoFHandler  :  public Subscriptor
 				      * Alias the @p FunctionMap type
 				      * declared elsewhere.
 				      */
-    typedef typename ::FunctionMap<dim>::type FunctionMap;
+    typedef typename dealii::FunctionMap<dim>::type FunctionMap;
 
 				     /**
 				      * Make the dimension available
@@ -1454,7 +1456,8 @@ DoFHandler<dim>::nth_active_fe_index (const unsigned int,
 
 #endif // DOXYGEN
 
-/*----------------------------   dof_handler.h     ---------------------------*/
+DEAL_II_NAMESPACE_CLOSE
 
+/*----------------------------   dof_handler.h     ---------------------------*/
 #endif
 /*----------------------------   dof_handler.h     ---------------------------*/

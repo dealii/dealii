@@ -20,6 +20,8 @@
 #include <iomanip>
 #include <strings.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 TableEntryBase::TableEntryBase ()
@@ -527,3 +529,5 @@ void TableHandler::add_value<unsigned int> (const std::string &,
 template
 void TableHandler::add_value<std::string> (const std::string &,
 					   const std::string);
+
+DEAL_II_NAMESPACE_CLOSE

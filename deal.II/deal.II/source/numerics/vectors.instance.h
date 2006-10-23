@@ -15,6 +15,8 @@
 
 // vectors.cc defines the vector type VEC
 
+DEAL_II_NAMESPACE_OPEN
+
 template
 void VectorTools::interpolate<deal_II_dimension>
 (const Mapping<deal_II_dimension>&,
@@ -228,3 +230,5 @@ void VectorTools::project
  const bool,
  const Quadrature<deal_II_dimension-1> &,
  const bool);
+
+DEAL_II_NAMESPACE_CLOSE

@@ -14,6 +14,8 @@
 
 #include <lac/filtered_matrix.templates.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 #define FILT(MM,VV) \
 template <> \
 void FilteredMatrix<MM , VV >::allocate_tmp_vector() \
@@ -45,3 +47,5 @@ FILT(SparseMatrix<float>, Vector<float>)
 BFILT(BlockSparseMatrix<float>, BlockVector<float>)
 template class FilteredMatrix<SparseMatrix<float>,Vector<float> >;
 template class FilteredMatrix<BlockSparseMatrix<float>,BlockVector<float> >;
+
+DEAL_II_NAMESPACE_CLOSE

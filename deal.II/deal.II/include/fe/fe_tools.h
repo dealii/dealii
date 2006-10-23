@@ -20,8 +20,10 @@
 #include <base/geometry_info.h>
 
 #include <vector>
-
 #include <boost/shared_ptr.hpp>
+
+
+DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class FullMatrix;
 template <typename number> class Vector;
@@ -1119,6 +1121,8 @@ FETools::FEFactory<FE>::get (const unsigned int degree) const
 
 
 /*@}*/
+
+DEAL_II_NAMESPACE_CLOSE
 
 /*----------------------------   fe_tools.h     ---------------------------*/
 /* end of #ifndef __deal2__fe_tools_H */

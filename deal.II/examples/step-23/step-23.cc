@@ -110,6 +110,8 @@
 				 // double digit time steps.
 #include <base/utilities.h>
 
+using namespace dealii;
+
 
 				 // @sect3{The <code>WaveEquation</code> class}
 

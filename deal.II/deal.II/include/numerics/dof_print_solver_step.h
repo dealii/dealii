@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <fstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 /**
@@ -126,5 +127,7 @@ DoFPrintSolverStep<dim, SOLVER, VECTOR>::print_vectors (const unsigned int step,
   std::ofstream of (fname.c_str());
   out.write (of);
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

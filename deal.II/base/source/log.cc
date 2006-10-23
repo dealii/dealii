@@ -36,6 +36,8 @@ extern "C" {
 }
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+
 
 LogStream deallog;
 
@@ -265,3 +267,5 @@ LogStream::memory_consumption () const
   
   return mem;
 }
+
+DEAL_II_NAMESPACE_CLOSE

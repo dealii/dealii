@@ -21,6 +21,9 @@
 #include <multigrid/mg_transfer.templates.h>
 #include <multigrid/multigrid.templates.h>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 // Warning: the following function is for debugging purposes only. It
 // will be compiled only, if the additional and undocumented compiler
 // flag MG_DEBUG is set. Furthermore, as soon as this function is
@@ -301,3 +304,5 @@ void MGSmootherContinuous<BlockVector<double> >::set_zero_interior_boundary (
 template
 void MGSmootherContinuous<BlockVector<float> >::set_zero_interior_boundary (
   const unsigned int, BlockVector<float>&) const;
+
+DEAL_II_NAMESPACE_CLOSE

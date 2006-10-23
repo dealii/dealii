@@ -5,7 +5,7 @@
 //    This file was automatically generated from blas.h.in
 //    See blastemplates in the deal.II contrib directory
 //
-//    Copyright (C) 2005 by the deal authors
+//    Copyright (C) 2005, 2006 by the deal authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -120,7 +120,7 @@ gemv (const char* trans, const int* m, const int* n, const double* alpha, const 
 inline void
 gemv (const char*, const int*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, double*, const int*)
 {
-  LAPACKSupport::ExcMissing("dgemv");
+  dealii::LAPACKSupport::ExcMissing("dgemv");
 }
 #endif
 
@@ -135,7 +135,7 @@ gemv (const char* trans, const int* m, const int* n, const float* alpha, const f
 inline void
 gemv (const char*, const int*, const int*, const float*, const float*, const int*, const float*, const int*, const float*, float*, const int*)
 {
-  LAPACKSupport::ExcMissing("sgemv");
+  dealii::LAPACKSupport::ExcMissing("sgemv");
 }
 #endif
 
@@ -150,7 +150,7 @@ getrf (const int* m, const int* n, double* A, const int* lda, int* ipiv, int* in
 inline void
 getrf (const int*, const int*, double*, const int*, int*, int*)
 {
-  LAPACKSupport::ExcMissing("dgetrf");
+  dealii::LAPACKSupport::ExcMissing("dgetrf");
 }
 #endif
 
@@ -165,7 +165,7 @@ getrf (const int* m, const int* n, float* A, const int* lda, int* ipiv, int* inf
 inline void
 getrf (const int*, const int*, float*, const int*, int*, int*)
 {
-  LAPACKSupport::ExcMissing("sgetrf");
+  dealii::LAPACKSupport::ExcMissing("sgetrf");
 }
 #endif
 
@@ -180,7 +180,7 @@ getrs (const char* trans, const int* n, const int* nrhs, const double* A, const 
 inline void
 getrs (const char*, const int*, const int*, const double*, const int*, const int*, double*, const int*, int*)
 {
-  LAPACKSupport::ExcMissing("dgetrs");
+  dealii::LAPACKSupport::ExcMissing("dgetrs");
 }
 #endif
 
@@ -195,7 +195,7 @@ getrs (const char* trans, const int* n, const int* nrhs, const float* A, const i
 inline void
 getrs (const char*, const int*, const int*, const float*, const int*, const int*, float*, const int*, int*)
 {
-  LAPACKSupport::ExcMissing("sgetrs");
+  dealii::LAPACKSupport::ExcMissing("sgetrs");
 }
 #endif
 
@@ -210,7 +210,7 @@ geev (const char* jobvl, const char* jobvr, const int* n, double* A, const int* 
 inline void
 geev (const char*, const char*, const int*, double*, const int*, double*, double*, double*, const int*, double*, const int*, double*, const int*, int*)
 {
-  LAPACKSupport::ExcMissing("dgeev");
+  dealii::LAPACKSupport::ExcMissing("dgeev");
 }
 #endif
 
@@ -225,7 +225,7 @@ geev (const char* jobvl, const char* jobvr, const int* n, float* A, const int* l
 inline void
 geev (const char*, const char*, const int*, float*, const int*, float*, float*, float*, const int*, float*, const int*, float*, const int*, int*)
 {
-  LAPACKSupport::ExcMissing("sgeev");
+  dealii::LAPACKSupport::ExcMissing("sgeev");
 }
 #endif
 
@@ -240,7 +240,7 @@ geevx (const char* balanc, const char* jobvl, const char* jobvr, const char* sen
 inline void
 geevx (const char*, const char*, const char*, const char*, const int*, double*, const int*, double*, double*, double*, const int*, double*, const int*, int*, int*, double*, double*, double*, double*, double*, const int*, int*, int*)
 {
-  LAPACKSupport::ExcMissing("dgeevx");
+  dealii::LAPACKSupport::ExcMissing("dgeevx");
 }
 #endif
 
@@ -255,7 +255,7 @@ geevx (const char* balanc, const char* jobvl, const char* jobvr, const char* sen
 inline void
 geevx (const char*, const char*, const char*, const char*, const int*, float*, const int*, float*, float*, float*, const int*, float*, const int*, int*, int*, float*, float*, float*, float*, float*, const int*, int*, int*)
 {
-  LAPACKSupport::ExcMissing("sgeevx");
+  dealii::LAPACKSupport::ExcMissing("sgeevx");
 }
 #endif
 
@@ -270,7 +270,7 @@ gesvd (int* jobu, int* jobvt, const int* n, const int* m, double* A, const int* 
 inline void
 gesvd (int*, int*, const int*, const int*, double*, const int*, double*, double*, const int*, double*, const int*, double*, const int*, int*)
 {
-  LAPACKSupport::ExcMissing("dgesvd");
+  dealii::LAPACKSupport::ExcMissing("dgesvd");
 }
 #endif
 
@@ -285,7 +285,7 @@ gesvd (int* jobu, int* jobvt, const int* n, const int* m, float* A, const int* l
 inline void
 gesvd (int*, int*, const int*, const int*, float*, const int*, float*, float*, const int*, float*, const int*, float*, const int*, int*)
 {
-  LAPACKSupport::ExcMissing("sgesvd");
+  dealii::LAPACKSupport::ExcMissing("sgesvd");
 }
 #endif
 
@@ -300,7 +300,7 @@ stev (const char* jobz, const int* n, double* d, double* e, double* z, const int
 inline void
 stev (const char*, const int*, double*, double*, double*, const int*, double*, int*)
 {
-  LAPACKSupport::ExcMissing("dstev");
+  dealii::LAPACKSupport::ExcMissing("dstev");
 }
 #endif
 
@@ -315,9 +315,8 @@ stev (const char* jobz, const int* n, float* d, float* e, float* z, const int* l
 inline void
 stev (const char*, const int*, float*, float*, float*, const int*, float*, int*)
 {
-  LAPACKSupport::ExcMissing("sstev");
+  dealii::LAPACKSupport::ExcMissing("sstev");
 }
 #endif
-
 
 #endif

@@ -15,6 +15,7 @@
 #include <lac/vector.h>
 #include <numerics/vectors.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 void
@@ -42,3 +43,5 @@ VectorTools::subtract_mean_value(Vector<double>     &v,
     if (p_select[i])
       v(i) -= s;  
 }
+
+DEAL_II_NAMESPACE_CLOSE

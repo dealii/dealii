@@ -24,6 +24,8 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class MappingQ;
 
 
@@ -459,5 +461,7 @@ template <>
 std::vector<unsigned int> FE_RaviartThomas<1>::get_dpo_vector (const unsigned int);
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

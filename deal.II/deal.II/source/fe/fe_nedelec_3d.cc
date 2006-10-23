@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,6 +18,9 @@
 #if deal_II_dimension == 3
 
 #include <fe/fe_nedelec.h>
+
+DEAL_II_NAMESPACE_OPEN
+
 
 // Transfer matrices for finite elements: have one matrix for each of
 // the four child cells which tells us how the degrees of freedom on
@@ -231,6 +234,7 @@ FE_Nedelec<3>::Matrices::n_constraint_matrices
 sizeof(FE_Nedelec<3>::Matrices::constraint_matrices[0]);
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 #else // #if deal_II_dimension
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty

@@ -19,6 +19,8 @@
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 /**
  * This class provides a map between two grids which are derived from
@@ -225,5 +227,7 @@ class InterGridMap
 			      const cell_iterator &dst_cell);
 };
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

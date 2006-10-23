@@ -22,6 +22,9 @@
 #include <vector>
 #include <iomanip>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 // forward declarations
 template<typename number> class Vector;
 
@@ -1455,6 +1458,8 @@ FullMatrix<number>::print (STREAM             &s,
 
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 

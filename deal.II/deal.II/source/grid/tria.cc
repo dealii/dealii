@@ -29,6 +29,8 @@
 #include <cmath>
 #include <iostream>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 // initialize the @p{straight_boundary} pointer of the triangulation
 // class. for the reasons why it is done like this, see the
@@ -9250,3 +9252,6 @@ Triangulation<dim>::remove_refinement_listener (RefinementListener &listener) co
 
 // explicit instantiations
 template class Triangulation<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE
+

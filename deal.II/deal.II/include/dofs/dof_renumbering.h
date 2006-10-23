@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,6 +22,7 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * Implementation of a number of renumbering algorithms for the degrees of
@@ -671,5 +672,6 @@ class DoFRenumbering
     DeclException0 (ExcNotDGFEM);
 };
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

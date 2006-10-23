@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,6 +22,8 @@
 #include <multigrid/mg_base.h>
 #include <multigrid/mg_level_object.h>
 #include <vector>
+
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class MGDoFHandler;
 
@@ -332,5 +334,7 @@ MGSmootherBlock<MATRIX, RELAX, number>::smooth(
 }
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

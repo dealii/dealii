@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <string>
 
+DEAL_II_NAMESPACE_OPEN
 /**
  * Identification of a program run. <tt>JobIdentifier</tt> determines the
  * start time of a program run and stores it as a program
@@ -76,5 +77,6 @@ class JobIdentifier
  * Global object to identify the presently running program.
  */
 extern JobIdentifier dealjobid;
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

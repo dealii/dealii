@@ -40,6 +40,8 @@
 #include <algorithm>
 #include <memory>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class Quadrature;
 
 //TODO: Add access to mapping values to FEValuesBase
@@ -2761,5 +2763,6 @@ FEFaceValuesBase<dim>::boundary_form (const unsigned int i) const
 
 #endif // DOXYGEN
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

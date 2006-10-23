@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,6 +24,8 @@
 #include <cmath>
 #include <functional>
 #include <fstream>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 
@@ -195,7 +197,7 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim> &tria,
 
   if (refine_cells || coarsen_cells)
     {
-      ::Vector<typename Vector::value_type> tmp(criteria);
+      dealii::Vector<typename Vector::value_type> tmp(criteria);
       if (refine_cells)
 	{
 	  std::nth_element (tmp.begin(), tmp.begin()+refine_cells,
@@ -234,7 +236,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim> &tria,
 				   // error, which is what we have to sum
 				   // up and compare with
 				   // @p{fraction_of_error*total_error}.
-  ::Vector<typename Vector::value_type> tmp(criteria);
+  dealii::Vector<typename Vector::value_type> tmp(criteria);
   const double total_error = tmp.l1_norm();
 
 				   // sort the largest criteria to the
@@ -242,13 +244,13 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim> &tria,
   std::sort (tmp.begin(), tmp.end(), std::greater<double>());
 
 				   // compute thresholds
-  typename ::Vector<typename Vector::value_type>::const_iterator pp=tmp.begin();
+  typename dealii::Vector<typename Vector::value_type>::const_iterator pp=tmp.begin();
   for (double sum=0; (sum<top_fraction*total_error) && (pp!=(tmp.end()-1)); ++pp)
     sum += *pp;
   double top_threshold = ( pp != tmp.begin () ?
 			   (*pp+*(pp-1))/2 :
 			   *pp );
-  typename ::Vector<typename Vector::value_type>::const_iterator qq=(tmp.end()-1);
+  typename dealii::Vector<typename Vector::value_type>::const_iterator qq=(tmp.end()-1);
   for (double sum=0; (sum<bottom_fraction*total_error) && (qq!=tmp.begin()); --qq)
     sum += *qq;
   double bottom_threshold = ( qq != (tmp.end()-1) ?
@@ -467,3 +469,6 @@ GridRefinement::
 refine_and_coarsen_optimize (Triangulation<deal_II_dimension> &,
                              const PETScWrappers::Vector &);
 #endif
+
+DEAL_II_NAMESPACE_CLOSE
+

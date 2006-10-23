@@ -38,6 +38,7 @@
 #include <cmath>
 
 
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 inline
@@ -1455,3 +1456,5 @@ void MatrixCreator::create_laplace_matrix<deal_II_dimension>
  const Function<deal_II_dimension>      &rhs,
  Vector<double>           &rhs_vector,
  const Function<deal_II_dimension> * const coefficient);
+
+DEAL_II_NAMESPACE_CLOSE

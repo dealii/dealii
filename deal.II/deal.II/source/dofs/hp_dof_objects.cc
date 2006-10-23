@@ -17,6 +17,7 @@
 #include <dofs/hp_dof_levels.h>
 #include <dofs/hp_dof_handler.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 //TODO: Several of the functions in this file are identical. some template trickery should make it possible to merge them
 
@@ -59,3 +60,5 @@ namespace internal
 #endif
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE

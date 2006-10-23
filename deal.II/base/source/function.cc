@@ -17,6 +17,8 @@
 #include <lac/vector.h>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <int dim>
 const unsigned int Function<dim>::dimension;
@@ -497,3 +499,5 @@ template class Function<3>;
 template class ZeroFunction<3>;
 template class ConstantFunction<3>;
 template class ComponentSelectFunction<3>;
+
+DEAL_II_NAMESPACE_CLOSE

@@ -63,6 +63,7 @@
 				 // offers such functionality:
 #include <base/tensor_function.h>
 
+using namespace dealii;
 
                                  // @sect3{The <code>MixedLaplaceProblem</code> class template}
 

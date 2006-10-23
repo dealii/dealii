@@ -17,6 +17,8 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 namespace internal
 {
   namespace Triangulation
@@ -149,5 +151,7 @@ namespace internal
   }
   
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -55,6 +55,7 @@
 #include <fstream>
 #include <iostream>
 
+using namespace dealii;
 
                                  // @sect3{The <code>ElasticProblem</code> class template}
 

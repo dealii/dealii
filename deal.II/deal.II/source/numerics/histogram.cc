@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,8 @@
 #include <numerics/histogram.h>
 #include <algorithm>
 #include <cmath>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 template <typename number>
@@ -339,3 +341,5 @@ template
 void Histogram::evaluate<double> (const Vector<double>   &values,
 				  const unsigned int      n_intervals,
 				  const IntervalSpacing   interval_spacing);
+
+DEAL_II_NAMESPACE_CLOSE

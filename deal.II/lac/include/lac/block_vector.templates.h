@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,6 +20,7 @@
 #include <cmath>
 #include <algorithm>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <typename Number>
 BlockVector<Number>::BlockVector (const unsigned int n_blocks,
@@ -112,8 +113,8 @@ void BlockVector<Number>::swap (BlockVector<Number> &v)
 	  ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
   
   for (unsigned int i=0; i<this->n_blocks(); ++i)
-    ::swap (this->components[i], v.components[i]);
-  ::swap (this->block_indices, v.block_indices);
+    dealii::swap (this->components[i], v.components[i]);
+  dealii::swap (this->block_indices, v.block_indices);
 }
 
 
@@ -165,5 +166,7 @@ BlockVector<Number>::memory_consumption () const
 }
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

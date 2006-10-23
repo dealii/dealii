@@ -20,6 +20,7 @@
 #include <dofs/dof_accessor.h>
 #include <fe/fe.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, class EulerVectorType>
@@ -118,3 +119,5 @@ template class MappingQ1Eulerian<deal_II_dimension, Vector<double> >;
 #ifdef DEAL_II_USE_PETSC
 template class MappingQ1Eulerian<deal_II_dimension, PETScWrappers::Vector>;
 #endif
+
+DEAL_II_NAMESPACE_CLOSE

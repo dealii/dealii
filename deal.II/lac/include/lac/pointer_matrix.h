@@ -17,6 +17,8 @@
 #include <base/smartpointer.h>
 #include <lac/vector.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template<class VECTOR> class VectorMemory;
 
 /*! @addtogroup Matrix2
@@ -914,5 +916,7 @@ PointerMatrixVector<number>::get () const
 }
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -21,6 +21,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace hp
 {
@@ -188,5 +189,7 @@ namespace hp
   
 } // namespace hp
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

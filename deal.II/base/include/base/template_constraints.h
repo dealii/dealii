@@ -16,6 +16,7 @@
 
 #include <base/config.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <bool, typename> struct constraint_and_return_value;
 
@@ -232,5 +233,6 @@ PointerComparison::equal (const T *p1, const T *p2)
 
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

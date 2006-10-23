@@ -26,6 +26,7 @@
 #include <algorithm>
 
 
+DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
@@ -623,3 +624,5 @@ MappingCartesian<dim>::clone () const
 // explicit instantiations
 
 template class MappingCartesian<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

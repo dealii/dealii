@@ -22,6 +22,9 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 /*!@addtogroup VMemory */
 /*@{*/
 
@@ -62,7 +65,7 @@
  *
  * @author Guido Kanschat, 1998-2003
 */
-template<class VECTOR = ::Vector<double> >
+template<class VECTOR = dealii::Vector<double> >
 class VectorMemory : public Subscriptor
 {
   public:
@@ -121,7 +124,7 @@ class VectorMemory : public Subscriptor
  * vectors as needed from the global heap, i.e. performs no
  * specially adapted actions for memory management.
  */
-template<class VECTOR = ::Vector<double> >
+template<class VECTOR = dealii::Vector<double> >
 class PrimitiveVectorMemory : public VectorMemory<VECTOR>
 {
   public:
@@ -189,7 +192,7 @@ class PrimitiveVectorMemory : public VectorMemory<VECTOR>
  * 
  * @author Guido Kanschat, 1999
  */
-template<class VECTOR = ::Vector<double> >
+template<class VECTOR = dealii::Vector<double> >
 class GrowingVectorMemory : public VectorMemory<VECTOR>
 {
   public:
@@ -400,5 +403,7 @@ GrowingVectorMemory<VECTOR>::memory_consumption () const
 }
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

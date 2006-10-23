@@ -17,6 +17,8 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 namespace LAPACKSupport
 {
@@ -127,5 +129,7 @@ namespace LAPACKSupport
 		 << " required here is missing in your LAPACK installation");
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

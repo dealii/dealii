@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,6 +21,9 @@
 #include <lac/block_sparse_matrix.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
+
+DEAL_II_NAMESPACE_OPEN
+
 
 template <class MATRIX, class VECTOR>
 FilteredMatrix<MATRIX,VECTOR>::FilteredMatrix ()
@@ -263,5 +266,7 @@ FilteredMatrix<MATRIX,VECTOR>::memory_consumption () const
 }
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

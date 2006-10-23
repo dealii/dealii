@@ -23,6 +23,8 @@
 #include <vector>
 #include <complex>
 
+DEAL_II_NAMESPACE_OPEN
+
 // forward declarations
 template<typename number> class Vector;
 template<typename number> class BlockVector;
@@ -483,5 +485,7 @@ LAPACKFullMatrix<number>::eigenvalue (const unsigned int i) const
 }
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -15,6 +15,8 @@
 #include <lac/full_matrix.templates.h>
 #include <base/logstream.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 #define TYPEMAT float
 
 template class FullMatrix<TYPEMAT>;
@@ -118,3 +120,5 @@ void FullMatrix<TYPEMAT>::precondition_Jacobi<TYPEVEC> (
 
 template double FullMatrix<TYPEMAT>::residual<TYPEVEC,TYPERES>(
   Vector<TYPEVEC>&, const Vector<TYPEVEC>&, const Vector<TYPERES>&) const;
+
+DEAL_II_NAMESPACE_CLOSE

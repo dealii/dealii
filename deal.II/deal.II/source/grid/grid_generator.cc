@@ -34,6 +34,9 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 
 template <int dim>
 void
@@ -1782,3 +1785,5 @@ template void
 GridGenerator::
 laplace_transformation<deal_II_dimension> (Triangulation<deal_II_dimension> &,
 					   const std::map<unsigned int,Point<deal_II_dimension> > &);
+
+DEAL_II_NAMESPACE_CLOSE

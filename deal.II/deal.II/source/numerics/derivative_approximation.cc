@@ -33,6 +33,8 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 template <typename T>
@@ -158,7 +160,8 @@ derivative_norm (const Derivative &d)
 				   //
 				   // if the d_11=a, d_22=b,
 				   // d_12=d_21=c
-  const double radicand = ::sqr(d[0][0] - d[1][1]) + 4*::sqr(d[0][1]);
+  const double radicand = dealii::sqr(d[0][0] - d[1][1]) +
+			  4*dealii::sqr(d[0][1]);
   const double eigenvalues[2]
     = { 0.5*(d[0][0] + d[1][1] + std::sqrt(radicand)),
 	0.5*(d[0][0] + d[1][1] - std::sqrt(radicand))  };
@@ -1073,3 +1076,5 @@ DerivativeApproximation::SecondDerivative<deal_II_dimension>::update_flags;
 template
 const UpdateFlags
 DerivativeApproximation::ThirdDerivative<deal_II_dimension>::update_flags;
+
+DEAL_II_NAMESPACE_CLOSE

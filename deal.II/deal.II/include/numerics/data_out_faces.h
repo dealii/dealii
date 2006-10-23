@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 /**
@@ -211,5 +212,7 @@ class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
     void build_some_patches (Data &data);
 };
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

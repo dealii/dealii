@@ -51,6 +51,8 @@
 extern "C" long int lrand48 (void);
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 // The following two classes are defined to be used in the compute_*
@@ -1467,3 +1469,4 @@ void DoFRenumbering::cell_wise_dg<deal_II_dimension>
  const unsigned int,
  const std::vector<MGDoFHandler<deal_II_dimension>::cell_iterator>&);
 
+DEAL_II_NAMESPACE_CLOSE

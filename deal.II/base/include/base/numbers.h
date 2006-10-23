@@ -13,6 +13,8 @@
 #ifndef __deal2__numbers_h
 #define __deal2__numbers_h
 
+DEAL_II_NAMESPACE_OPEN
+
 /**
  * Namespace for the declaration of universal constants. Since the
  * availability in <tt>math.h</tt> is not always guaranteed, we put
@@ -106,5 +108,7 @@ namespace deal_II_numbers {
 				              */
   bool is_finite (const double x);
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -29,6 +29,8 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 // This anonymous namespace contains utility functions to extract the
 // triangulation from any container such as DoFHandler, MGDoFHandler,
@@ -1080,3 +1082,6 @@ GridTools::minimal_cell_diameter (const Triangulation<deal_II_dimension> &triang
 template
 double
 GridTools::maximal_cell_diameter (const Triangulation<deal_II_dimension> &triangulation);
+
+DEAL_II_NAMESPACE_CLOSE
+

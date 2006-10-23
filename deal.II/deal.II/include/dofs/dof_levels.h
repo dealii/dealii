@@ -19,6 +19,8 @@
 #include <dofs/dof_objects.h>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int> class DoFHandler;
 template <int> class MGDoFHandler;
 
@@ -46,7 +48,7 @@ namespace internal
  * Note that vertices are separate from, and in fact have nothing to
  * do with cells. The indices of degrees of freedom located on
  * vertices therefore are not stored here, but rather in member
- * variables of the ::DoFHandler class.
+ * variables of the dealii::DoFHandler class.
  *
  * The indices of degrees of freedom located on lower dimensional
  * objects, i.e. on lines for 2D and on quads and lines for 3D are
@@ -71,7 +73,7 @@ namespace internal
  * DoFHandler::get_dof_index() and corresponding setter functions.
  * Knowledge of the actual data format is therefore
  * encapsulated to the present hierarchy of classes as well as the
- * ::DoFHandler class.
+ * dealii::DoFHandler class.
  *
  * @ingroup dofs
  * @author Wolfgang Bangerth, 1998, 2006
@@ -150,8 +152,8 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class ::DoFHandler;
-        template <int> friend class ::MGDoFHandler;
+        template <int> friend class dealii::DoFHandler;
+        template <int> friend class dealii::MGDoFHandler;
     };
 
 
@@ -187,8 +189,8 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class ::DoFHandler;
-        template <int> friend class ::MGDoFHandler;
+        template <int> friend class dealii::DoFHandler;
+        template <int> friend class dealii::MGDoFHandler;
     };
 
 
@@ -225,11 +227,13 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class ::DoFHandler;
-        template <int> friend class ::MGDoFHandler;
+        template <int> friend class dealii::DoFHandler;
+        template <int> friend class dealii::MGDoFHandler;
     };
 
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

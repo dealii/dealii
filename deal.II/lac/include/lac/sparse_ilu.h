@@ -18,6 +18,8 @@
 #include <lac/sparse_decomposition.h>
 #include <lac/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 /*! @addtogroup Preconditioners
  *@{
  */
@@ -206,5 +208,7 @@ SparseILU<number>::apply_decomposition (Vector<somenumber>       &dst,
 
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // __deal2__sparse_ilu_h

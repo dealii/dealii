@@ -32,6 +32,8 @@
 #  include <iostream>
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class Triangulation;
 
 // note: in non-debug mode, i.e. with optimizations, the file
@@ -1171,6 +1173,8 @@ std::ostream & operator << (std::ostream                           &out,
 }
 
 
+DEAL_II_NAMESPACE_CLOSE
+
 
 // if in optimized mode: include more templates
 #ifndef DEBUG
@@ -1179,6 +1183,5 @@ std::ostream & operator << (std::ostream                           &out,
 
 
 /*----------------------------   tria-iterator.h     ---------------------------*/
-
 #endif
 /*----------------------------   tria-iterator.h     ---------------------------*/

@@ -47,6 +47,8 @@
 #include <iostream>
 #include <sstream>
 
+using namespace dealii;
+
 // The following global variable is used to determine whether the
 // problem being solved is one for which an exact solution is known,
 // e.g. we are using the exact solution as the initial condition. It

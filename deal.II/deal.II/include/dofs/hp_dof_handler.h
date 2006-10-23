@@ -27,6 +27,7 @@
 #include <map>
 #include <set>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
@@ -114,7 +115,7 @@ namespace hp
 					* The default index of the
 					* finite element to be used on
 					* a given cell. For the usual,
-					* non-hp ::DoFHandler class
+					* non-hp dealii::DoFHandler class
 					* that only supports the same
 					* finite element to be used on
 					* all cells, the index of the
@@ -1269,17 +1270,17 @@ namespace hp
                                        /**
                                         * Make accessor objects friends.
                                         */
-      template <int structdim, class DH> friend class ::DoFAccessor;
+      template <int structdim, class DH> friend class dealii::DoFAccessor;
 
                                        /**
                                         * Make accessor objects friends.
                                         */
-      template <int dim1, class DH> friend class ::DoFObjectAccessor;
+      template <int dim1, class DH> friend class dealii::DoFObjectAccessor;
 
                                        /**
                                         * Make accessor objects friends.
                                         */
-      template <class DH> friend class ::DoFCellAccessor;
+      template <class DH> friend class dealii::DoFCellAccessor;
 
                                        /**
                                         * Likewise for DoFLevel
@@ -1450,7 +1451,7 @@ namespace hp
 			const unsigned int fe_index,
 			const unsigned int local_index) const
   {
-    Assert (fe_index != ::hp::DoFHandler<dim>::default_fe_index,
+    Assert (fe_index != dealii::hp::DoFHandler<dim>::default_fe_index,
 	    ExcMessage ("You need to specify a FE index when working "
 			"with hp DoFHandlers"));
     Assert (finite_elements != 0,
@@ -1503,7 +1504,7 @@ namespace hp
 			const unsigned int local_index,
 			const unsigned int global_index)
   {
-    Assert (fe_index != ::hp::DoFHandler<dim>::default_fe_index,
+    Assert (fe_index != dealii::hp::DoFHandler<dim>::default_fe_index,
 	    ExcMessage ("You need to specify a FE index when working "
 			"with hp DoFHandlers"));
     Assert (finite_elements != 0,
@@ -1649,7 +1650,7 @@ namespace hp
   fe_is_active_on_vertex (const unsigned int vertex_index,
 			  const unsigned int fe_index) const
   {
-    Assert (fe_index != ::hp::DoFHandler<dim>::default_fe_index,
+    Assert (fe_index != dealii::hp::DoFHandler<dim>::default_fe_index,
 	    ExcMessage ("You need to specify a FE index when working "
 			"with hp DoFHandlers"));
     Assert (finite_elements != 0,
@@ -1696,6 +1697,8 @@ namespace hp
 #endif
     
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 

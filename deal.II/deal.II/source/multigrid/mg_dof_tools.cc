@@ -34,6 +34,8 @@
 #include <algorithm>
 #include <numeric>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 #if deal_II_dimension == 1
 
@@ -1341,6 +1343,7 @@ MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
 }
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 
 
@@ -1364,6 +1367,8 @@ MGTools::reinit_vector (const MGDoFHandler<dim> &mg_dof,
 #include "mg_tools.pattern.in.h"
 #undef PATTERN
 
+
+DEAL_II_NAMESPACE_OPEN
 
 template void
 MGTools::compute_row_length_vector(
@@ -1422,3 +1427,5 @@ template void MGTools::make_boundary_list(
   const FunctionMap<deal_II_dimension>::type&,
   std::vector<std::set<unsigned int> >&,
   const std::vector<bool>&);
+
+DEAL_II_NAMESPACE_CLOSE

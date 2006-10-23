@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,6 +23,8 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 /**
  * Support for searching files in a list of paths and with a list of
  * suffixes.
@@ -42,6 +44,7 @@
  * @code
  * #include <base/path_search.h>
  *
+ DEAL_II_NAMESPACE_OPEN
  * PathSearch search("MESH");
  * std::string full_name = search.find("grid");
  * std::ifstream in(full_name.c_str());
@@ -323,6 +326,7 @@ PathSearch::show(STREAM& out) const
   out << std::endl;
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 

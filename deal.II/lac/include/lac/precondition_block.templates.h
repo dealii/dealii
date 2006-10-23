@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,6 +21,8 @@
 #include <lac/precondition_block.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 template <class MATRIX, typename inverse_type>
@@ -857,5 +859,7 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>::Tvmult (Vector<number2>       &
   
   PreconditionBlockSOR<MATRIX,inverse_type>::vmult(dst, help);
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

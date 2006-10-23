@@ -25,6 +25,9 @@
 
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
+
+
 template <int dim>
 FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 		:
@@ -353,3 +356,5 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
 
 
 template class FE_RaviartThomasNodal<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

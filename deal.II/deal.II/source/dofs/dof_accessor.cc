@@ -29,6 +29,8 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
 
@@ -1071,3 +1073,4 @@ template class TriaRawIterator   <deal_II_dimension,DoFCellAccessor<hp::DoFHandl
 template class TriaIterator      <deal_II_dimension,DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
 template class TriaActiveIterator<deal_II_dimension,DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
 
+DEAL_II_NAMESPACE_CLOSE

@@ -19,6 +19,10 @@
 
 #include <fe/fe_poly.templates.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template class FE_Poly<TensorProductPolynomials<deal_II_dimension>, deal_II_dimension>;
 template class FE_Poly<PolynomialSpace<deal_II_dimension>, deal_II_dimension>;
 template class FE_Poly<PolynomialsP<deal_II_dimension>, deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,6 +20,8 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+
+DEAL_II_NAMESPACE_OPEN
 
 //---------------------------------------------------------------------------
 
@@ -528,5 +530,7 @@ SparseMatrixEZ<number>::block_read (std::istream &in)
   
   CHECKFOR(in,']',c);
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // __deal2__sparse_matrix_ez_templates_h

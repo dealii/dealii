@@ -22,6 +22,8 @@
 #include <vector>
 #include <set>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <class Object> class MGLevelObject;
 template <int dim> class MGDoFHandler;
 template <typename number> class Vector;
@@ -342,5 +344,7 @@ class MGTools
 };
 
 /*@}*/
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

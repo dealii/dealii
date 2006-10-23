@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,6 +14,8 @@
 
 #include <lac/precondition_block.templates.h>
 #include <lac/sparse_matrix_ez.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 // explicit instantiations for "float" PreconditionBlock
@@ -197,3 +199,5 @@ template void PreconditionBlockSSOR<SparseMatrixEZ<double>, double>::Tvmult<floa
   Vector<float> &, const Vector<float> &) const;
 template void PreconditionBlockSSOR<SparseMatrixEZ<double>, double>::Tvmult<double> (
   Vector<double> &, const Vector<double> &) const;
+
+DEAL_II_NAMESPACE_CLOSE

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 
 #include <base/config.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 // This is a list of magic numbers used throughout the library.
 // They are collected in one file to avoid double usage.
@@ -35,5 +36,7 @@ const unsigned int mn_tria_hex_user_flags_end    = 0xa113;
 const unsigned int mn_persistent_tria_flags_begin= 0xa200;
 const unsigned int mn_persistent_tria_flags_end  = 0xa201;
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

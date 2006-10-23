@@ -35,6 +35,9 @@
 #include <boost/shared_ptr.hpp>
 
 
+DEAL_II_NAMESPACE_OPEN
+
+
 template <int dim> class MGDoFHandler;
 
 /*
@@ -691,5 +694,6 @@ MGTransferSelect<number>::select(const unsigned int component,
 			  : mg_component;
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -27,6 +27,7 @@
 #include <sstream>
 #include <iostream>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
@@ -635,3 +636,5 @@ FE_RaviartThomas<dim>::memory_consumption () const
 
 
 template class FE_RaviartThomas<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

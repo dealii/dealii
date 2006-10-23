@@ -14,6 +14,8 @@
 #include <base/memory_consumption.h>
 #include <fe/mapping_collection.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 namespace hp
 {
@@ -92,3 +94,5 @@ namespace hp
   template struct StaticMappingQ1<deal_II_dimension>;
   
 }
+
+DEAL_II_NAMESPACE_CLOSE

@@ -19,6 +19,7 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
@@ -142,7 +143,7 @@ namespace internal
 					  */
         template <int spacedim>
         void
-        set_dof_index (const ::hp::DoFHandler<spacedim> &dof_handler,
+        set_dof_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
 		       const unsigned int               obj_index,
 		       const unsigned int               fe_index,
 		       const unsigned int               local_index,
@@ -174,7 +175,7 @@ namespace internal
 					  */
         template <int spacedim>
         unsigned int
-        get_dof_index (const ::hp::DoFHandler<spacedim> &dof_handler,
+        get_dof_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
 		       const unsigned int               obj_index,
 		       const unsigned int               fe_index,
 		       const unsigned int               local_index,
@@ -205,7 +206,7 @@ namespace internal
                                           */
         template <int spacedim>
         unsigned int
-        n_active_fe_indices (const ::hp::DoFHandler<spacedim> &dof_handler,
+        n_active_fe_indices (const dealii::hp::DoFHandler<spacedim> &dof_handler,
                              const unsigned int               obj_index) const;
 
 					 /**
@@ -215,7 +216,7 @@ namespace internal
 					  */
         template <int spacedim>
         unsigned int
-        nth_active_fe_index (const ::hp::DoFHandler<spacedim> &dof_handler,
+        nth_active_fe_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
 			     const unsigned int               obj_level,
                              const unsigned int               obj_index,
 			     const unsigned int               n) const;
@@ -228,7 +229,7 @@ namespace internal
                                           */
         template <int spacedim>
         bool
-        fe_index_is_active (const ::hp::DoFHandler<spacedim> &dof_handler,
+        fe_index_is_active (const dealii::hp::DoFHandler<spacedim> &dof_handler,
                             const unsigned int               obj_index,
                             const unsigned int               fe_index,
 			    const unsigned int               obj_level) const;
@@ -246,7 +247,7 @@ namespace internal
                                           * resize arrays as
                                           * necessary.
                                           */
-        template <int> friend class ::hp::DoFHandler;
+        template <int> friend class dealii::hp::DoFHandler;
     };
 
 
@@ -257,13 +258,13 @@ namespace internal
     inline
     unsigned int
     DoFObjects<dim>::
-    get_dof_index (const ::hp::DoFHandler<spacedim> &dof_handler,
+    get_dof_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
                    const unsigned int                obj_index,
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
                    const unsigned int                obj_level) const
     {
-      Assert (fe_index != ::hp::DoFHandler<spacedim>::default_fe_index,
+      Assert (fe_index != dealii::hp::DoFHandler<spacedim>::default_fe_index,
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
       Assert (&dof_handler != 0,
@@ -338,14 +339,14 @@ namespace internal
     inline
     void
     DoFObjects<dim>::
-    set_dof_index (const ::hp::DoFHandler<spacedim> &dof_handler,
+    set_dof_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
                    const unsigned int                obj_index,
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
                    const unsigned int                global_index,
                    const unsigned int                obj_level)
     {
-      Assert (fe_index != ::hp::DoFHandler<spacedim>::default_fe_index,
+      Assert (fe_index != dealii::hp::DoFHandler<spacedim>::default_fe_index,
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
       Assert (&dof_handler != 0,
@@ -423,7 +424,7 @@ namespace internal
     inline
     unsigned int
     DoFObjects<dim>::
-    n_active_fe_indices (const ::hp::DoFHandler<spacedim> &dof_handler,
+    n_active_fe_indices (const dealii::hp::DoFHandler<spacedim> &dof_handler,
                          const unsigned int                obj_index) const
     {
       Assert (dim <= spacedim, ExcInternalError());
@@ -486,7 +487,7 @@ namespace internal
     inline
     unsigned int
     DoFObjects<dim>::
-    nth_active_fe_index (const ::hp::DoFHandler<spacedim> &dof_handler,
+    nth_active_fe_index (const dealii::hp::DoFHandler<spacedim> &dof_handler,
                          const unsigned int                obj_level,
                          const unsigned int                obj_index,
                          const unsigned int                n) const
@@ -566,7 +567,7 @@ namespace internal
     inline
     bool
     DoFObjects<dim>::
-    fe_index_is_active (const ::hp::DoFHandler<spacedim> &dof_handler,
+    fe_index_is_active (const dealii::hp::DoFHandler<spacedim> &dof_handler,
                         const unsigned int                obj_index,
                         const unsigned int                fe_index,
                         const unsigned int                obj_level) const
@@ -578,7 +579,7 @@ namespace internal
                           "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
-      Assert (fe_index != ::hp::DoFHandler<spacedim>::default_fe_index,
+      Assert (fe_index != dealii::hp::DoFHandler<spacedim>::default_fe_index,
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
       Assert (fe_index < dof_handler.get_fe().size(),
@@ -638,7 +639,6 @@ namespace internal
   }
 }
 
+DEAL_II_NAMESPACE_CLOSE
+
 #endif
-
-
-

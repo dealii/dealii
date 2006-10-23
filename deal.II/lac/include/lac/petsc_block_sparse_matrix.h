@@ -26,6 +26,8 @@
 
 #ifdef DEAL_II_USE_PETSC
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 namespace PETScWrappers
@@ -372,6 +374,7 @@ namespace PETScWrappers
   
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif    // DEAL_II_USE_PETSC
 

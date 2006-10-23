@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,6 +24,7 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 /**
  * @addtogroup Polynomials
  * @{
@@ -110,5 +111,6 @@ PolynomialsP<dim>::directional_degrees(unsigned int n,
   this->compute_index(n,degrees);
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

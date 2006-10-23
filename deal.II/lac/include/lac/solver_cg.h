@@ -23,6 +23,8 @@
 #include <base/subscriptor.h>
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
 /*!@addtogroup Solvers */
 /*@{*/
 
@@ -455,5 +457,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 }
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

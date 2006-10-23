@@ -17,6 +17,8 @@
 #include <base/polynomials_p.h>
 #include <fe/fe_poly.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class MappingQ;
 
 
@@ -355,5 +357,6 @@ class FE_DGPMonomial : public FE_Poly<PolynomialsP<dim>,dim>
 
 /*@}*/
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

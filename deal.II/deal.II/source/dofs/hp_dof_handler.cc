@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <functional>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
@@ -4391,3 +4392,5 @@ namespace hp
 /*-------------- Explicit Instantiations -------------------------------*/
   template class DoFHandler<deal_II_dimension>;
 }
+
+DEAL_II_NAMESPACE_CLOSE

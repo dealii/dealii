@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class DoFHandler;
 
 /**
@@ -376,7 +378,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * List of patches of all past and
 				      * present parameter value data sets.
 				      */
-    std::vector< ::DataOutBase::Patch<dim+1,dim+1> >   patches;
+    std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> >   patches;
 
 				     /**
 				      * Structure holding data vectors
@@ -422,7 +424,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * the base class DataOutBase) to
 				      * the actual output function.
 				      */
-    virtual const std::vector< ::DataOutBase::Patch<dim+1,dim+1> > & get_patches () const;
+    virtual const std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> > & get_patches () const;
 
 
 				     /**
@@ -434,5 +436,7 @@ class DataOutStack : public DataOutInterface<dim+1>
     virtual std::vector<std::string> get_dataset_names () const;
 };
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

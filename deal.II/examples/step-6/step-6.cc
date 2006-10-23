@@ -100,6 +100,7 @@
 				 // problems.
 #include <numerics/error_estimator.h>
 
+using namespace dealii;
 
 
                                  // @sect3{The <code>LaplaceProblem</code> class template}

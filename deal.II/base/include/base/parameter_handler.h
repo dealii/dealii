@@ -22,6 +22,7 @@
 #include <vector>
 #include <string>
 
+DEAL_II_NAMESPACE_OPEN
 
 //TODO: Allow long input lines to be broken by appending a backslash character
 //TODO: Provide an "include" command for parameter files
@@ -998,7 +999,8 @@ namespace Patterns
  *   @code
  *     #include <iostream>
  *     #include "../include/parameter_handler.h"
- *     
+ *
+ DEAL_II_NAMESPACE_OPEN
  *     
  *     class LinEq {
  *       public:
@@ -2185,5 +2187,6 @@ class MultipleParameterLoop : public ParameterHandler
 };
 
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

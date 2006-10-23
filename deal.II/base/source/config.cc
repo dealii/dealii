@@ -16,6 +16,7 @@
 #include <cmath>
 #include <limits>
 
+DEAL_II_NAMESPACE_OPEN
 
 namespace deal_II_numbers 
 {
@@ -29,7 +30,10 @@ namespace deal_II_numbers
 				     // comparisons will be false
     return ((x >= -std::numeric_limits<double>::max())
 	    &&
+DEAL_II_NAMESPACE_CLOSE
 	    (x <= std::numeric_limits<double>::max()));
 #endif
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE

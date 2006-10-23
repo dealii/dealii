@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <numeric>
 
+DEAL_II_NAMESPACE_OPEN
 
 TimeDependent::TimeSteppingData::TimeSteppingData (const unsigned int look_ahead,
 						   const unsigned int look_back)
@@ -585,7 +586,7 @@ namespace
       {
 	Assert(old_cell->n_children()==new_cell->n_children(), ExcNotImplemented());
 	for (unsigned int c=0; c<new_cell->n_children(); ++c)
-	  ::mirror_refinement_flags<dim> (new_cell->child(c), old_cell->child(c));
+	  dealii::mirror_refinement_flags<dim> (new_cell->child(c), old_cell->child(c));
       }
   }
 
@@ -603,7 +604,7 @@ namespace
 
 	Assert(cell2->n_children()==cell1->n_children(), ExcNotImplemented());
 	for (unsigned int c=0; c<cell1->n_children(); ++c) 
-	  grids_changed |= ::adapt_grid_cells<dim> (cell1->child(c),
+	  grids_changed |= dealii::adapt_grid_cells<dim> (cell1->child(c),
 						    cell2->child(c));
 	return grids_changed;
       };
@@ -711,7 +712,7 @@ namespace
 	    typename Triangulation<dim>::cell_iterator(tria1.end()) :
 	    tria1.begin(1));
     for (; cell1!=endc; ++cell1, ++cell2)
-      grids_changed |= ::adapt_grid_cells<dim> (cell1, cell2);
+      grids_changed |= dealii::adapt_grid_cells<dim> (cell1, cell2);
 
     return grids_changed;
   }
@@ -834,7 +835,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 					 // (there are more coming below then
 					 // also)
 	if (refinement_flags.adapt_grids)
-	  ::adapt_grids<dim> (*previous_tria, *tria);
+	  dealii::adapt_grids<dim> (*previous_tria, *tria);
 	
 					 // perform flagging of cells
 					 // needed to regularize the
@@ -1091,14 +1092,14 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 				       // strange things may happen
       if (refinement_flags.mirror_flags_to_previous_grid)
 	{
-	  ::adapt_grids<dim> (*previous_tria, *tria);
+	  dealii::adapt_grids<dim> (*previous_tria, *tria);
 
 	  typename Triangulation<dim>::cell_iterator old_cell, new_cell, endc;
 	  old_cell = previous_tria->begin(0);
 	  new_cell = tria->begin(0);
 	  endc     = tria->end(0);
 	  for (; new_cell!=endc; ++new_cell, ++old_cell)
-	    ::mirror_refinement_flags<dim> (new_cell, old_cell);
+	    dealii::mirror_refinement_flags<dim> (new_cell, old_cell);
 	};
       
       tria->prepare_coarsening_and_refinement ();
@@ -1109,7 +1110,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
 				       // cells to avoid the previous grid
 				       // to have cells refined twice more
 				       // than the present one and vica versa.
-      ::adapt_grids<dim> (*previous_tria, *tria);
+      dealii::adapt_grids<dim> (*previous_tria, *tria);
     };
 }
 
@@ -1250,3 +1251,5 @@ namespace TimeStepBase_Tria_Flags
   template class RefinementFlags<deal_II_dimension>;
   template class RefinementData<deal_II_dimension>;
 }
+
+DEAL_II_NAMESPACE_CLOSE

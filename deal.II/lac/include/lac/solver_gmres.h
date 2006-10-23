@@ -26,6 +26,8 @@
 #include <vector>
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
 /*!@addtogroup Solvers */
 /*@{*/
 
@@ -542,11 +544,12 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 
 				   // some additional vectors, also used
 				   // in the orthogonalization
-  ::Vector<double> gamma(n_tmp_vectors),
-                   ci   (n_tmp_vectors-1),
-                   si   (n_tmp_vectors-1),
-                   h    (n_tmp_vectors-1);
-
+  dealii::Vector<double>
+    gamma(n_tmp_vectors),
+    ci   (n_tmp_vectors-1),
+    si   (n_tmp_vectors-1),
+    h    (n_tmp_vectors-1);
+  
 
   unsigned int dim = 0;
 
@@ -574,7 +577,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
 				   // are used as stopping criterion
   VECTOR *r=0;
   VECTOR *x_=0;
-  ::Vector<double> *gamma_=0;
+  dealii::Vector<double> *gamma_=0;
   if (!use_default_residual)
     {
       r=this->memory.alloc();
@@ -582,7 +585,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
       r->reinit(x);
       x_->reinit(x);
 
-      gamma_=new ::Vector<double> (gamma.size());
+      gamma_ = new dealii::Vector<double> (gamma.size());
     }
 
                                    ///////////////////////////////////
@@ -726,7 +729,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
   	    {
 	      deallog << "default_res=" << rho << std::endl;
 	      
-	      ::Vector<double> h_(dim);
+	      dealii::Vector<double> h_(dim);
 	      *x_=x;
 	      *gamma_=gamma;
 	      H1.reinit(dim+1,dim);
@@ -950,5 +953,7 @@ SolverFGMRES<VECTOR>::solve (
 }
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

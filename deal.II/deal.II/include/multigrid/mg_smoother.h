@@ -22,6 +22,8 @@
 #include <multigrid/mg_level_object.h>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim> class MGDoFHandler;
 
 
@@ -585,5 +587,7 @@ memory_consumption () const
 
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

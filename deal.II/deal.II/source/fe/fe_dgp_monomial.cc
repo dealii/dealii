@@ -16,6 +16,7 @@
 
 #include <sstream>
 
+DEAL_II_NAMESPACE_OPEN
 
 // namespace for some functions that are used in this file.
 namespace 
@@ -462,3 +463,5 @@ FE_DGPMonomial<dim>::memory_consumption () const
 
 
 template class FE_DGPMonomial<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

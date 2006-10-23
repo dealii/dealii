@@ -20,6 +20,8 @@
 #include <cmath>
 #include <iterator>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 namespace
 {
@@ -1302,3 +1304,5 @@ template class QIterated<3>;
 template class QProjector<1>;
 template class QProjector<2>;
 template class QProjector<3>;
+
+DEAL_II_NAMESPACE_CLOSE

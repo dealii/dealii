@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -16,6 +16,7 @@
 #include <lac/sparse_mic.h>
 #include <lac/vector.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 SparseMIC<number>::SparseMIC ()
@@ -250,5 +251,7 @@ SparseMIC<number>::memory_consumption () const
 }
 
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // __deal2__sparse_mic_templates_h

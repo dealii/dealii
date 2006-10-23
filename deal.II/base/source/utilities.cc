@@ -32,6 +32,8 @@
 #  include <limits.h>
 #endif
 
+DEAL_II_NAMESPACE_OPEN
+
 
 namespace Utilities
 {
@@ -450,3 +452,5 @@ namespace Utilities
   }
   
 }
+
+DEAL_II_NAMESPACE_CLOSE

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,8 @@
 #include <base/config.h>
 #include <base/tensor_product_polynomials.h>
 #include <fe/fe_poly.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class MappingQ;
 
@@ -454,5 +456,7 @@ FE_Q_Hierarchical<1>::has_support_on_face (const unsigned int,
 template <>
 std::vector<unsigned int>
 FE_Q_Hierarchical<1>::face_fe_q_hierarchical_to_hierarchic_numbering (const unsigned int);
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

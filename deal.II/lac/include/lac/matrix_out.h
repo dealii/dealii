@@ -18,6 +18,8 @@
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 /**
  * Output a matrix in graphical form using the generic format
  * independent output routines of the base class. The matrix is
@@ -195,24 +197,20 @@ class MatrixOut : public DataOutInterface<2,2>
     
 				     /**
 				      * Abbreviate the somewhat
-				      * lengthy name for the ::DataOutBase::Patch
+				      * lengthy name for the dealii::DataOutBase::Patch
 				      * class.
 				      *
-				      * Note that we have to indicate
-				      * the global scope using the
-				      * @p :: in front of
-				      * DataOutBase, since
-				      * otherwise the C++ rules
-				      * specify that this here
-				      * indicates the DataOutBase
-				      * base class of this
-				      * class. Since that is a private
-				      * base class, we cannot access
-				      * its members, and so access to
-				      * the local Patch type would
-				      * be forbidden.
+				      * Note that we have to indicate the
+				      * global scope in front of DataOutBase,
+				      * since otherwise the C++ rules specify
+				      * that this here indicates the
+				      * DataOutBase base class of this
+				      * class. Since that is a private base
+				      * class, we cannot access its members,
+				      * and so access to the local Patch type
+				      * would be forbidden.
 				      */
-    typedef ::DataOutBase::Patch<2,2> Patch;
+    typedef dealii::DataOutBase::Patch<2,2> Patch;
 
 				     /**
 				      * This is a list of patches that
@@ -469,6 +467,8 @@ MatrixOut::build_patches (const Matrix      &matrix,
 
 
 /*----------------------------   matrix_out.h     ---------------------------*/
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 /*----------------------------   matrix_out.h     ---------------------------*/

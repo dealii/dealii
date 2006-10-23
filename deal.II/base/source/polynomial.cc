@@ -19,6 +19,8 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 // have a lock that guarantees that at most one thread is changing and
@@ -1052,3 +1054,5 @@ namespace Polynomials
   template class Monomial<double>;
   template class Monomial<long double>;
 }
+
+DEAL_II_NAMESPACE_CLOSE

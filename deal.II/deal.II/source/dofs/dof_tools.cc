@@ -37,6 +37,8 @@
 #include <algorithm>
 #include <numeric>
 
+DEAL_II_NAMESPACE_OPEN
+
 //#define WOLFGANG
 
 
@@ -1768,13 +1770,13 @@ namespace internal
       };
 
 
-      template <int dim> struct DoFHandlerSupportsDifferentP< ::DoFHandler<dim> >
+      template <int dim> struct DoFHandlerSupportsDifferentP< dealii::DoFHandler<dim> >
       {
           static const bool value = false;
       };
 
 
-      template <int dim> struct DoFHandlerSupportsDifferentP< ::MGDoFHandler<dim> >
+      template <int dim> struct DoFHandlerSupportsDifferentP< dealii::MGDoFHandler<dim> >
       {
           static const bool value = false;
       };
@@ -1791,7 +1793,7 @@ namespace internal
                                         */
       template <int dim>
       unsigned int
-      n_finite_elements (const ::hp::DoFHandler<dim> &dof_handler)
+      n_finite_elements (const dealii::hp::DoFHandler<dim> &dof_handler)
       {
         return dof_handler.get_fe().size();
       }
@@ -1949,7 +1951,7 @@ namespace internal
 #if deal_II_dimension == 1
     static
     void
-    make_hp_hanging_node_constraints (const ::DoFHandler<1> &,
+    make_hp_hanging_node_constraints (const dealii::DoFHandler<1> &,
 				      ConstraintMatrix    &)
     {
 				       // nothing to do for regular
@@ -1960,9 +1962,9 @@ namespace internal
 
     static
     void
-    make_oldstyle_hanging_node_constraints (const ::DoFHandler<1> &,
+    make_oldstyle_hanging_node_constraints (const dealii::DoFHandler<1> &,
 					    ConstraintMatrix    &,
-					    ::internal::int2type<1>)
+					    dealii::internal::int2type<1>)
     {
 				       // nothing to do for regular
 				       // dof handlers in 1d
@@ -1971,7 +1973,7 @@ namespace internal
 
     static
     void
-    make_hp_hanging_node_constraints (const ::MGDoFHandler<1> &,
+    make_hp_hanging_node_constraints (const dealii::MGDoFHandler<1> &,
 				      ConstraintMatrix    &)
     {
 				       // nothing to do for regular
@@ -1982,9 +1984,9 @@ namespace internal
 
     static
     void
-    make_oldstyle_hanging_node_constraints (const ::MGDoFHandler<1> &,
+    make_oldstyle_hanging_node_constraints (const dealii::MGDoFHandler<1> &,
 					    ConstraintMatrix    &,
-					    ::internal::int2type<1>)
+					    dealii::internal::int2type<1>)
     {
 				       // nothing to do for regular
 				       // dof handlers in 1d
@@ -1993,7 +1995,7 @@ namespace internal
 
     static
     void
-    make_hp_hanging_node_constraints (const ::hp::DoFHandler<1> &/*dof_handler*/,
+    make_hp_hanging_node_constraints (const dealii::hp::DoFHandler<1> &/*dof_handler*/,
 				      ConstraintMatrix        &/*constraints*/)
     {
 				       // we may have to compute
@@ -2007,9 +2009,9 @@ namespace internal
 
     static
     void
-    make_oldstyle_hanging_node_constraints (const ::hp::DoFHandler<1> &/*dof_handler*/,
+    make_oldstyle_hanging_node_constraints (const dealii::hp::DoFHandler<1> &/*dof_handler*/,
 					    ConstraintMatrix        &/*constraints*/,
-					    ::internal::int2type<1>)
+					    dealii::internal::int2type<1>)
     {
 				       // we may have to compute
 				       // constraints for
@@ -2027,7 +2029,7 @@ namespace internal
     void
     make_oldstyle_hanging_node_constraints (const DH         &dof_handler,
 					    ConstraintMatrix &constraints,
-					    ::internal::int2type<2>)
+					    dealii::internal::int2type<2>)
     {
       const unsigned int dim = 2;
   
@@ -2173,7 +2175,7 @@ namespace internal
     void
     make_oldstyle_hanging_node_constraints (const DH         &dof_handler,
 					    ConstraintMatrix &constraints,
-					    ::internal::int2type<3>)
+					    dealii::internal::int2type<3>)
     {
       const unsigned int dim = 3;
   
@@ -3036,7 +3038,7 @@ DoFTools::make_hanging_node_constraints (const DH &dof_handler,
     internal::DoFTools::
       make_oldstyle_hanging_node_constraints (dof_handler,
 					      constraints,
-					      ::internal::int2type<DH::dimension>());
+					      dealii::internal::int2type<DH::dimension>());
 }
 
 
@@ -5548,3 +5550,5 @@ DoFTools::convert_couplings_to_blocks (
   const hp::DoFHandler<deal_II_dimension>&, const Table<2, Coupling>&,
   std::vector<Table<2,Coupling> >&);
 
+
+DEAL_II_NAMESPACE_CLOSE

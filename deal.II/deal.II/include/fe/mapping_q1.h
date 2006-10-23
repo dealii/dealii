@@ -23,6 +23,7 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
 
 /*!@addtogroup mapping */
 /*@{*/
@@ -742,5 +743,7 @@ template <> void MappingQ1<1>::fill_fe_subface_values (
   std::vector<double>&) const;
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

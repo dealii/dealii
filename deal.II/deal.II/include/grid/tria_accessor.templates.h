@@ -25,6 +25,7 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
 
 /*------------------------ Functions: TriaAccessor ---------------------------*/
 
@@ -1178,5 +1179,6 @@ CellAccessor<dim>::active () const
   return !this->has_children();
 }
 
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

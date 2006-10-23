@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,8 @@
 // Driver file for SparseMatrixEZ functions with two types.
 
 // TYPEMAT and TYPEVEC are defined in sparse_matrix_ez?.cc
+
+DEAL_II_NAMESPACE_OPEN
 
 template void SparseMatrixEZ<TYPEMAT>::vmult<TYPEVEC> (
   Vector<TYPEVEC> &,
@@ -62,3 +64,4 @@ template void SparseMatrixEZ<TYPEMAT>::precondition_Jacobi<TYPEVEC> (
   const Vector<TYPEVEC> &,
   const TYPEMAT) const;
 
+DEAL_II_NAMESPACE_CLOSE

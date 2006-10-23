@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <memory>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 
@@ -1091,3 +1092,4 @@ template struct StaticMappingQ1<deal_II_dimension>;
 
 
 
+DEAL_II_NAMESPACE_CLOSE

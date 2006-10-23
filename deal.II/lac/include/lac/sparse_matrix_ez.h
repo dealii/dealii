@@ -21,6 +21,8 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 template<typename number> class Vector;
 template<typename number> class FullMatrix;
 
@@ -1787,6 +1789,8 @@ SparseMatrixEZ<number>::print_statistics(STREAM& out, bool full)
     }
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
 /*----------------------------   sparse_matrix.h     ---------------------------*/

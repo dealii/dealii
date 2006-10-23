@@ -2,7 +2,7 @@
 //      $Id$   
 //    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,9 @@
 #include <iostream>
 #include <cstdio>
 #include <algorithm>
+
+DEAL_II_NAMESPACE_OPEN
+
 
 std::map<std::string, std::vector<std::string> > PathSearch::path_lists;
 std::map<std::string, std::vector<std::string> > PathSearch::suffix_lists;
@@ -208,3 +211,5 @@ PathSearch::add_suffix (const std::string& suffix,
 }
 
 
+
+DEAL_II_NAMESPACE_CLOSE

@@ -27,6 +27,7 @@
 #include <functional>
 #include <numeric>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 /*------------------------------- FiniteElement ----------------------*/
@@ -965,3 +966,5 @@ FiniteElement<dim>::base_element(const unsigned index) const
 /*------------------------------- Explicit Instantiations -------------*/
 
 template class FiniteElement<deal_II_dimension>;
+
+DEAL_II_NAMESPACE_CLOSE

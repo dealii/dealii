@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -14,6 +14,7 @@
 #include <lac/sparse_matrix.h>
 #include <lac/sparse_decomposition.h>
 
+DEAL_II_NAMESPACE_OPEN
 
 /*! @addtogroup Preconditioners
  *@{
@@ -173,5 +174,7 @@ class SparseMIC : public SparseLUDecomposition<number>
 };
 
 /*@}*/
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif  // __deal2__

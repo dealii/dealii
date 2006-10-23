@@ -24,6 +24,8 @@
 
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 template <int dim>
 const unsigned int TriaAccessor<dim>::objectdim;
@@ -2269,3 +2271,6 @@ template class TriaRawIterator<deal_II_dimension,TriaObjectAccessor<3, deal_II_d
 template class TriaIterator<deal_II_dimension,TriaObjectAccessor<3, deal_II_dimension> >;
 template class TriaActiveIterator<deal_II_dimension,TriaObjectAccessor<3, deal_II_dimension> >;
 #endif
+
+DEAL_II_NAMESPACE_CLOSE
+

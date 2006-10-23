@@ -59,6 +59,7 @@
 				 // And this is again needed for C++ output:
 #include <fstream>
 
+using namespace dealii;
 
                                  // @sect3{Mesh generation}
 

@@ -25,6 +25,8 @@
 
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
+
 /*!@addtogroup mg */
 /*@{*/
 
@@ -636,5 +638,7 @@ PreconditionMG<dim, VECTOR, TRANSFER>::Tvmult_add (
 }
 
 #endif // DOXYGEN
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

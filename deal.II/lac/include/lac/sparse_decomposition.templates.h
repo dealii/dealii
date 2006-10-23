@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -9,10 +9,14 @@
 //
 //---------------------------------------------------------------------------
 
+#ifndef __deal2__sparse_decomposition_templates_h
+#define __deal2__sparse_decomposition_templates_h
+
 #include <base/memory_consumption.h>
 #include <lac/sparse_decomposition.h>
 #include <algorithm>
 
+DEAL_II_NAMESPACE_OPEN
 
 template<typename number>
 SparseLUDecomposition<number>::SparseLUDecomposition()
@@ -237,3 +241,6 @@ SparseLUDecomposition<number>::memory_consumption () const
 }
 
 
+DEAL_II_NAMESPACE_CLOSE
+
+#endif // __deal2__sparse_decomposition_templates_h

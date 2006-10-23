@@ -28,6 +28,8 @@
 #include <ctime>
 #include <cmath>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 #if deal_II_dimension == 1
 
@@ -1728,3 +1730,5 @@ template void GridOut::write<deal_II_dimension>
 template void GridOut::write<deal_II_dimension>
 (const Triangulation<deal_II_dimension> &,
  std::ostream &, const Mapping<deal_II_dimension> *) const;
+
+DEAL_II_NAMESPACE_CLOSE

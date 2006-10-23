@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,6 +12,8 @@
 //---------------------------------------------------------------------------
 
 #include <base/polynomials_p.h>
+
+DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim>
@@ -99,3 +101,5 @@ void PolynomialsP<3>::create_polynomial_ordering(
 template class PolynomialsP<1>;
 template class PolynomialsP<2>;
 template class PolynomialsP<3>;
+
+DEAL_II_NAMESPACE_CLOSE

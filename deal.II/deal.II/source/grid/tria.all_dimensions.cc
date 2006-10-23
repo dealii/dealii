@@ -30,6 +30,8 @@
 
 #include <numeric>
 
+DEAL_II_NAMESPACE_OPEN
+
 
 
 bool
@@ -112,3 +114,6 @@ namespace internal
     }
   }
 }
+
+DEAL_II_NAMESPACE_CLOSE
+

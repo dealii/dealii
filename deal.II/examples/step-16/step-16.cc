@@ -60,6 +60,7 @@
 #include <fstream>
 #include <sstream>
 
+using namespace dealii;
 
 				 // This class is based on the same
 				 // class in step 5. Remark that we

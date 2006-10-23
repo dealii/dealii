@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <vector>
 
+DEAL_II_NAMESPACE_OPEN
 
 
 /*! @addtogroup Vectors
@@ -510,5 +511,7 @@ void swap (BlockVector<Number> &u,
 {
   u.swap (v);
 }
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

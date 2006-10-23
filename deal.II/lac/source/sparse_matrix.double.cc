@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,7 +17,9 @@
 
 #define TYPEMAT double
 
+DEAL_II_NAMESPACE_OPEN
 template class SparseMatrix<TYPEMAT>;
+DEAL_II_NAMESPACE_CLOSE
 
 #define TYPE2 float
 #include "sparse_matrix_matrix.in.h"
@@ -41,6 +43,8 @@ template class SparseMatrix<TYPEMAT>;
 //  #define TYPEVEC long double
 
 //  #include <lac/sparse_matrix.2.templates>
+
+DEAL_II_NAMESPACE_OPEN
 
 #undef TYPEMAT
 
@@ -140,3 +144,5 @@ template void SparseMatrix<double>::
 vmult_add (BlockVector<double> &, const Vector<double> &) const;
 template void SparseMatrix<double>::
 Tvmult_add (BlockVector<double> &, const Vector<double> &) const;
+
+DEAL_II_NAMESPACE_CLOSE

@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <iostream>
 
+DEAL_II_NAMESPACE_OPEN
 
 /*
   Note that in this file, we use std::fabs, std::sqrt, etc
@@ -897,5 +898,7 @@ Vector<Number>::memory_consumption () const
   return sizeof(*this) + (max_vec_size * sizeof(Number));
 }
 
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

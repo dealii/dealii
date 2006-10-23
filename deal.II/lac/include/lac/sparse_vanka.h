@@ -22,6 +22,8 @@
 #include <vector>
 #include <map>
 
+DEAL_II_NAMESPACE_OPEN
+
 template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
 template <typename number> class Vector;
@@ -579,4 +581,6 @@ class SparseBlockVanka : public SparseVanka<number>
 };
 
 /*@}*/
+DEAL_II_NAMESPACE_CLOSE
+
 #endif
