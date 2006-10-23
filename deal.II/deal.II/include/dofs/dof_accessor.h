@@ -272,8 +272,9 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
 				   const unsigned int fe_index = DH::default_fe_index) const;
 
 				     /**
-				      * Set the index of the <i>i</i> degree
-				      * on the @p vertex-th vertex to @p index.
+				      * Set the global index of the <i>i</i>
+				      * degree on the @p vertex-th vertex of
+				      * the present cell to @p index.
 				      *
 				      * The last argument denotes the
 				      * finite element index. For the
