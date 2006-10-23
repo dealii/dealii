@@ -171,13 +171,14 @@
  *   module.
  *
  *
- *   <li> <b>Linear System</b>: One one knows how to evaluate the
+ *   <li> <b>Linear System</b>: If one knows how to evaluate the
  *   values and gradients of shape functions on individual cells using
  *   FEValues and friends, and knows how to get the global numbers of
  *   the degrees of freedom on a cell using the DoFHandler iterators,
- *   one uses the bilinear form of the problem to assemble the system
- *   matrix (and right hand side) of the linear system from which we
- *   will determine the solution of our problem.
+ *   then the next step is to use the bilinear form of the problem to
+ *   assemble the system matrix (and right hand side) of the linear
+ *   system. We will then determine the solution of our problem from
+ *   this linear system.
  *
  *   To do this, we need to have classes that store and manage the
  *   entries of matrices and vectors. deal.II comes with a whole set
