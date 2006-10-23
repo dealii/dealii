@@ -232,8 +232,9 @@ class DoFAccessor : public DoFObjectAccessor_Inheritance<structdim, DH::dimensio
     child (const unsigned int c) const;
 
 				     /**
-				      * Index of the <i>i</i> degree
-				      * on the @p vertexth vertex.
+				      * Global DoF index of the <i>i</i>
+				      * degree associated with the @p vertexth
+				      * vertex of the present cell.
 				      *
 				      * The last argument denotes the
 				      * finite element index. For the
