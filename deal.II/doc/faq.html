@@ -125,25 +125,25 @@
   c++/616 in October 2000, and it was fixed a few weeks later, but apparently
   did not make it to Red Hat's version). The problem manifests itself in
   situations like this:
-  <code>
-    <pre>
-      template &lt;int dim&gt; struct Function {};
-      template &lt;int dim&gt; struct RHS : Function&lt;dim&gt; { RHS() {}; };
+  </p>
+  <pre>
+    template &lt;int dim&gt; struct Function {};
+    template &lt;int dim&gt; struct RHS : Function&lt;dim&gt; { RHS() {}; };
 
-      template &lt;int dim&gt; void f () {
-        const RHS&lt;dim&gt; rhs;
-      };
-      template void f&lt;1&gt; ();
-    </pre>
-  </code>
-  Here, the compiler reports
-  <code>
-    <pre>
-      x.cc: In function `void f () [with int dim = 1]':
-      x.cc:7:   instantiated from here
-      x.cc:5: uninitialized const `rhs'
-    </pre>
-  </code>
+    template &lt;int dim&gt; void f ()
+    {
+      const RHS&lt;dim&gt; rhs;
+    };
+    template void f&lt;1&gt; ();
+  </pre>
+   
+  <p>Here, the compiler reports</p>
+  <pre>
+    x.cc: In function `void f () [with int dim = 1]':
+    x.cc:7:   instantiated from here
+    x.cc:5: uninitialized const `rhs'
+  </pre>
+  <p>
   which is clearly bogus since <code>rhs</code> uses the default constructor of
   the class. Unfortunately, there is no way of working around the bug short of
   removing the constness of the variable. We did not want to do this, since
