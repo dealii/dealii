@@ -264,7 +264,7 @@ clean-petsc:
 distclean-petsc:
 	cd petsc ; $(MAKE) distclean
 
-.PHONY : all base lac fe deal.II multigrid bits \
+.PHONY : all base lac fe deal.II multigrid bits hp fail\
 	clean clean-base clean-lac clean-fe \
 	clean-deal.II clean-multigrid clean-bits clean-hp clean-fail \
 	distclean distclean-base distclean-lac distclean-fe \
