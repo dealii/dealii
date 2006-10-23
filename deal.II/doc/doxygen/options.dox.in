@@ -920,7 +920,9 @@ INCLUDE_FILE_PATTERNS  =
 # [WB] irrespective of whether MT is actually switched on or not.
 # [GK] Define a variable doxygen in order to mask out inline functions
 PREDEFINED             = DOXYGEN=1 DEBUG=1 DEAL_II_USE_PETSC=1 \
-                         DEAL_II_USE_MT=1 DEAL_II_USE_MT_POSIX=1
+                         DEAL_II_USE_MT=1 DEAL_II_USE_MT_POSIX=1 \
+			 DEAL_II_NAMESPACE_OPEN="namespace dealii {" \
+			 DEAL_II_NAMESPACE_CLOSE="}"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
