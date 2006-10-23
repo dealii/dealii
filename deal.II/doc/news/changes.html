@@ -45,6 +45,17 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Changed: Everything that is part of the deal.II library has
+       been moved into a namespace <code>dealii</code>. To allow your
+       code to compile, you will have to either put a <code>using
+       namespace dealii;</code> declaration at the top of each file,
+       or qualify each deal.II class and function explicitly with
+       <code>dealii::</code> namespace access.
+       <br> 
+       (WB 2006/10/22)
+       </p>
+
+  <li> <p>
        Changed: Indices, such as vertex indices, are usually represented by
        unsigned integers in deal.II. One place where we didn't do this was in
        the <code>CellData</code> structure that can be used to describe cells
