@@ -195,7 +195,7 @@ namespace Evaluation
   }
 
 
-				   // @sect4{Point evaluation}
+				   // @sect4{%Point evaluation}
 
 				   // The next thing is to implement
 				   // actual evaluation classes. As
