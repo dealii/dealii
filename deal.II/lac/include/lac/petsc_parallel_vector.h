@@ -201,7 +201,7 @@ namespace PETScWrappers
                                           */
         template <typename Number>
         explicit Vector (const MPI_Comm         &communicator,
-                         const ::Vector<Number> &v,
+                         const dealii::Vector<Number> &v,
                          const unsigned int      local_size);
 
                                          /**
@@ -294,7 +294,7 @@ namespace PETScWrappers
                                           * source vector.
                                           */
         template <typename number>
-        Vector & operator = (const ::Vector<number> &v);
+        Vector & operator = (const dealii::Vector<number> &v);
 
                                          /**
                                           * Change the dimension of the vector
@@ -396,7 +396,7 @@ namespace PETScWrappers
 
     template <typename number>
     Vector::Vector (const MPI_Comm         &communicator,
-                    const ::Vector<number> &v,
+                    const dealii::Vector<number> &v,
                     const unsigned int      local_size)
                     :
                     communicator (communicator)
@@ -439,7 +439,7 @@ namespace PETScWrappers
     template <typename number>
     inline
     Vector &
-    Vector::operator = (const ::Vector<number> &v) 
+    Vector::operator = (const dealii::Vector<number> &v) 
     {
       Assert (size() == v.size(),
               ExcDimensionMismatch (size(), v.size()));

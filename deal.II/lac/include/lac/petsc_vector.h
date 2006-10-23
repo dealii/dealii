@@ -74,7 +74,7 @@ namespace PETScWrappers
                                         * elements.
                                         */
       template <typename Number>
-      explicit Vector (const ::Vector<Number> &v);
+      explicit Vector (const dealii::Vector<Number> &v);
 
                                        /**
                                         * Copy-constructor the values from a
@@ -147,7 +147,7 @@ namespace PETScWrappers
                                         * object.
                                         */
       template <typename number>
-      Vector & operator = (const ::Vector<number> &v);
+      Vector & operator = (const dealii::Vector<number> &v);
 
                                        /**
                                         * Change the dimension of the vector
@@ -217,7 +217,7 @@ namespace PETScWrappers
 #ifndef DOXYGEN
 
   template <typename number>
-  Vector::Vector (const ::Vector<number> &v)
+  Vector::Vector (const dealii::Vector<number> &v)
   {
     Vector::create_vector (v.size());
 
@@ -304,7 +304,7 @@ namespace PETScWrappers
   template <typename number>
   inline
   Vector &
-  Vector::operator = (const ::Vector<number> &v) 
+  Vector::operator = (const dealii::Vector<number> &v) 
   {
     reinit (v.size(), true);
                                      // the following isn't necessarily fast,
