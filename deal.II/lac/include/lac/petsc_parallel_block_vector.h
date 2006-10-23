@@ -448,7 +448,7 @@ namespace PETScWrappers
   
       for (unsigned int i=0; i<this->n_blocks(); ++i)
         this->components[i].swap (v.components[i]);
-      ::swap (this->block_indices, v.block_indices);
+      ::dealii::swap (this->block_indices, v.block_indices);
     }
   
 

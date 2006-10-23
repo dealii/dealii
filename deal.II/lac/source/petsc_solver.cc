@@ -226,15 +226,15 @@ namespace PETScWrappers
     
     switch (state)
       {
-        case ::SolverControl::iterate:
+        case ::dealii::SolverControl::iterate:
               *reason = KSP_CONVERGED_ITERATING;
               break;
               
-        case ::SolverControl::success:
+        case ::dealii::SolverControl::success:
               *reason = static_cast<KSPConvergedReason>(1);
               break;
               
-        case ::SolverControl::failure:
+        case ::dealii::SolverControl::failure:
               if (solver_control.last_step() > solver_control.max_steps())
                 *reason = KSP_DIVERGED_ITS;
               else

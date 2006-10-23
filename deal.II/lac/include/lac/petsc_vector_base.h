@@ -180,7 +180,7 @@ namespace PETScWrappers
                                           * that it can create objects of the
                                           * present type.
                                           */
-        friend class ::PETScWrappers::VectorBase;
+        friend class ::dealii::PETScWrappers::VectorBase;
     };
   }
                                    /**
