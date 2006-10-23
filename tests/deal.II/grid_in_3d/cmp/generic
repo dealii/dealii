@@ -18,7 +18,7 @@ DEAL::Reading grid_in_3d_evil_1.in
 DEAL::  caught exception:
 DEAL::--------------------------------------------------------
 An error occurred in file <grid_reordering.cc> in function
-    void internal::GridReordering3d::Orienter::orient_edges()
+    void dealii::internal::GridReordering3d::Orienter::orient_edges()
 The violated condition was: 
     cell_is_consistent(cur_posn)
 The name and call sequence of the exception was:
@@ -31,7 +31,7 @@ DEAL::Reading grid_in_3d_evil_2.in
 DEAL::  caught exception:
 DEAL::--------------------------------------------------------
 An error occurred in file <grid_reordering.cc> in function
-    void internal::GridReordering3d::Orienter::orient_edges()
+    void dealii::internal::GridReordering3d::Orienter::orient_edges()
 The violated condition was: 
     cell_is_consistent(cur_posn)
 The name and call sequence of the exception was:
@@ -44,7 +44,7 @@ DEAL::Reading grid_in_3d_evil_3.in
 DEAL::  caught exception:
 DEAL::--------------------------------------------------------
 An error occurred in file <grid_reordering.cc> in function
-    void internal::GridReordering3d::Orienter::orient_edges()
+    void dealii::internal::GridReordering3d::Orienter::orient_edges()
 The violated condition was: 
     cell_is_consistent(cur_posn)
 The name and call sequence of the exception was:
