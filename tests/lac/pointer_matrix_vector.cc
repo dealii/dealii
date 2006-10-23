@@ -13,6 +13,7 @@
 
 // Test vmult and Tvmult of PointerMatrixVector
 
+#include "../tests.h"
 #include <base/logstream.h>
 #include <lac/pointer_matrix.h>
 #include <lac/vector.h>
