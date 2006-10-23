@@ -17,6 +17,7 @@
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <grid/intergrid_map.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
 #include <dofs/dof_handler.h>
@@ -902,6 +903,56 @@ GridTools::maximal_cell_diameter (const Triangulation<dim> &triangulation)
 
 
 
+template <int dim>
+void
+GridTools::create_union_triangulation (const Triangulation<dim> &triangulation_1,
+				       const Triangulation<dim> &triangulation_2,
+				       Triangulation<dim>       &result)
+{
+  Assert (have_same_coarse_mesh (triangulation_1, triangulation_2),
+	  ExcMessage ("The two input triangulations are not derived from "
+		      "the same coarse mesh as required."));
+
+				   // first copy triangulation_1, and
+				   // then do as many iterations as
+				   // there are levels in
+				   // triangulation_2 to refine
+				   // additional cells. since this is
+				   // the maximum number of
+				   // refinements to get from the
+				   // coarse grid to triangulation_2,
+				   // it is clear that this is also
+				   // the maximum number of
+				   // refinements to get from any cell
+				   // on triangulation_1 to
+				   // triangulation_2
+  result.clear ();
+  result.copy_triangulation (triangulation_1);
+  for (unsigned int iteration=0; iteration<triangulation_2.n_levels();
+       ++iteration)
+    {
+      InterGridMap<Triangulation<dim> > intergrid_map;
+      intergrid_map.make_mapping (result, triangulation_2);
+
+      bool any_cell_flagged = false;
+      for (typename Triangulation<dim>::active_cell_iterator
+	     result_cell = result.begin_active();
+	   result_cell != result.end(); ++result_cell)
+	if (intergrid_map[result_cell]->has_children())
+	  {
+	    any_cell_flagged = true;
+	    result_cell->set_refine_flag ();
+	  }
+
+      if (any_cell_flagged == false)
+	break;
+      else
+	result.execute_coarsening_and_refinement();
+    }
+}
+
+
+
 
 // explicit instantiations
 
@@ -1082,6 +1133,12 @@ GridTools::minimal_cell_diameter (const Triangulation<deal_II_dimension> &triang
 template
 double
 GridTools::maximal_cell_diameter (const Triangulation<deal_II_dimension> &triangulation);
+
+template
+void
+GridTools::create_union_triangulation (const Triangulation<deal_II_dimension> &triangulation_1,
+				       const Triangulation<deal_II_dimension> &triangulation_2,
+				       Triangulation<deal_II_dimension>       &result);
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -530,6 +530,29 @@ class GridTools
     static
     double
     maximal_cell_diameter (const Triangulation<dim> &triangulation);
+
+				     /**
+				      * Given the two triangulations
+				      * specified as the first two
+				      * arguments, create the
+				      * triangulation that contains
+				      * the finest cells of both
+				      * triangulation and store it in
+				      * the third parameter. Previous
+				      * content of @p result will be
+				      * deleted.
+				      *
+				      * The function assumes that the
+				      * two input triangulations are
+				      * derived from the same coarse
+				      * grid.
+				      */
+    template <int dim>
+    static
+    void
+    create_union_triangulation (const Triangulation<dim> &triangulation_1,
+				const Triangulation<dim> &triangulation_2,
+				Triangulation<dim>       &result);
     
                                      /**
                                       * Exception
