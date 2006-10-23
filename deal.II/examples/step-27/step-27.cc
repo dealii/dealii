@@ -96,6 +96,9 @@
 #include <lac/compressed_sparsity_pattern.h>
 
 
+using namespace dealii;
+
+
 				 // @sect3{Equation data}
 				 //
 				 // First we define the classes
