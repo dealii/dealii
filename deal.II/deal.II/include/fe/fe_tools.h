@@ -1022,6 +1022,24 @@ class FETools
 				      * everything after the first
 				      * non-name character will be
 				      * chopped off.
+				      *
+				      * If the name of the element
+				      * already exists, an exception
+				      * is thrown. Thus, functionality
+				      * of get_fe_from_name() can only
+				      * be added, not changed.
+				      *
+				      * @note This function
+				      * manipulates a global table
+				      * (one table for each space
+				      * dimension). It is thread safe
+				      * in the sense that every access
+				      * to this table is secured by a
+				      * lock. Nevertheless, since each
+				      * name can be added only once,
+				      * user code has to make sure
+				      * that only one thread adds a
+				      * new element.
 				      */
     template <int dim>
     static void add_fe_name(const std::string& name,

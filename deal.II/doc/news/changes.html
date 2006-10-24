@@ -878,9 +878,23 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+
+  <li> <p> Improved: The lookup mechanism in <code
+       class="class">FETools</code>::<code
+       class="member">get_fe_from_name</code> has been changed, so
+       additional custom finite elements can be added using <code
+       class="class">FETools</code>::<code
+       class="member">add_fe_name</code>. In the course of this
+       change, the implementation of the lookup mechanism has been
+       simplified.
+       <br>
+       (GK 2006/10/24)
+       </p>
+
   <li> <p>
        New: There is a new functions <code
-       class="member">GridTools::create_union_triangulation</code>
+       class="class">GridTools</code>::<code
+       class="member">create_union_triangulation</code>
        that generates a triangulation that contains the respectively
        finest cells of two input triangulations.
        <br> 

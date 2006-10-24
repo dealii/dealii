@@ -16,6 +16,7 @@
 #include <base/quadrature_lib.h>
 #include <base/qprojector.h>
 #include <base/logstream.h>
+#include <base/thread_management.h>
 #include <base/utilities.h>
 #include <lac/full_matrix.h>
 #include <lac/householder.h>
@@ -47,15 +48,31 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+namespace 
+{
+// have a lock that guarantees that at most one thread is changing and
+// accessing the @p{coefficients} arrays of classes implementing
+// polynomials with tables. make this lock local to this file.
+//
+// having only one lock for all of these classes is probably not going
+// to be a problem since we only need it on very rare occasions. if
+// someone finds this is a bottleneck, feel free to replace it by a
+// more fine-grained solution
+  Threads::ThreadMutex fe_name_map_lock;
+
 // This is the map used by FETools::get_fe_from_name and
 // FETools::add_fe_name. Since FEFactoryBase has a template parameter
 // dim, it could not be a member variable of FETools. On the other
 // hand, it is only accessed by functions in this file, so it is safe
 // to make it a static variable here. It must be static so that we can
 // link several dimensions together.
-static std::map<const std::string,
-		boost::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> > >
-fe_name_map;
+  std::map<const std::string,
+	   boost::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> > >
+  fe_name_map;
+}
+
+
+
 
 
 
@@ -1401,6 +1418,16 @@ FETools::add_fe_name(const std::string& parameter_name,
     name.find_first_not_of(std::string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
   if (name_end < name.size())
     name.erase(name_end);
+				   // first make sure that no other
+				   // thread intercepts the
+				   // operation of this function;
+				   // for this, acquire the lock
+				   // until we quit this function
+  Threads::ThreadMutex::ScopedLock lock(fe_name_map_lock);
+  
+  Assert(fe_name_map.find(name) != fe_name_map.end(),
+	 ExcMessage("Cannot change existing element in finite element name list"));
+  
 				   // Insert the normalized name into
 				   // the map
   fe_name_map.insert(std::make_pair(name, factory));
@@ -1680,6 +1707,10 @@ FETools::get_fe_from_name_aux (std::string &name)
       }
     else
       {
+					 // Make sure no other thread
+					 // is just adding an element
+	Threads::ThreadMutex::ScopedLock lock (fe_name_map_lock);
+	
 	typename std::map<const std::string,
 	  boost::shared_ptr<const FETools::FEFactoryBase<dim> > >::const_iterator
 	  entry = fe_name_map.find(name_part);
