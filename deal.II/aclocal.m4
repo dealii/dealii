@@ -5164,6 +5164,7 @@ dnl Include the libz library
 dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_ZLIB, dnl
 [
+  dnl -- We should check for zlib.h, but I could not make AC_CHECK_HEADERS run (GK)
   if test "x$1" != "xyes" ; then
     AC_CHECK_LIB($1, crc32,
     [ LIBS="-l$1 $LIBS"
