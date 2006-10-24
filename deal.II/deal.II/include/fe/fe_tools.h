@@ -1043,7 +1043,7 @@ class FETools
 				      */
     template <int dim>
     static void add_fe_name(const std::string& name,
-			    boost::shared_ptr<const FEFactoryBase<dim> > factory);
+			    const FEFactoryBase<dim> *factory);
     
 				     /**
 				      * The string used for
