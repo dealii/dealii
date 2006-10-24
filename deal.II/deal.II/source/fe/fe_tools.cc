@@ -51,13 +51,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace 
 {
 // have a lock that guarantees that at most one thread is changing and
-// accessing the @p{coefficients} arrays of classes implementing
-// polynomials with tables. make this lock local to this file.
-//
-// having only one lock for all of these classes is probably not going
-// to be a problem since we only need it on very rare occasions. if
-// someone finds this is a bottleneck, feel free to replace it by a
-// more fine-grained solution
+// accessing the fe_name_map variable. make this lock local to this file.
   Threads::ThreadMutex fe_name_map_lock;
 
 // This is the map used by FETools::get_fe_from_name and
