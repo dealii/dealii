@@ -39,13 +39,24 @@ tests_x =  geometry_info_* \
 	   auto_derivative_function \
 	   anisotropic_* \
            hierarchical \
-	   data_out_base* \
+	   data_out_base \
+	   data_out_base_dx \
+	   data_out_base_eps \
+	   data_out_base_gmv \
+	   data_out_base_gnuplot \
+	   data_out_base_povray \
+	   data_out_base_tecplot \
+	   data_out_base_vtk \
 	   function_parser \
 	   utilities_* \
 	   is_finite
 
 ifeq ($(enable-multithreading),no)
   tests_x += threads
+endif
+
+ifeq (tecio, $(findstring tecio, $LIBS))
+  tests_x += data_out_base_tecplot_bin
 endif
 
 # from above list of regular expressions, generate the real set of
