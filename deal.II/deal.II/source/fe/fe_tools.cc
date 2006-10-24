@@ -1409,7 +1409,7 @@ void FETools::extrapolate(const DoFHandler<dim> &dof1,
 template <int dim>
 void
 FETools::add_fe_name(const std::string& parameter_name,
-		     boost::shared_ptr<const FEFactoryBase<dim> > factory)
+		     const FEFactoryBase<dim>* factory)
 {
 				   // Erase everything after the
 				   // actual class name
@@ -1425,12 +1425,12 @@ FETools::add_fe_name(const std::string& parameter_name,
 				   // until we quit this function
   Threads::ThreadMutex::ScopedLock lock(fe_name_map_lock);
   
-  Assert(fe_name_map.find(name) != fe_name_map.end(),
+  Assert(fe_name_map.find(name) == fe_name_map.end(),
 	 ExcMessage("Cannot change existing element in finite element name list"));
   
 				   // Insert the normalized name into
 				   // the map
-  fe_name_map.insert(std::make_pair(name, factory));
+  fe_name_map.insert(std::make_pair(name, boost::shared_ptr<const FEFactoryBase<dim> >(factory)));
 }
 
 
@@ -1448,35 +1448,25 @@ FETools::get_fe_from_name (const std::string &parameter_name)
       == fe_name_map.end())
     {
       add_fe_name (std::string("FE_Q_Hierarchical"),
-		   boost::shared_ptr<const FEFactoryBase<dim> >
-		   (new FEFactory<FE_Q_Hierarchical<dim> >()));
+		   new FEFactory<FE_Q_Hierarchical<dim> >());
       add_fe_name (std::string("FE_ABF"),
-		   boost::shared_ptr<const FEFactoryBase<dim> >
-		   (new FEFactory<FE_RaviartThomas<dim> >()));
+		   new FEFactory<FE_RaviartThomas<dim> >());
       add_fe_name (std::string("FE_RaviartThomas"),
-		   boost::shared_ptr<const FEFactoryBase<dim> >
-		   (new FEFactory<FE_RaviartThomas<dim> >()));
+		   new FEFactory<FE_RaviartThomas<dim> >());
       add_fe_name (std::string("FE_RaviartThomasNodal"),
-		   boost::shared_ptr<const FEFactoryBase<dim> >
-		   (new FEFactory<FE_RaviartThomasNodal<dim> >()));
+		   new FEFactory<FE_RaviartThomasNodal<dim> >());
       add_fe_name (std::string("FE_Nedelec"),
-		   boost::shared_ptr<const FEFactoryBase<dim> >
-		   (new FEFactory<FE_Nedelec<dim> >()));
+		   new FEFactory<FE_Nedelec<dim> >());
       add_fe_name (std::string("FE_DGPNonparametric"),
-		   boost::shared_ptr<const FEFactoryBase<dim> >
-		   (new FEFactory<FE_DGPNonparametric<dim> >()));
+		   new FEFactory<FE_DGPNonparametric<dim> >());
       add_fe_name (std::string("FE_DGP"),
-		   boost::shared_ptr<const FEFactoryBase<dim> >
-		   (new FEFactory<FE_DGP<dim> >()));
+		   new FEFactory<FE_DGP<dim> >());
       add_fe_name (std::string("FE_DGPMonomial"),
-		   boost::shared_ptr<const FEFactoryBase<dim> >
-		   (new FEFactory<FE_DGPMonomial<dim> >()));
+		   new FEFactory<FE_DGPMonomial<dim> >());
       add_fe_name (std::string("FE_DGQ"),
-		   boost::shared_ptr<const FEFactoryBase<dim> >
-		   (new FEFactory<FE_DGQ<dim> >()));
+		   new FEFactory<FE_DGQ<dim> >());
       add_fe_name (std::string("FE_Q<2>(4)"),
-		   boost::shared_ptr<const FEFactoryBase<dim> >
-		   (new FEFactory<FE_Q<dim> >()));
+		   new FEFactory<FE_Q<dim> >());
     }
   
 				   // Create a version of the name
@@ -1527,10 +1517,21 @@ FETools::get_fe_from_name (const std::string &parameter_name)
     {
       name.at(pos+1) = '0' + dim;
     }
-  FiniteElement<dim>* fe = get_fe_from_name_aux<dim> (name);
+  FiniteElement<dim>* fe;
+  try
+    {    
+      fe = get_fe_from_name_aux<dim> (name);
+    }
+  catch (std::string errline)
+    {
+      AssertThrow(false, ExcInvalidFEName(parameter_name
+					  + std::string(" at ")
+					  + errline));
+    }
 				   // Make sure the auxiliary function
 				   // ate up all characters of the name.
-  AssertThrow (name.size() == 0, ExcInvalidFEName(parameter_name));
+  AssertThrow (name.size() == 0, ExcInvalidFEName(parameter_name
+						  + std::string(" extra characters after end of name")));
   return fe;
 }
 
@@ -1572,7 +1573,8 @@ FETools::get_fe_from_name_aux (std::string &name)
 	{
 					   // Now, just the [...]
 					   // part should be left.
-	  AssertThrow(name.at(0) == '[', ExcInvalidFECharacter(name));
+	  if (name.size() == 0 || name[0] != '[')
+	    throw (std::string("Invalid first character in ") + name);
 	  do
 	    {
 					       // Erase the
@@ -1595,39 +1597,40 @@ FETools::get_fe_from_name_aux (std::string &name)
 		  
 		  const std::pair<int,unsigned int> tmp
 		    = Utilities::get_integer_at_position (name, 0);
-		    name.erase(0, tmp.second);
-						     // add to length,
-						     // including the '^'
-		    base_multiplicities.push_back (tmp.first);
-		  }
-		else
-						   // no, so
-						   // multiplicity is
-						   // 1
-		  base_multiplicities.push_back (1);
-
-						 // so that's it for
-						 // this base
-						 // element. base
-						 // elements are
-						 // separated by '-',
-						 // and the list is
-						 // terminated by ']',
-						 // so loop while the
-						 // next character is
-						 // '-'
+		  name.erase(0, tmp.second);
+						   // add to length,
+						   // including the '^'
+		  base_multiplicities.push_back (tmp.first);
 		}
-	    while (name[0] == '-');
-
-					     // so we got to the end
-					     // of the '-' separated
-					     // list. make sure that
-					     // we actually had a ']'
-					     // there
-	    AssertThrow (name.at(0) == ']', ExcInvalidFECharacter(name));
-	    name.erase(0,1);
-					     // just one more sanity check
-	    Assert ((base_fes.size() == base_multiplicities.size())
+	      else
+						 // no, so
+						 // multiplicity is
+						 // 1
+		base_multiplicities.push_back (1);
+	      
+					       // so that's it for
+					       // this base
+					       // element. base
+					       // elements are
+					       // separated by '-',
+					       // and the list is
+					       // terminated by ']',
+					       // so loop while the
+					       // next character is
+					       // '-'
+	    }
+	  while (name[0] == '-');
+	  
+					   // so we got to the end
+					   // of the '-' separated
+					   // list. make sure that
+					   // we actually had a ']'
+					   // there
+	  if (name.size() == 0 || name[0] != ']')
+	    throw (std::string("Invalid first character in ") + name);
+	  name.erase(0,1);
+					   // just one more sanity check
+	  Assert ((base_fes.size() == base_multiplicities.size())
 		    &&
 		    (base_fes.size() > 0),
 		    ExcInternalError());
@@ -1717,7 +1720,8 @@ FETools::get_fe_from_name_aux (std::string &name)
 	AssertThrow (entry != fe_name_map.end(), ExcInvalidFEName(name));
 					 // Now, just the (degree)
 					 // part should be left.
-	AssertThrow(name.at(0) == '(', ExcInvalidFECharacter(name));
+	if (name.size() == 0 || name[0] != '(')
+	  throw (std::string("Invalid first character in ") + name);
 	name.erase(0,1);
 	const std::pair<int,unsigned int> tmp
 	  = Utilities::get_integer_at_position (name, 0);
@@ -2067,7 +2071,7 @@ FETools::get_fe_from_name<deal_II_dimension> (const std::string &);
 template void
 FETools::add_fe_name<deal_II_dimension>(
   const std::string& name,
-  boost::shared_ptr<const FEFactoryBase<deal_II_dimension> > factory);
+  const FEFactoryBase<deal_II_dimension>* factory);
   
 template
 void
