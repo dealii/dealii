@@ -52,6 +52,7 @@
 				 // previous programs:
 using namespace dealii;
 
+
                                  // @sect3{The ``TwoPhaseFlowProblem'' class template}
                                  
 
@@ -68,7 +69,9 @@ class TwoPhaseFlowProblem
     void solve ();
     void compute_errors () const;
     void output_results (const unsigned int timestep_number) const;
-
+    double get_maximal_velocity () const;
+    void project_back_saturation ();
+    
     Vector<double> evaluate_solution (const Point<dim> &point) const;
     
     const unsigned int   degree;
@@ -311,13 +314,12 @@ KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
 
 
 double mobility_inverse (const double S, const double vis)
-{ 
+{
   return 1.0 /(1.0/vis * S * S + (1-S) * (1-S));
 }
 
 double f_saturation(const double S, const double vis)
 {   
-
   return S*S /( S * S +vis * (1-S) * (1-S));
 }
 
@@ -851,7 +853,8 @@ void TwoPhaseFlowProblem<dim>::solve ()
     cg.solve (schur_complement, solution.block(1), schur_rhs,
               preconditioner);
   
-    std::cout << solver_control.last_step()
+    std::cout << "   "
+	      << solver_control.last_step()
               << " CG Schur complement iterations to obtain convergence for pressure."
               << std::endl;
   }
@@ -1037,23 +1040,20 @@ void TwoPhaseFlowProblem<dim>::solve ()
         	
       }	
     SolverControl solver_control (system_matrix.block(2,2).m(),
-				  1e-12*system_rhs.block(2).l2_norm());
+				  1e-8*system_rhs.block(2).l2_norm());
     SolverCG<>   cg (solver_control);
     cg.solve (system_matrix.block(2,2), solution.block(2), system_rhs.block(2),
 	      PreconditionIdentity());
 		
 	
-    std::cout << solver_control.last_step()
+    std::cout << "   "
+	      << solver_control.last_step()
               << " CG iterations to obtain convergence for saturation."
               << std::endl;		
   } 
 
    
   old_solution = solution; 
-
-   
- 
-  
 }
                                  
                                  // @sect4{TwoPhaseFlow::compute_errors}
@@ -1177,12 +1177,66 @@ void TwoPhaseFlowProblem<dim>::output_results
   data_out.build_patches (degree+1);
   
   std::ostringstream filename;
-  filename << "solution-"<< timestep_number;
+  filename << "solution-"<< timestep_number << ".vtk";
 
   std::ofstream output (filename.str().c_str());
-  data_out.write_gnuplot (output);
+  data_out.write_vtk (output);
+}
 
-				   //data_out.write_vtk (output);
+
+
+template <int dim>
+void
+TwoPhaseFlowProblem<dim>::project_back_saturation ()
+{
+  for (unsigned int i=0; i<solution.block(dim).size(); ++i)
+    if (solution.block(dim)(i) < 0)
+      solution.block(dim)(i) = 0;
+    else
+      if (solution.block(dim)(i) > 1)
+	solution.block(dim)(i) = 1;
+
+  for (unsigned int i=0; i<solution.n_blocks(); ++i)
+    std::cout << "    sol(" << i << ")="
+	      << solution.block(i).linfty_norm ()
+	      << std::endl;
+}
+
+
+
+template <int dim>
+double
+TwoPhaseFlowProblem<dim>::get_maximal_velocity () const
+{
+  QGauss<dim>   quadrature_formula(degree+2); 
+  const unsigned int   n_q_points
+    = quadrature_formula.n_quadrature_points;
+
+  FEValues<dim> fe_values (fe, quadrature_formula, 
+			   update_values);
+  std::vector<Vector<double> >      old_solution_values(n_q_points, Vector<double>(dim+2));
+  double max_velocity = 0;
+  
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+      fe_values.get_function_values (old_solution, old_solution_values);
+
+      for (unsigned int q=0; q<n_q_points; ++q)
+	{
+	  Tensor<1,dim> velocity;
+	  for (unsigned int i=0; i<dim; ++i)
+	    velocity[i] = old_solution_values[q](i);	  
+	  
+	  max_velocity = std::max (max_velocity,
+				   velocity.norm());
+	}
+    }
+
+  return max_velocity;
 }
 
 
@@ -1194,7 +1248,7 @@ void TwoPhaseFlowProblem<dim>::output_results
 template <int dim>
 void TwoPhaseFlowProblem<dim>::run () 
 {
-  std::cout<<"Solving problem in " <<dim << " space dimensions." << std::endl;
+  std::cout << "Solving problem in " <<dim << " space dimensions." << std::endl;
   
   make_grid_and_dofs();
   
@@ -1210,16 +1264,28 @@ void TwoPhaseFlowProblem<dim>::run ()
   
   unsigned int timestep_number = 1;
   
-  for ( double time = time_step; time <=1; time+=time_step,  timestep_number++)
+  for ( double time = time_step; time <= 50; time+=time_step,  timestep_number++)
     { 
-      std::cout<< "Timestep_number = "<< timestep_number<<std::endl; 
+      std::cout << "Timestep " << timestep_number
+		<< " at t=" << time
+		<< ", dt=" << time_step
+		<< std::endl; 
       assemble_system ();
       solve ();
+      project_back_saturation ();
+      
       output_results(timestep_number);
 
       production_time.push_back (time);
       production_rate.push_back (1.0 - vfs_out/v_out);
-      std::cout<<"production_rate="<<production_rate.back()<<std::endl;       
+      std::cout << "   production_rate="<<production_rate.back()<<std::endl;
+
+      const double max_velocity = get_maximal_velocity();
+      std::cout << "   max velocity = " << max_velocity
+		<< std::endl;
+      
+//       time_step = std::pow(0.5, double(n_refinement_steps)) /
+// 		  max_velocity / 4;
     }
 
   std::ofstream production_history ("production_history");

@@ -13,7 +13,7 @@ program (besides the somewhat strange time-dependence of step-18).
 <h2>The two phase flow problem</h2>
 
 Modeling of two phase flow in porous media is important for both
-environmental remediation and the management of petroleum
+environmental remediation and the management of petroleum and groundwater
 reservoirs. Practical situations involving two phase flow include the
 dispersal of a nonaqueous phase liquid in an aquifer, or the joint
 movement of a mixture of fluids such as oil and water in a
