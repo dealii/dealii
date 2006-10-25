@@ -1243,7 +1243,7 @@ FE_Q<dim>::initialize_embedding ()
                                                // value is somewhat
                                                // fuzzy, but it works
                                                // for
-                                               // 1e-14*(degree^dim)*dim,
+                                               // 1e-14*degree*dim,
                                                // which is kind of
                                                // reasonable given
                                                // that we compute the
@@ -1257,15 +1257,15 @@ FE_Q<dim>::initialize_embedding ()
                                                // growth in
                                                // degree*dim, times a
                                                // small constant.
-	      if (std::fabs(cell_value) < 2e-14*std::pow(1.*this->degree,dim)*dim)
+	      if (std::fabs(cell_value) < 2e-14*this->degree*dim)
 		cell_interpolation(j, i) = 0.;
 	      else
 		cell_interpolation(j, i) = cell_value;
 
-	      if (std::fabs(subcell_value) < 2e-14*std::pow(1.*this->degree,dim)*dim)
+	      if (std::fabs(subcell_value) < 2e-14*this->degree*dim)
 		subcell_interpolation(j, i) = 0.;
 	      else
-		if (std::fabs(subcell_value-1) < 2e-14*std::pow(1.*this->degree,dim)*dim)
+		if (std::fabs(subcell_value-1) < 2e-14*this->degree*dim)
 		  subcell_interpolation(j, i) = 1.;
 		else			
 						   // we have put our
@@ -1317,7 +1317,7 @@ FE_Q<dim>::initialize_embedding ()
 	  double sum = 0;
 	  for (unsigned int col=0; col<this->dofs_per_cell; ++col)
 	    sum += this->prolongation[child](row,col);
-	  Assert (std::fabs(sum-1.) < 2e-14*std::pow(1.*this->degree,dim)*dim,
+	  Assert (std::fabs(sum-1.) < 2e-14*this->degree*dim,
 		  ExcInternalError());
 	}
     }
