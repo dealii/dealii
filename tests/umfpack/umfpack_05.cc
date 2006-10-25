@@ -25,8 +25,6 @@
 #include <lac/sparse_direct.h>
 
 
-
-template <int dim>
 void test ()
 {
   std::vector<unsigned int> size (2,2U);
@@ -56,6 +54,12 @@ void test ()
     ubb(i) = i;
   
   umfpackb.solve(ubb);
+
+  for (unsigned int i=0; i<4; ++i)
+    Assert (std::fabs (ubb(i) - i) < 1e-12,
+	    ExcInternalError());
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -66,7 +70,5 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test<1> ();
-  test<2> ();
-  test<3> ();
+  test ();
 }

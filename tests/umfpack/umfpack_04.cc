@@ -188,6 +188,8 @@ void test ()
   deallog << "relative norm distance = "
 	  << x.l2_norm() / ub.l2_norm()
 	  << std::endl;
+  Assert (x.l2_norm() / ub.l2_norm() < 1e-12,
+	  ExcInternalError());
 
   deallog << "Block Sparse Factorization" << std::endl;
   umfpackb.factorize(Bb);
@@ -202,6 +204,8 @@ void test ()
   deallog << "relative norm distance = "
 	  << b.l2_norm() / ubb.l2_norm()
 	  << std::endl;
+  Assert (b.l2_norm() / ubb.l2_norm() < 1e-12,
+	  ExcInternalError());
 }
 
 
