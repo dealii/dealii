@@ -339,7 +339,7 @@ k(x,y) \mathbf{I}$.
 
 Our two dimensional numerical simulation will be done on unit cell
 $\Omega = [0,1]\times [0,1]$ for $t\in [0,T]$.
- Boundary conditions are:
+%Boundary conditions are:
 \f[
 \begin{array}{cr}
 p(x,y)=1 & \forall(x,y)\in \Gamma_{1}:=\{(x,y)\in \partial \Omega: x=0\}\\
