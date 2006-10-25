@@ -1106,10 +1106,23 @@ class FETools
 				      * user code has to make sure
 				      * that only one thread adds a
 				      * new element.
+				      *
+				      * Note also that this table
+				      * exists once for each space
+				      * dimension. If you have a
+				      * program that works with finite
+				      * elements in different space
+				      * dimensions (for example, @ref
+				      * step_4 "step-4" does something
+				      * like this), then you should
+				      * call this function for each
+				      * space dimension for which you
+				      * want your finite element added
+				      * to the map.
 				      */
     template <int dim>
-    static void add_fe_name(const std::string& name,
-			    const FEFactoryBase<dim>* factory);
+    static void add_fe_name (const std::string& name,
+			     const FEFactoryBase<dim>* factory);
     
 				     /**
 				      * The string used for
