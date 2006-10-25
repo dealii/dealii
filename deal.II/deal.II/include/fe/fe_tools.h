@@ -1071,7 +1071,7 @@ class FETools
 				      *
 				      * In most cases, if you want
 				      * objects of type
-				      * <code>MyFE<code> be created
+				      * <code>MyFE</code> be created
 				      * whenever the name
 				      * <code>my_fe</code> is given to
 				      * get_fe_from_name, you will
