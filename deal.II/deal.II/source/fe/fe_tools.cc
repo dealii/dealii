@@ -101,6 +101,16 @@ namespace
                                    // and accessing the fe_name_map
                                    // variable. make this lock local
                                    // to this file.
+				   //
+				   // this and the next variable are
+				   // declared static (even though
+				   // they're in an anonymous
+				   // namespace) in order to make icc
+				   // happy (which otherwise reports a
+				   // multiply defined symbol when
+				   // linking libraries for more than
+				   // one space dimension together
+  static
   Threads::ThreadMutex fe_name_map_lock;
 
                                    // This is the map used by
@@ -122,6 +132,7 @@ namespace
                                    // there are no threads running,
                                    // there are no thread-safety
                                    // issues here
+  static
   std::map<const std::string,
 	   boost::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> > >
   fe_name_map
