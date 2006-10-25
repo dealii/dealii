@@ -50,19 +50,75 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace 
 {
-// have a lock that guarantees that at most one thread is changing and
-// accessing the fe_name_map variable. make this lock local to this file.
+                                   // a function that returns the
+                                   // default set of finite element
+                                   // names and factory objects for
+                                   // them. used to initialize
+                                   // fe_name_map below
+  std::map<const std::string,
+	   const FETools::FEFactoryBase<deal_II_dimension> * >
+  get_default_fe_names ()
+  {
+    std::map<const std::string,
+             const FETools::FEFactoryBase<deal_II_dimension> * >
+      default_map;
+
+    default_map["FE_Q_Hierarchical"]
+      = new FETools::FEFactory<FE_Q_Hierarchical<deal_II_dimension> >;
+    default_map["FE_ABF"]
+      = new FETools::FEFactory<FE_RaviartThomas<deal_II_dimension> >;
+    default_map["FE_RaviartThomas"]
+      = new FETools::FEFactory<FE_RaviartThomas<deal_II_dimension> >;
+    default_map["FE_RaviartThomasNodal"]
+      = new FETools::FEFactory<FE_RaviartThomasNodal<deal_II_dimension> >;
+    default_map["FE_Nedelec"]
+      = new FETools::FEFactory<FE_Nedelec<deal_II_dimension> >;
+    default_map["FE_DGPNonparametric"]
+      = new FETools::FEFactory<FE_DGPNonparametric<deal_II_dimension> >;
+    default_map["FE_DGP"]
+      = new FETools::FEFactory<FE_DGP<deal_II_dimension> >;
+    default_map["FE_DGPMonomial"]
+      = new FETools::FEFactory<FE_DGPMonomial<deal_II_dimension> >;
+    default_map["FE_DGQ"]
+      = new FETools::FEFactory<FE_DGQ<deal_II_dimension> >;
+    default_map["FE_Q"]
+      = new FETools::FEFactory<FE_Q<deal_II_dimension> >;
+
+    return default_map;
+  }
+  
+
+  
+                                   // have a lock that guarantees that
+                                   // at most one thread is changing
+                                   // and accessing the fe_name_map
+                                   // variable. make this lock local
+                                   // to this file.
   Threads::ThreadMutex fe_name_map_lock;
 
-// This is the map used by FETools::get_fe_from_name and
-// FETools::add_fe_name. Since FEFactoryBase has a template parameter
-// dim, it could not be a member variable of FETools. On the other
-// hand, it is only accessed by functions in this file, so it is safe
-// to make it a static variable here. It must be static so that we can
-// link several dimensions together.
+                                   // This is the map used by
+                                   // FETools::get_fe_from_name and
+                                   // FETools::add_fe_name. Since
+                                   // FEFactoryBase has a template
+                                   // parameter dim, it could not be a
+                                   // member variable of FETools. On
+                                   // the other hand, it is only
+                                   // accessed by functions in this
+                                   // file, so it is safe to make it a
+                                   // static variable here. It must be
+                                   // static so that we can link
+                                   // several dimensions together.
+                                   //
+                                   // it is initialized at program
+                                   // start time using the function
+                                   // above. because at this time
+                                   // there are no threads running,
+                                   // there are no thread-safety
+                                   // issues here
   std::map<const std::string,
-	   boost::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> > >
-  fe_name_map;
+	   const FETools::FEFactoryBase<deal_II_dimension> * >
+  fe_name_map
+  = get_default_fe_names ();
 }
 
 
@@ -1424,7 +1480,7 @@ FETools::add_fe_name(const std::string& parameter_name,
   
 				   // Insert the normalized name into
 				   // the map
-  fe_name_map.insert(std::make_pair(name, boost::shared_ptr<const FEFactoryBase<dim> >(factory)));
+  fe_name_map[name] = factory;
 }
 
 
@@ -1432,37 +1488,6 @@ template <int dim>
 FiniteElement<dim> *
 FETools::get_fe_from_name (const std::string &parameter_name)
 {
-				   // First, make sure that the
-				   // standard map from names to
-				   // element factories has been
-				   // filled by checking for one of
-				   // the elements.
-//TODO: Make this threadsafe
-  if (fe_name_map.find(std::string("FE_Q_Hierarchical"))
-      == fe_name_map.end())
-    {
-      add_fe_name (std::string("FE_Q_Hierarchical"),
-		   new FEFactory<FE_Q_Hierarchical<dim> >());
-      add_fe_name (std::string("FE_ABF"),
-		   new FEFactory<FE_RaviartThomas<dim> >());
-      add_fe_name (std::string("FE_RaviartThomas"),
-		   new FEFactory<FE_RaviartThomas<dim> >());
-      add_fe_name (std::string("FE_RaviartThomasNodal"),
-		   new FEFactory<FE_RaviartThomasNodal<dim> >());
-      add_fe_name (std::string("FE_Nedelec"),
-		   new FEFactory<FE_Nedelec<dim> >());
-      add_fe_name (std::string("FE_DGPNonparametric"),
-		   new FEFactory<FE_DGPNonparametric<dim> >());
-      add_fe_name (std::string("FE_DGP"),
-		   new FEFactory<FE_DGP<dim> >());
-      add_fe_name (std::string("FE_DGPMonomial"),
-		   new FEFactory<FE_DGPMonomial<dim> >());
-      add_fe_name (std::string("FE_DGQ"),
-		   new FEFactory<FE_DGQ<dim> >());
-      add_fe_name (std::string("FE_Q<2>(4)"),
-		   new FEFactory<FE_Q<dim> >());
-    }
-  
 				   // Create a version of the name
 				   // string where all template
 				   // parameters are eliminated.
@@ -1484,8 +1509,9 @@ FETools::get_fe_from_name (const std::string &parameter_name)
 	  if (name.at(pos1+1) != 'd')
 	    Assert (name.at(pos1+1) == dimchar,
 		    ExcInvalidFEName(name));
-	} else
-	  Assert(pos2-pos1 == 4, ExcInvalidFEName(name));
+	}
+      else
+        Assert(pos2-pos1 == 4, ExcInvalidFEName(name));
       
 				       // If pos1==pos2, then we are
 				       // probably at the end of the
@@ -1499,34 +1525,34 @@ FETools::get_fe_from_name (const std::string &parameter_name)
   for (unsigned int pos = name.find("^dim");
        pos < name.size();
        pos = name.find("^dim"))
-    {
-      name.erase(pos+2, 2);
-    }
+    name.erase(pos+2, 2);
   
 				   // Replace all occurences of "^d"
 				   // by using the actual dimension
   for (unsigned int pos = name.find("^d");
        pos < name.size();
        pos = name.find("^d"))
-    {
-      name.at(pos+1) = '0' + dim;
-    }
-  FiniteElement<dim>* fe;
+    name.at(pos+1) = '0' + dim;
+  
   try
     {    
-      fe = get_fe_from_name_aux<dim> (name);
+      FiniteElement<dim> *fe = get_fe_from_name_aux<dim> (name);
+
+                                       // Make sure the auxiliary function
+                                       // ate up all characters of the name.
+      AssertThrow (name.size() == 0,
+                   ExcInvalidFEName(parameter_name
+                                    + std::string(" extra characters after "
+                                                  "end of name")));
+      return fe;
     }
-  catch (std::string errline)
+  catch (const std::string &errline)
     {
       AssertThrow(false, ExcInvalidFEName(parameter_name
 					  + std::string(" at ")
 					  + errline));
+      return 0;
     }
-				   // Make sure the auxiliary function
-				   // ate up all characters of the name.
-  AssertThrow (name.size() == 0, ExcInvalidFEName(parameter_name
-						  + std::string(" extra characters after end of name")));
-  return fe;
 }
 
 
@@ -1708,8 +1734,8 @@ FETools::get_fe_from_name_aux (std::string &name)
 					 // is just adding an element
 	Threads::ThreadMutex::ScopedLock lock (fe_name_map_lock);
 	
-	typename std::map<const std::string,
-	  boost::shared_ptr<const FETools::FEFactoryBase<dim> > >::const_iterator
+	typename std::map<const std::string,const FETools::FEFactoryBase<dim>*>
+          ::const_iterator
 	  entry = fe_name_map.find(name_part);
 	AssertThrow (entry != fe_name_map.end(), ExcInvalidFEName(name));
 					 // Now, just the (degree)
