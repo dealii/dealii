@@ -1682,6 +1682,106 @@ SparseDirectUMFPACK::clear ()
 
 
 
+template <typename number>
+void
+SparseDirectUMFPACK::
+sort_arrays (const SparseMatrix<number> &)
+{
+                                   // do the copying around of entries
+                                   // so that the diagonal entry is in the
+                                   // right place. note that this is easy to
+                                   // detect: since all entries apart from the
+                                   // diagonal entry are sorted, we know that
+                                   // the diagonal entry is in the wrong place
+                                   // if and only if its column index is
+                                   // larger than the column index of the
+                                   // second entry in a row
+                                   //
+                                   // ignore rows with only one or no entry
+  for (unsigned int row=0; row<N; ++row)
+    {
+                                       // we may have to move some elements
+                                       // that are left of the diagonal but
+                                       // presently after the diagonal entry
+                                       // to the left, whereas the diagonal
+                                       // entry has to move to the right. we
+                                       // could first figure out where to
+                                       // move everything to, but for
+                                       // simplicity we just make a series
+                                       // of swaps instead (this is kind of
+                                       // a single run of bubble-sort, which
+                                       // gives us the desired result since
+                                       // the array is already "almost"
+                                       // sorted)
+                                       //
+                                       // in the first loop, the condition
+                                       // in the while-header also checks
+                                       // that the row has at least two
+                                       // entries and that the diagonal
+                                       // entry is really in the wrong place
+      int cursor = Ap[row];
+      while ((cursor < Ap[row+1]-1) &&
+             (Ai[cursor] > Ai[cursor+1]))
+        {
+          std::swap (Ai[cursor], Ai[cursor+1]);
+          std::swap (Ax[cursor], Ax[cursor+1]);
+          ++cursor;
+        }
+    }
+}
+
+
+
+template <typename number>
+void
+SparseDirectUMFPACK::
+sort_arrays (const BlockSparseMatrix<number> &matrix)
+{
+                                   // the case for block matrices is a
+                                   // bit more difficult, since all we
+                                   // know is that *within each
+                                   // block*, the diagonal of that
+                                   // block may come first. however,
+                                   // that means that there may be as
+                                   // many entries per row in the
+                                   // wrong place as there are block
+                                   // columns. we can do the same
+                                   // thing as above, but we have to
+                                   // do it multiple times
+  for (unsigned int row=0; row<N; ++row)
+    {
+      int cursor = Ap[row];
+      for (unsigned int block=0; block<matrix.n_block_cols(); ++block)
+        {
+
+                                           // find the next
+                                           // out-of-order element
+        while ((cursor < Ap[row+1]-1) &&
+               (Ai[cursor] < Ai[cursor+1]))
+          ++cursor;
+
+                                         // if there is none, then
+                                         // just go on
+        if (cursor == Ap[row+1]-1)
+          break;
+
+                                         // otherwise swap this entry
+                                         // with successive ones as
+                                         // long as necessary
+        unsigned int element = cursor;
+        while ((element < Ap[row+1]-1) &&
+               (Ai[element] > Ai[element+1]))
+          {
+            std::swap (Ai[element], Ai[element+1]);
+            std::swap (Ax[element], Ax[element+1]);
+            ++element;
+          }
+        }
+    }
+}
+
+
+
 template <class Matrix>
 void
 SparseDirectUMFPACK::
@@ -1766,63 +1866,27 @@ factorize (const Matrix &matrix)
       Assert (row_pointers[i] == Ap[i+1], ExcInternalError());
   }
 
-                                   // finally do the copying around of entries
-                                   // so that the diagonal entry is in the
-                                   // right place. note that this is easy to
-                                   // detect: since all entries apart from the
-                                   // diagonal entry are sorted, we know that
-                                   // the diagonal entry is in the wrong place
-                                   // if and only if its column index is
-                                   // larger than the column index of the
-                                   // second entry in a row
-                                   //
-                                   // ignore rows with only one or no entry
-  {
-    for (unsigned int row=0; row<N; ++row)
-      {
-                                         // we may have to move some elements
-                                         // that are left of the diagonal but
-                                         // presently after the diagonal entry
-                                         // to the left, whereas the diagonal
-                                         // entry has to move to the right. we
-                                         // could first figure out where to
-                                         // move everything to, but for
-                                         // simplicity we just make a series
-                                         // of swaps instead (this is kind of
-                                         // a single run of bubble-sort, which
-                                         // gives us the desired result since
-                                         // the array is already "almost"
-                                         // sorted)
-                                         //
-                                         // in the first loop, the condition
-                                         // in the while-header also checks
-                                         // that the row has at least two
-                                         // entries and that the diagonal
-                                         // entry is really in the wrong place
-        int cursor = Ap[row];
-        while ((cursor < Ap[row+1]-1) &&
-               (Ai[cursor] > Ai[cursor+1]))
-          {
-            std::swap (Ai[cursor], Ai[cursor+1]);
-            std::swap (Ax[cursor], Ax[cursor+1]);
-            ++cursor;
-          }
-      }
-  }
+                                   // make sure that the elements in
+                                   // each row are sorted. we have to
+                                   // be more careful for block sparse
+                                   // matrices, so ship this task out
+                                   // to a different function
+  sort_array<Matrix> ();
         
   int status;
-
   status = umfpack_di_symbolic (N, N,
                                 &Ap[0], &Ai[0], &Ax[0],
                                 &symbolic_decomposition,
                                 &control[0], 0);
-  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError("umfpack_di_symbolic", status));
+  AssertThrow (status == UMFPACK_OK,
+               ExcUMFPACKError("umfpack_di_symbolic", status));
   
   status = umfpack_di_numeric (&Ap[0], &Ai[0], &Ax[0],
                                symbolic_decomposition,
                                &numeric_decomposition,
                                &control[0], 0);
-  AssertThrow (status == UMFPACK_OK, ExcUMFPACKError("umfpack_di_numeric", status));
+  AssertThrow (status == UMFPACK_OK,
+               ExcUMFPACKError("umfpack_di_numeric", status));
 
   umfpack_di_free_symbolic (&symbolic_decomposition) ;
 }

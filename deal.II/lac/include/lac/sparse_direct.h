@@ -21,6 +21,7 @@
 #include <base/thread_management.h>
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
+#include <lac/block_sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1211,6 +1212,23 @@ class SparseDirectUMFPACK : public Subscriptor
                                       * yet.
                                       */
     void clear ();
+
+
+                                     /**
+                                      * Make sure that the arrays Ai
+                                      * and Ap are sorted in each
+                                      * row. UMFPACK wants it this
+                                      * way. We need to have two
+                                      * versions of this function, one
+                                      * for the usual SparseMatrix and
+                                      * one for the BlockSparseMatrix
+                                      * classes
+                                      */
+    template <typename number>
+    void sort_arrays (const SparseMatrix<number> &);
+    
+    template <typename number>
+    void sort_arrays (const BlockSparseMatrix<number> &);
 
                                      /**
                                       * The arrays in which we store the data
