@@ -50,39 +50,46 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace 
 {
+                                   // a shared pointer to factory
+                                   // objects, to ensure that they get
+                                   // deleted at the end of the
+                                   // program run and don't end up as
+                                   // apparent memory leaks to
+                                   // programs like valgrind
+  typedef
+  boost::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> >
+  FEFactoryPointer;
+  
                                    // a function that returns the
                                    // default set of finite element
                                    // names and factory objects for
                                    // them. used to initialize
                                    // fe_name_map below
-  std::map<const std::string,
-	   const FETools::FEFactoryBase<deal_II_dimension> * >
+  std::map<const std::string,FEFactoryPointer>
   get_default_fe_names ()
   {
-    std::map<const std::string,
-             const FETools::FEFactoryBase<deal_II_dimension> * >
-      default_map;
+    std::map<const std::string,FEFactoryPointer> default_map;
 
     default_map["FE_Q_Hierarchical"]
-      = new FETools::FEFactory<FE_Q_Hierarchical<deal_II_dimension> >;
+      = FEFactoryPointer(new FETools::FEFactory<FE_Q_Hierarchical<deal_II_dimension> >);
     default_map["FE_ABF"]
-      = new FETools::FEFactory<FE_RaviartThomas<deal_II_dimension> >;
+      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<deal_II_dimension> >);
     default_map["FE_RaviartThomas"]
-      = new FETools::FEFactory<FE_RaviartThomas<deal_II_dimension> >;
+      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<deal_II_dimension> >);
     default_map["FE_RaviartThomasNodal"]
-      = new FETools::FEFactory<FE_RaviartThomasNodal<deal_II_dimension> >;
+      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomasNodal<deal_II_dimension> >);
     default_map["FE_Nedelec"]
-      = new FETools::FEFactory<FE_Nedelec<deal_II_dimension> >;
+      = FEFactoryPointer(new FETools::FEFactory<FE_Nedelec<deal_II_dimension> >);
     default_map["FE_DGPNonparametric"]
-      = new FETools::FEFactory<FE_DGPNonparametric<deal_II_dimension> >;
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGPNonparametric<deal_II_dimension> >);
     default_map["FE_DGP"]
-      = new FETools::FEFactory<FE_DGP<deal_II_dimension> >;
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGP<deal_II_dimension> >);
     default_map["FE_DGPMonomial"]
-      = new FETools::FEFactory<FE_DGPMonomial<deal_II_dimension> >;
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGPMonomial<deal_II_dimension> >);
     default_map["FE_DGQ"]
-      = new FETools::FEFactory<FE_DGQ<deal_II_dimension> >;
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<deal_II_dimension> >);
     default_map["FE_Q"]
-      = new FETools::FEFactory<FE_Q<deal_II_dimension> >;
+      = FEFactoryPointer(new FETools::FEFactory<FE_Q<deal_II_dimension> >);
 
     return default_map;
   }
@@ -116,7 +123,7 @@ namespace
                                    // there are no thread-safety
                                    // issues here
   std::map<const std::string,
-	   const FETools::FEFactoryBase<deal_II_dimension> * >
+	   boost::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> > >
   fe_name_map
   = get_default_fe_names ();
 }
@@ -1480,7 +1487,7 @@ FETools::add_fe_name(const std::string& parameter_name,
   
 				   // Insert the normalized name into
 				   // the map
-  fe_name_map[name] = factory;
+  fe_name_map[name] = FEFactoryPointer(factory);
 }
 
 
@@ -1734,10 +1741,8 @@ FETools::get_fe_from_name_aux (std::string &name)
 					 // is just adding an element
 	Threads::ThreadMutex::ScopedLock lock (fe_name_map_lock);
 	
-	typename std::map<const std::string,const FETools::FEFactoryBase<dim>*>
-          ::const_iterator
-	  entry = fe_name_map.find(name_part);
-	AssertThrow (entry != fe_name_map.end(), ExcInvalidFEName(name));
+	AssertThrow (fe_name_map.find(name_part) != fe_name_map.end(),
+                     ExcInvalidFEName(name));
 					 // Now, just the (degree)
 					 // part should be left.
 	if (name.size() == 0 || name[0] != '(')
@@ -1746,7 +1751,7 @@ FETools::get_fe_from_name_aux (std::string &name)
 	const std::pair<int,unsigned int> tmp
 	  = Utilities::get_integer_at_position (name, 0);
 	name.erase(0, tmp.second+1);
-	return entry->second->get(tmp.first);
+	return fe_name_map.find(name_part)->second->get(tmp.first);
       }
   
     
