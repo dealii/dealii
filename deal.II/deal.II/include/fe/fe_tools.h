@@ -20,8 +20,6 @@
 #include <base/geometry_info.h>
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1064,6 +1062,13 @@ class FETools
 				      * after the first non-name
 				      * character will be ignored.
 				      *
+				      * The FEFactory object should be
+				      * an object newly created with
+				      * <tt>new</tt>. FETools will
+				      * take ownership of this object
+				      * and delete it once it is not
+				      * used anymore.
+				      *
 				      * In most cases, if you want
 				      * objects of type
 				      * <code>MyFE<code> be created
@@ -1103,8 +1108,8 @@ class FETools
 				      * new element.
 				      */
     template <int dim>
-    static void add_fe_name (const std::string        &name,
-                             const FEFactoryBase<dim> *factory);
+    static void add_fe_name(const std::string& name,
+			    const FEFactoryBase<dim>* factory);
     
 				     /**
 				      * The string used for
@@ -1122,14 +1127,6 @@ class FETools
 		    std::string,
 		    << "Can't re-generate a finite element from the string '"
 		    << arg1 << "'.");
-    
-				     /**
-				      * Parsing a finite element name,
-				      * an unexpected character showed up.
-				      */
-    DeclException1 (ExcInvalidFECharacter,
-		    std::string,
-		    << "Unexpected character at beginning of '"<< arg1 << "'");
     
 				     /**
 				      * Exception
