@@ -64,9 +64,19 @@ class FETools
 {
   public:
 				     /**
-				      * The base for factory objects
-				      * creating finite elements of a
-				      * given degree.
+				      * A base class for factory
+				      * objects creating finite
+				      * elements of a given
+				      * degree. Derived classes are
+				      * called whenever one wants to
+				      * have a transparent way to
+				      * create a finite element
+				      * object.
+				      *
+				      * This class is used in the
+				      * FETools::get_fe_from_name()
+				      * and FETools::add_fe_name()
+				      * functions.
 				      *
 				      * @author Guido Kanschat, 2006
 				      */
@@ -80,7 +90,8 @@ class FETools
 					  */
 	virtual FiniteElement<dim>*
 	get (const unsigned int degree) const = 0;
-					 /**
+
+                                         /**
 					  * Virtual destructor doing
 					  * nothing but making the
 					  * compiler happy.
@@ -89,10 +100,19 @@ class FETools
     };
     
 				     /**
-				      * The base for factory objects
-				      * creating finite elements of a
-				      * given degree.
+				      * A concrete class for factory
+				      * objects creating finite
+				      * elements of a given degree.
 				      *
+				      * The class's get() function
+				      * generates a finite element
+				      * object of the type given as
+				      * template argument, and with
+				      * the degree (however the finite
+				      * element class wishes to
+				      * interpret this number) given
+				      * as argument to get().
+				      * 
 				      * @author Guido Kanschat, 2006
 				      */
     template <class FE>
@@ -1011,20 +1031,51 @@ class FETools
     get_fe_from_name (const std::string &name);
 
 				     /**
-				      * Adds the name of a finite
-				      * element to be used by
-				      * get_fe_from_name().
+				      * Extend the list of finite
+				      * elements that can be generated
+				      * by get_fe_from_name() by the
+				      * one given as @p name. If
+				      * get_fe_from_name() is later
+				      * called with this name, it will
+				      * use the object given as second
+				      * argument to create a finite
+				      * element object.
 				      *
-				      * It is safe to use either the
-				      * class name explicitly or to
-				      * use the result of
-				      * FiniteElement::get_name, since
-				      * everything after the first
-				      * non-name character will be
-				      * chopped off.
+				      * The format of the @p name
+				      * parameter should include the
+				      * name of a finite
+				      * element. However, it is safe
+				      * to use either the class name
+				      * alone or to use the result of
+				      * FiniteElement::get_name (which
+				      * includes the space dimension
+				      * as well as the polynomial
+				      * degree), since everything
+				      * after the first non-name
+				      * character will be ignored.
 				      *
+				      * In most cases, if you want
+				      * objects of type
+				      * <code>MyFE<code> be created
+				      * whenever the name
+				      * <code>my_fe</code> is given to
+				      * get_fe_from_name, you will
+				      * want the second argument to
+				      * this function be of type
+				      * FEFactory@<MyFE@>, but you can
+				      * of course create your custom
+				      * finite element factory class.
+				      *
+				      * This function takes over
+				      * ownership of the object given
+				      * as second argument, i.e. you
+				      * should never attempt to
+				      * destroy it later on. The
+				      * object will be deleted at the
+				      * end of the program's lifetime.
+				      * 
 				      * If the name of the element
-				      * already exists, an exception
+				      * is already in use, an exception
 				      * is thrown. Thus, functionality
 				      * of get_fe_from_name() can only
 				      * be added, not changed.
@@ -1042,8 +1093,8 @@ class FETools
 				      * new element.
 				      */
     template <int dim>
-    static void add_fe_name(const std::string& name,
-			    const FEFactoryBase<dim> *factory);
+    static void add_fe_name (const std::string        &name,
+                             const FEFactoryBase<dim> *factory);
     
 				     /**
 				      * The string used for
