@@ -1013,10 +1013,10 @@ class FETools
 				      *
 				      * The function returns a pointer
 				      * to a newly create finite
-				      * element. It is in the callers
+				      * element. It is in the caller's
 				      * responsibility to destroy the
 				      * object pointed to at an
-				      * appropriate time.
+				      * appropriate later time.
 				      *
 				      * Since the value of the template
 				      * argument can't be deduced from the
@@ -1024,6 +1024,16 @@ class FETools
 				      * function, you have to explicitly
 				      * specify it when you call this
 				      * function.
+				      *
+				      * This function knows about all
+				      * the standard elements defined
+				      * in the library. However, it
+				      * doesn't by default know about
+				      * elements that you may have
+				      * defined in your program. To
+				      * make your own elements known
+				      * to this function, use the
+				      * add_fe_name() function.
 				      */
     template <int dim>
     static
