@@ -77,14 +77,6 @@
 #include <iostream>
 
 
-
-				 // In strict ANSI C mode, the
-				 // following constant are not defined
-				 // by default, so we do it ourselves:
-#ifndef M_PI
-#  define	M_PI		3.14159265358979323846
-#endif
-
 				 // The last step is as in previous
 				 // programs:
 using namespace dealii;
@@ -339,7 +331,7 @@ AdvectionField<dim>::value (const Point<dim> &p) const
   Point<dim> value;
   value[0] = 2;
   for (unsigned int i=1; i<dim; ++i)
-    value[i] = 1+0.8*std::sin(8*M_PI*p[0]);
+    value[i] = 1+0.8*std::sin(8*deal_II_numbers::PI*p[0]);
 
   return value;
 }
@@ -486,7 +478,7 @@ BoundaryValues<dim>::value (const Point<dim>   &p,
 {
   Assert (component == 0, ExcIndexRange (component, 0, 1));
 
-  const double sine_term = std::sin(16*M_PI*std::sqrt(p.square()));
+  const double sine_term = std::sin(16*deal_II_numbers::PI*std::sqrt(p.square()));
   const double weight    = std::exp(-5*p.square()) / std::exp(-5.);
   return sine_term * weight;
 }
