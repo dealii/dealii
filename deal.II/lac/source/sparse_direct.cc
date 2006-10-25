@@ -1685,7 +1685,7 @@ SparseDirectUMFPACK::clear ()
 template <typename number>
 void
 SparseDirectUMFPACK::
-sort_arrays (const SparseMatrix<number> &)
+sort_arrays (const SparseMatrix<number> &matrix)
 {
                                    // do the copying around of entries
                                    // so that the diagonal entry is in the
@@ -1698,7 +1698,7 @@ sort_arrays (const SparseMatrix<number> &)
                                    // second entry in a row
                                    //
                                    // ignore rows with only one or no entry
-  for (unsigned int row=0; row<N; ++row)
+  for (unsigned int row=0; row<matrix.m(); ++row)
     {
                                        // we may have to move some elements
                                        // that are left of the diagonal but
@@ -1748,7 +1748,7 @@ sort_arrays (const BlockSparseMatrix<number> &matrix)
                                    // columns. we can do the same
                                    // thing as above, but we have to
                                    // do it multiple times
-  for (unsigned int row=0; row<N; ++row)
+  for (unsigned int row=0; row<matrix.m(); ++row)
     {
       int cursor = Ap[row];
       for (unsigned int block=0; block<matrix.n_block_cols(); ++block)
@@ -1768,7 +1768,7 @@ sort_arrays (const BlockSparseMatrix<number> &matrix)
                                          // otherwise swap this entry
                                          // with successive ones as
                                          // long as necessary
-        unsigned int element = cursor;
+        int element = cursor;
         while ((element < Ap[row+1]-1) &&
                (Ai[element] > Ai[element+1]))
           {
@@ -1871,7 +1871,7 @@ factorize (const Matrix &matrix)
                                    // be more careful for block sparse
                                    // matrices, so ship this task out
                                    // to a different function
-  sort_array<Matrix> ();
+  sort_arrays (matrix);
         
   int status;
   status = umfpack_di_symbolic (N, N,
