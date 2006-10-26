@@ -65,6 +65,9 @@ namespace
                                    // names and factory objects for
                                    // them. used to initialize
                                    // fe_name_map below
+#ifdef DEAL_II_ANON_NAMESPACE_BUG
+    static
+#endif  
   std::map<const std::string,FEFactoryPointer>
   get_default_fe_names ()
   {
