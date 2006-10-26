@@ -13,88 +13,22 @@
 <body>
 
 
-  <h1><acronym>deal.II</acronym>-license for non-commercial use</h1>
+  <h1>The deal.II license</h1>
 
   <p>
-  For non-commercial purposes, the
-  <acronym>deal.II</acronym> library has been placed under an Open Source
+  The <acronym>deal.II</acronym> library has been placed under an Open Source
   license, in the sense advocated by the 
   <a href="http://www.opensource.org" target="_top">Open Source
   Initiative</a>. You are thus free to copy and use it, and you have
   free access to all source codes. However, <acronym>deal.II</acronym>
-  is not in the public domain, it is property of the
-  <acronym>deal.II</acronym> authors. Some parts of the library are by other
-  persons, and are marked with their names. Also, note that parts of
-  the files in the <code>contrib/</code> subdirectory are by other
-  people, and are distributed under separate licenses; in particular,
-  you will find parts of the <a href="http://www.boost.org/" target="_top">BOOST</a>
-  library in this directory, and deal.II comes with a copy of <a
-  href="http://www.cise.ufl.edu/research/sparse/umfpack/" target="_top">UMFPACK</a>
-  and one of <a href="http://www.students.tut.fi/~warp/FunctionParser/" target="_top">FunctionParser</a>, courtesy of their authors. UMFPACK and FunctionParser
-  are covered by their own licenses; please  refer to the
-  <a href="http://www.cise.ufl.edu/research/sparse/umfpack/" target="_top">UMFPACK</a> and
-  <a href="http://www.students.tut.fi/~warp/FunctionParser/" target="_top">FunctionParser</a> 
-  webpages to read them. The files of these external libraries are not part of
-  <acronym>deal.II</acronym>, but are only distributed together;
-  please refer to the webpages of these projects for further
-  information on license questions. In particular, if you do not agree
-  with the conditions of the licenses of these external libraries, you
-  may not use these components of our distribution.
-  </p>
-
-  <p>
-  <acronym>deal.II</acronym> is distributed under the Q Public License
-  (or "QPL"), which qualifies as an <a
-  href="http://www.opensource.org/osd.html" target="_top">Open Source
-  license</a>. It is thus appropriate for people wishing to write
-  software under the <a href="http://www.opensource.org"
-  target="_top">Open Source</a> model where all source code to the
-  software is made available to all users and can be freely modified
-  and redistributed. QPL was originally developed by
-  <a href="http://www.troll.no" target="_top">Troll Tech</a> for their
-  Qt program library, but has since gained some support by other
-  library authors as well.
-  </p>
-
-  <p>
-  The QPL prohibits development of proprietary software. If you intend
-  to develop commercial software based on <acronym>deal.II</acronym>,
-  we are willing to negotiate a suitable agreement. Feel free to
-  contact us in this case.
-  </p>
-
-  <p>
-  For more information on the QPL, please see also the following
-  links:
-  <br>
-  &nbsp &nbsp
-  &nbsp &nbsp
-  <a href="http://www.trolltech.com/licenses/qpl-annotated.html" target="_top">Annotated version</a>
-  &nbsp &nbsp
-  <a href="http://www.troll.no/qpl/plaintext.txt" target="_top">Plain text version</a>
-  &nbsp &nbsp
-  <a href="http://www.troll.no/announce/qpl.html" target="_top">Announcement</a>
-  &nbsp &nbsp
-  <a href="http://www.troll.no/qpl/comments.html" target="_top">Comments</a>
-  </p>
-
-
-  <p>
-  In addition to the terms imposed by the QPL, we have one restriction
-  on the use of the library:
-  </p>
-  <ul>
-  <li> Every publication presenting numerical results obtained with
-       the help of <acronym>deal.II</acronym> shall state the name of
-       the library and its principal authors (at present Wolfgang
-       Bangerth, Guido Kanschat and Ralf Hartmann), as well as cite at
-       least one of
-       the papers by these authors on <acronym>deal.II</acronym>. This
-       is the usual, fair way of giving credits to contributors to a
-       scientific result, and using a complex programming environment
-       like <acronym>deal.II</acronym> should be considered a
-       significant contribution.
-  </ul>
+  is not in the public domain, it is property of and copyrighted by the
+  <acronym>deal.II</acronym> authors, and there are restrictions on
+  its use. The legally binding license <a href="#license-text">is
+  given at the bottom of this page</a>.
+  Furthermore, deal.II distributions come bundled with some third
+  party software for which the deal.II authors do not own the
+  copyright. The licenses of these parts are discussed <a
+  href="#3rdparty">below</a>.
 
   <p>
   In this document, as well as in the program files, the terms
@@ -104,16 +38,125 @@
   Bangerth, Guido Kanschat and Ralf Hartmann.
   </p>
 
+
+
+  <h3>Restrictions on and commercial use of the library</h3>
+
+  <p>
+
+  <acronym>deal.II</acronym> is distributed under the <a
+  href="http://www.opensource.org/osd.html" target="_top">Open Source
+  license</a> called the <em>Q Public License</em> (or "QPL") listed
+  in full below. Essentially, an interpretation of this license is
+  that you can use the library free of charge for developing your own
+  programs. However, if you plan to distribute these programs to others, 
+  certain restrictions are imposed by the QPL.
+  
+  <p>
+
+  In non-legal terms, the license stipulates that if you want
+  to give your program to someone else in whatever form (including as
+  a binary executable), you have to make the entire source code of
+  your own program and all modifications to the deal.II library
+  available free of charge as well.
+
+  <p>
+
+  We recognize that giving away the source code may be an
+  unacceptable restriction in a commercial setting. As the owners of
+  the sources, we are able to grant you a differently licensed version
+  of the deal.II library that does not contain this
+  requirement, and we are very much willing to negotiate the terms of
+  such a license. Please contact the authors of the library if you are
+  interested in commercial use of deal.II.
+
+
+
+  <h3>Referencing the library</h3>
+
+  <p>
+  In addition to the terms imposed by the QPL, we ask for the
+  following courtesy:
+  </p>
+  <ul>
+  <li> Every publication presenting numerical results obtained with
+       the help of <acronym>deal.II</acronym> should state the name of
+       the library and its principal authors, as well as cite
+       the canonical deal.II reference listed at the top of <a
+       href="publications/toc.html">the publications page</a>.
+  </ul>
+  This is the usual, fair way of giving credit to contributors to a
+  scientific result. In addition, it helps us justify our effort in
+  developing deal.II as an academic undertaking.
+
+  <p>
+
+  We keep a  <a href="publications/toc.html">list of publications
+  using deal.II</a>. Feel free to let us know about your publications.
+
+
+  <a name="3rdparty">
+  <h3>Parts of the deal.II distribution under a separate license</h3>
+  </a>
+
+  Some of the files in the <code>contrib/</code> subdirectory are by
+  other people, and are distributed under separate licenses. These
+  files are not part of the <acronym>deal.II</acronym> library, but
+  they are distributed together. They are generally available for use
+  in non-commercial academic settings. For commercial use and if you
+  want to distribute your codes, please consult the licenses of these
+  parts of the deal.II distribution.
+
+  <p>
+
+  In particular, these are libraries that we distribute in the
+  <code>contrib/</code> subdirectory, courtesy of their authors:
+  <ul>
+    <li> Parts of the <a href="http://www.boost.org/" target="_top">BOOST</a>
+         library.
+    <li> <a
+         href="http://www.cise.ufl.edu/research/sparse/umfpack/"
+         target="_top">UMFPACK</a>. For the license, see <a
+	 href="http://www.cise.ufl.edu/research/sparse/umfpack/"
+	 target="_top">UMFPACK</a>.
+    <li> <a href="http://www.students.tut.fi/~warp/FunctionParser/"
+         target="_top">FunctionParser</a>. For the license see <a
+	 href="http://www.students.tut.fi/~warp/FunctionParser/"
+	 target="_top">FunctionParser</a>.
+  </ul>
+
   <p>
     
-  Please note that <acronym>deal.II</acronym> can interface with a number of <a
+  <acronym>deal.II</acronym> can interface with a number of <a
   href="readme.html#external-libs">other packages</a> that you have to install
   yourself. They are, of course, covered by their own licenses.
   </p>
 
 
+
+  <h3>About the license</h3>
+
+  <p>
+  The QPL was originally developed by
+  <a href="http://www.troll.no" target="_top">Troll Tech</a> for their
+  Qt program library, but has since gained some support by other
+  library authors as well.
+  For more information on the QPL, please also consult the following
+  links:
+  <br>
+  &nbsp &nbsp
+  &nbsp &nbsp
+  <a href="http://www.trolltech.com/licenses/qpl-annotated.html" target="_top">Annotated version</a>
+  &nbsp &nbsp
+  <a href="http://www.troll.no/qpl/plaintext.txt" target="_top">Plain text version</a>
+  </p>
+
+
+
 <hr>
+<a name="license-text">
 <h1 align=center>
+</a>
 THE Q PUBLIC LICENSE
 version 1.0
 <br>
