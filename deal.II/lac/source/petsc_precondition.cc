@@ -61,6 +61,9 @@ namespace PETScWrappers
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCJACOBI));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
 
@@ -83,6 +86,9 @@ namespace PETScWrappers
                                      // preconditioner
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCBJACOBI));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
@@ -116,6 +122,9 @@ namespace PETScWrappers
 
                                      // then set flags as given
     ierr = PCSORSetOmega (pc, additional_data.omega);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
@@ -154,6 +163,9 @@ namespace PETScWrappers
                                      // convert SOR to SSOR
     ierr = PCSORSetSymmetric (pc, SOR_SYMMETRIC_SWEEP);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
 
@@ -186,6 +198,9 @@ namespace PETScWrappers
 
                                      // then set flags as given
     ierr = PCEisenstatSetOmega (pc, additional_data.omega);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
@@ -225,6 +240,9 @@ namespace PETScWrappers
     PCICCSetLevels (pc, additional_data.levels);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
 
@@ -261,6 +279,9 @@ namespace PETScWrappers
 #else
     PCILUSetLevels (pc, additional_data.levels);  
 #endif
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
@@ -317,6 +338,9 @@ namespace PETScWrappers
 #else
     ierr = PCFactorSetShiftNonzero (pc, additional_data.damping);
 #endif
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
