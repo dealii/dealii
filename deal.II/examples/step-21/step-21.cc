@@ -70,9 +70,37 @@
 using namespace dealii;
 
 
-                                 // @sect3{The ``TwoPhaseFlowProblem'' class template}
+                                 // @sect3{The ``TwoPhaseFlowProblem'' class}
                                  
-				 // This is the main class of the program. It is close to the one of step-20, but with 
+				 // This is the main class of the program. It
+				 // is close to the one of step-20, but with a
+				 // few additional functions:
+				 //
+				 // <ul>
+				 //   <li>``assemble_rhs_S'' assembles the
+				 //   right hand side of the saturation
+				 //   equation. As explained in the
+				 //   introduction, this can't be integrated
+				 //   into ``assemble_rhs'' since it depends
+				 //   on the velocity that is computed in the
+				 //   first part of the time step.
+				 //
+				 //   <li>``get_maximal_velocity'' does as its
+				 //   name suggests. This function is used in
+				 //   the computation of the time step size.
+				 //
+				 //   <li>``project_back_saturation'' resets
+				 //   all saturation degrees of freedom with
+				 //   values less than zero to zero, and all
+				 //   those with saturations greater than one
+				 //   to one.
+				 // <ul>
+				 //
+				 // The rest of the class should be pretty
+				 // much obvious. The ``viscosity'' variable
+				 // stores the viscosity $\mu$ that enters
+				 // several of the formulas in the nonlinear
+				 // equations.
 template <int dim>
 class TwoPhaseFlowProblem 
 {
@@ -84,10 +112,10 @@ class TwoPhaseFlowProblem
     void make_grid_and_dofs ();
     void assemble_system ();
     void assemble_rhs_S ();
-    void solve ();
-    void output_results (const unsigned int timestep_number) const;
     double get_maximal_velocity () const;
+    void solve ();
     void project_back_saturation ();
+    void output_results () const;
     
     const unsigned int   degree;
     
@@ -95,36 +123,34 @@ class TwoPhaseFlowProblem
     FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
 
-
     BlockSparsityPattern      sparsity_pattern;
     BlockSparseMatrix<double> system_matrix;
 
     const unsigned int n_refinement_steps;
     
     double time_step;
-    double vis;    
-    double vfs_out;
-    double v_out;
+    unsigned int timestep_number;
+    double viscosity;    
  
-    BlockVector<double>       solution;
-    BlockVector<double>       old_solution;
-    BlockVector<double>       system_rhs;
-    
-    
+    BlockVector<double> solution;
+    BlockVector<double> old_solution;
+    BlockVector<double> system_rhs;
 };
 
 
-				 //{Right hand side, boundary values and initial values}
-                                
-				 // we define the template for pressure right-hand side(source function)
-                                 //and boundary values for pressure and saturation
-                                 // initial values for saturation.
+				 // @sect3{Equation data}
 
+				 // @sect4{Pressure right hand side}
+				 // At present, the right hand side of the
+				 // pressure equation is simply the zero
+				 // function. However, the rest of the program
+				 // is fully equipped to deal with anything
+				 // else, if this is desired:
 template <int dim>
-class RightHandSide : public Function<dim> 
+class PressureRightHandSide : public Function<dim> 
 {
   public:
-    RightHandSide () : Function<dim>(1) {};
+    PressureRightHandSide () : Function<dim>(1) {};
     
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
@@ -132,6 +158,19 @@ class RightHandSide : public Function<dim>
 
 
 
+template <int dim>
+double
+PressureRightHandSide<dim>::value (const Point<dim>  &/*p*/,
+				   const unsigned int /*component*/) const 
+{
+  return 0;
+}
+
+
+				 // @sect4{Pressure boundary values}
+				 // The next are pressure boundary values. As
+				 // mentioned in the introduction, we choose a
+				 // linear pressure field:
 template <int dim>
 class PressureBoundaryValues : public Function<dim> 
 {
@@ -144,16 +183,68 @@ class PressureBoundaryValues : public Function<dim>
 
 
 template <int dim>
+double
+PressureBoundaryValues<dim>::value (const Point<dim>  &p,
+				    const unsigned int /*component*/) const 
+{
+  return 1-p[0];
+}
+
+
+				 // @sect4{Saturation boundary values}
+
+				 // Then we also need boundary values on the
+				 // inflow portions of the boundary. The
+				 // question whether something is an inflow
+				 // part is decided when assembling the right
+				 // hand side, we only have to provide a
+				 // functional description of the boundary
+				 // values. This is as explained in the
+				 // introduction:
+template <int dim>
 class SaturationBoundaryValues : public Function<dim> 
 {
   public:
-    SaturationBoundaryValues () : Function<dim>(dim+2) {};
+    SaturationBoundaryValues () : Function<dim>(1) {};
     
-    virtual void vector_value (const Point<dim> &p, 
-			       Vector<double>   &value) const;
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component = 0) const;
 };
 
 
+
+template <int dim>
+double
+SaturationBoundaryValues<dim>::value (const Point<dim> &p,
+				      const unsigned int /*component*/) const 
+{
+  if (p[0] == 0)
+    return 1;
+  else
+    return 0;
+}
+
+
+
+				 // @sect4{Initial data}
+
+				 // Finally, we need initial data. In reality,
+				 // we only need initial data for the
+				 // saturation, but we are lazy, so we will
+				 // later, before the first time step, simply
+				 // interpolate the entire solution for the
+				 // previous time step from a function that
+				 // contains all vector components.
+				 //
+				 // We therefore simply create a function that
+				 // returns zero in all components. We do that
+				 // by simply forward every function to the
+				 // ZeroFunction class. Why not use that right
+				 // away in the places of this program where
+				 // we presently use the ``InitialValues''
+				 // class? Because this way it is simpler to
+				 // later go back and choose a different
+				 // function for initial values.
 template <int dim>
 class InitialValues : public Function<dim> 
 {
@@ -169,63 +260,12 @@ class InitialValues : public Function<dim>
 };
 
 
-
-
-				 // And then we also have to define
-				 // these respective functions, of
-				 // course. Given our discussion in
-				 // the introduction of how the
-				 // solution should look like, the
-				 // following computations should be
-				 // straightforward:
 template <int dim>
-double RightHandSide<dim>::value (const Point<dim>  &/*p*/,
-				  const unsigned int /*component*/) const 
+double
+InitialValues<dim>::value (const Point<dim>  &p,
+			   const unsigned int component) const 
 {
-  return 0;
-}
-
-
-
-template <int dim>
-double PressureBoundaryValues<dim>::value (const Point<dim>  &p,
-					   const unsigned int /*component*/) const 
-{
-  return 1-p[0];
-}
-
-
-template <int dim>
-void
-SaturationBoundaryValues<dim>::vector_value (const Point<dim> &p,
-					     Vector<double>   &values) const 
-{
-  Assert (values.size() == dim+2,
-	  ExcDimensionMismatch (values.size(), dim+2));
-
-  for (unsigned int d=0; d<dim+1; ++d)
-    values(d) = 0;
-
-  if (p[0] == 0)
-    values(dim+1) = 1;
-  else
-    values(dim+1) = 0;
-}
-
-
-
-template <int dim>
-double InitialValues<dim>::value (const Point<dim>  &p,
-				  const unsigned int component) const 
-{
-  if(component<dim+1)
-    return 0;
-  else 
-    { 
-      if(p[0]==0)return 1;
-      else return 0;
-    }
-  
+  return ZeroFunction<dim>(dim+2).value (p, component);
 }
 
 
@@ -234,21 +274,146 @@ void
 InitialValues<dim>::vector_value (const Point<dim> &p,
 				  Vector<double>   &values) const 
 {
-  Assert (values.size() == dim+2,
-	  ExcDimensionMismatch (values.size(), dim+2));
-
-  for (unsigned int d=0; d<dim+1; ++d)
-    values(d) = 0;
-  values(dim+1) = InitialValues::value(p,dim+1);
+  ZeroFunction<dim>(dim+2).vector_value (p, values);
 }
 
 
 
 
-				 // @sect3{The inverse permeability tensor, Coefficient and inverse mobility scalar}
+				 // @sect3{The inverse permeability tensor}
+
+				 // As announced in the introduction, we
+				 // implement two different permeability
+				 // tensor fields. Each of them we put into a
+				 // namespace of its own, so that it will be
+				 // easy later to replace use of one by the
+				 // other in the code.
+
+				 // @sect4{Random medium permeability}
+
+				 // This function does as announced in the
+				 // introduction, i.e. it creates an overlay
+				 // of exponentials at random places. There is
+				 // one thing worth considering for this
+				 // class. The issue centers around the
+				 // problem that the class creates the centers
+				 // of the exponentials using a random
+				 // function. If we therefore created the
+				 // centers each time we create an object of
+				 // the present type, we would get a different
+				 // list of centers each time. That's not what
+				 // we expect from classes of this type: they
+				 // should reliably represent the same
+				 // function.
+				 //
+				 // The solution to this problem is to make
+				 // the list of centers a static member
+				 // variable of this class, i.e. there exists
+				 // exactly one such variable for the entire
+				 // program, rather than for each object of
+				 // this type. That's exactly what we are
+				 // going to do.
+				 //
+				 // The next problem, however, is that we need
+				 // a way to initialize this variable. Since
+				 // this variable is initialized at the
+				 // beginning of the program, we can't use a
+				 // regular member function for that since
+				 // there may not be an object of this type
+				 // around at the time. The C++ standard
+				 // therefore says that only non-member and
+				 // static member functions can be used to
+				 // initialize a static variable. We use the
+				 // latter possibility by defining a function
+				 // ``get_centers'' that computes the list of
+				 // center points when called.
+				 //
+				 // Note that this class works just fine in
+				 // both 2d and 3d, with the only difference
+				 // being that we use more points in 3d: by
+				 // experimenting we find that we need more
+				 // exponentials in 3d than in 2d (we have
+				 // more ground to cover, after all, if we
+				 // want to keep the distance between centers
+				 // roughly equal), so we choose 40 in 2d and
+				 // 150 in 3d. For any other dimension, the
+				 // function does presently not know what to
+				 // do so simply throws an exception
+				 // indicating exactly this.
+namespace RandomMedium
+{
+  template <int dim>
+  class KInverse : public TensorFunction<2,dim>
+  {
+    public:
+      virtual void value_list (const std::vector<Point<dim> > &points,
+			       std::vector<Tensor<2,dim> >    &values) const;
+
+    private:
+      static std::vector<Point<dim> > centers;
+
+      static std::vector<Point<dim> > get_centers ();
+  };
+
+
+
+  template <int dim>
+  std::vector<Point<dim> >
+  KInverse<dim>::centers = KInverse<dim>::get_centers();
+
+
+  template <int dim>
+  std::vector<Point<dim> >
+  KInverse<dim>::get_centers ()
+  {
+    const unsigned int N = (dim == 2 ?
+			    40 :
+			    (dim == 3 ?
+			     150 :
+			     throw ExcNotImplemented()));
+  
+    std::vector<Point<dim> > centers_list (N);
+    for (unsigned int i=0; i<N; ++i)
+      for (unsigned int d=0; d<dim; ++d)
+	centers_list[i][d] = 1.*rand()/RAND_MAX;
+
+    return centers_list;
+  }
+
+
+
+  template <int dim>
+  void
+  KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
+			     std::vector<Tensor<2,dim> >    &values) const
+  {
+    Assert (points.size() == values.size(),
+	    ExcDimensionMismatch (points.size(), values.size()));
+
+    for (unsigned int p=0; p<points.size(); ++p)
+      {
+	values[p].clear ();
+
+	double permeability = 0;
+	for (unsigned int i=0; i<centers.size(); ++i)
+	  permeability += std::exp(-(points[p]-centers[i]).square()
+				   / (0.05 * 0.05));
+      
+	const double normalized_permeability
+	  = std::min (std::max(permeability, 0.01), 4.);
+      
+	for (unsigned int d=0; d<dim; ++d)
+	  values[p][d][d] = 1./normalized_permeability;
+      }
+  }
+}
+
+
+
+				 // @sect3{The inverse permeability tensor and the inverse mobility function}
 
                                 
-                                 //For the inverse  permeability tensor,
+                                 // For the inverse  permeability tensor,
                                  // ``KInverse''.As in introduction, '
                                  // assume the heterogeneous is isotropic,
                                  // so it is a scalar multipy the identity matrix.
@@ -275,67 +440,14 @@ InitialValues<dim>::vector_value (const Point<dim> &p,
                                  // function, and returns the values
                                  // of the function in the second
                                  // argument, a list of tensors:
-template <int dim>
-class KInverse : public TensorFunction<2,dim>
+double mobility_inverse (const double S, const double viscosity)
 {
-  public:
-    KInverse ();
-    
-    virtual void value_list (const std::vector<Point<dim> > &points,
-			     std::vector<Tensor<2,dim> >    &values) const;
-
-  private:
-    std::vector<Point<dim> > centers;
-};
-
-
-template <int dim>
-KInverse<dim>::KInverse () 
-{
-  const unsigned int N = 40;
-  centers.resize (N);
-  for (unsigned int i=0; i<N; ++i)
-    for (unsigned int d=0; d<dim; ++d)
-      centers[i][d] = 1.*rand()/RAND_MAX;
+  return 1.0 /(1.0/viscosity * S * S + (1-S) * (1-S));
 }
 
-
-
-template <int dim>
-void
-KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
-                           std::vector<Tensor<2,dim> >    &values) const
-{
-  Assert (points.size() == values.size(),
-	  ExcDimensionMismatch (points.size(), values.size()));
-
-  for (unsigned int p=0; p<points.size(); ++p)
-    {
-      values[p].clear ();
-
-      double permeability = 0;
-      for (unsigned int i=0; i<centers.size(); ++i)
-        permeability += std::exp(-(points[p]-centers[i]).square()
-                                 / (0.05 * 0.05));
-      
-      const double normalized_permeability
-        = std::min (std::max(permeability, 0.01), 4.);
-      
-      for (unsigned int d=0; d<dim; ++d)
-	values[p][d][d] = 1./normalized_permeability;
-    }
-}
-
-
-
-double mobility_inverse (const double S, const double vis)
-{
-  return 1.0 /(1.0/vis * S * S + (1-S) * (1-S));
-}
-
-double f_saturation(const double S, const double vis)
+double f_saturation(const double S, const double viscosity)
 {   
-  return S*S /( S * S +vis * (1-S) * (1-S));
+  return S*S /( S * S +viscosity * (1-S) * (1-S));
 }
 
 
@@ -427,9 +539,9 @@ TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem (const unsigned int degree)
                     FE_DGQ<dim>(degree), 1,
 		    FE_DGQ<dim>(degree), 1),
 		dof_handler (triangulation),
-		n_refinement_steps (5),
+		n_refinement_steps (4),
 		time_step (10.0/std::pow(2.0, double(n_refinement_steps))/6),
-                vis (0.2)
+                viscosity (0.2)
                 
 {}
 
@@ -539,8 +651,6 @@ void TwoPhaseFlowProblem<dim>::make_grid_and_dofs ()
                                  //at that time, we have the new velocity solved
                                  // we can use it to assemble Matrixblock(0,2)
                     
-  const KInverse<2>               k_inverse;
-
 template <int dim>
 void TwoPhaseFlowProblem<dim>::assemble_system () 
 {  
@@ -578,11 +688,13 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
                                    // in the case of the coefficient,
                                    // the array has to be one of
                                    // matrices.
-  const RightHandSide<dim>          right_hand_side;
+  const PressureRightHandSide<dim>  pressure_right_hand_side;
   const PressureBoundaryValues<dim> pressure_boundary_values;
+  const RandomMedium::KInverse<dim> k_inverse;
+
    
   
-  std::vector<double>               rhs_values (n_q_points);
+  std::vector<double>               pressure_rhs_values (n_q_points);
   std::vector<double>               boundary_values (n_face_q_points);
   std::vector<Tensor<2,dim> >       k_inverse_values (n_q_points);
   
@@ -611,8 +723,8 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
       local_rhs = 0;
 
       fe_values.get_function_values (old_solution, old_solution_values);
-      right_hand_side.value_list (fe_values.get_quadrature_points(),
-                                  rhs_values);
+      pressure_right_hand_side.value_list (fe_values.get_quadrature_points(),
+					   pressure_rhs_values);
       k_inverse.value_list (fe_values.get_quadrature_points(),
                             k_inverse_values);
       
@@ -636,7 +748,7 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
                 const double phi_j_s = extract_s (fe_values, j, q);  
 		
                 local_matrix(i,j) += (phi_i_u * k_inverse_values[q] *
-				      mobility_inverse(old_s,vis) * phi_j_u            
+				      mobility_inverse(old_s,viscosity) * phi_j_u            
                                       - div_phi_i_u * phi_j_p
                                       - phi_i_p * div_phi_j_u
 				      + phi_i_s * phi_j_s
@@ -644,7 +756,7 @@ void TwoPhaseFlowProblem<dim>::assemble_system ()
                                      * fe_values.JxW(q);     
               }
 
-            local_rhs(i) += (-phi_i_p * rhs_values[q])*
+            local_rhs(i) += (-phi_i_p * pressure_rhs_values[q])*
                             fe_values.JxW(q);
           }
       
@@ -726,9 +838,6 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
   const unsigned int   n_q_points      = quadrature_formula.n_quadrature_points;
   const unsigned int   n_face_q_points = face_quadrature_formula.n_quadrature_points;
   
-  vfs_out = 0.0;
-  v_out = 0.0;  
-  
   Vector<double>       local_rhs (dofs_per_cell);
   std::vector<Vector<double> > old_solution_values(n_q_points, Vector<double>(dim+2));
   std::vector<Vector<double> > old_solution_values_face(n_face_q_points, Vector<double>(dim+2));
@@ -763,7 +872,7 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
 	    const Tensor<1,dim> grad_phi_i_s = extract_grad_s(fe_values, i, q);
 	    	     
 	    local_rhs(i) += (
-	      time_step *(f_saturation(old_s,vis) * present_u * grad_phi_i_s)+
+	      time_step *(f_saturation(old_s,viscosity) * present_u * grad_phi_i_s)+
 	      old_s * phi_i_s)
 			    * fe_values.JxW(q);
 	  }
@@ -779,6 +888,7 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
 
 	  if (cell->at_boundary(face_no))
 	    {
+//TODO: use real boundary values from SaturationBoundaryValues!	      
 	      if (cell->face(face_no)->boundary_indicator() == 1)
 		for (unsigned int q=0;q<n_face_q_points;++q)
 		  neighbor_saturation[q] = 1;
@@ -804,19 +914,6 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
 	    }
           
 
-	  if (cell->at_boundary(face_no))
-	    {	
-	      if (cell->face(face_no)->boundary_indicator() ==2 )
-		{for (unsigned int q=0;q<n_face_q_points;++q)
-		  {
-		    vfs_out += present_solution_values_face[q](0)
-			       *f_saturation(present_solution_values_face[q](dim+1),vis)
-			       *fe_face_values.JxW(q);
-		    v_out += present_solution_values_face[q](0)
-			     *fe_face_values.JxW(q);
-		  }     	                     
-		}
-	    }
 	  for (unsigned int q=0;q<n_face_q_points;++q)
 	    {
 	      Tensor<1,dim> present_u_face;
@@ -833,7 +930,7 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
 		  for (unsigned int i=0; i<dofs_per_cell; ++i)
 		    { 
 		      const double outflow = -time_step * normal_flux 
-					     * f_saturation(old_solution_values_face[q](dim+1),vis)
+					     * f_saturation(old_solution_values_face[q](dim+1),viscosity)
 					     * extract_s(fe_face_values,i,q)
 					     * fe_face_values.JxW(q);
 		      local_rhs(i) += outflow;
@@ -845,7 +942,7 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
 		  for (unsigned int i=0; i<dofs_per_cell; ++i)
 		    {
 		      const double inflow = -time_step * normal_flux 
-					    * f_saturation( neighbor_saturation[q],vis)
+					    * f_saturation( neighbor_saturation[q],viscosity)
 					    * extract_s(fe_face_values,i,q)
 					    * fe_face_values.JxW(q);
 		      local_rhs(i) += inflow;
@@ -1091,8 +1188,7 @@ void TwoPhaseFlowProblem<dim>::solve ()
                                  // the one in which we generate
                                  // graphical output.
 template <int dim>
-void TwoPhaseFlowProblem<dim>::output_results 
-(const unsigned int timestep_number)  const
+void TwoPhaseFlowProblem<dim>::output_results ()  const
 {  
   std::vector<std::string> solution_names;
   switch (dim)
@@ -1124,7 +1220,7 @@ void TwoPhaseFlowProblem<dim>::output_results
   data_out.build_patches (degree+1);
   
   std::ostringstream filename;
-  filename << "solution-"<< timestep_number << ".vtk";
+  filename << "solution-" << timestep_number << ".vtk";
 
   std::ofstream output (filename.str().c_str());
   data_out.write_vtk (output);
@@ -1136,18 +1232,18 @@ template <int dim>
 void
 TwoPhaseFlowProblem<dim>::project_back_saturation ()
 {
-  for (unsigned int i=0; i<solution.block(dim).size(); ++i)
-    if (solution.block(dim)(i) < 0)
+  for (unsigned int i=0; i<solution.block(2).size(); ++i)
+    if (solution.block(2)(i) < 0)
       {
-	std::cout << "xxx       " << solution.block(dim)(i) << std::endl;
-	solution.block(dim)(i) = 0;
+	std::cout << "xxx       " << solution.block(2)(i) << std::endl;
+	solution.block(2)(i) = 0;
       }
   
     else
-      if (solution.block(dim)(i) > 1)
+      if (solution.block(2)(i) > 1)
 	{
-	  std::cout << "xxx       " << solution.block(dim)(i) << std::endl;
-	  solution.block(dim)(i) = 1;
+	  std::cout << "xxx       " << solution.block(2)(i) << std::endl;
+	  solution.block(2)(i) = 1;
 	}
 }
 
@@ -1212,9 +1308,9 @@ void TwoPhaseFlowProblem<dim>::run ()
   VectorTools::project (dof_handler, constraints, QGauss<dim>(degree+2),InitialValues<dim>(),tmp);
   std::copy (tmp.begin(), tmp.end(), old_solution.begin());
   
-  unsigned int timestep_number = 1;
-
+  timestep_number = 1;
   double time = 0;
+  
   do
     { 
       std::cout << "Timestep " << timestep_number
@@ -1224,7 +1320,7 @@ void TwoPhaseFlowProblem<dim>::run ()
 
       solve ();
       
-      output_results(timestep_number);
+      output_results ();
 
       time += time_step;
       ++timestep_number;
