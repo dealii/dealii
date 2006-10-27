@@ -20,6 +20,11 @@ it, this introduction will cover the use of block matrices and vectors, the
 definition of solvers and preconditioners, and finally the actual test case we
 are going to solve.
 
+We are going to extend this tutorial program in @ref step_21 "step-21" to
+solve not only the mixed Laplace equation, but add another equation that
+describes the transport of a mixture of two fluids.
+
+
 <h3>Formulation, weak form, and discrete problem</h3>
 
 In the form above, the Laplace equation is considered a good model equation
