@@ -7,7 +7,8 @@ In this project, we propose a numerical simulation for two phase
 flow problems in porous media. This problem includes one
 elliptic equation and one nonlinear, time dependent transport
 equation. This is therefore also the first time-dependent tutorial
-program (besides the somewhat strange time-dependence of step-18). 
+program (besides the somewhat strange time-dependence of @ref step_18
+"step-18").  
 
 
 <h2>The two phase flow problem</h2>
@@ -64,11 +65,11 @@ Here, $q$ is th sum source term, and
 @f]
 is the total mobility.
 
-So far, this looks like an ordinary stationary, Poisson-like equation
-that we can solve right away with the techniques of the first few
-tutorial programs (take a look at step-6, for example, for something
-very similar). However, we have not said anything yet about the
-saturation, which of course is going to change as the fluids move around.
+So far, this looks like an ordinary stationary, Poisson-like equation that we
+can solve right away with the techniques of the first few tutorial programs
+(take a look at @ref step_6 "step-6", for example, for something very
+similar). However, we have not said anything yet about the saturation, which
+of course is going to change as the fluids move around.
 
 The second part of the equations is a therefore description of the
 dynamics of the saturation. We model this as an advected quantity:
@@ -137,17 +138,17 @@ In the reservoir simulation community, it is common to solve the equations
 derived above by going back to the first order, mixed formulation. To this
 end, we re-introduce the total velocity $\mathbf u$ and write the equations in
 the following form:
-\f{eqnarray*}
+@f{eqnarray*}
   \mathbf{u}+\mathbf{K}\lambda(S) \nabla p&=&0 \\
   \nabla \cdot\mathbf{u} &=& 0 \\
   S_{t} + \mathbf{u} \cdot \nabla F(S) &=& 0.
-\f}
+@f}
 This formulation has the additional benefit that we do not have to express the
 total velocity $\mathbf u$ appearing in the transport equation as a function
 of the pressure, but can rather take the primary variable for it. Given the
 saddle point structure of the first two equations and their similarity to the
-mixed Laplace formulation we have introduced in step-20, it will come as no
-surprise that we will use a mixed discretization again. 
+mixed Laplace formulation we have introduced in @ref step_20 "step-20", it
+will come as no surprise that we will use a mixed discretization again. 
 
 But let's postpone this for a moment. The first business we have with these
 equations is to think about the time discretization. In reservoir simulation,
@@ -156,11 +157,11 @@ the pressure using an implicit equation, then the saturation using an explicit
 time stepping scheme. The algorithm is called IMPES for IMplicit Pressure
 Explicit Saturation. In a slightly modified form, this algorithm can be
 written as follows: for each time step, solve
-\f{eqnarray*}
+@f{eqnarray*}
   \mathbf{u}^{n+1}+\mathbf{K}\lambda(S^n) \nabla p^{n+1}&=&0 \\
   \nabla \cdot\mathbf{u}^{n+1} &=& 0 \\
   \frac {S^{n+1}-S^n}{\triangle t} + \mathbf{u}^{n+1} \cdot \nabla F(S^n) &=& 0,
-\f}
+@f}
 where $\triangle t$ is the length of a time step. Note how we solve the
 implicit pressure-velocity system that only depends on the previously computed
 saturation $S^n$, and then do an explicit time step for $S^{n+1}$ that only
@@ -169,19 +170,19 @@ depends on the previously known $S^n$ and the just computed $\mathbf{u}^{n+1}$.
 We can then state the problem in weak form as follows, by multiplying each
 equation with test functions $\mathbf v$, $q$, and $\sigma$ and integrating
 terms by parts:
-\f{eqnarray*}
+@f{eqnarray*}
   \left((\mathbf{K}\lambda(S^n))^{-1} \mathbf{u}^{n+1},\mathbf v\right)_\Omega -
   (p^{n+1}, \nabla\cdot\mathbf v)_\Omega &=& 
   - (p^{n+1}, \mathbf v)_{\partial\Omega} 
   \\
   (\nabla \cdot\mathbf{u}^{n+1}, q)_\Omega &=& 0 
-\f}
+@f}
 Note that in the first term, we have to prescribe the pressure $p^{n+1}$ on
 the boundary $\partial\Omega$ as boundary values for our problem. $\mathbf n$
 denotes the unit outward normal vector to $\partial K$, as usual.
 
 For the saturation equation, we obtain
-\f{eqnarray*}
+@f{eqnarray*}
   (S^{n+1}, \sigma)_\Omega
   +
   \triangle t 
@@ -193,10 +194,10 @@ For the saturation equation, we obtain
   \right\}
   &=&
   (S^n,\sigma)_\Omega.
-\f}
+@f}
 Using the fact that $\nabla \cdot \mathbf{u}^{n+1}=0$, we can rewrite the cell
 term to get an equation as follows:
-\f{eqnarray*}
+@f{eqnarray*}
   (S^{n+1}, \sigma)_\Omega
   +
   \triangle t 
@@ -208,16 +209,17 @@ term to get an equation as follows:
   \right\}
   &=&
   (S^n,\sigma)_\Omega.
-\f}
+@f}
 
 
 
 <h2>Space discretization</h2>
 
-In each time step, we then apply the mixed finite method of step-20 to the
-velocity and pressure. To be well-posed, we choose Raviart-Thomas spaces
-$RT_{k}$ for $\mathbf{u}$ and discontinuous elements of class $DQ_{k}$ for
-$p$. For the saturation, we will also choose $DQ_{k}$ spaces.
+In each time step, we then apply the mixed finite method of @ref step_20
+"step-20" to the velocity and pressure. To be well-posed, we choose
+Raviart-Thomas spaces $RT_{k}$ for $\mathbf{u}$ and discontinuous elements of
+class $DQ_{k}$ for $p$. For the saturation, we will also choose $DQ_{k}$
+spaces.
 
 Since we have discontinuous spaces, we have to think about how to evaluate
 terms on the interfaces between cells, since discontinuous functions are not
@@ -239,17 +241,18 @@ The quantities $S_+,\mathbf{u}_+$ then correspond to the values of these
 variables on the present cell, whereas $S_-,\mathbf{u}_-$ (needed on the
 inflow part of the boundary of $K$) are quantities taken from the neighboring
 cell. Some more context on discontinuous element techniques and evaluation of
-fluxes can also be found in step-12.
+fluxes can also be found in @ref step_12 "step-12".
 
 
 <h2>Linear solvers</h2>
 
 The linear solvers used in this program are a straightforward extension of the
-ones used in step-20. Essentially, we simply have to extend everything from
+ones used in @ref step_20 "step-20". Essentially, we simply have to extend
+everything from 
 two to three solution components. If we use the discrete spaces
 mentioned above and put shape functions into the bilinear forms, we
 arrive at the following linear system to be solved for time step $n+1$:
-\f[
+@f[
 \left(
 \begin{array}{ccc}
 M^u(S^{n}) & B^{T}& 0\\
@@ -268,11 +271,11 @@ B &    0 & 0\\
 0 \\ F_2 \\ F_3
 \end{array}
 \right)
-\f]
+@f]
 where the individual matrices and vectors are defined as follows using
 shape functions $\mathbf v_i$ (of type Raviart Thomas $RT_k$) for
 velocities and $\phi_i$ (of type $DG_k$) for both pressures and saturations:
-\f{eqnarray*}
+@f{eqnarray*}
 M^u(S^n)_{ij} &=&
 \left((\mathbf{K}\lambda(S^n))^{-1} \mathbf{v}_i,\mathbf
 v_j\right)_\Omega,
@@ -298,7 +301,7 @@ M^S_{ij} &=&
 \\
 (F_3)_i &=&
 (S^n,\phi_i)_\Omega.
-\f}
+@f}
 
 Note the following complication, however: Since the matrix $H_{ij}$
 depends on $\mathbf u^{n+1}$ implicitly (the velocities are needed to
@@ -309,10 +312,10 @@ have solved for the velocities.
 The solution scheme then involves the following steps:
 <ol>
   <li>Solve for the pressure $p^{n+1}$ using the Schur complement
-  technique introduced in step-20.
+  technique introduced in @ref step_20 "step-20".
 
   <li>Solve for the velocity $\mathbf u^{n+1}$ as also discussed in
-  step-20. 
+  @ref step_20 "step-20".
 
   <li>Compute the term $F_3-\triangle t\; H \mathbf u^{n+1}$, using
   the just computed velocities. 
@@ -330,39 +333,128 @@ its content, i.e. all three of its block components, into the variable
 <code>old_solution</code> for use in the next time step.
 
 
-<h2>Test Case</h2>
+<h2>Choosing a time step</h2>
 
-For simplicity, in our project we will assume no
-source $q=0$ and the heterogeneous porous medium is isotropic
-$\mathbf{K}(x,y) =
-k(x,y) \mathbf{I}$.
+A general rule of thumb in hyperbolic transport equations like the equation we
+have to solve for the saturation equation is that if we use an explicit time
+stepping scheme, then we should use a time step such that the distance that a
+particle can travel within one time step is no larger than the diameter of a
+single cell. In other words, here, we should choose
+@f[
+  \triangle t_{n+1} \le \frac h{|\mathbf{u}^{n+1}(\mathbf{x})|}.
+@f]
+Fortunately, we are in a position where we can do that: we only need the
+time step when we want to assemble the right hand side of the saturation
+equation, which is after we have already solved for $\mathbf{u}^{n+1}$. All we
+therefore have to do after solving for the velocity is to loop over all
+quadrature points in the domain and determine the maximal magnitude of the
+velocity. We can then set the time step for the saturation equation to
+@f[
+  \triangle t_{n+1} = \frac h{\max_{\mathbf{x}}|\mathbf{u}^{n+1}(\mathbf{x})|}.
+@f]
 
-Our two dimensional numerical simulation will be done on unit cell
-$\Omega = [0,1]\times [0,1]$ for $t\in [0,T]$.
-%Boundary conditions are:
-\f[
-\begin{array}{cr}
-p(x,y)=1 & \forall(x,y)\in \Gamma_{1}:=\{(x,y)\in \partial \Omega: x=0\}\\
-p(x,y)=0 & \forall(x,y)\in  \Gamma_{2}:=\{(x,y)\in \partial \Omega: x=1\}\\
-\mathbf{u}(x,y)\cdot \mathbf{n}=0 & \forall(x,y)\in
-\partial\Omega \setminus(\Gamma_{1}\bigcup \Gamma_{2})
-\end{array}
-\f]
+Note that we will have similar restrictions on the time step also in @ref
+step_23 "step-23" and @ref step_24 "step-24" where we solve the time dependent
+wave equation, another hyperbolic problem.
 
-Initial conditions are:
-\f[
-\begin{array}{cr}
-S(x,y,t=0)= 1& \forall (x,y) \in \Gamma_{1}\\
-S(x,y,t=0) = 0 & \forall(x,y)\in \partial \Omega \setminus
-\Gamma_{1}
-\end{array}
-\f]
 
-Our two phase flow are chosen as water and oil. The total mobility
-is : @f[\lambda (S) = \frac{1.0}{\mu} S^2 +(1-S)^2@f] Permeability is
-:
-@f[K(x,y)=\mathbf{k}(x,y)I=\frac{1.0}{2+1.99\sin(2\pi\frac{2x-y}{\epsilon})}
-I@f]
- Fractional flow of water is: @f[F(S)=\frac{S^2}{S^2+\mu (1-S)^2}@f]
-Choose $\epsilon=0.05$ , viscosity $\mu=0.2$.
-The resulting solution will be shown in result part.
+<h2>The test case</h2>
+
+For simplicity, this program assumes that there is no source, $q=0$, and that
+the heterogeneous porous medium is isotropic $\mathbf{K}(\mathbf{x}) =
+k(\mathbf{x}) \mathbf{I}$. The first one of these is a realistic assumption in
+oil reservoirs: apart from injection and production wells, there are usually
+no mechanisms for fluids to appear or disappear out of the blue. The second
+one is harder to justify: on a microscopic level, most rocks are isotropic,
+because they consist of a network of interconnected pores. However, this
+microscopic scale is out of the range of today's computer simulations, and we
+have to be content with simulating things on the scale of meters. On that
+scale, however, fluid transport typically happens through a network of crasks
+in the rock, rather than throuh pores. However, cracks often result from
+external stress fields in the rock layer (for example from tectonic faulting)
+and the cracks are therefore roughly aligned. This leads to a situation where
+the permeability is often orders of magnitude larger in the direction parallel
+to the cracks than perpendicular to the cracks. A problem typically faces in
+reservoir simulation, however, is that the modeler doesn't know the direction
+of cracks because oil reservoirs are not accessible to easy inspection. The
+only solution in that case is to assume an effective, isotropic permeability.
+
+Whatever the matter, both of these restrictions, no sources and isotropy,
+would be easy to lift with a few lines of code in the program.
+
+Next, for simplicity, our numerical simulation will be done on the
+unit cell $\Omega = [0,1]\times [0,1]$ for $t\in [0,T]$. Our initial
+conditions are $S(\mathbf{x},0)=0$; in the oil reservoir picture, where $S$
+would indicate the water saturation, this means that the reservoir contains
+pure oil at the beginning. Note that we do not need any initial
+conditions for pressure or velocity, since the equations do not contain time
+derivatives of these variables. Finally, we impose the following pressure
+boundary conditions:
+@f[
+  p(\mathbf{x},t)=1-x_1 \qquad \textrm{on}\ \partial\Omega.
+@f]
+Since the pressure and velocity solve a mixed form Poisson equation, the
+imposed pressure leads to a resulting flow field for the velocity. On the
+other hand, this flow field determines whether a piece of the boundary is of
+inflow or outflow type, which is of relevance because we have to impose
+boundary conditions for the saturation on the inflow part of the boundary,
+@f[
+  \Gamma_{in}(t) = \{\mathbf{x}\in\partial\Omega: 
+                     \mathbf{n} \cdot \mathbf{u}(\mathbf{x},t) < 0\}.
+@f]
+On this inflow boundary, we impose the following saturation values:
+@f{eqnarray}
+  S(\mathbf{x},t) = 1 & \textrm{on}\ \Gamma_{in}\cap\{x_1=1\},
+  \\
+  S(\mathbf{x},t) = 0 & \textrm{on}\ \Gamma_{in}\backslash \{x_1=1\}.
+@f}
+In other words, we have pure water entering the reservoir at the left, whereas
+the other parts of the boundary are in contact with undisturbed parts of the
+reservoir and whenever influx occurs on these boundaries, pure oil will enter.
+
+In our simulations, we choose the total mobility as
+@f[
+  \lambda (S) = \frac{1.0}{\mu} S^2 +(1-S)^2
+@f]
+where we use $\mu=0.2$ for the viscosity. In addition, the fractional flow of
+water is given by 
+@f[
+  F(S)=\frac{S^2}{S^2+\mu (1-S)^2}
+@f] 
+
+Finally, we will show results for computations with the two permeability
+functions introduced at the end of the results section of @ref step_20
+"step-20":
+<ul>
+  <li>A function that models a single, winding crack that snakes through the
+  domain. In analgy to @ref step_20 "step-20", but taking care of the slightly
+  different geometry we have here, we describe this by the following function
+  @f[
+    k(\mathbf x) 
+    = 
+    \max \{ e^{-\left(\frac{x_2-\frac 12 - 0.1\sin(10x_1)}{0.1}\right)^2}, 0.01 \}.
+  @f]
+  Taking the maximum is necessary to ensure that the ratio between maximal and
+  minimal permeability remains bounded. If we don't do that, permeabilities
+  will span many orders of magnitude. On the other hand, the ratio between
+  maximal and minimal permeability is a factor in the condition number of the
+  Schur complement matrix, and if too large leads to problems for which our
+  linear solvers will no longer converge properly.
+
+  <li>A function that models a somewhat random medium. Here, we choose 
+  @f{eqnarray*}
+    k(\mathbf x) 
+    &=& 
+    \min \{ \max \{ \sum_{i=1}^N \sigma_i(\mathbf{x}), 0.01 \}, 4\},
+    \\
+    \sigma_i(\mathbf x) 
+    &=& 
+    e^{-\left(\frac{|\mathbf{x}-\mathbf{x}_i|}{0.05}\right)^2},
+  @f}
+  where the centers $\mathbf{x}_i$ are $N$ randomly chosen locations inside
+  the domain. This function models a domain in which there are $N$ centers of
+  higher permeability (for example where rock has cracked) embedded in a
+  matrix of more pristine, unperturbed background rock. Note that here we have
+  cut off the permeability function both above and below to ensure a bounded
+  condition number.
+</ul>
