@@ -350,8 +350,16 @@ therefore have to do after solving for the velocity is to loop over all
 quadrature points in the domain and determine the maximal magnitude of the
 velocity. We can then set the time step for the saturation equation to
 @f[
-  \triangle t_{n+1} = \frac h{\max_{\mathbf{x}}|\mathbf{u}^{n+1}(\mathbf{x})|}.
+  \triangle t_{n+1} = \frac {\min_K h_K}{\max_{\mathbf{x}}|\mathbf{u}^{n+1}(\mathbf{x})|}.
 @f]
+
+Why is it important to do this? If we don't, then we will end up with lots of
+places where our saturation is larger than one or less than zero, as can
+easily be verified. (Remember that the saturation corresponds to something
+like the water fraction in the fluid mixture, and therefore must physically be
+between 0 and 1.) On the other hand, if we choose our time step according to
+the criterion listed above, this only happens very very infrequently &mdash;
+in fact only once for the entire run of the program.
 
 Note that we will have similar restrictions on the time step also in @ref
 step_23 "step-23" and @ref step_24 "step-24" where we solve the time dependent
@@ -428,11 +436,11 @@ functions introduced at the end of the results section of @ref step_20
 <ul>
   <li>A function that models a single, winding crack that snakes through the
   domain. In analgy to @ref step_20 "step-20", but taking care of the slightly
-  different geometry we have here, we describe this by the following function
+  different geometry we have here, we describe this by the following function:
   @f[
     k(\mathbf x) 
     = 
-    \max \{ e^{-\left(\frac{x_2-\frac 12 - 0.1\sin(10x_1)}{0.1}\right)^2}, 0.01 \}.
+    \max \left\{ e^{-\left(\frac{x_2-\frac 12 - 0.1\sin(10x_1)}{0.1}\right)^2}, 0.01 \right\}.
   @f]
   Taking the maximum is necessary to ensure that the ratio between maximal and
   minimal permeability remains bounded. If we don't do that, permeabilities
@@ -445,7 +453,7 @@ functions introduced at the end of the results section of @ref step_20
   @f{eqnarray*}
     k(\mathbf x) 
     &=& 
-    \min \{ \max \{ \sum_{i=1}^N \sigma_i(\mathbf{x}), 0.01 \}, 4\},
+    \min \left\{ \max \left\{ \sum_{i=1}^N \sigma_i(\mathbf{x}), 0.01 \right\}, 4\right\},
     \\
     \sigma_i(\mathbf x) 
     &=& 
