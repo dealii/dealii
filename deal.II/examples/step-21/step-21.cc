@@ -61,8 +61,8 @@
 				 // coefficient. Since it may have a spatial
 				 // dependence, we consider it a tensor-valued
 				 // function. The following include file
-				 // provides the ``TensorFunction'' class that
-				 // offers such functionality:
+				 // provides the <code>TensorFunction</code>
+				 // class that offers such functionality:
 #include <base/tensor_function.h>
 
 				 // The last step is as in all
@@ -70,34 +70,34 @@
 using namespace dealii;
 
 
-                                 // @sect3{The ``TwoPhaseFlowProblem'' class}
+                                 // @sect3{The <code>TwoPhaseFlowProblem</code> class}
                                  
 				 // This is the main class of the program. It
 				 // is close to the one of step-20, but with a
 				 // few additional functions:
 				 //
 				 // <ul>
-				 //   <li>``assemble_rhs_S'' assembles the
+				 //   <li><code>assemble_rhs_S</code> assembles the
 				 //   right hand side of the saturation
 				 //   equation. As explained in the
 				 //   introduction, this can't be integrated
-				 //   into ``assemble_rhs'' since it depends
+				 //   into <code>assemble_rhs</code> since it depends
 				 //   on the velocity that is computed in the
 				 //   first part of the time step.
 				 //
-				 //   <li>``get_maximal_velocity'' does as its
+				 //   <li><code>get_maximal_velocity</code> does as its
 				 //   name suggests. This function is used in
 				 //   the computation of the time step size.
 				 //
-				 //   <li>``project_back_saturation'' resets
+				 //   <li><code>project_back_saturation</code> resets
 				 //   all saturation degrees of freedom with
 				 //   values less than zero to zero, and all
 				 //   those with saturations greater than one
 				 //   to one.
-				 // <ul>
+				 // </ul>
 				 //
 				 // The rest of the class should be pretty
-				 // much obvious. The ``viscosity'' variable
+				 // much obvious. The <code>viscosity</code> variable
 				 // stores the viscosity $\mu$ that enters
 				 // several of the formulas in the nonlinear
 				 // equations.
@@ -241,7 +241,7 @@ SaturationBoundaryValues<dim>::value (const Point<dim> &p,
 				 // by simply forward every function to the
 				 // ZeroFunction class. Why not use that right
 				 // away in the places of this program where
-				 // we presently use the ``InitialValues''
+				 // we presently use the <code>InitialValues</code>
 				 // class? Because this way it is simpler to
 				 // later go back and choose a different
 				 // function for initial values.
@@ -371,7 +371,7 @@ namespace SingleCurvingCrack
 				 // static member functions can be used to
 				 // initialize a static variable. We use the
 				 // latter possibility by defining a function
-				 // ``get_centers'' that computes the list of
+				 // <code>get_centers</code> that computes the list of
 				 // center points when called.
 				 //
 				 // Note that this class works just fine in
@@ -460,27 +460,27 @@ namespace RandomMedium
 
                                 
                                  // For the inverse  permeability tensor,
-                                 // ``KInverse''.As in introduction, '
+                                 // <code>KInverse</code>.As in introduction, '
                                  // assume the heterogeneous is isotropic,
                                  // so it is a scalar multipy the identity matrix.
 				 //DealII has a base class not only for
                                  // scalar and generally vector-valued
-                                 // functions (the ``Function'' base
+                                 // functions (the <code>Function</code> base
                                  // class) but also for functions that
                                  // return tensors of fixed dimension
-                                 // and rank, the ``TensorFunction''
+                                 // and rank, the <code>TensorFunction</code>
                                  // template. Here, the function under
                                  // consideration returns a dim-by-dim
                                  // matrix, i.e. a tensor of rank 2
-                                 // and dimension ``dim''. We then
+                                 // and dimension <code>dim</code>. We then
                                  // choose the template arguments of
                                  // the base class appropriately.
                                  //
                                  // The interface that the
-                                 // ``TensorFunction'' class provides
+                                 // <code>TensorFunction</code> class provides
                                  // is essentially equivalent to the
-                                 // ``Function'' class. In particular,
-                                 // there exists a ``value_list''
+                                 // <code>Function</code> class. In particular,
+                                 // there exists a <code>value_list</code>
                                  // function that takes a list of
                                  // points at which to evaluate the
                                  // function, and returns the values
@@ -1011,7 +1011,7 @@ void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
 
                                  // @sect3{Linear solvers and preconditioners}
 
-                                 // @sect4{The ``InverseMatrix'' class template}
+                                 // @sect4{The <code>InverseMatrix</code> class template}
                                  
 				 // Everything here is completely same with step-20
                                  
@@ -1054,7 +1054,7 @@ void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
 }
 
 
-                                 // @sect4{The ``SchurComplement'' class template}
+                                 // @sect4{The <code>SchurComplement</code> class template}
                                                                  
  
 class SchurComplement : public Subscriptor
@@ -1093,7 +1093,7 @@ void SchurComplement::vmult (Vector<double>       &dst,
 }
 
 
-                                 // @sect4{The ``ApproximateSchurComplement'' class template}
+                                 // @sect4{The <code>ApproximateSchurComplement</code> class template}
 
 class ApproximateSchurComplement : public Subscriptor
 {
@@ -1376,7 +1376,7 @@ void TwoPhaseFlowProblem<dim>::run ()
 }
 
     
-                                 // @sect3{The ``main'' function}
+                                 // @sect3{The <code>main</code> function}
 
 				 // In the main function, we pass the degree
 				 // of the finite element space to the
