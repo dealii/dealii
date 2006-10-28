@@ -17,8 +17,8 @@
 
 // For an explanation of the include files, the reader should refer to
 // the example programs step-1 through step-4. They are in the
-// standard order, which is ``base'' -- ``lac'' -- ``grid'' --
-// ``dofs'' -- ``fe'' -- ``numerics'' (since each of these categories
+// standard order, which is <code>base</code> -- <code>lac</code> -- <code>grid</code> --
+// <code>dofs</code> -- <code>fe</code> -- <code>numerics</code> (since each of these categories
 // roughly builds upon previous ones), then a few C++ headers for
 // file, input/output and string streams.
 #include <base/quadrature_lib.h>
@@ -54,13 +54,13 @@ using namespace dealii;
 // The following global variable is used to determine whether the
 // problem being solved is one for which an exact solution is known,
 // e.g. we are using the exact solution as the initial condition. It
-// is set to zero by default, and modified by ``InitialValues::value''
+// is set to zero by default, and modified by <code>InitialValues::value</code>
 // (see below). Things such as the computation of the error between
 // the numerical and exact solutions depend on the value of this
 // variable.
 bool exact_solution_known = false;
 
-// @sect3{The ``SineGordonProblem'' class template}
+// @sect3{The <code>SineGordonProblem</code> class template}
 
 // The entire algorithm for solving the problem is encapsulated in
 // this class. Also, note that the class is declared with a template
@@ -113,10 +113,10 @@ class SineGordonProblem
 
 // @sect3{Exact solitary wave solutions of the sine-Gordon equation}
 
-// A kink-like solitary wave solution to the (``dim''+1) dimensional
+// A kink-like solitary wave solution to the (<code>dim</code>+1) dimensional
 // sine-Gordon equation, which we can test our code against, is given
 // by Leibbrandt in \e Phys. \e Rev. \e Lett. \b 41(7), and is
-// implemented in the ``ExactSolution'' class.  However, it should be
+// implemented in the <code>ExactSolution</code> class.  However, it should be
 // noted that a closed-form solution can only be obtained for the
 // infinite-line initial-value problem (not the Neumann
 // initial-boundary-value problem under consideration here). However,
@@ -126,9 +126,9 @@ class SineGordonProblem
 // problem, if reflections of waves off the boundaries of our domain
 // do \e not occur.
 // 
-// The constants $\vartheta$ (``th'') and $\lambda$ (``ld'') in the 2D
-// solution and $\vartheta$ (``th''), $\phi$ (``phi'') and $\tau$
-// (``tau'') in the 3D solution are called the B&auml;cklund
+// The constants $\vartheta$ (<code>th</code>) and $\lambda$ (<code>ld</code>) in the 2D
+// solution and $\vartheta$ (<code>th</code>), $\phi$ (<code>phi</code>) and $\tau$
+// (<code>tau</code>) in the 3D solution are called the B&auml;cklund
 // transformation parameters. They control such things as the
 // orientation and steepness of the kink. For the purposes of testing
 // the code against the exact solution, one should choose the
@@ -219,7 +219,7 @@ double ExactSolution<dim>::value (const Point<dim> &p,
 // and the Neumann boundary conditions are enforced directly through
 // the variational formulation. However, since our problem is time
 // dependent, we must specify the value of the independent variable
-// $u$ at the initial time $t_0$. We do so via the ``InitialValues''
+// $u$ at the initial time $t_0$. We do so via the <code>InitialValues</code>
 // class below.
 template <int dim>
 class InitialValues : public Function<dim>
@@ -270,15 +270,15 @@ double InitialValues<dim>::value (const Point<dim> &p,
   */
 }
 
-// @sect3{Implementation of the ``SineGordonProblem'' class}
+// @sect3{Implementation of the <code>SineGordonProblem</code> class}
 
 // \b TO \b DO: present the big picture here?
 
 // @sect4{SineGordonProblem::SineGordonProblem}
 
-// This is the constructor of the ``SineGordonProblem'' class. It
+// This is the constructor of the <code>SineGordonProblem</code> class. It
 // specifies the desired polynomial degree of the finite elements,
-// associates a ``DoFHandler'' to the ``triangulation'' object (just
+// associates a <code>DoFHandler</code> to the <code>triangulation</code> object (just
 // as in the example programs step-3 and step-4), initializes the
 // current or initial time, the final time, the time step size, and
 // the value of $\theta$ for the time stepping scheme.
@@ -303,12 +303,12 @@ SineGordonProblem<dim>::SineGordonProblem () :
 
 // @sect4{SineGordonProblem::make_grid_and_dofs}
 
-// This function creates a rectangular grid in ``dim'' dimensions and
+// This function creates a rectangular grid in <code>dim</code> dimensions and
 // refines it several times. Also, all matrix and vector members of
-// the ``SineGordonProblem'' class are initialized to their
+// the <code>SineGordonProblem</code> class are initialized to their
 // approrpiate sizes once the degrees of freedom have been
 // assembled. Unlike its analogue in step-3 (and step-4) this function
-// uses ``MatrixCreator'' class to generate a mass matrix $M$ and a
+// uses <code>MatrixCreator</code> class to generate a mass matrix $M$ and a
 // Laplace matrix $A$ and store them in the appropriate variables
 // for the remainder of the program's life.
 template <int dim>
@@ -351,7 +351,7 @@ void SineGordonProblem<dim>::make_grid_and_dofs ()
   massmatxvel.reinit    (dof_handler.n_dofs());
   system_rhs.reinit     (dof_handler.n_dofs());
 
-  // We will use the ``fem_errors'' vector, which is of size equal to
+  // We will use the <code>fem_errors</code> vector, which is of size equal to
   // the number of time steps, to store the errors in the finite
   // element solution after each time step. Note that we must make the
   // first element of the vector equal to zero, since there is no
@@ -373,7 +373,7 @@ template <int dim>
 void SineGordonProblem<dim>::assemble_system () 
 {  
   // First we assemble the Jacobian matrix $F'_h(U^n_l)$, where
-  // $U^n_l$ is stored in the vector ``solution'' for convenience.
+  // $U^n_l$ is stored in the vector <code>solution</code> for convenience.
   system_matrix = 0;
   system_matrix.copy_from (mass_matrix);
   system_matrix.add (std::pow(time_step*theta,2), laplace_matrix);
@@ -416,8 +416,8 @@ void SineGordonProblem<dim>::assemble_system ()
 // nonlinear iterative solver that we use when the time stepping is
 // implicit (i.e. $\theta\ne 0$). Moreover, we must allow the function
 // to receive as input an "old" and a "new" solution, which may not be
-// the actual solutions of the problem stored in ``old_solution'' and
-// ``solution.'' For the purposes of this function, let us call the
+// the actual solutions of the problem stored in <code>old_solution</code> and
+// <code>solution.</code> For the purposes of this function, let us call the
 // first two arguments $w_{\mathrm{old}}$ and $w_{\mathrm{new}}$,
 // respectively.
 //
@@ -447,8 +447,8 @@ void SineGordonProblem<dim>::compute_nl_term (const Vector<double> &old_data,
 
   for (; cell!=endc; ++cell)
     { 
-      // Once we re-initialize our ``FEValues'' instantiation to the
-      // current cell, we make use of the ``get_function_values''
+      // Once we re-initialize our <code>FEValues</code> instantiation to the
+      // current cell, we make use of the <code>get_function_values</code>
       // routine to get the obtain the values of the "old" data
       // (presumably at $t=t_{n-1}$) and the "new" data (presumably at
       // $t=t_n$) at the nodes of the chosen quadrature formula.
@@ -482,7 +482,7 @@ void SineGordonProblem<dim>::compute_nl_term (const Vector<double> &old_data,
 // This function computes the matrix $N(\cdot,\cdot)$ corresponding to
 // the nonlinear term in the Jacobian of $F(\cdot)$. It is also a
 // fundamental part of nonlinear iterative solver. Just as
-// ``compute_nl_term'', we must allow this function to receive
+// <code>compute_nl_term</code>, we must allow this function to receive
 // as input an "old" and a "new" solution, which we call the
 // $w_{\mathrm{old}}$ and $w_{\mathrm{new}}$, respectively.
 template <int dim>
@@ -508,7 +508,7 @@ void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data,
 
   for (; cell!=endc; ++cell)
     { 
-      // Again, first we re-initialize our ``FEValues'' instantiation
+      // Again, first we re-initialize our <code>FEValues</code> instantiation
       // to the current cell.
       fe_values.reinit (cell);
       fe_values.get_function_values (old_data, old_data_values);
@@ -543,9 +543,9 @@ void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data,
 
 // This function computes the norm of the difference between the
 // computed (i.e., finite element) solution after time step
-// ``timestep_number'' and the exact solution to see how well we are
+// <code>timestep_number</code> and the exact solution to see how well we are
 // doing. There are several choices for norms available to us in the
-// ``VectorTools'' class. We use the $L^2$ norm because it is a
+// <code>VectorTools</code> class. We use the $L^2$ norm because it is a
 // natural choice for our problem, since the solutions to the
 // sine-Gordon equation have finite energy or, equivalently, are $L^2$
 // functions. Given our weak formulation of the sine-Gordon equation,
@@ -579,8 +579,8 @@ void SineGordonProblem<dim>::compute_error (const unsigned int timestep_number)
 // discretization of each iteration of Newton's method for the
 // (nonlinear) first equation in the split formulation we derived in
 // the Introduction. The solution to the system is, in fact, $\delta
-// U^n_l$ so it is stored in ``d_solution'' and used to update
-// ``solution'' in the ``run'' function. We cannot use the Conjugate
+// U^n_l$ so it is stored in <code>d_solution</code> and used to update
+// <code>solution</code> in the <code>run</code> function. We cannot use the Conjugate
 // Gradient solver because the nonlinear term in the Jacobian matrix
 // results in a non-positive-definite matrix to invert. Moreover, we
 // would like the solver to quit when the \e relative error is
@@ -633,14 +633,14 @@ void SineGordonProblem<dim>::output_results (const unsigned int timestep_number)
   else 
     filename << timestep_number;
   
-  // We output the solution at the desired times in ``vtk'' format, so
+  // We output the solution at the desired times in <code>vtk</code> format, so
   // that we can use VisIt to make plots and/or animations.
   filename << ".vtk";
   std::ofstream output (filename.str().c_str());
   data_out.write_vtk (output);
 
   // We also store the current solution in our instantiation of a
-  // ``DataOutStack'' object, so that we can make a space-time plot of
+  // <code>DataOutStack</code> object, so that we can make a space-time plot of
   // the solution.
   data_out_stack.new_parameter_value (time, time_step*output_timestep_skip);
   data_out_stack.attach_dof_handler (dof_handler);
@@ -654,7 +654,7 @@ void SineGordonProblem<dim>::output_results (const unsigned int timestep_number)
 // This function has the top-level control over everything: it runs
 // the (outer) time-stepping loop, the (inner) nonlinear-solver loop,
 // outputs the solution after each time step and calls the
-// ``compute_error'' routine after each time step if an exact solution
+// <code>compute_error</code> routine after each time step if an exact solution
 // is known.
 template <int dim>
 void SineGordonProblem<dim>::run () 
@@ -669,16 +669,16 @@ void SineGordonProblem<dim>::run ()
 
   // To aknowledge the initial condition, we must use the function
   // $u_0(x)$ to compute the zeroth time step solution $U^0$. Note
-  // that when we create the ``InitialValues'' ``Function'' object, we
+  // that when we create the <code>InitialValues</code> <code>Function</code> object, we
   // set its internal time variable to $t_0$, in case our initial
   // condition is a function of space and time evaluated at $t=t_0$.
   InitialValues<dim> initial_condition (1, time);
 
   // Then, in 2D and 3D, we produce $U^0$ by projecting $u_0(x)$ onto
-  // the grid using ``VectorTools::project''. In 1D, however, we
+  // the grid using <code>VectorTools::project</code>. In 1D, however, we
   // obtain the zeroth time step solution by interpolating $u_0(x)$ at
   // the global degrees of freedom using
-  // ``VectorTools::interpolate''. We must make an exception for the
+  // <code>VectorTools::interpolate</code>. We must make an exception for the
   // 1D case because the projection algorithm computes integrals over
   // the boundary of the domain, which do not make sense in 1D, so we
   // cannot use it.
@@ -739,7 +739,7 @@ void SineGordonProblem<dim>::run ()
       // during which "nothing interesting happens" in the
       // solution. To improve overall efficiency --- in particular,
       // speed up the program and save disk space --- we only output
-      // the solution after ``output_timestep_skip'' time steps have
+      // the solution after <code>output_timestep_skip</code> time steps have
       // been taken.
       if (timestep_number % output_timestep_skip == 0)
 	  output_results (timestep_number);
@@ -778,20 +778,20 @@ void SineGordonProblem<dim>::run ()
 	      << std::endl << std::endl;
 
   // Finally, we output the sequence of solutions stored
-  // ``data_out_stack'' to a file of the appropriate format.
+  // <code>data_out_stack</code> to a file of the appropriate format.
   std::ostringstream filename;
   filename << "solution-" << dim << "d-" << "stacked" << ".vtk";
   std::ofstream output (filename.str().c_str());
   data_out_stack.write_vtk (output);
 }
 
-// @sect3{The ``main'' function}
+// @sect3{The <code>main</code> function}
 
 // This is the main function of the program. It creates an object of
 // top-level class and calls its principal function. Also, we supress
-// some of the library output by setting ``deallog.depth_console'' to
+// some of the library output by setting <code>deallog.depth_console</code> to
 // zero. Furthermore, if exceptions are thrown during the execution of
-// the run method of the ``SineGordonProblem'' class, we catch and
+// the run method of the <code>SineGordonProblem</code> class, we catch and
 // report them here. For more information about exceptions the reader
 // should consult step-6.
 int main () 
