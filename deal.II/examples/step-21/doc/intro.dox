@@ -359,7 +359,13 @@ easily be verified. (Remember that the saturation corresponds to something
 like the water fraction in the fluid mixture, and therefore must physically be
 between 0 and 1.) On the other hand, if we choose our time step according to
 the criterion listed above, this only happens very very infrequently &mdash;
-in fact only once for the entire run of the program.
+in fact only once for the entire run of the program. However, to be on the
+safe side, however, we run a function <code>project_back_saturation</code> at
+the end of each time step, that simply projects the saturation back onto the
+interval $[0,1]$, should it have gotten out of the physical range. This is
+useful since the functions $\lambda(S)$ and $F(S)$ do not represent anything
+physical outside this range, and we should not expect the program to do
+anything useful once we have negative saturations or ones larger than one.
 
 Note that we will have similar restrictions on the time step also in @ref
 step_23 "step-23" and @ref step_24 "step-24" where we solve the time dependent
