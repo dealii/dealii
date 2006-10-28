@@ -181,10 +181,10 @@ Note that in the first term, we have to prescribe the pressure $p^{n+1}$ on
 the boundary $\partial\Omega$ as boundary values for our problem. $\mathbf n$
 denotes the unit outward normal vector to $\partial K$, as usual.
 
-For the saturation equation, we obtain
+For the saturation equation, we obtain after integrating by parts
 @f{eqnarray*}
   (S^{n+1}, \sigma)_\Omega
-  +
+  -
   \triangle t 
   \sum_K
   \left\{
@@ -199,7 +199,7 @@ Using the fact that $\nabla \cdot \mathbf{u}^{n+1}=0$, we can rewrite the cell
 term to get an equation as follows:
 @f{eqnarray*}
   (S^{n+1}, \sigma)_\Omega
-  +
+  -
   \triangle t 
   \sum_K
   \left\{
@@ -284,6 +284,7 @@ B_{ij} &=&
 (\nabla \cdot \mathbf v_i, \phi_j)_\Omega,
 \\
 H_{ij} &=&
+  -
   \sum_K
   \left\{
   \left(F(S^n) \mathbf v_i, \nabla \phi_j)\right)_K
