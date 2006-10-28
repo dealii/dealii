@@ -795,6 +795,13 @@ void TwoPhaseFlowProblem<dim>::make_grid_and_dofs ()
                                  // stationary problems since there we use
                                  // each matrix object only once and it is
                                  // empty at the beginning anyway).
+				 //
+				 // Note that in its present form, the
+				 // function uses the permeability implemented
+				 // in the RandomMedium::KInverse
+				 // class. Switching to the single curved
+				 // crack permeability function is as simple
+				 // as just changing the namespace name.
 template <int dim>
 void TwoPhaseFlowProblem<dim>::assemble_system () 
 {  
