@@ -289,6 +289,52 @@ InitialValues<dim>::vector_value (const Point<dim> &p,
 				 // easy later to replace use of one by the
 				 // other in the code.
 
+				 // @sect4{Single curving crack permeability}
+
+				 // The first function for the permeability
+				 // was the one that models a single curving
+				 // crack. It was already used at the end of
+				 // step-20, and its functional form is given
+				 // in the introduction of the present
+				 // tutorial program:
+namespace SingleCurvingCrack
+{
+  template <int dim>
+  class KInverse : public TensorFunction<2,dim>
+  {
+    public:
+      virtual void value_list (const std::vector<Point<dim> > &points,
+			       std::vector<Tensor<2,dim> >    &values) const;
+  };
+
+
+  template <int dim>
+  void
+  KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
+			     std::vector<Tensor<2,dim> >    &values) const
+  {
+    Assert (points.size() == values.size(),
+	    ExcDimensionMismatch (points.size(), values.size()));
+
+    for (unsigned int p=0; p<points.size(); ++p)
+      {
+	values[p].clear ();
+
+	const double distance_to_flowline
+	  = std::fabs(points[p][1]-0.5-0.1*std::sin(10*points[p][0]));
+      
+	const double permeability = std::max(std::exp(-(distance_to_flowline*
+							distance_to_flowline)
+						      / (0.1 * 0.1)),
+					     0.01);
+      
+	for (unsigned int d=0; d<dim; ++d)
+	  values[p][d][d] = 1./permeability;
+      }
+  }
+}
+
+
 				 // @sect4{Random medium permeability}
 
 				 // This function does as announced in the
@@ -336,7 +382,7 @@ InitialValues<dim>::vector_value (const Point<dim> &p,
 				 // more ground to cover, after all, if we
 				 // want to keep the distance between centers
 				 // roughly equal), so we choose 40 in 2d and
-				 // 150 in 3d. For any other dimension, the
+				 // 100 in 3d. For any other dimension, the
 				 // function does presently not know what to
 				 // do so simply throws an exception
 				 // indicating exactly this.
@@ -369,13 +415,13 @@ namespace RandomMedium
     const unsigned int N = (dim == 2 ?
 			    40 :
 			    (dim == 3 ?
-			     150 :
+			     100 :
 			     throw ExcNotImplemented()));
   
     std::vector<Point<dim> > centers_list (N);
     for (unsigned int i=0; i<N; ++i)
       for (unsigned int d=0; d<dim; ++d)
-	centers_list[i][d] = 1.*rand()/RAND_MAX;
+	centers_list[i][d] = static_cast<double>(rand())/RAND_MAX;
 
     return centers_list;
   }
@@ -539,7 +585,7 @@ TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem (const unsigned int degree)
                     FE_DGQ<dim>(degree), 1,
 		    FE_DGQ<dim>(degree), 1),
 		dof_handler (triangulation),
-		n_refinement_steps (4),
+		n_refinement_steps (5),
 		time_step (10.0/std::pow(2.0, double(n_refinement_steps))/6),
                 viscosity (0.2)
                 
@@ -568,9 +614,7 @@ void TwoPhaseFlowProblem<dim>::make_grid_and_dofs ()
 
   triangulation.refine_global (n_refinement_steps);
   
-  dof_handler.distribute_dofs (fe);
-
- 
+  dof_handler.distribute_dofs (fe); 
   DoFRenumbering::component_wise (dof_handler);
 
                                   
