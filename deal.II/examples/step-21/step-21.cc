@@ -1196,9 +1196,17 @@ void TwoPhaseFlowProblem<dim>::solve ()
                                    // cells quite easily (in fact we use the
                                    // linear extensions in coordinate
                                    // directions of the cells, not the
-                                   // diameter). The maximal velocity we
-                                   // compute using a helper function defined
-                                   // below:
+                                   // diameter). Note that we will learn a
+                                   // more general way to do this in step-24,
+                                   // where we use the
+                                   // GridTools::minimal_cell_diameter
+                                   // function.
+				   //
+				   // The maximal velocity we compute using a
+                                   // helper function to compute the maximal
+                                   // velocity defined below, and with all
+                                   // this we can evaluate our new time step
+                                   // length:
   time_step = std::pow(0.5, double(n_refinement_steps)) /
               get_maximal_velocity();
 
