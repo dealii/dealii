@@ -2,7 +2,8 @@
 <h1>Introduction</h1>
 
 This is the first of a number of tutorial programs that will finally
-cover time-dependent problems. In particular, this program introduces
+cover "real" time-dependent problems, not the slightly odd form of time
+dependence found in @ref step_18 "step-18" or the DAE model of @ref step_21 "step-21". In particular, this program introduces
 the wave equation in a bounded domain. Later, @ref step_24 "step-24"
 will consider an example of absorbing boundary conditions, and @ref
 step_25 "step-25" a kind of nonlinear wave equation producing
