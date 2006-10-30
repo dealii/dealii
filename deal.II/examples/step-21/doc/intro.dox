@@ -128,7 +128,8 @@ as well as the time dependent Maxwell equations (here, the algebraic
 constraint is that the divergence of the electric displacement field
 equals the charge density, $\textrm{div}\ \mathbf D = \rho$ and that the
 divergence of the magnetic flux density is zero: $\textrm{div}\ \mathbf
-B = 0$). We will see that the different character of the two equations
+B = 0$); even the quasistatic model of @ref step_18 "step-18" falls into this
+category. We will see that the different character of the two equations 
 will inform our discretization strategy for the two equations.
 
 
