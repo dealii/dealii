@@ -242,7 +242,18 @@ template <int dim>
 FiniteElement<dim> *
 FE_DGQ<dim>::clone() const
 {
-  return new FE_DGQ<dim>(this->degree);
+				   // TODO[Prill] : There must be a better way
+				   // to extract 1D quadrature points from the
+				   // tensor product FE.
+  
+				   // Construct a dummy quadrature formula
+				   // containing the FE's nodes:
+  std::vector<Point<1> > qpoints(this->degree+1);
+  for (unsigned int i=0; i<=this->degree; ++i)
+    qpoints[i] = Point<1>(this->unit_support_points[i][0]);
+  Quadrature<1> pquadrature(qpoints);
+  
+  return new FE_DGQ<dim>(pquadrature);
 }
 
 
