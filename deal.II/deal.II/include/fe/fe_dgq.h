@@ -77,7 +77,14 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
   public:
 				     /**
 				      * Constructor for tensor product
-				      * polynomials of degree <tt>p</tt>.
+				      * polynomials of degree
+				      * <tt>p</tt>. The shape
+				      * functions created using this
+				      * constructor correspond to
+				      * Lagrange interpolation
+				      * polynomials for equidistantly
+				      * spaced support points in each
+				      * coordinate direction.
 				      */
     FE_DGQ (const unsigned int p);
 
