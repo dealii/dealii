@@ -196,7 +196,7 @@ FE_DGQ<dim>::FE_DGQ (const Quadrature<1>& points)
 		:
 		FE_Poly<TensorProductPolynomials<dim>, dim> (
 		  TensorProductPolynomials<dim>(Polynomials::Lagrange::generate_complete_basis(points.get_points())),
-		  FiniteElementData<dim>(get_dpo_vector(points.n_quadrature_points-1), 1, points.n_quadrature_points-1),
+		  FiniteElementData<dim>(get_dpo_vector(points.n_quadrature_points-1), 1, points.n_quadrature_points-1, FiniteElementData<dim>::L2),
 		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(points.n_quadrature_points-1),1, points.n_quadrature_points-1).dofs_per_cell, true),
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(
 		    get_dpo_vector(points.n_quadrature_points-1),1, points.n_quadrature_points-1).dofs_per_cell, std::vector<bool>(1,true)))
