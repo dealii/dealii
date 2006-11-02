@@ -49,19 +49,27 @@ class QGauss : public Quadrature<dim>
  * The Gauss-Lobatto quadrature rule.
  *
  * This modification of the Gauss quadrature uses the two interval end
- * points as well. Being exact for polynomials of degree <i>2n-2</i>,
- * this formula is suboptimal by one degree.
+ * points as well. Being exact for polynomials of degree <i>2n-3</i>,
+ * this formula is suboptimal by two degrees.
  *
- * The quadrature points are interval end points plus the zeroes of
+ * The quadrature points are interval end points plus the roots of
  * the derivative of the Legendre polynomial <i>P<sub>n-1</sub></i> of
  * degree <i>n-1</i>. The quadrature weights are
  * <i>2/(n(n-1)(P<sub>n-1</sub>(x<sub>i</sub>)<sup>2</sup>)</i>.
  *
- * @note The quadrature weights are not implemented yet.
+ * Note: This implementation has not yet been optimized concerning
+ *       numerical stability and efficiency. It can be easily adapted
+ *       to the general case of Gauss-Lobatto-Jacobi-Bouzitat quadrature
+ *       with arbitrary parameters <i>alpha</i>, <i>beta</i>, of which
+ *       the Gauss-Lobatto-Legendre quadrature (<i>alpha = beta = 0</i>)
+ *       is a special case.
  *
- * @sa http://en.wikipedia.org/wiki/Handbook_of_Mathematical_Functions
+ * @sa http://en.wikipedia.org/wiki/Handbook_of_Mathematical_Functions 
+ * @sa Karniadakis, G.E. and Sherwin, S.J.:
+ *     Spectral/hp element methods for computational fluid dynamics. 
+ *     Oxford: Oxford University Press, 2005 
  *
- * @author Guido Kanschat, 2005, 2006
+ * @author Guido Kanschat, 2005, 2006; F. Prill, 2006
  */
 template<int dim>
 class QGaussLobatto : public Quadrature<dim>
@@ -73,6 +81,47 @@ class QGaussLobatto : public Quadrature<dim>
 				      * (in each space direction).
 				      */
     QGaussLobatto(const unsigned int n);
+
+  protected:
+				     /**
+				      * Compute Legendre-Gauss-Lobatto quadrature
+				      * points in the interval [-1, +1].
+				      * @param q  number of points.
+				      * @return vector containing nodes.
+				      */
+    std::vector<double> compute_quadrature_points(const unsigned int q,
+                                                  const int alpha,
+                                                  const int beta) const;
+
+    				     /**
+				      * Compute Legendre-Gauss-Lobatto quadrature
+				      * weights.
+				      * @param x  quadrature points.
+				      * @return vector containing weights.
+				      */
+    std::vector<double> compute_quadrature_weights(std::vector<double>& x,
+                                                   const int alpha,
+                                                   const int beta) const;
+    
+				     /**
+				      * Evaluate a Jacobi polynomial
+				      * \f$ P^{\alpha, \beta}_n(x) \f$. 
+				      * Note: The Jacobi polynomials are
+				      * not orthonormal and defined on
+				      * the interval [-1, +1].
+				      * @param x  point of evaluation.
+				      */
+    double JacobiP(const double x,
+                   const int alpha,
+                   const int beta,
+                   const unsigned int n) const;
+
+    				     /**
+				      * Evaluate the Gamma function
+				      * \f[ \Gamma(n) = (n-1)! \f]. 
+				      * @param n  point of evaluation (integer).
+				      */
+    unsigned int gamma(const unsigned int n) const;
 };
 
   
@@ -250,6 +299,18 @@ class QWeddle : public Quadrature<dim>
 
 template <> QGauss<1>::QGauss (const unsigned int n);
 template <> QGaussLobatto<1>::QGaussLobatto (const unsigned int n);
+template <>
+std::vector<double> QGaussLobatto<1>::
+compute_quadrature_points(const unsigned int, const int, const int) const;
+template <>
+std::vector<double> QGaussLobatto<1>::
+compute_quadrature_weights(std::vector<double>&, const int, const int) const;
+template <>
+double QGaussLobatto<1>::
+JacobiP(const double, const int, const int, const unsigned int) const;
+template <>
+unsigned int QGaussLobatto<1>::
+QGaussLobatto<1>::gamma(const unsigned int n) const;
 template <> QGauss2<1>::QGauss2 ();
 template <> QGauss3<1>::QGauss3 ();
 template <> QGauss4<1>::QGauss4 ();

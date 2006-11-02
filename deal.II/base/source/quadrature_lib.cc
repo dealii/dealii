@@ -156,11 +156,137 @@ QGaussLobatto<1>::QGaussLobatto (unsigned int n)
 		:
 		Quadrature<1> (n)
 {
-  for (unsigned int k=0;k<n;++k)
+  std::vector<double> points  = compute_quadrature_points(n, 1, 1);
+  std::vector<double> w       = compute_quadrature_weights(points, 0, 0);
+
+				   // scale points to the interval
+				   // [0.0, 1.0]:
+  for (unsigned int i=0; i<points.size(); ++i)
     {
-      this->quadrature_points[k] = Point<1>(.5-.5*std::cos(M_PI*k/(n-1)));
+      this->quadrature_points[i] = Point<1>(0.5 + 0.5*points[i]);
+      this->weights[i]           = 0.5*w[i];
     }
 }
+
+
+
+template <>
+std::vector<double> QGaussLobatto<1>::
+compute_quadrature_points(const unsigned int q,
+			  const int alpha,
+			  const int beta) const
+{
+  const unsigned int m = q-2; // no. of inner points
+  std::vector<double> x(m);
+  
+				   // compute quadrature points with
+				   // a Newton algorithm.
+  const double epsilon = 1.e-10; // tolerance
+  
+				   // we take the zeros of the Chebyshev
+				   // polynomial (alpha=beta=-0.5) as
+				   // initial values:
+  for (unsigned int i=0; i<m; ++i)
+    x[i] = - std::cos( (double) (2*i+1)/(2*m) * M_PI );
+  
+  double r, s, J_x, f, delta;
+  for (unsigned int k=0; k<m; ++k)
+    {
+      r = x[k];
+      if (k>0)
+	r = (r + x[k-1])/2;
+
+      do 
+	{
+	  s = 1.;
+	  for (unsigned int i=0; i<k; ++i)
+	    s /= r - x[i];
+
+	  J_x   =  0.5*(alpha + beta + m + 1)*JacobiP(r, alpha+1, beta+1, m-1);
+	  f     = JacobiP(r, alpha, beta, m);
+	  delta = - f/(J_x - f*s);
+	  r += delta;
+	}
+      while (std::fabs(delta) >= epsilon);
+      
+      x[k] = r;
+    } // for
+
+				   // add boundary points:
+  x.insert(x.begin(), -1.);
+  x.push_back(+1.);
+
+  return x;
+}
+
+
+
+template <>
+std::vector<double> QGaussLobatto<1>::
+compute_quadrature_weights(std::vector<double>& x,
+			   const int alpha,
+			   const int beta) const
+{
+  const unsigned int q = x.size();
+  std::vector<double> w(q);
+  double s = 0;
+  
+  double factor = std::pow(2., alpha+beta+1)*gamma(alpha+q)*gamma(beta+q)/
+		  ((q-1)*gamma(q)*gamma(alpha+beta+q+1));
+  for (unsigned int i=0; i<q; ++i)
+    {
+      s = JacobiP(x[i], alpha, beta, q-1);
+      w[i] = factor/(s*s);
+    }
+  w[0]   *= (beta + 1);
+  w[q-1] *= (alpha + 1);
+
+  return w;
+}
+
+
+
+template <>
+double QGaussLobatto<1>::JacobiP(const double x,
+				 const int alpha,
+				 const int beta,
+				 const unsigned int n) const
+{
+				   // the Jacobi polynomial is evaluated
+				   // using a recursion formula.
+  std::vector<double> p(n+1);
+  double v, a1, a2, a3, a4;
+  
+				   // initial values P_0(x), P_1(x):
+  p[0] = 1.0;
+  if (n==0) return p[0];
+  p[1] = ((alpha+beta+2)*x + (alpha-beta))/2;
+  if (n==1) return p[1];
+  
+  for (unsigned int i=1; i<=(n-1); ++i)
+    {
+      v  = 2*i + alpha + beta;
+      a1 = 2*(i+1)*(i + alpha + beta + 1)*v;
+      a2 = (v + 1)*(alpha*alpha - beta*beta);
+      a3 = v*(v + 1)*(v + 2);
+      a4 = 2*(i+alpha)*(i+beta)*(v + 2);
+
+      p[i+1] =  1/a1*( (a2 + a3*x)*p[i] - a4*p[i-1]);
+    } // for
+  return p[n];
+}
+
+
+
+template <>
+unsigned int QGaussLobatto<1>::gamma(const unsigned int n) const
+{
+  unsigned int result = n - 1;
+  for (int i=n-2; i>1; --i)
+    result *= i;
+  return result;
+}
+
 
 
 template <>
@@ -469,6 +595,13 @@ QWeddle<1>::QWeddle ()
 template <int dim>
 QGauss<dim>::QGauss (const unsigned int n)
   :  Quadrature<dim> (QGauss<dim-1>(n), QGauss<1>(n))
+{}
+
+
+
+template <int dim>
+QGaussLobatto<dim>::QGaussLobatto (const unsigned int n)
+  :  Quadrature<dim> (QGaussLobatto<dim-1>(n), QGaussLobatto<1>(n))
 {}
 
 
