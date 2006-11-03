@@ -105,7 +105,7 @@ class QGaussLobatto : public Quadrature<dim>
     
 				     /**
 				      * Evaluate a Jacobi polynomial
-				      * \f$ P^{\alpha, \beta}_n(x) \f$. 
+				      * $ P^{\alpha, \beta}_n(x) $. 
 				      * Note: The Jacobi polynomials are
 				      * not orthonormal and defined on
 				      * the interval [-1, +1].
@@ -118,7 +118,7 @@ class QGaussLobatto : public Quadrature<dim>
 
     				     /**
 				      * Evaluate the Gamma function
-				      * \f[ \Gamma(n) = (n-1)! \f]. 
+				      * $ \Gamma(n) = (n-1)! $. 
 				      * @param n  point of evaluation (integer).
 				      */
     unsigned int gamma(const unsigned int n) const;
