@@ -161,3 +161,33 @@ auxilliary equation, i.e. $S_j(f,g) = \left( \sin\left[ \theta f +
 nonlinear term in the Jacobian matrix of $F(\cdot)$, i.e. $N_{ij}(f,g)
 = \left( \cos\left[ \theta f + (1-\theta) g\right]\varphi_i, \varphi_j
 \right)_{\Omega}$.
+
+
+<h3>The testcase</h3>
+
+There are a few analytical solutions for the sine-Gordon equation, both in 1d
+and 2d. In particular, the program as is computes the solution to a single
+kink-like solitary wave problem.  This solution is given by Leibbrandt in \e
+Phys. \e Rev. \e Lett. \b 41(7), and is implemented in the
+<code>ExactSolution</code> class.
+
+It should be noted that this closed-form solution strictly speaking only holds
+for the infinite-space initial-value problem (not the Neumann
+initial-boundary-value problem under consideration here). However, given that
+we impose \e zero Neumann boundary conditions, we expect that the solution to
+our initial-boundary-value problem would be close to the solution of the
+infinite-space initial-value problem, if reflections of waves off the
+boundaries of our domain do \e not occur.
+
+The constants $\vartheta$ and $\lambda$ in the 2D solution and $\vartheta$,
+$\phi$ and $\tau$ in the 3D solution are called the B&auml;cklund
+transformation parameters. They control such things as the orientation and
+steepness of the kink. For the purposes of testing the code against the exact
+solution, one should choose the parameters so that the kink is aligned with
+the grid
+
+In 1D, more interesting analytical solutions are known. Many of them are
+listed on http://mathworld.wolfram.com/Sine-GordonEquation.html . We have
+implemented the one kink, two kink, kink-antikink and stationary breather
+solitary-wave solutions.
+
