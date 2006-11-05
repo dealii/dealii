@@ -138,8 +138,8 @@ denoted by the same letter in lower case; e.g., $u^n = \sum_{i=1}^N
 U^n_i \varphi_i$ where $U^n \in {R}^N$ and $u^n \in
 H^1(\Omega)$. Thus, the finite-dimensional version of the variational fomulation requires that we solve the following matrix equations at each time step:
 @f{eqnarray*}
-  F_h'(U^n_l)\delta U^n_l &=& -F_h(U^n_l), \quad
-  	U^n_{l+1} = U^n_l + \delta U^n_l, \quad U^n_0 = U^{n-1}; \\
+  F_h'(U^n_l)\delta U^n_l &=& -F_h(U^n_l), \qquad
+  	U^n_{l+1} = U^n_l + \delta U^n_l, \qquad U^n_0 = U^{n-1}; \\
   MV^n &=& MV^{n-1} - k \theta AU^n -k (1-\theta) AU^{n-1} - k S(u^n,u^{n-1}).
 @f}
 Above, the matrix $F_h'(\cdot)$ and the vector $F_h(\cdot)$ denote the discrete versions of the gadgets discussed above, i.e.
@@ -161,6 +161,36 @@ auxilliary equation, i.e. $S_j(f,g) = \left( \sin\left[ \theta f +
 nonlinear term in the Jacobian matrix of $F(\cdot)$, i.e. $N_{ij}(f,g)
 = \left( \cos\left[ \theta f + (1-\theta) g\right]\varphi_i, \varphi_j
 \right)_{\Omega}$.
+
+What solvers can we use for the first equation? Let's look at the matrix we
+have to invert:
+@f[
+  M-k^2\theta^2N)_{ij} = 
+  \int_\Omega (1-k^2\theta^2 \cos \alpha) 
+ \varphi_i\varphi_j \; dx,
+@f]
+for some $\alpha$ that depends on the present and previous solution. First,
+note that the matrix is symmetric. In addition, if the time step $k$ is small
+enough, i.e. if $k\theta<1$ then the matrix is also going to be positive
+definite. In the program below, this will always be the case, so we will use
+the Conjugate Gradient method together with the SSOR method as
+preconditioner. We should keep in mind, however, that this is a point that
+will break if we happen to use a bigger time step. Fortunately, in that case
+the solver will just throw an exception indicating a failure to converge,
+rather than silently producing a wrong result. If that happens, then we can
+simply replace the CG method by something that can handle indefinite symmetric
+systems. The GMRES solver is typically the standard method for all "bad"
+linear systems, but it is also a slow one. Possibly better would be a solver
+that utilizes the symmetry, such as for example SymmLQ, which is also
+implemented in deal.II.
+
+This program uses a clever optimization over @ref step_23 "step-23" and @ref
+step_24 "step-24": If you read the above formulas closely, it becomes clear
+that the velocity $V$ only ever appears in products with the mass matrix. In
+@ref step_23 "step-23" and @ref step_24 "step-24", we we therefore a bit
+wasteful: in each time step, we would solve a linear system with the mass
+matrix, only to multiply the solution of that system by $M$ again in the next
+time step. This can, of course, be avoided, and we do so in this program.
 
 
 <h3>The testcase</h3>
@@ -184,10 +214,50 @@ $\phi$ and $\tau$ in the 3D solution are called the B&auml;cklund
 transformation parameters. They control such things as the orientation and
 steepness of the kink. For the purposes of testing the code against the exact
 solution, one should choose the parameters so that the kink is aligned with
-the grid
+the grid.
 
-In 1D, more interesting analytical solutions are known. Many of them are
-listed on http://mathworld.wolfram.com/Sine-GordonEquation.html . We have
-implemented the one kink, two kink, kink-antikink and stationary breather
-solitary-wave solutions.
+The solutions that we implement in the <code>ExactSolution</code> class are
+this:
+<ul>
+  <li>In 1d:
+  @f[
+  u(x,t) = 
+  -f \arctan\left[
+     \frac
+     {m\sin\left(\sqrt{1-m^2}t+c_2\right)}
+     {\sqrt{1-m^2} \cosh\left(mx+c_1\right)}
+     \right]
+  @f]
+  where we choose $m=\frac 12, c_1=c_2=0$.
 
+  In 1D, more interesting analytical solutions are known. Many of them are
+  listed on http://mathworld.wolfram.com/Sine-GordonEquation.html .
+
+  <li>In 2d:
+  @f[
+    u(x,y,t) = 4 \arctan \left[a_0 e^{s\xi}\right]
+  @f]
+  where $\xi$ is defined as
+  @f[
+    \xi = x \cos\vartheta + \sin(\vartheta) (y\cosh\lambda + t\sinh \lambda)
+  @f]
+  and where we choose $\vartheta=\frac \pi 4, \lambda=a_0=s=1$.
+
+  <li>In 3d:
+  @f[
+    u(x,y,z,t) = 4 \arctan \left[c_0 e^{s\xi}\right]
+  @f]
+  where $\xi$ is defined as
+  @f[
+    \xi = x \cos\vartheta + y \sin \vartheta \cos\phi +
+          \sin \vartheta \sin\phi (z\cosh\tau + t\sinh \tau)
+  @f]
+  and where we choose $\vartheta=\phi=\pi, \tau=c_1=s=1$.
+</ul>
+
+
+Since it makes it easier to play around, the <code>InitialValues</code> class
+that is used to set &mdash; surprise! &mdash; the initial values of our
+simulation simply queries the class that describes the exact solution for the
+value at the start time, rather than duplicating the effort to implement a
+solution function. 

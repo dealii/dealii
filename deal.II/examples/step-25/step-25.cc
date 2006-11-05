@@ -31,7 +31,7 @@
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
-#include <lac/solver_gmres.h>
+#include <lac/solver_cg.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -71,6 +71,7 @@ using namespace dealii;
 				 // class-encapsulation of the
 				 // problem, the reader should consult
 				 // step-3 and step-4.
+//TODO
 template <int dim>
 class SineGordonProblem 
 {
@@ -87,7 +88,7 @@ class SineGordonProblem
     void compute_nl_matrix (const Vector<double> &old_data, 
 			    const Vector<double> &new_data,
 			    SparseMatrix<double> &nl_matrix) const;
-    void solve ();
+    unsigned int solve ();
     void output_results (const unsigned int timestep_number);
 
     Triangulation<dim>   triangulation;
@@ -105,7 +106,6 @@ class SineGordonProblem
     Vector<double>       solution, d_solution, old_solution;
     Vector<double>       massmatxvel;
     Vector<double>       system_rhs;
-    Vector<double>       fem_errors;
 
     DataOutStack<dim>    data_out_stack;
 
@@ -113,61 +113,31 @@ class SineGordonProblem
     static const int n_global_refinements = 6;
 };
 
-				 // @sect3{Exact solitary wave solutions of the sine-Gordon equation}
 
-				 // A kink-like solitary wave solution
-				 // to the (<code>dim</code>+1)
-				 // dimensional sine-Gordon equation,
-				 // which we can test our code
-				 // against, is given by Leibbrandt in
-				 // \e Phys. \e Rev. \e Lett. \b
-				 // 41(7), and is implemented in the
-				 // <code>ExactSolution</code> class.
-				 // However, it should be noted that a
-				 // closed-form solution can only be
-				 // obtained for the infinite-line
-				 // initial-value problem (not the
-				 // Neumann initial-boundary-value
-				 // problem under consideration
-				 // here). However, given that we
-				 // impose \e zero Neumann boundary
-				 // conditions, we expect that the
-				 // solution to our
-				 // initial-boundary-value problem
-				 // would be close (in fact, equal) to
-				 // the solution infinite-line
-				 // initial-value problem, if
-				 // reflections of waves off the
-				 // boundaries of our domain do \e not
-				 // occur.
-				 // 
-				 // The constants $\vartheta$
-				 // (<code>th</code>) and $\lambda$
-				 // (<code>ld</code>) in the 2D
-				 // solution and $\vartheta$
-				 // (<code>th</code>), $\phi$
-				 // (<code>phi</code>) and $\tau$
-				 // (<code>tau</code>) in the 3D
-				 // solution are called the
-				 // B&auml;cklund transformation
-				 // parameters. They control such
-				 // things as the orientation and
-				 // steepness of the kink. For the
-				 // purposes of testing the code
-				 // against the exact solution, one
-				 // should choose the parameters so
-				 // that the kink is aligned with the
-				 // grid, e.g. $\vartheta = \phi =
-				 // \pi$.
-				 //
-				 // In 1D, more interesting analytical
-				 // solutions are known. Many of them
-				 // are listed on
-				 // http://mathworld.wolfram.com/Sine-GordonEquation.html
-				 // . We have implemented the one
-				 // kink, two kink, kink-antikink and
-				 // stationary breather solitary-wave
-				 // solutions.
+				 // @sect3{Initial conditions}
+
+				 // In the following two classes, we first
+				 // implement the exact solution for 1d, 2d,
+				 // and 3d mentioned in the introduction to
+				 // this program. This space-time solution may
+				 // be of independent interest if one wanted
+				 // to test the accuracy of the program by
+				 // comparing the numerical against the
+				 // analytic solution (note however that the
+				 // program uses a finite domain, whereas
+				 // these are analytic solutions for an
+				 // unbounded domain). This may, for example,
+				 // be done using the
+				 // VectorTools::integrate_difference
+				 // function. Note again (as was already
+				 // discussed in step-23) how we describe
+				 // space-time functions as spatial functions
+				 // that depend on a time variable that can be
+				 // set and queried using the
+				 // FunctionTime::set_time() and
+				 // FunctionTime::get_time() member functions
+				 // of the FunctionTime base class of the
+				 // Function class.
 template <int dim>
 class ExactSolution : public Function<dim>
 {
@@ -188,51 +158,39 @@ double ExactSolution<dim>::value (const Point<dim> &p,
     {
       case 1:
       {
-	double m = 0.5;
-					 //      double beta =
-					 //      std::sqrt(m*m-1.)/m;
-	double c1 = 0.;
-	double c2 = 0.;
-					 //       double s1 = 1.;
-					 //       double s2 = -1.;
-
-					 /* one kink (m>1) */
-					 /* return 4.*std::atan(std::exp(s1*(p[0]+s2*beta*t)/std::sqrt(1.-beta*beta))); */
-
-					 /* two kinks (m>1) */
-					 /* return 4.*std::atan(beta*std::sinh(beta*m*p[0])/std::cosh(beta*m*t)); */
-
-					 /* kink-antikink (m>1) */
-					 /* return -4.*std::atan(m/std::sqrt(m*m-1)*std::sinh(std::sqrt(m*m-1.)*t+c2)/
-					    std::cosh(m*p[0]+c1)); */
-
-					 /* stationary breather (m<1), period = 2.*pi*sqrt(1.-m*m) 
-					    for m=0.5, -5.4414 <= t <= 2.7207 is a good time interval */
-	return -4.*std::atan(m/std::sqrt(1.-m*m)*std::sin(std::sqrt(1.-m*m)*t+c2)
-			     /std::cosh(m*p[0]+c1));
+	const double m = 0.5;
+	const double c1 = 0.;
+	const double c2 = 0.;
+	return -4.*std::atan (m /
+			      std::sqrt(1.-m*m) *
+			      std::sin(std::sqrt(1.-m*m)*t+c2) /
+			      std::cosh(m*p[0]+c1));
       }
 
       case 2:
       {
-	double th  = deal_II_numbers::PI/4.;
-	double ld  = 1.;
-	double a0  = 1.;
-	double s   = 1.;
-	double arg = 0.;
-	arg = p[0]*std::cos(th) + std::sin(th)*(p[1]*std::cosh(ld)+t*std::sinh(ld));
+	const double theta  = deal_II_numbers::PI/4.;
+	const double lambda  = 1.;
+	const double a0  = 1.;
+	const double s   = 1.;
+	const double arg = p[0] * std::cos(theta) +
+			   std::sin(theta) *
+			   (p[1] * std::cosh(lambda) +
+			    t * std::sinh(lambda));
 	return 4.*std::atan(a0*std::exp(s*arg));
       }
 
       case 3:
       {
-	double th  = deal_II_numbers::PI;
+	double theta  = deal_II_numbers::PI;
 	double phi = deal_II_numbers::PI;
 	double tau = 1.;
 	double c0  = 1.;
 	double s   = 1.;
-	double arg = 0.;
-	arg = (p[0]*std::cos(th) + p[1]*std::sin(th)*std::cos(phi)
-	       + std::sin(th)*std::sin(phi)*(p[2]*std::cosh(tau)+t*std::sinh(tau)));
+	double arg = p[0]*std::cos(theta) +
+		     p[1]*std::sin(theta) * std::cos(phi) +
+		     std::sin(theta) * std::sin(phi) *
+		     (p[2]*std::cosh(tau)+t*std::sinh(tau));
 	return 4.*std::atan(c0*std::exp(s*arg));
       }
 
@@ -242,26 +200,25 @@ double ExactSolution<dim>::value (const Point<dim> &p,
     }
 }
 
-				 // @sect3{Boundary values and initial values}
-
-				 // For our problem, we do not enforce
-				 // Dirichlet boundary conditions and
-				 // the Neumann boundary conditions
-				 // are enforced directly through the
-				 // variational formulation. However,
-				 // since our problem is time
-				 // dependent, we must specify the
-				 // value of the independent variable
-				 // $u$ at the initial time $t_0$. We
-				 // do so via the
-				 // <code>InitialValues</code> class
-				 // below.
+				 // The second part of this section is that we
+				 // provide initial conditions. We are lazy
+				 // (and cautious) and don't want to implement
+				 // the same functions as above a second
+				 // time. Rather, if we are queried for
+				 // initial conditions, we create an object
+				 // <code>ExactSolution</code>, set it to the
+				 // correct time, and let it compute whatever
+				 // values the exact solution has at that
+				 // time:
 template <int dim>
 class InitialValues : public Function<dim>
 {
   public:
     InitialValues (const unsigned int n_components = 1, 
-		   const double time = 0.) : Function<dim>(n_components, time) {};
+		   const double time = 0.)
+		    :
+		    Function<dim>(n_components, time)
+      {}
   
     virtual double value (const Point<dim> &p,
 			  const unsigned int component = 0) const;
@@ -269,115 +226,83 @@ class InitialValues : public Function<dim>
 
 template <int dim>
 double InitialValues<dim>::value (const Point<dim> &p,
-				  const unsigned int /*component*/) const 
+				  const unsigned int component) const 
 {   
-				   // We could also use a localized
-				   // wave form for our initial
-				   // condition, and see how it
-				   // evolves when governed by the
-				   // sine-Gordon equation. An example
-				   // of such an initial condition is
-				   // the following:
-				   /*
-				     if ((p[0]>=-M_PI) && (p[0]<=M_PI) && (p[1]>=-M_PI) && (p[1]<=M_PI)) {
-				     return std::cos(p[0]/2.)*std::cos(p[1]/2.);
-				     } else {
-				     return 0.;
-				     }
-				   */
-
-				   // In 2D, another possibility for a
-				   // localized-wave initial condition
-				   // is a separable solution composed
-				   // of two 1D breathers:
-  double m = 0.5;
-  double t = this->get_time();
-  double argx = m/std::sqrt(1-m*m)*std::sin(std::sqrt(1-m*m)*t)/std::cosh(m*p[0]);
-  double argy = m/std::sqrt(1-m*m)*std::sin(std::sqrt(1-m*m)*t)/std::cosh(m*p[1]);
-  return 16.*std::atan(argx)*std::atan(argy);
-
-				   // For the purposes of validating
-				   // the program, we can use an exact
-				   // solution of the sine-Gordon
-				   // equation, at $t=t_0$, as the
-				   // initial condition for our
-				   // problem. Though, perhaps, this
-				   // is not the most efficient way to
-				   // implement the exact solution as
-				   // the initial conditons, it is
-				   // instuctive.
-				   /*
-				     ExactSolution<dim> exact_solution (1, this->get_time());
-				     return exact_solution.value (p);
-				   */
+  return ExactSolution<dim>(1, this->get_time()).value (p, component);
 }
+
+
 
 				 // @sect3{Implementation of the <code>SineGordonProblem</code> class}
 
-				 // \b TO \b DO: present the big
-				 // picture here?
+				 // Let's move on to the implementation of the
+				 // main class, as it implements the algorithm
+				 // outlined in the introduction.
 
 				 // @sect4{SineGordonProblem::SineGordonProblem}
 
 				 // This is the constructor of the
-				 // <code>SineGordonProblem</code>
-				 // class. It specifies the desired
-				 // polynomial degree of the finite
-				 // elements, associates a
+				 // <code>SineGordonProblem</code> class. It
+				 // specifies the desired polynomial degree of
+				 // the finite elements, associates a
 				 // <code>DoFHandler</code> to the
-				 // <code>triangulation</code> object
-				 // (just as in the example programs
-				 // step-3 and step-4), initializes
-				 // the current or initial time, the
-				 // final time, the time step size,
-				 // and the value of $\theta$ for the
-				 // time stepping scheme.
+				 // <code>triangulation</code> object (just as
+				 // in the example programs step-3 and
+				 // step-4), initializes the current or
+				 // initial time, the final time, the time
+				 // step size, and the value of $\theta$ for
+				 // the time stepping scheme. Since the
+				 // solutions we compute here are
+				 // time-periodic, the actual value of the
+				 // start-time doesn't matter, and we choose
+				 // it so that we start at an interesting
+				 // time.
 				 //
-				 // Note that if we were to chose the
-				 // explicit Euler time stepping
-				 // scheme ($\theta = 0$), then we
-				 // must pick a time step $k \le h$,
-				 // otherwise the scheme is not stable
-				 // and oscillations might arise in
-				 // the solution. The Crank-Nicolson
-				 // scheme ($\theta = \frac{1}{2}$)
-				 // and the implicit Euler scheme
-				 // ($\theta=1$) do not suffer from
-				 // this deficiency, since they are
-				 // unconditionally stable. However,
-				 // even then the time step should be
-				 // chosen to be on the order of $h$
-				 // in order to obtain a good
-				 // solution.
+				 // Note that if we were to chose the explicit
+				 // Euler time stepping scheme ($\theta = 0$),
+				 // then we must pick a time step $k \le h$,
+				 // otherwise the scheme is not stable and
+				 // oscillations might arise in the
+				 // solution. The Crank-Nicolson scheme
+				 // ($\theta = \frac{1}{2}$) and the implicit
+				 // Euler scheme ($\theta=1$) do not suffer
+				 // from this deficiency, since they are
+				 // unconditionally stable. However, even then
+				 // the time step should be chosen to be on
+				 // the order of $h$ in order to obtain a good
+				 // solution. Since we know that our mesh
+				 // results from the uniform subdivision of a
+				 // rectangle, we can compute that time step
+				 // easily; if we had a different domain, the
+				 // technique in step-24 using
+				 // GridTools::minimal_cell_diameter would
+				 // work as well.
 template <int dim>
-SineGordonProblem<dim>::SineGordonProblem () :
+SineGordonProblem<dim>::SineGordonProblem ()
+		:
                 fe (1),
 		dof_handler (triangulation),
-		time (-5.4414/*0.*/),
-		final_time (2.7207/*20.*/),
+		time (-5.4414),
+		final_time (2.7207),
 		time_step (10*1./std::pow(2.,n_global_refinements)),
 		theta (0.5)
 {}
 
 				 // @sect4{SineGordonProblem::make_grid_and_dofs}
 
-				 // This function creates a
-				 // rectangular grid in
-				 // <code>dim</code> dimensions and
-				 // refines it several times. Also,
-				 // all matrix and vector members of
-				 // the <code>SineGordonProblem</code>
-				 // class are initialized to their
-				 // approrpiate sizes once the degrees
-				 // of freedom have been
-				 // assembled. Unlike its analogue in
-				 // step-3 (and step-4) this function
-				 // uses <code>MatrixCreator</code>
-				 // class to generate a mass matrix
-				 // $M$ and a Laplace matrix $A$ and
-				 // store them in the appropriate
-				 // variables for the remainder of the
-				 // program's life.
+				 // This function creates a rectangular grid
+				 // in <code>dim</code> dimensions and refines
+				 // it several times. Also, all matrix and
+				 // vector members of the
+				 // <code>SineGordonProblem</code> class are
+				 // initialized to their appropriate sizes
+				 // once the degrees of freedom have been
+				 // assembled. Like step-24, we use the
+				 // <code>MatrixCreator</code> class to
+				 // generate a mass matrix $M$ and a Laplace
+				 // matrix $A$ and store them in the
+				 // appropriate variables for the remainder of
+				 // the program's life.
 template <int dim>
 void SineGordonProblem<dim>::make_grid_and_dofs ()
 {
@@ -407,9 +332,11 @@ void SineGordonProblem<dim>::make_grid_and_dofs ()
   mass_matrix.reinit    (sparsity_pattern);
   laplace_matrix.reinit (sparsity_pattern);
 
-  MatrixCreator::create_mass_matrix (dof_handler, QGauss<dim>(3), 
+  MatrixCreator::create_mass_matrix (dof_handler,
+				     QGauss<dim>(3), 
 				     mass_matrix);
-  MatrixCreator::create_laplace_matrix (dof_handler, QGauss<dim>(3), 
+  MatrixCreator::create_laplace_matrix (dof_handler,
+					QGauss<dim>(3), 
 					laplace_matrix);
 
   solution.reinit       (dof_handler.n_dofs());
@@ -417,36 +344,29 @@ void SineGordonProblem<dim>::make_grid_and_dofs ()
   old_solution.reinit   (dof_handler.n_dofs());
   massmatxvel.reinit    (dof_handler.n_dofs());
   system_rhs.reinit     (dof_handler.n_dofs());
-
-				   // We will use the
-				   // <code>fem_errors</code> vector,
-				   // which is of size equal to the
-				   // number of time steps, to store
-				   // the errors in the finite element
-				   // solution after each time
-				   // step. Note that we must make the
-				   // first element of the vector
-				   // equal to zero, since there is no
-				   // error in the solution after
-				   // zeroth time step because the
-				   // solution is just the initial
-				   // condition.
-  const unsigned int n_time_steps
-    = static_cast<unsigned int>(std::ceil(std::fabs(final_time-time)/time_step));
-  fem_errors.reinit (n_time_steps);
-  fem_errors(0) = 0.;
 }
 
 				 // @sect4{SineGordonProblem::assemble_system}
 
-				 // This functions assembles the
-				 // system matrix and right-hand side
-				 // vector for each iteration of
-				 // Newton's method. The reader should
-				 // refer to the last section of the
-				 // Introduction for the explicit
-				 // formulas for the system matrix and
-				 // right-hand side.
+				 // This functions assembles the system matrix
+				 // and right-hand side vector for each
+				 // iteration of Newton's method. The reader
+				 // should refer to the Introduction for the
+				 // explicit formulas for the system matrix
+				 // and right-hand side.
+				 //
+				 // Note that in each time step, we have to
+				 // add up the various contributions to the
+				 // matrix and right hand sides. In contrast
+				 // to step-23 and step-24, this requires
+				 // assembling a few more terms, since they
+				 // depend on the solution of the previous
+				 // time step or previous nonlinear step. We
+				 // use the functions
+				 // <code>compute_nl_matrix</code> and
+				 // <code>compute_nl_term</code> to do this,
+				 // while the present function provides the
+				 // top-level logic.
 template <int dim>
 void SineGordonProblem<dim>::assemble_system () 
 {  
@@ -458,6 +378,7 @@ void SineGordonProblem<dim>::assemble_system ()
   system_matrix = 0;
   system_matrix.copy_from (mass_matrix);
   system_matrix.add (std::pow(time_step*theta,2), laplace_matrix);
+
   SparseMatrix<double> tmp_matrix (sparsity_pattern);
   compute_nl_matrix (old_solution, solution, tmp_matrix);
   system_matrix.add (-std::pow(time_step*theta,2), tmp_matrix);
@@ -469,6 +390,7 @@ void SineGordonProblem<dim>::assemble_system ()
   tmp_matrix = 0;
   tmp_matrix.copy_from (mass_matrix);
   tmp_matrix.add (std::pow(time_step*theta,2), laplace_matrix);
+
   Vector<double> tmp_vector (solution.size());
   tmp_matrix.vmult (tmp_vector, solution);
   system_rhs += tmp_vector;
@@ -476,6 +398,7 @@ void SineGordonProblem<dim>::assemble_system ()
   tmp_matrix = 0;
   tmp_matrix.copy_from (mass_matrix);
   tmp_matrix.add (-std::pow(time_step,2)*theta*(1-theta), laplace_matrix);
+
   tmp_vector = 0;
   tmp_matrix.vmult (tmp_vector, old_solution);
   system_rhs -= tmp_vector;
@@ -492,41 +415,51 @@ void SineGordonProblem<dim>::assemble_system ()
 				 // @sect4{SineGordonProblem::compute_nl_term}
 
 				 // This function computes the vector
-				 // $S(\cdot,\cdot)$ corresponding to
-				 // the nonlinear term in the
-				 // auxilliary (second) equation of
-				 // the split formulation. This
-				 // function not only simplifies the
-				 // repeated computation of this term,
-				 // but it is also a fundamental part
-				 // of nonlinear iterative solver that
-				 // we use when the time stepping is
-				 // implicit (i.e. $\theta\ne
-				 // 0$). Moreover, we must allow the
-				 // function to receive as input an
-				 // "old" and a "new" solution, which
-				 // may not be the actual solutions of
-				 // the problem stored in
+				 // $S(\cdot,\cdot)$, which appears in the
+				 // nonlinear term in the both equations of
+				 // the split formulation. This function not
+				 // only simplifies the repeated computation
+				 // of this term, but it is also a fundamental
+				 // part of the nonlinear iterative solver
+				 // that we use when the time stepping is
+				 // implicit (i.e. $\theta\ne 0$). Moreover,
+				 // we must allow the function to receive as
+				 // input an "old" and a "new" solution. These
+				 // may not be the actual solutions of the
+				 // problem stored in
 				 // <code>old_solution</code> and
-				 // <code>solution.</code> For the
-				 // purposes of this function, let us
-				 // call the first two arguments
-				 // $w_{\mathrm{old}}$ and
-				 // $w_{\mathrm{new}}$, respectively.
+				 // <code>solution</code>, but are simply the
+				 // two functions we linearize around. For the
+				 // purposes of this function, let us call the
+				 // first two arguments $w_{\mathrm{old}}$ and
+				 // $w_{\mathrm{new}}$ in the documentation of
+				 // this class below, respectively.
 				 //
-				 // It is perhaps worth investigating
-				 // what order quadrature formula is
-				 // best suited for this type of
-				 // integration, since $\sin(\cdot)$
-				 // is an oscillatory function.
+				 // As a side-note, it is perhaps worth
+				 // investigating what order quadrature
+				 // formula is best suited for this type of
+				 // integration. Since $\sin(\cdot)$ is not a
+				 // polynomial, there are probably no
+				 // quadrature formulas that can integrate
+				 // these terms exactly. It is usually
+				 // sufficient to just make sure that the
+				 // right hand side is integrated up to the
+				 // same order of accuracy as the
+				 // discretization scheme is, but it may be
+				 // possible to improve on the constant in the
+				 // asympotitic statement of convergence by
+				 // choosing a more accurate quadrature
+				 // formula.
 template <int dim>
 void SineGordonProblem<dim>::compute_nl_term (const Vector<double> &old_data,
 					      const Vector<double> &new_data,
 					      Vector<double>       &nl_term) const
 {
-  QGauss<dim>   quadrature_formula (3);
-  FEValues<dim> fe_values (fe, quadrature_formula, 
-			   update_values | update_JxW_values | update_q_points);
+  const QGauss<dim> quadrature_formula (3);
+  FEValues<dim>     fe_values (fe, quadrature_formula, 
+			       update_values |
+			       update_JxW_values |
+			       update_q_points);
   
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.n_quadrature_points;
@@ -543,32 +476,27 @@ void SineGordonProblem<dim>::compute_nl_term (const Vector<double> &old_data,
   for (; cell!=endc; ++cell)
     { 
 				       // Once we re-initialize our
-				       // <code>FEValues</code>
-				       // instantiation to the current
-				       // cell, we make use of the
-				       // <code>get_function_values</code>
-				       // routine to get the obtain
-				       // the values of the "old" data
-				       // (presumably at $t=t_{n-1}$)
-				       // and the "new" data
-				       // (presumably at $t=t_n$) at
-				       // the nodes of the chosen
-				       // quadrature formula.
+				       // <code>FEValues</code> instantiation
+				       // to the current cell, we make use of
+				       // the <code>get_function_values</code>
+				       // routine to get the values of the
+				       // "old" data (presumably at
+				       // $t=t_{n-1}$) and the "new" data
+				       // (presumably at $t=t_n$) at the nodes
+				       // of the chosen quadrature formula.
       fe_values.reinit (cell);
       fe_values.get_function_values (old_data, old_data_values);
       fe_values.get_function_values (new_data, new_data_values);
       
 				       // Now, we can evaluate $\int_K
-				       // \sin\left[\theta
-				       // w_{\mathrm{new}} +
-				       // (1-\theta)
-				       // w_{\mathrm{old}}\right]\,\varphi_j\,\mathrm{d}x$
-				       // using the desired quadrature
-				       // formula.
+				       // \sin\left[\theta w_{\mathrm{new}} +
+				       // (1-\theta) w_{\mathrm{old}}\right]
+				       // \,\varphi_j\,\mathrm{d}x$ using the
+				       // desired quadrature formula.
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i) 	   
-	  local_nl_term(i) += (std::sin(theta*new_data_values.at(q_point) +
-					(1-theta)*old_data_values.at(q_point)) *
+	  local_nl_term(i) += (std::sin(theta * new_data_values[q_point] +
+					(1-theta) * old_data_values[q_point]) *
 			       fe_values.shape_value (i, q_point) *
 			       fe_values.JxW (q_point));	    
       
@@ -587,18 +515,16 @@ void SineGordonProblem<dim>::compute_nl_term (const Vector<double> &old_data,
 
 				 // @sect4{SineGordonProblem::compute_nl_matrix}
 
-				 // This function computes the matrix
-				 // $N(\cdot,\cdot)$ corresponding to
-				 // the nonlinear term in the Jacobian
-				 // of $F(\cdot)$. It is also a
-				 // fundamental part of nonlinear
-				 // iterative solver. Just as
-				 // <code>compute_nl_term</code>, we
-				 // must allow this function to
-				 // receive as input an "old" and a
-				 // "new" solution, which we call the
-				 // $w_{\mathrm{old}}$ and
-				 // $w_{\mathrm{new}}$, respectively.
+				 // This second function dealing with the
+				 // nonlinear scheme computes the matrix
+				 // $N(\cdot,\cdot)$ appearing in the
+				 // nonlinear term in the Jacobian of
+				 // $F(\cdot)$. Just as
+				 // <code>compute_nl_term</code>, we must
+				 // allow this function to receive as input an
+				 // "old" and a "new" solution, which we again
+				 // call $w_{\mathrm{old}}$ and
+				 // $w_{\mathrm{new}}$ below, respectively.
 template <int dim>
 void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data, 
 						const Vector<double> &new_data,
@@ -643,8 +569,8 @@ void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data,
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i) 
 	  for (unsigned int j=0; j<dofs_per_cell; ++j) 
-	    local_nl_matrix(i,j) += (std::cos(theta*new_data_values.at(q_point) +
-					      (1-theta)*old_data_values.at(q_point)) *
+	    local_nl_matrix(i,j) += (std::cos(theta * new_data_values[q_point] +
+					      (1-theta) * old_data_values[q_point]) *
 				     fe_values.shape_value (i, q_point) *
 				     fe_values.shape_value (j, q_point) *
 				     fe_values.JxW (q_point));
@@ -664,94 +590,55 @@ void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data,
     }
 }
 
-				 // @sect4{SineGordonProblem::compute_error}
 
-				 // This function computes the norm of
-				 // the difference between the
-				 // computed (i.e., finite element)
-				 // solution after time step
-				 // <code>timestep_number</code> and
-				 // the exact solution to see how well
-				 // we are doing. There are several
-				 // choices for norms available to us
-				 // in the <code>VectorTools</code>
-				 // class. We use the $L^2$ norm
-				 // because it is a natural choice for
-				 // our problem, since the solutions
-				 // to the sine-Gordon equation have
-				 // finite energy or, equivalently,
-				 // are $L^2$ functions. Given our
-				 // weak formulation of the
-				 // sine-Gordon equation, we are
-				 // computing a solution $u\in
-				 // H^1(\Omega)$, hence we could also
-				 // use the $H^1$ norm to compute the
-				 // error of the spatial
-				 // discretization. For more
-				 // information on the details behind
-				 // this computation, the reader
-				 // should refer to step-7.
-/*
-template <int dim>
-void SineGordonProblem<dim>::compute_error (const unsigned int timestep_number)
-{
-//TODO: do we need this still now? And do we still need fem_errors? We never call this function since exact_solution_known was always false...  
-  ExactSolution<dim> exact_solution (1, time);
-  
-  Vector<double> difference_per_cell (triangulation.n_active_cells());
-  VectorTools::integrate_difference (dof_handler,
-				     solution,
-				     exact_solution,
-				     difference_per_cell,
-				     QGauss<dim>(3),
-				     VectorTools::L2_norm);
-  fem_errors(timestep_number) = difference_per_cell.l2_norm();
-  
-  std::cout << "   The L^2 error in the solution is " 
-	    << fem_errors(timestep_number) << "."
-	    << std::endl;
-}
-*/
 
 				 // @sect4{SineGordonProblem::solve}
 
-				 // This function uses the GMRES
-				 // iterative solver on the linear
-				 // system of equations resulting from
-				 // the finite element spatial
-				 // discretization of each iteration
-				 // of Newton's method for the
-				 // (nonlinear) first equation in the
-				 // split formulation we derived in
-				 // the Introduction. The solution to
-				 // the system is, in fact, $\delta
-				 // U^n_l$ so it is stored in
-				 // <code>d_solution</code> and used
-				 // to update <code>solution</code> in
-				 // the <code>run</code> function. We
-				 // cannot use the Conjugate Gradient
-				 // solver because the nonlinear term
-				 // in the Jacobian matrix results in
-				 // a non-positive-definite matrix to
-				 // invert. Moreover, we would like
-				 // the solver to quit when the \e
-				 // relative error is $10^{-12}$. This
-				 // function is similar to its
-				 // analogue in step-3 (and step-4);
-				 // the only difference is the choice
-				 // of iterative solver and the new
-				 // stopping criterion.
+				 // As discussed in the Introduction, this
+				 // function uses the CG iterative solver on
+				 // the linear system of equations resulting
+				 // from the finite element spatial
+				 // discretization of each iteration of
+				 // Newton's method for the (nonlinear) first
+				 // equation of the split formulation. The
+				 // solution to the system is, in fact,
+				 // $\delta U^n_l$ so it is stored in
+				 // <code>d_solution</code> and used to update
+				 // <code>solution</code> in the
+				 // <code>run</code> function.
+				 //
+				 // Note that we re-set the solution update to
+				 // zero before solving for it. This is not
+				 // necessary: iterative solvers can start
+				 // from any point and converge to the correct
+				 // solution. If one has a good estimate about
+				 // the solution of a linear system, it may be
+				 // worthwhile to start from that vector, but
+				 // as a general observation it is a fact that
+				 // the starting point doesn't matter very
+				 // much: it has to be a very very good guess
+				 // to reduce the number of iterations by more
+				 // than a few. It turns out that here, it
+				 // using the previous nonlinear update as a
+				 // starting point actually hurts and
+				 // increases the number of iterations needed,
+				 // so we simply set it to zero.
 template <int dim>
-void SineGordonProblem<dim>::solve () 
+unsigned int
+SineGordonProblem<dim>::solve () 
 {
   SolverControl solver_control (1000, 1e-12*system_rhs.l2_norm());
-  SolverGMRES<> gmres (solver_control);
-  d_solution = 0;
-  gmres.solve (system_matrix, d_solution, system_rhs, PreconditionIdentity());
+  SolverCG<> cg (solver_control);
 
-  std::cout << "   " << solver_control.last_step()
-	    << " GMRES iterations needed to obtain convergence."
-	    << std::endl;
+  PreconditionSSOR<> preconditioner;
+  preconditioner.initialize(system_matrix, 1.2);
+  
+  d_solution = 0;
+  cg.solve (system_matrix, d_solution,
+	    system_rhs,
+	    preconditioner);
+
+  return solver_control.last_step();
 }
 
 				 // @sect4{SineGordonProblem::output_results}
@@ -821,11 +708,8 @@ void SineGordonProblem<dim>::output_results (const unsigned int timestep_number)
 				 // control over everything: it runs
 				 // the (outer) time-stepping loop,
 				 // the (inner) nonlinear-solver loop,
-				 // outputs the solution after each
-				 // time step and calls the
-				 // <code>compute_error</code> routine
-				 // after each time step if an exact
-				 // solution is known.
+				 // and outputs the solution after each
+				 // time step.
 template <int dim>
 void SineGordonProblem<dim>::run () 
 {
@@ -897,7 +781,7 @@ void SineGordonProblem<dim>::run ()
       old_solution = solution;
 
       std::cout << std::endl
-		<< " Time step #" << timestep_number << "; "
+		<< "Time step #" << timestep_number << "; "
 		<< "advancing to t = " << time << "." 
 		<< std::endl;
 
@@ -915,19 +799,30 @@ void SineGordonProblem<dim>::run ()
 				       // loop below is done, we have
 				       // (an approximation of) $U^n$.
       double initial_rhs_norm = 0.;
-      unsigned int nliter = 1;
+      bool first_iteration = true;
       do 
 	{
 	  assemble_system ();
-	  if (nliter == 1) initial_rhs_norm = system_rhs.l2_norm();
-	  std::cout << "   [NLITER]"; 
-	  solve ();
+
+	  if (first_iteration == true)
+	    initial_rhs_norm = system_rhs.l2_norm();
+
+	  const unsigned int n_iterations
+	    = solve ();
+
 	  solution += d_solution;
-	  d_solution = 0;
-	  nliter++;
+
+	  if (first_iteration == true)
+	    std::cout << "    " << n_iterations;
+	  else
+	    std::cout << '+' << n_iterations;
+	  first_iteration = false;
 	} 
       while (system_rhs.l2_norm() > 1e-6 * initial_rhs_norm);
-  
+
+      std::cout << " CG iterations per nonlinear step."
+		<< std::endl;
+      
 				       // In the case of the explicit
 				       // Euler time stepping scheme,
 				       // we must pick the time step
@@ -947,20 +842,17 @@ void SineGordonProblem<dim>::run ()
       if (timestep_number % output_timestep_skip == 0)
 	output_results (timestep_number);
       
-				       // Upon obtaining the solution
-				       // to the problem at $t=t_n$,
-				       // we must update the
+				       // Upon obtaining the solution to the
+				       // first equation of the problem at
+				       // $t=t_n$, we must update the
 				       // auxilliary velocity variable
-				       // $V^n$. However, we do not
-				       // compute and store $V^n$
-				       // since it is not a quantity
-				       // we use directly in the
-				       // problem. Hence, for
-				       // simplicity, we update $MV^n$
-				       // directly using the second
-				       // equation in the last
-				       // subsection of the
-				       // Introduction.
+				       // $V^n$. However, we do not compute
+				       // and store $V^n$ since it is not a
+				       // quantity we use directly in the
+				       // problem. Hence, for simplicity, we
+				       // update $MV^n$ directly using the
+				       // second equation in the last
+				       // subsection of the Introduction.
       Vector<double> tmp_vector (solution.size());
       laplace_matrix.vmult (tmp_vector, solution);
       massmatxvel.add (-time_step*theta, tmp_vector);
