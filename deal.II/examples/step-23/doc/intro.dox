@@ -314,6 +314,10 @@ integrals that contain shape functions defined on two meshes. This is a
 somewhat messy process that we omit here, but that is treated in some
 detail in @ref step_22 "step-22".
 
+Under these conditions (i.e. a mesh that doesn't change), one can optimize the
+solution procedure a bit by basically eliminating the solution of the second
+linear system. We will discuss this in the introduction of the @ref step_25
+"step-25" program. 
 
 <h3>Energy conservation</h3>
 
