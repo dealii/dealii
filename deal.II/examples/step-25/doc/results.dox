@@ -35,13 +35,45 @@ To this end, we can rotate the kink solution discussed above about the $z$ axis,
 
 \image html step-25.2d-angled_kink.gif "Animation of a moving 2D kink, at 45 degrees to the axis of the grid, showing boundary effects." width=5cm
 
-Another interesting solution to the sine-Gordon equation (which cannot be obtained analytically) can be produced by using two 1D breathers to construct the following separable 2D initial condition:
+Another interesting solution to the sine-Gordon equation (which cannot be
+obtained analytically) can be produced by using two 1D breathers to construct
+the following separable 2D initial condition: 
 \f[
-u_0(x) = u_{\mathrm{pseudobreather}}(x,t_0) = 16\arctan \left(\frac{m}{\sqrt{1-m^2}} \frac{\sin\left(\sqrt{1-m^2}t_0\right)}{\cosh(mx_1)} \right)\arctan \left(\frac{m}{\sqrt{1-m^2}} \frac{\sin\left(\sqrt{1-m^2}t_0\right)}{\cosh(mx_2)} \right),
+  u_0(x) = 
+  u_{\mathrm{pseudobreather}}(x,t_0) = 
+  16\arctan \left(
+    \frac{m}{\sqrt{1-m^2}}
+    \frac{\sin\left(\sqrt{1-m^2}t_0\right)}{\cosh(mx_1)} \right)
+  \arctan \left(
+    \frac{m}{\sqrt{1-m^2}}
+    \frac{\sin\left(\sqrt{1-m^2}t_0\right)}{\cosh(mx_2)} \right), 
 \f]
-where $x=(x_1,x_2)\in{R}^2$, $m=0.5(<1)$ as in the 1D case we discussed above. For the simulation shown below, we have chosen $\theta=\frac{1}{2}$, $k=10h$, $t_0=-5.4414$ and $t_f=2.7207$. The solution is pretty interesting --- it acts like a breather (as far as the pictures are concerned); however, it appears to break up and reassemble, rather than just oscillate. Naturally, the are things in the animation that can not be explained in a few words due to the fact that this initial condition is not an analytical solution to the sine-Gordon equation.
+where $x=(x_1,x_2)\in{R}^2$, $m=0.5(<1)$ as in the 1D case we discussed
+above. For the simulation shown below, we have chosen $\theta=\frac{1}{2}$,
+$k=10h$, $t_0=-5.4414$ and $t_f=2.7207$. The solution is pretty interesting
+--- it acts like a breather (as far as the pictures are concerned); however,
+it appears to break up and reassemble, rather than just oscillate. Naturally,
+the are things in the animation that can not be explained in a few words due
+to the fact that this initial condition is not an analytical solution to the
+sine-Gordon equation. 
 
 \image html step-25.2d-pseudobreather.gif "Animation of a 2D pseudobreather." width=5cm
 
 <h3>Future work</h3>
 Time-adaptive grids would likely be useful when solving a problem like this one (especially in the case of a traveling wave). However, due to the complexity of their implementation they are better left for another day.
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+It is instructive to change the initial conditions. Most choices will not lead
+to solutions that stay localized, but lead to solutions where the wave-like
+character of the equation dominates and a wave travels away from the location
+of a localized initial condition. For example, it is worth playing around with
+the <code>InitialValues</code> class, by replacing the call to the
+<code>ExactSolution</code> class by something like this function:
+@f[
+  u_0(x,y) = \cos\left(\frac x2\right)\cos\left(\frac y2\right)
+@f]
+if $|x|,|y|\le \frac\pi 2$, and $u_0(x,y)=0$ outside this region.
