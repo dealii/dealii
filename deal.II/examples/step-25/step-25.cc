@@ -69,7 +69,47 @@ using namespace dealii;
 				 // the dimension-independent
 				 // class-encapsulation of the problem, the
 				 // reader should consult step-3 and step-4.
-//TODO
+				 //
+				 // Compared to step-23 and step-24, there
+				 // isn't much newsworthy in the general
+				 // structure of the program (though there is
+				 // of course in the inner working of the
+				 // various functions!). The most notable
+				 // difference is the presence of the two new
+				 // functions <code>compute_nl_term</code> and
+				 // <code>compute_nl_matrix</code> that
+				 // compute the nonlinear contributions to the
+				 // matrix and right hand sides of the first
+				 // equation, as discussed in the
+				 // Introduction. In addition, we have to have
+				 // a vector <code>update_solution</code> that
+				 // contains the nonlinear update to the
+				 // solution vector in each Newton step.
+				 //
+				 // As also mentioned in the introduction, we
+				 // do not store the velocity variable in this
+				 // program, but the mass matrix times the
+				 // velocity. This is done in the
+				 // <code>M_x_velocity</code> variable (the
+				 // "<code>x</code>" is intended to stand for
+				 // "times").
+				 //
+				 // Finally, the
+				 // <code>output_timestep_skip</code> variable
+				 // stores every how many time steps graphical
+				 // output is to be generated. This is of
+				 // importance when using fine meshes (and
+				 // consequently small time steps) where we
+				 // would run lots of time steps and create
+				 // lots of output files of solutions that
+				 // look almost the same in subsequent
+				 // files. This only clogs up our
+				 // visualization procedures and we should
+				 // avoid creating more output than we are
+				 // really interested in. Therefore, if this
+				 // variable is to a value $n$ bigger than
+				 // one, output is generated only every $n$th
+				 // time step.
 template <int dim>
 class SineGordonProblem 
 {
@@ -87,7 +127,7 @@ class SineGordonProblem
 			    const Vector<double> &new_data,
 			    SparseMatrix<double> &nl_matrix) const;
     unsigned int solve ();
-    void output_results (const unsigned int timestep_number);
+    void output_results (const unsigned int timestep_number) const;
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -98,15 +138,17 @@ class SineGordonProblem
     SparseMatrix<double> mass_matrix;
     SparseMatrix<double> laplace_matrix;
     
-    double time, final_time, time_step;
-    double theta;
+    const unsigned int n_global_refinements;
 
-    Vector<double>       solution, d_solution, old_solution;
-    Vector<double>       massmatxvel;
+    double time;
+    const double final_time, time_step;
+    const double theta;
+
+    Vector<double>       solution, update_solution, old_solution;
+    Vector<double>       M_x_velocity;
     Vector<double>       system_rhs;
 
-    static const unsigned int output_timestep_skip = 1;
-    static const int n_global_refinements = 6;
+    const unsigned int output_timestep_skip;
 };
 
 
@@ -278,10 +320,12 @@ SineGordonProblem<dim>::SineGordonProblem ()
 		:
                 fe (1),
 		dof_handler (triangulation),
+		n_global_refinements (6),
 		time (-5.4414),
 		final_time (2.7207),
 		time_step (10*1./std::pow(2.,n_global_refinements)),
-		theta (0.5)
+		theta (0.5),
+		output_timestep_skip (1)
 {}
 
 				 // @sect4{SineGordonProblem::make_grid_and_dofs}
@@ -336,9 +380,9 @@ void SineGordonProblem<dim>::make_grid_and_dofs ()
 					laplace_matrix);
 
   solution.reinit       (dof_handler.n_dofs());
-  d_solution.reinit     (dof_handler.n_dofs());
+  update_solution.reinit     (dof_handler.n_dofs());
   old_solution.reinit   (dof_handler.n_dofs());
-  massmatxvel.reinit    (dof_handler.n_dofs());
+  M_x_velocity.reinit    (dof_handler.n_dofs());
   system_rhs.reinit     (dof_handler.n_dofs());
 }
 
@@ -399,7 +443,7 @@ void SineGordonProblem<dim>::assemble_system ()
   tmp_matrix.vmult (tmp_vector, old_solution);
   system_rhs -= tmp_vector;
 
-  system_rhs.add (-time_step, massmatxvel);
+  system_rhs.add (-time_step, M_x_velocity);
 
   tmp_vector = 0;
   compute_nl_term (old_solution, solution, tmp_vector);
@@ -599,7 +643,7 @@ void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data,
 				 // equation of the split formulation. The
 				 // solution to the system is, in fact,
 				 // $\delta U^n_l$ so it is stored in
-				 // <code>d_solution</code> and used to update
+				 // <code>update_solution</code> and used to update
 				 // <code>solution</code> in the
 				 // <code>run</code> function.
 				 //
@@ -636,8 +680,8 @@ SineGordonProblem<dim>::solve ()
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
   
-  d_solution = 0;
-  cg.solve (system_matrix, d_solution,
+  update_solution = 0;
+  cg.solve (system_matrix, update_solution,
 	    system_rhs,
 	    preconditioner);
 
@@ -651,7 +695,8 @@ SineGordonProblem<dim>::solve ()
 				 // respective functions in step-23 and
 				 // step-24:
 template <int dim>
-void SineGordonProblem<dim>::output_results (const unsigned int timestep_number)
+void
+SineGordonProblem<dim>::output_results (const unsigned int timestep_number) const
 {
   DataOut<dim> data_out;
 
@@ -766,7 +811,7 @@ void SineGordonProblem<dim>::run ()
 	  const unsigned int n_iterations
 	    = solve ();
 
-	  solution += d_solution;
+	  solution += update_solution;
 
 	  if (first_iteration == true)
 	    std::cout << "    " << n_iterations;
@@ -790,15 +835,15 @@ void SineGordonProblem<dim>::run ()
 				       // update $MV^n$ directly:
       Vector<double> tmp_vector (solution.size());
       laplace_matrix.vmult (tmp_vector, solution);
-      massmatxvel.add (-time_step*theta, tmp_vector);
+      M_x_velocity.add (-time_step*theta, tmp_vector);
 
       tmp_vector = 0;
       laplace_matrix.vmult (tmp_vector, old_solution);
-      massmatxvel.add (-time_step*(1-theta), tmp_vector);
+      M_x_velocity.add (-time_step*(1-theta), tmp_vector);
       
       tmp_vector = 0;
       compute_nl_term (old_solution, solution, tmp_vector);
-      massmatxvel.add (-time_step, tmp_vector);
+      M_x_velocity.add (-time_step, tmp_vector);
 
 				       // Oftentimes, in particular for fine
 				       // meshes, we must pick the time step
