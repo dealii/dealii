@@ -45,7 +45,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 				 // This is the only new one: We will need a
 				 // library function defined in a class
@@ -532,11 +531,10 @@ void TATForwardProblem<dim>::output_results () const
 
   data_out.build_patches ();
 
-  std::ostringstream filename;
-  filename << "solution-"
-	   << Utilities::int_to_string (timestep_number, 3)
-	   << ".gnuplot";
-  std::ofstream output (filename.str().c_str());
+  std::string filename =  "solution-" +
+			  Utilities::int_to_string (timestep_number, 3) +
+			  ".gnuplot";
+  std::ofstream output (filename.c_str());
   data_out.write_gnuplot (output);
 }
 
