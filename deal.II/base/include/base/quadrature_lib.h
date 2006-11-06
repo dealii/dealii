@@ -89,9 +89,10 @@ class QGaussLobatto : public Quadrature<dim>
 				      * @param q  number of points.
 				      * @return vector containing nodes.
 				      */
-    std::vector<double> compute_quadrature_points(const unsigned int q,
-                                                  const int alpha,
-                                                  const int beta) const;
+    std::vector<double>
+    compute_quadrature_points (const unsigned int q,
+			       const int alpha,
+			       const int beta) const;
 
     				     /**
 				      * Compute Legendre-Gauss-Lobatto quadrature
@@ -99,9 +100,10 @@ class QGaussLobatto : public Quadrature<dim>
 				      * @param x  quadrature points.
 				      * @return vector containing weights.
 				      */
-    std::vector<double> compute_quadrature_weights(std::vector<double>& x,
-                                                   const int alpha,
-                                                   const int beta) const;
+    std::vector<double>
+    compute_quadrature_weights (const std::vector<double> &x,
+				const int alpha,
+				const int beta) const;
     
 				     /**
 				      * Evaluate a Jacobi polynomial
@@ -304,7 +306,7 @@ std::vector<double> QGaussLobatto<1>::
 compute_quadrature_points(const unsigned int, const int, const int) const;
 template <>
 std::vector<double> QGaussLobatto<1>::
-compute_quadrature_weights(std::vector<double>&, const int, const int) const;
+compute_quadrature_weights(const std::vector<double>&, const int, const int) const;
 template <>
 double QGaussLobatto<1>::
 JacobiP(const double, const int, const int, const unsigned int) const;

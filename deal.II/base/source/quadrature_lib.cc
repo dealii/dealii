@@ -223,7 +223,7 @@ compute_quadrature_points(const unsigned int q,
 
 template <>
 std::vector<double> QGaussLobatto<1>::
-compute_quadrature_weights(std::vector<double>& x,
+compute_quadrature_weights(const std::vector<double> &x,
 			   const int alpha,
 			   const int beta) const
 {
@@ -231,8 +231,10 @@ compute_quadrature_weights(std::vector<double>& x,
   std::vector<double> w(q);
   double s = 0;
   
-  double factor = std::pow(2., alpha+beta+1)*gamma(alpha+q)*gamma(beta+q)/
-		  ((q-1)*gamma(q)*gamma(alpha+beta+q+1));
+  const double factor = std::pow(2., alpha+beta+1) *
+			gamma(alpha+q) *
+			gamma(beta+q) /
+			((q-1)*gamma(q)*gamma(alpha+beta+q+1));
   for (unsigned int i=0; i<q; ++i)
     {
       s = JacobiP(x[i], alpha, beta, q-1);
