@@ -1,4 +1,4 @@
-/* $Id: step-4.cc 14057 2006-10-23 21:47:43Z bangerth $ */
+/* $Id$ */
 /*    Version: $Name:  $                                          */
 /*                                                                */
 /*    Copyright (C) 2006 by the deal.II authors */

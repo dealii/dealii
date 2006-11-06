@@ -1,7 +1,7 @@
-/* $Id: step-4.cc 13345 2006-07-06 13:44:43Z guido $ */
+/* $Id$ */
 /* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
-/*    $Id: step-4.cc 13345 2006-07-06 13:44:43Z guido $       */
+/*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
 /*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors */
