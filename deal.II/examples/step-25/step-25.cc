@@ -28,6 +28,7 @@
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
+#include <base/utilities.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
@@ -46,10 +47,10 @@
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
-#include <numerics/data_out_stack.h>
+
 #include <fstream>
 #include <iostream>
-#include <sstream>
+
 
 				 // The last step is as in all
 				 // previous programs:
@@ -106,8 +107,6 @@ class SineGordonProblem
     Vector<double>       solution, d_solution, old_solution;
     Vector<double>       massmatxvel;
     Vector<double>       system_rhs;
-
-    DataOutStack<dim>    data_out_stack;
 
     static const unsigned int output_timestep_skip = 1;
     static const int n_global_refinements = 6;
@@ -661,45 +660,12 @@ void SineGordonProblem<dim>::output_results (const unsigned int timestep_number)
   data_out.add_data_vector (solution, "u");
   data_out.build_patches ();
 
-  std::ostringstream filename;
-  filename << "solution-" << dim << "d-";
+  const std::string filename =  "solution-" +
+				Utilities::int_to_string (timestep_number, 3) +
+				".vtk";
 
-				   // Pad the time step number in
-				   // filename with zeros in the
-				   // beginning so that the files are
-				   // ordered correctly in the shell
-				   // and we can generate a good
-				   // animation using convert.
-  if (timestep_number<10) 
-    filename << "0000" << timestep_number;
-  else if (timestep_number<100)
-    filename << "000" << timestep_number;
-  else if (timestep_number<1000)
-    filename << "00" << timestep_number;
-  else if (timestep_number<10000)
-    filename << "0" << timestep_number;
-  else 
-    filename << timestep_number;
-  
-				   // We output the solution at the
-				   // desired times in
-				   // <code>vtk</code> format, so that
-				   // we can use VisIt to make plots
-				   // and/or animations.
-  filename << ".vtk";
-  std::ofstream output (filename.str().c_str());
+  std::ofstream output (filename.c_str());
   data_out.write_vtk (output);
-
-				   // We also store the current
-				   // solution in our instantiation of
-				   // a <code>DataOutStack</code>
-				   // object, so that we can make a
-				   // space-time plot of the solution.
-  data_out_stack.new_parameter_value (time, time_step*output_timestep_skip);
-  data_out_stack.attach_dof_handler (dof_handler);
-  data_out_stack.add_data_vector (solution, "solution");
-  data_out_stack.build_patches (1);
-  data_out_stack.finish_parameter_value ();
 }
 
 				 // @sect4{SineGordonProblem::run}
@@ -713,9 +679,6 @@ void SineGordonProblem<dim>::output_results (const unsigned int timestep_number)
 template <int dim>
 void SineGordonProblem<dim>::run () 
 {
-  data_out_stack.declare_data_vector ("solution",
-				      DataOutStack<dim>::dof_vector);
-
   std::cout << "Solving problem in " << dim << " space dimensions." 
 	    << std::endl;
   
@@ -865,15 +828,6 @@ void SineGordonProblem<dim>::run ()
       compute_nl_term (old_solution, solution, tmp_vector);
       massmatxvel.add (-time_step, tmp_vector);
     }
-
-				   // Finally, we output the sequence
-				   // of solutions stored
-				   // <code>data_out_stack</code> to a
-				   // file of the appropriate format.
-  std::ostringstream filename;
-  filename << "solution-" << dim << "d-" << "stacked" << ".vtk";
-  std::ofstream output (filename.str().c_str());
-  data_out_stack.write_vtk (output);
 }
 
 				 // @sect3{The <code>main</code> function}
