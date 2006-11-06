@@ -566,7 +566,7 @@ void TATForwardProblem<dim>::run ()
 {
   setup_system();
 
-  VectorTools::project (dof_handler,constraints, 
+  VectorTools::project (dof_handler, constraints,
 			QGauss<dim>(3), InitialValuesP<dim>(),
 			old_solution_p);
   old_solution_v = 0;
