@@ -222,10 +222,10 @@ this:
   <li>In 1d:
   @f[
   u(x,t) = 
-  -f \arctan\left[
-     \frac
-     {m\sin\left(\sqrt{1-m^2}t+c_2\right)}
-     {\sqrt{1-m^2} \cosh\left(mx+c_1\right)}
+  -4 \arctan\left[
+     \frac{m\sin}{\sqrt{1-m^2}}
+     \frac{\left(\sqrt{1-m^2}t+c_2\right)}
+     {\cosh\left(mx+c_1\right)}
      \right]
   @f]
   where we choose $m=\frac 12, c_1=c_2=0$.
