@@ -1,4 +1,4 @@
-/*    $Id: $.                  */
+/*    $Id:$.                  */
 /*    Copyright (C) 2006 by the deal.II authors */
 /*    Author: Ivan Christov, Wolfgang Bangerth, Texas A&M University, 2006 */
 /*                                                                */
@@ -59,19 +59,16 @@ using namespace dealii;
 
 				 // @sect3{The <code>SineGordonProblem</code> class template}
 
-				 // The entire algorithm for solving
-				 // the problem is encapsulated in
-				 // this class. Also, note that the
-				 // class is declared with a template
-				 // parameter, which is the spatial
-				 // dimension, so that we can solve
-				 // the sine-Gordon equation in one,
-				 // two or three spatial
-				 // dimension. For more on the
-				 // dimension-independent
-				 // class-encapsulation of the
-				 // problem, the reader should consult
-				 // step-3 and step-4.
+				 // The entire algorithm for solving the
+				 // problem is encapsulated in this class. As
+				 // in previous example programs, the class is
+				 // declared with a template parameter, which
+				 // is the spatial dimension, so that we can
+				 // solve the sine-Gordon equation in one, two
+				 // or three spatial dimensions. For more on
+				 // the dimension-independent
+				 // class-encapsulation of the problem, the
+				 // reader should consult step-3 and step-4.
 //TODO
 template <int dim>
 class SineGordonProblem 
@@ -622,6 +619,13 @@ void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data,
 				 // starting point actually hurts and
 				 // increases the number of iterations needed,
 				 // so we simply set it to zero.
+				 //
+				 // The function returns the number of
+				 // iterations it took to converge to a
+				 // solution. This number will later be used
+				 // to generate output on the screen showing
+				 // how many iterations were needed in each
+				 // nonlinear iteration.
 template <int dim>
 unsigned int
 SineGordonProblem<dim>::solve () 
@@ -642,15 +646,10 @@ SineGordonProblem<dim>::solve ()
 
 				 // @sect4{SineGordonProblem::output_results}
 
-				 // This function outputs the results
-				 // to a file. It is almost identical
-				 // to its counterpart in step-3 (and
-				 // step-4). The only new thing is
-				 // that the function now takes a
-				 // parameter --- the time step number
-				 // --- so that it can append it to
-				 // the name of the file, which the
-				 // current solution is output to.
+				 // This function outputs the results to a
+				 // file. It is pretty much identical to the
+				 // respective functions in step-23 and
+				 // step-24:
 template <int dim>
 void SineGordonProblem<dim>::output_results (const unsigned int timestep_number)
 {
@@ -679,49 +678,37 @@ void SineGordonProblem<dim>::output_results (const unsigned int timestep_number)
 template <int dim>
 void SineGordonProblem<dim>::run () 
 {
-  std::cout << "Solving problem in " << dim << " space dimensions." 
-	    << std::endl;
-  
   make_grid_and_dofs ();
 
-				   // To aknowledge the initial
-				   // condition, we must use the
-				   // function $u_0(x)$ to compute the
-				   // zeroth time step solution
-				   // $U^0$. Note that when we create
-				   // the <code>InitialValues</code>
-				   // <code>Function</code> object, we
-				   // set its internal time variable
-				   // to $t_0$, in case our initial
-				   // condition is a function of space
-				   // and time evaluated at $t=t_0$.
-  InitialValues<dim> initial_condition (1, time);
-
-				   // Then, in 2D and 3D, we produce
-				   // $U^0$ by projecting $u_0(x)$
-				   // onto the grid using
-				   // <code>VectorTools::project</code>. In
-				   // 1D, however, we obtain the
-				   // zeroth time step solution by
-				   // interpolating $u_0(x)$ at the
-				   // global degrees of freedom using
-				   // <code>VectorTools::interpolate</code>. We
-				   // must make an exception for the
-				   // 1D case because the projection
-				   // algorithm computes integrals
-				   // over the boundary of the domain,
-				   // which do not make sense in 1D,
-				   // so we cannot use it.
-  if (dim == 1) 
-    {
-      VectorTools::interpolate (dof_handler, initial_condition, solution);
-    }
-  else 
+				   // To aknowledge the initial condition, we
+				   // must use the function $u_0(x)$. To this
+				   // end, below we will create an object of
+				   // type <code>InitialValues</code>; ote
+				   // that when we create this object (which
+				   // is derived from the
+				   // <code>Function</code> class), we set its
+				   // internal time variable to $t_0$, to
+				   // indicate that the initial condition is a
+				   // function of space and time evaluated at
+				   // $t=t_0$.
+				   //
+				   // Then we produce $U^0$ by projecting
+				   // $u_0(x)$ onto the grid using
+				   // <code>VectorTools::project</code>. We
+				   // have to use the same construct using
+				   // hanging node constraints as in step-21:
+				   // the VectorTools::project function
+				   // requires a hanging node constraints
+				   // object, but to be used we first need to
+				   // close it:
     {
       ConstraintMatrix constraints;
       constraints.close();
-      VectorTools::project (dof_handler, constraints, QGauss<dim>(3),
-			    initial_condition, solution);
+      VectorTools::project (dof_handler,
+			    constraints,
+			    QGauss<dim>(3),
+			    InitialValues<dim> (1, time),
+			    solution);
     }
 
 				   // For completeness, we output the
@@ -748,19 +735,25 @@ void SineGordonProblem<dim>::run ()
 		<< "advancing to t = " << time << "." 
 		<< std::endl;
 
-				       // First we must solve the
-				       // nonlinear equation in the
-				       // split formulation via
-				       // Newton's method ---
-				       // i.e. solve for $\delta
-				       // U^n_l$ then compute
-				       // $U^n_{l+1}$ and so on. The
-				       // stopping criterion is that
-				       // $\|F_h(U^n_l)\|_2 \le
-				       // 10^{-6}
-				       // \|F_h(U^n_0)\|_2$. When the
-				       // loop below is done, we have
-				       // (an approximation of) $U^n$.
+				       // The first step in each time step is
+				       // that we must solve the nonlinear
+				       // equation in the split formulation
+				       // via Newton's method --- i.e. solve
+				       // for $\delta U^n_l$ then compute
+				       // $U^n_{l+1}$ and so on. As stopping
+				       // criterion for this nonlinear
+				       // iteration we choose that
+				       // $\|F_h(U^n_l)\|_2 \le 10^{-6}
+				       // \|F_h(U^n_0)\|_2$. To this end, we
+				       // need to record the norm of the
+				       // residual in the first
+				       // iteration.
+				       //
+				       // At the end of each iteration, we
+				       // output to the console how many
+				       // linear solver iterations it took
+				       // us. When the loop below is done, we
+				       // have (an approximation of) $U^n$.
       double initial_rhs_norm = 0.;
       bool first_iteration = true;
       do 
@@ -786,25 +779,6 @@ void SineGordonProblem<dim>::run ()
       std::cout << " CG iterations per nonlinear step."
 		<< std::endl;
       
-				       // In the case of the explicit
-				       // Euler time stepping scheme,
-				       // we must pick the time step
-				       // to be quite small in order
-				       // for the scheme to be
-				       // stable. Therefore, there are
-				       // a lot of time steps during
-				       // which "nothing interesting
-				       // happens" in the solution. To
-				       // improve overall efficiency
-				       // --- in particular, speed up
-				       // the program and save disk
-				       // space --- we only output the
-				       // solution after
-				       // <code>output_timestep_skip</code>
-				       // time steps have been taken.
-      if (timestep_number % output_timestep_skip == 0)
-	output_results (timestep_number);
-      
 				       // Upon obtaining the solution to the
 				       // first equation of the problem at
 				       // $t=t_n$, we must update the
@@ -813,9 +787,7 @@ void SineGordonProblem<dim>::run ()
 				       // and store $V^n$ since it is not a
 				       // quantity we use directly in the
 				       // problem. Hence, for simplicity, we
-				       // update $MV^n$ directly using the
-				       // second equation in the last
-				       // subsection of the Introduction.
+				       // update $MV^n$ directly:
       Vector<double> tmp_vector (solution.size());
       laplace_matrix.vmult (tmp_vector, solution);
       massmatxvel.add (-time_step*theta, tmp_vector);
@@ -827,6 +799,21 @@ void SineGordonProblem<dim>::run ()
       tmp_vector = 0;
       compute_nl_term (old_solution, solution, tmp_vector);
       massmatxvel.add (-time_step, tmp_vector);
+
+				       // Oftentimes, in particular for fine
+				       // meshes, we must pick the time step
+				       // to be quite small in order for the
+				       // scheme to be stable. Therefore,
+				       // there are a lot of time steps during
+				       // which "nothing interesting happens"
+				       // in the solution. To improve overall
+				       // efficiency --- in particular, speed
+				       // up the program and save disk space
+				       // --- we only output the solution
+				       // every
+				       // <code>output_timestep_skip</code>:
+      if (timestep_number % output_timestep_skip == 0)
+	output_results (timestep_number);      
     }
 }
 
@@ -853,7 +840,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      SineGordonProblem<2> sg_problem;
+      SineGordonProblem<1> sg_problem;
       sg_problem.run ();
     }
   catch (std::exception &exc)
