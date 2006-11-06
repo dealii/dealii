@@ -85,7 +85,10 @@ class QGaussLobatto : public Quadrature<dim>
   protected:
 				     /**
 				      * Compute Legendre-Gauss-Lobatto quadrature
-				      * points in the interval [-1, +1].
+				      * points in the interval [-1, +1] which are
+				      * equal to the roots of the corresponding
+				      * Jacobi polynomial (specified by
+				      * @p alpha, @p beta).
 				      * @param q  number of points.
 				      * @return vector containing nodes.
 				      */
@@ -97,6 +100,9 @@ class QGaussLobatto : public Quadrature<dim>
     				     /**
 				      * Compute Legendre-Gauss-Lobatto quadrature
 				      * weights.
+				      * The quadrature points and weights are
+				      * related to Jacobi polynomial specified
+				      * by @p alpha, @p beta.
 				      * @param x  quadrature points.
 				      * @return vector containing weights.
 				      */
@@ -107,7 +113,9 @@ class QGaussLobatto : public Quadrature<dim>
     
 				     /**
 				      * Evaluate a Jacobi polynomial
-				      * $ P^{\alpha, \beta}_n(x) $. 
+				      * $ P^{\alpha, \beta}_n(x) $
+				      * specified by the parameters
+				      * @p alpha, @p beta, @p n.
 				      * Note: The Jacobi polynomials are
 				      * not orthonormal and defined on
 				      * the interval [-1, +1].
