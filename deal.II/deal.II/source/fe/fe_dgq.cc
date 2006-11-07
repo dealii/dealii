@@ -242,18 +242,7 @@ template <int dim>
 FiniteElement<dim> *
 FE_DGQ<dim>::clone() const
 {
-				   // TODO[Prill] : There must be a better way
-				   // to extract 1D quadrature points from the
-				   // tensor product FE.
-  
-				   // Construct a dummy quadrature formula
-				   // containing the FE's nodes:
-  std::vector<Point<1> > qpoints(this->degree+1);
-  for (unsigned int i=0; i<=this->degree; ++i)
-    qpoints[i] = Point<1>(this->unit_support_points[i][0]);
-  Quadrature<1> pquadrature(qpoints);
-  
-  return new FE_DGQ<dim>(pquadrature);
+  return new FE_DGQ<dim>(this->degree);
 }
 
 
@@ -661,6 +650,52 @@ FE_DGQ<dim>::memory_consumption () const
 
 
 
+template <int dim>
+FE_DGQArbitraryNodes<dim>::FE_DGQArbitraryNodes (const Quadrature<1>& points)
+		: FE_DGQ<dim>(points)
+{}
+
+
+
+template <int dim>
+std::string
+FE_DGQArbitraryNodes<dim>::get_name () const
+{
+				   // note that the
+				   // FETools::get_fe_from_name
+				   // function does not work for
+				   // FE_DGQArbitraryNodes since
+				   // there is no initialization by
+				   // a degree value.
+  std::ostringstream namebuf;  
+  namebuf << "FE_DGQArbitraryNodes<" << dim << ">(" << this->degree << ")";
+
+  return namebuf.str();
+}
+
+
+
+template <int dim>
+FiniteElement<dim> *
+FE_DGQArbitraryNodes<dim>::clone() const
+{
+				   // TODO[Prill] : There must be a better way
+				   // to extract 1D quadrature points from the
+				   // tensor product FE.
+  
+				   // Construct a dummy quadrature formula
+				   // containing the FE's nodes:
+  std::vector<Point<1> > qpoints(this->degree+1);
+  for (unsigned int i=0; i<=this->degree; ++i)
+    qpoints[i] = Point<1>(this->unit_support_points[i][0]);
+  Quadrature<1> pquadrature(qpoints);
+  
+  return new FE_DGQArbitraryNodes<dim>(pquadrature);
+}
+
+
+
 template class FE_DGQ<deal_II_dimension>;
+template class FE_DGQArbitraryNodes<deal_II_dimension>;
 
 DEAL_II_NAMESPACE_CLOSE

@@ -89,18 +89,6 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
     FE_DGQ (const unsigned int p);
 
 				     /**
-				      * Constructor for tensor product
-				      * polynomials based on
-				      * Polynomials::Lagrange
-				      * interpolation of the support
-				      * points in the quadrature rule
-				      * <tt>points</tt>. The degree of
-				      * these polynomials is
-				      * <tt>points.size()-1</tt>.
-				      */
-    FE_DGQ (const Quadrature<1>& points);
-    
-				     /**
 				      * Return a string that uniquely
 				      * identifies a finite
 				      * element. This class returns
@@ -324,6 +312,21 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 
 
   protected:
+				     /**
+				      * Constructor for tensor product
+				      * polynomials based on
+				      * Polynomials::Lagrange
+				      * interpolation of the support
+				      * points in the quadrature rule
+				      * <tt>points</tt>. The degree of
+				      * these polynomials is
+				      * <tt>points.size()-1</tt>.
+				      *
+				      * Note: The FE_DGQ::clone function
+				      * does not work properly for FE with
+				      * arbitrary nodes!
+				      */
+    FE_DGQ (const Quadrature<1>& points);
 
 				     /**
 				      * @p clone function instead of
@@ -388,6 +391,55 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      */
     template <int dim1> friend class MappingQ;
 };
+
+
+
+/**
+ * Implementation of scalar, discontinuous tensor product elements
+ * based on Lagrange polynomials with arbitrary nodes.
+ *
+ * See base class documentation for details.
+ *
+ * @author F. Prill 2006
+ */
+template <int dim>
+class FE_DGQArbitraryNodes : public FE_DGQ<dim>
+{
+  public:
+				     /**
+				      * Constructor for tensor product
+				      * polynomials based on
+				      * Polynomials::Lagrange
+				      * interpolation of the support
+				      * points in the quadrature rule
+				      * <tt>points</tt>. The degree of
+				      * these polynomials is
+				      * <tt>points.size()-1</tt>.
+				      */
+    FE_DGQArbitraryNodes (const Quadrature<1>& points);
+
+				     /**
+				      * Return a string that uniquely
+				      * identifies a finite
+				      * element. This class returns
+				      * <tt>FE_DGQArbitraryNodes<dim>(degree)</tt> ,
+				      * with <tt>dim</tt> and <tt>degree</tt>
+				      * replaced by appropriate
+				      * values.
+				      */
+    virtual std::string get_name () const;
+
+  protected:
+				     /**
+				      * @p clone function instead of
+				      * a copy constructor.
+				      *
+				      * This function is needed by the
+				      * constructors of @p FESystem.
+				      */
+    virtual FiniteElement<dim> *clone() const;
+};
+
 
 /*@}*/
 
