@@ -1135,6 +1135,8 @@ class FETools
 				      * custom element that must be
 				      * added using add_fe_name()
 				      * first.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcInvalidFEName,
 		    std::string,
@@ -1142,22 +1144,59 @@ class FETools
 		    << arg1 << "'.");
     
 				     /**
+				      * The string used for
+				      * get_fe_from_name() cannot be
+				      * translated to a finite
+				      * element.
+				      *
+				      * Dimension arguments in finite
+				      * element names should be
+				      * avoided. If they are there,
+				      * the dimension should be
+				      * <tt>dim</tt> or
+				      * <tt>d</tt>. Here, you gave a
+				      * numeric dimension argument,
+				      * which does not match the
+				      * template dimension of the
+				      * finite element class.
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException2 (ExcInvalidFEDimension,
+		    char, int,
+		    << "The dimension " << arg1
+		    << " in the finite element string must match "
+		    << "the space dimension "
+		    << arg2 << ".");
+    
+				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcInvalidFE);
 
                                      /**
                                       * The finite element must be
 				      * @ref GlossPrimitive "primitive".
+				      *
+				      * @ingroup Exceptions
                                       */
     DeclException0 (ExcFEMustBePrimitive);
 				     /**
 				      * Exception
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcTriangulationMismatch);
 
 				     /**
-				      * Exception
+				      * A continuous element is used
+				      * on a mesh with hanging nodes,
+				      * but the constraint matrices
+				      * are missing.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcHangingNodesNotAllowed,
 		    int,
@@ -1167,10 +1206,16 @@ class FETools
 		    << "additional ConstraintMatrix argument(s), instead.");
 				     /**
 				      * You need at least two grid levels.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcGridNotRefinedAtLeastOnce);
 				     /**
-				      * Exception
+				      * The dimensions of the matrix
+				      * used did not match the
+				      * expected dimensions.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException4 (ExcMatrixDimensionMismatch,
 		    int, int, int, int,
@@ -1181,6 +1226,8 @@ class FETools
 				      * Exception thrown if an
 				      * embedding matrix was computed
 				      * inaccurately.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException1(ExcLeastSquaresError, double,
 		   << "Least squares fit leaves a gap of " << arg1);

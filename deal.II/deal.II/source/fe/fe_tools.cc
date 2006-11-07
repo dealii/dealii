@@ -1526,10 +1526,9 @@ FETools::get_fe_from_name (const std::string &parameter_name)
       if (pos2-pos1 == 2)
 	{
 	  const char dimchar = '0' + dim;
-//TODO: Write a more explicit exception here!
 	  if (name.at(pos1+1) != 'd')
 	    Assert (name.at(pos1+1) == dimchar,
-		    ExcInvalidFEName(name));
+		    ExcInvalidFEDimension(name.at(pos1+1), dim));
 	}
       else
         Assert(pos2-pos1 == 4, ExcInvalidFEName(name));
