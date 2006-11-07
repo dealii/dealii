@@ -477,13 +477,13 @@ void plot_FE_DGQ_shape_functions()
   test_compute_functions(m, q3, "DGQ3");
   
   QGaussLobatto<1> quadrature_gl(5);
-  FE_DGQ<dim> qgl(quadrature_gl);
+  FE_DGQArbitraryNodes<dim> qgl(quadrature_gl);
   plot_shape_functions(m, qgl, "DGQGL");
   plot_face_shape_functions(m, qgl, "DGQGL");
   test_compute_functions(m, qgl, "DGQGL");
   
   QGauss<1> quadrature_g(5);
-  FE_DGQ<dim> qg(quadrature_g);
+  FE_DGQArbitraryNodes<dim> qg(quadrature_g);
   plot_shape_functions(m, qg, "DGQG");
   plot_face_shape_functions(m, qg, "DGQG");
   test_compute_functions(m, qg, "DGQG");

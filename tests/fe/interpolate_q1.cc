@@ -76,7 +76,7 @@ void check_dg_lobatto(const Function<dim>& f,
 		      const unsigned int degree)
 {
   QGaussLobatto<1> fe_quadrature(degree);
-  FE_DGQ<dim> fe(fe_quadrature);
+  FE_DGQArbitraryNodes<dim> fe(fe_quadrature);
   deallog << fe.get_name() << ' ';
   
   std::vector<double> dofs(fe.dofs_per_cell);
