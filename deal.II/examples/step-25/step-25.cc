@@ -323,7 +323,7 @@ SineGordonProblem<dim>::SineGordonProblem ()
 		n_global_refinements (6),
 		time (-5.4414),
 		final_time (2.7207),
-		time_step (10*1./std::pow(2.,n_global_refinements)),
+		time_step (10*1./std::pow(2.,1.*n_global_refinements)),
 		theta (0.5),
 		output_timestep_skip (1)
 {}
