@@ -13,6 +13,9 @@
 #ifndef __deal2__fe_dgq_h
 #define __deal2__fe_dgq_h
 
+
+//TODO: we should probably turn the derivation around, i.e. make FE_DGQ a special case of FE_DGQ_Generic/Arbitrary, and then have other classes that only have the constructor and clone() that use other sets of quadrature nodes.
+
 #include <base/config.h>
 #include <base/tensor_product_polynomials.h>
 #include <fe/fe_poly.h>
