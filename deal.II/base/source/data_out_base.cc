@@ -2786,7 +2786,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 	    << ", et=" << tecplot_cell_type[dim] << '\n';
       }
     else
-      out << "zone f=block, n=" << n_nodes << '\n';
+      out << "zone f=block, I=" << n_nodes << '\n';
   }
 
   
