@@ -665,35 +665,35 @@ inconvenience this causes.
 <ol>
 
   <li> <p>Improved: The class <code
-  class="class">LAPACKFullMatrix</code> now also uses LU factorization
-  of LAPACK. The new wrapper <code class="class">PreconditionLU</code>
-  allows us to use this as a preconditioner.
-  <br>
-  (GK 2006/10/02)
-  </p>
+       class="class">LAPACKFullMatrix</code> now also uses LU factorization
+       of LAPACK. The new wrapper <code class="class">PreconditionLU</code>
+       allows us to use this as a preconditioner.
+       <br>
+       (GK 2006/10/02)
+       </p>
 
   <li> <p>New: The class <code
-  class="class">PointerMatrixVector</code> implements the functions
-  <code class="member">vmult</code> and <code
-  class="member">Tvmult</code> for a <i>1xn</i>-matrix represented by
-  a single vector.
-  <br>
-  (GK 2006/09/17)
-  </p>
+       class="class">PointerMatrixVector</code> implements the functions
+       <code class="member">vmult</code> and <code
+       class="member">Tvmult</code> for a <i>1xn</i>-matrix represented by
+       a single vector.
+       <br>
+       (GK 2006/09/17)
+       </p>
 
   <li> <p>Improved: The class <code class="class">SolverCG</code> can
-  now estimate the condition number of the linear system using <code
-  class="class">TridiagonalMatrix</code> and LAPACK.
-  <br>
-  (GK 2006/09/06)
-  </p>  
+       now estimate the condition number of the linear system using <code
+       class="class">TridiagonalMatrix</code> and LAPACK.
+       <br>
+       (GK 2006/09/06)
+       </p>  
 
   <li> <p>New: the class <code class="class">TridiagonalMatrix</code>
-  has been introduced together with its basic methods, including an
-  eigenvalue solver for the symmetric case (LAPACK).
-  <br>
-  (GK 2006/09/06)
-  </p>
+       has been introduced together with its basic methods, including an
+       eigenvalue solver for the symmetric case (LAPACK).
+       <br>
+       (GK 2006/09/06)
+       </p>
 
   <li> <p> Improved: PETSc 2.3.1 (<i>build 16</i>) is now supported by the
        linear preconditioner classes. The new PETSc functions 
@@ -702,12 +702,12 @@ inconvenience this causes.
        </p>
 
   <li> <p>New: The class <code class="class">TransposeMatrix</code>
-  modeled after <code class="class">PointerMatrix</code> swaps the
-  <code class="member">vmult</code> functions such that its effect is
-  the transpose of the matrix it points to.
-  <br>
-  (GK 2006/07/07)
-  </p>  
+       modeled after <code class="class">PointerMatrix</code> swaps the
+       <code class="member">vmult</code> functions such that its effect is
+       the transpose of the matrix it points to.
+       <br>
+       (GK 2006/07/07)
+       </p>  
 
   <li> <p>New: There is now a function <code
        class="member">FullMatrix::trace</code> that does what its name suggests
@@ -732,7 +732,6 @@ inconvenience this causes.
        <br> 
        (WB 2006/06/07)
        </p>
-
   
   <li> <p> Improved: The <code
        class="class">SparseDirectUMFPACK</code> solver can now also be
@@ -761,7 +760,6 @@ inconvenience this causes.
        <br> 
        (WB 2006/04/24)
        </p>
-
   
   <li> <p> New: There are now assignment operators from <code
        class="class">BlockVector</code> to <code
