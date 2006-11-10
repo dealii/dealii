@@ -462,6 +462,13 @@ class TableHandler
                                           * Flag that may be used by
                                           * derived classes for
                                           * arbitrary purposes.
+					  *
+					  * In particular, the
+					  * ConvergenceTable class uses the
+					  * flag to denote columns for which
+					  * convergence information has
+					  * already been computed, or should
+					  * not be computed at all.
                                           */
         unsigned int flag;
     };
