@@ -397,18 +397,37 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
-  <li> <p> Extended: The <code class="class">QGaussLobatto</code> quadrature rule computes
-           Legendre-Gauss-Lobatto nodes and quadrature weights.
-	    <br>
-		 (F. Prill 2006/11/02)
+  <li> <p> Changed: We used to set preprocessor variables
+       <code>PACKAGE_NAME</code>, <code>PACKAGE_TARNAME</code>,
+       <code>PACKAGE_VERSION</code>, <code>PACKAGE_STRING</code>,
+       <code>PACKAGE_BUGREPORT</code> in the file
+       <code>&lt;base/config.h&gt;</code>. These variables were automatically
+       set by the autoconf package, with which we generate the
+       <code>./configure</code> script. However, these variables would conflict
+       if someone were to use a different package that also uses autoconf,
+       since that package would have the same variables, just set to different
+       values. The preprocessor warns about these cases.
+       <br>
+       We now avoid this conflict by not using these names any more. Instead,
+       we use the preprocessor names as above, prefixed with
+       <code>DEAL_II_</code>.
+       <br>
+       (WB 2006/11/10)
        </p>
+
+  <li> <p> Extended: The <code class="class">QGaussLobatto</code> quadrature
+       rule computes Legendre-Gauss-Lobatto nodes and quadrature weights.
+       <br>
+       (F. Prill 2006/11/02)
+       </p>
+
   <li> <p> Extended: The <code>contract</code> function family contracts two
-	    tensors. There is now a new version of this function, that contracts a
-	    tensor of rank three with a second one of rank two over given indices
-	    <tt>index1</tt> and <tt>index2</tt> of the first and second tensor,
-	    respectively, resulting in a tensor of rank three.
-	    <br>
-		 (Tobias Leicht 2006/09/27)
+       tensors. There is now a new version of this function, that contracts a
+       tensor of rank three with a second one of rank two over given indices
+       <tt>index1</tt> and <tt>index2</tt> of the first and second tensor,
+       respectively, resulting in a tensor of rank three. 
+       <br>
+       (Tobias Leicht 2006/09/27)
        </p>
 
   <li> <p> Fixed: The

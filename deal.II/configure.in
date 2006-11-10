@@ -46,6 +46,7 @@ dnl    Set the path to the deal.II libraries to `pwd`
 AC_PREFIX_DEFAULT(`pwd`)
 DEAL_II_PATH=`pwd`
 
+
 dnl    Split version number in major and minor
 DEAL_II_MAJOR=`echo $PACKAGE_VERSION | perl -pi -e 's/^(\d+)\..*/$1/;'`
 DEAL_II_MINOR=`echo $PACKAGE_VERSION | perl -pi -e 's/^\d+\.(\d+).*/$1/;'`
@@ -645,16 +646,30 @@ AC_SUBST(LDFLAGSPIC)
 
 dnl Write output to the global options file and modify other files as well
 dnl that need some information
-AC_OUTPUT([common/Make.global_options 
-           common/Makefile.template 
-           common/scripts/make_dependencies.pl
-	   Version
-           doc/Makefile 
-	   doc/doxygen/Makefile
-           doc/doxygen/options.dox
-	   doc/doxygen/header.html
-           doc/doxygen/header.tex])
+process_files="common/Make.global_options 
+               common/Makefile.template 
+               common/scripts/make_dependencies.pl
+	       Version
+               doc/Makefile 
+	       doc/doxygen/Makefile
+               doc/doxygen/options.dox
+	       doc/doxygen/header.html
+               doc/doxygen/header.tex"
+AC_OUTPUT($process_files)
 
+dnl    Autoconf has the annoying habit to simply define PACKAGE_NAME in
+dnl    AC_INIT and put this name into config.h, irrespective of the fact
+dnl    that other packages that we may use or that users may use with
+dnl    deal.II might have their own config.h and conflicting #defines for
+dnl    this variable. What we do is to simply rename these variables.
+dnl    However, there appears to be no way to do this in some sort of
+dnl    proper fashion, so all we can do is to run perl on the output files.
+$PERL -pi -e 's/PACKAGE_NAME/DEAL_II_PACKAGE_NAME/g;
+              s/PACKAGE_TARNAME/DEAL_II_PACKAGE_TARNAME/g;
+              s/PACKAGE_STRING/DEAL_II_PACKAGE_STRING/g;
+              s/PACKAGE_BUGREPORT/DEAL_II_PACKAGE_BUGREPORT/g;
+              s/PACKAGE_VERSION/DEAL_II_PACKAGE_VERSION/g;' \
+	$process_files base/include/base/config.h
 
 echo
 echo

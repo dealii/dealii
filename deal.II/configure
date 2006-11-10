@@ -1399,6 +1399,7 @@ ac_configure="$SHELL $ac_aux_dir/configure" # This should be Cygnus configure.
 
 DEAL_II_PATH=`pwd`
 
+
 DEAL_II_MAJOR=`echo $PACKAGE_VERSION | perl -pi -e 's/^(\d+)\..*/$1/;'`
 DEAL_II_MINOR=`echo $PACKAGE_VERSION | perl -pi -e 's/^\d+\.(\d+).*/$1/;'`
 
@@ -12659,7 +12660,16 @@ LDFLAGS="-L$DEAL_II_PATH/lib $LDFLAGS"
 
 
 
-                                                                                          ac_config_files="$ac_config_files common/Make.global_options common/Makefile.template common/scripts/make_dependencies.pl Version doc/Makefile doc/doxygen/Makefile doc/doxygen/options.dox doc/doxygen/header.html doc/doxygen/header.tex"
+process_files="common/Make.global_options
+               common/Makefile.template
+               common/scripts/make_dependencies.pl
+	       Version
+               doc/Makefile
+	       doc/doxygen/Makefile
+               doc/doxygen/options.dox
+	       doc/doxygen/header.html
+               doc/doxygen/header.tex"
+          ac_config_files="$ac_config_files $process_files"
 
 
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
@@ -13131,15 +13141,7 @@ for ac_config_target in $ac_config_targets
 do
   case "$ac_config_target" in
   # Handling of arguments.
-  "common/Make.global_options" ) CONFIG_FILES="$CONFIG_FILES common/Make.global_options" ;;
-  "common/Makefile.template" ) CONFIG_FILES="$CONFIG_FILES common/Makefile.template" ;;
-  "common/scripts/make_dependencies.pl" ) CONFIG_FILES="$CONFIG_FILES common/scripts/make_dependencies.pl" ;;
-  "Version" ) CONFIG_FILES="$CONFIG_FILES Version" ;;
-  "doc/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
-  "doc/doxygen/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/doxygen/Makefile" ;;
-  "doc/doxygen/options.dox" ) CONFIG_FILES="$CONFIG_FILES doc/doxygen/options.dox" ;;
-  "doc/doxygen/header.html" ) CONFIG_FILES="$CONFIG_FILES doc/doxygen/header.html" ;;
-  "doc/doxygen/header.tex" ) CONFIG_FILES="$CONFIG_FILES doc/doxygen/header.tex" ;;
+  "$process_files" ) CONFIG_FILES="$CONFIG_FILES $process_files" ;;
   "base/include/base/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS base/include/base/config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -13968,6 +13970,12 @@ echo "$as_me: error: $ac_sub_configure failed for $ac_dir" >&2;}
 fi
 
 
+$PERL -pi -e 's/PACKAGE_NAME/DEAL_II_PACKAGE_NAME/g;
+              s/PACKAGE_TARNAME/DEAL_II_PACKAGE_TARNAME/g;
+              s/PACKAGE_STRING/DEAL_II_PACKAGE_STRING/g;
+              s/PACKAGE_BUGREPORT/DEAL_II_PACKAGE_BUGREPORT/g;
+              s/PACKAGE_VERSION/DEAL_II_PACKAGE_VERSION/g;' \
+	$process_files base/include/base/config.h
 
 echo
 echo
