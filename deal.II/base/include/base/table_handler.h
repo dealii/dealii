@@ -243,7 +243,7 @@ class TableHandler
                                       * supercolumn.
                                       *
                                       * This function may also be used
-                                      * to break big tables with to
+                                      * to break big tables with too
                                       * many columns into smaller
                                       * ones. Call this function with
                                       * the first e.g. five columns
