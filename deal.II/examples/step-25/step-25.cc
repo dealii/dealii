@@ -23,7 +23,7 @@
 				 // <code>numerics</code> (since each
 				 // of these categories roughly builds
 				 // upon previous ones), then a few
-				 // C++ headers for file, input/output
+				 // C++ headers for file input/output
 				 // and string streams.
 #include <base/quadrature_lib.h>
 #include <base/function.h>
@@ -71,18 +71,18 @@ using namespace dealii;
 				 // reader should consult step-3 and step-4.
 				 //
 				 // Compared to step-23 and step-24, there
-				 // isn't much newsworthy in the general
+				 // isn't anything newsworthy in the general
 				 // structure of the program (though there is
-				 // of course in the inner working of the
+				 // of course in the inner workings of the
 				 // various functions!). The most notable
 				 // difference is the presence of the two new
 				 // functions <code>compute_nl_term</code> and
 				 // <code>compute_nl_matrix</code> that
 				 // compute the nonlinear contributions to the
-				 // matrix and right hand sides of the first
+				 // system matrix and right-hand side of the first
 				 // equation, as discussed in the
 				 // Introduction. In addition, we have to have
-				 // a vector <code>update_solution</code> that
+				 // a vector <code>solution_update</code> that
 				 // contains the nonlinear update to the
 				 // solution vector in each Newton step.
 				 //
@@ -91,25 +91,29 @@ using namespace dealii;
 				 // program, but the mass matrix times the
 				 // velocity. This is done in the
 				 // <code>M_x_velocity</code> variable (the
-				 // "<code>x</code>" is intended to stand for
+				 // "x" is intended to stand for
 				 // "times").
 				 //
 				 // Finally, the
-				 // <code>output_timestep_skip</code> variable
-				 // stores every how many time steps graphical
-				 // output is to be generated. This is of
-				 // importance when using fine meshes (and
-				 // consequently small time steps) where we
-				 // would run lots of time steps and create
-				 // lots of output files of solutions that
-				 // look almost the same in subsequent
+				 // <code>output_timestep_skip</code>
+				 // variable stores the number of time
+				 // steps to be taken each time before
+				 // graphical output is to be
+				 // generated. This is of importance
+				 // when using fine meshes (and
+				 // consequently small time steps)
+				 // where we would run lots of time
+				 // steps and create lots of output
+				 // files of solutions that look
+				 // almost the same in subsequent
 				 // files. This only clogs up our
-				 // visualization procedures and we should
-				 // avoid creating more output than we are
-				 // really interested in. Therefore, if this
-				 // variable is to a value $n$ bigger than
-				 // one, output is generated only every $n$th
-				 // time step.
+				 // visualization procedures and we
+				 // should avoid creating more output
+				 // than we are really interested
+				 // in. Therefore, if this variable is
+				 // set to a value $n$ bigger than one,
+				 // output is generated only every
+				 // $n$th time step.
 template <int dim>
 class SineGordonProblem 
 {
@@ -144,7 +148,7 @@ class SineGordonProblem
     const double final_time, time_step;
     const double theta;
 
-    Vector<double>       solution, update_solution, old_solution;
+    Vector<double>       solution, solution_update, old_solution;
     Vector<double>       M_x_velocity;
     Vector<double>       system_rhs;
 
@@ -155,8 +159,8 @@ class SineGordonProblem
 				 // @sect3{Initial conditions}
 
 				 // In the following two classes, we first
-				 // implement the exact solution for 1d, 2d,
-				 // and 3d mentioned in the introduction to
+				 // implement the exact solution for 1D, 2D,
+				 // and 3D mentioned in the introduction to
 				 // this program. This space-time solution may
 				 // be of independent interest if one wanted
 				 // to test the accuracy of the program by
@@ -167,8 +171,8 @@ class SineGordonProblem
 				 // unbounded domain). This may, for example,
 				 // be done using the
 				 // VectorTools::integrate_difference
-				 // function. Note again (as was already
-				 // discussed in step-23) how we describe
+				 // function. Note, again (as was already
+				 // discussed in step-23), how we describe
 				 // space-time functions as spatial functions
 				 // that depend on a time variable that can be
 				 // set and queried using the
@@ -238,8 +242,8 @@ double ExactSolution<dim>::value (const Point<dim> &p,
     }
 }
 
-				 // The second part of this section is that we
-				 // provide initial conditions. We are lazy
+				 // In the second part of this section, we
+				 // provide the initial conditions. We are lazy
 				 // (and cautious) and don't want to implement
 				 // the same functions as above a second
 				 // time. Rather, if we are queried for
@@ -380,7 +384,7 @@ void SineGordonProblem<dim>::make_grid_and_dofs ()
 					laplace_matrix);
 
   solution.reinit       (dof_handler.n_dofs());
-  update_solution.reinit     (dof_handler.n_dofs());
+  solution_update.reinit     (dof_handler.n_dofs());
   old_solution.reinit   (dof_handler.n_dofs());
   M_x_velocity.reinit    (dof_handler.n_dofs());
   system_rhs.reinit     (dof_handler.n_dofs());
@@ -395,7 +399,7 @@ void SineGordonProblem<dim>::make_grid_and_dofs ()
 				 // explicit formulas for the system matrix
 				 // and right-hand side.
 				 //
-				 // Note that in each time step, we have to
+				 // Note that during each time step, we have to
 				 // add up the various contributions to the
 				 // matrix and right hand sides. In contrast
 				 // to step-23 and step-24, this requires
@@ -411,8 +415,8 @@ template <int dim>
 void SineGordonProblem<dim>::assemble_system () 
 {  
 				   // First we assemble the Jacobian
-				   // matrix $F'_h(U^n_l)$, where
-				   // $U^n_l$ is stored in the vector
+				   // matrix $F'_h(U^{n,l})$, where
+				   // $U^{n,l}$ is stored in the vector
 				   // <code>solution</code> for
 				   // convenience.
   system_matrix = 0;
@@ -424,7 +428,7 @@ void SineGordonProblem<dim>::assemble_system ()
   system_matrix.add (-std::pow(time_step*theta,2), tmp_matrix);
 
 				   // Then, we compute the right-hand
-				   // side vector $-F_h(U^n_l)$.
+				   // side vector $-F_h(U^{n,l})$.
   system_rhs = 0;
 
   tmp_matrix = 0;
@@ -469,7 +473,7 @@ void SineGordonProblem<dim>::assemble_system ()
 				 // problem stored in
 				 // <code>old_solution</code> and
 				 // <code>solution</code>, but are simply the
-				 // two functions we linearize around. For the
+				 // two functions we linearize about. For the
 				 // purposes of this function, let us call the
 				 // first two arguments $w_{\mathrm{old}}$ and
 				 // $w_{\mathrm{new}}$ in the documentation of
@@ -555,9 +559,9 @@ void SineGordonProblem<dim>::compute_nl_term (const Vector<double> &old_data,
 
 				 // @sect4{SineGordonProblem::compute_nl_matrix}
 
-				 // This second function dealing with the
-				 // nonlinear scheme computes the matrix
-				 // $N(\cdot,\cdot)$ appearing in the
+				 // This is the second function dealing with the
+				 // nonlinear scheme. It computes the matrix
+				 // $N(\cdot,\cdot)$, whicih appears in the
 				 // nonlinear term in the Jacobian of
 				 // $F(\cdot)$. Just as
 				 // <code>compute_nl_term</code>, we must
@@ -642,8 +646,8 @@ void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data,
 				 // Newton's method for the (nonlinear) first
 				 // equation of the split formulation. The
 				 // solution to the system is, in fact,
-				 // $\delta U^n_l$ so it is stored in
-				 // <code>update_solution</code> and used to update
+				 // $\delta U^{n,l}$ so it is stored in
+				 // <code>solution_update</code> and used to update
 				 // <code>solution</code> in the
 				 // <code>run</code> function.
 				 //
@@ -656,11 +660,11 @@ void SineGordonProblem<dim>::compute_nl_matrix (const Vector<double> &old_data,
 				 // worthwhile to start from that vector, but
 				 // as a general observation it is a fact that
 				 // the starting point doesn't matter very
-				 // much: it has to be a very very good guess
+				 // much: it has to be a very, very good guess
 				 // to reduce the number of iterations by more
-				 // than a few. It turns out that here, it
+				 // than a few. It turns out that for this problem,
 				 // using the previous nonlinear update as a
-				 // starting point actually hurts and
+				 // starting point actually hurts convergence and
 				 // increases the number of iterations needed,
 				 // so we simply set it to zero.
 				 //
@@ -680,8 +684,8 @@ SineGordonProblem<dim>::solve ()
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
   
-  update_solution = 0;
-  cg.solve (system_matrix, update_solution,
+  solution_update = 0;
+  cg.solve (system_matrix, solution_update,
 	    system_rhs,
 	    preconditioner);
 
@@ -725,16 +729,19 @@ void SineGordonProblem<dim>::run ()
 {
   make_grid_and_dofs ();
 
-				   // To aknowledge the initial condition, we
-				   // must use the function $u_0(x)$. To this
-				   // end, below we will create an object of
-				   // type <code>InitialValues</code>; ote
-				   // that when we create this object (which
-				   // is derived from the
-				   // <code>Function</code> class), we set its
-				   // internal time variable to $t_0$, to
-				   // indicate that the initial condition is a
-				   // function of space and time evaluated at
+				   // To aknowledge the initial
+				   // condition, we must use the
+				   // function $u_0(x)$ to compute
+				   // $U^0$. To this end, below we
+				   // will create an object of type
+				   // <code>InitialValues</code>; note
+				   // that when we create this object
+				   // (which is derived from the
+				   // <code>Function</code> class), we
+				   // set its internal time variable
+				   // to $t_0$, to indicate that the
+				   // initial condition is a function
+				   // of space and time evaluated at
 				   // $t=t_0$.
 				   //
 				   // Then we produce $U^0$ by projecting
@@ -780,18 +787,21 @@ void SineGordonProblem<dim>::run ()
 		<< "advancing to t = " << time << "." 
 		<< std::endl;
 
-				       // The first step in each time step is
-				       // that we must solve the nonlinear
-				       // equation in the split formulation
-				       // via Newton's method --- i.e. solve
-				       // for $\delta U^n_l$ then compute
-				       // $U^n_{l+1}$ and so on. As stopping
-				       // criterion for this nonlinear
-				       // iteration we choose that
-				       // $\|F_h(U^n_l)\|_2 \le 10^{-6}
-				       // \|F_h(U^n_0)\|_2$. To this end, we
-				       // need to record the norm of the
-				       // residual in the first
+				       // At the beginning of each
+				       // time step we must solve the
+				       // nonlinear equation in the
+				       // split formulation via
+				       // Newton's method ---
+				       // i.e. solve for $\delta
+				       // U^{n,l}$ then compute
+				       // $U^{n,l+1}$ and so on. The
+				       // stopping criterion for this
+				       // nonlinear iteration is that
+				       // $\|F_h(U^{n,l})\|_2 \le
+				       // 10^{-6}
+				       // \|F_h(U^{n,0})\|_2$. Consequently,
+				       // we need to record the norm
+				       // of the residual in the first
 				       // iteration.
 				       //
 				       // At the end of each iteration, we
@@ -811,7 +821,7 @@ void SineGordonProblem<dim>::run ()
 	  const unsigned int n_iterations
 	    = solve ();
 
-	  solution += update_solution;
+	  solution += solution_update;
 
 	  if (first_iteration == true)
 	    std::cout << "    " << n_iterations;
@@ -827,7 +837,7 @@ void SineGordonProblem<dim>::run ()
 				       // Upon obtaining the solution to the
 				       // first equation of the problem at
 				       // $t=t_n$, we must update the
-				       // auxilliary velocity variable
+				       // auxiliary velocity variable
 				       // $V^n$. However, we do not compute
 				       // and store $V^n$ since it is not a
 				       // quantity we use directly in the
@@ -845,18 +855,22 @@ void SineGordonProblem<dim>::run ()
       compute_nl_term (old_solution, solution, tmp_vector);
       M_x_velocity.add (-time_step, tmp_vector);
 
-				       // Oftentimes, in particular for fine
-				       // meshes, we must pick the time step
-				       // to be quite small in order for the
-				       // scheme to be stable. Therefore,
-				       // there are a lot of time steps during
-				       // which "nothing interesting happens"
-				       // in the solution. To improve overall
-				       // efficiency --- in particular, speed
-				       // up the program and save disk space
-				       // --- we only output the solution
-				       // every
-				       // <code>output_timestep_skip</code>:
+				       // Oftentimes, in particular
+				       // for fine meshes, we must
+				       // pick the time step to be
+				       // quite small in order for the
+				       // scheme to be
+				       // stable. Therefore, there are
+				       // a lot of time steps during
+				       // which "nothing interesting
+				       // happens" in the solution. To
+				       // improve overall efficiency
+				       // -- in particular, speed up
+				       // the program and save disk
+				       // space -- we only output the
+				       // solution every
+				       // <code>output_timestep_skip</code>
+				       // time steps:
       if (timestep_number % output_timestep_skip == 0)
 	output_results (timestep_number);      
     }
