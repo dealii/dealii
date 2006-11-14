@@ -361,7 +361,7 @@ DEAL::Checking FE_DGQ<3>(2)2 against FE_DGQ<3>(3)2 in 3d:
 DEAL::0 0 0
 DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
 DEAL::Checking FE_DGQ<3>(3)2 against FE_DGQ<3>(2)2 in 3d:
-DEAL::9.6e-10 0 0
+DEAL::3.6e-10 0 0
 DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
 DEAL::Checking FE_DGP<3>(3)1 against FE_DGP<3>(1)1 in 3d:
 DEAL::Checking FE_DGP<3>(1)1 against FE_DGP<3>(3)1 in 3d:
