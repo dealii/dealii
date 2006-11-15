@@ -124,9 +124,9 @@ is defined as
   t}\right)^2
   + \left(\nabla u\right)^2 + 2 (1-\cos u) \; dx.
 @f]
-(The constant $2$ appears in the formula to ensure that all contributions to
-the energy are positive, and so that decaying solutions have finite energy on
-unbounded domains.)
+(We use $1-\cos u$ instead of $-\cos u$ in the formula to ensure that all
+contributions to the energy are positive, and so that decaying solutions have
+finite energy on unbounded domains.)
 
 Beyond this, clearly, adaptivity (i.e. time-adaptive grids) would be of
 interest to problems like these. Their complexity leads us to leave this out
