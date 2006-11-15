@@ -20,15 +20,15 @@ elsif ($contents eq 'Compiling')
 }
 elsif ($contents eq 'Linking')
 {
-    print ' 0   ';
+    print ' 1   ';
 }
 elsif ($contents eq 'Running')
 {
-    print ' 0   ';
+    print ' 2   ';
 }
 elsif ($contents eq 'Checking')
 {
-    print ' 0   ';
+    print ' 3   ';
 }
 else
 {
