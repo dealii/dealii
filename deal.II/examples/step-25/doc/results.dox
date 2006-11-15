@@ -122,7 +122,7 @@ is defined as
 @f[
   E(t) = \frac 12 \int_\Omega \left(\frac{\partial u}{\partial
   t}\right)^2
-  + \left(\nabla u\right)^2 + \cos u \; dx.
+  + \left(\nabla u\right)^2 - 2 \cos u \; dx.
 @f]
 
 Beyond this, clearly, adaptivity (i.e. time-adaptive grids) would be of
