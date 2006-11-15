@@ -268,6 +268,44 @@ class GridGenerator
 				const bool                       colorize=false);
 
 				     /**
+				      * Like the previous
+				      * function. However, here the
+				      * second argument does not
+				      * denote the number of
+				      * subdivisions in each
+				      * coordinate direction, but a
+				      * sequence of step sizes for
+				      * each coordinate direction. The
+				      * domain will therefore be
+				      * subdivided into
+				      * <code>step_sizes[i].size()</code>
+				      * cells in coordinate direction
+				      * <code>i</code>, with widths
+				      * <code>step_sizes[i][j]</code>
+				      * for the <code>j</code>th cell.
+				      *
+				      * This function is therefore the
+				      * right one to generate graded
+				      * meshes where cells are
+				      * concentrated in certain areas,
+				      * rather than a uniformly
+				      * subdivided mesh as the
+				      * previous function generates.
+				      *
+				      * The step sizes have to add up
+				      * to the dimensions of the hyper
+				      * rectangle specified by the
+				      * points @p p1 and @p p2.
+				      */
+    template <int dim>
+    void
+    subdivided_hyper_rectangle(Triangulation<dim>              &tria,
+			       const std::vector<std::vector<double> > &step_sizes,
+			       const Point<dim>                &p_1,
+			       const Point<dim>                &p_2,
+			       const bool                       colorize);
+    
+				     /**
 				      * A parallelogram. The first
 				      * corner point is the
 				      * origin. The <tt>dim</tt>

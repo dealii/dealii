@@ -442,6 +442,202 @@ subdivided_hyper_rectangle (Triangulation<dim>              &tria,
 }
 
 
+
+template <int dim>
+void
+GridGenerator::
+subdivided_hyper_rectangle(Triangulation<dim>              &tria,
+                           const std::vector<std::vector<double> > &step_sz,
+                           const Point<dim>                &p_1,
+                           const Point<dim>                &p_2,
+                           const bool                       colorize)
+{
+				   // contributed by Joerg R. Weimar
+				   // (j.weimar@jweimar.de) 2003
+				   // modified by Yaqi Wang 2006
+  Assert(step_sz.size() == dim, 
+	 ExcInvalidRepetitionsDimension(dim));
+
+
+				   // First, normalize input such that
+				   // p1 is lower in all coordinate
+				   // directions.
+
+                                   // and check the consistency of
+                                   // step sizes, i.e. that they all
+                                   // add up to the sizes specified by
+                                   // p_1 and p_2
+  Point<dim> p1(p_1);
+  Point<dim> p2(p_2);
+  std::vector< std::vector<double> > step_sizes(step_sz);
+
+  for (unsigned int i=0;i<dim;++i)
+    {
+      if (p1(i) > p2(i))
+	{
+	  std::swap (p1(i), p2(i));
+	  std::reverse (step_sizes[i].begin(), step_sizes[i].end());
+	}
+
+      double x = 0;
+      for (unsigned int j=0; j<step_sizes.at(i).size(); j++) 
+	x += step_sizes[i][j];
+      Assert(std::fabs(x - (p2(i)-p1(i))) <= 1e-12*std::fabs(x),
+	     ExcInvalidRepetitions (i) );
+    }
+
+ 
+                                   // then generate the necessary
+                                   // points
+  std::vector<Point<dim> > points;
+  switch (dim)
+    {
+      case 1:
+      {
+	double x=0;
+	for (unsigned int i=0; i<=step_sizes[0].size(); ++i)
+	  { 
+	    points.push_back (Point<dim> (p1[0]+x));
+	    x += step_sizes[0][i];
+	  }
+	break;
+      }
+      
+      case 2:
+      {
+	double y=0;
+	for (unsigned int j=0; j<=step_sizes[1].size(); ++j)
+	  {
+	    double x=0;
+	    for (unsigned int i=0; i<=step_sizes[0].size(); ++i)
+	      {
+		points.push_back (Point<dim> (p1[0]+x,
+					      p1[1]+y));
+		x += step_sizes[0][i];
+	      }
+	    y += step_sizes[1][j];
+	  }
+	break;
+
+      }
+      case 3:
+      {
+	double z=0;
+	for (unsigned int k=0; k<=step_sizes[2].size(); ++k)
+	  {
+	    double y=0;
+	    for (unsigned int j=0; j<=step_sizes[1].size(); ++j)
+	      {
+		double x=0;
+		for (unsigned int i=0; i<=step_sizes[0].size(); ++i)
+		  {
+		    points.push_back (Point<dim> (p1[0]+x,
+						  p1[1]+y,
+						  p1[2]+z));
+		    x += step_sizes[0][i];
+		  }
+		y += step_sizes[1][j];
+	      }
+	    z += step_sizes[2][k];
+	  }
+	break;
+      }
+      
+      default:
+            Assert (false, ExcNotImplemented());
+    }
+
+                                   // next create the cells
+				   // Prepare cell data
+  std::vector<CellData<dim> > cells;
+  switch (dim)
+    {
+      case 1:
+      {
+        cells.resize (step_sizes[0].size());
+        for (unsigned int x=0; x<step_sizes[0].size(); ++x)
+          {
+            cells[x].vertices[0] = x;
+            cells[x].vertices[1] = x+1;
+            cells[x].material_id = 0;
+          }
+        break;
+      }
+      
+      case 2:
+      {
+        cells.resize (step_sizes[1].size()*step_sizes[0].size());
+        for (unsigned int y=0; y<step_sizes[1].size(); ++y)
+          for (unsigned int x=0; x<step_sizes[0].size(); ++x)
+            {
+              const unsigned int c = x+y*step_sizes[0].size();
+              cells[c].vertices[0] = y*(step_sizes[0].size()+1)+x;
+              cells[c].vertices[1] = y*(step_sizes[0].size()+1)+x+1;
+              cells[c].vertices[2] = (y+1)*(step_sizes[0].size()+1)+x;
+              cells[c].vertices[3] = (y+1)*(step_sizes[0].size()+1)+x+1;
+              cells[c].material_id = 0;
+            }
+        break;
+      }
+      
+      case 3:
+      {
+        const unsigned int n_x  = (step_sizes[0].size()+1);
+        const unsigned int n_xy = (step_sizes[0].size()+1)*(step_sizes[1].size()+1);
+        
+        cells.resize (step_sizes[2].size()*step_sizes[1].size()*step_sizes[0].size());
+        for (unsigned int z=0; z<step_sizes[2].size(); ++z)
+          for (unsigned int y=0; y<step_sizes[1].size(); ++y)
+            for (unsigned int x=0; x<step_sizes[0].size(); ++x)
+              {
+                const unsigned int c = x+y*step_sizes[0].size() +
+                                       z*step_sizes[0].size()*step_sizes[1].size();
+                cells[c].vertices[0] = z*n_xy + y*n_x + x;
+                cells[c].vertices[1] = z*n_xy + y*n_x + x+1;
+                cells[c].vertices[2] = z*n_xy + (y+1)*n_x + x;
+                cells[c].vertices[3] = z*n_xy + (y+1)*n_x + x+1;
+                cells[c].vertices[4] = (z+1)*n_xy + y*n_x + x;
+                cells[c].vertices[5] = (z+1)*n_xy + y*n_x + x+1;
+                cells[c].vertices[6] = (z+1)*n_xy + (y+1)*n_x + x;
+                cells[c].vertices[7] = (z+1)*n_xy + (y+1)*n_x + x+1;
+                cells[c].material_id = 0;
+              }
+        break;
+        
+      }
+
+      default:
+            Assert (false, ExcNotImplemented());
+    }
+
+  tria.create_triangulation (points, cells, SubCellData());  
+
+  if (colorize)
+    {
+				       // to colorize, run through all
+				       // faces of all cells and set
+				       // boundary indicator to the
+				       // correct value if it was 0.
+     
+				       // use a large epsilon to
+				       // compare numbers to avoid
+				       // roundoff problems.
+      double min_size = *std::min_element (step_sizes[0].begin(),
+					   step_sizes[0].end());
+      for (unsigned int i=1; i<dim; ++i)
+	min_size = std::min (min_size,
+			     *std::min_element (step_sizes[i].begin(),
+						step_sizes[i].end()));
+      const double epsilon = 0.01 * min_size;
+    
+                                       // actual code is external since
+                                       // 1-D is different from 2/3D.
+      colorize_subdivided_hyper_rectangle (tria, p1, p2, epsilon);
+    }
+}
+
+
+
 #if deal_II_dimension == 1
 
 // Implementation for 1D only
@@ -1728,6 +1924,13 @@ template void
 GridGenerator::subdivided_hyper_rectangle<deal_II_dimension> 
 (Triangulation<deal_II_dimension> &,
  const std::vector<unsigned int>&,
+ const Point<deal_II_dimension>&,
+ const Point<deal_II_dimension>&, bool);
+
+template void
+GridGenerator::subdivided_hyper_rectangle<deal_II_dimension> 
+(Triangulation<deal_II_dimension> &,
+ const std::vector<std::vector<double> >&,
  const Point<deal_II_dimension>&,
  const Point<deal_II_dimension>&, bool);
 

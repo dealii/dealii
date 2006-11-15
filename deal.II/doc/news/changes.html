@@ -418,7 +418,7 @@ inconvenience this causes.
   <li> <p> Extended: The <code class="class">QGaussLobatto</code> quadrature
        rule computes Legendre-Gauss-Lobatto nodes and quadrature weights.
        <br>
-       (F. Prill 2006/11/02)
+       (Florian Prill 2006/11/02)
        </p>
 
   <li> <p> Extended: The <code>contract</code> function family contracts two
@@ -717,7 +717,7 @@ inconvenience this causes.
   <li> <p> Improved: PETSc 2.3.1 (<i>build 16</i>) is now supported by the
        linear preconditioner classes. The new PETSc functions 
        <code class="member">PCFactorSetXXX</code> are used.<br>       
-       (F. Prill, 2006/08/04)
+       (Florian Prill, 2006/08/04)
        </p>
 
   <li> <p>New: The class <code class="class">TransposeMatrix</code>
@@ -922,11 +922,19 @@ inconvenience this causes.
 
 <ol>
 
+  <li> <p> New: There is now a function <code
+       class="member">GridGenerator::subdivided_hyper_rectangle</code>
+       that produces a non-uniformly subdivided rectangle, ideally
+       suited for graded meshes.
+       <br>
+       (Yaqi Wang 2006/11/15)
+       </p>
+
   <li> <p> Fixed: Corrected <code class="member">clone</code> method 
        of <code class="class">FE_DGQ</code> class for non-equidistant 
        support points.
        <br>
-       (F. Prill 2006/10/31)
+       (Florian Prill 2006/10/31)
        </p>
 
   <li> <p> Improved: The lookup mechanism in <code
