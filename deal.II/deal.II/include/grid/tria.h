@@ -1288,18 +1288,36 @@ class Triangulation : public Subscriptor
     Triangulation (const MeshSmoothing smooth_grid = none);
 
 				     /**
-				      *  Copy constructor. You should really
-				      *  use the @p copy_triangulation function,
-				      *  so we declare this function but let
-				      *  it throw an internal error. The
-				      *  reason for this is that we may use
-				      *  triangulation objects in collection,
-				      *  but inside them sometimes strange
-				      *  operations like copying happen which
-				      *  should be avoided for objects as
-				      *  large as triangulations. By throwing
-				      *  an error, one easily finds these
-				      *  places and can find other ways.
+				      *  Copy constructor.
+				      *
+				      *  You should really use the @p
+				      *  copy_triangulation function,
+				      *  so we declare this function
+				      *  but let it throw an internal
+				      *  error. The reason for this is
+				      *  that we may want to use
+				      *  triangulation objects in
+				      *  collections. However, C++
+				      *  containers require that the
+				      *  objects stored in them are
+				      *  copyable, so we need to
+				      *  provide a copy
+				      *  constructor. On the other
+				      *  hand, copying triangulations
+				      *  is so expensive that we do
+				      *  not want such objects copied
+				      *  by accident, for example in
+				      *  compiler-generated temporary
+				      *  objects. By defining a copy
+				      *  constructor but throwing an
+				      *  error, we satisfy the formal
+				      *  requirements of containers,
+				      *  but at the same time disallow
+				      *  actual copies. Finally,
+				      *  through the exception, one
+				      *  easily finds the places where
+				      *  code has to be changed to
+				      *  avoid copies.
 				      */
     Triangulation (const Triangulation<dim> &t);
     
