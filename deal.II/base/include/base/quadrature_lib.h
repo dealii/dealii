@@ -84,12 +84,15 @@ class QGaussLobatto : public Quadrature<dim>
 
   protected:
 				     /**
-				      * Compute Legendre-Gauss-Lobatto quadrature
-				      * points in the interval [-1, +1] which are
-				      * equal to the roots of the corresponding
-				      * Jacobi polynomial (specified by
-				      * @p alpha, @p beta).
-				      * @param q  number of points.
+				      * Compute Legendre-Gauss-Lobatto
+				      * quadrature points in the
+				      * interval $[-1, +1]$. They are
+				      * equal to the roots of the
+				      * corresponding Jacobi
+				      * polynomial (specified by @p
+				      * alpha, @p beta).  @p q is
+				      * number of points.
+				      *
 				      * @return vector containing nodes.
 				      */
     std::vector<double>
@@ -103,7 +106,7 @@ class QGaussLobatto : public Quadrature<dim>
 				      * The quadrature points and weights are
 				      * related to Jacobi polynomial specified
 				      * by @p alpha, @p beta.
-				      * @param x  quadrature points.
+				      * @p x denotes the quadrature points.
 				      * @return vector containing weights.
 				      */
     std::vector<double>
@@ -118,8 +121,8 @@ class QGaussLobatto : public Quadrature<dim>
 				      * @p alpha, @p beta, @p n.
 				      * Note: The Jacobi polynomials are
 				      * not orthonormal and defined on
-				      * the interval [-1, +1].
-				      * @param x  point of evaluation.
+				      * the interval $[-1, +1]$.
+				      * @p x is the point of evaluation.
 				      */
     double JacobiP(const double x,
                    const int alpha,
