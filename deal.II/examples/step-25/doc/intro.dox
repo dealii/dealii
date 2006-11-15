@@ -264,7 +264,7 @@ these:
     \xi = x \cos\vartheta + y \sin \vartheta \cos\phi +
           \sin \vartheta \sin\phi (z\cosh\tau + t\sinh \tau),
   @f]
-  and where we choose $\vartheta=\phi=\pi, \tau=c_1=s=1$.
+  and where we choose $\vartheta=\phi=\frac{\pi}{4}, \tau=c_1=s=1$.
 </ul>
 
 

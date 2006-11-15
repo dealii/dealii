@@ -224,8 +224,8 @@ double ExactSolution<dim>::value (const Point<dim> &p,
 
       case 3:
       {
-	double theta  = deal_II_numbers::PI;
-	double phi = deal_II_numbers::PI;
+	double theta  = deal_II_numbers::PI/4;
+	double phi = deal_II_numbers::PI/4;
 	double tau = 1.;
 	double c0  = 1.;
 	double s   = 1.;
