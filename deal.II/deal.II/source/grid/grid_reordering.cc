@@ -1462,7 +1462,7 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
 				       // in lexicographic ordering
       for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
 	vertices_lex[GeometryInfo<3>::ucd_to_deal[i]]=cells[cell_no].vertices[i];
-      if (GridTools::cell_measure(all_vertices, vertices_lex) < 0)
+      if (GridTools::cell_measure<3>(all_vertices, vertices_lex) < 0)
 	{
 	  ++n_negative_cells;
 	  for (unsigned int i=0; i<4; ++i)
@@ -1476,7 +1476,7 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
 					   // bin
 	  for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
 	    vertices_lex[GeometryInfo<3>::ucd_to_deal[i]]=cells[cell_no].vertices[i];
-	  AssertThrow(GridTools::cell_measure(all_vertices, vertices_lex) > 0,
+	  AssertThrow(GridTools::cell_measure<3>(all_vertices, vertices_lex) > 0,
 		      ExcInternalError());
 	}
     }
