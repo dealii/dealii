@@ -298,6 +298,7 @@ class GridGenerator
 				      * points @p p1 and @p p2.
 				      */
     template <int dim>
+    static
     void
     subdivided_hyper_rectangle(Triangulation<dim>              &tria,
 			       const std::vector<std::vector<double> > &step_sizes,
