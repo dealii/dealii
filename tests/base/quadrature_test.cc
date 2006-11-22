@@ -41,6 +41,10 @@ fill_vector (std::vector<Quadrature<dim> *>& quadratures)
     }
   QMilne<1> q1d;
   quadratures.push_back (new Quadrature<dim>(q1d));
+  for (unsigned int i=2;i<8;++i)
+    {
+      quadratures.push_back (new QGaussLobatto<dim>(i));
+    }
 }
 
 template <int dim>
