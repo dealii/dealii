@@ -95,7 +95,7 @@ class QGaussLobatto : public Quadrature<dim>
 				      *
 				      * @return vector containing nodes.
 				      */
-    std::vector<double>
+    std::vector<long double>
     compute_quadrature_points (const unsigned int q,
 			       const int alpha,
 			       const int beta) const;
@@ -109,8 +109,8 @@ class QGaussLobatto : public Quadrature<dim>
 				      * @p x denotes the quadrature points.
 				      * @return vector containing weights.
 				      */
-    std::vector<double>
-    compute_quadrature_weights (const std::vector<double> &x,
+    std::vector<long double>
+    compute_quadrature_weights (const std::vector<long double> &x,
 				const int alpha,
 				const int beta) const;
     
@@ -124,10 +124,10 @@ class QGaussLobatto : public Quadrature<dim>
 				      * the interval $[-1, +1]$.
 				      * @p x is the point of evaluation.
 				      */
-    double JacobiP(const double x,
-                   const int alpha,
-                   const int beta,
-                   const unsigned int n) const;
+    long double JacobiP(const long double x,
+			const int alpha,
+			const int beta,
+			const unsigned int n) const;
 
     				     /**
 				      * Evaluate the Gamma function
@@ -313,14 +313,14 @@ class QWeddle : public Quadrature<dim>
 template <> QGauss<1>::QGauss (const unsigned int n);
 template <> QGaussLobatto<1>::QGaussLobatto (const unsigned int n);
 template <>
-std::vector<double> QGaussLobatto<1>::
+std::vector<long double> QGaussLobatto<1>::
 compute_quadrature_points(const unsigned int, const int, const int) const;
 template <>
-std::vector<double> QGaussLobatto<1>::
-compute_quadrature_weights(const std::vector<double>&, const int, const int) const;
+std::vector<long double> QGaussLobatto<1>::
+compute_quadrature_weights(const std::vector<long double>&, const int, const int) const;
 template <>
-double QGaussLobatto<1>::
-JacobiP(const double, const int, const int, const unsigned int) const;
+long double QGaussLobatto<1>::
+JacobiP(const long double, const int, const int, const unsigned int) const;
 template <>
 unsigned int QGaussLobatto<1>::
 QGaussLobatto<1>::gamma(const unsigned int n) const;

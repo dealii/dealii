@@ -156,14 +156,16 @@ QGaussLobatto<1>::QGaussLobatto (unsigned int n)
 		:
 		Quadrature<1> (n)
 {
-  std::vector<double> points  = compute_quadrature_points(n, 1, 1);
-  std::vector<double> w       = compute_quadrature_weights(points, 0, 0);
+  Assert (n >= 2, ExcNotImplemented());
+  
+  std::vector<long double> points  = compute_quadrature_points(n, 1, 1);
+  std::vector<long double> w       = compute_quadrature_weights(points, 0, 0);
 
 				   // scale points to the interval
 				   // [0.0, 1.0]:
   for (unsigned int i=0; i<points.size(); ++i)
     {
-      this->quadrature_points[i] = Point<1>(0.5 + 0.5*points[i]);
+      this->quadrature_points[i] = Point<1>(0.5 + 0.5*static_cast<double>(points[i]));
       this->weights[i]           = 0.5*w[i];
     }
 }
@@ -171,25 +173,33 @@ QGaussLobatto<1>::QGaussLobatto (unsigned int n)
 
 
 template <>
-std::vector<double> QGaussLobatto<1>::
+std::vector<long double> QGaussLobatto<1>::
 compute_quadrature_points(const unsigned int q,
 			  const int alpha,
 			  const int beta) const
 {
   const unsigned int m = q-2; // no. of inner points
-  std::vector<double> x(m);
+  std::vector<long double> x(m);
   
 				   // compute quadrature points with
 				   // a Newton algorithm.
-  const double epsilon = 1.e-10; // tolerance
-  
+
+				   // set tolerance
+#ifdef HAVE_STD_NUMERIC_LIMITS
+  const long double
+    epsilon = static_cast<long double>(std::numeric_limits<long double>::epsilon());
+#else
+  const long double
+    epsilon = 1.e-19L; 
+#endif
+
 				   // we take the zeros of the Chebyshev
 				   // polynomial (alpha=beta=-0.5) as
 				   // initial values:
   for (unsigned int i=0; i<m; ++i)
-    x[i] = - std::cos( (double) (2*i+1)/(2*m) * M_PI );
+    x[i] = - std::cos( (long double) (2*i+1)/(2*m) * M_PI );
   
-  double r, s, J_x, f, delta;
+  long double r, s, J_x, f, delta;
   for (unsigned int k=0; k<m; ++k)
     {
       r = x[k];
@@ -204,7 +214,7 @@ compute_quadrature_points(const unsigned int q,
 
 	  J_x   =  0.5*(alpha + beta + m + 1)*JacobiP(r, alpha+1, beta+1, m-1);
 	  f     = JacobiP(r, alpha, beta, m);
-	  delta = - f/(J_x - f*s);
+	  delta = f/(f*s- J_x);
 	  r += delta;
 	}
       while (std::fabs(delta) >= epsilon);
@@ -213,8 +223,8 @@ compute_quadrature_points(const unsigned int q,
     } // for
 
 				   // add boundary points:
-  x.insert(x.begin(), -1.);
-  x.push_back(+1.);
+  x.insert(x.begin(), -1.L);
+  x.push_back(+1.L);
 
   return x;
 }
@@ -222,19 +232,19 @@ compute_quadrature_points(const unsigned int q,
 
 
 template <>
-std::vector<double> QGaussLobatto<1>::
-compute_quadrature_weights(const std::vector<double> &x,
+std::vector<long double> QGaussLobatto<1>::
+compute_quadrature_weights(const std::vector<long double> &x,
 			   const int alpha,
 			   const int beta) const
 {
   const unsigned int q = x.size();
-  std::vector<double> w(q);
-  double s = 0;
+  std::vector<long double> w(q);
+  long double s = 0.L;
   
-  const double factor = std::pow(2., alpha+beta+1) *
-			gamma(alpha+q) *
-			gamma(beta+q) /
-			((q-1)*gamma(q)*gamma(alpha+beta+q+1));
+  const long double factor = std::pow(2., alpha+beta+1) *
+			     gamma(alpha+q) *
+			     gamma(beta+q) /
+			     ((q-1)*gamma(q)*gamma(alpha+beta+q+1));
   for (unsigned int i=0; i<q; ++i)
     {
       s = JacobiP(x[i], alpha, beta, q-1);
@@ -249,18 +259,18 @@ compute_quadrature_weights(const std::vector<double> &x,
 
 
 template <>
-double QGaussLobatto<1>::JacobiP(const double x,
-				 const int alpha,
-				 const int beta,
-				 const unsigned int n) const
+long double QGaussLobatto<1>::JacobiP(const long double x,
+				      const int alpha,
+				      const int beta,
+				      const unsigned int n) const
 {
 				   // the Jacobi polynomial is evaluated
 				   // using a recursion formula.
-  std::vector<double> p(n+1);
-  double v, a1, a2, a3, a4;
+  std::vector<long double> p(n+1);
+  int v, a1, a2, a3, a4;
   
 				   // initial values P_0(x), P_1(x):
-  p[0] = 1.0;
+  p[0] = 1.0L;
   if (n==0) return p[0];
   p[1] = ((alpha+beta+2)*x + (alpha-beta))/2;
   if (n==1) return p[1];
@@ -273,7 +283,7 @@ double QGaussLobatto<1>::JacobiP(const double x,
       a3 = v*(v + 1)*(v + 2);
       a4 = 2*(i+alpha)*(i+beta)*(v + 2);
 
-      p[i+1] =  1/a1*( (a2 + a3*x)*p[i] - a4*p[i-1]);
+      p[i+1] = static_cast<long double>( (a2 + a3*x)*p[i] - a4*p[i-1])/a1;
     } // for
   return p[n];
 }
