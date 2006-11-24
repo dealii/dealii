@@ -18,8 +18,7 @@ verbose = off
 PLATFORM = $(TARGET)+$(GXX-VERSION:intel_%=%)
 PLATFORM-HIERARCHY = $(shell $(PERL) ../hierarchy.pl $(PLATFORM))
 
-ID =  "deal"
-ID +="@"`hostname`
+ID = `id -un`"@"`hostname`
 
 ############################################################
 # First how to create executables, including all necessary
