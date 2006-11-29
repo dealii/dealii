@@ -234,7 +234,7 @@ namespace internal
                             const unsigned int               fe_index,
 			    const unsigned int               obj_level) const;
 
-                                          /**
+                                         /**
                                           * Determine an estimate for the
                                           * memory consumption (in bytes)
                                           * of this object.
