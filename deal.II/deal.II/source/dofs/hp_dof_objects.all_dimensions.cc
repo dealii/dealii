@@ -14,12 +14,8 @@
 
 #include <base/memory_consumption.h>
 #include <dofs/hp_dof_objects.h>
-#include <dofs/hp_dof_levels.h>
-#include <dofs/hp_dof_handler.h>
 
 DEAL_II_NAMESPACE_OPEN
-
-//TODO: Several of the functions in this file are identical. some template trickery should make it possible to merge them
 
 namespace internal
 {
@@ -40,24 +36,15 @@ namespace internal
     DoFObjects<1>::
     memory_consumption () const;
     
-#if deal_II_dimension >= 2
-
     template
     unsigned int
     DoFObjects<2>::
     memory_consumption () const;
     
-#endif
-    
-    
-#if deal_II_dimension >= 3
-
     template
     unsigned int
     DoFObjects<3>::
     memory_consumption () const;
-    
-#endif
   }
 }
 
