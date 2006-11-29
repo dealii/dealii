@@ -3354,10 +3354,9 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
     fi
 
         case "$target" in
-                              *apple-darwin*)
+            *apple-darwin*)
 	CXXFLAGSG="$CXXFLAGSG -Wno-long-double"
 	CXXFLAGSO="$CXXFLAGSO -Wno-long-double"
-	LDFLAGS="$LDFLAGS -bind_at_load"
         ;;
 
                               *dec-osf*)
