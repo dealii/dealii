@@ -66,9 +66,9 @@ ifneq ($(GXX-VERSION),compaq_cxx)
     deplibs.o += $(lib-contrib-petsc.o)
   endif
 
-  # for cygwin, also llapack and such are necessary
-  # we better link all libraries mentioned in $(libs)
-  ifeq ($(findstring cygwin,$(TARGET)),cygwin)
+  # for cygwin and darwin, also llapack and such are necessary
+  # we better link all libraries mentioned in $(LIBS)
+  ifneq ($(findstring cygwin,$(TARGET))$(findstring darwin,$(TARGET)),)
     deplibs.g += $(LIBS)
     deplibs.o += $(LIBS)
   endif
