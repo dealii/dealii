@@ -473,10 +473,14 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 
     dnl Some system specific things
     case "$target" in
-      dnl Use -Wno-long-long on Apple Darwin to avoid some unnecessary warning
+      dnl Use -Wno-long-long on Apple Darwin to avoid some unnecessary warning.
+      dnl Also use -bind_at_load as a linker flag because sometimes the
+      dnl linker complains about __divdi3 being available from both libgcc
+      dnl as well as from libg2c
       *apple-darwin*)
 	CXXFLAGSG="$CXXFLAGSG -Wno-long-double"
 	CXXFLAGSO="$CXXFLAGSO -Wno-long-double"
+	LDFLAGS="$LDFLAGS -bind_at_load"
         ;;
 
       dnl On DEC OSF, including both stdio.h and unistd.h causes a warning
