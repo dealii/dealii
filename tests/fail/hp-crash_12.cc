@@ -15,7 +15,7 @@
 // check the complex case described in the hp paper by playing through all
 // sorts of arrangements of finite elements on one coarse and one refined cell
 
-char logname[] = "crash_12/output";
+char logname[] = "hp-crash_12/output";
 
 
 #include "../tests.h"
