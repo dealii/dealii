@@ -12,7 +12,6 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/exceptions.h>
 #include <base/memory_consumption.h>
 #include <dofs/dof_levels.h>
 
@@ -29,6 +28,33 @@ namespace internal
       return MemoryConsumption::memory_consumption (cell_dof_indices_cache);
     }
 
+
+    
+    unsigned int
+    DoFLevel<1>::memory_consumption () const
+    {
+      return (DoFLevel<0>::memory_consumption () +
+              MemoryConsumption::memory_consumption (lines));
+    }
+
+    
+    
+    unsigned int
+    DoFLevel<2>::memory_consumption () const
+    {
+      return (DoFLevel<0>::memory_consumption () +
+              MemoryConsumption::memory_consumption (quads));
+    }
+
+    
+
+    unsigned int
+    DoFLevel<3>::memory_consumption () const
+    {
+      return (DoFLevel<0>::memory_consumption () +
+              MemoryConsumption::memory_consumption (hexes));
+    }
+    
   }
   
 }
