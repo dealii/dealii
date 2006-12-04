@@ -77,7 +77,6 @@ namespace internal
 		   const unsigned int       local_index,
 		   const unsigned int       global_index);
 
-#if deal_II_dimension >= 2
 
     template class DoFObjects<2>;
 
@@ -98,10 +97,6 @@ namespace internal
 		   const unsigned int       local_index,
 		   const unsigned int       global_index);
 
-#endif
-
-#if deal_II_dimension >= 3
-    
     template class DoFObjects<3>;
 
     template
@@ -120,8 +115,6 @@ namespace internal
 		   const unsigned int       fe_index,
 		   const unsigned int       local_index,
 		   const unsigned int       global_index);
-
-#endif
 
   }
 }
