@@ -298,7 +298,8 @@ class SparseDirectMA27 : public Subscriptor
     void solve (Vector<number> &rhs_and_solution) const;
 
 				     /**
-				      * Call the three functions above
+				      * Call the three functions 
+				      * initialize, factorize and solve
 				      * in that order, i.e. perform
 				      * the whole solution process for
 				      * the given right hand side
@@ -764,7 +765,9 @@ class SparseDirectMA47 : public Subscriptor
     void solve (Vector<double> &rhs_and_solution);
 
 				     /**
-				      * Call the three functions above
+				      * Call the three functions
+				      * initialize, factorize and
+				      * solve
 				      * in that order, i.e. perform
 				      * the whole solution process for
 				      * the given right hand side
@@ -1089,11 +1092,13 @@ class SparseDirectUMFPACK : public Subscriptor
 				      * functionality may not always be of
 				      * large benefit.
 				      *
-				      * If the initialization step has
-				      * not been performed yet, then
-				      * the initialize() function is
-				      * called at the beginning of
-				      * this function.
+				      * In contrast to the other direct solver
+				      * classes, the initialisation method
+				      * does nothing. Therefore initialise 
+				      * is not automatically called by this
+				      * method, when
+				      * the initialization step has
+				      * not been performed yet.
 				      *
 				      * This function copies the contents of
 				      * the matrix into its own storage; the
@@ -1114,10 +1119,14 @@ class SparseDirectUMFPACK : public Subscriptor
     
 				     /**
 				      * Preconditioner interface
-				      * function. Given the source
-				      * vector, returns the
+				      * function. Usually, given the source
+				      * vector, this method returns an
 				      * approximated solution of <i>Ax
-				      * = b</i>.
+				      * = b</i>. As this class provides a
+				      * wrapper to a direct solver, here
+				      * it is actually the exact solution
+				      * (exact within the range of numerical
+				      * accuracy of course).
 				      */
     void vmult (Vector<double>&, const Vector<double>&) const;
 
@@ -1168,7 +1177,8 @@ class SparseDirectUMFPACK : public Subscriptor
     void solve (Vector<double> &rhs_and_solution) const;
 
 				     /**
-				      * Call the three functions above
+				      * Call the two functions 
+				      * factorize and solve
 				      * in that order, i.e. perform
 				      * the whole solution process for
 				      * the given right hand side
