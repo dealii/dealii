@@ -1379,25 +1379,31 @@ void HelmholtzProblem<dim>::process_solution (const unsigned int cycle)
                                  // For this, we will use the
                                  // following convention: Faces
                                  // belonging to Gamma1 will have the
-                                 // boundary indicator <code>0</code> (which is
-                                 // the default, so we don't have to
-                                 // set it explicitely), and faces
-                                 // belonging to Gamma2 will use <code>1</code>
-                                 // as boundary indicator.  To set
-                                 // these values, we loop over all
-                                 // cells, then over all faces of a
-                                 // given cell, check whether it is
-                                 // part of the boundary that we want
-                                 // to denote by Gamma2, and if so set
-                                 // its boundary indicator to
-                                 // <code>1</code>. For the present program, we
-                                 // consider the left and bottom
-                                 // boundaries as Gamma2. We determine
-                                 // whether a face is part of that
-                                 // boundary by asking whether the x
-                                 // or y coordinates (i.e. vector
+                                 // boundary indicator <code>0</code>
+                                 // (which is the default, so we don't
+                                 // have to set it explicitely), and
+                                 // faces belonging to Gamma2 will use
+                                 // <code>1</code> as boundary
+                                 // indicator.  To set these values,
+                                 // we loop over all cells, then over
+                                 // all faces of a given cell, check
+                                 // whether it is part of the boundary
+                                 // that we want to denote by Gamma2,
+                                 // and if so set its boundary
+                                 // indicator to <code>1</code>. For
+                                 // the present program, we consider
+                                 // the left and bottom boundaries as
+                                 // Gamma2. We determine whether a
+                                 // face is part of that boundary by
+                                 // asking whether the x or y
+                                 // coordinates (i.e. vector
                                  // components 0 and 1) of the
-                                 // midpoint of a face equals -1.
+                                 // midpoint of a face equals -1, up
+                                 // to some small wiggle room that we
+                                 // have to give since it is instable
+                                 // to compare floating point numbers
+                                 // that are subject to round off in
+                                 // intermediate computations.
                                  //
                                  // It is worth noting that we have to
                                  // loop over all cells here, not only
@@ -1438,9 +1444,9 @@ void HelmholtzProblem<dim>::run ()
 	    for (unsigned int face=0;
                  face<GeometryInfo<dim>::faces_per_cell;
                  ++face)
-	      if ((cell->face(face)->center()(0) == -1)
+	      if ((std::fabs(cell->face(face)->center()(0) - (-1)) < 1e-12)
 		  ||
-		  (cell->face(face)->center()(1) == -1))
+		  (std::fabs(cell->face(face)->center()(1) - (-1)) < 1e-12))
 		cell->face(face)->set_boundary_indicator (1);
 	}
       else
