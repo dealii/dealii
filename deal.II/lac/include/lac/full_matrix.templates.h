@@ -2245,7 +2245,10 @@ FullMatrix<number>::gauss_jordan ()
   for (unsigned int i=0; i<N; ++i)
     diagonal_sum += std::fabs(this->el(i,i));
   const double typical_diagonal_element = diagonal_sum/N;
-  
+
+				   // initialize the array that holds
+				   // the permutations that we find
+				   // during pivot search
   std::vector<unsigned int> p(N);
   for (unsigned int i=0; i<N; ++i)
     p[i] = i;
