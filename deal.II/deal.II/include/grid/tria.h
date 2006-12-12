@@ -793,13 +793,19 @@ namespace internal
  *     be refined after the step.
  *
  *   <li> @p patch_level_1:
- *     Ensures patch level 1. As result the triangulation consists of
- *     patches, i.e. of cells that are refined once. It follows that
- *     if at least one of the children of a cell is or will be refined
- *     than all children need to be refined. If the @p patch_level_1 flag
- *     is set, than the flags @p eliminate_unrefined_islands,
- *     @p eliminate_refined_inner_islands and
- *     @p eliminate_refined_boundary_islands will be ignored as they will
+ *     A triangulation of patch level 1 consists of patches, i.e. of
+ *     cells that are refined once. This flag ensures that a mesh of
+ *     patch level 1 is still of patch level 1 after coarsening and
+ *     refinement. It is, however, the user's responsibility to ensure
+ *     that the mesh is of patch level 1 before calling
+ *     execute_coarsening_and_refinement the first time. The easiest
+ *     way to achieve this is by calling global_refine(1) straight
+ *     after creation of the triangulation.  It follows that if at
+ *     least one of the children of a cell is or will be refined than
+ *     all children need to be refined. If the @p patch_level_1 flag
+ *     is set, than the flags @p eliminate_unrefined_islands, @p
+ *     eliminate_refined_inner_islands and @p
+ *     eliminate_refined_boundary_islands will be ignored as they will
  *     be fulfilled automatically.
  *
  *   <li> @p smoothing_on_refinement:

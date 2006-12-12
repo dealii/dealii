@@ -7590,7 +7590,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 				   //    need to be refined. This step
 				   //    only sets refinement flags and does
 				   //    not set coarsening flags.
-				   //    If the path_level_1 flag is set, than
+				   //    If the path_level_1 flag is set, then
 				   //    eliminate_unrefined_islands,
 				   //    eliminate_refined_inner_islands and
 				   //    eliminate_refined_boundary_islands will
@@ -8007,7 +8007,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 				       //    - patch level n says that
 				       //      the triangulation consists
 				       //      of patches of level n.
-				       //      This does make sence only
+				       //      This makes sense only
 				       //      if the grid is already at
 				       //      least n times globally
 				       //      refined.
@@ -8030,7 +8030,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 					   // (A) is that before
 					   // calling this function
 					   // the grid was already of
-					   // patch level 2.
+					   // patch level 1.
 
 					   // loop over all cells
 					   // whose children are all
