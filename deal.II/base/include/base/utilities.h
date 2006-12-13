@@ -105,7 +105,7 @@ namespace Utilities
                          const char delimiter = ' ');
 
 				   /**
-				    * Teturn true if the given pattern
+				    * Return true if the given pattern
 				    * string appears in the first
 				    * position of the string.
 				    */
