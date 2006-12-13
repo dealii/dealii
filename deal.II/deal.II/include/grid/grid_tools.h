@@ -116,6 +116,37 @@ class GridTools
 				 SubCellData                 &subcelldata);
     
 				     /**
+				      * Remove vertices that are duplicated,
+				      * due to the input of a structured grid,
+				      * for example. If these vertices are not
+				      * removed, the faces bounded by these
+				      * vertices become part of the boundary,
+				      * even if they are in the interior of
+				      * the mesh.
+				      *
+				      * This function is called by some
+				      * <tt>GridIn::read_*</tt> functions. Only
+				      * the vertices with indices in @p
+				      * considered_vertices are tested for
+				      * equality. This speeds up the algorithm,
+				      * which is quadratic and thus quite slow
+				      * to begin with. However, if you whish to
+				      * consider all vertices, simply pass an
+				      * empty vector.
+				      *
+				      * Two vertices are considered equal, if
+				      * their difference in each coordinate
+				      * direction is less than @p tol.
+				      */
+    template <int dim>
+    static
+    void delete_duplicated_vertices (std::vector<Point<dim> >    &all_vertices,
+				     std::vector<CellData<dim> > &cells,
+				     SubCellData                 &subcelldata,
+				     std::vector<unsigned int>   &considered_vertices,
+				     double                       tol=1e-12);
+    
+				     /**
 				      * Transform the vertices of the
 				      * given triangulation by
 				      * applying the predicate to all

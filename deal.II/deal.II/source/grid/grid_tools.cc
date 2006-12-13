@@ -245,7 +245,61 @@ GridTools::cell_measure (const std::vector<Point<3> > &all_vertices,
   return (t34+t64+t95+t125+t156+t181+t207+t228)/12.;
 }
 
-#else
+#endif
+
+
+#if deal_II_dimension == 2
+
+template <>
+double
+GridTools::cell_measure(const std::vector<Point<2> > &all_vertices,
+			const unsigned int (&vertex_indices) [GeometryInfo<2>::vertices_per_cell])
+{
+/*
+  Get the computation of the measure by this little Maple script. We
+  use the blinear mapping of the unit quad to the real quad. However,
+  every transformation mapping the unit faces to straight lines should
+  do.
+
+  Remember that the area of the quad is given by
+  \int_K 1 dx dy  = \int_{\hat K} |det J| d(xi) d(eta)
+
+  # x and y are arrays holding the x- and y-values of the four vertices
+  # of this cell in real space. 
+  x := array(0..3);
+  y := array(0..3);
+  tphi[0] := (1-xi)*(1-eta):
+  tphi[1] :=     xi*(1-eta):
+  tphi[2] := (1-xi)*eta:
+  tphi[3] :=     xi*eta:
+  x_real := sum(x[s]*tphi[s], s=0..3):
+  y_real := sum(y[s]*tphi[s], s=0..3):
+  detJ := diff(x_real,xi)*diff(y_real,eta) - diff(x_real,eta)*diff(y_real,xi):
+
+  measure := simplify ( int ( int (detJ, xi=0..1), eta=0..1)):
+  readlib(C):
+
+  C(measure, optimized);
+
+  additional optimizaton: divide by 2 only one time
+*/
+
+  const double x[4] = { all_vertices[vertex_indices[0]](0),
+			all_vertices[vertex_indices[1]](0),
+			all_vertices[vertex_indices[2]](0),
+			all_vertices[vertex_indices[3]](0)};
+
+  const double y[4] = { all_vertices[vertex_indices[0]](1),
+			all_vertices[vertex_indices[1]](1),
+			all_vertices[vertex_indices[2]](1),
+			all_vertices[vertex_indices[3]](1)};
+
+  return (-x[1]*y[0]+x[1]*y[3]+y[0]*x[2]+x[0]*y[1]-x[0]*y[2]-y[1]*x[3]-x[2]*y[3]+x[3]*y[2])/2;
+
+}
+
+#endif
+
 
 template <int dim>
 double
@@ -256,7 +310,6 @@ GridTools::cell_measure(const std::vector<Point<dim> > &all_vertices,
   return 0.;
 }
 
-#endif
 
 
 template <int dim>
@@ -311,6 +364,75 @@ GridTools::delete_unused_vertices (std::vector<Point<dim> >    &vertices,
     if (vertex_used[v] == true)
       tmp.push_back (vertices[v]);
   swap (vertices, tmp);
+}
+
+
+
+template <int dim>
+void
+GridTools::delete_duplicated_vertices (std::vector<Point<dim> >    &vertices,
+				       std::vector<CellData<dim> > &cells,
+				       SubCellData                 &subcelldata,
+				       std::vector<unsigned int>   &considered_vertices,
+				       double                       tol)
+{
+				   // create a vector of vertex
+				   // indices. initialize it to the identity,
+				   // later on change that if possible.
+  std::vector<unsigned int> new_vertex_numbers(vertices.size());
+				   //TODO: find a better way to initialize this
+				   //vector
+  for (unsigned int i=0; i<vertices.size(); ++i)
+    new_vertex_numbers[i]=i;
+
+				   // if the considered_vertices vector is
+				   // empty, consider all vertices
+  if (considered_vertices.size()==0)
+    considered_vertices=new_vertex_numbers;
+
+				   // now loop over all vertices to be
+				   // considered and try to find an identical
+				   // one
+  for (unsigned int i=0; i<considered_vertices.size(); ++i)
+    {
+      if (new_vertex_numbers[considered_vertices[i]]!=considered_vertices[i])
+					 // this vertex has been identified with
+					 // another one already, skip it in the
+					 // test
+	continue;
+				       // this vertex is not identified with
+				       // another one so far. search in the list
+				       // of remaining vertices. if a duplicate
+				       // vertex is found, set the new vertex
+				       // index for that vertex to this vertex'
+				       // index.
+      for (unsigned int j=i+1; j<considered_vertices.size(); ++j)
+	{
+	  bool equal=true;
+	  for (unsigned int d=0; d<dim; ++d)
+	    equal &= (fabs(vertices[considered_vertices[j]](d)-vertices[considered_vertices[i]](d))<tol);
+	  if (equal)
+	    {
+	      new_vertex_numbers[considered_vertices[j]]=considered_vertices[i];
+	      // we do not suppose, that there might be another duplicate
+	      // vertex, so break here
+	      break;
+	    }
+	}		
+    }
+
+				   // now we got a renumbering list. simply
+				   // renumber all vertices (non-duplicate
+				   // vertices get renumbered to themselves, so
+				   // nothing bad happens). after that, the
+				   // duplicate vertices will be unused, so call
+				   // delete_unused_vertices() to do that part
+				   // of the job.
+  for (unsigned int c=0; c<cells.size(); ++c)
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      cells[c].vertices[v]=new_vertex_numbers[cells[c].vertices[v]];
+
+  delete_unused_vertices(vertices,cells,subcelldata);
 }
 
 
@@ -966,6 +1088,13 @@ template
 void GridTools::delete_unused_vertices (std::vector<Point<deal_II_dimension> > &,
 					std::vector<CellData<deal_II_dimension> > &,
 					SubCellData &);
+
+template
+void GridTools::delete_duplicated_vertices (std::vector<Point<deal_II_dimension> > &,
+					    std::vector<CellData<deal_II_dimension> > &,
+					    SubCellData &,
+					    std::vector<unsigned int> &,
+					    double);
 
 template
 void GridTools::shift<deal_II_dimension> (const Point<deal_II_dimension> &,

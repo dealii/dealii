@@ -397,6 +397,12 @@ inconvenience this causes.
 <h3>base</h3>
 
 <ol>
+  <li> <p> Fixed: If no substring is found with a width smaller than the given
+       threshold, the <code>Utilities::break_text_into_lines</code> function now
+       returns the smallest possible substring (larger than the threshold).
+       <br> (Tobias Leicht 2006/12/13)
+       </p>
+
   <li> <p> Changed: We used to set preprocessor variables
        <code>PACKAGE_NAME</code>, <code>PACKAGE_TARNAME</code>,
        <code>PACKAGE_VERSION</code>, <code>PACKAGE_STRING</code>,
@@ -921,6 +927,16 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+
+  <li> <p> New: There is now a function
+       <code>GridTools::delete_duplicated_vertices</code> that deletes duplicate
+       vertices which can occur if structured grids are read into deal, leading
+       to unwanted interior boundaries. In order to reduce the effort of the
+       quadratic algorithm, a list of vertices to be considered can be supplied
+       if available.  
+		 <br>
+		 (Tobias Leicht 2006/12/13)
+       </p>
 
   <li> <p> New: There is now a function <code
        class="member">GridGenerator::subdivided_hyper_rectangle</code>
