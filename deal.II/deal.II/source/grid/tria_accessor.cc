@@ -567,6 +567,8 @@ double TriaObjectAccessor<2, 2>::measure () const
   readlib(C):
 
   C(measure, optimized);
+
+  additional optimizaton: divide by 2 only one time
 */
 
   const double x[4] = { vertex(0)(0),
@@ -578,7 +580,7 @@ double TriaObjectAccessor<2, 2>::measure () const
 			vertex(2)(1),
 			vertex(3)(1)  };
 
-  return (-x[1]*y[0]/2+x[1]*y[3]/2+y[0]*x[2]/2+x[0]*y[1]/2-x[0]*y[2]/2-y[1]*x[3]/2-x[2]*y[3]/2+x[3]*y[2]/2);
+  return (-x[1]*y[0]+x[1]*y[3]+y[0]*x[2]+x[0]*y[1]-x[0]*y[2]-y[1]*x[3]-x[2]*y[3]+x[3]*y[2])/2;
 }
 
 
