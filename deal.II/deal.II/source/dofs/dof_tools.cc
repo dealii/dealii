@@ -1564,6 +1564,117 @@ namespace internal
   {
     namespace 
     {
+      inline
+      bool
+      check_master_dof_list (const FullMatrix<double> &face_interpolation_matrix,
+			     const std::vector<unsigned int> &master_dof_list)
+      {
+	const unsigned int N = master_dof_list.size();
+
+	FullMatrix<double> tmp (N,N);
+	for (unsigned int i=0; i<N; ++i)
+	  for (unsigned int j=0; j<N; ++j)
+	    tmp(i,j) = face_interpolation_matrix (master_dof_list[i], j);
+
+					 // then use the algorithm
+					 // from
+					 // FullMatrix::gauss_jordan
+					 // on this matrix to find out
+					 // whether it is
+					 // singular. the algorithm
+					 // there does piviting and at
+					 // the end swaps rows back
+					 // into their proper order --
+					 // we omit this step here,
+					 // since we don't care about
+					 // the inverse matrix, all we
+					 // care about is whether the
+					 // matrix is regular or
+					 // singular
+	
+					 // first get an estimate of the
+					 // size of the elements of this
+					 // matrix, for later checks whether
+					 // the pivot element is large
+					 // enough, or whether we have to
+					 // fear that the matrix is not
+					 // regular
+	double diagonal_sum = 0;
+	for (unsigned int i=0; i<N; ++i)
+	  diagonal_sum += std::fabs(tmp(i,i));
+	const double typical_diagonal_element = diagonal_sum/N;
+
+					 // initialize the array that holds
+					 // the permutations that we find
+					 // during pivot search
+	std::vector<unsigned int> p(N);
+	for (unsigned int i=0; i<N; ++i)
+	  p[i] = i;
+
+	for (unsigned int j=0; j<N; ++j)
+	  {
+					     // pivot search: search that
+					     // part of the line on and
+					     // right of the diagonal for
+					     // the largest element
+	    double       max = std::fabs(tmp(j,j));
+	    unsigned int r   = j;
+	    for (unsigned int i=j+1; i<N; ++i)
+	      {
+		if (std::fabs(tmp(i,j)) > max)
+		  {
+		    max = std::fabs(tmp(i,j));
+		    r = i;
+		  }
+	      }
+					     // check whether the
+					     // pivot is too small. if
+					     // that is the case, then
+					     // the matrix is singular
+					     // and we shouldn't use
+					     // this set of master
+					     // dofs
+	    if (max < 1.e-12*typical_diagonal_element)
+	      return false;
+      
+					     // row interchange
+	    if (r>j)
+	      {
+		for (unsigned int k=0; k<N; ++k)
+		  std::swap (tmp(j,k), tmp(r,k));
+
+		std::swap (p[j], p[r]);
+	      }
+
+					     // transformation
+	    const double hr = 1./tmp(j,j);
+	    tmp(j,j) = hr;
+	    for (unsigned int k=0; k<N; ++k)
+	      {
+		if (k==j) continue;
+		for (unsigned int i=0; i<N; ++i)
+		  {
+		    if (i==j) continue;
+		    tmp(i,k) -= tmp(i,j)*tmp(j,k)*hr;
+		  }
+	      }
+	    for (unsigned int i=0; i<N; ++i)
+	      {
+		tmp(i,j) *= hr;
+		tmp(j,i) *= -hr;
+	      }
+	    tmp(j,j) = hr;
+	  }
+
+					 // everything went fine, so
+					 // we can accept this set of
+					 // master dofs (at least as
+					 // far as they have already
+					 // been collected)
+	return true;
+      }
+      
+      
 				       /**
 					* When restricting, on a face, the
 					* degrees of freedom of fe1 to the
@@ -1582,11 +1693,32 @@ namespace internal
 					* fe1.dofs_per_face. After the
 					* function, exactly fe2.dofs_per_face
 					* entries will be true.
+					*
+					* The function is a bit
+					* complicated since it has to
+					* figure out a set a DoFs so
+					* that the corresponding rows
+					* in the face interpolation
+					* matrix are all linearly
+					* independent. we have a good
+					* heuristic (see the function
+					* body) for selecting these
+					* rows, but there are cases
+					* where this fails and we have
+					* to pick them
+					* differently. what we do is
+					* to run the heuristic and
+					* then go back to determine
+					* whether we have a set of
+					* rows with full row rank. if
+					* this isn't the case, go back
+					* and select dofs differently
 					*/
       template <int dim>
       void
       select_master_dofs_for_face_restriction (const FiniteElement<dim> &fe1,
 					       const FiniteElement<dim> &fe2,
+					       const FullMatrix<double> &face_interpolation_matrix,
 					       std::vector<bool>        &master_dof_mask)
       {
 	Assert (fe1.dofs_per_face >= fe2.dofs_per_face,
@@ -1601,9 +1733,6 @@ namespace internal
 	Assert (fe2.dofs_per_quad <= fe1.dofs_per_quad,
 		ExcInternalError());
 
-					 // initialize all with false
-	std::fill (master_dof_mask.begin(), master_dof_mask.end(), false);
-	
 					 // the idea here is to designate as
 					 // many DoFs in fe1 per object
 					 // (vertex, line, quad) as master as
@@ -1612,33 +1741,125 @@ namespace internal
 					 // to avoid the 'unsigned int < 0 is
 					 // always false warning for the cases
 					 // at the bottom in 1d and 2d)
+					 //
+					 // as mentioned in the paper,
+					 // it is not always easy to
+					 // find a set of master dofs
+					 // that produces an
+					 // invertible matrix. to this
+					 // end, we check in each step
+					 // whether the matrix is
+					 // still invertible. we have
+					 // never had a problem with
+					 // vertex and line dofs, so
+					 // we only check inside an
+					 // Assert statement, without
+					 // providing any code that
+					 // can cope with the
+					 // situation if this goes
+					 // wrong.
+					 //
+					 // on the other hand, we did
+					 // have trouble with adding
+					 // more quad dofs when Q3 and
+					 // Q4 elements meet at a
+					 // refined face in 3d (see
+					 // the hp/crash_12 test that
+					 // tests that we can do
+					 // exactly this, and failed
+					 // before we had code to
+					 // compensate for this
+					 // case). therefore, for quad
+					 // dofs (which appear only in
+					 // 3d anyway), we have a
+					 // piece of code that can add
+					 // dofs until we have finally
+					 // found a suitable set
+	std::vector<unsigned int> master_dof_list;
 	unsigned int index = 0;
-	for (int v=0; v<static_cast<signed int>(GeometryInfo<dim>::vertices_per_face); ++v)
+	for (int v=0;
+	     v<static_cast<signed int>(GeometryInfo<dim>::vertices_per_face);
+	     ++v)
 	  {
 	    for (unsigned int i=0; i<fe2.dofs_per_vertex; ++i)
-	      master_dof_mask[index+i] = true;
+	      {
+		master_dof_list.push_back (index+i);
+		Assert (check_master_dof_list (face_interpolation_matrix,
+					       master_dof_list),
+			ExcInternalError());
+	      }
 	    index += fe1.dofs_per_vertex;
 	  }
 
-	for (int l=0; l<static_cast<signed int>(GeometryInfo<dim>::lines_per_face); ++l)
+	for (int l=0;
+	     l<static_cast<signed int>(GeometryInfo<dim>::lines_per_face);
+	     ++l)
 	  {
 	    for (unsigned int i=0; i<fe2.dofs_per_line; ++i)
-	      master_dof_mask[index+i] = true;
+	      {
+		master_dof_list.push_back (index+i);
+		Assert (check_master_dof_list (face_interpolation_matrix,
+					       master_dof_list),
+			ExcInternalError());
+	      }
 	    index += fe1.dofs_per_line;
 	  }
 	
-	for (int q=0; q<static_cast<signed int>(GeometryInfo<dim>::quads_per_face); ++q)
+	for (int q=0;
+	     q<static_cast<signed int>(GeometryInfo<dim>::quads_per_face);
+	     ++q)
 	  {
-	    for (unsigned int i=0; i<fe2.dofs_per_quad; ++i)
-	      master_dof_mask[index+i] = true;
+	    unsigned int dofs_added = 0;
+	    unsigned int i          = 0;
+	    while (dofs_added < fe2.dofs_per_quad)
+	      {
+						 // make sure that we
+						 // were able to find
+						 // a set of master
+						 // dofs and that the
+						 // code down below
+						 // didn't just reject
+						 // all our efforts
+		Assert (i < fe1.dofs_per_quad,
+			ExcInternalError());
+						 // tentatively push
+						 // this quad dof
+		master_dof_list.push_back (index+i);
+
+						 // then see what
+						 // happens. if it
+						 // succeeds, fine
+		if (check_master_dof_list (face_interpolation_matrix,
+					   master_dof_list)
+		    == true)
+		  ++dofs_added;
+		else
+						   // well, it
+						   // didn't. simply
+						   // pop that dof
+						   // from the list
+						   // again and try
+						   // with the next
+						   // dof
+		  master_dof_list.pop_back ();
+
+						 // forward counter by
+						 // one
+		++i;
+	      }
 	    index += fe1.dofs_per_quad;
 	  }
 
 	Assert (index == fe1.dofs_per_face, ExcInternalError());
-	Assert (std::count (master_dof_mask.begin(), master_dof_mask.end(), true)
-		==
-		static_cast<signed int>(fe2.dofs_per_face),
+	Assert (master_dof_list.size() == fe2.dofs_per_face,
 		ExcInternalError());
+	
+					 // finally copy the list into the
+					 // mask
+	std::fill (master_dof_mask.begin(), master_dof_mask.end(), false);
+	for (std::vector<unsigned int>::const_iterator i=master_dof_list.begin();
+	     i!=master_dof_list.end(); ++i)
+	  master_dof_mask[*i] = true;
       }
 
       
@@ -2720,9 +2941,13 @@ namespace internal
 						     // master and slave
 						     // components. invert the
 						     // master component
+//TODO[WB]: cache this mask as well		    
 		    std::vector<bool> master_dof_mask (cell->get_fe().dofs_per_face);
 		    select_master_dofs_for_face_restriction (cell->get_fe(),
 							     dominating_fe,
+							     (*face_interpolation_matrices
+							      [dominating_fe_index]
+							      [cell->active_fe_index()]),
 							     master_dof_mask);
 		    
 		    ensure_existence_of_split_face_matrix
