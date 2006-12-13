@@ -81,6 +81,10 @@ void test ()
   for (unsigned int i=0; i<fe.size(); ++i)
     for (unsigned int j=0; j<fe.size(); ++j)
       {
+	deallog << "Testing " << fe[i].get_name()
+		<< " vs. " << fe[j].get_name()
+		<< std::endl;
+	
 					 // set fe on coarse cell to 'i', on
 					 // all fine cells to 'j'
 	typename hp::DoFHandler<dim>::active_cell_iterator
