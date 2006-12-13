@@ -588,13 +588,46 @@ GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells)
 
 template<>
 void
-GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &,
-						     std::vector<CellData<2> > &)
+GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &all_vertices,
+						     std::vector<CellData<2> >    &cells)
 {
-				   // nothing to be done in 2d
+  unsigned int vertices_lex[GeometryInfo<2>::vertices_per_cell];
+  unsigned int n_negative_cells=0;
+  for (unsigned int cell_no=0; cell_no<cells.size(); ++cell_no)
+    {
+				       // GridTools::cell_measure
+				       // requires the vertices to be
+				       // in lexicographic ordering
+      for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
+	vertices_lex[GeometryInfo<2>::ucd_to_deal[i]]=cells[cell_no].vertices[i];
+      if (GridTools::cell_measure<2>(all_vertices, vertices_lex) < 0)
+	{
+	  ++n_negative_cells;
+	  std::swap(cells[cell_no].vertices[1], cells[cell_no].vertices[3]);
+	  
+					   // check whether the
+					   // resulting cell is now ok.
+					   // if not, then the grid is
+					   // seriously broken and
+					   // should be sticked into the
+					   // bin
+	  for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
+	    vertices_lex[GeometryInfo<2>::ucd_to_deal[i]]=cells[cell_no].vertices[i];
+	  AssertThrow(GridTools::cell_measure<2>(all_vertices, vertices_lex) > 0,
+		      ExcInternalError());
+	}
+    }
+  
+				   // We assume that all cells of a grid have
+				   // either positive or negative volumes but
+				   // not both mixed. Although above reordering
+				   // might work also on single cells, grids
+				   // with both kind of cells are very likely to
+				   // be broken. Check for this here.
+  AssertThrow(n_negative_cells==0 || n_negative_cells==cells.size(), ExcInternalError());
 }
 
-#endif
+#endif // deal_II_dimension == 2
 
 
 
@@ -1465,6 +1498,7 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
       if (GridTools::cell_measure<3>(all_vertices, vertices_lex) < 0)
 	{
 	  ++n_negative_cells;
+	  // reorder vertices: swap front and back face
 	  for (unsigned int i=0; i<4; ++i)
 	    std::swap(cells[cell_no].vertices[i], cells[cell_no].vertices[i+4]);
 	  
@@ -1481,7 +1515,7 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
 	}
     }
   
-				   // We assuming that all cells of a
+				   // We assume that all cells of a
 				   // grid have either positive or
 				   // negative volumes but not both
 				   // mixed. Although above reordering

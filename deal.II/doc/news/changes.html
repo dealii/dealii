@@ -928,6 +928,14 @@ inconvenience this causes.
 
 <ol>
 
+  <li> <p> Extended: So far, the
+       <code>GridReordering::invert_all_cells_of_negative_grid</code> function
+       did nothing in 2d. Now, it inverts cells from clockwise to
+       counterclockwise sense (in the old numbering scheme).
+		 <br>
+		 (Tobias Leicht 2006/12/13)
+       </p>
+
   <li> <p> New: There is now a function
        <code>GridTools::delete_duplicated_vertices</code> that deletes duplicate
        vertices which can occur if structured grids are read into deal, leading
