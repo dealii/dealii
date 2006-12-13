@@ -214,7 +214,7 @@ namespace Utilities
                                              // location of the previous space, so
                                              // that we can break around there
             int location = std::min<int>(width,text.length()-1);
-            for (; location>=0; --location)
+            for (; location>0; --location)
               if (text[location] == delimiter)
                 break;
           
