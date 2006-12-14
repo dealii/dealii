@@ -272,7 +272,7 @@ namespace Utilities
       {
 					 // compute the number of
 					 // digits of i. assuming it
-					 // is less than 6 is likely
+					 // is less than 8 is likely
 					 // ok
 	if (i<10)
 	  return std::make_pair (i, 1U);
@@ -284,6 +284,10 @@ namespace Utilities
 	  return std::make_pair (i, 4U);
 	else if (i<100000)
 	  return std::make_pair (i, 5U);
+	else if (i<1000000)
+	  return std::make_pair (i, 6U);
+	else if (i<10000000)
+	  return std::make_pair (i, 7U);
 	else
 	  {
 	    Assert (false, ExcNotImplemented());
