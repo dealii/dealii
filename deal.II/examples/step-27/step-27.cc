@@ -1,1851 +1,916 @@
 /* $Id$ */
-/* Author: Wolfgang Bangerth, University of Heidelberg, 2001, 2002 */
+/* Author: Wolfgang Bangerth, University of Heidelberg, 2000 */
 
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2001, 2002, 2003, 2004, 2006 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+                                 // @sect3{Include files}
 
-				 // As in all programs, we start with
-				 // a list of include files from the
-				 // library, and as usual they are in
-				 // the standard order which is
-				 // <code>base</code> -- <code>lac</code> -- <code>grid</code> --
-				 // <code>dofs</code> -- <code>fe</code> -- <code>numerics</code>
-				 // (as each of these categories
-				 // roughly builds upon previous
-				 // ones), then C++ standard headers:
+				 // The first few files have already
+				 // been covered in previous examples
+				 // and will thus not be further
+				 // commented on.
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
-#include <base/table_handler.h>
-#include <base/thread_management.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/precondition.h>
 #include <grid/tria.h>
+#include <dofs/dof_handler.h>
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/grid_refinement.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_constraints.h>
+#include <grid/tria_boundary_lib.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <fe/fe_q.h>
 #include <fe/fe_values.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
+
+#include <fstream>
+#include <iostream>
+
+				 // From the following include file we
+				 // will import the declaration of
+				 // H1-conforming finite element shape
+				 // functions. This family of finite
+				 // elements is called <code>FE_Q</code>, and
+				 // was used in all examples before
+				 // already to define the usual bi- or
+				 // tri-linear elements, but we will
+				 // now use it for bi-quadratic
+				 // elements:
+#include <fe/fe_q.h>
+				 // We will not read the grid from a
+				 // file as in the previous example,
+				 // but generate it using a function
+				 // of the library. However, we will
+				 // want to write out the locally
+				 // refined grids (just the grid, not
+				 // the solution) in each step, so we
+				 // need the following include file
+				 // instead of <code>grid_in.h</code>:
+#include <grid/grid_out.h>
+
+
+				 // When using locally refined grids,
+				 // we will get so-called <code>hanging
+				 // nodes</code>. However, the standard
+				 // finite element methods assumes
+				 // that the discrete solution spaces
+				 // be continuous, so we need to make
+				 // sure that the degrees of freedom
+				 // on hanging nodes conform to some
+				 // constraints such that the global
+				 // solution is continuous. The
+				 // following file contains a class
+				 // which is used to handle these
+				 // constraints:
+#include <dofs/dof_constraints.h>
+
+				 // In order to refine our grids
+				 // locally, we need a function from
+				 // the library that decides which
+				 // cells to flag for refinement or
+				 // coarsening based on the error
+				 // indicators we have computed. This
+				 // function is defined here:
+#include <grid/grid_refinement.h>
+
+				 // Finally, we need a simple way to
+				 // actually compute the refinement
+				 // indicators based on some error
+				 // estimat. While in general,
+				 // adaptivity is very
+				 // problem-specific, the error
+				 // indicator in the following file
+				 // often yields quite nicely adapted
+				 // grids for a wide class of
+				 // problems.
 #include <numerics/error_estimator.h>
 
-				 // Now for the C++ standard headers:
-#include <iostream>
-#include <fstream>
-#include <list>
-#include <sstream>
-
-				 // The last step is as in all
-				 // previous programs:
+				 // Finally, this is as in previous
+				 // programs:
 using namespace dealii;
 
-				 // @sect3{Evaluation of the solution}
 
-				 // As for the program itself, we
-				 // first define classes that evaluate
-				 // the solutions of a Laplace
-				 // equation. In fact, they can
-				 // evaluate every kind of solution,
-				 // as long as it is described by a
-				 // <code>DoFHandler</code> object, and a
-				 // solution vector. We define them
-				 // here first, even before the
-				 // classes that actually generate the
-				 // solution to be evaluated, since we
-				 // need to declare an abstract base
-				 // class that the solver classes can
-				 // refer to.
-				 //
-				 // From an abstract point of view, we
-				 // declare a pure base class
-				 // that provides an evaluation
-				 // operator <code>operator()</code> which will
-				 // do the evaluation of the solution
-				 // (whatever derived classes might
-				 // consider an <code>evaluation</code>). Since
-				 // this is the only real function of
-				 // this base class (except for some
-				 // bookkeeping machinery), one
-				 // usually terms such a class that
-				 // only has an <code>operator()</code> a
-				 // <code>functor</code> in C++ terminology,
-				 // since it is used just like a
-				 // function object.
-				 //
-				 // Objects of this functor type will
-				 // then later be passed to the solver
-				 // object, which applies it to the
-				 // solution just computed. The
-				 // evaluation objects may then
-				 // extract any quantity they like
-				 // from the solution. The advantage
-				 // of putting these evaluation
-				 // functions into a separate
-				 // hierarchy of classes is that by
-				 // design they cannot use the
-				 // internals of the solver object and
-				 // are therefore independent of
-				 // changes to the way the solver
-				 // works. Furthermore, it is trivial
-				 // to write another evaluation class
-				 // without modifying the solver
-				 // class, which speeds up programming
-				 // (not being able to use internals
-				 // of another class also means that
-				 // you do not have to worry about
-				 // them -- programming evaluators is
-				 // usually a rather quickly done
-				 // task), as well as compilation (if
-				 // solver and evaluation classes are
-				 // put into different files: the
-				 // solver only needs to see the
-				 // declaration of the abstract base
-				 // class, and therefore does not need
-				 // to be recompiled upon addition of
-				 // a new evaluation class, or
-				 // modification of an old one).
-				 // On a related note, you can reuse
-				 // the evaluation classes for other
-				 // projects, solving different
-				 // equations.
-				 //
-				 // In order to improve separation of
-				 // code into different modules, we
-				 // put the evaluation classes into a
-				 // namespace of their own. This makes
-				 // it easier to actually solve
-				 // different equations in the same
-				 // program, by assembling it from
-				 // existing building blocks. The
-				 // reason for this is that classes
-				 // for similar purposes tend to have
-				 // the same name, although they were
-				 // developed in different
-				 // contexts. In order to be able to
-				 // use them together in one program,
-				 // it is necessary that they are
-				 // placed in different
-				 // namespaces. This we do here:
-namespace Evaluation
+                                 // @sect3{The <code>LaplaceProblem</code> class template}
+
+				 // The main class is again almost
+				 // unchanged. Two additions, however,
+				 // are made: we have added the
+				 // <code>refine_grid</code> function, which is
+				 // used to adaptively refine the grid
+				 // (instead of the global refinement
+				 // in the previous examples), and a
+				 // variable which will hold the
+				 // constraints associated to the
+				 // hanging nodes. In addition, we
+				 // have added a destructor to the
+				 // class for reasons that will become
+				 // clear when we discuss its
+				 // implementation.
+template <int dim>
+class LaplaceProblem 
 {
+  public:
+    LaplaceProblem ();
+    ~LaplaceProblem ();
 
-				   // Now for the abstract base class
-				   // of evaluation classes: its main
-				   // purpose is to declare a pure
-				   // virtual function <code>operator()</code>
-				   // taking a <code>DoFHandler</code> object,
-				   // and the solution vector. In
-				   // order to be able to use pointers
-				   // to this base class only, it also
-				   // has to declare a virtual
-				   // destructor, which however does
-				   // nothing. Besides this, it only
-				   // provides for a little bit of
-				   // bookkeeping: since we usually
-				   // want to evaluate solutions on
-				   // subsequent refinement levels, we
-				   // store the number of the present
-				   // refinement cycle, and provide a
-				   // function to change this number.
-  template <int dim>
-  class EvaluationBase 
-  {
-    public:
-      virtual ~EvaluationBase ();
-
-      void set_refinement_cycle (const unsigned int refinement_cycle);
-      
-      virtual void operator () (const DoFHandler<dim> &dof_handler,
-				const Vector<double>  &solution) const = 0;
-    protected:
-      unsigned int refinement_cycle;
-  };
-
-
-				   // After the declaration has been
-				   // discussed above, the
-				   // implementation is rather
-				   // straightforward:
-  template <int dim>
-  EvaluationBase<dim>::~EvaluationBase ()
-  {}
-  
-
-  
-  template <int dim>
-  void
-  EvaluationBase<dim>::set_refinement_cycle (const unsigned int step)
-  {
-    refinement_cycle = step;
-  }
-
-
-				   // @sect4{%Point evaluation}
-
-				   // The next thing is to implement
-				   // actual evaluation classes. As
-				   // noted in the introduction, we'd
-				   // like to extract a point value
-				   // from the solution, so the first
-				   // class does this in its
-				   // <code>operator()</code>. The actual point
-				   // is given to this class through
-				   // the constructor, as well as a
-				   // table object into which it will
-				   // put its findings.
-				   //
-				   // Finding out the value of a
-				   // finite element field at an
-				   // arbitrary point is rather
-				   // difficult, if we cannot rely on
-				   // knowing the actual finite
-				   // element used, since then we
-				   // cannot, for example, interpolate
-				   // between nodes. For simplicity,
-				   // we therefore assume here that
-				   // the point at which we want to
-				   // evaluate the field is actually a
-				   // node. If, in the process of
-				   // evaluating the solution, we find
-				   // that we did not encounter this
-				   // point upon looping over all
-				   // vertices, we then have to throw
-				   // an exception in order to signal
-				   // to the calling functions that
-				   // something has gone wrong, rather
-				   // than silently ignore this error.
-				   //
-				   // In the step-9 example program,
-				   // we have already seen how such an
-				   // exception class can be declared,
-				   // using the <code>DeclExceptionN</code>
-				   // macros. We use this mechanism
-				   // here again.
-				   //
-				   // From this, the actual
-				   // declaration of this class should
-				   // be evident. Note that of course
-				   // even if we do not list a
-				   // destructor explicitely, an
-				   // implicit destructor is generated
-				   // from the compiler, and it is
-				   // virtual just as the one of the
-				   // base class.
-  template <int dim>
-  class PointValueEvaluation : public EvaluationBase<dim>
-  {
-    public:
-      PointValueEvaluation (const Point<dim>   &evaluation_point,
-			    TableHandler       &results_table);
-      
-      virtual void operator () (const DoFHandler<dim> &dof_handler,
-				const Vector<double>  &solution) const;
-      
-      DeclException1 (ExcEvaluationPointNotFound,
-		      Point<dim>,
-		      << "The evaluation point " << arg1
-		      << " was not found among the vertices of the present grid.");
-    private:
-      const Point<dim>  evaluation_point;
-      TableHandler     &results_table;
-  };
-
-
-				   // As for the definition, the
-				   // constructor is trivial, just
-				   // taking data and storing it in
-				   // object-local ones:
-  template <int dim>
-  PointValueEvaluation<dim>::
-  PointValueEvaluation (const Point<dim>   &evaluation_point,
-			TableHandler       &results_table)
-		  :
-		  evaluation_point (evaluation_point),
-		  results_table (results_table)
-  {}
-  
-
-
-				   // Now for the function that is
-				   // mainly of interest in this
-				   // class, the computation of the
-				   // point value:
-  template <int dim>
-  void
-  PointValueEvaluation<dim>::
-  operator () (const DoFHandler<dim> &dof_handler,
-	       const Vector<double>  &solution) const 
-  {
-				     // First allocate a variable that
-				     // will hold the point
-				     // value. Initialize it with a
-				     // value that is clearly bogus,
-				     // so that if we fail to set it
-				     // to a reasonable value, we will
-				     // note at once. This may not be
-				     // necessary in a function as
-				     // small as this one, since we
-				     // can easily see all possible
-				     // paths of execution here, but
-				     // it proved to be helpful for
-				     // more complex cases, and so we
-				     // employ this strategy here as
-				     // well.
-    double point_value = 1e20;
-
-				     // Then loop over all cells and
-				     // all their vertices, and check
-				     // whether a vertex matches the
-				     // evaluation point. If this is
-				     // the case, then extract the
-				     // point value, set a flag that
-				     // we have found the point of
-				     // interest, and exit the loop.
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-    bool evaluation_point_found = false;
-    for (; (cell!=endc) && !evaluation_point_found; ++cell)
-      for (unsigned int vertex=0;
-	   vertex<GeometryInfo<dim>::vertices_per_cell;
-	   ++vertex)
-	if (cell->vertex(vertex) == evaluation_point)
-	  {
-					     // In order to extract
-					     // the point value from
-					     // the global solution
-					     // vector, pick that
-					     // component that belongs
-					     // to the vertex of
-					     // interest, and, in case
-					     // the solution is
-					     // vector-valued, take
-					     // the first component of
-					     // it:
-	    point_value = solution(cell->vertex_dof_index(vertex,0));
-					     // Note that by this we
-					     // have made an
-					     // assumption that is not
-					     // valid always and
-					     // should be documented
-					     // in the class
-					     // declaration if this
-					     // were code for a real
-					     // application rather
-					     // than a tutorial
-					     // program: we assume
-					     // that the finite
-					     // element used for the
-					     // solution we try to
-					     // evaluate actually has
-					     // degrees of freedom
-					     // associated with
-					     // vertices. This, for
-					     // example, does not hold
-					     // for discontinuous
-					     // elements, were the
-					     // support points for the
-					     // shape functions
-					     // happen to be located
-					     // at the vertices, but
-					     // are not associated
-					     // with the vertices but
-					     // rather with the cell
-					     // interior, since
-					     // association with
-					     // vertices would imply
-					     // continuity there. It
-					     // would also not hold
-					     // for edge oriented
-					     // elements, and the
-					     // like.
-					     //
-					     // Ideally, we would
-					     // check this at the
-					     // beginning of the
-					     // function, for example
-					     // by a statement like
-					     // <code>Assert
-					     // (dof_handler.get_fe().dofs_per_vertex
-					     // @> 0,
-					     // ExcNotImplemented())</code>,
-					     // which should make it
-					     // quite clear what is
-					     // going wrong when the
-					     // exception is
-					     // triggered. In this
-					     // case, we omit it
-					     // (which is indeed bad
-					     // style), but knowing
-					     // that that does not
-					     // hurt here, since the
-					     // statement
-					     // <code>cell-@>vertex_dof_index(vertex,0)</code>
-					     // would fail if we asked
-					     // it to give us the DoF
-					     // index of a vertex if
-					     // there were none.
-					     //
-					     // We stress again that
-					     // this restriction on
-					     // the allowed finite
-					     // elements should be
-					     // stated in the class
-					     // documentation.
-
-					     // Since we found the
-					     // right point, we now
-					     // set the respective
-					     // flag and exit the
-					     // innermost loop. The
-					     // outer loop will the
-					     // also be terminated due
-					     // to the set flag.
-	    evaluation_point_found = true;
-	    break;
-	  };
-
-				     // Finally, we'd like to make
-				     // sure that we have indeed found
-				     // the evaluation point, since if
-				     // that were not so we could not
-				     // give a reasonable value of the
-				     // solution there and the rest of
-				     // the computations were useless
-				     // anyway. So make sure through
-				     // the <code>AssertThrow</code> macro
-				     // already used in the step-9
-				     // program that we have indeed
-				     // found this point. If this is
-				     // not so, the macro throws an
-				     // exception of the type that is
-				     // given to it as second
-				     // argument, but compared to a
-				     // straightforward <code>throw</code>
-				     // statement, it fills the
-				     // exception object with a set of
-				     // additional information, for
-				     // example the source file and
-				     // line number where the
-				     // exception was generated, and
-				     // the condition that failed. If
-				     // you have a <code>catch</code> clause in
-				     // your main function (as this
-				     // program has), you will catch
-				     // all exceptions that are not
-				     // caught somewhere in between
-				     // and thus already handled, and
-				     // this additional information
-				     // will help you find out what
-				     // happened and where it went
-				     // wrong.
-    AssertThrow (evaluation_point_found,
-		 ExcEvaluationPointNotFound(evaluation_point));
-				     // Note that we have used the
-				     // <code>Assert</code> macro in other
-				     // example programs as well. It
-				     // differed from the
-				     // <code>AssertThrow</code> macro used
-				     // here in that it simply aborts
-				     // the program, rather than
-				     // throwing an exception, and
-				     // that it did so only in debug
-				     // mode. It was the right macro
-				     // to use to check about the size
-				     // of vectors passed as arguments
-				     // to functions, and the like.
-				     //
-				     // However, here the situation is
-				     // different: whether we find the
-				     // evaluation point or not may
-				     // change from refinement to
-				     // refinement (for example, if
-				     // the four cells around point
-				     // are coarsened away, then the
-				     // point may vanish after
-				     // refinement and
-				     // coarsening). This is something
-				     // that cannot be predicted from
-				     // a few number of runs of the
-				     // program in debug mode, but
-				     // should be checked always, also
-				     // in production runs. Thus the
-				     // use of the <code>AssertThrow</code>
-				     // macro here.
+    void run ();
     
-				     // Now, if we are sure that we
-				     // have found the evaluation
-				     // point, we can add the results
-				     // into the table of results:
-    results_table.add_value ("DoFs", dof_handler.n_dofs());
-    results_table.add_value ("u(x_0)", point_value);
-  }
+  private:
+    void setup_system ();
+    void assemble_system ();
+    void solve ();
+    void refine_grid ();
+    void output_results (const unsigned int cycle) const;
+
+    Triangulation<dim>   triangulation;
+
+    DoFHandler<dim>      dof_handler;
+    FE_Q<dim>            fe;
+
+				     // This is the new variable in
+				     // the main class. We need an
+				     // object which holds a list of
+				     // constraints originating from
+				     // the hanging nodes:
+    ConstraintMatrix     hanging_node_constraints;
+
+    SparsityPattern      sparsity_pattern;
+    SparseMatrix<double> system_matrix;
+
+    Vector<double>       solution;
+    Vector<double>       system_rhs;
+};
 
 
 
 
-				   // @sect4{Generating output}
+                                 // @sect3{The <code>LaplaceProblem</code> class implementation}
 
-				   // A different, maybe slightly odd
-				   // kind of <code>evaluation</code> of a
-				   // solution is to output it to a
-				   // file in a graphical
-				   // format. Since in the evaluation
-				   // functions we are given a
-				   // <code>DoFHandler</code> object and the
-				   // solution vector, we have all we
-				   // need to do this, so we can do it
-				   // in an evaluation class. The
-				   // reason for actually doing so
-				   // instead of putting it into the
-				   // class that computed the solution
-				   // is that this way we have more
-				   // flexibility: if we choose to
-				   // only output certain aspects of
-				   // it, or not output it at all. In
-				   // any case, we do not need to
-				   // modify the solver class, we just
-				   // have to modify one of the
-				   // modules out of which we build
-				   // this program. This form of
-				   // encapsulation, as above, helps
-				   // us to keep each part of the
-				   // program rather simple as the
-				   // interfaces are kept simple, and
-				   // no access to hidden data is
-				   // possible.
-				   //
-				   // Since this class which generates
-				   // the output is derived from the
-				   // common <code>EvaluationBase</code> base
-				   // class, its main interface is the
-				   // <code>operator()</code>
-				   // function. Furthermore, it has a
-				   // constructor taking a string that
-				   // will be used as the base part of
-				   // the file name to which output
-				   // will be sent (we will augment it
-				   // by a number indicating the
-				   // number of the refinement cycle
-				   // -- the base class has this
-				   // information at hand --, and a
-				   // suffix), and the constructor
-				   // also takes a value that
-				   // indicates which format is
-				   // requested, i.e. for which
-				   // graphics program we shall
-				   // generate output (from this we
-				   // will then also generate the
-				   // suffix of the filename to which
-				   // we write).
-				   //
-				   // Regarding the output format, the
-				   // <code>DataOutInterface</code> class
-				   // (which is a base class of
-				   // <code>DataOut</code> through which we
-				   // will access its fields) provides
-				   // an enumeration field
-				   // <code>OutputFormat</code>, which lists
-				   // names for all supported output
-				   // formats. At the time of writing
-				   // of this program, the supported
-				   // graphics formats are represented
-				   // by the enum values <code>ucd</code>,
-				   // <code>gnuplot</code>, <code>povray</code>,
-				   // <code>eps</code>, <code>gmv</code>, <code>tecplot</code>,
-				   // <code>tecplot_binary</code>, <code>dx</code>, and
-				   // <code>vtk</code>, but this list will
-				   // certainly grow over time. Now,
-				   // within various functions of that
-				   // base class, you can use values
-				   // of this type to get information
-				   // about these graphics formats
-				   // (for example the default suffix
-				   // used for files of each format),
-				   // and you can call a generic
-				   // <code>write</code> function, which then
-				   // branches to the
-				   // <code>write_gnuplot</code>,
-				   // <code>write_ucd</code>, etc functions
-				   // which we have used in previous
-				   // examples already, based on the
-				   // value of a second argument given
-				   // to it denoting the required
-				   // output format. This mechanism
-				   // makes it simple to write an
-				   // extensible program that can
-				   // decide which output format to
-				   // use at runtime, and it also
-				   // makes it rather simple to write
-				   // the program in a way such that
-				   // it takes advantage of newly
-				   // implemented output formats,
-				   // without the need to change the
-				   // application program.
-				   //
-				   // Of these two fields, the base
-				   // name and the output format
-				   // descriptor, the constructor
-				   // takes values and stores them for
-				   // later use by the actual
-				   // evaluation function.
-  template <int dim>
-  class SolutionOutput : public EvaluationBase<dim>
-  {
-    public:
-      SolutionOutput (const std::string                         &output_name_base,
-		      const typename DataOut<dim>::OutputFormat  output_format);
-      
-      virtual void operator () (const DoFHandler<dim> &dof_handler,
-				const Vector<double>  &solution) const;
-    private:
-      const std::string                         output_name_base;
-      const typename DataOut<dim>::OutputFormat output_format;
-  };
+                                 // @sect4{LaplaceProblem::LaplaceProblem}
+
+				 // The constructor of this class is
+				 // mostly the same as before, but
+				 // this time we want to use the
+				 // quadratic element. To do so, we
+				 // only have to replace the
+				 // constructor argument (which was
+				 // <code>1</code> in all previous examples) by
+				 // the desired polynomial degree
+				 // (here <code>2</code>):
+template <int dim>
+LaplaceProblem<dim>::LaplaceProblem () :
+		dof_handler (triangulation),
+                fe (2)
+{}
 
 
-  template <int dim>
-  SolutionOutput<dim>::
-  SolutionOutput (const std::string                         &output_name_base,
-		  const typename DataOut<dim>::OutputFormat  output_format)
-		  :
-		  output_name_base (output_name_base),
-		  output_format (output_format)
-  {}
-  
+                                 // @sect4{LaplaceProblem::~LaplaceProblem}
 
-				   // After the description above, the
-				   // function generating the actual
-				   // output is now relatively
-				   // straightforward. The only
-				   // particularly interesting feature
-				   // over previous example programs
-				   // is the use of the
-				   // <code>DataOut::default_suffix</code>
-				   // function, returning the usual
-				   // suffix for files of a given
-				   // format (e.g. ".eps" for
-				   // encapsulated postscript files,
-				   // ".gnuplot" for Gnuplot files),
-				   // and of the generic
-				   // <code>DataOut::write</code> function with
-				   // a second argument, which
-				   // branches to the actual output
-				   // functions for the different
-				   // graphics formats, based on the
-				   // value of the format descriptor
-				   // passed as second argument.
-				   //
-				   // Also note that we have to prefix
-				   // <code>this-@></code> to access a member
-				   // variable of the template
-				   // dependent base class. The reason
-				   // here, and further down in the
-				   // program is the same as the one
-				   // described in the step-7 example
-				   // program (look for <code>two-stage
-				   // name lookup</code> there).
-  template <int dim>
-  void
-  SolutionOutput<dim>::operator () (const DoFHandler<dim> &dof_handler,
-				    const Vector<double>  &solution) const
-  {
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "solution");
-    data_out.build_patches ();
-  
-    std::ostringstream filename;
-    filename << output_name_base << "-"
-	     << this->refinement_cycle
-	     << data_out.default_suffix (output_format)
-	     << std::ends;
-    std::ofstream out (filename.str().c_str());
-    
-    data_out.write (out, output_format);
-  }
-
-
-
-				   // @sect4{Other evaluations}
-  
-				   // In practical applications, one
-				   // would add here a list of other
-				   // possible evaluation classes,
-				   // representing quantities that one
-				   // may be interested in. For this
-				   // example, that much shall be
-				   // sufficient, so we close the
-				   // namespace.
+				 // Here comes the added destructor of
+				 // the class. The reason why we want
+				 // to add it is a subtle change in
+				 // the order of data elements in the
+				 // class as compared to all previous
+				 // examples: the <code>dof_handler</code>
+				 // object was defined before and not
+				 // after the <code>fe</code> object. Of course
+				 // we could have left this order
+				 // unchanged, but we would like to
+				 // show what happens if the order is
+				 // reversed since this produces a
+				 // rather nasty side-effect and
+				 // results in an error which is
+				 // difficult to track down if one
+				 // does not know what happens.
+				 //
+				 // Basically what happens is the
+				 // following: when we distribute the
+				 // degrees of freedom using the
+				 // function call
+				 // <code>dof_handler.distribute_dofs()</code>,
+				 // the <code>dof_handler</code> also stores a
+				 // pointer to the finite element in
+				 // use. Since this pointer is used
+				 // every now and then until either
+				 // the degrees of freedom are
+				 // re-distributed using another
+				 // finite element object or until the
+				 // <code>dof_handler</code> object is
+				 // destroyed, it would be unwise if
+				 // we would allow the finite element
+				 // object to be deleted before the
+				 // <code>dof_handler</code> object. To
+				 // disallow this, the DoF handler
+				 // increases a counter inside the
+				 // finite element object which counts
+				 // how many objects use that finite
+				 // element (this is what the
+				 // <code>Subscriptor</code>/<code>SmartPointer</code>
+				 // class pair is used for, in case
+				 // you want something like this for
+				 // your own programs; see step-7 for
+				 // a more complete discussion
+				 // of this topic). The finite
+				 // element object will refuse its
+				 // destruction if that counter is
+				 // larger than zero, since then some
+				 // other objects might rely on the
+				 // persistence of the finite element
+				 // object. An exception will then be
+				 // thrown and the program will
+				 // usually abort upon the attempt to
+				 // destroy the finite element.
+				 //
+				 // To be fair, such exceptions about
+				 // still used objects are not
+				 // particularly popular among
+				 // programmers using deal.II, since
+				 // they only tell us that something
+				 // is wrong, namely that some other
+				 // object is still using the object
+				 // that is presently being
+				 // destructed, but most of the time
+				 // not who this user is. It is
+				 // therefore often rather
+				 // time-consuming to find out where
+				 // the problem exactly is, although
+				 // it is then usually straightforward
+				 // to remedy the situation. However,
+				 // we believe that the effort to find
+				 // invalid references to objects that
+				 // do no longer exist is less if the
+				 // problem is detected once the
+				 // reference becomes invalid, rather
+				 // than when non-existent objects are
+				 // actually accessed again, since
+				 // then usually only invalid data is
+				 // accessed, but no error is
+				 // immediately raised.
+				 //
+				 // Coming back to the present
+				 // situation, if we did not write
+				 // this destructor, the compiler will
+				 // generate code that triggers
+				 // exactly the behavior sketched
+				 // above. The reason is that member
+				 // variables of the
+				 // <code>LaplaceProblem</code> class are
+				 // destructed bottom-up (i.e. in
+				 // reverse order of their declaration
+				 // in the class), as always in
+				 // C++. Thus, the finite element
+				 // object will be destructed before
+				 // the DoF handler object, since its
+				 // declaration is below the one of
+				 // the DoF handler. This triggers the
+				 // situation above, and an exception
+				 // will be raised when the <code>fe</code>
+				 // object is destructed. What needs
+				 // to be done is to tell the
+				 // <code>dof_handler</code> object to release
+				 // its lock to the finite element. Of
+				 // course, the <code>dof_handler</code> will
+				 // only release its lock if it really
+				 // does not need the finite element
+				 // any more, i.e. when all finite
+				 // element related data is deleted
+				 // from it. For this purpose, the
+				 // <code>DoFHandler</code> class has a
+				 // function <code>clear</code> which deletes
+				 // all degrees of freedom, and
+				 // releases its lock to the finite
+				 // element. After this, you can
+				 // safely destruct the finite element
+				 // object since its internal counter
+				 // is then zero.
+				 //
+				 // For completeness, we add the
+				 // output of the exception that would
+				 // have been triggered without this
+				 // destructor, to the end of the
+				 // results section of this example.
+template <int dim>
+LaplaceProblem<dim>::~LaplaceProblem () 
+{
+  dof_handler.clear ();
 }
 
-  
-				 // @sect3{The Laplace solver classes}
 
-				 // After defining what we want to
-				 // know of the solution, we should
-				 // now care how to get at it. We will
-				 // pack everything we need into a
-				 // namespace of its own, for much the
-				 // same reasons as for the
-				 // evaluations above.
+                                 // @sect4{LaplaceProblem::setup_system}
+
+				 // The next function is setting up
+				 // all the variables that describe
+				 // the linear finite element problem,
+				 // such as the DoF handler, the
+				 // matrices, and vectors. The
+				 // difference to what we did in
+				 // step-5 is only that we now also
+				 // have to take care of handing node
+				 // constraints. These constraints are
+				 // handled almost transparently by
+				 // the library, i.e. you only need to
+				 // know that they exist and how to
+				 // get them, but you do not have to
+				 // know how they are formed or what
+				 // exactly is done with them.
 				 //
-				 // Since we have discussed Laplace
-				 // solvers already in considerable
-				 // detail in previous examples, there
-				 // is not much new stuff
-				 // following. Rather, we have to a
-				 // great extent cannibalized previous
-				 // examples and put them, in slightly
-				 // different form, into this example
-				 // program. We will therefore mostly
-				 // be concerned with discussing the
-				 // differences to previous examples.
-				 //
-				 // Basically, as already said in the
-				 // introduction, the lack of new
-				 // stuff in this example is
-				 // deliberate, as it is more to
-				 // demonstrate software design
-				 // practices, rather than
-				 // mathematics. The emphasis in
-				 // explanations below will therefore
-				 // be more on the actual
-				 // implementation.
-namespace LaplaceSolver
+				 // At the beginning of the function,
+				 // you find all the things that are
+				 // the same as in step-5: setting up
+				 // the degrees of freedom (this time
+				 // we have quadratic elements, but
+				 // there is no difference from a user
+				 // code perspective to the linear --
+				 // or cubic, for that matter --
+				 // case), generating the sparsity
+				 // pattern, and initializing the
+				 // solution and right hand side
+				 // vectors. Note that the sparsity
+				 // pattern will have significantly
+				 // more entries per row now, since
+				 // there are now 9 degrees of freedom
+				 // per cell, not only four, that can
+				 // couple with each other. The
+				 // <code>dof_Handler.max_couplings_between_dofs()</code>
+				 // call will take care of this,
+				 // however:
+template <int dim>
+void LaplaceProblem<dim>::setup_system ()
 {
-				   // @sect4{An abstract base class}
+  dof_handler.distribute_dofs (fe);
 
-				   // In defining a Laplace solver, we
-				   // start out by declaring an
-				   // abstract base class, that has no
-				   // functionality itself except for
-				   // taking and storing a pointer to
-				   // the triangulation to be used
-				   // later.
-				   //
-				   // This base class is very general,
-				   // and could as well be used for
-				   // any other stationary problem. It
-				   // provides declarations of
-				   // functions that shall, in derived
-				   // classes, solve a problem,
-				   // postprocess the solution with a
-				   // list of evaluation objects, and
-				   // refine the grid,
-				   // respectively. None of these
-				   // functions actually does
-				   // something itself in the base
-				   // class.
-				   //
-				   // Due to the lack of actual
-				   // functionality, the programming
-				   // style of declaring very abstract
-				   // base classes reminds of the
-				   // style used in Smalltalk or Java
-				   // programs, where all classes are
-				   // derived from entirely abstract
-				   // classes <code>Object</code>, even number
-				   // representations. The author
-				   // admits that he does not
-				   // particularly like the use of
-				   // such a style in C++, as it puts
-				   // style over reason. Furthermore,
-				   // it promotes the use of virtual
-				   // functions for everything (for
-				   // example, in Java, all functions
-				   // are virtual per se), which,
-				   // however, has proven to be rather
-				   // inefficient in many applications
-				   // where functions are often only
-				   // accessing data, not doing
-				   // computations, and therefore
-				   // quickly return; the overhead of
-				   // virtual functions can then be
-				   // significant. The opinion of the
-				   // author is to have abstract base
-				   // classes wherever at least some
-				   // part of the code of actual
-				   // implementations can be shared
-				   // and thus separated into the base
-				   // class.
-				   //
-				   // Besides all these theoretical
-				   // questions, we here have a good
-				   // reason, which will become
-				   // clearer to the reader
-				   // below. Basically, we want to be
-				   // able to have a family of
-				   // different Laplace solvers that
-				   // differ so much that no larger
-				   // common subset of functionality
-				   // could be found. We therefore
-				   // just declare such an abstract
-				   // base class, taking a pointer to
-				   // a triangulation in the
-				   // constructor and storing it
-				   // henceforth. Since this
-				   // triangulation will be used
-				   // throughout all computations, we
-				   // have to make sure that the
-				   // triangulation exists until the
-				   // destructor exits. We do this by
-				   // keeping a <code>SmartPointer</code> to
-				   // this triangulation, which uses a
-				   // counter in the triangulation
-				   // class to denote the fact that
-				   // there is still an object out
-				   // there using this triangulation,
-				   // thus leading to an abort in case
-				   // the triangulation is attempted
-				   // to be destructed while this
-				   // object still uses it.
-				   //
-				   // Note that while the pointer
-				   // itself is declared constant
-				   // (i.e. throughout the lifetime of
-				   // this object, the pointer points
-				   // to the same object), it is not
-				   // declared as a pointer to a
-				   // constant triangulation. In fact,
-				   // by this we allow that derived
-				   // classes refine or coarsen the
-				   // triangulation within the
-				   // <code>refine_grid</code> function.
-				   //
-				   // Finally, we have a function
-				   // <code>n_dofs</code> is only a tool for
-				   // the driver functions to decide
-				   // whether we want to go on with
-				   // mesh refinement or not. It
-				   // returns the number of degrees of
-				   // freedom the present simulation
-				   // has.
-  template <int dim>
-  class Base
-  {
-    public:
-      Base (Triangulation<dim> &coarse_grid);
-      virtual ~Base ();
+  sparsity_pattern.reinit (dof_handler.n_dofs(),
+			   dof_handler.n_dofs(),
+			   dof_handler.max_couplings_between_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
-      virtual void solve_problem () = 0;
-      virtual void postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const = 0;
-      virtual void refine_grid () = 0;
-      virtual unsigned int n_dofs () const = 0;
-      
-    protected:
-      const SmartPointer<Triangulation<dim> > triangulation;
-  };
+  solution.reinit (dof_handler.n_dofs());
+  system_rhs.reinit (dof_handler.n_dofs());
 
-
-				   // The implementation of the only
-				   // two non-abstract functions is
-				   // then rather boring:
-  template <int dim>
-  Base<dim>::Base (Triangulation<dim> &coarse_grid)
-		  :
-		  triangulation (&coarse_grid)
-  {}
-
-
-  template <int dim>
-  Base<dim>::~Base () 
-  {}
   
+				   // After setting up all the degrees
+				   // of freedoms, here are now the
+				   // differences compared to step-5,
+				   // all of which are related to
+				   // constraints associated with the
+				   // hanging nodes. In the class
+				   // desclaration, we have already
+				   // allocated space for an object
+				   // <code>hanging_node_constraints</code>
+				   // that will hold a list of these
+				   // constraints (they form a matrix,
+				   // which is reflected in the name
+				   // of the class, but that is
+				   // immaterial for the moment). Now
+				   // we have to fill this
+				   // object. This is done using the
+				   // following function calls (the
+				   // first clears the contents of the
+				   // object that may still be left
+				   // over from computations on the
+				   // previous mesh before the last
+				   // adaptive refinement):
+  hanging_node_constraints.clear ();
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   hanging_node_constraints);
 
-				   // @sect4{A general solver class}
+				   // The next step is <code>closing</code>
+				   // this object. For this note that,
+				   // in principle, the
+				   // <code>ConstraintMatrix</code> class can
+				   // hold other constraints as well,
+				   // i.e. constraints that do not
+				   // stem from hanging
+				   // nodes. Sometimes, it is useful
+				   // to use such constraints, in
+				   // which case they may be added to
+				   // the <code>ConstraintMatrix</code> object
+				   // after the hanging node
+				   // constraints were computed. After
+				   // all constraints have been added,
+				   // they need to be sorted and
+				   // rearranged to perform some
+				   // actions more efficiently. This
+				   // postprocessing is done using the
+				   // <code>close()</code> function, after which
+				   // no further constraints may be
+				   // added any more:
+  hanging_node_constraints.close ();
 
-				   // Following now the main class
-				   // that implements assembling the
-				   // matrix of the linear system,
-				   // solving it, and calling the
-				   // postprocessor objects on the
-				   // solution. It implements the
-				   // <code>solve_problem</code> and
-				   // <code>postprocess</code> functions
-				   // declared in the base class. It
-				   // does not, however, implement the
-				   // <code>refine_grid</code> method, as mesh
-				   // refinement will be implemented
-				   // in a number of derived classes.
-				   //
-				   // It also declares a new abstract
-				   // virtual function,
-				   // <code>assemble_rhs</code>, that needs to
-				   // be overloaded in subclasses. The
-				   // reason is that we will implement
-				   // two different classes that will
-				   // implement different methods to
-				   // assemble the right hand side
-				   // vector. This function might also
-				   // be interesting in cases where
-				   // the right hand side depends not
-				   // simply on a continuous function,
-				   // but on something else as well,
-				   // for example the solution of
-				   // another discretized problem,
-				   // etc. The latter happens
-				   // frequently in non-linear
-				   // problems.
-				   //
-				   // As we mentioned previously, the
-				   // actual content of this class is
-				   // not new, but a mixture of
-				   // various techniques already used
-				   // in previous examples. We will
-				   // therefore not discuss them in
-				   // detail, but refer the reader to
-				   // these programs.
-				   //
-				   // Basically, in a few words, the
-				   // constructor of this class takes
-				   // pointers to a triangulation, a
-				   // finite element, and a function
-				   // object representing the boundary
-				   // values. These are either passed
-				   // down to the base class's
-				   // constructor, or are stored and
-				   // used to generate a
-				   // <code>DoFHandler</code> object
-				   // later. Since finite elements and
-				   // quadrature formula should match,
-				   // it is also passed a quadrature
-				   // object.
-				   //
-				   // The <code>solve_problem</code> sets up
-				   // the data structures for the
-				   // actual solution, calls the
-				   // functions to assemble the linear
-				   // system, and solves it.
-				   //
-				   // The <code>postprocess</code> function
-				   // finally takes an evaluation
-				   // object and applies it to the
-				   // computed solution.
-				   //
-				   // The <code>n_dofs</code> function finally
-				   // implements the pure virtual
-				   // function of the base class.
-  template <int dim>
-  class Solver : public virtual Base<dim>
-  {
-    public:
-      Solver (Triangulation<dim>       &triangulation,
-	      const FiniteElement<dim> &fe,
-	      const Quadrature<dim>    &quadrature,
-	      const Function<dim>      &boundary_values);
-      virtual
-      ~Solver ();
+				   // The constrained hanging nodes
+				   // will later be eliminated from
+				   // the linear system of
+				   // equations. When doing so, some
+				   // additional entries in the global
+				   // matrix will be set to non-zero
+				   // values, so we have to reserve
+				   // some space for them here. Since
+				   // the process of elimination of
+				   // these constrained nodes is
+				   // called <code>condensation</code>, the
+				   // functions that eliminate them
+				   // are called <code>condense</code> for both
+				   // the system matrix and right hand
+				   // side, as well as for the
+				   // sparsity pattern.
+  hanging_node_constraints.condense (sparsity_pattern);
 
-      virtual
-      void
-      solve_problem ();
+				   // Now all non-zero entries of the
+				   // matrix are known (i.e. those
+				   // from regularly assembling the
+				   // matrix and those that were
+				   // introduced by eliminating
+				   // constraints). We can thus close
+				   // the sparsity pattern and remove
+				   // unneeded space:
+  sparsity_pattern.compress();
 
-      virtual
-      void
-      postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const;
+				   // Finally, the so-constructed
+				   // sparsity pattern serves as the
+				   // basis on top of which we will
+				   // create the sparse matrix:
+  system_matrix.reinit (sparsity_pattern);
+}
 
-      virtual
-      unsigned int
-      n_dofs () const;
-      
-				       // In the protected section of
-				       // this class, we first have a
-				       // number of member variables,
-				       // of which the use should be
-				       // clear from the previous
-				       // examples:
-    protected:
-      const SmartPointer<const FiniteElement<dim> >  fe;
-      const SmartPointer<const Quadrature<dim> >     quadrature;
-      DoFHandler<dim>                                dof_handler;
-      Vector<double>                                 solution;
-      const SmartPointer<const Function<dim> >       boundary_values;
+                                 // @sect4{LaplaceProblem::assemble_system}
 
-				       // Then we declare an abstract
-				       // function that will be used
-				       // to assemble the right hand
-				       // side. As explained above,
-				       // there are various cases for
-				       // which this action differs
-				       // strongly in what is
-				       // necessary, so we defer this
-				       // to derived classes:
-      virtual void assemble_rhs (Vector<double> &rhs) const = 0;
-    
-				       // Next, in the private
-				       // section, we have a small
-				       // class which represents an
-				       // entire linear system, i.e. a
-				       // matrix, a right hand side,
-				       // and a solution vector, as
-				       // well as the constraints that
-				       // are applied to it, such as
-				       // those due to hanging
-				       // nodes. Its constructor
-				       // initializes the various
-				       // subobjects, and there is a
-				       // function that implements a
-				       // conjugate gradient method as
-				       // solver.
-    private:
-      struct LinearSystem
-      {
-	  LinearSystem (const DoFHandler<dim> &dof_handler);
+				 // Next, we have to assemble the
+				 // matrix again. There are no code
+				 // changes compared to step-5 except
+				 // for a single place: We have to use
+				 // a higher-order quadrature formula
+				 // to account for the higher
+				 // polynomial degree in the finite
+				 // element shape functions. This is
+				 // easy to change: the constructor of
+				 // the <code>QGauss</code> class takes the
+				 // number of quadrature points in
+				 // each space direction. Previously,
+				 // we had two points for bilinear
+				 // elements. Now we should use three
+				 // points for biquadratic elements.
+				 //
+				 // The rest of the code that forms
+				 // the local contributions and
+				 // transfers them into the global
+				 // objects remains unchanged. It is
+				 // worth noting, however, that under
+				 // the hood several things are
+				 // different than before. First, the
+				 // variables <code>dofs_per_cell</code> and
+				 // <code>n_q_points</code> now are 9 each,
+				 // where they were 4
+				 // before. Introducing such variables
+				 // as abbreviations is a good
+				 // strategy to make code work with
+				 // different elements without having
+				 // to change too much code. Secondly,
+				 // the <code>fe_values</code> object of course
+				 // needs to do other things as well,
+				 // since the shape functions are now
+				 // quadratic, rather than linear, in
+				 // each coordinate variable. Again,
+				 // however, this is something that is
+				 // completely transparent to user
+				 // code and nothing that you have to
+				 // worry about.
+template <int dim>
+void LaplaceProblem<dim>::assemble_system () 
+{  
+  const QGauss<dim>  quadrature_formula(3);
 
-	  void solve (Vector<double> &solution) const;
-	
-	  ConstraintMatrix     hanging_node_constraints;
-	  SparsityPattern      sparsity_pattern;
-	  SparseMatrix<double> matrix;
-	  Vector<double>       rhs;
-      };
+  FEValues<dim> fe_values (fe, quadrature_formula, 
+			   update_values    |  update_gradients |
+			   update_q_points  |  update_JxW_values);
 
-				       // Finally, there is a pair of
-				       // functions which will be used
-				       // to assemble the actual
-				       // system matrix. It calls the
-				       // virtual function assembling
-				       // the right hand side, and
-				       // installs a number threads
-				       // each running the second
-				       // function which assembles
-				       // part of the system
-				       // matrix. The mechanism for
-				       // doing so is the same as in
-				       // the step-9 example program.
-      void
-      assemble_linear_system (LinearSystem &linear_system);
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
 
-      void
-      assemble_matrix (LinearSystem                                         &linear_system,
-		       const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
-		       const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-		       Threads::ThreadMutex                                 &mutex) const;
-  };
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>       cell_rhs (dofs_per_cell);
 
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      cell_matrix = 0;
+      cell_rhs = 0;
 
-				   // Now here comes the constructor
-				   // of the class. It does not do
-				   // much except store pointers to
-				   // the objects given, and generate
-				   // <code>DoFHandler</code> object
-				   // initialized with the given
-				   // pointer to a triangulation. This
-				   // causes the DoF handler to store
-				   // that pointer, but does not
-				   // already generate a finite
-				   // element numbering (we only ask
-				   // for that in the
-				   // <code>solve_problem</code> function).
-  template <int dim>
-  Solver<dim>::Solver (Triangulation<dim>       &triangulation,
-		       const FiniteElement<dim> &fe,
-		       const Quadrature<dim>    &quadrature,
-		       const Function<dim>      &boundary_values)
-		  :
-		  Base<dim> (triangulation),
-		  fe (&fe),
-                  quadrature (&quadrature),
-		  dof_handler (triangulation),
-		  boundary_values (&boundary_values)
-  {}
+      fe_values.reinit (cell);
 
-
-				   // The destructor is simple, it
-				   // only clears the information
-				   // stored in the DoF handler object
-				   // to release the memory.
-  template <int dim>
-  Solver<dim>::~Solver () 
-  {
-    dof_handler.clear ();
-  }
-
-
-				   // The next function is the one
-				   // which delegates the main work in
-				   // solving the problem: it sets up
-				   // the DoF handler object with the
-				   // finite element given to the
-				   // constructor of this object, the
-				   // creates an object that denotes
-				   // the linear system (i.e. the
-				   // matrix, the right hand side
-				   // vector, and the solution
-				   // vector), calls the function to
-				   // assemble it, and finally solves
-				   // it:
-  template <int dim>
-  void
-  Solver<dim>::solve_problem ()
-  {
-    dof_handler.distribute_dofs (*fe);
-
-    std::cout << "Number of degrees of freedom: "
-              << dof_handler.n_dofs()
-              << std::endl;
-    
-    solution.reinit (dof_handler.n_dofs());
-
-    LinearSystem linear_system (dof_handler);
-
-    std::cout << "Number of constraints       : "
-              << linear_system.hanging_node_constraints.n_constraints()
-              << std::endl;
-
-    assemble_linear_system (linear_system);
-    linear_system.solve (solution);
-  }
-
-
-				   // As stated above, the
-				   // <code>postprocess</code> function takes
-				   // an evaluation object, and
-				   // applies it to the computed
-				   // solution. This function may be
-				   // called multiply, once for each
-				   // evaluation of the solution which
-				   // the user required.
-  template <int dim>
-  void
-  Solver<dim>::
-  postprocess (const Evaluation::EvaluationBase<dim> &postprocessor) const
-  {
-    postprocessor (dof_handler, solution);
-  }
-
-
-				   // The <code>n_dofs</code> function should
-				   // be self-explanatory:
-  template <int dim>
-  unsigned int
-  Solver<dim>::n_dofs () const
-  {
-    return dof_handler.n_dofs();
-  }
-  
-
-				   // The following function assembles
-				   // matrix and right hand side of
-				   // the linear system to be solved
-				   // in each step. It goes along the
-				   // same lines as used in previous
-				   // examples, so we explain it only
-				   // briefly:
-  template <int dim>
-  void
-  Solver<dim>::assemble_linear_system (LinearSystem &linear_system)
-  {
-				     // First define a convenience
-				     // abbreviation for these lengthy
-				     // iterator names...
-    typedef
-      typename DoFHandler<dim>::active_cell_iterator
-      active_cell_iterator;
-
-				     // ... and use it to split up the
-				     // set of cells into a number of
-				     // pieces of equal size. The
-				     // number of blocks is set to the
-				     // default number of threads to
-				     // be used, which by default is
-				     // set to the number of
-				     // processors found in your
-				     // computer at startup of the
-				     // program:
-    const unsigned int n_threads = multithread_info.n_default_threads;
-    std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
-      thread_ranges 
-      = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
-						    dof_handler.end (),
-						    n_threads);
-
-				     // These ranges are then assigned
-				     // to a number of threads which
-				     // we create next. Each will
-				     // assemble the local cell
-				     // matrices on the assigned
-				     // cells, and fill the matrix
-				     // object with it. Since there is
-				     // need for synchronization when
-				     // filling the same matrix from
-				     // different threads, we need a
-				     // mutex here:
-    Threads::ThreadMutex mutex;
-    Threads::ThreadGroup<> threads;
-    for (unsigned int thread=0; thread<n_threads; ++thread)
-      threads += Threads::spawn (*this, &Solver<dim>::assemble_matrix)
-                 (linear_system,
-                  thread_ranges[thread].first,
-                  thread_ranges[thread].second,
-                  mutex);
-
-				     // While the spawned threads
-				     // assemble the system matrix, we
-				     // can already compute the right
-				     // hand side vector in the main
-				     // thread, and condense away the
-				     // constraints due to hanging
-				     // nodes:
-    assemble_rhs (linear_system.rhs);
-    linear_system.hanging_node_constraints.condense (linear_system.rhs);
-
-				     // And while we're already at it
-				     // to compute things in parallel,
-				     // interpolating boundary values
-				     // is one more thing that can be
-				     // done independently, so we do
-				     // it here:
-    std::map<unsigned int,double> boundary_value_map;
-    VectorTools::interpolate_boundary_values (dof_handler,
-					      0,
-					      *boundary_values,
-					      boundary_value_map);
-    
-    
-				     // If this is done, wait for the
-				     // matrix assembling threads, and
-				     // condense the constraints in
-				     // the matrix as well:
-    threads.join_all ();
-    linear_system.hanging_node_constraints.condense (linear_system.matrix);
-
-				     // Now that we have the linear
-				     // system, we can also treat
-				     // boundary values, which need to
-				     // be eliminated from both the
-				     // matrix and the right hand
-				     // side:
-    MatrixTools::apply_boundary_values (boundary_value_map,
-					linear_system.matrix,
-					solution,
-					linear_system.rhs);
-
-  }
-
-
-				   // The second of this pair of
-				   // functions takes a range of cell
-				   // iterators, and assembles the
-				   // system matrix on this part of
-				   // the domain. Since it's actions
-				   // have all been explained in
-				   // previous programs, we do not
-				   // comment on it any more, except
-				   // for one pointe below.
-  template <int dim>
-  void
-  Solver<dim>::assemble_matrix (LinearSystem                                         &linear_system,
-				const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
-				const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-				Threads::ThreadMutex                                 &mutex) const
-  {
-    FEValues<dim> fe_values (*fe, *quadrature, 
-			     update_gradients | update_JxW_values);
-
-    const unsigned int   dofs_per_cell = fe->dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature->n_quadrature_points;
-
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-    for (typename DoFHandler<dim>::active_cell_iterator cell=begin_cell;
-	 cell!=end_cell; ++cell)
-      {
-	cell_matrix = 0;
-
-	fe_values.reinit (cell);
-
-	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
 				   fe_values.shape_grad(j,q_point) *
 				   fe_values.JxW(q_point));
 
-
-	cell->get_dof_indices (local_dof_indices);
-
-                                         // In the step-9 program, we
-                                         // have shown that you have
-                                         // to use the mutex to lock
-                                         // the matrix when copying
-                                         // the elements from the
-                                         // local to the global
-                                         // matrix. This was necessary
-                                         // to avoid that two threads
-                                         // access it at the same
-                                         // time, eventually
-                                         // overwriting their
-                                         // respective
-                                         // work. Previously, we have
-                                         // used the <code>acquire</code> and
-                                         // <code>release</code> functions of
-                                         // the mutex to lock and
-                                         // unlock the mutex,
-                                         // respectively. While this
-                                         // is valid, there is one
-                                         // possible catch: if between
-                                         // the locking operation and
-                                         // the unlocking operation an
-                                         // exception is thrown, the
-                                         // mutex remains in the
-                                         // locked state, and in some
-                                         // cases this might lead to
-                                         // deadlocks. A similar
-                                         // situation arises, when one
-                                         // changes the code to have a
-                                         // return statement somewhere
-                                         // in the middle of the
-                                         // locked block, and forgets
-                                         // that before we call
-                                         // <code>return</code>, we also have
-                                         // to unlock the mutex. This
-                                         // all is not be a problem
-                                         // here, but we want to show
-                                         // the general technique to
-                                         // cope with these problems
-                                         // nevertheless: have an
-                                         // object that upon
-                                         // initialization (i.e. in
-                                         // its constructor) locks the
-                                         // mutex, and on running the
-                                         // destructor unlocks it
-                                         // again. This is called the
-                                         // <code>scoped lock</code> pattern
-                                         // (apparently invented by
-                                         // Doug Schmidt originally),
-                                         // and it works because
-                                         // destructors of local
-                                         // objects are also run when
-                                         // we exit the function
-                                         // either through a
-                                         // <code>return</code> statement, or
-                                         // when an exception is
-                                         // raised. Thus, it is
-                                         // guaranteed that the mutex
-                                         // will always be unlocked
-                                         // when we exit this part of
-                                         // the program, whether the
-                                         // operation completed
-                                         // successfully or not,
-                                         // whether the exit path was
-                                         // something we implemented
-                                         // willfully or whether the
-                                         // function was exited by an
-                                         // exception that we did not
-                                         // forsee.
-                                         //
-                                         // deal.II implements the
-                                         // scoped locking pattern in
-                                         // the
-                                         // ThreadMutex::ScopedLock
-                                         // class: it takes the mutex
-                                         // in the constructor and
-                                         // locks it; in its
-                                         // destructor, it unlocks it
-                                         // again. So here is how it
-                                         // is used:
-        Threads::ThreadMutex::ScopedLock lock (mutex);
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    linear_system.matrix.add (local_dof_indices[i],
-				      local_dof_indices[j],
-				      cell_matrix(i,j));
-                                         // Here, at the brace, the
-                                         // current scope ends, so the
-                                         // <code>lock</code> variable goes out
-                                         // of existence and its
-                                         // destructor the mutex is
-                                         // unlocked.
-      };
-  }
-
-
-				   // Now for the functions that
-				   // implement actions in the linear
-				   // system class. First, the
-				   // constructor initializes all data
-				   // elements to their correct sizes,
-				   // and sets up a number of
-				   // additional data structures, such
-				   // as constraints due to hanging
-				   // nodes. Since setting up the
-				   // hanging nodes and finding out
-				   // about the nonzero elements of
-				   // the matrix is independent, we do
-				   // that in parallel (if the library
-				   // was configured to use
-				   // concurrency, at least;
-				   // otherwise, the actions are
-				   // performed sequentially). Note
-				   // that we spawn only one thread,
-				   // and do the second action in the
-				   // main thread. Since only one
-				   // thread is generated, we don't
-				   // use the <code>Threads::ThreadGroup</code>
-				   // class here, but rather use the
-				   // one created thread object
-				   // directly to wait for this
-				   // particular thread's exit.
-				   //
-				   // Note that taking up the address
-				   // of the
-				   // <code>DoFTools::make_hanging_node_constraints</code>
-				   // function is a little tricky,
-				   // since there are actually three
-				   // of them, one for each supported
-				   // space dimension. Taking
-				   // addresses of overloaded
-				   // functions is somewhat
-				   // complicated in C++, since the
-				   // address-of operator <code>&</code> in
-				   // that case returns more like a
-				   // set of values (the addresses of
-				   // all functions with that name),
-				   // and selecting the right one is
-				   // then the next step. If the
-				   // context dictates which one to
-				   // take (for example by assigning
-				   // to a function pointer of known
-				   // type), then the compiler can do
-				   // that by itself, but if this set
-				   // of pointers shall be given as
-				   // the argument to a function that
-				   // takes a template, the compiler
-				   // could choose all without having
-				   // a preference for one. We
-				   // therefore have to make it clear
-				   // to the compiler which one we
-				   // would like to have; for this, we
-				   // could use a cast, but for more
-				   // clarity, we assign it to a
-				   // temporary <code>mhnc_p</code> (short for
-				   // <code>pointer to
-				   // make_hanging_node_constraints</code>)
-				   // with the right type, and using
-				   // this pointer instead.
-  template <int dim>
-  Solver<dim>::LinearSystem::
-  LinearSystem (const DoFHandler<dim> &dof_handler)
-  {
-    hanging_node_constraints.clear ();
-
-    void (*mhnc_p) (const DoFHandler<dim> &,
-		    ConstraintMatrix      &)
-      = &DoFTools::make_hanging_node_constraints;
-    
-    Threads::Thread<>
-      mhnc_thread = Threads::spawn (mhnc_p)(dof_handler,
-                                            hanging_node_constraints);
-
-    sparsity_pattern.reinit (dof_handler.n_dofs(),
-			     dof_handler.n_dofs(),
-			     dof_handler.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-
-				     // Wait until the
-				     // <code>hanging_node_constraints</code>
-				     // object is fully set up, then
-				     // close it and use it to
-				     // condense the sparsity pattern:
-    mhnc_thread.join ();
-    hanging_node_constraints.close ();
-    hanging_node_constraints.condense (sparsity_pattern);
-
-				     // Finally, close the sparsity
-				     // pattern, initialize the
-				     // matrix, and set the right hand
-				     // side vector to the right size.
-    sparsity_pattern.compress();
-    matrix.reinit (sparsity_pattern);
-    rhs.reinit (dof_handler.n_dofs());
-  }
-
-
-
-				   // The second function of this
-				   // class simply solves the linear
-				   // system by a preconditioned
-				   // conjugate gradient method. This
-				   // has been extensively discussed
-				   // before, so we don't dwell into
-				   // it any more.
-  template <int dim>
-  void
-  Solver<dim>::LinearSystem::solve (Vector<double> &solution) const
-  {
-    SolverControl           solver_control (1000, 1e-12);
-    SolverCG<>              cg (solver_control);
-
-    PreconditionSSOR<> preconditioner;
-    preconditioner.initialize(matrix, 1.2);
-
-    cg.solve (matrix, solution, rhs, preconditioner);
-
-    hanging_node_constraints.distribute (solution);
-  }
-
-
-
-
-				   // @sect4{A primal solver}
-
-				   // In the previous section, a base
-				   // class for Laplace solvers was
-				   // implemented, that lacked the
-				   // functionality to assemble the
-				   // right hand side vector, however,
-				   // for reasons that were explained
-				   // there. Now we implement a
-				   // corresponding class that can do
-				   // this for the case that the right
-				   // hand side of a problem is given
-				   // as a function object.
-				   //
-				   // The actions of the class are
-				   // rather what you have seen
-				   // already in previous examples
-				   // already, so a brief explanation
-				   // should suffice: the constructor
-				   // takes the same data as does that
-				   // of the underlying class (to
-				   // which it passes all information)
-				   // except for one function object
-				   // that denotes the right hand side
-				   // of the problem. A pointer to
-				   // this object is stored (again as
-				   // a <code>SmartPointer</code>, in order to
-				   // make sure that the function
-				   // object is not deleted as long as
-				   // it is still used by this class).
-				   //
-				   // The only functional part of this
-				   // class is the <code>assemble_rhs</code>
-				   // method that does what its name
-				   // suggests.
-  template <int dim>
-  class PrimalSolver : public Solver<dim>
-  {
-    public:
-      PrimalSolver (Triangulation<dim>       &triangulation,
-		    const FiniteElement<dim> &fe,
-		    const Quadrature<dim>    &quadrature,
-		    const Function<dim>      &rhs_function,
-		    const Function<dim>      &boundary_values);
-    protected:
-      const SmartPointer<const Function<dim> > rhs_function;
-      virtual void assemble_rhs (Vector<double> &rhs) const;
-  };
-
-
-				   // The constructor of this class
-				   // basically does what it is
-				   // announced to do above...
-  template <int dim>
-  PrimalSolver<dim>::
-  PrimalSolver (Triangulation<dim>       &triangulation,
-		const FiniteElement<dim> &fe,
-		const Quadrature<dim>    &quadrature,
-		const Function<dim>      &rhs_function,
-		const Function<dim>      &boundary_values)
-		  :
-		  Base<dim> (triangulation),
-		  Solver<dim> (triangulation, fe,
-			       quadrature, boundary_values),
-                  rhs_function (&rhs_function)
-  {}
-
-
-
-				   // ... as does the <code>assemble_rhs</code>
-				   // function. Since this is
-				   // explained in several of the
-				   // previous example programs, we
-				   // leave it at that.
-  template <int dim>
-  void
-  PrimalSolver<dim>::
-  assemble_rhs (Vector<double> &rhs) const 
-  {
-    FEValues<dim> fe_values (*this->fe, *this->quadrature, 
-			     update_values | update_q_points  |
-                             update_JxW_values);
-
-    const unsigned int   dofs_per_cell = this->fe->dofs_per_cell;
-    const unsigned int   n_q_points    = this->quadrature->n_quadrature_points;
-
-    Vector<double>       cell_rhs (dofs_per_cell);
-    std::vector<double>  rhs_values (n_q_points);
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = this->dof_handler.begin_active(),
-      endc = this->dof_handler.end();
-    for (; cell!=endc; ++cell)
-      {
-	cell_rhs = 0;
-	fe_values.reinit (cell);
-	rhs_function->value_list (fe_values.get_quadrature_points(),
-				  rhs_values);
-      
-	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
-			    rhs_values[q_point] *
+			    1.0 *
 			    fe_values.JxW(q_point));
+	  }
 
-	cell->get_dof_indices (local_dof_indices);
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  rhs(local_dof_indices[i]) += cell_rhs(i);
-      };
-  }
-
-
-				   // @sect4{Local refinement by the Kelly error indicator}
-
-				   // The second class implementing
-				   // refinement strategies uses the
-				   // Kelly refinemet indicator used
-				   // in various example programs
-				   // before. Since this indicator is
-				   // already implemented in a class
-				   // of its own inside the deal.II
-				   // library, there is not much t do
-				   // here except cal the function
-				   // computing the indicator, then
-				   // using it to select a number of
-				   // cells for refinement and
-				   // coarsening, and refinement the
-				   // mesh accordingly.
-				   //
-				   // Again, this should now be
-				   // sufficiently standard to allow
-				   // the omission of further
-				   // comments.
-  template <int dim>
-  class RefinementKelly : public PrimalSolver<dim>
-  {
-    public:
-      RefinementKelly (Triangulation<dim>       &coarse_grid,
-		       const FiniteElement<dim> &fe,
-		       const Quadrature<dim>    &quadrature,
-		       const Function<dim>      &rhs_function,
-		       const Function<dim>      &boundary_values);
-
-      virtual void refine_grid ();
-  };
-
-
-
-  template <int dim>
-  RefinementKelly<dim>::
-  RefinementKelly (Triangulation<dim>       &coarse_grid,
-		   const FiniteElement<dim> &fe,
-		   const Quadrature<dim>    &quadrature,
-		   const Function<dim>      &rhs_function,
-		   const Function<dim>      &boundary_values)
-		  :
-		  Base<dim> (coarse_grid),
-                  PrimalSolver<dim> (coarse_grid, fe, quadrature,
-				     rhs_function, boundary_values)
-  {}
-
-
-
-  template <int dim>
-  void
-  RefinementKelly<dim>::refine_grid ()
-  {
-    Vector<float> estimated_error_per_cell (this->triangulation->n_active_cells());
-    KellyErrorEstimator<dim>::estimate (this->dof_handler,
-					QGauss<dim-1>(3),
-					typename FunctionMap<dim>::type(),
-					this->solution,
-					estimated_error_per_cell);
-    GridRefinement::refine_and_coarsen_fixed_number (*this->triangulation,
-						     estimated_error_per_cell,
-						     0.3, 0.03);
-    this->triangulation->execute_coarsening_and_refinement ();
-  }
-
-}
-
-
-
-
-				 // @sect3{Equation data}
-
-				 // As this is one more academic
-				 // example, we'd like to compare
-				 // exact and computed solution
-				 // against each other. For this, we
-				 // need to declare function classes
-				 // representing the exact solution
-				 // (for comparison and for the
-				 // Dirichlet boundary values), as
-				 // well as a class that denotes the
-				 // right hand side of the equation
-				 // (this is simply the Laplace
-				 // operator applied to the exact
-				 // solution we'd like to recover).
-				 //
-				 // For this example, let us choose as
-				 // exact solution the function
-				 // $u(x,y)=exp(x+sin(10y+5x^2))$. In more
-				 // than two dimensions, simply repeat
-				 // the sine-factor with <code>y</code>
-				 // replaced by <code>z</code> and so on. Given
-				 // this, the following two classes
-				 // are probably straightforward from
-				 // the previous examples.
-				 //
-				 // As in previous examples, the C++
-				 // language forces us to declare and
-				 // define a constructor to the
-				 // following classes even though they
-				 // are empty. This is due to the fact
-				 // that the base class has no default
-				 // constructor (i.e. one without
-				 // arguments), even though it has a
-				 // constructor which has default
-				 // values for all arguments.
-template <int dim>
-class Solution : public Function<dim>
-{
-  public:
-    Solution () : Function<dim> () {};
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component) const;
-};
-
-
-template <int dim>
-double
-Solution<dim>::value (const Point<dim>   &p,
-		      const unsigned int  /*component*/) const
-{
-  double q = p(0);
-  for (unsigned int i=1; i<dim; ++i)
-    q += std::sin(10*p(i)+5*p(0)*p(0));
-  const double exponential = std::exp(q);
-  return exponential;
-}
-
-
-
-template <int dim>
-class RightHandSide : public Function<dim>
-{
-  public:
-    RightHandSide () : Function<dim> () {};
-    
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int  component) const;
-};
-
-
-template <int dim>
-double
-RightHandSide<dim>::value (const Point<dim>   &p,
-			   const unsigned int  /*component*/) const
-{
-  double product = 1;
-  for (unsigned int d=0; d<dim; ++d)
-    product *= (p[d]+1);
-  return product;
-}
-
-
-
-				 // @sect3{The driver routines}
-
-				 // What is now missing are only the
-				 // functions that actually select the
-				 // various options, and run the
-				 // simulation on successively finer
-				 // grids to monitor the progress as
-				 // the mesh is refined.
-				 //
-				 // This we do in the following
-				 // function: it takes a solver
-				 // object, and a list of
-				 // postprocessing (evaluation)
-				 // objects, and runs them with
-				 // intermittent mesh refinement:
-template <int dim>
-void
-run_simulation (LaplaceSolver::Base<dim>                     &solver,
-		const std::list<Evaluation::EvaluationBase<dim> *> &postprocessor_list)
-{
-				   // Then start a loop which only
-				   // terminates once the number of
-				   // degrees of freedom is larger
-				   // than 20,000 (you may of course
-				   // change this limit, if you need
-				   // more -- or less -- accuracy from
-				   // your program).
-  for (unsigned int step=0; true; ++step)
-    {
-      std::cout << "Refinement cycle: "
-		<< step << " " << std::endl;
-
-				       // Now solve the problem on the
-				       // present grid, and run the
-				       // evaluators on it. The long
-				       // type name of iterators into
-				       // the list is a little
-				       // annoying, but could be
-				       // shortened by a typedef, if
-				       // so desired.
-      solver.solve_problem ();
-
-      for (typename std::list<Evaluation::EvaluationBase<dim> *>::const_iterator
-	     i = postprocessor_list.begin();
-	   i != postprocessor_list.end(); ++i)
+      cell->get_dof_indices (local_dof_indices);
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
-	  (*i)->set_refinement_cycle (step);
-	  solver.postprocess (**i);
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+	    system_matrix.add (local_dof_indices[i],
+			       local_dof_indices[j],
+			       cell_matrix(i,j));
+	  
+	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
 	}
-
-
-				       // Now check whether more
-				       // iterations are required, or
-				       // whether the loop shall be
-				       // ended:
-      if (solver.n_dofs() < 20000)
-	solver.refine_grid ();
-      else
-	break;
-
-      std::cout << std::endl;
     }
 
-				   // Finally end the line in which we
-				   // displayed status reports:
-  std::cout << std::endl;
+				   // After the system of equations
+				   // has been assembled just as for
+				   // the previous examples, we still
+				   // have to eliminate the
+				   // constraints due to hanging
+				   // nodes. This is done using the
+				   // following two function calls:
+  hanging_node_constraints.condense (system_matrix);
+  hanging_node_constraints.condense (system_rhs);
+				   // Using them, degrees of freedom
+				   // associated to hanging nodes have
+				   // been removed from the linear
+				   // system and the independent
+				   // variables are only the regular
+				   // nodes. The constrained nodes are
+				   // still in the linear system
+				   // (there is a one on the diagonal
+				   // of the matrix and all other
+				   // entries for this line are set to
+				   // zero) but the computed values
+				   // are invalid (the <code>condense</code>
+				   // function modifies the system so
+				   // that the values in the solution
+				   // corresponding to constrained
+				   // nodes are invalid, but that the
+				   // system still has a well-defined
+				   // solution; we compute the correct
+				   // values for these nodes at the
+				   // end of the <code>solve</code> function).
+
+				   // As almost all the stuff before,
+				   // the interpolation of boundary
+				   // values works also for higher
+				   // order elements without the need
+				   // to change your code for that. We
+				   // note that for proper results, it
+				   // is important that the
+				   // elimination of boundary nodes
+				   // from the system of equations
+				   // happens *after* the elimination
+				   // of hanging nodes.
+  std::map<unsigned int,double> boundary_values;
+  VectorTools::interpolate_boundary_values (dof_handler,
+					    0,
+					    ZeroFunction<dim>(),
+					    boundary_values);
+  MatrixTools::apply_boundary_values (boundary_values,
+				      system_matrix,
+				      solution,
+				      system_rhs);
+}
+
+
+
+                                 // @sect4{LaplaceProblem::solve}
+
+				 // We continue with gradual
+				 // improvements. The function that
+				 // solves the linear system again
+				 // uses the SSOR preconditioner, and
+				 // is again unchanged except that we
+				 // have to incorporate hanging node
+				 // constraints. As mentioned above,
+				 // the degrees of freedom
+				 // corresponding to hanging node
+				 // constraints have been removed from
+				 // the linear system by giving the
+				 // rows and columns of the matrix a
+				 // special treatment. This way, the
+				 // values for these degrees of
+				 // freedom have wrong, but
+				 // well-defined values after solving
+				 // the linear system. What we then
+				 // have to do is to use the
+				 // constraints to assign to them the
+				 // values that they should have. This
+				 // process, called <code>distributing</code>
+				 // hanging nodes, computes the values
+				 // of constrained nodes from the
+				 // values of the unconstrained ones,
+				 // and requires only a single
+				 // additional function call that you
+				 // find at the end of this function:
+
+template <int dim>
+void LaplaceProblem<dim>::solve () 
+{
+  SolverControl           solver_control (1000, 1e-12);
+  SolverCG<>              cg (solver_control);
+
+  PreconditionSSOR<> preconditioner;
+  preconditioner.initialize(system_matrix, 1.2);
+
+  cg.solve (system_matrix, solution, system_rhs,
+	    preconditioner);
+
+  hanging_node_constraints.distribute (solution);
+}
+
+
+                                 // @sect4{LaplaceProblem::refine_grid}
+
+				 // Instead of global refinement, we
+				 // now use a slightly more elaborate
+				 // scheme. We will use the
+				 // <code>KellyErrorEstimator</code> class
+				 // which implements an error
+				 // estimator for the Laplace
+				 // equation; it can in principle
+				 // handle variable coefficients, but
+				 // we will not use these advanced
+				 // features, but rather use its most
+				 // simple form since we are not
+				 // interested in quantitative results
+				 // but only in a quick way to
+				 // generate locally refined grids.
+				 //
+				 // Although the error estimator
+				 // derived by Kelly et al. was
+				 // originally developed for the Laplace
+				 // equation, we have found that it is
+				 // also well suited to quickly
+				 // generate locally refined grids for
+				 // a wide class of
+				 // problems. Basically, it looks at
+				 // the jumps of the gradients of the
+				 // solution over the faces of cells
+				 // (which is a measure for the second
+				 // derivatives) and scales it by the
+				 // size of the cell. It is therefore
+				 // a measure for the local smoothness
+				 // of the solution at the place of
+				 // each cell and it is thus
+				 // understandable that it yields
+				 // reasonable grids also for
+				 // hyperbolic transport problems or
+				 // the wave equation as well,
+				 // although these grids are certainly
+				 // suboptimal compared to approaches
+				 // specially tailored to the
+				 // problem. This error estimator may
+				 // therefore be understood as a quick
+				 // way to test an adaptive program.
+				 //
+				 // The way the estimator works is to
+				 // take a <code>DoFHandler</code> object
+				 // describing the degrees of freedom
+				 // and a vector of values for each
+				 // degree of freedom as input and
+				 // compute a single indicator value
+				 // for each active cell of the
+				 // triangulation (i.e. one value for
+				 // each of the
+				 // <code>triangulation.n_active_cells()</code>
+				 // cells). To do so, it needs two
+				 // additional pieces of information:
+				 // a quadrature formula on the faces
+				 // (i.e. quadrature formula on
+				 // <code>dim-1</code> dimensional objects. We
+				 // use a 3-point Gauss rule again, a
+				 // pick that is consistent and
+				 // appropriate with the choice
+				 // bi-quadratic finite element shape
+				 // functions in this program.
+				 // (What constitutes a suitable
+				 // quadrature rule here of course
+				 // depends on knowledge of the way
+				 // the error estimator evaluates
+				 // the solution field. As said
+				 // above, the jump of the gradient
+				 // is integrated over each face,
+				 // which would be a quadratic
+				 // function on each face for the
+				 // quadratic elements in use in
+				 // this example. In fact, however,
+				 // it is the square of the jump of
+				 // the gradient, as explained in
+				 // the documentation of that class,
+				 // and that is a quartic function,
+				 // for which a 3 point Gauss
+				 // formula is sufficient since it
+				 // integrates polynomials up to
+				 // order 5 exactly.)
+				 //
+				 // Secondly, the function wants a
+				 // list of boundaries where we have
+				 // imposed Neumann value, and the
+				 // corresponding Neumann values. This
+				 // information is represented by an
+				 // object of type
+				 // <code>FunctionMap@<dim@>::type</code> that is
+				 // essentially a map from boundary
+				 // indicators to function objects
+				 // describing Neumann boundary values
+				 // (in the present example program,
+				 // we do not use Neumann boundary
+				 // values, so this map is empty, and
+				 // in fact constructed using the
+				 // default constructor of the map in
+				 // the place where the function call
+				 // expects the respective function
+				 // argument).
+				 //
+				 // The output, as mentioned is a
+				 // vector of values for all
+				 // cells. While it may make sense to
+				 // compute the *value* of a degree of
+				 // freedom very accurately, it is
+				 // usually not helpful to compute the
+				 // *error indicator* corresponding to
+				 // a cell particularly accurately. We
+				 // therefore typically use a vector
+				 // of floats instead of a vector of
+				 // doubles to represent error
+				 // indicators.
+template <int dim>
+void LaplaceProblem<dim>::refine_grid ()
+{
+  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+
+  KellyErrorEstimator<dim>::estimate (dof_handler,
+				      QGauss<dim-1>(3),
+				      typename FunctionMap<dim>::type(),
+				      solution,
+				      estimated_error_per_cell);
+
+				   // The above function returned one
+				   // error indicator value for each
+				   // cell in the
+				   // <code>estimated_error_per_cell</code>
+				   // array. Refinement is now done as
+				   // follows: refine those 30 per
+				   // cent of the cells with the
+				   // highest error values, and
+				   // coarsen the 3 per cent of cells
+				   // with the lowest values.
+				   //
+				   // One can easily verify that if
+				   // the second number were zero,
+				   // this would approximately result
+				   // in a doubling of cells in each
+				   // step in two space dimensions,
+				   // since for each of the 30 per
+				   // cent of cells, four new would be
+				   // replaced, while the remaining 70
+				   // per cent of cells remain
+				   // untouched. In practice, some
+				   // more cells are usually produced
+				   // since it is disallowed that a
+				   // cell is refined twice while the
+				   // neighbor cell is not refined; in
+				   // that case, the neighbor cell
+				   // would be refined as well.
+				   //
+				   // In many applications, the number
+				   // of cells to be coarsened would
+				   // be set to something larger than
+				   // only three per cent. A non-zero
+				   // value is useful especially if
+				   // for some reason the initial
+				   // (coarse) grid is already rather
+				   // refined. In that case, it might
+				   // be necessary to refine it in
+				   // some regions, while coarsening
+				   // in some other regions is
+				   // useful. In our case here, the
+				   // initial grid is very coarse, so
+				   // coarsening is only necessary in
+				   // a few regions where
+				   // over-refinement may have taken
+				   // place. Thus a small, non-zero
+				   // value is appropriate here.
+				   //
+				   // The following function now takes
+				   // these refinement indicators and
+				   // flags some cells of the
+				   // triangulation for refinement or
+				   // coarsening using the method
+				   // described above. It is from a
+				   // class that implements
+				   // several different algorithms to
+				   // refine a triangulation based on
+				   // cell-wise error indicators.
+  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+						   estimated_error_per_cell,
+						   0.3, 0.03);
+
+				   // After the previous function has
+				   // exited, some cells are flagged
+				   // for refinement, and some other
+				   // for coarsening. The refinement
+				   // or coarsening itself is not
+				   // performed by now, however, since
+				   // there are cases where further
+				   // modifications of these flags is
+				   // useful. Here, we don't want to
+				   // do any such thing, so we can
+				   // tell the triangulation to
+				   // perform the actions for which
+				   // the cells are flagged:
+  triangulation.execute_coarsening_and_refinement ();
+}
+
+
+                                 // @sect4{LaplaceProblem::output_results}
+
+				 // At the end of computations on each
+				 // grid, and just before we continue
+				 // the next cycle with mesh
+				 // refinement, we want to output the
+				 // results from this cycle.
+				 //
+				 // In the present program, we will
+				 // not write the solution (except for
+				 // in the last step, see the next
+				 // function), but only the meshes
+				 // that we generated, as a
+				 // two-dimensional Encapsulated
+				 // Postscript (EPS) file.
+				 //
+				 // We have already seen in step-1 how
+				 // this can be achieved. The only
+				 // thing we have to change is the
+				 // generation of the file name, since
+				 // it should contain the number of
+				 // the present refinement cycle
+				 // provided to this function as an
+				 // argument. The most general way is
+				 // to use the std::stringstream class
+				 // as shown in step-5, but here's a
+				 // little hack that makes it simpler
+				 // if we know that we have less than
+				 // 10 iterations: assume that the
+				 // numbers `0' through `9' are
+				 // represented consecutively in the
+				 // character set used on your machine
+				 // (this is in fact the case in all
+				 // known character sets), then
+				 // '0'+cycle gives the character
+				 // corresponding to the present cycle
+				 // number. Of course, this will only
+				 // work if the number of cycles is
+				 // actually less than 10, and rather
+				 // than waiting for the disaster to
+				 // happen, we safeguard our little
+				 // hack with an explicit assertion at
+				 // the beginning of the function. If
+				 // this assertion is triggered,
+				 // i.e. when <code>cycle</code> is larger than
+				 // or equal to 10, an exception of
+				 // type <code>ExcNotImplemented</code> is
+				 // raised, indicating that some
+				 // functionality is not implemented
+				 // for this case (the functionality
+				 // that is missing, of course, is the
+				 // generation of file names for that
+				 // case):
+template <int dim>
+void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+{
+  Assert (cycle < 10, ExcNotImplemented());
+
+  std::string filename = "grid-";
+  filename += ('0' + cycle);
+  filename += ".eps";
+  
+  std::ofstream output (filename.c_str());
+
+  GridOut grid_out;
+  grid_out.write_eps (triangulation, output);
 }
 
 
@@ -1919,104 +984,202 @@ create_coarse_grid (Triangulation<2> &coarse_grid)
 }
 
 
-				 // The final function is one which
-				 // takes the name of a solver
-				 // (presently "kelly" and "global"
-				 // are allowed), creates a solver
-				 // object out of it using a coarse
-				 // grid (in this case the ubiquitous
-				 // unit square) and a finite element
-				 // object (here the likewise
-				 // ubiquitous bilinear one), and uses
-				 // that solver to ask for the
-				 // solution of the problem on a
-				 // sequence of successively refined
-				 // grids.
+                                 // @sect4{LaplaceProblem::run}
+
+				 // The final function before
+				 // <code>main()</code> is again the main
+				 // driver of the class, <code>run()</code>. It
+				 // is similar to the one of step-5,
+				 // except that we generate a file in
+				 // the program again instead of
+				 // reading it from disk, in that we
+				 // adaptively instead of globally
+				 // refine the mesh, and that we
+				 // output the solution on the final
+				 // mesh in the present function.
 				 //
-				 // The function also sets up two of
-				 // evaluation functions, one
-				 // evaluating the solution at the
-				 // point (0.5,0.5), the other writing
-				 // out the solution to a file.
+				 // The first block in the main loop
+				 // of the function deals with mesh
+				 // generation. If this is the first
+				 // cycle of the program, instead of
+				 // reading the grid from a file on
+				 // disk as in the previous example,
+				 // we now again create it using a
+				 // library function. The domain is
+				 // again a circle, which is why we
+				 // have to provide a suitable
+				 // boundary object as well. We place
+				 // the center of the circle at the
+				 // origin and have the radius be one
+				 // (these are the two hidden
+				 // arguments to the function, which
+				 // have default values).
+				 //
+				 // You will notice by looking at the
+				 // coarse grid that it is of inferior
+				 // quality than the one which we read
+				 // from the file in the previous
+				 // example: the cells are less
+				 // equally formed. However, using the
+				 // library function this program
+				 // works in any space dimension,
+				 // which was not the case before.
+				 //
+				 // In case we find that this is not
+				 // the first cycle, we want to refine
+				 // the grid. Unlike the global
+				 // refinement employed in the last
+				 // example program, we now use the
+				 // adaptive procedure described
+				 // above.
+				 //
+				 // The rest of the loop looks as
+				 // before:
 template <int dim>
-void solve_problem () 
+void LaplaceProblem<dim>::run () 
 {
-  Triangulation<dim> triangulation;
-  create_coarse_grid (triangulation);
+  for (unsigned int cycle=0; cycle<5; ++cycle)
+    {
+      std::cout << "Cycle " << cycle << ':' << std::endl;
 
-  const FE_Q<dim>          fe(1);
-  const QGauss<dim>       quadrature(4);
-  const RightHandSide<dim> rhs_function;
-  const ZeroFunction<dim>      boundary_values;
+      if (cycle == 0)
+	create_coarse_grid (triangulation);
+      else
+	refine_grid ();
+      
 
-				   // Create a solver object of the
-				   // kind indicated by the argument
-				   // to this function. If the name is
-				   // not recognized, throw an
-				   // exception!
-  LaplaceSolver::RefinementKelly<dim> solver (triangulation, fe,
-                                              quadrature,
-                                              rhs_function,
-                                              boundary_values);
+      std::cout << "   Number of active cells:       "
+		<< triangulation.n_active_cells()
+		<< std::endl;
 
-				   // Next create a table object in
-				   // which the values of the
-				   // numerical solution at the point
-				   // (0.5,0.5) will be stored, and
-				   // create a respective evaluation
-				   // object:
-  TableHandler results_table;
-  Evaluation::PointValueEvaluation<dim>
-    postprocessor1 (Point<dim>(0.5,0.5), results_table);
+      setup_system ();
 
-				   // Also generate an evaluator which
-				   // writes out the solution:
-  Evaluation::SolutionOutput<dim>
-    postprocessor2 (std::string("solution"),
-		    DataOut<dim>::vtk);
+      std::cout << "   Number of degrees of freedom: "
+		<< dof_handler.n_dofs()
+		<< std::endl;
+      
+      assemble_system ();
+      solve ();
+      output_results (cycle);
+    }
 
-				   // Take these two evaluation
-				   // objects and put them in a
-				   // list...
-  std::list<Evaluation::EvaluationBase<dim> *> postprocessor_list;
-  postprocessor_list.push_back (&postprocessor1);
-  postprocessor_list.push_back (&postprocessor2);
+				   // After we have finished computing
+				   // the solution on the finesh mesh,
+				   // and writing all the grids to
+				   // disk, we want to also write the
+				   // actual solution on this final
+				   // mesh to a file. As already done
+				   // in one of the previous examples,
+				   // we use the EPS format for
+				   // output, and to obtain a
+				   // reasonable view on the solution,
+				   // we rescale the z-axis by a
+				   // factor of four.
+  DataOutBase::EpsFlags eps_flags;
+  eps_flags.z_scaling = 4;
+  
+  DataOut<dim> data_out;
+  data_out.set_flags (eps_flags);
 
-				   // ... which we can then pass on to
-				   // the function that actually runs
-				   // the simulation on successively
-				   // refined grids:
-  run_simulation (solver, postprocessor_list);
-
-				   // When this all is done, write out
-				   // the results of the point
-				   // evaluations, and finally delete
-				   // the solver object:
-  results_table.write_text (std::cout);
-
-				   // And one blank line after all
-				   // results:
-  std::cout << std::endl;
+  data_out.attach_dof_handler (dof_handler);
+  data_out.add_data_vector (solution, "solution");
+  data_out.build_patches ();
+  
+  std::ofstream output ("final-solution.eps");
+  data_out.write_eps (output);
 }
 
 
+                                 // @sect3{The <code>main</code> function}
 
-				 // There is not much to say about the
-				 // main function. It follows the same
-				 // pattern as in all previous
-				 // examples, with attempts to catch
-				 // thrown exceptions, and displaying
-				 // as much information as possible if
-				 // we should get some. The rest is
-				 // self-explanatory.
+				 // The main function is unaltered in
+				 // its functionality from the
+				 // previous example, but we have
+				 // taken a step of additional
+				 // caution. Sometimes, something goes
+				 // wrong (such as insufficient disk
+				 // space upon writing an output file,
+				 // not enough memory when trying to
+				 // allocate a vector or a matrix, or
+				 // if we can't read from or write to
+				 // a file for whatever reason), and
+				 // in these cases the library will
+				 // throw exceptions. Since these are
+				 // run-time problems, not programming
+				 // errors that can be fixed once and
+				 // for all, this kind of exceptions
+				 // is not switched off in optimized
+				 // mode, in contrast to the
+				 // <code>Assert</code> macro which we have
+				 // used to test against programming
+				 // errors. If uncaught, these
+				 // exceptions propagate the call tree
+				 // up to the <code>main</code> function, and
+				 // if they are not caught there
+				 // either, the program is aborted. In
+				 // many cases, like if there is not
+				 // enough memory or disk space, we
+				 // can't do anything but we can at
+				 // least print some text trying to
+				 // explain the reason why the program
+				 // failed. A way to do so is shown in
+				 // the following. It is certainly
+				 // useful to write any larger program
+				 // in this way, and you can do so by
+				 // more or less copying this function
+				 // except for the <code>try</code> block that
+				 // actually encodes the functionality
+				 // particular to the present
+				 // application.
 int main () 
 {
+
+				   // The general idea behind the
+				   // layout of this function is as
+				   // follows: let's try to run the
+				   // program as we did before...
   try
     {
       deallog.depth_console (0);
 
-      solve_problem<2> ();
+      LaplaceProblem<2> laplace_problem_2d;
+      laplace_problem_2d.run ();
     }
+				   // ...and if this should fail, try
+				   // to gather as much information as
+				   // possible. Specifically, if the
+				   // exception that was thrown is an
+				   // object of a class that is
+				   // derived from the C++ standard
+				   // class <code>exception</code>, then we can
+				   // use the <code>what</code> member function
+				   // to get a string which describes
+				   // the reason why the exception was
+				   // thrown. 
+				   //
+				   // The deal.II exception classes
+				   // are all derived from the
+				   // standard class, and in
+				   // particular, the <code>exc.what()</code>
+				   // function will return
+				   // approximately the same string as
+				   // would be generated if the
+				   // exception was thrown using the
+				   // <code>Assert</code> macro. You have seen
+				   // the output of such an exception
+				   // in the previous example, and you
+				   // then know that it contains the
+				   // file and line number of where
+				   // the exception occured, and some
+				   // other information. This is also
+				   // what the following statements
+				   // would print.
+				   //
+				   // Apart from this, there isn't
+				   // much that we can do except
+				   // exiting the program with an
+				   // error code (this is what the
+				   // <code>return 1;</code> does):
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
@@ -2027,8 +1190,16 @@ int main ()
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
+
       return 1;
     }
+				   // If the exception that was thrown
+				   // somewhere was not an object of a
+				   // class derived from the standard
+				   // <code>exception</code> class, then we
+				   // can't do anything at all. We
+				   // then simply print an error
+				   // message and exit.
   catch (...) 
     {
       std::cerr << std::endl << std::endl
@@ -2039,7 +1210,16 @@ int main ()
 		<< "----------------------------------------------------"
 		<< std::endl;
       return 1;
-    };
+    }
 
+				   // If we got to this point, there
+				   // was no exception which
+				   // propagated up to the main
+				   // function (there may have been
+				   // exceptions, but they were caught
+				   // somewhere in the program or the
+				   // library). Therefore, the program
+				   // performed as was expected and we
+				   // can return without error.
   return 0;
 }
