@@ -396,6 +396,84 @@ class KellyErrorEstimator
                           const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
                           const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
 
+
+				     /**
+				      * Equivalent to the set of functions
+				      * above, except that this one takes a
+				      * quadrature collection for hp finite
+				      * element dof handlers.
+				      */
+    template <typename InputVector, class DH>
+    static void estimate (const Mapping<dim>      &mapping,
+			  const DH                &dof,
+			  const hp::QCollection<dim-1> &quadrature,
+			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const InputVector       &solution,
+			  Vector<float>           &error,
+			  const std::vector<bool> &component_mask = std::vector<bool>(),
+			  const Function<dim>     *coefficients   = 0,
+			  const unsigned int       n_threads = multithread_info.n_default_threads,
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+
+
+				     /**
+				      * Equivalent to the set of functions
+				      * above, except that this one takes a
+				      * quadrature collection for hp finite
+				      * element dof handlers.
+				      */
+    template <typename InputVector, class DH>
+    static void estimate (const DH                &dof,
+			  const hp::QCollection<dim-1> &quadrature,
+			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const InputVector       &solution,
+			  Vector<float>           &error,
+			  const std::vector<bool> &component_mask = std::vector<bool>(),
+			  const Function<dim>     *coefficients   = 0,
+			  const unsigned int       n_threads = multithread_info.n_default_threads,
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+
+
+				     /**
+				      * Equivalent to the set of functions
+				      * above, except that this one takes a
+				      * quadrature collection for hp finite
+				      * element dof handlers.
+				      */
+    template <typename InputVector, class DH>
+    static void estimate (const Mapping<dim>          &mapping,
+			  const DH                    &dof,
+			  const hp::QCollection<dim-1> &quadrature,
+			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const std::vector<const InputVector *> &solutions,
+			  std::vector<Vector<float>*> &errors,
+			  const std::vector<bool>     &component_mask = std::vector<bool>(),
+			  const Function<dim>         *coefficients   = 0,
+			  const unsigned int           n_threads = multithread_info.n_default_threads,
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
+
+
+				     /**
+				      * Equivalent to the set of functions
+				      * above, except that this one takes a
+				      * quadrature collection for hp finite
+				      * element dof handlers.
+				      */
+    template <typename InputVector, class DH>
+    static void estimate (const DH                    &dof,
+			  const hp::QCollection<dim-1> &quadrature,
+			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const std::vector<const InputVector *> &solutions,
+			  std::vector<Vector<float>*> &errors,
+			  const std::vector<bool>     &component_mask = std::vector<bool>(),
+			  const Function<dim>         *coefficients   = 0,
+			  const unsigned int           n_threads = multithread_info.n_default_threads,
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
+    
     
 				     /**
 				      * Exception
@@ -841,6 +919,83 @@ class KellyErrorEstimator<1>
                           const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
                           const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
 
+
+				     /**
+				      * Equivalent to the set of functions
+				      * above, except that this one takes a
+				      * quadrature collection for hp finite
+				      * element dof handlers.
+				      */
+    template <typename InputVector, class DH>
+    static void estimate (const Mapping<1>      &mapping,
+			  const DH                &dof,
+			  const hp::QCollection<0> &quadrature,
+			  const typename FunctionMap<1>::type &neumann_bc,
+			  const InputVector       &solution,
+			  Vector<float>           &error,
+			  const std::vector<bool> &component_mask = std::vector<bool>(),
+			  const Function<1>     *coefficients   = 0,
+			  const unsigned int       n_threads = multithread_info.n_default_threads,
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+
+
+				     /**
+				      * Equivalent to the set of functions
+				      * above, except that this one takes a
+				      * quadrature collection for hp finite
+				      * element dof handlers.
+				      */
+    template <typename InputVector, class DH>
+    static void estimate (const DH                &dof,
+			  const hp::QCollection<0> &quadrature,
+			  const typename FunctionMap<1>::type &neumann_bc,
+			  const InputVector       &solution,
+			  Vector<float>           &error,
+			  const std::vector<bool> &component_mask = std::vector<bool>(),
+			  const Function<1>     *coefficients   = 0,
+			  const unsigned int       n_threads = multithread_info.n_default_threads,
+                          const unsigned int       subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int       material_id = deal_II_numbers::invalid_unsigned_int);
+
+
+				     /**
+				      * Equivalent to the set of functions
+				      * above, except that this one takes a
+				      * quadrature collection for hp finite
+				      * element dof handlers.
+				      */
+    template <typename InputVector, class DH>
+    static void estimate (const Mapping<1>          &mapping,
+			  const DH                    &dof,
+			  const hp::QCollection<0> &quadrature,
+			  const typename FunctionMap<1>::type &neumann_bc,
+			  const std::vector<const InputVector *> &solutions,
+			  std::vector<Vector<float>*> &errors,
+			  const std::vector<bool>     &component_mask = std::vector<bool>(),
+			  const Function<1>         *coefficients   = 0,
+			  const unsigned int           n_threads = multithread_info.n_default_threads,
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
+
+
+				     /**
+				      * Equivalent to the set of functions
+				      * above, except that this one takes a
+				      * quadrature collection for hp finite
+				      * element dof handlers.
+				      */
+    template <typename InputVector, class DH>
+    static void estimate (const DH                    &dof,
+			  const hp::QCollection<0> &quadrature,
+			  const typename FunctionMap<1>::type &neumann_bc,
+			  const std::vector<const InputVector *> &solutions,
+			  std::vector<Vector<float>*> &errors,
+			  const std::vector<bool>     &component_mask = std::vector<bool>(),
+			  const Function<1>         *coefficients   = 0,
+			  const unsigned int           n_threads = multithread_info.n_default_threads,
+                          const unsigned int           subdomain_id = deal_II_numbers::invalid_unsigned_int,
+                          const unsigned int           material_id = deal_II_numbers::invalid_unsigned_int);
     
 				     /**
 				      * Exception

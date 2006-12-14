@@ -135,6 +135,91 @@ estimate (const DH   &dof_handler,
 
 
 template <typename InputVector, class DH>
+void
+KellyErrorEstimator<1>::
+estimate (const Mapping<1>      &mapping,
+          const DH   &dof_handler,
+          const hp::QCollection<0> &quadrature,
+          const FunctionMap<1>::type &neumann_bc,
+          const InputVector       &solution,
+          Vector<float>           &error,
+          const std::vector<bool> &component_mask,
+          const Function<1>     *coefficients,
+          const unsigned int       n_threads,
+          const unsigned int       subdomain_id,
+          const unsigned int       material_id)
+{
+				   // just pass on to the other function
+  const std::vector<const InputVector *> solutions (1, &solution);
+  std::vector<Vector<float>*>              errors (1, &error);
+  estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
+	    component_mask, coefficients, n_threads, subdomain_id, material_id);
+}
+
+
+template <typename InputVector, class DH>
+void
+KellyErrorEstimator<1>::
+estimate (const DH   &dof_handler,
+          const hp::QCollection<0> &quadrature,
+          const FunctionMap<1>::type &neumann_bc,
+          const InputVector       &solution,
+          Vector<float>           &error,
+          const std::vector<bool> &component_mask,
+          const Function<1>     *coefficients,
+          const unsigned int       n_threads,
+          const unsigned int       subdomain_id,
+          const unsigned int       material_id)
+{
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+  estimate(StaticMappingQ1<1>::mapping, dof_handler, quadrature, neumann_bc, solution,
+	   error, component_mask, coefficients, n_threads, subdomain_id, material_id);
+}
+
+
+
+template <typename InputVector, class DH>
+void
+KellyErrorEstimator<1>::
+estimate (const DH   &dof_handler,
+          const hp::QCollection<0> &quadrature,
+          const FunctionMap<1>::type &neumann_bc,
+          const std::vector<const InputVector*> &solutions,
+          std::vector<Vector<float>*> &errors,
+          const std::vector<bool> &component_mask,
+          const Function<1>     *coefficients,
+          const unsigned int       n_threads,
+          const unsigned int       subdomain_id,
+          const unsigned int       material_id)
+{
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+  estimate(StaticMappingQ1<1>::mapping, dof_handler, quadrature, neumann_bc, solutions,
+	   errors, component_mask, coefficients, n_threads, subdomain_id, material_id);
+}
+
+
+
+
+template <typename InputVector, class DH>
+void KellyErrorEstimator<1>::
+estimate (const Mapping<1>                    &mapping,
+          const DH                 &dof_handler,
+          const hp::QCollection<0>                 &,
+          const FunctionMap<1>::type          &neumann_bc,
+          const std::vector<const InputVector *> &solutions,
+          std::vector<Vector<float>*>              &errors,
+          const std::vector<bool>                  &component_mask_,
+          const Function<1>                   *coefficient,
+          const unsigned int,
+          const unsigned int                  subdomain_id,
+          const unsigned int                  material_id)
+{
+  Assert (false, ExcInternalError());
+}
+
+
+
+template <typename InputVector, class DH>
 void KellyErrorEstimator<1>::
 estimate (const Mapping<1>                    &mapping,
           const DH                 &dof_handler,
@@ -318,7 +403,7 @@ estimate (const Mapping<1>                    &mapping,
 		    
                       for (unsigned int s=0; s<n_solution_vectors; ++s)
                         grad_neighbor[s] = v;
-                    };
+                    }
                 }
               else
                                                  // fill with zeroes.
@@ -463,6 +548,51 @@ estimate (const DH                &dof_handler,
            subdomain_id, material_id);
 }
 
+
+template <int dim>
+template <typename InputVector, class DH>
+void
+KellyErrorEstimator<dim>::
+estimate (const Mapping<dim>      &mapping,
+          const DH                &dof_handler,
+          const hp::QCollection<dim-1> &quadrature,
+          const typename FunctionMap<dim>::type &neumann_bc,
+          const InputVector       &solution,
+          Vector<float>           &error,
+          const std::vector<bool> &component_mask,
+          const Function<dim>     *coefficients,
+          const unsigned int       n_threads,
+          const unsigned int       subdomain_id,
+          const unsigned int       material_id)
+{
+				   // just pass on to the other function
+  const std::vector<const InputVector *> solutions (1, &solution);
+  std::vector<Vector<float>*>              errors (1, &error);
+  estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
+	    component_mask, coefficients, n_threads, subdomain_id, material_id);
+}
+
+
+template <int dim>
+template <typename InputVector, class DH>
+void
+KellyErrorEstimator<dim>::
+estimate (const DH                &dof_handler,
+          const hp::QCollection<dim-1> &quadrature,
+          const typename FunctionMap<dim>::type &neumann_bc,
+          const InputVector       &solution,
+          Vector<float>           &error,
+          const std::vector<bool> &component_mask,
+          const Function<dim>     *coefficients,
+          const unsigned int       n_threads,
+          const unsigned int       subdomain_id,
+          const unsigned int       material_id)
+{
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+  estimate(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, neumann_bc, solution,
+	   error, component_mask, coefficients, n_threads,
+           subdomain_id, material_id);
+}
 
 
 
@@ -724,6 +854,27 @@ template <int dim>
 template <typename InputVector, class DH>
 void
 KellyErrorEstimator<dim>::
+estimate (const Mapping<dim>                  &/*mapping*/,
+          const DH                            &/*dof_handler*/,
+          const hp::QCollection<dim-1>        &/*quadrature*/,
+          const typename FunctionMap<dim>::type &/*neumann_bc*/,
+          const std::vector<const InputVector *> &/*solutions*/,
+          std::vector<Vector<float>*>              &/*errors*/,
+          const std::vector<bool>                  &/*component_mask_*/,
+          const Function<dim>                 */*coefficients*/,
+          const unsigned int                   /*n_threads_*/,
+          const unsigned int                   /*subdomain_id*/,
+          const unsigned int                   /*material_id*/)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+template <int dim>
+template <typename InputVector, class DH>
+void
+KellyErrorEstimator<dim>::
 estimate (const Mapping<dim>                  &mapping,
           const DH                            &dof_handler,
           const Quadrature<dim-1>             &quadrature,
@@ -882,7 +1033,7 @@ estimate (const Mapping<dim>                  &mapping,
       (*errors[n]).reinit (dof_handler.get_tria().n_active_cells());
       for (unsigned int i=0;i<dof_handler.get_tria().n_active_cells();++i)
 	(*errors[n])(i)=0;
-    };
+    }
 
   unsigned int present_cell=0;
 
@@ -933,6 +1084,27 @@ template <int dim>
 template <typename InputVector, class DH>
 void KellyErrorEstimator<dim>::estimate (const DH                            &dof_handler,
 					 const Quadrature<dim-1>             &quadrature,
+					 const typename FunctionMap<dim>::type &neumann_bc,
+					 const std::vector<const InputVector *> &solutions,
+					 std::vector<Vector<float>*>              &errors,
+					 const std::vector<bool>                  &component_mask,
+					 const Function<dim>                 *coefficients,
+					 const unsigned int                   n_threads,
+                                         const unsigned int       subdomain_id,
+                                         const unsigned int       material_id)
+{
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));  
+  estimate(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
+	   errors, component_mask, coefficients, n_threads,
+           subdomain_id, material_id);
+}
+
+
+
+template <int dim>
+template <typename InputVector, class DH>
+void KellyErrorEstimator<dim>::estimate (const DH                            &dof_handler,
+					 const hp::QCollection<dim-1>             &quadrature,
 					 const typename FunctionMap<dim>::type &neumann_bc,
 					 const std::vector<const InputVector *> &solutions,
 					 std::vector<Vector<float>*>              &errors,
@@ -1076,8 +1248,8 @@ integrate_over_regular_face (const DH                                 &dof_handl
 	      for (unsigned int point=0; point<n_q_points; ++point)
 		per_thread_data.phi[n][point][component] *=
 		  per_thread_data.coefficient_values[point](component);
-	};
-    };
+	}
+    }
 
 
   if (face->at_boundary() == true)
@@ -1115,8 +1287,8 @@ integrate_over_regular_face (const DH                                 &dof_handl
 	    for (unsigned int component=0; component<n_components; ++component)
 	      for (unsigned int point=0; point<n_q_points; ++point)
 		per_thread_data.phi[n][point][component] -= g[point](component);
-	};
-    };
+	}
+    }
 
 
 				   // now phi contains the following:
@@ -1292,8 +1464,8 @@ integrate_over_irregular_face (const DH                                 &dof_han
 		  for (unsigned int point=0; point<n_q_points; ++point)
 		    per_thread_data.phi[n][point][component] *=
 		      per_thread_data.coefficient_values[point](component);
-	    };
-	};
+	    }
+	}
 
 				       // get the weights for the
 				       // integration. note that it
@@ -1319,7 +1491,7 @@ integrate_over_irregular_face (const DH                                 &dof_han
 				  per_thread_data.JxW_values[p];
 
       face_integrals[neighbor_child->face(neighbor_neighbor)] = face_integral;
-    };
+    }
 
 
 				   // finally loop over all subfaces to
@@ -1337,7 +1509,7 @@ integrate_over_irregular_face (const DH                                 &dof_han
       
       for (unsigned int n=0; n<n_solution_vectors; ++n)
 	sum[n] += face_integrals[face->child(subface_no)][n];
-    };
+    }
 
   face_integrals[face] = sum;
 }
@@ -1353,16 +1525,14 @@ template class KellyErrorEstimator<deal_II_dimension>;
 
 // instantiate the externally visible functions. define a list of functions
 // for vectors, where the vector/matrix can be replaced using a preprocessor
-// variable VectorType/MatrixType. note that we need a space between
-// "VectorType" and ">" to disambiguate ">>" when VectorType trails in an
-// angle bracket
-#define INSTANTIATE(InputVector,DH) \
+// variable VectorType/MatrixType
+#define INSTANTIATE_1(InputVector,DH,Q) \
 template    \
 void    \
 KellyErrorEstimator<deal_II_dimension>::    \
 estimate<InputVector,DH > (const Mapping<deal_II_dimension>      &,    \
           const DH   &,    \
-          const Quadrature<deal_II_dimension-1> &,    \
+          const Q<deal_II_dimension-1> &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
           const InputVector       &,    \
           Vector<float>           &,    \
@@ -1376,7 +1546,7 @@ template    \
 void    \
 KellyErrorEstimator<deal_II_dimension>::    \
 estimate<InputVector,DH > (const DH   &,    \
-          const Quadrature<deal_II_dimension-1> &,    \
+          const Q<deal_II_dimension-1> &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
           const InputVector       &,    \
           Vector<float>           &,    \
@@ -1391,7 +1561,7 @@ void    \
 KellyErrorEstimator<deal_II_dimension>::    \
 estimate<InputVector,DH > (const Mapping<deal_II_dimension>          &,    \
           const DH       &,    \
-          const Quadrature<deal_II_dimension-1>     &,    \
+          const Q<deal_II_dimension-1>     &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
           const std::vector<const InputVector *> &,    \
           std::vector<Vector<float>*> &,    \
@@ -1405,7 +1575,7 @@ template    \
 void    \
 KellyErrorEstimator<deal_II_dimension>::    \
 estimate<InputVector,DH > (const DH       &,    \
-          const Quadrature<deal_II_dimension-1>     &,    \
+          const Q<deal_II_dimension-1>     &,    \
           const FunctionMap<deal_II_dimension>::type &,    \
           const std::vector<const InputVector *> &,    \
           std::vector<Vector<float>*> &,    \
@@ -1414,6 +1584,11 @@ estimate<InputVector,DH > (const DH       &,    \
           const unsigned int           , \
           const unsigned int           , \
           const unsigned int)
+
+#define INSTANTIATE(InputVector,DH) \
+     INSTANTIATE_1(InputVector,DH,Quadrature); \
+     INSTANTIATE_1(InputVector,DH,hp::QCollection)
+
 
 INSTANTIATE(Vector<double>,DoFHandler<deal_II_dimension>);
 INSTANTIATE(Vector<float>,DoFHandler<deal_II_dimension>);
