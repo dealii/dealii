@@ -202,17 +202,17 @@ estimate (const DH   &dof_handler,
 
 template <typename InputVector, class DH>
 void KellyErrorEstimator<1>::
-estimate (const Mapping<1>                    &mapping,
-          const DH                 &dof_handler,
-          const hp::QCollection<0>                 &,
-          const FunctionMap<1>::type          &neumann_bc,
-          const std::vector<const InputVector *> &solutions,
-          std::vector<Vector<float>*>              &errors,
-          const std::vector<bool>                  &component_mask_,
-          const Function<1>                   *coefficient,
+estimate (const Mapping<1>                    &/*mapping*/,
+          const DH                            &/*dof_handler*/,
+          const hp::QCollection<0>            &,
+          const FunctionMap<1>::type          &/*neumann_bc*/,
+          const std::vector<const InputVector *> &/*solutions*/,
+          std::vector<Vector<float>*>            &/*errors*/,
+          const std::vector<bool>                &/*component_mask_*/,
+          const Function<1>                   */*coefficient*/,
           const unsigned int,
-          const unsigned int                  subdomain_id,
-          const unsigned int                  material_id)
+          const unsigned int                   /*subdomain_id*/,
+          const unsigned int                   /*material_id*/)
 {
   Assert (false, ExcInternalError());
 }
