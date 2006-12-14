@@ -1769,10 +1769,13 @@ class RightHandSide : public Function<dim>
 
 template <int dim>
 double
-RightHandSide<dim>::value (const Point<dim>   &/*p*/,
+RightHandSide<dim>::value (const Point<dim>   &p,
 			   const unsigned int  /*component*/) const
 {
-  return 1.;
+  double product = 1;
+  for (unsigned int d=0; d<dim; ++d)
+    product *= (p[d]+1);
+  return product;
 }
 
 
@@ -1797,15 +1800,6 @@ void
 run_simulation (LaplaceSolver::Base<dim>                     &solver,
 		const std::list<Evaluation::EvaluationBase<dim> *> &postprocessor_list)
 {
-				   // We will give an indicator of the
-				   // step we are presently computing,
-				   // in order to keep the user
-				   // informed that something is still
-				   // happening, and that the program
-				   // is not in an endless loop. This
-				   // is the head of this status line:
-  std::cout << "Refinement cycle: ";
-
 				   // Then start a loop which only
 				   // terminates once the number of
 				   // degrees of freedom is larger
@@ -1815,17 +1809,8 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 				   // your program).
   for (unsigned int step=0; true; ++step)
     {
-				       // Then give the <code>alive</code>
-				       // indication for this
-				       // iteration. Note that the
-				       // <code>std::flush</code> is needed to
-				       // have the text actually
-				       // appear on the screen, rather
-				       // than only in some buffer
-				       // that is only flushed the
-				       // next time we issue an
-				       // end-line.
-      std::cout << step << " " << std::flush;
+      std::cout << "Refinement cycle: "
+		<< step << " " << std::endl;
 
 				       // Now solve the problem on the
 				       // present grid, and run the
@@ -1843,7 +1828,7 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 	{
 	  (*i)->set_refinement_cycle (step);
 	  solver.postprocess (**i);
-	};
+	}
 
 
 				       // Now check whether more
@@ -1854,7 +1839,9 @@ run_simulation (LaplaceSolver::Base<dim>                     &solver,
 	solver.refine_grid ();
       else
 	break;
-    };
+
+      std::cout << std::endl;
+    }
 
 				   // Finally end the line in which we
 				   // displayed status reports:
