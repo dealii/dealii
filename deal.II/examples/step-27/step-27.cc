@@ -34,7 +34,7 @@
 #include <grid/tria_boundary_lib.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
-#include <fe/fe_values.h>
+#include <fe/hp_fe_values.h>
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
 #include <numerics/data_out.h>
@@ -70,8 +70,9 @@ class LaplaceProblem
 
     Triangulation<dim>   triangulation;
 
-    DoFHandler<dim>      dof_handler;
-    FE_Q<dim>            fe;
+    hp::DoFHandler<dim>      dof_handler;
+    hp::FECollection<dim>    fe_collection;
+    hp::QCollection<dim>     quadrature_collection;
 
     ConstraintMatrix     hanging_node_constraints;
 
@@ -85,9 +86,14 @@ class LaplaceProblem
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
-		dof_handler (triangulation),
-                fe (2)
-{}
+		dof_handler (triangulation)
+{
+  for (unsigned int degree=1; degree<5; ++degree)
+    {
+      fe_collection.push_back (FE_Q<dim>(degree));
+      quadrature_collection.push_back (QGauss<dim>(degree+2));
+    }
+}
 
 
 template <int dim>
@@ -99,7 +105,7 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs (fe_collection);
 
   sparsity_pattern.reinit (dof_handler.n_dofs(),
 			   dof_handler.n_dofs(),
@@ -123,32 +129,31 @@ void LaplaceProblem<dim>::setup_system ()
 
 template <int dim>
 void LaplaceProblem<dim>::assemble_system () 
-{  
-  const QGauss<dim>  quadrature_formula(3);
+{
+  hp::FEValues<dim> hp_fe_values (fe_collection,
+				  quadrature_collection, 
+				  update_values    |  update_gradients |
+				  update_q_points  |  update_JxW_values);
 
-  FEValues<dim> fe_values (fe, quadrature_formula, 
-			   update_values    |  update_gradients |
-			   update_q_points  |  update_JxW_values);
-
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
-
-  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs (dofs_per_cell);
-
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-
-  typename DoFHandler<dim>::active_cell_iterator
+  typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
+      const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
+      FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+      Vector<double>       cell_rhs (dofs_per_cell);
+
+      std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
       cell_matrix = 0;
       cell_rhs = 0;
 
-      fe_values.reinit (cell);
+      hp_fe_values.reinit (cell);
 
-      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+      const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values ();
+      
+      for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -238,7 +243,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
     const std::string filename = "solution-" +
 				 Utilities::int_to_string (cycle, 2) +
 				 ".gnuplot";
-    DataOut<dim> data_out;
+    DataOut<dim,hp::DoFHandler<dim> > data_out;
 
     data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, "solution");
