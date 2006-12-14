@@ -130,11 +130,11 @@ class GridTools
 				      * considered_vertices are tested for
 				      * equality. This speeds up the algorithm,
 				      * which is quadratic and thus quite slow
-				      * to begin with. However, if you whish to
+				      * to begin with. However, if you wish to
 				      * consider all vertices, simply pass an
 				      * empty vector.
 				      *
-				      * Two vertices are considered equal, if
+				      * Two vertices are considered equal if
 				      * their difference in each coordinate
 				      * direction is less than @p tol.
 				      */
@@ -144,7 +144,7 @@ class GridTools
 				     std::vector<CellData<dim> > &cells,
 				     SubCellData                 &subcelldata,
 				     std::vector<unsigned int>   &considered_vertices,
-				     double                       tol=1e-12);
+				     const double                 tol=1e-12);
     
 				     /**
 				      * Transform the vertices of the
