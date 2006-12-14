@@ -33,8 +33,8 @@ DEAL::DEAL_II_PATH/lac/include/lac/block_vector.h
 DEAL::DEAL_II_CCPATH="DEAL_II_PATH/lac/include/lac/::DEAL_II_PATH/lac/source/"
 DEAL:: Suffixes "" ".h" ".c" ".cc"
 DEAL::DEAL_II_MESHPATH=":DEAL_II_PATH/lib/meshes/"
-DEAL:: Suffixes "" ".inp" ".xda" ".dbmesh"
-DEAL::PathSearch[MESH] 2 directories 4 suffixes
+DEAL:: Suffixes "" ".inp" ".xda" ".dbmesh" ".dat" ".plt" ".nc" ".msh"
+DEAL::PathSearch[MESH] 2 directories 8 suffixes
 DEAL::PathSearch[MESH] 2 directories 
 DEAL::PathSearch[MESH] trying backstep
 DEAL::PathSearch[MESH] trying DEAL_II_PATH/lib/meshes/backstep
@@ -42,7 +42,7 @@ DEAL::PathSearch[MESH] 2 directories
 DEAL::PathSearch[MESH] trying backstep.inp
 DEAL::PathSearch[MESH] trying DEAL_II_PATH/lib/meshes/backstep.inp
 DEAL::PathSearch[MESH] opened DEAL_II_PATH/lib/meshes/backstep.inp
-DEAL::PathSearch[MESH] 2 directories 4 suffixes
+DEAL::PathSearch[MESH] 2 directories 8 suffixes
 DEAL::PathSearch[MESH] 2 directories 
 DEAL::PathSearch[MESH] trying backstep
 DEAL::PathSearch[MESH] trying DEAL_II_PATH/lib/meshes/backstep
