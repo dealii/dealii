@@ -65,6 +65,7 @@ class LaplaceProblem
     void setup_system ();
     void assemble_system ();
     void solve ();
+    void create_coarse_grid ();
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
@@ -255,10 +256,11 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 }
 
 
-void
-create_coarse_grid (Triangulation<2> &coarse_grid)
+template <>
+void LaplaceProblem<2>::create_coarse_grid ()
 {
   const unsigned int dim = 2;
+  
   static const Point<2> vertices_1[]
     = {  Point<2> (-1.,   -1.),
          Point<2> (-1./2, -1.),
@@ -318,10 +320,10 @@ create_coarse_grid (Triangulation<2> &coarse_grid)
       cells[i].material_id = 0;
     }
 
-  coarse_grid.create_triangulation (vertices,
+  triangulation.create_triangulation (vertices,
                                     cells,
                                     SubCellData());
-  coarse_grid.refine_global (1);
+  triangulation.refine_global (1);
 }
 
 
@@ -334,7 +336,7 @@ void LaplaceProblem<dim>::run ()
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
-	create_coarse_grid (triangulation);
+	create_coarse_grid ();
       else
 	refine_grid ();
       
