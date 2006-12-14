@@ -13,6 +13,8 @@
 
 #include <base/path_search.h>
 #include <base/logstream.h>
+#include <base/utilities.h>
+#include <grid/grid_in.h>
 
 #include <iostream>
 #include <cstdio>
@@ -40,12 +42,18 @@ PathSearch::initialize_classes()
   v.push_back(std::string(".prm"));
   suffix_lists.insert(map_type(std::string("PARAMETER"), v));
 
-//TODO[GK]: instead of listing by hand here, query the GridIn class which formats it can presently read
+//TODO[GK]: instead of listing by hand here, query the GridIn class which formats it can presently read.
+//[Tobias Leicht]: the problem with this approach is that we would could not link with a base-lib alone
+// (undefined reference problem). we do that in the tests, however.
   v.clear();
   v.push_back(empty);
   v.push_back(std::string(".inp"));
   v.push_back(std::string(".xda"));
   v.push_back(std::string(".dbmesh"));
+  v.push_back(std::string(".dat"));
+  v.push_back(std::string(".plt"));
+  v.push_back(std::string(".nc"));
+  v.push_back(std::string(".msh"));
   suffix_lists.insert(map_type(std::string("MESH"), v));
 }
 

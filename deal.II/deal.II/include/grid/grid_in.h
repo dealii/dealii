@@ -123,7 +123,11 @@ class SubCellData;
  * mesh generator (see http://www.geuz.org/gmsh/ ). The documentation
  * in the @p GMSH manual explains how to generate meshes compatible with
  * the deal.II library (i.e. quads rather than triangles).
- * </ul>
+ *
+ * <li> <tt>Tecplot</tt> format: this format is used by @p TECPLOT and often
+ * serves as a basis for data exchange between different applications. Note,
+ * that currently only the ASCII format is supported, binary data cannot be
+ * read.  </ul>
  *
  *
  * <h3>Structure of input grid data. The GridReordering class</h3>
@@ -208,7 +212,9 @@ class GridIn
 					   /// Use read_msh()
 	  msh,
 					   /// Use read_netcdf()
-	  netcdf
+	  netcdf,
+					   /// Use read_tecplot()
+	  tecplot
     };
     
 				     /**
@@ -276,6 +282,14 @@ class GridIn
 				      * NetCDF library.
 				      */
     void read_netcdf (const std::string &filename);
+    
+    				     /**
+				      * Read grid data from a file containing
+				      * tecplot ASCII data. This also works in
+				      * the absence of any tecplot
+				      * installation.
+				      */
+    void read_tecplot (std::istream &in);
     
 				     /**
 				      * Returns the standard suffix
@@ -384,6 +398,25 @@ class GridIn
     static void skip_comment_lines (std::istream    &in,
 				    const char  comment_start);
 
+				     /**
+				      * This function does the nasty work (due
+				      * to very lax conventions and different
+				      * versions of the tecplot format) of
+				      * extracting the important parameters from
+				      * a tecplot header, contained in the
+				      * string @p header. The other variables
+				      * are output variables, their value has no
+				      * influence on the function execution..
+				      */
+    static void parse_tecplot_header(std::string   &header,
+				     unsigned int (&tecplot2deal)[dim],
+				     unsigned int  &n_vars,
+				     unsigned int  &n_vertices,
+				     unsigned int  &n_cells,
+				     unsigned int (&IJK)[dim],
+				     bool          &structured,
+				     bool          &blocked);
+    
 				     /**
 				      * This function can write the
 				      * raw cell data objects created

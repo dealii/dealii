@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <base/path_search.h>
+#include <base/utilities.h>
 
 #include <grid/grid_in.h>
 #include <grid/tria.h>
@@ -21,13 +22,13 @@
 #include <map>
 #include <algorithm>
 #include <fstream>
+#include <cctype>
 
 #ifdef HAVE_LIBNETCDF
 #include <netcdfcpp.h>
 #endif
 
 DEAL_II_NAMESPACE_OPEN
-
 
 template <int dim>
 GridIn<dim>::GridIn () :
@@ -1224,6 +1225,449 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 
 #endif
 
+template <int dim>
+void GridIn<dim>::parse_tecplot_header(std::string &header,
+				       unsigned int (&tecplot2deal)[dim],
+				       unsigned int &n_vars,
+				       unsigned int &n_vertices,
+				       unsigned int &n_cells,
+				       unsigned int (&IJK)[dim],
+				       bool &structured,
+				       bool &blocked)
+{
+				   // initialize the output variables
+  n_vars=0;
+  n_vertices=0;
+  n_cells=0;
+  switch(dim)
+    {
+      case 3:
+	    IJK[2]=0;
+      case 2:
+	    IJK[1]=0;
+      case 1:
+	    IJK[0]=0;
+    }
+  structured=true;
+  blocked=false;
+  
+				   // convert the string to upper case
+  transform(header.begin(),header.end(),header.begin(),::toupper);
+  
+				   // replace all tabs, commas, newlines by
+				   // whitespaces
+  std::replace(header.begin(),header.end(),'\t',' ');
+  std::replace(header.begin(),header.end(),',',' ');
+  std::replace(header.begin(),header.end(),'\n',' ');
+  
+				   // now remove whitespace in front of and
+				   // after '='
+  std::string::size_type pos=header.find("=");
+  
+  while(pos!=static_cast<std::string::size_type>(std::string::npos))
+    if(header[pos+1]==' ')
+      header.erase(pos+1,1);
+    else if (header[pos-1]==' ')
+      {
+	header.erase(pos-1,1);
+	--pos;
+      }
+    else
+      pos=header.find("=",++pos);
+  
+				   // split the string into individual entries
+  std::vector<std::string> entries=Utilities::break_text_into_lines(header,1,' ');
+
+				   // now go through the list and try to extract
+  for (unsigned int i=0; i<entries.size(); ++i)
+    {
+      if (Utilities::match_at_string_start(entries[i],"VARIABLES=\""))
+	{
+	  ++n_vars;
+					   // we assume, that the first variable
+					   // is x or no coordinate at all (not y or z)
+	  if (Utilities::match_at_string_start(entries[i],"VARIABLES=\"X\""))
+	    {
+	      tecplot2deal[0]=0;
+	    }
+	  ++i;
+	  while(entries[i][0]=='"')
+	    {
+	      if (entries[i]=="\"X\"")
+		tecplot2deal[0]=n_vars;
+	      else if (entries[i]=="\"Y\"")
+		{
+		  AssertThrow(dim>1,
+			      ExcMessage("Tecplot file contains Y data, which is not possible for 1d plot"));
+		  tecplot2deal[1]=n_vars;
+		}
+	      else if (entries[i]=="\"Z\"")
+		switch (dim)
+		  {
+		    case 1:
+			  AssertThrow(false,
+				      ExcMessage("Tecplot file contains Y data, which is not possible for 1d plot"));
+			  break;
+		    case 2:
+							   // we assume, that z
+							   // contains the data
+							   // which is intended
+							   // as y in deal
+			  tecplot2deal[1]=n_vars;
+			  break;
+		    case 3:
+			  tecplot2deal[2]=n_vars;
+			  break;
+		  }
+	      ++n_vars;
+	      ++i;
+	    }
+					   // set i back, so that the next
+					   // string is treated correctly
+	  --i;
+	  
+	  AssertThrow(n_vars>=dim,
+		      ExcMessage("Tecplot file must contain at least one variable for each dimension"));
+	  for (unsigned int i=1; i<dim; ++i)
+	    AssertThrow(tecplot2deal[i]>0,
+			ExcMessage("Tecplot file must contain at least one variable for each dimension."));
+	}
+      else if (Utilities::match_at_string_start(entries[i],"ZONETYPE=ORDERED"))
+	structured=true;
+      else if (Utilities::match_at_string_start(entries[i],"ZONETYPE=FELINESEG") && dim==1)
+	structured=false;
+      else if (Utilities::match_at_string_start(entries[i],"ZONETYPE=FEQUADRILATERAL") && dim==2)
+	structured=false;
+      else if (Utilities::match_at_string_start(entries[i],"ZONETYPE=FEBRICK") && dim==3)
+	structured=false;
+      else if (Utilities::match_at_string_start(entries[i],"ZONETYPE="))
+					 // unsupported ZONETYPE
+	{
+	  AssertThrow(false,ExcMessage("The tecplot file contains an unsupported ZONETYPE."));
+	}
+      else if (Utilities::match_at_string_start(entries[i],"DATAPACKING=POINT"))
+	blocked=false;
+      else if (Utilities::match_at_string_start(entries[i],"DATAPACKING=BLOCK"))
+	blocked=true;
+      else if (Utilities::match_at_string_start(entries[i],"F=POINT"))
+	{
+	  structured=true;
+	  blocked=false;
+	}
+      else if (Utilities::match_at_string_start(entries[i],"F=BLOCK"))
+	{
+	  structured=true;
+	  blocked=true;
+	}
+      else if (Utilities::match_at_string_start(entries[i],"F=FEPOINT"))
+	{
+	  structured=false;
+	  blocked=false;
+	}
+      else if (Utilities::match_at_string_start(entries[i],"F=FEBLOCK"))
+	{
+	  structured=false;
+	  blocked=true;
+	}
+      else if (Utilities::match_at_string_start(entries[i],"ET=QUADRILATERAL") && dim==2)
+	structured=false;
+      else if (Utilities::match_at_string_start(entries[i],"ET=BRICK") && dim==3)
+	structured=false;
+      else if (Utilities::match_at_string_start(entries[i],"ET="))
+					 // unsupported ElementType
+	{
+	  AssertThrow(false,ExcMessage("The tecplot file contains an unsupported ElementType."));
+	}
+      else if (Utilities::match_at_string_start(entries[i],"I="))
+	IJK[0]=Utilities::get_integer_at_position(entries[i],2).first;
+      else if (Utilities::match_at_string_start(entries[i],"J="))
+	{
+	  IJK[1]=Utilities::get_integer_at_position(entries[i],2).first;
+	  AssertThrow(dim>1 || IJK[1]==1,
+		      ExcMessage("Parameter 'J=' found in tecplot, although this is only possible for dimensions greater than 1."));
+	}
+      else if (Utilities::match_at_string_start(entries[i],"K="))
+	{
+	  IJK[2]=Utilities::get_integer_at_position(entries[i],2).first;
+	  AssertThrow(dim>2 || IJK[2]==1,
+		      ExcMessage("Parameter 'K=' found in tecplot, although this is only possible for dimensions greater than 2."));
+	}
+      else if (Utilities::match_at_string_start(entries[i],"N="))
+	n_vertices=Utilities::get_integer_at_position(entries[i],2).first;
+      else if (Utilities::match_at_string_start(entries[i],"E="))
+	n_cells=Utilities::get_integer_at_position(entries[i],2).first;
+    }
+  
+				   // now we have read all the fields we are
+				   // interested in. do some checks and
+				   // calculate the variables
+  if (structured)
+    {
+      n_vertices=1;
+      n_cells=1;
+      for (unsigned int d=0; d<dim; ++d)
+	{
+	  AssertThrow(IJK[d]>0,
+		      ExcMessage("Tecplot file does not contain a complete and consistent set of parameters"));
+	  n_vertices*=IJK[d];
+	  n_cells*=(IJK[d]-1);
+	}
+    }
+  else
+    {
+      AssertThrow(n_vertices>0,
+		  ExcMessage("Tecplot file does not contain a complete and consistent set of parameters"));
+      if (n_cells==0)
+					 // this means an error, although
+					 // tecplot itself accepts entries like
+					 // 'J=20' instead of 'E=20'. therefore,
+					 // take the max of IJK
+	n_cells=*std::max_element(IJK,IJK+dim);
+      AssertThrow(n_cells>0,
+		  ExcMessage("Tecplot file does not contain a complete and consistent set of parameters"));
+    }
+}
+
+
+
+#if deal_II_dimension == 2
+
+template <>
+void GridIn<2>::read_tecplot (std::istream &in)
+{
+  const unsigned int dim=2;
+  Assert (tria != 0, ExcNoTriangulationSelected());
+  AssertThrow (in, ExcIO());
+  
+				   // skip comments at start of file
+  skip_comment_lines (in, '#');
+
+				   // some strings for parsing the header
+  std::string line, header;
+				   
+				   // first, concatenate all header lines
+				   // create a searchstring with almost all
+				   // letters. exclude e and E from the letters
+				   // to search, as they might appear in
+				   // exponential notation
+  std::string letters ="abcdfghijklmnopqrstuvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ";
+
+  getline(in,line);
+  while(line.find_first_of(letters)!=std::string::npos)
+    {
+      header+=" "+line;
+      getline(in,line);
+    }
+  
+				   // now create some variables holding
+				   // important information on the mesh, get
+				   // this information from the header string
+  unsigned int tecplot2deal[dim],
+    n_vars,
+    n_vertices,
+    n_cells,
+    IJK[dim];
+  bool structured,
+    blocked;
+
+  parse_tecplot_header(header,
+		       tecplot2deal,n_vars,n_vertices,n_cells,IJK,
+		       structured,blocked);
+  
+				   // reserve space for vertices. note, that in
+				   // tecplot vertices are ordered beginning
+				   // with 1, whereas in deal all indices start
+				   // with 0. in order not to use -1 for all the
+				   // connectivity information, a 0th vertex
+				   // (unused) is inserted at the origin.
+  std::vector<Point<dim> > vertices(n_vertices+1);
+  vertices[0]=Point<dim>();
+				   // reserve space for cells
+  std::vector<CellData<dim> > cells(n_cells);
+  SubCellData                 subcelldata;
+
+  if (blocked)
+    {
+				       // blocked data format. first we get all
+				       // the values of the first variable for
+				       // all points, after that we get all
+				       // values for the second variable and so
+				       // on.
+
+				       // dummy variable to read in all the info
+				       // we do not want to use
+      double dummy;
+				       // which is the first index to read in
+				       // the loop (see below)
+      unsigned int next_index=0;
+      
+      				       // note, that we have already read the
+				       // first line containing the first variable
+      if (tecplot2deal[0]==0)
+	{
+					   // we need the information in this
+					   // line, so extract it
+	  std::vector<std::string> first_var=Utilities::break_text_into_lines(line,1);
+	  char *endptr;
+	  for (unsigned int i=1; i<first_var.size()+1; ++i)
+	    vertices[i](0) = std::strtod (first_var[i-1].c_str(), &endptr);
+
+					   // if there are many points, the data
+					   // for this var might continue in the
+					   // next line(s)
+	  for (unsigned int j=first_var.size()+1; j<n_vertices+1; ++j)
+	    in>>vertices[j](next_index);
+					   // now we got all values of the first
+					   // variable, so increase the counter
+	  next_index=1;
+	}
+
+				       // main loop over all variables
+      for (unsigned int i=1; i<n_vars; ++i)
+	{
+					     // if we read all the important
+					     // variables and do not want to
+					     // read further, because we are
+					     // using a structured grid, we can
+					     // stop here (and skip, for
+					     // example, a whole lot of solution
+					     // variables)
+	  if (next_index==dim && structured)
+	    break;
+	  
+	  if (i==tecplot2deal[next_index])
+	    {
+					       // we need this line, read it in
+	      for (unsigned int j=1; j<n_vertices+1; ++j)
+		in>>vertices[j](next_index);
+	      ++next_index;
+	    }
+	  else
+	    {
+					       // we do not need this line, read
+					       // it in and discard it
+	      for (unsigned int j=1; j<n_vertices+1; ++j)
+		in>>dummy;
+	    }
+	}
+      Assert(next_index==dim, ExcInternalError());
+    }
+  else
+    {
+				       // the data is not blocked, so we get all
+				       // the variables for one point, then the
+				       // next and so on. create a vector to
+				       // hold these components
+      std::vector<double> vars(n_vars);
+      
+				       // now fill the first vertex. note, that we
+				       // have already read the first line
+				       // containing the first vertex
+      std::vector<std::string> first_vertex=Utilities::break_text_into_lines(line,1);
+      char *endptr;
+      for (unsigned int d=0; d<dim; ++d)
+	  vertices[1](d) = std::strtod (first_vertex[tecplot2deal[d]].c_str(), &endptr);
+      
+				       // read the remaining vertices from the
+				       // list
+      for (unsigned int v=2; v<n_vertices+1; ++v)
+	{
+	  for (unsigned int i=0; i<n_vars; ++i)
+	    in>>vars[i];
+					   // fill the vertex
+					   // coordinates. respect the position
+					   // of coordinates in the list of
+					   // variables
+	  for (unsigned int i=0; i<dim; ++i)
+	       vertices[v](i)=vars[tecplot2deal[i]];
+	}
+    }
+  
+  if (structured)
+    {
+				       // this is the part of the code that only
+				       // works in 2d
+      unsigned int I=IJK[0],
+		   J=IJK[1];
+      
+      unsigned int cell=0;
+      // set up array of cells
+      for (unsigned int j=0; j<J-1; ++j) 
+	for (unsigned int i=1; i<I; ++i)
+	  {
+	    cells[cell].vertices[0]=i+  j    *I;
+	    cells[cell].vertices[1]=i+1+j    *I;
+	    cells[cell].vertices[2]=i+1+(j+1)*I;
+	    cells[cell].vertices[3]=i  +(j+1)*I;
+	    ++cell;
+	  }
+      Assert(cell=n_cells, ExcInternalError());
+      std::vector<unsigned int> boundary_vertices(2*I+2*J-4);
+      unsigned int k=0;
+      for (unsigned int i=1;i<I+1;++i)
+	{
+	  boundary_vertices[k]=i;
+	  ++k;
+	  boundary_vertices[k]=i+(J-1)*I;
+	  ++k;
+	}
+      for (unsigned int j=1;j<J-1;++j)
+	{
+	  boundary_vertices[k]=1+j*I;
+	  ++k;
+	  boundary_vertices[k]=I+j*I;
+	  ++k;
+	}
+      Assert(k==boundary_vertices.size(), ExcInternalError());
+				       // delete the duplicated vertices at the
+				       // boundary, which occur, e.g. in c-type
+				       // or o-type grids around a body
+				       // (airfoil). this automatically deletes
+				       // unused vertices as well.
+      GridTools::delete_duplicated_vertices(vertices,cells,subcelldata,boundary_vertices);
+    }
+  else
+    {
+				       // set up array of cells, unstructured
+				       // mode, so the connectivity is
+				       // explicitly given
+      for (unsigned int i=0; i<n_cells; ++i) 
+	{
+					   // note that since in the input file
+					   // we found the number of cells at
+					   // the top, there should still be
+					   // input here, so check this:
+	  AssertThrow (in, ExcIO());
+	  
+					   // get the connectivity from the
+					   // input file. the vertices are
+					   // ordered like in the ucd format
+	  for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
+	    in>>cells[i].vertices[j];
+	}
+				       // do some clean-up on vertices
+      GridTools::delete_unused_vertices (vertices, cells, subcelldata);
+    }
+  
+				   // check that no forbidden arrays are
+				   // used. as we do not read in any
+				   // subcelldata, nothing should happen here.
+  Assert (subcelldata.check_consistency(dim), ExcInternalError());
+  AssertThrow (in, ExcIO());
+
+				   // do some cleanup on cells
+  GridReordering<dim>::invert_all_cells_of_negative_grid (vertices, cells);
+  GridReordering<dim>::reorder_cells (cells);
+  tria->create_triangulation_compatibility (vertices, cells, subcelldata);
+}
+
+#endif
+
+template <int dim>
+void GridIn<dim>::read_tecplot(std::istream &)
+{
+  Assert(false, ExcNotImplemented());
+}
 
 
 template <int dim>
@@ -1269,6 +1713,9 @@ void GridIn<dim>::skip_comment_lines (std::istream &in,
 				   // put back first character of
 				   // first non-comment line
   in.putback (c);
+
+  // at last: skip additional empty lines, if present
+  skip_empty_lines(in);
 }
 
 
@@ -1494,6 +1941,10 @@ void GridIn<dim>::read (std::istream& in,
 				 "functions, instead."));
 	return;
 
+      case tecplot:
+	read_tecplot (in);
+	return;
+	
       case Default:
 	break;
    }
@@ -1518,6 +1969,8 @@ GridIn<dim>::default_suffix (const Format format)
 	return ".xda";
       case netcdf:
 	return ".nc";
+      case tecplot:
+	return ".dat";
       default: 
 	Assert (false, ExcNotImplemented()); 
 	return ".unknown_format";
@@ -1551,6 +2004,24 @@ GridIn<dim>::parse_format (const std::string &format_name)
   if (format_name == "nc")
     return netcdf;
 
+  if (format_name == "tecplot")
+    return tecplot;
+
+  if (format_name == "dat")
+    return tecplot;
+
+  if (format_name == "plt")
+				     // Actually, this is the extension for the
+				     // tecplot binary format, which we do not
+				     // support right now. However, some people
+				     // tend to create tecplot ascii files with
+				     // the extension 'plt' instead of
+				     // 'dat'. Thus, include this extension
+				     // here. If it actually is a binary file,
+				     // the read_tecplot() function will fail
+				     // and throw an exception, anyway.
+    return tecplot;
+
   AssertThrow (false, ExcInvalidState ());
 				   // return something weird
   return Format(Default);
@@ -1561,7 +2032,7 @@ GridIn<dim>::parse_format (const std::string &format_name)
 template <int dim>
 std::string GridIn<dim>::get_format_names () 
 {
-  return "dbmesh|msh|ucd|xda|netcdf";
+  return "dbmesh|msh|ucd|xda|netcdf|tecplot";
 }
 
 
