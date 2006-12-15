@@ -661,7 +661,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
   
   const unsigned int
     n_rows           = sparsity_pattern->n_rows();
-  const unsigned int * const
+  const std::size_t * const
     rowstart_indices = sparsity_pattern->get_rowstart_indices();
   const unsigned int * const
     col_nums         = sparsity_pattern->get_column_numbers();
@@ -991,7 +991,7 @@ SparseDirectMA27::fill_A (const SparseMatrix<number> &matrix)
   const SparsityPattern &sparsity_pattern = matrix.get_sparsity_pattern ();
   
   const unsigned int n_rows = sparsity_pattern.n_rows();
-  const unsigned int *rowstart_indices = sparsity_pattern.get_rowstart_indices();
+  const std::size_t  *rowstart_indices = sparsity_pattern.get_rowstart_indices();
   const unsigned int *col_nums         = sparsity_pattern.get_column_numbers();
 
   unsigned int global_index = 0;
@@ -1236,7 +1236,7 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
   
   const unsigned int
     n_rows           = sparsity_pattern.n_rows();
-  const unsigned int * const
+  const std::size_t * const
     rowstart_indices = sparsity_pattern.get_rowstart_indices();
   const unsigned int * const
     col_nums         = sparsity_pattern.get_column_numbers();
@@ -1508,7 +1508,7 @@ SparseDirectMA47::fill_A (const SparseMatrix<double> &matrix)
   const SparsityPattern &sparsity_pattern = matrix.get_sparsity_pattern ();
   
   const unsigned int n_rows = sparsity_pattern.n_rows();
-  const unsigned int *rowstart_indices = sparsity_pattern.get_rowstart_indices();
+  const std::size_t  *rowstart_indices = sparsity_pattern.get_rowstart_indices();
   const unsigned int *col_nums         = sparsity_pattern.get_column_numbers();
 
   unsigned int global_index = 0;

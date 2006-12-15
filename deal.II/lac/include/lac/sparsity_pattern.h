@@ -1257,7 +1257,7 @@ class SparsityPattern : public Subscriptor
 				      * avoid programs relying on outdated
 				      * information!
 				      */
-    inline const unsigned int * get_rowstart_indices () const;
+    inline const std::size_t * get_rowstart_indices () const;
 
 				     /**
 				      * @deprecated. Use @p row_length and
@@ -1396,7 +1396,7 @@ class SparsityPattern : public Subscriptor
 				      * may be larger than the actually used
 				      * part of the array.
 				      */
-    unsigned int max_vec_len;
+    std::size_t max_vec_len;
 
 				     /**
 				      * Maximum number of elements per
@@ -1439,7 +1439,7 @@ class SparsityPattern : public Subscriptor
 				      * number of elements that was allocated
 				      * is stored in #max_dim.
 				      */
-    unsigned int *rowstart;
+    std::size_t *rowstart;
 
 				     /**
 				      * Array of column numbers. In
@@ -1961,7 +1961,7 @@ SparsityPattern::optimize_diagonal () const
 
 
 inline
-const unsigned int *
+const std::size_t *
 SparsityPattern::get_rowstart_indices () const
 {
   return rowstart;

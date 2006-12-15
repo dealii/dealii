@@ -689,12 +689,22 @@ inconvenience this causes.
 
 <ol>
 
-  <li> <p>Improved: The class <code
-       class="class">LAPACKFullMatrix</code> now also uses LU factorization
-       of LAPACK. The new wrapper <code class="class">PreconditionLU</code>
-       allows us to use this as a preconditioner.
+  <li> <p>Improved: The <code
+       class="class">SparsityPattern</code> class would produce
+       segmentation faults if one tried to allocate a matrix with more
+       than about 4.2 billion elements (i.e. the number that one can
+       store in a 32-bit unsigned integer). This is now fixed: if you
+       have enough memory, this is now possible on 64-bit
+       systems. (The number of rows is still limited by the 32-bit
+       limit, but this is probably going to be enough for some time to
+       come.) This fix also required changing the return type of the
+       <code>SparsityPattern::get_rowstart_indices</code> function
+       from <code>const unsigned int *</code> to <code>const
+       std::size_t *</code>; since this function should not be used
+       outside of the library anyway, this is probably not a change
+       that affects user code.
        <br>
-       (GK 2006/10/02)
+       (WB 2006/12/14)
        </p>
 
   <li> <p>New: The class <code

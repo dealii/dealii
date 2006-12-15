@@ -933,7 +933,7 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
   const unsigned int n = src.size();
   somenumber              *dst_ptr = dst.begin();
   const somenumber        *src_ptr = src.begin();
-  const unsigned int *rowstart_ptr = &cols->rowstart[0];
+  const std::size_t  *rowstart_ptr = &cols->rowstart[0];
 
 				   // optimize the following loop for
 				   // the case that the relaxation
@@ -976,7 +976,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>       &dst,
   Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
 
   const unsigned int  n            = src.size();
-  const unsigned int *rowstart_ptr = &cols->rowstart[0];
+  const std::size_t  *rowstart_ptr = &cols->rowstart[0];
   somenumber         *dst_ptr      = &dst(0);
 
 				   // forward sweep

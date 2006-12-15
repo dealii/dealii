@@ -299,7 +299,7 @@ SparsityPattern::reinit (
       max_row_length = 0;
       compressed = false;
       return;
-    };
+    }
 
 				   // first, if the matrix is
 				   // quadratic and special treatment
@@ -320,7 +320,7 @@ SparsityPattern::reinit (
 				   // note that the number of elements
 				   // per row is bounded by the number
 				   // of columns
-  unsigned int vec_len = 0;
+  std::size_t vec_len = 0;
   for (unsigned int i=0; i<m; ++i)
     vec_len += std::min((diagonal_optimized ?
 			 std::max(row_lengths[i], 1U) :
@@ -337,36 +337,64 @@ SparsityPattern::reinit (
   if (vec_len == 0)
     {
       vec_len = 1;
-      if (colnums) delete[] colnums;
+      if (colnums)
+	{
+	  delete[] colnums;
+	  colnums = 0;
+	}
+      
       max_vec_len = vec_len;
       colnums = new unsigned int[max_vec_len];
     }
   
   max_row_length = (row_lengths.size() == 0 ?
 		    0 :
-		    std::min (*std::max_element(row_lengths.begin(), row_lengths.end()),
+		    std::min (*std::max_element(row_lengths.begin(),
+						row_lengths.end()),
 			      n));
 
   if (diagonal_optimized && (max_row_length==0) && (m!=0))
     max_row_length = 1;
   
 				   // allocate memory for the rowstart
-				   // values, if necessary
+				   // values, if necessary. even
+				   // though we re-set the pointers
+				   // again immediately after deleting
+				   // their old content, set them to
+				   // zero in between because the
+				   // allocation might fail, in which
+				   // case we get an exception and the
+				   // destructor of this object will
+				   // be called -- where we look at
+				   // the non-nullness of the (now
+				   // invalid) pointer again and try
+				   // to delete the memory a second
+				   // time.
   if (rows > max_dim)
     {
-      if (rowstart) delete[] rowstart;
+      if (rowstart)
+	{
+	  delete[] rowstart;
+	  rowstart = 0;
+	}
+
       max_dim = rows;
-      rowstart = new unsigned int[max_dim+1];
-    };
+      rowstart = new std::size_t[max_dim+1];
+    }
 
 				   // allocate memory for the column
 				   // numbers if necessary
   if (vec_len > max_vec_len)
     {
-      if (colnums) delete[] colnums;
+      if (colnums)
+	{
+	  delete[] colnums;
+	  colnums = 0;
+	}
+      
       max_vec_len = vec_len;
       colnums = new unsigned int[max_vec_len];
-    };
+    }
 
 				   // set the rowstart array 
   rowstart[0] = 0;
@@ -414,7 +442,7 @@ SparsityPattern::compress ()
 				   // elements there are, in order to
 				   // allocate the right amount of
 				   // memory
-  const unsigned int nonzero_elements
+  const std::size_t nonzero_elements
     = std::count_if (&colnums[rowstart[0]],
 		     &colnums[rowstart[rows]],
 		     std::bind2nd(std::not_equal_to<unsigned int>(), invalid_entry));
@@ -647,7 +675,7 @@ SparsityPattern::max_entries_per_row () const
 				   // gives us a sharp bound
   unsigned int m = 0;
   for (unsigned int i=1; i<rows; ++i)
-    m = std::max (m, rowstart[i]-rowstart[i-1]);
+    m = std::max (m, static_cast<unsigned int>(rowstart[i]-rowstart[i-1]));
 
   return m;
 }
@@ -939,7 +967,7 @@ SparsityPattern::block_read (std::istream &in)
   if (colnums)
   delete[] colnums;
 
-  rowstart = new unsigned int[max_dim+1];
+  rowstart = new std::size_t[max_dim+1];
   colnums  = new unsigned int[max_vec_len];
   
                                    // then read data

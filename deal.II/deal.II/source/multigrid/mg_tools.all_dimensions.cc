@@ -60,7 +60,7 @@ MGTools::apply_boundary_values (
   std::set<unsigned int>::const_iterator dof  = boundary_dofs.begin(),
 					 endd = boundary_dofs.end();
   const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
-  const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
+  const std::size_t  *sparsity_rowstart = sparsity.get_rowstart_indices();
   const unsigned int *sparsity_colnums  = sparsity.get_column_numbers();
   for (; dof != endd; ++dof)
     {

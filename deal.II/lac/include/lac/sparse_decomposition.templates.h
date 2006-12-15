@@ -159,7 +159,7 @@ SparseLUDecomposition<number>::prebuild_lower_bound()
 {
   const unsigned int * const
     column_numbers = this->get_sparsity_pattern().get_column_numbers();
-  const unsigned int * const
+  const std::size_t * const
     rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();
   const unsigned int N = this->m();
 
@@ -185,7 +185,7 @@ SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber>& matrix
 
                                    // note: pointers to the sparsity
                                    // pattern of the old matrix!
-  const unsigned int * const rowstart_indices
+  const std::size_t * const rowstart_indices
     = matrix.get_sparsity_pattern().get_rowstart_indices();
 
   const unsigned int * const column_numbers

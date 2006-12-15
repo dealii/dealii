@@ -67,7 +67,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
     this->strengthen_diagonal_impl();
 
   const SparsityPattern             &sparsity = this->get_sparsity_pattern();
-  const unsigned int * const rowstart_indices = sparsity.get_rowstart_indices();
+  const std::size_t  * const rowstart_indices = sparsity.get_rowstart_indices();
   const unsigned int * const column_numbers   = sparsity.get_column_numbers();
   
 /*
@@ -185,7 +185,7 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
   
   const unsigned int N=dst.size();
-  const unsigned int * const rowstart_indices
+  const std::size_t  * const rowstart_indices
     = this->get_sparsity_pattern().get_rowstart_indices();
   const unsigned int * const column_numbers
     = this->get_sparsity_pattern().get_column_numbers();
@@ -253,7 +253,7 @@ void SparseILU<number>::Tvmult (Vector<somenumber>       &dst,
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
   
   const unsigned int N=dst.size();
-  const unsigned int * const rowstart_indices
+  const std::size_t  * const rowstart_indices
     = this->get_sparsity_pattern().get_rowstart_indices();
   const unsigned int * const column_numbers
     = this->get_sparsity_pattern().get_column_numbers();

@@ -74,7 +74,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
   std::map<unsigned int,double>::const_iterator dof  = boundary_values.begin(),
 						endd = boundary_values.end();
   const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
-  const unsigned int *sparsity_rowstart = sparsity.get_rowstart_indices();
+  const std::size_t  *sparsity_rowstart = sparsity.get_rowstart_indices();
   const unsigned int *sparsity_colnums  = sparsity.get_column_numbers();
   for (; dof != endd; ++dof)
     {

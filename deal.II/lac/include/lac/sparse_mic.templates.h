@@ -140,7 +140,7 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
   }
 
   const unsigned int* const col_nums = this->get_sparsity_pattern().get_column_numbers();
-  const unsigned int* const rowstarts = this->get_sparsity_pattern().get_rowstart_indices();
+  const std::size_t* const rowstarts = this->get_sparsity_pattern().get_rowstart_indices();
 
   for(unsigned int row=0; row<this->m(); row++)
     {
@@ -171,7 +171,7 @@ SparseMIC<number>::get_rowsum (const unsigned int row) const
                                    // get start of this row. skip the
                                    // diagonal element
   const unsigned int * const column_numbers = this->get_sparsity_pattern().get_column_numbers();
-  const unsigned int * const rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();
+  const std::size_t  * const rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();
   const unsigned int * const rowend = &column_numbers[rowstart_indices[row+1]];
 
                                    // find the position where the part
@@ -197,7 +197,7 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
 
   const unsigned int N=dst.size();
-  const unsigned int * const rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();
+  const std::size_t  * const rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();
   const unsigned int * const column_numbers   = this->get_sparsity_pattern().get_column_numbers();
                                    // We assume the underlying matrix A is:
                                    // A = X - L - U, where -L and -U are
