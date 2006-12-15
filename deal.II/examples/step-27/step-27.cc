@@ -263,18 +263,33 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 {
   const unsigned int N = 5;
 
-  const unsigned n_fourier_modes = int_pow (N+1, dim);
-  std::vector<Tensor<1,dim> > k_vectors (n_fourier_modes);
-  for (unsigned int k=0; k<n_fourier_modes; ++k)
-    switch (dim)
+  std::vector<Tensor<1,dim> > k_vectors;
+  std::vector<unsigned int>   abs_k_square;
+  
+  switch (dim)
+    {
+      case 2:
       {
-	case 2:
-	      k_vectors[k][0] = deal_II_numbers::PI * (k / (N+1));
-	      k_vectors[k][1] = deal_II_numbers::PI * (k % (N+1));
-	      break;
-	default:
-	      Assert (false, ExcNotImplemented());
+	for (unsigned int i=0; i<N; ++i)
+	  for (unsigned int j=0; j<N; ++j)
+	    {
+	      const unsigned int k_times_k = i*i + j*j;
+	      if (k_times_k < N*N)
+		{
+		  k_vectors.push_back (Point<2>(deal_II_numbers::PI * i,
+						deal_II_numbers::PI * j));
+		  abs_k_square.push_back (k_times_k);
+		}
+	    }
+	    
+	break;
       }
+      
+      default:
+	    Assert (false, ExcNotImplemented());
+    }
+
+  const unsigned n_fourier_modes = k_vectors.size();
   
   QGauss<1>      base_quadrature (2);
   QIterated<dim> quadrature (base_quadrature, N);
@@ -321,27 +336,38 @@ estimate_smoothness (Vector<float> &smoothness_indicators) const
 	      dof_values(i);
 	}
 
+				       // for each abs_k value we have, find
+				       // the largest fourier coefficient
+      std::vector<double>
+	max_fourier_coefficient (*max_element(abs_k_square.begin(),
+					      abs_k_square.end()) + 1,
+				 0.);
+      for (unsigned int f=0; f<n_fourier_modes; ++f)
+	max_fourier_coefficient[abs_k_square[f]]
+	  = std::max (max_fourier_coefficient[abs_k_square[f]],
+		      std::abs (transformed_values[f]));
+      
 				       // now try to fit a curve C|k|^{-s} to
-				       // the fourier transform of the
-				       // solution on this cell
+				       // the maximal fourier coefficients of
+				       // the solution on this cell
       double A[2][2] = { { 0,0 }, { 0,0 }};
       double F[2]    = { 0,0 };
-      
-      for (unsigned int f=0; f<n_fourier_modes; ++f)
-	{
-	  const double k_abs = std::sqrt(k_vectors[f] *
-					 k_vectors[f]);
 
-	  if (k_abs == 0)
-	    continue;
+      for (unsigned int f=0; f<max_fourier_coefficient.size(); ++f)
+	if (max_fourier_coefficient[f] > 0)
+	  {
+	    const double k_abs = std::sqrt(1.*f);
+
+	    if (k_abs == 0)
+	      continue;
 	  
-	  A[0][0] += 1;
-	  A[1][0] += std::log (k_abs);
-	  A[1][1] += std::pow (std::log (k_abs), 2.);
+	    A[0][0] += 1;
+	    A[1][0] += std::log (k_abs);
+	    A[1][1] += std::pow (std::log (k_abs), 2.);
 
-	  F[0] += std::log (std::abs (transformed_values[f]));
-	  F[1] += std::log (std::abs (transformed_values[f])) *
-		  std::log (k_abs);
+	    F[0] += std::log (std::abs (max_fourier_coefficient[f]));
+	    F[1] += std::log (std::abs (max_fourier_coefficient[f])) *
+		    std::log (k_abs);
 	}
       A[0][1] = A[1][0];
       
