@@ -461,24 +461,60 @@ template <int dim>
 KellyErrorEstimator<dim>::PerThreadData::
 PerThreadData (const unsigned int n_solution_vectors,
 	       const unsigned int n_components,
-	       const unsigned int n_q_points,
+	       const unsigned int max_n_q_points,
                const unsigned int subdomain_id,
                const unsigned int material_id)
                 :
                 subdomain_id (subdomain_id),
                 material_id (material_id)
 {
-				   // Init the size of a lot of vectors
-				   // needed in the calculations once
-				   // per thread.
-  normal_vectors.resize(n_q_points);
-  coefficient_values1.resize(n_q_points);
-  coefficient_values.resize(n_q_points);
-  JxW_values.resize(n_q_points);  
+				   // Init the size of a lot of vectors needed
+				   // in the calculations once per thread. we
+				   // will later resize them as necessary, but
+				   // for the moment just reserve the maximal
+				   // memory necessary to avoid later
+				   // re-allocation
+  normal_vectors.resize(max_n_q_points);
+  coefficient_values1.resize(max_n_q_points);
+  coefficient_values.resize(max_n_q_points);
+  JxW_values.resize(max_n_q_points);  
 
   phi.resize(n_solution_vectors);
   psi.resize(n_solution_vectors);
   neighbor_psi.resize(n_solution_vectors);
+
+  for (unsigned int i=0; i<n_solution_vectors; ++i)
+    {
+      phi[i].resize(max_n_q_points);
+      psi[i].resize(max_n_q_points);
+      neighbor_psi[i].resize(max_n_q_points);
+
+      for (unsigned int qp=0;qp<max_n_q_points;++qp)
+	{
+	  phi[i][qp].resize(n_components);
+	  psi[i][qp].resize(n_components);
+	  neighbor_psi[i][qp].resize(n_components);
+	}
+    }
+
+  for (unsigned int qp=0;qp<max_n_q_points;++qp)
+    coefficient_values[qp].reinit(n_components);
+}
+
+
+
+template <int dim>
+void
+KellyErrorEstimator<dim>::PerThreadData::
+resize (const unsigned int n_components,
+	const unsigned int n_q_points)
+{
+  const unsigned int n_solution_vectors = phi.size();
+
+  normal_vectors.resize(n_q_points);
+  coefficient_values1.resize(n_q_points);
+  coefficient_values.resize(n_q_points);
+  JxW_values.resize(n_q_points);  
 
   for (unsigned int i=0; i<n_solution_vectors; ++i)
     {
@@ -611,7 +647,8 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
                PerThreadData                       &per_thread_data)
 {
   const unsigned int n_solution_vectors = solutions.size();
-
+  const unsigned int n_components       = dof_handler.get_fe().n_components();
+  
   const unsigned int subdomain_id = per_thread_data.subdomain_id;
   const unsigned int material_id  = per_thread_data.material_id;
 
@@ -812,7 +849,15 @@ estimate_some (const hp::MappingCollection<dim>                  &mapping,
 
                                            // so now we know that we care for
                                            // this face, let's do something
-                                           // about it:
+                                           // about it. first re-size the
+                                           // arrays we may use to the correct
+                                           // size:
+	  per_thread_data.resize (n_components,
+				  quadrature[cell->active_fe_index()]
+				  .n_quadrature_points);
+	  
+	  
+					   // then do the actual integration
 	  if (face->has_children() == false)
 					     // if the face is a regular one,
 					     // i.e.  either on the other side
@@ -854,30 +899,9 @@ template <int dim>
 template <typename InputVector, class DH>
 void
 KellyErrorEstimator<dim>::
-estimate (const Mapping<dim>                  &/*mapping*/,
-          const DH                            &/*dof_handler*/,
-          const hp::QCollection<dim-1>        &/*quadrature*/,
-          const typename FunctionMap<dim>::type &/*neumann_bc*/,
-          const std::vector<const InputVector *> &/*solutions*/,
-          std::vector<Vector<float>*>              &/*errors*/,
-          const std::vector<bool>                  &/*component_mask_*/,
-          const Function<dim>                 */*coefficients*/,
-          const unsigned int                   /*n_threads_*/,
-          const unsigned int                   /*subdomain_id*/,
-          const unsigned int                   /*material_id*/)
-{
-  Assert (false, ExcNotImplemented());
-}
-
-
-
-template <int dim>
-template <typename InputVector, class DH>
-void
-KellyErrorEstimator<dim>::
 estimate (const Mapping<dim>                  &mapping,
           const DH                            &dof_handler,
-          const Quadrature<dim-1>             &quadrature,
+          const hp::QCollection<dim-1>        &face_quadratures,
           const typename FunctionMap<dim>::type &neumann_bc,
           const std::vector<const InputVector *> &solutions,
           std::vector<Vector<float>*>              &errors,
@@ -974,7 +998,7 @@ estimate (const Mapping<dim>                  &mapping,
     data_structures[i]
       = new PerThreadData (solutions.size(),
                            dof_handler.get_fe().n_components(),
-                           quadrature.n_quadrature_points,
+                           face_quadratures.max_n_quadrature_points(),
                            subdomain_id, material_id);
   
 				   // split all cells into threads if
@@ -998,9 +1022,6 @@ estimate (const Mapping<dim>                  &mapping,
 
   hp::MappingCollection<dim> mapping_collection;
   mapping_collection.push_back (mapping);
-  
-  hp::QCollection<dim-1> face_quadratures;
-  face_quadratures.push_back (quadrature);
   
   for (unsigned int i=0; i<n_threads; ++i)
     threads += Threads::spawn (estimate_some_ptr)
@@ -1080,6 +1101,32 @@ estimate (const Mapping<dim>                  &mapping,
 }
 
 
+
+template <int dim>
+template <typename InputVector, class DH>
+void
+KellyErrorEstimator<dim>::
+estimate (const Mapping<dim>                  &mapping,
+          const DH                            &dof_handler,
+          const Quadrature<dim-1>             &quadrature,
+          const typename FunctionMap<dim>::type &neumann_bc,
+          const std::vector<const InputVector *> &solutions,
+          std::vector<Vector<float>*>              &errors,
+          const std::vector<bool>                  &component_mask,
+          const Function<dim>                 *coefficients,
+          const unsigned int                   n_threads,
+          const unsigned int                   subdomain_id,
+          const unsigned int                   material_id)
+{
+				   // forward to the function with the QCollection
+  estimate (mapping, dof_handler,
+	    hp::QCollection<dim-1>(quadrature),
+	    neumann_bc, solutions,
+	    errors, component_mask, coefficients,
+	    n_threads, subdomain_id, material_id);
+}
+
+
 template <int dim>
 template <typename InputVector, class DH>
 void KellyErrorEstimator<dim>::estimate (const DH                            &dof_handler,
@@ -1146,7 +1193,8 @@ integrate_over_regular_face (const DH                                 &dof_handl
   
 				   // initialize data of the restriction
 				   // of this cell to the present face
-  fe_face_values_cell.reinit (cell, face_no);
+  fe_face_values_cell.reinit (cell, face_no,
+			      cell->active_fe_index());
   
 				   // get gradients of the finite element
 				   // function on this cell
@@ -1175,8 +1223,12 @@ integrate_over_regular_face (const DH                                 &dof_handl
       
 				       // get restriction of finite element
 				       // function of @p{neighbor} to the
-				       // common face.
-      fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor);
+				       // common face. in the hp case, use the
+				       // quadrature formula that matches the
+				       // one we would use for the present
+				       // cell
+      fe_face_values_neighbor.reinit (neighbor, neighbor_neighbor,
+				      cell->active_fe_index());
       
 				       // get gradients on neighbor cell
       for (unsigned int n=0; n<n_solution_vectors; ++n)
@@ -1381,12 +1433,14 @@ integrate_over_irregular_face (const DH                                 &dof_han
 				       // restrict the finite element
 				       // on the present cell to the
 				       // subface
-      fe_subface_values.reinit (cell, face_no, subface_no);
+      fe_subface_values.reinit (cell, face_no, subface_no,
+				cell->active_fe_index());
 
 				       // restrict the finite element
 				       // on the neighbor cell to the
 				       // common @p{subface}.
-      fe_face_values.reinit (neighbor_child, neighbor_neighbor);
+      fe_face_values.reinit (neighbor_child, neighbor_neighbor,
+			     cell->active_fe_index());
 
                                        // store the gradient of the
 				       // solution in psi
