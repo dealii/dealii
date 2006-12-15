@@ -16,6 +16,7 @@
 
 #include "../tests.h"
 #include <base/function.h>
+#include <base/function_lib.h>
 #include <base/logstream.h>
 #include <base/quadrature_lib.h>
 #include <lac/vector.h>
@@ -41,6 +42,7 @@
 #include <fe/fe_q_hierarchical.h>
 #include <fe/fe_raviart_thomas.h>
 #include <fe/fe_system.h>
+#include <fe/q_collection.h>
 
 #include <fstream>
 #include <vector>
@@ -251,6 +253,159 @@ void test_with_2d_deformed_refined_mesh (const hp::FECollection<dim> &fe)
       
       do_check (triangulation, fe);
     }
+}
+
+
+
+// test that interpolating a suitable polynomial onto a refined mesh (which
+// should yield zero error) and then applying constraints still yields zero
+// error. we do so with every pair of finite elements given
+template <int dim>
+void test_interpolation_base (const hp::FECollection<dim>     &fe,
+			      const std::vector<unsigned int> &polynomial_degrees,
+			      const bool                       do_refine)
+{
+				   // create a mesh like this (viewed
+				   // from top, if in 3d):
+				   // *---*---*
+				   // | 0 | 1 |
+				   // *---*---*
+				   //
+				   // then refine cell 1 if do_refine, so that
+				   // we get hanging nodes
+  Triangulation<dim>     triangulation;
+  std::vector<unsigned int> subdivisions (dim, 1);
+  subdivisions[0] = 2;
+  GridGenerator::subdivided_hyper_rectangle (triangulation, subdivisions,
+                                             Point<dim>(),
+					     (dim == 3 ?
+					      Point<dim>(2,1,1) :
+					      (dim == 2 ?
+					       Point<dim>(2,1) :
+					       Point<dim>(2.))));
+
+  if (do_refine)
+    {
+      (++triangulation.begin_active())->set_refine_flag ();
+      triangulation.execute_coarsening_and_refinement ();
+    }
+  
+  hp::DoFHandler<dim>        dof_handler(triangulation);
+
+
+				   // for every pair of finite elements,
+				   // assign them to each of the two sides of the domain
+  for (unsigned int fe1=0; fe1<fe.size(); ++fe1)
+    for (unsigned int fe2=0; fe2<fe.size(); ++fe2)
+      {
+					 // skip elements that don't have
+					 // support points defined
+	if (! (fe[fe1].has_support_points() &&
+	       fe[fe2].has_support_points()))
+	  continue;
+	
+	deallog << "Testing " << fe[fe1].get_name()
+		<< " vs. " << fe[fe2].get_name()
+		<< std::endl;
+	
+					 // set fe on coarse cell to 'i', on
+					 // all fine cells to 'j'
+	typename hp::DoFHandler<dim>::active_cell_iterator
+	  cell = dof_handler.begin_active();
+	cell->set_active_fe_index (fe1);
+	++cell;
+
+	for (; cell != dof_handler.end(); ++cell)
+	  cell->set_active_fe_index (fe2);
+
+	dof_handler.distribute_dofs (fe);
+  
+	ConstraintMatrix constraints;
+	DoFTools::make_hanging_node_constraints (dof_handler,
+						 constraints);
+	constraints.close ();
+
+	Vector<double> interpolant_1 (dof_handler.n_dofs());
+	Vector<double> interpolant_2 (dof_handler.n_dofs());
+	
+	Vector<float>  error (triangulation.n_active_cells());
+
+					 // now consider the dim polynomials
+					 // of degree equal to the minimal
+					 // degree of the two finite elements
+					 // with dependence on only a single
+					 // coordinate. also consider the one
+					 // that has full degree in all
+					 // directions (note that the last
+					 // test will fail for P finite
+					 // elements, whereas it is ok for the
+					 // Q elements; the P elements don't
+					 // run this test right now because
+					 // they have no support points and
+					 // therefore can't use
+					 // VectorTools::interpolate...)
+	const unsigned int min_degree = std::min (polynomial_degrees[fe1],
+						  polynomial_degrees[fe2]);
+	for (unsigned int test=0; test<dim+1; ++test)
+	  {
+	    Tensor<1,dim> exponents;
+	    if (test < dim)
+	      exponents[test] = min_degree;
+	    else
+	      {
+		for (unsigned int i=0; i<dim; ++i)
+		  exponents[i] = min_degree;
+	      }
+
+	    const Functions::Monomial<dim> test_function (exponents,
+							  fe.n_components());
+
+					     // interpolate the function
+	    VectorTools::interpolate (dof_handler,
+				      test_function,
+				      interpolant_1);
+
+					     // then compute the interpolation error
+	    VectorTools::integrate_difference (dof_handler,
+					       interpolant_1,
+					       test_function,
+					       error,
+					       hp::QCollection<dim>(QGauss<dim>(min_degree+2)),
+					       VectorTools::L2_norm);
+	    Assert (error.l2_norm() < 1e-12*interpolant_1.l2_norm(),
+		    ExcInternalError());
+	    deallog << "  Relative interpolation error before constraints: "
+		    << error.l2_norm() / interpolant_1.l2_norm()
+		    << std::endl;
+
+					     // copy the interpolant, apply
+					     // the constraints, and then
+					     // compare the difference. it
+					     // should be zero, since our
+					     // original polynomial was in the
+					     // ansatz space
+	    interpolant_2 = interpolant_1;
+	    constraints.distribute (interpolant_2);
+
+	    interpolant_2 -= interpolant_1;
+
+	    Assert (interpolant_2.l2_norm() < 1e-12*interpolant_1.l2_norm(),
+		    ExcInternalError());
+
+	    deallog << "  Relative difference after constraints: "
+		    << interpolant_2.l2_norm() / interpolant_1.l2_norm()
+		    << std::endl;
+	  }
+      }
+}
+
+
+template <int dim>
+void test_interpolation (const hp::FECollection<dim>     &fe,
+			 const std::vector<unsigned int> &polynomial_degrees)
+{
+  test_interpolation_base (fe, polynomial_degrees, false);
+  test_interpolation_base (fe, polynomial_degrees, true);
 }
 
 
