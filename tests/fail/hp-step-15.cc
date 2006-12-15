@@ -15,6 +15,8 @@
 // a hp-ified version of step-15
 
 
+#include "../tests.h"
+
 #include <base/logstream.h>
 #include <fstream>
 std::ofstream logfile("step-15/output");
