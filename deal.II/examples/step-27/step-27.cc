@@ -48,6 +48,8 @@
 #include <grid/grid_refinement.h>
 #include <numerics/error_estimator.h>
 
+#include <complex>
+
 				 // Finally, this is as in previous
 				 // programs:
 using namespace dealii;
@@ -67,6 +69,7 @@ class LaplaceProblem
     void solve ();
     void create_coarse_grid ();
     void refine_grid ();
+    void estimate_smoothness (Vector<float> &smoothness_indicators) const;
     void output_results (const unsigned int cycle) const;
 
     Triangulation<dim>   triangulation;
@@ -74,6 +77,7 @@ class LaplaceProblem
     hp::DoFHandler<dim>      dof_handler;
     hp::FECollection<dim>    fe_collection;
     hp::QCollection<dim>     quadrature_collection;
+    hp::QCollection<dim-1>   face_quadrature_collection;
 
     ConstraintMatrix     hanging_node_constraints;
 
@@ -85,14 +89,41 @@ class LaplaceProblem
 };
 
 
+
+template <int dim>
+class RightHandSide : public Function<dim>
+{
+  public:
+    RightHandSide () : Function<dim> () {};
+    
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component) const;
+};
+
+
+template <int dim>
+double
+RightHandSide<dim>::value (const Point<dim>   &p,
+			   const unsigned int  /*component*/) const
+{
+  double product = 1;
+  for (unsigned int d=0; d<dim; ++d)
+    product *= (p[d]+1);
+  return product;
+}
+
+
+
+
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem () :
 		dof_handler (triangulation)
 {
-  for (unsigned int degree=1; degree<5; ++degree)
+  for (unsigned int degree=2; degree<7; ++degree)
     {
       fe_collection.push_back (FE_Q<dim>(degree));
       quadrature_collection.push_back (QGauss<dim>(degree+2));
+      face_quadrature_collection.push_back (QGauss<dim-1>(degree+2));
     }
 }
 
@@ -136,6 +167,8 @@ void LaplaceProblem<dim>::assemble_system ()
 				  update_values    |  update_gradients |
 				  update_q_points  |  update_JxW_values);
 
+  const RightHandSide<dim> rhs_function;
+  
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -151,8 +184,12 @@ void LaplaceProblem<dim>::assemble_system ()
       cell_rhs = 0;
 
       hp_fe_values.reinit (cell);
-
+      
       const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values ();
+
+      std::vector<double>  rhs_values (fe_values.n_quadrature_points);
+      rhs_function.value_list (fe_values.get_quadrature_points(),
+			       rhs_values);
       
       for (unsigned int q_point=0; q_point<fe_values.n_quadrature_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -163,7 +200,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   fe_values.JxW(q_point));
 
 	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
-			    1.0 *
+			    rhs_values[q_point] *
 			    fe_values.JxW(q_point));
 	  }
 
@@ -207,23 +244,169 @@ void LaplaceProblem<dim>::solve ()
   hanging_node_constraints.distribute (solution);
 }
 
+
+unsigned int
+int_pow (const unsigned int x,
+	 const unsigned int n)
+{
+  unsigned int p=1;
+  for (unsigned int i=0; i<n; ++i)
+    p *= x;
+  return p;
+}
+
+
+template <int dim>
+void
+LaplaceProblem<dim>::
+estimate_smoothness (Vector<float> &smoothness_indicators) const
+{
+  const unsigned int N = 5;
+
+  const unsigned n_fourier_modes = int_pow (N+1, dim);
+  std::vector<Tensor<1,dim> > k_vectors (n_fourier_modes);
+  for (unsigned int k=0; k<n_fourier_modes; ++k)
+    switch (dim)
+      {
+	case 2:
+	      k_vectors[k][0] = deal_II_numbers::PI * (k / (N+1));
+	      k_vectors[k][1] = deal_II_numbers::PI * (k % (N+1));
+	      break;
+	default:
+	      Assert (false, ExcNotImplemented());
+      }
+  
+  QGauss<1>      base_quadrature (2);
+  QIterated<dim> quadrature (base_quadrature, N);
+  
+  std::vector<Table<2,std::complex<double> > >
+    fourier_transforms (fe_collection.size());
+  for (unsigned int fe=0; fe<fe_collection.size(); ++fe)
+    {
+      fourier_transforms[fe].reinit (n_fourier_modes,
+				     fe_collection[fe].dofs_per_cell);
+
+      for (unsigned int k=0; k<n_fourier_modes; ++k)
+	for (unsigned int i=0; i<fe_collection[fe].dofs_per_cell; ++i)
+	  {
+	    std::complex<double> sum = 0;
+	    for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+	      {
+		const Point<dim> x_q = quadrature.point(q);
+		sum += std::exp(std::complex<double>(0,1) *
+				(k_vectors[k] * x_q)) *
+		       fe_collection[fe].shape_value(i,x_q) *
+		       quadrature.weight(q);
+	      }
+	    fourier_transforms[fe](k,i) = sum;
+	  }
+    }
+
+  typename hp::DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  std::vector<std::complex<double> > transformed_values (n_fourier_modes);
+  for (unsigned int index=0; cell!=endc; ++cell, ++index)
+    {
+      Vector<double> dof_values (cell->get_fe().dofs_per_cell);
+      cell->get_dof_values (solution, dof_values);
+
+      for (unsigned int f=0; f<n_fourier_modes; ++f)
+	{
+	  transformed_values[f] = 0;
+	  for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+	    transformed_values[f] +=
+	      fourier_transforms[cell->active_fe_index()](f,i)
+	      *
+	      dof_values(i);
+	}
+
+				       // now try to fit a curve C|k|^{-s} to
+				       // the fourier transform of the
+				       // solution on this cell
+      double A[2][2] = { { 0,0 }, { 0,0 }};
+      double F[2]    = { 0,0 };
+      
+      for (unsigned int f=0; f<n_fourier_modes; ++f)
+	{
+	  const double k_abs = std::sqrt(k_vectors[f] *
+					 k_vectors[f]);
+
+	  if (k_abs == 0)
+	    continue;
+	  
+	  A[0][0] += 1;
+	  A[1][0] += std::log (k_abs);
+	  A[1][1] += std::pow (std::log (k_abs), 2.);
+
+	  F[0] += std::log (std::abs (transformed_values[f]));
+	  F[1] += std::log (std::abs (transformed_values[f])) *
+		  std::log (k_abs);
+	}
+      A[0][1] = A[1][0];
+      
+      const double det = A[0][0] * A[1][1] - A[0][1] * A[0][1];
+      const double s = (A[0][0]*F[1] - A[1][1]*F[0]) / det;
+      
+      smoothness_indicators(index) = s;
+    }
+}
+
+
+
+  
 template <int dim>
 void LaplaceProblem<dim>::refine_grid ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-
   KellyErrorEstimator<dim>::estimate (dof_handler,
-				      QGauss<dim-1>(3),
+				      face_quadrature_collection,
 				      typename FunctionMap<dim>::type(),
 				      solution,
 				      estimated_error_per_cell);
 
+  Vector<float> smoothness_indicators (triangulation.n_active_cells());
+  estimate_smoothness (smoothness_indicators);
+  
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
 						   estimated_error_per_cell,
 						   0.3, 0.03);
 
+  float max_smoothness = 0,
+	 min_smoothness = smoothness_indicators.linfty_norm();
+  {
+    typename hp::DoFHandler<dim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for (unsigned int index=0; cell!=endc; ++cell, ++index)
+      if (cell->refine_flag_set())
+	{
+	  max_smoothness = std::max (max_smoothness,
+				     smoothness_indicators(index));
+	  min_smoothness = std::min (min_smoothness,
+				     smoothness_indicators(index));
+	}
+  }
+  const float cutoff_smoothness = (max_smoothness + min_smoothness) / 2;
+  {
+    typename hp::DoFHandler<dim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
+    for (unsigned int index=0; cell!=endc; ++cell, ++index)
+      if (cell->refine_flag_set()
+	  &&
+	  (smoothness_indicators(index) > cutoff_smoothness))
+	{
+	  cell->clear_refine_flag();
+	  cell->set_active_fe_index (std::min (cell->active_fe_index() + 1,
+					       fe_collection.size() - 1));
+	}
+  } 
+  
   triangulation.execute_coarsening_and_refinement ();
 }
+
+
 
 template <int dim>
 void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
@@ -241,17 +424,36 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   }
   
   {
+    Vector<float> smoothness_indicators (triangulation.n_active_cells());
+    estimate_smoothness (smoothness_indicators);
+
+
+    Vector<float> fe_indices (triangulation.n_active_cells());
+    {
+      typename hp::DoFHandler<dim>::active_cell_iterator
+	cell = dof_handler.begin_active(),
+	endc = dof_handler.end();
+      for (unsigned int index=0; cell!=endc; ++cell, ++index)
+	{
+	  
+	  fe_indices(index) = cell->active_fe_index();
+//	  smoothness_indicators(index) *= std::sqrt(cell->diameter());
+	}
+    }
+    
     const std::string filename = "solution-" +
 				 Utilities::int_to_string (cycle, 2) +
-				 ".gnuplot";
+				 ".vtk";
     DataOut<dim,hp::DoFHandler<dim> > data_out;
 
     data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, "solution");
+    data_out.add_data_vector (smoothness_indicators, "smoothness");
+    data_out.add_data_vector (fe_indices, "fe_index");
     data_out.build_patches ();
   
     std::ofstream output (filename.c_str());
-    data_out.write_gnuplot (output);
+    data_out.write_vtk (output);
   }
 }
 
@@ -323,7 +525,7 @@ void LaplaceProblem<2>::create_coarse_grid ()
   triangulation.create_triangulation (vertices,
                                     cells,
                                     SubCellData());
-  triangulation.refine_global (1);
+  triangulation.refine_global (3);
 }
 
 
@@ -331,7 +533,7 @@ void LaplaceProblem<2>::create_coarse_grid ()
 template <int dim>
 void LaplaceProblem<dim>::run () 
 {
-  for (unsigned int cycle=0; cycle<5; ++cycle)
+  for (unsigned int cycle=0; cycle<8; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
@@ -349,6 +551,9 @@ void LaplaceProblem<dim>::run ()
 
       std::cout << "   Number of degrees of freedom: "
 		<< dof_handler.n_dofs()
+		<< std::endl;
+      std::cout << "   Number of constraints       : "
+		<< hanging_node_constraints.n_constraints()
 		<< std::endl;
       
       assemble_system ();
