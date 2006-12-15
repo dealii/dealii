@@ -15,6 +15,8 @@
 // a hp-ified version of step-14
 
 
+#include "../tests.h"
+
 #include <base/logstream.h>
 #include <fstream>
 std::ofstream logfile("step-14/output");
@@ -35,7 +37,7 @@ std::ofstream logfile("step-14/output");
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
 #include <grid/grid_refinement.h>
-#include <dofs/dof_handler.h>
+#include <dofs/hp_dof_handler.h>
 #include <dofs/dof_constraints.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
