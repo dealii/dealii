@@ -1056,6 +1056,58 @@ namespace Functions
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
 				      const unsigned int  component = 0) const;
   };
+
+
+
+/**
+ * A class that represents a function object for a monomial. Monomials are
+ * polynomials with only a single term, i.e. in 1-d they have the form
+ * $x^\alpha$, in 2-d the form $x_1^{\alpha_1}x_2^{\alpha_2}$, and in 3-d
+ * $x_1^{\alpha_1}x_2^{\alpha_2}x_3^{\alpha_3}$. Monomials are therefore
+ * described by a $dim$-tuple of exponents. Consequently, the class's
+ * constructor takes a Tensor<1,dim> to describe the set of exponents. Most of
+ * the time these exponents will of course be integers, but real exponents are
+ * of course equally valid.
+ *
+ * @author Wolfgang Bangerth, 2006
+ */
+  template <int dim>
+  class Monomial : public Function<dim>
+  {
+    public:
+				       /**
+					* Constructor. The arguments are
+					* described in the general description
+					* of the class.
+					*/
+      Monomial (const Tensor<1,dim> &exponents);
+    
+				       /**
+					* Function value at one point.
+					*/
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+      
+				       /**
+					* Function values at multiple points.
+					*/
+      virtual void value_list (const std::vector<Point<dim> > &points,
+			       std::vector<double>            &values,
+			       const unsigned int              component = 0) const;
+
+				       /**
+					* Function gradient at one point.
+					*/
+      virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				      const unsigned int  component = 0) const;
+
+    private:
+				       /**
+					* The set of exponents.
+					*/
+      const Tensor<1,dim> exponents;
+  };
+  
 }
 DEAL_II_NAMESPACE_CLOSE
 

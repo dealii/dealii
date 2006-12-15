@@ -1498,6 +1498,78 @@ namespace Functions
     
     return sum;
   }
+
+
+
+
+/* ---------------------- Monomial ----------------------- */
+  
+  
+  
+  template <int dim>
+  Monomial<dim>::
+  Monomial (const Tensor<1,dim> &exponents)
+		  :
+		  exponents (exponents)
+  {}
+  
+  
+  
+  template <int dim>
+  double
+  Monomial<dim>::value (const Point<dim>   &p,
+			const unsigned int  component) const
+  {
+    Assert (component==0, ExcIndexRange(component,0,1)) ;
+
+    double prod = 1;
+    for (unsigned int s=0; s<dim; ++s)
+      prod *= std::pow(p[s], exponents[s]);
+    
+    return prod;
+  }
+  
+  
+  
+  template <int dim>
+  Tensor<1,dim>
+  Monomial<dim>::gradient (const Point<dim>   &p,
+			   const unsigned int  component) const
+  {
+    Assert (component==0, ExcIndexRange(component,0,1)) ;
+
+    Tensor<1,dim> r;
+    for (unsigned int d=0; d<dim; ++d)
+      {
+	double prod = 1;
+	for (unsigned int s=0; s<dim; ++s)
+	  prod *= (s==d
+		   ?
+		   exponents[s] * std::pow(p[s], exponents[s]-1)
+		   :
+		   std::pow(p[s], exponents[s]));
+
+	r[d] = prod;
+      }
+  
+    return r;
+  }
+
+
+
+  template<int dim>
+  void
+  Monomial<dim>::value_list (const std::vector<Point<dim> > &points,
+			     std::vector<double>            &values,
+			     const unsigned int              component) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+
+    for (unsigned int i=0; i<points.size(); ++i)
+      values[i] = Monomial<dim>::value (points[i], component);
+  }
+
   
   
 // explicit instantiations  
@@ -1533,6 +1605,9 @@ namespace Functions
   template class FourierSineSum<3>;
   template class SlitSingularityFunction<2>;
   template class SlitSingularityFunction<3>;
+  template class Monomial<1>;
+  template class Monomial<2>;
+  template class Monomial<3>;
 }
 
 DEAL_II_NAMESPACE_CLOSE
