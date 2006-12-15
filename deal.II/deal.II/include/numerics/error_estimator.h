@@ -574,6 +574,15 @@ class KellyErrorEstimator
 				      * with and needs not allocate
 				      * memory itself, or synchronise
 				      * with other threads.
+				      *
+				      * The sizes of the arrays are
+				      * initialized with the maximal number of
+				      * entries necessary for the hp
+				      * case. Within the loop over individual
+				      * cells, we then resize the arrays as
+				      * necessary. Since for std::vector
+				      * resizing to a smaller size doesn't
+				      * imply memory allocation, this is fast.
 				      */
     struct PerThreadData
     {
@@ -657,9 +666,15 @@ class KellyErrorEstimator
 					  */
 	PerThreadData (const unsigned int n_solution_vectors,
 		       const unsigned int n_components,
-		       const unsigned int n_q_points,
+		       const unsigned int max_n_q_points,
                        const unsigned int subdomain_id,
                        const unsigned int material_id);
+
+					 /**
+					  * Constructor.
+					  */
+	void resize (const unsigned int n_components,
+		     const unsigned int max_n_q_points);
     };
 
 
