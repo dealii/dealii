@@ -1508,8 +1508,10 @@ namespace Functions
   
   template <int dim>
   Monomial<dim>::
-  Monomial (const Tensor<1,dim> &exponents)
+  Monomial (const Tensor<1,dim> &exponents,
+	    const unsigned int   n_components)
 		  :
+		  Function<dim> (n_components),
 		  exponents (exponents)
   {}
   
@@ -1520,13 +1522,28 @@ namespace Functions
   Monomial<dim>::value (const Point<dim>   &p,
 			const unsigned int  component) const
   {
-    Assert (component==0, ExcIndexRange(component,0,1)) ;
+    Assert (component<this->n_components,
+	    ExcIndexRange(component, 0, this->n_components)) ;
 
     double prod = 1;
     for (unsigned int s=0; s<dim; ++s)
       prod *= std::pow(p[s], exponents[s]);
     
     return prod;
+  }
+
+
+
+  template <int dim>
+  void
+  Monomial<dim>::vector_value (const Point<dim>   &p,
+			       Vector<double>     &values) const
+  {
+    Assert (values.size() == this->n_components,
+	    ExcDimensionMismatch (values.size(), this->n_components));
+
+    for (unsigned int i=0; i<values.size(); ++i)
+      values(i) = Monomial<dim>::value(p,i);
   }
   
   

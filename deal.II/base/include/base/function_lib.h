@@ -1076,11 +1076,16 @@ namespace Functions
   {
     public:
 				       /**
-					* Constructor. The arguments are
-					* described in the general description
-					* of the class.
+					* Constructor. The first argument is
+					* explained in the general description
+					* of the class. The second argument
+					* denotes the number of vector
+					* components this object shall
+					* represent. All vector components
+					* will have the same value.
 					*/
-      Monomial (const Tensor<1,dim> &exponents);
+      Monomial (const Tensor<1,dim> &exponents,
+		const unsigned int n_components = 1);
     
 				       /**
 					* Function value at one point.
@@ -1088,6 +1093,18 @@ namespace Functions
       virtual double value (const Point<dim>   &p,
 			    const unsigned int  component = 0) const;
       
+				       /**
+					* Return all components of a
+					* vector-valued function at a
+					* given point.
+					*
+					* <tt>values</tt> shall have the right
+					* size beforehand,
+					* i.e. #n_components.
+					*/
+      virtual void vector_value (const Point<dim>   &p,
+				 Vector<double>     &values) const;
+
 				       /**
 					* Function values at multiple points.
 					*/
