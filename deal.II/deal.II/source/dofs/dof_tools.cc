@@ -1742,76 +1742,42 @@ namespace internal
 					 // always false warning for the cases
 					 // at the bottom in 1d and 2d)
 					 //
-					 // as mentioned in the paper,
-					 // it is not always easy to
-					 // find a set of master dofs
-					 // that produces an
-					 // invertible matrix. to this
-					 // end, we check in each step
-					 // whether the matrix is
-					 // still invertible. we have
-					 // never had a problem with
-					 // vertex and line dofs, so
-					 // we only check inside an
-					 // Assert statement, without
-					 // providing any code that
-					 // can cope with the
-					 // situation if this goes
-					 // wrong.
+					 // as mentioned in the paper, it is
+					 // not always easy to find a set of
+					 // master dofs that produces an
+					 // invertible matrix. to this end, we
+					 // check in each step whether the
+					 // matrix is still invertible and
+					 // simply discard this dof if the
+					 // matrix is not invertible anymore.
 					 //
-					 // on the other hand, we did
-					 // have trouble with adding
-					 // more quad dofs when Q3 and
-					 // Q4 elements meet at a
-					 // refined face in 3d (see
-					 // the hp/crash_12 test that
-					 // tests that we can do
-					 // exactly this, and failed
-					 // before we had code to
-					 // compensate for this
-					 // case). therefore, for quad
-					 // dofs (which appear only in
-					 // 3d anyway), we have a
-					 // piece of code that can add
-					 // dofs until we have finally
-					 // found a suitable set
+					 // the cases where we did have
+					 // trouble in the past were with
+					 // adding more quad dofs when Q3 and
+					 // Q4 elements meet at a refined face
+					 // in 3d (see the hp/crash_12 test
+					 // that tests that we can do exactly
+					 // this, and failed before we had
+					 // code to compensate for this
+					 // case). the other case are system
+					 // elements: if we have say a Q1Q2 vs
+					 // a Q2Q3 element, then we can't just
+					 // take all master dofs on a line
+					 // from a single base element, since
+					 // the shape functions of that base
+					 // element are independent of that of
+					 // the other one. this latter case
+					 // shows up when running
+					 // hp/hp_constraints_q_system_06
 	std::vector<unsigned int> master_dof_list;
 	unsigned int index = 0;
 	for (int v=0;
 	     v<static_cast<signed int>(GeometryInfo<dim>::vertices_per_face);
 	     ++v)
 	  {
-	    for (unsigned int i=0; i<fe2.dofs_per_vertex; ++i)
-	      {
-		master_dof_list.push_back (index+i);
-		Assert (check_master_dof_list (face_interpolation_matrix,
-					       master_dof_list),
-			ExcInternalError());
-	      }
-	    index += fe1.dofs_per_vertex;
-	  }
-
-	for (int l=0;
-	     l<static_cast<signed int>(GeometryInfo<dim>::lines_per_face);
-	     ++l)
-	  {
-	    for (unsigned int i=0; i<fe2.dofs_per_line; ++i)
-	      {
-		master_dof_list.push_back (index+i);
-		Assert (check_master_dof_list (face_interpolation_matrix,
-					       master_dof_list),
-			ExcInternalError());
-	      }
-	    index += fe1.dofs_per_line;
-	  }
-	
-	for (int q=0;
-	     q<static_cast<signed int>(GeometryInfo<dim>::quads_per_face);
-	     ++q)
-	  {
 	    unsigned int dofs_added = 0;
 	    unsigned int i          = 0;
-	    while (dofs_added < fe2.dofs_per_quad)
+	    while (dofs_added < fe2.dofs_per_vertex)
 	      {
 						 // make sure that we
 						 // were able to find
@@ -1820,10 +1786,10 @@ namespace internal
 						 // code down below
 						 // didn't just reject
 						 // all our efforts
-		Assert (i < fe1.dofs_per_quad,
+		Assert (i < fe1.dofs_per_vertex,
 			ExcInternalError());
 						 // tentatively push
-						 // this quad dof
+						 // this vertex dof
 		master_dof_list.push_back (index+i);
 
 						 // then see what
@@ -1845,6 +1811,56 @@ namespace internal
 
 						 // forward counter by
 						 // one
+		++i;
+	      }
+	    index += fe1.dofs_per_vertex;	    
+	  }
+
+	for (int l=0;
+	     l<static_cast<signed int>(GeometryInfo<dim>::lines_per_face);
+	     ++l)
+	  {
+					     // same algorithm as above
+	    unsigned int dofs_added = 0;
+	    unsigned int i          = 0;
+	    while (dofs_added < fe2.dofs_per_line)
+	      {
+		Assert (i < fe1.dofs_per_line,
+			ExcInternalError());
+		
+		master_dof_list.push_back (index+i);
+		if (check_master_dof_list (face_interpolation_matrix,
+					   master_dof_list)
+		    == true)
+		  ++dofs_added;
+		else
+		  master_dof_list.pop_back ();
+
+		++i;
+	      }
+	    index += fe1.dofs_per_line;
+	  }
+	
+	for (int q=0;
+	     q<static_cast<signed int>(GeometryInfo<dim>::quads_per_face);
+	     ++q)
+	  {
+					     // same algorithm as above
+	    unsigned int dofs_added = 0;
+	    unsigned int i          = 0;
+	    while (dofs_added < fe2.dofs_per_quad)
+	      {
+		Assert (i < fe1.dofs_per_quad,
+			ExcInternalError());
+		
+		master_dof_list.push_back (index+i);
+		if (check_master_dof_list (face_interpolation_matrix,
+					   master_dof_list)
+		    == true)
+		  ++dofs_added;
+		else
+		  master_dof_list.pop_back ();
+
 		++i;
 	      }
 	    index += fe1.dofs_per_quad;
