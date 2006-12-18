@@ -1999,7 +1999,15 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
           ExcDimensionMismatch(this->n_cols(), M.n_cols()));
   Assert (this->n_rows() == M.n_rows(),
 	  ExcDimensionMismatch(this->n_rows(), M.n_rows()));
-  
+
+  if ((&M == this) && (this->n_cols() <= 4))
+    {
+				       // avoid overwriting source
+				       // by destination matrix:
+      FullMatrix<number2> M2 = M;
+      invert(M2);
+    }
+  else
   switch (this->n_cols()) 
     {
       case 1:

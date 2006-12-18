@@ -695,6 +695,12 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li> <p>Fixed: The <code class="member">FullMatrix::invert</code> 
+       function would return wrong results if one tried to invert a
+       matrix of dimension smaller than 5 in situ. This is now fixed.
+       <br>
+       (Florian Prill 2006/12/18)
+       </p>
 
   <li> <p>Improved: The <code
        class="class">SparsityPattern</code> class would produce
