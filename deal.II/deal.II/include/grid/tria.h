@@ -808,6 +808,18 @@ namespace internal
  *     eliminate_refined_boundary_islands will be ignored as they will
  *     be fulfilled automatically.
  *
+ *   <li> @p coarsest_level_1:
+ *     Each coarse grid cell is refined at least once, i.e. the
+ *     triangulation might have active cells on level 1 but not on
+ *     level 0. This flag ensures that a mesh which has
+ *     coarsest_level_1 has still coarsest_level_1 after coarsening
+ *     and refinement. It is, however, the user's responsibility to
+ *     ensure that the mesh has coarsest_level_1 before calling
+ *     execute_coarsening_and_refinement the first time. The easiest
+ *     way to achieve this is by calling global_refine(1) straight
+ *     after creation of the triangulation. It follows that active
+ *     cells on level 1 may not be coarsenend.
+ *
  *   <li> @p smoothing_on_refinement:
  *     This flag sums up all smoothing algorithms which may be performed upon
  *     refinement by flagging some more cells for refinement.
@@ -1192,6 +1204,7 @@ class Triangulation : public Subscriptor
 	  limit_level_difference_at_vertices = 0x1,     
 	  eliminate_unrefined_islands        = 0x2,
 	  patch_level_1                      = 0x4,
+	  coarsest_level_1                   = 0x8,
 	  
 	  eliminate_refined_inner_islands    = 0x100,
 	  eliminate_refined_boundary_islands = 0x200,

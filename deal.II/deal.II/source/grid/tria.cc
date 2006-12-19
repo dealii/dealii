@@ -7562,26 +7562,30 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 				   // are done the first. the
 				   // following order is chosen:
 				   //
-				   // 0/ do not coarsen a cell if
+				   // 0/ Only if coarsest_level_1 is set:
+				   //    clear all coarsen flags on level 1
+				   //    to avoid level 0 cells being
+				   //    created by coarsening.
+				   // 1/ do not coarsen a cell if
 				   //    'most of the neighbors' will be
 				   //    refined after the step. This is
 				   //    to prevent occurence of
 				   //    unrefined islands.
-				   // 1/ eliminate refined islands in the
+				   // 2/ eliminate refined islands in the
 				   //    interior and at the boundary. since
 				   //    they don't do much harm besides
 				   //    increasing the number of degrees
 				   //    of freedom, doing this has a
 				   //    rather low priority.
-  				   // 2/ limit the level difference of
+  				   // 3/ limit the level difference of
 				   //    neighboring cells at each vertex.
-  				   // 3/ eliminate unrefined islands. this
+  				   // 4/ eliminate unrefined islands. this
 				   //    has higher priority since this
 				   //    diminishes the approximation
 				   //    properties not only of the unrefined
 				   //    island, but also of the surrounding
 				   //    patch.
-				   // 4/ ensure patch level 1. Then the
+				   // 5/ ensure patch level 1. Then the
 				   //    triangulation consists of patches,
 				   //    i.e. of cells that are
 				   //    refined once. It follows that if
@@ -7596,12 +7600,12 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 				   //    eliminate_refined_boundary_islands will
 				   //    be fulfilled automatically and do not
 				   //    need to be enforced separately.
-  				   // 5/ take care of the requirement that no
+  				   // 6/ take care of the requirement that no
 				   //    double refinement is done at each face
-  				   // 6/ take care that no double refinement
+  				   // 7/ take care that no double refinement
 				   //    is done at each line in 3d or higher
 				   //    dimensions.
-				   // 7/ make sure that all children of each
+				   // 8/ make sure that all children of each
 				   //    cell are either flagged for coarsening
 				   //    or none of the children is
 				   //
@@ -7637,8 +7641,25 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
   do
     {
 
-				       //////////////////////////////////////
+      				       //////////////////////////////////////
 				       // STEP 0:
+				       //    Only if coarsest_level_1 is set:
+				       //    clear all coarsen flags on level 1
+				       //    to avoid level 0 cells being
+				       //    created by coarsening.
+      if (smooth_grid & coarsest_level_1 && n_levels()>=2)
+	{
+	  typename Triangulation<dim>::cell_iterator
+	    cell=begin(1),
+	    endc=end(1);
+	  
+	  for (; cell!=endc; ++cell)
+	    cell->clear_coarsen_flag();
+	}
+
+
+				       //////////////////////////////////////
+				       // STEP 1:
 				       //    do not coarsen a cell if 'most of
 				       //    the neighbors' will be refined after
 				       //    the step. This is to prevent the
@@ -7731,7 +7752,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 
 
 				       //////////////////////////////////////
-				       // STEP 1:
+				       // STEP 2:
 				       //    eliminate refined islands in the
 				       //    interior and at the boundary. since
 				       //    they don't do much harm besides
@@ -7877,7 +7898,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 	}
 
 				       //////////////////////////////////////
-				       // STEP 2:
+				       // STEP 3:
 				       //    limit the level difference of
 				       //    neighboring cells at each vertex.
       if (smooth_grid & limit_level_difference_at_vertices) 
@@ -7937,7 +7958,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 	}
 
 				       /////////////////////////////////////
-				       // STEP 3:      
+				       // STEP 4:      
 				       //    eliminate unrefined
 				       //    islands. this has higher
 				       //    priority since this
@@ -7994,7 +8015,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 
 
 				       /////////////////////////////////
-				       // STEP 4:
+				       // STEP 5:
 				       //    ensure patch level 1.
 				       //
 				       //    Introduce some terminology:
@@ -8166,7 +8187,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
       
 
 				       /////////////////////////////////
-				       // STEP 5:
+				       // STEP 6:
 				       //    take care of the requirement that no
 				       //    double refinement is done at each face
       for (active_cell_iterator cell = last_active(); cell != end(); --cell)
@@ -8208,14 +8229,14 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 	  }
 
 				       //////////////////////////////////////
-				       // STEP 6:
+				       // STEP 7:
 				       //    take care that no double refinement
 				       //    is done at each line in 3d or higher
 				       //    dimensions.
       prepare_refinement_dim_dependent ();
       
 				       //////////////////////////////////////
-				       // STEP 7:
+				       // STEP 8:
 				       //    make sure that all children of each
 				       //    cell are either flagged for coarsening
 				       //    or none of the children is
