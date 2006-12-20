@@ -968,37 +968,47 @@ inconvenience this causes.
        (RH 2006/12/20)
        </p>
 
-  <li> <p> Extended: The <code>GridIn</code> class can now read in tecplot files
-       in ASCII format (block and point format, ordered and unstructured grids,
-       format specifiers acccording to Tecplot 10 and younger versions). At the
-       moment the implementation is restricted to 2d grids but can easily be
+  <li> <p>
+       Extended: The <code class="class">GridIn</code> class can now
+       read in tecplot files in ASCII format (block and point format,
+       ordered and unstructured grids, format specifiers acccording to
+       Tecplot 10 and younger versions). At the moment the
+       implementation is restricted to 2d grids but can easily be
        extended to 3d as well.
        <br>
        (Tobias Leicht 2006/12/14)
        </p>
 
-  <li> <p> Extended: So far, the
-       <code>GridReordering::invert_all_cells_of_negative_grid</code> function
-       did nothing in 2d. Now, it inverts cells from clockwise to
-       counterclockwise sense (in the old numbering scheme).
+  <li> <p>
+       Extended: So far, the <code
+       class="class">GridReordering</code>::<code
+       class="member">invert_all_cells_of_negative_grid</code>
+       function did nothing in 2d. Now, it inverts cells from
+       clockwise to counterclockwise sense (in the old numbering
+       scheme).
        <br>
        (Tobias Leicht 2006/12/13)
        </p>
 
-  <li> <p> New: There is now a function
-       <code>GridTools::delete_duplicated_vertices</code> that deletes duplicate
-       vertices which can occur if structured grids are read into deal, leading
-       to unwanted interior boundaries. In order to reduce the effort of the
-       quadratic algorithm, a list of vertices to be considered can be supplied
-       if available.  
+  <li> <p>
+       New: There is now a function <code
+       class="class">GridTools</code>::<code
+       class="member">delete_duplicated_vertices</code> that deletes
+       duplicate vertices which can occur if structured grids are read
+       into <acronym>deal.II</acronym>, leading to unwanted interior
+       boundaries. In order to reduce the effort of the quadratic
+       algorithm, a list of vertices to be considered can be supplied
+       if available.
        <br>
        (Tobias Leicht 2006/12/13)
        </p>
 
-  <li> <p> New: There is now a function <code
-       class="member">GridGenerator::subdivided_hyper_rectangle</code>
-       that produces a non-uniformly subdivided rectangle, ideally
-       suited for graded meshes.
+  <li> <p>
+       New: There is now a function <code
+       class="class">GridGenerator</code>::<code
+       class="member">subdivided_hyper_rectangle</code> that produces
+       a non-uniformly subdivided rectangle, ideally suited for graded
+       meshes.
        <br>
        (Yaqi Wang 2006/11/15)
        </p>
