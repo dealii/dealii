@@ -247,7 +247,7 @@ mesh many times, with randomly perturbed starting values, and while it
 converges it yields a different solution, with a different energy every
 time. One can therefore not say that the solver converges to a certain energy,
 and we can't answer the question what the smallest value of $I(u)$ might be in
-$W^{1,\infty}$. This is unsatisfactory, but maybe to be expected for such a
+$W^{1,\infty}$. This is unsatisfactory, but may be expected for such a
 contrived and pathological problem. Consider it an example in programming with
 deal.II then, and not an example in solving this particular problem.
 
