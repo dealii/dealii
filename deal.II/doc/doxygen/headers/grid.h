@@ -14,12 +14,16 @@
 /**
  * @defgroup grid Grid classes
  *
- * This module groups classes that have to do with the topology and geometry
- * of meshes. A mesh can be thought of a collection of cells; if the mesh has
- * been refined (possibly in an adaptive way), then this collection is grouped
- * into a hierarchy of refinement levels. In addition to cells, the geometric
- * objects that make up a triangulation are the faces of cells (and in 3d the
- * edges of cells) as well as the vertices of the cells.
+ * This module groups classes that have to do with the topology and
+ * geometry of meshes. A mesh can be thought of a collection of cells;
+ * if the mesh has been refined (possibly in an adaptive way), then
+ * this collection is grouped into a hierarchy of refinement
+ * levels. In addition to cells, the geometric objects that make up a
+ * triangulation are the faces of cells (and in 3d the edges of cells)
+ * as well as the vertices of the cells. Note that we abuse the word
+ * <it>triangulation</it> somewhat, since deal.II only implements
+ * triangulations made up of linear, quadrilateral, and hexahedral
+ * cells; triangles and tetrahedra are not supported.
  *
  * This collection of cells is managed by the Triangulation class. It holds
  * the relevant data in memory and offers interfaces to query it. Most things
