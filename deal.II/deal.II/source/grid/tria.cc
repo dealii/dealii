@@ -7562,7 +7562,8 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 				   // are done the first. the
 				   // following order is chosen:
 				   //
-				   // 0/ Only if coarsest_level_1 is set:
+				   // 0/ Only if coarsest_level_1 or
+				   //    patch_level_1 is set:
 				   //    clear all coarsen flags on level 1
 				   //    to avoid level 0 cells being
 				   //    created by coarsening.
@@ -7643,11 +7644,13 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 
       				       //////////////////////////////////////
 				       // STEP 0:
-				       //    Only if coarsest_level_1 is set:
+				       //    Only if coarsest_level_1 or
+				       //    patch_level_1 is set:
 				       //    clear all coarsen flags on level 1
 				       //    to avoid level 0 cells being
 				       //    created by coarsening.
-      if (smooth_grid & coarsest_level_1 && n_levels()>=2)
+      if (((smooth_grid & coarsest_level_1) ||
+	   (smooth_grid & patch_level_1)) && n_levels()>=2)
 	{
 	  typename Triangulation<dim>::cell_iterator
 	    cell=begin(1),
