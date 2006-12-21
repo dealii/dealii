@@ -695,6 +695,15 @@ inconvenience this causes.
 <h3>lac</h3>
 
 <ol>
+  <li> <p>Fixed: The <code class="class">SparseDirectMA27</code> 
+       class works for symmetric matrices and had a check to make sure the
+       matrix is indeed symmetric. However, the check compared entries for
+       equality, something one should not do for floating point numbers. It now
+       checks that symmetric entries are equal up to a small relative number.
+       <br>
+       (WB 2006/12/21)
+       </p>
+
   <li> <p>Fixed: The <code class="member">FullMatrix::invert</code> 
        function would return wrong results if one tried to invert a
        matrix of dimension smaller than 5 in situ. This is now fixed.

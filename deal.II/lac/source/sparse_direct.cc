@@ -1014,7 +1014,8 @@ SparseDirectMA27::fill_A (const SparseMatrix<number> &matrix)
                                            // value, unless this one is zero
           Assert ((matrix(row,*col) == 0)
                   ||
-                  (matrix(row,*col) == matrix(*col,row)),
+                  (std::fabs(matrix(row,*col) - matrix(*col,row))
+		   <= 1e-15 * std::fabs (matrix(row,*col))),
                   ExcMatrixNotSymmetric());
 	}
       else
@@ -1022,7 +1023,8 @@ SparseDirectMA27::fill_A (const SparseMatrix<number> &matrix)
                                          // symmetry
         Assert ((matrix(row,*col) == 0)
                 ||
-                (matrix(row,*col) == matrix(*col,row)),
+                (std::fabs(matrix(row,*col) - matrix(*col,row))
+		   <= 1e-15 * std::fabs (matrix(row,*col))),
                 ExcMatrixNotSymmetric());
         
   Assert (global_index == n_nonzero_elements, ExcInternalError());  
