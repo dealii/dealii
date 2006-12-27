@@ -82,7 +82,8 @@ tests_x = grid_generator_?? \
 	  hp_constraints* \
 	  face_interpolation \
 	  subface_interpolation \
-	  face_orientation_crash
+	  face_orientation_crash \
+	  refine_and_coarsen
 
 # tests for the hp branch:
 #	  fe_collection_*

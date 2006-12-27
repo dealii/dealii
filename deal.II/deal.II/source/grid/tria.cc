@@ -7423,39 +7423,60 @@ void Triangulation<dim>::fix_coarsen_flags ()
     Assert (cell->coarsen_flag_set() == false, ExcInternalError());
 #endif
 
-				   // revert change of flags: use
-				   // coarsen flags again and delete
-				   // user flags
+				   // now loop over all cells which have the
+				   // user flag set. their children were
+				   // flagged for coarsening. set the coarsen
+				   // flag again if we are sure that none of
+				   // the neighbors of these children are
+				   // refined, or will be refined, since then
+				   // we would get a two-level jump in
+				   // refinement. on the other hand, if one of
+				   // the children's neighbors has their user
+				   // flag set, then we know that its children
+				   // will go away by coarsening, and we will
+				   // be ok.
+				   //
+				   // note on the other hand that we do allow
+				   // level-2 jumps in refinement between
+				   // neighbors in 1d, so this whole procedure
+				   // is only necessary if we are not in 1d
+				   //
+				   // since we remove some coarsening/user
+				   // flags in the process, we have to work
+				   // from the finest level to the coarsest
+				   // one, since we occasionally inspect user
+				   // flags of cells on finer levels and need
+				   // to be sure that these flags are final
   for (cell=last(); cell!=endc; --cell)
     if (cell->user_flag_set())
       {
-	cell->clear_user_flag();
-
-					 // find out whether the
-					 // children of this cell may
-					 // be flagged for refinement
 	bool coarsening_allowed = true;
-	for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
-	  for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
-	    {
-	      const cell_iterator child_neighbor = cell->child(c)->neighbor(n);
-	      if (child_neighbor.state() == IteratorState::valid)
-		if (child_neighbor->has_children() ||
-						     // neighbor has children,
-						     // then only allow coarsening
-						     // if this neighbor will be
-						     // coarsened as well. however,
-						     // I don't see the consequences
-						     // of this case, so simply
-						     // disallow coarsening if
-						     // any neighbor is more
-						     // refined. maybe someone
-						     // else will want to do this
-						     // some time
-		    (child_neighbor->refine_flag_set() &&
-		     (child_neighbor->level()==cell->level()+1)))
-		  coarsening_allowed = false;
-	    }
+
+	if (dim > 1)
+	  {
+	    for (unsigned int c=0;
+		 (c<GeometryInfo<dim>::children_per_cell) && (coarsening_allowed==true);
+		 ++c)
+	      for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
+		{
+		  const cell_iterator child_neighbor = cell->child(c)->neighbor(n);
+		  if ((child_neighbor.state() == IteratorState::valid)
+		      &&
+		      (child_neighbor->level()==cell->level()+1)
+		      &&
+		      ((child_neighbor->has_children()
+			&&
+			!child_neighbor->user_flag_set())
+		       ||
+		       (child_neighbor->has_children()
+			&&
+			child_neighbor->refine_flag_set())))
+		    {
+		      coarsening_allowed = false;
+		      break;
+		    }
+		}
+	  }
 	
 					 // if allowed: tag the
 					 // children for coarsening
@@ -7468,6 +7489,10 @@ void Triangulation<dim>::fix_coarsen_flags ()
 	      cell->child(c)->set_coarsen_flag();
 	    }
       }
+
+				   // clear all user flags again, now that we
+				   // don't need them any more
+  clear_user_flags ();
 }
 
 

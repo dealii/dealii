@@ -960,6 +960,20 @@ inconvenience this causes.
 
 <ol>
   <li> <p>
+       Fixed: The <code class="class">Triangulation</code>::<code
+       class="member">execute_coarsening_and_refinement</code> function has to
+       discard coarsening flags in 2d and 3d if a neighbor of a flagged cell is
+       refined or will be refined, in order to avoid that we end up with
+       neighboring cells that differ in refinement by two levels. The function
+       was overly conservative, however, in that it didn't allow a cell to be
+       coarsened if its neighbor is once refined but is also marked for
+       coarsening. This is now fixed and will lead to a few more cells being
+       coarsened.
+       <br>
+       (Yaqi Wang, WB 2006/12/27)
+       </p>
+
+  <li> <p>
        Fixed: The <code class="class">Triangulation</code>::<code class="member">
        MeshSmoothing</code> flag <code>patch_level_1</code> wrongly produced cells
        on level 0 during <code>coarsening_and_refinement</code>, which is now fixed.
