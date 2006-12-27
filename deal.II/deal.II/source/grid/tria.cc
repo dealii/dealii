@@ -7210,10 +7210,9 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 				   // first clear flags on lines,
 				   // since we need them to determine
 				   // which lines will be refined
-  for (line_iterator line=begin_line(); line!=end_line(); ++line)
-    line->clear_user_flag();
+  clear_user_flags_line();
 
-				   // variables to store whether the
+				   // variable to store whether the
 				   // mesh was changed in the present
 				   // loop and in the whole process
   bool mesh_changed      = false;
@@ -7222,6 +7221,14 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
     {
       mesh_changed = false;
 
+				       // for this following, we need to know
+				       // which cells are going to be
+				       // coarsened, if we had to make a
+				       // decision. the following function
+				       // sets these flags:
+      fix_coarsen_flags ();
+
+      
 				       // flag those lines that will
 				       // be refined
       for (active_cell_iterator cell=begin_active(); cell!=end(); ++cell)
@@ -7308,36 +7315,145 @@ void Triangulation<3>::prepare_refinement_dim_dependent ()
 		  }
 	      }
 
-					     // there is another thing
-					     // here: if any of the
-					     // lines if refined, we
-					     // may not coarsen this
-					     // cell.  this also holds
-					     // true if the line is
-					     // not yet refined, but
-					     // will be
+					     // there is another thing here:
+					     // if any of the lines will be
+					     // refined, then we may not
+					     // coarsen the present cell
+	    if (cell->line(line)->user_flag_set()
+		&&
+		cell->coarsen_flag_set())
+	      {
+		cell->clear_coarsen_flag ();
+		mesh_changed = true;
+		
+		break;
+	      }
+
+					     // similarly, if any of the lines
+					     // *is* already refined, we may
+					     // not coarsen the current
+					     // cell. however, there's a
+					     // catch: if the line is refined,
+					     // but the cell behind it is
+					     // going to be coarsened, then
+					     // the situation changes. if we
+					     // forget this second condition,
+					     // the refine_and_coarsen_3d test
+					     // will start to fail. note that
+					     // to know which cells are going
+					     // to be coarsened, the call for
+					     // fix_coarsen_flags above is
+					     // necessary
 					     //
-					     // this is not totally
-					     // true, since the
-					     // neighbors' children
-					     // may also be all
-					     // coarsened, but we do
-					     // not catch these
-					     // aspects here; in
-					     // effect, we disallow to
-					     // coarsen sharp edges
-					     // where the refinement
-					     // level decreases from
-					     // each cell to the next
-	    if (cell->line(line)->has_children() ||
-		cell->line(line)->user_flag_set())
-	      if (cell->coarsen_flag_set())
-		{
-		  cell->clear_coarsen_flag ();
-		  mesh_changed = true;
-		  
-		  break;
-		}
+					     // the problem is that finding
+					     // all cells that are behind an
+					     // edge in 3d is somewhat of a
+					     // pain and worst of all
+					     // introduces a quadratic
+					     // behavior in this algorithm. on
+					     // the other hand, not many cells
+					     // have their coarsen flag set
+					     // usually, and fixing
+					     // refine_and_coarsen_3d is a
+					     // somewhat important case
+	    if (cell->line(line)->has_children() &&
+		cell->coarsen_flag_set())
+	      {
+		bool cant_be_coarsened = false;
+		
+					       // loop over all cells of this
+					       // level to find neighbors of
+					       // this cell and edge
+		for (cell_iterator edge_neighbor=begin(cell->level());
+		     ((edge_neighbor != end(cell->level()))
+		      &&
+		      (cant_be_coarsened == false));
+		     ++edge_neighbor)
+		  if (edge_neighbor != cell)
+		    for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
+		      if (edge_neighbor->line(e) == cell->line(line))
+			{
+							   // this is a cell
+							   // that is adjacent
+							   // to the present
+							   // cell across this
+							   // edge. so treat
+							   // it, but only if
+							   // it is actually
+							   // refined or will
+							   // be refined
+			  if (! (cell->has_children()
+				 ||
+				 (!cell->has_children() &&
+				  cell->refine_flag_set())))
+			    break;
+
+							   // figure out if
+							   // the neighbor is
+							   // going to be
+							   // coarsened. as a
+							   // post-condition
+							   // of the call to
+							   // fix_coarsen_flags(),
+							   // either all
+							   // children of a
+							   // cell must be
+							   // flagged for
+							   // coarsening, or
+							   // none may. above
+							   // we delete some
+							   // coarsen flags,
+							   // and in the next
+							   // call to
+							   // fix_coarsen_flags()
+							   // the flags to all
+							   // siblings will be
+							   // removed. we will
+							   // check here if
+							   // still all
+							   // children have
+							   // that flag set
+			  unsigned int n_children_flagged = 0;
+			  for (unsigned int c=0; c<GeometryInfo<dim>::children_per_cell; ++c)
+			    if ((edge_neighbor->child(c)->has_children() == false)
+				&&
+				edge_neighbor->child(c)->coarsen_flag_set())
+			      ++n_children_flagged;
+			  
+							   // now, if not all
+							   // children are
+							   // flagged, then
+							   // the neighboring
+							   // cell isn't going
+							   // to be
+							   // coarsened. that
+							   // means that the
+							   // common edge
+							   // isn't going to
+							   // be coarsened and
+							   // that we can't
+							   // coarsen the
+							   // present cell
+			  if (n_children_flagged !=
+			      GeometryInfo<dim>::children_per_cell)
+			    cant_be_coarsened = true;
+
+
+							   // neighbor was
+							   // found. no reason
+							   // to keep looping
+							   // over edges of
+							   // the possible
+							   // edge_neighbor
+			  break;
+			}
+
+		if (cant_be_coarsened == true)
+		  {
+		    cell->clear_coarsen_flag ();
+		    mesh_changed = true;
+		  }
+	      }
 	  }
     }
   while (mesh_changed == true);
@@ -8230,8 +8346,7 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 		      &&
 		      (cell->neighbor(i)->refine_flag_set() == false))
 		    {
-		      if (cell->neighbor(i)->coarsen_flag_set())
-			cell->neighbor(i)->clear_coarsen_flag();
+		      cell->neighbor(i)->clear_coarsen_flag();
 		      cell->neighbor(i)->set_refine_flag();
 		    }
 		  else

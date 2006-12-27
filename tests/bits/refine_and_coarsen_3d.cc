@@ -14,6 +14,11 @@
 
 // check that if we take an locally refined mesh, refine it globally once,
 // then coarsen it globally again, that we get the same mesh
+//
+// Triangulation::fix_coarsen_flags used to be too conservative in allowing
+// cells to be coarsened (see today's changes.html entry). in contrast to the
+// 1d and 2d cases, the 3d case appears to have an additional problem
+// somewhere
 
 #include "../tests.h"
 
