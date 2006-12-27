@@ -1,5 +1,5 @@
-//----------------------------  refine_and_coarsen.cc  ---------------------------
-//    $Id: refine_and_coarsen.cc 11749 2005-11-09 19:11:20Z wolf $
+//----------------------------  refine_and_coarsen_1d.cc  ---------------------------
+//    $Id: refine_and_coarsen_1d.cc 11749 2005-11-09 19:11:20Z wolf $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2006 by the deal.II authors
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  refine_and_coarsen.cc  ---------------------------
+//----------------------------  refine_and_coarsen_1d.cc  ---------------------------
 
 
 // check that if we take an locally refined mesh, refine it globally once,
@@ -74,14 +74,12 @@ void check ()
 
 int main () 
 {
-  std::ofstream logfile("refine_and_coarsen/output");
+  std::ofstream logfile("refine_and_coarsen_1d/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   check<1> ();
-  check<2> ();
-  check<3> ();
 }
 
   
