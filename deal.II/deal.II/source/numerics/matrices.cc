@@ -1000,7 +1000,6 @@ create_boundary_mass_matrix_1 (const Mapping<dim>        &mapping,
   Assert (matrix.n() == matrix.m(), ExcInternalError());
   Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
   Assert (boundary_functions.size() != 0, ExcInternalError());
-  Assert (dof.get_fe() == fe, ExcInternalError());
   Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
 	  ExcInternalError());
   Assert (n_components == boundary_functions.begin()->second->n_components,
@@ -1437,10 +1436,9 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
 			       const Function<dim> * const coefficient,
 			       const IteratorRange<hp::DoFHandler<dim> >   range,
 			       Threads::ThreadMutex      &mutex)
-{
-/*  
-  const FiniteElement<dim> &fe = dof.get_fe();
-  const unsigned int n_components  = fe.n_components();
+{  
+  const hp::FECollection<dim> &fe_collection = dof.get_fe();
+  const unsigned int n_components  = fe_collection.n_components();
   const bool         fe_is_system  = (n_components != 1);
 
   Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
@@ -1448,7 +1446,6 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
   Assert (matrix.n() == matrix.m(), ExcInternalError());
   Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
   Assert (boundary_functions.size() != 0, ExcInternalError());
-  Assert (dof.get_fe() == fe, ExcInternalError());
   Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
 	  ExcInternalError());
   Assert (n_components == boundary_functions.begin()->second->n_components,
@@ -1469,35 +1466,34 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
     };
 #endif
   
-  const unsigned int dofs_per_cell = fe.dofs_per_cell,
-		     dofs_per_face = fe.dofs_per_face;
+  const unsigned int max_dofs_per_cell = fe_collection.max_dofs_per_cell(),
+		     max_dofs_per_face = fe_collection.max_dofs_per_face();
   
-  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_vector(dofs_per_cell);
+  FullMatrix<double> cell_matrix(max_dofs_per_cell, max_dofs_per_cell);
+  Vector<double>     cell_vector(max_dofs_per_cell);
 
 
   UpdateFlags update_flags = UpdateFlags (update_values     |
 					  update_JxW_values |
 					  update_q_points);
-  FEFaceValues<dim> fe_values (mapping, fe, q, update_flags);
+  hp::FEFaceValues<dim> x_fe_values (mapping, fe_collection, q, update_flags);
 
 				   // two variables for the coefficient,
 				   // one for the two cases indicated in
 				   // the name
-  std::vector<double>          coefficient_values (fe_values.n_quadrature_points);
-  std::vector<Vector<double> > coefficient_vector_values (fe_values.n_quadrature_points,
-							  Vector<double>(n_components));
+  std::vector<double>          coefficient_values;
+  std::vector<Vector<double> > coefficient_vector_values;
 
-  std::vector<double>          rhs_values_scalar (fe_values.n_quadrature_points);
-  std::vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
-						  Vector<double>(n_components));
+  std::vector<double>          rhs_values_scalar;
+  std::vector<Vector<double> > rhs_values_system;
 
-  std::vector<unsigned int> dofs (dofs_per_cell);
-  std::vector<unsigned int> dofs_on_face_vector (dofs_per_face);
+  std::vector<unsigned int> dofs (max_dofs_per_cell);
+  std::vector<unsigned int> dofs_on_face_vector (max_dofs_per_face);
 
 				   // for each dof on the cell, have a
 				   // flag whether it is on the face
-  std::vector<bool>         dof_is_on_face(dofs_per_cell);
+  std::vector<bool>         dof_is_on_face(max_dofs_per_cell);
+
 
   typename hp::DoFHandler<dim>::active_cell_iterator cell = range.first;
   for (; cell!=range.second; ++cell)
@@ -1507,14 +1503,24 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
       if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
 	  boundary_functions.end())
 	{
-	  cell_matrix = 0;
-	  cell_vector = 0;
+	  x_fe_values.reinit (cell, face);
+
+	  const FEFaceValues<dim> &fe_values = x_fe_values.get_present_fe_values ();
+
+	  const FiniteElement<dim> &fe = cell->get_fe();
+	  const unsigned int dofs_per_cell = fe.dofs_per_cell;
+	  const unsigned int dofs_per_face = fe.dofs_per_face;
 	  
-	  fe_values.reinit (cell, face);
+	  cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
+	  cell_vector.reinit (dofs_per_cell);
+	  cell_matrix = 0;
+	  cell_vector = 0;	  
 	  
 	  if (fe_is_system)
 					     // FE has several components
 	    {
+	      rhs_values_system.resize (fe_values.n_quadrature_points,
+					Vector<double>(n_components));
 	      boundary_functions.find(cell->face(face)->boundary_indicator())
 		->second->vector_value_list (fe_values.get_quadrature_points(),
 					     rhs_values_system);
@@ -1523,6 +1529,7 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
 		{
 		  if (coefficient->n_components==1)
 		    {
+		      coefficient_values.resize (fe_values.n_quadrature_points);
 		      coefficient->value_list (fe_values.get_quadrature_points(),
 					       coefficient_values);
 		      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -1549,6 +1556,8 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
 		    }
 		  else
 		    {
+		      coefficient_vector_values.resize (fe_values.n_quadrature_points,
+							Vector<double>(n_components));
 		      coefficient->vector_value_list (fe_values.get_quadrature_points(),
 						      coefficient_vector_values);
 		      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -1600,11 +1609,13 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
 	  else
 					     // FE is a scalar one
 	    {
+	      rhs_values_scalar.resize (fe_values.n_quadrature_points);
 	      boundary_functions.find(cell->face(face)->boundary_indicator())
 		->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
 	      
 	      if (coefficient != 0)
 		{
+		  coefficient_values.resize (fe_values.n_quadrature_points);
 		  coefficient->value_list (fe_values.get_quadrature_points(),
 					   coefficient_values);
 		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
@@ -1686,8 +1697,13 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
 					   // inefficient, so we copy the dofs
 					   // into a set, which enables binary
 					   // searches.
+	  dofs.resize (dofs_per_cell);
+	  dofs_on_face_vector.resize (dofs_per_face);
+	  dof_is_on_face.resize (dofs_per_cell);
+
 	  cell->get_dof_indices (dofs);
-	  cell->face(face)->get_dof_indices (dofs_on_face_vector);
+	  cell->face(face)->get_dof_indices (dofs_on_face_vector,
+					     cell->active_fe_index());
 
 					   // check for each of the
 					   // dofs on this cell
@@ -1781,9 +1797,8 @@ create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>        &mapping,
 						 // smallness
 		Assert (std::fabs(cell_vector(j)) <= 1e-10 * max_diag_entry,
 			ExcInternalError());
-	      };
-	};
-*/	
+	      }
+	}
 }
 
 
