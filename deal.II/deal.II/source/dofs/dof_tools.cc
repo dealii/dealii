@@ -25,6 +25,7 @@
 #include <dofs/dof_constraints.h>
 #include <fe/fe.h>
 #include <fe/fe_values.h>
+#include <fe/fe_collection.h>
 #include <dofs/dof_tools.h>
 #include <lac/sparsity_pattern.h>
 #include <lac/compressed_sparsity_pattern.h>
@@ -869,7 +870,6 @@ DoFTools::make_sparsity_pattern (
   SparsityPattern&         sparsity)
 {
   const unsigned int n_dofs = dof.n_dofs();
-  const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
 
   Assert (sparsity.n_rows() == n_dofs,
 	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
@@ -880,55 +880,74 @@ DoFTools::make_sparsity_pattern (
   Assert (couplings.n_cols() == dof.get_fe().n_components(),
 	  ExcDimensionMismatch(couplings.n_cols(), dof.get_fe().n_components()));
 
-				   // first build a mask for each dof,
-				   // not like the one given which
-				   // represents components. make sure
-				   // we do the right thing also with
+  const hp::FECollection<DH::dimension> fe_collection (dof.get_fe());
+  
+				   // first, for each finite element, build a
+				   // mask for each dof, not like the one
+				   // given which represents components. make
+				   // sure we do the right thing also with
 				   // respect to non-primitive shape
-				   // functions, which takes some
-				   // additional thought
-  std::vector<std::vector<bool> > dof_mask(dofs_per_cell,
-					   std::vector<bool>(dofs_per_cell, false));
-  for (unsigned int i=0; i<dofs_per_cell; ++i)
-    for (unsigned int j=0; j<dofs_per_cell; ++j)
-      if (dof.get_fe().is_primitive(i) &&
-          dof.get_fe().is_primitive(j))
-        dof_mask[i][j] = (couplings(dof.get_fe().system_to_component_index(i).first,
-				    dof.get_fe().system_to_component_index(j).first) != none);
-      else
-        {
-          const unsigned int first_nonzero_comp_i
-            = (std::find (dof.get_fe().get_nonzero_components(i).begin(),
-                          dof.get_fe().get_nonzero_components(i).end(),
-                          true)
-               -
-               dof.get_fe().get_nonzero_components(i).begin());
-          const unsigned int first_nonzero_comp_j
-            = (std::find (dof.get_fe().get_nonzero_components(j).begin(),
-                          dof.get_fe().get_nonzero_components(j).end(),
-                          true)
-               -
-               dof.get_fe().get_nonzero_components(j).begin());
-          Assert (first_nonzero_comp_i < dof.get_fe().n_components(),
-                  ExcInternalError());
-          Assert (first_nonzero_comp_j < dof.get_fe().n_components(),
-                  ExcInternalError());          
-          
-          dof_mask[i][j] = (couplings(first_nonzero_comp_i,first_nonzero_comp_j) != none);
-        }
+				   // functions, which takes some additional
+				   // thought
+  std::vector<std::vector<std::vector<bool> > > dof_mask(fe_collection.size());
+  for (unsigned int f=0; f<fe_collection.size(); ++f)
+    {
+      const unsigned int dofs_per_cell = fe_collection[f].dofs_per_cell;
+
+      dof_mask[f].resize (dofs_per_cell,
+			  std::vector<bool>(dofs_per_cell, false));
+      
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
+	  if (fe_collection[f].is_primitive(i) &&
+	      fe_collection[f].is_primitive(j))
+	    dof_mask[f][i][j]
+	      = (couplings(fe_collection[f].system_to_component_index(i).first,
+			   fe_collection[f].system_to_component_index(j).first) != none);
+	  else
+	    {
+	      const unsigned int first_nonzero_comp_i
+		= (std::find (fe_collection[f].get_nonzero_components(i).begin(),
+			      fe_collection[f].get_nonzero_components(i).end(),
+			      true)
+		   -
+		   fe_collection[f].get_nonzero_components(i).begin());
+	      const unsigned int first_nonzero_comp_j
+		= (std::find (fe_collection[f].get_nonzero_components(j).begin(),
+			      fe_collection[f].get_nonzero_components(j).end(),
+			      true)
+		   -
+		   fe_collection[f].get_nonzero_components(j).begin());
+	      Assert (first_nonzero_comp_i < fe_collection[f].n_components(),
+		      ExcInternalError());
+	      Assert (first_nonzero_comp_j < fe_collection[f].n_components(),
+		      ExcInternalError());          
+	      
+	      dof_mask[f][i][j]
+		= (couplings(first_nonzero_comp_i,first_nonzero_comp_j) != none);
+	    }
+    }
   
 
 
-  std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
+  std::vector<unsigned int> dofs_on_this_cell(fe_collection.max_dofs_per_cell());
   typename DH::active_cell_iterator cell = dof.begin_active(),
 				    endc = dof.end();
   for (; cell!=endc; ++cell) 
     {
+      const unsigned int fe_index
+	= cell->active_fe_index();
+      
+      const unsigned int dofs_per_cell
+	= fe_collection[fe_index].dofs_per_cell;
+      
+      dofs_on_this_cell.resize (dofs_per_cell);
       cell->get_dof_indices (dofs_on_this_cell);
+      
 				       // make sparsity pattern for this cell
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	  if (dof_mask[i][j] == true)
+	  if (dof_mask[fe_index][i][j] == true)
 	    sparsity.add (dofs_on_this_cell[i],
 			  dofs_on_this_cell[j]);
     }
@@ -1108,7 +1127,8 @@ void DoFTools::make_boundary_sparsity_pattern (
         {
           const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
           dofs_on_this_face.resize (dofs_per_face);
-          cell->face(f)->get_dof_indices (dofs_on_this_face);
+          cell->face(f)->get_dof_indices (dofs_on_this_face,
+					  cell->active_fe_index());
 
                                            // make sparsity pattern for this cell
           for (unsigned int i=0; i<dofs_per_face; ++i)
@@ -5146,7 +5166,7 @@ DoFTools::map_dof_to_boundary_indices (const DH                  &dof_handler,
         {
           const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
           dofs_on_face.resize (dofs_per_face);
-          cell->face(f)->get_dof_indices (dofs_on_face);
+          cell->face(f)->get_dof_indices (dofs_on_face, cell->active_fe_index());
           for (unsigned int i=0; i<dofs_per_face; ++i)
             if (mapping[dofs_on_face[i]] == DH::invalid_dof_index)
               mapping[dofs_on_face[i]] = next_boundary_index++;
@@ -5189,7 +5209,7 @@ void DoFTools::map_dof_to_boundary_indices (
       {
         const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
         dofs_on_face.resize (dofs_per_face);
-	cell->face(f)->get_dof_indices (dofs_on_face);
+	cell->face(f)->get_dof_indices (dofs_on_face, cell->active_fe_index());
 	for (unsigned int i=0; i<dofs_per_face; ++i)
 	  if (mapping[dofs_on_face[i]] == DH::invalid_dof_index)
 	    mapping[dofs_on_face[i]] = next_boundary_index++;
@@ -5397,52 +5417,98 @@ DoFTools::compute_row_length_vector(
 //   const Table<2,Coupling>& couplings, const Table<2,Coupling>& flux_couplings);
 
 template void
-DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,SparsityPattern>
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				SparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  SparsityPattern    &sparsity);
 template void
-DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,CompressedSparsityPattern>
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				CompressedSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  CompressedSparsityPattern    &sparsity);
 template void
-DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,BlockSparsityPattern>
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				BlockSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  BlockSparsityPattern                &sparsity);
 template void
-DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,CompressedBlockSparsityPattern>
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				CompressedBlockSparsityPattern>
 (const DoFHandler<deal_II_dimension> &dof,
  CompressedBlockSparsityPattern      &sparsity);
 
 template void
-DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SparsityPattern>
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				SparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  SparsityPattern    &sparsity);
 template void
-DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,CompressedSparsityPattern>
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				CompressedSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  CompressedSparsityPattern    &sparsity);
 template void
-DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,BlockSparsityPattern>
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				BlockSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  BlockSparsityPattern                &sparsity);
 template void
-DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,CompressedBlockSparsityPattern>
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				CompressedBlockSparsityPattern>
 (const hp::DoFHandler<deal_II_dimension> &dof,
  CompressedBlockSparsityPattern      &sparsity);
 
 
 template void 
-DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,SparsityPattern>
-(const DoFHandler<deal_II_dimension>&, const Table<2,Coupling>&, SparsityPattern&);
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				SparsityPattern>
+(const DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ SparsityPattern&);
 template void 
-DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,CompressedSparsityPattern>
-(const DoFHandler<deal_II_dimension>&, const Table<2,Coupling>&, CompressedSparsityPattern&);
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				CompressedSparsityPattern>
+(const DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ CompressedSparsityPattern&);
 template void 
-DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,BlockSparsityPattern>
-(const DoFHandler<deal_II_dimension>&, const Table<2,Coupling>&, BlockSparsityPattern&);
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				BlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ BlockSparsityPattern&);
 template void 
-DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,CompressedBlockSparsityPattern>
-(const DoFHandler<deal_II_dimension>&, const Table<2,Coupling>&, CompressedBlockSparsityPattern&);
+DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension>,
+				CompressedBlockSparsityPattern>
+(const DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ CompressedBlockSparsityPattern&);
+
+
+template void 
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				SparsityPattern>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ SparsityPattern&);
+template void 
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				CompressedSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ CompressedSparsityPattern&);
+template void 
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				BlockSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ BlockSparsityPattern&);
+template void 
+DoFTools::make_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,
+				CompressedBlockSparsityPattern>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const Table<2,Coupling>&,
+ CompressedBlockSparsityPattern&);
 
 // #if deal_II_dimension > 1
 template void
@@ -5764,6 +5830,27 @@ DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension> >
  std::vector<unsigned int> &);
 
 #endif
+
+
+
+template
+void
+DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ const std::set<unsigned char> &,
+ std::vector<unsigned int> &);
+
+#if deal_II_dimension != 1
+
+template
+void
+DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ std::vector<unsigned int> &);
+
+#endif
+
+
 
 
 template

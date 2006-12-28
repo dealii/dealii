@@ -39,6 +39,14 @@ template <int dim> class DoFHandler;
 template <int dim> class MGDoFHandler;
 template <int dim> class FEValues;
 
+namespace hp
+{
+  template <int> class QCollection;
+  template <int> class MappingCollection;
+  template <int> class DoFHandler;
+}
+
+
 #ifdef DEAL_II_USE_PETSC
 namespace PETScWrappers
 {
@@ -251,6 +259,52 @@ class MatrixCreator
 				    const Function<dim>      &rhs,
 				    Vector<double>           &rhs_vector,
 				    const Function<dim> * const a = 0);
+				     /**
+				      * Same function as above, but for hp
+				      * objects.
+				      */
+    template <int dim, typename number>
+    static void create_mass_matrix (const hp::MappingCollection<dim>       &mapping,
+				    const hp::DoFHandler<dim>    &dof,
+				    const hp::QCollection<dim>    &q,
+				    SparseMatrix<number>     &matrix,
+				    const Function<dim> * const a = 0);
+
+				     /**
+				      * Same function as above, but for hp
+				      * objects.
+				      */
+    template <int dim, typename number>
+    static void create_mass_matrix (const hp::DoFHandler<dim>    &dof,
+				    const hp::QCollection<dim>    &q,
+				    SparseMatrix<number>     &matrix,
+				    const Function<dim> * const a = 0);
+
+				     /**
+				      * Same function as above, but for hp
+				      * objects.
+				      */
+    template <int dim, typename number>
+    static void create_mass_matrix (const hp::MappingCollection<dim>       &mapping,
+				    const hp::DoFHandler<dim>    &dof,
+				    const hp::QCollection<dim>    &q,
+				    SparseMatrix<number>     &matrix,
+				    const Function<dim>      &rhs,
+				    Vector<double>           &rhs_vector,
+				    const Function<dim> * const a = 0);
+
+				     /**
+				      * Same function as above, but for hp
+				      * objects.
+				      */
+    template <int dim, typename number>
+    static void create_mass_matrix (const hp::DoFHandler<dim>    &dof,
+				    const hp::QCollection<dim>    &q,
+				    SparseMatrix<number>     &matrix,
+				    const Function<dim>      &rhs,
+				    Vector<double>           &rhs_vector,
+				    const Function<dim> * const a = 0);
+
     
 				     /**
 				      * Assemble the mass matrix and a
@@ -307,6 +361,49 @@ class MatrixCreator
     static
     void create_boundary_mass_matrix (const DoFHandler<dim>    &dof,
 				      const Quadrature<dim-1>  &q,
+				      SparseMatrix<double>     &matrix,
+				      const typename FunctionMap<dim>::type        &boundary_functions,
+				      Vector<double>           &rhs_vector,
+				      std::vector<unsigned int>&dof_to_boundary_mapping,
+				      const Function<dim> * const a = 0);
+
+				     /**
+				      * Same function as above, but for hp
+				      * objects.
+				      */
+    template <int dim>
+    static
+    void create_boundary_mass_matrix (const hp::MappingCollection<dim>       &mapping,
+				      const hp::DoFHandler<dim>    &dof,
+				      const hp::QCollection<dim-1>  &q,
+				      SparseMatrix<double>     &matrix,
+				      const typename FunctionMap<dim>::type &boundary_functions,
+				      Vector<double>           &rhs_vector,
+				      std::vector<unsigned int>&dof_to_boundary_mapping,
+				      const Function<dim> * const a = 0);
+
+				     /**
+				      * Same function as above, but for hp
+				      * objects.
+				      */
+    static
+    void create_boundary_mass_matrix (const hp::MappingCollection<1>       &mapping,
+				      const hp::DoFHandler<1>    &dof,
+				      const hp::QCollection<0>    &q,
+				      SparseMatrix<double>   &matrix,
+				      const FunctionMap<1>::type &boundary_functions,
+				      Vector<double>         &rhs_vector,
+				      std::vector<unsigned int>&dof_to_boundary_mapping,
+				      const Function<1> * const a = 0);
+
+				     /**
+				      * Same function as above, but for hp
+				      * objects.
+				      */
+    template <int dim>
+    static
+    void create_boundary_mass_matrix (const hp::DoFHandler<dim>    &dof,
+				      const hp::QCollection<dim-1>  &q,
 				      SparseMatrix<double>     &matrix,
 				      const typename FunctionMap<dim>::type        &boundary_functions,
 				      Vector<double>           &rhs_vector,
@@ -383,6 +480,56 @@ class MatrixCreator
 				       const Function<dim> * const a = 0);
 
 				     /**
+				      * Like the functions above, but for hp
+				      * dof handlers, mappings, and quadrature
+				      * collections.
+				      */
+    template <int dim>
+    static void create_laplace_matrix (const hp::MappingCollection<dim>       &mapping,
+				       const hp::DoFHandler<dim>    &dof,
+				       const hp::QCollection<dim>    &q,
+				       SparseMatrix<double>     &matrix,
+				       const Function<dim> * const a = 0);
+    
+				     /**
+				      * Like the functions above, but for hp
+				      * dof handlers, mappings, and quadrature
+				      * collections.
+				      */
+    template <int dim>
+    static void create_laplace_matrix (const hp::DoFHandler<dim>    &dof,
+				       const hp::QCollection<dim>    &q,
+				       SparseMatrix<double>     &matrix,
+				       const Function<dim> * const a = 0);
+
+				     /**
+				      * Like the functions above, but for hp
+				      * dof handlers, mappings, and quadrature
+				      * collections.
+				      */
+    template <int dim>
+    static void create_laplace_matrix (const hp::MappingCollection<dim>       &mapping,
+				       const hp::DoFHandler<dim>    &dof,
+				       const hp::QCollection<dim>    &q,
+				       SparseMatrix<double>     &matrix,
+				       const Function<dim>      &rhs,
+				       Vector<double>           &rhs_vector,
+				       const Function<dim> * const a = 0);
+
+				     /**
+				      * Like the functions above, but for hp
+				      * dof handlers, mappings, and quadrature
+				      * collections.
+				      */
+    template <int dim>
+    static void create_laplace_matrix (const hp::DoFHandler<dim>    &dof,
+				       const hp::QCollection<dim>    &q,
+				       SparseMatrix<double>     &matrix,
+				       const Function<dim>      &rhs,
+				       Vector<double>           &rhs_vector,
+				       const Function<dim> * const a = 0);
+
+				     /**
 				      * Exception
 				      */
     DeclException0 (ExcComponentMismatch);    
@@ -394,15 +541,15 @@ class MatrixCreator
 				      * just like a
 				      * <tt>std::pair<iterator,iterator></tt>
 				      * but is templatized on the
-				      * space dimension.
+				      * dof handler that shouls be used.
 				      */
-    template <int dim>
+    template <typename DH>
     struct IteratorRange 
     {
 					 /**
 					  * Typedef for the iterator type.
 					  */
-	typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
+	typedef typename DH::active_cell_iterator active_cell_iterator;
 
 					 /**
 					  * Abbreviation for a pair of
@@ -450,7 +597,7 @@ class MatrixCreator
 			       const Quadrature<dim>    &q,
 			       SparseMatrix<number>     &matrix,
 			       const Function<dim> * const a,
-			       const IteratorRange<dim>  range,
+			       const IteratorRange<DoFHandler<dim> >  range,
 			       Threads::ThreadMutex     &mutex);
 
 				     /**
@@ -472,10 +619,37 @@ class MatrixCreator
 			       const Function<dim>      &rhs,
 			       Vector<double>           &rhs_vector,
 			       const Function<dim> * const a,
-			       const IteratorRange<dim>  range,
+			       const IteratorRange<DoFHandler<dim> >  range,
 			       Threads::ThreadMutex     &mutex);
 
 				     /**
+				      * Same function as above, but for hp
+				      * objects.
+				      */
+    template <int dim, typename number>
+    static
+    void create_mass_matrix_1 (const hp::MappingCollection<dim>       &mapping,
+			       const hp::DoFHandler<dim>    &dof,
+			       const hp::QCollection<dim>    &q,
+			       SparseMatrix<number>     &matrix,
+			       const Function<dim> * const a,
+			       const IteratorRange<hp::DoFHandler<dim> >  range,
+			       Threads::ThreadMutex     &mutex);
+
+    template <int dim, typename number>
+    static
+    void create_mass_matrix_2 (const hp::MappingCollection<dim>       &mapping,
+			       const hp::DoFHandler<dim>    &dof,
+			       const hp::QCollection<dim>    &q,
+			       SparseMatrix<number>     &matrix,
+			       const Function<dim>      &rhs,
+			       Vector<double>           &rhs_vector,
+			       const Function<dim> * const a,
+			       const IteratorRange<hp::DoFHandler<dim> >  range,
+			       Threads::ThreadMutex     &mutex);
+
+
+/**
 				      * Version of the same function
 				      * (without suffix @p _1) with
 				      * the same argument list that
@@ -492,7 +666,7 @@ class MatrixCreator
 				  const Quadrature<dim>    &q,
 				  SparseMatrix<double>     &matrix,
 				  const Function<dim> * const a,
-				  const IteratorRange<dim>  range,
+				  const IteratorRange<DoFHandler<dim> >  range,
 				  Threads::ThreadMutex     &mutex);
 
 				     /**
@@ -514,9 +688,51 @@ class MatrixCreator
 				  const Function<dim>      &rhs,
 				  Vector<double>           &rhs_vector,
 				  const Function<dim> * const a,
-				  const IteratorRange<dim>  range,
+				  const IteratorRange<DoFHandler<dim> >  range,
 				  Threads::ThreadMutex     &mutex);
 
+				     /**
+				      * Version of the same function
+				      * (without suffix @p _1) with
+				      * the same argument list that
+				      * operates only on an interval
+				      * of iterators. Used for
+				      * parallelization. The mutex is
+				      * used to synchronise access to
+				      * the matrix.
+				      */
+    template <int dim>
+    static
+    void create_laplace_matrix_1 (const hp::MappingCollection<dim>       &mapping,
+				  const hp::DoFHandler<dim>    &dof,
+				  const hp::QCollection<dim>    &q,
+				  SparseMatrix<double>     &matrix,
+				  const Function<dim> * const a,
+				  const IteratorRange<hp::DoFHandler<dim> >  range,
+				  Threads::ThreadMutex     &mutex);
+
+				     /**
+				      * Version of the same function
+				      * (without suffix @p _2) with
+				      * the same argument list that
+				      * operates only on an interval
+				      * of iterators. Used for
+				      * parallelization. The mutex is
+				      * used to synchronise access to
+				      * the matrix.
+				      */
+    template <int dim>
+    static
+    void create_laplace_matrix_2 (const hp::MappingCollection<dim>       &mapping,
+				  const hp::DoFHandler<dim>    &dof,
+				  const hp::QCollection<dim>    &q,
+				  SparseMatrix<double>     &matrix,
+				  const Function<dim>      &rhs,
+				  Vector<double>           &rhs_vector,
+				  const Function<dim> * const a,
+				  const IteratorRange<hp::DoFHandler<dim> >  range,
+				  Threads::ThreadMutex     &mutex);
+    
 				     /**
 				      * Version of the same function
 				      * (without suffix @p _1) with
@@ -537,7 +753,23 @@ class MatrixCreator
 					Vector<double>           &rhs_vector,
 					std::vector<unsigned int>&dof_to_boundary_mapping,
 					const Function<dim> * const a,
-					const IteratorRange<dim>  range,
+					const IteratorRange<DoFHandler<dim> >  range,
+					Threads::ThreadMutex     &mutex);
+
+				     /**
+				      * Same as above, but for hp.
+				      */
+    template <int dim>
+    static
+    void create_boundary_mass_matrix_1 (const hp::MappingCollection<dim>       &mapping,
+					const hp::DoFHandler<dim>    &dof,
+					const hp::QCollection<dim-1>  &q,
+					SparseMatrix<double>     &matrix,
+					const typename FunctionMap<dim>::type        &boundary_functions,
+					Vector<double>           &rhs_vector,
+					std::vector<unsigned int>&dof_to_boundary_mapping,
+					const Function<dim> * const a,
+					const IteratorRange<hp::DoFHandler<dim> >  range,
 					Threads::ThreadMutex     &mutex);
 };
 
