@@ -3449,7 +3449,7 @@ determine_intermediate_format_dimensions (std::istream &input)
 {
   Assert (input, ExcIO());
           
-  int dim, spacedim;
+  unsigned int dim, spacedim;
   input >> dim >> spacedim;
 
   return std::make_pair (dim, spacedim);
