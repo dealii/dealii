@@ -359,7 +359,7 @@ class Tensor<1,dim>
 				      * that seems to be impossible as
 				      * well.
 				      */
-    template <int otherrank, int otherdim>  friend class Tensor;
+    template <int otherrank, int otherdim>  friend class dealii::Tensor;
 
 				     /**
 				      * Point is allowed access to
