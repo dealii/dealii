@@ -262,9 +262,10 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
             GXX_VERSION_DETAILED=$GXX_VERSION
           else
   
-      	    dnl Sun Workshop?
-            is_sun_cc="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
-            if test "x$is_sun_cc" != "x" ; then
+      	    dnl Sun Workshop/Studio?
+            is_sun_cc_1="`($CXX -V 2>&1) | grep 'Sun WorkShop'`"
+            is_sun_cc_2="`($CXX -V 2>&1) | grep 'Sun C++'`"
+            if test "x$is_sun_cc_1$is_sun_cc_2" != "x" ; then
               AC_MSG_RESULT(C++ compiler is Sun Workshop compiler)
               GXX_VERSION=sun_workshop
               GXX_VERSION_DETAILED=$GXX_VERSION
@@ -692,10 +693,9 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSO="$CXXFLAGS -w"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-G"
-          AC_MSG_ERROR(Attention! deal.II is not known to work with SUN Compilers!
+          AC_MSG_ERROR([deal.II is known not to work with SUN Compilers!
 	If you intend to port it, please remove this message
-	from aclocal.m4 and call autoconf and configure. If you do not understand
-	this, you will NOT want to do it!)
+	from aclocal.m4 and call autoconf and configure.])
           ;;
   
       portland_group)
