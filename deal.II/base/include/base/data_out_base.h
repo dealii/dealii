@@ -2390,7 +2390,8 @@ class DataOutInterface : private DataOutBase
     using DataOutBase::deal_II_intermediate;
     using DataOutBase::parse_output_format;
     using DataOutBase::get_output_format_names;
-
+    using DataOutBase::determine_intermediate_format_dimensions;
+    
 				     /**
 				      * Constructor.
 				      */
