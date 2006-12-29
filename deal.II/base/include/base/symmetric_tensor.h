@@ -125,7 +125,7 @@ namespace internal
     template <int rank1, int rank2, int dim>
     struct double_contraction_result 
     {
-	typedef SymmetricTensor<rank1+rank2-4,dim> type;
+	typedef ::dealii::SymmetricTensor<rank1+rank2-4,dim> type;
     };
     
 
@@ -248,7 +248,7 @@ namespace internal
     template <int rank, int dim>
     struct AccessorTypes<rank, dim,true>
     {
-        typedef const SymmetricTensor<rank,dim> tensor_type;
+        typedef const ::dealii::SymmetricTensor<rank,dim> tensor_type;
 
         typedef double reference;
     };
@@ -265,7 +265,7 @@ namespace internal
     template <int rank, int dim>
     struct AccessorTypes<rank,dim,false>
     {
-        typedef SymmetricTensor<rank,dim> tensor_type;
+        typedef ::dealii::SymmetricTensor<rank,dim> tensor_type;
 
         typedef double &reference;
     };
@@ -399,7 +399,7 @@ namespace internal
         template <int,int,bool,int>
         friend class Accessor;
 #  ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
-        friend class SymmetricTensor<rank,dim>;
+        friend class ::dealii::SymmetricTensor<rank,dim>;
         friend class Accessor<rank,dim,constness,P+1>;
 #  endif
 #else
@@ -516,10 +516,10 @@ namespace internal
 #ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
         template <int,int> friend class SymmetricTensor;
         template <int,int,bool,int>
-        friend class Accessor;
+        friend class SymmetricTensorAccessors::Accessor;
 #  ifndef DEAL_II_TEMPL_SPEC_FRIEND_BUG
-        friend class SymmetricTensor<rank,dim>;
-        friend class Accessor<rank,dim,constness,2>;
+        friend class ::dealii::SymmetricTensor<rank,dim>;
+        friend class SymmetricTensorAccessors::Accessor<rank,dim,constness,2>;
 #  endif
 #else
         friend class SymmetricTensor<rank,dim>;
