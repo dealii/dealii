@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/point.h>
+#include <base/table.h>
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN
@@ -128,7 +129,7 @@ template <typename number> class SparseMatrix;
  * shell onto a grid of an airfoil, for example.
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, Stefan Nauber, Joerg Weimar, 1998, 1999, 2000, 2001, 2002, 2003.
+ * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, Stefan Nauber, Joerg Weimar, Yaqi Wang, 1998, 1999, 2000, 2001, 2002, 2003, 2006.
  */
 class GridGenerator
 {
@@ -305,6 +306,29 @@ class GridGenerator
 			       const Point<dim>                &p_1,
 			       const Point<dim>                &p_2,
 			       const bool                       colorize);
+
+				     /**
+				      * Like the previous function, but with
+				      * the following twist: the @p
+				      * material_id argument is a
+				      * dim-dimensional array that, for each
+				      * cell, indicates which material_id
+				      * should be set. In addition, and this
+				      * is the major new functionality, if the
+				      * material_id of a cell is <tt>(unsigned
+				      * char)(-1)</tt>, then that cell is
+				      * deleted from the triangulation,
+				      * i.e. the domain will have a void
+				      * there.
+				      */
+    template <int dim>
+    static
+    void
+    subdivided_hyper_rectangle (Triangulation<dim>                       &tria,
+				const std::vector< std::vector<double> > &spacing,
+				const Point<dim>                         &p,
+				const Table<dim,unsigned char>           &material_id,
+				const bool                                colorize=false);
     
 				     /**
 				      * A parallelogram. The first

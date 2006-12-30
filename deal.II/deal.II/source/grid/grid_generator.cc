@@ -22,6 +22,7 @@
 #include <lac/sparse_matrix.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_reordering.h>
+#include <grid/grid_tools.h>
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
@@ -636,6 +637,287 @@ subdivided_hyper_rectangle(Triangulation<dim>              &tria,
     }
 }
 
+
+
+#if deal_II_dimension == 1
+
+template <>
+void
+GridGenerator::
+subdivided_hyper_rectangle (Triangulation<1>&                             tria,
+                            const std::vector< std::vector<double> >&     spacing,
+                            const Point<1>&                               p,
+			    const Table<1,unsigned char>&                 material_id,
+                            const bool                                    colorize)
+{
+				   // contributed by Yaqi Wang 2006
+  Assert(spacing.size() == 1, 
+	 ExcInvalidRepetitionsDimension(1));
+
+  const unsigned int n_cells = material_id.size(0);
+
+  Assert(spacing[0].size() == n_cells, 
+	 ExcInvalidRepetitionsDimension(1));
+
+  double delta = std::numeric_limits<double>::max();
+  for (unsigned int i=0; i<n_cells; i++) {
+    Assert (spacing[0][i] >= 0, ExcInvalidRepetitions(-1));
+    delta = std::min (delta, spacing[0][i]);
+  }
+  
+                                   // generate the necessary points
+  std::vector<Point<1> > points;
+  double ax = p[0];
+  for (unsigned int x=0; x<=n_cells; ++x) {
+    points.push_back (Point<1> (ax));
+    if (x<n_cells)
+      ax += spacing[0][x];
+  }
+                                   // create the cells
+  unsigned int n_val_cells = 0;
+  for (unsigned int i=0; i<n_cells; i++)
+    if (material_id[i]!=(unsigned char)(-1)) n_val_cells++;
+
+  std::vector<CellData<1> > cells(n_val_cells);
+  unsigned int id = 0;
+  for (unsigned int x=0; x<n_cells; ++x)
+    if (material_id[x] != (unsigned char)(-1))
+      {
+	cells[id].vertices[0] = x;
+	cells[id].vertices[1] = x+1;
+	cells[id].material_id = material_id[x];
+	id++;
+      }
+                                   // create triangulation
+  SubCellData t;
+  GridTools::delete_unused_vertices (points, cells, t);
+
+  tria.create_triangulation (points, cells, t);  
+
+                                   // set boundary indicator
+  if (colorize)
+    Assert (false, ExcNotImplemented());
+}
+
+#endif
+
+#if deal_II_dimension == 2
+
+template <>
+void
+GridGenerator::
+subdivided_hyper_rectangle (Triangulation<2>&                         tria,
+                            const std::vector< std::vector<double> >&     spacing,
+                            const Point<2>&                               p,
+			    const Table<2,unsigned char>&                 material_id,
+                            const bool                                    colorize)
+{
+				   // contributed by Yaqi Wang 2006
+  Assert(spacing.size() == 2, 
+	 ExcInvalidRepetitionsDimension(2));
+
+  std::vector<unsigned int> repetitions(2);
+  unsigned int n_cells = 1;
+  double delta = std::numeric_limits<double>::max();
+  for (unsigned int i=0; i<2; i++)
+    {
+      repetitions[i] = spacing[i].size();
+      n_cells *= repetitions[i];
+      for (unsigned int j=0; j<repetitions[i]; j++)
+	{
+	  Assert (spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
+	  delta = std::min (delta, spacing[i][j]);
+	}
+      Assert(material_id.size(i) == repetitions[i], 
+	     ExcInvalidRepetitionsDimension(i));
+    }
+ 
+                                   // generate the necessary points
+  std::vector<Point<2> > points;
+  double ay = p[1];
+  for (unsigned int y=0; y<=repetitions[1]; ++y)
+    {
+      double ax = p[0];
+      for (unsigned int x=0; x<=repetitions[0]; ++x)
+	{
+	  points.push_back (Point<2> (ax,ay));
+	  if (x<repetitions[0])
+	    ax += spacing[0][x];
+	}
+      if (y<repetitions[1])
+	ay += spacing[1][y];
+    }
+
+                                   // create the cells
+  unsigned int n_val_cells = 0;
+  for (unsigned int i=0; i<material_id.size(0); i++)
+    for (unsigned int j=0; j<material_id.size(1); j++)
+      if (material_id[i][j] != (unsigned char)(-1))
+	n_val_cells++;
+
+  std::vector<CellData<2> > cells(n_val_cells);
+  unsigned int id = 0;
+  for (unsigned int y=0; y<repetitions[1]; ++y)
+    for (unsigned int x=0; x<repetitions[0]; ++x)
+      if (material_id[x][y]!=(unsigned char)(-1))
+	{
+	  cells[id].vertices[0] = y*(repetitions[0]+1)+x;
+	  cells[id].vertices[1] = y*(repetitions[0]+1)+x+1;
+	  cells[id].vertices[2] = (y+1)*(repetitions[0]+1)+x;
+	  cells[id].vertices[3] = (y+1)*(repetitions[0]+1)+x+1;
+	  cells[id].material_id = material_id[x][y];
+	  id++;
+	}
+
+                                    // create triangulation
+  SubCellData t;
+  GridTools::delete_unused_vertices (points, cells, t);
+
+  tria.create_triangulation (points, cells, t);  
+
+                                    // set boundary indicator
+  if (colorize)
+    {
+      double eps = 0.01 * delta;
+      Triangulation<2>::cell_iterator cell = tria.begin_raw(),
+				      endc = tria.end();
+      for (; cell !=endc; ++cell)
+	{
+	  Point<2> cell_center = cell->center();
+	  for(unsigned int f=0; f<GeometryInfo<2>::faces_per_cell; ++f)
+	    if (cell->face(f)->boundary_indicator() == 0)
+	      {
+		Point<2> face_center = cell->face(f)->center();
+		for (unsigned int i=0; i<2; ++i)
+		  {
+		    if (face_center[i]<cell_center[i]-eps)
+		      cell->face(f)->set_boundary_indicator(i*2);
+		    if (face_center[i]>cell_center[i]+eps)
+		      cell->face(f)->set_boundary_indicator(i*2+1);
+		  }
+	      }
+	}
+    }
+}
+
+#endif
+
+#if deal_II_dimension == 3
+
+template <>
+void
+GridGenerator::
+subdivided_hyper_rectangle (Triangulation<3>&                           tria,
+                            const std::vector< std::vector<double> >&     spacing,
+                            const Point<3>&                             p,
+			    const Table<3,unsigned char>&               material_id,
+                            const bool                                    colorize)
+{
+				   // contributed by Yaqi Wang 2006
+  const unsigned int dim = 3;
+  
+  Assert(spacing.size() == dim, 
+	 ExcInvalidRepetitionsDimension(dim));
+
+  std::vector<unsigned int> repetitions(dim);
+  unsigned int n_cells = 1;
+  double delta = std::numeric_limits<double>::max();
+  for (unsigned int i=0; i<dim; i++)
+    {
+      repetitions[i] = spacing[i].size();
+      n_cells *= repetitions[i];
+      for (unsigned int j=0; j<repetitions[i]; j++)
+	{
+	  Assert (spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
+	  delta = std::min (delta, spacing[i][j]);
+	}
+      Assert(material_id.size(i) == repetitions[i], 
+	     ExcInvalidRepetitionsDimension(i));
+    }
+
+                                   // generate the necessary points
+  std::vector<Point<dim> > points;
+  double az = p[2];
+  for (unsigned int z=0; z<=repetitions[2]; ++z)
+    {
+      double ay = p[1];
+      for (unsigned int y=0; y<=repetitions[1]; ++y)
+	{
+	  double ax = p[0];
+	  for (unsigned int x=0; x<=repetitions[0]; ++x)
+	    {
+	      points.push_back (Point<dim> (ax,ay,az));
+	      if (x<repetitions[0])
+		ax += spacing[0][x];
+	    }
+	  if (y<repetitions[1])
+	    ay += spacing[1][y];
+	}
+      if (z<repetitions[2])
+	az += spacing[2][z];
+    }
+
+                                   // create the cells
+  unsigned int n_val_cells = 0;
+  for (unsigned int i=0; i<material_id.size(0); i++)
+    for (unsigned int j=0; j<material_id.size(1); j++)
+      for (unsigned int k=0; k<material_id.size(2); k++)
+	if (material_id[i][j][k]!=(unsigned char)(-1))
+	  n_val_cells++;
+
+  std::vector<CellData<dim> > cells(n_val_cells);
+  unsigned int id = 0;
+  const unsigned int n_x  = (repetitions[0]+1);
+  const unsigned int n_xy = (repetitions[0]+1)*(repetitions[1]+1);
+  for (unsigned int z=0; z<repetitions[2]; ++z)
+    for (unsigned int y=0; y<repetitions[1]; ++y)
+      for (unsigned int x=0; x<repetitions[0]; ++x)
+	if (material_id[x][y][z]!=(unsigned char)(-1))
+	  {
+	    cells[id].vertices[0] = z*n_xy + y*n_x + x;
+	    cells[id].vertices[1] = z*n_xy + y*n_x + x+1;
+	    cells[id].vertices[2] = z*n_xy + (y+1)*n_x + x;
+	    cells[id].vertices[3] = z*n_xy + (y+1)*n_x + x+1;
+	    cells[id].vertices[4] = (z+1)*n_xy + y*n_x + x;
+	    cells[id].vertices[5] = (z+1)*n_xy + y*n_x + x+1;
+	    cells[id].vertices[6] = (z+1)*n_xy + (y+1)*n_x + x;
+	    cells[id].vertices[7] = (z+1)*n_xy + (y+1)*n_x + x+1;
+	    cells[id].material_id = material_id[x][y][z];
+	    id++;
+	  }
+
+				 // create triangulation
+  SubCellData t;
+  GridTools::delete_unused_vertices (points, cells, t);
+
+  tria.create_triangulation (points, cells, t);  
+
+                                  // set boundary indicator
+  if (colorize)
+    {
+      double eps = 0.01 * delta;
+      Triangulation<dim>::cell_iterator cell = tria.begin_raw(),
+					endc = tria.end();
+      for (; cell !=endc; ++cell)
+	{
+	  Point<dim> cell_center = cell->center();
+	  for(unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	    if (cell->face(f)->boundary_indicator() == 0)
+	      {
+		Point<dim> face_center = cell->face(f)->center();
+		for (unsigned int i=0; i<dim; ++i)
+		  {
+		    if (face_center[i]<cell_center[i]-eps)
+		      cell->face(f)->set_boundary_indicator(i*2);
+		    if (face_center[i]>cell_center[i]+eps)
+		      cell->face(f)->set_boundary_indicator(i*2+1);
+		  }
+	      }
+	}
+    }
+}
+
+#endif
 
 
 #if deal_II_dimension == 1
