@@ -41,10 +41,7 @@ int main ()
   deallog.depth_console(0);
 
   const unsigned int dim=3;
-  Point<dim> origin;
-  CylinderBoundary<dim> boundary;
   Triangulation<dim> tria;
-  tria.set_boundary(0, boundary);
   GridGenerator::cylinder(tria, 1, .7);
 
   deallog << "n_cells=" << tria.n_active_cells() << std::endl;
@@ -68,7 +65,7 @@ int main ()
 
   deallog << "n_cells=" << tria.n_active_cells() << std::endl;
 
-  
+
   for (cell=tria.begin_active(); cell!=endc; ++cell)
     if (!predicate (cell->center(), cell->diameter()))
       cell->set_coarsen_flag ();
@@ -78,7 +75,7 @@ int main ()
   tria.prepare_coarsening_and_refinement();
   for (cell=tria.begin_active(); cell!=endc; ++cell)
     Assert (!cell->refine_flag_set(), ExcInternalError());
-  
+
   tria.execute_coarsening_and_refinement();
 
   deallog << "n_cells=" << tria.n_active_cells() << std::endl;

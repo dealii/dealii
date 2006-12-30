@@ -83,7 +83,8 @@ tests_x = grid_generator_?? \
 	  face_interpolation \
 	  subface_interpolation \
 	  face_orientation_crash \
-	  refine_and_coarsen_*
+	  refine_and_coarsen_* \
+	  tria_crash_*
 
 # tests for the hp branch:
 #	  fe_collection_*
