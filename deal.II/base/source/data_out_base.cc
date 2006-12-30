@@ -3911,7 +3911,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
   {
     std::pair<unsigned int, unsigned int>
       dimension_info
-      = determine_intermediate_format_dimensions (in);
+      = this->determine_intermediate_format_dimensions (in);
     AssertThrow ((dimension_info.first  == dim) &&
                  (dimension_info.second == spacedim),
                  ExcIncompatibleDimensions (dimension_info.first, dim,
