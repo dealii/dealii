@@ -57,6 +57,20 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
   
   const unsigned int n_vertices = tria.n_used_vertices();
 
+				   // vertices are implicitly numbered from 0 to
+				   // n_vertices-1. we have to renumber the
+				   // vertices, because otherwise we would end
+				   // up with wrong results, if there are unused
+				   // vertices
+  std::vector<unsigned int> renumber(vertices.size());
+				   // fill this vector with new vertex numbers
+				   // ranging from 0 to n_vertices-1
+  unsigned int new_number=0;
+  for (unsigned int i=0; i<vertices.size(); ++i)
+    if (vertex_used[i])
+      renumber[i]=new_number++;
+  Assert(new_number==n_vertices, ExcInternalError());
+
   typename Triangulation<dim>::active_cell_iterator       cell;
   const typename Triangulation<dim>::active_cell_iterator endc=tria.end();
 
@@ -92,7 +106,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
       for (cell = tria.begin_active(); cell != endc; ++cell)
 	{
 	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	    out << '\t' << cell->vertex_index(GeometryInfo<dim>::dx_to_deal[v]);
+	    out << '\t' << renumber[cell->vertex_index(GeometryInfo<dim>::dx_to_deal[v])];
 	  out << '\n';
 	}
       out << "attribute \"element type\" string \"";
@@ -153,7 +167,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
 	      typename Triangulation<dim>::face_iterator face = cell->face(f);
 	      
 	      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
-		out << '\t' << face->vertex_index(GeometryInfo<dim-1>::dx_to_deal[v]);
+		out << '\t' << renumber[face->vertex_index(GeometryInfo<dim-1>::dx_to_deal[v])];
 	      out << '\n';
 	    }
 	}
