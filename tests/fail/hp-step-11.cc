@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,7 +19,7 @@
 
 #include <base/logstream.h>
 #include <fstream>
-std::ofstream logfile("step-11/output");
+std::ofstream logfile("hp-step-11/output");
 
 #include <base/quadrature_lib.h>
 #include <base/function.h>
@@ -139,15 +139,15 @@ void LaplaceProblem<dim>::assemble_and_solve ()
     = std::max (static_cast<unsigned int>(std::ceil(1.*(static_cast<const MappingQ<dim>&>(mapping[0]).get_degree()+1)/2)),
 		2U);
   MatrixTools::create_laplace_matrix (mapping, dof_handler,
-				      QGauss<dim>(gauss_degree),
+				      hp::QCollection<dim>(QGauss<dim>(gauss_degree)),
 				      system_matrix);
   VectorTools::create_right_hand_side (mapping, dof_handler,
-				       QGauss<dim>(gauss_degree),
+				       hp::QCollection<dim>(QGauss<dim>(gauss_degree)),
 				       ConstantFunction<dim>(-2),
 				       system_rhs);
   Vector<double> tmp (system_rhs.size());
   VectorTools::create_boundary_right_hand_side (mapping, dof_handler,
-						QGauss<dim-1>(gauss_degree),
+						hp::QCollection<dim-1>(QGauss<dim-1>(gauss_degree)),
 						ConstantFunction<dim>(1),
 						tmp);
   system_rhs += tmp;
@@ -163,7 +163,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
 				     solution,
 				     ZeroFunction<dim>(),
 				     norm_per_cell,
-				     QGauss<dim>(gauss_degree+1),
+				     hp::QCollection<dim>(QGauss<dim>(gauss_degree+1)),
 				     VectorTools::H1_seminorm);
   const double norm = norm_per_cell.l2_norm();
 
