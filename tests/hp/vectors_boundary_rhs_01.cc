@@ -1,5 +1,5 @@
-//----------------------------  vectors_point_source_hp.cc  ---------------------------
-//    $Id: vectors_point_source_hp.cc 14279 2006-12-28 04:53:24Z bangerth $
+//----------------------------  vectors_boundary_rhs.cc  ---------------------------
+//    $Id: vectors_boundary_rhs.cc 14279 2006-12-28 04:53:24Z bangerth $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2000, 2001, 2003, 2004, 2006, 2007 by the deal.II authors
@@ -9,12 +9,12 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  vectors_point_source_hp.cc  ---------------------------
+//----------------------------  vectors_boundary_rhs.cc  ---------------------------
 
 
-// like deal.II/vectors_point_source_hp, but for hp objects. here, each hp object has only a
+// like deal.II/vectors_boundary_rhs, but for hp objects. here, each hp object has only a
 // single component, so we expect exactly the same output as for the old test.
-// vectors_point_source_hp_hp tests for different finite elements
+// vectors_boundary_rhs_hp tests for different finite elements
 
 
 #include "../tests.h"
@@ -41,6 +41,25 @@
 #include <fstream>
 
 
+template<int dim>
+class MySquareFunction : public Function<dim>
+{
+  public:
+    MySquareFunction () : Function<dim>(2) {};
+    
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component) const
+      {	return (component+1)*p.square(); };
+    
+    virtual void   vector_value (const Point<dim>   &p,
+				 Vector<double>     &values) const
+      { values(0) = value(p,0);
+	values(1) = value(p,1); };
+};
+
+
+
+
 template <int dim>
 void
 check ()
@@ -59,8 +78,8 @@ check ()
 				   // create a system element composed
 				   // of one Q1 and one Q2 element
   hp::FECollection<dim> element;
-  for (unsigned int i=1; i<7-dim; ++i)
-    element.push_back (FE_Q<dim>(i));
+  element.push_back (FESystem<dim> (FE_Q<dim>(1), 1,
+				    FE_Q<dim>(2), 1));
   hp::DoFHandler<dim> dof(tr);
   for (typename hp::DoFHandler<dim>::active_cell_iterator
 	 cell = dof.begin_active(); cell!=dof.end(); ++cell)
@@ -73,13 +92,15 @@ check ()
 				   // formula suited to the elements
 				   // we have here
   hp::MappingCollection<dim> mapping;
-  for (unsigned int i=1; i<7-dim; ++i)
-    mapping.push_back (MappingQ<dim>(i+1));
+  mapping.push_back (MappingQ<dim>(3));
+
+  hp::QCollection<dim-1> quadrature;
+  quadrature.push_back (QGauss<dim-1>(3));
 
   Vector<double> rhs (dof.n_dofs());
-  VectorTools::create_point_source_vector (mapping, dof,
-					   tr.begin()->center(),
-					   rhs);
+  VectorTools::create_boundary_right_hand_side (dof, quadrature,
+				       MySquareFunction<dim>(),
+				       rhs);
   for (unsigned int i=0; i<rhs.size(); ++i)
     deallog << rhs(i) << std::endl;
 }
@@ -88,15 +109,12 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("vectors_point_source_hp/output");
+  std::ofstream logfile ("vectors_boundary_rhs_01/output");
   logfile.precision (4);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console (0);
 
-  deallog.push ("1d");
-  check<1> ();
-  deallog.pop ();
   deallog.push ("2d");
   check<2> ();
   deallog.pop ();

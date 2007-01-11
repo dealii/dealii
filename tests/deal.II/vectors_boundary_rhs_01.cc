@@ -1,5 +1,5 @@
-//----------------------------  vectors_rhs.cc  ---------------------------
-//    $Id: vectors_rhs.cc 14279 2006-12-28 04:53:24Z bangerth $
+//----------------------------  vectors_boundary_rhs.cc  ---------------------------
+//    $Id: vectors_boundary_rhs.cc 14279 2006-12-28 04:53:24Z bangerth $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2000, 2001, 2003, 2004, 2006, 2007 by the deal.II authors
@@ -9,10 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  vectors_rhs.cc  ---------------------------
+//----------------------------  vectors_boundary_rhs.cc  ---------------------------
 
 
-// check VectorTools::create_right_hand_side
+// check VectorTools::create_boundary_right_hand_side
 
 
 #include "../tests.h"
@@ -51,11 +51,11 @@ class MySquareFunction : public Function<dim>
     
     virtual void   vector_value (const Point<dim>   &p,
 				 Vector<double>     &values) const
-      { values(0) = value(p,0);
-	values(1) = value(p,1); };
+      {
+	for (unsigned int d=0; d<dim; ++d)
+	  values(d) = value(p,d);
+      };
 };
-
-
 
 
 template <int dim>
@@ -86,10 +86,10 @@ check ()
 				   // we have here
   MappingQ<dim> mapping(3);
 
-  QGauss<dim> quadrature(3);
+  QGauss<dim-1> quadrature(3);
 
   Vector<double> rhs (dof.n_dofs());
-  VectorTools::create_right_hand_side (dof, quadrature,
+  VectorTools::create_boundary_right_hand_side (dof, quadrature,
 				       MySquareFunction<dim>(),
 				       rhs);
   for (unsigned int i=0; i<rhs.size(); ++i)
@@ -100,15 +100,12 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("vectors_rhs/output");
+  std::ofstream logfile ("vectors_boundary_rhs_01/output");
   logfile.precision (4);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
   deallog.depth_console (0);
 
-  deallog.push ("1d");
-  check<1> ();
-  deallog.pop ();
   deallog.push ("2d");
   check<2> ();
   deallog.pop ();

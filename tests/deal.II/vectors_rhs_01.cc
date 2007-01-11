@@ -1,5 +1,5 @@
-//----------------------------  vectors_rhs_hp.cc  ---------------------------
-//    $Id: vectors_rhs_hp.cc 14279 2006-12-28 04:53:24Z bangerth $
+//----------------------------  vectors_rhs.cc  ---------------------------
+//    $Id: vectors_rhs.cc 14279 2006-12-28 04:53:24Z bangerth $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2000, 2001, 2003, 2004, 2006, 2007 by the deal.II authors
@@ -9,12 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  vectors_rhs_hp.cc  ---------------------------
+//----------------------------  vectors_rhs.cc  ---------------------------
 
 
-// like deal.II/vectors_rhs_hp, but for hp objects. here, each hp object has only a
-// single component, so we expect exactly the same output as for the old test.
-// vectors_rhs_hp_hp tests for different finite elements
+// check VectorTools::create_right_hand_side
 
 
 #include "../tests.h"
@@ -27,7 +25,7 @@
 #include <grid/tria_iterator.h>
 #include <grid/tria_accessor.h>
 #include <grid/grid_generator.h>
-#include <dofs/hp_dof_handler.h>
+#include <dofs/dof_handler.h>
 #include <dofs/dof_tools.h>
 #include <dofs/dof_constraints.h>
 #include <fe/fe_q.h>
@@ -77,28 +75,18 @@ check ()
 
 				   // create a system element composed
 				   // of one Q1 and one Q2 element
-  hp::FECollection<dim> element;
-  for (unsigned int i=1; i<7-dim; ++i)
-    element.push_back (FESystem<dim> (FE_Q<dim>(i), 1,
-				      FE_Q<dim>(i+1), 1));
-  hp::DoFHandler<dim> dof(tr);
-  for (typename hp::DoFHandler<dim>::active_cell_iterator
-	 cell = dof.begin_active(); cell!=dof.end(); ++cell)
-    cell->set_active_fe_index (rand() % element.size());
-  
+  FESystem<dim> element(FE_Q<dim>(1), 1,
+			FE_Q<dim>(2), 1);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
 				   // use a more complicated mapping
 				   // of the domain and a quadrature
 				   // formula suited to the elements
 				   // we have here
-  hp::MappingCollection<dim> mapping;
-  for (unsigned int i=1; i<7-dim; ++i)
-    mapping.push_back (MappingQ<dim>(i+1));
+  MappingQ<dim> mapping(3);
 
-  hp::QCollection<dim> quadrature;
-  for (unsigned int i=1; i<7-dim; ++i)
-    quadrature.push_back (QGauss<dim>(3+i));
+  QGauss<dim> quadrature(3);
 
   Vector<double> rhs (dof.n_dofs());
   VectorTools::create_right_hand_side (dof, quadrature,
@@ -112,7 +100,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("vectors_rhs_hp/output");
+  std::ofstream logfile ("vectors_rhs_01/output");
   logfile.precision (4);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);
