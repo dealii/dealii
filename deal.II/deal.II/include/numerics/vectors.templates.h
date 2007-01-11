@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name:  $
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,7 +43,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-//TODO[RH]: Use StaticQ1Mapping where appropriate
+//TODO[RH]: Use StaticMappingQ1 where appropriate
 
 template <int dim, class VECTOR, class DH>
 void VectorTools::interpolate (const Mapping<dim>    &mapping,
@@ -524,8 +524,9 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
   std::vector<unsigned int> dofs (dofs_per_cell);
   Vector<double> cell_vector (dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
-						 endc = dof_handler.end();
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
 
   if (n_components==1)
     {
@@ -536,7 +537,8 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 	  fe_values.reinit(cell);
 	  
 	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
-	  rhs_function.value_list (fe_values.get_quadrature_points(), rhs_values);
+	  rhs_function.value_list (fe_values.get_quadrature_points(),
+				   rhs_values);
 	  
 	  cell_vector = 0;
 	  for (unsigned int point=0; point<n_q_points; ++point)
@@ -554,19 +556,22 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
     }
   else
     {
-      std::vector<Vector<double> > rhs_values(n_q_points, Vector<double>(n_components));
+      std::vector<Vector<double> > rhs_values(n_q_points,
+					      Vector<double>(n_components));
       
-      // Use the faster code if the FiniteElement is primitive
-      if (fe.is_primitive ())
+      for (; cell!=endc; ++cell) 
 	{
-	  for (; cell!=endc; ++cell) 
+	  fe_values.reinit(cell);
+	  
+	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
+	  rhs_function.vector_value_list (fe_values.get_quadrature_points(),
+					  rhs_values);
+	      
+	  cell_vector = 0;
+					   // Use the faster code if the
+					   // FiniteElement is primitive
+	  if (fe.is_primitive ())
 	    {
-	      fe_values.reinit(cell);
-	      
-	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
-	      rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
-	      
-	      cell_vector = 0;
 	      for (unsigned int point=0; point<n_q_points; ++point)
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  {
@@ -577,24 +582,12 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 		                      fe_values.shape_value(i,point) *
 		                      weights[point];
 		  }
-	      
-	      cell->get_dof_indices (dofs);
-	      
-	      for (unsigned int i=0; i<dofs_per_cell; ++i)
-		rhs_vector(dofs[i]) += cell_vector(i);
 	    }
-	}
-      else
-	// Otherwise do it the way proposed for vector valued elements
-	{
-	  for (; cell!=endc; ++cell) 
+	  else
 	    {
-	      fe_values.reinit(cell);
-	      
-	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
-	      rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
-	      
-	      cell_vector = 0;
+					       // Otherwise do it the way
+					       // proposed for vector valued
+					       // elements
 	      for (unsigned int point=0; point<n_q_points; ++point)
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
@@ -604,15 +597,16 @@ void VectorTools::create_right_hand_side (const Mapping<dim>    &mapping,
 			                  fe_values.shape_value_component(i,point,comp_i) *
 			                  weights[point];
 		      }
-	      
-	      cell->get_dof_indices (dofs);
-	      
-	      for (unsigned int i=0; i<dofs_per_cell; ++i)
-		rhs_vector(dofs[i]) += cell_vector(i);
 	    }
+      
+	  cell->get_dof_indices (dofs);
+	  
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    rhs_vector(dofs[i]) += cell_vector(i);
 	}
     }
 }
+
 
 
 template <int dim>
@@ -627,6 +621,148 @@ void VectorTools::create_right_hand_side (const DoFHandler<dim>    &dof_handler,
 }
 
 
+
+
+template <int dim>
+void VectorTools::create_right_hand_side (const hp::MappingCollection<dim>    &mapping,
+					  const hp::DoFHandler<dim> &dof_handler,
+					  const hp::QCollection<dim> &quadrature,
+					  const Function<dim>   &rhs_function,
+					  Vector<double>        &rhs_vector)
+{
+  const hp::FECollection<dim> &fe  = dof_handler.get_fe();
+  Assert (fe.n_components() == rhs_function.n_components,
+	  ExcComponentMismatch());
+  Assert (rhs_vector.size() == dof_handler.n_dofs(),
+	  ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+  rhs_vector = 0;
+  
+  UpdateFlags update_flags = UpdateFlags(update_values   |
+					 update_q_points |
+					 update_JxW_values);
+  hp::FEValues<dim> x_fe_values (mapping, fe, quadrature, update_flags);
+
+  const unsigned int n_components  = fe.n_components();
+  
+  std::vector<unsigned int> dofs (fe.max_dofs_per_cell());
+  Vector<double> cell_vector (fe.max_dofs_per_cell());
+
+  typename hp::DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+
+  if (n_components==1)
+    {
+      std::vector<double> rhs_values;
+      
+      for (; cell!=endc; ++cell) 
+	{
+	  x_fe_values.reinit(cell);
+
+	  const FEValues<dim> &fe_values = x_fe_values.get_present_fe_values();
+	  
+	  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+			     n_q_points    = fe_values.n_quadrature_points;
+	  rhs_values.resize (n_q_points);
+	  dofs.resize (dofs_per_cell);
+	  cell_vector.reinit (dofs_per_cell);
+	  
+	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
+	  rhs_function.value_list (fe_values.get_quadrature_points(),
+				   rhs_values);
+	  
+	  cell_vector = 0;
+	  for (unsigned int point=0; point<n_q_points; ++point)
+	    for (unsigned int i=0; i<dofs_per_cell; ++i) 
+	      cell_vector(i) += rhs_values[point] *
+				fe_values.shape_value(i,point) *
+				weights[point];
+	
+	  cell->get_dof_indices (dofs);
+	  
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    rhs_vector(dofs[i]) += cell_vector(i);
+	}
+      
+    }
+  else
+    {
+      std::vector<Vector<double> > rhs_values;
+      
+      for (; cell!=endc; ++cell)
+	{
+	  x_fe_values.reinit(cell);
+
+	  const FEValues<dim> &fe_values = x_fe_values.get_present_fe_values();
+	  
+	  const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+			     n_q_points    = fe_values.n_quadrature_points;
+	  rhs_values.resize (n_q_points,
+			     Vector<double>(n_components));
+	  dofs.resize (dofs_per_cell);
+	  cell_vector.reinit (dofs_per_cell);
+	      
+	  const std::vector<double> &weights   = fe_values.get_JxW_values ();
+	  rhs_function.vector_value_list (fe_values.get_quadrature_points(),
+					  rhs_values);
+	      
+	  cell_vector = 0;
+	  
+					   // Use the faster code if the
+					   // FiniteElement is primitive
+	  if (cell->get_fe().is_primitive ())
+	    {
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  {
+		    const unsigned int component
+		      = cell->get_fe().system_to_component_index(i).first;
+		    
+		    cell_vector(i) += rhs_values[point](component) *
+				      fe_values.shape_value(i,point) *
+				      weights[point];
+		  }
+	    }
+	  else
+	    {
+					       // Otherwise do it the way proposed
+					       // for vector valued elements
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i)
+		  for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
+		    if (cell->get_fe().get_nonzero_components(i)[comp_i])
+		      {
+			cell_vector(i) += rhs_values[point](comp_i) *
+					  fe_values.shape_value_component(i,point,comp_i) *
+					  weights[point];
+		      }
+	    }
+	      
+	  cell->get_dof_indices (dofs);
+	  
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    rhs_vector(dofs[i]) += cell_vector(i);
+	}
+    }
+}
+
+
+
+template <int dim>
+void VectorTools::create_right_hand_side (const hp::DoFHandler<dim>    &dof_handler,
+					  const hp::QCollection<dim>    &quadrature,
+					  const Function<dim>      &rhs_function,
+					  Vector<double>           &rhs_vector)
+{
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+  create_right_hand_side(hp::StaticMappingQ1<dim>::mapping_collection, 
+			 dof_handler, quadrature,
+			 rhs_function, rhs_vector);
+}
+
+
+
+
 template <int dim>
 void VectorTools::create_point_source_vector (const Mapping<dim>       &mapping,
                                               const DoFHandler<dim>    &dof_handler,
@@ -635,6 +771,9 @@ void VectorTools::create_point_source_vector (const Mapping<dim>       &mapping,
 {
    Assert (rhs_vector.size() == dof_handler.n_dofs(),
            ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+   Assert (dof_handler.get_fe().n_components() == 1,
+	   ExcMessage ("This function only works for scalar finite elements"));
+   
    rhs_vector = 0;
 
    std::pair<typename DoFHandler<dim>::active_cell_iterator, Point<dim> >
@@ -643,7 +782,8 @@ void VectorTools::create_point_source_vector (const Mapping<dim>       &mapping,
 
    Quadrature<dim> q(GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
 
-   FEValues<dim> fe_values(dof_handler.get_fe(), q, UpdateFlags(update_values));
+   FEValues<dim> fe_values(mapping, dof_handler.get_fe(),
+			   q, UpdateFlags(update_values));
    fe_values.reinit(cell_point.first);
 
    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
@@ -655,6 +795,8 @@ void VectorTools::create_point_source_vector (const Mapping<dim>       &mapping,
       rhs_vector(local_dof_indices[i]) =  fe_values.shape_value(i,0);
 }
 
+
+
 template <int dim>
 void VectorTools::create_point_source_vector (const DoFHandler<dim>    &dof_handler,
                                               const Point<dim>         &p,
@@ -664,6 +806,53 @@ void VectorTools::create_point_source_vector (const DoFHandler<dim>    &dof_hand
   create_point_source_vector(StaticMappingQ1<dim>::mapping, dof_handler,
                              p, rhs_vector);
 }
+
+
+template <int dim>
+void VectorTools::create_point_source_vector (const hp::MappingCollection<dim>       &mapping,
+                                              const hp::DoFHandler<dim>    &dof_handler,
+                                              const Point<dim>         &p,
+                                              Vector<double>           &rhs_vector)
+{
+   Assert (rhs_vector.size() == dof_handler.n_dofs(),
+           ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+   Assert (dof_handler.get_fe().n_components() == 1,
+	   ExcMessage ("This function only works for scalar finite elements"));
+   
+   rhs_vector = 0;
+
+   std::pair<typename hp::DoFHandler<dim>::active_cell_iterator, Point<dim> >
+      cell_point =
+      GridTools::find_active_cell_around_point (mapping, dof_handler, p);
+
+   Quadrature<dim> q(GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+
+   FEValues<dim> fe_values(mapping[cell_point.first->active_fe_index()],
+			   cell_point.first->get_fe(), q, UpdateFlags(update_values));
+   fe_values.reinit(cell_point.first);
+
+   const unsigned int dofs_per_cell = cell_point.first->get_fe().dofs_per_cell;
+
+   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+   cell_point.first->get_dof_indices (local_dof_indices);
+
+   for(unsigned int i=0; i<dofs_per_cell; i++)
+      rhs_vector(local_dof_indices[i]) =  fe_values.shape_value(i,0);
+}
+
+
+
+template <int dim>
+void VectorTools::create_point_source_vector (const hp::DoFHandler<dim>    &dof_handler,
+                                              const Point<dim>         &p,
+                                              Vector<double>           &rhs_vector)
+{
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+  create_point_source_vector(hp::StaticMappingQ1<dim>::mapping_collection,
+			     dof_handler,
+                             p, rhs_vector);
+}
+
 
 #if deal_II_dimension != 1
 
@@ -746,7 +935,8 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 	      
 	      cell_vector = 0;
 	      
-	      // Use the faster code if the FiniteElement is primitive
+					       // Use the faster code if the
+					       // FiniteElement is primitive
 	      if (fe.is_primitive ())
 		{		  
 		  for (unsigned int point=0; point<n_q_points; ++point)
@@ -762,15 +952,18 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim>      &mapping,
 		}
 	      else
 		{
-		  // And the full featured code, if vector valued FEs are used
+						   // And the full featured
+						   // code, if vector valued
+						   // FEs are used
 		  for (unsigned int point=0; point<n_q_points; ++point)
 		    for (unsigned int i=0; i<dofs_per_cell; ++i)
 		      for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
 			if (fe.get_nonzero_components(i)[comp_i])
 			  {
-			    cell_vector(i) += rhs_values[point](comp_i) *
-			                      fe_values.shape_value_component(i,point,comp_i) *
-			                      weights[point];
+			    cell_vector(i)
+			      += rhs_values[point](comp_i) *
+			      fe_values.shape_value_component(i,point,comp_i) *
+			      weights[point];
 			  }
 		}
 		  
@@ -806,11 +999,177 @@ VectorTools::create_boundary_right_hand_side (const DoFHandler<dim>   &dof_handl
 					      const std::set<unsigned char> &boundary_indicators)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  static const MappingQ1<dim> mapping;
-  create_boundary_right_hand_side(mapping, dof_handler, quadrature,
+
+  create_boundary_right_hand_side(StaticMappingQ1<dim>::mapping, dof_handler,
+				  quadrature,
 				  rhs_function, rhs_vector,
 				  boundary_indicators);
 }
+
+
+
+#if deal_II_dimension != 1
+
+template <int dim>
+void
+VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim>      &mapping,
+					      const hp::DoFHandler<dim>   &dof_handler,
+					      const hp::QCollection<dim-1> &quadrature,
+					      const Function<dim>     &rhs_function,
+					      Vector<double>          &rhs_vector,
+					      const std::set<unsigned char> &boundary_indicators)
+{
+  const hp::FECollection<dim> &fe  = dof_handler.get_fe();
+  Assert (fe.n_components() == rhs_function.n_components,
+	  ExcComponentMismatch());
+  Assert (rhs_vector.size() == dof_handler.n_dofs(),
+	  ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
+  
+  rhs_vector = 0;
+  
+  UpdateFlags update_flags = UpdateFlags(update_values   |
+					 update_q_points |
+					 update_JxW_values);
+  hp::FEFaceValues<dim> x_fe_values (mapping, fe, quadrature, update_flags);
+
+  const unsigned int n_components  = fe.n_components();
+  
+  std::vector<unsigned int> dofs (fe.max_dofs_per_cell());
+  Vector<double> cell_vector (fe.max_dofs_per_cell());
+
+  typename hp::DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+
+  if (n_components==1)
+    {
+      std::vector<double> rhs_values;
+      
+      for (; cell!=endc; ++cell)
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  if (cell->face(face)->at_boundary () &&
+	      (boundary_indicators.find (cell->face(face)->boundary_indicator())
+	       !=
+	       boundary_indicators.end()))
+	    {
+	      x_fe_values.reinit(cell, face);
+
+	      const FEFaceValues<dim> &fe_values = x_fe_values.get_present_fe_values();
+
+	      const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+				 n_q_points    = fe_values.n_quadrature_points;
+	      rhs_values.resize (n_q_points);
+	      
+	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
+	      rhs_function.value_list (fe_values.get_quadrature_points(), rhs_values);
+	      
+	      cell_vector = 0;
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		for (unsigned int i=0; i<dofs_per_cell; ++i) 
+		  cell_vector(i) += rhs_values[point] *
+				    fe_values.shape_value(i,point) *
+				    weights[point];
+	
+	      cell->get_dof_indices (dofs);
+	  
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		rhs_vector(dofs[i]) += cell_vector(i);
+	    }
+    }
+  else
+    {
+      std::vector<Vector<double> > rhs_values;
+      
+      for (; cell!=endc; ++cell) 
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  if (cell->face(face)->at_boundary () &&
+	      (boundary_indicators.find (cell->face(face)->boundary_indicator())
+	       !=
+	       boundary_indicators.end()))
+	    {
+	      x_fe_values.reinit(cell, face);
+
+	      const FEFaceValues<dim> &fe_values = x_fe_values.get_present_fe_values();
+
+	      const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
+				 n_q_points    = fe_values.n_quadrature_points;
+	      rhs_values.resize (n_q_points, Vector<double>(n_components));
+	      
+	      const std::vector<double> &weights   = fe_values.get_JxW_values ();
+	      rhs_function.vector_value_list (fe_values.get_quadrature_points(), rhs_values);
+	      
+	      cell_vector = 0;
+	      
+					       // Use the faster code if the
+					       // FiniteElement is primitive
+	      if (cell->get_fe().is_primitive ())
+		{		  
+		  for (unsigned int point=0; point<n_q_points; ++point)
+		    for (unsigned int i=0; i<dofs_per_cell; ++i)
+		      {
+			const unsigned int component
+			  = cell->get_fe().system_to_component_index(i).first;
+			
+			cell_vector(i) += rhs_values[point](component) *
+				          fe_values.shape_value(i,point) *
+				          weights[point];
+		      }
+		}
+	      else
+		{
+						   // And the full featured
+						   // code, if vector valued
+						   // FEs are used
+		  for (unsigned int point=0; point<n_q_points; ++point)
+		    for (unsigned int i=0; i<dofs_per_cell; ++i)
+		      for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
+			if (cell->get_fe().get_nonzero_components(i)[comp_i])
+			  {
+			    cell_vector(i)
+			      += rhs_values[point](comp_i) *
+			      fe_values.shape_value_component(i,point,comp_i) *
+			      weights[point];
+			  }
+		}
+		  
+	      cell->get_dof_indices (dofs);
+	      
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		rhs_vector(dofs[i]) += cell_vector(i);
+	    }
+    }
+}
+
+#else
+
+void
+VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<1>    &,
+					      const hp::DoFHandler<1> &,
+					      const hp::QCollection<0> &,
+					      const Function<1>   &,
+					      Vector<double>      &,
+					      const std::set<unsigned char> &)
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
+#endif
+
+template <int dim>
+void
+VectorTools::create_boundary_right_hand_side (const hp::DoFHandler<dim>   &dof_handler,
+					      const hp::QCollection<dim-1> &quadrature,
+					      const Function<dim>     &rhs_function,
+					      Vector<double>          &rhs_vector,
+					      const std::set<unsigned char> &boundary_indicators)
+{
+  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+  create_boundary_right_hand_side(hp::StaticMappingQ1<dim>::mapping_collection,
+				  dof_handler, quadrature,
+				  rhs_function, rhs_vector,
+				  boundary_indicators);
+}
+
 
 
 

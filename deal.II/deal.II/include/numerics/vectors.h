@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -568,6 +568,27 @@ class VectorTools
 					Vector<double>        &rhs_vector);
 
 				     /**
+				      * Like the previous set of functions,
+				      * but for hp objects.
+				      */
+    template <int dim>
+    static void create_right_hand_side (const hp::MappingCollection<dim>    &mapping,
+					const hp::DoFHandler<dim> &dof,
+					const hp::QCollection<dim> &q,
+					const Function<dim>   &rhs,
+					Vector<double>        &rhs_vector);
+
+				     /**
+				      * Like the previous set of functions,
+				      * but for hp objects.
+				      */
+    template <int dim>
+    static void create_right_hand_side (const hp::DoFHandler<dim> &dof,
+					const hp::QCollection<dim> &q,
+					const Function<dim>   &rhs,
+					Vector<double>        &rhs_vector);
+    
+				     /**
 				      * Create a right hand side
 				      * vector for a point source at point @p p.
                                       * Prior content of the
@@ -593,6 +614,31 @@ class VectorTools
                                            const Point<dim>      &p,
                                            Vector<double>        &rhs_vector);
 
+				     /**
+				      * Like the previous set of functions,
+				      * but for hp objects.
+				      */
+    template <int dim>
+    static void create_point_source_vector(const hp::MappingCollection<dim>    &mapping,
+                                           const hp::DoFHandler<dim> &dof,
+                                           const Point<dim>      &p,
+                                           Vector<double>        &rhs_vector);
+
+				     /**
+				      * Like the previous set of functions,
+				      * but for hp objects. The function uses
+				      * the default Q1 mapping object. Note
+				      * that if your hp::DoFHandler uses any
+				      * active fe index other than zero, then
+				      * you need to call the function above
+				      * that provides a mapping object for
+				      * each active fe index.
+				      */
+    template <int dim>
+    static void create_point_source_vector(const hp::DoFHandler<dim> &dof,
+                                           const Point<dim>      &p,
+                                           Vector<double>        &rhs_vector);
+    
                                      /**
 				      * Create a right hand side
 				      * vector from boundary
@@ -634,6 +680,47 @@ class VectorTools
     template <int dim>
     static void create_boundary_right_hand_side (const DoFHandler<dim>   &dof,
 						 const Quadrature<dim-1> &q,
+						 const Function<dim>     &rhs,
+						 Vector<double>          &rhs_vector,
+						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+
+                                     /**
+				      * Same as the set of functions above,
+				      * but for hp objects.
+				      */
+    template <int dim>
+    static void create_boundary_right_hand_side (const hp::MappingCollection<dim>      &mapping,
+						 const hp::DoFHandler<dim>   &dof,
+						 const hp::QCollection<dim-1> &q,
+						 const Function<dim>     &rhs,
+						 Vector<double>          &rhs_vector,
+						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+
+				     /**
+				      * Specialization of above
+				      * function for 1d. Since the
+				      * computation is not useful in
+				      * 1d, this function simply
+				      * throws an exception.
+				      */
+    static void create_boundary_right_hand_side (const hp::MappingCollection<1>    &mapping,
+						 const hp::DoFHandler<1> &dof,
+						 const hp::QCollection<0> &q,
+						 const Function<1>   &rhs,
+						 Vector<double>      &rhs_vector,
+						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+
+				     /**
+				      * Calls the @p
+				      * create_boundary_right_hand_side
+				      * function, see above, with a single Q1
+				      * mapping as collection. This function
+				      * therefore will only work if the only
+				      * active fe index in use is zero.
+				      */
+    template <int dim>
+    static void create_boundary_right_hand_side (const hp::DoFHandler<dim>   &dof,
+						 const hp::QCollection<dim-1> &q,
 						 const Function<dim>     &rhs,
 						 Vector<double>          &rhs_vector,
 						 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());

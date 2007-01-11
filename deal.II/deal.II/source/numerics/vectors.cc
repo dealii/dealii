@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -50,6 +50,21 @@ void VectorTools::create_right_hand_side<deal_II_dimension>
  const Quadrature<deal_II_dimension> &,
  const Function<deal_II_dimension>   &,
  Vector<double>                      &);
+
+template
+void VectorTools::create_right_hand_side<deal_II_dimension>
+(const hp::MappingCollection<deal_II_dimension>    &,
+ const hp::DoFHandler<deal_II_dimension> &,
+ const hp::QCollection<deal_II_dimension> &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &);
+template
+void VectorTools::create_right_hand_side<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension> &,
+ const hp::QCollection<deal_II_dimension> &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &);
+
 template
 void VectorTools::create_point_source_vector<deal_II_dimension>
 (const Mapping<deal_II_dimension>    &,
@@ -59,6 +74,18 @@ void VectorTools::create_point_source_vector<deal_II_dimension>
 template
 void VectorTools::create_point_source_vector<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
+ const Point<deal_II_dimension>      &,
+ Vector<double>                      &);
+
+template
+void VectorTools::create_point_source_vector<deal_II_dimension>
+(const hp::MappingCollection<deal_II_dimension>    &,
+ const hp::DoFHandler<deal_II_dimension> &,
+ const Point<deal_II_dimension>      &,
+ Vector<double>                      &);
+template
+void VectorTools::create_point_source_vector<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension> &,
  const Point<deal_II_dimension>      &,
  Vector<double>                      &);
 
@@ -79,6 +106,27 @@ void
 VectorTools::create_boundary_right_hand_side<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &,
  const Quadrature<deal_II_dimension-1> &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const std::set<unsigned char> &);
+
+#if deal_II_dimension != 1
+template
+void
+VectorTools::create_boundary_right_hand_side<deal_II_dimension>
+(const hp::MappingCollection<deal_II_dimension>    &,
+ const hp::DoFHandler<deal_II_dimension> &,
+ const hp::QCollection<deal_II_dimension-1> &,
+ const Function<deal_II_dimension>   &,
+ Vector<double>                      &,
+ const std::set<unsigned char> &);
+#endif
+
+template
+void
+VectorTools::create_boundary_right_hand_side<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension> &,
+ const hp::QCollection<deal_II_dimension-1> &,
  const Function<deal_II_dimension>   &,
  Vector<double>                      &,
  const std::set<unsigned char> &);
