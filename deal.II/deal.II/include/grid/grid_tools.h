@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,6 +23,15 @@
 #include <list>
 
 DEAL_II_NAMESPACE_OPEN
+
+
+template <int> class DoFHandler;
+template <int> class Mapping;
+namespace hp
+{
+  template <int> class DoFHandler;
+  template <int> class MappingCollection;
+}
 
 
 /**
@@ -373,6 +382,23 @@ class GridTools
                                    const Container<dim> &container,
                                    const Point<dim>     &p);
 
+				     /**
+				      * A version of the previous function
+				      * where we use that mapping on a given
+				      * cell that corresponds to the active
+				      * finite element index of that
+				      * cell. This is obviously only useful
+				      * for hp problems, since the active
+				      * finite element index for all other DoF
+				      * handlers is always zero.
+				      */
+    template <int dim>
+    static
+    std::pair<typename hp::DoFHandler<dim>::active_cell_iterator, Point<dim> >
+    find_active_cell_around_point (const hp::MappingCollection<dim>   &mapping,
+                                   const hp::DoFHandler<dim> &container,
+                                   const Point<dim>     &p);
+    
                                      /**
                                       * Use the METIS partitioner to generate
                                       * a partitioning of the active cells

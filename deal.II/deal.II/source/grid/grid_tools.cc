@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,6 +25,7 @@
 #include <dofs/dof_tools.h>
 #include <fe/fe_dgq.h>
 #include <fe/mapping_q1.h>
+#include <fe/mapping_collection.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 
@@ -685,7 +686,8 @@ typename Container::active_cell_iterator
 GridTools::find_active_cell_around_point (const Container  &container,
                                           const Point<dim> &p)
 {
-   return find_active_cell_around_point(StaticMappingQ1<dim>::mapping, container, p).first;
+   return find_active_cell_around_point(StaticMappingQ1<dim>::mapping,
+					container, p).first;
 }
 
 
@@ -718,18 +720,18 @@ GridTools::find_active_cell_around_point (const Mapping<dim>   &mapping,
 
    for(; cell != endc; ++cell)
       {
-         Point<dim> p_cell = mapping.transform_real_to_unit_cell(*cell, p);
+         const Point<dim> p_cell = mapping.transform_real_to_unit_cell(*cell, p);
 
                                    // calculate the infinity norm of
                                    // the distance vector to the unit cell.
-         double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+         const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
 
                                    // We compare if the point is inside the
                                    // unit cell (or at least not too far
                                    // outside). If it is, it is also checked
                                    // that the cell has a more refined state
-         if(dist < best_distance ||
-            (dist == best_distance && (*cell)->level() > best_level))
+         if (dist < best_distance ||
+	     (dist == best_distance && (*cell)->level() > best_level))
             {
                best_distance = dist;
                best_level    = (*cell)->level();
@@ -737,10 +739,69 @@ GridTools::find_active_cell_around_point (const Mapping<dim>   &mapping,
             }
       }
 
-   Assert(best_cell.first.state() == IteratorState::valid, ExcPointNotFound<dim>(p));
+   Assert (best_cell.first.state() == IteratorState::valid,
+	   ExcPointNotFound<dim>(p));
 
    return best_cell;
 }
+
+
+
+template <int dim>
+std::pair<typename hp::DoFHandler<dim>::active_cell_iterator, Point<dim> >
+GridTools::find_active_cell_around_point (const hp::MappingCollection<dim>   &mapping,
+                                          const hp::DoFHandler<dim> &container,
+                                          const Point<dim>     &p)
+{
+   typedef typename hp::DoFHandler<dim>::active_cell_iterator cell_iterator;
+
+                                   // The best distance is set to the
+                                   // maximum allowable distance from
+                                   // the unit cell; we assume a
+                                   // max. deviation of 1e-10
+   double best_distance = 1e-10;
+   int    best_level = -1;
+   std::pair<cell_iterator, Point<dim> > best_cell;
+
+                                   // Find closest vertex and determine
+                                   // all adjacent cells
+   unsigned int vertex = find_closest_vertex(container, p);
+   
+   std::vector<cell_iterator> adjacent_cells =
+      find_cells_adjacent_to_vertex(container, vertex);
+
+   typename std::vector<cell_iterator>::const_iterator
+      cell = adjacent_cells.begin(),
+      endc = adjacent_cells.end();
+
+   for(; cell != endc; ++cell)
+      {
+         const Point<dim> p_cell
+	   = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
+
+                                   // calculate the infinity norm of
+                                   // the distance vector to the unit cell.
+         const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+
+                                   // We compare if the point is inside the
+                                   // unit cell (or at least not too far
+                                   // outside). If it is, it is also checked
+                                   // that the cell has a more refined state
+         if (dist < best_distance ||
+	     (dist == best_distance && (*cell)->level() > best_level))
+            {
+               best_distance = dist;
+               best_level    = (*cell)->level();
+               best_cell     = std::make_pair(*cell, p_cell);
+            }
+      }
+
+   Assert (best_cell.first.state() == IteratorState::valid,
+	   ExcPointNotFound<dim>(p));
+
+   return best_cell;
+}
+
 
 
 template <int dim>
@@ -1185,6 +1246,12 @@ GridTools::find_active_cell_around_point (const Mapping<deal_II_dimension> &,
 template
 std::pair<hp::DoFHandler<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
 GridTools::find_active_cell_around_point (const Mapping<deal_II_dimension> &,
+                                          const hp::DoFHandler<deal_II_dimension> &,
+                                          const Point<deal_II_dimension> &);
+
+template
+std::pair<hp::DoFHandler<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
+GridTools::find_active_cell_around_point (const hp::MappingCollection<deal_II_dimension> &,
                                           const hp::DoFHandler<deal_II_dimension> &,
                                           const Point<deal_II_dimension> &);
 
