@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1074,7 +1074,8 @@ DoFTools::make_boundary_sparsity_pattern (
         {
           const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
           dofs_on_this_face.resize (dofs_per_face);
-          cell->face(f)->get_dof_indices (dofs_on_this_face);
+          cell->face(f)->get_dof_indices (dofs_on_this_face,
+					  cell->active_fe_index());
           
                                            // make sparsity pattern for this cell
           for (unsigned int i=0; i<dofs_per_face; ++i)
@@ -3024,7 +3025,8 @@ namespace internal
 						     // apply
 						     // constraints
 		    scratch_dofs.resize (cell->get_fe().dofs_per_face);
-		    cell->face(face)->get_dof_indices (scratch_dofs, cell->active_fe_index ());
+		    cell->face(face)->get_dof_indices (scratch_dofs,
+						       cell->active_fe_index ());
 
 						     // split dofs into master
 						     // and slave components
@@ -3667,7 +3669,8 @@ DoFTools::extract_boundary_dofs (const DH                      &dof_handler,
             
             const unsigned int dofs_per_face = fe.dofs_per_face;
             face_dof_indices.resize (dofs_per_face);
-	    cell->face(face)->get_dof_indices (face_dof_indices);
+	    cell->face(face)->get_dof_indices (face_dof_indices,
+					       cell->active_fe_index());
 
  	    for (unsigned int i=0; i<fe.dofs_per_face; ++i)
  	      if (!check_vector_component)
@@ -5166,7 +5169,8 @@ DoFTools::map_dof_to_boundary_indices (const DH                  &dof_handler,
         {
           const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
           dofs_on_face.resize (dofs_per_face);
-          cell->face(f)->get_dof_indices (dofs_on_face, cell->active_fe_index());
+          cell->face(f)->get_dof_indices (dofs_on_face,
+					  cell->active_fe_index());
           for (unsigned int i=0; i<dofs_per_face; ++i)
             if (mapping[dofs_on_face[i]] == DH::invalid_dof_index)
               mapping[dofs_on_face[i]] = next_boundary_index++;
