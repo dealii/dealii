@@ -1,4 +1,4 @@
-//----------------------------  matrices.cc  ---------------------------
+//----------------------------  matrices_hp.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,12 +9,10 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  matrices.cc  ---------------------------
+//----------------------------  matrices_hp.cc  ---------------------------
 
 
-// like deal.II/matrices, but for hp objects. here, each hp object has only a
-// single component, so we expect exactly the same output as for the old test.
-// matrices_hp tests for different finite elements
+// like hp/matrices, but with different fe objects
 
 
 #include "../tests.h"
@@ -70,7 +68,8 @@ check_boundary (const hp::DoFHandler<dim> &dof,
   function_map[0] = &coefficient;
 
   hp::QCollection<dim-1> face_quadrature;
-  face_quadrature.push_back (QGauss6<dim-1>());
+  for (unsigned int i=1; i<7-dim; ++i)
+    face_quadrature.push_back (QGauss<dim-1>(3+i));
   
   std::vector<unsigned int> dof_to_boundary_mapping;
   DoFTools::map_dof_to_boundary_indices (dof,
@@ -137,9 +136,14 @@ check ()
 				   // create a system element composed
 				   // of one Q1 and one Q2 element
   hp::FECollection<dim> element;
-  element.push_back (FESystem<dim> (FE_Q<dim>(1), 1,
-				    FE_Q<dim>(2), 1));
+  for (unsigned int i=1; i<7-dim; ++i)
+    element.push_back (FESystem<dim> (FE_Q<dim>(i), 1,
+				      FE_Q<dim>(i+1), 1));
   hp::DoFHandler<dim> dof(tr);
+  for (typename hp::DoFHandler<dim>::active_cell_iterator
+	 cell = dof.begin_active(); cell!=dof.end(); ++cell)
+    cell->set_active_fe_index (rand() % element.size());
+  
   dof.distribute_dofs(element);
 
 				   // use a more complicated mapping
@@ -147,10 +151,12 @@ check ()
 				   // formula suited to the elements
 				   // we have here
   hp::MappingCollection<dim> mapping;
-  mapping.push_back (MappingQ<dim>(3));
+  for (unsigned int i=1; i<7-dim; ++i)
+    mapping.push_back (MappingQ<dim>(i+1));
 
   hp::QCollection<dim> quadrature;
-  quadrature.push_back (QGauss6<dim>());
+  for (unsigned int i=1; i<7-dim; ++i)
+    quadrature.push_back (QGauss<dim>(3+i));
 
 				   // create sparsity pattern. note
 				   // that different components should
@@ -211,7 +217,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("matrices/output");
+  std::ofstream logfile ("matrices_hp/output");
   logfile.precision (2);
   logfile.setf(std::ios::fixed);  
   deallog.attach(logfile);

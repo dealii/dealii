@@ -36,11 +36,12 @@ void test1 ()
   Triangulation<dim> tria;
   GridIn<dim> gi;
   gi.attach_triangulation (tria);
-  std::ifstream in ("grid_in_2d.inp");
+  std::ifstream in ("test.ucd");
   gi.read_ucd (in);
-  
+
+  std::ofstream xx("xx");
   GridOut grid_out;
-  grid_out.write_ucd (tria, logfile);
+  grid_out.write_gnuplot (tria, xx);
 }
 
 
@@ -112,8 +113,8 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test1<2> ();
-  test2<2> ();
+  test1<3> ();
+//  test2<2> ();
 				   // test3 needs NetCDF
 //    test3<2> ();
 

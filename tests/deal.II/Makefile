@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -39,6 +39,7 @@ tests_x = block_matrices \
 	intergrid_constraints \
 	intergrid_map \
 	matrices \
+	vectors_* \
 	support_point_map \
 	filtered_matrix \
 	boundaries \
