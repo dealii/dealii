@@ -22,6 +22,7 @@ default: run-tests
 ############################################################
 
 tests_x = block_matrices \
+	adigma\
 	constraints \
 	data_out \
 	derivative_* \
@@ -31,6 +32,7 @@ tests_x = block_matrices \
 	error_estimator \
 	grid_invert \
 	grid_out \
+	grid_out_* \
 	grid_test \
 	grid_transform \
 	grid_transform_3d \
