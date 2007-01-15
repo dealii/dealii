@@ -22,7 +22,6 @@ default: run-tests
 ############################################################
 
 tests_x = block_matrices \
-	adigma\
 	constraints \
 	data_out \
 	derivative_* \
