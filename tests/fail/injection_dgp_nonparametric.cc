@@ -15,7 +15,7 @@
 char logname[] = "injection_dgp_nonparametric/output";
 
 
-#include "injection_common.h"
+#include "../fe/injection_common.h"
 
 
 template <int dim>

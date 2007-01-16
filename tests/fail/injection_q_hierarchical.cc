@@ -15,7 +15,7 @@
 char logname[] = "injection_q_hierarchical/output";
 
 
-#include "injection_common.h"
+#include "../fe/injection_common.h"
 
 
 template <int dim>
