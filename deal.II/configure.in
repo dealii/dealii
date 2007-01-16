@@ -701,7 +701,7 @@ if test "x$darwin_shared_lib" = "xyes" ; then
     echo "     WARNING: The installed compiler version seems to be "
     echo "     WARNING: the Apple gcc3.3, build 1666, which does not"
     echo "     WARNING: work properly for building dynamics libs"
-    echo "     WARNING: Please install Apples november 2004 patch"
+    echo "     WARNING: Please install Apples November 2004 patch"
     echo "     WARNING: for the gcc, which can be found on:"
     echo "     WARNING: http://www.apple.com/developer"
   fi
