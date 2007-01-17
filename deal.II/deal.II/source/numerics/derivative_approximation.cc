@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -614,6 +614,7 @@ approximate_derivative_tensor (const DH<dim>                                &dof
 
 
 
+#ifdef DEAL_II_FUNPTR_TEMPLATE_TEMPLATE_BUG
 namespace WorkAround
 {
 // gcc 2.95 is not happy if we take the address of a template function as in
@@ -635,7 +636,7 @@ namespace WorkAround
   };
   const bool IsHP<hp::DoFHandler>::value;  
 }
-
+#endif
 
 
 template <class DerivativeDescription, int dim,
