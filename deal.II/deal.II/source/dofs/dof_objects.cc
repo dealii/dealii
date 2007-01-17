@@ -24,15 +24,6 @@ namespace internal
 {
   namespace DoFHandler
   {
-    template<int dim>
-    unsigned int
-    DoFObjects<dim>::memory_consumption () const
-    {
-      return (MemoryConsumption::memory_consumption (dofs));
-    }
-
-
-
     template <int dim>
     template <int spacedim>
     void
