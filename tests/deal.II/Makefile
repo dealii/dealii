@@ -11,11 +11,11 @@ include ../Makefile.paths
 include $D/common/Make.global_options
 debug-mode = on
 
-libraries = $(lib-lac.g)  \
-            $(lib-base.g) \
-            $(lib-deal2-1d.g) \
+libraries = $(lib-deal2-1d.g) \
             $(lib-deal2-2d.g) \
-            $(lib-deal2-3d.g)
+            $(lib-deal2-3d.g) \
+            $(lib-lac.g)  \
+            $(lib-base.g)
 
 default: run-tests 
 
