@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1462,12 +1462,12 @@ class FiniteElement : public Subscriptor,
 				     /**
 				      * For faces with non-standard
 				      * face_orientation in 3D, the shape
-				      * functions on faces have to be permutated
+				      * functions on faces have to be permutat
 				      * in order to be combined with the correct
 				      * dofs. This function returns a vector of
 				      * integer values, that have to be added to
 				      * the index of a shape function in order
-				      * to result in the permutated index. Prior
+				      * to result in the permuted index. Prior
 				      * content of the vector @p shifts is
 				      * erased. In 3D a vector of length @p
 				      * dofs_per_quad is returned, in 2D and 1D

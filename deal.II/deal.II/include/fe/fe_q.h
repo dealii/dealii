@@ -442,12 +442,12 @@ class FE_Q : public FE_Poly<TensorProductPolynomials<dim>,dim>
     				     /**
 				      * For faces with non-standard
 				      * face_orientation in 3D, the shape
-				      * functions on faces have to be permutated
+				      * functions on faces have to be permuted
 				      * in order to be combined with the correct
 				      * dofs. This function returns a vector of
 				      * integer values, that have to be added to
 				      * the index of a shape function in order
-				      * to result in the permutated index. Prior
+				      * to result in the permuted index. Prior
 				      * content of the vector @p shifts is
 				      * erased. In 3D a vector of length @p
 				      * dofs_per_quad is returned, in 2D and 1D

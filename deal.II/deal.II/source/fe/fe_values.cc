@@ -321,11 +321,11 @@ FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
 				   // are needed
   if (dim==3)
     {
-      permutated_shape_functions.resize(fe.dofs_per_cell);
+      permuted_shape_functions.resize(fe.dofs_per_cell);
 				       // initialize cell permutation mapping
 				       // with identity
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	this->permutated_shape_functions[i]=i;
+	this->permuted_shape_functions[i]=i;
 
       if (fe.dofs_per_quad>0 &&
 	  (flags & update_values ||
@@ -416,10 +416,10 @@ void FEValuesBase<3>::reinit ()
 	{
  	  if (thiscell->face_orientation(face_no))
 	    for (unsigned int i=0; i<fe->dofs_per_quad; ++i)
-	      this->permutated_shape_functions[offset+i]=offset+i;
+	      this->permuted_shape_functions[offset+i]=offset+i;
  	  else
 	    for (unsigned int i=0; i<fe->dofs_per_quad; ++i)
- 	      this->permutated_shape_functions[offset+i]=offset+i+this->shift_in_face_shape_functions[i];
+ 	      this->permuted_shape_functions[offset+i]=offset+i+this->shift_in_face_shape_functions[i];
 
 	  offset+=this->fe->dofs_per_quad;
 	}
@@ -1076,7 +1076,7 @@ FEValuesBase<dim>::memory_consumption () const
   return (MemoryConsumption::memory_consumption (this->shape_values) +
 	  MemoryConsumption::memory_consumption (this->shape_gradients) +
 	  MemoryConsumption::memory_consumption (this->shape_2nd_derivatives) +
-	  MemoryConsumption::memory_consumption (this->permutated_shape_functions) +
+	  MemoryConsumption::memory_consumption (this->permuted_shape_functions) +
 	  MemoryConsumption::memory_consumption (this->shift_in_face_shape_functions) +
 	  MemoryConsumption::memory_consumption (this->JxW_values) +
 	  MemoryConsumption::memory_consumption (this->quadrature_points) +

@@ -284,11 +284,11 @@ class FEValuesData
 				      * faces are oriented according to the
 				      * standard, this is the identity mapping.
 				      */
-    std::vector<unsigned int> permutated_shape_functions;
+    std::vector<unsigned int> permuted_shape_functions;
 
 				     /**
 				      * Bool flag indicating the need to update
-				      * the @p permutated_shape_functions vector
+				      * the @p permuted_shape_functions vector
 				      * on each cell. This is only necessary in
 				      * 3d and if the finite element has
 				      * shape_functions on the face.
@@ -659,7 +659,7 @@ class FEValuesBase : protected FEValuesData<dim>,
     
 				     /**
 				      * If shape functions belong to a face in
-				      * 3D, they have to be permutated, if the
+				      * 3D, they have to be permuted, if the
 				      * face has non-standard face
 				      * orientation. This functuion takes an
 				      * index of a shape function (on a standard
@@ -2754,7 +2754,7 @@ unsigned int
 FEValuesBase<3>::shift_shape_function_index (const unsigned int i) const
 {
   Assert(i<fe->dofs_per_cell, ExcInternalError());
-  return this->permutated_shape_functions[i];
+  return this->permuted_shape_functions[i];
 }
 
 
