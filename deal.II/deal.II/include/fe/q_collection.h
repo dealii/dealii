@@ -17,6 +17,7 @@
 #include <base/subscriptor.h>
 #include <base/quadrature.h>
 #include <base/smartpointer.h>
+#include <base/memory_consumption.h>
 #include <fe/fe.h>
 
 #include <vector>
@@ -188,6 +189,66 @@ namespace hp
     Assert (index < quadratures.size (),
 	    ExcIndexRange (index, 0, quadratures.size ()));
     return *quadratures[index];
+  }
+
+
+
+  template <int dim>
+  inline
+  QCollection<dim>::QCollection ()
+  {}
+
+
+
+  template <int dim>
+  inline
+  QCollection<dim>::QCollection (const Quadrature<dim> &quadrature)
+  {
+    quadratures
+      .push_back (boost::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(quadrature)));
+  }
+
+  
+
+  template <int dim>
+  inline
+  QCollection<dim>::
+  QCollection (const QCollection<dim> &q_collection)
+                  :
+                  Subscriptor (),
+                                                   // copy the array
+                                                   // of shared
+                                                   // pointers. nothing
+                                                   // bad should
+                                                   // happen -- they
+                                                   // simply all point
+                                                   // to the same
+                                                   // objects, and the
+                                                   // last one to die
+                                                   // will delete the
+                                                   // mappings
+                  quadratures (q_collection.quadratures)
+  {}
+
+
+
+  template <int dim>
+  inline
+  unsigned int
+  QCollection<dim>::memory_consumption () const
+  {
+    return (sizeof(*this) +
+	    MemoryConsumption::memory_consumption (quadratures));
+  }
+
+
+  template <int dim>
+  inline
+  void
+  QCollection<dim>::push_back (const Quadrature<dim> &new_quadrature)
+  {
+    quadratures
+      .push_back (boost::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(new_quadrature)));
   }
   
 } // namespace hp
