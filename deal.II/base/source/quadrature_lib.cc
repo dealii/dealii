@@ -184,15 +184,29 @@ compute_quadrature_points(const unsigned int q,
 				   // compute quadrature points with
 				   // a Newton algorithm.
 
-				   // set tolerance
+				   // Set tolerance. See class QGauss
+				   // for detailed explanation.
 #ifdef HAVE_STD_NUMERIC_LIMITS
   const long double
-    epsilon = static_cast<long double>(std::numeric_limits<long double>::epsilon());
+    long_double_eps = static_cast<long double>(std::numeric_limits<long double>::epsilon()),
+    double_eps      = static_cast<long double>(std::numeric_limits<double>::epsilon());
 #else
   const long double
-    epsilon = 1.e-19L; 
+    long_double_eps = 1.09-19L,
+    double_eps      = 2.23-16;
 #endif
 
+				   // check whether long double is
+				   // more accurate than double, and
+				   // set tolerances accordingly
+  const long double epsilon
+    = (static_cast<long double>(1.0) + long_double_eps != static_cast<long double>(1.0)
+       ?
+       std::max (double_eps / 100, long_double_eps * 5)
+       :
+       double_eps * 5
+       );
+  
 				   // we take the zeros of the Chebyshev
 				   // polynomial (alpha=beta=-0.5) as
 				   // initial values:
