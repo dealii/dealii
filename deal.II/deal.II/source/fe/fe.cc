@@ -333,6 +333,30 @@ FiniteElement<dim>::component_to_block_index (const unsigned int index) const
 }
 
 
+#if deal_II_dimension < 3
+
+template <int dim>
+void
+FiniteElement<dim>::get_face_shape_function_shifts (std::vector<int> &shifts) const
+{
+				   // general template for 1D and 2D, return an
+				   // empty vector
+  shifts.clear();
+}
+
+#else
+
+template <>
+void
+FiniteElement<3>::get_face_shape_function_shifts (std::vector<int> &shifts) const
+{
+  shifts.clear();
+  shifts.resize(this->dofs_per_quad,0);
+}
+
+#endif
+
+
 
 template <int dim>
 bool

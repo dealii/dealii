@@ -316,6 +316,34 @@ FEValuesData<dim>::initialize (const unsigned int        n_quadrature_points,
 
   if (flags & update_cell_JxW_values)
     this->cell_JxW_values.resize(n_quadrature_points);
+
+				   // initialize the permutation fields, if they
+				   // are needed
+  if (dim==3)
+    {
+      permutated_shape_functions.resize(fe.dofs_per_cell);
+				       // initialize cell permutation mapping
+				       // with identity
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	this->permutated_shape_functions[i]=i;
+
+      if (fe.dofs_per_quad>0 &&
+	  (flags & update_values ||
+	   flags & update_gradients ||
+	   flags & update_second_derivatives))
+	{
+					   // ask the fe to fill the vector of
+					   // shifts
+	  fe.get_face_shape_function_shifts(shift_in_face_shape_functions);
+	  Assert (shift_in_face_shape_functions.size()==fe.dofs_per_quad,
+		  ExcInternalError());
+	  update_shape_function_permutation=true;
+	}
+      else
+	update_shape_function_permutation=false;
+    }
+  else
+    update_shape_function_permutation=false;
 }
 
 
@@ -363,6 +391,43 @@ FEValuesBase<dim>::~FEValuesBase ()
       delete tmp1;
     }
 }
+
+
+#if deal_II_dimension <3
+template <int dim>
+void FEValuesBase<dim>::reinit ()
+{
+				   // do nothing in 1D and 2D
+}
+#else
+
+template <>
+void FEValuesBase<3>::reinit ()
+{
+				   // in 3D reinit the permutation of face shape
+				   // functions, if necessary
+  if (update_shape_function_permutation)
+    {
+      Assert (this->shift_in_face_shape_functions.size()==this->fe->dofs_per_quad,
+	      ExcInternalError());
+      Triangulation<3>::cell_iterator thiscell = *(this->present_cell);
+      unsigned int offset=fe->first_quad_index;
+      for (unsigned int face_no=0; face_no<GeometryInfo<3>::faces_per_cell; ++face_no)
+	{
+ 	  if (thiscell->face_orientation(face_no))
+	    for (unsigned int i=0; i<fe->dofs_per_quad; ++i)
+	      this->permutated_shape_functions[offset+i]=offset+i;
+ 	  else
+	    for (unsigned int i=0; i<fe->dofs_per_quad; ++i)
+ 	      this->permutated_shape_functions[offset+i]=offset+i+this->shift_in_face_shape_functions[i];
+
+	  offset+=this->fe->dofs_per_quad;
+	}
+      Assert (offset-fe->first_quad_index==GeometryInfo<3>::faces_per_cell*this->fe->dofs_per_quad,
+	      ExcInternalError());
+    }
+}
+#endif
 
 
 
@@ -1011,12 +1076,15 @@ FEValuesBase<dim>::memory_consumption () const
   return (MemoryConsumption::memory_consumption (this->shape_values) +
 	  MemoryConsumption::memory_consumption (this->shape_gradients) +
 	  MemoryConsumption::memory_consumption (this->shape_2nd_derivatives) +
+	  MemoryConsumption::memory_consumption (this->permutated_shape_functions) +
+	  MemoryConsumption::memory_consumption (this->shift_in_face_shape_functions) +
 	  MemoryConsumption::memory_consumption (this->JxW_values) +
 	  MemoryConsumption::memory_consumption (this->quadrature_points) +
 	  MemoryConsumption::memory_consumption (this->normal_vectors) +
 	  MemoryConsumption::memory_consumption (this->boundary_forms) +
 	  MemoryConsumption::memory_consumption (this->cell_JxW_values) +
 	  sizeof(this->update_flags) +
+	  sizeof(this->update_shape_function_permutation) +
 	  MemoryConsumption::memory_consumption (n_quadrature_points) +
 	  MemoryConsumption::memory_consumption (dofs_per_cell) +
 	  MemoryConsumption::memory_consumption (mapping) +
@@ -1260,6 +1328,8 @@ void FEValues<dim>::do_reinit ()
 
   this->fe_data->clear_first_cell ();
   this->mapping_data->clear_first_cell ();
+  
+  FEValuesBase<dim>::reinit();
 }
 
 
@@ -1537,6 +1607,7 @@ void FEFaceValues<dim>::do_reinit (const unsigned int face_no)
 
   this->fe_data->clear_first_cell ();
   this->mapping_data->clear_first_cell ();
+  FEValuesBase<dim>::reinit();
 }
 
 
@@ -1789,6 +1860,7 @@ void FESubfaceValues<dim>::do_reinit (const unsigned int face_no,
 
   this->fe_data->clear_first_cell ();
   this->mapping_data->clear_first_cell ();
+  FEValuesBase<dim>::reinit();
 }
 
 

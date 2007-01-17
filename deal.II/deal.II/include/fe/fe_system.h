@@ -539,6 +539,25 @@ class FESystem : public FiniteElement<dim>
     virtual
     FiniteElementDomination::Domination
     compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
+
+    				     /**
+				      * For faces with non-standard
+				      * face_orientation in 3D, the shape
+				      * functions on faces have to be permutated
+				      * in order to be combined with the correct
+				      * dofs. This function returns a vector of
+				      * integer values, that have to be added to
+				      * the index of a shape function in order
+				      * to result in the permutated index. Prior
+				      * content of the vector @p shifts is
+				      * erased. In 3D a vector of length @p
+				      * dofs_per_quad is returned, in 2D and 1D
+				      * there is no need for permutation and a
+				      * vector of length 0 is returned.
+				      */
+    virtual
+    void
+    get_face_shape_function_shifts (std::vector<int> &shifts) const;
 				     //@}
     
 				     /**

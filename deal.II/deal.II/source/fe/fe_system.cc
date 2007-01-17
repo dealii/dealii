@@ -2926,6 +2926,40 @@ FESystem<dim>::unit_face_support_point (const unsigned index) const
 
 
 
+template <int dim>
+void
+FESystem<dim>::get_face_shape_function_shifts (std::vector<int> &shifts) const
+{
+				   // general template for 1D and 2D, return an
+				   // empty vector
+  shifts.clear();
+}
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+void
+FESystem<3>::get_face_shape_function_shifts (std::vector<int> &shifts) const
+{
+  shifts.clear();
+  std::vector<int> temp;
+				   // to obtain the shifts for this composed
+				   // element, concatenate the shift vectors of
+				   // the base elements
+  for (unsigned int b=0; b<n_base_elements();++b)
+    {
+      this->base_element(b).get_face_shape_function_shifts(temp);
+      for (unsigned int c=0; c<element_multiplicity(b); ++c)
+	shifts.insert(shifts.begin(),temp.begin(),temp.end());
+    }
+  Assert (shifts.size()==this->dofs_per_quad, ExcInternalError());
+}
+
+#endif
+
+
 
 template <int dim>
 unsigned int

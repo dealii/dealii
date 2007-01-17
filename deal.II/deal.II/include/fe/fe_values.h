@@ -263,7 +263,38 @@ class FEValuesData
 				      * non-zero components.
 				      */
     std::vector<unsigned int> shape_function_to_row_table;
-    
+
+				     /**
+				      * Vector containing the permutation of
+				      * shape functions necessary if the faces
+				      * of a cell have the wrong
+				      * face_orientation. This is computed only
+				      * once. Actually, this does not contain
+				      * the permutation itself but rather the
+				      * shift of indices needed to calculate the
+				      * permutation.
+				      */
+    std::vector<int> shift_in_face_shape_functions;
+
+				     /**
+				      * Vector containing the permutation of
+				      * shape functions due to faces with
+				      * non-standard face_orientation on a given
+				      * cell (recomputed on each cell.) If all
+				      * faces are oriented according to the
+				      * standard, this is the identity mapping.
+				      */
+    std::vector<unsigned int> permutated_shape_functions;
+
+				     /**
+				      * Bool flag indicating the need to update
+				      * the @p permutated_shape_functions vector
+				      * on each cell. This is only necessary in
+				      * 3d and if the finite element has
+				      * shape_functions on the face.
+				      */
+    bool update_shape_function_permutation;
+        
                                      /**
 				      * Original update flags handed
 				      * to the constructor of
@@ -626,7 +657,19 @@ class FEValuesBase : protected FEValuesData<dim>,
 				    const unsigned int point_no,
 				    const unsigned int component) const;
     
-
+				     /**
+				      * If shape functions belong to a face in
+				      * 3D, they have to be permutated, if the
+				      * face has non-standard face
+				      * orientation. This functuion takes an
+				      * index of a shape function (on a standard
+				      * cell) and returns the corresponding
+				      * shape function on the real cell.
+				      */
+    unsigned int
+    shift_shape_function_index (const unsigned int i) const;
+    
+    
 				     //@}
 				     /// @name FunctionAccess Access to values of global finite element functions
 				     //@{
@@ -1623,6 +1666,12 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      */
     UpdateFlags compute_update_flags (const UpdateFlags update_flags) const;
 
+				     /**
+				      * Reinit the permutation of (face) shape
+				      * functions to match the present cell.
+				      */
+    void reinit();
+
   private:
                                      /**
                                       * Copy constructor. Since
@@ -2322,15 +2371,17 @@ double
 FEValuesBase<dim>::shape_value (const unsigned int i,
 				const unsigned int j) const
 {
+  const unsigned int I=shift_shape_function_index(i);
+  
   Assert (this->update_flags & update_values,
 	  ExcAccessToUninitializedField());
-  Assert (fe->is_primitive (i),
-	  ExcShapeFunctionNotPrimitive(i));
+  Assert (fe->is_primitive (I),
+	  ExcShapeFunctionNotPrimitive(I));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:
   if (fe->is_primitive())
-    return this->shape_values(i,j);
+    return this->shape_values(I,j);
   else
 				     // otherwise, use the mapping
 				     // between shape function numbers
@@ -2341,7 +2392,7 @@ FEValuesBase<dim>::shape_value (const unsigned int i,
 				     // question to which vector
 				     // component the call of this
 				     // function refers
-    return this->shape_values(this->shape_function_to_row_table[i], j);
+    return this->shape_values(this->shape_function_to_row_table[I], j);
 }
 
 
@@ -2353,6 +2404,8 @@ FEValuesBase<dim>::shape_value_component (const unsigned int i,
 					  const unsigned int j,
 					  const unsigned int component) const
 {
+  const unsigned int I=shift_shape_function_index(i);
+
   Assert (this->update_flags & update_values,
 	  ExcAccessToUninitializedField());
   Assert (component < fe->n_components(),
@@ -2367,10 +2420,10 @@ FEValuesBase<dim>::shape_value_component (const unsigned int i,
 				   // system_to_component_table only
 				   // works if the shape function is
 				   // primitive):
-  if (fe->is_primitive(i))
+  if (fe->is_primitive(I))
     {
-      if (component == fe->system_to_component_index(i).first)
-	return this->shape_values(this->shape_function_to_row_table[i],j);
+      if (component == fe->system_to_component_index(I).first)
+	return this->shape_values(this->shape_function_to_row_table[I],j);
       else
 	return 0;
     }
@@ -2385,7 +2438,7 @@ FEValuesBase<dim>::shape_value_component (const unsigned int i,
 				       // whether the shape function
 				       // is non-zero at all within
 				       // this component:
-      if (fe->get_nonzero_components(i)[component] == false)
+      if (fe->get_nonzero_components(I)[component] == false)
 	return 0.;
 
 				       // count how many non-zero
@@ -2397,10 +2450,10 @@ FEValuesBase<dim>::shape_value_component (const unsigned int i,
 				       // shape function in the arrays
 				       // we index presently:
       const unsigned int
-	row = (this->shape_function_to_row_table[i]
+	row = (this->shape_function_to_row_table[I]
 	       +
-	       std::count (fe->get_nonzero_components(i).begin(),
-			   fe->get_nonzero_components(i).begin()+component,
+	       std::count (fe->get_nonzero_components(I).begin(),
+			   fe->get_nonzero_components(I).begin()+component,
 			   true));
       return this->shape_values(row, j);
     };
@@ -2414,19 +2467,21 @@ const Tensor<1,dim> &
 FEValuesBase<dim>::shape_grad (const unsigned int i,
 			       const unsigned int j) const
 {
+  const unsigned int I=shift_shape_function_index(i);
+
   Assert (this->update_flags & update_gradients,
 	  ExcAccessToUninitializedField());
-  Assert (fe->is_primitive (i),
-	  ExcShapeFunctionNotPrimitive(i));
+  Assert (fe->is_primitive (I),
+	  ExcShapeFunctionNotPrimitive(I));
   Assert (i<this->shape_gradients.size(),
-	  ExcIndexRange (i, 0, this->shape_gradients.size()));
+	  ExcIndexRange (I, 0, this->shape_gradients.size()));
   Assert (j<this->shape_gradients[0].size(),
 	  ExcIndexRange (j, 0, this->shape_gradients[0].size()));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:
   if (fe->is_primitive())
-    return this->shape_gradients[i][j];
+    return this->shape_gradients[I][j];
   else
 				     // otherwise, use the mapping
 				     // between shape function numbers
@@ -2437,7 +2492,7 @@ FEValuesBase<dim>::shape_grad (const unsigned int i,
 				     // question to which vector
 				     // component the call of this
 				     // function refers
-    return this->shape_gradients[this->shape_function_to_row_table[i]][j];
+    return this->shape_gradients[this->shape_function_to_row_table[I]][j];
 }
 
 
@@ -2449,6 +2504,8 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
 					 const unsigned int j,
 					 const unsigned int component) const
 {
+  const unsigned int I=shift_shape_function_index(i);
+
   Assert (this->update_flags & update_gradients,
 	  ExcAccessToUninitializedField());
   Assert (component < fe->n_components(),
@@ -2463,10 +2520,10 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
 				   // system_to_component_table only
 				   // works if the shape function is
 				   // primitive):
-  if (fe->is_primitive(i))
+  if (fe->is_primitive(I))
     {
-      if (component == fe->system_to_component_index(i).first)
-	return this->shape_gradients[this->shape_function_to_row_table[i]][j];
+      if (component == fe->system_to_component_index(I).first)
+	return this->shape_gradients[this->shape_function_to_row_table[I]][j];
       else
 	return Tensor<1,dim>();
     }
@@ -2481,7 +2538,7 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
 				       // whether the shape function
 				       // is non-zero at all within
 				       // this component:
-      if (fe->get_nonzero_components(i)[component] == false)
+      if (fe->get_nonzero_components(I)[component] == false)
 	return Tensor<1,dim>();
 
 				       // count how many non-zero
@@ -2493,10 +2550,10 @@ FEValuesBase<dim>::shape_grad_component (const unsigned int i,
 				       // shape function in the arrays
 				       // we index presently:
       const unsigned int
-	row = (this->shape_function_to_row_table[i]
+	row = (this->shape_function_to_row_table[I]
 	       +
-	       std::count (fe->get_nonzero_components(i).begin(),
-			   fe->get_nonzero_components(i).begin()+component,
+	       std::count (fe->get_nonzero_components(I).begin(),
+			   fe->get_nonzero_components(I).begin()+component,
 			   true));
       return this->shape_gradients[row][j];
     };
@@ -2510,19 +2567,21 @@ const Tensor<2,dim> &
 FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 					 const unsigned int j) const
 {
+  const unsigned int I=shift_shape_function_index(i);
+
   Assert (this->update_flags & update_second_derivatives,
 	  ExcAccessToUninitializedField());
-  Assert (fe->is_primitive (i),
+  Assert (fe->is_primitive (I),
 	  ExcShapeFunctionNotPrimitive(i));
-  Assert (i<this->shape_2nd_derivatives.size(),
-	  ExcIndexRange (i, 0, this->shape_2nd_derivatives.size()));
+  Assert (I<this->shape_2nd_derivatives.size(),
+	  ExcIndexRange (I, 0, this->shape_2nd_derivatives.size()));
   Assert (j<this->shape_2nd_derivatives[0].size(),
 	  ExcIndexRange (j, 0, this->shape_2nd_derivatives[0].size()));
 
 				   // if the entire FE is primitive,
 				   // then we can take a short-cut:
   if (fe->is_primitive())
-    return this->shape_2nd_derivatives[i][j];
+    return this->shape_2nd_derivatives[I][j];
   else
 				     // otherwise, use the mapping
 				     // between shape function numbers
@@ -2533,7 +2592,7 @@ FEValuesBase<dim>::shape_2nd_derivative (const unsigned int i,
 				     // question to which vector
 				     // component the call of this
 				     // function refers
-    return this->shape_2nd_derivatives[this->shape_function_to_row_table[i]][j];
+    return this->shape_2nd_derivatives[this->shape_function_to_row_table[I]][j];
 }
 
 
@@ -2545,6 +2604,8 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
 						   const unsigned int j,
 						   const unsigned int component) const
 {
+  const unsigned int I=shift_shape_function_index(i);
+
   Assert (this->update_flags & update_second_derivatives,
 	  ExcAccessToUninitializedField());
   Assert (component < fe->n_components(),
@@ -2559,10 +2620,10 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
 				   // system_to_component_table only
 				   // works if the shape function is
 				   // primitive):
-  if (fe->is_primitive(i))
+  if (fe->is_primitive(I))
     {
-      if (component == fe->system_to_component_index(i).first)
-	return this->shape_2nd_derivatives[this->shape_function_to_row_table[i]][j];
+      if (component == fe->system_to_component_index(I).first)
+	return this->shape_2nd_derivatives[this->shape_function_to_row_table[I]][j];
       else
 	return Tensor<2,dim>();
     }
@@ -2589,10 +2650,10 @@ FEValuesBase<dim>::shape_2nd_derivative_component (const unsigned int i,
 				       // shape function in the arrays
 				       // we index presently:
       const unsigned int
-	row = (this->shape_function_to_row_table[i]
+	row = (this->shape_function_to_row_table[I]
 	       +
-	       std::count (fe->get_nonzero_components(i).begin(),
-			   fe->get_nonzero_components(i).begin()+component,
+	       std::count (fe->get_nonzero_components(I).begin(),
+			   fe->get_nonzero_components(I).begin()+component,
 			   true));
       return this->shape_2nd_derivatives[row][j];
     };
@@ -2674,6 +2735,28 @@ FEValuesBase<dim>::JxW (const unsigned int i) const
   
   return this->JxW_values[i];
 }
+
+
+
+template <int dim>
+inline
+unsigned int
+FEValuesBase<dim>::shift_shape_function_index (const unsigned int i) const
+{
+				   // standard implementation for 1D and 2D
+  Assert(i<fe->dofs_per_cell, ExcInternalError());
+  return i;
+}
+
+template <>
+inline
+unsigned int
+FEValuesBase<3>::shift_shape_function_index (const unsigned int i) const
+{
+  Assert(i<fe->dofs_per_cell, ExcInternalError());
+  return this->permutated_shape_functions[i];
+}
+
 
 
 /*------------------------ Inline functions: FEValues ----------------------------*/
@@ -2760,6 +2843,8 @@ FEFaceValuesBase<dim>::boundary_form (const unsigned int i) const
   
   return this->boundary_forms[i];
 }
+
+
 
 #endif // DOXYGEN
 

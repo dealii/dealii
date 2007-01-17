@@ -959,6 +959,16 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+  <li> <p> Fixed: On faces with wrong <code>face_orientation</code> the shape
+       functions have to reordered in order to be combined with the correct
+       dofs. This is only relevant for continuous elements in 3D. At least for
+       <code class="class">FE_Q</code> and systems of <code
+       class="class">FE_Q</code> this works now, for other finite elements the
+       reordering vector still has to be implemented.
+		 <br>
+		 (Tobias Leicht, 2007/01/17)
+       </p>
+
   <li> <p>
        Fixed: The <code class="class">Triangulation</code>::<code
        class="member">execute_coarsening_and_refinement</code> function has to

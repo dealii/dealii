@@ -710,6 +710,37 @@ compare_for_face_domination (const FiniteElement<dim> &fe_other) const
 
 
 
+template <int dim>
+void
+FE_Q<dim>::get_face_shape_function_shifts (std::vector<int> &shifts) const
+{
+				   // general template for 1D and 2D, return an
+				   // empty vector
+  shifts.clear();
+}
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+void
+FE_Q<3>::get_face_shape_function_shifts (std::vector<int> &shifts) const
+{
+  shifts.resize(this->dofs_per_quad);
+
+  unsigned int points=this->degree-1;
+  Assert(points*points==this->dofs_per_quad, ExcInternalError());
+		
+  for (unsigned int local=0; local<this->dofs_per_quad; ++local)
+				     // face support points are in lexicographic
+				     // ordering with x running fastest. invert
+				     // that (y running fastest)
+    shifts[local] = (local%points)*points + local/points - local;
+}
+
+#endif
+
 //---------------------------------------------------------------------------
 // Auxiliary functions
 //---------------------------------------------------------------------------

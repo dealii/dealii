@@ -1459,6 +1459,31 @@ class FiniteElement : public Subscriptor,
     unsigned int
     component_to_block_index (const unsigned int component) const;
 
+				     /**
+				      * For faces with non-standard
+				      * face_orientation in 3D, the shape
+				      * functions on faces have to be permutated
+				      * in order to be combined with the correct
+				      * dofs. This function returns a vector of
+				      * integer values, that have to be added to
+				      * the index of a shape function in order
+				      * to result in the permutated index. Prior
+				      * content of the vector @p shifts is
+				      * erased. In 3D a vector of length @p
+				      * dofs_per_quad is returned, in 2D and 1D
+				      * there is no need for permutation and a
+				      * vector of length 0 is returned, the same
+				      * is true for elements which have no dofs
+				      * on quads. The general implementation
+				      * returns a vector of zeros, resulting in
+				      * no permutation at all. This has to be
+				      * overloaded by derived finite element
+				      * classes.
+				      */
+    virtual
+    void
+    get_face_shape_function_shifts (std::vector<int> &shifts) const;
+
 				     //@}
     
 				     /**
