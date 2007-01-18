@@ -1196,6 +1196,20 @@ class FiniteElement : public Subscriptor,
     face_system_to_component_index (const unsigned int index) const;
 
 				     /**
+				      * For faces with non-standard
+				      * face_orientation in 3D, the dofs on
+				      * faces (quads) have to be permuted in
+				      * order to be combined with the correct
+				      * shape functions. Given a local dof @p
+				      * index on a quad, return the local index,
+				      * if the face has non-standard
+				      * face_orientation. In 2D and 1D there is
+				      * no need for permutation so the identity
+				      * is returned.
+				      */
+    unsigned int adjust_quad_dof_index_for_face_orientation (const unsigned int index) const;
+
+				     /**
 				      * Return in which of the vector
 				      * components of this finite
 				      * element the @p ithe shape
@@ -1458,31 +1472,6 @@ class FiniteElement : public Subscriptor,
 				      */
     unsigned int
     component_to_block_index (const unsigned int component) const;
-
-				     /**
-				      * For faces with non-standard
-				      * face_orientation in 3D, the shape
-				      * functions on faces have to be permutat
-				      * in order to be combined with the correct
-				      * dofs. This function returns a vector of
-				      * integer values, that have to be added to
-				      * the index of a shape function in order
-				      * to result in the permuted index. Prior
-				      * content of the vector @p shifts is
-				      * erased. In 3D a vector of length @p
-				      * dofs_per_quad is returned, in 2D and 1D
-				      * there is no need for permutation and a
-				      * vector of length 0 is returned, the same
-				      * is true for elements which have no dofs
-				      * on quads. The general implementation
-				      * returns a vector of zeros, resulting in
-				      * no permutation at all. This has to be
-				      * overloaded by derived finite element
-				      * classes.
-				      */
-    virtual
-    void
-    get_face_shape_function_shifts (std::vector<int> &shifts) const;
 
 				     //@}
     
@@ -2078,6 +2067,29 @@ class FiniteElement : public Subscriptor,
 				      */    
     std::vector<Point<dim-1> > generalized_face_support_points;
     
+				     /**
+				      * For faces with non-standard
+				      * face_orientation in 3D, the dofs on
+				      * faces (quads) have to be permuted in
+				      * order to be combined with the correct
+				      * shape functions. Given a local dof @p
+				      * index on a quad, return the shift in the
+				      * local index, if the face has
+				      * non-standard face_orientation,
+				      * i.e. <code>old_index + shift =
+				      * new_index</code>. In 2D and 1D there is
+				      * no need for permutation so the vector is
+				      * empty. In 3D it has the size of @p
+				      * dofs_per_quad.
+				      *
+				      * The standard implementation fills this
+				      * with zeros, i.e. no permuatation at
+				      * all. Derived finite element classes have
+				      * to fill this vector with the correct
+				      * values.
+				      */
+    std::vector<int> adjust_quad_dof_index_for_face_orientation_table;
+
   private:
 				     /**
 				      * Store what

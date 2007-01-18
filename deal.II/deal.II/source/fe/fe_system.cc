@@ -1729,6 +1729,8 @@ void FESystem<dim>::initialize ()
 				   // on cell and face
   initialize_unit_support_points ();
   initialize_unit_face_support_points ();
+
+  initialize_quad_dof_index_permutation ();
 }
 
 
@@ -1844,6 +1846,40 @@ initialize_unit_face_support_points ()
 	= base_element(base_i).unit_face_support_points[index_in_base];
     };
 }
+
+
+
+template <int dim>
+void
+FESystem<dim>::initialize_quad_dof_index_permutation ()
+{
+				   // general template for 1D and 2D, do nothing
+}
+
+
+
+#if deal_II_dimension == 3
+
+template <>
+void
+FESystem<3>::initialize_quad_dof_index_permutation ()
+{
+				   // to obtain the shifts for this composed
+				   // element, concatenate the shift vectors of
+				   // the base elements
+  for (unsigned int b=0; b<n_base_elements();++b)
+    {
+      const std::vector<int> &temp=this->base_element(b).adjust_quad_dof_index_for_face_orientation_table;
+      for (unsigned int c=0; c<element_multiplicity(b); ++c)
+	adjust_quad_dof_index_for_face_orientation_table.insert
+	  (adjust_quad_dof_index_for_face_orientation_table.begin(),
+	   temp.begin(),temp.end());
+    }
+  Assert (adjust_quad_dof_index_for_face_orientation_table.size()==this->dofs_per_quad,
+	  ExcInternalError());
+}
+
+#endif
 
 
 
@@ -2923,41 +2959,6 @@ FESystem<dim>::unit_face_support_point (const unsigned index) const
     return (base_element(this->face_system_to_base_index(index).first.first)
             .unit_face_support_point(this->face_system_to_base_index(index).second));
 }
-
-
-
-template <int dim>
-void
-FESystem<dim>::get_face_shape_function_shifts (std::vector<int> &shifts) const
-{
-				   // general template for 1D and 2D, return an
-				   // empty vector
-  shifts.clear();
-}
-
-
-
-#if deal_II_dimension == 3
-
-template <>
-void
-FESystem<3>::get_face_shape_function_shifts (std::vector<int> &shifts) const
-{
-  shifts.clear();
-  std::vector<int> temp;
-				   // to obtain the shifts for this composed
-				   // element, concatenate the shift vectors of
-				   // the base elements
-  for (unsigned int b=0; b<n_base_elements();++b)
-    {
-      this->base_element(b).get_face_shape_function_shifts(temp);
-      for (unsigned int c=0; c<element_multiplicity(b); ++c)
-	shifts.insert(shifts.begin(),temp.begin(),temp.end());
-    }
-  Assert (shifts.size()==this->dofs_per_quad, ExcInternalError());
-}
-
-#endif
 
 
 

@@ -114,6 +114,7 @@ FiniteElement<dim>::FiniteElement (
 		:
 		FiniteElementData<dim> (fe_data),
 		cached_primitivity(false),
+		adjust_quad_dof_index_for_face_orientation_table (this->dofs_per_quad, 0),
                 system_to_base_table(this->dofs_per_cell),
                 face_system_to_base_table(this->dofs_per_face),		
                 component_to_base_table (this->components,
@@ -333,25 +334,25 @@ FiniteElement<dim>::component_to_block_index (const unsigned int index) const
 }
 
 
-#if deal_II_dimension < 3
-
 template <int dim>
-void
-FiniteElement<dim>::get_face_shape_function_shifts (std::vector<int> &shifts) const
+unsigned int
+FiniteElement<dim>::adjust_quad_dof_index_for_face_orientation (const unsigned int) const
 {
-				   // general template for 1D and 2D, return an
-				   // empty vector
-  shifts.clear();
+				   // general template for 1D and 2D: not implemented
+  Assert (false, ExcNotImplemented());
+  return deal_II_numbers::invalid_unsigned_int;
 }
 
-#else
+#if deal_II_dimension == 3
 
 template <>
-void
-FiniteElement<3>::get_face_shape_function_shifts (std::vector<int> &shifts) const
+unsigned int
+FiniteElement<3>::adjust_quad_dof_index_for_face_orientation (const unsigned int index) const
 {
-  shifts.clear();
-  shifts.resize(this->dofs_per_quad,0);
+  Assert (index<this->dofs_per_quad, ExcIndexRange(index,0,this->dofs_per_quad));
+  Assert (adjust_quad_dof_index_for_face_orientation_table.size()==this->dofs_per_quad,
+	  ExcInternalError());
+  return index+adjust_quad_dof_index_for_face_orientation_table[index];
 }
 
 #endif

@@ -253,8 +253,13 @@ DoFCellAccessor<DoFHandler<3> >::update_cell_dof_indices_cache () const
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->dof_index(d);
   for (unsigned int quad=0; quad<6; ++quad)
-    for (unsigned int d=0; d<dofs_per_quad; ++d)
-      *next++ = this->quad(quad)->dof_index(d);
+    if (this->face_orientation(quad))
+      for (unsigned int d=0; d<dofs_per_quad; ++d)
+	*next++ = this->quad(quad)->dof_index(d);
+    else
+      for (unsigned int d=0; d<dofs_per_quad; ++d)
+	*next++ = this->quad(quad)->dof_index(this->dof_handler->get_fe().
+					      adjust_quad_dof_index_for_face_orientation(d));
   for (unsigned int d=0; d<dofs_per_hex; ++d)
     *next++ = dof_index(d);
 }

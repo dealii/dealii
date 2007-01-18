@@ -589,8 +589,13 @@ DoFObjectAccessor<3,DH>::get_dof_indices (std::vector<unsigned int> &dof_indices
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->dof_index(d,fe_index);
   for (unsigned int quad=0; quad<6; ++quad)
-    for (unsigned int d=0; d<dofs_per_quad; ++d)
-      *next++ = this->quad(quad)->dof_index(d,fe_index);
+    if (this->face_orientation(quad))
+      for (unsigned int d=0; d<dofs_per_quad; ++d)
+	*next++ = this->quad(quad)->dof_index(d,fe_index);
+    else
+      for (unsigned int d=0; d<dofs_per_quad; ++d)
+	*next++ = this->quad(quad)->dof_index(this->dof_handler->get_fe()[fe_index].
+					      adjust_quad_dof_index_for_face_orientation(d),fe_index);
   for (unsigned int d=0; d<dofs_per_hex; ++d)
     *next++ = this->dof_index(d,fe_index);
 }
