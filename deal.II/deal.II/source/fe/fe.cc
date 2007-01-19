@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -114,7 +114,9 @@ FiniteElement<dim>::FiniteElement (
 		:
 		FiniteElementData<dim> (fe_data),
 		cached_primitivity(false),
-		adjust_quad_dof_index_for_face_orientation_table (this->dofs_per_quad, 0),
+		adjust_quad_dof_index_for_face_orientation_table (dim == 3 ?
+								  this->dofs_per_quad : 0,
+								  0),
                 system_to_base_table(this->dofs_per_cell),
                 face_system_to_base_table(this->dofs_per_face),		
                 component_to_base_table (this->components,
