@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -252,6 +252,18 @@ DoFCellAccessor<DoFHandler<3> >::update_cell_dof_indices_cache () const
   for (unsigned int line=0; line<12; ++line)
     for (unsigned int d=0; d<dofs_per_line; ++d)
       *next++ = this->line(line)->dof_index(d);
+
+				   // now copy dof numbers from the face. for
+				   // faces with the wrong orientation, we
+				   // have already made sure that we're ok by
+				   // picking the correct lines and vertices
+				   // (this happens automatically in the
+				   // line() and vertex() functions. however,
+				   // if the face is in wrong orientation, we
+				   // look at it in flipped orientation and we
+				   // will have to adjust the shape function
+				   // indices that we see to correspond to the
+				   // correct (cell-local) ordering.
   for (unsigned int quad=0; quad<6; ++quad)
     if (this->face_orientation(quad))
       for (unsigned int d=0; d<dofs_per_quad; ++d)
