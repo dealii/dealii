@@ -1201,11 +1201,11 @@ class FiniteElement : public Subscriptor,
 				      * faces (quads) have to be permuted in
 				      * order to be combined with the correct
 				      * shape functions. Given a local dof @p
-				      * index on a quad, return the local index,
-				      * if the face has non-standard
-				      * face_orientation. In 2D and 1D there is
-				      * no need for permutation so the identity
-				      * is returned.
+				      * index on a quad, return the local
+				      * index, if the face has non-standard
+				      * face_orientation. In 2D and 1D there
+				      * is no need for permutation and
+				      * consequently, and exception is thrown.
 				      */
     unsigned int adjust_quad_dof_index_for_face_orientation (const unsigned int index) const;
 
