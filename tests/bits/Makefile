@@ -1,6 +1,6 @@
 ############################################################
 # Makefile,v 1.15 2002/06/13 12:51:13 hartmann Exp
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -84,7 +84,8 @@ tests_x = grid_generator_?? \
 	  subface_interpolation \
 	  face_orientation_crash \
 	  refine_and_coarsen_* \
-	  tria_crash_*
+	  tria_crash_* \
+	  face_orientation_*
 
 # tests for the hp branch:
 #	  fe_collection_*
