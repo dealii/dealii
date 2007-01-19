@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1864,18 +1864,26 @@ template <>
 void
 FESystem<3>::initialize_quad_dof_index_permutation ()
 {
+				   // the array into which we want to write
+				   // should have the correct size already.
+  Assert (adjust_quad_dof_index_for_face_orientation_table.size()==this->dofs_per_quad,
+	  ExcInternalError());
 				   // to obtain the shifts for this composed
 				   // element, concatenate the shift vectors of
 				   // the base elements
+  unsigned int index = 0;
   for (unsigned int b=0; b<n_base_elements();++b)
     {
-      const std::vector<int> &temp=this->base_element(b).adjust_quad_dof_index_for_face_orientation_table;
+      const std::vector<int> &temp
+	= this->base_element(b).adjust_quad_dof_index_for_face_orientation_table;
       for (unsigned int c=0; c<element_multiplicity(b); ++c)
-	adjust_quad_dof_index_for_face_orientation_table.insert
-	  (adjust_quad_dof_index_for_face_orientation_table.begin(),
-	   temp.begin(),temp.end());
+	{
+	  std::copy (temp.begin(), temp.end(),
+		     adjust_quad_dof_index_for_face_orientation_table.begin() + index);
+	  index += temp.size();
+	}
     }
-  Assert (adjust_quad_dof_index_for_face_orientation_table.size()==this->dofs_per_quad,
+  Assert (index == this->dofs_per_quad,
 	  ExcInternalError());
 }
 
