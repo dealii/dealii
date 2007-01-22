@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 dnl
 dnl $Id$
 
@@ -689,14 +689,31 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           ;;
   
       sun_workshop | sun_forte)
+
           CXXFLAGSG="$CXXFLAGS -DDEBUG -w"
           CXXFLAGSO="$CXXFLAGS -w"
           CXXFLAGSPIC="-KPIC"
           LDFLAGSPIC="-G"
-          AC_MSG_ERROR([deal.II is known not to work with SUN Compilers!
-	If you intend to port it, please remove this message
-	from aclocal.m4 and call autoconf and configure.])
-          ;;
+
+	  dnl See if the flag -library=stlport4 is available, and if so use it
+	  CXXFLAGS="$CXXFLAGSG -library=stlport4"
+	  AC_MSG_CHECKING(whether -library=stlport4 works)
+	  AC_TRY_COMPILE(
+            [
+#             include <iostream>
+	    ],
+            [ 
+	      std::cout << std::endl;
+            ],
+            [
+              AC_MSG_RESULT(no)
+            ],
+            [
+              AC_MSG_RESULT(yes)
+              CXXFLAGSG="$CXXFLAGSG -library=stlport4"
+              CXXFLAGSO="$CXXFLAGSO -library=stlport4"
+            ])
+ 	  ;;
   
       portland_group)
 	  dnl Suppress warnings:
