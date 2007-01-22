@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -306,106 +306,6 @@ class DoFTools
 				      * @name Sparsity Pattern Generation
 				      * @{
 				      */
-    
-				     /**
-				      * On initializing a
-				      * SparsityPattern, the number of
-				      * entries required for each row
-				      * must be known. This function
-				      * estimates the maximum number
-				      * of coupling degrees of freedom
-				      * for each row of the sparsity
-				      * pattern.
-				      *
-				      * @param dofs The DoFHandler
-				      * @param row_lengths The vector
-				      * containing the resulting row
-				      * lengths. It must have the
-				      * length DoFHandler::n_dofs().
-				      *
-				      * @param flux_couplings
-				      * Additional couplings between
-				      * shape functions due to flux
-				      * operators on faces are
-				      * considered. If <tt>false</tt>,
-				      * the default, only topological
-				      * couplings between cells are
-				      * counted.
-				      */
-    template<class DH>
-    static
-    void compute_row_length_vector(
-      const DH& dofs,
-      std::vector<unsigned int>& row_lengths,
-      const Coupling flux_couplings = none);
-    
-				     /**
-				      * On initializing a
-				      * SparsityPattern, the number of
-				      * entries required for each row
-				      * must be known. This function
-				      * estimates the maximum number
-				      * of coupling degrees of freedom
-				      * for each row of the sparsity
-				      * pattern.
-				      *
-				      * In systems of equations,
-				      * couplings between components
-				      * <b>not</b> coupling in the
-				      * differential equation can be
-				      * eliminated by the two optional
-				      * tables, which may reduce the
-				      * amount of pre-allocated
-				      * memory dramatically.
-				      * 
-				      * @param dofs The DoFHandler
-				      * @param row_lengths The vector
-				      * containing the resulting row
-				      * lengths. It must have the
-				      * length DoFHandler::n_dofs().
-				      *
-				      * @param couplings
-				      * Optional argument for
-				      * optimizing out non-coupled
-				      * components of a system. If the
-				      * entry at position <i>(i,j)</i>
-				      * is #none, then couplings
-				      * between the related dofs are
-				      * neglected. See Coupling.
-				      *
-				      * @param flux_couplings:
-				      * similar to the previous
-				      * argument allows neglecting
-				      * couplings. Here, couplings due
-				      * to flux operators on faces are
-				      * considered. See #Coupling.
-				      */
-    template<class DH>
-    static
-    void compute_row_length_vector(
-      const DH& dofs,
-      std::vector<unsigned int>& row_lengths,
-      const Table<2,Coupling>& couplings,
-      const Table<2,Coupling>& flux_couplings);
-
-				     /**
-				      * Same as the other function,
-				      * but separates the blocks for a
-				      * block system of equations.
-				      *
-				      * The result vector
-				      * <tt>row_lengths</tt> contains
-				      * FiniteElementData::n_blocks()
-				      * vectors of length
-				      * DH::n_dofs().
-				      */
-    template<class DH>
-    static
-    void compute_row_length_vector(
-      const DH& dofs,
-      std::vector<std::vector<unsigned int> >& row_lengths,
-      const Table<2,Coupling>& couplings,
-      const Table<2,Coupling>& flux_couplings);
     
 				     /**
 				      * Locate non-zero entries of the

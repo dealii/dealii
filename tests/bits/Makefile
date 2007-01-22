@@ -31,7 +31,6 @@ tests_x = grid_generator_?? \
 	  data_out_rotation_0* \
 	  data_out_stack_0* \
 	  dof_tools_[0-9]* \
-	  dof_tools_row_[0-9] \
 	  fe_tools_[0-9]* \
 	  fe_tools_cpfqpm* \
 	  fe_face_to_cell_index \
