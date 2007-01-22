@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -322,7 +322,7 @@ template <>
 long double QGaussLobatto<1>::
 JacobiP(const long double, const int, const int, const unsigned int) const;
 template <>
-unsigned int QGaussLobatto<1>::
+unsigned int 
 QGaussLobatto<1>::gamma(const unsigned int n) const;
 template <> QGauss2<1>::QGauss2 ();
 template <> QGauss3<1>::QGauss3 ();
