@@ -7798,9 +7798,9 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
       if (((smooth_grid & coarsest_level_1) ||
 	   (smooth_grid & patch_level_1)) && n_levels()>=2)
 	{
-	  typename Triangulation<dim>::cell_iterator
-	    cell=begin(1),
-	    endc=end(1);
+	  typename Triangulation<dim>::active_cell_iterator
+	    cell=begin_active(1),
+	    endc=end_active(1);
 	  
 	  for (; cell!=endc; ++cell)
 	    cell->clear_coarsen_flag();
