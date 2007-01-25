@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1292,15 +1292,17 @@ ParameterHandler::scan_line (std::string        line,
 				   // exit subsection
   if ((line.find ("END") == 0) ||
       (line.find ("end") == 0))
-    if (subsection_path.size() == 0) 
-      {
-	std::cerr << "Line " << lineno
-		  << ": There is no subsection to leave here!" << std::endl;
-	return false;
-      }
-    else
-      return leave_subsection ();
-
+    {
+      if (subsection_path.size() == 0) 
+	{
+	  std::cerr << "Line " << lineno
+		    << ": There is no subsection to leave here!" << std::endl;
+	  return false;
+	}
+      else
+	return leave_subsection ();
+    }
+  
 				   // regular entry
   if ((line.find ("SET ") == 0) ||
       (line.find ("set ") == 0)) 
