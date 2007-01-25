@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -150,17 +150,21 @@ namespace hp
                  real_fe_index      = fe_index;
 
     if (real_q_index == deal_II_numbers::invalid_unsigned_int)
-      if (this->q_collection.size() > 1)
-        real_q_index = cell->active_fe_index();
-      else
-        real_q_index = 0;
+      {
+	if (this->q_collection.size() > 1)
+	  real_q_index = cell->active_fe_index();
+	else
+	  real_q_index = 0;
+      }
     
     if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
-      if (this->mapping_collection->size() > 1)
-        real_mapping_index = cell->active_fe_index();
-      else
-        real_mapping_index = 0;
-
+      {
+	if (this->mapping_collection->size() > 1)
+	  real_mapping_index = cell->active_fe_index();
+	else
+	  real_mapping_index = 0;
+      }
+    
     if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
       real_fe_index = cell->active_fe_index();
 
@@ -343,17 +347,21 @@ namespace hp
                  real_fe_index      = fe_index;
 
     if (real_q_index == deal_II_numbers::invalid_unsigned_int)
-      if (this->q_collection.size() > 1)
-        real_q_index = cell->active_fe_index();
-      else
-        real_q_index = 0;
+      {
+	if (this->q_collection.size() > 1)
+	  real_q_index = cell->active_fe_index();
+	else
+	  real_q_index = 0;
+      }
     
     if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
-      if (this->mapping_collection->size() > 1)
-        real_mapping_index = cell->active_fe_index();
-      else
-        real_mapping_index = 0;
-
+      {
+	if (this->mapping_collection->size() > 1)
+	  real_mapping_index = cell->active_fe_index();
+	else
+	  real_mapping_index = 0;
+      }
+    
     if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
       real_fe_index = cell->active_fe_index();
 
@@ -540,17 +548,21 @@ namespace hp
                  real_fe_index      = fe_index;
 
     if (real_q_index == deal_II_numbers::invalid_unsigned_int)
-      if (this->q_collection.size() > 1)
-        real_q_index = cell->active_fe_index();
-      else
-        real_q_index = 0;
+      {
+	if (this->q_collection.size() > 1)
+	  real_q_index = cell->active_fe_index();
+	else
+	  real_q_index = 0;
+      }
     
     if (real_mapping_index == deal_II_numbers::invalid_unsigned_int)
-      if (this->mapping_collection->size() > 1)
-        real_mapping_index = cell->active_fe_index();
-      else
-        real_mapping_index = 0;
-
+      {
+	if (this->mapping_collection->size() > 1)
+	  real_mapping_index = cell->active_fe_index();
+	else
+	  real_mapping_index = 0;
+      }
+    
     if (real_fe_index == deal_II_numbers::invalid_unsigned_int)
       real_fe_index = cell->active_fe_index();
 
