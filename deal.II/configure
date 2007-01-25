@@ -3018,7 +3018,17 @@ echo "${ECHO_T}C++ compiler is gcc-2.97" >&6
         case "$GXX_VERSION_STRING" in
 	  *version\ 4.2.0*) GXX_VERSION_DETAILED=gcc4.2.0 ;;
 	  *version\ 4.2.1*) GXX_VERSION_DETAILED=gcc4.2.1 ;;
+	  *version\ 4.2.2*) GXX_VERSION_DETAILED=gcc4.2.2 ;;
 	  *)                GXX_VERSION_DETAILED=gcc4.2.x ;;
+        esac
+  	;;
+      *version\ 4.3*)
+  	GXX_VERSION=gcc4.3
+        case "$GXX_VERSION_STRING" in
+	  *version\ 4.3.0*) GXX_VERSION_DETAILED=gcc4.3.0 ;;
+	  *version\ 4.3.1*) GXX_VERSION_DETAILED=gcc4.3.1 ;;
+	  *version\ 4.3.2*) GXX_VERSION_DETAILED=gcc4.3.2 ;;
+	  *)                GXX_VERSION_DETAILED=gcc4.3.x ;;
         esac
   	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
@@ -3916,6 +3926,11 @@ echo "${ECHO_T}C compiler is gcc-4.1" >&6
   	echo "$as_me:$LINENO: result: C compiler is gcc-4.2" >&5
 echo "${ECHO_T}C compiler is gcc-4.2" >&6
   	CC_VERSION=gcc4.2
+  	;;
+      *version\ 4.3*)
+  	echo "$as_me:$LINENO: result: C compiler is gcc-4.3" >&5
+echo "${ECHO_T}C compiler is gcc-4.3" >&6
+  	CC_VERSION=gcc4.3
   	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	echo "$as_me:$LINENO: result: C compiler is $CC_VERSION_STRING" >&5

@@ -151,7 +151,17 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
         case "$GXX_VERSION_STRING" in
 	  *version\ 4.2.0*) GXX_VERSION_DETAILED=gcc4.2.0 ;;
 	  *version\ 4.2.1*) GXX_VERSION_DETAILED=gcc4.2.1 ;;
+	  *version\ 4.2.2*) GXX_VERSION_DETAILED=gcc4.2.2 ;;
 	  *)                GXX_VERSION_DETAILED=gcc4.2.x ;;
+        esac
+  	;;
+      *version\ 4.3*)
+  	GXX_VERSION=gcc4.3
+        case "$GXX_VERSION_STRING" in
+	  *version\ 4.3.0*) GXX_VERSION_DETAILED=gcc4.3.0 ;;
+	  *version\ 4.3.1*) GXX_VERSION_DETAILED=gcc4.3.1 ;;
+	  *version\ 4.3.2*) GXX_VERSION_DETAILED=gcc4.3.2 ;;
+	  *)                GXX_VERSION_DETAILED=gcc4.3.x ;;
         esac
   	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
@@ -941,6 +951,10 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
       *version\ 4.2*)
   	AC_MSG_RESULT(C compiler is gcc-4.2)
   	CC_VERSION=gcc4.2
+  	;;
+      *version\ 4.3*)
+  	AC_MSG_RESULT(C compiler is gcc-4.3)
+  	CC_VERSION=gcc4.3
   	;;
       *2.4* | *2.5* | *2.6* | *2.7* | *2.8*)
   	AC_MSG_RESULT(C compiler is $CC_VERSION_STRING)
