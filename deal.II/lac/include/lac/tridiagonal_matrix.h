@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -406,13 +406,17 @@ TridiagonalMatrix<number>::operator()(unsigned int i, unsigned int j) const
   if (j==i)
     return diagonal[i];
   if (j==i-1)
-    if (is_symmetric)
-      return right[i-1];
-    else
-      return left[i];
+    {
+      if (is_symmetric)
+	return right[i-1];
+      else
+	return left[i];
+    }
+  
   if (j==i+1)
     return right[i];
-  AssertThrow(false, ExcInternalError());
+  
+  Assert (false, ExcInternalError());
   return 0;
 }
 
@@ -430,13 +434,17 @@ TridiagonalMatrix<number>::operator()(unsigned int i, unsigned int j)
   if (j==i)
     return diagonal[i];
   if (j==i-1)
-    if (is_symmetric)
-      return right[i-1];
-    else
-      return left[i];
+    {
+      if (is_symmetric)
+	return right[i-1];
+      else
+	return left[i];
+    }
+  
   if (j==i+1)
     return right[i];
-  AssertThrow(false, ExcInternalError());
+
+  Assert (false, ExcInternalError());
   return diagonal[0];
 }
 
