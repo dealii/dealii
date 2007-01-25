@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -311,22 +311,27 @@ FE_PolyTensor<POLY,dim>::get_data (const UpdateFlags      update_flags,
 			   values, grads, grad_grads);
 	
 	if (flags & update_values)
-	  if (inverse_node_matrix.n_cols() == 0)
-	    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-	      data->shape_values[i][k] = values[i];
- 	  else
- 	    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
- 	      for (unsigned int j=0; j<this->dofs_per_cell; ++j)
- 		data->shape_values[i][k] += inverse_node_matrix(j,i) * values[j];
+	  {
+	    if (inverse_node_matrix.n_cols() == 0)
+	      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+		data->shape_values[i][k] = values[i];
+	    else
+	      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+		for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+		  data->shape_values[i][k] += inverse_node_matrix(j,i) * values[j];
+	  }
 	
 	if (flags & update_gradients)
-	  if (inverse_node_matrix.n_cols() == 0)
-	    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-	      data->shape_grads[i][k] = grads[i];
-	  else
-	    for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-	      for (unsigned int j=0; j<this->dofs_per_cell; ++j)
-		data->shape_grads[i][k] += inverse_node_matrix(j,i) * grads[j];
+	  {
+	    if (inverse_node_matrix.n_cols() == 0)
+	      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+		data->shape_grads[i][k] = grads[i];
+	    else
+	      for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+		for (unsigned int j=0; j<this->dofs_per_cell; ++j)
+		  data->shape_grads[i][k] += inverse_node_matrix(j,i) * grads[j];
+	  }
+	
       }
   return data;
 }

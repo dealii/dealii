@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -7971,28 +7971,30 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 			  ++total_neighbors;
 
 			if (neighbor.state() == IteratorState::valid)
-			  if ((neighbor->active() &&
-			       !neighbor->refine_flag_set()) ||
-			      (neighbor->level() == cell->level()-1))
-			    ++unrefined_neighbors;
-			  else
-			    if (!neighbor->active())
-							       // maybe this cell's
-							       // children will be
-							       // coarsened
-			      {
-				unsigned int tagged_children = 0;
-				for (unsigned int c=0;
-				     c<GeometryInfo<dim>::children_per_cell;
-				     ++c)
-				  if (neighbor->child(c)->coarsen_flag_set())
-				    ++tagged_children;
-				if (tagged_children ==
-				    GeometryInfo<dim>::children_per_cell)
-				  ++unrefined_neighbors;
-			      }
+			  {
+			    if ((neighbor->active() &&
+				 !neighbor->refine_flag_set()) ||
+				(neighbor->level() == cell->level()-1))
+			      ++unrefined_neighbors;
+			    else
+			      if (!neighbor->active())
+								 // maybe this cell's
+								 // children will be
+								 // coarsened
+				{
+				  unsigned int tagged_children = 0;
+				  for (unsigned int c=0;
+				       c<GeometryInfo<dim>::children_per_cell;
+				       ++c)
+				    if (neighbor->child(c)->coarsen_flag_set())
+				      ++tagged_children;
+				  if (tagged_children ==
+				      GeometryInfo<dim>::children_per_cell)
+				    ++unrefined_neighbors;
+				}
+			  }
 		      }
-		
+		    
 						     // if all
 						     // neighbors
 						     // unrefined:
@@ -8033,15 +8035,17 @@ bool Triangulation<dim>::prepare_coarsening_and_refinement ()
 			  (smooth_grid & eliminate_refined_boundary_islands)) )
 			&&
 			(total_neighbors != 0))
-		      if (!cell->active())
-			for (unsigned int c=0;
-			     c<GeometryInfo<dim>::children_per_cell; ++c)
-			  {
-			    cell->child(c)->clear_refine_flag ();
-			    cell->child(c)->set_coarsen_flag ();
-			  }
-		      else 
-			cell->clear_refine_flag();
+		      {
+			if (!cell->active())
+			  for (unsigned int c=0;
+			       c<GeometryInfo<dim>::children_per_cell; ++c)
+			    {
+			      cell->child(c)->clear_refine_flag ();
+			      cell->child(c)->set_coarsen_flag ();
+			    }
+			else
+			  cell->clear_refine_flag();
+		      }
 		  }
 	      }
 	}
