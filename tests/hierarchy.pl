@@ -35,9 +35,13 @@ $hierarchy{"i686-pc-linux-gnu+gcc3.3"}        = "generic";
 $hierarchy{"i686-pc-linux-gnu+gcc3.4"}        = "i686-pc-linux-gnu+gcc3.3";
 $hierarchy{"i686-pc-linux-gnu+gcc4.0"}        = "i686-pc-linux-gnu+gcc3.4";
 $hierarchy{"i686-pc-linux-gnu+gcc4.1"}        = "i686-pc-linux-gnu+gcc4.0";
+$hierarchy{"i686-pc-linux-gnu+gcc4.2"}        = "i686-pc-linux-gnu+gcc4.1";
+$hierarchy{"i686-pc-linux-gnu+gcc4.3"}        = "i686-pc-linux-gnu+gcc4.2";
 
 $hierarchy{"i686-pc-linux-gnu+icc7"}          = "generic";
 $hierarchy{"i686-pc-linux-gnu+icc7.1"}        = "i686-pc-linux-gnu+icc7";
+$hierarchy{"i686-pc-linux-gnu+icc8"}          = "i686-pc-linux-gnu+icc7.1";
+$hierarchy{"i686-pc-linux-gnu+icc9"}          = "i686-pc-linux-gnu+icc8";
 
 $hierarchy{"mips-sgi-irix6.5+MIPSpro7.4"}     = "generic";
 
@@ -45,6 +49,8 @@ $hierarchy{"x86_64-unknown-linux-gnu+gcc3.3"} = "generic";
 $hierarchy{"x86_64-unknown-linux-gnu+gcc3.4"} = "x86_64-unknown-linux-gnu+gcc3.3";
 $hierarchy{"x86_64-unknown-linux-gnu+gcc4.0"} = "x86_64-unknown-linux-gnu+gcc3.4";
 $hierarchy{"x86_64-unknown-linux-gnu+gcc4.1"} = "x86_64-unknown-linux-gnu+gcc4.0";
+$hierarchy{"x86_64-unknown-linux-gnu+gcc4.2"} = "x86_64-unknown-linux-gnu+gcc4.1";
+$hierarchy{"x86_64-unknown-linux-gnu+gcc4.3"} = "x86_64-unknown-linux-gnu+gcc4.2";
 
 $hierarchy{"x86_64-unknown-linux-gnu+icc9"} = "x86_64-unknown-linux-gnu+gcc3.3";
 
