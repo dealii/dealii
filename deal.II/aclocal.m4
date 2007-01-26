@@ -710,18 +710,17 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  AC_MSG_CHECKING(whether -library=stlport4 works)
 	  AC_TRY_COMPILE(
             [
-#             include <iostream>
 	    ],
             [ 
-	      std::cout << std::endl;
-            ],
-            [
-              AC_MSG_RESULT(no)
+	      ;
             ],
             [
               AC_MSG_RESULT(yes)
               CXXFLAGSG="$CXXFLAGSG -library=stlport4"
               CXXFLAGSO="$CXXFLAGSO -library=stlport4"
+            ],
+            [
+              AC_MSG_RESULT(no)
             ])
  	  ;;
   
