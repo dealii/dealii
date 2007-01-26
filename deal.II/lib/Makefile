@@ -61,13 +61,13 @@ ifeq ($(enable-shared),yes)
 
   libpetscall.g$(shared-lib-suffix): $(xlib.g)
 	@echo "======================debug============= Linking library:   libpetscall.g$(shared-lib-suffix)"
-	@$(CXX) -shared -o libpetscall.g$(shared-lib-suffix) \
-		-Wl,-rpath,$(lib-contrib-petsc-path.g) $(xlib.g)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o libpetscall.g$(shared-lib-suffix) \
+		$(xlib.g)
 
   libpetscall$(shared-lib-suffix): $(xlib.o)
 	@echo "======================optimized========= Linking library:   libpetscall$(shared-lib-suffix)"
-	@$(CXX) -shared -o libpetscall$(shared-lib-suffix) \
-		-Wl,-rpath,$(lib-contrib-petsc-path.o) $(xlib.o)
+	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o libpetscall$(shared-lib-suffix) \
+		$(xlib.o)
 
 else
 
