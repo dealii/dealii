@@ -384,6 +384,25 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
+    dnl On some gcc 4.3 snapshots, a 'const' qualifier on a return type triggers a
+    dnl warning. This is unfortunate, since we happen to stumble on this
+    dnl in some of our template trickery with iterator classes. If necessary,
+    dnl do not use the relevant warning flag
+    CXXFLAGS="-Wreturn-type -Werror"
+    AC_MSG_CHECKING(whether qualifiers in return types lead to a warning)
+    AC_TRY_COMPILE(
+          [
+            const double foo() { return 1.; }
+          ],
+          [;],
+          [
+            AC_MSG_RESULT(no)
+          ],
+          [
+            AC_MSG_RESULT(yes)
+            CXXFLAGSG="$CXXFLAGSG -Wno-return-type"
+          ])
+
     dnl Set PIC flags. On some systems, -fpic/PIC is implied, so don't set
     dnl anything to avoid a warning. on AIX make sure we always pass -lpthread
     dnl because this seems to be somehow required to make things work. Likewise
