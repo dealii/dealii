@@ -11,11 +11,6 @@
 //
 //----------------------------  mesh_3d.h  ---------------------------
 
-// generate two cubes that are attached to each other in a way so that
-// the edges are all ok, but the normals of the common face don't
-// match up for the standard orientation of the normals. we thus have
-// to store the face orientation in each cell
-
 #include "../tests.h"
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
@@ -23,6 +18,10 @@
 #include <grid/grid_reordering.h>
 
 
+// generate two cubes that are attached to each other in a way so that
+// the edges are all ok, but the normals of the common face don't
+// match up for the standard orientation of the normals. we thus have
+// to store the face orientation in each cell
 
 void create_two_cubes (Triangulation<3> &coarse_grid)
 {
@@ -59,8 +58,52 @@ void create_two_cubes (Triangulation<3> &coarse_grid)
   GridReordering<3>::reorder_cells (cells);
   coarse_grid.create_triangulation_compatibility (vertices, cells, SubCellData());
 }
-  
 
+
+
+// generate two cubes that are attached to each other in a way so that
+// the edges are not all ok and the common face is rotated. we thus have
+// to store the face rotation (and face flip) in each cell
+
+void create_two_cubes_rotation (Triangulation<3> &coarse_grid,
+				const unsigned int n_rotations)
+{
+  Assert(n_rotations<4, ExcNotImplemented());
+  
+  const Point<3> points[6] = { Point<3>(0,0,0),
+                               Point<3>(1,0,0),
+                               Point<3>(1,1,0),
+                               Point<3>(0,1,0),
+                               Point<3>(2,0,0),
+                               Point<3>(2,1,0)};
+  std::vector<Point<3> > vertices;
+  for (unsigned int i=0; i<6; ++i)
+    vertices.push_back (points[i]);
+  for (unsigned int i=0; i<6; ++i)
+    vertices.push_back (points[i] + Point<3>(0,0,-1));
+
+  std::vector<CellData<3> > cells(2);
+    
+  const unsigned int connectivity[5][8]
+				     // first row: left cube
+				     // second row: right cube, standard_orientation
+				     // third row: right cube, rotated once
+				     // forth row: right cube, rotated twice
+				     // fifth row: right cube, rotated three times
+    = { { 0,1,2,3,6,7,8,9 },
+        { 1,4,5,2,7,10,11,8},
+        { 2,5,11,8,1,4,10,7},
+        { 8,11,10,7,2,5,4,1},
+        { 7,10,4,1,8,11,5,2} };
+  for (unsigned int j=0; j<8; ++j)
+    {
+      cells[0].vertices[j]   = connectivity[0][j];
+      cells[1].vertices[j]   = connectivity[1+n_rotations][j];
+    }
+                                   // finally generate a triangulation
+                                   // out of this
+  coarse_grid.create_triangulation_compatibility (vertices, cells, SubCellData());
+}
 
 
 
