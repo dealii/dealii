@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1019,6 +1019,78 @@ MGTools::count_dofs_per_component (
 }
 
 
+template <int dim>
+void
+MGTools::count_dofs_per_block (
+  const MGDoFHandler<dim>&     dof_handler,
+  std::vector<std::vector<unsigned int> >& dofs_per_block,
+  std::vector<unsigned int>  target_block)
+{
+  const FiniteElement<dim>& fe = dof_handler.get_fe();
+  const unsigned int n_blocks = fe.n_blocks();
+  const unsigned int n_levels = dof_handler.get_tria().n_levels();
+  
+  dofs_per_block.resize (n_levels, std::vector<unsigned int>(n_blocks));
+  for (unsigned int l=0;l<n_levels;++l)
+    std::fill (dofs_per_block[l].begin(), dofs_per_block[l].end(), 0U);
+  
+				   // If the empty vector was given as
+				   // default argument, set up this
+				   // vector as identity.
+  if (target_block.size()==0)
+    {
+      target_block.resize(n_blocks);
+      for (unsigned int i=0;i<n_blocks;++i)
+	target_block[i] = i;
+    }
+  
+  Assert(target_block.size()==n_blocks,
+	 ExcDimensionMismatch(target_block.size(),n_blocks));
+
+				   // special case for only one
+				   // block. treat this first
+				   // since it does not require any
+				   // computations
+  if (n_blocks == 1)
+    {
+      for (unsigned int l=0;l<n_levels;++l)
+	dofs_per_block[l][0] = dof_handler.n_dofs(l);
+      return;
+    } 
+				   // otherwise determine the number
+				   // of dofs in each block
+				   // separately. do so in parallel
+  for (unsigned int l=0;l<n_levels;++l)
+    {
+      std::vector<std::vector<bool> >
+	dofs_in_block (n_blocks, std::vector<bool>(dof_handler.n_dofs(l), false));
+      std::vector<std::vector<bool> >
+	block_select (n_blocks, std::vector<bool>(n_blocks, false));
+      Threads::ThreadGroup<> threads;
+      for (unsigned int i=0; i<n_blocks; ++i)
+	{
+	  void (*fun_ptr) (const unsigned int level,
+			   const MGDoFHandler<dim>&,
+			   const std::vector<bool>&,
+			   std::vector<bool>&,
+			   bool)
+	    = &DoFTools::template extract_level_dofs<dim>;
+	  block_select[i][i] = true;
+	  threads += Threads::spawn (fun_ptr)(l, dof_handler, block_select[i],
+					      dofs_in_block[i], true);
+	};
+      threads.join_all ();
+      
+				       // next count what we got
+      for (unsigned int block=0;block<fe.n_blocks();++block)
+	dofs_per_block[l][target_block[block]]
+	  += std::count(dofs_in_block[block].begin(),
+			dofs_in_block[block].end(),
+			true);
+    }
+}
+
+
 #if deal_II_dimension == 1
 
 template <int dim>
@@ -1418,6 +1490,10 @@ template void MGTools::count_dofs_per_component<deal_II_dimension> (
   bool,
   std::vector<unsigned int>);
 template void MGTools::count_dofs_per_component<deal_II_dimension> (
+  const MGDoFHandler<deal_II_dimension>&,
+  std::vector<std::vector<unsigned int> >&,
+  std::vector<unsigned int>);
+template void MGTools::count_dofs_per_block<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&,
   std::vector<std::vector<unsigned int> >&,
   std::vector<unsigned int>);
