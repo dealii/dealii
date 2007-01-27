@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2005, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -68,10 +68,11 @@ bool PointComp<3>::operator () (const Point<3> &p1,
 				const Point<3> &p2) const
 {
   return ((p1(2) < p2(2)) ||
-	  (p1(2) == p2(2)) &&
-	  ((p1(0)+p1(1) < p2(0)+p2(1)) ||
-	   ((p1(0)+p1(1) == p2(0)+p2(1)) &&
-	    (p1(0)-p1(1) < p2(0)-p2(1)))));
+	  ((p1(2) == p2(2))
+	   &&
+	   ((p1(0)+p1(1) < p2(0)+p2(1)) ||
+	    ((p1(0)+p1(1) == p2(0)+p2(1)) &&
+	     (p1(0)-p1(1) < p2(0)-p2(1))))));
 }
 
 
