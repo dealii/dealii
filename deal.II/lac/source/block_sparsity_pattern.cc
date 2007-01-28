@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -385,6 +385,20 @@ CompressedBlockSparsityPattern (const unsigned int n_rows,
 		BlockSparsityPatternBase<CompressedSparsityPattern>(n_rows,
 								    n_columns)
 {}
+
+
+CompressedBlockSparsityPattern::
+CompressedBlockSparsityPattern (const std::vector<unsigned int>& row_indices,
+				const std::vector<unsigned int>& col_indices)
+		:
+		BlockSparsityPatternBase<CompressedSparsityPattern>(row_indices.size(),
+								    col_indices.size())
+{
+  for (unsigned int i=0;i<row_indices.size();++i)
+    for (unsigned int j=0;j<col_indices.size();++j)
+      this->block(i,j).reinit(row_indices[i],col_indices[j]);
+  this->collect_sizes();
+}
 
 
 // Remark: The explicit instantiations for "BlockSparsityPatternBase" were moved
