@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -3022,7 +3022,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				   // first patch. checks against all
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
-  Assert ((patch[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
+  Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
 	  (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
 	  ExcDimensionMismatch (patches[0].points_are_available ? (patches[0].data.n_rows() + spacedim) : patches[0].data.n_rows(), n_data_sets));
 
