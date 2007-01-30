@@ -212,6 +212,25 @@ inconvenience this causes.
 
 <ol>
 
+  <li> <p>Extended: <code>DataOutBase::Patch</code> has been extended by a new
+  boolean flag <tt>points_are_available</tt>, which defaults to
+  <tt>false</tt>. It is set to <tt>true</tt> if the coordinates of the points
+  defining the subdivision of a patch are appended to the <tt>data</tt> table
+  contained in a <code>Patch</code>. This way, <code
+  class="class">DataOut</code>::<code class="member">build_patches()</code> can
+  use a <code class="class">Mapping</code> to represent curved boundaries,
+  especially for higher order elements. This change corresponds to an extension
+  of the intermediate format for graphics.
+  <br>
+  Using the given <code class="class">Mapping</code> to obtain function values
+  in <code class="class">DataOut</code>::<code
+  class="member">build_patches()</code> also fixes a bug for <code
+  class="class">FE_RaviartThomas</code> and <code class="class">FE_ABF</code>
+  elements, which need to evaluate the function values on the real (mapped) cell. 
+  <br>
+  (Tobias Leicht 2007/01/30)
+  </p>
+
   <li> <p>New: a program <tt>reconfigure</tt> has been added to the
   deal.II main directory, which reruns <tt>configure</tt> with the sam
   command line arguments as last time.

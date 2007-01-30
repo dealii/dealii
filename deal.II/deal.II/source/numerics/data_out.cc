@@ -384,26 +384,28 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
   QTrapez<1>     q_trapez;
   QIterated<DH::dimension> patch_points (q_trapez, data.n_subdivisions);
 
-//TODO[?]: This is strange -- Data has a member 'mapping' that should
-//be used here, but it isn't. Rather, up until version 1.94, we were
-//actually initializing a local mapping object and used that... While
-//we use the mapping to transform the vertex coordinates, we do not
-//use the mapping to transform the shape functions (necessary for
-//example for Raviart-Thomas elements). This could lead to trouble
-//when someone tries to use MappingEulerian with such elements
+// We use the mapping to transform the vertex coordinates and the shape
+// functions (necessary for example for Raviart-Thomas elements). On the
+// boundary, general mappings do not reduce to a MappingQ1, therefore the mapped
+// (quadrature) points are stored in the patch, whereas for cells in the
+// interior of the domain these points are obtained by a dim-linear mapping and
+// can be recovered from the vertices later on, thus they need not to be stored.
 
 				   // create collection objects from
 				   // single quadratures,
-				   // and finite elements. if we have
+				   // mappings and finite elements. if we have
 				   // an hp DoFHandler,
 				   // dof_handler.get_fe() returns a
 				   // collection of which we do a
 				   // shallow copy instead
   const hp::QCollection<DH::dimension>       q_collection (patch_points);
   const hp::FECollection<DH::dimension>      fe_collection(this->dofs->get_fe());
+  const hp::MappingCollection<DH::dimension> mapping_collection(*(data.mapping));
   
-  hp::FEValues<DH::dimension> x_fe_patch_values (fe_collection, q_collection,
-                                       update_values);
+  hp::FEValues<DH::dimension> x_fe_patch_values (mapping_collection,
+						 fe_collection,
+						 q_collection,
+						 update_values | update_q_points);
 
   const unsigned int n_q_points = patch_points.n_quadrature_points;
   
@@ -436,6 +438,29 @@ void DataOut<dim,DH>::build_some_patches (Data &data)
           const FEValues<DH::dimension> &fe_patch_values
             = x_fe_patch_values.get_present_fe_values ();
 	  
+					   // if the cell is at the boundary,
+					   // append the quadrature points to
+					   // the last rows of the
+					   // patch->data member
+	  if (cell->at_boundary())
+	    {
+	      Assert(patch->space_dim==dim, ExcInternalError());
+	      const std::vector<Point<dim> > & q_points=fe_patch_values.get_quadrature_points();
+					       // resize the patch->data member
+					       // in order to have enough memory
+					       // for the quadrature points as
+					       // well
+	      patch->data.reinit(patch->data.size(0)+dim,patch->data.size(1));
+					       // set the flag indicating that
+					       // for this cell the points are
+					       // explicitly given
+	      patch->points_are_available=true;
+					       // copy points to patch->data
+	      for (unsigned int i=0; i<dim; ++i)
+		for (unsigned int q=0; q<n_q_points; ++q)
+		  patch->data(patch->data.size(0)-dim+i,q)=q_points[q][i];
+	    }
+
 					   // first fill dof_data
 	  for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
 	    {

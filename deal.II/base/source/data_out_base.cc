@@ -96,29 +96,60 @@ static unsigned int vtk_cell_type[4] =
 //Auxiliary functions
 //----------------------------------------------------------------------//
 //For a given patch, compute the node interpolating the corner nodes
-//linearly at the point (xfrac, yfrac, zfrac).
+//linearly at the point (xstep, ystep, zstep)*1./n_subdivisions.
+//If the popints are saved in the patch->data member, return the
+//saved point instead
 template <int dim, int spacedim>
 inline
 void
 compute_node(
   Point<spacedim>& node,
   const DataOutBase::Patch<dim,spacedim>* patch,
-  const float xfrac,
-  const float yfrac,
-  const float zfrac)
+  const unsigned int xstep,
+  const unsigned int ystep,
+  const unsigned int zstep,
+  const unsigned int n_subdivisions)
 {
-  node = (patch->vertices[1] * xfrac) + (patch->vertices[0] * (1-xfrac));
-  if (dim>1)
+  if (patch->points_are_available)
     {
-      node*= 1-yfrac;
-      node += ((patch->vertices[3] * xfrac) + (patch->vertices[2] * (1-xfrac))) * yfrac;
-      if (dim>2)
+      unsigned int point_no=0;
+				       // note: switch without break !
+      switch (dim)
 	{
-	  node *= (1-zfrac);
-	  node += (((patch->vertices[5] * xfrac) + (patch->vertices[4] * (1-xfrac)))
-		   * (1-yfrac) +
-		   ((patch->vertices[7] * xfrac) + (patch->vertices[6] * (1-xfrac)))
-		   * yfrac) * zfrac;
+	  case 3:
+		Assert (zstep<n_subdivisions+1, ExcIndexRange(zstep,0,n_subdivisions+1));
+		point_no+=(n_subdivisions+1)*(n_subdivisions+1)*zstep;
+	  case 2:
+		Assert (ystep<n_subdivisions+1, ExcIndexRange(ystep,0,n_subdivisions+1));
+		point_no+=(n_subdivisions+1)*ystep;
+	  case 1:
+		Assert (xstep<n_subdivisions+1, ExcIndexRange(xstep,0,n_subdivisions+1));
+		point_no+=xstep;
+	}
+      for (unsigned int d=0; d<spacedim; ++d)
+	node[d]=patch->data(patch->data.size(0)-spacedim+d,point_no);
+    }
+  else
+    {
+				       // perform a dim-linear interpolation
+      const double stepsize=1./n_subdivisions,
+		      xfrac=xstep*stepsize;
+
+      node = (patch->vertices[1] * xfrac) + (patch->vertices[0] * (1-xfrac));
+      if (dim>1)
+	{
+	  const double yfrac=ystep*stepsize;
+	  node*= 1-yfrac;
+	  node += ((patch->vertices[3] * xfrac) + (patch->vertices[2] * (1-xfrac))) * yfrac;
+	  if (dim>2)
+	    {
+	      const double zfrac=zstep*stepsize;
+	      node *= (1-zfrac);
+	      node += (((patch->vertices[5] * xfrac) + (patch->vertices[4] * (1-xfrac)))
+		       * (1-yfrac) +
+		       ((patch->vertices[7] * xfrac) + (patch->vertices[6] * (1-xfrac)))
+		       * yfrac) * zfrac;
+	    }
 	}
     }
 }
@@ -170,6 +201,8 @@ compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim> >& patches,
 
   
 //----------------------------------------------------------------------//
+template <int dim, int spacedim>
+const unsigned int DataOutBase::Patch<dim,spacedim>::space_dim;
 
 
 
@@ -181,7 +214,8 @@ template <int dim, int spacedim>
 DataOutBase::Patch<dim,spacedim>::Patch ()
                 :
 		patch_index(no_neighbor),
-		n_subdivisions (1)
+		n_subdivisions (1),
+		points_are_available(false)
 				   // all the other data has a
 				   // constructor of its own, except
 				   // for the "neighbors" field, which
@@ -215,6 +249,9 @@ DataOutBase::Patch<dim,spacedim>::operator == (const Patch &patch) const
   if (n_subdivisions != patch.n_subdivisions)
     return false;
 
+  if (points_are_available != patch.points_are_available)
+    return false;
+      
   if (data.n_rows() != patch.data.n_rows())
     return false;
 
@@ -240,7 +277,9 @@ DataOutBase::Patch<dim,spacedim>::memory_consumption () const
 	  +
 	  MemoryConsumption::memory_consumption(n_subdivisions)
 	  +
-	  MemoryConsumption::memory_consumption(data));
+	  MemoryConsumption::memory_consumption(data)
+	  +
+	  MemoryConsumption::memory_consumption(points_are_available));
 }
 
 
@@ -1218,9 +1257,10 @@ DataOutBase::write_nodes (
 	  for (unsigned int i1=0; i1<n1; ++i1)
 	    {
 	      compute_node(node, &*patch,
-			   i1 * 1./n_subdivisions,
-			   i2 * 1./n_subdivisions,
-			   i3 * 1./n_subdivisions);
+			   i1,
+			   i2,
+			   i3,
+			   n_subdivisions);
 	      out.write(count++, node);
 	    }
     }
@@ -1286,8 +1326,9 @@ DataOutBase::write_data (
       const unsigned int n_subdivisions = patch->n_subdivisions;
       const unsigned int n = n_subdivisions+1;
 				       // Length of loops in all dimensions
-      Assert (patch->data.n_rows() == n_data_sets,
-	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
+      Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
+	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
+	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
       Assert (patch->data.n_cols() == template_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n));
       
@@ -1729,8 +1770,9 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
       unsigned int d2 = n;
       unsigned int d3 = n*n;
       
-      Assert (patch->data.n_rows() == n_data_sets,
-	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
+      Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
+	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
+	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
       Assert (patch->data.n_cols() == template_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
@@ -1742,12 +1784,9 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 	    {
 	      for (unsigned int i1=0; i1<n1; ++i1)
 		{
-		  const double x_frac = i1 * 1./n_subdivisions,
-			       y_frac = i2 * 1./n_subdivisions;
-		  
 						   // compute coordinates for
 						   // this patch point
-		  compute_node(node, &*patch, x_frac, y_frac, 0.);
+		  compute_node(node, &*patch, i1, i2, 0, n_subdivisions);
 		  out << node << ' ';
 		  
 		  for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
@@ -1774,13 +1813,9 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 	    for (unsigned int i2=0; i2<n2; ++i2)
 	      for (unsigned int i1=0; i1<n1; ++i1)
 		{
-		  const double x_frac = i1 * 1./n_subdivisions,
-			       y_frac = i2 * 1./n_subdivisions,
-			       z_frac = i3 * 1./n_subdivisions;
-		  
 						   // compute coordinates for
 						   // this patch point
-		  compute_node(this_point, &*patch, x_frac, y_frac, z_frac);
+		  compute_node(this_point, &*patch, i1, i2, i3, n_subdivisions);
 						   // line into positive x-direction
 						   // if possible
 		  if (i1 < n_subdivisions)
@@ -1795,8 +1830,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 		      
 						       // write point there
 						       // and its data
-		      const double x_frac_new = x_frac + 1./n_subdivisions;
-		      compute_node(node, &*patch, x_frac_new, y_frac, z_frac);
+		      compute_node(node, &*patch, i1+1, i2, i3, n_subdivisions);
 		      out << node;
 		      
 		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
@@ -1823,8 +1857,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 		      
 						       // write point there
 						       // and its data
-		      const double y_frac_new = y_frac + 1./n_subdivisions;
-		      compute_node(node, &*patch, x_frac, y_frac_new, z_frac);
+		      compute_node(node, &*patch, i1, i2+1, i3, n_subdivisions);
 		      out << node;
 		      
 		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
@@ -1851,8 +1884,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 		      
 						       // write point there
 						       // and its data
-		      const double z_frac_new = z_frac + 1./n_subdivisions;
-		      compute_node(node, &*patch, x_frac, y_frac, z_frac_new);
+		      compute_node(node, &*patch, i1, i2, i3+1, n_subdivisions);
 		      out << node;
 		      
 		      for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
@@ -1956,8 +1988,9 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
       
-      Assert (patch->data.n_rows() == n_data_sets,
-	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
+      Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
+	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
+	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
       Assert (patch->data.n_cols() == template_power<dim>(n_subdivisions+1),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
       
@@ -2005,8 +2038,9 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
       const unsigned int d1=1;
       const unsigned int d2=n;
       
-      Assert (patch->data.n_rows() == n_data_sets,
-	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
+      Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
+	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
+	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
       Assert (patch->data.n_cols() == template_power<dim>(n),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
 
@@ -2016,11 +2050,9 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
       for (unsigned int i2=0; i2<n; ++i2)
 	for (unsigned int i1=0; i1<n; ++i1)
 	  {
-	    const double x_frac = i1 * 1./n_subdivisions,
-			 y_frac = i2 * 1./n_subdivisions;
 					     // compute coordinates for
 					     // this patch point, storing in ver
-	    compute_node(ver[i1*d1+i2*d2], &*patch, x_frac, y_frac, 0.);
+	    compute_node(ver[i1*d1+i2*d2], &*patch, i1, i2, 0, n_subdivisions);
 	  }
 
       
@@ -2271,17 +2303,11 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
       for (unsigned int i2=0; i2<n_subdivisions; ++i2)
 	for (unsigned int i1=0; i1<n_subdivisions; ++i1)
 	  {
-	    const double x_frac = i1 * 1./n_subdivisions,
-			 y_frac = i2 * 1./n_subdivisions,
-				  
-			x_frac1 = (i1+1) * 1./n_subdivisions,
-			y_frac1 = (i2+1) * 1./n_subdivisions;
-	    
 	    Point<spacedim> points[4];
-	    compute_node(points[0], &*patch, x_frac, y_frac, 0.);
-	    compute_node(points[1], &*patch, x_frac1, y_frac, 0.);
-	    compute_node(points[2], &*patch, x_frac, y_frac1, 0.);
-	    compute_node(points[3], &*patch, x_frac1, y_frac1, 0.);
+	    compute_node(points[0], &*patch, i1, i2, 0, n_subdivisions);
+	    compute_node(points[1], &*patch, i1+1, i2, 0, n_subdivisions);
+	    compute_node(points[2], &*patch, i1, i2+1, 0, n_subdivisions);
+	    compute_node(points[3], &*patch, i1+1, i2+1, 0, n_subdivisions);
 	    
 	    switch (spacedim)
 	      {
@@ -2596,8 +2622,9 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 				   // first patch. checks against all
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
-  Assert (n_data_sets == patches[0].data.n_rows(),
-	  ExcDimensionMismatch (patches[0].data.n_rows(), n_data_sets));
+  Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
+	  (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
+	  ExcDimensionMismatch (patches[0].points_are_available ? (patches[0].data.n_rows() + spacedim) : patches[0].data.n_rows(), n_data_sets));
   
   
 				   ///////////////////////
@@ -2727,11 +2754,12 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 				   // first patch. checks against all
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
-  Assert (n_data_sets == patches[0].data.n_rows(),
-	  ExcDimensionMismatch (patches[0].data.n_rows(), n_data_sets));
-  
+  Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
+	  (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
+	  ExcDimensionMismatch (patches[0].points_are_available ? (patches[0].data.n_rows() + spacedim) : patches[0].data.n_rows(), n_data_sets));
 
   
+
 				   // first count the number of cells
 				   // and cells for later use
   unsigned int n_nodes;
@@ -2994,11 +3022,12 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 				   // first patch. checks against all
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
-  Assert (n_data_sets == patches[0].data.n_rows(),
-	  ExcDimensionMismatch (patches[0].data.n_rows(), n_data_sets));
-  
+  Assert ((patch[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
+	  (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
+	  ExcDimensionMismatch (patches[0].points_are_available ? (patches[0].data.n_rows() + spacedim) : patches[0].data.n_rows(), n_data_sets));
 
   
+
 				   // first count the number of cells
 				   // and cells for later use
   unsigned int n_nodes;
@@ -3282,8 +3311,9 @@ void DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 				   // first patch. checks against all
 				   // other patches are made in
 				   // write_gmv_reorder_data_vectors
-  Assert (n_data_sets == patches[0].data.n_rows(),
-	  ExcDimensionMismatch (patches[0].data.n_rows(), n_data_sets));
+  Assert ((patches[0].data.n_rows() == n_data_sets && !patches[0].points_are_available) ||
+	  (patches[0].data.n_rows() == n_data_sets+spacedim && patches[0].points_are_available),
+	  ExcDimensionMismatch (patches[0].points_are_available ? (patches[0].data.n_rows() + spacedim) : patches[0].data.n_rows(), n_data_sets));
   
   
 				   ///////////////////////
@@ -3469,7 +3499,12 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
 				   // first patch. the equivalence of
 				   // these two definitions is checked
 				   // in the main function.
-  const unsigned int n_data_sets = patches[0].data.n_rows();
+  
+				   // we have to take care, however, whether the
+				   // points are appended to the end of the
+				   // patch->data table
+  const unsigned int n_data_sets
+    =patches[0].points_are_available ? (patches[0].data.n_rows() - spacedim) : patches[0].data.n_rows();
 
   Assert (data_vectors.size()[0] == n_data_sets,
 	  ExcInternalError());
@@ -3481,8 +3516,9 @@ DataOutBase::write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedi
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
       
-      Assert (patch->data.n_rows() == n_data_sets,
-	      ExcDimensionMismatch (patch->data.n_rows(), n_data_sets));
+      Assert ((patch->data.n_rows() == n_data_sets && !patch->points_are_available) ||
+	      (patch->data.n_rows() == n_data_sets+spacedim && patch->points_are_available),
+	      ExcDimensionMismatch (patch->points_are_available ? (patch->data.n_rows() + spacedim) : patch->data.n_rows(), n_data_sets));
       Assert (patch->data.n_cols() == template_power<dim>(n_subdivisions+1),
 	      ExcInvalidDatasetSize (patch->data.n_cols(), n_subdivisions+1));
       
@@ -4044,6 +4080,8 @@ operator << (std::ostream                           &out,
   out << patch.patch_index << ' ' << patch.n_subdivisions
       << '\n';
 
+  out << patch.points_are_available<<'\n';
+  
   out << patch.data.n_rows() << ' ' << patch.data.n_cols() << '\n';
   for (unsigned int i=0; i<patch.data.n_rows(); ++i)
     for (unsigned int j=0; j<patch.data.n_cols(); ++j)
@@ -4093,7 +4131,7 @@ operator >> (std::istream                     &in,
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     in >> patch.neighbors[i];
 
-  in >> patch.patch_index >> patch.n_subdivisions;
+  in >> patch.patch_index >> patch.n_subdivisions >> patch.points_are_available;
 
   unsigned int n_rows, n_cols;
   in >> n_rows >> n_cols;

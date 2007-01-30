@@ -108,6 +108,10 @@ class ParameterHandler;
  * <tt>n_subdivisions==3</tt> will yield 4 times 4 (times 4) points, etc. The actual
  * location of these points on the patch will be computed by a multilinear
  * transformation from the vertices given for this patch.
+
+ * For cells at the boundary, a mapping might be used to calculate the position
+ * of the inner points. In that case the coordinates are stored inside the
+ * Patch, as they cannot be easily recovered otherwise.
  *
  * Given these comments, the actual data to be printed on this patch of
  * points consists of several data sets each of which has a value at each
@@ -253,6 +257,12 @@ class DataOutBase
     struct Patch
     {
 					 /**
+					  * Make the <tt>spacedim</tt> template
+					  * parameter available.
+					  */
+	static const unsigned int space_dim=spacedim;
+	
+					 /**
 					  * Corner points of a patch.
 					  * Inner points are computed by
 					  * a multilinear transform of
@@ -329,6 +339,23 @@ class DataOutBase
 					  * patches provided.
 					  */
 	Table<2,float> data;
+
+					 /**
+					  * Bool flag indicating, whether the
+					  * coordinates of the inner patch
+					  * points are appended to the @p data
+					  * table (@ true) or not (@ false),
+					  * where the second is the standard and
+					  * can be found for all cells in the
+					  * interior of a domain. On the
+					  * boundary, patch points are evaluated
+					  * using a Mapping and therefore have
+					  * to be stored inside the patch, as
+					  * the Mapping and the corresponding
+					  * boundary information might not be
+					  * available later on.
+					  */
+	bool points_are_available;
 	
 					 /**
 					  * Default constructor. Sets

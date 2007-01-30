@@ -907,18 +907,18 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension>
 				      * additional first parameter
 				      * defines a mapping that is to
 				      * be used in the generation of
-				      * output. For internal reasons,
-				      * even if
+				      * output. If
 				      * <tt>n_subdivisions>1</tt>, the
 				      * points interior of subdivided
-				      * patches are still computed
-				      * from the vertices of the cell,
-				      * i.e. even a higher order
-				      * mapping does not lead to a
+				      * patches which originate from
+				      * cells at the boundary of the
+				      * domain are computed using the
+				      * mapping, i.e. a higher order
+				      * mapping leads to a
 				      * representation of a curved
 				      * boundary by using more
-				      * subdivisions. However, the
-				      * mapping argument can be used
+				      * subdivisions. The
+				      * mapping argument can also be used
 				      * for the Eulerian mappings (see
 				      * class MappingQ1Eulerian) where
 				      * a mapping is used not only to
