@@ -4131,8 +4131,41 @@ operator >> (std::istream                     &in,
   for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
     in >> patch.neighbors[i];
 
-  in >> patch.patch_index >> patch.n_subdivisions >> patch.points_are_available;
+  in >> patch.patch_index >> patch.n_subdivisions;
 
+  {
+				     // we would like to use
+				     //   in >> patch.points_are_available;
+				     // here, but in order to be compatible with
+				     // older versions of the deal.II intermediate
+				     // format, which did not contain this flag,
+				     // we have to do it a bit more complicated.
+    
+    std::string line;
+				     // eat the rest of the previous line
+    getline (in, line);
+				     // now get the line that should contain the
+				     // flag points_are_available
+    getline (in,line);
+    if (line=="1" || line=="true")
+      patch.points_are_available=true;
+    else if (line=="0" || line=="false")
+      patch.points_are_available=false;
+    else
+      {
+					 // this is not the line we searched
+					 // for, so this must be the old format,
+					 // i.e. we have no points available
+	patch.points_are_available=false;
+					 // put back the line, because it needs
+					 // to be read in the following
+	in.putback('\n');
+	for (int c=line.length()-1; c>=0; --c)
+	  in.putback(line[c]);
+	in.putback('\n');
+      }
+  }
+  
   unsigned int n_rows, n_cols;
   in >> n_rows >> n_cols;
   patch.data.reinit (n_rows, n_cols);
