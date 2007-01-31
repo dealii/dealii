@@ -5,7 +5,7 @@
   <link href="../screen.css" rel="StyleSheet">
   <title>The deal.II news page</title>
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors">
+  <meta name="copyright" content="Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors">
   <meta name="date" content="$Date$">
   <meta name="keywords" content="deal.II"></head>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
@@ -211,32 +211,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-
-  <li> <p>Extended: <code>DataOutBase::Patch</code> has been extended by a new
-  boolean flag <tt>points_are_available</tt>, which defaults to
-  <tt>false</tt>. It is set to <tt>true</tt> if the coordinates of the points
-  defining the subdivision of a patch are appended to the <tt>data</tt> table
-  contained in a <code>Patch</code>. This way, <code
-  class="class">DataOut</code>::<code class="member">build_patches()</code> can
-  use a <code class="class">Mapping</code> to represent curved boundaries,
-  especially for higher order elements. This change corresponds to an extension
-  of the intermediate format for graphics.
-  <br>
-  Using the given <code class="class">Mapping</code> to obtain function values
-  in <code class="class">DataOut</code>::<code
-  class="member">build_patches()</code> also fixes a bug for <code
-  class="class">FE_RaviartThomas</code> and <code class="class">FE_ABF</code>
-  elements, which need to evaluate the function values on the real (mapped) cell. 
-  <br>
-  (Tobias Leicht 2007/01/30)
-  </p>
-
-  <li> <p>New: a program <tt>reconfigure</tt> has been added to the
-  deal.II main directory, which reruns <tt>configure</tt> with the sam
-  command line arguments as last time.
-  <br>
-  (GK 2006/10/24)
-  </p>
+  <li> <p>
+       New: a program <tt>reconfigure</tt> has been added to the
+       deal.II main directory, which reruns <tt>configure</tt> with
+       the sam command line arguments as last time.
+       <br>
+       (GK 2006/10/24)
+       </p>
 
   <li> <p>New: The step-25 tutorial program, demonstrating the
        solution of the nonlinear sine-Gordon equation (a variant of
@@ -978,14 +959,37 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+   <li> <p>Extended: <code>DataOutBase::Patch</code> has been extended by
+       a new boolean flag <tt>points_are_available</tt>, which
+       defaults to <tt>false</tt>. It is set to <tt>true</tt> if the
+       coordinates of the points defining the subdivision of a patch
+       are appended to the <tt>data</tt> table contained in a
+       <code>Patch</code>. This way, <code
+       class="class">DataOut</code>::<code
+       class="member">build_patches()</code> can use a <code
+       class="class">Mapping</code> to represent curved boundaries,
+       especially for higher order elements. This change corresponds
+       to an extension of the intermediate format for graphics.
+       <br>
+       Fixed: Using the given <code class="class">Mapping</code> to
+       obtain function values in <code
+       class="class">DataOut</code>::<code
+       class="member">build_patches()</code> also fixes a bug for
+       <code class="class">FE_RaviartThomas</code> and <code
+       class="class">FE_ABF</code>elements, which need to evaluate the
+       function values on the real (mapped) cell.
+       <br>
+       (Tobias Leicht 2007/01/30)
+       </p>
+
   <li> <p> Fixed: On faces with wrong <code>face_orientation</code> the dofs
        have to reordered in order to be combined with the correct shape
        functions. This is only relevant for continuous elements in 3D. At least for
        <code class="class">FE_Q</code> and systems of <code
        class="class">FE_Q</code> this works now, for other finite elements the
        reordering vector still has to be implemented.
-		 <br>
-		 (Tobias Leicht, 2007/01/17)
+       <br>
+       (Tobias Leicht, 2007/01/17)
        </p>
 
   <li> <p>
