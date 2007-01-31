@@ -2000,7 +2000,7 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
   Assert (this->n_rows() == M.n_rows(),
 	  ExcDimensionMismatch(this->n_rows(), M.n_rows()));
 
-  if ((&M == this) && (this->n_cols() <= 4))
+  if (&M == this)
     {
 				       // avoid overwriting source
 				       // by destination matrix:
