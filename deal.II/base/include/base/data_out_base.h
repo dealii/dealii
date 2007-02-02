@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2591,8 +2591,8 @@ class DataOutInterface : private DataOutBase
     void set_flags (const VtkFlags &vtk_flags);
 
     				     /**
-				      * Set the flags to be used for
-				      * output in VTK format.
+				      * Set the flags to be used for output in
+				      * deal.II intermediate format.
 				      */
     void set_flags (const Deal_II_IntermediateFlags &deal_II_intermediate_flags);    
 
@@ -2783,11 +2783,10 @@ class DataOutInterface : private DataOutBase
     VtkFlags     vtk_flags;
 
 				     /**
-				      * Flags to be used upon output
-				      * of vtk data in one space
-				      * dimension. Can be changed by
-				      * using the <tt>set_flags</tt>
-				      * function.
+				      * Flags to be used upon output of
+				      * deal.II intermediate data in one space
+				      * dimension. Can be changed by using the
+				      * <tt>set_flags</tt> function.
 				      */
     Deal_II_IntermediateFlags     deal_II_intermediate_flags;
 };
@@ -2830,7 +2829,7 @@ class DataOutInterface : private DataOutBase
  * into this object, you have to know the template parameters for the space
  * dimension which were used when writing the data. If this knowledge is
  * available at compile time, then this is no problem. However, if it is not
- * (such as in a simple format converted), then it needs to be figured out at
+ * (such as in a simple format converter), then it needs to be figured out at
  * run time, even though the compiler already needs it at compile time. A way
  * around using the DataOutBase::determine_intermediate_format_dimensions()
  * function is explained in @ref step_19 "step-19".
