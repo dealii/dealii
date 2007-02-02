@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,6 +30,11 @@ template <typename number> class Vector;
 //TODO: Find a way to avoid the forward declarations and get rid of dof_handler include files.
 
 template <int celldim, class DH> class DoFObjectAccessor;
+template <class DH> class DoFObjectAccessor<0,DH>;
+template <class DH> class DoFObjectAccessor<1,DH>;
+template <class DH> class DoFObjectAccessor<2,DH>;
+template <class DH> class DoFObjectAccessor<3,DH>;
+
 
 template <int dim, typename Accessor> class TriaRawIterator;
 
