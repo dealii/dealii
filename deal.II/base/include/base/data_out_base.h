@@ -331,12 +331,21 @@ class DataOutBase
 					  * <tt>QIterated</tt> class
 					  * when used with the
 					  * <tt>QTrapez</tt> class as
-					  * subquadrature.					  *
+					  * subquadrature.
+					  *
 					  * Since the number of data vectors
 					  * is usually the same for all
-					  * patches to be printed, <tt>data.size()</tt>
-					  * should yield the same value for all
-					  * patches provided.
+					  * patches to be printed,
+					  * <tt>data.size()</tt> should yield
+					  * the same value for all patches
+					  * provided. The exception are
+					  * patches for which
+					  * points_are_available are set,
+					  * where the actual coordinates of
+					  * the point are appended to the
+					  * 'data' field, see the
+					  * documentation of the
+					  * points_are_available flag.
 					  */
 	Table<2,float> data;
 
@@ -347,13 +356,17 @@ class DataOutBase
 					  * table (@ true) or not (@ false),
 					  * where the second is the standard and
 					  * can be found for all cells in the
-					  * interior of a domain. On the
-					  * boundary, patch points are evaluated
-					  * using a Mapping and therefore have
-					  * to be stored inside the patch, as
-					  * the Mapping and the corresponding
-					  * boundary information might not be
-					  * available later on.
+					  * interior of a domain.
+					  *
+					  * On the boundary of a domain, patch
+					  * points are evaluated using a
+					  * Mapping and therefore have to be
+					  * stored inside the patch, as the
+					  * Mapping and the corresponding
+					  * boundary information are no longer
+					  * available later on when we
+					  * actually write the patch out to an
+					  * output stream.
 					  */
 	bool points_are_available;
 	
