@@ -358,7 +358,7 @@ namespace deal_II_exceptions
 #define Assert(cond, exc)                                           \
   {                                                                 \
     if (!(cond))                                                    \
-      deal_II_exceptions::internals::                               \
+      ::dealii::deal_II_exceptions::internals::			    \
       issue_error_assert_1 (__FILE__,                               \
 			     __LINE__,                              \
 			     __PRETTY_FUNCTION__, #cond, #exc, exc);\
@@ -399,7 +399,7 @@ namespace deal_II_exceptions
 #    define AssertThrow(cond, exc)                                   \
       {                                                              \
         if (!(cond))                                                 \
-          deal_II_exceptions::internals::                            \
+	  ::dealii::deal_II_exceptions::internals::		     \
           issue_error_throw (__FILE__,                               \
 		  	     __LINE__,                               \
 			     __PRETTY_FUNCTION__, #cond, #exc, exc); \
@@ -408,7 +408,7 @@ namespace deal_II_exceptions
 #    define AssertThrow(cond, exc)                                   \
       {                                                              \
         if (__builtin_expect(!(cond), false))                        \
-          deal_II_exceptions::internals::                            \
+	  ::dealii::deal_II_exceptions::internals::		     \
           issue_error_throw (__FILE__,                               \
 		  	     __LINE__,                               \
 			     __PRETTY_FUNCTION__, #cond, #exc, exc); \
@@ -418,7 +418,7 @@ namespace deal_II_exceptions
 #  define AssertThrow(cond, exc)                                    \
     {                                                               \
       if (!(cond))                                                  \
-        deal_II_exceptions::internals::abort ();                    \
+	::dealii::deal_II_exceptions::internals::abort ();	    \
     }
 #endif
 
