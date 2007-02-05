@@ -138,7 +138,7 @@ namespace PETScWrappers
                    const PetscScalar value)
   {
 
-    Assert (!std::isnan(value) && !std::isinf(value), 
+    Assert (deal_II_numbers::is_finite(value),
 	    ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
     if (last_action != LastAction::insert)
