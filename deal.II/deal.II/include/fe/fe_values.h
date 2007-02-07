@@ -713,6 +713,17 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * corresponding to a whole
 				      * discretization.
 				      *
+				      * The vector <tt>indices</tt>
+				      * corresponds to the degrees of
+				      * freedom on a single cell. Its
+				      * length may even be a multiple
+				      * of the number of dofs per
+				      * cell. Then, the vectors in
+				      * <tt>value</tt> should allow
+				      * for the same multiple of the
+				      * components of the finite
+				      * element.
+				      *
 				      * You may want to use this
 				      * function, if you want to
 				      * access just a single block
@@ -739,10 +750,12 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * corresponding to a whole
 				      * discretization.
 				      *
-				      * The length of the vector
-				      * <tt>indices</tt> may even be a
-				      * multiple of the number of dofs
-				      * per cell. Then, the vectors in
+				      * The vector <tt>indices</tt>
+				      * corresponds to the degrees of
+				      * freedom on a single cell. Its
+				      * length may even be a multiple
+				      * of the number of dofs per
+				      * cell. Then, the vectors in
 				      * <tt>value</tt> should allow
 				      * for the same multiple of the
 				      * components of the finite
@@ -781,10 +794,12 @@ class FEValuesBase : protected FEValuesData<dim>,
 				      * corresponding to a whole
 				      * discretization.
 				      *
-				      * The length of the vector
-				      * <tt>indices</tt> may even be a
-				      * multiple of the number of dofs
-				      * per cell. Then, the vectors in
+				      * The vector <tt>indices</tt>
+				      * corresponds to the degrees of
+				      * freedom on a single cell. Its
+				      * length may even be a multiple
+				      * of the number of dofs per
+				      * cell. Then, the vectors in
 				      * <tt>value</tt> should allow
 				      * for the same multiple of the
 				      * components of the finite
