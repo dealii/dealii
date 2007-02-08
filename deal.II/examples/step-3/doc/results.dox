@@ -94,34 +94,37 @@ suggestions:
   to describe your particular boundary values.
   </li>
 
-  <li>
-  Modify the type of boundary condition: Presently, what happens is that we use
-  Dirichlet boundary values all around, since the default is that all boundary
-  parts have boundary indicator zero, and then we tell the
-  <code>VectorTools::interpolate_boundary_values</code> function to interpolate
-  boundary values to zero on all boundary components with indicator zero.
-  <p>
-  We can change this behavior if we assign parts of the boundary different
-  indicators. For example, try this immediately after calling
-  <code>GridGenerator::hyper_cube</code>:
+  <li> Modify the type of boundary condition: Presently, what happens
+  is that we use Dirichlet boundary values all around, since the
+  default is that all boundary parts have boundary indicator zero, and
+  then we tell the
+  <code>VectorTools::interpolate_boundary_values</code> function to
+  interpolate boundary values to zero on all boundary components with
+  indicator zero.  <p> We can change this behavior if we assign parts
+  of the boundary different indicators. For example, try this
+  immediately after calling <code>GridGenerator::hyper_cube</code>:
   <code><pre>
-    triangulation.begin_active()->face(0)->set_boundary_indicator(1);
-  </pre></code>
-  What this does is it first asks the triangulation to return an iterator that
-  points to the first active cell. Of course, this being the coarse mesh for
-  the triangulation of a square, the triangulation has only a single cell at
-  this moment, and it is active. Next, we ask the cell to return an iterator to
-  its first face, and then we ask the face to reset the boundary indicator of
-  that face to 1. What then follows is this: When the mesh is refined, faces of
-  child cells inherit the boundary indicator of their parents, i.e. even on the
-  finest mesh, the faces on one side of the square have boundary indicator
-  1. Later, when we get to interpolating boundary conditions, the
-  <code>interpolate_boundary_values</code> will only produce boundary values
-  for those faces that have zero boundary indicator, and leave those faces
-  alone that have a different boundary indicator. Keeping with the theory of
-  the Laplace equation, this will then lead to homogenous Neumann conditions on
-  this side, i.e. a zero normal derivative of the solution. You will see this
-  if you run the program.
+  triangulation.begin_active()->face(0)->set_boundary_indicator(1);
+  </pre></code> What this does is it first asks the triangulation to
+  return an iterator that points to the first active cell. Of course,
+  this being the coarse mesh for the triangulation of a square, the
+  triangulation has only a single cell at this moment, and it is
+  active. Next, we ask the cell to return an iterator to its first
+  face, and then we ask the face to reset the boundary indicator of
+  that face to 1. What then follows is this: When the mesh is refined,
+  faces of child cells inherit the boundary indicator of their
+  parents, i.e. even on the finest mesh, the faces on one side of the
+  square have boundary indicator 1. Later, when we get to
+  interpolating boundary conditions, the
+  <code>interpolate_boundary_values</code> will only produce boundary
+  values for those faces that have zero boundary indicator, and leave
+  those faces alone that have a different boundary indicator. What
+  this then does is to impose Dirichlet boundary conditions on the
+  former, and homogenous Neumann conditions on the latter (i.e. zero
+  normal derivative of the solution, unless one adds additional terms
+  to the right hand side of the variational equality that deal with
+  potentially non-zero Neumann conditions). You will see this if you
+  run the program.
 
   <li>
   A slight variation of the last point would be to set different boundary
