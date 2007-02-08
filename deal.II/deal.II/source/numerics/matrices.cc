@@ -821,9 +821,9 @@ MatrixCreator::create_mass_matrix_2 (const hp::MappingCollection<dim>       &map
 						 fe_values.shape_value(j,point) *
 						 weight *
 						 coefficient_values[point]);
-			  local_rhs(i) += fe_values.shape_value(i,point) *
-					  rhs_values[point] * weight;
 			}
+		      local_rhs(i) += fe_values.shape_value(i,point) *
+				      rhs_values[point] * weight;
 		    }
 		}
 	    }
@@ -846,9 +846,9 @@ MatrixCreator::create_mass_matrix_2 (const hp::MappingCollection<dim>       &map
 						 fe_values.shape_value(j,point) *
 						 weight *
 						 coefficient_vector_values[point](component_i));
-			  local_rhs(i) += fe_values.shape_value(i,point) *
-					  rhs_values[point] * weight;
-			}
+			}			  
+		      local_rhs(i) += fe_values.shape_value(i,point) *
+				      rhs_values[point] * weight;
 		    }
 		}
 	    }
@@ -868,8 +868,8 @@ MatrixCreator::create_mass_matrix_2 (const hp::MappingCollection<dim>       &map
 		      cell_matrix(i,j) += (fe_values.shape_value(i,point) *
 					   fe_values.shape_value(j,point) *
 					   weight);
-		    local_rhs(i) += v * rhs_values[point] * weight;
 		  }
+		local_rhs(i) += v * rhs_values[point] * weight;
 	      }
 	  }
 
@@ -2115,8 +2115,8 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 				 fe.system_to_component_index(j).first))
 			      cell_matrix(i,j) += (Du * Dv * weight *
 						   coefficient_values[point]);
-			    local_rhs(i) += v * rhs_values[point] * weight;
 			  }
+			local_rhs(i) += v * rhs_values[point] * weight;  
 		      }
 		  }
 	    }
@@ -2140,8 +2140,8 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 				(fe.system_to_component_index(j).first == component_i))
 			      cell_matrix(i,j) += (Du * Dv * weight *
 						   coefficient_vector_values[point](component_i));
-			    local_rhs(i) += v * rhs_values[point] * weight;
 			  }
+			local_rhs(i) += v * rhs_values[point] * weight;
 		      }
 		  }
 	    }
@@ -2161,8 +2161,8 @@ MatrixCreator::create_laplace_matrix_2 (const Mapping<dim>       &mapping,
 			(fe.system_to_component_index(i).first ==
 			 fe.system_to_component_index(j).first))
 		      cell_matrix(i,j) += (Du * Dv * weight);
-		    local_rhs(i) += v * rhs_values[point] * weight;
 		  }
+		local_rhs(i) += v * rhs_values[point] * weight;
 	      }
 	  }
 
@@ -2514,8 +2514,8 @@ MatrixCreator::create_laplace_matrix_2 (const hp::MappingCollection<dim>       &
 				 fe.system_to_component_index(j).first))
 			      cell_matrix(i,j) += (Du * Dv * weight *
 						   coefficient_values[point]);
-			    local_rhs(i) += v * rhs_values[point] * weight;
 			  }
+			local_rhs(i) += v * rhs_values[point] * weight;
 		      }
 		  }
 	    }
@@ -2539,8 +2539,8 @@ MatrixCreator::create_laplace_matrix_2 (const hp::MappingCollection<dim>       &
 				(fe.system_to_component_index(j).first == component_i))
 			      cell_matrix(i,j) += (Du * Dv * weight *
 						   coefficient_vector_values[point](component_i));
-			    local_rhs(i) += v * rhs_values[point] * weight;
 			  }
+			local_rhs(i) += v * rhs_values[point] * weight;
 		      }
 		  }
 	    }
@@ -2560,8 +2560,8 @@ MatrixCreator::create_laplace_matrix_2 (const hp::MappingCollection<dim>       &
 			(fe.system_to_component_index(i).first ==
 			 fe.system_to_component_index(j).first))
 		      cell_matrix(i,j) += (Du * Dv * weight);
-		    local_rhs(i) += v * rhs_values[point] * weight;
 		  }
+		local_rhs(i) += v * rhs_values[point] * weight;
 	      }
 	  }
 

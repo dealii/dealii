@@ -975,6 +975,14 @@ inconvenience this causes.
 <h3>deal.II</h3>
 
 <ol>
+   <li> <p>Fixed: <code class="class">MatrixCreator</code>::<code 
+       class="member">create_mass_matrix</code> and <code class="member">
+       create_laplace_matrix</code> computed wrong values for the right 
+       hand sides. This has been fixed. 
+       <br>
+       (Moritz Allmaras 2007/02/08)
+       </p>
+
    <li> <p>Extended: <code>DataOutBase::Patch</code> has been extended by
        a new boolean flag <tt>points_are_available</tt>, which
        defaults to <tt>false</tt>. It is set to <tt>true</tt> if the
