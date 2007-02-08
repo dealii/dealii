@@ -1234,6 +1234,20 @@ class DataOutBase
 				      */
     struct Deal_II_IntermediateFlags
     {
+					 /**
+					  * An indicator of the
+					  * currect file format
+					  * version used to write
+					  * intermediate format. We do
+					  * not attempt to be backward
+					  * compatible, so this number
+					  * is used only to verify
+					  * that the format we are
+					  * writing is what the
+					  * current readers and
+					  * writers understand.
+					  */
+        static const unsigned int format_version = 2;
       private:
 					 /**
 					  * Dummy entry to suppress compiler

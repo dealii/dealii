@@ -158,7 +158,7 @@ compute_node(
 //TODO: Should this go to the utilities namespace?
 
 // Compute n^dim, where dim is a template parameter
-template<int dim>
+template <int dim>
 inline
 unsigned int template_power (const unsigned int n)
 {
@@ -203,6 +203,8 @@ compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim> >& patches,
 //----------------------------------------------------------------------//
 template <int dim, int spacedim>
 const unsigned int DataOutBase::Patch<dim,spacedim>::space_dim;
+
+const unsigned int DataOutBase::Deal_II_IntermediateFlags::format_version;
 
 
 
@@ -3455,7 +3457,8 @@ write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
 
                                    // then write a header
   out << "[deal.II intermediate format graphics data]" << '\n'
-      << "[written by " << DEAL_II_PACKAGE_STRING << "]" << '\n';
+      << "[written by " << DEAL_II_PACKAGE_STRING << "]" << '\n'
+      << "[Version: " << Deal_II_IntermediateFlags::format_version << "]" << '\n';
 
   out << data_names.size() << '\n';
   for (unsigned int i=0; i<data_names.size(); ++i)
@@ -3939,11 +3942,14 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     tmp.swap (dataset_names);
   }
 
-				   // then check that we have the correct
-				   // header of this file. both the first and
-				   // second real lines have to match, as well
-				   // as the dimension information written
-				   // before that
+				   // then check that we have the
+				   // correct header of this
+				   // file. both the first and second
+				   // real lines have to match, as
+				   // well as the dimension
+				   // information written before that
+				   // and the Version information
+				   // written in the third line
   {
     std::pair<unsigned int, unsigned int>
       dimension_info
@@ -3975,6 +3981,18 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     s << "[written by " << DEAL_II_PACKAGE_STRING << "]";
     
     Assert (header == s.str(), ExcUnexpectedInput(s.str(),header));
+  }  
+  {
+    std::string header;
+    getline (in, header);
+
+    std::ostringstream s;
+    s << "[Version: " << DataOutBase::Deal_II_IntermediateFlags::format_version << "]";
+    
+    Assert (header == s.str(), 
+	    ExcMessage("Invalid or incompatible file format. Intermediate format "
+		       "files can only be read by the same deal.II version as they "
+		       "are written by."));
   }  
   
 				   // then read the rest of the data
