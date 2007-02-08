@@ -2033,6 +2033,12 @@ class DataOutBase
  * is then converted in the present class to the final graphics
  * format.
  *
+ * Note that the intermediate format is what its name suggests: a
+ * direct representation of internal data. It isn't standardized and
+ * will change whenever we change our internal representation. You can
+ * only expect to process files written in this format using the same
+ * version of deal.II that was used for writing.
+ *
  * The reason why we offer to write out this intermediate format is
  * that it can be read back into a deal.II program using the
  * DataOutReader class, which is helpful in at least two contexts:
@@ -2526,6 +2532,19 @@ class DataOutInterface : private DataOutBase
 				      * in deal.II intermediate
 				      * format. See
 				      * DataOut::write_deal_II_intermediate.
+				      *
+				      * Note that the intermediate
+				      * format is what its name
+				      * suggests: a direct
+				      * representation of internal
+				      * data. It isn't standardized
+				      * and will change whenever we
+				      * change our internal
+				      * representation. You can only
+				      * expect to process files
+				      * written in this format using
+				      * the same version of deal.II
+				      * that was used for writing.
 				      */
     void write_deal_II_intermediate (std::ostream &out) const;
     
@@ -2846,7 +2865,12 @@ class DataOutInterface : private DataOutBase
  * run time, even though the compiler already needs it at compile time. A way
  * around using the DataOutBase::determine_intermediate_format_dimensions()
  * function is explained in @ref step_19 "step-19".
- * 
+ *
+ * Note that the intermediate format is what its name suggests: a
+ * direct representation of internal data. It isn't standardized and
+ * will change whenever we change our internal representation. You can
+ * only expect to process files written in this format using the same
+ * version of deal.II that was used for writing.
  *
  * @ingroup input output
  * @author Wolfgang Bangerth, 2005
