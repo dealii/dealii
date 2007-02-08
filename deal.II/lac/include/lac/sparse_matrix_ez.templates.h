@@ -18,6 +18,7 @@
 #include <lac/vector.h>
 
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
 #include <cmath>
 
@@ -435,6 +436,56 @@ SparseMatrixEZ<number>::print (std::ostream &out) const
 	  <<i->value() << std::endl;
       ++i;
     }
+}
+
+
+template <typename number>
+void 
+SparseMatrixEZ<number>::print_formatted ( std::ostream 		&out,
+					  const unsigned int     precision,
+					  const bool 		 scientific,
+					  const unsigned int     width_,
+					  const char* 		 zero_string,
+					  const double 		 denominator) const
+{
+  AssertThrow (out, ExcIO());
+  Assert (m() != 0, ExcNotInitialized());
+  Assert (n() != 0, ExcNotInitialized());
+
+  unsigned int width = width_;
+	
+  std::ios::fmtflags old_flags = out.flags();
+  unsigned int old_precision = out.precision (precision);
+
+  if (scientific)
+    {
+      out.setf (std::ios::scientific, std::ios::floatfield);
+      if (!width)
+	width = precision+7;
+    } else {
+      out.setf (std::ios::fixed, std::ios::floatfield);
+      if (!width)
+	width = precision+2;
+    }
+
+				   // TODO: Skip nonexisting entries
+  for (unsigned int i=0; i<m(); ++i)
+    {
+      for (unsigned int j=0; j<n(); ++j)
+	{
+	  const Entry* entry = locate(i,j);
+	  if (entry)
+	    out << std::setw(width)
+	        << entry->value * denominator << ' ';
+	  else
+	    out << std::setw(width) << zero_string << ' ';
+	}
+      out << std::endl;
+    };
+  
+				   // reset output format
+  out.precision(old_precision);
+  out.flags (old_flags);
 }
 
 
