@@ -245,12 +245,11 @@ class ConstraintMatrix;
  *   is the same as a @p cell_iterator takes when started with @p begin_active and
  *   promoted with the <tt>++</tt> operator.
  *
- *   You can use the @p distribute_cell_to_dof_vector function of the
- *   DoFHandler class to convert cell based data to a data
- *   vector with values on the degrees of freedom, which can then be
- *   added to a DataOut object to be printed. But also you can
- *   add a cell based data vector itself to a DataOut object,
- *   see the @p DataOut::add_data_vector functions.
+ *   This data, one number per active cell, can be used to generate
+ *   graphical output by directly passing it to the DataOut class
+ *   through the DataOut::add_data_vector function. Alternatively, it
+ *   can be interpolated to the nodal points of a finite element field
+ *   using the DoFTools::distribute_cell_to_dof_vector function.
  *
  *   Presently, there is the possibility to compute the following values from the
  *   difference, on each cell: @p mean, @p L1_norm, @p L2_norm, @p Linfty_norm,
