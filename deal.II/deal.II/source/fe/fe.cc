@@ -340,8 +340,11 @@ template <int dim>
 unsigned int
 FiniteElement<dim>::adjust_quad_dof_index_for_face_orientation (const unsigned int) const
 {
-				   // general template for 1D and 2D: not implemented
-  Assert (false, ExcNotImplemented());
+				   // general template for 1D and 2D: not
+				   // implemented. in fact, the function
+				   // shouldn't even be called unless we are
+				   // in 3d, so throw an internal error
+  Assert (false, ExcInternalError());
   return deal_II_numbers::invalid_unsigned_int;
 }
 
@@ -351,6 +354,15 @@ template <>
 unsigned int
 FiniteElement<3>::adjust_quad_dof_index_for_face_orientation (const unsigned int index) const
 {
+				   // adjust dofs on 3d faces if the face is
+				   // flipped. note that we query a table that
+				   // derived elements need to have set up
+				   // front. the exception are discontinuous
+				   // elements for which there should be no
+				   // face dofs anyway (i.e. dofs_per_quad==0
+				   // in 3d), so we don't need the table, but
+				   // the function should also not have been
+				   // called
   Assert (index<this->dofs_per_quad, ExcIndexRange(index,0,this->dofs_per_quad));
   Assert (adjust_quad_dof_index_for_face_orientation_table.size()==this->dofs_per_quad,
 	  ExcInternalError());
