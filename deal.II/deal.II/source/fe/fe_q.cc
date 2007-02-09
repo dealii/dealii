@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -810,11 +810,10 @@ template <>
 void
 FE_Q<3>::initialize_quad_dof_index_permutation ()
 {
-
   Assert (adjust_quad_dof_index_for_face_orientation_table.size()==this->dofs_per_quad,
 	  ExcInternalError());
 
-  unsigned int points=this->degree-1;
+  const unsigned int points = this->degree-1;
   Assert(points*points==this->dofs_per_quad, ExcInternalError());
 		
   for (unsigned int local=0; local<this->dofs_per_quad; ++local)
@@ -822,7 +821,7 @@ FE_Q<3>::initialize_quad_dof_index_permutation ()
 				     // ordering with x running fastest. invert
 				     // that (y running fastest)
     this->adjust_quad_dof_index_for_face_orientation_table[local]
-      =(local%points)*points + local/points - local;
+      = (local%points)*points + local/points - local;
 }
 
 #endif
