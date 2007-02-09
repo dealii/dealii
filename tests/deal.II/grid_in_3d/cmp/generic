@@ -15,44 +15,14 @@ DEAL::Reading grid_in_3d_evil_0.in
 DEAL::  10 active cells
 DEAL::  hash=318
 DEAL::Reading grid_in_3d_evil_1.in
-DEAL::  caught exception:
-DEAL::--------------------------------------------------------
-An error occurred in file <grid_reordering.cc> in function
-    void dealii::internal::GridReordering3d::Orienter::orient_edges()
-The violated condition was: 
-    cell_is_consistent(cur_posn)
-The name and call sequence of the exception was:
-    ExcGridOrientError("Mesh is Unorientable")
-Additional Information: 
-Grid Orientation Error: Mesh is Unorientable
---------------------------------------------------------
-
+DEAL::  10 active cells
+DEAL::  hash=317
 DEAL::Reading grid_in_3d_evil_2.in
-DEAL::  caught exception:
-DEAL::--------------------------------------------------------
-An error occurred in file <grid_reordering.cc> in function
-    void dealii::internal::GridReordering3d::Orienter::orient_edges()
-The violated condition was: 
-    cell_is_consistent(cur_posn)
-The name and call sequence of the exception was:
-    ExcGridOrientError("Mesh is Unorientable")
-Additional Information: 
-Grid Orientation Error: Mesh is Unorientable
---------------------------------------------------------
-
+DEAL::  10 active cells
+DEAL::  hash=313
 DEAL::Reading grid_in_3d_evil_3.in
-DEAL::  caught exception:
-DEAL::--------------------------------------------------------
-An error occurred in file <grid_reordering.cc> in function
-    void dealii::internal::GridReordering3d::Orienter::orient_edges()
-The violated condition was: 
-    cell_is_consistent(cur_posn)
-The name and call sequence of the exception was:
-    ExcGridOrientError("Mesh is Unorientable")
-Additional Information: 
-Grid Orientation Error: Mesh is Unorientable
---------------------------------------------------------
-
+DEAL::  10 active cells
+DEAL::  hash=314
 DEAL::Reading grid_in_3d_evil_4.in
 DEAL::  10 active cells
 DEAL::  hash=318
