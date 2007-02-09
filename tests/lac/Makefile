@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -29,7 +29,8 @@ tests_x = vector-vector \
 	matrix_lib matrix_out pointer_matrix pointer_matrix_vector \
 	solver eigen \
 	sparse_ilu sparse_ilu_t lapack_fill block_minres \
-	identity_matrix* trace
+	identity_matrix* trace \
+	print_formatted_*
 
 
 # from above list of regular expressions, generate the real set of
