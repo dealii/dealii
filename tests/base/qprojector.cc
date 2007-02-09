@@ -106,7 +106,7 @@ void check_faces (Quadrature<1>& q1)
 	      << std::endl;
 
       unsigned int
-	offset = QProjector<dim>::DataSetDescriptor::face(f, false, nqs);
+	offset = QProjector<dim>::DataSetDescriptor::face(f, false, false, false, nqs);
       
       for (unsigned int k=0;k<nqs;++k)
 	deallog << faces.point(offset+k) << std::endl;
@@ -115,7 +115,7 @@ void check_faces (Quadrature<1>& q1)
 	      << " orientation true"
 	      << std::endl;
       
-      offset = QProjector<dim>::DataSetDescriptor::face(f, true, nqs);
+      offset = QProjector<dim>::DataSetDescriptor::face(f, true, false, false, nqs);
       
       for (unsigned int k=0;k<nqs;++k)
 	deallog << faces.point(offset+k) << std::endl;
