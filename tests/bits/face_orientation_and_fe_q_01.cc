@@ -16,6 +16,9 @@
 // face_orientation==false. for p>=3, we need to revert the order of dofs
 // somehow between the two sides of the face.  this test is derived from
 // deal.II/project_q_03
+//
+// this test only tests the whole thing for p==3, since higher polynomial
+// degrees take forever to test. this should, at one point, probably be fixed
 
 char logname[] = "face_orientation_and_fe_q_01/output";
 
