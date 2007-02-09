@@ -1112,6 +1112,32 @@ namespace internal
 	  master_dof_mask[*i] = true;
       }
 
+
+
+				       /**
+					* Make sure that the mask exists that
+					* determines which dofs will be the
+					* masters on refined faces where an
+					* fe1 and a fe2 meet.
+					*/
+      template <int dim>
+      void
+      ensure_existence_of_master_dof_mask (const FiniteElement<dim> &fe1,
+					   const FiniteElement<dim> &fe2,
+					   const FullMatrix<double> &face_interpolation_matrix,
+					   boost::shared_ptr<std::vector<bool> > &master_dof_mask)
+      {
+	if (master_dof_mask == 0)
+	  {
+	    master_dof_mask = boost::shared_ptr<std::vector<bool> >
+			      (new std::vector<bool> (fe1.dofs_per_face));
+	    select_master_dofs_for_face_restriction (fe1,
+						     fe2,
+						     face_interpolation_matrix,
+						     *master_dof_mask);
+	  }
+      }
+      
       
                                        /**
                                         * Make sure that the given @p
@@ -1924,6 +1950,15 @@ namespace internal
       Table<2,boost::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > > >
         split_face_interpolation_matrices (n_finite_elements (dof_handler),
 					   n_finite_elements (dof_handler));
+
+				       // finally, for each pair of finite
+				       // elements, have a mask that states
+				       // which of the degrees of freedom on
+				       // the coarse side of a refined face
+				       // will act as master dofs.
+      Table<2,boost::shared_ptr<std::vector<bool> > >
+	master_dof_masks (n_finite_elements (dof_handler),
+			  n_finite_elements (dof_handler));
       
 				       // loop over all faces
 				       //
@@ -2191,19 +2226,21 @@ namespace internal
 						     // master and slave
 						     // components. invert the
 						     // master component
-//TODO[WB]: cache this mask as well		    
-		    std::vector<bool> master_dof_mask (cell->get_fe().dofs_per_face);
-		    select_master_dofs_for_face_restriction (cell->get_fe(),
-							     dominating_fe,
-							     (*face_interpolation_matrices
-							      [dominating_fe_index]
-							      [cell->active_fe_index()]),
-							     master_dof_mask);
+		    ensure_existence_of_master_dof_mask
+		      (cell->get_fe(),
+		       dominating_fe,
+		       (*face_interpolation_matrices
+			[dominating_fe_index]
+			[cell->active_fe_index()]),
+		       master_dof_masks
+		       [dominating_fe_index]
+		       [cell->active_fe_index()]);
 		    
 		    ensure_existence_of_split_face_matrix
 		      (*face_interpolation_matrices
                        [dominating_fe_index][cell->active_fe_index()],
-		       master_dof_mask,
+		       (*master_dof_masks
+			[dominating_fe_index][cell->active_fe_index()]),
 		       split_face_interpolation_matrices
                        [dominating_fe_index][cell->active_fe_index()]);
 		    
@@ -2246,7 +2283,8 @@ namespace internal
 		    master_dofs.clear ();
 		    slave_dofs.clear ();
 		    for (unsigned int i=0; i<cell->get_fe().dofs_per_face; ++i)
-		      if (master_dof_mask[i] == true)
+		      if ((*master_dof_masks
+			   [dominating_fe_index][cell->active_fe_index()])[i] == true)
 			master_dofs.push_back (scratch_dofs[i]);
 		      else
 			slave_dofs.push_back (scratch_dofs[i]);
@@ -2490,6 +2528,7 @@ namespace internal
     }
   }
 }
+
 
 
 
